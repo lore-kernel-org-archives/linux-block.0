@@ -2,239 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A692C43334
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 12:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72025C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 13:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234877AbiF3Mdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 08:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42470 "EHLO
+        id S233226AbiF3NKW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 09:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234855AbiF3Mdi (ORCPT
+        with ESMTP id S230305AbiF3NKV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 08:33:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6ADD334B97
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 05:33:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656592416;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cgnrW5cxLH48CnZyxRoYJ8gOY4LsyuFZedpGVmm6qFI=;
-        b=b4NwW4MbHSljygQawo0uDvJ1u+9cxbeL7HB6eQAROPTGyVwhuDT/yizJeLkhX5tFWHAy69
-        ZkFT1rGey5NhbGiHo2BrLZWcP2VCEK6UINHstFyjY+sWRJeAfDcvPgVGcfUnUOKKzYXO2s
-        oS/d8cRRrk8dUMUqgNgql66EGEZFRjA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-410-OqXdsN7APpq7dDidBfWA8Q-1; Thu, 30 Jun 2022 08:33:33 -0400
-X-MC-Unique: OqXdsN7APpq7dDidBfWA8Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C3AE801233;
-        Thu, 30 Jun 2022 12:33:32 +0000 (UTC)
-Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EC292026D64;
-        Thu, 30 Jun 2022 12:33:25 +0000 (UTC)
-Date:   Thu, 30 Jun 2022 20:33:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com
-Subject: Re: [PATCH V3 1/1] ublk: add io_uring based userspace block driver
-Message-ID: <Yr2YEIoBPOLxq6NB@T590>
-References: <20220628160807.148853-1-ming.lei@redhat.com>
- <20220628160807.148853-2-ming.lei@redhat.com>
- <fdd06581-a8aa-5948-6043-fc7e3381eb2d@linux.alibaba.com>
+        Thu, 30 Jun 2022 09:10:21 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4E722BCE
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 06:10:16 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id dw10-20020a17090b094a00b001ed00a16eb4so2801445pjb.2
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 06:10:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=G4bLlDbGum0qb3IbsWjcup0EsY9KhuiCtpjJmTBamCs=;
+        b=ZVvAl4tpb2fSc6YkelD54V0gMKmTtvxa7vCPkoTXLZB8QWMEwJebi1KLcbpkkACTyX
+         fPQ1gH1iw7sEGgOKZSBNfJJEpIl2JM/Z6IGZTkZCasIzN9UrVTtnhvJmAKmYZTBBSqob
+         q94D6DOJpZcOYDTktGGzsn1bbQUTiJnCToKDDE4lSydRK7a5vmm/HxGQTFMjuNUyxnlu
+         05k3SYnqTji/0ukl+Z5FcHvaEvWcSLXM9NSPmljBaxO7/w9peh9EK3r9OAXJyyl3bGpU
+         dktstq7ehOiKJQ22gHW2wKpk99kcVzb6TM50C5PToHv6/KdEJbfDvpCQ05pudCg/tVIL
+         Iz+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=G4bLlDbGum0qb3IbsWjcup0EsY9KhuiCtpjJmTBamCs=;
+        b=eWJa/Kr6uFPt7nnryuzgj+326ncTnB7fdkBLxJPieeHx/sop4sno6v2QhsIKyDGghY
+         +Gl96o1JoE4LEC7qJVl+7TJrn5YFSP4FYpFZNlip1Vi+a12e3P1ATsBDcroQSNozZ0mW
+         17WUtRQZrdCxok74M0DZozaV+ch0dTyip4jQGbx81F3QcoHKMB5eg/tImNrpZn3tfbhb
+         +BMgcYBSbiIRtLhn1EX+UFazbLla6P4R+n5l2EF7Nwq5K3MufqMXsKf/eIxstpDEcY4c
+         uZG74vETLOPU6ukYPEe5xVC7cfk6+ct6ArSd1kpBklcXyKC95NmUusgmvwDME3H21UHt
+         bI9Q==
+X-Gm-Message-State: AJIora+IzoQ463b9eq066cmSTKNYv8i28nm+cmCTUQEQZ/TKVj9BJXv/
+        GbrdSa4HLLaJ6EywTeOgvkCU6A==
+X-Google-Smtp-Source: AGRyM1tobyytABbKIJoPSwwfqrpszougg0VkfWQ3lfNaLzQLQO9ET5B5PhZFxXp7AsaFZqwzdwQcNw==
+X-Received: by 2002:a17:902:e888:b0:16a:1b3d:aac4 with SMTP id w8-20020a170902e88800b0016a1b3daac4mr15788906plg.80.1656594616335;
+        Thu, 30 Jun 2022 06:10:16 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id c18-20020a621c12000000b0051bbd79fc9csm13544285pfc.57.2022.06.30.06.10.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jun 2022 06:10:15 -0700 (PDT)
+Message-ID: <a0e96da3-bc4a-3714-c186-2fcfb1fb8bcc@kernel.dk>
+Date:   Thu, 30 Jun 2022 07:10:14 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fdd06581-a8aa-5948-6043-fc7e3381eb2d@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 0/2] blk-cgroup: duplicated code refactor
+Content-Language: en-US
+To:     John Garry <john.garry@huawei.com>,
+        Jason Yan <yanaijie@huawei.com>, tj@kernel.org, jack@suse.cz,
+        hch@lst.de
+Cc:     linux-block@vger.kernel.org
+References: <20220629070917.3113016-1-yanaijie@huawei.com>
+ <2ba24ea6-df8f-3afb-1526-bfb5916f2fcf@kernel.dk>
+ <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 07:35:11PM +0800, Ziyang Zhang wrote:
-> On 2022/6/29 00:08, Ming Lei wrote:
+On 6/30/22 2:16 AM, John Garry wrote:
+> On 29/06/2022 18:09, Jens Axboe wrote:
+>> Like I told Yu, stop using the huawei email until your MTA
+>> misconfiguration issues are fixed. They end up in spam and risk getting
+>> lost. This series was one of them.
 > 
-> [...]
+> Hi Jens,
 > 
-> > +#define UBLK_MAX_PIN_PAGES	32
-> > +
-> > +static inline void ublk_release_pages(struct ublk_queue *ubq, struct page **pages,
-> > +		int nr_pages)
-> > +{
-> > +	int i;
-> > +
-> > +	for (i = 0; i < nr_pages; i++)
-> > +		put_page(pages[i]);
-> > +}
-> > +
-> > +static inline int ublk_pin_user_pages(struct ublk_queue *ubq, u64 start_vm,
-> > +		unsigned int nr_pages, unsigned int gup_flags,
-> > +		struct page **pages)
-> > +{
-> > +	return get_user_pages_fast(start_vm, nr_pages, gup_flags, pages);
-> > +}
-> 
-> > +
-> > +static inline unsigned ublk_copy_bv(struct bio_vec *bv, void **bv_addr,
-> > +		void *pg_addr, unsigned int *pg_off,
-> > +		unsigned int *pg_len, bool to_bv)
-> > +{
-> > +	unsigned len = min_t(unsigned, bv->bv_len, *pg_len);
-> > +
-> > +	if (*bv_addr == NULL)
-> > +		*bv_addr = kmap_local_page(bv->bv_page);
-> > +
-> > +	if (to_bv)
-> > +		memcpy(*bv_addr + bv->bv_offset, pg_addr + *pg_off, len);
-> > +	else
-> > +		memcpy(pg_addr + *pg_off, *bv_addr + bv->bv_offset, len);
-> > +
-> > +	bv->bv_offset += len;
-> > +	bv->bv_len -= len;
-> > +	*pg_off += len;
-> > +	*pg_len -= len;
-> > +
-> > +	if (!bv->bv_len) {
-> > +		kunmap_local(*bv_addr);
-> > +		*bv_addr = NULL;
-> > +	}
-> > +
-> > +	return len;
-> > +}
-> > +
-> > +/* copy rq pages to ublksrv vm address pointed by io->addr */
-> > +static int ublk_copy_pages(struct ublk_queue *ubq, struct request *rq, bool to_rq,
-> > +		unsigned int max_bytes)
-> > +{
-> > +	unsigned int gup_flags = to_rq ? 0 : FOLL_WRITE;
-> > +	struct ublk_io *io = &ubq->ios[rq->tag];
-> > +	struct page *pgs[UBLK_MAX_PIN_PAGES];
-> > +	struct req_iterator req_iter;
-> > +	struct bio_vec bv;
-> > +	const unsigned int rq_bytes = min(blk_rq_bytes(rq), max_bytes);
-> > +	unsigned long start = io->addr, left = rq_bytes;
-> > +	unsigned int idx = 0, pg_len = 0, pg_off = 0;
-> > +	int nr_pin = 0;
-> > +	void *pg_addr = NULL;
-> > +	struct page *curr = NULL;
-> > +
-> > +	rq_for_each_segment(bv, rq, req_iter) {
-> > +		unsigned len, bv_off = bv.bv_offset, bv_len = bv.bv_len;
-> > +		void *bv_addr = NULL;
-> > +
-> > +refill:
-> > +		if (pg_len == 0) {
-> > +			unsigned int off = 0;
-> > +
-> > +			if (pg_addr) {
-> > +				kunmap_local(pg_addr);
-> > +				if (!to_rq)
-> > +					set_page_dirty_lock(curr);
-> > +				pg_addr = NULL;
-> > +			}
-> > +
-> > +			/* refill pages */
-> > +			if (idx >= nr_pin) {
-> > +				unsigned int max_pages;
-> > +
-> > +				ublk_release_pages(ubq, pgs, nr_pin);
-> > +
-> > +				off = start & (PAGE_SIZE - 1);
-> > +				max_pages = min_t(unsigned, (off + left +
-> > +						PAGE_SIZE - 1) >> PAGE_SHIFT,
-> > +						UBLK_MAX_PIN_PAGES);
-> > +				nr_pin = ublk_pin_user_pages(ubq, start,
-> > +						max_pages, gup_flags, pgs);
-> > +				if (nr_pin < 0)
-> > +					goto exit;
-> > +				idx = 0;
-> > +			}
-> > +			pg_off = off;
-> > +			pg_len = min(PAGE_SIZE - off, left);
-> > +			off = 0;
-> > +			curr = pgs[idx++];
-> > +			pg_addr = kmap_local_page(curr);
-> > +		}
-> > +
-> > +		len = ublk_copy_bv(&bv, &bv_addr, pg_addr, &pg_off, &pg_len,
-> > +				to_rq);
-> > +		/* either one of the two has been consumed */
-> > +		WARN_ON_ONCE(bv.bv_len && pg_len);
-> > +		start += len;
-> > +		left -= len;
-> > +
-> > +		/* overflow */
-> > +		WARN_ON_ONCE(left > rq_bytes);
-> > +		WARN_ON_ONCE(bv.bv_len > bv_len);
-> > +		if (bv.bv_len)
-> > +			goto refill;
-> > +
-> > +		bv.bv_len = bv_len;
-> > +		bv.bv_offset = bv_off;
-> > +	}
-> > +	if (pg_addr) {
-> > +		kunmap_local(pg_addr);
-> > +		if (!to_rq)
-> > +			set_page_dirty_lock(curr);
-> > +	}
-> > +	ublk_release_pages(ubq, pgs, nr_pin);
-> > +
-> > +exit:
-> > +	return rq_bytes - left;
-> > +}
-> > +
-> 
-> Hi Ming, 
-> 
-> I note that you pin the user buffer's pages, memcpy() and release them immediately.
-> 
-> 1) I think maybe copy_page_from_iter() is another choice for copying user buffer to biovecs
->    since copy_page_from_iter() do not pin pages(But it may raise page fault).
+> Just wondering - are there any of my mails in your spam folder?
 
-copy_page_from_iter/copy_page_to_iter needs the userspage page,
-then copy between the userspace page and bvec_iter pages, what it does
-is just kmap/copy/kunmap.
+Don't recall seeing any of yours in spam.
 
-Not see it is useful here.
-
-> 
-> 2) Or will you design some mechanism such as LRU to manage these pinned pages? 
->    For example pin those pages frequently required for a long time and release
->    those pages not used for a long time.
->    I remember you have talked about this LRU on pinned pages?
-
-I'd explain it a bit.
-
-When I worked on v1/v2, 'perf report' shows that get_user_pages_fast()
-as one of top samples. Turns out it is a bug, which is fixed in
-
-https://github.com/ming1/linux/commit/3c9fd476951759858cc548dee4cedc074194d0b0
-
-After the issue is fixed, not see get_user_pages_fast() being hot spot
-any more. I actually implemented one patch which pins all pages in
-the ubd device whole lifetime, but not see obvious improvement, so I gave
-up the idea.
-
-In the test VM on my laptop, single job ubd/null randwrite can reach 700K iops.
-
-> 
-> Which one do you think is better? copy_page_from_iter() or pin pages with LRU?
-> Maybe it depends on the user's workload?
-
-So far in the enablement stage, I think the current approach is just fine,
-but we still can improve it in future.
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
