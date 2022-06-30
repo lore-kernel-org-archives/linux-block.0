@@ -2,87 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72025C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 13:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACC5C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 14:57:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233226AbiF3NKW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 09:10:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48062 "EHLO
+        id S235428AbiF3O5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 10:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230305AbiF3NKV (ORCPT
+        with ESMTP id S235407AbiF3O5H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 09:10:21 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4E722BCE
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 06:10:16 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id dw10-20020a17090b094a00b001ed00a16eb4so2801445pjb.2
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 06:10:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=G4bLlDbGum0qb3IbsWjcup0EsY9KhuiCtpjJmTBamCs=;
-        b=ZVvAl4tpb2fSc6YkelD54V0gMKmTtvxa7vCPkoTXLZB8QWMEwJebi1KLcbpkkACTyX
-         fPQ1gH1iw7sEGgOKZSBNfJJEpIl2JM/Z6IGZTkZCasIzN9UrVTtnhvJmAKmYZTBBSqob
-         q94D6DOJpZcOYDTktGGzsn1bbQUTiJnCToKDDE4lSydRK7a5vmm/HxGQTFMjuNUyxnlu
-         05k3SYnqTji/0ukl+Z5FcHvaEvWcSLXM9NSPmljBaxO7/w9peh9EK3r9OAXJyyl3bGpU
-         dktstq7ehOiKJQ22gHW2wKpk99kcVzb6TM50C5PToHv6/KdEJbfDvpCQ05pudCg/tVIL
-         Iz+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=G4bLlDbGum0qb3IbsWjcup0EsY9KhuiCtpjJmTBamCs=;
-        b=eWJa/Kr6uFPt7nnryuzgj+326ncTnB7fdkBLxJPieeHx/sop4sno6v2QhsIKyDGghY
-         +Gl96o1JoE4LEC7qJVl+7TJrn5YFSP4FYpFZNlip1Vi+a12e3P1ATsBDcroQSNozZ0mW
-         17WUtRQZrdCxok74M0DZozaV+ch0dTyip4jQGbx81F3QcoHKMB5eg/tImNrpZn3tfbhb
-         +BMgcYBSbiIRtLhn1EX+UFazbLla6P4R+n5l2EF7Nwq5K3MufqMXsKf/eIxstpDEcY4c
-         uZG74vETLOPU6ukYPEe5xVC7cfk6+ct6ArSd1kpBklcXyKC95NmUusgmvwDME3H21UHt
-         bI9Q==
-X-Gm-Message-State: AJIora+IzoQ463b9eq066cmSTKNYv8i28nm+cmCTUQEQZ/TKVj9BJXv/
-        GbrdSa4HLLaJ6EywTeOgvkCU6A==
-X-Google-Smtp-Source: AGRyM1tobyytABbKIJoPSwwfqrpszougg0VkfWQ3lfNaLzQLQO9ET5B5PhZFxXp7AsaFZqwzdwQcNw==
-X-Received: by 2002:a17:902:e888:b0:16a:1b3d:aac4 with SMTP id w8-20020a170902e88800b0016a1b3daac4mr15788906plg.80.1656594616335;
-        Thu, 30 Jun 2022 06:10:16 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c18-20020a621c12000000b0051bbd79fc9csm13544285pfc.57.2022.06.30.06.10.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jun 2022 06:10:15 -0700 (PDT)
-Message-ID: <a0e96da3-bc4a-3714-c186-2fcfb1fb8bcc@kernel.dk>
-Date:   Thu, 30 Jun 2022 07:10:14 -0600
+        Thu, 30 Jun 2022 10:57:07 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2EB831DA7E;
+        Thu, 30 Jun 2022 07:57:06 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E7FC61063;
+        Thu, 30 Jun 2022 07:57:05 -0700 (PDT)
+Received: from [10.57.85.25] (unknown [10.57.85.25])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8C5A3F66F;
+        Thu, 30 Jun 2022 07:57:01 -0700 (PDT)
+Message-ID: <f9c1e41b-d2a8-61fe-0888-4f0f988912a7@arm.com>
+Date:   Thu, 30 Jun 2022 15:56:56 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v3 0/2] blk-cgroup: duplicated code refactor
-Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>,
-        Jason Yan <yanaijie@huawei.com>, tj@kernel.org, jack@suse.cz,
-        hch@lst.de
-Cc:     linux-block@vger.kernel.org
-References: <20220629070917.3113016-1-yanaijie@huawei.com>
- <2ba24ea6-df8f-3afb-1526-bfb5916f2fcf@kernel.dk>
- <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v7 08/21] iommu/dma: support PCI P2PDMA pages in dma-iommu
+ map_sg
+Content-Language: en-GB
+To:     Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
+References: <20220615161233.17527-1-logang@deltatee.com>
+ <20220615161233.17527-9-logang@deltatee.com>
+ <feecc6fe-a16e-11f2-33c8-3de7c96b9ad5@arm.com>
+ <f56181fb-7035-a775-22b1-77f97d6ec52c@deltatee.com>
+ <7f0673e1-433b-65fb-1d2b-c3e4adeebf87@arm.com>
+ <626de61d-e85e-bc9f-9e3d-836a408c859f@deltatee.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <626de61d-e85e-bc9f-9e3d-836a408c859f@deltatee.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/22 2:16 AM, John Garry wrote:
-> On 29/06/2022 18:09, Jens Axboe wrote:
->> Like I told Yu, stop using the huawei email until your MTA
->> misconfiguration issues are fixed. They end up in spam and risk getting
->> lost. This series was one of them.
+On 2022-06-29 23:41, Logan Gunthorpe wrote:
 > 
-> Hi Jens,
 > 
-> Just wondering - are there any of my mails in your spam folder?
+> On 2022-06-29 13:15, Robin Murphy wrote:
+>> On 2022-06-29 16:57, Logan Gunthorpe wrote:
+>>>
+>>>
+>>>
+>>> On 2022-06-29 06:07, Robin Murphy wrote:
+>>>> On 2022-06-15 17:12, Logan Gunthorpe wrote:
+>>>>> When a PCI P2PDMA page is seen, set the IOVA length of the segment
+>>>>> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
+>>>>> apply the appropriate bus address to the segment. The IOVA is not
+>>>>> created if the scatterlist only consists of P2PDMA pages.
+>>>>>
+>>>>> A P2PDMA page may have three possible outcomes when being mapped:
+>>>>>      1) If the data path between the two devices doesn't go through
+>>>>>         the root port, then it should be mapped with a PCI bus address
+>>>>>      2) If the data path goes through the host bridge, it should be
+>>>>> mapped
+>>>>>         normally with an IOMMU IOVA.
+>>>>>      3) It is not possible for the two devices to communicate and thus
+>>>>>         the mapping operation should fail (and it will return
+>>>>> -EREMOTEIO).
+>>>>>
+>>>>> Similar to dma-direct, the sg_dma_mark_pci_p2pdma() flag is used to
+>>>>> indicate bus address segments. On unmap, P2PDMA segments are skipped
+>>>>> over when determining the start and end IOVA addresses.
+>>>>>
+>>>>> With this change, the flags variable in the dma_map_ops is set to
+>>>>> DMA_F_PCI_P2PDMA_SUPPORTED to indicate support for P2PDMA pages.
+>>>>>
+>>>>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>>>>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>>>>> ---
+>>>>>     drivers/iommu/dma-iommu.c | 68
+>>>>> +++++++++++++++++++++++++++++++++++----
+>>>>>     1 file changed, 61 insertions(+), 7 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+>>>>> index f90251572a5d..b01ca0c6a7ab 100644
+>>>>> --- a/drivers/iommu/dma-iommu.c
+>>>>> +++ b/drivers/iommu/dma-iommu.c
+>>>>> @@ -21,6 +21,7 @@
+>>>>>     #include <linux/iova.h>
+>>>>>     #include <linux/irq.h>
+>>>>>     #include <linux/list_sort.h>
+>>>>> +#include <linux/memremap.h>
+>>>>>     #include <linux/mm.h>
+>>>>>     #include <linux/mutex.h>
+>>>>>     #include <linux/pci.h>
+>>>>> @@ -1062,6 +1063,16 @@ static int __finalise_sg(struct device *dev,
+>>>>> struct scatterlist *sg, int nents,
+>>>>>             sg_dma_address(s) = DMA_MAPPING_ERROR;
+>>>>>             sg_dma_len(s) = 0;
+>>>>>     +        if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
+>>>>
+>>>> Logically, should we not be able to use sg_is_dma_bus_address() here? I
+>>>> think it should be feasible, and simpler, to prepare the p2p segments
+>>>> up-front, such that at this point all we need to do is restore the
+>>>> original length (if even that, see below).
+>>>
+>>> Per my previous email, no, because sg_is_dma_bus_address() is not set
+>>> yet and not meant to tell you something about the page. That flag will
+>>> be set below by pci_p2pdma_map_bus_segment() and then checkd in
+>>> iommu_dma_unmap_sg() to determine if the dma_address in the segment
+>>> needs to be unmapped.
+>>
+>> I know it's not set yet as-is; I'm suggesting things should be
+>> restructured so that it *would be*. In the logical design of this code,
+>> the DMA addresses are effectively determined in iommu_dma_map_sg(), and
+>> __finalise_sg() merely converts them from a relative to an absolute form
+>> (along with undoing the other trickery). Thus the call to
+>> pci_p2pdma_map_bus_segment() absolutely belongs in the main
+>> iommu_map_sg() loop.
+> 
+> I don't see how that can work: __finalise_sg() does more than convert
+> them from relative to absolute, it also figures out which SG entry will
+> contain which dma_address segment. Which segment a P2PDMA address needs
+> to be programmed into depends on the how 'cur' is calculated which in
+> turn depends on things like seg_mask and max_len. This calculation is
+> not done in iommu_dma_map_sg() so I don't see how there's any hope of
+> assigning the bus address for the P2P segments in that function.
+> 
+> If there's a way to restructure things so that's possible that I'm not
+> seeing, I'm open to it but it's certainly not immediately obvious.
 
-Don't recall seeing any of yours in spam.
+Huh? It's still virtually the same thing; iommu_dma_map_sg() calls 
+pci_p2pdma_map_bus_segment(s) and sets s->length to 0 if 
+PCI_P2PDMA_MAP_BUS_ADDR, then __finalise_sg() can use 
+sg_is_dma_bus_address(s) in place of is_pci_p2pdma_page(sg_page(s)), and 
+just propagate the DMA address and original length from s to cur.
 
--- 
-Jens Axboe
+Here you've written a patch which looks to correctly interrupt any 
+ongoing concatenation state and convey some data from the given input 
+segment to the appropriate output segment, so I'm baffled by why you'd 
+think you couldn't do what you've already done.
 
+Thanks,
+Robin.
