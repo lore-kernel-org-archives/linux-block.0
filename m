@@ -2,477 +2,688 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6AEEC43334
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 09:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E3DC43334
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 09:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233595AbiF3JJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 05:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
+        id S234118AbiF3JOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 05:14:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233372AbiF3JJY (ORCPT
+        with ESMTP id S234070AbiF3JOV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 05:09:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 74A52186D7
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 02:09:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656580161;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eBv7vdolWO3npRX+yg1tChhgDvKvrOQ3VrHDB1tllMA=;
-        b=LcP8u6JoeqsjLl+JIe99cfbSM7axnqNQ9PjUUC/55/N7EIxSREaNiYg+9aPSCe1BCxHzWy
-        oP2EEJUVQt4p3mO/KEEuV1TGs+jCHV6Xw+HpnH1tIZrz+V1mo/yfl5uIS0+lvSDQ26e6K5
-        yyi1CElkf+Uy4jF7O/hKJNl55IlLIlo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-357-idXJ1IGQP3qLAci6EobUCw-1; Thu, 30 Jun 2022 05:09:18 -0400
-X-MC-Unique: idXJ1IGQP3qLAci6EobUCw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9FA018001EA;
-        Thu, 30 Jun 2022 09:09:17 +0000 (UTC)
-Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F36A1730C;
-        Thu, 30 Jun 2022 09:09:11 +0000 (UTC)
-Date:   Thu, 30 Jun 2022 17:09:06 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        joseph.qi@linux.alibaba.com
-Subject: Re: [RFC] libubd: library for ubd(userspace block driver based on
- io_uring passthrough)
-Message-ID: <Yr1oMvYCqn5m2oLX@T590>
-References: <fd926012-6845-05e4-077b-6c8cfbf3d3cc@linux.alibaba.com>
- <YrnMwgW7TemVdbXv@T590>
- <fada5140-077e-6904-f9b6-c7bfba7779eb@linux.alibaba.com>
- <Yrw4gJq+NaX+TCDz@T590>
- <b3ef9b0e-f24c-7867-91c8-2bf15c646b77@linux.alibaba.com>
+        Thu, 30 Jun 2022 05:14:21 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2044.outbound.protection.outlook.com [40.107.223.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29E8240BD;
+        Thu, 30 Jun 2022 02:14:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O78+PXr+/vRNNfMOz4Yb2KznlTwvP67uZxl5Ojqy8HKxYLG6/N4NJDn9smRnrauVi/qZJWY2HxK41iYJtzhBVHAnt5KzYZ7L825KNuTg8wPpSDwhEBCKPCFBq0OXvN9Ud2SZ5FrMHHh8+CU0RVmcSrOPCOZWgpThGaDXpQ7ZT+yP+F3OuBIkMquw4gPe1i+eTqpTmiHY73V4S1DhheyBPuyURC68tE6Yr/eSoZF12OXqkKQKIwxn8bQ7DjvTP8g/x3vsUwcpbU2W5oGy3P1sr7mSJrNK4/lwRD3JxGQaMPSPdUT2FjwXptIeQs/AJdvn/+UEHDYrn79FVg6Vr8EFHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZIKYgSi8FEB/8bYaiu7+YXsjGTNBlPiCSGf24gXOvP0=;
+ b=c1yFad5iqED7PWvjrvExCjG8RVw6h+d1GN0mvgpucgHR/19Ir7LyYKLXkKzh48ZOvzRISRTDWAI00ZYuX9/vl/5zv7H3vPoF2i+SjLkJUzBdOAhos3BOM3APIN2LHPqSyBEGzViGcIy6DGY/DaJqCbFYNU2JkPNYDcBvZisX77GUYxsGI/kDhopDMNuMGvQgd/2NhGCWjnEnNMf8/a0VI5v+VQoOzyLv446obUzAHOpTwz7AucmxOvQNNBUibupSKwEb7sM+k0liT3+0CVI4JetUy276UGMWuf1Ea70JdgnWrHFfH19SD4WaJONm2YGDZYgPFoLl+JKh3j5vghPFgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=grimberg.me smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZIKYgSi8FEB/8bYaiu7+YXsjGTNBlPiCSGf24gXOvP0=;
+ b=XT4AqCgKnjZhOq7UysnjA48CUcBpJktVwwptG1hE0Aj4Z5sgdSyJjm02HPzIeeqY4T2qRT+FYARF7mUJGsT00KBfQrre9CWO8uJLg4yUoRmLaZjW6G32VXsZApRghisKFRUmQIuORj+YFCCkfuUCnT+2cLpysEPYgcjzV/GrvqxYzJ1n6Inj5wTWMKFYyBWiKi8If85ryLm3Z+JAD71NfqAqPij8fuP5oqCRHtEWRaGTbIpwfrc2A39pzLnqobhhq6yn7AYKMHonRIhmh03cYFDDxQEebVz/ApBCCSiTqjP/Wh3bNqL9ss+aRcfij8iI+jcV/ug852zgVV9hqkekHQ==
+Received: from MW4P221CA0008.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::13)
+ by DM5PR1201MB0153.namprd12.prod.outlook.com (2603:10b6:4:57::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.18; Thu, 30 Jun
+ 2022 09:14:17 +0000
+Received: from CO1NAM11FT058.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:8b:cafe::c6) by MW4P221CA0008.outlook.office365.com
+ (2603:10b6:303:8b::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15 via Frontend
+ Transport; Thu, 30 Jun 2022 09:14:17 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.235) by
+ CO1NAM11FT058.mail.protection.outlook.com (10.13.174.164) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5395.14 via Frontend Transport; Thu, 30 Jun 2022 09:14:17 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL107.nvidia.com
+ (10.27.9.16) with Microsoft SMTP Server (TLS) id 15.0.1497.32; Thu, 30 Jun
+ 2022 09:14:17 +0000
+Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Thu, 30 Jun
+ 2022 02:14:15 -0700
+From:   Chaitanya Kulkarni <kch@nvidia.com>
+To:     <linux-block@vger.kernel.org>, <linux-raid@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <agk@redhat.com>, <song@kernel.org>,
+        <djwong@kernel.org>, <kbusch@kernel.org>, <hch@lst.de>,
+        <sagi@grimberg.me>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <viro@zeniv.linux.org.uk>,
+        <javier@javigon.com>, <johannes.thumshirn@wdc.com>,
+        <bvanassche@acm.org>, <dongli.zhang@oracle.com>,
+        <ming.lei@redhat.com>, <willy@infradead.org>,
+        <jefflexu@linux.alibaba.com>, <josef@toxicpanda.com>, <clm@fb.com>,
+        <dsterba@suse.com>, <jack@suse.com>, <tytso@mit.edu>,
+        <adilger.kernel@dilger.ca>, <jlayton@kernel.org>,
+        <idryomov@gmail.com>, <danil.kipnis@cloud.ionos.com>,
+        <ebiggers@google.com>, <jinpu.wang@cloud.ionos.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Subject: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Date:   Thu, 30 Jun 2022 02:14:00 -0700
+Message-ID: <20220630091406.19624-1-kch@nvidia.com>
+X-Mailer: git-send-email 2.29.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3ef9b0e-f24c-7867-91c8-2bf15c646b77@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Content-Type: text/plain; charset="y"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 628ae762-7407-4cae-de06-08da5a78e8d6
+X-MS-TrafficTypeDiagnostic: DM5PR1201MB0153:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6/CSXdVuDm4VgZZ7KnSaQw8/9wahZ/W4fqekKNVqoE7rR3EvjUreUjly9M0k?=
+ =?us-ascii?Q?x8w55tIIulIQgcLfIiyKLcQOkB8PZmwuhGxJIVb1r/FSntQ2/goUb3uLu7Up?=
+ =?us-ascii?Q?/4bPebu4yZGb68Hv2ZGpBav1bbrAcEWW7mC8l4u2gy4iQr9soB4IZ7gkAsec?=
+ =?us-ascii?Q?ew7NmekiujRNUo0SMF8ymzpXpfO3lH1NSkGTGkDSu4u07lrwkfvcpDrrvVRb?=
+ =?us-ascii?Q?FKp+vmPW9adHOknDpYSxXuqE4JByBYZfJrnZ0WHiViiMY514rO6T2Yc3IGOS?=
+ =?us-ascii?Q?Hg6iKP59W5jddhHn2+Y/XBiljqYpn+iEA5uwcNu4KIb9laGPARLNH5BeER+c?=
+ =?us-ascii?Q?Lk2MpkGR0bAg0tGyOGMe/CvnoDzbd50X7U0MV/vY6hSVEJICNbA2KErMl21k?=
+ =?us-ascii?Q?LQQH5/fE8rCgkFZltS99Z5ZrOom87ATkymfZnbjXtA8IeMX6TK5neGMbC4xH?=
+ =?us-ascii?Q?mfeemEfw7irMF+PPwA1ysf9w24O/BQH1j09KI8YAuESicU3fIvlbxORhH9d1?=
+ =?us-ascii?Q?Nh0w94DWnAJbS/sCFs1C3hgik2ZmnxrOr3I8/qu8RVtOgTdgnWvcbriAXQzf?=
+ =?us-ascii?Q?P3ZwlIj6AvQYFFb9pAtxUW+KdpDTaxLGPihv6+iPx46Gy4s85LmRXnrAV6T6?=
+ =?us-ascii?Q?uzL+j77f1sYPv3hIClq8ZdAZ9NG6FtEbicHZaBO/e5auPm6504nuV8+xwW+2?=
+ =?us-ascii?Q?2WH41naOf59uRnIpVNEuDOgriK5HWocvJSVkw64Qoskvgx/PSTVebced+QUt?=
+ =?us-ascii?Q?iYq1zq/krZHzJKF55Kk+wXMC73C7ILOK9rxfLC8w97/4hCaTFtTN/NLFYVUv?=
+ =?us-ascii?Q?FA4O2tBirONHWMfjhd0iAd8Z7Q4LG03qbOhE8O6Vy8BPkCfNOekyvGp9HgEL?=
+ =?us-ascii?Q?0uc9cim3ILJMChqapq9O7s8jCufpNR+1B8Y/0pq42adM1HrqGYGWUmcwb4D0?=
+ =?us-ascii?Q?V5ZRsmR5ddN61ZSXNSBKjA=3D=3D?=
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(396003)(376002)(346002)(136003)(46966006)(40470700004)(36840700001)(47076005)(82310400005)(356005)(83380400001)(30864003)(107886003)(8936002)(2906002)(36756003)(5660300002)(16526019)(7406005)(186003)(1076003)(110136005)(2616005)(426003)(336012)(54906003)(316002)(81166007)(7416002)(966005)(36860700001)(8676002)(70206006)(4326008)(70586007)(7696005)(40480700001)(40460700003)(6666004)(82740400003)(478600001)(26005)(41300700001)(36900700001)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2022 09:14:17.3911
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 628ae762-7407-4cae-de06-08da5a78e8d6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT058.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0153
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 03:16:21PM +0800, Ziyang Zhang wrote:
-> Hi, Ming
-> 
-> On 2022/6/29 19:33, Ming Lei wrote:
-> > On Wed, Jun 29, 2022 at 11:22:23AM +0800, Ziyang Zhang wrote:
-> >> Hi Ming,
-> >>
-> >> On 2022/6/27 23:29, Ming Lei wrote:
-> >>> Hi Ziyang,
-> >>>
-> >>> On Mon, Jun 27, 2022 at 04:20:55PM +0800, Ziyang Zhang wrote:
-> >>>> Hi Ming,
-> >>>>
-> >>>> We are learning your ubd code and developing a library: libubd for ubd.
-> >>>> This article explains why we need libubd and how we design it.
-> >>>>
-> >>>> Related threads:
-> >>>> (1) https://lore.kernel.org/all/Yk%2Fn7UtGK1vVGFX0@T590/
-> >>>> (2) https://lore.kernel.org/all/YnDhorlKgOKiWkiz@T590/
-> >>>> (3) https://lore.kernel.org/all/20220509092312.254354-1-ming.lei@redhat.com/
-> >>>> (4) https://lore.kernel.org/all/20220517055358.3164431-1-ming.lei@redhat.com/
-> >>>>
-> >>>>
-> >>>> Userspace block driver(ubd)[1], based on io_uring passthrough,
-> >>>> allows users to define their own backend storage in userspace
-> >>>> and provides block devices such as /dev/ubdbX.
-> >>>> Ming Lei has provided kernel driver code: ubd_drv.c[2]
-> >>>> and userspace code: ubdsrv[3].
-> >>>>
-> >>>> ubd_drv.c simply passes all blk-mq IO requests
-> >>>> to ubdsrv through io_uring sqes/cqes. We think the kernel code
-> >>>> is pretty well-designed.
-> >>>>
-> >>>> ubdsrv is implemented by a single daemon
-> >>>> and target(backend) IO handling(null_tgt and loop_tgt) 
-> >>>> is embedded in the daemon. 
-> >>>> While trying ubdsrv, we find ubdsrv is hard to be used 
-> >>>> by our backend.
-> >>>
-> >>> ubd is supposed to provide one generic framework for user space block
-> >>> driver, and it can be used for doing lots of fun/useful thing.
-> >>>
-> >>> If I understand correctly, this isn't same with your use case:
-> >>>
-> >>> 1) your user space block driver isn't generic, and should be dedicated
-> >>> for Alibaba's uses
-> >>>
-> >>> 2) your case has been there for long time, and you want to switch from other
-> >>> approach(maybe tcmu) to ubd given ubd has better performance.
-> >>>
-> >>
-> >> Yes, you are correct :)
-> >> The idea of design libubd is actually from libtcmu.
-> >>
-> >> We do have some userspace storage system as the IO handling backend, 
-> >> and we need ubd to provide block drivers such as /dev/ubdbX for up layer client apps.
-> >>
-> >>
-> >> I think your motivation is that provides a complete user block driver to users
-> >> and they DO NOT change any code.
-> >> Users DO change their code using libubd for embedding libubd into the backend.
-> >>
-> >>
-> >>>> First is description of our backend:
-> >>>>
-> >>>> (1) a distributing system sends/receives IO requests 
-> >>>>     through network.
-> >>>>
-> >>>> (2) The system use RPC calls among hundreds of
-> >>>>      storage servers and RPC calls are associated with data buffers
-> >>>>      allocated from a memory pool.
-> >>>>
-> >>>> (3) On each server for each device(/dev/vdX), our backend runs
-> >>>>      many threads to handle IO requests and manage the device. 
-> >>>>
-> >>>> Second are reasons why ubdsrv is hard to use for us:
-> >>>>
-> >>>> (1) ubdsrv requires the target(backend) issues IO requests
-> >>>>     to the io_uring provided by ubdsrv but our backend 
-> >>>>     uses something like RPC and does not support io_uring.
-> >>>
-> >>> As one generic framework, the io command has to be io_uring
-> >>> passthrough, and the io doesn't have to be handled by io_uring.
-> >>
-> >> Yes, our backend define its own communicating method.
-> >>
-> >>>
-> >>> But IMO io_uring is much more efficient, so I'd try to make async io
-> >>> (io uring) as the 1st citizen in the framework, especially for new
-> >>> driver.
-> >>>
-> >>> But it can support other way really, such as use io_uring with eventfd,
-> >>> the other userspace context can handle io, then wake up io_uring context
-> >>> via eventfd. You may not use io_uring for handling io, but you still
-> >>> need to communicate with the context for handling io_uring passthrough
-> >>> command, and one mechanism(such as eventfd) has to be there for the
-> >>> communication.
-> >>
-> >> Ok, eventfd may be helpful. 
-> >> If you read my API, you may find ubdlib_complete_io_request().
-> >> I think the backend io worker thread can call this function to tell the 
-> >> ubd queue thread(the io_uring context in it) to commit the IO.
-> > 
-> > The ubdlib_complete_io_request() has to be called in the same pthread
-> > context, that looks not flexible. When you handle IO via non-io_uring in the same
-> > context, the cpu utilization in submission/completion side should be
-> > higher than io_uring. And this way should be worse than the usage in
-> > ubd/loop, that is why I suggest to use one io_uring for handling both
-> > io command and io request if possible.
-> 
-> ubdlib_complete_io_request() can be called in the io worker thread,
-> not in the ubdsrv queue thread(with the io_uring context for handling uring_cmd).
-> 
-> You can find ubd_runner.c in my libubd repo. There are many io worker
-> threads for each ubdsrv queue to handle IO requests.
-> 
-> Actually this idea comes from tcmu-runner. The data flow is:
-> 
-> 1) in ubdsrv queue thread, io_uring_enter(): returns(IO reqs received from blk-mq)
-> 
-> 2) in ubdsrv queue thread, ubdsrv_reap_requests(): iterate on each cqe(with an IO req),
->    
->    for READ/WRITE requests, ubd_aio_queue_io() to enqueue the IO req into a io_queue
->    (each ubdsrv queue has one io_queue). This IO req's status is IO_HANDLING_ASYNC.
->     
->    for other simple(can be handled very quickly), 
->    handle it right now and call ubdlib_complete_io_request()
-> 
-> 3) in ubdsrv queue thread, ubdsrv_commit_and_fetch(): iterate on all IO slots per ubdsrv queue
->    and setup sqe if one IO(IO completion) is ready to commit.
->    
->    Here, some IO slots are still IO_HANDLING_ASYNC so no sqe is generated for them.
-> 
-> 
-> 4)  in ubdsrv queue thread, io_uring_enter(): submit all sqes and wait for cqes
->     (io_uring_enter() will return after at least one IO req is received from blk-mq)
->    
-> 5) When 3) or 4) happens, at the same time in ubdsrv queue IO worker threads:
->    each io worker thread try to deque and handle one IO req from io_queue per ubdsrv queue.
->    
->    After the IO worker handles the IO req(WRITE/READ), it calls ubdlib_complete_io_request()
->    This function can mark this  IO req's status to ready to commit.
-> 
-> IO handling/completion and io_uring_enter() can happen at the same time.
-> 
-> Besides, io_uring_enter can:
-> 
-> 1) block and wait for cqes until at least
-> one blk-mq req comes from queue_rq()
-> 
-> 2) submit sqes(with last IO completion and next fetch)
-> 
-> so I have to consider how to notify io_uring about io completion 
-> after io_uring_enter() is slept(block and wait for cqes).
+Hi,
 
-Yeah, that was exactly my question, :-)
+This adds support for the REQ_OP_VERIFY. In this version we add
+support for block layer. NVMe host side, NVMeOF Block device backend,
+and NVMeOF File device backend and null_blk driver.
 
-> 
-> In current version of ubd_runner(an async libubd target), I try to use an "unblock"
-> io_uring_enter_timeout() and caller can set a timeout value for it.
-> So IO completions happen after io_uring_enter_timeout() call can be committed
-> by next io_uring_enter_timeout() call...
-> 
-> But this is a very ugly implementation 
-> because I may waste CPU on useless loops in ubdsrv queue thread if
-> blk-mq reqs do not income frequently.
-> 
-> You mentioned that eventfd may be helpful and I agree with you. :)
-> I can register an eventfd in io_uring after ubd_aio_queue_io() and write the eventfd
-> in  ubdlib_complete_io_request().
-> 
-> I will fix my code.
+In this version we also add a new blkverify userspace tool along with
+the testcases patch for the util-linux, this patch will be followed
+by the this series.
 
-FYI, there is one example about using eventfd to wakeup io_uring, which
-can be added to the library for your usecase:
+Below is the summary of testlog :-
 
-https://gist.github.com/1Jo1/6496d1b8b6b363c301271340e2eab95b
+1. NVMeOF bdev-ns null_blk verify=0 (triggering bdev emulation code) :-
+-----------------------------------------------------------------------
 
-> 
-> > 
-> >>
-> >>
-> >>
-> >>>
-> >>>>
-> >>>> (2) ubdsrv forks a daemon and it takes over everything.
-> >>>>     Users should type "list/stop/del" ctrl-commands to interact with
-> >>>>     the daemon. It is inconvenient for our backend
-> >>>>     because it has threads(from a C++ thread library) running inside.
-> >>>
-> >>> No, list/stop/del won't interact with the daemon, and the per-queue
-> >>> pthread is only handling IO commands(io_uring passthrough) and IO request.
-> >>>
-> >>
-> >>
-> >> Sorry I made a mistake.
-> >>
-> >> I mean from user's view, 
-> >> he has to type list/del/stop from cmdlind to control the daemon.
-> >> (I know the control flow is cmdline-->ubd_drv.c-->ubdsrv daemon).
-> >>
-> >> This is a little weird if we try to make a ubd library.
-> >> So I actually provides APIs in libubd for users to do these list/del/stop works.
-> > 
-> > OK, that is fine to export APIs for admin purpose.
-> > 
-> >>
-> >>
-> >>>>
-> >>>> (3) ubdsrv PRE-allocates internal data buffers for each ubd device.
-> >>>>     The data flow is:
-> >>>>     bio vectors <-1-> ubdsrv data buffer <-2-> backend buffer(our RPC buffer).
-> >>>>     Since ubdsrv does not export its internal data buffer to backend,
-> >>>>     the second copy is unavoidable. 
-> >>>>     PRE-allocating data buffer may not be a good idea for wasting memory
-> >>>>     if there are hundreds of ubd devices(/dev/ubdbX).
-> >>>
-> >>> The preallocation is just virtual memory, which is cheap and not pinned, but
-> >>> ubdsrv does support buffer provided by io command, see:
-> >>>
-> >>> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
-> >>
-> >> Actually I discussed on the design of pre-allocation in your RFC patch for ubd_drv
-> >> but you did not reply :)
-> >>
-> >> I paste it here:
-> >>
-> >> "I am worried about the fixed-size(size is max io size, 256KiB) pre-allocated data buffers in UBDSRV
-> >> may consume too much memory. Do you mean these pages can be reclaimed by sth like madvise()?
-> >> If (1)swap is not set and (2)madvise() is not called, these pages may not be reclaimed."
-> >>
-> >> I observed that your ubdsrv use posix_memalign() to pre-allocate data buffers, 
-> >> and I have already noticed the memory cost while testing your ubdsrv with hundreds of /dev/ubdbX.
-> > 
-> > Usually posix_memalign just allocates virtual memory which is unlimited
-> > in 64bit arch, and pages should be allocated until the buffer is read or write.
-> > After the READ/WRITE is done, kernel still can reclaim the pages in this
-> > virtual memory.
-> > 
-> > In future, we still may optimize the memory uses via madvise, such as
-> > MADV_DONTNEED, after the slot is idle for long enough.
-> 
-> Ok, thanks for explanation. 
-> 
-> > 
-> >>
-> >> Another IMPORTANT problem is your commit:
-> >> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
-> >> may be not helpful for WRITE requests if I understand correctly.
-> >>
-> >> Consider this data flow:
-> >>
-> >> 1. ubdsrv commits an IO req(req1, a READ req).
-> >>
-> >> 2. ubdsrv issues a sqe(UBD_IO_COMMIT_AND_FETCH_REQ), and sets io->addr to addr1.
-> >>    addr1 is the addr of buffer user passed.
-> >>    
-> >>
-> >> 3. ubd gets the sqe and commits req1, sets io->addr to addr1.
-> >>
-> >> 4. ubd gets IO req(req2, a WRITE req) from blk-mq(queue_rq) and commit a cqe.
-> >>
-> >> 5. ubd copys data to be written from biovec to addr1 in a task_work.
-> >>
-> >> 6. ubdsrv gets the cqe and tell the IO target to handle req2.
-> >>
-> >> 7. IO target handles req2. It is a WRITE req so target issues a io_uring write
-> >>    cmd(with buffer set to addr1).
-> >>
-> >>
-> >>
-> >> The problem happens in 5). You cannot know the actual data_len of an blk-mq req
-> >> until you get one in queue_rq. So length of addr1 may be less than data_len.
-> > 
-> > So far, the actual length of buffer has to be set as at least rq_max_blocks, since
-> > we set it as ubd queue's max hw sectors. Yeah, you may argue memory
-> > waste, but process virtual address is unlimited for 64bit arch, and
-> > pages are allocated until actual read/write is started.
-> 
-> Ok, since I allow users to config rq_max_blocks in libubd, 
-> it's users' responsibility to ensure length of user buffers
-> is at least rq_max_blocks.
-> 
-> Now I agree on your commit:
-> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
-> 
-> Provide WRITE buffer in advance(when sending COMMIT_AND_FETCH) seems OK :)
-> 
-> > 
-> >>>
-> >>>>
-> >>>> To better use ubd in more complicated scenarios, we have developed libubd.
-> >>>> It does not assume implementation of backend and can be embedded into it.
-> >>>> We refer to the code structure of tcmu-runner[4], 
-> >>>> which includes a library(libtcmu) for users 
-> >>>> to embed tcmu-runner inside backend's code. 
-> >>>> It:
-> >>>>
-> >>>> (1) Does not fork/pthread_create but embedded in backend's threads
-> >>>
-> >>> That is because your backend may not use io_uring, I guess.
-> >>>
-> >>> But it is pretty easy to move the decision of creating pthread to target
-> >>> code, which can be done in the interface of .prepare_target().
-> >>
-> >> I think the library should not create any thread if we want a libubd.
-> > 
-> > I Agree.
-> > 
-> >>
-> >>>
-> >>>>
-> >>>> (2) Provides libubd APIs for backend to add/delete ubd devices 
-> >>>>     and fetch/commit IO requests
-> >>>
-> >>> The above could be the main job of libubd.
-> >>
-> >> indeed.
-> >>
-> >>>
-> >>>>
-> >>>> (3) simply passes backend-provided data buffers to ubd_drv.c in kernel,
-> >>>>     since the backend actually has no knowledge 
-> >>>>     on incoming data size until it gets an IO descriptor.
-> >>>
-> >>> I can understand your requirement, not look at your code yet, but libubd
-> >>> should be pretty thin from function viewpoint, and there are lots of common
-> >>> things to abstract/share among all drivers, please see recent ubdsrv change:
-> >>>
-> >>> https://github.com/ming1/ubdsrv/commits/master
-> >>>
-> >>> in which:
-> >>> 	- coroutine is added for handling target io
-> >>> 	- the target interface(ubdsrv_tgt_type) has been cleaned/improved for
-> >>> 	supporting complicated target
-> >>> 	- c++ support
-> >>
-> >> Yes, I have read your coroutine code but I am not an expert of C++ 20.:(
-> >> I think it is actually target(backend) design and ubd should not assume 
-> >> how the backend handle IOs. 
-> >>
-> >> The work ubd in userspace has to be done is:
-> >>
-> >> 1) give some IO descriptors to backend, such as ubd_get_io_requests()
-> >>
-> >> 2) get IO completion form backend, such as ubd_complete_io_requests()
-> > 
-> > Or the user provides/registers two callbacks: handle_io_async() and
-> > io_complete(), the former is called when one request comes from ubd
-> > driver, the latter(optional) is called when one io is done.
-> > 
-> > Also you didn't mention how you notify io_uring about io completion after
-> > io_uring_enter() is slept if your backend code doesn't use io_uring to
-> > handle io.
-> > 
-> > I think one communication mechanism(such as eventfd) is needed for your
-> > case.
-> 
-> Ok, I will try eventfd with io_uring.
-> 
-> > 
-> >>
-> >>
-> >>
-> >>>
-> >>> IMO, libubd isn't worth of one freshly new project, and it could be integrated
-> >>> into ubdsrv easily. The potential users could be existed usersapce
-> >>> block driver projects.
-> >>
-> >> Yes, so many userspace storage systems can use ubd!
-> >> You may look at tcmu-runner. It:
-> >>
-> >> 1) provides a library(libtcmu.c) for those who have a existing backend.
-> >>
-> >> 2) provides a runner(main.c in tcmu-runner) like your ubdsrv 
-> >>    for those who just want to run it. 
-> >>    And the runner is build on top of libtcmu.
-> >>
-> >>>
-> >>> If you don't object, I am happy to co-work with you to add the support
-> >>> for libubd in ubdsrv, then we can avoid to invent a wheel
-> >>
-> >> +1 :)
-> > 
-> > Thinking of further, I'd suggest to split ubdsrv into two parts:
-> > 
-> > 1) libubdsrv
-> > - provide APIs like what you did in libubd
-> > - provide API for notify io_uring(handling io command) that one io is
-> > completed, and the API should support handling IO from other context
-> > (not same with the io_uring context for handling io command).
-> > 
-> > 2) ubd target
-> > - built on libubdsrv, such as ubd command is built on libubdsrv, and
-> > specific target implementation is built on the library too.
-> > 
-> > It shouldn't be hard to work towards this direction, and I guess this
-> > way should make current target implementation more clean.
-> > 
-> 
-> Yes, this is like tcmu-runner's structure: a libtcmu and some target
-> Thanks, Ming.  Glad to co-work with you.
-> 
-> I will take your advice and improve libubd(the communication mechanism, maybe eventfd).
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme1n1 
+linux-block (for-next) # dmesg -c 
+[ 1171.171536] nvmet: nvmet_bdev_emulate_verify_work 467
+linux-block (for-next) # nvme verify -s 0 -c 1024 /dev/nvme1n1  
+NVME Verify Success
+linux-block (for-next) # dmesg -c 
+[ 1199.322161] nvmet: nvmet_bdev_emulate_verify_work 467
 
-I have added libublk branch for working towards this direction, if we
-cowork on libublk, please write patch against this branch, then I can
-apply your patch directly.
+2. NVMeOF bdev-ns null_blk verify=1.
+-----------------------------------------------------------------------
 
-https://github.com/ming1/ubdsrv/tree/libublk
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme1n1 
+linux-block (for-next) # dmesg -c 
+[ 1257.661548] nvmet: nvmet_bdev_execute_verify 506
+[ 1257.661558] null_blk: null_process_cmd 1406
+linux-block (for-next) # nvme verify -s 0 -c 1024 /dev/nvme1n1  
+NVME Verify Success
+linux-block (for-next) # dmesg -c 
+[ 1269.613415] nvmet: nvmet_bdev_execute_verify 506
+[ 1269.613425] null_blk: null_process_cmd 1406
 
-Thanks, 
-Ming
+3. NVMeOF file-ns :-
+-----------------------------------------------------------------------
 
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme1n1 
+linux-block (for-next) # dmesg -c 
+[ 3452.675959] nvme_setup_verify 844
+[ 3452.675969] nvmet: nvmet_file_execute_verify 525
+[ 3452.675971] nvmet: nvmet_file_emulate_verify_work 502
+[ 3452.675972] nvmet: do_direct_io_emulate_verify 431
+linux-block (for-next) # nvme verify -s 0 -c 1024 /dev/nvme1n1
+NVME Verify Success
+linux-block (for-next) # dmesg  -c 
+[ 3459.794385] nvmet: nvmet_file_execute_verify 525
+[ 3459.794389] nvmet: nvmet_file_emulate_verify_work 502
+[ 3459.794391] nvmet: do_direct_io_emulate_verify 431
+
+4. NVMe PCIe device.
+-----------------------------------------------------------------------
+
+linux-block (for-next) # modprobe nvme
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme0n1
+linux-block (for-next) # dmesg  -c
+[ 2763.432194] nvme nvme0: pci function 0000:00:04.0
+[ 2763.473827] nvme nvme0: 48/0/0 default/read/poll queues
+[ 2763.478868] nvme nvme0: Ignoring bogus Namespace Identifiers
+[ 2766.583923] nvme_setup_verify 844
+
+Here is a link for the complete cover-letter for the background to save
+reviewer's time :-
+https://patchwork.kernel.org/project/dm-devel/cover/20211104064634.4481-1-chaitanyak@nvidia.com/
+
+-ck
+
+Chaitanya Kulkarni (6):
+  block: add support for REQ_OP_VERIFY
+  nvme: add support for the Verify command
+  nvmet: add Verify command support for bdev-ns
+  nvmet: add Verify emulation support for bdev-ns
+  nvmet: add verify emulation support for file-ns
+  null_blk: add REQ_OP_VERIFY support
+
+ Documentation/ABI/stable/sysfs-block |  12 +++
+ block/blk-core.c                     |   5 +
+ block/blk-lib.c                      | 155 +++++++++++++++++++++++++++
+ block/blk-merge.c                    |  18 ++++
+ block/blk-settings.c                 |  17 +++
+ block/blk-sysfs.c                    |   8 ++
+ block/blk.h                          |   4 +
+ block/ioctl.c                        |  35 ++++++
+ drivers/block/null_blk/main.c        |  20 +++-
+ drivers/block/null_blk/null_blk.h    |   1 +
+ drivers/nvme/host/core.c             |  33 ++++++
+ drivers/nvme/target/admin-cmd.c      |   3 +-
+ drivers/nvme/target/core.c           |  14 ++-
+ drivers/nvme/target/io-cmd-bdev.c    |  75 +++++++++++++
+ drivers/nvme/target/io-cmd-file.c    | 152 ++++++++++++++++++++++++++
+ drivers/nvme/target/nvmet.h          |   4 +-
+ include/linux/bio.h                  |   9 +-
+ include/linux/blk_types.h            |   2 +
+ include/linux/blkdev.h               |  22 ++++
+ include/linux/nvme.h                 |  19 ++++
+ include/uapi/linux/fs.h              |   1 +
+ 21 files changed, 601 insertions(+), 8 deletions(-)
+
+-- 
+2.29.0
+
+######################## NVMeOF bdev-ns null_blk verify=0 ######################
+
+0 directories, 0 files
+linux-block (for-next) # ./bdev.sh 1
+++ FILE=/dev/nvme0n1
+++ NN=1
+++ NQN=testnqn
+++ let NR_DEVICES=NN+1
+++ modprobe -r null_blk
+++ modprobe null_blk nr_devices=0 verify=0
+++ modprobe nvme
+++ modprobe nvme-fabrics
+++ modprobe nvmet
+++ modprobe nvme-loop
+++ dmesg -c
+++ sleep 2
+++ tree /sys/kernel/config
+/sys/kernel/config
+├── nullb
+│   └── features
+└── nvmet
+    ├── hosts
+    ├── ports
+    └── subsystems
+
+5 directories, 1 file
+++ mkdir /sys/kernel/config/nvmet/subsystems/testnqn
+++ mkdir /sys/kernel/config/nvmet/ports/1/
+++ echo -n loop
+++ echo -n 1
+++ ln -s /sys/kernel/config/nvmet/subsystems/testnqn /sys/kernel/config/nvmet/ports/1/subsystems/
+++ sleep 1
+++ echo transport=loop,nqn=testnqn
++++ shuf -i 1-1 -n 1
+++ for i in `shuf -i  1-$NN -n $NN`
+++ mkdir config/nullb/nullb1
+++ echo 4096
+++ echo 20971520
+++ echo 1
++++ cat config/nullb/nullb1/index
+++ IDX=0
+++ mkdir /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1
+++ let IDX=IDX+1
+++ echo ' ####### /dev/nullb1'
+ ####### /dev/nullb1
+++ echo -n /dev/nullb1
+++ cat /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1/device_path
+/dev/nullb1
+++ echo 1
+++ dmesg -c
+[ 1150.985720] nvmet: creating nvm controller 1 for subsystem testnqn for NQN nqn.2014-08.org.nvmexpress:uuid:7f5b83f1-b258-4300-9a55-cd1902bea8c2.
+[ 1150.985882] nvme nvme1: creating 48 I/O queues.
+[ 1150.990654] nvme nvme1: new ctrl: "testnqn"
+[ 1150.995681] null_blk: disk nullb1 created
+[ 1150.998886] nvmet: adding nsid 1 to subsystem testnqn
+[ 1151.000716] nvme nvme1: rescanning namespaces.
+++ sleep 1
+++ mount
+++ column -t
+++ grep nvme
+++ '[' 1 ']'
++++ wc -l
++++ ls -l /dev/nvme1 /dev/nvme1n1
+++ cnt=2
+++ echo 2
+2
+++ '[' 2 -gt 1 ']'
+++ break
+++ dmesg -c
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme1n1 
+linux-block (for-next) # dmesg -c 
+[ 1171.171536] nvmet: nvmet_bdev_emulate_verify_work 467
+linux-block (for-next) # nvme verify -s 0 -c 1024 /dev/nvme1n1  
+NVME Verify Success
+linux-block (for-next) # dmesg -c 
+[ 1199.322161] nvmet: nvmet_bdev_emulate_verify_work 467
+linux-block (for-next) # ./delete.sh 1
++ nvme disconnect -n testnqn
+NQN:testnqn disconnected 1 controller(s)
+
+real	0m0.343s
+user	0m0.002s
+sys	0m0.003s
+++ shuf -i 1-1 -n 1
++ for i in `shuf -i  1-$NN -n $NN`
++ echo 0
++ rmdir /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1
++ rmdir config/nullb/nullb1
++ sleep 2
++ rm -fr /sys/kernel/config/nvmet/ports/1/subsystems/testnqn
++ sleep 1
++ rmdir /sys/kernel/config/nvmet/ports/1
++ rmdir /sys/kernel/config/nvmet/subsystems/testnqn
++ sleep 1
++ modprobe -r nvme_loop
++ modprobe -r nvme_fabrics
++ modprobe -r nvmet
++ modprobe -r nvme
++ modprobe -r null_blk
++ umount /mnt/nvme0n1
+umount: /mnt/nvme0n1: no mount point specified.
++ umount /mnt/backend
+umount: /mnt/backend: not mounted.
++ tree /sys/kernel/config
+/sys/kernel/config
+
+0 directories, 0 files
+
+######################## NVMeOF bdev-ns null_blk verify=1 #####################
+
+linux-block (for-next) # ./bdev.sh 1
+++ FILE=/dev/nvme0n1
+++ NN=1
+++ NQN=testnqn
+++ let NR_DEVICES=NN+1
+++ modprobe -r null_blk
+++ modprobe null_blk nr_devices=0 verify=1
+++ modprobe nvme
+++ modprobe nvme-fabrics
+++ modprobe nvmet
+++ modprobe nvme-loop
+++ dmesg -c
+++ sleep 2
+++ tree /sys/kernel/config
+/sys/kernel/config
+├── nullb
+│   └── features
+└── nvmet
+    ├── hosts
+    ├── ports
+    └── subsystems
+
+5 directories, 1 file
+++ mkdir /sys/kernel/config/nvmet/subsystems/testnqn
+++ mkdir /sys/kernel/config/nvmet/ports/1/
+++ echo -n loop
+++ echo -n 1
+++ ln -s /sys/kernel/config/nvmet/subsystems/testnqn /sys/kernel/config/nvmet/ports/1/subsystems/
+++ sleep 1
+++ echo transport=loop,nqn=testnqn
++++ shuf -i 1-1 -n 1
+++ for i in `shuf -i  1-$NN -n $NN`
+++ mkdir config/nullb/nullb1
+++ echo 4096
+++ echo 20971520
+++ echo 1
++++ cat config/nullb/nullb1/index
+++ IDX=0
+++ mkdir /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1
+++ let IDX=IDX+1
+++ echo ' ####### /dev/nullb1'
+ ####### /dev/nullb1
+++ echo -n /dev/nullb1
+++ cat /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1/device_path
+/dev/nullb1
+++ echo 1
+++ dmesg -c
+[ 1250.311632] nvmet: creating nvm controller 1 for subsystem testnqn for NQN nqn.2014-08.org.nvmexpress:uuid:328bb18d-3662-48eb-8bc2-ca7d4ad73799.
+[ 1250.311853] nvme nvme1: creating 48 I/O queues.
+[ 1250.316251] nvme nvme1: new ctrl: "testnqn"
+[ 1250.321710] null_blk: disk nullb1 created
+[ 1250.324678] nvmet: adding nsid 1 to subsystem testnqn
+[ 1250.326546] nvme nvme1: rescanning namespaces.
+++ sleep 1
+++ mount
+++ column -t
+++ grep nvme
+++ '[' 1 ']'
++++ wc -l
++++ ls -l /dev/nvme1 /dev/nvme1n1
+++ cnt=2
+++ echo 2
+2
+++ '[' 2 -gt 1 ']'
+++ break
+++ dmesg -c
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme1n1 
+linux-block (for-next) # dmesg -c 
+[ 1257.661548] nvmet: nvmet_bdev_execute_verify 506
+[ 1257.661558] null_blk: null_process_cmd 1406
+linux-block (for-next) # nvme verify -s 0 -c 1024 /dev/nvme1n1  
+NVME Verify Success
+linux-block (for-next) # dmesg -c 
+[ 1269.613415] nvmet: nvmet_bdev_execute_verify 506
+[ 1269.613425] null_blk: null_process_cmd 1406
+linux-block (for-next) # 
+linux-block (for-next) # ./delete.sh 1
++ nvme disconnect -n testnqn
+NQN:testnqn disconnected 1 controller(s)
+
+real	0m0.339s
+user	0m0.002s
+sys	0m0.003s
+++ shuf -i 1-1 -n 1
++ for i in `shuf -i  1-$NN -n $NN`
++ echo 0
++ rmdir /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1
++ rmdir config/nullb/nullb1
++ sleep 2
++ rm -fr /sys/kernel/config/nvmet/ports/1/subsystems/testnqn
++ sleep 1
++ rmdir /sys/kernel/config/nvmet/ports/1
++ rmdir /sys/kernel/config/nvmet/subsystems/testnqn
++ sleep 1
++ modprobe -r nvme_loop
++ modprobe -r nvme_fabrics
++ modprobe -r nvmet
++ modprobe -r nvme
++ modprobe -r null_blk
++ umount /mnt/nvme0n1
+umount: /mnt/nvme0n1: no mount point specified.
++ umount /mnt/backend
+umount: /mnt/backend: not mounted.
++ tree /sys/kernel/config
+/sys/kernel/config
+
+0 directories, 0 files
+
+################################### NVMeOF file-ns #############################
+
+linux-block (for-next) # 
+linux-block (for-next) # ./file.sh 1
+++ FILE=/mnt/backend/nvme1n1
+++ SS=testnqn
+++ SSPATH=/sys/kernel/config/nvmet/subsystems/testnqn/
+++ PORTS=/sys/kernel/config/nvmet/ports
+++ main
+++ load_modules
+++ dmesg -c
+++ modprobe nvme
+++ modprobe nvme-fabrics
+++ modprobe nvmet
+++ modprobe nvme-loop
+++ sleep 3
+++ mount_fs
+++ make_nullb
+++ ./compile_nullb.sh
++ umount /mnt/nullb0
+umount: /mnt/nullb0: not mounted.
++ rmdir 'config/nullb/nullb*'
+rmdir: failed to remove 'config/nullb/nullb*': No such file or directory
++ dmesg -c
++ modprobe -r null_blk
++ lsmod
++ grep null_blk
+++ nproc
++ make -j 48 M=drivers/block modules
++ HOST=drivers/block/null_blk/
+++ uname -r
++ HOST_DEST=/lib/modules/5.18.0blk+/kernel/drivers/block/null_blk/
++ cp drivers/block/null_blk//null_blk.ko /lib/modules/5.18.0blk+/kernel/drivers/block/null_blk//
++ ls -lrth /lib/modules/5.18.0blk+/kernel/drivers/block/null_blk//null_blk.ko
+-rw-r--r--. 1 root root 1.1M Jun 29 17:06 /lib/modules/5.18.0blk+/kernel/drivers/block/null_blk//null_blk.ko
++ sleep 1
++ dmesg -c
+++ ./compile_nullb.sh
++ umount /mnt/nullb0
+umount: /mnt/nullb0: not mounted.
++ rmdir 'config/nullb/nullb*'
+rmdir: failed to remove 'config/nullb/nullb*': No such file or directory
++ dmesg -c
++ modprobe -r null_blk
++ lsmod
++ grep null_blk
+++ nproc
++ make -j 48 M=drivers/block modules
++ HOST=drivers/block/null_blk/
+++ uname -r
++ HOST_DEST=/lib/modules/5.18.0blk+/kernel/drivers/block/null_blk/
++ cp drivers/block/null_blk//null_blk.ko /lib/modules/5.18.0blk+/kernel/drivers/block/null_blk//
++ ls -lrth /lib/modules/5.18.0blk+/kernel/drivers/block/null_blk//null_blk.ko
+-rw-r--r--. 1 root root 1.1M Jun 29 17:06 /lib/modules/5.18.0blk+/kernel/drivers/block/null_blk//null_blk.ko
++ sleep 1
++ dmesg -c
+++ modprobe null_blk nr_devices=0
+++ sleep 1
+++ mkdir config/nullb/nullb0
+++ tree config/nullb/nullb0
+config/nullb/nullb0
+├── badblocks
+├── blocking
+├── blocksize
+├── cache_size
+├── completion_nsec
+├── discard
+├── home_node
+├── hw_queue_depth
+├── index
+├── irqmode
+├── max_sectors
+├── mbps
+├── memory_backed
+├── poll_queues
+├── power
+├── queue_mode
+├── size
+├── submit_queues
+├── use_per_node_hctx
+├── verify
+├── virt_boundary
+├── zone_capacity
+├── zoned
+├── zone_max_active
+├── zone_max_open
+├── zone_nr_conv
+└── zone_size
+
+0 directories, 27 files
+++ echo 1
+++ echo 512
+++ echo 20480
+++ echo 1
+++ sleep 2
++++ cat config/nullb/nullb0/index
+++ IDX=0
+++ lsblk
+++ grep null0
+++ sleep 1
+++ mkfs.xfs -f /dev/nullb0
+meta-data=/dev/nullb0            isize=512    agcount=4, agsize=1310720 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=0
+data     =                       bsize=4096   blocks=5242880, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+++ mount /dev/nullb0 /mnt/backend/
+++ sleep 1
+++ mount
+++ column -t
+++ grep nvme
+++ dd if=/dev/zero of=/mnt/backend/nvme1n1 count=2621440 bs=4096
+2621440+0 records in
+2621440+0 records out
+10737418240 bytes (11 GB, 10 GiB) copied, 5.01608 s, 2.1 GB/s
+++ file /mnt/backend/nvme1n1
+/mnt/backend/nvme1n1: data
+++ make_target
+++ tree /sys/kernel/config
+/sys/kernel/config
+├── nullb
+│   ├── features
+│   └── nullb0
+│       ├── badblocks
+│       ├── blocking
+│       ├── blocksize
+│       ├── cache_size
+│       ├── completion_nsec
+│       ├── discard
+│       ├── home_node
+│       ├── hw_queue_depth
+│       ├── index
+│       ├── irqmode
+│       ├── max_sectors
+│       ├── mbps
+│       ├── memory_backed
+│       ├── poll_queues
+│       ├── power
+│       ├── queue_mode
+│       ├── size
+│       ├── submit_queues
+│       ├── use_per_node_hctx
+│       ├── verify
+│       ├── virt_boundary
+│       ├── zone_capacity
+│       ├── zoned
+│       ├── zone_max_active
+│       ├── zone_max_open
+│       ├── zone_nr_conv
+│       └── zone_size
+└── nvmet
+    ├── hosts
+    ├── ports
+    └── subsystems
+
+6 directories, 28 files
+++ mkdir /sys/kernel/config/nvmet/subsystems/testnqn/
+++ for i in 1
+++ mkdir /sys/kernel/config/nvmet/subsystems/testnqn//namespaces/1
+++ echo -n /mnt/backend/nvme1n1
+++ cat /sys/kernel/config/nvmet/subsystems/testnqn//namespaces/1/device_path
+/mnt/backend/nvme1n1
+++ cat /sys/kernel/config/nvmet/subsystems/testnqn//namespaces/1/buffered_io
+0
+++ echo 1
+++ mkdir /sys/kernel/config/nvmet/ports/1/
+++ echo -n loop
+++ echo -n 1
+++ ln -s /sys/kernel/config/nvmet/subsystems/testnqn/ /sys/kernel/config/nvmet/ports/1/subsystems/
+++ sleep 1
+++ connect
+++ echo transport=loop,nqn=testnqn
+++ sleep 1
+++ dmesg -c
+[ 3436.671070] null_blk: module loaded
+[ 3437.678812] null_blk: disk nullb0 created
+[ 3440.700250] XFS (nullb0): Mounting V5 Filesystem
+[ 3440.701686] XFS (nullb0): Ending clean mount
+[ 3440.701772] xfs filesystem being mounted at /mnt/backend supports timestamps until 2038 (0x7fffffff)
+[ 3446.742777] nvmet: adding nsid 1 to subsystem testnqn
+[ 3447.752282] nvmet: creating nvm controller 1 for subsystem testnqn for NQN nqn.2014-08.org.nvmexpress:uuid:55bf9c5a-2992-4ffc-ac53-18003029a0b9.
+[ 3447.752423] nvme nvme1: creating 48 I/O queues.
+[ 3447.758869] nvme nvme1: new ctrl: "testnqn"
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme1n1 
+linux-block (for-next) # dmesg -c 
+[ 3452.675959] nvme_setup_verify 844
+[ 3452.675969] nvmet: nvmet_file_execute_verify 525
+[ 3452.675971] nvmet: nvmet_file_emulate_verify_work 502
+[ 3452.675972] nvmet: do_direct_io_emulate_verify 431
+linux-block (for-next) # nvme verify -s 0 -c 1024 /dev/nvme1n1
+NVME Verify Success
+linux-block (for-next) # dmesg  -c 
+[ 3459.794385] nvmet: nvmet_file_execute_verify 525
+[ 3459.794389] nvmet: nvmet_file_emulate_verify_work 502
+[ 3459.794391] nvmet: do_direct_io_emulate_verify 431
+linux-block (for-next) #  
+linux-block (for-next) # 
+linux-block (for-next) # ./delete.sh 1
++ nvme disconnect -n testnqn
+NQN:testnqn disconnected 1 controller(s)
+
+real	0m0.338s
+user	0m0.001s
+sys	0m0.004s
+++ shuf -i 1-1 -n 1
++ for i in `shuf -i  1-$NN -n $NN`
++ echo 0
++ rmdir /sys/kernel/config/nvmet/subsystems/testnqn/namespaces/1
++ rmdir config/nullb/nullb0
++ sleep 2
++ rm -fr /sys/kernel/config/nvmet/ports/1/subsystems/testnqn
++ sleep 1
++ rmdir /sys/kernel/config/nvmet/ports/1
++ rmdir /sys/kernel/config/nvmet/subsystems/testnqn
++ sleep 1
++ modprobe -r nvme_loop
++ modprobe -r nvme_fabrics
++ modprobe -r nvmet
++ modprobe -r nvme
++ umount /mnt/nvme0n1
+umount: /mnt/nvme0n1: no mount point specified.
++ umount /mnt/backend
++ modprobe -r null_blk
++ tree /sys/kernel/config
+/sys/kernel/config
+
+0 directories, 0 files
+
+################################# NVMe PCIe device  ###########################
+linux-block (for-next) #
+linux-block (for-next) #
+linux-block (for-next) # modprobe nvme
+linux-block (for-next) # blkverify -o 0 -l 40960 /dev/nvme0n1
+linux-block (for-next) # dmesg  -c
+[ 2763.432194] nvme nvme0: pci function 0000:00:04.0
+[ 2763.473827] nvme nvme0: 48/0/0 default/read/poll queues
+[ 2763.478868] nvme nvme0: Ignoring bogus Namespace Identifiers
+[ 2766.583923] nvme_setup_verify 844
