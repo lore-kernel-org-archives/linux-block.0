@@ -2,61 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 142D7C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 08:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EB1C43334
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 08:33:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233266AbiF3ISs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 04:18:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43876 "EHLO
+        id S230160AbiF3Idk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 04:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234077AbiF3IRg (ORCPT
+        with ESMTP id S229925AbiF3Idj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 04:17:36 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD73E43396
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 01:16:22 -0700 (PDT)
-Received: from fraeml742-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LYWNd4Mfdz67wM8;
-        Thu, 30 Jun 2022 16:15:29 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml742-chm.china.huawei.com (10.206.15.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 30 Jun 2022 10:16:17 +0200
-Received: from [10.126.174.156] (10.126.174.156) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 30 Jun 2022 09:16:16 +0100
-Message-ID: <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
-Date:   Thu, 30 Jun 2022 09:16:18 +0100
+        Thu, 30 Jun 2022 04:33:39 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ADAA1A382
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 01:33:38 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id DDE9F21CA5;
+        Thu, 30 Jun 2022 08:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1656578016; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iDT1CUHWfgPQNA+zyxq3ITlTYfYGUqZD8UVFfpFXlbg=;
+        b=fWoY0DDDB+Ww4AAimeCvfIV7Mb3IbBoWDjVyM9tgJWxGuAeJ9IvZfclwzIEbBV0cCtUGqZ
+        +MDeXwOcmijwadpZDAEJ1V5jW2xJ0pHwFx8cE76Uk20nBEdvnsBc9Uzgtl6LhMLnbSE9Ea
+        FjUkwb118Zl8I0v/UDA/g+GnQ6iM6YM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1656578016;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iDT1CUHWfgPQNA+zyxq3ITlTYfYGUqZD8UVFfpFXlbg=;
+        b=fex9OB5OtU/+39RSYM4U2gerUkqZlMLSGkMplga9a7YnwpGf7Av1ah+Bp67b5OZP8cf9E4
+        6kmQcIP+nOKDOQAQ==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id C726C2C141;
+        Thu, 30 Jun 2022 08:33:36 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 8278DA061F; Thu, 30 Jun 2022 10:33:36 +0200 (CEST)
+Date:   Thu, 30 Jun 2022 10:33:36 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v2 07/63] block/bfq: Use the new blk_opf_t type
+Message-ID: <20220630083336.ik4hkacm5ktdrqar@quack3.lan>
+References: <20220629233145.2779494-1-bvanassche@acm.org>
+ <20220629233145.2779494-8-bvanassche@acm.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v3 0/2] blk-cgroup: duplicated code refactor
-To:     Jens Axboe <axboe@kernel.dk>, Jason Yan <yanaijie@huawei.com>,
-        <tj@kernel.org>, <jack@suse.cz>, <hch@lst.de>
-CC:     <linux-block@vger.kernel.org>
-References: <20220629070917.3113016-1-yanaijie@huawei.com>
- <2ba24ea6-df8f-3afb-1526-bfb5916f2fcf@kernel.dk>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <2ba24ea6-df8f-3afb-1526-bfb5916f2fcf@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.126.174.156]
-X-ClientProxiedBy: lhreml727-chm.china.huawei.com (10.201.108.78) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220629233145.2779494-8-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 29/06/2022 18:09, Jens Axboe wrote:
-> Like I told Yu, stop using the huawei email until your MTA
-> misconfiguration issues are fixed. They end up in spam and risk getting
-> lost. This series was one of them.
+On Wed 29-06-22 16:30:49, Bart Van Assche wrote:
+> Use the new blk_opf_t type for arguments and variables that represent
+> request flags or a bitwise combination of a request operation and
+> request flags.
+> 
+> This patch does not change any functionality.
+> 
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Hi Jens,
+Sure. Feel free to add:
 
-Just wondering - are there any of my mails in your spam folder?
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-thanks,
-John
+								Honza
+
+> ---
+>  block/bfq-cgroup.c  | 16 ++++++++--------
+>  block/bfq-iosched.c |  8 ++++----
+>  block/bfq-iosched.h |  8 ++++----
+>  3 files changed, 16 insertions(+), 16 deletions(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index 9fc605791b1e..af79028627a5 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -220,7 +220,7 @@ void bfqg_stats_update_avg_queue_size(struct bfq_group *bfqg)
+>  }
+>  
+>  void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+> -			      unsigned int op)
+> +			      blk_opf_t op)
+>  {
+>  	blkg_rwstat_add(&bfqg->stats.queued, op, 1);
+>  	bfqg_stats_end_empty_time(&bfqg->stats);
+> @@ -228,18 +228,18 @@ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+>  		bfqg_stats_set_start_group_wait_time(bfqg, bfqq_group(bfqq));
+>  }
+>  
+> -void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op)
+> +void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t op)
+>  {
+>  	blkg_rwstat_add(&bfqg->stats.queued, op, -1);
+>  }
+>  
+> -void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op)
+> +void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t op)
+>  {
+>  	blkg_rwstat_add(&bfqg->stats.merged, op, 1);
+>  }
+>  
+>  void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
+> -				  u64 io_start_time_ns, unsigned int op)
+> +				  u64 io_start_time_ns, blk_opf_t op)
+>  {
+>  	struct bfqg_stats *stats = &bfqg->stats;
+>  	u64 now = ktime_get_ns();
+> @@ -255,11 +255,11 @@ void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
+>  #else /* CONFIG_BFQ_CGROUP_DEBUG */
+>  
+>  void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+> -			      unsigned int op) { }
+> -void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op) { }
+> -void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op) { }
+> +			      blk_opf_t op) { }
+> +void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t op) { }
+> +void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t op) { }
+>  void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
+> -				  u64 io_start_time_ns, unsigned int op) { }
+> +				  u64 io_start_time_ns, blk_opf_t op) { }
+>  void bfqg_stats_update_dequeue(struct bfq_group *bfqg) { }
+>  void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg) { }
+>  void bfqg_stats_update_idle_time(struct bfq_group *bfqg) { }
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index e6d7e6b01a05..a724fc882158 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -668,7 +668,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
+>   * significantly affect service guarantees coming from the BFQ scheduling
+>   * algorithm.
+>   */
+> -static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
+> +static void bfq_limit_depth(blk_opf_t op, struct blk_mq_alloc_data *data)
+>  {
+>  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
+>  	struct bfq_io_cq *bic = bfq_bic_lookup(data->q);
+> @@ -6104,7 +6104,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
+>  static void bfq_update_insert_stats(struct request_queue *q,
+>  				    struct bfq_queue *bfqq,
+>  				    bool idle_timer_disabled,
+> -				    unsigned int cmd_flags)
+> +				    blk_opf_t cmd_flags)
+>  {
+>  	if (!bfqq)
+>  		return;
+> @@ -6129,7 +6129,7 @@ static void bfq_update_insert_stats(struct request_queue *q,
+>  static inline void bfq_update_insert_stats(struct request_queue *q,
+>  					   struct bfq_queue *bfqq,
+>  					   bool idle_timer_disabled,
+> -					   unsigned int cmd_flags) {}
+> +					   blk_opf_t cmd_flags) {}
+>  #endif /* CONFIG_BFQ_CGROUP_DEBUG */
+>  
+>  static struct bfq_queue *bfq_init_rq(struct request *rq);
+> @@ -6141,7 +6141,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  	struct bfq_data *bfqd = q->elevator->elevator_data;
+>  	struct bfq_queue *bfqq;
+>  	bool idle_timer_disabled = false;
+> -	unsigned int cmd_flags;
+> +	blk_opf_t cmd_flags;
+>  	LIST_HEAD(free);
+>  
+>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index ca8177d7bf7c..6bde1f4ecc50 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -994,11 +994,11 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg);
+>  
+>  void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq);
+>  void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+> -			      unsigned int op);
+> -void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op);
+> -void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op);
+> +			      blk_opf_t op);
+> +void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t op);
+> +void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t op);
+>  void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
+> -				  u64 io_start_time_ns, unsigned int op);
+> +				  u64 io_start_time_ns, blk_opf_t op);
+>  void bfqg_stats_update_dequeue(struct bfq_group *bfqg);
+>  void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg);
+>  void bfqg_stats_update_idle_time(struct bfq_group *bfqg);
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
