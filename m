@@ -2,76 +2,194 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A723C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 09:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63453C43334
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 11:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231375AbiF3J4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 05:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58332 "EHLO
+        id S234102AbiF3LfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 07:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230511AbiF3J4q (ORCPT
+        with ESMTP id S232927AbiF3LfR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 05:56:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1620366AC
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 02:56:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656583005;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=9P5s6J6M9dZUv6A2sm3ewX+NdhaZ9Znte9gZ3ncjQIU=;
-        b=icaKFqNZL0gej1FfNG3jEHu5i6yEb8RNWCQs2z0bVXxkya4hpIhUkXNT/a6v1uM3v996uk
-        EbvrCwxVQ9xpFcYvW6MhgHt3mMJqJ8JUc6QOLNMb5dgeaz3M7VN/Td7Vh14Pll9nHMFcyR
-        exKH2uS+QmLCKSHb7fQlRf/hYU+97tM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-665-oAoqMYFhP9KOPVN3jDZndw-1; Thu, 30 Jun 2022 05:56:41 -0400
-X-MC-Unique: oAoqMYFhP9KOPVN3jDZndw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9865C811E75;
-        Thu, 30 Jun 2022 09:56:40 +0000 (UTC)
-Received: from fedora34.. (unknown [10.66.146.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ED972492C3B;
-        Thu, 30 Jun 2022 09:56:38 +0000 (UTC)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     shinichiro.kawasaki@wdc.com, yangx.jy@fujitsu.com
-Subject: [PATCH blktests] common/multipath-over-rdma: skip NO-CARRIER NIC when start_soft_rdma
-Date:   Thu, 30 Jun 2022 17:56:25 +0800
-Message-Id: <20220630095625.2705173-1-yi.zhang@redhat.com>
+        Thu, 30 Jun 2022 07:35:17 -0400
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F389A5A445;
+        Thu, 30 Jun 2022 04:35:15 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VHsMSXI_1656588911;
+Received: from 30.97.57.27(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VHsMSXI_1656588911)
+          by smtp.aliyun-inc.com;
+          Thu, 30 Jun 2022 19:35:12 +0800
+Message-ID: <fdd06581-a8aa-5948-6043-fc7e3381eb2d@linux.alibaba.com>
+Date:   Thu, 30 Jun 2022 19:35:11 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH V3 1/1] ublk: add io_uring based userspace block driver
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20220628160807.148853-1-ming.lei@redhat.com>
+ <20220628160807.148853-2-ming.lei@redhat.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20220628160807.148853-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The rxe/siw driver will be bind to NO-CARRIER interface which lead
-nvmeof-mp/001 failed.
-For example, nvmeof-mp/001 with two NICs, if will output
-count_devices(): 1 <> 2 when the second NIC has NO-CARRIER
+On 2022/6/29 00:08, Ming Lei wrote:
 
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- common/multipath-over-rdma | 1 +
- 1 file changed, 1 insertion(+)
+[...]
 
-diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index 8edcf39..8ab3da1 100644
---- a/common/multipath-over-rdma
-+++ b/common/multipath-over-rdma
-@@ -409,6 +409,7 @@ start_soft_rdma() {
- 				[ -e "$i" ] || continue
- 				[ "$i" = "lo" ] && continue
- 				[ "$(<"$i/addr_len")" = 6 ] || continue
-+				[ "$(<"$i/carrier")" = 1 ] || continue
- 				has_soft_rdma "$i" && continue
- 				rdma link add "${i}_$type" type $type netdev "$i" ||
- 				echo "Failed to bind the $type driver to $i"
--- 
-2.34.1
+> +#define UBLK_MAX_PIN_PAGES	32
+> +
+> +static inline void ublk_release_pages(struct ublk_queue *ubq, struct page **pages,
+> +		int nr_pages)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < nr_pages; i++)
+> +		put_page(pages[i]);
+> +}
+> +
+> +static inline int ublk_pin_user_pages(struct ublk_queue *ubq, u64 start_vm,
+> +		unsigned int nr_pages, unsigned int gup_flags,
+> +		struct page **pages)
+> +{
+> +	return get_user_pages_fast(start_vm, nr_pages, gup_flags, pages);
+> +}
 
+> +
+> +static inline unsigned ublk_copy_bv(struct bio_vec *bv, void **bv_addr,
+> +		void *pg_addr, unsigned int *pg_off,
+> +		unsigned int *pg_len, bool to_bv)
+> +{
+> +	unsigned len = min_t(unsigned, bv->bv_len, *pg_len);
+> +
+> +	if (*bv_addr == NULL)
+> +		*bv_addr = kmap_local_page(bv->bv_page);
+> +
+> +	if (to_bv)
+> +		memcpy(*bv_addr + bv->bv_offset, pg_addr + *pg_off, len);
+> +	else
+> +		memcpy(pg_addr + *pg_off, *bv_addr + bv->bv_offset, len);
+> +
+> +	bv->bv_offset += len;
+> +	bv->bv_len -= len;
+> +	*pg_off += len;
+> +	*pg_len -= len;
+> +
+> +	if (!bv->bv_len) {
+> +		kunmap_local(*bv_addr);
+> +		*bv_addr = NULL;
+> +	}
+> +
+> +	return len;
+> +}
+> +
+> +/* copy rq pages to ublksrv vm address pointed by io->addr */
+> +static int ublk_copy_pages(struct ublk_queue *ubq, struct request *rq, bool to_rq,
+> +		unsigned int max_bytes)
+> +{
+> +	unsigned int gup_flags = to_rq ? 0 : FOLL_WRITE;
+> +	struct ublk_io *io = &ubq->ios[rq->tag];
+> +	struct page *pgs[UBLK_MAX_PIN_PAGES];
+> +	struct req_iterator req_iter;
+> +	struct bio_vec bv;
+> +	const unsigned int rq_bytes = min(blk_rq_bytes(rq), max_bytes);
+> +	unsigned long start = io->addr, left = rq_bytes;
+> +	unsigned int idx = 0, pg_len = 0, pg_off = 0;
+> +	int nr_pin = 0;
+> +	void *pg_addr = NULL;
+> +	struct page *curr = NULL;
+> +
+> +	rq_for_each_segment(bv, rq, req_iter) {
+> +		unsigned len, bv_off = bv.bv_offset, bv_len = bv.bv_len;
+> +		void *bv_addr = NULL;
+> +
+> +refill:
+> +		if (pg_len == 0) {
+> +			unsigned int off = 0;
+> +
+> +			if (pg_addr) {
+> +				kunmap_local(pg_addr);
+> +				if (!to_rq)
+> +					set_page_dirty_lock(curr);
+> +				pg_addr = NULL;
+> +			}
+> +
+> +			/* refill pages */
+> +			if (idx >= nr_pin) {
+> +				unsigned int max_pages;
+> +
+> +				ublk_release_pages(ubq, pgs, nr_pin);
+> +
+> +				off = start & (PAGE_SIZE - 1);
+> +				max_pages = min_t(unsigned, (off + left +
+> +						PAGE_SIZE - 1) >> PAGE_SHIFT,
+> +						UBLK_MAX_PIN_PAGES);
+> +				nr_pin = ublk_pin_user_pages(ubq, start,
+> +						max_pages, gup_flags, pgs);
+> +				if (nr_pin < 0)
+> +					goto exit;
+> +				idx = 0;
+> +			}
+> +			pg_off = off;
+> +			pg_len = min(PAGE_SIZE - off, left);
+> +			off = 0;
+> +			curr = pgs[idx++];
+> +			pg_addr = kmap_local_page(curr);
+> +		}
+> +
+> +		len = ublk_copy_bv(&bv, &bv_addr, pg_addr, &pg_off, &pg_len,
+> +				to_rq);
+> +		/* either one of the two has been consumed */
+> +		WARN_ON_ONCE(bv.bv_len && pg_len);
+> +		start += len;
+> +		left -= len;
+> +
+> +		/* overflow */
+> +		WARN_ON_ONCE(left > rq_bytes);
+> +		WARN_ON_ONCE(bv.bv_len > bv_len);
+> +		if (bv.bv_len)
+> +			goto refill;
+> +
+> +		bv.bv_len = bv_len;
+> +		bv.bv_offset = bv_off;
+> +	}
+> +	if (pg_addr) {
+> +		kunmap_local(pg_addr);
+> +		if (!to_rq)
+> +			set_page_dirty_lock(curr);
+> +	}
+> +	ublk_release_pages(ubq, pgs, nr_pin);
+> +
+> +exit:
+> +	return rq_bytes - left;
+> +}
+> +
+
+Hi Ming, 
+
+I note that you pin the user buffer's pages, memcpy() and release them immediately.
+
+1) I think maybe copy_page_from_iter() is another choice for copying user buffer to biovecs
+   since copy_page_from_iter() do not pin pages(But it may raise page fault).
+
+2) Or will you design some mechanism such as LRU to manage these pinned pages? 
+   For example pin those pages frequently required for a long time and release
+   those pages not used for a long time.
+   I remember you have talked about this LRU on pinned pages?
+
+Which one do you think is better? copy_page_from_iter() or pin pages with LRU?
+Maybe it depends on the user's workload?
+
+Regards,
+Zhang
