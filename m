@@ -2,193 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10E33C43334
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 08:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F87EC43334
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 08:50:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbiF3Ieg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 04:34:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37660 "EHLO
+        id S233341AbiF3Iul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 04:50:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232814AbiF3Ief (ORCPT
+        with ESMTP id S231838AbiF3Iuk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 04:34:35 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C301F2252D
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 01:34:33 -0700 (PDT)
+        Thu, 30 Jun 2022 04:50:40 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079F3427E2
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 01:50:40 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 7CAE51F9DC;
-        Thu, 30 Jun 2022 08:34:32 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTP id B955C21C8F;
+        Thu, 30 Jun 2022 08:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1656578072; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1656579038; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=RVIsZ8Orktq2gYRd9xfni6qDmSFabiL1jchYMv8NRAI=;
-        b=GSFrj8VLncPrbRP/BZh8z959dUU+ub8B0tGGQU30WhacNQ8nWjJcRXeFlag75VZ/Ae8pmh
-        YxPsjqQqJDzG3hcXwHZGYF4723Sm2ZIdQJdt6wW4VJ6jXH+3o+Uf1Q7uSs6GR3jwuM8ZLt
-        wn70VqdFzomvt04qVgR7oZoHjHsdM4g=
+        bh=ykT6Q+EutwjEyePO55nGWPq8jAr92jLqcIAmhuzpnEg=;
+        b=LQsa+pW2Xu1pU/vne161LbSi3lyTXZ4JLRk7YzR6cyS97DjvHFbj+upAhx44MqwTi9iPpr
+        K1tsw46lmuRFjqBiGFL/n9pcf9a3pKobeSiyUG63ntGI78TI+40F5VLzeHC8eZf+N19oeR
+        uSme9vq65S7btrzzD3T46LiGsjBoLlg=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1656578072;
+        s=susede2_ed25519; t=1656579038;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=RVIsZ8Orktq2gYRd9xfni6qDmSFabiL1jchYMv8NRAI=;
-        b=7XgOqn+v0b3egDpUVkbkKiSu+nwzajpl25xnlDX1ljo8ER0Nwh0FTsfPUmuoiGuGSD1rcp
-        5e+i1MJscjzRg6Dg==
+        bh=ykT6Q+EutwjEyePO55nGWPq8jAr92jLqcIAmhuzpnEg=;
+        b=I82QZcrvEv465gjjuRq00winTBBIb0vkVGkDWhPNI+emGyaemLV2/499FlviRretsNilH6
+        8eycnPXGamsWVGCw==
 Received: from quack3.suse.cz (unknown [10.100.224.230])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 5C0482C141;
-        Thu, 30 Jun 2022 08:34:32 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTPS id A183D2C141;
+        Thu, 30 Jun 2022 08:50:38 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 1F764A061F; Thu, 30 Jun 2022 10:34:32 +0200 (CEST)
-Date:   Thu, 30 Jun 2022 10:34:32 +0200
+        id 47F53A061F; Thu, 30 Jun 2022 10:50:38 +0200 (CEST)
+Date:   Thu, 30 Jun 2022 10:50:38 +0200
 From:   Jan Kara <jack@suse.cz>
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v2 46/63] fs/buffer: Use the new blk_opf_t type
-Message-ID: <20220630083432.244d5rgdzxe72eru@quack3.lan>
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J . Wong" <djwong@kernel.org>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH v2 48/63] fs/direct-io: Reduce the size of struct dio
+Message-ID: <20220630085038.7ubc7zemwwsyjd3e@quack3.lan>
 References: <20220629233145.2779494-1-bvanassche@acm.org>
- <20220629233145.2779494-47-bvanassche@acm.org>
+ <20220629233145.2779494-49-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220629233145.2779494-47-bvanassche@acm.org>
+In-Reply-To: <20220629233145.2779494-49-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 29-06-22 16:31:28, Bart Van Assche wrote:
-> Improve static type checking by using the new blk_opf_t type for block layer
-> request flags. Change WRITE into REQ_OP_WRITE. This patch does not change
-> any functionality since REQ_OP_WRITE == WRITE == 1.
+On Wed 29-06-22 16:31:30, Bart Van Assche wrote:
+> Reduce the size of struct dio by combining the 'op' and 'op_flags' into
+> the new 'opf' member. Use the new blk_opf_t type to improve static type
+> checking. This patch does not change any functionality.
 > 
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
 > Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: Darrick J. Wong <djwong@kernel.org>
 > Cc: Jan Kara <jack@suse.cz>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Looks good to me. Feel free to add:
+Just one nit below.
+
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index 840752006f60..b72706d163f5 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -117,8 +117,7 @@ struct dio_submit {
+>  /* dio_state communicated between submission path and end_io */
+>  struct dio {
+>  	int flags;			/* doesn't change */
+> -	int op;
+> -	int op_flags;
+> +	blk_opf_t opf;			/* request operation type and flags */
+>  	struct gendisk *bio_disk;
+>  	struct inode *inode;
+>  	loff_t i_size;			/* i_size when submitted */
+> @@ -154,6 +153,11 @@ struct dio {
+>  
+>  static struct kmem_cache *dio_cache __read_mostly;
+>  
+> +static inline bool op_is_read(blk_opf_t opf)
+> +{
+> +	return !op_is_write(opf);
+> +}
+> +
+
+This is a bit dangerous although currently OK for direct IO code. I'm just
+afraid someone will extend direct IO code (unlikely) or copy-paste this to
+a place where there can be more operations than read & write... Maybe just
+add here a comment like /* Direct IO code does only reads or writes */.
+
+Otherwise feel free to add:
 
 Reviewed-by: Jan Kara <jack@suse.cz>
 
 								Honza
-
-> ---
->  fs/buffer.c                 | 21 +++++++++++----------
->  include/linux/buffer_head.h |  9 +++++----
->  2 files changed, 16 insertions(+), 14 deletions(-)
-> 
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index 898c7f301b1b..4a00b61f35ec 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -52,8 +52,8 @@
->  #include "internal.h"
->  
->  static int fsync_buffers_list(spinlock_t *lock, struct list_head *list);
-> -static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
-> -			 struct writeback_control *wbc);
-> +static int submit_bh_wbc(enum req_op op, blk_opf_t op_flags,
-> +			 struct buffer_head *bh, struct writeback_control *wbc);
->  
->  #define BH_ENTRY(list) list_entry((list), struct buffer_head, b_assoc_buffers)
->  
-> @@ -1716,7 +1716,7 @@ int __block_write_full_page(struct inode *inode, struct page *page,
->  	struct buffer_head *bh, *head;
->  	unsigned int blocksize, bbits;
->  	int nr_underway = 0;
-> -	int write_flags = wbc_to_write_flags(wbc);
-> +	blk_opf_t write_flags = wbc_to_write_flags(wbc);
->  
->  	head = create_page_buffers(page, inode,
->  					(1 << BH_Dirty)|(1 << BH_Uptodate));
-> @@ -2994,8 +2994,8 @@ static void end_bio_bh_io_sync(struct bio *bio)
->  	bio_put(bio);
->  }
->  
-> -static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
-> -			 struct writeback_control *wbc)
-> +static int submit_bh_wbc(enum req_op op, blk_opf_t op_flags,
-> +			 struct buffer_head *bh, struct writeback_control *wbc)
->  {
->  	struct bio *bio;
->  
-> @@ -3040,7 +3040,7 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
->  	return 0;
->  }
->  
-> -int submit_bh(int op, int op_flags, struct buffer_head *bh)
-> +int submit_bh(enum req_op op, blk_opf_t op_flags, struct buffer_head *bh)
->  {
->  	return submit_bh_wbc(op, op_flags, bh, NULL);
->  }
-> @@ -3072,7 +3072,8 @@ EXPORT_SYMBOL(submit_bh);
->   * All of the buffers must be for the same device, and must also be a
->   * multiple of the current approved size for the device.
->   */
-> -void ll_rw_block(int op, int op_flags,  int nr, struct buffer_head *bhs[])
-> +void ll_rw_block(enum req_op op, blk_opf_t op_flags, int nr,
-> +		 struct buffer_head *bhs[])
->  {
->  	int i;
->  
-> @@ -3081,7 +3082,7 @@ void ll_rw_block(int op, int op_flags,  int nr, struct buffer_head *bhs[])
->  
->  		if (!trylock_buffer(bh))
->  			continue;
-> -		if (op == WRITE) {
-> +		if (op == REQ_OP_WRITE) {
->  			if (test_clear_buffer_dirty(bh)) {
->  				bh->b_end_io = end_buffer_write_sync;
->  				get_bh(bh);
-> @@ -3101,7 +3102,7 @@ void ll_rw_block(int op, int op_flags,  int nr, struct buffer_head *bhs[])
->  }
->  EXPORT_SYMBOL(ll_rw_block);
->  
-> -void write_dirty_buffer(struct buffer_head *bh, int op_flags)
-> +void write_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
->  {
->  	lock_buffer(bh);
->  	if (!test_clear_buffer_dirty(bh)) {
-> @@ -3119,7 +3120,7 @@ EXPORT_SYMBOL(write_dirty_buffer);
->   * and then start new I/O and then wait upon it.  The caller must have a ref on
->   * the buffer_head.
->   */
-> -int __sync_dirty_buffer(struct buffer_head *bh, int op_flags)
-> +int __sync_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags)
->  {
->  	int ret = 0;
->  
-> diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-> index c9d1463bb20f..9795df9400bd 100644
-> --- a/include/linux/buffer_head.h
-> +++ b/include/linux/buffer_head.h
-> @@ -9,6 +9,7 @@
->  #define _LINUX_BUFFER_HEAD_H
->  
->  #include <linux/types.h>
-> +#include <linux/blk_types.h>
->  #include <linux/fs.h>
->  #include <linux/linkage.h>
->  #include <linux/pagemap.h>
-> @@ -201,11 +202,11 @@ struct buffer_head *alloc_buffer_head(gfp_t gfp_flags);
->  void free_buffer_head(struct buffer_head * bh);
->  void unlock_buffer(struct buffer_head *bh);
->  void __lock_buffer(struct buffer_head *bh);
-> -void ll_rw_block(int, int, int, struct buffer_head * bh[]);
-> +void ll_rw_block(enum req_op, blk_opf_t, int, struct buffer_head * bh[]);
->  int sync_dirty_buffer(struct buffer_head *bh);
-> -int __sync_dirty_buffer(struct buffer_head *bh, int op_flags);
-> -void write_dirty_buffer(struct buffer_head *bh, int op_flags);
-> -int submit_bh(int, int, struct buffer_head *);
-> +int __sync_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags);
-> +void write_dirty_buffer(struct buffer_head *bh, blk_opf_t op_flags);
-> +int submit_bh(enum req_op, blk_opf_t, struct buffer_head *);
->  void write_boundary_block(struct block_device *bdev,
->  			sector_t bblock, unsigned blocksize);
->  int bh_uptodate_or_lock(struct buffer_head *bh);
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
