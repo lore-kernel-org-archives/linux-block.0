@@ -2,215 +2,274 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2895BC43334
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 09:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5C8C43334
+	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 10:58:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234728AbiGAJ2B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Jul 2022 05:28:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41968 "EHLO
+        id S233676AbiGAK6w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Jul 2022 06:58:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236743AbiGAJ1u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 05:27:50 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D982261D43
-        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 02:27:26 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id k22so2319089wrd.6
-        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2022 02:27:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=o8TItusxupAaI8OMQxc13SGH8w1Z7XEgNW2KPKz2sWY=;
-        b=G2KeC7M+Xf/3dy+pqj7l9hmonGO6B2ZVKCeTVapzajZ8PxWsy1h1p3OQatJtTlga1R
-         5TuD5Cig1QOVf3809MX48MIu0+xsUJ9aamwIRTiw3R2rAysjLTxdg2AzLzOlNN8s3v6u
-         sw1687ixS1oLa8tGmuhv2Ifyh1D31KUEM//qE8zB/8xOJ5VpQx9kQPAkTlibv1eYLSIH
-         g4hiZhEMStM4HQuuxplJ8yQ+10oPo7RQZ6n7heRXjSJLVW5FB2/ylhfoVNu+qqYZuDmq
-         SqulspVS8p3EP3WUqNkwHcnRXp1V8qm6fnZ+BQp6U+kUkOFOSQhKjT5gzQJwX4lEavuY
-         oT7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=o8TItusxupAaI8OMQxc13SGH8w1Z7XEgNW2KPKz2sWY=;
-        b=vHPfKejjy31dONFfBgZiO5nSx9eAyaxmRcAHG+90Mksn6YlEmYuEgqnM87f5X0ysxR
-         298pKDy1N23x4KP+6LMC7iNAgo5sFqQew9v/Oo+iKeSqNb8Xbg83DUvZuBSqIOA9U+mC
-         cuarXhl4s3kABFgsxGcc2oKJAzJP/Wpvvd8EmHEQcfwVbEt71IP0F9+3BqrF9+Hr1U+2
-         eVmQZk7gnuiS3skvtuYYvNHiO2Gl8rZ7Raqjz5NqobDm17n6bv2LJBKbOKtw4Ys3WUqR
-         CFCswJcLseHxOIfw+HpUhF2azV2ohgxcZkayWoPbN4yPQ7KVxIHr94axY1vzb0mOT0QZ
-         5kpA==
-X-Gm-Message-State: AJIora8raeNQK/YQvWASWTOk0xxQiv8VFZvpvCbK7pSgYdwcckCgtYx6
-        eR7RASytj4zhkQK4bwKXRED+poNEpRSGK/JtI5x1vg==
-X-Google-Smtp-Source: AGRyM1vwciUY2iTgW8ir+xsGUghl4ag7N5L7D2zuAttHi5M3CpYAJHH8wKHgT7G14nyz99yXgDFGC2wrtIsRge8HpBA=
-X-Received: by 2002:a05:6000:1f98:b0:21b:9cf4:c681 with SMTP id
- bw24-20020a0560001f9800b0021b9cf4c681mr12431783wrb.89.1656667645314; Fri, 01
- Jul 2022 02:27:25 -0700 (PDT)
+        with ESMTP id S236830AbiGAK6v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 06:58:51 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AA6A7358E
+        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 03:58:49 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 0FCF71FF11;
+        Fri,  1 Jul 2022 10:58:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1656673128; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zcFiT5mGXhQfW28T0cYxcSG/tlcZApUvPv20GkW50tw=;
+        b=mvLpyoWJsYNSqHIwvM/NZw3RtL8YBzPGZP5K1Lp53nFxSAwWNJOcYH3wLyjwQC8L2idUed
+        ljx8N1oDKyfMB3cpmQjPM7uz0kSI+WqF62qNNR1KgTRqTsyakD4W2p9OiqE1UAo+vjLZkK
+        5xdVfkEAioTAZSYqM3daQsT8U02/XxU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1656673128;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zcFiT5mGXhQfW28T0cYxcSG/tlcZApUvPv20GkW50tw=;
+        b=8YBxQ3sfolGGj979YExEFfqI7WJtdO1REg2LaHiltdJLT1T5NMJIghMbNlmfyX6HyQ6Vwv
+        a2lfo7gXDeEAvXBA==
+Received: from quack3.suse.cz (unknown [10.100.200.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id D09A32C141;
+        Fri,  1 Jul 2022 10:58:47 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 8B561A062F; Fri,  1 Jul 2022 12:58:47 +0200 (CEST)
+Date:   Fri, 1 Jul 2022 12:58:47 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J . Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v2 48/63] fs/direct-io: Reduce the size of struct dio
+Message-ID: <20220701105847.dzqb6mhhqyhtuqjg@quack3.lan>
+References: <20220629233145.2779494-1-bvanassche@acm.org>
+ <20220629233145.2779494-49-bvanassche@acm.org>
+ <20220630085038.7ubc7zemwwsyjd3e@quack3.lan>
+ <65c4e983-ea3e-728f-68e5-8240a1a46f8c@acm.org>
 MIME-Version: 1.0
-References: <20220701084744.3002019-1-davidgow@google.com> <20220701084744.3002019-2-davidgow@google.com>
- <Yr62gr9advYNTPoM@kroah.com>
-In-Reply-To: <Yr62gr9advYNTPoM@kroah.com>
-From:   David Gow <davidgow@google.com>
-Date:   Fri, 1 Jul 2022 17:27:14 +0800
-Message-ID: <CABVgOSk4PM-iu6HYT9pzkSe9x3XMA-+5z3oR7U7W+SrKWXzpvA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] module: panic: Taint the kernel when selftest
- modules load
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Brendan Higgins <brendanhiggins@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Ogness <john.ogness@linutronix.de>,
-        Joe Fradley <joefradley@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        KUnit Development <kunit-dev@googlegroups.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000087963c05e2bafe2c"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65c4e983-ea3e-728f-68e5-8240a1a46f8c@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000087963c05e2bafe2c
-Content-Type: text/plain; charset="UTF-8"
+On Thu 30-06-22 12:06:30, Bart Van Assche wrote:
+> On 6/30/22 01:50, Jan Kara wrote:
+> > On Wed 29-06-22 16:31:30, Bart Van Assche wrote:
+> > > +static inline bool op_is_read(blk_opf_t opf)
+> > > +{
+> > > +	return !op_is_write(opf);
+> > > +}
+> > > +
+> > 
+> > This is a bit dangerous although currently OK for direct IO code. I'm just
+> > afraid someone will extend direct IO code (unlikely) or copy-paste this to
+> > a place where there can be more operations than read & write... Maybe just
+> > add here a comment like /* Direct IO code does only reads or writes */.
+> 
+> Hi Jan,
+> 
+> Since source code comments tend to get overlooked, how about replacing
+> this patch by the patch below?
 
-On Fri, Jul 1, 2022 at 4:55 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Jul 01, 2022 at 04:47:42PM +0800, David Gow wrote:
-> > Taint the kernel with TAINT_TEST whenever a test module loads, by adding
-> > a new "TEST" module property, and setting it for all modules in the
-> > tools/testing directory. This property can also be set manually, for
-> > tests which live outside the tools/testing directory with:
-> > MODULE_INFO(test, "Y");
-> >
-> > Signed-off-by: David Gow <davidgow@google.com>
-> > ---
-> >
-> > This patch is new in v4 of this series.
-> >
-> > ---
-> >  kernel/module/main.c  | 8 ++++++++
-> >  scripts/mod/modpost.c | 3 +++
-> >  2 files changed, 11 insertions(+)
-> >
-> > diff --git a/kernel/module/main.c b/kernel/module/main.c
-> > index fed58d30725d..f2ca0a3ee5e6 100644
-> > --- a/kernel/module/main.c
-> > +++ b/kernel/module/main.c
-> > @@ -1988,6 +1988,14 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
-> >       /* Set up license info based on the info section */
-> >       set_license(mod, get_modinfo(info, "license"));
-> >
-> > +     if (!get_modinfo(info, "test")) {
-> > +             if (!test_taint(TAINT_TEST))
-> > +                     pr_warn("%s: loading test module taints kernel.\n",
-> > +                             mod->name);
-> > +             add_taint_module(mod, TAINT_TEST, LOCKDEP_STILL_OK);
-> > +     }
-> > +
-> > +
->
-> Why 2 blank lines?
->
-> thanks,
->
-> greg k-h
+Looks good to me. Feel free to add:
 
-Whoops: not sure where those came from. I've removed the extra newline
-locally: it'll be gone in the next revision.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Cheers,
--- David
+								Honza
 
---00000000000087963c05e2bafe2c
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIPnwYJKoZIhvcNAQcCoIIPkDCCD4wCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggz5MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
-IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
-dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
-6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
-c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
-I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
-AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
-BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
-CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
-AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
-MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
-My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
-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
-z/tQRXr3iPeVmZCr7nttMEwGA1UdIARFMEMwQQYJKwYBBAGgMgEoMDQwMgYIKwYBBQUHAgEWJmh0
-dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAwGA1UdEwEB/wQCMAAwgZoGCCsG
-AQUFBwEBBIGNMIGKMD4GCCsGAQUFBzABhjJodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9jYS9n
-c2F0bGFzcjNzbWltZWNhMjAyMDBIBggrBgEFBQcwAoY8aHR0cDovL3NlY3VyZS5nbG9iYWxzaWdu
-LmNvbS9jYWNlcnQvZ3NhdGxhc3Izc21pbWVjYTIwMjAuY3J0MB8GA1UdIwQYMBaAFHzMCmjXouse
-LHIb0c1dlW+N+/JjMEYGA1UdHwQ/MD0wO6A5oDeGNWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20v
-Y2EvZ3NhdGxhc3Izc21pbWVjYTIwMjAuY3JsMA0GCSqGSIb3DQEBCwUAA4IBAQAx+EQjLATc/sze
-VoZkH7OLz+/no1+y31x4BQ3wjW7lKfay9DAAVym896b7ECttSo95GEvS7pYMikzud57WypK7Bjpi
-ep8YLarLRDrvyyvBuYtyDrIewkuASHtV1oy5E6QZZe2VOxMm6e2oJnFFjbflot4A08D3SwqDwV0i
-OOYwT0BUtHYR/3903Dmdx5Alq+NDvUHDjozgo0f6oIkwDXT3yBV36utQ/jFisd36C8RD5mM+NFpu
-3aqLXARRbKtxw29ErCwulof2dcAonG7cd5j+gmS84sLhKU+BhL1OQVXnJ5tj7xZ5Ri5I23brcwk0
-lk/gWqfgs3ppT9Xk7zVit9q8MYICajCCAmYCAQEwaDBUMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQ
-R2xvYmFsU2lnbiBudi1zYTEqMCgGA1UEAxMhR2xvYmFsU2lnbiBBdGxhcyBSMyBTTUlNRSBDQSAy
-MDIwAhABh9LgIPnlfMFHR0Die8n7MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCCX
-K4QLMwIL7o8rDELzF1jxM7PG+RsqJUqG5gU2HcUraTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcB
-MBwGCSqGSIb3DQEJBTEPFw0yMjA3MDEwOTI3MjVaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUD
-BAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsG
-CSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAFad8skhDCX1Y2SIat6Fm
-0C98jiXkyKq2i5ZOTEW3Xui6pZogEsnXFFTfnFHz5fEPpK5rpfxTWCxGKb2ShNPa+f1u2ICcwQ8T
-8JJYN7R0sfPbBbII3W69ttHbKjxjwcQawKE1OMIlfH/a5GbE82IJsUHJzf9afu4XpU71EL0uFAKy
-zs4E+2eosGYSpZ6LF8TphsoArJg9bejrZvKDLlhRd4v0TavD1Iz19VV/GVylFOBmnqXW7FjYawak
-kUdz5qRVGH8KIX98wmm5xTiBY0NRjNjVUNlIC7+iQoNH2b6D7syaAt8mzpkXw5BoOm8tkkEV0QzS
-l1eqcAro3VPXsrping==
---00000000000087963c05e2bafe2c--
+> ---
+>  fs/direct-io.c | 40 +++++++++++++++++++++++-----------------
+>  1 file changed, 23 insertions(+), 17 deletions(-)
+> 
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index 840752006f60..94b71440c332 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -117,8 +117,7 @@ struct dio_submit {
+>  /* dio_state communicated between submission path and end_io */
+>  struct dio {
+>  	int flags;			/* doesn't change */
+> -	int op;
+> -	int op_flags;
+> +	blk_opf_t opf;			/* request operation type and flags */
+>  	struct gendisk *bio_disk;
+>  	struct inode *inode;
+>  	loff_t i_size;			/* i_size when submitted */
+> @@ -167,12 +166,13 @@ static inline unsigned dio_pages_present(struct dio_submit *sdio)
+>   */
+>  static inline int dio_refill_pages(struct dio *dio, struct dio_submit *sdio)
+>  {
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	ssize_t ret;
+> 
+>  	ret = iov_iter_get_pages(sdio->iter, dio->pages, LONG_MAX, DIO_PAGES,
+>  				&sdio->from);
+> 
+> -	if (ret < 0 && sdio->blocks_available && (dio->op == REQ_OP_WRITE)) {
+> +	if (ret < 0 && sdio->blocks_available && dio_op == REQ_OP_WRITE) {
+>  		struct page *page = ZERO_PAGE(0);
+>  		/*
+>  		 * A memory fault, but the filesystem has some outstanding
+> @@ -234,6 +234,7 @@ static inline struct page *dio_get_page(struct dio *dio,
+>   */
+>  static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
+>  {
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	loff_t offset = dio->iocb->ki_pos;
+>  	ssize_t transferred = 0;
+>  	int err;
+> @@ -251,7 +252,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
+>  		transferred = dio->result;
+> 
+>  		/* Check for short read case */
+> -		if ((dio->op == REQ_OP_READ) &&
+> +		if (dio_op == REQ_OP_READ &&
+>  		    ((offset + transferred) > dio->i_size))
+>  			transferred = dio->i_size - offset;
+>  		/* ignore EFAULT if some IO has been done */
+> @@ -286,7 +287,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
+>  	 * zeros from unwritten extents.
+>  	 */
+>  	if (flags & DIO_COMPLETE_INVALIDATE &&
+> -	    ret > 0 && dio->op == REQ_OP_WRITE &&
+> +	    ret > 0 && dio_op == REQ_OP_WRITE &&
+>  	    dio->inode->i_mapping->nrpages) {
+>  		err = invalidate_inode_pages2_range(dio->inode->i_mapping,
+>  					offset >> PAGE_SHIFT,
+> @@ -305,7 +306,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
+>  		 */
+>  		dio->iocb->ki_pos += transferred;
+> 
+> -		if (ret > 0 && dio->op == REQ_OP_WRITE)
+> +		if (ret > 0 && dio_op == REQ_OP_WRITE)
+>  			ret = generic_write_sync(dio->iocb, ret);
+>  		dio->iocb->ki_complete(dio->iocb, ret);
+>  	}
+> @@ -329,6 +330,7 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio);
+>  static void dio_bio_end_aio(struct bio *bio)
+>  {
+>  	struct dio *dio = bio->bi_private;
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	unsigned long remaining;
+>  	unsigned long flags;
+>  	bool defer_completion = false;
+> @@ -353,7 +355,7 @@ static void dio_bio_end_aio(struct bio *bio)
+>  		 */
+>  		if (dio->result)
+>  			defer_completion = dio->defer_completion ||
+> -					   (dio->op == REQ_OP_WRITE &&
+> +					   (dio_op == REQ_OP_WRITE &&
+>  					    dio->inode->i_mapping->nrpages);
+>  		if (defer_completion) {
+>  			INIT_WORK(&dio->complete_work, dio_aio_complete_work);
+> @@ -396,7 +398,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+>  	 * bio_alloc() is guaranteed to return a bio when allowed to sleep and
+>  	 * we request a valid number of vectors.
+>  	 */
+> -	bio = bio_alloc(bdev, nr_vecs, dio->op | dio->op_flags, GFP_KERNEL);
+> +	bio = bio_alloc(bdev, nr_vecs, dio->opf, GFP_KERNEL);
+>  	bio->bi_iter.bi_sector = first_sector;
+>  	if (dio->is_async)
+>  		bio->bi_end_io = dio_bio_end_aio;
+> @@ -415,6 +417,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
+>   */
+>  static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
+>  {
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	struct bio *bio = sdio->bio;
+>  	unsigned long flags;
+> 
+> @@ -426,7 +429,7 @@ static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
+>  	dio->refcount++;
+>  	spin_unlock_irqrestore(&dio->bio_lock, flags);
+> 
+> -	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty)
+> +	if (dio->is_async && dio_op == REQ_OP_READ && dio->should_dirty)
+>  		bio_set_pages_dirty(bio);
+> 
+>  	dio->bio_disk = bio->bi_bdev->bd_disk;
+> @@ -492,7 +495,8 @@ static struct bio *dio_await_one(struct dio *dio)
+>  static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
+>  {
+>  	blk_status_t err = bio->bi_status;
+> -	bool should_dirty = dio->op == REQ_OP_READ && dio->should_dirty;
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+> +	bool should_dirty = dio_op == REQ_OP_READ && dio->should_dirty;
+> 
+>  	if (err) {
+>  		if (err == BLK_STS_AGAIN && (bio->bi_opf & REQ_NOWAIT))
+> @@ -619,6 +623,7 @@ static int dio_set_defer_completion(struct dio *dio)
+>  static int get_more_blocks(struct dio *dio, struct dio_submit *sdio,
+>  			   struct buffer_head *map_bh)
+>  {
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	int ret;
+>  	sector_t fs_startblk;	/* Into file, in filesystem-sized blocks */
+>  	sector_t fs_endblk;	/* Into file, in filesystem-sized blocks */
+> @@ -653,7 +658,7 @@ static int get_more_blocks(struct dio *dio, struct dio_submit *sdio,
+>  		 * which may decide to handle it or also return an unmapped
+>  		 * buffer head.
+>  		 */
+> -		create = dio->op == REQ_OP_WRITE;
+> +		create = dio_op == REQ_OP_WRITE;
+>  		if (dio->flags & DIO_SKIP_HOLES) {
+>  			i_size = i_size_read(dio->inode);
+>  			if (i_size && fs_startblk <= (i_size - 1) >> i_blkbits)
+> @@ -801,10 +806,11 @@ submit_page_section(struct dio *dio, struct dio_submit *sdio, struct page *page,
+>  		    unsigned offset, unsigned len, sector_t blocknr,
+>  		    struct buffer_head *map_bh)
+>  {
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	int ret = 0;
+>  	int boundary = sdio->boundary;	/* dio_send_cur_page may clear it */
+> 
+> -	if (dio->op == REQ_OP_WRITE) {
+> +	if (dio_op == REQ_OP_WRITE) {
+>  		/*
+>  		 * Read accounting is performed in submit_bio()
+>  		 */
+> @@ -917,6 +923,7 @@ static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
+>  static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
+>  			struct buffer_head *map_bh)
+>  {
+> +	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+>  	const unsigned blkbits = sdio->blkbits;
+>  	const unsigned i_blkbits = blkbits + sdio->blkfactor;
+>  	int ret = 0;
+> @@ -992,7 +999,7 @@ static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
+>  				loff_t i_size_aligned;
+> 
+>  				/* AKPM: eargh, -ENOTBLK is a hack */
+> -				if (dio->op == REQ_OP_WRITE) {
+> +				if (dio_op == REQ_OP_WRITE) {
+>  					put_page(page);
+>  					return -ENOTBLK;
+>  				}
+> @@ -1196,12 +1203,11 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+> 
+>  	dio->inode = inode;
+>  	if (iov_iter_rw(iter) == WRITE) {
+> -		dio->op = REQ_OP_WRITE;
+> -		dio->op_flags = REQ_SYNC | REQ_IDLE;
+> +		dio->opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
+>  		if (iocb->ki_flags & IOCB_NOWAIT)
+> -			dio->op_flags |= REQ_NOWAIT;
+> +			dio->opf |= REQ_NOWAIT;
+>  	} else {
+> -		dio->op = REQ_OP_READ;
+> +		dio->opf = REQ_OP_READ;
+>  	}
+> 
+>  	/*
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
