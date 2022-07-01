@@ -2,103 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2526EC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 01:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B19C43334
+	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 01:51:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230505AbiGABrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 21:47:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55038 "EHLO
+        id S230318AbiGABvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 21:51:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbiGABrG (ORCPT
+        with ESMTP id S229563AbiGABvX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 21:47:06 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00CE45C953
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 18:47:04 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R561e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VHvnoJW_1656640021;
-Received: from 30.225.24.50(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0VHvnoJW_1656640021)
-          by smtp.aliyun-inc.com;
-          Fri, 01 Jul 2022 09:47:01 +0800
-Message-ID: <087a250f-01fd-a38e-78a8-4449175b6d4a@linux.alibaba.com>
-Date:   Fri, 1 Jul 2022 09:47:00 +0800
+        Thu, 30 Jun 2022 21:51:23 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A0617599
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 18:51:22 -0700 (PDT)
+Received: from canpemm500004.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LYyks3fS6zTgCW;
+        Fri,  1 Jul 2022 09:47:49 +0800 (CST)
+Received: from [10.174.179.14] (10.174.179.14) by
+ canpemm500004.china.huawei.com (7.192.104.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 1 Jul 2022 09:51:20 +0800
+Subject: Re: [PATCH v3 0/2] blk-cgroup: duplicated code refactor
+To:     Bart Van Assche <bvanassche@acm.org>,
+        John Garry <john.garry@huawei.com>,
+        Jens Axboe <axboe@kernel.dk>, <tj@kernel.org>, <jack@suse.cz>,
+        <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>
+References: <20220629070917.3113016-1-yanaijie@huawei.com>
+ <2ba24ea6-df8f-3afb-1526-bfb5916f2fcf@kernel.dk>
+ <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
+ <9a9e6a5f-d03d-fbb5-71df-c4e2e35e898d@acm.org>
+From:   Jason Yan <yanaijie@huawei.com>
+Message-ID: <6d604c3a-1321-d9ae-e0da-b8e6173c1932@huawei.com>
+Date:   Fri, 1 Jul 2022 09:51:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.10.0
-Subject: Re: [PATCH v2 60/63] fs/ocfs2: Use the enum req_op and blk_opf_t
- types
+In-Reply-To: <9a9e6a5f-d03d-fbb5-71df-c4e2e35e898d@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>
-References: <20220629233145.2779494-1-bvanassche@acm.org>
- <20220629233145.2779494-61-bvanassche@acm.org>
-From:   Joseph Qi <joseph.qi@linux.alibaba.com>
-In-Reply-To: <20220629233145.2779494-61-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.14]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500004.china.huawei.com (7.192.104.92)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 6/30/22 7:31 AM, Bart Van Assche wrote:
-> Improve static type checking by using the enum req_op type for variables
-> that represent a request operation and the new blk_opf_t type for
-> variables that represent request flags. Combine the last two
-> o2hb_setup_one_bio() arguments into a single argument.
+On 2022/7/1 2:03, Bart Van Assche wrote:
+> On 6/30/22 01:16, John Garry wrote:
+>> Just wondering - are there any of my mails in your spam folder?
 > 
-> Cc: Mark Fasheh <mark@fasheh.com>
-> Cc: Joel Becker <jlbec@evilplan.org>
-> Cc: Joseph Qi <joseph.qi@linux.alibaba.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  fs/ocfs2/cluster/heartbeat.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
+> This morning I found the following email from you in my spam folder:
 > 
-> diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
-> index ea0e70c0fce0..5d7e303b0293 100644
-> --- a/fs/ocfs2/cluster/heartbeat.c
-> +++ b/fs/ocfs2/cluster/heartbeat.c
-> @@ -503,8 +503,7 @@ static void o2hb_bio_end_io(struct bio *bio)
->  static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
->  				      struct o2hb_bio_wait_ctxt *wc,
->  				      unsigned int *current_slot,
-> -				      unsigned int max_slots, int op,
-> -				      int op_flags)
-> +				      unsigned int max_slots, blk_opf_t opf)
->  {
->  	int len, current_page;
->  	unsigned int vec_len, vec_start;
-> @@ -518,7 +517,7 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
->  	 * GFP_KERNEL that the local node can get fenced. It would be
->  	 * nicest if we could pre-allocate these bios and avoid this
->  	 * all together. */
-> -	bio = bio_alloc(reg->hr_bdev, 16, op | op_flags, GFP_ATOMIC);
-> +	bio = bio_alloc(reg->hr_bdev, 16, opf, GFP_ATOMIC);
->  	if (!bio) {
->  		mlog(ML_ERROR, "Could not alloc slots BIO!\n");
->  		bio = ERR_PTR(-ENOMEM);
-> @@ -566,7 +565,7 @@ static int o2hb_read_slots(struct o2hb_region *reg,
->  
->  	while(current_slot < max_slots) {
->  		bio = o2hb_setup_one_bio(reg, &wc, &current_slot, max_slots,
-> -					 REQ_OP_READ, 0);
-> +					 REQ_OP_READ);
->  		if (IS_ERR(bio)) {
->  			status = PTR_ERR(bio);
->  			mlog_errno(status);
-> @@ -598,7 +597,7 @@ static int o2hb_issue_node_write(struct o2hb_region *reg,
->  
->  	slot = o2nm_this_node();
->  
-> -	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, REQ_OP_WRITE,
-> +	bio = o2hb_setup_one_bio(reg, write_wc, &slot, slot+1, REQ_OP_WRITE |
->  				 REQ_SYNC);
+> https://lore.kernel.org/linux-scsi/82e30007-1ffc-92e4-38b5-eaf7dd2e316d@huawei.com/ 
+> 
+> 
+> I'm going to reinstall my email filter that keeps Huawei emails out of 
+> the spam folder.
+> 
+> If the following information has not yet been shared with your IT 
+> department, please share it: https://support.google.com/a/answer/174124
+> 
+> Bart.
+> .
 
-Better to let 'REQ_OP_WRITE | REQ_SYNC' at the same line.
-Other looks fine.
-Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+Sorry to bring your guys so many troubles.
 
->  	if (IS_ERR(bio)) {
->  		status = PTR_ERR(bio);
+And thanks Bart. Yes our IT department is planning to support DKIM. But
+this needs time and they have to consider the performance issues. And we
+are going to try a workaround approach before they fix it entirely.
+
+Thanks you so much again.
+
+Jason.
