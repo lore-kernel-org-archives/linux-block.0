@@ -2,23 +2,23 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11ECCC43334
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF5ECCA479
 	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 07:55:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235418AbiGAHzM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235489AbiGAHzM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 1 Jul 2022 03:55:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50946 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbiGAHzK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 03:55:10 -0400
+        with ESMTP id S235375AbiGAHzL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 03:55:11 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6036D56D;
-        Fri,  1 Jul 2022 00:55:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD026D570;
+        Fri,  1 Jul 2022 00:55:08 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LZ6Sg1Cgpzl5Bv;
-        Fri,  1 Jul 2022 15:36:03 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LZ6Sh0w81zlBQL;
+        Fri,  1 Jul 2022 15:36:04 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgAXFWgIpL5igL73AA--.48972S10;
+        by APP3 (Coremail) with SMTP id _Ch0CgAXFWgIpL5igL73AA--.48972S12;
         Fri, 01 Jul 2022 15:36:45 +0800 (CST)
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     tj@kernel.org, mkoutny@suse.com, axboe@kernel.dk,
@@ -26,32 +26,32 @@ To:     tj@kernel.org, mkoutny@suse.com, axboe@kernel.dk,
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v6 5/8] blk-throttle: use 'READ/WRITE' instead of '0/1'
-Date:   Fri,  1 Jul 2022 15:49:20 +0800
-Message-Id: <20220701074923.657426-7-yukuai3@huawei.com>
+Subject: [PATCH v6 7/8] blk-throttle: cleanup tg_update_disptime()
+Date:   Fri,  1 Jul 2022 15:49:22 +0800
+Message-Id: <20220701074923.657426-9-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220701074923.657426-1-yukuai3@huawei.com>
 References: <20220701074923.657426-1-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgAXFWgIpL5igL73AA--.48972S10
-X-Coremail-Antispam: 1UD129KBjvdXoWrZFyfJFy5Aw4xXw17CFWfXwb_yoWkKrgEvF
-        yUGrWjvrs8Gwn3XFykG3WY9r95Ka13XFyIgay09F9rWF4UA3Z8A3W3Z3sIkr42kayIkr93
-        X34rG348Ar18tjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbm8YFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Jr0_Jr4l1IIY67AEw4v_Jr0_Jr4l82xGYIkIc2x26280x7IE14v26r126s
-        0DM28IrcIa0xkI8VCY1x0267AKxVW5JVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-        Y2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-        v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAF
-        wI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2
-        WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkE
-        bVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjsIEF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI
-        8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxAIw28IcVAKzI0EY4vE52x082I5
-        MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-        AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-        0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26c
-        xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAF
-        wI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UuuWdUUUUU=
+X-CM-TRANSID: _Ch0CgAXFWgIpL5igL73AA--.48972S12
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur47KFW5Gry5tw1rtw4Dtwb_yoW8Xw45pF
+        yUCF4rJa18tr4q9ry5XFsFqFWfJan7JFWfA397GayfArW2qrnFgrn7ZryrZaykAF93XrW5
+        ZFsrtw48Aa1UZ3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUQIb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
+        Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
+        rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
+        AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
+        14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
+        xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Y
+        z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7Iv64x0x7Aq67IIx4CEVc8vx2IErcIFxwACI4
+        02YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCF04k20xvEw4C26cxK6c8Ij28I
+        cwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8V
+        AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
+        14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU166wJUUUUU==
 Sender: yukuai1@huaweicloud.com
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
@@ -59,37 +59,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make the code easier to read, like everywhere else.
+th_update_disptime() only need to adjust postion for 'tg' in
+'parent_sq', there is no need to call throtl_enqueue/dequeue_tg().
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-throttle.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/blk-throttle.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 7b09b48577ba..e690dc1c1cde 100644
+index ab30efedff4e..473f0b651ef0 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -329,8 +329,8 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
- /* init a service_queue, assumes the caller zeroed it */
- static void throtl_service_queue_init(struct throtl_service_queue *sq)
+@@ -520,7 +520,6 @@ static void throtl_rb_erase(struct rb_node *n,
  {
--	INIT_LIST_HEAD(&sq->queued[0]);
--	INIT_LIST_HEAD(&sq->queued[1]);
-+	INIT_LIST_HEAD(&sq->queued[READ]);
-+	INIT_LIST_HEAD(&sq->queued[WRITE]);
- 	sq->pending_tree = RB_ROOT_CACHED;
- 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
+ 	rb_erase_cached(n, &parent_sq->pending_tree);
+ 	RB_CLEAR_NODE(n);
+-	--parent_sq->nr_pending;
  }
-@@ -1156,7 +1156,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
- 		nr_disp += throtl_dispatch_tg(tg);
  
- 		sq = &tg->service_queue;
--		if (sq->nr_queued[0] || sq->nr_queued[1])
-+		if (sq->nr_queued[READ] || sq->nr_queued[WRITE])
- 			tg_update_disptime(tg);
+ static void update_min_dispatch_time(struct throtl_service_queue *parent_sq)
+@@ -572,7 +571,11 @@ static void throtl_enqueue_tg(struct throtl_grp *tg)
+ static void throtl_dequeue_tg(struct throtl_grp *tg)
+ {
+ 	if (tg->flags & THROTL_TG_PENDING) {
+-		throtl_rb_erase(&tg->rb_node, tg->service_queue.parent_sq);
++		struct throtl_service_queue *parent_sq =
++			tg->service_queue.parent_sq;
++
++		throtl_rb_erase(&tg->rb_node, parent_sq);
++		--parent_sq->nr_pending;
+ 		tg->flags &= ~THROTL_TG_PENDING;
+ 	}
+ }
+@@ -1040,9 +1043,9 @@ static void tg_update_disptime(struct throtl_grp *tg)
+ 	disptime = jiffies + min_wait;
  
- 		if (nr_disp >= THROTL_QUANTUM)
+ 	/* Update dispatch time */
+-	throtl_dequeue_tg(tg);
++	throtl_rb_erase(&tg->rb_node, tg->service_queue.parent_sq);
+ 	tg->disptime = disptime;
+-	throtl_enqueue_tg(tg);
++	tg_service_queue_add(tg);
+ 
+ 	/* see throtl_add_bio_tg() */
+ 	tg->flags &= ~THROTL_TG_WAS_EMPTY;
 -- 
 2.31.1
 
