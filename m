@@ -2,152 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAB4CCA47F
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 11:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456CAC43334
+	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 13:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235927AbiGALzY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Jul 2022 07:55:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55532 "EHLO
+        id S231976AbiGANq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Jul 2022 09:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234791AbiGALzX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 07:55:23 -0400
-Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D075823BD;
-        Fri,  1 Jul 2022 04:55:22 -0700 (PDT)
-Received: from mx0.riseup.net (mx0-pn.riseup.net [10.0.1.42])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
-         client-signature RSA-PSS (2048 bits) client-digest SHA256)
-        (Client CN "mx0.riseup.net", Issuer "R3" (not verified))
-        by mx1.riseup.net (Postfix) with ESMTPS id 4LZDCt0kflzDqJx;
-        Fri,  1 Jul 2022 11:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
-        t=1656676522; bh=OmDfSiag79ufUXArN30LVk+EOWL3+NU7HJfkYVWwnEs=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=bQmFDRdMJzvZTv/048CChDzvcBkOHgUQrFztw2zatFqVCRWgxr+6Z9hGp2H+K6qo6
-         DurzcHXdVEd4pPQAZD68gGbXIIYqjtd/FcDmnpEhG4uniXrUNj6zKPVQGTLEysMJ0h
-         zLj4E9Eu+i6/9dq5kkXZcD+X+PEg1RMqQW6yxIhE=
-Received: from fews1.riseup.net (fews1-pn.riseup.net [10.0.1.83])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
-         client-signature RSA-PSS (2048 bits) client-digest SHA256)
-        (Client CN "mail.riseup.net", Issuer "R3" (not verified))
-        by mx0.riseup.net (Postfix) with ESMTPS id 4LZDCr1fmPz9tBq;
-        Fri,  1 Jul 2022 11:55:20 +0000 (UTC)
-X-Riseup-User-ID: 58664E14B2D373C4C74D8CFBD14FDC6AA3184A3116830436C65DB32C22F59FC5
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-         by fews1.riseup.net (Postfix) with ESMTPSA id 4LZDCg5zQxz5vw3;
-        Fri,  1 Jul 2022 11:55:11 +0000 (UTC)
-Message-ID: <f361c4b7-12b8-0513-2025-4ed8025a67d1@riseup.net>
-Date:   Fri, 1 Jul 2022 08:55:07 -0300
-MIME-Version: 1.0
-Subject: Re: [PATCH v4 3/4] kunit: Taint the kernel when KUnit tests are run
+        with ESMTP id S231903AbiGANqQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 09:46:16 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4A623141
+        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 06:46:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1656683171; x=1688219171;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=QmdHmTrPgpAMgNTAWCdMtKT9JVGdMFSlSmM7cZvdOHw=;
+  b=kq8uws6T/wHw2/5KW7oMhMF5osVLew9PFUumY5g79PI6o8+ZagiXJhlK
+   heTTh2PZb9xlohJ7ox+IhYEUMfHwdI7+18JDqyOxs5w3SGAqfqQJgvkN6
+   B9SXcARNYw182ZusSDWXXHoWrdORgl+JAQcRcJzD/mbPFUFEzIk6/1qa6
+   /0HKC5I7QcVS8C/XwqGyBIBXJq2439QktjAiZXxnUjvBLgPJArE6O1de4
+   uDkWBfj6aen8/47LCmoc4mYvZN4ZEuPagNpIG3HnqdPgzRpnZF283vyBT
+   46x5S1dzJ9S+pPUW2rSUrTD3oeoaW7F+Q5E9lZ5SjjYJLXbkd4O7C+0nD
+   g==;
+X-IronPort-AV: E=Sophos;i="5.92,237,1650902400"; 
+   d="scan'208";a="308913409"
+Received: from mail-dm6nam10lp2102.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.102])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Jul 2022 21:46:10 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fBSHW7p3xeV5Ijrg1qRH/364JHR+vOtMyXK8N2rwVZow17pSbgdb0DIClRBzPAeUw+KOqYv0tL2ZrGL4SoUgQHYEIoxjCf4f88EUg87eNjmz63aQvx+RXd2pIUp6EyP9UliTqKZRmZE47d9HfvBRt812qA7GxsHGRO8bAagOJnwNkTQOlpW4yorJzsOS/seUCr8VVGUCacMDAUqvRD9rtxJ7eCv5g4SXP/5htqdnYX4GH2kDRagO4MHi8zL8t+sr/gKd4o8DSq1i8LL0HMyMXLEQ3SoCUt16IP+mbY9B5mjrqLnHii28M7P47FMYwOG45huLZtQnUFpZBgaZditqRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QmdHmTrPgpAMgNTAWCdMtKT9JVGdMFSlSmM7cZvdOHw=;
+ b=Xn9BJJo/oo3GsaO+8co971KCuLuCtO3oqHk9R0NfpB+HnzvRfJAv97z+1/g0HzFO88el/tJ+cT9HZHd9ty8ToVwSqTNgGwx+s/rCNm4wubtV6hft98c1u6+sxJd87QlwYKGNnpwWjLoFOKOVRsYu+QcXHflTjmAlv6R8Gy3WdaSx9h1Wd6OIFzLJXLKKxtyFTkh5e0cdLDEELj5KY0ZvUWSBwH9XfQF/oQMcuhMYaw92j0ursj1UCPLkDrZlaAbBCqrlpp2BiIvHrprVcc44KCjERVpFMa8A48rpsKoClHNCYLufOetkrWppTUloiBBRyHErIzQMZLGkCLWnuGkSgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QmdHmTrPgpAMgNTAWCdMtKT9JVGdMFSlSmM7cZvdOHw=;
+ b=MOZi7NpqeecYo6jg/yjYHuPFUsg7wc4ltBH20vLW5bilfGJTk/gW0k0cNDcKxrMMkdlx361prGOL8Kt0Alj0x06fNIW4cm0IoZ3U8qr1eixWNG+KV2ZJKKCsAPLKzr7OlUvjt8meiKXWp2kE7/IAxh3HS2GIKPWfuaYUoNmGcJg=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ MWHPR04MB0208.namprd04.prod.outlook.com (2603:10b6:300:7::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5395.14; Fri, 1 Jul 2022 13:46:08 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833%7]) with mapi id 15.20.5395.017; Fri, 1 Jul 2022
+ 13:46:08 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "yangx.jy@fujitsu.com" <yangx.jy@fujitsu.com>
+Subject: Re: [PATCH blktests] common/multipath-over-rdma: skip NO-CARRIER NIC
+ when start_soft_rdma
+Thread-Topic: [PATCH blktests] common/multipath-over-rdma: skip NO-CARRIER NIC
+ when start_soft_rdma
+Thread-Index: AQHYjGe2ug1ooHvJRkiA3OAdd/PwPK1piQSA
+Date:   Fri, 1 Jul 2022 13:46:08 +0000
+Message-ID: <20220701134607.fg66g5nrllnhqdc2@shindev>
+References: <20220630095625.2705173-1-yi.zhang@redhat.com>
+In-Reply-To: <20220630095625.2705173-1-yi.zhang@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     David Gow <davidgow@google.com>
-Cc:     "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        Kees Cook <keescook@chromium.org>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Ogness <john.ogness@linutronix.de>,
-        Joe Fradley <joefradley@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-kbuild@vger.kernel.org,
-        Brendan Higgins <brendanhiggins@google.com>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>
-References: <20220701084744.3002019-1-davidgow@google.com>
- <20220701084744.3002019-3-davidgow@google.com>
-From:   =?UTF-8?Q?Ma=c3=adra_Canal?= <mairacanal@riseup.net>
-In-Reply-To: <20220701084744.3002019-3-davidgow@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a6b486cb-8eed-4751-f007-08da5b680d4c
+x-ms-traffictypediagnostic: MWHPR04MB0208:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: BOmtvDVHWDRdcusgJULG/FUJtCDkq8x14dMwe0NX76DtsweoMJum5PI3ckoi3F7t60aiA6WGiN4tMRB0lj2IwfeJdOkNLSBNg1hAeAcatOTr+lpy1snD7RZfLfenmw48I4ik5ib03s1DVP4qhgbRYKgncvc7MtyACBlEKoZAeVtxAbHFElsXAH38G27dLjrjrGFKWU/zd4C3hgP5O/9veVtcNCHTULiqvJUaypNRiT6OmxsdMVXN4rzy7/AZG2wfy9i4plPN2IAeXchRYdT4+uac15LqQPUGsK+Imx8Z6LdUVceFJNl5Sp5JZpZ9OQDaeilY3Vd9zUfPAYNOrQ2edMfrO6WzDRMkSW4y9GiXPbrgQihPbGtzT5cr023elBLqhSlT3KhdYoTliEUfcC97AAJJJ97uawFAidpAg3JaRd+sTD0HHf9fLY5ce1y0xv8K1/kNEmaj8ToAJEdlBtIRLGKFrKgIXftBxChSaHDdSoDrhdBk0CxAbKc/JSdy4HGw7wYBYNpEKpAFf5ZzlTYzRHhN4qGWOy2BzX3qM91LXRAsy6Vhq/KOLf0xT5NoIirpdwZGoBAuuGOyFLa4bin/9OAtC3Om3UY2P86a/nh9mKWuKZKacPNAeen088N2kwG98AvSxFnHSuPg9CSg7FjG8fcNxzhezHZQSZtnslIbvcb0k7fcSrFFpNgfPN+29X6RudAcUZVVQ6LSsnxRdU3fMUv3hNF37fnck03YdDHOnI0md4CDmgWI88JY9xALg3VmZW8j55L0lmHDe9ffKHyhKa074z0yGTIkt4l99AltcNxu+hIZlKHTnbeVTryad5Mw
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(7916004)(366004)(136003)(396003)(346002)(376002)(39860400002)(4744005)(38070700005)(44832011)(6916009)(41300700001)(2906002)(54906003)(66476007)(82960400001)(6486002)(5660300002)(478600001)(8936002)(186003)(86362001)(6512007)(316002)(9686003)(26005)(122000001)(1076003)(38100700002)(76116006)(6506007)(66946007)(71200400001)(33716001)(8676002)(4326008)(66556008)(66446008)(91956017)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Sxk/B+3RmKdW7o1q/cPcPEH0W+wFij7qzlqMeESsfWSVxx4hIH9be0TEDzl8?=
+ =?us-ascii?Q?9spTihyQA295FYWlW8Dk9FjMWmnpAgXaPz902XV/wI1Gg7KMdGCbe01gcbEi?=
+ =?us-ascii?Q?wymUU/A7+sPzK85MJx1p1lKxj/AxANzb4bjLrgSfkPCGV6VWUFXZKZD48kP4?=
+ =?us-ascii?Q?rBA3duOIDh/bDtViKh8iAq0mtBUBPT6bsPwBdcdvbPKutSq/bqi2TKUfVmb1?=
+ =?us-ascii?Q?gUBUAxMle94hNK7ZxbNm2k155tTHCr0H/wASQkwPt/dcBtRUPw379MQrJPGr?=
+ =?us-ascii?Q?qZyzEAP9T5m7dlKwPqLgw5AoZGttF32NkIriOhXhfnAUFh9GzdXo65HGGAGj?=
+ =?us-ascii?Q?Vq6vvsjyN+ZwgH+Jz4wEYveBkw//wTjsL2ZFuK8wVK1VWyc31y4DeYUEnUYO?=
+ =?us-ascii?Q?WkH87KyZm9YrZ1ZLWRACAv3xom1CKWN7jCB6hUfYr4GTzMEuhHVfH+eicj7e?=
+ =?us-ascii?Q?MYWiBTUJC8xgAeT5DgkBlUtMtBG2wIkx9gcjL4xR+8ukMdjmgOm6hF2mWUdV?=
+ =?us-ascii?Q?SrHcS0V6IGoP6LzokbcCT7YK15AGTfLLhfYP9CAE1EcAgktIuITfyFl25cJs?=
+ =?us-ascii?Q?1Pb7LXKBY4XW2U+Yqu9RWwUeIIlU6butPYI8VTxK9S8FW+i65wiyQXsgQdkz?=
+ =?us-ascii?Q?UgDQPGCb8ndr6GzioTHRi63HOEMkmxy9xtKawBD1DGieNnDOb5EUh5pPPlhl?=
+ =?us-ascii?Q?+PqV/UVdB6jzgkVHfk2YrNblIiYdJmPQ+dz4thXt4N+6enD7y2JnRsQK5Jh8?=
+ =?us-ascii?Q?tts4pfIHmovJwNiWfvvMIUNlrAfECLs4P7tMPNybOksrCtAi+owU3x55aesF?=
+ =?us-ascii?Q?Rifnmuwt0wQ3vr4ZE8VNC4wBdRhjuhEbb3Xs58PSZWqOB6do6B8w+29mw+Z0?=
+ =?us-ascii?Q?rPlFM4mDUpjmECruOL6oJPMvrpFzV2M2z6ZfRvZ2quNRVkAhLx+7SW9AoN/A?=
+ =?us-ascii?Q?3AAGmq7PPPszPs60iwxTjKz6kJ48J8SWx1z9M/1VIr/28Pbm+C86ebC3tuTd?=
+ =?us-ascii?Q?Xnndz8wbw1ajFUI7+YXTbTQcV87UteYI7BCAlqy3Vp+UGTouU8DFvFiQ3UN8?=
+ =?us-ascii?Q?BsoIDGm1NpZ0fS8+UGdZgOpHTXw7TsXIhquvP/cruCkJHXH3qi6anX3dmlP/?=
+ =?us-ascii?Q?/bAFI+C+3MerRezFTnFUXepW2QJsQ0tKqfaBwLdTd43ssbMhR31FJFEWjzA6?=
+ =?us-ascii?Q?byz56TGjtIuBV3dPT/pqXQUk+EWaZH3govaRDtCMiSd+q1Twsa6IrAUkka1H?=
+ =?us-ascii?Q?YXP+pULDhpQN7g+Q0diKFuKFrfefT2duz59IcRlDXOTdTWPmokWKIpcPd5C0?=
+ =?us-ascii?Q?8qQfSEteXGX9HLz0mBDxBPpuqlvpxqc5gNAub+gD2wFa75CuDJW5ynQCTjcz?=
+ =?us-ascii?Q?mTpb56bcg6MbbYnRAWeFRnpmMYfrujzHeHQz55DG+9I2LReZeP/k49VqTdwy?=
+ =?us-ascii?Q?68qQHNQ8L1MpMqxrLat3YD5PQaBPnHpwLRKJ9U0u3YdCrtZRbC0+P73kNKw3?=
+ =?us-ascii?Q?UaQwz0TTV7vtYqaY/88esEEeA5rKqtblBxxEc1+w1oxevd2j3E1UPFsY43B3?=
+ =?us-ascii?Q?R0udHjdj8orxWSCq2ByQC3MmkoXdJNYj60E/U3ceWOgPq1NG4iit1ZppshYX?=
+ =?us-ascii?Q?Or+jg/nD6DW9xkffv4WWB4k=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <F0D6236701F158459B2FA99C21F48C3F@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a6b486cb-8eed-4751-f007-08da5b680d4c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2022 13:46:08.4062
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: f0ISVS6ExlVOKnS56rnoayL1VVLu5SBNIW/ly1GAIC4FJMbkoSJZFPS34MgDqfkdpgpRqPYjCePFj8LlTkALr8/1rfBpm8M0Mn1KTGeycoE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR04MB0208
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/1/22 05:47, 'David Gow' via KUnit Development wrote:
-> Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
-> Due to KUnit tests not being intended to run on production systems, and
-> potentially causing problems (or security issues like leaking kernel
-> addresses), the kernel's state should not be considered safe for
-> production use after KUnit tests are run.
-> 
-> This both marks KUnit modules as test modules using MODULE_INFO() and
-> manually taints the kernel when tests are run (which catches builtin
-> tests).
-> 
-> Acked-by: Luis Chamberlain <mcgrof@kernel.org>
-> Tested-by: Daniel Latypov <dlatypov@google.com>
-> Reviewed-by: Brendan Higgins <brendanhiggins@google.com>
-> Signed-off-by: David Gow <davidgow@google.com>
-> ---
+On Jun 30, 2022 / 17:56, Yi Zhang wrote:
+> The rxe/siw driver will be bind to NO-CARRIER interface which lead
+> nvmeof-mp/001 failed.
+> For example, nvmeof-mp/001 with two NICs, if will output
+> count_devices(): 1 <> 2 when the second NIC has NO-CARRIER
+>=20
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 
-Tested with DRM KUnit tests on x86_64.
+Thanks, applied.
 
-Tested-By: Maíra Canal <mairacanal@riseup.net>
-
-Best Regards
-- Maíra Canal
-
-> 
-> Changes since v3:
-> https://lore.kernel.org/lkml/20220513083212.3537869-2-davidgow@google.com/
-> - Use MODULE_INFO() for KUnit modules.
->   - This is technically redundant, as the KUnit executor will taint the
->     kernel when _any_ KUnit tests are run, but may be useful if some
->     other tool will parse the 'test' property.
-> - Add {Acked,Tested,Reviewed}-by tags.
-> 
-> ---
->  include/kunit/test.h | 3 ++-
->  lib/kunit/test.c     | 4 ++++
->  2 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/kunit/test.h b/include/kunit/test.h
-> index 8ffcd7de9607..ccae848720dc 100644
-> --- a/include/kunit/test.h
-> +++ b/include/kunit/test.h
-> @@ -277,7 +277,8 @@ static inline int kunit_run_all_tests(void)
->  	{								\
->  		return __kunit_test_suites_exit(__suites);		\
->  	}								\
-> -	module_exit(kunit_test_suites_exit)
-> +	module_exit(kunit_test_suites_exit)				\
-> +	MODULE_INFO(test, "Y");
->  #else
->  #define kunit_test_suites_for_module(__suites)
->  #endif /* MODULE */
-> diff --git a/lib/kunit/test.c b/lib/kunit/test.c
-> index a5053a07409f..8b11552dc215 100644
-> --- a/lib/kunit/test.c
-> +++ b/lib/kunit/test.c
-> @@ -11,6 +11,7 @@
->  #include <kunit/test-bug.h>
->  #include <linux/kernel.h>
->  #include <linux/moduleparam.h>
-> +#include <linux/panic.h>
->  #include <linux/sched/debug.h>
->  #include <linux/sched.h>
->  
-> @@ -501,6 +502,9 @@ int kunit_run_tests(struct kunit_suite *suite)
->  	struct kunit_result_stats suite_stats = { 0 };
->  	struct kunit_result_stats total_stats = { 0 };
->  
-> +	/* Taint the kernel so we know we've run tests. */
-> +	add_taint(TAINT_TEST, LOCKDEP_STILL_OK);
-> +
->  	if (suite->suite_init) {
->  		suite->suite_init_err = suite->suite_init(suite);
->  		if (suite->suite_init_err) {
+--=20
+Shin'ichiro Kawasaki=
