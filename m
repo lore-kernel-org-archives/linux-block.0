@@ -2,101 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DA04C43334
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 04:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62535C43334
+	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 07:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbiGAErr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Jul 2022 00:47:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45838 "EHLO
+        id S233683AbiGAHDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Jul 2022 03:03:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiGAErq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 00:47:46 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C49B677CC
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 21:47:44 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id k20so1430287edj.13
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 21:47:44 -0700 (PDT)
+        with ESMTP id S234519AbiGAHDd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 03:03:33 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4AA865C6
+        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 00:03:32 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id v9so1489484ljk.10
+        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2022 00:03:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=6XKumRL0REDbETPlrmyQFCqGhHL9wXNafoTmj/Yv6gc=;
-        b=E9zQoob5DZIom1jHLd2YbpVix7UMzA+HeQBvuaJSkZMYqeFTICCyDupC0/2xa9GHAA
-         hl2/OzuLFJG17aqzJtjrrr+WMxbcdW3BMTcr/vVc3HcnNCGdZbe+zkGvOwy0wizgtP/X
-         CfBr4o9SFFE/jZctzKaOJlLtzhWMP1ObednSU5baDPzrfcFHkskybyaqhdM7BvLFEK/Z
-         419jViz4CgNDJkYtvi49tND9sousLw9sBq+PB9QrzaiC320XGLc981OIZ6pwLSPk+q4C
-         PXAW5LYm5ZQpSI0r60kdFumub7Vl9n8NDm5mZCFsC4fmfpk3EEph6ousdZySPP4F3cf0
-         zaKQ==
+        bh=ZzGoxlloW/Tws0uB5qKakVTUVgLN1VSSjTDGzgBbeK4=;
+        b=Y5TERYM1KO4GGyrxpePRMjK1I/B3OjmOWWVVJrwZbS5v/A+JRd3ymTog0e7f9KLa1M
+         v1d0ILM6qPxanDRGGkF18ogf7iijflAkbtxgnAwvxKb0NCaEJJHPIPKgniZUxfn93vYZ
+         puOQ9DChEJ8x9oXIkCSNx1XBvtCdgpE0dswfWslgvEUa+0UOhXIl59GqNb292YHlidzi
+         tVLZdkEGdCpwxkIpFv7GR3OaL8zoxtlF0ljt6n2T8TOHiYu1+k5LECPuwiHGEtkDOR+s
+         dUCWtlMdBrokhUUt7kroRI93iPEG5umNehcYF6qjjgJ0WoBJ9+hbwy/RXTcaMcnzvZnW
+         gAgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=6XKumRL0REDbETPlrmyQFCqGhHL9wXNafoTmj/Yv6gc=;
-        b=dSZ7oRYtr8/cB/xNhgJ8bVe7G+8y5sjfGWNPU+KlvW6nQnX4nc9NNZCMB1yLtHLyEc
-         HsoNt7SEVs/fxK1ZwRq1XGOjr0zr7lY2hOY/y2h6VOtos7fT52zPu/V2sLhynZECb9TI
-         Pdx8Ngm7xooLtbeB5JHy/aivxGt04YTtbydCTNtCawA62mvnMjBZpR9+uP2K3MZJI0Ah
-         nGR8CtIuBf3uriOwtag22R5Y8cLREjSrfBg+KpYrLxCYanPeqSh+Pm1VNwmqYUxFLN+S
-         X1Fp0jIkpkGwjbrbTBdv4zDURnBnfogNXqXnhcppS0LMEIOgzWepvNAJUGJywHxO4Mzt
-         eJ4Q==
-X-Gm-Message-State: AJIora9yjUEkf9Cg/CBfaW8fNb9+jvro7/webGVtOET0og/YsQi3mH4g
-        bORHkyo2vtGnTMY4OG1z9Tv+30x8WLgppiHkurHa5W7hbvY=
-X-Google-Smtp-Source: AGRyM1vh9MHXrfGsFScu0BWXVNjhq6c4a8Nz5plNhFdecScrMMpFp0y9/G9PCsXTNO1yZe/nAHu4TZq1oxZK77rJ8PE=
-X-Received: by 2002:a05:6402:430e:b0:435:9e41:6858 with SMTP id
- m14-20020a056402430e00b004359e416858mr16636983edc.69.1656650862930; Thu, 30
- Jun 2022 21:47:42 -0700 (PDT)
+        bh=ZzGoxlloW/Tws0uB5qKakVTUVgLN1VSSjTDGzgBbeK4=;
+        b=EB2u1EeeWqBD/AvdQRizHa5OjGdCjflmn9AhzYv6fuEIJJQt24gvYRHerM6vkSKp8u
+         a8/36IGhcazKrjtlulGWPOiqnYDVpMgaTYr9+qbqFO5Zznxg31x4zGposd8NnzYR1BBU
+         XWuccgqvcjcuFrGpo19ZfDQlCEGOdw7pJy9o7FYAoYdHwbPVNQRwv6CcpvQ3TzIiXsvf
+         4WOXNKfCUar7/MZU2XswnvCdoefHRaBnsTesc9KLF0E7qO2cNnbbzP+Kj1JqmYKoknbX
+         yr8Vf/i9SRi1Wj9R09EDuKzK2W/Ww/P8t6HneTZ7qUiG1RpftE0jXqo1hu/24+r6Vs+d
+         CSYQ==
+X-Gm-Message-State: AJIora+zxFnjA6YYn/JqdYs6e8b/tyxzzsEGTwJVjWA0FMRmeSKfOUX0
+        jr1lO5zZPZsGUPTgwq7qDVubqbsKo5Cw0LU/m+s=
+X-Google-Smtp-Source: AGRyM1uCZPHYSAuuTDM0k+PDr2scrPsQwfon3EPxQHMobJm2gWmkW3Rg6lxq7418ApG4tqXBLnoXiKt8NDXnMY1pNnk=
+X-Received: by 2002:a05:651c:1543:b0:25a:94d9:7d3f with SMTP id
+ y3-20020a05651c154300b0025a94d97d3fmr7230644ljp.330.1656659010952; Fri, 01
+ Jul 2022 00:03:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220629233145.2779494-1-bvanassche@acm.org> <20220629233145.2779494-17-bvanassche@acm.org>
-In-Reply-To: <20220629233145.2779494-17-bvanassche@acm.org>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Fri, 1 Jul 2022 06:47:32 +0200
-Message-ID: <CAMGffE=+9WUbbERgeUVvX5MK6dPieOtHi9znUAysd++UypAxYA@mail.gmail.com>
-Subject: Re: [PATCH v2 16/63] block/rnbd: Use blk_opf_t where appropriate
+References: <20220629233145.2779494-1-bvanassche@acm.org> <20220629233145.2779494-59-bvanassche@acm.org>
+In-Reply-To: <20220629233145.2779494-59-bvanassche@acm.org>
+From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date:   Fri, 1 Jul 2022 16:03:13 +0900
+Message-ID: <CAKFNMomUbnbXNng-RL5JdNG8pYXc_y7r68hORnhxivd-tEs75A@mail.gmail.com>
+Subject: Re: [PATCH v2 58/63] fs/nilfs2: Use the enum req_op and blk_opf_t types
 To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Md . Haris Iqbal" <haris.iqbal@ionos.com>
+        Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 1:32 AM Bart Van Assche <bvanassche@acm.org> wrote:
+On Thu, Jun 30, 2022 at 8:33 AM Bart Van Assche wrote:
 >
-> Improve static type checking by using the new blk_opf_t type to represent
-> the combination of a request and request flags.
+> Improve static type checking by using the enum req_op type for variables
+> that represent a request operation and the new blk_opf_t type for
+> variables that represent request flags. Combine the 'mode' and
+> 'mode_flags' arguments of nilfs_btnode_submit_block into a single
+> argument 'opf'.
 >
-> Cc: Md. Haris Iqbal <haris.iqbal@ionos.com>
-> Cc: Jack Wang <jinpu.wang@ionos.com>
+> Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
-Thanks!
 > ---
->  drivers/block/rnbd/rnbd-proto.h | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
-> index bfb08dd434d1..ea7ac8bca63c 100644
-> --- a/drivers/block/rnbd/rnbd-proto.h
-> +++ b/drivers/block/rnbd/rnbd-proto.h
-> @@ -229,9 +229,9 @@ static inline bool rnbd_flags_supported(u32 flags)
->         return true;
->  }
->
-> -static inline u32 rnbd_to_bio_flags(u32 rnbd_opf)
-> +static inline blk_opf_t rnbd_to_bio_flags(u32 rnbd_opf)
->  {
-> -       u32 bio_opf;
-> +       blk_opf_t bio_opf;
->
->         switch (rnbd_op(rnbd_opf)) {
->         case RNBD_OP_READ:
-> @@ -286,7 +286,8 @@ static inline u32 rq_to_rnbd_flags(struct request *rq)
->                 break;
->         default:
->                 WARN(1, "Unknown request type %d (flags %llu)\n",
-> -                    req_op(rq), (unsigned long long)rq->cmd_flags);
-> +                    (__force u32)req_op(rq),
-> +                    (__force unsigned long long)rq->cmd_flags);
->                 rnbd_opf = 0;
->         }
->
+>  fs/nilfs2/btnode.c            |  8 ++++----
+>  fs/nilfs2/btnode.h            |  4 ++--
+>  fs/nilfs2/btree.c             |  6 +++---
+>  fs/nilfs2/gcinode.c           |  5 ++---
+>  fs/nilfs2/mdt.c               | 19 ++++++++++---------
+>  include/trace/events/nilfs2.h |  4 ++--
+>  6 files changed, 23 insertions(+), 23 deletions(-)
+
+Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+
+Looks good.  Thank you!
+
+Ryusuke Konishi
