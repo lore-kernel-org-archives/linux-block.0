@@ -2,86 +2,238 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFF9CCA479
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 16:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96B3CCA481
+	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 17:17:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231655AbiGAQZp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Jul 2022 12:25:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48326 "EHLO
+        id S229847AbiGARRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Jul 2022 13:17:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230132AbiGAQZo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 12:25:44 -0400
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CE6140A09
-        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 09:25:44 -0700 (PDT)
-Received: by mail-qt1-f171.google.com with SMTP id k14so783231qtm.3
-        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2022 09:25:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=CqLS9/VnMCYBuMzbL3e0tU8Vk7oa/JV3t+gC5Xn/h/k=;
-        b=RZAqdBmuhIc+ihwcegqL4Hg5zdzu1EP4x+QECpbLjfGV+h2IL2Kbls+6Y7ISWrno8L
-         UCWNivqAnGlZwsZATx4/15RYWeY4L9YGu5SqFow3IrLOmraJyT0O8UVlVp8/QhAMejyQ
-         xAPOfn+hnvKUCWtVlKp/pc/NiKbRoKYzuwyla+C2a5VLfwnFds3hegpjG8J+QhbMx4wj
-         /bCBU4zt1tMy1MABIA64pbViI07RcQoRqlI8KSIVM3AYPvhBoAfcVClV/Gy1z+jRgVow
-         Pmp/Pp8/3A4WCbLfzBMzc0bfuVMXWWlmL548lmSJezcas6k2XSg6wOQWV8XgUWJzKLDR
-         Z+6A==
-X-Gm-Message-State: AJIora9n6kgwA7PQkNaH1kruT5g16zAb/xzQInvHKiR8PutD9x4HxzF6
-        wgqo8nRtCi4Oy0mOjtuEegKb
-X-Google-Smtp-Source: AGRyM1tzR5+oekiebA2Cl4ZcA8vDGKaik3m8+xoET3D9HB7EA7KAOUlWMkJMC/Ms3M1Oy/CjZO9H4Q==
-X-Received: by 2002:ac8:570f:0:b0:31d:3692:36e0 with SMTP id 15-20020ac8570f000000b0031d369236e0mr4051034qtw.343.1656692743249;
-        Fri, 01 Jul 2022 09:25:43 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id k201-20020a37a1d2000000b006a716fed4d6sm17007710qke.50.2022.07.01.09.25.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Jul 2022 09:25:42 -0700 (PDT)
-Date:   Fri, 1 Jul 2022 12:25:41 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Subject: [git pull] device mapper fixes for 5.19-rc5
-Message-ID: <Yr8gBVNDik5el/n/@redhat.com>
+        with ESMTP id S229476AbiGARRF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 13:17:05 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43FBD167C9;
+        Fri,  1 Jul 2022 10:17:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656695824; x=1688231824;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=78PtGUkKSp36JzVKi0xJJNA9YET195hTgBzl+p/xvmM=;
+  b=A2gnsFjE3ZPeTI+x9CA1JXAN5UA24mJHbH+t855fd3gSTISb6545KugD
+   Z+rXdRSJvCy7vgb039XagZXlAclk4980/8UzYJoPdsvgzX566F6wrHjm3
+   rEqZWJIhCHoKhJtcW6odgZfsQ6Df+i0YZtx1lzkFSVtbAzfNthcb42jcd
+   zgs0biuXedqEEzXboMsdxEflq2dFnRaY4oWUL5eUjAI9IQQPz1UDbvtIB
+   umnA/JImmuJvpE6q8yrUN3ux3zBPn1QdVe9xHRK4DHnw9eDbLqr2FDl+1
+   tDrx0yN+rtGXsPUOqfMr1bIygby2G/12G+3V21XBsSsXCZsKke5HUKxZ2
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10395"; a="281464206"
+X-IronPort-AV: E=Sophos;i="5.92,237,1650956400"; 
+   d="scan'208";a="281464206"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2022 10:17:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,237,1650956400"; 
+   d="scan'208";a="566417554"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 01 Jul 2022 10:16:56 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o7KGG-000EBO-5W;
+        Fri, 01 Jul 2022 17:16:56 +0000
+Date:   Sat, 2 Jul 2022 01:16:31 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     David Gow <davidgow@google.com>,
+        Brendan Higgins <brendanhiggins@google.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Greg KH <greg@kroah.com>, Luis Chamberlain <mcgrof@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        David Gow <davidgow@google.com>,
+        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        John Ogness <john.ogness@linutronix.de>,
+        Joe Fradley <joefradley@google.com>,
+        Daniel Latypov <dlatypov@google.com>,
+        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>,
+        Aaron Tomlin <atomlin@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH v4 4/4] selftest: Taint kernel when test module loaded
+Message-ID: <202207020131.L5kV3eDf-lkp@intel.com>
+References: <20220701084744.3002019-4-davidgow@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20220701084744.3002019-4-davidgow@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi David,
 
-The following changes since commit 90736eb3232d208ee048493f371075e4272e0944:
+I love your patch! Yet something to improve:
 
-  dm mirror log: clear log bits up to BITS_PER_LONG boundary (2022-06-23 14:55:43 -0400)
+[auto build test ERROR on masahiroy-kbuild/for-next]
+[also build test ERROR on shuah-kselftest/next linus/master v5.19-rc4 next-20220701]
+[cannot apply to mcgrof/modules-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-are available in the Git repository at:
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Gow/panic-Taint-kernel-if-tests-are-run/20220701-164843
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git for-next
+config: arm-randconfig-r024-20220629 (https://download.01.org/0day-ci/archive/20220702/202207020131.L5kV3eDf-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project a9119143a2d1f4d0d0bc1fe0d819e5351b4e0deb)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm cross compiling tool for clang build
+        # apt-get install binutils-arm-linux-gnueabi
+        # https://github.com/intel-lab-lkp/linux/commit/42b6461d6cca4baeeeed474b1400e203057c2b9b
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review David-Gow/panic-Taint-kernel-if-tests-are-run/20220701-164843
+        git checkout 42b6461d6cca4baeeeed474b1400e203057c2b9b
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash lib/
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.19/dm-fixes-5
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-for you to fetch changes up to 617b365872a247480e9dcd50a32c8d1806b21861:
+All errors (new ones prefixed by >>):
 
-  dm raid: fix KASAN warning in raid5_add_disks (2022-06-29 19:48:04 -0400)
+   lib/test_printf.c:157:52: warning: format specifies type 'unsigned char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|128|255", "%hhu|%hhu|%hhu|%hhu|%hhu", 0, 1, 257, 128, -1);
+                                  ~~~~                       ^
+                                  %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:157:55: warning: format specifies type 'unsigned char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|128|255", "%hhu|%hhu|%hhu|%hhu|%hhu", 0, 1, 257, 128, -1);
+                                       ~~~~                     ^
+                                       %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:157:58: warning: format specifies type 'unsigned char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|128|255", "%hhu|%hhu|%hhu|%hhu|%hhu", 0, 1, 257, 128, -1);
+                                            ~~~~                   ^~~
+                                            %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:157:63: warning: format specifies type 'unsigned char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|128|255", "%hhu|%hhu|%hhu|%hhu|%hhu", 0, 1, 257, 128, -1);
+                                                 ~~~~                   ^~~
+                                                 %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:157:68: warning: format specifies type 'unsigned char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|128|255", "%hhu|%hhu|%hhu|%hhu|%hhu", 0, 1, 257, 128, -1);
+                                                      ~~~~                   ^~
+                                                      %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:158:52: warning: format specifies type 'char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|-128|-1", "%hhd|%hhd|%hhd|%hhd|%hhd", 0, 1, 257, 128, -1);
+                                  ~~~~                       ^
+                                  %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:158:55: warning: format specifies type 'char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|-128|-1", "%hhd|%hhd|%hhd|%hhd|%hhd", 0, 1, 257, 128, -1);
+                                       ~~~~                     ^
+                                       %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:158:58: warning: format specifies type 'char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|-128|-1", "%hhd|%hhd|%hhd|%hhd|%hhd", 0, 1, 257, 128, -1);
+                                            ~~~~                   ^~~
+                                            %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:158:63: warning: format specifies type 'char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|-128|-1", "%hhd|%hhd|%hhd|%hhd|%hhd", 0, 1, 257, 128, -1);
+                                                 ~~~~                   ^~~
+                                                 %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:158:68: warning: format specifies type 'char' but the argument has type 'int' [-Wformat]
+           test("0|1|1|-128|-1", "%hhd|%hhd|%hhd|%hhd|%hhd", 0, 1, 257, 128, -1);
+                                                      ~~~~                   ^~
+                                                      %d
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:159:41: warning: format specifies type 'unsigned short' but the argument has type 'int' [-Wformat]
+           test("2015122420151225", "%ho%ho%#ho", 1037, 5282, -11627);
+                                     ~~~          ^~~~
+                                     %o
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:159:47: warning: format specifies type 'unsigned short' but the argument has type 'int' [-Wformat]
+           test("2015122420151225", "%ho%ho%#ho", 1037, 5282, -11627);
+                                        ~~~             ^~~~
+                                        %o
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+   lib/test_printf.c:159:53: warning: format specifies type 'unsigned short' but the argument has type 'int' [-Wformat]
+           test("2015122420151225", "%ho%ho%#ho", 1037, 5282, -11627);
+                                           ~~~~               ^~~~~~
+                                           %#o
+   lib/test_printf.c:137:40: note: expanded from macro 'test'
+           __test(expect, strlen(expect), fmt, ##__VA_ARGS__)
+                                          ~~~    ^~~~~~~~~~~
+>> lib/test_printf.c:801:1: error: use of undeclared identifier 'TAINT_KUNIT'
+   KSTM_MODULE_LOADERS(test_printf);
+   ^
+   lib/../tools/testing/selftests/kselftest_module.h:45:12: note: expanded from macro 'KSTM_MODULE_LOADERS'
+           add_taint(TAINT_KUNIT, LOCKDEP_STILL_OK);       \
+                     ^
+   13 warnings and 1 error generated.
+--
+>> lib/test_scanf.c:811:1: error: use of undeclared identifier 'TAINT_KUNIT'
+   KSTM_MODULE_LOADERS(test_scanf);
+   ^
+   lib/../tools/testing/selftests/kselftest_module.h:45:12: note: expanded from macro 'KSTM_MODULE_LOADERS'
+           add_taint(TAINT_KUNIT, LOCKDEP_STILL_OK);       \
+                     ^
+   1 error generated.
+--
+>> lib/test_bitmap.c:889:1: error: use of undeclared identifier 'TAINT_KUNIT'
+   KSTM_MODULE_LOADERS(test_bitmap);
+   ^
+   lib/../tools/testing/selftests/kselftest_module.h:45:12: note: expanded from macro 'KSTM_MODULE_LOADERS'
+           add_taint(TAINT_KUNIT, LOCKDEP_STILL_OK);       \
+                     ^
+   1 error generated.
 
-Please pull, thanks.
-Mike
 
-----------------------------------------------------------------
-- 3 fixes for invalid memory accesses discovered by using KASAN while
-  running the lvm2 testsuite's dm-raid tests. Includes changes to MD's
-  raid5.c given the dependency dm-raid has on the MD code.
+vim +/TAINT_KUNIT +801 lib/test_printf.c
 
-----------------------------------------------------------------
-Heinz Mauelshagen (1):
-      dm raid: fix accesses beyond end of raid member array
+707cc7280f452a1 Rasmus Villemoes 2015-11-06  800  
+6b1a4d5b1a26ae8 Tobin C. Harding 2019-04-05 @801  KSTM_MODULE_LOADERS(test_printf);
 
-Mikulas Patocka (2):
-      dm raid: fix KASAN warning in raid5_remove_disk
-      dm raid: fix KASAN warning in raid5_add_disks
-
- drivers/md/dm-raid.c | 34 ++++++++++++++++++----------------
- drivers/md/raid5.c   |  6 +++++-
- 2 files changed, 23 insertions(+), 17 deletions(-)
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
