@@ -2,84 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62535C43334
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 07:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E43C43334
+	for <linux-block@archiver.kernel.org>; Fri,  1 Jul 2022 07:20:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233683AbiGAHDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Jul 2022 03:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33714 "EHLO
+        id S234847AbiGAHUD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Jul 2022 03:20:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234519AbiGAHDd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 03:03:33 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4AA865C6
-        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 00:03:32 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id v9so1489484ljk.10
-        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2022 00:03:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZzGoxlloW/Tws0uB5qKakVTUVgLN1VSSjTDGzgBbeK4=;
-        b=Y5TERYM1KO4GGyrxpePRMjK1I/B3OjmOWWVVJrwZbS5v/A+JRd3ymTog0e7f9KLa1M
-         v1d0ILM6qPxanDRGGkF18ogf7iijflAkbtxgnAwvxKb0NCaEJJHPIPKgniZUxfn93vYZ
-         puOQ9DChEJ8x9oXIkCSNx1XBvtCdgpE0dswfWslgvEUa+0UOhXIl59GqNb292YHlidzi
-         tVLZdkEGdCpwxkIpFv7GR3OaL8zoxtlF0ljt6n2T8TOHiYu1+k5LECPuwiHGEtkDOR+s
-         dUCWtlMdBrokhUUt7kroRI93iPEG5umNehcYF6qjjgJ0WoBJ9+hbwy/RXTcaMcnzvZnW
-         gAgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZzGoxlloW/Tws0uB5qKakVTUVgLN1VSSjTDGzgBbeK4=;
-        b=EB2u1EeeWqBD/AvdQRizHa5OjGdCjflmn9AhzYv6fuEIJJQt24gvYRHerM6vkSKp8u
-         a8/36IGhcazKrjtlulGWPOiqnYDVpMgaTYr9+qbqFO5Zznxg31x4zGposd8NnzYR1BBU
-         XWuccgqvcjcuFrGpo19ZfDQlCEGOdw7pJy9o7FYAoYdHwbPVNQRwv6CcpvQ3TzIiXsvf
-         4WOXNKfCUar7/MZU2XswnvCdoefHRaBnsTesc9KLF0E7qO2cNnbbzP+Kj1JqmYKoknbX
-         yr8Vf/i9SRi1Wj9R09EDuKzK2W/Ww/P8t6HneTZ7qUiG1RpftE0jXqo1hu/24+r6Vs+d
-         CSYQ==
-X-Gm-Message-State: AJIora+zxFnjA6YYn/JqdYs6e8b/tyxzzsEGTwJVjWA0FMRmeSKfOUX0
-        jr1lO5zZPZsGUPTgwq7qDVubqbsKo5Cw0LU/m+s=
-X-Google-Smtp-Source: AGRyM1uCZPHYSAuuTDM0k+PDr2scrPsQwfon3EPxQHMobJm2gWmkW3Rg6lxq7418ApG4tqXBLnoXiKt8NDXnMY1pNnk=
-X-Received: by 2002:a05:651c:1543:b0:25a:94d9:7d3f with SMTP id
- y3-20020a05651c154300b0025a94d97d3fmr7230644ljp.330.1656659010952; Fri, 01
- Jul 2022 00:03:30 -0700 (PDT)
+        with ESMTP id S234517AbiGAHUC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Jul 2022 03:20:02 -0400
+Received: from mail.nfschina.com (unknown [IPv6:2400:dd01:100f:2:72e2:84ff:fe10:5f45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A02E94F1B7;
+        Fri,  1 Jul 2022 00:20:01 -0700 (PDT)
+Received: from localhost (unknown [127.0.0.1])
+        by mail.nfschina.com (Postfix) with ESMTP id C40761E80D94;
+        Fri,  1 Jul 2022 15:18:32 +0800 (CST)
+X-Virus-Scanned: amavisd-new at test.com
+Received: from mail.nfschina.com ([127.0.0.1])
+        by localhost (mail.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id JA5CAX10H07x; Fri,  1 Jul 2022 15:18:30 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.65.12.78])
+        (Authenticated sender: jiaming@nfschina.com)
+        by mail.nfschina.com (Postfix) with ESMTPA id ABF5A1E80D93;
+        Fri,  1 Jul 2022 15:18:28 +0800 (CST)
+From:   Zhang Jiaming <jiaming@nfschina.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        liqiong@nfschina.com, renyu@nfschina.com,
+        Zhang Jiaming <jiaming@nfschina.com>
+Subject: [PATCH] block: Fix typo in comments
+Date:   Fri,  1 Jul 2022 15:19:53 +0800
+Message-Id: <20220701071953.10753-1-jiaming@nfschina.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220629233145.2779494-1-bvanassche@acm.org> <20220629233145.2779494-59-bvanassche@acm.org>
-In-Reply-To: <20220629233145.2779494-59-bvanassche@acm.org>
-From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Fri, 1 Jul 2022 16:03:13 +0900
-Message-ID: <CAKFNMomUbnbXNng-RL5JdNG8pYXc_y7r68hORnhxivd-tEs75A@mail.gmail.com>
-Subject: Re: [PATCH v2 58/63] fs/nilfs2: Use the enum req_op and blk_opf_t types
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 8:33 AM Bart Van Assche wrote:
->
-> Improve static type checking by using the enum req_op type for variables
-> that represent a request operation and the new blk_opf_t type for
-> variables that represent request flags. Combine the 'mode' and
-> 'mode_flags' arguments of nilfs_btnode_submit_block into a single
-> argument 'opf'.
->
-> Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  fs/nilfs2/btnode.c            |  8 ++++----
->  fs/nilfs2/btnode.h            |  4 ++--
->  fs/nilfs2/btree.c             |  6 +++---
->  fs/nilfs2/gcinode.c           |  5 ++---
->  fs/nilfs2/mdt.c               | 19 ++++++++++---------
->  include/trace/events/nilfs2.h |  4 ++--
->  6 files changed, 23 insertions(+), 23 deletions(-)
+There are 2 typos (writeable,exlusively) in comments.
+Fix it.
 
-Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Signed-off-by: Zhang Jiaming <jiaming@nfschina.com>
+---
+ block/bdev.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Looks good.  Thank you!
+diff --git a/block/bdev.c b/block/bdev.c
+index 5fe06c1f2def..5c3754ed5689 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -272,7 +272,7 @@ EXPORT_SYMBOL(freeze_bdev);
+  * thaw_bdev  -- unlock filesystem
+  * @bdev:	blockdevice to unlock
+  *
+- * Unlocks the filesystem and marks it writeable again after freeze_bdev().
++ * Unlocks the filesystem and marks it writable again after freeze_bdev().
+  */
+ int thaw_bdev(struct block_device *bdev)
+ {
+@@ -618,7 +618,7 @@ static void bd_clear_claiming(struct block_device *whole, void *holder)
+  * @bdev: block device of interest
+  * @holder: holder that has claimed @bdev
+  *
+- * Finish exclusive open of a block device. Mark the device as exlusively
++ * Finish exclusive open of a block device. Mark the device as exclusively
+  * open by the holder and wake up all waiters for exclusive open to finish.
+  */
+ static void bd_finish_claiming(struct block_device *bdev, void *holder)
+@@ -830,7 +830,7 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+ 		 * Block event polling for write claims if requested.  Any write
+ 		 * holder makes the write_holder state stick until all are
+ 		 * released.  This is good enough and tracking individual
+-		 * writeable reference is too fragile given the way @mode is
++		 * writable reference is too fragile given the way @mode is
+ 		 * used in blkdev_get/put().
+ 		 */
+ 		if ((mode & FMODE_WRITE) && !bdev->bd_write_holder &&
+-- 
+2.25.1
 
-Ryusuke Konishi
