@@ -2,217 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D8EC43334
-	for <linux-block@archiver.kernel.org>; Sat,  2 Jul 2022 05:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E444C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  2 Jul 2022 17:02:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbiGBFP1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Jul 2022 01:15:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56428 "EHLO
+        id S232116AbiGBRCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Jul 2022 13:02:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231485AbiGBFP0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Jul 2022 01:15:26 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41602AE3D
-        for <linux-block@vger.kernel.org>; Fri,  1 Jul 2022 22:15:25 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id s1so5841208wra.9
-        for <linux-block@vger.kernel.org>; Fri, 01 Jul 2022 22:15:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BtvyTHqNk47av6p+hx5oOhqETjtuq5ybEh0wfG5nG70=;
-        b=ML9bgvpjG3IsC2FptWtN9fHOov4LmDzYown8I8942QyHEhcVgItatrnmJhDcr6aVFK
-         9IpEXaSRozS6A/SlTU8qYg8rk5mjg053VySaXq5QIYdwP6U6RpL4nWkPbDmRxtEPBH2h
-         y3waVs3ilBTzmdvgxv6nr1DF2ur9mLZvhMSDar8fkSVPSAJHlyCcHIOhDuUdG2mj24Qh
-         oWFAVgXVrC9W5YegMWzlKWLtMjTIMPu9S8uuw13nC72XkcZKCq88XRk5UV3sC4wBR+LZ
-         3V7zZZVBmmcwL3M7TpbnE+5LzB7ZMjGMmmMCd4tLghm8OQvpv9NsEsBC1pMdJJ0ErsBt
-         46NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BtvyTHqNk47av6p+hx5oOhqETjtuq5ybEh0wfG5nG70=;
-        b=ZDDLVCuTXRB3HfKM7VjdLwphZgT1fWI9CR+p3lEbyG7xglVJqxwOB1Dp8gEuKqVOSd
-         sJo5xXzHOt9cG+AdCGHtrmVXHeajfHbFbcdYMep4YKaP7M9JgxXNw8/X/FGAKVqR3irJ
-         FyyO8KqW10Zd3bUXcIGuFBgdo3DdUDXSZhV4/itTy3hUHT81sdhIIiWLtlG3cnGr0zh7
-         C/58D9vOKa7VKNlWrryNAEKVPt7E+hIA3GHSwI/FsqZLeaH5zAEMfK97MGynBwU3vVOJ
-         +XQMJh5KvdVukPK7spakltvzoqCL9nuesqTCVs0KZdAe2ObyXJOvNpKtEN0+JrlbQhCL
-         3WrA==
-X-Gm-Message-State: AJIora/+Bjfr4C1xd6BN6xprftb0yYkCcua91ex79KIPBGVFKkMUYG/n
-        I2ydpIzzrRDdoaPpOhRihh7ZosCR8KV1vuLCeX/vWg==
-X-Google-Smtp-Source: AGRyM1vu42eI/pOP7aSZzfJAPkeXxFJph6bFCNI8ZoAsBC75T4Pa6dXLeQWW2R1zbVoTvESWy2onuWk+AALs2R5qV9k=
-X-Received: by 2002:a05:6000:1542:b0:21d:28c0:eb43 with SMTP id
- 2-20020a056000154200b0021d28c0eb43mr16947959wry.622.1656738923390; Fri, 01
- Jul 2022 22:15:23 -0700 (PDT)
+        with ESMTP id S231520AbiGBRCI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Jul 2022 13:02:08 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543AFDFEC;
+        Sat,  2 Jul 2022 10:02:06 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 262H1Mcw005085
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 2 Jul 2022 13:01:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1656781287; bh=YP1/tEtj9VsIJb/YIEUR2pIcNgtT3bFvYv3Fm1d9240=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=dJFOSUIIKSktp2BGhJUbbk9/eKhfPkuallTgI21xVjs/4px1B7XIc1cUapo4ESae0
+         G1QEAmgGTHHd2lyWP2Z2Ajw+M9nlYudU4pTkFN+71zfudqmy41U6ROy9XxjnPgkkUr
+         UpxDJljyT5nA9vHzdyEUGyCzARkGln8yGSxrd7gOFE7AOGno1oFH0Bx3bG/T46ZFtm
+         f9TryQ6GPX/ZAC9u56PLh/+vMheqGX1kUsGTGzTfvjAgKHQsL4s0xOTWLVCznLeLrv
+         TdZ4bjSDXmUdXHUXvFw99zQV9oZtEWKPr/9EhLFukivnj5nYlyUp9if9jKYJ+03t4v
+         pv3Q0S8KwYE6w==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id B343315C3E94; Sat,  2 Jul 2022 13:01:22 -0400 (EDT)
+Date:   Sat, 2 Jul 2022 13:01:22 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Zorro Lang <zlang@redhat.com>, Amir Goldstein <amir73il@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <YsB54p1vpBg4v2Xd@mit.edu>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
+ <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
+ <YoZbF90qS+LlSDfS@casper.infradead.org>
+ <20220519154419.ziy4esm4tgikejvj@zlang-mailbox>
+ <YoZq7/lr8hvcs9T3@casper.infradead.org>
 MIME-Version: 1.0
-References: <20220701084744.3002019-1-davidgow@google.com> <20220701084744.3002019-4-davidgow@google.com>
- <Yr92OngNsEOxszUA@bombadil.infradead.org> <CABVgOSnZwnQZAo5LH1KEbpVYvCtvTVCG4kZR=aV_gxFuU_D12g@mail.gmail.com>
-In-Reply-To: <CABVgOSnZwnQZAo5LH1KEbpVYvCtvTVCG4kZR=aV_gxFuU_D12g@mail.gmail.com>
-From:   David Gow <davidgow@google.com>
-Date:   Sat, 2 Jul 2022 13:15:12 +0800
-Message-ID: <CABVgOS=W-hAUN_Nx0-5-FysT1NZ-khWje00DnTdWhV1zD7UXKw@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] selftest: Taint kernel when test module loaded
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Brendan Higgins <brendanhiggins@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Ogness <john.ogness@linutronix.de>,
-        Joe Fradley <joefradley@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        KUnit Development <kunit-dev@googlegroups.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000008035405e2cb97f4"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoZq7/lr8hvcs9T3@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000008035405e2cb97f4
-Content-Type: text/plain; charset="UTF-8"
+On Thu, May 19, 2022 at 05:06:07PM +0100, Matthew Wilcox wrote:
+> 
+> Right, but that's the personal perspective of an expert tester.  I don't
+> particularly want to build that expertise myself; I want to write patches
+> which touch dozens of filesystems, and I want to be able to smoke-test
+> those patches.  Maybe xfstests or kdevops doesn't want to solve that
+> problem, but that would seem like a waste of other peoples time.
 
-On Sat, Jul 2, 2022 at 12:06 PM David Gow <davidgow@google.com> wrote:
->
-> On Sat, Jul 2, 2022 at 6:33 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> >
-> > On Fri, Jul 01, 2022 at 04:47:44PM +0800, David Gow wrote:
-> > > Make any kselftest test module (using the kselftest_module framework)
-> > > taint the kernel with TAINT_TEST on module load.
-> > >
-> > > Note that several selftests use kernel modules which are not based on
-> > > the kselftest_module framework, and so will not automatically taint the
-> > > kernel.
-> > >
-> > > This can be done in two ways:
-> > > - Moving the module to the tools/testing directory. All modules under
-> > >   this directory will taint the kernel.
-> > > - Adding the 'test' module property with:
-> > >   MODULE_INFO(test, "Y")
-> >
-> > This just needs to be documented somewhere other than a commit log.
-> > Otherwise I am not sure how we can be sure it will catch on.
->
-> I've updated the kselftest documentation for v5.
->
-> > > Similarly, selftests which do not load modules into the kernel generally
-> > > should not taint the kernel (or possibly should only do so on failure),
-> > > as it's assumed that testing from user-space should be safe. Regardless,
-> > > they can write to /proc/sys/kernel/tainted if required.
-> > >
-> > > Signed-off-by: David Gow <davidgow@google.com>
-> >
-> > Looks good otherwise!
-> >
-> > Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-> >
-> > Do we want this to go through selftest / kunit / modules tree?
-> > Happy for it to through any. I can't predict a conflict.
->
-> I don't mind which tree it goes through either -- I'm not aware of
-> anything which would depend on it. I do have it on the list of things
-> pending for the KUnit tree, but it's much less KUnit-specific now
-> compared to v1. Regardless, I'll leave in the KUnit to-do list, and
-> we'll pick it up if no-one else particularly wants to.
->
+Willy,
 
-FYI: It looks like patches 1 & 3 are already in the kunit tree, so it
-makes sense to take the rest of them, too:
-https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/log/?h=kunit
+For your use case I'm guessing that you have two major concerns:
+
+  * bugs that you may have introduced when "which touch dozens of
+    filesystems"
+
+  * bugs in the core mm and fs-writeback code which may be much
+    more substantive/complex changes.
+
+Would you say that is correct?
+
+At least for ext4 and xfs, it's probably quite sufficient just to run
+the -g auto group for the ext4/4k and xfs/4k test configs --- that is
+the standard default file system configs using the 4k block size.
+Both of these currently don't require any test exclusions for
+kvm-xfstests or gce-xfstests when running the auto group.  And so for
+the purposes of catching bugs in the core MM/VFS layer and any changes
+that the folio patches are likely to touch for ext4 and xfs, it's the
+auto group for ext4/4k and xfs/4k is probably quite sufficient.
+Testing the more exotic test configs, such as bigalloc for ext4, or
+realtime for xfs, or the external log configs, are not likely to be
+relevant for the folio patches.
+
+Note: I recommend that you skip using the loop device xfstests
+strategy, which Luis likes to advocate.  For the perspective of
+*likely* regressions caused by the Folio patches, I claim they are
+going to cause you more pain than they are worth.  If there are some
+strange Folio/loop device interactions, they aren't likely going to be
+obvious/reproduceable failures that will cause pain to linux-next
+testers.  While it would be nice to find **all** possible bugs before
+patches go usptream to Linus, if it slows down your development
+velocity to near-standstill, it's not worth it.  We have to be
+realistic about things.
+
+
+What about other file systems?  Well, first of all, xfstests only has
+support for the following file systems:
+
+	9p btrfs ceph cifs exfat ext2 ext4 f2fs gfs glusterfs jfs msdos
+	nfs ocfs2 overlay pvfs2 reiserfs tmpfs ubifs udf vfat virtiofs xfs
+
+{kvm,gce}-xfstests supports these 16 file systems:
+
+	9p btrfs exfat ext2 ext4 f2fs jfs msdos nfs overlay reiserfs
+	tmpfs ubifs udf vfat xfs
+
+kdevops has support for these file systems:
+
+	btrfs ext4 xfs
+
+So realistically, you're not going to have *full* test coverage for
+all of the file systems you might want to touch, no matter what you
+do.  And even for those file systems that are technically supported by
+xfstests and kvm-xfstests, if they aren't being regularly run (for
+example, exfat, 9p, ubifs, udf, etc.) there may be bitrot and very
+likely there is no one actively *to* maintain exclude files.  For that
+matter, there might not be anyone you could turn to for help
+interpreting the test results.
+
+So....  I believe the most realistic thing is to do is to run xfstests
+on a simple set of configs --- using no special mkfs or mount options
+--- first against the baseline, and then after you've applied your
+folio patches.  If there are any new test failures, do something like:
+
+   kvm-xfstests -c f2fs/default -C 10 generic/013
+
+to check to see whether it's a hard failure or not.  If it's a hard
+failure, then it's a problem with your patches.  If it's a flaky
+failure, it's possible you'll need to repeat the test against the baseline:
+
+   git checkout origin; kbuild
+   kvm-xfstests -c f2fs/default -C 10 generic/013
+
+If it's also flaky on the baseline, you can ignore the test failure
+for the purposes of folio development.
+
+There are more complex things you could do, such as running a baseline
+set of tests 500 times (as Luis suggests), but I believe that for your
+use case, it's not a good use of your time.  You'd need to speed
+several weeks finding *all* the flaky tests up front, especially if
+you want to do this for a large set of file systems.  It's much more
+efficient to check if a suspetected test regression is really a flaky
+test result when you come across them.
+
+I'd also suggest using the -g quick tests for file systems other than
+ext4 and xfs.  That's probably going to be quite sufficient for
+finding obvious problems that might be introduced when you're making
+changes to f2fs, btrfs, etc., and it will reduce the number of
+potential flaky tests that you might have to handle.
+
+
+It should be possible to automate this, and Leah and I have talked
+about designs to automate this process.  Leah has some rough scripts
+that do a semantic-style diff for the baseline and after applying the
+proposed xfs backports.  So it operates on something like this:
+
+f2fs/default: 868 tests, 10 failures, 217 skipped, 6899 seconds
+  Failures: generic/050 generic/064 generic/252 generic/342
+    generic/383 generic/502 generic/506 generic/526 generic/527
+    generic/563
+
+In theory, we could also have automated tools that look for the
+suspected test regressions, and then try running those test
+regressions 20 or 25 times on the baseline and after applying the
+patch series.  Those don't exist yet, but it's just a Mere Matter of
+Programming.  :-)
+
+I can't promise anything, especially with dates, but developing better
+automation tools to support the xfs stable backports is on our
+near-term roadmap --- and that would probably be applicable for for
+folio development usecase.
 
 Cheers,
--- David
 
---00000000000008035405e2cb97f4
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIPnwYJKoZIhvcNAQcCoIIPkDCCD4wCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggz5MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
-IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
-dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
-6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
-c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
-I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
-AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
-BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
-CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
-AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
-MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
-My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
-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
-z/tQRXr3iPeVmZCr7nttMEwGA1UdIARFMEMwQQYJKwYBBAGgMgEoMDQwMgYIKwYBBQUHAgEWJmh0
-dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAwGA1UdEwEB/wQCMAAwgZoGCCsG
-AQUFBwEBBIGNMIGKMD4GCCsGAQUFBzABhjJodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9jYS9n
-c2F0bGFzcjNzbWltZWNhMjAyMDBIBggrBgEFBQcwAoY8aHR0cDovL3NlY3VyZS5nbG9iYWxzaWdu
-LmNvbS9jYWNlcnQvZ3NhdGxhc3Izc21pbWVjYTIwMjAuY3J0MB8GA1UdIwQYMBaAFHzMCmjXouse
-LHIb0c1dlW+N+/JjMEYGA1UdHwQ/MD0wO6A5oDeGNWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20v
-Y2EvZ3NhdGxhc3Izc21pbWVjYTIwMjAuY3JsMA0GCSqGSIb3DQEBCwUAA4IBAQAx+EQjLATc/sze
-VoZkH7OLz+/no1+y31x4BQ3wjW7lKfay9DAAVym896b7ECttSo95GEvS7pYMikzud57WypK7Bjpi
-ep8YLarLRDrvyyvBuYtyDrIewkuASHtV1oy5E6QZZe2VOxMm6e2oJnFFjbflot4A08D3SwqDwV0i
-OOYwT0BUtHYR/3903Dmdx5Alq+NDvUHDjozgo0f6oIkwDXT3yBV36utQ/jFisd36C8RD5mM+NFpu
-3aqLXARRbKtxw29ErCwulof2dcAonG7cd5j+gmS84sLhKU+BhL1OQVXnJ5tj7xZ5Ri5I23brcwk0
-lk/gWqfgs3ppT9Xk7zVit9q8MYICajCCAmYCAQEwaDBUMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQ
-R2xvYmFsU2lnbiBudi1zYTEqMCgGA1UEAxMhR2xvYmFsU2lnbiBBdGxhcyBSMyBTTUlNRSBDQSAy
-MDIwAhABh9LgIPnlfMFHR0Die8n7MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCDp
-myI6YdUkYSDLGMNpBLQUNYRJN0LF6NS6xPdtFpU4cTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcB
-MBwGCSqGSIb3DQEJBTEPFw0yMjA3MDIwNTE1MjNaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUD
-BAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsG
-CSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEATznrmUKqtmKPOM0mgFPm
-hwZ5BJMna59QAMv8LHS2+3BReuudjMy3MzN+GDs0aodOwmsiARkral8YB3GYguf7TvMyQke+9PAi
-GzLhrAsCXla7z5DbkxADRQJGYGi4JOSmoPD0k+9awSwcsd0IPOlsy+4zMovpqNV2EM5+t3rIn73r
-kt3R0da1Sx36udR9p1kMaNVMus5RMADXzQ1MGnWBIxr8OQoLXBn01ZKQ3khFYD7ByLrLYsp+ue9w
-Riyc7snb+2bjjZjqKRGxPcy/j9r8NxvuVuVYc2reBh9ohPYN890FfWFB+hbjslSTkGojkcegtWmP
-4i5f975istGfoIovJQ==
---00000000000008035405e2cb97f4--
+					- Ted
