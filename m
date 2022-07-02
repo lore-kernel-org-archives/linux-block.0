@@ -2,185 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E444C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  2 Jul 2022 17:02:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 373D7C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  2 Jul 2022 21:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232116AbiGBRCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Jul 2022 13:02:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54658 "EHLO
+        id S229727AbiGBVsR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Jul 2022 17:48:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231520AbiGBRCI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Jul 2022 13:02:08 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543AFDFEC;
-        Sat,  2 Jul 2022 10:02:06 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 262H1Mcw005085
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 2 Jul 2022 13:01:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1656781287; bh=YP1/tEtj9VsIJb/YIEUR2pIcNgtT3bFvYv3Fm1d9240=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=dJFOSUIIKSktp2BGhJUbbk9/eKhfPkuallTgI21xVjs/4px1B7XIc1cUapo4ESae0
-         G1QEAmgGTHHd2lyWP2Z2Ajw+M9nlYudU4pTkFN+71zfudqmy41U6ROy9XxjnPgkkUr
-         UpxDJljyT5nA9vHzdyEUGyCzARkGln8yGSxrd7gOFE7AOGno1oFH0Bx3bG/T46ZFtm
-         f9TryQ6GPX/ZAC9u56PLh/+vMheqGX1kUsGTGzTfvjAgKHQsL4s0xOTWLVCznLeLrv
-         TdZ4bjSDXmUdXHUXvFw99zQV9oZtEWKPr/9EhLFukivnj5nYlyUp9if9jKYJ+03t4v
-         pv3Q0S8KwYE6w==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id B343315C3E94; Sat,  2 Jul 2022 13:01:22 -0400 (EDT)
-Date:   Sat, 2 Jul 2022 13:01:22 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Zorro Lang <zlang@redhat.com>, Amir Goldstein <amir73il@gmail.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>
+        with ESMTP id S229436AbiGBVsR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Jul 2022 17:48:17 -0400
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 464F3E90;
+        Sat,  2 Jul 2022 14:48:16 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id g7so5903281pjj.2;
+        Sat, 02 Jul 2022 14:48:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=7pzCwbuJ1awOTDylC4AhAOeWlZjFXPBT2qh8yB9f/UI=;
+        b=D3LH1f0A+zK8TYAVgii7giXyKC22NUd+9+y0h6pSM1Z7yiTYvdPsPWZCVNQ+PZZzmL
+         H8Nf7JNeomZSWktgwlMW8lU7GvrCpEkaadiKhfYpZFDCxzboL5T+SHhvPTWHkpgNcZIR
+         5lmuCi7Qg7On49sdGYnHPCphI1Y6meBeU3SoJZDE4FmS7R9OdwHfCT3hdqTpwshsw/5h
+         +WTGZsWvabtDA+ttkOTZtuZF22IIZOps/bHS5g4sscxKb0I/k6Cmo6MBEGo+PvuR5qMy
+         PqWGG7pZv97n5Ir72ZDks6zKwk527Yv9+aESs4jBOc6i44LoTIlj3ICsRjyXmph2Sovw
+         NwRg==
+X-Gm-Message-State: AJIora/Sj+ZijtiluQQt688yUOIc4KaqKDO2UvcK8q5S0JQrSB1qpOqa
+        j38zMng+8bVY2h5iI4uDACY=
+X-Google-Smtp-Source: AGRyM1tw20hL7NzxcC3lFHpleCL9qds7kkpA3sISl4o4Fht8U57Yct74xtvn4jcfwoluT7gkdzaQIQ==
+X-Received: by 2002:a17:90b:4b42:b0:1ed:f6f:ff2 with SMTP id mi2-20020a17090b4b4200b001ed0f6f0ff2mr27694822pjb.131.1656798495445;
+        Sat, 02 Jul 2022 14:48:15 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id x65-20020a623144000000b00527d9639723sm9027011pfx.184.2022.07.02.14.48.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Jul 2022 14:48:14 -0700 (PDT)
+Message-ID: <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+Date:   Sat, 2 Jul 2022 14:48:12 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
 Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
  expunges
-Message-ID: <YsB54p1vpBg4v2Xd@mit.edu>
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     amir73il@gmail.com, pankydev8@gmail.com, tytso@mit.edu,
+        josef@toxicpanda.com, jmeneghi@redhat.com, Jan Kara <jack@suse.cz>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>
 References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
- <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
- <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
- <YoZbF90qS+LlSDfS@casper.infradead.org>
- <20220519154419.ziy4esm4tgikejvj@zlang-mailbox>
- <YoZq7/lr8hvcs9T3@casper.infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoZq7/lr8hvcs9T3@casper.infradead.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 05:06:07PM +0100, Matthew Wilcox wrote:
+On 5/18/22 20:07, Luis Chamberlain wrote:
+> I've been promoting the idea that running fstests once is nice,
+> but things get interesting if you try to run fstests multiple
+> times until a failure is found. It turns out at least kdevops has
+> found tests which fail with a failure rate of typically 1/2 to
+> 1/30 average failure rate. That is 1/2 means a failure can happen
+> 50% of the time, whereas 1/30 means it takes 30 runs to find the
+> failure.
 > 
-> Right, but that's the personal perspective of an expert tester.  I don't
-> particularly want to build that expertise myself; I want to write patches
-> which touch dozens of filesystems, and I want to be able to smoke-test
-> those patches.  Maybe xfstests or kdevops doesn't want to solve that
-> problem, but that would seem like a waste of other peoples time.
+> I have tried my best to annotate failure rates when I know what
+> they might be on the test expunge list, as an example:
+> 
+> workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
+> 
+> The term "failure rate 1/15" is 16 characters long, so I'd like
+> to propose to standardize a way to represent this. How about
+> 
+> generic/530 # F:1/15
+> 
+> Then we could extend the definition. F being current estimate, and this
+> can be just how long it took to find the first failure. A more valuable
+> figure would be failure rate avarage, so running the test multiple
+> times, say 10, to see what the failure rate is and then averaging the
+> failure out. So this could be a more accurate representation. For this
+> how about:
+> 
+> generic/530 # FA:1/15
+> 
+> This would mean on average there failure rate has been found to be about
+> 1/15, and this was determined based on 10 runs.
+> 
+> We should also go extend check for fstests/blktests to run a test
+> until a failure is found and report back the number of successes.
+> 
+> Thoughts?
+> 
+> Note: yes failure rates lower than 1/100 do exist but they are rare
+> creatures. I love them though as my experience shows so far that they
+> uncover hidden bones in the closet, and they they make take months and
+> a lot of eyeballs to resolve.
 
-Willy,
+I strongly disagree with annotating tests with failure rates. My opinion 
+is that on a given test setup a test either should pass 100% of the time 
+or fail 100% of the time. If a test passes in one run and fails in 
+another run that either indicates a bug in the test or a bug in the 
+software that is being tested. Examples of behaviors that can cause 
+tests to behave unpredictably are use-after-free bugs and race 
+conditions. How likely it is to trigger such behavior depends on a 
+number of factors. This could even depend on external factors like which 
+network packets are received from other systems. I do not expect that 
+flaky tests have an exact failure rate. Hence my opinion that flaky 
+tests are not useful and also that it is not useful to annotate flaky 
+tests with a failure rate. If a test is flaky I think that the root 
+cause of the flakiness must be determined and fixed.
 
-For your use case I'm guessing that you have two major concerns:
-
-  * bugs that you may have introduced when "which touch dozens of
-    filesystems"
-
-  * bugs in the core mm and fs-writeback code which may be much
-    more substantive/complex changes.
-
-Would you say that is correct?
-
-At least for ext4 and xfs, it's probably quite sufficient just to run
-the -g auto group for the ext4/4k and xfs/4k test configs --- that is
-the standard default file system configs using the 4k block size.
-Both of these currently don't require any test exclusions for
-kvm-xfstests or gce-xfstests when running the auto group.  And so for
-the purposes of catching bugs in the core MM/VFS layer and any changes
-that the folio patches are likely to touch for ext4 and xfs, it's the
-auto group for ext4/4k and xfs/4k is probably quite sufficient.
-Testing the more exotic test configs, such as bigalloc for ext4, or
-realtime for xfs, or the external log configs, are not likely to be
-relevant for the folio patches.
-
-Note: I recommend that you skip using the loop device xfstests
-strategy, which Luis likes to advocate.  For the perspective of
-*likely* regressions caused by the Folio patches, I claim they are
-going to cause you more pain than they are worth.  If there are some
-strange Folio/loop device interactions, they aren't likely going to be
-obvious/reproduceable failures that will cause pain to linux-next
-testers.  While it would be nice to find **all** possible bugs before
-patches go usptream to Linus, if it slows down your development
-velocity to near-standstill, it's not worth it.  We have to be
-realistic about things.
-
-
-What about other file systems?  Well, first of all, xfstests only has
-support for the following file systems:
-
-	9p btrfs ceph cifs exfat ext2 ext4 f2fs gfs glusterfs jfs msdos
-	nfs ocfs2 overlay pvfs2 reiserfs tmpfs ubifs udf vfat virtiofs xfs
-
-{kvm,gce}-xfstests supports these 16 file systems:
-
-	9p btrfs exfat ext2 ext4 f2fs jfs msdos nfs overlay reiserfs
-	tmpfs ubifs udf vfat xfs
-
-kdevops has support for these file systems:
-
-	btrfs ext4 xfs
-
-So realistically, you're not going to have *full* test coverage for
-all of the file systems you might want to touch, no matter what you
-do.  And even for those file systems that are technically supported by
-xfstests and kvm-xfstests, if they aren't being regularly run (for
-example, exfat, 9p, ubifs, udf, etc.) there may be bitrot and very
-likely there is no one actively *to* maintain exclude files.  For that
-matter, there might not be anyone you could turn to for help
-interpreting the test results.
-
-So....  I believe the most realistic thing is to do is to run xfstests
-on a simple set of configs --- using no special mkfs or mount options
---- first against the baseline, and then after you've applied your
-folio patches.  If there are any new test failures, do something like:
-
-   kvm-xfstests -c f2fs/default -C 10 generic/013
-
-to check to see whether it's a hard failure or not.  If it's a hard
-failure, then it's a problem with your patches.  If it's a flaky
-failure, it's possible you'll need to repeat the test against the baseline:
-
-   git checkout origin; kbuild
-   kvm-xfstests -c f2fs/default -C 10 generic/013
-
-If it's also flaky on the baseline, you can ignore the test failure
-for the purposes of folio development.
-
-There are more complex things you could do, such as running a baseline
-set of tests 500 times (as Luis suggests), but I believe that for your
-use case, it's not a good use of your time.  You'd need to speed
-several weeks finding *all* the flaky tests up front, especially if
-you want to do this for a large set of file systems.  It's much more
-efficient to check if a suspetected test regression is really a flaky
-test result when you come across them.
-
-I'd also suggest using the -g quick tests for file systems other than
-ext4 and xfs.  That's probably going to be quite sufficient for
-finding obvious problems that might be introduced when you're making
-changes to f2fs, btrfs, etc., and it will reduce the number of
-potential flaky tests that you might have to handle.
-
-
-It should be possible to automate this, and Leah and I have talked
-about designs to automate this process.  Leah has some rough scripts
-that do a semantic-style diff for the baseline and after applying the
-proposed xfs backports.  So it operates on something like this:
-
-f2fs/default: 868 tests, 10 failures, 217 skipped, 6899 seconds
-  Failures: generic/050 generic/064 generic/252 generic/342
-    generic/383 generic/502 generic/506 generic/526 generic/527
-    generic/563
-
-In theory, we could also have automated tools that look for the
-suspected test regressions, and then try running those test
-regressions 20 or 25 times on the baseline and after applying the
-patch series.  Those don't exist yet, but it's just a Mere Matter of
-Programming.  :-)
-
-I can't promise anything, especially with dates, but developing better
-automation tools to support the xfs stable backports is on our
-near-term roadmap --- and that would probably be applicable for for
-folio development usecase.
-
-Cheers,
-
-					- Ted
+Bart.
