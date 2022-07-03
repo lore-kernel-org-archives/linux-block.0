@@ -2,60 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC7BEC43334
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 07:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC58C43334
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 13:16:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbiGCHM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 03:12:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36900 "EHLO
+        id S232672AbiGCNQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 09:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230309AbiGCHM0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 03:12:26 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012EF6242;
-        Sun,  3 Jul 2022 00:12:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=zEPta8a4kO4M2oOgAWC9+IxxiKqCShbd1Nc4YNMmNnM=; b=LcBIb7GZtLVAwyR7lzyvnEI2qM
-        XNVu5o5ZG2Imbsx8F2LP5t4ZeDoHZ3MANMBXtLWB+OzLafhr5j4nvfGKwUUiwpKM9GELUdFEdRjM1
-        wECa4VbvDtFEzlKt6wASi9JmjOhVndTzcOPMzJpDk/wAVM7enl4hsAB45vT+5+T/2V6p/3bSmcXbW
-        /7E/Eyca9EZp3AYIwOaHwBhkQlA/uwVAgjZaHDYIkLynVueIZ7ak+06UwcWLxC6vZ2gNPgv/pQVd7
-        NnUSPMWGkP0gfbTjaxJzM9Tu36hDOaXu7/CJpEFSPzdoA+Ubr24VJwYQ/AFXkSS033Ub8xhX2tzaz
-        ntKbrsEw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o7tmF-00EDWr-Fn; Sun, 03 Jul 2022 07:12:19 +0000
-Date:   Sun, 3 Jul 2022 00:12:19 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Dae R. Jeong" <threeearcat@gmail.com>
-Cc:     axboe@kernel.dk, rostedt@goodmis.org, mingo@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: INFO: task hung in blk_trace_remove
-Message-ID: <YsFBU1ZzeTy1lVu4@infradead.org>
-References: <YsEhsEvhZyoJFtSO@archdragon>
+        with ESMTP id S232487AbiGCNQS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 09:16:18 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD4463E9;
+        Sun,  3 Jul 2022 06:16:17 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 263DFRbI024097
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 3 Jul 2022 09:15:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1656854134; bh=yN7VurO+JH7Mo0Ckmg7/VswnfnxYfW2lA7CXiFOOZa8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=ENt1xY3yANlkp01oZmFFQ1vZpE5hmxZSOapOmMq1o5KLT10yJRziY0BKdKrjhgJ35
+         KNDLYbuCEEoqhnlCinIttTawZM2ofnrLQcVKtZNNX7UXnGs/s+osL1b6aDzo2JPulX
+         CP9wmtbj1ncOzLJNn1R39ZLIxFvzuuXefQ+2W9Co7/CnsjEDWz+cW5ERywjH/bOxr6
+         JT+NWKgEln2ytRbYong40dTokBPmcyEttS5JuwhqTeF3y9MiIYXnzH4grRXI3Dd/Ek
+         iKbcMoQyFaaScDOSSzBfNEEcUzBREwE+W3WTsPeba3UJguLF8KZF/258dp8FUgqRD7
+         r9telvU5q75uA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id C788315C3E94; Sun,  3 Jul 2022 09:15:27 -0400 (EDT)
+Date:   Sun, 3 Jul 2022 09:15:27 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Chinner <david@fromorbit.com>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <YsGWb8nPUySuhos/@mit.edu>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+ <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YsEhsEvhZyoJFtSO@archdragon>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 03, 2022 at 01:57:20PM +0900, Dae R. Jeong wrote:
-> Hello,
+On Sun, Jul 03, 2022 at 08:56:54AM +0300, Amir Goldstein wrote:
 > 
-> We observed an issue "INFO: task hung in blk_trace_remove" during
-> fuzzing.
+> That is true for some use cases, but unfortunately, the flaky
+> fstests are way too valuable and too hard to replace or improve,
+> so practically, fs developers have to run them, but not everyone does.
 > 
-> Unfortunately, we have not found a reproducer for the crash yet. We
-> will inform you if we have any update on this crash.
-> 
-> The crash information is attached at the end of this email.
+> Zorro has already proposed to properly tag the non deterministic tests
+> with a specific group and I think there is really no other solution.
 
-This looks like it is due to locking an on the /dev/sg node instead
-of the more usual (and more tested) block device node.
+The non-deterministic tests are not the sole, or even the most likely
+cause of flaky tests.  Or put another way, even if we used a
+deterministic pseudo-random numberator seed for some of the curently
+"non-determinstic tests" (and I believe we are for many of them
+already anyway), it's not going to be make the flaky tests go away.
 
-It might make sense to run with lockdep enabled to get a better
-grip on potential locking issues here.
+That's because with many of these tests, we are running multiple
+threads either in the fstress or fsx, or in the antogonist workload
+that is say, running the space utilization to full to generate ENOSPC
+errors, and then deleting a bunch of files to trigger as many ENOSPC
+hitter events as possible.
+
+> The only question is whether we remove them from the 'auto' group
+> (I think we should).
+
+I wouldn't; if someone wants to exclude the non-determistic tests,
+once they are tagged as belonging to a group, they can just exclude
+that group.  So there's no point removing them from the auto group
+IMHO.
+
+> filesystem developers that will run ./check -g auto -g soak
+> will get the exact same test coverage as today's -g auto
+> and the "commoners" that run ./check -g auto will enjoy blissful
+> determitic test results, at least for the default config of regularly
+> tested filesystems (a.k.a, the ones tested by kernet test bot).?
+
+First of all, there are a number of tests today which are in soak or
+long_rw which are not in auto, so "-g auto -g soak" will *not* result
+in the "exact same test coverage".
+
+Secondly, as I've tested above, deterministic tests does not
+necessasrily mean determinsitic test results --- unless by
+"determinsitic tests" you mean "completely single-threaded tests",
+which would eliminate a large amount of useful test coverage.
+
+Cheers,
+
+					- Ted
