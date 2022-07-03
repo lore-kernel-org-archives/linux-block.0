@@ -2,108 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC58C43334
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 13:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF6AC43334
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 13:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232672AbiGCNQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 09:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34678 "EHLO
+        id S232462AbiGCNc3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 09:32:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232487AbiGCNQS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 09:16:18 -0400
+        with ESMTP id S229739AbiGCNc2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 09:32:28 -0400
 Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD4463E9;
-        Sun,  3 Jul 2022 06:16:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC3363EC;
+        Sun,  3 Jul 2022 06:32:27 -0700 (PDT)
 Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
         (authenticated bits=0)
         (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 263DFRbI024097
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 263DW3EE030648
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 3 Jul 2022 09:15:28 -0400
+        Sun, 3 Jul 2022 09:32:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1656854134; bh=yN7VurO+JH7Mo0Ckmg7/VswnfnxYfW2lA7CXiFOOZa8=;
+        t=1656855127; bh=L+Hz99xOt45QvdSxLGEvpYQPTANWobOaJHGCr2gbev0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=ENt1xY3yANlkp01oZmFFQ1vZpE5hmxZSOapOmMq1o5KLT10yJRziY0BKdKrjhgJ35
-         KNDLYbuCEEoqhnlCinIttTawZM2ofnrLQcVKtZNNX7UXnGs/s+osL1b6aDzo2JPulX
-         CP9wmtbj1ncOzLJNn1R39ZLIxFvzuuXefQ+2W9Co7/CnsjEDWz+cW5ERywjH/bOxr6
-         JT+NWKgEln2ytRbYong40dTokBPmcyEttS5JuwhqTeF3y9MiIYXnzH4grRXI3Dd/Ek
-         iKbcMoQyFaaScDOSSzBfNEEcUzBREwE+W3WTsPeba3UJguLF8KZF/258dp8FUgqRD7
-         r9telvU5q75uA==
+        b=NPkc71lo7lSlzXn3ei16G/3G00s2LODNpq7e3kfGKBMhhiRr3bqdQs0NNEY0FNRFj
+         xgoD29Sp2nk+QMCsFyfb5dSsARP+vcTjglCnfALIPgWpZ1Sg/PuH7CVqlUIvBkTCpu
+         KxHmUXvAgl+HozpRRj9ugtfcYPb9V+gxz7CPPmxi1FPFxJvQcL7dBjY1pKhunS90bM
+         j0ZGs1PJ21BVyd2pS0FI9SRYTCYFkShupzb3dXSVb3WGnLJ/lrOxWhmE4PgWKJzLu2
+         od8NGWAruJjTiDs9pQWK8xpZIjKciiR7mFuF+kglcbtl4awayx9jMTr3TZ2Ss5jr1z
+         PnvxLnWX/+orA==
 Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id C788315C3E94; Sun,  3 Jul 2022 09:15:27 -0400 (EDT)
-Date:   Sun, 3 Jul 2022 09:15:27 -0400
+        id 8B1C715C3E94; Sun,  3 Jul 2022 09:32:03 -0400 (EDT)
+Date:   Sun, 3 Jul 2022 09:32:03 -0400
 From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        amir73il@gmail.com, pankydev8@gmail.com, josef@toxicpanda.com,
+        jmeneghi@redhat.com, Jan Kara <jack@suse.cz>,
+        Davidlohr Bueso <dave@stgolabs.net>,
         Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Dave Chinner <david@fromorbit.com>
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>
 Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
  expunges
-Message-ID: <YsGWb8nPUySuhos/@mit.edu>
+Message-ID: <YsGaU4lFjR5Gh29h@mit.edu>
 References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
  <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
- <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
+In-Reply-To: <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 03, 2022 at 08:56:54AM +0300, Amir Goldstein wrote:
+On Sat, Jul 02, 2022 at 02:48:12PM -0700, Bart Van Assche wrote:
 > 
-> That is true for some use cases, but unfortunately, the flaky
-> fstests are way too valuable and too hard to replace or improve,
-> so practically, fs developers have to run them, but not everyone does.
-> 
-> Zorro has already proposed to properly tag the non deterministic tests
-> with a specific group and I think there is really no other solution.
+> I strongly disagree with annotating tests with failure rates. My opinion is
+> that on a given test setup a test either should pass 100% of the time or
+> fail 100% of the time.
 
-The non-deterministic tests are not the sole, or even the most likely
-cause of flaky tests.  Or put another way, even if we used a
-deterministic pseudo-random numberator seed for some of the curently
-"non-determinstic tests" (and I believe we are for many of them
-already anyway), it's not going to be make the flaky tests go away.
+My opinion is also that no child should ever go to bed hungry, and we
+should end world hunger.
 
-That's because with many of these tests, we are running multiple
-threads either in the fstress or fsx, or in the antogonist workload
-that is say, running the space utilization to full to generate ENOSPC
-errors, and then deleting a bunch of files to trigger as many ENOSPC
-hitter events as possible.
+However, meanwhile, in the real world, while we can *strive* to
+eliminate all flaky tests, whether it is caused by buggy tests, or
+buggy kernel code, there's an old saying that the only time code is
+bug-free is when it is no longer being used.
 
-> The only question is whether we remove them from the 'auto' group
-> (I think we should).
+That being said, I completely agree that annotating failure rates in
+xfstesets-dev upstream probably doesn't make much sense.  As we've
+stated before, it is highly dependent on the hardware configuration,
+and kernel version (remember, sometimes flaky tests are caused by bugs
+in other kernel subsystems --- including the loop device, which has
+not historically been bug-free(tm) either, and so bugs come and go
+across the entire kernel surface).
 
-I wouldn't; if someone wants to exclude the non-determistic tests,
-once they are tagged as belonging to a group, they can just exclude
-that group.  So there's no point removing them from the auto group
-IMHO.
+I believe the best way to handle this is to have better test results
+analysis tools.  We can certainly consider having some shared test
+results database, but I'm not convinced that flat text files shared
+via git is sufficiently scalable.
 
-> filesystem developers that will run ./check -g auto -g soak
-> will get the exact same test coverage as today's -g auto
-> and the "commoners" that run ./check -g auto will enjoy blissful
-> determitic test results, at least for the default config of regularly
-> tested filesystems (a.k.a, the ones tested by kernet test bot).?
 
-First of all, there are a number of tests today which are in soak or
-long_rw which are not in auto, so "-g auto -g soak" will *not* result
-in the "exact same test coverage".
+The final thing I'll note it that we've lived with low probability
+flakes for a very long time, and it hasn't been the end of the world.
+Sometime in 2011 or 2012, when I first started at Google and when we
+first started rolling out ext4 to the all of our data centers, once or
+twice a month --- across the entire world-wide fleet --- there would
+be an unexplained file system corruption that had remarkably similar
+characteristics.  It took us several months to run it down, and it
+turned out to be a lock getting released one C statement too soon.
+When I did some further archeological research, it turned out it had
+been in upstream for well over a *decade* --- in ext3 and ext4 --- and
+had not been noticed in at least 3 or 4 enterprise distro GA
+testing/qualification cycles.  Or rather, it might have been noticed,
+but since it couldn't be replicated, I'm guessing the QA testers
+shrugged, assumed that it *must* have been due to some cosmic ray, or
+some such, and moved on.
 
-Secondly, as I've tested above, deterministic tests does not
-necessasrily mean determinsitic test results --- unless by
-"determinsitic tests" you mean "completely single-threaded tests",
-which would eliminate a large amount of useful test coverage.
+> If a test is flaky I think that the root cause of the flakiness must
+> be determined and fixed.  
+
+In the ideal world, sure.  Then again, in the ideal world, we wouldn't
+have thousands of people getting killed over border disputes and
+because some maniacal world leader thinks that it's A-OK to overrun
+the borders of adjacent countries.
+
+However, until we have infinite resources available to us, the reality
+is that we need to live with the fact that life is imperfect, despite
+all of our efforts to reduce these sort of flaky tests --- especially
+when we're talking about esoteric test configurations that most users
+won't be using.  (Or when they are triggered by test code that is not
+used in production, but for which the error injection or shutdown
+simuilation code is itself not perfect.)
 
 Cheers,
 
