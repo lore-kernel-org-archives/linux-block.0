@@ -2,118 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373D7C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  2 Jul 2022 21:48:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 524C1C43334
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 04:57:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbiGBVsR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Jul 2022 17:48:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50552 "EHLO
+        id S230147AbiGCE5b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 00:57:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiGBVsR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Jul 2022 17:48:17 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 464F3E90;
-        Sat,  2 Jul 2022 14:48:16 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id g7so5903281pjj.2;
-        Sat, 02 Jul 2022 14:48:16 -0700 (PDT)
+        with ESMTP id S229782AbiGCE50 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 00:57:26 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C63099592;
+        Sat,  2 Jul 2022 21:57:25 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 23so6026713pgc.8;
+        Sat, 02 Jul 2022 21:57:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:subject:message-id:mime-version:content-disposition;
+        bh=0zAnyni5Vrc+oHO28/Vl9glMrviD0r1aRl+f2W+XCP0=;
+        b=TW1PnzLppzQFL1P7oklyO9PYNyG9aTwZxQJaZyjGNlUj6GSEE2FApRPB/7J1v9M60p
+         mobryRspQ8HsxlqoHowLswelyMPdgIUvWqaIYcSPUBh0AUzCzZeJqnnFx/uEEQg5vCPc
+         gWnetOAMDnDi666Q/ODhvvUPxJ5HCoUdywVtjXeW7NNDV5HLMCfl8O44IJ+pB1BAQ2Ba
+         mBadORhUfnTobCQeKpZaq4jMYLZT+5keoxkBnHHqmkBqgaS2cqujVmRgPB//omPUkd7O
+         jDeRRLKVlX5HZCbFwQMr/ysPF561jjz8/jwDQ70eAwRPLZw6xnOwJjgbWlKV/CWG+moO
+         Djqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7pzCwbuJ1awOTDylC4AhAOeWlZjFXPBT2qh8yB9f/UI=;
-        b=D3LH1f0A+zK8TYAVgii7giXyKC22NUd+9+y0h6pSM1Z7yiTYvdPsPWZCVNQ+PZZzmL
-         H8Nf7JNeomZSWktgwlMW8lU7GvrCpEkaadiKhfYpZFDCxzboL5T+SHhvPTWHkpgNcZIR
-         5lmuCi7Qg7On49sdGYnHPCphI1Y6meBeU3SoJZDE4FmS7R9OdwHfCT3hdqTpwshsw/5h
-         +WTGZsWvabtDA+ttkOTZtuZF22IIZOps/bHS5g4sscxKb0I/k6Cmo6MBEGo+PvuR5qMy
-         PqWGG7pZv97n5Ir72ZDks6zKwk527Yv9+aESs4jBOc6i44LoTIlj3ICsRjyXmph2Sovw
-         NwRg==
-X-Gm-Message-State: AJIora/Sj+ZijtiluQQt688yUOIc4KaqKDO2UvcK8q5S0JQrSB1qpOqa
-        j38zMng+8bVY2h5iI4uDACY=
-X-Google-Smtp-Source: AGRyM1tw20hL7NzxcC3lFHpleCL9qds7kkpA3sISl4o4Fht8U57Yct74xtvn4jcfwoluT7gkdzaQIQ==
-X-Received: by 2002:a17:90b:4b42:b0:1ed:f6f:ff2 with SMTP id mi2-20020a17090b4b4200b001ed0f6f0ff2mr27694822pjb.131.1656798495445;
-        Sat, 02 Jul 2022 14:48:15 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id x65-20020a623144000000b00527d9639723sm9027011pfx.184.2022.07.02.14.48.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Jul 2022 14:48:14 -0700 (PDT)
-Message-ID: <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
-Date:   Sat, 2 Jul 2022 14:48:12 -0700
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition;
+        bh=0zAnyni5Vrc+oHO28/Vl9glMrviD0r1aRl+f2W+XCP0=;
+        b=6XhOZ7wvv0TfqW3QHh8lB9BWA9Czi2IZz01b/eeHDPkd+Ss+a+ipDvDJcnv4pSLIO3
+         AbKOW7atB7ooS3YRHtzvRtVFmn/rHYTMz+Ln8VIxcZXhf5pahSiM8AgeeSBytH4y8FiZ
+         iSydFOoqs+OmQEZDGONF084D0ZVGns0bnFnHUGhuzB/Udx2EZY3+ddst7lHMsZugDXRe
+         hFhvrB401dMZQU+MUbaMWZ5OWeGJjVUSIiSyW5v81h0bxMTKB+OJ1VnVkffmCcX6H7hM
+         CV7s2znXWpGJJuRNqlr3vqyM98r3sbIKx7IGdqp7MJ2aaCJ5ez2meJeZ4CHzXL+4NV8y
+         FLBA==
+X-Gm-Message-State: AJIora+Lx6SpJCwwJiMxZ09jESn89yV+sk4BqMiSLArDfbtIb/gk3Byw
+        u9BDaMIBh/ZOG6u0x6VbLEcdcI9Fllg=
+X-Google-Smtp-Source: AGRyM1v2vDCwQzbnh3bk0IN/7gz3BMZq4vYYyTtn9D5CMJvZ1xigEu4PeSPNcuQDRwj6Ud9qBgzB4A==
+X-Received: by 2002:a05:6a00:cd1:b0:525:4c0e:d0a3 with SMTP id b17-20020a056a000cd100b005254c0ed0a3mr28282467pfv.67.1656824245238;
+        Sat, 02 Jul 2022 21:57:25 -0700 (PDT)
+Received: from archdragon (dragonet.kaist.ac.kr. [143.248.133.220])
+        by smtp.gmail.com with ESMTPSA id u10-20020a170903124a00b0016a01637620sm1311707plh.76.2022.07.02.21.57.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Jul 2022 21:57:24 -0700 (PDT)
+Date:   Sun, 3 Jul 2022 13:57:20 +0900
+From:   "Dae R. Jeong" <threeearcat@gmail.com>
+To:     axboe@kernel.dk, rostedt@goodmis.org, mingo@redhat.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: INFO: task hung in blk_trace_remove
+Message-ID: <YsEhsEvhZyoJFtSO@archdragon>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
- expunges
-Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     amir73il@gmail.com, pankydev8@gmail.com, tytso@mit.edu,
-        josef@toxicpanda.com, jmeneghi@redhat.com, Jan Kara <jack@suse.cz>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/22 20:07, Luis Chamberlain wrote:
-> I've been promoting the idea that running fstests once is nice,
-> but things get interesting if you try to run fstests multiple
-> times until a failure is found. It turns out at least kdevops has
-> found tests which fail with a failure rate of typically 1/2 to
-> 1/30 average failure rate. That is 1/2 means a failure can happen
-> 50% of the time, whereas 1/30 means it takes 30 runs to find the
-> failure.
-> 
-> I have tried my best to annotate failure rates when I know what
-> they might be on the test expunge list, as an example:
-> 
-> workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
-> 
-> The term "failure rate 1/15" is 16 characters long, so I'd like
-> to propose to standardize a way to represent this. How about
-> 
-> generic/530 # F:1/15
-> 
-> Then we could extend the definition. F being current estimate, and this
-> can be just how long it took to find the first failure. A more valuable
-> figure would be failure rate avarage, so running the test multiple
-> times, say 10, to see what the failure rate is and then averaging the
-> failure out. So this could be a more accurate representation. For this
-> how about:
-> 
-> generic/530 # FA:1/15
-> 
-> This would mean on average there failure rate has been found to be about
-> 1/15, and this was determined based on 10 runs.
-> 
-> We should also go extend check for fstests/blktests to run a test
-> until a failure is found and report back the number of successes.
-> 
-> Thoughts?
-> 
-> Note: yes failure rates lower than 1/100 do exist but they are rare
-> creatures. I love them though as my experience shows so far that they
-> uncover hidden bones in the closet, and they they make take months and
-> a lot of eyeballs to resolve.
+Hello,
 
-I strongly disagree with annotating tests with failure rates. My opinion 
-is that on a given test setup a test either should pass 100% of the time 
-or fail 100% of the time. If a test passes in one run and fails in 
-another run that either indicates a bug in the test or a bug in the 
-software that is being tested. Examples of behaviors that can cause 
-tests to behave unpredictably are use-after-free bugs and race 
-conditions. How likely it is to trigger such behavior depends on a 
-number of factors. This could even depend on external factors like which 
-network packets are received from other systems. I do not expect that 
-flaky tests have an exact failure rate. Hence my opinion that flaky 
-tests are not useful and also that it is not useful to annotate flaky 
-tests with a failure rate. If a test is flaky I think that the root 
-cause of the flakiness must be determined and fixed.
+We observed an issue "INFO: task hung in blk_trace_remove" during
+fuzzing.
 
-Bart.
+Unfortunately, we have not found a reproducer for the crash yet. We
+will inform you if we have any update on this crash.
+
+The crash information is attached at the end of this email.
+
+
+Best regards,
+Dae R. Jeong
+
+------
+
+- Kernel commit:
+92f20ff72066d
+
+- Crash report: 
+INFO: task syz-executor.0:13658 blocked for more than 143 seconds.
+      Not tainted 5.19.0-rc3-32288-g0f3b08299494 #3
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.0  state:D stack:27824 pid:13658 ppid:  6759 flags:0x00004004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5146 [inline]
+ __schedule+0x96c/0x10f0 kernel/sched/core.c:6458
+ schedule+0xea/0x1b0 kernel/sched/core.c:6530
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6589
+ __mutex_lock_common+0xe0f/0x25e0 kernel/locking/mutex.c:679
+ __mutex_lock kernel/locking/mutex.c:747 [inline]
+ mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
+ blk_trace_remove+0x1c/0x40 kernel/trace/blktrace.c:374
+ sg_ioctl_common drivers/scsi/sg.c:1130 [inline]
+ sg_ioctl+0x712/0x4be0 drivers/scsi/sg.c:1164
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0x152/0x1f0 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x4e/0xa0 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x47268d
+RSP: 002b:00007fab57574be8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000057d4a0 RCX: 000000000047268d
+RDX: 0000000000000000 RSI: 0000000000001276 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000057d4a8
+R13: 000000000057d4ac R14: 00007ffe9afe72f0 R15: 00007fab57574d80
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/40:
+ #0: ffffffff92f1a3e0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
+1 lock held by in:imklog/6420:
+ #0: ffff88807d844368 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x3bf/0x530 fs/file.c:1036
+4 locks held by syz-executor.0/13657:
+1 lock held by syz-executor.0/13658:
+ #0: ffff888022c78378 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1c/0x40 kernel/trace/blktrace.c:374
+
