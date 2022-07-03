@@ -2,93 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80267CCA47F
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 16:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E4DC433EF
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 18:10:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231989AbiGCQay (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 12:30:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32948 "EHLO
+        id S231145AbiGCSKb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 14:10:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbiGCQax (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 12:30:53 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DC35FB1;
-        Sun,  3 Jul 2022 09:30:51 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 263GUG1U006323
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 3 Jul 2022 12:30:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1656865823; bh=uKC0mfydFMX4nUGBHuT9jkHWP7ClJOQjzQ31vgmMI5E=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=ovcz2irxhBKksjbFBj4coBed2FkyJqDL5tkts1iix6B+4/yL/g8C9U5LwjN631HSa
-         aMA2tibyXYr5MEVfNxBWpEPRH9wW7Xi0Ae4JasXNq3OhGwzBJv0JkgN/9tQ4Js0fvn
-         zrWezqpIT0c9tr5wEO6XeolPAYbo0ybOMplXHi/VZX9vbTJyhLGy6X8Tf1nyJvgXSY
-         InsEIKp9piRbk8bkV+fXdSDsj6GpzSPfscaaGBK+R8XmLroIzmtYcshgXZ+svbfnTq
-         pzrRuAzvSmJCrzmz/iVNJydcJhkv8BxhyytpZxmz9Jb0YZ3vuezcLpdzaG4EeLsXOr
-         rbmJVJnL0K74A==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 62C5215C3E94; Sun,  3 Jul 2022 12:30:16 -0400 (EDT)
-Date:   Sun, 3 Jul 2022 12:30:16 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Dave Chinner <david@fromorbit.com>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
- expunges
-Message-ID: <YsHEGElna2Ae2V83@mit.edu>
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
- <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
- <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
- <YsGWb8nPUySuhos/@mit.edu>
- <CAOQ4uxhEaVjk6rEnsnjWOKs+dygioXk-9h-WJjBzkJfe8U9eMQ@mail.gmail.com>
+        with ESMTP id S229549AbiGCSKa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 14:10:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B82F460F6
+        for <linux-block@vger.kernel.org>; Sun,  3 Jul 2022 11:10:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656871828;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ayXml23qBeBCmrzLfgRXNtHzuajrRtR37MMNQFm/CRw=;
+        b=jG4Y9oNqtZugd8VRyqXIx7yksZ90Rh4JsGKT3GjnlojzhATA1tqi7Ds6ECpV5qyCR+lB1m
+        pt1YboWONCXS7fFoYrKqsfSlHNSxqQPNhdTKwKCxQ3WTPRlGlyX1UXIpxrRRNuukT1TIXh
+        Fa6hrMJMbXGqJ40s4irZKjnhmyFL8x0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-271-P8EDZk4INPuK0rJ01-lKLQ-1; Sun, 03 Jul 2022 14:10:22 -0400
+X-MC-Unique: P8EDZk4INPuK0rJ01-lKLQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8CEC0801231;
+        Sun,  3 Jul 2022 18:10:22 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B3CD40E7F28;
+        Sun,  3 Jul 2022 18:10:20 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-block@vger.kernel.org
+Cc:     shinichiro.kawasaki@wdc.com
+Subject: [PATCH blktests] block/008: fix cpu online restore
+Date:   Mon,  4 Jul 2022 02:09:57 +0800
+Message-Id: <20220703180956.2922025-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ4uxhEaVjk6rEnsnjWOKs+dygioXk-9h-WJjBzkJfe8U9eMQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 03, 2022 at 05:22:17PM +0300, Amir Goldstein wrote:
-> 
-> To be clear, when I wrote deterministic, what I meant was deterministic
-> results empirically, in the same sense that Bart meant - a test should
-> always pass.
+The offline cpus cannot be restored during _cleanup when only _offline_cpu
+executed, fix it by reset RESTORE_CPUS_ONLINE=1 during test.
 
-Well all of the tests in the auto group pass at 100% of the time for
-the ext4/4k and xfs/4k groups.  (Well, at least if use the HDD and SSD
-as the storage device.  If you are using eMMC flash, or Luis's loop
-device config, there would be more failures.)
+Fixes: bd6b882 ("block/008: check CPU offline failure due to many IRQs")
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ tests/block/008 | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-But if we're talking about btrfs/4k, f2fs/4k, xfs/realtime,
-xfs/realtime_28k/logdev, ext4/bigalloc, etc. there would be a *lot* of
-tests that would need to be removed from the auto group.
+diff --git a/tests/block/008 b/tests/block/008
+index 75aae65..f61f33a 100755
+--- a/tests/block/008
++++ b/tests/block/008
+@@ -91,6 +91,11 @@ test_device() {
+ 		fi
+ 	done
+ 
++	# The RESTORE_CPUS_ONLINE setting was ignored with previous
++	# err=$(_offline_cpu "${online_cpus[$idx]}" when only _offline_cpu
++	# executed, reset it here then the offline cpus can be retored
++	# shellcheck disable=SC2034
++	RESTORE_CPUS_ONLINE=1
+ 	FIO_PERF_FIELDS=("read iops")
+ 	_fio_perf_report
+ 
+-- 
+2.34.1
 
-So what "non-determinsitic tests" should we remove from the auto
-group?  For what file systems, file system configs, and storage
-devices?  What would you propose?
-
-Remember, Matthew wants something that he can use to test "dozens" of
-file systems that he's touching for the folio patches.  If we have to
-remove all of the tests that fail if you are using nfs, vfat, hfs,
-msdos, etc., then the auto group would be pretty anemic.  Let's not do
-that.
-
-If you want a "always pass" group, we could do that, but let's not
-call that the "auto" group, please.
-
-						- Ted
