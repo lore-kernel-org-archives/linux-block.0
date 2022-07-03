@@ -2,70 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 524C1C43334
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 04:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6615C43334
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 05:05:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230147AbiGCE5b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 00:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39036 "EHLO
+        id S231134AbiGCFF2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 01:05:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbiGCE50 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 00:57:26 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C63099592;
-        Sat,  2 Jul 2022 21:57:25 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 23so6026713pgc.8;
-        Sat, 02 Jul 2022 21:57:25 -0700 (PDT)
+        with ESMTP id S230517AbiGCFF1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 01:05:27 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3C6AE61;
+        Sat,  2 Jul 2022 22:05:26 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id t21so6144331pfq.1;
+        Sat, 02 Jul 2022 22:05:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=date:from:to:subject:message-id:mime-version:content-disposition;
-        bh=0zAnyni5Vrc+oHO28/Vl9glMrviD0r1aRl+f2W+XCP0=;
-        b=TW1PnzLppzQFL1P7oklyO9PYNyG9aTwZxQJaZyjGNlUj6GSEE2FApRPB/7J1v9M60p
-         mobryRspQ8HsxlqoHowLswelyMPdgIUvWqaIYcSPUBh0AUzCzZeJqnnFx/uEEQg5vCPc
-         gWnetOAMDnDi666Q/ODhvvUPxJ5HCoUdywVtjXeW7NNDV5HLMCfl8O44IJ+pB1BAQ2Ba
-         mBadORhUfnTobCQeKpZaq4jMYLZT+5keoxkBnHHqmkBqgaS2cqujVmRgPB//omPUkd7O
-         jDeRRLKVlX5HZCbFwQMr/ysPF561jjz8/jwDQ70eAwRPLZw6xnOwJjgbWlKV/CWG+moO
-         Djqg==
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=hlVxCaScnZLJkKKNNp3S86nS11JatpDEtOn+lvMWbBw=;
+        b=b1K+Vbf9Z3OZrQQKZW2Vb2/OZjY9VuA/NPhh7anAKwPa63+Yj12pekJJ6qN0qIMltn
+         jz+5RrQ0+PH7Pn2CyNMdDtzpknkpUyQqcozS5rmuy1gD6ST/y1VfCwzcZPo9vT722gk8
+         A5upVcUWjyiC/+TNgx/2apef8J91TdI0nuWWd7FDjGcWEw0ScmV0w1PDNVqpfoDbxrFz
+         IAwEBrHDfEkf+C0qkA4/BKJOj08wRZyuZxd/b2BsObhR8V0dyPAzu3CE3+STqXXg/MG8
+         akx9PJ1b1wCIAMvkV5EyinOHWuqsc3EEkybMI/MJBgcblEigzvimm2LQO/WwFiKnZ75c
+         N8Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition;
-        bh=0zAnyni5Vrc+oHO28/Vl9glMrviD0r1aRl+f2W+XCP0=;
-        b=6XhOZ7wvv0TfqW3QHh8lB9BWA9Czi2IZz01b/eeHDPkd+Ss+a+ipDvDJcnv4pSLIO3
-         AbKOW7atB7ooS3YRHtzvRtVFmn/rHYTMz+Ln8VIxcZXhf5pahSiM8AgeeSBytH4y8FiZ
-         iSydFOoqs+OmQEZDGONF084D0ZVGns0bnFnHUGhuzB/Udx2EZY3+ddst7lHMsZugDXRe
-         hFhvrB401dMZQU+MUbaMWZ5OWeGJjVUSIiSyW5v81h0bxMTKB+OJ1VnVkffmCcX6H7hM
-         CV7s2znXWpGJJuRNqlr3vqyM98r3sbIKx7IGdqp7MJ2aaCJ5ez2meJeZ4CHzXL+4NV8y
-         FLBA==
-X-Gm-Message-State: AJIora+Lx6SpJCwwJiMxZ09jESn89yV+sk4BqMiSLArDfbtIb/gk3Byw
-        u9BDaMIBh/ZOG6u0x6VbLEcdcI9Fllg=
-X-Google-Smtp-Source: AGRyM1v2vDCwQzbnh3bk0IN/7gz3BMZq4vYYyTtn9D5CMJvZ1xigEu4PeSPNcuQDRwj6Ud9qBgzB4A==
-X-Received: by 2002:a05:6a00:cd1:b0:525:4c0e:d0a3 with SMTP id b17-20020a056a000cd100b005254c0ed0a3mr28282467pfv.67.1656824245238;
-        Sat, 02 Jul 2022 21:57:25 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=hlVxCaScnZLJkKKNNp3S86nS11JatpDEtOn+lvMWbBw=;
+        b=wP4CIhjZFF/VJdlkPkUONPJ6H4wh7AZmxaXs0EpT6ZEDhb99C6JJv1Rv8DGUZZCWVV
+         Fcey42Mul4O/qS7M8XJMdvUr4rHm8jNuWNLVxybYcJI3lco1Ej6ULKo/jTMyR0Rs56P+
+         Z4oljXTP4OVTV0lW/rW4EmHX+n+mbdPsmQv633UGutrJ93Rzxy/gAagDvU1gv/xoaZQr
+         721Kf3pkVNbfTS46ukM4M//03GryjE80oz5qHQAdA6cU5kwAZS/eJmhrMToC2KRAMBRB
+         JC9W8ObfKa+ylKOi9Q0gLx8qu5b3elwVaRUb3q7zkzn2hmNteEg+1QRj/W39S+s68msK
+         iVMQ==
+X-Gm-Message-State: AJIora/S5qwDYlCBnq53d4TV/B/XsudVWUE58MJr+LK4oi9hSmwJI9Vp
+        4oF/7MXSslqsdjIHITUMFRc=
+X-Google-Smtp-Source: AGRyM1ud0dcsh6HFmY/eo2bh2uzjOLXh1eEPG/4zwN4UO1kmSLaMaLACEuO531Hm+OGZRSuQiUV/1A==
+X-Received: by 2002:a05:6a00:1353:b0:525:9f57:1a28 with SMTP id k19-20020a056a00135300b005259f571a28mr27792088pfu.69.1656824726141;
+        Sat, 02 Jul 2022 22:05:26 -0700 (PDT)
 Received: from archdragon (dragonet.kaist.ac.kr. [143.248.133.220])
-        by smtp.gmail.com with ESMTPSA id u10-20020a170903124a00b0016a01637620sm1311707plh.76.2022.07.02.21.57.23
+        by smtp.gmail.com with ESMTPSA id bj28-20020a056a00319c00b0051bc36b7995sm18174355pfb.62.2022.07.02.22.05.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Jul 2022 21:57:24 -0700 (PDT)
-Date:   Sun, 3 Jul 2022 13:57:20 +0900
+        Sat, 02 Jul 2022 22:05:25 -0700 (PDT)
+Date:   Sun, 3 Jul 2022 14:05:21 +0900
 From:   "Dae R. Jeong" <threeearcat@gmail.com>
 To:     axboe@kernel.dk, rostedt@goodmis.org, mingo@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: INFO: task hung in blk_trace_remove
-Message-ID: <YsEhsEvhZyoJFtSO@archdragon>
+Subject: Re: INFO: task hung in blk_trace_remove
+Message-ID: <YsEjkdFvaLkxFo/I@archdragon>
+References: <YsEhsEvhZyoJFtSO@archdragon>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <YsEhsEvhZyoJFtSO@archdragon>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Sun, Jul 03, 2022 at 01:57:25PM +0900, Dae R. Jeong wrote:
+> Hello,
+> 
+> We observed an issue "INFO: task hung in blk_trace_remove" during
+> fuzzing.
 
-We observed an issue "INFO: task hung in blk_trace_remove" during
-fuzzing.
+We also observed a similar issue "INFO: task hung in
+blk_trace_setup". At this point, we don't know whether these two
+issues are caused by the same reason.
 
-Unfortunately, we have not found a reproducer for the crash yet. We
-will inform you if we have any update on this crash.
+Unfortunately, we have not found a reproducer for this crash. We will
+inform you if we have any update.
 
 The crash information is attached at the end of this email.
 
@@ -78,11 +86,12 @@ Dae R. Jeong
 - Kernel commit:
 92f20ff72066d
 
-- Crash report: 
-INFO: task syz-executor.0:13658 blocked for more than 143 seconds.
-      Not tainted 5.19.0-rc3-32288-g0f3b08299494 #3
+- Crash report:
+
+INFO: task syz-executor.0:13708 blocked for more than 143 seconds.
+      Not tainted 5.19.0-rc3-32288-g0f3b08299494 #15
 "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:27824 pid:13658 ppid:  6759 flags:0x00004004
+task:syz-executor.0  state:D stack:26560 pid:13708 ppid:  6772 flags:0x00004004
 Call Trace:
  <TASK>
  context_switch kernel/sched/core.c:5146 [inline]
@@ -92,30 +101,63 @@ Call Trace:
  __mutex_lock_common+0xe0f/0x25e0 kernel/locking/mutex.c:679
  __mutex_lock kernel/locking/mutex.c:747 [inline]
  mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
- blk_trace_remove+0x1c/0x40 kernel/trace/blktrace.c:374
- sg_ioctl_common drivers/scsi/sg.c:1130 [inline]
- sg_ioctl+0x712/0x4be0 drivers/scsi/sg.c:1164
+ blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
+ sg_ioctl_common drivers/scsi/sg.c:1122 [inline]
+ sg_ioctl+0x1b61/0x4000 drivers/scsi/sg.c:1164
  vfs_ioctl fs/ioctl.c:51 [inline]
  __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl+0x152/0x1f0 fs/ioctl.c:856
+ __se_sys_ioctl+0x129/0x1c0 fs/ioctl.c:856
  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
  do_syscall_64+0x4e/0xa0 arch/x86/entry/common.c:82
  entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x47268d
-RSP: 002b:00007fab57574be8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000057d4a0 RCX: 000000000047268d
-RDX: 0000000000000000 RSI: 0000000000001276 RDI: 0000000000000003
+RIP: 0033:0x478dc9
+RSP: 002b:00007f5dde784be8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000077d4a0 RCX: 0000000000478dc9
+RDX: 0000000020000340 RSI: 00000000c0481273 RDI: 0000000000000003
 RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000057d4a8
-R13: 000000000057d4ac R14: 00007ffe9afe72f0 R15: 00007fab57574d80
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000077d4a8
+R13: 000000000077d4ac R14: 000000000077d4a0 R15: 00007ffdfb78c900
+ </TASK>
+INFO: task syz-executor.0:13709 blocked for more than 143 seconds.
+      Not tainted 5.19.0-rc3-32288-g0f3b08299494 #15
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.0  state:D stack:26608 pid:13709 ppid:  6772 flags:0x00004004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5146 [inline]
+ __schedule+0x96c/0x10f0 kernel/sched/core.c:6458
+ schedule+0xea/0x1b0 kernel/sched/core.c:6530
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6589
+ __mutex_lock_common+0xe0f/0x25e0 kernel/locking/mutex.c:679
+ __mutex_lock kernel/locking/mutex.c:747 [inline]
+ mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
+ blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
+ sg_ioctl_common drivers/scsi/sg.c:1122 [inline]
+ sg_ioctl+0x1b61/0x4000 drivers/scsi/sg.c:1164
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl+0x129/0x1c0 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x4e/0xa0 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x478dc9
+RSP: 002b:00007f5dde763be8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000077e9c0 RCX: 0000000000478dc9
+RDX: 00000000200003c0 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000077e9c8
+R13: 000000000077e9cc R14: 000000000077e9c0 R15: 00007ffdfb78c900
  </TASK>
 
 Showing all locks held in the system:
 1 lock held by khungtaskd/40:
- #0: ffffffff92f1a3e0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
-1 lock held by in:imklog/6420:
- #0: ffff88807d844368 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x3bf/0x530 fs/file.c:1036
-4 locks held by syz-executor.0/13657:
-1 lock held by syz-executor.0/13658:
- #0: ffff888022c78378 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_remove+0x1c/0x40 kernel/trace/blktrace.c:374
-
+ #0: ffffffff9071a3e0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
+1 lock held by systemd-journal/3025:
+ #0: ffff8880b933bb58 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x25/0x110 kernel/sched/core.c:544
+1 lock held by in:imklog/6630:
+ #0: ffff88801c6e40e8 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x2f3/0x430 fs/file.c:1036
+2 locks held by syz-executor.0/13707:
+1 lock held by syz-executor.0/13708:
+ #0: ffff88814c195ff8 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
+1 lock held by syz-executor.0/13709:
+ #0: ffff88814c195ff8 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
