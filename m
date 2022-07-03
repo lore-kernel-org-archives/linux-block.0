@@ -2,147 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC9ACCA473
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 14:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6283C433EF
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 14:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232760AbiGCOWh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 10:22:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37518 "EHLO
+        id S231739AbiGCOyQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 10:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233020AbiGCOWa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 10:22:30 -0400
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CFD12DF0;
-        Sun,  3 Jul 2022 07:22:29 -0700 (PDT)
-Received: by mail-vs1-xe31.google.com with SMTP id 189so6766673vsh.2;
-        Sun, 03 Jul 2022 07:22:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/pAsz4QfzaFjXy7Vy118iqtoQ+29CHgJNrEY4mVAeMs=;
-        b=Nh4ZuoP7+jlqimG7xuP9QDOT3P+pZ0AORLfMyRP9QfxV6uUBEi2Wyb+upqAIoGcQ2b
-         Ju27gFx9zznRQiOZ5L0lB+0Ip2xVBSblWDcMDfUR4UN4NKrHMj69V+djgYE89quYkRXu
-         6N58/qUZSHzYMIxFPr666VfANsDzWg/wSVj2i1mAdiNyfPFAdkZpyX6eCIU9tSMsabKc
-         euSH9b0kE0pHZ1UjpTFqQQxMZAdQzARSmkFZvkLUEZQ3aAphHX/RHjnjk5beRoqNj+Nq
-         6LFfCkOz9/nZqaeaWCjvq4ycUK2tRihXYDVzyTLoqq33A1F+S6t0xgtT1CXoieEzIsph
-         5I2w==
+        with ESMTP id S229739AbiGCOyP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 10:54:15 -0400
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194ED2DC4;
+        Sun,  3 Jul 2022 07:54:15 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id t21so6837960pfq.1;
+        Sun, 03 Jul 2022 07:54:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/pAsz4QfzaFjXy7Vy118iqtoQ+29CHgJNrEY4mVAeMs=;
-        b=7pWK65UQVoYKk6X87jfsR+y1DlbRe8x7tVDcIsmywfJIm4kSkN2+nVLmYE6fKNeUbI
-         2o/AXRjlFcNbeDlSWVyGAjzkdFJW5pFrHzlHazB/xptwQzb9b8dAGtUtQbLwvWhvR1Tx
-         xoI4c/OWKuAlo/ebOC37dYlx+Lt90k/qNBI1RnIEnjOv4gffUrofpMFC1RI7IlHCapm8
-         /cD8SFXQ4A0dR1oU7sDQWzqnZbxHg0xo1b9DLVMOtvyzHx4OuzCwM4KapIEJq3ctRH6j
-         AgKMxPnhesvCEmrW3LcRAuQUick4So6qyBalGAXfNnJ3OX8pJyMO/Ntz30pjiTB7pNL/
-         a/gg==
-X-Gm-Message-State: AJIora9fUDd6LEebbZUOcyVAsT1tsoDHPFi34wTaaSAD2oLbRZLjHkoc
-        zF9KHb/QJgiWByP72OMmdbB6A1RLN36/pj+vF9MnYmm9+fOmDw==
-X-Google-Smtp-Source: AGRyM1uEQOOUY3fdKlv0RswYlo+lPv9RHJzpSQ7EWV/O9/ofrLJhjT1A2qw5B08eafr6LkY6PkX1GBSymq/wC6C7vQQ=
-X-Received: by 2002:a05:6102:5dc:b0:354:63f1:df8d with SMTP id
- v28-20020a05610205dc00b0035463f1df8dmr14550839vsf.72.1656858148774; Sun, 03
- Jul 2022 07:22:28 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=N/5JSOMEADoapmIXoVRcPDoVueHzRiWPhNBdsUZ1uek=;
+        b=vrVUo2KTpKNzb5cG4zxaRTPges13A+3TxcVWKad7B5j6k3xGAGGgZn36G/cQcYT4/X
+         4sejEmA3+fG2a/zQbYfkPGWe2ZwyeH2hx/0zcYGaHXd57P+btpsXHUUpjX1Vl5mijzED
+         kgkeeE+s8bxiV3e3rr+yQ9cplTBg4nAewBGq85+LgVws9m/cj3fOor4YFckD9PiZg7Ic
+         YGq0JmPLJnnQpN7YBFLjPk92iFgj3JfNl3S8InU7O3xvq8fN5gMKJr3KY31fYYB0L6wy
+         6lOo4D5j+pis68XNptYEh8EgaMz1GQPWORwamnpg91zAwZxLzZru4NegfifVfoFF+kJG
+         TLRg==
+X-Gm-Message-State: AJIora8yxtyPbre1x6pzQ9bxCIfEkEL75Bh457x0RVBv4jd9upr0k0zM
+        fCbAQKMEKrKVetZzdpVZYgg=
+X-Google-Smtp-Source: AGRyM1v3iRbadRBADbEjJfZBpuos8qHnw0o4bD0D51mMNQMz8DhRKlPNNZqEkr5eG8gAifIg5nx96Q==
+X-Received: by 2002:a63:7741:0:b0:40c:c3cb:d9bd with SMTP id s62-20020a637741000000b0040cc3cbd9bdmr20458523pgc.581.1656860054340;
+        Sun, 03 Jul 2022 07:54:14 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id g24-20020a170902d5d800b00168c4c3ed94sm18981428plh.309.2022.07.03.07.54.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 03 Jul 2022 07:54:13 -0700 (PDT)
+Message-ID: <1abb9307-509d-e2dc-5756-ebc297a62538@acm.org>
+Date:   Sun, 3 Jul 2022 07:54:11 -0700
 MIME-Version: 1.0
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org> <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
- <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com> <YsGWb8nPUySuhos/@mit.edu>
-In-Reply-To: <YsGWb8nPUySuhos/@mit.edu>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Sun, 3 Jul 2022 17:22:17 +0300
-Message-ID: <CAOQ4uxhEaVjk6rEnsnjWOKs+dygioXk-9h-WJjBzkJfe8U9eMQ@mail.gmail.com>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for expunges
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Content-Language: en-US
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        amir73il@gmail.com, pankydev8@gmail.com, josef@toxicpanda.com,
+        jmeneghi@redhat.com, Jan Kara <jack@suse.cz>,
+        Davidlohr Bueso <dave@stgolabs.net>,
         Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Dave Chinner <david@fromorbit.com>
-Content-Type: text/plain; charset="UTF-8"
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org> <YsGaU4lFjR5Gh29h@mit.edu>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <YsGaU4lFjR5Gh29h@mit.edu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 3, 2022 at 4:15 PM Theodore Ts'o <tytso@mit.edu> wrote:
->
-> On Sun, Jul 03, 2022 at 08:56:54AM +0300, Amir Goldstein wrote:
-> >
-> > That is true for some use cases, but unfortunately, the flaky
-> > fstests are way too valuable and too hard to replace or improve,
-> > so practically, fs developers have to run them, but not everyone does.
-> >
-> > Zorro has already proposed to properly tag the non deterministic tests
-> > with a specific group and I think there is really no other solution.
->
-> The non-deterministic tests are not the sole, or even the most likely
-> cause of flaky tests.  Or put another way, even if we used a
-> deterministic pseudo-random numberator seed for some of the curently
-> "non-determinstic tests" (and I believe we are for many of them
-> already anyway), it's not going to be make the flaky tests go away.
->
-> That's because with many of these tests, we are running multiple
-> threads either in the fstress or fsx, or in the antogonist workload
-> that is say, running the space utilization to full to generate ENOSPC
-> errors, and then deleting a bunch of files to trigger as many ENOSPC
-> hitter events as possible.
->
-> > The only question is whether we remove them from the 'auto' group
-> > (I think we should).
->
-> I wouldn't; if someone wants to exclude the non-determistic tests,
-> once they are tagged as belonging to a group, they can just exclude
-> that group.  So there's no point removing them from the auto group
-> IMHO.
+On 7/3/22 06:32, Theodore Ts'o wrote:
+> On Sat, Jul 02, 2022 at 02:48:12PM -0700, Bart Van Assche wrote:
+>>
+>> I strongly disagree with annotating tests with failure rates. My opinion is
+>> that on a given test setup a test either should pass 100% of the time or
+>> fail 100% of the time.
+> 
+> My opinion is also that no child should ever go to bed hungry, and we
+> should end world hunger.
 
-The reason I suggested that *we* change our habits is because
-we want to give passing-by fs testers an easier experience.
+In my view the above comment is unfair. The first year after I wrote the
+SRP tests in blktests I submitted multiple fixes for kernel bugs 
+encountered by running these tests. Although it took a significant 
+effort, after about one year the test itself and the kernel code it 
+triggered finally resulted in reliable operation of the test. After that 
+initial stabilization period these tests uncovered regressions in many 
+kernel development cycles, even in the v5.19-rc cycle.
 
-Another argument in favor of splitting out -g soak from -g auto -
-You only need to run -g soak in a loop for as long as you like to be
-confident about the results.
-You need to run -g auto only once per definition -
-If a test ends up failing the Nth time you run -g auto then it belongs
-in -g soak and not in -g auto.
-
->
-> > filesystem developers that will run ./check -g auto -g soak
-> > will get the exact same test coverage as today's -g auto
-> > and the "commoners" that run ./check -g auto will enjoy blissful
-> > determitic test results, at least for the default config of regularly
-> > tested filesystems (a.k.a, the ones tested by kernet test bot).?
->
-> First of all, there are a number of tests today which are in soak or
-> long_rw which are not in auto, so "-g auto -g soak" will *not* result
-> in the "exact same test coverage".
-
-I addressed this in my proposal.
-I proposed to remove these two tests out of soak and asked for
-Darrick's opinion.
-Who is using -g soak anyway?
-
->
-> Secondly, as I've tested above, deterministic tests does not
-> necessasrily mean determinsitic test results --- unless by
-> "determinsitic tests" you mean "completely single-threaded tests",
-> which would eliminate a large amount of useful test coverage.
->
-
-To be clear, when I wrote deterministic, what I meant was deterministic
-results empirically, in the same sense that Bart meant - a test should
-always pass.
-
-Because Luis was using the expunge lists to blacklist any test failure,
-no matter the failure rate, the kdevops expunge lists could be used as
-a first draft for -g soak group, at least for tests that are blocklisted by
-kdevops for all of ext4,xfs and btrfs default configs on the upstream kernel.
+Since I'm not very familiar with xfstests I do not know what makes the 
+stress tests in this test suite fail. Would it be useful to modify the 
+code that decides the test outcome to remove the flakiness, e.g. by only 
+checking that the stress tests do not trigger any unwanted behavior, 
+e.g. kernel warnings or filesystem inconsistencies?
 
 Thanks,
-Amir.
+
+Bart.
