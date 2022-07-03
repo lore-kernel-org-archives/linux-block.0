@@ -2,79 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFECC43334
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 16:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80267CCA47F
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 16:30:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232746AbiGCQFv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 12:05:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53042 "EHLO
+        id S231989AbiGCQay (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 12:30:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbiGCQFu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 12:05:50 -0400
-Received: from smtp.smtpout.orange.fr (smtp06.smtpout.orange.fr [80.12.242.128])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 786F05588
-        for <linux-block@vger.kernel.org>; Sun,  3 Jul 2022 09:05:47 -0700 (PDT)
-Received: from pop-os.home ([90.11.190.129])
-        by smtp.orange.fr with ESMTPA
-        id 826ToL9zNWo1m826TovmZ7; Sun, 03 Jul 2022 18:05:46 +0200
-X-ME-Helo: pop-os.home
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Sun, 03 Jul 2022 18:05:46 +0200
-X-ME-IP: 90.11.190.129
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] block: null_blk: Use the bitmap API to allocate bitmaps
-Date:   Sun,  3 Jul 2022 18:05:43 +0200
-Message-Id: <7c4d3116ba843fc4a8ae557dd6176352a6cd0985.1656864320.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229574AbiGCQax (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 12:30:53 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13DC35FB1;
+        Sun,  3 Jul 2022 09:30:51 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 263GUG1U006323
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 3 Jul 2022 12:30:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1656865823; bh=uKC0mfydFMX4nUGBHuT9jkHWP7ClJOQjzQ31vgmMI5E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=ovcz2irxhBKksjbFBj4coBed2FkyJqDL5tkts1iix6B+4/yL/g8C9U5LwjN631HSa
+         aMA2tibyXYr5MEVfNxBWpEPRH9wW7Xi0Ae4JasXNq3OhGwzBJv0JkgN/9tQ4Js0fvn
+         zrWezqpIT0c9tr5wEO6XeolPAYbo0ybOMplXHi/VZX9vbTJyhLGy6X8Tf1nyJvgXSY
+         InsEIKp9piRbk8bkV+fXdSDsj6GpzSPfscaaGBK+R8XmLroIzmtYcshgXZ+svbfnTq
+         pzrRuAzvSmJCrzmz/iVNJydcJhkv8BxhyytpZxmz9Jb0YZ3vuezcLpdzaG4EeLsXOr
+         rbmJVJnL0K74A==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 62C5215C3E94; Sun,  3 Jul 2022 12:30:16 -0400 (EDT)
+Date:   Sun, 3 Jul 2022 12:30:16 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Chinner <david@fromorbit.com>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <YsHEGElna2Ae2V83@mit.edu>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+ <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
+ <YsGWb8nPUySuhos/@mit.edu>
+ <CAOQ4uxhEaVjk6rEnsnjWOKs+dygioXk-9h-WJjBzkJfe8U9eMQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOQ4uxhEaVjk6rEnsnjWOKs+dygioXk-9h-WJjBzkJfe8U9eMQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use bitmap_zalloc()/bitmap_free() instead of hand-writing them.
+On Sun, Jul 03, 2022 at 05:22:17PM +0300, Amir Goldstein wrote:
+> 
+> To be clear, when I wrote deterministic, what I meant was deterministic
+> results empirically, in the same sense that Bart meant - a test should
+> always pass.
 
-It is less verbose and it improves the semantic.
+Well all of the tests in the auto group pass at 100% of the time for
+the ext4/4k and xfs/4k groups.  (Well, at least if use the HDD and SSD
+as the storage device.  If you are using eMMC flash, or Luis's loop
+device config, there would be more failures.)
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/block/null_blk/main.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+But if we're talking about btrfs/4k, f2fs/4k, xfs/realtime,
+xfs/realtime_28k/logdev, ext4/bigalloc, etc. there would be a *lot* of
+tests that would need to be removed from the auto group.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index d695ea29efa6..f76fedf64449 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1656,7 +1656,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- static void cleanup_queue(struct nullb_queue *nq)
- {
--	kfree(nq->tag_map);
-+	bitmap_free(nq->tag_map);
- 	kfree(nq->cmds);
- }
- 
-@@ -1783,14 +1783,13 @@ static const struct block_device_operations null_rq_ops = {
- static int setup_commands(struct nullb_queue *nq)
- {
- 	struct nullb_cmd *cmd;
--	int i, tag_size;
-+	int i;
- 
- 	nq->cmds = kcalloc(nq->queue_depth, sizeof(*cmd), GFP_KERNEL);
- 	if (!nq->cmds)
- 		return -ENOMEM;
- 
--	tag_size = ALIGN(nq->queue_depth, BITS_PER_LONG) / BITS_PER_LONG;
--	nq->tag_map = kcalloc(tag_size, sizeof(unsigned long), GFP_KERNEL);
-+	nq->tag_map = bitmap_zalloc(nq->queue_depth, GFP_KERNEL);
- 	if (!nq->tag_map) {
- 		kfree(nq->cmds);
- 		return -ENOMEM;
--- 
-2.34.1
+So what "non-determinsitic tests" should we remove from the auto
+group?  For what file systems, file system configs, and storage
+devices?  What would you propose?
 
+Remember, Matthew wants something that he can use to test "dozens" of
+file systems that he's touching for the folio patches.  If we have to
+remove all of the tests that fail if you are using nfs, vfat, hfs,
+msdos, etc., then the auto group would be pretty anemic.  Let's not do
+that.
+
+If you want a "always pass" group, we could do that, but let's not
+call that the "auto" group, please.
+
+						- Ted
