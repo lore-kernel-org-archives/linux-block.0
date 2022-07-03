@@ -2,162 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6615C43334
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 05:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C48BCCA480
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jul 2022 05:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231134AbiGCFF2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jul 2022 01:05:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42844 "EHLO
+        id S229911AbiGCF5J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jul 2022 01:57:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230517AbiGCFF1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 01:05:27 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3C6AE61;
-        Sat,  2 Jul 2022 22:05:26 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id t21so6144331pfq.1;
-        Sat, 02 Jul 2022 22:05:26 -0700 (PDT)
+        with ESMTP id S229562AbiGCF5I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jul 2022 01:57:08 -0400
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D2B635C;
+        Sat,  2 Jul 2022 22:57:07 -0700 (PDT)
+Received: by mail-vs1-xe2b.google.com with SMTP id w187so6134945vsb.1;
+        Sat, 02 Jul 2022 22:57:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hlVxCaScnZLJkKKNNp3S86nS11JatpDEtOn+lvMWbBw=;
-        b=b1K+Vbf9Z3OZrQQKZW2Vb2/OZjY9VuA/NPhh7anAKwPa63+Yj12pekJJ6qN0qIMltn
-         jz+5RrQ0+PH7Pn2CyNMdDtzpknkpUyQqcozS5rmuy1gD6ST/y1VfCwzcZPo9vT722gk8
-         A5upVcUWjyiC/+TNgx/2apef8J91TdI0nuWWd7FDjGcWEw0ScmV0w1PDNVqpfoDbxrFz
-         IAwEBrHDfEkf+C0qkA4/BKJOj08wRZyuZxd/b2BsObhR8V0dyPAzu3CE3+STqXXg/MG8
-         akx9PJ1b1wCIAMvkV5EyinOHWuqsc3EEkybMI/MJBgcblEigzvimm2LQO/WwFiKnZ75c
-         N8Bg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=S09EmHyul/XlTGMMFg0S5sr547tyBYiGoQ4G8XzTNcI=;
+        b=ddINMmdAPrBQ66IZHifncJZbP+UcQiW7L/OYWGGvmDNZH4IEFt4XTLbAkliUAs5/N+
+         0YvwesqIn0cN9U8oaOX7J29t7/go35LyZWnbCmMVtReMixfQPcPDcXW4GQCmPs25xWeN
+         MOl5i+h83ZjwLVYoJ6e9gi1aTl+hw1ufA+PFGAsDXkrTHt9tYT/ZSW3jhNvrGNt10rZm
+         cRn8L1Dt6+Qp+Hlusfu/UbYY0/avVy0DkJEkbO+LAuiDijNAlvczNO67x8JYDvWJ0UUN
+         ZE77P4pJUVJBgs/8AagbpVojikLyV4lInQQikeOhpFs4GyH/gB6lFwgIAtb4rcDtddZR
+         nx7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hlVxCaScnZLJkKKNNp3S86nS11JatpDEtOn+lvMWbBw=;
-        b=wP4CIhjZFF/VJdlkPkUONPJ6H4wh7AZmxaXs0EpT6ZEDhb99C6JJv1Rv8DGUZZCWVV
-         Fcey42Mul4O/qS7M8XJMdvUr4rHm8jNuWNLVxybYcJI3lco1Ej6ULKo/jTMyR0Rs56P+
-         Z4oljXTP4OVTV0lW/rW4EmHX+n+mbdPsmQv633UGutrJ93Rzxy/gAagDvU1gv/xoaZQr
-         721Kf3pkVNbfTS46ukM4M//03GryjE80oz5qHQAdA6cU5kwAZS/eJmhrMToC2KRAMBRB
-         JC9W8ObfKa+ylKOi9Q0gLx8qu5b3elwVaRUb3q7zkzn2hmNteEg+1QRj/W39S+s68msK
-         iVMQ==
-X-Gm-Message-State: AJIora/S5qwDYlCBnq53d4TV/B/XsudVWUE58MJr+LK4oi9hSmwJI9Vp
-        4oF/7MXSslqsdjIHITUMFRc=
-X-Google-Smtp-Source: AGRyM1ud0dcsh6HFmY/eo2bh2uzjOLXh1eEPG/4zwN4UO1kmSLaMaLACEuO531Hm+OGZRSuQiUV/1A==
-X-Received: by 2002:a05:6a00:1353:b0:525:9f57:1a28 with SMTP id k19-20020a056a00135300b005259f571a28mr27792088pfu.69.1656824726141;
-        Sat, 02 Jul 2022 22:05:26 -0700 (PDT)
-Received: from archdragon (dragonet.kaist.ac.kr. [143.248.133.220])
-        by smtp.gmail.com with ESMTPSA id bj28-20020a056a00319c00b0051bc36b7995sm18174355pfb.62.2022.07.02.22.05.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Jul 2022 22:05:25 -0700 (PDT)
-Date:   Sun, 3 Jul 2022 14:05:21 +0900
-From:   "Dae R. Jeong" <threeearcat@gmail.com>
-To:     axboe@kernel.dk, rostedt@goodmis.org, mingo@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: INFO: task hung in blk_trace_remove
-Message-ID: <YsEjkdFvaLkxFo/I@archdragon>
-References: <YsEhsEvhZyoJFtSO@archdragon>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=S09EmHyul/XlTGMMFg0S5sr547tyBYiGoQ4G8XzTNcI=;
+        b=Q3jYSUkTeVdGwK5BJ+V1i0qU/vm0pOHw79HvJQ95Xly4L9Av52gT0TkyE/wg81/iSh
+         tKMGGyWPBCmmWqB3KBHBp8Kqxf68QLmZ2KgIfpnTKdSh3EZOn6CMP6dO6Garh+jS4Ttr
+         w6nUZyvT96xHEYSgkQJm9KSSyNRg3V69II0d51pmuJjkUHR+tFy/7YtuYV3f/maWC8f2
+         mIGbZPzlgbrK0ANMObaEYcSSExj9x9MmX1qNswYIaMU/8HD46NYtsDwNfKrM/SR6AIz/
+         HpAJ5FHXik+NjFXsVme5C1tdlqmlw5ZJuSIgRWsq4HjfIMzmN8N8OEFdHylEfPT2epul
+         N/IQ==
+X-Gm-Message-State: AJIora8cLuIS0cGAUOMjezHHzv17sPErGBdDxcQ/emP4JIPBhSFVX5/i
+        9uz1cPSeE6m1NQhUGqLgBY1uPd5v2M3eBS9jdWk=
+X-Google-Smtp-Source: AGRyM1tn8NLjJQpQ8hpfGDpoOVBmFOazVY52hM8TqvGWp/ZGkht9NeNFbBfVPOD7UgaiXvL6gEGW/PI/Raf5gZDorqk=
+X-Received: by 2002:a05:6102:38c7:b0:356:4e2f:ae5b with SMTP id
+ k7-20020a05610238c700b003564e2fae5bmr14281202vst.71.1656827826320; Sat, 02
+ Jul 2022 22:57:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YsEhsEvhZyoJFtSO@archdragon>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org> <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+In-Reply-To: <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Sun, 3 Jul 2022 08:56:54 +0300
+Message-ID: <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for expunges
+To:     Bart Van Assche <bvanassche@acm.org>,
+        "Darrick J. Wong" <djwong@kernel.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Theodore Tso <tytso@mit.edu>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Dave Chinner <david@fromorbit.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 03, 2022 at 01:57:25PM +0900, Dae R. Jeong wrote:
-> Hello,
-> 
-> We observed an issue "INFO: task hung in blk_trace_remove" during
-> fuzzing.
+On Sun, Jul 3, 2022 at 12:48 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 5/18/22 20:07, Luis Chamberlain wrote:
+> > I've been promoting the idea that running fstests once is nice,
+> > but things get interesting if you try to run fstests multiple
+> > times until a failure is found. It turns out at least kdevops has
+> > found tests which fail with a failure rate of typically 1/2 to
+> > 1/30 average failure rate. That is 1/2 means a failure can happen
+> > 50% of the time, whereas 1/30 means it takes 30 runs to find the
+> > failure.
+> >
+> > I have tried my best to annotate failure rates when I know what
+> > they might be on the test expunge list, as an example:
+> >
+> > workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
+> >
+> > The term "failure rate 1/15" is 16 characters long, so I'd like
+> > to propose to standardize a way to represent this. How about
+> >
+> > generic/530 # F:1/15
+> >
+> > Then we could extend the definition. F being current estimate, and this
+> > can be just how long it took to find the first failure. A more valuable
+> > figure would be failure rate avarage, so running the test multiple
+> > times, say 10, to see what the failure rate is and then averaging the
+> > failure out. So this could be a more accurate representation. For this
+> > how about:
+> >
+> > generic/530 # FA:1/15
+> >
+> > This would mean on average there failure rate has been found to be about
+> > 1/15, and this was determined based on 10 runs.
+> >
+> > We should also go extend check for fstests/blktests to run a test
+> > until a failure is found and report back the number of successes.
+> >
+> > Thoughts?
+> >
+> > Note: yes failure rates lower than 1/100 do exist but they are rare
+> > creatures. I love them though as my experience shows so far that they
+> > uncover hidden bones in the closet, and they they make take months and
+> > a lot of eyeballs to resolve.
+>
+> I strongly disagree with annotating tests with failure rates. My opinion
+> is that on a given test setup a test either should pass 100% of the time
+> or fail 100% of the time. If a test passes in one run and fails in
+> another run that either indicates a bug in the test or a bug in the
+> software that is being tested. Examples of behaviors that can cause
+> tests to behave unpredictably are use-after-free bugs and race
+> conditions. How likely it is to trigger such behavior depends on a
+> number of factors. This could even depend on external factors like which
+> network packets are received from other systems. I do not expect that
+> flaky tests have an exact failure rate. Hence my opinion that flaky
+> tests are not useful and also that it is not useful to annotate flaky
+> tests with a failure rate. If a test is flaky I think that the root
+> cause of the flakiness must be determined and fixed.
+>
 
-We also observed a similar issue "INFO: task hung in
-blk_trace_setup". At this point, we don't know whether these two
-issues are caused by the same reason.
+That is true for some use cases, but unfortunately, the flaky
+fstests are way too valuable and too hard to replace or improve,
+so practically, fs developers have to run them, but not everyone does.
 
-Unfortunately, we have not found a reproducer for this crash. We will
-inform you if we have any update.
+Zorro has already proposed to properly tag the non deterministic tests
+with a specific group and I think there is really no other solution.
 
-The crash information is attached at the end of this email.
+The only question is whether we remove them from the 'auto' group
+(I think we should).
 
+There is probably a large overlap already between the 'stress' 'soak' and
+'fuzzers' test groups and the non-deterministic tests.
+Moreover, if the test is not a stress/fuzzer test and it is not deterministic
+then the test is likely buggy.
 
-Best regards,
-Dae R. Jeong
+There is only one 'stress' test not in 'auto' group (generic/019), only two
+'soak' tests not in the 'auto' group (generic/52{1,2}).
+There are only three tests in 'soak' group and they are also exactly
+the same three tests in the 'long_rw' group.
 
-------
+So instead of thinking up a new 'flaky' 'random' 'stochastic' name
+we may just repurpose the 'soak' group for this matter and start
+moving known flaky tests from 'auto' to 'soak'.
 
-- Kernel commit:
-92f20ff72066d
+generic/52{1,2} can be removed from 'soak' group and remain
+in 'long_rw' group, unless filesystem developers would like to
+add those to the stochastic test run.
 
-- Crash report:
+filesystem developers that will run ./check -g auto -g soak
+will get the exact same test coverage as today's -g auto
+and the "commoners" that run ./check -g auto will enjoy blissful
+determitic test results, at least for the default config of regularly
+tested filesystems (a.k.a, the ones tested by kernet test bot).?
 
-INFO: task syz-executor.0:13708 blocked for more than 143 seconds.
-      Not tainted 5.19.0-rc3-32288-g0f3b08299494 #15
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:26560 pid:13708 ppid:  6772 flags:0x00004004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5146 [inline]
- __schedule+0x96c/0x10f0 kernel/sched/core.c:6458
- schedule+0xea/0x1b0 kernel/sched/core.c:6530
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6589
- __mutex_lock_common+0xe0f/0x25e0 kernel/locking/mutex.c:679
- __mutex_lock kernel/locking/mutex.c:747 [inline]
- mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
- blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
- sg_ioctl_common drivers/scsi/sg.c:1122 [inline]
- sg_ioctl+0x1b61/0x4000 drivers/scsi/sg.c:1164
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl+0x129/0x1c0 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x4e/0xa0 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x478dc9
-RSP: 002b:00007f5dde784be8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000077d4a0 RCX: 0000000000478dc9
-RDX: 0000000020000340 RSI: 00000000c0481273 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000077d4a8
-R13: 000000000077d4ac R14: 000000000077d4a0 R15: 00007ffdfb78c900
- </TASK>
-INFO: task syz-executor.0:13709 blocked for more than 143 seconds.
-      Not tainted 5.19.0-rc3-32288-g0f3b08299494 #15
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:26608 pid:13709 ppid:  6772 flags:0x00004004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5146 [inline]
- __schedule+0x96c/0x10f0 kernel/sched/core.c:6458
- schedule+0xea/0x1b0 kernel/sched/core.c:6530
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6589
- __mutex_lock_common+0xe0f/0x25e0 kernel/locking/mutex.c:679
- __mutex_lock kernel/locking/mutex.c:747 [inline]
- mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:799
- blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
- sg_ioctl_common drivers/scsi/sg.c:1122 [inline]
- sg_ioctl+0x1b61/0x4000 drivers/scsi/sg.c:1164
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl+0x129/0x1c0 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x4e/0xa0 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x478dc9
-RSP: 002b:00007f5dde763be8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 000000000077e9c0 RCX: 0000000000478dc9
-RDX: 00000000200003c0 RSI: 00000000c0481273 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 000000000077e9c8
-R13: 000000000077e9cc R14: 000000000077e9c0 R15: 00007ffdfb78c900
- </TASK>
+Darrick,
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/40:
- #0: ffffffff9071a3e0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
-1 lock held by systemd-journal/3025:
- #0: ffff8880b933bb58 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x25/0x110 kernel/sched/core.c:544
-1 lock held by in:imklog/6630:
- #0: ffff88801c6e40e8 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x2f3/0x430 fs/file.c:1036
-2 locks held by syz-executor.0/13707:
-1 lock held by syz-executor.0/13708:
- #0: ffff88814c195ff8 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
-1 lock held by syz-executor.0/13709:
- #0: ffff88814c195ff8 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_setup+0xa9/0x1b0 kernel/trace/blktrace.c:616
+As the one who created the 'soak' group and only one that added
+tests to it, what do you think about this proposal?
+What do you think should be done with generic/52{1,2}?
+
+Thanks,
+Amir.
