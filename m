@@ -2,118 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FEC0C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jul 2022 11:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDB9CCA47F
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jul 2022 11:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232685AbiGDLQm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 07:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60906 "EHLO
+        id S233407AbiGDLRw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 07:17:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231339AbiGDLQl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 07:16:41 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95884F58B
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 04:16:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1656933400; x=1688469400;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VNgkiwqgLCvv/IcVNjUwL9tCzsdUDTAp6zVIJjdA3x8=;
-  b=RTBcXcqFQwEK9708sus/ob/Yd5i8MkowexOPKN8aKBhNYigQj7KZzfqa
-   bPHPb+VNIQx2uA8vIMFbtm2YsO+FvsCCv+nuAvc3BLoRT4uzlp/849XtC
-   x1AHn56oMjt7CjGns20CXLTy6tBDvbI1LIftQrhkw+zt5jIO9LlZJ6aV2
-   DmUNLbEQ4F8nD6qQAyzUPuLOvX/Vy57W8LDo9YTARQg48GLLcK6uWOf73
-   3HpBsetbIxnm9y5RPxDQ9/dHiZcofZFtoHCWt4T29BPdZW/HoIcYmezw6
-   hsvi9prgci1izcEaKcxUVIf67zrwYZMWro6AoSZrUT85Mga3m06PUj0bA
-   A==;
-X-IronPort-AV: E=Sophos;i="5.92,243,1650902400"; 
-   d="scan'208";a="309082963"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Jul 2022 19:16:39 +0800
-IronPort-SDR: hZv4PaBGSPD8erm0gjM5A2Vd6b9xRPR8GUtApPJo7yBP/N4YpXJ/OxMQRQUPNSmNjAmb1hU3Sb
- veEf8AOw881JnExkaOXD885Wyqbz8UEDwy9Bi3bwdsAwUaUBum096DyWvotPLu96Z+bSM77qKO
- qSFpNopPqyEB7C/ap4sh/J16vAJT8mVZKr3abSQcAwrp4SkLAG+L/LsYQKkQDDdM+LBqRBWgTD
- NaGHxR/Uq47FZHVgGiVlK3gdgHrTP0PddcOYmCCkab8taS7JmejSzaDsK8mrTNBp/D72cXxvaO
- BwD/7/42M8r6bKCRGvnegx80
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 03:34:00 -0700
-IronPort-SDR: xVD9bUCyWOGaeAr8znywC4ggPFnyrKTrMeWhsBrO4VQfjlynzFSXRbn4WAOXNJapGaHlpgfkFe
- atv1TNQhoG4auAA++JbnWd1J6o8tNWNu8O5rYiYAsIMFQjn08AE1tfqIEnmEwCetGZ0ExLBiFW
- yUYoUP1aoaQ5bKsr6+EhQVAUDgAWAlKLZvfY9zwqrwsZqDPU+XUnxHVDMK1/mJ3Lw2dPfR4qlm
- rVDBTspJ3XZqldbbj7iQfmxofF5/WdMO557ETrYtPE1N3QIF9QWSfpR0LB5FijwVawbiTnch6b
- CtI=
-WDCIronportException: Internal
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip01.wdc.com with ESMTP; 04 Jul 2022 04:16:39 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Yi Zhang <yi.zhang@redhat.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] block/008: avoid _offline_cpu() call in sub-shell
-Date:   Mon,  4 Jul 2022 20:16:38 +0900
-Message-Id: <20220704111638.1109883-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.36.1
+        with ESMTP id S231339AbiGDLRv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 07:17:51 -0400
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12FDFFD39;
+        Mon,  4 Jul 2022 04:17:50 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id c131-20020a1c3589000000b003a19b2bce36so2184757wma.4;
+        Mon, 04 Jul 2022 04:17:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=+VL49oyTMqtQVlCZQv7iwps6wPC1IEZF9C70oZ/eY/E=;
+        b=Q8omAhSRJ21uiAi+lGUaC+NvDSw7+JaUdycofei5DDAqEnlZIvuVfuqE4deukVT438
+         x9kHaB8TN9duz/3O4ZngUD2qyrjbf+7hbFHhVmymFMO1sc1pbiucPm/wAw0vcHPJmexp
+         bUQ2DIKVuLUXPTHZ6ohMgGYI8Qv5B5YMJZ0kM7LKaKR8gVLZHE6TmxbraD6EFKgvP33G
+         m4nhmxdf8JjF1s745fzaPNgJSjk70H5a+8SVMLI55i421xDwTaKlZ1X1LKSS1v27eRL9
+         Ruirt9lAgxgYhJpprmBWFtLmsQXZ7CgM7UQYRqiHM45w378f1KAR2Ilt4MW1vWOdvHen
+         xWQA==
+X-Gm-Message-State: AJIora9VKjsLiQfQtt99KdY0voE1DsrUboeVmgNnssvTshM+5d6DuTq7
+        sDTkO5WXFCFCmBAb+7ctzxM=
+X-Google-Smtp-Source: AGRyM1sI+vQroUA/Vkxn7ULBTwqUFMiFSJmU+g7j2cR0l8XO+EmRduZcIIL8U0SLQVYARIbtVwn9JQ==
+X-Received: by 2002:a05:600c:2246:b0:3a0:4d14:e9d5 with SMTP id a6-20020a05600c224600b003a04d14e9d5mr30579509wmm.70.1656933468513;
+        Mon, 04 Jul 2022 04:17:48 -0700 (PDT)
+Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id ba15-20020a0560001c0f00b0021bae66362esm26953312wrb.58.2022.07.04.04.17.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Jul 2022 04:17:48 -0700 (PDT)
+Message-ID: <da861bbb-1506-7598-fa06-32201456967d@grimberg.me>
+Date:   Mon, 4 Jul 2022 14:17:44 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH V3 1/1] ublk: add io_uring based userspace block driver
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+References: <20220628160807.148853-1-ming.lei@redhat.com>
+ <20220628160807.148853-2-ming.lei@redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220628160807.148853-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The helper function _offline_cpu() sets a value to RESTORE_CPUS_ONLINE.
-However, the commit bd6b882b2650 ("block/008: check CPU offline failure
-due to many IRQs") put _offline_cpu() call in sub-shell, then the set
-value to RESTORE_CPUS_ONLINE no longer affects function caller's
-environment. This resulted in offlined CPUs not restored by _cleanup()
-when the test case block/008 calls only _offline_cpu() and does not call
-_online_cpu().
 
-To fix the issue, avoid _offline_cpu() call in sub-shell. Use file
-redirect to get output of _offline_cpu() instead of sub-shell execution.
+> This is the driver part of userspace block driver(ublk driver), the other
+> part is userspace daemon part(ublksrv)[1].
+> 
+> The two parts communicate by io_uring's IORING_OP_URING_CMD with one
+> shared cmd buffer for storing io command, and the buffer is read only for
+> ublksrv, each io command is indexed by io request tag directly, and
+> is written by ublk driver.
+> 
+> For example, when one READ io request is submitted to ublk block driver, ublk
+> driver stores the io command into cmd buffer first, then completes one
+> IORING_OP_URING_CMD for notifying ublksrv, and the URING_CMD is issued to
+> ublk driver beforehand by ublksrv for getting notification of any new io request,
+> and each URING_CMD is associated with one io request by tag.
+> 
+> After ublksrv gets the io command, it translates and handles the ublk io
+> request, such as, for the ublk-loop target, ublksrv translates the request
+> into same request on another file or disk, like the kernel loop block
+> driver. In ublksrv's implementation, the io is still handled by io_uring,
+> and share same ring with IORING_OP_URING_CMD command. When the target io
+> request is done, the same IORING_OP_URING_CMD is issued to ublk driver for
+> both committing io request result and getting future notification of new
+> io request.
+> 
+> Another thing done by ublk driver is to copy data between kernel io
+> request and ublksrv's io buffer:
+> 
+> 1) before ubsrv handles WRITE request, copy the request's data into
+> ublksrv's userspace io buffer, so that ublksrv can handle the write
+> request
+> 
+> 2) after ubsrv handles READ request, copy ublksrv's userspace io buffer
+> into this READ request, then ublk driver can complete the READ request
+> 
+> Zero copy may be switched if mm is ready to support it.
+> 
+> ublk driver doesn't handle any logic of the specific user space driver,
+> so it should be small/simple enough.
+> 
+> [1] ublksrv
+> 
+> https://github.com/ming1/ubdsrv
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   drivers/block/Kconfig         |    6 +
+>   drivers/block/Makefile        |    2 +
+>   drivers/block/ublk_drv.c      | 1603 +++++++++++++++++++++++++++++++++
+>   include/uapi/linux/ublk_cmd.h |  158 ++++
+>   4 files changed, 1769 insertions(+)
+>   create mode 100644 drivers/block/ublk_drv.c
+>   create mode 100644 include/uapi/linux/ublk_cmd.h
+> 
+> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+> index fdb81f2794cd..d218089cdbec 100644
+> --- a/drivers/block/Kconfig
+> +++ b/drivers/block/Kconfig
+> @@ -408,6 +408,12 @@ config BLK_DEV_RBD
+>   
+>   	  If unsure, say N.
+>   
+> +config BLK_DEV_UBLK
+> +	bool "Userspace block driver"
 
-Fixes: bd6b882b2650 ("block/008: check CPU offline failure due to many IRQs")
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
-Link: https://lore.kernel.org/linux-block/20220703180956.2922025-1-yi.zhang@redhat.com/
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/block/008 | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/tests/block/008 b/tests/block/008
-index 75aae65..cd09352 100755
---- a/tests/block/008
-+++ b/tests/block/008
-@@ -34,6 +34,7 @@ test_device() {
- 	local offline_cpus=()
- 	local offlining=1
- 	local max_offline=${#HOTPLUGGABLE_CPUS[@]}
-+	local o=$TMPDIR/offline_cpu_out
- 	if [[ ${#HOTPLUGGABLE_CPUS[@]} -eq ${#ALL_CPUS[@]} ]]; then
- 		(( max_offline-- ))
- 	fi
-@@ -60,18 +61,18 @@ test_device() {
- 
- 		if (( offlining )); then
- 			idx=$((RANDOM % ${#online_cpus[@]}))
--			if err=$(_offline_cpu "${online_cpus[$idx]}" 2>&1); then
-+			if _offline_cpu "${online_cpus[$idx]}" > "$o" 2>&1; then
- 				offline_cpus+=("${online_cpus[$idx]}")
- 				unset "online_cpus[$idx]"
- 				online_cpus=("${online_cpus[@]}")
--			elif [[ $err =~ "No space left on device" ]]; then
-+			elif [[ $(<"$o") =~ "No space left on device" ]]; then
- 				# ENOSPC means CPU offline failure due to IRQ
- 				# vector shortage. Keep current number of
- 				# offline CPUs as maximum CPUs to offline.
- 				max_offline=${#offline_cpus[@]}
- 				offlining=0
- 			else
--				echo "Failed to offline CPU: $err"
-+				echo "Failed to offline CPU: $(<"$o")"
- 				break
- 			fi
- 		fi
--- 
-2.36.1
-
+Really? why compile this to the kernel and not tristate as loadable
+module?
