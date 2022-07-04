@@ -2,523 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1D9C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jul 2022 04:08:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82431C43334
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jul 2022 05:20:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231314AbiGDEI0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 00:08:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
+        id S229547AbiGDFUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 01:20:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230505AbiGDEIY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 00:08:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 41D041145
-        for <linux-block@vger.kernel.org>; Sun,  3 Jul 2022 21:08:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656907701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yyoD9ICcSLqA7nMGmX4vOpZrp6WQEab//KDtY/05lpE=;
-        b=aze8KQ+AfdVFRg8JehzqZuDooTMVZYeluLKmg+ohk+cn+lU35YgsNidOsqsFJOEpIWrh8H
-        aHq+JB/okyAFgFePuOBLj/vZzlH06Rjj4DrYpUlcPVAlMIYAHVg37+C/XWq7d5GHDM5XMT
-        q5gp1+1zpnkH3GX+elqnXW/djQU4eE4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-272-W6yywczfOoC2bumQDxWjtQ-1; Mon, 04 Jul 2022 00:08:16 -0400
-X-MC-Unique: W6yywczfOoC2bumQDxWjtQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B260B101A588;
-        Mon,  4 Jul 2022 04:08:15 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E103841617E;
-        Mon,  4 Jul 2022 04:08:09 +0000 (UTC)
-Date:   Mon, 4 Jul 2022 12:08:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        joseph.qi@linux.alibaba.com, ming.lei@redhat.com
-Subject: Re: [RFC] libubd: library for ubd(userspace block driver based on
- io_uring passthrough)
-Message-ID: <YsJno65CzIei1K1X@T590>
-References: <fd926012-6845-05e4-077b-6c8cfbf3d3cc@linux.alibaba.com>
- <YrnMwgW7TemVdbXv@T590>
- <fada5140-077e-6904-f9b6-c7bfba7779eb@linux.alibaba.com>
- <Yrw4gJq+NaX+TCDz@T590>
- <b3ef9b0e-f24c-7867-91c8-2bf15c646b77@linux.alibaba.com>
- <Yr1oMvYCqn5m2oLX@T590>
- <4e4b0130-81a1-567c-0fd5-624f9d18ce85@linux.alibaba.com>
+        with ESMTP id S229501AbiGDFUN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 01:20:13 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB6D2BE
+        for <linux-block@vger.kernel.org>; Sun,  3 Jul 2022 22:20:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1656912010; x=1688448010;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=eOQYKRcSXfRp3HTi0cM92HaIGmqh7gjTBzDXJV7Pxlk=;
+  b=ltP0gxC7f6mQ8KGuE38yYYGNOvDUBf4C4JHjJMQIci6qmJH2xEoMTyCT
+   Gj4fFDISv93qkeOXkpoYuD/OJp7ckfma1T/T/LraU48cainL4Z1wU7Brx
+   QJFYtrMau0G9b1zIgltAHSOBG6nOdzxKNqEeFCAjXgDN9tK5cj2FF7Bi6
+   iXD3yw2plBZ1Mhzj2+Dzkf4njXKOMw1Rj6v8j56XtdpyYGx5apGtZSeOP
+   VikBByGmGs8HsZ70R4PoahzqdRSa2cAhytrf1HaXK8ipjZZKF45Os10ay
+   PxvkLBJbv7ifqj12DhJMkF1R5M0Uxt3BdVoelTDqUhN952o5xo3y7JVlX
+   g==;
+X-IronPort-AV: E=Sophos;i="5.92,243,1650902400"; 
+   d="scan'208";a="209625457"
+Received: from mail-bn8nam11lp2168.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.168])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Jul 2022 13:20:09 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QNuQHUYsxCmZHCbav36HaubT0UAB7zmxbICxQ3gsBuef5XiKPUuVVviz8apUa0Iupic1eMNjAASVm4IBKBtbZPnWLEaawV+zmcssJuIo2h89xXOuj+mDfJvv4F1C/q+dITaWXvC3Dn1wvNw/RbjdRQvejRSyYdpqhbk4f0lAGQXynCM+uT2kL8LuaMUeX5gMtozqUoLUIdKdEhb0hSRosJITcbUzixphDmlsMIEOFEiiQQygvFU9Q5RW4t+aE+HrE+MEdwBSP5VrescnByo3M2XkXmgLI24x+jXTdUlj8LdQlopIhvFxnwezthauNTvsAOrapoMIiCnhI1QI6xgUBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=222WGlNURkjTHQyCG4Dd7hH8/TWs/5nx/A07RyHNI/w=;
+ b=Ef0r+I30fbcO1UXDa6bgZXOBWTaC6zTRWrHHWmMFSHEvghUuC1xc7qF9xRL05BmwDNB9lWGtv/SCSsIXG1MUSuDenPVMnK++RCubgmQbZwZUsWak3oIokml5PrcL7wtSotKQEgUT/oI+sTZPGmksnW63BB32vjU4FqydNXMpAvK8cIiLr0SexfwutEaNHr9eBMK1S0aday8B01qe34tD2lIxKYEmYM51WvhRqr8kvrc8+AJkhYrQ4W/cqjf4n9C/FlpnZMqNnDUO5wcWCe3BY3Fl6QlHmadLy92gs8J2l7fQK1J4kmiBgCimeFFBrPvqzfDFV36sXkOVuh5NtRspPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=222WGlNURkjTHQyCG4Dd7hH8/TWs/5nx/A07RyHNI/w=;
+ b=Vv2zZNb94hKth+talat6iq43xa8I9VzNj6gaH4AuSJuEVDYTEZ4w+IG7xU+BJmWC/kzB5Vkau3UqBDMvkPNVpfnHEWRquSzKEZgBRKRKLA247X/KR/kn4PAv7OUv9LAqoG9u54cNG0av3IxE1rb53nZ8O+g6ylpg9oogdUOmVyM=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ SA2PR04MB7484.namprd04.prod.outlook.com (2603:10b6:806:134::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.15; Mon, 4 Jul
+ 2022 05:20:08 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833%7]) with mapi id 15.20.5395.020; Mon, 4 Jul 2022
+ 05:20:08 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests] block/008: fix cpu online restore
+Thread-Topic: [PATCH blktests] block/008: fix cpu online restore
+Thread-Index: AQHYjwg096RdlhMAIEKAAwKQivwDX61trWMA
+Date:   Mon, 4 Jul 2022 05:20:08 +0000
+Message-ID: <20220704052008.jegtbiposiy5aipg@shindev>
+References: <20220703180956.2922025-1-yi.zhang@redhat.com>
+In-Reply-To: <20220703180956.2922025-1-yi.zhang@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9745bfbf-9509-4eaf-818a-08da5d7cdcce
+x-ms-traffictypediagnostic: SA2PR04MB7484:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: m0uFR0vkLlgz1EsrsxEpZsNbgxIhJzoXmwPXU8cYJQdeLod416ujztR9GAwfzYtZLHMTn8xKyH6NEWRKjaPq5jd7Ejmm6cY+3uZ0Ri75J+XDFDySpr7XqYvSBog7O3y6HZ5eCCQ7wo8F0e0A3xYJljjZWXA74b558ffntjUPHdWbssT3rU7F2PJonm2YMrxbg9WH/f31OtDhKcLn6BVk+EbeOVEApUfeZ3VNxsdIDSG5tBb1cqOAoeWVZ4TmCwUk1bVeQxSCPpQnzrxEl0ybyhu8x6aXe2/PccMPk72bQ5GCChYJB96Xx2goLfgpzlLUCAossUZYKAF7M15Y681LiAsELwziWdFTRIvRiMcOerY7KT0UNz53i85HFNLCh9ZTUAEiuzUGc+me58/FiomWqrF//3NeJEGVtO92F0Lj7Egr8WyVN8sP+iushJ8kg5QiOyjmPg7U7mKZ5bYPLT/1jmIFPaic1RLcVv6dasIDO6E51eViYi0VjMCU/ps9HVUSbWBVTiljWCagXamhfUzOlvV5cNAVmVxQs62v+9g06HChBbyk3QI2gC4Nl0hEXosq/KhsG6Mrua7n+XB+sALUfx1iVo2klPdegY8YuGiclqnojGzw4MFBjmbbJZZtZn6fhkKPqEdMqhcKr6CrZMcV+Qx0Cgj7CgBiBQDUBTbHyDvoSzN2vF6OZrMSTxoX5gENYki5JXghTacWTvc9EXrOt4KGDMcFf2eHwle16XURCW2Ob3C5UZpi7Qx1R43JGrydaP6QHTCptOYnkeb3S6OzeHHhf4XoEC/utKV3ZNsZiRYtPVLopwDWqRF4BClV4bav
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(7916004)(39860400002)(396003)(366004)(346002)(376002)(136003)(71200400001)(6486002)(478600001)(2906002)(44832011)(66476007)(6916009)(6512007)(6506007)(26005)(76116006)(9686003)(66946007)(316002)(5660300002)(66556008)(8936002)(66446008)(64756008)(8676002)(4326008)(86362001)(1076003)(186003)(83380400001)(41300700001)(38100700002)(91956017)(122000001)(38070700005)(33716001)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?0Imx4giQw7x40P+WXHNtC71MVXLtnVD2QYk6EWe9J4t/mejZ5jX0MpZ18e5l?=
+ =?us-ascii?Q?A/iqqYi+b2neFWniuYMHPHhimuYWmhMTSw+9rdy0gryPVg3ATwZr0NluvRSg?=
+ =?us-ascii?Q?VJrYQHQH08JkZng2nn1/hhWdV9Vx8ZzD+7Y7fJLKsHDgjUOtgzvfWripRLWy?=
+ =?us-ascii?Q?bCKX8e6rOPf5pl4L8q04Hh78PtjPvRcef1k2P+U7ARtOrNLdFWBOe3O1mKN7?=
+ =?us-ascii?Q?legOWO9vY3yjMALl+DiNQFkQOYuOMQhS7Z84a9olL3iNDedJF/y0ysR28hMF?=
+ =?us-ascii?Q?+vP6LJCqq7YnH7uu3iaP+i9E1uG39MJYQlZvrQuaTTUAAXPWoaT/zdmSoFLz?=
+ =?us-ascii?Q?c0AnQb1ZghSS0ucgRgrMUaJ1yC9SQW8Loc8AS+ZB+i10CvAwa9Nw32upu+0h?=
+ =?us-ascii?Q?3MYtLxkkvRg0a6uPT8twmZm+nAyoEpXjgdVXY3f2hXmdNiaQCltjuzfaH7zt?=
+ =?us-ascii?Q?1Pw9qkPv2weInng3jPFo56qwkS3IQ+APrGSQ/9ZujHw+nMgDBuh2Yv/R8W+U?=
+ =?us-ascii?Q?7hbHI9SsNU1HMCYAOd211t7lljrBZzXpGFoZY66nVUbD2zLwzEfb96LAvema?=
+ =?us-ascii?Q?LxPJdz7tVPOeyqzejViD2jFzm4CSU4qXdhON8wMScVtvG07edm89nrpgZta8?=
+ =?us-ascii?Q?rZqEmeTYXB7hPpErxVZ60n4Y4Agenh4b8U+qj0drLpA+BUbAa4mP2n8AmEhv?=
+ =?us-ascii?Q?L7GZCOoaRx65O7fFbsZmLpn3HyN5AYqC0D0giIOwlgbydceXU3kM9z3CPvau?=
+ =?us-ascii?Q?cdeRJc+w9WpWkIXRK02uwpRwvOo/MXzMpS3YkNBu8QKfD7mitUnEh9wbpWLk?=
+ =?us-ascii?Q?aDxbuV8q7/IBOndj/JQKqlkidLyfYFO24wQ1Xia+nWOnv4qlykdq/hHXMvax?=
+ =?us-ascii?Q?KKqsrQAGMuvhzD76ag7xX5tMChI0c5tSOMZiPH1YgQn9UW50pJwXVeWGFzsY?=
+ =?us-ascii?Q?dkTCHjx6xQWtU1lbv+mj9eX0UPMY8XftMm7BCCynZbFzOBSVhT0H8WAYy4HK?=
+ =?us-ascii?Q?hcproVbEZr4vhizrwSh1HSOSVZovu5Q7J8daQByvQHIMMXpVUsM5+rUsusNT?=
+ =?us-ascii?Q?rTtlF2wKFEBz/cvu7SVfZSxV/5Vdyb9/hhaOMSZpn9ZGF7hBsvV3SNKYwSHF?=
+ =?us-ascii?Q?EIePMCmyyEWuo1HPpvSGnyPFq0NNoCKL7+x2u+wAbxJg3nsx5uvixkKrATew?=
+ =?us-ascii?Q?4YobGjxXGnlPghyx0/EbdSu9nQWDDgJfD67RKnmpNL6hqazSdBfRPFvi/IQ1?=
+ =?us-ascii?Q?83Jab/8UaJ/qkDdY7EVm87GJrPm1vSsZpzAkkIiRHqxTbO2rczfafaFzNcpt?=
+ =?us-ascii?Q?bVpCNNCIYkY+u2kJp1YrVtVLrK6gCjh3mxUxY4k2GU9083BOSlxmkAbGI2tG?=
+ =?us-ascii?Q?kVs6N6jmcIQB+fqGzfH1Qf7gO8Ioq0yOVRAOgC3EmTI9fJ6/RBTbiMwKmqle?=
+ =?us-ascii?Q?Z/N5yVocSeFAJGPvIWpEwRTOdgYRsInPDYddgsrPWVQOtvNXsKxwwLPhP3/p?=
+ =?us-ascii?Q?6HS1Ni9SIummeRIcjcs9HdCLbOAbanPOQqk0lSyvxDOYkZcNenyZYS3EFjff?=
+ =?us-ascii?Q?yi4BIyGtxVjyoGUnonAlow68R/D29mcf6lrPXZaoZDDONILKb4XFbX3WJlXG?=
+ =?us-ascii?Q?xq1XsAJDe18TAwvFargw088=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <D83B6BD334BD614BAA07EACC5C11C745@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e4b0130-81a1-567c-0fd5-624f9d18ce85@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9745bfbf-9509-4eaf-818a-08da5d7cdcce
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2022 05:20:08.7570
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VEJNTZJxZ7GJqKI0IpDlJ/5rFIjgPZ2cXQurXjp/a6jaaL72VW6xj+zz5C99jD+F6rBKNKjmFiNdcsS/hDSgCyXHFXUhNd6rN9/PCkrOuX8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7484
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 05:29:07PM +0800, Ziyang Zhang wrote:
-> On 2022/6/30 17:09, Ming Lei wrote:
-> > On Thu, Jun 30, 2022 at 03:16:21PM +0800, Ziyang Zhang wrote:
-> >> Hi, Ming
-> >>
-> >> On 2022/6/29 19:33, Ming Lei wrote:
-> >>> On Wed, Jun 29, 2022 at 11:22:23AM +0800, Ziyang Zhang wrote:
-> >>>> Hi Ming,
-> >>>>
-> >>>> On 2022/6/27 23:29, Ming Lei wrote:
-> >>>>> Hi Ziyang,
-> >>>>>
-> >>>>> On Mon, Jun 27, 2022 at 04:20:55PM +0800, Ziyang Zhang wrote:
-> >>>>>> Hi Ming,
-> >>>>>>
-> >>>>>> We are learning your ubd code and developing a library: libubd for ubd.
-> >>>>>> This article explains why we need libubd and how we design it.
-> >>>>>>
-> >>>>>> Related threads:
-> >>>>>> (1) https://lore.kernel.org/all/Yk%2Fn7UtGK1vVGFX0@T590/
-> >>>>>> (2) https://lore.kernel.org/all/YnDhorlKgOKiWkiz@T590/
-> >>>>>> (3) https://lore.kernel.org/all/20220509092312.254354-1-ming.lei@redhat.com/
-> >>>>>> (4) https://lore.kernel.org/all/20220517055358.3164431-1-ming.lei@redhat.com/
-> >>>>>>
-> >>>>>>
-> >>>>>> Userspace block driver(ubd)[1], based on io_uring passthrough,
-> >>>>>> allows users to define their own backend storage in userspace
-> >>>>>> and provides block devices such as /dev/ubdbX.
-> >>>>>> Ming Lei has provided kernel driver code: ubd_drv.c[2]
-> >>>>>> and userspace code: ubdsrv[3].
-> >>>>>>
-> >>>>>> ubd_drv.c simply passes all blk-mq IO requests
-> >>>>>> to ubdsrv through io_uring sqes/cqes. We think the kernel code
-> >>>>>> is pretty well-designed.
-> >>>>>>
-> >>>>>> ubdsrv is implemented by a single daemon
-> >>>>>> and target(backend) IO handling(null_tgt and loop_tgt) 
-> >>>>>> is embedded in the daemon. 
-> >>>>>> While trying ubdsrv, we find ubdsrv is hard to be used 
-> >>>>>> by our backend.
-> >>>>>
-> >>>>> ubd is supposed to provide one generic framework for user space block
-> >>>>> driver, and it can be used for doing lots of fun/useful thing.
-> >>>>>
-> >>>>> If I understand correctly, this isn't same with your use case:
-> >>>>>
-> >>>>> 1) your user space block driver isn't generic, and should be dedicated
-> >>>>> for Alibaba's uses
-> >>>>>
-> >>>>> 2) your case has been there for long time, and you want to switch from other
-> >>>>> approach(maybe tcmu) to ubd given ubd has better performance.
-> >>>>>
-> >>>>
-> >>>> Yes, you are correct :)
-> >>>> The idea of design libubd is actually from libtcmu.
-> >>>>
-> >>>> We do have some userspace storage system as the IO handling backend, 
-> >>>> and we need ubd to provide block drivers such as /dev/ubdbX for up layer client apps.
-> >>>>
-> >>>>
-> >>>> I think your motivation is that provides a complete user block driver to users
-> >>>> and they DO NOT change any code.
-> >>>> Users DO change their code using libubd for embedding libubd into the backend.
-> >>>>
-> >>>>
-> >>>>>> First is description of our backend:
-> >>>>>>
-> >>>>>> (1) a distributing system sends/receives IO requests 
-> >>>>>>     through network.
-> >>>>>>
-> >>>>>> (2) The system use RPC calls among hundreds of
-> >>>>>>      storage servers and RPC calls are associated with data buffers
-> >>>>>>      allocated from a memory pool.
-> >>>>>>
-> >>>>>> (3) On each server for each device(/dev/vdX), our backend runs
-> >>>>>>      many threads to handle IO requests and manage the device. 
-> >>>>>>
-> >>>>>> Second are reasons why ubdsrv is hard to use for us:
-> >>>>>>
-> >>>>>> (1) ubdsrv requires the target(backend) issues IO requests
-> >>>>>>     to the io_uring provided by ubdsrv but our backend 
-> >>>>>>     uses something like RPC and does not support io_uring.
-> >>>>>
-> >>>>> As one generic framework, the io command has to be io_uring
-> >>>>> passthrough, and the io doesn't have to be handled by io_uring.
-> >>>>
-> >>>> Yes, our backend define its own communicating method.
-> >>>>
-> >>>>>
-> >>>>> But IMO io_uring is much more efficient, so I'd try to make async io
-> >>>>> (io uring) as the 1st citizen in the framework, especially for new
-> >>>>> driver.
-> >>>>>
-> >>>>> But it can support other way really, such as use io_uring with eventfd,
-> >>>>> the other userspace context can handle io, then wake up io_uring context
-> >>>>> via eventfd. You may not use io_uring for handling io, but you still
-> >>>>> need to communicate with the context for handling io_uring passthrough
-> >>>>> command, and one mechanism(such as eventfd) has to be there for the
-> >>>>> communication.
-> >>>>
-> >>>> Ok, eventfd may be helpful. 
-> >>>> If you read my API, you may find ubdlib_complete_io_request().
-> >>>> I think the backend io worker thread can call this function to tell the 
-> >>>> ubd queue thread(the io_uring context in it) to commit the IO.
-> >>>
-> >>> The ubdlib_complete_io_request() has to be called in the same pthread
-> >>> context, that looks not flexible. When you handle IO via non-io_uring in the same
-> >>> context, the cpu utilization in submission/completion side should be
-> >>> higher than io_uring. And this way should be worse than the usage in
-> >>> ubd/loop, that is why I suggest to use one io_uring for handling both
-> >>> io command and io request if possible.
-> >>
-> >> ubdlib_complete_io_request() can be called in the io worker thread,
-> >> not in the ubdsrv queue thread(with the io_uring context for handling uring_cmd).
-> >>
-> >> You can find ubd_runner.c in my libubd repo. There are many io worker
-> >> threads for each ubdsrv queue to handle IO requests.
-> >>
-> >> Actually this idea comes from tcmu-runner. The data flow is:
-> >>
-> >> 1) in ubdsrv queue thread, io_uring_enter(): returns(IO reqs received from blk-mq)
-> >>
-> >> 2) in ubdsrv queue thread, ubdsrv_reap_requests(): iterate on each cqe(with an IO req),
-> >>    
-> >>    for READ/WRITE requests, ubd_aio_queue_io() to enqueue the IO req into a io_queue
-> >>    (each ubdsrv queue has one io_queue). This IO req's status is IO_HANDLING_ASYNC.
-> >>     
-> >>    for other simple(can be handled very quickly), 
-> >>    handle it right now and call ubdlib_complete_io_request()
-> >>
-> >> 3) in ubdsrv queue thread, ubdsrv_commit_and_fetch(): iterate on all IO slots per ubdsrv queue
-> >>    and setup sqe if one IO(IO completion) is ready to commit.
-> >>    
-> >>    Here, some IO slots are still IO_HANDLING_ASYNC so no sqe is generated for them.
-> >>
-> >>
-> >> 4)  in ubdsrv queue thread, io_uring_enter(): submit all sqes and wait for cqes
-> >>     (io_uring_enter() will return after at least one IO req is received from blk-mq)
-> >>    
-> >> 5) When 3) or 4) happens, at the same time in ubdsrv queue IO worker threads:
-> >>    each io worker thread try to deque and handle one IO req from io_queue per ubdsrv queue.
-> >>    
-> >>    After the IO worker handles the IO req(WRITE/READ), it calls ubdlib_complete_io_request()
-> >>    This function can mark this  IO req's status to ready to commit.
-> >>
-> >> IO handling/completion and io_uring_enter() can happen at the same time.
-> >>
-> >> Besides, io_uring_enter can:
-> >>
-> >> 1) block and wait for cqes until at least
-> >> one blk-mq req comes from queue_rq()
-> >>
-> >> 2) submit sqes(with last IO completion and next fetch)
-> >>
-> >> so I have to consider how to notify io_uring about io completion 
-> >> after io_uring_enter() is slept(block and wait for cqes).
-> > 
-> > Yeah, that was exactly my question, :-)
-> > 
-> >>
-> >> In current version of ubd_runner(an async libubd target), I try to use an "unblock"
-> >> io_uring_enter_timeout() and caller can set a timeout value for it.
-> >> So IO completions happen after io_uring_enter_timeout() call can be committed
-> >> by next io_uring_enter_timeout() call...
-> >>
-> >> But this is a very ugly implementation 
-> >> because I may waste CPU on useless loops in ubdsrv queue thread if
-> >> blk-mq reqs do not income frequently.
-> >>
-> >> You mentioned that eventfd may be helpful and I agree with you. :)
-> >> I can register an eventfd in io_uring after ubd_aio_queue_io() and write the eventfd
-> >> in  ubdlib_complete_io_request().
-> >>
-> >> I will fix my code.
-> > 
-> > FYI, there is one example about using eventfd to wakeup io_uring, which
-> > can be added to the library for your usecase:
-> > 
-> > https://gist.github.com/1Jo1/6496d1b8b6b363c301271340e2eab95b
-> 
-> Thanks, will take a view.
-> 
-> > 
-> >>
-> >>>
-> >>>>
-> >>>>
-> >>>>
-> >>>>>
-> >>>>>>
-> >>>>>> (2) ubdsrv forks a daemon and it takes over everything.
-> >>>>>>     Users should type "list/stop/del" ctrl-commands to interact with
-> >>>>>>     the daemon. It is inconvenient for our backend
-> >>>>>>     because it has threads(from a C++ thread library) running inside.
-> >>>>>
-> >>>>> No, list/stop/del won't interact with the daemon, and the per-queue
-> >>>>> pthread is only handling IO commands(io_uring passthrough) and IO request.
-> >>>>>
-> >>>>
-> >>>>
-> >>>> Sorry I made a mistake.
-> >>>>
-> >>>> I mean from user's view, 
-> >>>> he has to type list/del/stop from cmdlind to control the daemon.
-> >>>> (I know the control flow is cmdline-->ubd_drv.c-->ubdsrv daemon).
-> >>>>
-> >>>> This is a little weird if we try to make a ubd library.
-> >>>> So I actually provides APIs in libubd for users to do these list/del/stop works.
-> >>>
-> >>> OK, that is fine to export APIs for admin purpose.
-> >>>
-> >>>>
-> >>>>
-> >>>>>>
-> >>>>>> (3) ubdsrv PRE-allocates internal data buffers for each ubd device.
-> >>>>>>     The data flow is:
-> >>>>>>     bio vectors <-1-> ubdsrv data buffer <-2-> backend buffer(our RPC buffer).
-> >>>>>>     Since ubdsrv does not export its internal data buffer to backend,
-> >>>>>>     the second copy is unavoidable. 
-> >>>>>>     PRE-allocating data buffer may not be a good idea for wasting memory
-> >>>>>>     if there are hundreds of ubd devices(/dev/ubdbX).
-> >>>>>
-> >>>>> The preallocation is just virtual memory, which is cheap and not pinned, but
-> >>>>> ubdsrv does support buffer provided by io command, see:
-> >>>>>
-> >>>>> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
-> >>>>
-> >>>> Actually I discussed on the design of pre-allocation in your RFC patch for ubd_drv
-> >>>> but you did not reply :)
-> >>>>
-> >>>> I paste it here:
-> >>>>
-> >>>> "I am worried about the fixed-size(size is max io size, 256KiB) pre-allocated data buffers in UBDSRV
-> >>>> may consume too much memory. Do you mean these pages can be reclaimed by sth like madvise()?
-> >>>> If (1)swap is not set and (2)madvise() is not called, these pages may not be reclaimed."
-> >>>>
-> >>>> I observed that your ubdsrv use posix_memalign() to pre-allocate data buffers, 
-> >>>> and I have already noticed the memory cost while testing your ubdsrv with hundreds of /dev/ubdbX.
-> >>>
-> >>> Usually posix_memalign just allocates virtual memory which is unlimited
-> >>> in 64bit arch, and pages should be allocated until the buffer is read or write.
-> >>> After the READ/WRITE is done, kernel still can reclaim the pages in this
-> >>> virtual memory.
-> >>>
-> >>> In future, we still may optimize the memory uses via madvise, such as
-> >>> MADV_DONTNEED, after the slot is idle for long enough.
-> >>
-> >> Ok, thanks for explanation. 
-> >>
-> >>>
-> >>>>
-> >>>> Another IMPORTANT problem is your commit:
-> >>>> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
-> >>>> may be not helpful for WRITE requests if I understand correctly.
-> >>>>
-> >>>> Consider this data flow:
-> >>>>
-> >>>> 1. ubdsrv commits an IO req(req1, a READ req).
-> >>>>
-> >>>> 2. ubdsrv issues a sqe(UBD_IO_COMMIT_AND_FETCH_REQ), and sets io->addr to addr1.
-> >>>>    addr1 is the addr of buffer user passed.
-> >>>>    
-> >>>>
-> >>>> 3. ubd gets the sqe and commits req1, sets io->addr to addr1.
-> >>>>
-> >>>> 4. ubd gets IO req(req2, a WRITE req) from blk-mq(queue_rq) and commit a cqe.
-> >>>>
-> >>>> 5. ubd copys data to be written from biovec to addr1 in a task_work.
-> >>>>
-> >>>> 6. ubdsrv gets the cqe and tell the IO target to handle req2.
-> >>>>
-> >>>> 7. IO target handles req2. It is a WRITE req so target issues a io_uring write
-> >>>>    cmd(with buffer set to addr1).
-> >>>>
-> >>>>
-> >>>>
-> >>>> The problem happens in 5). You cannot know the actual data_len of an blk-mq req
-> >>>> until you get one in queue_rq. So length of addr1 may be less than data_len.
-> >>>
-> >>> So far, the actual length of buffer has to be set as at least rq_max_blocks, since
-> >>> we set it as ubd queue's max hw sectors. Yeah, you may argue memory
-> >>> waste, but process virtual address is unlimited for 64bit arch, and
-> >>> pages are allocated until actual read/write is started.
-> >>
-> >> Ok, since I allow users to config rq_max_blocks in libubd, 
-> >> it's users' responsibility to ensure length of user buffers
-> >> is at least rq_max_blocks.
-> >>
-> >> Now I agree on your commit:
-> >> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
-> >>
-> >> Provide WRITE buffer in advance(when sending COMMIT_AND_FETCH) seems OK :)
-> >>
-> >>>
-> >>>>>
-> >>>>>>
-> >>>>>> To better use ubd in more complicated scenarios, we have developed libubd.
-> >>>>>> It does not assume implementation of backend and can be embedded into it.
-> >>>>>> We refer to the code structure of tcmu-runner[4], 
-> >>>>>> which includes a library(libtcmu) for users 
-> >>>>>> to embed tcmu-runner inside backend's code. 
-> >>>>>> It:
-> >>>>>>
-> >>>>>> (1) Does not fork/pthread_create but embedded in backend's threads
-> >>>>>
-> >>>>> That is because your backend may not use io_uring, I guess.
-> >>>>>
-> >>>>> But it is pretty easy to move the decision of creating pthread to target
-> >>>>> code, which can be done in the interface of .prepare_target().
-> >>>>
-> >>>> I think the library should not create any thread if we want a libubd.
-> >>>
-> >>> I Agree.
-> >>>
-> >>>>
-> >>>>>
-> >>>>>>
-> >>>>>> (2) Provides libubd APIs for backend to add/delete ubd devices 
-> >>>>>>     and fetch/commit IO requests
-> >>>>>
-> >>>>> The above could be the main job of libubd.
-> >>>>
-> >>>> indeed.
-> >>>>
-> >>>>>
-> >>>>>>
-> >>>>>> (3) simply passes backend-provided data buffers to ubd_drv.c in kernel,
-> >>>>>>     since the backend actually has no knowledge 
-> >>>>>>     on incoming data size until it gets an IO descriptor.
-> >>>>>
-> >>>>> I can understand your requirement, not look at your code yet, but libubd
-> >>>>> should be pretty thin from function viewpoint, and there are lots of common
-> >>>>> things to abstract/share among all drivers, please see recent ubdsrv change:
-> >>>>>
-> >>>>> https://github.com/ming1/ubdsrv/commits/master
-> >>>>>
-> >>>>> in which:
-> >>>>> 	- coroutine is added for handling target io
-> >>>>> 	- the target interface(ubdsrv_tgt_type) has been cleaned/improved for
-> >>>>> 	supporting complicated target
-> >>>>> 	- c++ support
-> >>>>
-> >>>> Yes, I have read your coroutine code but I am not an expert of C++ 20.:(
-> >>>> I think it is actually target(backend) design and ubd should not assume 
-> >>>> how the backend handle IOs. 
-> >>>>
-> >>>> The work ubd in userspace has to be done is:
-> >>>>
-> >>>> 1) give some IO descriptors to backend, such as ubd_get_io_requests()
-> >>>>
-> >>>> 2) get IO completion form backend, such as ubd_complete_io_requests()
-> >>>
-> >>> Or the user provides/registers two callbacks: handle_io_async() and
-> >>> io_complete(), the former is called when one request comes from ubd
-> >>> driver, the latter(optional) is called when one io is done.
-> >>>
-> >>> Also you didn't mention how you notify io_uring about io completion after
-> >>> io_uring_enter() is slept if your backend code doesn't use io_uring to
-> >>> handle io.
-> >>>
-> >>> I think one communication mechanism(such as eventfd) is needed for your
-> >>> case.
-> >>
-> >> Ok, I will try eventfd with io_uring.
-> >>
-> >>>
-> >>>>
-> >>>>
-> >>>>
-> >>>>>
-> >>>>> IMO, libubd isn't worth of one freshly new project, and it could be integrated
-> >>>>> into ubdsrv easily. The potential users could be existed usersapce
-> >>>>> block driver projects.
-> >>>>
-> >>>> Yes, so many userspace storage systems can use ubd!
-> >>>> You may look at tcmu-runner. It:
-> >>>>
-> >>>> 1) provides a library(libtcmu.c) for those who have a existing backend.
-> >>>>
-> >>>> 2) provides a runner(main.c in tcmu-runner) like your ubdsrv 
-> >>>>    for those who just want to run it. 
-> >>>>    And the runner is build on top of libtcmu.
-> >>>>
-> >>>>>
-> >>>>> If you don't object, I am happy to co-work with you to add the support
-> >>>>> for libubd in ubdsrv, then we can avoid to invent a wheel
-> >>>>
-> >>>> +1 :)
-> >>>
-> >>> Thinking of further, I'd suggest to split ubdsrv into two parts:
-> >>>
-> >>> 1) libubdsrv
-> >>> - provide APIs like what you did in libubd
-> >>> - provide API for notify io_uring(handling io command) that one io is
-> >>> completed, and the API should support handling IO from other context
-> >>> (not same with the io_uring context for handling io command).
-> >>>
-> >>> 2) ubd target
-> >>> - built on libubdsrv, such as ubd command is built on libubdsrv, and
-> >>> specific target implementation is built on the library too.
-> >>>
-> >>> It shouldn't be hard to work towards this direction, and I guess this
-> >>> way should make current target implementation more clean.
-> >>>
-> >>
-> >> Yes, this is like tcmu-runner's structure: a libtcmu and some target
-> >> Thanks, Ming.  Glad to co-work with you.
-> >>
-> >> I will take your advice and improve libubd(the communication mechanism, maybe eventfd).
-> > 
-> > I have added libublk branch for working towards this direction, if we
-> > cowork on libublk, please write patch against this branch, then I can
-> > apply your patch directly.
-> > 
-> > https://github.com/ming1/ubdsrv/tree/libublk
-> 
-> Ok, but It concerns me that libubdsrv may change current ubdsrv project's structure a lot
-> because:
-> 1) target implementation will be built on top of libubdsrv and the target
->    should create pthread(ubdsrv loop) itself.
-> 
-> 2) have to remove pthread/process(daemon) in current ubdsrv to build libubdsrv.
->    It was really a hard job. :-(
+On Jul 04, 2022 / 02:09, Yi Zhang wrote:
+> The offline cpus cannot be restored during _cleanup when only _offline_cp=
+u
+> executed, fix it by reset RESTORE_CPUS_ONLINE=3D1 during test.
+>=20
+> Fixes: bd6b882 ("block/008: check CPU offline failure due to many IRQs")
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 
-Both the two are not hard to do, and turns out that making libubdsrv is actually
-one big cleanup.
+Hello Yi, thank you for catching this. The commit bd6b882 put the _offline_=
+cpu
+call into a sub-shell, then RESTORE_CPUS_ONLINE reset in the function no lo=
+nger
+affects _cleanup function. When I made the commit, I overlooked that point.
 
-All these works[1] are basically done:
+Your change should fix the issue but it makes the RESTORE_CPUS_ONLINE=3D1 i=
+n
+_offline_cpu meaningless. Instead, I suggest following patch. Could you con=
+firm
+it fixes the issue in your environment?
 
-1) libublksrv
-- built .so and .a are under lib/
-- exported header file is include/ublksrv.h
-- so any other application can make ublk device against this library
-- eventfd notification is added too, so io handling doesn't have to
-be done via io_uring, one callback of ->handle_event(), and two APIs
-are added for this support
-
-2) ublk/ubd utility
-- built against libublksrv, meantime it uses the private header of the
-library too, which is fine, since the two are in same project
-
-3) two examples
-- demo_null.c: one < 200 LOC standalone example to show how to make
-a ubd/null block device against libublksrv
-
-- demo_event.c: one simple standalone example(~300LOC) to make one ublk
-disk by handling io via another pthread(not by io_uring) against
-libublksrv
-
-Any comments/feedback/tests are welcome.
+diff --git a/tests/block/008 b/tests/block/008
+index 75aae65..cd09352 100755
+--- a/tests/block/008
++++ b/tests/block/008
+@@ -34,6 +34,7 @@ test_device() {
+ 	local offline_cpus=3D()
+ 	local offlining=3D1
+ 	local max_offline=3D${#HOTPLUGGABLE_CPUS[@]}
++	local o=3D$TMPDIR/offline_cpu_out
+ 	if [[ ${#HOTPLUGGABLE_CPUS[@]} -eq ${#ALL_CPUS[@]} ]]; then
+ 		(( max_offline-- ))
+ 	fi
+@@ -60,18 +61,18 @@ test_device() {
+=20
+ 		if (( offlining )); then
+ 			idx=3D$((RANDOM % ${#online_cpus[@]}))
+-			if err=3D$(_offline_cpu "${online_cpus[$idx]}" 2>&1); then
++			if _offline_cpu "${online_cpus[$idx]}" > "$o" 2>&1; then
+ 				offline_cpus+=3D("${online_cpus[$idx]}")
+ 				unset "online_cpus[$idx]"
+ 				online_cpus=3D("${online_cpus[@]}")
+-			elif [[ $err =3D~ "No space left on device" ]]; then
++			elif [[ $(<"$o") =3D~ "No space left on device" ]]; then
+ 				# ENOSPC means CPU offline failure due to IRQ
+ 				# vector shortage. Keep current number of
+ 				# offline CPUs as maximum CPUs to offline.
+ 				max_offline=3D${#offline_cpus[@]}
+ 				offlining=3D0
+ 			else
+-				echo "Failed to offline CPU: $err"
++				echo "Failed to offline CPU: $(<"$o")"
+ 				break
+ 			fi
+ 		fi
 
 
-[1] libublk
-https://github.com/ming1/ubdsrv/tree/libublk
-
-
-Thanks,
-Ming
-
+--=20
+Shin'ichiro Kawasaki=
