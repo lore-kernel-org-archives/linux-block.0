@@ -2,293 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C0EC43334
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jul 2022 22:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC38C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jul 2022 23:05:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbiGDWKu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 18:10:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59036 "EHLO
+        id S230236AbiGDXE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 19:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiGDWKt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 18:10:49 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8C7DCD;
-        Mon,  4 Jul 2022 15:10:46 -0700 (PDT)
-Received: from localhost (mtl.collabora.ca [66.171.169.34])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: krisman)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id CAC4B660199B;
-        Mon,  4 Jul 2022 23:10:43 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1656972644;
-        bh=f7qX9aNdHMeGZi3tiyhpEyLoPPdnaIV/8y9fDqUo/yk=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=DU/88rlbrpqnAbvddnCzw1P0IdJDbM23mf8fyRc60h82Ny3UYojaYxyj/zeSczEQO
-         2pIu4uTXuForPLl6YnzNu8Xlb3mPCzldw9WUew0aXrzLqbNSPukds2V59o0vUQcoaO
-         7LoxIORbxaDRyvS9IYqEsS0qp+dstIduQ2Bcx6FjrfnvV2uPvgKkFOiDEXeWF2MsY8
-         L1tuDLjKCSOybO6nQuPnHhyFdPx36/6hXcN6SB5wGhl89CK5r622pKqKpGsFC01YFW
-         M8oY1i282i+SsZBOBgZ95a8+I1V2rCkRWVjYYbR8gU5XXuEGq2wKsLt4B5p4ODskao
-         3yziv5xB1+eGA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH V3 1/1] ublk: add io_uring based userspace block driver
-Organization: Collabora
-References: <20220628160807.148853-1-ming.lei@redhat.com>
-        <20220628160807.148853-2-ming.lei@redhat.com>
-Date:   Mon, 04 Jul 2022 18:10:40 -0400
-In-Reply-To: <20220628160807.148853-2-ming.lei@redhat.com> (Ming Lei's message
-        of "Wed, 29 Jun 2022 00:08:07 +0800")
-Message-ID: <8735fg4jhb.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        with ESMTP id S229641AbiGDXE7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 19:04:59 -0400
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6675EDEBE
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 16:04:57 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id q9so15144669wrd.8
+        for <linux-block@vger.kernel.org>; Mon, 04 Jul 2022 16:04:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3iPb1uwa1fPfHppzvLU9rHvh0oUB4hSiMAfifeyLX24=;
+        b=Izv4IW8AI1baYzJtFqu7A2Jnh9KTU0DtAakCSe49qYhAx5FR0dZfvYOLWG02sZKeFB
+         3xSUpeFR4zr5diRfKgJLNBfm8UEt8eIOQTHT7DjJl5UqvHbpYhPD07ER/mq4WnovLVMy
+         gBfgq4Mv7nvszl40CB0CuAso7Yizbjyn1r7LO+pFzCFoFkWk1YovdllXV7P56lswN/BA
+         jYYQnmLKQrpGaqA41FpSy7DjhgRRrbNohZ97YTkxuK7eG06kEIFEQL8Vod61tnfivQIf
+         PkSWHuIS7rCr6hJtAAWo3Ewtudn1PaD0jfwY4Ys4tJoVMbYRVenbEPGq95CbWQdYcPA9
+         1Ddw==
+X-Gm-Message-State: AJIora8wacVzammqDWZF+fmpCDnLfGZJ9vz7lmIiW0CpMMNB1NK+uihb
+        8jv9lVr0VfjGYDTmXxjLmmo=
+X-Google-Smtp-Source: AGRyM1vpSmj7Wkc4yoYCw/LOEo7TDl1/XOsTN1ySnSXCzObyaIfDpJxYLCBDixArytk+F9NvaSaC5w==
+X-Received: by 2002:adf:fb49:0:b0:21a:3ccc:fb77 with SMTP id c9-20020adffb49000000b0021a3cccfb77mr28242775wrs.280.1656975895818;
+        Mon, 04 Jul 2022 16:04:55 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id b6-20020adff906000000b0021d6a23fdf3sm4104231wrr.15.2022.07.04.16.04.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Jul 2022 16:04:55 -0700 (PDT)
+Message-ID: <2c42c70a-8eb4-a095-1d2b-139614ebd903@grimberg.me>
+Date:   Tue, 5 Jul 2022 02:04:53 +0300
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [bug report] nvme/rdma: nvme connect failed after offline one cpu
+ on host side
+Content-Language: en-US
+To:     Yi Zhang <yi.zhang@redhat.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <CAHj4cs9+F5F-v_2m=MYd8B=dXVgTBrtGikTTzfBU8_cX8fb0=g@mail.gmail.com>
+ <CAHj4cs_RUuiOw4pzSD+fv70p6izVMZ8z7mc+E0Kv0Rh8zriWCQ@mail.gmail.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <CAHj4cs_RUuiOw4pzSD+fv70p6izVMZ8z7mc+E0Kv0Rh8zriWCQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming Lei <ming.lei@redhat.com> writes:
 
-> This is the driver part of userspace block driver(ublk driver), the other
-> part is userspace daemon part(ublksrv)[1].
->
-> The two parts communicate by io_uring's IORING_OP_URING_CMD with one
-> shared cmd buffer for storing io command, and the buffer is read only for
-> ublksrv, each io command is indexed by io request tag directly, and
-> is written by ublk driver.
->
-> For example, when one READ io request is submitted to ublk block driver, ublk
-> driver stores the io command into cmd buffer first, then completes one
-> IORING_OP_URING_CMD for notifying ublksrv, and the URING_CMD is issued to
-> ublk driver beforehand by ublksrv for getting notification of any new io request,
-> and each URING_CMD is associated with one io request by tag.
->
-> After ublksrv gets the io command, it translates and handles the ublk io
-> request, such as, for the ublk-loop target, ublksrv translates the request
-> into same request on another file or disk, like the kernel loop block
-> driver. In ublksrv's implementation, the io is still handled by io_uring,
-> and share same ring with IORING_OP_URING_CMD command. When the target io
-> request is done, the same IORING_OP_URING_CMD is issued to ublk driver for
-> both committing io request result and getting future notification of new
-> io request.
->
-> Another thing done by ublk driver is to copy data between kernel io
-> request and ublksrv's io buffer:
->
-> 1) before ubsrv handles WRITE request, copy the request's data into
-> ublksrv's userspace io buffer, so that ublksrv can handle the write
-> request
->
-> 2) after ubsrv handles READ request, copy ublksrv's userspace io buffer
-> into this READ request, then ublk driver can complete the READ request
->
-> Zero copy may be switched if mm is ready to support it.
->
-> ublk driver doesn't handle any logic of the specific user space driver,
-> so it should be small/simple enough.
->
-> [1] ublksrv
->
-> https://github.com/ming1/ubdsrv
->
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> update the subject to better describe the issue:
+> 
+> So I tried this issue on one nvme/rdma environment, and it was also
+> reproducible, here are the steps:
+> 
+> # echo 0 >/sys/devices/system/cpu/cpu0/online
+> # dmesg | tail -10
+> [  781.577235] smpboot: CPU 0 is now offline
+> # nvme connect -t rdma -a 172.31.45.202 -s 4420 -n testnqn
+> Failed to write to /dev/nvme-fabrics: Invalid cross-device link
+> no controller found: failed to write to nvme-fabrics device
+> 
+> # dmesg
+> [  781.577235] smpboot: CPU 0 is now offline
+> [  799.471627] nvme nvme0: creating 39 I/O queues.
+> [  801.053782] nvme nvme0: mapped 39/0/0 default/read/poll queues.
+> [  801.064149] nvme nvme0: Connect command failed, error wo/DNR bit: -16402
+> [  801.073059] nvme nvme0: failed to connect queue: 1 ret=-18
 
-Hi Ming,
+This is because of blk_mq_alloc_request_hctx() and was raised before.
 
-A few comments inline:
+IIRC there was reluctance to make it allocate a request for an hctx even
+if its associated mapped cpu is offline.
 
+The latest attempt was from Ming:
+[PATCH V7 0/3] blk-mq: fix blk_mq_alloc_request_hctx
 
-> +#define UBLK_MINORS		(1U << MINORBITS)
-> +
-> +struct ublk_rq_data {
-> +	struct callback_head work;
-> +};
-> +
-> +/* io cmd is active: sqe cmd is received, and its cqe isn't done */
-> +#define UBLK_IO_FLAG_ACTIVE	0x01
-> +
-> +/*
-> + * FETCH io cmd is completed via cqe, and the io cmd is being handled by
-> + * ublksrv, and not committed yet
-> + */
-> +#define UBLK_IO_FLAG_OWNED_BY_SRV 0x02
-> +
-
-Minor nit: I wonder if the IO life cycle isn't better represented as a
-state machine than flags:
-
-enum {
-   UBLK_IO_FREE,
-   UBLK_IO_QUEUED
-   UBLK_IO_OWNED_BY_SRV
-   UBLK_IO_COMPLETED,
-   UBLK_IO_ABORTED,
-}
-
-Since currently, IO_FLAG_ACTIVE and IO_OWNED_BY_SRV should (almost) be
-mutually exclusive.
-
-
-> +
-> +static int ublk_ctrl_stop_dev(struct ublk_device *ub)
-> +{
-> +	ublk_stop_dev(ub);
-> +	cancel_work_sync(&ub->stop_work);
-> +	return 0;
-> +}
-> +
-> +static inline bool ublk_queue_ready(struct ublk_queue *ubq)
-> +{
-> +	return ubq->nr_io_ready == ubq->q_depth;
-> +}
-> +
-> +/* device can only be started after all IOs are ready */
-> +static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
-> +{
-> +	mutex_lock(&ub->mutex);
-> +	ubq->nr_io_ready++;
-
-I think this is still problematic for the case where a FETCH_IO is sent
-from a different thread than the one originally set in ubq_daemon
-(i.e. a userspace bug).  Since ubq_daemon is used to decide what task
-context will do the data copy, If an IO_FETCH_RQ is sent to the same queue
-from two threads, the data copy can happen in the context of the wrong
-task.  I'd suggest something like the check below at the beginning of
-mark_io_ready and a similar on for IO_COMMIT_AND_FETCH_RQ
-
-	mutex_lock(&ub->mutex);
-        if (ub->ubq_daemon && ub->ubq_daemon != current) {
-           mutex_unlock(&ub->mutex);
-           return -EINVAL;
-        }
-	ubq->nr_io_ready++;
-        ...
-> +	if (ublk_queue_ready(ubq)) {
-> +		ubq->ubq_daemon = current;
-> +		get_task_struct(ubq->ubq_daemon);
-> +		ub->nr_queues_ready++;
-> +	}
-> +	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
-> +		complete_all(&ub->completion);
-> +	mutex_unlock(&ub->mutex);
-> +}
-> +
-> +static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> +{
-> +	struct ublksrv_io_cmd *ub_cmd = (struct ublksrv_io_cmd *)cmd->cmd;
-> +	struct ublk_device *ub = cmd->file->private_data;
-> +	struct ublk_queue *ubq;
-> +	struct ublk_io *io;
-> +	u32 cmd_op = cmd->cmd_op;
-> +	unsigned tag = ub_cmd->tag;
-> +	int ret = -EINVAL;
-> +
-> +	pr_devel("%s: receieved: cmd op %d queue %d tag %d result %d\n",
-
-                         ^^^
-                         received
-
-
-> +			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
-> +			ub_cmd->result);
-> +
-> +	if (!(issue_flags & IO_URING_F_SQE128))
-> +		goto out;
-> +
-> +	ubq = ublk_get_queue(ub, ub_cmd->q_id);
-> +	if (!ubq || ub_cmd->q_id != ubq->q_id)
-
-q_id is coming from userspace and is used to access an array inside
-ublk_get_queue().  I think you need to ensure qid < ub->dev_info.nr_hw_queues
-before calling ublk_get_queue() to protect from a kernel bad memory
-access triggered by userspace.
-
-> +		goto out;
-> +
-> +	if (WARN_ON_ONCE(tag >= ubq->q_depth))
-
-Userspace shouldn't be able to easily trigger a WARN_ON.
-
-> +		goto out;
-> +
-> +	io = &ubq->ios[tag];
-> +
-> +	/* there is pending io cmd, something must be wrong */
-> +	if (io->flags & UBLK_IO_FLAG_ACTIVE) {b
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
-> +	switch (cmd_op) {
-> +	case UBLK_IO_FETCH_REQ:
-> +		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
-> +		if (WARN_ON_ONCE(ublk_queue_ready(ubq))) {
-
-Likewise, this shouldn't trigger a WARN_ON, IMO.
-
-> +			ret = -EBUSY;
-> +			goto out;
-> +		}
-> +		/*
-> +		 * The io is being handled by server, so COMMIT_RQ is expected
-> +		 * instead of FETCH_REQ
-> +		 */
-> +		if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
-> +			goto out;
-> +		/* FETCH_RQ has to provide IO buffer */
-> +		if (!ub_cmd->addr)
-> +			goto out;
-> +		io->cmd = cmd;
-> +		io->flags |= UBLK_IO_FLAG_ACTIVE;
-> +		io->addr = ub_cmd->addr;
-> +
-> +		ublk_mark_io_ready(ub, ubq);
-> +		break;
-> +	case UBLK_IO_COMMIT_AND_FETCH_REQ:
-> +		/* FETCH_RQ has to provide IO buffer */
-> +		if (!ub_cmd->addr)
-> +			goto out;
-> +		io->addr = ub_cmd->addr;
-> +		io->flags |= UBLK_IO_FLAG_ACTIVE;
-> +		fallthrough;
-> +	case UBLK_IO_COMMIT_REQ:
-> +		io->cmd = cmd;
-> +		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
-> +			goto out;
-> +		ublk_commit_completion(ub, ub_cmd);
-> +
-> +		/* COMMIT_REQ is supposed to not fetch req */
-
-I wonder if we could make it without IO_COMMIT_REQ.  Is it useful to be
-able to commit without fetching a new request?
-
-> +		if (cmd_op == UBLK_IO_COMMIT_REQ) {
-> +			ret = UBLK_IO_RES_OK;
-> +			goto out;
-> +		}
-> +		break;
-> +	default:
-> +		goto out;
-> +	}
-> +	return -EIOCBQUEUED;
-> +
-> + out:
-> +	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
-> +	io_uring_cmd_done(cmd, ret, 0);
-> +	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
-> +			__func__, cmd_op, tag, ret, io->flags);
-> +	return -EIOCBQUEUED;
-> +}
-> +
-
-Thanks!
-
--- 
-Gabriel Krisman Bertazi
+Don't know where that went tho...
