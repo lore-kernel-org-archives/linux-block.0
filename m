@@ -2,69 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DC3CCA47B
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 16:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B61C43334
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 16:15:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229801AbiGEQMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jul 2022 12:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
+        id S229877AbiGEQPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jul 2022 12:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiGEQMp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 12:12:45 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C89F1A3A5;
-        Tue,  5 Jul 2022 09:12:44 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id B875B67373; Tue,  5 Jul 2022 18:12:40 +0200 (CEST)
-Date:   Tue, 5 Jul 2022 18:12:40 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20220705161240.GB13721@lst.de>
-References: <20220615161233.17527-1-logang@deltatee.com> <20220615161233.17527-21-logang@deltatee.com> <20220629064854.GD17576@lst.de> <99242789-66a6-bbd2-b56a-e47891f4522e@deltatee.com> <20220629175906.GU23621@ziepe.ca> <20220705075108.GB17451@lst.de> <20220705135102.GE23621@ziepe.ca>
+        with ESMTP id S229702AbiGEQPA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 12:15:00 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944631D0C8;
+        Tue,  5 Jul 2022 09:14:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 57666B817FD;
+        Tue,  5 Jul 2022 16:14:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F0A4C341C7;
+        Tue,  5 Jul 2022 16:14:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657037696;
+        bh=jNGEpTpeSmqKpSVd5WTsEpzVFmUn2heCACZwWdaIfgM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=H6h6ccuuC/xuEPVerNLuBvvQicBkvX0E4bSEFrA7DZEq5CRrk4dD/7aHX4vzxnqql
+         HzGqwhMRniS+90r8IHAlRWYuHdG6Yzb2GI8GekG4B6gHJpd0d5wfTj+LQqGoJwtMc2
+         ruSOdsjh9VE8RrhN6qP4UiPZN/SOi2bhylzvt3tDkH4Jl7RDg1g+9+j5JVzBTo00RA
+         86Z1E6LYe4xKeO8ij9D3N6H7rMNOZj9sncCixEhy+BQJD6H+mlTY7fRFCkJgAbCe1s
+         gSiDDTrMrtrt2c7ug10M138EOnPjaEyDbc0VrfjRC8r/5oqEYMOuUoq2U3cts99jhQ
+         eQ0/nwNXEsecw==
+Date:   Tue, 5 Jul 2022 10:14:53 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 3/3] block: fix leaking page ref on truncated direct io
+Message-ID: <YsRjfWadmLrc4h7Y@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220705154506.2993693-1-kbusch@fb.com>
+ <20220705154506.2993693-3-kbusch@fb.com>
+ <YsReqmngB2MLvYrC@ZenIV>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220705135102.GE23621@ziepe.ca>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <YsReqmngB2MLvYrC@ZenIV>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 05, 2022 at 10:51:02AM -0300, Jason Gunthorpe wrote:
-> > In fact I'm not even sure this should be a character device, it seems
-> > to fit it way better with the PCI sysfs hierchacy, just like how we
-> > map MMIO resources, which these are anyway.  And once it is on sysfs
-> > we do have a uniqueue inode and need none of the pseudofs stuff, and
-> > don't need all the glue code in nvme either.
+On Tue, Jul 05, 2022 at 04:54:18PM +0100, Al Viro wrote:
+> On Tue, Jul 05, 2022 at 08:45:06AM -0700, Keith Busch wrote:
+> > From: Keith Busch <kbusch@kernel.org>
+> > 
+> > The size being added to a bio from an iov is aligned to a block size
+> > after the pages were gotten. If the new aligned size truncates the last
+> > page, its reference was being leaked. Ensure all pages that were not
+> > added to the bio have their reference released.
+> > 
+> > Since this essentially requires doing the same that bio_put_pages(), and
+> > there was only one caller for that function, this patch makes the
+> > put_page() loop common for everyone.
+> > 
+> > Fixes: b1a000d3b8ec5 ("block: relax direct io memory alignment")
+> > Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+> > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > 
-> Shouldn't there be an allocator here? It feels a bit weird that the
-> entire CMB is given to a single process, it is a sharable resource,
-> isn't it?
+> I still very much dislike this.  Background: iov_iter_get_pages should
+> advance the fucking iterator by the amount it has grabbed.  It's
+> really much cleaner that way.  So your round-down-then-fuck-off-if-zero
+> is going to be a clumsy.
 
-Making the entire area given by the device to the p2p allocator available
-to user space seems sensible to me.  That is what the current series does,
-and what a sysfs interface would do as well.
+I currently don't see a better way to do it, but I'll be happy if you come up
+with something.
+
+> Whatever; I can deal with that on top of your patch.  Where would you
+> have it go wrt tree?  Could you do a branch based at the last of your
+> original series, so that both Jens and I could pull from it?
+
+Branch pushed here:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/kbusch/linux.git/log/?h=alignment-fixes-rebased
+ 
+> One thing I would really like to avoid is having the entire #for-5.20/block
+> in ancestors of those commits; that would make for a monumental headache
+> with iov_iter series ;-/
+
+I'm sorry this is clashing with your work. Please let me know if there's
+anything else I can do to help.
