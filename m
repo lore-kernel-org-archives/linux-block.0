@@ -2,107 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAE1C43334
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 11:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A66C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 14:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232127AbiGELmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jul 2022 07:42:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51034 "EHLO
+        id S231682AbiGEOE1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jul 2022 10:04:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231528AbiGELmt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 07:42:49 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C4AB1704C;
-        Tue,  5 Jul 2022 04:42:47 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4LcgkS6gdlz6R4gT;
-        Tue,  5 Jul 2022 19:41:52 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDn79O0I8RiTYCaAQ--.21417S3;
-        Tue, 05 Jul 2022 19:42:45 +0800 (CST)
-Subject: Re: [PATCH -next v5 4/8] blk-throttle: fix io hung due to config
- updates
-To:     Jens Axboe <axboe@kernel.dk>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>, tj@kernel.org
-Cc:     ming.lei@redhat.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20220528064330.3471000-1-yukuai3@huawei.com>
- <20220528064330.3471000-5-yukuai3@huawei.com>
- <20220622172621.GA28246@blackbody.suse.cz>
- <f5165488-2461-8946-593f-14154e404850@huawei.com>
- <20220623162620.GB16004@blackbody.suse.cz>
- <75b3cdcc-1aa3-7259-4900-f09a2a081716@huawei.com>
- <7e14a11b-225e-13c4-35ff-762eafd20b70@kernel.dk>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <2b3d9f87-a5e2-75e0-b6bc-b8588ffec8cd@huaweicloud.com>
-Date:   Tue, 5 Jul 2022 19:42:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S231797AbiGEOEO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 10:04:14 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874893885
+        for <linux-block@vger.kernel.org>; Tue,  5 Jul 2022 06:51:04 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id he28so13691690qtb.13
+        for <linux-block@vger.kernel.org>; Tue, 05 Jul 2022 06:51:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=aXXqCO4eYEW7ihl1nkLRPlC9zfL+9NshKktoq8vfUqo=;
+        b=cDfN+bQczbdMb2leah0e/N44YCVFwIYBhS6uK2yvKAxV/VrnPHyc+hyWjNAaUg1PfL
+         kVcyYs7o5yY5RdPBbZ1Uy12G+gaOeGz7GPvyLzJpp7K+3AfzkxCHdfURo3kwOoQVGHsB
+         CgYT4nV/UQd7IrmpI3kE+7IkazWCK3VkAF/AOUDIg9vA84UJqgb+kOFEqstZkexFUiOW
+         t4uMNrJQXIZB/yeHytTtD8UoGO1NLRJoiAFfgFOvXzUbr67CkUchXLiOTkdsKPw7QrA5
+         0GMzIsPAHjhYnDnVJ1sJYE4BoAvaoerhS04hqo2hF28Qc0NfnJdWsyByjW3v2jzln7ab
+         r2qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aXXqCO4eYEW7ihl1nkLRPlC9zfL+9NshKktoq8vfUqo=;
+        b=4OD7Ga9Rc/j02j3zlG2Wc+zVb9JxNGW1GdUky9bPE/vlSgT/cjjd1cc9XQYsCu8M3a
+         9Io+iHPOt2/UNrayyBkqX7msT1BpeCjpQxueXA6nFafJPvrZpnoHI9eJ3acFvFwfT0sg
+         lQwYvVABAfi7Wbb7uq8oM+M7lVUoM012Q/P2xp4Ox46mXegVRIgI5iXvl1BoyRqQlTyz
+         NHkDLRYOLehDMjd/dL8qgfzO9VuiDquhEdRqBLqZkyJDcgCSmdnGhWWrBaX/qlPwbYKV
+         wDajMa0ZU4588wEHCW+9EmjqYo4Kh4CnhxgWVUAWySoBqc1KbueCEJ2bebo1MkGPDUiH
+         NYtA==
+X-Gm-Message-State: AJIora85rrNIILgNMwJ/6pj937Ux5qFKlM7MvhG2bheFo8W4+DjuUPQ7
+        iRC8e+DBvgBlt5c7fPUwXvNH2w==
+X-Google-Smtp-Source: AGRyM1tiQ1fXhmwo7QGB7JVrZMkNllap136sZt6NhU7vlDBe2k8co+srzJapO8MDIuFHQGrnlFDnUA==
+X-Received: by 2002:a05:6214:5005:b0:472:e6b0:1fb2 with SMTP id jo5-20020a056214500500b00472e6b01fb2mr12627413qvb.124.1657029063626;
+        Tue, 05 Jul 2022 06:51:03 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id f10-20020a05620a280a00b006a69d7f390csm27745242qkp.103.2022.07.05.06.51.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jul 2022 06:51:02 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1o8ixC-006VQ4-6E; Tue, 05 Jul 2022 10:51:02 -0300
+Date:   Tue, 5 Jul 2022 10:51:02 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Logan Gunthorpe <logang@deltatee.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+Message-ID: <20220705135102.GE23621@ziepe.ca>
+References: <20220615161233.17527-1-logang@deltatee.com>
+ <20220615161233.17527-21-logang@deltatee.com>
+ <20220629064854.GD17576@lst.de>
+ <99242789-66a6-bbd2-b56a-e47891f4522e@deltatee.com>
+ <20220629175906.GU23621@ziepe.ca>
+ <20220705075108.GB17451@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <7e14a11b-225e-13c4-35ff-762eafd20b70@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDn79O0I8RiTYCaAQ--.21417S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7trW3KFyUur15WF18CrW7urg_yoW8XrWxpr
-        W8Kay29anrJw1xJwsaqw1Iqw1Fqr12qrn8Wr1rtw1fZrn8Kr1Y9r40ga1ruF97Zr4rCan7
-        AwsYvrZ3Xr9Yy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AK
-        xVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-        AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWU
-        JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUot
-        CzDUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220705075108.GB17451@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/06/26 0:41, Jens Axboe 写道:
-> On 6/25/22 2:36 AM, Yu Kuai wrote:
->> ? 2022/06/24 0:26, Michal Koutn? ??:
->>> On Thu, Jun 23, 2022 at 08:27:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
->>>>> Here we may allow to dispatch a bio above current slice's
->>>>> calculate_bytes_allowed() if bytes_skipped is already >0.
->>>>
->>>> Hi, I don't expect that to happen. For example, if a bio is still
->>>> throttled, then old slice is keeped with proper 'bytes_skipped',
->>>> then new wait time is caculated based on (bio_size - bytes_skipped).
->>>>
->>>> After the bio is dispatched(I assum that other bios can't preempt),
->>>
->>> With this assumptions it adds up as you write. I believe we're in
->>> agreement.
->>>
->>> It's the same assumption I made below (FIFO everywhere, i.e. no
->>> reordering). So the discussed difference shouldn't really be negative
->>> (and if the assumption didn't hold, so the modular arithmetic yields
->>> corerct bytes_skipped value).
->> Yes, nice that we're in aggreement.
->>
->> I'll wait to see if Tejun has any suggestions.
-> 
-> I flushed more emails from spam again. Please stop using the buggy
-> huawei address until this gets resolved, your patches are getting lost
-> left and right and I don't have time to go hunting for emails.
-> 
+On Tue, Jul 05, 2022 at 09:51:08AM +0200, Christoph Hellwig wrote:
 
-Hi, Jens
+> But what also really matters here:  I don't want every user that
+> wants to be able to mmap a character device to do all this work.
+> The layering is simply wrong, it needs some character device
+> based helpers, not be open code everywhere.
 
-Can you please take a look if this patchset is ok?
+I think alot (all?) cases would be happy if the inode was 1:1 with the
+cdev struct device. I suppose the cdev code would still have to create
+pseudo fs, but at least that is hidden.
 
-https://lore.kernel.org/all/20220701093441.885741-1-yukuai1@huaweicloud.com/
+> In fact I'm not even sure this should be a character device, it seems
+> to fit it way better with the PCI sysfs hierchacy, just like how we
+> map MMIO resources, which these are anyway.  And once it is on sysfs
+> we do have a uniqueue inode and need none of the pseudofs stuff, and
+> don't need all the glue code in nvme either.
 
-This is sent by huaweicloud.com（DMARC record is empty).
+Shouldn't there be an allocator here? It feels a bit weird that the
+entire CMB is given to a single process, it is a sharable resource,
+isn't it?
 
-Thanks,
-Kuai
-
+Jason
