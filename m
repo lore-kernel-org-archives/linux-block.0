@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8425C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FC8C43334
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:55:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231923AbiGECzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 22:55:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38710 "EHLO
+        id S231878AbiGECz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 22:55:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231801AbiGECzB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:55:01 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D97CC8
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:55:00 -0700 (PDT)
+        with ESMTP id S230005AbiGECz4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:55:56 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FE97D6F
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:55:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1656989700; x=1688525700;
+  t=1656989755; x=1688525755;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=1y6wAypb2e7pXog7C7mFRuD3grgqGrQRog8SU6seADI=;
-  b=k4nW7oGv/KV/0JUcOVKjl+6sgyYhVu9dfc6twZ+evwwf2ExJFq6Hse3T
-   dWZpcKMwmECZNhuBUHBVBrXEIJAZCvwFw0Q7MzzdNGrj8JVYEqh4hpbpf
-   qjHamgzGGsusZtTCFmJsH4Js62yTFgoA9Mdoao5S6CTuG5eAff5Q4PcEF
-   G4iXN6vWD8fnuBHASsCug8wu6YbIEmqNsl9zj7Vd0pTmD9ZBWua61yb7l
-   eBsmMczK6UIUWJH8EHn4o9j/kb75HRpds05pOihUEXam/QGjyGvX697Ar
-   W+lWYyCLYndj+fICXnJBPl1Rg3apGDsxn/U3NfjPCMJDJ7LXBcDdCvq9A
-   w==;
+  bh=Y8lcgAPDEr2cqKnB0CgGnKFQmRqGD0zu4iwMGeDrRYo=;
+  b=Nno4SFxyG9Jb4jn7AF0ualk4zwJeRcLpDLYSQz4lCTMOAZ/oO4u8f6GF
+   BiAIdPUqgVNxbgVo/+zHzbohPDI/KNxNQNnTBwYd76eyMColulJPq78bE
+   lCGAxXXJf97osDwMGyiNR9vLYQPBGg/iA5V0uVAZnwArVtsBY16TGitdF
+   ra+Eejf0j1vAHp1c/oqyDQl3PQ4Q+5WaNSDa5crItk2JjkYbsK14sTVDX
+   itPgdcVT3YoXdVJP4hnll0cZCex5QctIHFkaCSeLvuV9+5JXCtDvheVOp
+   qr8HtBlan3udXIn4zjVv2H56lbTqx0URitN7gxxBHVcKeMrADcVVur2+e
+   A==;
 X-IronPort-AV: E=Sophos;i="5.92,245,1650902400"; 
-   d="scan'208";a="205520952"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2022 10:55:00 +0800
-IronPort-SDR: Pa9TF3ifpfgi4hN2mAKlSrjJMn8nbbNEapCu/InpTSrXQL1I4N2rDwEhCfhihAmcSQn6O8rrII
- DRdNmIUSkS6u0cYQVtIU5utuWn9ed755T9wqR0MfymmKfKVAxlGfN/zsT0LGb6V0XR8ZRpmp+K
- PJamsZv2+E1kYGLjL028mXuEwkK1I+79lY7IXHxDF730Rp6dBSe4GfFgY4UA3c3ySFqBl9qnhk
- dG2w7Qf1cY9JZADTeSr/G3kkTSZ2YRSUIvHoEn/YlEdLboNQo5TtIu0/HYA4gL3dWS5IRpSc8b
- huWpb0B2Uth0KGpAzg0oSzdN
+   d="scan'208";a="316926994"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2022 10:55:55 +0800
+IronPort-SDR: pM9IzpHIm8pNk28bPre6zQ5LbIkbuHx7wVXC1LS+3nl4hwaxOhyHp2i27iduTM2CECToZQixFc
+ IIcJuPmDIlXf54sAxc9TVdonIs9J/ps2Nmt+DLC9P8WlwZMDTmkfFeh99WjvKGoYZCxuB946YA
+ jIvyUw57EWXwjc0+dZAyNYfmTmjZUDtKvyGZOcHUypA8Hy7K7+2IUF2nIeyHvR6YYKWKLU694+
+ lH5Y/b5AwJMQqdm9UabjOvx8No5K/U2QdxFz0CwQj+mtEouTpYd7Y6PXnpR2oW7ozvWc8txtgS
+ i0SDc9qTXGT1+EkL1FIww+2O
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:16:51 -0700
-IronPort-SDR: 7zGPuKt6dmGLJDQKOdrysqcaf13oZ0FSSB+rZIoSHkZZzAy/czHcNwPyEfKe1Oy9DI2V04TGeQ
- mUsd8BNQGzd2RuR/Rxl23bQtnmlC9r2/fZuG733i2eRWVv4MIaarI2gx1lS5ohhYE1nSwubFvy
- MXgOgDf7068VTnQ3RolqQdpCfvm6zvHBzBSjufxWnylW28r8dTrNz4m+9FawESYmtzOIM67Z+i
- vO36AhQJyAcUJ34K8leJTb0TBogfVgdP0MtPd9xVHalKOdRz1L4jyd2ply/qOz4yEnkYBKRdzp
- AWM=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:13:14 -0700
+IronPort-SDR: eRcJKvFCZQr3JD94H1yOU/HwPGXQah1H15t/sWSI8HbpvdkndBu28SkzmzxWjqHVabZNyc9SA8
+ OdecFBzNU+u+nWK7pZw7eYldewasJdhsK6wjn0wTLfSs0/m7+6b/3yNWKv94ZyVnzPLIHuIr2m
+ xOWMb5zAvZ0affjynIC9/N1vQ4T7BRGBe5eRzsPNOg0yAOd3g+3a4zqRGQn5u0ew2nCRg4a+Wz
+ 07CM9I+CVC4RIg/xFLEMFfJyI/t6TyBtJWXdbmWkcBwQuNhJ/pHWJbdomga7PQogCTmXJWQaTw
+ Mh4=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:55:00 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:55:56 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LcS2W6bPqz1RwqM
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:54:59 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LcS3b0b8Kz1Rwnm
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:55:55 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -56,36 +56,36 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1656989699; x=1659581700; bh=1y6wAypb2e7pXog7C7mFRuD3grgqGrQRog8
-        SU6seADI=; b=ajSE4pQESPSpjDj92KGRa6Ue0IELvkjnqKFeY7hE9S1kmQo1tW0
-        LyBdWz0Kh9uY5d1m/VdR5V4c2ZHSZRz54+LP8bbt4v51rYCV2xMboLtELOMO1FZW
-        CFmOrLE/GSeukmUDozhBMlM5lpTcXWy0nFgn+asMpFwupUTet5EvQk4L0XZlxBQ5
-        5rhGgHRdDhYE/1zCdfin8lQGBxr2BdOezRRYrDFAmta/inoTT5/cHdu3yOf8+G3G
-        Tz4VEGLAP9YUs8Dza8UjPuHpHY0t3rBHpXAUXiDEhF2pgDf088hoiO/4iAZbkPWx
-        tYtGJlBkF44FcfsY1xFjy8ynO+hT6RL24yA==
+        1656989754; x=1659581755; bh=Y8lcgAPDEr2cqKnB0CgGnKFQmRqGD0zu4iw
+        MGeDrRYo=; b=DbdYtbrAPEpkNXcR5ct8xxau/LljEmNX1k6H3A6NYsEs9PJFhNp
+        anVlqxX3Fos6UX6AQWMUlmKU5XWXxyOaXirFSZjLLD0rSWik7E9Q0HpG0Wm2WKAO
+        ZZDcZVqmWMhB1skK9W6ITUs9faTytKvvxk5xftGbtwoxHZA8sZeMpJIVl9oKlWlY
+        0L9oJmLRZDgD7AGSw8l/1QC3G9QnMgU9e6nUiYSiFOME51yx5PX41lj/OCA5lNm6
+        1OpJssZ9DHlhBlN4GIzvnnJBCNoWGwsYqT67YpEhsqEAWzfYwF3BonbkEMls/GEe
+        GDJ59RSEh3+WNdUWjDZ0IUQauLNWoqQ0Rdw==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 28S5xU12CFWo for <linux-block@vger.kernel.org>;
-        Mon,  4 Jul 2022 19:54:59 -0700 (PDT)
+        with ESMTP id 3jYjHlcM9msy for <linux-block@vger.kernel.org>;
+        Mon,  4 Jul 2022 19:55:54 -0700 (PDT)
 Received: from [10.225.163.105] (unknown [10.225.163.105])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LcS2V2zgZz1RtVk;
-        Mon,  4 Jul 2022 19:54:58 -0700 (PDT)
-Message-ID: <535739b6-ee61-eccb-1dfc-3c57eab21cea@opensource.wdc.com>
-Date:   Tue, 5 Jul 2022 11:54:57 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LcS3Y3vhHz1RtVk;
+        Mon,  4 Jul 2022 19:55:53 -0700 (PDT)
+Message-ID: <98bebb07-d8a6-7a65-7843-874e62422fd6@opensource.wdc.com>
+Date:   Tue, 5 Jul 2022 11:55:52 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 15/17] dm-zoned: cleanup dmz_fixup_devices
+Subject: Re: [PATCH 16/17] block: remove blk_queue_zone_sectors
 Content-Language: en-US
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
 References: <20220704124500.155247-1-hch@lst.de>
- <20220704124500.155247-16-hch@lst.de>
+ <20220704124500.155247-17-hch@lst.de>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220704124500.155247-16-hch@lst.de>
+In-Reply-To: <20220704124500.155247-17-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -93,74 +93,115 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 7/4/22 21:44, Christoph Hellwig wrote:
-> Use the bdev based helpers where applicable and move the zoned_dev
-> into the scope where it is actually used.
+> Always use bdev_zone_sectors instead.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
 Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
 > ---
->  drivers/md/dm-zoned-target.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+>  drivers/md/dm-table.c  |  4 +---
+>  drivers/md/dm-zone.c   | 10 ++++++----
+>  include/linux/blkdev.h | 11 +++--------
+>  3 files changed, 10 insertions(+), 15 deletions(-)
 > 
-> diff --git a/drivers/md/dm-zoned-target.c b/drivers/md/dm-zoned-target.c
-> index 6ba6ef44b00e2..95b132b52f332 100644
-> --- a/drivers/md/dm-zoned-target.c
-> +++ b/drivers/md/dm-zoned-target.c
-> @@ -764,8 +764,7 @@ static void dmz_put_zoned_device(struct dm_target *ti)
->  static int dmz_fixup_devices(struct dm_target *ti)
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index b36b528e56cff..df904b7e95ce3 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -1620,13 +1620,11 @@ static bool dm_table_supports_zoned_model(struct dm_table *t,
+>  static int device_not_matches_zone_sectors(struct dm_target *ti, struct dm_dev *dev,
+>  					   sector_t start, sector_t len, void *data)
 >  {
->  	struct dmz_target *dmz = ti->private;
-> -	struct dmz_dev *reg_dev, *zoned_dev;
-> -	struct request_queue *q;
-> +	struct dmz_dev *reg_dev = NULL;
->  	sector_t zone_nr_sectors = 0;
->  	int i;
+> -	struct request_queue *q = bdev_get_queue(dev->bdev);
+>  	unsigned int *zone_sectors = data;
 >  
-> @@ -780,31 +779,32 @@ static int dmz_fixup_devices(struct dm_target *ti)
->  			return -EINVAL;
->  		}
->  		for (i = 1; i < dmz->nr_ddevs; i++) {
-> -			zoned_dev = &dmz->dev[i];
-> +			struct dmz_dev *zoned_dev = &dmz->dev[i];
-> +			struct block_device *bdev = zoned_dev->bdev;
-> +
->  			if (zoned_dev->flags & DMZ_BDEV_REGULAR) {
->  				ti->error = "Secondary disk is not a zoned device";
->  				return -EINVAL;
->  			}
-> -			q = bdev_get_queue(zoned_dev->bdev);
->  			if (zone_nr_sectors &&
-> -			    zone_nr_sectors != blk_queue_zone_sectors(q)) {
-> +			    zone_nr_sectors != bdev_zone_sectors(bdev)) {
->  				ti->error = "Zone nr sectors mismatch";
->  				return -EINVAL;
->  			}
-> -			zone_nr_sectors = blk_queue_zone_sectors(q);
-> +			zone_nr_sectors = bdev_zone_sectors(bdev);
->  			zoned_dev->zone_nr_sectors = zone_nr_sectors;
-> -			zoned_dev->nr_zones = bdev_nr_zones(zoned_dev->bdev);
-> +			zoned_dev->nr_zones = bdev_nr_zones(bdev);
->  		}
->  	} else {
-> -		reg_dev = NULL;
-> -		zoned_dev = &dmz->dev[0];
-> +		struct dmz_dev *zoned_dev = &dmz->dev[0];
-> +		struct block_device *bdev = zoned_dev->bdev;
-> +
->  		if (zoned_dev->flags & DMZ_BDEV_REGULAR) {
->  			ti->error = "Disk is not a zoned device";
->  			return -EINVAL;
->  		}
-> -		q = bdev_get_queue(zoned_dev->bdev);
-> -		zoned_dev->zone_nr_sectors = blk_queue_zone_sectors(q);
-> -		zoned_dev->nr_zones = bdev_nr_zones(zoned_dev->bdev);
-> +		zoned_dev->zone_nr_sectors = bdev_zone_sectors(bdev);
-> +		zoned_dev->nr_zones = bdev_nr_zones(bdev);
+>  	if (!bdev_is_zoned(dev->bdev))
+>  		return 0;
+> -
+> -	return blk_queue_zone_sectors(q) != *zone_sectors;
+> +	return bdev_zone_sectors(dev->bdev) != *zone_sectors;
+>  }
+>  
+>  /*
+> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+> index 6d105abe12415..842c31019b513 100644
+> --- a/drivers/md/dm-zone.c
+> +++ b/drivers/md/dm-zone.c
+> @@ -334,7 +334,7 @@ static int dm_update_zone_wp_offset_cb(struct blk_zone *zone, unsigned int idx,
+>  static int dm_update_zone_wp_offset(struct mapped_device *md, unsigned int zno,
+>  				    unsigned int *wp_ofst)
+>  {
+> -	sector_t sector = zno * blk_queue_zone_sectors(md->queue);
+> +	sector_t sector = zno * bdev_zone_sectors(md->disk->part0);
+>  	unsigned int noio_flag;
+>  	struct dm_table *t;
+>  	int srcu_idx, ret;
+> @@ -373,7 +373,7 @@ struct orig_bio_details {
+>  static bool dm_zone_map_bio_begin(struct mapped_device *md,
+>  				  unsigned int zno, struct bio *clone)
+>  {
+> -	sector_t zsectors = blk_queue_zone_sectors(md->queue);
+> +	sector_t zsectors = bdev_zone_sectors(md->disk->part0);
+>  	unsigned int zwp_offset = READ_ONCE(md->zwp_offset[zno]);
+>  
+>  	/*
+> @@ -443,7 +443,7 @@ static blk_status_t dm_zone_map_bio_end(struct mapped_device *md, unsigned int z
+>  		return BLK_STS_OK;
+>  	case REQ_OP_ZONE_FINISH:
+>  		WRITE_ONCE(md->zwp_offset[zno],
+> -			   blk_queue_zone_sectors(md->queue));
+> +			   bdev_zone_sectors(md->disk->part0));
+>  		return BLK_STS_OK;
+>  	case REQ_OP_WRITE_ZEROES:
+>  	case REQ_OP_WRITE:
+> @@ -593,6 +593,7 @@ void dm_zone_endio(struct dm_io *io, struct bio *clone)
+>  {
+>  	struct mapped_device *md = io->md;
+>  	struct request_queue *q = md->queue;
+> +	struct gendisk *disk = md->disk;
+>  	struct bio *orig_bio = io->orig_bio;
+>  	unsigned int zwp_offset;
+>  	unsigned int zno;
+> @@ -608,7 +609,8 @@ void dm_zone_endio(struct dm_io *io, struct bio *clone)
+>  		 */
+>  		if (clone->bi_status == BLK_STS_OK &&
+>  		    bio_op(clone) == REQ_OP_ZONE_APPEND) {
+> -			sector_t mask = (sector_t)blk_queue_zone_sectors(q) - 1;
+> +			sector_t mask =
+> +				(sector_t)bdev_zone_sectors(disk->part0) - 1;
+>  
+>  			orig_bio->bi_iter.bi_sector +=
+>  				clone->bi_iter.bi_sector & mask;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 183aa83143fd2..f1eca3f5610eb 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -669,11 +669,6 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
 >  	}
+>  }
 >  
->  	if (reg_dev) {
+> -static inline sector_t blk_queue_zone_sectors(struct request_queue *q)
+> -{
+> -	return blk_queue_is_zoned(q) ? q->limits.chunk_sectors : 0;
+> -}
+> -
+>  #ifdef CONFIG_BLK_DEV_ZONED
+>  static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
+>  {
+> @@ -1312,9 +1307,9 @@ static inline sector_t bdev_zone_sectors(struct block_device *bdev)
+>  {
+>  	struct request_queue *q = bdev_get_queue(bdev);
+>  
+> -	if (q)
+> -		return blk_queue_zone_sectors(q);
+> -	return 0;
+> +	if (!blk_queue_is_zoned(q))
+> +		return 0;
+> +	return q->limits.chunk_sectors;
+>  }
+>  
+>  static inline int queue_dma_alignment(const struct request_queue *q)
 
 
 -- 
