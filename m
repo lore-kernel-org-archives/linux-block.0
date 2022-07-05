@@ -2,118 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA1CBC43334
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 15:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A3CCC43334
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 15:55:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232568AbiGEPrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jul 2022 11:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41884 "EHLO
+        id S232841AbiGEPzC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jul 2022 11:55:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232415AbiGEPqP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 11:46:15 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51A41C10B
-        for <linux-block@vger.kernel.org>; Tue,  5 Jul 2022 08:46:08 -0700 (PDT)
-Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 265FDkhp013675
-        for <linux-block@vger.kernel.org>; Tue, 5 Jul 2022 08:46:08 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=facebook; bh=xFgG8Xc6eIABxXYm/O+u+rzOX/O2jGRK+u7+j6UP5fA=;
- b=N1oQETHku8zOM6DPcOmWmGdOLL8ChDBXFKdPJuwrYDUE0cjPmCl0wbo/i2QPucaMtHI3
- DcZYfFkSl9V/SxvqYAw3MK6yCpMUoHRfwtw66LujtT+TyhbctSVOvKpQLK2d8QjDejpn
- +UjaQIHyKnqBrBHUTi6MmI26wtdb1AklnUs= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3h2hbqrwe6-8
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 05 Jul 2022 08:46:08 -0700
-Received: from snc-exhub201.TheFacebook.com (2620:10d:c085:21d::7) by
- snc-exhub101.TheFacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Tue, 5 Jul 2022 08:46:01 -0700
-Received: from twshared18317.08.ash9.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:21d::7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Tue, 5 Jul 2022 08:45:33 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 407A55C1F910; Tue,  5 Jul 2022 08:45:10 -0700 (PDT)
-From:   Keith Busch <kbusch@fb.com>
-To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
-        "Keith Busch" <kbusch@kernel.org>
-Subject: [PATCH 1/3] block: ensure iov_iter advances for added pages
-Date:   Tue, 5 Jul 2022 08:45:04 -0700
-Message-ID: <20220705154506.2993693-1-kbusch@fb.com>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S232929AbiGEPyt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 11:54:49 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7D7110B;
+        Tue,  5 Jul 2022 08:54:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=KnteNFVb4hLEYiZyDI8cVxZPIL4Feew3hWjDB9DFLpE=; b=hhcpPpPkvtpvpUJOzPDO+fyAPh
+        bxejUaXJd6KqIgbbpg7oM3eEAjsCuAakHKoJ5Akem8fJqRf6xHQZNVvxOYK6c7bXYdMrq7PJmfJrt
+        5v3mz/Hcg1m0J4H9bI6W672QPpWsh9Jas1Y69Q/ggQheKU2zXI9Mw0cEkesLUqLgFHcG8aknHFzAL
+        qeFmkjn9oWxrbK5sp4EKtqMz5saqPOKJtNgf2SMswxWD3v4XU+pQNb0SzOYBr//qHmP8HSO8Dnp49
+        F7UmL+ERiYC4Bo6+u/gQxEvPgJkckVF6uxJVpuPdVhYtbfhAAW5jcuNrXtOfUrOeeRL8hbJBGz8+p
+        eztBOkYg==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.95 #2 (Red Hat Linux))
+        id 1o8ksU-008R3E-6r;
+        Tue, 05 Jul 2022 15:54:18 +0000
+Date:   Tue, 5 Jul 2022 16:54:18 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Keith Busch <kbusch@fb.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH 3/3] block: fix leaking page ref on truncated direct io
+Message-ID: <YsReqmngB2MLvYrC@ZenIV>
+References: <20220705154506.2993693-1-kbusch@fb.com>
+ <20220705154506.2993693-3-kbusch@fb.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: QqOayhV1a9PZ2y1G69FPZNNgOvTgPpWM
-X-Proofpoint-ORIG-GUID: QqOayhV1a9PZ2y1G69FPZNNgOvTgPpWM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-05_12,2022-06-28_01,2022-06-22_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220705154506.2993693-3-kbusch@fb.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On Tue, Jul 05, 2022 at 08:45:06AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The size being added to a bio from an iov is aligned to a block size
+> after the pages were gotten. If the new aligned size truncates the last
+> page, its reference was being leaked. Ensure all pages that were not
+> added to the bio have their reference released.
+> 
+> Since this essentially requires doing the same that bio_put_pages(), and
+> there was only one caller for that function, this patch makes the
+> put_page() loop common for everyone.
+> 
+> Fixes: b1a000d3b8ec5 ("block: relax direct io memory alignment")
+> Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
 
-There are cases where a bio may not accept additional pages, and the iov
-needs to advance to the last data length that was accepted. The zone
-append used to handle this correctly, but was inadvertently broken when
-the setup was made common with the normal r/w case.
+I still very much dislike this.  Background: iov_iter_get_pages should
+advance the fucking iterator by the amount it has grabbed.  It's
+really much cleaner that way.  So your round-down-then-fuck-off-if-zero
+is going to be a clumsy.
 
-Fixes: 576ed9135489c ("block: use bio_add_page in bio_iov_iter_get_pages"=
-)
-Fixes: c58c0074c54c2 ("block/bio: remove duplicate append pages code")
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/bio.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Whatever; I can deal with that on top of your patch.  Where would you
+have it go wrt tree?  Could you do a branch based at the last of your
+original series, so that both Jens and I could pull from it?
 
-diff --git a/block/bio.c b/block/bio.c
-index 933ea3210954..fdd58461b78f 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1211,6 +1211,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
- 	ssize_t size, left;
- 	unsigned len, i;
- 	size_t offset;
-+	int ret =3D 0;
-=20
- 	/*
- 	 * Move page array up in the allocated memory for the bio vecs as far a=
-s
-@@ -1235,7 +1236,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
-=20
- 	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
- 		struct page *page =3D pages[i];
--		int ret;
-=20
- 		len =3D min_t(size_t, PAGE_SIZE - offset, left);
- 		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
-@@ -1246,13 +1246,13 @@ static int __bio_iov_iter_get_pages(struct bio *b=
-io, struct iov_iter *iter)
-=20
- 		if (ret) {
- 			bio_put_pages(pages + i, left, offset);
--			return ret;
-+			break;
- 		}
- 		offset =3D 0;
- 	}
-=20
--	iov_iter_advance(iter, size);
--	return 0;
-+	iov_iter_advance(iter, size - left);
-+	return ret;
- }
-=20
- /**
---=20
-2.30.2
-
+One thing I would really like to avoid is having the entire #for-5.20/block
+in ancestors of those commits; that would make for a monumental headache
+with iov_iter series ;-/
