@@ -2,109 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0CCC43334
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 17:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9236FCCA47F
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 17:57:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233293AbiGERmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jul 2022 13:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33832 "EHLO
+        id S229727AbiGER5r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jul 2022 13:57:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232949AbiGERmj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 13:42:39 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D33119006;
-        Tue,  5 Jul 2022 10:42:38 -0700 (PDT)
+        with ESMTP id S229673AbiGER5q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 13:57:46 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7351BE86;
+        Tue,  5 Jul 2022 10:57:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CBCCAB81887;
-        Tue,  5 Jul 2022 17:42:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4620C341C7;
-        Tue,  5 Jul 2022 17:42:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1657042955;
-        bh=18T9JrVrQmGUhIeB/JuQTrGy9yUM/iGt2yUQiwv239s=;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 81FDBB81887;
+        Tue,  5 Jul 2022 17:57:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23DDEC341C7;
+        Tue,  5 Jul 2022 17:57:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657043862;
+        bh=2n0MdI/phNcEmcix0C+izbdt51lZOoB1FibJBB1glbE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=E+wsESQzjBq0Jm7GRcNunkZNg/B9u9pWxluE8Hvyw5c8ngmjtRMeYZplVgH18CEMg
-         +CWBPqMRpf6vtqHc8uVHP4AxL8xobnRkwM4XtCynMLc+/O8b28/frnTwxcKPJt8aG2
-         gLkaIa6aOTwyOr/X8xpnr7Wu6h8BVukKTtB9ibvU=
-Date:   Tue, 5 Jul 2022 19:42:32 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <YsR4CNDgtt4JWonv@kroah.com>
-References: <20220629175906.GU23621@ziepe.ca>
- <20220705075108.GB17451@lst.de>
- <20220705135102.GE23621@ziepe.ca>
- <20220705161240.GB13721@lst.de>
- <a509b13c-244b-23fc-f989-339750a733a5@deltatee.com>
- <20220705164315.GB14484@lst.de>
- <acb91f37-0470-8ce4-19e4-426903cbc3a1@deltatee.com>
- <20220705165039.GB14566@lst.de>
- <YsRzNqmZYlgkL7fI@kroah.com>
- <1bd43ef7-0403-bd25-087c-d54d5af677e4@deltatee.com>
+        b=WPWuUIYH2m+thvDdaR7J1//HnOGKOFxxB4NJp6pNe6vMzogtjLZRoFBtxO5LlMNeI
+         yWudYsaRp5DLrK6fJ3hIMQYHCgLjjZ5MxX3p6AyAqdxBjjw/h26TTzcR/Pc8ewwHf7
+         QMwbCfdPkWn2iRfmb6GBERZ1Soz212xPz3jM9A45G2MEhQieqAKfyzJ4nbOrHPEOTO
+         N/cG0O5LyrMmRlQhtqIXscvzDi/zOUEEQMIE8bYNhu2xUZunJpe+x4Vs289Np/BdU0
+         uO/tchQgfmJcBt4F7r3FfIciHf3T2qrWT6ajp55T795YNQmliXF17uGnd3wfJMeH/3
+         7Zg6dyGWPk/BA==
+Date:   Tue, 5 Jul 2022 10:57:41 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "song@kernel.org" <song@kernel.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: Re: [PATCH 1/6] block: add support for REQ_OP_VERIFY
+Message-ID: <YsR7lbTfBH0dUMMg@magnolia>
+References: <20220630091406.19624-1-kch@nvidia.com>
+ <20220630091406.19624-2-kch@nvidia.com>
+ <Yr3M0W5T/CwMtvte@magnolia>
+ <476112fe-c01e-dbaa-793d-19d3ec94c6ef@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1bd43ef7-0403-bd25-087c-d54d5af677e4@deltatee.com>
+In-Reply-To: <476112fe-c01e-dbaa-793d-19d3ec94c6ef@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 05, 2022 at 11:32:23AM -0600, Logan Gunthorpe wrote:
+On Tue, Jul 05, 2022 at 04:50:33PM +0000, Chaitanya Kulkarni wrote:
+> Darrik,
 > 
+> Thanks for the reply.
 > 
-> On 2022-07-05 11:21, Greg Kroah-Hartman wrote:
-> > On Tue, Jul 05, 2022 at 06:50:39PM +0200, Christoph Hellwig wrote:
-> >> [note for the newcomers, this is about allowing mmap()ing the PCIe
-> >> P2P memory from the generic PCI P2P code through sysfs, and more
-> >> importantly how to revoke it on device removal]
+> >> +
+> >> +/**
+> >> + * __blkdev_issue_verify - generate number of verify operations
+> >> + * @bdev:	blockdev to issue
+> >> + * @sector:	start sector
+> >> + * @nr_sects:	number of sectors to verify
+> >> + * @gfp_mask:	memory allocation flags (for bio_alloc())
+> >> + * @biop:	pointer to anchor bio
+> >> + *
+> >> + * Description:
+> >> + *  Verify a block range using hardware offload.
+> >> + *
+> >> + * The function will emulate verify operation if no explicit hardware
+> >> + * offloading for verifying is provided.
+> >> + */
+> >> +int __blkdev_issue_verify(struct block_device *bdev, sector_t sector,
+> >> +		sector_t nr_sects, gfp_t gfp_mask, struct bio **biop)
+> >> +{
+> >> +	unsigned int max_verify_sectors = bdev_verify_sectors(bdev);
+> >> +	sector_t min_io_sect = (BIO_MAX_VECS << PAGE_SHIFT) >> 9;
+> >> +	struct bio *bio = *biop;
+> >> +	sector_t curr_sects;
+> >> +	char *buf;
+> >> +
+> >> +	if (!max_verify_sectors) {
+> >> +		int ret = 0;
+> >> +
+> >> +		buf = kzalloc(min_io_sect << 9, GFP_KERNEL);
 > > 
-> > We allow mmap on PCIe config space today, right?  Why is this different
-> > from what pci_create_legacy_files() does today?
+> > k*z*alloc?  I don't think you need to zero a buffer that we're reading
+> > into, right?
 > > 
-> >> On Tue, Jul 05, 2022 at 10:44:49AM -0600, Logan Gunthorpe wrote:
-> >>> We might be able to. I'm not sure. I'll have to figure out how to find
-> >>> that inode from the p2pdma code. I haven't found an obvious interface to
-> >>> do that.
-> >>
-> >> I think the right way to approach this would be a new sysfs API
-> >> that internally calls unmap_mapping_range internally instead of
-> >> exposing the inode. I suspect that might actually be the right thing
-> >> to do for iomem_inode as well.
-> > 
-> > Why do we need something new and how is this any different from the PCI
-> > binary files I mention above?  We have supported PCI hotplug for a very
-> > long time, do the current PCI binary sysfs files not work properly with
-> > mmap and removing a device?
+> > --D
 > 
-> The P2PDMA code allocates and hands out struct pages to userspace that
-> are backed with ZONE_DEVICE memory from a device's BAR. This is quite
-> different from the existing binary files mentioned above which neither
-> support struct pages nor allocation.
+> we don't need to but I guess it is just a habit to make sure alloced
+> buffer is zeored, should I remove it for any particular reason ?
 
-Why would you want to do this through a sysfs interface?  that feels
-horrid...
+What's the point in wasting CPU time zeroing a buffer if you're just
+going to DMA into it?
 
+--D
+
+> -ck
+> 
+> 
