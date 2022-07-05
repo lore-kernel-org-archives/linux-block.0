@@ -2,734 +2,243 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577C8C43334
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67883C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 03:11:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234730AbiGEC7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 22:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41694 "EHLO
+        id S233452AbiGEDLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 23:11:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234683AbiGEC7L (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:59:11 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9FA64D9
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1656989949; x=1688525949;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=c1YXb43PV8tICjE/oGwgecht68Scc3uuiii3avgEI3c=;
-  b=NCg4pK5K/cH4UsRhNySjgloMJZknWPj09XptAVL5epFef6IqoIcu+OAo
-   PalMm0VSxDJ7ojyxSHwjNU4YmZv4lKSLt6xwrBf/RVuL8hIwFPUZXDknu
-   J3LyE/iicA2yXBuDkJlsW5PYLz9MYLRXzwtg+UviA+nweZcAElOhqI5lT
-   zckmYIegA+d4jsIijDc0HWP+UHoQFciL5zifbwBjNJwvy4psAjD9v2zLK
-   y9d3i7qqpaakTkCMj1v2Nq6ADlrEsvIpuAP1p55/S7TjaefKFtp8fxnPt
-   m7OpWR1Kr2qgPuwHDNatRq8w/hI8iJix/VGgPChSRLSblHtykjxJ3Qm5I
-   w==;
-X-IronPort-AV: E=Sophos;i="5.92,245,1650902400"; 
-   d="scan'208";a="209701493"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2022 10:59:09 +0800
-IronPort-SDR: X7FIkDPpGWUctdHWg77MTR1GokyQ7LhgihFmY4mYuzTqzDwkzGS8F1A1+TgX3V+Qw3nswB8dYQ
- tZpaecXhE5s99W/vZOKtPjy78QNvXxvx05cRwFVTitC2b6R9fnSgW7Tg48SboAuT8h/up0KNLG
- U8oPHiAHBobviz51y5y7c9x3LYRj7HzAp8VBrUDK9Jvv0LKgZJFNfv83Cpx7giigjbJUlNGjyP
- 8LMK4S8NPftAwe4qThH96OvAINExL7LSdZmsIjHiDsFS2WFQGcLyMWf8OXF14aqWnZbXnGTiUa
- bkHIPnWxrzUWccgZj6AUFacD
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:21:01 -0700
-IronPort-SDR: zq2OufcnHpja6khE6BlazMrmu/ehnTHuEsBNckImIUPb+BCrHdI1lDKFw37GJ32y7AfoqTbU/7
- Exh0PzYPRSmAWWH8QAAoHfEVo8kUeOjacIzOhMGdCGe29Zsh0Ee9eUwqetqBtCWojE6K4H+6aA
- cs45J/6WEbuYbenmdW6yLG4ZIuMCnTKao0P40Nhk1SrjXexbJtjAW8gn2+0gvbVV4L1y6KcJqh
- q/gKdojDVb1BkwKDWNrhX/HFF0+NiQ7zNo7hyDpfHRJKu8ZIsf6l4NNg+2mmj1z0kRDx5NYvNJ
- IwA=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:59:10 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LcS7K0GXgz1RwqM
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:59:09 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1656989946; x=1659581947; bh=c1YXb43PV8tICjE/oGwgecht68Scc3uuiii
-        3avgEI3c=; b=jCQHd/vyznsRuD2EQWTN6GwJ1ieRNmagYKZFcmfQHInelsrCcgz
-        QKZiO2B74cOXjLXPqZo/zsqdKPVuVUsxQDnaCtdzENI0BJUyEmGVzRW1xzv0hamo
-        Ny174NxnQVkvGoKf1cj28KsTDimp0FdBiTA4gvDYlNNhMt2j0YSdgD2PN30rkqo7
-        AJyHgV5axF9xHitZYqw6itv5OV7YHzkhByE+0a+Pjn/Jjyt1yYSCX1DL+HIAU6/u
-        a1opUueK9WiriE0qTc2iXlv4i8WCAirNmxLbaQ+mV7dLWHc36Soj/KhMKmnbB6Sp
-        y2bqleXozzIOU8kGI/TltOF+uIbP4kDEHZA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id OcAj63YuCtGO for <linux-block@vger.kernel.org>;
-        Mon,  4 Jul 2022 19:59:06 -0700 (PDT)
-Received: from [10.225.163.105] (unknown [10.225.163.105])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LcS7F5f7pz1RtVk;
-        Mon,  4 Jul 2022 19:59:05 -0700 (PDT)
-Message-ID: <1b7c08a5-f0e0-f5cb-7575-e9d3b79fec99@opensource.wdc.com>
-Date:   Tue, 5 Jul 2022 11:59:04 +0900
+        with ESMTP id S230005AbiGEDLm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 23:11:42 -0400
+Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0D3F101DB;
+        Mon,  4 Jul 2022 20:11:40 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-2-147.pa.nsw.optusnet.com.au [49.181.2.147])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 04E2A5ED0D4;
+        Tue,  5 Jul 2022 13:11:35 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1o8YyL-00EgSt-PA; Tue, 05 Jul 2022 13:11:33 +1000
+Date:   Tue, 5 Jul 2022 13:11:33 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Theodore Tso <tytso@mit.edu>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <20220705031133.GD3237952@dread.disaster.area>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+ <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
+ <20220704032516.GC3237952@dread.disaster.area>
+ <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 17/17] block: move zone related fields to struct gendisk
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
-References: <20220704124500.155247-1-hch@lst.de>
- <20220704124500.155247-18-hch@lst.de>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220704124500.155247-18-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=OJNEYQWB c=1 sm=1 tr=0 ts=62c3abec
+        a=ivVLWpVy4j68lT4lJFbQgw==:117 a=ivVLWpVy4j68lT4lJFbQgw==:17
+        a=kj9zAlcOel0A:10 a=RgO8CyIxsXoA:10 a=7-415B0cAAAA:8 a=N54-gffFAAAA:8
+        a=NEAV23lmAAAA:8 a=OFeBVxtZYzNL8miIrAsA:9 a=CjuIK1q_8ugA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22 a=6l0D2HzqY3Epnrm8mE3f:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/4/22 21:45, Christoph Hellwig wrote:
-> Move the zone related fields that are currently stored in
-> struct request_queue to struct gendisk as these are part of the highlevel
-> block layer API and are only used for non-passthrough I/O that requires
-> the gendisk.
+On Mon, Jul 04, 2022 at 10:58:22AM +0300, Amir Goldstein wrote:
+> On Mon, Jul 4, 2022 at 6:25 AM Dave Chinner <david@fromorbit.com> wrote:
+> >
+> > On Sun, Jul 03, 2022 at 08:56:54AM +0300, Amir Goldstein wrote:
+> > > On Sun, Jul 3, 2022 at 12:48 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> > > >
+> > > > On 5/18/22 20:07, Luis Chamberlain wrote:
+> > > > > I've been promoting the idea that running fstests once is nice,
+> > > > > but things get interesting if you try to run fstests multiple
+> > > > > times until a failure is found. It turns out at least kdevops has
+> > > > > found tests which fail with a failure rate of typically 1/2 to
+> > > > > 1/30 average failure rate. That is 1/2 means a failure can happen
+> > > > > 50% of the time, whereas 1/30 means it takes 30 runs to find the
+> > > > > failure.
+> > > > >
+> > > > > I have tried my best to annotate failure rates when I know what
+> > > > > they might be on the test expunge list, as an example:
+> > > > >
+> > > > > workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
+> > > > >
+> > > > > The term "failure rate 1/15" is 16 characters long, so I'd like
+> > > > > to propose to standardize a way to represent this. How about
+> > > > >
+> > > > > generic/530 # F:1/15
+> > > > >
+> > > > > Then we could extend the definition. F being current estimate, and this
+> > > > > can be just how long it took to find the first failure. A more valuable
+> > > > > figure would be failure rate avarage, so running the test multiple
+> > > > > times, say 10, to see what the failure rate is and then averaging the
+> > > > > failure out. So this could be a more accurate representation. For this
+> > > > > how about:
+> > > > >
+> > > > > generic/530 # FA:1/15
+> > > > >
+> > > > > This would mean on average there failure rate has been found to be about
+> > > > > 1/15, and this was determined based on 10 runs.
+> > > > >
+> > > > > We should also go extend check for fstests/blktests to run a test
+> > > > > until a failure is found and report back the number of successes.
+> > > > >
+> > > > > Thoughts?
+> > > > >
+> > > > > Note: yes failure rates lower than 1/100 do exist but they are rare
+> > > > > creatures. I love them though as my experience shows so far that they
+> > > > > uncover hidden bones in the closet, and they they make take months and
+> > > > > a lot of eyeballs to resolve.
+> > > >
+> > > > I strongly disagree with annotating tests with failure rates. My opinion
+> > > > is that on a given test setup a test either should pass 100% of the time
+> > > > or fail 100% of the time. If a test passes in one run and fails in
+> > > > another run that either indicates a bug in the test or a bug in the
+> > > > software that is being tested. Examples of behaviors that can cause
+> > > > tests to behave unpredictably are use-after-free bugs and race
+> > > > conditions. How likely it is to trigger such behavior depends on a
+> > > > number of factors. This could even depend on external factors like which
+> > > > network packets are received from other systems. I do not expect that
+> > > > flaky tests have an exact failure rate. Hence my opinion that flaky
+> > > > tests are not useful and also that it is not useful to annotate flaky
+> > > > tests with a failure rate. If a test is flaky I think that the root
+> > > > cause of the flakiness must be determined and fixed.
+> > > >
+> > >
+> > > That is true for some use cases, but unfortunately, the flaky
+> > > fstests are way too valuable and too hard to replace or improve,
+> > > so practically, fs developers have to run them, but not everyone does.
+> >
+> > Everyone *should* be running them. They find *new bugs*, and it
+> > doesn't matter how old the kernel is. e.g. if you're backporting XFS
+> > log changes and you aren't running the "flakey" recoveryloop group
+> > tests, then you are *not testing failure handling log recovery
+> > sufficiently*.
+> >
+> > Where do you draw the line? recvoeryloop tests that shutdown and
+> > recover the filesystem will find bugs, they are guaranteed to be
+> > flakey, and they are *absolutely necessary* to be run because they
+> > are the only tests that exercise that critical filesysetm crash
+> > recovery functionality.
+> >
+> > What do we actually gain by excluding these "non-deterministic"
+> > tests from automated QA environments?
+> >
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Automated QA environment is a broad term.
+> We all have automated QA environments.
+> But there is a specific class of automated test env, such as CI build bots
+> that do not tolerate human intervention.
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Those environments need curated test lists because of the fact
+that failures gate progress. They also tend to run in resource
+limited environments as fstests is not the only set of tests that
+are run. Hence, generally speaking, CI is not an environment you'd
+be running a full "auto" group set of tests. Even the 'quick' group
+(which take an hour to run here) is often far too time and resource
+intensive for a CI system to use effectively.
 
-> ---
->  block/blk-mq-debugfs-zoned.c   |  6 +--
->  block/blk-sysfs.c              |  2 +-
->  block/blk-zoned.c              | 45 ++++++++---------
->  drivers/block/null_blk/zoned.c |  2 +-
->  drivers/md/dm-zone.c           | 74 +++++++++++++--------------
->  drivers/nvme/host/multipath.c  |  2 +-
->  drivers/nvme/target/zns.c      |  2 +-
->  drivers/scsi/sd_zbc.c          |  2 +-
->  include/linux/blk-mq.h         |  8 +--
->  include/linux/blkdev.h         | 91 ++++++++++++++++------------------
->  10 files changed, 110 insertions(+), 124 deletions(-)
+IOWs, we can't easily curate a set of tests that are appropriate for
+all CI environments - it's up to the people running the CI
+enviroment to determine what level of testing is appropriate for
+gating commits to their source tree, not the fstests maintainers or
+developers...
+
+> Is it enough to run only the deterministic tests to validate xfs code?
+> No it is not.
 > 
-> diff --git a/block/blk-mq-debugfs-zoned.c b/block/blk-mq-debugfs-zoned.c
-> index 038cb627c8689..a77b099c34b7a 100644
-> --- a/block/blk-mq-debugfs-zoned.c
-> +++ b/block/blk-mq-debugfs-zoned.c
-> @@ -11,11 +11,11 @@ int queue_zone_wlock_show(void *data, struct seq_file *m)
->  	struct request_queue *q = data;
->  	unsigned int i;
->  
-> -	if (!q->seq_zones_wlock)
-> +	if (!q->disk->seq_zones_wlock)
->  		return 0;
->  
-> -	for (i = 0; i < q->nr_zones; i++)
-> -		if (test_bit(i, q->seq_zones_wlock))
-> +	for (i = 0; i < q->disk->nr_zones; i++)
-> +		if (test_bit(i, q->disk->seq_zones_wlock))
->  			seq_printf(m, "%u\n", i);
->  
->  	return 0;
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 5ce72345ac666..c0303026752d5 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -325,7 +325,7 @@ static ssize_t queue_zoned_show(struct request_queue *q, char *page)
->  
->  static ssize_t queue_nr_zones_show(struct request_queue *q, char *page)
->  {
-> -	return queue_var_show(blk_queue_nr_zones(q), page);
-> +	return queue_var_show(disk_nr_zones(q->disk), page);
->  }
->  
->  static ssize_t queue_max_open_zones_show(struct request_queue *q, char *page)
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index ee8752f083a94..4826083ce9a48 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -57,10 +57,10 @@ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
->   */
->  bool blk_req_needs_zone_write_lock(struct request *rq)
->  {
-> -	if (!rq->q->seq_zones_wlock)
-> +	if (blk_rq_is_passthrough(rq))
->  		return false;
->  
-> -	if (blk_rq_is_passthrough(rq))
-> +	if (!rq->q->disk->seq_zones_wlock)
->  		return false;
->  
->  	switch (req_op(rq)) {
-> @@ -77,7 +77,7 @@ bool blk_req_zone_write_trylock(struct request *rq)
->  {
->  	unsigned int zno = blk_rq_zone_no(rq);
->  
-> -	if (test_and_set_bit(zno, rq->q->seq_zones_wlock))
-> +	if (test_and_set_bit(zno, rq->q->disk->seq_zones_wlock))
->  		return false;
->  
->  	WARN_ON_ONCE(rq->rq_flags & RQF_ZONE_WRITE_LOCKED);
-> @@ -90,7 +90,7 @@ EXPORT_SYMBOL_GPL(blk_req_zone_write_trylock);
->  void __blk_req_zone_write_lock(struct request *rq)
->  {
->  	if (WARN_ON_ONCE(test_and_set_bit(blk_rq_zone_no(rq),
-> -					  rq->q->seq_zones_wlock)))
-> +					  rq->q->disk->seq_zones_wlock)))
->  		return;
->  
->  	WARN_ON_ONCE(rq->rq_flags & RQF_ZONE_WRITE_LOCKED);
-> @@ -101,9 +101,9 @@ EXPORT_SYMBOL_GPL(__blk_req_zone_write_lock);
->  void __blk_req_zone_write_unlock(struct request *rq)
->  {
->  	rq->rq_flags &= ~RQF_ZONE_WRITE_LOCKED;
-> -	if (rq->q->seq_zones_wlock)
-> +	if (rq->q->disk->seq_zones_wlock)
->  		WARN_ON_ONCE(!test_and_clear_bit(blk_rq_zone_no(rq),
-> -						 rq->q->seq_zones_wlock));
-> +						 rq->q->disk->seq_zones_wlock));
->  }
->  EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
->  
-> @@ -189,7 +189,7 @@ static int blk_zone_need_reset_cb(struct blk_zone *zone, unsigned int idx,
->  int blkdev_zone_mgmt_all(struct block_device *bdev, unsigned int op,
->  			 gfp_t gfp_mask)
->  {
-> -	struct request_queue *q = bdev_get_queue(bdev);
-> +	struct gendisk *disk = bdev->bd_disk;
->  	sector_t capacity = bdev_nr_sectors(bdev);
->  	sector_t zone_sectors = bdev_zone_sectors(bdev);
->  	unsigned long *need_reset;
-> @@ -197,19 +197,18 @@ int blkdev_zone_mgmt_all(struct block_device *bdev, unsigned int op,
->  	sector_t sector = 0;
->  	int ret;
->  
-> -	need_reset = blk_alloc_zone_bitmap(q->node, q->nr_zones);
-> +	need_reset = blk_alloc_zone_bitmap(disk->queue->node, disk->nr_zones);
->  	if (!need_reset)
->  		return -ENOMEM;
->  
-> -	ret = bdev->bd_disk->fops->report_zones(bdev->bd_disk, 0,
-> -				q->nr_zones, blk_zone_need_reset_cb,
-> -				need_reset);
-> +	ret = disk->fops->report_zones(disk, 0, disk->nr_zones,
-> +				       blk_zone_need_reset_cb, need_reset);
->  	if (ret < 0)
->  		goto out_free_need_reset;
->  
->  	ret = 0;
->  	while (sector < capacity) {
-> -		if (!test_bit(blk_queue_zone_no(q, sector), need_reset)) {
-> +		if (!test_bit(disk_zone_no(disk, sector), need_reset)) {
->  			sector += zone_sectors;
->  			continue;
->  		}
-> @@ -452,12 +451,10 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
->  
->  void disk_free_zone_bitmaps(struct gendisk *disk)
->  {
-> -	struct request_queue *q = disk->queue;
-> -
-> -	kfree(q->conv_zones_bitmap);
-> -	q->conv_zones_bitmap = NULL;
-> -	kfree(q->seq_zones_wlock);
-> -	q->seq_zones_wlock = NULL;
-> +	kfree(disk->conv_zones_bitmap);
-> +	disk->conv_zones_bitmap = NULL;
-> +	kfree(disk->seq_zones_wlock);
-> +	disk->seq_zones_wlock = NULL;
->  }
->  
->  struct blk_revalidate_zone_args {
-> @@ -607,9 +604,9 @@ int blk_revalidate_disk_zones(struct gendisk *disk,
->  	blk_mq_freeze_queue(q);
->  	if (ret > 0) {
->  		blk_queue_chunk_sectors(q, args.zone_sectors);
-> -		q->nr_zones = args.nr_zones;
-> -		swap(q->seq_zones_wlock, args.seq_zones_wlock);
-> -		swap(q->conv_zones_bitmap, args.conv_zones_bitmap);
-> +		disk->nr_zones = args.nr_zones;
-> +		swap(disk->seq_zones_wlock, args.seq_zones_wlock);
-> +		swap(disk->conv_zones_bitmap, args.conv_zones_bitmap);
->  		if (update_driver_data)
->  			update_driver_data(disk);
->  		ret = 0;
-> @@ -634,9 +631,9 @@ void disk_clear_zone_settings(struct gendisk *disk)
->  	disk_free_zone_bitmaps(disk);
->  	blk_queue_flag_clear(QUEUE_FLAG_ZONE_RESETALL, q);
->  	q->required_elevator_features &= ~ELEVATOR_F_ZBD_SEQ_WRITE;
-> -	q->nr_zones = 0;
-> -	q->max_open_zones = 0;
-> -	q->max_active_zones = 0;
-> +	disk->nr_zones = 0;
-> +	disk->max_open_zones = 0;
-> +	disk->max_active_zones = 0;
->  	q->limits.chunk_sectors = 0;
->  	q->limits.zone_write_granularity = 0;
->  	q->limits.max_zone_append_sectors = 0;
-> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-> index e62c52e964259..64b06caab9843 100644
-> --- a/drivers/block/null_blk/zoned.c
-> +++ b/drivers/block/null_blk/zoned.c
-> @@ -170,7 +170,7 @@ int null_register_zoned_dev(struct nullb *nullb)
->  			return ret;
->  	} else {
->  		blk_queue_chunk_sectors(q, dev->zone_size_sects);
-> -		q->nr_zones = bdev_nr_zones(nullb->disk->part0);
-> +		nullb->disk->nr_zones = bdev_nr_zones(nullb->disk->part0);
->  	}
->  
->  	blk_queue_max_zone_append_sectors(q, dev->zone_size_sects);
-> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> index 842c31019b513..2b89cde30c9e9 100644
-> --- a/drivers/md/dm-zone.c
-> +++ b/drivers/md/dm-zone.c
-> @@ -139,13 +139,11 @@ bool dm_is_zone_write(struct mapped_device *md, struct bio *bio)
->  
->  void dm_cleanup_zoned_dev(struct mapped_device *md)
->  {
-> -	struct request_queue *q = md->queue;
-> -
-> -	if (q) {
-> -		kfree(q->conv_zones_bitmap);
-> -		q->conv_zones_bitmap = NULL;
-> -		kfree(q->seq_zones_wlock);
-> -		q->seq_zones_wlock = NULL;
-> +	if (md->disk) {
-> +		kfree(md->disk->conv_zones_bitmap);
-> +		md->disk->conv_zones_bitmap = NULL;
-> +		kfree(md->disk->seq_zones_wlock);
-> +		md->disk->seq_zones_wlock = NULL;
->  	}
->  
->  	kvfree(md->zwp_offset);
-> @@ -179,31 +177,31 @@ static int dm_zone_revalidate_cb(struct blk_zone *zone, unsigned int idx,
->  				 void *data)
->  {
->  	struct mapped_device *md = data;
-> -	struct request_queue *q = md->queue;
-> +	struct gendisk *disk = md->disk;
->  
->  	switch (zone->type) {
->  	case BLK_ZONE_TYPE_CONVENTIONAL:
-> -		if (!q->conv_zones_bitmap) {
-> -			q->conv_zones_bitmap =
-> -				kcalloc(BITS_TO_LONGS(q->nr_zones),
-> +		if (!disk->conv_zones_bitmap) {
-> +			disk->conv_zones_bitmap =
-> +				kcalloc(BITS_TO_LONGS(disk->nr_zones),
->  					sizeof(unsigned long), GFP_NOIO);
-> -			if (!q->conv_zones_bitmap)
-> +			if (!disk->conv_zones_bitmap)
->  				return -ENOMEM;
->  		}
-> -		set_bit(idx, q->conv_zones_bitmap);
-> +		set_bit(idx, disk->conv_zones_bitmap);
->  		break;
->  	case BLK_ZONE_TYPE_SEQWRITE_REQ:
->  	case BLK_ZONE_TYPE_SEQWRITE_PREF:
-> -		if (!q->seq_zones_wlock) {
-> -			q->seq_zones_wlock =
-> -				kcalloc(BITS_TO_LONGS(q->nr_zones),
-> +		if (!disk->seq_zones_wlock) {
-> +			disk->seq_zones_wlock =
-> +				kcalloc(BITS_TO_LONGS(disk->nr_zones),
->  					sizeof(unsigned long), GFP_NOIO);
-> -			if (!q->seq_zones_wlock)
-> +			if (!disk->seq_zones_wlock)
->  				return -ENOMEM;
->  		}
->  		if (!md->zwp_offset) {
->  			md->zwp_offset =
-> -				kvcalloc(q->nr_zones, sizeof(unsigned int),
-> +				kvcalloc(disk->nr_zones, sizeof(unsigned int),
->  					 GFP_KERNEL);
->  			if (!md->zwp_offset)
->  				return -ENOMEM;
-> @@ -228,7 +226,7 @@ static int dm_zone_revalidate_cb(struct blk_zone *zone, unsigned int idx,
->   */
->  static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
->  {
-> -	struct request_queue *q = md->queue;
-> +	struct gendisk *disk = md->disk;
->  	unsigned int noio_flag;
->  	int ret;
->  
-> @@ -236,7 +234,7 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
->  	 * Check if something changed. If yes, cleanup the current resources
->  	 * and reallocate everything.
->  	 */
-> -	if (!q->nr_zones || q->nr_zones != md->nr_zones)
-> +	if (!disk->nr_zones || disk->nr_zones != md->nr_zones)
->  		dm_cleanup_zoned_dev(md);
->  	if (md->nr_zones)
->  		return 0;
-> @@ -246,17 +244,17 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
->  	 * operations in this context are done as if GFP_NOIO was specified.
->  	 */
->  	noio_flag = memalloc_noio_save();
-> -	ret = dm_blk_do_report_zones(md, t, 0, q->nr_zones,
-> +	ret = dm_blk_do_report_zones(md, t, 0, disk->nr_zones,
->  				     dm_zone_revalidate_cb, md);
->  	memalloc_noio_restore(noio_flag);
->  	if (ret < 0)
->  		goto err;
-> -	if (ret != q->nr_zones) {
-> +	if (ret != disk->nr_zones) {
->  		ret = -EIO;
->  		goto err;
->  	}
->  
-> -	md->nr_zones = q->nr_zones;
-> +	md->nr_zones = disk->nr_zones;
->  
->  	return 0;
->  
-> @@ -301,7 +299,7 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
->  	 * correct value to be exposed in sysfs queue/nr_zones.
->  	 */
->  	WARN_ON_ONCE(queue_is_mq(q));
-> -	q->nr_zones = bdev_nr_zones(md->disk->part0);
-> +	md->disk->nr_zones = bdev_nr_zones(md->disk->part0);
->  
->  	/* Check if zone append is natively supported */
->  	if (dm_table_supports_zone_append(t)) {
-> @@ -466,26 +464,26 @@ static blk_status_t dm_zone_map_bio_end(struct mapped_device *md, unsigned int z
->  	}
->  }
->  
-> -static inline void dm_zone_lock(struct request_queue *q,
-> -				unsigned int zno, struct bio *clone)
-> +static inline void dm_zone_lock(struct gendisk *disk, unsigned int zno,
-> +				struct bio *clone)
->  {
->  	if (WARN_ON_ONCE(bio_flagged(clone, BIO_ZONE_WRITE_LOCKED)))
->  		return;
->  
-> -	wait_on_bit_lock_io(q->seq_zones_wlock, zno, TASK_UNINTERRUPTIBLE);
-> +	wait_on_bit_lock_io(disk->seq_zones_wlock, zno, TASK_UNINTERRUPTIBLE);
->  	bio_set_flag(clone, BIO_ZONE_WRITE_LOCKED);
->  }
->  
-> -static inline void dm_zone_unlock(struct request_queue *q,
-> -				  unsigned int zno, struct bio *clone)
-> +static inline void dm_zone_unlock(struct gendisk *disk, unsigned int zno,
-> +				  struct bio *clone)
->  {
->  	if (!bio_flagged(clone, BIO_ZONE_WRITE_LOCKED))
->  		return;
->  
-> -	WARN_ON_ONCE(!test_bit(zno, q->seq_zones_wlock));
-> -	clear_bit_unlock(zno, q->seq_zones_wlock);
-> +	WARN_ON_ONCE(!test_bit(zno, disk->seq_zones_wlock));
-> +	clear_bit_unlock(zno, disk->seq_zones_wlock);
->  	smp_mb__after_atomic();
-> -	wake_up_bit(q->seq_zones_wlock, zno);
-> +	wake_up_bit(disk->seq_zones_wlock, zno);
->  
->  	bio_clear_flag(clone, BIO_ZONE_WRITE_LOCKED);
->  }
-> @@ -520,7 +518,6 @@ int dm_zone_map_bio(struct dm_target_io *tio)
->  	struct dm_io *io = tio->io;
->  	struct dm_target *ti = tio->ti;
->  	struct mapped_device *md = io->md;
-> -	struct request_queue *q = md->queue;
->  	struct bio *clone = &tio->clone;
->  	struct orig_bio_details orig_bio_details;
->  	unsigned int zno;
-> @@ -536,7 +533,7 @@ int dm_zone_map_bio(struct dm_target_io *tio)
->  
->  	/* Lock the target zone */
->  	zno = bio_zone_no(clone);
-> -	dm_zone_lock(q, zno, clone);
-> +	dm_zone_lock(md->disk, zno, clone);
->  
->  	orig_bio_details.nr_sectors = bio_sectors(clone);
->  	orig_bio_details.op = bio_op(clone);
-> @@ -546,7 +543,7 @@ int dm_zone_map_bio(struct dm_target_io *tio)
->  	 * both valid, and if the bio is a zone append, remap it to a write.
->  	 */
->  	if (!dm_zone_map_bio_begin(md, zno, clone)) {
-> -		dm_zone_unlock(q, zno, clone);
-> +		dm_zone_unlock(md->disk, zno, clone);
->  		return DM_MAPIO_KILL;
->  	}
->  
-> @@ -570,12 +567,12 @@ int dm_zone_map_bio(struct dm_target_io *tio)
->  		sts = dm_zone_map_bio_end(md, zno, &orig_bio_details,
->  					  *tio->len_ptr);
->  		if (sts != BLK_STS_OK)
-> -			dm_zone_unlock(q, zno, clone);
-> +			dm_zone_unlock(md->disk, zno, clone);
->  		break;
->  	case DM_MAPIO_REQUEUE:
->  	case DM_MAPIO_KILL:
->  	default:
-> -		dm_zone_unlock(q, zno, clone);
-> +		dm_zone_unlock(md->disk, zno, clone);
->  		sts = BLK_STS_IOERR;
->  		break;
->  	}
-> @@ -592,7 +589,6 @@ int dm_zone_map_bio(struct dm_target_io *tio)
->  void dm_zone_endio(struct dm_io *io, struct bio *clone)
->  {
->  	struct mapped_device *md = io->md;
-> -	struct request_queue *q = md->queue;
->  	struct gendisk *disk = md->disk;
->  	struct bio *orig_bio = io->orig_bio;
->  	unsigned int zwp_offset;
-> @@ -651,5 +647,5 @@ void dm_zone_endio(struct dm_io *io, struct bio *clone)
->  				zwp_offset - bio_sectors(orig_bio);
->  	}
->  
-> -	dm_zone_unlock(q, zno, clone);
-> +	dm_zone_unlock(disk, zno, clone);
->  }
-> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> index ccf9a6da8f6e1..f26640ccb9555 100644
-> --- a/drivers/nvme/host/multipath.c
-> +++ b/drivers/nvme/host/multipath.c
-> @@ -830,7 +830,7 @@ void nvme_mpath_add_disk(struct nvme_ns *ns, struct nvme_id_ns *id)
->  				   ns->head->disk->queue);
->  #ifdef CONFIG_BLK_DEV_ZONED
->  	if (blk_queue_is_zoned(ns->queue) && ns->head->disk)
-> -		ns->head->disk->queue->nr_zones = ns->queue->nr_zones;
-> +		ns->head->disk->nr_zones = ns->disk->nr_zones;
->  #endif
->  }
->  
-> diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-> index c9b2ce06ca93e..385f2fe2792ff 100644
-> --- a/drivers/nvme/target/zns.c
-> +++ b/drivers/nvme/target/zns.c
-> @@ -57,7 +57,7 @@ bool nvmet_bdev_zns_enable(struct nvmet_ns *ns)
->  	 * zones, reject the device. Otherwise, use report zones to detect if
->  	 * the device has conventional zones.
->  	 */
-> -	if (ns->bdev->bd_disk->queue->conv_zones_bitmap)
-> +	if (ns->bdev->bd_disk->conv_zones_bitmap)
->  		return false;
->  
->  	ret = blkdev_report_zones(ns->bdev, 0, bdev_nr_zones(ns->bdev),
-> diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-> index b4106f8997342..b8c97456506ac 100644
-> --- a/drivers/scsi/sd_zbc.c
-> +++ b/drivers/scsi/sd_zbc.c
-> @@ -855,7 +855,7 @@ int sd_zbc_revalidate_zones(struct scsi_disk *sdkp)
->  
->  	if (sdkp->zone_info.zone_blocks == zone_blocks &&
->  	    sdkp->zone_info.nr_zones == nr_zones &&
-> -	    disk->queue->nr_zones == nr_zones)
-> +	    disk->nr_zones == nr_zones)
->  		goto unlock;
->  
->  	flags = memalloc_noio_save();
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 43aad0da3305d..1b0b753609975 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -1123,12 +1123,12 @@ void blk_dump_rq_flags(struct request *, char *);
->  #ifdef CONFIG_BLK_DEV_ZONED
->  static inline unsigned int blk_rq_zone_no(struct request *rq)
->  {
-> -	return blk_queue_zone_no(rq->q, blk_rq_pos(rq));
-> +	return disk_zone_no(rq->q->disk, blk_rq_pos(rq));
->  }
->  
->  static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
->  {
-> -	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
-> +	return disk_zone_is_seq(rq->q->disk, blk_rq_pos(rq));
->  }
->  
->  bool blk_req_needs_zone_write_lock(struct request *rq);
-> @@ -1150,8 +1150,8 @@ static inline void blk_req_zone_write_unlock(struct request *rq)
->  
->  static inline bool blk_req_zone_is_write_locked(struct request *rq)
->  {
-> -	return rq->q->seq_zones_wlock &&
-> -		test_bit(blk_rq_zone_no(rq), rq->q->seq_zones_wlock);
-> +	return rq->q->disk->seq_zones_wlock &&
-> +		test_bit(blk_rq_zone_no(rq), rq->q->disk->seq_zones_wlock);
->  }
->  
->  static inline bool blk_req_can_dispatch_to_zone(struct request *rq)
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index f1eca3f5610eb..547eb07848741 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -164,6 +164,29 @@ struct gendisk {
->  #ifdef  CONFIG_BLK_DEV_INTEGRITY
->  	struct kobject integrity_kobj;
->  #endif	/* CONFIG_BLK_DEV_INTEGRITY */
-> +
-> +#ifdef CONFIG_BLK_DEV_ZONED
-> +	/*
-> +	 * Zoned block device information for request dispatch control.
-> +	 * nr_zones is the total number of zones of the device. This is always
-> +	 * 0 for regular block devices. conv_zones_bitmap is a bitmap of nr_zones
-> +	 * bits which indicates if a zone is conventional (bit set) or
-> +	 * sequential (bit clear). seq_zones_wlock is a bitmap of nr_zones
-> +	 * bits which indicates if a zone is write locked, that is, if a write
-> +	 * request targeting the zone was dispatched.
-> +	 *
-> +	 * Reads of this information must be protected with blk_queue_enter() /
-> +	 * blk_queue_exit(). Modifying this information is only allowed while
-> +	 * no requests are being processed. See also blk_mq_freeze_queue() and
-> +	 * blk_mq_unfreeze_queue().
-> +	 */
-> +	unsigned int		nr_zones;
-> +	unsigned int		max_open_zones;
-> +	unsigned int		max_active_zones;
-> +	unsigned long		*conv_zones_bitmap;
-> +	unsigned long		*seq_zones_wlock;
-> +#endif /* CONFIG_BLK_DEV_ZONED */
-> +
->  #if IS_ENABLED(CONFIG_CDROM)
->  	struct cdrom_device_info *cdi;
->  #endif
-> @@ -469,31 +492,6 @@ struct request_queue {
->  
->  	unsigned int		required_elevator_features;
->  
-> -#ifdef CONFIG_BLK_DEV_ZONED
-> -	/*
-> -	 * Zoned block device information for request dispatch control.
-> -	 * nr_zones is the total number of zones of the device. This is always
-> -	 * 0 for regular block devices. conv_zones_bitmap is a bitmap of nr_zones
-> -	 * bits which indicates if a zone is conventional (bit set) or
-> -	 * sequential (bit clear). seq_zones_wlock is a bitmap of nr_zones
-> -	 * bits which indicates if a zone is write locked, that is, if a write
-> -	 * request targeting the zone was dispatched. All three fields are
-> -	 * initialized by the low level device driver (e.g. scsi/sd.c).
-> -	 * Stacking drivers (device mappers) may or may not initialize
-> -	 * these fields.
-> -	 *
-> -	 * Reads of this information must be protected with blk_queue_enter() /
-> -	 * blk_queue_exit(). Modifying this information is only allowed while
-> -	 * no requests are being processed. See also blk_mq_freeze_queue() and
-> -	 * blk_mq_unfreeze_queue().
-> -	 */
-> -	unsigned int		nr_zones;
-> -	unsigned long		*conv_zones_bitmap;
-> -	unsigned long		*seq_zones_wlock;
-> -	unsigned int		max_open_zones;
-> -	unsigned int		max_active_zones;
-> -#endif /* CONFIG_BLK_DEV_ZONED */
-> -
->  	int			node;
->  #ifdef CONFIG_BLK_DEV_IO_TRACE
->  	struct blk_trace __rcu	*blk_trace;
-> @@ -670,63 +668,59 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
->  }
->  
->  #ifdef CONFIG_BLK_DEV_ZONED
-> -static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-> +static inline unsigned int disk_nr_zones(struct gendisk *disk)
->  {
-> -	return blk_queue_is_zoned(q) ? q->nr_zones : 0;
-> +	return blk_queue_is_zoned(disk->queue) ? disk->nr_zones : 0;
->  }
->  
-> -static inline unsigned int blk_queue_zone_no(struct request_queue *q,
-> -					     sector_t sector)
-> +static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
->  {
-> -	if (!blk_queue_is_zoned(q))
-> +	if (!blk_queue_is_zoned(disk->queue))
->  		return 0;
-> -	return sector >> ilog2(q->limits.chunk_sectors);
-> +	return sector >> ilog2(disk->queue->limits.chunk_sectors);
->  }
->  
-> -static inline bool blk_queue_zone_is_seq(struct request_queue *q,
-> -					 sector_t sector)
-> +static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
->  {
-> -	if (!blk_queue_is_zoned(q))
-> +	if (!blk_queue_is_zoned(disk->queue))
->  		return false;
-> -	if (!q->conv_zones_bitmap)
-> +	if (!disk->conv_zones_bitmap)
->  		return true;
-> -	return !test_bit(blk_queue_zone_no(q, sector), q->conv_zones_bitmap);
-> +	return !test_bit(disk_zone_no(disk, sector), disk->conv_zones_bitmap);
->  }
->  
->  static inline void disk_set_max_open_zones(struct gendisk *disk,
->  		unsigned int max_open_zones)
->  {
-> -	disk->queue->max_open_zones = max_open_zones;
-> +	disk->max_open_zones = max_open_zones;
->  }
->  
->  static inline void disk_set_max_active_zones(struct gendisk *disk,
->  		unsigned int max_active_zones)
->  {
-> -	disk->queue->max_active_zones = max_active_zones;
-> +	disk->max_active_zones = max_active_zones;
->  }
->  
->  static inline unsigned int bdev_max_open_zones(struct block_device *bdev)
->  {
-> -	return bdev->bd_disk->queue->max_open_zones;
-> +	return bdev->bd_disk->max_open_zones;
->  }
->  
->  static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
->  {
-> -	return bdev->bd_disk->queue->max_active_zones;
-> +	return bdev->bd_disk->max_active_zones;
->  }
->  
->  #else /* CONFIG_BLK_DEV_ZONED */
-> -static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
-> +static inline unsigned int disk_nr_zones(struct gendisk *disk)
->  {
->  	return 0;
->  }
-> -static inline bool blk_queue_zone_is_seq(struct request_queue *q,
-> -					 sector_t sector)
-> +static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
->  {
->  	return false;
->  }
-> -static inline unsigned int blk_queue_zone_no(struct request_queue *q,
-> -					     sector_t sector)
-> +static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
->  {
->  	return 0;
->  }
-> @@ -734,6 +728,7 @@ static inline unsigned int bdev_max_open_zones(struct block_device *bdev)
->  {
->  	return 0;
->  }
-> +
->  static inline unsigned int bdev_max_active_zones(struct block_device *bdev)
->  {
->  	return 0;
-> @@ -902,14 +897,12 @@ const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
->  
->  static inline unsigned int bio_zone_no(struct bio *bio)
->  {
-> -	return blk_queue_zone_no(bdev_get_queue(bio->bi_bdev),
-> -				 bio->bi_iter.bi_sector);
-> +	return disk_zone_no(bio->bi_bdev->bd_disk, bio->bi_iter.bi_sector);
->  }
->  
->  static inline unsigned int bio_zone_is_seq(struct bio *bio)
->  {
-> -	return blk_queue_zone_is_seq(bdev_get_queue(bio->bi_bdev),
-> -				     bio->bi_iter.bi_sector);
-> +	return disk_zone_is_seq(bio->bi_bdev->bd_disk, bio->bi_iter.bi_sector);
->  }
->  
->  /*
+> My LTS environment is human monitored - I look at every failure and
+> analyse the logs and look at historic data to decide if they are regressions
+> or not. A bot simply cannot do that.
+> The bot can go back and run the test N times on baseline vs patch.
+> 
+> The question is, do we want kernel test bot to run -g auto -x soak
+> on linux-next and report issues to us?
+> 
+> I think the answer to this question should be yes.
+> 
+> Do we want kernel test bot to run -g auto and report flaky test
+> failures to us?
+> 
+> I am pretty sure that the answer is no.
 
+My answer to both is *yes, absolutely*.
 
+The zero-day kernel test bot runs all sorts of non-deterministic
+tests, including performance regression testing. We want these
+flakey/non-deterministic tests run in such environments, because
+they are often configurations we do not ahve access to and/or would
+never even consider. e.g. 128p server with a single HDD running IO
+scalability tests like AIM7...
+
+This is exactly where such automated testing provides developers
+with added value - it covers both hardware and software configs that
+indvidual developers cannot exercise themselves. Developers may or
+may not pay attention to those results depending on the test that
+"fails" and the hardware it "failed' on, but the point is that it
+got tested on something we'd never get coverage on otherwise.
+
+> > The test run policy mechanisms we already have avoid
+> > this whole can of worms - we don't need to care about the specific
+> > test requirements of any specific test enviroment because the
+> > default is inclusive and it is trivial to exclude tests from that
+> > default set if needed.
+> >
+> 
+> I had the humble notion that we should make running fstests to
+> passing-by developers as easy as possible, because I have had the
+> chance to get feedback from some developers on their first time
+> attempt to run fstests and it wasn't pleasant, but nevermind.
+> -g auto -x soak is fine.
+
+I think that the way to do this is the way Ted has described - wrap
+fstests in an environment where all the required knowledge is
+already encapsulated and the "drive by testers" just need to crank
+the handle and it churns out results.
+
+As it is, I don't think making things easier for "drive-by" testing
+at the expense of making things arbitrarily different and/or harder
+for people who use it every day is a good trade-off. The "target
+market" for fstests is *filesystem developers* and people who spend
+their working life *testing filesystems*. The number of people who
+do *useful* "drive-by" testing of filesystems is pretty damn small,
+and IMO that niche is nowhere near as important as making things
+better for the people who use fstests every day....
+
+> When you think about it, many fs developrs run ./check -g auto,
+> so we should not interfere with that, but I bet very few run './check'?
+> so we could make the default for './check' some group combination
+> that is as deterministic as possible.
+
+Bare ./check invocations are designed to run every test, regardless
+of what group they are in.
+
+Stop trying to redefine longstanding existing behaviour - if you
+want to define "deterministic" tests so that you can run just those
+tests, define a group for it, add all the tests to it, and then
+document it in the README as "if you have no experience with
+fstests, this is where you should start".
+
+Good luck keeping that up to date, though, as you're now back to the
+same problem that Ted describes, which is the "deterministic" group
+changes based on kernel, filesystem, config, etc.
+
+-Dave.
 -- 
-Damien Le Moal
-Western Digital Research
+Dave Chinner
+david@fromorbit.com
