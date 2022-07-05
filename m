@@ -2,114 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A66C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 14:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1165C43334
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 15:46:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231682AbiGEOE1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jul 2022 10:04:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56062 "EHLO
+        id S230209AbiGEPqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jul 2022 11:46:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231797AbiGEOEO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 10:04:14 -0400
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874893885
-        for <linux-block@vger.kernel.org>; Tue,  5 Jul 2022 06:51:04 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id he28so13691690qtb.13
-        for <linux-block@vger.kernel.org>; Tue, 05 Jul 2022 06:51:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aXXqCO4eYEW7ihl1nkLRPlC9zfL+9NshKktoq8vfUqo=;
-        b=cDfN+bQczbdMb2leah0e/N44YCVFwIYBhS6uK2yvKAxV/VrnPHyc+hyWjNAaUg1PfL
-         kVcyYs7o5yY5RdPBbZ1Uy12G+gaOeGz7GPvyLzJpp7K+3AfzkxCHdfURo3kwOoQVGHsB
-         CgYT4nV/UQd7IrmpI3kE+7IkazWCK3VkAF/AOUDIg9vA84UJqgb+kOFEqstZkexFUiOW
-         t4uMNrJQXIZB/yeHytTtD8UoGO1NLRJoiAFfgFOvXzUbr67CkUchXLiOTkdsKPw7QrA5
-         0GMzIsPAHjhYnDnVJ1sJYE4BoAvaoerhS04hqo2hF28Qc0NfnJdWsyByjW3v2jzln7ab
-         r2qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aXXqCO4eYEW7ihl1nkLRPlC9zfL+9NshKktoq8vfUqo=;
-        b=4OD7Ga9Rc/j02j3zlG2Wc+zVb9JxNGW1GdUky9bPE/vlSgT/cjjd1cc9XQYsCu8M3a
-         9Io+iHPOt2/UNrayyBkqX7msT1BpeCjpQxueXA6nFafJPvrZpnoHI9eJ3acFvFwfT0sg
-         lQwYvVABAfi7Wbb7uq8oM+M7lVUoM012Q/P2xp4Ox46mXegVRIgI5iXvl1BoyRqQlTyz
-         NHkDLRYOLehDMjd/dL8qgfzO9VuiDquhEdRqBLqZkyJDcgCSmdnGhWWrBaX/qlPwbYKV
-         wDajMa0ZU4588wEHCW+9EmjqYo4Kh4CnhxgWVUAWySoBqc1KbueCEJ2bebo1MkGPDUiH
-         NYtA==
-X-Gm-Message-State: AJIora85rrNIILgNMwJ/6pj937Ux5qFKlM7MvhG2bheFo8W4+DjuUPQ7
-        iRC8e+DBvgBlt5c7fPUwXvNH2w==
-X-Google-Smtp-Source: AGRyM1tiQ1fXhmwo7QGB7JVrZMkNllap136sZt6NhU7vlDBe2k8co+srzJapO8MDIuFHQGrnlFDnUA==
-X-Received: by 2002:a05:6214:5005:b0:472:e6b0:1fb2 with SMTP id jo5-20020a056214500500b00472e6b01fb2mr12627413qvb.124.1657029063626;
-        Tue, 05 Jul 2022 06:51:03 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id f10-20020a05620a280a00b006a69d7f390csm27745242qkp.103.2022.07.05.06.51.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Jul 2022 06:51:02 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1o8ixC-006VQ4-6E; Tue, 05 Jul 2022 10:51:02 -0300
-Date:   Tue, 5 Jul 2022 10:51:02 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20220705135102.GE23621@ziepe.ca>
-References: <20220615161233.17527-1-logang@deltatee.com>
- <20220615161233.17527-21-logang@deltatee.com>
- <20220629064854.GD17576@lst.de>
- <99242789-66a6-bbd2-b56a-e47891f4522e@deltatee.com>
- <20220629175906.GU23621@ziepe.ca>
- <20220705075108.GB17451@lst.de>
+        with ESMTP id S232614AbiGEPpo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 11:45:44 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A4118378
+        for <linux-block@vger.kernel.org>; Tue,  5 Jul 2022 08:45:36 -0700 (PDT)
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 265FDUAD028428
+        for <linux-block@vger.kernel.org>; Tue, 5 Jul 2022 08:45:36 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=e76lo8txgOrdQXHNY5JneNADPoSOMcRa9MkJbZK28GY=;
+ b=cqJJMIy5L2UcyhUCgQMDDU7wtNM0yzXmJse+Vl81/7zUtpGB0B6FoiX2VCHhuwW0daY4
+ 9mW57wgPLoKFz6Jp2qIt4ewJrYPBvRKKSsbz56pp+6TUO9BvxpiMvH4jGWpE0ijXV+JM
+ A47WsBSYUQTj5srOw6NfCMU9qyC2W/PAm6M= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3h4apvvbp9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 05 Jul 2022 08:45:36 -0700
+Received: from twshared25107.07.ash9.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 5 Jul 2022 08:45:34 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 527EB5C1F913; Tue,  5 Jul 2022 08:45:10 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 2/3] block: ensure bio_iov_add_page can't fail
+Date:   Tue, 5 Jul 2022 08:45:05 -0700
+Message-ID: <20220705154506.2993693-2-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220705154506.2993693-1-kbusch@fb.com>
+References: <20220705154506.2993693-1-kbusch@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220705075108.GB17451@lst.de>
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: icILdWDP3K2WXZgYnSQSckaBpaa5Y8kh
+X-Proofpoint-GUID: icILdWDP3K2WXZgYnSQSckaBpaa5Y8kh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-05_12,2022-06-28_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 05, 2022 at 09:51:08AM +0200, Christoph Hellwig wrote:
+From: Keith Busch <kbusch@kernel.org>
 
-> But what also really matters here:  I don't want every user that
-> wants to be able to mmap a character device to do all this work.
-> The layering is simply wrong, it needs some character device
-> based helpers, not be open code everywhere.
+Adding the page could fail on the bio_full() condition, which checks for
+either exceeding the bio's max segments or total size exceeding
+UINT_MAX. We already ensure the max segments can't be exceeded, so just
+ensure the total size won't reach the limit. This simplifies error
+handling and removes unnecessary repeated bio_full() checks.
 
-I think alot (all?) cases would be happy if the inode was 1:1 with the
-cdev struct device. I suppose the cdev code would still have to create
-pseudo fs, but at least that is hidden.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/bio.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-> In fact I'm not even sure this should be a character device, it seems
-> to fit it way better with the PCI sysfs hierchacy, just like how we
-> map MMIO resources, which these are anyway.  And once it is on sysfs
-> we do have a uniqueue inode and need none of the pseudofs stuff, and
-> don't need all the glue code in nvme either.
+diff --git a/block/bio.c b/block/bio.c
+index fdd58461b78f..01223f8086ed 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1165,8 +1165,6 @@ static int bio_iov_add_page(struct bio *bio, struct=
+ page *page,
+ 	bool same_page =3D false;
+=20
+ 	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
+-		if (WARN_ON_ONCE(bio_full(bio, len)))
+-			return -EINVAL;
+ 		__bio_add_page(bio, page, len, offset);
+ 		return 0;
+ 	}
+@@ -1228,7 +1226,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
+, struct iov_iter *iter)
+ 	 * result to ensure the bio's total size is correct. The remainder of
+ 	 * the iov data will be picked up in the next bio iteration.
+ 	 */
+-	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
++	size =3D iov_iter_get_pages(iter, pages, UINT_MAX - bio->bi_iter.bi_siz=
+e,
++				  nr_pages, &offset);
+ 	if (size > 0)
+ 		size =3D ALIGN_DOWN(size, bdev_logical_block_size(bio->bi_bdev));
+ 	if (unlikely(size <=3D 0))
+@@ -1238,16 +1237,16 @@ static int __bio_iov_iter_get_pages(struct bio *b=
+io, struct iov_iter *iter)
+ 		struct page *page =3D pages[i];
+=20
+ 		len =3D min_t(size_t, PAGE_SIZE - offset, left);
+-		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
++		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND) {
+ 			ret =3D bio_iov_add_zone_append_page(bio, page, len,
+ 					offset);
+-		else
+-			ret =3D bio_iov_add_page(bio, page, len, offset);
++			if (ret) {
++				bio_put_pages(pages + i, left, offset);
++				break;
++			}
++		} else
++			bio_iov_add_page(bio, page, len, offset);
+=20
+-		if (ret) {
+-			bio_put_pages(pages + i, left, offset);
+-			break;
+-		}
+ 		offset =3D 0;
+ 	}
+=20
+--=20
+2.30.2
 
-Shouldn't there be an allocator here? It feels a bit weird that the
-entire CMB is given to a single process, it is a sharable resource,
-isn't it?
-
-Jason
