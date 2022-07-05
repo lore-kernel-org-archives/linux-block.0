@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC5DC433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6E1C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234575AbiGECbA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 22:31:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
+        id S231579AbiGECcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 22:32:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232389AbiGECbA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:31:00 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5EB227
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:30:59 -0700 (PDT)
+        with ESMTP id S234459AbiGECcD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:32:03 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E1024E
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:32:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1656988258; x=1688524258;
+  t=1656988322; x=1688524322;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=2hn761/VM2mO0Ez6uD50tfK9rtJFq6flc+B4e+Bf4h0=;
-  b=JtkX/EBZWqx3ZWGuBDMPEtICejLjdFHpcL+6LuL887rEowKrZaRI4QgB
-   VVvn4lyTHQwS330EYyGGmgP8tMlXCEJ2igwSfEKIycQcRO9xbizbLcBRa
-   TZeaIBGXLfZtf6U39EIonf+0Kr2Uv3TOfnfo/Q5BUh6oFMmJiBwYcLCAt
-   82U/EpmQObdN5D62yKUkMd5NGvgtjv6rvfjZF4eVAzUruDvcUNXLAgukd
-   UVTE1L0WTQFpAnMr9/Cn3IDCEwbWNd3l5XGV3Ahzz4Y5j0cV91tCuXY2H
-   VvvHd0fB+tm6iM19kR+Vuly6I4gbXhGFErHdgAXtoTLIPEZ9j8nD/tmFM
+  bh=Ro+fI82nD1IGiNFuAK6LUHDwCz2uvuI1Aih9ZqsmmTw=;
+  b=DidzLw8TIyZXMUerkWrmdl3+S313+LBoyri8MYv1NzQQiLiAU61zbD2O
+   2GY/fEgNvVk/jNdB2YbF6A1edzZqKLFdjUjtUrYoZDilZnEw0tE1eBaEt
+   K7RQLm7dJ5b3SFdiybVmQFIWvUREY8rISgSTjCnrpKWI+5Cfz8tdFet6u
+   ikHODzhyOraJ/bVAlrPihbjiR4UBvYNob4REJrm6eWeaPuuz9DRXSr/PK
+   acM6iRE+W6ByMJ7CkYcu1uI9qjeVmk6MCwrvhLPFIYCEpjeHkDNKWd2mH
+   RsxFkmta75k2PfEdhBWzyaHfFuG40MiVjxs4HmKpryJD9hb4klOH3mFAV
    A==;
 X-IronPort-AV: E=Sophos;i="5.92,245,1650902400"; 
-   d="scan'208";a="204806442"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2022 10:30:58 +0800
-IronPort-SDR: wvbFl+W5GhfAADdgO06hcSFC+SEpXTmA0e7UBohtwxZYg+965o4f57wmrKqFdfa9AcXF0aipkM
- YOfDWBDfrDdORNMBYkYpHrveD3tG+sU7ORJQnhMUvkVmGklIGE7nsLz1acXwTS42kaE9LV2vWm
- HhQudR+0BqM9KY8oJk0kQBpRYsqhcfbs6qGbn9M5HiH8lyG8JYuERdcaJwwz6nx4ei3wzdeoXa
- /VD2rT9EUd+pgtrxZ96idww+piv+zoOabtbyk1oQ8wktbLLng8c/R7Bh92/9LhWuPXBUTh4X+/
- i97iXn8MMepRlXe8w8VOXaqN
+   d="scan'208";a="203465757"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2022 10:32:01 +0800
+IronPort-SDR: Ys/O162habi1N/pDHK8JI0pn6Vi3+G8mlsmwoGCZlvLUijzVvd3G+rmcSKO1ZYF8Xe1u0X6A1F
+ /7ks5cjXrLUreNpHx5LFu3OuaRFwJ+dg7zFOolfognY66VYGXVd3muDoeRWFw8D+DPRYsEwLrE
+ UdHbwksdJ3F0AcF697bppnm8M5vDrD4G5bKoD3ew/Dj0tIDJ36qx2iq92PDYBGSOF2H3ak48O9
+ Mg6z/q/qbMUbEzGjDemfkX0DLRrfecceZuI0LIuBzmS1UlSJUB9TMTr18DVtIvJZ4vJZSvw9X5
+ nRbAVjTA1Sq7AYyoW7wGQb5P
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 18:52:49 -0700
-IronPort-SDR: R683ZWC0NQmqVk9yI9JKg3eus1wRXGMQXq3EPS31DdgfuuexS2PqYxXCUouZhjZ0zwVb8TSpgo
- dGoyvskuZozo0xnL+pknAnppNezVB3Kj1gSeY9MtuXU3wNZs9HzonmULyHJ6+ByeFcLb2qx0h9
- QDyJ+lzZEozP05Q+njMsKbPwQQG6vM7qKgtnYJje2uhu2eVq6pkufFe1QEBBL4tic3Koon7YQp
- dSl33feofrm8m/RFqDY5nGCrg0Rnw4lIPoQ4sIDK3Q+ChytwaWkXeSLuhUUB5tXu9kWkr+rwFr
- z98=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 18:49:20 -0700
+IronPort-SDR: dBYNfrxwLNQhZh4sVZEOyJnJezGusx0/aw5X/8VyIz8kxopXdrYAbs80hfj4LARDQhqQSWwYKG
+ UKCU9ZJSyfoZXuwpD7KeXcMqsCt5u+g2bi8F213Eub5JyPoKejlR4IzxVsIFEpZSdtL9KQ9B0i
+ ikMJJlD6N5b11turs005GMvG4H4o/IJMejlwOee6SlLod6uCO+Y2XTVfdn6HHHAuyH4E1WWz7b
+ BGAiBP5kwWzUshuZVNXZSuA5+oaprNRjbh0jTbg7RQgtl5TQ6K4XQFR9IEbKuatDcMK5nMwsFl
+ 8i4=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:30:59 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:32:01 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LcRVp2BKnz1Rw4L
-        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:30:58 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LcRX052Kmz1Rwnm
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:32:00 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -56,36 +56,36 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1656988257; x=1659580258; bh=2hn761/VM2mO0Ez6uD50tfK9rtJFq6flc+B
-        4e+Bf4h0=; b=S0P2HSjhX66Iv5uNELmmr0DsQ6e1N2N94PZusn9ZwOQ4Qo6tvfL
-        9t2FVsVm24Jckjfdx7LvTALN//OdAOTEQIYI2p1s5ue78H7sb7iT+hUYOj2VB7wv
-        TNgiDEY353oh60p/qO5YdGFrjDTT8NAIUFkynXsjDcR5Bm1OPuD0yk7uct5yOX7y
-        F8jZv5x3gbj70SMbM9jbev8vMyIUcw1qx9WeuUFJvumPbi0nHBC4L/C49VB0j6qI
-        E+zaNIyJ8zJiHO+Zg6M7OyUXWjZDEN63n0fnJDW5MMC2XUye8vGnIsoFKSxHKqkM
-        iFiIKQ19zWhlP7JkL5kDinaJiGymE6zzZkQ==
+        1656988320; x=1659580321; bh=Ro+fI82nD1IGiNFuAK6LUHDwCz2uvuI1Aih
+        9ZqsmmTw=; b=E5si8k2AyrL9p+0u2wPVEH9uM3pJyLDKNMYvqS466EiGZ7b8VQB
+        Gb7Iy6h91Um4fbaue0VXVzRShIykbnYeMZvnb0bxB8zYCtpzUrAjwtYgn7KT4mmq
+        w2zTI8JvTz+HT4F0gPIrfPyrHTbIGKHiVf5t31RyJvGffCAOhmbdeeyf1o0kTdLj
+        lJ4Fh/bBLjt4LSpdng5pQRsC8rebZ3TnSbPRmIizfLfBp3vLt503L0IQAg7BryG3
+        tCYgfcbvIbno2pSFTz0V4SYjsIt5ctML2m4WttC3NQ5aT85/DsjznkS0LsLpru2v
+        7MWgNzCTA7jMlsE8ue0OR8OyDB8cIgKXfqw==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 6Dwuxfo7HwQh for <linux-block@vger.kernel.org>;
-        Mon,  4 Jul 2022 19:30:57 -0700 (PDT)
+        with ESMTP id 9a_feJW0DjVQ for <linux-block@vger.kernel.org>;
+        Mon,  4 Jul 2022 19:32:00 -0700 (PDT)
 Received: from [10.225.163.105] (unknown [10.225.163.105])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LcRVm5SzGz1RtVk;
-        Mon,  4 Jul 2022 19:30:56 -0700 (PDT)
-Message-ID: <36284d54-bb3d-d77b-cc30-1759e897478b@opensource.wdc.com>
-Date:   Tue, 5 Jul 2022 11:30:55 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LcRWz1GBQz1RtVk;
+        Mon,  4 Jul 2022 19:31:58 -0700 (PDT)
+Message-ID: <9e815a0b-0d60-730a-51f8-6ba749b5c60e@opensource.wdc.com>
+Date:   Tue, 5 Jul 2022 11:31:57 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [PATCH 04/17] block: simplify blk_mq_plug
+Subject: Re: [PATCH 05/17] block: export blkdev_zone_mgmt_all
 Content-Language: en-US
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
 References: <20220704124500.155247-1-hch@lst.de>
- <20220704124500.155247-5-hch@lst.de>
+ <20220704124500.155247-6-hch@lst.de>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220704124500.155247-5-hch@lst.de>
+In-Reply-To: <20220704124500.155247-6-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -93,110 +93,74 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 7/4/22 21:44, Christoph Hellwig wrote:
-> Drop the unused q argument, and invert the check to move the exception
-> into a branch and the regular path as the normal return.
+> Export blkdev_zone_mgmt_all so that the nvme target can use it instead
+> of duplicating the functionality.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-core.c  |  2 +-
->  block/blk-merge.c |  2 +-
->  block/blk-mq.c    |  2 +-
->  block/blk-mq.h    | 18 ++++++++----------
->  4 files changed, 11 insertions(+), 13 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 6bcca0b686de4..bc16e9bae2dc4 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -719,7 +719,7 @@ void submit_bio_noacct(struct bio *bio)
->  
->  	might_sleep();
->  
-> -	plug = blk_mq_plug(q, bio);
-> +	plug = blk_mq_plug(bio);
->  	if (plug && plug->nowait)
->  		bio->bi_opf |= REQ_NOWAIT;
->  
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 0f5f42ebd0bb0..5abf5aa5a5f0e 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -1051,7 +1051,7 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
->  	struct blk_plug *plug;
->  	struct request *rq;
->  
-> -	plug = blk_mq_plug(q, bio);
-> +	plug = blk_mq_plug(bio);
->  	if (!plug || rq_list_empty(plug->mq_list))
->  		return false;
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 15c7c5c4ad222..dc714dff73001 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2804,7 +2804,7 @@ static void bio_set_ioprio(struct bio *bio)
->  void blk_mq_submit_bio(struct bio *bio)
->  {
->  	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-> -	struct blk_plug *plug = blk_mq_plug(q, bio);
-> +	struct blk_plug *plug = blk_mq_plug(bio);
->  	const int is_sync = op_is_sync(bio->bi_opf);
->  	struct request *rq;
->  	unsigned int nr_segs = 1;
-> diff --git a/block/blk-mq.h b/block/blk-mq.h
-> index 31d75a83a562d..1cc0b17d69229 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -294,7 +294,6 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
->  
->  /*
->   * blk_mq_plug() - Get caller context plug
-> - * @q: request queue
->   * @bio : the bio being submitted by the caller context
->   *
->   * Plugging, by design, may delay the insertion of BIOs into the elevator in
-> @@ -305,23 +304,22 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
->   * order. While this is not a problem with regular block devices, this ordering
->   * change can cause write BIO failures with zoned block devices as these
->   * require sequential write patterns to zones. Prevent this from happening by
-> - * ignoring the plug state of a BIO issuing context if the target request queue
-> - * is for a zoned block device and the BIO to plug is a write operation.
-> + * ignoring the plug state of a BIO issuing context if is for a zoned block
-
-s/if is/if it is/
-
-> + 8 device and the BIO to plug is a write operation.
-
-s/8/*
-
->   *
->   * Return current->plug if the bio can be plugged and NULL otherwise
->   */
-> -static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
-> -					   struct bio *bio)
-> +static inline struct blk_plug *blk_mq_plug( struct bio *bio)
->  {
-> +	/* Zoned block device write operation case: do not plug the BIO */
-> +	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
-> +		return NULL;
-> +
->  	/*
->  	 * For regular block devices or read operations, use the context plug
->  	 * which may be NULL if blk_start_plug() was not executed.
->  	 */
-> -	if (!bdev_is_zoned(bio->bi_bdev) || !op_is_write(bio_op(bio)))
-> -		return current->plug;
-> -
-> -	/* Zoned block device write operation case: do not plug the BIO */
-> -	return NULL;
-> +	return current->plug;
->  }
->  
->  /* Free all requests on the list */
-
-With the typos fixed, looks good.
 
 Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+
+> ---
+>  block/blk-zoned.c      | 10 +++++-----
+>  include/linux/blkdev.h |  2 ++
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 90a5c9cc80ab3..7fbe395fa51fc 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -185,8 +185,8 @@ static int blk_zone_need_reset_cb(struct blk_zone *zone, unsigned int idx,
+>  	}
+>  }
+>  
+> -static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
+> -					  gfp_t gfp_mask)
+> +int blkdev_zone_mgmt_all(struct block_device *bdev, unsigned int op,
+> +			 gfp_t gfp_mask)
+>  {
+>  	struct request_queue *q = bdev_get_queue(bdev);
+>  	sector_t capacity = get_capacity(bdev->bd_disk);
+> @@ -213,8 +213,7 @@ static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
+>  			continue;
+>  		}
+>  
+> -		bio = blk_next_bio(bio, bdev, 0, REQ_OP_ZONE_RESET | REQ_SYNC,
+> -				   gfp_mask);
+> +		bio = blk_next_bio(bio, bdev, 0, op | REQ_SYNC, gfp_mask);
+>  		bio->bi_iter.bi_sector = sector;
+>  		sector += zone_sectors;
+>  
+> @@ -231,6 +230,7 @@ static int blkdev_zone_reset_all_emulated(struct block_device *bdev,
+>  	kfree(need_reset);
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(blkdev_zone_mgmt_all);
+>  
+>  static int blkdev_zone_reset_all(struct block_device *bdev, gfp_t gfp_mask)
+>  {
+> @@ -295,7 +295,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+>  	 */
+>  	if (op == REQ_OP_ZONE_RESET && sector == 0 && nr_sectors == capacity) {
+>  		if (!blk_queue_zone_resetall(q))
+> -			return blkdev_zone_reset_all_emulated(bdev, gfp_mask);
+> +			return blkdev_zone_mgmt_all(bdev, op, gfp_mask);
+>  		return blkdev_zone_reset_all(bdev, gfp_mask);
+>  	}
+>  
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 270cd0c552924..b9baee910b825 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -302,6 +302,8 @@ unsigned int blkdev_nr_zones(struct gendisk *disk);
+>  extern int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+>  			    sector_t sectors, sector_t nr_sectors,
+>  			    gfp_t gfp_mask);
+> +int blkdev_zone_mgmt_all(struct block_device *bdev, unsigned int op,
+> +			 gfp_t gfp_mask);
+>  int blk_revalidate_disk_zones(struct gendisk *disk,
+>  			      void (*update_driver_data)(struct gendisk *disk));
+>  
+
 
 -- 
 Damien Le Moal
