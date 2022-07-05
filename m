@@ -2,207 +2,202 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A2D9C43334
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC5DC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 02:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232937AbiGECaS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 22:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53598 "EHLO
+        id S234575AbiGECbA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jul 2022 22:31:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232389AbiGECaQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:30:16 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359BD12B;
-        Mon,  4 Jul 2022 19:30:15 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2652T3Eb014803
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 4 Jul 2022 22:29:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1656988148; bh=vkToY3+0z2gJ/zZAIOzcr5HC/HYL/fc9AWQRgjk7pyg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=Tvc+I/agdb1zplF1kXuCvZ7fGcjg+Hm7PFnvPp6XKACnKp1vD0AXrIV+ibEcg8aVI
-         0BE7Ot3na4nhDWnRgcWB7YhTOILP+mC5D/BJBiqBTJ7vueC9J7DP2Y92CFwCRYnf4i
-         q26iT3aR2mcysUzyi3OBzJL820Xxln6AiEZKjn/E5dT+85hcj7kiM3qHYic8ZM5x1I
-         EgIkSxGQHyeaTN8CcatHp8TbjgFfjfUYbjM16xaRIDuGo9Uwfnl/02GbVChhfkv9uh
-         HXPwXOZqPGP05oJK4DciaFBmMpLlqsUQOPROIG7XGUNdYPnJrf++F0XB3z8wnfoQ+z
-         c/oKTgrk8ftAg==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 021B015C4331; Mon,  4 Jul 2022 22:29:02 -0400 (EDT)
-Date:   Mon, 4 Jul 2022 22:29:02 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
- expunges
-Message-ID: <YsOh7tbbAiNW/1Jx@mit.edu>
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
- <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
- <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
- <20220704032516.GC3237952@dread.disaster.area>
- <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
+        with ESMTP id S232389AbiGECbA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 22:31:00 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5EB227
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:30:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1656988258; x=1688524258;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2hn761/VM2mO0Ez6uD50tfK9rtJFq6flc+B4e+Bf4h0=;
+  b=JtkX/EBZWqx3ZWGuBDMPEtICejLjdFHpcL+6LuL887rEowKrZaRI4QgB
+   VVvn4lyTHQwS330EYyGGmgP8tMlXCEJ2igwSfEKIycQcRO9xbizbLcBRa
+   TZeaIBGXLfZtf6U39EIonf+0Kr2Uv3TOfnfo/Q5BUh6oFMmJiBwYcLCAt
+   82U/EpmQObdN5D62yKUkMd5NGvgtjv6rvfjZF4eVAzUruDvcUNXLAgukd
+   UVTE1L0WTQFpAnMr9/Cn3IDCEwbWNd3l5XGV3Ahzz4Y5j0cV91tCuXY2H
+   VvvHd0fB+tm6iM19kR+Vuly6I4gbXhGFErHdgAXtoTLIPEZ9j8nD/tmFM
+   A==;
+X-IronPort-AV: E=Sophos;i="5.92,245,1650902400"; 
+   d="scan'208";a="204806442"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Jul 2022 10:30:58 +0800
+IronPort-SDR: wvbFl+W5GhfAADdgO06hcSFC+SEpXTmA0e7UBohtwxZYg+965o4f57wmrKqFdfa9AcXF0aipkM
+ YOfDWBDfrDdORNMBYkYpHrveD3tG+sU7ORJQnhMUvkVmGklIGE7nsLz1acXwTS42kaE9LV2vWm
+ HhQudR+0BqM9KY8oJk0kQBpRYsqhcfbs6qGbn9M5HiH8lyG8JYuERdcaJwwz6nx4ei3wzdeoXa
+ /VD2rT9EUd+pgtrxZ96idww+piv+zoOabtbyk1oQ8wktbLLng8c/R7Bh92/9LhWuPXBUTh4X+/
+ i97iXn8MMepRlXe8w8VOXaqN
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 18:52:49 -0700
+IronPort-SDR: R683ZWC0NQmqVk9yI9JKg3eus1wRXGMQXq3EPS31DdgfuuexS2PqYxXCUouZhjZ0zwVb8TSpgo
+ dGoyvskuZozo0xnL+pknAnppNezVB3Kj1gSeY9MtuXU3wNZs9HzonmULyHJ6+ByeFcLb2qx0h9
+ QDyJ+lzZEozP05Q+njMsKbPwQQG6vM7qKgtnYJje2uhu2eVq6pkufFe1QEBBL4tic3Koon7YQp
+ dSl33feofrm8m/RFqDY5nGCrg0Rnw4lIPoQ4sIDK3Q+ChytwaWkXeSLuhUUB5tXu9kWkr+rwFr
+ z98=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2022 19:30:59 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LcRVp2BKnz1Rw4L
+        for <linux-block@vger.kernel.org>; Mon,  4 Jul 2022 19:30:58 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1656988257; x=1659580258; bh=2hn761/VM2mO0Ez6uD50tfK9rtJFq6flc+B
+        4e+Bf4h0=; b=S0P2HSjhX66Iv5uNELmmr0DsQ6e1N2N94PZusn9ZwOQ4Qo6tvfL
+        9t2FVsVm24Jckjfdx7LvTALN//OdAOTEQIYI2p1s5ue78H7sb7iT+hUYOj2VB7wv
+        TNgiDEY353oh60p/qO5YdGFrjDTT8NAIUFkynXsjDcR5Bm1OPuD0yk7uct5yOX7y
+        F8jZv5x3gbj70SMbM9jbev8vMyIUcw1qx9WeuUFJvumPbi0nHBC4L/C49VB0j6qI
+        E+zaNIyJ8zJiHO+Zg6M7OyUXWjZDEN63n0fnJDW5MMC2XUye8vGnIsoFKSxHKqkM
+        iFiIKQ19zWhlP7JkL5kDinaJiGymE6zzZkQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 6Dwuxfo7HwQh for <linux-block@vger.kernel.org>;
+        Mon,  4 Jul 2022 19:30:57 -0700 (PDT)
+Received: from [10.225.163.105] (unknown [10.225.163.105])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LcRVm5SzGz1RtVk;
+        Mon,  4 Jul 2022 19:30:56 -0700 (PDT)
+Message-ID: <36284d54-bb3d-d77b-cc30-1759e897478b@opensource.wdc.com>
+Date:   Tue, 5 Jul 2022 11:30:55 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 04/17] block: simplify blk_mq_plug
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+References: <20220704124500.155247-1-hch@lst.de>
+ <20220704124500.155247-5-hch@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220704124500.155247-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 04, 2022 at 10:58:22AM +0300, Amir Goldstein wrote:
-> I had the humble notion that we should make running fstests to
-> passing-by developers as easy as possible, because I have had the
-> chance to get feedback from some developers on their first time
-> attempt to run fstests and it wasn't pleasant, but nevermind.
-> -g auto -x soak is fine.
+On 7/4/22 21:44, Christoph Hellwig wrote:
+> Drop the unused q argument, and invert the check to move the exception
+> into a branch and the regular path as the normal return.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-core.c  |  2 +-
+>  block/blk-merge.c |  2 +-
+>  block/blk-mq.c    |  2 +-
+>  block/blk-mq.h    | 18 ++++++++----------
+>  4 files changed, 11 insertions(+), 13 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 6bcca0b686de4..bc16e9bae2dc4 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -719,7 +719,7 @@ void submit_bio_noacct(struct bio *bio)
+>  
+>  	might_sleep();
+>  
+> -	plug = blk_mq_plug(q, bio);
+> +	plug = blk_mq_plug(bio);
+>  	if (plug && plug->nowait)
+>  		bio->bi_opf |= REQ_NOWAIT;
+>  
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 0f5f42ebd0bb0..5abf5aa5a5f0e 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -1051,7 +1051,7 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
+>  	struct blk_plug *plug;
+>  	struct request *rq;
+>  
+> -	plug = blk_mq_plug(q, bio);
+> +	plug = blk_mq_plug(bio);
+>  	if (!plug || rq_list_empty(plug->mq_list))
+>  		return false;
+>  
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 15c7c5c4ad222..dc714dff73001 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2804,7 +2804,7 @@ static void bio_set_ioprio(struct bio *bio)
+>  void blk_mq_submit_bio(struct bio *bio)
+>  {
+>  	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+> -	struct blk_plug *plug = blk_mq_plug(q, bio);
+> +	struct blk_plug *plug = blk_mq_plug(bio);
+>  	const int is_sync = op_is_sync(bio->bi_opf);
+>  	struct request *rq;
+>  	unsigned int nr_segs = 1;
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 31d75a83a562d..1cc0b17d69229 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -294,7 +294,6 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>  
+>  /*
+>   * blk_mq_plug() - Get caller context plug
+> - * @q: request queue
+>   * @bio : the bio being submitted by the caller context
+>   *
+>   * Plugging, by design, may delay the insertion of BIOs into the elevator in
+> @@ -305,23 +304,22 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>   * order. While this is not a problem with regular block devices, this ordering
+>   * change can cause write BIO failures with zoned block devices as these
+>   * require sequential write patterns to zones. Prevent this from happening by
+> - * ignoring the plug state of a BIO issuing context if the target request queue
+> - * is for a zoned block device and the BIO to plug is a write operation.
+> + * ignoring the plug state of a BIO issuing context if is for a zoned block
 
-I really don't think using some kind of group exclusion is the right
-way to go.  First of all, the definition "determinism" keeps shifting
-around.  The most recent way you've used it, it's for "passing-by
-developers" to be able to tell if their patches may have caused a
-regression.  Is that right.
+s/if is/if it is/
 
-Secondly, a group-based exclusion list is problematic because groups
-are fixed with respect to a kernel version (and therefore will very
-easily go out of date), and they are fixed with respect to a file
-system type, and which tests will either fail or be flaky will vary,
-widly, by file system type.
+> + 8 device and the BIO to plug is a write operation.
 
-For example to the "fixed in time" problem, I had a global exclude for
-the following tests: generic/471 generic/484 generic/554.  That's
-because they were failing for me all the time, with various resources
-that made them test or global kernel bugs.  But unless you regularly
-check to see whether a test which is on a particular exclusion list or
-in some magic "soak" group (and "soak is a ***massive*** misnomer ---
-the group as you've proposed it should really be named
-"might-fail-perhaps-on-some-fs-type-or-config"), the tests could
-remain on the list long after the test bug or the kernel bug has been
-addressed.
+s/8/*
 
-So as of commit 7fd7c21547a1 ("test-appliance: add kernel version
-conditionals using cpp to exclude files") in xfstests-bld, generic/471
-and generic/484 are only excluded when testing LTS kernels older than
-5.10, and generic/554 is only excluded when testing LTS kernels older
-than 5.4.  The point is (a) you can't easily do version-specific
-exclusions with xfstests group declarations, and (b) someone needs to
-periodically sweep through the tests to see if tests should be in the
-soak or "might-fail-perhaps-on-some-fs-type-or-config" group.
+>   *
+>   * Return current->plug if the bio can be plugged and NULL otherwise
+>   */
+> -static inline struct blk_plug *blk_mq_plug(struct request_queue *q,
+> -					   struct bio *bio)
+> +static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+>  {
+> +	/* Zoned block device write operation case: do not plug the BIO */
+> +	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
+> +		return NULL;
+> +
+>  	/*
+>  	 * For regular block devices or read operations, use the context plug
+>  	 * which may be NULL if blk_start_plug() was not executed.
+>  	 */
+> -	if (!bdev_is_zoned(bio->bi_bdev) || !op_is_write(bio_op(bio)))
+> -		return current->plug;
+> -
+> -	/* Zoned block device write operation case: do not plug the BIO */
+> -	return NULL;
+> +	return current->plug;
+>  }
+>  
+>  /* Free all requests on the list */
 
-As an example of why you're going to want to do the exclusions on a
-per-file system basis, consider the tests that would have to be added
-to the "might-fail-perhaps-on-some-fs-type-or-config".  If the goal is
-to let "drive-by developer to know whether their has caused a
-regression", especially someone like Willy who might be modifying a
-large number of testers, then you would need to add at *least* 135
-tests to the "soak" or "might-fail-perhaps-on-some-fs-type-or-config"
-group:
+With the typos fixed, looks good.
 
-(These are current test failures that I have observed using
-v4.19-rc4.)
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-btrfs/default: 1176 tests, 7 failures, 244 skipped, 8937 seconds
-  Failures: btrfs/012 btrfs/219 btrfs/235 generic/041 generic/297
-    generic/298 shared/298
-exfat/default: 1222 tests, 23 failures, 552 skipped, 1561 seconds
-  Failures: generic/013 generic/309 generic/310 generic/394
-    generic/409 generic/410 generic/411 generic/428 generic/430
-    generic/431 generic/432 generic/433 generic/438 generic/443
-    generic/465 generic/490 generic/519 generic/563 generic/565
-    generic/591 generic/633 generic/639 generic/676
-ext2/default: 1188 tests, 4 failures, 472 skipped, 2803 seconds
-  Failures: generic/347 generic/607 generic/614 generic/631
-f2fs/default: 877 tests, 5 failures, 217 skipped, 4249 seconds
-  Failures: generic/050 generic/064 generic/252 generic/506
-    generic/563
-jfs/default: 1074 tests, 62 failures, 404 skipped, 3695 seconds
-  Failures: generic/015 generic/034 generic/039 generic/040
-    generic/041 generic/056 generic/057 generic/065 generic/066
-    generic/073 generic/079 generic/083 generic/090 generic/101
-    generic/102 generic/104 generic/106 generic/107 generic/204
-    generic/226 generic/258 generic/260 generic/269 generic/288
-    generic/321 generic/322 generic/325 generic/335 generic/336
-    generic/341 generic/342 generic/343 generic/348 generic/376
-    generic/405 generic/416 generic/424 generic/427 generic/467
-    generic/475 generic/479 generic/480 generic/481 generic/489
-    generic/498 generic/502 generic/510 generic/520 generic/526
-    generic/527 generic/534 generic/535 generic/537 generic/547
-    generic/552 generic/557 generic/563 generic/607 generic/614
-    generic/629 generic/640 generic/690
-nfs/loopback: 818 tests, 2 failures, 345 skipped, 9365 seconds
-  Failures: generic/426 generic/551
-reiserfs/default: 1076 tests, 25 failures, 413 skipped, 3368 seconds
-  Failures: generic/102 generic/232 generic/235 generic/258
-    generic/321 generic/355 generic/381 generic/382 generic/383
-    generic/385 generic/386 generic/394 generic/418 generic/520
-    generic/533 generic/535 generic/563 generic/566 generic/594
-    generic/603 generic/614 generic/620 generic/634 generic/643
-    generic/691
-vfat/default: 1197 tests, 42 failures, 528 skipped, 4616 seconds
-  Failures: generic/003 generic/130 generic/192 generic/213
-    generic/221 generic/258 generic/309 generic/310 generic/313
-    generic/394 generic/409 generic/410 generic/411 generic/428
-    generic/430 generic/431 generic/432 generic/433 generic/438
-    generic/443 generic/465 generic/467 generic/477 generic/495
-    generic/519 generic/563 generic/565 generic/568 generic/569
-    generic/589 generic/632 generic/633 generic/637 generic/638
-    generic/639 generic/644 generic/645 generic/656 generic/676
-    generic/683 generic/688 generic/689
-
-This is not *all* of the tests.  There are a number of file system
-types that are causing the VM to crash.  I haven't had time this
-weekend to figure out what tests need to be added to the exclude group
-for udf, ubifs, overlayfs, etc.  So there might be even *more* tests
-that we would need to be added to the
-"might-fail-perhaps-on-some-fs-type-or-config" group.
-
-It *could* be fewer, if we want to exclude reiserfs and jfs, on the
-theory that they might be deprecated soon.  But there are still some
-very commonly used file systems, such as vfat, exfat, etc., that have
-a *huge* number of failing tests that is going to make life unpleasant
-for the drive-by developer/tester.  And there are other file systems
-which will cause a kernel crash or lockup on v4.19-rc4, which
-certainly will give trouble for the drive-by tester.
-
-Which is why I argue that using a group, whether it's called soak, or
-something else, to exclude all of the tests that might fail and thus
-confuse the passing-by fs testers is the best way to go.
-
-> The reason I suggested that *we* change our habits is because
-> we want to give passing-by fs testers an easier experience.
-
-Realistically, if we want to give passing-by fs testers an easier
-experience, we need to give these testers more turn-key experience.
-This was part of my original goals when I created kvm-xfstests and
-gce-xfstests.  This is why I upload pre-created VM images for
-kvm-xfstests and gce-xfstests --- so people don't have to build
-xfstests and all their dependencies, and to figure out how to set up
-and configure it.  For example, it means that I can tell ext4
-developers to just run "kvm-xfstests smoke" as a bare minimum before
-sending me a patch for review.  
-
-There is more that we clearly need to do if we want to make something
-which is completely turn-key for a drive-by tester, especially if they
-need to test more than just ext4 and xfs.  I have some ideas, and this
-is something that I'm hoping to do more work in the next few months.
-If someone is interested in contributing some time and energy to this
-project, please give me a ring.  Many hands make light work, and all that.
-
-Cheers,
-
-	 	     	  	      	    - Ted
-
-
+-- 
+Damien Le Moal
+Western Digital Research
