@@ -2,243 +2,301 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67883C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 03:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3645C43334
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jul 2022 04:16:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233452AbiGEDLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jul 2022 23:11:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45998 "EHLO
+        id S234689AbiGEEQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jul 2022 00:16:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230005AbiGEDLm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jul 2022 23:11:42 -0400
-Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0D3F101DB;
-        Mon,  4 Jul 2022 20:11:40 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-2-147.pa.nsw.optusnet.com.au [49.181.2.147])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 04E2A5ED0D4;
-        Tue,  5 Jul 2022 13:11:35 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1o8YyL-00EgSt-PA; Tue, 05 Jul 2022 13:11:33 +1000
-Date:   Tue, 5 Jul 2022 13:11:33 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Amir Goldstein <amir73il@gmail.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Theodore Tso <tytso@mit.edu>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
- expunges
-Message-ID: <20220705031133.GD3237952@dread.disaster.area>
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
- <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
- <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
- <20220704032516.GC3237952@dread.disaster.area>
- <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
+        with ESMTP id S230432AbiGEEQO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jul 2022 00:16:14 -0400
+Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F0D613CE3;
+        Mon,  4 Jul 2022 21:16:11 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R961e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VIQHI6I_1656994568;
+Received: from 30.97.57.39(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VIQHI6I_1656994568)
+          by smtp.aliyun-inc.com;
+          Tue, 05 Jul 2022 12:16:09 +0800
+Message-ID: <ebd6754e-57bf-88a7-df04-3f38864b0c52@linux.alibaba.com>
+Date:   Tue, 5 Jul 2022 12:16:07 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.4 cv=OJNEYQWB c=1 sm=1 tr=0 ts=62c3abec
-        a=ivVLWpVy4j68lT4lJFbQgw==:117 a=ivVLWpVy4j68lT4lJFbQgw==:17
-        a=kj9zAlcOel0A:10 a=RgO8CyIxsXoA:10 a=7-415B0cAAAA:8 a=N54-gffFAAAA:8
-        a=NEAV23lmAAAA:8 a=OFeBVxtZYzNL8miIrAsA:9 a=CjuIK1q_8ugA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22 a=6l0D2HzqY3Epnrm8mE3f:22
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.10.0
+Subject: Re: [PATCH V3 1/1] ublk: add io_uring based userspace block driver
+Content-Language: en-US
+To:     Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+References: <20220628160807.148853-1-ming.lei@redhat.com>
+ <20220628160807.148853-2-ming.lei@redhat.com> <8735fg4jhb.fsf@collabora.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <8735fg4jhb.fsf@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 04, 2022 at 10:58:22AM +0300, Amir Goldstein wrote:
-> On Mon, Jul 4, 2022 at 6:25 AM Dave Chinner <david@fromorbit.com> wrote:
-> >
-> > On Sun, Jul 03, 2022 at 08:56:54AM +0300, Amir Goldstein wrote:
-> > > On Sun, Jul 3, 2022 at 12:48 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> > > >
-> > > > On 5/18/22 20:07, Luis Chamberlain wrote:
-> > > > > I've been promoting the idea that running fstests once is nice,
-> > > > > but things get interesting if you try to run fstests multiple
-> > > > > times until a failure is found. It turns out at least kdevops has
-> > > > > found tests which fail with a failure rate of typically 1/2 to
-> > > > > 1/30 average failure rate. That is 1/2 means a failure can happen
-> > > > > 50% of the time, whereas 1/30 means it takes 30 runs to find the
-> > > > > failure.
-> > > > >
-> > > > > I have tried my best to annotate failure rates when I know what
-> > > > > they might be on the test expunge list, as an example:
-> > > > >
-> > > > > workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
-> > > > >
-> > > > > The term "failure rate 1/15" is 16 characters long, so I'd like
-> > > > > to propose to standardize a way to represent this. How about
-> > > > >
-> > > > > generic/530 # F:1/15
-> > > > >
-> > > > > Then we could extend the definition. F being current estimate, and this
-> > > > > can be just how long it took to find the first failure. A more valuable
-> > > > > figure would be failure rate avarage, so running the test multiple
-> > > > > times, say 10, to see what the failure rate is and then averaging the
-> > > > > failure out. So this could be a more accurate representation. For this
-> > > > > how about:
-> > > > >
-> > > > > generic/530 # FA:1/15
-> > > > >
-> > > > > This would mean on average there failure rate has been found to be about
-> > > > > 1/15, and this was determined based on 10 runs.
-> > > > >
-> > > > > We should also go extend check for fstests/blktests to run a test
-> > > > > until a failure is found and report back the number of successes.
-> > > > >
-> > > > > Thoughts?
-> > > > >
-> > > > > Note: yes failure rates lower than 1/100 do exist but they are rare
-> > > > > creatures. I love them though as my experience shows so far that they
-> > > > > uncover hidden bones in the closet, and they they make take months and
-> > > > > a lot of eyeballs to resolve.
-> > > >
-> > > > I strongly disagree with annotating tests with failure rates. My opinion
-> > > > is that on a given test setup a test either should pass 100% of the time
-> > > > or fail 100% of the time. If a test passes in one run and fails in
-> > > > another run that either indicates a bug in the test or a bug in the
-> > > > software that is being tested. Examples of behaviors that can cause
-> > > > tests to behave unpredictably are use-after-free bugs and race
-> > > > conditions. How likely it is to trigger such behavior depends on a
-> > > > number of factors. This could even depend on external factors like which
-> > > > network packets are received from other systems. I do not expect that
-> > > > flaky tests have an exact failure rate. Hence my opinion that flaky
-> > > > tests are not useful and also that it is not useful to annotate flaky
-> > > > tests with a failure rate. If a test is flaky I think that the root
-> > > > cause of the flakiness must be determined and fixed.
-> > > >
-> > >
-> > > That is true for some use cases, but unfortunately, the flaky
-> > > fstests are way too valuable and too hard to replace or improve,
-> > > so practically, fs developers have to run them, but not everyone does.
-> >
-> > Everyone *should* be running them. They find *new bugs*, and it
-> > doesn't matter how old the kernel is. e.g. if you're backporting XFS
-> > log changes and you aren't running the "flakey" recoveryloop group
-> > tests, then you are *not testing failure handling log recovery
-> > sufficiently*.
-> >
-> > Where do you draw the line? recvoeryloop tests that shutdown and
-> > recover the filesystem will find bugs, they are guaranteed to be
-> > flakey, and they are *absolutely necessary* to be run because they
-> > are the only tests that exercise that critical filesysetm crash
-> > recovery functionality.
-> >
-> > What do we actually gain by excluding these "non-deterministic"
-> > tests from automated QA environments?
-> >
+On 2022/7/5 06:10, Gabriel Krisman Bertazi wrote:
+> Ming Lei <ming.lei@redhat.com> writes:
 > 
-> Automated QA environment is a broad term.
-> We all have automated QA environments.
-> But there is a specific class of automated test env, such as CI build bots
-> that do not tolerate human intervention.
-
-Those environments need curated test lists because of the fact
-that failures gate progress. They also tend to run in resource
-limited environments as fstests is not the only set of tests that
-are run. Hence, generally speaking, CI is not an environment you'd
-be running a full "auto" group set of tests. Even the 'quick' group
-(which take an hour to run here) is often far too time and resource
-intensive for a CI system to use effectively.
-
-IOWs, we can't easily curate a set of tests that are appropriate for
-all CI environments - it's up to the people running the CI
-enviroment to determine what level of testing is appropriate for
-gating commits to their source tree, not the fstests maintainers or
-developers...
-
-> Is it enough to run only the deterministic tests to validate xfs code?
-> No it is not.
+>> This is the driver part of userspace block driver(ublk driver), the other
+>> part is userspace daemon part(ublksrv)[1].
+>>
+>> The two parts communicate by io_uring's IORING_OP_URING_CMD with one
+>> shared cmd buffer for storing io command, and the buffer is read only for
+>> ublksrv, each io command is indexed by io request tag directly, and
+>> is written by ublk driver.
+>>
+>> For example, when one READ io request is submitted to ublk block driver, ublk
+>> driver stores the io command into cmd buffer first, then completes one
+>> IORING_OP_URING_CMD for notifying ublksrv, and the URING_CMD is issued to
+>> ublk driver beforehand by ublksrv for getting notification of any new io request,
+>> and each URING_CMD is associated with one io request by tag.
+>>
+>> After ublksrv gets the io command, it translates and handles the ublk io
+>> request, such as, for the ublk-loop target, ublksrv translates the request
+>> into same request on another file or disk, like the kernel loop block
+>> driver. In ublksrv's implementation, the io is still handled by io_uring,
+>> and share same ring with IORING_OP_URING_CMD command. When the target io
+>> request is done, the same IORING_OP_URING_CMD is issued to ublk driver for
+>> both committing io request result and getting future notification of new
+>> io request.
+>>
+>> Another thing done by ublk driver is to copy data between kernel io
+>> request and ublksrv's io buffer:
+>>
+>> 1) before ubsrv handles WRITE request, copy the request's data into
+>> ublksrv's userspace io buffer, so that ublksrv can handle the write
+>> request
+>>
+>> 2) after ubsrv handles READ request, copy ublksrv's userspace io buffer
+>> into this READ request, then ublk driver can complete the READ request
+>>
+>> Zero copy may be switched if mm is ready to support it.
+>>
+>> ublk driver doesn't handle any logic of the specific user space driver,
+>> so it should be small/simple enough.
+>>
+>> [1] ublksrv
+>>
+>> https://github.com/ming1/ubdsrv
+>>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > 
-> My LTS environment is human monitored - I look at every failure and
-> analyse the logs and look at historic data to decide if they are regressions
-> or not. A bot simply cannot do that.
-> The bot can go back and run the test N times on baseline vs patch.
+> Hi Ming,
 > 
-> The question is, do we want kernel test bot to run -g auto -x soak
-> on linux-next and report issues to us?
+> A few comments inline:
 > 
-> I think the answer to this question should be yes.
 > 
-> Do we want kernel test bot to run -g auto and report flaky test
-> failures to us?
+>> +#define UBLK_MINORS		(1U << MINORBITS)
+>> +
+>> +struct ublk_rq_data {
+>> +	struct callback_head work;
+>> +};
+>> +
+>> +/* io cmd is active: sqe cmd is received, and its cqe isn't done */
+>> +#define UBLK_IO_FLAG_ACTIVE	0x01
+>> +
+>> +/*
+>> + * FETCH io cmd is completed via cqe, and the io cmd is being handled by
+>> + * ublksrv, and not committed yet
+>> + */
+>> +#define UBLK_IO_FLAG_OWNED_BY_SRV 0x02
+>> +
 > 
-> I am pretty sure that the answer is no.
-
-My answer to both is *yes, absolutely*.
-
-The zero-day kernel test bot runs all sorts of non-deterministic
-tests, including performance regression testing. We want these
-flakey/non-deterministic tests run in such environments, because
-they are often configurations we do not ahve access to and/or would
-never even consider. e.g. 128p server with a single HDD running IO
-scalability tests like AIM7...
-
-This is exactly where such automated testing provides developers
-with added value - it covers both hardware and software configs that
-indvidual developers cannot exercise themselves. Developers may or
-may not pay attention to those results depending on the test that
-"fails" and the hardware it "failed' on, but the point is that it
-got tested on something we'd never get coverage on otherwise.
-
-> > The test run policy mechanisms we already have avoid
-> > this whole can of worms - we don't need to care about the specific
-> > test requirements of any specific test enviroment because the
-> > default is inclusive and it is trivial to exclude tests from that
-> > default set if needed.
-> >
+> Minor nit: I wonder if the IO life cycle isn't better represented as a
+> state machine than flags:
 > 
-> I had the humble notion that we should make running fstests to
-> passing-by developers as easy as possible, because I have had the
-> chance to get feedback from some developers on their first time
-> attempt to run fstests and it wasn't pleasant, but nevermind.
-> -g auto -x soak is fine.
+> enum {
+>    UBLK_IO_FREE,
+>    UBLK_IO_QUEUED
+>    UBLK_IO_OWNED_BY_SRV
+>    UBLK_IO_COMPLETED,
+>    UBLK_IO_ABORTED,
+> }
+> 
+> Since currently, IO_FLAG_ACTIVE and IO_OWNED_BY_SRV should (almost) be
+> mutually exclusive.
+> 
+> 
+>> +
+>> +static int ublk_ctrl_stop_dev(struct ublk_device *ub)
+>> +{
+>> +	ublk_stop_dev(ub);
+>> +	cancel_work_sync(&ub->stop_work);
+>> +	return 0;
+>> +}
+>> +
+>> +static inline bool ublk_queue_ready(struct ublk_queue *ubq)
+>> +{
+>> +	return ubq->nr_io_ready == ubq->q_depth;
+>> +}
+>> +
+>> +/* device can only be started after all IOs are ready */
+>> +static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+>> +{
+>> +	mutex_lock(&ub->mutex);
+>> +	ubq->nr_io_ready++;
+> 
+> I think this is still problematic for the case where a FETCH_IO is sent
+> from a different thread than the one originally set in ubq_daemon
+> (i.e. a userspace bug).  Since ubq_daemon is used to decide what task
+> context will do the data copy, If an IO_FETCH_RQ is sent to the same queue
+> from two threads, the data copy can happen in the context of the wrong
+> task.  I'd suggest something like the check below at the beginning of
+> mark_io_ready and a similar on for IO_COMMIT_AND_FETCH_RQ
+> 
+> 	mutex_lock(&ub->mutex);
+>         if (ub->ubq_daemon && ub->ubq_daemon != current) {
+>            mutex_unlock(&ub->mutex);
+>            return -EINVAL;
+>         }
+> 	ubq->nr_io_ready++;
+>         ...
+>> +	if (ublk_queue_ready(ubq)) {
+>> +		ubq->ubq_daemon = current;
+>> +		get_task_struct(ubq->ubq_daemon);
+>> +		ub->nr_queues_ready++;
+>> +	}
+>> +	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
+>> +		complete_all(&ub->completion);
+>> +	mutex_unlock(&ub->mutex);
+>> +}
+>> +
+>> +static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
+>> +{
+>> +	struct ublksrv_io_cmd *ub_cmd = (struct ublksrv_io_cmd *)cmd->cmd;
+>> +	struct ublk_device *ub = cmd->file->private_data;
+>> +	struct ublk_queue *ubq;
+>> +	struct ublk_io *io;
+>> +	u32 cmd_op = cmd->cmd_op;
+>> +	unsigned tag = ub_cmd->tag;
+>> +	int ret = -EINVAL;
+>> +
+>> +	pr_devel("%s: receieved: cmd op %d queue %d tag %d result %d\n",
+> 
+>                          ^^^
+>                          received
+> 
+> 
+>> +			__func__, cmd->cmd_op, ub_cmd->q_id, tag,
+>> +			ub_cmd->result);
+>> +
+>> +	if (!(issue_flags & IO_URING_F_SQE128))
+>> +		goto out;
+>> +
+>> +	ubq = ublk_get_queue(ub, ub_cmd->q_id);
+>> +	if (!ubq || ub_cmd->q_id != ubq->q_id)
+> 
+> q_id is coming from userspace and is used to access an array inside
+> ublk_get_queue().  I think you need to ensure qid < ub->dev_info.nr_hw_queues
+> before calling ublk_get_queue() to protect from a kernel bad memory
+> access triggered by userspace.
+> 
+>> +		goto out;
+>> +
+>> +	if (WARN_ON_ONCE(tag >= ubq->q_depth))
+> 
+> Userspace shouldn't be able to easily trigger a WARN_ON.
+> 
+>> +		goto out;
+>> +
+>> +	io = &ubq->ios[tag];
+>> +
+>> +	/* there is pending io cmd, something must be wrong */
+>> +	if (io->flags & UBLK_IO_FLAG_ACTIVE) {b
+>> +		ret = -EBUSY;
+>> +		goto out;
+>> +	}
+>> +
+>> +	switch (cmd_op) {
+>> +	case UBLK_IO_FETCH_REQ:
+>> +		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
+>> +		if (WARN_ON_ONCE(ublk_queue_ready(ubq))) {
+> 
+> Likewise, this shouldn't trigger a WARN_ON, IMO.
+> 
+>> +			ret = -EBUSY;
+>> +			goto out;
+>> +		}
+>> +		/*
+>> +		 * The io is being handled by server, so COMMIT_RQ is expected
+>> +		 * instead of FETCH_REQ
+>> +		 */
+>> +		if (io->flags & UBLK_IO_FLAG_OWNED_BY_SRV)
+>> +			goto out;
+>> +		/* FETCH_RQ has to provide IO buffer */
+>> +		if (!ub_cmd->addr)
+>> +			goto out;
+>> +		io->cmd = cmd;
+>> +		io->flags |= UBLK_IO_FLAG_ACTIVE;
+>> +		io->addr = ub_cmd->addr;
+>> +
+>> +		ublk_mark_io_ready(ub, ubq);
+>> +		break;
+>> +	case UBLK_IO_COMMIT_AND_FETCH_REQ:
+>> +		/* FETCH_RQ has to provide IO buffer */
+>> +		if (!ub_cmd->addr)
+>> +			goto out;
+>> +		io->addr = ub_cmd->addr;
+>> +		io->flags |= UBLK_IO_FLAG_ACTIVE;
+>> +		fallthrough;
+>> +	case UBLK_IO_COMMIT_REQ:
+>> +		io->cmd = cmd;
+>> +		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
+>> +			goto out;
+>> +		ublk_commit_completion(ub, ub_cmd);
+>> +
+>> +		/* COMMIT_REQ is supposed to not fetch req */
+> 
+> I wonder if we could make it without IO_COMMIT_REQ.  Is it useful to be
+> able to commit without fetching a new request?
 
-I think that the way to do this is the way Ted has described - wrap
-fstests in an environment where all the required knowledge is
-already encapsulated and the "drive by testers" just need to crank
-the handle and it churns out results.
+UBLK_IO_COMMIT_REQ is not necessary, IMO. 
+In current version of ubd_drv.c I find UBLK_IO_COMMIT_REQ is sent by ublksrv
+after it gets one UBD_IO_RES_ABORT beacuse ubd_drv wants to abort IOs and let
+the ublk daemon exit.
 
-As it is, I don't think making things easier for "drive-by" testing
-at the expense of making things arbitrarily different and/or harder
-for people who use it every day is a good trade-off. The "target
-market" for fstests is *filesystem developers* and people who spend
-their working life *testing filesystems*. The number of people who
-do *useful* "drive-by" testing of filesystems is pretty damn small,
-and IMO that niche is nowhere near as important as making things
-better for the people who use fstests every day....
+We can use UBLK_IO_COMMIT_AND_FETCH_REQ to replace UBLK_IO_COMMIT_REQ.
+The data flow could be:
 
-> When you think about it, many fs developrs run ./check -g auto,
-> so we should not interfere with that, but I bet very few run './check'?
-> so we could make the default for './check' some group combination
-> that is as deterministic as possible.
+1) UBLK_IO_COMMIT_AND_FETCH_REQ from ublksrv
 
-Bare ./check invocations are designed to run every test, regardless
-of what group they are in.
+2) ubd_drv receives IO's sqe with UBLK_IO_COMMIT_AND_FETCH_REQ
+   and sets the IO's status to UBLK_IO_QUEUED
 
-Stop trying to redefine longstanding existing behaviour - if you
-want to define "deterministic" tests so that you can run just those
-tests, define a group for it, add all the tests to it, and then
-document it in the README as "if you have no experience with
-fstests, this is where you should start".
+3) ubd_drv wants to abort IOs so it just completes
+   this IO's cqe(UBD_IO_RES_ABORT)
 
-Good luck keeping that up to date, though, as you're now back to the
-same problem that Ted describes, which is the "deterministic" group
-changes based on kernel, filesystem, config, etc.
+I successfully removed UBLK_IO_COMMIT_REQ when developing libubd
+although I choose the earliest version of ubd_drv.c(v5.17-ubd-dev)
+which may be a buggy version.
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> 
+>> +		if (cmd_op == UBLK_IO_COMMIT_REQ) {
+>> +			ret = UBLK_IO_RES_OK;
+>> +			goto out;
+>> +		}
+>> +		break;
+>> +	default:
+>> +		goto out;
+>> +	}
+>> +	return -EIOCBQUEUED;
+>> +
+>> + out:
+>> +	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
+>> +	io_uring_cmd_done(cmd, ret, 0);
+>> +	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
+>> +			__func__, cmd_op, tag, ret, io->flags);
+>> +	return -EIOCBQUEUED;
+>> +}
+>> +
+> 
+> Thanks!
+> 
