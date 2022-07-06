@@ -2,99 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD314C43334
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 14:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E14CCA47F
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 15:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232514AbiGFOwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 10:52:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40608 "EHLO
+        id S233589AbiGFPau (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 11:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232371AbiGFOwT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 10:52:19 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2117248D2
-        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 07:52:18 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id m13so14264079ioj.0
-        for <linux-block@vger.kernel.org>; Wed, 06 Jul 2022 07:52:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=SEbukFa2QWMZwSoMSlefwgQKjSOZaTUazMJWi+s+igA=;
-        b=pAf+xM5lgL2ndW9+1ejwh63vphlj180H+CefqWkBSgx/OzfqyL3669HXdAvewwmEVd
-         uC/7YZbnfdt4tuiA26DC0+vRoWrIXKMIkZ3WLmLbc9AluQmSmWvwh4A59XMYyYn82ZFb
-         UL6hc7NMPzxzQ2NYhN7NhxbDpOajN0vonPbwClYUqOsD+wnjWLOZnbj9YhTdgRrCtIWE
-         HGOKg7ZvadI3ACXyLfvzJ2CdDFXjjxZ+06dgZOk8KCnSPF/qwPZhIGfCbf+qp9BlPlBN
-         3XHgpAA0T0jeLsKRnEHJYqsRFztayVDVcwHtZoq3OhDV17mRYqIisaH9GJCQr1sBDytw
-         mk0Q==
+        with ESMTP id S233628AbiGFPas (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 11:30:48 -0400
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2641237E3
+        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 08:30:46 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id r14so16801624wrg.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Jul 2022 08:30:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=SEbukFa2QWMZwSoMSlefwgQKjSOZaTUazMJWi+s+igA=;
-        b=vge/6dheTh2qhz87MsM/B0DDY2dI2gkgJN32Ccezag/+FlBOZevz69tI7faBxZcy8J
-         +N+q4BhL9288JcgQ6u6s3ex94rITsBwpqmKUqeA/5LLmbBLB/Qt6daVhnfA5y9NvncNk
-         TGrA40vqz3XjFARPN5qwxsdIMFuPMNTVtEDUZuIAcLbdbpy8+2lC0DZTEfwkhtAWHBga
-         nX/G2jFk/XTHalf8HlozgArNPUo+yAwcAkNztO495UompXdgvplcSY8lVcAx5TPweYT4
-         Co2cO4W9YkEfGYkqGgKSQphho1vrLschI/CzRLqBkgjEZPLEFj9f7IiOg4eoEcg/SX2u
-         TOKQ==
-X-Gm-Message-State: AJIora++MsGGIy7//4Yziu5hGY4QmGe+XFXyMw3KSRN6EVWC6pc/A2gf
-        pfzIs+2bYv+lrEz3n8/jCMz82Q==
-X-Google-Smtp-Source: AGRyM1sWQ3V1NB2XI9W4fM2OSegslhVPHlX+Tmr7Dw8+XrvB6v2eHLsSg4gco8OdLZUw5VGxBVGVkw==
-X-Received: by 2002:a05:6602:2c0c:b0:669:c1a9:245c with SMTP id w12-20020a0566022c0c00b00669c1a9245cmr22291594iov.218.1657119138102;
-        Wed, 06 Jul 2022 07:52:18 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x18-20020a056e020f1200b002dc3a66b4b7sm272289ilj.33.2022.07.06.07.52.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 07:52:17 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     guoqing.jiang@linux.dev
-Cc:     jinpu.wang@ionos.com, haris.iqbal@ionos.com,
-        linux-block@vger.kernel.org
-In-Reply-To: <20220706133152.12058-1-guoqing.jiang@linux.dev>
-References: <20220706133152.12058-1-guoqing.jiang@linux.dev>
-Subject: Re: [PATCH V2 0/8] reduce the size of rnbd_clt_dev
-Message-Id: <165711913730.329256.8144446315536322784.b4-ty@kernel.dk>
-Date:   Wed, 06 Jul 2022 08:52:17 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=XvMk995wzgnDDJsq9K/qXkIeP50uy/sMjQBxeoI5vHk=;
+        b=NmLWPv6cZi3OQRugb2BHz1FgXTQE0fj+sYiYqmA62aahb5JGE2HS6mcPqy3WdCiuPe
+         nPrw4WfXoSsc8K4YO+6Vot5dUSa6L3cT+Sd7rzJUcCTsqN7zBt+BQF8Vc8pZGZnummGk
+         oxEpGTdVhZee50zltQluxXwnxDjA9/T+kIvbcw/2p2ShcU2RnEqXViwghlK/iqZbumw4
+         siGZ38G0j6jUuQTzcWfhBqImSaVOi6EBqMv7hbfWTFERMUwqQUvTo21IB8XshcdKSHp5
+         F8BfwXeI8rjL+REkBrv/Isnx6okDGbpR+AgGdYL/gjy0rqDYoIaGnLFQ2ss+jqeABlQ4
+         qNLQ==
+X-Gm-Message-State: AJIora86x7KnzYfLG0BPr4jFYK3+8pgGK4yG9LVxVOwbE/M036VHk7hX
+        HW9u/jF/AD0i/b+MT9JougNEsLV7p1Y=
+X-Google-Smtp-Source: AGRyM1vcVnSxSH3WsC7XW58OYK6cjX6DhrmMF3Sf0/0iIGolBMboRP/Fm0D47hTciu30fK/aNaVDgw==
+X-Received: by 2002:adf:ffc1:0:b0:21d:66a1:c3ee with SMTP id x1-20020adfffc1000000b0021d66a1c3eemr17797653wrs.364.1657121445291;
+        Wed, 06 Jul 2022 08:30:45 -0700 (PDT)
+Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id o3-20020a5d4083000000b0021d7ae38ca2sm2733195wrp.55.2022.07.06.08.30.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Jul 2022 08:30:44 -0700 (PDT)
+Message-ID: <0a8099e6-6e28-da1f-7b4b-0ea04fa8f9d6@grimberg.me>
+Date:   Wed, 6 Jul 2022 18:30:43 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [bug report] nvme/rdma: nvme connect failed after offline one cpu
+ on host side
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <CAHj4cs9+F5F-v_2m=MYd8B=dXVgTBrtGikTTzfBU8_cX8fb0=g@mail.gmail.com>
+ <CAHj4cs_RUuiOw4pzSD+fv70p6izVMZ8z7mc+E0Kv0Rh8zriWCQ@mail.gmail.com>
+ <2c42c70a-8eb4-a095-1d2b-139614ebd903@grimberg.me> <YsOKnb7MWLCeJxBE@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <YsOKnb7MWLCeJxBE@T590>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 6 Jul 2022 21:31:44 +0800, Guoqing Jiang wrote:
-> Could you apply the series for rnbd?  Jinpu has acked all the patches.
+
+>>> update the subject to better describe the issue:
+>>>
+>>> So I tried this issue on one nvme/rdma environment, and it was also
+>>> reproducible, here are the steps:
+>>>
+>>> # echo 0 >/sys/devices/system/cpu/cpu0/online
+>>> # dmesg | tail -10
+>>> [  781.577235] smpboot: CPU 0 is now offline
+>>> # nvme connect -t rdma -a 172.31.45.202 -s 4420 -n testnqn
+>>> Failed to write to /dev/nvme-fabrics: Invalid cross-device link
+>>> no controller found: failed to write to nvme-fabrics device
+>>>
+>>> # dmesg
+>>> [  781.577235] smpboot: CPU 0 is now offline
+>>> [  799.471627] nvme nvme0: creating 39 I/O queues.
+>>> [  801.053782] nvme nvme0: mapped 39/0/0 default/read/poll queues.
+>>> [  801.064149] nvme nvme0: Connect command failed, error wo/DNR bit: -16402
+>>> [  801.073059] nvme nvme0: failed to connect queue: 1 ret=-18
+>>
+>> This is because of blk_mq_alloc_request_hctx() and was raised before.
+>>
+>> IIRC there was reluctance to make it allocate a request for an hctx even
+>> if its associated mapped cpu is offline.
+>>
+>> The latest attempt was from Ming:
+>> [PATCH V7 0/3] blk-mq: fix blk_mq_alloc_request_hctx
+>>
+>> Don't know where that went tho...
 > 
-> Thanks,
-> Guoqing
-> 
-> Changes since V1:
-> 1. add more Acked-by tags from Jinpu, thanks!
-> 
-> [...]
+> The attempt relies on that the queue for connecting io queue uses
+> non-admined irq, unfortunately that can't be true for all drivers,
+> so that way can't go.
 
-Applied, thanks!
+The only consumer is nvme-fabrics, so others don't matter.
+Maybe we need a different interface that allows this relaxation.
 
-[1/8] rnbd-clt: open code send_msg_open in rnbd_clt_map_device
-      commit: 43a20e93310ec218550dcdda0ae79dcd91dbd880
-[2/8] rnbd-clt: don't free rsp in msg_open_conf for map scenario
-      commit: 953d0c1b1d29c75221ae2d14a0f937f2e0f90592
-[3/8] rnbd-clt: kill read_only from struct rnbd_clt_dev
-      commit: e8d5be284d3089aa5c3d957e53f71d2eca72b574
-[4/8] rnbd-clt: reduce the size of struct rnbd_clt_dev
-      commit: 7e6c34c6ca2282ea1a9c3a2d06db3e3578f272dd
-[5/8] rnbd-clt: adjust the layout of struct rnbd_clt_dev
-      commit: 50aff97483b6afe4a9796154e9f6a5ca0a4f55c2
-[6/8] rnbd-clt: check capacity inside rnbd_clt_change_capacity
-      commit: ffa41a71702493b9145a5ae4f4b1b8a4bab1b8f7
-[7/8] rnbd-clt: pass sector_t type for resize capacity
-      commit: 59498516e707ed6b6a5c01ae28fc816382d9698f
-[8/8] rnbd-clt: make rnbd_clt_change_capacity return void
-      commit: 3b56590b1715b998cb5c73a5bd2e9d340ccb42dc
+> So far, I'd suggest to fix nvme_*_connect_io_queues() to ignore failed
+> io queue, then the nvme host still can be setup with less io queues.
 
-Best regards,
--- 
-Jens Axboe
+What happens when the CPU comes back? Not sure we can simply ignore it.
 
-
+> Otherwise nvme_*_connect_io_queues() could fail easily, especially for
+> 1:1 mapping.
