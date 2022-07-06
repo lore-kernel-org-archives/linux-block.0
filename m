@@ -2,69 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EB2CCA47F
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 06:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CFA3C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 07:03:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbiGFGve (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 02:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46514 "EHLO
+        id S230298AbiGFHDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 03:03:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiGFGvd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 02:51:33 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4D5614D0B;
-        Tue,  5 Jul 2022 23:51:32 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 79E0F67373; Wed,  6 Jul 2022 08:51:27 +0200 (CEST)
-Date:   Wed, 6 Jul 2022 08:51:27 +0200
+        with ESMTP id S229849AbiGFHDz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 03:03:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8AA5D5A;
+        Wed,  6 Jul 2022 00:03:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=FNPTWfp4mk8fJGbONDFfJNnSLRYFpC010l13Y9aXWQ8=; b=z7xVdIuu3H3x41dq61eVCF6X7P
+        203Nf5e3o9KTwJfCIvCVaL8+2rLtAVD8zjUk/8/hdo+lBP2H+O+VZVp/EOSBA04QIYA9q+UGm+ndF
+        Htzq08g7menFmb/WuDB/KD6PPbugjJgZrxFcTEn0CqoRhON7oQrd+2Z3USZhLb7QLOUKOQ59CYzV1
+        z+U29+jL50yR0+H411LiPbBYF/GzpkFWcl5p4LKWOW+YtL6dJcPwW4mDcIFmK6dqtJ+uWxD7lBWVm
+        l03L6e5LbsqY7HutLnmStnt2d5TEIx+8o8WH53OxTRmodpUMhUc52NZIJR1dDeJe7mCIGEqhN4DND
+        cP3JEVVA==;
+Received: from [2001:4bb8:189:3c4a:f22c:c36a:4e84:c723] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o8z4i-006uoJ-K5; Wed, 06 Jul 2022 07:03:53 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20220706065127.GA27132@lst.de>
-References: <20220705135102.GE23621@ziepe.ca> <20220705161240.GB13721@lst.de> <a509b13c-244b-23fc-f989-339750a733a5@deltatee.com> <20220705164315.GB14484@lst.de> <acb91f37-0470-8ce4-19e4-426903cbc3a1@deltatee.com> <20220705165039.GB14566@lst.de> <YsRzNqmZYlgkL7fI@kroah.com> <1bd43ef7-0403-bd25-087c-d54d5af677e4@deltatee.com> <YsR4CNDgtt4JWonv@kroah.com> <b3deacdd-cb76-6ebb-0e29-ef6a5a426a0d@deltatee.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org
+Subject: clean up zoned device information v2
+Date:   Wed,  6 Jul 2022 09:03:34 +0200
+Message-Id: <20220706070350.1703384-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3deacdd-cb76-6ebb-0e29-ef6a5a426a0d@deltatee.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 05, 2022 at 12:16:45PM -0600, Logan Gunthorpe wrote:
-> The current version does it through a char device, but that requires
-> creating a simple_fs and anon_inode for teardown on driver removal, plus
-> a bunch of hooks through the driver that exposes it (NVMe, in this case)
-> to set this all up.
-> 
-> Christoph is suggesting a sysfs interface which could potentially avoid
-> the anon_inode and all of the extra hooks. It has some significant
-> benefits and maybe some small downsides, but I wouldn't describe it as
-> horrid.
+Hi all,
 
-Yeah, I don't think is is horrible, it fits in with the resource files
-for the BARs, and solves a lot of problems.  Greg, can you explain
-what would be so bad about it?
+this cleans up the block layer zoned device information APIs and
+moves all fields currently in the request_queue to the gendisk as
+they aren't relevant for passthrough I/O.
+
+Changes since v1:
+ - drop the blk-zoned/nvmet code sharing for now
+ - use a helper a little earlier
+ - various spelling fixes
+
+Diffstat:
+ block/bio.c                    |    2 
+ block/blk-core.c               |   13 +--
+ block/blk-merge.c              |    2 
+ block/blk-mq-debugfs-zoned.c   |    6 -
+ block/blk-mq.c                 |    2 
+ block/blk-mq.h                 |   18 ++---
+ block/blk-settings.c           |   11 +--
+ block/blk-sysfs.c              |    8 --
+ block/blk-zoned.c              |   85 ++++++++++++------------
+ block/blk.h                    |    8 +-
+ block/genhd.c                  |    1 
+ block/ioctl.c                  |    2 
+ block/partitions/core.c        |    2 
+ drivers/block/null_blk/zoned.c |    8 +-
+ drivers/md/dm-table.c          |    6 -
+ drivers/md/dm-zone.c           |   86 +++++++++++-------------
+ drivers/md/dm-zoned-target.c   |   25 +++----
+ drivers/md/dm.c                |    2 
+ drivers/nvme/host/multipath.c  |    2 
+ drivers/nvme/host/zns.c        |    6 -
+ drivers/nvme/target/zns.c      |   14 +--
+ drivers/scsi/sd.c              |    6 -
+ drivers/scsi/sd_zbc.c          |   10 +-
+ fs/zonefs/super.c              |   17 ++--
+ include/linux/blk-mq.h         |    8 +-
+ include/linux/blkdev.h         |  144 +++++++++++++++--------------------------
+ 26 files changed, 227 insertions(+), 267 deletions(-)
