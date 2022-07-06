@@ -2,90 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9544C43334
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 12:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA7BC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 13:03:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232617AbiGFM74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 08:59:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59838 "EHLO
+        id S232007AbiGFNDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 09:03:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232584AbiGFM74 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 08:59:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B144113F58
-        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 05:59:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657112394;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Z9GmFXKulJgNRiwUHEzmdBETprSRaCi3MtHplNfrlgo=;
-        b=cLC3nh9n4ltq4+Gl0/HRumzu/V/vbPMzRXeLgB6yHQUXyd/+QioBRuZvmUEFK3POkKrjQu
-        WjZ0Wn2qiNd96PeYIxmJiTnPC+f8dIyMp+BP3Kk+a0NO6C+fD/gkmb8UBLPcIZqALPS0eQ
-        D+Z0sgtxOJDPjEEpCOShx53Jro8fQI8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-359-eagCCqWtP-a8_6l-gy9hEw-1; Wed, 06 Jul 2022 08:59:51 -0400
-X-MC-Unique: eagCCqWtP-a8_6l-gy9hEw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3ECE4299E74E;
-        Wed,  6 Jul 2022 12:59:51 +0000 (UTC)
-Received: from localhost (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4D06040D282F;
-        Wed,  6 Jul 2022 12:59:49 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Guangwu Zhang <guazhang@redhat.com>
-Subject: [PATCH] scsi: megaraid: clear READ queue map's nr_queues
-Date:   Wed,  6 Jul 2022 20:59:42 +0800
-Message-Id: <20220706125942.528533-1-ming.lei@redhat.com>
+        with ESMTP id S229804AbiGFNDz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 09:03:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60091582D;
+        Wed,  6 Jul 2022 06:03:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=nD/aqJU0V41bWXT6P36l4XHLuMfgkO3GGtQpfGI2ywI=; b=x0EJkDkXitmxoeJzqogaK4bQIE
+        ALOdZhyoMDBwdqovGnEVunRzWDjLmdJD7U2J6RwLOl1puU8yIeRivZxF4q4Ax6fto1InE3pfp98gk
+        K1M40Ttxtf70UOwCeDCL2fE9yacGmp/Ua7BCk7/o82lMaVh0GYutMzor1uSyLX5BMJzPyT37Cwquo
+        cQNp0Co+6aR+lhHx/vFu1gafDL8fIHec4YA8m1Ha2NpXIGaRH2BgaLtUrhykhgiXxF5piFC4EAGFB
+        N3UFVeO6/pnSsT6xiKP/FvrczIcZLb39/v8QIuFnuymcj7F/VQxSJbwLpnU4w5KTwo33T5ilQ8Rlp
+        n2SClWhg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o94h7-00A938-DJ; Wed, 06 Jul 2022 13:03:53 +0000
+Date:   Wed, 6 Jul 2022 06:03:53 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/20] block, blksnap: header file of the module interface
+Message-ID: <YsWIOYqO4QVnd2Ru@infradead.org>
+References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
+ <1655135593-1900-3-git-send-email-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1655135593-1900-3-git-send-email-sergei.shtepa@veeam.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-megaraid scsi driver sets set->nr_maps as 3 if poll_queues is > 0, and
-blk-mq actually initializes each map's nr_queues as nr_hw_queues, so
-megaraid driver has to clear READ queue map's nr_queues, otherwise queue
-map becomes broken if poll_queues is set as non-zero.
+On Mon, Jun 13, 2022 at 06:52:55PM +0300, Sergei Shtepa wrote:
+> The header file contains a set of declarations, structures and control
+> requests (ioctl) that allows to manage the module from the user space.
 
-Fixes: 9e4bec5b2a23 ("scsi: megaraid_sas: mq_poll support")
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: sumit.saxena@broadcom.com
-Cc: chandrakanth.patil@broadcom.com
-Cc: linux-block@vger.kernel.org
-Cc: Hannes Reinecke <hare@suse.de>
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Tested-by: Guangwu Zhang <guazhang@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/scsi/megaraid/megaraid_sas_base.c | 3 +++
- 1 file changed, 3 insertions(+)
+I think this should go into include/uapi/ if you want it in a global
+place.
 
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index c95360a3c186..0917b05059b4 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -3195,6 +3195,9 @@ static int megasas_map_queues(struct Scsi_Host *shost)
- 	qoff += map->nr_queues;
- 	offset += map->nr_queues;
- 
-+	/* we never use READ queue, so can't cheat blk-mq */
-+	shost->tag_set.map[HCTX_TYPE_READ].nr_queues = 0;
-+
- 	/* Setup Poll hctx */
- 	map = &shost->tag_set.map[HCTX_TYPE_POLL];
- 	map->nr_queues = instance->iopoll_q_count;
--- 
-2.31.1
+> +#pragma once
+
+In the kernel we use classic #ifdef based guards.
+
+> +#include <linux/types.h>
+> +#include <linux/uuid.h>
+
+The uuid_t type can't be used in a userspae API.  Please use a raw
+__u8 API and then use import_uuid.
+
+> +#define BLK_SNAP_MODULE_NAME "blksnap"
+
+Does this belong into a user interface?
+
+> +#define BLK_SNAP_IMAGE_NAME "blksnap-image"
+> +#define BLK_SNAP 'V'
+> +
+> +enum blk_snap_ioctl {
+> +	/*
+> +	 * Service controls
+> +	 */
+> +	blk_snap_ioctl_version,
+> +	/*
+> +	 * Contols for tracking
+> +	 */
+> +	blk_snap_ioctl_tracker_remove,
+> +	blk_snap_ioctl_tracker_collect,
+> +	blk_snap_ioctl_tracker_read_cbt_map,
+> +	blk_snap_ioctl_tracker_mark_dirty_blocks,
+> +	/*
+> +	 * Snapshot contols
+> +	 */
+> +	blk_snap_ioctl_snapshot_create,
+> +	blk_snap_ioctl_snapshot_destroy,
+> +	blk_snap_ioctl_snapshot_append_storage,
+> +	blk_snap_ioctl_snapshot_take,
+> +	blk_snap_ioctl_snapshot_collect,
+> +	blk_snap_ioctl_snapshot_collect_images,
+> +	blk_snap_ioctl_snapshot_wait_event,
+> +	blk_snap_ioctl_end,
+
+For uapis classic #defines have the adnvantage that userspace can test
+for their presence if new ones get added.  Also the _end one should not
+be in an UAPI header as new ones can be added at any time.
 
