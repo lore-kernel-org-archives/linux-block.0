@@ -2,391 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 972BCC43334
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 17:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFF4C43334
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 18:41:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234107AbiGFRo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 13:44:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33190 "EHLO
+        id S233860AbiGFSla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 14:41:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233945AbiGFRoi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 13:44:38 -0400
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB8002BB0C
-        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 10:44:08 -0700 (PDT)
-Received: by mail-qt1-f182.google.com with SMTP id he28so19267715qtb.13
-        for <linux-block@vger.kernel.org>; Wed, 06 Jul 2022 10:44:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=SQIHCrXZxRbxb4t/6IOmpTMMhkU2VlZ9Pj8HK758FhE=;
-        b=60YqH/y42tyFrvByoL124rsTBTMO1ZhrBCwBsYVbI7ff59R3memc+WCPcPsxfkJ+Sc
-         8/KntQIeVt15Cpw+zUbPeEiMC5licbJZxKMYoufq+OVPTMclxBmMUPOW+N/xXZrfesjl
-         7aLWZesvkmljDZeMUfjMqkeikZe/Vd/mxr4brHkc9eKoHidq3wPt2qRiZ/yz2htzUNqY
-         kTHtegnUVcd6VgyQ88lwTtwtrHmPeoO48hrhECJnZy5ir4PlJop7X+8sDEEBinMYmDPC
-         OdEoUNEVh+iFUFn9pvpjDbMahMeWIbYLlNejkTqqbOT19+bx982nRCVzC2Y/wgkObXO6
-         mFMw==
-X-Gm-Message-State: AJIora/UE+eM9i0RyZtNnzZk9uLNsjqhpOsjij//bJF4m/2BhlkSubV8
-        FZanrvMxJXkFDL8uQGsWMytuZ2TqqzXm
-X-Google-Smtp-Source: AGRyM1um6OSyP/0PZszNyQooJt67NokL9RyZ+4I39ddectX6Ebb4MCnZGfrqGqlr+PRW9cvJVnJg/Q==
-X-Received: by 2002:a05:6214:1c87:b0:46b:c547:543d with SMTP id ib7-20020a0562141c8700b0046bc547543dmr37080842qvb.52.1657129447341;
-        Wed, 06 Jul 2022 10:44:07 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id j17-20020a05620a289100b006a793bde241sm33577598qkp.63.2022.07.06.10.44.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Jul 2022 10:44:06 -0700 (PDT)
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     dm-devel@redhat.com
-Cc:     linux-block@vger.kernel.org
-Subject: [5.20 PATCH v3 2/2] dm: add two stage requeue mechanism
-Date:   Wed,  6 Jul 2022 13:44:03 -0400
-Message-Id: <20220706174403.79317-3-snitzer@kernel.org>
-X-Mailer: git-send-email 2.15.0
-In-Reply-To: <20220706174403.79317-1-snitzer@kernel.org>
-References: <20220706174403.79317-1-snitzer@kernel.org>
+        with ESMTP id S233163AbiGFSla (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 14:41:30 -0400
+Received: from na01-obe.outbound.protection.outlook.com (mail-eastus2azon11021016.outbound.protection.outlook.com [52.101.57.16])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F7014006
+        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 11:41:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=koiDZSLbLTDfanmRAy3g6avGsmt2JGz19pYe6ZN6XqjRlLwfT2HDEBFOxaZ/yBz3QdkXySQZRTkycgrABo40RbY50P49g6oFqJqhJD7SCirC7s/lrVVp6qL66P4W0OGdf6Hc+KL/ztAHJzomKSPEdOa8gwSrz+DfVVRaF1SO59uJyXtNHxIp7Xlwuxqa9pHquR+b9TtIIZH1xSywA4KMaI0wBu/AL3iNwaPX6jwfcZIMNCZ701X3CuXYtHG9K11+vcGYC95NMHDc4bzN/WluvSWohiPYq59prBkQgkMqBo81pY/pe8EPSUbkyqH1/NVL5k0j3nAQKJWsVgTmyOsejg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rSl0HF9jiCfbWN/l6ALoN7igrgMddlA6kKgWWhl3kII=;
+ b=ofGBcOgtE5MqIdcW/v2cs3fjvBsfYODWcr2TsOSf1qWwaM7qxge03qrp5ZMMecTI03W1sdqWN9jm8P9iMCA5eQderHqiP1waX1Ys5YXgi0wdGsyy1wBWecGFy9Wr9IrcOvNl9TQaXxaTgFZHeXKW9G860zioxn5lOz7UuIw/qEToFGNpp5qCWgdMPOhYNBX8ccUTCEEb2yFogW/UAWf9xKHEyTFDM1yrhEYpcBjUCzVbvzHEVuhGuvo3iFvoHWrx++fw8zBcyCrxGamCyarzyr/Dj9RbIk6cMNlh9D1qdoAlA6f911tFXBrMaA7fxlKggk5zjNFdRUzwg+21huPACw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rSl0HF9jiCfbWN/l6ALoN7igrgMddlA6kKgWWhl3kII=;
+ b=ifu23Cyp4fserAH6iKIrd3jlwqP/Y20hDdF0Pq4s+wP21Y0EzeaXUQKmgdLUObp8h+giyWLUZyxfIEVxXPN50EuNMOUzfAjAYCXGi8Ge/0O7iyGeC95FL9F8yqobBX31vedwWXPoxvDNZSYrEZqFp3+2tpWbMvoWlc3FD6x4Hyk=
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com (2603:10b6:510:d2::21)
+ by PH7PR21MB3260.namprd21.prod.outlook.com (2603:10b6:510:1d8::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.2; Wed, 6 Jul
+ 2022 18:41:27 +0000
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::7838:dcbf:513b:d992]) by PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::7838:dcbf:513b:d992%5]) with mapi id 15.20.5438.000; Wed, 6 Jul 2022
+ 18:41:26 +0000
+From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: RE: Question about merging raw block device writes
+Thread-Topic: Question about merging raw block device writes
+Thread-Index: AdiHFR/O/apBVKitTXairniuc6HJ9QKUqi1w
+Date:   Wed, 6 Jul 2022 18:41:26 +0000
+Message-ID: <PH0PR21MB3025A24A3B27D21465E4C932D7809@PH0PR21MB3025.namprd21.prod.outlook.com>
+References: <PH0PR21MB3025A7D1326A92A4B8BDB5FED7B59@PH0PR21MB3025.namprd21.prod.outlook.com>
+In-Reply-To: <PH0PR21MB3025A7D1326A92A4B8BDB5FED7B59@PH0PR21MB3025.namprd21.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=9eefed94-8cb9-419f-8b6a-54707b07e910;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-06-23T15:22:34Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4667ed80-bfcf-4a01-725f-08da5f7f223e
+x-ms-traffictypediagnostic: PH7PR21MB3260:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: a5cq64D+3GNCu6MQuQ5RyIED3qC7La4h3psnNjVJw1IQ071nimKbk0DLtZ8wtGdMkJKl45vdn44WSGALdu7srbIv5qNuXS86XMVA429DiiJI8ibHeylqZ9npWw6hoaP9qXng/jdRhFXOgloNVwzKgVeCC3K/HGIlba+xrPy3W5L132JjC2ztfUgS/rHw8F1mvTEqtVKAz7/g72EnnEQmkQ8QEIfBQ7MJb1KLM3jjWRhLIsblvrx+lI08Y6//9O6z22JEizdYfqxA7P+p7SyvR0mDwhOChy4GI9Vt8OKg4JtD2WkpQFC5zAT4VyG60uy/dM3VEFJmNBlysfRKUYSXoNm/JsQJM/o3RhVcmBSwQ175iMM5+oxK33/msEkVK4oE5UfzFrzO6ei4vXSgWu8oT0W4GQDazRAfkF4qWoOokNQPZxnroBtUFZdiwTRzOWsHuqkq+9TgTAHTFpG2OGoS9BTJ/++cv2fC8dxCwNva9ptoskuXjrCK0dyxrUy9w7ofkDFyanw5C2ylb0pIQL2yG1W32WtpkFNRnOuEDa1wCFDGEsliOThZ8rLWauIa1VMDdVQ5UeSgu8TsQZ5Pfh3TeYGCHY4btt/+m6jmFDB/qJu6Q1F+iY/yrzgKLmyyJirgq3TXYTJ1itXh89VaLge1l12Mlt31rm862+NdxtJOfAJQ8K63RMvD90Koy3FsfQh78rYlDq+sjt7n2FPzUOFUIgoF4bbOtsOUEt2qtLtUASVXShinpn5rsK14+zZph3q1J4jMZsu1CzeXMq4Zay5dgkXGU7EzSNhGuP9kisRq6Ux2Bsez+P24AdIISwymi4h3uJWDzPeKKE3Dd1AJ/KTAx/2Yuc3KLTc/jse6LyRp2O+OfEkn/T6ekpUR1P9ekIOP
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR21MB3025.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(366004)(396003)(376002)(346002)(451199009)(6506007)(26005)(86362001)(7696005)(41300700001)(122000001)(38100700002)(38070700005)(9686003)(82960400001)(186003)(82950400001)(8936002)(52536014)(5660300002)(10290500003)(76116006)(66446008)(66476007)(66946007)(66556008)(33656002)(8676002)(64756008)(8990500004)(6916009)(55016003)(2906002)(83380400001)(316002)(478600001)(71200400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?c0SBH160h3EtYTcGbAGE+89Wq9zY17Gm5xzHukedqiK4X4OzqVPWYe6Gn0mJ?=
+ =?us-ascii?Q?gC6wTnF851ZRStrK/dHTbOPFMgNQzQa959IqkEfusaOoJ70Zlua6l6KuqWtK?=
+ =?us-ascii?Q?xkXbeTFkqppFYeU7epI/9AD8pTwUR0wZb1q9NljTCnbU/3YyUMzp/rXw4FBA?=
+ =?us-ascii?Q?bUYwd21Bc09m0u7MXv+e4gsSBB9T/+g4VOik4sj8cI839DM3Nx9egzpvWKrd?=
+ =?us-ascii?Q?aezORRQKd7qUKIB/29BFk496DJ8b7E++uhjkk5JF6G0Zevxf3yKkkdWwsRBc?=
+ =?us-ascii?Q?gDVZQrhR+bTq/LfcLTAEWdtuSfdm/GlXDfawLI0dzIGUsyNxLnhXyc3KYwF6?=
+ =?us-ascii?Q?kxhY+76NUH44DXz/0MfE4/HZ52q9zmB9x4zjP1b8k1l5cNwTV8y9xmQM6pzr?=
+ =?us-ascii?Q?23sJ2MOQaJ7Zyt41IWWwLOBUaHwlwsT1F2Lnf5OlX8uaF+WUn726ATOnaSE1?=
+ =?us-ascii?Q?eRAfemAEbHr+wWZjPiu/Maf3LHvGnfG+dfJFlxJsG5gYiqIbeQ3Ul5PDlEI8?=
+ =?us-ascii?Q?Q1LCHLX7Ksn/vq6n+BGxZYnyQArnfAytGQ317M8qPHSyiGsyiJJM+HxKBOpU?=
+ =?us-ascii?Q?OaPw2hEdY0RD5HZyR3pFKipwYjNwKarBOWHPnht4mrVzeaamKbR8kbz9ZF0b?=
+ =?us-ascii?Q?r127BKhAJ5udrZO6xYTTqgoQAiu1FyqL+aOf2Edb9ttdshKLcWq+zo4GZZca?=
+ =?us-ascii?Q?QrOe561PNnEwG+nfM4m8PBE+EwoicGlLQxWgQ9V0v69xEBSMwoQM2wgNM4z5?=
+ =?us-ascii?Q?qUErbfzzbBHd9K3rN5E8FB7xuTNY3SnV62MfFXtd8cK2eqP/iukas4DUfflB?=
+ =?us-ascii?Q?4mHbqqie3YYaQbQVPJny/KMGvWABcN2gSbO5NmFfCCrVa7V9EbvSnecS6d+H?=
+ =?us-ascii?Q?X8f8/fZj1bYyckAQjbesnXhd2Du5avpAo62snJvqLe1p4oTRjzNfH9UyeaGp?=
+ =?us-ascii?Q?I2vOWmjJ62AmC4Wbr5RfJCW4oDN62hHeFjLPEAHeM15qrAWvFkDS8zKwj9Ur?=
+ =?us-ascii?Q?AMCtSXt3MlbIrGJa4FOt8LnBEeW9o0sZj4bbuko5gYlDPk5+117Wmtfc06nX?=
+ =?us-ascii?Q?2sdMofsEwzt0tQYu9DuXlzPddqLvwfqbx5vJCRB2LFcsE1E5Xfyuf9Z5PTX+?=
+ =?us-ascii?Q?B8EVwLFLHXw61vWOdocaOYJ46+wh6ZAlfzRX+6BhtwhxF3pPVjideApMsLVm?=
+ =?us-ascii?Q?VCv0qmaq2GwUg8CYWjkgt+gLYIqx89kYEX73D9y6XlFTt9Kyq/4LkCAM1XcF?=
+ =?us-ascii?Q?8Pw1MZIVcZbqnZ0PppK4Jhw74uVJ/zkBzanS5GWSsLXya2Zj1YTZsh2zc6Sz?=
+ =?us-ascii?Q?Z/2APxvfO85vAmwu0iY1Ph78akq7V7GFFXOniwJah3myg53IBEiliTO0iXfc?=
+ =?us-ascii?Q?f0wiCOfUg49E056/tK3K1vtqZnYFlItpl8v8yoN7MQUh+T9W7h5Li6cZ9f3S?=
+ =?us-ascii?Q?rIqj6brfl/Cfhl8vPhC/y9ymeywa/uP1EHoERrEnQvdl0g83gPpqax9VcC9H?=
+ =?us-ascii?Q?292eFHGDtk/xYq9MQJVTelxIRy0vfRKbgonFJ5PzPEqIsa7/D2zivXGI1PsZ?=
+ =?us-ascii?Q?wFDhKNqzLD2ocHuFQlx1rXnN5maJB7FSE5A7335U734tJB0zQA7TGmLqIzKm?=
+ =?us-ascii?Q?/Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR21MB3025.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4667ed80-bfcf-4a01-725f-08da5f7f223e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2022 18:41:26.5724
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2Y2FkiMkPDV9rsw43S/CTWdR64lfChOSHtSNQ41G2KVnK87OGD5GqrlaJiLcBSLRXTyUKmxCwuQEI2hN5We4Ppc63+3nfEIgWmzfLHhYGd8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR21MB3260
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+From: Michael Kelley (LINUX) Sent: Thursday, June 23, 2022 8:28 AM
+>=20
+> In using fio for performance measurements of sequential I/O against a
+> SCSI disk, I see a big difference in reads vs. writes.  Reads get good
+> merging, but writes get no merging.  Here are the fio command lines:
+>=20
+> fio --bs=3D4k --ioengine=3Dlibaio --iodepth=3D64 --filename=3D/dev/sdc --=
+direct=3D1 --numjobs=3D8
+> --rw=3Dread --name=3Dreadmerge
+>=20
+> fio --bs=3D4k --ioengine=3Dlibaio --iodepth=3D64 --filename=3D/dev/sdc --=
+direct=3D1 --numjobs=3D8
+> --rw=3Dwrite --name=3Dwritemerge
+>=20
+> /sys/block/sdc/queue/scheduler is set to [none].  Linux kernel is 5.18.5.
+>=20
+> The code difference appears to be in blkdev_read_iter() vs.
+> blkdev_write_iter().  The latter has blk_start_plug()/blk_finish_plug()
+> while the former does not.  As a result, blk_mq_submit_bio() puts
+> write requests on the pluglist, which is flushed almost immediately.
+> blk_mq_submit_bio() sends the read requests through
+> blk_mq_try_issue_directly(), and they are later merged in a blk-mq
+> software queue.
+>=20
+> For writes, the pluglist flush path is as follows:
+>=20
+> blk_finish_plug()
+> __blk_flush_plug()
+> blk_mq_flush_plug_list()
+> blk_mq_plug_issue_direct()
+> blk_mq_request_issue_directly()
+> __blk_mq_try_issue_directly()
+>=20
+> The last function is called with "bypass_insert" set to true, so if the
+> request must wait for budget, the request doesn't go on a blk-mq
+> software queue like reads do, and no merging happens.
+>=20
+> I don't know the blk-mq layer well enough to know what's
+> supposed to be happening.  Is it intentional to not do write merges
+> in this case? Or did something get broken, and it wasn't noticed?
+>=20
 
-Commit 61b6e2e5321d ("dm: fix BLK_STS_DM_REQUEUE handling when dm_io
-represents split bio") reverted DM core's bio splitting back to using
-bio_split()+bio_chain() because it was found that otherwise DM's
-BLK_STS_DM_REQUEUE would trigger a live-lock waiting for bio
-completion that would never occur.
+Gentle ping.  Anyone have knowledge of whether write merging
+*should* be happening in this case?
 
-Restore using bio_trim()+bio_inc_remaining(), like was done in commit
-7dd76d1feec7 ("dm: improve bio splitting and associated IO
-accounting"), but this time with proper handling for the above
-scenario that is covered in more detail in the commit header for
-61b6e2e5321d.
-
-Solve this issue by adding a two staged dm_io requeue mechanism that
-uses the new bio_rewind() via dm_io_rewind():
-
-1) requeue the dm_io into the requeue_list added to struct
-   mapped_device, and schedule it via new added requeue work. This
-   workqueue just clones the dm_io->orig_bio (which DM saves and
-   ensures its end sector isn't modified). dm_io_rewind() uses the
-   sectors and sectors_offset members of the dm_io that are recorded
-   relative to the end of orig_bio: bio_rewind()+bio_trim() are then
-   used to make that cloned bio reflect the subset of the original bio
-   that is represented by the dm_io that is being requeued.
-
-2) the 2nd stage requeue is same with original requeue, but
-   io->orig_bio points to new cloned bio (which matches the requeued
-   dm_io as described above).
-
-This allows DM core to shift the need for bio cloning from bio-split
-time (during IO submission) to the less likely BLK_STS_DM_REQUEUE
-handling (after IO completes with that error).
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@kernel.org>
----
- drivers/md/dm-core.h      |  13 ++++-
- drivers/md/dm-io-rewind.c |  25 +++++++++-
- drivers/md/dm.c           | 121 +++++++++++++++++++++++++++++++++++-----------
- 3 files changed, 129 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index 5793a27b2118..5a3fe5897b1e 100644
---- a/drivers/md/dm-core.h
-+++ b/drivers/md/dm-core.h
-@@ -22,6 +22,8 @@
- 
- #define DM_RESERVED_MAX_IOS		1024
- 
-+struct dm_io;
-+
- struct dm_kobject_holder {
- 	struct kobject kobj;
- 	struct completion completion;
-@@ -91,6 +93,14 @@ struct mapped_device {
- 	spinlock_t deferred_lock;
- 	struct bio_list deferred;
- 
-+	/*
-+	 * requeue work context is needed for cloning one new bio
-+	 * to represent the dm_io to be requeued, since each
-+	 * dm_io may point to the original bio from FS.
-+	 */
-+	struct work_struct requeue_work;
-+	struct dm_io *requeue_list;
-+
- 	void *interface_ptr;
- 
- 	/*
-@@ -275,7 +285,6 @@ struct dm_io {
- 	atomic_t io_count;
- 	struct mapped_device *md;
- 
--	struct bio *split_bio;
- 	/* The three fields represent mapped part of original bio */
- 	struct bio *orig_bio;
- 	unsigned int sector_offset; /* offset to end of orig_bio */
-@@ -319,6 +328,6 @@ extern atomic_t dm_global_event_nr;
- extern wait_queue_head_t dm_global_eventq;
- void dm_issue_global_event(void);
- 
--void bio_rewind(struct bio *bio, unsigned bytes);
-+void dm_io_rewind(struct dm_io *io, struct bio_set *bs);
- 
- #endif
-diff --git a/drivers/md/dm-io-rewind.c b/drivers/md/dm-io-rewind.c
-index fbeaa8a342ed..3ba7162f85fa 100644
---- a/drivers/md/dm-io-rewind.c
-+++ b/drivers/md/dm-io-rewind.c
-@@ -131,7 +131,7 @@ static inline void bio_rewind_iter(const struct bio *bio,
-  * rewinding from end of bio and restoring its original position.
-  * Caller is also responsibile for restoring bio's size.
-  */
--void bio_rewind(struct bio *bio, unsigned bytes)
-+static void bio_rewind(struct bio *bio, unsigned bytes)
- {
- 	if (bio_integrity(bio))
- 		bio_integrity_rewind(bio, bytes);
-@@ -141,3 +141,26 @@ void bio_rewind(struct bio *bio, unsigned bytes)
- 
- 	bio_rewind_iter(bio, &bio->bi_iter, bytes);
- }
-+
-+void dm_io_rewind(struct dm_io *io, struct bio_set *bs)
-+{
-+	struct bio *orig = io->orig_bio;
-+	struct bio *new_orig = bio_alloc_clone(orig->bi_bdev, orig,
-+					       GFP_NOIO, bs);
-+	/*
-+	 * bio_rewind can restore to previous position since the end
-+	 * sector is fixed for original bio, but we still need to
-+	 * restore bio's size manually (using io->sectors).
-+	 */
-+	bio_rewind(new_orig, ((io->sector_offset << 9) -
-+			      orig->bi_iter.bi_size));
-+	bio_trim(new_orig, 0, io->sectors);
-+
-+	bio_chain(new_orig, orig);
-+	/*
-+	 * __bi_remaining was increased (by dm_split_and_process_bio),
-+	 * so must drop the one added in bio_chain.
-+	 */
-+	atomic_dec(&orig->__bi_remaining);
-+	io->orig_bio = new_orig;
-+}
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index c987f9ad24a4..fa6839141118 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -590,7 +590,6 @@ static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
- 	atomic_set(&io->io_count, 2);
- 	this_cpu_inc(*md->pending_io);
- 	io->orig_bio = bio;
--	io->split_bio = NULL;
- 	io->md = md;
- 	spin_lock_init(&io->lock);
- 	io->start_time = jiffies;
-@@ -880,13 +879,35 @@ static int __noflush_suspending(struct mapped_device *md)
- 	return test_bit(DMF_NOFLUSH_SUSPENDING, &md->flags);
- }
- 
-+static void dm_requeue_add_io(struct dm_io *io, bool first_stage)
-+{
-+	struct mapped_device *md = io->md;
-+
-+	if (first_stage) {
-+		struct dm_io *next = md->requeue_list;
-+
-+		md->requeue_list = io;
-+		io->next = next;
-+	} else {
-+		bio_list_add_head(&md->deferred, io->orig_bio);
-+	}
-+}
-+
-+static void dm_kick_requeue(struct mapped_device *md, bool first_stage)
-+{
-+	if (first_stage)
-+		queue_work(md->wq, &md->requeue_work);
-+	else
-+		queue_work(md->wq, &md->work);
-+}
-+
- /*
-  * Return true if the dm_io's original bio is requeued.
-  * io->status is updated with error if requeue disallowed.
-  */
--static bool dm_handle_requeue(struct dm_io *io)
-+static bool dm_handle_requeue(struct dm_io *io, bool first_stage)
- {
--	struct bio *bio = io->split_bio ? io->split_bio : io->orig_bio;
-+	struct bio *bio = io->orig_bio;
- 	bool handle_requeue = (io->status == BLK_STS_DM_REQUEUE);
- 	bool handle_polled_eagain = ((io->status == BLK_STS_AGAIN) &&
- 				     (bio->bi_opf & REQ_POLLED));
-@@ -912,8 +933,8 @@ static bool dm_handle_requeue(struct dm_io *io)
- 		spin_lock_irqsave(&md->deferred_lock, flags);
- 		if ((__noflush_suspending(md) &&
- 		     !WARN_ON_ONCE(dm_is_zone_write(md, bio))) ||
--		    handle_polled_eagain) {
--			bio_list_add_head(&md->deferred, bio);
-+		    handle_polled_eagain || first_stage) {
-+			dm_requeue_add_io(io, first_stage);
- 			requeued = true;
- 		} else {
- 			/*
-@@ -926,19 +947,21 @@ static bool dm_handle_requeue(struct dm_io *io)
- 	}
- 
- 	if (requeued)
--		queue_work(md->wq, &md->work);
-+		dm_kick_requeue(md, first_stage);
- 
- 	return requeued;
- }
- 
--static void dm_io_complete(struct dm_io *io)
-+static void __dm_io_complete(struct dm_io *io, bool first_stage)
- {
--	struct bio *bio = io->split_bio ? io->split_bio : io->orig_bio;
-+	struct bio *bio = io->orig_bio;
- 	struct mapped_device *md = io->md;
- 	blk_status_t io_error;
- 	bool requeued;
- 
--	requeued = dm_handle_requeue(io);
-+	requeued = dm_handle_requeue(io, first_stage);
-+	if (requeued && first_stage)
-+		return;
- 
- 	io_error = io->status;
- 	if (dm_io_flagged(io, DM_IO_ACCOUNTED))
-@@ -978,6 +1001,58 @@ static void dm_io_complete(struct dm_io *io)
- 	}
- }
- 
-+static void dm_wq_requeue_work(struct work_struct *work)
-+{
-+	struct mapped_device *md = container_of(work, struct mapped_device,
-+						requeue_work);
-+	unsigned long flags;
-+	struct dm_io *io;
-+
-+	/* reuse deferred lock to simplify dm_handle_requeue */
-+	spin_lock_irqsave(&md->deferred_lock, flags);
-+	io = md->requeue_list;
-+	md->requeue_list = NULL;
-+	spin_unlock_irqrestore(&md->deferred_lock, flags);
-+
-+	while (io) {
-+		struct dm_io *next = io->next;
-+
-+		dm_io_rewind(io, &md->queue->bio_split);
-+
-+		io->next = NULL;
-+		__dm_io_complete(io, false);
-+		io = next;
-+	}
-+}
-+
-+/*
-+ * Two staged requeue:
-+ *
-+ * 1) io->orig_bio points to the real original bio, and the part mapped to
-+ *    this io must be requeued, instead of other parts of the original bio.
-+ *
-+ * 2) io->orig_bio points to new cloned bio which matches the requeued dm_io.
-+ */
-+static void dm_io_complete(struct dm_io *io)
-+{
-+	bool first_requeue;
-+
-+	/*
-+	 * Only dm_io that has been split needs two stage requeue, otherwise
-+	 * we may run into long bio clone chain during suspend and OOM could
-+	 * be triggered.
-+	 *
-+	 * Also flush data dm_io won't be marked as DM_IO_WAS_SPLIT, so they
-+	 * also aren't handled via the first stage requeue.
-+	 */
-+	if (dm_io_flagged(io, DM_IO_WAS_SPLIT))
-+		first_requeue = true;
-+	else
-+		first_requeue = false;
-+
-+	__dm_io_complete(io, first_requeue);
-+}
-+
- /*
-  * Decrements the number of outstanding ios that a bio has been
-  * cloned into, completing the original io if necc.
-@@ -1256,6 +1331,7 @@ static size_t dm_dax_recovery_write(struct dax_device *dax_dev, pgoff_t pgoff,
- void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors)
- {
- 	struct dm_target_io *tio = clone_to_tio(bio);
-+	struct dm_io *io = tio->io;
- 	unsigned bio_sectors = bio_sectors(bio);
- 
- 	BUG_ON(dm_tio_flagged(tio, DM_TIO_IS_DUPLICATE_BIO));
-@@ -1271,8 +1347,9 @@ void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors)
- 	 * __split_and_process_bio() may have already saved mapped part
- 	 * for accounting but it is being reduced so update accordingly.
- 	 */
--	dm_io_set_flag(tio->io, DM_IO_WAS_SPLIT);
--	tio->io->sectors = n_sectors;
-+	dm_io_set_flag(io, DM_IO_WAS_SPLIT);
-+	io->sectors = n_sectors;
-+	io->sector_offset = bio_sectors(io->orig_bio);
- }
- EXPORT_SYMBOL_GPL(dm_accept_partial_bio);
- 
-@@ -1395,17 +1472,7 @@ static void setup_split_accounting(struct clone_info *ci, unsigned len)
- 		 */
- 		dm_io_set_flag(io, DM_IO_WAS_SPLIT);
- 		io->sectors = len;
--	}
--
--	if (static_branch_unlikely(&stats_enabled) &&
--	    unlikely(dm_stats_used(&io->md->stats))) {
--		/*
--		 * Save bi_sector in terms of its offset from end of
--		 * original bio, only needed for DM-stats' benefit.
--		 * - saved regardless of whether split needed so that
--		 *   dm_accept_partial_bio() doesn't need to.
--		 */
--		io->sector_offset = bio_end_sector(ci->bio) - ci->sector;
-+		io->sector_offset = bio_sectors(ci->bio);
- 	}
- }
- 
-@@ -1705,11 +1772,9 @@ static void dm_split_and_process_bio(struct mapped_device *md,
- 	 * Remainder must be passed to submit_bio_noacct() so it gets handled
- 	 * *after* bios already submitted have been completely processed.
- 	 */
--	WARN_ON_ONCE(!dm_io_flagged(io, DM_IO_WAS_SPLIT));
--	io->split_bio = bio_split(bio, io->sectors, GFP_NOIO,
--				  &md->queue->bio_split);
--	bio_chain(io->split_bio, bio);
--	trace_block_split(io->split_bio, bio->bi_iter.bi_sector);
-+	bio_trim(bio, io->sectors, ci.sector_count);
-+	trace_block_split(bio, bio->bi_iter.bi_sector);
-+	bio_inc_remaining(bio);
- 	submit_bio_noacct(bio);
- out:
- 	/*
-@@ -1985,9 +2050,11 @@ static struct mapped_device *alloc_dev(int minor)
- 
- 	init_waitqueue_head(&md->wait);
- 	INIT_WORK(&md->work, dm_wq_work);
-+	INIT_WORK(&md->requeue_work, dm_wq_requeue_work);
- 	init_waitqueue_head(&md->eventq);
- 	init_completion(&md->kobj_holder.completion);
- 
-+	md->requeue_list = NULL;
- 	md->swap_bios = get_swap_bios();
- 	sema_init(&md->swap_bios_semaphore, md->swap_bios);
- 	mutex_init(&md->swap_bios_lock);
--- 
-2.15.0
-
+Michael
