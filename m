@@ -2,171 +2,338 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD8DC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 11:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 150E6C43334
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 11:59:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232071AbiGFLX4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 07:23:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58930 "EHLO
+        id S232040AbiGFL70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 07:59:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232025AbiGFLX4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 07:23:56 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C8A15710
-        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 04:23:54 -0700 (PDT)
+        with ESMTP id S229804AbiGFL7Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 07:59:24 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FE6323BED
+        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 04:59:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1657106634; x=1688642634;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=JxKiHPkydbui6nKC/EhAbdWkJ1K1VyLfQm3b3/Pdjtg=;
-  b=HA5dByEl+asLK98OgXpubdDOgnEIs4Rdevfcn9KWyDyQ73c8oUlcdXP7
-   Ex2M32A+VRDu44omWv2SvSh2Am7RS/ucbKOpCnJ88GKgnklUPwNoNmjuu
-   K1UuSxFVh9HB3Xr8EhbAShsTESoGCVnqmHoITXwnvIQKiwrsA622LGHCs
-   SrTRc0joak2q12Il8x3dIY+eN69IO8i45vkmM50Higpkuck2tmR63UaEg
-   mTM2PzAAN2oGgX4YZ9b5fJD7z0liGzgbF2nmfvr9K2eUabe9pvwmtzor2
-   xm1ATRGM0vTFtwoH+OWMMzIol8raOH8gZnZm9sO9NtNy+IjsgHehjqeXm
-   w==;
+  t=1657108762; x=1688644762;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7s7q0INtd+Rq06SCkVVAKizJ6RdF1NL+4ogbR8OLEAM=;
+  b=V3FcF7R1gIpZ39KFLaSngEF4nNvFTKEOXDJ5RnFtzdXFhas46JPHpI9G
+   aCHVIXwrhV1R8a+MukwgnzATdccD3UN/POgO58N1TJ611Q2tpj0jRMUa0
+   usJ1dPwpPiK8YEi7I6FwU5kxUWmTBQ10HfODYCz1yzilXVoCokcU6Lrf3
+   xcUWZ9CTZ13dbAMll/ri0g2jxFDpmdUgoMpdbLtiC2qqmZ/I7U4pfZTox
+   9CeNbXLeqpVlqqf6xjn36AXWlrcvzcAbZmvGzJ/SDOKF2gNdfi7L24I39
+   31XGlww1NCNltCoRRuni0Jto7xQn2l6D2RDPlExE1skDt3MRVFo96al4b
+   g==;
 X-IronPort-AV: E=Sophos;i="5.92,249,1650902400"; 
-   d="scan'208";a="203631322"
-Received: from mail-mw2nam10lp2102.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.102])
-  by ob1.hgst.iphmx.com with ESMTP; 06 Jul 2022 19:23:53 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dJ3cp7HX5sQxtJRmfiB4RH7kqkAMrYcnripTL6VtdmmWrplyeEKe7EGz3Aii8Cx2DfNQh8xCwB7FO8ON8U0owjd3i2xsdTbzuEmz9pAKgLnAlTRBrEmiBH8TLLyQTuWV1a4hPi3earZT7bpzfj9XgGYWtQPG78RGQhAA+4cPhg4SvX0Hw7T0vddOZLLsP/qIaZ4a1tD5EtehPAozLXshYUbg9Q8oVq8qO8Y9pW6veidAgah6ndlH10I05+0HMYPQI7U9FE0sGWeT4aufvYXgQyPFRqp7rPwsnWagxAZgGoYE+G1EswsnzOtau/nto0RXZhYpw6Iui+L2fnomW6RPKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JxKiHPkydbui6nKC/EhAbdWkJ1K1VyLfQm3b3/Pdjtg=;
- b=k/1K/a8MuQLLu9WuDIqnj/wlAnWz6QxPyZXfFW9pPiLh0UN27OiA6+6FlGKzzE01S8xa68a4MlVsnOUAQB9TzXXsBr965MmYJ5rDDqvooVOr4EPE+1CVAIqfq31G/qlyMr94KeHEZL+r233ufP08wPfB57tA8heCpoObmKGhdbyYSoEDsBdz1l/2z+fZTR5r52fwkveMB7yU5o6jsrS1LvpS1eUhSQmmTSF7j1OqaZX/wUQbqVA/Kzz3eH8+wu5pCGpjUcWjcQm31IFLK2SkKITfYE+QRMMtqSQX6LbdFFf9w17bGygUWZcRvg7xWfXBOrJZZqgFkkhVBEFTkebMDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JxKiHPkydbui6nKC/EhAbdWkJ1K1VyLfQm3b3/Pdjtg=;
- b=teTXs8OvGIr78rCiTRT3uh02xy8wRTVh9icZPsHqKE5ceUEkKR0xySm4kzvVlMp1bFT8aYxKQr1BUMLepGo3bEAQbL+N3tPfvmN1jgvLg0F5iwz8n+lXVgs7MmG12k4zkcZEv12PWFhe9o43f/et0pv0xaQQIkwFF8sE7pNaKd8=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- PH0PR04MB8420.namprd04.prod.outlook.com (2603:10b6:510:f6::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5395.17; Wed, 6 Jul 2022 11:23:51 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::3cc7:ac84:d443:5833]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::3cc7:ac84:d443:5833%7]) with mapi id 15.20.5395.021; Wed, 6 Jul 2022
- 11:23:50 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: blktests: print multiple skip reasons
-Thread-Topic: blktests: print multiple skip reasons
-Thread-Index: AQHYkF3CbIn6+UHqqUaQcGpiq+iSva1v9W2AgAE/kgA=
-Date:   Wed, 6 Jul 2022 11:23:50 +0000
-Message-ID: <20220706112350.r3lgd6hfeteu6lfd@shindev>
-References: <20220705105537.hdjmbq3dcok3srmj@shindev>
- <d5c0ac21-47fd-6aa6-43bd-0ac8052094ef@nvidia.com>
-In-Reply-To: <d5c0ac21-47fd-6aa6-43bd-0ac8052094ef@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 15d3b3f1-e749-44cd-90f2-08da5f4200a5
-x-ms-traffictypediagnostic: PH0PR04MB8420:EE_
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: dBJTdZpQDRfHkUhB1gTwqp0yGL/XNeh1rvwnlc2Kit98GYxElaNbOOgeltoTRJtl+oROofgQYkG6uqyE0sC2De92FRycEJayk+bNiAQSkoflkkePmORK/dF8Y3oZ+6/y8O2tbWcRsWjQ9aMHtqU1rJOhXU4iU3rZ/KeXzO6jyZRv3kBF7HUVft0u73YJmvHLxRM6ocF4lE7QGXyJNnI0rWjwzzst/4DTxsZ+2KMPKTDpxGBU1pL2NpDytH5w3O3Zv5XqUqJCSQFxojBe/UMJZSoWM3+f9Gk+hoObhOwaU5T8jOhE8+OxwNPHxkjU9ul1MxAIJ3muQyPcRPtXE7OiQm66KoIgEuWsxk3WTNHk3I0II1kMlSgXnonMIaa2W3m5f0Ac2312do1rkx/whHsXnE6Uj5LvJqFf7x53+xMLW3yWoDvBJ2xV3ZAxRDA80vhUifTe8iwXJrocNBQwsto6l74fQVljvQmA6XN8oAuj7VDKuhQ4/lV3Ua/RSvyuHqX3rr6YMOg5LD3pmgdzdiJRXetNmsD97VpsDA++S1hVBp7BjdJp5jkAWP30nGz4YOdy9tpU8f8bNYVN+ep5zLbEr1yS4ATMxT9OxM2NTsNAbsW1ZbfatojGdkUEuunrc99J8KV1i3AKjzfqUIuHToE6WbeLImpX0VXKrtde+FIpYBc52TR6tolnnc9vQQgCZlY3fn9skO/Eax4G3sgZLTItFoPMOJkFC+Nm6eAvfLeD5+C560M/bIZuxA86sPYiP5+1/D6kbb6IXAZgtlNIQAyG1JSnHxtINiV9FI6YDHyGdJls3KWyHn/Wi0YGu4f2r/0jpNkpECzWCV+V9HZTWneEqlbuDBJO+9B89toMI9nozQk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(4636009)(136003)(376002)(39860400002)(366004)(346002)(396003)(6486002)(1076003)(966005)(66476007)(478600001)(2906002)(71200400001)(66446008)(6916009)(316002)(9686003)(53546011)(91956017)(66946007)(8936002)(6506007)(26005)(64756008)(8676002)(44832011)(5660300002)(86362001)(4326008)(76116006)(66556008)(83380400001)(186003)(41300700001)(38070700005)(33716001)(6512007)(82960400001)(38100700002)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?aUKIYbegySU9f+YZ69INF+vDDs1/Le/250S9lZYW4Y80eyGUkahzglG7V3Nn?=
- =?us-ascii?Q?P9tXU6gYDtrLCzBVHiN+K8Yn7USqrnYo8QpRJ8+YMHl514DaS6N/foVbStd/?=
- =?us-ascii?Q?e1zhtxASIlB3C2hTo/Abc3o2B5EaA0cVLxnz2a/FUlFsXHIwMaxSOvRgUkUb?=
- =?us-ascii?Q?Rx6DOKxe84Ocv+ea0YV6fcPbT5fwJITO9hPfrxUlXf4B0agQDA+F4uvaSb/n?=
- =?us-ascii?Q?zzdfBouo2KJiCJfRVXXk1EqgK3TRrVCGeXSF9kfdXeENbQlHm8GMXc9+Oxit?=
- =?us-ascii?Q?bKjj6302PIsp7M5lb6+eRsoodRymyF2rlB95gNHkucg2kIXCHVU6P9sHfSXB?=
- =?us-ascii?Q?DnZ6Ri1bDndxOIAR7d5PfkIqFwRk6B79hkGnR/UyRCEqs9mMkh5zrpl+4vKN?=
- =?us-ascii?Q?Tt+H6fX1pN2v7kMyOQ+rxMblV4bHL8/OQ2Dno2gfp7sYXe2q1Ctj/4PTN3c1?=
- =?us-ascii?Q?1ZnDOM5Qo1Z7YM0TB4IHSFEzI3hluEA0OCfb+2lVnk+fFuK1899dhaXRa5UL?=
- =?us-ascii?Q?SBWi8DS9qdV7UyxiHIS4xBo8Ps80Cj2qLYL9xcLrWF0sx4Wy8VWHarwRHzJp?=
- =?us-ascii?Q?0VV59KjmFnGi7un37FYP5n57/e/H44/+JvYmfNBjZY+wzkrg74ZpCeTyh206?=
- =?us-ascii?Q?IQ+R1uqHdhfLedjjadcDl9jOkmOl5hF7xg8obawQsTrQWxU3fOLi8g7A6Z5r?=
- =?us-ascii?Q?9ytkMaPGKaq/HVKr1GpUoBs4ZpANrH8Wx1V4mzFwHwBsUTHH7ioFR0X5je4y?=
- =?us-ascii?Q?P00brPPfgp+YSZ/7teO2Z3ar7RltI9iZoTfYPxr2JObEt/0PKMKdIrn1tEjd?=
- =?us-ascii?Q?4SATNRzCNIEBdyhekbTELAOIcV4IV7j9EVKrl4lD9+U22DdwUlRgATXBNFpq?=
- =?us-ascii?Q?HAGHQgEkoycr+ulGdav5s4mGQ5VopYGRdgtX3L5SHe6ugODAFr+0eg37Uy+0?=
- =?us-ascii?Q?7ICq42S98Rv4wWFsSXmFlO6Fc/hZeWrUkjMqiG91nE7EAalA2bM4nLH7f4eL?=
- =?us-ascii?Q?g14mNMEzFNOk7O6NpqxUWoYqhP4wmB8wKEPfCnQXOT7XkDsKu8v/axBYWn6K?=
- =?us-ascii?Q?lOEvczKot3RW3xCeOW5mBR9MELoLsvpwQUgfQDDvxKgAEDQ60IiyxPE/MnjH?=
- =?us-ascii?Q?YCi+SHpAfet1vukzy50n4h/ZpXYS1GovmpUfn+58ffnZiaPBku+jmIY4EH2D?=
- =?us-ascii?Q?uxkUEr/VTtT6OftAMxf17b6vx/RP4QRd4EW/V4h2YmAi1tc4BGGUpKxXbmDY?=
- =?us-ascii?Q?4ekmXLXTz+jiRLvHFX0FJqimvkG82dCPwQz1AVXeEEG7U8xT4FPuNjLHI1ad?=
- =?us-ascii?Q?LJPFe3cyUyso4dssNBs9wmjHpsr4Puwfg2YKxebDuMA8a/odEMCN3a5FgPy2?=
- =?us-ascii?Q?j8ifcAQFz2jcb5Iv1ty3rZ98epw0B2R4O+kpBZL/8jweHSMPoseKmJmur1zK?=
- =?us-ascii?Q?brpu1eEmVqo+hjpKRIZxxsIGzclYct2sNuS31OtmeSnR3qWIYmgqwuy+i2L8?=
- =?us-ascii?Q?rEf49stbuRvpN82Lz7I+16ui5kp+05AHJUUxe+Jtr462xhmNW9B3yWUUqeGV?=
- =?us-ascii?Q?2WTIoT/Q8MViB73Sl/ZIPQyuX+4WULE6HUQstJ8EpH/0h1Bw5S6fkD4YjimT?=
- =?us-ascii?Q?wJl+l2MflH74U9VjV67LuQM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1E4758E7EC166E4A8F4FDA42E9BD64A4@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="204978276"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Jul 2022 19:59:21 +0800
+IronPort-SDR: xiyMPrRVXWsRePm6iY+lycG2ZhZqMZXsSXO73GkoB4V4s+uOt7gyrjBDjVtep3Ecdhj6GVfkah
+ 6U28wy1TbQyLIfA/TlIDZ0sb/tMZ7XeI4hzPkhNcAEL0L0/81UADiw+X/KDg4Ip66l+zl78RPw
+ sNNnbn5vAl92Ow4ODdVWjW/UNvU9AO+5JoY0mVSVP0WESajbgdOFiNPTJmkA8eBzu5ydf/Szrq
+ ouW2eHVJ7+oVy0m84ktL91gFZZj0cKarj01NM2FwbEM6VAcuS7lIPxZSPWEGRCW9k3B3QtEJ5U
+ lpIHoNXVfZE5Mxzk5MkUVPnO
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jul 2022 04:16:36 -0700
+IronPort-SDR: Nh5Tgt9/6YVeKM7vechl2VTp+5NlmtAlYVh6uPaMcwzz1ykubDi1OfcTBNBSobpolWZQSZuemi
+ WPyyd0+uzvH4wQwtk9XZJKKrxLd5ImDpQJnbK8Wzr0JQ1D7XBRdaHqz6yUyLBO2vfOb5pYASoK
+ LSRufNx0oZdhhrofrD35vVwERHbEBKFEHEyKJFjHaLfd2xNQ/McAIumEA5tukpWU60bmN4SVht
+ n0ZUjXJWe7wvtW4LtJFPB8l2zz7oAX+v6v4ZLx2JxFmooQUOZnCPMJNTP7GhUtU4WIm8O71X71
+ 0UI=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Jul 2022 04:59:23 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LdJ496gwRz1Rwry
+        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 04:59:21 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1657108760; x=1659700761; bh=7s7q0INtd+Rq06SCkVVAKizJ6RdF1NL+4og
+        bR8OLEAM=; b=KHyklUV29fkLDUfNPXPjsamI0VSfhAeaNT1+1sUHwRFVSY967n2
+        vGLVRkAjeWTsg0ZTtIqVXUTcK4CS/guh3FTrn2VC5/KjmCZ2DvKsk/WXwdoG33Pe
+        Vf888AJjh7Vmf8BVG08elXDATR7N9mV2IWKfK0KB7RrvJ2hvVOw4iKBPo0j3ZCv2
+        BB/eN7WjUFMaAmGvPTLitDWq0ZHnphaZNzNoW/VRl1jGZqS8jXeR8Tg6hSvVgS8f
+        AQlzTkkU841tEAgOt0C1lbYT9Ur2DShKATvVDvuScdMa0VHrKAQY7CPiDFXoqCu7
+        4XMRw6jwo5n+Kaq4pu9NFKHMieqbcu9vR2A==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id IvTrff8SeESv for <linux-block@vger.kernel.org>;
+        Wed,  6 Jul 2022 04:59:20 -0700 (PDT)
+Received: from [10.225.163.110] (unknown [10.225.163.110])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LdJ471s4bz1RtVk;
+        Wed,  6 Jul 2022 04:59:19 -0700 (PDT)
+Message-ID: <e5737383-3b85-e50b-166f-296ef821a47a@opensource.wdc.com>
+Date:   Wed, 6 Jul 2022 20:59:18 +0900
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15d3b3f1-e749-44cd-90f2-08da5f4200a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2022 11:23:50.9051
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gKSxUDrfrQd3a/8mnEHdEAvjvHhObl78+Q26EMZtxhUROwj6lCKu1vgqG8jp33+ib5HE7efHZtx3x7cyuo/XHzP5W4fcHPRCTgS3/oCKvt4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB8420
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 11/16] block: replace blkdev_nr_zones with bdev_nr_zones
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20220706070350.1703384-1-hch@lst.de>
+ <20220706070350.1703384-12-hch@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220706070350.1703384-12-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jul 05, 2022 / 16:20, Chaitanya Kulkarni wrote:
->=20
-> Hi Shinichiro,
->=20
-> On 7/5/22 03:55, Shinichiro Kawasaki wrote:
-> > For those who interested in blktests:
-> >=20
-> > A pull request is now under review [1] which suggests to improve SKIP_R=
-EASON
-> > handling. Some test cases or test groups have rather large number of te=
-st
-> > run requirements and then they may have multiple skip reasons. However,=
- blktests
-> > can report only single skip reason. To know all of the skip reasons, we=
- need to
-> > repeat skip reason resolution and blktests run. This is a troublesome w=
-ork.
-> >=20
-> > With the suggested code change, all of the skip reasons will be printed=
- at one
-> > shot run. Handy. On the other hand, it will change the way to set SKIP_=
-REASON in
-> > requirement check functions. A new helper function will be used in plac=
-e of
-> > substittion to the SKIP_REASON variable.
-> >=20
-> > Just in case you are interested in, take a look in the pull request.
-> >=20
-> > [1] https://github.com/osandov/blktests/pull/96
-> >=20
->=20
-> Is is possible to make pull request available on the mailing list
-> as a patch-series? as far as I know not every developer in the
-> block/nvme/scsi/dm looked at the github explicitly ?
+On 7/6/22 16:03, Christoph Hellwig wrote:
+> Pass a block_device instead of a request_queue as that is what most
+> callers have at hand.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 
-Okay, I'll ask the pull request author if the patches can be posted to linu=
-x-
-block list. Or I may post on behalf of the author.
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
---=20
-Shin'ichiro Kawasaki=
+And for the zonefs bits:
+
+Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+
+> ---
+>  block/blk-zoned.c              | 15 ++++++++-------
+>  block/ioctl.c                  |  2 +-
+>  drivers/block/null_blk/zoned.c |  2 +-
+>  drivers/md/dm-zone.c           |  2 +-
+>  drivers/md/dm-zoned-target.c   |  5 ++---
+>  drivers/nvme/target/zns.c      |  6 +++---
+>  fs/zonefs/super.c              | 17 ++++++++---------
+>  include/linux/blkdev.h         |  4 ++--
+>  8 files changed, 26 insertions(+), 27 deletions(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index 0d431394cf90c..2dec25d8aa3bd 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -108,21 +108,22 @@ void __blk_req_zone_write_unlock(struct request *rq)
+>  EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
+>  
+>  /**
+> - * blkdev_nr_zones - Get number of zones
+> - * @disk:	Target gendisk
+> + * bdev_nr_zones - Get number of zones
+> + * @bdev:	Target device
+>   *
+>   * Return the total number of zones of a zoned block device.  For a block
+>   * device without zone capabilities, the number of zones is always 0.
+>   */
+> -unsigned int blkdev_nr_zones(struct gendisk *disk)
+> +unsigned int bdev_nr_zones(struct block_device *bdev)
+>  {
+> -	sector_t zone_sectors = blk_queue_zone_sectors(disk->queue);
+> +	sector_t zone_sectors = bdev_zone_sectors(bdev);
+>  
+> -	if (!blk_queue_is_zoned(disk->queue))
+> +	if (!bdev_is_zoned(bdev))
+>  		return 0;
+> -	return (get_capacity(disk) + zone_sectors - 1) >> ilog2(zone_sectors);
+> +	return (bdev_nr_sectors(bdev) + zone_sectors - 1) >>
+> +		ilog2(zone_sectors);
+>  }
+> -EXPORT_SYMBOL_GPL(blkdev_nr_zones);
+> +EXPORT_SYMBOL_GPL(bdev_nr_zones);
+>  
+>  /**
+>   * blkdev_report_zones - Get zones information
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 46949f1b0dba5..60121e89052bc 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -495,7 +495,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+>  	case BLKGETZONESZ:
+>  		return put_uint(argp, bdev_zone_sectors(bdev));
+>  	case BLKGETNRZONES:
+> -		return put_uint(argp, blkdev_nr_zones(bdev->bd_disk));
+> +		return put_uint(argp, bdev_nr_zones(bdev));
+>  	case BLKROGET:
+>  		return put_int(argp, bdev_read_only(bdev) != 0);
+>  	case BLKSSZGET: /* get block device logical block size */
+> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+> index 576ab3ed082a5..e62c52e964259 100644
+> --- a/drivers/block/null_blk/zoned.c
+> +++ b/drivers/block/null_blk/zoned.c
+> @@ -170,7 +170,7 @@ int null_register_zoned_dev(struct nullb *nullb)
+>  			return ret;
+>  	} else {
+>  		blk_queue_chunk_sectors(q, dev->zone_size_sects);
+> -		q->nr_zones = blkdev_nr_zones(nullb->disk);
+> +		q->nr_zones = bdev_nr_zones(nullb->disk->part0);
+>  	}
+>  
+>  	blk_queue_max_zone_append_sectors(q, dev->zone_size_sects);
+> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+> index ae616b87c91ae..6d105abe12415 100644
+> --- a/drivers/md/dm-zone.c
+> +++ b/drivers/md/dm-zone.c
+> @@ -301,7 +301,7 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
+>  	 * correct value to be exposed in sysfs queue/nr_zones.
+>  	 */
+>  	WARN_ON_ONCE(queue_is_mq(q));
+> -	q->nr_zones = blkdev_nr_zones(md->disk);
+> +	q->nr_zones = bdev_nr_zones(md->disk->part0);
+>  
+>  	/* Check if zone append is natively supported */
+>  	if (dm_table_supports_zone_append(t)) {
+> diff --git a/drivers/md/dm-zoned-target.c b/drivers/md/dm-zoned-target.c
+> index 0ec5d8b9b1a4e..6ba6ef44b00e2 100644
+> --- a/drivers/md/dm-zoned-target.c
+> +++ b/drivers/md/dm-zoned-target.c
+> @@ -793,8 +793,7 @@ static int dmz_fixup_devices(struct dm_target *ti)
+>  			}
+>  			zone_nr_sectors = blk_queue_zone_sectors(q);
+>  			zoned_dev->zone_nr_sectors = zone_nr_sectors;
+> -			zoned_dev->nr_zones =
+> -				blkdev_nr_zones(zoned_dev->bdev->bd_disk);
+> +			zoned_dev->nr_zones = bdev_nr_zones(zoned_dev->bdev);
+>  		}
+>  	} else {
+>  		reg_dev = NULL;
+> @@ -805,7 +804,7 @@ static int dmz_fixup_devices(struct dm_target *ti)
+>  		}
+>  		q = bdev_get_queue(zoned_dev->bdev);
+>  		zoned_dev->zone_nr_sectors = blk_queue_zone_sectors(q);
+> -		zoned_dev->nr_zones = blkdev_nr_zones(zoned_dev->bdev->bd_disk);
+> +		zoned_dev->nr_zones = bdev_nr_zones(zoned_dev->bdev);
+>  	}
+>  
+>  	if (reg_dev) {
+> diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+> index 82b61acf7a72b..c4c99b832daf2 100644
+> --- a/drivers/nvme/target/zns.c
+> +++ b/drivers/nvme/target/zns.c
+> @@ -60,7 +60,7 @@ bool nvmet_bdev_zns_enable(struct nvmet_ns *ns)
+>  	if (ns->bdev->bd_disk->queue->conv_zones_bitmap)
+>  		return false;
+>  
+> -	ret = blkdev_report_zones(ns->bdev, 0, blkdev_nr_zones(bd_disk),
+> +	ret = blkdev_report_zones(ns->bdev, 0, bdev_nr_zones(ns->bdev),
+>  				  validate_conv_zones_cb, NULL);
+>  	if (ret < 0)
+>  		return false;
+> @@ -241,7 +241,7 @@ static unsigned long nvmet_req_nr_zones_from_slba(struct nvmet_req *req)
+>  {
+>  	unsigned int sect = nvmet_lba_to_sect(req->ns, req->cmd->zmr.slba);
+>  
+> -	return blkdev_nr_zones(req->ns->bdev->bd_disk) -
+> +	return bdev_nr_zones(req->ns->bdev) -
+>  		(sect >> ilog2(bdev_zone_sectors(req->ns->bdev)));
+>  }
+>  
+> @@ -386,7 +386,7 @@ static int zmgmt_send_scan_cb(struct blk_zone *z, unsigned i, void *d)
+>  static u16 nvmet_bdev_zone_mgmt_emulate_all(struct nvmet_req *req)
+>  {
+>  	struct block_device *bdev = req->ns->bdev;
+> -	unsigned int nr_zones = blkdev_nr_zones(bdev->bd_disk);
+> +	unsigned int nr_zones = bdev_nr_zones(bdev);
+>  	struct request_queue *q = bdev_get_queue(bdev);
+>  	struct bio *bio = NULL;
+>  	sector_t sector = 0;
+> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+> index 053299758deb9..9c0eef1ff32a0 100644
+> --- a/fs/zonefs/super.c
+> +++ b/fs/zonefs/super.c
+> @@ -1394,7 +1394,7 @@ static void zonefs_init_dir_inode(struct inode *parent, struct inode *inode,
+>  {
+>  	struct super_block *sb = parent->i_sb;
+>  
+> -	inode->i_ino = blkdev_nr_zones(sb->s_bdev->bd_disk) + type + 1;
+> +	inode->i_ino = bdev_nr_zones(sb->s_bdev) + type + 1;
+>  	inode_init_owner(&init_user_ns, inode, parent, S_IFDIR | 0555);
+>  	inode->i_op = &zonefs_dir_inode_operations;
+>  	inode->i_fop = &simple_dir_operations;
+> @@ -1540,7 +1540,7 @@ static int zonefs_create_zgroup(struct zonefs_zone_data *zd,
+>  	/*
+>  	 * The first zone contains the super block: skip it.
+>  	 */
+> -	end = zd->zones + blkdev_nr_zones(sb->s_bdev->bd_disk);
+> +	end = zd->zones + bdev_nr_zones(sb->s_bdev);
+>  	for (zone = &zd->zones[1]; zone < end; zone = next) {
+>  
+>  		next = zone + 1;
+> @@ -1635,8 +1635,8 @@ static int zonefs_get_zone_info(struct zonefs_zone_data *zd)
+>  	struct block_device *bdev = zd->sb->s_bdev;
+>  	int ret;
+>  
+> -	zd->zones = kvcalloc(blkdev_nr_zones(bdev->bd_disk),
+> -			     sizeof(struct blk_zone), GFP_KERNEL);
+> +	zd->zones = kvcalloc(bdev_nr_zones(bdev), sizeof(struct blk_zone),
+> +			     GFP_KERNEL);
+>  	if (!zd->zones)
+>  		return -ENOMEM;
+>  
+> @@ -1648,9 +1648,9 @@ static int zonefs_get_zone_info(struct zonefs_zone_data *zd)
+>  		return ret;
+>  	}
+>  
+> -	if (ret != blkdev_nr_zones(bdev->bd_disk)) {
+> +	if (ret != bdev_nr_zones(bdev)) {
+>  		zonefs_err(zd->sb, "Invalid zone report (%d/%u zones)\n",
+> -			   ret, blkdev_nr_zones(bdev->bd_disk));
+> +			   ret, bdev_nr_zones(bdev));
+>  		return -EIO;
+>  	}
+>  
+> @@ -1816,8 +1816,7 @@ static int zonefs_fill_super(struct super_block *sb, void *data, int silent)
+>  	if (ret)
+>  		goto cleanup;
+>  
+> -	zonefs_info(sb, "Mounting %u zones",
+> -		    blkdev_nr_zones(sb->s_bdev->bd_disk));
+> +	zonefs_info(sb, "Mounting %u zones", bdev_nr_zones(sb->s_bdev));
+>  
+>  	if (!sbi->s_max_wro_seq_files &&
+>  	    !sbi->s_max_active_seq_files &&
+> @@ -1833,7 +1832,7 @@ static int zonefs_fill_super(struct super_block *sb, void *data, int silent)
+>  	if (!inode)
+>  		goto cleanup;
+>  
+> -	inode->i_ino = blkdev_nr_zones(sb->s_bdev->bd_disk);
+> +	inode->i_ino = bdev_nr_zones(sb->s_bdev);
+>  	inode->i_mode = S_IFDIR | 0555;
+>  	inode->i_ctime = inode->i_mtime = inode->i_atime = current_time(inode);
+>  	inode->i_op = &zonefs_dir_inode_operations;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index c05e1cc05c265..fa2757ef4a846 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -298,7 +298,7 @@ void disk_set_zoned(struct gendisk *disk, enum blk_zoned_model model);
+>  #define BLK_ALL_ZONES  ((unsigned int)-1)
+>  int blkdev_report_zones(struct block_device *bdev, sector_t sector,
+>  			unsigned int nr_zones, report_zones_cb cb, void *data);
+> -unsigned int blkdev_nr_zones(struct gendisk *disk);
+> +unsigned int bdev_nr_zones(struct block_device *bdev);
+>  extern int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+>  			    sector_t sectors, sector_t nr_sectors,
+>  			    gfp_t gfp_mask);
+> @@ -312,7 +312,7 @@ extern int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+>  
+>  #else /* CONFIG_BLK_DEV_ZONED */
+>  
+> -static inline unsigned int blkdev_nr_zones(struct gendisk *disk)
+> +static inline unsigned int bdev_nr_zones(struct block_device *bdev)
+>  {
+>  	return 0;
+>  }
+
+
+-- 
+Damien Le Moal
+Western Digital Research
