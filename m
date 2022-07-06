@@ -2,57 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 407D9CCA473
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 08:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA1BC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 09:15:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230309AbiGFILH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 04:11:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
+        id S233131AbiGFJPh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 05:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230355AbiGFILG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 04:11:06 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DD2A22BCA;
-        Wed,  6 Jul 2022 01:11:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ueo9aHss8pxOEcowsjGEpgCpwjFxectcGQkPUxmju0k=; b=l1IX8KfjemuImRmcMd9phEAysP
-        9fwh7OYl1GcmwCCM2h9/jzNh7pWWSfxyzzaeaQVUq24Pfcsf8IUA8e9SqCcIlnt4Kv9pGI5iOl4jO
-        7hwIb0AyDu2guJKXqUP43gY8UAiUlgSrTkRwaI9Gr9DMQ/L5k4WN7eq5bW2UVYvTXjFkXF0SPxf8W
-        fkLT59sFyGVQA3mp3PGzs2L1Mbe2DX5koR5yTZZ8jie+17aM9nBQGxz2gfzVHrOh6DH4/vEDSWFAZ
-        yX/d6ApSZ29k0UsZh0+Z2n5nZ5FPng81YF0goFfYf7AOEnz3W1QbNZ4XUo/KAXBWSAuhckR82VX7u
-        lbX7VV2g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o907k-007IRA-Rr; Wed, 06 Jul 2022 08:11:04 +0000
-Date:   Wed, 6 Jul 2022 01:11:04 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     gjoyce@linux.vnet.ibm.com
-Cc:     keyrings@vger.kernel.org, gjoyce@ibm.com, dhowells@redhat.com,
-        jarkko@kernel.org, andrzej.jakowski@intel.com,
-        jonathan.derrick@linux.dev, drmiller.lnx@gmail.com,
-        linux-block@vger.kernel.org, greg@gilhooley.com
-Subject: Re: [PATCH 4/4] arch_vars: create arch specific permanent store
-Message-ID: <YsVDmPyjHLIZm+Qn@infradead.org>
-References: <20220706023935.875994-1-gjoyce@linux.vnet.ibm.com>
- <20220706023935.875994-5-gjoyce@linux.vnet.ibm.com>
+        with ESMTP id S233165AbiGFJPd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 05:15:33 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0ABAB7CE;
+        Wed,  6 Jul 2022 02:15:30 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id g16-20020a17090a7d1000b001ea9f820449so19707343pjl.5;
+        Wed, 06 Jul 2022 02:15:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=heBhDPAZZcza0ZAAL/XaeCAoRWcoC2O1hG9RrLQTw+Q=;
+        b=SiAFl/uCcoQQbxAciu9Sn4YY+1os4B3LfvgPMpNoFHJZET+MPChoGxCZJprfbp6v6E
+         N91BbYFyo7Dqfm3lIBmveiOhD+UI0xRcD+KpbNlQxCThmRq2t8gPLgc8mc998KjSDckM
+         F9jS+v2pA7zJ3z9dvpCGUa+jKi1DcttlBdrqXtgx3YiYAykwU+NE4ANj+FRM/xfGC+9w
+         NS+unZ9EpTs56Wh0Vl/pH0V5Zm4MKHjHL2EZGXsqUTJGVUT6AfHqEO6K4ZUgXLoh/cHP
+         7kunI1PBzYBi2NuBvTue8+z50mizOLVz3xAIznzywqFIO3TMGWo8fPjvLvvSQYcMIBH3
+         Tfaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=heBhDPAZZcza0ZAAL/XaeCAoRWcoC2O1hG9RrLQTw+Q=;
+        b=acnhygCblwKHl6pbSttNA7kALWB+EeoLOOw6YFuGept63nGx1t80R+h1sw/RHtFuNE
+         3YORlQmhKInXrR4NJYwsOSuxWAEeCj5Yn0spd9cZWXcrsGzHuMCgFj13WCbgDxzzp4MJ
+         HnhZ79Mk/KLN+hsrLmFH6cR1dEZfxF1hLiExoFtD0Bg6rTauyij5EKOO5KDVqonb8DtW
+         qX5xB1VqaSOJZbPWUrkuXpZUg2NA327ZGwrOz45lBqp3dN379KDdYYBC0ZK8IQG6Tlqw
+         49Ko3vqmZEu3e4KRgwlUdFNpXvdKB0Y7CF/WMtvtuTAJkD4ubHR0P3+z1Gf0lfhbUDGf
+         IiiQ==
+X-Gm-Message-State: AJIora8Iq1Y9IsfZeKCC9gyT63mTUABvpji6iwizs3iKrKOiONsw8Tg6
+        IL1CyNMI9o+U8b6V2wEUwpYlO2iBXNxZow==
+X-Google-Smtp-Source: AGRyM1sf/WnWaGWp85yrdFZgYzGzuzrJhJYkkNYI+LwYbZl0m4pyUiA2SsFaYprMKjDKb26Myuuwww==
+X-Received: by 2002:a17:902:dad1:b0:16a:75cb:5d97 with SMTP id q17-20020a170902dad100b0016a75cb5d97mr46194698plx.64.1657098929770;
+        Wed, 06 Jul 2022 02:15:29 -0700 (PDT)
+Received: from localhost.localdomain (ec2-13-113-80-70.ap-northeast-1.compute.amazonaws.com. [13.113.80.70])
+        by smtp.gmail.com with ESMTPSA id y23-20020a63ce17000000b004123c6a084dsm5422582pgf.22.2022.07.06.02.15.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Jul 2022 02:15:28 -0700 (PDT)
+From:   Zhang Boyang <zhangboyang.id@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org,
+        Zhang Boyang <zhangboyang.id@gmail.com>
+Subject: [PATCH] loop: introduce LO_FLAGS_NODEALLOC
+Date:   Wed,  6 Jul 2022 17:14:55 +0800
+Message-Id: <20220706091455.35063-1-zhangboyang.id@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220706023935.875994-5-gjoyce@linux.vnet.ibm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 05, 2022 at 09:39:35PM -0500, gjoyce@linux.vnet.ibm.com wrote:
-> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> 
-> Platforms that have a permanent key store may provide unique
-> platform dependent functions to read/write variables. The
-> default (weak) functions return -EOPNOTSUPP unless overridden
-> by architecture/platform versions.
+Previously, for file-backed loop devices, REQ_OP_DISCARD and
+REQ_OP_WRITE_ZEROES (without REQ_NOUNMAP) are implemented using
+fallocate(FALLOC_FL_PUNCH_HOLE), which will cause the underlying file to
+be sparse and disk space freed. The users have no choice to prevent this
+this from happening.
 
-Which is none as of this patch set, as is the number of of users of
-this API.  Did this slip in by accident?
+This patch introduces LO_FLAGS_NODEALLOC. With this flag set,
+REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES are forced to use
+fallocate(FALLOC_FL_ZERO_RANGE). The disk space of underlying file is
+kept allocated. This is useful if users, for example, want to use a
+preallocated file as the backing file.
+
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+---
+ drivers/block/loop.c      | 17 +++++++++++++++--
+ include/uapi/linux/loop.h | 15 +++++++++++----
+ 2 files changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 084f9b8a0ba3..a52ef0787202 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -483,11 +483,15 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 		 * write zeroes the range.  Otherwise, punch them out.
+ 		 */
+ 		return lo_fallocate(lo, rq, pos,
+-			(rq->cmd_flags & REQ_NOUNMAP) ?
++			((rq->cmd_flags & REQ_NOUNMAP) ||
++			 (lo->lo_flags & LO_FLAGS_NODEALLOC)) ?
+ 				FALLOC_FL_ZERO_RANGE :
+ 				FALLOC_FL_PUNCH_HOLE);
+ 	case REQ_OP_DISCARD:
+-		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
++		return lo_fallocate(lo, rq, pos,
++			(lo->lo_flags & LO_FLAGS_NODEALLOC) ?
++				FALLOC_FL_ZERO_RANGE :
++				FALLOC_FL_PUNCH_HOLE);
+ 	case REQ_OP_WRITE:
+ 		if (cmd->use_aio)
+ 			return lo_rw_aio(lo, cmd, pos, WRITE);
+@@ -719,12 +723,20 @@ static ssize_t loop_attr_dio_show(struct loop_device *lo, char *buf)
+ 	return sysfs_emit(buf, "%s\n", dio ? "1" : "0");
+ }
+ 
++static ssize_t loop_attr_nodealloc_show(struct loop_device *lo, char *buf)
++{
++	int nodealloc = (lo->lo_flags & LO_FLAGS_NODEALLOC);
++
++	return sysfs_emit(buf, "%s\n", nodealloc ? "1" : "0");
++}
++
+ LOOP_ATTR_RO(backing_file);
+ LOOP_ATTR_RO(offset);
+ LOOP_ATTR_RO(sizelimit);
+ LOOP_ATTR_RO(autoclear);
+ LOOP_ATTR_RO(partscan);
+ LOOP_ATTR_RO(dio);
++LOOP_ATTR_RO(nodealloc);
+ 
+ static struct attribute *loop_attrs[] = {
+ 	&loop_attr_backing_file.attr,
+@@ -733,6 +745,7 @@ static struct attribute *loop_attrs[] = {
+ 	&loop_attr_autoclear.attr,
+ 	&loop_attr_partscan.attr,
+ 	&loop_attr_dio.attr,
++	&loop_attr_nodealloc.attr,
+ 	NULL,
+ };
+ 
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index 6f63527dd2ed..a6afd06ffa07 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -18,17 +18,24 @@ enum {
+ 	LO_FLAGS_AUTOCLEAR	= 4,
+ 	LO_FLAGS_PARTSCAN	= 8,
+ 	LO_FLAGS_DIRECT_IO	= 16,
++	LO_FLAGS_NODEALLOC	= 32,
+ };
+ 
+ /* LO_FLAGS that can be set using LOOP_SET_STATUS(64) */
+-#define LOOP_SET_STATUS_SETTABLE_FLAGS (LO_FLAGS_AUTOCLEAR | LO_FLAGS_PARTSCAN)
++#define LOOP_SET_STATUS_SETTABLE_FLAGS (LO_FLAGS_AUTOCLEAR		\
++					| LO_FLAGS_PARTSCAN		\
++					| LO_FLAGS_NODEALLOC)
+ 
+ /* LO_FLAGS that can be cleared using LOOP_SET_STATUS(64) */
+-#define LOOP_SET_STATUS_CLEARABLE_FLAGS (LO_FLAGS_AUTOCLEAR)
++#define LOOP_SET_STATUS_CLEARABLE_FLAGS (LO_FLAGS_AUTOCLEAR		\
++					 | LO_FLAGS_NODEALLOC)
+ 
+ /* LO_FLAGS that can be set using LOOP_CONFIGURE */
+-#define LOOP_CONFIGURE_SETTABLE_FLAGS (LO_FLAGS_READ_ONLY | LO_FLAGS_AUTOCLEAR \
+-				       | LO_FLAGS_PARTSCAN | LO_FLAGS_DIRECT_IO)
++#define LOOP_CONFIGURE_SETTABLE_FLAGS (LO_FLAGS_READ_ONLY		\
++				       | LO_FLAGS_AUTOCLEAR		\
++				       | LO_FLAGS_PARTSCAN		\
++				       | LO_FLAGS_DIRECT_IO		\
++				       | LO_FLAGS_NODEALLOC)
+ 
+ #include <asm/posix_types.h>	/* for __kernel_old_dev_t */
+ #include <linux/types.h>	/* for __u64 */
+-- 
+2.30.2
+
