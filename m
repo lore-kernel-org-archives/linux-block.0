@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EAC8C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 13:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13725C43334
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 13:32:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232771AbiGFNcI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 09:32:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60642 "EHLO
+        id S232842AbiGFNcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 09:32:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232842AbiGFNcH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 09:32:07 -0400
+        with ESMTP id S233383AbiGFNcJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 09:32:09 -0400
 Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF9C524093
-        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 06:32:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6BB24093
+        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 06:32:08 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1657114325;
+        t=1657114327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=L/UttL/iBXWscmtUZHBpvcbNGpMxOQrwmDrDzNQgCd8=;
-        b=IjK3ZaZUoY1TKky0BAhWd6h17IyZr4BNyXBMXOb8hwJ8sq35tsgWwlAaexhFIeoiwDYT9x
-        08apjlb1fG7hzyxGaG4U6oPw3iHujCx5+Dtse/DByzCoYsTtecOmmialMVy1aBl0/35Pep
-        06mADHZXY1hR0ADAz/Z1/vz67o8fKPY=
+        bh=FQz4hxo02O/ERI8ouk8kiuNQTGrlxl6VHggvw9kZINo=;
+        b=ryGyOpelcJgivVxaPZRMqL5vx0XZEn+Zv0JzuljsY6Xtrg/EYmjFsRaYREO/Gfa3c/xe8K
+        KylFF8WycrQOTt6JWrOA/sc50RfENpIeCTebVoq+vD2sbdNpqGZ7+ecaGIuFWewsyF0YL8
+        Ps+zIv7e6nBx3NhxHnQis0Xo3DX7vRU=
 From:   Guoqing Jiang <guoqing.jiang@linux.dev>
 To:     axboe@kernel.dk
 Cc:     haris.iqbal@ionos.com, jinpu.wang@ionos.com,
         linux-block@vger.kernel.org
-Subject: [PATCH V2 5/8] rnbd-clt: adjust the layout of struct rnbd_clt_dev
-Date:   Wed,  6 Jul 2022 21:31:49 +0800
-Message-Id: <20220706133152.12058-6-guoqing.jiang@linux.dev>
+Subject: [PATCH V2 6/8] rnbd-clt: check capacity inside rnbd_clt_change_capacity
+Date:   Wed,  6 Jul 2022 21:31:50 +0800
+Message-Id: <20220706133152.12058-7-guoqing.jiang@linux.dev>
 In-Reply-To: <20220706133152.12058-1-guoqing.jiang@linux.dev>
 References: <20220706133152.12058-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
@@ -42,54 +42,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-While at it, let re-arrange the struct to remove holes.
-
-Before, pahole reports
-
-	/* size: 232, cachelines: 4, members: 17 */
-	/* sum members: 224, holes: 2, sum holes: 8 */
-	/* last cacheline: 40 bytes */
-
-After the change, the report changes to
-
-	/* size: 224, cachelines: 4, members: 17 */
-	/* last cacheline: 32 bytes */
+Currently, process_msg_open_rsp checks if capacity changed or not before
+call rnbd_clt_change_capacity while the checking also make sense for
+rnbd_clt_resize_dev_store, let's move the checking into the function.
 
 Acked-by: Jack Wang <jinpu.wang@ionos.com>
 Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 ---
- drivers/block/rnbd/rnbd-clt.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-index 7520272541b1..df237d2ea0d9 100644
---- a/drivers/block/rnbd/rnbd-clt.h
-+++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -106,6 +106,7 @@ struct rnbd_queue {
- };
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 53f216be8615..84fd509c2626 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -71,6 +71,12 @@ static inline bool rnbd_clt_get_dev(struct rnbd_clt_dev *dev)
+ static int rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
+ 				    size_t new_nsectors)
+ {
++	if (get_capacity(dev->gd) == new_nsectors)
++		return 0;
++
++	/*
++	 * If the size changed, we need to revalidate it
++	 */
+ 	rnbd_clt_info(dev, "Device size changed from %llu to %zu sectors\n",
+ 		      get_capacity(dev->gd), new_nsectors);
+ 	set_capacity_and_notify(dev->gd, new_nsectors);
+@@ -93,12 +99,7 @@ static int process_msg_open_rsp(struct rnbd_clt_dev *dev,
+ 	if (dev->dev_state == DEV_STATE_MAPPED_DISCONNECTED) {
+ 		u64 nsectors = le64_to_cpu(rsp->nsectors);
  
- struct rnbd_clt_dev {
-+	struct kobject		kobj;
- 	struct rnbd_clt_session	*sess;
- 	struct request_queue	*queue;
- 	struct rnbd_queue	*hw_queues;
-@@ -114,15 +115,14 @@ struct rnbd_clt_dev {
- 	u32			clt_device_id;
- 	struct mutex		lock;
- 	enum rnbd_clt_dev_state	dev_state;
-+	refcount_t		refcount;
- 	char			*pathname;
- 	enum rnbd_access_mode	access_mode;
- 	u32			nr_poll_queues;
- 	u64			size;		/* device size in bytes */
- 	struct list_head        list;
- 	struct gendisk		*gd;
--	struct kobject		kobj;
- 	char			*blk_symlink_name;
--	refcount_t		refcount;
- 	struct work_struct	unmap_on_rmmod_work;
- };
- 
+-		/*
+-		 * If the device was remapped and the size changed in the
+-		 * meantime we need to revalidate it
+-		 */
+-		if (get_capacity(dev->gd) != nsectors)
+-			rnbd_clt_change_capacity(dev, nsectors);
++		rnbd_clt_change_capacity(dev, nsectors);
+ 		gd_kobj = &disk_to_dev(dev->gd)->kobj;
+ 		kobject_uevent(gd_kobj, KOBJ_ONLINE);
+ 		rnbd_clt_info(dev, "Device online, device remapped successfully\n");
 -- 
 2.31.1
 
