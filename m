@@ -2,95 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49ADCCA482
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 13:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6EFC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 14:29:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232345AbiGFN55 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 09:57:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55396 "EHLO
+        id S233486AbiGFO3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 10:29:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232833AbiGFN54 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 09:57:56 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DE017A90;
-        Wed,  6 Jul 2022 06:57:54 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8B0FE2262B;
-        Wed,  6 Jul 2022 13:57:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1657115873; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kiUjfUaxXUHtTpdwighgqJkP8dPW871+3s1BnMx2Ltw=;
-        b=yvPvbIuuxtdk2ZX8Q8tSoKYC5cW9dKB+5Zw1LzSQH7197bMhDdli0CWLiflL03yBVSxu31
-        3GMcXYJKFvhvNqtUy2cQiQ4XZHsfkN6pzZ7I3g+QRQgLeWpktmJqk3iii4LCOU5lITaQ9i
-        sL2Y/gJxVd14DsEMqswdcEn7ilbN6V4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1657115873;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=kiUjfUaxXUHtTpdwighgqJkP8dPW871+3s1BnMx2Ltw=;
-        b=DrSRj0EvDTIpUIt/FJqzoaO8ehUFDCc6m4Kks/eb8UIsdpsS4gF3k4Myi2JAHEtoQp9hzo
-        OUxLU3k8ElQq8jAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5F0F213A7D;
-        Wed,  6 Jul 2022 13:57:53 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id RZFGFuGUxWKNOAAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 06 Jul 2022 13:57:53 +0000
-Message-ID: <18d78bd6-2150-f771-9a6e-2b972d2e1192@suse.de>
-Date:   Wed, 6 Jul 2022 15:57:52 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v3 6/6] blk-mq: Drop local variable for reserved tag
-Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, bvanassche@acm.org, hch@lst.de,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, satishkh@cisco.com,
-        sebaddel@cisco.com, kartilak@cisco.com
-Cc:     linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        mpi3mr-linuxdrv.pdl@broadcom.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org
-References: <1657109034-206040-1-git-send-email-john.garry@huawei.com>
- <1657109034-206040-7-git-send-email-john.garry@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <1657109034-206040-7-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        with ESMTP id S233399AbiGFO3E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 10:29:04 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763272658;
+        Wed,  6 Jul 2022 07:28:57 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 266EGfhH014880;
+        Wed, 6 Jul 2022 14:28:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : reply-to : to : cc : date : in-reply-to : references : content-type
+ : mime-version : content-transfer-encoding; s=pp1;
+ bh=K8I/xFNNYnKZsWrRatGZ+DWv4j8ApzU7WSvXTR4REvg=;
+ b=A1EHVr/SK41RsV9YRGY832WhBWXhcplqnwVIgmLzWs1NvZZkWMN6GXK6gkXy8Oeuemoy
+ xFlTVhZtSrjjaDTctseIICXUR9hw7gfRc9te+ovJMaEZI91d6L6iWyCbQR2GfjJcz4J9
+ yn5pMrcP5JQk0ZMe7I7epNId7FCvP+CEdf+RSa73tZO1i6J/JXgkzO4X3+Bd3Pc1ydNs
+ 13I6zCTmG6RbUMY2GjRpkvWhYpWqW+MSMDIqiKbxZgX+RoqLFL4F7ygl6G3CEywK0HMT
+ fbi29JE7XQojyHmIOW2LEmbnhrznH3Gw9azXEgQonqUlbhV/c3IxnptDL78tJyLe0Hru Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5c1109u7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Jul 2022 14:28:34 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 266EHI3K020915;
+        Wed, 6 Jul 2022 14:28:34 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5c1109tt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Jul 2022 14:28:34 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 266ELPDp001198;
+        Wed, 6 Jul 2022 14:28:33 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma01wdc.us.ibm.com with ESMTP id 3h4ud1mx7x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 06 Jul 2022 14:28:33 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 266ESWFt31064504
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 6 Jul 2022 14:28:32 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C50C5BE04F;
+        Wed,  6 Jul 2022 14:28:32 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CDC56BE059;
+        Wed,  6 Jul 2022 14:28:31 +0000 (GMT)
+Received: from rhel-laptop.ibm.com (unknown [9.160.24.101])
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  6 Jul 2022 14:28:31 +0000 (GMT)
+Message-ID: <ba904e767b52ce511dfe8442a628ef72714846be.camel@linux.vnet.ibm.com>
+Subject: Re: [PATCH 4/4] arch_vars: create arch specific permanent store
+From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reply-To: gjoyce@linux.vnet.ibm.com
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     keyrings@vger.kernel.org, gjoyce@ibm.com, dhowells@redhat.com,
+        jarkko@kernel.org, andrzej.jakowski@intel.com,
+        jonathan.derrick@linux.dev, drmiller.lnx@gmail.com,
+        linux-block@vger.kernel.org, brking@linux.vnet.ibm.com
+Date:   Wed, 06 Jul 2022 09:28:31 -0500
+In-Reply-To: <YsVDmPyjHLIZm+Qn@infradead.org>
+References: <20220706023935.875994-1-gjoyce@linux.vnet.ibm.com>
+         <20220706023935.875994-5-gjoyce@linux.vnet.ibm.com>
+         <YsVDmPyjHLIZm+Qn@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Qm5iga0niUJXQrCeVyoclwvJJS3hbkXJ
+X-Proofpoint-ORIG-GUID: xeGT0snnfM9Ik8B5fchT4D83jzwJr3GD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-06_08,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=996
+ impostorscore=0 clxscore=1011 mlxscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207060056
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/22 14:03, John Garry wrote:
-> The local variable is now only referenced once so drop it.
+On Wed, 2022-07-06 at 01:11 -0700, Christoph Hellwig wrote:
+> On Tue, Jul 05, 2022 at 09:39:35PM -0500, gjoyce@linux.vnet.ibm.com
+> wrote:
+> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+> > 
+> > Platforms that have a permanent key store may provide unique
+> > platform dependent functions to read/write variables. The
+> > default (weak) functions return -EOPNOTSUPP unless overridden
+> > by architecture/platform versions.
 > 
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->   block/blk-mq-tag.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Which is none as of this patch set, as is the number of of users of
+> this API.  Did this slip in by accident?
 
-Cheers,
+You are correct, there are currently no platforms that utilize this
+key store interface. However, there is a pseries platform store that 
+has a driver that will provide the interfaces. This is in a separate
+patchset that is currently being submitted.
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
