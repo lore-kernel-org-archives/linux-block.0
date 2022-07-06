@@ -2,181 +2,267 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB8DCCA473
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 16:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 378CFCCA47F
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 17:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233321AbiGFQgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 12:36:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60882 "EHLO
+        id S231875AbiGFRLV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 13:11:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230247AbiGFQgJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 12:36:09 -0400
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7594167FA;
-        Wed,  6 Jul 2022 09:36:08 -0700 (PDT)
-Received: by mail-vs1-xe2b.google.com with SMTP id 185so4484092vse.6;
-        Wed, 06 Jul 2022 09:36:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=i90W+nmLcKJiuU8nDMzMQhv3WUqAkvxIUgvsvqlvC6U=;
-        b=KPNStwzU/WUz8HJuvH6zB5FOFwhfyrHw157f4JuCebX99xVsLG2D3r0EaGasjTsEIp
-         dt22OVbgVNAnmd4KZTwrjo0eL7eWxNMP+JqC2HFYebenNlt2kZk8q922mKIhIarw+E1s
-         FkbOKXj+UmQaIXlW/80q+PrUDiNSXcfCgLY0zg+UC078LCu83gNsB/xzW67w0rjCy7w5
-         q1IEsyVfcGpATahCBDwkVsb9k2zxzXIetOtrLhCiLcQy7qytvPKe1lijppv3WKn0+ccE
-         5q/g6tig6VLKXPQ6aQVGA7ZmpuxyR2WMLAfkpMA+gJ9FNT96N0wa788BzlRflsGBc6/Z
-         uTCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=i90W+nmLcKJiuU8nDMzMQhv3WUqAkvxIUgvsvqlvC6U=;
-        b=APzz891kkyuV29vcjOYyGh0o3sMsguO/c09gVZQ+b+FjdW6SrhC2Eo3JrabSPOouXu
-         j7pg9YLEq4ComyeuhcsljtTfhoeBNQ1WJKwNySdN2tt+entpKuHnqgBEDDhc8WSkeuAw
-         agZJUjnkVpBpvaBD9Z7NIV5Q4PhEEqRyIut88tnSPHJbQlFfW1tWxAteYojH03FmbQSz
-         GZwrQ5ORvxRJCqyGFu6wfSj/yzv9HWxF7ZB7NadiCQkh7xAHJcdC7YfDdVYsIRRD1vxi
-         DigtgRm7ZtOD981eU4xNw2UXn69MovJ7HUwL9WmsJDtEt9Uaqq5TK/yd7m2PSaRZAK+D
-         4Ibw==
-X-Gm-Message-State: AJIora+Nr7bCQB/rsqmLfJvEmyBbdRs4w1JwLzk/a04yBKi69N+2D/Iz
-        0pjIMJ6fHYxkyTu4q227LIj2TCjpko2hRPQeP+g=
-X-Google-Smtp-Source: AGRyM1tnkW4IeW9/81uz5P8pCuI6gW/bkVVSiVtYR6lE5LkenQueOcwH2XjlXBeSNYieDiA5VxWGQ38uYgVTERyOyHw=
-X-Received: by 2002:a67:e0c6:0:b0:357:1264:f63d with SMTP id
- m6-20020a67e0c6000000b003571264f63dmr2236451vsl.36.1657125367974; Wed, 06 Jul
- 2022 09:36:07 -0700 (PDT)
+        with ESMTP id S229824AbiGFRLU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 13:11:20 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF941EC65;
+        Wed,  6 Jul 2022 10:11:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657127478; x=1688663478;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GZ21WeUn2BvY+TriUS2rQPak4SchM30SywlYdffG4P0=;
+  b=CrBZjo7r+HdVGMmTEsl84VhKztqZRnMDweEPz6kfKB+Yb4wwhNnH3umT
+   y0ohvnN49UNUU9fimq2kQOFMQ6sywTE8qY+ods2oX1g1IFpvE0trKx8N3
+   HneJ8Mm1MQ/JFs/czVZhtWVPSD8w8ToEk/MHjyjjPJ8H6Vj8Ghu4y7Vy1
+   AG/CT7raJbJCkEpxN5Miyqdsb86RKyHvrscJh4Kr3OEZmTjK3zYDwu2nw
+   26TbfrKO5fzjbj1ROwm+XaopqLMXBqk/YkDql7r7yvdZ30dANtny9zcmy
+   jVSM8WU/Dq20u9//YIWXLVdpyuPcrmtgyUMpFZN5hXbyezQzV3dTERu4R
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10400"; a="281364065"
+X-IronPort-AV: E=Sophos;i="5.92,250,1650956400"; 
+   d="scan'208";a="281364065"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2022 10:11:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,250,1650956400"; 
+   d="scan'208";a="625981050"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 06 Jul 2022 10:11:14 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o98YU-000KpD-0G;
+        Wed, 06 Jul 2022 17:11:14 +0000
+Date:   Thu, 7 Jul 2022 01:10:47 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     gjoyce@linux.vnet.ibm.com, keyrings@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, gjoyce@ibm.com, dhowells@redhat.com,
+        jarkko@kernel.org, andrzej.jakowski@intel.com,
+        jonathan.derrick@linux.dev, drmiller.lnx@gmail.com,
+        linux-block@vger.kernel.org, greg@gilhooley.com
+Subject: Re: [PATCH 4/4] arch_vars: create arch specific permanent store
+Message-ID: <202207070041.gf2Xgary-lkp@intel.com>
+References: <20220706023935.875994-5-gjoyce@linux.vnet.ibm.com>
 MIME-Version: 1.0
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org> <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
- <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
- <20220704032516.GC3237952@dread.disaster.area> <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
- <20220705031133.GD3237952@dread.disaster.area> <CAOQ4uxi2rBGqmtXghFJ+frDORETum+4KOKEg0oeX-woPXLNxTw@mail.gmail.com>
- <YsWcZbBALgWKS88+@mit.edu>
-In-Reply-To: <YsWcZbBALgWKS88+@mit.edu>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Wed, 6 Jul 2022 19:35:57 +0300
-Message-ID: <CAOQ4uxgr8v=h1xi=sfJD9uSp6DR_iAiXScd68Ov7=6Cm-iA+ZA@mail.gmail.com>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for expunges
-To:     "Theodore Ts'o" <tytso@mit.edu>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220706023935.875994-5-gjoyce@linux.vnet.ibm.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 6, 2022 at 5:30 PM Theodore Ts'o <tytso@mit.edu> wrote:
->
-> On Wed, Jul 06, 2022 at 01:11:16PM +0300, Amir Goldstein wrote:
-> >
-> > So I am wondering what is the status today, because I rarely
-> > see fstests failure reports from kernel test bot on the list, but there
-> > are some reports.
-> >
-> > Does anybody have a clue what hw/fs/config/group of fstests
-> > kernel test bot is running on linux-next?
->
-> Te zero-day test bot only reports test regressions.  So they have some
-> list of tests that have failed in the past, and they only report *new*
-> test failures.  This is not just true for fstests, but it's also true
-> for things like check and compiler warnings warnings --- and I suspect
-> it's for those sorts of reports that caused the zero-day bot to keep
-> state, and to filter out test failures and/or check warnings and/or
-> compiler warnings, so that only new test failures and/or new compiler
-> warnigns are reported.  If they didn't, they would be spamming kernel
-> developers, and given how.... "kind and understanding" kernel
-> developers are at getting spammed, especially when sometimes the
-> complaints are bogus ones (either test bugs or compiler bugs), my
-> guess is that they did the filtering out of sheer self-defense.  It
-> certainly wasn't something requested by a file system developer as far
-> as I know.
->
->
-> So this is how I think an automated system for "drive-by testers"
-> should work.  First, the tester would specify the baseline/origin tag,
-> and the testing system would run the tests on the baseline once.
-> Hopefully, the test runner already has exclude files so that kernel
-> bugs that cause an immediate kernel crash or deadlock would be already
-> be in the exclude list.  But as I've discovered this weekend, for file
-> systems that I haven't tried in a few yeas, like udf, or
-> ubifs. etc. there may be missing tests that result in the test VM to
-> stop responding and/or crash.
->
-> I have a planned improvement where if you are using the gce-xfstests's
-> lightweight test manager, since the LTM is constantly reading the
-> serial console, a deadlock can be detected and the LTM can restart the
-> VM.  The VM can then disambiguate from a forced reboot caused by the
-> LTM, or a forced shutdown caused by the use of a preemptible VM (a
-> planned feature not yet fully implemented yet), and the test runner
-> can skip the tests already run, and skip the test which caused the
-> crash or deadlock, and this could be reported so that eventually, the
-> test could be added to the exclude file to benefit thouse people who
-> are using kvm-xfstests.  (This is an example of a planned improvement
-> in xfstests-bld which if someone is interested in helping to implement
-> it, they should give me a ring.)
->
-> Once the tests which are failing given a particular baseline are
-> known, this state would then get saved, and then now the tests can be
-> run on the drive-by developer's changes.  We can now compare the known
-> failures for the baseline, with the changed kernels, and if there are
-> any new failures, there are two possibilities: (a) this was a new
-> feailure caused by the drive-by developer's changes, (b) this was a
-> pre-existing known flake.
->
-> To disambiguate between these two cases, we now run the failed test N
-> times (where N is probably something like 10-50 times; I normally use
-> 25 times) on the changed kernel, and get the failure rate.  If the
-> failure rate is 100%, then this is almost certainly (a).  If the
-> failure rate is < 100% (and greater than 0%), then we need to rerun
-> the failed test on the baseline kernel N times, and see if the failure
-> rate is 0%, then we should do a bisection search to determine the
-> guilty commit.
->
-> If the failure rate is 0%, then this is either an extremely rare
-> flake, in which case we might need to increase N --- or it's an
-> example of a test failure which is sensitive to the order of tests
-> which are failed, in which case we may need to reun all of the tests
-> in order up to the failed test.
->
-> This is right now what I do when processing patches for upstream.
-> It's also rather similar to what we're doing for the XFS stable
-> backports, because it's much more efficient than running the baseline
-> tests 100 times (which can take a week of continuous testing per
-> Luis's comments) --- we only tests dozens (or more) times where a
-> potential flake has been found, as opposed to *all* tests.  It's all
-> done manually, but it would be great if we could automate this to make
-> life easier for XFS stable backporters, and *also* for drive-by
-> developers.
->
+Hi,
 
-This process sounds like it could get us to mostly unattended regression
-testing, so it sounds good.
+Thank you for the patch! Yet something to improve:
 
-I do wonder if there is nothing more that fstests devlopers can do to
-assist when annotating new (and existing) tests to aid in that effort.
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v5.19-rc5 next-20220706]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-For example, there might be a case to tag a test as "this is a very
-reliable test that should have no failures at all - if there is a failure
-then something is surely wrong".
-I wonder if it would help to have a group like that and how many
-tests would that group include.
+url:    https://github.com/intel-lab-lkp/linux/commits/gjoyce-linux-vnet-ibm-com/sed-opal-keyrings-discovery-revert-and-key-store/20220706-104204
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: sparc64-randconfig-r002-20220703 (https://download.01.org/0day-ci/archive/20220707/202207070041.gf2Xgary-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/b984dda112cdbda6b41045bf63f790a3c2903c7a
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review gjoyce-linux-vnet-ibm-com/sed-opal-keyrings-discovery-revert-and-key-store/20220706-104204
+        git checkout b984dda112cdbda6b41045bf63f790a3c2903c7a
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=sparc64 SHELL=/bin/bash
 
-> And again, if anyone is interested in helping with this, especially if
-> you're familiar with shell, python 3, and/or the Go language, please
-> contact me off-line.
->
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-Please keep me in the loop if you have a prototype I may be able
-to help test it.
+All error/warnings (new ones prefixed by >>):
 
-Thanks,
-Amir.
+   block/sed-opal.c: In function 'update_sed_opal_key':
+>> block/sed-opal.c:286:15: error: implicit declaration of function 'key_alloc'; did you mean 'bdev_alloc'? [-Werror=implicit-function-declaration]
+     286 |         key = key_alloc(&key_type_user, desc, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+         |               ^~~~~~~~~
+         |               bdev_alloc
+>> block/sed-opal.c:286:26: error: 'key_type_user' undeclared (first use in this function)
+     286 |         key = key_alloc(&key_type_user, desc, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+         |                          ^~~~~~~~~~~~~
+   block/sed-opal.c:286:26: note: each undeclared identifier is reported only once for each function it appears in
+>> block/sed-opal.c:288:33: error: 'KEY_USR_VIEW' undeclared (first use in this function)
+     288 |                                 KEY_USR_VIEW | KEY_USR_SEARCH | KEY_USR_WRITE,
+         |                                 ^~~~~~~~~~~~
+>> block/sed-opal.c:288:48: error: 'KEY_USR_SEARCH' undeclared (first use in this function)
+     288 |                                 KEY_USR_VIEW | KEY_USR_SEARCH | KEY_USR_WRITE,
+         |                                                ^~~~~~~~~~~~~~
+>> block/sed-opal.c:288:65: error: 'KEY_USR_WRITE' undeclared (first use in this function)
+     288 |                                 KEY_USR_VIEW | KEY_USR_SEARCH | KEY_USR_WRITE,
+         |                                                                 ^~~~~~~~~~~~~
+>> block/sed-opal.c:294:15: error: implicit declaration of function 'key_instantiate_and_link'; did you mean 'd_instantiate_anon'? [-Werror=implicit-function-declaration]
+     294 |         ret = key_instantiate_and_link(key, key_data, keylen,
+         |               ^~~~~~~~~~~~~~~~~~~~~~~~
+         |               d_instantiate_anon
+   block/sed-opal.c: In function 'read_sed_opal_key':
+>> block/sed-opal.c:307:9: error: unknown type name 'key_ref_t'; did you mean 'key_ref_put'?
+     307 |         key_ref_t kref;
+         |         ^~~~~~~~~
+         |         key_ref_put
+>> block/sed-opal.c:313:16: error: implicit declaration of function 'keyring_search' [-Werror=implicit-function-declaration]
+     313 |         kref = keyring_search(make_key_ref(sed_opal_keyring, true),
+         |                ^~~~~~~~~~~~~~
+   block/sed-opal.c:314:18: error: 'key_type_user' undeclared (first use in this function)
+     314 |                 &key_type_user,
+         |                  ^~~~~~~~~~~~~
+>> block/sed-opal.c:318:20: warning: passing argument 1 of 'IS_ERR' makes pointer from integer without a cast [-Wint-conversion]
+     318 |         if (IS_ERR(kref)) {
+         |                    ^~~~
+         |                    |
+         |                    int
+   In file included from include/linux/container_of.h:6,
+                    from include/linux/list.h:5,
+                    from include/linux/rculist.h:10,
+                    from include/linux/pid.h:5,
+                    from include/linux/sched.h:14,
+                    from include/linux/delay.h:23,
+                    from block/sed-opal.c:12:
+   include/linux/err.h:34:60: note: expected 'const void *' but argument is of type 'int'
+      34 | static inline bool __must_check IS_ERR(__force const void *ptr)
+         |                                                ~~~~~~~~~~~~^~~
+>> block/sed-opal.c:319:31: warning: passing argument 1 of 'PTR_ERR' makes pointer from integer without a cast [-Wint-conversion]
+     319 |                 ret = PTR_ERR(kref);
+         |                               ^~~~
+         |                               |
+         |                               int
+   In file included from include/linux/container_of.h:6,
+                    from include/linux/list.h:5,
+                    from include/linux/rculist.h:10,
+                    from include/linux/pid.h:5,
+                    from include/linux/sched.h:14,
+                    from include/linux/delay.h:23,
+                    from block/sed-opal.c:12:
+   include/linux/err.h:29:61: note: expected 'const void *' but argument is of type 'int'
+      29 | static inline long __must_check PTR_ERR(__force const void *ptr)
+         |                                                 ~~~~~~~~~~~~^~~
+>> block/sed-opal.c:322:31: error: invalid use of undefined type 'struct key'
+     322 |                 down_read(&key->sem);
+         |                               ^~
+   block/sed-opal.c:325:41: error: invalid use of undefined type 'struct key'
+     325 |                         if (buflen > key->datalen)
+         |                                         ^~
+   block/sed-opal.c:326:45: error: invalid use of undefined type 'struct key'
+     326 |                                 buflen = key->datalen;
+         |                                             ^~
+   block/sed-opal.c:328:34: error: invalid use of undefined type 'struct key'
+     328 |                         ret = key->type->read(key, (char *)buffer, buflen);
+         |                                  ^~
+   block/sed-opal.c:330:29: error: invalid use of undefined type 'struct key'
+     330 |                 up_read(&key->sem);
+         |                             ^~
+   block/sed-opal.c: In function 'sed_opal_init':
+>> block/sed-opal.c:2938:14: error: implicit declaration of function 'keyring_alloc'; did you mean 'warn_alloc'? [-Werror=implicit-function-declaration]
+    2938 |         kr = keyring_alloc(".sed_opal",
+         |              ^~~~~~~~~~~~~
+         |              warn_alloc
+>> block/sed-opal.c:2940:18: error: 'KEY_POS_ALL' undeclared (first use in this function)
+    2940 |                 (KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW |
+         |                  ^~~~~~~~~~~
+>> block/sed-opal.c:2940:33: error: 'KEY_POS_SETATTR' undeclared (first use in this function)
+    2940 |                 (KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW |
+         |                                 ^~~~~~~~~~~~~~~
+   block/sed-opal.c:2940:52: error: 'KEY_USR_VIEW' undeclared (first use in this function)
+    2940 |                 (KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW |
+         |                                                    ^~~~~~~~~~~~
+>> block/sed-opal.c:2941:17: error: 'KEY_USR_READ' undeclared (first use in this function)
+    2941 |                 KEY_USR_READ | KEY_USR_SEARCH | KEY_USR_WRITE,
+         |                 ^~~~~~~~~~~~
+   block/sed-opal.c:2941:32: error: 'KEY_USR_SEARCH' undeclared (first use in this function)
+    2941 |                 KEY_USR_READ | KEY_USR_SEARCH | KEY_USR_WRITE,
+         |                                ^~~~~~~~~~~~~~
+   block/sed-opal.c:2941:49: error: 'KEY_USR_WRITE' undeclared (first use in this function)
+    2941 |                 KEY_USR_READ | KEY_USR_SEARCH | KEY_USR_WRITE,
+         |                                                 ^~~~~~~~~~~~~
+>> block/sed-opal.c:2942:17: error: 'KEY_ALLOC_NOT_IN_QUOTA' undeclared (first use in this function)
+    2942 |                 KEY_ALLOC_NOT_IN_QUOTA,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +286 block/sed-opal.c
+
+455a7b238cd6bc Scott Bauer 2017-02-03  274  
+8a2b115580e8f7 Greg Joyce  2022-07-05  275  /*
+8a2b115580e8f7 Greg Joyce  2022-07-05  276   * Allocate/update a SED Opal key and add it to the SED Opal keyring.
+8a2b115580e8f7 Greg Joyce  2022-07-05  277   */
+8a2b115580e8f7 Greg Joyce  2022-07-05  278  static int update_sed_opal_key(const char *desc, u_char *key_data, int keylen)
+8a2b115580e8f7 Greg Joyce  2022-07-05  279  {
+8a2b115580e8f7 Greg Joyce  2022-07-05  280  	int ret;
+8a2b115580e8f7 Greg Joyce  2022-07-05  281  	struct key *key;
+8a2b115580e8f7 Greg Joyce  2022-07-05  282  
+8a2b115580e8f7 Greg Joyce  2022-07-05  283  	if (!sed_opal_keyring)
+8a2b115580e8f7 Greg Joyce  2022-07-05  284  		return -ENOKEY;
+8a2b115580e8f7 Greg Joyce  2022-07-05  285  
+8a2b115580e8f7 Greg Joyce  2022-07-05 @286  	key = key_alloc(&key_type_user, desc, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
+8a2b115580e8f7 Greg Joyce  2022-07-05  287  				current_cred(),
+8a2b115580e8f7 Greg Joyce  2022-07-05 @288  				KEY_USR_VIEW | KEY_USR_SEARCH | KEY_USR_WRITE,
+8a2b115580e8f7 Greg Joyce  2022-07-05  289  				0,
+8a2b115580e8f7 Greg Joyce  2022-07-05  290  				NULL);
+8a2b115580e8f7 Greg Joyce  2022-07-05  291  	if (IS_ERR(key))
+8a2b115580e8f7 Greg Joyce  2022-07-05  292  		return PTR_ERR(key);
+8a2b115580e8f7 Greg Joyce  2022-07-05  293  
+8a2b115580e8f7 Greg Joyce  2022-07-05 @294  	ret = key_instantiate_and_link(key, key_data, keylen,
+8a2b115580e8f7 Greg Joyce  2022-07-05  295  			sed_opal_keyring, NULL);
+8a2b115580e8f7 Greg Joyce  2022-07-05  296  	key_put(key);
+8a2b115580e8f7 Greg Joyce  2022-07-05  297  
+8a2b115580e8f7 Greg Joyce  2022-07-05  298  	return ret;
+8a2b115580e8f7 Greg Joyce  2022-07-05  299  }
+8a2b115580e8f7 Greg Joyce  2022-07-05  300  
+8a2b115580e8f7 Greg Joyce  2022-07-05  301  /*
+8a2b115580e8f7 Greg Joyce  2022-07-05  302   * Read a SED Opal key from the SED Opal keyring.
+8a2b115580e8f7 Greg Joyce  2022-07-05  303   */
+8a2b115580e8f7 Greg Joyce  2022-07-05  304  static int read_sed_opal_key(const char *key_name, u_char *buffer, int buflen)
+8a2b115580e8f7 Greg Joyce  2022-07-05  305  {
+8a2b115580e8f7 Greg Joyce  2022-07-05  306  	int ret;
+8a2b115580e8f7 Greg Joyce  2022-07-05 @307  	key_ref_t kref;
+8a2b115580e8f7 Greg Joyce  2022-07-05  308  	struct key *key;
+8a2b115580e8f7 Greg Joyce  2022-07-05  309  
+8a2b115580e8f7 Greg Joyce  2022-07-05  310  	if (!sed_opal_keyring)
+8a2b115580e8f7 Greg Joyce  2022-07-05  311  		return -ENOKEY;
+8a2b115580e8f7 Greg Joyce  2022-07-05  312  
+8a2b115580e8f7 Greg Joyce  2022-07-05 @313  	kref = keyring_search(make_key_ref(sed_opal_keyring, true),
+8a2b115580e8f7 Greg Joyce  2022-07-05  314  		&key_type_user,
+8a2b115580e8f7 Greg Joyce  2022-07-05  315  		key_name,
+8a2b115580e8f7 Greg Joyce  2022-07-05  316  		true);
+8a2b115580e8f7 Greg Joyce  2022-07-05  317  
+8a2b115580e8f7 Greg Joyce  2022-07-05 @318  	if (IS_ERR(kref)) {
+8a2b115580e8f7 Greg Joyce  2022-07-05 @319  		ret = PTR_ERR(kref);
+8a2b115580e8f7 Greg Joyce  2022-07-05  320  	} else {
+8a2b115580e8f7 Greg Joyce  2022-07-05  321  		key = key_ref_to_ptr(kref);
+8a2b115580e8f7 Greg Joyce  2022-07-05 @322  		down_read(&key->sem);
+8a2b115580e8f7 Greg Joyce  2022-07-05  323  		ret = key_validate(key);
+8a2b115580e8f7 Greg Joyce  2022-07-05  324  		if (ret == 0) {
+8a2b115580e8f7 Greg Joyce  2022-07-05  325  			if (buflen > key->datalen)
+8a2b115580e8f7 Greg Joyce  2022-07-05  326  				buflen = key->datalen;
+8a2b115580e8f7 Greg Joyce  2022-07-05  327  
+8a2b115580e8f7 Greg Joyce  2022-07-05  328  			ret = key->type->read(key, (char *)buffer, buflen);
+8a2b115580e8f7 Greg Joyce  2022-07-05  329  		}
+8a2b115580e8f7 Greg Joyce  2022-07-05  330  		up_read(&key->sem);
+8a2b115580e8f7 Greg Joyce  2022-07-05  331  
+8a2b115580e8f7 Greg Joyce  2022-07-05  332  		key_ref_put(kref);
+8a2b115580e8f7 Greg Joyce  2022-07-05  333  	}
+8a2b115580e8f7 Greg Joyce  2022-07-05  334  
+8a2b115580e8f7 Greg Joyce  2022-07-05  335  	return ret;
+8a2b115580e8f7 Greg Joyce  2022-07-05  336  }
+8a2b115580e8f7 Greg Joyce  2022-07-05  337  
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
