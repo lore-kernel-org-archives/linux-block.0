@@ -2,109 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6EFC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 14:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D93C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 14:31:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233486AbiGFO3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 10:29:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51696 "EHLO
+        id S233071AbiGFOb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 10:31:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233399AbiGFO3E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 10:29:04 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763272658;
-        Wed,  6 Jul 2022 07:28:57 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 266EGfhH014880;
-        Wed, 6 Jul 2022 14:28:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=K8I/xFNNYnKZsWrRatGZ+DWv4j8ApzU7WSvXTR4REvg=;
- b=A1EHVr/SK41RsV9YRGY832WhBWXhcplqnwVIgmLzWs1NvZZkWMN6GXK6gkXy8Oeuemoy
- xFlTVhZtSrjjaDTctseIICXUR9hw7gfRc9te+ovJMaEZI91d6L6iWyCbQR2GfjJcz4J9
- yn5pMrcP5JQk0ZMe7I7epNId7FCvP+CEdf+RSa73tZO1i6J/JXgkzO4X3+Bd3Pc1ydNs
- 13I6zCTmG6RbUMY2GjRpkvWhYpWqW+MSMDIqiKbxZgX+RoqLFL4F7ygl6G3CEywK0HMT
- fbi29JE7XQojyHmIOW2LEmbnhrznH3Gw9azXEgQonqUlbhV/c3IxnptDL78tJyLe0Hru Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5c1109u7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Jul 2022 14:28:34 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 266EHI3K020915;
-        Wed, 6 Jul 2022 14:28:34 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3h5c1109tt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Jul 2022 14:28:34 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 266ELPDp001198;
-        Wed, 6 Jul 2022 14:28:33 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma01wdc.us.ibm.com with ESMTP id 3h4ud1mx7x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 06 Jul 2022 14:28:33 +0000
-Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 266ESWFt31064504
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 6 Jul 2022 14:28:32 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C50C5BE04F;
-        Wed,  6 Jul 2022 14:28:32 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CDC56BE059;
-        Wed,  6 Jul 2022 14:28:31 +0000 (GMT)
-Received: from rhel-laptop.ibm.com (unknown [9.160.24.101])
-        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed,  6 Jul 2022 14:28:31 +0000 (GMT)
-Message-ID: <ba904e767b52ce511dfe8442a628ef72714846be.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH 4/4] arch_vars: create arch specific permanent store
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     keyrings@vger.kernel.org, gjoyce@ibm.com, dhowells@redhat.com,
-        jarkko@kernel.org, andrzej.jakowski@intel.com,
-        jonathan.derrick@linux.dev, drmiller.lnx@gmail.com,
-        linux-block@vger.kernel.org, brking@linux.vnet.ibm.com
-Date:   Wed, 06 Jul 2022 09:28:31 -0500
-In-Reply-To: <YsVDmPyjHLIZm+Qn@infradead.org>
-References: <20220706023935.875994-1-gjoyce@linux.vnet.ibm.com>
-         <20220706023935.875994-5-gjoyce@linux.vnet.ibm.com>
-         <YsVDmPyjHLIZm+Qn@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Qm5iga0niUJXQrCeVyoclwvJJS3hbkXJ
-X-Proofpoint-ORIG-GUID: xeGT0snnfM9Ik8B5fchT4D83jzwJr3GD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-06_08,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- adultscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=996
- impostorscore=0 clxscore=1011 mlxscore=0 malwarescore=0 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207060056
+        with ESMTP id S232523AbiGFOb0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 10:31:26 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B445A20182;
+        Wed,  6 Jul 2022 07:31:24 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 266ETwXl010753
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 6 Jul 2022 10:29:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1657117802; bh=NUUsO3D1IV2NnscRXQ3iW7vDLpbznJlBJF/3puoiFlU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=ByMVPDFr5R8Axivia9yVVNfmFzr4obgpDayheOHhBGP5rmhlYUHdlEHTNapSRSbf5
+         aU9t1GR/wcQgSFL/PlOl2xi1rRKoVFUsw1meRM189aCKKaCoVCnEzjCQIBLCcfNayW
+         9PwiaPAWermMd6xdFujtqUTzfOK5GZTYQA/CIOGTogVSfOo5KvlPGWBAQd6HlJWEPJ
+         NoVB7juD+bkcdYyzBN4rS3qExjK+32bsNAtI/b71wChegqKDeqd/obsyme4fYlmG3h
+         NPJ7v6IORhwbj8MAsfVR8BBTSDAnYqaxo9BAgZNJXifHiqbuItiJXN/+d8oCe4h0nJ
+         Aek0hE4Sl/5iw==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id DD1BA15C3E94; Wed,  6 Jul 2022 10:29:57 -0400 (EDT)
+Date:   Wed, 6 Jul 2022 10:29:57 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>, Zorro Lang <zlang@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <YsWcZbBALgWKS88+@mit.edu>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <a120fb86-5a08-230f-33ee-1cb47381fff1@acm.org>
+ <CAOQ4uxgBtMifsNt1SDA0tz098Rt7Km6MAaNgfCeW=s=FPLtpCQ@mail.gmail.com>
+ <20220704032516.GC3237952@dread.disaster.area>
+ <CAOQ4uxj5wabQvsGELS7t_Z9Z4Z2ZUHAR8d+LBao89ANErwZ95g@mail.gmail.com>
+ <20220705031133.GD3237952@dread.disaster.area>
+ <CAOQ4uxi2rBGqmtXghFJ+frDORETum+4KOKEg0oeX-woPXLNxTw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOQ4uxi2rBGqmtXghFJ+frDORETum+4KOKEg0oeX-woPXLNxTw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2022-07-06 at 01:11 -0700, Christoph Hellwig wrote:
-> On Tue, Jul 05, 2022 at 09:39:35PM -0500, gjoyce@linux.vnet.ibm.com
-> wrote:
-> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > 
-> > Platforms that have a permanent key store may provide unique
-> > platform dependent functions to read/write variables. The
-> > default (weak) functions return -EOPNOTSUPP unless overridden
-> > by architecture/platform versions.
+On Wed, Jul 06, 2022 at 01:11:16PM +0300, Amir Goldstein wrote:
 > 
-> Which is none as of this patch set, as is the number of of users of
-> this API.  Did this slip in by accident?
+> So I am wondering what is the status today, because I rarely
+> see fstests failure reports from kernel test bot on the list, but there
+> are some reports.
+> 
+> Does anybody have a clue what hw/fs/config/group of fstests
+> kernel test bot is running on linux-next?
 
-You are correct, there are currently no platforms that utilize this
-key store interface. However, there is a pseries platform store that 
-has a driver that will provide the interfaces. This is in a separate
-patchset that is currently being submitted.
+Te zero-day test bot only reports test regressions.  So they have some
+list of tests that have failed in the past, and they only report *new*
+test failures.  This is not just true for fstests, but it's also true
+for things like check and compiler warnings warnings --- and I suspect
+it's for those sorts of reports that caused the zero-day bot to keep
+state, and to filter out test failures and/or check warnings and/or
+compiler warnings, so that only new test failures and/or new compiler
+warnigns are reported.  If they didn't, they would be spamming kernel
+developers, and given how.... "kind and understanding" kernel
+developers are at getting spammed, especially when sometimes the
+complaints are bogus ones (either test bugs or compiler bugs), my
+guess is that they did the filtering out of sheer self-defense.  It
+certainly wasn't something requested by a file system developer as far
+as I know.
 
+
+So this is how I think an automated system for "drive-by testers"
+should work.  First, the tester would specify the baseline/origin tag,
+and the testing system would run the tests on the baseline once.
+Hopefully, the test runner already has exclude files so that kernel
+bugs that cause an immediate kernel crash or deadlock would be already
+be in the exclude list.  But as I've discovered this weekend, for file
+systems that I haven't tried in a few yeas, like udf, or
+ubifs. etc. there may be missing tests that result in the test VM to
+stop responding and/or crash.
+
+I have a planned improvement where if you are using the gce-xfstests's
+lightweight test manager, since the LTM is constantly reading the
+serial console, a deadlock can be detected and the LTM can restart the
+VM.  The VM can then disambiguate from a forced reboot caused by the
+LTM, or a forced shutdown caused by the use of a preemptible VM (a
+planned feature not yet fully implemented yet), and the test runner
+can skip the tests already run, and skip the test which caused the
+crash or deadlock, and this could be reported so that eventually, the
+test could be added to the exclude file to benefit thouse people who
+are using kvm-xfstests.  (This is an example of a planned improvement
+in xfstests-bld which if someone is interested in helping to implement
+it, they should give me a ring.)
+
+Once the tests which are failing given a particular baseline are
+known, this state would then get saved, and then now the tests can be
+run on the drive-by developer's changes.  We can now compare the known
+failures for the baseline, with the changed kernels, and if there are
+any new failures, there are two possibilities: (a) this was a new
+feailure caused by the drive-by developer's changes, (b) this was a
+pre-existing known flake.
+
+To disambiguate between these two cases, we now run the failed test N
+times (where N is probably something like 10-50 times; I normally use
+25 times) on the changed kernel, and get the failure rate.  If the
+failure rate is 100%, then this is almost certainly (a).  If the
+failure rate is < 100% (and greater than 0%), then we need to rerun
+the failed test on the baseline kernel N times, and see if the failure
+rate is 0%, then we should do a bisection search to determine the
+guilty commit.
+
+If the failure rate is 0%, then this is either an extremely rare
+flake, in which case we might need to increase N --- or it's an
+example of a test failure which is sensitive to the order of tests
+which are failed, in which case we may need to reun all of the tests
+in order up to the failed test.
+
+This is right now what I do when processing patches for upstream.
+It's also rather similar to what we're doing for the XFS stable
+backports, because it's much more efficient than running the baseline
+tests 100 times (which can take a week of continuous testing per
+Luis's comments) --- we only tests dozens (or more) times where a
+potential flake has been found, as opposed to *all* tests.  It's all
+done manually, but it would be great if we could automate this to make
+life easier for XFS stable backporters, and *also* for drive-by
+developers.
+
+And again, if anyone is interested in helping with this, especially if
+you're familiar with shell, python 3, and/or the Go language, please
+contact me off-line.
+
+Cheers,
+
+						- Ted
