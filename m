@@ -2,112 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C3ACC43334
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jul 2022 21:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DA8C43334
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 01:46:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234391AbiGFVaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jul 2022 17:30:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53426 "EHLO
+        id S231942AbiGGBqY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jul 2022 21:46:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234627AbiGFVas (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 17:30:48 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3412A94F;
-        Wed,  6 Jul 2022 14:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=8YduW0eS5FyJqaOqaP8Ime9Kxv0Nz0ax91qwOz8aVq0=; b=tJ8pa1OCY41/griklmW+EWfOVD
-        GWRX3NjEHhYKoa1dirAXu9tcLaN+qpf0nzpSUt6AE2hSTAMaGkgPgv4NcYCGYPyn5+QpenS+wTnVf
-        dzwHgdTgxI67I3CmK0cMnjTb734bjxbjYx7DQA9orlsLZwJnT7/WMP2dzbiZ7YbAQzYQu/y+kd36E
-        NWKd/LUDPN2BcSU2j0kYeELLqOgQTg66ewIFq/UnLnPvN5w4UmYxGdTvEJEsZFKMhHTjiXUcAJU+a
-        56SmKOp2xezp85myJotIUFWF91GMeRTiTwry5HfRHn7/M0IWeMCxtQww2OKOWXkI2zuBZnUl0FPwc
-        DaJoW4Qg==;
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1o9CbT-008LWu-KY; Wed, 06 Jul 2022 15:30:36 -0600
-Message-ID: <e40595f9-f398-d43f-b09d-08d3e88b3950@deltatee.com>
-Date:   Wed, 6 Jul 2022 15:30:30 -0600
+        with ESMTP id S231627AbiGGBqX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jul 2022 21:46:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A593A2ED6D
+        for <linux-block@vger.kernel.org>; Wed,  6 Jul 2022 18:46:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657158381;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=balIyGGcThFGQnZtBoNOoylNjVr91YNMza6Ayzw3JGM=;
+        b=E6QKueb65reyFzd2eqFLFyYGlP7cU8dXEKc3MaKHG8mt6rOWwjf+3Z5EsFahghn2lWfBn+
+        +xhR76/inbARqWMWYa96S+FE7t6q4Y0aQLil6EL1e+QCecXMSO03ufHUuqQgUdgWt/B2+L
+        o+07nfBaIiLy0NNcX8562RrV+T6olxg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-624-_XOvf8u9PLGwRWov-MAsuw-1; Wed, 06 Jul 2022 21:46:20 -0400
+X-MC-Unique: _XOvf8u9PLGwRWov-MAsuw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 24558185A7B2;
+        Thu,  7 Jul 2022 01:46:20 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 81F4C18ECC;
+        Thu,  7 Jul 2022 01:46:15 +0000 (UTC)
+Date:   Thu, 7 Jul 2022 09:46:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [bug report] nvme/rdma: nvme connect failed after offline one
+ cpu on host side
+Message-ID: <YsY64iMxnLtucKsP@T590>
+References: <CAHj4cs9+F5F-v_2m=MYd8B=dXVgTBrtGikTTzfBU8_cX8fb0=g@mail.gmail.com>
+ <CAHj4cs_RUuiOw4pzSD+fv70p6izVMZ8z7mc+E0Kv0Rh8zriWCQ@mail.gmail.com>
+ <2c42c70a-8eb4-a095-1d2b-139614ebd903@grimberg.me>
+ <YsOKnb7MWLCeJxBE@T590>
+ <0a8099e6-6e28-da1f-7b4b-0ea04fa8f9d6@grimberg.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-References: <20220705161240.GB13721@lst.de>
- <a509b13c-244b-23fc-f989-339750a733a5@deltatee.com>
- <20220705164315.GB14484@lst.de>
- <acb91f37-0470-8ce4-19e4-426903cbc3a1@deltatee.com>
- <20220705165039.GB14566@lst.de> <YsRzNqmZYlgkL7fI@kroah.com>
- <1bd43ef7-0403-bd25-087c-d54d5af677e4@deltatee.com>
- <YsR4CNDgtt4JWonv@kroah.com>
- <b3deacdd-cb76-6ebb-0e29-ef6a5a426a0d@deltatee.com>
- <20220706065127.GA27132@lst.de> <YsU0Cb0rRbW8FGPX@kroah.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <YsU0Cb0rRbW8FGPX@kroah.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, hch@lst.de, jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, bhelgaas@google.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0a8099e6-6e28-da1f-7b4b-0ea04fa8f9d6@grimberg.me>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022-07-06 01:04, Greg Kroah-Hartman wrote:
-> On Wed, Jul 06, 2022 at 08:51:27AM +0200, Christoph Hellwig wrote:
->> On Tue, Jul 05, 2022 at 12:16:45PM -0600, Logan Gunthorpe wrote:
->>> The current version does it through a char device, but that requires
->>> creating a simple_fs and anon_inode for teardown on driver removal, plus
->>> a bunch of hooks through the driver that exposes it (NVMe, in this case)
->>> to set this all up.
->>>
->>> Christoph is suggesting a sysfs interface which could potentially avoid
->>> the anon_inode and all of the extra hooks. It has some significant
->>> benefits and maybe some small downsides, but I wouldn't describe it as
->>> horrid.
->>
->> Yeah, I don't think is is horrible, it fits in with the resource files
->> for the BARs, and solves a lot of problems.  Greg, can you explain
->> what would be so bad about it?
+On Wed, Jul 06, 2022 at 06:30:43PM +0300, Sagi Grimberg wrote:
 > 
-> As you mention, you will have to pass different things down into sysfs
-> in order for that to be possible.  If it matches the resource files like
-> we currently have today, that might not be that bad, but it still feels
-> odd to me.  Let's see an implementation and a Documentation/ABI/ entry
-> first though.
+> > > > update the subject to better describe the issue:
+> > > > 
+> > > > So I tried this issue on one nvme/rdma environment, and it was also
+> > > > reproducible, here are the steps:
+> > > > 
+> > > > # echo 0 >/sys/devices/system/cpu/cpu0/online
+> > > > # dmesg | tail -10
+> > > > [  781.577235] smpboot: CPU 0 is now offline
+> > > > # nvme connect -t rdma -a 172.31.45.202 -s 4420 -n testnqn
+> > > > Failed to write to /dev/nvme-fabrics: Invalid cross-device link
+> > > > no controller found: failed to write to nvme-fabrics device
+> > > > 
+> > > > # dmesg
+> > > > [  781.577235] smpboot: CPU 0 is now offline
+> > > > [  799.471627] nvme nvme0: creating 39 I/O queues.
+> > > > [  801.053782] nvme nvme0: mapped 39/0/0 default/read/poll queues.
+> > > > [  801.064149] nvme nvme0: Connect command failed, error wo/DNR bit: -16402
+> > > > [  801.073059] nvme nvme0: failed to connect queue: 1 ret=-18
+> > > 
+> > > This is because of blk_mq_alloc_request_hctx() and was raised before.
+> > > 
+> > > IIRC there was reluctance to make it allocate a request for an hctx even
+> > > if its associated mapped cpu is offline.
+> > > 
+> > > The latest attempt was from Ming:
+> > > [PATCH V7 0/3] blk-mq: fix blk_mq_alloc_request_hctx
+> > > 
+> > > Don't know where that went tho...
+> > 
+> > The attempt relies on that the queue for connecting io queue uses
+> > non-admined irq, unfortunately that can't be true for all drivers,
+> > so that way can't go.
+> 
+> The only consumer is nvme-fabrics, so others don't matter.
+> Maybe we need a different interface that allows this relaxation.
+> 
+> > So far, I'd suggest to fix nvme_*_connect_io_queues() to ignore failed
+> > io queue, then the nvme host still can be setup with less io queues.
+> 
+> What happens when the CPU comes back? Not sure we can simply ignore it.
 
-I'll work something up in the coming weeks.
+Anyway, it is a not good choice to fail the whole controller if only one
+queue can't be connected. I meant the queue can be kept as non-LIVE, and
+it should work since no any io can be issued to this queue when it is
+non-LIVE.
 
-Thanks,
+Just wondering why we can't re-connect the io queue and set LIVE after
+any CPU in the this hctx->cpumask becomes online? blk-mq could add one
+pair of callbacks for driver for handing this queue change.
 
-Logan
+
+thanks,
+Ming
+
