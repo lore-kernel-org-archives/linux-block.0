@@ -2,128 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28549CCA480
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 21:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 115DDC43334
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 22:08:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236856AbiGGVgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jul 2022 17:36:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46696 "EHLO
+        id S230284AbiGGWIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jul 2022 18:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236801AbiGGVgh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 17:36:37 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91942380;
-        Thu,  7 Jul 2022 14:36:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ttm6gGP6SLsd/ERoDNA6enC+GfvJnC9kynUKCW0O0ns=; b=yG/OHYUxpGtlw44gkc5XopLGK7
-        I6y30vKOkhOgcv+c8LaKNmQixg7SzUKOv8wSBBO+6LBT8YXJPQXcIR0qWJClh6qOzughOSEPsNMfy
-        S8DJkDEk+QYlc/azK+k+pGgEtW9CrNp8CzMc1vh7pfA3wOIoQtKS6wSLiAAByTp2BbN5++4vl3VAC
-        Zku/392MLRMD/b2b6Zeco5gTA+2lC0sHcilcbcxPhxpF/P1rFjeBgdu6UdzweR4E0XmzLUCeP2ogK
-        RObaFJoTdvPJ1wAzXrh490Wnuns+OppbHZaPWd99DmY2EgLSK7UE7EuHzOSk9RlAx4688b2+ycQXa
-        /fqLBcTw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o9ZAn-000Lbq-4A; Thu, 07 Jul 2022 21:36:33 +0000
-Date:   Thu, 7 Jul 2022 14:36:33 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        Zorro Lang <zlang@redhat.com>,
-        Amir Goldstein <amir73il@gmail.com>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
- expunges
-Message-ID: <YsdR4XgXW+iE/m8h@bombadil.infradead.org>
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
- <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
- <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
- <YoZbF90qS+LlSDfS@casper.infradead.org>
- <20220519154419.ziy4esm4tgikejvj@zlang-mailbox>
- <YoZq7/lr8hvcs9T3@casper.infradead.org>
- <YsB54p1vpBg4v2Xd@mit.edu>
+        with ESMTP id S229638AbiGGWIA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 18:08:00 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17FF35C967
+        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 15:08:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1657231679; x=1688767679;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8Jcbkis6ueOEcETD9ZZvN8IRAci++ian9KhgTLSOCUY=;
+  b=DbUAzu88oEzziw+3KqMfgSIJGsHjjAB4L4vMojOT/Led4XtOyNWge6Pq
+   7VGAWPi0SFa3faXkpd/pm/n+Nes/LeBBqhHFLYRhRxktzquOrpU8ERR1s
+   5vzC5i99mSHrrj2N/FvzVvRvEjfQJE+NN1ST/2NKCkqpGieOjxgF1Fof0
+   VBBduh2HqKl76b8k7b8YeeLJw5X90bcKyiQd518OpzHvEltGjyF6BlpcV
+   8WUwmjzoMvPuI1IrG15JV6FpKNvt/P+iZjmiw+XV66g+TNMGDo1JlP08d
+   aSSZIwHWV/CsCJvv2cM1PYeteRVA6F4jrHhVgknLAPksF8jI1SuBaUiYZ
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.92,253,1650902400"; 
+   d="scan'208";a="317257889"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Jul 2022 06:07:59 +0800
+IronPort-SDR: 6AH0tGkXDWXO5o9rSImfaBjeRtpq2VgHMCQSZ1SPqbhoBiRXkpTXySCceMPduQhj9T0lfp0+8j
+ 1ry2Cc0FB0o2u0n4eOglVeOGBq5eDCxw7yVgkhIPcXK1/TLgejWS7rXIWGo8F9jelX99EQspWd
+ Mi52n7JIDKS4ir4v0AtkLwS5QifHfTzG9sXUyu9xZ9GjWTDZhl+E8GRXDNoI4mSd3ydJ5mZZpY
+ iqCnOcHZhTis+0A0Z8wAQsxYJHEmg5DqrEUBrkx7sNXD7L9iuNchc5hESfGqFb6BmX7KqgdHX4
+ XpfQ+pqgaUJbcz8rw34e6p/T
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Jul 2022 14:25:12 -0700
+IronPort-SDR: vGGw49vf/t/qKELC0ChIIe8PNU5ka7l6OqcxFAz4KZTCvKvy3WPeashCQY13OIOvC/lUQJMvae
+ tfq3wpt7kEXfN9qGU1CTfrETbrUtNAU0cZ1ygaC6Qj2y3ZZp7wK+mB/JkG7vndLELb3pjvF77Z
+ v+/+fc7+qKHAA+UQuYjYIMJeHeYur4MWHe2qwLR2emVzwoipD9V04j52APPZgqlSlyLJeIbl30
+ okOAr85OcA/KmLKveZuCZlFrqhhVR+mhVodAQR4/3N/t/uzK7q+LJ1O4Nz3vK3JfPE0TlOPqpi
+ Oos=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Jul 2022 15:08:00 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Lf9Wz0qXpz1Rwnx
+        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 15:07:59 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1657231678; x=1659823679; bh=8Jcbkis6ueOEcETD9ZZvN8IRAci++ian9Kh
+        gTLSOCUY=; b=sBdYeYT//qBL4XiBOl6nAvLFS6uZQKf8z9l9kmuALXyfgdba9r0
+        gKb23Lv+QzlFFc111wuZO7d6cqkeVpOAf982JZAEh+eiEpEV1zyqUdujEHZTyenB
+        lcmWm/a10vr6o4KowjRPzcDbTZTUJcTIkgsHGC7knhpG7O+JFfWZ9kd++/0lLFyp
+        3wrR0owkW9FzcQtF+rwiSwZyqHSruqQjIFVDIhK0/rmoSjco7PS4Ur6ND8cce/5l
+        pgM1PXQUH+4KUkYIJ1pbJLqnxh3dWS6RFc0G21IotoW8DPX73Fv26bsjpk/9aacF
+        fCPD86sFT3VY27sJu1TOZpFupwUkbsYxq9g==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id I8aYaaBecpkw for <linux-block@vger.kernel.org>;
+        Thu,  7 Jul 2022 15:07:58 -0700 (PDT)
+Received: from [10.225.163.110] (unknown [10.225.163.110])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Lf9Wx4vYmz1Rw4L;
+        Thu,  7 Jul 2022 15:07:57 -0700 (PDT)
+Message-ID: <c9ec1fe9-5949-635e-f26b-84283b7924ae@opensource.wdc.com>
+Date:   Fri, 8 Jul 2022 07:07:56 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YsB54p1vpBg4v2Xd@mit.edu>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2 63/63] fs/zonefs: Use the enum req_op type for request
+ operations
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>
+References: <20220629233145.2779494-1-bvanassche@acm.org>
+ <20220629233145.2779494-64-bvanassche@acm.org>
+ <f42c76ef-ae9a-71ee-e1e0-1aa3cbbad154@opensource.wdc.com>
+ <ef46a115-62eb-2fa5-5e7c-264be950bda8@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <ef46a115-62eb-2fa5-5e7c-264be950bda8@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 02, 2022 at 01:01:22PM -0400, Theodore Ts'o wrote:
-> Note: I recommend that you skip using the loop device xfstests
-> strategy, which Luis likes to advocate.  For the perspective of
-> *likely* regressions caused by the Folio patches, I claim they are
-> going to cause you more pain than they are worth.  If there are some
-> strange Folio/loop device interactions, they aren't likely going to be
-> obvious/reproduceable failures that will cause pain to linux-next
-> testers.  While it would be nice to find **all** possible bugs before
-> patches go usptream to Linus, if it slows down your development
-> velocity to near-standstill, it's not worth it.  We have to be
-> realistic about things.
-
-Regressions with the loopback block driver can creep up and we used to
-be much worse, but we have gotten better at it. Certainly testing a
-loopback driver can mean running into a regression with the loopback
-driver. But some block driver must be used in the end.
-
-> What about other file systems?  Well, first of all, xfstests only has
-> support for the following file systems:
+On 7/8/22 02:58, Bart Van Assche wrote:
+> On 6/30/22 16:39, Damien Le Moal wrote:
+>> On 6/30/22 08:31, Bart Van Assche wrote:
+>>> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>>> Cc: Naohiro Aota <naohiro.aota@wdc.com>
+>>> Cc: Johannes Thumshirn <jth@kernel.org>
+>>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>>> ---
+>>>   fs/zonefs/trace.h | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/fs/zonefs/trace.h b/fs/zonefs/trace.h
+>>> index 21501da764bd..42edcfd393ed 100644
+>>> --- a/fs/zonefs/trace.h
+>>> +++ b/fs/zonefs/trace.h
+>>> @@ -25,7 +25,7 @@ TRACE_EVENT(zonefs_zone_mgmt,
+>>>   	    TP_STRUCT__entry(
+>>>   			     __field(dev_t, dev)
+>>>   			     __field(ino_t, ino)
+>>> -			     __field(int, op)
+>>> +			     __field(enum req_op, op)
+>>>   			     __field(sector_t, sector)
+>>>   			     __field(sector_t, nr_sectors)
+>>>   	    ),
+>>
+>> Nit: the patch title could be more to the point, E.g.
+>>
+>> fs/zonefs: Use the enum req_op type for zone operation trace events
+>>
+>> Otherwise, looks good.
+>>
+>> Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 > 
-> 	9p btrfs ceph cifs exfat ext2 ext4 f2fs gfs glusterfs jfs msdos
-> 	nfs ocfs2 overlay pvfs2 reiserfs tmpfs ubifs udf vfat virtiofs xfs
+> How about using the title "fs/zonefs: Use the enum req_op type for 
+> tracing request operations"?
+
+Works too.
+
 > 
-> {kvm,gce}-xfstests supports these 16 file systems:
+> Thanks,
 > 
-> 	9p btrfs exfat ext2 ext4 f2fs jfs msdos nfs overlay reiserfs
-> 	tmpfs ubifs udf vfat xfs
-> 
-> kdevops has support for these file systems:
-> 
-> 	btrfs ext4 xfs
+> Bart.
 
-Thanks for this list Ted!
 
-And so adding suport for a new filesystem in kdevops should be:
-
- * a kconfig symbol for the fs and then one per supported mkfs config
-   option you want to support
-
- * a configuration file for it, this can be as elaborate to support
-   different mkfs config options as we have for xfs [0] or one
-   with just one or two mkfs config options [1]. The default
-   is just shared information.
-
-[0] https://github.com/linux-kdevops/kdevops/blob/master/playbooks/roles/fstests/templates/xfs/xfs.config
-[1] https://github.com/linux-kdevops/kdevops/blob/master/playbooks/roles/fstests/templates/ext4/ext4.config
-
-> There are more complex things you could do, such as running a baseline
-> set of tests 500 times (as Luis suggests),
-
-I advocate 100 and I suggest that is a nice goal for enterprise kernels.
-
-I also personally advocate this confidence in a baseline for stable
-kernels if *I* am going to backport changes.
-
-> but I believe that for your
-> use case, it's not a good use of your time.  You'd need to speed
-> several weeks finding *all* the flaky tests up front, especially if
-> you want to do this for a large set of file systems.  It's much more
-> efficient to check if a suspetected test regression is really a flaky
-> test result when you come across them.
-
-Or you work with a test runner that has the list of known failures / flaky
-failures for a target configuration like using loopbacks already. And
-hence why I tend to attend to these for xfs, btrfs, and ext4 when I have
-time. My goal has been to work towards a baseline of at least 100
-successful runs without failure tracking upstream.
-
-  Luis
+-- 
+Damien Le Moal
+Western Digital Research
