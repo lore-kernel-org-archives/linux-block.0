@@ -2,81 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 380B4C43334
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 07:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B0BCCA479
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 07:28:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231316AbiGGHUx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jul 2022 03:20:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
+        id S230334AbiGGH21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jul 2022 03:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbiGGHUw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 03:20:52 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3664720F78
-        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 00:20:51 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LdnqQ1gKFzl1sF
-        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 15:20:02 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgCnCWlOicZilpTiAQ--.30604S3;
-        Thu, 07 Jul 2022 15:20:48 +0800 (CST)
-Subject: Re: [PATCH 7/8] dm: delay registering the gendisk
-To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org
-References: <20210804094147.459763-1-hch@lst.de>
- <20210804094147.459763-8-hch@lst.de>
- <ad2c7878-dabb-cb41-1bba-60ef48fa1a9f@huaweicloud.com>
- <20220707052425.GA13016@lst.de>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <fd5c2e0a-5f68-9f1f-dfc2-49a2cd51de0b@huaweicloud.com>
-Date:   Thu, 7 Jul 2022 15:20:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S230028AbiGGH20 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 03:28:26 -0400
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07FA9B25
+        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 00:28:25 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id r11-20020a1c440b000000b003a2d053adcbso79457wma.4
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2022 00:28:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=VVI8npOEGe5tO/udmJvFICtsIfMpa9lX4aydEcHk/R8=;
+        b=usFDMAgWnv7ua6SbxBb5mR7Fv5lpSOpoYyN9M1kk6SYFhUg0fA+BWacwsgYrK5LkyH
+         7TZZUcBy0y1gVgMrelGY6SRjwneB6hQQWL0m/QXbJnNWLMMJuPYnRqPkVhdUFuz0Fh9o
+         XSFtRSsgOMO2Ta5JhKPomiX7UKk5XlrKdjIyGHSuNYFXI0xhZ3j7aE/fjArDwcNC0ttE
+         BPEw3CTw+E+doERPffA0WF69fAPmTGaP6nKf559aO1rdHseZDr8JHOHBaUkn0AvoQaD2
+         26FDP3P30CW+he05qwBOkr4nNrltDtvSdo7pyv7GWbaWnv1p4+cOZBmrZsL67ZAyDR1R
+         4lvw==
+X-Gm-Message-State: AJIora8+RuZnJoiD+zbwWDeGuIgMwas3dvNzNhqUFWgFG5uWgkbF2RGN
+        Qm7NhGxj0Ew3qzJ6YzCe2lo=
+X-Google-Smtp-Source: AGRyM1sTj4WPOZuLo4cv7u8yFyb8NRjaD+uG2mjCteI506sayaF99ruHwkad25iWl5f/zL3oHELaUA==
+X-Received: by 2002:a7b:c2aa:0:b0:39c:9039:e74b with SMTP id c10-20020a7bc2aa000000b0039c9039e74bmr2773680wmk.127.1657178903595;
+        Thu, 07 Jul 2022 00:28:23 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id ay26-20020a5d6f1a000000b0021baf5e590dsm37511413wrb.71.2022.07.07.00.28.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Jul 2022 00:28:23 -0700 (PDT)
+Message-ID: <6c79d36f-1e74-c3b9-bded-0b1f7223dead@grimberg.me>
+Date:   Thu, 7 Jul 2022 10:28:22 +0300
 MIME-Version: 1.0
-In-Reply-To: <20220707052425.GA13016@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCnCWlOicZilpTiAQ--.30604S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKFWUWrWDKw48Xw18GrW8Crg_yoWxCFc_ZF
-        s8W3s7C3W5G3Wvga1UKr95J39xKa4xZ34kWFy7uF4Duw18Xa1DWFy7GwnxXr15J348Xr9x
-        ZryYgrWUCw1jqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb4kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-        UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [bug report] nvme/rdma: nvme connect failed after offline one cpu
+ on host side
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <CAHj4cs9+F5F-v_2m=MYd8B=dXVgTBrtGikTTzfBU8_cX8fb0=g@mail.gmail.com>
+ <CAHj4cs_RUuiOw4pzSD+fv70p6izVMZ8z7mc+E0Kv0Rh8zriWCQ@mail.gmail.com>
+ <2c42c70a-8eb4-a095-1d2b-139614ebd903@grimberg.me> <YsOKnb7MWLCeJxBE@T590>
+ <0a8099e6-6e28-da1f-7b4b-0ea04fa8f9d6@grimberg.me> <YsY64iMxnLtucKsP@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <YsY64iMxnLtucKsP@T590>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/07/07 13:24, Christoph Hellwig Ð´µÀ:
-> On Thu, Jul 07, 2022 at 11:29:26AM +0800, Yu Kuai wrote:
->> We found that this patch fix a nullptr crash in our test:
-> 
->> Do you think it's ok to backport this patch(and all realted patches) to
->> lts, or it's better to fix that bio can be submitted with queue
->> uninitialized from block layer?
-> 
-> Given how long ago this was I do not remember offhand how much prep
-> work this would require.  The patch itself is of course tiny and
-> backportable, but someone will need to do the work and figure out how
-> much else would have to be backported.
 
-Ok, I'll try to figure out that, and backport them.(At least to 5.10.y)
-
-Thanks,
-Kuai
-> .
+>>>>> update the subject to better describe the issue:
+>>>>>
+>>>>> So I tried this issue on one nvme/rdma environment, and it was also
+>>>>> reproducible, here are the steps:
+>>>>>
+>>>>> # echo 0 >/sys/devices/system/cpu/cpu0/online
+>>>>> # dmesg | tail -10
+>>>>> [  781.577235] smpboot: CPU 0 is now offline
+>>>>> # nvme connect -t rdma -a 172.31.45.202 -s 4420 -n testnqn
+>>>>> Failed to write to /dev/nvme-fabrics: Invalid cross-device link
+>>>>> no controller found: failed to write to nvme-fabrics device
+>>>>>
+>>>>> # dmesg
+>>>>> [  781.577235] smpboot: CPU 0 is now offline
+>>>>> [  799.471627] nvme nvme0: creating 39 I/O queues.
+>>>>> [  801.053782] nvme nvme0: mapped 39/0/0 default/read/poll queues.
+>>>>> [  801.064149] nvme nvme0: Connect command failed, error wo/DNR bit: -16402
+>>>>> [  801.073059] nvme nvme0: failed to connect queue: 1 ret=-18
+>>>>
+>>>> This is because of blk_mq_alloc_request_hctx() and was raised before.
+>>>>
+>>>> IIRC there was reluctance to make it allocate a request for an hctx even
+>>>> if its associated mapped cpu is offline.
+>>>>
+>>>> The latest attempt was from Ming:
+>>>> [PATCH V7 0/3] blk-mq: fix blk_mq_alloc_request_hctx
+>>>>
+>>>> Don't know where that went tho...
+>>>
+>>> The attempt relies on that the queue for connecting io queue uses
+>>> non-admined irq, unfortunately that can't be true for all drivers,
+>>> so that way can't go.
+>>
+>> The only consumer is nvme-fabrics, so others don't matter.
+>> Maybe we need a different interface that allows this relaxation.
+>>
+>>> So far, I'd suggest to fix nvme_*_connect_io_queues() to ignore failed
+>>> io queue, then the nvme host still can be setup with less io queues.
+>>
+>> What happens when the CPU comes back? Not sure we can simply ignore it.
 > 
+> Anyway, it is a not good choice to fail the whole controller if only one
+> queue can't be connected. 
 
+That is irrelevant.
+
+> I meant the queue can be kept as non-LIVE, and
+> it should work since no any io can be issued to this queue when it is
+> non-LIVE.
+
+The way that nvme-pci behaves is to create all the queues and either
+have them idle when their mapped cpu is offline, and have the queue
+there and ready when the cpu comes back. It is the simpler approach and
+I would like to have it for fabrics too, but to establish a fabrics
+queue we need to send a request (connect) to the controller. The fact
+that we cannot simply get a reference to a request for a given hw queue
+is baffling to me.
+
+> Just wondering why we can't re-connect the io queue and set LIVE after
+> any CPU in the this hctx->cpumask becomes online? blk-mq could add one
+> pair of callbacks for driver for handing this queue change.
+Certainly possible, but you are creating yet another interface solely
+for nvme-fabrics that covers up for the existing interface that does not
+satisfy what nvme-fabrics (the only consumer of it) would like it to do.
