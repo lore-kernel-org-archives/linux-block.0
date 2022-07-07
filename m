@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0879CCA479
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 20:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C89CCA480
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 20:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236210AbiGGUyP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jul 2022 16:54:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47200 "EHLO
+        id S236145AbiGGUyQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jul 2022 16:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236604AbiGGUyN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 16:54:13 -0400
-Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA1E2ED5F
-        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 13:54:11 -0700 (PDT)
+        with ESMTP id S236497AbiGGUyO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 16:54:14 -0400
+Received: from mailout1.w2.samsung.com (mailout1.w2.samsung.com [211.189.100.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5AC2ED6D
+        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 13:54:12 -0700 (PDT)
 Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20220707205408usoutp02197838f108a6656b6d13c208825581f9~-p2b5KZyK0814008140usoutp02Y;
+        by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20220707205408usoutp014a35be4ef1f304cc8f90130eccc7be78~-p2blxZK51458514585usoutp01g;
         Thu,  7 Jul 2022 20:54:08 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20220707205408usoutp02197838f108a6656b6d13c208825581f9~-p2b5KZyK0814008140usoutp02Y
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20220707205408usoutp014a35be4ef1f304cc8f90130eccc7be78~-p2blxZK51458514585usoutp01g
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
         s=mail20170921; t=1657227248;
-        bh=eD5Y2u9QU7lEZR6xSuM2Z/FqgDvzezZ0oxwiHvcMWtk=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=iJk8tMQFotud/F8GJ1evM+wxGWHl7APNVrZdiuU7f0/OB93QX3L+kGesZ7vZ27MK/
-         I+8EK944EiNgnWJI1SjMFc77qsshgTQS9gAoWpX6ju8ZUddrxmktrk3YFckQMzCVts
-         wdMLyUWVm77pMj7hQkNgV7f7dtc3+NSzvfbG5QXc=
+        bh=OTaFPl7pNfjbVQIasNX4U8UhTKJbeXyDaRbKTsVUEiw=;
+        h=From:To:CC:Subject:Date:References:From;
+        b=q/ED6PiQtTe8XzxhiDYIzxUV3eqiuufRPic2jcdjZ20AQoT8tk9rW9imEJTTKG4VO
+         WjVVd7de7kxPoFIZuR6Lqp1dou/O4bBplIVWHyj6HeNIURhDOH9SuhV1Mj9fyUXjED
+         pNYswkOhxHMji8pObQeJfGdeOD9CHZ90rOWSP77c=
 Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
         [203.254.195.111]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220707205408uscas1p29b5fe2b2c078760de09c6518e2383b5e~-p2byOQU_0168401684uscas1p2M;
+        20220707205408uscas1p24b90336c0e1c7971f745b442df9c15ad~-p2bZ9gHS0168401684uscas1p2K;
         Thu,  7 Jul 2022 20:54:08 +0000 (GMT)
 Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
-        ussmges2new.samsung.com (USCPEMTA) with SMTP id 86.C8.09642.0F747C26; Thu, 
+        ussmges2new.samsung.com (USCPEMTA) with SMTP id 46.C8.09642.FE747C26; Thu, 
         7 Jul 2022 16:54:08 -0400 (EDT)
 Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
-        [203.254.195.89]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426~-p2bgvM3w0203702037uscas1p2L;
-        Thu,  7 Jul 2022 20:54:08 +0000 (GMT)
-X-AuditID: cbfec36f-bfdff700000025aa-fe-62c747f0d9fc
+        [203.254.195.89]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220707205407uscas1p10e5bf9f9758dc5acfa3712c3f3c848c6~-p2bCx8jw0573005730uscas1p1U;
+        Thu,  7 Jul 2022 20:54:07 +0000 (GMT)
+X-AuditID: cbfec36f-c15ff700000025aa-fd-62c747ef492c
 Received: from SSI-EX4.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id EF.BC.52349.FE747C26; Thu, 
-        7 Jul 2022 16:54:08 -0400 (EDT)
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id 9F.BC.52349.FE747C26; Thu, 
+        7 Jul 2022 16:54:07 -0400 (EDT)
 Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
         SSI-EX4.ssi.samsung.com (105.128.2.229) with Microsoft SMTP Server
         (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
@@ -52,12 +52,13 @@ To:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
         Vincent Fu <vincent.fu@samsung.com>
-Subject: [PATCH 1/2] null_blk: add module parameters for 4 options
-Thread-Topic: [PATCH 1/2] null_blk: add module parameters for 4 options
-Thread-Index: AQHYkkOyvej/KiD+9EuRcuvImqkv2w==
+Subject: [PATCH 0/2] null_blk: harmonize some module parameter and configfs
+ options
+Thread-Topic: [PATCH 0/2] null_blk: harmonize some module parameter and
+        configfs options
+Thread-Index: AQHYkkOy2ZlLii6YFkuT20APqeTVuw==
 Date:   Thu, 7 Jul 2022 20:54:06 +0000
-Message-ID: <20220707205401.81664-2-vincent.fu@samsung.com>
-In-Reply-To: <20220707205401.81664-1-vincent.fu@samsung.com>
+Message-ID: <20220707205401.81664-1-vincent.fu@samsung.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -67,142 +68,55 @@ Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7djX87of3I8nGWw4I2Gx+m4/m8XeW9oO
-        TB6Xz5Z6fN4kF8AUxWWTkpqTWZZapG+XwJWx/nNawV7Ziln9T5kaGHdKdjFyckgImEgsvLyH
-        vYuRi0NIYCWjxOHDS9kgnFYmiZb109hhqu5f64NKrGWUuN7zgQnC+cgo8fX9HRYIZymjxOXD
-        yxm7GDk42AQ0Jd7uLwDpFhFIkzhxZQXYJGaBCInmBfOYQWxhASeJvZtXsYKUiwi4Syw7ZAFh
-        6kn8PqMIUsEioCLRObWFBcTmFbCWWHxqItgUTgEbiYanvxhBbEYBMYnvp9YwQUwXl7j1ZD4T
-        xM2CEotm72GGsMUk/u16yAZhK0rc//4S6ho9iRtTp7BB2NoSyxa+ZobYJShxcuYTFoh6SYmD
-        K26AfSgh0Mkhca75DtQgF4mrHRuhiqQlrl6fygxR1M4oMXfjF6jEBGBoPZGCsK0l/nVeg9rM
-        J/H31yPGCYzKs5AcPgvJUbOQHDULyVELGFlWMYqXFhfnpqcWG+WllusVJ+YWl+al6yXn525i
-        BCaM0/8O5+9gvH7ro94hRiYOxkOMEhzMSiK88crHk4R4UxIrq1KL8uOLSnNSiw8xSnOwKInz
-        LsvckCgkkJ5YkpqdmlqQWgSTZeLglGpg0tdSf/uXv2f+1vKiw/pmbE+uXL/u+2N+iqWGVtu6
-        1MmvTE/7XpJyuP+/pWBKl+wLr+ZSdc+r+emrLt+4smLCFrH+y1NW3iro4FPMYL9SUuyvzGrE
-        NOv3eaP9S5SrlpS5nl+nznl3tunz2b8uc/3yyP63XODJOZdK5tfrVx1wE1DSXNOpsjfw0D8Z
-        oXVfvtmqW37Y9O2qo19k9b8E3YcTHudc2SYQNfPH1a7ekkPTLeUWTV88N5JbZV/LKY5TFqoF
-        TtMWzzv44MyS04KTn/rZGXv/Pca8SU+j5WlCyKt/5m+sl5toXHX6uWsS3/HqNeJ5P2W+B/6v
-        C6q66HBbszWLX+H8GZ0k07UqN09fWaf2IEmJpTgj0VCLuag4EQATWCabhwMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmkeLIzCtJLcpLzFFi42LJbGCapPvB/XiSwYs1bBar7/azWey9pe3A
-        5HH5bKnH501yAUxRXDYpqTmZZalF+nYJXBnrP6cV7JWtmNX/lKmBcadkFyMnh4SAicT9a31s
-        XYxcHEICqxklXv76BuV8ZJTouTGZEaRKSGApo8TeH1VdjBwcbAKaEm/3F4CERQTSJE5cWcEO
-        YjMLREg0L5jHDGILCzhJ7N28ihWkXETAXWLZIQsIU0/i9xlFkAoWARWJzqktLCA2r4C1xOJT
-        E9khFllLHLs6lQnE5hSwkWh4+gvsAEYBMYnvp9YwQWwSl7j1ZD4TxPkCEkv2nGeGsEUlXj7+
-        xwphK0rc//4S6jI9iRtTp7BB2NoSyxa+ZobYKyhxcuYTFoh6SYmDK26wTGAUn4VkxSwk7bOQ
-        tM9C0r6AkWUVo3hpcXFuekWxYV5quV5xYm5xaV66XnJ+7iZGYDyd/nc4cgfj0Vsf9Q4xMnEw
-        HmKU4GBWEuGNVz6eJMSbklhZlVqUH19UmpNafIhRmoNFSZxXyHVivJBAemJJanZqakFqEUyW
-        iYNTqoGJ//mMm0t2NL+VN/h9m+Hkopnh0yx2yc5k+Vmgmezy8Ddr1mnnws1WG2M0WBbE8M/e
-        edT9+qNS90Nu0psuut3NlfYt8HbadyF+x919Us+eWxc53Cm+/zS7623MPsGupWyyl+x/G18T
-        7fwz+bQRt8jq6zMWNQoL3pnXw2n49J2WZfmj7M/aUTUPXy7ZaZv1pzhq76KAxWot+6fK6+0+
-        z738WIdoZOblgiPK77K37Kpax3b92/LsSTLrNHNf8f3OKmKby9/Bm5p4cJ2r+ztF7lcJM9Ma
-        Dm3Tqz3is0UraEFJkdmlpohzRyNfS4v/1y1QzpVV3BJyIJRPJEjmxS+rMhnFqgdlT0w05SpN
-        T3MtTWFSYinOSDTUYi4qTgQAzZQ31hYDAAA=
-X-CMS-MailID: 20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEIsWRmVeSWpSXmKPExsWy7djX87of3I8nGcx7wGSx+m4/m8XeW9oO
+        TB6Xz5Z6fN4kF8AUxWWTkpqTWZZapG+XwJXRN+UsS0ErS8XNRetZGhiXMHcxcnJICJhIHNh4
+        lQnEFhJYySixYHJAFyMXkN3KJLF9zRYWmKI9v/ewQhStZZSYetMSougjo8TX93dYIJyljBKX
+        Dy9n7GLk4GAT0JR4u78ApEFEIE3ixJUV7CA2s0CERPOCeWCbhQVCJdoP/2EHKRcRiJLY9qEE
+        wtSTOHk+C6SCRUBFonNqC9gJvALWEh9u3WIEsRkFxCS+n1rDBDFRXOLWk/lMEGcKSiyavQfq
+        LzGJf7seskHYihL3v7+EukBP4sbUKWwQtrbEsoWvmSHmC0qcnPkE6l1JiYMrboB9JSHwlV2i
+        89lPqEEuEn0rdrFD2NISV69PZYYoameUmLvxC1T3BEaJ60+kIGxriX+d16A280n8/fUIHDwS
+        ArwSHW1CExiVZiH5YRaS+2YhuW8WkvsWMLKsYhQvLS7OTU8tNspLLdcrTswtLs1L10vOz93E
+        CEwWp/8dzt/BeP3WR71DjEwcjIcYJTiYlUR445WPJwnxpiRWVqUW5ccXleakFh9ilOZgURLn
+        XZa5IVFIID2xJDU7NbUgtQgmy8TBKdXAFPZ3rY5lu/GmuTpF3O9r8nwavuqdjtrUoB5fuFTq
+        Z9dL/8xX16+6Xef4aeywfPOM547VO6bf6st/++qSixKPSs3C6K69TT3x631uZK+LtuAqmlpi
+        /D5jM1fq7yOey3z0zzlxthU+WjEpk/12lJ9F6b64Cw/5JlRFx/js3Si9bv87ZsHiQyqqWhf3
+        lcu923h9l+AV6dx7y5eqzV740Lt95qENOnPlFl9VSjm50q/0x2zLz/tkmzcsnhrkUdcx3+/K
+        57Q5xvUpvv3d92IXvmu4e0DA953Kq1kb7k96+Vl65a2C5qd1U+8u3rZwm1b3+q+rHa7yfp1/
+        1dDLVmj523cP1vq+nPZie16qzUn2ju5ThWFKLMUZiYZazEXFiQDjam9ehQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrLLMWRmVeSWpSXmKPExsWS2cA0Sfe9+/Ekg+X7lCxW3+1ns9h7S9uB
+        yePy2VKPz5vkApiiuGxSUnMyy1KL9O0SuDL6ppxlKWhlqbi5aD1LA+MS5i5GTg4JAROJPb/3
+        sHYxcnEICaxmlOh/0sEM4XxklOi5MZkRpEpIYCmjxN4fVV2MHBxsApoSb/cXgIRFBNIkTlxZ
+        wQ5iMwtESDQvmAc2VFggVKL98B92iJooiYP9UxhBWkUE9CROns8CCbMIqEh0Tm1hAbF5Bawl
+        Pty6BbaJUUBM4vupNUwQI8Ulbj2ZzwRxp4DEkj3noW4WlXj5+B8rhK0ocf/7S6gT9CRuTJ3C
+        BmFrSyxb+JoZYr6gxMmZT1gg6iUlDq64wTKBUXQWkhWzkLTPQtI+C0n7AkaWVYzipcXFuekV
+        xYZ5qeV6xYm5xaV56XrJ+bmbGIExcvrf4cgdjEdvfdQ7xMjEwXiIUYKDWUmEN175eJIQb0pi
+        ZVVqUX58UWlOavEhRmkOFiVxXiHXifFCAumJJanZqakFqUUwWSYOTqkGpjyHS17uaw7W+un/
+        6TsVl6wT7KP7VaNk6vZTzE03LNZ+btmx7KiytVDlDk3++9uurvQ0/eua8yY5ymDdnNuBssxe
+        9sK72Sdz164oitcOXWIgue7P44i/LTezWI4KKS3793HvG+6ff1eqe23rfV24p8C0mXGR5q3u
+        5o/ltX+4vDevWWsWH357gX2VcR8D49tXqs9XPz6/YcFfiRgZ25Xqs7S2b91yJE7o0LT8p43M
+        eyKztJmE5M/OSDP+cCls0TWWlDSPzGWOk7x4LXj28X82ecF7ZILa5aO2N25XLz+79/Cct1UP
+        7WbO/G8naJrTdecQ7+zk1W9EWpLP3HfZwLZ/trVMUta6gs63BZbmnk2HjymxFGckGmoxFxUn
+        AgCOfPZwAAMAAA==
+X-CMS-MailID: 20220707205407uscas1p10e5bf9f9758dc5acfa3712c3f3c848c6
 CMS-TYPE: 301P
-X-CMS-RootMailID: 20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426
-References: <20220707205401.81664-1-vincent.fu@samsung.com>
-        <CGME20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426@uscas1p2.samsung.com>
+X-CMS-RootMailID: 20220707205407uscas1p10e5bf9f9758dc5acfa3712c3f3c848c6
+References: <CGME20220707205407uscas1p10e5bf9f9758dc5acfa3712c3f3c848c6@uscas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add as module parameters these options:
+These patches add plumbing to allow some options that could formerly only b=
+e
+set via module parameters to now be set via configfs and vice versa.
 
-memory_backed
-discard
-mbps
-cache_size
+Vincent Fu (2):
+  null_blk: add module parameters for 4 options
+  null_blk: add configfs variables for 2 options
 
-Previously these could only be set via configfs.
+ Documentation/block/null_blk.rst  | 22 ++++++++++++++++++
+ drivers/block/null_blk/main.c     | 38 ++++++++++++++++++++++++++++---
+ drivers/block/null_blk/null_blk.h |  2 ++
+ 3 files changed, 59 insertions(+), 3 deletions(-)
 
-Still missing is bad_blocks
-
-Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
----
- Documentation/block/null_blk.rst | 22 ++++++++++++++++++++++
- drivers/block/null_blk/main.c    | 20 ++++++++++++++++++++
- 2 files changed, 42 insertions(+)
-
-diff --git a/Documentation/block/null_blk.rst b/Documentation/block/null_bl=
-k.rst
-index edbbab2f1..cf020e4da 100644
---- a/Documentation/block/null_blk.rst
-+++ b/Documentation/block/null_blk.rst
-@@ -72,6 +72,28 @@ submit_queues=3D[1..nr_cpus]: Default: 1
- hw_queue_depth=3D[0..qdepth]: Default: 64
-   The hardware queue depth of the device.
-=20
-+memory_backed=3D[0/1]: Default: 0
-+  Whether or not to use a memory buffer to respond to IO requests
-+
-+  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+  0  Transfer no data in response to IO requests
-+  1  Use a memory buffer to respond to IO requests
-+  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+discard=3D[0/1]: Default: 0
-+  Support discard operations (requires memory-backed null_blk device).
-+
-+  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+  0  Do not support discard operations
-+  1  Enable support for discard operations
-+  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+cache_size=3D[Size in MB]: Default: 0
-+  Cache size in MB for memory-backed device.
-+
-+mbps=3D[Maximum bandwidth in MB/s]: Default: 0 (no limit)
-+  Bandwidth limit for device performance.
-+
- Multi-queue specific parameters
- -------------------------------
-=20
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 3778df206..8f821fa94 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -201,6 +201,22 @@ static bool g_use_per_node_hctx;
- module_param_named(use_per_node_hctx, g_use_per_node_hctx, bool, 0444);
- MODULE_PARM_DESC(use_per_node_hctx, "Use per-node allocation for hardware =
-context queues. Default: false");
-=20
-+static bool g_memory_backed;
-+module_param_named(memory_backed, g_memory_backed, bool, 0444);
-+MODULE_PARM_DESC(memory_backed, "Create a memory-backed block device. Defa=
-ult: false");
-+
-+static bool g_discard;
-+module_param_named(discard, g_discard, bool, 0444);
-+MODULE_PARM_DESC(discard, "Support discard operations (requires memory-bac=
-ked null_blk device). Default: false");
-+
-+static unsigned long g_cache_size;
-+module_param_named(cache_size, g_cache_size, ulong, 0444);
-+MODULE_PARM_DESC(mbps, "Cache size in MiB for memory-backed device. Defaul=
-t: 0 (none)");
-+
-+static unsigned int g_mbps;
-+module_param_named(mbps, g_mbps, uint, 0444);
-+MODULE_PARM_DESC(mbps, "Limit maximum bandwidth (in MiB/s). Default: 0 (no=
- limit)");
-+
- static bool g_zoned;
- module_param_named(zoned, g_zoned, bool, S_IRUGO);
- MODULE_PARM_DESC(zoned, "Make device as a host-managed zoned block device.=
- Default: false");
-@@ -650,6 +666,10 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->irqmode =3D g_irqmode;
- 	dev->hw_queue_depth =3D g_hw_queue_depth;
- 	dev->blocking =3D g_blocking;
-+	dev->memory_backed =3D g_memory_backed;
-+	dev->discard =3D g_discard;
-+	dev->cache_size =3D g_cache_size;
-+	dev->mbps =3D g_mbps;
- 	dev->use_per_node_hctx =3D g_use_per_node_hctx;
- 	dev->zoned =3D g_zoned;
- 	dev->zone_size =3D g_zone_size;
 --=20
 2.25.1
