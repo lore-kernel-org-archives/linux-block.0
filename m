@@ -2,78 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C8DC43334
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 17:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 331EFC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 17:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235521AbiGGRd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jul 2022 13:33:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41092 "EHLO
+        id S231572AbiGGR6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jul 2022 13:58:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235347AbiGGRd3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 13:33:29 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1301095;
-        Thu,  7 Jul 2022 10:33:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TMaNklIdIcP+MFN2zwCG5jiftF6l+7/4HlhjYmCCffE=; b=Sn0j+sa3jhLQ0ziIexYmJgHUPF
-        ipH5TffoQhAW/RMhlhDR63Y1dQ/gQr6C/IjgyLZut5m8YWccvybkG2lt8sGbx4r8QgBYxATJMrQVq
-        9wqoMr8wbfVeht7o45vHjxRhg5cf/jER3KIA96iyL/yKONUDDwhsxgkgZy6lxw2ySmwo5djC8vTEi
-        v3W0b/A3Hj/VHwKxiRddE6dgdmyD7hMm94HFh1vu4gMPoDJgEfjlY1pGm0hiR0wwcS7gSxFTd0mDE
-        wRxUej3+v58daNyzNsBCv7ZXsNeKePVHHQIveb1MR+LiChvdfC6umxQM2DYVzhicvbsTp+ciiRXrv
-        TQNIE1GA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o9VNU-00HENG-U1; Thu, 07 Jul 2022 17:33:24 +0000
-Date:   Thu, 7 Jul 2022 10:33:24 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 11/20] block, blksnap: functions and structures for
- performing block I/O operations
-Message-ID: <YscY5ImH+1EjgsIF@infradead.org>
-References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
- <1655135593-1900-12-git-send-email-sergei.shtepa@veeam.com>
+        with ESMTP id S230313AbiGGR6R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 13:58:17 -0400
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C18B153D24
+        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 10:58:16 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 145so19850879pga.12
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2022 10:58:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ho4YF1TF5QwEy3FU6og3Bg4EnhPBQa43lL1RvxN+E5g=;
+        b=ezRAvyiPH7dVEYpDDOceRookRhXvAF4FXFJM8lWz+VZJSc2NwnnAzcRU0el3Apo70E
+         ymfHO+8zCAH7H7EM7aOwft2gO331DH3JJrd4DLzY6/T5+AiHEULRTUNLveM4RvDNZ3Cl
+         597divz/IDib764O7BmtsLCiBpyVPtIQjTUp95FnQalAZ/WKz3XQkVF2DBjRKWWuvhNM
+         elZCGZLuIyTCMWndaxOttyC4nzr7EdAXEqSSlQXjPGiUeGFKjMtXF0IDUaPEpQUPd11A
+         W3eXElwBKWH6rEMULSivJclrivZIYHt2yhjyusocp/XxPrW/J1YMotFe586LkXGrXySW
+         X9fA==
+X-Gm-Message-State: AJIora8fzWKSwN9uHMEyxme2E6uBrQMaG1+1nr7QTH6YAYZnq/n9uc8p
+        99sd7/90prpsztJuQs/zHph1+62rkhE=
+X-Google-Smtp-Source: AGRyM1sIJUSJ94mEBYgSIfnu0RucK6RiN99TzBxpMgeQO38xscYH2k8biS1i8hjCMNLFhRYRXJWZMw==
+X-Received: by 2002:a17:90b:390d:b0:1ed:3058:45e5 with SMTP id ob13-20020a17090b390d00b001ed305845e5mr6448681pjb.141.1657216696183;
+        Thu, 07 Jul 2022 10:58:16 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id k3-20020aa792c3000000b005252680aa30sm27085915pfa.3.2022.07.07.10.58.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Jul 2022 10:58:15 -0700 (PDT)
+Message-ID: <ef46a115-62eb-2fa5-5e7c-264be950bda8@acm.org>
+Date:   Thu, 7 Jul 2022 10:58:13 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1655135593-1900-12-git-send-email-sergei.shtepa@veeam.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2 63/63] fs/zonefs: Use the enum req_op type for request
+ operations
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>
+References: <20220629233145.2779494-1-bvanassche@acm.org>
+ <20220629233145.2779494-64-bvanassche@acm.org>
+ <f42c76ef-ae9a-71ee-e1e0-1aa3cbbad154@opensource.wdc.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <f42c76ef-ae9a-71ee-e1e0-1aa3cbbad154@opensource.wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +#define SECTORS_IN_PAGE (PAGE_SIZE / SECTOR_SIZE)
+On 6/30/22 16:39, Damien Le Moal wrote:
+> On 6/30/22 08:31, Bart Van Assche wrote:
+>> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>> Cc: Naohiro Aota <naohiro.aota@wdc.com>
+>> Cc: Johannes Thumshirn <jth@kernel.org>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
+>>   fs/zonefs/trace.h | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/fs/zonefs/trace.h b/fs/zonefs/trace.h
+>> index 21501da764bd..42edcfd393ed 100644
+>> --- a/fs/zonefs/trace.h
+>> +++ b/fs/zonefs/trace.h
+>> @@ -25,7 +25,7 @@ TRACE_EVENT(zonefs_zone_mgmt,
+>>   	    TP_STRUCT__entry(
+>>   			     __field(dev_t, dev)
+>>   			     __field(ino_t, ino)
+>> -			     __field(int, op)
+>> +			     __field(enum req_op, op)
+>>   			     __field(sector_t, sector)
+>>   			     __field(sector_t, nr_sectors)
+>>   	    ),
+> 
+> Nit: the patch title could be more to the point, E.g.
+> 
+> fs/zonefs: Use the enum req_op type for zone operation trace events
+> 
+> Otherwise, looks good.
+> 
+> Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-This can use PAGE_SECTORS from blk_types.h
+How about using the title "fs/zonefs: Use the enum req_op type for 
+tracing request operations"?
 
-> +
-> +struct bio_set diff_io_bioset = { 0 };
+Thanks,
 
-No need to initialize global variables to 0.
-
-> +	// Allocate both bios
-> +	opf = diff_io->is_write ? REQ_OP_WRITE : REQ_OP_READ;
-> +	gfp = GFP_NOIO | (is_nowait ? GFP_NOWAIT : 0);
-> +
-> +	bio = bio_alloc_bioset(diff_region->bdev, nr_iovecs,
-> +			       opf | REQ_SYNC | REQ_IDLE | REQ_FUA,
-
-REQ_FUA on reads does not make sense.
-
-> +	submit_bio_noacct(bio);
-> +
-> +	// Submit flush bio
-> +	bio_set_flag(flush_bio, BIO_FILTERED);
-> +	flush_bio->bi_end_io = diff_io_endio;
-> +	flush_bio->bi_private = diff_io;
-> +	flush_bio->bi_iter.bi_sector = 0;
-> +	submit_bio_noacct(flush_bio);
-
-And a separate flush for reads seems odd and probably wrong here.
-And for writes REQ_FUA already ensuresyour write went to disk.
-Do you also need to flush all previous data?  In which case you
-probably want a single bio with REQ_PREFLUSH and REQ_FUA instead
-of submitting two separate bios here.
+Bart.
