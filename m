@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE685C43334
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 20:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0879CCA479
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jul 2022 20:54:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236640AbiGGUyO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jul 2022 16:54:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
+        id S236210AbiGGUyP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jul 2022 16:54:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236588AbiGGUyN (ORCPT
+        with ESMTP id S236604AbiGGUyN (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 16:54:13 -0400
 Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE9892E9F9
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA1E2ED5F
         for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 13:54:11 -0700 (PDT)
 Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20220707205409usoutp02e5bea93b58b91507877c1cbc4bebc5ac~-p2cb3srO0813608136usoutp02i;
-        Thu,  7 Jul 2022 20:54:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20220707205409usoutp02e5bea93b58b91507877c1cbc4bebc5ac~-p2cb3srO0813608136usoutp02i
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1657227249;
-        bh=dKvuV+Vke9yXzQKdji7pOnqSjxR/gIZILkZLC2ZX7nY=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=SbwHhk1aU5vC/mE8xgzZp1NK4h/WCHydkMTum6K9RYqjCxI3Sz9zRyQiSTqrtplZv
-         es/yNp++RPhGajQM6HVZRGAyhslk2L9BUxa2Nz1yO8DLXL/CUc344bOe1k51xbjsjk
-         B8RIiAn43JbpDnqvNNNqAN0Ceo+WYtAlJixIrICY=
-Received: from ussmges3new.samsung.com (u112.gpu85.samsung.co.kr
-        [203.254.195.112]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220707205409uscas1p1741953af2df22a143b4d3de54f84f64c~-p2cV2Efk2682526825uscas1p15;
-        Thu,  7 Jul 2022 20:54:09 +0000 (GMT)
-Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
-        ussmges3new.samsung.com (USCPEMTA) with SMTP id F5.EA.09749.0F747C26; Thu, 
-        7 Jul 2022 16:54:09 -0400 (EDT)
-Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
-        [203.254.195.89]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220707205408uscas1p1418aafe8915d04c68946012fab73f698~-p2cEm9JB2699526995uscas1p15;
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20220707205408usoutp02197838f108a6656b6d13c208825581f9~-p2b5KZyK0814008140usoutp02Y;
         Thu,  7 Jul 2022 20:54:08 +0000 (GMT)
-X-AuditID: cbfec370-a83ff70000002615-5b-62c747f0e4c3
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20220707205408usoutp02197838f108a6656b6d13c208825581f9~-p2b5KZyK0814008140usoutp02Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1657227248;
+        bh=eD5Y2u9QU7lEZR6xSuM2Z/FqgDvzezZ0oxwiHvcMWtk=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=iJk8tMQFotud/F8GJ1evM+wxGWHl7APNVrZdiuU7f0/OB93QX3L+kGesZ7vZ27MK/
+         I+8EK944EiNgnWJI1SjMFc77qsshgTQS9gAoWpX6ju8ZUddrxmktrk3YFckQMzCVts
+         wdMLyUWVm77pMj7hQkNgV7f7dtc3+NSzvfbG5QXc=
+Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
+        [203.254.195.111]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220707205408uscas1p29b5fe2b2c078760de09c6518e2383b5e~-p2byOQU_0168401684uscas1p2M;
+        Thu,  7 Jul 2022 20:54:08 +0000 (GMT)
+Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
+        ussmges2new.samsung.com (USCPEMTA) with SMTP id 86.C8.09642.0F747C26; Thu, 
+        7 Jul 2022 16:54:08 -0400 (EDT)
+Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
+        [203.254.195.89]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426~-p2bgvM3w0203702037uscas1p2L;
+        Thu,  7 Jul 2022 20:54:08 +0000 (GMT)
+X-AuditID: cbfec36f-bfdff700000025aa-fe-62c747f0d9fc
 Received: from SSI-EX4.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id 30.CC.52349.0F747C26; Thu, 
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id EF.BC.52349.FE747C26; Thu, 
         7 Jul 2022 16:54:08 -0400 (EDT)
 Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
         SSI-EX4.ssi.samsung.com (105.128.2.229) with Microsoft SMTP Server
@@ -52,11 +52,11 @@ To:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 CC:     "gost.dev@samsung.com" <gost.dev@samsung.com>,
         Vincent Fu <vincent.fu@samsung.com>
-Subject: [PATCH 2/2] null_blk: add configfs variables for 2 options
-Thread-Topic: [PATCH 2/2] null_blk: add configfs variables for 2 options
-Thread-Index: AQHYkkOyzJ/fIPlMQ0yClOKz1HwYFg==
+Subject: [PATCH 1/2] null_blk: add module parameters for 4 options
+Thread-Topic: [PATCH 1/2] null_blk: add module parameters for 4 options
+Thread-Index: AQHYkkOyvej/KiD+9EuRcuvImqkv2w==
 Date:   Thu, 7 Jul 2022 20:54:06 +0000
-Message-ID: <20220707205401.81664-3-vincent.fu@samsung.com>
+Message-ID: <20220707205401.81664-2-vincent.fu@samsung.com>
 In-Reply-To: <20220707205401.81664-1-vincent.fu@samsung.com>
 Accept-Language: en-US
 Content-Language: en-US
@@ -67,142 +67,142 @@ Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7djX87of3Y8nGbzczGSx+m4/m8XeW9oO
-        TB6Xz5Z6fN4kF8AUxWWTkpqTWZZapG+XwJWxbm4fc8FC6YoHX44xNTDuFO9i5OCQEDCReNRT
-        2sXIxSEksJJRorvpFzOE08ok8XziAyaYop+rYiDiaxklLq46zAbhfGSU+Pr+DguEs5RR4vLh
-        5YwgHWwCmhJv9xd0MXJyiAikSZy4soIdxGYWiJBoXjCPGcQWFnCWeNv7lQWixkNiy6cXjBC2
-        nsSqk/vA6lkEVCQ6p7aA1fAKWEus3zYVLM4pYCPR8PQXWD2jgJjE91NrmCDmi0vcejIfzJYQ
-        EJRYNHsPM4QtJvFv10M2CFtR4v73l1D36EncmDqFDcLWlli28DUzxC5BiZMzn7BA1EtKHFxx
-        A+xHCYFODonvM3ZAQ8VF4v38TIgaaYmr16cyQ9S0M0rM3fgFqnkCo8T1J1IQtrXEv85rUIv5
-        JP7+esQ4gVF5FpK7ZyG5aRaSm2YhuWkBI8sqRvHS4uLc9NRi47zUcr3ixNzi0rx0veT83E2M
-        wIRx+t/hgh2Mt2591DvEyMTBeIhRgoNZSYQ3Xvl4khBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHe
-        ZZkbEoUE0hNLUrNTUwtSi2CyTBycUg1MU3PX+q0OnXoqUaLp9y6TfYcOm5z12suQwvPTyO5J
-        AUP/3+7Dy29nn1wSfXbTFJ+JMpKyrD1yKZ7VLjVV/QFVFjIGs+9Z2cXVrlD5rdWofzXXNnIu
-        B7dc6UJtTb6mVTNe39v+c/Weid53hHft1sjemaO2uKhVaN9aU69rPe4rt0Vc+cvBcF223GrT
-        BOOTslbzc0sXZxmks6u6GQl5t03fdDSyMH0/w7Unomc5+HV4xc4dryuqspH5M/f+Tqe5+9g/
-        cPUs95R8+6Lk+moB9aN397Cuc2zdt/dF/KFVsju8VeWXzjy6ZMvZ98ulLkuukL58TIJR825L
-        /KymL1s3FW5of6gRf1bqZyX3+ZLSsx++KLEUZyQaajEXFScCAHMpwXKHAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplkeLIzCtJLcpLzFFi42LJbGCapPvB/XiSwYQPmhar7/azWey9pe3A
-        5HH5bKnH501yAUxRXDYpqTmZZalF+nYJXBnr5vYxFyyUrnjw5RhTA+NO8S5GDg4JAROJn6ti
-        uhi5OIQEVjNK/FpzjRXC+cgo0XNjMmMXIyeQs5RRYu+PKpAGNgFNibf7C0DCIgJpEieurGAH
-        sZkFIiSaF8xjBrGFBZwl3vZ+ZYGo8ZDY8ukFI4StJ7Hq5D6wehYBFYnOqS1gNbwC1hLrt01l
-        h1hlLXHs6lQmEJtTwEai4ekvsF5GATGJ76fWMEHsEpe49WQ+mC0hICCxZM95ZghbVOLl43+s
-        ELaixP3vL6Fu05O4MXUKG4StLbFs4WtmiL2CEidnPmGBqJeUOLjiBssERvFZSFbMQtI+C0n7
-        LCTtCxhZVjGKlxYX56ZXFBvmpZbrFSfmFpfmpesl5+duYgTG1Ol/hyN3MB699VHvECMTB+Mh
-        RgkOZiUR3njl40lCvCmJlVWpRfnxRaU5qcWHGKU5WJTEeYVcJ8YLCaQnlqRmp6YWpBbBZJk4
-        OKUamPh3X7T5rfjQm5u1a9Wv2Ipzu5Vt7xScqniTyOUheGeX5bW9x5fsuWD1u1JcbdlG2YMJ
-        i/7v2mPsEMbp+HZjTLvRu3MxfKpV4hM+2j7Rn+qRU/ByxyGeV4UWq46YZq8sP7+eV/ggf5lU
-        959/GfYhl9/HJpovnXmwY1raZLvb35aYa+TZSESer3wd6iCoM0vqfqLf+qav7Y+leuK99ZTv
-        adzOm/JucciPTI6D664Ev+8XVjNeJ7xZ78KzmDWaaior658oNTwwnFSoxJo4v6cvi+H4v2o5
-        zefvveZfWtJ1vO3atvRnWw/eL7ux9vphS7nGr8Fmy5Yfz5m79clsf3EVlxa/hoP222XdTicb
-        +8xx2arEUpyRaKjFXFScCACsOmz3GAMAAA==
-X-CMS-MailID: 20220707205408uscas1p1418aafe8915d04c68946012fab73f698
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrCIsWRmVeSWpSXmKPExsWy7djX87of3I8nGWw4I2Gx+m4/m8XeW9oO
+        TB6Xz5Z6fN4kF8AUxWWTkpqTWZZapG+XwJWx/nNawV7Ziln9T5kaGHdKdjFyckgImEgsvLyH
+        vYuRi0NIYCWjxOHDS9kgnFYmiZb109hhqu5f64NKrGWUuN7zgQnC+cgo8fX9HRYIZymjxOXD
+        yxm7GDk42AQ0Jd7uLwDpFhFIkzhxZQXYJGaBCInmBfOYQWxhASeJvZtXsYKUiwi4Syw7ZAFh
+        6kn8PqMIUsEioCLRObWFBcTmFbCWWHxqItgUTgEbiYanvxhBbEYBMYnvp9YwQUwXl7j1ZD4T
+        xM2CEotm72GGsMUk/u16yAZhK0rc//4S6ho9iRtTp7BB2NoSyxa+ZobYJShxcuYTFoh6SYmD
+        K26AfSgh0Mkhca75DtQgF4mrHRuhiqQlrl6fygxR1M4oMXfjF6jEBGBoPZGCsK0l/nVeg9rM
+        J/H31yPGCYzKs5AcPgvJUbOQHDULyVELGFlWMYqXFhfnpqcWG+WllusVJ+YWl+al6yXn525i
+        BCaM0/8O5+9gvH7ro94hRiYOxkOMEhzMSiK88crHk4R4UxIrq1KL8uOLSnNSiw8xSnOwKInz
+        LsvckCgkkJ5YkpqdmlqQWgSTZeLglGpg0tdSf/uXv2f+1vKiw/pmbE+uXL/u+2N+iqWGVtu6
+        1MmvTE/7XpJyuP+/pWBKl+wLr+ZSdc+r+emrLt+4smLCFrH+y1NW3iro4FPMYL9SUuyvzGrE
+        NOv3eaP9S5SrlpS5nl+nznl3tunz2b8uc/3yyP63XODJOZdK5tfrVx1wE1DSXNOpsjfw0D8Z
+        oXVfvtmqW37Y9O2qo19k9b8E3YcTHudc2SYQNfPH1a7ekkPTLeUWTV88N5JbZV/LKY5TFqoF
+        TtMWzzv44MyS04KTn/rZGXv/Pca8SU+j5WlCyKt/5m+sl5toXHX6uWsS3/HqNeJ5P2W+B/6v
+        C6q66HBbszWLX+H8GZ0k07UqN09fWaf2IEmJpTgj0VCLuag4EQATWCabhwMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmkeLIzCtJLcpLzFFi42LJbGCapPvB/XiSwYs1bBar7/azWey9pe3A
+        5HH5bKnH501yAUxRXDYpqTmZZalF+nYJXBnrP6cV7JWtmNX/lKmBcadkFyMnh4SAicT9a31s
+        XYxcHEICqxklXv76BuV8ZJTouTGZEaRKSGApo8TeH1VdjBwcbAKaEm/3F4CERQTSJE5cWcEO
+        YjMLREg0L5jHDGILCzhJ7N28ihWkXETAXWLZIQsIU0/i9xlFkAoWARWJzqktLCA2r4C1xOJT
+        E9khFllLHLs6lQnE5hSwkWh4+gvsAEYBMYnvp9YwQWwSl7j1ZD4TxPkCEkv2nGeGsEUlXj7+
+        xwphK0rc//4S6jI9iRtTp7BB2NoSyxa+ZobYKyhxcuYTFoh6SYmDK26wTGAUn4VkxSwk7bOQ
+        tM9C0r6AkWUVo3hpcXFuekWxYV5quV5xYm5xaV66XnJ+7iZGYDyd/nc4cgfj0Vsf9Q4xMnEw
+        HmKU4GBWEuGNVz6eJMSbklhZlVqUH19UmpNafIhRmoNFSZxXyHVivJBAemJJanZqakFqEUyW
+        iYNTqoGJ//mMm0t2NL+VN/h9m+Hkopnh0yx2yc5k+Vmgmezy8Ddr1mnnws1WG2M0WBbE8M/e
+        edT9+qNS90Nu0psuut3NlfYt8HbadyF+x919Us+eWxc53Cm+/zS7623MPsGupWyyl+x/G18T
+        7fwz+bQRt8jq6zMWNQoL3pnXw2n49J2WZfmj7M/aUTUPXy7ZaZv1pzhq76KAxWot+6fK6+0+
+        z738WIdoZOblgiPK77K37Kpax3b92/LsSTLrNHNf8f3OKmKby9/Bm5p4cJ2r+ztF7lcJM9Ma
+        Dm3Tqz3is0UraEFJkdmlpohzRyNfS4v/1y1QzpVV3BJyIJRPJEjmxS+rMhnFqgdlT0w05SpN
+        T3MtTWFSYinOSDTUYi4qTgQAzZQ31hYDAAA=
+X-CMS-MailID: 20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426
 CMS-TYPE: 301P
-X-CMS-RootMailID: 20220707205408uscas1p1418aafe8915d04c68946012fab73f698
+X-CMS-RootMailID: 20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426
 References: <20220707205401.81664-1-vincent.fu@samsung.com>
-        <CGME20220707205408uscas1p1418aafe8915d04c68946012fab73f698@uscas1p1.samsung.com>
+        <CGME20220707205408uscas1p2a6d8869ffc10faf23bc9728792e7e426@uscas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allow setting via configfs these two options:
+Add as module parameters these options:
 
-no_sched
-shared_tag_bitmap
+memory_backed
+discard
+mbps
+cache_size
 
-Previously these could only be activated as module parameters.
+Previously these could only be set via configfs.
 
-Still missing are:
-
-shared_tags
-timeout
-requeue
-init_hctx
+Still missing is bad_blocks
 
 Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
 ---
- drivers/block/null_blk/main.c     | 18 +++++++++++++++---
- drivers/block/null_blk/null_blk.h |  2 ++
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ Documentation/block/null_blk.rst | 22 ++++++++++++++++++++++
+ drivers/block/null_blk/main.c    | 20 ++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
+diff --git a/Documentation/block/null_blk.rst b/Documentation/block/null_bl=
+k.rst
+index edbbab2f1..cf020e4da 100644
+--- a/Documentation/block/null_blk.rst
++++ b/Documentation/block/null_blk.rst
+@@ -72,6 +72,28 @@ submit_queues=3D[1..nr_cpus]: Default: 1
+ hw_queue_depth=3D[0..qdepth]: Default: 64
+   The hardware queue depth of the device.
+=20
++memory_backed=3D[0/1]: Default: 0
++  Whether or not to use a memory buffer to respond to IO requests
++
++  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++  0  Transfer no data in response to IO requests
++  1  Use a memory buffer to respond to IO requests
++  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++discard=3D[0/1]: Default: 0
++  Support discard operations (requires memory-backed null_blk device).
++
++  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++  0  Do not support discard operations
++  1  Enable support for discard operations
++  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++cache_size=3D[Size in MB]: Default: 0
++  Cache size in MB for memory-backed device.
++
++mbps=3D[Maximum bandwidth in MB/s]: Default: 0 (no limit)
++  Bandwidth limit for device performance.
++
+ Multi-queue specific parameters
+ -------------------------------
+=20
 diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 8f821fa94..c955a07db 100644
+index 3778df206..8f821fa94 100644
 --- a/drivers/block/null_blk/main.c
 +++ b/drivers/block/null_blk/main.c
-@@ -425,6 +425,8 @@ NULLB_DEVICE_ATTR(zone_nr_conv, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_open, uint, NULL);
- NULLB_DEVICE_ATTR(zone_max_active, uint, NULL);
- NULLB_DEVICE_ATTR(virt_boundary, bool, NULL);
-+NULLB_DEVICE_ATTR(no_sched, bool, NULL);
-+NULLB_DEVICE_ATTR(shared_tag_bitmap, bool, NULL);
+@@ -201,6 +201,22 @@ static bool g_use_per_node_hctx;
+ module_param_named(use_per_node_hctx, g_use_per_node_hctx, bool, 0444);
+ MODULE_PARM_DESC(use_per_node_hctx, "Use per-node allocation for hardware =
+context queues. Default: false");
 =20
- static ssize_t nullb_device_power_show(struct config_item *item, char *pag=
-e)
- {
-@@ -548,6 +550,8 @@ static struct configfs_attribute *nullb_device_attrs[] =
-=3D {
- 	&nullb_device_attr_zone_max_open,
- 	&nullb_device_attr_zone_max_active,
- 	&nullb_device_attr_virt_boundary,
-+	&nullb_device_attr_no_sched,
-+	&nullb_device_attr_shared_tag_bitmap,
- 	NULL,
- };
-=20
-@@ -604,7 +608,13 @@ nullb_group_drop_item(struct config_group *group, stru=
-ct config_item *item)
- static ssize_t memb_group_features_show(struct config_item *item, char *pa=
-ge)
- {
- 	return snprintf(page, PAGE_SIZE,
--			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_c=
-apacity,zone_nr_conv,zone_max_open,zone_max_active,blocksize,max_sectors,vi=
-rt_boundary\n");
-+			"badblocks,blocking,blocksize,cache_size,"
-+			"completion_nsec,discard,home_node,hw_queue_depth,"
-+			"irqmode,max_sectors,mbps,memory_backed,no_sched,"
-+			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
-+			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
-+			"zone_capacity,zone_max_active,zone_max_open,"
-+			"zone_nr_conv,zone_size\n");
- }
-=20
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -678,6 +688,8 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->zone_max_open =3D g_zone_max_open;
- 	dev->zone_max_active =3D g_zone_max_active;
- 	dev->virt_boundary =3D g_virt_boundary;
-+	dev->no_sched =3D g_no_sched;
-+	dev->shared_tag_bitmap =3D g_shared_tag_bitmap;
- 	return dev;
- }
-=20
-@@ -1899,9 +1911,9 @@ static int null_init_tag_set(struct nullb *nullb, str=
-uct blk_mq_tag_set *set)
- 	set->numa_node =3D nullb ? nullb->dev->home_node : g_home_node;
- 	set->cmd_size	=3D sizeof(struct nullb_cmd);
- 	set->flags =3D BLK_MQ_F_SHOULD_MERGE;
--	if (g_no_sched)
-+	if (nullb->dev->no_sched)
- 		set->flags |=3D BLK_MQ_F_NO_SCHED;
--	if (g_shared_tag_bitmap)
-+	if (nullb->dev->shared_tag_bitmap)
- 		set->flags |=3D BLK_MQ_F_TAG_HCTX_SHARED;
- 	set->driver_data =3D nullb;
- 	if (poll_queues)
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/nul=
-l_blk.h
-index 8359b4384..ce5c810c1 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -113,6 +113,8 @@ struct nullb_device {
- 	bool discard; /* if support discard */
- 	bool zoned; /* if device is zoned */
- 	bool virt_boundary; /* virtual boundary on/off for the device */
-+	bool no_sched; /* no IO scheduler for the device */
-+	bool shared_tag_bitmap; /* use hostwide shared tags */
- };
-=20
- struct nullb {
++static bool g_memory_backed;
++module_param_named(memory_backed, g_memory_backed, bool, 0444);
++MODULE_PARM_DESC(memory_backed, "Create a memory-backed block device. Defa=
+ult: false");
++
++static bool g_discard;
++module_param_named(discard, g_discard, bool, 0444);
++MODULE_PARM_DESC(discard, "Support discard operations (requires memory-bac=
+ked null_blk device). Default: false");
++
++static unsigned long g_cache_size;
++module_param_named(cache_size, g_cache_size, ulong, 0444);
++MODULE_PARM_DESC(mbps, "Cache size in MiB for memory-backed device. Defaul=
+t: 0 (none)");
++
++static unsigned int g_mbps;
++module_param_named(mbps, g_mbps, uint, 0444);
++MODULE_PARM_DESC(mbps, "Limit maximum bandwidth (in MiB/s). Default: 0 (no=
+ limit)");
++
+ static bool g_zoned;
+ module_param_named(zoned, g_zoned, bool, S_IRUGO);
+ MODULE_PARM_DESC(zoned, "Make device as a host-managed zoned block device.=
+ Default: false");
+@@ -650,6 +666,10 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->irqmode =3D g_irqmode;
+ 	dev->hw_queue_depth =3D g_hw_queue_depth;
+ 	dev->blocking =3D g_blocking;
++	dev->memory_backed =3D g_memory_backed;
++	dev->discard =3D g_discard;
++	dev->cache_size =3D g_cache_size;
++	dev->mbps =3D g_mbps;
+ 	dev->use_per_node_hctx =3D g_use_per_node_hctx;
+ 	dev->zoned =3D g_zoned;
+ 	dev->zone_size =3D g_zone_size;
 --=20
 2.25.1
