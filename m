@@ -2,71 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0778C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 18:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C65ECCCA47B
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 20:22:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239313AbiGHS7F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jul 2022 14:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49320 "EHLO
+        id S240064AbiGHUWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 16:22:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238179AbiGHS7A (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 14:59:00 -0400
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C0D91C138
-        for <linux-block@vger.kernel.org>; Fri,  8 Jul 2022 11:58:59 -0700 (PDT)
-Received: by mail-pl1-f170.google.com with SMTP id c13so13315185pla.6
-        for <linux-block@vger.kernel.org>; Fri, 08 Jul 2022 11:58:59 -0700 (PDT)
+        with ESMTP id S240059AbiGHUWR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 16:22:17 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5D3904C9
+        for <linux-block@vger.kernel.org>; Fri,  8 Jul 2022 13:22:16 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id a20so8742939ilk.9
+        for <linux-block@vger.kernel.org>; Fri, 08 Jul 2022 13:22:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/UZePUHRNJILM679cWPNfgYLf9iBJLiMq5x1kWJ7CZ4=;
+        b=U4pdhs9bqBwM/E03LS2JpiFDCzjMlIq4GhGcpD6IuJj8LLGxXDbSJwvnx+GS0OJdVB
+         Fk3e8R/0Mo4Hti7k2MR7W66WaMnhWkydN3kRYJ2NNjthsCuxlV8LPe1zcEz/GEs4F1ZW
+         NoMF3cvZe2cnKZriRCjzI1C2hZQSt7+5L0pT4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=8El55oBhsal1YvHv4IXgTDyrjOJ73nQdWIhXAlq6X58=;
-        b=TbN1WxCd6ezJNBVFzRJ+oHlTnWw0yHz4i039/BIVpwyWk+T5pPWQH0IZM4yw+8x3Lg
-         s+muUY/0soU8shnP4PS10rGfiQE22gK5omaJbm4YisgxydBmnW2ze2oZZw6nO6OSQB98
-         b77f5bMp2b16CMv+Tr5ACV0+QR6k4g6e3dCYPDAwoo5a6DUW5r4nJdK8jjV5rqDPPqU0
-         1zFsdO0nHCFZJ1OkRYVqXbAf2dyGUnyE4wAYZyl+NUz6Jlws7Dup8N2aiKFjuVZSNfjO
-         vyxv1mEP+p3TEtfbGuvgF+ISAf2L3NkQrgvkngGEj5dp7rJDsevEuqqq8qtK2cHZBuUz
-         u8NQ==
-X-Gm-Message-State: AJIora81HjSVJuIH8HPm0cLw7Yr1qulwmzX4l0Fkbxh/JDFZFc85w1RZ
-        LJk1oejV1P9PhnLG1gbq7CMrYQ1cq9s=
-X-Google-Smtp-Source: AGRyM1u31kiAYPbguv9ZthcIeygs6/BqhPnSdUiZJNQb8c9w02A8HFa+TwhukQTeCpGPelUgJA2oUw==
-X-Received: by 2002:a17:90b:4a12:b0:1ef:fd9e:a02e with SMTP id kk18-20020a17090b4a1200b001effd9ea02emr1446301pjb.216.1657306738673;
-        Fri, 08 Jul 2022 11:58:58 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id c17-20020a170903235100b0016bdf53b303sm12194911plh.205.2022.07.08.11.58.57
+        bh=/UZePUHRNJILM679cWPNfgYLf9iBJLiMq5x1kWJ7CZ4=;
+        b=KhV8xdE42MoWK9+9qM2RqM9Uc7Nd8UPNX5P2PoQNwAr58kxDnCWLeCOUCdX6L9QWww
+         +jY3BFY7IB9IMApVJawLy80wqZhXEf4eHKdxQxn+6wKS5/elS5fZ/RmbmjHiLkosxpKi
+         gCenw80Cnu7bzPZ1P0tjcvHSRTPglhed11PUh/R8R8Ub8wfiylsb1XIAHCX53obE2CcU
+         jI0DaKF3xgGCyDWjOxDAO8aEOJtMURr3IYwAZ9e5GwoR8lsmySCurjsbxnXHaKsmXFbc
+         e8HjAtazkh3Veh4QpgvQBDXylTmMDO+Gj+UOYFRTvbjblXG3F74TKOJ/gtRwq/OiM0mx
+         WqvQ==
+X-Gm-Message-State: AJIora+WYYyYKe7Plr3uu3thF9oglwTd/6CK/YSuEACk7OvNRnNUMbss
+        ZXmIm79nNdep7DKtkSdsOiR/SQ==
+X-Google-Smtp-Source: AGRyM1sqoFVBarg/sjA1rALOnA1pW658MEpnpIO3S4XvRk/cZWsGRtqSyVTChGm4FvqKvvqsH5qgAg==
+X-Received: by 2002:a05:6e02:144f:b0:2dc:2850:2956 with SMTP id p15-20020a056e02144f00b002dc28502956mr3093263ilo.258.1657311736099;
+        Fri, 08 Jul 2022 13:22:16 -0700 (PDT)
+Received: from [192.168.1.128] ([38.15.45.1])
+        by smtp.gmail.com with ESMTPSA id u18-20020a92ccd2000000b002d8d813892csm16967320ilq.8.2022.07.08.13.22.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Jul 2022 11:58:57 -0700 (PDT)
-Message-ID: <def01493-bd2d-bed4-ab1a-9b4304687692@acm.org>
-Date:   Fri, 8 Jul 2022 11:58:56 -0700
+        Fri, 08 Jul 2022 13:22:15 -0700 (PDT)
+Subject: Re: [PATCH v6 3/4] kunit: Taint the kernel when KUnit tests are run
+To:     David Gow <davidgow@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Brendan Higgins <brendanhiggins@google.com>
+Cc:     "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        John Ogness <john.ogness@linutronix.de>,
+        Joe Fradley <joefradley@google.com>,
+        Daniel Latypov <dlatypov@google.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>,
+        Aaron Tomlin <atomlin@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Michal Marek <michal.lkml@markovi.net>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-kbuild@vger.kernel.org,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <20220708044847.531566-1-davidgow@google.com>
+ <20220708044847.531566-3-davidgow@google.com>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <fc638852-ac9a-abab-8fdb-01b685cdec96@linuxfoundation.org>
+Date:   Fri, 8 Jul 2022 14:22:14 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [bug report] blktests nvme/005 trigered debugfs: Directory
- 'hctx0' with parent '/' already present!
+In-Reply-To: <20220708044847.531566-3-davidgow@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
-References: <CAHj4cs9Jhg4DZRnck_rdGWtpv9nLTAF__CVtPQu9vViVUZ-Odg@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAHj4cs9Jhg4DZRnck_rdGWtpv9nLTAF__CVtPQu9vViVUZ-Odg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/8/22 09:32, Yi Zhang wrote:
-> I found below error log when I ran blktests nvme/ tests on aarch64
-> with the latest linux-block/for-next,
-> Please help check it, and feel free to let me know if you need any
-> info/test for it, thanks.
+On 7/7/22 10:48 PM, David Gow wrote:
+> Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
+> Due to KUnit tests not being intended to run on production systems, and
+> potentially causing problems (or security issues like leaking kernel
+> addresses), the kernel's state should not be considered safe for
+> production use after KUnit tests are run.
+> 
+> This both marks KUnit modules as test modules using MODULE_INFO() and
+> manually taints the kernel when tests are run (which catches builtin
+> tests).
+> 
+> Acked-by: Luis Chamberlain <mcgrof@kernel.org>
+> Tested-by: Daniel Latypov <dlatypov@google.com>
+> Reviewed-by: Brendan Higgins <brendanhiggins@google.com>
+> Signed-off-by: David Gow <davidgow@google.com>
+> ---
+> 
+> No changes since v5:
+> https://lore.kernel.org/linux-kselftest/20220702040959.3232874-3-davidgow@google.com/
+> 
+> No changes since v4:
+> https://lore.kernel.org/linux-kselftest/20220701084744.3002019-3-davidgow@google.com/
+> 
 
-Is this 100% reproducible? I tried to reproduce this yesterday but 
-without success. See also 
-https://bugzilla.kernel.org/show_bug.cgi?id=216191.
+David, Brendan, Andrew,
 
-Thanks,
+Just confirming the status of these patches. I applied v4 1/3 and v4 3/4
+to linux-kselftest kunit for 5.20-rc1.
 
-Bart.
+I am seeing v5 and v6 now. Andrew applied v5 looks like. Would you like
+me to drop the two I applied? Do we have to refresh with v6?
+
+thanks,
+-- Shuah
+
