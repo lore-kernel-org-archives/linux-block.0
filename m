@@ -2,64 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FD8C43334
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 06:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C49C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 07:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237136AbiGHGBf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jul 2022 02:01:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38888 "EHLO
+        id S237225AbiGHH6i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 03:58:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiGHGBe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 02:01:34 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA4D796B0;
-        Thu,  7 Jul 2022 23:01:34 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 5A4AE68BFE; Fri,  8 Jul 2022 08:01:27 +0200 (CEST)
-Date:   Fri, 8 Jul 2022 08:01:26 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        shinichiro.kawasaki@wdc.com, dan.j.williams@intel.com,
-        yukuai3@huawei.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Song Liu <song@kernel.org>
-Subject: Re: REGRESSION: [PATCH 4/4] block: freeze the queue earlier in
- del_gendisk
-Message-ID: <20220708060126.GA16457@lst.de>
-References: <20220614074827.458955-1-hch@lst.de> <20220614074827.458955-5-hch@lst.de> <72a5bf2e-cd56-a85c-2b99-cb8729a66fed@deltatee.com>
+        with ESMTP id S237265AbiGHH6h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 03:58:37 -0400
+Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA945FDA;
+        Fri,  8 Jul 2022 00:58:32 -0700 (PDT)
+Received: from usmail.veeam.com (colmbx01.amust.local [172.18.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id 1E7E540C7C;
+        Fri,  8 Jul 2022 03:58:29 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
+        s=mx2-2022; t=1657267109;
+        bh=ger7AXoipHQnVDoEh6jCczwlc3wU2JQI8RBDWadO9ds=;
+        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
+        b=arF5cObhikWiaEzbVdfPC7UubpFczJHYkoTQP+/cINVguGpJQc+wjiBwiQW5P+pA0
+         LYi4T1w7CIHxwnwBmAl/ctl9yk2zPnltUYPKWqiR1tvFHx+5V2GVKifXyRK1W/S3pf
+         e/ulsO8z4ZyhE8sr5WGP7XXZ5M9GLnFPuhzcbmj1oeiehjZaEowUBvWvSjRRgLRCww
+         hmex/N+lXkaoI0MuLS+JLEvWh/SbJMLkb8DXlKDj2ujvHXmSMO0M1SPwzvUGCdhz/H
+         SWsXuGf+k/kcTbqFc2gQYx4I0vvljk7HRBVqO98WIBFLEKl5ex3HDVjYgx4xv8kcG3
+         h852isQqV1Ypg==
+Received: from [172.24.11.83] (172.24.11.83) by colmbx01.amust.local
+ (172.18.0.171) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.9; Fri, 8 Jul 2022
+ 03:58:26 -0400
+Message-ID: <f68a45b1-c986-bc77-d956-e6bafe821d52@veeam.com>
+Date:   Fri, 8 Jul 2022 09:58:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <72a5bf2e-cd56-a85c-2b99-cb8729a66fed@deltatee.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 15/20] block, blksnap: snapshot image block device
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
+ <1655135593-1900-16-git-send-email-sergei.shtepa@veeam.com>
+ <YsWKhjDV18DeyEZ8@infradead.org>
+ <49039d2b-e4bc-62a1-7b4a-a78001a2f430@veeam.com>
+ <YscW1Byo0PQq5C84@infradead.org>
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+In-Reply-To: <YscW1Byo0PQq5C84@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [172.24.11.83]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
+ colmbx01.amust.local (172.18.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29078F7554657D65
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 07, 2022 at 11:41:40PM -0600, Logan Gunthorpe wrote:
-> I'm not really sure why this is yet, but this patch in rc4 causes some
-> random failures with mdadm tests.
-> 
-> It seems the 11spare-migration tests starts failing roughly every other
-> run because the block device is not quite cleaned up after mdadm --stop
-> by the time the next mdadm --create commands starts, or rather there
-> appears to be a race now between the newly created device and the one
-> being cleaned up. This results in an infrequent sysfs panic with a
-> duplicate filename error (see the end of this email).
-> 
-> I managed to bisect this and found a09b314005f3a09 to be the problematic
-> commit.
 
-Taking a look at the mddev code this commit just seems to increase the
-race window of hitting horrible life time problems in md, but I'll also
-try to reproduce and verify it myself.
+> On Thu, Jul 07, 2022 at 11:16:42AM +0200, Sergei Shtepa wrote:
+>> The module creates a block device for each snapshot image.
+>> To make a backup of a block device, the backup tool reads snapshot image.
+>> This snapshot image block device allows to mount a file system on it
+>> and perform the necessary preparation. If not for this requirement,
+>> it would be possible to implement reading via an additional ioctl.
+>> But that wouldn't be a good design, I think.
+> Ok, got it.  It was just me who was confused.
+> 
+>> Perhaps I have implemented this block device incorrectly?
+>> Processing requests of the snapshot image block device is started
+>> in the function snapimage_queue_rq(). And ends in the 
+>> snapimage_queue_work() in another kernel thread. Therefore, when
+>> the request is initialized in snapimage_init_request(), a kernel worker
+>> is prepared.
+> I don't think it is wrong, but there is some potential for optimization.
+> 
+> Is there a reson this is implemented as a blk-mq driver vs a bio
+> based driver that just implements ->submit_bio?  The latter has
+> the advantage that you are always called in user context, and don't
+> need the extra workqueue offload. 
+> 
+> The block layer also generally assumes that blk-mq drivers don't
+> call submit_bio_noacct underneath, so if we can't I'd much
+> prefer the bio based driver approach here.
+> 
 
-Take a look at how md searches for a duplicate name in md_alloc,
-mddev_alloc_unit and mddev_find_locked based on the all_mddevs list,
-and how the mddev gets dropped from all_mddevs very early and long
-before the gendisk is gone in mddev_put.  I think what needs to be
-done is to implement a free_disk method and drop the mddev (and free it)
-from that.  But given how much intricate mess is based on all_mddevs
-we'll have to be very careful about that.
+There was a goal to use the kernel innovations whenever possible.
+Of course, it makes sense to return to bio based if it allows to
+achieve better performance. This is not a matter of principle.
