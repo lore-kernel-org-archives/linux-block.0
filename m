@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C57CCA482
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 054ECCCA483
 	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 16:51:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239285AbiGHQvS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S239248AbiGHQvS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 8 Jul 2022 12:51:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35416 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238994AbiGHQvP (ORCPT
+        with ESMTP id S238991AbiGHQvP (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 12:51:15 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5E96D562;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4B32BB33;
         Fri,  8 Jul 2022 09:51:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=uJjrxZhZdYVYZtXKOvole/gSNQLljW7DYXsmqSCAvGo=; b=CjHcrl1a6j4yr4iGsb795tcytT
-        NECRTdE0jXeH/1rMGVNU+FRvl8kMJk67LTeXkAcBYDiINeM/wNgAVoVjeZGn+fmrt0N+T+27HCINi
-        N5FNXo1CgxhwwgwlHRp6aC2ClGYKQtOQn5BmEMVimNVOlDfmOCMdJTJ3JUEA3lcGW/gZO9+qOd9Nu
-        h8etgYBVAnEe83NrwXLYD06OUC9sGDW15wE6Nb1dzE9AwEcmUfF+zzlNQ14ZQ6lAfMcd7ZHogxoFc
-        EFwW+Xu7ic3SGnE9yQnorciCErOi3B1M/KP8gv6Dp7HzKk3mtenVF9Wa7IyLPSEB2eB2v1eSTpRov
-        gmxUaGkA==;
+        bh=LmGCYzInizLDoaY0nxdRNakEEV5uOH/M0iEEe8ldOrY=; b=qf67dDm/FK9cXJ3/XdFWopqX6+
+        Iv1TZsACNs3pjKs21M6ptQoc0wfPVDyASStV1w0FQb5ySqhvcbNG5wnaIzGMcR/X4iT/kVgAHBblk
+        Q/q1iuEdRmEM30tKuo17TTPPN6BSacuMvrfE+/fNMkc6NmqtAA7LiEuMHT7SMOA2Vrw5avcJDsSzp
+        Lk3JJaWyU1OONu0c5C0Uv3Tg5jwM1OniviPLdZZm9OnITYVnqlg7tRRIxKHX262Ht3nwzB8zILp1l
+        Cppr2vavZt+CKBcCUdIMd7Bg+UJBp+wY2RzwD4Ms7r+IRGv5g4vsp95b5XKQLR1T/RQD8u9TM5C4n
+        ZtKl6cDQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1o9rCB-009xkJ-SC; Fri, 08 Jul 2022 10:51:13 -0600
+        id 1o9rCB-009xkG-SB; Fri, 08 Jul 2022 10:51:13 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1o9rC9-0001Jv-H0; Fri, 08 Jul 2022 10:51:09 -0600
+        id 1o9rC9-0001Jo-68; Fri, 08 Jul 2022 10:51:09 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -56,58 +56,76 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Date:   Fri,  8 Jul 2022 10:50:55 -0600
-Message-Id: <20220708165104.5005-5-logang@deltatee.com>
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Date:   Fri,  8 Jul 2022 10:50:53 -0600
+Message-Id: <20220708165104.5005-3-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220708165104.5005-1-logang@deltatee.com>
 References: <20220708165104.5005-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, iommu@lists.linux.dev, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, jhubbard@nvidia.com, rcampbell@nvidia.com, jgg@nvidia.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, iommu@lists.linux.dev, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, bhelgaas@google.com, jhubbard@nvidia.com, rcampbell@nvidia.com, kch@nvidia.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v8 04/13] dma-mapping: allow EREMOTEIO return code for P2PDMA transfers
+Subject: [PATCH v8 02/13] PCI/P2PDMA: Attempt to set map_type if it has not been set
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add EREMOTEIO error return to dma_map_sgtable() which will be used
-by .map_sg() implementations that detect P2PDMA pages that the
-underlying DMA device cannot access.
+Attempt to find the mapping type for P2PDMA pages on the first
+DMA map attempt if it has not been done ahead of time.
+
+Previously, the mapping type was expected to be calculated ahead of
+time, but if pages are to come from userspace then there's no
+way to ensure the path was checked ahead of time.
+
+This change will calculate the mapping type if it hasn't pre-calculated
+so it is no longer invalid to call pci_p2pdma_map_sg() before the mapping
+type is calculated, so drop the WARN_ON when that is the case.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- kernel/dma/mapping.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/pci/p2pdma.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index db7244291b74..20e70fa71091 100644
---- a/kernel/dma/mapping.c
-+++ b/kernel/dma/mapping.c
-@@ -197,7 +197,7 @@ static int __dma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
- 	if (ents > 0)
- 		debug_dma_map_sg(dev, sg, nents, ents, dir, attrs);
- 	else if (WARN_ON_ONCE(ents != -EINVAL && ents != -ENOMEM &&
--			      ents != -EIO))
-+			      ents != -EIO && ents != -EREMOTEIO))
- 		return -EIO;
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 462b429ad243..4e8bc457e29a 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -854,6 +854,7 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+ 	struct pci_dev *provider = to_p2p_pgmap(pgmap)->provider;
+ 	struct pci_dev *client;
+ 	struct pci_p2pdma *p2pdma;
++	int dist;
  
- 	return ents;
-@@ -255,6 +255,9 @@ EXPORT_SYMBOL(dma_map_sg_attrs);
-  *		complete the mapping. Should succeed if retried later.
-  *   -EIO	Legacy error code with an unknown meaning. eg. this is
-  *		returned if a lower level call returned DMA_MAPPING_ERROR.
-+ *   -EREMOTEIO	The DMA device cannot access P2PDMA memory specified in
-+ *		the sg_table. This will not succeed if retried.
-+ *
-  */
- int dma_map_sgtable(struct device *dev, struct sg_table *sgt,
- 		    enum dma_data_direction dir, unsigned long attrs)
+ 	if (!provider->p2pdma)
+ 		return PCI_P2PDMA_MAP_NOT_SUPPORTED;
+@@ -870,6 +871,10 @@ static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
+ 		type = xa_to_value(xa_load(&p2pdma->map_types,
+ 					   map_types_idx(client)));
+ 	rcu_read_unlock();
++
++	if (type == PCI_P2PDMA_MAP_UNKNOWN)
++		return calc_map_type_and_dist(provider, client, &dist, true);
++
+ 	return type;
+ }
+ 
+@@ -912,7 +917,7 @@ int pci_p2pdma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
+ 	case PCI_P2PDMA_MAP_BUS_ADDR:
+ 		return __pci_p2pdma_map_sg(p2p_pgmap, dev, sg, nents);
+ 	default:
+-		WARN_ON_ONCE(1);
++		/* Mapping is not Supported */
+ 		return 0;
+ 	}
+ }
 -- 
 2.30.2
 
