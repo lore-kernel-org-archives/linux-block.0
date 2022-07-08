@@ -2,205 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D55A0CCA47B
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 03:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E52C43334
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 04:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236849AbiGHD31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jul 2022 23:29:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58786 "EHLO
+        id S236694AbiGHEQL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 00:16:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236501AbiGHD30 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jul 2022 23:29:26 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ABE373933;
-        Thu,  7 Jul 2022 20:29:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=oM2k/skZQvyu3mUYfkmntJvn7Ev2BYz4NH8zgIp7wHI=; b=rHG9dzm8IpPU7EfLVpII+KVjLX
-        tK5RzYEsVvZxSEwtzFKftLvIoD7Gprdj8prhV6AczG/W1VhVFRA0+eJOe8FB1oYirYLF/RKjzuD1y
-        UeDEi51PvWgAnfcZaU3Gwg3yJ7ho+xCZcFg47ydeQ/XmgoGz+hnH2UXSd2OVAnZpRaDhU4lA368tD
-        oe+dO/0K+fc3cXMTKiXo8fOIKu03oBij5w1Ge8Sml/7vp/K9duiAF0tEeC/5h5rnSekPO7SDQxmi+
-        t+Coa71RLCVtJVynZWQvpaKSs5ZIFuJtUldewmkkeABsbAtcvNHR4ZT5VhVmpe3X/ZzFhhyxT4Ch5
-        5u2Qto6g==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o9eg6-003A5X-T9; Fri, 08 Jul 2022 03:29:15 +0000
-Date:   Fri, 8 Jul 2022 04:29:14 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-aio@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ocfs2-devel@oss.oracle.com, linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 07/19] mm/migrate: Convert expected_page_refs() to
- folio_expected_refs()
-Message-ID: <Ysekikp60Hhs5lV0@casper.infradead.org>
-References: <20220608150249.3033815-1-willy@infradead.org>
- <20220608150249.3033815-8-willy@infradead.org>
- <6e7599d1-8a5f-bf16-383c-febd753bd051@google.com>
+        with ESMTP id S230230AbiGHEQK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 00:16:10 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760D625E98;
+        Thu,  7 Jul 2022 21:16:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1657253769; x=1688789769;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Ygwc1tThcfGKXgAibHVPHIyzgiOlEYO1cEpUxc29sz4=;
+  b=lgcG9z+8MoNerIFNJfQaRMih76BXLTAn/Tdmh8Y0qT/IfJmreyFKagpM
+   B6lu5w6VyGer6NkE2AmbX9Dh7Fls/bXXxJGNePJUUFI9PnLpXtou9bbPU
+   Qx0cuSZBudbTlM2GmqGopn5cGi7OKWAMrfwyMAWw3Dwn/dYozjDMebOGH
+   Y7Nmym/iGuaBD5NXdhqZlVilPT6pr7FAOvePtpNl9k2GX7gYrFhb26pVg
+   OVtLrCKJdEBpWqhkppiFp9Kr/6xfoZBdsEAm+r+A7fBLDee2DDfpo5bQ3
+   lQAOKIHq5zY52TsQgozvRXkhkmLdoyWaQg4Zi9QxUgm7WOkmZ7zEMs2nM
+   A==;
+X-IronPort-AV: E=Sophos;i="5.92,254,1650902400"; 
+   d="scan'208";a="309486087"
+Received: from mail-dm6nam04lp2046.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.46])
+  by ob1.hgst.iphmx.com with ESMTP; 08 Jul 2022 12:16:08 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zlb8HWRMmDIH1F+0vG3ikCZJ+JksRbx+S1VTwZuMyVZucLkQVTyu4iWe4yijGR8dwpSf2VJK20XVQNUQpw0wF39NEZGw9pb4nhrvfk+mY5hc/Gn4SsnvmFW/hSiBV0TVOQiyDz2+cq8vFOQ+TEELAC6Ay9DMUDnSplUe5AP9iCfirdPims66eHtCzOoz5W/7lkCep3MEstfP9mZCHM/Mx/wZn/lv7AWetlURInF6Q8m2aT4yEJR+gqStHdRhYz2YAPpVjyWMzzkzxpF+bpGN+R7ig32dyIPFwA0pAbiDd7GreBWDejETgYlp+oDbW7ba0YpKVV+1dZVHa8ZisBzU5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9uiJJBAgTaOGnd6jBRDtUwDyKicEznBuNFEUh1zsn9w=;
+ b=dQ9H1l0D0Dxz3BOox+SLGIe8MF4Q8offhqd0i8YdnxFWRarRzJB5hn8iTmqtG05rhBuCGdb2tpd20u7iG7/b05kMqKQnOIFds5awUINNkpAfxyX4PaCae+v4n5dtjoGzvn9sfGdpbWpeCbbP4+nk0HuMfHYdTxsoe18CxnbE01mgDl9C4bNz0k6zUGV+uNiQIuxikziXwjiGDM/+GqbvVaX78PWBI6bYsDx2x+qEIVdtH/M/IUbqildh6kLP7LoWIC1jyjhD+TID3o90ng6khPUM9esA//PpzlWs0/H4kIZIulGEws0UpjAQjmWoggjZZSfoxATi8J3WYQ7twqzbCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9uiJJBAgTaOGnd6jBRDtUwDyKicEznBuNFEUh1zsn9w=;
+ b=VYRTDL2bApj5tmnCj5TABaEJH7NCbRQRFX7yGRHtF1ez/v2mUWBiETl73cIXM/oUdc1otwRWQFf+I3TnDNmoeCiTTBZ+1ATI3nOnxY7DrgTLTDlGjtCPTMSWizbOPH0r3UKPqXfibdapP2KFv6upBf2MpOsSHtis2DHM2ZdCxjQ=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ CY4PR0401MB3666.namprd04.prod.outlook.com (2603:10b6:910:8a::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5395.19; Fri, 8 Jul
+ 2022 04:16:01 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833%7]) with mapi id 15.20.5395.021; Fri, 8 Jul 2022
+ 04:16:01 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: clean up zoned device information v2
+Thread-Topic: clean up zoned device information v2
+Thread-Index: AQHYkoFuwNMgOCV5fUetRXO/+tTtxw==
+Date:   Fri, 8 Jul 2022 04:16:01 +0000
+Message-ID: <20220708041601.pcefrofpmiw4lht7@shindev>
+References: <20220706070350.1703384-1-hch@lst.de>
+In-Reply-To: <20220706070350.1703384-1-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ae156ea7-edd8-4397-64bd-08da60989179
+x-ms-traffictypediagnostic: CY4PR0401MB3666:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Ij/k3dkeguR8fWaB4R1JcRJTYvMbAgew0lS7xScUkhomx4n5LW/vXldC/48hxmgyIwMnN0C79JFLbk5/0VYB+Ta5ReM/UmvlH+q0wXF6c8V/znE2L1yshXWR2CVj591+bhOVNyDtwURtQxQpO16I3HuR8gIJbDhJyJ0d6GdGMllnLIVSsLZ6Btcb0q1vmdZECFHjNLEbQBOzCi2nBgLxBe4wMq+mqnw77yZgaCzRgh1mPi2A/TncIh6ZcsMCGHx8/2/2OVXykTD1Fa48jXEe95zwEs0qJhDKDtRGlQPwRSTQUCrr9ZypApq+6uS7HxavSAr8nqxrem+bYucMrfToOZ8f1t1phCs3gQXo+/9QvZJmbkFFdv7yTrOn/C4LuNCzDXh66biG3zP/5gxgTElR4PGUZymepkpeEn8LtoPrijm1pihrJoaSaUKkyoS9OP0hjjiTvncL8MyniKBmIlsZhmTsJExrazLvyBD8sP7enetFLay7k1Ch5AoY4f+7vMuOjzBjlzqq3KQQfBxygAe8+cCrYWJwr/JtPdfFEbvb2iRsdmT/M50DkaU1O9Bcr0PvMdr6eO2BVWSj7EogdIAmDkoWKwEuy1jx9syd0jcnk615gx0rzSVerdn55EXgG0mMS01GHs+kC3oaQYuvu7vtEYzxnnXSpLf+OjPfFwHRim+A8KZSrAtLjTAqSjmZ/pNgE+Foz38A4BtmQBGOjwFVlT+sd5HYYK6Jeh1X3AW/MEeS4EjR1QBlbfgHKcO6LnQ7lY3B3yDt2cf/9PZmM2x5AcNG9z1aQumWq3/Mf3s13hMMkcFBMERsSb+rD2mPWymS
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(7916004)(396003)(39860400002)(346002)(376002)(366004)(136003)(66446008)(4326008)(38070700005)(8676002)(5660300002)(66946007)(33716001)(66476007)(66556008)(64756008)(4744005)(91956017)(2906002)(6506007)(82960400001)(26005)(76116006)(8936002)(86362001)(44832011)(71200400001)(6486002)(6512007)(9686003)(478600001)(6916009)(54906003)(122000001)(38100700002)(1076003)(41300700001)(83380400001)(316002)(186003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9iub5NZi4lsRBhj2r0QoVxmkoYZERlxQCx+AgLAvFr3+9Qhgnnkt0tB1Y4+h?=
+ =?us-ascii?Q?9+4XiWHftE2EPGmgEZSobmdxc7dkebEopN8UaW5i7g7GGj/EsXOPuyYk922L?=
+ =?us-ascii?Q?Rzul9tfqs9Wk+ERmBhMILBT53Pkp38tpp5bCW5pwivJUdf32mp0e1KbiRjm3?=
+ =?us-ascii?Q?e6BzFPE5/KbDXSbGYvJPAq9KcD1C1AXfXXg2tQ658jVoTgMDQNLuBWUXBYaL?=
+ =?us-ascii?Q?rSIEfl/rshut5tVHgtljKrYQgrz2xsUqvPp1lbva12VKoJCB0tf1r1Q41nkJ?=
+ =?us-ascii?Q?IOvl8AXdn2AJBaozsgVVHcA5FbK2lUpvLKdjPnMs0nKkqprAkzI8wC4d7IEs?=
+ =?us-ascii?Q?OD/1YAIUpRl3wI2D+8sa2IQlMs3PxzLdJqK/ANiJakQSfmxEo6b68iTKFAFn?=
+ =?us-ascii?Q?4yKsAHOVm4ZOqWo6eHtT32Lba1780DBMTXcAjgIucEEBdeljoD1CSmiV8DQN?=
+ =?us-ascii?Q?yYNVsrZN9jm8oc61E74LWdB0BCpJi7UV55tDPvfOv9+yAnvtzQvOnzgNDcev?=
+ =?us-ascii?Q?qyZ996tytN03wC4GX/tAZkoKSnhakFAxnfHYA5Kt6puYkgcZKoBuYMrXhbJX?=
+ =?us-ascii?Q?fUrKop9+xWKmxU4Wn9mVdr0ZrZ3puhK6Ej+o4jeZKRp0YI2rKiJtn7Y9PNDm?=
+ =?us-ascii?Q?/5bHf8XSqhg/ZED1m8/Ys7Jj32FfSgRYM/GvNPNgpLFY9hp06zPjdQ9VzHF4?=
+ =?us-ascii?Q?wEOP1fT50GakxxeKOjo20jePe4Ghp4mAmbs8JBZenN2O/QfPRWR/Hu48mLOy?=
+ =?us-ascii?Q?m3COcdtifvZBEQOioNuJYvfpqziV0NAUHl2PdVpMlM5KjO5QLuw71ga57p/e?=
+ =?us-ascii?Q?MtZWEHK3HvXs7oPwc8J8Kve1hkZerJZdy1AwpVjGahjdmEbfKZ9sUrnj1gua?=
+ =?us-ascii?Q?oVQPvrVK4qkGmSggmYCezzpzYda2bhMpPQa7WO9VA03f1AxGWdMj1GM0zuwP?=
+ =?us-ascii?Q?/iiXogoK1w9crJ3SGASgfp24Lw4RDdJk5J4LUrx9ScOJDPrI3N7/heFzfMU1?=
+ =?us-ascii?Q?bDZV8BiVrV7Dv1XxJeMRXLy2N6fwrlbdjur6vc53PIm22PjTtu9btyBPUct+?=
+ =?us-ascii?Q?K1rWMTpQUpsuwI0/dkBXfGZ+TsSbFaHwaM7zz0A04FrumZpLYwAUHYBqChGD?=
+ =?us-ascii?Q?gsLtHf2VsdKa3Je1RP3Nq0Q9+93fFGd0grmnHe94SMI9cn5VxOKKHM8yYDdX?=
+ =?us-ascii?Q?kk02pZh1zdNzmIziDG90rftWwigkJS+RwJgS8JvwXONaxl1/ocLSrcVDVvro?=
+ =?us-ascii?Q?yedRojcVU5ddy8tGmsrhH/shVlkBeS2W8iE2ubdL5gRSIPGguaoDelNsuyFF?=
+ =?us-ascii?Q?JaePYKIyDqcTqsbae+KYRuS8kHksCeoTdshAx4bWhWP4yJDTIoGtkGVZB73W?=
+ =?us-ascii?Q?YQ3MpjHIYYSDgvr1ldiA931APKjJ3ZA3elxM0eQzD9pQ5agp+vmzpwMJdAf6?=
+ =?us-ascii?Q?LuUrkCxGGdponnYK6iYbS7TsWIatYhi/OsbwZN7Ij671wy7e9ApfShUUXvbj?=
+ =?us-ascii?Q?NSc6txv1cD5ylXfGi8UsqvOPjYk+UhbGcXQ9gJzcASwXPFdRzofAN0GQS9Mp?=
+ =?us-ascii?Q?pNO/1eyM/uN5gbbolr4IC//YOP9hgNn5qJLOSaYsuDsFtshSqmcXCju1sqME?=
+ =?us-ascii?Q?onrW+lwZIsPNeZPocwVYXGg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <FA45823237EDA34CB0734B5D410AF553@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6e7599d1-8a5f-bf16-383c-febd753bd051@google.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae156ea7-edd8-4397-64bd-08da60989179
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2022 04:16:01.8137
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: s9dkYnsGl94sMY7RNZw75Be52OPPuYy2ZqpY9Th8/0s26rR6zQ9kOODGhj+2wCEBizRovrCTqXUPXSxhkHqsQjvet8diAV0KXlFrroKfxKE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3666
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 07, 2022 at 07:50:17PM -0700, Hugh Dickins wrote:
-> On Wed, 8 Jun 2022, Matthew Wilcox (Oracle) wrote:
-> 
-> > Now that both callers have a folio, convert this function to
-> > take a folio & rename it.
-> > 
-> > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  mm/migrate.c | 19 ++++++++++++-------
-> >  1 file changed, 12 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/mm/migrate.c b/mm/migrate.c
-> > index 2975f0c4d7cf..2e2f41572066 100644
-> > --- a/mm/migrate.c
-> > +++ b/mm/migrate.c
-> > @@ -336,13 +336,18 @@ void pmd_migration_entry_wait(struct mm_struct *mm, pmd_t *pmd)
-> >  }
-> >  #endif
-> >  
-> > -static int expected_page_refs(struct address_space *mapping, struct page *page)
-> > +static int folio_expected_refs(struct address_space *mapping,
-> > +		struct folio *folio)
-> >  {
-> > -	int expected_count = 1;
-> > +	int refs = 1;
-> > +	if (!mapping)
-> > +		return refs;
-> >  
-> > -	if (mapping)
-> > -		expected_count += compound_nr(page) + page_has_private(page);
-> > -	return expected_count;
-> > +	refs += folio_nr_pages(folio);
-> > +	if (folio_get_private(folio))
-> > +		refs++;
-> > +
-> > +	return refs;
-> >  }
-> >  
-> >  /*
-> > @@ -359,7 +364,7 @@ int folio_migrate_mapping(struct address_space *mapping,
-> >  	XA_STATE(xas, &mapping->i_pages, folio_index(folio));
-> >  	struct zone *oldzone, *newzone;
-> >  	int dirty;
-> > -	int expected_count = expected_page_refs(mapping, &folio->page) + extra_count;
-> > +	int expected_count = folio_expected_refs(mapping, folio) + extra_count;
-> >  	long nr = folio_nr_pages(folio);
-> >  
-> >  	if (!mapping) {
-> > @@ -669,7 +674,7 @@ static int __buffer_migrate_folio(struct address_space *mapping,
-> >  		return migrate_page(mapping, &dst->page, &src->page, mode);
-> >  
-> >  	/* Check whether page does not have extra refs before we do more work */
-> > -	expected_count = expected_page_refs(mapping, &src->page);
-> > +	expected_count = folio_expected_refs(mapping, src);
-> >  	if (folio_ref_count(src) != expected_count)
-> >  		return -EAGAIN;
-> >  
-> > -- 
-> > 2.35.1
-> 
-> This commit (742e89c9e352d38df1a5825fe40c4de73a5d5f7a in pagecache.git
-> folio/for-next and recent linux-next) is dangerously wrong, at least
-> for swapcache, and probably for some others.
-> 
-> I say "dangerously" because it tells page migration a swapcache page
-> is safe for migration when it certainly is not.
-> 
-> The fun that typically ensues is kernel BUG at include/linux/mm.h:750!
-> put_page_testzero() VM_BUG_ON_PAGE(page_ref_count(page) == 0, page),
-> if CONFIG_DEBUG_VM=y (bisecting for that is what brought me to this).
-> But I guess you might get silent data corruption too.
-> 
-> I assumed at first that you'd changed the rules, and were now expecting
-> any subsystem that puts a non-zero value into folio->private to raise
-> its refcount - whereas the old convention (originating with buffer heads)
-> is that setting PG_private says an extra refcount has been taken, please
-> call try_to_release_page() to lower it, and maybe that will use data in
-> page->private to do so; but page->private free for the subsystem owning
-> the page to use as it wishes, no refcount implication.  But that you
-> had missed updating swapcache.
-> 
-> So I got working okay with the patch below; but before turning it into
-> a proper patch, noticed that there were still plenty of other places
-> applying the test for PG_private: so now think that maybe you set out
-> with intention as above, realized it wouldn't work, but got distracted
-> before cleaning up some places you'd already changed.  And patch below
-> now goes in the wrong direction.
-> 
-> Or maybe you didn't intend any change, but the PG_private test just got
-> missed in a few places.  I don't know, hope you remember, but current
-> linux-next badly inconsistent.
-> Over to you, thanks,
+On Jul 06, 2022 / 09:03, Christoph Hellwig wrote:
+> Hi all,
+>=20
+> this cleans up the block layer zoned device information APIs and
+> moves all fields currently in the request_queue to the gendisk as
+> they aren't relevant for passthrough I/O.
+>=20
+> Changes since v1:
+>  - drop the blk-zoned/nvmet code sharing for now
+>  - use a helper a little earlier
+>  - various spelling fixes
 
-Ugh.  The problem I'm trying to solve is that we're short on page flags.
-We _seemed_ to have correlation between "page->private != NULL" and
-"PG_private is set", and so I thought I could make progress towards
-removing PG_private.  But the rule you set out above wasn't written down
-anywhere that I was able to find it.
+This series passed my test set for zoned block devices. It may be late but,
 
-I'm about to go to sleep, but I'll think on this some more tomorrow.
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-> Hugh
-> 
-> --- a/mm/migrate.c	2022-07-06 14:24:44.499941975 -0700
-> +++ b/mm/migrate.c	2022-07-06 15:49:25.000000000 -0700
-> @@ -351,6 +351,10 @@ unlock:
->  }
->  #endif
->  
-> +static inline bool folio_counted_private(struct folio *folio)
-> +{
-> +	return !folio_test_swapcache(folio) && folio_get_private(folio);
-> +}
->  static int folio_expected_refs(struct address_space *mapping,
->  		struct folio *folio)
->  {
-> @@ -359,7 +363,7 @@ static int folio_expected_refs(struct ad
->  		return refs;
->  
->  	refs += folio_nr_pages(folio);
-> -	if (folio_get_private(folio))
-> +	if (folio_counted_private(folio))
->  		refs++;
->  
->  	return refs;
-> --- a/mm/vmscan.c	2022-07-06 14:24:44.531942217 -0700
-> +++ b/mm/vmscan.c	2022-07-06 15:49:37.000000000 -0700
-> @@ -2494,6 +2494,10 @@ shrink_inactive_list(unsigned long nr_to
->   * The downside is that we have to touch folio->_refcount against each folio.
->   * But we had to alter folio->flags anyway.
->   */
-> +static inline bool folio_counted_private(struct folio *folio)
-> +{
-> +	return !folio_test_swapcache(folio) && folio_get_private(folio);
-> +}
->  static void shrink_active_list(unsigned long nr_to_scan,
->  			       struct lruvec *lruvec,
->  			       struct scan_control *sc,
-> @@ -2538,8 +2542,9 @@ static void shrink_active_list(unsigned
->  		}
->  
->  		if (unlikely(buffer_heads_over_limit)) {
-> -			if (folio_get_private(folio) && folio_trylock(folio)) {
-> -				if (folio_get_private(folio))
-> +			if (folio_counted_private(folio) &&
-> +			    folio_trylock(folio)) {
-> +				if (folio_counted_private(folio))
->  					filemap_release_folio(folio, 0);
->  				folio_unlock(folio);
->  			}
+--=20
+Shin'ichiro Kawasaki=
