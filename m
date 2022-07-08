@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8932DC43334
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 04:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5ACCCA47F
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 04:49:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237019AbiGHEtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jul 2022 00:49:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51398 "EHLO
+        id S237079AbiGHEt0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 00:49:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237356AbiGHEtN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 00:49:13 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5330A76974
-        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 21:49:12 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-31c95f27403so92821527b3.6
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2022 21:49:12 -0700 (PDT)
+        with ESMTP id S237334AbiGHEtY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 00:49:24 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50F5A76E94
+        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 21:49:17 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id ay16-20020a056a00301000b00528c0c726f8so4246906pfb.16
+        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2022 21:49:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=UquCbMkMEN53oDqhrIsDuW+/Yi+lnpJDBsKu7NltgmI=;
-        b=SPGqZ7snq0dDaZavBhTshBo3GD/RIz16PYHpkAZP09NkIM7rSc3+bp+s6l/7++Cv7B
-         XWa5GQMin+l++ZOP/yB/e+b60YfCQdDYXY2VcElGWwTBkz3vCLMTOOcnR9cOfsiNGmj8
-         tlqh1FLXZ3uERR/doIcBKL6AyyV2xy+uFI/GmTVeOB6R3o2WyolQeIvTIgXgI3a+UUqv
-         c5paBcyBylaDfDM1yzvksVPzvjik6pRI4mF17AwFW08HuS2JXclpRWj3VnAvBFZNo7Ea
-         6QdKwSftZV1L52yNE7NANxbkca+Rdd+HxSkS2rq66Tt7UH0+HZ+lXRb32QqGn/pRABWO
-         nFwg==
+        bh=1A6qYqJKHf9NGGZzmDub8k30/R66by5jlEKXrPXJj44=;
+        b=SucqxFgX5rzmSoqNlZU2wpXRBbbPqhJVl8kphJxPAiVmOyq1RCb6fPcIgZTCECgvWY
+         ZvzyzFgvUUwI2OfgQCMK/ZMVW2DbcyvoVaCjOIk3Dd9X8NddhS2BqOJEBFi1zlZGoDG9
+         cBp+bBfHNgKW5bcgTDicUBNuURnwtK5JpSMpAudRip2/A0kgo09arl5cIxAqSggphD5h
+         DlmAsg0XbQxTyWvCbiLSwdJ7D5fZkkDKn5z2B8yBbrjY7kie+eVqFCLQ95btr4MHp9KJ
+         IkZ7oBqL3WHolRgwyxaP4j7aA4VVLVZ/jpHzsbqbpei9/XO0E7tMb7v8AsWgJnbkvxSx
+         KOIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=UquCbMkMEN53oDqhrIsDuW+/Yi+lnpJDBsKu7NltgmI=;
-        b=yvYEatLOgFtqamksqia7haWHKgAlny7+frfzzicpZShajBB24Z9+vvUZqn8g6MgAnw
-         EjCgRKCMp14fNZAC64q45hKgiMtCJ5v0frB4RMQ1ccjU4cfwNfq9THW1VEECu3DCHVAA
-         aXQlC4aHM8C9TPOJ6KIXGSqP9ULTJAKPETJs99kVV5Lzuw0glQSyQ8odVq1T/5vVTjSQ
-         ftrUXCZ8BiAg65IN9jtkPLn3V3+C1j6ukZ7nzI3f7FBTy5ancdDzTrkIWPmBIINtGNjN
-         eHhCGW3ImBHTpWyDHFEPqCpGMpizy9MpFjkUVpUMbxv/gom7qHFwZiKct5Zww4BLefSl
-         OJiQ==
-X-Gm-Message-State: AJIora8WO6992/+dBY6KvsHRp0KdHyoJpMMf8IQVewtOmouExIBL16oV
-        zPCCTLAuGufoa1J0VFra5Su06Av45vHDcg==
-X-Google-Smtp-Source: AGRyM1s34hRTvZB8Y7Xk9te1i17z6IbWppPGWTLYgGaU9rmBgS1u+VkLNYZr0Wk1pk93+iVd+YYx2UmXUKNKpA==
+        bh=1A6qYqJKHf9NGGZzmDub8k30/R66by5jlEKXrPXJj44=;
+        b=qmVYwcH9oyfTarHg4iMTldFcXAPLh9pN/B2NEBFffdmt7L/bn/728AdQ/N55sHUieB
+         N5KTKhGHp9e+LkGCCg04aqKq+X71w+HKUz/4OX4WI08MvTt0u0yp5Ykko4LRRcBfZLx3
+         rs/44cwwVVInJtJ4Xnb9xnpEF8cBVbSAIU2b+SfPBwrM5Drcuy49KVbrY3QXgph/to4a
+         7Rg17DSMf++NnPFEl9TsA6ZCAE+j5D9uu9QDoeDQQRKyDR+l1wI7Sk8bhUD8oWo5WIxg
+         zLU4EAP1AeWy1ETWcRY/KYpdpaDdItGBSv+jpuUfSfqaY5ohg/Ao74sBro8TNmw2m+oj
+         WQyw==
+X-Gm-Message-State: AJIora/sxjklLfM3R6M5XtMg4PXuo7ASVZ2TawJtO7Bi3DYDm3E5LrP6
+        l3jPqC4/RIy0BwlTFJHSPPpcqTzXwnjVZg==
+X-Google-Smtp-Source: AGRyM1sNiqa//ZLeKy8OfqscWC5TleJ9FjN0cVegp4W+XLXK7wRYhByeorgwSFiNKTOHYZCDeoM1MTU2M/LAsw==
 X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
- (user=davidgow job=sendgmr) by 2002:a25:ad14:0:b0:66e:cb9e:8d43 with SMTP id
- y20-20020a25ad14000000b0066ecb9e8d43mr1664970ybi.176.1657255751621; Thu, 07
- Jul 2022 21:49:11 -0700 (PDT)
-Date:   Fri,  8 Jul 2022 12:48:45 +0800
+ (user=davidgow job=sendgmr) by 2002:a17:90a:249:b0:1e0:a8a3:3c6c with SMTP id
+ t9-20020a17090a024900b001e0a8a33c6cmr4643pje.0.1657255756113; Thu, 07 Jul
+ 2022 21:49:16 -0700 (PDT)
+Date:   Fri,  8 Jul 2022 12:48:46 +0800
 In-Reply-To: <20220708044847.531566-1-davidgow@google.com>
-Message-Id: <20220708044847.531566-2-davidgow@google.com>
+Message-Id: <20220708044847.531566-3-davidgow@google.com>
 Mime-Version: 1.0
 References: <20220708044847.531566-1-davidgow@google.com>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
-Subject: [PATCH v6 2/4] module: panic: Taint the kernel when selftest modules load
+Subject: [PATCH v6 3/4] kunit: Taint the kernel when KUnit tests are run
 From:   David Gow <davidgow@google.com>
 To:     Brendan Higgins <brendanhiggins@google.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
@@ -83,79 +83,77 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Taint the kernel with TAINT_TEST whenever a test module loads, by adding
-a new "TEST" module property, and setting it for all modules in the
-tools/testing directory. This property can also be set manually, for
-tests which live outside the tools/testing directory with:
-MODULE_INFO(test, "Y");
+Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
+Due to KUnit tests not being intended to run on production systems, and
+potentially causing problems (or security issues like leaking kernel
+addresses), the kernel's state should not be considered safe for
+production use after KUnit tests are run.
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-Reviewed-by: Aaron Tomlin <atomlin@redhat.com>
-Acked-by: Brendan Higgins <brendanhiggins@google.com>
+This both marks KUnit modules as test modules using MODULE_INFO() and
+manually taints the kernel when tests are run (which catches builtin
+tests).
+
+Acked-by: Luis Chamberlain <mcgrof@kernel.org>
+Tested-by: Daniel Latypov <dlatypov@google.com>
+Reviewed-by: Brendan Higgins <brendanhiggins@google.com>
 Signed-off-by: David Gow <davidgow@google.com>
 ---
 
-Version 6 of this patch fixes the issue pointed out by Nathan here,
-whereby the check for the module property was inverted:
-https://lore.kernel.org/linux-kselftest/Ysd9FG1fOSnzKv8d@dev-arch.thelio-3990X/
+No changes since v5:
+https://lore.kernel.org/linux-kselftest/20220702040959.3232874-3-davidgow@google.com/
 
-Changes since v5:
-https://lore.kernel.org/linux-kselftest/20220702040959.3232874-2-davidgow@google.com/
-- Fix the test for the module property being inverted, making this patch
-  do exactly the opposite of what it should. (Thanks Nathan Chancellor)
-- Revert to using pr_warn(), as we already don't warn if the kernel is
-  tainted, so won't spam the logs.
-- Add Reviewed-, Acked-by tags.
+No changes since v4:
+https://lore.kernel.org/linux-kselftest/20220701084744.3002019-3-davidgow@google.com/
 
-Changes since v4:
-https://lore.kernel.org/linux-kselftest/20220701084744.3002019-2-davidgow@google.com/
-- Use pr_warn_once() to only log a warning the first time a module
-taints the kernel with TAINT_TEST
-  - Loading lots of test modules is a common usecase, and this would
-otherwise spam the logs too much.
-  - Thanks Luis.
-- Remove a superfluous newline (Thanks Greg)
-- Add Luis' Reviewed-by tag.
-
-This patch was new in v4 of the series.
+Changes since v3:
+https://lore.kernel.org/lkml/20220513083212.3537869-2-davidgow@google.com/
+- Use MODULE_INFO() for KUnit modules.
+  - This is technically redundant, as the KUnit executor will taint the
+    kernel when _any_ KUnit tests are run, but may be useful if some
+    other tool will parse the 'test' property.
+- Add {Acked,Tested,Reviewed}-by tags.
 
 ---
- kernel/module/main.c  | 7 +++++++
- scripts/mod/modpost.c | 3 +++
- 2 files changed, 10 insertions(+)
+ include/kunit/test.h | 3 ++-
+ lib/kunit/test.c     | 4 ++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/module/main.c b/kernel/module/main.c
-index fed58d30725d..4723f1316709 100644
---- a/kernel/module/main.c
-+++ b/kernel/module/main.c
-@@ -1988,6 +1988,13 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
- 	/* Set up license info based on the info section */
- 	set_license(mod, get_modinfo(info, "license"));
+diff --git a/include/kunit/test.h b/include/kunit/test.h
+index 8ffcd7de9607..ccae848720dc 100644
+--- a/include/kunit/test.h
++++ b/include/kunit/test.h
+@@ -277,7 +277,8 @@ static inline int kunit_run_all_tests(void)
+ 	{								\
+ 		return __kunit_test_suites_exit(__suites);		\
+ 	}								\
+-	module_exit(kunit_test_suites_exit)
++	module_exit(kunit_test_suites_exit)				\
++	MODULE_INFO(test, "Y");
+ #else
+ #define kunit_test_suites_for_module(__suites)
+ #endif /* MODULE */
+diff --git a/lib/kunit/test.c b/lib/kunit/test.c
+index a5053a07409f..8b11552dc215 100644
+--- a/lib/kunit/test.c
++++ b/lib/kunit/test.c
+@@ -11,6 +11,7 @@
+ #include <kunit/test-bug.h>
+ #include <linux/kernel.h>
+ #include <linux/moduleparam.h>
++#include <linux/panic.h>
+ #include <linux/sched/debug.h>
+ #include <linux/sched.h>
  
-+	if (get_modinfo(info, "test")) {
-+		if (!test_taint(TAINT_TEST))
-+			pr_warn("%s: loading test module taints kernel.\n",
-+				mod->name);
-+		add_taint_module(mod, TAINT_TEST, LOCKDEP_STILL_OK);
-+	}
+@@ -501,6 +502,9 @@ int kunit_run_tests(struct kunit_suite *suite)
+ 	struct kunit_result_stats suite_stats = { 0 };
+ 	struct kunit_result_stats total_stats = { 0 };
+ 
++	/* Taint the kernel so we know we've run tests. */
++	add_taint(TAINT_TEST, LOCKDEP_STILL_OK);
 +
- 	return 0;
- }
- 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 29d5a841e215..5937212b4433 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2191,6 +2191,9 @@ static void add_header(struct buffer *b, struct module *mod)
- 
- 	if (strstarts(mod->name, "drivers/staging"))
- 		buf_printf(b, "\nMODULE_INFO(staging, \"Y\");\n");
-+
-+	if (strstarts(mod->name, "tools/testing"))
-+		buf_printf(b, "\nMODULE_INFO(test, \"Y\");\n");
- }
- 
- static void add_exported_symbols(struct buffer *buf, struct module *mod)
+ 	if (suite->suite_init) {
+ 		suite->suite_init_err = suite->suite_init(suite);
+ 		if (suite->suite_init_err) {
 -- 
 2.37.0.rc0.161.g10f37bed90-goog
 
