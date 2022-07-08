@@ -2,149 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82655C43334
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 10:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3445C43334
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 12:47:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238010AbiGHKpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jul 2022 06:45:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
+        id S237598AbiGHMrn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 08:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238021AbiGHKpl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 06:45:41 -0400
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8118CBCA2;
-        Fri,  8 Jul 2022 03:45:40 -0700 (PDT)
-Received: from usmail.veeam.com (colmbx01.amust.local [172.18.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 15FDBCAFE8;
-        Fri,  8 Jul 2022 13:45:38 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1657277138;
-        bh=k2p6iW/otqptBXt9uJxTJ4gF8hPp0GmsUJIZED0Kuyw=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=SgnCWTylYFEM7XR76ykdZWr6D8DR5JvUr6+5ehgeWqloMfenVqjC/jJJ8M3f3l5zM
-         K3F52Knpc5ohgX66UT2STyHHgaZT6iwKbYDI6ioQoFYZHXTkSLAT6NcFynPhBjuWgz
-         qmrjk8uAAomfVthSHP2o11f9/ZCKosAgMl52IxwVPuNJrKfJUmVjd5CmPdWpBpHbSg
-         T/zoL+kWCm14NzEpf97qU56KORa+HbGthQwHFgSse/GaWB0gXbDfBvd3CNdSz8PdwM
-         1nD2jMR0Qy243vfcDc62dx8OvB2xjZ6jtjrHaiqMZ4CeCzBXJmdBLzuozGqQOO43TO
-         imAfrkj5uyCDg==
-Received: from [172.24.11.83] (172.24.11.83) by colmbx01.amust.local
- (172.18.0.171) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.9; Fri, 8 Jul 2022
- 06:45:35 -0400
-Message-ID: <aec88137-070e-7c1d-215f-86a1e6d4b10a@veeam.com>
-Date:   Fri, 8 Jul 2022 12:45:33 +0200
+        with ESMTP id S237469AbiGHMrn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 08:47:43 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 877D76B258
+        for <linux-block@vger.kernel.org>; Fri,  8 Jul 2022 05:47:42 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id w24so17978606pjg.5
+        for <linux-block@vger.kernel.org>; Fri, 08 Jul 2022 05:47:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:from:subject:to:cc
+         :content-language:content-transfer-encoding;
+        bh=Zf8l3oHCecA1dC7efE4EmKeEheeZ9tHOE/uMGwIqNHM=;
+        b=7iMC9C7ZkWghWsE9PJKX3lo6DWR4XSI7TRKmdJDmZnhzdJsCfGO9ZoKvIuhxIWPpe8
+         YhV8bLBi+cd3nAScQ1WkEsfctgxwE4iUib4pPROo7glcPuP22LgPvv3kYqhrX2NmDcb5
+         mHgQuBpsT4Vyq8y/q5bGwZbIpToGmQj9wdQUMmGQAJr7iDmGbPNOjDqUIBr2LT6BQBJL
+         Th8O3xQxr6M1aC34QoXvT88/kcJ0RNhm+gr+KM7mcU/FH3PZbhARh363x/IubzVx3ozs
+         b/qGsAyptbL9O0je3q0DWXJmklwlIwNJWfqU2UrCcjBXIeVWIejBRqQpYCOrdvKxshMm
+         /NCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:content-language:content-transfer-encoding;
+        bh=Zf8l3oHCecA1dC7efE4EmKeEheeZ9tHOE/uMGwIqNHM=;
+        b=kJX7RR5UYLeqmrwwRfFRk0wfVbSUofFoiHEz8Gdbdt8XN2k4HxaaDgKHpfk50m925G
+         CKJwzhcSNx4yXo5sLZhyEYtYn/2M3wvYod0jU/3+wTAyyF3n+1BIsA0ApA/Eo+ZOWufP
+         1PUNhI961ewSxj3tpMq3j37MHjxruhFBKMirIEMSh93eAppoeB+QMa0asLJ+0Xm957eV
+         L52WrPF8jSIUTjmDW0hDptJvod5W5f2pcwTbFYcHsazf10NY8IbIvEsv3+OJ0bY9Jl2P
+         45cTHfj2XnOXVEGa3WcUv+dX2pE4C9FozCYxxj8uuPGcJvwYFSJx1TLCcSg2uxdL91BU
+         x1Hw==
+X-Gm-Message-State: AJIora9dKkkRRFPZb/wI/NwMbdP4qbcafOs5ZRhDZQqDdKLAVqLimofw
+        53UA9CUWI79idkH08Jd2AllnJg==
+X-Google-Smtp-Source: AGRyM1stczfP8QuacibbPocVTEoKXye8Tz91bdIZiEnft3xi2HF0pTTk6i0BVmK9QaRawQR7cUWZmg==
+X-Received: by 2002:a17:902:7290:b0:16b:b6b5:7e6c with SMTP id d16-20020a170902729000b0016bb6b57e6cmr3778890pll.116.1657284461997;
+        Fri, 08 Jul 2022 05:47:41 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id c9-20020a624e09000000b0052974b651b9sm1984457pfb.38.2022.07.08.05.47.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Jul 2022 05:47:41 -0700 (PDT)
+Message-ID: <1b53ba18-b689-f192-a7e9-19062b3bbafa@kernel.dk>
+Date:   Fri, 8 Jul 2022 06:47:40 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 01/20] block, blk_filter: enable block device filters
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.19-rc6
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
- <1655135593-1900-2-git-send-email-sergei.shtepa@veeam.com>
- <YsWHHcCfSVFklh4M@infradead.org>
- <ff78a1ee-8bc5-6e8e-040f-978cd07eacfe@veeam.com>
- <YscXTGXumE5Ust15@infradead.org>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <YscXTGXumE5Ust15@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.24.11.83]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- colmbx01.amust.local (172.18.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29078F7554657D6B
-X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Linus,
+
+NVMe pull request with another id quirk addition, and a tracing fix.
+Please pull!
 
 
-On 7/7/22 19:26, Christoph Hellwig wrote:
-> 
-> On Thu, Jul 07, 2022 at 10:26:55AM +0200, Sergei Shtepa wrote:
->> Thank you, Christoph, for your attention to the patch.
->>
->> I am preparing the next version of the patch. In it, I planned to
->> simplify the bdev_filer code.
->> I will make changes in it, in accordance with your comments, and
->> will add your code and check it on my test labs.
->>
->> But I'm not sure if using the blk_mq_freeze_queue() is appropriate.
->> If I understood the code correctly, it is based on the expectation
->> that the counter q->q_usage_counter will decrease to zero.
->> To increase it, a blk_queue_enter() is used. And at the time of
->> calling the filter_bio() in the submit_bio_noacct(), this counter
->> has not yet been increased. I will double check this and try to
->> get rid of the bdev->bd_filter_lock.
-> Indeed.  For this to work we'd need to call the filter driver
-> later.  Which is brings up another question:  Is there a real
-> need to attach the filter driver to the bdev and thus potentially
-> partition?  The rest of the block layer operates on the whole disk
-> after the intial partition remapping, and besides allowing the
-> filter driver to be called under q_usage_counter, this would
-> also clean up some concepts.  It would probably also allow to
-> remove the repeat return value over just using submit_bio_noacct
-> similar to how normal stacking drivers reinject bios.
-> 
+The following changes since commit f3163d8567adbfebe574fb22c647ce5b829c5971:
 
-Thank you Christoph.
-This is the most crucial question for the entire patch.
-The filtering location sets restrictions for the filter code and
-determines its main algorithm.
+  Merge tag 'nvme-5.19-2022-06-30' of git://git.infradead.org/nvme into block-5.19 (2022-06-30 14:00:11 -0600)
 
-1. Work at the partition or disk level?
-At the user level, programs operate with block devices.
-In fact, the "disk" entity makes sense only for the kernel level. 
-When the user chooses which block devices to backup and which not,
-he operates with mounting points, which are converted into block
-devices, partitions. Therefore, it is better to handle bio before
-remapping to disk.
-If the filtering is performed after remapping, then we will be
-forced to apply a filter to the entire disk, or complicate the
-filtering algorithm by calculating which range of sectors bio is
-addressed to. And if bio is addressed to the partition boundary...
-Filtering at the block device level seems to me a simpler solution.
-But this is not the biggest problem.
+are available in the Git repository at:
 
-2. Can the filter sleep or postpone bio processing to the worker thread?
-The problem is in the implementation of the COW algorithm.
-If I send a bio to read a chunk (one bio), and then pass a write bio,
-then with some probability I am reading partially overwritten data.
-Writing overtakes reading. And flags REQ_SYNC and REQ_PREFLUSH don't help.
-Maybe it's a disk driver issue, or a hypervisor, or a NAS, or a RAID,
-or maybe normal behavior. I don't know. Although, maybe I'm not working
-correctly with flags. I have seen the comments on patch 11/20, but I am
-not sure that the fixes will solve this problem.
-But because of this, I have to postpone the write until the read completes.
+  git://git.kernel.dk/linux-block.git tags/block-5.19-2022-07-08
 
-2.1 The easiest way to solve the problem is to block the writer's thread
-with a semaphore. And for bio with a flag REQ_NOWAIT, complete processing
-with bio_wouldblock_error(). This is the solution currently being used.
+for you to fetch changes up to 6b0de7d0f3285df849be2b3cc94fc3a0a31987bf:
 
-2.2 Another solution is possible without putting the thread into a sleep
-state, but with placing a write bio in a queue to another thread.
-This solution is used in the veeamsnap out-of-tree module and it has
-performance issues. I don't like. But when handling make_request_fn,
-which was on kernels before 5.10, there was no choice.
+  Merge tag 'nvme-5.19-2022-07-07' of git://git.infradead.org/nvme into block-5.19 (2022-07-07 17:38:19 -0600)
 
-The current implementation, when the filtering is performed before
-remapping, allows to handle the bio to the partition, and allows to
-switch the writer's thread to the sleep state.
-I had to pay for it with a reference counter on the filter and a spinlock.
-It may be possible to do better with RCU. I haven't tried it yet.
+----------------------------------------------------------------
+block-5.19-2022-07-08
 
-If I am blocked by the q->q_usage_counter counter, then I will not
-be able to execute COW in the context of the current thread due to deadlocks.
-I will have to use a scheme with an additional worker thread.
-Bio filtering will become much more complicated.
+----------------------------------------------------------------
+Jens Axboe (1):
+      Merge tag 'nvme-5.19-2022-07-07' of git://git.infradead.org/nvme into block-5.19
 
-From an architectural point of view, I see the filter as an intermediate
-layer between the file system and the block layer. If we lower the filter
-deep into the block layer, then restrictions will be imposed on its use.
+Keith Busch (2):
+      nvme-pci: phison e16 has bogus namespace ids
+      nvme: use struct group for generic command dwords
+
+ drivers/nvme/host/pci.c   | 3 ++-
+ drivers/nvme/host/trace.h | 2 +-
+ include/linux/nvme.h      | 2 ++
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+-- 
+Jens Axboe
 
