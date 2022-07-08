@@ -2,189 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B48BCCA483
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 04:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E8EC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 05:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237070AbiGHEyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jul 2022 00:54:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55832 "EHLO
+        id S237197AbiGHFmG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 01:42:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237225AbiGHEyl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 00:54:41 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ABC376E9E
-        for <linux-block@vger.kernel.org>; Thu,  7 Jul 2022 21:54:39 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id r14so23169381wrg.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Jul 2022 21:54:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sz8usM5OOAxMSGMRGNk8MoEaRmhzBeAasBjyztwmQ0o=;
-        b=XvQr0qdgMR+nOcAcTf+7xs8BktG18BYs/gyLp5C5uUsjKtaGS7EF9lRf5zMCPTk5BJ
-         91x/Spo8Cfl4CVSPbPoMfLrZsEwhY0cNHM2q7EZ0nlSFf2pbkNNGBgFJwDr4PWfiQA1R
-         rjSqjpl0EY3iSCJAU48gfTIUWBgXCZlfQnTkkQe5IaGiy4iNSAVkSmARbuu5920d6StE
-         Mu+9ay0uGrpKJNlbX9QXXUknZR2EeKcCJs4NUI/9GG+xW0j5zMKpqA9wT3lgzcNdk1P3
-         +DDWrQu8tOvaOqcdVi11eMbXfr8ZoiUe4Ta28ix+r6raRL7MH0DfN1S0WQseo23ZyBuK
-         IaKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sz8usM5OOAxMSGMRGNk8MoEaRmhzBeAasBjyztwmQ0o=;
-        b=nOnEY6/9dwdiVn7WMhUlunf9lTK9EhKGsND4jcNy2bUrbientGjk8Uv6ui55TT8SEk
-         PmK8ALQseqfazBOITL1+eTEB2WytCnpCM+UkMljLVsuFTKVLxZqoJtrapupHVR1owBWP
-         77tfCKhRztILQmNyBHG38YWfhT71GNp8weqVikcBFCuoixL7Zco6SG5slHVbuSDVYRxr
-         ZpIzO2usSF6NeG110RcDzYGn1/HUXab5IiqZqkW0DINIOK0mRgsYFeRjCnGhAw4qBQl2
-         NjB9fhU3+dXId5ZKFkDe+ktKSTiXy9Sp9n4aU/kWkvefL5JnhZMWjHUQ9+ie6Z8g3p4r
-         vLfg==
-X-Gm-Message-State: AJIora84HPftY+pz+Q2ZvwvebpqIuNcURuCwSyhk53L/OcYfVlE1JY7/
-        eOVgiWJ3MN4Ktu3di72G6osPZXmB1AnTa12/GnVjlg==
-X-Google-Smtp-Source: AGRyM1tIeGQJ+ivPnEvcRAtn4O4y3vU//xrt6CdwdEW1jsM9325goPmktj2iKPfJEmyAwwTZyTpi7ATaQ047jGlt+PQ=
-X-Received: by 2002:adf:e804:0:b0:21d:6e85:7550 with SMTP id
- o4-20020adfe804000000b0021d6e857550mr1349414wrm.337.1657256077460; Thu, 07
- Jul 2022 21:54:37 -0700 (PDT)
+        with ESMTP id S230384AbiGHFmA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 01:42:00 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF54B6257;
+        Thu,  7 Jul 2022 22:41:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=3lzXW6qPtXhFeu2P9jaQ+m4mcBJQg8NEszfW+aPdopc=; b=pKJSk7J/mBEW8xdHWutGVehOFY
+        p0qp/idvfZYuedVhcUBizLhFJLkM5fGCdHAiq+Llz9gHNg5cgsr709b6FeSEf2zwZmDyrbcYIPind
+        9xjkIIYALhNlEiVViU8PUThjk8I6o5kDZuJhlsu9rEF0mSPw2xTjOdrCzgqrtJf/fOeoOl0F6bQ1H
+        GBDzAlpip1xt6NHwFAUP0i/jY9RI5IF/1+XsJyUuwabLFulKcGeNw7tRroaeAQLop/9SjtJQpU0R5
+        lD8ylOoFYvN/UIy3DI1Y0tWFHCCEWItqu03+LS4kMqb/vx4ad/4+y6DiZIFzH+3Y01/MHzPOpLIoF
+        c3uo4EMA==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1o9gkK-009IZv-Lk; Thu, 07 Jul 2022 23:41:45 -0600
+Message-ID: <72a5bf2e-cd56-a85c-2b99-cb8729a66fed@deltatee.com>
+Date:   Thu, 7 Jul 2022 23:41:40 -0600
 MIME-Version: 1.0
-References: <20220702040959.3232874-1-davidgow@google.com> <20220702040959.3232874-2-davidgow@google.com>
- <Ysd9FG1fOSnzKv8d@dev-arch.thelio-3990X>
-In-Reply-To: <Ysd9FG1fOSnzKv8d@dev-arch.thelio-3990X>
-From:   David Gow <davidgow@google.com>
-Date:   Fri, 8 Jul 2022 12:54:26 +0800
-Message-ID: <CABVgOS=-B3HDxS-6N2Yn897C7giPtBe3jxLomY_Om15Kee5UYw@mail.gmail.com>
-Subject: Re: [PATCH v5 2/4] module: panic: Taint the kernel when selftest
- modules load
-To:     Nathan Chancellor <nathan@kernel.org>
-Cc:     Brendan Higgins <brendanhiggins@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Ogness <john.ogness@linutronix.de>,
-        Joe Fradley <joefradley@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        KUnit Development <kunit-dev@googlegroups.com>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Michal Marek <michal.lkml@markovi.net>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-CA
+To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
+Cc:     shinichiro.kawasaki@wdc.com, dan.j.williams@intel.com,
+        yukuai3@huawei.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Song Liu <song@kernel.org>
+References: <20220614074827.458955-1-hch@lst.de>
+ <20220614074827.458955-5-hch@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20220614074827.458955-5-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: hch@lst.de, axboe@kernel.dk, shinichiro.kawasaki@wdc.com, dan.j.williams@intel.com, yukuai3@huawei.com, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, song@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: REGRESSION: [PATCH 4/4] block: freeze the queue earlier in
+ del_gendisk
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 8, 2022 at 8:40 AM Nathan Chancellor <nathan@kernel.org> wrote:
->
-> On Sat, Jul 02, 2022 at 12:09:57PM +0800, David Gow wrote:
-> > Taint the kernel with TAINT_TEST whenever a test module loads, by adding
-> > a new "TEST" module property, and setting it for all modules in the
-> > tools/testing directory. This property can also be set manually, for
-> > tests which live outside the tools/testing directory with:
-> > MODULE_INFO(test, "Y");
-> >
-> > Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-> > Signed-off-by: David Gow <davidgow@google.com>
-> > ---
-> >  kernel/module/main.c  | 7 +++++++
-> >  scripts/mod/modpost.c | 3 +++
-> >  2 files changed, 10 insertions(+)
-> >
-> > diff --git a/kernel/module/main.c b/kernel/module/main.c
-> > index fed58d30725d..730503561eb0 100644
-> > --- a/kernel/module/main.c
-> > +++ b/kernel/module/main.c
-> > @@ -1988,6 +1988,13 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
-> >       /* Set up license info based on the info section */
-> >       set_license(mod, get_modinfo(info, "license"));
-> >
-> > +     if (!get_modinfo(info, "test")) {
-> > +             if (!test_taint(TAINT_TEST))
-> > +                     pr_warn_once("%s: loading test module taints kernel.\n",
-> > +                                  mod->name);
-> > +             add_taint_module(mod, TAINT_TEST, LOCKDEP_STILL_OK);
-> > +     }
-> > +
-> >       return 0;
-> >  }
-> >
-> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> > index 29d5a841e215..5937212b4433 100644
-> > --- a/scripts/mod/modpost.c
-> > +++ b/scripts/mod/modpost.c
-> > @@ -2191,6 +2191,9 @@ static void add_header(struct buffer *b, struct module *mod)
-> >
-> >       if (strstarts(mod->name, "drivers/staging"))
-> >               buf_printf(b, "\nMODULE_INFO(staging, \"Y\");\n");
-> > +
-> > +     if (strstarts(mod->name, "tools/testing"))
-> > +             buf_printf(b, "\nMODULE_INFO(test, \"Y\");\n");
-> >  }
-> >
-> >  static void add_exported_symbols(struct buffer *buf, struct module *mod)
-> > --
-> > 2.37.0.rc0.161.g10f37bed90-goog
-> >
-> >
->
-> Hi David,
->
-> This change has landed in linux-next as commit e20729ede7ed ("module:
-> panic: taint the kernel when selftest modules load") and on all of my
-> test machines, I see this new message printed, even though as far as I
-> am aware, I am not loading any testing modules. For example, in QEMU, I
-> see:
->
-> [    0.596978] serio: loading test module taints kernel.
->
-> and on my Honeycomb LX2, I see:
->
-> [    5.400861] fuse: loading test module taints kernel.
->
-> It seems like the get_modinfo() check might be wrong? The following diff
-> resolves it for me, I can send a formal patch if necessary (although it
-> appears to have gone in via -mm so I assume Andrew can squash this in).
->
+Hi,
 
-Whoops: this is definitely the wrong way round. Thanks very much for
-catching it! (I'd swapped it locally at some point to test, and
-must've accidentally committed it.)
+On 2022-06-14 01:48, Christoph Hellwig wrote:
+> Freeze the queue earlier in del_gendisk so that the state does not
+> change while we remove debugfs and sysfs files.
+> 
+> Ming mentioned that being able to observer request in debugfs might
+> be useful while the queue is being frozen in del_gendisk, which is
+> made possible by this change.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I've sent out v6 with this fixed (and a couple of other minor changes):
-https://lore.kernel.org/linux-kselftest/20220708044847.531566-2-davidgow@google.com/T/#u
+I'm not really sure why this is yet, but this patch in rc4 causes some
+random failures with mdadm tests.
 
-That being said, if just squashing your change below in is easier, I'm
-fine with that, too. (The other changes are minor enough that we could
-live without them and/or send them in separately.)
+It seems the 11spare-migration tests starts failing roughly every other
+run because the block device is not quite cleaned up after mdadm --stop
+by the time the next mdadm --create commands starts, or rather there
+appears to be a race now between the newly created device and the one
+being cleaned up. This results in an infrequent sysfs panic with a
+duplicate filename error (see the end of this email).
 
-Unless there are any objections, should Andrew update this patch in
-his tree, and we remove the series from the kunit tree?
+I managed to bisect this and found a09b314005f3a09 to be the problematic
+commit.
 
-Cheers,
--- David
+Reverting seems to fix it.
 
->
-> diff --git a/kernel/module/main.c b/kernel/module/main.c
-> index 730503561eb0..4f91e41b8bc9 100644
-> --- a/kernel/module/main.c
-> +++ b/kernel/module/main.c
-> @@ -1988,7 +1988,7 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
->         /* Set up license info based on the info section */
->         set_license(mod, get_modinfo(info, "license"));
->
-> -       if (!get_modinfo(info, "test")) {
-> +       if (get_modinfo(info, "test")) {
->                 if (!test_taint(TAINT_TEST))
->                         pr_warn_once("%s: loading test module taints kernel.\n",
->                                      mod->name);
+Thanks,
+
+Logan
+
+> ---
+>  block/genhd.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index e0675772178b0..278227ba1d531 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -623,6 +623,7 @@ void del_gendisk(struct gendisk *disk)
+>  	 * Prevent new I/O from crossing bio_queue_enter().
+>  	 */
+>  	blk_queue_start_drain(q);
+> +	blk_mq_freeze_queue_wait(q);
+>  
+>  	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+>  		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+> @@ -646,8 +647,6 @@ void del_gendisk(struct gendisk *disk)
+>  	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+>  	device_del(disk_to_dev(disk));
+>  
+> -	blk_mq_freeze_queue_wait(q);
+> -
+>  	blk_throtl_cancel_bios(disk->queue);
+>  
+>  	blk_sync_queue(q);
+
+
+[ 1026.373014] sysfs: cannot create duplicate filename
+'/devices/virtual/block/md124'
+[ 1026.374616] CPU: 1 PID: 11046 Comm: mdadm Not tainted
+5.19.0-rc4-eid-vmlocalyes-dbg-00065-gff4ec5f79108 #2430
+[ 1026.376546] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+1.14.0-2 04/01/2014
+[ 1026.378000] Call Trace:
+[ 1026.378461]  <TASK>
+[ 1026.378867]  dump_stack_lvl+0x5a/0x74
+[ 1026.379558]  dump_stack+0x10/0x12
+[ 1026.380178]  sysfs_warn_dup.cold+0x17/0x27
+[ 1026.380944]  sysfs_create_dir_ns+0x17d/0x190
+[ 1026.381765]  ? sysfs_create_mount_point+0x80/0x80
+[ 1026.382638]  ? __kasan_check_read+0x11/0x20
+[ 1026.383401]  ? class_dir_child_ns_type+0x23/0x30
+[ 1026.384267]  kobject_add_internal+0x145/0x460
+[ 1026.385084]  kobject_add+0xf3/0x150
+[ 1026.385733]  ? kset_create_and_add+0xe0/0xe0
+[ 1026.386529]  ? __kasan_check_read+0x11/0x20
+[ 1026.387306]  ? mutex_unlock+0x12/0x20
+[ 1026.387986]  ? device_add+0x1da/0xf20
+[ 1026.388676]  device_add+0x224/0xf20
+[ 1026.389316]  ? kobject_set_name_vargs+0x95/0xb0
+[ 1026.390163]  ? __fw_devlink_link_to_suppliers+0x180/0x180
+[ 1026.391157]  ? sprintf+0xae/0xe0
+[ 1026.391784]  device_add_disk+0x1b8/0x5f0
+[ 1026.392520]  md_alloc+0x4c9/0x800
+[ 1026.393131]  ? __kasan_check_read+0x11/0x20
+[ 1026.393921]  md_probe+0x24/0x30
+[ 1026.394506]  blk_request_module+0x9a/0x100
+[ 1026.395268]  blkdev_get_no_open+0x66/0xa0
+[ 1026.395993]  blkdev_get_by_dev.part.0+0x24/0x570
+[ 1026.396854]  ? devcgroup_check_permission+0xed/0x240
+[ 1026.397770]  blkdev_get_by_dev+0x51/0x60
+[ 1026.398497]  blkdev_open+0xa4/0x140
+[ 1026.399146]  do_dentry_open+0x2a7/0x6e0
+[ 1026.399854]  ? blkdev_close+0x50/0x50
+[ 1026.400546]  vfs_open+0x58/0x60
+[ 1026.401125]  path_openat+0x77e/0x13f0
+[ 1026.401830]  ? lookup_open.isra.0+0xaf0/0xaf0
+[ 1026.402615]  ? kvm_sched_clock_read+0x18/0x40
+[ 1026.403441]  ? sched_autogroup_detach+0x20/0x20
+[ 1026.404267]  ? __this_cpu_preempt_check+0x13/0x20
+[ 1026.405141]  do_filp_open+0x154/0x280
+[ 1026.405833]  ? may_open_dev+0x60/0x60
+[ 1026.406558]  ? __kasan_check_read+0x11/0x20
+[ 1026.407302]  ? do_raw_spin_unlock+0x98/0x100
+[ 1026.408067]  ? alloc_fd+0x183/0x340
+[ 1026.408718]  do_sys_openat2+0x119/0x2c0
+[ 1026.409437]  ? kmem_cache_free+0x156/0x690
+[ 1026.410167]  ? dput+0x29/0x750
+[ 1026.410730]  ? build_open_flags+0x280/0x280
+[ 1026.411607]  ? putname+0x7c/0x90
+[ 1026.412164]  __x64_sys_openat+0xe7/0x160
+[ 1026.412919]  ? __ia32_compat_sys_open+0x130/0x130
+[ 1026.413630]  ? syscall_enter_from_user_mode+0x21/0x60
+[ 1026.414271]  ? lockdep_hardirqs_on+0x82/0x110
+[ 1026.414828]  ? trace_hardirqs_on+0x3d/0x100
+[ 1026.415376]  do_syscall_64+0x3b/0x90
+[ 1026.415837]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+[ 1026.416473] RIP: 0033:0x7fab048f3be7
+[ 1026.416938] Code: 25 00 00 41 00 3d 00 00 41 00 74 47 64 8b 04 25 18
+00 00 00 85 c0 75 6b 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f
+05 <48> 3d 00 f0 ff ff 0f 87 95 00 00 00 48 8b 4c 24 28 64 48 2b 0c 25
+[ 1026.419219] RSP: 002b:00007ffc3c3d7ae0 EFLAGS: 00000246 ORIG_RAX:
+0000000000000101
+[ 1026.420162] RAX: ffffffffffffffda RBX: 00000000000003e8 RCX:
+00007fab048f3be7
+[ 1026.421045] RDX: 0000000000004082 RSI: 00007ffc3c3d7b70 RDI:
+00000000ffffff9c
+[ 1026.421928] RBP: 00007ffc3c3d7b70 R08: 0000000000000000 R09:
+00007ffc3c3d79f0
+[ 1026.422809] R10: 0000000000000000 R11: 0000000000000246 R12:
+0000000000004082
+[ 1026.423696] R13: 0000000000000009 R14: 00007ffc3c3d7b68 R15:
+0000556054ddd970
+[ 1026.424608]  </TASK>
+[ 1026.424982] kobject_add_internal failed for md124 with -EEXIST, don't
+try to register things with the same name in the same directory.
+
