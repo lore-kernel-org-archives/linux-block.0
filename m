@@ -2,163 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A62E1C43334
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jul 2022 23:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D9DC43334
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jul 2022 03:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239307AbiGHXTV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jul 2022 19:19:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
+        id S229481AbiGIDUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jul 2022 23:20:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239055AbiGHXTS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 19:19:18 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58AC4198E;
-        Fri,  8 Jul 2022 16:19:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1657322357; x=1688858357;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pc1V+hc3nLWgOYR+olBZbWKKUSmpRc4Pzg4j2XhZTsc=;
-  b=d3s20VfXAQpo7EUYJhov3LbnxmCHb0PsxoC/WVTpNulf9jSSbvFvjrX5
-   fLrCi/+D8vibq94+rLMT4VDL9+vzkdma8SBZDWAaPZ6CyzfFiHtn+gJ9l
-   uDyKq8qcXXk8PLl0NQun8IM0o8nlQJW2LVhs70HZQ/l/4A2y49vv+kz7X
-   yzJBXZ0ap1fbn/heJM1GeKTsDVhSEiNi/RTLnm7EnO7H3fbMBBoos5QN7
-   mJRdUXv99KFmTJGG5tlvMQVTIxlCZLQdIOYhwuLKQDlB0ofVYXXu9F96y
-   LQAw+aaGliTD/NCpMXj+8Bp2AZkGQwITCAzgJQIYSBrztW6r641GH4Mv3
-   A==;
-X-IronPort-AV: E=Sophos;i="5.92,256,1650902400"; 
-   d="scan'208";a="203871836"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jul 2022 07:19:17 +0800
-IronPort-SDR: fwdJIj+8vtiTFBvlPVAfN0DqXZKVziEowQ7etfKPZRKh73SWByZie0zT/mpN7CnY2plsLVfBiu
- RqwTibA29BCC6ZCwybuwO8/5g+36BYAMDkJRr091DV/W9IUBkeEa9+e1Dg1DbZSmy2m10eJ6Ls
- E+MRqMwoTKksf3WYG0BBk7/KNJpNAFLTVSfU3NGOg8gGd9MKoRfbpV96BbnCtqHvkIsM1aLgi5
- 71oVWYhGfNDI0qxuHBYvmeJ8qX8XGE2MQOPGnZ1hfSRs8Mdx34rbtxnTj599t75g28uvv5yNTn
- 0XCbYX1IqusGBtSZNZlBWJvT
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Jul 2022 15:36:22 -0700
-IronPort-SDR: +9lmFEz7PD2i02CoLXx4j06g+16XdH2CuHirM0FvmwbCBHG2fyHc+zVwAHy36SYa2yi+VWKrxj
- I63ZtHTp7uTQeVcTPy1hkz1Z5NjNnb54fjQbKIKAf7eCh/U58BjqYGrr9Gq+pTslKbcxLnricQ
- x8bFZ1wpLx1XxAOHPlnPwfYEU90FoT98SR4j0+/MDBdrCIddvaqenaV61Wx0wwBmcJWbS7NhOM
- q6YlgwAh93M3B+6VNqT6A2TtM42zDl6DvSC+oo7cECDSQiTAn/kXKWyP4keIltwyCXeli1Ze82
- cwI=
-WDCIronportException: Internal
-Received: from phd010370.ad.shared (HELO naota-xeon.wdc.com) ([10.225.55.250])
-  by uls-op-cesaip01.wdc.com with ESMTP; 08 Jul 2022 16:19:16 -0700
-From:   Naohiro Aota <naohiro.aota@wdc.com>
-To:     linux-btrfs@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Naohiro Aota <naohiro.aota@wdc.com>
-Subject: [PATCH 13/13] btrfs: zoned: wait until zone is finished when allocation didn't progress
-Date:   Sat,  9 Jul 2022 08:18:50 +0900
-Message-Id: <bfda89d79a418ce9bdb68bf3f444a95a04b63181.1657321126.git.naohiro.aota@wdc.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <cover.1657321126.git.naohiro.aota@wdc.com>
-References: <cover.1657321126.git.naohiro.aota@wdc.com>
+        with ESMTP id S229379AbiGIDUA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jul 2022 23:20:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E2AFB6390E
+        for <linux-block@vger.kernel.org>; Fri,  8 Jul 2022 20:19:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657336795;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6tEa4h3AuCWiVLODFkT+rRGEj5LGAYoGPlr3UlbCOYw=;
+        b=FpT5AFxqL+I9faMuejwxFrwIt+2h8HOCgnr7E9FgwtDAd/SuJE3KoHqEKWyJ9itxdgmV60
+        zUngDHHZk7u6SAw7+fpA80GZqHFcsOSIAaW4QogQ/vD1v6fxHzRr4dIAXeNzdSL5mXxF4b
+        y9/2SR2HJ6TSCqXB5gJW1GdK+0STpNA=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-647-9f9kaj-zPkOqSXh52ads8Q-1; Fri, 08 Jul 2022 23:19:53 -0400
+X-MC-Unique: 9f9kaj-zPkOqSXh52ads8Q-1
+Received: by mail-pj1-f70.google.com with SMTP id mm6-20020a17090b358600b001ef7bd409b0so326792pjb.8
+        for <linux-block@vger.kernel.org>; Fri, 08 Jul 2022 20:19:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6tEa4h3AuCWiVLODFkT+rRGEj5LGAYoGPlr3UlbCOYw=;
+        b=0xbtVUiYGB9f2kiXRs4MxA/p1QY8rv9UwjemAluWIeCLB71iflqAvfwnme7KClvQYc
+         2KvxcSBQ+XDAt7XTSHALaQ9i5SOjt5juqhkIAW0y45ID13SLUCmXfmR4XSkbqr6b5hsN
+         LrYY0ipaZXEC0fpoFtZcnX8Llp+78twf98ao1T3LOXlfUFFmGMGjhcwmxF+jK0nvPGNs
+         0rVo2/q7b1hsw7lQStN01EjGdPsUYPst1crEnZ1WwNoSYZvKUFQfASLoYG1EdvRsgVwA
+         aSUPGLdVktVLU31RTT883ZJEJwDVTRqTWHDUX0e9jtcYY0SzUVRupNF8lg3U39N+DpBs
+         Y9hw==
+X-Gm-Message-State: AJIora/s/cXeCDisXO9AQsTGnEhiB/RQDsfpUnlXeRdJb9Q/owtSTl80
+        tAs73o4k602mUvD7CLoSe18AM/4ciIEDJ5Lk5EeSCBOt5+uNcbEajLeiVpBFcxKev8XGt6lUcmN
+        2Bk461ix/JXnnH+aKNFUhXpsAxEMsBLtEB5vLpqc=
+X-Received: by 2002:a17:902:7fc2:b0:16b:dc53:5060 with SMTP id t2-20020a1709027fc200b0016bdc535060mr6963798plb.95.1657336792550;
+        Fri, 08 Jul 2022 20:19:52 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tJVTqZUrgGkJr+6RIms7c9nogEy1BpM0bt5qUl2JUpn+ksyqbgeDB7DA6BEla8M+7/b+q+bsw5N5dBmlbfJVI=
+X-Received: by 2002:a17:902:7fc2:b0:16b:dc53:5060 with SMTP id
+ t2-20020a1709027fc200b0016bdc535060mr6963773plb.95.1657336792237; Fri, 08 Jul
+ 2022 20:19:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAHj4cs9Jhg4DZRnck_rdGWtpv9nLTAF__CVtPQu9vViVUZ-Odg@mail.gmail.com>
+ <def01493-bd2d-bed4-ab1a-9b4304687692@acm.org>
+In-Reply-To: <def01493-bd2d-bed4-ab1a-9b4304687692@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Sat, 9 Jul 2022 11:19:41 +0800
+Message-ID: <CAHj4cs-xUroRHbvY4kBPCBFgch7d24yXDFLo4P_ym8KEkHCvug@mail.gmail.com>
+Subject: Re: [bug report] blktests nvme/005 trigered debugfs: Directory
+ 'hctx0' with parent '/' already present!
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the allocated position doesn't progress, we cannot submit IOs to
-finish a block group, but there should be ongoing IOs that will finish a
-block group. So, in that case, we wait for a zone to be finished and retry
-the allocation after that.
+On Sat, Jul 9, 2022 at 2:59 AM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 7/8/22 09:32, Yi Zhang wrote:
+> > I found below error log when I ran blktests nvme/ tests on aarch64
+> > with the latest linux-block/for-next,
+> > Please help check it, and feel free to let me know if you need any
+> > info/test for it, thanks.
+>
+> Is this 100% reproducible? I tried to reproduce this yesterday but
+> without success. See also
+Yes, it always can be reproduced at the second run of "nvme_trtype=tcp
+./check nvme/005"
+I reproduced it on aarch64, not sure if it's arch related.
 
-Introduce a new flag BTRFS_FS_NEED_ZONE_FINISH for fs_info->flags to
-indicate we need a zone finish to have proceeded. The flag is set when the
-allocator detected it cannot activate a new block group. And, it is cleared
-once a zone is finished.
+> https://bugzilla.kernel.org/show_bug.cgi?id=216191.
+I tried block/001, and cannot reproduce it.
 
-CC: stable@vger.kernel.org # 5.16+
-Fixes: afba2bc036b0 ("btrfs: zoned: implement active zone tracking")
-Signed-off-by: Naohiro Aota <naohiro.aota@wdc.com>
----
- fs/btrfs/ctree.h   | 4 ++++
- fs/btrfs/disk-io.c | 1 +
- fs/btrfs/inode.c   | 9 +++++++--
- fs/btrfs/zoned.c   | 6 ++++++
- 4 files changed, 18 insertions(+), 2 deletions(-)
+>
+> Thanks,
+>
+> Bart.
 
-diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
-index c215e15baea2..ddecd92fa848 100644
---- a/fs/btrfs/ctree.h
-+++ b/fs/btrfs/ctree.h
-@@ -638,6 +638,9 @@ enum {
- 	/* Indicate we have half completed snapshot deletions pending. */
- 	BTRFS_FS_UNFINISHED_DROPS,
- 
-+	/* Indicate we have to finish a zone to do next allocation. */
-+	BTRFS_FS_NEED_ZONE_FINISH,
-+
- #if BITS_PER_LONG == 32
- 	/* Indicate if we have error/warn message printed on 32bit systems */
- 	BTRFS_FS_32BIT_ERROR,
-@@ -1084,6 +1087,7 @@ struct btrfs_fs_info {
- 
- 	spinlock_t zone_active_bgs_lock;
- 	struct list_head zone_active_bgs;
-+	wait_queue_head_t zone_finish_wait;
- 
- 	/* Updates are not protected by any lock */
- 	struct btrfs_commit_stats commit_stats;
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index 914557d59472..1fe5f79770a0 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -3135,6 +3135,7 @@ void btrfs_init_fs_info(struct btrfs_fs_info *fs_info)
- 	init_waitqueue_head(&fs_info->transaction_blocked_wait);
- 	init_waitqueue_head(&fs_info->async_submit_wait);
- 	init_waitqueue_head(&fs_info->delayed_iputs_wait);
-+	init_waitqueue_head(&fs_info->zone_finish_wait);
- 
- 	/* Usable values until the real ones are cached from the superblock */
- 	fs_info->nodesize = 4096;
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 681e2cb4dd9c..815121350d91 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -1643,8 +1643,13 @@ static noinline int run_delalloc_zoned(struct btrfs_inode *inode,
- 		if (ret == 0)
- 			done_offset = end;
- 
--		if (done_offset == start)
--			return -ENOSPC;
-+		if (done_offset == start) {
-+			struct btrfs_fs_info *info = inode->root->fs_info;
-+
-+			wait_var_event(&info->zone_finish_wait,
-+				       !test_bit(BTRFS_FS_NEED_ZONE_FINISH, &info->flags));
-+			continue;
-+		}
- 
- 		if (!locked_page_done) {
- 			__set_page_dirty_nobuffers(locked_page);
-diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-index 67098f3fcd14..471d870875ed 100644
---- a/fs/btrfs/zoned.c
-+++ b/fs/btrfs/zoned.c
-@@ -2006,6 +2006,9 @@ static int do_zone_finish(struct btrfs_block_group *block_group, bool fully_writ
- 	/* For active_bg_list */
- 	btrfs_put_block_group(block_group);
- 
-+	clear_bit(BTRFS_FS_NEED_ZONE_FINISH, &fs_info->flags);
-+	wake_up_all(&fs_info->zone_finish_wait);
-+
- 	return 0;
- }
- 
-@@ -2042,6 +2045,9 @@ bool btrfs_can_activate_zone(struct btrfs_fs_devices *fs_devices, u64 flags)
- 	}
- 	mutex_unlock(&fs_info->chunk_mutex);
- 
-+	if (!ret)
-+		set_bit(BTRFS_FS_NEED_ZONE_FINISH, &fs_info->flags);
-+
- 	return ret;
- }
- 
--- 
-2.35.1
+>
+
+
+--
+Best Regards,
+  Yi Zhang
 
