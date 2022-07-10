@@ -2,77 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D240C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jul 2022 16:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA5EC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 10 Jul 2022 01:15:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiGIQKp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Jul 2022 12:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48014 "EHLO
+        id S229523AbiGJBPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Jul 2022 21:15:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbiGIQKo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jul 2022 12:10:44 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8CA2C64E
-        for <linux-block@vger.kernel.org>; Sat,  9 Jul 2022 09:10:43 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id z12-20020a17090a7b8c00b001ef84000b8bso4577940pjc.1
-        for <linux-block@vger.kernel.org>; Sat, 09 Jul 2022 09:10:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=oKYe7AbRdgVEW/SANKAs5haVdcr7sWgF6qR0TOl7CFA=;
-        b=xZVaLqikU36jhj1A4dOH8bgtHaag6Ph0SgpXUIbYaojF08fyZA0VuNGvd/6BRHkOhX
-         Fkv0iZQ/5Dehe9qcUwNnUkvhwpCdL7tjPm3fWKo8POpw0tPi4wS++DQpNdSC0wvREuzs
-         iPDnS7YvfdgCzy/3PBme6kEU/tGnLiDD7WHZw188oR0+qMOLR3xhAcd4NijCJBHE7ytv
-         gJ23XT4+RH+ss945HdXMIggYe/ztEn7eKKVkJpRD41P/Tb9Mw32DWrycP0NnFAC5UYr/
-         nT4owGRCgWxf9bXMl6sxFU9HBFsJ9oOTX/2qAQrB2PeCtrk5qtgpdw7MqiNxGDV4y8FD
-         X9ow==
+        with ESMTP id S229450AbiGJBPK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jul 2022 21:15:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B50F5BF77
+        for <linux-block@vger.kernel.org>; Sat,  9 Jul 2022 18:15:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657415707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LnmwoE1ESaUSXake5lmFYTPM0/kp0klpWUDGs+CL1aM=;
+        b=iexgIstEzH0mvfOwUWvrOuMXkDkio3ncneZJZNjxfPwNkqK1i13UtIx0cvxDXNdbKn+xLv
+        nLS5qMxaWCVFLLuEKZltvcdSozxnypwoWMBTacORxV9VE9imEvJ5NvpiFsi+uL90vs7xAu
+        v/dKEQSQgNgIixv0iKLPAkMmlaK2UZM=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-515-x9VX5zMlMgSbJzb2pe4ISg-1; Sat, 09 Jul 2022 21:15:06 -0400
+X-MC-Unique: x9VX5zMlMgSbJzb2pe4ISg-1
+Received: by mail-pl1-f200.google.com with SMTP id c15-20020a170902d48f00b0016c01db365cso1525578plg.20
+        for <linux-block@vger.kernel.org>; Sat, 09 Jul 2022 18:15:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=oKYe7AbRdgVEW/SANKAs5haVdcr7sWgF6qR0TOl7CFA=;
-        b=obDws7BQIScJUQ4mX6aYbqsqHPC4jrCrWI9H0VkGd20cxjOcCNlcYN7Gc62IvWXw0X
-         KqEV9llDmiGeavAMuexNNAq7gy/xAGzFg2iqUYzShPwrSJmzpQyyCs/3M80+zAIROOqi
-         zVcUfFmkqHYYF9gklLfZWeeGaP+xRszwXOeUc91RfTNBZ/vDvkETng712mZMMEgOvn7M
-         vo4gqsRqmZhsEdDHI5ZgJhRYfAcZOPSuR7SXhYSqfZmfeikTu0OszxuYUDdD8Qc4tHNg
-         3jX/t68kd8U/T1Nw6hxcPOnxjwcpbfHCBb7kXoBLt2O8D2Cko8aCaXgpUla3xAh3X3ws
-         GzZg==
-X-Gm-Message-State: AJIora8ZAby2VX1eJD7xZPtPPjubgeedRXMGIilOlSw19mfSQIYvE+AY
-        x4AGVkYQDCeh6Dwy0q24md8erA==
-X-Google-Smtp-Source: AGRyM1tWJGs3avV/brergo65kWANuqJO7WzKiLb2HtkjNdtbzRXZIEDYRoeN0iFN1TpF9SvaxLPBRg==
-X-Received: by 2002:a17:90b:1bcc:b0:1ed:361b:702a with SMTP id oa12-20020a17090b1bcc00b001ed361b702amr6903521pjb.1.1657383042514;
-        Sat, 09 Jul 2022 09:10:42 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u17-20020a170902e5d100b0016bea2a0a8dsm1526795plf.91.2022.07.09.09.10.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Jul 2022 09:10:42 -0700 (PDT)
-Message-ID: <44c1e78a-ae48-775e-0329-c954c7b04a80@kernel.dk>
-Date:   Sat, 9 Jul 2022 10:10:40 -0600
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LnmwoE1ESaUSXake5lmFYTPM0/kp0klpWUDGs+CL1aM=;
+        b=E9e9yQsi7OAOeEz6jp/mF0wtQaNPwFzzQB40oOPS4oCoz0niEs3x1973ul9scWd9fV
+         thZVciUCAN5U1KNuMSSPXoQ8keWaxPgg3VHQjSteWxPCPUScqFGo37Y2rsG6wetZJqmu
+         b7V6Z+niByr1A0P/V6WVLOlnntL4R58WDdxoNGbOinFoevUz/0cm8WU4qZ4ENlP4+LXl
+         oO/ghEP/W59mGOdLNNGkDgl2pEVF+nGsrQ3S4VANEFNG8tYSnhwsxFM1nKm5BVeYRERX
+         m+SkonxKG8yeNRQf4ER1nYs5fRUFfPRFBwFRDUm0s5n1lot9NnVigiOlsHyh/xRtLYKs
+         7j+Q==
+X-Gm-Message-State: AJIora9mxAcvS3fyZVJa+an1QfP3gTkFFoDbB9Gt18w7S7TYs8YzF/3t
+        opNkwV4/qrAzA+GXcsspEhRjG6KZKqRULsAioo+ZkYGxKfZFpGiOnowP9KO/BIS+TO0YW2VKrTw
+        rwLahaBNgvQKB+l8o/N05VbQrJLbvAHFtcR12JT0=
+X-Received: by 2002:a05:6a00:793:b0:52a:b261:f8e7 with SMTP id g19-20020a056a00079300b0052ab261f8e7mr10004223pfu.20.1657415705341;
+        Sat, 09 Jul 2022 18:15:05 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tqJATeVZl4K9fNLEfFlRcSBawUoqH1LFdOK/P3Q+zc5HAvKZdmY9aMRgLd4rtICcDO1JtOVkruH4QCr3aZBZs=
+X-Received: by 2002:a05:6a00:793:b0:52a:b261:f8e7 with SMTP id
+ g19-20020a056a00079300b0052ab261f8e7mr10004202pfu.20.1657415705013; Sat, 09
+ Jul 2022 18:15:05 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 01/13] block: add bdev_max_segments() helper
-Content-Language: en-US
-To:     Naohiro Aota <naohiro.aota@wdc.com>, linux-btrfs@vger.kernel.org
-Cc:     linux-block@vger.kernel.org,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <cover.1657321126.git.naohiro.aota@wdc.com>
- <b4401816e33a90b1f05a1e32b420f073a8438591.1657321126.git.naohiro.aota@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <b4401816e33a90b1f05a1e32b420f073a8438591.1657321126.git.naohiro.aota@wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAHj4cs9Jhg4DZRnck_rdGWtpv9nLTAF__CVtPQu9vViVUZ-Odg@mail.gmail.com>
+ <def01493-bd2d-bed4-ab1a-9b4304687692@acm.org> <CAHj4cs-xUroRHbvY4kBPCBFgch7d24yXDFLo4P_ym8KEkHCvug@mail.gmail.com>
+In-Reply-To: <CAHj4cs-xUroRHbvY4kBPCBFgch7d24yXDFLo4P_ym8KEkHCvug@mail.gmail.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Sun, 10 Jul 2022 09:14:53 +0800
+Message-ID: <CAHj4cs960iq+KfSaCWCtm=xB3bNYNVkewLmZPpuaO66ZZ9nwXQ@mail.gmail.com>
+Subject: Re: [bug report] blktests nvme/005 trigered debugfs: Directory
+ 'hctx0' with parent '/' already present!
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/8/22 5:18 PM, Naohiro Aota wrote:
-> Add bdev_max_segments() like other queue parameters.
+On Sat, Jul 9, 2022 at 11:19 AM Yi Zhang <yi.zhang@redhat.com> wrote:
+>
+> On Sat, Jul 9, 2022 at 2:59 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> >
+> > On 7/8/22 09:32, Yi Zhang wrote:
+> > > I found below error log when I ran blktests nvme/ tests on aarch64
+> > > with the latest linux-block/for-next,
+> > > Please help check it, and feel free to let me know if you need any
+> > > info/test for it, thanks.
+> >
+> > Is this 100% reproducible? I tried to reproduce this yesterday but
+> > without success. See also
+> Yes, it always can be reproduced at the second run of "nvme_trtype=tcp
+> ./check nvme/005"
+> I reproduced it on aarch64, not sure if it's arch related.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Just reproduced it on x86_64, so pls try to run two times for the test.
+
+
+>
+> > https://bugzilla.kernel.org/show_bug.cgi?id=216191.
+> I tried block/001, and cannot reproduce it.
+>
+> >
+> > Thanks,
+> >
+> > Bart.
+>
+> >
+>
+>
+> --
+> Best Regards,
+>   Yi Zhang
+
+
 
 -- 
-Jens Axboe
+Best Regards,
+  Yi Zhang
 
