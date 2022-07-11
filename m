@@ -2,155 +2,247 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0ADCCA487
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 11:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBC1C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 11:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231171AbiGKL24 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 07:28:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40328 "EHLO
+        id S229996AbiGKL6J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 07:58:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230448AbiGKL2Q (ORCPT
+        with ESMTP id S229456AbiGKL6I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 07:28:16 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA876382
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 04:08:02 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20220711110757epoutp04bc95187db409cc7c5962bccc1a64ada3~Awbw7n2A13101131011epoutp04Q
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 11:07:57 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20220711110757epoutp04bc95187db409cc7c5962bccc1a64ada3~Awbw7n2A13101131011epoutp04Q
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1657537677;
-        bh=rfBwCyaPTWgve+aNLgO7YznJVxf6LVxBLuPK/IeYRRc=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=F+hXuGoBJ6QKBCMAyP9aiiuQZEPtpYXgK38YjcSA+pODmEzQXy0NA5IhNScEcXYee
-         CN01+PU6xlBwfiVcu8DgVBQl2oBp5dg5DZgkI9BUYS501vuF7UCmNqNYWhEq3VfTUn
-         2AWMaKvnSVuE2m1XdYp7fwY4+ZDMoPcgq4fHk5jo=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20220711110756epcas5p10847bd1317dc4be3e3fa169081c35b62~AwbwOTEhI1352413524epcas5p18;
-        Mon, 11 Jul 2022 11:07:56 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4LhLhV2MlMz4x9Pt; Mon, 11 Jul
-        2022 11:07:54 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        55.20.09566.A840CC26; Mon, 11 Jul 2022 20:07:54 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20220711110753epcas5p4169b9e288d15ca35740dbb66a6f6983a~AwbtzOTky0387003870epcas5p4j;
-        Mon, 11 Jul 2022 11:07:53 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220711110753epsmtrp22fc9aa1e8677181c1165fc0e32b6db35~AwbtyZxb_2556725567epsmtrp22;
-        Mon, 11 Jul 2022 11:07:53 +0000 (GMT)
-X-AuditID: b6c32a4a-b8dff7000000255e-6e-62cc048afe11
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D7.89.08802.9840CC26; Mon, 11 Jul 2022 20:07:53 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.110.206.5]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220711110751epsmtip2af1d1762efbc5c9c0992382025e8908a~AwbsAefGg0337803378epsmtip2B;
-        Mon, 11 Jul 2022 11:07:51 +0000 (GMT)
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@kernel.dk
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, asml.silence@gmail.com,
-        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com,
-        Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH for-next 0/4] nvme-multipathing for uring-passthrough
-Date:   Mon, 11 Jul 2022 16:31:51 +0530
-Message-Id: <20220711110155.649153-1-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
+        Mon, 11 Jul 2022 07:58:08 -0400
+Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B71D32B96;
+        Mon, 11 Jul 2022 04:58:05 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VJ0fXuV_1657540681;
+Received: from 30.82.254.107(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VJ0fXuV_1657540681)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Jul 2022 19:58:02 +0800
+Message-ID: <bec45186-cafa-98bf-1397-bc9d51c65a6e@linux.alibaba.com>
+Date:   Mon, 11 Jul 2022 19:58:01 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH V4 0/2] ublk: add io_uring based userspace block driver
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+References: <20220711022024.217163-1-ming.lei@redhat.com>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <20220711022024.217163-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNJsWRmVeSWpSXmKPExsWy7bCmpm4Xy5kkg9vr+SyaJvxltpizahuj
-        xeq7/WwWNw/sZLJYufook8W71nMsFkf/v2WzOP/2MJPFpEPXGC323tK2mL/sKbvFutfvWRx4
-        PHbOusvucf7eRhaPy2dLPTat6mTz2Lyk3mP3zQY2j74tqxg9Pm+SC+CIyrbJSE1MSS1SSM1L
-        zk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xNtVVy8QnQdcvMAbpVSaEsMacUKBSQWFyspG9n
-        U5RfWpKqkJFfXGKrlFqQklNgUqBXnJhbXJqXrpeXWmJlaGBgZApUmJCdMWnSZdaCJ7wVf7dt
-        ZWtgXMLdxcjJISFgIrH48yaWLkYuDiGB3YwSFw7/ZYJwPjFK3Nn9iRnC+cwo0bmhlwWm5cXV
-        DqiqXYwST/p/McFV7Ty+A6iKg4NNQFPiwuRSkAYRAReJzqbprCA1zAJ3GSUadq1mBEkIC7hK
-        dJ5cywhSzyKgKnFueyVImFfAUuLkztfsEMvkJWZe+s4OEReUODnzCdgRzEDx5q2zwa6TEGjl
-        kDhwfT3UdS4S538vYYKwhSVeHd8CNUhK4vO7vWwQdrLEpZnnoGpKJB7vOQhl20u0nupnBrmH
-        Gej+9bv0IXbxSfT+fsIEEpYQ4JXoaBOCqFaUuDfpKSuELS7xcMYSKNtDYseju8wgtpBArMTl
-        139ZJzDKzULywSwkH8xCWLaAkXkVo2RqQXFuemqxaYFRXmo5PC6T83M3MYJTqZbXDsaHDz7o
-        HWJk4mA8xCjBwawkwvvn7KkkId6UxMqq1KL8+KLSnNTiQ4ymwFCdyCwlmpwPTOZ5JfGGJpYG
-        JmZmZiaWxmaGSuK8Xlc3JQkJpCeWpGanphakFsH0MXFwSjUw7fH1dTM2X3OgsHCff4LUFVOX
-        7RbPT8x9etj27FH3FN+Lq713vjoiKGD5/nqd8OONUnGGq6QsmzY+yuUL7uuX3a/WcTzj+5Or
-        iolbb/UclmTQm1sWv6u0yGCh4+/zv1taZDaouiuVMvu8D7vmILzvHZ/rl74y3bKP/JyfJ0UL
-        vzqpd2PL/tAjXBqHpJvS8yS8jJ5YlOb84Tn5x8OY6/p833u2xtPd5yzslrI9Hrj0zZzC9yV5
-        Lst3ip+IF5j45OCbXQcmaetZ6x+9fPnoTNmdN+6/k8w+qc0fN0OptedjtIuq9d28g8U+nmLr
-        XmbcOcV14lf4veUcd672nkjZNWvyxj9Fh1e0TFp9xnMuw6NF65VYijMSDbWYi4oTAbe2JGEu
-        BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMLMWRmVeSWpSXmKPExsWy7bCSvG4ny5kkg7eXFS2aJvxltpizahuj
-        xeq7/WwWNw/sZLJYufook8W71nMsFkf/v2WzOP/2MJPFpEPXGC323tK2mL/sKbvFutfvWRx4
-        PHbOusvucf7eRhaPy2dLPTat6mTz2Lyk3mP3zQY2j74tqxg9Pm+SC+CI4rJJSc3JLEst0rdL
-        4MqYNOkya8ET3oq/27ayNTAu4e5i5OSQEDCReHG1g6mLkYtDSGAHo0T70m3MEAlxieZrP9gh
-        bGGJlf+es0MUfWSUOPrlPmMXIwcHm4CmxIXJpSA1IgJeEit6/oANYhZ4yigxeVY/I0hCWMBV
-        ovPkWrB6FgFViXPbK0HCvAKWEid3voaaLy8x89J3doi4oMTJmU9YQGxmoHjz1tnMExj5ZiFJ
-        zUKSWsDItIpRMrWgODc9t9iwwCgvtVyvODG3uDQvXS85P3cTIzjctbR2MO5Z9UHvECMTB+Mh
-        RgkOZiUR3j9nTyUJ8aYkVlalFuXHF5XmpBYfYpTmYFES573QdTJeSCA9sSQ1OzW1ILUIJsvE
-        wSnVwCT82/aO16mNke1JZuUGKnf7ew838dxN/O9jmbJZTEfnkvo9WZ41ZxOLytwfOqn1M4Qp
-        V5UWnNlzMmTiMWve5uPc11yfx9v3GspbpL7b0X746Yvt22Of3Z6xglGa8a1h1qsXkvJT33NM
-        MmmKPHJlG2da0d+MT+o6upUXPZc0/Jh+lsvXwW1Pb5Ntv+cXhlIORrlXKxXiK4N82Zan/oq9
-        LJrqoC+w+KHzrrUOD98mOYi3nf55IORkhddrlY8bT/Isyfv5fz5DeHnRxM0v9/wR9ea8wvw4
-        1PJXnPJPpQ7373GCTrxm1VOc93jJBrzxXHv0xf335at7/0nPW1Dw2O+PxSMN1yuvfXyE2WYL
-        rljWo8RSnJFoqMVcVJwIALhWjX7mAgAA
-X-CMS-MailID: 20220711110753epcas5p4169b9e288d15ca35740dbb66a6f6983a
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220711110753epcas5p4169b9e288d15ca35740dbb66a6f6983a
-References: <CGME20220711110753epcas5p4169b9e288d15ca35740dbb66a6f6983a@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-nvme passthrough lacks multipathing capability and some of us have
-already expressed interest to see this plumbed. Most recently during LSFMM,
-around 2 months back.
+Hello Ming,
 
-This series wires up multipathing for uring-passthrough commands.
-Attempt is not to affect the common path (i.e. when
-requeue/failover does not trigger) with allocation or deferral. The
-most important design bit is to treat "struct io_uring_cmd" in the same
-way as "struct bio" is treated by the block-based nvme multipath.
-Uring-commands are queued when path is not available, and resubmitted on
-discovery of new path. Also if passthrough command on multipath-node is
-failed, it is resubmitted on a different path.
+First thanks for this great work, I think ublk will be a powerful
+replacement for tcmu. I read your v3 ublk kernel and user-space
+codes, and have some ublk design questions here:
 
-Testing:
-Using the upstream fio that support uring-passthrough:
+1) As I said before, currently ublk still needs user-space backstore
+to allocate io buffer in advance, for example, UBLK_IO_FETCH_REQ
+command needs to set ublk_io->addr when starting device. Currently,
+some of our internal business may create hundreds or thousands of
+tcmu devices in one host, when switching to ublk, it'll need user-space
+backstore to allocate lots of memory in advance, which will waste memory
+in a host with swap off. Also user-space backstore may use advanced
+network components, they may maintain internal memory pool, which
+can be used as io buffer.
 
-fio -iodepth=16 -rw=randread -ioengine=io_uring_cmd -bs=4k -numjobs=4
--size=1G -iodepth_batch_submit=16 -group_reporting -cmd_type=nvme
--filename=/dev/ng0n1 -name=uring-pt
+So I'd like to suggest that at least we add a new flag and keep GET_DATA
+command. When used, FETCH command does not need to pass io
+buffer addr, and backstore needs to send a GET_DATA command with
+user addr for write request.
 
-1. Multiple failover - every command is retried 1-5 times before completion
-2. Fail nvme_find_path() - this tests completion post requeue
-3. Combine above two
-4. Repeat above but for passthrough commands which do not generate bio
-(e.g. flush command)
+Support high flexibility, let's user decides what's best for them.
+
+2) complicated ublk user-space
+First forgive me  I think current ublk user-space codes looks somewhat
+complicated:
+  1. UBLK_CMD_START_DEV and io handler worker need to be
+in different task context, because UBLK_CMD_START_DEV needs
+to wait the number of queue depth of sqes to be submitted in advance.
+
+  2. mixed getting ublk command and target io handle in one io_uring instance
+I'm not sure it's a good design, see ublksrv_handle_cqe(), which contains
+many flag handle work and is_target_io() check, I think the data flow is not
+that clear for me at least
+
+  3. helper like tcmulib_get_next_command()
+I wonder whether current ublk user-space can offer similar helper which
+will return a set of io commands to backstore easily.
+
+I'd like to suggest:
+1. When starting ublk dev, pass io_uring fd for every queue, then in
+blk-mq->queue_rq(), it'll generate one cqe for every coming request,
+not need to issue fetch sqes command in advance, kernel codes would
+simplify a bit,  UBLK_IO_FLAG_ACTIVE may be discarded. And helper
+like returning a set of io command would be added easily. Note these
+io_uring fd would be just used for notifying io command generated.
+
+2. We use another io_uring fd per queue to handle GET_DATA or
+COMMIT_REQ command. Indeed, if we can support synchronous ioctl
+interface to do GET_DATA and COMMIT_REQ, we may make libublk
+really simple.
 
 
-Anuj Gupta (2):
-  nvme: compact nvme_uring_cmd_pdu struct
-  nvme-multipath: add multipathing for uring-passthrough commands
+Here I'd like to describe how we use tcmu. A main thread call
+tcmulib_get_next_command() to get a set of io commands, then
+it dispatches them to user-space io wokers. Take write requests as
+example, io worker use ioctl(2) to get data from bios, and send
+data to distributed fs, finally call ioctl(2) to commit req. Multiple
+io workers can run concurrently. Since GET_DATA(write request)
+or COMMIT_REQ(read request) mainly do memcpy work, one
+io_uring instance will just do these jobs sequentially, which may
+not take advantage of multi-cpu.
 
-Kanchan Joshi (2):
-  io_uring, nvme: rename a function
-  io_uring: grow a field in struct io_uring_cmd
+So finally, I would suggest ublk or libulk just offer basic interface:
+add/start/delete dev interface, get io commands sescriptor, get io
+data, commit io helper. Let's user-space target make decisions,
+for example, whether to use eventfd.
 
- drivers/nvme/host/ioctl.c     | 157 +++++++++++++++++++++++++++++-----
- drivers/nvme/host/multipath.c |  36 +++++++-
- drivers/nvme/host/nvme.h      |  26 ++++++
- include/linux/io_uring.h      |  44 +++++++++-
- io_uring/uring_cmd.c          |   4 +-
- 5 files changed, 237 insertions(+), 30 deletions(-)
+Thanks for your patience
 
--- 
-2.25.1
+
+Regards,
+Xiaoguang Wang
+
+> Hello Guys,
+>
+> ublk driver is one kernel driver for implementing generic userspace block
+> device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
+> ublk server[1] which is the userspace part of ublk for communicating
+> with ublk driver and handling specific io logic by its target module.
+>
+> Another thing ublk driver handles is to copy data between user space buffer
+> and request/bio's pages, or take zero copy if mm is ready for support it in
+> future. ublk driver doesn't handle any IO logic of the specific driver, so
+> it is small/simple, and all io logics are done by the target code in ublkserver.
+>
+> The above two are main jobs done by ublk driver.
+>
+> ublk driver can help to move IO logic into userspace, in which the
+> development work is easier/more effective than doing in kernel, such as,
+> ublk-loop takes < 200 lines of loop specific code to get basically same 
+> function with kernel loop block driver, meantime the performance is
+> is even better than kernel loop with same setting. ublksrv[1] provide built-in
+> test for comparing both by running "make test T=loop", for example, see
+> the test result running on VM which is over my lattop(root disk is
+> nvme/device mapper/xfs):
+>
+> 	[root@ktest-36 ubdsrv]#make -s -C /root/git/ubdsrv/tests run T=loop/001 R=10
+> 	running loop/001
+> 		fio (ublk/loop(/root/git/ubdsrv/tests/tmp/ublk_loop_VqbMA), libaio, bs 4k, dio, hw queues:1)...
+> 		randwrite: jobs 1, iops 32572
+> 		randread: jobs 1, iops 143052
+> 		rw: jobs 1, iops read 29919 write 29964
+> 	
+> 	[root@ktest-36 ubdsrv]# make test T=loop/003
+> 	make -s -C /root/git/ubdsrv/tests run T=loop/003 R=10
+> 	running loop/003
+> 		fio (kernel_loop/kloop(/root/git/ubdsrv/tests/tmp/ublk_loop_ZIVnG), libaio, bs 4k, dio, hw queues:1)...
+> 		randwrite: jobs 1, iops 27436
+> 		randread: jobs 1, iops 95273
+> 		rw: jobs 1, iops read 22542 write 22543 
+>
+>
+> Another example is high performance qcow2 support[2], which could be built with
+> ublk framework more easily than doing it inside kernel.
+>
+> Also there are more people who express interests on userspace block driver[3],
+> Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
+> requirement from Google. Ziyang Zhang from Alibaba said they "plan to
+> replace TCMU by UBD as a new choice" because UBD can get better throughput than
+> TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
+> storage service for providing storage to containers.
+>
+> It is io_uring based: io request is delivered to userspace via new added
+> io_uring command which has been proved as very efficient for making nvme
+> passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
+> shared/mmap buffer is used for sharing io descriptor to userspace, the
+> buffer is readonly for userspace, each IO just takes 24bytes so far.
+> It is suggested to use io_uring in userspace(target part of ublk server)
+> to handle IO request too. And it is still easy for ublkserver to support
+> io handling by non-io_uring, and this work isn't done yet, but can be
+> supported easily with help o eventfd.
+>
+> This way is efficient since no extra io command copy is required, no sleep
+> is needed in transferring io command to userspace. Meantime the communication
+> protocol is simple and efficient, one single command of
+> UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
+> command result in one trip. IO handling is often batched after single
+> io_uring_enter() returns, both IO requests from ublk server target and
+> IO commands could be handled as a whole batch.
+>
+> And the patch by patch change can be found in the following
+> tree:
+>
+> https://github.com/ming1/linux/tree/my_for-5.20-ubd-devel_v4
+>
+> ublk server repo(master branch):
+>
+> 	https://github.com/ming1/ubdsrv
+>
+> Any comments are welcome!
+>
+> Since V3:
+> - address Gabriel Krisman Bertazi's comments on V3: add userspace data
+>   validation before handling command, remove warning, ...
+> - remove UBLK_IO_COMMIT_REQ command as suggested by Zixiang and Gabriel Krisman Bertazi
+> - fix one request double free when running abort
+> - rewrite/cleanup ublk_copy_pages(), then this handling becomes very
+>   clean
+> - add one command of UBLK_IO_REFETCH_REQ for allowing ublk_drv to build
+>   as module
+>
+> Since V2:
+> - fix one big performance problem:
+> 	https://github.com/ming1/linux/commit/3c9fd476951759858cc548dee4cedc074194d0b0
+> - rename as ublk, as suggested by Gabriel Krisman Bertazi 
+> - lots of cleanup & code improvement & bugfix, see details in git
+>   hisotry
+>
+>
+> Since V1:
+>
+> Remove RFC now because ublk driver codes gets lots of cleanup, enhancement and
+> bug fixes since V1:
+>
+> - cleanup uapi: remove ublk specific error code,  switch to linux error code,
+> remove one command op, remove one field from cmd_desc
+>
+> - add monitor mechanism to handle ubq_daemon being killed, ublksrv[1]
+>   includes builtin tests for covering heavy IO with deleting ublk / killing
+>   ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
+>   and the abort/stop mechanism is simple
+>
+> - fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
+>   MQ ublk-loop devices(test/scratch)
+>
+> - improve batching submission as suggested by Jens
+>
+> - improve handling for starting device, replace random wait/poll with
+> completion
+>
+> - all kinds of cleanup, bug fix,..
+>
+> Ming Lei (2):
+>   ublk: add io_uring based userspace block driver
+>   ublk_drv: add UBLK_IO_REFETCH_REQ for supporting to build as module
+>
+>  drivers/block/Kconfig         |    6 +
+>  drivers/block/Makefile        |    2 +
+>  drivers/block/ublk_drv.c      | 1701 +++++++++++++++++++++++++++++++++
+>  include/uapi/linux/ublk_cmd.h |  173 ++++
+>  4 files changed, 1882 insertions(+)
+>  create mode 100644 drivers/block/ublk_drv.c
+>  create mode 100644 include/uapi/linux/ublk_cmd.h
+>
 
