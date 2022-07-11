@@ -2,163 +2,320 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FCD2C43334
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 18:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F796C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 19:57:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229870AbiGKS7k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 14:59:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43344 "EHLO
+        id S229664AbiGKT5C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 15:57:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbiGKS7j (ORCPT
+        with ESMTP id S229476AbiGKT5C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 14:59:39 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06801FCD9
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 11:59:37 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220711185935epoutp022b43b9660761d650c6c0e931ba08f757~A23kNtkhg2680326803epoutp02G
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 18:59:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220711185935epoutp022b43b9660761d650c6c0e931ba08f757~A23kNtkhg2680326803epoutp02G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1657565975;
-        bh=8WNQ5ChxuGE5Q71oImwf+rEE0lr/N+rms/8BqaHTtew=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=H4C2iQDUpwqtM8f3kMctEqEoZK7BXqDvQ5hv6d1RTbOJcoV4JGsEbJCG3tEkBEpph
-         9pgFQM7duYs4tI9phNOzqnpiw6DJp46+453fRl/8hsmxktT+VQc6rxyawV1Lai+t7m
-         AVhzPk9DzVfwStaWK9EW393Vo8X/YlagVfZtP+Ac=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20220711185934epcas5p3aec09119e47cc1946203b0b36a9a2581~A23jMqlp32413124131epcas5p3R;
-        Mon, 11 Jul 2022 18:59:34 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4LhY8h2NvSz4x9Pp; Mon, 11 Jul
-        2022 18:59:32 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        22.0C.09566.4137CC26; Tue, 12 Jul 2022 03:59:32 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220711185931epcas5p1bf5d0c8aa5ed5b6d262b81023c2a266e~A23gRc9HF2883828838epcas5p1P;
-        Mon, 11 Jul 2022 18:59:31 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220711185931epsmtrp237cb38be85c8eb71b8f670812d341b3f~A23gQpCjA0917509175epsmtrp2x;
-        Mon, 11 Jul 2022 18:59:31 +0000 (GMT)
-X-AuditID: b6c32a4a-ba3ff7000000255e-7d-62cc731425f3
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        AB.C5.08802.3137CC26; Tue, 12 Jul 2022 03:59:31 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220711185929epsmtip1aac3f7335cfdd50514bcdcb4c399abdf~A23eBcsj00490104901epsmtip1V;
-        Mon, 11 Jul 2022 18:59:29 +0000 (GMT)
-Date:   Tue, 12 Jul 2022 00:24:06 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Stefan Metzmacher <metze@samba.org>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, kbusch@kernel.org,
-        axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
-        gost.dev@samsung.com
+        Mon, 11 Jul 2022 15:57:02 -0400
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9AD5720D;
+        Mon, 11 Jul 2022 12:57:00 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id r129-20020a1c4487000000b003a2d053adcbso5575198wma.4;
+        Mon, 11 Jul 2022 12:57:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=O95XBONbhmcHFULPXsQnT4f0oCEVatoS/EeJhmunXGs=;
+        b=yyO2jz55rH4OEt1rGu/qz1g4dxICGifBHIiJ2ABbe6tQKV2jwL6TdzYMlCfQ8yHR0H
+         TVWkLwzvhIrMQ34jD8PXKJm4gKdqwg0zw04cxPl+lao/1dfziwp+hC+BsKbB9r9kOMGI
+         c9dpTFcZIRTeQKVtrTCJF/RYdFh1C+5nle4VxB4MORERlVXIxb2wCjojUB0vDOa9MYdz
+         sxGkOplCTx0O1Z8WKNU06fdM/2J4NsVQhT/xzpz5JSyIgDUULjj9rxjKJxO+igq+Xh6v
+         oomlWGNPlxxds/jKYxlDSu1mQE5cuDaQg0Yv9wC3suOYJ+pTl8fgz42HW5g/InqaYynM
+         USow==
+X-Gm-Message-State: AJIora+j54s/CTaLDGlbtbvsBMJJt5un7qjs91l2Xamo7qu28hlHqrAi
+        TmR9dEVwcUOkm+7ygrPvYbA=
+X-Google-Smtp-Source: AGRyM1u5Fb/D8Jsr7DeZ4Lnoq4U99v2IXTLSKnvm+VomEXYyv0wyV8hSvXYPgG6roa8mI3z1Pyblng==
+X-Received: by 2002:a05:600c:219a:b0:3a2:e4b0:4cfb with SMTP id e26-20020a05600c219a00b003a2e4b04cfbmr60548wme.2.1657569418752;
+        Mon, 11 Jul 2022 12:56:58 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id b10-20020a5d634a000000b0021b89f8662esm6684298wrw.13.2022.07.11.12.56.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Jul 2022 12:56:58 -0700 (PDT)
+Message-ID: <5f30c7de-03b1-768a-d44f-594ed2d1dc75@grimberg.me>
+Date:   Mon, 11 Jul 2022 22:56:56 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
 Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
  uring-passthrough commands
-Message-ID: <20220711185406.GB20562@test-zns>
-MIME-Version: 1.0
-In-Reply-To: <5c71b8f6-afec-8ef6-0a70-d13e71ded79c@samba.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Tf0xbVRTHva+lPJpVnx2ES3FdfWYhTCktK/UVqTNhzOdGHG7GMZyWUp4t
-        Utra1zJlM5IiICTAxBFXKsFEZLE1LlRgAmVjZYDCBoPpCMYVCUUQM34mKrNstrxq9t/nnPs9
-        P+4596Is/gBHgBYaLJTZoNbjHC67ayAxMSmavp4vGXI8RtjObrGIz5xdgHDdqecQ0/3dCPGV
-        axAhlivG2MT43QGEaPDeBkTfz08TLW3zkcRE2yab+OaPFfYLO8jupjuR5LivnU3eumEl3c5q
-        Dvlt6wdk73QZh2zuqQNkXYcTkBtuYXZUblG6jlIXUGYRZdAYCwoNWiV++JgqQ5Uql0iTpAri
-        WVxkUBdTSvxAVnbSwUJ9sGFcVKLWW4OubDVN48nPp5uNVgsl0hlpixKnTAV6k8wkptXFtNWg
-        FRsoS5pUIklJDQrzinRXb8lN3h3v/ui8j5SBFW4NQFGIyWD/vZQawEX5WC+AE1cW2YyxDuAD
-        x6VIxtgA0DbTA2pA1HZEWfsEYA56AOypXI9gjN8AXJ8KxUehbGwPHGqsjwjV4GCJ8OYn1pA7
-        GkuAk7/f3C7BwmoQ6Cor39bvxDTQ7W9AQszDkuCcq53D8OPwB7ufHcoThSlh1eaLIXcM9hTs
-        7xpGQnkg9j0KA5c84e4OwLrmNoThnXBpuCOSYQHcWO7jMKyBk/axsMYC5zxXw7wfVozUs0LM
-        wgrhwuBcmB+Ftf/4EWZePPhRJZ+RPwl9DfMRDMfC2fOtYSbhWkt5eHJfInD1LxfrLBA2PXSd
-        podKMJwGq1dtEQzvhuWdjqAfDXI8vHAfZTARXuxJ/hxwnCCOMtHFWopONaUYqFP/r1tjLHaD
-        7de899B3YPbXVbEXICjwAoiy8Ghe4MZIPp9XoH6vlDIbVWarnqK9IDW4qo9ZghiNMfgdDBaV
-        VKaQyORyuUyxTy7FY3mHfnLn8zGt2kIVUZSJMv8Xh6BRgjLEQTvP0HFfv9q7sBhzucpe22Ft
-        EV3Rnn7rokRzVNViW3rH+0aeHcJXPjzeKKo0HdZ1Jo/m8F5KrppF/YMradeM0k7heOCJOL8w
-        136mXHlkebBi69z5+BO3d7Van6kYHflij0bWtJTr0NnZiT4y4++7vY8ckUgvDJ8+VYdm5ShW
-        +rqdM8MZxzPwjtpZ6vpWSezLea651wOZgWPDMwsCoXIpYcvnDryf6R8lTM81xxnGPM2oJ8c2
-        tD+9dA29HL/6dqOCeMA9mTlt8ZUvFpUoJ4XiuKmpX67l3uPni2c1RzWe6hOvRcwt+/atDek/
-        ncfozVx36snS3ecG3gzsyvozgYuzaZ1aupdlptX/AkziaK1WBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHIsWRmVeSWpSXmKPExsWy7bCSnK5w8Zkkg0XTFC2aJvxltpizahuj
-        xeq7/WwWNw/sZLJYufook8W71nMsFuffHmaymHToGqPF3lvaFvOXPWW3uLjsJ4vFutfvWRx4
-        PHbOusvucf7eRhaPy2dLPTat6mTz2Lyk3mP3zQY2j7m7+hg9+rasYvT4vEkugDOKyyYlNSez
-        LLVI3y6BK6Px7w7GggucFRf+7GJsYJzF0cXIySEhYCLRsPEiYxcjF4eQwA5GiTl3N7FAJMQl
-        mq/9YIewhSVW/nvODlH0hFFi0u9JbCAJFgFViWNT+1m7GDk42AQ0JS5MLgUJiwioS1x6eQFs
-        DrNAD5PE9jWMILawQLLEpieTmEBsXgFdicerN7JBzFzKJLFy9UuohKDEyZlPoJrNJOZtfsgM
-        Mp9ZQFpi+T8OiLC8RPPW2WBhTgFbifaf7iBhUQFliQPbjjNNYBSahWTQLCSDZiEMmoVk0AJG
-        llWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMFRqKW1g3HPqg96hxiZOBgPMUpwMCuJ
-        8P45eypJiDclsbIqtSg/vqg0J7X4EKM0B4uSOO+FrpPxQgLpiSWp2ampBalFMFkmDk6pBqYz
-        /ZNN6hzbuV1NVhy4JsAVtf/fM4lbk3MCdK4K3NsbY+bnwDh1mWHevMY9b32cW/tXOPZcU2P0
-        ql4euWlbMd+Cgmvpi3w3Pt7lEqsndyx6W43i3JMOd5X4Lnebyse4/fWoObbJNrooQy2xtTHY
-        +f2C2l65ZRmXf/x9bMs+bb6mCpe3xoOa6rXnp1YdPm2ym41t3xGTrwr7Pk11neD0oGDSY9Un
-        Jz4E1id/2b6ic5mL3Vf71MjNQTO1rTyrOeJM3OcaRO0721UyTeJP4eR/3WGv5shFyhevEygK
-        DGZk3bwoII+Nx67zuvVdzcWzzN5Fpst2SkyaqbicYzbPyvucWcctwv/FuaTI6uyXmlbxToml
-        OCPRUIu5qDgRADwyCBQxAwAA
-X-CMS-MailID: 20220711185931epcas5p1bf5d0c8aa5ed5b6d262b81023c2a266e
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_11bf0b_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089
+Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     hch@lst.de, kbusch@kernel.org, axboe@kernel.dk,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
 References: <20220711110155.649153-1-joshi.k@samsung.com>
-        <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
-        <20220711110155.649153-5-joshi.k@samsung.com>
-        <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
-        <5c71b8f6-afec-8ef6-0a70-d13e71ded79c@samba.org>
+ <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+ <20220711110155.649153-5-joshi.k@samsung.com>
+ <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
+ <20220711183746.GA20562@test-zns>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220711183746.GA20562@test-zns>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_11bf0b_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
 
-On Mon, Jul 11, 2022 at 05:12:23PM +0200, Stefan Metzmacher wrote:
->Hi Sagi,
->
->>>@@ -189,6 +190,12 @@ enum {
->>>      NVME_REQ_USERCMD        = (1 << 1),
->>>  };
->>>+static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
->>>+        struct io_uring_cmd *ioucmd)
->>>+{
->
->Shouldn't we have a BUILD_BUG_ON(sizeof(struct nvme_uring_cmd_pdu) > sizeof(ioucmd->pdu));
->here?
-Not sure if I got the concern. We have this already inside
-nvme_ns_uring_cmd function.
+>>> @@ -448,6 +442,14 @@ static int nvme_uring_cmd_io(struct nvme_ctrl 
+>>> *ctrl, struct nvme_ns *ns,
+>>>      pdu->meta_buffer = nvme_to_user_ptr(d.metadata);
+>>>      pdu->meta_len = d.metadata_len;
+>>> +    if (issue_flags & IO_URING_F_MPATH) {
+>>> +        req->cmd_flags |= REQ_NVME_MPATH;
+>>> +        /*
+>>> +         * we would need the buffer address (d.addr field) if we have
+>>> +         * to retry the command. Store it by repurposing ioucmd->cmd
+>>> +         */
+>>> +        ioucmd->cmd = (void *)d.addr;
+>>
+>> What does repurposing mean here?
+> 
+> This field (ioucmd->cmd) was pointing to passthrough command (which
+> is embedded in SQE of io_uring). At this point we have consumed
+> passthrough command, so this field can be reused if we have to. And we
+> have to beceause failover needs recreating passthrough command.
+> Please see nvme_uring_cmd_io_retry to see how this helps in recreating
+> the fields of passthrough command. And more on this below.
 
->>>+    return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
->>>+}
->>>+
->
->>>diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
->>>index d734599cbcd7..57f4dfc83316 100644
->>>--- a/include/linux/io_uring.h
->>>+++ b/include/linux/io_uring.h
->>>@@ -15,6 +15,8 @@ enum io_uring_cmd_flags {
->>>      IO_URING_F_SQE128        = 4,
->>>      IO_URING_F_CQE32        = 8,
->>>      IO_URING_F_IOPOLL        = 16,
->>>+    /* to indicate that it is a MPATH req*/
->>>+    IO_URING_F_MPATH        = 32,
->
->Isn't that nvme specific? If so I don't think it belongs in io_uring.h at all...
+so ioucmd->cmd starts as an nvme_uring_cmd pointer and continues as
+an address of buffer for a later processing that may or may not
+happen in its lifetime?
 
-Right. Removing this was bit ugly in nvme, but yes, need to kill this in
-v2.
+Sounds a bit of a backwards design to me.
 
-------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_11bf0b_
-Content-Type: text/plain; charset="utf-8"
+>>> +    }
+>>>      blk_execute_rq_nowait(req, false);
+>>>      return -EIOCBQUEUED;
+>>>  }
+>>> @@ -665,12 +667,135 @@ int nvme_ns_head_chr_uring_cmd(struct 
+>>> io_uring_cmd *ioucmd,
+>>>      int srcu_idx = srcu_read_lock(&head->srcu);
+>>>      struct nvme_ns *ns = nvme_find_path(head);
+>>>      int ret = -EINVAL;
+>>> +    struct device *dev = &head->cdev_device;
+>>> +
+>>> +    if (likely(ns)) {
+>>> +        ret = nvme_ns_uring_cmd(ns, ioucmd,
+>>> +                issue_flags | IO_URING_F_MPATH);
+>>> +    } else if (nvme_available_path(head)) {
+>>> +        struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+>>> +        struct nvme_uring_cmd *payload = NULL;
+>>> +
+>>> +        dev_warn_ratelimited(dev, "no usable path - requeuing I/O\n");
+>>> +        /*
+>>> +         * We may requeue two kinds of uring commands:
+>>> +         * 1. command failed post submission. pdu->req will be non-null
+>>> +         * for this
+>>> +         * 2. command that could not be submitted because path was not
+>>> +         * available. For this pdu->req is set to NULL.
+>>> +         */
+>>> +        pdu->req = NULL;
+>>
+>> Relying on a pointer does not sound like a good idea to me.
+>> But why do you care at all where did this command came from?
+>> This code should not concern itself what happened prior to this
+>> execution.
+> Required, please see nvme_uring_cmd_io_retry. And this should be more
+> clear as part of responses to your other questions.
 
+I think I understand. But it looks fragile to me.
 
-------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_11bf0b_--
+> 
+>>> +        /*
+>>> +         * passthrough command will not be available during retry as it
+>>> +         * is embedded in io_uring's SQE. Hence we allocate/copy here
+>>> +         */
+>>
+>> OK, that is a nice solution.
+> Please note that prefered way is to recreate the passthrough command,
+> and not to allocate it. We allocate it here because this happens very early
+> (i.e. before processing passthrough command and setting that up inside
+> struct request). Recreating requires a populated 'struct request' .
+
+I think that once a driver consumes a command as queued, it needs a
+stable copy of the command (could be in a percpu pool).
+
+The current design of nvme multipathing is that the request is stripped
+from its bios and placed on a requeue_list, and if a request was not
+formed yet (i.e. nvme available path exist but no usable) the bio is
+placed on the requeue_list.
+
+So ideally we have something sufficient like a bio, that can be linked
+on a requeue list, and is sufficient to build a request, at any point in
+time...
+
+>>
+>>> +        payload = kmalloc(sizeof(struct nvme_uring_cmd), GFP_KERNEL);
+>>> +        if (!payload) {
+>>> +            ret = -ENOMEM;
+>>> +            goto out_unlock;
+>>> +        }
+>>> +        memcpy(payload, ioucmd->cmd, sizeof(struct nvme_uring_cmd));
+>>> +        ioucmd->cmd = payload;
+>>> -    if (ns)
+>>> -        ret = nvme_ns_uring_cmd(ns, ioucmd, issue_flags);
+>>> +        spin_lock_irq(&head->requeue_ioucmd_lock);
+>>> +        ioucmd_list_add(&head->requeue_ioucmd_list, ioucmd);
+>>> +        spin_unlock_irq(&head->requeue_ioucmd_lock);
+>>> +        ret = -EIOCBQUEUED;
+>>> +    } else {
+>>> +        dev_warn_ratelimited(dev, "no available path - failing I/O\n");
+>>
+>> ret=-EIO ?
+> Did not do as it was initialized to -EINVAL. Do you prefer -EIO instead.
+
+It is not an invalid argument error here, it is essentially an IO error.
+So yes, that would be my preference.
+
+>>> +    }
+>>> +out_unlock:
+>>>      srcu_read_unlock(&head->srcu, srcu_idx);
+>>>      return ret;
+>>>  }
+>>> +
+>>> +int nvme_uring_cmd_io_retry(struct nvme_ns *ns, struct request *oreq,
+>>> +        struct io_uring_cmd *ioucmd, struct nvme_uring_cmd_pdu *pdu)
+>>> +{
+>>> +    struct nvme_ctrl *ctrl = ns->ctrl;
+>>> +    struct request_queue *q = ns ? ns->queue : ctrl->admin_q;
+>>> +    struct nvme_uring_data d;
+>>> +    struct nvme_command c;
+>>> +    struct request *req;
+>>> +    struct bio *obio = oreq->bio;
+>>> +    void *meta = NULL;
+>>> +
+>>> +    memcpy(&c, nvme_req(oreq)->cmd, sizeof(struct nvme_command));
+>>> +    d.metadata = (__u64)pdu->meta_buffer;
+>>> +    d.metadata_len = pdu->meta_len;
+>>> +    d.timeout_ms = oreq->timeout;
+>>> +    d.addr = (__u64)ioucmd->cmd;
+>>> +    if (obio) {
+>>> +        d.data_len = obio->bi_iter.bi_size;
+>>> +        blk_rq_unmap_user(obio);
+>>> +    } else {
+>>> +        d.data_len = 0;
+>>> +    }
+>>> +    blk_mq_free_request(oreq);
+>>
+>> The way I would do this that in nvme_ioucmd_failover_req (or in the
+>> retry driven from command retriable failure) I would do the above,
+>> requeue it and kick the requeue work, to go over the requeue_list and
+>> just execute them again. Not sure why you even need an explicit retry
+>> code.
+> During retry we need passthrough command. But passthrough command is not
+> stable (i.e. valid only during first submission). We can make it stable
+> either by:
+> (a) allocating in nvme (b) return -EAGAIN to io_uring, and it will do 
+> allocate + deferral
+> Both add a cost. And since any command can potentially fail, that
+> means taking that cost for every IO that we issue on mpath node. Even if
+> no failure (initial or subsquent after IO) occcured.
+
+As mentioned, I think that if a driver consumes a command as queued,
+it needs a stable copy for a later reformation of the request for
+failover purposes.
+
+> So to avoid commmon-path cost, we go about doing nothing (no allocation,
+> no deferral) in the outset and choose to recreate the passthrough
+> command if failure occured. Hope this explains the purpose of
+> nvme_uring_cmd_io_retry?
+
+I think it does, but I'm still having a hard time with it...
+
+> 
+> 
+>>> +    req = nvme_alloc_user_request(q, &c, nvme_to_user_ptr(d.addr),
+>>> +            d.data_len, nvme_to_user_ptr(d.metadata),
+>>> +            d.metadata_len, 0, &meta, d.timeout_ms ?
+>>> +            msecs_to_jiffies(d.timeout_ms) : 0,
+>>> +            ioucmd->cmd_op == NVME_URING_CMD_IO_VEC, 0, 0);
+>>> +    if (IS_ERR(req))
+>>> +        return PTR_ERR(req);
+>>> +
+>>> +    req->end_io = nvme_uring_cmd_end_io;
+>>> +    req->end_io_data = ioucmd;
+>>> +    pdu->bio = req->bio;
+>>> +    pdu->meta = meta;
+>>> +    req->cmd_flags |= REQ_NVME_MPATH;
+>>> +    blk_execute_rq_nowait(req, false);
+>>> +    return -EIOCBQUEUED;
+>>> +}
+>>> +
+>>> +void nvme_ioucmd_mpath_retry(struct io_uring_cmd *ioucmd)
+>>> +{
+>>> +    struct cdev *cdev = file_inode(ioucmd->file)->i_cdev;
+>>> +    struct nvme_ns_head *head = container_of(cdev, struct nvme_ns_head,
+>>> +            cdev);
+>>> +    int srcu_idx = srcu_read_lock(&head->srcu);
+>>> +    struct nvme_ns *ns = nvme_find_path(head);
+>>> +    unsigned int issue_flags = IO_URING_F_SQE128 | IO_URING_F_CQE32 |
+>>> +        IO_URING_F_MPATH;
+>>> +    struct device *dev = &head->cdev_device;
+>>> +
+>>> +    if (likely(ns)) {
+>>> +        struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+>>> +        struct request *oreq = pdu->req;
+>>> +        int ret;
+>>> +
+>>> +        if (oreq == NULL) {
+>>> +            /*
+>>> +             * this was not submitted (to device) earlier. For this
+>>> +             * ioucmd->cmd points to persistent memory. Free that
+>>> +             * up post submission
+>>> +             */
+>>> +            const void *cmd = ioucmd->cmd;
+>>> +
+>>> +            ret = nvme_ns_uring_cmd(ns, ioucmd, issue_flags);
+>>> +            kfree(cmd);
+>>> +        } else {
+>>> +            /*
+>>> +             * this was submitted (to device) earlier. Use old
+>>> +             * request, bio (if it exists) and nvme-pdu to recreate
+>>> +             * the command for the discovered path
+>>> +             */
+>>> +            ret = nvme_uring_cmd_io_retry(ns, oreq, ioucmd, pdu);
+>>
+>> Why is this needed? Why is reuse important here? Why not always call
+>> nvme_ns_uring_cmd?
+> 
+> Please see the previous explanation.
+> If condition is for the case when we made the passthrough command stable
+> by allocating beforehand.
+> Else is for the case when we avoided taking that cost.
+
+The current design of the multipath failover code is clean:
+1. extract bio(s) from request
+2. link in requeue_list
+3. schedule requeue_work that,
+  3.1 takes bios 1-by-1, and submits them again (exactly the same way)
+
+I'd like us to try to follow the same design where retry is
+literally "do the exact same thing, again". That would eliminate
+two submission paths that do the same thing, but slightly different.
+
+> 
+>>> +        }
+>>> +        if (ret != -EIOCBQUEUED)
+>>> +            io_uring_cmd_done(ioucmd, ret, 0);
+>>> +    } else if (nvme_available_path(head)) {
+>>> +        dev_warn_ratelimited(dev, "no usable path - requeuing I/O\n");
+>>> +        spin_lock_irq(&head->requeue_ioucmd_lock);
+>>> +        ioucmd_list_add(&head->requeue_ioucmd_list, ioucmd);
+>>> +        spin_unlock_irq(&head->requeue_ioucmd_lock);
+>>> +    } else {
+>>> +        dev_warn_ratelimited(dev, "no available path - failing I/O\n");
+>>> +        io_uring_cmd_done(ioucmd, -EINVAL, 0);
+>>
+>> -EIO?
+> Can change -EINVAL to -EIO if that is what you prefer.
+
+Yes.
