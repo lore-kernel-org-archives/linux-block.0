@@ -2,108 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C64D1C43334
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 15:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58DEFC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 16:58:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229979AbiGKPe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 11:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58602 "EHLO
+        id S229883AbiGKQ6N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 12:58:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229578AbiGKPe5 (ORCPT
+        with ESMTP id S229470AbiGKQ6M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 11:34:57 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F3F46113C;
-        Mon, 11 Jul 2022 08:34:56 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C13EC203A0;
-        Mon, 11 Jul 2022 15:34:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1657553694;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ibgfxck5aA+CZ8n/I3QasCKRlyOnnCdyT/M8j1pRBNI=;
-        b=mZxWhYRUcjf1M7Gk9lTlPfnaYdhUuBuG3WLL8byEwJdh5K05OHxnZKGe7Hyiyf+yRyNQzm
-        sf0Z5DLKezRvxqv0rJxAJhOTCJx6ll6uMWz363kFYBIr5RpJNyiqM+PSK/+X6fUL/J4pO4
-        74LOMGnOMb0wbqOjCWnGOHS3n3q2OvM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1657553694;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ibgfxck5aA+CZ8n/I3QasCKRlyOnnCdyT/M8j1pRBNI=;
-        b=PnFmZKyZiNQSna10gPjmonoLB1i/QSlPNArYvasIMjyqsgyWqOlsWvr67m8JPRVDeB+gos
-        KjzbGYJSt8aOprDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9260213322;
-        Mon, 11 Jul 2022 15:34:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id i020Ih5DzGJ0ZQAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Mon, 11 Jul 2022 15:34:54 +0000
-Date:   Mon, 11 Jul 2022 17:30:05 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Naohiro Aota <Naohiro.Aota@wdc.com>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 03/13] btrfs: replace BTRFS_MAX_EXTENT_SIZE with
- fs_info->max_extent_size
-Message-ID: <20220711153005.GZ15169@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <cover.1657321126.git.naohiro.aota@wdc.com>
- <f5c4db672fc1862b1cec6fc3ee75c5aab85f75f1.1657321126.git.naohiro.aota@wdc.com>
- <PH0PR04MB7416D26D6BC98BC13EBD09309B859@PH0PR04MB7416.namprd04.prod.outlook.com>
+        Mon, 11 Jul 2022 12:58:12 -0400
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFD34422EE;
+        Mon, 11 Jul 2022 09:58:11 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id i128-20020a1c3b86000000b003a2ce31b4f8so5358281wma.1;
+        Mon, 11 Jul 2022 09:58:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=0U5+IilDXsW3BQxwBvuwuzwwHS2jIXKuQyNc4QZoJgE=;
+        b=kZlLvWIjtFAtSMonjLdIsOu31jvFzCaKC5egtI0J94f2MTmceNAkf49zpgh2XyGHYu
+         56VZdFUy/PFjit+hot2jp6UAJA9tOH+3/Q7Wm63qV5wxXFwHV7oJix66yI2gbhhKWeBf
+         VWWa0UBoev5Sjy2ZZSRksPoVVmgx/iwuOudEvu0yCfDJgpp6oIHszHbvR2D78y0P/C8s
+         oqxV2kSuY/5DHdxntGYB2fdQ2QVsGGVLT4b7/ooJ6AntxysciVwVz9v9m6bt3tu1n0g1
+         lM1DjIiznM/fEZhu08eZYG1RJVbMrp1rvE/FDrFHWq3IG7Vzq9KyXMZSSyO2PzDS+ffL
+         nuBQ==
+X-Gm-Message-State: AJIora9RUCGUmVKhq9bS9x/FJ+G6QH32kAlfjyf5/Z2LrsD/r5OqnLiF
+        zxphbgh53Ga2/C3f6m27+jE=
+X-Google-Smtp-Source: AGRyM1tDTW2pN9aXI0tb3raSr2YbZRwwOSx9Vn1KdSvNg5gxK9sQ5xn3fSv9QJoTVdTn9JzqblCltg==
+X-Received: by 2002:a7b:cb07:0:b0:3a2:e524:4117 with SMTP id u7-20020a7bcb07000000b003a2e5244117mr9881392wmj.54.1657558690142;
+        Mon, 11 Jul 2022 09:58:10 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id c8-20020a7bc848000000b003a2e7c13a3asm3450777wml.42.2022.07.11.09.58.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Jul 2022 09:58:09 -0700 (PDT)
+Message-ID: <2dde0a5b-e4ce-dd44-0f4b-661c860dd5bd@grimberg.me>
+Date:   Mon, 11 Jul 2022 19:58:07 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH0PR04MB7416D26D6BC98BC13EBD09309B859@PH0PR04MB7416.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
+Content-Language: en-US
+To:     Stefan Metzmacher <metze@samba.org>,
+        Kanchan Joshi <joshi.k@samsung.com>, hch@lst.de,
+        kbusch@kernel.org, axboe@kernel.dk
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+ <20220711110155.649153-5-joshi.k@samsung.com>
+ <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
+ <5c71b8f6-afec-8ef6-0a70-d13e71ded79c@samba.org>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <5c71b8f6-afec-8ef6-0a70-d13e71ded79c@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 09, 2022 at 11:36:45AM +0000, Johannes Thumshirn wrote:
-> On 09.07.22 01:21, Naohiro Aota wrote:
-> > diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-> > index 3194eca41635..cedc94a7d5b2 100644
-> > --- a/fs/btrfs/extent_io.c
-> > +++ b/fs/btrfs/extent_io.c
-> > @@ -2021,10 +2021,16 @@ noinline_for_stack bool find_lock_delalloc_range(struct inode *inode,
-> >  				    struct page *locked_page, u64 *start,
-> >  				    u64 *end)
-> >  {
-> > +	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-> >  	struct extent_io_tree *tree = &BTRFS_I(inode)->io_tree;
-> >  	const u64 orig_start = *start;
-> >  	const u64 orig_end = *end;
-> > -	u64 max_bytes = BTRFS_MAX_EXTENT_SIZE;
-> > +#ifdef CONFIG_BTRFS_FS_RUN_SANITY_TESTS
-> > +	/* The sanity tests may not set a valid fs_info. */
-> > +	u64 max_bytes = fs_info ? fs_info->max_extent_size : BTRFS_MAX_EXTENT_SIZE;
-> > +#else
-> > +	u64 max_bytes = fs_info->max_extent_size;
-> > +#endif
-> 
-> Do we really need the ifdef here? I don't think there will be a lot
-> of performance penalty from the 1 compare that we safe with the ifdef.
 
-You're right that performce-wise it does not make much improvement
-however with the explicit ifdef it's clear that it's there for tests,
-otherwise finding the conditional fs_info check would be hard to spot. A
-search for CONFIG_BTRFS_FS_RUN_SANITY_TESTS would find it. On the other
-hand the whole function is EXPORT_FOR_TESTS so we can expect exceptions
-for tests. So this could be the pattern to follow should we need it in
-the future (ie. no ifdef).
+>>> +static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
+>>> +        struct io_uring_cmd *ioucmd)
+>>> +{
+> 
+> Shouldn't we have a BUILD_BUG_ON(sizeof(struct nvme_uring_cmd_pdu) > 
+> sizeof(ioucmd->pdu));
+> here?
+
+Probably...
+
+>>> +    return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
+>>> +}
+>>> +
+> 
+>>> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+>>> index d734599cbcd7..57f4dfc83316 100644
+>>> --- a/include/linux/io_uring.h
+>>> +++ b/include/linux/io_uring.h
+>>> @@ -15,6 +15,8 @@ enum io_uring_cmd_flags {
+>>>       IO_URING_F_SQE128        = 4,
+>>>       IO_URING_F_CQE32        = 8,
+>>>       IO_URING_F_IOPOLL        = 16,
+>>> +    /* to indicate that it is a MPATH req*/
+>>> +    IO_URING_F_MPATH        = 32,
+> 
+> Isn't that nvme specific? If so I don't think it belongs in io_uring.h 
+> at all...
+
+Yes, it doesn't, it should be completely internal to nvme.
