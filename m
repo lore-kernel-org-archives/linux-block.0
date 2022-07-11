@@ -2,108 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF52C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 11:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4475CCA47F
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 11:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231133AbiGKLV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 07:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33290 "EHLO
+        id S229555AbiGKL2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 07:28:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231152AbiGKLUO (ORCPT
+        with ESMTP id S229543AbiGKL2S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 07:20:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E51112871E
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 03:44:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657536291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Cc4YCGlT5mNKlbQEPPOYGJvAwmuI9Lc6pbXcTrCWK8Y=;
-        b=HhKCo5Km7Z25zXeKiDUB9GjpsJjvlXmvA/ULTNwzJGCqDdp6eUP4Zyqr0M5bNUFEQUA6T1
-        t2Y5whKRAW7jEIAl+MK2Y4g70rRX0Yyoj7/qBahf7zsxi3oNO2IpsyhC0YeSDYHKthx9ej
-        aTTcgDF75pWryz4Rz424je7MS5izvEc=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-522-iZAzedaxOPyZxjDPXXJBpQ-1; Mon, 11 Jul 2022 06:44:37 -0400
-X-MC-Unique: iZAzedaxOPyZxjDPXXJBpQ-1
-Received: by mail-pj1-f72.google.com with SMTP id r13-20020a17090a454d00b001f04dfc6195so241687pjm.2
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 03:44:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Cc4YCGlT5mNKlbQEPPOYGJvAwmuI9Lc6pbXcTrCWK8Y=;
-        b=g/SBXh2l/3M0qyWU4bDuAorxHBjF3fFmk+g6XDXoCsj3S+rgm1VV8EWDkDdkjzVSFA
-         yM3MEeDdIO7zU+gf9BcssfbhIWLEqh+6Knzdy1xVMvNlVWgGlVYCWT6m2emcw7vfBrCK
-         8gZwA7QXQVhD+N0EGuCdQbUCnDe/Q428LJ0SzppNBdIZPXWMhjBzU+xo/sbejak9wz6V
-         FQrqzJtkqQeYDwi9+HGwF/Pl2HeNm85ag2VZq2wFnA9pC85ir7HSLVbX07NBQa3Bj7LX
-         b5cRruc1pOUNcDK0flRAPy5QLK8TZTDaAplZGbC1gH1flPty6AZyARJqRDAbSINpR6R8
-         RN3Q==
-X-Gm-Message-State: AJIora9646ydWHjFGWXellW58uaNY0JRrebRl1aeexaVZ41jhMW0fphU
-        4jE7inBvwy/eAosRcG5hCQseGXsTYKvmeBrqBFjhlcxKLm4Yd1R6BQCdzMUyp8rqPF8FapTvfOP
-        SB35PRemyBKbtb+rHZALMT1ZdIcleje1pzwK4z68=
-X-Received: by 2002:a05:6a00:23c9:b0:52a:cedd:3992 with SMTP id g9-20020a056a0023c900b0052acedd3992mr5137995pfc.43.1657536276205;
-        Mon, 11 Jul 2022 03:44:36 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1uYnrOw+uRMOO/c8vIUctc1rvWmK0ZrqojXQg4WeaNm2BClRjrUewK/w7HbyvrDFnWyFbiVoVncLj9L6foJtg0=
-X-Received: by 2002:a05:6a00:23c9:b0:52a:cedd:3992 with SMTP id
- g9-20020a056a0023c900b0052acedd3992mr5137972pfc.43.1657536275864; Mon, 11 Jul
- 2022 03:44:35 -0700 (PDT)
+        Mon, 11 Jul 2022 07:28:18 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA86A3
+        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 04:08:30 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220711110829epoutp03839e99345193da00f69ebaea2482cf51~AwcPEmqcP2024420244epoutp03_
+        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 11:08:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220711110829epoutp03839e99345193da00f69ebaea2482cf51~AwcPEmqcP2024420244epoutp03_
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1657537709;
+        bh=TPokgc8KiyKiXoT7NCkFEOk/43/FQR9MxdUyRi6+mZk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=IiNv9mdUfdwa+nQIwKsNszwLGCQ0UpZjY40j9bhKUaNCX+D0cB4UIbNzTn8ig2Vpv
+         hWAj+YzwMVxqroYQFK+IFqFCm5MTw+8tIvYIPDHeF7vjLHb4PFAFanKyO+9cKF4bap
+         huiFxkAiIeXhCq8dei+GYwKebEnzbFNkhsGffBzw=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20220711110828epcas5p130ed5ecf71cb8427a86abc25beb9432d~AwcODpN8E1709317093epcas5p1O;
+        Mon, 11 Jul 2022 11:08:28 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4LhLj46SHpz4x9Pv; Mon, 11 Jul
+        2022 11:08:24 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        AB.30.09566.8A40CC26; Mon, 11 Jul 2022 20:08:24 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b~AwcKN9xEX2363823638epcas5p2r;
+        Mon, 11 Jul 2022 11:08:24 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220711110824epsmtrp163c8723a98b81f7851e41ea44ecb7772~AwcKNKTnl1261612616epsmtrp1D;
+        Mon, 11 Jul 2022 11:08:24 +0000 (GMT)
+X-AuditID: b6c32a4a-ba3ff7000000255e-ba-62cc04a84df3
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7E.89.08802.8A40CC26; Mon, 11 Jul 2022 20:08:24 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220711110820epsmtip2521d7a387b1bdcc51eb6f4dd6b6b3ffc~AwcG34GhO0331003310epsmtip2T;
+        Mon, 11 Jul 2022 11:08:20 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     hch@lst.de, sagi@grimberg.me, kbusch@kernel.org, axboe@kernel.dk
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH for-next 3/4] io_uring: grow a field in struct io_uring_cmd
+Date:   Mon, 11 Jul 2022 16:31:54 +0530
+Message-Id: <20220711110155.649153-4-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220711110155.649153-1-joshi.k@samsung.com>
 MIME-Version: 1.0
-References: <20220711090808.259682-1-ming.lei@redhat.com>
-In-Reply-To: <20220711090808.259682-1-ming.lei@redhat.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Mon, 11 Jul 2022 18:44:24 +0800
-Message-ID: <CAHj4cs85rWQHUY4+9axMNitJo67kD22=UjDHpK25e3i1uuYZTg@mail.gmail.com>
-Subject: Re: [PATCH] blk-mq: don't create hctx debugfs dir until
- q->debugfs_dir is created
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrGJsWRmVeSWpSXmKPExsWy7bCmhu4KljNJBr8nGlk0TfjLbDFn1TZG
+        i9V3+9ksbh7YyWSxcvVRJot3redYLI7+f8tmcf7tYSaLSYeuMVrsvaVtMX/ZU3aLda/fszjw
+        eOycdZfd4/y9jSwel8+Wemxa1cnmsXlJvcfumw1sHn1bVjF6fN4kF8ARlW2TkZqYklqkkJqX
+        nJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ibaqvk4hOg65aZA3SrkkJZYk4pUCggsbhYSd/O
+        pii/tCRVISO/uMRWKbUgJafApECvODG3uDQvXS8vtcTK0MDAyBSoMCE74/uG46wFOwUqDu15
+        zdrAuJm3i5GTQ0LARGL6okusILaQwG5GiY6z9V2MXED2J0aJ5XufsEI4nxkl7q+4ywjTMXHH
+        Q3aIxC5GibNHHzPDVR09vwXI4eBgE9CUuDC5FKRBRMBForNpOtgkZoG7jBINu1aDTRIW8Jbo
+        +boBbDeLgKrE8n1TwXp5BSwl1jyxgFgmLzHz0nd2EJtTwEpi5vZ/YK28AoISJ2c+YQGxmYFq
+        mrfOZoaon8shsfQLO4TtInHq4AwWCFtY4tXxLVBxKYmX/W1QdrLEpZnnmCDsEonHew5C2fYS
+        raf6wc5hBnpl/S59iFV8Er2/nzCBhCUEeCU62oQgqhUl7k16ygphi0s8nLEEyvaQuHlrLxsk
+        dHoZJTZ/es40gVF+FpIPZiH5YBbCtgWMzKsYJVMLinPTU4tNC4zyUsvh0Zqcn7uJEZxgtbx2
+        MD588EHvECMTB+MhRgkOZiUR3j9nTyUJ8aYkVlalFuXHF5XmpBYfYjQFhvBEZinR5Hxgis8r
+        iTc0sTQwMTMzM7E0NjNUEuf1uropSUggPbEkNTs1tSC1CKaPiYNTqoFJwlxSUF2NTSLW68Vb
+        54aPz0+u+RLms5mRf+WhjPUMt7/YHBe78rLznNvtqYzK0qzPu4u7pEwnO/kvenDl8a4j+Q4y
+        PhPZuZocBDqtxJ1Kma7sObi+xOSgbl92tefFi7PNUhcf6X+9MaTxxqaiAJ5TWxx7/p5JZam4
+        sC3i9DuGdTLf6m7dCLDIUtvQ8u7L+9bi25LXDrzestVy4+LfRbN8ts1ZE/xYbteUOx12nCxF
+        0zZu3GBiX9sZ/PbJrlzJVb9XdoR5fuG7c+5PcMwcb9ZZG2qPXDO56qltyWoQkcPtZJNvKLYy
+        Idv+1oTbyQ/esmqXzd0x8epNmcWrnxQnH7+pL619n5+7aV9ih8PDp+u2KbEUZyQaajEXFScC
+        ANYOrRM5BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNLMWRmVeSWpSXmKPExsWy7bCSvO4KljNJBhPvs1o0TfjLbDFn1TZG
+        i9V3+9ksbh7YyWSxcvVRJot3redYLI7+f8tmcf7tYSaLSYeuMVrsvaVtMX/ZU3aLda/fszjw
+        eOycdZfd4/y9jSwel8+Wemxa1cnmsXlJvcfumw1sHn1bVjF6fN4kF8ARxWWTkpqTWZZapG+X
+        wJXxfcNx1oKdAhWH9rxmbWDczNvFyMkhIWAiMXHHQ/YuRi4OIYEdjBJzPq1lhEiISzRf+8EO
+        YQtLrPz3HKroI6PE5Gl3gBwODjYBTYkLk0tBakQEvCRW9PxhAqlhFngKVDOrH2yQsIC3RM/X
+        DawgNouAqsTyfVOZQXp5BSwl1jyxgJgvLzHz0newXZwCVhIzt/8DaxUCKjl1dyYTiM0rIChx
+        cuYTFhCbGai+eets5gmMArOQpGYhSS1gZFrFKJlaUJybnltsWGCUl1quV5yYW1yal66XnJ+7
+        iREcH1paOxj3rPqgd4iRiYPxEKMEB7OSCO+fs6eShHhTEiurUovy44tKc1KLDzFKc7AoifNe
+        6DoZLySQnliSmp2aWpBaBJNl4uCUamAS/uf3TIxVzYnF37C2//pmzqf8t7dc0epo0f2dtEdd
+        epL6h03NF5s0X1vaGyjYBCz8V3w588usEyUuex1zHDdLb7GR5bTVbqmee2PLl4uc3Ew2lY8/
+        mPOnW2/UmVl8M85EuHT1j+B7FYcNTnzMM7Pfy3X2m79xcl2ozgQe9ZhCY7P/n/UlfvryXFrn
+        I+rorVG3iWVbqoiHn++1AzPi594+kzDp8aGF5Tq7N96dLnE0frLb1un8ZoLbv7T1tn239Z0Z
+        2GE9V+2/6Q/OJ49E9MXXPutevUTt49q6BJV39Zd7vJZVvtarlwh/LPzggqmiaNElYQaXL8Wd
+        Abty9ppwsib0fTC8/9CfLzmCa9VpZSWW4oxEQy3mouJEAKoCxfX+AgAA
+X-CMS-MailID: 20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+        <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Verified on linux-block/for-next,
-Tested-by: Yi Zhang <yi.zhang@redhat.com>
+Use the leftover space to carve 'next' field that enables linking of
+io_uring_cmd structs. Also introduce a list head and few helpers.
 
-On Mon, Jul 11, 2022 at 5:08 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> blk_mq_debugfs_register_hctx() can be called by blk_mq_update_nr_hw_queues
-> when gendisk isn't added yet, such as nvme tcp.
->
-> Fixes the warning of 'debugfs: Directory 'hctx0' with parent '/' already present!'
-> which can be observed reliably when running blktests nvme/005.
->
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq-debugfs.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index b80fae7ab1d9..28adb01f6441 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -728,6 +728,9 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
->         char name[20];
->         int i;
->
-> +       if (!q->debugfs_dir)
-> +               return;
-> +
->         snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
->         hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
->
-> --
-> 2.31.1
->
+This is in preparation to support nvme-mulitpath, allowing multiple
+uring passthrough commands to be queued.
 
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+---
+ include/linux/io_uring.h | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
+diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+index 54063d67506b..d734599cbcd7 100644
+--- a/include/linux/io_uring.h
++++ b/include/linux/io_uring.h
+@@ -22,9 +22,14 @@ struct io_uring_cmd {
+ 	const void	*cmd;
+ 	/* callback to defer completions to task context */
+ 	void (*task_work_cb)(struct io_uring_cmd *cmd);
++	struct io_uring_cmd	*next;
+ 	u32		cmd_op;
+-	u32		pad;
+-	u8		pdu[32]; /* available inline for free use */
++	u8		pdu[28]; /* available inline for free use */
++};
++
++struct ioucmd_list {
++	struct io_uring_cmd *head;
++	struct io_uring_cmd *tail;
+ };
+ 
+ #if defined(CONFIG_IO_URING)
+@@ -54,6 +59,27 @@ static inline void io_uring_free(struct task_struct *tsk)
+ 	if (tsk->io_uring)
+ 		__io_uring_free(tsk);
+ }
++
++static inline struct io_uring_cmd *ioucmd_list_get(struct ioucmd_list *il)
++{
++	struct io_uring_cmd *ioucmd = il->head;
++
++	il->head = il->tail = NULL;
++
++	return ioucmd;
++}
++
++static inline void ioucmd_list_add(struct ioucmd_list *il,
++		struct io_uring_cmd *ioucmd)
++{
++	ioucmd->next = NULL;
++
++	if (il->tail)
++		il->tail->next = ioucmd;
++	else
++		il->head = ioucmd;
++	il->tail = ioucmd;
++}
+ #else
+ static inline void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret,
+ 		ssize_t ret2)
+@@ -80,6 +106,14 @@ static inline const char *io_uring_get_opcode(u8 opcode)
+ {
+ 	return "";
+ }
++static inline struct io_uring_cmd *ioucmd_list_get(struct ioucmd_list *il)
++{
++	return NULL;
++}
++static inline void ioucmd_list_add(struct ioucmd_list *il,
++		struct io_uring_cmd *ioucmd)
++{
++}
+ #endif
+ 
+ #endif
 -- 
-Best Regards,
-  Yi Zhang
+2.25.1
 
