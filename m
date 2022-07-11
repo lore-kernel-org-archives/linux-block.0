@@ -2,69 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB793C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 03:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05DFC43334
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 04:33:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbiGKDj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jul 2022 23:39:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40400 "EHLO
+        id S229521AbiGKEd0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 00:33:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiGKDj1 (ORCPT
+        with ESMTP id S229482AbiGKEd0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jul 2022 23:39:27 -0400
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5758213DEA;
-        Sun, 10 Jul 2022 20:39:26 -0700 (PDT)
-Received: by mail-pj1-f50.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so3772156pjf.2;
-        Sun, 10 Jul 2022 20:39:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QE7JJYPymJYEjSIRg5jCrbP1FqM2+RCByJ/BFBKot1A=;
-        b=vvLc8fqTIgWxiYsD9rHI9Lzk0drMsSfSaySPNZysynJFunZIytXBr2iznmjtZ8AV0Z
-         yW4RmvG4HTgf8qozYFgIhtYybn6jK0ZPBLvywUHMmC488jnLOjfA711D57F083nrtRBW
-         /xlPeQWzGB6RW1u+7Mrz5H4XQUHAxQTID5FiJlOxlNWKvfcsMaGAwhDZdNKJTMExvq2W
-         0XqUauZZvK/VW9EcgZBNZNsOCqumdz7GTGxphZie9U4vCqF3o+AEow17WI8FeGmBYrSG
-         STvWlgTcq5H9lMEdvJQmg/4rGxkMnhL4MuGt7eRf0PVcalEdkMfdl4uxjZHCEjOp1fgk
-         EvPw==
-X-Gm-Message-State: AJIora+vIPSfaaKyXLvgDzp1uwtOKg+HYK1zcOBmmYaQLP8fzxNLLJ7U
-        2iNJ0WzuUdST3CyJ+Bd0KgU=
-X-Google-Smtp-Source: AGRyM1su0xHZ6Ef0N6HO80MhMbx7u3fom5ZT26vDFPPmAs9nMDqcs/2xpps8t6IEicgZawPau+/WUQ==
-X-Received: by 2002:a17:90b:4c8c:b0:1ef:bff6:c964 with SMTP id my12-20020a17090b4c8c00b001efbff6c964mr14952558pjb.36.1657510765658;
-        Sun, 10 Jul 2022 20:39:25 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id z2-20020a1709027e8200b0016be2bb8e68sm3432786pla.303.2022.07.10.20.39.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Jul 2022 20:39:24 -0700 (PDT)
-Message-ID: <43810471-af38-570f-8cce-7b0f927bdc2d@acm.org>
-Date:   Sun, 10 Jul 2022 20:39:23 -0700
+        Mon, 11 Jul 2022 00:33:26 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B33C19005;
+        Sun, 10 Jul 2022 21:33:25 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7046268AA6; Mon, 11 Jul 2022 06:33:21 +0200 (CEST)
+Date:   Mon, 11 Jul 2022 06:33:21 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        shinichiro.kawasaki@wdc.com, dan.j.williams@intel.com,
+        yukuai3@huawei.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Song Liu <song@kernel.org>
+Subject: Re: REGRESSION: [PATCH 4/4] block: freeze the queue earlier in
+ del_gendisk
+Message-ID: <20220711043321.GA21925@lst.de>
+References: <20220614074827.458955-1-hch@lst.de> <20220614074827.458955-5-hch@lst.de> <72a5bf2e-cd56-a85c-2b99-cb8729a66fed@deltatee.com> <20220708060126.GA16457@lst.de> <c43e40da-7549-0c81-2a3c-d837b59f7e76@deltatee.com> <20220709081745.GA26411@lst.de> <55940f1e-bd93-e167-2580-35880ab1e702@deltatee.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] scsi: megaraid: clear READ queue map's nr_queues
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Guangwu Zhang <guazhang@redhat.com>
-References: <20220706125942.528533-1-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220706125942.528533-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <55940f1e-bd93-e167-2580-35880ab1e702@deltatee.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/6/22 05:59, Ming Lei wrote:
-> megaraid scsi driver sets set->nr_maps as 3 if poll_queues is > 0, and
-> blk-mq actually initializes each map's nr_queues as nr_hw_queues, so
-> megaraid driver has to clear READ queue map's nr_queues, otherwise queue
-> map becomes broken if poll_queues is set as non-zero.
+On Sun, Jul 10, 2022 at 09:33:51PM -0600, Logan Gunthorpe wrote:
+> I did a fairly quick review of the patches:
+> 
+>  - In the patch that introduces md_free_disk() it looks like md_free()
+> can still be called from the error path of md_alloc() before
+> mddev->gendisk is set... which seems to make things rather complicated
+> seeing we then can't use free_disk to finish the cleanup if the disk
+> hasn't been created yet. I probably need to take closer look at this
+> but, it might make more sense for the cleanup to remain in md_free() but
+> call kobject_put() in md_free_disk() and del_gendisk() in
+> mdev_delayed_delete(). Then md_alloc() can still use kobject_put() in
+> the error path and it makes a little more sense seeing we'd still be
+> freeing the kobject stuff in it's own release method instead of the
+> disks free method.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Uww, yes.  I suspect the best fix is to actually stop the kobject
+from taking part in the md life time directly.  Because the kobject
+contributes a reference to the disk until it is deleted, we might
+as well stop messing with the refcounts entirely and just call
+kobject_del on it just before del_gendisk.  Let me see what I can do
+there.
+
+> 
+>  - In the patch with md_rdevs_overlap, it looks like we remove the
+> rcu_read_lock(), which definitely seems out of place and probably isn't
+> correct. But the comment that was recreated still references the rcu so
+> probably should be changed.
+
+Fixed.
+
+>  - The last patch has a typo in the title (disk is *a* freed).
+
+Fixed.
