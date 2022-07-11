@@ -2,95 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F33C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 17:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1A1C43334
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 17:55:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbiGKRUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 13:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56700 "EHLO
+        id S229563AbiGKRzw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 13:55:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiGKRUo (ORCPT
+        with ESMTP id S229765AbiGKRzv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 13:20:44 -0400
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CAE812763
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 10:20:43 -0700 (PDT)
-Received: by mail-pj1-f48.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so9006147pjr.4
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 10:20:43 -0700 (PDT)
+        Mon, 11 Jul 2022 13:55:51 -0400
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C00E7CB7B;
+        Mon, 11 Jul 2022 10:55:49 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id d16so7987412wrv.10;
+        Mon, 11 Jul 2022 10:55:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=x4P9VeOPYLY9QFo86l4yvV2oTsVEIgH/Es/I3gcXiBY=;
-        b=eKUSz5L4KPmINqNvhwNwTFjBIZVzL5Fwz7LSIlWtNtiwZNSl/3hSPNoR0eH9NPeUfE
-         FHbV4gbJniK3s1X89n/MfVTvEWvcGUGsyoAklZJgqF/ZqeOPVDiNP0F3kZvYcRQCHVub
-         R8Xwou4YrKfugRS6K3DjNXslmVz8/y8NiVg4zl9DzeKpJ6zxF0wpbHaXpKzeeFxqH3VT
-         ESaQHUWm81SxH4tW1ShD/58cbmdMtOJKKUpFa8yVPjKZ1yh1jTTGcEl0xSwRBIabx1X7
-         KlrzuLo4wU6IJ6dtREpsLn2Qyecf89cMYwF8xDmkA0HAGS68JxMJ8pOkIR0uZy/OpmtI
-         4zZw==
-X-Gm-Message-State: AJIora/S5fM/aZs3/XFkSsLPHd3Y4WRYG6Lni5A/DCcaA/PinCraNobl
-        o8KKBgZLstNB0uK+n+LuR4MTJXMpDZ0=
-X-Google-Smtp-Source: AGRyM1uK80yZ17f6r15tUkip2hZomPDy5X9esVJoiHxi54sU73/jnTRq87wwQeurB/eK22lqH8Yfew==
-X-Received: by 2002:a17:90b:1e4f:b0:1ef:aa42:f196 with SMTP id pi15-20020a17090b1e4f00b001efaa42f196mr18428693pjb.228.1657560042711;
-        Mon, 11 Jul 2022 10:20:42 -0700 (PDT)
-Received: from [172.16.225.97] ([99.0.87.44])
-        by smtp.gmail.com with ESMTPSA id u7-20020a17090341c700b0016befcc142csm4987434ple.293.2022.07.11.10.20.41
+        bh=txFXdouWdbSMaKn/caC2kD6TFZVlGEJSQ/STyjeuePM=;
+        b=BxSHKxONkAubYXXEnjLsxUhliMo19FXENBf7GX8pzgiTrD39un4ucSB3FTgPlnvFMD
+         x21E7V76RgBajKzKgWsK60YlRcdy4tHdbPYVuK2kToYD7pYkctPmeTCga3TCLesehC0I
+         xBT7Rk7tJCphu///zn9wM3cC/hpNG08fBFH1j5Nee2hK3TA0J7SITG2y6VuJAMlll3l1
+         DFkq2YDcXMJorLWbYhezdL/WMkCC0JwAgJOnUYkzMgVuIVphYDcbifmICIRgHUMYcABp
+         yBGZnO1zjzbIfttpyA7MVr7tsVe6epV2FMYJWmJvf9vjpm+VdUKH/1E9SgPHIOepq2Dt
+         6JBw==
+X-Gm-Message-State: AJIora/FjRkhHOmAdA3v+cgEunIGBdm4go0Nz+YB4Gh0Lp+JKll3jL7P
+        DMlXQz/KzmOStbzYao01yWk=
+X-Google-Smtp-Source: AGRyM1sKxx1B26hTHr9NFnILGrSO5IkEVbBifXCrW4nydchvlUTDPmtgCkdme4W/ypt+B+OyHU0BLw==
+X-Received: by 2002:adf:f946:0:b0:21d:6433:a7bb with SMTP id q6-20020adff946000000b0021d6433a7bbmr18582857wrr.518.1657562148165;
+        Mon, 11 Jul 2022 10:55:48 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id w2-20020adfde82000000b00213ba3384aesm6353066wrl.35.2022.07.11.10.55.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Jul 2022 10:20:41 -0700 (PDT)
-Message-ID: <4c5f332f-ccd4-5d0e-14d4-bccf57bcd7cc@acm.org>
-Date:   Mon, 11 Jul 2022 10:20:39 -0700
+        Mon, 11 Jul 2022 10:55:47 -0700 (PDT)
+Message-ID: <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
+Date:   Mon, 11 Jul 2022 20:55:45 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] blk-mq: don't create hctx debugfs dir until
- q->debugfs_dir is created
+ Thunderbird/91.9.1
+Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
+ io_uring_cmd
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <20220711090808.259682-1-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220711090808.259682-1-ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+        hch@lst.de, kbusch@kernel.org
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
+ <20220711110155.649153-4-joshi.k@samsung.com>
+ <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/11/22 02:08, Ming Lei wrote:
-> blk_mq_debugfs_register_hctx() can be called by blk_mq_update_nr_hw_queues
-> when gendisk isn't added yet, such as nvme tcp.
+
+>> Use the leftover space to carve 'next' field that enables linking of
+>> io_uring_cmd structs. Also introduce a list head and few helpers.
+>>
+>> This is in preparation to support nvme-mulitpath, allowing multiple
+>> uring passthrough commands to be queued.
 > 
-> Fixes the warning of 'debugfs: Directory 'hctx0' with parent '/' already present!'
-> which can be observed reliably when running blktests nvme/005.
-> 
-> Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->   block/blk-mq-debugfs.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index b80fae7ab1d9..28adb01f6441 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -728,6 +728,9 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
->   	char name[20];
->   	int i;
->   
-> +	if (!q->debugfs_dir)
-> +		return;
-> +
->   	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
->   	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
->   
+> It's not clear to me why we need linking at that level?
 
-Does this patch need a Fixes: tag?
+I think the attempt is to allow something like blk_steal_bios that
+nvme leverages for io_uring_cmd(s).
 
-Additionally, as one can see here, I reported this bug before Yi: 
-https://bugzilla.kernel.org/show_bug.cgi?id=216191
-
-Thanks,
-
-Bart.
+nvme failover steals all the bios from requests that fail (and should
+failover) and puts them on a requeue list, and then schedules
+a work that takes these bios one-by-one and submits them on a different
+bottom namespace (see nvme_failover_req/nvme_requeue_work).
