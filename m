@@ -2,66 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 592A8CCA47B
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 15:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5D6C3F2D4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 15:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232078AbiGKPAe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 11:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56972 "EHLO
+        id S232203AbiGKPMj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 11:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232080AbiGKPAU (ORCPT
+        with ESMTP id S229706AbiGKPMg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 11:00:20 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A357696F;
-        Mon, 11 Jul 2022 07:59:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D9B5A61582;
-        Mon, 11 Jul 2022 14:59:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CA62C34115;
-        Mon, 11 Jul 2022 14:59:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657551583;
-        bh=dxZGKngfKO1Un0ysAWdBwrkK8xmIWeIei9M7jEZdOHg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NGwk1jTuNGOtpzHLQ7/aldklQ4LAtQOSBbU+hNaaRFVKhRQBPEbIk14EDNRiubnXH
-         xc5ETYEeLmrbgkdEvLWPOVDBqn4kQpo9dUqZ2AuuGDBHBRuoV406k9kaI+KN867EdD
-         v/fMt8rcjQfkhnMy87zktIzILzf4T8zZtfCNwx7AuGJHfKvon8lXc+aR4cZqHbDV1M
-         M4ibjcxGLSNTqO1IDyudF9xbDd8hzsv4weSah2mk5lUhSYe4/RPJr/QeJIGZ+fp1xV
-         ocVMh/BCEFRW5dnbOmvsL8yvd9baP8OKXmjc9+jQE4YxWr/9w8Smsdqn/zf+5+szQ8
-         60nlq1Rbh9q7A==
-Date:   Mon, 11 Jul 2022 08:59:39 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        lkft-triage@lists.linaro.org, regressions@lists.linux.dev,
-        Jens Axboe <axboe@kernel.dk>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        clang-built-linux <clang-built-linux@googlegroups.com>
-Subject: Re: Block: bio.c:1232:6: error: variable 'i' is used uninitialized
- whenever 'if' condition is true [-Werror,-Wsometimes-uninitialized]
-Message-ID: <Ysw627zSWSrEzrUZ@kbusch-mbp>
-References: <CA+G9fYtDr=tqPmM6f9aGQOfqkxUo-yP-kHBQG787D0Cj6oO-dg@mail.gmail.com>
+        Mon, 11 Jul 2022 11:12:36 -0400
+Received: from hr2.samba.org (hr2.samba.org [IPv6:2a01:4f8:192:486::2:0])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFE474E0C;
+        Mon, 11 Jul 2022 08:12:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+        s=42; h=From:Cc:To:Date:Message-ID;
+        bh=K+A7Xq0Dtg1M28AX2pm6iq7+K2wlhOA1YKzGE8z96xA=; b=ratBO5EA5ds+0wKQOD4let/B32
+        Aj2p5qOJmxyMmtY0WdwaAVsGUumqNmum7z3V+13nIUCI3uwXpoGoMQYumZYYC8Fj0s6K5v6eJQCxf
+        vcbx471HkEdRoS+ZJXccc7y07U8mAUhLrxoR9UJT8hYUE63gAGxZDC7l9HW9e6TiCpdBk3HSeh5Lb
+        Zo6bAeTbGVzwoug5qeRckCXmmDQai/wsUwHN+Jy9FqXwY8JdjTjtfhtSWoHtZ9Tf8Re0puRh65VZ4
+        5To4VC9qOKFVdSvaT/aqXun/rqArJjv/HTPqNueC7e+nLGfpScQIkP0Fo2WTi6cknKlOBXtAAzRhB
+        XNppXIItFtblsBHmujlJOJDSMi6SwM23q6tVW2uzOTJXir+h3ptwR9doqsXd+qFuSu6PcQxBkU/GY
+        xgBC4DDOlr5M/RXY00cpAcc/W4snU6cGCDjXYrVS19R12nyWHUpOjl9QcC0aD8hji7zmfR1ELKg+W
+        zEpdqk34C2kWsJtW1OBIIWYE;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+        by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+        (Exim)
+        id 1oAv5D-004BnU-TL; Mon, 11 Jul 2022 15:12:23 +0000
+Message-ID: <5c71b8f6-afec-8ef6-0a70-d13e71ded79c@samba.org>
+Date:   Mon, 11 Jul 2022 17:12:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYtDr=tqPmM6f9aGQOfqkxUo-yP-kHBQG787D0Cj6oO-dg@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
+Content-Language: en-US
+To:     Sagi Grimberg <sagi@grimberg.me>,
+        Kanchan Joshi <joshi.k@samsung.com>, hch@lst.de,
+        kbusch@kernel.org, axboe@kernel.dk
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+ <20220711110155.649153-5-joshi.k@samsung.com>
+ <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
+From:   Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 06:14:10PM +0530, Naresh Kamboju wrote:
-> Following regression found with clang i386 and x86 builds failed on
-> Linux next-20220711 tag. Please find the build error logs.
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Hi Sagi,
 
-Sorry, I needed to send a v2 of this patch. I didn't realize this was already
-merged (it doesn't appear in the block tree), though, so I'm not sure if I need
-send a fixup patch or the correct version now.
+>> @@ -189,6 +190,12 @@ enum {
+>>       NVME_REQ_USERCMD        = (1 << 1),
+>>   };
+>> +static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
+>> +        struct io_uring_cmd *ioucmd)
+>> +{
+
+Shouldn't we have a BUILD_BUG_ON(sizeof(struct nvme_uring_cmd_pdu) > sizeof(ioucmd->pdu));
+here?
+
+>> +    return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
+>> +}
+>> +
+
+>> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+>> index d734599cbcd7..57f4dfc83316 100644
+>> --- a/include/linux/io_uring.h
+>> +++ b/include/linux/io_uring.h
+>> @@ -15,6 +15,8 @@ enum io_uring_cmd_flags {
+>>       IO_URING_F_SQE128        = 4,
+>>       IO_URING_F_CQE32        = 8,
+>>       IO_URING_F_IOPOLL        = 16,
+>> +    /* to indicate that it is a MPATH req*/
+>> +    IO_URING_F_MPATH        = 32,
+
+Isn't that nvme specific? If so I don't think it belongs in io_uring.h at all...
+
+metze
+
+
