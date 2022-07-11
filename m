@@ -2,91 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B88FC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 02:29:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD236C43334
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 03:34:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbiGKC3Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jul 2022 22:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37656 "EHLO
+        id S229544AbiGKDeY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jul 2022 23:34:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiGKC3X (ORCPT
+        with ESMTP id S229450AbiGKDeY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jul 2022 22:29:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3570E6363
-        for <linux-block@vger.kernel.org>; Sun, 10 Jul 2022 19:29:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657506562;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vz1GK9BX/gFWrmQP642bPgzY3Nvglr3NVgRq93Im89w=;
-        b=f019XGULGnW31ctgHxDCos+PMckk39IiWenXaEmNbF86Yb9iJHZFdEaT6GzYiL1m51zwMO
-        EYnBZBdbnATiwbQ8DD+xx8ieK5Dz6ARoSM+fgNaeSg6oPFxQhF6iec/iSUYQAEY2ZFPo3C
-        dKC2190TxQd2B6gYMeb5cAtE0fW272U=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-120-uu9Qu8LaNlyZedILrsx2Gw-1; Sun, 10 Jul 2022 22:29:19 -0400
-X-MC-Unique: uu9Qu8LaNlyZedILrsx2Gw-1
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-31c8c7138ebso34795697b3.17
-        for <linux-block@vger.kernel.org>; Sun, 10 Jul 2022 19:29:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vz1GK9BX/gFWrmQP642bPgzY3Nvglr3NVgRq93Im89w=;
-        b=E6phfOVr06IigSGqeOZMdw6jrOo7iWeAM1sUImJEOrCVewjjpr6JrXaaOpCl5HqM41
-         1UFWwhrmCdfy4CG80hn+YNM2HKHBO142CnkyRz5oQcQO4w24q2ygts/Xf6YirXiq9zXU
-         st3t594x0oDsRcjjNvHxeQcDfHB+r0ghCBbnT2iEdOVQke079NU29kGOkLQoiRjS+Lwc
-         89P8F+SBBx5LUeXG6uT1N0gMKeZWXsh3MYvl+9Vq9OejmvxRx6oIVHzBNKmDiIKWI2OD
-         D3Ix3GStI1iYc5s9OCxiwLWyrmzS0U5qAb9kZ8UkQ0XKrPAlBa2fDxSUkOqTLrxTrDx/
-         8j/g==
-X-Gm-Message-State: AJIora/QNCc3eNRihuFLrXpm9WCDn4uedYM25ovkZxGrv2yfa37uNw9P
-        bK4CfmE6cwD58+vFMp6pIO8RGHAYw0YfjTvgYsKuhcRURJZNJzZ8O604oUSX09JWJS4L1uFTGT9
-        Oj78ptUeEPlBWMbMZky5lshn37Pce5FCWFK4g7VI=
-X-Received: by 2002:a25:3a81:0:b0:66a:645f:fe99 with SMTP id h123-20020a253a81000000b0066a645ffe99mr14836579yba.489.1657506558827;
-        Sun, 10 Jul 2022 19:29:18 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1vqb00OL/S1ZQjGqe7y+O8w1oRX078Ot3LxIDI/LAz0Qo3pnFgAsc+9LkWNbW0R7S/zmsYzgDDbhqhxqw1uYNM=
-X-Received: by 2002:a25:3a81:0:b0:66a:645f:fe99 with SMTP id
- h123-20020a253a81000000b0066a645ffe99mr14836571yba.489.1657506558645; Sun, 10
- Jul 2022 19:29:18 -0700 (PDT)
+        Sun, 10 Jul 2022 23:34:24 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 829F862CC;
+        Sun, 10 Jul 2022 20:34:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=P7YzCVqNHhOLgeVqVrx43f24ZBviyuF5w7w7XSB/y4c=; b=ptpsIiQMXr5ztcVclTxUxY+rFU
+        mwu8xox2f+LrvI2HQguRaOxdLccsdHDEtvvDhBx2v2aoXRElvMEHs+MP4SNnmn7T9OHAoRXLeUNIC
+        ZZZF4ml2NYx4JzXLI3nTFpYXRsyVayL3tvavnqg/qHuoBGgN9timfaYILpBzEbVga4rWtCB0YYD3j
+        9SWGBf5b/9xFVA7qy8w0HDYOvfIB1+gNM4lWofFHBx6uGm0khTDSGO4WdawDxnHJzIl8G/LWvErRv
+        Hoc1HcJ5CNbzubx3frVTjztLoRWjENGLbSb/qwPcKKH5P3Foij1de4EXF5he2adeh0LWnMUhIOfri
+        qOOtM1aQ==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1oAkBI-00BhAY-LM; Sun, 10 Jul 2022 21:33:58 -0600
+Message-ID: <55940f1e-bd93-e167-2580-35880ab1e702@deltatee.com>
+Date:   Sun, 10 Jul 2022 21:33:51 -0600
 MIME-Version: 1.0
-References: <20220706125942.528533-1-ming.lei@redhat.com>
-In-Reply-To: <20220706125942.528533-1-ming.lei@redhat.com>
-From:   Ming Lei <ming.lei@redhat.com>
-Date:   Mon, 11 Jul 2022 10:29:07 +0800
-Message-ID: <CAFj5m9JEtVY4WBwYPPmaJHXamozUXLZ2Pzk_2+ZNN7o6x7CYFQ@mail.gmail.com>
-Subject: Re: [PATCH] scsi: megaraid: clear READ queue map's nr_queues
-To:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
-        linux-block <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Guangwu Zhang <guazhang@redhat.com>,
-        Ming Lei <minlei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-CA
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, shinichiro.kawasaki@wdc.com,
+        dan.j.williams@intel.com, yukuai3@huawei.com, ming.lei@redhat.com,
+        linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Song Liu <song@kernel.org>
+References: <20220614074827.458955-1-hch@lst.de>
+ <20220614074827.458955-5-hch@lst.de>
+ <72a5bf2e-cd56-a85c-2b99-cb8729a66fed@deltatee.com>
+ <20220708060126.GA16457@lst.de>
+ <c43e40da-7549-0c81-2a3c-d837b59f7e76@deltatee.com>
+ <20220709081745.GA26411@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20220709081745.GA26411@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: hch@lst.de, axboe@kernel.dk, shinichiro.kawasaki@wdc.com, dan.j.williams@intel.com, yukuai3@huawei.com, ming.lei@redhat.com, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, song@kernel.org
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: REGRESSION: [PATCH 4/4] block: freeze the queue earlier in
+ del_gendisk
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Guys,
 
-On Wed, Jul 6, 2022 at 8:59 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> megaraid scsi driver sets set->nr_maps as 3 if poll_queues is > 0, and
-> blk-mq actually initializes each map's nr_queues as nr_hw_queues, so
-> megaraid driver has to clear READ queue map's nr_queues, otherwise queue
-> map becomes broken if poll_queues is set as non-zero.
->
-> Fixes: 9e4bec5b2a23 ("scsi: megaraid_sas: mq_poll support")
 
-Ping...
 
-Without this fix, it is easy to observe fio hang when running cpu hotplug
-test in case of 'poll_queues > 0'.
+On 2022-07-09 02:17, Christoph Hellwig wrote:
+> On Fri, Jul 08, 2022 at 09:55:55AM -0600, Logan Gunthorpe wrote:
+>> I agree it's a mess, probably buggy and could use a cleanup with a
+>> free_disk method. But I'm not sure the all_mdevs lifetime issues are the
+>> problem here. If the entry in all_mdevs outlasts the disk, then
+>> md_alloc() will just fail earlier. Many test scripts rely on the fact
+>> that you can stop an mddev and recreate it immediately after. We need
+>> some way of ensuring any deleted disks are fully deleted before trying
+>> to make a new mddev, in case the new one has the same name as one being
+>> deleted.
+> 
+> I think those tests are broken.  But fortunately that is just an
+> assumption in the tests, while device name reuse is a real problem.
+> 
+> I could not reproduce your problem, but on the for-5.20/block
+> tree I see a hang in 10ddf-geometry when running the tests.
 
-Thanks,
-Ming
+Ah, strange. I never saw an issue with that test, though I didn't run
+that one repeatedly with the latest branch. So maybe it was an
+intermittent like I saw with 11spare-migration and I just missed it.
 
+> The branch here:
+> 
+>     git://git.infradead.org/users/hch/block.git md-lifetime-fixes
+>     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/md-lifetime-fixes
+> 
+> fixes that for me and does not introduce new regressions.  Can you
+> check if that helps your problem?
+
+Yes, I can confirm those patches fix the bug I was seeing too.
+
+
+I did a fairly quick review of the patches:
+
+ - In the patch that introduces md_free_disk() it looks like md_free()
+can still be called from the error path of md_alloc() before
+mddev->gendisk is set... which seems to make things rather complicated
+seeing we then can't use free_disk to finish the cleanup if the disk
+hasn't been created yet. I probably need to take closer look at this
+but, it might make more sense for the cleanup to remain in md_free() but
+call kobject_put() in md_free_disk() and del_gendisk() in
+mdev_delayed_delete(). Then md_alloc() can still use kobject_put() in
+the error path and it makes a little more sense seeing we'd still be
+freeing the kobject stuff in it's own release method instead of the
+disks free method.
+
+ - In the patch with md_rdevs_overlap, it looks like we remove the
+rcu_read_lock(), which definitely seems out of place and probably isn't
+correct. But the comment that was recreated still references the rcu so
+probably should be changed.
+
+ - The last patch has a typo in the title (disk is *a* freed).
+
+Thanks!
+
+Logan
