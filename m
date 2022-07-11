@@ -2,247 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBC1C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 11:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7F8C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jul 2022 12:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbiGKL6J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 07:58:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
+        id S232080AbiGKMov (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 08:44:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiGKL6I (ORCPT
+        with ESMTP id S231971AbiGKMob (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 07:58:08 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B71D32B96;
-        Mon, 11 Jul 2022 04:58:05 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VJ0fXuV_1657540681;
-Received: from 30.82.254.107(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VJ0fXuV_1657540681)
-          by smtp.aliyun-inc.com;
-          Mon, 11 Jul 2022 19:58:02 +0800
-Message-ID: <bec45186-cafa-98bf-1397-bc9d51c65a6e@linux.alibaba.com>
-Date:   Mon, 11 Jul 2022 19:58:01 +0800
+        Mon, 11 Jul 2022 08:44:31 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA11261B0F
+        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 05:44:22 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id z3so2925799ilz.5
+        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 05:44:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=br3tJQEkgsdXZG9sAFREqjWpIgB35zSs0NthrE2bN3k=;
+        b=Bi0thlVz28P+BmpNFIxaCbIy7Lv8vL3tS/jJ3BC35kpIlkbgevxH6ZGSjASitkI6ox
+         bWek58zuQOiKTTy7OBqFBpYhjQGK4sKtZtfLY43UbeI6KKRTfOZc00HgNenG7TVegw/1
+         m/RhpKKG0pHAT7zkBUyRxoCfBltuagXIMfvjsrG/skElxD+5q37FUjgWx/29u5QT1mu4
+         NVMIWXLrfzcnm42Ej0qp6VazUED7qx3ApGTngjiHHcpAIqnanKHn34+jIQ0+glWDGP8D
+         pm6OTzl4912V/GbwS16+sMoeABXxBvBkS37Nt4HKxK9b4Az0p2Ytrg5Ohut6skha6wN9
+         t0tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=br3tJQEkgsdXZG9sAFREqjWpIgB35zSs0NthrE2bN3k=;
+        b=h+emwvH5qo6qp/7njJn2DgHv1/NntjkBde1sao1FeGgZAI2iWtFLc11nTRSh+kAeYd
+         GW6YrI1a9c903tT34bcQJT6MMgt39XeZkpsX/zxWGIO0YdHei+P48syLVmL8qXHc9ycy
+         AGH2xUPJf/7w1m1fo56MZZOs+ZBUz/TqSnPyG7NVb+4IQKR+KXhFg0epGXcpKDmcKYYC
+         WeWJ0Ek7XG5SPf/PqnUMeGJID3f3eVriPBll8h7Kvk5OjWTlYSQgpk+WcqswZnLKa1/h
+         q3/GXQtG5r/s0GbI0jc/Ds7IQQVhjUFhP1vOAcJR86rfbkFScTyFr3Yj7TGwFkxo4A+q
+         CsbQ==
+X-Gm-Message-State: AJIora8ieTRCA6Y3HT8EG93cHmSuFehYuB304Wh3/n8rdM7KOOH/SgP5
+        +S48OnrAXp1gRCoacMUV0DUqOgYwTGOOscfz1SKXqw==
+X-Google-Smtp-Source: AGRyM1u0Uy4Mw/UttOQP310bU1YeSnqgNYdZDkVFy5JATHL9JvuOeqeSAvXzJ83qxP5Tp1jTjPgqFfrTcJaG2FaG/ag=
+X-Received: by 2002:a05:6e02:1549:b0:2dc:616a:1dd4 with SMTP id
+ j9-20020a056e02154900b002dc616a1dd4mr8633961ilu.131.1657543461597; Mon, 11
+ Jul 2022 05:44:21 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH V4 0/2] ublk: add io_uring based userspace block driver
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-References: <20220711022024.217163-1-ming.lei@redhat.com>
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-In-Reply-To: <20220711022024.217163-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Mon, 11 Jul 2022 18:14:10 +0530
+Message-ID: <CA+G9fYtDr=tqPmM6f9aGQOfqkxUo-yP-kHBQG787D0Cj6oO-dg@mail.gmail.com>
+Subject: Block: bio.c:1232:6: error: variable 'i' is used uninitialized
+ whenever 'if' condition is true [-Werror,-Wsometimes-uninitialized]
+To:     open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        lkft-triage@lists.linaro.org, regressions@lists.linux.dev
+Cc:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Ming,
+Following regression found with clang i386 and x86 builds failed on
+Linux next-20220711 tag. Please find the build error logs.
 
-First thanks for this great work, I think ublk will be a powerful
-replacement for tcmu. I read your v3 ublk kernel and user-space
-codes, and have some ublk design questions here:
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
 
-1) As I said before, currently ublk still needs user-space backstore
-to allocate io buffer in advance, for example, UBLK_IO_FETCH_REQ
-command needs to set ublk_io->addr when starting device. Currently,
-some of our internal business may create hundreds or thousands of
-tcmu devices in one host, when switching to ublk, it'll need user-space
-backstore to allocate lots of memory in advance, which will waste memory
-in a host with swap off. Also user-space backstore may use advanced
-network components, they may maintain internal memory pool, which
-can be used as io buffer.
+Regressions found on i386:
 
-So I'd like to suggest that at least we add a new flag and keep GET_DATA
-command. When used, FETCH command does not need to pass io
-buffer addr, and backstore needs to send a GET_DATA command with
-user addr for write request.
+   - build-clang-12-defconfig
+   - build-clang-nightly-lkftconfig
+   - build-clang-13-defconfig
+   - build-clang-12-lkftconfig
+   - build-clang-14-lkftconfig
+   - build-clang-nightly-defconfig
+   - build-clang-13-lkftconfig
 
-Support high flexibility, let's user decides what's best for them.
+Regressions found on x86_64:
 
-2) complicated ublk user-space
-First forgive me  I think current ublk user-space codes looks somewhat
-complicated:
-  1. UBLK_CMD_START_DEV and io handler worker need to be
-in different task context, because UBLK_CMD_START_DEV needs
-to wait the number of queue depth of sqes to be submitted in advance.
+   - build-clang-nightly-x86_64_defconfig
+   - build-clang-nightly-lkftconfig
+   - build-clang-13-lkftconfig
+   - build-clang-12-lkftconfig
+   - build-clang-13-lkftconfig-kcsan
+   - build-clang-14-lkftconfig
+   - build-clang-14-x86_64_defconfig
 
-  2. mixed getting ublk command and target io handle in one io_uring instance
-I'm not sure it's a good design, see ublksrv_handle_cqe(), which contains
-many flag handle work and is_target_io() check, I think the data flow is not
-that clear for me at least
+make --silent --keep-going --jobs=8
+O=/home/tuxbuild/.cache/tuxmake/builds/1/build LLVM=1 LLVM_IAS=1
+ARCH=x86_64 CROSS_COMPILE=x86_64-linux-gnu- 'HOSTCC=sccache clang'
+'CC=sccache clang'
+block/bio.c:1232:6: error: variable 'i' is used uninitialized whenever
+'if' condition is true [-Werror,-Wsometimes-uninitialized]
+        if (unlikely(!size)) {
+            ^~~~~~~~~~~~~~~
+include/linux/compiler.h:78:22: note: expanded from macro 'unlikely'
+# define unlikely(x)    __builtin_expect(!!(x), 0)
+                        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+block/bio.c:1254:9: note: uninitialized use occurs here
+        while (i < nr_pages)
+               ^
+block/bio.c:1232:2: note: remove the 'if' if its condition is always false
+        if (unlikely(!size)) {
+        ^~~~~~~~~~~~~~~~~~~~~~
+block/bio.c:1202:17: note: initialize the variable 'i' to silence this warning
+        unsigned len, i;
+                       ^
+                        = 0
+1 error generated.
 
-  3. helper like tcmulib_get_next_command()
-I wonder whether current ublk user-space can offer similar helper which
-will return a set of io commands to backstore easily.
+Build details:
+---------------
+        download_url: https://builds.tuxbuild.com/2BnQO6OXSJejfpLO4fQ3fWa5wVT/,
+        git_describe: next-20220711,
+        git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next,
+        git_sha: 4112a8699ae2eac797415b9be1d7901b3f79e772,
+        git_short_log: 4112a8699ae2 (\Add linux-next specific files
+for 20220711\),
+        kconfig: https://builds.tuxbuild.com/2BnQO6OXSJejfpLO4fQ3fWa5wVT/config
+        kernel_version: 5.19.0-rc6,
+        make_variables: {
+            LLVM: 1,
+            LLVM_IAS: 1
+        },
 
-I'd like to suggest:
-1. When starting ublk dev, pass io_uring fd for every queue, then in
-blk-mq->queue_rq(), it'll generate one cqe for every coming request,
-not need to issue fetch sqes command in advance, kernel codes would
-simplify a bit,  UBLK_IO_FLAG_ACTIVE may be discarded. And helper
-like returning a set of io command would be added easily. Note these
-io_uring fd would be just used for notifying io command generated.
+Steps to reproduce:
+tuxmake --runtime podman --target-arch x86_64 --toolchain clang-14
+--kconfig https://builds.tuxbuild.com/2BnQO6OXSJejfpLO4fQ3fWa5wVT/config
+LLVM=1 LLVM_IAS=1
 
-2. We use another io_uring fd per queue to handle GET_DATA or
-COMMIT_REQ command. Indeed, if we can support synchronous ioctl
-interface to do GET_DATA and COMMIT_REQ, we may make libublk
-really simple.
+Best regards
+Naresh Kamboju
 
-
-Here I'd like to describe how we use tcmu. A main thread call
-tcmulib_get_next_command() to get a set of io commands, then
-it dispatches them to user-space io wokers. Take write requests as
-example, io worker use ioctl(2) to get data from bios, and send
-data to distributed fs, finally call ioctl(2) to commit req. Multiple
-io workers can run concurrently. Since GET_DATA(write request)
-or COMMIT_REQ(read request) mainly do memcpy work, one
-io_uring instance will just do these jobs sequentially, which may
-not take advantage of multi-cpu.
-
-So finally, I would suggest ublk or libulk just offer basic interface:
-add/start/delete dev interface, get io commands sescriptor, get io
-data, commit io helper. Let's user-space target make decisions,
-for example, whether to use eventfd.
-
-Thanks for your patience
-
-
-Regards,
-Xiaoguang Wang
-
-> Hello Guys,
->
-> ublk driver is one kernel driver for implementing generic userspace block
-> device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
-> ublk server[1] which is the userspace part of ublk for communicating
-> with ublk driver and handling specific io logic by its target module.
->
-> Another thing ublk driver handles is to copy data between user space buffer
-> and request/bio's pages, or take zero copy if mm is ready for support it in
-> future. ublk driver doesn't handle any IO logic of the specific driver, so
-> it is small/simple, and all io logics are done by the target code in ublkserver.
->
-> The above two are main jobs done by ublk driver.
->
-> ublk driver can help to move IO logic into userspace, in which the
-> development work is easier/more effective than doing in kernel, such as,
-> ublk-loop takes < 200 lines of loop specific code to get basically same 
-> function with kernel loop block driver, meantime the performance is
-> is even better than kernel loop with same setting. ublksrv[1] provide built-in
-> test for comparing both by running "make test T=loop", for example, see
-> the test result running on VM which is over my lattop(root disk is
-> nvme/device mapper/xfs):
->
-> 	[root@ktest-36 ubdsrv]#make -s -C /root/git/ubdsrv/tests run T=loop/001 R=10
-> 	running loop/001
-> 		fio (ublk/loop(/root/git/ubdsrv/tests/tmp/ublk_loop_VqbMA), libaio, bs 4k, dio, hw queues:1)...
-> 		randwrite: jobs 1, iops 32572
-> 		randread: jobs 1, iops 143052
-> 		rw: jobs 1, iops read 29919 write 29964
-> 	
-> 	[root@ktest-36 ubdsrv]# make test T=loop/003
-> 	make -s -C /root/git/ubdsrv/tests run T=loop/003 R=10
-> 	running loop/003
-> 		fio (kernel_loop/kloop(/root/git/ubdsrv/tests/tmp/ublk_loop_ZIVnG), libaio, bs 4k, dio, hw queues:1)...
-> 		randwrite: jobs 1, iops 27436
-> 		randread: jobs 1, iops 95273
-> 		rw: jobs 1, iops read 22542 write 22543 
->
->
-> Another example is high performance qcow2 support[2], which could be built with
-> ublk framework more easily than doing it inside kernel.
->
-> Also there are more people who express interests on userspace block driver[3],
-> Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
-> requirement from Google. Ziyang Zhang from Alibaba said they "plan to
-> replace TCMU by UBD as a new choice" because UBD can get better throughput than
-> TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
-> storage service for providing storage to containers.
->
-> It is io_uring based: io request is delivered to userspace via new added
-> io_uring command which has been proved as very efficient for making nvme
-> passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
-> shared/mmap buffer is used for sharing io descriptor to userspace, the
-> buffer is readonly for userspace, each IO just takes 24bytes so far.
-> It is suggested to use io_uring in userspace(target part of ublk server)
-> to handle IO request too. And it is still easy for ublkserver to support
-> io handling by non-io_uring, and this work isn't done yet, but can be
-> supported easily with help o eventfd.
->
-> This way is efficient since no extra io command copy is required, no sleep
-> is needed in transferring io command to userspace. Meantime the communication
-> protocol is simple and efficient, one single command of
-> UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
-> command result in one trip. IO handling is often batched after single
-> io_uring_enter() returns, both IO requests from ublk server target and
-> IO commands could be handled as a whole batch.
->
-> And the patch by patch change can be found in the following
-> tree:
->
-> https://github.com/ming1/linux/tree/my_for-5.20-ubd-devel_v4
->
-> ublk server repo(master branch):
->
-> 	https://github.com/ming1/ubdsrv
->
-> Any comments are welcome!
->
-> Since V3:
-> - address Gabriel Krisman Bertazi's comments on V3: add userspace data
->   validation before handling command, remove warning, ...
-> - remove UBLK_IO_COMMIT_REQ command as suggested by Zixiang and Gabriel Krisman Bertazi
-> - fix one request double free when running abort
-> - rewrite/cleanup ublk_copy_pages(), then this handling becomes very
->   clean
-> - add one command of UBLK_IO_REFETCH_REQ for allowing ublk_drv to build
->   as module
->
-> Since V2:
-> - fix one big performance problem:
-> 	https://github.com/ming1/linux/commit/3c9fd476951759858cc548dee4cedc074194d0b0
-> - rename as ublk, as suggested by Gabriel Krisman Bertazi 
-> - lots of cleanup & code improvement & bugfix, see details in git
->   hisotry
->
->
-> Since V1:
->
-> Remove RFC now because ublk driver codes gets lots of cleanup, enhancement and
-> bug fixes since V1:
->
-> - cleanup uapi: remove ublk specific error code,  switch to linux error code,
-> remove one command op, remove one field from cmd_desc
->
-> - add monitor mechanism to handle ubq_daemon being killed, ublksrv[1]
->   includes builtin tests for covering heavy IO with deleting ublk / killing
->   ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
->   and the abort/stop mechanism is simple
->
-> - fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
->   MQ ublk-loop devices(test/scratch)
->
-> - improve batching submission as suggested by Jens
->
-> - improve handling for starting device, replace random wait/poll with
-> completion
->
-> - all kinds of cleanup, bug fix,..
->
-> Ming Lei (2):
->   ublk: add io_uring based userspace block driver
->   ublk_drv: add UBLK_IO_REFETCH_REQ for supporting to build as module
->
->  drivers/block/Kconfig         |    6 +
->  drivers/block/Makefile        |    2 +
->  drivers/block/ublk_drv.c      | 1701 +++++++++++++++++++++++++++++++++
->  include/uapi/linux/ublk_cmd.h |  173 ++++
->  4 files changed, 1882 insertions(+)
->  create mode 100644 drivers/block/ublk_drv.c
->  create mode 100644 include/uapi/linux/ublk_cmd.h
->
-
+--
+Linaro LKFT
+https://lkft.linaro.org
