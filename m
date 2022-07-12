@@ -2,96 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50541CCA47F
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 20:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D21C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 20:26:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233561AbiGLUOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 16:14:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54858 "EHLO
+        id S229729AbiGLU0Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 16:26:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233435AbiGLUOG (ORCPT
+        with ESMTP id S229492AbiGLU0W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 16:14:06 -0400
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED1ABFACF;
-        Tue, 12 Jul 2022 13:14:01 -0700 (PDT)
-Received: by mail-wr1-f48.google.com with SMTP id v16so12671233wrd.13;
-        Tue, 12 Jul 2022 13:14:01 -0700 (PDT)
+        Tue, 12 Jul 2022 16:26:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E722CC9239
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 13:26:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657657581;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uitgsVWXbdrv8zFt2LqySt7cam5rPIej+nIiQV98pw0=;
+        b=C7lNcKdTIO/4t1o2w+QipgLIS+tgXICwbZa4beRgCa3ofpm/Thvl/MpY1jDnDqbZf6eqOD
+        pTYNI55BAq8WGCSdthDABJit6sAsBRKCxFgYsXBgpDpmF40sYs8NOzcw8G7CX5kNmTnbot
+        iR2p+1SmXQr1b/wZWx+HIgNF6GLz0uE=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-567-L_e_yzs8OciyTreOy7mcCw-1; Tue, 12 Jul 2022 16:26:19 -0400
+X-MC-Unique: L_e_yzs8OciyTreOy7mcCw-1
+Received: by mail-ot1-f70.google.com with SMTP id cd25-20020a056830621900b00618ff1dd900so3462463otb.13
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 13:26:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=i44WgiLhEQpL2L8I1eN0xvDidyFTyh3H4rXwJnmjusA=;
-        b=PBBtHg+mydX9pqMw1SnRPPN8lgFO1vpOouvEBLhbaWOr3G/UA+g/xk3Jr8E0VKCV7G
-         VmcAKDC0JkNA6LeJD2SnsdQqvRfQrfR5rH2xV3vz2KkwvE62JZJs9zU51Y3FYfekuHpn
-         yPSDRMmLDPErj5jke37+Vt2EkeOl155jHjUxHrOLRVSsn2eOf+mh29SuJC4JJyiIHXlW
-         eWR0+iIZ4MPtPkSZ7dAX17jU43GzfZBjF8ThifkDAq9OykQhm8vUE0XhbwKN4+8+2cin
-         RZMfwNcJRIVLHLVqs60rJIO58saoVJHO/n2L8naULt2FaI/ODPYcJpYWhGTeGIAwW8nE
-         7E0g==
-X-Gm-Message-State: AJIora8LsKoYu+461q/zem3vOsBBy4hcoGZGwp7jyjzs80CSk6n7XhsT
-        1Z3OGkVbWs7r46FHU+L5k7k=
-X-Google-Smtp-Source: AGRyM1s2AXD5tSZHdhk70dkHduOPy8P8nujvoI7SI2uNkAjYundFhC3fqCftHzf55G2bv5Dopht+9w==
-X-Received: by 2002:adf:facc:0:b0:21d:8c8f:4b51 with SMTP id a12-20020adffacc000000b0021d8c8f4b51mr23123290wrs.307.1657656839604;
-        Tue, 12 Jul 2022 13:13:59 -0700 (PDT)
-Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
-        by smtp.gmail.com with ESMTPSA id q6-20020a1cf306000000b003a033177655sm13617110wmq.29.2022.07.12.13.13.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Jul 2022 13:13:59 -0700 (PDT)
-Message-ID: <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
-Date:   Tue, 12 Jul 2022 23:13:57 +0300
+        bh=uitgsVWXbdrv8zFt2LqySt7cam5rPIej+nIiQV98pw0=;
+        b=QDpL387Px5CPeyoUnGrsbY+OGRzK/1LpnF0ysw/tvnLUKcmP5jwafaBon3XvhmUr1+
+         naLjiJ5o3SC7tTV07xEqi3JfY3Jh+x1vcY/nbfYDC/uzOR1ddyGwIOu6qbUK682B7FTN
+         w6CzjSpfBJpb72Jo5ZfbdRmy6sQq4VIVcSsT9cD8Wgk7J+vd1earGaZq8u2dQVq0A/Y1
+         uweAQIHKbNn/modoUkvt+0cbXFsnmnQyuljxFkg8lskjFXcRRLTpGfkvdFn/AS6LdNyV
+         ZjbPWuKBqh7ZUOTdtDTVabzX85PTVvEsctpoL0sDMf8AW3afVRDhxQFBURWEsLSlqs4C
+         aa6A==
+X-Gm-Message-State: AJIora8L9S3/P5Nu8O/FmgqZPUe3X+pz1BmyLgrnqaZB+LX/QFYjt1eH
+        VUMbWEVsPphVFEwavcyuuMOHmJinLE3K7tfhaYd+mpUO24zdKeRfKDpHC0JCtArw1u/cgN/s72Z
+        DV8OnRQiYbqaA6g0Nm5ddQOs=
+X-Received: by 2002:a05:6830:608d:b0:616:ecd7:de2 with SMTP id by13-20020a056830608d00b00616ecd70de2mr9966415otb.119.1657657578770;
+        Tue, 12 Jul 2022 13:26:18 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1t9ZClxcrqJht1T6mxLG+napIslBEJNktJNzhxGbv3GvFDTtH6eVOCwyrB0kLgCN4MgD4pEBw==
+X-Received: by 2002:a05:6830:608d:b0:616:ecd7:de2 with SMTP id by13-20020a056830608d00b00616ecd70de2mr9966403otb.119.1657657578577;
+        Tue, 12 Jul 2022 13:26:18 -0700 (PDT)
+Received: from dell-per740-01.7a2m.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id k26-20020a056830151a00b006168bc4caacsm3992119otp.67.2022.07.12.13.26.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 13:26:18 -0700 (PDT)
+From:   Tom Rix <trix@redhat.com>
+To:     axboe@kernel.dk, nathan@kernel.org, ndesaulniers@google.com,
+        viro@zeniv.linux.org.uk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev, Tom Rix <trix@redhat.com>
+Subject: [PATCH] block: move initialization of i to its definition
+Date:   Tue, 12 Jul 2022 16:26:08 -0400
+Message-Id: <20220712202608.630259-1-trix@redhat.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
- uring-passthrough commands
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>
-Cc:     kbusch@kernel.org, axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
-        gost.dev@samsung.com
-References: <20220711110155.649153-1-joshi.k@samsung.com>
- <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
- <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20220712065250.GA6574@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+clang build fails with
+block/bio.c:1232:6: error: variable 'i' is used uninitialized whenever 'if' condition is true [-Werror,-Wsometimes-uninitialized]
+        if (unlikely(!size)) {
 
-> Hmm, I'm a little confused on what this is trying to archive.
-> 
-> The io_uring passthrough already does support multipathing, it picks
-> an available path in nvme_ns_head_chr_uring_cmd and uses that.
-> 
-> What this does is adding support for requeing on failure or the
-> lack of an available path.  Which very strongly is against our
-> passthrough philosophy both in SCSI and NVMe where error handling
-> is left entirely to the userspace program issuing the I/O.
-> 
-> So this does radically change behavior in a very unexpected way.
-> Why?
+In this check, the code jumps to 'end:' over the loop that initializes 'i'.
+Move the initialization of i to its definition.
 
-I think the difference from scsi-generic and controller nvme passthru is
-that this is a mpath device node (or mpath chardev). This is why I think
-that users would expect that it would have equivalent multipath
-capabilities (i.e. failover).
+Fixes: 9a6469060316 ("block: convert to advancing variants of iov_iter_get_pages{,_alloc}()")
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ block/bio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-In general, I think that uring passthru as an alternative I/O interface
-and as such needs to be able to failover. If this is not expected from
-the interface, then why are we exposing a chardev for the mpath device
-node? why not only the bottom namespaces?
+diff --git a/block/bio.c b/block/bio.c
+index a98b90489ae0..aff36ca7cabb 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1199,7 +1199,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+ 	ssize_t size, left;
+-	unsigned len, i;
++	unsigned len, i = 0;
+ 	size_t offset, trim;
+ 	int ret = 0;
+ 
+@@ -1234,7 +1234,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 		goto out;
+ 	}
+ 
+-	for (left = size, i = 0; left > 0; left -= len, i++) {
++	for (left = size; left > 0; left -= len, i++) {
+ 		struct page *page = pages[i];
+ 
+ 		len = min_t(size_t, PAGE_SIZE - offset, left);
+-- 
+2.27.0
 
-I can't really imagine a user that would use uring passthru and
-when it gets an error completion, would then try to reconcile if there
-is an available path (from sysfs?), and submitting it again in hope that
-an available path is selected by the driver (without really being able
-to control any of this)...
-
-Maybe I'm wrong, but it looks like an awkward interface to operate on a
-multipath device node, but implement failover yourself, based on some
-information that is not necessarily in-sync with the driver.
