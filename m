@@ -2,71 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E497CCA47F
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 21:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A3CC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 21:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229700AbiGLV0U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 17:26:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60772 "EHLO
+        id S229962AbiGLVps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 17:45:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231485AbiGLV0U (ORCPT
+        with ESMTP id S229755AbiGLVpr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 17:26:20 -0400
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7977D0E11
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 14:26:19 -0700 (PDT)
-Received: by mail-pj1-f53.google.com with SMTP id o3-20020a17090a744300b001ef8f7f3dddso377975pjk.3
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 14:26:19 -0700 (PDT)
+        Tue, 12 Jul 2022 17:45:47 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72ED5A58C9
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 14:45:46 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d10so8579795pfd.9
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 14:45:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
+         :content-transfer-encoding;
+        bh=t91dV4p+lIBUUzn1a9qwdkpkg3zk1bPcQsEAZ+bI0n4=;
+        b=LXA1nvp/pnJFnXX58mMxdmCDAp9A/H2P5NRTYlra6mVFwjjWpLS+/8gLrcYP8S9OxC
+         yZYKdJtb69SGHYhdeA9x7ZZ/4ogA8Axl0soi3V+9kmSDhzSiylXvVyHUXvC8yBODG7dK
+         iE+UI176nucZuGK7HMEQcagi80fmCdfaCr/VXVTZfr669E+rcQR9ZzxQbRGmgufQEiUq
+         XL7AY/cVnEmitX2J2X4PMEp1O+NzJbxZ95WqDrsRYZSkz7DTVJqbbW397qLoLNs9XrRc
+         pGFYdNPwMbu0C70y9Kbeux5ucWiEovYrYCyxBwsre/oV3WlR0frcL7eSyneGJSUZTxSg
+         +kBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=KK7P3L9Kli1wdat4RBjBc1YBJWepWM2uXjn/zFCX0Eo=;
-        b=BfDMTs5B69WcjqG30oJyG988Awdle/HnUT/ASLtjLyjJUNNHzQushDXpcz1BT659oA
-         WUYI7p4hJrvvxlZSsgTmd4EYfyjHNvnY9MT/PJK5OKKoMmtrTbGr6DD3P/SRdqjAnP1D
-         LDct3ak5ga/cpTO2wUq0jUMtZQYEiR4Wk1Nzsg9cDlx0IpAF+F0MvLxTNGCuBHikD3mV
-         yR9Sd5yktqptm7SdXW64IhS5gJvkv9mUmxkJ4Muxn3Igo0I7YP5HurcvRCRmPFYeAVlH
-         5Fc/B/AcnCluqM0KMINuXk0HiKO2yqKAkkL+5f0/vCqCx4dEh4oQqBLzazhKNdAbniGr
-         BXNA==
-X-Gm-Message-State: AJIora8nZnJki5rxunQYL9+UJxTRkUvuO91a6rvefLQWX6Xx7J31PCWu
-        +RYLB3DfZryqxm26iO8xVVcd7tlndNw=
-X-Google-Smtp-Source: AGRyM1sAxH/IiZseTiil5+UZYLnk6BLHYzNtNNbC0Q8eR+MoRD4f/DXFIYslOnjsMbiXVPfQ/HCUUA==
-X-Received: by 2002:a17:90b:92:b0:1f0:6331:e9f1 with SMTP id bb18-20020a17090b009200b001f06331e9f1mr195745pjb.102.1657661179216;
-        Tue, 12 Jul 2022 14:26:19 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:de3c:137c:f4d2:d291? ([2620:15c:211:201:de3c:137c:f4d2:d291])
-        by smtp.gmail.com with ESMTPSA id n12-20020a170902e54c00b00161a9df4de8sm7406195plf.145.2022.07.12.14.26.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Jul 2022 14:26:17 -0700 (PDT)
-Message-ID: <149ae9d9-f4b7-cbad-61ff-69d06eb901c4@acm.org>
-Date:   Tue, 12 Jul 2022 14:26:16 -0700
+        h=x-gm-message-state:from:to:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=t91dV4p+lIBUUzn1a9qwdkpkg3zk1bPcQsEAZ+bI0n4=;
+        b=4xxIGURdvnT8uq9mg7hqDYKo1PIWftN4rn1+FZkqRcNOfElbcrosmkVybvPcboxcr8
+         jriwJffKDUHmS3p4vAzc/TSdPrnUNZobzDA9gHjmiN5tVVJfSq9YrkTKgo1CO8+Nx5O4
+         Z+cWeAFELC94mfFnvl2oZZ8OxejZJBY73fRpcOiFkWJak/ObhT0fmddWu7LfP0ZLqhCR
+         ltPKKlBALoT7/7FnhqDE3KLgS2ZPlr4JA8VNPJj5OHTnbN9CheZcHcIAS5SI0ebZ+p1p
+         P6XOSMv9ZTFt7dzVkrGQ5G6+ZknKBS9bnEMizAqnj3HYMXtaTSCoUFWW7adzjSwk6PEH
+         71VQ==
+X-Gm-Message-State: AJIora937Q97ynzXhpjlegsu4auNTAnL4GaBrXUkZemup2kQuJyUyMBF
+        iz3k9MxnwPVp44Shuj4JPT1hBA==
+X-Google-Smtp-Source: AGRyM1uIM2IhbbnhU5hU2KB7CAbnkROh4oRWKyYPDKmv+Jr+UhBnD+Z6QhKTiBe+IcHsNlhwCgRASQ==
+X-Received: by 2002:a62:1b57:0:b0:52a:d646:de3c with SMTP id b84-20020a621b57000000b0052ad646de3cmr207673pfb.60.1657662345921;
+        Tue, 12 Jul 2022 14:45:45 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id h7-20020a170902f54700b0016be4d310b2sm7368109plf.80.2022.07.12.14.45.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 14:45:45 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     ubizjak@gmail.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20220712151947.6783-1-ubizjak@gmail.com>
+References: <20220712151947.6783-1-ubizjak@gmail.com>
+Subject: Re: [PATCH v2] blk-iolatency: Use atomic{,64}_try_cmpxchg
+Message-Id: <165766234436.62453.4264335710864400533.b4-ty@kernel.dk>
+Date:   Tue, 12 Jul 2022 15:45:44 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH blktests v2] common, tests: Support printing multiple skip
- reasons
-Content-Language: en-US
-To:     "lizhijian@fujitsu.com" <lizhijian@fujitsu.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
-References: <20220712082810.1868224-1-lizhijian@fujitsu.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220712082810.1868224-1-lizhijian@fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/12/22 01:21, lizhijian@fujitsu.com wrote:
-> Some test cases or test groups have rather large number of test
-> run requirements and then they may have multiple skip reasons. However,
-> blktests can report only single skip reason. To know all of the skip
-> reasons, we need to repeat skip reason resolution and blktests run.
-> This is a troublesome work.
+On Tue, 12 Jul 2022 17:19:47 +0200, Uros Bizjak wrote:
+> Use atomic_try_cmpxchg instead of atomic_cmpxchg (*ptr, old, new) == old
+> in check_scale_change and atomic64_try_cmpxchg in blkcg_iolatency_done_bio.
+> x86 CMPXCHG instruction returns success in ZF flag, so this change saves a
+> compare after cmpxchg (and related move instruction in front of cmpxchg).
 > 
-> In this patch, we add skip reasons to SKIP_REASONS array, then all of
-> the skip reasons will be printed by iterating SKIP_REASONS at one shot
-> run.
+> No functional change intended.
+> 
+> [...]
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Applied, thanks!
+
+[1/1] blk-iolatency: Use atomic{,64}_try_cmpxchg
+      commit: aee8960c2eae12636040dbf0f04e135273b1612d
+
+Best regards,
+-- 
+Jens Axboe
+
+
