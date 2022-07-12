@@ -2,90 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB0AC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 20:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50541CCA47F
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 20:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbiGLUIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 16:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48640 "EHLO
+        id S233561AbiGLUOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 16:14:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233836AbiGLUId (ORCPT
+        with ESMTP id S233435AbiGLUOG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 16:08:33 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB52AB43
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 13:08:31 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so87218pjf.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 13:08:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=6Lqpato/f28eA3XrWVfglz0yLW5AQKseXQr9k0rsUFA=;
-        b=AOS1c0MnsFBWYlHDV3+MxRFb4d7gp80FtjneMJJL/D2A2H8UNFY0SMd83YCafnLUpe
-         et/ra3hUgxEdRTj4OKLEDcRGRBiWSGrcK+q/tDN5LX+bcUcyqeluuU6LHYdHr2wg76wQ
-         qSC+xtb1eYsd4b4QeXbV9tEcluq35ki7YyHS710UlKz3xd+44bfreIC+dRnZkHrC2kIo
-         7dHHaOMbWGfXwsICl1pqj5Ya7hUNrjMvJjZ74qw8ImFoPxsnJIJn3JnFoefsqif7fJgP
-         ngEKrL0UROOhR6GHg9oAFJPlBTqBd0PvvO0vEYgRM2TV9q2jgZrxDlGICNnAT0zfysAN
-         hpJw==
+        Tue, 12 Jul 2022 16:14:06 -0400
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED1ABFACF;
+        Tue, 12 Jul 2022 13:14:01 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id v16so12671233wrd.13;
+        Tue, 12 Jul 2022 13:14:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=6Lqpato/f28eA3XrWVfglz0yLW5AQKseXQr9k0rsUFA=;
-        b=4Hc1drCajPNF5dNxM5ZaReR29pSZj6JHqYG+jJ5Cxz+40wvCWrI3DoPR0RojA8GNVQ
-         YM1iwXp7tFBcHnja83Fw115kKdAOdXsNMQld5ngla5K2md+FyEdSnhGhnJap7EYs4LSp
-         mBJOrOssJVDrdDiXaR02+8aOzxtlfyOV3Px8BUfUiuJdkunrjqI77Ks/Ybrt/EcO3ZsK
-         AwnaVaCpowy8ZmDr4lKAJKk8IjUDXAbUmcEBA3vBgfunr8ZqTUmtwj88u/4NFXluz+U6
-         BBkS7s9X+uDhXCgotg+F7ho4hqj8PwvA3/53RoBEuOk7IBtJ09yZlacj8nxZO1oqOgwj
-         aIZg==
-X-Gm-Message-State: AJIora9k4xeounMyHdEbq3YTQaU7VrTYolxt1R/A7+rsGZUo7bED92lK
-        s7ihBO1OZ7bl5pkfBxo/LZ/Tlg==
-X-Google-Smtp-Source: AGRyM1tVNec+WUDrx8OTAhKe8cXaZzH+MyRRdelXOlWxsLuJI04HBOCf5joSuyHVSN+utVixIgIYlA==
-X-Received: by 2002:a17:903:1c4:b0:16c:4e45:38a3 with SMTP id e4-20020a17090301c400b0016c4e4538a3mr10888515plh.41.1657656511314;
-        Tue, 12 Jul 2022 13:08:31 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d124-20020a623682000000b00528d4f647f2sm7461362pfa.91.2022.07.12.13.08.30
+        bh=i44WgiLhEQpL2L8I1eN0xvDidyFTyh3H4rXwJnmjusA=;
+        b=PBBtHg+mydX9pqMw1SnRPPN8lgFO1vpOouvEBLhbaWOr3G/UA+g/xk3Jr8E0VKCV7G
+         VmcAKDC0JkNA6LeJD2SnsdQqvRfQrfR5rH2xV3vz2KkwvE62JZJs9zU51Y3FYfekuHpn
+         yPSDRMmLDPErj5jke37+Vt2EkeOl155jHjUxHrOLRVSsn2eOf+mh29SuJC4JJyiIHXlW
+         eWR0+iIZ4MPtPkSZ7dAX17jU43GzfZBjF8ThifkDAq9OykQhm8vUE0XhbwKN4+8+2cin
+         RZMfwNcJRIVLHLVqs60rJIO58saoVJHO/n2L8naULt2FaI/ODPYcJpYWhGTeGIAwW8nE
+         7E0g==
+X-Gm-Message-State: AJIora8LsKoYu+461q/zem3vOsBBy4hcoGZGwp7jyjzs80CSk6n7XhsT
+        1Z3OGkVbWs7r46FHU+L5k7k=
+X-Google-Smtp-Source: AGRyM1s2AXD5tSZHdhk70dkHduOPy8P8nujvoI7SI2uNkAjYundFhC3fqCftHzf55G2bv5Dopht+9w==
+X-Received: by 2002:adf:facc:0:b0:21d:8c8f:4b51 with SMTP id a12-20020adffacc000000b0021d8c8f4b51mr23123290wrs.307.1657656839604;
+        Tue, 12 Jul 2022 13:13:59 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id q6-20020a1cf306000000b003a033177655sm13617110wmq.29.2022.07.12.13.13.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Jul 2022 13:08:30 -0700 (PDT)
-Message-ID: <149a582d-500b-611f-ce64-7c697ba9c0a2@kernel.dk>
-Date:   Tue, 12 Jul 2022 14:08:29 -0600
+        Tue, 12 Jul 2022 13:13:59 -0700 (PDT)
+Message-ID: <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
+Date:   Tue, 12 Jul 2022 23:13:57 +0300
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCHv2 1/3] block: ensure iov_iter advances for added pages
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
 Content-Language: en-US
-To:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@kernel.org>
-References: <20220712153256.2202024-1-kbusch@fb.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220712153256.2202024-1-kbusch@fb.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>
+Cc:     kbusch@kernel.org, axboe@kernel.dk, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
+        gost.dev@samsung.com
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+ <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220712065250.GA6574@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/12/22 9:32 AM, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+
+> Hmm, I'm a little confused on what this is trying to archive.
 > 
-> There are cases where a bio may not accept additional pages, and the iov
-> needs to advance to the last data length that was accepted. The zone
-> append used to handle this correctly, but was inadvertently broken when
-> the setup was made common with the normal r/w case.
+> The io_uring passthrough already does support multipathing, it picks
+> an available path in nvme_ns_head_chr_uring_cmd and uses that.
+> 
+> What this does is adding support for requeing on failure or the
+> lack of an available path.  Which very strongly is against our
+> passthrough philosophy both in SCSI and NVMe where error handling
+> is left entirely to the userspace program issuing the I/O.
+> 
+> So this does radically change behavior in a very unexpected way.
+> Why?
 
-Al, how do you want to handle this? I currently see you have that
-block-fixes branch, but I don't see anything depending on it. I can do
-one of the following with these three fixes:
+I think the difference from scsi-generic and controller nvme passthru is
+that this is a mpath device node (or mpath chardev). This is why I think
+that users would expect that it would have equivalent multipath
+capabilities (i.e. failover).
 
-1) Apply them on top of for-5.20/block
-2) Apply them to a new branch off the tag I made for you
+In general, I think that uring passthru as an alternative I/O interface
+and as such needs to be able to failover. If this is not expected from
+the interface, then why are we exposing a chardev for the mpath device
+node? why not only the bottom namespaces?
 
-And that still leaves the question of what will happen with your
-block-fixes branch. Did you want me to pull that in? Or?
+I can't really imagine a user that would use uring passthru and
+when it gets an error completion, would then try to reconcile if there
+is an available path (from sysfs?), and submitting it again in hope that
+an available path is selected by the driver (without really being able
+to control any of this)...
 
--- 
-Jens Axboe
-
+Maybe I'm wrong, but it looks like an awkward interface to operate on a
+multipath device node, but implement failover yourself, based on some
+information that is not necessarily in-sync with the driver.
