@@ -2,169 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD5FCCA47C
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 11:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A91C1C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 12:49:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232018AbiGLLqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 07:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58436 "EHLO
+        id S233242AbiGLMtD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 08:49:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231136AbiGLLqK (ORCPT
+        with ESMTP id S229703AbiGLMs6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 07:46:10 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A1BAE3B5
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 04:46:09 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220712114607epoutp024e64f8f4fe63514d641db7f1d6f3957f~BEmYtVIR61883918839epoutp027
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 11:46:07 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220712114607epoutp024e64f8f4fe63514d641db7f1d6f3957f~BEmYtVIR61883918839epoutp027
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1657626367;
-        bh=zMdXetJT+/feFCQLF4Yj27rJKHTUDOLFXnQpuT6tZ90=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=b/wNBonx2qWMVx9UthN2ksOM58sYAO8Vs4jqlaGVdXBqLdzGVf0F5DT3l1TjeeXvD
-         6QKFYWrLFNSBM+y8TbjHA2FzCvlQdGK2YYsWzCrJ74LoaVBTpM8XbwxQCBJh9xmabO
-         XZ+WoSVFql48p+QgYgR8gxDIvIwMEuAOWdkuEpBk=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20220712114607epcas5p34f4e1a64e810990d6a2ad2c31ddcf177~BEmYPfCMT0058800588epcas5p3Q;
-        Tue, 12 Jul 2022 11:46:07 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.176]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4LhzV43Dgxz4x9Pr; Tue, 12 Jul
-        2022 11:46:04 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        44.B2.09639.7FE5DC26; Tue, 12 Jul 2022 20:45:59 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220712114559epcas5p307791594bb4d99b7b9c02ffb0960d5c1~BEmQcVqt_1633316333epcas5p3J;
-        Tue, 12 Jul 2022 11:45:59 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220712114559epsmtrp1e925269083cab0f968d55e5d9a813007~BEmQbJW3J0872808728epsmtrp1Y;
-        Tue, 12 Jul 2022 11:45:59 +0000 (GMT)
-X-AuditID: b6c32a4b-e83ff700000025a7-6d-62cd5ef78d75
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        27.51.08802.6FE5DC26; Tue, 12 Jul 2022 20:45:58 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220712114557epsmtip26ca397013840dc596018671d58b3557b~BEmO6pf_k1376913769epsmtip2F;
-        Tue, 12 Jul 2022 11:45:57 +0000 (GMT)
-Date:   Tue, 12 Jul 2022 17:10:34 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, kbusch@kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, asml.silence@gmail.com,
-        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
-Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
- io_uring_cmd
-Message-ID: <20220712114034.GB4465@test-zns>
+        Tue, 12 Jul 2022 08:48:58 -0400
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29ABE26AC0;
+        Tue, 12 Jul 2022 05:48:58 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 23so7464380pgc.8;
+        Tue, 12 Jul 2022 05:48:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=54C2TPYXSPlTMXJUnlGF1jTRtY0nrlM/ihgIc0q9Wag=;
+        b=O0B3lvpJG6QioVuNnag38xXqfEk2SpikZlweVPQKcejz7TuO7PKjQ9Sg9VARIM/jwS
+         cyUsAtxgZVERedD2B/BbpeIRUgu+Xr1dNi2k6zdVT6C3eQfFqtlfC9jq2zLeiIRLIqxP
+         YsSPOooIYvp8jgs0xQhRz7GzAO1cQwGBkv8M8sc9ylVTJmY+GPo5dzUVT4SejwSfw3Gq
+         SPBd+NlNdx5uy99tdjNE7dzvUA2lgweFl4h2ExvnEo/hpkSLCY25OyBwEIagWjjxrXGe
+         LheT89q+Q+lhUzCG/aB1/wTsL0KWnUfrVtd/e2QYrX015E9YxI8dtzosGfN5M1XPa/AL
+         gXxA==
+X-Gm-Message-State: AJIora/fbqDzp7r+4MbkwRwdGxq0Fn5uIvpF31zc7e+D4cycsyB2YHdR
+        lBIKeqbUx7ul8v2lv44X4l70KNr09To=
+X-Google-Smtp-Source: AGRyM1tm6+g/fhzGG8TP6P5Y9Z9kczuFlCKFDM9768aqwWimPJgAXA07HLQWvwlUlinS0oHUfyFddQ==
+X-Received: by 2002:a65:49c5:0:b0:412:6e3e:bd91 with SMTP id t5-20020a6549c5000000b004126e3ebd91mr20590031pgs.221.1657630137602;
+        Tue, 12 Jul 2022 05:48:57 -0700 (PDT)
+Received: from [192.168.51.14] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id m7-20020a170902bb8700b0016bf1ed3489sm6735698pls.143.2022.07.12.05.48.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Jul 2022 05:48:56 -0700 (PDT)
+Message-ID: <1f9e8664-944c-5ab2-cbc5-c40fdd9b517c@acm.org>
+Date:   Tue, 12 Jul 2022 05:48:55 -0700
 MIME-Version: 1.0
-In-Reply-To: <7fb16d2a-21f4-3380-75f3-c8e8c08fd318@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrAJsWRmVeSWpSXmKPExsWy7bCmuu73uLNJBg+6NC2aJvxltpizahuj
-        xeq7/WwWNw/sZLJYufook8W71nMsFuffHmaymHToGqPF3lvaFvOXPWW3WPf6PYsDt8fOWXfZ
-        Pc7f28jicflsqcemVZ1sHpuX1HvsvtnA5tG3ZRWjx+dNcgEcUdk2GamJKalFCql5yfkpmXnp
-        tkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUBnKimUJeaUAoUCEouLlfTtbIryS0tS
-        FTLyi0tslVILUnIKTAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM548f8xS0CdY8bfjFXsD41S+
-        LkZODgkBE4kpu5axdjFycQgJ7GaUaFo/hRnC+cQoseT9YzYI5zOjxKYrL5lgWqZu2swCkdjF
-        KHHg136oqmeMEl1bu9lBqlgEVCX+Xn4LZHNwsAloSlyYXAoSFhFQkOj5vRKsnlngJ6PE9H2d
-        YFOFBQIlVvfuAevlFdCRuDZnAQuELShxcuYTMJtTwFai598NsHpRAWWJA9uOM4EMkhBYyyGx
-        b/sTVojzXCQOXHvJBmELS7w6voUdwpaSeNnfBmUnS1yaeQ7qnRKJx3sOQtn2Eq2n+plBbGaB
-        DIkpXw5D2XwSvb+fMIE8IyHAK9HRJgRRrihxb9JTqLXiEg9nLIGyPSRu3toLDZReZom/d24z
-        T2CUm4Xkn1lIVkDYVhKdH5pYZwGtYBaQllj+jwPC1JRYv0t/ASPrKkbJ1ILi3PTUYtMC47zU
-        cngsJ+fnbmIEJ10t7x2Mjx580DvEyMTBeIhRgoNZSYT3z9lTSUK8KYmVValF+fFFpTmpxYcY
-        TYHxM5FZSjQ5H5j280riDU0sDUzMzMxMLI3NDJXEeb2ubkoSEkhPLEnNTk0tSC2C6WPi4JRq
-        YHJ/sHSfaYJ/TGzL+5OpxeuNS5iY6l0cmW04JphyPXOb8fbIrtCNqbVqrTvXdjQ/e8GUHSMl
-        OceAMVXh/on3X17qxOilGlmdMk46s7Vtweu1UcvbIszuleeZSNVbf+eqduJtdGGbteBdYqLK
-        /LDN2zoCpDVmOSTyif2atsaleNX71rdpWjXH7PK3fZm+YMbDZWeCP3Uc5bziELx5wZcNbxps
-        tSTqfaRTtU4fMp61NeJTq9ZqS4eHSVnfLeO3N59uWxE3S2dHr+L5pksvHBsnVuzomTTp8/cd
-        62VVOb3/MzHrFcwUsNLOfibYuf2VauujRHM2+1VfZu5PkF4eJNJs5ipYu9cl0Xl19bc1lvNr
-        lViKMxINtZiLihMBuoek+EMEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrLLMWRmVeSWpSXmKPExsWy7bCSvO63uLNJBiebrCyaJvxltpizahuj
-        xeq7/WwWNw/sZLJYufook8W71nMsFuffHmaymHToGqPF3lvaFvOXPWW3WPf6PYsDt8fOWXfZ
-        Pc7f28jicflsqcemVZ1sHpuX1HvsvtnA5tG3ZRWjx+dNcgEcUVw2Kak5mWWpRfp2CVwZbf3c
-        BQf4KqY8nsfewPiQu4uRk0NCwERi6qbNLF2MXBxCAjsYJTatmMECkRCXaL72gx3CFpZY+e85
-        O0TRE0aJI3c/gxWxCKhK/L38FijBwcEmoClxYXIpSFhEQEGi5/dKNpB6ZoGfjBL/rt1jBkkI
-        CwRKrO7dAzaUV0BH4tqcBVCbe5klvv87ygKREJQ4OfMJmM0sYCYxb/NDZpAFzALSEsv/cYCE
-        OQVsJXr+3WACsUUFlCUObDvONIFRcBaS7llIumchdC9gZF7FKJlaUJybnltsWGCUl1quV5yY
-        W1yal66XnJ+7iREcQ1paOxj3rPqgd4iRiYPxEKMEB7OSCO+fs6eShHhTEiurUovy44tKc1KL
-        DzFKc7AoifNe6DoZLySQnliSmp2aWpBaBJNl4uCUamBiPemuFNcS1Lz07sZilw9uc2T1J+xw
-        vND+ZkHrd+byONkUyQTRNQsDZIMuOju0n2G/X2CYI3Rsxmrui5oLN01Y+CLc6MgutpjZB9x2
-        MPcYJZbk8d6VXHnj8ILEv8u0VxuxNczmlG/Xf6fJ8bcw78qa6qt3/WqUuesi8utzDVjXNf/N
-        jpu9il345syoXK7g6QlLVrNHcd+6OkPqSFF2/ralJ6Li3y49afRj4cqPXrl7LQ91nrt69UfB
-        JpEAlcaeH2vO1ob3TViyeWnSi8ALJpdv/Nj8/uzKDU+XevBOnCJ5ZxZ/xA6xjikbfEV2X1q3
-        ze/d1DYemY2LJrNOXvXM57Jx8ir92UeUnpxpLV5sq/++TYmlOCPRUIu5qDgRABLdqn0QAwAA
-X-CMS-MailID: 20220712114559epcas5p307791594bb4d99b7b9c02ffb0960d5c1
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_81924_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b
-References: <20220711110155.649153-1-joshi.k@samsung.com>
-        <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
-        <20220711110155.649153-4-joshi.k@samsung.com>
-        <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
-        <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
-        <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me>
-        <7fb16d2a-21f4-3380-75f3-c8e8c08fd318@kernel.dk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] block: Use try_cmpxchg some more
+Content-Language: en-US
+To:     Uros Bizjak <ubizjak@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20220711153301.2388-1-ubizjak@gmail.com>
+ <Ys0C72unFFlsWomq@infradead.org>
+ <CAFULd4bqmbundK=YE9A1scW6za3z4B7B_XjY=sS1R+3H40fF0Q@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAFULd4bqmbundK=YE9A1scW6za3z4B7B_XjY=sS1R+3H40fF0Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_81924_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On 7/12/22 00:04, Uros Bizjak wrote:
+> while (try_cmpxchg ...);
+> 
+> looks to me like a semicolon was left there in error, like "if (...);".
 
-On Mon, Jul 11, 2022 at 12:24:42PM -0600, Jens Axboe wrote:
->On 7/11/22 12:22 PM, Sagi Grimberg wrote:
->>
->>>>> Use the leftover space to carve 'next' field that enables linking of
->>>>> io_uring_cmd structs. Also introduce a list head and few helpers.
->>>>>
->>>>> This is in preparation to support nvme-mulitpath, allowing multiple
->>>>> uring passthrough commands to be queued.
->>>>
->>>> It's not clear to me why we need linking at that level?
->>>
->>> I think the attempt is to allow something like blk_steal_bios that
->>> nvme leverages for io_uring_cmd(s).
->>
->> I'll rephrase because now that I read it, I think my phrasing is
->> confusing.
->>
->> I think the attempt is to allow something like blk_steal_bios that
->> nvme leverages, but for io_uring_cmd(s). Essentially allow io_uring_cmd
->> to be linked in a requeue_list.
->
->I see. I wonder if there's some other way we can accomplish that, so we
->don't have to shrink the current space. io_kiocb already support
->linking, so seems like that should be workable.
->
->>> nvme failover steals all the bios from requests that fail (and should
->>> failover) and puts them on a requeue list, and then schedules
->>> a work that takes these bios one-by-one and submits them on a different
->>> bottom namespace (see nvme_failover_req/nvme_requeue_work).
->>
->> Maybe if io_kiocb could exposed to nvme, and it had some generic space
->> that nvme could use, that would work as well...
->
->It will be more exposed in 5.20, but passthrough is already using the
->per-op allotted space in the io_kiocb. But as mentioned above, there's
->already linking support between io_kiocbs, and that is likely what
->should be used here too.
->
-io_kiocb linking is used if user-space wants to link SQEs for any
-ordering. If we go this route, we give up that feature for
-uring-command SQEs.
+Putting the semicolon at the end is not what Christoph suggested and is 
+not allowed by the kernel coding style.
 
-------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_81924_
-Content-Type: text/plain; charset="utf-8"
+I also prefer the while-loop instead of do-while.
 
+Thanks,
 
-------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_81924_--
+Bart.
