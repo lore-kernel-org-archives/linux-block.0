@@ -2,75 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A37D8C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 20:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F575C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 20:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231364AbiGLUhg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 16:37:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41628 "EHLO
+        id S229930AbiGLUjx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 16:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbiGLUhg (ORCPT
+        with ESMTP id S233036AbiGLUjv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 16:37:36 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511CFB197F;
-        Tue, 12 Jul 2022 13:37:35 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 086663383C;
-        Tue, 12 Jul 2022 20:37:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1657658254;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+trnDr+pJ3wLMVAOo1gWxDwo59FKwzr7H7Yzaf8eevI=;
-        b=TkZUtJ/zJtDGMW+Po0eZTMCLNlc7r7X6Yk57RK2DkqUMd2+C3pTQ4M1BHdSg/R6nqxszok
-        FabfKDihrviiMBchbp5XlIjYHmzvsF8MA9Jj8aszl5RyIcMcWJxrOM0V+UaZ8uLxeglfjj
-        wIXef8ByyOWeox6BcIV0driTyMW0KHg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1657658254;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+trnDr+pJ3wLMVAOo1gWxDwo59FKwzr7H7Yzaf8eevI=;
-        b=Ww+lKtut8MSwQbl2P1XEcJO7G+G/2cb7pUxQRbkSc/QIkf69gsIEo2pFfCxR/wD/7XWqje
-        3SNMqxx3RfcORbDQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id DB79013A94;
-        Tue, 12 Jul 2022 20:37:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id EfGHNI3bzWLlXQAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Tue, 12 Jul 2022 20:37:33 +0000
-Date:   Tue, 12 Jul 2022 22:32:44 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Naohiro Aota <naohiro.aota@wdc.com>
-Cc:     linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 00/13] btrfs: zoned: fix active zone tracking issues
-Message-ID: <20220712203244.GE15169@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org
-References: <cover.1657321126.git.naohiro.aota@wdc.com>
+        Tue, 12 Jul 2022 16:39:51 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 490714F676
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 13:39:50 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id b8so7703033pjo.5
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 13:39:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=GnU4+UsuMLHKK/2SNUMJrMPlV+rAC3v4haluyK3jv0Y=;
+        b=h7SaNRyqO6FmXedci1wt+OWuhyN9R4tjZfppnwXHrV3MOu31tslDc5eB+iXIvnFEKh
+         rr02vcEzfQyclojporOsKkLcjCvNf4WCC/mOV7ydTSy3FuJdBPgA0XmW0fPBfBf0YsCA
+         K46MZH2YZSYFSe5/obP1pPajR9Sz1NCHwz7qIENQxuqfxAnmG7BhxTdNFMepjcK9zTc4
+         ae6FbfMO1ORkPr2s9+DgIwRC01IBDQA+kc4TgkfIvnamED5xxZAyGjQwAhxpEQjLe+CF
+         e6LqJ/43Bw1kXiLA37p00bXMcEbvQtS907MXS1ge+Yg/a5Morj4adzlMDOgxSgS1p9T5
+         phzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=GnU4+UsuMLHKK/2SNUMJrMPlV+rAC3v4haluyK3jv0Y=;
+        b=Fs8rdZaGlJa8Q8i5Uc7QC3/MVDwb4Hv7oGR8qkY4CtS+G7KzJhX/QiILwJ4HBZPjUz
+         fOW0m4XyHMxPZ9eZWTzf+OHmR1o+sbDCWIuDCn4t8J6DdPw9xkV2KL/SDRxJFUMcAEHU
+         UkDtMqpLRsAOW0f0OHSFkDbzoztBmNCJHzr+WX6QXoWPNa3r5VnwkfLP7m8kUV5C0jGB
+         TRYLtVDL28SZgeGk4DKCgWmjbapjp6AlIBcuK7Fc+FSZH3tXEroBPh9RtS3tNfKRXtpg
+         Caw66ZVTe5yx7L4R76FiphCjgfyM0dUjBl59laO0hKrlz68UxyJgtGc0SVW0+B5nGf6d
+         joKQ==
+X-Gm-Message-State: AJIora8tCi0wigzdNKtdzDWOpJSEfYowUS7wkiNKJex3O445zwwySmAt
+        x8eCMCmipf4IuRu+F+4c3EJTHMXs8pFINQ==
+X-Google-Smtp-Source: AGRyM1uilEx21kiIAKEvcWo8xUaisXaksezhUkTgwbFg4f1noN1lKAK2FLw+0Q7b5jG+y5k0HzsGdg==
+X-Received: by 2002:a17:902:db02:b0:16c:5568:d740 with SMTP id m2-20020a170902db0200b0016c5568d740mr7980357plx.100.1657658389614;
+        Tue, 12 Jul 2022 13:39:49 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d10-20020a170902ceca00b0015e8d4eb2cdsm7312542plg.279.2022.07.12.13.39.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jul 2022 13:39:49 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, vincent.fu@samsung.com
+Cc:     gost.dev@samsung.com
+In-Reply-To: <20220708174943.87787-1-vincent.fu@samsung.com>
+References: <CGME20220708174950uscas1p28249281e53bc42b8e148bb76745b39a0@uscas1p2.samsung.com> <20220708174943.87787-1-vincent.fu@samsung.com>
+Subject: Re: [PATCH for-next v2 0/2] null_blk: harmonize some module parameter and configfs options
+Message-Id: <165765838869.44117.8384067765868369752.b4-ty@kernel.dk>
+Date:   Tue, 12 Jul 2022 14:39:48 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1657321126.git.naohiro.aota@wdc.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 09, 2022 at 08:18:37AM +0900, Naohiro Aota wrote:
-> This series addresses mainly two issues on zoned btrfs' active zone
+On Fri, 8 Jul 2022 17:49:49 +0000, Vincent Fu wrote:
+> These patches add plumbing to allow some options that could formerly only be
+> set via module parameters to now be set via configfs and vice versa.
+> 
+> Changes since v1:
+>  - fix documentation formatting in patch 1
+> 
+> Vincent Fu (2):
+>   null_blk: add module parameters for 4 options
+>   null_blk: add configfs variables for 2 options
+> 
+> [...]
 
-Btw, I have one minor remark that's in many patches: please don't use
-'zoned btrfs' when referring to it, either use 'zoned filesystem' or
-'zoned mode'. I've fixed it where I noticed but in the future it would
-be good to have it in the patches from the beginning. Thanks.
+Applied, thanks!
+
+[1/2] null_blk: add module parameters for 4 options
+      (no commit info)
+[2/2] null_blk: add configfs variables for 2 options
+      (no commit info)
+
+Best regards,
+-- 
+Jens Axboe
+
+
