@@ -2,235 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DCBC43334
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 07:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 003EACCA47C
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 07:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232090AbiGLHFF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 03:05:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46296 "EHLO
+        id S230310AbiGLHFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 03:05:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232312AbiGLHED (ORCPT
+        with ESMTP id S231968AbiGLHFF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 03:04:03 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDDC21E02;
-        Tue, 12 Jul 2022 00:03:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=0JLzuoaC7nW3s5hxRaC/qqyoK8M7u9apwCZLzl0G/70=; b=RSFks6mNQQfVI8KIqaWXROJAwA
-        AevKjH/MNEQrD3DorF0MELIK775DA1wB5Thqr+T3Fo2E9EmhaCetrC1X4rZtrKv4qv8WMLN3U0Dsz
-        SphekHYLl/qrJ+/PiCB2S0QN42yRvw1XeCjLJCaSt0tyPe3qla0mLaAATs61o7W2TTstwWhxs1XnA
-        J1EoIDx9Qs+SgG3TRlmOZDrH+Oufs1ygUdxPLav0ERLKPUnrlrlqP79t2EYDTFZ8ptoNjNyV0+FjV
-        L6NuYFmr/r0FAim0g8r0sI2yaCPfo8dPyKUe9YEwO1ys//aYHp2VWFhJszoBfuSbGXKIskeJeKSeB
-        2YI/ugIA==;
-Received: from ip4d15c27d.dynamic.kabel-deutschland.de ([77.21.194.125] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oB9w1-008DbJ-IL; Tue, 12 Jul 2022 07:03:54 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Song Liu <song@kernel.org>
-Cc:     Logan Gunthorpe <logang@deltatee.com>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 7/8] md: only delete entries from all_mddevs when the disk is freed
-Date:   Tue, 12 Jul 2022 09:03:30 +0200
-Message-Id: <20220712070331.1390700-8-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220712070331.1390700-1-hch@lst.de>
-References: <20220712070331.1390700-1-hch@lst.de>
+        Tue, 12 Jul 2022 03:05:05 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EF91D0EA;
+        Tue, 12 Jul 2022 00:05:04 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id l2so5244847qtp.11;
+        Tue, 12 Jul 2022 00:05:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=D7LWQnfNk6keltPhuzK4RA+8ZwNJY7TvltfTLzLyfmA=;
+        b=N0vNPoLFN38DuBtFJfGVNJglEiQ8ApSQ0HX31CbwSoCvVA0niVlDNSgmtHJGHM1plT
+         vOWTN9vAJv+VjwVeBrD6oHLgxOcRlkqrEUScwnb3MHgBTc3m0UlkD7jSTkw7lbGCJeFJ
+         X9BlcWiEauuQLl8DCfDdNt/vKFwxX2iAZrqNe3bLFnoppDtzXDw3k4b2GsZipHpvC0Au
+         2OL4+uMN3IPFk7oP4bwsSsZufmYry9gJU8lrgLH1VuwN1nkPPJMNKuWc09LxwgkT5gNa
+         /5aPqWWP5MIJeFU6lx7JkX9Bd0Mk/jYszVpSiOCZnF5j6ewBxMaYJ9yjbpx17oZ7sJVJ
+         +53g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=D7LWQnfNk6keltPhuzK4RA+8ZwNJY7TvltfTLzLyfmA=;
+        b=HMwJSLHOejyPnC93+WUoS+zsmDwKdUBL+z9f3pxSFwssgUNRAp2klRcqQfC8GaV7Ma
+         3EJq+4urdHLczhd3DU+BPm7HGtV7s9/sq69BmYlZSguk1H4uHaLw+poxNSEiyLHBVq/L
+         ta6dPzi/ozKCtqb9GyeijmF8/4cMFU4ib8EoZMIL6gBVr1AQNbsqmS9gULre4qtTOpdH
+         lGoFw6miChuMyRi35Qc0/dBBaWsHJZDDnItwit2hbCMXbvAbUIgbdlXloIFYVgsoVsGQ
+         i/O8/st6OfWa8mNaLMpWaROiYU3NPwTx+nms7KJ7fQ+HhRDQ7ExAEtfFVv5+mVW7VmbE
+         3Ncg==
+X-Gm-Message-State: AJIora/K0+h3Y5is4NL5siJ3t8yDtNMgyErOeLPkRO1IHHmiZQtLV15v
+        DtxXnyEcv5jhF58IyJrE4HeKYuSvcYXXad+bDhbhO/n9QQHq8g==
+X-Google-Smtp-Source: AGRyM1vPbZI8RMjdd0URsWOpqecC2HKJ7e5obZLK/80/fXMbeuV+mRQjvreSQIXukpmzULdsXPTPaehBgMe0gvRFwZk=
+X-Received: by 2002:a05:622a:110e:b0:31e:b568:b5a5 with SMTP id
+ e14-20020a05622a110e00b0031eb568b5a5mr6676673qty.54.1657609503173; Tue, 12
+ Jul 2022 00:05:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20220711153301.2388-1-ubizjak@gmail.com> <Ys0C72unFFlsWomq@infradead.org>
+In-Reply-To: <Ys0C72unFFlsWomq@infradead.org>
+From:   Uros Bizjak <ubizjak@gmail.com>
+Date:   Tue, 12 Jul 2022 09:04:52 +0200
+Message-ID: <CAFULd4bqmbundK=YE9A1scW6za3z4B7B_XjY=sS1R+3H40fF0Q@mail.gmail.com>
+Subject: Re: [PATCH] block: Use try_cmpxchg some more
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This ensures device names don't get prematurely reused.  Instead add a
-deleted flag to skip already deleted devices in mddev_get and other
-places that only want to see live mddevs.
+On Tue, Jul 12, 2022 at 7:13 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Mon, Jul 11, 2022 at 05:33:01PM +0200, Uros Bizjak wrote:
+> > Use try_cmpxchg family of functions instead of cmpxchg (*ptr, old, new) == old.
+> > x86 CMPXCHG instruction returns success in ZF flag, so this change saves a
+> > compare after cmpxchg (and related move instruction in front of cmpxchg).
+> >
+> > Also, try_cmpxchg implicitly assigns old *ptr value to "old" when
+> > cmpxchg fails, enabling further code simplifications.
+> >
+> > No functional change intended.
+>
+> You might want to split this into a patch per caller as it might
+> attact different reviewers.
 
-Reported-by; Logan Gunthorpe <logang@deltatee.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/md/md.c | 58 ++++++++++++++++++++++++++++++++++---------------
- drivers/md/md.h |  1 +
- 2 files changed, 42 insertions(+), 17 deletions(-)
+No problem for me. get_maintainer.pl returned Jens as the sole
+maintainer for all these parts, so I put everything together in order
+to ease the maintainer's job.
 
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index f15bc6bb65f2d..9afc438a08e4d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -625,6 +625,10 @@ EXPORT_SYMBOL(md_flush_request);
- 
- static inline struct mddev *mddev_get(struct mddev *mddev)
- {
-+	lockdep_assert_held(&all_mddevs_lock);
-+
-+	if (mddev->deleted)
-+		return NULL;
- 	atomic_inc(&mddev->active);
- 	return mddev;
- }
-@@ -639,7 +643,7 @@ static void mddev_put(struct mddev *mddev)
- 	    mddev->ctime == 0 && !mddev->hold_active) {
- 		/* Array is not configured at all, and not held active,
- 		 * so destroy it */
--		list_del_init(&mddev->all_mddevs);
-+		mddev->deleted = true;
- 
- 		/*
- 		 * Call queue_work inside the spinlock so that
-@@ -720,8 +724,8 @@ static struct mddev *mddev_find(dev_t unit)
- 
- 	spin_lock(&all_mddevs_lock);
- 	mddev = mddev_find_locked(unit);
--	if (mddev)
--		mddev_get(mddev);
-+	if (mddev && !mddev_get(mddev))
-+		mddev = NULL;
- 	spin_unlock(&all_mddevs_lock);
- 
- 	return mddev;
-@@ -3330,6 +3334,8 @@ static bool md_rdev_overlaps(struct md_rdev *rdev)
- 
- 	spin_lock(&all_mddevs_lock);
- 	list_for_each_entry(mddev, &all_mddevs, all_mddevs) {
-+		if (mddev->deleted)
-+			continue;
- 		rdev_for_each(rdev2, mddev) {
- 			if (rdev != rdev2 && rdev->bdev == rdev2->bdev &&
- 			    md_rdevs_overlap(rdev, rdev2)) {
-@@ -5504,11 +5510,10 @@ md_attr_show(struct kobject *kobj, struct attribute *attr, char *page)
- 	if (!entry->show)
- 		return -EIO;
- 	spin_lock(&all_mddevs_lock);
--	if (list_empty(&mddev->all_mddevs)) {
-+	if (!mddev_get(mddev)) {
- 		spin_unlock(&all_mddevs_lock);
- 		return -EBUSY;
- 	}
--	mddev_get(mddev);
- 	spin_unlock(&all_mddevs_lock);
- 
- 	rv = entry->show(mddev, page);
-@@ -5529,11 +5534,10 @@ md_attr_store(struct kobject *kobj, struct attribute *attr,
- 	if (!capable(CAP_SYS_ADMIN))
- 		return -EACCES;
- 	spin_lock(&all_mddevs_lock);
--	if (list_empty(&mddev->all_mddevs)) {
-+	if (!mddev_get(mddev)) {
- 		spin_unlock(&all_mddevs_lock);
- 		return -EBUSY;
- 	}
--	mddev_get(mddev);
- 	spin_unlock(&all_mddevs_lock);
- 	rv = entry->store(mddev, page, length);
- 	mddev_put(mddev);
-@@ -7815,6 +7819,10 @@ static void md_free_disk(struct gendisk *disk)
- {
- 	struct mddev *mddev = disk->private_data;
- 
-+	spin_lock(&all_mddevs_lock);
-+	list_del_init(&mddev->all_mddevs);
-+	spin_unlock(&all_mddevs_lock);
-+
- 	percpu_ref_exit(&mddev->writes_pending);
- 	bioset_exit(&mddev->bio_set);
- 	bioset_exit(&mddev->sync_set);
-@@ -8131,6 +8139,8 @@ static void *md_seq_start(struct seq_file *seq, loff_t *pos)
- 		if (!l--) {
- 			mddev = list_entry(tmp, struct mddev, all_mddevs);
- 			mddev_get(mddev);
-+			if (!mddev_get(mddev))
-+				continue;
- 			spin_unlock(&all_mddevs_lock);
- 			return mddev;
- 		}
-@@ -8144,25 +8154,35 @@ static void *md_seq_next(struct seq_file *seq, void *v, loff_t *pos)
- {
- 	struct list_head *tmp;
- 	struct mddev *next_mddev, *mddev = v;
-+	struct mddev *to_put = NULL;
- 
- 	++*pos;
- 	if (v == (void*)2)
- 		return NULL;
- 
- 	spin_lock(&all_mddevs_lock);
--	if (v == (void*)1)
-+	if (v == (void*)1) {
- 		tmp = all_mddevs.next;
--	else
-+	} else {
-+		to_put = mddev;
- 		tmp = mddev->all_mddevs.next;
--	if (tmp != &all_mddevs)
--		next_mddev = mddev_get(list_entry(tmp,struct mddev,all_mddevs));
--	else {
--		next_mddev = (void*)2;
--		*pos = 0x10000;
- 	}
-+
-+	for (;;) {
-+		if (tmp == &all_mddevs) {
-+			next_mddev = (void*)2;
-+			*pos = 0x10000;
-+			break;
-+		}
-+		next_mddev = list_entry(tmp, struct mddev, all_mddevs);
-+		if (mddev_get(next_mddev))
-+			break;
-+		mddev = next_mddev;
-+		tmp = mddev->all_mddevs.next;
-+	};
- 	spin_unlock(&all_mddevs_lock);
- 
--	if (v != (void*)1)
-+	if (to_put)
- 		mddev_put(mddev);
- 	return next_mddev;
- 
-@@ -8732,6 +8752,8 @@ void md_do_sync(struct md_thread *thread)
- 			goto skip;
- 		spin_lock(&all_mddevs_lock);
- 		list_for_each_entry(mddev2, &all_mddevs, all_mddevs) {
-+			if (mddev2->deleted)
-+				continue;
- 			if (mddev2 == mddev)
- 				continue;
- 			if (!mddev->parallel_resync
-@@ -9530,7 +9552,8 @@ static int md_notify_reboot(struct notifier_block *this,
- 
- 	spin_lock(&all_mddevs_lock);
- 	list_for_each_entry_safe(mddev, n, &all_mddevs, all_mddevs) {
--		mddev_get(mddev);
-+		if (!mddev_get(mddev))
-+			continue;
- 		spin_unlock(&all_mddevs_lock);
- 		if (mddev_trylock(mddev)) {
- 			if (mddev->pers)
-@@ -9885,7 +9908,8 @@ static __exit void md_exit(void)
- 
- 	spin_lock(&all_mddevs_lock);
- 	list_for_each_entry_safe(mddev, n, &all_mddevs, all_mddevs) {
--		mddev_get(mddev);
-+		if (!mddev_get(mddev))
-+			continue;
- 		spin_unlock(&all_mddevs_lock);
- 		export_array(mddev);
- 		mddev->ctime = 0;
-diff --git a/drivers/md/md.h b/drivers/md/md.h
-index cf2cbb17acbd4..e731a2fdc6ac1 100644
---- a/drivers/md/md.h
-+++ b/drivers/md/md.h
-@@ -488,6 +488,7 @@ struct mddev {
- 
- 	atomic_t			max_corr_read_errors; /* max read retries */
- 	struct list_head		all_mddevs;
-+	bool				deleted;
- 
- 	const struct attribute_group	*to_remove;
- 
--- 
-2.30.2
+> > +     do {
+> > +     } while (old && !atomic_try_cmpxchg(&blkg->use_delay, &old, old - 1));
+>
+> It might just be me, but for loops with an empty body this do { } while
+> construct looks odd.  Why not:
+>
+>         while (old && !atomic_try_cmpxchg(&blkg->use_delay, &old, old - 1))
+>                 ;
 
+The form was taken from e6790e4b5d5e97dc287f3496dd2cf2dbabdfdb35 [1].
+Using try_cmpxhchg, almost every use fits in
+
+do {
+    // the body of the loop
+} while (try_cmpxchg ...)
+
+and when the body of the loop is empty, it is clear that this was
+indeed intended. Using
+
+while (try_cmpxchg ...);
+
+looks to me like a semicolon was left there in error, like "if (...);".
+
+> The the use of the atomic on ->use_delay looks really whacky to start
+> with.  To me it sounds like it really wants to use a proper lock
+> instead of all this magic.
+
+I took a lot of care not to change the functionality of the
+surrounding code, and any functional change should be outside of the
+scope of the patch.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e6790e4b5d5e97dc287f3496dd2cf2dbabdfdb35
+
+Uros.
