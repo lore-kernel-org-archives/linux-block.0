@@ -2,95 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E60CCA47C
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 14:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 889BBC43334
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 15:13:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233565AbiGLOeG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 10:34:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51258 "EHLO
+        id S230191AbiGLPNT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 11:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233465AbiGLOd1 (ORCPT
+        with ESMTP id S234115AbiGLPM7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 10:33:27 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9490CBA392
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 07:33:06 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id t5-20020a17090a6a0500b001ef965b262eso8190375pjj.5
-        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 07:33:06 -0700 (PDT)
+        Tue, 12 Jul 2022 11:12:59 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A505724A;
+        Tue, 12 Jul 2022 08:06:07 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id v12so10453581edc.10;
+        Tue, 12 Jul 2022 08:06:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zwF8KM+QN1wrDkEu1y1myqZInsbYcwieQIeG//Czh5M=;
-        b=YvAp9hap2BYWKUedYvYv1gLfcLHkjPGSrnu+ouiXvg1fz+w9UddQf3z+Jspw1C7UkN
-         3Og/jjD9pDCij7aA0mCP6SZbFCJKliefl2wXnbbpJf63ChTVbAT19GktrSXv4M5rmy8E
-         ET+Am8TGe1S5+J4POBPx2fjfAUqZb8AxwOxbE=
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=AQeDqtEy+5DeVKw7Jgay8OdRWZJPmVJw29fco3ng5Eo=;
+        b=IEI9Zm7s2CF0UBCPAMZdmwo2DxHXG1xTdG8l77U6rvJbaII4BwZ2YhijiKh0/7faeZ
+         1Nx1B6RztXIkZzyoxs2l/x6X4yJw01mtCASL5fWNEr0SGAT/uStCDMaLXG7vU5+3a5Ke
+         qjCVgJwlAUcK6nOjebNpatDCyOSdHUV2MH7gzinVl4pDb26/50U2pk/VxlJbJXq5Xa6w
+         MNucBl6793fcsDEvujhrBeg/NpEJn4MDKwRdgRANgMy8jdQq1WEU5SA40VzV4DNPCWNr
+         718GgYeYzdNVRXdKonnoZZ4LcbCWn2nSu9FoILNtMTBUDsgxZvclrZZ1QSSePWiyaMvS
+         4Jgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zwF8KM+QN1wrDkEu1y1myqZInsbYcwieQIeG//Czh5M=;
-        b=6jnDnAL4+ZCKvnozqIsGIWfnk620CPKRh/DPCM7DV/iukaH3SSOggUTCwhBxDiSQy4
-         GJ2fFlw17iBWzSEMc1RcNOO2kgeuaPpHaGcIFtMxZQ05N63op/EeQ986g//Re1wM++Gb
-         HHHwVurMnbyW8Q2WXILHP7I7zYHBPNPhTXhFFXSyVd38x0ugq+WuJy7E6Gpa3BYiIJyE
-         OWx0fWvdbSmP4pjAld8RJHcKIsEF8q2UEJYHdmOGB4ON74zZFneSRTpFFhXFEQ5srTDL
-         ixYh4RtdzEfGj3E1oq/OP+Api2qBTmvJWCCAObdggLkatIHSd61C+hIWUoGTVEZksd3p
-         APYw==
-X-Gm-Message-State: AJIora/N1tiERpY9/4G3HPdaG4gvv1PND9mruyDfpqAT5YYFIMUmosVd
-        cajUe8j2CJk/Rje1b2kvOET/UA==
-X-Google-Smtp-Source: AGRyM1vFALT/kH4MpQ9lXXSKLlwZModCE+ymj2gXl0DE2+g39x4/69CMi73CAf4DAs8nYrZL+EMYjA==
-X-Received: by 2002:a17:902:f785:b0:16a:4f3b:a20c with SMTP id q5-20020a170902f78500b0016a4f3ba20cmr24811436pln.118.1657636386137;
-        Tue, 12 Jul 2022 07:33:06 -0700 (PDT)
-Received: from google.com ([240f:75:7537:3187:695c:b409:1af4:f672])
-        by smtp.gmail.com with ESMTPSA id k9-20020aa79d09000000b005251c6fbd0csm6900113pfp.29.2022.07.12.07.33.03
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=AQeDqtEy+5DeVKw7Jgay8OdRWZJPmVJw29fco3ng5Eo=;
+        b=ArufEd8s9OmFLJe43N5LLObzvgbggCaH78ppJp/hdQDS6s8ihS5vGckMgr/Naw5Xyr
+         H4HjMSoAS/34FNTZQbOCagt8Dv8DrBymH7lYeNpHl/w4Swfzl/HJuayAnmznRHgGchzR
+         hRIH4NfZ/xKlkOf+dV6PsgGx5x3dmLHjpgR5w3CCwInIb5SSUT7ZIe8okYR8SsQ6oyXw
+         LjoGA5+uC9/54i5ebwShnEkACOgmxGP1Wj6USMUsy+HxxC6hRbUgToWQMNmfTJrulYem
+         YAIAHT1xqeGdKb6E5wgVafcXjZLg6gF7rEX8O4dLl9RNTkr4K3Zr8ewGty9cNvIHB8dp
+         4EYw==
+X-Gm-Message-State: AJIora9D85t7ZZIVj1ELkYw63OdtCCPvN1wUCdG57c6KyfbsnSh1jUm6
+        LlXmN/dcVTre6PvpMZKa3cFhIdodEXE=
+X-Google-Smtp-Source: AGRyM1tPg3ti9n/Alp6ozRsYdrrOoGpObaCjqCjLnKehEqvtl7qmulcz2RilyhkrW1qIOaHOCrlqmA==
+X-Received: by 2002:aa7:d053:0:b0:43a:a164:2c3 with SMTP id n19-20020aa7d053000000b0043aa16402c3mr32608721edo.333.1657638363399;
+        Tue, 12 Jul 2022 08:06:03 -0700 (PDT)
+Received: from localhost.localdomain ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id i8-20020a170906a28800b0072b13fa5e4csm3926753ejz.58.2022.07.12.08.06.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 07:33:05 -0700 (PDT)
-Date:   Tue, 12 Jul 2022 23:33:01 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Kefeng Wang <wangkefeng.wang@huawei.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: fix unused 'zram_wb_devops' warning
-Message-ID: <Ys2GHQkhAqdGqOlx@google.com>
-References: <20220608072534.68850-1-wangkefeng.wang@huawei.com>
+        Tue, 12 Jul 2022 08:06:02 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v2] block/rq_qos: Use atomic_try_cmpxchg in atomic_inc_below
+Date:   Tue, 12 Jul 2022 17:05:47 +0200
+Message-Id: <20220712150547.5786-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220608072534.68850-1-wangkefeng.wang@huawei.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+ Andrew
+Use atomic_try_cmpxchg instead of atomic_cmpxchg (*ptr, old, new) == old in
+atomic_inc_below. x86 CMPXCHG instruction returns success in ZF flag,
+so this change saves a compare after cmpxchg (and related move instruction
+in front of cmpxchg).
 
-Message ID: 20220608072534.68850-1-wangkefeng.wang@huawei.com
+Also, atomic_try_cmpxchg implicitly assigns old *ptr value to "old" when
+cmpxchg fails, enabling further code simplifications.
 
-On (22/06/08 15:25), Kefeng Wang wrote:
-> drivers/block/zram/zram_drv.c:55:45: warning: 'zram_wb_devops' defined but not used [-Wunused-const-variable=]
-> 
-> Fix the above warning if CONFIG_ZRAM_WRITEBACK not enabled.
-> 
-> Signed-off-by: Kefeng Wang <wangkefeng.wang@huawei.com>
-> ---
->  drivers/block/zram/zram_drv.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index 39cd1397ed3b..fff5eb4d3f20 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -52,7 +52,9 @@ static unsigned int num_devices = 1;
->  static size_t huge_class_size;
->  
->  static const struct block_device_operations zram_devops;
-> +#ifdef CONFIG_ZRAM_WRITEBACK
->  static const struct block_device_operations zram_wb_devops;
-> +#endif
->  
->  static void zram_free_page(struct zram *zram, size_t index);
->  static int zram_bvec_read(struct zram *zram, struct bio_vec *bvec,
+No functional change intended.
 
-Reviewed-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+---
+v2: Split patch from the original big patch
+---
+ block/blk-rq-qos.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index d3a75693adbf..88f0fe7dcf54 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -10,16 +10,10 @@ static bool atomic_inc_below(atomic_t *v, unsigned int below)
+ {
+ 	unsigned int cur = atomic_read(v);
+ 
+-	for (;;) {
+-		unsigned int old;
+-
++	do {
+ 		if (cur >= below)
+ 			return false;
+-		old = atomic_cmpxchg(v, cur, cur + 1);
+-		if (old == cur)
+-			break;
+-		cur = old;
+-	}
++	} while (!atomic_try_cmpxchg(v, &cur, cur + 1));
+ 
+ 	return true;
+ }
+-- 
+2.35.3
+
