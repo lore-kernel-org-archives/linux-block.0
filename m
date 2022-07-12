@@ -2,93 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F730C43334
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 15:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEBFC43334
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 15:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232182AbiGLP1z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 11:27:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36458 "EHLO
+        id S234122AbiGLPd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 11:33:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbiGLP1x (ORCPT
+        with ESMTP id S234169AbiGLPdN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 11:27:53 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBFCBC25;
-        Tue, 12 Jul 2022 08:27:53 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id ss3so8920145ejc.11;
-        Tue, 12 Jul 2022 08:27:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DgrpeUlEg7dspJm0u/Xa9mdZFkQ0wTFNU4ocm1l1BOA=;
-        b=k7cv85FzcOc5t49cOOmfHFuJOLh2saADD2PdsnMZGEXYbOAC5YzCr5qZ00zipRE346
-         mmELpdeP6OVRqXO7sgxYtIT12jjh0g/ccm61y2PTo8FGTWpUmp4DKnRrb2EiLkL8tL2E
-         DiDYDGGGXf6bVa5wKzoM/Z6lmBkSTotUELzV+Dj4iGCWOAiuxMnvWEprh731Q9qM9O5p
-         fP49p28XbPHH868sMHRlCMhGXfSM4pnbo/9aWtCtD7W2MnXbAcfoXdtwlzVcUUdbDp5D
-         nUu3BOC7B4BeEzoH8Sq4rUteot59NXe7cR/hR8qgwX1M7qcHx8FLcE16ozle0UMXXZvt
-         OSnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DgrpeUlEg7dspJm0u/Xa9mdZFkQ0wTFNU4ocm1l1BOA=;
-        b=ylEOgCBUpYjc1uSgpniHIIFmMyuQy6duBoLGhYicXcceS7sSBJYrLkhT4P6eKXTtTA
-         FENN2tv2SXCs7hyiPUwuKMtUYPOBTdXMFtoUuIWB3lQ+xl/vIcVxitu5vqtqhJ1H8w5u
-         2YA6qu+zwbwPedjRalBI1ZYRrLtKDCic6VCwpGsZNbCC7BJx1WvjUY0tqhyB1e34jeg8
-         p9HOlgy2sP6wjUGkHaIWjkTU46Dom3RLATRw6PbaEspgEwV7yddbYY7ANBm6J1g+bSsx
-         osaFCdMfNkb73bmogPYOWbRko8HWY9MevUuK/yXY4nEqHsx5OE0Nh0azpm4Yetgq3o5d
-         Zn8A==
-X-Gm-Message-State: AJIora8QRiTrTtOG0NnR4rd18hjKFx7QPs8PCnDefNcxVnjPmwxVZ4cH
-        E3gpOHSd98pIyu6XuY/kbbp7uWINkfg=
-X-Google-Smtp-Source: AGRyM1vUtFVhV4+kPGrdeDT4LK7IBeZdd8UAgg6ZbrNcnulYaM1rX/AF7tFce9aCgtmRFhNpGhjK8w==
-X-Received: by 2002:a17:907:3e15:b0:72b:879a:eec7 with SMTP id hp21-20020a1709073e1500b0072b879aeec7mr2193711ejc.136.1657639671490;
-        Tue, 12 Jul 2022 08:27:51 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id c1-20020a17090618a100b0072b4e4cd346sm2701487ejf.188.2022.07.12.08.27.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 08:27:51 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] block: Use try_cmpxchg in update_io_ticks
-Date:   Tue, 12 Jul 2022 17:27:41 +0200
-Message-Id: <20220712152741.7324-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        Tue, 12 Jul 2022 11:33:13 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD419C1656
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 08:33:08 -0700 (PDT)
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 26CAJIiC016258
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 08:33:08 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=facebook;
+ bh=jxCiKEH/1t+x3zcdL+X8KQZmdGEfq3hNQwQWm3upkXM=;
+ b=J2vjKWGwOeHI/1or0uRAqwLUgKp9SfJ3ShrxQE0JTDyzLkYxvE3TtLuvv9XqWqdp44tg
+ sUpvw3WA4oP3Gfuan4+nqUd+VLtNYY+JN+c1Yqc5WanUYpC3jYyQqdowK6X3nymVP4CN
+ pLtOsjRO4kDT4ZXKMeDlMrXjoNOBRptppik= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by m0001303.ppops.net (PPS) with ESMTPS id 3h973fhsbq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 08:33:08 -0700
+Received: from twshared25478.08.ash9.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c085:21d::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 12 Jul 2022 08:33:06 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 9EBB160739E9; Tue, 12 Jul 2022 08:32:58 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 3/3] block: fix leaking page ref on truncated direct io
+Date:   Tue, 12 Jul 2022 08:32:56 -0700
+Message-ID: <20220712153256.2202024-3-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220712153256.2202024-1-kbusch@fb.com>
+References: <20220712153256.2202024-1-kbusch@fb.com>
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: n1znQAjixL64uWG4Fwjq2R3Sj6KWz625
+X-Proofpoint-ORIG-GUID: n1znQAjixL64uWG4Fwjq2R3Sj6KWz625
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-12_10,2022-07-12_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use try_cmpxchg instead of cmpxchg (*ptr, old, new) == old in
-update_io_ticks. x86 CMPXCHG instruction returns success in ZF flag,
-so this change saves a compare after cmpxchg (and related
-move instruction in front of cmpxchg).
+From: Keith Busch <kbusch@kernel.org>
 
-No functional change intended.
+The size being added to a bio from an iov is aligned to a block size
+after the pages were gotten. If the new aligned size truncates the last
+page, its reference was being leaked. Ensure all pages that were not
+added to the bio have their reference released.
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>
+Since this essentially requires doing the same that bio_put_pages(), and
+there was only one caller for that function, this patch makes the
+put_page() loop common for everyone.
+
+Fixes: b1a000d3b8ec5 ("block: relax direct io memory alignment")
+Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
-v2: Split patch from the original big patch
----
- block/blk-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v1->v2: fixed possible uninitialized variable
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 27fb1357ad4b..628b965356db 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -987,7 +987,7 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
- again:
- 	stamp = READ_ONCE(part->bd_stamp);
- 	if (unlikely(time_after(now, stamp))) {
--		if (likely(cmpxchg(&part->bd_stamp, stamp, now) == stamp))
-+		if (likely(try_cmpxchg(&part->bd_stamp, &stamp, now)))
- 			__part_stat_add(part, io_ticks, end ? now - stamp : 1);
+This update is also pushed to my repo,
+
+https://git.kernel.org/pub/scm/linux/kernel/git/kbusch/linux.git/log/?h=3Da=
+lignment-fixes-rebased
+
+ block/bio.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 01223f8086ed..de345a9b52db 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1151,14 +1151,6 @@ void bio_iov_bvec_set(struct bio *bio, struct iov_it=
+er *iter)
+ 	bio_set_flag(bio, BIO_CLONED);
+ }
+=20
+-static void bio_put_pages(struct page **pages, size_t size, size_t off)
+-{
+-	size_t i, nr =3D DIV_ROUND_UP(size + (off & ~PAGE_MASK), PAGE_SIZE);
+-
+-	for (i =3D 0; i < nr; i++)
+-		put_page(pages[i]);
+-}
+-
+ static int bio_iov_add_page(struct bio *bio, struct page *page,
+ 		unsigned int len, unsigned int offset)
+ {
+@@ -1207,7 +1199,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, =
+struct iov_iter *iter)
+ 	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages =3D (struct page **)bv;
+ 	ssize_t size, left;
+-	unsigned len, i;
++	unsigned len, i =3D 0;
+ 	size_t offset;
+ 	int ret =3D 0;
+=20
+@@ -1228,10 +1220,16 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
+, struct iov_iter *iter)
+ 	 */
+ 	size =3D iov_iter_get_pages(iter, pages, UINT_MAX - bio->bi_iter.bi_size,
+ 				  nr_pages, &offset);
+-	if (size > 0)
++	if (size > 0) {
++		nr_pages =3D DIV_ROUND_UP(offset + size, PAGE_SIZE);
+ 		size =3D ALIGN_DOWN(size, bdev_logical_block_size(bio->bi_bdev));
+-	if (unlikely(size <=3D 0))
+-		return size ? size : -EFAULT;
++	} else
++		nr_pages =3D 0;
++
++	if (unlikely(size <=3D 0)) {
++		ret =3D size ? size : -EFAULT;
++		goto out;
++	}
+=20
+ 	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
+ 		struct page *page =3D pages[i];
+@@ -1240,10 +1238,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio,=
+ struct iov_iter *iter)
+ 		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND) {
+ 			ret =3D bio_iov_add_zone_append_page(bio, page, len,
+ 					offset);
+-			if (ret) {
+-				bio_put_pages(pages + i, left, offset);
++			if (ret)
+ 				break;
+-			}
+ 		} else
+ 			bio_iov_add_page(bio, page, len, offset);
+=20
+@@ -1251,6 +1247,10 @@ static int __bio_iov_iter_get_pages(struct bio *bio,=
+ struct iov_iter *iter)
  	}
- 	if (part->bd_partno) {
--- 
-2.35.3
+=20
+ 	iov_iter_advance(iter, size - left);
++out:
++	while (i < nr_pages)
++		put_page(pages[i++]);
++
+ 	return ret;
+ }
+=20
+--=20
+2.30.2
 
