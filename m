@@ -2,100 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46649C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 01:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7828AC43334
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 02:27:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbiGLBvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jul 2022 21:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37270 "EHLO
+        id S230334AbiGLC1E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jul 2022 22:27:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229721AbiGLBvO (ORCPT
+        with ESMTP id S230457AbiGLC06 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jul 2022 21:51:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 55B382AC5D
-        for <linux-block@vger.kernel.org>; Mon, 11 Jul 2022 18:51:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657590672;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KIjzl7edHnX8DzaOiYgsgS3/Vle3xDsIdNJSVd1oDco=;
-        b=HlRaojecxme0o9pogmSzoiNETtrG6QNSv90VwyS0TDixhZmHxob2rYVdphl6XGV+Tj0yiT
-        qw04Fdzmqd/T+Ttr0ApumyMYxRkO31pABcpqWywCpJ/DP+NpzhU9c0K+eJ0BZS6QH9CStW
-        UsglzOuQDXuey/SsdmCUwRRvaEWaqv8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-179-uJKlGyDbO_WtIs_1AII_ZA-1; Mon, 11 Jul 2022 21:51:09 -0400
-X-MC-Unique: uJKlGyDbO_WtIs_1AII_ZA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5A4985A585;
-        Tue, 12 Jul 2022 01:51:08 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F31AF40D2827;
-        Tue, 12 Jul 2022 01:51:04 +0000 (UTC)
-Date:   Tue, 12 Jul 2022 09:50:59 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>
-Subject: Re: [PATCH] blk-mq: don't create hctx debugfs dir until
- q->debugfs_dir is created
-Message-ID: <YszTg0GAQrOa96UX@T590>
-References: <20220711090808.259682-1-ming.lei@redhat.com>
- <4c5f332f-ccd4-5d0e-14d4-bccf57bcd7cc@acm.org>
+        Mon, 11 Jul 2022 22:26:58 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92BE78FD4A;
+        Mon, 11 Jul 2022 19:26:52 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VJ6IXEP_1657592808;
+Received: from 30.97.56.235(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VJ6IXEP_1657592808)
+          by smtp.aliyun-inc.com;
+          Tue, 12 Jul 2022 10:26:49 +0800
+Message-ID: <1f021cc5-3cbe-a69d-7d50-8c758174d178@linux.alibaba.com>
+Date:   Tue, 12 Jul 2022 10:26:47 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4c5f332f-ccd4-5d0e-14d4-bccf57bcd7cc@acm.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH V4 2/2] ublk_drv: add UBLK_IO_REFETCH_REQ for supporting
+ to build as module
+Content-Language: en-US
+To:     Gabriel Krisman Bertazi <krisman@collabora.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        io-uring@vger.kernel.org,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+References: <20220711022024.217163-1-ming.lei@redhat.com>
+ <20220711022024.217163-3-ming.lei@redhat.com> <87lesze7o3.fsf@collabora.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <87lesze7o3.fsf@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 10:20:39AM -0700, Bart Van Assche wrote:
-> On 7/11/22 02:08, Ming Lei wrote:
-> > blk_mq_debugfs_register_hctx() can be called by blk_mq_update_nr_hw_queues
-> > when gendisk isn't added yet, such as nvme tcp.
-> > 
-> > Fixes the warning of 'debugfs: Directory 'hctx0' with parent '/' already present!'
-> > which can be observed reliably when running blktests nvme/005.
-> > 
-> > Reported-by: Yi Zhang <yi.zhang@redhat.com>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >   block/blk-mq-debugfs.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> > index b80fae7ab1d9..28adb01f6441 100644
-> > --- a/block/blk-mq-debugfs.c
-> > +++ b/block/blk-mq-debugfs.c
-> > @@ -728,6 +728,9 @@ void blk_mq_debugfs_register_hctx(struct request_queue *q,
-> >   	char name[20];
-> >   	int i;
-> > +	if (!q->debugfs_dir)
-> > +		return;
-> > +
-> >   	snprintf(name, sizeof(name), "hctx%u", hctx->queue_num);
-> >   	hctx->debugfs_dir = debugfs_create_dir(name, q->debugfs_dir);
+On 2022/7/12 04:06, Gabriel Krisman Bertazi wrote:
+> Ming Lei <ming.lei@redhat.com> writes:
 > 
-> Does this patch need a Fixes: tag?
+>> Add UBLK_IO_REFETCH_REQ command to fetch the incoming io request in
+>> ubq daemon context, so we can avoid to call task_work_add(), then
+>> it is fine to build ublk driver as module.
+>>
+>> In this way, iops is affected a bit, but just by ~5% on ublk/null,
+>> given io_uring provides pretty good batching issuing & completing.
+>>
+>> One thing to be careful is race between ->queue_rq() and handling
+>> abort, which is avoided by quiescing queue when aborting queue.
+>> Except for that, handling abort becomes much easier with
+>> UBLK_IO_REFETCH_REQ since aborting handler is strictly exclusive with
+>> anything done in ubq daemon kernel context.
+> 
+> Hi Ming,
+> 
+> FWIW, I'm not very fond this change.  It adds complexity to the kernel
+> driver and to the userspace server implementation, who now have to deal
+> with different interface semantics just because the driver was built-in
+> or built as a module.  I don't think the tristate support warrants such
+> complexity.  I was hoping we might get away with exporting that symbol
+> or adding a built-in ubd-specific wrapper that can be exported and
+> invokes task_work_add.
+> 
+> Either way, Alibaba seems to consider this feature useful, and if that
+> is the case, we can just not use it on our side.
 
-Yeah,
+Our app handles IOs itself with network(RPC) and internal memory pool
+so UBLK_IO_REFETCH_REQ
+(actually I think it is like NEED_GET_DATA in the earlist version :) )
+is helpful to us because we can assign data buffer address AFTER the app
+gets one IO requests(WRITE, with data size) and we avoid PRE-allocating buffers.
 
-Fixes: 6cfc0081b046 ("blk-mq: no need to check return value of debugfs_create functions")
+Besides, adding UBLK_IO_REFETCH_REQ is helpful to build ublk driver as module
+It seems like kernel developers do not want a built-in driver. :)
+
+Maybe your app is different from ours(you may not need to handle IOs by yourelf).
+
+Thanks， 
+Ziyang Zhang
+
 
 > 
-> Additionally, as one can see here, I reported this bug before Yi:
-> https://bugzilla.kernel.org/show_bug.cgi?id=216191
-
-Sorry for missing your report, and I am fine to add your reported-by.
-
-
-Thanks,
-Ming
-
+> That said, the patch looks good to me, just a minor comment inline.
+> 
+> Thanks,
+> 
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> ---
+>>  drivers/block/Kconfig         |   2 +-
+>>  drivers/block/ublk_drv.c      | 121 ++++++++++++++++++++++++++--------
+>>  include/uapi/linux/ublk_cmd.h |  17 +++++
+>>  3 files changed, 113 insertions(+), 27 deletions(-)
+>>
+>> diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+>> index d218089cdbec..2ba77fd960c2 100644
+>> --- a/drivers/block/Kconfig
+>> +++ b/drivers/block/Kconfig
+>> @@ -409,7 +409,7 @@ config BLK_DEV_RBD
+>>  	  If unsure, say N.
+>>  
+>>  config BLK_DEV_UBLK
+>> -	bool "Userspace block driver"
+>> +	tristate "Userspace block driver"
+>>  	select IO_URING
+>>  	help
+>>            io uring based userspace block driver.
+>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+>> index 0076418e6fad..98482f8d1a77 100644
+>> --- a/drivers/block/ublk_drv.c
+>> +++ b/drivers/block/ublk_drv.c
+>> @@ -92,6 +92,7 @@ struct ublk_queue {
+>>  	int q_id;
+>>  	int q_depth;
+>>  
+>> +	unsigned long flags;
+>>  	struct task_struct	*ubq_daemon;
+>>  	char *io_cmd_buf;
+>>  
+>> @@ -141,6 +142,15 @@ struct ublk_device {
+>>  	struct work_struct	stop_work;
+>>  };
+>>  
+>> +#define ublk_use_task_work(ubq)						\
+>> +({                                                                      \
+>> +	bool ret = false;						\
+>> +	if (IS_BUILTIN(CONFIG_BLK_DEV_UBLK) &&                          \
+>> +			!((ubq)->flags & UBLK_F_NEED_REFETCH))		\
+>> +		ret = true;						\
+>> +	ret;								\
+>> +})
+>> +
+> 
+> This should be an inline function, IMO.
+> 
+> 
