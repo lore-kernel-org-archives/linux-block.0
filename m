@@ -2,136 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3F8CCA47C
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 15:45:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1674C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 19:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbiGLPpJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 11:45:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55398 "EHLO
+        id S236011AbiGLTUI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jul 2022 15:20:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbiGLPpI (ORCPT
+        with ESMTP id S236246AbiGLTTh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 11:45:08 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDA9C08E1;
-        Tue, 12 Jul 2022 08:45:07 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id e15so10646686edj.2;
-        Tue, 12 Jul 2022 08:45:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+/Odg1sihGKTXAswGd97F0WSR+SxhfCI4ZHjZFl5WTI=;
-        b=GKkMtyNwA3AUceejasIeFoYEtVaVn4xX+Jgy6JJ/Bhmo2niK5wru/fENw4PzA9yYzh
-         CZMGK7FoeuHA8qcUzYJPrSwcC7xxkCl1TGNMWi5P+FsIGqL8Ch0P7A+520GpKp76/P1N
-         N6+Nt1l4fAv4H2BnlHz6hk+9KWrclKV2WjtaiRKWX+OQnuhCv2lkpTD3+oN2Br3h69pd
-         SoKeZOsnDm/ZYLFSk5VTHckCpQdO39EaNcon6/mnwNnKhuPNJo6zGS36skoFxxg2v6Em
-         /NoKv2YmhPuusaLfjWOUe0CQFnB6Rgej9AaZsG1l8UiWGZph0hnRXLiKWnqhBM6fSU5S
-         rceA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+/Odg1sihGKTXAswGd97F0WSR+SxhfCI4ZHjZFl5WTI=;
-        b=EtMzDNPpLx/SrSPowhMOVbFt1ICwAmMB/C8ASmOgb+KDl/qygFbjVKHvZBsTIfRGxa
-         6+1zNW+R9CkccnzT9VMFBJVOAIoZOyJ7v0Gahv5Vby3+MIKX5a6uQqkEg/6MaD0t3ddh
-         ioQw59EraXONpkH6YX8OxIpFQ3/vD9WteJyxhznBxGnCblhRSA7LDytDJLMsIIyAQ7e3
-         sS/QA8angKSP/LXnsnQoggG+Q2qiJuv8Uc/p0DIEdDzZckUSDsC9uZCJh7Xu6Ex6RrqK
-         PIbyDXpbo/NlEcCw8yjIfM7Fg4RX4eT3zOVaMBQ8/kG/yrt3i5OiDQLWY2mZzkNHlj87
-         A3vw==
-X-Gm-Message-State: AJIora9dpVGddW3SQga3SojDmsMV3QOIwko/uMZB9Zv8/Es5EAlz44bz
-        opDQzjw7T86yBKa207s0mR9PWayoD5M=
-X-Google-Smtp-Source: AGRyM1vzDIYYarVp9yz7WWwp1ttRsZeXo5LffHnmyAaDmqakNd+eO/CH3VinTckAj75EYKUX4Yizmg==
-X-Received: by 2002:a05:6402:643:b0:43a:77a6:acd with SMTP id u3-20020a056402064300b0043a77a60acdmr33077527edx.173.1657640706079;
-        Tue, 12 Jul 2022 08:45:06 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id f10-20020a1709064dca00b006fef557bb7asm3932125ejw.80.2022.07.12.08.45.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jul 2022 08:45:05 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] blk-cgroup: Use atomic{,64}_try_cmpxchg
-Date:   Tue, 12 Jul 2022 17:44:55 +0200
-Message-Id: <20220712154455.66868-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        Tue, 12 Jul 2022 15:19:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91542EB012
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 11:56:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1566561582
+        for <linux-block@vger.kernel.org>; Tue, 12 Jul 2022 18:56:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C407C3411E;
+        Tue, 12 Jul 2022 18:56:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657652201;
+        bh=jBjVzYtHZsBaG5CBnzyZ4hZhZcpnBdY4THIatRpO6M4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Pd8uckI2TiqppywK978gp/BN1nY65B/GK3oM6xaZ6VPr8r1S40CrbIExnnzCqY+C5
+         QgquCk04gfnvNMnZpsflguLKW+elW9XWxO/vqMIwNXmhKCHVbSd2JDH2Y+tKsB2iY7
+         vKyWgOoeWI4JZhxhBqbot6R8zki6Q1xk6KTmOvORMAMokRMzKmhAxiHzMwdKhlLvH9
+         nAikF71Uo1XSOAG6/VqVh0gotiXkY4/+5rqWC9iMdWfMXe5xrKU/DTPr9PqeRW1cJC
+         GuEtbbPaibD8XBBRi4yTIyIlkMsYJ/iuq7k2iePl0cNA6pGfmWBNsRLBshDIIaK6iI
+         9ig9nVes7Z4VQ==
+Date:   Tue, 12 Jul 2022 12:56:38 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [bug report] block: fix leaking page ref on truncated direct io
+Message-ID: <Ys3D5jQuR2/u8zNC@kbusch-mbp>
+References: <Ys02ZQ+ekH1b0Dtl@kili>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ys02ZQ+ekH1b0Dtl@kili>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use atomic_try_cmpxchg instead of atomic_cmpxchg (*ptr, old, new) == old
-in blkcg_unuse_delay, blkcg_set_delay and blkcg_clear_delay and
-atomic64_try_cmpxchg in blkcg_scale_delay.  x86 CMPXCHG instruction
-returns success in ZF flag, so this change saves a compare after cmpxchg
-(and related move instruction in front of cmpxchg).
+On Tue, Jul 12, 2022 at 11:52:53AM +0300, Dan Carpenter wrote:
+> Hello Keith Busch,
+> 
+> The patch 7b1ccdf617ca: "block: fix leaking page ref on truncated
+> direct io" from Jul 5, 2022, leads to the following Smatch static
+> checker warning:
+> 
+> 	block/bio.c:1254 __bio_iov_iter_get_pages()
+> 	error: uninitialized symbol 'i'.
 
-Also, atomic_try_cmpxchg implicitly assigns old *ptr value to "old" when
-cmpxchg fails, enabling further code simplifications.
+Yeah, this one was not ready to be merged into any staging trees. One of the
+build-bots even flagged this patch hours after it was initially posted.
 
-No functional change intended.
-
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Cc: Jens Axboe <axboe@kernel.dk>
----
-v2: Split patch from the original big patch
-    Use while instead of do-while loop
----
- block/blk-cgroup.c |  2 +-
- block/blk-cgroup.h | 12 ++++--------
- 2 files changed, 5 insertions(+), 9 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 764e740b0c0f..ca99260348ff 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1696,7 +1696,7 @@ static void blkcg_scale_delay(struct blkcg_gq *blkg, u64 now)
- 	 * everybody is happy with their IO latencies.
- 	 */
- 	if (time_before64(old + NSEC_PER_SEC, now) &&
--	    atomic64_cmpxchg(&blkg->delay_start, old, now) == old) {
-+	    atomic64_try_cmpxchg(&blkg->delay_start, &old, now)) {
- 		u64 cur = atomic64_read(&blkg->delay_nsec);
- 		u64 sub = min_t(u64, blkg->last_delay, now - old);
- 		int cur_use = atomic_read(&blkg->use_delay);
-diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-index d4de0a35e066..d2724d1dd7c9 100644
---- a/block/blk-cgroup.h
-+++ b/block/blk-cgroup.h
-@@ -430,12 +430,8 @@ static inline int blkcg_unuse_delay(struct blkcg_gq *blkg)
- 	 * then check to see if we were the last delay so we can drop the
- 	 * congestion count on the cgroup.
- 	 */
--	while (old) {
--		int cur = atomic_cmpxchg(&blkg->use_delay, old, old - 1);
--		if (cur == old)
--			break;
--		old = cur;
--	}
-+	while (old && !atomic_try_cmpxchg(&blkg->use_delay, &old, old - 1))
-+		;
- 
- 	if (old == 0)
- 		return 0;
-@@ -458,7 +454,7 @@ static inline void blkcg_set_delay(struct blkcg_gq *blkg, u64 delay)
- 	int old = atomic_read(&blkg->use_delay);
- 
- 	/* We only want 1 person setting the congestion count for this blkg. */
--	if (!old && atomic_cmpxchg(&blkg->use_delay, old, -1) == old)
-+	if (!old && atomic_try_cmpxchg(&blkg->use_delay, &old, -1))
- 		atomic_inc(&blkg->blkcg->css.cgroup->congestion_count);
- 
- 	atomic64_set(&blkg->delay_nsec, delay);
-@@ -475,7 +471,7 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
- 	int old = atomic_read(&blkg->use_delay);
- 
- 	/* We only want 1 person clearing the congestion count for this blkg. */
--	if (old && atomic_cmpxchg(&blkg->use_delay, old, 0) == old)
-+	if (old && atomic_try_cmpxchg(&blkg->use_delay, &old, 0))
- 		atomic_dec(&blkg->blkcg->css.cgroup->congestion_count);
- }
- 
--- 
-2.35.3
-
+I've a v2 posted with the appropriate correction, and I'll sort it out with the
+maintainers on next steps.
