@@ -2,146 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F28C43334
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 15:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14157C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 16:28:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236412AbiGMP7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 11:59:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36436 "EHLO
+        id S234823AbiGMQ2n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 12:28:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237089AbiGMP7T (ORCPT
+        with ESMTP id S234904AbiGMQ2n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 11:59:19 -0400
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E953E0EA;
-        Wed, 13 Jul 2022 08:59:18 -0700 (PDT)
-Received: by mail-wm1-f43.google.com with SMTP id i204-20020a1c3bd5000000b003a2fa488efdso1136290wma.4;
-        Wed, 13 Jul 2022 08:59:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=y2AcRM2dbenguVq8Sn45LnuUE26anJQ/q/pVY/6n1mI=;
-        b=NGmFsK31K81LNnEuzLEkyqa079LU33gvDJxusPFpemorWRPip2CCK+nQy3kYMY3LWt
-         slVCbGuOycWQI/HyDgVCtTJZcxtH9Z/TqEDgHB6Km9ikqYJ5j9Cwn+6xru3Uyhn2+/qg
-         uVyRw2QcKOnRXj7P+Ltn/ydyYxNkL0yjScCOQRH2UavyG9+j/yD8rHhIuJ+1vgyjxOXx
-         vqM326AfI5IGdaFZ1cndX1SDDTi9qHBU3N8UJUAijEH8MSfDAPEqm4SDOhC6h1mfd1Vv
-         jFMp/mU8tcA3kCg/VBkNdtU3fqzhqM6rl63mEGahXlQU/fEqO2VR+kfyS6yyXNtJq0QD
-         SdIA==
-X-Gm-Message-State: AJIora+ZCgGQKFOcL2F7dCkcF8kTs/QWH3dQypLSX4t2Tl56k+IAqpJO
-        40TJnKTNUsH+8MfjPtbGZIs=
-X-Google-Smtp-Source: AGRyM1v89jFtIWf5Owe/3xq9jPWOLvLV7mOEFexlE0Il+i3C8RydeEbGQ74p0+J4bujEJipuYpHfag==
-X-Received: by 2002:a05:600c:4fc8:b0:3a1:987c:82d4 with SMTP id o8-20020a05600c4fc800b003a1987c82d4mr4449032wmq.26.1657727956465;
-        Wed, 13 Jul 2022 08:59:16 -0700 (PDT)
-Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id p13-20020a5d458d000000b0021d728d687asm14103484wrq.36.2022.07.13.08.59.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jul 2022 08:59:16 -0700 (PDT)
-Message-ID: <c000ecc9-e570-0788-88fa-8225a4b9fa04@grimberg.me>
-Date:   Wed, 13 Jul 2022 18:59:13 +0300
+        Wed, 13 Jul 2022 12:28:43 -0400
+X-Greylist: delayed 401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 13 Jul 2022 09:28:38 PDT
+Received: from adrastea.uberspace.de (adrastea.uberspace.de [185.26.156.139])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36EB4A183
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 09:28:37 -0700 (PDT)
+Received: (qmail 21136 invoked by uid 990); 13 Jul 2022 16:21:54 -0000
+Authentication-Results: adrastea.uberspace.de;
+        auth=pass (plain)
+Message-ID: <0790e1fa-f9b5-9da8-7817-99023ea900f1@manueljacob.de>
+Date:   Wed, 13 Jul 2022 18:21:49 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
- uring-passthrough commands
-Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, kbusch@kernel.org,
-        axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
-        gost.dev@samsung.com
-References: <20220711110155.649153-1-joshi.k@samsung.com>
- <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
- <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de>
- <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
- <20220713053633.GA13135@lst.de>
- <24f0a3e6-aa53-8c69-71b7-d66289a63eae@grimberg.me>
- <20220713101235.GA27815@lst.de>
- <772b461a-bc43-c229-906d-0e280091e17f@grimberg.me>
- <96f47d9b-fbfc-80da-4c38-f46986f14a43@suse.de>
- <7c7a093c-4103-b67d-c145-9d84aaae835e@grimberg.me>
- <04b475f6-506f-188b-d104-b27e9dffc1b8@suse.de>
- <66322f2d-fbde-7b9f-14f1-0651511d95b8@grimberg.me>
- <1d1d94ea-b67b-405c-c825-faf67f258558@suse.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <1d1d94ea-b67b-405c-c825-faf67f258558@suse.de>
+ Thunderbird/91.11.0
+Content-Language: en-US-large
+To:     linux-block@vger.kernel.org
+From:   Manuel Jacob <me@manueljacob.de>
+Subject: FALLOC_FL_ZERO_RANGE is faster on dm-crypt device than on underlying
+ block device
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: /
+X-Rspamd-Report: MIME_GOOD(-0.1)
+X-Rspamd-Score: -0.1
+Received: from unknown (HELO unkown) (::1)
+        by adrastea.uberspace.de (Haraka/2.8.28) with ESMTPSA; Wed, 13 Jul 2022 18:21:54 +0200
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+I noticed that `mkfs.ext4 -E lazy_itable_init=0,lazy_journal_init=0` was 
+a lot faster on a dm-crypt device (1min 30s) than on the underlying NVMe 
+drive (MKNSSDPL2TB-D8, 8min). I tracked it down to the `fallocate` 
+system calls made while writing the inode tables (with mode 
+FALLOC_FL_ZERO_RANGE).
 
->>>>> Amongst all the other issue we've found the prime problem with 
->>>>> SG_IO is that it needs to be directed to the 'active' path.
->>>>> For the device-mapper has a distinct callout (dm_prepare_ioctl), 
->>>>> which essentially returns the current active path device. And then 
->>>>> the device-mapper core issues the command on that active path.
->>>>>
->>>>> All nice and good, _unless_ that command triggers an error.
->>>>> Normally it'd be intercepted by the dm-multipath end_io handler, 
->>>>> and would set the path to offline.
->>>>> But as ioctls do not use the normal I/O path the end_io handler is 
->>>>> never called, and further SG_IO calls are happily routed down the 
->>>>> failed path.
->>>>>
->>>>> And the customer had to use SG_IO (or, in qemu-speak, LUN 
->>>>> passthrough) as his application/filesystem makes heavy use of 
->>>>> persistent reservations.
->>>>
->>>> How did this conclude Hannes?
->>>
->>> It didn't. The proposed interface got rejected, and now we need to 
->>> come up with an alternative solution.
->>> Which we haven't found yet.
->>
->> Lets assume for the sake of discussion, had dm-mpath set a path to be
->> offline on ioctl errors, what would qemu do upon this error? blindly
->> retry? Until When? Or would qemu need to learn about the path tables in
->> order to know when there is at least one online path in order to retry?
->>
-> IIRC that was one of the points why it got rejected.
-> Ideally we would return an errno indicating that the path had failed, 
-> but further paths are available, so a retry is in order.
-> Once no paths are available qemu would be getting a different error 
-> indicating that all paths are failed.
+To show the difference more pronouncedly, I ran the `fallocate` command 
+with a bigger size (1 GiB) on the block devices directly. Before each 
+test, I ran `echo 3 > /proc/sys/vm/drop_caches`, and after each test, I 
+ran `sync` but it finished almost instantly.
 
-There is no such no-paths-available error.
+fallocate --zero-range /dev/mapper/test -o 1073741824 -l 1073741824
+real	0m0.488s
+user	0m0.000s
+sys	0m0.026s
 
-> 
-> But we would be overloading a new meaning to existing error numbers, or 
-> even inventing our own error numbers. Which makes it rather awkward to use.
+fallocate --zero-range /dev/nvme0n1p1 -o 1073741824 -l 1073741824
+real	0m15.253s
+user	0m0.000s
+sys	0m0.037s
 
-I agree that this sounds awkward.
+When opening the dm-crypt device with NO_READ_WORKQUEUE and 
+NO_WRITE_WORKQUEUE, the difference is not quite as big. It is probably 
+because the encryption happens on one core instead of in 8 tasks on 4 
+physical cores.
 
-> Ideally we would be able to return this as the SG_IO status, as that is 
-> well capable of expressing these situations. But then we would need to 
-> parse and/or return the error ourselves, essentially moving sg_io 
-> funtionality into dm-mpath. Also not what one wants.
+fallocate --zero-range /dev/mapper/test -o 1073741824 -l 1073741824
+real	0m0.943s
+user	0m0.003s
+sys	0m0.939s
 
-uring actually should send back the cqe for passthru, but there is no
-concept like "Path error, but no paths are available".
-
-> 
->> What is the model that a passthru consumer needs to follow when
->> operating against a mpath device?
-> 
-> The model really is that passthru consumer needs to deal with these errors:
-> - No error (obviously)
-> - I/O error (error status will not change with a retry)
-> - Temporary/path related error (error status might change with a retry)
-> 
-> Then the consumer can decide whether to invoke a retry (for the last 
-> class), or whether it should pass up that error, as maybe there are 
-> applications with need a quick response time and can handle temporary 
-> failures (or, in fact, want to be informed about temporary failures).
-> 
-> IE the 'DNR' bit should serve nicely here, keeping in mind that we might 
-> need to 'fake' an NVMe error status if the connection is severed.
-
-uring passthru sends the cqe status to userspace IIRC. But nothing in
-there indicates about path availability. That would be something that
-userspace would need to reconcile on its own from traversing sysfs or
-alike...
+The slowdown on the unencrypted device doesn’t really affect me except 
+when running benchmarks (the original goal was testing the performance 
+of various operations ON the file system, not file system creation), but 
+if I can help tracking down the source of the slowdown, I’d be happy to 
+provide more information.
