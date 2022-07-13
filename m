@@ -2,89 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57677C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 20:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDE1CCA479
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 20:25:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230479AbiGMUVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 16:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51838 "EHLO
+        id S236905AbiGMUZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 16:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236883AbiGMUVa (ORCPT
+        with ESMTP id S236654AbiGMUZa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 16:21:30 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273EF2DA91
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:21:29 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id f11so10567135pgj.7
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:21:29 -0700 (PDT)
+        Wed, 13 Jul 2022 16:25:30 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9228A2717E
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:25:27 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id g16-20020a17090a7d1000b001ea9f820449so5579495pjl.5
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=JcYpGy4wzAqqtoFWvjiTbUFlKhGd0IaTVFe++/A2tj8=;
-        b=j3/yPTm93If9fOoylNboDvrKY3qdKwD+2gPm56U744CITZPKzrmWQSjHCfhH1XDpj8
-         1cg3oDoehjlRPSBHyP8ld4ZTcOZak844Ie0+2k+5lJcfIfQZSoIGqHARuNSFIjGwjnGL
-         u6uZgq//x3qX/jONleOFz8cx+pRBR7fXRzYNMIZIgglFxnUIpqrZFJnTyphVoH97Z1N/
-         iO1m1byzqdETeZiNlLI75M09vhqyTk8V7+7eVYsstdXAWCpSZC8OrNIDIWvD4V/UWNzh
-         fdS3KD6wg0P37ss2wfWteZ1vRhx4LiwAjoWv9IR3h2NwYKzV3o+PsggSFyJiiJw+ip/W
-         aSxA==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=KNxdzYJ31Vhyt7oycuRbMlgHEjW6wotI0WNAdQq4UMw=;
+        b=t8kPJVCKtimxDlTtyzRgs6JNvOaLECNuXxarQU5OqBNA+ziab/DxNvRTorr+G98Cl5
+         2n5ZybUVwcbsU+P2E2FnhFqF/mDjUjQRVf+6EFKX70Vbyzk6vKllj0cfGMjRaaH7wV46
+         OJqqnL5CnvYZ/tMqCZLuH5USn/gtG52kAARi3QGK/WoJbpmkwcRGlqfg+bv7QswLkwWF
+         sqTDGUA8vN6GDwxQrdyDse3TUfWV6rQR1erg83hXbDszgJFa74wrL8rWeUtIlOlOn2rW
+         idSQYSMMEmA6NKhXQnU+1DLRu0Ph3fLJmWMrp5S4wqtLYYQgpiVlQDtmbrMJhScjh0kg
+         U6CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=JcYpGy4wzAqqtoFWvjiTbUFlKhGd0IaTVFe++/A2tj8=;
-        b=wSVbnVWtN45CUVTA6TBKJyFxvmUHuP4XkEUUhj2qEFLUlVcPjQV8aV0xuyCQnpX8sh
-         eQr15N5bNcXkliug7+Rj6dYZgudoOsJBm1xF5cIdNDZ3Acj2i8TgV8hV9wcj1sKvo/7n
-         Nb1pMfWISCygGZF6wgqMEOLojM0i8+SBr9mlrA9FD0oZX8A680eS1SB3yCnW0YrFAJSa
-         /EmR2ca5AQZgom7ZU4PGrA6Z1MwDySQdIcWc4Iw7FMRRWblrUC/adK7fYs6a3Fiihv+2
-         6CaTF/YJSjrR9qMPsew1JZ+FZanh5EC2OP3kh7K+l33E9g9n/UvXo0mBvEWKIcavQHTS
-         mVhw==
-X-Gm-Message-State: AJIora8PwWUj9EYbItXDutj1NVkKE/1u800b9kt6t5MNchr248q5tQ5B
-        JMmPNsmUmmf3P0FsgzayUa6zJBiFkwPO/w==
-X-Google-Smtp-Source: AGRyM1sRtpOzM8so8J17lC2HC0Gp5PVrftTwsJh5/KvwUQD6vq4e+sEjRVff8ts6usamWE4TAZfvFw==
-X-Received: by 2002:a63:4042:0:b0:411:bbfe:e736 with SMTP id n63-20020a634042000000b00411bbfee736mr4375329pga.1.1657743688555;
-        Wed, 13 Jul 2022 13:21:28 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902ce8e00b00168b113f222sm9357024plg.173.2022.07.13.13.21.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 13:21:28 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        kbusch@fb.com
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, kbusch@kernel.org
-In-Reply-To: <20220712153256.2202024-1-kbusch@fb.com>
-References: <20220712153256.2202024-1-kbusch@fb.com>
-Subject: Re: [PATCHv2 1/3] block: ensure iov_iter advances for added pages
-Message-Id: <165774368761.35656.10611792606953434095.b4-ty@kernel.dk>
-Date:   Wed, 13 Jul 2022 14:21:27 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=KNxdzYJ31Vhyt7oycuRbMlgHEjW6wotI0WNAdQq4UMw=;
+        b=ML25uqM8W54Amcu8cAryxHoyFF4Ad1hV4E+bEvTaOjXnpEA2FkRp6cw+zxt0TKuotl
+         eXzxm5J09HiHGvyYv5Es3drJgfqD0P1VFtqKPJqSziByI39xmDFIrxq/aZD2WUXxU0Ri
+         /vuGLGtmENXxKpO4UO6YoehSgkS/HgmuOQlAxrFO0DT5ct9ErstGXqZPe7Q/RR4X8Xm2
+         ur0Gl3Iz0hVOrcxQK+XAP3JyETmW04d+GgLMow9Dm3PH+AMKzuK0aGT1wxVbVfrvjWWh
+         XBBqD1jhb2uZ6ag1l1sO/WAYziLi8ZhhQvWaN1heX78oIAsd5zs4BqbDnc8DHvVZRNFq
+         pc6g==
+X-Gm-Message-State: AJIora/KXUQdd5vZK/a2GtvoHERf/kD/v8HKraPVy0AZVM1eBv96KJIE
+        unKyjs7eO17IkKiG1m2JlhGlpg==
+X-Google-Smtp-Source: AGRyM1uMWJM21AdMA4hg31Ti1BfbhNdmhNhNqXCJYSv6TufmkF9YayM6wEk9gfkZAYCsy7kM3FFnog==
+X-Received: by 2002:a17:90b:240b:b0:1ef:8a68:1596 with SMTP id nr11-20020a17090b240b00b001ef8a681596mr5542909pjb.234.1657743927006;
+        Wed, 13 Jul 2022 13:25:27 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id a15-20020a170902710f00b0016bedcced2fsm9332014pll.35.2022.07.13.13.25.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Jul 2022 13:25:26 -0700 (PDT)
+Message-ID: <6e5d590b-448d-ea75-f29d-877a2cd6413b@kernel.dk>
+Date:   Wed, 13 Jul 2022 14:25:25 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH V5 0/2] ublk: add io_uring based userspace block driver
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+References: <20220713140711.97356-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220713140711.97356-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 12 Jul 2022 08:32:54 -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+On 7/13/22 8:07 AM, Ming Lei wrote:
+> Hello Guys,
 > 
-> There are cases where a bio may not accept additional pages, and the iov
-> needs to advance to the last data length that was accepted. The zone
-> append used to handle this correctly, but was inadvertently broken when
-> the setup was made common with the normal r/w case.
-> 
-> [...]
+> ublk driver is one kernel driver for implementing generic userspace block
+> device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
+> ublk server[1] which is the userspace part of ublk for communicating
+> with ublk driver and handling specific io logic by its target module.
 
-Applied, thanks!
+Ming, is this ready to get merged in an experimental state?
 
-[1/3] block: ensure iov_iter advances for added pages
-      commit: 5a044eef1265581683530e75351c19e29ee33a11
-[2/3] block: ensure bio_iov_add_page can't fail
-      commit: ac3c48e32c047a3781d6bc28bb5013e4431350fd
-[3/3] block: fix leaking page ref on truncated direct io
-      commit: 44b6b0b0e980d99d24de7e5d57baae48a78db3b6
-
-Best regards,
 -- 
 Jens Axboe
-
 
