@@ -2,85 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDE1CCA479
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 20:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5A3C43334
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 21:06:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236905AbiGMUZb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 16:25:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54520 "EHLO
+        id S237048AbiGMVGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 17:06:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236654AbiGMUZa (ORCPT
+        with ESMTP id S236391AbiGMVGa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 16:25:30 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9228A2717E
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:25:27 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id g16-20020a17090a7d1000b001ea9f820449so5579495pjl.5
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:25:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=KNxdzYJ31Vhyt7oycuRbMlgHEjW6wotI0WNAdQq4UMw=;
-        b=t8kPJVCKtimxDlTtyzRgs6JNvOaLECNuXxarQU5OqBNA+ziab/DxNvRTorr+G98Cl5
-         2n5ZybUVwcbsU+P2E2FnhFqF/mDjUjQRVf+6EFKX70Vbyzk6vKllj0cfGMjRaaH7wV46
-         OJqqnL5CnvYZ/tMqCZLuH5USn/gtG52kAARi3QGK/WoJbpmkwcRGlqfg+bv7QswLkwWF
-         sqTDGUA8vN6GDwxQrdyDse3TUfWV6rQR1erg83hXbDszgJFa74wrL8rWeUtIlOlOn2rW
-         idSQYSMMEmA6NKhXQnU+1DLRu0Ph3fLJmWMrp5S4wqtLYYQgpiVlQDtmbrMJhScjh0kg
-         U6CQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=KNxdzYJ31Vhyt7oycuRbMlgHEjW6wotI0WNAdQq4UMw=;
-        b=ML25uqM8W54Amcu8cAryxHoyFF4Ad1hV4E+bEvTaOjXnpEA2FkRp6cw+zxt0TKuotl
-         eXzxm5J09HiHGvyYv5Es3drJgfqD0P1VFtqKPJqSziByI39xmDFIrxq/aZD2WUXxU0Ri
-         /vuGLGtmENXxKpO4UO6YoehSgkS/HgmuOQlAxrFO0DT5ct9ErstGXqZPe7Q/RR4X8Xm2
-         ur0Gl3Iz0hVOrcxQK+XAP3JyETmW04d+GgLMow9Dm3PH+AMKzuK0aGT1wxVbVfrvjWWh
-         XBBqD1jhb2uZ6ag1l1sO/WAYziLi8ZhhQvWaN1heX78oIAsd5zs4BqbDnc8DHvVZRNFq
-         pc6g==
-X-Gm-Message-State: AJIora/KXUQdd5vZK/a2GtvoHERf/kD/v8HKraPVy0AZVM1eBv96KJIE
-        unKyjs7eO17IkKiG1m2JlhGlpg==
-X-Google-Smtp-Source: AGRyM1uMWJM21AdMA4hg31Ti1BfbhNdmhNhNqXCJYSv6TufmkF9YayM6wEk9gfkZAYCsy7kM3FFnog==
-X-Received: by 2002:a17:90b:240b:b0:1ef:8a68:1596 with SMTP id nr11-20020a17090b240b00b001ef8a681596mr5542909pjb.234.1657743927006;
-        Wed, 13 Jul 2022 13:25:27 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id a15-20020a170902710f00b0016bedcced2fsm9332014pll.35.2022.07.13.13.25.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jul 2022 13:25:26 -0700 (PDT)
-Message-ID: <6e5d590b-448d-ea75-f29d-877a2cd6413b@kernel.dk>
-Date:   Wed, 13 Jul 2022 14:25:25 -0600
+        Wed, 13 Jul 2022 17:06:30 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C6E32EFE;
+        Wed, 13 Jul 2022 14:06:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:Message-Id:Date:Cc:To:From
+        :references:content-disposition:in-reply-to;
+        bh=Eva5OAEv/RJD0HMIjc3d1CqcCIZEAGFzGgc5x7s6/Ho=; b=KbR/HcHFIkiZJyWdtT8Br+4DZR
+        ZGql0iXsIOi+gP6Ige5kvTyzkjGrYfaEfiFapblWysGcLow4+NiK0qL2IdBhH5oY2yQth3pTHFcqx
+        OfAwHcmMLMFJDpWgsqGiXQZJ/8oYRkb+6F4OB1wf9fFkq/lvY2NvpZcdlMJugjERYpX0VDyKW8y77
+        EcS71qVKls3JTZ2aaV1DSWAC8LqW9cf1bvaH7t8QcTLJoZtau9HWxMQlyNLKDC0uv26/pjSlw+JD7
+        7biUwYPPJA7xMW1OIWLld93P+eWZSxjvbBEWwwX/xiqSiC1gj5FUUv7rpMWSPCq7MLiRHU6Y9+kdO
+        1ZSpxPEw==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1oBjYv-00EDFl-Fz; Wed, 13 Jul 2022 15:06:26 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1oBjYu-0003py-RH; Wed, 13 Jul 2022 15:06:24 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     Song Liu <song@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Logan Gunthorpe <logang@deltatee.com>
+Date:   Wed, 13 Jul 2022 15:06:23 -0600
+Message-Id: <20220713210623.14705-1-logang@deltatee.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH V5 0/2] ublk: add io_uring based userspace block driver
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-References: <20220713140711.97356-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220713140711.97356-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: song@kernel.org, hch@lst.de, linux-raid@vger.kernel.org, linux-block@vger.kernel.org, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH] md: Ensure mddev object is cleaned up with kobject_put on error path
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/22 8:07 AM, Ming Lei wrote:
-> Hello Guys,
-> 
-> ublk driver is one kernel driver for implementing generic userspace block
-> device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
-> ublk server[1] which is the userspace part of ublk for communicating
-> with ublk driver and handling specific io logic by its target module.
+The documentation for kobject_init() clearly states that the new
+object must be cleaned up with a call to kobject_put(), not a
+kfree() call directly.
 
-Ming, is this ready to get merged in an experimental state?
+However, the error path in mddev_alloc() frees the newly allocated
+mddev object directly with kfree() after kobject_init() is called
+in mddev_init().
 
+Fix this by changing the kfree() call to a kobject_put().
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ drivers/md/md.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 198d4ceae55a..d9e0e38be38c 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -769,7 +769,7 @@ static struct mddev *mddev_alloc(dev_t unit)
+ 	return new;
+ out_free_new:
+ 	spin_unlock(&all_mddevs_lock);
+-	kfree(new);
++	kobject_put(&new->kobj);
+ 	return ERR_PTR(error);
+ }
+ 
+
+base-commit: 922f4b5c75aa13532382ffb4964d2d12ad98747e
 -- 
-Jens Axboe
+2.30.2
 
