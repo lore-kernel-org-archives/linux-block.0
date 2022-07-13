@@ -2,102 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF3CC43334
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 23:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E168C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 23:50:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231510AbiGMXqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 19:46:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55526 "EHLO
+        id S231177AbiGMXuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 19:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbiGMXqg (ORCPT
+        with ESMTP id S230371AbiGMXuB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 19:46:36 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6D6419BF
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 16:46:35 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id q5-20020a17090a304500b001efcc885cc4so607195pjl.4
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 16:46:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=goY5s09yDjamY/zMU5kBbCD+EHX29aLygMcuT7F3v0c=;
-        b=C2qLSZl8ptTZ42zHdHCxk2BOy9WdHv80VIgEhOva6Wl6xohe3GYNyjEp0ABlzOqOPb
-         2n0TI1esjW0E/mjTX1bXdvHPK1FMPyToxYwblhrJ4UG87MUSH/MgQhx9RDfZmor1WRlK
-         BpvLYoj44+0u53zAeccpa4OYasWpehzTRdFJyaxomBJ9QNUkVnQURO1WCkB8QIoLkpAo
-         7g6oQNxWhEQ45rQonxsKPOBZQh5SAJEToJfTMaOF0HJwowUMPzb6lYWDr+gqF5sNzhYJ
-         wh0ccoZEn2uKAcF+nfwbs1Orl2chaMZEAMJJHEgxR8hxc4Rc5lo8fPxCuRcd023ervJv
-         7TDQ==
+        Wed, 13 Jul 2022 19:50:01 -0400
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73A552DCF
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 16:49:59 -0700 (PDT)
+Received: by mail-pg1-f172.google.com with SMTP id h132so4464pgc.10
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 16:49:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=goY5s09yDjamY/zMU5kBbCD+EHX29aLygMcuT7F3v0c=;
-        b=AQmoge6z0A3zeYf5PrK7sdv8eivxTjz/6A26ibxtYAJd7QljZH69A8GNrzBp1Xjbeh
-         t9WvOcSXk2erFjv77igJc1ByRK6ZzjABZvaw/avqZEjJpNNUddVcZNfsUrztRTkQ6qzR
-         YBf5D9VtpUoqw/9bWI2B4FLPgfLDSYNZgqjXFiIxL5rbNeDKFh+v5BeAYnnpLR97Qo+n
-         o4qUNcAACpi3LMD7lM5A1E0EEZXbuoVMB7R3Xxzwpd83+7N4dHjJ/lh2NTL5yFDPCyWR
-         ACLXmn0zaQf173lV/hjNZyaUggD8m1nCxxEt9kVtVQKcWluImM6lAyqUnKda6Wxhe0xe
-         q67g==
-X-Gm-Message-State: AJIora9wqgL5aCDsOd0k8toAgMhSPjyYdEiE7uYGw3JG18vJfgxs8ql7
-        yE77uLyDkbA45jFvl4Hv8CA5YA==
-X-Google-Smtp-Source: AGRyM1s+e0Sys0LuGyWP0xkZpSFlrftoz+VqgKP2/XtxSADN2j6AUd5sbSqWzTIneLlO/yMEXjYSJg==
-X-Received: by 2002:a17:902:c992:b0:16b:d8b9:1c5f with SMTP id g18-20020a170902c99200b0016bd8b91c5fmr5364819plc.93.1657755995336;
-        Wed, 13 Jul 2022 16:46:35 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y9-20020aa79ae9000000b0052ab8525893sm106545pfp.142.2022.07.13.16.46.34
+        bh=IvPV3oJ9vdJJfCHBYW47RH7lM0GyR4PdZoEoClAuzZ8=;
+        b=LAvAyxp4I4+n8v9SORbIIJ5N22J+7DKCmHWwajz2niYjyMyy18EYjteQv2hGEppho2
+         ahbtlwpKZHKVfj1e5lUs2l9qTmMVKeLHFs+w/6ftXYLX8HQ0nyMQjJjZbTeogQSh6mFT
+         gauaZ5w50UKDEj2s3wX7Mn6kSKa5ceMTCK8TaCMFkUT5hGdbThQpmkZ5MVEi7o4RnPQ5
+         acgtuUQJC5vWefRGMdgaHTe16Ji8CZPKGbDM7zv1HvXGjr+M0q5XWr79QFGBGbuIXFQl
+         y+M042pZk2WNyp91dBKvKVXeGdsc6xumfZ36B6apXHDOp9GwwWZdeadC5hPkN8TSv+O/
+         L2Pg==
+X-Gm-Message-State: AJIora9XH5Gh/RKhQFNgDM1KrS/pGUjyTgDZGQc/i2oAZhpOSiS/E2q/
+        1tcnrh32lRoSpq3qrgPMG44Ep8FTT1Y=
+X-Google-Smtp-Source: AGRyM1vLzflS9+Q+Xr1E1B4DFWNgPKak2akIdeSxm76cXX+bkulQapC/tRtORsaUByOmq2HjUb2MuA==
+X-Received: by 2002:a62:7bd7:0:b0:52b:1d57:e098 with SMTP id w206-20020a627bd7000000b0052b1d57e098mr706908pfc.19.1657756199133;
+        Wed, 13 Jul 2022 16:49:59 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:cf8d:5409:1ca6:f804? ([2620:15c:211:201:cf8d:5409:1ca6:f804])
+        by smtp.gmail.com with ESMTPSA id np12-20020a17090b4c4c00b001ecbd9aa1a7sm69347pjb.1.2022.07.13.16.49.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jul 2022 16:46:34 -0700 (PDT)
-Message-ID: <ee65aa8a-2e74-9a7a-f8e6-11266744a326@kernel.dk>
-Date:   Wed, 13 Jul 2022 17:46:33 -0600
+        Wed, 13 Jul 2022 16:49:58 -0700 (PDT)
+Message-ID: <0496421c-5793-40c4-4662-865fc19bbbdc@acm.org>
+Date:   Wed, 13 Jul 2022 16:49:57 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
 Subject: Re: [PATCH v2 00/63] Improve static type checking for request flags
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20220629233145.2779494-1-bvanassche@acm.org>
  <d1a88d4f-9f03-a1d6-cf4a-fcdb8070399c@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d1a88d4f-9f03-a1d6-cf4a-fcdb8070399c@acm.org>
-Content-Type: text/plain; charset=UTF-8
+ <ee65aa8a-2e74-9a7a-f8e6-11266744a326@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <ee65aa8a-2e74-9a7a-f8e6-11266744a326@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/22 3:48 PM, Bart Van Assche wrote:
-> On 6/29/22 16:30, Bart Van Assche wrote:
->> A source of confusion in the block layer is that can be nontrivial to determine
->> which type of flags a u32 function argument accepts. This patch series clears
->> up that confusion for request flags by introducing a new __bitwise type, namely
->> blk_opf_t. Additionally, the type 'int' is change into 'enum req_op' where used
->> to hold a request operation.
->>
->> Analysis of the sparse warnings introduced by this conversion resulted in one
->> bug fix ("blktrace: Trace remap operations correctly").
->>
->> Although the number of patches in this series is significant, the risk of this
->> patch series is low since most patches involve changing one integer type (int
->> or u32) into another integer type of the same size (enum req_op or blk_opf_t).
->>
->> Please consider this patch series for kernel v5.20.
+On 7/13/22 16:46, Jens Axboe wrote:
+> On 7/13/22 3:48 PM, Bart Van Assche wrote:
+>> I think that everyone who is interested in reviewing this patch series
+>> has had sufficient time to review the patches in this patch series. Do
+>> you prefer to queue this patch series for kernel v5.20 or kernel
+>> v5.21?
 > 
-> (replying to my own email)
-> 
-> Hi Jens,
-> 
-> I think that everyone who is interested in reviewing this patch series
-> has had sufficient time to review the patches in this patch series. Do
-> you prefer to queue this patch series for kernel v5.20 or kernel
-> v5.21?
+> I've been pondering the same. I'm fine with going for 5.20 as this will
+> be a pain to maintain, but the first patch doesn't even apply to my
+> for-5.20/block branch...
 
-I've been pondering the same. I'm fine with going for 5.20 as this will
-be a pain to maintain, but the first patch doesn't even apply to my
-for-5.20/block branch...
+Hi Jens,
 
--- 
-Jens Axboe
+This patch series was prepared against your for-next branch. I will 
+rebase it on top of your for-5.20/block branch, retest and repost it.
+
+Thanks,
+
+Bart.
+
 
