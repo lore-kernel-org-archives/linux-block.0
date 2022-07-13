@@ -2,172 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE40BCCA481
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 15:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F28C43334
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 15:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236744AbiGMPnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 11:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48408 "EHLO
+        id S236412AbiGMP7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 11:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230436AbiGMPnj (ORCPT
+        with ESMTP id S237089AbiGMP7T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 11:43:39 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2044.outbound.protection.outlook.com [40.107.92.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B7ADE87;
-        Wed, 13 Jul 2022 08:43:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZGHNkPSeuj5uazpBoeMhLGEaAe2C88qEJQFsNS2xQQZTSCsfK2AgFhHKSbYzkko8VZizkwO7MbkB6V5akLMseZDHbCDzcz5phvtwJlMSqvI0wukT27JY3ECrl05YDG4Seg/81sZtYO6337g0mvCZX9tcvrP6tFrWyvdQxunMfQQ3R4DrZmffCO/wj/ySLHeG76Ho7044S8g4aObpAJ3zRASNoXmW33qs1zOa5hgc9gIXog/r2Ep9J3XqfSYX5hB3M+d6Yf4xhvaZUd5Pbsi4zpoti8nteifJGH7YBWvv8SZbL6ZEqTC08MzKdq8f4XeHx0a7z0TVezIYucdr0TRk7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BLHlzs/lmOt1CTNpWlKWO4S51pCQAGi1msy82OT0GpU=;
- b=W8Gr85MvHWUqRO1yxJaWO0Er/m+mbFsp777PMJ9Yn2vOxD2FGJHkpK3JGofKn8z96WlaR8PkpEciamn9sl3PzFtaX56WhtGGCWwk6FXiiXsUvns5fuVyL4NWICPwK0B82Nfu/EV0I7jjVtHbO8VjnMaBmU7vl69mBrZI2Y+jnJbhM4JfIdsy2VQIfq5IHSwjh1LBjnhaKLto+NAmj8yXSFLNn7O2rfD6SnNShqBcqoUo7pl6Gn0gG4btacqOeAiGkWQfG60f+suKvoiSp0qt1CzDVRPu9Tz59vWXWzGG+OkAVtAAqcLsmsj3oDDc3NNU0Hpf2ibCmyo6Q7frGFCSxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BLHlzs/lmOt1CTNpWlKWO4S51pCQAGi1msy82OT0GpU=;
- b=EtuV8MeHgEeQBcT27n6VgOUmuNSEGURICb9OpDukk8ZH+5eC816OqhLaTU3Tm8Ybs4UAZCvCZtvD8AbHuWySkZ2rMU+YXR54l969Gj9MHZhFnNNZv2+Rx6we2kINJpltSSw3yqQoyRNNbXfNUkCRqRvy1YKs0EPY0puQ2VcNbB/AqiPzo/nQnwh90t5TC56WvQxzGgd2/+FsL7HTEBtua0xD7yFleBZBdgOT21AVrvGpcRPx2d8WLDSABQREq9l4oXICP1GIjOPDjGnEVZJyo8NYlL1hJ7ja4NonrB9A1uClH9mIyHfGj64Y3a4qfD4lIWtNzjBM/QoK23ZUA8EGzw==
-Received: from BL0PR12MB4659.namprd12.prod.outlook.com (2603:10b6:207:1d::33)
- by BN6PR12MB1617.namprd12.prod.outlook.com (2603:10b6:405:d::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5438.12; Wed, 13 Jul
- 2022 15:43:36 +0000
-Received: from BL0PR12MB4659.namprd12.prod.outlook.com
- ([fe80::3cc0:2098:d2fe:5f56]) by BL0PR12MB4659.namprd12.prod.outlook.com
- ([fe80::3cc0:2098:d2fe:5f56%7]) with mapi id 15.20.5417.026; Wed, 13 Jul 2022
- 15:43:36 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Matthew Wilcox <willy@infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "song@kernel.org" <song@kernel.org>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
-        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "idryomov@gmail.com" <idryomov@gmail.com>,
-        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
-Subject: Re: [PATCH V2 0/6] block: add support for REQ_OP_VERIFY
-Thread-Topic: [PATCH V2 0/6] block: add support for REQ_OP_VERIFY
-Thread-Index: AQHYloklge72pDYJZUKn07WrBI9g4618OGyAgAA5IgA=
-Date:   Wed, 13 Jul 2022 15:43:36 +0000
-Message-ID: <22451082-a467-4bd7-d25d-0f9d0dac4848@nvidia.com>
-References: <20220713072019.5885-1-kch@nvidia.com>
- <Ys64O6malGAbslBL@casper.infradead.org>
-In-Reply-To: <Ys64O6malGAbslBL@casper.infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e0bc82d7-0a1b-498d-0891-08da64e67349
-x-ms-traffictypediagnostic: BN6PR12MB1617:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: x+cjAICaTvY0tiMT1FnlRVD9K9S/sktApZCQDHUcqoP/PfYlVkMR9oUGnxwZA5Xv9ze6X7OD0n38qX4qBipW4/CjGjTBINhzVFohEQ263YKog3FZ8sxUnWCICKbHx5/wqnJmhx1e67FI7HJh9N/bFF7A0fISkbJoqeO++5yfTV+jx3aUHmQRSjDW5pptU70RR9EucI1Paf4a8cqPsvnerW6x754OoXj4gnv8kTBnYW9OaZb/Mbd+Ifs0rVdcOfCA8+9PzQlt5EnCxL/mYcO7CsITz6MfXqCsHfrtxdRWEk3idedBi6Ait7geV4ypLEmXY8Wp/wL++7OhvywZ75TRJCHU7D+jzwumn1lSSVc6fuCMPtFe9NEVHaPqoeO//kdXW/K7HGEsIh2fFZuQ4yqlZN6UOdgUM95TkUdBgjePqOErGBD9VCK+Mn4gXLAFCmz84M2VVaZ/SBRoyCxWTNdWXh8CL6YS3dv/z9iBvZJIA+6JQmma7UKvizPAtFNo+7a0AE5GURu9wVoUcDQ7cloyaQi0tMqTNL28NSMFD8p5podvMjwWZUxNAuP3WSq96zqp7aEfZ7hacImEsQKZE4PzPcVMbxPKEsfvqXKHnOYeea7nnc7D8aJkHczZh9+Zi8g5f5L95kfmFavGbbsJKy2mYSRNO3/06buBe7N7hqXFaiF+tINx7irA+V98sCMPATfF4SeM0MOJMPSLw5NLDxAzoPdPp6gqNWo3yAf6bAX3EMZ1pCxr9iCqXlWeO1BzsC8e5EiUcUtw8ZZ3OIBwWsj7b4nzLUcMR9olhSCv82GUxeTN9BteFCX+fNXx99+839L8sbmPLvMzAZPmbCC7nfo3T2MgYpZtK1jIxRrVdIAbtMHMyNDVPpRRFsG8vQq1Wooy
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB4659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(366004)(396003)(376002)(136003)(39860400002)(53546011)(66446008)(41300700001)(66556008)(6512007)(64756008)(6506007)(66946007)(6486002)(66476007)(36756003)(5660300002)(316002)(54906003)(478600001)(76116006)(86362001)(110136005)(91956017)(71200400001)(122000001)(31696002)(38100700002)(38070700005)(2616005)(83380400001)(8676002)(31686004)(8936002)(2906002)(186003)(7416002)(7406005)(4326008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?K2NRWEdndW5PakRJV29Wck9GdHQwdUpmaWNmaWwrVHNqMGJVdU8wdmVoMDNl?=
- =?utf-8?B?L2JPSzA2OFJJczVpMlV3d3hFUnJXSXhzMTRwZWhlY0xjeURvYXRnMzlHL3pt?=
- =?utf-8?B?eVdMejN1bm1WN0xGL1NnZnV5VHRWYlZjWnhpdUtMRWVsNC83eGJVeW9SN1Jw?=
- =?utf-8?B?RzlzY2svd1RLRG5ldzJkNEVCQW5pa2I5RUg0aUlkdC9jdW50NFV5anFXd0kr?=
- =?utf-8?B?aHMrSEdwTWJ6eW14TUFHTitRQnBRN0dSSmlkV0NVY0NkOXEzVlVwN2w3eUlU?=
- =?utf-8?B?Q1AweG5aL1FmS0pQSTR1cVZBbStpMnZpMFQwYm5LUTNWQzBjaGZQS0NidUtY?=
- =?utf-8?B?R2w1M3hUZ0M3YWQvM2VmSnZLZ0FXd1FuR3l1OFMrTXJHR0RtNkZXNGswNm9x?=
- =?utf-8?B?dUNKYmFLNEpDYWRXNEJwYVNPR2JVSWMrTUNWVlQ0V2k0MlpJQlZvaEM4ZnlN?=
- =?utf-8?B?MlhOaFljaWJ4SUMzL1laR0ZoT0QzbjFHMGkwOWh4c296S0RDS2o4VExYUlJ6?=
- =?utf-8?B?RlVYcFlxK0s1ZXI0TUtOZzYraUpyazhPZHBHclA5NW9nc01oTC9pRnpXcFFS?=
- =?utf-8?B?YkhwUmVKa0NXMWw4ZVptRlpiT1dpaVBFNThSZ3VpMlJXbDQ1NHZsY1F5cHIz?=
- =?utf-8?B?cFJjcHFkNkx4OU5IbEFXTFB5Mnk0NjNmSGloZi9Hd1NuRGZUWnBwQVhvU0dP?=
- =?utf-8?B?UURpZHA3T3NySEkxZkZaZnJHSG0zeTRiNFVIeUMvQndGR3lKR3BTNzZjYmZ4?=
- =?utf-8?B?OHJpUld4VHhQUzhDeTFzeUxiZDdUdEdLdng2MktIb0lYNUlEc2syb0ZhV3Jx?=
- =?utf-8?B?elUzaEtLcE5EV1VtajF0QnoySjJXVjRrWG1uNnczdmxnczFWQ1c0RE0vY2t0?=
- =?utf-8?B?MjYrUGZUSXQzWFc0cFNwc2JCZ0dqWnpnWGQzNDRQZXRLanEzalB2bGhHRjVF?=
- =?utf-8?B?RlJnTHhxYXpnQ2oyYnVESUEyOWJOWmxYQS95d3JURHdDVnZwNk9yTTZqb1B1?=
- =?utf-8?B?aVQwT1VQOTgxb0JKWThNamYrWFNvN2QyeitDUzhaekRab014MXVabTFsY0kw?=
- =?utf-8?B?Z2hWc0lQMklYS2llSXJkT2tVdlp4TlBKa0h6VnlaeTJ2RzQ4ekVjV0dJT2ZB?=
- =?utf-8?B?bzhxSzNpRjI1OUpaYzIyZlJSWFV6Sld3Wit0NVVRbGdxRUJhVjRVeEt0UmMx?=
- =?utf-8?B?dnVxNCtzL1luUUJDMDlvNmFDQVE3d1lwekJxOS80dFV0Y25aTmNUT1RXUnhw?=
- =?utf-8?B?MlV2MVFBSTFpajF4Q25OU3M2cXNYdDdJWUhjeXo4NHFvZm9VREFSRlc3M3N1?=
- =?utf-8?B?dEE3c0w0ek9DVDVOUUlBTEk0R0VESmdGM2d3RkpRa1dQd25hcGlRVDV2enl2?=
- =?utf-8?B?aVZkci9YRHY4WkNuQTZZMktXVmlwYkkrczF4aVlWbzFrREdnTVZWYVpoNnRD?=
- =?utf-8?B?Y21BYUtJTDB0VmYwSGZpSWFPN2hLMDlGSU1xNlM4MmY4U1JMRG5ybWFzTzdS?=
- =?utf-8?B?RllHWUV5OFNTcFVUWmlxeWZKUEhydTJSWThybkVDdWxxdlR6c1FXTHRKUm9C?=
- =?utf-8?B?S1NFQVhWZmtCazNGVExKaVFwdnJTdVlqNTVMQ2luYkh0TXpZdEMvTTd4MEpS?=
- =?utf-8?B?RUllVThCVnFkb2p4b3Faa1A3elJnMHlLaTdLZEFvelRCZm0yNTUzcktxOVJI?=
- =?utf-8?B?REJnQmhVYnFORUl4MjdhN2dYUjJiL2lhNjYvbGwwb3YwSU9CNDBhVEVKSmlK?=
- =?utf-8?B?TTF6cDJ3WURLeTRtd0FKNjZ0bFIrS25ZczdRRzJsd3RtcTEyYkZ5K0Q5ZWg2?=
- =?utf-8?B?R2VaOHYrcUtGVnBlcXM2cXRMSkM5Mm5FaFpyZHljU0VVSTJtc3FkaTEycVRr?=
- =?utf-8?B?SkxzOW44eDIvMlZGeUNERjkwSC9UMlE2MWtibHg5QjZxMUVXcDZrN0R6MGdv?=
- =?utf-8?B?aWkwK1lieWxqZWJLWFVkL3plQ1FNRVBMMzl6SFE3N0VqVlVBcnp5b0FWRjBa?=
- =?utf-8?B?UWgxckNpc3JkeWp0R2xRVy9hRnhDWlVUM3JvMVRERWNzTWx4dlo5SnRCTS9S?=
- =?utf-8?B?bk5lNlpYVExFWi93OHBqUTNOUFhtelpmVkFna2o4dmdIMVJhUGtvTTlmTVE1?=
- =?utf-8?B?cDBmVEs4VStGVHRFV1NSQ2VMbVEzeEptZGRxNEtiSXphSkxGc1AwZldKR2tJ?=
- =?utf-8?Q?GSz+o3ZnhgX78ZapiyBZWtWimwKYbqSayF/SY78aVfZK?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AC8C512CC292C8459B57987F685A50CE@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Wed, 13 Jul 2022 11:59:19 -0400
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E953E0EA;
+        Wed, 13 Jul 2022 08:59:18 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id i204-20020a1c3bd5000000b003a2fa488efdso1136290wma.4;
+        Wed, 13 Jul 2022 08:59:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=y2AcRM2dbenguVq8Sn45LnuUE26anJQ/q/pVY/6n1mI=;
+        b=NGmFsK31K81LNnEuzLEkyqa079LU33gvDJxusPFpemorWRPip2CCK+nQy3kYMY3LWt
+         slVCbGuOycWQI/HyDgVCtTJZcxtH9Z/TqEDgHB6Km9ikqYJ5j9Cwn+6xru3Uyhn2+/qg
+         uVyRw2QcKOnRXj7P+Ltn/ydyYxNkL0yjScCOQRH2UavyG9+j/yD8rHhIuJ+1vgyjxOXx
+         vqM326AfI5IGdaFZ1cndX1SDDTi9qHBU3N8UJUAijEH8MSfDAPEqm4SDOhC6h1mfd1Vv
+         jFMp/mU8tcA3kCg/VBkNdtU3fqzhqM6rl63mEGahXlQU/fEqO2VR+kfyS6yyXNtJq0QD
+         SdIA==
+X-Gm-Message-State: AJIora+ZCgGQKFOcL2F7dCkcF8kTs/QWH3dQypLSX4t2Tl56k+IAqpJO
+        40TJnKTNUsH+8MfjPtbGZIs=
+X-Google-Smtp-Source: AGRyM1v89jFtIWf5Owe/3xq9jPWOLvLV7mOEFexlE0Il+i3C8RydeEbGQ74p0+J4bujEJipuYpHfag==
+X-Received: by 2002:a05:600c:4fc8:b0:3a1:987c:82d4 with SMTP id o8-20020a05600c4fc800b003a1987c82d4mr4449032wmq.26.1657727956465;
+        Wed, 13 Jul 2022 08:59:16 -0700 (PDT)
+Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id p13-20020a5d458d000000b0021d728d687asm14103484wrq.36.2022.07.13.08.59.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Jul 2022 08:59:16 -0700 (PDT)
+Message-ID: <c000ecc9-e570-0788-88fa-8225a4b9fa04@grimberg.me>
+Date:   Wed, 13 Jul 2022 18:59:13 +0300
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB4659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0bc82d7-0a1b-498d-0891-08da64e67349
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jul 2022 15:43:36.5455
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xdev/kgnqNxNcAmQpdlD/Tja50n8j3LdIA1p3R++eDtJwB4emEsrKM0upInPiIVi46zkClEAD3OGw2xP5UO+7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR12MB1617
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
+Content-Language: en-US
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, kbusch@kernel.org,
+        axboe@kernel.dk, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
+        gost.dev@samsung.com
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+ <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de>
+ <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
+ <20220713053633.GA13135@lst.de>
+ <24f0a3e6-aa53-8c69-71b7-d66289a63eae@grimberg.me>
+ <20220713101235.GA27815@lst.de>
+ <772b461a-bc43-c229-906d-0e280091e17f@grimberg.me>
+ <96f47d9b-fbfc-80da-4c38-f46986f14a43@suse.de>
+ <7c7a093c-4103-b67d-c145-9d84aaae835e@grimberg.me>
+ <04b475f6-506f-188b-d104-b27e9dffc1b8@suse.de>
+ <66322f2d-fbde-7b9f-14f1-0651511d95b8@grimberg.me>
+ <1d1d94ea-b67b-405c-c825-faf67f258558@suse.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <1d1d94ea-b67b-405c-c825-faf67f258558@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNy8xMy8yMDIyIDU6MTkgQU0sIE1hdHRoZXcgV2lsY294IHdyb3RlOg0KPiBPbiBXZWQsIEp1
-bCAxMywgMjAyMiBhdCAxMjoyMDoxM0FNIC0wNzAwLCBDaGFpdGFueWEgS3Vsa2Fybmkgd3JvdGU6
-DQo+PiBIaSwNCj4+DQo+PiBPbmUgb2YgdGhlIHJlc3BvbnNpYmlsaXRpZXMgb2YgdGhlIE9wZXJh
-dGluZyBTeXN0ZW0sIGFsb25nIHdpdGggbWFuYWdpbmcNCj4+IHJlc291cmNlcywgaXMgdG8gcHJv
-dmlkZSBhIHVuaWZpZWQgaW50ZXJmYWNlIHRvIHRoZSB1c2VyIGJ5IGNyZWF0aW5nDQo+PiBoYXJk
-d2FyZSBhYnN0cmFjdGlvbnMuIEluIHRoZSBMaW51eCBLZXJuZWwgc3RvcmFnZSBzdGFjayB0aGF0
-DQo+PiBhYnN0cmFjdGlvbiBpcyBjcmVhdGVkIGJ5IGltcGxlbWVudGluZyB0aGUgZ2VuZXJpYyBy
-ZXF1ZXN0IG9wZXJhdGlvbnMNCj4+IHN1Y2ggYXMgUkVRX09QX1JFQUQvUkVRX09QX1dSSVRFIG9y
-IFJFUV9PUF9ESVNDQVJEL1JFUV9PUF9XUklURV9aRVJPRVMsDQo+PiBldGMgdGhhdCBhcmUgbWFw
-cGVkIHRvIHRoZSBzcGVjaWZpYyBsb3ctbGV2ZWwgaGFyZHdhcmUgcHJvdG9jb2wgY29tbWFuZHMN
-Cj4+IGUuZy4gU0NTSSBvciBOVk1lLg0KPiANCj4gU3RpbGwgTkFLLCBzZWUgcHJldmlvdXMgdGhy
-ZWFkIGZvciByZWFzb25zLiAgU29tZXdoYXQgZGlzYXBwb2ludGluZyB0aGF0DQo+IHlvdSBzZW50
-IGEgbmV3IHZlcnNpb24gaW5zdGVhZCBvZiBhZGRyZXNzaW5nIHRob3NlIGNvbW1lbnRzIGZpcnN0
-Lg0KDQpJJ3ZlIGFsc28gYXNrZWQgeW91IGV4YWN0bHkgd2hhdCBkbyB5b3UgZXhwZWN0IGFzIEkg
-ZGlkIG5vdCB1bmRlcnN0YW5kDQp5b3VyIGZpcnN0IHJlcGx5Lg0KDQpJJ3ZlIGFkZGVkIHRoZSBm
-aXhlcyB0byB0aGlzIHZlcnNpb24gYmFzZWQgb24gdGhlIG90aGVyIGNvbW1lbnRzIHRoYXQgDQpJ
-J3ZlIHJlY2VpdmVkIGFzIEkgdGhpbmsgdGhleSBzdGlsbCBuZWVkcyBiZSB0byByZXZpZXdlZC4N
-Cg0KQXMgSSBjYW4gc2VlIHlvdXIgcmVwbHkgZWFybGllciB0b2RheSwgSSdsbCBjb250aW51ZSBk
-aXNjdXNzaW9uIG9uIHRoYXQNCnRocmVhZC4NCg0KLWNrDQoNCg0K
+
+>>>>> Amongst all the other issue we've found the prime problem with 
+>>>>> SG_IO is that it needs to be directed to the 'active' path.
+>>>>> For the device-mapper has a distinct callout (dm_prepare_ioctl), 
+>>>>> which essentially returns the current active path device. And then 
+>>>>> the device-mapper core issues the command on that active path.
+>>>>>
+>>>>> All nice and good, _unless_ that command triggers an error.
+>>>>> Normally it'd be intercepted by the dm-multipath end_io handler, 
+>>>>> and would set the path to offline.
+>>>>> But as ioctls do not use the normal I/O path the end_io handler is 
+>>>>> never called, and further SG_IO calls are happily routed down the 
+>>>>> failed path.
+>>>>>
+>>>>> And the customer had to use SG_IO (or, in qemu-speak, LUN 
+>>>>> passthrough) as his application/filesystem makes heavy use of 
+>>>>> persistent reservations.
+>>>>
+>>>> How did this conclude Hannes?
+>>>
+>>> It didn't. The proposed interface got rejected, and now we need to 
+>>> come up with an alternative solution.
+>>> Which we haven't found yet.
+>>
+>> Lets assume for the sake of discussion, had dm-mpath set a path to be
+>> offline on ioctl errors, what would qemu do upon this error? blindly
+>> retry? Until When? Or would qemu need to learn about the path tables in
+>> order to know when there is at least one online path in order to retry?
+>>
+> IIRC that was one of the points why it got rejected.
+> Ideally we would return an errno indicating that the path had failed, 
+> but further paths are available, so a retry is in order.
+> Once no paths are available qemu would be getting a different error 
+> indicating that all paths are failed.
+
+There is no such no-paths-available error.
+
+> 
+> But we would be overloading a new meaning to existing error numbers, or 
+> even inventing our own error numbers. Which makes it rather awkward to use.
+
+I agree that this sounds awkward.
+
+> Ideally we would be able to return this as the SG_IO status, as that is 
+> well capable of expressing these situations. But then we would need to 
+> parse and/or return the error ourselves, essentially moving sg_io 
+> funtionality into dm-mpath. Also not what one wants.
+
+uring actually should send back the cqe for passthru, but there is no
+concept like "Path error, but no paths are available".
+
+> 
+>> What is the model that a passthru consumer needs to follow when
+>> operating against a mpath device?
+> 
+> The model really is that passthru consumer needs to deal with these errors:
+> - No error (obviously)
+> - I/O error (error status will not change with a retry)
+> - Temporary/path related error (error status might change with a retry)
+> 
+> Then the consumer can decide whether to invoke a retry (for the last 
+> class), or whether it should pass up that error, as maybe there are 
+> applications with need a quick response time and can handle temporary 
+> failures (or, in fact, want to be informed about temporary failures).
+> 
+> IE the 'DNR' bit should serve nicely here, keeping in mind that we might 
+> need to 'fake' an NVMe error status if the connection is severed.
+
+uring passthru sends the cqe status to userspace IIRC. But nothing in
+there indicates about path availability. That would be something that
+userspace would need to reconcile on its own from traversing sysfs or
+alike...
