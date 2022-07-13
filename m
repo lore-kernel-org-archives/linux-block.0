@@ -2,103 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A691CCA479
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 12:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C82C43334
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 12:18:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231944AbiGMMRh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 08:17:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35744 "EHLO
+        id S234672AbiGMMSO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 08:18:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiGMMRg (ORCPT
+        with ESMTP id S229613AbiGMMSM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 08:17:36 -0400
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444E9A238F;
-        Wed, 13 Jul 2022 05:17:35 -0700 (PDT)
-Received: by mail-wr1-f50.google.com with SMTP id a5so15232005wrx.12;
-        Wed, 13 Jul 2022 05:17:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=F/hDU5t/SYe5V0/3VS5pxCEmSkWFDNtQGXEw7qwTLNo=;
-        b=CFEhMlZFODBTfW/nuPD+pSQIeWu/DMB01MpWxUZjt6R2ysgDL6msEh5/5ntKHCMSB9
-         aQnU/H4BPLV1XdaKfnuGE4vOdBthSOSM24dYn4hOmxy6C67HU7zuoeFeA8Jf4MSq/lTE
-         jiCtZ0E7+7XYGl1GWFRAc6IO377a3KedIH55Le0aiHr257UXtdTkQvR+X5tatNnLOUeb
-         3UVT85LnwbLvbD/ICGLweg16TLx8mzKOD7ald6vPrf6X4KhEBYh/3vrhw0JIQDkbAZAM
-         IaVi3NN0B2W/Vrx6V39imgQMZGdHKjxryFOZCvMCXFHabKd5ClVadO7IYcLfoKtSfigr
-         +mTg==
-X-Gm-Message-State: AJIora+Kcgt9l8XNb+FJyJsq8d6g+h2JwyTHn+FjVx3F58RWGt2ZRsbZ
-        NiZW6BhnNk4FbujEvA6BacQ=
-X-Google-Smtp-Source: AGRyM1tAELyc3EL80IJoRz+3GsaLhUTzyAc4LlhFA9oAzjwelcEYV2FL/crE4onZIaPYOe0ifaiCCQ==
-X-Received: by 2002:a5d:5983:0:b0:21d:a811:3b41 with SMTP id n3-20020a5d5983000000b0021da8113b41mr2821809wri.441.1657714653787;
-        Wed, 13 Jul 2022 05:17:33 -0700 (PDT)
-Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id c11-20020adffb4b000000b0021a34023ca3sm10852773wrs.62.2022.07.13.05.17.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Jul 2022 05:17:33 -0700 (PDT)
-Message-ID: <474e9b28-033d-f951-b79b-45db31c2129b@grimberg.me>
-Date:   Wed, 13 Jul 2022 15:17:31 +0300
+        Wed, 13 Jul 2022 08:18:12 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1886DA238F;
+        Wed, 13 Jul 2022 05:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WgehCo4EWz54AyF2jDUuG0Xj0H/FjQtWvzeLouBbzy8=; b=hiFqFuAZ+D4oDZkdGrk3mNwzMD
+        RIy2FWRD01ImOMohxZ8m+oSnAnrZugKZCrbRbuLAfgfm93CUmmSdIq/4hwbRAbDr0ukKJWTnGpHXR
+        iQ1Tr4QcsDokLiSOoXImkKWeQz3d51T3UJX1Uhw8xWnu1KOCxOaCG3ndxI3FniFiEWESfF1YjfWv0
+        xpqgBJ67IfhYi0ILfNdc7DxI3lJNsEeE75sm/g4LS9TGlCHw3D9nhrwHl1znFQNqekPD1rNs6qWMf
+        +YTEq1Cvs1rFBavrhFCxNokpBT1AY4DDVYumygqVZ6vgUL/WHbSkJ6TWJqHGUr13Wu+sIJDCDql6d
+        ZbukAvMg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oBbJU-008AhI-St; Wed, 13 Jul 2022 12:17:56 +0000
+Date:   Wed, 13 Jul 2022 13:17:56 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "song@kernel.org" <song@kernel.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Message-ID: <Ys639LsjBUGPNErd@casper.infradead.org>
+References: <20220630091406.19624-1-kch@nvidia.com>
+ <YsXJdXnXsMtaC8DJ@casper.infradead.org>
+ <5ffe57d3-354c-eabe-ea38-9c4201c13970@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
- uring-passthrough commands
-Content-Language: en-US
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     hch@lst.de, kbusch@kernel.org, axboe@kernel.dk,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, asml.silence@gmail.com,
-        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
-References: <20220711110155.649153-1-joshi.k@samsung.com>
- <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
- <20220711110155.649153-5-joshi.k@samsung.com>
- <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
- <20220711183746.GA20562@test-zns>
- <5f30c7de-03b1-768a-d44f-594ed2d1dc75@grimberg.me>
- <20220712042332.GA14780@test-zns>
- <3a2b281b-793b-b8ad-6a27-138c89a46fac@grimberg.me>
- <20220713053757.GA15022@test-zns>
- <f15bc945-8192-c10e-70d8-9946ae2969ce@grimberg.me>
- <20220713112850.GD30733@test-zns>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20220713112850.GD30733@test-zns>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ffe57d3-354c-eabe-ea38-9c4201c13970@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->>>> However io_kiocb is less
->>>> constrained, and could be used as a context to hold such a space.
->>>>
->>>> Even if it is undesired to have io_kiocb be passed to uring_cmd(), it
->>>> can still hold a driver specific space paired with a helper to 
->>>> obtain it
->>>> (i.e. something like io_uring_cmd_to_driver_ctx(ioucmd) ). Then if the
->>>> space is pre-allocated it is only a small memory copy for a stable copy
->>>> that would allow a saner failover design.
->>>
->>> I am thinking along the same lines, but it's not about few bytes of
->>> space rather we need 80 (72 to be precise). Will think more, but
->>> these 72 bytes really stand tall in front of my optimism.
->>
->> You don't have to populate this space on every I/O, you can just
->> populate it when there is no usable path and when you failover a
->> request...
+On Wed, Jul 13, 2022 at 09:14:42AM +0000, Chaitanya Kulkarni wrote:
+> On 7/6/22 10:42, Matthew Wilcox wrote:
+> > On Thu, Jun 30, 2022 at 02:14:00AM -0700, Chaitanya Kulkarni wrote:
+> >> This adds support for the REQ_OP_VERIFY. In this version we add
+> > 
+> > IMO, VERIFY is a useless command.  The history of storage is full of
+> > devices which simply lie.  Since there's no way for the host to check if
+> > the device did any work, cheap devices may simply implement it as a NOOP.
 > 
-> Getting the space and when/how to populate it - related but diferent
-> topics in this context.
+> Thanks for sharing your feedback regarding cheap devices.
 > 
-> It is about the lifetime of SQE which is valid only for the first
-> submission. If we don't make the command stable at that point, we don't
-> have another chance. And that is exactly what happens for failover.
-> Since we know IO is failed only when it fails, but by that time
-> original passthrough-command is gone out of hand. I think if we somehow
-> get the space (preallocated), it is ok to copy to command for every IO
-> in mpath case.
+> This falls outside of the scope of the work, as scope of this work is
+> not to analyze different vendor implementations of the verify command.
 
-Yea you're right. you need to populate it as soon as you queue the
-uring command.
+The work is pointless.  As a customer, I can't ever use the VERIFY
+command because I have no reason for trusting the outcome.  And there's
+no way for a vendor to convince me that I should trust the result.
+
+> > Even expensive devices where there's an ironclad legal contract between
+> > the vendor and customer may have bugs that result in only some of the
+> > bytes being VERIFYed.  We shouldn't support it.
+> This is not true with enterprise SSDs, I've been involved with product
+> qualification of the high end enterprise SSDs since 2012 including good
+> old non-nvme devices with e.g. skd driver on linux/windows/vmware.
+
+Oh, I'm sure there's good faith at the high end.  But bugs happen in
+firmware, and everybody knows it.
+
+> > Now, everything you say about its value (not consuming bus bandwidth)
+> > is true, but the device should provide the host with proof-of-work.
+> 
+> Yes that seems to be missing but it is not a blocker in this work since
+> protocol needs to provide this information.
+
+There's no point in providing access to a feature when that feature is
+not useful.
+
+> We can update the respective specification to add a log page which
+> shows proof of work for verify command e.g.
+> A log page consist of the information such as :-
+> 
+> 1. How many LBAs were verified ? How long it took.
+> 2. What kind of errors were detected ?
+> 3. How many blocks were moved to safe location ?
+> 4. How much data (LBAs) been moved successfully ?
+> 5. How much data we lost permanently with uncorrectible errors?
+> 6. What is the impact on the overall size of the storage, in
+>     case of flash reduction in the over provisioning due to
+>     uncorrectible errors.
+
+That's not proof of work.  That's claim of work.
+
+> > I'd suggest calculating some kind of checksum, even something like a
+> > SHA-1 of the contents would be worth having.  It doesn't need to be
+> > crypto-secure; just something the host can verify the device didn't spoof.
+> 
+> I did not understand exactly what you mean here.
+
+The firmware needs to prove to me that it *did something*.  That it
+actually read those bytes that it claims to have verified.  The simplest
+way to do so is to calculate a hash over the blocks which were read
+(maybe the host needs to provide a nonce as part of the VERIFY command
+so the drive can't "remember" the checksum).
