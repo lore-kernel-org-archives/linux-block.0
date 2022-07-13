@@ -2,88 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61070C43334
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jul 2022 23:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C6BC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 05:41:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234010AbiGLXVZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jul 2022 19:21:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49434 "EHLO
+        id S233681AbiGMFlx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 01:41:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbiGLXVZ (ORCPT
+        with ESMTP id S233952AbiGMFlb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jul 2022 19:21:25 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD2CAF77E;
-        Tue, 12 Jul 2022 16:21:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=GcSnsmTSArOCBkWqx5BnP3VtK1UGANiObmnZI2DrZCI=; b=quQkmn7Ru3FY1R4vebW5OaTrE6
-        VK03ZuqBx4mcVXXvB60q861itmQX3w71PSXDCUAdGlD6Bt+RRyXCn7QthO4VyKrnkBrzpJKIgNTiP
-        Nug3bOBneWoc7ypHfFvx8dKixR385/DLju6VAcFRtmJl13fpmy38+o9fXGlkydhxO+kg+nLtFIx8y
-        4bwZ0co290AaGxkr+wFF67QVme0e8osYkIf6Eg/A5Fq/gL0GMB/IpvKSBUtPsmX9pmznTUIaosCi8
-        OoSXah5k63KpMAnKN+9HFhYkgRHz2qLCvPZwPKDjXSSK1OcUyxUznWB5ki5pNZ1BUvUd0LQAUEEpy
-        E13znKnQ==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oBPBv-00DQUR-Om; Tue, 12 Jul 2022 17:21:20 -0600
-Message-ID: <a083fad9-c844-b4bd-b68d-0515803427c1@deltatee.com>
-Date:   Tue, 12 Jul 2022 17:21:19 -0600
+        Wed, 13 Jul 2022 01:41:31 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0AB7E026F;
+        Tue, 12 Jul 2022 22:36:38 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 82B0E68AA6; Wed, 13 Jul 2022 07:36:33 +0200 (CEST)
+Date:   Wed, 13 Jul 2022 07:36:33 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Kanchan Joshi <joshi.k@samsung.com>, kbusch@kernel.org,
+        axboe@kernel.dk, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
+        gost.dev@samsung.com
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
+Message-ID: <20220713053633.GA13135@lst.de>
+References: <20220711110155.649153-1-joshi.k@samsung.com> <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com> <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de> <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-CA
-To:     Christoph Hellwig <hch@lst.de>, Song Liu <song@kernel.org>
-Cc:     linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220712070331.1390700-1-hch@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20220712070331.1390700-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: hch@lst.de, song@kernel.org, linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: fix md disk_name lifetime problems
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Jul 12, 2022 at 11:13:57PM +0300, Sagi Grimberg wrote:
+> I think the difference from scsi-generic and controller nvme passthru is
+> that this is a mpath device node (or mpath chardev). This is why I think
+> that users would expect that it would have equivalent multipath
+> capabilities (i.e. failover).
 
+How is that different from /dev/sg?
 
-On 2022-07-12 01:03, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this series tries to fix a problem repored by Logan where we see
-> duplicate sysfs file name in md.  It is due to the fact that the
-> md driver only checks for duplicates on currently live mddevs,
-> while the sysfs name can live on longer.  It is an old problem,
-> but the race window got longer due to waiting for the device freeze
-> earlier in del_gendisk.
-> 
-> Note that I still can't reproduce this problem so this was based
-> on code inspection.  Also note that I occasionally run into a hang
-> in the 07layouts tests with or without this series.
+> In general, I think that uring passthru as an alternative I/O interface
+> and as such needs to be able to failover. If this is not expected from
+> the interface, then why are we exposing a chardev for the mpath device
+> node? why not only the bottom namespaces?
 
-Yes, there should be a fix for 07layouts in md-next already 
-(92a2748dc3c5).
-
-Your branch wasn't based off md-next and does have some conflicts. 
-
-I've rebased your patches onto md-next, replaced patch 2 with 
-my suggestion and ran my battery of tests on it and have found that 
-it fixes the bug I identified and looks good to me.
-
-https://github.com/sbates130272/linux-p2pmem   md-lifetime-fixes
-
-This branch will still conflict (easily) with the patch
-8b9ab62662 ("block: remove blk_cleanup_disk") in your branch.
-
-How do you want to proceed with getting these merged?
-
-Logan
-
-
+The failover will happen when you retry, but we leave that retry to
+userspace.  There even is the uevent to tell userspace when a new
+path is up.
