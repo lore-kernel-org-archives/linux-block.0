@@ -2,91 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0DC0C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 14:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728B8C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 15:05:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236536AbiGMOJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 10:09:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44654 "EHLO
+        id S236747AbiGMPFM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 11:05:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236487AbiGMOJa (ORCPT
+        with ESMTP id S234652AbiGMPFL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 10:09:30 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C69938A
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 07:09:28 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id o15so12174415pjh.1
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 07:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IZUCsCUFTB3hUkWYK46U+VsvZBxdvNM3Fkqu8Dxi8pc=;
-        b=Cn/jpQyig6YQIyCLHkn4YaP7UZR5ml4Q9/jM/qWHFT8jzNZxvfWZdaVAlBy206ad7N
-         pE1scK5mgeZYVQq6z/R/5AN20t9Gs/e1e3BMDsMtvjpaEz9mjHwlsnYQFxSHMYdQORKu
-         LmZEmrcfGRK9gCw6EuVk5VVOaH+qxczVX007bw+bmQxmVuA0T9S5lzOdLP98F/7Pem51
-         WvIdP9WAI41JgutJjyTuzGlSXvXFrZy7i2fr8AnhnCXEvDyJfpinG3E8ntorApKIcLYT
-         d5WQDwlJ2jhRZQK9hAGuhEi9JkrbEXHlQEiHSYzbXixem49nWfplucI2sNSKjaF1tH3O
-         ss1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IZUCsCUFTB3hUkWYK46U+VsvZBxdvNM3Fkqu8Dxi8pc=;
-        b=ka4FyzaquPHogt07nhjSo6PpLCmOuxBd3Om79iFMsuRCTbTtZVEfpOis+EPAdocy3h
-         I088PvE8bNJ9s45OWVV+4LS19lgXQ6IkO64zvgJ6N63EW8YYrZdxgfZk7irSefFKz5d+
-         6PWP630AqYpUjbB11pJ/NySV6TEA8vM6AJI1EMRmWDJ90GFNrbROyxVWhDH1zZZJR87Z
-         VU0CKb9itMN2gdhTICJrF8RwhOMzb3dOlh+clmXz/WiPdAY67c6i/cUo3xUsAFIkpN1M
-         BEee0MvN8C/lWClCiKaJTVVUozEMO5mDaTDOLHj1koKQDq6RSy7uzuw+JD/S/bkGyWxO
-         0plg==
-X-Gm-Message-State: AJIora+sf6stXOfICtxwxBJ3L4ybAS7RwkBVAZv5j12yOHN0K42jUJBO
-        N6VOrIu8VHMlnpy3OFI8hBi5uA==
-X-Google-Smtp-Source: AGRyM1ue1MoP4IWh46nK55SBZDgiY7nb8CbRRXsJl/DmE7gN3+60bd97mvAZFdyOMgJmskZsh3ZRLg==
-X-Received: by 2002:a17:90a:e008:b0:1ef:831a:1fff with SMTP id u8-20020a17090ae00800b001ef831a1fffmr10183337pjy.221.1657721367885;
-        Wed, 13 Jul 2022 07:09:27 -0700 (PDT)
-Received: from FVFYT0MHHV2J.bytedance.net ([2408:8207:18d5:ce0:b14a:8f36:de08:545f])
-        by smtp.gmail.com with ESMTPSA id y4-20020a655b44000000b004126f343fc9sm7920738pgr.67.2022.07.13.07.09.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 07:09:27 -0700 (PDT)
-From:   Muchun Song <songmuchun@bytedance.com>
-To:     axboe@kernel.dk, snitzer@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hch@lst.de, Muchun Song <songmuchun@bytedance.com>
-Subject: [PATCH] block: fix missing blkcg_bio_issue_init
-Date:   Wed, 13 Jul 2022 22:02:26 +0800
-Message-Id: <20220713140226.68135-1-songmuchun@bytedance.com>
-X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+        Wed, 13 Jul 2022 11:05:11 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E4341D35;
+        Wed, 13 Jul 2022 08:05:09 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 2CE4933EBC;
+        Wed, 13 Jul 2022 15:05:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1657724708; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3UthFAv3XYV85llf1wlYTZ00AmCnaMVjVxb5nRXSeSw=;
+        b=SwqlHRDxgN7Jzn2rO6klx+TGxsb5kYnOmvpEnxIg442V/TJzgxweZNo1LA6Ou5tZZYxHC6
+        t41LQy7I8A6ZbJwe+P2NX8LDtAf1Zc5eL+wOkIHnF2nXws/Mlsw50FBKcAPRTIpieoP3zd
+        kHWda9H3XDl8OidcG3UyH52gQDD9QPE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1657724708;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3UthFAv3XYV85llf1wlYTZ00AmCnaMVjVxb5nRXSeSw=;
+        b=WYu1r+884kvySXmy1H9WTd4t806hphyxPIyqSBY+c85qDWJ77/AiWD6xWQ3IX8zhNjROLV
+        1s/OrNwCvZyDTfBQ==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id EE9CE2C141;
+        Wed, 13 Jul 2022 15:05:07 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id A1E4BA0635; Wed, 13 Jul 2022 17:05:07 +0200 (CEST)
+Date:   Wed, 13 Jul 2022 17:05:07 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>, Song Liu <song@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>, Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com
+Subject: Re: remove bdevname
+Message-ID: <20220713150507.6bvq4bidmirs2mql@quack3>
+References: <20220713055317.1888500-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220713055317.1888500-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The commit 513616843d73 ("block: remove superfluous calls to
-blkcg_bio_issue_init") has removed blkcg_bio_issue_init from
-__bio_clone since submit_bio will override ->bi_issue.
-However, __blk_queue_split is called after blkcg_bio_issue_init
-(see blk_mq_submit_bio) in submit_bio. In this case, the
-->bi_issue is 0. Fix it.
+On Wed 13-07-22 07:53:08, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series removes the final uses and the implementation of the bdevname()
+> function.
 
-Fixes: 513616843d73 ("block: remove superfluous calls to blkcg_bio_issue_init")
-Signed-off-by: Muchun Song <songmuchun@bytedance.com>
----
- block/blk-merge.c | 1 +
- 1 file changed, 1 insertion(+)
+All patches look good to me. Feel free to add:
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 5abf5aa5a5f0..a5bfe7f18f42 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -355,6 +355,7 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
- 		/* there isn't chance to merge the splitted bio */
- 		split->bi_opf |= REQ_NOMERGE;
- 
-+		blkcg_bio_issue_init(split);
- 		bio_chain(split, *bio);
- 		trace_block_split(split, (*bio)->bi_iter.bi_sector);
- 		submit_bio_noacct(*bio);
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> 
+> Diffstat:
+>  block/bdev.c                        |   10 ++---
+>  block/blk-lib.c                     |    6 +--
+>  block/genhd.c                       |   23 ------------
+>  drivers/block/drbd/drbd_req.c       |    6 +--
+>  drivers/block/pktcdvd.c             |   10 +----
+>  drivers/block/rnbd/rnbd-srv-dev.c   |    1 
+>  drivers/block/rnbd/rnbd-srv-dev.h   |    1 
+>  drivers/block/rnbd/rnbd-srv-sysfs.c |    5 +-
+>  drivers/block/rnbd/rnbd-srv.c       |    9 ++---
+>  drivers/block/rnbd/rnbd-srv.h       |    3 -
+>  drivers/md/md.c                     |    2 -
+>  drivers/md/raid1.c                  |    2 -
+>  drivers/md/raid10.c                 |    2 -
+>  fs/ext4/mmp.c                       |    9 ++---
+>  fs/jbd2/journal.c                   |    6 ++-
+>  fs/ocfs2/cluster/heartbeat.c        |   64 ++++++++++++++++--------------------
+>  include/linux/blkdev.h              |    1 
+>  kernel/trace/blktrace.c             |    4 +-
+>  18 files changed, 62 insertions(+), 102 deletions(-)
 -- 
-2.11.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
