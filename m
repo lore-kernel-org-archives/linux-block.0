@@ -2,137 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB77AC43334
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 11:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A2EC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 11:56:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235441AbiGMLuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 07:50:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42086 "EHLO
+        id S235991AbiGML4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 07:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231264AbiGMLuB (ORCPT
+        with ESMTP id S236127AbiGML4H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 07:50:01 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDEAE4778;
-        Wed, 13 Jul 2022 04:50:00 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 04A5220076;
-        Wed, 13 Jul 2022 11:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1657712999; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NfMyiG6I6kY9duJdum1vSBmQPs459FBBxkpB0eMmIG4=;
-        b=MBiFCVEpkGBkXylj/DRftkyXS3dQHP175Q8BVAy2q/IIyUM9glNzGIHwRU2mQZ96irpV2K
-        DlzRfYX433mqXk8g+jxRPb880qGKAPuOjxu+0D8ZioPWBSGrDlCy6UDCr4tSNU+qBfky2l
-        35Ut5Xx1KWYMRX9VevE+QLW5Fwtkbkk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1657712999;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NfMyiG6I6kY9duJdum1vSBmQPs459FBBxkpB0eMmIG4=;
-        b=pGNNYSoAwdU5qBAB/O0zEtiuqF8w8l5ur5tzVXP2y/lncNKQlKY6cQX3+vnO+oYLbajtP6
-        gRrtRfWmCLKbv/BQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A901B13AAD;
-        Wed, 13 Jul 2022 11:49:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4/GJKGaxzmKsFgAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 13 Jul 2022 11:49:58 +0000
-Message-ID: <96f47d9b-fbfc-80da-4c38-f46986f14a43@suse.de>
-Date:   Wed, 13 Jul 2022 13:49:58 +0200
+        Wed, 13 Jul 2022 07:56:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD3D1034ED;
+        Wed, 13 Jul 2022 04:56:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zQ/ZVt480ezifkPZehDb75C3ZE/sBmWOTZFlFXYsE1Q=; b=ehNWRgt/QUVkgcdcEueXaNh5X5
+        b0rF/ru4ecjZqewzB3D//ugVio7xMFxxD2ARzI+iylV7AZQ77/rSF0y2sR75VVXvJC8gU5pqiU6NU
+        RIJWAG3JqxKobfpeRmjG8WiRmFgTkDkqNZPRirB0LuXdgXKRx/4nB7hwgPRy9St6y1VNonDALgPen
+        sRxfFRnW1BanpKFXs7Z9Xl01+kdjtfkJbTkcEgGj8hpmrgPzIFQJuTBKreo+znzVjApfClqENNxEB
+        BMdt0/Glc8z+jRz3h84C581a15d1J+NynoFNldmk8REnOwkHEtL/GXwauvNnh1KQ8S/nEmONyskrI
+        1OJFxAgg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oBayK-003JZA-Ey; Wed, 13 Jul 2022 11:56:04 +0000
+Date:   Wed, 13 Jul 2022 04:56:04 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 01/20] block, blk_filter: enable block device filters
+Message-ID: <Ys6y1AYTl8r/i3UX@infradead.org>
+References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
+ <1655135593-1900-2-git-send-email-sergei.shtepa@veeam.com>
+ <YsWHHcCfSVFklh4M@infradead.org>
+ <ff78a1ee-8bc5-6e8e-040f-978cd07eacfe@veeam.com>
+ <YscXTGXumE5Ust15@infradead.org>
+ <aec88137-070e-7c1d-215f-86a1e6d4b10a@veeam.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, kbusch@kernel.org,
-        axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
-        gost.dev@samsung.com
-References: <20220711110155.649153-1-joshi.k@samsung.com>
- <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
- <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de>
- <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
- <20220713053633.GA13135@lst.de>
- <24f0a3e6-aa53-8c69-71b7-d66289a63eae@grimberg.me>
- <20220713101235.GA27815@lst.de>
- <772b461a-bc43-c229-906d-0e280091e17f@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
- uring-passthrough commands
-In-Reply-To: <772b461a-bc43-c229-906d-0e280091e17f@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aec88137-070e-7c1d-215f-86a1e6d4b10a@veeam.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/22 13:00, Sagi Grimberg wrote:
-> 
->>> Maybe the solution is to just not expose a /dev/ng for the mpath device
->>> node, but only for bottom namespaces. Then it would be completely
->>> equivalent to scsi-generic devices.
->>>
->>> It just creates an unexpected mix of semantics of best-effort
->>> multipathing with just path selection, but no requeue/failover...
->>
->> Which is exactly the same semanics as SG_IO on the dm-mpath nodes.
-> 
-> I view uring passthru somewhat as a different thing than sending SG_IO
-> ioctls to dm-mpath. But it can be argued otherwise.
-> 
-> BTW, the only consumer of it that I'm aware of commented that he
-> expects dm-mpath to retry SG_IO when dm-mpath retry for SG_IO submission
-> was attempted (https://www.spinics.net/lists/dm-devel/msg46924.html).
-> 
->  From Paolo:
-> "The problem is that userspace does not have a way to direct the command 
-> to a different path in the resubmission. It may not even have permission 
-> to issue DM_TABLE_STATUS, or to access the /dev nodes for the underlying 
-> paths, so without Martin's patches SG_IO on dm-mpath is basically 
-> unreliable by design."
-> 
-> I didn't manage to track down any followup after that email though...
-> 
-I did; 'twas me who was involved in the initial customer issue leading 
-up to that.
+On Fri, Jul 08, 2022 at 12:45:33PM +0200, Sergei Shtepa wrote:
+> 1. Work at the partition or disk level?
+> At the user level, programs operate with block devices.
+> In fact, the "disk" entity makes sense only for the kernel level. 
+> When the user chooses which block devices to backup and which not,
+> he operates with mounting points, which are converted into block
+> devices, partitions. Therefore, it is better to handle bio before
+> remapping to disk.
+> If the filtering is performed after remapping, then we will be
+> forced to apply a filter to the entire disk, or complicate the
+> filtering algorithm by calculating which range of sectors bio is
+> addressed to. And if bio is addressed to the partition boundary...
+> Filtering at the block device level seems to me a simpler solution.
+> But this is not the biggest problem.
 
-Amongst all the other issue we've found the prime problem with SG_IO is 
-that it needs to be directed to the 'active' path.
-For the device-mapper has a distinct callout (dm_prepare_ioctl), which 
-essentially returns the current active path device. And then the 
-device-mapper core issues the command on that active path.
+Note that bi_bdev stays for the partition things came from.  So we
+could still do filtering after blk_partition_remap has been called,
+the filter driver just needs to be careful on how to interpret the
+sector numbers.
 
-All nice and good, _unless_ that command triggers an error.
-Normally it'd be intercepted by the dm-multipath end_io handler, and 
-would set the path to offline.
-But as ioctls do not use the normal I/O path the end_io handler is never 
-called, and further SG_IO calls are happily routed down the failed path.
+> 2. Can the filter sleep or postpone bio processing to the worker thread?
 
-And the customer had to use SG_IO (or, in qemu-speak, LUN passthrough) 
-as his application/filesystem makes heavy use of persistent reservations.
+I think all of te above is fine, just for normal submit_bio based
+drivers.
 
-So yeah, nvme-multipathing should be okay here, as io_uring and normal 
-I/O are using the same code paths, hence the above scenario really won't 
-occur.
+> The problem is in the implementation of the COW algorithm.
+> If I send a bio to read a chunk (one bio), and then pass a write bio,
+> then with some probability I am reading partially overwritten data.
+> Writing overtakes reading. And flags REQ_SYNC and REQ_PREFLUSH don't help.
+> Maybe it's a disk driver issue, or a hypervisor, or a NAS, or a RAID,
+> or maybe normal behavior. I don't know. Although, maybe I'm not working
+> correctly with flags. I have seen the comments on patch 11/20, but I am
+> not sure that the fixes will solve this problem.
+> But because of this, I have to postpone the write until the read completes.
 
-Cheers,
+In the I/O stack there really isn't any ordering.  While a general
+reordering looks a bit odd to be, it absolutely it always possible.
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+> 2.1 The easiest way to solve the problem is to block the writer's thread
+> with a semaphore. And for bio with a flag REQ_NOWAIT, complete processing
+> with bio_wouldblock_error(). This is the solution currently being used.
+
+This sounds ok.  The other option would be to put the write on hold and
+only queue it up from the read completion (or rather a workqueue kicked
+off from the read completion).  But this is basically the same, just
+without blocking the I/O submitter, so we could do the semaphore first
+and optimize later as needed.
+
+> If I am blocked by the q->q_usage_counter counter, then I will not
+> be able to execute COW in the context of the current thread due to deadlocks.
+> I will have to use a scheme with an additional worker thread.
+> Bio filtering will become much more complicated.
+
+q_usage_counter itself doesn't really block you from doing anything.
+You can still sleep inside of it, and most driver do that.
