@@ -2,138 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F2CC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 13:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCB0CCA480
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 14:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236090AbiGMNra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 09:47:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48822 "EHLO
+        id S235692AbiGMOER (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 10:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231274AbiGMNr3 (ORCPT
+        with ESMTP id S236348AbiGMOEM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 09:47:29 -0400
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1B2105;
-        Wed, 13 Jul 2022 06:47:28 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
+        Wed, 13 Jul 2022 10:04:12 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7500330F62;
+        Wed, 13 Jul 2022 07:04:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 580C9CAFC5;
-        Wed, 13 Jul 2022 16:47:26 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1657720046;
-        bh=vOOalNQ9r9QRquMExxnzKYoMS7P4s1dLtt3mNir4PW4=;
-        h=Date:Subject:To:CC:References:From:In-Reply-To:From;
-        b=ANCTOIT4KS7uvUfMlXU2CGXcGYfNwh5Rx/e/jUQUBq5fd640Fwng2rLv5tgnGGYqH
-         K16LLp6tw21JrvQ5t+saL3Mn9b4j8NdM0lZjYTojFN6AEz36wfSovmzx3Wqq/Tdiz6
-         2e2RcjSc71OELSYb2iZlpqdPeaj+VuJd9I5IdvgWnac/Nw50qLVkUSXJy4JoDYkG5x
-         ZG/i2VgeGBkPfz1FMA05Eysy7i3QB7ZuZca4pZRCwHlVr0R35grSiQmw843ay2q+PZ
-         n6o0QKUoeBD4Hcl1IrtTK13bWV4GwomlXhwkvx7DolQzGcROK2NTviyyFKJIDkBDt4
-         Z3IHqVPGhR3bA==
-Received: from [172.24.11.83] (172.24.11.83) by prgmbx01.amust.local
- (172.24.128.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.9; Wed, 13 Jul
- 2022 15:47:23 +0200
-Message-ID: <51e3fc9e-5b46-ab23-bbf8-5d0ad9dada29@veeam.com>
-Date:   Wed, 13 Jul 2022 15:47:23 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 01/20] block, blk_filter: enable block device filters
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        by ams.source.kernel.org (Postfix) with ESMTPS id 329CAB81FC6;
+        Wed, 13 Jul 2022 14:04:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0153C34114;
+        Wed, 13 Jul 2022 14:04:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657721049;
+        bh=ZAU0L5kK4Sf9McbG926Hj/XUT0R01MpGmbcgsJYk0eo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JfznMmDaQH8d32YdV1e+uqSCeYmXGCrB04FZaz89S34KHt+hYUNSByGZqfuyt8WaJ
+         OXEs5vq9mIuJZVjZSfiO3VQGq17tu956YqCQYKrTviTMbGlc/FmaBatE1ij2Un8cJu
+         ma92AqTrKLaKbwKsTf3ddF93RILXggb102oGrWXD7NNZjvJ0hxyvCPlaUMGd3Ubtz/
+         P+fi5Q43yiUn4WjZ/LMf/PljTOCIuc0JYEQpQedQnEJpRE9jzeed85Y7qufijypS2/
+         Q46HfTgC5K/9xlwN6PWBZk/CAVeoGTHOEELqfB+2XjR98j1PjCER8gYkAAQGulFCBe
+         XpJ/yVKe1IYTA==
+Date:   Wed, 13 Jul 2022 08:04:03 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
- <1655135593-1900-2-git-send-email-sergei.shtepa@veeam.com>
- <YsWHHcCfSVFklh4M@infradead.org>
- <ff78a1ee-8bc5-6e8e-040f-978cd07eacfe@veeam.com>
- <YscXTGXumE5Ust15@infradead.org>
- <aec88137-070e-7c1d-215f-86a1e6d4b10a@veeam.com>
- <Ys6y1AYTl8r/i3UX@infradead.org>
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-In-Reply-To: <Ys6y1AYTl8r/i3UX@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.24.11.83]
-X-ClientProxiedBy: prgmbx01.amust.local (172.24.128.102) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29D2A50A54647160
-X-Veeam-MMEX: True
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "song@kernel.org" <song@kernel.org>,
+        "djwong@kernel.org" <djwong@kernel.org>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "jefflexu@linux.alibaba.com" <jefflexu@linux.alibaba.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
+        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "idryomov@gmail.com" <idryomov@gmail.com>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+Subject: Re: [PATCH 0/6] block: add support for REQ_OP_VERIFY
+Message-ID: <Ys7Q020ELE80OL+X@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220630091406.19624-1-kch@nvidia.com>
+ <YsXJdXnXsMtaC8DJ@casper.infradead.org>
+ <5ffe57d3-354c-eabe-ea38-9c4201c13970@nvidia.com>
+ <Ys639LsjBUGPNErd@casper.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ys639LsjBUGPNErd@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/22 13:56, Christoph Hellwig wrote:
-> 
-> On Fri, Jul 08, 2022 at 12:45:33PM +0200, Sergei Shtepa wrote:
->> 1. Work at the partition or disk level?
->> At the user level, programs operate with block devices.
->> In fact, the "disk" entity makes sense only for the kernel level. 
->> When the user chooses which block devices to backup and which not,
->> he operates with mounting points, which are converted into block
->> devices, partitions. Therefore, it is better to handle bio before
->> remapping to disk.
->> If the filtering is performed after remapping, then we will be
->> forced to apply a filter to the entire disk, or complicate the
->> filtering algorithm by calculating which range of sectors bio is
->> addressed to. And if bio is addressed to the partition boundary...
->> Filtering at the block device level seems to me a simpler solution.
->> But this is not the biggest problem.
-> Note that bi_bdev stays for the partition things came from.  So we
-> could still do filtering after blk_partition_remap has been called,
-> the filter driver just needs to be careful on how to interpret the
-> sector numbers.
+On Wed, Jul 13, 2022 at 01:17:56PM +0100, Matthew Wilcox wrote:
+> The firmware needs to prove to me that it *did something*.  That it
+> actually read those bytes that it claims to have verified.  The simplest
+> way to do so is to calculate a hash over the blocks which were read
+> (maybe the host needs to provide a nonce as part of the VERIFY command
+> so the drive can't "remember" the checksum).
 
-Thanks. I'll check it out.
+From a protocol perspective, NVMe's verify command currently leaves 8-bytes in
+the response unused, so this could be a reasonable way to return something like
+a crc64 of the verified blocks. The verify command starts at an arbitrary block
+and spans an arbitrary number of them, so I think a device "remembering" all
+possible combinations as a way to cheat may be harder than just doing the work
+:).
 
-> 
->> 2. Can the filter sleep or postpone bio processing to the worker thread?
-> I think all of te above is fine, just for normal submit_bio based
-> drivers.
- 
-Good. But I'm starting to think that for request-based block devices,
-filtering should be different. I need to check it out.
-
->> The problem is in the implementation of the COW algorithm.
->> If I send a bio to read a chunk (one bio), and then pass a write bio,
->> then with some probability I am reading partially overwritten data.
->> Writing overtakes reading. And flags REQ_SYNC and REQ_PREFLUSH don't help.
->> Maybe it's a disk driver issue, or a hypervisor, or a NAS, or a RAID,
->> or maybe normal behavior. I don't know. Although, maybe I'm not working
->> correctly with flags. I have seen the comments on patch 11/20, but I am
->> not sure that the fixes will solve this problem.
->> But because of this, I have to postpone the write until the read completes.
-> In the I/O stack there really isn't any ordering.  While a general
-> reordering looks a bit odd to be, it absolutely it always possible.
-> 
-
-Thank you!
-So this is normal behavior and locking the writing is necessary.
-When designing the module, I mistakenly thought that it would be enough
-to set the correct order of sending bios.
-
->> 2.1 The easiest way to solve the problem is to block the writer's thread
->> with a semaphore. And for bio with a flag REQ_NOWAIT, complete processing
->> with bio_wouldblock_error(). This is the solution currently being used.
-> This sounds ok.  The other option would be to put the write on hold and
-> only queue it up from the read completion (or rather a workqueue kicked
-> off from the read completion).  But this is basically the same, just
-> without blocking the I/O submitter, so we could do the semaphore first
-> and optimize later as needed.
-> 
->> If I am blocked by the q->q_usage_counter counter, then I will not
->> be able to execute COW in the context of the current thread due to deadlocks.
->> I will have to use a scheme with an additional worker thread.
->> Bio filtering will become much more complicated.
-> q_usage_counter itself doesn't really block you from doing anything.
-> You can still sleep inside of it, and most driver do that.
-> 
-Ok. I will try to lower the handle point under the protection of the
-q_usage_counter. Maybe I'm mistaken about deadlocks.
-
-Thank you so much for the review and for the explanatory answers!
-I got a lot of useful recommendations.
-I have a lot of work to do to improve the patch.
+But this is just theoretical; it'd be some time before we'd see devices
+supporting such a scheme, assuming there's support from the standards
+committees.
