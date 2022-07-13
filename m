@@ -2,292 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F2EC43334
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 22:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF3CC43334
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 23:46:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbiGMWp7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 18:45:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44490 "EHLO
+        id S231510AbiGMXqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 19:46:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236862AbiGMWp5 (ORCPT
+        with ESMTP id S229598AbiGMXqg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 18:45:57 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8E9E4E87B;
-        Wed, 13 Jul 2022 15:45:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=TSLgmWrfFLwcBqeTu36t0kIJWYWj1dR3dordDhUt/Tg=; b=plL4GLU9vQUDNZ3OqgWYNpR0JC
-        q0iOcsLcXvWoMrqXz1T8gkGsu5ATS9JFKr2Ln0KpNsQWdIxqb0hrPh1HRxIaDRJwCZT0WXbi4v8rR
-        4+qo8RhF/cXuQ6VLnb7kBvBzd3YfVMyCtqndWi9qZo+jXdUEj5Qo5iY3B5Imeq2h/zmJOK/Z+uaOd
-        XzsMdWeESZtwyw7UfX9ZIdHHfunNhhhbMUHMJ1ISzYA9n9HsiLypq26P/hSg78bvU2ujrGUAMZhQk
-        O4hoWsyF35TKHfBTwWsH5pNAJFgz9V0WSDg9V4qNrkVapaboL1KNZZL5nfdLU//LJD5Efn/8Dn00k
-        JAhJ7/1A==;
-Received: from jlbec by zeniv.linux.org.uk with local (Exim 4.95 #2 (Red Hat Linux))
-        id 1oBl6s-00Bbjs-1i;
-        Wed, 13 Jul 2022 22:45:34 +0000
-Date:   Wed, 13 Jul 2022 15:45:06 -0700
-From:   Joel Becker <jlbec@evilplan.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>, Song Liu <song@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>, Mark Fasheh <mark@fasheh.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com
-Subject: Re: [PATCH 7/9] ocfs2/cluster: remove the hr_dev_name field from
- struct o2hb_region
-Message-ID: <Ys9K8j4SzXkY/x+b@google.com>
-Mail-Followup-To: Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= <christoph.boehmwalder@linbit.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>, Song Liu <song@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>, Jan Kara <jack@suse.com>,
-        Mark Fasheh <mark@fasheh.com>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com
-References: <20220713055317.1888500-1-hch@lst.de>
- <20220713055317.1888500-8-hch@lst.de>
+        Wed, 13 Jul 2022 19:46:36 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD6D6419BF
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 16:46:35 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id q5-20020a17090a304500b001efcc885cc4so607195pjl.4
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 16:46:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=goY5s09yDjamY/zMU5kBbCD+EHX29aLygMcuT7F3v0c=;
+        b=C2qLSZl8ptTZ42zHdHCxk2BOy9WdHv80VIgEhOva6Wl6xohe3GYNyjEp0ABlzOqOPb
+         2n0TI1esjW0E/mjTX1bXdvHPK1FMPyToxYwblhrJ4UG87MUSH/MgQhx9RDfZmor1WRlK
+         BpvLYoj44+0u53zAeccpa4OYasWpehzTRdFJyaxomBJ9QNUkVnQURO1WCkB8QIoLkpAo
+         7g6oQNxWhEQ45rQonxsKPOBZQh5SAJEToJfTMaOF0HJwowUMPzb6lYWDr+gqF5sNzhYJ
+         wh0ccoZEn2uKAcF+nfwbs1Orl2chaMZEAMJJHEgxR8hxc4Rc5lo8fPxCuRcd023ervJv
+         7TDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=goY5s09yDjamY/zMU5kBbCD+EHX29aLygMcuT7F3v0c=;
+        b=AQmoge6z0A3zeYf5PrK7sdv8eivxTjz/6A26ibxtYAJd7QljZH69A8GNrzBp1Xjbeh
+         t9WvOcSXk2erFjv77igJc1ByRK6ZzjABZvaw/avqZEjJpNNUddVcZNfsUrztRTkQ6qzR
+         YBf5D9VtpUoqw/9bWI2B4FLPgfLDSYNZgqjXFiIxL5rbNeDKFh+v5BeAYnnpLR97Qo+n
+         o4qUNcAACpi3LMD7lM5A1E0EEZXbuoVMB7R3Xxzwpd83+7N4dHjJ/lh2NTL5yFDPCyWR
+         ACLXmn0zaQf173lV/hjNZyaUggD8m1nCxxEt9kVtVQKcWluImM6lAyqUnKda6Wxhe0xe
+         q67g==
+X-Gm-Message-State: AJIora9wqgL5aCDsOd0k8toAgMhSPjyYdEiE7uYGw3JG18vJfgxs8ql7
+        yE77uLyDkbA45jFvl4Hv8CA5YA==
+X-Google-Smtp-Source: AGRyM1s+e0Sys0LuGyWP0xkZpSFlrftoz+VqgKP2/XtxSADN2j6AUd5sbSqWzTIneLlO/yMEXjYSJg==
+X-Received: by 2002:a17:902:c992:b0:16b:d8b9:1c5f with SMTP id g18-20020a170902c99200b0016bd8b91c5fmr5364819plc.93.1657755995336;
+        Wed, 13 Jul 2022 16:46:35 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id y9-20020aa79ae9000000b0052ab8525893sm106545pfp.142.2022.07.13.16.46.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Jul 2022 16:46:34 -0700 (PDT)
+Message-ID: <ee65aa8a-2e74-9a7a-f8e6-11266744a326@kernel.dk>
+Date:   Wed, 13 Jul 2022 17:46:33 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220713055317.1888500-8-hch@lst.de>
-X-Burt-Line: Trees are cool.
-X-Red-Smith: Ninety feet between bases is perhaps as close as man has ever
- come to perfection.
-Sender: Joel Becker <jlbec@ftp.linux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2 00/63] Improve static type checking for request flags
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20220629233145.2779494-1-bvanassche@acm.org>
+ <d1a88d4f-9f03-a1d6-cf4a-fcdb8070399c@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <d1a88d4f-9f03-a1d6-cf4a-fcdb8070399c@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-LGTM
+On 7/13/22 3:48 PM, Bart Van Assche wrote:
+> On 6/29/22 16:30, Bart Van Assche wrote:
+>> A source of confusion in the block layer is that can be nontrivial to determine
+>> which type of flags a u32 function argument accepts. This patch series clears
+>> up that confusion for request flags by introducing a new __bitwise type, namely
+>> blk_opf_t. Additionally, the type 'int' is change into 'enum req_op' where used
+>> to hold a request operation.
+>>
+>> Analysis of the sparse warnings introduced by this conversion resulted in one
+>> bug fix ("blktrace: Trace remap operations correctly").
+>>
+>> Although the number of patches in this series is significant, the risk of this
+>> patch series is low since most patches involve changing one integer type (int
+>> or u32) into another integer type of the same size (enum req_op or blk_opf_t).
+>>
+>> Please consider this patch series for kernel v5.20.
+> 
+> (replying to my own email)
+> 
+> Hi Jens,
+> 
+> I think that everyone who is interested in reviewing this patch series
+> has had sufficient time to review the patches in this patch series. Do
+> you prefer to queue this patch series for kernel v5.20 or kernel
+> v5.21?
 
-Reviewed-by: Joel Becker <jlbec@evilplan.org>
-
-On Wed, Jul 13, 2022 at 07:53:15AM +0200, Christoph Hellwig wrote:
-> Just print the block device name directly using the %pg format specifier.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/ocfs2/cluster/heartbeat.c | 64 +++++++++++++++++-------------------
->  1 file changed, 30 insertions(+), 34 deletions(-)
-> 
-> diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
-> index ea0e70c0fce09..5f83c0c0918c0 100644
-> --- a/fs/ocfs2/cluster/heartbeat.c
-> +++ b/fs/ocfs2/cluster/heartbeat.c
-> @@ -235,8 +235,6 @@ struct o2hb_region {
->  	 * (hr_steady_iterations == 0) within hr_unsteady_iterations */
->  	atomic_t		hr_unsteady_iterations;
->  
-> -	char			hr_dev_name[BDEVNAME_SIZE];
-> -
->  	unsigned int		hr_timeout_ms;
->  
->  	/* randomized as the region goes up and down so that a node
-> @@ -287,8 +285,8 @@ static void o2hb_write_timeout(struct work_struct *work)
->  		container_of(work, struct o2hb_region,
->  			     hr_write_timeout_work.work);
->  
-> -	mlog(ML_ERROR, "Heartbeat write timeout to device %s after %u "
-> -	     "milliseconds\n", reg->hr_dev_name,
-> +	mlog(ML_ERROR, "Heartbeat write timeout to device %pg after %u "
-> +	     "milliseconds\n", reg->hr_bdev,
->  	     jiffies_to_msecs(jiffies - reg->hr_last_timeout_start));
->  
->  	if (o2hb_global_heartbeat_active()) {
-> @@ -383,9 +381,9 @@ static void o2hb_nego_timeout(struct work_struct *work)
->  
->  	if (master_node == o2nm_this_node()) {
->  		if (!test_bit(master_node, reg->hr_nego_node_bitmap)) {
-> -			printk(KERN_NOTICE "o2hb: node %d hb write hung for %ds on region %s (%s).\n",
-> +			printk(KERN_NOTICE "o2hb: node %d hb write hung for %ds on region %s (%pg).\n",
->  				o2nm_this_node(), O2HB_NEGO_TIMEOUT_MS/1000,
-> -				config_item_name(&reg->hr_item), reg->hr_dev_name);
-> +				config_item_name(&reg->hr_item), reg->hr_bdev);
->  			set_bit(master_node, reg->hr_nego_node_bitmap);
->  		}
->  		if (memcmp(reg->hr_nego_node_bitmap, live_node_bitmap,
-> @@ -399,8 +397,8 @@ static void o2hb_nego_timeout(struct work_struct *work)
->  			return;
->  		}
->  
-> -		printk(KERN_NOTICE "o2hb: all nodes hb write hung, maybe region %s (%s) is down.\n",
-> -			config_item_name(&reg->hr_item), reg->hr_dev_name);
-> +		printk(KERN_NOTICE "o2hb: all nodes hb write hung, maybe region %s (%pg) is down.\n",
-> +			config_item_name(&reg->hr_item), reg->hr_bdev);
->  		/* approve negotiate timeout request. */
->  		o2hb_arm_timeout(reg);
->  
-> @@ -419,9 +417,9 @@ static void o2hb_nego_timeout(struct work_struct *work)
->  		}
->  	} else {
->  		/* negotiate timeout with master node. */
-> -		printk(KERN_NOTICE "o2hb: node %d hb write hung for %ds on region %s (%s), negotiate timeout with node %d.\n",
-> +		printk(KERN_NOTICE "o2hb: node %d hb write hung for %ds on region %s (%pg), negotiate timeout with node %d.\n",
->  			o2nm_this_node(), O2HB_NEGO_TIMEOUT_MS/1000, config_item_name(&reg->hr_item),
-> -			reg->hr_dev_name, master_node);
-> +			reg->hr_bdev, master_node);
->  		ret = o2hb_send_nego_msg(reg->hr_key, O2HB_NEGO_TIMEOUT_MSG,
->  				master_node);
->  		if (ret)
-> @@ -437,8 +435,8 @@ static int o2hb_nego_timeout_handler(struct o2net_msg *msg, u32 len, void *data,
->  	struct o2hb_nego_msg *nego_msg;
->  
->  	nego_msg = (struct o2hb_nego_msg *)msg->buf;
-> -	printk(KERN_NOTICE "o2hb: receive negotiate timeout message from node %d on region %s (%s).\n",
-> -		nego_msg->node_num, config_item_name(&reg->hr_item), reg->hr_dev_name);
-> +	printk(KERN_NOTICE "o2hb: receive negotiate timeout message from node %d on region %s (%pg).\n",
-> +		nego_msg->node_num, config_item_name(&reg->hr_item), reg->hr_bdev);
->  	if (nego_msg->node_num < O2NM_MAX_NODES)
->  		set_bit(nego_msg->node_num, reg->hr_nego_node_bitmap);
->  	else
-> @@ -452,8 +450,8 @@ static int o2hb_nego_approve_handler(struct o2net_msg *msg, u32 len, void *data,
->  {
->  	struct o2hb_region *reg = data;
->  
-> -	printk(KERN_NOTICE "o2hb: negotiate timeout approved by master node on region %s (%s).\n",
-> -		config_item_name(&reg->hr_item), reg->hr_dev_name);
-> +	printk(KERN_NOTICE "o2hb: negotiate timeout approved by master node on region %s (%pg).\n",
-> +		config_item_name(&reg->hr_item), reg->hr_bdev);
->  	o2hb_arm_timeout(reg);
->  	return 0;
->  }
-> @@ -689,8 +687,8 @@ static int o2hb_check_own_slot(struct o2hb_region *reg)
->  	else
->  		errstr = ERRSTR3;
->  
-> -	mlog(ML_ERROR, "%s (%s): expected(%u:0x%llx, 0x%llx), "
-> -	     "ondisk(%u:0x%llx, 0x%llx)\n", errstr, reg->hr_dev_name,
-> +	mlog(ML_ERROR, "%s (%pg): expected(%u:0x%llx, 0x%llx), "
-> +	     "ondisk(%u:0x%llx, 0x%llx)\n", errstr, reg->hr_bdev,
->  	     slot->ds_node_num, (unsigned long long)slot->ds_last_generation,
->  	     (unsigned long long)slot->ds_last_time, hb_block->hb_node,
->  	     (unsigned long long)le64_to_cpu(hb_block->hb_generation),
-> @@ -863,8 +861,8 @@ static void o2hb_set_quorum_device(struct o2hb_region *reg)
->  		   sizeof(o2hb_live_node_bitmap)))
->  		goto unlock;
->  
-> -	printk(KERN_NOTICE "o2hb: Region %s (%s) is now a quorum device\n",
-> -	       config_item_name(&reg->hr_item), reg->hr_dev_name);
-> +	printk(KERN_NOTICE "o2hb: Region %s (%pg) is now a quorum device\n",
-> +	       config_item_name(&reg->hr_item), reg->hr_bdev);
->  
->  	set_bit(reg->hr_region_num, o2hb_quorum_region_bitmap);
->  
-> @@ -922,8 +920,8 @@ static int o2hb_check_slot(struct o2hb_region *reg,
->  		/* The node is live but pushed out a bad crc. We
->  		 * consider it a transient miss but don't populate any
->  		 * other values as they may be junk. */
-> -		mlog(ML_ERROR, "Node %d has written a bad crc to %s\n",
-> -		     slot->ds_node_num, reg->hr_dev_name);
-> +		mlog(ML_ERROR, "Node %d has written a bad crc to %pg\n",
-> +		     slot->ds_node_num, reg->hr_bdev);
->  		o2hb_dump_slot(hb_block);
->  
->  		slot->ds_equal_samples++;
-> @@ -1002,11 +1000,11 @@ static int o2hb_check_slot(struct o2hb_region *reg,
->  		slot_dead_ms = le32_to_cpu(hb_block->hb_dead_ms);
->  		if (slot_dead_ms && slot_dead_ms != dead_ms) {
->  			/* TODO: Perhaps we can fail the region here. */
-> -			mlog(ML_ERROR, "Node %d on device %s has a dead count "
-> +			mlog(ML_ERROR, "Node %d on device %pg has a dead count "
->  			     "of %u ms, but our count is %u ms.\n"
->  			     "Please double check your configuration values "
->  			     "for 'O2CB_HEARTBEAT_THRESHOLD'\n",
-> -			     slot->ds_node_num, reg->hr_dev_name, slot_dead_ms,
-> +			     slot->ds_node_num, reg->hr_bdev, slot_dead_ms,
->  			     dead_ms);
->  		}
->  		goto out;
-> @@ -1145,8 +1143,8 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
->  		/* Do not re-arm the write timeout on I/O error - we
->  		 * can't be sure that the new block ever made it to
->  		 * disk */
-> -		mlog(ML_ERROR, "Write error %d on device \"%s\"\n",
-> -		     write_wc.wc_error, reg->hr_dev_name);
-> +		mlog(ML_ERROR, "Write error %d on device \"%pg\"\n",
-> +		     write_wc.wc_error, reg->hr_bdev);
->  		ret = write_wc.wc_error;
->  		goto bail;
->  	}
-> @@ -1170,9 +1168,9 @@ static int o2hb_do_disk_heartbeat(struct o2hb_region *reg)
->  	if (atomic_read(&reg->hr_steady_iterations) != 0) {
->  		if (atomic_dec_and_test(&reg->hr_unsteady_iterations)) {
->  			printk(KERN_NOTICE "o2hb: Unable to stabilize "
-> -			       "heartbeat on region %s (%s)\n",
-> +			       "heartbeat on region %s (%pg)\n",
->  			       config_item_name(&reg->hr_item),
-> -			       reg->hr_dev_name);
-> +			       reg->hr_bdev);
->  			atomic_set(&reg->hr_steady_iterations, 0);
->  			reg->hr_aborted_start = 1;
->  			wake_up(&o2hb_steady_queue);
-> @@ -1494,7 +1492,7 @@ static void o2hb_region_release(struct config_item *item)
->  	struct page *page;
->  	struct o2hb_region *reg = to_o2hb_region(item);
->  
-> -	mlog(ML_HEARTBEAT, "hb region release (%s)\n", reg->hr_dev_name);
-> +	mlog(ML_HEARTBEAT, "hb region release (%pg)\n", reg->hr_bdev);
->  
->  	kfree(reg->hr_tmp_block);
->  
-> @@ -1641,7 +1639,7 @@ static ssize_t o2hb_region_dev_show(struct config_item *item, char *page)
->  	unsigned int ret = 0;
->  
->  	if (to_o2hb_region(item)->hr_bdev)
-> -		ret = sprintf(page, "%s\n", to_o2hb_region(item)->hr_dev_name);
-> +		ret = sprintf(page, "%pg\n", to_o2hb_region(item)->hr_bdev);
->  
->  	return ret;
->  }
-> @@ -1798,8 +1796,6 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
->  		goto out2;
->  	}
->  
-> -	bdevname(reg->hr_bdev, reg->hr_dev_name);
-> -
->  	sectsize = bdev_logical_block_size(reg->hr_bdev);
->  	if (sectsize != reg->hr_block_bytes) {
->  		mlog(ML_ERROR,
-> @@ -1895,8 +1891,8 @@ static ssize_t o2hb_region_dev_store(struct config_item *item,
->  		ret = -EIO;
->  
->  	if (hb_task && o2hb_global_heartbeat_active())
-> -		printk(KERN_NOTICE "o2hb: Heartbeat started on region %s (%s)\n",
-> -		       config_item_name(&reg->hr_item), reg->hr_dev_name);
-> +		printk(KERN_NOTICE "o2hb: Heartbeat started on region %s (%pg)\n",
-> +		       config_item_name(&reg->hr_item), reg->hr_bdev);
->  
->  out3:
->  	if (ret < 0) {
-> @@ -2088,10 +2084,10 @@ static void o2hb_heartbeat_group_drop_item(struct config_group *group,
->  			quorum_region = 1;
->  		clear_bit(reg->hr_region_num, o2hb_quorum_region_bitmap);
->  		spin_unlock(&o2hb_live_lock);
-> -		printk(KERN_NOTICE "o2hb: Heartbeat %s on region %s (%s)\n",
-> +		printk(KERN_NOTICE "o2hb: Heartbeat %s on region %s (%pg)\n",
->  		       ((atomic_read(&reg->hr_steady_iterations) == 0) ?
->  			"stopped" : "start aborted"), config_item_name(item),
-> -		       reg->hr_dev_name);
-> +		       reg->hr_bdev);
->  	}
->  
->  	/*
-> -- 
-> 2.30.2
-> 
+I've been pondering the same. I'm fine with going for 5.20 as this will
+be a pain to maintain, but the first patch doesn't even apply to my
+for-5.20/block branch...
 
 -- 
+Jens Axboe
+
