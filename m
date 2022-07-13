@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15243C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 05:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A66A5CCA479
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 05:53:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229599AbiGMFxk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 01:53:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
+        id S234250AbiGMFxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 01:53:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbiGMFxi (ORCPT
+        with ESMTP id S232287AbiGMFxj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 01:53:38 -0400
+        Wed, 13 Jul 2022 01:53:39 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619761EE;
-        Tue, 12 Jul 2022 22:53:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A15EDD5;
+        Tue, 12 Jul 2022 22:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Y2m5n2ywVdorzEoaFVlEdw3M6b4Binlg2HpluXfaIZg=; b=aY8PUpMOr3XL4OGdcJC3oZLePj
-        U2Fpy5CT1WtNvKl+Uh2jm9+2lBXEu/Jso/1cholqbux8jzHP3uQ/4/wImvAQ3GuR2SrEuZ/gSB7He
-        57CgDQLolbdY00Dzuwwr2vNEIgrxp2tIoBknZFSKaduvhaGj1E1fBPc/THzPcVj1eroIl7hMQUprV
-        /QynO1qrDenogR8CfOhS4ukxm0TgzTd0/AGa4IQnrUaIWlT77XHIsNONx0aYZP5hsMoueapQNk0Nw
-        RtbEUPKVuSWup65o3wgXLZUx7fXmOIh7e5sk0ewAprdrhvV1K3tdjHdt7+zkT4HxaLTkBXvHvlDwz
-        OM73TuRg==;
+        bh=20fYCpa6V6Ap10mEOQh3cL90/z7nSmsIewaP84vytaE=; b=qh0sF5wn2Ta7HQYLFlY/P/Q9Wi
+        DS2ijefXpSBdkMRpGE9Xk4pb6JYtV2a3YEQtifKPjKehtbR6ZvnECB9ae8ReP2XIadd8BoIMUsgwv
+        8yjoGchrDeEgcwI9LNlYEKD1U6bj16k1Ha8HxlK5UrRBqbSo7xJEYeen35qZ9zzFDFe/jv2yZwMtS
+        hI1ykmF+ndaa1FvAd0SZcSbb7CcwoVicWCK915yEKaJFEgPS7XM+KzrdcPqjCz9HPCJi3u8Hj+RAr
+        M5AVOo+lJIjwhmLkaBi87rz7EH6i8wgeIjc+GTplUECFn0Diq3CizjrqPhTdnsXn1/eCIGeNWVM4u
+        iXwU2e5Q==;
 Received: from ip4d15c27d.dynamic.kabel-deutschland.de ([77.21.194.125] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oBVJK-000NNd-M0; Wed, 13 Jul 2022 05:53:23 +0000
+        id 1oBVJQ-000NR5-KG; Wed, 13 Jul 2022 05:53:29 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
@@ -42,9 +42,9 @@ Cc:     =?UTF-8?q?Christoph=20B=C3=B6hmwalder?=
         linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
         linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
         ocfs2-devel@oss.oracle.com
-Subject: [PATCH 1/9] block: stop using bdevname in bdev_write_inode
-Date:   Wed, 13 Jul 2022 07:53:09 +0200
-Message-Id: <20220713055317.1888500-2-hch@lst.de>
+Subject: [PATCH 3/9] drbd: stop using bdevname in drbd_report_io_error
+Date:   Wed, 13 Jul 2022 07:53:11 +0200
+Message-Id: <20220713055317.1888500-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220713055317.1888500-1-hch@lst.de>
 References: <20220713055317.1888500-1-hch@lst.de>
@@ -55,35 +55,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just use the %pg format specifier instead.  Also reformat the
-printk statement to be more readable.
+Just use the %pg format specifier instead.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bdev.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/block/drbd/drbd_req.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/block/bdev.c b/block/bdev.c
-index 5fe06c1f2def4..ce05175e71cea 100644
---- a/block/bdev.c
-+++ b/block/bdev.c
-@@ -54,12 +54,10 @@ static void bdev_write_inode(struct block_device *bdev)
- 	while (inode->i_state & I_DIRTY) {
- 		spin_unlock(&inode->i_lock);
- 		ret = write_inode_now(inode, true);
--		if (ret) {
--			char name[BDEVNAME_SIZE];
--			pr_warn_ratelimited("VFS: Dirty inode writeback failed "
--					    "for block device %s (err=%d).\n",
--					    bdevname(bdev, name), ret);
--		}
-+		if (ret)
-+			pr_warn_ratelimited(
-+	"VFS: Dirty inode writeback failed for block device %pg (err=%d).\n",
-+				bdev, ret);
- 		spin_lock(&inode->i_lock);
- 	}
- 	spin_unlock(&inode->i_lock);
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index e64bcfba30ef3..6d8dd14458c69 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -523,16 +523,14 @@ static void mod_rq_state(struct drbd_request *req, struct bio_and_error *m,
+ 
+ static void drbd_report_io_error(struct drbd_device *device, struct drbd_request *req)
+ {
+-        char b[BDEVNAME_SIZE];
+-
+ 	if (!__ratelimit(&drbd_ratelimit_state))
+ 		return;
+ 
+-	drbd_warn(device, "local %s IO error sector %llu+%u on %s\n",
++	drbd_warn(device, "local %s IO error sector %llu+%u on %pg\n",
+ 			(req->rq_state & RQ_WRITE) ? "WRITE" : "READ",
+ 			(unsigned long long)req->i.sector,
+ 			req->i.size >> 9,
+-			bdevname(device->ldev->backing_bdev, b));
++			device->ldev->backing_bdev);
+ }
+ 
+ /* Helper for HANDED_OVER_TO_NETWORK.
 -- 
 2.30.2
 
