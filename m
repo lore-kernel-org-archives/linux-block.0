@@ -2,162 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08DE2CCA479
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 16:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57677C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 20:21:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237155AbiGMQbo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 12:31:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39006 "EHLO
+        id S230479AbiGMUVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 16:21:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230114AbiGMQbn (ORCPT
+        with ESMTP id S236883AbiGMUVa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 12:31:43 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77AC22BCE;
-        Wed, 13 Jul 2022 09:31:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:References:Cc:To:From:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=C7deXBJkld9dKOb+9dmge4oavMjDnk9mwBlB++tFQbg=; b=pgom7nhehqOdPFtPzEiqxAEERB
-        oC3Esu9pkpiUpv9Ix6nW2vJDp1iKJeOZ5LMt9WlV6MnlvLZNW64RDueqgWaCgUeAu0916Rlqwwc+I
-        GXOX8rvFfv7y1I4tTB6ELUScQmU7r6wiZ9d2Rj6tSpYf6Jw7tF3BgutBEFc6YbF74ubashazYgXfu
-        fYfG8L8kjB77zxJcDyS+ll2ToV/X5cL+M8gZ/eLIbkYxYLRHWbDFJ4uRAvLZZinEmZIqUrn54MyXV
-        zn279DqOaSk+C75j0cnB780O9PdU7Or7fQcp6zqH0768Zr0AAs1TICiDJc5ZcvsfD3y54svvQeqZf
-        CAI4S4MQ==;
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oBfH0-00E9Ob-S6; Wed, 13 Jul 2022 10:31:39 -0600
-Message-ID: <663a32ea-fb8c-2a5e-253e-29582ba99f3d@deltatee.com>
-Date:   Wed, 13 Jul 2022 10:31:38 -0600
+        Wed, 13 Jul 2022 16:21:30 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273EF2DA91
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:21:29 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id f11so10567135pgj.7
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 13:21:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=JcYpGy4wzAqqtoFWvjiTbUFlKhGd0IaTVFe++/A2tj8=;
+        b=j3/yPTm93If9fOoylNboDvrKY3qdKwD+2gPm56U744CITZPKzrmWQSjHCfhH1XDpj8
+         1cg3oDoehjlRPSBHyP8ld4ZTcOZak844Ie0+2k+5lJcfIfQZSoIGqHARuNSFIjGwjnGL
+         u6uZgq//x3qX/jONleOFz8cx+pRBR7fXRzYNMIZIgglFxnUIpqrZFJnTyphVoH97Z1N/
+         iO1m1byzqdETeZiNlLI75M09vhqyTk8V7+7eVYsstdXAWCpSZC8OrNIDIWvD4V/UWNzh
+         fdS3KD6wg0P37ss2wfWteZ1vRhx4LiwAjoWv9IR3h2NwYKzV3o+PsggSFyJiiJw+ip/W
+         aSxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=JcYpGy4wzAqqtoFWvjiTbUFlKhGd0IaTVFe++/A2tj8=;
+        b=wSVbnVWtN45CUVTA6TBKJyFxvmUHuP4XkEUUhj2qEFLUlVcPjQV8aV0xuyCQnpX8sh
+         eQr15N5bNcXkliug7+Rj6dYZgudoOsJBm1xF5cIdNDZ3Acj2i8TgV8hV9wcj1sKvo/7n
+         Nb1pMfWISCygGZF6wgqMEOLojM0i8+SBr9mlrA9FD0oZX8A680eS1SB3yCnW0YrFAJSa
+         /EmR2ca5AQZgom7ZU4PGrA6Z1MwDySQdIcWc4Iw7FMRRWblrUC/adK7fYs6a3Fiihv+2
+         6CaTF/YJSjrR9qMPsew1JZ+FZanh5EC2OP3kh7K+l33E9g9n/UvXo0mBvEWKIcavQHTS
+         mVhw==
+X-Gm-Message-State: AJIora8PwWUj9EYbItXDutj1NVkKE/1u800b9kt6t5MNchr248q5tQ5B
+        JMmPNsmUmmf3P0FsgzayUa6zJBiFkwPO/w==
+X-Google-Smtp-Source: AGRyM1sRtpOzM8so8J17lC2HC0Gp5PVrftTwsJh5/KvwUQD6vq4e+sEjRVff8ts6usamWE4TAZfvFw==
+X-Received: by 2002:a63:4042:0:b0:411:bbfe:e736 with SMTP id n63-20020a634042000000b00411bbfee736mr4375329pga.1.1657743688555;
+        Wed, 13 Jul 2022 13:21:28 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id f14-20020a170902ce8e00b00168b113f222sm9357024plg.173.2022.07.13.13.21.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jul 2022 13:21:28 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        kbusch@fb.com
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, kbusch@kernel.org
+In-Reply-To: <20220712153256.2202024-1-kbusch@fb.com>
+References: <20220712153256.2202024-1-kbusch@fb.com>
+Subject: Re: [PATCHv2 1/3] block: ensure iov_iter advances for added pages
+Message-Id: <165774368761.35656.10611792606953434095.b4-ty@kernel.dk>
+Date:   Wed, 13 Jul 2022 14:21:27 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-From:   Logan Gunthorpe <logang@deltatee.com>
-To:     Christoph Hellwig <hch@lst.de>, Song Liu <song@kernel.org>
-Cc:     linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220713113125.2232975-1-hch@lst.de>
- <20220713113125.2232975-2-hch@lst.de>
- <1f9beba5-3fa0-a0e6-c810-a82cec8e3496@deltatee.com>
-In-Reply-To: <1f9beba5-3fa0-a0e6-c810-a82cec8e3496@deltatee.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: hch@lst.de, song@kernel.org, linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH 1/9] md: fix error handling in md_alloc
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022-07-13 09:26, Logan Gunthorpe wrote:
+On Tue, 12 Jul 2022 08:32:54 -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
+> There are cases where a bio may not accept additional pages, and the iov
+> needs to advance to the last data length that was accepted. The zone
+> append used to handle this correctly, but was inadvertently broken when
+> the setup was made common with the normal r/w case.
 > 
-> 
-> On 2022-07-13 05:31, Christoph Hellwig wrote:
->> Error handling in md_alloc is a mess.  Untangle it to just free the mddev
->> directly before add_disk is called and thus the gendisk is globally
->> visible.  After that clear the hold flag and let the mddev_put take care
->> of cleaning up the mddev through the usual mechanisms.
->>
->> Fixes: 5e55e2f5fc95 ("[PATCH] md: convert compile time warnings into runtime warnings")
->> Fixes: 9be68dd7ac0e ("md: add error handling support for add_disk()")
->> Fixes: 7ad1069166c0 ("md: properly unwind when failing to add the kobject in md_alloc")
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> ---
->>
->> Note: the put_disk here is not fully correct on md-next, but will
->> do the right thing once merged with the block tree.
->>
->>  drivers/md/md.c | 45 ++++++++++++++++++++++++++++++++-------------
->>  1 file changed, 32 insertions(+), 13 deletions(-)
->>
->> diff --git a/drivers/md/md.c b/drivers/md/md.c
->> index b64de313838f2..7affddade8b6b 100644
->> --- a/drivers/md/md.c
->> +++ b/drivers/md/md.c
->> @@ -791,6 +791,15 @@ static struct mddev *mddev_alloc(dev_t unit)
->>  	return ERR_PTR(error);
->>  }
->>  
->> +static void mddev_free(struct mddev *mddev)
->> +{
->> +	spin_lock(&all_mddevs_lock);
->> +	list_del(&mddev->all_mddevs);
->> +	spin_unlock(&all_mddevs_lock);
->> +
->> +	kfree(mddev);
->> +}
-> 
-> Sadly, I still don't think this is correct. mddev_init() has already
-> called kobject_init() and according to the documentation it *must* be
-> cleaned up with a call to kobject_put(). That doesn't happen in this
-> path -- so I believe this will cause memory leaks.
+> [...]
 
-What about something along these lines:
+Applied, thanks!
+
+[1/3] block: ensure iov_iter advances for added pages
+      commit: 5a044eef1265581683530e75351c19e29ee33a11
+[2/3] block: ensure bio_iov_add_page can't fail
+      commit: ac3c48e32c047a3781d6bc28bb5013e4431350fd
+[3/3] block: fix leaking page ref on truncated direct io
+      commit: 44b6b0b0e980d99d24de7e5d57baae48a78db3b6
+
+Best regards,
+-- 
+Jens Axboe
 
 
-
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 78e2588ed43e..1d13840cec6d 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -5581,6 +5581,15 @@ md_attr_store(struct kobject *kobj, struct
-attribute *at>
-        return rv;
- }
-
-+static void mddev_free(struct mddev *mddev)
-+{
-+       percpu_ref_exit(&mddev->writes_pending);
-+       bioset_exit(&mddev->bio_set);
-+       bioset_exit(&mddev->sync_set);
-+
-+       kfree(mddev);
-+}
-+
- static void md_free(struct kobject *ko)
- {
-        struct mddev *mddev = container_of(ko, struct mddev, kobj);
-@@ -5593,12 +5602,9 @@ static void md_free(struct kobject *ko)
-        if (mddev->gendisk) {
-                del_gendisk(mddev->gendisk);
-                blk_cleanup_disk(mddev->gendisk);
-+       } else {
-+               mddev_free(mddev);
-        }
--       percpu_ref_exit(&mddev->writes_pending);
--
--       bioset_exit(&mddev->bio_set);
--       bioset_exit(&mddev->sync_set);
--       kfree(mddev);
- }
-
- static const struct sysfs_ops md_sysfs_ops = {
-@@ -7858,6 +7864,13 @@ static unsigned int md_check_events(struct
-gendisk *disk>
-        return ret;
- }
-
-+static void md_free_disk(struct gendisk *disk)
-+{
-+       struct mddev *mddev = disk->private_data;
-+
-+       mddev_free(mddev);
-+}
-+
- const struct block_device_operations md_fops =
- {
-        .owner          = THIS_MODULE,
-@@ -7871,6 +7884,7 @@ const struct block_device_operations md_fops =
-        .getgeo         = md_getgeo,
-        .check_events   = md_check_events,
-        .set_read_only  = md_set_read_only,
-+       .free_disk      = md_free_disk,
- };
