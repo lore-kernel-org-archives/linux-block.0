@@ -2,182 +2,198 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0D2C43334
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F360EC433EF
 	for <linux-block@archiver.kernel.org>; Wed, 13 Jul 2022 14:07:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236398AbiGMOH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 10:07:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41442 "EHLO
+        id S236297AbiGMOHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 10:07:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236297AbiGMOH0 (ORCPT
+        with ESMTP id S236321AbiGMOH1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 10:07:26 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5CB3245D;
-        Wed, 13 Jul 2022 07:07:24 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Wed, 13 Jul 2022 10:07:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 151D332473
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 07:07:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657721245;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=167YRn++fYV6uBWm30cEoRObvG1upqHih6YB0tP+W1Q=;
+        b=HyAgpb+s4zzo4vzkO3NuBAUSXVqz+vF9y+SlavRtWUXknJiIOkqJ5ZIQVyGnVFcC8mTQrz
+        y+TzSC4KscjjrTtLExjfGFs9bJ1TDX0uP8mpzAwB3vdE6u+nBmZyrEj9k6zoUvANd5QcEE
+        3hDbSNIJ6dIt1e/l07FnpvqizcCcGGw=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-626-wQegNj3LOqyM9K909Bg6aQ-1; Wed, 13 Jul 2022 10:07:19 -0400
+X-MC-Unique: wQegNj3LOqyM9K909Bg6aQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 9EA9E20191;
-        Wed, 13 Jul 2022 14:07:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1657721243; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pnfH5Bkw5sQHVn/yM5oao0mW1esxplkQAuhzbZiKYqE=;
-        b=A6XHUOyyHlyOjWK8LU1J/6Y3xtEnLfnWHTuZ2ryLiwr5fZEt6TdqxVIJvWIAH6wbBIprCY
-        1YToZquVTYvBCHATjDN8NgJQmt/KOUe9n9U6HKXhsGlWNtgMbMQTSsUsYYmFfaKYwH1rDl
-        iNGGiBzQ7pETFKCDvbcJ7ZEq8DrklWg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1657721243;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pnfH5Bkw5sQHVn/yM5oao0mW1esxplkQAuhzbZiKYqE=;
-        b=ZWBzEKXU6QQGbJotrjpfGHTK5uJXakqmuiSbGwhK8a/Nir9JZLtnwlmMDtmJu9v1zn8Lsw
-        VhbwrbinaOhpJzCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4053B13AAD;
-        Wed, 13 Jul 2022 14:07:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Z71iD5vRzmLZVgAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 13 Jul 2022 14:07:23 +0000
-Message-ID: <1d1d94ea-b67b-405c-c825-faf67f258558@suse.de>
-Date:   Wed, 13 Jul 2022 16:07:22 +0200
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6EC223801F5D;
+        Wed, 13 Jul 2022 14:07:18 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 69B361121314;
+        Wed, 13 Jul 2022 14:07:17 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V5 0/2] ublk: add io_uring based userspace block driver
+Date:   Wed, 13 Jul 2022 22:07:09 +0800
+Message-Id: <20220713140711.97356-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, kbusch@kernel.org,
-        axboe@kernel.dk, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
-        gost.dev@samsung.com
-References: <20220711110155.649153-1-joshi.k@samsung.com>
- <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
- <20220711110155.649153-5-joshi.k@samsung.com> <20220712065250.GA6574@lst.de>
- <436c8875-5a99-4328-80ac-6a5aef7f16f4@grimberg.me>
- <20220713053633.GA13135@lst.de>
- <24f0a3e6-aa53-8c69-71b7-d66289a63eae@grimberg.me>
- <20220713101235.GA27815@lst.de>
- <772b461a-bc43-c229-906d-0e280091e17f@grimberg.me>
- <96f47d9b-fbfc-80da-4c38-f46986f14a43@suse.de>
- <7c7a093c-4103-b67d-c145-9d84aaae835e@grimberg.me>
- <04b475f6-506f-188b-d104-b27e9dffc1b8@suse.de>
- <66322f2d-fbde-7b9f-14f1-0651511d95b8@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
- uring-passthrough commands
-In-Reply-To: <66322f2d-fbde-7b9f-14f1-0651511d95b8@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/13/22 15:41, Sagi Grimberg wrote:
-> 
->>>>>>> Maybe the solution is to just not expose a /dev/ng for the mpath 
->>>>>>> device
->>>>>>> node, but only for bottom namespaces. Then it would be completely
->>>>>>> equivalent to scsi-generic devices.
->>>>>>>
->>>>>>> It just creates an unexpected mix of semantics of best-effort
->>>>>>> multipathing with just path selection, but no requeue/failover...
->>>>>>
->>>>>> Which is exactly the same semanics as SG_IO on the dm-mpath nodes.
->>>>>
->>>>> I view uring passthru somewhat as a different thing than sending SG_IO
->>>>> ioctls to dm-mpath. But it can be argued otherwise.
->>>>>
->>>>> BTW, the only consumer of it that I'm aware of commented that he
->>>>> expects dm-mpath to retry SG_IO when dm-mpath retry for SG_IO 
->>>>> submission
->>>>> was attempted (https://www.spinics.net/lists/dm-devel/msg46924.html).
->>>>>
->>>>>  From Paolo:
->>>>> "The problem is that userspace does not have a way to direct the 
->>>>> command to a different path in the resubmission. It may not even 
->>>>> have permission to issue DM_TABLE_STATUS, or to access the /dev 
->>>>> nodes for the underlying paths, so without Martin's patches SG_IO 
->>>>> on dm-mpath is basically unreliable by design."
->>>>>
->>>>> I didn't manage to track down any followup after that email though...
->>>>>
->>>> I did; 'twas me who was involved in the initial customer issue 
->>>> leading up to that.
->>>>
->>>> Amongst all the other issue we've found the prime problem with SG_IO 
->>>> is that it needs to be directed to the 'active' path.
->>>> For the device-mapper has a distinct callout (dm_prepare_ioctl), 
->>>> which essentially returns the current active path device. And then 
->>>> the device-mapper core issues the command on that active path.
->>>>
->>>> All nice and good, _unless_ that command triggers an error.
->>>> Normally it'd be intercepted by the dm-multipath end_io handler, and 
->>>> would set the path to offline.
->>>> But as ioctls do not use the normal I/O path the end_io handler is 
->>>> never called, and further SG_IO calls are happily routed down the 
->>>> failed path.
->>>>
->>>> And the customer had to use SG_IO (or, in qemu-speak, LUN 
->>>> passthrough) as his application/filesystem makes heavy use of 
->>>> persistent reservations.
->>>
->>> How did this conclude Hannes?
->>
->> It didn't. The proposed interface got rejected, and now we need to 
->> come up with an alternative solution.
->> Which we haven't found yet.
-> 
-> Lets assume for the sake of discussion, had dm-mpath set a path to be
-> offline on ioctl errors, what would qemu do upon this error? blindly
-> retry? Until When? Or would qemu need to learn about the path tables in
-> order to know when there is at least one online path in order to retry?
-> 
-IIRC that was one of the points why it got rejected.
-Ideally we would return an errno indicating that the path had failed, 
-but further paths are available, so a retry is in order.
-Once no paths are available qemu would be getting a different error 
-indicating that all paths are failed.
+Hello Guys,
 
-But we would be overloading a new meaning to existing error numbers, or 
-even inventing our own error numbers. Which makes it rather awkward to use.
+ublk driver is one kernel driver for implementing generic userspace block
+device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
+ublk server[1] which is the userspace part of ublk for communicating
+with ublk driver and handling specific io logic by its target module.
 
-Ideally we would be able to return this as the SG_IO status, as that is 
-well capable of expressing these situations. But then we would need to 
-parse and/or return the error ourselves, essentially moving sg_io 
-funtionality into dm-mpath. Also not what one wants.
+Another thing ublk driver handles is to copy data between user space buffer
+and request/bio's pages, or take zero copy if mm is ready for support it in
+future. ublk driver doesn't handle any IO logic of the specific driver, so
+it is small/simple, and all io logics are done by the target code in ublkserver.
 
-> What is the model that a passthru consumer needs to follow when
-> operating against a mpath device?
+The above two are main jobs done by ublk driver.
 
-The model really is that passthru consumer needs to deal with these errors:
-- No error (obviously)
-- I/O error (error status will not change with a retry)
-- Temporary/path related error (error status might change with a retry)
+ublk driver can help to move IO logic into userspace, in which the
+development work is easier/more effective than doing in kernel, such as,
+ublk-loop takes < 200 lines of loop specific code to get basically same 
+function with kernel loop block driver, meantime the performance is
+is even better than kernel loop with same setting. ublksrv[1] provide built-in
+test for comparing both by running "make test T=loop", for example, see
+the test result running on VM which is over my lattop(root disk is
+nvme/device mapper/xfs):
 
-Then the consumer can decide whether to invoke a retry (for the last 
-class), or whether it should pass up that error, as maybe there are 
-applications with need a quick response time and can handle temporary 
-failures (or, in fact, want to be informed about temporary failures).
+	[root@ktest-36 ubdsrv]#make -s -C /root/git/ubdsrv/tests run T=loop/001 R=10
+	running loop/001
+		fio (ublk/loop(/root/git/ubdsrv/tests/tmp/ublk_loop_VqbMA), libaio, bs 4k, dio, hw queues:1)...
+		randwrite: jobs 1, iops 32572
+		randread: jobs 1, iops 143052
+		rw: jobs 1, iops read 29919 write 29964
+	
+	[root@ktest-36 ubdsrv]# make test T=loop/003
+	make -s -C /root/git/ubdsrv/tests run T=loop/003 R=10
+	running loop/003
+		fio (kernel_loop/kloop(/root/git/ubdsrv/tests/tmp/ublk_loop_ZIVnG), libaio, bs 4k, dio, hw queues:1)...
+		randwrite: jobs 1, iops 27436
+		randread: jobs 1, iops 95273
+		rw: jobs 1, iops read 22542 write 22543 
 
-IE the 'DNR' bit should serve nicely here, keeping in mind that we might 
-need to 'fake' an NVMe error status if the connection is severed.
 
-Cheers,
+Another example is high performance qcow2 support[2], which could be built with
+ublk framework more easily than doing it inside kernel.
 
-Hannes
+Also there are more people who express interests on userspace block driver[3],
+Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
+requirement from Google. Ziyang Zhang from Alibaba said they "plan to
+replace TCMU by UBD as a new choice" because UBD can get better throughput than
+TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
+storage service for providing storage to containers.
+
+It is io_uring based: io request is delivered to userspace via new added
+io_uring command which has been proved as very efficient for making nvme
+passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
+shared/mmap buffer is used for sharing io descriptor to userspace, the
+buffer is readonly for userspace, each IO just takes 24bytes so far.
+It is suggested to use io_uring in userspace(target part of ublk server)
+to handle IO request too. And it is still easy for ublkserver to support
+io handling by non-io_uring, and this work isn't done yet, but can be
+supported easily with help o eventfd.
+
+This way is efficient since no extra io command copy is required, no sleep
+is needed in transferring io command to userspace. Meantime the communication
+protocol is simple and efficient, one single command of
+UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
+command result in one trip. IO handling is often batched after single
+io_uring_enter() returns, both IO requests from ublk server target and
+IO commands could be handled as a whole batch.
+
+And the patch by patch change can be found in the following
+tree:
+
+https://github.com/ming1/linux/tree/my_for-5.20-ubd-devel_v4
+
+ublk server repo(master branch):
+
+	https://github.com/ming1/ubdsrv
+
+Any comments are welcome!
+
+Since V4:
+- drop patch of "ublk_drv: add UBLK_IO_REFETCH_REQ for supporting to build as module",
+instead of using io_uring_cmd_complete_in_task for building driver as module
+
+- simplify aborting code
+
+
+Since V3:
+- address Gabriel Krisman Bertazi's comments on V3: add userspace data
+  validation before handling command, remove warning, ...
+- remove UBLK_IO_COMMIT_REQ command as suggested by Zixiang and Gabriel Krisman Bertazi
+- fix one request double free when running abort
+- rewrite/cleanup ublk_copy_pages(), then this handling becomes very
+  clean
+- add one command of UBLK_IO_REFETCH_REQ for allowing ublk_drv to build
+  as module
+
+Since V2:
+- fix one big performance problem:
+	https://github.com/ming1/linux/commit/3c9fd476951759858cc548dee4cedc074194d0b0
+- rename as ublk, as suggested by Gabriel Krisman Bertazi 
+- lots of cleanup & code improvement & bugfix, see details in git
+  hisotry
+
+
+Since V1:
+
+Remove RFC now because ublk driver codes gets lots of cleanup, enhancement and
+bug fixes since V1:
+
+- cleanup uapi: remove ublk specific error code,  switch to linux error code,
+remove one command op, remove one field from cmd_desc
+
+- add monitor mechanism to handle ubq_daemon being killed, ublksrv[1]
+  includes builtin tests for covering heavy IO with deleting ublk / killing
+  ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
+  and the abort/stop mechanism is simple
+
+- fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
+  MQ ublk-loop devices(test/scratch)
+
+- improve batching submission as suggested by Jens
+
+- improve handling for starting device, replace random wait/poll with
+completion
+
+- all kinds of cleanup, bug fix,..
+
+
+Ming Lei (2):
+  ublk_drv: add io_uring based userspace block driver
+  ublk_drv: support to complete io command via task_work_add
+
+ drivers/block/Kconfig         |    6 +
+ drivers/block/Makefile        |    2 +
+ drivers/block/ublk_drv.c      | 1589 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/ublk_cmd.h |  162 ++++
+ 4 files changed, 1759 insertions(+)
+ create mode 100644 drivers/block/ublk_drv.c
+ create mode 100644 include/uapi/linux/ublk_cmd.h
+
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+2.31.1
+
