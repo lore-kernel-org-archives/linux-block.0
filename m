@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C93CC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1757CCA47C
 	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:09:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240530AbiGNSJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S240527AbiGNSJj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 14 Jul 2022 14:09:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56484 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240596AbiGNSJT (ORCPT
+        with ESMTP id S240597AbiGNSJV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 14:09:19 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5B013F1D
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:16 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id l12so1122112plk.13
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:16 -0700 (PDT)
+        Thu, 14 Jul 2022 14:09:21 -0400
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506FDC2E
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:18 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id z1so1121328plb.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gqV8cNZaB9jlk+NaIIKl1ONjy8WOx/shXV6SvyYqNyQ=;
-        b=rSaNV+vPZzKV0idhTTs7odrI7RfeJcNB1C17HeGmknUusQMPETVwFrBa3ZtZePPlcr
-         OfgHP9zgvKWVFcxhaPJwBtJdybWkMSOrJ/UDXdj7g/zX4hZWIE8imYzxwnuql/ieWw59
-         XmQfDOKNhzwEJmmRsPUdhHgWj5Dx5HFw82jUAfVho+8TUOE9k26VrEclM4a26ZMNnP2L
-         6a1XiqhMzYl3dk8P68zwcmAVMiiCGO6TNf3o9aEcbLxA9x3XPdcnnvjtN7nQgxTpWu8+
-         klJntE3RUJ+18fUtvPW9VAroxFLaW2NekFsqvVj8HXraqgzmcQdaM6CC1x/WEp11Wv7c
-         sG3w==
-X-Gm-Message-State: AJIora+cL056SKw2ToVjuhNdCzdslgh8ip8zkghdIRJW0s6HhWxuiEh5
-        Z6eTFBmdiZPuXr2ZDWkahzw=
-X-Google-Smtp-Source: AGRyM1s7xtq/w1mQaucwsr7+7uWNUpqbgSbpdV6NDww0l1VCZ6hzQBOqGHCd0gCFH1iZ+I/hHWbXkA==
-X-Received: by 2002:a17:902:f54e:b0:16c:5119:d4a8 with SMTP id h14-20020a170902f54e00b0016c5119d4a8mr9387356plf.22.1657822155988;
-        Thu, 14 Jul 2022 11:09:15 -0700 (PDT)
+        bh=+XRcEoE4iSMNUpUECe2dIYkLT1HuZct2wmLoZ0YJMh0=;
+        b=fkG1+dDBZ23Md4GFWmp/qgexcGXGKghzknCVK1PNah4HjYLnCKZIDhvTtBmtfizxiY
+         usXhFQKpYdOp1llRC7uyK7JDgAQCPlKQVHPQXM8m/7Is42S3nl3x4Xlmmkdc3dNeYWP0
+         2JmqbtEQB3Nf0EHO++IjBUZOSnn1M2lBsDUTt41fUCd8YtU9CnBDmFkShO8cFyD/ZEYc
+         0SrrbjXaUQpVTztCMq5vV/Qh0fxmrj9HT0ZBqITH41FjCaK8jTv40zHmaXZbyZL6srVv
+         sdwD5rPVKQxoERwhiWwqg//L70I7VNc9E9Zk0X9yb6ETZlVKTnEbEAvWmxt/G5YHEs5u
+         BGog==
+X-Gm-Message-State: AJIora+PwYkhn1qSrzUwjQxYNMorC8mnneidyOen1XrK+y1L6E2Ttya8
+        pAtN9mY4jJYav+XrYMMgO8k=
+X-Google-Smtp-Source: AGRyM1sKKH88a6SfMyhZBEIvkPCOBKZstXWZN9ewBiMAa5DGYIa06c+a8759kMd6RsxHwm+5AYypoA==
+X-Received: by 2002:a17:90b:1e4d:b0:1f0:462b:b531 with SMTP id pi13-20020a17090b1e4d00b001f0462bb531mr17802491pjb.34.1657822157610;
+        Thu, 14 Jul 2022 11:09:17 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9fab:70d1:f0e7:922b])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.09.14
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.09.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:09:15 -0700 (PDT)
+        Thu, 14 Jul 2022 11:09:16 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
-Subject: [PATCH v3 61/63] PM: Use the enum req_op and blk_opf_t types
-Date:   Thu, 14 Jul 2022 11:07:27 -0700
-Message-Id: <20220714180729.1065367-62-bvanassche@acm.org>
+        "Darrick J . Wong" <djwong@kernel.org>
+Subject: [PATCH v3 62/63] fs/xfs: Use the enum req_op and blk_opf_t types
+Date:   Thu, 14 Jul 2022 11:07:28 -0700
+Message-Id: <20220714180729.1065367-63-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
 In-Reply-To: <20220714180729.1065367-1-bvanassche@acm.org>
 References: <20220714180729.1065367-1-bvanassche@acm.org>
@@ -56,117 +56,77 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Improve static type checking by using the enum req_op type for variables
-that represent a request operation and the new blk_opf_t type for
-variables that represent request flags. Combine the first two
-hib_submit_io() arguments into a single argument.
+that represent a request operation and the new blk_opf_t type for the
+combination of a request operation with request flags.
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- kernel/power/swap.c | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+ fs/xfs/xfs_bio_io.c      | 2 +-
+ fs/xfs/xfs_buf.c         | 4 ++--
+ fs/xfs/xfs_linux.h       | 2 +-
+ fs/xfs/xfs_log_recover.c | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/power/swap.c b/kernel/power/swap.c
-index 91fffdd2c7fb..277434b6c0bf 100644
---- a/kernel/power/swap.c
-+++ b/kernel/power/swap.c
-@@ -269,15 +269,14 @@ static void hib_end_io(struct bio *bio)
- 	bio_put(bio);
+diff --git a/fs/xfs/xfs_bio_io.c b/fs/xfs/xfs_bio_io.c
+index ae4345b37621..fe21c76f75b8 100644
+--- a/fs/xfs/xfs_bio_io.c
++++ b/fs/xfs/xfs_bio_io.c
+@@ -15,7 +15,7 @@ xfs_rw_bdev(
+ 	sector_t		sector,
+ 	unsigned int		count,
+ 	char			*data,
+-	unsigned int		op)
++	enum req_op		op)
+ 
+ {
+ 	unsigned int		is_vmalloc = is_vmalloc_addr(data);
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index bf4e60871068..5e8f40d8c052 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -1416,7 +1416,7 @@ xfs_buf_ioapply_map(
+ 	int		map,
+ 	int		*buf_offset,
+ 	int		*count,
+-	int		op)
++	blk_opf_t	op)
+ {
+ 	int		page_index;
+ 	unsigned int	total_nr_pages = bp->b_page_count;
+@@ -1493,7 +1493,7 @@ _xfs_buf_ioapply(
+ 	struct xfs_buf	*bp)
+ {
+ 	struct blk_plug	plug;
+-	int		op;
++	blk_opf_t	op;
+ 	int		offset;
+ 	int		size;
+ 	int		i;
+diff --git a/fs/xfs/xfs_linux.h b/fs/xfs/xfs_linux.h
+index cb9105d667db..f9878021e7d0 100644
+--- a/fs/xfs/xfs_linux.h
++++ b/fs/xfs/xfs_linux.h
+@@ -196,7 +196,7 @@ static inline uint64_t howmany_64(uint64_t x, uint32_t y)
  }
  
--static int hib_submit_io(int op, int op_flags, pgoff_t page_off, void *addr,
--		struct hib_bio_batch *hb)
-+static int hib_submit_io(blk_opf_t opf, pgoff_t page_off, void *addr,
-+			 struct hib_bio_batch *hb)
+ int xfs_rw_bdev(struct block_device *bdev, sector_t sector, unsigned int count,
+-		char *data, unsigned int op);
++		char *data, enum req_op op);
+ 
+ #define ASSERT_ALWAYS(expr)	\
+ 	(likely(expr) ? (void)0 : assfail(NULL, #expr, __FILE__, __LINE__))
+diff --git a/fs/xfs/xfs_log_recover.c b/fs/xfs/xfs_log_recover.c
+index 5f7e4e6e33ce..940c8107cbd4 100644
+--- a/fs/xfs/xfs_log_recover.c
++++ b/fs/xfs/xfs_log_recover.c
+@@ -122,7 +122,7 @@ xlog_do_io(
+ 	xfs_daddr_t		blk_no,
+ 	unsigned int		nbblks,
+ 	char			*data,
+-	unsigned int		op)
++	enum req_op		op)
  {
- 	struct page *page = virt_to_page(addr);
- 	struct bio *bio;
- 	int error = 0;
+ 	int			error;
  
--	bio = bio_alloc(hib_resume_bdev, 1, op | op_flags,
--			GFP_NOIO | __GFP_HIGH);
-+	bio = bio_alloc(hib_resume_bdev, 1, opf, GFP_NOIO | __GFP_HIGH);
- 	bio->bi_iter.bi_sector = page_off * (PAGE_SIZE >> 9);
- 
- 	if (bio_add_page(bio, page, PAGE_SIZE, 0) < PAGE_SIZE) {
-@@ -317,8 +316,7 @@ static int mark_swapfiles(struct swap_map_handle *handle, unsigned int flags)
- {
- 	int error;
- 
--	hib_submit_io(REQ_OP_READ, 0, swsusp_resume_block,
--		      swsusp_header, NULL);
-+	hib_submit_io(REQ_OP_READ, swsusp_resume_block, swsusp_header, NULL);
- 	if (!memcmp("SWAP-SPACE",swsusp_header->sig, 10) ||
- 	    !memcmp("SWAPSPACE2",swsusp_header->sig, 10)) {
- 		memcpy(swsusp_header->orig_sig,swsusp_header->sig, 10);
-@@ -331,7 +329,7 @@ static int mark_swapfiles(struct swap_map_handle *handle, unsigned int flags)
- 		swsusp_header->flags = flags;
- 		if (flags & SF_CRC32_MODE)
- 			swsusp_header->crc32 = handle->crc32;
--		error = hib_submit_io(REQ_OP_WRITE, REQ_SYNC,
-+		error = hib_submit_io(REQ_OP_WRITE | REQ_SYNC,
- 				      swsusp_resume_block, swsusp_header, NULL);
- 	} else {
- 		pr_err("Swap header not found!\n");
-@@ -408,7 +406,7 @@ static int write_page(void *buf, sector_t offset, struct hib_bio_batch *hb)
- 	} else {
- 		src = buf;
- 	}
--	return hib_submit_io(REQ_OP_WRITE, REQ_SYNC, offset, src, hb);
-+	return hib_submit_io(REQ_OP_WRITE | REQ_SYNC, offset, src, hb);
- }
- 
- static void release_swap_writer(struct swap_map_handle *handle)
-@@ -1003,7 +1001,7 @@ static int get_swap_reader(struct swap_map_handle *handle,
- 			return -ENOMEM;
- 		}
- 
--		error = hib_submit_io(REQ_OP_READ, 0, offset, tmp->map, NULL);
-+		error = hib_submit_io(REQ_OP_READ, offset, tmp->map, NULL);
- 		if (error) {
- 			release_swap_reader(handle);
- 			return error;
-@@ -1027,7 +1025,7 @@ static int swap_read_page(struct swap_map_handle *handle, void *buf,
- 	offset = handle->cur->entries[handle->k];
- 	if (!offset)
- 		return -EFAULT;
--	error = hib_submit_io(REQ_OP_READ, 0, offset, buf, hb);
-+	error = hib_submit_io(REQ_OP_READ, offset, buf, hb);
- 	if (error)
- 		return error;
- 	if (++handle->k >= MAP_PAGE_ENTRIES) {
-@@ -1526,8 +1524,7 @@ int swsusp_check(void)
- 	if (!IS_ERR(hib_resume_bdev)) {
- 		set_blocksize(hib_resume_bdev, PAGE_SIZE);
- 		clear_page(swsusp_header);
--		error = hib_submit_io(REQ_OP_READ, 0,
--					swsusp_resume_block,
-+		error = hib_submit_io(REQ_OP_READ, swsusp_resume_block,
- 					swsusp_header, NULL);
- 		if (error)
- 			goto put;
-@@ -1535,7 +1532,7 @@ int swsusp_check(void)
- 		if (!memcmp(HIBERNATE_SIG, swsusp_header->sig, 10)) {
- 			memcpy(swsusp_header->sig, swsusp_header->orig_sig, 10);
- 			/* Reset swap signature now */
--			error = hib_submit_io(REQ_OP_WRITE, REQ_SYNC,
-+			error = hib_submit_io(REQ_OP_WRITE | REQ_SYNC,
- 						swsusp_resume_block,
- 						swsusp_header, NULL);
- 		} else {
-@@ -1586,11 +1583,11 @@ int swsusp_unmark(void)
- {
- 	int error;
- 
--	hib_submit_io(REQ_OP_READ, 0, swsusp_resume_block,
--		      swsusp_header, NULL);
-+	hib_submit_io(REQ_OP_READ, swsusp_resume_block,
-+			swsusp_header, NULL);
- 	if (!memcmp(HIBERNATE_SIG,swsusp_header->sig, 10)) {
- 		memcpy(swsusp_header->sig,swsusp_header->orig_sig, 10);
--		error = hib_submit_io(REQ_OP_WRITE, REQ_SYNC,
-+		error = hib_submit_io(REQ_OP_WRITE | REQ_SYNC,
- 					swsusp_resume_block,
- 					swsusp_header, NULL);
- 	} else {
