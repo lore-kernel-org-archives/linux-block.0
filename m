@@ -2,73 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E4AC43334
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 14:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88700C43334
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 14:41:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232005AbiGNOiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 10:38:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48344 "EHLO
+        id S232289AbiGNOld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 10:41:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238391AbiGNOiD (ORCPT
+        with ESMTP id S231666AbiGNOlc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 10:38:03 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D8E49B6E
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 07:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=uD27qdxYN8lWOtvC15ApMDfnGoCi5Cne/k7LhGdN3N8=; b=yxoCqDSmZLi5DrFl7IbJKhJEI/
-        CAR9E6sI3lCcFGdHpcsXQQ5NWGfbv9e14hKhgD18o7MvuS60QNe1CpNJSFV/iczyOz0Z/r+HRWB64
-        0iSahnnxKoTfoJl4VaC1UI8syljfFfdi3JOV1X+yq0jXUvanxCwRarAxgcc7t5IYxW7WcKSh17foo
-        76Sq/+BsW5Bu8UX115gZkyfnPSq0JzQwJwxW3CjvpoLGNH1PRPDE1iJsMho98UwQKaronPUl7BNrw
-        lIm9pSq5j247rnvVdxptU/4UH6BL0o6cwErWFGaaq0Qri9iiqzvsawDRLUU85qHmdO3iRUX1SWwnW
-        T+XTj7cg==;
-Received: from ip4d15c27d.dynamic.kabel-deutschland.de ([77.21.194.125] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oBzya-00FGrX-9f; Thu, 14 Jul 2022 14:38:00 +0000
-Date:   Thu, 14 Jul 2022 16:37:58 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 5.19
-Message-ID: <YtAqRsNAUZXA60+V@infradead.org>
+        Thu, 14 Jul 2022 10:41:32 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418F23ED42;
+        Thu, 14 Jul 2022 07:41:32 -0700 (PDT)
+Received: from localhost (mtl.collabora.ca [66.171.169.34])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: krisman)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id D23FC6601A3B;
+        Thu, 14 Jul 2022 15:41:30 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1657809691;
+        bh=mJIM2zGgD78gQfPnTLvFFsazmmE8m4nDAx4O+dQ3QR0=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=TpfrT7ybUq990Pru3NUwibUPmdfYNU/FPugMFvIN9KOq/p4JnnBGjUly5UwLDJPjU
+         /eFpDjrdsmM3k8JeBVXxVmaboJYRrfjR942ifNvRWuq9VTdt6o173+hYSAfwgswzIZ
+         WSxufC4rQyq9wJsSrppHERrcBRbhBBHm7PzR3opjDIEP7AwUuHj8Yh2TYlOFhjz35w
+         h/yrdv/o1jkNN3zWkW70THW6UFs8qHplYTyOvC9NibKdPISYVnRZJ+honMu7bLeQtg
+         HyyKQ+5CzQ0nqNibp65WQcTPqHz8GGdxH8PO275zBzN9lrlF4upYOb1rwFPah02sbB
+         4zK6xnYcIm4RA==
+From:   Gabriel Krisman Bertazi <krisman@collabora.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Subject: Re: [PATCH V5 0/2] ublk: add io_uring based userspace block driver
+Organization: Collabora
+References: <20220713140711.97356-1-ming.lei@redhat.com>
+Date:   Thu, 14 Jul 2022 10:41:27 -0400
+In-Reply-To: <20220713140711.97356-1-ming.lei@redhat.com> (Ming Lei's message
+        of "Wed, 13 Jul 2022 22:07:09 +0800")
+Message-ID: <87h73jah9k.fsf@collabora.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 6b0de7d0f3285df849be2b3cc94fc3a0a31987bf:
+Ming Lei <ming.lei@redhat.com> writes:
 
-  Merge tag 'nvme-5.19-2022-07-07' of git://git.infradead.org/nvme into block-5.19 (2022-07-07 17:38:19 -0600)
+> ublk driver is one kernel driver for implementing generic userspace block
+> device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
+> ublk server[1] which is the userspace part of ublk for communicating
+> with ublk driver and handling specific io logic by its target module.
 
-are available in the Git repository at:
+Hey Ming,
 
-  git://git.infradead.org/nvme.git tags/nvme-5.19-2022-07-14
+I didn't get a chance to look deep into v5 as I was on a last minute
+leave in the past few days.  Either way, I went through them now and the
+patches look good to me.  I'm quite happy they are merged, thank you
+very much for this work.
 
-for you to fetch changes up to 6961b5e02876b3b47f030a1f1ee8fd3e631ac270:
+Just for ML archive purposes, the entire series is
 
-  nvme: fix block device naming collision (2022-07-14 16:35:25 +0200)
+Reviewed-by: Gabriel Krisman Bertazi <krisman@collabora.com>
 
-----------------------------------------------------------------
-nvme fixes for Linux 5.19
+:)
 
- - fix a block device naming collision (Israel Rukshin)
- - fix freeze accounting for PCI error handling (Keith Busch)
-
-----------------------------------------------------------------
-Israel Rukshin (1):
-      nvme: fix block device naming collision
-
-Keith Busch (1):
-      nvme-pci: fix freeze accounting for error handling
-
- drivers/nvme/host/core.c | 6 +++---
- drivers/nvme/host/pci.c  | 9 +++++++--
- 2 files changed, 10 insertions(+), 5 deletions(-)
+-- 
+Gabriel Krisman Bertazi
