@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01841C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FAAC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:07:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238985AbiGNSHo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 14:07:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53376 "EHLO
+        id S239145AbiGNSHs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 14:07:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239993AbiGNSHn (ORCPT
+        with ESMTP id S240080AbiGNSHp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 14:07:43 -0400
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68F5474DB
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:42 -0700 (PDT)
-Received: by mail-pl1-f172.google.com with SMTP id v21so1116802plo.0
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:42 -0700 (PDT)
+        Thu, 14 Jul 2022 14:07:45 -0400
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED2367CA3
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:44 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id t5-20020a17090a6a0500b001ef965b262eso3830065pjj.5
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FqWcVZR+TlS6nAYd4x1HnwZQVCB/mm92CN44/Naq0EY=;
-        b=psRcrLWG8SYJywAwLfS+zWe/wIkASdIoI/XnfqpZKTNvnj3eS54z35uGzlQ8QaOxiG
-         5QVu4jTW5MUedPu6g7ZU6Y1XwE01CRbvGZ8fcSozD/PMWFUZ70rKwHRO3haQ6ui/306l
-         Zgg0ZOgeICjEIhdLq5iOEu6WvnqpUqtYllslTNe1s5UoFxIGtWcYKQU/M3PUbvv44PIH
-         lppm0MCEKrbv8dZHjWCAWVPKGeafQQJkEWTA8+q9+F+Qgt32YeSgquYnsBFIkoCWTiiC
-         4T1dQQWbeOzCE68LhMmLW+ecCnDf1cBnwXUO23ekmgNbWTKXYXg/ivVWsBMQm1z3JzYl
-         YoNw==
-X-Gm-Message-State: AJIora9GDj0h4mdKSWln8NiLK3wzpSTspeRg2UutXBJK0MnB8f39XEf/
-        cIHZvEbcw1btL5IGH46zZxY=
-X-Google-Smtp-Source: AGRyM1sL+jUnEqzIL+43kvvHupl8mPhTvecpUo4ccD0MUbROh6lWhszs1wA0nr3mpTM5vDf0TMh8XQ==
-X-Received: by 2002:a17:902:8343:b0:167:8899:2f92 with SMTP id z3-20020a170902834300b0016788992f92mr9626162pln.117.1657822062106;
-        Thu, 14 Jul 2022 11:07:42 -0700 (PDT)
+        bh=3A3OIJKH6e+SWDlSEoB6rMdvK3P+Zd27BmCPqlq7REg=;
+        b=BOS5hUr3buXbGv/ue8nwuWfnhKV3mmYXGrFohjE+XgrITOa5rDA6ZAShlCOJsUYzKr
+         pJ/IjimgfMlvBenVxSBRIBJ4CXD80CL5/r5+ntVRYTB5GwYrU3QbRyhWjO0K45dIjTnz
+         u2vI6NRk7qQ/xZ3ap9Sy3EPhGo67t5XBReK96Q4S5z7qDLW2BT5HgEEanl7wJsC99hTW
+         1skWoPfslX4T0226NMjtYClCEPolDCllna45rWEqE4DPvUQpbbyp4QV56x/ceb07OFes
+         7g2ewxSr1iIkm0iBY+lsbn9Uxg7kTQR5FwnOjHvQg+wLjg8lJ48A3XnbWDcZ28uomT87
+         FP9A==
+X-Gm-Message-State: AJIora/ij3kkvF5lCcuII7b3A//PAltk8JnQbte4jlTOtD45Q459qOfD
+        uC4XualThfMzXJCO7xdVpMw=
+X-Google-Smtp-Source: AGRyM1ujEhtO8JxYnIF3WXYRwc6ioyf7Ag7hegfHp4Bd6e77GdT9wi8SjT9WqlJGGAd1cxIW66JIZg==
+X-Received: by 2002:a17:90a:6c65:b0:1ef:9479:372c with SMTP id x92-20020a17090a6c6500b001ef9479372cmr10834986pjj.21.1657822063655;
+        Thu, 14 Jul 2022 11:07:43 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9fab:70d1:f0e7:922b])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.07.40
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.07.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:07:41 -0700 (PDT)
+        Thu, 14 Jul 2022 11:07:43 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -44,13 +44,10 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
         Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
         Damien Le Moal <damien.lemoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Tim Waugh <tim@cyberelk.net>, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH v3 04/63] block: Change the type of req_op() and bio_op() into enum req_op
-Date:   Thu, 14 Jul 2022 11:06:30 -0700
-Message-Id: <20220714180729.1065367-5-bvanassche@acm.org>
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH v3 05/63] block: Introduce the type blk_opf_t
+Date:   Thu, 14 Jul 2022 11:06:31 -0700
+Message-Id: <20220714180729.1065367-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
 In-Reply-To: <20220714180729.1065367-1-bvanassche@acm.org>
 References: <20220714180729.1065367-1-bvanassche@acm.org>
@@ -60,99 +57,198 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Improve static type checking by changing the type of the value returned by
-req_op() and bio_op() from unsigned int into enum req_op. Insert
-'default: break;' in switch statements on the enum req_op type to prevent
-that the compiler warns about these switch statements.
+Introduce the type blk_opf_t for the request operation and flags (REQ_OP_*
+and REQ_*). This type will be used to improve documentation of the block
+layer code and also to allow sparse to verify whether request flags are used
+correctly.
 
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc: Tim Waugh <tim@cyberelk.net>
-Cc: Alasdair Kergon <agk@redhat.com>
-Cc: Mike Snitzer <snitzer@kernel.org>
-Cc: Mikulas Patocka <mpatocka@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-merge.c         | 2 ++
- drivers/block/paride/pd.c | 2 ++
- drivers/md/dm.c           | 2 ++
- include/linux/blk-mq.h    | 6 ++++--
- include/linux/blk_types.h | 6 ++++--
- 5 files changed, 14 insertions(+), 4 deletions(-)
+ include/linux/blk_types.h | 97 ++++++++++++++++++++-------------------
+ 1 file changed, 51 insertions(+), 46 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 5abf5aa5a5f0..de178a8b4c82 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -405,6 +405,8 @@ unsigned int blk_recalc_rq_segments(struct request *rq)
- 		return 1;
- 	case REQ_OP_WRITE_ZEROES:
- 		return 0;
-+	default:
-+		break;
- 	}
- 
- 	rq_for_each_bvec(bv, rq, iter)
-diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
-index c8c14c6f5c3a..f8a75bc90f70 100644
---- a/drivers/block/paride/pd.c
-+++ b/drivers/block/paride/pd.c
-@@ -501,6 +501,8 @@ static enum action do_pd_io_start(void)
- 			return do_pd_read_start();
- 		else
- 			return do_pd_write_start();
-+	default:
-+		break;
- 	}
- 	return Fail;
- }
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 33d3799bb66e..6c21922b87d0 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1542,6 +1542,8 @@ static blk_status_t __process_abnormal_io(struct clone_info *ci,
- 	case REQ_OP_WRITE_ZEROES:
- 		num_bios = ti->num_write_zeroes_bios;
- 		break;
-+	default:
-+		break;
- 	}
- 
- 	/*
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d74f6a6b7e69..677195de0663 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -198,8 +198,10 @@ struct request {
- 	void *end_io_data;
- };
- 
--#define req_op(req) \
--	((req)->cmd_flags & REQ_OP_MASK)
-+static inline enum req_op req_op(const struct request *req)
-+{
-+	return req->cmd_flags & REQ_OP_MASK;
-+}
- 
- static inline bool blk_rq_is_passthrough(struct request *rq)
- {
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index cce8768bc00b..e66cbe377ae8 100644
+index e66cbe377ae8..1ef99790f6ed 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -463,8 +463,10 @@ enum stat_group {
- 	NR_STAT_GROUPS
+@@ -240,6 +240,8 @@ static inline void bio_issue_init(struct bio_issue *issue,
+ 			((u64)size << BIO_ISSUE_SIZE_SHIFT));
+ }
+ 
++typedef __u32 __bitwise blk_opf_t;
++
+ typedef unsigned int blk_qc_t;
+ #define BLK_QC_T_NONE		-1U
+ 
+@@ -250,7 +252,7 @@ typedef unsigned int blk_qc_t;
+ struct bio {
+ 	struct bio		*bi_next;	/* request queue link */
+ 	struct block_device	*bi_bdev;
+-	unsigned int		bi_opf;		/* bottom bits REQ_OP, top bits
++	blk_opf_t		bi_opf;		/* bottom bits REQ_OP, top bits
+ 						 * req_flags.
+ 						 */
+ 	unsigned short		bi_flags;	/* BIO_* below */
+@@ -338,7 +340,7 @@ enum {
+ typedef __u32 __bitwise blk_mq_req_flags_t;
+ 
+ #define REQ_OP_BITS	8
+-#define REQ_OP_MASK	((1 << REQ_OP_BITS) - 1)
++#define REQ_OP_MASK	(__force blk_opf_t)((1 << REQ_OP_BITS) - 1)
+ #define REQ_FLAG_BITS	24
+ 
+ /**
+@@ -356,35 +358,35 @@ typedef __u32 __bitwise blk_mq_req_flags_t;
+  */
+ enum req_op {
+ 	/* read sectors from the device */
+-	REQ_OP_READ		= 0,
++	REQ_OP_READ		= (__force blk_opf_t)0,
+ 	/* write sectors to the device */
+-	REQ_OP_WRITE		= 1,
++	REQ_OP_WRITE		= (__force blk_opf_t)1,
+ 	/* flush the volatile write cache */
+-	REQ_OP_FLUSH		= 2,
++	REQ_OP_FLUSH		= (__force blk_opf_t)2,
+ 	/* discard sectors */
+-	REQ_OP_DISCARD		= 3,
++	REQ_OP_DISCARD		= (__force blk_opf_t)3,
+ 	/* securely erase sectors */
+-	REQ_OP_SECURE_ERASE	= 5,
++	REQ_OP_SECURE_ERASE	= (__force blk_opf_t)5,
+ 	/* write the zero filled sector many times */
+-	REQ_OP_WRITE_ZEROES	= 9,
++	REQ_OP_WRITE_ZEROES	= (__force blk_opf_t)9,
+ 	/* Open a zone */
+-	REQ_OP_ZONE_OPEN	= 10,
++	REQ_OP_ZONE_OPEN	= (__force blk_opf_t)10,
+ 	/* Close a zone */
+-	REQ_OP_ZONE_CLOSE	= 11,
++	REQ_OP_ZONE_CLOSE	= (__force blk_opf_t)11,
+ 	/* Transition a zone to full */
+-	REQ_OP_ZONE_FINISH	= 12,
++	REQ_OP_ZONE_FINISH	= (__force blk_opf_t)12,
+ 	/* write data at the current zone write pointer */
+-	REQ_OP_ZONE_APPEND	= 13,
++	REQ_OP_ZONE_APPEND	= (__force blk_opf_t)13,
+ 	/* reset a zone write pointer */
+-	REQ_OP_ZONE_RESET	= 15,
++	REQ_OP_ZONE_RESET	= (__force blk_opf_t)15,
+ 	/* reset all the zone present on the device */
+-	REQ_OP_ZONE_RESET_ALL	= 17,
++	REQ_OP_ZONE_RESET_ALL	= (__force blk_opf_t)17,
+ 
+ 	/* Driver private requests */
+-	REQ_OP_DRV_IN		= 34,
+-	REQ_OP_DRV_OUT		= 35,
++	REQ_OP_DRV_IN		= (__force blk_opf_t)34,
++	REQ_OP_DRV_OUT		= (__force blk_opf_t)35,
+ 
+-	REQ_OP_LAST,
++	REQ_OP_LAST		= (__force blk_opf_t)36,
  };
  
--#define bio_op(bio) \
--	((bio)->bi_opf & REQ_OP_MASK)
-+static inline enum req_op bio_op(const struct bio *bio)
-+{
-+	return bio->bi_opf & REQ_OP_MASK;
-+}
+ enum req_flag_bits {
+@@ -425,28 +427,31 @@ enum req_flag_bits {
+ 	__REQ_NR_BITS,		/* stops here */
+ };
+ 
+-#define REQ_FAILFAST_DEV	(1ULL << __REQ_FAILFAST_DEV)
+-#define REQ_FAILFAST_TRANSPORT	(1ULL << __REQ_FAILFAST_TRANSPORT)
+-#define REQ_FAILFAST_DRIVER	(1ULL << __REQ_FAILFAST_DRIVER)
+-#define REQ_SYNC		(1ULL << __REQ_SYNC)
+-#define REQ_META		(1ULL << __REQ_META)
+-#define REQ_PRIO		(1ULL << __REQ_PRIO)
+-#define REQ_NOMERGE		(1ULL << __REQ_NOMERGE)
+-#define REQ_IDLE		(1ULL << __REQ_IDLE)
+-#define REQ_INTEGRITY		(1ULL << __REQ_INTEGRITY)
+-#define REQ_FUA			(1ULL << __REQ_FUA)
+-#define REQ_PREFLUSH		(1ULL << __REQ_PREFLUSH)
+-#define REQ_RAHEAD		(1ULL << __REQ_RAHEAD)
+-#define REQ_BACKGROUND		(1ULL << __REQ_BACKGROUND)
+-#define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
+-#define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
+-
+-#define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+-#define REQ_POLLED		(1ULL << __REQ_POLLED)
+-#define REQ_ALLOC_CACHE		(1ULL << __REQ_ALLOC_CACHE)
+-
+-#define REQ_DRV			(1ULL << __REQ_DRV)
+-#define REQ_SWAP		(1ULL << __REQ_SWAP)
++#define REQ_FAILFAST_DEV	\
++			(__force blk_opf_t)(1ULL << __REQ_FAILFAST_DEV)
++#define REQ_FAILFAST_TRANSPORT	\
++			(__force blk_opf_t)(1ULL << __REQ_FAILFAST_TRANSPORT)
++#define REQ_FAILFAST_DRIVER	\
++			(__force blk_opf_t)(1ULL << __REQ_FAILFAST_DRIVER)
++#define REQ_SYNC	(__force blk_opf_t)(1ULL << __REQ_SYNC)
++#define REQ_META	(__force blk_opf_t)(1ULL << __REQ_META)
++#define REQ_PRIO	(__force blk_opf_t)(1ULL << __REQ_PRIO)
++#define REQ_NOMERGE	(__force blk_opf_t)(1ULL << __REQ_NOMERGE)
++#define REQ_IDLE	(__force blk_opf_t)(1ULL << __REQ_IDLE)
++#define REQ_INTEGRITY	(__force blk_opf_t)(1ULL << __REQ_INTEGRITY)
++#define REQ_FUA		(__force blk_opf_t)(1ULL << __REQ_FUA)
++#define REQ_PREFLUSH	(__force blk_opf_t)(1ULL << __REQ_PREFLUSH)
++#define REQ_RAHEAD	(__force blk_opf_t)(1ULL << __REQ_RAHEAD)
++#define REQ_BACKGROUND	(__force blk_opf_t)(1ULL << __REQ_BACKGROUND)
++#define REQ_NOWAIT	(__force blk_opf_t)(1ULL << __REQ_NOWAIT)
++#define REQ_CGROUP_PUNT	(__force blk_opf_t)(1ULL << __REQ_CGROUP_PUNT)
++
++#define REQ_NOUNMAP	(__force blk_opf_t)(1ULL << __REQ_NOUNMAP)
++#define REQ_POLLED	(__force blk_opf_t)(1ULL << __REQ_POLLED)
++#define REQ_ALLOC_CACHE	(__force blk_opf_t)(1ULL << __REQ_ALLOC_CACHE)
++
++#define REQ_DRV		(__force blk_opf_t)(1ULL << __REQ_DRV)
++#define REQ_SWAP	(__force blk_opf_t)(1ULL << __REQ_SWAP)
+ 
+ #define REQ_FAILFAST_MASK \
+ 	(REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT | REQ_FAILFAST_DRIVER)
+@@ -469,22 +474,22 @@ static inline enum req_op bio_op(const struct bio *bio)
+ }
  
  /* obsolete, don't use in new code */
- static inline void bio_set_op_attrs(struct bio *bio, unsigned op,
+-static inline void bio_set_op_attrs(struct bio *bio, unsigned op,
+-		unsigned op_flags)
++static inline void bio_set_op_attrs(struct bio *bio, enum req_op op,
++				    blk_opf_t op_flags)
+ {
+ 	bio->bi_opf = op | op_flags;
+ }
+ 
+-static inline bool op_is_write(unsigned int op)
++static inline bool op_is_write(blk_opf_t op)
+ {
+-	return (op & 1);
++	return !!(op & (__force blk_opf_t)1);
+ }
+ 
+ /*
+  * Check if the bio or request is one that needs special treatment in the
+  * flush state machine.
+  */
+-static inline bool op_is_flush(unsigned int op)
++static inline bool op_is_flush(blk_opf_t op)
+ {
+ 	return op & (REQ_FUA | REQ_PREFLUSH);
+ }
+@@ -494,13 +499,13 @@ static inline bool op_is_flush(unsigned int op)
+  * PREFLUSH flag.  Other operations may be marked as synchronous using the
+  * REQ_SYNC flag.
+  */
+-static inline bool op_is_sync(unsigned int op)
++static inline bool op_is_sync(blk_opf_t op)
+ {
+ 	return (op & REQ_OP_MASK) == REQ_OP_READ ||
+ 		(op & (REQ_SYNC | REQ_FUA | REQ_PREFLUSH));
+ }
+ 
+-static inline bool op_is_discard(unsigned int op)
++static inline bool op_is_discard(blk_opf_t op)
+ {
+ 	return (op & REQ_OP_MASK) == REQ_OP_DISCARD;
+ }
