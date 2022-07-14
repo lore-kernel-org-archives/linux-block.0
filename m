@@ -2,143 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DD4C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 03:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7A3CCA479
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 03:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232246AbiGNDA4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 23:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59352 "EHLO
+        id S232139AbiGNDlK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jul 2022 23:41:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231207AbiGNDA4 (ORCPT
+        with ESMTP id S229606AbiGNDlJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 23:00:56 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042C820F60
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 20:00:55 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id z12so719085wrq.7
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 20:00:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+xwAXAvYI9FTbVDjyFeCH64OhB8MXdH0zkgpyggSvUk=;
-        b=dMCsTIAFAcgVHxxSiOLpbduJW+c7ON7UybqBzef+4ZnZnGUYbSLHechQQdGPF7SLa7
-         Xcl7s4pBFVoASRgo8sggxFSu0BuIzvYnjIauzoDCpmOkbiJ0k9J1yofYL6Jd4W4OpCIZ
-         vZu+IImCn4t+odtM7993ooGtuwJET10zE1b7fZ+moMrtVjeylBBr/DN4V+ukrwSozaKX
-         Mqln9AlXkZphrX0FvdbJulL0n7XymjCkeZFn/W0jQICg7syyUfDLs6lB6aymnFGRCaFw
-         Emz39/ROBeBxLQ42xcazo+DFBJCTkt9AR+z/KHtFFfj9P2fu49qjTkTmUyCKmQd7LDPf
-         1w5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+xwAXAvYI9FTbVDjyFeCH64OhB8MXdH0zkgpyggSvUk=;
-        b=AhrdNAlhbXIAmfFti/bk9LLqXiBN0PRW2iPFPXW2ucac8H2lEe/fXBheBG5KlpSFjC
-         i3XuWFNrAdNwY1ymwnSWcV61Mly48oPs5bXeFrBPrjZ1eWT1spxRzTG/sHvWDGzLV60O
-         kThlCiXS06qCC0zwPH2Ey9z8OegAT3soFhN/+z/DgHVbX2Ue5bjyByU4VGRatsRocQeA
-         3aTtD7aENgxsL1us6DFq6Zkf5SDUtZ1WdqLdUimRRG2F/9rYrD3kLM9Ua2H3mLydNTFs
-         6seUSTlbOOL9xloer2pviGKIYRvBC+RdlqQqRkl/63UjRTv7I81XP+txk8kabK1TZo0l
-         qoTQ==
-X-Gm-Message-State: AJIora9CiOSmTLae9Ms12ML5wjm8K0VqxbHiXraYX07OtkHcdHyrVrGQ
-        py7sNSO7MSelHdpHND4aTDKHAiWa+s5iqJK5BDG8
-X-Google-Smtp-Source: AGRyM1vvo+tthDYWScteO4hpZvrGvs19yHNivGyWRsakaG8eMJ8KqyISvXRV6JQGpJ44lzvE5fOckdhkSSV/DO8/okM=
-X-Received: by 2002:a5d:64a3:0:b0:21d:adaa:ce4c with SMTP id
- m3-20020a5d64a3000000b0021dadaace4cmr6001437wrp.161.1657767653490; Wed, 13
- Jul 2022 20:00:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220714000536.2250531-1-mcgrof@kernel.org>
-In-Reply-To: <20220714000536.2250531-1-mcgrof@kernel.org>
-From:   Paul Moore <paul@paul-moore.com>
-Date:   Wed, 13 Jul 2022 23:00:42 -0400
-Message-ID: <CAHC9VhSjfrMtqy_6+=_=VaCsJKbKU1oj6TKghkue9LrLzO_++w@mail.gmail.com>
-Subject: Re: [PATCH] lsm,io_uring: add LSM hooks to for the new uring_cmd file op
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     axboe@kernel.dk, casey@schaufler-ca.com, joshi.k@samsung.com,
-        linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
+        Wed, 13 Jul 2022 23:41:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3139B21E19
+        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 20:41:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657770064;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3PqAwSujQrcFKBakWmxqsGxJDNIOKr6UoNvVqvwCEF4=;
+        b=EDC1bRo1y/XQDQk1vWuMH9c3WGg2gPN+Ue7vz/ctamE7A7Jx6bulURSM+ahqhCY0Snmlqa
+        fIIrmwEsNIRfmTNO+03JEq52U32q6c6/A/PFMrs8Nl2sSrwQFBdkSa4uscD35BlG59LiZR
+        R7ztKKB3LGfKBaahViArA7wrBAG+lB4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-498-lj0l3Q0eN2CkbUOOcky_hw-1; Wed, 13 Jul 2022 23:41:00 -0400
+X-MC-Unique: lj0l3Q0eN2CkbUOOcky_hw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E77CB1C14487;
+        Thu, 14 Jul 2022 03:40:59 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D52C40CF8EE;
+        Thu, 14 Jul 2022 03:40:51 +0000 (UTC)
+Date:   Thu, 14 Jul 2022 11:40:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
+        hch@lst.de, kbusch@kernel.org, io-uring@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        a.manzanares@samsung.com, javier@javigon.com
-Content-Type: text/plain; charset="UTF-8"
+        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
+        gost.dev@samsung.com, ming.lei@redhat.com
+Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
+ io_uring_cmd
+Message-ID: <Ys+QPjYBDoByrfw1@T590>
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
+ <20220711110155.649153-4-joshi.k@samsung.com>
+ <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
+ <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
+ <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 8:05 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
-> add infrastructure for uring-cmd"), this extended the struct
-> file_operations to allow a new command which each subsystem can use
-> to enable command passthrough. Add an LSM specific for the command
-> passthrough which enables LSMs to inspect the command details.
->
-> This was discussed long ago without no clear pointer for something
-> conclusive, so this enables LSMs to at least reject this new file
-> operation.
->
-> [0] https://lkml.kernel.org/r/8adf55db-7bab-f59d-d612-ed906b948d19@schaufler-ca.com
+On Mon, Jul 11, 2022 at 09:22:54PM +0300, Sagi Grimberg wrote:
+> 
+> > > > Use the leftover space to carve 'next' field that enables linking of
+> > > > io_uring_cmd structs. Also introduce a list head and few helpers.
+> > > > 
+> > > > This is in preparation to support nvme-mulitpath, allowing multiple
+> > > > uring passthrough commands to be queued.
+> > > 
+> > > It's not clear to me why we need linking at that level?
+> > 
+> > I think the attempt is to allow something like blk_steal_bios that
+> > nvme leverages for io_uring_cmd(s).
+> 
+> I'll rephrase because now that I read it, I think my phrasing is
+> confusing.
+> 
+> I think the attempt is to allow something like blk_steal_bios that
+> nvme leverages, but for io_uring_cmd(s). Essentially allow io_uring_cmd
+> to be linked in a requeue_list.
 
-[NOTE: I now see that the IORING_OP_URING_CMD has made it into the
-v5.19-rcX releases, I'm going to be honest and say that I'm
-disappointed you didn't post the related LSM additions until
-v5.19-rc6, especially given our earlier discussions.]
+io_uring_cmd is 1:1 with pt request, so I am wondering why not retry on
+io_uring_cmd instance directly via io_uring_cmd_execute_in_task().
 
-While the earlier discussion may not have offered a detailed approach
-on how to solve this, I think it was rather conclusive in that the
-approach used then (and reproduced here) did not provide enough
-context to the LSMs to be able to make a decision.  There were similar
-concerns when it came to auditing the command passthrough.  It appears
-that most of my concerns in the original thread still apply to this
-patch.
+I feels it isn't necessary to link io_uring_cmd into list.
 
-Given the LSM hook in this patch, it is very difficult (impossible?)
-to determine the requested operation as these command opcodes are
-device/subsystem specific.  The unfortunate result is that the LSMs
-are likely going to either allow all, or none, of the commands for a
-given device/subsystem, and I think we can all agree that is not a
-good idea.
 
-That is the critical bit of feedback on this patch, but there is more
-feedback inline below.
+Thanks,
+Ming
 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> ---
->  include/linux/lsm_hook_defs.h | 1 +
->  include/linux/lsm_hooks.h     | 3 +++
->  include/linux/security.h      | 5 +++++
->  io_uring/uring_cmd.c          | 5 +++++
->  security/security.c           | 4 ++++
->  5 files changed, 18 insertions(+)
-
-...
-
-> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> index 0a421ed51e7e..5e666aa7edb8 100644
-> --- a/io_uring/uring_cmd.c
-> +++ b/io_uring/uring_cmd.c
-> @@ -3,6 +3,7 @@
->  #include <linux/errno.h>
->  #include <linux/file.h>
->  #include <linux/io_uring.h>
-> +#include <linux/security.h>
->
->  #include <uapi/linux/io_uring.h>
->
-> @@ -82,6 +83,10 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
->         struct file *file = req->file;
->         int ret;
->
-> +       ret = security_uring_cmd(ioucmd);
-> +       if (ret)
-> +               return ret;
-> +
->         if (!req->file->f_op->uring_cmd)
->                 return -EOPNOTSUPP;
->
-
-In order to be consistent with most of the other LSM hooks, the
-'req->file->f_op->uring_cmd' check should come before the LSM hook
-call.  The general approach used in most places is to first validate
-the request and do any DAC based access checks before calling into the
-LSM.
-
--- 
-paul-moore.com
