@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 916EBCCA47B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C51CCA483
 	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:09:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240297AbiGNSJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S240480AbiGNSJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 14 Jul 2022 14:09:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56402 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240559AbiGNSJN (ORCPT
+        with ESMTP id S240567AbiGNSJR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 14:09:13 -0400
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A541DA70
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:54 -0700 (PDT)
-Received: by mail-pj1-f41.google.com with SMTP id o3-20020a17090a744300b001ef8f7f3dddso3844457pjk.3
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:54 -0700 (PDT)
+        Thu, 14 Jul 2022 14:09:17 -0400
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64831EC40
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:58 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id x18-20020a17090a8a9200b001ef83b332f5so9445968pjn.0
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=EUoY0k2BuhL80C0ftNzAJFXnMEcQcdbAuqLljTbPns0=;
-        b=mi6k2prR4zzK9qzfNqMjkN22WkZ7dCkMEtVcdUh4TN2V4YeoAismo08skSRHOL/94h
-         fPJVE6CDTQHDKzTFinduxrZN4MoY8cYMovnApvSgppsm3LKDi+qt/EqYwELb6BsLUaH8
-         hJZlWuUP/rm2FLVgOEpqm/XU2vquA6wEkD7cwFKB0hszxA93fWbzMGpSLf8AwHcBTmRp
-         6b684tsliZh/ZtMmUeUYfcG5boPloUmsllg1LITSKG6ammGYzhMzKSPJmxPM4CarZcEV
-         R/qwh9ufMGQgA6kjSbpWFJG8Ffq+xAlp0cABrU0mwF/YtNzf2iEVGjDhpdcauAHr5sCO
-         jL2g==
-X-Gm-Message-State: AJIora+G1bxw9kubqzoZcX7UKx7SQe5KGNtgJ3rgpVJ2WCiVHkhtjHRs
-        RTX9jW1b9EzvCkM3l/1/v6U=
-X-Google-Smtp-Source: AGRyM1vjr5B8iUFeQTcnwyrQat+8SheHiuXiCfGDbkNc/ArqwLvQ7EM7bZYp/sknoUHKaWnPh9y8TQ==
-X-Received: by 2002:a17:902:6b41:b0:16a:55f6:95ee with SMTP id g1-20020a1709026b4100b0016a55f695eemr9465388plt.156.1657822134346;
-        Thu, 14 Jul 2022 11:08:54 -0700 (PDT)
+        bh=9lMphn1SUMaEEknT8kOhZa94blEe2vdGNgrXwL+uWb4=;
+        b=IYqzmAN9HS/a3D6lVNw3fjHZF6h5ZDfeXK3DKNmIN6wJ5ehWrASuxCsPM19XXOCj3R
+         F+1gHhwvj1EYKm1lRH2njcaBo7sc8IcQaqMwapchoCudnxu2K9/kqZyyEik1iAwTcbCr
+         3kWN+P8eJViJKMPEHkiS7GVInuW42qvF8Jea63u3w9g8cv+sTSitd1Cw7aeYQToktqhA
+         cveH+Y89CF9k+4WEdmYbQrmOFK9uGa5jzMmELy7/kGQPLSwz9AC4REHuz+u0OsB2Tz+j
+         xI8E4/1L4YUr22ZDrE3lUrIJQGQBcRCK7V5FOHFxjRAvIA3mEt6quatAA6yWtm1TlKWk
+         ZsCw==
+X-Gm-Message-State: AJIora8ynJpeUz9es8nyRT5kDmdRwuEE/Adx7oQWeAsbM1t9JXoHRJ+m
+        rvjkR53u2csxQ/VM4jVXbT0=
+X-Google-Smtp-Source: AGRyM1vwbX9geU6sMZ90kPnbp42+C3+fZwPY2m3pfnrmxShOufN2UYDcplhVWeT75jwGCFsHMAx1BQ==
+X-Received: by 2002:a17:902:c641:b0:16b:dd82:c04 with SMTP id s1-20020a170902c64100b0016bdd820c04mr9411909pls.144.1657822137476;
+        Thu, 14 Jul 2022 11:08:57 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9fab:70d1:f0e7:922b])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.08.52
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.08.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:08:53 -0700 (PDT)
+        Thu, 14 Jul 2022 11:08:56 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
-        Jan Kara <jack@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <djwong@kernel.org>
-Subject: [PATCH v3 48/63] fs/direct-io: Reduce the size of struct dio
-Date:   Thu, 14 Jul 2022 11:07:14 -0700
-Message-Id: <20220714180729.1065367-49-bvanassche@acm.org>
+        David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH v3 50/63] fs/btrfs: Use the enum req_op and blk_opf_t types
+Date:   Thu, 14 Jul 2022 11:07:16 -0700
+Message-Id: <20220714180729.1065367-51-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
 In-Reply-To: <20220714180729.1065367-1-bvanassche@acm.org>
 References: <20220714180729.1065367-1-bvanassche@acm.org>
@@ -56,196 +56,207 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reduce the size of struct dio by combining the 'op' and 'op_flags' into
-the new 'opf' member. Use the new blk_opf_t type to improve static type
-checking. This patch does not change any functionality.
+Improve static type checking by using the enum req_op type for variables
+that represent a request operation and the new blk_opf_t type for
+variables that represent request flags.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Darrick J. Wong <djwong@kernel.org>
+Acked-by: David Sterba <dsterba@suse.com>
+Cc: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- fs/direct-io.c | 40 +++++++++++++++++++++++-----------------
- 1 file changed, 23 insertions(+), 17 deletions(-)
+ fs/btrfs/check-integrity.c |  4 ++--
+ fs/btrfs/compression.c     |  6 +++---
+ fs/btrfs/compression.h     |  2 +-
+ fs/btrfs/extent_io.c       | 18 +++++++++---------
+ fs/btrfs/inode.c           |  4 ++--
+ fs/btrfs/raid56.c          |  4 ++--
+ 6 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 840752006f60..94b71440c332 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -117,8 +117,7 @@ struct dio_submit {
- /* dio_state communicated between submission path and end_io */
- struct dio {
- 	int flags;			/* doesn't change */
--	int op;
--	int op_flags;
-+	blk_opf_t opf;			/* request operation type and flags */
- 	struct gendisk *bio_disk;
- 	struct inode *inode;
- 	loff_t i_size;			/* i_size when submitted */
-@@ -167,12 +166,13 @@ static inline unsigned dio_pages_present(struct dio_submit *sdio)
-  */
- static inline int dio_refill_pages(struct dio *dio, struct dio_submit *sdio)
+diff --git a/fs/btrfs/check-integrity.c b/fs/btrfs/check-integrity.c
+index 5d20137b7b67..98c6e5feab19 100644
+--- a/fs/btrfs/check-integrity.c
++++ b/fs/btrfs/check-integrity.c
+@@ -152,7 +152,7 @@ struct btrfsic_block {
+ 	struct btrfsic_block *next_in_same_bio;
+ 	void *orig_bio_private;
+ 	bio_end_io_t *orig_bio_end_io;
+-	int submit_bio_bh_rw;
++	blk_opf_t submit_bio_bh_rw;
+ 	u64 flush_gen; /* only valid if !never_written */
+ };
+ 
+@@ -1681,7 +1681,7 @@ static void btrfsic_process_written_block(struct btrfsic_dev_state *dev_state,
+ 					  u64 dev_bytenr, char **mapped_datav,
+ 					  unsigned int num_pages,
+ 					  struct bio *bio, int *bio_is_patched,
+-					  int submit_bio_bh_rw)
++					  blk_opf_t submit_bio_bh_rw)
  {
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
- 	ssize_t ret;
+ 	int is_metadata;
+ 	struct btrfsic_block *block;
+diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+index f4564f32f6d9..a82b9f17f476 100644
+--- a/fs/btrfs/compression.c
++++ b/fs/btrfs/compression.c
+@@ -455,7 +455,7 @@ static blk_status_t submit_compressed_bio(struct btrfs_fs_info *fs_info,
  
- 	ret = iov_iter_get_pages(sdio->iter, dio->pages, LONG_MAX, DIO_PAGES,
- 				&sdio->from);
  
--	if (ret < 0 && sdio->blocks_available && (dio->op == REQ_OP_WRITE)) {
-+	if (ret < 0 && sdio->blocks_available && dio_op == REQ_OP_WRITE) {
- 		struct page *page = ZERO_PAGE(0);
- 		/*
- 		 * A memory fault, but the filesystem has some outstanding
-@@ -234,6 +234,7 @@ static inline struct page *dio_get_page(struct dio *dio,
-  */
- static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
+ static struct bio *alloc_compressed_bio(struct compressed_bio *cb, u64 disk_bytenr,
+-					unsigned int opf, bio_end_io_t endio_func,
++					blk_opf_t opf, bio_end_io_t endio_func,
+ 					u64 *next_stripe_start)
  {
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
- 	loff_t offset = dio->iocb->ki_pos;
- 	ssize_t transferred = 0;
- 	int err;
-@@ -251,7 +252,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
- 		transferred = dio->result;
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(cb->inode->i_sb);
+@@ -505,7 +505,7 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
+ 				 unsigned int compressed_len,
+ 				 struct page **compressed_pages,
+ 				 unsigned int nr_pages,
+-				 unsigned int write_flags,
++				 blk_opf_t write_flags,
+ 				 struct cgroup_subsys_state *blkcg_css,
+ 				 bool writeback)
+ {
+@@ -517,7 +517,7 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
+ 	blk_status_t ret;
+ 	int skip_sum = inode->flags & BTRFS_INODE_NODATASUM;
+ 	const bool use_append = btrfs_use_zone_append(inode, disk_start);
+-	const unsigned int bio_op = use_append ? REQ_OP_ZONE_APPEND : REQ_OP_WRITE;
++	const enum req_op bio_op = use_append ? REQ_OP_ZONE_APPEND : REQ_OP_WRITE;
  
- 		/* Check for short read case */
--		if ((dio->op == REQ_OP_READ) &&
-+		if (dio_op == REQ_OP_READ &&
- 		    ((offset + transferred) > dio->i_size))
- 			transferred = dio->i_size - offset;
- 		/* ignore EFAULT if some IO has been done */
-@@ -286,7 +287,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
- 	 * zeros from unwritten extents.
- 	 */
- 	if (flags & DIO_COMPLETE_INVALIDATE &&
--	    ret > 0 && dio->op == REQ_OP_WRITE &&
-+	    ret > 0 && dio_op == REQ_OP_WRITE &&
- 	    dio->inode->i_mapping->nrpages) {
- 		err = invalidate_inode_pages2_range(dio->inode->i_mapping,
- 					offset >> PAGE_SHIFT,
-@@ -305,7 +306,7 @@ static ssize_t dio_complete(struct dio *dio, ssize_t ret, unsigned int flags)
+ 	ASSERT(IS_ALIGNED(start, fs_info->sectorsize) &&
+ 	       IS_ALIGNED(len, fs_info->sectorsize));
+diff --git a/fs/btrfs/compression.h b/fs/btrfs/compression.h
+index 2707404389a5..2b56d63e01ce 100644
+--- a/fs/btrfs/compression.h
++++ b/fs/btrfs/compression.h
+@@ -99,7 +99,7 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
+ 				  unsigned int compressed_len,
+ 				  struct page **compressed_pages,
+ 				  unsigned int nr_pages,
+-				  unsigned int write_flags,
++				  blk_opf_t write_flags,
+ 				  struct cgroup_subsys_state *blkcg_css,
+ 				  bool writeback);
+ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 04e36343da3a..60a20df353e7 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -3357,7 +3357,7 @@ static int calc_bio_boundaries(struct btrfs_bio_ctrl *bio_ctrl,
+ static int alloc_new_bio(struct btrfs_inode *inode,
+ 			 struct btrfs_bio_ctrl *bio_ctrl,
+ 			 struct writeback_control *wbc,
+-			 unsigned int opf,
++			 blk_opf_t opf,
+ 			 bio_end_io_t end_io_func,
+ 			 u64 disk_bytenr, u32 offset, u64 file_offset,
+ 			 enum btrfs_compression_type compress_type)
+@@ -3437,7 +3437,7 @@ static int alloc_new_bio(struct btrfs_inode *inode,
+  * @prev_bio_flags:  flags of previous bio to see if we can merge the current one
+  * @compress_type:   compress type for current bio
+  */
+-static int submit_extent_page(unsigned int opf,
++static int submit_extent_page(blk_opf_t opf,
+ 			      struct writeback_control *wbc,
+ 			      struct btrfs_bio_ctrl *bio_ctrl,
+ 			      struct page *page, u64 disk_bytenr,
+@@ -3615,7 +3615,7 @@ __get_extent_map(struct inode *inode, struct page *page, size_t pg_offset,
+  */
+ static int btrfs_do_readpage(struct page *page, struct extent_map **em_cached,
+ 		      struct btrfs_bio_ctrl *bio_ctrl,
+-		      unsigned int read_flags, u64 *prev_em_start)
++		      blk_opf_t read_flags, u64 *prev_em_start)
+ {
+ 	struct inode *inode = page->mapping->host;
+ 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+@@ -3983,8 +3983,8 @@ static noinline_for_stack int __extent_writepage_io(struct btrfs_inode *inode,
+ 	int saved_ret = 0;
+ 	int ret = 0;
+ 	int nr = 0;
+-	u32 opf = REQ_OP_WRITE;
+-	const unsigned int write_flags = wbc_to_write_flags(wbc);
++	enum req_op op = REQ_OP_WRITE;
++	const blk_opf_t write_flags = wbc_to_write_flags(wbc);
+ 	bool has_error = false;
+ 	bool compressed;
+ 
+@@ -4058,7 +4058,7 @@ static noinline_for_stack int __extent_writepage_io(struct btrfs_inode *inode,
+ 		iosize = min(min(em_end, end + 1), dirty_range_end) - cur;
+ 
+ 		if (btrfs_use_zone_append(inode, em->block_start))
+-			opf = REQ_OP_ZONE_APPEND;
++			op = REQ_OP_ZONE_APPEND;
+ 
+ 		free_extent_map(em);
+ 		em = NULL;
+@@ -4094,7 +4094,7 @@ static noinline_for_stack int __extent_writepage_io(struct btrfs_inode *inode,
  		 */
- 		dio->iocb->ki_pos += transferred;
+ 		btrfs_page_clear_dirty(fs_info, page, cur, iosize);
  
--		if (ret > 0 && dio->op == REQ_OP_WRITE)
-+		if (ret > 0 && dio_op == REQ_OP_WRITE)
- 			ret = generic_write_sync(dio->iocb, ret);
- 		dio->iocb->ki_complete(dio->iocb, ret);
- 	}
-@@ -329,6 +330,7 @@ static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio);
- static void dio_bio_end_aio(struct bio *bio)
+-		ret = submit_extent_page(opf | write_flags, wbc,
++		ret = submit_extent_page(op | write_flags, wbc,
+ 					 &epd->bio_ctrl, page,
+ 					 disk_bytenr, iosize,
+ 					 cur - page_offset(page),
+@@ -4575,7 +4575,7 @@ static int write_one_subpage_eb(struct extent_buffer *eb,
  {
- 	struct dio *dio = bio->bi_private;
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
- 	unsigned long remaining;
- 	unsigned long flags;
- 	bool defer_completion = false;
-@@ -353,7 +355,7 @@ static void dio_bio_end_aio(struct bio *bio)
- 		 */
- 		if (dio->result)
- 			defer_completion = dio->defer_completion ||
--					   (dio->op == REQ_OP_WRITE &&
-+					   (dio_op == REQ_OP_WRITE &&
- 					    dio->inode->i_mapping->nrpages);
- 		if (defer_completion) {
- 			INIT_WORK(&dio->complete_work, dio_aio_complete_work);
-@@ -396,7 +398,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
- 	 * bio_alloc() is guaranteed to return a bio when allowed to sleep and
- 	 * we request a valid number of vectors.
- 	 */
--	bio = bio_alloc(bdev, nr_vecs, dio->op | dio->op_flags, GFP_KERNEL);
-+	bio = bio_alloc(bdev, nr_vecs, dio->opf, GFP_KERNEL);
- 	bio->bi_iter.bi_sector = first_sector;
- 	if (dio->is_async)
- 		bio->bi_end_io = dio_bio_end_aio;
-@@ -415,6 +417,7 @@ dio_bio_alloc(struct dio *dio, struct dio_submit *sdio,
-  */
- static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
- {
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
- 	struct bio *bio = sdio->bio;
- 	unsigned long flags;
- 
-@@ -426,7 +429,7 @@ static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
- 	dio->refcount++;
- 	spin_unlock_irqrestore(&dio->bio_lock, flags);
- 
--	if (dio->is_async && dio->op == REQ_OP_READ && dio->should_dirty)
-+	if (dio->is_async && dio_op == REQ_OP_READ && dio->should_dirty)
- 		bio_set_pages_dirty(bio);
- 
- 	dio->bio_disk = bio->bi_bdev->bd_disk;
-@@ -492,7 +495,8 @@ static struct bio *dio_await_one(struct dio *dio)
- static blk_status_t dio_bio_complete(struct dio *dio, struct bio *bio)
- {
- 	blk_status_t err = bio->bi_status;
--	bool should_dirty = dio->op == REQ_OP_READ && dio->should_dirty;
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
-+	bool should_dirty = dio_op == REQ_OP_READ && dio->should_dirty;
- 
- 	if (err) {
- 		if (err == BLK_STS_AGAIN && (bio->bi_opf & REQ_NOWAIT))
-@@ -619,6 +623,7 @@ static int dio_set_defer_completion(struct dio *dio)
- static int get_more_blocks(struct dio *dio, struct dio_submit *sdio,
- 			   struct buffer_head *map_bh)
- {
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+ 	struct btrfs_fs_info *fs_info = eb->fs_info;
+ 	struct page *page = eb->pages[0];
+-	unsigned int write_flags = wbc_to_write_flags(wbc) | REQ_META;
++	blk_opf_t write_flags = wbc_to_write_flags(wbc) | REQ_META;
+ 	bool no_dirty_ebs = false;
  	int ret;
- 	sector_t fs_startblk;	/* Into file, in filesystem-sized blocks */
- 	sector_t fs_endblk;	/* Into file, in filesystem-sized blocks */
-@@ -653,7 +658,7 @@ static int get_more_blocks(struct dio *dio, struct dio_submit *sdio,
- 		 * which may decide to handle it or also return an unmapped
- 		 * buffer head.
- 		 */
--		create = dio->op == REQ_OP_WRITE;
-+		create = dio_op == REQ_OP_WRITE;
- 		if (dio->flags & DIO_SKIP_HOLES) {
- 			i_size = i_size_read(dio->inode);
- 			if (i_size && fs_startblk <= (i_size - 1) >> i_blkbits)
-@@ -801,10 +806,11 @@ submit_page_section(struct dio *dio, struct dio_submit *sdio, struct page *page,
- 		    unsigned offset, unsigned len, sector_t blocknr,
- 		    struct buffer_head *map_bh)
+ 
+@@ -4620,7 +4620,7 @@ static noinline_for_stack int write_one_eb(struct extent_buffer *eb,
  {
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
+ 	u64 disk_bytenr = eb->start;
+ 	int i, num_pages;
+-	unsigned int write_flags = wbc_to_write_flags(wbc) | REQ_META;
++	blk_opf_t write_flags = wbc_to_write_flags(wbc) | REQ_META;
  	int ret = 0;
- 	int boundary = sdio->boundary;	/* dio_send_cur_page may clear it */
  
--	if (dio->op == REQ_OP_WRITE) {
-+	if (dio_op == REQ_OP_WRITE) {
- 		/*
- 		 * Read accounting is performed in submit_bio()
- 		 */
-@@ -917,6 +923,7 @@ static inline void dio_zero_block(struct dio *dio, struct dio_submit *sdio,
- static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
- 			struct buffer_head *map_bh)
+ 	prepare_eb_write(eb);
+diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
+index 05e0c4a5affd..f8378c949be4 100644
+--- a/fs/btrfs/inode.c
++++ b/fs/btrfs/inode.c
+@@ -485,7 +485,7 @@ struct async_chunk {
+ 	struct page *locked_page;
+ 	u64 start;
+ 	u64 end;
+-	unsigned int write_flags;
++	blk_opf_t write_flags;
+ 	struct list_head extents;
+ 	struct cgroup_subsys_state *blkcg_css;
+ 	struct btrfs_work work;
+@@ -1435,7 +1435,7 @@ static int cow_file_range_async(struct btrfs_inode *inode,
+ 	int i;
+ 	bool should_compress;
+ 	unsigned nofs_flag;
+-	const unsigned int write_flags = wbc_to_write_flags(wbc);
++	const blk_opf_t write_flags = wbc_to_write_flags(wbc);
+ 
+ 	unlock_extent(&inode->io_tree, start, end);
+ 
+diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
+index a5b623ee6fac..c520412d1f86 100644
+--- a/fs/btrfs/raid56.c
++++ b/fs/btrfs/raid56.c
+@@ -1136,7 +1136,7 @@ static int rbio_add_io_sector(struct btrfs_raid_bio *rbio,
+ 			      unsigned int stripe_nr,
+ 			      unsigned int sector_nr,
+ 			      unsigned long bio_max_len,
+-			      unsigned int opf)
++			      enum req_op op)
  {
-+	const enum req_op dio_op = dio->opf & REQ_OP_MASK;
- 	const unsigned blkbits = sdio->blkbits;
- 	const unsigned i_blkbits = blkbits + sdio->blkfactor;
- 	int ret = 0;
-@@ -992,7 +999,7 @@ static int do_direct_IO(struct dio *dio, struct dio_submit *sdio,
- 				loff_t i_size_aligned;
+ 	const u32 sectorsize = rbio->bioc->fs_info->sectorsize;
+ 	struct bio *last = bio_list->tail;
+@@ -1181,7 +1181,7 @@ static int rbio_add_io_sector(struct btrfs_raid_bio *rbio,
  
- 				/* AKPM: eargh, -ENOTBLK is a hack */
--				if (dio->op == REQ_OP_WRITE) {
-+				if (dio_op == REQ_OP_WRITE) {
- 					put_page(page);
- 					return -ENOTBLK;
- 				}
-@@ -1196,12 +1203,11 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+ 	/* put a new bio on the list */
+ 	bio = bio_alloc(stripe->dev->bdev, max(bio_max_len >> PAGE_SHIFT, 1UL),
+-			opf, GFP_NOFS);
++			op, GFP_NOFS);
+ 	bio->bi_iter.bi_sector = disk_start >> 9;
+ 	bio->bi_private = rbio;
  
- 	dio->inode = inode;
- 	if (iov_iter_rw(iter) == WRITE) {
--		dio->op = REQ_OP_WRITE;
--		dio->op_flags = REQ_SYNC | REQ_IDLE;
-+		dio->opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
- 		if (iocb->ki_flags & IOCB_NOWAIT)
--			dio->op_flags |= REQ_NOWAIT;
-+			dio->opf |= REQ_NOWAIT;
- 	} else {
--		dio->op = REQ_OP_READ;
-+		dio->opf = REQ_OP_READ;
- 	}
- 
- 	/*
