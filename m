@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 722F3C43334
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:09:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F721C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:09:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240486AbiGNSJf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 14:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56458 "EHLO
+        id S240513AbiGNSJg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 14:09:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240586AbiGNSJS (ORCPT
+        with ESMTP id S240587AbiGNSJS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 14 Jul 2022 14:09:18 -0400
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C84B813F21
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:08 -0700 (PDT)
-Received: by mail-pj1-f45.google.com with SMTP id o15so3575728pjh.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:08 -0700 (PDT)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE96A1F630
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:09 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id i8-20020a17090a4b8800b001ef8a65bfbdso3865853pjh.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:09:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=aeMYSY8iDviRZiTG9cEA+YD61nSxKsTjjgptB5cDRxU=;
-        b=pQc4HMo2E9x2edl8elbSCxD42TkYg2K7YXhQGkeXSKdX/SwJJlmmq5qdApbv31+TN2
-         jeNIk5bLMY6mWsVb14Rt35+Va9idvBBQZ+xyuy3yxuzZ8Mx4495p8jiEN+9ZzWfy7oUh
-         dV/hkc5pNUZ9nTw69lbkjtNZMPjDp6p5DvMmrBWJO/0adpjtsa+bwx0osditwxgbS4UK
-         3wRLvTjHGUehRCZPMec2ngNGUuNXNwGQnDg2u2iqYRI5HWSX/dzik8Vcw/RIrUn/67bG
-         stkY87D7gD0b/Fbueh1tEu7ZvsERfalPlkFIeoA/Bw7gwZzEQW3uVk85XrodL2TEKtRs
-         Z7mA==
-X-Gm-Message-State: AJIora/ka+gWSdygqMmDs1TNC3pFXz2ig2Zu2+qaxNmBuvrlwfsEd2R/
-        ++v7gUqioSyNON8NBClu+vY=
-X-Google-Smtp-Source: AGRyM1tE5KjNy63uV9NLJZ2/VA5Qfw078BPa1/ILjFsm6sK9TeVmatKx+BUB/yhYcEVZttr1VH3W7Q==
-X-Received: by 2002:a17:90b:3648:b0:1ef:7c45:62cb with SMTP id nh8-20020a17090b364800b001ef7c4562cbmr17888281pjb.132.1657822147964;
-        Thu, 14 Jul 2022 11:09:07 -0700 (PDT)
+        bh=fwZgRIbeTJ8+UmoWbPxfXxKQtrGzbjX7MkK2nUi2Kgk=;
+        b=iNn3si5SsWeq7GBzX3VC9FJIOSHh4a7B25VvETUGIW1iV2S0hO4nVLR3WppblWPMgl
+         aEz7D6wXFRFrHaRs6H3kQk6vW1vHkI1A5XlR3SYvuAkZuA7QutMYrtsWd1NMN5RfXXET
+         izXt9vyFVAcG9Xhfh20THzXq3f/51pODgUf5TlhueTFFNDM4t/NkiS+YgB1SodAuCYNZ
+         SLFGv+oXltzWV0Vt0uM6RCLxgVO6ruNg8YcHbzV3FmrDKRkfBqenfoQb7HW4uJSWBAKr
+         NDRt6TyZmCoIrWLxorYm9noKljRQ8BgGFnLIIuleCmXaarcXZ+hor0NvT45LnbItYnJK
+         FQBg==
+X-Gm-Message-State: AJIora8DDlHLAOsvWu99abAvEq6/UQDgUBbHVDjuAkyKdK09akfYbOyr
+        zKoZRKju9QP79SAcOLwW4PI=
+X-Google-Smtp-Source: AGRyM1uLEPDzbPIvYUhlFYTg6pjnSzyp01wHRLDNJwKxsf6E9Lw8Z2lhWLgC8zTRhT7OaUJFBhIkVQ==
+X-Received: by 2002:a17:902:f544:b0:16c:5119:d4c2 with SMTP id h4-20020a170902f54400b0016c5119d4c2mr9368872plf.1.1657822149558;
+        Thu, 14 Jul 2022 11:09:09 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9fab:70d1:f0e7:922b])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.09.06
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.09.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:09:07 -0700 (PDT)
+        Thu, 14 Jul 2022 11:09:08 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
-        Mike Christie <michael.christie@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH v3 56/63] fs/jbd2: Fix the documentation of the jbd2_write_superblock() callers
-Date:   Thu, 14 Jul 2022 11:07:22 -0700
-Message-Id: <20220714180729.1065367-57-bvanassche@acm.org>
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>
+Subject: [PATCH v3 57/63] fs/nfs: Use enum req_op where appropriate
+Date:   Thu, 14 Jul 2022 11:07:23 -0700
+Message-Id: <20220714180729.1065367-58-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
 In-Reply-To: <20220714180729.1065367-1-bvanassche@acm.org>
 References: <20220714180729.1065367-1-bvanassche@acm.org>
@@ -56,126 +56,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 2a222ca992c3 ("fs: have submit_bh users pass in op and flags
-separately") renamed the jbd2_write_superblock() 'write_op' argument into
-'write_flags'. Propagate this change to the jbd2_write_superblock()
-callers. Additionally, change the type of 'write_flags' into blk_opf_t.
+Improve static type checking by using enum req_op for request operations.
+Rename an 'rw' argument into 'op' since that name is typically used for
+request operations. This patch does not change any functionality. Note:
+REQ_OP_READ = READ = 0 and REQ_OP_WRITE = WRITE = 1.
 
-Cc: Mike Christie <michael.christie@oracle.com>
-Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Trond Myklebust <trond.myklebust@hammerspace.com>
+Cc: Anna Schumaker <anna@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- fs/jbd2/journal.c           | 15 ++++++++-------
- include/linux/jbd2.h        |  2 +-
- include/trace/events/jbd2.h | 12 ++++++------
- 3 files changed, 15 insertions(+), 14 deletions(-)
+ fs/nfs/blocklayout/blocklayout.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
-index 07e6aaf7e213..2a1b9da7c3e3 100644
---- a/fs/jbd2/journal.c
-+++ b/fs/jbd2/journal.c
-@@ -1604,7 +1604,7 @@ static int journal_reset(journal_t *journal)
-  * This function expects that the caller will have locked the journal
-  * buffer head, and will return with it unlocked
-  */
--static int jbd2_write_superblock(journal_t *journal, int write_flags)
-+static int jbd2_write_superblock(journal_t *journal, blk_opf_t write_flags)
- {
- 	struct buffer_head *bh = journal->j_sb_buffer;
- 	journal_superblock_t *sb = journal->j_superblock;
-@@ -1661,13 +1661,14 @@ static int jbd2_write_superblock(journal_t *journal, int write_flags)
-  * @journal: The journal to update.
-  * @tail_tid: TID of the new transaction at the tail of the log
-  * @tail_block: The first block of the transaction at the tail of the log
-- * @write_op: With which operation should we write the journal sb
-+ * @write_flags: Flags for the journal sb write operation
-  *
-  * Update a journal's superblock information about log tail and write it to
-  * disk, waiting for the IO to complete.
-  */
- int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
--				     unsigned long tail_block, int write_op)
-+				    unsigned long tail_block,
-+				    blk_opf_t write_flags)
- {
- 	journal_superblock_t *sb = journal->j_superblock;
- 	int ret;
-@@ -1687,7 +1688,7 @@ int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
- 	sb->s_sequence = cpu_to_be32(tail_tid);
- 	sb->s_start    = cpu_to_be32(tail_block);
+diff --git a/fs/nfs/blocklayout/blocklayout.c b/fs/nfs/blocklayout/blocklayout.c
+index 79a8b451791f..943aeea1eb16 100644
+--- a/fs/nfs/blocklayout/blocklayout.c
++++ b/fs/nfs/blocklayout/blocklayout.c
+@@ -121,7 +121,7 @@ static bool offset_in_map(u64 offset, struct pnfs_block_dev_map *map)
+ }
  
--	ret = jbd2_write_superblock(journal, write_op);
-+	ret = jbd2_write_superblock(journal, write_flags);
- 	if (ret)
- 		goto out;
+ static struct bio *
+-do_add_page_to_bio(struct bio *bio, int npg, int rw, sector_t isect,
++do_add_page_to_bio(struct bio *bio, int npg, enum req_op op, sector_t isect,
+ 		struct page *page, struct pnfs_block_dev_map *map,
+ 		struct pnfs_block_extent *be, bio_end_io_t end_io,
+ 		struct parallel_io *par, unsigned int offset, int *len)
+@@ -131,7 +131,7 @@ do_add_page_to_bio(struct bio *bio, int npg, int rw, sector_t isect,
+ 	u64 disk_addr, end;
  
-@@ -1704,12 +1705,12 @@ int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
- /**
-  * jbd2_mark_journal_empty() - Mark on disk journal as empty.
-  * @journal: The journal to update.
-- * @write_op: With which operation should we write the journal sb
-+ * @write_flags: Flags for the journal sb write operation
-  *
-  * Update a journal's dynamic superblock fields to show that journal is empty.
-  * Write updated superblock to disk waiting for IO to complete.
-  */
--static void jbd2_mark_journal_empty(journal_t *journal, int write_op)
-+static void jbd2_mark_journal_empty(journal_t *journal, blk_opf_t write_flags)
- {
- 	journal_superblock_t *sb = journal->j_superblock;
- 	bool had_fast_commit = false;
-@@ -1735,7 +1736,7 @@ static void jbd2_mark_journal_empty(journal_t *journal, int write_op)
- 		had_fast_commit = true;
- 	}
+ 	dprintk("%s: npg %d rw %d isect %llu offset %u len %d\n", __func__,
+-		npg, rw, (unsigned long long)isect, offset, *len);
++		npg, (__force u32)op, (unsigned long long)isect, offset, *len);
  
--	jbd2_write_superblock(journal, write_op);
-+	jbd2_write_superblock(journal, write_flags);
+ 	/* translate to device offset */
+ 	isect += be->be_v_offset;
+@@ -154,7 +154,7 @@ do_add_page_to_bio(struct bio *bio, int npg, int rw, sector_t isect,
  
- 	if (had_fast_commit)
- 		jbd2_set_feature_fast_commit(journal);
-diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
-index e79d6e0b14e8..dc1724131300 100644
---- a/include/linux/jbd2.h
-+++ b/include/linux/jbd2.h
-@@ -1557,7 +1557,7 @@ extern int	   jbd2_journal_wipe       (journal_t *, int);
- extern int	   jbd2_journal_skip_recovery	(journal_t *);
- extern void	   jbd2_journal_update_sb_errno(journal_t *);
- extern int	   jbd2_journal_update_sb_log_tail	(journal_t *, tid_t,
--				unsigned long, int);
-+				unsigned long, blk_opf_t);
- extern void	   jbd2_journal_abort      (journal_t *, int);
- extern int	   jbd2_journal_errno      (journal_t *);
- extern void	   jbd2_journal_ack_err    (journal_t *);
-diff --git a/include/trace/events/jbd2.h b/include/trace/events/jbd2.h
-index a4dfe005983d..99f783c384bb 100644
---- a/include/trace/events/jbd2.h
-+++ b/include/trace/events/jbd2.h
-@@ -355,22 +355,22 @@ TRACE_EVENT(jbd2_update_log_tail,
+ retry:
+ 	if (!bio) {
+-		bio = bio_alloc(map->bdev, bio_max_segs(npg), rw, GFP_NOIO);
++		bio = bio_alloc(map->bdev, bio_max_segs(npg), op, GFP_NOIO);
+ 		bio->bi_iter.bi_sector = disk_addr >> SECTOR_SHIFT;
+ 		bio->bi_end_io = end_io;
+ 		bio->bi_private = par;
+@@ -291,7 +291,7 @@ bl_read_pagelist(struct nfs_pgio_header *header)
+ 		} else {
+ 			bio = do_add_page_to_bio(bio,
+ 						 header->page_array.npages - i,
+-						 READ,
++						 REQ_OP_READ,
+ 						 isect, pages[i], &map, &be,
+ 						 bl_end_io_read, par,
+ 						 pg_offset, &pg_len);
+@@ -420,9 +420,8 @@ bl_write_pagelist(struct nfs_pgio_header *header, int sync)
  
- TRACE_EVENT(jbd2_write_superblock,
- 
--	TP_PROTO(journal_t *journal, int write_op),
-+	TP_PROTO(journal_t *journal, blk_opf_t write_flags),
- 
--	TP_ARGS(journal, write_op),
-+	TP_ARGS(journal, write_flags),
- 
- 	TP_STRUCT__entry(
- 		__field(	dev_t,  dev			)
--		__field(	  int,  write_op		)
-+		__field(    blk_opf_t,  write_flags		)
- 	),
- 
- 	TP_fast_assign(
- 		__entry->dev		= journal->j_fs_dev->bd_dev;
--		__entry->write_op	= write_op;
-+		__entry->write_flags	= write_flags;
- 	),
- 
--	TP_printk("dev %d,%d write_op %x", MAJOR(__entry->dev),
--		  MINOR(__entry->dev), __entry->write_op)
-+	TP_printk("dev %d,%d write_flags %x", MAJOR(__entry->dev),
-+		  MINOR(__entry->dev), (__force u32)__entry->write_flags)
- );
- 
- TRACE_EVENT(jbd2_lock_buffer_stall,
+ 		pg_len = PAGE_SIZE;
+ 		bio = do_add_page_to_bio(bio, header->page_array.npages - i,
+-					 WRITE, isect, pages[i], &map, &be,
+-					 bl_end_io_write, par,
+-					 0, &pg_len);
++					 REQ_OP_WRITE, isect, pages[i], &map,
++					 &be, bl_end_io_write, par, 0, &pg_len);
+ 		if (IS_ERR(bio)) {
+ 			header->pnfs_error = PTR_ERR(bio);
+ 			bio = NULL;
