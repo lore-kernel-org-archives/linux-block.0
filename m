@@ -2,93 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7A3CCA479
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 03:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED6EC43334
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 04:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232139AbiGNDlK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jul 2022 23:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56622 "EHLO
+        id S232500AbiGNEWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 00:22:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbiGNDlJ (ORCPT
+        with ESMTP id S232089AbiGNEWW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jul 2022 23:41:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3139B21E19
-        for <linux-block@vger.kernel.org>; Wed, 13 Jul 2022 20:41:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657770064;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3PqAwSujQrcFKBakWmxqsGxJDNIOKr6UoNvVqvwCEF4=;
-        b=EDC1bRo1y/XQDQk1vWuMH9c3WGg2gPN+Ue7vz/ctamE7A7Jx6bulURSM+ahqhCY0Snmlqa
-        fIIrmwEsNIRfmTNO+03JEq52U32q6c6/A/PFMrs8Nl2sSrwQFBdkSa4uscD35BlG59LiZR
-        R7ztKKB3LGfKBaahViArA7wrBAG+lB4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-498-lj0l3Q0eN2CkbUOOcky_hw-1; Wed, 13 Jul 2022 23:41:00 -0400
-X-MC-Unique: lj0l3Q0eN2CkbUOOcky_hw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E77CB1C14487;
-        Thu, 14 Jul 2022 03:40:59 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D52C40CF8EE;
-        Thu, 14 Jul 2022 03:40:51 +0000 (UTC)
-Date:   Thu, 14 Jul 2022 11:40:46 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshi.k@samsung.com>,
-        hch@lst.de, kbusch@kernel.org, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
-        gost.dev@samsung.com, ming.lei@redhat.com
-Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
- io_uring_cmd
-Message-ID: <Ys+QPjYBDoByrfw1@T590>
-References: <20220711110155.649153-1-joshi.k@samsung.com>
- <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
- <20220711110155.649153-4-joshi.k@samsung.com>
- <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
- <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
- <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me>
+        Thu, 14 Jul 2022 00:22:22 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2596252A8;
+        Wed, 13 Jul 2022 21:22:21 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26E3mtTN014131;
+        Thu, 14 Jul 2022 04:22:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2021-07-09;
+ bh=gEUw90tZk1r6yssH4yKKHaYEgG74IVVFYSQOQADC5Ow=;
+ b=MXdmOyY5wgDj50uWlKf1qopBWQoEEAgNrzs19qJg1WNs+QLJ4BTuWJsLUV4/N67UE2PV
+ jU+wEmpT3n0rPOXoGAe3WzUjbmCrCYpBcD+D0XaqfzwTOzpTEODG+t59dDF2Ssma/fOX
+ nEJit07qlKA9wLEGkAb6iVaV6NyxkyOGLZVept0ue1pvriXLQ47jC2sp7+VqDsJmpP6f
+ x3H8jtIa3apiUh4a5rQdWj5LZ+OVBUEJCgF+PUpObFWgM0SXEEjniPIOO6/o22hQJTSX
+ 1B+W3vteQi3rTOeXGqN6mu8IVpwyMxoQy6sBMMZj6qGIPCui1kgFyEwDPZUZvjBsd1Lg dA== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3h71scc27p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jul 2022 04:22:16 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 26E4Ap8l000933;
+        Thu, 14 Jul 2022 04:22:16 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3h7045au2m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 14 Jul 2022 04:22:16 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 26E4MD5J024736;
+        Thu, 14 Jul 2022 04:22:15 GMT
+Received: from ca-mkp.mkp.ca.oracle.com (ca-mkp.ca.oracle.com [10.156.108.201])
+        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3h7045au20-4;
+        Thu, 14 Jul 2022 04:22:15 +0000
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     linux-scsi@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        sumit.saxena@broadcom.com, linux-block@vger.kernel.org,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Guangwu Zhang <guazhang@redhat.com>,
+        Hannes Reinecke <hare@suse.de>, chandrakanth.patil@broadcom.com
+Subject: Re: [PATCH] scsi: megaraid: clear READ queue map's nr_queues
+Date:   Thu, 14 Jul 2022 00:22:11 -0400
+Message-Id: <165777180151.4401.1027468101338336442.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220706125942.528533-1-ming.lei@redhat.com>
+References: <20220706125942.528533-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: DQZd2I2Wc-0psZdV_7XDZMr5kYFsUBkL
+X-Proofpoint-ORIG-GUID: DQZd2I2Wc-0psZdV_7XDZMr5kYFsUBkL
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 11, 2022 at 09:22:54PM +0300, Sagi Grimberg wrote:
+On Wed, 6 Jul 2022 20:59:42 +0800, Ming Lei wrote:
+
+> megaraid scsi driver sets set->nr_maps as 3 if poll_queues is > 0, and
+> blk-mq actually initializes each map's nr_queues as nr_hw_queues, so
+> megaraid driver has to clear READ queue map's nr_queues, otherwise queue
+> map becomes broken if poll_queues is set as non-zero.
 > 
-> > > > Use the leftover space to carve 'next' field that enables linking of
-> > > > io_uring_cmd structs. Also introduce a list head and few helpers.
-> > > > 
-> > > > This is in preparation to support nvme-mulitpath, allowing multiple
-> > > > uring passthrough commands to be queued.
-> > > 
-> > > It's not clear to me why we need linking at that level?
-> > 
-> > I think the attempt is to allow something like blk_steal_bios that
-> > nvme leverages for io_uring_cmd(s).
 > 
-> I'll rephrase because now that I read it, I think my phrasing is
-> confusing.
-> 
-> I think the attempt is to allow something like blk_steal_bios that
-> nvme leverages, but for io_uring_cmd(s). Essentially allow io_uring_cmd
-> to be linked in a requeue_list.
 
-io_uring_cmd is 1:1 with pt request, so I am wondering why not retry on
-io_uring_cmd instance directly via io_uring_cmd_execute_in_task().
+Applied to 5.19/scsi-fixes, thanks!
 
-I feels it isn't necessary to link io_uring_cmd into list.
+[1/1] scsi: megaraid: clear READ queue map's nr_queues
+      https://git.kernel.org/mkp/scsi/c/8312cd3a7b83
 
-
-Thanks,
-Ming
-
+-- 
+Martin K. Petersen	Oracle Linux Engineering
