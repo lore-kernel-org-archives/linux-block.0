@@ -2,228 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C408C43334
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 10:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 542C2C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 13:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235397AbiGNKtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 06:49:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58540 "EHLO
+        id S230460AbiGNNBH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 09:01:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238539AbiGNKtB (ORCPT
+        with ESMTP id S239209AbiGNNBG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 06:49:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 813EEF59B
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 03:48:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657795738;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=DzTeR2rmk7qmr31e8W4zO+N/0UYr/rJ97WwWMsCN/PI=;
-        b=RLSqGjQsDvivrGrQ2SalsieWO6RMOh8ME3B4Rw85HKusl6vR7snmdSd9/x1DGNojllQvsM
-        9QK0fLahqJ1ZobR389tB4mmcSyEyu5yiQEQvGU8Qycxx4wyzn3b/Kk8WiRb4xowyDlxU/7
-        cwtjPmq+9quA6FpLoz+7PkHBXpt7hKk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-eBwoO6OIM6aOnMs7XGa7jg-1; Thu, 14 Jul 2022 06:48:55 -0400
-X-MC-Unique: eBwoO6OIM6aOnMs7XGa7jg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1AF443C0D195;
-        Thu, 14 Jul 2022 10:48:55 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 32C48141511D;
-        Thu, 14 Jul 2022 10:48:49 +0000 (UTC)
-Date:   Thu, 14 Jul 2022 18:48:45 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        ming.lei@redhat.com
-Subject: Re: [PATCH V5 1/2] ublk_drv: add io_uring based userspace block
- driver
-Message-ID: <Ys/0jTxQCEHdI560@T590>
-References: <20220713140711.97356-1-ming.lei@redhat.com>
- <20220713140711.97356-2-ming.lei@redhat.com>
- <a4249561-84a0-a314-c377-b96d28b7b20b@linux.alibaba.com>
+        Thu, 14 Jul 2022 09:01:06 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5545B04A
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 06:01:05 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id f11so1473118pgj.7
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 06:01:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=r/8zyWfZCvNbLpmSSP7gthGFGvc5Hlv8LoSGYxVx1nQ=;
+        b=jVVC+lJtbuKGOvZkRtgpYjXpzMVxBDEk2XHZD4FADnm2dji0WUwE54qx08UWpkmxFg
+         Lr7bfES+kJ4jfGmlXdtHs3jxS1HcHbTbChtBW2kKNs7HFwQu/2MFAAFPIXwcUKaRiDR8
+         3TyT5fJVs9eTTJ7J4Z6GjYlLRA/9A8QDmj8qh2bXCuzyZqPtqlkc+c5rosEEdqEg9GGn
+         mr+JjGjBkENWPzO1E68rNi4JcdLlEZpCNqpyks5e6eRNX/4bxANeqa2e61vAZaTvRUnG
+         VbZdSQUD9wc+Y8BOqtTkNVgmSaF6IsJEfWE2HbR0kGJvrgMrUMhGcBnsPMn+uS6Nb6Q1
+         /vMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=r/8zyWfZCvNbLpmSSP7gthGFGvc5Hlv8LoSGYxVx1nQ=;
+        b=uD8mp9oiEUOKiTvTtPkjtht1S8fxN6oJS6QEPztQkH9yFCsD/R+i67lB2wvNSgpoze
+         FbThKacl65vtqyz8tvrtLjYHk8McEsFHQ9rsGs+J6vNTJyN7M5UNfVjqcowsdngVVFnd
+         Me2kHq2yEzqzmwjextdexeRrRN8rbnqXADVo+9O19TwPNMxTv9c1nZzW31TpyL0Dmt+y
+         RZGwWlWgmzTA7eNYpyxakjETdHqxhsqEiSjqrXBhfo4ro1WU/GEx7QTibFr7pmBQkAWn
+         +DrHdifLNC4c35K+J5Sy8ks4Ph70SmjRXp4H0VwuarrvvPX6oCWwErllYyoXvkeeUJH7
+         LXPg==
+X-Gm-Message-State: AJIora8pYQTl3VfPfcBSAbq8xnYtZTzLauyUeXF9VzWg1cpEhzj8bp6u
+        50TdcocrXWkkHC6xyWd/vju8Q4ccZijfkQ==
+X-Google-Smtp-Source: AGRyM1ucxXLv3oJ3FkNgOlrzes0pVUKBC+bLnQaB4f3FZs/xQz9i8DDmAjlHsieeF5B2qWkNvejb5w==
+X-Received: by 2002:a65:6d1a:0:b0:3fb:2109:7b87 with SMTP id bf26-20020a656d1a000000b003fb21097b87mr7471169pgb.127.1657803661001;
+        Thu, 14 Jul 2022 06:01:01 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id h3-20020a63c003000000b00416018b5bbbsm1271156pgg.76.2022.07.14.06.01.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Jul 2022 06:01:00 -0700 (PDT)
+Message-ID: <47f6931d-5bb3-bc7e-51db-ef2e9d54d01b@kernel.dk>
+Date:   Thu, 14 Jul 2022 07:00:59 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a4249561-84a0-a314-c377-b96d28b7b20b@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] ublk_drv: fix request queue leak
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+References: <20220714103201.131648-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220714103201.131648-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 14, 2022 at 06:20:38PM +0800, Ziyang Zhang wrote:
-> On 2022/7/13 22:07, Ming Lei wrote:
-> > This is the driver part of userspace block driver(ublk driver), the other
-> > part is userspace daemon part(ublksrv)[1].
-> > 
-> > The two parts communicate by io_uring's IORING_OP_URING_CMD with one
-> > shared cmd buffer for storing io command, and the buffer is read only for
-> > ublksrv, each io command is indexed by io request tag directly, and
-> > is written by ublk driver.
-> > 
-> > For example, when one READ io request is submitted to ublk block driver, ublk
-> > driver stores the io command into cmd buffer first, then completes one
-> > IORING_OP_URING_CMD for notifying ublksrv, and the URING_CMD is issued to
-> > ublk driver beforehand by ublksrv for getting notification of any new io request,
-> > and each URING_CMD is associated with one io request by tag.
-> > 
-> > After ublksrv gets the io command, it translates and handles the ublk io
-> > request, such as, for the ublk-loop target, ublksrv translates the request
-> > into same request on another file or disk, like the kernel loop block
-> > driver. In ublksrv's implementation, the io is still handled by io_uring,
-> > and share same ring with IORING_OP_URING_CMD command. When the target io
-> > request is done, the same IORING_OP_URING_CMD is issued to ublk driver for
-> > both committing io request result and getting future notification of new
-> > io request.
-> > 
-> > Another thing done by ublk driver is to copy data between kernel io
-> > request and ublksrv's io buffer:
-> > 
-> > 1) before ubsrv handles WRITE request, copy the request's data into
-> > ublksrv's userspace io buffer, so that ublksrv can handle the write
-> > request
-> > 
-> > 2) after ubsrv handles READ request, copy ublksrv's userspace io buffer
-> > into this READ request, then ublk driver can complete the READ request
-> > 
-> > Zero copy may be switched if mm is ready to support it.
-> > 
-> > ublk driver doesn't handle any logic of the specific user space driver,
-> > so it is small/simple enough.
-> > 
-> > [1] ublksrv
-> > 
-> > https://github.com/ming1/ubdsrv
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
+On 7/14/22 4:32 AM, Ming Lei wrote:
+> Call blk_cleanup_queue() in release code path for fixing request
+> queue leak.
 > 
+> Also for-5.20/block has cleaned up blk_cleanup_queue(), which is
+> basically merged to del_gendisk() if blk_mq_alloc_disk() is used
+> for allocating disk and queue.
 > 
-> Hi, Ming
+> However, ublk may not add disk in case of starting device failure, then
+> del_gendisk() won't be called when removing ublk device, so blk_mq_exit_queue
+> will not be callsed, and it can be bit hard to deal with this kind of
+> merge conflict.
 > 
-> I find that a big change from v4 to v5 is the simplification of locks.
-> 
-> In v5 you remove ubq->abort_lock, and I want to ask why it is OK to remove it?
+> Turns out ublk's queue/disk use model is very similar with scsi, so switch
+> to scsi's model by allocating disk and queue independently, then it can be
+> quite easy to handle v5.20 merge conflict by replacing blk_cleanup_queue
+> with blk_mq_destroy_queue.
 
-Actually V4 and previous version dealt with the issue too complicated.
+Tried this with the below incremental added to make it compile with
+the core block changes too, and it still fails for me:
 
-> 
-> If you have time, could you explain how ublk deals with potential race on:
-> 1)queue_rq 2)ublk_abort_queue 3) ublk_ctrl_stop_dev 4) ublk_rq_task_work.
-> (Lock in ublk really confuses me...)
-
-One big change is the following code:
-
-__ublk_rq_task_work():
-	bool task_exiting = current != ubq->ubq_daemon ||
-                (current->flags & PF_EXITING);
-	...
-	if (unlikely(task_exiting)) {
-                blk_mq_end_request(req, BLK_STS_IOERR);
-                mod_delayed_work(system_wq, &ub->monitor_work, 0);
-                return;
-    }
-
-Abort is always started after PF_EXITING is set, but if PF_EXITING is
-set, __ublk_rq_task_work fails the request immediately, then io->flags
-won't be touched, then no race with abort. Also PF_EXITING is
-per-task flag, can only be set before calling __ublk_rq_task_work(),
-and setting it actually serialized with calling task work func.
-
-In ublk_queue_rq(), we don't touch io->flags, so there isn't race
-with abort.
-
-Wrt. ublk_ctrl_stop_dev(), it isn't related with abort directly, and
-if del_gendisk() waits for inflight IO, abort work will be started
-for making forward progress. After del_gendisk() returns, there can't
-be any inflight io, so it is safe to cancel other pending io command.
-
-> 
-> 
-> [...]
-> 
-> > +
-> > +/*
-> > + * __ublk_fail_req() may be called from abort context or ->ubq_daemon
-> > + * context during exiting, so lock is required.
-> > + *
-> > + * Also aborting may not be started yet, keep in mind that one failed
-> > + * request may be issued by block layer again.
-> > + */
-> > +static void __ublk_fail_req(struct ublk_io *io, struct request *req)
-> > +{
-> > +	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
-> > +
-> > +	if (!(io->flags & UBLK_IO_FLAG_ABORTED)) {
-> > +		io->flags |= UBLK_IO_FLAG_ABORTED;
-> > +		blk_mq_end_request(req, BLK_STS_IOERR);
-> > +	}
-> > +}
-> > +
-> 
-> [...]
-> 
-> > +
-> > +/*
-> > + * When ->ubq_daemon is exiting, either new request is ended immediately,
-> > + * or any queued io command is drained, so it is safe to abort queue
-> > + * lockless
-> > + */
-> > +static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
-> > +{
-> > +	int i;
-> > +
-> > +	if (!ublk_get_device(ub))
-> > +		return;
-> > +
-> > +	for (i = 0; i < ubq->q_depth; i++) {
-> > +		struct ublk_io *io = &ubq->ios[i];
-> > +
-> > +		if (!(io->flags & UBLK_IO_FLAG_ACTIVE)) {
-> > +			struct request *rq;
-> > +
-> > +			/*
-> > +			 * Either we fail the request or ublk_rq_task_work_fn
-> > +			 * will do it
-> > +			 */
-> > +			rq = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], i);
-> > +			if (rq)
-> > +				__ublk_fail_req(io, rq);
-> > +		}
-> > +	}
-> > +	ublk_put_device(ub);
-> > +}
-> > +
-> 
-> 
-> Another problem: 
-> 
-> 1) comment of __ublk_fail_req():  "so lock is required"
-
-Yeah, now __ublk_fail_req is only called in abort context, and no race
-with task work any more, so lock isn't needed.
-
-> 
-> 2) comment of ublk_abort_queue(): "so it is safe to abort queue lockless"
-
-This comment is updated in v5, and it is correct.
-
-> 
-> 3) ublk_abort_queue() calls _ublk_fail_req() on all ubqs.
-
-No, ublk_abort_queue() only aborts the passed ubq, so if one ubq daemon
-is aborted, other ubqs can still handle IO during deleting disk.
+[   22.488660] WARNING: CPU: 0 PID: 11 at block/blk-mq.c:3880 blk_mq_release+0xa4/0xf0
+[   22.490797] Modules linked in:
+[   22.491762] CPU: 0 PID: 11 Comm: kworker/0:1 Not tainted 5.19.0-rc6-00322-g42ed61fe42f3-dirty #1609
+[   22.494659] Hardware name: linux,dummy-virt (DT)
+[   22.496171] Workqueue: events blkg_free_workfn
+[   22.497652] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   22.499965] pc : blk_mq_release+0xa4/0xf0
+[   22.501386] lr : blk_mq_release+0x44/0xf0
+[   22.502748] sp : ffff80000af73cb0
+[   22.503880] x29: ffff80000af73cb0 x28: 0000000000000000 x27: 0000000000000000
+[   22.506263] x26: 0000000000000000 x25: ffff00001fe47b05 x24: 0000000000000000
+[   22.508655] x23: ffff0000052b6cb8 x22: ffff0000031e1c38 x21: 0000000000000000
+[   22.511035] x20: ffff0000031e1cf0 x19: ffff0000031e1bf0 x18: 0000000000000000
+[   22.513427] x17: 0000000000000000 x16: 0000000000000000 x15: 0000ffffa8000b80
+[   22.515814] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000001
+[   22.518209] x11: ffff80000945b7e8 x10: 0000000000006cb9 x9 : 00000000ffffffff
+[   22.520600] x8 : ffff800008fb5000 x7 : ffff80000860cf28 x6 : 0000000000000000
+[   22.522987] x5 : 0000000000000000 x4 : 0000000000000028 x3 : ffff80000af73c14
+[   22.525363] x2 : ffff0000071ccaa8 x1 : ffff0000071ccaa8 x0 : ffff0000071cc800
+[   22.527624] Call trace:
+[   22.528473]  blk_mq_release+0xa4/0xf0
+[   22.529724]  blk_release_queue+0x58/0xa0
+[   22.530946]  kobject_put+0x84/0xe0
+[   22.531821]  blk_put_queue+0x10/0x18
+[   22.532716]  blkg_free_workfn+0x58/0x84
+[   22.533681]  process_one_work+0x2ac/0x438
+[   22.534872]  worker_thread+0x1cc/0x264
+[   22.535829]  kthread+0xd0/0xe0
+[   22.536598]  ret_from_fork+0x10/0x20
 
 
-Thanks,
-Ming
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index eeeac43e1dc1..d818da818c00 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -1078,7 +1078,7 @@ static void ublk_cdev_rel(struct device *dev)
+ {
+ 	struct ublk_device *ub = container_of(dev, struct ublk_device, cdev_dev);
+ 
+-	blk_cleanup_queue(ub->ub_queue);
++	blk_put_queue(ub->ub_queue);
+ 
+ 	put_disk(ub->ub_disk);
+ 
+@@ -1174,8 +1174,8 @@ static int ublk_add_dev(struct ublk_device *ub)
+ 		goto out_cleanup_tags;
+ 	ub->ub_queue->queuedata = ub;
+ 
+-	disk = ub->ub_disk = __alloc_disk_node(ub->ub_queue, NUMA_NO_NODE,
+-			&ublk_bio_compl_lkclass);
++	disk = ub->ub_disk = blk_mq_alloc_disk_for_queue(ub->ub_queue,
++						 &ublk_bio_compl_lkclass);
+ 	if (IS_ERR(disk)) {
+ 		err = PTR_ERR(disk);
+ 		goto out_free_request_queue;
+@@ -1212,7 +1212,7 @@ static int ublk_add_dev(struct ublk_device *ub)
+ 	return 0;
+ 
+ out_free_request_queue:
+-	blk_cleanup_queue(ub->ub_queue);
++	blk_put_queue(ub->ub_queue);
+ out_cleanup_tags:
+ 	blk_mq_free_tag_set(&ub->tag_set);
+ out_deinit_queues:
+
+
+-- 
+Jens Axboe
 
