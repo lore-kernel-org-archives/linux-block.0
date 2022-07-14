@@ -2,140 +2,220 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C353AC43334
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 22:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E636C43334
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 23:11:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbiGNWoT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 18:44:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
+        id S238543AbiGNXLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 19:11:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiGNWoS (ORCPT
+        with ESMTP id S229481AbiGNXLB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 18:44:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CAC66AF6;
-        Thu, 14 Jul 2022 15:44:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5E333B829DF;
-        Thu, 14 Jul 2022 22:44:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDE5DC34114;
-        Thu, 14 Jul 2022 22:44:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657838654;
-        bh=ZTNaD7TTclpn13DZH9gmDu/kVHAK0vU6nq05MFNP/OI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=OeQS1awqXop0peSKh0A2dyghSIgn/D6oI+ww24QPmvMecatn8NjCA7FnNbTxEA1a/
-         jFfq/8eoAnF4reSH3Zx5kRBPZtq+YrIOM8HKBzJObtP2Ce3WAxlCRQiGY63uEN5Hen
-         DXyg1enx4YljQAw7SN2WDuLqa7+SvA0Tirs62KT5LpVuYOAhBNesaRbael/3jB9R3e
-         Ipu0Z9Ok3f1qtPoAtUizrTvfyKyZgfT1XWtlp8dlj7SLkFReNxP74nx3isQPvw2C6h
-         h0ATw8BT5o2FV9ZpvVEjQMzburXRmJx+x+EICrJ/Hog1ZVlmG8L60Q+0d9vLU8VYyC
-         PbhWXmyYeRo0w==
-From:   SeongJae Park <sj@kernel.org>
-To:     roger.pau@citrix.com
-Cc:     axboe@kernel.dk, boris.ostrovsky@oracle.com, jgross@suse.com,
-        mheyne@amazon.de, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        SeongJae Park <sj@kernel.org>, stable@vger.kernel.org
-Subject: [PATCH v2] xen-blkback: fix persistent grants negotiation
-Date:   Thu, 14 Jul 2022 22:44:10 +0000
-Message-Id: <20220714224410.51147-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        Thu, 14 Jul 2022 19:11:01 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74C113EB5
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 16:10:58 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220714231052epoutp02650d49a49be96db052ea01a1abc6ad70~B1O0Mv0G80118701187epoutp02P
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 23:10:52 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220714231052epoutp02650d49a49be96db052ea01a1abc6ad70~B1O0Mv0G80118701187epoutp02P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1657840252;
+        bh=XKjcKrBiNJPIvHm3Pc2IEOcF6ugpBtjk6hvCUBodlt0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=i2HYImPFPsgmSGXbeTjyn901pQKgwL52cir0nTdeFc9vAeNbzNsw8V0rf3sMzb4Oy
+         oY2n2bxZSpHIxDYo77jEUtXCfH4QqBG2VCxhq+gFUM/rvJpeAsP5lTCh/yz8Bf2y3U
+         Wco59c+yP04knttxwXQXfehdmNC6LaBIPCkMO22Y=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20220714231051epcas5p4b3caa5ff4752700aa15940f21eae0240~B1Ozjy64R2828228282epcas5p4Y;
+        Thu, 14 Jul 2022 23:10:51 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.177]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4LkVbF1vf4z4x9Pp; Thu, 14 Jul
+        2022 23:10:49 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        76.0F.09662.972A0D26; Fri, 15 Jul 2022 08:10:49 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220714231048epcas5p14495dd43b5e169ee533cc185f72addac~B1OwwKDkG2822628226epcas5p1G;
+        Thu, 14 Jul 2022 23:10:48 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220714231048epsmtrp2fa8cbc7ae1ae03b4d1dc1e094684c385~B1OwuO9KX2203722037epsmtrp2M;
+        Thu, 14 Jul 2022 23:10:48 +0000 (GMT)
+X-AuditID: b6c32a49-885ff700000025be-d2-62d0a2791e39
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        38.9E.08905.872A0D26; Fri, 15 Jul 2022 08:10:48 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220714231046epsmtip2d59211587a5e568e2ae354c6648668bb~B1OvDrAlM0098600986epsmtip2b;
+        Thu, 14 Jul 2022 23:10:46 +0000 (GMT)
+Date:   Fri, 15 Jul 2022 04:35:23 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, kbusch@kernel.org,
+        axboe@kernel.dk, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
+        gost.dev@samsung.com
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
+Message-ID: <20220714230523.GA14373@test-zns>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YtAy2PUDoWUUE9Bl@T590>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTZxjG953Tnp661Z0ViJ+VuXq8TFgKrWvLQWFbBrqjm0kTFmXO2BU4
+        oQRom17o3BLsRCZyEaybaLMFMho7WwaDEQYUTK0XNqeFXZiRpKRqC5t2XJRoZEHXenDxv9/3
+        vM97+W44KuzDRHiJzswYdZoyElvG6T2fslGy/5vRAunA1eepg02LKPWVuxdQnmAjRl339SPU
+        Gc9FhJquDnCokX/OI5Td/yeghsZfo1pOR3iU/3gVQnXcmeG89QLd7wjy6JGJLg79+1UL3e0+
+        gtE/OA/Q3us2jJ45O4bRR3vcgL7XvVrF31OapWU0RYxRzOgK9UUluuJs8t08dY5aoZTKJLJM
+        KoMU6zTlTDaZ+55Ksq2kLDYwKa7QlFlikkpjMpHpb2QZ9RYzI9bqTeZskjEUlRnkhjSTptxk
+        0RWn6RjzZplUukkRM35Uqr0wVocavlv38WzzSdQG/Mm1gI9DQg5d55rRWrAMFxJeAB9Uj2Ps
+        4i6AHt/Zpch9AI/OB8DTlGjfOC/OQmIIwF/+ymVNkwC2fRZ6EuAQ62FnYIBbC3AcI1Lg6HFL
+        XE4kSBgMenhxP0rUItBjq+LEAwlEIewO25E4CwgJPP31Ay7LL8GfT4U58Tp8Yh2M/L01LicR
+        a6GvdxiJ14HEIA7b3WMcdrhc2HJoCmM5Ad4e7uGxLIL3poeW9EL426kAwrIZ3ho8t8RvwurL
+        jWicUUILF9q+R1heDhv+DSPxGSAhgDWfC1n7Gjhhj3BZXgFvnHQuMQ3nWqp47JmEUDh4qQNt
+        Aqsdz2zH8UwLljfDI7MHuY5YC5RYBV2PcBZTYOdAeivgusFKxmAqL2ZMCoNMx1j/v+NCfXk3
+        ePKEU7f3gWBoNs0PEBz4AcRRMlFQ5w8UCAVFmv2fMEa92mgpY0x+oIhdzzFUlFSoj/0BnVkt
+        k2dK5UqlUp75ulJGrhDsGOsuEBLFGjNTyjAGxvg0D8H5IhuC3xQ31Guj73+L1XExDIT2Tbf2
+        jphrOuYzyPzk5KkDOVFRc8LD1NGBcP5j+LAiCXe3198sn56oy8of9jrs6sRA8adXrILADftG
+        gWV2+8xyR5J7wV/TpR/Pu7ty37HH0RM9ezdcJsW7nHsadnIkOVt8rvuyqefeeeVWDs9t3bTz
+        R9+u6FDrNdsVV2nF/CXGHAlN2u78FPHOHV5b8sXu1jMZqldffLTQ5l+sbEqn5/7o+tWq9qxx
+        zF3I62937g4Nhr1Vh3PhB4cgf+/bFp9UgCo6pSqhdP2is7FVWVu/o22cG7724ctbgwuLqxYk
+        zZMX8S1fWh0bZjsqg9OugdsTlSTHpNXIUlGjSfMfrw8XSUsEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjkeLIzCtJLcpLzFFi42LZdlhJXrdi0YUkg/4zyhZNE/4yW8xZtY3R
+        YvXdfjaLmwd2MlmsXH2UyeJd6zkWi/NvDzNZTDp0jdFi7y1ti/nLnrJbHJrczGSx7vV7Fgce
+        j52z7rJ7nL+3kcXj8tlSj02rOtk8Ni+p99h9s4HN4/2+q2wefVtWMXp83iQXwBnFZZOSmpNZ
+        llqkb5fAlbHnUTtTwX3FiiPnz7E1MPZJdTFyckgImEi82XGLvYuRi0NIYDejxPX7U9ggEuIS
+        zdd+sEPYwhIr/z2HKnrCKDF5xxZWkASLgKrE+nO7gGwODjYBTYkLk0tBwiICShJ3764G62UW
+        6GGS2L6GEcQWFkiW2PRkEhOIzSugK7Fs7ndWiJmPmCX+L1/ADJEQlDg58wkLRLOZxLzND5lB
+        5jMLSEss/8cBYnIKqEg8fekKUiEqoCxxYNtxpgmMgrOQNM9C0jwLoXkBI/MqRsnUguLc9Nxi
+        wwLDvNRyveLE3OLSvHS95PzcTYzgqNLS3MG4fdUHvUOMTByMhxglOJiVRHi7D51LEuJNSays
+        Si3Kjy8qzUktPsQozcGiJM57oetkvJBAemJJanZqakFqEUyWiYNTqoFpw2aj5Fm/+ji/rytI
+        89awfHP8h5/2qY4JxUkmq/QCv6q7639PDvwy84V89Yp/Ys2Jhyu/u/ssnd3JxDFpQ//XpWzr
+        vCe8qn99+QiTrU5Uvb90Vi2Xu9Xh/NqIQmH3WbpP8ybt0sh8Ua6t43b8xk9rs8v/bzDMXdXf
+        /S7PZHfmiQztupfs9/6zfW7bvj+M+cK7f9mv9DfefM715PnMR28WTVapPdWStPU6w4xQs1yP
+        R5ufeu9Yavva9/IFKaYqfv93f/8aXAnX9f6am/71XylLsrzwm5m9AtNvuWxQ3ZSz8cj6o2wH
+        vjhkdpRr+9qfTeJjOGRhGFm7/UZr8T1ficcKl91djt2exRrDZpfcZXlQiaU4I9FQi7moOBEA
+        FcrZKBkDAAA=
+X-CMS-MailID: 20220714231048epcas5p14495dd43b5e169ee533cc185f72addac
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_90150_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+        <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+        <20220711110155.649153-5-joshi.k@samsung.com>
+        <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
+        <20220711183746.GA20562@test-zns>
+        <5f30c7de-03b1-768a-d44f-594ed2d1dc75@grimberg.me>
+        <20220712042332.GA14780@test-zns>
+        <3a2b281b-793b-b8ad-6a27-138c89a46fac@grimberg.me>
+        <20220713053757.GA15022@test-zns> <YtAy2PUDoWUUE9Bl@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Persistent grants feature can be used only when both backend and the
-frontend supports the feature.  The feature was always supported by
-'blkback', but commit aac8a70db24b ("xen-blkback: add a parameter for
-disabling of persistent grants") has introduced a parameter for
-disabling it runtime.
+------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_90150_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-To avoid the parameter be updated while being used by 'blkback', the
-commit caches the parameter into 'vbd->feature_gnt_persistent' in
-'xen_vbd_create()', and then check if the guest also supports the
-feature and finally updates the field in 'connect_ring()'.
+On Thu, Jul 14, 2022 at 11:14:32PM +0800, Ming Lei wrote:
+>On Wed, Jul 13, 2022 at 11:07:57AM +0530, Kanchan Joshi wrote:
+>> > > > > > The way I would do this that in nvme_ioucmd_failover_req (or in the
+>> > > > > > retry driven from command retriable failure) I would do the above,
+>> > > > > > requeue it and kick the requeue work, to go over the requeue_list and
+>> > > > > > just execute them again. Not sure why you even need an explicit retry
+>> > > > > > code.
+>> > > > > During retry we need passthrough command. But passthrough command is not
+>> > > > > stable (i.e. valid only during first submission). We can make it stable
+>> > > > > either by:
+>> > > > > (a) allocating in nvme (b) return -EAGAIN to io_uring, and
+>> > > > > it will do allocate + deferral
+>> > > > > Both add a cost. And since any command can potentially fail, that
+>> > > > > means taking that cost for every IO that we issue on mpath node. Even if
+>> > > > > no failure (initial or subsquent after IO) occcured.
+>> > > >
+>> > > > As mentioned, I think that if a driver consumes a command as queued,
+>> > > > it needs a stable copy for a later reformation of the request for
+>> > > > failover purposes.
+>> > >
+>> > > So what do you propose to make that stable?
+>> > > As I mentioned earlier, stable copy requires allocating/copying in fast
+>> > > path. And for a condition (failover) that may not even occur.
+>> > > I really think currrent solution is much better as it does not try to make
+>> > > it stable. Rather it assembles pieces of passthrough command if retry
+>> > > (which is rare) happens.
+>> >
+>> > Well, I can understand that io_uring_cmd is space constrained, otherwise
+>> > we wouldn't be having this discussion.
+>>
+>> Indeed. If we had space for keeping passthrough command stable for
+>> retry, that would really have simplified the plumbing. Retry logic would
+>> be same as first submission.
+>>
+>> > However io_kiocb is less
+>> > constrained, and could be used as a context to hold such a space.
+>> >
+>> > Even if it is undesired to have io_kiocb be passed to uring_cmd(), it
+>> > can still hold a driver specific space paired with a helper to obtain it
+>> > (i.e. something like io_uring_cmd_to_driver_ctx(ioucmd) ). Then if the
+>> > space is pre-allocated it is only a small memory copy for a stable copy
+>> > that would allow a saner failover design.
+>>
+>> I am thinking along the same lines, but it's not about few bytes of
+>> space rather we need 80 (72 to be precise). Will think more, but
+>> these 72 bytes really stand tall in front of my optimism.
+>>
+>> Do you see anything is possible in nvme-side?
+>> Now also passthrough command (although in a modified form) gets copied
+>> into this preallocated space i.e. nvme_req(req)->cmd. This part -
+>
+>I understand it can't be allocated in nvme request which is freed
+>during retry,
 
-However, 'connect_ring()' could be called before 'xen_vbd_create()', so
-later execution of 'xen_vbd_create()' can wrongly overwrite 'true' to
-'vbd->feature_gnt_persistent'.  As a result, 'blkback' could try to use
-'persistent grants' feature even if the guest doesn't support the
-feature.
+Why not. Yes it gets freed, but we have control over when it gets freed
+and we can do if anything needs to be done before freeing it. Please see
+below as well.
 
-This commit fixes the issue by moving the parameter value caching to
-'xen_blkif_alloc()', which allocates the 'blkif'.  Because the struct
-embeds 'vbd' object, which will be used by 'connect_ring()' later, this
-should be called before 'connect_ring()' and therefore this should be
-the right and safe place to do the caching.
+>and looks the extra space has to be bound with
+>io_uring_cmd.
 
-Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
-Cc: <stable@vger.kernel.org> # 5.10.x
-Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
-Signed-off-by: SeongJae Park <sj@kernel.org>
----
+if extra space is bound with io_uring_cmd, it helps to reduce the code
+(and just that. I don't see that efficiency will improve - rather it
+will be tad bit less because of one more 72 byte copy opeation in fast-path).
 
-Changes from v1[1]
-- Avoid the behavioral change[2]
-- Rebase on latest xen/tip/linux-next
-- Re-work by SeongJae Park <sj@kernel.org>
-- Cc stable@
+Alternate is to use this space that is bound with request i.e.
+nvme_req(req)->cmd. This is also preallocated and passthru-cmd
+already gets copied. But it is ~80% of the original command. 
+Rest 20% includes few fields (data/meta buffer addres, rspective len)
+which are not maintained (as bio/request can give that). 
+During retry, we take out stuff from nvme_req(req)->cmd and then free
+req. Please see nvme_uring_cmd_io_retry in the patch. And here is the
+fragement for quick glance -
 
-[1] https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/
-[2] https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/
++       memcpy(&c, nvme_req(oreq)->cmd, sizeof(struct nvme_command));
++       d.metadata = (__u64)pdu->meta_buffer;
++       d.metadata_len = pdu->meta_len;
++       d.timeout_ms = oreq->timeout;
++       d.addr = (__u64)ioucmd->cmd;
++       if (obio) {
++               d.data_len = obio->bi_iter.bi_size;
++               blk_rq_unmap_user(obio);
++       } else {
++               d.data_len = 0;
++       }
++       blk_mq_free_request(oreq);
 
- drivers/block/xen-blkback/xenbus.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+Do you see chinks in above?
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 97de13b14175..16c6785d260c 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -157,6 +157,11 @@ static int xen_blkif_alloc_rings(struct xen_blkif *blkif)
- 	return 0;
- }
- 
-+/* Enable the persistent grants feature. */
-+static bool feature_persistent = true;
-+module_param(feature_persistent, bool, 0644);
-+MODULE_PARM_DESC(feature_persistent, "Enables the persistent grants feature");
-+
- static struct xen_blkif *xen_blkif_alloc(domid_t domid)
- {
- 	struct xen_blkif *blkif;
-@@ -181,6 +186,8 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
- 	__module_get(THIS_MODULE);
- 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
- 
-+	blkif->vbd.feature_gnt_persistent = feature_persistent;
-+
- 	return blkif;
- }
- 
-@@ -472,12 +479,6 @@ static void xen_vbd_free(struct xen_vbd *vbd)
- 	vbd->bdev = NULL;
- }
- 
--/* Enable the persistent grants feature. */
--static bool feature_persistent = true;
--module_param(feature_persistent, bool, 0644);
--MODULE_PARM_DESC(feature_persistent,
--		"Enables the persistent grants feature");
--
- static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 			  unsigned major, unsigned minor, int readonly,
- 			  int cdrom)
-@@ -520,8 +521,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 	if (bdev_max_secure_erase_sectors(bdev))
- 		vbd->discard_secure = true;
- 
--	vbd->feature_gnt_persistent = feature_persistent;
--
- 	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
- 		handle, blkif->domid);
- 	return 0;
--- 
-2.25.1
+------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_90150_
+Content-Type: text/plain; charset="utf-8"
 
+
+------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_90150_--
