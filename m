@@ -2,52 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 498D8C43334
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B1CCCA47B
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:07:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbiGNSHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 14:07:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53328 "EHLO
+        id S239969AbiGNSHn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 14:07:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238985AbiGNSHk (ORCPT
+        with ESMTP id S239145AbiGNSHm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 14:07:40 -0400
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D965474DB
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:39 -0700 (PDT)
-Received: by mail-pl1-f182.google.com with SMTP id b2so1116137plx.7
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:39 -0700 (PDT)
+        Thu, 14 Jul 2022 14:07:42 -0400
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065D0474DB
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:41 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id bf13so2258251pgb.11
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:07:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=q0uhXXYc08ayQNzNKSJEspnpLygydGYC6ZAg6zFpr8o=;
-        b=vWFRBJneWx+P00Km9vQR9wwTE+lm5i/Zot9nqhb8dKR5nyU5URO8X1UtSljbIo8Tpd
-         Ne8aEH8QFJ6UjctJoZVNU+YQuVZoCQQSJJs5659/Wi/DTVpqbnU2MRrBKN8vb0KpWxHh
-         JGBJPvpZn6E7OZK42bpOqdZBpKEX72I5c+vla3YFC3vyY4t0LMrjwLjyhe8m0GU4Ez1v
-         5R6LvjANMdKh/haers+j2LgqXLO8ohNiKyUgfxa762OJ78wtsl63jEaXZfdY37Kw1ge7
-         jsBAY5pzNU5+ghM0QPTVlbp5umg6g/XscXcmrZFJvZGffk7Hy2uLxt4DxVVa31bHUrf3
-         rRNg==
-X-Gm-Message-State: AJIora9BTXooQoslcVeshPD6W9vgZ8aDTR08FNOZy+wxL2h6El6lY7YP
-        hi4bJd5GfGqwKnXPMj/i/30=
-X-Google-Smtp-Source: AGRyM1uprSkf2OZ6vN2mK18f4xjqfe6LtzpiB2KB8WhvJYZNjStP05cljhvqisy+faL+nA54pD/HTA==
-X-Received: by 2002:a17:902:e946:b0:16b:d4e1:a405 with SMTP id b6-20020a170902e94600b0016bd4e1a405mr9408801pll.16.1657822058733;
-        Thu, 14 Jul 2022 11:07:38 -0700 (PDT)
+        bh=8+Bh9N5Yp5KDYV7iPP9RY6GJoeEKF5We9shml1qw4dM=;
+        b=1B1yhY0TrEXeiQLZezPe/4dGVdVVuWzaIzSo0OBEEx9ZRnCSzmSFOQLIRuqbwrZyTc
+         68c1uYk6+J0Tpk8KRy5mEqf6frk6VhR084PoBsdc7zfGxZSjfuWB0EcIulkWK8Huvwmj
+         dE9VzrQ120y7hStDIQ36m/o+PNX73hMx/2iMOeV+x6d9+lW5V2WDIty6I3qaldKABGft
+         TBp05k+G6nlvz+OpDgtjTom4v6QpjDmM5+8wE+tbdFG5FhRFri3z25qvsd+eGb12Q94q
+         LnVVl50MHCsTz5Sl/4CaGV6ncZNI9iJNEg0FQ8ewNCK7V/r05S51U+emDp1TlDCPAEHG
+         W11A==
+X-Gm-Message-State: AJIora8O+1MZv1L9OObvqEjEVDxc2WopLtcCXiYKKqbzuhny/ytXOv0k
+        YSNNi/y46asx8YdoNB9bgj0=
+X-Google-Smtp-Source: AGRyM1sGBKWJp8QqCM4IN2XDlvihI2WBfYgcFhHn/jshwzZLqNJXLePWFZ+ZJ3Vc1ClfPgmxULoG2g==
+X-Received: by 2002:a63:f910:0:b0:419:d6c0:c969 with SMTP id h16-20020a63f910000000b00419d6c0c969mr537016pgi.624.1657822060412;
+        Thu, 14 Jul 2022 11:07:40 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9fab:70d1:f0e7:922b])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.07.37
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.07.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:07:38 -0700 (PDT)
+        Thu, 14 Jul 2022 11:07:39 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Tejun Heo <tj@kernel.org>, Minchan Kim <minchan@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Hannes Reinecke <hare@suse.de>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH v3 02/63] block: Use enum req_op where appropriate
-Date:   Thu, 14 Jul 2022 11:06:28 -0700
-Message-Id: <20220714180729.1065367-3-bvanassche@acm.org>
+Subject: [PATCH v3 03/63] block: Change the type of the last .rw_page() argument
+Date:   Thu, 14 Jul 2022 11:06:29 -0700
+Message-Id: <20220714180729.1065367-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
 In-Reply-To: <20220714180729.1065367-1-bvanassche@acm.org>
 References: <20220714180729.1065367-1-bvanassche@acm.org>
@@ -57,159 +59,88 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Change the type of the arguments that are used to pass a REQ_OP_* value
-from int or unsigned int into enum req_op to improve static type
-checking.
+All .rw_page() callers pass an enum req_op value as last argument. Make
+this explicit by changing the type of the last argument into enum req_op.
+See also commit 3f289dcb4b26 ("block: make bdev_ops->rw_page() take a
+REQ_OP instead of bool").
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Dan Williams <dan.j.williams@intel.com>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Damien Le Moal <damien.lemoal@wdc.com>
 Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-core.c          | 6 +++---
- block/blk-mq-debugfs.c    | 2 +-
- block/blk-throttle.c      | 7 ++++---
- block/blk-wbt.c           | 2 +-
- block/blk.h               | 2 +-
- include/linux/blk_types.h | 2 +-
- include/linux/blkdev.h    | 6 +++---
- 7 files changed, 14 insertions(+), 13 deletions(-)
+ drivers/block/brd.c           | 2 +-
+ drivers/block/zram/zram_drv.c | 2 +-
+ drivers/nvdimm/btt.c          | 2 +-
+ drivers/nvdimm/pmem.c         | 2 +-
+ include/linux/blkdev.h        | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 8365996a8ef8..67b8bcfa27f0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -136,7 +136,7 @@ static const char *const blk_op_name[] = {
-  * string format. Useful in the debugging and tracing bio or request. For
-  * invalid REQ_OP_XXX it returns string "UNKNOWN".
-  */
--inline const char *blk_op_str(unsigned int op)
-+inline const char *blk_op_str(enum req_op op)
- {
- 	const char *op_str = "UNKNOWN";
- 
-@@ -953,7 +953,7 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
+diff --git a/drivers/block/brd.c b/drivers/block/brd.c
+index 9e26d5e769f3..7b82876af36e 100644
+--- a/drivers/block/brd.c
++++ b/drivers/block/brd.c
+@@ -310,7 +310,7 @@ static void brd_submit_bio(struct bio *bio)
  }
  
- unsigned long bdev_start_io_acct(struct block_device *bdev,
--				 unsigned int sectors, unsigned int op,
-+				 unsigned int sectors, enum req_op op,
- 				 unsigned long start_time)
+ static int brd_rw_page(struct block_device *bdev, sector_t sector,
+-		       struct page *page, unsigned int op)
++		       struct page *page, enum req_op op)
  {
- 	const int sgrp = op_stat_group(op);
-@@ -994,7 +994,7 @@ unsigned long bio_start_io_acct(struct bio *bio)
- }
- EXPORT_SYMBOL_GPL(bio_start_io_acct);
- 
--void bdev_end_io_acct(struct block_device *bdev, unsigned int op,
-+void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
- 		      unsigned long start_time)
- {
- 	const int sgrp = op_stat_group(op);
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 7ee1b13380d0..6cc2411e2d26 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -304,7 +304,7 @@ static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
- int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
- {
- 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
--	const unsigned int op = req_op(rq);
-+	const enum req_op op = req_op(rq);
- 	const char *op_str = blk_op_str(op);
- 
- 	seq_printf(m, "%p {.op=", rq);
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 139b2d7a99e2..9f5fe62afff9 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2203,8 +2203,9 @@ bool __blk_throtl_bio(struct bio *bio)
- 
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- static void throtl_track_latency(struct throtl_data *td, sector_t size,
--	int op, unsigned long time)
-+				 enum req_op op, unsigned long time)
- {
-+	const bool rw = op_is_write(op);
- 	struct latency_bucket *latency;
- 	int index;
- 
-@@ -2215,10 +2216,10 @@ static void throtl_track_latency(struct throtl_data *td, sector_t size,
- 
- 	index = request_bucket_index(size);
- 
--	latency = get_cpu_ptr(td->latency_buckets[op]);
-+	latency = get_cpu_ptr(td->latency_buckets[rw]);
- 	latency[index].total_latency += time;
- 	latency[index].samples++;
--	put_cpu_ptr(td->latency_buckets[op]);
-+	put_cpu_ptr(td->latency_buckets[rw]);
+ 	struct brd_device *brd = bdev->bd_disk->private_data;
+ 	int err;
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index e5233c911e43..a35b86c58aa2 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1631,7 +1631,7 @@ static void zram_slot_free_notify(struct block_device *bdev,
  }
  
- void blk_throtl_stat_add(struct request *rq, u64 time_ns)
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0c119be0e813..7bf09ae06577 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -670,7 +670,7 @@ u64 wbt_default_latency_nsec(struct request_queue *q)
- 
- static int wbt_data_dir(const struct request *rq)
+ static int zram_rw_page(struct block_device *bdev, sector_t sector,
+-		       struct page *page, unsigned int op)
++		       struct page *page, enum req_op op)
  {
--	const int op = req_op(rq);
-+	const enum req_op op = req_op(rq);
- 
- 	if (op == REQ_OP_READ)
- 		return READ;
-diff --git a/block/blk.h b/block/blk.h
-index b71e22c97d77..c4b084bfe87c 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -160,7 +160,7 @@ static inline bool blk_discard_mergable(struct request *req)
+ 	int offset, ret;
+ 	u32 index;
+diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+index 5e622c0d4b66..dfbf73145d16 100644
+--- a/drivers/nvdimm/btt.c
++++ b/drivers/nvdimm/btt.c
+@@ -1483,7 +1483,7 @@ static void btt_submit_bio(struct bio *bio)
  }
  
- static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
--						     int op)
-+						     enum req_op op)
+ static int btt_rw_page(struct block_device *bdev, sector_t sector,
+-		struct page *page, unsigned int op)
++		struct page *page, enum req_op op)
  {
- 	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
- 		return min(q->limits.max_discard_sectors,
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 0e6a2af7ed3d..cce8768bc00b 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -522,7 +522,7 @@ static inline bool op_is_zone_mgmt(enum req_op op)
- 	}
+ 	struct btt *btt = bdev->bd_disk->private_data;
+ 	int rc;
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index a72b81fa3242..f36efcc11f67 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -239,7 +239,7 @@ static void pmem_submit_bio(struct bio *bio)
  }
  
--static inline int op_stat_group(unsigned int op)
-+static inline int op_stat_group(enum req_op op)
+ static int pmem_rw_page(struct block_device *bdev, sector_t sector,
+-		       struct page *page, unsigned int op)
++		       struct page *page, enum req_op op)
  {
- 	if (op_is_discard(op))
- 		return STAT_DISCARD;
+ 	struct pmem_device *pmem = bdev->bd_disk->private_data;
+ 	blk_status_t rc;
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index ec072a5129bf..2f13f0062192 100644
+index 2f13f0062192..ca2ff113ea00 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -872,7 +872,7 @@ extern void blk_queue_exit(struct request_queue *q);
- extern void blk_sync_queue(struct request_queue *q);
- 
- /* Helper to convert REQ_OP_XXX to its string format XXX */
--extern const char *blk_op_str(unsigned int op);
-+extern const char *blk_op_str(enum req_op op);
- 
- int blk_status_to_errno(blk_status_t status);
- blk_status_t errno_to_blk_status(int errno);
-@@ -1434,9 +1434,9 @@ static inline void blk_wake_io_task(struct task_struct *waiter)
- }
- 
- unsigned long bdev_start_io_acct(struct block_device *bdev,
--				 unsigned int sectors, unsigned int op,
-+				 unsigned int sectors, enum req_op op,
- 				 unsigned long start_time);
--void bdev_end_io_acct(struct block_device *bdev, unsigned int op,
-+void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
- 		unsigned long start_time);
- 
- void bio_start_io_acct_time(struct bio *bio, unsigned long start_time);
+@@ -1381,7 +1381,7 @@ struct block_device_operations {
+ 			unsigned int flags);
+ 	int (*open) (struct block_device *, fmode_t);
+ 	void (*release) (struct gendisk *, fmode_t);
+-	int (*rw_page)(struct block_device *, sector_t, struct page *, unsigned int);
++	int (*rw_page)(struct block_device *, sector_t, struct page *, enum req_op);
+ 	int (*ioctl) (struct block_device *, fmode_t, unsigned, unsigned long);
+ 	int (*compat_ioctl) (struct block_device *, fmode_t, unsigned, unsigned long);
+ 	unsigned int (*check_events) (struct gendisk *disk,
