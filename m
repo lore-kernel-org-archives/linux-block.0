@@ -2,53 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB3ECCA47B
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3907FC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 18:09:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233854AbiGNSJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 14:09:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55144 "EHLO
+        id S240157AbiGNSJ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 14:09:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240523AbiGNSIr (ORCPT
+        with ESMTP id S240541AbiGNSIt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 14:08:47 -0400
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5273DC37
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:42 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id b2so1118953plx.7
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:42 -0700 (PDT)
+        Thu, 14 Jul 2022 14:08:49 -0400
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C3A14090
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:45 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id r1so1121288plo.10
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 11:08:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wD3ywf4yaoFAbAUOfKrGBD6BdZNwViN2JP41b+JRVuU=;
-        b=fbxOOOueuxMa4eIUt/dMMOuChTAlsmmyReUggaUZ1dLI1Unk7Ln6KX5tDRszG86KAM
-         bvSyBW+WA9nLzo6hK1/CUJVHD5l8urTUOjU1Q23l04w5vdwWk0VoDjrsTrcLqxK/8GHz
-         lFpIyoegLwZcdH3MfG4L/+lBZJKykrrfVJwnTbCRTDTxPeOOtreyeaOOiTJkGuszCien
-         gy/NsCHyJzrfjPxJiP+vuAjsy4ZWxeTtYnAmjJ8Fi2CtRN/Up39zESIAzyPjOByiZmN8
-         xV2r5KpMeKw2YcSp7c7i8g2P6bAqjugA4hEBlfAqeuPpmJlf16fT1rcBAKLvFKWo0maY
-         pyzw==
-X-Gm-Message-State: AJIora8MRpoFb2nipZ4ceQuucsoTe8gtylGh+dHNItPwk4ws/LkhhasS
-        vQqtjZSKQ9C8OYQ6mZxhF80=
-X-Google-Smtp-Source: AGRyM1tMbrhNeqAmhnPdy1BZyUEAeofWOR+aY+wiKwK/dPmQ0/0EpHwa42IcXpEM6arxM6o61MUbpA==
-X-Received: by 2002:a17:902:f542:b0:16b:dbf1:2179 with SMTP id h2-20020a170902f54200b0016bdbf12179mr9872345plf.18.1657822121213;
-        Thu, 14 Jul 2022 11:08:41 -0700 (PDT)
+        bh=XYU1/QmsLeNdj0K1UBWBwoHsQTbx8MJ5yBdMXh+eT/Q=;
+        b=qFzA3asLJx7Yq9iBceMgNWBIKaazr4joqa/gVbDQiD/OH0eWgWV3lFowjcLq0rnNg/
+         VofWbVNjlGdt/dOxILax4fi/ALgChtDdA/O/USf1vECUX4LOMFSBVXtz5ggg+musOoDK
+         F2Jx/wnAtvrf/eAZT/5ksRZuPd5ZBeKuwZocfMaLOhAuvedwzdL0jxHyV8LL2Rj05eFE
+         qoPdf/D3PNYA0GlL1xjAjp0m5mVS7AUOGouOImbe7XRzHAY1/CjJoAf7rWpxbcbuqkSC
+         /nTvIYmkrWIHwhYZUbCQsTZlwW/kzKnjZgBZFQnPdQEPay6rRUdOqgv59fykV79PVLaZ
+         SG2w==
+X-Gm-Message-State: AJIora/B80MM+BwDXPXCZ862AoGROKJXiVfHeydBj92EsfwlL8by5saT
+        vWwAqp8ALmCRavmgb+Vij/Q=
+X-Google-Smtp-Source: AGRyM1thJfDSN/Dps0K3I+qBVBFVWj/KPHqJNeFfVD8Il6bQxVA4R5N00LgbRREqGiqE4DacHqzdXQ==
+X-Received: by 2002:a17:90b:2114:b0:1ef:8ac4:c66c with SMTP id kz20-20020a17090b211400b001ef8ac4c66cmr17192509pjb.174.1657822124298;
+        Thu, 14 Jul 2022 11:08:44 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:9fab:70d1:f0e7:922b])
-        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.08.39
+        by smtp.gmail.com with ESMTPSA id m5-20020a170902db0500b0016bebb0cb96sm1781846plx.266.2022.07.14.11.08.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 11:08:40 -0700 (PDT)
+        Thu, 14 Jul 2022 11:08:43 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
         Bart Van Assche <bvanassche@acm.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        Mike Christie <michael.christie@oracle.com>
-Subject: [PATCH v3 40/63] scsi/core: Change the return type of scsi_noretry_cmd() into bool
-Date:   Thu, 14 Jul 2022 11:07:06 -0700
-Message-Id: <20220714180729.1065367-41-bvanassche@acm.org>
+        Hannes Reinecke <hare@suse.com>, Martin Wilck <mwilck@suse.com>
+Subject: [PATCH v3 42/63] scsi/device_handlers: Use the new blk_opf_t type
+Date:   Thu, 14 Jul 2022 11:07:08 -0700
+Message-Id: <20220714180729.1065367-43-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
 In-Reply-To: <20220714180729.1065367-1-bvanassche@acm.org>
 References: <20220714180729.1065367-1-bvanassche@acm.org>
@@ -58,82 +55,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch prepares for introducing the new blk_opf_t type in the SCSI core.
-Since the value returned by scsi_noretry_cmd() is only used in boolean
-expressions, this patch does not change any functionality.
+Improve static type checking by using the new blk_opf_t type for variables
+that represent request flags.
 
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: John Garry <john.garry@huawei.com>
-Cc: Mike Christie <michael.christie@oracle.com>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: Martin Wilck <mwilck@suse.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_error.c | 16 ++++++++--------
- drivers/scsi/scsi_priv.h  |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ drivers/scsi/device_handler/scsi_dh_alua.c  | 4 ++--
+ drivers/scsi/device_handler/scsi_dh_emc.c   | 2 +-
+ drivers/scsi/device_handler/scsi_dh_hp_sw.c | 4 ++--
+ drivers/scsi/device_handler/scsi_dh_rdac.c  | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 266ce414589c..b776cefc7cda 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -1779,7 +1779,7 @@ static void scsi_eh_offline_sdevs(struct list_head *work_q,
-  * scsi_noretry_cmd - determine if command should be failed fast
-  * @scmd:	SCSI cmd to examine.
-  */
--int scsi_noretry_cmd(struct scsi_cmnd *scmd)
-+bool scsi_noretry_cmd(struct scsi_cmnd *scmd)
+diff --git a/drivers/scsi/device_handler/scsi_dh_alua.c b/drivers/scsi/device_handler/scsi_dh_alua.c
+index 1d9be771f3ee..610a51538f03 100644
+--- a/drivers/scsi/device_handler/scsi_dh_alua.c
++++ b/drivers/scsi/device_handler/scsi_dh_alua.c
+@@ -127,7 +127,7 @@ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
+ 		       int bufflen, struct scsi_sense_hdr *sshdr, int flags)
  {
- 	struct request *req = scsi_cmd_to_rq(scmd);
+ 	u8 cdb[MAX_COMMAND_SIZE];
+-	int req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
  
-@@ -1789,19 +1789,19 @@ int scsi_noretry_cmd(struct scsi_cmnd *scmd)
- 	case DID_TIME_OUT:
- 		goto check_type;
- 	case DID_BUS_BUSY:
--		return req->cmd_flags & REQ_FAILFAST_TRANSPORT;
-+		return !!(req->cmd_flags & REQ_FAILFAST_TRANSPORT);
- 	case DID_PARITY:
--		return req->cmd_flags & REQ_FAILFAST_DEV;
-+		return !!(req->cmd_flags & REQ_FAILFAST_DEV);
- 	case DID_ERROR:
- 		if (get_status_byte(scmd) == SAM_STAT_RESERVATION_CONFLICT)
--			return 0;
-+			return false;
- 		fallthrough;
- 	case DID_SOFT_ERROR:
--		return req->cmd_flags & REQ_FAILFAST_DRIVER;
-+		return !!(req->cmd_flags & REQ_FAILFAST_DRIVER);
- 	}
+ 	/* Prepare the command. */
+@@ -157,7 +157,7 @@ static int submit_stpg(struct scsi_device *sdev, int group_id,
+ 	u8 cdb[MAX_COMMAND_SIZE];
+ 	unsigned char stpg_data[8];
+ 	int stpg_len = 8;
+-	int req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
  
- 	if (!scsi_status_is_check_condition(scmd->result))
--		return 0;
-+		return false;
+ 	/* Prepare the data buffer */
+diff --git a/drivers/scsi/device_handler/scsi_dh_emc.c b/drivers/scsi/device_handler/scsi_dh_emc.c
+index bd28ec6cfb72..2e21ab447873 100644
+--- a/drivers/scsi/device_handler/scsi_dh_emc.c
++++ b/drivers/scsi/device_handler/scsi_dh_emc.c
+@@ -239,7 +239,7 @@ static int send_trespass_cmd(struct scsi_device *sdev,
+ 	unsigned char cdb[MAX_COMMAND_SIZE];
+ 	int err, res = SCSI_DH_OK, len;
+ 	struct scsi_sense_hdr sshdr;
+-	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
  
- check_type:
- 	/*
-@@ -1809,9 +1809,9 @@ int scsi_noretry_cmd(struct scsi_cmnd *scmd)
- 	 * the check condition was retryable.
- 	 */
- 	if (req->cmd_flags & REQ_FAILFAST_DEV || blk_rq_is_passthrough(req))
--		return 1;
-+		return true;
+ 	if (csdev->flags & CLARIION_SHORT_TRESPASS) {
+diff --git a/drivers/scsi/device_handler/scsi_dh_hp_sw.c b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
+index 4a3f7831a2d6..0d2cfa60aa06 100644
+--- a/drivers/scsi/device_handler/scsi_dh_hp_sw.c
++++ b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
+@@ -83,7 +83,7 @@ static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
+ 	unsigned char cmd[6] = { TEST_UNIT_READY };
+ 	struct scsi_sense_hdr sshdr;
+ 	int ret = SCSI_DH_OK, res;
+-	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
  
--	return 0;
-+	return false;
- }
+ retry:
+@@ -121,7 +121,7 @@ static int hp_sw_start_stop(struct hp_sw_dh_data *h)
+ 	struct scsi_device *sdev = h->sdev;
+ 	int res, rc = SCSI_DH_OK;
+ 	int retry_cnt = HP_SW_RETRIES;
+-	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
  
- /**
-diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-index 6eeaa0a7f86d..429663bd78ec 100644
---- a/drivers/scsi/scsi_priv.h
-+++ b/drivers/scsi/scsi_priv.h
-@@ -82,7 +82,7 @@ void scsi_eh_ready_devs(struct Scsi_Host *shost,
- 			struct list_head *done_q);
- int scsi_eh_get_sense(struct list_head *work_q,
- 		      struct list_head *done_q);
--int scsi_noretry_cmd(struct scsi_cmnd *scmd);
-+bool scsi_noretry_cmd(struct scsi_cmnd *scmd);
- void scsi_eh_done(struct scsi_cmnd *scmd);
+ retry:
+diff --git a/drivers/scsi/device_handler/scsi_dh_rdac.c b/drivers/scsi/device_handler/scsi_dh_rdac.c
+index 66652ab409cc..bf8754741f85 100644
+--- a/drivers/scsi/device_handler/scsi_dh_rdac.c
++++ b/drivers/scsi/device_handler/scsi_dh_rdac.c
+@@ -536,7 +536,7 @@ static void send_mode_select(struct work_struct *work)
+ 	unsigned char cdb[MAX_COMMAND_SIZE];
+ 	struct scsi_sense_hdr sshdr;
+ 	unsigned int data_size;
+-	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
++	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
+ 		REQ_FAILFAST_DRIVER;
  
- /* scsi_lib.c */
+ 	spin_lock(&ctlr->ms_lock);
