@@ -2,75 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88700C43334
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 14:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE10C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 14:55:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232289AbiGNOld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 10:41:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50660 "EHLO
+        id S239173AbiGNOzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 10:55:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231666AbiGNOlc (ORCPT
+        with ESMTP id S239376AbiGNOzP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 10:41:32 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418F23ED42;
-        Thu, 14 Jul 2022 07:41:32 -0700 (PDT)
-Received: from localhost (mtl.collabora.ca [66.171.169.34])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: krisman)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id D23FC6601A3B;
-        Thu, 14 Jul 2022 15:41:30 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1657809691;
-        bh=mJIM2zGgD78gQfPnTLvFFsazmmE8m4nDAx4O+dQ3QR0=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=TpfrT7ybUq990Pru3NUwibUPmdfYNU/FPugMFvIN9KOq/p4JnnBGjUly5UwLDJPjU
-         /eFpDjrdsmM3k8JeBVXxVmaboJYRrfjR942ifNvRWuq9VTdt6o173+hYSAfwgswzIZ
-         WSxufC4rQyq9wJsSrppHERrcBRbhBBHm7PzR3opjDIEP7AwUuHj8Yh2TYlOFhjz35w
-         h/yrdv/o1jkNN3zWkW70THW6UFs8qHplYTyOvC9NibKdPISYVnRZJ+honMu7bLeQtg
-         HyyKQ+5CzQ0nqNibp65WQcTPqHz8GGdxH8PO275zBzN9lrlF4upYOb1rwFPah02sbB
-         4zK6xnYcIm4RA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Subject: Re: [PATCH V5 0/2] ublk: add io_uring based userspace block driver
-Organization: Collabora
-References: <20220713140711.97356-1-ming.lei@redhat.com>
-Date:   Thu, 14 Jul 2022 10:41:27 -0400
-In-Reply-To: <20220713140711.97356-1-ming.lei@redhat.com> (Ming Lei's message
-        of "Wed, 13 Jul 2022 22:07:09 +0800")
-Message-ID: <87h73jah9k.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        Thu, 14 Jul 2022 10:55:15 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE5BB52445;
+        Thu, 14 Jul 2022 07:55:13 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 26EEsLPg008235
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Jul 2022 10:54:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1657810466; bh=QawvQ560xdvpwEjmvpfYqk0KReolW7mc5YwpiDi8AfQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=pu/S7BHY5/kT9cNJvuSsMX2+ODL61NzBt9WeY0kH2iDG1wLIRcJqXa056UAdnT5+R
+         AOBqk+iBbUVfpambcQLLwkcwq41iDUgaWVXHm0jCDFkqWSpDaoESYWo2IWefkCcFPR
+         dNlco22a1oOA7NYcLgzPxYPBZPms8A98tFYGPOCk3otxcYnaC30u5O484Q6oS806vX
+         nqNfS1uK+j9hjifljIYmah6A264d9whosKObzjpZTzUMGjE7Zx/aXeDSM0PApGB+9y
+         avfsuVx4y3MSJ8j+JXl3SVk3a5IQDq2BOebsVOHim9lSZk09zLlA2Qei9BCtXZjSZp
+         VkEYcHXptjpPA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 3753C15C003C; Thu, 14 Jul 2022 10:54:21 -0400 (EDT)
+Date:   Thu, 14 Jul 2022 10:54:21 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>, Song Liu <song@kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.com>, Mark Fasheh <mark@fasheh.com>,
+        Joel Becker <jlbec@evilplan.org>,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com
+Subject: Re: [PATCH 8/9] ext4: only initialize mmp_bdevname once
+Message-ID: <YtAuHaiK+Me08swz@mit.edu>
+References: <20220713055317.1888500-1-hch@lst.de>
+ <20220713055317.1888500-9-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220713055317.1888500-9-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming Lei <ming.lei@redhat.com> writes:
+On Wed, Jul 13, 2022 at 07:53:16AM +0200, Christoph Hellwig wrote:
+> mmp_bdevname is currently both initialized nested inside the kthread_run
+> call in ext4_multi_mount_protect and in the kmmpd thread started by it.
+> 
+> Lift the initiaization out of the kthread_run call in
+> ext4_multi_mount_protect, move the BUILD_BUG_ON next to it and remove
+> the duplicate assignment inside of kmmpd.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-> ublk driver is one kernel driver for implementing generic userspace block
-> device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
-> ublk server[1] which is the userspace part of ublk for communicating
-> with ublk driver and handling specific io logic by its target module.
-
-Hey Ming,
-
-I didn't get a chance to look deep into v5 as I was on a last minute
-leave in the past few days.  Either way, I went through them now and the
-patches look good to me.  I'm quite happy they are merged, thank you
-very much for this work.
-
-Just for ML archive purposes, the entire series is
-
-Reviewed-by: Gabriel Krisman Bertazi <krisman@collabora.com>
-
-:)
-
--- 
-Gabriel Krisman Bertazi
+Acked-by: Theodore Ts'o <tytso@mit.edu>
