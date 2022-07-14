@@ -2,71 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE10C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 14:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1328C43334
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jul 2022 15:14:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239173AbiGNOzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 10:55:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32930 "EHLO
+        id S238391AbiGNPOy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 11:14:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239376AbiGNOzP (ORCPT
+        with ESMTP id S232191AbiGNPOx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 10:55:15 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE5BB52445;
-        Thu, 14 Jul 2022 07:55:13 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 26EEsLPg008235
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 14 Jul 2022 10:54:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1657810466; bh=QawvQ560xdvpwEjmvpfYqk0KReolW7mc5YwpiDi8AfQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=pu/S7BHY5/kT9cNJvuSsMX2+ODL61NzBt9WeY0kH2iDG1wLIRcJqXa056UAdnT5+R
-         AOBqk+iBbUVfpambcQLLwkcwq41iDUgaWVXHm0jCDFkqWSpDaoESYWo2IWefkCcFPR
-         dNlco22a1oOA7NYcLgzPxYPBZPms8A98tFYGPOCk3otxcYnaC30u5O484Q6oS806vX
-         nqNfS1uK+j9hjifljIYmah6A264d9whosKObzjpZTzUMGjE7Zx/aXeDSM0PApGB+9y
-         avfsuVx4y3MSJ8j+JXl3SVk3a5IQDq2BOebsVOHim9lSZk09zLlA2Qei9BCtXZjSZp
-         VkEYcHXptjpPA==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 3753C15C003C; Thu, 14 Jul 2022 10:54:21 -0400 (EDT)
-Date:   Thu, 14 Jul 2022 10:54:21 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>, Song Liu <song@kernel.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.com>, Mark Fasheh <mark@fasheh.com>,
-        Joel Becker <jlbec@evilplan.org>,
-        Joseph Qi <joseph.qi@linux.alibaba.com>,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com
-Subject: Re: [PATCH 8/9] ext4: only initialize mmp_bdevname once
-Message-ID: <YtAuHaiK+Me08swz@mit.edu>
-References: <20220713055317.1888500-1-hch@lst.de>
- <20220713055317.1888500-9-hch@lst.de>
+        Thu, 14 Jul 2022 11:14:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 816334507F
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 08:14:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1657811691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OeF6usJeTyAcTdKe5UBwqQy7jEW4hkpRgeYYoNc1qmc=;
+        b=KIFkiLckc39SYnjHrymz5JKb1GASAtimkW2ppnmVmkNwnAQ6ZPrcrKWMttgUCH/aagm6bR
+        Q8l1w/y00w47nXjrFGGokUlgYfZ7hJtqxtYlxMJacRnbl+042mYMVH11Wcc00iZCmwQpJm
+        jKvv+fHVsHIEQuDpBVjQ7BqCjplI+jo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-324-cF3MWFlaO3-_NJpZ-c4sCw-1; Thu, 14 Jul 2022 11:14:46 -0400
+X-MC-Unique: cF3MWFlaO3-_NJpZ-c4sCw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E7C718F025F;
+        Thu, 14 Jul 2022 15:14:45 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B2B05140EBE3;
+        Thu, 14 Jul 2022 15:14:37 +0000 (UTC)
+Date:   Thu, 14 Jul 2022 23:14:32 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, kbusch@kernel.org,
+        axboe@kernel.dk, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        asml.silence@gmail.com, joshiiitr@gmail.com, anuj20.g@samsung.com,
+        gost.dev@samsung.com, ming.lei@redhat.com
+Subject: Re: [PATCH for-next 4/4] nvme-multipath: add multipathing for
+ uring-passthrough commands
+Message-ID: <YtAy2PUDoWUUE9Bl@T590>
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110827epcas5p3fd81f142f55ca3048abc38a9ef0d0089@epcas5p3.samsung.com>
+ <20220711110155.649153-5-joshi.k@samsung.com>
+ <3fc68482-fb24-1f39-5428-faa3a8db9ecb@grimberg.me>
+ <20220711183746.GA20562@test-zns>
+ <5f30c7de-03b1-768a-d44f-594ed2d1dc75@grimberg.me>
+ <20220712042332.GA14780@test-zns>
+ <3a2b281b-793b-b8ad-6a27-138c89a46fac@grimberg.me>
+ <20220713053757.GA15022@test-zns>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220713055317.1888500-9-hch@lst.de>
+In-Reply-To: <20220713053757.GA15022@test-zns>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 13, 2022 at 07:53:16AM +0200, Christoph Hellwig wrote:
-> mmp_bdevname is currently both initialized nested inside the kthread_run
-> call in ext4_multi_mount_protect and in the kmmpd thread started by it.
+On Wed, Jul 13, 2022 at 11:07:57AM +0530, Kanchan Joshi wrote:
+> > > > > > The way I would do this that in nvme_ioucmd_failover_req (or in the
+> > > > > > retry driven from command retriable failure) I would do the above,
+> > > > > > requeue it and kick the requeue work, to go over the requeue_list and
+> > > > > > just execute them again. Not sure why you even need an explicit retry
+> > > > > > code.
+> > > > > During retry we need passthrough command. But passthrough command is not
+> > > > > stable (i.e. valid only during first submission). We can make it stable
+> > > > > either by:
+> > > > > (a) allocating in nvme (b) return -EAGAIN to io_uring, and
+> > > > > it will do allocate + deferral
+> > > > > Both add a cost. And since any command can potentially fail, that
+> > > > > means taking that cost for every IO that we issue on mpath node. Even if
+> > > > > no failure (initial or subsquent after IO) occcured.
+> > > > 
+> > > > As mentioned, I think that if a driver consumes a command as queued,
+> > > > it needs a stable copy for a later reformation of the request for
+> > > > failover purposes.
+> > > 
+> > > So what do you propose to make that stable?
+> > > As I mentioned earlier, stable copy requires allocating/copying in fast
+> > > path. And for a condition (failover) that may not even occur.
+> > > I really think currrent solution is much better as it does not try to make
+> > > it stable. Rather it assembles pieces of passthrough command if retry
+> > > (which is rare) happens.
+> > 
+> > Well, I can understand that io_uring_cmd is space constrained, otherwise
+> > we wouldn't be having this discussion.
 > 
-> Lift the initiaization out of the kthread_run call in
-> ext4_multi_mount_protect, move the BUILD_BUG_ON next to it and remove
-> the duplicate assignment inside of kmmpd.
+> Indeed. If we had space for keeping passthrough command stable for
+> retry, that would really have simplified the plumbing. Retry logic would
+> be same as first submission.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > However io_kiocb is less
+> > constrained, and could be used as a context to hold such a space.
+> > 
+> > Even if it is undesired to have io_kiocb be passed to uring_cmd(), it
+> > can still hold a driver specific space paired with a helper to obtain it
+> > (i.e. something like io_uring_cmd_to_driver_ctx(ioucmd) ). Then if the
+> > space is pre-allocated it is only a small memory copy for a stable copy
+> > that would allow a saner failover design.
+> 
+> I am thinking along the same lines, but it's not about few bytes of
+> space rather we need 80 (72 to be precise). Will think more, but
+> these 72 bytes really stand tall in front of my optimism.
+> 
+> Do you see anything is possible in nvme-side?
+> Now also passthrough command (although in a modified form) gets copied
+> into this preallocated space i.e. nvme_req(req)->cmd. This part -
 
-Acked-by: Theodore Ts'o <tytso@mit.edu>
+I understand it can't be allocated in nvme request which is freed
+during retry, and looks the extra space has to be bound with
+io_uring_cmd.
+
+
+thanks, 
+Ming
+
