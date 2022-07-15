@@ -2,233 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9E7C43334
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 09:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC70C43334
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 10:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbiGOJlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 05:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56758 "EHLO
+        id S232024AbiGOKPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 06:15:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232217AbiGOJlU (ORCPT
+        with ESMTP id S230407AbiGOKPk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 05:41:20 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33247FE54
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 02:41:19 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id A10D31FCEA;
-        Fri, 15 Jul 2022 09:41:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1657878078; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=M2ep95EsyNsOUq8lAoKXnzJ/mAfGet4AvyL+3exRQ4o=;
-        b=bknMClarTfeEs7fYDHqfKWSFZ1mVTzwgi25Hg1YnpGl3INwDRUNPL2EgBMOQ8BR5NJ4GbO
-        XdB5TOOw8F2o7bwvS1hmJAtnmkpUK4zahXNSAPrkcVD5JlRHYLnP4YMKsFa5O5jqyQ7UDy
-        5K70lvncyIS2k6VzGC7PXcB0xGkm/d8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1657878078;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=M2ep95EsyNsOUq8lAoKXnzJ/mAfGet4AvyL+3exRQ4o=;
-        b=0EGWheiU/lcDKXpJLdPZWdQhSbYycLTABwzfl8s/wJlfZowqNZ88LDXLmTrH3yPm48wXS9
-        9z8QNwi2Tg44IfDA==
-Received: from quack3.suse.cz (unknown [10.100.200.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 873C52C141;
-        Fri, 15 Jul 2022 09:41:18 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 3B42EA0657; Fri, 15 Jul 2022 11:41:18 +0200 (CEST)
-Date:   Fri, 15 Jul 2022 11:41:18 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v3 07/63] block/bfq: Use the new blk_opf_t type
-Message-ID: <20220715094118.dp5sxbzho6ud6rqd@quack3>
-References: <20220714180729.1065367-1-bvanassche@acm.org>
- <20220714180729.1065367-8-bvanassche@acm.org>
+        Fri, 15 Jul 2022 06:15:40 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3370820D2;
+        Fri, 15 Jul 2022 03:15:38 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id u13so7085612lfn.5;
+        Fri, 15 Jul 2022 03:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=3jL/lfoMTvA3SObDpy7W+GRYeEbbVoydVSs+VhMSyQ8=;
+        b=LKqUeJAhYet/E4+FOjDCJ0dKq4cDW2x4E+rfQdu83sWKvClZdCu1e1M0E0f3NVLWeY
+         RXqHP7rrV4Gy0UvBJZ6Bv4RiaH1MNOZ0zYRfjZ35s6KLeY6hYXQcra7SL8Bs6qETPdr5
+         dYYLgG48qse3A1sQodtQrzuSaIVuhSnWYGOCsfY5B7tL5JDS6Z3SbspiTM2N6zT81LBz
+         GrmAOEmVMPpU117asGxfbCJUPK8r1VAAGAELjEv0s/Ph5p+GAAYDP5wadDJdkdPE4Jv9
+         Ebcy0Ity1RZ3igPwXdeAet2+5VSr+p+LL13YixBvp19SsNp9YpNMvk/gnMMrJ07RuCcm
+         55Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3jL/lfoMTvA3SObDpy7W+GRYeEbbVoydVSs+VhMSyQ8=;
+        b=Y7AlmLyyzzUhLU0Xa4nnzSHExxCy6sgmJ9ZLAfSqcXOWufbtKk1WlSJ9FaWzANZ+22
+         9PgFI1QNoD2RHSFwQoWyp/x2HH7DVpZfbAQSurGMrw8noaYiRxnvH1JoHURxwdZN7bjN
+         3qOvD4pXKRS8cIIVqlvpysFLHYlF20Af93B8+fEmsUNvjmQP9vsRyIg6kTpjGaQOogc7
+         7602wOzgmrF5/kZtCibbw/bXUT/v+Odkev1ts1ph3pto2A2huoiAy7nrlX2BxejMTPdt
+         w5Tx1T9/jONGD9vp10uHzBIzd68qz9K7mGVT80Hsqzh+g1sH40peJksW5GBY0vsxeRr+
+         SFGg==
+X-Gm-Message-State: AJIora+b6uOdsYuJVoLDxswHz4dLLL4KAfYgr5A2mzhHmed66rwUKx5C
+        oSNCTtJW+fpjmw3pZT7J4Hs=
+X-Google-Smtp-Source: AGRyM1t48mlwdtZzT1aWp5fHW0tldYcGnnIY2KtrlB80elovY46YP+G88J/+IMfODsBiDN0SPqzLiA==
+X-Received: by 2002:a19:4f0b:0:b0:489:c753:5c1d with SMTP id d11-20020a194f0b000000b00489c7535c1dmr7473118lfb.339.1657880136897;
+        Fri, 15 Jul 2022 03:15:36 -0700 (PDT)
+Received: from [192.168.1.7] ([212.22.223.21])
+        by smtp.gmail.com with ESMTPSA id e10-20020a19674a000000b00483f8c40c14sm835123lfj.243.2022.07.15.03.15.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Jul 2022 03:15:36 -0700 (PDT)
+Message-ID: <41207539-f621-1bb2-2f43-0b2b9e3f6866@gmail.com>
+Date:   Fri, 15 Jul 2022 13:15:34 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220714180729.1065367-8-bvanassche@acm.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v2] xen-blkback: fix persistent grants negotiation
+Content-Language: en-US
+To:     SeongJae Park <sj@kernel.org>, roger.pau@citrix.com,
+        jgross@suse.com
+Cc:     axboe@kernel.dk, boris.ostrovsky@oracle.com, mheyne@amazon.de,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        andrii.chepurnyi82@gmail.com
+References: <20220714224410.51147-1-sj@kernel.org>
+From:   Oleksandr <olekstysh@gmail.com>
+In-Reply-To: <20220714224410.51147-1-sj@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 14-07-22 11:06:33, Bart Van Assche wrote:
-> Use the new blk_opf_t type for arguments and variables that represent
-> request flags or a bitwise combination of a request operation and
-> request flags. Rename those variables from 'op' into 'opf'.
-> 
-> This patch does not change any functionality.
-> 
-> Cc: Jan Kara <jack@suse.cz>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Looks good to me. Feel free to add:
+On 15.07.22 01:44, SeongJae Park wrote:
 
-Reviewed-by: Jan Kara <jack@suse.cz>
 
-								Honza
+Hello all.
 
+Adding Andrii Chepurnyi to CC who have played with the use-case which 
+required reconnect recently and faced some issues with 
+feature_persistent handling.
+
+
+
+
+> Persistent grants feature can be used only when both backend and the
+> frontend supports the feature.  The feature was always supported by
+> 'blkback', but commit aac8a70db24b ("xen-blkback: add a parameter for
+> disabling of persistent grants") has introduced a parameter for
+> disabling it runtime.
+>
+> To avoid the parameter be updated while being used by 'blkback', the
+> commit caches the parameter into 'vbd->feature_gnt_persistent' in
+> 'xen_vbd_create()', and then check if the guest also supports the
+> feature and finally updates the field in 'connect_ring()'.
+>
+> However, 'connect_ring()' could be called before 'xen_vbd_create()', so
+> later execution of 'xen_vbd_create()' can wrongly overwrite 'true' to
+> 'vbd->feature_gnt_persistent'.  As a result, 'blkback' could try to use
+> 'persistent grants' feature even if the guest doesn't support the
+> feature.
+>
+> This commit fixes the issue by moving the parameter value caching to
+> 'xen_blkif_alloc()', which allocates the 'blkif'.  Because the struct
+> embeds 'vbd' object, which will be used by 'connect_ring()' later, this
+> should be called before 'connect_ring()' and therefore this should be
+> the right and safe place to do the caching.
+>
+> Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
+> Cc: <stable@vger.kernel.org> # 5.10.x
+> Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+> Signed-off-by: SeongJae Park <sj@kernel.org>
 > ---
->  block/bfq-cgroup.c  | 26 +++++++++++++-------------
->  block/bfq-iosched.c | 16 ++++++++--------
->  block/bfq-iosched.h |  8 ++++----
->  3 files changed, 25 insertions(+), 25 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 9fc605791b1e..30b15a9a47c4 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -220,46 +220,46 @@ void bfqg_stats_update_avg_queue_size(struct bfq_group *bfqg)
->  }
->  
->  void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
-> -			      unsigned int op)
-> +			      blk_opf_t opf)
->  {
-> -	blkg_rwstat_add(&bfqg->stats.queued, op, 1);
-> +	blkg_rwstat_add(&bfqg->stats.queued, opf, 1);
->  	bfqg_stats_end_empty_time(&bfqg->stats);
->  	if (!(bfqq == ((struct bfq_data *)bfqg->bfqd)->in_service_queue))
->  		bfqg_stats_set_start_group_wait_time(bfqg, bfqq_group(bfqq));
->  }
->  
-> -void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op)
-> +void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t opf)
->  {
-> -	blkg_rwstat_add(&bfqg->stats.queued, op, -1);
-> +	blkg_rwstat_add(&bfqg->stats.queued, opf, -1);
->  }
->  
-> -void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op)
-> +void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t opf)
->  {
-> -	blkg_rwstat_add(&bfqg->stats.merged, op, 1);
-> +	blkg_rwstat_add(&bfqg->stats.merged, opf, 1);
->  }
->  
->  void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
-> -				  u64 io_start_time_ns, unsigned int op)
-> +				  u64 io_start_time_ns, blk_opf_t opf)
->  {
->  	struct bfqg_stats *stats = &bfqg->stats;
->  	u64 now = ktime_get_ns();
->  
->  	if (now > io_start_time_ns)
-> -		blkg_rwstat_add(&stats->service_time, op,
-> +		blkg_rwstat_add(&stats->service_time, opf,
->  				now - io_start_time_ns);
->  	if (io_start_time_ns > start_time_ns)
-> -		blkg_rwstat_add(&stats->wait_time, op,
-> +		blkg_rwstat_add(&stats->wait_time, opf,
->  				io_start_time_ns - start_time_ns);
->  }
->  
->  #else /* CONFIG_BFQ_CGROUP_DEBUG */
->  
->  void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
-> -			      unsigned int op) { }
-> -void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op) { }
-> -void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op) { }
-> +			      blk_opf_t opf) { }
-> +void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t opf) { }
-> +void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t opf) { }
->  void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
-> -				  u64 io_start_time_ns, unsigned int op) { }
-> +				  u64 io_start_time_ns, blk_opf_t opf) { }
->  void bfqg_stats_update_dequeue(struct bfq_group *bfqg) { }
->  void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg) { }
->  void bfqg_stats_update_idle_time(struct bfq_group *bfqg) { }
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index e6d7e6b01a05..c740b41fe0a4 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -668,19 +668,19 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
->   * significantly affect service guarantees coming from the BFQ scheduling
->   * algorithm.
->   */
-> -static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
-> +static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
->  {
->  	struct bfq_data *bfqd = data->q->elevator->elevator_data;
->  	struct bfq_io_cq *bic = bfq_bic_lookup(data->q);
-> -	struct bfq_queue *bfqq = bic ? bic_to_bfqq(bic, op_is_sync(op)) : NULL;
-> +	struct bfq_queue *bfqq = bic ? bic_to_bfqq(bic, op_is_sync(opf)) : NULL;
->  	int depth;
->  	unsigned limit = data->q->nr_requests;
->  
->  	/* Sync reads have full depth available */
-> -	if (op_is_sync(op) && !op_is_write(op)) {
-> +	if (op_is_sync(opf) && !op_is_write(opf)) {
->  		depth = 0;
->  	} else {
-> -		depth = bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(op)];
-> +		depth = bfqd->word_depths[!!bfqd->wr_busy_queues][op_is_sync(opf)];
->  		limit = (limit * depth) >> bfqd->full_depth_shift;
->  	}
->  
-> @@ -693,7 +693,7 @@ static void bfq_limit_depth(unsigned int op, struct blk_mq_alloc_data *data)
->  		depth = 1;
->  
->  	bfq_log(bfqd, "[%s] wr_busy %d sync %d depth %u",
-> -		__func__, bfqd->wr_busy_queues, op_is_sync(op), depth);
-> +		__func__, bfqd->wr_busy_queues, op_is_sync(opf), depth);
->  	if (depth)
->  		data->shallow_depth = depth;
->  }
-> @@ -6104,7 +6104,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
->  static void bfq_update_insert_stats(struct request_queue *q,
->  				    struct bfq_queue *bfqq,
->  				    bool idle_timer_disabled,
-> -				    unsigned int cmd_flags)
-> +				    blk_opf_t cmd_flags)
->  {
->  	if (!bfqq)
->  		return;
-> @@ -6129,7 +6129,7 @@ static void bfq_update_insert_stats(struct request_queue *q,
->  static inline void bfq_update_insert_stats(struct request_queue *q,
->  					   struct bfq_queue *bfqq,
->  					   bool idle_timer_disabled,
-> -					   unsigned int cmd_flags) {}
-> +					   blk_opf_t cmd_flags) {}
->  #endif /* CONFIG_BFQ_CGROUP_DEBUG */
->  
->  static struct bfq_queue *bfq_init_rq(struct request *rq);
-> @@ -6141,7 +6141,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  	struct bfq_data *bfqd = q->elevator->elevator_data;
->  	struct bfq_queue *bfqq;
->  	bool idle_timer_disabled = false;
-> -	unsigned int cmd_flags;
-> +	blk_opf_t cmd_flags;
->  	LIST_HEAD(free);
->  
->  #ifdef CONFIG_BFQ_GROUP_IOSCHED
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index ca8177d7bf7c..ad8e513d7e87 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -994,11 +994,11 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg);
->  
->  void bfqg_stats_update_legacy_io(struct request_queue *q, struct request *rq);
->  void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
-> -			      unsigned int op);
-> -void bfqg_stats_update_io_remove(struct bfq_group *bfqg, unsigned int op);
-> -void bfqg_stats_update_io_merged(struct bfq_group *bfqg, unsigned int op);
-> +			      blk_opf_t opf);
-> +void bfqg_stats_update_io_remove(struct bfq_group *bfqg, blk_opf_t opf);
-> +void bfqg_stats_update_io_merged(struct bfq_group *bfqg, blk_opf_t opf);
->  void bfqg_stats_update_completion(struct bfq_group *bfqg, u64 start_time_ns,
-> -				  u64 io_start_time_ns, unsigned int op);
-> +				  u64 io_start_time_ns, blk_opf_t opf);
->  void bfqg_stats_update_dequeue(struct bfq_group *bfqg);
->  void bfqg_stats_set_start_empty_time(struct bfq_group *bfqg);
->  void bfqg_stats_update_idle_time(struct bfq_group *bfqg);
+>
+> Changes from v1[1]
+> - Avoid the behavioral change[2]
+> - Rebase on latest xen/tip/linux-next
+> - Re-work by SeongJae Park <sj@kernel.org>
+> - Cc stable@
+>
+> [1] https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/
+> [2] https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/
+>
+>   drivers/block/xen-blkback/xenbus.c | 15 +++++++--------
+>   1 file changed, 7 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index 97de13b14175..16c6785d260c 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -157,6 +157,11 @@ static int xen_blkif_alloc_rings(struct xen_blkif *blkif)
+>   	return 0;
+>   }
+>   
+> +/* Enable the persistent grants feature. */
+> +static bool feature_persistent = true;
+> +module_param(feature_persistent, bool, 0644);
+> +MODULE_PARM_DESC(feature_persistent, "Enables the persistent grants feature");
+> +
+>   static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+>   {
+>   	struct xen_blkif *blkif;
+> @@ -181,6 +186,8 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+>   	__module_get(THIS_MODULE);
+>   	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
+>   
+> +	blkif->vbd.feature_gnt_persistent = feature_persistent;
+> +
+>   	return blkif;
+>   }
+>   
+> @@ -472,12 +479,6 @@ static void xen_vbd_free(struct xen_vbd *vbd)
+>   	vbd->bdev = NULL;
+>   }
+>   
+> -/* Enable the persistent grants feature. */
+> -static bool feature_persistent = true;
+> -module_param(feature_persistent, bool, 0644);
+> -MODULE_PARM_DESC(feature_persistent,
+> -		"Enables the persistent grants feature");
+> -
+>   static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+>   			  unsigned major, unsigned minor, int readonly,
+>   			  int cdrom)
+> @@ -520,8 +521,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+>   	if (bdev_max_secure_erase_sectors(bdev))
+>   		vbd->discard_secure = true;
+>   
+> -	vbd->feature_gnt_persistent = feature_persistent;
+> -
+>   	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
+>   		handle, blkif->domid);
+>   	return 0;
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Regards,
+
+Oleksandr Tyshchenko
+
