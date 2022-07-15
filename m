@@ -2,92 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EFBCCA482
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 18:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11332CCA480
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 19:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbiGOSrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 14:47:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60496 "EHLO
+        id S230050AbiGOTCm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 15:02:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229956AbiGOSrq (ORCPT
+        with ESMTP id S229538AbiGOTCl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 14:47:46 -0400
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2223C8EA
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:47:45 -0700 (PDT)
-Received: by mail-pf1-f171.google.com with SMTP id b133so1570086pfb.6
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:47:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=T3eHuEl5s+o4BUs6B7cGxx4/p/uTNMi3vU7THX5iw5Y=;
-        b=RLO7Q3LDTvCUs3fdUBwHFt5xN012m0L+q9jPVSxtUZNfQKvQNQCA18H0SmkriNe0EN
-         fG5axBpazYrTztArTNfXTiu8IrHkRpyinq9/GPqD/Fixl5ieXlJlKjlKW/jr9K8go9/U
-         RUzUQAobOAZu29KyfZVlPzEwjW1EVzW2Ajv0LefvhDoXNdbAfn4b/Y+DSYubKmxx/ScJ
-         5soKz7C+DOTVwaDkJfQOpEoJEFTRZdp+OT5tRZ9+YKsWNP3gQ4/P1ga4eq+aZCN3SqVi
-         4Ni/mlJ/15qo/FvGlYXu+nGBwDxe88/DdjmHwSQIb9BXD55QqS9vIHniEEREeKU6E6We
-         aYcQ==
-X-Gm-Message-State: AJIora/+R7OSZ2XdIzAekEK51qbRkK3ChouBS+j3zo2I/77aYp+QIrZQ
-        iQh0Wtt98+ZIOKeLmK02LPg=
-X-Google-Smtp-Source: AGRyM1vaqoI+sRfhcExYQzfld5AThsL55q3uUCTK9mqbYl1oGoIbneCwfHERJ+vGRabGm0HTpQTRqw==
-X-Received: by 2002:a63:ec47:0:b0:419:7e6d:19b5 with SMTP id r7-20020a63ec47000000b004197e6d19b5mr13648913pgj.256.1657910865380;
-        Fri, 15 Jul 2022 11:47:45 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:2e39:7b26:bf0e:fb58])
-        by smtp.gmail.com with ESMTPSA id n2-20020a170902d2c200b0016c2cdea409sm3880490plc.280.2022.07.15.11.47.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 11:47:44 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Li Zefan <lizf@cn.fujitsu.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH 2/2] blktrace: Fix the blk_fill_rwbs() kernel-doc header
-Date:   Fri, 15 Jul 2022 11:47:35 -0700
-Message-Id: <20220715184735.2326034-3-bvanassche@acm.org>
-X-Mailer: git-send-email 2.37.0.170.g444d1eabd0-goog
-In-Reply-To: <20220715184735.2326034-1-bvanassche@acm.org>
-References: <20220715184735.2326034-1-bvanassche@acm.org>
+        Fri, 15 Jul 2022 15:02:41 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F79F501A5;
+        Fri, 15 Jul 2022 12:02:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=jujfwG01dI+nm2T9PWfBuPM/ZuQZ4xaHDU/3x3esj7k=; b=vshOETTLB/053qWcYEpRjl1hLU
+        btE+kOnXwV4W9dUiiMvLCrbAZAElTJXt5jVfg+IutzKO1cyip9ng1YfymUZ/5k36CU78ZV5kc3j8C
+        fMQgXx/wFdRQ6EIyqjyHYBHAjxPR+sVAPbhARME3knMhuiZPWA6YIvGpXSihfBaXRuQN34HPqPgnJ
+        Cu5JmTlZt3zltSMdmB4w+waspWOZe5YuplQ7nstXHO0quGTIM4f7jBLV2I5izohnKmmZEwQ0xRm+N
+        JXw9qrxQjyEk3SaPLv++O3drVwz30VT8/XcNu6NSj4JHLEP2nZ70xQqyjcgsnwQy3yPuod3q83jgR
+        zkrQmPCA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oCQaD-009bAK-9g; Fri, 15 Jul 2022 19:02:37 +0000
+Date:   Fri, 15 Jul 2022 12:02:37 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     casey@schaufler-ca.com, axboe@kernel.dk, joshi.k@samsung.com,
+        linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        a.manzanares@samsung.com, javier@javigon.com
+Subject: Re: [PATCH] lsm,io_uring: add LSM hooks to for the new uring_cmd
+ file op
+Message-ID: <YtG5zRPFV967/y0v@bombadil.infradead.org>
+References: <20220714000536.2250531-1-mcgrof@kernel.org>
+ <CAHC9VhSjfrMtqy_6+=_=VaCsJKbKU1oj6TKghkue9LrLzO_++w@mail.gmail.com>
+ <YtC8Hg1mjL+0mjfl@bombadil.infradead.org>
+ <CAHC9VhQMABYKRqZmJQtXai0gtiueU42ENvSUH929=pF6tP9xOg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHC9VhQMABYKRqZmJQtXai0gtiueU42ENvSUH929=pF6tP9xOg@mail.gmail.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reflect recent changes in the blk_fill_rwbs() kernel-doc header.
+On Fri, Jul 15, 2022 at 02:46:16PM -0400, Paul Moore wrote:
+> It looks like I owe you an apology, Luis.  While my frustration over
+> io_uring remains, along with my disappointment that the io_uring
+> developers continue to avoid discussing access controls with the LSM
+> community, you are not the author of the IORING_OP_URING_CMD.   You
+> are simply trying to do the right thing by adding the necessary LSM
+> controls and in my confusion I likely caused you a bit of frustration;
+> I'm sorry for that.
 
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Fixes: 919dbca8670d ("blktrace: Use the new blk_opf_t type")
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- kernel/trace/blktrace.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+No frustration caused, I get it.
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 150058f5daa9..7f5eb295fe19 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1873,11 +1873,11 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- /**
-  * blk_fill_rwbs - Fill the buffer rwbs by mapping op to character string.
-  * @rwbs:	buffer to be filled
-- * @op:		REQ_OP_XXX for the tracepoint
-+ * @opf:	request operation type (REQ_OP_XXX) and flags for the tracepoint
-  *
-  * Description:
-- *     Maps the REQ_OP_XXX to character and fills the buffer provided by the
-- *     caller with resulting string.
-+ *     Maps each request operation and flag to a single character and fills the
-+ *     buffer provided by the caller with resulting string.
-  *
-  **/
- void blk_fill_rwbs(char *rwbs, blk_opf_t opf)
+> Well, we're at -rc6 right now which means IORING_OP_URING_CMD is
+> happening and it's unlikely the LSM folks are going to be able to
+> influence the design/implementation much at this point so we have to
+> do the best we can.  Given the existing constraints, I think your
+> patch is reasonable (although please do shift the hook call site down
+> a bit as discussed above), we just need to develop the LSM
+> implementations to go along with it.
+> 
+> Luis, can you respin and resend the patch with the requested changes?
+
+Sure thing.
+
+> I also think we should mark the patches with a 'Fixes:' line that
+> points at the IORING_OP_URING_CMD commit, ee692a21e9bf ("fs,io_uring:
+> add infrastructure for uring-cmd").
+
+I'll do that.
+
+  Luis
