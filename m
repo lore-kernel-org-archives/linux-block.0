@@ -2,85 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61732CCA481
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 15:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC28C43334
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 15:46:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232978AbiGOPFj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 11:05:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46782 "EHLO
+        id S235510AbiGOPqv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 11:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232855AbiGOPFj (ORCPT
+        with ESMTP id S235179AbiGOPqr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 11:05:39 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB922C67A
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 08:05:38 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id 125so4061702iou.6
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 08:05:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=GyF5vVUfYg0uGjuHMOooMcwwdDurfB/NjUpbYbcr06U=;
-        b=bhPLfwdwXmyk/H2PFbTvP7ybSzx+AT91O5DBfH2+tqH2stNW+hsOg6UmwAFKcvUNCn
-         uncUJMNKhY5Y4qOKfeaWfsxcGh9k8iYTZx4deOreqM9P6c3nmkraj7OW8BylNicHMELi
-         dg1HGYu7o0dP1GjkU569oCBYJMGgs8q7/unEoIlwJPvux6xC3lpTdr8bYpS8Ukjp3+aZ
-         ncgda/mTwjoel/ChXx+1OzuUDwR7k4DYvXyekTFaDsEqJ/WkDK8IcdOD7o6UYcWkIQup
-         6Rc1ivxsjJQ8cMDbwILq+A3N3x6pCnuz0xxqdLIsKu1T1k3BMUpfQZNJgz9qveM0m0Jd
-         kCwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=GyF5vVUfYg0uGjuHMOooMcwwdDurfB/NjUpbYbcr06U=;
-        b=Cz6zPF8IVEif8I4rpwA1aH5bYjwbdf9dGriMI52y9UoixPA+oIOl6WY08oEI2RITsv
-         sF2yUPVn5NcPfZ2RhytMoU47hdy6jvIHcmEGhlFPFYbieSKEurMnpshDe6iW2sq/ukHE
-         zOL3bPb1B6MxxjMR2HaUgHlK4xksztVlID+oDn+xIKwjC8dBzhRYVAVRUxWw1FDCWBur
-         cynCf45XGf8hh2JxGmFreNFfimRYPJ4wua9lWa8Np8+2bRWs3DuCUAQk2ix3teBWJnJH
-         HLMKhUw7EWEgy9vTbwG47Ade0FswWXRYkrP9p7pA4LLEKHqo+Rtv6bOalpTucyKxCva1
-         74Jg==
-X-Gm-Message-State: AJIora8fh0dmvP65slLIiz8WYJXOOACampeOR5ZZLg5B+4ditqkZNkIq
-        KPC0qT58max7U9UpqNNCGw7EbQ==
-X-Google-Smtp-Source: AGRyM1v+28YqO5JTOYmncYwGj3waUtsYsregMJHG1FOY0Z/GGxqQRCyVAmj2xpNB6nT8hfkLgIXn3g==
-X-Received: by 2002:a05:6602:3298:b0:675:7d23:6643 with SMTP id d24-20020a056602329800b006757d236643mr6925275ioz.143.1657897537524;
-        Fri, 15 Jul 2022 08:05:37 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id a27-20020a027a1b000000b0033ef5e3c7b8sm1991129jac.142.2022.07.15.08.05.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Jul 2022 08:05:36 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     vincent.fu@samsung.com, dan.carpenter@oracle.com
-Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com,
-        johannes.thumshirn@wdc.com, kernel-janitors@vger.kernel.org,
-        damien.lemoal@opensource.wdc.com, kch@nvidia.com,
-        shinichiro.kawasaki@wdc.com
-In-Reply-To: <YtEhCjDq2oe2SIkS@kili>
-References: <YtEhCjDq2oe2SIkS@kili>
-Subject: Re: (subset) [PATCH 1/2] null_blk: prevent NULL dereference in null_init_tag_set()
-Message-Id: <165789753645.280962.1878458022201591770.b4-ty@kernel.dk>
-Date:   Fri, 15 Jul 2022 09:05:36 -0600
+        Fri, 15 Jul 2022 11:46:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4CA231;
+        Fri, 15 Jul 2022 08:46:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DFBEB62135;
+        Fri, 15 Jul 2022 15:46:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65BE5C34115;
+        Fri, 15 Jul 2022 15:46:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1657900006;
+        bh=1pP6wpTZR6yxJttIfhQ8GaI8CR+vOrFTZHxcwN15uk0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nTS1MBom8JQTTyxEVLiCJsH0hjcLXRd+KWRW8j3+FwNB94NtVwxVS2b96USqC+sj4
+         X/y9CH5O8YMTLBPq2aLd6pHgYwMMkzcQE8XH7EE5DFEuPgy48tsQv1wK1nuHVA8sjv
+         d9LxY2RmBRhHoOoqQHLHJmdKo67NuGc+5QL5hrDXhUzcvX1aesCIXJLRFKlGsLsT+U
+         rvJ9XJYf3yOkXRvfjwP0iY+hRoZsNgrRJ1SbPWaq5DYVaa4NkP9SzzfADd2GOYlAmX
+         BGuzgB7BqNF8zrOFWIG+/Hiit3qJ6zHtel3LuLoAF7S4p7KhMQcV/CU9YTJSlfi0if
+         u/t2DHgvbMY0g==
+From:   SeongJae Park <sj@kernel.org>
+To:     Andrii Chepurnyi <andrii.chepurnyi82@gmail.com>
+Cc:     Oleksandr <olekstysh@gmail.com>, SeongJae Park <sj@kernel.org>,
+        roger.pau@citrix.com, jgross@suse.com, axboe@kernel.dk,
+        boris.ostrovsky@oracle.com, mheyne@amazon.de,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] xen-blkback: fix persistent grants negotiation
+Date:   Fri, 15 Jul 2022 15:46:43 +0000
+Message-Id: <20220715154643.54334-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAJwUmVB6H3iTs-C+U=v-pwJB7-_ZRHPxHzKRJZ22xEPW7z8a=g@mail.gmail.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 15 Jul 2022 11:10:50 +0300, Dan Carpenter wrote:
-> The "nullb" pointer can be NULL.  Smatch prints a warning about this:
+Hello,
+
+
+Oleksandr, thank you for Cc-ing Andrii.  Andrii, thank you for the comment!
+
+On Fri, 15 Jul 2022 15:00:10 +0300 Andrii Chepurnyi <andrii.chepurnyi82@gmail.com> wrote:
+
+> [-- Attachment #1: Type: text/plain, Size: 5237 bytes --]
 > 
->     drivers/block/null_blk/main.c:1914 null_init_tag_set()
->     error: we previously assumed 'nullb' could be null (see line 1911)
+> Hello All,
 > 
+> I faced the mentioned issue recently and just to bring more context here is
+> our setup:
+> We use pvblock backend for Android guest. It starts using u-boot with
+> pvblock support(which frontend doesn't support the persistent grants
+> feature), later it loads and starts the Linux kernel(which frontend
+> supports the persistent grants feature). So in total, we have sequent two
+> different frontends reconnection, the first of which doesn't support
+> persistent grants.
+> So the original patch [1] perfectly solves the original issue and provides
+> the ability to use persistent grants after the reconnection when Linux
+> frontend which supports persistent grants comes into play.
+> At the same time [2] will disable the persistent grants feature for the
+> first and second frontend.
+
+Thank you for this great explanation of your situation.
+
+> Is it possible to keep [1]  as is?
+
+Yes, my concerns about Max's original patch[1] are conflicting behavior
+description in the document[1] and different behavior on blkfront-side
+'feature_persistent' parameter.  I will post Max's patch again with patches for
+blkfront behavior change and Documents updates.
+
+[1] https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/
+
+
+Thanks,
+SJ
+
 > 
-
-Applied, thanks!
-
-[2/2] null_blk: fix ida error handling in null_add_dev()
-      commit: 8c740c6bf12dec03b6f35b19fe6c183929d0b88a
-
-Best regards,
--- 
-Jens Axboe
-
-
+> [1]
+> https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/
+> [2] https://lore.kernel.org/xen-devel/20220714224410.51147-1-sj@kernel.org/
+> 
+> Best regards,
+> Andrii
+> 
+> On Fri, Jul 15, 2022 at 1:15 PM Oleksandr <olekstysh@gmail.com> wrote:
+> 
+> >
+> > On 15.07.22 01:44, SeongJae Park wrote:
+> >
+> >
+> > Hello all.
+> >
+> > Adding Andrii Chepurnyi to CC who have played with the use-case which
+> > required reconnect recently and faced some issues with
+> > feature_persistent handling.
+[...]
