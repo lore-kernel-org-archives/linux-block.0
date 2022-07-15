@@ -2,125 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98F85C43334
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 12:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FC2CCA47C
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 13:20:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231236AbiGOMrg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 08:47:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59080 "EHLO
+        id S234666AbiGONUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 09:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230204AbiGOMrf (ORCPT
+        with ESMTP id S229436AbiGONUL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 08:47:35 -0400
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11A87753B1
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 05:47:34 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20220715124731epoutp04e0c103926050a7c50d3c96e6d14b2180~CAX12lcY30404204042epoutp04T
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 12:47:31 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20220715124731epoutp04e0c103926050a7c50d3c96e6d14b2180~CAX12lcY30404204042epoutp04T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1657889251;
-        bh=m4z7uUtLkPe+eWeACNWwje/ASBR0VGJAA/fGfwHaCok=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=rV00ECzyw+C9NAmNSSR12lRZT2eYOA8l4jtoxGTW86nmgHeEkvDSq07gtf2pmEau4
-         8uKQvpo/Q8s0Wmr/1kQrQZQk56LqQTX7NL4s52l3xSQYFHonspaupHw3ptCGzfvFHR
-         BPrgLXQ1bVeh+u1S58mH/2L7CNhM65ei2htNxG0o=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20220715124730epcas5p2434080647cf8a6114c300c0c94154d5f~CAX1dgH9W0820508205epcas5p2j;
-        Fri, 15 Jul 2022 12:47:30 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.181]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4LkrjX1Pnhz4x9Pp; Fri, 15 Jul
-        2022 12:47:28 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A7.7B.09566.CD161D26; Fri, 15 Jul 2022 21:47:24 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220715124723epcas5p3781182051671984415ac50c42f1b4cb8~CAXusgZzI1756217562epcas5p37;
-        Fri, 15 Jul 2022 12:47:23 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220715124723epsmtrp2ecc6d07bdf61087fd11cbb52914f6e66~CAXuryhi91951219512epsmtrp2u;
-        Fri, 15 Jul 2022 12:47:23 +0000 (GMT)
-X-AuditID: b6c32a4a-ba3ff7000000255e-8a-62d161dc17b6
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        B7.17.08802.BD161D26; Fri, 15 Jul 2022 21:47:23 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220715124722epsmtip2a84415a4a3753c84173a8c1b3b73d689~CAXtpZbHk0390703907epsmtip2k;
-        Fri, 15 Jul 2022 12:47:22 +0000 (GMT)
-Date:   Fri, 15 Jul 2022 18:11:58 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Sachin Sant <sachinp@linux.ibm.com>
-Cc:     linux-block@vger.kernel.org, vincent.fu@samsung.com,
-        linuxppc-dev@lists.ozlabs.org, linux-next@vger.kernel.org
-Subject: Re: Kernel crash(block/null_blk) while running blktests (block/10)
-Message-ID: <20220715124158.GA25618@test-zns>
+        Fri, 15 Jul 2022 09:20:11 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 488AF550A2;
+        Fri, 15 Jul 2022 06:20:10 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26FD7DUu016059;
+        Fri, 15 Jul 2022 13:20:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
+ subject : message-id : date : cc : to : content-transfer-encoding :
+ mime-version; s=pp1; bh=bvfEcQthPppdDUhmK1oAFu2rcAWVigm3l8flhHV+6K8=;
+ b=gbdmXMu2H8+J9Civ7fw+dVU4pryFUHVwPCtF1zxc/84MdD/FIwwgFgluCCLMT2YFx0Qw
+ Ps3QgTc9ktUt3unqoobF7Qode3Trx7O/uMVk843Pl6BWzBmYWo/fqAUVXLotPBI+0Bt7
+ esHj5LuHjHu+Gqol77d2G2EMH7YH4eLC14NUCYoeX3e+3HXKnlificMDuI3L+oBr37oY
+ BuWZ2lu7BjAcKo1VNvgyWmfvt8U9Q3bJRqbATRQ3kcjoZmGhCOpXiG/+H+DULc7gfjBv
+ zJ6iQ1bZcac348HsLB7K1dpyzJDiWYNXvGzAcq8yLIXdMJ3pbxwFctzXuIc08cSB5snA Mw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hb8fkrqhe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jul 2022 13:20:06 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26FD7Us3018646;
+        Fri, 15 Jul 2022 13:20:06 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hb8fkrqgh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jul 2022 13:20:06 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26FDK38a009877;
+        Fri, 15 Jul 2022 13:20:03 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04fra.de.ibm.com with ESMTP id 3h99s7b6vp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jul 2022 13:20:03 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26FDK1qH10682738
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Jul 2022 13:20:01 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 60BBE4203F;
+        Fri, 15 Jul 2022 13:20:01 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2732C42042;
+        Fri, 15 Jul 2022 13:20:00 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.43.67.10])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 Jul 2022 13:19:59 +0000 (GMT)
+From:   Sachin Sant <sachinp@linux.ibm.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Subject: Re: [PATCH] null_blk: cleanup null_init_tag_set
+Message-Id: <443E9662-1342-482A-B3BC-E64287FF9FE4@linux.ibm.com>
+Date:   Fri, 15 Jul 2022 18:49:58 +0530
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        vincent.fu@samsung.com, linux-next@vger.kernel.org
+To:     ming.lei@redhat.com
+X-Mailer: Apple Mail (2.3696.100.31)
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ku3qbGpneJfP7wNBZsBu6E_7ImYIyPav
+X-Proofpoint-GUID: fCfZlV3rKN_JcYB0ITY-47x6_CDS5G0I
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <9CCFA12F-603C-4C70-844F-83B5C9580BAB@linux.ibm.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNKsWRmVeSWpSXmKPExsWy7bCmlu6dxItJBp23uC323tK2OLiwjdHi
-        9/d/rBa/Xm5gsnjc3cHowOoxYdEBRo/zMxYyevRtWcXo8XmTXABLVLZNRmpiSmqRQmpecn5K
-        Zl66rZJ3cLxzvKmZgaGuoaWFuZJCXmJuqq2Si0+ArltmDtBaJYWyxJxSoFBAYnGxkr6dTVF+
-        aUmqQkZ+cYmtUmpBSk6BSYFecWJucWleul5eaomVoYGBkSlQYUJ2xqwTD5gK5rJWHHiwlL2B
-        8QJLFyMHh4SAicSczcJdjFwcQgK7GSVu7bvPDOF8YpS4e+8MG4TzmVHi9pl1jF2MnGAdTQt3
-        sYLYQgK7GCW2vjCGKHrGKHHq3iWwIhYBVYknH/eBrWAT0JS4MLkUJCwioC7xefZ+JpAws0CJ
-        RMuMMJCwsIC3xMv1nSwgNq+ArsSvt4/ZIWxBiZMzn4DFOQUcJe5tOQoWFxVQljiw7TgTyFoJ
-        gUfsEufvPGSBuM1FYkVnIxOELSzx6vgWdghbSuLzu71sEHayxKWZ56BqSiQe7zkIZdtLtJ7q
-        ZwaxmQUyJfrO/WeFsPkken8/YYKEFq9ER5sQRLmixL1JT1khbHGJhzOWsEKUeEjs268FCZEp
-        jBIbT3axTGCUm4XknVlINkDYVhKdH5qAbFCoSEss/8cBYWpKrN+lv4CRdRWjZGpBcW56arFp
-        gVFeajk8gpPzczcxglOhltcOxocPPugdYmTiYDzEKMHBrCTC233oXJIQb0piZVVqUX58UWlO
-        avEhRlNg5ExklhJNzgcm47ySeEMTSwMTMzMzE0tjM0MlcV6vq5uShATSE0tSs1NTC1KLYPqY
-        ODilGpjqHJaqJZofXbH111WRVmaOEospecK7OVfKH6+f+5jx2qNH63fHNz96//z0/i+yotZM
-        74+ffc5/c0Ndwp2SS4HaSUvmB0/TkNbf6/74z/kVuyde01rEyqu13KBisZ/tAwYn2fkmGQwC
-        0gdFflTlhy2c3Lb04hn91Isu09cfPqz3iUtrQ5BXsNeJDO7vBcJrJs9mK/TT2lhzveY1zxuz
-        NLU97zdODGaep6q1vWnJvtt9kx5yz5l9Xv7us7xQVeOTEnvkom0fPMoSPLW9v90gY22S45Xz
-        u6P8pj5eUHjyyuJvDk6RjdPfTTikf/VO7Oo+4xXLLxhcnX62x6NWcmsHXx6vY/LGwNWisR59
-        58WNrWqDlViKMxINtZiLihMBMS7Dpg4EAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNLMWRmVeSWpSXmKPExsWy7bCSvO7txItJBp2/RC323tK2OLiwjdHi
-        9/d/rBa/Xm5gsnjc3cHowOoxYdEBRo/zMxYyevRtWcXo8XmTXABLFJdNSmpOZllqkb5dAlfG
-        gz+rmArOMFWcWv2TqYFxJlMXIyeHhICJRNPCXaxdjFwcQgI7GCXWXuiDSohLNF/7wQ5hC0us
-        /PcczBYSeMIo8WeaAIjNIqAq8eTjPpYuRg4ONgFNiQuTS0HCIgLqEp9n72cCCTMLlEi0zAgD
-        CQsLeEu8XN/JAmLzCuhK/Hr7mB1i7RRGidnzt7JCJAQlTs58AlbELGAmMW/zQ2aIOdISy/9x
-        gIQ5BRwl7m05CnaNqICyxIFtx5kmMArOQtI9C0n3LITuBYzMqxglUwuKc9Nziw0LjPJSy/WK
-        E3OLS/PS9ZLzczcxgsNbS2sH455VH/QOMTJxMB5ilOBgVhLh7T50LkmINyWxsiq1KD++qDQn
-        tfgQozQHi5I474Wuk/FCAumJJanZqakFqUUwWSYOTqkGpo2KSxZtmSK37nWtwmWV5NVVj1+K
-        dv8/tmtXpF7CocqTzQ91ff4c5POby3wtV3D551nXnmyOmZ0XO9Wo4nZjxT1DVZ/3licrek+t
-        rAn4sSZa5Z+BqI3w+grl1d9qd2r2M6j7ev2PVt7wNIpDvakhXv2LzcpvXHk31h8/bx41s3qe
-        ZMLhzye41j/UtgqpvMnkbxejcXzalVSTOUt8r0/6kahREsucpnhszhYtvW7Wr7NnP7F/+3uK
-        6MEND15qi56694Xj7cPpx//G8F7Mj3OPfJvdFH+63IivaULoB7nQmcnvWQ/Nqrwms6k9cH1W
-        sr9F3uz1N5Nyyvmfbs5se+Ail1Hvd++1XIhEaFhNAONaIyWW4oxEQy3mouJEABi4gK3eAgAA
-X-CMS-MailID: 20220715124723epcas5p3781182051671984415ac50c42f1b4cb8
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----5z7FhDiNVqIrGinT0BtluOzfBNI2flEmVN09niYgIFJo-6e-=_135144_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220715123722epcas5p209d7ab2411e2ca5d63f5e2e42a83a665
-References: <CGME20220715123722epcas5p209d7ab2411e2ca5d63f5e2e42a83a665@epcas5p2.samsung.com>
-        <9CCFA12F-603C-4C70-844F-83B5C9580BAB@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-15_05,2022-07-15_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ bulkscore=0 adultscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=786 mlxscore=0 spamscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
+ definitions=main-2207150057
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------5z7FhDiNVqIrGinT0BtluOzfBNI2flEmVN09niYgIFJo-6e-=_135144_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+I ran into similar[1] issue (addressed by this patch ) while running blktes=
+ts and
+can confirm that this patch fixes the reported problem for me.
 
-On Fri, Jul 15, 2022 at 06:07:01PM +0530, Sachin Sant wrote:
->While running blktests[*] (block/10) on a IBM Power server booted with
->5.19.0-rc6-next-20220714 following crash is seen:
-Ming has posted a fix , please see if this can be tried -
-https://lore.kernel.org/linux-block/20220715031916.151469-1-ming.lei@redhat.com/
+Tested-by: Sachin Sant <sachinp@linux.ibm.com>
 
+Thanks
+- Sachin
 
-
-------5z7FhDiNVqIrGinT0BtluOzfBNI2flEmVN09niYgIFJo-6e-=_135144_
-Content-Type: text/plain; charset="utf-8"
-
-
-------5z7FhDiNVqIrGinT0BtluOzfBNI2flEmVN09niYgIFJo-6e-=_135144_--
+[1] -> https://lore.kernel.org/linux-next/20220715124158.GA25618@test-zns/T=
+/#t=
