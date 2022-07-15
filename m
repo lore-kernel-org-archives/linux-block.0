@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB60C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 22:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE9FCCA480
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 22:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbiGOWvV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 18:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53242 "EHLO
+        id S231241AbiGOWvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 18:51:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbiGOWvU (ORCPT
+        with ESMTP id S231208AbiGOWvX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 18:51:20 -0400
+        Fri, 15 Jul 2022 18:51:23 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29724331E;
-        Fri, 15 Jul 2022 15:51:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B50E43326;
+        Fri, 15 Jul 2022 15:51:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id ADA23B82EF0;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 03DEAB82EF0;
+        Fri, 15 Jul 2022 22:51:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B07D5C341CA;
         Fri, 15 Jul 2022 22:51:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43707C3411E;
-        Fri, 15 Jul 2022 22:51:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657925477;
-        bh=o0ng7rDUX3HJX5PzVTuirQIgJKM/KMzDsM7dZaRh1UQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=jN2p0VTKf1wUpI/xIITkZTZrE1Q/c7CqHuh8qboGE4G0SNvGc9IfTeBQLq2ahdIuY
-         do2hayd/4Mmdbw5t7ZkJv8RDEvHCtnoaNR+ZQRxgkhfP63e+xVcp0HK1+dGzHK+Ezq
-         SU0WLlUSv1HgX09NslYVXtXxn7idycRhZNlLaHkx+pQhPv2DjP/5iM1qPm5Wt49clu
-         KSJFB+1yJ9ejUCFuXU6tGi7Iw+xJiJsJAwEWDq7XAOf5txN7DzZccNtqA5IcsLvr5E
-         /Ouo0Gdk7SlwryUAz67KdbHlBT/dXn9pau8TVZIxon9PgFxpE4eJHTjPbFNjXOp1Mn
-         Jtupck9KTLUQA==
+        s=k20201202; t=1657925479;
+        bh=mrIb/ElueXH2WPoRY6/+AIbMzXNHxy0Ea9Il6Cse/O8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tZxT+pQbuYr4srnjPLlT74GcfOoy9RBpxXwayjAkFgyh5LrNUY2q22OQHx045z57h
+         JdL3SjIYgm+lnKlOTPxlxhxTXrDItgz5B7Iq0KW9mCCuECOsfsPxQLvCGEY2TAaylX
+         2k3Ob5C7883feGULACavffuwP/y6NAcpUwh1zqITBCaRejmAzNJdScnUecrJbb03C1
+         56w9YccBqDpPCC3y+dRiauLqFDY13lTcAFOM9J+bJQugs6+dxc7q/fhpTvxXAmKs6/
+         UFobBSH5woSg6vsIMZc1Ne6tlWWStPO2MzvrYtDH9IlB94a1Y1CeYMd2QJpBnzdiOD
+         V5dPouOxOxBTA==
 From:   SeongJae Park <sj@kernel.org>
 To:     roger.pau@citrix.com
 Cc:     axboe@kernel.dk, boris.ostrovsky@oracle.com, jgross@suse.com,
@@ -39,54 +39,87 @@ Cc:     axboe@kernel.dk, boris.ostrovsky@oracle.com, jgross@suse.com,
         mheyne@amazon.de, xen-devel@lists.xenproject.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org, SeongJae Park <sj@kernel.org>
-Subject: [PATCH v4 0/3] xen-blk{back,front}: Fix two bugs in 'feature_persistent'
-Date:   Fri, 15 Jul 2022 22:51:05 +0000
-Message-Id: <20220715225108.193398-1-sj@kernel.org>
+Subject: [PATCH v4 2/3] xen-blkback: Apply 'feature_persistent' parameter when connect
+Date:   Fri, 15 Jul 2022 22:51:07 +0000
+Message-Id: <20220715225108.193398-3-sj@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220715225108.193398-1-sj@kernel.org>
+References: <20220715225108.193398-1-sj@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduction of 'feature_persistent' made two bugs.  First one is wrong
-overwrite of 'vbd->feature_gnt_persistent' in 'blkback' due to wrong
-parameter value caching position, and the second one is unintended
-behavioral change that could break previous dynamic frontend/backend
-persistent feature support changes.  This patchset fixes the issues.
+From: Maximilian Heyne <mheyne@amazon.de>
 
-Changes from v3
-(https://lore.kernel.org/xen-devel/20220715175521.126649-1-sj@kernel.org/)
-- Split 'blkback' patch for each of the two issues
-- Add 'Reported-by: Andrii Chepurnyi <andrii.chepurnyi82@gmail.com>'
+In some use cases[1], the backend is created while the frontend doesn't
+support the persistent grants feature, but later the frontend can be
+changed to support the feature and reconnect.  In the past, 'blkback'
+enabled the persistent grants feature since it unconditionally checked
+if frontend supports the persistent grants feature for every connect
+('connect_ring()') and decided whether it should use persistent grans or
+not.
 
-Changes from v2
-(https://lore.kernel.org/xen-devel/20220714224410.51147-1-sj@kernel.org/)
-- Keep the behavioral change of v1
-- Update blkfront's counterpart to follow the changed behavior
-- Update documents for the changed behavior
+However, commit aac8a70db24b ("xen-blkback: add a parameter for
+disabling of persistent grants") has mistakenly changed the behavior.
+It made the frontend feature support check to not be repeated once it
+shown the 'feature_persistent' as 'false', or the frontend doesn't
+support persistent grants.
 
-Changes from v1
-(https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/)
-- Avoid the behavioral change
-  (https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/)
-- Rebase on latest xen/tip/linux-next
-- Re-work by SeongJae Park <sj@kernel.org>
-- Cc stable@
+This commit changes the behavior of the parameter to make effect for
+every connect, so that the previous workflow can work again as expected.
 
-Maximilian Heyne (1):
-  xen-blkback: Apply 'feature_persistent' parameter when connect
+[1] https://lore.kernel.org/xen-devel/CAJwUmVB6H3iTs-C+U=v-pwJB7-_ZRHPxHzKRJZ22xEPW7z8a=g@mail.gmail.com/
 
-SeongJae Park (2):
-  xen-blkback: fix persistent grants negotiation
-  xen-blkfront: Apply 'feature_persistent' parameter when connect
+Reported-by: Andrii Chepurnyi <andrii.chepurnyi82@gmail.com>
+Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
+Cc: <stable@vger.kernel.org> # 5.10.x
+Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+Signed-off-by: SeongJae Park <sj@kernel.org>
+---
+ Documentation/ABI/testing/sysfs-driver-xen-blkback | 2 +-
+ drivers/block/xen-blkback/xenbus.c                 | 9 +++------
+ 2 files changed, 4 insertions(+), 7 deletions(-)
 
- .../ABI/testing/sysfs-driver-xen-blkback      |  2 +-
- .../ABI/testing/sysfs-driver-xen-blkfront     |  2 +-
- drivers/block/xen-blkback/xenbus.c            | 20 ++++++++-----------
- drivers/block/xen-blkfront.c                  |  4 +---
- 4 files changed, 11 insertions(+), 17 deletions(-)
-
+diff --git a/Documentation/ABI/testing/sysfs-driver-xen-blkback b/Documentation/ABI/testing/sysfs-driver-xen-blkback
+index 7faf719af165..fac0f429a869 100644
+--- a/Documentation/ABI/testing/sysfs-driver-xen-blkback
++++ b/Documentation/ABI/testing/sysfs-driver-xen-blkback
+@@ -42,5 +42,5 @@ KernelVersion:  5.10
+ Contact:        Maximilian Heyne <mheyne@amazon.de>
+ Description:
+                 Whether to enable the persistent grants feature or not.  Note
+-                that this option only takes effect on newly created backends.
++                that this option only takes effect on newly connected backends.
+                 The default is Y (enable).
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index 16c6785d260c..ee7ad2fb432d 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -186,8 +186,6 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
+ 	__module_get(THIS_MODULE);
+ 	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
+ 
+-	blkif->vbd.feature_gnt_persistent = feature_persistent;
+-
+ 	return blkif;
+ }
+ 
+@@ -1086,10 +1084,9 @@ static int connect_ring(struct backend_info *be)
+ 		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+ 		return -ENOSYS;
+ 	}
+-	if (blkif->vbd.feature_gnt_persistent)
+-		blkif->vbd.feature_gnt_persistent =
+-			xenbus_read_unsigned(dev->otherend,
+-					"feature-persistent", 0);
++
++	blkif->vbd.feature_gnt_persistent = feature_persistent &&
++		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
+ 
+ 	blkif->vbd.overflow_max_grants = 0;
+ 
 -- 
 2.25.1
 
