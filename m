@@ -2,150 +2,197 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F281C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 11:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0788C43334
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 12:37:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231558AbiGOLMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 07:12:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36718 "EHLO
+        id S233344AbiGOMhS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 08:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231292AbiGOLMk (ORCPT
+        with ESMTP id S229573AbiGOMhR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 07:12:40 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1893E87217
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 04:12:35 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220715111230epoutp031654fb2bdac4570c33d979a8dc15ed2e~B-E4oQKjo1012110121epoutp03_
-        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:12:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220715111230epoutp031654fb2bdac4570c33d979a8dc15ed2e~B-E4oQKjo1012110121epoutp03_
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1657883550;
-        bh=Ji9OfW4MTOZofKIL3li59siIKM0d+5nNRqymbyXJlds=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=RtfcvVhl77Quvi1PE3X2uXnb1Zq/HuHYTkEMhjC0GoEa5xt6yoW5CkvpruTi0zG30
-         8806yF7OOUj2NU19I23aI+JJe4qDTeVCGYZ2I3iXK577w/YX09IP6bJ3+igBBcDObV
-         KOFQnMHDNYikWJaeX7lcugA2ycjkQkWshXYC40HQ=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20220715111229epcas5p24cdb6c2dedae889189ca6cd8518586ad~B-E4MiZHX0850708507epcas5p21;
-        Fri, 15 Jul 2022 11:12:29 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4Lkpbt2TW0z4x9Py; Fri, 15 Jul
-        2022 11:12:26 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        85.46.09662.A9B41D26; Fri, 15 Jul 2022 20:12:26 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220715111225epcas5p174b037b8b850300e1ff2d1b96dd0a64d~B-E0ZA86c1396213962epcas5p12;
-        Fri, 15 Jul 2022 11:12:25 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220715111225epsmtrp191da074f2d6e26c34a8a4fc31f69d141~B-E0YGCWd1475014750epsmtrp1q;
-        Fri, 15 Jul 2022 11:12:25 +0000 (GMT)
-X-AuditID: b6c32a49-885ff700000025be-44-62d14b9a3566
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        1C.63.08802.99B41D26; Fri, 15 Jul 2022 20:12:25 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220715111223epsmtip243bea6f75bf92c0416d33c21c9e224ea~B-EycOCFr1601816018epsmtip2b;
-        Fri, 15 Jul 2022 11:12:23 +0000 (GMT)
-Date:   Fri, 15 Jul 2022 16:37:00 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
-        Jens Axboe <axboe@kernel.dk>, hch@lst.de, kbusch@kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, asml.silence@gmail.com,
-        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
-Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
- io_uring_cmd
-Message-ID: <20220715110700.GA27117@test-zns>
+        Fri, 15 Jul 2022 08:37:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A2B6B77D;
+        Fri, 15 Jul 2022 05:37:15 -0700 (PDT)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26FC5bCe007742;
+        Fri, 15 Jul 2022 12:37:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
+ subject : message-id : date : cc : to : content-transfer-encoding :
+ mime-version; s=pp1; bh=QFI4HdS5nW/1YwyxtYgBSYN97hNea2MFZvGZ9zsBmzc=;
+ b=VdnGppwcp5owmt3EeyuSxwElSzptvsdvlIYUJcsNlkTWoglXut3snwucW8wm9ror1+gN
+ cAeU7F+wBB1cl7LuOBrMoYLiIBXO30yn1NYj7KJEuC7mLtKlqKgBCoknw2ZAzjq4o1Iu
+ X6flkD9SBcfM9UQ+8KvOIS6UjrTj08cxG2/tXq2w+VfgLVBN10TtabJLOmBcsIl9ufFj
+ /ouA3dlXZ1WTHaO3MCxJ75pSymmpHqG2tRhF0NW9g7UGwgCH8HqlPjTpn7lr1viiiNUo
+ J+E65XtT/DsSOm0hwdZRWFdVhGLXJYBQQ8BEmuGqa4W2MPNf/ztAxY+B2NOSTb1SvaS2 Zg== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hb7xm0sv1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jul 2022 12:37:07 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26FCaQaB022883;
+        Fri, 15 Jul 2022 12:37:05 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma02fra.de.ibm.com with ESMTP id 3hama9h8r8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 15 Jul 2022 12:37:05 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26FCb3Pm24772888
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Jul 2022 12:37:03 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8E34742045;
+        Fri, 15 Jul 2022 12:37:03 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 850784203F;
+        Fri, 15 Jul 2022 12:37:02 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.43.67.10])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 15 Jul 2022 12:37:02 +0000 (GMT)
+From:   Sachin Sant <sachinp@linux.ibm.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Subject: Kernel crash(block/null_blk) while running blktests (block/10)
+Message-Id: <9CCFA12F-603C-4C70-844F-83B5C9580BAB@linux.ibm.com>
+Date:   Fri, 15 Jul 2022 18:07:01 +0530
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-next@vger.kernel.org
+To:     linux-block@vger.kernel.org, vincent.fu@samsung.com
+X-Mailer: Apple Mail (2.3696.100.31)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kC0omlGdZvdtU_noWsp7e5qdn6foHXs3
+X-Proofpoint-ORIG-GUID: kC0omlGdZvdtU_noWsp7e5qdn6foHXs3
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <20220714153051.5e53zgkcabb7ajms@carbon.lan>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmuu4s74tJBtO6+C2aJvxltpizahuj
-        xeq7/WwWhx9PYre4eWAnk8XK1UeZLN61nmOxOP/2MJPFpEPXGC323tK2mL/sKbvFocnNTBbr
-        Xr9nceD12DnrLrvH+XsbWTwuny312LSqk81j85J6j903G9g83u+7yubRt2UVo8fm09UenzfJ
-        BXBFZdtkpCampBYppOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5+AToumXmAF2u
-        pFCWmFMKFApILC5W0rezKcovLUlVyMgvLrFVSi1IySkwKdArTswtLs1L18tLLbEyNDAwMgUq
-        TMjOeNd5irngF1fFonV7WRsYp3F2MXJySAiYSEx9sIMFxBYS2M0ocW2maxcjF5D9iVFiT1sT
-        I4TzmVHi8cObzDAdq+4eZoFI7GKU6Lp1mBXCecYocfTMLjaQKhYBVYl7hycwdTFycLAJaEpc
-        mFwKEhYRUJbY/n8bWDOzwE4miUcPNjCCJIQFAiVW9+5hB7F5BXQlnl8/xgRhC0qcnPkE7D5O
-        AUuJgyfPgtWIAg06sO04E8ggCYELHBKbu64yQZznIjH903OoU4UlXh3fwg5hS0m87G+DspMl
-        Ls08B1VfIvF4z0Eo216i9VQ/WC+zQKbEpQ/T2CBsPone30/AnpEQ4JXoaBOCKFeUuDfpKSuE
-        LS7xcMYSKNtD4uatvWyQQDnKLHHl4HnWCYxys5D8MwvJCgjbSqLzQxPrLKAVzALSEsv/cUCY
-        mhLrd+kvYGRdxSiZWlCcm55abFpgmJdaDo/k5PzcTYzgxKzluYPx7oMPeocYmTgYDzFKcDAr
-        ifB2HzqXJMSbklhZlVqUH19UmpNafIjRFBg/E5mlRJPzgbkhryTe0MTSwMTMzMzE0tjMUEmc
-        1+vqpiQhgfTEktTs1NSC1CKYPiYOTqkGJo2oH5PqSrbPmBd0JkjIOWHdHrN3vz57FN+PulPP
-        FJN+yKw2Ypvn+n1PyrZ0bwhPfOWrmigZwuJ7dUdd6aMENzaHpllKolNePP900YUld5XVJ/3z
-        2Qu2qeXKukYrsy41nD5X2Ma6JWWZ5B032zM2/za1HL63bHNO8cZJ+5UWG0w4WNhtN3P1xy6d
-        vaHzA+aWyfue+LafM/irfsO5En2NShG1vMsnlMVlb7Ib/30zhfVW6+wJTucFjBleelcfuMMt
-        HW24jWHy+54iVw/Jsw2/3l4uaGZg/5dmM4/jZc4k+3TlgBKJB/95ej2X6dTcXjeNoeL8m/DJ
-        lfkRuu/SmXd7PjL6/+k2X/1GnWO2Vn7iSizFGYmGWsxFxYkAy3CCulUEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAIsWRmVeSWpSXmKPExsWy7bCSvO5M74tJBk9ajSyaJvxltpizahuj
-        xeq7/WwWhx9PYre4eWAnk8XK1UeZLN61nmOxOP/2MJPFpEPXGC323tK2mL/sKbvFocnNTBbr
-        Xr9nceD12DnrLrvH+XsbWTwuny312LSqk81j85J6j903G9g83u+7yubRt2UVo8fm09UenzfJ
-        BXBFcdmkpOZklqUW6dslcGXcb/jGVrCSo2Lr9F9MDYz32boYOTkkBEwkVt09zNLFyMUhJLCD
-        UWLxtzWMEAlxieZrP9ghbGGJlf+eg9lCAk8YJX5dCAGxWQRUJe4dnsDUxcjBwSagKXFhcilI
-        WERAWWL7/21gM5kFdjJJrDv5EmyZsECgxOrePWBzeAV0JZ5fP8YEsfg4s8SyBxtZIRKCEidn
-        PmEBsZkFzCTmbX7IDLKAWUBaYvk/DpAwp4ClxMGTZ8HmiAItO7DtONMERsFZSLpnIemehdC9
-        gJF5FaNkakFxbnpusWGBUV5quV5xYm5xaV66XnJ+7iZGcKRpae1g3LPqg94hRiYOxkOMEhzM
-        SiK83YfOJQnxpiRWVqUW5ccXleakFh9ilOZgURLnvdB1Ml5IID2xJDU7NbUgtQgmy8TBKdXA
-        VP3tjxETa9gMGcurEnpMOWufxU9qD7B3/f7xouNLln3n+R2fSjEs3Fwb02jk/XbbRP/zO/v/
-        PjcytVXdc+9Hxfqu77+szyy2n2s4ua1POHzynQ6rlRMv7U+x3vzbuMXy8ozm1PIn0w6uMhXJ
-        +ceqcMO/sK7v2T/rkmfBX5Y+a9AyU5nWrHXi4SLDSXzW/aLJy5grLfU0r2zb9vaW6drv597u
-        PrHRZfGcH8cunJrxYu58C5ZnHMt8uP4YPOHdOZ3HPL3llFuI2oTQlC3Ma/69vzvlxqnVU89/
-        Z/64+6bXiazJyeUWB2fqahXPF5H8IPtLMkcmZGlEnC3DlLerVjuZH5yze/nxP92f7Dacyn5x
-        wvitEktxRqKhFnNRcSIAQmnjCyMDAAA=
-X-CMS-MailID: 20220715111225epcas5p174b037b8b850300e1ff2d1b96dd0a64d
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b
-References: <20220711110155.649153-1-joshi.k@samsung.com>
-        <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
-        <20220711110155.649153-4-joshi.k@samsung.com>
-        <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
-        <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
-        <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me> <Ys+QPjYBDoByrfw1@T590>
-        <20220714081923.GE30733@test-zns>
-        <20220714153051.5e53zgkcabb7ajms@carbon.lan>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-15_05,2022-07-15_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=978
+ malwarescore=0 spamscore=0 mlxscore=0 adultscore=0 clxscore=1011
+ suspectscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2206140000 definitions=main-2207150050
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+While running blktests[*] (block/10) on a IBM Power server booted with
+5.19.0-rc6-next-20220714 following crash is seen:
 
-On Thu, Jul 14, 2022 at 05:30:51PM +0200, Daniel Wagner wrote:
->On Thu, Jul 14, 2022 at 01:49:23PM +0530, Kanchan Joshi wrote:
->> If path is not available, retry is not done immediately rather we wait for
->> path to be available (as underlying controller may still be
->> resetting/connecting). List helped as command gets added into
->> it (and submitter/io_uring gets the control back), and retry is done
->> exact point in time.
->> But yes, it won't harm if we do couple of retries even if path is known
->> not to be available (somewhat like iopoll). As this situation is
->> not common. And with that scheme, we don't have to link io_uring_cmd.
->
->Stupid question does it only fail over immediately when the path is not
->available or any failure? If it fails over for everything it's possible
->the target gets the same request twice. FWIW, we are just debugging this
->scenario right now.
+[ 9089.636612] null_blk: disk nullb30 created
+[ 9089.640752] null_blk: disk nullb31 created
+[ 9089.640759] null_blk: module loaded
+[ 9134.099371] Kernel attempted to read user page (0) - exploit attempt? (u=
+id: 0)
+[ 9134.099396] BUG: Kernel NULL pointer dereference on read at 0x00000000
+[ 9134.099401] Faulting instruction address: 0xc0080000064b254c
+[ 9134.099407] Oops: Kernel access of bad area, sig: 11 [#1]
+[ 9134.099411] LE PAGE_SIZE=3D64K MMU=3DHash SMP NR_CPUS=3D2048 NUMA pSeries
+[ 9134.099417] Modules linked in: null_blk(E+) xfs(E) dm_delay(E) overlay(E=
+) dm_thin_pool(E) dm_persistent_data(E) dm_bio_prison(E) dm_flakey(E) dm_sn=
+apshot(E) dm_bufio(E) dm_zero(E) loop(E) dm_mod(E) nft_fib_inet(E) nft_fib_=
+ipv4(E) nft_fib_ipv6(E) nft_fib(E) nft_reject_inet(E) nf_reject_ipv4(E) nf_=
+reject_ipv6(E) nft_reject(E) nft_ct(E) nft_chain_nat(E) nf_nat(E) nf_conntr=
+ack(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) ip_set(E) bonding(E) rfkill(E) t=
+ls(E) nf_tables(E) libcrc32c(E) nfnetlink(E) sunrpc(E) pseries_rng(E) vmx_c=
+rypto(E) ext4(E) mbcache(E) jbd2(E) sr_mod(E) cdrom(E) sd_mod(E) sg(E) lpfc=
+(E) nvmet_fc(E) nvmet(E) ibmvscsi(E) scsi_transport_srp(E) ibmveth(E) nvme_=
+fc(E) nvme(E) nvme_fabrics(E) nvme_core(E) t10_pi(E) scsi_transport_fc(E) c=
+rc64_rocksoft(E) crc64(E) tg3(E) ipmi_devintf(E) ipmi_msghandler(E) fuse(E)=
+ [last unloaded: null_blk]
+[ 9134.099502] CPU: 26 PID: 2910448 Comm: modprobe Tainted: G            E =
+     5.19.0-rc6-next-20220714 #2
+[ 9134.099510] NIP:  c0080000064b254c LR: c0080000064b907c CTR: c0080000064=
+b8e80
+[ 9134.099515] REGS: c000000091573600 TRAP: 0300   Tainted: G            E =
+      (5.19.0-rc6-next-20220714)
+[ 9134.099520] MSR:  8000000002009033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24222=
+424  XER: 00000000
+[ 9134.099534] CFAR: c00000000000c9dc DAR: 0000000000000000 DSISR: 40000000=
+ IRQMASK: 0=20
+[ 9134.099534] GPR00: c0080000064b907c c0000000915738a0 c0080000064e8100 00=
+00000000000000=20
+[ 9134.099534] GPR04: c0080000064e18e0 0000000000000cc0 0000000000000040 ff=
+ffffffffffffff=20
+[ 9134.099534] GPR08: 0000000000000058 0000000000000001 0000000000000001 00=
+000000000168a9=20
+[ 9134.099534] GPR12: c0080000064b8e80 c00000001ec20700 c000000091573d00 00=
+0001000c370950=20
+[ 9134.099534] GPR16: 000000000000ff20 c008000006243060 c008000006240000 00=
+00000000003078=20
+[ 9134.099534] GPR20: 0000000000000001 c000000091573bc0 c0080000064e1488 00=
+00000000000000=20
+[ 9134.099534] GPR24: 0000000000000000 c000000002960e40 c000000002960e70 c0=
+080000064e1480=20
+[ 9134.099534] GPR28: 0000000000000000 ffffffffffffffff c0080000064e1880 c0=
+080000064e02a8=20
+[ 9134.099598] NIP [c0080000064b254c] null_init_tag_set+0x74/0x180 [null_bl=
+k]
+[ 9134.099610] LR [c0080000064b907c] null_init+0x1fc/0x354 [null_blk]
+[ 9134.099619] Call Trace:
+[ 9134.099622] [c0000000915738a0] [c0000000915738e0] 0xc0000000915738e0 (un=
+reliable)
+[ 9134.099630] [c0000000915738c0] [c0080000064b907c] null_init+0x1fc/0x354 =
+[null_blk]
+[ 9134.099640] [c000000091573960] [c000000000011ff4] do_one_initcall+0x64/0=
+x300
+[ 9134.099650] [c000000091573a30] [c0000000002365bc] do_init_module+0x6c/0x=
+2d0
+[ 9134.099659] [c000000091573ab0] [c000000000239a54] load_module+0x1ed4/0x2=
+290
+[ 9134.099667] [c000000091573c90] [c00000000023a170] __do_sys_finit_module+=
+0xe0/0x180
+[ 9134.099675] [c000000091573db0] [c000000000032e7c] system_call_exception+=
+0x17c/0x350
+[ 9134.099683] [c000000091573e10] [c00000000000c53c] system_call_common+0xe=
+c/0x270
+[ 9134.099692] --- interrupt: c00 at 0x7fffa0edf164
+[ 9134.099696] NIP:  00007fffa0edf164 LR: 00000001212e04fc CTR: 00000000000=
+00000
+[ 9134.099701] REGS: c000000091573e80 TRAP: 0c00   Tainted: G            E =
+      (5.19.0-rc6-next-20220714)
+[ 9134.099706] MSR:  800000000000f033 <SF,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 282=
+22244  XER: 00000000
+[ 9134.099720] IRQMASK: 0=20
+[ 9134.099720] GPR00: 0000000000000161 00007fffe62a6870 00007fffa0fb7300 00=
+00000000000003=20
+[ 9134.099720] GPR04: 000001000c370ec0 0000000000000000 0000000000000003 00=
+00000000000000=20
+[ 9134.099720] GPR08: 0000000000000000 0000000000000000 0000000000000000 00=
+00000000000000=20
+[ 9134.099720] GPR12: 0000000000000000 00007fffa14bca50 0000000000040000 00=
+0001000c370950=20
+[ 9134.099720] GPR16: 000001000c370950 0000000000000020 000001000c370950 00=
+00000000000000=20
+[ 9134.099720] GPR20: 0000000000000000 000000000000003a 000001000c370cb0 00=
+0000000000003a=20
+[ 9134.099720] GPR24: 00000001212eb068 000001000c370950 0000000000000000 00=
+0001000c370dc0=20
+[ 9134.099720] GPR28: 000001000c370ec0 0000000000040000 0000000000000000 00=
+0001000c370cb0=20
+[ 9134.099779] NIP [00007fffa0edf164] 0x7fffa0edf164
+[ 9134.099783] LR [00000001212e04fc] 0x1212e04fc
+[ 9134.099787] --- interrupt: c00
+[ 9134.099790] Instruction dump:
+[ 9134.099793] 7d0907b4 2ea90000 409600ec 814a0150 91440044 e9430000 e8ea01=
+3e 39000058=20
+[ 9134.099804] 39400001 90e40050 9104004c 91440058 <e9030000> 89480163 2f8a=
+0000 419e0010=20
+[ 9134.099817] ---[ end trace 0000000000000000 ]---
+[ 9134.116174]=20
+[ 9135.116180] Kernel panic - not syncing: Fatal exception
 
-failover is only for path-related failure, and not otherwise.
-you might want to take a look at nvme_decide_disposition routine where
-it makes that decision.
+This regression was introduced in 5.19.0-rc6-next-20220713, next-20220712
+build was good.
 
-------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_
-Content-Type: text/plain; charset="utf-8"
+Git bisect leads me to following patch -
 
+commit 37ae152c7a0d
+     null_blk: add configfs variables for 2 options
 
-------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_--
+Reverting this patch allows me to run the blktests to completion.
+
+- Sachin
+
+[*] -> https://github.com/osandov/blktests/=
