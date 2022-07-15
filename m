@@ -2,134 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76BDEC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 03:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39185C43334
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 03:24:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232413AbiGODTh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jul 2022 23:19:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42942 "EHLO
+        id S241025AbiGODYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jul 2022 23:24:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229809AbiGODTg (ORCPT
+        with ESMTP id S229603AbiGODYV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jul 2022 23:19:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0546BA447
-        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 20:19:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657855175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=emBQVCvmCzbXZasFCfRAByeUl9dmTBIicsnMSzE7ulg=;
-        b=Z5sv2CFEBs2bbMedjtkzyxdrlW/Zl5U/e0a7LxWYjG1H9LS2etJiHLmV6tkgY2SF7OjGsL
-        Yl6mUWUBMZfsnXgZFSER1WSLUEFMDcUyHXk5Kw0lgavGYjRm3sDex+dB9qzzIjrBsS2xCD
-        kUWtxHfHM3LZsGWYxkgTySZzxkMahO4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-199-N8JHJ0jxOcyru_eBLF0VBg-1; Thu, 14 Jul 2022 23:19:29 -0400
-X-MC-Unique: N8JHJ0jxOcyru_eBLF0VBg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8033E85A584;
-        Fri, 15 Jul 2022 03:19:29 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8B12D18ECC;
-        Fri, 15 Jul 2022 03:19:27 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-Subject: [PATCH] null_blk: cleanup null_init_tag_set
-Date:   Fri, 15 Jul 2022 11:19:16 +0800
-Message-Id: <20220715031916.151469-1-ming.lei@redhat.com>
+        Thu, 14 Jul 2022 23:24:21 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D6015FEC
+        for <linux-block@vger.kernel.org>; Thu, 14 Jul 2022 20:24:20 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LkcBY1tx7zKHh1
+        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:23:17 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgCnCWng3dBiDTIaAw--.57220S3;
+        Fri, 15 Jul 2022 11:24:18 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Subject: Re: [PATCH 7/8] dm: delay registering the gendisk
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org
+References: <20210804094147.459763-1-hch@lst.de>
+ <20210804094147.459763-8-hch@lst.de>
+ <ad2c7878-dabb-cb41-1bba-60ef48fa1a9f@huaweicloud.com>
+ <20220707052425.GA13016@lst.de>
+ <fd5c2e0a-5f68-9f1f-dfc2-49a2cd51de0b@huaweicloud.com>
+Message-ID: <6ff5c130-b5b1-b611-bb99-6a2275404fcd@huaweicloud.com>
+Date:   Fri, 15 Jul 2022 11:24:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <fd5c2e0a-5f68-9f1f-dfc2-49a2cd51de0b@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-CM-TRANSID: _Ch0CgCnCWng3dBiDTIaAw--.57220S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw18tFW3Gry3Xw4kAFW8WFg_yoW8Jw48pF
+        WfuFsYkrsrXFsrW392y3yjg3sY9w43Ka1rGryrGryIqryDWrZay3y2yFnFvFy3Arn7WrZI
+        qFWjq345Za1vyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The passed 'nullb' can be NULL, so cause null ptr reference.
+Hi, Christoph!
 
-Fix the issue, meantime cleanup null_init_tag_set for avoiding to add
-similar issue in future.
+在 2022/07/07 15:20, Yu Kuai 写道:
+> 在 2022/07/07 13:24, Christoph Hellwig 写道:
+>> On Thu, Jul 07, 2022 at 11:29:26AM +0800, Yu Kuai wrote:
+>>> We found that this patch fix a nullptr crash in our test:
+>>
+>>> Do you think it's ok to backport this patch(and all realted patches) to
+>>> lts, or it's better to fix that bio can be submitted with queue
+>>> uninitialized from block layer?
+>>
+>> Given how long ago this was I do not remember offhand how much prep
+>> work this would require.  The patch itself is of course tiny and
+>> backportable, but someone will need to do the work and figure out how
+>> much else would have to be backported.
+> 
+> Ok, I'll try to figure out that, and backport them.(At least to 5.10.y)
 
-Cc: Vincent Fu <vincent.fu@samsung.com>
-Fixes: 37ae152c7a0d ("null_blk: add configfs variables for 2 options")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/null_blk/main.c | 49 ++++++++++++++++++++++-------------
- 1 file changed, 31 insertions(+), 18 deletions(-)
+While reviewing the code, I didn't found any protection that
+bd_link_disk_holder() won't concurrent with
+bd_register_pending_holders(). If they do can concurrent,
+following scenario is problematic:
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index c955a07dba2d..a08856b121b3 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1898,31 +1898,44 @@ static int null_gendisk_register(struct nullb *nullb)
- 
- static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
- {
-+	unsigned int flags = BLK_MQ_F_SHOULD_MERGE;
-+	int hw_queues, numa_node;
-+	unsigned int queue_depth;
- 	int poll_queues;
- 
-+	if (nullb) {
-+		hw_queues = nullb->dev->submit_queues;
-+		poll_queues = nullb->dev->poll_queues;
-+		queue_depth = nullb->dev->hw_queue_depth;
-+		numa_node = nullb->dev->home_node;
-+		if (nullb->dev->no_sched)
-+			flags |= BLK_MQ_F_NO_SCHED;
-+		if (nullb->dev->shared_tag_bitmap)
-+			flags |= BLK_MQ_F_TAG_HCTX_SHARED;
-+		if (nullb->dev->blocking)
-+			flags |= BLK_MQ_F_BLOCKING;
-+	} else {
-+		hw_queues = g_submit_queues;
-+		poll_queues = g_poll_queues;
-+		queue_depth = g_hw_queue_depth;
-+		numa_node = g_home_node;
-+		if (g_blocking)
-+			flags |= BLK_MQ_F_BLOCKING;
-+	}
-+
- 	set->ops = &null_mq_ops;
--	set->nr_hw_queues = nullb ? nullb->dev->submit_queues :
--						g_submit_queues;
--	poll_queues = nullb ? nullb->dev->poll_queues : g_poll_queues;
--	if (poll_queues)
--		set->nr_hw_queues += poll_queues;
--	set->queue_depth = nullb ? nullb->dev->hw_queue_depth :
--						g_hw_queue_depth;
--	set->numa_node = nullb ? nullb->dev->home_node : g_home_node;
- 	set->cmd_size	= sizeof(struct nullb_cmd);
--	set->flags = BLK_MQ_F_SHOULD_MERGE;
--	if (nullb->dev->no_sched)
--		set->flags |= BLK_MQ_F_NO_SCHED;
--	if (nullb->dev->shared_tag_bitmap)
--		set->flags |= BLK_MQ_F_TAG_HCTX_SHARED;
-+	set->flags = flags;
- 	set->driver_data = nullb;
--	if (poll_queues)
-+	set->nr_hw_queues = hw_queues;
-+	set->queue_depth = queue_depth;
-+	set->numa_node = numa_node;
-+	if (poll_queues) {
-+		set->nr_hw_queues += poll_queues;
- 		set->nr_maps = 3;
--	else
-+	} else {
- 		set->nr_maps = 1;
--
--	if ((nullb && nullb->dev->blocking) || g_blocking)
--		set->flags |= BLK_MQ_F_BLOCKING;
-+	}
- 
- 	return blk_mq_alloc_tag_set(set);
- }
--- 
-2.31.1
+t1				t2
+device_add_disk
+  disk->slave_dir = kobject_create_and_add
+				bd_link_disk_holder
+				 __link_disk_holder
+				 list_add
+  bd_register_pending_holders
+   list_for_each_entry
+    __link_disk_holder -> -EEXIST
+
+In this case, I think maybe ignore '-EEXIST' is fine.
+
+I'm not familiar with dm, and I'm not sure if I missed something,
+please kindly correct me if I'm wrong.
+
+Thanks,
+Kuai
 
