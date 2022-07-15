@@ -2,114 +2,219 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A802C43334
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 18:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A45CCA482
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 18:46:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbiGOSMb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 14:12:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39494 "EHLO
+        id S229481AbiGOSqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 14:46:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229631AbiGOSMa (ORCPT
+        with ESMTP id S229800AbiGOSqd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 14:12:30 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A91D59245;
-        Fri, 15 Jul 2022 11:12:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AB4D362315;
-        Fri, 15 Jul 2022 18:12:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24257C3411E;
-        Fri, 15 Jul 2022 18:12:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657908749;
-        bh=zv88e6V2bOYszh5xZ5YFkXFxU2Be44JHufVZU7uo7YY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lOXj38MUE4WmuKeKIPlNexwIs7d8j8Mz4uoK2G7zN/dZp+RTkb2v8L75BR+FVb2zH
-         NmLEm83eUNRwIqIcI9wL5Q7Y/K5KaSXYAggo90eNZJreO3MwD6YLDAVtSqrhawd220
-         FfTrGX7RzR5bYdQfxpxddrFbFuFVbOAP84mKTE5tFRcQ9vpdfUvihzKC280u33p+nf
-         sgh91eVFS1/df/x4i5S5Y3xGZfhkxUDSNLG//qoPSaN62QmkmLK3zEnf05TyCfYrGC
-         o42ruHmQt/OmwMwUVYrktc9irgZcBlYavqVg1mrCYYtvemdz22qgg797b5wCsDY7Xe
-         fosRk69rVR62A==
-From:   SeongJae Park <sj@kernel.org>
-To:     SeongJae Park <sj@kernel.org>
-Cc:     roger.pau@citrix.com, axboe@kernel.dk, boris.ostrovsky@oracle.com,
-        jgross@suse.com, olekstysh@gmail.com, andrii.chepurnyi82@gmail.com,
-        mheyne@amazon.de, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] Fix persistent grants negotiation with a behavior change
-Date:   Fri, 15 Jul 2022 18:12:26 +0000
-Message-Id: <20220715181226.126714-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220715175521.126649-1-sj@kernel.org>
-References: 
+        Fri, 15 Jul 2022 14:46:33 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934953C8FE
+        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:46:29 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id v16so7911339wrd.13
+        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:46:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HgEvmkQJ8DtoN15myw3ivc8jTluNDOe94y/KIzzFT9M=;
+        b=byEaUquOywUh4/sI3O3G5seHxneOlm644kl23aMyMln/dSMw+9cYnpM/LNL1/lM7wE
+         8lDvBLEv47nOVylQKRUNRLVEu1nk7XBWsI2TlZk44qsX543geBtZ2WKGg1GPwz7mrgp6
+         frhlEH5FCyH3tucdbbL+ILEYj4fzpPytsZRy0zL8U135ad8eLvL+8mK7yDm7ZGcuvINF
+         0aX8gChK00UY3FTIx+e/cD3Odz7zNBiCoT0mSEO1XSWuntGXoxZoHua+Smk38hCNxFLR
+         F9s8rEeQF42aeZs+/RlFhO4CLv4MP0HGruQ1YD3PjXngCO5IyECztMrbH0Kj2z9TMeng
+         9R8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HgEvmkQJ8DtoN15myw3ivc8jTluNDOe94y/KIzzFT9M=;
+        b=DBoLlJtXzCmA6PNZHrG5zV3myQuFkFrhA/DaNGe1eVGPdCt0EfH6TX2D8pbBUGLhKm
+         3oLBH5ce8dhexBXdZCEw4KJhalk9JxCZ57hQYyW9OBGc7f/jy6RIGNj2XKQ3BTUBj8R8
+         hc/tO/C/CLu7TMz0IA/lBaOv3gnQxLYj5XrH1nLHqzs3bVljDCQWDTjF7tvylMgYurZX
+         CvsLO3oHs+6Pl2WJysRCfWdDc68VWxLH8Y2OZhMYTMtx1TtYpxaQQNpx/deFCfi6Dv8c
+         KaLyCVKdRxW9jReSTpOkq2YMxf6w6dF6vL4d3ol4mkJp2UsdVFemcLuvCxi1FBA0B+Xa
+         7rLA==
+X-Gm-Message-State: AJIora8/x+4uYx4rtrZQjuDOZQ8Ri6G5ZjO6TaKggTH6tJKp8879tuUz
+        /Sc0+sfaYbqUy2ym7sd0jdF3aUjYgsGhrCE/LLh6
+X-Google-Smtp-Source: AGRyM1sMRQOGr4iboLKVVfr4M8h98/DvcanhVGhBrLtpBWNIjFHka5pgln3Ffjq4ZGfhCBUczGY4SyT7k+AEk6OM99o=
+X-Received: by 2002:adf:d22f:0:b0:21d:6b26:8c6f with SMTP id
+ k15-20020adfd22f000000b0021d6b268c6fmr14457397wrh.70.1657910788008; Fri, 15
+ Jul 2022 11:46:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220714000536.2250531-1-mcgrof@kernel.org> <CAHC9VhSjfrMtqy_6+=_=VaCsJKbKU1oj6TKghkue9LrLzO_++w@mail.gmail.com>
+ <YtC8Hg1mjL+0mjfl@bombadil.infradead.org>
+In-Reply-To: <YtC8Hg1mjL+0mjfl@bombadil.infradead.org>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Fri, 15 Jul 2022 14:46:16 -0400
+Message-ID: <CAHC9VhQMABYKRqZmJQtXai0gtiueU42ENvSUH929=pF6tP9xOg@mail.gmail.com>
+Subject: Re: [PATCH] lsm,io_uring: add LSM hooks to for the new uring_cmd file op
+To:     Luis Chamberlain <mcgrof@kernel.org>, casey@schaufler-ca.com
+Cc:     axboe@kernel.dk, joshi.k@samsung.com,
+        linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        a.manzanares@samsung.com, javier@javigon.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+On Thu, Jul 14, 2022 at 9:00 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> On Wed, Jul 13, 2022 at 11:00:42PM -0400, Paul Moore wrote:
+> > On Wed, Jul 13, 2022 at 8:05 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> > >
+> > > io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
+> > > add infrastructure for uring-cmd"), this extended the struct
+> > > file_operations to allow a new command which each subsystem can use
+> > > to enable command passthrough. Add an LSM specific for the command
+> > > passthrough which enables LSMs to inspect the command details.
+> > >
+> > > This was discussed long ago without no clear pointer for something
+> > > conclusive, so this enables LSMs to at least reject this new file
+> > > operation.
+> > >
+> > > [0] https://lkml.kernel.org/r/8adf55db-7bab-f59d-d612-ed906b948d19@schaufler-ca.com
+> >
+> > [NOTE: I now see that the IORING_OP_URING_CMD has made it into the
+> > v5.19-rcX releases, I'm going to be honest and say that I'm
+> > disappointed you didn't post the related LSM additions
+>
+> It does not mean I didn't ask for them too.
+>
+> > until
+> > v5.19-rc6, especially given our earlier discussions.]
+>
+> And hence since I don't see it either, it's on us now.
 
-On Fri, 15 Jul 2022 17:55:19 +0000 SeongJae Park <sj@kernel.org> wrote:
+It looks like I owe you an apology, Luis.  While my frustration over
+io_uring remains, along with my disappointment that the io_uring
+developers continue to avoid discussing access controls with the LSM
+community, you are not the author of the IORING_OP_URING_CMD.   You
+are simply trying to do the right thing by adding the necessary LSM
+controls and in my confusion I likely caused you a bit of frustration;
+I'm sorry for that.
 
-> The first patch of this patchset fixes 'feature_persistent' parameter
-> handling in 'blkback' to respect the frontend's persistent grants
-> support always.  The fix makes a behavioral change, so the second patch
-> makes the counterpart of 'blkfront' to consistently follow the behavior
-> change.
+> As important as I think LSMs are, I cannot convince everyone
+> to take them as serious as I do.
 
-I made the behavior change as requested by Andrii[1].  I therefore made similar
-behavior change to blkfront and Cc-ed stable for the second change, too.
+Yes, I think a lot of us are familiar with that feeling unfortunately :/
 
-To make the change history clear and reduce the stable side overhead, however,
-it might be better to apply the v2, which don't make behavior change but only
-fix the issue, Cc stable@ for it, make the behavior change commits for both
-blkback and blkfront, update the documents, and don't Cc stable@ for the
-behavior change and documents update commits.
+> > While the earlier discussion may not have offered a detailed approach
+> > on how to solve this, I think it was rather conclusive in that the
+> > approach used then (and reproduced here) did not provide enough
+> > context to the LSMs to be able to make a decision.
+>
+> Right...
+>
+> > There were similar
+> > concerns when it came to auditing the command passthrough.  It appears
+> > that most of my concerns in the original thread still apply to this
+> > patch.
+> >
+> > Given the LSM hook in this patch, it is very difficult (impossible?)
+> > to determine the requested operation as these command opcodes are
+> > device/subsystem specific.  The unfortunate result is that the LSMs
+> > are likely going to either allow all, or none, of the commands for a
+> > given device/subsystem, and I think we can all agree that is not a
+> > good idea.
+> >
+> > That is the critical bit of feedback on this patch, but there is more
+> > feedback inline below.
+>
+> Given a clear solution is not easily tangible at this point
+> I was hoping perhaps at least the abilility to enable LSMs to
+> reject uring-cmd would be better than nothing at this point.
 
-One downside of that would be that it will make a behavioral difference in
-pre-5.19.x and post-5.19.x.
+Without any cooperation from the io_uring developers, that is likely
+what we will have to do.  I know there was a lot of talk about this
+functionality not being like another ioctl(), but from a LSM
+perspective I think that is how we will need to treat it.
 
-I think both downsides are not critical, so posted this patchset in this shape.
-If anyone prefer some changes, please let me know, though.
+> > > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> > > ---
+> > >  include/linux/lsm_hook_defs.h | 1 +
+> > >  include/linux/lsm_hooks.h     | 3 +++
+> > >  include/linux/security.h      | 5 +++++
+> > >  io_uring/uring_cmd.c          | 5 +++++
+> > >  security/security.c           | 4 ++++
+> > >  5 files changed, 18 insertions(+)
+> >
+> > ...
+> >
+> > > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+> > > index 0a421ed51e7e..5e666aa7edb8 100644
+> > > --- a/io_uring/uring_cmd.c
+> > > +++ b/io_uring/uring_cmd.c
+> > > @@ -3,6 +3,7 @@
+> > >  #include <linux/errno.h>
+> > >  #include <linux/file.h>
+> > >  #include <linux/io_uring.h>
+> > > +#include <linux/security.h>
+> > >
+> > >  #include <uapi/linux/io_uring.h>
+> > >
+> > > @@ -82,6 +83,10 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
+> > >         struct file *file = req->file;
+> > >         int ret;
+> > >
+> > > +       ret = security_uring_cmd(ioucmd);
+> > > +       if (ret)
+> > > +               return ret;
+> > > +
+> > >         if (!req->file->f_op->uring_cmd)
+> > >                 return -EOPNOTSUPP;
+> > >
+> >
+> > In order to be consistent with most of the other LSM hooks, the
+> > 'req->file->f_op->uring_cmd' check should come before the LSM hook
+> > call.
+>
+> Sure.
+>
+> > The general approach used in most places is to first validate
+> > the request and do any DAC based access checks before calling into the
+> > LSM.
+>
+> OK.
+>
+> Let me know how you'd like to proceed given our current status.
 
-[1] https://lore.kernel.org/xen-devel/CAJwUmVB6H3iTs-C+U=v-pwJB7-_ZRHPxHzKRJZ22xEPW7z8a=g@mail.gmail.com/
+Well, we're at -rc6 right now which means IORING_OP_URING_CMD is
+happening and it's unlikely the LSM folks are going to be able to
+influence the design/implementation much at this point so we have to
+do the best we can.  Given the existing constraints, I think your
+patch is reasonable (although please do shift the hook call site down
+a bit as discussed above), we just need to develop the LSM
+implementations to go along with it.
 
+Luis, can you respin and resend the patch with the requested changes?
 
-Thanks,
-SJ
+Casey, it looks like Smack and SELinux are the only LSMs to implement
+io_uring access controls.  Given the hook that Luis developed in this
+patch, could you draft a patch for Smack to add the necessary checks?
+I'll do the same for SELinux.  My initial thinking is that all we can
+really do is check the access between the creds on the current task
+(any overrides will have already taken place by the time the LSM hook
+is called) with the io_uring_cmd:file label/creds; we won't be able to
+provide much permission granularity for all the reasons previously
+discussed, but I suspect that will be more of a SELinux problem than a
+Smack problem (although I suspect Smack will need to treat this as
+both a read and a write, which is likely less than ideal).
 
-> 
-> Changes from v2
-> (https://lore.kernel.org/xen-devel/20220714224410.51147-1-sj@kernel.org/)
-> - Keep the behavioral change of v1
-> - Update blkfront's counterpart to follow the changed behavior
-> - Update documents for the changed behavior
-> 
-> Changes from v1
-> (https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/)
-> - Avoid the behavioral change
->   (https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/)
-> - Rebase on latest xen/tip/linux-next
-> - Re-work by SeongJae Park <sj@kernel.org>
-> - Cc stable@
-> 
-> 
-> 
-> Maximilian Heyne (1):
->   xen, blkback: fix persistent grants negotiation
-> 
-> SeongJae Park (1):
->   xen-blkfront: Apply 'feature_persistent' parameter when connect
-> 
->  Documentation/ABI/testing/sysfs-driver-xen-blkback  | 2 +-
->  Documentation/ABI/testing/sysfs-driver-xen-blkfront | 2 +-
->  drivers/block/xen-blkback/xenbus.c                  | 9 +++------
->  drivers/block/xen-blkfront.c                        | 4 +---
->  4 files changed, 6 insertions(+), 11 deletions(-)
-> 
-> -- 
-> 2.25.1
+I think it's doubtful we will have all of this ready and tested in
+time for v5.19, but I think we can have it ready shortly after that
+and I'll mark all of the patches for -stable when I send them to
+Linus.
+
+I also think we should mark the patches with a 'Fixes:' line that
+points at the IORING_OP_URING_CMD commit, ee692a21e9bf ("fs,io_uring:
+add infrastructure for uring-cmd").
+
+How does that sound to everyone?
+
+-- 
+paul-moore.com
