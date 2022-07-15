@@ -2,179 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC70C43334
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 10:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F281C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jul 2022 11:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbiGOKPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jul 2022 06:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
+        id S231558AbiGOLMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jul 2022 07:12:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230407AbiGOKPk (ORCPT
+        with ESMTP id S231292AbiGOLMk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jul 2022 06:15:40 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3370820D2;
-        Fri, 15 Jul 2022 03:15:38 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id u13so7085612lfn.5;
-        Fri, 15 Jul 2022 03:15:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=3jL/lfoMTvA3SObDpy7W+GRYeEbbVoydVSs+VhMSyQ8=;
-        b=LKqUeJAhYet/E4+FOjDCJ0dKq4cDW2x4E+rfQdu83sWKvClZdCu1e1M0E0f3NVLWeY
-         RXqHP7rrV4Gy0UvBJZ6Bv4RiaH1MNOZ0zYRfjZ35s6KLeY6hYXQcra7SL8Bs6qETPdr5
-         dYYLgG48qse3A1sQodtQrzuSaIVuhSnWYGOCsfY5B7tL5JDS6Z3SbspiTM2N6zT81LBz
-         GrmAOEmVMPpU117asGxfbCJUPK8r1VAAGAELjEv0s/Ph5p+GAAYDP5wadDJdkdPE4Jv9
-         Ebcy0Ity1RZ3igPwXdeAet2+5VSr+p+LL13YixBvp19SsNp9YpNMvk/gnMMrJ07RuCcm
-         55Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=3jL/lfoMTvA3SObDpy7W+GRYeEbbVoydVSs+VhMSyQ8=;
-        b=Y7AlmLyyzzUhLU0Xa4nnzSHExxCy6sgmJ9ZLAfSqcXOWufbtKk1WlSJ9FaWzANZ+22
-         9PgFI1QNoD2RHSFwQoWyp/x2HH7DVpZfbAQSurGMrw8noaYiRxnvH1JoHURxwdZN7bjN
-         3qOvD4pXKRS8cIIVqlvpysFLHYlF20Af93B8+fEmsUNvjmQP9vsRyIg6kTpjGaQOogc7
-         7602wOzgmrF5/kZtCibbw/bXUT/v+Odkev1ts1ph3pto2A2huoiAy7nrlX2BxejMTPdt
-         w5Tx1T9/jONGD9vp10uHzBIzd68qz9K7mGVT80Hsqzh+g1sH40peJksW5GBY0vsxeRr+
-         SFGg==
-X-Gm-Message-State: AJIora+b6uOdsYuJVoLDxswHz4dLLL4KAfYgr5A2mzhHmed66rwUKx5C
-        oSNCTtJW+fpjmw3pZT7J4Hs=
-X-Google-Smtp-Source: AGRyM1t48mlwdtZzT1aWp5fHW0tldYcGnnIY2KtrlB80elovY46YP+G88J/+IMfODsBiDN0SPqzLiA==
-X-Received: by 2002:a19:4f0b:0:b0:489:c753:5c1d with SMTP id d11-20020a194f0b000000b00489c7535c1dmr7473118lfb.339.1657880136897;
-        Fri, 15 Jul 2022 03:15:36 -0700 (PDT)
-Received: from [192.168.1.7] ([212.22.223.21])
-        by smtp.gmail.com with ESMTPSA id e10-20020a19674a000000b00483f8c40c14sm835123lfj.243.2022.07.15.03.15.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Jul 2022 03:15:36 -0700 (PDT)
-Message-ID: <41207539-f621-1bb2-2f43-0b2b9e3f6866@gmail.com>
-Date:   Fri, 15 Jul 2022 13:15:34 +0300
+        Fri, 15 Jul 2022 07:12:40 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1893E87217
+        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 04:12:35 -0700 (PDT)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220715111230epoutp031654fb2bdac4570c33d979a8dc15ed2e~B-E4oQKjo1012110121epoutp03_
+        for <linux-block@vger.kernel.org>; Fri, 15 Jul 2022 11:12:30 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220715111230epoutp031654fb2bdac4570c33d979a8dc15ed2e~B-E4oQKjo1012110121epoutp03_
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1657883550;
+        bh=Ji9OfW4MTOZofKIL3li59siIKM0d+5nNRqymbyXJlds=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=RtfcvVhl77Quvi1PE3X2uXnb1Zq/HuHYTkEMhjC0GoEa5xt6yoW5CkvpruTi0zG30
+         8806yF7OOUj2NU19I23aI+JJe4qDTeVCGYZ2I3iXK577w/YX09IP6bJ3+igBBcDObV
+         KOFQnMHDNYikWJaeX7lcugA2ycjkQkWshXYC40HQ=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20220715111229epcas5p24cdb6c2dedae889189ca6cd8518586ad~B-E4MiZHX0850708507epcas5p21;
+        Fri, 15 Jul 2022 11:12:29 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4Lkpbt2TW0z4x9Py; Fri, 15 Jul
+        2022 11:12:26 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        85.46.09662.A9B41D26; Fri, 15 Jul 2022 20:12:26 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220715111225epcas5p174b037b8b850300e1ff2d1b96dd0a64d~B-E0ZA86c1396213962epcas5p12;
+        Fri, 15 Jul 2022 11:12:25 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220715111225epsmtrp191da074f2d6e26c34a8a4fc31f69d141~B-E0YGCWd1475014750epsmtrp1q;
+        Fri, 15 Jul 2022 11:12:25 +0000 (GMT)
+X-AuditID: b6c32a49-885ff700000025be-44-62d14b9a3566
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        1C.63.08802.99B41D26; Fri, 15 Jul 2022 20:12:25 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220715111223epsmtip243bea6f75bf92c0416d33c21c9e224ea~B-EycOCFr1601816018epsmtip2b;
+        Fri, 15 Jul 2022 11:12:23 +0000 (GMT)
+Date:   Fri, 15 Jul 2022 16:37:00 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Jens Axboe <axboe@kernel.dk>, hch@lst.de, kbusch@kernel.org,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
+Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
+ io_uring_cmd
+Message-ID: <20220715110700.GA27117@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v2] xen-blkback: fix persistent grants negotiation
-Content-Language: en-US
-To:     SeongJae Park <sj@kernel.org>, roger.pau@citrix.com,
-        jgross@suse.com
-Cc:     axboe@kernel.dk, boris.ostrovsky@oracle.com, mheyne@amazon.de,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        andrii.chepurnyi82@gmail.com
-References: <20220714224410.51147-1-sj@kernel.org>
-From:   Oleksandr <olekstysh@gmail.com>
-In-Reply-To: <20220714224410.51147-1-sj@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20220714153051.5e53zgkcabb7ajms@carbon.lan>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEJsWRmVeSWpSXmKPExsWy7bCmuu4s74tJBtO6+C2aJvxltpizahuj
+        xeq7/WwWhx9PYre4eWAnk8XK1UeZLN61nmOxOP/2MJPFpEPXGC323tK2mL/sKbvFocnNTBbr
+        Xr9nceD12DnrLrvH+XsbWTwuny312LSqk81j85J6j903G9g83u+7yubRt2UVo8fm09UenzfJ
+        BXBFZdtkpCampBYppOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5+AToumXmAF2u
+        pFCWmFMKFApILC5W0rezKcovLUlVyMgvLrFVSi1IySkwKdArTswtLs1L18tLLbEyNDAwMgUq
+        TMjOeNd5irngF1fFonV7WRsYp3F2MXJySAiYSEx9sIMFxBYS2M0ocW2maxcjF5D9iVFiT1sT
+        I4TzmVHi8cObzDAdq+4eZoFI7GKU6Lp1mBXCecYocfTMLjaQKhYBVYl7hycwdTFycLAJaEpc
+        mFwKEhYRUJbY/n8bWDOzwE4miUcPNjCCJIQFAiVW9+5hB7F5BXQlnl8/xgRhC0qcnPkE7D5O
+        AUuJgyfPgtWIAg06sO04E8ggCYELHBKbu64yQZznIjH903OoU4UlXh3fwg5hS0m87G+DspMl
+        Ls08B1VfIvF4z0Eo216i9VQ/WC+zQKbEpQ/T2CBsPone30/AnpEQ4JXoaBOCKFeUuDfpKSuE
+        LS7xcMYSKNtD4uatvWyQQDnKLHHl4HnWCYxys5D8MwvJCgjbSqLzQxPrLKAVzALSEsv/cUCY
+        mhLrd+kvYGRdxSiZWlCcm55abFpgmJdaDo/k5PzcTYzgxKzluYPx7oMPeocYmTgYDzFKcDAr
+        ifB2HzqXJMSbklhZlVqUH19UmpNafIjRFBg/E5mlRJPzgbkhryTe0MTSwMTMzMzE0tjMUEmc
+        1+vqpiQhgfTEktTs1NSC1CKYPiYOTqkGJo2oH5PqSrbPmBd0JkjIOWHdHrN3vz57FN+PulPP
+        FJN+yKw2Ypvn+n1PyrZ0bwhPfOWrmigZwuJ7dUdd6aMENzaHpllKolNePP900YUld5XVJ/3z
+        2Qu2qeXKukYrsy41nD5X2Ma6JWWZ5B032zM2/za1HL63bHNO8cZJ+5UWG0w4WNhtN3P1xy6d
+        vaHzA+aWyfue+LafM/irfsO5En2NShG1vMsnlMVlb7Ib/30zhfVW6+wJTucFjBleelcfuMMt
+        HW24jWHy+54iVw/Jsw2/3l4uaGZg/5dmM4/jZc4k+3TlgBKJB/95ej2X6dTcXjeNoeL8m/DJ
+        lfkRuu/SmXd7PjL6/+k2X/1GnWO2Vn7iSizFGYmGWsxFxYkAy3CCulUEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAIsWRmVeSWpSXmKPExsWy7bCSvO5M74tJBk9ajSyaJvxltpizahuj
+        xeq7/WwWhx9PYre4eWAnk8XK1UeZLN61nmOxOP/2MJPFpEPXGC323tK2mL/sKbvFocnNTBbr
+        Xr9nceD12DnrLrvH+XsbWTwuny312LSqk81j85J6j903G9g83u+7yubRt2UVo8fm09UenzfJ
+        BXBFcdmkpOZklqUW6dslcGXcb/jGVrCSo2Lr9F9MDYz32boYOTkkBEwkVt09zNLFyMUhJLCD
+        UWLxtzWMEAlxieZrP9ghbGGJlf+eg9lCAk8YJX5dCAGxWQRUJe4dnsDUxcjBwSagKXFhcilI
+        WERAWWL7/21gM5kFdjJJrDv5EmyZsECgxOrePWBzeAV0JZ5fP8YEsfg4s8SyBxtZIRKCEidn
+        PmEBsZkFzCTmbX7IDLKAWUBaYvk/DpAwp4ClxMGTZ8HmiAItO7DtONMERsFZSLpnIemehdC9
+        gJF5FaNkakFxbnpusWGBUV5quV5xYm5xaV66XnJ+7iZGcKRpae1g3LPqg94hRiYOxkOMEhzM
+        SiK83YfOJQnxpiRWVqUW5ccXleakFh9ilOZgURLnvdB1Ml5IID2xJDU7NbUgtQgmy8TBKdXA
+        VP3tjxETa9gMGcurEnpMOWufxU9qD7B3/f7xouNLln3n+R2fSjEs3Fwb02jk/XbbRP/zO/v/
+        PjcytVXdc+9Hxfqu77+szyy2n2s4ua1POHzynQ6rlRMv7U+x3vzbuMXy8ozm1PIn0w6uMhXJ
+        +ceqcMO/sK7v2T/rkmfBX5Y+a9AyU5nWrHXi4SLDSXzW/aLJy5grLfU0r2zb9vaW6drv597u
+        PrHRZfGcH8cunJrxYu58C5ZnHMt8uP4YPOHdOZ3HPL3llFuI2oTQlC3Ma/69vzvlxqnVU89/
+        Z/64+6bXiazJyeUWB2fqahXPF5H8IPtLMkcmZGlEnC3DlLerVjuZH5yze/nxP92f7Dacyn5x
+        wvitEktxRqKhFnNRcSIAQmnjCyMDAAA=
+X-CMS-MailID: 20220715111225epcas5p174b037b8b850300e1ff2d1b96dd0a64d
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+        <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
+        <20220711110155.649153-4-joshi.k@samsung.com>
+        <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
+        <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
+        <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me> <Ys+QPjYBDoByrfw1@T590>
+        <20220714081923.GE30733@test-zns>
+        <20220714153051.5e53zgkcabb7ajms@carbon.lan>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-On 15.07.22 01:44, SeongJae Park wrote:
-
-
-Hello all.
-
-Adding Andrii Chepurnyi to CC who have played with the use-case which 
-required reconnect recently and faced some issues with 
-feature_persistent handling.
-
-
-
-
-> Persistent grants feature can be used only when both backend and the
-> frontend supports the feature.  The feature was always supported by
-> 'blkback', but commit aac8a70db24b ("xen-blkback: add a parameter for
-> disabling of persistent grants") has introduced a parameter for
-> disabling it runtime.
+On Thu, Jul 14, 2022 at 05:30:51PM +0200, Daniel Wagner wrote:
+>On Thu, Jul 14, 2022 at 01:49:23PM +0530, Kanchan Joshi wrote:
+>> If path is not available, retry is not done immediately rather we wait for
+>> path to be available (as underlying controller may still be
+>> resetting/connecting). List helped as command gets added into
+>> it (and submitter/io_uring gets the control back), and retry is done
+>> exact point in time.
+>> But yes, it won't harm if we do couple of retries even if path is known
+>> not to be available (somewhat like iopoll). As this situation is
+>> not common. And with that scheme, we don't have to link io_uring_cmd.
 >
-> To avoid the parameter be updated while being used by 'blkback', the
-> commit caches the parameter into 'vbd->feature_gnt_persistent' in
-> 'xen_vbd_create()', and then check if the guest also supports the
-> feature and finally updates the field in 'connect_ring()'.
->
-> However, 'connect_ring()' could be called before 'xen_vbd_create()', so
-> later execution of 'xen_vbd_create()' can wrongly overwrite 'true' to
-> 'vbd->feature_gnt_persistent'.  As a result, 'blkback' could try to use
-> 'persistent grants' feature even if the guest doesn't support the
-> feature.
->
-> This commit fixes the issue by moving the parameter value caching to
-> 'xen_blkif_alloc()', which allocates the 'blkif'.  Because the struct
-> embeds 'vbd' object, which will be used by 'connect_ring()' later, this
-> should be called before 'connect_ring()' and therefore this should be
-> the right and safe place to do the caching.
->
-> Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
-> Cc: <stable@vger.kernel.org> # 5.10.x
-> Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
-> Signed-off-by: SeongJae Park <sj@kernel.org>
-> ---
->
-> Changes from v1[1]
-> - Avoid the behavioral change[2]
-> - Rebase on latest xen/tip/linux-next
-> - Re-work by SeongJae Park <sj@kernel.org>
-> - Cc stable@
->
-> [1] https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/
-> [2] https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/
->
->   drivers/block/xen-blkback/xenbus.c | 15 +++++++--------
->   1 file changed, 7 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index 97de13b14175..16c6785d260c 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -157,6 +157,11 @@ static int xen_blkif_alloc_rings(struct xen_blkif *blkif)
->   	return 0;
->   }
->   
-> +/* Enable the persistent grants feature. */
-> +static bool feature_persistent = true;
-> +module_param(feature_persistent, bool, 0644);
-> +MODULE_PARM_DESC(feature_persistent, "Enables the persistent grants feature");
-> +
->   static struct xen_blkif *xen_blkif_alloc(domid_t domid)
->   {
->   	struct xen_blkif *blkif;
-> @@ -181,6 +186,8 @@ static struct xen_blkif *xen_blkif_alloc(domid_t domid)
->   	__module_get(THIS_MODULE);
->   	INIT_WORK(&blkif->free_work, xen_blkif_deferred_free);
->   
-> +	blkif->vbd.feature_gnt_persistent = feature_persistent;
-> +
->   	return blkif;
->   }
->   
-> @@ -472,12 +479,6 @@ static void xen_vbd_free(struct xen_vbd *vbd)
->   	vbd->bdev = NULL;
->   }
->   
-> -/* Enable the persistent grants feature. */
-> -static bool feature_persistent = true;
-> -module_param(feature_persistent, bool, 0644);
-> -MODULE_PARM_DESC(feature_persistent,
-> -		"Enables the persistent grants feature");
-> -
->   static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
->   			  unsigned major, unsigned minor, int readonly,
->   			  int cdrom)
-> @@ -520,8 +521,6 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
->   	if (bdev_max_secure_erase_sectors(bdev))
->   		vbd->discard_secure = true;
->   
-> -	vbd->feature_gnt_persistent = feature_persistent;
-> -
->   	pr_debug("Successful creation of handle=%04x (dom=%u)\n",
->   		handle, blkif->domid);
->   	return 0;
+>Stupid question does it only fail over immediately when the path is not
+>available or any failure? If it fails over for everything it's possible
+>the target gets the same request twice. FWIW, we are just debugging this
+>scenario right now.
 
--- 
-Regards,
+failover is only for path-related failure, and not otherwise.
+you might want to take a look at nvme_decide_disposition routine where
+it makes that decision.
 
-Oleksandr Tyshchenko
+------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_
+Content-Type: text/plain; charset="utf-8"
 
+
+------HMHzcl7Kov5y0bbYah5tgDYyhjafTXQAGx6UUfEgMJOMVZI4=_13446e_--
