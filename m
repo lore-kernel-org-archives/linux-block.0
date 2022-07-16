@@ -2,116 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB533C43334
-	for <linux-block@archiver.kernel.org>; Sat, 16 Jul 2022 09:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1DBC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Jul 2022 12:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbiGPJyL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Jul 2022 05:54:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44478 "EHLO
+        id S231815AbiGPMdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Jul 2022 08:33:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiGPJyL (ORCPT
+        with ESMTP id S231793AbiGPMdX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Jul 2022 05:54:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BB76DFC2
-        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 02:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1657965249;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=BYm7Wq06epmbPBfN/dzQBhuSy+vcO07Mx6d5oKR5bKw=;
-        b=UHJ9DrgVVN+XKF4pYEPrJCZ5aumiXl8I4ph5ernT1lwFcB/v+FZ9fl/SHvr1EVgNe/vs3f
-        hmvk5NrrcQkM94m2d7pR+ftCQcFTGVnfV4Tq4ZEFzY7BNFIubDkyMEMopVlj9c5bqQR5+x
-        0PFZV8J4ROfQY9yZ3d+aGoOGkRbuj84=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-26-nQCBGuGhPg24iBUfhAiBkw-1; Sat, 16 Jul 2022 05:53:55 -0400
-X-MC-Unique: nQCBGuGhPg24iBUfhAiBkw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3DF76101A54E;
-        Sat, 16 Jul 2022 09:53:55 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 37DC0400DC12;
-        Sat, 16 Jul 2022 09:53:53 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        kernel test robot <lkp@intel.com>
-Subject: [PATCH] ublk_drv: fix build warning with -Wmaybe-uninitialized and one sparse warning
-Date:   Sat, 16 Jul 2022 17:53:44 +0800
-Message-Id: <20220716095344.222674-1-ming.lei@redhat.com>
+        Sat, 16 Jul 2022 08:33:23 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B861EC51
+        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 05:33:22 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id q5so5296105plr.11
+        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 05:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=o4csOc+rtB7OUTKym0l3RxG2wfhS0254EiN6uhE/JmQ=;
+        b=2/NMJ6WlCAOj0nNYy32FujAraP5+NrISPHGUKecmoPyVl0OmmKR7kcJtpqR2NakGmc
+         0WizbndmcjewSnvT2dCOGwQ55qmZvdkgVdqn6MNMtwd8FhHd3OIxrwrVkgbnc4u3rYqU
+         4pFS7Xm4X8gnvSq6RgbyJ+iTYt7FKx9o5W8PMRQWde8uRJKASZ46F5Q8x/mGWWQ9HxQM
+         klVQzScTANxG7U1YYRAPJ+sk63GH/qwoilViwM8XLfOXr4SDQvL18CNDWzY2/ZK18G9M
+         VnFHeRwYu+p/QqyYxDyuBNiCzkkDAy6FwZnlwAODYvGsdle8+AqV8snnXy39hhJot2Rz
+         zJmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=o4csOc+rtB7OUTKym0l3RxG2wfhS0254EiN6uhE/JmQ=;
+        b=jG2gqAsKBiG15n92VaWH2iHhH0Lqc+o07vBUFNF19CYD+QP+7J+0D79WPzMUDmaFbv
+         FEKjhr86QFfGEeqFfYMrFbaMffKzoBkdbw7yzXSUWUu3sbRKlUKHcvr3SKFM4bdg/AMb
+         HGw3y5klF1/E8vPeMsVat3delXLE0ABacYkybC0aJdP7s5bql7rhZ4kP/HgCMU8aaZyu
+         jOW544PBGACwhnm9Z1Y6qsfbxKCBAIcNtX/cvMdb/0GUpw1xYGwwzkUKcCg54Ds07CXM
+         /+K51APvSt6hFPACCkCVreHZ7Wul9bBaK8irGe3uIxv647mkyV11Ato5uxT0s071IA0q
+         XwVA==
+X-Gm-Message-State: AJIora9Ez1NkfXxr7OIkQNjCjROTnZgJEa5srjXW7EeMHa91k9JYzXzE
+        /P8ZxxhkCXwZnm+SKwDL9m7gvbuJHBYdQw==
+X-Google-Smtp-Source: AGRyM1uwCugYrV5gHHxlWUC3M6QBVGA2S0E6AOVw+P1TjDFHQj6fdRDNZcz5gfmUIsb3poGJB2SxEQ==
+X-Received: by 2002:a17:90b:4c8c:b0:1ef:bff6:c964 with SMTP id my12-20020a17090b4c8c00b001efbff6c964mr20722243pjb.36.1657974801892;
+        Sat, 16 Jul 2022 05:33:21 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id k10-20020a17090a39ca00b001ef8ac4c681sm7654278pjf.0.2022.07.16.05.33.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Jul 2022 05:33:21 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     13667453960@163.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yijiangshan@kylinos.cn
+In-Reply-To: <20220712094350.1379942-1-13667453960@163.com>
+References: <20220712094350.1379942-1-13667453960@163.com>
+Subject: Re: [PATCH] mtip32xx: replace ternary operator with min_t()
+Message-Id: <165797480045.362401.4678527786770696731.b4-ty@kernel.dk>
+Date:   Sat, 16 Jul 2022 06:33:20 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After applying -Wmaybe-uninitialized manually, two build warnings are
-triggered:
+On Tue, 12 Jul 2022 17:43:50 +0800, Jiangshan Yi wrote:
+> From: Jiangshan Yi <yijiangshan@kylinos.cn>
+> 
+> Fix the following coccicheck warning:
+> 
+> drivers/block/mtip32xx/mtip32xx.c:2264: WARNING opportunity for min().
+> drivers/block/mtip32xx/mtip32xx.c:2328: WARNING opportunity for min().
+> drivers/block/mtip32xx/mtip32xx.c:2357: WARNING opportunity for min().
+> 
+> [...]
 
-drivers/block/ublk_drv.c:940:11: warning: ‘io’ may be used uninitialized [-Wmaybe-uninitialized]
-  940 |         io->flags &= ~UBLK_IO_FLAG_ACTIVE;
+Applied, thanks!
 
-drivers/block/ublk_drv.c: In function ‘ublk_ctrl_uring_cmd’:
-drivers/block/ublk_drv.c:1531:9: warning: ‘ret’ may be used uninitialized [-Wmaybe-uninitialized]
+[1/1] mtip32xx: replace ternary operator with min_t()
+      (no commit info)
 
-Fix the 1st one by removing 'io->flags &= ~UBLK_IO_FLAG_ACTIVE;' which
-isn't needed since the function always return successfully after setting
-this flag.
-
-Fix the 2nd one by always initializing 'ret'.
-
-Also fix another sparse warning of 'sparse: sparse: incorrect type in return
-expression' by changing return type of ublk_setup_iod().
-
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f10c4319dc1f..2c1b01d7f27d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -407,7 +407,7 @@ static inline unsigned int ublk_req_build_flags(struct request *req)
- 	return flags;
- }
- 
--static int ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
-+static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
- {
- 	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
- 	struct ublk_io *io = &ubq->ios[req->tag];
-@@ -937,7 +937,6 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 	return -EIOCBQUEUED;
- 
-  out:
--	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
- 	io_uring_cmd_done(cmd, ret, 0);
- 	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
- 			__func__, cmd_op, tag, ret, io->flags);
-@@ -1299,13 +1298,12 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
- 	struct ublk_device *ub;
- 	unsigned long queue;
- 	unsigned int retlen;
--	int ret;
-+	int ret = -EINVAL;
- 
- 	ub = ublk_get_device_from_id(header->dev_id);
- 	if (!ub)
- 		goto out;
- 
--	ret = -EINVAL;
- 	queue = header->data[0];
- 	if (queue >= ub->dev_info.nr_hw_queues)
- 		goto out;
+Best regards,
 -- 
-2.36.1
+Jens Axboe
+
 
