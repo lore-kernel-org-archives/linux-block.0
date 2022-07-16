@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1DBC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Jul 2022 12:33:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B449C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Jul 2022 12:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231815AbiGPMdY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Jul 2022 08:33:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38842 "EHLO
+        id S231970AbiGPMd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Jul 2022 08:33:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231793AbiGPMdX (ORCPT
+        with ESMTP id S231744AbiGPMd2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Jul 2022 08:33:23 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B861EC51
-        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 05:33:22 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id q5so5296105plr.11
-        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 05:33:22 -0700 (PDT)
+        Sat, 16 Jul 2022 08:33:28 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9DB31EEE0
+        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 05:33:27 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id o31-20020a17090a0a2200b001ef7bd037bbso8524636pjo.0
+        for <linux-block@vger.kernel.org>; Sat, 16 Jul 2022 05:33:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=o4csOc+rtB7OUTKym0l3RxG2wfhS0254EiN6uhE/JmQ=;
-        b=2/NMJ6WlCAOj0nNYy32FujAraP5+NrISPHGUKecmoPyVl0OmmKR7kcJtpqR2NakGmc
-         0WizbndmcjewSnvT2dCOGwQ55qmZvdkgVdqn6MNMtwd8FhHd3OIxrwrVkgbnc4u3rYqU
-         4pFS7Xm4X8gnvSq6RgbyJ+iTYt7FKx9o5W8PMRQWde8uRJKASZ46F5Q8x/mGWWQ9HxQM
-         klVQzScTANxG7U1YYRAPJ+sk63GH/qwoilViwM8XLfOXr4SDQvL18CNDWzY2/ZK18G9M
-         VnFHeRwYu+p/QqyYxDyuBNiCzkkDAy6FwZnlwAODYvGsdle8+AqV8snnXy39hhJot2Rz
-         zJmg==
+        bh=Z5XjUyUmaWOdMLRu7KLMY18nTfzRSKpg9LsYNj7VMyg=;
+        b=L8dNezZZTiMuGApSLQ+7SHjTBRtJsfgoco+bzvbWEqSDJpdDKzpWhmZbw4mEcM+sn6
+         w61bQhN4j/U4Bv5zAMO0k8BdmZ4qE/pEhEJXN3Axs4u6dLEV/9OWh9AfVHEuQNFc7Vp2
+         59tQiMWSa+1vZrBORKo6Hqhna1e1gvVGzKs8f6mfCqvRtP7SiLF/FQ4b6wreEOWa8aqi
+         foL/CJYuCV+uZceGxy2gmTJfjQnEtzj0iK7Ut3gFVMuDnLnurF9MZRsSFQjTYJNI02kC
+         kvYwG5SL3ajZunF50JxUtTeNvFJk0JaFNWLpe9X8jKd32uHv+JpUNWINxyq2JU3/B8dy
+         +M0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=o4csOc+rtB7OUTKym0l3RxG2wfhS0254EiN6uhE/JmQ=;
-        b=jG2gqAsKBiG15n92VaWH2iHhH0Lqc+o07vBUFNF19CYD+QP+7J+0D79WPzMUDmaFbv
-         FEKjhr86QFfGEeqFfYMrFbaMffKzoBkdbw7yzXSUWUu3sbRKlUKHcvr3SKFM4bdg/AMb
-         HGw3y5klF1/E8vPeMsVat3delXLE0ABacYkybC0aJdP7s5bql7rhZ4kP/HgCMU8aaZyu
-         jOW544PBGACwhnm9Z1Y6qsfbxKCBAIcNtX/cvMdb/0GUpw1xYGwwzkUKcCg54Ds07CXM
-         /+K51APvSt6hFPACCkCVreHZ7Wul9bBaK8irGe3uIxv647mkyV11Ato5uxT0s071IA0q
-         XwVA==
-X-Gm-Message-State: AJIora9Ez1NkfXxr7OIkQNjCjROTnZgJEa5srjXW7EeMHa91k9JYzXzE
-        /P8ZxxhkCXwZnm+SKwDL9m7gvbuJHBYdQw==
-X-Google-Smtp-Source: AGRyM1uwCugYrV5gHHxlWUC3M6QBVGA2S0E6AOVw+P1TjDFHQj6fdRDNZcz5gfmUIsb3poGJB2SxEQ==
-X-Received: by 2002:a17:90b:4c8c:b0:1ef:bff6:c964 with SMTP id my12-20020a17090b4c8c00b001efbff6c964mr20722243pjb.36.1657974801892;
-        Sat, 16 Jul 2022 05:33:21 -0700 (PDT)
+        bh=Z5XjUyUmaWOdMLRu7KLMY18nTfzRSKpg9LsYNj7VMyg=;
+        b=eFPy25vTOj9Vn4oGMxmo+0Oa+wmZhBJezK0yzppnxSZk+swEcsH6oMmLTPghGx3RLH
+         1d9y+SxXEVieabnNiIsGrSJc/7RsdHhRfv7v9Uwz40y4aLiqNVIv2UbgnMKOwjmDnMpO
+         MjSKnhE115neEw3WG3yrCsMQQwtQZVyKLKcPq+tIjOgowGS4Wp5dSds3R8PMt88FnFgH
+         4KFg6coZZrsRAR+tDZK43swnKfu1cjBRGKI764nLMRCG3To9TNHL8UknhMCEf1M6gEF8
+         YvQWRLPJBNusfIL8dDaBBmimLoe8QInDKVwqlBWfXHPtvZ98EO+xDGlDI117xVohFZ7P
+         w40g==
+X-Gm-Message-State: AJIora9Az+VFmlSaBi6IjAQOzIQof0l+zGK0X/se6AqLqF4IxKP3hxkS
+        3mOg60NuQX9iuFvKAh09boYH4k7fjSpjCQ==
+X-Google-Smtp-Source: AGRyM1vQjSSqUm74RGw7EEP5/3oQyxQ5TczVzey6fFwh16Ydz3raAIIcIJaJ0y3JqJMU7zwpOsQPmg==
+X-Received: by 2002:a17:90b:17c4:b0:1f0:4482:8efc with SMTP id me4-20020a17090b17c400b001f044828efcmr26526915pjb.207.1657974807361;
+        Sat, 16 Jul 2022 05:33:27 -0700 (PDT)
 Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id k10-20020a17090a39ca00b001ef8ac4c681sm7654278pjf.0.2022.07.16.05.33.20
+        by smtp.gmail.com with ESMTPSA id o90-20020a17090a0a6300b001f0cece9285sm5112359pjo.18.2022.07.16.05.33.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Jul 2022 05:33:21 -0700 (PDT)
+        Sat, 16 Jul 2022 05:33:26 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     13667453960@163.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yijiangshan@kylinos.cn
-In-Reply-To: <20220712094350.1379942-1-13667453960@163.com>
-References: <20220712094350.1379942-1-13667453960@163.com>
-Subject: Re: [PATCH] mtip32xx: replace ternary operator with min_t()
-Message-Id: <165797480045.362401.4678527786770696731.b4-ty@kernel.dk>
-Date:   Sat, 16 Jul 2022 06:33:20 -0600
+To:     bvanassche@acm.org
+Cc:     jaegeuk@kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org
+In-Reply-To: <20220715184735.2326034-1-bvanassche@acm.org>
+References: <20220715184735.2326034-1-bvanassche@acm.org>
+Subject: Re: [PATCH 0/2] Fix recently introduced kernel-doc warnings
+Message-Id: <165797480617.363028.4687340933765044343.b4-ty@kernel.dk>
+Date:   Sat, 16 Jul 2022 06:33:26 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -64,21 +64,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 12 Jul 2022 17:43:50 +0800, Jiangshan Yi wrote:
-> From: Jiangshan Yi <yijiangshan@kylinos.cn>
+On Fri, 15 Jul 2022 11:47:33 -0700, Bart Van Assche wrote:
+> This patch series fixes two recently introduced kernel-doc warnings. Please
+> consider these two patches for kernel v5.20.
 > 
-> Fix the following coccicheck warning:
+> Thanks,
 > 
-> drivers/block/mtip32xx/mtip32xx.c:2264: WARNING opportunity for min().
-> drivers/block/mtip32xx/mtip32xx.c:2328: WARNING opportunity for min().
-> drivers/block/mtip32xx/mtip32xx.c:2357: WARNING opportunity for min().
+> Bart.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] mtip32xx: replace ternary operator with min_t()
-      (no commit info)
+[1/2] fs/buffer: Fix the ll_rw_block() kernel-doc header
+      commit: f54541403b2f51d98aa65472ddb021b1ef7d1eed
+[2/2] blktrace: Fix the blk_fill_rwbs() kernel-doc header
+      commit: 020e3618cc81abf11fe6bffaac27861ff94707ce
 
 Best regards,
 -- 
