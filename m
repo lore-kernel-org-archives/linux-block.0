@@ -2,101 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC14C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 17 Jul 2022 14:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F2FC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 17 Jul 2022 15:03:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbiGQOtR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Jul 2022 10:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60542 "EHLO
+        id S229701AbiGQPD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Jul 2022 11:03:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233151AbiGQOtQ (ORCPT
+        with ESMTP id S230334AbiGQPD1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Jul 2022 10:49:16 -0400
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BF66439;
-        Sun, 17 Jul 2022 07:49:15 -0700 (PDT)
-Received: by mail-pj1-f41.google.com with SMTP id a15so9681683pjs.0;
-        Sun, 17 Jul 2022 07:49:15 -0700 (PDT)
+        Sun, 17 Jul 2022 11:03:27 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC5C13DCC;
+        Sun, 17 Jul 2022 08:03:26 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id os14so17168875ejb.4;
+        Sun, 17 Jul 2022 08:03:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=Dv/p7nIIHn8hT8UchBSA1/4q6QSRvBvNjEZvxKQbyo8=;
+        b=mI3kAqolKJgIMErLRLmU220y2pf1R3sVUCBZ48ZmrtB9/qm4CWeIBjsaUqo6TrqNng
+         yl7MTD2nmTkTbkA1Cz64bJnNezfsstOddleBs2IRYZXxR2JHYtQHBx5xI0xEWP/w1lqH
+         GHS674QDl1KZ/c69QdmmiA6fyj9RRVXH+P+WPHUOHENXxKstvGWeou3Uv54thCkm1YWP
+         Z1PGTT+QcuppkLjB6RRhVdrDJqH+RGtWkBJWUmUutcWbIkS5Z5N2aXTQ4v7c+JknP4u0
+         qfN0OXt6cUmY3wcEur23i5aFHVxOZ8K9T0Z2Oq0KklazzFei0gIV87SozXvwSCz20C6m
+         Y9Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=MBqBRgrfgPQGc4/jdSwIFgnWOJuS+NlWZm/Y/rNo1tY=;
-        b=AtWaRYWfkxg8hQctM5pMBpV4cIQbrMTg7OBzcjNIdIHriz4HxAcVF2W3kbSm7Z6qeo
-         5rOKaHBTO91kQCg9KbcGDYhzaKlO4g8O8xdRlkVkoUkZqOsC4ly7Vrg6fEsY9chWN1g8
-         Qs4kSsLcaSJXNndfAGUQDpZxy1rIDqkyCggwbjKfxWTnmht+nL0JHY1PTDfFojI4sE4j
-         D4Rfirn6TXiphpBJWdIURH44eg58fFxs37rWHggY/i3fXTXi7DdN9LM0vudnfiCCGwJe
-         KVMSnqh/2XXiYXpHqyXZ74n8+g/HC/bvV9Re06QhBGRzAxO1Drk+Lj83MVnZzK5g3JZ6
-         vVFg==
-X-Gm-Message-State: AJIora8dJ6rtQYHffiQxcxVy9iAn849g4RdBC/7Y+XP52iof+hMPG577
-        ETDyEZoj8vLvJyd8IM4B44c=
-X-Google-Smtp-Source: AGRyM1vKlS5JO91dnrQ13ldmYHdfA/q1yTYeHEWzfgJZ/HDGTDHezfDGiHirtSxHBdrdjdCBfqjKTw==
-X-Received: by 2002:a17:903:24e:b0:16b:9fa2:41e5 with SMTP id j14-20020a170903024e00b0016b9fa241e5mr23860146plh.127.1658069354999;
-        Sun, 17 Jul 2022 07:49:14 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id a18-20020a170902b59200b0016bcc35000asm7264431pls.302.2022.07.17.07.49.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Jul 2022 07:49:13 -0700 (PDT)
-Message-ID: <d4efe597-94b0-5878-fb54-1c6deb915659@acm.org>
-Date:   Sun, 17 Jul 2022 07:49:12 -0700
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=Dv/p7nIIHn8hT8UchBSA1/4q6QSRvBvNjEZvxKQbyo8=;
+        b=vQNGbQs3109hCqiTIbI7B4dy9egk7XKoApN0C3BCIzU71quYlJ8cj5l7S8908NkWn6
+         WubZM9wo6Q2wTW6Yxv7vd7o8kJreTLpYNpmlVhyTLUTP0wvV9bBC4gOWNlg3jAdrKr/N
+         bSLmr3NNusn+8bRYb2sHhor9laP96ZkHQmOWsdVJkDiAPJ1SvvrIXfesnxdQ5HqD8Mbt
+         5ZlTlhDgoNjEDTKKRRJ8V7oVA4s1YE2P/5Vk+ld6b/qvkylehKfxWbyebQKNYnMeNkpU
+         0O3FPzhwG1DXECocjC8+r1NzCXtq4+xP8G23szdQwXXpPanUKbb23mZhLZ4V5rkoAd09
+         01ZQ==
+X-Gm-Message-State: AJIora9ARzC667pYT4jxnY+e4zBr2Q+VzNUz1MUGgY/NpnEY2rntcQJF
+        WSJ9lmPif5us+508JC4UNOkyRfUdldkzIzQhNpLOV1KR9/8YzA+a
+X-Google-Smtp-Source: AGRyM1uOuPqlK5ptYLbZNVxzFCT39fPMVgLt6uh8ewQOJiucginsvXn8XqJj3WtSh7l0p/ZWCB2s1ggEe/mcOj0OuP4=
+X-Received: by 2002:a17:907:c27:b0:72b:8118:b899 with SMTP id
+ ga39-20020a1709070c2700b0072b8118b899mr22465859ejc.739.1658070204720; Sun, 17
+ Jul 2022 08:03:24 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [RFC] block: Add a NULL check in blk_mq_free_rqs()
-Content-Language: en-US
-To:     Gautam Menghani <gautammenghani201@gmail.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        skhan@linuxfoundation.org
-References: <20220717102242.219424-1-gautammenghani201@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220717102242.219424-1-gautammenghani201@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   Wei Chen <harperchen1110@gmail.com>
+Date:   Sun, 17 Jul 2022 23:02:49 +0800
+Message-ID: <CAO4mrfdjv2TZf7dc=ei61NBmLePLUGCJ9WbmvWGWa8Q4o=bRkw@mail.gmail.com>
+Subject: WARNING in floppy_interrupt
+To:     efremov@linux.com, axboe@kernel.dk, linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/17/22 03:22, Gautam Menghani wrote:
-> Syzbot reported a general protection fault in the function
-> blk_mq_clear_rq_mapping() in the file block/blk-mq.c.
-> The issue is that the variable drv_tags is NULL, and this
-> originates from the struct blk_mq_tag_set. The dashboard link for this
-> issue is :
-> syzkaller.appspot.com/bug?id=c3ce4caa4fc58c156d4903984131cdfa38eee354
-> 
-> This patch fixes the above bug, but there is another syzbot bug which is
-> related to this and getting triggered after the call to
-> blk_mq_clear_rq_mapping(). As a result, I cannot determine if the issue
-> is really solved. The link to other issue:
-> syzkaller.appspot.com/bug?id=7643cea70f1d0ce15f5f4bc39488918837ad4233
-> 
-> Please provide feedback/suggestions on the same.
-> 
-> Signed-off-by: Gautam Menghani <gautammenghani201@gmail.com>
-> ---
->   block/blk-mq.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 93d9d60980fb..c1dd1b78b95c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3092,7 +3092,8 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->   		}
->   	}
->   
-> -	blk_mq_clear_rq_mapping(drv_tags, tags);
-> +	if (drv_tags)
-> +		blk_mq_clear_rq_mapping(drv_tags, tags);
->   
->   	while (!list_empty(&tags->page_list)) {
->   		page = list_first_entry(&tags->page_list, struct page, lru);
+Dear Linux Developer,
 
-I don't see how drv_tags could be NULL without triggering a race 
-condition. Please take a look at the nbd driver to see whether the root 
-cause is perhaps in that driver instead of in the block layer core.
+Recently when using our tool to fuzz kernel, the following crash was triggered:
 
-Thanks,
+HEAD commit: fc74e0a40e4f Linux 5.16-rc7
+git tree: upstream
+compiler: clang 12.0.0
+console output:
+https://drive.google.com/file/d/1bTS1Khxq5ZVwEPK-QIzGMJ24DcBhlZNW/view?usp=sharing
+Syzlang reproducer:
+https://drive.google.com/file/d/11TW-_hd6xARpzEv05ZzN5njdyKjPV4ku/view?usp=sharing
+C reproducer: https://drive.google.com/file/d/1vLLyr50AtjVUYr3ZFyypwB0WcNa0dloj/view?usp=sharing
+kernel config: https://drive.google.com/file/d/1L16y3aFu5mPQbKNsc7eQc6RH55YRd1zd/view?usp=sharing
 
-Bart.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: Wei Chen <harperchen1110@gmail.com>
+
+WARNING: CPU: 0 PID: 38 at drivers/block/floppy.c:1000
+floppy_interrupt+0x694/0x6d0
+Modules linked in:
+CPU: 0 PID: 38 Comm: kworker/u2:2 Not tainted 5.16.0-rc7 #4
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Workqueue: floppy floppy_work_workfn
+RIP: 0010:floppy_interrupt+0x694/0x6d0
+Code: 21 0c 31 ed 48 c7 c7 00 a6 f4 8a 48 c7 c2 6d c1 52 8c 48 c7 c1
+e0 a4 f4 8a 31 c0 e8 9d 68 26 05 e9 e7 fd ff ff e8 1c 38 ac fc <0f> 0b
+e9 63 fb ff ff 89 d9 80 e1 07 38 c1 0f 8c a6 fa ff ff 48 89
+RSP: 0018:ffffc90000007d28 EFLAGS: 00010046
+RAX: ffffffff84d5d9d4 RBX: 0000000000000001 RCX: ffff8880149523c0
+RDX: 0000000080010000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff84d5d530 R09: fffffbfff1a56ead
+R10: fffffbfff1a56ead R11: 0000000000000000 R12: dffffc0000000000
+R13: 0000000000000000 R14: ffffffff84d65f30 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888063c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007efe73921000 CR3: 000000000c88e000 CR4: 0000000000752ef0
+DR0: 00000000200000c0 DR1: 0000000020000080 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000600
+PKRU: 55555554
+Call Trace:
+ <IRQ>
+ __handle_irq_event_percpu+0x20a/0x6d0
+ handle_irq_event+0x10a/0x300
+ handle_edge_irq+0x245/0xbe0
+ __common_interrupt+0xce/0x1e0
+ common_interrupt+0x9f/0xc0
+ </IRQ>
+ <TASK>
+ asm_common_interrupt+0x1e/0x40
+RIP: 0010:reset_fdc+0x36b/0x520
+Code: 80 cb 80 48 8d 2c ed 70 a9 f7 90 48 89 e8 48 c1 e8 03 42 80 3c
+30 00 74 08 48 89 ef e8 1e d9 f6 fc 8b 55 00 83 c2 04 89 d8 ee <e9> aa
+00 00 00 e8 6b b4 ab fc 48 8d 1c ed 6d a9 f7 90 48 89 d8 48
+RSP: 0018:ffffc90000cbfc28 EFLAGS: 00000202
+RAX: 0000000090f7a981 RBX: ffffffff90f7a981 RCX: ffff8880149523c0
+RDX: 00000000000003f4 RSI: 0000000000000062 RDI: 0000000000000044
+RBP: ffffffff90f7a970 R08: ffffffff84d65d27 R09: fffffbfff1ff5bd0
+R10: fffffbfff1ff5bd0 R11: 0000000000000000 R12: 0000000000000000
+R13: 1ffffffff21ef52f R14: dffffc0000000000 R15: ffffffff90f7a978
+ process_one_work+0x853/0x1140
+ worker_thread+0xac1/0x1320
+ kthread+0x410/0x500
+ ret_from_fork+0x1f/0x30
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0: 80 cb 80              or     $0x80,%bl
+   3: 48 8d 2c ed 70 a9 f7 lea    -0x6f085690(,%rbp,8),%rbp
+   a: 90
+   b: 48 89 e8              mov    %rbp,%rax
+   e: 48 c1 e8 03          shr    $0x3,%rax
+  12: 42 80 3c 30 00        cmpb   $0x0,(%rax,%r14,1)
+  17: 74 08                je     0x21
+  19: 48 89 ef              mov    %rbp,%rdi
+  1c: e8 1e d9 f6 fc        callq  0xfcf6d93f
+  21: 8b 55 00              mov    0x0(%rbp),%edx
+  24: 83 c2 04              add    $0x4,%edx
+  27: 89 d8                mov    %ebx,%eax
+  29: ee                    out    %al,(%dx)
+* 2a: e9 aa 00 00 00        jmpq   0xd9 <-- trapping instruction
+  2f: e8 6b b4 ab fc        callq  0xfcabb49f
+  34: 48 8d 1c ed 6d a9 f7 lea    -0x6f085693(,%rbp,8),%rbx
+  3b: 90
+  3c: 48 89 d8              mov    %rbx,%rax
+  3f: 48                    rex.W
+
+Best,
+Wei
