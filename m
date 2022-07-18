@@ -2,98 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56137C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 08:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CDC0CCA479
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 09:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233241AbiGRI4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 04:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
+        id S233872AbiGRJDa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 05:03:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232841AbiGRI4G (ORCPT
+        with ESMTP id S233941AbiGRJD3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 04:56:06 -0400
-Received: from out199-4.us.a.mail.aliyun.com (out199-4.us.a.mail.aliyun.com [47.90.199.4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE3AAE4F
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:56:02 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VJglAm9_1658134558;
-Received: from 30.97.56.227(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VJglAm9_1658134558)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Jul 2022 16:55:58 +0800
-Message-ID: <bcd9ac30-9961-5607-e40d-41915af5cd88@linux.alibaba.com>
-Date:   Mon, 18 Jul 2022 16:55:57 +0800
+        Mon, 18 Jul 2022 05:03:29 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F54B101D4;
+        Mon, 18 Jul 2022 02:03:27 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E42DD20D06;
+        Mon, 18 Jul 2022 09:03:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1658135005; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=57gkp0hUG7Y73zWw1Kce1r7pjaK22KjeqS40qcTUkzE=;
+        b=n2r2J7I4Z/UzJsod/fdYlUtlEJWtvitT3bOwIAzakFS7uhwhRTDi3uM9pth+/ac4E2u+L3
+        5BprjSWo25iMAg+H792pkEVZQeLUBUvcHtb+qOhfO+xD2YDX/I9di/XBPcc13OzqnLwsrl
+        PKrw0++dcWeF8xtKPg5rV67vz0JiEsw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1658135005;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=57gkp0hUG7Y73zWw1Kce1r7pjaK22KjeqS40qcTUkzE=;
+        b=VKBcZSQMwcZ3WQW/IZxze+BijA3qfW22vEo6v3DzaGTTp4yv19TK/Y1rUrM6R5J/MNZs56
+        1dM1T2nh1F5sVJAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D4B1F13754;
+        Mon, 18 Jul 2022 09:03:25 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Kf7YM90h1WINIwAAMHmgww
+        (envelope-from <dwagner@suse.de>); Mon, 18 Jul 2022 09:03:25 +0000
+Date:   Mon, 18 Jul 2022 11:03:25 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Jens Axboe <axboe@kernel.dk>, hch@lst.de, kbusch@kernel.org,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, asml.silence@gmail.com,
+        joshiiitr@gmail.com, anuj20.g@samsung.com, gost.dev@samsung.com
+Subject: Re: [PATCH for-next 3/4] io_uring: grow a field in struct
+ io_uring_cmd
+Message-ID: <20220718090325.4bh4xjfe5yuihdvo@carbon.lan>
+References: <20220711110155.649153-1-joshi.k@samsung.com>
+ <CGME20220711110824epcas5p22c8e945cb8c3c3ac46c8c2b5ab55db9b@epcas5p2.samsung.com>
+ <20220711110155.649153-4-joshi.k@samsung.com>
+ <2b644543-9a54-c6c4-fd94-f2a64d0701fa@kernel.dk>
+ <43955a42-7185-2afc-9a55-80cc2de53bf9@grimberg.me>
+ <96fcba9a-76ad-8e04-e94e-b6ec5934f84e@grimberg.me>
+ <Ys+QPjYBDoByrfw1@T590>
+ <20220714081923.GE30733@test-zns>
+ <20220714153051.5e53zgkcabb7ajms@carbon.lan>
+ <20220715110700.GA27117@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: use of the system work queue in ublk
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-References: <YtT/4Y387f/6pxZH@infradead.org> <YtUNX2l2xkWXQwYA@T590>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <YtUNX2l2xkWXQwYA@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220715110700.GA27117@test-zns>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/7/18 15:35, Ming Lei wrote:
-> Hi Christoph,
+On Fri, Jul 15, 2022 at 04:37:00PM +0530, Kanchan Joshi wrote:
+> On Thu, Jul 14, 2022 at 05:30:51PM +0200, Daniel Wagner wrote:
+> > On Thu, Jul 14, 2022 at 01:49:23PM +0530, Kanchan Joshi wrote:
+> > > If path is not available, retry is not done immediately rather we wait for
+> > > path to be available (as underlying controller may still be
+> > > resetting/connecting). List helped as command gets added into
+> > > it (and submitter/io_uring gets the control back), and retry is done
+> > > exact point in time.
+> > > But yes, it won't harm if we do couple of retries even if path is known
+> > > not to be available (somewhat like iopoll). As this situation is
+> > > not common. And with that scheme, we don't have to link io_uring_cmd.
+> > 
+> > Stupid question does it only fail over immediately when the path is not
+> > available or any failure? If it fails over for everything it's possible
+> > the target gets the same request twice. FWIW, we are just debugging this
+> > scenario right now.
 > 
-> On Sun, Jul 17, 2022 at 11:38:25PM -0700, Christoph Hellwig wrote:
->> Hi Ming,
->>
->> it seems like ublk uses schedule_work to stop the device, which
->> includes a del_gendisk.  I'm a little fearful this will gets us into
->> lockdep chains of death once syzbot or Tetsu notice it.
-> 
-> ublksrv has two built-in tests(generic/001, generic/002) for covering
-> heavy io with device removal and killing ubq_daemon, not see lockdep
-> warning when running the two tests with lockdep enabled.
-> 
-> Could you or Tetsu provide a bit more info about the warning?
-> 
->>
->> That being said, I don't reall understand the design of
->> ublk_daemon_monitor_work, which is only used to kick off other
->> work to start with.
-> 
-> If the ubq daemon becomes dead, ublk_daemon_monitor_work will be
-> scheduled for handling the error: abort pending io requests, and
-> start to delete disk.
-> 
-> It has to be triggered when del_gendisk() is in-progress for making
-> forward progress.
-> 
-> 
-> Thanks,
-> Ming
+> failover is only for path-related failure, and not otherwise.
+> you might want to take a look at nvme_decide_disposition routine where
+> it makes that decision.
 
-Hi Ming,
-
-Just to make sure I understand usage of ublk_daemon_monitor_work correctly.
-
-1) For a dying ubq daemon, ublk_daemon_monitor_work schedule stop work first.
-
-2) The stop work calls del_gendisk() and it is blocked because there are
-   pending blk-mq requests(maybe handling in ublksrv target).
-
-3) Meanwhile, the monitor work aborts all pending blk-mq IOs
-   (with UBLK_IO_FLAG_ACTIVE unset) by blk_mq_end_request(req, BLK_STS_IOERR).
-
-4) After all pending blk-mq reqs are aborted,
-   del_gendisk() in stop work returns and /dev/ublkbX is removed.
-   No more blk-mq reqs.
-
-5) In stop work, cancel all queued(with UBLK_IO_FLAG_ACTIVE set) ublk IOs
-   by io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0) and ublksrv won't
-   issue sqes again.
-
-
-Hope I am correct and all of these works looks good to me.
-Besides, the tests(generic/001, generic/002) run successfully for me.
-
-Regards,
-Ziyang Zhang
-
-
+Ah okay, never mind. I somewhat got the impression there is special
+handling code added for this case. Sorry for the noise.
