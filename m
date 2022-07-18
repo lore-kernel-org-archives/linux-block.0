@@ -2,80 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFDAC43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 19:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1643C43334
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 19:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234648AbiGRTNR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 15:13:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34402 "EHLO
+        id S231199AbiGRTWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 15:22:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233710AbiGRTNQ (ORCPT
+        with ESMTP id S235704AbiGRTWw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 15:13:16 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAF652FFE7
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:15 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id u20so10082932iob.8
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:15 -0700 (PDT)
+        Mon, 18 Jul 2022 15:22:52 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31AF2F67D;
+        Mon, 18 Jul 2022 12:22:51 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id v4-20020a17090abb8400b001ef966652a3so19138500pjr.4;
+        Mon, 18 Jul 2022 12:22:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=HU5bWKva0n4CR+ZgzHRD+NVBi9ldPcXdDIl3yM6JOW8=;
-        b=KaOzmEIAiHqAuZNxCUhdjdpgXYRyV2csPEYtKzGA/T7I72R/C7jMwz5AfiyzjHqsQ3
-         GAnuQ41uJGMxL298wb3fxKH4JmiDA7nyvFusKQSljrm7wBCezHEjDRUFf4eoLz4UfBcZ
-         VHS9ZMfXBpYdJUBD6xFlBUoZ8GoJ9dJqgMOx4xJcsaS2Ww/dxE8VT3WWeqHIjF6Cm1g7
-         ZrXXMUv/VYtWF53pZgh9vERGrhZP9kLVK3k1m6xPEvmgMIK7LcLqiYDZUUEZ1dgNxlZW
-         f66pfLAutXYU14pswNB4GMUNGHD8w5j+c/9yKbV+LXuxtUZWP7aZPtm5t+5EbYEXl4uU
-         hrSQ==
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=L49cEqnvIqcH6kuvpQrqn6Zje6ktkAbRLUeIUPxx/7E=;
+        b=AOJiH+SXnVmQJ+bGNsZclRXLODxNSpRAvPfO/VxS7r8q2g5X+8Xlta47Sl1pGHzkV+
+         FwVS6nFN35kueD5zFoeT2Vv3mlbHyBS2eLHAXHY+HA81SCyD7KP1t86n3llHw0BDRhTg
+         7ch/aSQGS5uqNET+mWyGr9MIsDr6aTo1b+6izOguOwAcCZPuG46lc3d9yq3pl2ncn2vD
+         Viw2Q0xjJXJVjT2AMQBZ1fIMD63Tief5fi+JCPArIrudaYNEp/+tca6nW5kzvPHK8EvX
+         OrRROGhSWJzS0qyYOUQQX6nlYAPRZP8RFAaRlfraANgBC65PrFNL+zLE+OpIUFOPlbpB
+         kS5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=HU5bWKva0n4CR+ZgzHRD+NVBi9ldPcXdDIl3yM6JOW8=;
-        b=RMfGTGykCJTCpB4grBluwDJl0VWHKmwN9GL8swKAxpLuJ/NS2JfiXAGMS+EEFh3u7k
-         FhZFr6xy0NrWqvP+hasgnX9wZ6w17IQ0aLRYQkAobjRZOaRfkEgIuta0Bl1nMCzPIfAM
-         /w/S2NWTZpSKS3asGf7WofzOuIJ/md86MSIE183BQj+O1U0kW5KGpHiHOHull2x9hgMq
-         9XgOehhgMH7S1bU/+q6KtmXfqK4eGT2FjlKaWWZIBlgcf3y2wBImwYqNVA7OHeOJujj3
-         TYqlCGAIA1U8PeYPLSrnIg+fnvI+Lm10o6xzrGewkq6sASnfWCSKBsy3fV1NPt4craUX
-         n8/Q==
-X-Gm-Message-State: AJIora9RbnjCWxTE8/yPi2cEg9Q2nKeLRQcoFEFzXXBmqMnJL5sEkCpR
-        /tTC0nA2NzOVlM0puqR+T6bMoQclUwmenw==
-X-Google-Smtp-Source: AGRyM1t+koiFVWZ1enVF4A83oSuEeJ5xgLN76E9IIEdPjCYDaTPonCxhy7VXSTLQn6fdMTNDNDvrmw==
-X-Received: by 2002:a05:6638:3709:b0:341:471c:4c64 with SMTP id k9-20020a056638370900b00341471c4c64mr10677356jav.226.1658171595395;
-        Mon, 18 Jul 2022 12:13:15 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id i5-20020a056e02054500b002dce11c89c7sm2148060ils.14.2022.07.18.12.13.14
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=L49cEqnvIqcH6kuvpQrqn6Zje6ktkAbRLUeIUPxx/7E=;
+        b=hiZlLRGpZBgPitM7gSsX/2JZbHyPCZ/DtY93s4gPByhpAloBBUdCjAg/Go1iK3cF9r
+         qeCaPDyRWEHIktgfxyNSlBKrkLU6f1mb7GNz35XbE3HrBppGAhkh3KJGimx4iEl+cW7E
+         EkdUVyanO/4HhmNdkoGiLT6+ojicMPhVlagt0EomAmAq1+dQ5lqizTTVGhxr7VOx4zHx
+         P+T9z+cEOUT2xx1N2XflOsNNgK2uMcJapg1rviOQiRtaafjJggg84aQthIevtUyOGRBc
+         m2PKCQ92CRPPafLeORnRn50pIq86a9Uz2x/QrCeLwurG3txGYhUvNMuYsDc0tRgZp3a+
+         VPlw==
+X-Gm-Message-State: AJIora8CL1WilHca2HYj51N36fT09dMkairTf7krh9OY+F2fe1NvwvPP
+        K8L94F9uc5kHYeuEgI0yISopTII1864=
+X-Google-Smtp-Source: AGRyM1tq50m0ES0OTSxOpN5pOU2LngotNJr4NPiFELTsNZIQFAUcI3uyp1uiOJvpro1TX2XYoK7uXQ==
+X-Received: by 2002:a17:902:f708:b0:153:839f:bf2c with SMTP id h8-20020a170902f70800b00153839fbf2cmr28645338plo.113.1658172170867;
+        Mon, 18 Jul 2022 12:22:50 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id e15-20020a056a0000cf00b005255489187fsm9620296pfj.135.2022.07.18.12.22.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 12:13:14 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ming.lei@redhat.com
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-In-Reply-To: <20220718160851.312972-1-ming.lei@redhat.com>
-References: <20220718160851.312972-1-ming.lei@redhat.com>
-Subject: Re: [for-5.20/block PATCH] mmc: fix disk/queue leak in case of adding disk failure
-Message-Id: <165817159477.144996.10465399315575008612.b4-ty@kernel.dk>
-Date:   Mon, 18 Jul 2022 13:13:14 -0600
+        Mon, 18 Jul 2022 12:22:49 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 18 Jul 2022 09:22:47 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jinke Han <hanjinke.666@bytedance.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH] block: don't allow the same type rq_qos add more than
+ once
+Message-ID: <YtWzB6T7GBb7fiNe@slm.duckdns.org>
+References: <20220718083646.67601-1-hanjinke.666@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220718083646.67601-1-hanjinke.666@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 19 Jul 2022 00:08:51 +0800, Ming Lei wrote:
-> In case of adding disk failure, the disk needs to be released, otherwise
-> disk/queue is leaked.
+Hello,
+
+On Mon, Jul 18, 2022 at 04:36:46PM +0800, Jinke Han wrote:
+> When the io.cost.qos file is written by two cpu concurrently, rq_qos may
+> be added to one disk twice. In that case, there will be two iocs enabled
+> and running on one disk. They own different iocgs on their active list.
+> In the ioc_timer_fn function, because of the iocgs from two ioc have the
+> same root iocg, the root iocg's walk_list may be overwritten by each
+> other and this lead to list add/del corrutions in building or destorying
+> the inner_walk list.
 > 
-> 
+> And so far, the blk-rq-qos framework works in case that one instance for
+> one type rq_qos per queue by default. This patch make this explicit and
+> also fix the crash above.
 
-Applied, thanks!
+Ah, good catch. Looks great. Just a few nits below.
 
-[1/1] mmc: fix disk/queue leak in case of adding disk failure
-      commit: bf14fad19ffbb3d37a1bb1324f966973e7d4a7b6
+> Signed-off-by: hanjinke <hanjinke.666@bytedance.com>
 
-Best regards,
+Can you please use your full name in FIRST LAST form on the SOB line?
+
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2886,7 +2886,12 @@ static int blk_iocost_init(struct request_queue *q)
+>  	 * called before policy activation completion, can't assume that the
+>  	 * target bio has an iocg associated and need to test for NULL iocg.
+>  	 */
+> -	rq_qos_add(q, rqos);
+> +	ret = rq_qos_add(q, rqos);
+> +	if (ret) {
+> +		free_percpu(ioc->pcpu_stat);
+> +		kfree(ioc);
+> +		return ret;
+
+Given that these get repeated for policy activation failure, it'd prolly be
+better to factor them out at the end and use gotos and make all of the users
+use the same pattern.
+
+> +static inline int rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+>  {
+>  	/*
+>  	 * No IO can be in-flight when adding rqos, so freeze queue, which
+> @@ -98,6 +98,8 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+>  	blk_mq_freeze_queue(q);
+>  
+>  	spin_lock_irq(&q->queue_lock);
+> +	if (rq_qos_id(q, rqos->id))
+> +		goto out;
+
+Maybe rename the goto label to ebusy so that it's `goto ebusy`?
+
+Other than the nits, please feel free to add
+
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
 -- 
-Jens Axboe
-
-
+tejun
