@@ -2,103 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC6FCCA479
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 18:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 526F0C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 19:13:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235158AbiGRSUx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 14:20:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59530 "EHLO
+        id S235021AbiGRTNG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 15:13:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234906AbiGRSUx (ORCPT
+        with ESMTP id S233431AbiGRTNF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 14:20:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA032ED7B;
-        Mon, 18 Jul 2022 11:20:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5386161625;
-        Mon, 18 Jul 2022 18:20:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4401CC341CE;
-        Mon, 18 Jul 2022 18:20:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658168451;
-        bh=PnxMBy8fxW18f0T5GnUx+lo4QdMgo44VTpGfg/xcKDQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=A6HqTKO4Ffmr4pWeTvRmBaTHbh1WQV4vyBSGg/DM7A5hLp4cJKO+7KNEk1HP1gv4M
-         NOB7rCMqA2wDbjrZw7GosfIvPoJWF5d8fGxHmcTgERiXT7axZ0kk7rRCYXj7SIX8D+
-         4YAAWEnzresDnlKQNWI1a2bsy23gn8LvIK4MmQnBiEc0aHreEPFAwqHhvqHfIEXjJ1
-         75/jXDYHySw3DZHw0LLWLaZPcGiy+PdEBzBfyQNJwgHfxLi1YBlcq5AsxNNMgKgiyW
-         3fuAZk/dTuCdRChyYHDph0uF7Z/pF73O/wEBhJYoCg9H6owrL0bgFCpT5S4g/jh2zR
-         8fW3VwAiYlstg==
-Received: by mail-yb1-f170.google.com with SMTP id h62so22265853ybb.11;
-        Mon, 18 Jul 2022 11:20:51 -0700 (PDT)
-X-Gm-Message-State: AJIora8l57nMrVlk1vAl4dy0nULYZRVgK8nDvRuy121B37ULV+0p34NV
-        o4LOQtyTwSLmZuGQGoKE9rWuQ4xQMwJ3lGKrWdo=
-X-Google-Smtp-Source: AGRyM1uKWFBosHjgaAbV3yZIw7T4eJxjkO2blUEJbSazn7fbV1jt9DTNa4LNaAt3UUYBZRujPJssQjKWU2RvEEdYDxs=
-X-Received: by 2002:a25:8611:0:b0:66e:d9e7:debc with SMTP id
- y17-20020a258611000000b0066ed9e7debcmr28379734ybk.257.1658168450283; Mon, 18
- Jul 2022 11:20:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220718063410.338626-1-hch@lst.de> <20220718063410.338626-10-hch@lst.de>
- <b8521a53-fb41-279c-dc43-580e8d0de045@suse.de>
-In-Reply-To: <b8521a53-fb41-279c-dc43-580e8d0de045@suse.de>
-From:   Song Liu <song@kernel.org>
-Date:   Mon, 18 Jul 2022 11:20:39 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW6VYLt0hPsa667mr5+Zn1pxjY_670NaD8+No=2ZjoOzYg@mail.gmail.com>
-Message-ID: <CAPhsuW6VYLt0hPsa667mr5+Zn1pxjY_670NaD8+No=2ZjoOzYg@mail.gmail.com>
-Subject: Re: [PATCH 09/10] md: only delete entries from all_mddevs when the
- disk is freed
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-raid <linux-raid@vger.kernel.org>,
+        Mon, 18 Jul 2022 15:13:05 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3CC2D1C5
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:02 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id r70so8939599iod.10
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
+         :content-transfer-encoding;
+        bh=ZJEuLsMRKUxpd8gJCMilrz767jCkM6zmrnjpbeCFU9M=;
+        b=kKR9I4FVfr4npYm/FwMPeGKnE1tPcWbWEboAMzIbnqmGPBfE0HhcHLODZX9wCjssBr
+         pIUHKVSchsGIf/CRmXV3AjI6hb232hHVwMabwFCJwXNIzJhMe/b9sVmdtA2r7mtLtfFs
+         4twaLIAXt43x48uQ5vN9z2s1Z8E0PIpg4DoZaTTW6AhYaKY+mAfb2Nhd5DQjizgXwESg
+         T8haaDru1vuB3FX/EN/76vlFksF1xER108KfwUr4xtLQVmchCdtRad8ClkBLQ68m5n2e
+         zOHsoZG6c7eLCsvZXa1YWo7tTEuhqAOgjhUsI6N7yKddSlOuvbqqmJHFYFtZfMG7vadu
+         hIig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=ZJEuLsMRKUxpd8gJCMilrz767jCkM6zmrnjpbeCFU9M=;
+        b=qVBZMDhg6DUpn9YNuB5/Nv+GRA3dLdmANl6EHF7VVGzVykVfW9XhibnrwTyJJ9PxyL
+         9YCwab/ZnOzDpX9noDYztygTgtg5h5XCLgYs3IUdQRl9aK48fC47xxAoGjZruli/Ip7z
+         yL7al+JLCuMbEQhivOj+TaQ3ZNh5nVrP0F5JoSLKyrztRp2I2wagjxUe2TzebHBfQQ50
+         dLjgAjl7sEZOSy4AyPFNWZG3wLYHB8NJ28edxTEXqvUVVjR4ZvwN6eS3MAEyuEv239ky
+         xHjOfwFwFz7qs2MrK8SrUmtEktTuHmVtPx0eiDaLBXHgXQHwO+nYkWuzTxECE1VxeqQK
+         Qjjw==
+X-Gm-Message-State: AJIora+e4lNUOTNRur+xfeNH7W3TBRgK15ELXmuE7rRVza+mayvtOeHw
+        3ZP2Yd40vqSmo4V3zENrsJTtAet3ofNdyw==
+X-Google-Smtp-Source: AGRyM1vYRfQKwwNpLfaIlTDzujVOxSzsfBauBFQCXTJMDcVRaclA7QalraSqvoqixrhuat0nLczyCQ==
+X-Received: by 2002:a05:6638:1a1a:b0:33f:405d:b1ed with SMTP id cd26-20020a0566381a1a00b0033f405db1edmr15085179jab.164.1658171582231;
+        Mon, 18 Jul 2022 12:13:02 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id j195-20020a0263cc000000b003417ba4f66asm725116jac.41.2022.07.18.12.13.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jul 2022 12:13:01 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-kernel@vger.kernel.org, yangyingliang@huawei.com,
         linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20220718042408.3132835-1-yangyingliang@huawei.com>
+References: <20220718042408.3132835-1-yangyingliang@huawei.com>
+Subject: Re: [PATCH -next] ublk_drv: fix missing error return code in ublk_add_dev()
+Message-Id: <165817158152.143885.14328206381467598787.b4-ty@kernel.dk>
+Date:   Mon, 18 Jul 2022 13:13:01 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 18, 2022 at 12:17 AM Hannes Reinecke <hare@suse.de> wrote:
->
-> On 7/18/22 08:34, Christoph Hellwig wrote:
-> > This ensures device names don't get prematurely reused.  Instead add a
-> > deleted flag to skip already deleted devices in mddev_get and other
-> > places that only want to see live mddevs.
-> >
-> > Reported-by; Logan Gunthorpe <logang@deltatee.com>
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >   drivers/md/md.c | 56 +++++++++++++++++++++++++++++++++----------------
-> >   drivers/md/md.h |  1 +
-> >   2 files changed, 39 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/drivers/md/md.c b/drivers/md/md.c
-> > index 805f2b4ed9c0d..08cf21ad4c2d7 100644
-> > --- a/drivers/md/md.c
-> > +++ b/drivers/md/md.c
-> > @@ -625,6 +625,10 @@ EXPORT_SYMBOL(md_flush_request);
-> >
-> >   static inline struct mddev *mddev_get(struct mddev *mddev)
-> >   {
-> > +     lockdep_assert_held(&all_mddevs_lock);
-> > +
-> > +     if (mddev->deleted)
-> > +             return NULL;
-> >       atomic_inc(&mddev->active);
-> >       return mddev;
-> >   }
->
-> Why can't we use 'atomic_inc_unless_zero' here and do away with the
-> additional 'deleted' flag?
+On Mon, 18 Jul 2022 12:24:08 +0800, Yang Yingliang wrote:
+> If blk_mq_init_queue() fails, it should return error code in ublk_add_dev()
+> 
+> 
 
-Thanks Christoph for the set. And thanks Hannes for the quick review!
+Applied, thanks!
 
-I think atomic_inc_unless_zero() should work here. Alternatively, we can
-also grab a big from mddev->flags as MD_DELETED.
+[1/1] ublk_drv: fix missing error return code in ublk_add_dev()
+      commit: f50e5d670c622349277a46996a70386cc3661b10
 
-Thanks,
-Song
+Best regards,
+-- 
+Jens Axboe
 
-[...]
+
