@@ -2,62 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 713C5C43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 06:18:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 978A1C43334
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 06:29:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233100AbiGRGSM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 02:18:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40020 "EHLO
+        id S232460AbiGRG3f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 02:29:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230242AbiGRGSD (ORCPT
+        with ESMTP id S229711AbiGRG3e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 02:18:03 -0400
-Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BF3CE083;
-        Sun, 17 Jul 2022 23:18:00 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VJcpb.B_1658125077;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VJcpb.B_1658125077)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Jul 2022 14:17:58 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     rostedt@goodmis.org
-Cc:     axboe@kernel.dk, mingo@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] blktrace: Fix some kernel-doc comments
-Date:   Mon, 18 Jul 2022 14:17:55 +0800
-Message-Id: <20220718061755.114599-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Mon, 18 Jul 2022 02:29:34 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A132FE
+        for <linux-block@vger.kernel.org>; Sun, 17 Jul 2022 23:29:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=NxytYu9RL3B84gpoej13M9pXSFpOfq2+Z2HWvYdbMgY=; b=06gVrBOwijLm9U4zg75uwHkEKV
+        0n+P6UpPecI8nYrHKTOss/gnsi+IzG9XrYtOvsIw45rNk63IagAGDAQ2nHvrHSvqBmJC7r1VoWeIG
+        CgDStOKwnnUrsdwRRnxJ8FadRK+xlbWfcwGhpFNdmAHIqNrhJO2VVIppnG82XjthUvoZS6NZEjq0o
+        s+LOj3hB2nb0+NvY81nZ6fMLW14YsmyqYSS5yV+rTQNVkI3BtIY0np8jAjzTb3H4kgTcf15Bzqg6O
+        PghrIzdkw1JeUnjE4uMOsuuPL6UZNZ2IowTELl4pdgwa6qWh/0z2GbSCydWnjE/a6w/2si5xqga6T
+        +lf0ZS4A==;
+Received: from 089144198117.atnat0007.highway.a1.net ([89.144.198.117] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oDKG2-00BD5H-SX; Mon, 18 Jul 2022 06:29:31 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH 1/2] block: call blk_mq_exit_queue from disk_release for never added disks
+Date:   Mon, 18 Jul 2022 08:29:27 +0200
+Message-Id: <20220718062928.335399-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove warnings found by running scripts/kernel-doc, which is caused by
-using 'make W=1'.
-kernel/trace/blktrace.c:1884: warning: Function parameter or member 'opf' not described in 'blk_fill_rwbs'
-kernel/trace/blktrace.c:1884: warning: Excess function parameter 'op' description in 'blk_fill_rwbs'
+To undo the all initialization from blk_mq_init_allocated_queue in case
+of a probe failure where add_disk is never called we have to call
+blk_mq_exit_queue from put_disk.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+We should be doing this in general, but can't do it for the normal
+teardown case (yet) as the tagset can be gone by the time the disk is
+released once it was added.  I hope to sort this out properly eventual
+but for now this isolated hack will do it.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- kernel/trace/blktrace.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/genhd.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 150058f5daa9..5632b6159d88 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1873,7 +1873,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- /**
-  * blk_fill_rwbs - Fill the buffer rwbs by mapping op to character string.
-  * @rwbs:	buffer to be filled
-- * @op:		REQ_OP_XXX for the tracepoint
-+ * @opf:	a combination of a request operation and request flags
-  *
-  * Description:
-  *     Maps the REQ_OP_XXX to character and fills the buffer provided by the
+diff --git a/block/genhd.c b/block/genhd.c
+index 44dfcf67ed96a..ad8a3678d4480 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1138,6 +1138,18 @@ static void disk_release(struct device *dev)
+ 	might_sleep();
+ 	WARN_ON_ONCE(disk_live(disk));
+ 
++	/*
++	 * To undo the all initialization from blk_mq_init_allocated_queue in
++	 * case of a probe failure where add_disk is never called we have to
++	 * call blk_mq_exit_queue here. We can't do this for the more common
++	 * teardown case (yet) as the tagset can be gone by the time the disk
++	 * is released once it was added.
++	 */
++	if (queue_is_mq(disk->queue) &&
++	    test_bit(GD_OWNS_QUEUE, &disk->state) &&
++	    !test_bit(GD_ADDED, &disk->state))
++		blk_mq_exit_queue(disk->queue);
++
+ 	blkcg_exit_queue(disk->queue);
+ 
+ 	disk_release_events(disk);
 -- 
-2.20.1.7.g153144c
+2.30.2
 
