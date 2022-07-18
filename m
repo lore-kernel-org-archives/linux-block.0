@@ -2,103 +2,223 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9136CCCA479
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 08:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C071C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 08:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiGRIdq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 04:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39816 "EHLO
+        id S233130AbiGRIhG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 04:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233059AbiGRIdp (ORCPT
+        with ESMTP id S232852AbiGRIhF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 04:33:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5F29219019
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658133223;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=w7A1bExvC2fZfktgZT5a8FbB+VQj1q0Rk6hqgYVPf7w=;
-        b=ax+5QtnN2Nz7GqW/7UdwW/pR6VzGtnL5HftS+ManEQOkW5st5e/s+80A5rgVijPRMjRQVq
-        hkIjLGlJyuomTbIZyuBTgeQyhK/TlxlibWk6slkarJwNggfkB3zFJeTpVuJ/tsKX/NmIcT
-        zlXaofMAVDXrhRui1aClwyOE9WWttUc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-577-nHOHql1nNqeb-L1eGdIJhA-1; Mon, 18 Jul 2022 04:33:41 -0400
-X-MC-Unique: nHOHql1nNqeb-L1eGdIJhA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FA343C0CD3A;
-        Mon, 18 Jul 2022 08:33:41 +0000 (UTC)
-Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 58BF52166B26;
-        Mon, 18 Jul 2022 08:33:37 +0000 (UTC)
-Date:   Mon, 18 Jul 2022 16:33:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH 1/2] block: call blk_mq_exit_queue from disk_release for
- never added disks
-Message-ID: <YtUa3f2Z3xra9gTG@T590>
-References: <20220718062928.335399-1-hch@lst.de>
- <YtUJXGhFBw5yrf7N@T590>
+        Mon, 18 Jul 2022 04:37:05 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B729719290
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:37:03 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id z12-20020a17090a7b8c00b001ef84000b8bso17497354pjc.1
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:37:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hrEyQGzrB3TAIf/TmXechjLg15TCHCdypY6rTcTiJ1Q=;
+        b=aYzzebC8Nn5bqXlt1anYrWRRc1cd679atDrbMKEoimTgs6qL74K36w/o7x7Pmi/dm0
+         9n3CklWEN8XA3oztwnzH1on4r1sQCcH14KQNK8+ivGYom3PtaHgLTS8LCg8kTqalcHE2
+         0PKMiZecAeeTDeJKj4z8F/EL2zSKnFcSTX0slJm4O5/gFeezRQiV5NL/RNc/MoacC9ib
+         bKo4svAeaNwGB6c1ArZoyD/OMA5EjGLLLMGqla2poqNgJNJfmZsaS1e2zHFMIzHsTHz1
+         ToqEhZUV3mwCUx/me2EiUW7zruqe1ezj2xbb/mYQCKHrzo0EgjtZ5UyzzaagxJ4HiKdY
+         rwkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hrEyQGzrB3TAIf/TmXechjLg15TCHCdypY6rTcTiJ1Q=;
+        b=rfbDeH/3Z67M4SVQ1ToE5gsR8c09tfqYT4eYRo9PcvXxvU41iH+rVO1cbtZ9S+0bLk
+         q1HAMFONRpUGUqZgJqJB8DCk1mN6cHI2AFMj70of1i0l/dT78ybixOkHA7mrYRGvojeB
+         y7NQPx4f66RjTZ/A0AUbmJnCDyuaToWwXrpMXP8/82+nW1u2vcmTK9az2VKjtv6vdL/p
+         B2tPJvaQiWgScxzCYtGXRk+xgnAFz78ydS7f/YyPZ/bEuy9qZ1s7+qN3w0Yl51TQlW+P
+         c+5dkgAI1gzes8yRHwTSg17zwg4a51OmPQw94GDOLkRTWg2KUCMuCywhNdF9vIUJ/Xl3
+         ocAQ==
+X-Gm-Message-State: AJIora/FqALkhq+E+iqdkCSJjEq3VPjiFmmUvtDuykGDFtvRpCwgo+sw
+        ZxxhGQQA8f7XVF8trEA8634byeqxXmqSDA==
+X-Google-Smtp-Source: AGRyM1shMPa38M0T1/NNgVd+C25k5wuq8hvvwXh0UbSz0nvv2e7mPwkacDPoPodFXencByhxF9Gg7w==
+X-Received: by 2002:a17:90b:17c4:b0:1f0:5541:f2a with SMTP id me4-20020a17090b17c400b001f055410f2amr31585924pjb.224.1658133423176;
+        Mon, 18 Jul 2022 01:37:03 -0700 (PDT)
+Received: from C02GD5ZHMD6R.bytedance.net ([61.120.150.77])
+        by smtp.gmail.com with ESMTPSA id b5-20020a170902d88500b00163ffbc4f74sm8794752plz.49.2022.07.18.01.37.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Jul 2022 01:37:02 -0700 (PDT)
+From:   Jinke Han <hanjinke.666@bytedance.com>
+X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, hanjinke <hanjinke.666@bytedance.com>
+Subject: [PATCH] block: don't allow the same type rq_qos add more than once
+Date:   Mon, 18 Jul 2022 16:36:46 +0800
+Message-Id: <20220718083646.67601-1-hanjinke.666@bytedance.com>
+X-Mailer: git-send-email 2.32.0 (Apple Git-132)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtUJXGhFBw5yrf7N@T590>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 18, 2022 at 03:18:52PM +0800, Ming Lei wrote:
-> On Mon, Jul 18, 2022 at 08:29:27AM +0200, Christoph Hellwig wrote:
-> > To undo the all initialization from blk_mq_init_allocated_queue in case
-> > of a probe failure where add_disk is never called we have to call
-> > blk_mq_exit_queue from put_disk.
-> > 
-> > We should be doing this in general, but can't do it for the normal
-> > teardown case (yet) as the tagset can be gone by the time the disk is
-> > released once it was added.  I hope to sort this out properly eventual
-> > but for now this isolated hack will do it.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  block/genhd.c | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/block/genhd.c b/block/genhd.c
-> > index 44dfcf67ed96a..ad8a3678d4480 100644
-> > --- a/block/genhd.c
-> > +++ b/block/genhd.c
-> > @@ -1138,6 +1138,18 @@ static void disk_release(struct device *dev)
-> >  	might_sleep();
-> >  	WARN_ON_ONCE(disk_live(disk));
-> >  
-> > +	/*
-> > +	 * To undo the all initialization from blk_mq_init_allocated_queue in
-> > +	 * case of a probe failure where add_disk is never called we have to
-> > +	 * call blk_mq_exit_queue here. We can't do this for the more common
-> > +	 * teardown case (yet) as the tagset can be gone by the time the disk
-> > +	 * is released once it was added.
-> > +	 */
-> > +	if (queue_is_mq(disk->queue) &&
-> > +	    test_bit(GD_OWNS_QUEUE, &disk->state) &&
-> > +	    !test_bit(GD_ADDED, &disk->state))
-> > +		blk_mq_exit_queue(disk->queue);
-> > +
-> 
-> Request queue is allocated successfully, but disk allocation may fail,
-> so blk_mq_exit_queue still may be missed in this case.
+From: hanjinke <hanjinke.666@bytedance.com>
 
-Or we do have request queue uses without disk attached, such as nvme
-admin/connection queue.
+In our test of iocost, we encounttered some list add/del corrutions of
+inner_walk list in ioc_timer_fn.
+The resean can be descripted as follow:
 
+cpu 0						cpu 1
+ioc_qos_write					ioc_qos_write
 
-Thanks,
-Ming
+ioc = q_to_ioc(bdev_get_queue(bdev));
+if (!ioc) {
+	ioc = kzalloc();			ioc = q_to_ioc(bdev_get_queue(bdev));
+							if (!ioc) {
+								ioc = kzalloc();
+								...
+								rq_qos_add(q, rqos);
+							 }
+	...
+	rq_qos_add(q, rqos);
+	...
+}
+
+When the io.cost.qos file is written by two cpu concurrently, rq_qos may
+be added to one disk twice. In that case, there will be two iocs enabled
+and running on one disk. They own different iocgs on their active list.
+In the ioc_timer_fn function, because of the iocgs from two ioc have the
+same root iocg, the root iocg's walk_list may be overwritten by each
+other and this lead to list add/del corrutions in building or destorying
+the inner_walk list.
+
+And so far, the blk-rq-qos framework works in case that one instance for
+one type rq_qos per queue by default. This patch make this explicit and
+also fix the crash above.
+
+Signed-off-by: hanjinke <hanjinke.666@bytedance.com>
+---
+ block/blk-iocost.c    |  7 ++++++-
+ block/blk-iolatency.c |  6 +++++-
+ block/blk-ioprio.c    |  5 +++++
+ block/blk-rq-qos.h    | 11 ++++++++++-
+ block/blk-wbt.c       |  8 +++++++-
+ 5 files changed, 33 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 33a11ba971ea..2c41edc3fd70 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2886,7 +2886,12 @@ static int blk_iocost_init(struct request_queue *q)
+ 	 * called before policy activation completion, can't assume that the
+ 	 * target bio has an iocg associated and need to test for NULL iocg.
+ 	 */
+-	rq_qos_add(q, rqos);
++	ret = rq_qos_add(q, rqos);
++	if (ret) {
++		free_percpu(ioc->pcpu_stat);
++		kfree(ioc);
++		return ret;
++	}
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
+ 	if (ret) {
+ 		rq_qos_del(q, rqos);
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 9568bf8dfe82..9a572439f326 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -773,7 +773,11 @@ int blk_iolatency_init(struct request_queue *q)
+ 	rqos->ops = &blkcg_iolatency_ops;
+ 	rqos->q = q;
+ 
+-	rq_qos_add(q, rqos);
++	ret = rq_qos_add(q, rqos);
++	if (ret) {
++		kfree(blkiolat);
++		return ret;
++	}
+ 
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iolatency);
+ 	if (ret) {
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 79e797f5d194..931bffdf0cab 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -251,6 +251,11 @@ int blk_ioprio_init(struct request_queue *q)
+ 	 * rq-qos callbacks.
+ 	 */
+ 	rq_qos_add(q, rqos);
++	if (ret) {
++		blkcg_deactivate_policy(q, &ioprio_policy);
++		kfree(blkioprio_blkg);
++		return ret;
++	}
+ 
+ 	return 0;
+ }
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 0e46052b018a..bbc70cf21c9c 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -86,7 +86,7 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ 	init_waitqueue_head(&rq_wait->wait);
+ }
+ 
+-static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
++static inline int rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+ {
+ 	/*
+ 	 * No IO can be in-flight when adding rqos, so freeze queue, which
+@@ -98,6 +98,8 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+ 	blk_mq_freeze_queue(q);
+ 
+ 	spin_lock_irq(&q->queue_lock);
++	if (rq_qos_id(q, rqos->id))
++		goto out;
+ 	rqos->next = q->rq_qos;
+ 	q->rq_qos = rqos;
+ 	spin_unlock_irq(&q->queue_lock);
+@@ -109,6 +111,13 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+ 		blk_mq_debugfs_register_rqos(rqos);
+ 		mutex_unlock(&q->debugfs_mutex);
+ 	}
++
++	return 0;
++out:
++	spin_unlock_irq(&q->queue_lock);
++	blk_mq_unfreeze_queue(q);
++	return -EBUSY;
++
+ }
+ 
+ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 0c119be0e813..cc8f45929b31 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -820,6 +820,7 @@ int wbt_init(struct request_queue *q)
+ {
+ 	struct rq_wb *rwb;
+ 	int i;
++	int ret;
+ 
+ 	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
+ 	if (!rwb)
+@@ -846,7 +847,12 @@ int wbt_init(struct request_queue *q)
+ 	/*
+ 	 * Assign rwb and add the stats callback.
+ 	 */
+-	rq_qos_add(q, &rwb->rqos);
++	ret = rq_qos_add(q, &rwb->rqos);
++	if (ret) {
++		blk_stat_free_callback(rwb->cb);
++		kfree(rwb);
++		return ret;
++	}
+ 	blk_stat_add_callback(q, rwb->cb);
+ 
+ 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
+-- 
+2.20.1
 
