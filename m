@@ -2,98 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF82C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 12:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08694C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 12:24:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbiGRMXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 08:23:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44494 "EHLO
+        id S233963AbiGRMY4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 08:24:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230131AbiGRMXV (ORCPT
+        with ESMTP id S234845AbiGRMYl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 08:23:21 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5B2F25297
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 05:23:19 -0700 (PDT)
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Lmh0K20Z9zlW4H;
-        Mon, 18 Jul 2022 20:21:37 +0800 (CST)
-Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 18 Jul 2022 20:23:17 +0800
-Received: from huawei.com (10.175.127.227) by dggpeml500009.china.huawei.com
- (7.185.36.209) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 18 Jul
- 2022 20:23:16 +0800
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <ming.lei@redhat.com>, <hch@lst.de>,
-        "Yufen Yu" <yuyufen@huawei.com>
-Subject: [PATCH] blk-mq: run queue after issuing the last request of the plug list
-Date:   Mon, 18 Jul 2022 20:35:28 +0800
-Message-ID: <20220718123528.178714-1-yuyufen@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Mon, 18 Jul 2022 08:24:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E68D31145
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 05:24:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658147069;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JaN8Md9qX08DyikgPic0MhdnqduPbYVgd0e7WGFGJB4=;
+        b=QHD2/JND/OQA5eACpAUQSlDGvTTPYBSgwTThSma65fKa/vS41dwrAW+lL6/RKG+6sVp6as
+        Yz3H+uW44B8pbKfJNSfyRxXgneUqHLW/5DEsljvpY3sIB/OL7NTnEejVjkpuMCCsE/p9Xo
+        mVaFogKtW4wdlWDKrI3VyYd1eYNXHUo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-75-Z51wG6CsPO2t0CPE9CF8Lw-1; Mon, 18 Jul 2022 08:24:25 -0400
+X-MC-Unique: Z51wG6CsPO2t0CPE9CF8Lw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5F90085A581;
+        Mon, 18 Jul 2022 12:24:25 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 18D1590A00;
+        Mon, 18 Jul 2022 12:24:21 +0000 (UTC)
+Date:   Mon, 18 Jul 2022 20:24:16 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH 3/3] ublk_drv: missing error code in ublk_add_dev()
+Message-ID: <YtVQ8OComr1XD4SM@T590>
+References: <YtVAlDAfLLRolN/X@kili>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500009.china.huawei.com (7.185.36.209)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtVAlDAfLLRolN/X@kili>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We do test on a virtio scsi device (/dev/sda) and the default mq
-scheduler is 'none'. We found a IO hung as following:
+On Mon, Jul 18, 2022 at 02:14:28PM +0300, Dan Carpenter wrote:
+> This error path accidentally returns success instead of a negative
+> error code.
+> 
+> Fixes: cebbe577cb17 ("ublk_drv: fix request queue leak")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  drivers/block/ublk_drv.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index c0f9a5b4ed58..332472901ff8 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -1169,8 +1169,10 @@ static int ublk_add_dev(struct ublk_device *ub)
+>  		goto out_deinit_queues;
+>  
+>  	ub->ub_queue = blk_mq_init_queue(&ub->tag_set);
+> -	if (IS_ERR(ub->ub_queue))
+> +	if (IS_ERR(ub->ub_queue)) {
+> +		err = PTR_ERR(ub->ub_queue);
+>  		goto out_cleanup_tags;
+> +	}
 
-blk_finish_plug
-  blk_mq_plug_issue_direct
-      scsi_mq_get_budget
-      //get budget_token fail and sdev->restarts=1
+Yang Yingliang has posted one same patch:
 
-			     	 scsi_end_request
-				   scsi_run_queue_async
-                                   //sdev->restart=0 and run queue
+https://lore.kernel.org/linux-block/YtUOhUXBKG28bew4@T590/T/#t
 
-     blk_mq_request_bypass_insert
-        //add request to hctx->dispatch list
 
-  //continue to dispath plug list
-  blk_mq_dispatch_plug_list
-      blk_mq_try_issue_list_directly
-        //success issue all requests from plug list
-
-After .get_budget fail, scsi_mq_get_budget will increase 'restarts'.
-Normally, it will run hw queue when io complete and set 'restarts'
-as 0. But if we run queue before adding request to the dispatch list
-and blk_mq_dispatch_plug_list also success issue all requests, then
-on one will run queue, and the request will be stall in the dispatch
-list and cannot complete forever.
-
-To fix the bug, we run queue after issuing the last request in
-function blk_mq_sched_insert_requests.
-
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
----
- block/blk-mq-sched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index a4f7c101b53b..c3ad97ca2753 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -490,8 +490,8 @@ void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		blk_mq_insert_requests(hctx, ctx, list);
- 	}
- 
--	blk_mq_run_hw_queue(hctx, run_queue_async);
-  out:
-+	blk_mq_run_hw_queue(hctx, run_queue_async);
- 	percpu_ref_put(&q->q_usage_counter);
- }
- 
--- 
-2.31.1
+Thanks,
+Ming
 
