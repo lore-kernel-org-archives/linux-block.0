@@ -2,104 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1342C43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 22:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9871CCA479
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 22:04:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236377AbiGRWAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 18:00:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47232 "EHLO
+        id S236279AbiGRWEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 18:04:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233981AbiGRWAQ (ORCPT
+        with ESMTP id S235709AbiGRWE3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 18:00:16 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A3F30567;
-        Mon, 18 Jul 2022 15:00:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Smy+K5SsBoKu7R2Ez6Wknyaqr3gfX9BPVA5fVt2P8T0=; b=leyACy2j4DACa1kT6Gpoba8VOm
-        VOcEfZL3PkIZgiPs8NmLAJaBh8ucD+6kAoUEzxAXkRiJhdoKUCC9eS2BxTrWrSU3Gqy8FGHCl0+Yf
-        cnoOA2e2G7FTo7OqIQ+Jms+460wxBba1ZdXNg9IsZJuJ86ignpBqHcbMW+ipI2+RdNLMHKQbtEnSK
-        yUQZmHoK4wSnrk6TsdqloQ/tkKm0+6MDqgVLg+haVl7nQ2yUnqoiirjvDUaegs24clTHejTLG5Nhf
-        GrMHfUZ3Mq47NEGdmLxe/Y3iaYND/IDLOH/w41NkO0UbGqm0/y7Hu229QF2xyeGt/BSMoNktdIPyL
-        BQ+qyY7Q==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oDYmh-001q88-OL; Mon, 18 Jul 2022 22:00:11 +0000
-Date:   Mon, 18 Jul 2022 15:00:11 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Dave Airlie <airlied@gmail.com>
-Cc:     torvalds@linux-foundation.org, Jonathan Corbet <corbet@lwn.net>,
-        linux-doc@vger.kernel.org, gregkh@linuxfoundation.org,
-        Daniel Vetter <daniel@ffwll.ch>, linux-kernel@vger.kernel.org,
+        Mon, 18 Jul 2022 18:04:29 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9AE1F2D6;
+        Mon, 18 Jul 2022 15:04:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 778DBB817B5;
+        Mon, 18 Jul 2022 22:04:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0E7DC341C0;
+        Mon, 18 Jul 2022 22:04:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658181860;
+        bh=3JxZkLM8MBszfDbDjwosYrF471wfmGyjogJnExYKUPY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=BSlcJtetWKT66UYJ5KpIsH1zskh3T2ZqU/URAT5Y8TZeNrDkyU4XdYFBS1UCq8HGs
+         OeAcEtyYH5QPq1S0Yf81A5dfERgEQxdiY1nFXXqysSevgo4VJ10WCEzxjCSTsywggx
+         5o3XEpBmhlD+Mj4w7jqRwz28mrK0Ev4Pvv7VC/qnVVpXS6vgAgZnf3vmjMzM//0TM+
+         m2PNihIHQjQ8iDbkBmz1rc3GpaRWbkpAqP8iOcdqqB4t+W5qDj3Ykk/sudVMnTAfSN
+         MIStUtpzJ2s7xfcOgw526ZqsCKTTUvFKUQGKMYkCj01RTmOKRLDqptGyKlWg1k0DIr
+         kQpGkmvYq8x6g==
+Date:   Mon, 18 Jul 2022 15:04:14 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Thorsten Leemhuis <linux@leemhuis.info>
+Cc:     Dave Airlie <airlied@gmail.com>, torvalds@linux-foundation.org,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        gregkh@linuxfoundation.org, Daniel Vetter <daniel@ffwll.ch>,
+        mcgrof@kernel.org, linux-kernel@vger.kernel.org,
         dri-devel@lists.sf.net, netdev@vger.kernel.org,
         linux-wireless@vger.kernel.org, alsa-devel@alsa-project.org,
         linux-media@vger.kernel.org, linux-block@vger.kernel.org,
-        Dave Airlie <airlied@redhat.com>,
-        Paul Moore <paul@paul-moore.com>,
-        Casey Schaufler <casey@schaufler-ca.com>
+        Dave Airlie <airlied@redhat.com>
 Subject: Re: [PATCH] docs: driver-api: firmware: add driver firmware
  guidelines.
-Message-ID: <YtXX604B2X8vdH9b@bombadil.infradead.org>
+Message-ID: <20220718150414.1767bbd8@kernel.org>
+In-Reply-To: <97e5afd3-77a3-2227-0fbf-da2f9a41520f@leemhuis.info>
 References: <20220718072144.2699487-1-airlied@gmail.com>
+        <97e5afd3-77a3-2227-0fbf-da2f9a41520f@leemhuis.info>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220718072144.2699487-1-airlied@gmail.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 18, 2022 at 05:21:44PM +1000, Dave Airlie wrote:
-> From: Dave Airlie <airlied@redhat.com>
+On Mon, 18 Jul 2022 11:33:11 +0200 Thorsten Leemhuis wrote:
+> > If the hardware isn't
+> > +  enabled by default or under development,  
 > 
-> A recent snafu where Intel ignored upstream feedback on a firmware
-> change, led to a late rc6 fix being required. In order to avoid this
-> in the future we should document some expectations around
-> linux-firmware.
-> 
-> I was originally going to write this for drm, but it seems quite generic
-> advice.
-> 
-> I'm cc'ing this quite widely to reach subsystems which use fw a lot.
-> 
-> Signed-off-by: Dave Airlie <airlied@redhat.com>
+> Wondering if it might be better to drop the "or under development", as
+> the "enabled by default" is the main part afaics. Maybe something like
+> "If support for the hardware is normally inactive (e.g. has to be
+> enabled manually by a kernel parameter)" would be better anyway.
 
-Document well deserved to be written, thanks for making this happen.
-Modulo all the silly spelling / bike-shedding issues folks might find,
-in case you care to re-spin for a v2:
-
-Acked-by: Luis Chamberlain <mcgrof@kernel.org>
-
-Now let's think about the impact of two corner cases which *do*
-happen and so this poses security implications on enablement:
-
-1) Devices which end up with a security issue which a vendor considers
-   obsolete, and the only way to fix something is firmware. We're
-   security-out-of-luck. For this I've previously sucessfully have put
-   effort into organizations to open source the firmware. We were
-   successful more than once:
-
-     * https://github.com/qca/open-ath9k-htc-firmware
-     * https://github.com/qca/ath6kl-firmware
-
-   When these efforts fall short we have a slew of reverse engineering
-   efforts which fortunately also have been sucessfull.
-
-2) Vendor goes belly up
-
-Both implicate the need to help persuade early on a strategy for open
-source firmware, and I don't want to hear anyone tell me it is not
-possible.
-
-When that fails we can either reverse engineer and worst case, I am not
-sure if we have a process for annotations or should. Perhaps a kconfig
-symbol which drivers with buggy firmware can depend on, and only if you
-enable that kconfig symbol would these drivers be available to be
-enabled?
-
-Are we aware of such device drivers? They must exist...
-
-  Luis
+It's a tricky one, I'd say something like you can break the FW ABI
+"until HW becomes available for public consumption" or such.
+I'm guessing what we're after is letting people break the compatibility
+in early stages of the product development cycles. Pre-silicon and
+bring up, but not after there are products on the market?
