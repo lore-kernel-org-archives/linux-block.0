@@ -2,91 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD61C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 13:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E81CCA482
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 14:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235264AbiGRNwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 09:52:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49932 "EHLO
+        id S229550AbiGROcx convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 10:32:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235487AbiGRNwg (ORCPT
+        with ESMTP id S230171AbiGROc0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 09:52:36 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527F627FC6;
-        Mon, 18 Jul 2022 06:52:35 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Lmk011gYyzKHsC;
-        Mon, 18 Jul 2022 21:51:29 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgAXemmfZdVijUahAw--.40633S3;
-        Mon, 18 Jul 2022 21:52:32 +0800 (CST)
+        Mon, 18 Jul 2022 10:32:26 -0400
+Received: from relay3.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D650023173
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 07:32:25 -0700 (PDT)
+Received: from omf02.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay11.hostedemail.com (Postfix) with ESMTP id 5B8778091B;
+        Mon, 18 Jul 2022 14:32:24 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf02.hostedemail.com (Postfix) with ESMTPA id C991F80013;
+        Mon, 18 Jul 2022 14:32:22 +0000 (UTC)
+Message-ID: <49a8099eb7dd01e9d2d190056171341d87cd442b.camel@perches.com>
 Subject: Re: [PATCH] nbd: add missing definition of pr_fmt
+From:   Joe Perches <joe@perches.com>
 To:     Yu Kuai <yukuai1@huaweicloud.com>, josef@toxicpanda.com,
         axboe@kernel.dk, houtao1@huawei.com
 Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
         linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Date:   Mon, 18 Jul 2022 07:32:21 -0700
+In-Reply-To: <853a5164-78cf-1ccb-8e18-cff5b5bce4ff@huaweicloud.com>
 References: <20220706093320.1962871-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <853a5164-78cf-1ccb-8e18-cff5b5bce4ff@huaweicloud.com>
-Date:   Mon, 18 Jul 2022 21:52:31 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+         <853a5164-78cf-1ccb-8e18-cff5b5bce4ff@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.44.1-0ubuntu1 
 MIME-Version: 1.0
-In-Reply-To: <20220706093320.1962871-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgAXemmfZdVijUahAw--.40633S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7GrWDtrykuF4kJr43GFyrtFb_yoW3Kwb_C3
-        s7Zw4xXws3Wr92kr4jyF13ZryFyw4rXrnYqrnIgrZxXFy7ZayxA3Z2ya95Gr47Ga1vq3Z3
-        Aa1qvrsrC3WfXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
-        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
-        U==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Stat-Signature: zn5wsm8bu3ibsfq9fmhf1s3698hxhkmh
+X-Rspamd-Server: rspamout04
+X-Rspamd-Queue-Id: C991F80013
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX19u1lF+U+u5u4KTIb69mjPigTZKoouq7xY=
+X-HE-Tag: 1658154742-75497
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/07/06 17:33, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Mon, 2022-07-18 at 21:52 +0800, Yu Kuai wrote:
+> åœ¨ 2022/07/06 17:33, Yu Kuai å†™é“:
+> > From: Yu Kuai <yukuai3@huawei.com>
+> > 
+> > commit 1243172d5894 ("nbd: use pr_err to output error message") tries
+> > to define pr_fmt and use short pr_err() to output error message,
+> > however, the definition is missed.
 > 
-> commit 1243172d5894 ("nbd: use pr_err to output error message") tries
-> to define pr_fmt and use short pr_err() to output error message,
-> however, the definition is missed.
+> friendly ping ...
+[]
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+[]
+> > @@ -44,6 +44,9 @@
+> >   #include <linux/nbd-netlink.h>
+> >   #include <net/genetlink.h>
+> >   
+> > +#undef pr_fmt
+> > +#define pr_fmt(fmt) "nbd: " fmt
+> > +
 
-friendly ping ...
-> 
-> Fixes: 1243172d5894 ("nbd: use pr_err to output error message")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   drivers/block/nbd.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 07f3c139a3d7..94a1602adab5 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -44,6 +44,9 @@
->   #include <linux/nbd-netlink.h>
->   #include <net/genetlink.h>
->   
-> +#undef pr_fmt
-> +#define pr_fmt(fmt) "nbd: " fmt
-> +
->   #define CREATE_TRACE_POINTS
->   #include <trace/events/nbd.h>
->   
-> 
+Typically, this #define is place before all #include lines
+so there is no need for an #undef
 
