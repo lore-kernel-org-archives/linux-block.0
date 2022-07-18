@@ -2,60 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 526F0C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B75C3C43334
 	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 19:13:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235021AbiGRTNG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235199AbiGRTNG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 18 Jul 2022 15:13:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34130 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233431AbiGRTNF (ORCPT
+        with ESMTP id S234767AbiGRTNG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 15:13:05 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3CC2D1C5
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:02 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id r70so8939599iod.10
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:02 -0700 (PDT)
+        Mon, 18 Jul 2022 15:13:06 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88052F3B8
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:05 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id y2so10071669ior.12
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 12:13:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
-         :content-transfer-encoding;
-        bh=ZJEuLsMRKUxpd8gJCMilrz767jCkM6zmrnjpbeCFU9M=;
-        b=kKR9I4FVfr4npYm/FwMPeGKnE1tPcWbWEboAMzIbnqmGPBfE0HhcHLODZX9wCjssBr
-         pIUHKVSchsGIf/CRmXV3AjI6hb232hHVwMabwFCJwXNIzJhMe/b9sVmdtA2r7mtLtfFs
-         4twaLIAXt43x48uQ5vN9z2s1Z8E0PIpg4DoZaTTW6AhYaKY+mAfb2Nhd5DQjizgXwESg
-         T8haaDru1vuB3FX/EN/76vlFksF1xER108KfwUr4xtLQVmchCdtRad8ClkBLQ68m5n2e
-         zOHsoZG6c7eLCsvZXa1YWo7tTEuhqAOgjhUsI6N7yKddSlOuvbqqmJHFYFtZfMG7vadu
-         hIig==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=ECMSU0iwvYt8tVE81ImJIsGyJ1Mwn7+kBGoJQPQ6k5Y=;
+        b=opvdSOTUsRFayUBtCxOuT6SJdk+fiFsUHVMpWnb0m9fsLIPgPE8yDMBJQ6CSG4+3nW
+         ZHiJCTiTiHh9Cz5MS5yHigL3IEYSQtiwQaWzUtS/XzTQz442BYbiJXAQVc/ebhMvARui
+         C93ROS/awBZA6UHZLa2Jytl+vfTar7B53KhgAmiVZeS2fLLMuKDSNp1/0OJYph9Blj9h
+         QO095eWeJl34ls78Tfwjed5yRFkgTyQxRv9OX/0GWnkNEYg78mx/NRiYWqub27jTGsOl
+         4CfwP7RwrgKkXHsp/8+/28CwTx1nBC5ib0pgktTgdnh941ZjSHE8eKKU9mZlttSIKbFv
+         lEVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:in-reply-to:references:subject
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=ZJEuLsMRKUxpd8gJCMilrz767jCkM6zmrnjpbeCFU9M=;
-        b=qVBZMDhg6DUpn9YNuB5/Nv+GRA3dLdmANl6EHF7VVGzVykVfW9XhibnrwTyJJ9PxyL
-         9YCwab/ZnOzDpX9noDYztygTgtg5h5XCLgYs3IUdQRl9aK48fC47xxAoGjZruli/Ip7z
-         yL7al+JLCuMbEQhivOj+TaQ3ZNh5nVrP0F5JoSLKyrztRp2I2wagjxUe2TzebHBfQQ50
-         dLjgAjl7sEZOSy4AyPFNWZG3wLYHB8NJ28edxTEXqvUVVjR4ZvwN6eS3MAEyuEv239ky
-         xHjOfwFwFz7qs2MrK8SrUmtEktTuHmVtPx0eiDaLBXHgXQHwO+nYkWuzTxECE1VxeqQK
-         Qjjw==
-X-Gm-Message-State: AJIora+e4lNUOTNRur+xfeNH7W3TBRgK15ELXmuE7rRVza+mayvtOeHw
-        3ZP2Yd40vqSmo4V3zENrsJTtAet3ofNdyw==
-X-Google-Smtp-Source: AGRyM1vYRfQKwwNpLfaIlTDzujVOxSzsfBauBFQCXTJMDcVRaclA7QalraSqvoqixrhuat0nLczyCQ==
-X-Received: by 2002:a05:6638:1a1a:b0:33f:405d:b1ed with SMTP id cd26-20020a0566381a1a00b0033f405db1edmr15085179jab.164.1658171582231;
-        Mon, 18 Jul 2022 12:13:02 -0700 (PDT)
+        bh=ECMSU0iwvYt8tVE81ImJIsGyJ1Mwn7+kBGoJQPQ6k5Y=;
+        b=SJgO2kbts9eFMomMPhxXbLwvA4xpLspEe/E/HgESaDhUIFmjuoTTdzOG4RyBiGbGQn
+         3M7fmSHrrzkEaNyune7WTMX8cjBAn049iB7wAANYTmccs97nvR84X8BMoUj2E5CdUL9a
+         viQNfUOIL6/GK2J/7zP5lz9lX0lqnCsxtOcMhhywMr5z5FpbNP7X95RWu9zT36MqRTpS
+         Kyz468uKklfu3pbYskdBu4R8hU7ii7ox4XXo6BP1Ynb1A1LWfg0VU2ywLx5C+f74t8Dm
+         2UY/+gF3HbmiwWsuzJOpqEFRpcWs1ayMxv5eMfb9h14MnhcYKdeCRxLgZhMd8nzBtCSL
+         NQDA==
+X-Gm-Message-State: AJIora8bzUZ4JRrmHlQXfTwsEO8yBu+D/Kdd28zjWC21vJTXpAtYE4Jh
+        nUoE4O2rXrjZCRiY5E9A1i5ezg==
+X-Google-Smtp-Source: AGRyM1voLiUtdmFcV+uW8VNvoJYBIZcDuv7NzaRkCOJeqZzvTU28lGAtoCPVNCAbBTnqyfNSH90uNA==
+X-Received: by 2002:a05:6638:1654:b0:341:59e0:9958 with SMTP id a20-20020a056638165400b0034159e09958mr6672340jat.224.1658171585178;
+        Mon, 18 Jul 2022 12:13:05 -0700 (PDT)
 Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id j195-20020a0263cc000000b003417ba4f66asm725116jac.41.2022.07.18.12.13.01
+        by smtp.gmail.com with ESMTPSA id c10-20020a02a60a000000b0033ebf04f624sm5876625jam.152.2022.07.18.12.13.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 12:13:01 -0700 (PDT)
+        Mon, 18 Jul 2022 12:13:04 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-kernel@vger.kernel.org, yangyingliang@huawei.com,
+To:     yang.lee@linux.alibaba.com
+Cc:     abaci@linux.alibaba.com, linux-kernel@vger.kernel.org,
         linux-block@vger.kernel.org
-In-Reply-To: <20220718042408.3132835-1-yangyingliang@huawei.com>
-References: <20220718042408.3132835-1-yangyingliang@huawei.com>
-Subject: Re: [PATCH -next] ublk_drv: fix missing error return code in ublk_add_dev()
-Message-Id: <165817158152.143885.14328206381467598787.b4-ty@kernel.dk>
-Date:   Mon, 18 Jul 2022 13:13:01 -0600
+In-Reply-To: <20220718015431.40185-1-yang.lee@linux.alibaba.com>
+References: <20220718015431.40185-1-yang.lee@linux.alibaba.com>
+Subject: Re: [PATCH -next] ublk_drv: remove unneeded semicolon
+Message-Id: <165817158455.144161.2812725798881211807.b4-ty@kernel.dk>
+Date:   Mon, 18 Jul 2022 13:13:04 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -63,15 +64,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 18 Jul 2022 12:24:08 +0800, Yang Yingliang wrote:
-> If blk_mq_init_queue() fails, it should return error code in ublk_add_dev()
+On Mon, 18 Jul 2022 09:54:31 +0800, Yang Li wrote:
+> Eliminate the following coccicheck warnings:
+> ./drivers/block/ublk_drv.c:1467:2-3: Unneeded semicolon
+> ./drivers/block/ublk_drv.c:1528:2-3: Unneeded semicolon
 > 
 > 
 
 Applied, thanks!
 
-[1/1] ublk_drv: fix missing error return code in ublk_add_dev()
-      commit: f50e5d670c622349277a46996a70386cc3661b10
+[1/1] ublk_drv: remove unneeded semicolon
+      commit: 6b1439d203a3c3d7adcf31ba70734eb95f8fa02d
 
 Best regards,
 -- 
