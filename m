@@ -2,124 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E34EC43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 14:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 236E5C43334
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 15:16:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234603AbiGROzj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 10:55:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48434 "EHLO
+        id S233817AbiGRPQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 11:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234597AbiGROzi (ORCPT
+        with ESMTP id S233406AbiGRPQT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 10:55:38 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673B417057
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 07:55:37 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id v67-20020a1cac46000000b003a1888b9d36so10015857wme.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 07:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=awB3IScCM82ThTtG2SFehRsEwEakyzEv6teXUnsFMUA=;
-        b=xpExZ3kZCdk2WKHRKvNTZvS7M91X0EEJtGhiw331LmrtUZOYjX68OUTX0PXvRoq9Mg
-         rqRaN2pueOU9+e0THRE0dnpvpdRcP3K01m4gEUfL1uPoqfF0O0ihsPtN58yxHoc7voDY
-         1cQFrVWgDcoMgZ2WmrmEL8uzt0DB4SWAnFV2j4Taehtrz8/xQLX0L0ptEmEwFjp60GVk
-         0S5wr44rR8pwrLJpegsNUKKkLGK+MuKZxkjnEkCS7p+fYa7uxUteoCgcGecUQA0ED3RN
-         YE1oRr4rJnXM+3ZYpfeYSI/rtdPEpucaIulaDfXRio1x4Wkz9vHEqUBu5M1jnvusK3wR
-         CITA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=awB3IScCM82ThTtG2SFehRsEwEakyzEv6teXUnsFMUA=;
-        b=rd0QlgxcvVGYAToS9xlW0+0obSb3BiLBI8+9+vCsL4rwcRoyXUg46zSXEI/W6vUEBa
-         GEUAMTljwDUr3S9qVKMqHpXlsoKj035wLXMROLqC5DnqqzOyLEPw1xzLplaLn6/iAEkX
-         69Y4/Jl9C/U/C39rFpOe0hJJwDFj8JTePrk+bLr4NZ+Y5p6btujRfdUGQLnnrInqQLmv
-         4WWpI4PdPTZM8kAShoggIB7W/VHeoNXLNAMU35s8MHJ4buTJlecR/c20aKs07hzMcxii
-         Xl5OSO2LFLgD4yjoH1F4Z4Uz7uue9rFKiW/pIoCokPfuZl0Q4Icot7OpFnJt32RMcd8e
-         Istg==
-X-Gm-Message-State: AJIora8qaryxixaow0/eVHDISM7RTotORmag0KoXI6fRdRH+RyUZO9+v
-        Y2kx+eBzK/GdB/gesm33/hPJVGkdMp9Qa/ZoZ/Z36BBy3Q==
-X-Google-Smtp-Source: AGRyM1tH7+KDgIRxNaY2LGntFQMixVhfjpDqcUF6WGCiIIg9/YcIi0aQwTC6+2UR286rXvWRV6cy1fT2sqKQ7U2WyyY=
-X-Received: by 2002:a7b:c3cc:0:b0:3a3:8ec:d69 with SMTP id t12-20020a7bc3cc000000b003a308ec0d69mr17787022wmj.78.1658156135929;
- Mon, 18 Jul 2022 07:55:35 -0700 (PDT)
+        Mon, 18 Jul 2022 11:16:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E1A52528A
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 08:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658157377;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4w2YzXwIcNhtVOHvuOnlSaUKnkJgVptl3/QWhOtpS6c=;
+        b=SHBnbr6XefITyLYtc5Y/z3hnce804jndIh8KuOhdVm8QkG5ZQ2QAtLXDtlFQNh15yHWfkQ
+        yNnS71FioHpDFCBLnTLZb5VAF12mywPmr7bSMIhNSwN/5v8z7EaaQLnreYMK5z/pkuOudR
+        zcMTZYBWff6tDWOoMJLImLCfsGSvX1Y=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-307-GFD1dWvaMliiWCjkhxY0aQ-1; Mon, 18 Jul 2022 11:16:16 -0400
+X-MC-Unique: GFD1dWvaMliiWCjkhxY0aQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 618FE1C06ECC;
+        Mon, 18 Jul 2022 15:16:15 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B85340C1288;
+        Mon, 18 Jul 2022 15:16:12 +0000 (UTC)
+Date:   Mon, 18 Jul 2022 23:16:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] block: call blk_mq_exit_queue from disk_release for
+ never added disks
+Message-ID: <YtV5N2ATLgy+d/q+@T590>
+References: <20220718062928.335399-1-hch@lst.de>
+ <YtUJXGhFBw5yrf7N@T590>
+ <20220718130725.GA19204@lst.de>
 MIME-Version: 1.0
-References: <20220714000536.2250531-1-mcgrof@kernel.org> <CAHC9VhSjfrMtqy_6+=_=VaCsJKbKU1oj6TKghkue9LrLzO_++w@mail.gmail.com>
- <YtC8Hg1mjL+0mjfl@bombadil.infradead.org> <CGME20220715184632epcas5p36bd157d36a2aed044de40264911bec05@epcas5p3.samsung.com>
- <CAHC9VhQMABYKRqZmJQtXai0gtiueU42ENvSUH929=pF6tP9xOg@mail.gmail.com> <20220716032041.GB25618@test-zns>
-In-Reply-To: <20220716032041.GB25618@test-zns>
-From:   Paul Moore <paul@paul-moore.com>
-Date:   Mon, 18 Jul 2022 10:55:24 -0400
-Message-ID: <CAHC9VhQKeufrqN=dVZ74wEFgd3K=KY-aEZafYembT738juzWUw@mail.gmail.com>
-Subject: Re: [PATCH] lsm,io_uring: add LSM hooks to for the new uring_cmd file op
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>, casey@schaufler-ca.com,
-        axboe@kernel.dk, linux-security-module@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, a.manzanares@samsung.com,
-        javier@javigon.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220718130725.GA19204@lst.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 15, 2022 at 11:26 PM Kanchan Joshi <joshi.k@samsung.com> wrote:
-> On Fri, Jul 15, 2022 at 02:46:16PM -0400, Paul Moore wrote:
-> >On Thu, Jul 14, 2022 at 9:00 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> >> On Wed, Jul 13, 2022 at 11:00:42PM -0400, Paul Moore wrote:
-> >> > On Wed, Jul 13, 2022 at 8:05 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> >> > >
-> >> > > io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
-> >> > > add infrastructure for uring-cmd"), this extended the struct
-> >> > > file_operations to allow a new command which each subsystem can use
-> >> > > to enable command passthrough. Add an LSM specific for the command
-> >> > > passthrough which enables LSMs to inspect the command details.
-> >> > >
-> >> > > This was discussed long ago without no clear pointer for something
-> >> > > conclusive, so this enables LSMs to at least reject this new file
-> >> > > operation.
-> >> > >
-> >> > > [0] https://lkml.kernel.org/r/8adf55db-7bab-f59d-d612-ed906b948d19@schaufler-ca.com
-> >> >
-> >> > [NOTE: I now see that the IORING_OP_URING_CMD has made it into the
-> >> > v5.19-rcX releases, I'm going to be honest and say that I'm
-> >> > disappointed you didn't post the related LSM additions
-> >>
-> >> It does not mean I didn't ask for them too.
-> >>
-> >> > until
-> >> > v5.19-rc6, especially given our earlier discussions.]
-> >>
-> >> And hence since I don't see it either, it's on us now.
-> >
-> >It looks like I owe you an apology, Luis.  While my frustration over
-> >io_uring remains, along with my disappointment that the io_uring
-> >developers continue to avoid discussing access controls with the LSM
-> >community, you are not the author of the IORING_OP_URING_CMD.   You
->
-> I am to be shot down here. Solely.
-> My LSM understanding has been awful. At a level that I am not clear
-> how to fix if someone says - your code lacks LSM consideration.
-> But nothing to justify, I fully understand this is not someone else's
-> problem but mine. I intend to get better at it.
-> And I owe apology (to you/LSM-folks, Luis, Jens) for the mess.
+On Mon, Jul 18, 2022 at 03:07:25PM +0200, Christoph Hellwig wrote:
+> On Mon, Jul 18, 2022 at 03:18:52PM +0800, Ming Lei wrote:
+> > Request queue is allocated successfully, but disk allocation may fail,
+> > so blk_mq_exit_queue still may be missed in this case.
+> 
+> Yes.  That's a separate issue, though and solved by this one liner:
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d716b7f3763f3..70177ee74295b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3960,7 +3960,7 @@ struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set, void *queuedata,
+>  
+>  	disk = __alloc_disk_node(q, set->numa_node, lkclass);
+>  	if (!disk) {
+> -		blk_put_queue(q);
+> +		blk_mq_destroy_queue(q);
+>  		return ERR_PTR(-ENOMEM);
 
-Thanks for your honesty.  If it is any consolation, my understanding
-of io_uring remains superficial at best, and it's one of the reasons
-I've asked the io_uring devs to ack/review the LSM io_uring hooks and
-their placement in the io_uring code.  Developing a deep understanding
-of one kernel subsystem is often very difficult, doing the same across
-multiple subsystems requires a *lot* of time and effort.  We have to
-rely on our combined expertise to help each other fill in the gaps :)
+OK, but it is still tricky, since there isn't the required order between
+calling blk_mq_free_tag_set and put_disk, but now put_disk has to be called
+before calling blk_mq_free_tag_set, so you may have to audit drivers
+first, and make sure that all put_disk is called before blk_mq_free_tag_set()
+in driver's error handling code path.
 
-If you are ever unsure about something in the LSM layer, or how a
-change to io_uring (or any other subsystem) might impact the LSMs,
-please don't hesitate to ask us.  It might take all of us a little
-while to sort it out, but we can usually get it working in the end.
 
-There shouldn't be harm in asking for help/clarification, the harm
-usually comes when assumptions are made.
 
--- 
-paul-moore.com
+Thanks,
+Ming
+
