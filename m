@@ -2,223 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C071C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 08:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56137C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 08:56:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233130AbiGRIhG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 04:37:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43218 "EHLO
+        id S233241AbiGRI4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 04:56:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232852AbiGRIhF (ORCPT
+        with ESMTP id S232841AbiGRI4G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 04:37:05 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B729719290
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:37:03 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id z12-20020a17090a7b8c00b001ef84000b8bso17497354pjc.1
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hrEyQGzrB3TAIf/TmXechjLg15TCHCdypY6rTcTiJ1Q=;
-        b=aYzzebC8Nn5bqXlt1anYrWRRc1cd679atDrbMKEoimTgs6qL74K36w/o7x7Pmi/dm0
-         9n3CklWEN8XA3oztwnzH1on4r1sQCcH14KQNK8+ivGYom3PtaHgLTS8LCg8kTqalcHE2
-         0PKMiZecAeeTDeJKj4z8F/EL2zSKnFcSTX0slJm4O5/gFeezRQiV5NL/RNc/MoacC9ib
-         bKo4svAeaNwGB6c1ArZoyD/OMA5EjGLLLMGqla2poqNgJNJfmZsaS1e2zHFMIzHsTHz1
-         ToqEhZUV3mwCUx/me2EiUW7zruqe1ezj2xbb/mYQCKHrzo0EgjtZ5UyzzaagxJ4HiKdY
-         rwkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hrEyQGzrB3TAIf/TmXechjLg15TCHCdypY6rTcTiJ1Q=;
-        b=rfbDeH/3Z67M4SVQ1ToE5gsR8c09tfqYT4eYRo9PcvXxvU41iH+rVO1cbtZ9S+0bLk
-         q1HAMFONRpUGUqZgJqJB8DCk1mN6cHI2AFMj70of1i0l/dT78ybixOkHA7mrYRGvojeB
-         y7NQPx4f66RjTZ/A0AUbmJnCDyuaToWwXrpMXP8/82+nW1u2vcmTK9az2VKjtv6vdL/p
-         B2tPJvaQiWgScxzCYtGXRk+xgnAFz78ydS7f/YyPZ/bEuy9qZ1s7+qN3w0Yl51TQlW+P
-         c+5dkgAI1gzes8yRHwTSg17zwg4a51OmPQw94GDOLkRTWg2KUCMuCywhNdF9vIUJ/Xl3
-         ocAQ==
-X-Gm-Message-State: AJIora/FqALkhq+E+iqdkCSJjEq3VPjiFmmUvtDuykGDFtvRpCwgo+sw
-        ZxxhGQQA8f7XVF8trEA8634byeqxXmqSDA==
-X-Google-Smtp-Source: AGRyM1shMPa38M0T1/NNgVd+C25k5wuq8hvvwXh0UbSz0nvv2e7mPwkacDPoPodFXencByhxF9Gg7w==
-X-Received: by 2002:a17:90b:17c4:b0:1f0:5541:f2a with SMTP id me4-20020a17090b17c400b001f055410f2amr31585924pjb.224.1658133423176;
-        Mon, 18 Jul 2022 01:37:03 -0700 (PDT)
-Received: from C02GD5ZHMD6R.bytedance.net ([61.120.150.77])
-        by smtp.gmail.com with ESMTPSA id b5-20020a170902d88500b00163ffbc4f74sm8794752plz.49.2022.07.18.01.37.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 01:37:02 -0700 (PDT)
-From:   Jinke Han <hanjinke.666@bytedance.com>
-X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org, hanjinke <hanjinke.666@bytedance.com>
-Subject: [PATCH] block: don't allow the same type rq_qos add more than once
-Date:   Mon, 18 Jul 2022 16:36:46 +0800
-Message-Id: <20220718083646.67601-1-hanjinke.666@bytedance.com>
-X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+        Mon, 18 Jul 2022 04:56:06 -0400
+Received: from out199-4.us.a.mail.aliyun.com (out199-4.us.a.mail.aliyun.com [47.90.199.4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE3AAE4F
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 01:56:02 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VJglAm9_1658134558;
+Received: from 30.97.56.227(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VJglAm9_1658134558)
+          by smtp.aliyun-inc.com;
+          Mon, 18 Jul 2022 16:55:58 +0800
+Message-ID: <bcd9ac30-9961-5607-e40d-41915af5cd88@linux.alibaba.com>
+Date:   Mon, 18 Jul 2022 16:55:57 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: use of the system work queue in ublk
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+References: <YtT/4Y387f/6pxZH@infradead.org> <YtUNX2l2xkWXQwYA@T590>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <YtUNX2l2xkWXQwYA@T590>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: hanjinke <hanjinke.666@bytedance.com>
+On 2022/7/18 15:35, Ming Lei wrote:
+> Hi Christoph,
+> 
+> On Sun, Jul 17, 2022 at 11:38:25PM -0700, Christoph Hellwig wrote:
+>> Hi Ming,
+>>
+>> it seems like ublk uses schedule_work to stop the device, which
+>> includes a del_gendisk.  I'm a little fearful this will gets us into
+>> lockdep chains of death once syzbot or Tetsu notice it.
+> 
+> ublksrv has two built-in tests(generic/001, generic/002) for covering
+> heavy io with device removal and killing ubq_daemon, not see lockdep
+> warning when running the two tests with lockdep enabled.
+> 
+> Could you or Tetsu provide a bit more info about the warning?
+> 
+>>
+>> That being said, I don't reall understand the design of
+>> ublk_daemon_monitor_work, which is only used to kick off other
+>> work to start with.
+> 
+> If the ubq daemon becomes dead, ublk_daemon_monitor_work will be
+> scheduled for handling the error: abort pending io requests, and
+> start to delete disk.
+> 
+> It has to be triggered when del_gendisk() is in-progress for making
+> forward progress.
+> 
+> 
+> Thanks,
+> Ming
 
-In our test of iocost, we encounttered some list add/del corrutions of
-inner_walk list in ioc_timer_fn.
-The resean can be descripted as follow:
+Hi Ming,
 
-cpu 0						cpu 1
-ioc_qos_write					ioc_qos_write
+Just to make sure I understand usage of ublk_daemon_monitor_work correctly.
 
-ioc = q_to_ioc(bdev_get_queue(bdev));
-if (!ioc) {
-	ioc = kzalloc();			ioc = q_to_ioc(bdev_get_queue(bdev));
-							if (!ioc) {
-								ioc = kzalloc();
-								...
-								rq_qos_add(q, rqos);
-							 }
-	...
-	rq_qos_add(q, rqos);
-	...
-}
+1) For a dying ubq daemon, ublk_daemon_monitor_work schedule stop work first.
 
-When the io.cost.qos file is written by two cpu concurrently, rq_qos may
-be added to one disk twice. In that case, there will be two iocs enabled
-and running on one disk. They own different iocgs on their active list.
-In the ioc_timer_fn function, because of the iocgs from two ioc have the
-same root iocg, the root iocg's walk_list may be overwritten by each
-other and this lead to list add/del corrutions in building or destorying
-the inner_walk list.
+2) The stop work calls del_gendisk() and it is blocked because there are
+   pending blk-mq requests(maybe handling in ublksrv target).
 
-And so far, the blk-rq-qos framework works in case that one instance for
-one type rq_qos per queue by default. This patch make this explicit and
-also fix the crash above.
+3) Meanwhile, the monitor work aborts all pending blk-mq IOs
+   (with UBLK_IO_FLAG_ACTIVE unset) by blk_mq_end_request(req, BLK_STS_IOERR).
 
-Signed-off-by: hanjinke <hanjinke.666@bytedance.com>
----
- block/blk-iocost.c    |  7 ++++++-
- block/blk-iolatency.c |  6 +++++-
- block/blk-ioprio.c    |  5 +++++
- block/blk-rq-qos.h    | 11 ++++++++++-
- block/blk-wbt.c       |  8 +++++++-
- 5 files changed, 33 insertions(+), 4 deletions(-)
+4) After all pending blk-mq reqs are aborted,
+   del_gendisk() in stop work returns and /dev/ublkbX is removed.
+   No more blk-mq reqs.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 33a11ba971ea..2c41edc3fd70 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2886,7 +2886,12 @@ static int blk_iocost_init(struct request_queue *q)
- 	 * called before policy activation completion, can't assume that the
- 	 * target bio has an iocg associated and need to test for NULL iocg.
- 	 */
--	rq_qos_add(q, rqos);
-+	ret = rq_qos_add(q, rqos);
-+	if (ret) {
-+		free_percpu(ioc->pcpu_stat);
-+		kfree(ioc);
-+		return ret;
-+	}
- 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
- 	if (ret) {
- 		rq_qos_del(q, rqos);
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 9568bf8dfe82..9a572439f326 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -773,7 +773,11 @@ int blk_iolatency_init(struct request_queue *q)
- 	rqos->ops = &blkcg_iolatency_ops;
- 	rqos->q = q;
- 
--	rq_qos_add(q, rqos);
-+	ret = rq_qos_add(q, rqos);
-+	if (ret) {
-+		kfree(blkiolat);
-+		return ret;
-+	}
- 
- 	ret = blkcg_activate_policy(q, &blkcg_policy_iolatency);
- 	if (ret) {
-diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-index 79e797f5d194..931bffdf0cab 100644
---- a/block/blk-ioprio.c
-+++ b/block/blk-ioprio.c
-@@ -251,6 +251,11 @@ int blk_ioprio_init(struct request_queue *q)
- 	 * rq-qos callbacks.
- 	 */
- 	rq_qos_add(q, rqos);
-+	if (ret) {
-+		blkcg_deactivate_policy(q, &ioprio_policy);
-+		kfree(blkioprio_blkg);
-+		return ret;
-+	}
- 
- 	return 0;
- }
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 0e46052b018a..bbc70cf21c9c 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -86,7 +86,7 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
- 	init_waitqueue_head(&rq_wait->wait);
- }
- 
--static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
-+static inline int rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
- {
- 	/*
- 	 * No IO can be in-flight when adding rqos, so freeze queue, which
-@@ -98,6 +98,8 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
- 	blk_mq_freeze_queue(q);
- 
- 	spin_lock_irq(&q->queue_lock);
-+	if (rq_qos_id(q, rqos->id))
-+		goto out;
- 	rqos->next = q->rq_qos;
- 	q->rq_qos = rqos;
- 	spin_unlock_irq(&q->queue_lock);
-@@ -109,6 +111,13 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
- 		blk_mq_debugfs_register_rqos(rqos);
- 		mutex_unlock(&q->debugfs_mutex);
- 	}
-+
-+	return 0;
-+out:
-+	spin_unlock_irq(&q->queue_lock);
-+	blk_mq_unfreeze_queue(q);
-+	return -EBUSY;
-+
- }
- 
- static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0c119be0e813..cc8f45929b31 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -820,6 +820,7 @@ int wbt_init(struct request_queue *q)
- {
- 	struct rq_wb *rwb;
- 	int i;
-+	int ret;
- 
- 	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
- 	if (!rwb)
-@@ -846,7 +847,12 @@ int wbt_init(struct request_queue *q)
- 	/*
- 	 * Assign rwb and add the stats callback.
- 	 */
--	rq_qos_add(q, &rwb->rqos);
-+	ret = rq_qos_add(q, &rwb->rqos);
-+	if (ret) {
-+		blk_stat_free_callback(rwb->cb);
-+		kfree(rwb);
-+		return ret;
-+	}
- 	blk_stat_add_callback(q, rwb->cb);
- 
- 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
--- 
-2.20.1
+5) In stop work, cancel all queued(with UBLK_IO_FLAG_ACTIVE set) ublk IOs
+   by io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0) and ublksrv won't
+   issue sqes again.
+
+
+Hope I am correct and all of these works looks good to me.
+Besides, the tests(generic/001, generic/002) run successfully for me.
+
+Regards,
+Ziyang Zhang
+
 
