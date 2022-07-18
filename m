@@ -2,152 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 075B3C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 07:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F81C43334
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 07:23:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233795AbiGRHTL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 03:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49812 "EHLO
+        id S233809AbiGRHXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 03:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233794AbiGRHTI (ORCPT
+        with ESMTP id S233288AbiGRHXK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 03:19:08 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4FF63DB;
-        Mon, 18 Jul 2022 00:19:05 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Mon, 18 Jul 2022 03:23:10 -0400
+X-Greylist: delayed 67 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 18 Jul 2022 00:23:08 PDT
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F06F13CFA
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 00:23:08 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-277-AgST6BwiNTG9NjgWcQgQBg-1; Mon, 18 Jul 2022 03:21:54 -0400
+X-MC-Unique: AgST6BwiNTG9NjgWcQgQBg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id F412E3476D;
-        Mon, 18 Jul 2022 07:19:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1658128744; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8Qlhf9RDC9+P1dUjKbkTpu9mABQtBPjpqZyVqgLnyPE=;
-        b=bVCwE72hyrM13oBWrYan81mxqVXGY7KwumU8R5Vj56EeudqyAyl/CT/R9r+KDKBGYTgY4r
-        JHwutUisJ11LN+ox5FbAPWm5lXK7wP5/bwE8huPyXf2tC0ynZBM1kg2w4slQH4clG2llqS
-        Z5TTMj0WimTkd3xEBD+h4X05AYGqyEU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1658128744;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8Qlhf9RDC9+P1dUjKbkTpu9mABQtBPjpqZyVqgLnyPE=;
-        b=L86h1sjjfZ8DEnZHp6DaVc7DBXIO8ptp3G51nG5wZCt1SruSptIxAQ1DDAQAMPvXIKDt+G
-        T5aDDmOxKvib+sCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E256013A37;
-        Mon, 18 Jul 2022 07:19:03 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id RDiTNmcJ1WK8bgAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 18 Jul 2022 07:19:03 +0000
-Message-ID: <dc52a1b9-f007-e42b-0ef0-0de2387aa2f5@suse.de>
-Date:   Mon, 18 Jul 2022 09:19:03 +0200
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F8D7811E80;
+        Mon, 18 Jul 2022 07:21:53 +0000 (UTC)
+Received: from dreadlord.bne.redhat.com (fdacunha.bne.redhat.com [10.64.0.157])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 69304141511A;
+        Mon, 18 Jul 2022 07:21:49 +0000 (UTC)
+From:   Dave Airlie <airlied@gmail.com>
+To:     torvalds@linux-foundation.org, Jonathan Corbet <corbet@lwn.net>,
+        linux-doc@vger.kernel.org, gregkh@linuxfoundation.org,
+        Daniel Vetter <daniel@ffwll.ch>, mcgrof@kernel.org
+Cc:     linux-kernel@vger.kernel.org, dri-devel@lists.sf.net,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        alsa-devel@alsa-project.org, linux-media@vger.kernel.org,
+        linux-block@vger.kernel.org, Dave Airlie <airlied@redhat.com>
+Subject: [PATCH] docs: driver-api: firmware: add driver firmware guidelines.
+Date:   Mon, 18 Jul 2022 17:21:44 +1000
+Message-Id: <20220718072144.2699487-1-airlied@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 10/10] md: simplify md_open
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Song Liu <song@kernel.org>
-Cc:     Logan Gunthorpe <logang@deltatee.com>, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20220718063410.338626-1-hch@lst.de>
- <20220718063410.338626-11-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220718063410.338626-11-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/18/22 08:34, Christoph Hellwig wrote:
-> Now that devices are on the all_mddevs list until the gendisk is freed,
-> there can't be any duplicates.  Remove the global list lookup and just
-> grab a reference.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/md/md.c | 42 +++++++++++++++---------------------------
->   1 file changed, 15 insertions(+), 27 deletions(-)
-> 
-> diff --git a/drivers/md/md.c b/drivers/md/md.c
-> index 08cf21ad4c2d7..9b1e61b4bac8b 100644
-> --- a/drivers/md/md.c
-> +++ b/drivers/md/md.c
-> @@ -7785,45 +7785,33 @@ static int md_set_read_only(struct block_device *bdev, bool ro)
->   
->   static int md_open(struct block_device *bdev, fmode_t mode)
->   {
-> -	/*
-> -	 * Succeed if we can lock the mddev, which confirms that
-> -	 * it isn't being stopped right now.
-> -	 */
-> -	struct mddev *mddev = mddev_find(bdev->bd_dev);
-> +	struct mddev *mddev;
->   	int err;
->   
-> +	spin_lock(&all_mddevs_lock);
-> +	mddev = mddev_get(bdev->bd_disk->private_data);
-> +	spin_unlock(&all_mddevs_lock);
->   	if (!mddev)
->   		return -ENODEV;
->   
-> -	if (mddev->gendisk != bdev->bd_disk) {
-> -		/* we are racing with mddev_put which is discarding this
-> -		 * bd_disk.
-> -		 */
-> -		mddev_put(mddev);
-> -		/* Wait until bdev->bd_disk is definitely gone */
-> -		if (work_pending(&mddev->del_work))
-> -			flush_workqueue(md_misc_wq);
-> -		return -EBUSY;
-> -	}
-> -	BUG_ON(mddev != bdev->bd_disk->private_data);
-> -
-> -	if ((err = mutex_lock_interruptible(&mddev->open_mutex)))
-> +	err = mutex_lock_interruptible(&mddev->open_mutex);
-> +	if (err)
->   		goto out;
->   
-> -	if (test_bit(MD_CLOSING, &mddev->flags)) {
-> -		mutex_unlock(&mddev->open_mutex);
-> -		err = -ENODEV;
-> -		goto out;
-> -	}
-> +	err = -ENODEV;
-> +	if (test_bit(MD_CLOSING, &mddev->flags))
-> +		goto out_unlock;
->   
-> -	err = 0;
->   	atomic_inc(&mddev->openers);
->   	mutex_unlock(&mddev->open_mutex);
->   
->   	bdev_check_media_change(bdev);
-> - out:
-> -	if (err)
-> -		mddev_put(mddev);
-> +	return 0;
-> +
-> +out_unlock:
-> +	mutex_unlock(&mddev->open_mutex);
-> +out:
-> +	mddev_put(mddev);
->   	return err;
->   }
->   
+From: Dave Airlie <airlied@redhat.com>
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+A recent snafu where Intel ignored upstream feedback on a firmware
+change, led to a late rc6 fix being required. In order to avoid this
+in the future we should document some expectations around
+linux-firmware.
 
-Cheers,
+I was originally going to write this for drm, but it seems quite generic
+advice.
 
-Hannes
+I'm cc'ing this quite widely to reach subsystems which use fw a lot.
+
+Signed-off-by: Dave Airlie <airlied@redhat.com>
+---
+ Documentation/driver-api/firmware/core.rst    |  1 +
+ .../firmware/firmware-usage-guidelines.rst    | 34 +++++++++++++++++++
+ 2 files changed, 35 insertions(+)
+ create mode 100644 Documentation/driver-api/firmware/firmware-usage-guidelines.rst
+
+diff --git a/Documentation/driver-api/firmware/core.rst b/Documentation/driver-api/firmware/core.rst
+index 1d1688cbc078..803cd574bbd7 100644
+--- a/Documentation/driver-api/firmware/core.rst
++++ b/Documentation/driver-api/firmware/core.rst
+@@ -13,4 +13,5 @@ documents these features.
+    direct-fs-lookup
+    fallback-mechanisms
+    lookup-order
++   firmware-usage-guidelines
+ 
+diff --git a/Documentation/driver-api/firmware/firmware-usage-guidelines.rst b/Documentation/driver-api/firmware/firmware-usage-guidelines.rst
+new file mode 100644
+index 000000000000..34d2412e78c6
+--- /dev/null
++++ b/Documentation/driver-api/firmware/firmware-usage-guidelines.rst
+@@ -0,0 +1,34 @@
++===================
++Firmware Guidelines
++===================
++
++Drivers that use firmware from linux-firmware should attempt to follow
++the rules in this guide.
++
++* Firmware should be versioned with at least a major/minor version. It
++  is suggested that the firmware files in linux-firmware be named with
++  some device specific name, and just the major version. The
++  major/minor/patch versions should be stored in a header in the
++  firmware file for the driver to detect any non-ABI fixes/issues. The
++  firmware files in linux-firmware should be overwritten with the newest
++  compatible major version. Newer major version firmware should remain
++  compatible with all kernels that load that major number.
++
++* Users should *not* have to install newer firmware to use existing
++  hardware when they install a newer kernel.  If the hardware isn't
++  enabled by default or under development, this can be ignored, until
++  the first kernel release that enables that hardware.  This means no
++  major version bumps without the kernel retaining backwards
++  compatibility for the older major versions.  Minor version bumps
++  should not introduce new features that newer kernels depend on
++  non-optionally.
++
++* If a security fix needs lockstep firmware and kernel fixes in order to
++  be successful, then all supported major versions in the linux-firmware
++  repo should be updated with the security fix, and the kernel patches
++  should detect if the firmware is new enough to declare if the security
++  issue is fixed.  All communications around security fixes should point
++  at both the firmware and kernel fixes. If a security fix requires
++  deprecating old major versions, then this should only be done as a
++  last option, and be stated clearly in all communications.
++
+-- 
+2.36.1
 
