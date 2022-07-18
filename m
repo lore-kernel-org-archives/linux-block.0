@@ -2,134 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E511BC43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 12:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED39C43334
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 12:20:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234691AbiGRMKr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 08:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58086 "EHLO
+        id S234592AbiGRMUR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 08:20:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234628AbiGRMKq (ORCPT
+        with ESMTP id S234481AbiGRMUR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 08:10:46 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B221BF
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 05:10:43 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VJlvYMf_1658146240;
-Received: from 30.97.56.227(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VJlvYMf_1658146240)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Jul 2022 20:10:41 +0800
-Message-ID: <2234026d-5822-71e8-0923-c43a2b5fe077@linux.alibaba.com>
-Date:   Mon, 18 Jul 2022 20:10:40 +0800
+        Mon, 18 Jul 2022 08:20:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A28A12497F
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 05:20:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658146815;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dT8wclbe0dsDbFDo3wqco9LNIKkqsqCbo2sn9czCEwQ=;
+        b=et7znn4t8YseWHPc2+/Lh8AFnPHhTTci59syF69IYcHJoVoD+BS3lDC5CsjPFT+y9W22B6
+        rk1cGorBORqZHKHfECAYAu5TdSgeTm5Q2T+tuszZJCrC3Eq0cHow8Mz1fxhRRFL8ouzx8G
+        qTJAojJDqHp8ZteulcYyVrDK4BB6kno=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-52-YtucA-rdPumzn4GtpOW_xQ-1; Mon, 18 Jul 2022 08:20:08 -0400
+X-MC-Unique: YtucA-rdPumzn4GtpOW_xQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20B9F2919EB7;
+        Mon, 18 Jul 2022 12:20:08 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 191482166B26;
+        Mon, 18 Jul 2022 12:20:03 +0000 (UTC)
+Date:   Mon, 18 Jul 2022 20:19:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH 1/3] ublk_drv: fix an IS_ERR() vs NULL check
+Message-ID: <YtVP7qLG6Cgx+xCN@T590>
+References: <YtVAgedTsQVK1oTM@kili>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.11.0
-Subject: Re: [PATCH] ublk_drv: fix build warning with -Wmaybe-uninitialized
- and one sparse warning
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-References: <20220716095344.222674-1-ming.lei@redhat.com>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20220716095344.222674-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtVAgedTsQVK1oTM@kili>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/7/16 17:53, Ming Lei wrote:
-> After applying -Wmaybe-uninitialized manually, two build warnings are
-> triggered:
+On Mon, Jul 18, 2022 at 02:14:09PM +0300, Dan Carpenter wrote:
+> The blk_mq_alloc_disk_for_queue() doesn't return error pointers, it
+> returns NULL on error.
 > 
-> drivers/block/ublk_drv.c:940:11: warning: ‘io’ may be used uninitialized [-Wmaybe-uninitialized]
->   940 |         io->flags &= ~UBLK_IO_FLAG_ACTIVE;
-> 
-> drivers/block/ublk_drv.c: In function ‘ublk_ctrl_uring_cmd’:
-> drivers/block/ublk_drv.c:1531:9: warning: ‘ret’ may be used uninitialized [-Wmaybe-uninitialized]
-> 
-> Fix the 1st one by removing 'io->flags &= ~UBLK_IO_FLAG_ACTIVE;' which
-> isn't needed since the function always return successfully after setting
-> this flag.
-> 
-> Fix the 2nd one by always initializing 'ret'.
-> 
-> Also fix another sparse warning of 'sparse: sparse: incorrect type in return
-> expression' by changing return type of ublk_setup_iod().
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Fixes: cebbe577cb17 ("ublk_drv: fix request queue leak")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
->  drivers/block/ublk_drv.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>  drivers/block/ublk_drv.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
 > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index f10c4319dc1f..2c1b01d7f27d 100644
+> index 52fd0af8a4f2..97725d13e4bd 100644
 > --- a/drivers/block/ublk_drv.c
 > +++ b/drivers/block/ublk_drv.c
-> @@ -407,7 +407,7 @@ static inline unsigned int ublk_req_build_flags(struct request *req)
->  	return flags;
->  }
+> @@ -1175,8 +1175,8 @@ static int ublk_add_dev(struct ublk_device *ub)
 >  
-> -static int ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
-> +static blk_status_t ublk_setup_iod(struct ublk_queue *ubq, struct request *req)
->  {
->  	struct ublksrv_io_desc *iod = ublk_get_iod(ubq, req->tag);
->  	struct ublk_io *io = &ubq->ios[req->tag];
-> @@ -937,7 +937,6 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
->  	return -EIOCBQUEUED;
->  
->   out:
-> -	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
->  	io_uring_cmd_done(cmd, ret, 0);
+>  	disk = ub->ub_disk = blk_mq_alloc_disk_for_queue(ub->ub_queue,
+>  						 &ublk_bio_compl_lkclass);
+> -	if (IS_ERR(disk)) {
+> -		err = PTR_ERR(disk);
+> +	if (!disk) {
+> +		err = -ENOMEM;
+>  		goto out_free_request_queue;
+>  	}
 
-Hi Ming,
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Actually I found one potential bug BEFORE this commit.
 
-In ublk_ch_uring_cmd(), there is a check:
+Thanks,
+Ming
 
-	/* there is pending io cmd, something must be wrong */
-	if (io->flags & UBLK_IO_FLAG_ACTIVE) {
-		ret = -EBUSY;
-		goto out;
-	}
-
-Now assume that:
-
- (1) We get a second(duplicate) ublk cmd(such as UBLK_IO_COMMIT_AND_FETCH_REQ)
-     on the same tag and queue from a malicious app,
-     the check fails as expected because UBLK_IO_FLAG_ACTIVE has been set 
-     and ublk_io is queued. 
-
- (2) We goto label "out" and execute: 
-        io->flags &= ~UBLK_IO_FLAG_ACTIVE
-           -->  "io_uring_cmd_done(cmd, ret, 0)(ret is -EBUSY)
-
- (2) Then, if the malicious app issues a third ublk cmd(the same cmd_op) on the same
-     tag and queue, the check passes because UBLK_IO_FLAG_ACTIVE is unset
-     (it should fail since it is a duplicate cmd)
-
-In this commit you do fix it by removing "io->flags &= ~UBLK_IO_FLAG_ACTIVE"
-in "out" routine for another reason.(‘io’ may be used uninitialized)
-
-However I have just found a side effect(maybe fix a potential bug) and share it here. :)
-
->  	pr_devel("%s: complete: cmd op %d, tag %d ret %x io_flags %x\n",
->  			__func__, cmd_op, tag, ret, io->flags);
-> @@ -1299,13 +1298,12 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
->  	struct ublk_device *ub;
->  	unsigned long queue;
->  	unsigned int retlen;
-> -	int ret;
-> +	int ret = -EINVAL;
->  
->  	ub = ublk_get_device_from_id(header->dev_id);
->  	if (!ub)
->  		goto out;
->  
-> -	ret = -EINVAL;
->  	queue = header->data[0];
->  	if (queue >= ub->dev_info.nr_hw_queues)
->  		goto out;
