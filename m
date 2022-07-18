@@ -2,68 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EE7C43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 12:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D82FC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 13:07:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234822AbiGRMv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 08:51:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42606 "EHLO
+        id S235304AbiGRNHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 09:07:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234600AbiGRMv4 (ORCPT
+        with ESMTP id S235313AbiGRNHa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 08:51:56 -0400
-Received: from smtpbg.qq.com (biz-43-154-54-12.mail.qq.com [43.154.54.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4B620F58;
-        Mon, 18 Jul 2022 05:51:51 -0700 (PDT)
-X-QQ-mid: bizesmtp78t1658148705tr6iccbm
-Received: from localhost.localdomain ( [171.223.96.21])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Mon, 18 Jul 2022 20:51:43 +0800 (CST)
-X-QQ-SSF: 01000000002000E0U000C00A0000020
-X-QQ-FEAT: nUI8eyKROnHXnaQZjotUY3P+hV3DbtNiGzLUyrpyWQ7xU3b8dZirKfj/pzN4z
-        cXdK+DFE3HsP0Nb1eInZT0cZCorKrPagagVpyJveqOfBT1xwD99axMU4C1xtC+p7O5M5Vxr
-        cBK+M4ucfaNDdAddmWeFH7TRrqBA1Bl85SkSOTJ1Xtt+9WS468yq8Zrb82bJg3GMdD+aStu
-        kVpH87ZqtSRPFWq+TuRHEXoxAGbdg99R6gB+df0JbckfYvlYLz/F+XxX/+z4vZfxDF/+BQ/
-        Bf6880i5sfIKGIV+Nbv3UE9oIoKIxqU7QYKHzj6iiIQ9MXGDJYuxUyG5Bq+7MZfqCD8xcL/
-        5EAfxLWqEIOYHsvXtNNqrstDey55IG/z/T4oHF2RQ/LdAxRN0gu6DNU+3+4wLOorBJ/Hxn1
-        CQftNojluYE=
-X-QQ-GoodBg: 0
-From:   Jason Wang <wangborong@cdjrlc.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jason Wang <wangborong@cdjrlc.com>
-Subject: [PATCH] block: Fix comment typo
-Date:   Fri, 15 Jul 2022 12:49:47 +0800
-Message-Id: <20220715044947.21260-1-wangborong@cdjrlc.com>
-X-Mailer: git-send-email 2.35.1
+        Mon, 18 Jul 2022 09:07:30 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8767222BFC
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 06:07:29 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 44AE468AA6; Mon, 18 Jul 2022 15:07:26 +0200 (CEST)
+Date:   Mon, 18 Jul 2022 15:07:25 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] block: call blk_mq_exit_queue from disk_release
+ for never added disks
+Message-ID: <20220718130725.GA19204@lst.de>
+References: <20220718062928.335399-1-hch@lst.de> <YtUJXGhFBw5yrf7N@T590>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtUJXGhFBw5yrf7N@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The double `can' is duplicated in line 570, remove one.
+On Mon, Jul 18, 2022 at 03:18:52PM +0800, Ming Lei wrote:
+> Request queue is allocated successfully, but disk allocation may fail,
+> so blk_mq_exit_queue still may be missed in this case.
 
-Signed-off-by: Jason Wang <wangborong@cdjrlc.com>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes.  That's a separate issue, though and solved by this one liner:
 
-diff --git a/block/bio.c b/block/bio.c
-index 06abd495c6ea..6cc1271a9f98 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -567,7 +567,7 @@ EXPORT_SYMBOL(bio_alloc_bioset);
-  * be reused by calling bio_uninit() before calling bio_init() again.
-  *
-  * Note that unlike bio_alloc() or bio_alloc_bioset() allocations from this
-- * function are not backed by a mempool can can fail.  Do not use this function
-+ * function are not backed by a mempool can fail.  Do not use this function
-  * for allocations in the file system I/O path.
-  *
-  * Returns: Pointer to new bio on success, NULL on failure.
--- 
-2.35.1
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d716b7f3763f3..70177ee74295b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3960,7 +3960,7 @@ struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set, void *queuedata,
+ 
+ 	disk = __alloc_disk_node(q, set->numa_node, lkclass);
+ 	if (!disk) {
+-		blk_put_queue(q);
++		blk_mq_destroy_queue(q);
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 	set_bit(GD_OWNS_QUEUE, &disk->state);
