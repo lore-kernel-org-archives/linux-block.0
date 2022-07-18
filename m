@@ -2,116 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5310CCA479
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 16:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 013DDCCA482
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 17:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235644AbiGRQMi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 12:12:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47106 "EHLO
+        id S233740AbiGRRMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 13:12:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235627AbiGRQMd (ORCPT
+        with ESMTP id S233654AbiGRRMn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 12:12:33 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D652A73D;
-        Mon, 18 Jul 2022 09:12:33 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id z12-20020a056830128c00b0061c8168d3faso7764737otp.7;
-        Mon, 18 Jul 2022 09:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E97tihP8HnbI/adEmvxCjiADzk+ycuYUVPz4eAZufX8=;
-        b=lOi8HISE/WBi5tBpHSDKX3uf5I0ag7Z1hcOUqSfQsB8WgpjH3j8/f/QZYOmeGQkOhA
-         lwozyxjT0ude+8GMBFlz/OfdEJ0fgqyxhc5hXKGWnU974ZRj8J3gJyIn088PRUPPMeli
-         7u63BA9EauP4odKcKxI+kNwvnSIPUFZ6ojJlctIrDF5ENk9li+0VgBVZiFLBPInvIF4l
-         mHbO0g96xEk1O69Jnuguv9jPFqcgl0VAJKMa+LmsLgfNCl2vh04RnUvC7SYd0Yoo46ff
-         e95p9xsn6okMoIFy90b/PqkGyFsBOzYOtX+4dc77F+bA1hApG4OKsN86g7prXbyYJ8SI
-         TpOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E97tihP8HnbI/adEmvxCjiADzk+ycuYUVPz4eAZufX8=;
-        b=RXW7Iz8A7oncaSuUdwMnvrHYQtvwg/QppaLcui+8h+yQE0azv3cjNNIvLtrwNQWQ2r
-         Li2tKasRY9fZClAc48SFo8vTDpH1JfwdIJtEX0Ja510u35HLwx30e4zUe8zpl5mSKNVj
-         DhpC6LK5D5bKa7g/ncTJUlDPRa6EjsqBgSRs/82G+CIdWoq3Vr5B7jy9+HJ073ejrYG2
-         OI1N6dvCpvelcjDIwDLP+3if2SbfrBgwzjpnUQM1NUFasQ4+lmceVnoPSU0EEloNIg8x
-         9UWg6d1/UP8yksqRoHqribdohu9l6lqcv4wjgH5Y7ZNbS4HxiL6xG9dvOLhPRlcBLfrg
-         9cKw==
-X-Gm-Message-State: AJIora93pTf8LDkyAw4r18lmsOUefOiRTZa5gEg989K8OCaGfMKuBEZ7
-        +flQaA2kJ4cCbsQZMNVFB/bl7I/z4MBmh9BTznE=
-X-Google-Smtp-Source: AGRyM1u8zj1bV71F06iwCAEO/iNocAMe7lhHQUtETzV61a63N8I6/58X5nFZOsMn33gIduBYquoztm6MVS22Txbp7qE=
-X-Received: by 2002:a9d:7855:0:b0:61c:814f:a7e9 with SMTP id
- c21-20020a9d7855000000b0061c814fa7e9mr7458227otm.315.1658160752397; Mon, 18
- Jul 2022 09:12:32 -0700 (PDT)
+        Mon, 18 Jul 2022 13:12:43 -0400
+Received: from sonic308-15.consmr.mail.ne1.yahoo.com (sonic308-15.consmr.mail.ne1.yahoo.com [66.163.187.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D212B26D
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 10:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1658164361; bh=xppzB0kxv5KtG37fv45GQbugTJkA94hzrsgf767sUGA=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=Lj7anAlzLC03KVoF9tysKYMSjLdn8ebskxCp6rv7uu6uNGN5ojdsPMkUNcngoPAgCt1g+2Z99Gk46clWMLCfSTbDc00jqApzYzNEo7lXFFjg2fq+XPLXXQhThFeiokuFjYhu1/wD74hfPSbTyOxAUYPmOc4lIdxuMZiqHnAtmTUF0QFxMuEXJ8KOa2JYw2bcSjvQxUzmajqYOETe2Vc6excA+2YSDDlIjs8ZlhTzCvXYZE0plYQl141MYbGxMda07S6mtYK68nXwjlpV1Ve6PfSLMobCbvYq4xK5EKmO++QrYnZqghN/MfqOyMYmEJ61AgzVtk6vpe3n4wQubx07jw==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1658164361; bh=OfkCiPtmqP8Tk1RPckeS4qJX6EAdj9LC41Pg7PIeLe6=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=L00MNOtyUOMjbQ19v6sASagzA2jv+Qf1QoLde9jFOXMohbQZjg0J9QRtpOYbZ/diVCGlxO3B1S+iwHXxXUQtVbwxfI7KntwRIw9frHsS/1MXEcrTvronAbKyLEwwOEoxa9tIU2WPm+bAMDUAxNfIiKm8+0Y0hB0zut5KlqJAjxngs+6sXbJRGNgDaB8KOQAN5el9a0f2/evMh7kI1QX+PUbt8q47Z8EQBJqAFwF+Exfv1QEiVSHIKWXI/btt/fmDPpbAJ0ZK2lbOXmTDBk270ZJZQCnDi8/8nx2KI8JpfURGCuM2UTQvExPgWb/GPSxKcdnGsLV1fhMBqhYUamfSmQ==
+X-YMail-OSG: mIh5kRUVM1nxarMNoEbeBYqruHczFLbuKIy2dGsbvxHswfKSHBhiae.Q9NMAcCI
+ Url2YXb7M25ckR57PrAuQh_dkxF1LhrrPVM38gi4g6ASMVYs6VfjhuqlJ6JrR1Z6cYS_rmSvgAYL
+ M9qX2BzLsM8g4.2Us9o10jiUnuPnVVVrovIzeYp4rGMWRIqF3PGY2fRjxhxFjU24RA0A9Npf_.Wj
+ GxqcZLf3RwrVcCfr9f30RVHlD2iYNwlFb6sEjrCvMoBM2xt3zEGfbJawVANpfoivT97_0.gmFHny
+ 8PTGpHDBMc4YJNuclYAp6IPAthYJWZhBDD7_i.L5ssqNGGlxX8VspBhtYQ7vougufOo.IAMmKjtT
+ 3cOQo_.SdD7YUu5flQ1bfJkX695D7OJlacXmYqcXkjoG_d2VR1xjbuvUWpSmiMf3l4MvzJQCFxyZ
+ 15efGnJT9ewIjHfGAJ8odaBAsOSMheltBBUquBlB3p2s41FXBwitfwwVex0QiWZig8hoRW.ITonh
+ OFGNxmxvgXTj7tl_HKk3pinX.8p454jp0xXCb.Jyuf2whJcdnSXnOfLzhXFEoU7EB1zjNP3x1zXW
+ ZJB.sRDE6Fm7lIFKtu.YygJP8Py_AWUTaFzk28FdtVEwfREJtUvYMZnhQSl97HCML6toSVzl92V.
+ 8hJbxEia4A_SThFLKEBf8RJ_Zc4m5KNK6wWTf4xPuz__MMP7FwlYSP6I7W_SnMq8fbKzYdPT_un.
+ M_MvyJ.bO6DIzmpYH_Nt2HJwSwo_t6Z_nRM52vwerjyg8xfo.xXjfqjQ2Txe2KpQuKV.ccJEqCQu
+ h1oriLmH3h3JQUGnekdnAbZtsQo_dr9nQe2cboloaHp9gWft4t1k9UtcXbBNA1LOEvc5OBU1i1Os
+ e3T3dDSuCFsRkM5kSVcTSbxZgkv9J93cdjOZ6y19Y0_N80I6y9ncmmqF72xUChfLxDT7naEAyoZ_
+ 6Ph3GldXnNUQhQuattpRrxClna.P8tSq.AM0or9GKprjlF9kLkGYh9j984SyiozjtarfZ2KjiPs0
+ e1tc4bjXwXBT8MyY.A3JKLou6zbUcGiGIrSR_5phFhcLYpuRGfzaEn.pG7icsN8tv4rZGcrHM7tD
+ cBLDovtOi1iHvkEByfwpQa_RGmYFHCzxXWdIwOT9yY6bIGC0c.alXlIgs92fLn6D1uZzanznFb5_
+ P42NF5bkSz_vORVeZ7_mzb1tOvXe5YJWGoSjTOeKaDjihcmupTdzIdkFRLsD14.G_qi3YaBQ_Uev
+ vjMT78Bx_AT9SScWRsSodOQaQsV1COapBOQsw3Aiat2.KA.kpwuwqLxGLfDc.t7c_tkymWuExr3a
+ Y78R96hjONPSL.cV9d3MIvmN_RCnaih0qK17SsiDvaqfIXCTdszwfqOO3fyfehnyLJcP1fZcoMCX
+ SweaW9JSrZT4k0m8Jiy9Hn6QPSiOYl8B9pnKqdpoEPZaK_u6nr9bqN9kct0ekQCn1rrZXJoOlg56
+ E24qNVQ7o1V4iJuQdFnhIhHqPCA4QmLcG6yOi1vtp8QZcTdip9ruJK0.XH80QDeLAfhFpkr2wN0B
+ X8A0SJC15RdqgSQ4CrayiilI6QMsRMNFp_cBQu3r03bw7T5goiTcvVCz.9PSjo768szPref2spCi
+ xnWAfxEKgpNZrHwLuieymvISp5bvxTQeDIXKqNKAF3Z7nxh9UH1KIdpyMOODPOu_x_DNbfYPNr45
+ gkmTwJoYl9GOhHBuEE0d1cJnouMxrqWqjSa_4BAucHJXrMjCB_xBxvAsAJOqCcydfejbLgr6F8g6
+ nY2ACVhXNYdB6DTZK5k9BmuAUj56gqi8pX_aLTcTCtvC6V9zYVPZ8VWe0uzEWbLPDEwM2Ujn1b.h
+ _izhZQKObUnVB5PwtX.Rp0DQ9EElHh_8UmpCDI6FuzaLnKdfy5g0_wAIfmi7H3yp6Mr5XFpWa_Gv
+ IBbYGERhnsMSxtYIEhyG8aaaakHbhKfxjonTsFJYq0r4JHxWv1xK0YV601Hx0qFAFpVTJKuYYeAl
+ OVPMXFXYrRYKTzEObAHSCnrMJSaDNixLJQxj97PRBw8O8dsqaOuDeeTfcvsoT_UoG.ig9zJrDJCR
+ FYwzDo2ruK9NbyHs7JdU0NooIrK95qg2oomEn4svaFSvgFSyLjToDSoYzlRlv2eq9YziZ078.zIH
+ 0J9219aF8l9qAGuZSQwEfVat02Lz47YNM4WyBcU2yGmb0m.ZXnJwUcGN3KlHV.CRHr1QbQYhu7Zs
+ JHuYPnt.t1YkXiRKa5M4jOaseIFl7wR.7CfcMb10nBvD8m824G8TKpP0fih9uaNo2xPSHdPERXtJ
+ 3tqFqLCO0l3edNZIa9w--
+X-Sonic-MF: <casey@schaufler-ca.com>
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ne1.yahoo.com with HTTP; Mon, 18 Jul 2022 17:12:41 +0000
+Received: by hermes--production-gq1-56bb98dbc7-fxknz (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 4dcb57f26f3bd08333e217284802ba60;
+          Mon, 18 Jul 2022 17:12:37 +0000 (UTC)
+Message-ID: <e139a585-ece7-7813-7c90-9ffc3a924a87@schaufler-ca.com>
+Date:   Mon, 18 Jul 2022 10:12:35 -0700
 MIME-Version: 1.0
-References: <20220715225108.193398-1-sj@kernel.org>
-In-Reply-To: <20220715225108.193398-1-sj@kernel.org>
-From:   Andrii Chepurnyi <andrii.chepurnyi82@gmail.com>
-Date:   Mon, 18 Jul 2022 19:12:21 +0300
-Message-ID: <CAJwUmVDFPV-cunSVQyLQ2Lk2_pXiAnW+cGSGFQBUaBcq=PxpBQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] xen-blk{back,front}: Fix two bugs in 'feature_persistent'
-To:     SeongJae Park <sj@kernel.org>
-Cc:     roger.pau@citrix.com, axboe@kernel.dk, boris.ostrovsky@oracle.com,
-        jgross@suse.com, Oleksandr <olekstysh@gmail.com>, mheyne@amazon.de,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2] lsm,io_uring: add LSM hooks for the new uring_cmd file
+ op
+Content-Language: en-US
+To:     Paul Moore <paul@paul-moore.com>, Jens Axboe <axboe@kernel.dk>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     joshi.k@samsung.com, linux-security-module@vger.kernel.org,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, a.manzanares@samsung.com,
+        javier@javigon.com, casey@schaufler-ca.com
+References: <20220715191622.2310436-1-mcgrof@kernel.org>
+ <a56d191e-a3a3-76b9-6ca3-782803d2600c@kernel.dk>
+ <CAHC9VhRzm=1mh9bZKEdLSG0vet=amQDVpuZk+1shMuXYLV_qoQ@mail.gmail.com>
+ <CAHC9VhQm3CBUkVz2OHBmuRi1VDNxvfWs-tFT2UO9LKMbO7YJMg@mail.gmail.com>
+From:   Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <CAHC9VhQm3CBUkVz2OHBmuRi1VDNxvfWs-tFT2UO9LKMbO7YJMg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.20407 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello SeongJae,
+On 7/15/2022 8:33 PM, Paul Moore wrote:
+> On Fri, Jul 15, 2022 at 3:52 PM Paul Moore <paul@paul-moore.com> wrote:
+>> On Fri, Jul 15, 2022 at 3:28 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>> On 7/15/22 1:16 PM, Luis Chamberlain wrote:
+>>>> io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
+>>>> add infrastructure for uring-cmd"), this extended the struct
+>>>> file_operations to allow a new command which each subsystem can use
+>>>> to enable command passthrough. Add an LSM specific for the command
+>>>> passthrough which enables LSMs to inspect the command details.
+>>>>
+>>>> This was discussed long ago without no clear pointer for something
+>>>> conclusive, so this enables LSMs to at least reject this new file
+>>>> operation.
+>>> From an io_uring perspective, this looks fine to me. It may be easier if
+>>> I take this through my tree due to the moving of the files, or the
+>>> security side can do it but it'd have to then wait for merge window (and
+>>> post io_uring branch merge) to do so. Just let me know. If done outside
+>>> of my tree, feel free to add:
+> I forgot to add this earlier ... let's see how the timing goes, I
+> don't expect the LSM/Smack/SELinux bits to be ready and tested before
+> the merge window opens so I'm guessing this will not be an issue in
+> practice, but thanks for the heads-up.
 
-Thanks for the efforts.
-I've tested backend patches(1,2) on my custom 5.10 kernel (since I
-can't test on vanilla) and it works for me.
+I have a patch that may or may not be appropriate. I ran the
+liburing tests without (additional) failures, but it looks like
+there isn't anything there testing uring_cmd. Do you have a
+test tucked away somewhere I can use?
 
-Best regards,
-Andrii
+Thanks.
 
-
-On Sat, Jul 16, 2022 at 1:51 AM SeongJae Park <sj@kernel.org> wrote:
->
-> Introduction of 'feature_persistent' made two bugs.  First one is wrong
-> overwrite of 'vbd->feature_gnt_persistent' in 'blkback' due to wrong
-> parameter value caching position, and the second one is unintended
-> behavioral change that could break previous dynamic frontend/backend
-> persistent feature support changes.  This patchset fixes the issues.
->
-> Changes from v3
-> (https://lore.kernel.org/xen-devel/20220715175521.126649-1-sj@kernel.org/)
-> - Split 'blkback' patch for each of the two issues
-> - Add 'Reported-by: Andrii Chepurnyi <andrii.chepurnyi82@gmail.com>'
->
-> Changes from v2
-> (https://lore.kernel.org/xen-devel/20220714224410.51147-1-sj@kernel.org/)
-> - Keep the behavioral change of v1
-> - Update blkfront's counterpart to follow the changed behavior
-> - Update documents for the changed behavior
->
-> Changes from v1
-> (https://lore.kernel.org/xen-devel/20220106091013.126076-1-mheyne@amazon.de/)
-> - Avoid the behavioral change
->   (https://lore.kernel.org/xen-devel/20220121102309.27802-1-sj@kernel.org/)
-> - Rebase on latest xen/tip/linux-next
-> - Re-work by SeongJae Park <sj@kernel.org>
-> - Cc stable@
->
-> Maximilian Heyne (1):
->   xen-blkback: Apply 'feature_persistent' parameter when connect
->
-> SeongJae Park (2):
->   xen-blkback: fix persistent grants negotiation
->   xen-blkfront: Apply 'feature_persistent' parameter when connect
->
->  .../ABI/testing/sysfs-driver-xen-blkback      |  2 +-
->  .../ABI/testing/sysfs-driver-xen-blkfront     |  2 +-
->  drivers/block/xen-blkback/xenbus.c            | 20 ++++++++-----------
->  drivers/block/xen-blkfront.c                  |  4 +---
->  4 files changed, 11 insertions(+), 17 deletions(-)
->
-> --
-> 2.25.1
->
