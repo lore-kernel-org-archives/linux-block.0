@@ -2,113 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F4FC43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 16:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F4AC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 16:09:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234982AbiGRQG5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 12:06:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42582 "EHLO
+        id S233919AbiGRQJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 12:09:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234795AbiGRQG5 (ORCPT
+        with ESMTP id S234658AbiGRQJG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 12:06:57 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72115DE85;
-        Mon, 18 Jul 2022 09:06:56 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id x21so9430900plb.3;
-        Mon, 18 Jul 2022 09:06:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=a0s8px3/RXnurTCxUDxMO4W/3qNbuh+YY9hkSyPHlqw=;
-        b=LrBaIMF6COvViX5DtFglUTH0q1CuPSPG5iuEstXaYcgwfaru6AtDA1iIDWf2Ed6jjs
-         sykws9SDgJWVINwOukrPsnWIcp2jGlUYjCF2MmNXqqe+kXCpfv+JRLx+B87b7X0x7UQy
-         jUrTDEtmeiFDTqxzsYcoDBnupB2MZrQDe5ZlC6FfhupNfG++ulDdzeZ/fU2MFzOeCCeu
-         RR6EXfCkgWk7EWwMFuGm5W29eDKSC0auX0Mn1FnkwCKIyGCkJdanv7Fvdf1UNBipm0Q6
-         KgsvH3w5SilDwawg6wWZr0a/tVrUklhsmF5OslXn/yEJP52zKUHoy3JQM0zqwsrj2TSZ
-         z7vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=a0s8px3/RXnurTCxUDxMO4W/3qNbuh+YY9hkSyPHlqw=;
-        b=7w6WwhrcNDwhxyaBAKlYImrjJzW2enyCG0dVWHQvFxNDidQxXeXvEBWAA3n2k9T+T4
-         ikRDOYw97H/pIN/lg6uz3vJJM6YhM5SRWnQQqw8OSsjrNcU801CXAzh4Xi1uBnj6E74O
-         FGCRfuCVYt8iRSX2zSOSsKZPSe1ooUq6dVu3OZSz+bvJ528xFPbCTGHbPh/6DaAF2hDI
-         PUgRsNkxygx07s9KaUnBb7xE1coVe8ZwhUhrfi2BF3k8HM3o5GmAYJMf2lapLm1++TQy
-         nH4TSMsBtNGhD4PCS+8AilZZ4Zo972ZZxOGf28wLJyDHWCv5j7CZ97YpUJ4BBHbWh8we
-         EtIg==
-X-Gm-Message-State: AJIora/2psqWFHcfIbSZvUuXd9kF6wBLY2jSZHyFxrLEip0ts+/vjfiZ
-        5YtnqdBGjQzdpDHYM8YK3rg=
-X-Google-Smtp-Source: AGRyM1vjM1mQ5+vKx3O9hxJDeWTy0SvQrZcnBLb4icB9XZ48AAYMf1oaAxQJmCeoYUvW/wP692w/qA==
-X-Received: by 2002:a17:90b:4b49:b0:1ef:a03e:b671 with SMTP id mi9-20020a17090b4b4900b001efa03eb671mr38988994pjb.108.1658160415872;
-        Mon, 18 Jul 2022 09:06:55 -0700 (PDT)
-Received: from biggie ([103.230.148.189])
-        by smtp.gmail.com with ESMTPSA id g23-20020a631117000000b00412a708f38asm8219773pgl.35.2022.07.18.09.06.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jul 2022 09:06:55 -0700 (PDT)
-Date:   Mon, 18 Jul 2022 21:36:50 +0530
-From:   Gautam Menghani <gautammenghani201@gmail.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org
-Subject: Re: [RFC] block: Add a NULL check in blk_mq_free_rqs()
-Message-ID: <YtWFGsZIXx+KDl2G@biggie>
-References: <20220717102242.219424-1-gautammenghani201@gmail.com>
- <d4efe597-94b0-5878-fb54-1c6deb915659@acm.org>
+        Mon, 18 Jul 2022 12:09:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C65A128E3B
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 09:09:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658160544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LbfFJyGXhyiH+sON0cRK8sRP8rbAXaaOwN8jSvUzmjU=;
+        b=LuLyAp0X3i76fFqEkHJVMxVDdbvueRlUSyxYz/AFvtfHm+P/q7v1CUOQE4/AZRFxyNZ3rb
+        buJQk7w2U87bNCT5Qf7p7h7WT0RJDuOAfuY7XL83G/CryYGpAYGYh/tbZwjUOsWBzCTOdB
+        HE2jMSDCVEaaK4LYu3g7BACfPAKqNJc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-215-hofuAGtqOnm3Souywp578w-1; Mon, 18 Jul 2022 12:09:01 -0400
+X-MC-Unique: hofuAGtqOnm3Souywp578w-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 244B2801231;
+        Mon, 18 Jul 2022 16:09:01 +0000 (UTC)
+Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AC3CD401E7B;
+        Mon, 18 Jul 2022 16:08:59 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [for-5.20/block PATCH] mmc: fix disk/queue leak in case of adding disk failure
+Date:   Tue, 19 Jul 2022 00:08:51 +0800
+Message-Id: <20220718160851.312972-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4efe597-94b0-5878-fb54-1c6deb915659@acm.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 17, 2022 at 07:49:12AM -0700, Bart Van Assche wrote:
-> On 7/17/22 03:22, Gautam Menghani wrote:
-> > Syzbot reported a general protection fault in the function
-> > blk_mq_clear_rq_mapping() in the file block/blk-mq.c.
-> > The issue is that the variable drv_tags is NULL, and this
-> > originates from the struct blk_mq_tag_set. The dashboard link for this
-> > issue is :
-> > syzkaller.appspot.com/bug?id=c3ce4caa4fc58c156d4903984131cdfa38eee354
-> > 
-> > This patch fixes the above bug, but there is another syzbot bug which is
-> > related to this and getting triggered after the call to
-> > blk_mq_clear_rq_mapping(). As a result, I cannot determine if the issue
-> > is really solved. The link to other issue:
-> > syzkaller.appspot.com/bug?id=7643cea70f1d0ce15f5f4bc39488918837ad4233
-> > 
-> > Please provide feedback/suggestions on the same.
-> > 
-> > Signed-off-by: Gautam Menghani <gautammenghani201@gmail.com>
-> > ---
-> >   block/blk-mq.c | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 93d9d60980fb..c1dd1b78b95c 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -3092,7 +3092,8 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> >   		}
-> >   	}
-> > -	blk_mq_clear_rq_mapping(drv_tags, tags);
-> > +	if (drv_tags)
-> > +		blk_mq_clear_rq_mapping(drv_tags, tags);
-> >   	while (!list_empty(&tags->page_list)) {
-> >   		page = list_first_entry(&tags->page_list, struct page, lru);
-> 
-> I don't see how drv_tags could be NULL without triggering a race condition.
-> Please take a look at the nbd driver to see whether the root cause is
-> perhaps in that driver instead of in the block layer core.
+In case of adding disk failure, the disk needs to be released, otherwise
+disk/queue is leaked.
 
-Yes, this might very well be the case. Thank you for the feedback.
-> 
-> Thanks,
-> 
-> Bart.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/mmc/core/block.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
-Gautam
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index bda6c67ce93f..e08e22f0a7c5 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -2505,10 +2505,11 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+ 		dev_set_drvdata(&card->dev, md);
+ 	ret = device_add_disk(md->parent, md->disk, mmc_disk_attr_groups);
+ 	if (ret)
+-		goto err_cleanup_queue;
++		goto err_put_disk;
+ 	return md;
+ 
+- err_cleanup_queue:
++ err_put_disk:
++	put_disk(md->disk);
+ 	blk_mq_free_tag_set(&md->queue.tag_set);
+  err_kfree:
+ 	kfree(md);
+-- 
+2.31.1
+
