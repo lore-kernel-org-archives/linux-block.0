@@ -2,70 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE5BAC43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 01:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15502C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 04:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbiGRByi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Jul 2022 21:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47178 "EHLO
+        id S229801AbiGREO6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 00:14:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229801AbiGRByh (ORCPT
+        with ESMTP id S229535AbiGREO5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Jul 2022 21:54:37 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D579FCE10;
-        Sun, 17 Jul 2022 18:54:35 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R271e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=yang.lee@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VJb26jE_1658109272;
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0VJb26jE_1658109272)
-          by smtp.aliyun-inc.com;
-          Mon, 18 Jul 2022 09:54:33 +0800
-From:   Yang Li <yang.lee@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Li <yang.lee@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH -next] ublk_drv: remove unneeded semicolon
-Date:   Mon, 18 Jul 2022 09:54:31 +0800
-Message-Id: <20220718015431.40185-1-yang.lee@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        Mon, 18 Jul 2022 00:14:57 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5877765C1;
+        Sun, 17 Jul 2022 21:14:56 -0700 (PDT)
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LmT6M6lyFzVfrG;
+        Mon, 18 Jul 2022 12:11:07 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 18 Jul 2022 12:14:54 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 18 Jul
+ 2022 12:14:53 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     <axboe@kernel.dk>
+Subject: [PATCH -next] ublk_drv: fix missing error return code in ublk_add_dev()
+Date:   Mon, 18 Jul 2022 12:24:08 +0800
+Message-ID: <20220718042408.3132835-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Eliminate the following coccicheck warnings:
-./drivers/block/ublk_drv.c:1467:2-3: Unneeded semicolon
-./drivers/block/ublk_drv.c:1528:2-3: Unneeded semicolon
+If blk_mq_init_queue() fails, it should return error code in ublk_add_dev()
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+Fixes: cebbe577cb17 ("ublk_drv: fix request queue leak")
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
 ---
- drivers/block/ublk_drv.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/ublk_drv.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 52fd0af8a4f2..b005cb1354e4 100644
+index 52fd0af8a4f2..bea441782cb0 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -1464,7 +1464,7 @@ static int ublk_ctrl_cmd_validate(struct io_uring_cmd *cmd,
- 			return -EINVAL;
- 		if (!header->addr)
- 			return -EINVAL;
--	};
-+	}
+@@ -1169,8 +1169,10 @@ static int ublk_add_dev(struct ublk_device *ub)
+ 		goto out_deinit_queues;
  
- 	return 0;
- }
-@@ -1525,7 +1525,7 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		break;
- 	default:
- 		break;
--	};
+ 	ub->ub_queue = blk_mq_init_queue(&ub->tag_set);
+-	if (IS_ERR(ub->ub_queue))
++	if (IS_ERR(ub->ub_queue)) {
++		err = PTR_ERR(ub->ub_queue);
+ 		goto out_cleanup_tags;
 +	}
-  out:
- 	io_uring_cmd_done(cmd, ret, 0);
- 	pr_devel("%s: cmd done ret %d cmd_op %x, dev id %d qid %d\n",
+ 	ub->ub_queue->queuedata = ub;
+ 
+ 	disk = ub->ub_disk = blk_mq_alloc_disk_for_queue(ub->ub_queue,
 -- 
-2.20.1.7.g153144c
+2.25.1
 
