@@ -2,92 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD070C43334
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 13:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD61C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 13:52:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234449AbiGRNl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 09:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36112 "EHLO
+        id S235264AbiGRNwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 09:52:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234435AbiGRNlz (ORCPT
+        with ESMTP id S235487AbiGRNwg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 09:41:55 -0400
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF0E1DA42;
-        Mon, 18 Jul 2022 06:41:55 -0700 (PDT)
-Received: by mail-pg1-f180.google.com with SMTP id h132so10582900pgc.10;
-        Mon, 18 Jul 2022 06:41:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Rnjh/i5JdMf0J8B93u/CObaqJyaPuNqc0mMcjhYd/7c=;
-        b=UdUmwx8z6t1T5W1twXtmQ+4sWtICHFYFcqfdK1FC6W1nqsKt8g4tUW7B1gSh1Vk53F
-         vpnJ/VzDLFAVnggvC6dW+/EoNQ9fA5gDgr3Fr48RlZHhA0S+2nqkGU2UVdx/yfXN1Jbh
-         KcaxQa87EvtTTDbFasTW8irBZMXEDEH8/zpVj1wkHsQCL0JMf9NyEg5MNPkT1ojynFvT
-         QwrxVwYuZwZrRbjhTmeEtdR4JbrRO/k5DKdAI5mEPnXueyah4eW1QuO95Npi87kfcRLP
-         FKmf250XeZCBrPvTCM58aDjmToMquu87A4uLk7DtsaTpFfGayXXg0+3clq/8Ypco80/D
-         pz1w==
-X-Gm-Message-State: AJIora9+Db5AC36JWQEo2NIdBBzPY2AIGt4qRD4Hnx1f2s23eb0gd7ZS
-        0yu0so/p1oR1OMIc7dT3IvVaczG8jmg=
-X-Google-Smtp-Source: AGRyM1vaZgqSURLsI49S4CAXVaT+0OJ5kw/Xn9OoIvrsCVaaAcWfb25DQXgmenKH2fRDbtTR5uvA0w==
-X-Received: by 2002:a05:6a00:450d:b0:52b:84ca:9509 with SMTP id cw13-20020a056a00450d00b0052b84ca9509mr524383pfb.74.1658151714220;
-        Mon, 18 Jul 2022 06:41:54 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id w188-20020a6282c5000000b0052aee60e058sm9268784pfd.102.2022.07.18.06.41.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Jul 2022 06:41:53 -0700 (PDT)
-Message-ID: <5a245067-7adb-c482-3ea4-22beb81fa719@acm.org>
-Date:   Mon, 18 Jul 2022 06:41:52 -0700
+        Mon, 18 Jul 2022 09:52:36 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527F627FC6;
+        Mon, 18 Jul 2022 06:52:35 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Lmk011gYyzKHsC;
+        Mon, 18 Jul 2022 21:51:29 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgAXemmfZdVijUahAw--.40633S3;
+        Mon, 18 Jul 2022 21:52:32 +0800 (CST)
+Subject: Re: [PATCH] nbd: add missing definition of pr_fmt
+To:     Yu Kuai <yukuai1@huaweicloud.com>, josef@toxicpanda.com,
+        axboe@kernel.dk, houtao1@huawei.com
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+References: <20220706093320.1962871-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <853a5164-78cf-1ccb-8e18-cff5b5bce4ff@huaweicloud.com>
+Date:   Mon, 18 Jul 2022 21:52:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH -next] blktrace: Fix some kernel-doc comments
-Content-Language: en-US
-To:     Yang Li <yang.lee@linux.alibaba.com>, rostedt@goodmis.org
-Cc:     axboe@kernel.dk, mingo@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
-References: <20220718061755.114599-1-yang.lee@linux.alibaba.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220718061755.114599-1-yang.lee@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20220706093320.1962871-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgAXemmfZdVijUahAw--.40633S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7GrWDtrykuF4kJr43GFyrtFb_yoW3Kwb_C3
+        s7Zw4xXws3Wr92kr4jyF13ZryFyw4rXrnYqrnIgrZxXFy7ZayxA3Z2ya95Gr47Ga1vq3Z3
+        Aa1qvrsrC3WfXjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
+        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
+        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
+        U==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/17/22 23:17, Yang Li wrote:
-> Remove warnings found by running scripts/kernel-doc, which is caused by
-> using 'make W=1'.
-> kernel/trace/blktrace.c:1884: warning: Function parameter or member 'opf' not described in 'blk_fill_rwbs'
-> kernel/trace/blktrace.c:1884: warning: Excess function parameter 'op' description in 'blk_fill_rwbs'
+ÔÚ 2022/07/06 17:33, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> commit 1243172d5894 ("nbd: use pr_err to output error message") tries
+> to define pr_fmt and use short pr_err() to output error message,
+> however, the definition is missed.
+
+friendly ping ...
+> 
+> Fixes: 1243172d5894 ("nbd: use pr_err to output error message")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 > ---
->   kernel/trace/blktrace.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/block/nbd.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > 
-> diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-> index 150058f5daa9..5632b6159d88 100644
-> --- a/kernel/trace/blktrace.c
-> +++ b/kernel/trace/blktrace.c
-> @@ -1873,7 +1873,7 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
->   /**
->    * blk_fill_rwbs - Fill the buffer rwbs by mapping op to character string.
->    * @rwbs:	buffer to be filled
-> - * @op:		REQ_OP_XXX for the tracepoint
-> + * @opf:	a combination of a request operation and request flags
->    *
->    * Description:
->    *     Maps the REQ_OP_XXX to character and fills the buffer provided by the
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 07f3c139a3d7..94a1602adab5 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -44,6 +44,9 @@
+>   #include <linux/nbd-netlink.h>
+>   #include <net/genetlink.h>
+>   
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) "nbd: " fmt
+> +
+>   #define CREATE_TRACE_POINTS
+>   #include <trace/events/nbd.h>
+>   
+> 
 
-A patch similar to the above patch should already have been queued by 
-Jens Axboe. See also "[PATCH 0/2] Fix recently introduced kernel-doc 
-warnings" 
-(https://lore.kernel.org/all/165797480617.363028.4687340933765044343.b4-ty@kernel.dk/).
-
-Thanks,
-
-Bart.
