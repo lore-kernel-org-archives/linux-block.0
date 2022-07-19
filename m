@@ -2,89 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11622C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 18:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A324FC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 22:31:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233242AbiGSSou (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 14:44:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41454 "EHLO
+        id S239191AbiGSWbe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 18:31:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbiGSSou (ORCPT
+        with ESMTP id S232480AbiGSWbd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 14:44:50 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2CB5D0DA;
-        Tue, 19 Jul 2022 11:44:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=g4n3pn/BdiidAVlG8n7vW9SOKjeAQObM3+2LI6wCqWc=; b=LlysqE2TdB89G+TLfwT00mqfzD
-        2OpHtnNOFfryQhYFboKAvRYOx1TpReXdtvA6ultRLboH1tneT+1kKgyOWhbBihF1qQzi7XUt1rK+f
-        5MoojWrZSO4ZwBD7ia0UTjdMIVc34JDmRtXcPCJ2njWOd8boC9/Bwds2IKZupCipCVRjSYKYfqMen
-        Iyqu5MBY7H6pzY9vEO+UsK13679ENFBi5UlPci5j4DSFXRltBOxZoCsjXKWExuEVthFotA1OiJNEZ
-        3U+kdUhhHhMkhXLKQzSQM4mzhQ0URr2FavNwTIbr8FzaQj2WBv5CWkSQ2gLU779hMc1YlvwerdpUW
-        zO/E5r7g==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oDsD7-001XEL-RH; Tue, 19 Jul 2022 12:44:46 -0600
-Message-ID: <f601eb55-54cf-ff0f-8ec0-586ca4dbe38a@deltatee.com>
-Date:   Tue, 19 Jul 2022 12:44:45 -0600
+        Tue, 19 Jul 2022 18:31:33 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819F24F68F;
+        Tue, 19 Jul 2022 15:31:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BDD1EB81D9E;
+        Tue, 19 Jul 2022 22:31:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D2EFC341C6;
+        Tue, 19 Jul 2022 22:31:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658269889;
+        bh=xBsNiIMMI61ZsRhK57QPnpQXFAF/uUru2IBPm5xDOok=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=GbLLdxnBasZ3J/VmbW+T8dRYdw9CQMZkQYGqgazvzzSFoSto0ODn6h90z31OnWSgE
+         IYFjNcrZtInWYCrGCb4dupQxh4o93Vo9XI7Deoi4eVAzVjFX2eYR/D9FPaIT8IpXMY
+         WA5y4i0cyPtbyvQEv4cma09lCLZppj2WiWn7u9DM7csbuDCBxSWBt6ypmiU11VHU0A
+         l41argqGFJ1/+1oC/xX9HDvKLBFd12G5/TRW/9A/ZLwKTXezANSisqTJgFx/JLWxUu
+         0jEisI4+5ths/C8bOTQ4Kt8NrGWWr7qR9IMMDZ105T4slXJrWtw2jJGJrA8eYKPsOC
+         kHskSWaoqzN+g==
+Date:   Tue, 19 Jul 2022 17:31:27 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "mstowe@redhat.com" <mstowe@redhat.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Xiao Yang <yangx.jy@fujitsu.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: blktests failures with v5.19-rc1
+Message-ID: <20220719223127.GA1585747@bhelgaas>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-CA
-To:     Song Liu <song@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-raid <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org
-References: <20220719091824.1064989-1-hch@lst.de>
- <CAPhsuW7hYzg-o6a7rdLs4==fv+0hqFtEyUVS0XtPjOqLHYg3eg@mail.gmail.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <CAPhsuW7hYzg-o6a7rdLs4==fv+0hqFtEyUVS0XtPjOqLHYg3eg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: song@kernel.org, hch@lst.de, linux-raid@vger.kernel.org, linux-block@vger.kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: fix md disk_name lifetime problems v4
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220719045036.h273puvs3cibafix@shindev>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022-07-19 12:42, Song Liu wrote:
-> On Tue, Jul 19, 2022 at 2:18 AM Christoph Hellwig <hch@lst.de> wrote:
->>
->> Hi all,
->>
->> this series tries to fix a problem repored by Logan where we see
->> duplicate sysfs file name in md.  It is due to the fact that the
->> md driver only checks for duplicates on currently live mddevs,
->> while the sysfs name can live on longer.  It is an old problem,
->> but the race window got longer due to waiting for the device freeze
->> earlier in del_gendisk.
->>
->> Changes since v3:
->>  - remove a now superflous mddev->gendisk NULL check
->>  - use a bit in mddev->flags instead of a new field
->>
->> Changes since v2:
->>  - delay mddev->kobj initialization
->>
->> Changes since v1:
->>  - rebased to the md-next branch
->>  - fixed error handling in md_alloc for real
->>  - add a little cleanup patch
+On Tue, Jul 19, 2022 at 04:50:36AM +0000, Shinichiro Kawasaki wrote:
+> On Jun 15, 2022 / 17:16, Keith Busch wrote:
+> > On Wed, Jun 15, 2022 at 02:47:27PM -0500, Bjorn Helgaas wrote:
+> > > On Tue, Jun 14, 2022 at 04:00:45AM +0000, Shinichiro Kawasaki wrote:
+> > > > 
+> > > > Yeah, this WARN is confusing for us then it would be valuable to
+> > > > test by blktests not to repeat it. One point I wonder is: which test
+> > > > group the test case will it fall in? The nvme group could be the
+> > > > group to add, probably.
+> > > > 
+> > > > Another point I wonder is other kernel test suite than blktests.
+> > > > Don't we have more appropriate test suite to check PCI device
+> > > > rescan/remove race ? Such a test sounds more like a PCI bus
+> > > > sub-system test than block/storage test.
+> > > 
+> > > I'm not aware of such a test, but it would be nice to have one.
+> > > 
+> > > Can you share your qemu config so I can reproduce this locally?
+> > > 
+> > > Thanks for finding and reporting this!
+> > 
+> > This ought to be reproducible with any pci device that can be
+> > removed. Since we initially observed with nvme, you can try with
+> > such a device. A quick way to get one appearing in qemu is to add
+> > parameters:
+> > 
+> >         -drive id=n,if=none,file=null-co://,format=raw \
+> > 	-device nvme,serial=foobar,drive=n
 > 
-> Applied to md-next. Thanks!
+> Did you have chance to reproduce the WARN? Recently, it was reported
+> again [1] and getting attention.
 
-I've only just finished my testing on this and it all looks good to me.
+I have not paid any attention to this yet.  From what I can tell, the
+problem was discovered by a test case (i.e., not reported by a
+real-world user), it is not a recent regression, we haven't identified
+a commit that introduced the problem, and we do not have a potential
+fix for it.  Obviously it needs to be fixed and I'm not trying to
+minimize the problem; I just want to calibrate it against everything
+else.
 
-I've also reviewed the last 2 patches, for what it's worth.
-
-Logan
-
+> [1] https://lore.kernel.org/linux-block/4ed3028b-2d2f-8755-fec2-0b9cb5ad42d2@fujitsu.com/
+> 
+> -- 
+> Shin'ichiro Kawasaki
