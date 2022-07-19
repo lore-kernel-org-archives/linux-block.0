@@ -2,119 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5E0C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 07:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10268CCA481
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 07:59:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236980AbiGSHul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 03:50:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41098 "EHLO
+        id S233829AbiGSH7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 03:59:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232009AbiGSHuk (ORCPT
+        with ESMTP id S233690AbiGSH7M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 03:50:40 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C081E3E1
-        for <linux-block@vger.kernel.org>; Tue, 19 Jul 2022 00:50:39 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id g4so12802826pgc.1
-        for <linux-block@vger.kernel.org>; Tue, 19 Jul 2022 00:50:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:to:cc:references
-         :from:in-reply-to:content-transfer-encoding;
-        bh=PBjfaUdPj5evCqbgk7mF2+xOQYrjkKK5SCgiEZ6AFog=;
-        b=4lwX7lH7voEKXllRjuXXIWuahCwdYq00XCmdkwgwHW+uSezLtuOHvA8XUQvxDoInJo
-         1rmAKASBIbnytTQnjyuqU6+YQmfiHYm+FNy5r8SL6eqKkqOSjt8TdQ9HDs24ToNKISF7
-         NmzKbGCE574fdSkm8oq0ADc0E6cNKtmh8dMY4gSahs3KzV0JkdP+5mj9Ujy7g+eXqiRa
-         DTHm/ZV38rwMpVczuRD2ZMVyFTKBU+QTGiDi9ughNhOqUYWISMwj5zIFuHCHGtONvmfw
-         FBvWAuvhWsrWY2AGdlrf3FfN522CyVSidLNB5LAhdlvnuE1ikmd5g5h3ISqwRGAEopQC
-         5Xlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :to:cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=PBjfaUdPj5evCqbgk7mF2+xOQYrjkKK5SCgiEZ6AFog=;
-        b=mhXyNBtP7kY0KM5ADsr5pksbWqvv/WNFOuMGcJSs32qdAFwObHVLFr5SP1/0aNUYZA
-         TGDRU2E8csGtO3tCGViZwujKWoSeUxkWAvkUxGpFpdF4EXSUQ8T0+EwaA1Wb0H5BQXhJ
-         jzZtH9aAglMOc+e9JMzrmCXOV3m/8HRsffxZz25n7AMYqVk0fkW2hCSSGmAY53ygvONZ
-         Ad54Kg/P6VdO+vuIs5a/kCntY96k8KXPE7Gmjt4NV+8qArwCz2IAPoR+8jMP1TMtdwHE
-         kQAiqPfR3tLjjmmI8DCQ6jV7MXOE15M1u4DAruTHR9yuyVerqI2vZnMq4+eEAU1utHA/
-         ujjA==
-X-Gm-Message-State: AJIora+PRfA0YuMBG9Ux1QiNSO8Ej0oKxK0JTGTZfHEtwfPMmJI0KGyV
-        o/uztdtofY6MrfWq0oL+etxQDg==
-X-Google-Smtp-Source: AGRyM1vBtNGhOqlnABScERkafYVTqE2igXFv6cNjIrRTf1iEGD63CGABSiMaSZWAvvbQNNxkE168Cw==
-X-Received: by 2002:a05:6a00:816:b0:52a:dea8:26a2 with SMTP id m22-20020a056a00081600b0052adea826a2mr31996768pfk.36.1658217039223;
-        Tue, 19 Jul 2022 00:50:39 -0700 (PDT)
-Received: from [10.4.188.211] ([139.177.225.225])
-        by smtp.gmail.com with ESMTPSA id o21-20020a170902779500b0016be24e3668sm10779367pll.291.2022.07.19.00.50.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Jul 2022 00:50:38 -0700 (PDT)
-Message-ID: <5b02a27a-72a1-501f-b06e-8963ebb34916@bytedance.com>
-Date:   Tue, 19 Jul 2022 15:50:32 +0800
+        Tue, 19 Jul 2022 03:59:12 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C1C31DEC;
+        Tue, 19 Jul 2022 00:59:11 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 1059D2008A;
+        Tue, 19 Jul 2022 07:59:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1658217550; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ag2PCav6/+YWGJlrgwEXroJayeEk/+Qui+8D2H2O964=;
+        b=prK6cADJAqPxfa28FbmsUgZXK11s315oVnxiRUd54XueJX5Jep7ok6FcE8+QrExBACftq8
+        aan2fQvT2Q9coXymgq3TwMkhwywNXm2wU5Lgpz9KIAU1oID4FQ+BJIJnstqVFq1H9l+bD4
+        TujAUQn0+qb8kcdJp4arpfkCV4ymqis=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1658217550;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ag2PCav6/+YWGJlrgwEXroJayeEk/+Qui+8D2H2O964=;
+        b=kohvmFbcvZIBxVe6N6g+9pY87RphQtqiBBRa91ej6XSkRMiB0tdT9ps6wMM7U4VE47SwtP
+        re5VEsNLQD7NVpAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E80A213488;
+        Tue, 19 Jul 2022 07:59:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id VqaRN01k1mJyPgAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 19 Jul 2022 07:59:09 +0000
+Message-ID: <6a411ecb-0fef-56fb-1e54-bb46612c2b3b@suse.de>
+Date:   Tue, 19 Jul 2022 09:59:09 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.10.0
-Subject: Re: [PATCH] block: don't allow the same type rq_qos add more than
- once
-To:     Muchun Song <songmuchun@bytedance.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Cgroups <cgroups@vger.kernel.org>
-References: <20220718083646.67601-1-hanjinke.666@bytedance.com>
- <CAMZfGtVLkO6T-0n7fMBTvR84Ji8GhTO5==u9v+8f+dRkJhFHMA@mail.gmail.com>
-From:   hanjinke <hanjinke.666@bytedance.com>
-In-Reply-To: <CAMZfGtVLkO6T-0n7fMBTvR84Ji8GhTO5==u9v+8f+dRkJhFHMA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 09/10] md: only delete entries from all_mddevs when the
+ disk is freed
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Song Liu <song@kernel.org>, Logan Gunthorpe <logang@deltatee.com>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org
+References: <20220718063410.338626-1-hch@lst.de>
+ <20220718063410.338626-10-hch@lst.de>
+ <b8521a53-fb41-279c-dc43-580e8d0de045@suse.de>
+ <20220719071434.GA28668@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20220719071434.GA28668@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for your review. I have saw this review just after the send of 
-patch v2
+On 7/19/22 09:14, Christoph Hellwig wrote:
+> On Mon, Jul 18, 2022 at 09:17:42AM +0200, Hannes Reinecke wrote:
+>> Why can't we use 'atomic_inc_unless_zero' here and do away with the
+>> additional 'deleted' flag?
+> 
+> See my previous reply.
+> 
+>>> @@ -3338,6 +3342,8 @@ static bool md_rdev_overlaps(struct md_rdev *rdev)
+>>>      	spin_lock(&all_mddevs_lock);
+>>>    	list_for_each_entry(mddev, &all_mddevs, all_mddevs) {
+>>> +		if (mddev->deleted)
+>>> +			continue;
+>>
+>> Any particular reason why you can't use the 'mddev_get()' / 'mddev_put()'
+>> sequence here?
+> 
+> Mostly because it would be pretty mess.  mdev_put takes all_mddevs_lock,
+> so we'd have to add an unlock/relock cycle for each loop iteration.
+> 
+>> After all, I don't think that 'mddev' should vanish while being in this
+>> loop, no?
+> 
+> It won't, at least without the call to mddev_put.  Once mddev_put is
+> in the game things aren't that easy, and I suspect the exising and
+> new code might have bugs in that area in the reboot notifier and
+> md_exit for extreme corner cases.
 
-在 2022/7/19 下午2:53, Muchun Song 写道:
-> On Mon, Jul 18, 2022 at 4:37 PM Jinke Han <hanjinke.666@bytedance.com> wrote:
->>
->> From: hanjinke <hanjinke.666@bytedance.com>
->>
->> In our test of iocost, we encounttered some list add/del corrutions of
->> inner_walk list in ioc_timer_fn.
->> The resean can be descripted as follow:
->>
->> cpu 0                                           cpu 1
->> ioc_qos_write                                   ioc_qos_write
->>
->> ioc = q_to_ioc(bdev_get_queue(bdev));
->> if (!ioc) {
->>          ioc = kzalloc();                        ioc = q_to_ioc(bdev_get_queue(bdev));
->>                                                          if (!ioc) {
->>                                                                  ioc = kzalloc();
->>                                                                  ...
->>                                                                  rq_qos_add(q, rqos);
->>                                                           }
->>          ...
->>          rq_qos_add(q, rqos);
->>          ...
->> }
->>
->> When the io.cost.qos file is written by two cpu concurrently, rq_qos may
->> be added to one disk twice. In that case, there will be two iocs enabled
->> and running on one disk. They own different iocgs on their active list.
->> In the ioc_timer_fn function, because of the iocgs from two ioc have the
->> same root iocg, the root iocg's walk_list may be overwritten by each
->> other and this lead to list add/del corrutions in building or destorying
->> the inner_walk list.
->>
->> And so far, the blk-rq-qos framework works in case that one instance for
->> one type rq_qos per queue by default. This patch make this explicit and
->> also fix the crash above.
->>
->> Signed-off-by: hanjinke <hanjinke.666@bytedance.com>
-> 
-> The change LGTM. Maybe it is better to add a Fixes tag here so that
-> others can easily know what Linux versions should be backported.
-> 
-> Reviewed-by: Muchun Song <songmuchun@bytedance.com>
-> 
-> Thanks.
+And again, MD mess.
+But thanks for start clearing it up.
+
+Cheers,
+
+Hannes
