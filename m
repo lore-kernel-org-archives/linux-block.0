@@ -2,185 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC15CCA483
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 04:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08756CCA481
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 04:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234007AbiGSEwx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 00:52:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51850 "EHLO
+        id S234893AbiGSEz7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 00:55:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233445AbiGSEwx (ORCPT
+        with ESMTP id S229763AbiGSEz6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 00:52:53 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D743AB38
-        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 21:52:50 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220719045248epoutp01b20b338b8b9ab2d60118972e7e168f0a~DIegntWAf1209312093epoutp01a
-        for <linux-block@vger.kernel.org>; Tue, 19 Jul 2022 04:52:48 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220719045248epoutp01b20b338b8b9ab2d60118972e7e168f0a~DIegntWAf1209312093epoutp01a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1658206368;
-        bh=VqeeiIw8zv5QdFlqpTPrDDcYjaoPONkCSpNhbPg+OfE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MHFFgoQpiEp8CBhJ7F1DzrH+mavwonJ1ME7wYm7HTRua2ri9XChIDARz4qL5kkcEe
-         7wr2vnP5M3fa70qGHDg5j2iY7P4hUdrFeP6gZfOzr4nI8T7xgxj4LZ6l67MoSUjyFW
-         WO8Zj2yvKT2vMkpd0s7KXZwO/3E8yuZKXd7H+F4w=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20220719045248epcas5p302d8e1f8bccbfef23611d9797c3c44a1~DIegJBJNl2325523255epcas5p3K;
-        Tue, 19 Jul 2022 04:52:48 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.179]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4Ln5zv66zWz4x9QF; Tue, 19 Jul
-        2022 04:52:43 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        73.96.09662.B9836D26; Tue, 19 Jul 2022 13:52:43 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220719045243epcas5p3a41ed724b270ac45c58e1cba8bc2ba14~DIebgK1uI2118121181epcas5p3D;
-        Tue, 19 Jul 2022 04:52:43 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220719045243epsmtrp1ccfb42b24616dd8f333f46dc1320aa3c~DIebfAakK1146611466epsmtrp1C;
-        Tue, 19 Jul 2022 04:52:43 +0000 (GMT)
-X-AuditID: b6c32a49-86fff700000025be-ab-62d6389b7778
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        05.1A.08802.B9836D26; Tue, 19 Jul 2022 13:52:43 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220719045241epsmtip29d9db9bab2732e54825a90094ab26b07~DIeZzI_S30923609236epsmtip2y;
-        Tue, 19 Jul 2022 04:52:41 +0000 (GMT)
-Date:   Tue, 19 Jul 2022 10:17:17 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     Casey Schaufler <casey@schaufler-ca.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        a.manzanares@samsung.com, javier@javigon.com,
-        ankit.kumar@samsung.com
-Subject: Re: [PATCH v2] lsm,io_uring: add LSM hooks for the new uring_cmd
- file op
-Message-ID: <20220719044717.GA22571@test-zns>
+        Tue, 19 Jul 2022 00:55:58 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2B9910F4;
+        Mon, 18 Jul 2022 21:55:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1658206556; x=1689742556;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=m9PAzBOW+Xe6NkduzR2OOARXU145GDmy1IWVESQfatQ=;
+  b=YZxuNv2FXTsYQOy6KQyohzDI0cc9tDS30HV4tnWjp34aBMEkHrvZbzeb
+   e5yAB/JeABQ3c1iD6D5m8+kpVNh7Yh0bgVbWPl7WiSFjO6EQbMGGzT9AA
+   nyssN5mSE7zATH8dW66vToxA6hEk8zLuKAAHRrUxg0a8nw4k5pHqw1tsl
+   jRwuEy5QWab0UOLJGHAmnQDHFgvuHOZH9L4coIQT0S0mWYEWMK3AKy6+k
+   2gMzSffN9WE9adhbHMLWTCz3JS+r4MVHnlyWcQXG+LMDtSP5rccqJDGoI
+   x8lBYlpF0V5WppsZ/wgOo7D5YcI6Hyi5nQ3bxuPS3ETwYBLE1gY+46CXB
+   w==;
+X-IronPort-AV: E=Sophos;i="5.92,283,1650902400"; 
+   d="scan'208";a="318388748"
+Received: from mail-bn8nam12lp2170.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.170])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jul 2022 12:50:39 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PB4NRpXcjhjCS73SheCWUsT+JlTbXYrAZ18xLo7hw1C0vf+HZnQMKcVAo9JNN6tXbDqv8v9PfR//tqPsDHIbc+hiGKbrlD+geBGf101SzkT+DojkO7qe7Rl1wgfFIiFPpdnuWO2sqlM9cKeKQUra4sBwZE8uzm5Suu5Uq50DZRXBpY2hdbXmtpJd+iR3cuVS9WR4N2VECpEiaaSJEXM9QZBOl2jpIqIiEigzlrEnXlkIwGPsw4pHnZI1dfdIXGQ4hOEVzOt/WIqQ/232fumPcZzBDI4NCBz2jg98smXeCphcs+IgsPXu2Zy51IpMu/6kxwd7J+LzOsGyFKnGN89y+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O0/LlpyV/Dz14cdkk4p3BVe6lKIZb8zfSuMy8iZRu94=;
+ b=lEdgWhmkbfTjXCW3rF5X4yIPJjzA2W4yfyVmM3pgIfzc26WfwXBck5QNRyiQg5eEltlkW7Bm4GBLeofnu7zDCx5uv0NKfQrVkCcmq7uHHFi293ElzoweLZ9sJUXTAu9T7bZKXMMXY0B7W1BujZyEG5zowG/hW33GZQ+iGSfJQloY+vNx6DDAZ/nWmtmeSoiJBgl+RSu3ALG2lMDP9DtTEHgnXDKRaylONyu/J3jvo+p1d8Gq/ogKuZp/7Smbgu+egopbwPmx0KCZT8lGaTOs9h2E7Gg/oLFAgEne3K/M4MSmsjN16LQZrth0skq5RCXGo42CrJ3IUwFtLQPdOVsxZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O0/LlpyV/Dz14cdkk4p3BVe6lKIZb8zfSuMy8iZRu94=;
+ b=ikhiwDpRlXSSgALstDfW4XpGRQy9JoxSdUOCfbDlHqDXVMDeA1KKdNxr3Aj0M859vrDI4TaNw3GmBTLm5VtLQnaOXBIgKyEeVI1wPP/txt2sUv7GJacg40MavEQdAs8AeD+tRUbk8fD6zlSW52EAFKi0Ah1ZWg/4M+NQhp1+1RM=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ DM5PR04MB0442.namprd04.prod.outlook.com (2603:10b6:3:a9::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5438.22; Tue, 19 Jul 2022 04:50:37 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::3cc7:ac84:d443:5833%9]) with mapi id 15.20.5438.023; Tue, 19 Jul 2022
+ 04:50:37 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+CC:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Yi Zhang <yi.zhang@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "mstowe@redhat.com" <mstowe@redhat.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Xiao Yang <yangx.jy@fujitsu.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: blktests failures with v5.19-rc1
+Thread-Topic: blktests failures with v5.19-rc1
+Thread-Index: AQHYfFwe8PMwMXtEZEqIJFDj8WJWFa1IXnmAgAACxQCAADBSgIAAJ8QAgAEp9oCABDqugIAAFNGAgAAEQoCAABbgAIACmtiAgAA6YwCANDpNAA==
+Date:   Tue, 19 Jul 2022 04:50:36 +0000
+Message-ID: <20220719045036.h273puvs3cibafix@shindev>
+References: <20220614040044.rypyclhqfv5w4xy7@shindev>
+ <20220615194727.GA1022614@bhelgaas>
+ <YqpoSp2F+Shqvk/u@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <YqpoSp2F+Shqvk/u@kbusch-mbp.dhcp.thefacebook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 67278073-a409-4c11-d0d5-08da694238f1
+x-ms-traffictypediagnostic: DM5PR04MB0442:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZW0b/0Q0FHIAs9qbVaI8qvpJkUB8GIn1IBifs+McS+IweLpRfdfwx5WzmaE1XNBfp6EcYTNTiemwK1J8TAFf3mV+01VUoBGWCQkDlbmI9wUgB3ctiy5mR5x0sLimi+80sFsGiDs42YeTCAdkb/YE06z3qGLsL3Lf2bslWpHz8rua7vXK6GXY3AL2gBTYsb6FqhuDfjuZbLPI60AxmYMUQ8q20Mf+HbqmlQBK3BJCXt4E5y4DTSX7+N8MQ3JsKbuHPzxbdoSVnzbBCV7r178Cl1XmoKJ/ORpNCKqxAWzKu7qhzmRDiD3Fi9nM0eMY6e3iow54pT4j4YKkthwKPRpBluInHV7NwwckLYWNPiuJBeJrMVWtRNIiFGScz7hfzxHi7CNnzhzAUmEUBEZ1TwGgO5THMuv21Kp8i/SfLVUW6jaW6K3kty/LbNnehLxKf2NPxez1p36TGRecCirgWaQUvrGyKgZhTogDbk4n0R8ye6qn3GtFYjGNQoo+kzdwBoS0J4Sk2nKZLnRV6DuXhsc/H/5YhbB6AM4kODzCQoi575xFV7hA5uyxq0h2RkHoAwKCOlvOp9kyS8HYsqkUtTHKcgCp9stkAfOvMtiySG6L45LGIq5yorSZtCdldayF2fqSMfiDuJkSiYdcgAUYe/s8ZwwkBLIPaxKH6T5sVjGAa+6L8Z29wC/HKzGDtBiRjfk45t6A1j9kFnjdnOlGyAJsWRLq53nfEg6EQdWDZ6juTOXi1mf3n0p0/+C6wkDG1xy00fKRXNDSVhzg2fNNzcR/z+4lF8haFkrOuec6OrxOGdBrzH+DSTvbFHS8OBd9UzO5EuILSwmcMXr+wEVQQgfKIw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(4636009)(39860400002)(376002)(366004)(136003)(346002)(396003)(966005)(8676002)(478600001)(6486002)(6512007)(6506007)(6916009)(26005)(41300700001)(9686003)(44832011)(64756008)(86362001)(33716001)(71200400001)(82960400001)(122000001)(316002)(66476007)(38100700002)(66556008)(54906003)(83380400001)(186003)(1076003)(2906002)(38070700005)(66946007)(7416002)(76116006)(91956017)(4326008)(8936002)(5660300002)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?kJ0Wg1NTuNOsWRWF+La6CXMa3DpBHm1w4Y24+zPrpzgRl/PO5jMi5xSidN20?=
+ =?us-ascii?Q?uCrfvG68EPFdA5HEsY7p+BC3C7km8+H0bwTX5XFI6wCJhQ4yezaMUlbRe9sg?=
+ =?us-ascii?Q?7CQHOYw/qV+wa8gSqjo9P4/XZABOGfTByAAzxuSBx1TFnrL68kJuDo6kspHM?=
+ =?us-ascii?Q?JYG3OQFg22+DsmEWeePPRJHy3lAGy+PcAX0WE3ltwGCgWe4RemD0ld/qaMvp?=
+ =?us-ascii?Q?C7l/NbDU5WeJE0I59WM3umQDWtrboNVVRQc6LQwp1IiDhrt626nBRbEkTg+a?=
+ =?us-ascii?Q?GnimEwMPnyguAmIymDOkPaRe4Y5eytaZrxtUzXF2etFwW8j6gufBTcqtUGy3?=
+ =?us-ascii?Q?2y1zmC1TUAPWWKZxIHd2msH1GWsrwrr0WdNg6Bg8huH7jK2siU7qd9KhnUl3?=
+ =?us-ascii?Q?b2xPb+/tmLh2j3VDKX2IJMDvi5FKjkUdcBV6MYt/cK6/Bp9yJPOvwiDr6WqP?=
+ =?us-ascii?Q?a6bvcwNZACgaV+DZcvUjLYhCRacMk27JjlLfUeKhFE25naoI/4JxxmoLTD3o?=
+ =?us-ascii?Q?wRAerrVLMVg267UMAYmI3kO2Cg3ezMaaf8h5OdFO9sSCSwxsHfQs3cFlCXUI?=
+ =?us-ascii?Q?SB4k2rZ3ai6AMXjnx/xmSfJUV/rouulPAkKPEhLsd5+0jbeR7snaMyWla1ox?=
+ =?us-ascii?Q?aLGyVtGjSMf9j6PNmtcVmD0FTUHspnI95VA8eVYjbw7AmBDt4swT7/p2dOZk?=
+ =?us-ascii?Q?BX5zBmcLkp5Af6hvIywx5LzM9szkN1mRiEn0pkHzUwN4Ok+1MCxRTZbCMkAY?=
+ =?us-ascii?Q?/0c/ZcHhut5F/i+LemRMyDNtkuHxRuDXkmo7mwgjSDLJKJROsMfAs3AZ1G7i?=
+ =?us-ascii?Q?i/noVWTZEX7uJfDksKjIbqOr2F7vhsYQ5otSsRM4EQ5CUvqsWIAtDBPEyu1y?=
+ =?us-ascii?Q?7TQ2+Qbhy5VgU+Qv4JJOdZOBtKXaJPn7jk1Zmz0XmSecOs3Ata4eBY6W/EWl?=
+ =?us-ascii?Q?wOe3lWxEIGvJjeEDknmloGgMNf2BGKhFhhM8krxbx1xv4Qeem41uSl7aa2xT?=
+ =?us-ascii?Q?q/z9sDG0wuM0+qeb9y86/PjJOoxwteXrvu8rMM41MVHNrwftBXoi6pdsZDyU?=
+ =?us-ascii?Q?yilBkjap+32tJ7rNybpTSVRLDMMhgb6PlTh6LIVQ4t6wN8JPIfNi+LWsEik6?=
+ =?us-ascii?Q?JPstVtF3ok08bJSFpqgrWWuBGvOE4ggaxHLtCQoz0xPFPyW1ZBpWNklX1yjt?=
+ =?us-ascii?Q?zxxkOvT61VuPWTfzrs2rwAxY4GWtawz8ekcTpXwGipWCR60KqoK5HoEEXRMW?=
+ =?us-ascii?Q?grD6kVAgkcxQ7wzt1+7FPYWsq+yFY51lNLoOmiE2pFRr7fPO3d7ASblA8wnK?=
+ =?us-ascii?Q?qnxFeUCf0FrEMaYefWi/iwV98C7p5UzTm0uVtstAhrQsgrAzAClamKFVC8oD?=
+ =?us-ascii?Q?qIXkvLegQu9JSNK5JgwTfI0hFeK/NI8yVXWBabH2xSsxbCx5Fio+gv6qRVqa?=
+ =?us-ascii?Q?CboboTd+pRE8RGorr9luLF/gBkiD2pgBewl+yTcdR8FY14Oz2YpdDlbhujfp?=
+ =?us-ascii?Q?LhrgtfgWab5/fEK6pKu7dU2RRxT+9scQmHSJDei6CvdPNOn0i6+tkbW5Bu06?=
+ =?us-ascii?Q?ZNTrgXoI2t2vBiNVSYJSqz2BSMBpq/Zmnm04PFSt3DcP46zhJmjbc0RKRV1E?=
+ =?us-ascii?Q?yb8zt25yvhDy+Xi3qltXJy4=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <AE1A12E4CCC73B468ECB00B0A584F7BA@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <CAHC9VhRzjLFg9B4wL7GvW3WY-qM4BoqqcpyS0gW8MUbQ9BD2mg@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrFJsWRmVeSWpSXmKPExsWy7bCmhu5si2tJBpM+GVhMP6xosebKb3aL
-        1Xf72SzubfvFZvGu9RyLRefpC0wWe29pW8xf9pTd4kPPIzaLGxOeMlrcnjSdxYHbo3nBHRaP
-        y2dLPTat6mTz2Lyk3mPt3heMHn1bVjF6HN2/iM3j8ya5AI6obJuM1MSU1CKF1Lzk/JTMvHRb
-        Je/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wcoCuVFMoSc0qBQgGJxcVK+nY2RfmlJakK
-        GfnFJbZKqQUpOQUmBXrFibnFpXnpenmpJVaGBgZGpkCFCdkZUyd/Zi+4JlXRsfsZawPjZLEu
-        Rk4OCQETiYaJtxlBbCGB3YwS3XcDIexPjBKfvyl3MXIB2Z8ZJZZcX84G0/Cr9xQjRGIXo8TK
-        d7PYIZxnjBLvnvYxg1SxCKhKnDo+GaiKg4NNQFPiwuRSkLCIgIrE4qfrwZqZBfYySWz61MME
-        khAWCJZ40bYTbAOvgK5Ew5VdrBC2oMTJmU9YQGxOgUCJ6d97wU4VFVCWOLDtOBPERUs5JB4t
-        cwHZJSHgItHQHQMRFpZ4dXwLO4QtJfGyvw3KTpa4NPMcVGuJxOM9B6Fse4nWU/1g5zMLZEis
-        7L3KBmHzSfT+fsIEMZ5XoqNNCKJcUeLepKesELa4xMMZS6BsD4nOiRuYIYF4jlli+wqeCYxy
-        s5A8MwvJBgjbSqLzQxPrLKANzALSEsv/cUCYmhLrd+kvYGRdxSiZWlCcm55abFpgmJdaDo/g
-        5PzcTYzgRKvluYPx7oMPeocYmTgYDzFKcDArifCK1F5OEuJNSaysSi3Kjy8qzUktPsRoCoyc
-        icxSosn5wFSfVxJvaGJpYGJmZmZiaWxmqCTO63V1U5KQQHpiSWp2ampBahFMHxMHp1QDE6dt
-        TOjum0070q2kXtdwBYnN9292drK0EXn4zWONyNfqVUnfxbqi335LN/C9EM6UP1HZ/MXZTqmH
-        e7j4d35SdJpb7//3Wvqd7HtTZkx43KLbfjX142Tm5fc8FgtLbvqYF21cqH3po6j/LvVpZdNP
-        TefccfPz7E0+qfV7K88mrN7dfO7QxrtudSrlnfGbymWjSpnFjqvZMbhl7Vmq1Zm7+NTTR9uj
-        9h/JcND/rXB1Z+mE5Vk5ySq3D+9u6pxxLkFSSfXqotdP455NtxENUYo8sH6F3VbRoEc9OanH
-        q143d+otnvf6tI8rs+23O8I2aj+P7/GwZc2LbHu/56PCPpvK9QIpP/gm/1m+kWP/jjuLYpVY
-        ijMSDbWYi4oTAfJlMXc9BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNLMWRmVeSWpSXmKPExsWy7bCSvO5si2tJBv/3cVhMP6xosebKb3aL
-        1Xf72SzubfvFZvGu9RyLRefpC0wWe29pW8xf9pTd4kPPIzaLGxOeMlrcnjSdxYHbo3nBHRaP
-        y2dLPTat6mTz2Lyk3mPt3heMHn1bVjF6HN2/iM3j8ya5AI4oLpuU1JzMstQifbsEroybx6cx
-        F3RIVOzZNoW1gfG+cBcjJ4eEgInEr95TjCC2kMAORom2q6wQcXGJ5ms/2CFsYYmV/54D2VxA
-        NU8YJRa+uglWxCKgKnHq+GSgZg4ONgFNiQuTS0HCIgIqEoufrgebySywn0li10N/EFtYIFji
-        RdtONhCbV0BXouHKLlaImeeYJbbufM8MkRCUODnzCQtEs5nEvM0PmUHmMwtISyz/xwES5hQI
-        lJj+vRdsvqiAssSBbceZJjAKzkLSPQtJ9yyE7gWMzKsYJVMLinPTc4sNC4zyUsv1ihNzi0vz
-        0vWS83M3MYLjR0trB+OeVR/0DjEycTAeYpTgYFYS4RWpvZwkxJuSWFmVWpQfX1Sak1p8iFGa
-        g0VJnPdC18l4IYH0xJLU7NTUgtQimCwTB6dUA1MJ59Ginrrb18p/eu89khQk7bCP/cqcybN7
-        zP9WX1W6EsAhW/MxKkNDtfu85Y/ds7xXGHKqnZN1m7Ftfoz+8fb3KRnnqp3YT4tfyTw5j6eg
-        09goICF+Z7p16EI5pVSROTbx0f+3LJ4tX3tQOz9Vl/n4o6drJ5VwythZy09MOnOqOtrx7wbe
-        7nUnb4i6p4rNWMjXwFN+o6uv8eQpx71ZDP3CblmPveOn5hwSeZUh2Ptxq8y1Znc2wYYT1d36
-        M+5YT2RaVD9/+zJJDQsfPsHgt0XLisRibWv9mzoabfguyQaE7b1Y92Bmls2JVcyHZn/jUT53
-        7Uzy7efbzcQqOzynbUpbLhRXPzVt0ZxT00PElFiKMxINtZiLihMBbEqq5Q4DAAA=
-X-CMS-MailID: 20220719045243epcas5p3a41ed724b270ac45c58e1cba8bc2ba14
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_a32a6_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220718215605epcas5p4332ce1e7321243d7052834b0804c91c6
-References: <20220715191622.2310436-1-mcgrof@kernel.org>
-        <a56d191e-a3a3-76b9-6ca3-782803d2600c@kernel.dk>
-        <CAHC9VhRzm=1mh9bZKEdLSG0vet=amQDVpuZk+1shMuXYLV_qoQ@mail.gmail.com>
-        <CAHC9VhQm3CBUkVz2OHBmuRi1VDNxvfWs-tFT2UO9LKMbO7YJMg@mail.gmail.com>
-        <e139a585-ece7-7813-7c90-9ffc3a924a87@schaufler-ca.com>
-        <CGME20220718215605epcas5p4332ce1e7321243d7052834b0804c91c6@epcas5p4.samsung.com>
-        <CAHC9VhRzjLFg9B4wL7GvW3WY-qM4BoqqcpyS0gW8MUbQ9BD2mg@mail.gmail.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 67278073-a409-4c11-d0d5-08da694238f1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2022 04:50:37.0006
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TlCFkFUbRDG0s2wDtneEZVTmMTByZ2u2KUKrCIe88WQ/Ii328nTJZW4YixcTuXWjsXPlxcXNJiPkQ+icoS1cs58Da81K75pbsZSZoZm5Xr0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0442
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_a32a6_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Jun 15, 2022 / 17:16, Keith Busch wrote:
+> On Wed, Jun 15, 2022 at 02:47:27PM -0500, Bjorn Helgaas wrote:
+> > On Tue, Jun 14, 2022 at 04:00:45AM +0000, Shinichiro Kawasaki wrote:
+> > >=20
+> > > Yeah, this WARN is confusing for us then it would be valuable to
+> > > test by blktests not to repeat it. One point I wonder is: which test
+> > > group the test case will it fall in? The nvme group could be the
+> > > group to add, probably.
+> > >=20
+> > > Another point I wonder is other kernel test suite than blktests.
+> > > Don't we have more appropriate test suite to check PCI device
+> > > rescan/remove race ? Such a test sounds more like a PCI bus
+> > > sub-system test than block/storage test.
+> >=20
+> > I'm not aware of such a test, but it would be nice to have one.
+> >=20
+> > Can you share your qemu config so I can reproduce this locally?
+> >=20
+> > Thanks for finding and reporting this!
+>=20
+> Hi Bjorn,
+>=20
+> This ought to be reproducible with any pci device that can be removed. Si=
+nce we
+> initially observed with nvme, you can try with such a device. A quick way=
+ to
+> get one appearing in qemu is to add parameters:
+>=20
+>         -drive id=3Dn,if=3Dnone,file=3Dnull-co://,format=3Draw \
+> 	-device nvme,serial=3Dfoobar,drive=3Dn
 
-On Mon, Jul 18, 2022 at 05:52:01PM -0400, Paul Moore wrote:
->On Mon, Jul 18, 2022 at 1:12 PM Casey Schaufler <casey@schaufler-ca.com> wrote:
->> On 7/15/2022 8:33 PM, Paul Moore wrote:
->> > On Fri, Jul 15, 2022 at 3:52 PM Paul Moore <paul@paul-moore.com> wrote:
->> >> On Fri, Jul 15, 2022 at 3:28 PM Jens Axboe <axboe@kernel.dk> wrote:
->> >>> On 7/15/22 1:16 PM, Luis Chamberlain wrote:
->> >>>> io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
->> >>>> add infrastructure for uring-cmd"), this extended the struct
->> >>>> file_operations to allow a new command which each subsystem can use
->> >>>> to enable command passthrough. Add an LSM specific for the command
->> >>>> passthrough which enables LSMs to inspect the command details.
->> >>>>
->> >>>> This was discussed long ago without no clear pointer for something
->> >>>> conclusive, so this enables LSMs to at least reject this new file
->> >>>> operation.
->> >>> From an io_uring perspective, this looks fine to me. It may be easier if
->> >>> I take this through my tree due to the moving of the files, or the
->> >>> security side can do it but it'd have to then wait for merge window (and
->> >>> post io_uring branch merge) to do so. Just let me know. If done outside
->> >>> of my tree, feel free to add:
->> > I forgot to add this earlier ... let's see how the timing goes, I
->> > don't expect the LSM/Smack/SELinux bits to be ready and tested before
->> > the merge window opens so I'm guessing this will not be an issue in
->> > practice, but thanks for the heads-up.
->>
->> I have a patch that may or may not be appropriate. I ran the
->> liburing tests without (additional) failures, but it looks like
->> there isn't anything there testing uring_cmd. Do you have a
->> test tucked away somewhere I can use?
+Hello Bjorn,
 
-Earlier testing was done using fio. liburing tests need a formal review
-in list. Tree is here -
-https://github.com/ankit-sam/liburing/tree/uring-pt
-It adds new "test/io_uring_passthrough.t", which can be run this way:
+Did you have chance to reproduce the WARN? Recently, it was reported again =
+[1]
+and getting attention.
 
-./test/io_uring_passthrough.t /dev/ng0n1
+[1] https://lore.kernel.org/linux-block/4ed3028b-2d2f-8755-fec2-0b9cb5ad42d=
+2@fujitsu.com/
 
-Requires nvme device (/dev/ng0n1). And admin-access as well, as this
-is raw open. FWIW, each passthrough command (at nvme driver level) is
-also guarded by admin-access.
-
-Ankit (CCed) has the plans to post it (will keep you guys in loop) after
-bit more testing with 5.20 branch.
-
->All I have at the moment is the audit-testsuite io_uring test (link
->below) which is lacking a test for the io_uring CMD command.  I plan
->on adding that, but I haven't finished the SELinux patch yet.
->
->* https://protect2.fireeye.com/v1/url?k=9cb2caea-fd39dfd9-9cb341a5-000babff9bb7-e1f9086bae09b852&q=1&e=b1985274-4644-447d-be8c-16f520cadbd9&u=https%3A%2F%2Fgithub.com%2Flinux-audit%2Faudit-testsuite%2Ftree%2Fmain%2Ftests%2Fio_uring
->
->(Side note: there will be a SELinux io_uring test similar to the
->audit-testsuite test, but that effort was delayed due to lack of
->io_uring support in the Fedora policy for a while; it's working now,
->but the SELinux/SCTP issues have been stealing my time lately.)
-
-------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_a32a6_
-Content-Type: text/plain; charset="utf-8"
-
-
-------OEEzMZle2oafIX2psGkTvPl59BrXC3apHO-sLjJPJT1qP5Pe=_a32a6_--
+--=20
+Shin'ichiro Kawasaki=
