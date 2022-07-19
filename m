@@ -2,217 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F84CCA481
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 08:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D49B4C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 09:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236955AbiGSIsq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 04:48:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53750 "EHLO
+        id S232986AbiGSJTM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 05:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237135AbiGSIso (ORCPT
+        with ESMTP id S237247AbiGSJS5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 04:48:44 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6613C8FC;
-        Tue, 19 Jul 2022 01:48:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A5B2161790;
-        Tue, 19 Jul 2022 08:48:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD50C341C6;
-        Tue, 19 Jul 2022 08:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658220521;
-        bh=Y80I/9h5gwXwAl7BrWnNgRboomD0Q/i4fsdukksbxuA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ftz2opaB3z+yb8RtydfLoLtaxsjl9hbVDuSH7gqPczmybG3jqnAUX/sMgYFai0B3B
-         D/GVCtngIJW3ALxtzJdXN9F9GYV3fLFB6cJSSD+sVPPUikiEIjT0M8UPFkwT0aa5xL
-         S6gbKGCyNjELTnqJzmWgE2WySNetGPq/TuPWVf762sbXBQXxv4Ch7L0hoP4OKxhBeF
-         wempCKHPca39pk1WqmSOjqnkIctwswq4BX7jZBwaQ4uWPl0JWkCWzcYye7zvAQIS3v
-         mXo4NI3t11uKJPh3r7gX87oIZdPIvGwwnzMg2urBDZulfeOAMM5Uk/DRfnKWweGNcg
-         ixWwiuFbfaCqw==
-Date:   Tue, 19 Jul 2022 09:48:35 +0100
-From:   Mauro Carvalho Chehab <mchehab@kernel.org>
-To:     Dave Airlie <airlied@gmail.com>
-Cc:     torvalds@linux-foundation.org, Jonathan Corbet <corbet@lwn.net>,
-        linux-doc@vger.kernel.org, gregkh@linuxfoundation.org,
-        Daniel Vetter <daniel@ffwll.ch>, mcgrof@kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.sf.net,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-media@vger.kernel.org,
-        linux-block@vger.kernel.org, Dave Airlie <airlied@redhat.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>
-Subject: Re: [PATCH] docs: driver-api: firmware: add driver firmware
- guidelines. (v2)
-Message-ID: <20220719094835.52197852@sal.lan>
-In-Reply-To: <20220719065357.2705918-1-airlied@gmail.com>
-References: <20220719065357.2705918-1-airlied@gmail.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        Tue, 19 Jul 2022 05:18:57 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50AD73E74F;
+        Tue, 19 Jul 2022 02:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=slp5c8XNQeNg+3MWRwWz66XB39JqNpBUq4l6sTmVRoE=; b=yRGOkQMwRrMEr+hJyom5vZsg+H
+        DLGgg+LLJpSVL65VcrtmUaAPfIxdv7/tAP5Jg5ESWWr50CU/uSLeFoIWiGEodb/7zMQDIViU0WYMx
+        jfpQeUUXZclkck3P7Fs7YoeadeUBgCVeGEXko+OelQ/mQ2OTTVYa+LQj6yH8HvmT0ZcNMU3FyhZvi
+        4I3DDfVJPkQ3ANuCiRyo1x1ooR65TsaYdHpffXRBvkVJ8osWv83JbVbLyvfHYXUtL7nPcFFxiqTh+
+        864aTv4jScC45WNjV1w5sJl6iu0V+cUPpGHA/C1TIVLya7n1wQ7s/H/wkztI31CrkzTM/lVVuBWZx
+        DLw6Pl9w==;
+Received: from 089144198117.atnat0007.highway.a1.net ([89.144.198.117] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oDjND-007C9L-Uu; Tue, 19 Jul 2022 09:18:36 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Song Liu <song@kernel.org>
+Cc:     Logan Gunthorpe <logang@deltatee.com>, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 02/10] md: fix error handling in md_alloc
+Date:   Tue, 19 Jul 2022 11:18:16 +0200
+Message-Id: <20220719091824.1064989-3-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220719091824.1064989-1-hch@lst.de>
+References: <20220719091824.1064989-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Em Tue, 19 Jul 2022 16:53:57 +1000
-Dave Airlie <airlied@gmail.com> escreveu:
+Error handling in md_alloc is a mess.  Untangle it to just free the mddev
+directly before add_disk is called and thus the gendisk is globally
+visible.  After that clear the hold flag and let the mddev_put take care
+of cleaning up the mddev through the usual mechanisms.
 
-> From: Dave Airlie <airlied@redhat.com>
-> 
-> A recent snafu where Intel ignored upstream feedback on a firmware
-> change, led to a late rc6 fix being required. In order to avoid this
-> in the future we should document some expectations around
-> linux-firmware.
-> 
-> I was originally going to write this for drm, but it seems quite generic
-> advice.
+Fixes: 5e55e2f5fc95 ("[PATCH] md: convert compile time warnings into runtime warnings")
+Fixes: 9be68dd7ac0e ("md: add error handling support for add_disk()")
+Fixes: 7ad1069166c0 ("md: properly unwind when failing to add the kobject in md_alloc")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/md/md.c | 45 ++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 32 insertions(+), 13 deletions(-)
 
-Indeed it makes sense to document firmware API compatibility in a generic way.
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 7829045fc7fd9..f1c4f8ccb939d 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -790,6 +790,15 @@ static struct mddev *mddev_alloc(dev_t unit)
+ 	return ERR_PTR(error);
+ }
+ 
++static void mddev_free(struct mddev *mddev)
++{
++	spin_lock(&all_mddevs_lock);
++	list_del(&mddev->all_mddevs);
++	spin_unlock(&all_mddevs_lock);
++
++	kfree(mddev);
++}
++
+ static const struct attribute_group md_redundancy_group;
+ 
+ void mddev_unlock(struct mddev *mddev)
+@@ -5661,8 +5670,8 @@ int md_alloc(dev_t dev, char *name)
+ 	mutex_lock(&disks_mutex);
+ 	mddev = mddev_alloc(dev);
+ 	if (IS_ERR(mddev)) {
+-		mutex_unlock(&disks_mutex);
+-		return PTR_ERR(mddev);
++		error = PTR_ERR(mddev);
++		goto out_unlock;
+ 	}
+ 
+ 	partitioned = (MAJOR(mddev->unit) != MD_MAJOR);
+@@ -5680,7 +5689,7 @@ int md_alloc(dev_t dev, char *name)
+ 			    strcmp(mddev2->gendisk->disk_name, name) == 0) {
+ 				spin_unlock(&all_mddevs_lock);
+ 				error = -EEXIST;
+-				goto out_unlock_disks_mutex;
++				goto out_free_mddev;
+ 			}
+ 		spin_unlock(&all_mddevs_lock);
+ 	}
+@@ -5693,7 +5702,7 @@ int md_alloc(dev_t dev, char *name)
+ 	error = -ENOMEM;
+ 	disk = blk_alloc_disk(NUMA_NO_NODE);
+ 	if (!disk)
+-		goto out_unlock_disks_mutex;
++		goto out_free_mddev;
+ 
+ 	disk->major = MAJOR(mddev->unit);
+ 	disk->first_minor = unit << shift;
+@@ -5714,26 +5723,36 @@ int md_alloc(dev_t dev, char *name)
+ 	mddev->gendisk = disk;
+ 	error = add_disk(disk);
+ 	if (error)
+-		goto out_cleanup_disk;
++		goto out_put_disk;
+ 
+ 	kobject_init(&mddev->kobj, &md_ktype);
+ 	error = kobject_add(&mddev->kobj, &disk_to_dev(disk)->kobj, "%s", "md");
+-	if (error)
+-		goto out_del_gendisk;
++	if (error) {
++		/*
++		 * The disk is already live at this point.  Clear the hold flag
++		 * and let mddev_put take care of the deletion, as it isn't any
++		 * different from a normal close on last release now.
++		 */
++		mddev->hold_active = 0;
++		goto done;
++	}
+ 
+ 	kobject_uevent(&mddev->kobj, KOBJ_ADD);
+ 	mddev->sysfs_state = sysfs_get_dirent_safe(mddev->kobj.sd, "array_state");
+ 	mddev->sysfs_level = sysfs_get_dirent_safe(mddev->kobj.sd, "level");
+-	goto out_unlock_disks_mutex;
+ 
+-out_del_gendisk:
+-	del_gendisk(disk);
+-out_cleanup_disk:
+-	blk_cleanup_disk(disk);
+-out_unlock_disks_mutex:
++done:
+ 	mutex_unlock(&disks_mutex);
+ 	mddev_put(mddev);
+ 	return error;
++
++out_put_disk:
++	put_disk(disk);
++out_free_mddev:
++	mddev_free(mddev);
++out_unlock:
++	mutex_unlock(&disks_mutex);
++	return error;
+ }
+ 
+ static void md_probe(dev_t dev)
+-- 
+2.30.2
 
-Some suggestions below.
-
-> v2: rewritten with suggestions from Thorsten Leemhuis.
->
-> Acked-by: Luis Chamberlain <mcgrof@kernel.org>
-> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
-> Signed-off-by: Dave Airlie <airlied@redhat.com>
-> ---
->  Documentation/driver-api/firmware/core.rst    |  1 +
->  .../firmware/firmware-usage-guidelines.rst    | 34 +++++++++++++++++++
->  2 files changed, 35 insertions(+)
->  create mode 100644 Documentation/driver-api/firmware/firmware-usage-guidelines.rst
-> 
-> diff --git a/Documentation/driver-api/firmware/core.rst b/Documentation/driver-api/firmware/core.rst
-> index 1d1688cbc078..803cd574bbd7 100644
-> --- a/Documentation/driver-api/firmware/core.rst
-> +++ b/Documentation/driver-api/firmware/core.rst
-> @@ -13,4 +13,5 @@ documents these features.
->     direct-fs-lookup
->     fallback-mechanisms
->     lookup-order
-> +   firmware-usage-guidelines
->  
-> diff --git a/Documentation/driver-api/firmware/firmware-usage-guidelines.rst b/Documentation/driver-api/firmware/firmware-usage-guidelines.rst
-> new file mode 100644
-> index 000000000000..34d2412e78c6
-> --- /dev/null
-> +++ b/Documentation/driver-api/firmware/firmware-usage-guidelines.rst
-> @@ -0,0 +1,34 @@
-> +===================
-> +Firmware Guidelines
-> +===================
-> +
-> +Drivers that use firmware from linux-firmware should attempt to follow
-> +the rules in this guide.
-> +
-> +* Firmware should be versioned with at least a major/minor version.
-
-It is hard to enforce how vendors will version their firmware. On media,
-we have some drivers whose major means different hardware versions. For
-instance, on xc3028, v3.x means low voltage chips, while v2.x means
-"normal" voltage. We end changing the file name on Linux to avoid the risk
-of damaging the hardware, as using v27 firmware on low power chips damage
-them. So, we have:
-
-	drivers/media/tuners/xc2028.h:#define XC2028_DEFAULT_FIRMWARE "xc3028-v27.fw"
-	drivers/media/tuners/xc2028.h:#define XC3028L_DEFAULT_FIRMWARE "xc3028L-v36.fw"
-
-As their main market is not Linux - nor PC - as their main sales are on 
-TV sets, and them don't officially support Linux, there's nothing we can
-do to enforce it.
-
-IMO we need a more generic text here to indicate that Linux firmware
-files should be defined in a way that it should be possible to detect
-when there are incompatibilities with past versions. 
-So, I would say, instead:
-
-	Firmware files shall be designed in a way that it allows
-	checking for firmware ABI version changes. It is recommended
-	that firmware files to be versioned with at least major/minor
-	version.
-
-> It
-> +  is suggested that the firmware files in linux-firmware be named with
-> +  some device specific name, and just the major version. 
-
-> The
-> +  major/minor/patch versions should be stored in a header in the
-> +  firmware file for the driver to detect any non-ABI fixes/issues. 
-
-I would also make this more generic. On media, we ended adding the firmware
-version indicated at the file name. For instance, xc4000 driver checks for
-two firmware files:
-
-drivers/media/tuners/xc4000.c:#define XC4000_DEFAULT_FIRMWARE "dvb-fe-xc4000-1.4.fw"
-drivers/media/tuners/xc4000.c:#define XC4000_DEFAULT_FIRMWARE_NEW "dvb-fe-xc4000-1.4.1.fw"
-
-On such cases, the driver can take decisions based on the firmware name.
-
-I would change the text to be more generic covering both cases:
-
-	The firmware version shall either be stored at the firmware
-	header or as part of the firmware file name, in order to let the
-	driver to detect any non-ABI fixes/changes.
-
-> The
-> +  firmware files in linux-firmware should be overwritten with the newest
-> +  compatible major version.
-
-For me "shall" is mandatory, while "should" is optional.
-
-In this specific case, I'm not so sure if overriding it is the best thing 
-to do on all subsystems. I mean, even with the same ABI, older firmware 
-usually means that some bugs and/or limitations will be present there.
-
-That's specially true on codecs: even having the same ABI, older versions
-won't support decoding newer protocols. We have one case with some
-digital TV decoders that only support some Cable-TV protocols with
-newer firmware versions. We have also one case were remote controller
-decoding is buggy with older firmwares. On both situations, the ABI
-didn't change.
-
-> Newer major version firmware should remain
-> +  compatible with all kernels that load that major number.
-
-	should -> shall
-
-> +
-> +* Users should *not* have to install newer firmware to use existing
-> +  hardware when they install a newer kernel. 
-
-> If the hardware isn't
-> +  enabled by default or under development,
-
-Hmm.. someone might understand that not having a "default Y" at Kconfig
-would mean that this is not enabled by default ;-)
-
-IMO you can just tell, instead:
-
-	"This can be ignored until the first kernel release that enables support
-	 for such hardware."
-
-> this can be ignored, until
-> +  the first kernel release that enables that hardware. 
-
-> This means no
-> +  major version bumps without the kernel retaining backwards
-> +  compatibility for the older major versions.  Minor version bumps
-> +  should not introduce new features that newer kernels depend on
-> +  non-optionally.
-> +
-> +* If a security fix needs lockstep firmware and kernel fixes in order to
-> +  be successful, then all supported major versions in the linux-firmware
-> +  repo should be updated with the security fix, and the kernel patches
-> +  should detect if the firmware is new enough to declare if the security
-> +  issue is fixed.  All communications around security fixes should point
-> +  at both the firmware and kernel fixes. If a security fix requires
-> +  deprecating old major versions, then this should only be done as a
-> +  last option, and be stated clearly in all communications.
-> +
-
-Perfect!
-
-Regards,
-Mauro
