@@ -2,106 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D002C43334
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 14:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6C2C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 15:50:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239357AbiGSOuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 10:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47546 "EHLO
+        id S239377AbiGSPum (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 11:50:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238614AbiGSOtt (ORCPT
+        with ESMTP id S239462AbiGSPu0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 10:49:49 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF12DF65;
-        Tue, 19 Jul 2022 07:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1658242187; x=1689778187;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=hHKtJ6+Dxw4RZU20X6JIbyKBSqc3/xUJvDskXuGrQIc=;
-  b=Lc+qJn4qMJQJDWWaDlCmrIPKgBmUkq9tjBUc/+ESu/N20pEntfpo0bYM
-   YE74x8lRrex7wrg06u9oznax2BsPv6TzIeTmQIUyxQakaJLxvfGgm4NGE
-   xFWdgwSaNawk9D5xZzeBcXROccqbodpYY9FmQbjL0Tb96K3LBXPwV9Uoe
-   VVXoasAwcv9qKVDZFTwF4t+CYwzTJMnLnTbBDa99h8XpWh0adH0vPdG4a
-   vvSP4afxeEmexsC3BwxeFFyBi4cCXRDiubiKnIIYOAiapVIfzqAJA324y
-   5AMO6SlZvniyEJrpLy/0RkYXa8THxuNjbDYeKCTteKGXXKaSvFgEdb3oF
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10413"; a="287661303"
-X-IronPort-AV: E=Sophos;i="5.92,284,1650956400"; 
-   d="scan'208";a="287661303"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 07:49:47 -0700
-X-IronPort-AV: E=Sophos;i="5.92,284,1650956400"; 
-   d="scan'208";a="594852649"
-Received: from kckollur-mobl1.amr.corp.intel.com (HELO [10.212.118.182]) ([10.212.118.182])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2022 07:49:45 -0700
-Message-ID: <95fc3b8f-7556-371d-2817-7e0d811de24a@linux.intel.com>
-Date:   Tue, 19 Jul 2022 09:49:44 -0500
+        Tue, 19 Jul 2022 11:50:26 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 363915019D;
+        Tue, 19 Jul 2022 08:50:20 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id f65so13828617pgc.12;
+        Tue, 19 Jul 2022 08:50:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=1KmDVlh31ZPGT/1gu3CgqryQOvMMNoshEj5LmQLClLE=;
+        b=CF2Yl7/YP6QIiN+4C38UCBemOvDUzg7jlB4d1bqOkoD5yqqrJB+CRjWnNPHNlMgnu+
+         sEHUhgCfdAlKwXHI/PmOSb1YvCYyiwG1O6dWPjunb+ExP0lN64xjqmEH93/2nrrD5XZ6
+         N+pHWdcCKLfvI1mDWoLpIASJOORCjdgYfVpZzvo7/4exGllQykD5IexOfM+o02tkzLE/
+         OIbRgvakahk0q70n3fYO/zz2Vsjd2Q23JtRKHT4gS24Xmo874q9vUSkafxEMuQ5UgR+1
+         arPPp2PTOhN9BEo3i3LBk+xEy81ckUNH3Ck74QxAUAykiY5kjrK2ZIud4cL7Q9iNvME6
+         yyYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=1KmDVlh31ZPGT/1gu3CgqryQOvMMNoshEj5LmQLClLE=;
+        b=NS79c8Mulz/wjSutiumZQBfIIU+wXTm64ycGO7yKrEhnAJTmCPs8yMX1q11hddqrQa
+         KP0JinqGIPzSwodQlkvbYFCv5+v031d0hjehYVTP6dwQmdlE6plZtuvs4zWscbHJzrmf
+         pA8C7dValig3ch7CORQMGFlLgRqGyKZvZPuGyZCltpsr2MxGWIRm8drtig1FezHEkl7t
+         Kv/LMWHZHMRoIGvjY33tSYo4xGeW1kr8tbTneQsi0SPZlumq6qgF33L8Wzxfq7HRK9J+
+         esZUYzq6lZ0XBRhNvVyNrRUPJlRaR1OKbn1tTBDg0bJhBTQ/EdBQlZ36Iy/v0ZaYqSY8
+         SL1Q==
+X-Gm-Message-State: AJIora+XFR6W/+ACrFCyBI4A/FVjjzzTigRBA3uCtxiIuXkR2cI+Kjn+
+        HnhGwwlKF9spQK0pyURsA7ix4aRRdpo=
+X-Google-Smtp-Source: AGRyM1tL6lj/7a5Chb8Z0J9xbIW7Gt1EkHU36SQs0eRhYFiSuJqwwGeqiYt03NdfTgnXeQBdGjN8gA==
+X-Received: by 2002:a63:f90d:0:b0:419:b112:91ea with SMTP id h13-20020a63f90d000000b00419b11291eamr25506678pgi.592.1658245819292;
+        Tue, 19 Jul 2022 08:50:19 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:c106])
+        by smtp.gmail.com with ESMTPSA id e13-20020a170902ef4d00b0016d1ab31b05sm348255plx.42.2022.07.19.08.50.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Jul 2022 08:50:18 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 19 Jul 2022 05:50:16 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jinke Han <hanjinke.666@bytedance.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH v2] block: don't allow the same type rq_qos add more than
+ once
+Message-ID: <YtbSuMqmrwGmAZti@slm.duckdns.org>
+References: <20220719070258.25721-1-hanjinke.666@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [PATCH] docs: driver-api: firmware: add driver firmware
- guidelines.
-Content-Language: en-US
-To:     Dave Airlie <airlied@gmail.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>
-Cc:     alsa-devel@alsa-project.org,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Linux Wireless List <linux-wireless@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        "Luis R. Rodriguez" <mcgrof@kernel.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Network Development <netdev@vger.kernel.org>,
-        "dri-devel@lists.sf.net" <dri-devel@lists.sf.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>
-References: <20220718072144.2699487-1-airlied@gmail.com>
- <YtWeUOJewho7p/vM@intel.com>
- <CAPM=9tyhOfOz1tn7uNsg_0EzvrBHcSoY+8bignNb2zfgZr6iRw@mail.gmail.com>
-From:   Pierre-Louis Bossart <pierre-louis.bossart@linux.intel.com>
-In-Reply-To: <CAPM=9tyhOfOz1tn7uNsg_0EzvrBHcSoY+8bignNb2zfgZr6iRw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220719070258.25721-1-hanjinke.666@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 7/18/22 19:29, Dave Airlie wrote:
->>> +* Firmware should be versioned with at least a major/minor version. It
->>> +  is suggested that the firmware files in linux-firmware be named with
->>> +  some device specific name, and just the major version. The
->>> +  major/minor/patch versions should be stored in a header in the
->>> +  firmware file for the driver to detect any non-ABI fixes/issues. The
->>> +  firmware files in linux-firmware should be overwritten with the newest
->>> +  compatible major version. Newer major version firmware should remain
->>> +  compatible with all kernels that load that major number.
->>
->> would symbolic links be acceptable in the linux-firmware.git where
->> the <fmw>_<major>.bin is a sym link to <fwm>_<major>.<minor>.bin
->>
->> or having the <fwm>_<major>.bin really to be the overwritten every minor
->> update?
+On Tue, Jul 19, 2022 at 03:02:58PM +0800, Jinke Han wrote:
+> From: Jinke Han <hanjinke.666@bytedance.com>
 > 
-> I don't think providing multiple minor versions of fw in
-> linux-firmware is that interesting.
-> Like if the major is the same, surely you always want the newer ones.
-> As long as the
-> ABI doesn't break. Otherwise we are just wasting disk space with fws
-> nobody will be using.
+> In our test of iocost, we encounttered some list add/del corrutions of
+> inner_walk list in ioc_timer_fn.
+> 
+> The reason can be descripted as follow:
+> cpu 0						cpu 1
+> ioc_qos_write					ioc_qos_write
+> 
+> ioc = q_to_ioc(bdev_get_queue(bdev));
+> if (!ioc) {
+>         ioc = kzalloc();			ioc = q_to_ioc(bdev_get_queue(bdev));
+> 						if (!ioc) {
+> 							ioc = kzalloc();
+> 							...
+> 							rq_qos_add(q, rqos);
+> 						}
+>         ...
+>         rq_qos_add(q, rqos);
+>         ...
+> }
+> 
+> When the io.cost.qos file is written by two cpu concurrently, rq_qos may
+> be added to one disk twice. In that case, there will be two iocs enabled
+> and running on one disk. They own different iocgs on their active list.
+> In the ioc_timer_fn function, because of the iocgs from two ioc have the
+> same root iocg, the root iocg's walk_list may be overwritten by each
+> other and this lead to list add/del corrutions in building or destorying
+> the inner_walk list.
+> 
+> And so far, the blk-rq-qos framework works in case that one instance for
+> one type rq_qos per queue by default. This patch make this explicit and
+> also fix the crash above.
+> 
+> Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
 
-It was my understanding that once a firmware file is in linux-firmware
-it's there forever. There are tons of existing symlinks to point to the
-latest version, but the previous versions are not removed/overwritten.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-see random examples:
-ls -lR /lib/firmware  | grep t4fw
-ls -lR /lib/firmware  | grep fw_release
+Thanks.
 
-
+-- 
+tejun
