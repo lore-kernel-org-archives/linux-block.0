@@ -2,100 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AADB6CCA48B
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 13:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6454C43334
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 13:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242588AbiGSNBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 09:01:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52518 "EHLO
+        id S238753AbiGSNVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 09:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243181AbiGSNAf (ORCPT
+        with ESMTP id S239655AbiGSNV2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 09:00:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B96761DBC;
-        Tue, 19 Jul 2022 05:25:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 19 Jul 2022 09:21:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6057DCBD25
+        for <linux-block@vger.kernel.org>; Tue, 19 Jul 2022 05:37:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658234262;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qvqB2ULTeD0f2GX9QuVLUrCzayp94gM6HQvsFtp7g0Y=;
+        b=YeZVLofE3Ma1D+84yqjuOi5EkwcSPQ2toKyGMMxGVwl9kxtJ5UL1DeIXLgWSXJTOD3Upbf
+        4+uykOSYboM7Muk/jhJTuxJlM6ThUQl1HziqMR/6UNgDuA8L6A7SKn8jdfMm2d5lLdo1f3
+        7tFxqP3NaGbE3thZfXybYGf+uInWGtE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-564-ND3EB5wzOqynH1WRPi1hVw-1; Tue, 19 Jul 2022 08:37:33 -0400
+X-MC-Unique: ND3EB5wzOqynH1WRPi1hVw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B7E60B81B38;
-        Tue, 19 Jul 2022 12:25:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F4EC341CA;
-        Tue, 19 Jul 2022 12:25:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1658233544;
-        bh=chF6hNHxYwr7S/4cPwX/yypxTGcy93JoJmDViWNqhYo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YAlbJG5pD9aN+WSYd+L+Q8yuMv10H3ncO3q5mB6by3QQ3X015Za13QEiOHFPaCmM2
-         6n1jhZWMowKecQRWXffihyHCa2eiUk1NJ7IlbjrpMApRm6yUWN2aOkw1nGM0dwLnW3
-         7usj5pcZuRaahBt0DgkFBLTAKfqLO5EhNFlMgjXs=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Kashyap Desai <kashyap.desai@broadcom.com>,
-        sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        Guangwu Zhang <guazhang@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.18 158/231] scsi: megaraid: Clear READ queue maps nr_queues
-Date:   Tue, 19 Jul 2022 13:54:03 +0200
-Message-Id: <20220719114727.553269401@linuxfoundation.org>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220719114714.247441733@linuxfoundation.org>
-References: <20220719114714.247441733@linuxfoundation.org>
-User-Agent: quilt/0.66
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB0031C068F5;
+        Tue, 19 Jul 2022 12:37:32 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D5098141511F;
+        Tue, 19 Jul 2022 12:37:29 +0000 (UTC)
+Date:   Tue, 19 Jul 2022 20:37:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH 2/2] Revert "ublk_drv: fix request queue leak"
+Message-ID: <YtalgzqC/q3JpYCR@T590>
+References: <20220718062928.335399-1-hch@lst.de>
+ <20220718062928.335399-2-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220718062928.335399-2-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+Hi Christoph,
 
-[ Upstream commit 8312cd3a7b835ae3033a679e5f0014a40e7891c5 ]
+On Mon, Jul 18, 2022 at 08:29:28AM +0200, Christoph Hellwig wrote:
+> This was just a rather broken way to paper over a core block layer bug
+> that is now fixed.
+> 
+> This reverts commit cebbe577cb17ed9b04b50d9e6802a8bacffbadca.
 
-The megaraid SCSI driver sets set->nr_maps as 3 if poll_queues is > 0, and
-blk-mq actually initializes each map's nr_queues as nr_hw_queues.
-Consequently the driver has to clear READ queue map's nr_queues, otherwise
-the queue map becomes broken if poll_queues is set as non-zero.
+This change will break START_DEV/STOP_DEV, which is supposed to run
+multiple cycles after the device is added, especially this way can
+help to implement error recovery from userside, such as one ubq_daemon
+is crashed/hang, the device can be recovered by sending STOP_DEV/START_DEV
+commands again after new ubq_daemon is setup.
 
-Link: https://lore.kernel.org/r/20220706125942.528533-1-ming.lei@redhat.com
-Fixes: 9e4bec5b2a23 ("scsi: megaraid_sas: mq_poll support")
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Cc: sumit.saxena@broadcom.com
-Cc: chandrakanth.patil@broadcom.com
-Cc: linux-block@vger.kernel.org
-Cc: Hannes Reinecke <hare@suse.de>
-Reported-by: Guangwu Zhang <guazhang@redhat.com>
-Tested-by: Guangwu Zhang <guazhang@redhat.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/scsi/megaraid/megaraid_sas_base.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
-index db6793608447..f5deb0e561a9 100644
---- a/drivers/scsi/megaraid/megaraid_sas_base.c
-+++ b/drivers/scsi/megaraid/megaraid_sas_base.c
-@@ -3195,6 +3195,9 @@ static int megasas_map_queues(struct Scsi_Host *shost)
- 	qoff += map->nr_queues;
- 	offset += map->nr_queues;
- 
-+	/* we never use READ queue, so can't cheat blk-mq */
-+	shost->tag_set.map[HCTX_TYPE_READ].nr_queues = 0;
-+
- 	/* Setup Poll hctx */
- 	map = &shost->tag_set.map[HCTX_TYPE_POLL];
- 	map->nr_queues = instance->iopoll_q_count;
--- 
-2.35.1
+So here we do need separated request_queue/disk, and the model is
+similar with scsi's, in which disk rebind needs to be supported
+and GD_OWNS_QUEUE can't be set.
 
 
+Thanks,
+Ming
 
