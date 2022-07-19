@@ -2,71 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9871CCA479
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jul 2022 22:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01849C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 00:30:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236279AbiGRWEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jul 2022 18:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51074 "EHLO
+        id S234975AbiGSAaN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jul 2022 20:30:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235709AbiGRWE3 (ORCPT
+        with ESMTP id S230104AbiGSAaM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jul 2022 18:04:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9AE1F2D6;
-        Mon, 18 Jul 2022 15:04:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 778DBB817B5;
-        Mon, 18 Jul 2022 22:04:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0E7DC341C0;
-        Mon, 18 Jul 2022 22:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658181860;
-        bh=3JxZkLM8MBszfDbDjwosYrF471wfmGyjogJnExYKUPY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=BSlcJtetWKT66UYJ5KpIsH1zskh3T2ZqU/URAT5Y8TZeNrDkyU4XdYFBS1UCq8HGs
-         OeAcEtyYH5QPq1S0Yf81A5dfERgEQxdiY1nFXXqysSevgo4VJ10WCEzxjCSTsywggx
-         5o3XEpBmhlD+Mj4w7jqRwz28mrK0Ev4Pvv7VC/qnVVpXS6vgAgZnf3vmjMzM//0TM+
-         m2PNihIHQjQ8iDbkBmz1rc3GpaRWbkpAqP8iOcdqqB4t+W5qDj3Ykk/sudVMnTAfSN
-         MIStUtpzJ2s7xfcOgw526ZqsCKTTUvFKUQGKMYkCj01RTmOKRLDqptGyKlWg1k0DIr
-         kQpGkmvYq8x6g==
-Date:   Mon, 18 Jul 2022 15:04:14 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Thorsten Leemhuis <linux@leemhuis.info>
-Cc:     Dave Airlie <airlied@gmail.com>, torvalds@linux-foundation.org,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        gregkh@linuxfoundation.org, Daniel Vetter <daniel@ffwll.ch>,
-        mcgrof@kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.sf.net, netdev@vger.kernel.org,
-        linux-wireless@vger.kernel.org, alsa-devel@alsa-project.org,
-        linux-media@vger.kernel.org, linux-block@vger.kernel.org,
-        Dave Airlie <airlied@redhat.com>
-Subject: Re: [PATCH] docs: driver-api: firmware: add driver firmware
- guidelines.
-Message-ID: <20220718150414.1767bbd8@kernel.org>
-In-Reply-To: <97e5afd3-77a3-2227-0fbf-da2f9a41520f@leemhuis.info>
-References: <20220718072144.2699487-1-airlied@gmail.com>
-        <97e5afd3-77a3-2227-0fbf-da2f9a41520f@leemhuis.info>
+        Mon, 18 Jul 2022 20:30:12 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8759B6551;
+        Mon, 18 Jul 2022 17:30:09 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id l23so24326303ejr.5;
+        Mon, 18 Jul 2022 17:30:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tHECUp5Nu2/GZmp47KHS0DA3aZn/HqPLp4AXTv+D1so=;
+        b=cmjJp4Wc70UFyJOU6m9PHDv6cgBcSxACjV8XCYXocWtr/FcDcZs/QFmdPSXbhLyk3R
+         FCPJlVcDF3a/bfbY1OWEBMjl7TtYtUqMl4/A/cUcxiW5hsr+PAuT1lF+4Ixp22UZhHaL
+         sJIUDawrTaLiqBcojVG2hn0PPXAFrYn7zche+uxAV4J2eoaR53m7JLz9lb0PPCkXovqr
+         TCkGxZqKxLlK4CUnskdjqrd6D8nX5LutfIhmOojrYGQhrbAL0nFeOJB3HSXXDc75ja4Q
+         Ur9wiz3Bf1hLJs4caVo1AfyVNX5xpE4+6LBYPFFX8y4zfXhOa+ndM9cAVlVQj/YWQdYx
+         EP1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tHECUp5Nu2/GZmp47KHS0DA3aZn/HqPLp4AXTv+D1so=;
+        b=dBZzEOhtjIyFkgbp1UeKf8XczD+xW+qQXcBLUyb0RhTbkjpWyIwJwqxSn0Apaw1oLs
+         aDrSqvrJFUf1nzQoApe8exwuu7WnWDXzjAuE6kHon1F/9LqsULM9SHbct09WHVkZNw1s
+         S4CI6nvqadzFDsQy75jZw63W/oSP3zx6yeZ4o8Osjtr6Qyaj1m7S3Y45MpqZU6g/KbrY
+         +yh00FxpVoCey9AitLjsxvlfJfpk1Z4GR0zFhwpqBMmTbXm6oZR9Ut6MCABvp5gaFxbs
+         gKyCaJ99aA79gieEJAZfX+JXjRqArymTr72AAOaPUXIKymwVqAjZFwOtszY1UdQ8aNwz
+         QGjA==
+X-Gm-Message-State: AJIora9oQiiTjoCW//GkIDfsWmzq3SL8KZFkXJ85WUdCHbMiOhJIDdij
+        Z0jHvWViDmS2fW/C3L4vHYbDWIIezGeNSt88+Ek=
+X-Google-Smtp-Source: AGRyM1svWNwoYq60pp37EFhGkxbFoEzaD37OWwpIsvtcVPSeTlz8BczIXRa0zpFaHGe5N9WvcJ4GnRQwW7CTE2lGvM0=
+X-Received: by 2002:a17:907:96ac:b0:72f:1dea:5b66 with SMTP id
+ hd44-20020a17090796ac00b0072f1dea5b66mr10887738ejc.266.1658190608048; Mon, 18
+ Jul 2022 17:30:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20220718072144.2699487-1-airlied@gmail.com> <YtWeUOJewho7p/vM@intel.com>
+In-Reply-To: <YtWeUOJewho7p/vM@intel.com>
+From:   Dave Airlie <airlied@gmail.com>
+Date:   Tue, 19 Jul 2022 10:29:56 +1000
+Message-ID: <CAPM=9tyhOfOz1tn7uNsg_0EzvrBHcSoY+8bignNb2zfgZr6iRw@mail.gmail.com>
+Subject: Re: [PATCH] docs: driver-api: firmware: add driver firmware guidelines.
+To:     Rodrigo Vivi <rodrigo.vivi@intel.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        "Luis R. Rodriguez" <mcgrof@kernel.org>,
+        alsa-devel@alsa-project.org,
+        Network Development <netdev@vger.kernel.org>,
+        Linux Wireless List <linux-wireless@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+        "dri-devel@lists.sf.net" <dri-devel@lists.sf.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 18 Jul 2022 11:33:11 +0200 Thorsten Leemhuis wrote:
-> > If the hardware isn't
-> > +  enabled by default or under development,  
-> 
-> Wondering if it might be better to drop the "or under development", as
-> the "enabled by default" is the main part afaics. Maybe something like
-> "If support for the hardware is normally inactive (e.g. has to be
-> enabled manually by a kernel parameter)" would be better anyway.
+> > +* Firmware should be versioned with at least a major/minor version. It
+> > +  is suggested that the firmware files in linux-firmware be named with
+> > +  some device specific name, and just the major version. The
+> > +  major/minor/patch versions should be stored in a header in the
+> > +  firmware file for the driver to detect any non-ABI fixes/issues. The
+> > +  firmware files in linux-firmware should be overwritten with the newest
+> > +  compatible major version. Newer major version firmware should remain
+> > +  compatible with all kernels that load that major number.
+>
+> would symbolic links be acceptable in the linux-firmware.git where
+> the <fmw>_<major>.bin is a sym link to <fwm>_<major>.<minor>.bin
+>
+> or having the <fwm>_<major>.bin really to be the overwritten every minor
+> update?
 
-It's a tricky one, I'd say something like you can break the FW ABI
-"until HW becomes available for public consumption" or such.
-I'm guessing what we're after is letting people break the compatibility
-in early stages of the product development cycles. Pre-silicon and
-bring up, but not after there are products on the market?
+I don't think providing multiple minor versions of fw in
+linux-firmware is that interesting.
+Like if the major is the same, surely you always want the newer ones.
+As long as the
+ABI doesn't break. Otherwise we are just wasting disk space with fws
+nobody will be using.
+
+Dave.
