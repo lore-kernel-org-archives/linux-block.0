@@ -2,70 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE79C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 12:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADB6CCA48B
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 13:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241761AbiGSMvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 08:51:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50072 "EHLO
+        id S242588AbiGSNBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 09:01:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241766AbiGSMuS (ORCPT
+        with ESMTP id S243181AbiGSNAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 08:50:18 -0400
-Received: from smtpbg.qq.com (biz-43-154-54-12.mail.qq.com [43.154.54.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97C28FD64;
-        Tue, 19 Jul 2022 05:19:59 -0700 (PDT)
-X-QQ-mid: bizesmtp84t1658232992tcyg0vfy
-Received: from localhost.localdomain ( [171.223.96.21])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Tue, 19 Jul 2022 20:16:30 +0800 (CST)
-X-QQ-SSF: 01000000002000F0U000B00A0000020
-X-QQ-FEAT: 4rCmCcmdMHdi35qznvqNxxvnEWdSiRmmST1u+A2o6peXFM/RSPwShRDt80gHA
-        y5DVAxaORbKKdxdxy0RXOWPAkhqBXotrr90r8Qf4Fi65bbCAqQWvR+03tN+lHkZi7TSZNv9
-        YoX+BR/arF0CSkVM85USAgAIDuf0wu4iiLQdvhsq4Ocr/CJpCJofS+HLnDok5GJZIB1rDqi
-        J6rFXe2FhiUBBzfDsiDdyKVIREWrAb0bSisepF97ZleNonM52r0awyxf0NnR5e1YOOBqY1N
-        v3oRZHhM6xhmec09WOtHr94pWHAVP9DKk/Ty1NJKxSCEDjcfjcqjrQSma+V3qWnFgCzR5Sl
-        y6VHSuQJNuBjinDlb9d4ay4X9oLx2CXW8D7CFc8MQzb1KZKp3V2Y1HdEIWxfmHri3jJ+1RU
-        4xvtfeMJsrs=
-X-QQ-GoodBg: 0
-From:   Jason Wang <wangborong@cdjrlc.com>
-To:     axboe@kernel.dk
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jason Wang <wangborong@cdjrlc.com>
-Subject: [PATCH] block/drbd: Fix comment typo
-Date:   Sat, 16 Jul 2022 12:14:34 +0800
-Message-Id: <20220716041434.33148-1-wangborong@cdjrlc.com>
-X-Mailer: git-send-email 2.35.1
+        Tue, 19 Jul 2022 09:00:35 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B96761DBC;
+        Tue, 19 Jul 2022 05:25:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B7E60B81B38;
+        Tue, 19 Jul 2022 12:25:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5F4EC341CA;
+        Tue, 19 Jul 2022 12:25:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1658233544;
+        bh=chF6hNHxYwr7S/4cPwX/yypxTGcy93JoJmDViWNqhYo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=YAlbJG5pD9aN+WSYd+L+Q8yuMv10H3ncO3q5mB6by3QQ3X015Za13QEiOHFPaCmM2
+         6n1jhZWMowKecQRWXffihyHCa2eiUk1NJ7IlbjrpMApRm6yUWN2aOkw1nGM0dwLnW3
+         7usj5pcZuRaahBt0DgkFBLTAKfqLO5EhNFlMgjXs=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Kashyap Desai <kashyap.desai@broadcom.com>,
+        sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        Guangwu Zhang <guazhang@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.18 158/231] scsi: megaraid: Clear READ queue maps nr_queues
+Date:   Tue, 19 Jul 2022 13:54:03 +0200
+Message-Id: <20220719114727.553269401@linuxfoundation.org>
+X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20220719114714.247441733@linuxfoundation.org>
+References: <20220719114714.247441733@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The double `and' is duplicated in line 89, remove one.
+From: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Jason Wang <wangborong@cdjrlc.com>
+[ Upstream commit 8312cd3a7b835ae3033a679e5f0014a40e7891c5 ]
+
+The megaraid SCSI driver sets set->nr_maps as 3 if poll_queues is > 0, and
+blk-mq actually initializes each map's nr_queues as nr_hw_queues.
+Consequently the driver has to clear READ queue map's nr_queues, otherwise
+the queue map becomes broken if poll_queues is set as non-zero.
+
+Link: https://lore.kernel.org/r/20220706125942.528533-1-ming.lei@redhat.com
+Fixes: 9e4bec5b2a23 ("scsi: megaraid_sas: mq_poll support")
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: sumit.saxena@broadcom.com
+Cc: chandrakanth.patil@broadcom.com
+Cc: linux-block@vger.kernel.org
+Cc: Hannes Reinecke <hare@suse.de>
+Reported-by: Guangwu Zhang <guazhang@redhat.com>
+Tested-by: Guangwu Zhang <guazhang@redhat.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/drbd/drbd_bitmap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/scsi/megaraid/megaraid_sas_base.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-index 7d9db33363de..736416186c2f 100644
---- a/drivers/block/drbd/drbd_bitmap.c
-+++ b/drivers/block/drbd/drbd_bitmap.c
-@@ -86,7 +86,7 @@ struct drbd_bitmap {
+diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
+index db6793608447..f5deb0e561a9 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_base.c
++++ b/drivers/scsi/megaraid/megaraid_sas_base.c
+@@ -3195,6 +3195,9 @@ static int megasas_map_queues(struct Scsi_Host *shost)
+ 	qoff += map->nr_queues;
+ 	offset += map->nr_queues;
  
- 	/* exclusively to be used by __al_write_transaction(),
- 	 * drbd_bm_mark_for_writeout() and
--	 * and drbd_bm_write_hinted() -> bm_rw() called from there.
-+	 * drbd_bm_write_hinted() -> bm_rw() called from there.
- 	 */
- 	unsigned int n_bitmap_hints;
- 	unsigned int al_bitmap_hints[AL_UPDATES_PER_TRANSACTION];
++	/* we never use READ queue, so can't cheat blk-mq */
++	shost->tag_set.map[HCTX_TYPE_READ].nr_queues = 0;
++
+ 	/* Setup Poll hctx */
+ 	map = &shost->tag_set.map[HCTX_TYPE_POLL];
+ 	map->nr_queues = instance->iopoll_q_count;
 -- 
 2.35.1
+
+
 
