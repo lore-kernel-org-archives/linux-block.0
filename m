@@ -2,165 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE13CCA487
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 06:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C1AC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jul 2022 06:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbiGSGtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jul 2022 02:49:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55776 "EHLO
+        id S231645AbiGSGxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jul 2022 02:53:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237080AbiGSGtO (ORCPT
+        with ESMTP id S229763AbiGSGxs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jul 2022 02:49:14 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB4C2B188;
-        Mon, 18 Jul 2022 23:49:08 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 115E4336A3;
-        Tue, 19 Jul 2022 06:49:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1658213347; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aI5hSd3aPqVjrxDxXDtNYXynhrAAxknGQEg4S3098UE=;
-        b=uEuI0vCH/Pr5EYsbyZ6uECvtxJEPS63jdAYuAM3Z1+nu7Xyi8z+NI+BE8fpEYsKzHq+RFI
-        4G9JqceyC82VVPvdAJjITpkVxTBxYr+xLGeQO4/b3Ymh+6hW01tE8/x2Iv7JWZpAJS/4jK
-        CBObQvqcPzjhoZOb2bTGoA5+ZyB9MGs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1658213347;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aI5hSd3aPqVjrxDxXDtNYXynhrAAxknGQEg4S3098UE=;
-        b=lAG77sIqd4/GdM4a+V130Oc+qQEMekmBWaSXEozHUEKrKCjcTlK2jdW+lUrx0/Siu40Sgh
-        awZ2o3M+y0yIuMAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D797113A72;
-        Tue, 19 Jul 2022 06:49:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id kby9M+JT1mJWHQAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 19 Jul 2022 06:49:06 +0000
-Message-ID: <019d93cd-2033-2fa7-9532-2baa226d817f@suse.de>
-Date:   Tue, 19 Jul 2022 08:49:06 +0200
+        Tue, 19 Jul 2022 02:53:48 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDEA275C8
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 23:53:47 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-31e45527da5so32423487b3.5
+        for <linux-block@vger.kernel.org>; Mon, 18 Jul 2022 23:53:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=u5KxztmCmMVHIN310A4ZHMWsumpUd/uei+99VlIfECo=;
+        b=g45peOwJLERlzIw9j9Qr3FglyHx1ejYM46zmBvA/t4aMhMusgrlHHP7DtNqT3w8UDx
+         +nBrmbn3AeWkJLwpUK3lBY+pXw5XeerP0NGTxCjRBjj8iozdPjAL8Jci7xtIVoqKdBHL
+         fEUljn0PqIWZr/hPjTugMvYwnqskDlL10SVhxZ8CnPVRvTIxBC5x8rAXgDmSAduRjwo4
+         vhYvaSwgrqv7mSpvQ5A7gKQbEfS+zIX/0XYSM/O/B+apqFIO+1NiJatid+NqnQIqIo7K
+         L1w3wWiR2lvJZHwarcjfbBoMYr2KyA83S8A3w/tgFxGpzA8wF+Vuh0UAE5vn24mWyr64
+         ig1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=u5KxztmCmMVHIN310A4ZHMWsumpUd/uei+99VlIfECo=;
+        b=u7FqRbGykLbmIrm9OrZg0+64k2M5AqizYlfqM1kfTTZ/ai+wnb/ixBlZR0yH/FGW0r
+         eo3uou2pExAgTclF4UAYRo43qMdOTYqst1jv7XiD265b+X+YSEiHngwjbctLVXa65tqv
+         Go95ppL7W5ABG4nhz9VyuIq7kUjm5oTAluGJx8ROLN5CcFgrP4aCn9dde1T7zu39pZ/q
+         1IdfzYvX9K9cYYz1+Y8JztP4aHVhu1Ry05ZUESIZ56gr0ibQ+L89xSWYFVXI/NMhnGuu
+         ohTKUY+mMXrKixf/NxlD8F+/+oHaVfJ9pRyWbB+lfmaNtu2wmpUszJ5oz27blw56fKlO
+         cy9w==
+X-Gm-Message-State: AJIora8cD0b1swwPh7/+Z3QxNKJ1iEx9xvRb8dYzup8OzKv/zB8OMdMx
+        IuBK1LmzP96g6jsOyopoNDNnzwdSlYrxKx5bKQe2h385RIykqPCJ
+X-Google-Smtp-Source: AGRyM1vKSBqibQJYRQ+aqUzhML96/8AsNMD0slmFOO0+vHlS3+2F8QNM4+T5y938H9dnBSoBA29EmeNpgAcZLDGPnbA=
+X-Received: by 2002:a0d:ca88:0:b0:31d:c7a:6ec3 with SMTP id
+ m130-20020a0dca88000000b0031d0c7a6ec3mr35667468ywd.141.1658213626831; Mon, 18
+ Jul 2022 23:53:46 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 3/4] block: sed-opal: keyring support for SED Opal keys
-Content-Language: en-US
-To:     gjoyce@linux.vnet.ibm.com, linux-block@vger.kernel.org
-Cc:     keyrings@vger.kernel.org, dhowells@redhat.com, jarkko@kernel.org,
-        jonathan.derrick@linux.dev, brking@linux.vnet.ibm.com,
-        greg@gilhooley.com, gjoyce@ibm.com
-References: <20220718210156.1535955-1-gjoyce@linux.vnet.ibm.com>
- <20220718210156.1535955-4-gjoyce@linux.vnet.ibm.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220718210156.1535955-4-gjoyce@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20220718083646.67601-1-hanjinke.666@bytedance.com>
+In-Reply-To: <20220718083646.67601-1-hanjinke.666@bytedance.com>
+From:   Muchun Song <songmuchun@bytedance.com>
+Date:   Tue, 19 Jul 2022 14:53:09 +0800
+Message-ID: <CAMZfGtVLkO6T-0n7fMBTvR84Ji8GhTO5==u9v+8f+dRkJhFHMA@mail.gmail.com>
+Subject: Re: [PATCH] block: don't allow the same type rq_qos add more than once
+To:     Jinke Han <hanjinke.666@bytedance.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Cgroups <cgroups@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/18/22 23:01, gjoyce@linux.vnet.ibm.com wrote:
-> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> 
-> Extend the SED block driver so it can alternatively
-> obtain a key from a sed-opal kernel keyring. The SED
-> ioctls will indicate the source of the key, either
-> directly in the ioctl data or from the keyring.
-> 
-> This allows the use of SED commands in scripts such as
-> udev scripts so that drives may be automatically unlocked
-> as they become available.
-> 
-> Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> ---
->   block/Kconfig                 |   1 +
->   block/sed-opal.c              | 198 +++++++++++++++++++++++++++++++++-
->   include/linux/sed-opal.h      |   3 +
->   include/uapi/linux/sed-opal.h |   8 +-
->   4 files changed, 206 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 50b17e260fa2..f65169e9356b 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -182,6 +182,7 @@ config BLK_DEBUG_FS_ZONED
->   
->   config BLK_SED_OPAL
->   	bool "Logic for interfacing with Opal enabled SEDs"
-> +	depends on KEYS
->   	help
->   	Builds Logic for interfacing with Opal enabled controllers.
->   	Enabling this option enables users to setup/unlock/lock
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index feba36e54ae0..4cfc3458cba5 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -20,6 +20,10 @@
->   #include <linux/sed-opal.h>
->   #include <linux/string.h>
->   #include <linux/kdev_t.h>
-> +#include <linux/key.h>
-> +#include <linux/key-type.h>
-> +#include <linux/arch_vars.h>
-> +#include <keys/user-type.h>
->   
->   #include "opal_proto.h"
->   
-> @@ -29,6 +33,8 @@
->   /* Number of bytes needed by cmd_finalize. */
->   #define CMD_FINALIZE_BYTES_NEEDED 7
->   
-> +static struct key *sed_opal_keyring;
-> +
->   struct opal_step {
->   	int (*fn)(struct opal_dev *dev, void *data);
->   	void *data;
-> @@ -266,6 +272,107 @@ static void print_buffer(const u8 *ptr, u32 length)
->   #endif
->   }
->   
-> +/*
-> + * Allocate/update a SED Opal key and add it to the SED Opal keyring.
-> + */
-> +static int update_sed_opal_key(const char *desc, u_char *key_data, int keylen)
-> +{
-> +	int ret;
-> +	struct key *key;
-> +
-> +	if (!sed_opal_keyring)
-> +		return -ENOKEY;
-> +
-> +	key = key_alloc(&key_type_user, desc, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID,
-> +			current_cred(),
-> +			KEY_USR_VIEW | KEY_USR_SEARCH | KEY_USR_WRITE,
-> +			0,
-> +			NULL);
-> +	if (IS_ERR(key))
-> +		return PTR_ERR(key);
-> +
-> +	ret = key_instantiate_and_link(key, key_data, keylen,
-> +				       sed_opal_keyring, NULL);
-> +	key_put(key);
-> +
+On Mon, Jul 18, 2022 at 4:37 PM Jinke Han <hanjinke.666@bytedance.com> wrote:
+>
+> From: hanjinke <hanjinke.666@bytedance.com>
+>
+> In our test of iocost, we encounttered some list add/del corrutions of
+> inner_walk list in ioc_timer_fn.
+> The resean can be descripted as follow:
+>
+> cpu 0                                           cpu 1
+> ioc_qos_write                                   ioc_qos_write
+>
+> ioc = q_to_ioc(bdev_get_queue(bdev));
+> if (!ioc) {
+>         ioc = kzalloc();                        ioc = q_to_ioc(bdev_get_queue(bdev));
+>                                                         if (!ioc) {
+>                                                                 ioc = kzalloc();
+>                                                                 ...
+>                                                                 rq_qos_add(q, rqos);
+>                                                          }
+>         ...
+>         rq_qos_add(q, rqos);
+>         ...
+> }
+>
+> When the io.cost.qos file is written by two cpu concurrently, rq_qos may
+> be added to one disk twice. In that case, there will be two iocs enabled
+> and running on one disk. They own different iocgs on their active list.
+> In the ioc_timer_fn function, because of the iocgs from two ioc have the
+> same root iocg, the root iocg's walk_list may be overwritten by each
+> other and this lead to list add/del corrutions in building or destorying
+> the inner_walk list.
+>
+> And so far, the blk-rq-qos framework works in case that one instance for
+> one type rq_qos per queue by default. This patch make this explicit and
+> also fix the crash above.
+>
+> Signed-off-by: hanjinke <hanjinke.666@bytedance.com>
 
-Maybe you should consider 'key_create_or_update() here, as it combines 
-both operations.
-Also the 'key_instantiate_and_link()' operation will always insert the 
-key, so you might end up with key duplicates.
+The change LGTM. Maybe it is better to add a Fixes tag here so that
+others can easily know what Linux versions should be backported.
 
-Cheers,
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
 
-Hannes
-
+Thanks.
