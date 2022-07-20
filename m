@@ -2,99 +2,261 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFAEC43334
-	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 09:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D96BAC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 09:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232105AbiGTJb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Jul 2022 05:31:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32826 "EHLO
+        id S237447AbiGTJgt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Jul 2022 05:36:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230246AbiGTJbX (ORCPT
+        with ESMTP id S232156AbiGTJgo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Jul 2022 05:31:23 -0400
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F7AB54CBE
-        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 02:31:19 -0700 (PDT)
-X-QQ-mid: bizesmtp65t1658309464t5kcqyci
-Received: from eureka.localdomain ( [123.124.208.226])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Wed, 20 Jul 2022 17:30:51 +0800 (CST)
-X-QQ-SSF: 01400000002000B0D000000A0000020
-X-QQ-FEAT: hoArX50alxG/Em5tr+cjD56eDWqOPkiKaRqdDQ9vGGbrlnaAHGGwmB+D0Nsox
-        OI9UqoySXCx41SDJA5Ofz1EJIBoDdK4d9gmoSc4YUoQeQG2/xjIr04w+qutBGoM92YUDf3y
-        1+3pN3kuapLW2zbJs/aAkxNnelPShvLMVAhbcmX19iHrrJ5Zy9giqyCWt8bMYjP7hv2wjaC
-        y1ACKxCStoTnT5iObt5JMD9LeUqtSV8LUJpmVBDI1529XhbwpXVXSLOQ9i3xL13KXuEdFN4
-        TeT/QrKz8Ka6awfkWTB1d0yzJdE7y0f1R2+S/yuiBeOkXQdeatuLCZawllNd+TNDr269SjE
-        FIP3ms0L+W2e4EH+/t77SpAeaS7uj63EZ5d1hLGHBSrnEWLXcdhM+yIkWkEU7sNahAkS2/u
-        RWXZ5L+pVv4=
-X-QQ-GoodBg: 1
-From:   Wang You <wangyoua@uniontech.com>
-To:     axboe@kernel.dk
+        Wed, 20 Jul 2022 05:36:44 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4336F65D6B
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 02:36:35 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id j1-20020a17090aeb0100b001ef777a7befso3340742pjz.0
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 02:36:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=oXKrqXNoQbGqXRKsJ331SBJ7YG/0WKRR7aaK+WgaUgE=;
+        b=joNrTJHxlVPnJRGb4f5KBM5NAjHQOSGvKdfYEBNnHb8bcv1/Cdl6rj5AtCz2mXeGsc
+         +zeKQDsw5+SGysz+Zn8WbGnYPEOF9wEd8xMZr60qGCNCFk7lUkxLi7bF7xKlvFVr6lam
+         3TXrUBnFuLI3eDmOUseVnQV+2f8rBmyqjlHAN1ZLBPXNqC0UPGcEyqSjDfQRad2lcj70
+         31HL/lKNDBycUOE5opjsi7vGRYVlh6XQHrM52h6Pnn0TGM9joWEB2HY/it4SzmjknpuI
+         xKjTJE8SF8n4ik1FteRU7FclP6t3uzinZkzJsc2YGJs1pqgMLWtGZ/U03nKtca6ZhOFm
+         SLQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=oXKrqXNoQbGqXRKsJ331SBJ7YG/0WKRR7aaK+WgaUgE=;
+        b=QGPc7ip4M6Z3uS1Ith2UJZzOEd6jX1zWFhcKAjhlkjRBmQpVI7b7MC4mQqeoojPsD+
+         ufSwwRX+aqqhzBO9oVXmh/MUJZThrRgbm0UOpIHDe+X857EfILiIAQg0QG7l4Um0/x+h
+         juw9W/A1aTHY+uV9Ho5Mqz7Bc8d72W1yHf9tWSVv5EM4Fp+yaQAC2N1RaMyv1qsR/C0a
+         iGDSiW5ygFddtvnabCRVeNkWJRtw+h6SgpOWjzgpO3IybVdSIVwp6X2gZZcENlsMOVkl
+         OHuFJc3bjCmtt/5//7O2NqUzwYlzaRYeAg4xOzdb2S7fd0DEq/RCF4X2LgZ/JweuQZUw
+         fQnw==
+X-Gm-Message-State: AJIora9rgmWMqwJUDgQFbQgpQxnS5mSk9ypBjMISnA0Np5Krf6ctlUhp
+        ABhkeF7z8JzIkto6Jb0rMBE38Q==
+X-Google-Smtp-Source: AGRyM1vJd0HvTrmLBpXtrQNAYeXvkixWEGjOk8pk9/gZVY4S2kx0V2mdBKCX5F7RInlezFy6V4SvJg==
+X-Received: by 2002:a17:90b:3ec2:b0:1f0:3e9e:4f1d with SMTP id rm2-20020a17090b3ec200b001f03e9e4f1dmr4476777pjb.172.1658309794699;
+        Wed, 20 Jul 2022 02:36:34 -0700 (PDT)
+Received: from C02GD5ZHMD6R.bytedance.net ([61.120.150.77])
+        by smtp.gmail.com with ESMTPSA id w15-20020a63c10f000000b004114cc062f0sm11355811pgf.65.2022.07.20.02.36.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Jul 2022 02:36:34 -0700 (PDT)
+From:   Jinke Han <hanjinke.666@bytedance.com>
+X-Google-Original-From: Jinke Han <hnajinke.666@bytedance>
+To:     axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hch@lst.de, jaegeuk@kernel.org, fio@vger.kernel.org,
-        ming.lei@redhat.com, wangyoua@uniontech.com,
-        wangxiaohua@uniontech.com
-Subject: [PATCH 0/2] Improve mq-deadline performance in HDD
-Date:   Wed, 20 Jul 2022 17:30:46 +0800
-Message-Id: <20220720093048.225944-1-wangyoua@uniontech.com>
-X-Mailer: git-send-email 2.27.0
+        cgroups@vger.kernel.org, Jinke Han <hanjinke.666@bytedance.com>,
+        Muchun Song <songmuchun@bytedance.com>, stable@vger.kernel.org
+Subject: [PATCH v4] block: don't allow the same type rq_qos add more than once
+Date:   Wed, 20 Jul 2022 17:36:16 +0800
+Message-Id: <20220720093616.70584-1-hanjinke.666@bytedance.com>
+X-Mailer: git-send-email 2.32.0 (Apple Git-132)
+In-Reply-To: <20220719165313.51887-1-hanjinke.666@bytedance.com>
+References: <20220719165313.51887-1-hanjinke.666@bytedance.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign4
-X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi jens,
+From: Jinke Han <hanjinke.666@bytedance.com>
 
-We already know that batching requests can increase the storage
-performance of some devices, but after testing, I found that it
-will reduce the performance of some low and medium speed devices
-when using the scheduler (especially mq-deadline), such as
-rotational disks connected to a raid.
+In our test of iocost, we encountered some list add/del corruptions of
+inner_walk list in ioc_timer_fn.
 
-In order to balance the performance difference between different
-devices, a more sophisticated mechanism may be needed to control
-the number of batching (such as sometimes 1 is better),
-but obviously this is not easy.
+The reason can be described as follow:
+cpu 0						cpu 1
+ioc_qos_write					ioc_qos_write
 
-At the same time I noticed that when the mq-deadline scheduler select
-a request for a higher sector outside the batch, deadline_fifo_request
-is used to select the request within the fifo and restart the batch.
-Selecting a request from a fifo tends to satisfy the request's timeline,
-but it is not always very urgent.
+ioc = q_to_ioc(bdev_get_queue(bdev));
+if (!ioc) {
+        ioc = kzalloc();			ioc = q_to_ioc(bdev_get_queue(bdev));
+						if (!ioc) {
+							ioc = kzalloc();
+							...
+							rq_qos_add(q, rqos);
+						}
+        ...
+        rq_qos_add(q, rqos);
+        ...
+}
 
-So in the case of no expire, can the selection strategy of the first
-request in the batch be changed? Because in devices with rotation
-characteristics, proper sector access order is beneficial to performance.
+When the io.cost.qos file is written by two cpus concurrently, rq_qos may
+be added to one disk twice. In that case, there will be two iocs enabled
+and running on one disk. They own different iocgs on their active list.
+In the ioc_timer_fn function, because of the iocgs from two iocs have the
+same root iocg, the root iocg's walk_list may be overwritten by each
+other and this leads to list add/del corruptions in building or destroying
+the inner_walk list.
 
-This patch series includes the following two parts:
+And so far, the blk-rq-qos framework works in case that one instance for
+one type rq_qos per queue by default. This patch make this explicit and
+also fix the crash above.
 
-- Added a temporary sys interface nr_sched_batch to control the number
-  of batching requests.
+Signed-off-by: Jinke Han <hanjinke.666@bytedance.com>
+Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Cc: <stable@vger.kernel.org>
+---
+Changes in v2
+-use goto pattern in iocost and rename the ebusy label
+Changes in v3
+-use goto in all places
+Changes in v4
+-correct some spell errors and resolve conflict with next kernel
 
-- Added a deadline_head_request function to select the request from the
-  first of the red-black tree instead of the fifo when appropriate.
+ block/blk-iocost.c    | 20 +++++++++++++-------
+ block/blk-iolatency.c | 18 +++++++++++-------
+ block/blk-rq-qos.h    | 11 ++++++++++-
+ block/blk-wbt.c       | 12 +++++++++++-
+ 4 files changed, 45 insertions(+), 16 deletions(-)
 
-Thanks,
-
-Wang.
-
-Wang You (2):
-  block: Introduce nr_sched_batch sys interface
-  block/mq-deadline: Prioritize first request
-
- block/blk-mq-sched.c   |  4 +++-
- block/blk-sysfs.c      | 34 ++++++++++++++++++++++++++++++++++
- block/mq-deadline.c    | 42 +++++++++++++++++++++++++++++++++++++++---
- include/linux/blkdev.h |  1 +
- 4 files changed, 77 insertions(+), 4 deletions(-)
-
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index b7082f2aed9c..7936e5f5821c 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2886,15 +2886,21 @@ static int blk_iocost_init(struct request_queue *q)
+ 	 * called before policy activation completion, can't assume that the
+ 	 * target bio has an iocg associated and need to test for NULL iocg.
+ 	 */
+-	rq_qos_add(q, rqos);
++	ret = rq_qos_add(q, rqos);
++	if (ret)
++		goto err_free_ioc;
++
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
+-	if (ret) {
+-		rq_qos_del(q, rqos);
+-		free_percpu(ioc->pcpu_stat);
+-		kfree(ioc);
+-		return ret;
+-	}
++	if (ret)
++		goto err_del_qos;
+ 	return 0;
++
++err_del_qos:
++	rq_qos_del(q, rqos);
++err_free_ioc:
++	free_percpu(ioc->pcpu_stat);
++	kfree(ioc);
++	return ret;
+ }
+ 
+ static struct blkcg_policy_data *ioc_cpd_alloc(gfp_t gfp)
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 79745c6d8e15..e285152345a2 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -771,19 +771,23 @@ int blk_iolatency_init(struct request_queue *q)
+ 	rqos->ops = &blkcg_iolatency_ops;
+ 	rqos->q = q;
+ 
+-	rq_qos_add(q, rqos);
+-
++	ret = rq_qos_add(q, rqos);
++	if (ret)
++		goto err_free;
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iolatency);
+-	if (ret) {
+-		rq_qos_del(q, rqos);
+-		kfree(blkiolat);
+-		return ret;
+-	}
++	if (ret)
++		goto err_qos_del;
+ 
+ 	timer_setup(&blkiolat->timer, blkiolatency_timer_fn, 0);
+ 	INIT_WORK(&blkiolat->enable_work, blkiolatency_enable_work_fn);
+ 
+ 	return 0;
++
++err_qos_del:
++	rq_qos_del(q, rqos);
++err_free:
++	kfree(blkiolat);
++	return ret;
+ }
+ 
+ static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 0e46052b018a..08b856570ad1 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -86,7 +86,7 @@ static inline void rq_wait_init(struct rq_wait *rq_wait)
+ 	init_waitqueue_head(&rq_wait->wait);
+ }
+ 
+-static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
++static inline int rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+ {
+ 	/*
+ 	 * No IO can be in-flight when adding rqos, so freeze queue, which
+@@ -98,6 +98,8 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+ 	blk_mq_freeze_queue(q);
+ 
+ 	spin_lock_irq(&q->queue_lock);
++	if (rq_qos_id(q, rqos->id))
++		goto ebusy;
+ 	rqos->next = q->rq_qos;
+ 	q->rq_qos = rqos;
+ 	spin_unlock_irq(&q->queue_lock);
+@@ -109,6 +111,13 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
+ 		blk_mq_debugfs_register_rqos(rqos);
+ 		mutex_unlock(&q->debugfs_mutex);
+ 	}
++
++	return 0;
++ebusy:
++	spin_unlock_irq(&q->queue_lock);
++	blk_mq_unfreeze_queue(q);
++	return -EBUSY;
++
+ }
+ 
+ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index f2e4bf1dca47..a9982000b667 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -820,6 +820,7 @@ int wbt_init(struct request_queue *q)
+ {
+ 	struct rq_wb *rwb;
+ 	int i;
++	int ret;
+ 
+ 	rwb = kzalloc(sizeof(*rwb), GFP_KERNEL);
+ 	if (!rwb)
+@@ -846,7 +847,10 @@ int wbt_init(struct request_queue *q)
+ 	/*
+ 	 * Assign rwb and add the stats callback.
+ 	 */
+-	rq_qos_add(q, &rwb->rqos);
++	ret = rq_qos_add(q, &rwb->rqos);
++	if (ret)
++		goto err_free;
++
+ 	blk_stat_add_callback(q, rwb->cb);
+ 
+ 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
+@@ -855,4 +859,10 @@ int wbt_init(struct request_queue *q)
+ 	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
+ 
+ 	return 0;
++
++err_free:
++	blk_stat_free_callback(rwb->cb);
++	kfree(rwb);
++	return ret;
++
+ }
 -- 
-2.27.0
-
-
-
+2.20.1
 
