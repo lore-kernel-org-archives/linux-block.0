@@ -2,69 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C77C43334
-	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 16:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFB0C43334
+	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 23:55:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbiGTQXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Jul 2022 12:23:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54446 "EHLO
+        id S231902AbiGTXzW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Jul 2022 19:55:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbiGTQXE (ORCPT
+        with ESMTP id S230513AbiGTXzW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Jul 2022 12:23:04 -0400
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E82558F1;
-        Wed, 20 Jul 2022 09:23:03 -0700 (PDT)
-Received: by mail-pj1-f53.google.com with SMTP id q43-20020a17090a17ae00b001f1f67e053cso2737349pja.4;
-        Wed, 20 Jul 2022 09:23:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=j/7Nq86xQuLWi18Sbz5otnLeWqHxkZyGTPSeuAnlhKs=;
-        b=tHGTDDtwPk4MKkQXQKOeE7YnQNmvp1lzmsR73XIs0SPh/+eBY+eGa09w7rZWYzmbT0
-         mXTWOz1XUpTSISBnhFPtbr+I2BvL9gcBJCH+zrjiSbC0XhcAPYTVzHJQicNp3JgRrdEv
-         Ycn/h1a2Ty0XC0783XrX696KscNIuWHH9V5mif0ugr5Xp4L32YCQatJYAa7dongNm71T
-         6srgHkVnbyOkQwqlclWQLMrp1mcUggvW/AG2WLbJ9nZTW8Ll0OHMgG2QLn6pD4Su9uRq
-         HxitYUd16Lj5hEozwxWej9h6qfrPEiztMYqFjS9e/0xJugrDXLgVCobogC1V7cJ1r2mb
-         J6bg==
-X-Gm-Message-State: AJIora+v5S58jDPWFQpoSFba6oqlQSjoEoDFyzeqS4HXOJyVGgsT2WPJ
-        v8Xj/IJO/ukJYn33wRRfNf4=
-X-Google-Smtp-Source: AGRyM1tqGfJtimyYcs1bWLVlLQ6mD2g4Qr/uCJsVxrhEue2fwXlDDOikx06kNgQUciR02J9JPzCa9Q==
-X-Received: by 2002:a17:90b:164d:b0:1f0:31c1:9e88 with SMTP id il13-20020a17090b164d00b001f031c19e88mr6513725pjb.206.1658334182537;
-        Wed, 20 Jul 2022 09:23:02 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:a7e0:78fc:9269:215b? ([2620:15c:211:201:a7e0:78fc:9269:215b])
-        by smtp.gmail.com with ESMTPSA id f5-20020a170902ab8500b0016bfcf8a463sm14058884plr.289.2022.07.20.09.23.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Jul 2022 09:23:01 -0700 (PDT)
-Message-ID: <c4da04a9-3f3d-3e22-a59a-1ab2867a5649@acm.org>
-Date:   Wed, 20 Jul 2022 09:22:59 -0700
+        Wed, 20 Jul 2022 19:55:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 645AE19C12
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 16:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658361320;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nZiIki+EFwqboammilHL/MQyZf3Y1IPP63ig+d68u8Y=;
+        b=NVRhnQlfSCzxLmrKQZe3VeEC6jI7b9IcstipfObxVq3oKSHpmcs770/DN6nOqhjnXNlmgG
+        ieVSYtHk9e1btgKm18NA3y5s1nc4ucwRMWZXoxR0tQmTDHRU8H/Yxn0lDDvxztr+v8OetB
+        Ce0fNootsAswUE+G8ys1rPfhnLxvjVA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-674-XnM5QZW_OUa7m5LyQLuT8w-1; Wed, 20 Jul 2022 19:55:13 -0400
+X-MC-Unique: XnM5QZW_OUa7m5LyQLuT8w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B771B8001EA;
+        Wed, 20 Jul 2022 23:55:12 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 89C47492C3B;
+        Wed, 20 Jul 2022 23:55:08 +0000 (UTC)
+Date:   Thu, 21 Jul 2022 07:55:03 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH 1/2] blk-mq: fix error handling in __blk_mq_alloc_disk
+Message-ID: <YtiV148hTcpsjTZ+@T590>
+References: <20220720130541.1323531-1-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 2/2] block/mq-deadline: Prioritize first request
-Content-Language: en-US
-To:     Wang You <wangyoua@uniontech.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hch@lst.de, jaegeuk@kernel.org, fio@vger.kernel.org,
-        ming.lei@redhat.com, wangxiaohua@uniontech.com
-References: <20220720093048.225944-1-wangyoua@uniontech.com>
- <20220720093048.225944-3-wangyoua@uniontech.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220720093048.225944-3-wangyoua@uniontech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220720130541.1323531-1-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/20/22 02:30, Wang You wrote:
-> The test hardware is:
-> Kunpeng-920, HW-SAS3508+(MG04ACA400N * 2), RAID0.
-Please also provide performance numbers for a single hard disk and with 
-no RAID controller between the host and the hard disk.
+On Wed, Jul 20, 2022 at 03:05:40PM +0200, Christoph Hellwig wrote:
+> To fully clean up the queue if the disk allocation fails we need to
+> call blk_mq_destroy_queue and not just blk_put_queue.
+> 
+> Fixes: 6f8191fdf41d ("block: simplify disk shutdown")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d716b7f3763f3..70177ee74295b 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3960,7 +3960,7 @@ struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set, void *queuedata,
+>  
+>  	disk = __alloc_disk_node(q, set->numa_node, lkclass);
+>  	if (!disk) {
+> -		blk_put_queue(q);
+> +		blk_mq_destroy_queue(q);
+>  		return ERR_PTR(-ENOMEM);
+ 
+The same change is needed in case of blk_mq_init_allocated_queue() failure too.
 
 Thanks,
+Ming
 
-Bart.
