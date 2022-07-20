@@ -2,61 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF7BC43334
-	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 06:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 843AAC43334
+	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 06:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238649AbiGTGHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Jul 2022 02:07:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46006 "EHLO
+        id S239365AbiGTGSQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Jul 2022 02:18:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237966AbiGTGHJ (ORCPT
+        with ESMTP id S239401AbiGTGSQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Jul 2022 02:07:09 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231EA68735
-        for <linux-block@vger.kernel.org>; Tue, 19 Jul 2022 23:07:09 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9DCB068BEB; Wed, 20 Jul 2022 08:07:05 +0200 (CEST)
-Date:   Wed, 20 Jul 2022 08:07:05 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] Revert "ublk_drv: fix request queue leak"
-Message-ID: <20220720060705.GB6734@lst.de>
-References: <20220718062928.335399-1-hch@lst.de> <20220718062928.335399-2-hch@lst.de> <YtalgzqC/q3JpYCR@T590>
+        Wed, 20 Jul 2022 02:18:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622474E623
+        for <linux-block@vger.kernel.org>; Tue, 19 Jul 2022 23:18:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=dUiIiMcRNV0/EisTLoCzK1N0eHx3Feg8TOv1fCz87j4=; b=iJ8NpjoMP9ePJb4J7tdv2wKFqb
+        Nvv66qSj9hGA3hbIe7CDfv3lGkXGz1mExkfiRCsLgL7D+fJzvp+KL81UvqF+WNSiyF79zyZfIMdPb
+        DsqEdWwQtdQ9x8fqdIh5grqB0vDcUC7D2mYKa33VDcwpvB8njYjFu6NTOjITxV0psJZWLlNO+PBY8
+        gUqT27qz3rIA4WzvAtOjyGXgfuiqHIvE1bAfIRkWdU7jISbHDqUxm1SphcgZPrSsO/BeSl4LduUse
+        a/Ldc+JEYAgiD1P2vlDEIBUj6QE2I7j+LRikHsF6QdAASw4QzO6BdrKZZk0EI+GrOyDCCzSbANfhV
+        NmnjyVmg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oE326-00176O-LJ; Wed, 20 Jul 2022 06:18:06 +0000
+Date:   Tue, 19 Jul 2022 23:18:06 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Yi Zhang <yi.zhang@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Subject: Re: [bug report] blktests nvme/tcp triggered WARNING at
+ kernel/workqueue.c:2628 check_flush_dependency+0x110/0x14c
+Message-ID: <YteeHq8TJBncRvZu@infradead.org>
+References: <CAHj4cs86Dm577NK-C+bW6=+mv2V3KOpQCG0Vg6xZrSGzNijX4g@mail.gmail.com>
+ <5ce566fd-f871-48dc-1cb7-30b745c58f05@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YtalgzqC/q3JpYCR@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <5ce566fd-f871-48dc-1cb7-30b745c58f05@grimberg.me>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 08:37:23PM +0800, Ming Lei wrote:
-> This change will break START_DEV/STOP_DEV, which is supposed to run
-> multiple cycles after the device is added, especially this way can
-> help to implement error recovery from userside, such as one ubq_daemon
-> is crashed/hang, the device can be recovered by sending STOP_DEV/START_DEV
-> commands again after new ubq_daemon is setup.
-
-What is broken in START_DEV/STOP_DEV?  Please explain the semantics you
-want and what doesn't work.  FYI, there is nothing in the test suite the
-complains.  And besides the obvious block layer bug that Jens found you
-seemed to be perfectly happy with the semantics.
-
-> So here we do need separated request_queue/disk, and the model is
-> similar with scsi's, in which disk rebind needs to be supported
-> and GD_OWNS_QUEUE can't be set.
-
-SCSI needs it because it needs the request_queue to probe for what ULP
-to bind to, and it allows to unbind the ULP.  None of that is the case
-here.  And managing the lifetimes separately is a complete mess, so
-don't do it.  Especially not in a virtual driver where you don't have
-to cater to a long set protocol like SCSI.
-
+On Sun, Jul 10, 2022 at 12:41:33PM +0300, Sagi Grimberg wrote:
 > 
-> Thanks,
-> Ming
----end quoted text---
+> > Hello
+> > 
+> > I reproduced this issue on the linux-block/for-next, pls help check
+> > it, feel free to let me know if you need info/test, thanks.
+> 
+> 
+> These reports are making me tired... Should we just remove
+> MEM_RECLAIM from all nvme/nvmet workqueues are be done with
+> it?
+> 
+> The only downside is that nvme reset/error-recovery will
+> also be susceptible for low-memory situation...
+
+We can't just do that.  We need to sort out the dependency chains
+properly.
