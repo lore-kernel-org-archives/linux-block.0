@@ -2,73 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F09C43334
-	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 08:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F165EC43334
+	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 09:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232620AbiGTIj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Jul 2022 04:39:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48768 "EHLO
+        id S231251AbiGTJAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Jul 2022 05:00:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiGTIj1 (ORCPT
+        with ESMTP id S231143AbiGTJAp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Jul 2022 04:39:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3E49C50045
-        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 01:39:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658306365;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wlMH5g2pYYdVhxWcCiqJMHzm6/EnXH4v1zhevt16ax4=;
-        b=ZXeorXI8+oUvG36ozPXQV21OwdLGQGd3MIB8IwPgj1VmHijMkSTWa+nFPZCAzj6KGK0tgT
-        bCGLtFZunqrM+XEQKMcjkNBXwJnBcG1prc35OBtC+ORmzPDlID/00m3AleqB0ktsPVpANX
-        MbrGX82tS0nZQxa9fqCVLKBaAJDsRuo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-546-3bqPEGlvOT6zWw1kCmwQAQ-1; Wed, 20 Jul 2022 04:39:23 -0400
-X-MC-Unique: 3bqPEGlvOT6zWw1kCmwQAQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 618E58001EA;
-        Wed, 20 Jul 2022 08:39:23 +0000 (UTC)
-Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E839518EA8;
-        Wed, 20 Jul 2022 08:39:20 +0000 (UTC)
-Date:   Wed, 20 Jul 2022 16:39:16 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [linux-next] [5.19.0-rc1] kernel crashes while performing driver
- bind/unbind test with SLUB_DEBUG enabled
-Message-ID: <Yte/INnQsKESNPQu@T590>
-References: <c1846219-cea9-e82c-7337-6f6d9ffadd3d@linux.vnet.ibm.com>
- <Yqksbtth8zzEmjp4@T590>
- <d789d8f6-71c3-3927-7708-141b43c3ba0b@linux.vnet.ibm.com>
- <Ys7EXeoVbLRZj9CL@T590>
- <59642c8d-adbf-cbfd-ffee-3f3b31613e05@linux.vnet.ibm.com>
+        Wed, 20 Jul 2022 05:00:45 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361A928721
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 02:00:44 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 89D6568AFE; Wed, 20 Jul 2022 11:00:40 +0200 (CEST)
+Date:   Wed, 20 Jul 2022 11:00:40 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/2] Revert "ublk_drv: fix request queue leak"
+Message-ID: <20220720090040.GA18210@lst.de>
+References: <20220718062928.335399-1-hch@lst.de> <20220718062928.335399-2-hch@lst.de> <YtalgzqC/q3JpYCR@T590> <20220720060705.GB6734@lst.de> <YtezD/apQ1dM0n33@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <59642c8d-adbf-cbfd-ffee-3f3b31613e05@linux.vnet.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+In-Reply-To: <YtezD/apQ1dM0n33@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 01:49:25PM +0530, Tasmiya Nalatwad wrote:
-> Greetings,
+On Wed, Jul 20, 2022 at 03:47:27PM +0800, Ming Lei wrote:
+> > What is broken in START_DEV/STOP_DEV?  Please explain the semantics you
+> > want and what doesn't work.  FYI, there is nothing in the test suite the
+> > complains.  And besides the obvious block layer bug that Jens found you
+> > seemed to be perfectly happy with the semantics.
 > 
-> Sure I will verify, could you please provide me the code patch.
+> START_DEV calls add_disk(), and STOP_DEV calls del_gendisk(), but if 
+> GD_OWNS_QUEUE is set, blk_mq_exit_queue() will be called in
+> del_gendisk(), then the following START_DEV will stuck.
 
-Oh, sorry for not providing link for you, please try the following
-patches:
+Uh, yeah.  alloc_disk and add_disk are supposed to be paired and
+not split over different ioctls.  The lifetime rules here are
+rather broken.
 
-https://lore.kernel.org/linux-scsi/20220712221936.1199196-1-bvanassche@acm.org/T/#t
+> > > similar with scsi's, in which disk rebind needs to be supported
+> > > and GD_OWNS_QUEUE can't be set.
+> > 
+> > SCSI needs it because it needs the request_queue to probe for what ULP
+> > to bind to, and it allows to unbind the ULP.  None of that is the case
+> > here.  And managing the lifetimes separately is a complete mess, so
+> > don't do it.  Especially not in a virtual driver where you don't have
+> > to cater to a long set protocol like SCSI.
+> 
+> If blk_mq_exit_queue is called in del_gendisk() for scsi, how can
+> re-bind work as expected since it needs one completely workable
+> request queue instead of partial exited one?
 
-
-Thanks,
-Ming
-
+For !GD_OWNS_QUEUE blk_mq_exit_queue is not called from del_gendisk().
