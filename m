@@ -2,61 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9785C43334
-	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 07:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE3CC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Jul 2022 08:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240053AbiGTHuV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Jul 2022 03:50:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36972 "EHLO
+        id S237160AbiGTITh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Jul 2022 04:19:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240276AbiGTHuT (ORCPT
+        with ESMTP id S232647AbiGTITg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Jul 2022 03:50:19 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5876026AF4;
-        Wed, 20 Jul 2022 00:50:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5DC99KaVMKNvHK8g1E5RGSOPLs84rEGyapt+YMXaaQw=; b=zpOJbOJuS2bNUuK9YB2PVDxCQ0
-        wdpsGwiR2nCs169wWm7n+LKiv02YfXq4AbnMtsbJEKBLZuUvyOdy8GSNKIvguExVC8OKTHozf8kxy
-        pfZos4WDNLTRLJS6VYQW8OK+6IJcs2OSDh0+Dj41yEbk/Q2+Ni0jHfk3bevAJrljX047qVMHj1Iln
-        tdj8KbBZDS1uhh/8YSWen+2ZthpdHLsi1+Ys6cjbacL17HR0IF0CinWUC00WvdS7KHdIaCOd5QLHP
-        3+rrsFEDCRZ4Ru1Lr3TZO0lTc6kGPp0yvWuwSbzJQXe5shbsm2LdRcN3RBbRkCkofd4HizvuMZ/is
-        lq/NKG+g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oE4TK-002BEi-0i; Wed, 20 Jul 2022 07:50:18 +0000
-Date:   Wed, 20 Jul 2022 00:50:17 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     gjoyce@linux.vnet.ibm.com
-Cc:     linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        dhowells@redhat.com, jarkko@kernel.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, greg@gilhooley.com, gjoyce@ibm.com
-Subject: Re: [PATCH 4/4] arch_vars: create arch specific permanent store
-Message-ID: <YtezuVYVQnqX2IsY@infradead.org>
-References: <20220718210156.1535955-1-gjoyce@linux.vnet.ibm.com>
- <20220718210156.1535955-5-gjoyce@linux.vnet.ibm.com>
+        Wed, 20 Jul 2022 04:19:36 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4C4445F52;
+        Wed, 20 Jul 2022 01:19:35 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26K7RJbV022970;
+        Wed, 20 Jul 2022 08:19:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=KOCwHeadE/oMbxq2JBe4TjRQ/Hb4D12jZplqoyY1WME=;
+ b=Xjb7rXuuf/EkmIMlxjXol3/LNfEvwefHLVe1IQ14NOwdagTBFpcC4+jU8nqfIAeT3uyx
+ Y+Nxj3/3LhfJ/YQPwdsNPW2YmtkrzqdUhDR/pbmVRFaC9FLQpztBfmM/91fskG53c++n
+ 5UxU2WlTPVK5TxqXCGqUubDXY4ZsqNY69wW4KepITJEdwuFqZopBbUiUr1L3UqRnB3Tv
+ iPZtOmuSaLt1et8d77YUcoeE3DHUTCHTmq7qDNxRDdeHQ2zzoYRzqxqnYnwQLXPL1FMM
+ RULugGbFqr9gv9cVk3cmT1Cbtt/E9197ZrkjNTjSa/pY15877TeCNbgXbqfofTp+NjJX uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hedb49pm6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jul 2022 08:19:34 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26K7T8qt032256;
+        Wed, 20 Jul 2022 08:19:34 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3hedb49pks-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jul 2022 08:19:34 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26K86mPK020054;
+        Wed, 20 Jul 2022 08:19:33 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma01dal.us.ibm.com with ESMTP id 3hbmy9pjy3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 20 Jul 2022 08:19:33 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26K8JWCu23331314
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 20 Jul 2022 08:19:32 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B0C7124055;
+        Wed, 20 Jul 2022 08:19:32 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 02C2A124054;
+        Wed, 20 Jul 2022 08:19:29 +0000 (GMT)
+Received: from [9.43.112.189] (unknown [9.43.112.189])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 20 Jul 2022 08:19:29 +0000 (GMT)
+Message-ID: <59642c8d-adbf-cbfd-ffee-3f3b31613e05@linux.vnet.ibm.com>
+Date:   Wed, 20 Jul 2022 13:49:25 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220718210156.1535955-5-gjoyce@linux.vnet.ibm.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [linux-next] [5.19.0-rc1] kernel crashes while performing driver
+ bind/unbind test with SLUB_DEBUG enabled
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        abdhalee@linux.vnet.ibm.com, mputtash@linux.vnet.com,
+        sachinp@linux.vnet.com
+References: <c1846219-cea9-e82c-7337-6f6d9ffadd3d@linux.vnet.ibm.com>
+ <Yqksbtth8zzEmjp4@T590>
+ <d789d8f6-71c3-3927-7708-141b43c3ba0b@linux.vnet.ibm.com>
+ <Ys7EXeoVbLRZj9CL@T590>
+From:   Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+In-Reply-To: <Ys7EXeoVbLRZj9CL@T590>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: C6Y7Nv445Ywi2oLmL8ylqw3RMu5xVhhm
+X-Proofpoint-ORIG-GUID: xJElMXN19Tba3c02ohfit4DIqeLtnkDu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-20_04,2022-07-19_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 adultscore=0 spamscore=0 impostorscore=0 malwarescore=0
+ suspectscore=0 mlxlogscore=964 phishscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2207200033
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 18, 2022 at 04:01:56PM -0500, gjoyce@linux.vnet.ibm.com wrote:
-> From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Greetings,
+
+Sure I will verify, could you please provide me the code patch.
+
+On 7/13/22 18:41, Ming Lei wrote:
+> On Wed, Jul 13, 2022 at 03:49:05PM +0530, Tasmiya Nalatwad wrote:
+>> Greetings,
+>>
+>> While running plain bind/unbind test on scsi I had enabled slub_debug
+>>
+>> System has FC adapter with multipath enabled.
+>>
+>> Step 1 : Added slub_debug in /etc/default/grub saved the configuration and
+>> rebooted the machine.
+>> Step 2 : Performed normal driver bind/unbind test.
 > 
-> Platforms that have a permanent key store may provide unique
-> platform dependent functions to read/write variables. The
-> default (weak) functions return -EOPNOTSUPP unless overridden
-> by architecture/platform versions.
+> Hello,
+> 
+> Can you try the following patches and see if they are helpful?
+> 
+> 
+> Thanks,
+> Ming
+> 
 
-This is still lacking any useful implementation.  It also seems to be
-used in patch 3 before it actually is used.
-
-As the functionality seems optional I'd suggest to drop this patch for
-now and not call it from patch 3, and do a separate series later that
-adds the infrastructure, at leat one useful backend and the caller.
+-- 
+Regards,
+Tasmiya Nalatwad
+IBM Linux Technology Center
