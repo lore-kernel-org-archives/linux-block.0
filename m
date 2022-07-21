@@ -2,136 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F0BC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 04:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1AF7C43334
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:03:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230314AbiGUEoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jul 2022 00:44:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39364 "EHLO
+        id S229559AbiGUFDh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jul 2022 01:03:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230114AbiGUEoP (ORCPT
+        with ESMTP id S229441AbiGUFDg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jul 2022 00:44:15 -0400
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 79718743E1
-        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 21:44:14 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-198-wCWCKbzDPBOPH_d9xnmbWw-1; Thu, 21 Jul 2022 00:44:01 -0400
-X-MC-Unique: wCWCKbzDPBOPH_d9xnmbWw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80331811E80;
-        Thu, 21 Jul 2022 04:44:00 +0000 (UTC)
-Received: from dreadlord.bne.redhat.com (fdacunha.bne.redhat.com [10.64.0.157])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BEEA3909FF;
-        Thu, 21 Jul 2022 04:43:55 +0000 (UTC)
-From:   Dave Airlie <airlied@gmail.com>
-To:     torvalds@linux-foundation.org, Jonathan Corbet <corbet@lwn.net>,
-        linux-doc@vger.kernel.org, gregkh@linuxfoundation.org,
-        Daniel Vetter <daniel@ffwll.ch>, mcgrof@kernel.org
-Cc:     linux-kernel@vger.kernel.org, dri-devel@lists.sf.net,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-media@vger.kernel.org,
-        linux-block@vger.kernel.org, Dave Airlie <airlied@redhat.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Harry Wentland <harry.wentland@amd.com>
-Subject: [PATCH] docs: driver-api: firmware: add driver firmware guidelines. (v3)
-Date:   Thu, 21 Jul 2022 14:43:52 +1000
-Message-Id: <20220721044352.3110507-1-airlied@gmail.com>
+        Thu, 21 Jul 2022 01:03:36 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9594577A7F
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:03:35 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 5EB0B68AFE; Thu, 21 Jul 2022 07:03:32 +0200 (CEST)
+Date:   Thu, 21 Jul 2022 07:03:32 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: fix error handling in __blk_mq_alloc_disk
+Message-ID: <20220721050332.GA19443@lst.de>
+References: <20220720130541.1323531-1-hch@lst.de> <YtiV148hTcpsjTZ+@T590>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtiV148hTcpsjTZ+@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Dave Airlie <airlied@redhat.com>
+On Thu, Jul 21, 2022 at 07:55:03AM +0800, Ming Lei wrote:
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index d716b7f3763f3..70177ee74295b 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -3960,7 +3960,7 @@ struct gendisk *__blk_mq_alloc_disk(struct blk_mq_tag_set *set, void *queuedata,
+> >  
+> >  	disk = __alloc_disk_node(q, set->numa_node, lkclass);
+> >  	if (!disk) {
+> > -		blk_put_queue(q);
+> > +		blk_mq_destroy_queue(q);
+> >  		return ERR_PTR(-ENOMEM);
+>  
+> The same change is needed in case of blk_mq_init_allocated_queue() failure too.
 
-A recent snafu where Intel ignored upstream feedback on a firmware
-change, led to a late rc6 fix being required. In order to avoid this
-in the future we should document some expectations around
-linux-firmware.
-
-I was originally going to write this for drm, but it seems quite generic
-advice.
-
-v2: rewritten with suggestions from Thorsten Leemhuis
-v3: rewritten with suggestions from Mauro
-
-Acked-by: Luis Chamberlain <mcgrof@kernel.org>
-Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
-Acked-by: Daniel Vetter <daniel@ffwll.ch>
-Acked-by: Harry Wentland <harry.wentland@amd.com>
-Signed-off-by: Dave Airlie <airlied@redhat.com>
----
- Documentation/driver-api/firmware/core.rst    |  1 +
- .../firmware/firmware-usage-guidelines.rst    | 44 +++++++++++++++++++
- 2 files changed, 45 insertions(+)
- create mode 100644 Documentation/driver-api/firmware/firmware-usage-guidelines.rst
-
-diff --git a/Documentation/driver-api/firmware/core.rst b/Documentation/driver-api/firmware/core.rst
-index 1d1688cbc078..803cd574bbd7 100644
---- a/Documentation/driver-api/firmware/core.rst
-+++ b/Documentation/driver-api/firmware/core.rst
-@@ -13,4 +13,5 @@ documents these features.
-    direct-fs-lookup
-    fallback-mechanisms
-    lookup-order
-+   firmware-usage-guidelines
- 
-diff --git a/Documentation/driver-api/firmware/firmware-usage-guidelines.rst b/Documentation/driver-api/firmware/firmware-usage-guidelines.rst
-new file mode 100644
-index 000000000000..fdcfce42c6d2
---- /dev/null
-+++ b/Documentation/driver-api/firmware/firmware-usage-guidelines.rst
-@@ -0,0 +1,44 @@
-+===================
-+Firmware Guidelines
-+===================
-+
-+Users switching to a newer kernel should *not* have to install newer
-+firmware files to keep their hardware working. At the same time updated
-+firmware files must not cause any regressions for users of older kernel
-+releases.
-+
-+Drivers that use firmware from linux-firmware should follow the rules in
-+this guide. (Where there is limited control of the firmware,
-+i.e. company doesn't support Linux, firmwares sourced from misc places,
-+then of course these rules will not apply strictly.)
-+
-+* Firmware files shall be designed in a way that it allows checking for
-+  firmware ABI version changes. It is recommended that firmware files be
-+  versioned with at least a major/minor version. It is suggested that
-+  the firmware files in linux-firmware be named with some device
-+  specific name, and just the major version. The firmware version should
-+  be stored in the firmware header, or as an exception, as part of the
-+  firmware file name, in order to let the driver detact any non-ABI
-+  fixes/changes. The firmware files in linux-firmware should be
-+  overwritten with the newest compatible major version. Newer major
-+  version firmware shall remain compatible with all kernels that load
-+  that major number.
-+
-+* If the kernel support for the hardware is normally inactive, or the
-+  hardware isn't available for public consumption, this can
-+  be ignored, until the first kernel release that enables that hardware.
-+  This means no major version bumps without the kernel retaining
-+  backwards compatibility for the older major versions.  Minor version
-+  bumps should not introduce new features that newer kernels depend on
-+  non-optionally.
-+
-+* If a security fix needs lockstep firmware and kernel fixes in order to
-+  be successful, then all supported major versions in the linux-firmware
-+  repo that are required by currently supported stable/LTS kernels,
-+  should be updated with the security fix. The kernel patches should
-+  detect if the firmware is new enough to declare if the security issue
-+  is fixed.  All communications around security fixes should point at
-+  both the firmware and kernel fixes. If a security fix requires
-+  deprecating old major versions, then this should only be done as a
-+  last option, and be stated clearly in all communications.
-+
--- 
-2.36.1
+I don't think so.  blk_mq_init_allocated_queue only calls
+blk_mq_add_queue_tag_set at the very end, after any failure point,
+and the last failure point is blk_mq_realloc_hw_ctxs not mapping
+any queues.  So what would we clean up when
+blk_mq_init_allocated_queue fails?
 
