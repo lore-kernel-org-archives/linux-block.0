@@ -2,41 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C48C2C43334
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ABCCCA479
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbiGUFQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229849AbiGUFQn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 21 Jul 2022 01:16:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54500 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229849AbiGUFQm (ORCPT
+        with ESMTP id S229441AbiGUFQm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 21 Jul 2022 01:16:42 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF84079ECA
-        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:16:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D8B79685
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:16:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=H72h2JvByxb5W1o2dtY465ID2BKO/juYzUUuupKE3ec=; b=A6JJaTW7+mjSDyb+yT3l0FV4A1
-        d4tgXjH5Fwl3nwvLcbn3DaY4I6XZsQKe3HfWIWtHKt6+Zp+1e6xTitYOrPxJdQ/x29I+6ed8x9h8M
-        SLckSWSUpn/Xr493gQKjRkQn3D3l57ZZzYQ62/lZ6i75V9ok/S5vR4gxYDn6qL1+LGHpmKL3YK/bZ
-        9R3DYa5pW8FJ9DELg49kFSMlwBpEBhGl0lSA8LujQ1RX2YUjl1SLpvFWSRXIiBMOo7PgPm+kWTKZO
-        jdT7hGIChIy1mHfVYNiH9MZVKurxFWAM/6OAv5AjwLJ7J4QgnBJlL6p7TDLIkEiO8w4tFtB7/ycfE
-        jyJDlt0w==;
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=fc8QV1X1iKaXhzgry1xfjfhVtXpABQdYuFVoYOaVbx4=; b=pFhfdf7r81gX3kJhE0xrX4OrzY
+        w9/c5s2ZhpBPwbRTdG9ps7olG14Dsopr/WpZqSeqhSj9uuFjHE8JDj+IEsl/HOneIfjrEinzbr+RT
+        ZCBapzx576yynW3E75g9m7Bu9CwWABgJ8K3ErBrzz9BMt7MZTzTkFyzAZh8Eo7pz/XBq2X2ksjbqw
+        Oacla+Mk3jRft+NOR6CxqJY6IrDA+6XqOOJxt3y0K3TNTGrYxq1sLQoZS2aAix0ToXo2Q8NCfzGRA
+        DzeJE1jWJy3nabn4x6kb527UxBSdk/+MzjNsONzqRZMypU+RPKg3ra6NFJhXjVPGBN6HBZ2yKb9F3
+        pWI66W2g==;
 Received: from 089144198117.atnat0007.highway.a1.net ([89.144.198.117] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oEOYB-00HDRr-8t; Thu, 21 Jul 2022 05:16:39 +0000
+        id 1oEOY7-00HDOo-Pg; Thu, 21 Jul 2022 05:16:36 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 1/8] ublk: add a MAINTAINERS entry
-Date:   Thu, 21 Jul 2022 07:16:25 +0200
-Message-Id: <20220721051632.1676890-2-hch@lst.de>
+Subject: ublk fixups
+Date:   Thu, 21 Jul 2022 07:16:24 +0200
+Message-Id: <20220721051632.1676890-1-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220721051632.1676890-1-hch@lst.de>
-References: <20220721051632.1676890-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -44,31 +42,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make get_maintainers.pl work for ublk.
+Hi Ming, hi Jens,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+this series has a bunch of fixes and cleanups of ublk.  The most important
+one is the last one, which moves ublk over to a proper gendisk life cycle.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index fe5daf1415013..8a4bbca9f28f4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20415,6 +20415,13 @@ F:	Documentation/filesystems/ubifs-authentication.rst
- F:	Documentation/filesystems/ubifs.rst
- F:	fs/ubifs/
- 
-+UBLK USERSPACE BLOCK DRIVER
-+M:	Ming Lei <ming.lei@redhat.com>
-+L:	linux-block@vger.kernel.org
-+S:	Maintained
-+F:	drivers/block/ublk_drv.c
-+F:	include/uapi/linux/ublk_cmd.h
-+
- UCLINUX (M68KNOMMU AND COLDFIRE)
- M:	Greg Ungerer <gerg@linux-m68k.org>
- L:	linux-m68k@lists.linux-m68k.org
--- 
-2.30.2
+This series passes the ubdsrv tests.
 
+Diffstat:
+ MAINTAINERS                   |    7 
+ drivers/block/ublk_drv.c      |  530 ++++++++++++++++++------------------------
+ include/uapi/linux/ublk_cmd.h |    1 
+ 3 files changed, 241 insertions(+), 297 deletions(-)
