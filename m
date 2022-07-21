@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFD2C43334
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:16:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 379F7C43334
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:17:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229441AbiGUFQ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jul 2022 01:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54808 "EHLO
+        id S229984AbiGUFRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jul 2022 01:17:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbiGUFQ4 (ORCPT
+        with ESMTP id S229958AbiGUFRD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jul 2022 01:16:56 -0400
+        Thu, 21 Jul 2022 01:17:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C783D79ECE
-        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:16:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDE779ECE
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:17:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=GtqeGaiuEThwQGpdoGUXPWyEOCsMJfLU6D9UAX3Y39s=; b=xzX9f2N/WGAKsC7QPKPN1u27ls
-        oJVItTQ2ICYqSuBmlhiBCS3CietSdD70EV0/ackznTA60YhNwgyKAfuWgNBbhM6HjZSRTOYqneZi1
-        9zD8AlE82O3N6gousNCYpQYrj5uiozrweTKUqssVeBnBAW/G7pWLtT4lulYdDKP4Nz3cz9iuGG3T1
-        8Fr0obiL1WkxASUNSQAaxc1Xg433iSlLPX2FgyZz9i5dNfECiwO3TSdFK/FC2ANLobToZuWqAdJNG
-        W7FNvJxtWwo7AfBBWPB+vxxq0FcfyybyHCJFBMOutgnmFFqqjHbzhueEkyO/hdSNcjRaF5cvdEIuP
-        SACDggPA==;
+        bh=jm0roFuUacizElAlpwI3+r1F+KLQVTFqM3e7Zs/Y4IA=; b=xbVN1kNsdgZsW3ZrvIvQ9mL8sd
+        hZhaP3zTJc/5RryOJiSpzZRePWx545UT8L9g8jv/+EufwZlDe9w16hJfvHw+aRXGR6AePDmwxV8Tq
+        N2xHGHnPAbm+jCdEaV1tnvQJoai825iLi8LzcftwezrH8LocbhBG/shmn4Uk3KfW8A1bP+gRRHKMX
+        wdNeFR4HgKv0mNnfqyse1P3Z2rE+qtWDoKGNjmHV4fb2Pm/4N7UchcsWXwuG883vIHa2VOSZNnPmJ
+        VhRsjBOPbCfp9HjvdncJDgVOyM0xh7kLEte/BUAUpG4fohEqlm0xS1MB08pQa+qIpaLaEgk8hFbO+
+        eUmeO75Q==;
 Received: from 089144198117.atnat0007.highway.a1.net ([89.144.198.117] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oEOYQ-00HDeV-BI; Thu, 21 Jul 2022 05:16:54 +0000
+        id 1oEOYX-00HDnR-2x; Thu, 21 Jul 2022 05:17:01 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 5/8] ublk: cleanup ublk_ctrl_uring_cmd
-Date:   Thu, 21 Jul 2022 07:16:29 +0200
-Message-Id: <20220721051632.1676890-6-hch@lst.de>
+Subject: [PATCH 7/8] ublk: rewrite ublk_ctrl_get_queue_affinity to not rely on hctx->cpumask
+Date:   Thu, 21 Jul 2022 07:16:31 +0200
+Message-Id: <20220721051632.1676890-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220721051632.1676890-1-hch@lst.de>
 References: <20220721051632.1676890-1-hch@lst.de>
@@ -44,359 +44,120 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move all per-command work into the per-command ublk_ctrl_* helpers
-instead of being split over those, ublk_ctrl_cmd_validate, and the main
-ublk_ctrl_uring_cmd handler.  To facilitate that, the old
-ublk_ctrl_stop_dev function that just contained two function calls is
-folded into both callers.
+Looking at the hctxs and cpumap is not safe without at very last a RCU
+reference.  It also requires the queue to be set up before starting the
+device, which leads to rather awkware life time rules.
+
+Instead rewrite ublk_ctrl_get_queue_affinity to call blk_mq_map_queues
+on an on-stack blk_mq_queue_map and build the cpumask from that.
+
+Note: given that ublk has not made it into a released kernel it might
+make sense to change the ABI for this command to instead copy the
+qmap.mq_map array (a nr_cpu_ids sized array of unsigned integer
+values  where the CPU index directly points to the queue) to userspace.
+
+That way all the information could be transported to userspace in a
+single command.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/ublk_drv.c | 234 +++++++++++++++++++--------------------
- 1 file changed, 116 insertions(+), 118 deletions(-)
+ drivers/block/ublk_drv.c | 63 ++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 31 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 1f7bbbc3276a2..af70c18796e70 100644
+index 7d57cbecfc8a0..67c6c46b8e07e 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -813,13 +813,6 @@ static void ublk_stop_dev(struct ublk_device *ub)
- 	cancel_delayed_work_sync(&ub->monitor_work);
+@@ -1245,26 +1245,16 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
+ 	return ret;
  }
  
--static int ublk_ctrl_stop_dev(struct ublk_device *ub)
+-static struct blk_mq_hw_ctx *ublk_get_hw_queue(struct ublk_device *ub,
+-		unsigned int index)
 -{
--	ublk_stop_dev(ub);
--	cancel_work_sync(&ub->stop_work);
--	return 0;
+-	struct blk_mq_hw_ctx *hctx;
+-	unsigned long i;
+-
+-	queue_for_each_hw_ctx(ub->ub_queue, hctx, i)
+-		if (hctx->queue_num == index)
+-			return hctx;
+-	return NULL;
 -}
 -
- static inline bool ublk_queue_ready(struct ublk_queue *ubq)
- {
- 	return ubq->nr_io_ready == ubq->q_depth;
-@@ -1205,8 +1198,8 @@ static int ublk_add_dev(struct ublk_device *ub)
- 
- static void ublk_remove(struct ublk_device *ub)
- {
--	ublk_ctrl_stop_dev(ub);
--
-+	ublk_stop_dev(ub);
-+	cancel_work_sync(&ub->stop_work);
- 	cdev_device_del(&ub->cdev, &ub->cdev_dev);
- 	put_device(&ub->cdev_dev);
- }
-@@ -1227,36 +1220,45 @@ static struct ublk_device *ublk_get_device_from_id(int idx)
- 	return ub;
- }
- 
--static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
-+static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
- {
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
--	int ret = -EINVAL;
- 	int ublksrv_pid = (int)header->data[0];
- 	unsigned long dev_blocks = header->data[1];
-+	struct ublk_device *ub;
-+	int ret = -EINVAL;
- 
- 	if (ublksrv_pid <= 0)
--		return ret;
-+		return -EINVAL;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return -EINVAL;
- 
- 	wait_for_completion_interruptible(&ub->completion);
- 
- 	schedule_delayed_work(&ub->monitor_work, UBLK_DAEMON_MONITOR_PERIOD);
- 
- 	mutex_lock(&ub->mutex);
--	if (!disk_live(ub->ub_disk)) {
--		/* We may get disk size updated */
--		if (dev_blocks) {
--			ub->dev_info.dev_blocks = dev_blocks;
--			ublk_update_capacity(ub);
--		}
--		ub->dev_info.ublksrv_pid = ublksrv_pid;
--		ret = add_disk(ub->ub_disk);
--		if (!ret)
--			ub->dev_info.state = UBLK_S_DEV_LIVE;
--	} else {
-+	if (disk_live(ub->ub_disk)) {
- 		ret = -EEXIST;
-+		goto out_unlock;
- 	}
--	mutex_unlock(&ub->mutex);
- 
-+	/* We may get disk size updated */
-+	if (dev_blocks) {
-+		ub->dev_info.dev_blocks = dev_blocks;
-+		ublk_update_capacity(ub);
-+	}
-+	ub->dev_info.ublksrv_pid = ublksrv_pid;
-+	ret = add_disk(ub->ub_disk);
-+	if (ret)
-+		goto out_unlock;
-+
-+	ub->dev_info.state = UBLK_S_DEV_LIVE;
-+out_unlock:
-+	mutex_unlock(&ub->mutex);
-+	ublk_put_device(ub);
- 	return ret;
- }
- 
-@@ -1281,6 +1283,13 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
- 	unsigned long queue;
- 	unsigned int retlen;
- 	int ret = -EINVAL;
-+	
-+	if (header->len * BITS_PER_BYTE < nr_cpu_ids)
-+		return -EINVAL;
-+	if (header->len & (sizeof(unsigned long)-1))
-+		return -EINVAL;
-+	if (!header->addr)
-+		return -EINVAL;
- 
- 	ub = ublk_get_device_from_id(header->dev_id);
- 	if (!ub)
-@@ -1311,38 +1320,64 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
- 	return ret;
- }
- 
--static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_dev_info *info,
--		void __user *argp, int idx)
-+static inline void ublk_dump_dev_info(struct ublksrv_ctrl_dev_info *info)
- {
-+	pr_devel("%s: dev id %d flags %llx\n", __func__,
-+			info->dev_id, info->flags[0]);
-+	pr_devel("\t nr_hw_queues %d queue_depth %d block size %d dev_capacity %lld\n",
-+			info->nr_hw_queues, info->queue_depth,
-+			info->block_size, info->dev_blocks);
-+}
-+
-+static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	void __user *argp = (void __user *)(unsigned long)header->addr;
-+	struct ublksrv_ctrl_dev_info info;
- 	struct ublk_device *ub;
--	int ret;
-+	int ret = -EINVAL;
-+
-+	if (header->len < sizeof(info) || !header->addr)
-+		return -EINVAL;
-+	if (header->queue_id != (u16)-1) {
-+		pr_warn("%s: queue_id is wrong %x\n",
-+			__func__, header->queue_id);
-+		return -EINVAL;
-+	}
-+	if (copy_from_user(&info, argp, sizeof(info)))
-+		return -EFAULT;
-+	ublk_dump_dev_info(&ub->dev_info);
-+	if (header->dev_id != info.dev_id) {
-+		pr_warn("%s: dev id not match %u %u\n",
-+			__func__, header->dev_id, info.dev_id);
-+		return -EINVAL;
-+	}
- 
- 	ret = mutex_lock_killable(&ublk_ctl_mutex);
- 	if (ret)
- 		return ret;
- 
--	ub = __ublk_create_dev(idx);
--	if (!IS_ERR_OR_NULL(ub)) {
--		memcpy(&ub->dev_info, info, sizeof(*info));
-+	ub = __ublk_create_dev(header->dev_id);
-+	if (IS_ERR(ub)) {
-+		ret = PTR_ERR(ub);
-+		goto out_unlock;
-+	}
- 
--		/* update device id */
--		ub->dev_info.dev_id = ub->ub_number;
-+	memcpy(&ub->dev_info, &info, sizeof(info));
- 
--		ret = ublk_add_dev(ub);
--		if (!ret) {
--			if (copy_to_user(argp, &ub->dev_info, sizeof(*info))) {
--				ublk_remove(ub);
--				ret = -EFAULT;
--			}
--		}
--	} else {
--		if (IS_ERR(ub))
--			ret = PTR_ERR(ub);
--		else
--			ret = -ENOMEM;
-+	/* update device id */
-+	ub->dev_info.dev_id = ub->ub_number;
-+
-+	ret = ublk_add_dev(ub);
-+	if (ret)
-+		goto out_unlock;
-+
-+	if (copy_to_user(argp, &ub->dev_info, sizeof(info))) {
-+		ublk_remove(ub);
-+		ret = -EFAULT;
- 	}
-+out_unlock:
- 	mutex_unlock(&ublk_ctl_mutex);
--
- 	return ret;
- }
- 
-@@ -1386,16 +1421,6 @@ static int ublk_ctrl_del_dev(int idx)
- 	return ret;
- }
- 
--
--static inline void ublk_dump_dev_info(struct ublksrv_ctrl_dev_info *info)
--{
--	pr_devel("%s: dev id %d flags %llx\n", __func__,
--			info->dev_id, info->flags[0]);
--	pr_devel("\t nr_hw_queues %d queue_depth %d block size %d dev_capacity %lld\n",
--			info->nr_hw_queues, info->queue_depth,
--			info->block_size, info->dev_blocks);
--}
--
- static inline void ublk_ctrl_cmd_dump(struct io_uring_cmd *cmd)
- {
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-@@ -1405,59 +1430,47 @@ static inline void ublk_ctrl_cmd_dump(struct io_uring_cmd *cmd)
- 			header->data[0], header->addr, header->len);
- }
- 
--static int ublk_ctrl_cmd_validate(struct io_uring_cmd *cmd,
--		struct ublksrv_ctrl_dev_info *info)
-+static int ublk_ctrl_stop_dev(struct io_uring_cmd *cmd)
- {
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
--	u32 cmd_op = cmd->cmd_op;
--	void __user *argp = (void __user *)(unsigned long)header->addr;
-+	struct ublk_device *ub;
- 
--	if (!capable(CAP_SYS_ADMIN))
--		return -EPERM;
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return -EINVAL;
- 
--	switch (cmd_op) {
--	case UBLK_CMD_GET_DEV_INFO:
--		if (header->len < sizeof(*info) || !header->addr)
--			return -EINVAL;
--		break;
--	case UBLK_CMD_ADD_DEV:
--		if (header->len < sizeof(*info) || !header->addr)
--			return -EINVAL;
--		if (copy_from_user(info, argp, sizeof(*info)) != 0)
--			return -EFAULT;
--		ublk_dump_dev_info(info);
--		if (header->dev_id != info->dev_id) {
--			printk(KERN_WARNING "%s: cmd %x, dev id not match %u %u\n",
--					__func__, cmd_op, header->dev_id,
--					info->dev_id);
--			return -EINVAL;
--		}
--		if (header->queue_id != (u16)-1) {
--			printk(KERN_WARNING "%s: cmd %x queue_id is wrong %x\n",
--					__func__, cmd_op, header->queue_id);
--			return -EINVAL;
--		}
--		break;
--	case UBLK_CMD_GET_QUEUE_AFFINITY:
--		if ((header->len * BITS_PER_BYTE) < nr_cpu_ids)
--			return -EINVAL;
--		if (header->len & (sizeof(unsigned long)-1))
--			return -EINVAL;
--		if (!header->addr)
--			return -EINVAL;
--	}
-+	ublk_stop_dev(ub);
-+	cancel_work_sync(&ub->stop_work);
- 
-+	ublk_put_device(ub);
- 	return 0;
- }
- 
--static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
--		unsigned int issue_flags)
-+static int ublk_ctrl_get_dev_info(struct io_uring_cmd *cmd)
+ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
  {
  	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
  	void __user *argp = (void __user *)(unsigned long)header->addr;
--	struct ublksrv_ctrl_dev_info info;
--	u32 cmd_op = cmd->cmd_op;
+-	struct blk_mq_hw_ctx *hctx;
++	struct blk_mq_queue_map	qmap = {};
++	cpumask_var_t cpumask;
  	struct ublk_device *ub;
-+	int ret = 0;
-+
-+	if (header->len < sizeof(struct ublksrv_ctrl_dev_info) || !header->addr)
-+		return -EINVAL;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return -EINVAL;
-+
-+	if (copy_to_user(argp, &ub->dev_info, sizeof(ub->dev_info)))
-+		ret = -EFAULT;
-+	ublk_put_device(ub);
-+
-+	return ret;
-+}
-+
-+static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
-+		unsigned int issue_flags)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
+ 	unsigned long queue;
+ 	unsigned int retlen;
++	unsigned int i;
  	int ret = -EINVAL;
+ 	
+ 	if (header->len * BITS_PER_BYTE < nr_cpu_ids)
+@@ -1276,30 +1266,41 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
  
- 	ublk_ctrl_cmd_dump(cmd);
-@@ -1465,38 +1478,23 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	if (!(issue_flags & IO_URING_F_SQE128))
- 		goto out;
+ 	ub = ublk_get_device_from_id(header->dev_id);
+ 	if (!ub)
+-		goto out;
++		return -EINVAL;
  
--	ret = ublk_ctrl_cmd_validate(cmd, &info);
--	if (ret)
-+	ret = -EPERM;
-+	if (!capable(CAP_SYS_ADMIN))
- 		goto out;
+ 	queue = header->data[0];
+ 	if (queue >= ub->dev_info.nr_hw_queues)
+-		goto out;
+-	hctx = ublk_get_hw_queue(ub, queue);
+-	if (!hctx)
+-		goto out;
++		goto out_put_device;
++
++	qmap.mq_map = kcalloc(nr_cpu_ids, sizeof(qmap.mq_map), GFP_KERNEL);
++	if (!qmap.mq_map)
++		goto out_put_device;
++	qmap.nr_queues = ub->dev_info.nr_hw_queues;
++	blk_mq_map_queues(&qmap);
++
++	ret = -ENOMEM;
++	if (!zalloc_cpumask_var(&cpumask, GFP_KERNEL))
++		goto out_free_qmap;
++
++	for_each_possible_cpu(i)
++		if (qmap.mq_map[i] == queue)
++			cpumask_set_cpu(i, cpumask);
  
- 	ret = -ENODEV;
--	switch (cmd_op) {
-+	switch (cmd->cmd_op) {
- 	case UBLK_CMD_START_DEV:
--		ub = ublk_get_device_from_id(header->dev_id);
--		if (ub) {
--			ret = ublk_ctrl_start_dev(ub, cmd);
--			ublk_put_device(ub);
++	ret = -EFAULT;
+ 	retlen = min_t(unsigned short, header->len, cpumask_size());
+-	if (copy_to_user(argp, hctx->cpumask, retlen)) {
+-		ret = -EFAULT;
+-		goto out;
+-	}
+-	if (retlen != header->len) {
+-		if (clear_user(argp + retlen, header->len - retlen)) {
+-			ret = -EFAULT;
+-			goto out;
 -		}
-+		ret = ublk_ctrl_start_dev(cmd);
- 		break;
- 	case UBLK_CMD_STOP_DEV:
--		ub = ublk_get_device_from_id(header->dev_id);
--		if (ub) {
--			ret = ublk_ctrl_stop_dev(ub);
--			ublk_put_device(ub);
--		}
-+		ret = ublk_ctrl_stop_dev(cmd);
- 		break;
- 	case UBLK_CMD_GET_DEV_INFO:
--		ub = ublk_get_device_from_id(header->dev_id);
--		if (ub) {
--			if (copy_to_user(argp, &ub->dev_info, sizeof(info)))
--				ret = -EFAULT;
--			else
--				ret = 0;
--			ublk_put_device(ub);
--		}
-+		ret = ublk_ctrl_get_dev_info(cmd);
- 		break;
- 	case UBLK_CMD_ADD_DEV:
--		ret = ublk_ctrl_add_dev(&info, argp, header->dev_id);
-+		ret = ublk_ctrl_add_dev(cmd);
- 		break;
- 	case UBLK_CMD_DEL_DEV:
- 		ret = ublk_ctrl_del_dev(header->dev_id);
+-	}
++	if (copy_to_user(argp, cpumask, retlen))
++		goto out_put_device;
++
++	if (retlen != header->len &&
++	    clear_user(argp + retlen, header->len - retlen))
++		goto out_put_device;
++
+ 	ret = 0;
+- out:
+-	if (ub)
+-		ublk_put_device(ub);
++	free_cpumask_var(cpumask);
++out_free_qmap:
++	kfree(qmap.mq_map);
++out_put_device:
++	ublk_put_device(ub);
+ 	return ret;
+ }
+ 
 -- 
 2.30.2
 
