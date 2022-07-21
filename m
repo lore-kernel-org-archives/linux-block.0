@@ -2,71 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846FDC43334
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 07:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D46C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 07:19:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230238AbiGUHPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jul 2022 03:15:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33640 "EHLO
+        id S229527AbiGUHTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jul 2022 03:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232367AbiGUHPr (ORCPT
+        with ESMTP id S231908AbiGUHTK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jul 2022 03:15:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5FDAC7B7A2
-        for <linux-block@vger.kernel.org>; Thu, 21 Jul 2022 00:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658387745;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lOZQPbTsHpKcgMEDvwjgRpFPYjZdmaKijWN1c98XWsc=;
-        b=cxDV8XGVl5S1lrKQRrkPfoJZIHOEl89pXivqLbxzbepdYSvd4u1xuA5q/3TUNgM2c3mpRl
-        LGndndGu6C9foj2jL23SEkf2fZf2k0J15g8zYNczSjQ2HiG8b1BC5iXKYD85L7ehID0jEA
-        r6EWXwm9j/kVGKPvkJ20Puu2gbKYhTQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-540-5j7A35EROZW7LC56vCSj0g-1; Thu, 21 Jul 2022 03:15:38 -0400
-X-MC-Unique: 5j7A35EROZW7LC56vCSj0g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B50A2381A084;
-        Thu, 21 Jul 2022 07:15:37 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A391140EBE3;
-        Thu, 21 Jul 2022 07:15:34 +0000 (UTC)
-Date:   Thu, 21 Jul 2022 15:15:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/8] ublk: simplify ublk_ch_open and ublk_ch_release
-Message-ID: <Ytj9EnJA6MpgVPK8@T590>
-References: <20220721051632.1676890-1-hch@lst.de>
- <20220721051632.1676890-5-hch@lst.de>
+        Thu, 21 Jul 2022 03:19:10 -0400
+Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C8FC7B7AD
+        for <linux-block@vger.kernel.org>; Thu, 21 Jul 2022 00:19:07 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VK-R-og_1658387943;
+Received: from 30.97.56.180(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VK-R-og_1658387943)
+          by smtp.aliyun-inc.com;
+          Thu, 21 Jul 2022 15:19:04 +0800
+Message-ID: <f4094148-1585-ee06-a4db-fd787a73f6c8@linux.alibaba.com>
+Date:   Thu, 21 Jul 2022 15:19:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220721051632.1676890-5-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH 5/8] ublk: cleanup ublk_ctrl_uring_cmd
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20220721051632.1676890-1-hch@lst.de>
+ <20220721051632.1676890-6-hch@lst.de>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20220721051632.1676890-6-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 21, 2022 at 07:16:28AM +0200, Christoph Hellwig wrote:
-> fops->open and fops->release are always paired.  Use simple atomic bit
-> ops ot indicate if the device is opened instead of a count that can
-> only be 0 and 1 and a useless cmpxchg loop in ublk_ch_release.
-> 
-> Also don't bother clearing file->private_data is the file is about to
-> be freed anyway.
+On 2022/7/21 13:16, Christoph Hellwig wrote:
+> Move all per-command work into the per-command ublk_ctrl_* helpers
+> instead of being split over those, ublk_ctrl_cmd_validate, and the main
+> ublk_ctrl_uring_cmd handler.  To facilitate that, the old
+> ublk_ctrl_stop_dev function that just contained two function calls is
+> folded into both callers.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
--- 
-Ming
-
+Reviewed-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
