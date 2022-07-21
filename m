@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B2D4C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:16:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A678C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 05:16:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229956AbiGUFQt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jul 2022 01:16:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54618 "EHLO
+        id S229950AbiGUFQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jul 2022 01:16:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229950AbiGUFQs (ORCPT
+        with ESMTP id S229441AbiGUFQw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jul 2022 01:16:48 -0400
+        Thu, 21 Jul 2022 01:16:52 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E080279ECA
-        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:16:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C3479ED1
+        for <linux-block@vger.kernel.org>; Wed, 20 Jul 2022 22:16:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=DvETBB5agZp7ygVb4rCORiayjfYhnL2Zion3w5qgXrs=; b=nbVk0ULGKH3faDzm5CPvQ3I0PP
-        6Y7UUB9dsaCEeGMIc1XfRtd7xfte/TrDH7L8CHL8fOtAbshHhaBV3/F0rUZi7bR9H1EnZqR3+tPfl
-        FgzcN5fL3ZrdecH1+YXxrd+8l5v/VH/QsripNxWcXD1faiggZ4hzMVz6ReyxdTJIVfQdXQ/H96yO9
-        /zul3SgtPUrKLOoQnWHni9EYnJlQ+Ak/PEoEVctFc9LcTSJ+y1ydN2rBbttpF73n/krEZqBDAmB/K
-        ANBlYIYvE4tZh8QZtHiktpxo1dp/FI3mkg4u1HTjgnnVY+RqGZ7SjypyBxHTsb7ZvZREOkwmPDX3e
-        aX8sHKfQ==;
+        bh=p3Kp8ytO8RxIl5ARh+MIw1lb0SipwSEVu685ZQVathA=; b=A5SMgryannzoUmJYdZgZ7/0usX
+        0NBMRJQrK0bAx4Dt9RamjpLFEaZzPSSnN3RcVXP+HUJiBnlEuyfOk38QMWvMF4NCbQb5+zYrjJfpK
+        JV7CW6XRY3KbxKRPd/daN6TgONndX2QDf9NOBBlfKuXrGTl+/y02WhVfVdQNjHfQvASdUHydBWr55
+        bMyfVyZdSzyFJaD52SuOY7EiXSGm7V8pHUjYNNoK/eILqkrkZUUukSA8bTLO3PktK4MQHm+//7qrA
+        8Jk+iUHHTslnZw+6dmwaJXNWlKe6DQNmiHHKnDiXPlC8WVyf2xtZfk/idZMgTDk1DPX42g0EXSyde
+        vA7dcY5Q==;
 Received: from 089144198117.atnat0007.highway.a1.net ([89.144.198.117] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oEOYI-00HDWp-B2; Thu, 21 Jul 2022 05:16:46 +0000
+        id 1oEOYL-00HDaL-UK; Thu, 21 Jul 2022 05:16:50 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 3/8] ublk: remove the empty open and release block device operations
-Date:   Thu, 21 Jul 2022 07:16:27 +0200
-Message-Id: <20220721051632.1676890-4-hch@lst.de>
+Subject: [PATCH 4/8] ublk: simplify ublk_ch_open and ublk_ch_release
+Date:   Thu, 21 Jul 2022 07:16:28 +0200
+Message-Id: <20220721051632.1676890-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220721051632.1676890-1-hch@lst.de>
 References: <20220721051632.1676890-1-hch@lst.de>
@@ -44,37 +44,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-No need to define empty versions, they can just be left out.
+fops->open and fops->release are always paired.  Use simple atomic bit
+ops ot indicate if the device is opened instead of a count that can
+only be 0 and 1 and a useless cmpxchg loop in ublk_ch_release.
+
+Also don't bother clearing file->private_data is the file is about to
+be freed anyway.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/ublk_drv.c | 11 -----------
- 1 file changed, 11 deletions(-)
+ drivers/block/ublk_drv.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 07913b5bccd90..deabcb23ae2af 100644
+index deabcb23ae2af..1f7bbbc3276a2 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -208,19 +208,8 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
- 			PAGE_SIZE);
+@@ -125,7 +125,8 @@ struct ublk_device {
+ 	struct cdev		cdev;
+ 	struct device		cdev_dev;
+ 
+-	atomic_t		ch_open_cnt;
++#define UB_STATE_OPEN		(1 << 0)
++	unsigned long		state;
+ 	int			ub_number;
+ 
+ 	struct mutex		mutex;
+@@ -647,21 +648,17 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+ 	struct ublk_device *ub = container_of(inode->i_cdev,
+ 			struct ublk_device, cdev);
+ 
+-	if (atomic_cmpxchg(&ub->ch_open_cnt, 0, 1) == 0) {
+-		filp->private_data = ub;
+-		return 0;
+-	}
+-	return -EBUSY;
++	if (test_and_set_bit(UB_STATE_OPEN, &ub->state))
++		return -EBUSY;
++	filp->private_data = ub;
++	return 0;
  }
  
--static int ublk_open(struct block_device *bdev, fmode_t mode)
--{
--	return 0;
--}
--
--static void ublk_release(struct gendisk *disk, fmode_t mode)
--{
--}
--
- static const struct block_device_operations ub_fops = {
- 	.owner =	THIS_MODULE,
--	.open =		ublk_open,
--	.release =	ublk_release,
- };
+ static int ublk_ch_release(struct inode *inode, struct file *filp)
+ {
+ 	struct ublk_device *ub = filp->private_data;
  
- #define UBLK_MAX_PIN_PAGES	32
+-	while (atomic_cmpxchg(&ub->ch_open_cnt, 1, 0) != 1)
+-		cpu_relax();
+-
+-	filp->private_data = NULL;
++	clear_bit(UB_STATE_OPEN, &ub->state);
+ 	return 0;
+ }
+ 
 -- 
 2.30.2
 
