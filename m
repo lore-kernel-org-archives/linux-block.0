@@ -2,79 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D570CCA488
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 12:07:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA37C43334
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 12:12:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233481AbiGUMHg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jul 2022 08:07:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48900 "EHLO
+        id S233534AbiGUMML (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jul 2022 08:12:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233477AbiGUMHf (ORCPT
+        with ESMTP id S233422AbiGUMMK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jul 2022 08:07:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1689885FB3
-        for <linux-block@vger.kernel.org>; Thu, 21 Jul 2022 05:07:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658405240;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=b9ugx/ZqACR4HW5VcP1UFVVMLvpTmYYfpJTw+qiZB+4=;
-        b=W5TR6rDRWXtYar4zIdU+6419O5NC/kDzhNxZVu0QzB73tJ9OD/Ms8fRtau7HtlbahrgS68
-        4jEywpeo1y5Y1p5MFlHnRH/FtIv6OerhWhzn2a1IeMTmZQwU1fSW4sA2rznI5mbcW+igsI
-        Ylwh/3qscxAs83pdejfJCUYBrlS653g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-404-pNulgRqlMI-BD6SbuzQ5uA-1; Thu, 21 Jul 2022 08:07:19 -0400
-X-MC-Unique: pNulgRqlMI-BD6SbuzQ5uA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A54B98001EA;
-        Thu, 21 Jul 2022 12:07:18 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 28BE840D296B;
-        Thu, 21 Jul 2022 12:07:15 +0000 (UTC)
-Date:   Thu, 21 Jul 2022 20:07:11 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: call blk_mq_exit_queue from disk_release for
- never added disks
-Message-ID: <YtlBb3qQHM1Hg0hU@T590>
-References: <20220720130541.1323531-1-hch@lst.de>
- <20220720130541.1323531-2-hch@lst.de>
+        Thu, 21 Jul 2022 08:12:10 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C0C85D7C;
+        Thu, 21 Jul 2022 05:12:09 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 63EB033B1B;
+        Thu, 21 Jul 2022 12:12:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1658405528; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=egR2joWkG1+t+z/IWkDo9SUageousK0DwRASKkHhVfU=;
+        b=MKfAMXWymz/PeJ+Hj+TOowtdvYcslKgrLg9O9B52SBiSr5Q4s94nWiUreKNJYK4mt3Jp+F
+        Ae2+3tyzG+B/5mhs9mBbqU54hX7W3N2bhXrTlsA6No+9kMvohw4D1356kdNuRULr7O+Yot
+        DiDImJXw05Ux1QFcYcW2PG+s647bUcc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1658405528;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=egR2joWkG1+t+z/IWkDo9SUageousK0DwRASKkHhVfU=;
+        b=5GqiOy0esk3vevbXgeq18R+LEEJiqAIn4/R7hfUrIZccvGqJhf83iximXo2tZmXigx1XQO
+        AOhFWSYcLCFtxhCQ==
+Received: from localhost.localdomain (unknown [10.163.16.22])
+        by relay2.suse.de (Postfix) with ESMTP id 1296E2C149;
+        Thu, 21 Jul 2022 12:12:01 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-block@vger.kernel.org
+Cc:     nvdimm@lists.linux.dev, linux-raid@vger.kernel.org,
+        Coly Li <colyli@suse.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Geliang Tang <geliang.tang@suse.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        NeilBrown <neilb@suse.de>, Richard Fan <richard.fan@suse.com>,
+        Vishal L Verma <vishal.l.verma@intel.com>,
+        Wols Lists <antlists@youngman.org.uk>, Xiao Ni <xni@redhat.com>
+Subject: [PATCH v6 0/7] badblocks improvement for multiple bad block ranges 
+Date:   Thu, 21 Jul 2022 20:11:45 +0800
+Message-Id: <20220721121152.4180-1-colyli@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220720130541.1323531-2-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 03:05:41PM +0200, Christoph Hellwig wrote:
-> To undo the all initialization from blk_mq_init_allocated_queue in case
-> of a probe failure where add_disk is never called we have to call
-> blk_mq_exit_queue from put_disk.
-> 
-> This relies on the fact that drivers always call blk_mq_free_tag_set
-> after calling put_disk in the probe error path if they have a gendisk
-> at all.
-> 
-> We should be doing this in general, but can't do it for the normal
-> teardown case (yet) as the tagset can be gone by the time the disk is
-> released once it was added.  I hope to sort this out properly eventually
-> but for now this isolated hack will do it.
-> 
-> Fixes: 6f8191fdf41d ("block: simplify disk shutdown")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
+This is the v6 version of the badblocks improvement series, which makes
+badblocks APIs to handle multiple ranges in bad block table.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+The change comparing to previous v5 version is the modification against
+review comments from Xiao Ni,
+- Typo fixes in code comments or commit logs.
+- The over thought checking conditions like '<=' are simplified as '<'.
+- Some unnecessary condition checks are removed.
+- In _badblocks_set(), if prev returned from prev_badblocks() is <0, set 
+  it properly before jumping to update_sectors. This helps to avoid un-
+  necessary looping.
+
+There is NO in-memory or on-disk format change in the whole series, all
+existing API and data structures are consistent. This series just only
+improve the code algorithm to handle more corner cases, the interfaces
+are same and consistency to all existing callers (md raid and nvdimm
+drivers).
+
+The original motivation of the change is from the requirement from our
+customer, that current badblocks routines don't handle multiple ranges.
+For example if the bad block setting range covers multiple ranges from
+bad block table, only the first two bad block ranges merged and rested
+ranges are intact. The expected behavior should be all the covered
+ranges to be handled.
+
+All the patches are tested by modified user space code and the code
+logic works as expected. The modified user space testing code is
+provided in the last patch. The testing code is an example how the
+improved code is tested.
+
+The whole change is divided into 6 patches to make the code review more
+clear and easier. If people prefer, I'd like to post a single large
+patch finally after the code review accomplished.
+
+Please review the code and response. Thank you all in advance.
+
+Coly Li
+
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Geliang Tang <geliang.tang@suse.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: NeilBrown <neilb@suse.de>
+Cc: Richard Fan <richard.fan@suse.com>
+Cc: Vishal L Verma <vishal.l.verma@intel.com>
+Cc: Wols Lists <antlists@youngman.org.uk>
+Cc: Xiao Ni <xni@redhat.com>
+---
+
+Coly Li (6):
+  badblocks: add more helper structure and routines in badblocks.h
+  badblocks: add helper routines for badblock ranges handling
+  badblocks: improve badblocks_set() for multiple ranges handling
+  badblocks: improve badblocks_clear() for multiple ranges handling
+  badblocks: improve badblocks_check() for multiple ranges handling
+  badblocks: switch to the improved badblock handling code
+
+ block/badblocks.c         | 1609 ++++++++++++++++++++++++++++++-------
+ include/linux/badblocks.h |   30 +
+ 2 files changed, 1345 insertions(+), 294 deletions(-)
 
 -- 
-Ming
+2.35.3
 
