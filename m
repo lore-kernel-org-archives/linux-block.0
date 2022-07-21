@@ -2,517 +2,214 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88965C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 12:12:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B5FC43334
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jul 2022 12:12:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233553AbiGUMMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jul 2022 08:12:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53028 "EHLO
+        id S233555AbiGUMMa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jul 2022 08:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233544AbiGUMMW (ORCPT
+        with ESMTP id S233551AbiGUMM1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jul 2022 08:12:22 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E46785D7C;
-        Thu, 21 Jul 2022 05:12:21 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id E91A11F86C;
-        Thu, 21 Jul 2022 12:12:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1658405539; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        Thu, 21 Jul 2022 08:12:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 67AED863D2
+        for <linux-block@vger.kernel.org>; Thu, 21 Jul 2022 05:12:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658405545;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=gN8esZe8vJx8CdMKi+7yvuKfBcNTS62chKvnUCD6o1E=;
-        b=k52OIraM2J6aLdShMFuSOOut73Sy0P7uc6sN8Cimqgreydv7D++3sMMWG1IuQAMEHQJAli
-        NJ/2BCmxkS2V0MKZW7ciNu8ERU85tegOtUX1qOMZaSnl9rIeW9VrfR+Y3zHptdRepRTyJj
-        GlNUjNNgs7mmtpVAwkg/xCApuCr/YWo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1658405539;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gN8esZe8vJx8CdMKi+7yvuKfBcNTS62chKvnUCD6o1E=;
-        b=NZ7WeQgpM2LhXkFescmcMDvc9cE8HQ8iCIfLuQDkYY1uruowwz8V+sLIal2UH74XWE9J/a
-        jLqgTOeQpI1o/xBA==
-Received: from localhost.localdomain (unknown [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id AAD9B2C149;
+        bh=m8MHABTPbxx3BGnBlN9Cx5R8uzpVbWvZekDjhk6Y+bs=;
+        b=fpnRsLB4n/qEQr4O190j5o+adQVmRfKBlYwD5tSAOkAw7tFxJvtz1DP5EwWcaGxYX0hjEc
+        DwJDA0XFE2sMeNVFem1OzSaGE/DTLa8CfZd9OVXiLsXU8RlQ0Ix8zXT+8ibFEO0AeYo2/T
+        7qQDRSm71q9xUZ5lD2THJC8GR7NHE9E=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-194-LxCR2fN5M0adCAM331STbQ-1; Thu, 21 Jul 2022 08:12:17 -0400
+X-MC-Unique: LxCR2fN5M0adCAM331STbQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 194873C01D92;
+        Thu, 21 Jul 2022 12:12:17 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 894C4401E7B;
         Thu, 21 Jul 2022 12:12:14 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-block@vger.kernel.org
-Cc:     nvdimm@lists.linux.dev, linux-raid@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Geliang Tang <geliang.tang@suse.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.de>,
-        Vishal L Verma <vishal.l.verma@intel.com>,
-        Xiao Ni <xni@redhat.com>
-Subject: [PATCH v6 2/7] badblocks: add helper routines for badblock ranges handling
-Date:   Thu, 21 Jul 2022 20:11:47 +0800
-Message-Id: <20220721121152.4180-3-colyli@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220721121152.4180-1-colyli@suse.de>
-References: <20220721121152.4180-1-colyli@suse.de>
+Date:   Thu, 21 Jul 2022 20:12:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 5/8] ublk: cleanup ublk_ctrl_uring_cmd
+Message-ID: <YtlCmV4YuHegwiGX@T590>
+References: <20220721051632.1676890-1-hch@lst.de>
+ <20220721051632.1676890-6-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220721051632.1676890-6-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds several helper routines to improve badblock ranges
-handling. These helper routines will be used later in the improved
-version of badblocks_set()/badblocks_clear()/badblocks_check().
+On Thu, Jul 21, 2022 at 07:16:29AM +0200, Christoph Hellwig wrote:
+> Move all per-command work into the per-command ublk_ctrl_* helpers
+> instead of being split over those, ublk_ctrl_cmd_validate, and the main
+> ublk_ctrl_uring_cmd handler.  To facilitate that, the old
+> ublk_ctrl_stop_dev function that just contained two function calls is
+> folded into both callers.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/ublk_drv.c | 234 +++++++++++++++++++--------------------
+>  1 file changed, 116 insertions(+), 118 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 1f7bbbc3276a2..af70c18796e70 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -813,13 +813,6 @@ static void ublk_stop_dev(struct ublk_device *ub)
+>  	cancel_delayed_work_sync(&ub->monitor_work);
+>  }
+>  
+> -static int ublk_ctrl_stop_dev(struct ublk_device *ub)
+> -{
+> -	ublk_stop_dev(ub);
+> -	cancel_work_sync(&ub->stop_work);
+> -	return 0;
+> -}
+> -
+>  static inline bool ublk_queue_ready(struct ublk_queue *ubq)
+>  {
+>  	return ubq->nr_io_ready == ubq->q_depth;
+> @@ -1205,8 +1198,8 @@ static int ublk_add_dev(struct ublk_device *ub)
+>  
+>  static void ublk_remove(struct ublk_device *ub)
+>  {
+> -	ublk_ctrl_stop_dev(ub);
+> -
+> +	ublk_stop_dev(ub);
+> +	cancel_work_sync(&ub->stop_work);
+>  	cdev_device_del(&ub->cdev, &ub->cdev_dev);
+>  	put_device(&ub->cdev_dev);
+>  }
+> @@ -1227,36 +1220,45 @@ static struct ublk_device *ublk_get_device_from_id(int idx)
+>  	return ub;
+>  }
+>  
+> -static int ublk_ctrl_start_dev(struct ublk_device *ub, struct io_uring_cmd *cmd)
+> +static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
+>  {
+>  	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
+> -	int ret = -EINVAL;
+>  	int ublksrv_pid = (int)header->data[0];
+>  	unsigned long dev_blocks = header->data[1];
+> +	struct ublk_device *ub;
+> +	int ret = -EINVAL;
+>  
+>  	if (ublksrv_pid <= 0)
+> -		return ret;
+> +		return -EINVAL;
+> +
+> +	ub = ublk_get_device_from_id(header->dev_id);
+> +	if (!ub)
+> +		return -EINVAL;
+>  
+>  	wait_for_completion_interruptible(&ub->completion);
+>  
+>  	schedule_delayed_work(&ub->monitor_work, UBLK_DAEMON_MONITOR_PERIOD);
+>  
+>  	mutex_lock(&ub->mutex);
+> -	if (!disk_live(ub->ub_disk)) {
+> -		/* We may get disk size updated */
+> -		if (dev_blocks) {
+> -			ub->dev_info.dev_blocks = dev_blocks;
+> -			ublk_update_capacity(ub);
+> -		}
+> -		ub->dev_info.ublksrv_pid = ublksrv_pid;
+> -		ret = add_disk(ub->ub_disk);
+> -		if (!ret)
+> -			ub->dev_info.state = UBLK_S_DEV_LIVE;
+> -	} else {
+> +	if (disk_live(ub->ub_disk)) {
+>  		ret = -EEXIST;
+> +		goto out_unlock;
+>  	}
+> -	mutex_unlock(&ub->mutex);
+>  
+> +	/* We may get disk size updated */
+> +	if (dev_blocks) {
+> +		ub->dev_info.dev_blocks = dev_blocks;
+> +		ublk_update_capacity(ub);
+> +	}
+> +	ub->dev_info.ublksrv_pid = ublksrv_pid;
+> +	ret = add_disk(ub->ub_disk);
+> +	if (ret)
+> +		goto out_unlock;
+> +
+> +	ub->dev_info.state = UBLK_S_DEV_LIVE;
+> +out_unlock:
+> +	mutex_unlock(&ub->mutex);
+> +	ublk_put_device(ub);
+>  	return ret;
+>  }
+>  
+> @@ -1281,6 +1283,13 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
+>  	unsigned long queue;
+>  	unsigned int retlen;
+>  	int ret = -EINVAL;
+> +	
+> +	if (header->len * BITS_PER_BYTE < nr_cpu_ids)
+> +		return -EINVAL;
+> +	if (header->len & (sizeof(unsigned long)-1))
+> +		return -EINVAL;
+> +	if (!header->addr)
+> +		return -EINVAL;
+>  
+>  	ub = ublk_get_device_from_id(header->dev_id);
+>  	if (!ub)
+> @@ -1311,38 +1320,64 @@ static int ublk_ctrl_get_queue_affinity(struct io_uring_cmd *cmd)
+>  	return ret;
+>  }
+>  
+> -static int ublk_ctrl_add_dev(const struct ublksrv_ctrl_dev_info *info,
+> -		void __user *argp, int idx)
+> +static inline void ublk_dump_dev_info(struct ublksrv_ctrl_dev_info *info)
+>  {
+> +	pr_devel("%s: dev id %d flags %llx\n", __func__,
+> +			info->dev_id, info->flags[0]);
+> +	pr_devel("\t nr_hw_queues %d queue_depth %d block size %d dev_capacity %lld\n",
+> +			info->nr_hw_queues, info->queue_depth,
+> +			info->block_size, info->dev_blocks);
+> +}
+> +
+> +static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
+> +{
+> +	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
+> +	void __user *argp = (void __user *)(unsigned long)header->addr;
+> +	struct ublksrv_ctrl_dev_info info;
+>  	struct ublk_device *ub;
+> -	int ret;
+> +	int ret = -EINVAL;
+> +
+> +	if (header->len < sizeof(info) || !header->addr)
+> +		return -EINVAL;
+> +	if (header->queue_id != (u16)-1) {
+> +		pr_warn("%s: queue_id is wrong %x\n",
+> +			__func__, header->queue_id);
+> +		return -EINVAL;
+> +	}
+> +	if (copy_from_user(&info, argp, sizeof(info)))
+> +		return -EFAULT;
+> +	ublk_dump_dev_info(&ub->dev_info);
 
-- Helpers prev_by_hint() and prev_badblocks() are used to find the bad
-  range from bad table which the searching range starts at or after.
+The above line should have been ublk_dump_dev_info(&info), otherwise
+looks fine:
 
-- The following helpers are to decide the relative layout between the
-  manipulating range and existing bad block range from bad table.
-  - can_merge_behind()
-    Return 'true' if the manipulating range can backward merge with the
-    bad block range.
-  - can_merge_front()
-    Return 'true' if the manipulating range can forward merge with the
-    bad block range.
-  - can_combine_front()
-    Return 'true' if two adjacent bad block ranges before the
-    manipulating range can be merged.
-  - overlap_front()
-    Return 'true' if the manipulating range exactly overlaps with the
-    bad block range in front of its range.
-  - overlap_behind()
-    Return 'true' if the manipulating range exactly overlaps with the
-    bad block range behind its range.
-  - can_front_overwrite()
-    Return 'true' if the manipulating range can forward overwrite the
-    bad block range in front of its range.
+Reviewed-by: Ming Lei <ming.lei@rehdat.com>
 
-- The following helpers are to add the manipulating range into the bad
-  block table. Different routine is called with the specific relative
-  layout between the manipulating range and other bad block range in the
-  bad block table.
-  - behind_merge()
-    Merge the manipulating range with the bad block range behind its
-    range, and return the number of merged length in unit of sector.
-  - front_merge()
-    Merge the manipulating range with the bad block range in front of
-    its range, and return the number of merged length in unit of sector.
-  - front_combine()
-    Combine the two adjacent bad block ranges before the manipulating
-    range into a larger one.
-  - front_overwrite()
-    Overwrite partial of whole bad block range which is in front of the
-    manipulating range. The overwrite may split existing bad block range
-    and generate more bad block ranges into the bad block table.
-  - insert_at()
-    Insert the manipulating range at a specific location in the bad
-    block table.
-
-All the above helpers are used in later patches to improve the bad block
-ranges handling for badblocks_set()/badblocks_clear()/badblocks_check().
-
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: Dan Williams <dan.j.williams@intel.com>
-Cc: Geliang Tang <geliang.tang@suse.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: NeilBrown <neilb@suse.de>
-Cc: Vishal L Verma <vishal.l.verma@intel.com>
-Cc: Xiao Ni <xni@redhat.com>
----
- block/badblocks.c | 377 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 377 insertions(+)
-
-diff --git a/block/badblocks.c b/block/badblocks.c
-index 3afb550c0f7b..72be83507977 100644
---- a/block/badblocks.c
-+++ b/block/badblocks.c
-@@ -16,6 +16,383 @@
- #include <linux/types.h>
- #include <linux/slab.h>
- 
-+/*
-+ * Find the range starts at-or-before 's' from bad table. The search
-+ * starts from index 'hint' and stops at index 'hint_end' from the bad
-+ * table.
-+ */
-+static int prev_by_hint(struct badblocks *bb, sector_t s, int hint)
-+{
-+	int hint_end = hint + 2;
-+	u64 *p = bb->page;
-+	int ret = -1;
-+
-+	while ((hint < hint_end) && ((hint + 1) <= bb->count) &&
-+	       (BB_OFFSET(p[hint]) <= s)) {
-+		if ((hint + 1) == bb->count || BB_OFFSET(p[hint + 1]) > s) {
-+			ret = hint;
-+			break;
-+		}
-+		hint++;
-+	}
-+
-+	return ret;
-+}
-+
-+/*
-+ * Find the range starts at-or-before bad->start. If 'hint' is provided
-+ * (hint >= 0) then search in the bad table from hint firstly. It is
-+ * very probably the wanted bad range can be found from the hint index,
-+ * then the unnecessary while-loop iteration can be avoided.
-+ */
-+static int prev_badblocks(struct badblocks *bb, struct badblocks_context *bad,
-+			  int hint)
-+{
-+	sector_t s = bad->start;
-+	int ret = -1;
-+	int lo, hi;
-+	u64 *p;
-+
-+	if (!bb->count)
-+		goto out;
-+
-+	if (hint >= 0) {
-+		ret = prev_by_hint(bb, s, hint);
-+		if (ret >= 0)
-+			goto out;
-+	}
-+
-+	lo = 0;
-+	hi = bb->count;
-+	p = bb->page;
-+
-+	while (hi - lo > 1) {
-+		int mid = (lo + hi)/2;
-+		sector_t a = BB_OFFSET(p[mid]);
-+
-+		if (a == s) {
-+			ret = mid;
-+			goto out;
-+		}
-+
-+		if (a < s)
-+			lo = mid;
-+		else
-+			hi = mid;
-+	}
-+
-+	if (BB_OFFSET(p[lo]) <= s)
-+		ret = lo;
-+out:
-+	return ret;
-+}
-+
-+/*
-+ * Return 'true' if the range indicated by 'bad' can be backward merged
-+ * with the bad range (from the bad table) index by 'behind'.
-+ */
-+static bool can_merge_behind(struct badblocks *bb, struct badblocks_context *bad,
-+			     int behind)
-+{
-+	sector_t sectors = bad->len;
-+	sector_t s = bad->start;
-+	u64 *p = bb->page;
-+
-+	if ((s < BB_OFFSET(p[behind])) &&
-+	    ((s + sectors) >= BB_OFFSET(p[behind])) &&
-+	    ((BB_END(p[behind]) - s) <= BB_MAX_LEN) &&
-+	    BB_ACK(p[behind]) == bad->ack)
-+		return true;
-+	return false;
-+}
-+
-+/*
-+ * Do backward merge for range indicated by 'bad' and the bad range
-+ * (from the bad table) indexed by 'behind'. The return value is merged
-+ * sectors from bad->len.
-+ */
-+static int behind_merge(struct badblocks *bb, struct badblocks_context *bad,
-+			int behind)
-+{
-+	sector_t sectors = bad->len;
-+	sector_t s = bad->start;
-+	u64 *p = bb->page;
-+	int merged = 0;
-+
-+	WARN_ON(s >= BB_OFFSET(p[behind]));
-+	WARN_ON((s + sectors) < BB_OFFSET(p[behind]));
-+
-+	if (s < BB_OFFSET(p[behind])) {
-+		merged = BB_OFFSET(p[behind]) - s;
-+		p[behind] =  BB_MAKE(s, BB_LEN(p[behind]) + merged, bad->ack);
-+
-+		WARN_ON((BB_LEN(p[behind]) + merged) >= BB_MAX_LEN);
-+	}
-+
-+	return merged;
-+}
-+
-+/*
-+ * Return 'true' if the range indicated by 'bad' can be forward
-+ * merged with the bad range (from the bad table) indexed by 'prev'.
-+ */
-+static bool can_merge_front(struct badblocks *bb, int prev,
-+			    struct badblocks_context *bad)
-+{
-+	sector_t s = bad->start;
-+	u64 *p = bb->page;
-+
-+	if (BB_ACK(p[prev]) == bad->ack &&
-+	    (s < BB_END(p[prev]) ||
-+	     (s == BB_END(p[prev]) && (BB_LEN(p[prev]) < BB_MAX_LEN))))
-+		return true;
-+	return false;
-+}
-+
-+/*
-+ * Do forward merge for range indicated by 'bad' and the bad range
-+ * (from bad table) indexed by 'prev'. The return value is sectors
-+ * merged from bad->len.
-+ */
-+static int front_merge(struct badblocks *bb, int prev, struct badblocks_context *bad)
-+{
-+	sector_t sectors = bad->len;
-+	sector_t s = bad->start;
-+	u64 *p = bb->page;
-+	int merged = 0;
-+
-+	WARN_ON(s > BB_END(p[prev]));
-+
-+	if (s < BB_END(p[prev])) {
-+		merged = min_t(sector_t, sectors, BB_END(p[prev]) - s);
-+	} else {
-+		merged = min_t(sector_t, sectors, BB_MAX_LEN - BB_LEN(p[prev]));
-+		if ((prev + 1) < bb->count &&
-+		    merged > (BB_OFFSET(p[prev + 1]) - BB_END(p[prev]))) {
-+			merged = BB_OFFSET(p[prev + 1]) - BB_END(p[prev]);
-+		}
-+
-+		p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
-+				  BB_LEN(p[prev]) + merged, bad->ack);
-+	}
-+
-+	return merged;
-+}
-+
-+/*
-+ * 'Combine' is a special case which can_merge_front() is not able to
-+ * handle: If a bad range (indexed by 'prev' from bad table) exactly
-+ * starts as bad->start, and the bad range ahead of 'prev' (indexed by
-+ * 'prev - 1' from bad table) exactly ends at where 'prev' starts, and
-+ * the sum of their lengths does not exceed BB_MAX_LEN limitation, then
-+ * these two bad range (from bad table) can be combined.
-+ *
-+ * Return 'true' if bad ranges indexed by 'prev' and 'prev - 1' from bad
-+ * table can be combined.
-+ */
-+static bool can_combine_front(struct badblocks *bb, int prev,
-+			      struct badblocks_context *bad)
-+{
-+	u64 *p = bb->page;
-+
-+	if ((prev > 0) &&
-+	    (BB_OFFSET(p[prev]) == bad->start) &&
-+	    (BB_END(p[prev - 1]) == BB_OFFSET(p[prev])) &&
-+	    (BB_LEN(p[prev - 1]) + BB_LEN(p[prev]) <= BB_MAX_LEN) &&
-+	    (BB_ACK(p[prev - 1]) == BB_ACK(p[prev])))
-+		return true;
-+	return false;
-+}
-+
-+/*
-+ * Combine the bad ranges indexed by 'prev' and 'prev - 1' (from bad
-+ * table) into one larger bad range, and the new range is indexed by
-+ * 'prev - 1'.
-+ */
-+static void front_combine(struct badblocks *bb, int prev)
-+{
-+	u64 *p = bb->page;
-+
-+	p[prev - 1] = BB_MAKE(BB_OFFSET(p[prev - 1]),
-+			      BB_LEN(p[prev - 1]) + BB_LEN(p[prev]),
-+			      BB_ACK(p[prev]));
-+	if ((prev + 1) < bb->count)
-+		memmove(p + prev, p + prev + 1, (bb->count - prev - 1) * 8);
-+}
-+
-+/*
-+ * Return 'true' if the range indicated by 'bad' is exactly forward
-+ * overlapped with the bad range (from bad table) indexed by 'front'.
-+ * Exactly forward overlap means the bad range (from bad table) indexed
-+ * by 'prev' does not cover the whole range indicated by 'bad'.
-+ */
-+static bool overlap_front(struct badblocks *bb, int front,
-+			  struct badblocks_context *bad)
-+{
-+	u64 *p = bb->page;
-+
-+	if (bad->start >= BB_OFFSET(p[front]) &&
-+	    bad->start < BB_END(p[front]))
-+		return true;
-+	return false;
-+}
-+
-+/*
-+ * Return 'true' if the range indicated by 'bad' is exactly backward
-+ * overlapped with the bad range (from bad table) indexed by 'behind'.
-+ */
-+static bool overlap_behind(struct badblocks *bb, struct badblocks_context *bad,
-+			   int behind)
-+{
-+	u64 *p = bb->page;
-+
-+	if (bad->start < BB_OFFSET(p[behind]) &&
-+	    (bad->start + bad->len) > BB_OFFSET(p[behind]))
-+		return true;
-+	return false;
-+}
-+
-+/*
-+ * Return 'true' if the range indicated by 'bad' can overwrite the bad
-+ * range (from bad table) indexed by 'prev'.
-+ *
-+ * The range indicated by 'bad' can overwrite the bad range indexed by
-+ * 'prev' when,
-+ * 1) The whole range indicated by 'bad' can cover partial or whole bad
-+ *    range (from bad table) indexed by 'prev'.
-+ * 2) The ack value of 'bad' is larger or equal to the ack value of bad
-+ *    range 'prev'.
-+ *
-+ * If the overwriting doesn't cover the whole bad range (from bad table)
-+ * indexed by 'prev', new range might be split from existing bad range,
-+ * 1) The overwrite covers head or tail part of existing bad range, 1
-+ *    extra bad range will be split and added into the bad table.
-+ * 2) The overwrite covers middle of existing bad range, 2 extra bad
-+ *    ranges will be split (ahead and after the overwritten range) and
-+ *    added into the bad table.
-+ * The number of extra split ranges of the overwriting is stored in
-+ * 'extra' and returned for the caller.
-+ */
-+static bool can_front_overwrite(struct badblocks *bb, int prev,
-+				struct badblocks_context *bad, int *extra)
-+{
-+	u64 *p = bb->page;
-+	int len;
-+
-+	WARN_ON(!overlap_front(bb, prev, bad));
-+
-+	if (BB_ACK(p[prev]) >= bad->ack)
-+		return false;
-+
-+	if (BB_END(p[prev]) <= (bad->start + bad->len)) {
-+		len = BB_END(p[prev]) - bad->start;
-+		if (BB_OFFSET(p[prev]) == bad->start)
-+			*extra = 0;
-+		else
-+			*extra = 1;
-+
-+		bad->len = len;
-+	} else {
-+		if (BB_OFFSET(p[prev]) == bad->start)
-+			*extra = 1;
-+		else
-+		/*
-+		 * prev range will be split into two, beside the overwritten
-+		 * one, an extra slot needed from bad table.
-+		 */
-+			*extra = 2;
-+	}
-+
-+	if ((bb->count + (*extra)) >= MAX_BADBLOCKS)
-+		return false;
-+
-+	return true;
-+}
-+
-+/*
-+ * Do the overwrite from the range indicated by 'bad' to the bad range
-+ * (from bad table) indexed by 'prev'.
-+ * The previously called can_front_overwrite() will provide how many
-+ * extra bad range(s) might be split and added into the bad table. All
-+ * the splitting cases in the bad table will be handled here.
-+ */
-+static int front_overwrite(struct badblocks *bb, int prev,
-+			   struct badblocks_context *bad, int extra)
-+{
-+	u64 *p = bb->page;
-+	sector_t orig_end = BB_END(p[prev]);
-+	int orig_ack = BB_ACK(p[prev]);
-+
-+	switch (extra) {
-+	case 0:
-+		p[prev] = BB_MAKE(BB_OFFSET(p[prev]), BB_LEN(p[prev]),
-+				  bad->ack);
-+		break;
-+	case 1:
-+		if (BB_OFFSET(p[prev]) == bad->start) {
-+			p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
-+					  bad->len, bad->ack);
-+			memmove(p + prev + 2, p + prev + 1,
-+				(bb->count - prev - 1) * 8);
-+			p[prev + 1] = BB_MAKE(bad->start + bad->len,
-+					      orig_end - BB_END(p[prev]),
-+					      orig_ack);
-+		} else {
-+			p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
-+					  bad->start - BB_OFFSET(p[prev]),
-+					  BB_ACK(p[prev]));
-+			/*
-+			 * prev +2 -> prev + 1 + 1, which is for,
-+			 * 1) prev + 1: the slot index of the previous one
-+			 * 2) + 1: one more slot for extra being 1.
-+			 */
-+			memmove(p + prev + 2, p + prev + 1,
-+				(bb->count - prev - 1) * 8);
-+			p[prev + 1] = BB_MAKE(bad->start, bad->len, bad->ack);
-+		}
-+		break;
-+	case 2:
-+		p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
-+				  bad->start - BB_OFFSET(p[prev]),
-+				  BB_ACK(p[prev]));
-+		/*
-+		 * prev + 3 -> prev + 1 + 2, which is for,
-+		 * 1) prev + 1: the slot index of the previous one
-+		 * 2) + 2: two more slots for extra being 2.
-+		 */
-+		memmove(p + prev + 3, p + prev + 1,
-+			(bb->count - prev - 1) * 8);
-+		p[prev + 1] = BB_MAKE(bad->start, bad->len, bad->ack);
-+		p[prev + 2] = BB_MAKE(BB_END(p[prev + 1]),
-+				      orig_end - BB_END(p[prev + 1]),
-+				      BB_ACK(p[prev]));
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return bad->len;
-+}
-+
-+/*
-+ * Explicitly insert a range indicated by 'bad' to the bad table, where
-+ * the location is indexed by 'at'.
-+ */
-+static int insert_at(struct badblocks *bb, int at, struct badblocks_context *bad)
-+{
-+	u64 *p = bb->page;
-+	int len;
-+
-+	WARN_ON(badblocks_full(bb));
-+
-+	len = min_t(sector_t, bad->len, BB_MAX_LEN);
-+	if (at < bb->count)
-+		memmove(p + at + 1, p + at, (bb->count - at) * 8);
-+	p[at] = BB_MAKE(bad->start, len, bad->ack);
-+
-+	return len;
-+}
-+
- /**
-  * badblocks_check() - check a given range for bad sectors
-  * @bb:		the badblocks structure that holds all badblock information
--- 
-2.35.3
+Thanks,
+Ming
 
