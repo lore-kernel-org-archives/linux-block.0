@@ -2,88 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 169B8C43334
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 08:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C93C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 08:46:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233552AbiGVI3C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 04:29:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54990 "EHLO
+        id S232347AbiGVIqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 04:46:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232715AbiGVI3B (ORCPT
+        with ESMTP id S234764AbiGVIqU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 04:29:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665439E793;
-        Fri, 22 Jul 2022 01:29:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 22 Jul 2022 04:46:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 87FD79FE1E
+        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 01:46:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658479564;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=LBPMxK58eeFaYZO+mDr7jxmrJ7sT7p546GJgjwMsEZ0=;
+        b=auD8d1iZ9ingmXS9t96wVXkjsugwNz87SZRLGwSW7cY/1HbRuTss5BHF4QVnhLdvc81L4V
+        Ys2dHVjTpP2flmWAnHDavGvBbqCRrsXYoJogG/5s/mV/pmMPmEIKBjidPt1hsneHcRBCLd
+        DXB+NileI/TCBIZmz6nuKfwQRotQy7M=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-601-dHg6ijydNHKwRV1nx98J6g-1; Fri, 22 Jul 2022 04:46:00 -0400
+X-MC-Unique: dHg6ijydNHKwRV1nx98J6g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0600661D1D;
-        Fri, 22 Jul 2022 08:29:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F872C341C6;
-        Fri, 22 Jul 2022 08:28:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658478539;
-        bh=a5jDdfGqOSYPOdBr/dRhHaxh3Xr4VJFqzGplwBVNszI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZMIwH2dfJ74LE6FO6bZLmX7j5WndYM5Q8XiZmjDLaAjIvCCLPS6r4q444/Xax2MMz
-         Cc7GEaoAo4Pxnf/2dClhCMluHOHg9FkciSAfEcUKpVUkunyW8+fShntD0wzJq6U3FC
-         sRgcs+0hUs1zG4Ix38UNJxij9vlPPwHuSEnYaerFu4WZ+/7MJ/9GKrtUmQ4T6ILmMh
-         MuoBbnB6QPMjrCZiFtuhqNjkglX/Np2RQSmvcLGEYvnG5zHfxZ1jlRIVrOZoURHYmL
-         7t/rF67396rZj9aGTI2B1wOTCKShRknHvWFbO/9FVJ0VMrDYINVe7jcx3m7g0bAYZH
-         qMBDsJvPRQgpg==
-Date:   Fri, 22 Jul 2022 01:28:57 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: RFC: what to do about fscrypt vs block device interaction
-Message-ID: <YtpfyZ8Dr9duVr45@sol.localdomain>
-References: <20220721125929.1866403-1-hch@lst.de>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C7C13C10140;
+        Fri, 22 Jul 2022 08:46:00 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29E1640CF8F0;
+        Fri, 22 Jul 2022 08:45:58 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 0/2] ublk_drv: make sure that correct flags(features) returned to userspace
+Date:   Fri, 22 Jul 2022 16:45:14 +0800
+Message-Id: <20220722084516.624457-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220721125929.1866403-1-hch@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 21, 2022 at 02:59:29PM +0200, Christoph Hellwig wrote:
-> Hi Eric,
-> 
-> fscrypt is the last major user of request_queues in file system code.
-> A lot of this would be easy to fix, and I have some pending patches,
-> but the major roadblocker is that the fscrypt_blk_crypto_key tries
-> to hold it's own refefrences to the request_queue.  The reason for
-> that is documented in the code, as in that the master key can outlive
-> the super_block.  But can you explain why we need to do that?  I
-> think evicting the key on unmount would be very much the expected
-> behavior.  With that we could rework how fscrypt interacts with the
-> file systems for inline encryption and avoid the nasty returning
-> of the devics in the get_devices method.  See my draft patch below,
-> for which I'm stuck at how to find a super_block for the evict side,
-> which seems to require larger logic changes.
+Hello Jens,
 
-Yes, evicting the blk-crypto keys at unmount is the expected behavior.  And it
-basically is the actual behavior as well, but as currently implemented there can
-be a slight delay.  There are two reasons for the delay, both probably solvable.
+The 1st patch cleans ublk_add_dev a bit, meantime fix one potential
+free un-allocated buffer issue.
 
-The first is that ->s_master_keys isn't released until __put_super().  It
-probably should be moved earlier, maybe to generic_shutdown_super().
+The 2nd one makes sure that driver supported flags returned to
+userspace, this way is important for maintaining compatibility.
 
-The second reason is that the keyrings subsystem is being used to keep track of
-the superblock's master keys (for several reasons, such as integrating with the
-key quotas), and a side effect of that we get the delay of the keyring's
-subsystem garbage collector before the destroy callbacks of the keys actually
-run.  That delays the eviction of the blk-crypto keys.
+V3:
+- cleanup ublk_ctrl_add_dev by Christoph
 
-To avoid that, I think we could go through and evict all the blk_crypto_keys
-(i.e. call fscrypt_destroy_prepared_key() on the fscrypt_prepared_keys embedded
-in each fscrypt_master_key) during the unmount itself, separating it from the
-destruction of the key objects from the keyring subsystem's perspective.
-That could happen in the moved call to fscrypt_sb_free().
+V2:
+- avoid double free device in case that char dev is failed to add
 
-I don't remember any specific reason why this wasn't done originally.
-blk-crypto support was added later on, so when it was added I think we just
-defaulted to keeping the same lifecycle for everything as before.
 
-- Eric
+Christoph Hellwig (1):
+  ublk_drv: fix error handling of ublk_add_dev
+
+Ming Lei (1):
+  ublk_drv: make sure that correct flags(features) returned to userspace
+
+ drivers/block/ublk_drv.c      | 112 ++++++++++++++++++----------------
+ include/uapi/linux/ublk_cmd.h |  11 +++-
+ 2 files changed, 66 insertions(+), 57 deletions(-)
+
+-- 
+2.31.1
+
