@@ -2,78 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8A4C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 09:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7123C43334
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 09:51:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234840AbiGVJIP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 05:08:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35614 "EHLO
+        id S235170AbiGVJv5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 05:51:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234508AbiGVJH7 (ORCPT
+        with ESMTP id S234841AbiGVJvm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 05:07:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B53E59FE39
-        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 02:07:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658480821;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=B9Ir2c2JvWf3oST9qGNjswV+dkWoW/lcLtdqAFUz+vU=;
-        b=g/m1wXB7SWH4uG64l5uSXecRewHmidFl0eF40WaXPcirop0HyEu16biRwVN4DDH8TVTqg/
-        EbAsABzmycvZHxVQBtqTWl1qLNWkYYiOKtDmBeIOEcQjM2H69QQsLboDx3xRn2Im26VntY
-        L/XUAWHqm/9diFAIHAZxXvaippEbuS4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-466-CnLTfc7GOaiUaxNqjnZulg-1; Fri, 22 Jul 2022 05:06:52 -0400
-X-MC-Unique: CnLTfc7GOaiUaxNqjnZulg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B6ABE18E0043;
-        Fri, 22 Jul 2022 09:06:51 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 79328403D0E2;
-        Fri, 22 Jul 2022 09:06:47 +0000 (UTC)
-Date:   Fri, 22 Jul 2022 17:06:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: ublk vs write cache and FUA
-Message-ID: <YtpooYTRpjuV3dV4@T590>
-References: <20220721151458.GA4399@lst.de>
- <YtlwYKu8S4SV68MK@T590>
+        Fri, 22 Jul 2022 05:51:42 -0400
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF73411147
+        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 02:51:39 -0700 (PDT)
+X-QQ-mid: bizesmtp68t1658483488tiq7mmxl
+Received: from eureka.localdomain ( [123.124.208.226])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Fri, 22 Jul 2022 17:51:21 +0800 (CST)
+X-QQ-SSF: 01400000002000B0D000000A0000020
+X-QQ-FEAT: u333Yk6K//cJf6U3Gg35wNrITo20vet63t8xhIw9HlBoV0teoSgOYTlAyOa/V
+        qkJYzrZKYsHDG0fLMX9OAHn4pTepV4VwPQOlO01nTdipDxzGs7BKJPPdqGKgmfg/5gYNvRQ
+        zAwwPdQ3CsGH2IsdvQlqe0iP04U2qsCqtmQESwk2umYpdstqIPs2S1F90uWWm9wNKRlodmR
+        /2nHcGBmezFWe6nNDMgWMSEnkpn5AU15KhhL0vejZ680TPMgkBdQmm6o56P+Py5gvOsfmxF
+        sODPTnDYNyO7OOd0rfhhrbfzt0FF0HxWOUh2WHsdiNYVw38lDknKptMgg0vxS6bdPnOxCvn
+        acqHFT6t+TyeBGkpOx9hSC7xZADuujfwswzWCDoez3AhvaKf4dSQ7FgZ8Y2UgqEHVgr7tCy
+        pBRvDhZXSnCrtLLIEVrBLQ==
+X-QQ-GoodBg: 1
+From:   Wang You <wangyoua@uniontech.com>
+To:     axboe@kernel.dk, bvanassche@acm.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        hch@lst.de, jaegeuk@kernel.org, fio@vger.kernel.org,
+        ming.lei@redhat.com, wangyoua@uniontech.com,
+        wangxiaohua@uniontech.com
+Subject: [PATCH v2 0/2] Improve mq-deadline performance in HDD
+Date:   Fri, 22 Jul 2022 17:51:18 +0800
+Message-Id: <20220722095120.371212-1-wangyoua@uniontech.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YtlwYKu8S4SV68MK@T590>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign9
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 21, 2022 at 11:27:28PM +0800, Ming Lei wrote:
-> On Thu, Jul 21, 2022 at 05:14:58PM +0200, Christoph Hellwig wrote:
-> > Hi Ming,
-> > 
-> > ublk implements REQ_OP_FLUSH and REQ_FUA, but will never see those as
-> > it never calls blk_queue_write_cache.  Can we drop the code?  Or should
-> > there be a flag to enable write cache and fua support when setting up
-> > a device?
-> 
-> There should have been flags defined in ublksrv_ctrl_dev_info for describe
-> wc/fua info, since ublk_drv doesn't handle any device specific logic.
-> 
-> So please keep REQ_OP_FLUSH and REQ_FUA which two should be useful, and I
-> will add flags and related code to use them.
+Hi jens,
 
-Actually we can add two commands for set/get device parameter, then at least
-generic block device parameters(wc, fua, discard, zoned, rototional, ...)
-can be configurable, so all kinds of block device can be simulated
-with userspace ublk.
+We already know that batching requests can increase the storage
+performance of some devices, but after testing, I found that it
+will reduce the performance of some low and medium speed devices
+when using the scheduler (especially mq-deadline), such as
+rotational disks connected to a raid.
+
+In order to balance the performance difference between different
+devices, a more sophisticated mechanism may be needed to control
+the number of batching (such as sometimes 1 is better),
+but obviously this is not easy.
+
+At the same time I noticed that when the mq-deadline scheduler select
+a request for a higher sector outside the batch, deadline_fifo_request
+is used to select the request within the fifo and restart the batch.
+Selecting a request from a fifo tends to satisfy the request's timeline,
+but it is not always very urgent.
+
+So in the case of no expire, can the selection strategy of the first
+request in the batch be changed? Because in devices with rotation
+characteristics, proper sector access order is beneficial to performance.
+
+This patch series includes the following two parts:
+
+- Added a temporary sys interface nr_sched_batch to control the number
+  of batching requests.
+
+- Added a deadline_head_request function to select the request from the
+  first of the red-black tree instead of the fifo when appropriate.
 
 Thanks,
-Ming
+
+Wang.
+
+Wang You (2):
+  block: Introduce nr_sched_batch sys interface
+  block/mq-deadline: Prioritize first request
+
+ block/blk-mq-sched.c   |  4 +++-
+ block/blk-sysfs.c      | 32 +++++++++++++++++++++++++++++++
+ block/mq-deadline.c    | 43 +++++++++++++++++++++++++++++++++++++++---
+ include/linux/blkdev.h |  1 +
+ 4 files changed, 76 insertions(+), 4 deletions(-)
+
+-- 
+2.27.0
+
+
+
 
