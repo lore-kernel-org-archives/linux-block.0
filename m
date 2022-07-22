@@ -2,58 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07278CCA48A
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 08:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF336C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 08:15:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234485AbiGVILp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 04:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34626 "EHLO
+        id S230429AbiGVIP5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 04:15:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230367AbiGVILo (ORCPT
+        with ESMTP id S233544AbiGVIP4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 04:11:44 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8577E9CE04;
-        Fri, 22 Jul 2022 01:11:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ta3rvx+Batm6nlecC0K7iwKchb/Me2mo/w2bTMnndwY=; b=Icpp3ZraJ98dzkqejg7ojIFZlW
-        twhBghYZj8E0XytNLt5zspXTcWQ9DdL0bSjxTxEf8HvC4iii/6mfrgHZqL+86uIfAarieFyUa4mZk
-        QVCe6tpTIigKLnLYC0/U+Cwsn2ooqs/VGY+HpeCzDCbl1QRRbBVyRSGjTTATVDKHepfiwvvOq7X7f
-        9ugB6djOL1o1F2qEXRT2AC456mpMcxlXm8ncni/gOi/3Ur5oa8ATDDRQd+3jGJ9ROxV9fIEMxTsR4
-        heID/JaqnPVRGe58CI6SMsk28zG5vle3mGee6VSe1P61JQnjJxyIwKKABdDlsVZnth2Gd+iXmdprl
-        TTE2a/fA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oEnl9-000uTi-6h; Fri, 22 Jul 2022 08:11:43 +0000
-Date:   Fri, 22 Jul 2022 01:11:43 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v4 9/9] xfs: support STATX_DIOALIGN
-Message-ID: <Ytpbv1sDoh8pqWXx@infradead.org>
-References: <20220722071228.146690-1-ebiggers@kernel.org>
- <20220722071228.146690-10-ebiggers@kernel.org>
+        Fri, 22 Jul 2022 04:15:56 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9EF05007C;
+        Fri, 22 Jul 2022 01:15:54 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R881e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=liusong@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VK4HbEZ_1658477750;
+Received: from 30.178.80.135(mailfrom:liusong@linux.alibaba.com fp:SMTPD_---0VK4HbEZ_1658477750)
+          by smtp.aliyun-inc.com;
+          Fri, 22 Jul 2022 16:15:51 +0800
+Message-ID: <eb99b420-3e28-98c7-dacc-767d564661e2@linux.alibaba.com>
+Date:   Fri, 22 Jul 2022 16:15:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220722071228.146690-10-ebiggers@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.0.3
+Subject: Re: [PATCH] blk-mq: avoid potential infinite loop in
+ __blk_mq_alloc_request
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1658467343-55843-1-git-send-email-liusong@linux.alibaba.com>
+ <Yto2sHfyiJITgYAn@infradead.org>
+From:   Liu Song <liusong@linux.alibaba.com>
+In-Reply-To: <Yto2sHfyiJITgYAn@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 12:12:28AM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Add support for STATX_DIOALIGN to xfs, so that direct I/O alignment
-> restrictions are exposed to userspace in a generic way.
+> On Fri, Jul 22, 2022 at 01:22:23PM +0800, Liu Song wrote:
+>> From: Liu Song <liusong@linux.alibaba.com>
+>>
+>> If "blk_mq_get_tag" returns BLK_MQ_NO_TAG because the value of
+>> "tags->nr_reserved_tags" is 0, it will fall into an infinite loop in
+>> "__blk_mq_alloc_requests", so borrow BLK_MQ_REQ_NOWAIT to exit the loop.
+> That means the driver calling blk_mq_alloc_request has a bug, and
+> we should not work round that in the low level tag allocation path.
+>
+> If we want to be nice we can add a WARN_ON before going all the way
+> down into the tag allocator, something like:
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 92aae03103b74..d6c7e2ece025f 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -520,6 +520,10 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+>   	struct request *rq;
+>   	int ret;
+>   
+> +	if (WARN_ON_ONCE((flags & BLK_MQ_REQ_RESERVED) &&
+> +			!q->tag_set->reserved_tags))
+> +		return ERR_PTR(-EINVAL);
+> +
 
-Looks good:
+Hi，
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+It is a reasonable approach to prevent abnormal alloc from going down,
+but this is a very rare exception after all, and above modification is 
+checked
+every alloc request, which seems to be a bit excessive overhead.
+
+After the rare exception occurs and fix it, the impact on the alloc 
+request will be lower.
+
+Thanks
+
+>   	ret = blk_queue_enter(q, flags);
+>   	if (ret)
+>   		return ERR_PTR(ret);
+
