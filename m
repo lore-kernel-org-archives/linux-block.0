@@ -2,90 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EC5C43334
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 15:23:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9589FCCA489
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 16:03:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235750AbiGVPXc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 11:23:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40372 "EHLO
+        id S229771AbiGVQDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 12:03:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233308AbiGVPXb (ORCPT
+        with ESMTP id S229880AbiGVQDx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 11:23:31 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0EA19DEF6
-        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 08:23:19 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id l24so3861161ion.13
-        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 08:23:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=4E9ffZWo48VqZN8DRdIWXLdH7FBFPVhFQ3tDW+E3A/4=;
-        b=vM2Hi6jAGYRCESN4R2Ligq/rwTyhvOk6wTzhq3E79Io5aTt8ce8fgs+7fIBaPEAFvZ
-         fDT1SLI8FnDl0e6JdhMa7XAo3rzXBgPbBJ4j/w/s4YygB95q6zc7xh3OVWMVkUYEGBNA
-         cRlgPQ4QgVk6U7e6rVMggCcn4GjZNiByva4kBhLzLeSbaSg8AOhOHJtc5gtFgsIR/PPH
-         ogYY9gZ0vML7DSWNcMx92oVUkoO1Vx3CHslkJEs9RjcmIS3dDHGzY1xUUerDwN0IhrLi
-         YkkbgMzmwmbzIdmojgqmujuJHA6kYTAzgfrVOWKbZlGhO8LRqC+8VhfH/DANWlXKnxLR
-         66wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=4E9ffZWo48VqZN8DRdIWXLdH7FBFPVhFQ3tDW+E3A/4=;
-        b=4aT6EqvCJdSHFVwBi6lffnTJz7IEcDcztvf5shYzV1XaJHPESQ09DuYnhtoaT6gOMK
-         7aEYR/mxQIDqhg+n6E1I6bveE76OU4jxV8m9OeaddjaVbNsFv8/h5KrGxqacyuDSX4v2
-         XB8P85XUbnB3pa3QjBYdyHUp5QgvvsfiapV7y87qCTFTHcaX3/qxZ3i9q+sxSpdU5Z0E
-         FI0mn8uRQZuNNu1MR5yavFIfVmN3zGJrQn0Wqgw2IKHl0L7mrODqG6cE0LOqFKyUMN7+
-         PZeARtUCdbR223JJpzlt++9ahidCbi+kJQQRbC6PxMVx/63I2YuUC+rsaTJD1QPE+AU9
-         Ah7g==
-X-Gm-Message-State: AJIora8XYl+BdpJv2Wg78DEefGC15GzKlU9HvN16QjYfJkewCrGbuLeD
-        RCPOvVzJXxuoUP6uvmPuCgj1mM72/T/TEQ==
-X-Google-Smtp-Source: AGRyM1uyTHtnsFvxzLO2vF6f5tsYRb9W24BzjYpInq4CE02QaUkVLbfiZMkq1e60ORLGfmsQcD+ZmQ==
-X-Received: by 2002:a05:6602:2b10:b0:67b:80f8:6f2b with SMTP id p16-20020a0566022b1000b0067b80f86f2bmr89621iov.147.1658503399164;
-        Fri, 22 Jul 2022 08:23:19 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v18-20020a02b092000000b0033c836fe144sm2099256jah.85.2022.07.22.08.23.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 08:23:18 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ming.lei@redhat.com
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        ZiyangZhang@linux.alibaba.com
-In-Reply-To: <20220722103817.631258-1-ming.lei@redhat.com>
-References: <20220722103817.631258-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V4 0/2] ublk_drv: make sure that correct flags(features) returned to userspace
-Message-Id: <165850339736.236870.2964518260731776133.b4-ty@kernel.dk>
-Date:   Fri, 22 Jul 2022 09:23:17 -0600
+        Fri, 22 Jul 2022 12:03:53 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269BD5A14D;
+        Fri, 22 Jul 2022 09:03:53 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0086668AFE; Fri, 22 Jul 2022 18:03:49 +0200 (CEST)
+Date:   Fri, 22 Jul 2022 18:03:49 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: RFC: what to do about fscrypt vs block device interaction
+Message-ID: <20220722160349.GA10142@lst.de>
+References: <20220721125929.1866403-1-hch@lst.de> <YtpfyZ8Dr9duVr45@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YtpfyZ8Dr9duVr45@sol.localdomain>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 22 Jul 2022 18:38:15 +0800, Ming Lei wrote:
-> The 1st patch cleans ublk_add_dev a bit, meantime fix one potential
-> free un-allocated buffer issue.
+On Fri, Jul 22, 2022 at 01:28:57AM -0700, Eric Biggers wrote:
+> Yes, evicting the blk-crypto keys at unmount is the expected behavior.
+> And it basically is the actual behavior as well, but as currently
+> implemented there can be a slight delay.  There are two reasons for the
+> delay, both probably solvable.
 > 
-> The 2nd one makes sure that driver supported flags returned to
-> userspace, this way is important for maintaining compatibility.
+> The first is that ->s_master_keys isn't released until __put_super().
+> It probably should be moved earlier, maybe to generic_shutdown_super().
+
+Yes, this does sound like a good idea.
+
+> The second reason is that the keyrings subsystem is being used to keep
+> track of the superblock's master keys (for several reasons, such as
+> integrating with the key quotas), and a side effect of that we get the
+> delay of the keyring's subsystem garbage collector before the destroy
+> callbacks of the keys actually  run.  That delays the eviction of the
+> blk-crypto keys.
 > 
-> V4:
-> - move UBLK_F_ALL out of uapi header, and change order of clearing
-> dev_info.flags as suggested by Chrisotph
-> 
-> [...]
+> To avoid that, I think we could go through and evict all the
+> blk_crypto_keys (i.e. call fscrypt_destroy_prepared_key() on the
+> fscrypt_prepared_keys embedded in each fscrypt_master_key) during the
+> unmount itself, separating it from the destruction of the key objects
+> from the keyring subsystem's perspective. That could happen in the
+> moved call to fscrypt_sb_free().
 
-Applied, thanks!
+I'll give this a try.
 
-[1/2] ublk_drv: fix error handling of ublk_add_dev
-      commit: fa9482e0b23d9abe7034becff59daeaba09146ff
-[2/2] ublk_drv: make sure that correct flags(features) returned to userspace
-      commit: 6d8c5afc9ab14595707ff25d971dde45728eba3e
-
-Best regards,
--- 
-Jens Axboe
-
-
+What would be a good test suite or set of tests to make sure I don't
+break fscrypt operation?
