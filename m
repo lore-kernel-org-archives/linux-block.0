@@ -2,208 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B90C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 09:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B21C43334
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 09:53:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234807AbiGVJwA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 05:52:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55702 "EHLO
+        id S234195AbiGVJxb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 05:53:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235002AbiGVJvu (ORCPT
+        with ESMTP id S234841AbiGVJx2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 05:51:50 -0400
-Received: from smtpproxy21.qq.com (smtpbg701.qq.com [203.205.195.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DF0DFF8
-        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 02:51:44 -0700 (PDT)
-X-QQ-mid: bizesmtp68t1658483494tbs747nq
-Received: from eureka.localdomain ( [123.124.208.226])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Fri, 22 Jul 2022 17:51:33 +0800 (CST)
-X-QQ-SSF: 01400000002000B0D000000A0000020
-X-QQ-FEAT: 3auutXC5AV8E3RzgBgxgTnhPlZLbjLHjhmHStedrgoyqUuafpVYdht6B4JDCO
-        u6RofgjvrgbKz9de0wgfyMOyzkAv247dcjYD2hP+Oc82MkBTWp0qV56syPX2rUE56g1NBP9
-        BYzBirCBEeuv5xSUAJi970KiBMj04RMMYIMLGDS8uhEXw6QtLcvSBVqEXVYn9KFbl0ntSaJ
-        Mxg2eQTkyYZ+tCekIwuP7uNYMaMBqmdTe0aBB845gOJ28WQd1VIUdiBPIybPuXAxprR/7HM
-        whJRqFODt0hIAfX/mcoS0BV1QdBFrU6UVc9igOXudhmkPQZjG+KyLwjTGbNiHwLihB8m2be
-        c6sSXwc5RNz7WDv6FqPtpSfTQeG6q0URLbsJ+zOeMtHCWH6fXtZ8Ae2FHVRHHL1UEpJPBVA
-        wVZVPA/4OxOUZWIqK65Nkajc7nIJ+S6V
-X-QQ-GoodBg: 1
-From:   Wang You <wangyoua@uniontech.com>
-To:     axboe@kernel.dk, bvanassche@acm.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hch@lst.de, jaegeuk@kernel.org, fio@vger.kernel.org,
-        ming.lei@redhat.com, wangyoua@uniontech.com,
-        wangxiaohua@uniontech.com
-Subject: [PATCH v2 2/2] block/mq-deadline: Prioritize first request
-Date:   Fri, 22 Jul 2022 17:51:20 +0800
-Message-Id: <20220722095120.371212-3-wangyoua@uniontech.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220722095120.371212-1-wangyoua@uniontech.com>
-References: <20220722095120.371212-1-wangyoua@uniontech.com>
+        Fri, 22 Jul 2022 05:53:28 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 367A0D1
+        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 02:53:23 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 6FF0468AFE; Fri, 22 Jul 2022 11:53:19 +0200 (CEST)
+Date:   Fri, 22 Jul 2022 11:53:19 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH V3 2/2] ublk_drv: make sure that correct
+ flags(features) returned to userspace
+Message-ID: <20220722095319.GA13942@lst.de>
+References: <20220722084516.624457-1-ming.lei@redhat.com> <20220722084516.624457-3-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign8
-X-QQ-Bgrelay: 1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220722084516.624457-3-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The function deadline_head_request can select the request located at
-the head from the sector red-black tree of the mq-deadline scheduler,
-dispatch such a request may cause the disk access address to return
-to the head, so as to prevent it from swinging back and forth.
+On Fri, Jul 22, 2022 at 04:45:16PM +0800, Ming Lei wrote:
+>  	/* We are not ready to support zero copy */
+> +	ub->dev_info.flags &= ~UBLK_F_SUPPORT_ZERO_COPY;
 
-- The presence of the scheduler batching requests may reduce or
-  even eliminate its ability to fuse and sort, so I sometimes set
-  it to 1.
+Nit: I'd move this below the clearing of UBLK_F_ALL.  Not because it
+makes much of a differece, but because it flows more logical.
 
-- This pathc may exacerbate the risk of expire, I don't know if
-  a more absolute expire detection is necessary.
+> +/* All UBLK_F_* have to be included into UBLK_F_ALL */
+> +#define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY | UBLK_F_URING_CMD_COMP_IN_TASK)
 
-- Tested some disks (mainly rotational disks and some SSDs) with
-  the fio tool (using sync, direct, etc. parameters), the results
-  show that they increase the disk's small sector sequential read
-  and write performance, does this imply that changing
-  nr_sched_batch is reasonable?
+And this should not be in the uapi header but only kernel internal.
 
-- Later testing on different hardware showed that the raid controller 
-  probably played an important role, but the performance of a single 
-  disk did not improve as expected. so I'm not sure if this patch really 
-  has the desired effect.
+Otherwise looks good:
 
-Thanks,
-
-Wang.
-
-The following are all test data:
-
-The test hardware is:
-Kunpeng-920, HW-SAS3508+(MG04ACA400N * 2), RAID0.
-
-The test command is:
-fio -ioengine=psync -lockmem=1G -buffered=0 -time_based=1 -direct=1
--iodepth=1 -thread -bs=512B -size=110g -numjobs=16 -runtime=300
--group_reporting -name=read -filename=/dev/sdb14
--ioscheduler=mq-deadline -rw=read[,write,rw]
-
-- The following is the test data:
-origin/master:
-read iops: 152421       write iops: 136959      rw iops: 54593,54581
-
-nr_sched_batch = 1:
-read iops: 166449       write iops: 139477      rw iops: 55363,55355
-
-nr_sched_batch = 1, use deadline_head_request:
-read iops: 171177       write iops: 184431      rw iops: 56178,56169
-
-
-- The test hardware is:
-Hygon C86, MG04ACA400N
-
-The test command is:
-fio -ioengine=psync -lockmem=1G -buffered=0 -time_based=1 -direct=1 -iodepth=1 
--thread -bs=512B -size=110g -numjobs=32 -runtime=300 -group_reporting 
--name=read -filename=/dev/sdc -ioscheduler=mq-deadline -rw=read[,write,rw]
-
-The following is the test data:
-origin/master:
-read iops: 15463	write iops: 5949	rw iops: 574,576
-
-nr_sched_batch = 1:
-read iops: 15082	write iops: 6283	rw iops: 783,786
-
-nr_sched_batch = 1, use deadline_head_request:
-read iops: 15368	write iops: 6575	rw iops: 907,906
-
-
-- The test hardware is:
-Kunpeng-920, HW-SAS3508 + Samsung SSD 780, RAID0.
-
-The test command is:
-fio -ioengine=psync -lockmem=1G -buffered=0 -time_based=1 -direct=1 -iodepth=1 
--thread -bs=512B -size=110g -numjobs=16 -runtime=300 -group_reporting 
--name=read -filename=/dev/sda -ioscheduler=mq-deadline -rw=read[,write,rw]
-
-The following is the test data:
-origin/master:
-read iops: 115399       write iops: 136801      rw iops: 58082,58084
-
-nr_sched_batch = 1, use deadline_head_request:
-read iops: 136473       write iops: 184646      rw iops: 56460,56454
-
-Signed-off-by: Wang You <wangyoua@uniontech.com>
----
- block/mq-deadline.c | 43 ++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 40 insertions(+), 3 deletions(-)
-
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 1a9e835e816c..4660dd4a16f6 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -344,6 +344,36 @@ deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
- 	return rq;
- }
- 
-+static inline struct request *
-+deadline_head_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
-+		      int data_dir)
-+{
-+	struct rb_node *node = rb_first(&per_prio->sort_list[data_dir]);
-+	struct request *rq;
-+	unsigned long flags;
-+
-+	if (!node)
-+		return NULL;
-+
-+	rq = rb_entry_rq(node);
-+	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
-+		return rq;
-+
-+	/*
-+	 * Look for a write request that can be dispatched, that is one with
-+	 * an unlocked target zone.
-+	 */
-+	spin_lock_irqsave(&dd->zone_lock, flags);
-+	while (rq) {
-+		if (blk_req_can_dispatch_to_zone(rq))
-+			break;
-+		rq = deadline_latter_request(rq);
-+	}
-+	spin_unlock_irqrestore(&dd->zone_lock, flags);
-+
-+	return rq;
-+}
-+
- /*
-  * Returns true if and only if @rq started after @latest_start where
-  * @latest_start is in jiffies.
-@@ -429,13 +459,20 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
- 	 * we are not running a batch, find best request for selected data_dir
- 	 */
- 	next_rq = deadline_next_request(dd, per_prio, data_dir);
--	if (deadline_check_fifo(per_prio, data_dir) || !next_rq) {
-+	if (deadline_check_fifo(per_prio, data_dir)) {
- 		/*
- 		 * A deadline has expired, the last request was in the other
--		 * direction, or we have run out of higher-sectored requests.
--		 * Start again from the request with the earliest expiry time.
-+		 * direction. Start again from the request with the earliest
-+		 * expiry time.
- 		 */
- 		rq = deadline_fifo_request(dd, per_prio, data_dir);
-+	} else if (!next_rq) {
-+		/*
-+		 * There is no operation expired, and we have run out of
-+		 * higher-sectored requests. Look for the sector at the head
-+		 * which may reduce disk seek consumption.
-+		 */
-+		rq = deadline_head_request(dd, per_prio, data_dir);
- 	} else {
- 		/*
- 		 * The last req was the same dir and we have a next request in
--- 
-2.27.0
-
-
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
