@@ -2,99 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 099D8C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 16:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41177CCA489
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 16:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232418AbiGVQTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 12:19:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51000 "EHLO
+        id S233902AbiGVQYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 12:24:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229850AbiGVQTt (ORCPT
+        with ESMTP id S229593AbiGVQYm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 12:19:49 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D87FD4
-        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 09:19:48 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id h14so2522702ilq.12
-        for <linux-block@vger.kernel.org>; Fri, 22 Jul 2022 09:19:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
-         :subject:content-transfer-encoding;
-        bh=EJIEvCamJr3iUlfkMyefeyGCZsnSBMLNyj/g7/CrM7s=;
-        b=oD7NNwUo6FmG2hdEVo6C5SDIFTJWzyfok7yA3pfKEuA91+EXtdCzu+CJeVWBd0XRLD
-         /HgWC1HMfPMwRXmz0piEefly2vyqoIkwJPaNRblzOzRxkPWYSvNwBzSM1sNGDV3n5aY+
-         yMsE5KYMLX7huDuRxRMtozEW4cWQRQpVyFT1xlAcjk2spYjxxv+wB2ynI3QirjLvf3an
-         QogqTBRKQx6DR8sbziD9PXOr4cAhd9MrhXtwhOca0YFexyRl/peUBYynAqkix45go5vv
-         LP/Sz8spslI+Lk9J5jDu4tcvkObOl3KwZmAx+iMOyh6vUAaDtohh/3OHANbPcmsWFP1+
-         /u5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=EJIEvCamJr3iUlfkMyefeyGCZsnSBMLNyj/g7/CrM7s=;
-        b=QINTSvfgaPM4tT3ZGrC0Ro/f98M0bAUjDVjI5+uE0pF4hQaZPr9ZWjwFzwaSb7T0B3
-         LC/m25lpzlZn00aBNFx3cIzNP2e/Rw+slti6m7+Neai1YHpm1JQob2CRaMK8NaeISkq3
-         0+2UKucfGTaWvsJ+k/ety5/f3dC9bSJ4R7NlV8p2fC3j4uPxrTakBKi0Px43dwlMU6pC
-         m+ogn/ZF8wR22+4ZsQDsYoZCghTfU3Ip4HGNNXC/gGxGqv7EiD5xIZypvAHoVGaaitTk
-         eIDrIVehBDOxax1JdkdT1i13tiVI24plLK1251vTwOfrJPbsxXCvl3kR9wxYzi9uDszO
-         44kA==
-X-Gm-Message-State: AJIora/00E46jtD3WypeU2SbnZ5AMjvGDhK1oyg+bvHjtBB2dghiA4Sn
-        ix2pKZPbnV2vDcaO63cC8jleoqlmCPUZQg==
-X-Google-Smtp-Source: AGRyM1vEHALhP2kyZLaNB0SbU+2N6JLlgkvGr034DplCCh0aVdLCvSwtSVSR1OVSbaBFptLa+vE60Q==
-X-Received: by 2002:a05:6e02:2145:b0:2dc:8548:ad90 with SMTP id d5-20020a056e02214500b002dc8548ad90mr316343ilv.147.1658506788216;
-        Fri, 22 Jul 2022 09:19:48 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s20-20020a02b154000000b003316f4b9b26sm2184311jah.131.2022.07.22.09.19.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Jul 2022 09:19:47 -0700 (PDT)
-Message-ID: <ebd024bf-f931-1396-bdd8-a9efc444b144@kernel.dk>
-Date:   Fri, 22 Jul 2022 10:19:46 -0600
+        Fri, 22 Jul 2022 12:24:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1F58AB31;
+        Fri, 22 Jul 2022 09:24:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 245A2621BD;
+        Fri, 22 Jul 2022 16:24:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801EFC341C6;
+        Fri, 22 Jul 2022 16:24:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658507080;
+        bh=ERD6L0tGWO0x9Vzt+94y6IPYs2il1yz7+hLCIIQ9VMQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=M7syBNh7Q+slzlSg95Ty+U3caUx3OkvdZKYgFaT6zO7YKN9OsdTxAXKpzM/fQ8EUj
+         8laTCMg9BidYfI43AVNQjAskrSgTEIhdawoWcCWFN1EAKRyOqivbfv7qK9N59+Vvnq
+         ixHzlI/3Lkn2UIyRqLOaAICt3NyJKQeAO9La4LBsM3B/cUM9f6Cxa2XXZSNWSWP4n7
+         eKglhO2cux23pKTuvR31k1jROOcx4Jvj6L34W3fwmJ0EjPxsmlZpViqsKNhWnWhV8U
+         qZwtGZ8Kg87h7OJAYIWHEdlyKK+giZJRMb/S/JIukT8Eyn8v4Et7jPN0R8WTIdRmRv
+         SETEtPcVhPZPQ==
+Date:   Fri, 22 Jul 2022 09:24:39 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 9/9] xfs: support STATX_DIOALIGN
+Message-ID: <YtrPRysafr5KK3NQ@magnolia>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-10-ebiggers@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 5.19-rc8
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220722071228.146690-10-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, Jul 22, 2022 at 12:12:28AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add support for STATX_DIOALIGN to xfs, so that direct I/O alignment
+> restrictions are exposed to userspace in a generic way.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Just a single fix for missing error propagation for an allocation
-failure in raid5. Please pull!
+LGTM
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
+--D
 
-The following changes since commit 957a2b345cbcf41b4b25d471229f0e35262f066c:
-
-  block: fix missing blkcg_bio_issue_init (2022-07-14 10:54:49 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.19-2022-07-21
-
-for you to fetch changes up to 82e094f7bd988c02df27f8c8d81af8f750660b2a:
-
-  Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.19 (2022-07-19 12:42:33 -0600)
-
-----------------------------------------------------------------
-block-5.19-2022-07-21
-
-----------------------------------------------------------------
-Dan Carpenter (1):
-      md/raid5: missing error code in setup_conf()
-
-Jens Axboe (1):
-      Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.19
-
- drivers/md/raid5.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
--- 
-Jens Axboe
-
+> ---
+>  fs/xfs/xfs_iops.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
+> index 29f5b8b8aca69a..bac3f56141801e 100644
+> --- a/fs/xfs/xfs_iops.c
+> +++ b/fs/xfs/xfs_iops.c
+> @@ -605,6 +605,15 @@ xfs_vn_getattr(
+>  		stat->blksize = BLKDEV_IOSIZE;
+>  		stat->rdev = inode->i_rdev;
+>  		break;
+> +	case S_IFREG:
+> +		if (request_mask & STATX_DIOALIGN) {
+> +			struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
+> +
+> +			stat->result_mask |= STATX_DIOALIGN;
+> +			stat->dio_mem_align = target->bt_logical_sectorsize;
+> +			stat->dio_offset_align = target->bt_logical_sectorsize;
+> +		}
+> +		fallthrough;
+>  	default:
+>  		stat->blksize = xfs_stat_blksize(ip);
+>  		stat->rdev = 0;
+> -- 
+> 2.37.0
+> 
