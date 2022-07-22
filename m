@@ -2,64 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9589FCCA489
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 16:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A17C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 16:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229771AbiGVQDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 12:03:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39060 "EHLO
+        id S235292AbiGVQII (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 12:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229880AbiGVQDx (ORCPT
+        with ESMTP id S235110AbiGVQII (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 12:03:53 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269BD5A14D;
-        Fri, 22 Jul 2022 09:03:53 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0086668AFE; Fri, 22 Jul 2022 18:03:49 +0200 (CEST)
-Date:   Fri, 22 Jul 2022 18:03:49 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: RFC: what to do about fscrypt vs block device interaction
-Message-ID: <20220722160349.GA10142@lst.de>
-References: <20220721125929.1866403-1-hch@lst.de> <YtpfyZ8Dr9duVr45@sol.localdomain>
+        Fri, 22 Jul 2022 12:08:08 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C827BCE12;
+        Fri, 22 Jul 2022 09:08:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=mVumerM2BtpAjoiQzG3zHpPKgPxLzaYLQdBiSPXzBcA=; b=PDQeY5gz5Bxkz8IKg3LmyXVXAH
+        AjJDRc/XfslgoaC1Q83GHu5meqbqg59CZqBsKENHVYDZ+D3FL6OWpjRp9d/JAorSixJFqHqQsbUBB
+        QoY0TXwc12SVg0RTQsThq6jk08psM7DN/l9zZR3MmnfgplAIEQFIhfm81tXLL01fEvQ09zRn4toCA
+        X2/DNFPu4psDhUTRjR27exzdgH5aGZJsqm7yK486AXX0XP/Y1iIoX1cc0g9c+8R++vxVFXUsobQ8g
+        mvrDpc0PuX1Buu0G0Em0ZvFcWzQdAp/dny4bDjxpzCKna7cYkXpJFDjMu8atLdxTGkb+F3v4+xrJN
+        YeyVmLZg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oEvC6-007lQI-QJ; Fri, 22 Jul 2022 16:08:02 +0000
+Date:   Fri, 22 Jul 2022 09:08:02 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Liu Song <liusong@linux.alibaba.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: avoid potential infinite loop in
+ __blk_mq_alloc_request
+Message-ID: <YtrLYiJFlqL64voT@infradead.org>
+References: <1658467343-55843-1-git-send-email-liusong@linux.alibaba.com>
+ <Yto2sHfyiJITgYAn@infradead.org>
+ <eb99b420-3e28-98c7-dacc-767d564661e2@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YtpfyZ8Dr9duVr45@sol.localdomain>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <eb99b420-3e28-98c7-dacc-767d564661e2@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 01:28:57AM -0700, Eric Biggers wrote:
-> Yes, evicting the blk-crypto keys at unmount is the expected behavior.
-> And it basically is the actual behavior as well, but as currently
-> implemented there can be a slight delay.  There are two reasons for the
-> delay, both probably solvable.
-> 
-> The first is that ->s_master_keys isn't released until __put_super().
-> It probably should be moved earlier, maybe to generic_shutdown_super().
+On Fri, Jul 22, 2022 at 04:15:49PM +0800, Liu Song wrote:
+> It is a reasonable approach to prevent abnormal alloc from going down,
+> but this is a very rare exception after all, and above modification is
+> checked
+> every alloc request, which seems to be a bit excessive overhead.
 
-Yes, this does sound like a good idea.
-
-> The second reason is that the keyrings subsystem is being used to keep
-> track of the superblock's master keys (for several reasons, such as
-> integrating with the key quotas), and a side effect of that we get the
-> delay of the keyring's subsystem garbage collector before the destroy
-> callbacks of the keys actually  run.  That delays the eviction of the
-> blk-crypto keys.
-> 
-> To avoid that, I think we could go through and evict all the
-> blk_crypto_keys (i.e. call fscrypt_destroy_prepared_key() on the
-> fscrypt_prepared_keys embedded in each fscrypt_master_key) during the
-> unmount itself, separating it from the destruction of the key objects
-> from the keyring subsystem's perspective. That could happen in the
-> moved call to fscrypt_sb_free().
-
-I'll give this a try.
-
-What would be a good test suite or set of tests to make sure I don't
-break fscrypt operation?
+Every allocation of a passthrough requests.  Which isn't really the
+normal fast path.
