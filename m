@@ -2,60 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A3AC43334
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 05:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26224C43334
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 05:33:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232599AbiGVFW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 01:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55000 "EHLO
+        id S229761AbiGVFdk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 01:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiGVFW4 (ORCPT
+        with ESMTP id S229505AbiGVFdj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 01:22:56 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF94D868BE;
-        Thu, 21 Jul 2022 22:22:53 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=liusong@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VK3pGzr_1658467343;
-Received: from localhost(mailfrom:liusong@linux.alibaba.com fp:SMTPD_---0VK3pGzr_1658467343)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Jul 2022 13:22:49 +0800
-From:   Liu Song <liusong@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-mq: avoid potential infinite loop in __blk_mq_alloc_request
-Date:   Fri, 22 Jul 2022 13:22:23 +0800
-Message-Id: <1658467343-55843-1-git-send-email-liusong@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Fri, 22 Jul 2022 01:33:39 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D99B8951EF;
+        Thu, 21 Jul 2022 22:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=DtZsf139KOAbMbBJhz2+Jz2bLGfy9yjxTmGvtBExryU=; b=nz/ewjV3YfTAilYoWxcthFxHUO
+        X1sckuby9XCEoxLN1lgc/kThLGx8mPYl0S/Ox1Lfeen7MjCe8Mm6SYUSyaEqUc4rJ1dw8+HhnamRq
+        QGy8+nDo1oYmPrqb4V7fZ21L3sE/NN9yL//EhFJfYFvMk7z1Xkxk04YfK4t7YC2/iUqqinQe5HXLp
+        y56sN1Ybv+mBL2ktYbCjO6VXzkU+ez6NcAZo/5Mk4a4m0RxnpAHecOSqNB8BbSbdRdTIcz4IyffyO
+        zo3oZeHZl5Ue0p0j7wGCjuHN47lpoo1eGnqdBpQBU75kiUK7iUZ6fVkV9+aWlrfiGouZAyyw1jqA6
+        kc7MOwgw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oElI8-0007VT-Lh; Fri, 22 Jul 2022 05:33:36 +0000
+Date:   Thu, 21 Jul 2022 22:33:36 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Liu Song <liusong@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: avoid potential infinite loop in
+ __blk_mq_alloc_request
+Message-ID: <Yto2sHfyiJITgYAn@infradead.org>
+References: <1658467343-55843-1-git-send-email-liusong@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1658467343-55843-1-git-send-email-liusong@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Liu Song <liusong@linux.alibaba.com>
+On Fri, Jul 22, 2022 at 01:22:23PM +0800, Liu Song wrote:
+> From: Liu Song <liusong@linux.alibaba.com>
+> 
+> If "blk_mq_get_tag" returns BLK_MQ_NO_TAG because the value of
+> "tags->nr_reserved_tags" is 0, it will fall into an infinite loop in
+> "__blk_mq_alloc_requests", so borrow BLK_MQ_REQ_NOWAIT to exit the loop.
 
-If "blk_mq_get_tag" returns BLK_MQ_NO_TAG because the value of
-"tags->nr_reserved_tags" is 0, it will fall into an infinite loop in
-"__blk_mq_alloc_requests", so borrow BLK_MQ_REQ_NOWAIT to exit the loop.
+That means the driver calling blk_mq_alloc_request has a bug, and
+we should not work round that in the low level tag allocation path.
 
-Because "blk_mq_alloc_data" objects are allocated on the stack, changing
-the content of flags will not generate extra impact.
+If we want to be nice we can add a WARN_ON before going all the way
+down into the tag allocator, something like:
 
-Signed-off-by: Liu Song <liusong@linux.alibaba.com>
----
- block/blk-mq-tag.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 2dcd738..6f1d6e6 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -139,6 +139,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
- 	if (data->flags & BLK_MQ_REQ_RESERVED) {
- 		if (unlikely(!tags->nr_reserved_tags)) {
- 			WARN_ON_ONCE(1);
-+			data->flags |= BLK_MQ_REQ_NOWAIT;
- 			return BLK_MQ_NO_TAG;
- 		}
- 		bt = &tags->breserved_tags;
--- 
-1.8.3.1
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 92aae03103b74..d6c7e2ece025f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -520,6 +520,10 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 	struct request *rq;
+ 	int ret;
+ 
++	if (WARN_ON_ONCE((flags & BLK_MQ_REQ_RESERVED) &&
++			!q->tag_set->reserved_tags))
++		return ERR_PTR(-EINVAL);
++
+ 	ret = blk_queue_enter(q, flags);
+ 	if (ret)
+ 		return ERR_PTR(ret);
