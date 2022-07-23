@@ -2,83 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A41C43334
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 10:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C80D9C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 14:59:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230399AbiGWK7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Jul 2022 06:59:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34478 "EHLO
+        id S231994AbiGWO7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Jul 2022 10:59:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239375AbiGWK7k (ORCPT
+        with ESMTP id S236191AbiGWO7r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Jul 2022 06:59:40 -0400
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE5D26130
-        for <linux-block@vger.kernel.org>; Sat, 23 Jul 2022 03:59:38 -0700 (PDT)
-X-QQ-mid: bizesmtp79t1658573961tz10fe20
-Received: from eureka.localdomain ( [123.124.208.226])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Sat, 23 Jul 2022 18:59:09 +0800 (CST)
-X-QQ-SSF: 01400000002000B0D000B00A0000020
-X-QQ-FEAT: 4rCmCcmdMHfwis57XlYAPZfJdHJIxkKNcwfR4eFB0vZN/Pzx6uJfciJh7n054
-        lVJvDLJ+negW15WQMWccV6GExZ/LlNYWlxKKf3+qMYqLuvwQ/D3boqidj+aiShvFxaZgme2
-        4kn+D+afWkNCf4eoZPf0ziVTYWv7hWET0Yvt2Ypv5hgwvsO36g3TVzxjNcG/JBs/J/DZPma
-        NVGfCJ5EGrrdM+4QVPMm9RqPhirigUk8UMqTNj1fG2hzu7QrbDcxKjzLjsI9gfNVLAr4zHl
-        N4hNDAprzRHmzRT5Zu4eserDeuXbo4jvk+McsmlEcBwHsCr9sP+38bmR2U5PdLUZmqSdWcI
-        rErMgv8rUAwPaH4Tc3oYAlBjZDZ6QWxHb3v77Zk+qVEbcKMT9dWpS1b4KBR3Ff0DE3t7Vic
-X-QQ-GoodBg: 2
-From:   Wang You <wangyoua@uniontech.com>
-To:     bvanassche@acm.org
-Cc:     axboe@kernel.dk, fio@vger.kernel.org, hch@lst.de,
-        jaegeuk@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        wangxiaohua@uniontech.com, wangyoua@uniontech.com
-Subject: Re: [PATCH v2 2/2] block/mq-deadline: Prioritize first request
-Date:   Sat, 23 Jul 2022 18:59:09 +0800
-Message-Id: <20220723105909.440050-1-wangyoua@uniontech.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <f798c875-0bb9-add7-d7a3-4ac2a76e85d9@acm.org>
-References: <f798c875-0bb9-add7-d7a3-4ac2a76e85d9@acm.org>
+        Sat, 23 Jul 2022 10:59:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5214E14D0A;
+        Sat, 23 Jul 2022 07:59:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E439360BA9;
+        Sat, 23 Jul 2022 14:59:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF125C341C0;
+        Sat, 23 Jul 2022 14:59:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1658588385;
+        bh=M9jMVR91TD7sPGCXWoiFHEnLMPyC1nFPhYQlehtKTj0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=i7yaspiq2062x2uoFJS3DlPxhhbXNmhSyRyrWSs+DbKNseT/oOPPA2tjkmGt1qzSP
+         Vrav+H0vlqdTFzsnhZevG49y+69orIdlp/xECwFXeEfKWaJrCBJFUgtJVmRil+U7PC
+         0iCLS5KfpAE7N/gxh1nTaa9G/9ynEoUbj7lGPibE=
+Date:   Sat, 23 Jul 2022 16:59:42 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Tadeusz Struk <tadeusz.struk@linaro.org>
+Cc:     stable@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>,
+        syzbot+4f441e6ca0fcad141421@syzkaller.appspotmail.com,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 5.10 1/2] block: split bio_kmalloc from bio_alloc_bioset
+Message-ID: <YtwM3uHugOOdDQZT@kroah.com>
+References: <20220718211226.506362-1-tadeusz.struk@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign3
-X-QQ-Bgrelay: 1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220718211226.506362-1-tadeusz.struk@linaro.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> What is MG04ACA400N?
+On Mon, Jul 18, 2022 at 02:12:25PM -0700, Tadeusz Struk wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> Upstream commit: 3175199ab0ac ("block: split bio_kmalloc from bio_alloc_bioset")
+> 
+> This is backport to stable 5.10. It fixes an issue reported by syzbot.
+> Link: https://syzkaller.appspot.com/bug?id=a3416231e37024a75f2b95bd95db0d8ce8132a84
 
-It is a Toshiba 7200 RPM hard drive.
+Both now queued up, thanks.
 
-> The above results are low enough such that these could come from a hard 
-> disk. However, the test results are hard to interpret since the I/O 
-> pattern is neither perfectly sequential nor perfectly random (32 
-> sequential jobs). Please provide separate measurements for sequential 
-> and random I/O.
-
-> The above results show that this patch makes reading from a hard disk 
-> slower. Isn't the primary use case of mq-deadline to make reading from 
-> hard disks faster? So why should these two patches be applied if these 
-> slow down reading from a hard disk?
-
-The data of MG04ACA400N on the raid controller is obviously different from 
-the single disk, especially the reading data, I did not expect this situation, 
-the data on the raid controller made me mistakenly think that the same applies 
-to HDD.
-
-I will re-analyze the impact of this patch on the HDD later, please ignore it 
-for now.
-
-Also, can I ask? If using fio or other tools, how should testing be done to get 
-more accurate and convincing data? Such as the perfectly sequential and random I/O 
-performance you mentioned above (fio's multi-threaded test does result in neither 
-perfectly sequential nor perfectly random, but single thread dispatch is too slow, 
-and cannot play the merge and sorting ability of elv).
-
-Thanks,
-
-Wang.
-
-
+greg k-h
