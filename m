@@ -2,109 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFE0C43334
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 08:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD328C43334
+	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 10:17:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232604AbiGWIMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Jul 2022 04:12:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42882 "EHLO
+        id S239487AbiGWKRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Jul 2022 06:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230371AbiGWIMV (ORCPT
+        with ESMTP id S239499AbiGWKRK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Jul 2022 04:12:21 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC91217AA4;
-        Sat, 23 Jul 2022 01:12:17 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LqfC00FwYzKFpv;
-        Sat, 23 Jul 2022 16:11:08 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgAXFWhdrdtiiutfBA--.45581S4;
-        Sat, 23 Jul 2022 16:12:15 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     joe@perches.com, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, houtao1@huawei.com
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com
-Subject: [PATCH v2] nbd: add missing definition of pr_fmt
-Date:   Sat, 23 Jul 2022 16:24:27 +0800
-Message-Id: <20220723082427.3890655-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        Sat, 23 Jul 2022 06:17:10 -0400
+Received: from smtpproxy21.qq.com (smtpbg703.qq.com [203.205.195.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBB2DA5C8
+        for <linux-block@vger.kernel.org>; Sat, 23 Jul 2022 03:07:02 -0700 (PDT)
+X-QQ-mid: bizesmtp85t1658570658th2mgs73
+Received: from eureka.localdomain ( [123.124.208.226])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Sat, 23 Jul 2022 18:04:07 +0800 (CST)
+X-QQ-SSF: 01400000002000B0D000B00A0000020
+X-QQ-FEAT: ILHsT53NKPj0HRDuEtI5CbFD7rnuEHAyGC+20aqF8DJXqYDMQ5BN+2SdvaKK5
+        zCGT1gSzYgjkwhGLcKrh3muLGgmAKIE0BdZ8BLlySm7EAJ4bnrGbaZHVQoHMHLSzcANBti3
+        +B7UiNHj+XVbpxfxe9rm7UvYiMgBdpEdvIk8E0TH/ZIWFH/0qd4O+HNmV1hBLREisoz5Gl+
+        nT38oQvOWPKfZe/DcCrHNfSNcCHRirRTd+7YOf75SsT0vc1nQ/vXLS1JAsPvr04dNLEp51p
+        4h9+uDR0AAaT1DLeNOcOzMty/hsgfyQ4eXiep6N8UQPnwexDrXHN5gUzCjFBdHIB/um3Cyw
+        hC39LlHsUDwA/t4P5GI44+8yyAzAyCThZOA3t8SbsMwyGDWZ5NLpDyodWBK0A==
+X-QQ-GoodBg: 2
+From:   Wang You <wangyoua@uniontech.com>
+To:     bvanassche@acm.org
+Cc:     axboe@kernel.dk, fio@vger.kernel.org, hch@lst.de,
+        jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
+        wangxiaohua@uniontech.com, wangyoua@uniontech.com
+Subject: Re: [PATCH v2 1/2] block: Introduce nr_sched_batch sys interface
+Date:   Sat, 23 Jul 2022 18:04:06 +0800
+Message-Id: <20220723100406.437387-1-wangyoua@uniontech.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <da0fe451-c036-cd18-7eb2-55c51c104ab5@acm.org>
+References: <da0fe451-c036-cd18-7eb2-55c51c104ab5@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgAXFWhdrdtiiutfBA--.45581S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw1rKr1UZw4rXF4DAw1xuFg_yoW8Xw13pF
-        4qkFZYkFyvkrW2kFn7G3WI9F15t3WkJFWfK3yxCayFyrZxAr13Cr4DtFyFvF1kJrWIkw4a
-        vF1DJay0vFs7Wr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUv014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-        n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
-        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-        AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
-        Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
-        XdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign3
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+> Do we need this new parameter? How does the performance of reducing 
+> nr_requests compare to configuring nr_sched_batch?
 
-commit 1243172d5894 ("nbd: use pr_err to output error message") tries
-to define pr_fmt and use short pr_err() to output error message,
-however, the definition is missed.
+It seems I can't get convincing data in the current test conditions, sorry, 
+please ignore it unless I can produce valid evidence.
 
-This patch also remove existing "nbd:" inside pr_err().
+I will reconsider the effect of this modification on a single disk, 
+from recent testing it seems that the link to the raid controller has 
+a lot of impact.
 
-Fixes: 1243172d5894 ("nbd: use pr_err to output error message")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
-Changes in v2, suggested by Joe
- - move pr_fmt() to before any #include, so that #undef can be remove
- - remove existing "nbd:"
+Thanks,
 
- drivers/block/nbd.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Wang.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index f5d098a148cb..2a709daefbc4 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -11,6 +11,8 @@
-  * (part of code stolen from loop.c)
-  */
- 
-+#define pr_fmt(fmt) "nbd: " fmt
-+
- #include <linux/major.h>
- 
- #include <linux/blkdev.h>
-@@ -1950,7 +1952,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 			     test_bit(NBD_DISCONNECT_REQUESTED, &nbd->flags)) ||
- 			    !refcount_inc_not_zero(&nbd->refs)) {
- 				mutex_unlock(&nbd_index_mutex);
--				pr_err("nbd: device at index %d is going down\n",
-+				pr_err("device at index %d is going down\n",
- 					index);
- 				return -EINVAL;
- 			}
-@@ -1961,7 +1963,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	if (!nbd) {
- 		nbd = nbd_dev_add(index, 2);
- 		if (IS_ERR(nbd)) {
--			pr_err("nbd: failed to add new device\n");
-+			pr_err("failed to add new device\n");
- 			return PTR_ERR(nbd);
- 		}
- 	}
--- 
-2.31.1
 
