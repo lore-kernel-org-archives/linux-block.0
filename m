@@ -2,116 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4606C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jul 2022 22:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F10C7C43334
+	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 02:14:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236580AbiGVWBL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jul 2022 18:01:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32970 "EHLO
+        id S233053AbiGWCOi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jul 2022 22:14:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbiGVWBK (ORCPT
+        with ESMTP id S235826AbiGWCOh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jul 2022 18:01:10 -0400
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC7BD12AD3;
-        Fri, 22 Jul 2022 15:01:09 -0700 (PDT)
-Received: by mail-pf1-f181.google.com with SMTP id 17so5573573pfy.0;
-        Fri, 22 Jul 2022 15:01:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ajABxSWxUsCKK9Od/qyGt1skys7+Os0a1j5QneotZAc=;
-        b=pHTVnlr0j8aazre/ckFL9Ibpo2RrF48v+q9azJxE6tMLk1jPDzLet2UIZSOajgLbvL
-         KNuzEAGlfy17au3yClIknYryV7aA1wdQgK286ienNuI9sAUvjoQY2AJm7yojGXB21oLU
-         6db3XQL1OM6syNcGt1Z9j8BTr/jXg2tGwKpSohuexEmkuADi3TMZV37rReY5Tdyt5w9J
-         wlVQyt4tZ6t+/U5mwtHW+pdxNHuYj2eoEEOMe/DoQCH4nyVRarHuYgZwharKcDDhxts7
-         G977jhODVOlhWhJQqVai6+5pJ50DbgH8fTXc1fZo9d+AgtxTgxSvXS9nCuVquxyubPEE
-         dNIQ==
-X-Gm-Message-State: AJIora/QoTqcRb0nJLywOgBx34AJUav/TqDyBooXyRIsB3Bga9UhUvjS
-        iuPCyW7d9Hn6koKOuQgQNXDxB1N9aDkUOQ==
-X-Google-Smtp-Source: AGRyM1vg+HIfwhtPL+PdWNr+gthVaYVrLjl4aYh4LyhLKIfuUmvhrIx/NVwQSMMB+QOUIwNSw5D80g==
-X-Received: by 2002:a63:5b5f:0:b0:416:1e31:5704 with SMTP id l31-20020a635b5f000000b004161e315704mr1494610pgm.523.1658527269253;
-        Fri, 22 Jul 2022 15:01:09 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:805b:3c64:6a1f:424c? ([2620:15c:211:201:805b:3c64:6a1f:424c])
-        by smtp.gmail.com with ESMTPSA id x8-20020a170902a38800b0016c46ff1973sm4220464pla.228.2022.07.22.15.01.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Jul 2022 15:01:08 -0700 (PDT)
-Message-ID: <a1cceb79-c72c-5a76-ed7a-156c09505692@acm.org>
-Date:   Fri, 22 Jul 2022 15:01:06 -0700
+        Fri, 22 Jul 2022 22:14:37 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F304F7697E;
+        Fri, 22 Jul 2022 19:14:35 -0700 (PDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LqVC62XznzWf1x;
+        Sat, 23 Jul 2022 10:10:42 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 23 Jul 2022 10:14:32 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 23 Jul 2022 10:14:31 +0800
+Subject: Re: [PATCH] nbd: add missing definition of pr_fmt
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Joe Perches <joe@perches.com>,
+        <josef@toxicpanda.com>, <axboe@kernel.dk>, <houtao1@huawei.com>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220706093320.1962871-1-yukuai1@huaweicloud.com>
+ <853a5164-78cf-1ccb-8e18-cff5b5bce4ff@huaweicloud.com>
+ <49a8099eb7dd01e9d2d190056171341d87cd442b.camel@perches.com>
+ <0dba2f0c-ba02-853e-60e7-873eabedcd80@huaweicloud.com>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <4e6a80cb-63fa-660c-8acf-f25062800238@huawei.com>
+Date:   Sat, 23 Jul 2022 10:14:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCHv6 07/11] block/bounce: count bytes instead of sectors
-Content-Language: en-US
-To:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        damien.lemoal@opensource.wdc.com, ebiggers@kernel.org,
-        pankydev8@gmail.com, Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>
-References: <20220610195830.3574005-1-kbusch@fb.com>
- <20220610195830.3574005-8-kbusch@fb.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220610195830.3574005-8-kbusch@fb.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <0dba2f0c-ba02-853e-60e7-873eabedcd80@huaweicloud.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/10/22 12:58, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Individual bv_len's may not be a sector size.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->   block/bounce.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/bounce.c b/block/bounce.c
-> index 8f7b6fe3b4db..fbadf179601f 100644
-> --- a/block/bounce.c
-> +++ b/block/bounce.c
-> @@ -205,19 +205,26 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
->   	int rw = bio_data_dir(*bio_orig);
->   	struct bio_vec *to, from;
->   	struct bvec_iter iter;
-> -	unsigned i = 0;
-> +	unsigned i = 0, bytes = 0;
->   	bool bounce = false;
-> -	int sectors = 0;
-> +	int sectors;
->   
->   	bio_for_each_segment(from, *bio_orig, iter) {
->   		if (i++ < BIO_MAX_VECS)
-> -			sectors += from.bv_len >> 9;
-> +			bytes += from.bv_len;
->   		if (PageHighMem(from.bv_page))
->   			bounce = true;
->   	}
->   	if (!bounce)
->   		return;
->   
-> +	/*
-> +	 * Individual bvecs might not be logical block aligned. Round down
-> +	 * the split size so that each bio is properly block size aligned,
-> +	 * even if we do not use the full hardware limits.
-> +	 */
-> +	sectors = ALIGN_DOWN(bytes, queue_logical_block_size(q)) >>
-> +			SECTOR_SHIFT;
->   	if (sectors < bio_sectors(*bio_orig)) {
->   		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
->   		bio_chain(bio, *bio_orig);
+Hi!
 
-Do I see correctly that there are two changes in this patch: counting 
-bytes instead of sectors and also splitting at logical block boundaries 
-instead of a 512-byte boundary? Should this patch perhaps be split?
+在 2022/07/20 19:46, Yu Kuai 写道:
+> Hi !
+> 
+> 在 2022/07/18 22:32, Joe Perches 写道:
+>> On Mon, 2022-07-18 at 21:52 +0800, Yu Kuai wrote:
+>>> 在 2022/07/06 17:33, Yu Kuai 写道:
+>>>> From: Yu Kuai <yukuai3@huawei.com>
+>>>>
+>>>> commit 1243172d5894 ("nbd: use pr_err to output error message") tries
+>>>> to define pr_fmt and use short pr_err() to output error message,
+>>>> however, the definition is missed.
+>>> friendly ping ...
+>> []
+>>>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> []
+>>>> @@ -44,6 +44,9 @@
+>>>>    #include <linux/nbd-netlink.h>
+>>>>    #include <net/genetlink.h>
+>>>> +#undef pr_fmt
+>>>> +#define pr_fmt(fmt) "nbd: " fmt
+>>>> +
+
+I tried to remove the #undef:
+
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -44,7 +44,6 @@
+  #include <linux/nbd-netlink.h>
+  #include <net/genetlink.h>
+
+  #define pr_fmt(fmt) "nbd: " fmt
+
+And then following warning is triggered:
+
+drivers/block/nbd.c:47: warning: "pr_fmt" redefined
+    47 | #define pr_fmt(fmt) "nbd: " fmt
+
+It semms that keeping that #undef is the right thing to do.
 
 Thanks,
-
-Bart.
+Kuai
+>> Typically, this #define is place before all #include lines
+>> so there is no need for an #undef
+> 
+> Thanks for you advice, I'll do that in v2.
+> 
+> Kuai
+> 
+> .
+> 
