@@ -2,192 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C165C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 15:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 120FCC43334
+	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 20:28:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237985AbiGWPHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Jul 2022 11:07:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57234 "EHLO
+        id S229542AbiGWU2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Jul 2022 16:28:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237785AbiGWPHk (ORCPT
+        with ESMTP id S236450AbiGWU2C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Jul 2022 11:07:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 145A71A82F
-        for <linux-block@vger.kernel.org>; Sat, 23 Jul 2022 08:07:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658588859;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=I9frz5sI+kGcAzZlm+hfkm8rSp0rpwMvP7rdg2Zj9EU=;
-        b=eLW3w5eODwV6mTpHfsXTBirDIiB5J5A5cHlqyOIUwIs+AZHcFTQ8xSdIcl7XGpHHXhC1gn
-        iEQH/eqrUOOZoRWEaK1ugII7/Ovx1C8AjCFQLf0rmm+9F0rKWQ1EWlytFl88SH6lvcfamw
-        3mdlKit39HqDg6GgPr8a+KDrVZsUQes=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-186-z3qrlOLqP2Gj3fwiIEvrmA-1; Sat, 23 Jul 2022 11:07:33 -0400
-X-MC-Unique: z3qrlOLqP2Gj3fwiIEvrmA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9917101A54E;
-        Sat, 23 Jul 2022 15:07:32 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB5EA1121314;
-        Sat, 23 Jul 2022 15:07:31 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 2/2] ublk_drv: add SET_PARA/GET_PARA control command
-Date:   Sat, 23 Jul 2022 23:07:13 +0800
-Message-Id: <20220723150713.750369-3-ming.lei@redhat.com>
-In-Reply-To: <20220723150713.750369-1-ming.lei@redhat.com>
-References: <20220723150713.750369-1-ming.lei@redhat.com>
+        Sat, 23 Jul 2022 16:28:02 -0400
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B847140B9;
+        Sat, 23 Jul 2022 13:28:01 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id B7266320024A;
+        Sat, 23 Jul 2022 16:27:58 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Sat, 23 Jul 2022 16:27:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        invisiblethingslab.com; h=cc:cc:content-transfer-encoding:date
+        :date:from:from:in-reply-to:message-id:mime-version:reply-to
+        :sender:subject:subject:to:to; s=fm3; t=1658608078; x=
+        1658694478; bh=JobHjI4vPeM2BF7bd/XNMmcC9Kn1HoQurkd99RcLsRk=; b=M
+        WTbsxQI9l4G7tqQAiHf/K7oMTU8ufWVr4ldV3R0crGVCTUJE7fJXbX/llcvh7KRu
+        lMPM4KBNzZXu+MCHVaVLJQ0vLXz6MvmZsaqgDYfLZ4LJ14ywaAxJBJmLhz8um+EW
+        k7IzfudSehvF4XvP4qQma6b8jgN2bz148Fdt6Yt+6d8M5tufHxPp55tYcCM2qKUa
+        AYxF2DvjnVWkrL/qH2HxZEmzjG/JCRLw22jYZo/5WVhG4frOZki37ELYn0CVoGO4
+        7ORJfy/Cr/ZwsgiqTSIevzoBtjgL4Kf/ojeISpBEqc1eKHbu+qZhcF2WSCHN5rc5
+        UqLNwgbiVCjkEGxQwZn/A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1658608078; x=1658694478; bh=JobHjI4vPeM2BF7bd/XNMmcC9Kn1HoQurkd
+        99RcLsRk=; b=BQzLN7kwQvOQTpo8U3OTqq0SwNGL/plAlnFsyOgbYUHXhPgDTuE
+        Ow0WJS1uDHRgtvX6+v3V2jy+yZohTe8uG+k8qH/8cwoHhxr9rZZzpAnEE39A7F7U
+        vmR/K50G5UxQFjvDe06/kn6PxIbeVr9nrDsPaaWJ85y6C7zKo7aJsfV2r05HpZwC
+        FcNsswMDcMZsLMNOUVJF03H5qTfEl89C4kA999nfCRI30K+0Wa/kznBB5Z54GKnL
+        /l9SClT6onhEurr+kr0nJEU5bp9RBu8qn8PoHk/0DRiMVahfQVcMcTtG6JhmzQ94
+        N7EPeagF7IvLMo3QXMSu4z0uaeTP2PzmO2A==
+X-ME-Sender: <xms:zVncYhja2YsMrz1pascGufrCx-vqsDs7MGodUpfU5PyD-sr2YADKBQ>
+    <xme:zVncYmCIyWtQJbimb9qARN54THJuUyrg0YANqUKRC1MEbRaqcc0DIy_NSObJ2x4fn
+    OA7cu7xiMabMbw>
+X-ME-Received: <xmr:zVncYhGpNeWW41J4StWOV6iVK3bLRdtt3oXkt--Z3xypZtt4N-uIMUvsFM2j52Flw7UdtCyTH9OJ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvddtgedgudehfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffvghmihcu
+    ofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhishhisghlvghthhhinhhgsh
+    hlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedvfeegkedvkefgffegkefhieejtdff
+    keehhfelheefjeeutefgleeggfdtveeileenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhisghlvghthhhinhhgshhl
+    rggsrdgtohhm
+X-ME-Proxy: <xmx:zVncYmSuTaxvkIgwjscXUi8qDgWXvKe6gD2lmBle3EWjy3oFhFI1NQ>
+    <xmx:zVncYuzcNODMt62BbUfJJcV9PQx4ynVBof6lhT7Qyp7kT5mOx5dHyQ>
+    <xmx:zVncYs60dMfNq7vzWLaR2BI0_Q09317PxJRuAe88bvcOZ_NfiHTrxQ>
+    <xmx:zlncYi-mxStZ1a7CLztz4dQx6lLzHJqDKQf5N9ww0Zv3zFhmN0ogwA>
+Feedback-ID: iac594737:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 23 Jul 2022 16:27:57 -0400 (EDT)
+From:   Demi Marie Obenour <demi@invisiblethingslab.com>
+To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] Implement diskseq checks in blkback
+Date:   Sat, 23 Jul 2022 16:27:15 -0400
+Message-Id: <20220723202715.1347-1-demi@invisiblethingslab.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add two commands to set/get parameters generically.
+This allows specifying a disk sequence number in XenStore.  If it does
+not match the disk sequence number of the underlying device, the device
+will not be exported and a warning will be logged.  Userspace can use
+this to eliminate race conditions due to major/minor number reuse.
+Older kernels will ignore this, so it is safe for userspace to set it
+unconditionally.
 
-Both generic block device parameters and feature related parameters
-can be covered with this way, then it becomes quite easy to extend
-in future.
-
-Meantime this way provides mechanism to simulate any kind of generic
-block device from userspace easily.
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Demi Marie Obenour <demi@invisiblethingslab.com>
 ---
- drivers/block/ublk_drv.c      | 87 +++++++++++++++++++++++++++++++++++
- include/uapi/linux/ublk_cmd.h |  2 +
- 2 files changed, 89 insertions(+)
+I'm marking this patch as RFC because I have not tested it beyond
+compiliation, and because I want to get feedback on the API before I put
+more effort into it.
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index e185bdb165de..83fd65d8a205 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1674,6 +1674,87 @@ static int ublk_ctrl_get_dev_info(struct io_uring_cmd *cmd)
- 	return ret;
- }
+ drivers/block/xen-blkback/xenbus.c | 35 ++++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index 97de13b14175eb8ced14d1649a3be461a464ee8a..cb531236b19709c791a82c868bfb4ed9aa284485 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -480,7 +480,7 @@ MODULE_PARM_DESC(feature_persistent,
  
-+static int ublk_ctrl_get_para(struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	void __user *argp = (void __user *)(unsigned long)header->addr;
-+	struct ublk_device *ub;
-+	struct ublk_para_header ph;
-+	struct ublk_para_header *para = NULL;
-+	int ret = 0;
-+
-+	if (header->len <= sizeof(ph) || !header->addr)
-+		return -EINVAL;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return -EINVAL;
-+
-+	ret = -EFAULT;
-+	if (copy_from_user(&ph, argp, sizeof(ph)))
-+		goto out_put;
-+
-+	ret = ublk_validate_para_header(ub, &ph);
-+	if (ret)
-+		goto out_put;
-+
-+	mutex_lock(&ub->mutex);
-+	para = xa_load(&ub->paras, ph.type);
-+	mutex_unlock(&ub->mutex);
-+	if (!para)
-+		ret = -EINVAL;
-+	else if (copy_to_user(argp, para, ph.len))
-+		ret = -EFAULT;
-+out_put:
-+	ublk_put_device(ub);
-+	return ret;
-+}
-+
-+static int ublk_ctrl_set_para(struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	void __user *argp = (void __user *)(unsigned long)header->addr;
-+	struct ublk_device *ub;
-+	struct ublk_para_header ph;
-+	struct ublk_para_header *para = NULL;
-+	int ret = -EFAULT;
-+
-+	if (header->len <= sizeof(ph) || !header->addr)
-+		return -EINVAL;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return -EINVAL;
-+
-+	if (copy_from_user(&ph, argp, sizeof(ph)))
-+		goto out_put;
-+
-+	ret = ublk_validate_para_header(ub, &ph);
-+	if (ret)
-+		goto out_put;
-+
-+	para = kmalloc(ph.len, GFP_KERNEL);
-+	if (!para) {
-+		ret = -ENOMEM;
-+	} else if (copy_from_user(para, argp, ph.len)) {
-+		ret = -EFAULT;
-+	} else {
-+		/* parameters can only be changed when device isn't live */
-+		mutex_lock(&ub->mutex);
-+		if (ub->dev_info.state != UBLK_S_DEV_LIVE)
-+			ret = ublk_install_para(ub, para);
-+		else
-+			ret = -EACCES;
-+		mutex_unlock(&ub->mutex);
-+	}
-+out_put:
-+	ublk_put_device(ub);
-+	if (ret)
-+		kfree(para);
-+
-+	return ret;
-+}
-+
- static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
+ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 			  unsigned major, unsigned minor, int readonly,
+-			  int cdrom)
++			  bool cdrom, u64 diskseq)
  {
-@@ -1709,6 +1790,12 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_CMD_GET_QUEUE_AFFINITY:
- 		ret = ublk_ctrl_get_queue_affinity(cmd);
- 		break;
-+	case UBLK_CMD_GET_PARA:
-+		ret = ublk_ctrl_get_para(cmd);
-+		break;
-+	case UBLK_CMD_SET_PARA:
-+		ret = ublk_ctrl_set_para(cmd);
-+		break;
- 	default:
- 		break;
+ 	struct xen_vbd *vbd;
+ 	struct block_device *bdev;
+@@ -508,6 +508,25 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
+ 		xen_vbd_free(vbd);
+ 		return -ENOENT;
  	}
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 99f81a1e9a95..0f7be7398755 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -15,6 +15,8 @@
- #define	UBLK_CMD_DEL_DEV		0x05
- #define	UBLK_CMD_START_DEV	0x06
- #define	UBLK_CMD_STOP_DEV	0x07
-+#define	UBLK_CMD_SET_PARA	0x08
-+#define	UBLK_CMD_GET_PARA	0x09
++
++	if (diskseq != (u64)-1) {
++		struct gendisk *disk = bdev->bd_disk;
++		if (unlikely(disk == NULL)) {
++			pr_err("xen_vbd_create: device %08x has no gendisk\n",
++			       vbd->pdevice);
++			xen_vbd_free(vbd);
++			return -EFAULT;
++		}
++
++		if (unlikely(disk->diskseq != diskseq)) {
++			pr_warn("xen_vbd_create: device %08x has incorrect sequence "
++				"number 0x%llx (expected 0x%llx)\n",
++				vbd->pdevice, disk->diskseq, diskseq);
++			xen_vbd_free(vbd);
++			return -ENODEV;
++		}
++	}
++
+ 	vbd->size = vbd_sz(vbd);
  
- /*
-  * IO commands, issued by ublk server, and handled by ublk driver.
+ 	if (cdrom || disk_to_cdi(vbd->bdev->bd_disk))
+@@ -712,6 +731,7 @@ static void backend_changed(struct xenbus_watch *watch,
+ 	int cdrom = 0;
+ 	unsigned long handle;
+ 	char *device_type;
++	unsigned long long diskseq;
+ 
+ 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
+ 
+@@ -730,6 +750,17 @@ static void backend_changed(struct xenbus_watch *watch,
+ 		return;
+ 	}
+ 
++	err = xenbus_scanf(XBT_NIL, dev->nodename, "diskseq", "%llx", &diskseq);
++	if (err == -ENOENT) {
++		diskseq = (uint64_t)-1;
++	} else if (err != 1) {
++		xenbus_dev_fatal(dev, err, "reading diskseq");
++		return;
++	} else if (diskseq == (uint64_t)-1) {
++		xenbus_dev_fatal(dev, err, "UINT64_MAX is not a valid diskseq");
++		return;
++	}
++
+ 	if (be->major | be->minor) {
+ 		if (be->major != major || be->minor != minor)
+ 			pr_warn("changing physical device (from %x:%x to %x:%x) not supported.\n",
+@@ -763,7 +794,7 @@ static void backend_changed(struct xenbus_watch *watch,
+ 	be->minor = minor;
+ 
+ 	err = xen_vbd_create(be->blkif, handle, major, minor,
+-			     !strchr(be->mode, 'w'), cdrom);
++			     !strchr(be->mode, 'w'), cdrom, diskseq);
+ 
+ 	if (err)
+ 		xenbus_dev_fatal(dev, err, "creating vbd structure");
 -- 
-2.31.1
-
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+Invisible Things Lab
