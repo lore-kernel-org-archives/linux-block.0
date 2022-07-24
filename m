@@ -2,174 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120FCC43334
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jul 2022 20:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FB3CCA48F
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jul 2022 02:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiGWU2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Jul 2022 16:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40188 "EHLO
+        id S234667AbiGXCCF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Jul 2022 22:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236450AbiGWU2C (ORCPT
+        with ESMTP id S229602AbiGXCCF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Jul 2022 16:28:02 -0400
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B847140B9;
-        Sat, 23 Jul 2022 13:28:01 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailout.west.internal (Postfix) with ESMTP id B7266320024A;
-        Sat, 23 Jul 2022 16:27:58 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Sat, 23 Jul 2022 16:27:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        invisiblethingslab.com; h=cc:cc:content-transfer-encoding:date
-        :date:from:from:in-reply-to:message-id:mime-version:reply-to
-        :sender:subject:subject:to:to; s=fm3; t=1658608078; x=
-        1658694478; bh=JobHjI4vPeM2BF7bd/XNMmcC9Kn1HoQurkd99RcLsRk=; b=M
-        WTbsxQI9l4G7tqQAiHf/K7oMTU8ufWVr4ldV3R0crGVCTUJE7fJXbX/llcvh7KRu
-        lMPM4KBNzZXu+MCHVaVLJQ0vLXz6MvmZsaqgDYfLZ4LJ14ywaAxJBJmLhz8um+EW
-        k7IzfudSehvF4XvP4qQma6b8jgN2bz148Fdt6Yt+6d8M5tufHxPp55tYcCM2qKUa
-        AYxF2DvjnVWkrL/qH2HxZEmzjG/JCRLw22jYZo/5WVhG4frOZki37ELYn0CVoGO4
-        7ORJfy/Cr/ZwsgiqTSIevzoBtjgL4Kf/ojeISpBEqc1eKHbu+qZhcF2WSCHN5rc5
-        UqLNwgbiVCjkEGxQwZn/A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:message-id
-        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-        1658608078; x=1658694478; bh=JobHjI4vPeM2BF7bd/XNMmcC9Kn1HoQurkd
-        99RcLsRk=; b=BQzLN7kwQvOQTpo8U3OTqq0SwNGL/plAlnFsyOgbYUHXhPgDTuE
-        Ow0WJS1uDHRgtvX6+v3V2jy+yZohTe8uG+k8qH/8cwoHhxr9rZZzpAnEE39A7F7U
-        vmR/K50G5UxQFjvDe06/kn6PxIbeVr9nrDsPaaWJ85y6C7zKo7aJsfV2r05HpZwC
-        FcNsswMDcMZsLMNOUVJF03H5qTfEl89C4kA999nfCRI30K+0Wa/kznBB5Z54GKnL
-        /l9SClT6onhEurr+kr0nJEU5bp9RBu8qn8PoHk/0DRiMVahfQVcMcTtG6JhmzQ94
-        N7EPeagF7IvLMo3QXMSu4z0uaeTP2PzmO2A==
-X-ME-Sender: <xms:zVncYhja2YsMrz1pascGufrCx-vqsDs7MGodUpfU5PyD-sr2YADKBQ>
-    <xme:zVncYmCIyWtQJbimb9qARN54THJuUyrg0YANqUKRC1MEbRaqcc0DIy_NSObJ2x4fn
-    OA7cu7xiMabMbw>
-X-ME-Received: <xmr:zVncYhGpNeWW41J4StWOV6iVK3bLRdtt3oXkt--Z3xypZtt4N-uIMUvsFM2j52Flw7UdtCyTH9OJ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvddtgedgudehfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffvghmihcu
-    ofgrrhhivgcuqfgsvghnohhurhcuoeguvghmihesihhnvhhishhisghlvghthhhinhhgsh
-    hlrggsrdgtohhmqeenucggtffrrghtthgvrhhnpedvfeegkedvkefgffegkefhieejtdff
-    keehhfelheefjeeutefgleeggfdtveeileenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpeguvghmihesihhnvhhishhisghlvghthhhinhhgshhl
-    rggsrdgtohhm
-X-ME-Proxy: <xmx:zVncYmSuTaxvkIgwjscXUi8qDgWXvKe6gD2lmBle3EWjy3oFhFI1NQ>
-    <xmx:zVncYuzcNODMt62BbUfJJcV9PQx4ynVBof6lhT7Qyp7kT5mOx5dHyQ>
-    <xmx:zVncYs60dMfNq7vzWLaR2BI0_Q09317PxJRuAe88bvcOZ_NfiHTrxQ>
-    <xmx:zlncYi-mxStZ1a7CLztz4dQx6lLzHJqDKQf5N9ww0Zv3zFhmN0ogwA>
-Feedback-ID: iac594737:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 23 Jul 2022 16:27:57 -0400 (EDT)
-From:   Demi Marie Obenour <demi@invisiblethingslab.com>
-To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Demi Marie Obenour <demi@invisiblethingslab.com>,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] Implement diskseq checks in blkback
-Date:   Sat, 23 Jul 2022 16:27:15 -0400
-Message-Id: <20220723202715.1347-1-demi@invisiblethingslab.com>
-X-Mailer: git-send-email 2.37.1
+        Sat, 23 Jul 2022 22:02:05 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A717B11C19;
+        Sat, 23 Jul 2022 19:02:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 40D2DB80D3E;
+        Sun, 24 Jul 2022 02:02:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C80C341C0;
+        Sun, 24 Jul 2022 02:02:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658628121;
+        bh=P7SNPqf+kK7Uv5jaRDdQvqwL+CiGRzt4kUYwRGuMwuM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YJjZPL/MEDF7Q2m0BsBorqsKTC+7h5i+R/udBxD0IuxUYQvVrek2cohPL6C7rPK8C
+         BOIHeWQ47tSvQSwI94gwdGleMtB23vMKEb3haUxSBCX5/JlAvuYeArRveRVG8+3QEo
+         +6VFDKSDJMw9FFgBBLmQ+cLOLNGbS7+uaGXorNhz/GJCbEk9IrfBzoGFQqA3lvEqT/
+         IubqfaoIUl1E/s1tqxFU+K/t7aGL7ohNdS7zbDj5qO6rB7Bo3don7Mrfl370ed4tyB
+         ne38gcQUbi3ov4JkM1ULuc7Y1gl4VeaGWhJHpDSVd+ASvcC0gltl164iKK43cuILr1
+         i1plHjvIsYaNg==
+Date:   Sat, 23 Jul 2022 19:01:59 -0700
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Message-ID: <YtyoF89iOg8gs7hj@google.com>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220722071228.146690-7-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This allows specifying a disk sequence number in XenStore.  If it does
-not match the disk sequence number of the underlying device, the device
-will not be exported and a warning will be logged.  Userspace can use
-this to eliminate race conditions due to major/minor number reuse.
-Older kernels will ignore this, so it is safe for userspace to set it
-unconditionally.
+On 07/22, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Currently, if an f2fs filesystem is mounted with the mode=lfs and
+> io_bits mount options, DIO reads are allowed but DIO writes are not.
+> Allowing DIO reads but not DIO writes is an unusual restriction, which
+> is likely to be surprising to applications, namely any application that
+> both reads and writes from a file (using O_DIRECT).  This behavior is
+> also incompatible with the proposed STATX_DIOALIGN extension to statx.
+> Given this, let's drop the support for DIO reads in this configuration.
 
-Signed-off-by: Demi Marie Obenour <demi@invisiblethingslab.com>
----
-I'm marking this patch as RFC because I have not tested it beyond
-compiliation, and because I want to get feedback on the API before I put
-more effort into it.
+IIRC, we allowed DIO reads since applications complained a lower performance.
+So, I'm afraid this change will make another confusion to users. Could
+you please apply the new bahavior only for STATX_DIOALIGN?
 
- drivers/block/xen-blkback/xenbus.c | 35 ++++++++++++++++++++++++++++--
- 1 file changed, 33 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 97de13b14175eb8ced14d1649a3be461a464ee8a..cb531236b19709c791a82c868bfb4ed9aa284485 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -480,7 +480,7 @@ MODULE_PARM_DESC(feature_persistent,
- 
- static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 			  unsigned major, unsigned minor, int readonly,
--			  int cdrom)
-+			  bool cdrom, u64 diskseq)
- {
- 	struct xen_vbd *vbd;
- 	struct block_device *bdev;
-@@ -508,6 +508,25 @@ static int xen_vbd_create(struct xen_blkif *blkif, blkif_vdev_t handle,
- 		xen_vbd_free(vbd);
- 		return -ENOENT;
- 	}
-+
-+	if (diskseq != (u64)-1) {
-+		struct gendisk *disk = bdev->bd_disk;
-+		if (unlikely(disk == NULL)) {
-+			pr_err("xen_vbd_create: device %08x has no gendisk\n",
-+			       vbd->pdevice);
-+			xen_vbd_free(vbd);
-+			return -EFAULT;
-+		}
-+
-+		if (unlikely(disk->diskseq != diskseq)) {
-+			pr_warn("xen_vbd_create: device %08x has incorrect sequence "
-+				"number 0x%llx (expected 0x%llx)\n",
-+				vbd->pdevice, disk->diskseq, diskseq);
-+			xen_vbd_free(vbd);
-+			return -ENODEV;
-+		}
-+	}
-+
- 	vbd->size = vbd_sz(vbd);
- 
- 	if (cdrom || disk_to_cdi(vbd->bdev->bd_disk))
-@@ -712,6 +731,7 @@ static void backend_changed(struct xenbus_watch *watch,
- 	int cdrom = 0;
- 	unsigned long handle;
- 	char *device_type;
-+	unsigned long long diskseq;
- 
- 	pr_debug("%s %p %d\n", __func__, dev, dev->otherend_id);
- 
-@@ -730,6 +750,17 @@ static void backend_changed(struct xenbus_watch *watch,
- 		return;
- 	}
- 
-+	err = xenbus_scanf(XBT_NIL, dev->nodename, "diskseq", "%llx", &diskseq);
-+	if (err == -ENOENT) {
-+		diskseq = (uint64_t)-1;
-+	} else if (err != 1) {
-+		xenbus_dev_fatal(dev, err, "reading diskseq");
-+		return;
-+	} else if (diskseq == (uint64_t)-1) {
-+		xenbus_dev_fatal(dev, err, "UINT64_MAX is not a valid diskseq");
-+		return;
-+	}
-+
- 	if (be->major | be->minor) {
- 		if (be->major != major || be->minor != minor)
- 			pr_warn("changing physical device (from %x:%x to %x:%x) not supported.\n",
-@@ -763,7 +794,7 @@ static void backend_changed(struct xenbus_watch *watch,
- 	be->minor = minor;
- 
- 	err = xen_vbd_create(be->blkif, handle, major, minor,
--			     !strchr(be->mode, 'w'), cdrom);
-+			     !strchr(be->mode, 'w'), cdrom, diskseq);
- 
- 	if (err)
- 		xenbus_dev_fatal(dev, err, "creating vbd structure");
--- 
-Sincerely,
-Demi Marie Obenour (she/her/hers)
-Invisible Things Lab
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  fs/f2fs/file.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
+> index 5e5c97fccfb4ee..ad0212848a1ab9 100644
+> --- a/fs/f2fs/file.c
+> +++ b/fs/f2fs/file.c
+> @@ -823,7 +823,6 @@ static inline bool f2fs_force_buffered_io(struct inode *inode,
+>  				struct kiocb *iocb, struct iov_iter *iter)
+>  {
+>  	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+> -	int rw = iov_iter_rw(iter);
+>  
+>  	if (!fscrypt_dio_supported(inode))
+>  		return true;
+> @@ -841,7 +840,7 @@ static inline bool f2fs_force_buffered_io(struct inode *inode,
+>  	 */
+>  	if (f2fs_sb_has_blkzoned(sbi))
+>  		return true;
+> -	if (f2fs_lfs_mode(sbi) && (rw == WRITE)) {
+> +	if (f2fs_lfs_mode(sbi)) {
+>  		if (block_unaligned_IO(inode, iocb, iter))
+>  			return true;
+>  		if (F2FS_IO_ALIGNED(sbi))
+> -- 
+> 2.37.0
