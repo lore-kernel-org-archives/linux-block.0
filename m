@@ -2,154 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8671FC43334
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 18:19:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A89CCC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 20:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236357AbiGYSTo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jul 2022 14:19:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39034 "EHLO
+        id S236984AbiGYUZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jul 2022 16:25:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236046AbiGYSTn (ORCPT
+        with ESMTP id S236236AbiGYUZn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jul 2022 14:19:43 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA421F2C0;
-        Mon, 25 Jul 2022 11:19:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4DCBDB80E4E;
-        Mon, 25 Jul 2022 18:19:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94E94C341CE;
-        Mon, 25 Jul 2022 18:19:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658773179;
-        bh=5ctrK9GcdQKBCgVRjOjSn7Zl1uZhf8IDSGwjOw4LfHQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rSKOYgwnDQNhAul/FFWNhcjNEh8mkbav8WZc9aVOPUpEZLcGdeAfvm9Z67oByrhO6
-         yDCjxfGfJCJy5LOKF1+kINZz8iYhE56KWNXLbL/L6kvhZB6Emyr6i8Or/HrYX09bCG
-         T71OoXyLX5eAyzHgAZRXVUvHSrKWitnDNQKVkYcaHi5va86HdbrVBnA8aQ39elJFKc
-         YaqqVlMTxvCIlJm4sVZlIA3gvmC5HNNuypauZm5DPIVesRwodUBsD8CVWP69LboQLG
-         AR6kHYsg/fmdn9jH724X8+NBE85grh57wzrM3bH0+WmIR52KhQaudQRpOJlkh/bJzd
-         ldXt3e9esSxlQ==
-Date:   Mon, 25 Jul 2022 11:19:36 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, linux-f2fs-devel@lists.sourceforge.net
-Subject: Re: [PATCHv6 11/11] iomap: add support for dma aligned direct-io
-Message-ID: <Yt7euM+hjIWSGrII@sol.localdomain>
-References: <20220610195830.3574005-1-kbusch@fb.com>
- <20220610195830.3574005-12-kbusch@fb.com>
- <YtpTYSNUCwPelNgL@sol.localdomain>
- <Ytq3qwTBTRRxBfXv@kbusch-mbp.dhcp.thefacebook.com>
- <Ytrl/1YEg9M0fb+i@gmail.com>
- <YtsH3RvJ86CZVMgN@kbusch-mbp.dhcp.thefacebook.com>
+        Mon, 25 Jul 2022 16:25:43 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C2D637C
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 13:25:41 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id c24so9579449qkm.4
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 13:25:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jQ7HI45z5wixFb+/1Im4pHzErViUmi/CF5+gTInj3AE=;
+        b=oqOA072L/kD87nOMc3gKe/vkv/qvVP0z8KtLLpIDVI1nhUlt9u9vM/8Kza+NEHD8WV
+         CId7cKZYxhcQywmKBqKVftF223zsI+KZQEcZ0FieRSM3rEih+WvReAub29AapTxNn5sF
+         kzv+rzDScT0ARSmviIiEonye1f7pEosRNcEgKVr6yQPOB+YkNTL5DUIYNtM7hXtiz3TC
+         UHpwY5pyj1pGB9YV7fD7AHA2Y16v8uIKmYp/NCSiC4VYZuOKbJLQWLz8Wywm66uCZhvw
+         J+bXiJTHp5UaYiqs4ZCE1LtVegqkjCmmO/ROmd6WF3qotpciJby5fOS5elY0ik5pesBy
+         ozlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jQ7HI45z5wixFb+/1Im4pHzErViUmi/CF5+gTInj3AE=;
+        b=glPI+YJCpVB9cxhbKX1Xxct+dtNbmoqLR+13a/Ib8LUeTRZ8g3tGWIE2yxDPSE00Vw
+         zheuo+jfMHK40jOfQqA62sITPCl02WUI35aPWdfceuT+SoNEbZZkNL34fF9yhdeVR6sp
+         xqipv4a0ZnFzEYRszTPrdnw/GB9Z3mLzljxnrIJ06AkR2520Hkq1gOqHumoe5RGvERM3
+         rmTN57xpm1q80kye6mm6EPmOiijBq+doqC/EvZB/FfouLjUpLvNh4Y6+lr7xuII/UZsb
+         AyD8tHegxGvglG8wrbh/iz+Z6bAn4TNjDOY/9XfrZwI78i4mX+FlGE4mxnrBYQl8BZwL
+         c2Dg==
+X-Gm-Message-State: AJIora9A2vilYUI8vvlhdYGJBSuRNLcL15M8Lk3OGUd0ESTbSS3KdYcH
+        pKr7R+IElVh/C2fhnO6r8e2ds/Vb3GmIRA==
+X-Google-Smtp-Source: AGRyM1uTG4HZVwBBzArzy/8u/TGwyAfj5s8K5Dg5PUsYAJUdOT12doKcBg3ssTXnOYySh4d4KA3L5w==
+X-Received: by 2002:a05:620a:13b9:b0:6b5:f7a0:ff7a with SMTP id m25-20020a05620a13b900b006b5f7a0ff7amr10539094qki.298.1658780740285;
+        Mon, 25 Jul 2022 13:25:40 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id i10-20020a05622a08ca00b0031e9fa40c2esm7822025qte.27.2022.07.25.13.25.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jul 2022 13:25:39 -0700 (PDT)
+Date:   Mon, 25 Jul 2022 16:25:38 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     joe@perches.com, axboe@kernel.dk, yukuai3@huawei.com,
+        houtao1@huawei.com, linux-block@vger.kernel.org,
+        nbd@other.debian.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v2] nbd: add missing definition of pr_fmt
+Message-ID: <Yt78QrEvSap5YadH@localhost.localdomain>
+References: <20220723082427.3890655-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YtsH3RvJ86CZVMgN@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <20220723082427.3890655-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 02:26:05PM -0600, Keith Busch wrote:
-> On Fri, Jul 22, 2022 at 06:01:35PM +0000, Eric Biggers wrote:
-> > On Fri, Jul 22, 2022 at 08:43:55AM -0600, Keith Busch wrote:
-> > > On Fri, Jul 22, 2022 at 12:36:01AM -0700, Eric Biggers wrote:
-> > > > [+f2fs list and maintainers]
-> > > > 
-> > > > On Fri, Jun 10, 2022 at 12:58:30PM -0700, Keith Busch wrote:
-> > > > > From: Keith Busch <kbusch@kernel.org>
-> > > > > 
-> > > > > Use the address alignment requirements from the block_device for direct
-> > > > > io instead of requiring addresses be aligned to the block size.
-> > > > > 
-> > > > > Signed-off-by: Keith Busch <kbusch@kernel.org>
-> > > > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > > > > ---
-> > > > >  fs/iomap/direct-io.c | 4 ++--
-> > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > > 
-> > > > > diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> > > > > index 370c3241618a..5d098adba443 100644
-> > > > > --- a/fs/iomap/direct-io.c
-> > > > > +++ b/fs/iomap/direct-io.c
-> > > > > @@ -242,7 +242,6 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
-> > > > >  	struct inode *inode = iter->inode;
-> > > > >  	unsigned int blkbits = blksize_bits(bdev_logical_block_size(iomap->bdev));
-> > > > >  	unsigned int fs_block_size = i_blocksize(inode), pad;
-> > > > > -	unsigned int align = iov_iter_alignment(dio->submit.iter);
-> > > > >  	loff_t length = iomap_length(iter);
-> > > > >  	loff_t pos = iter->pos;
-> > > > >  	unsigned int bio_opf;
-> > > > > @@ -253,7 +252,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
-> > > > >  	size_t copied = 0;
-> > > > >  	size_t orig_count;
-> > > > >  
-> > > > > -	if ((pos | length | align) & ((1 << blkbits) - 1))
-> > > > > +	if ((pos | length) & ((1 << blkbits) - 1) ||
-> > > > > +	    !bdev_iter_is_aligned(iomap->bdev, dio->submit.iter))
-> > > > >  		return -EINVAL;
-> > > > >  
-> > > > >  	if (iomap->type == IOMAP_UNWRITTEN) {
-> > > > 
-> > > > I noticed that this patch is going to break the following logic in
-> > > > f2fs_should_use_dio() in fs/f2fs/file.c:
-> > > > 
-> > > > 	/*
-> > > > 	 * Direct I/O not aligned to the disk's logical_block_size will be
-> > > > 	 * attempted, but will fail with -EINVAL.
-> > > > 	 *
-> > > > 	 * f2fs additionally requires that direct I/O be aligned to the
-> > > > 	 * filesystem block size, which is often a stricter requirement.
-> > > > 	 * However, f2fs traditionally falls back to buffered I/O on requests
-> > > > 	 * that are logical_block_size-aligned but not fs-block aligned.
-> > > > 	 *
-> > > > 	 * The below logic implements this behavior.
-> > > > 	 */
-> > > > 	align = iocb->ki_pos | iov_iter_alignment(iter);
-> > > > 	if (!IS_ALIGNED(align, i_blocksize(inode)) &&
-> > > > 	    IS_ALIGNED(align, bdev_logical_block_size(inode->i_sb->s_bdev)))
-> > > > 		return false;
-> > > > 
-> > > > 	return true;
-> > > > 
-> > > > So, f2fs assumes that __iomap_dio_rw() returns an error if the I/O isn't logical
-> > > > block aligned.  This patch changes that.  The result is that DIO will sometimes
-> > > > proceed in cases where the I/O doesn't have the fs block alignment required by
-> > > > f2fs for all DIO.
-> > > > 
-> > > > Does anyone have any thoughts about what f2fs should be doing here?  I think
-> > > > it's weird that f2fs has different behaviors for different degrees of
-> > > > misalignment: fail with EINVAL if not logical block aligned, else fallback to
-> > > > buffered I/O if not fs block aligned.  I think it should be one convention or
-> > > > the other.  Any opinions about which one it should be?
-> > > 
-> > > It looks like f2fs just falls back to buffered IO for this condition without
-> > > reaching the new code in iomap_dio_bio_iter().
-> > 
-> > No.  It's a bit subtle, so read the code and what I'm saying carefully.  f2fs
-> > only supports 4K aligned DIO and normally falls back to buffered I/O; however,
-> > for DIO that is *very* misaligned (not even LBS aligned) it returns EINVAL
-> > instead.  And it relies on __iomap_dio_rw() returning that EINVAL.
+On Sat, Jul 23, 2022 at 04:24:27PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Okay, I understand the code flow now.
+> commit 1243172d5894 ("nbd: use pr_err to output error message") tries
+> to define pr_fmt and use short pr_err() to output error message,
+> however, the definition is missed.
 > 
-> I tested f2fs direct io with every possible alignment, and it is successful for
-> all hardware dma supported alignments and continues to return EINVAL for
-> unaligned. Is the concern that it's now returning success in scenarios that
-> used to fail? Or is there some other 4k f2fs constraint that I haven't found
-> yet?
+> This patch also remove existing "nbd:" inside pr_err().
+> 
+> Fixes: 1243172d5894 ("nbd: use pr_err to output error message")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-f2fs has a lot of different options, and edge cases that only occur occasionally
-such as data blocks being moved by garbage collection.  So just because
-misaligned DIO appears to work doesn't necessarily mean that it actually works.
-Maybe the f2fs developers can elaborate on the reason that f2fs always requires
-4K alignment for DIO.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-- Eric
+Thanks,
+
+Josef
