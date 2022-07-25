@@ -2,108 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2ABC43334
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 14:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F036CC43334
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 15:43:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233838AbiGYOrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jul 2022 10:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
+        id S234671AbiGYPnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jul 2022 11:43:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiGYOrB (ORCPT
+        with ESMTP id S230295AbiGYPnl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jul 2022 10:47:01 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9243C13F1A;
-        Mon, 25 Jul 2022 07:47:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 25 Jul 2022 11:43:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51D91398
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 08:43:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658763819;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KNyB7toDFaNajhP2JDMJHQNTTUkvEH3wmLgI2/Fgc9o=;
+        b=TQkkX6HvJrfPZwRuxrQrojwVV9SlLRbbYBNeRJe18XJ0mNWR7qjQZUYQU/iYGnHp66bVnF
+        qc11m6HY57q5Ie0UoRpLvai9Bve+t/d2g8mZLAO0l8tA0Y9qTxMJy1/BnzzmS8gJvLixWs
+        g3ZW1wkRQqnzhP0+noZc5lcrs8RsVZ0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-294-T-D4Mgi0P8ilF8Bil2GiCg-1; Mon, 25 Jul 2022 11:43:36 -0400
+X-MC-Unique: T-D4Mgi0P8ilF8Bil2GiCg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3D037B80DE9;
-        Mon, 25 Jul 2022 14:46:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12A5DC341C6;
-        Mon, 25 Jul 2022 14:46:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658760418;
-        bh=PZKVLgIIqdh9g4wPfJ5NHR7BP7/xQGyMshytByH1RJM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dmS4DNDrLhJ9CA/GNgiKyZDaLdV2ZqESyyBrwX5Anr3zbwmlC1Amcvm+cxJKZtQFf
-         A5qRBVTOO0svm8DcPHWQREspfRrbKbEnZaPgemr6LNsWMT+YMiL6DO/VXbgLE7Siq1
-         jB1WtmFqomimhIRA2JXinRRzjMeQg4LHCNjMDGFty2LHhtLN+XrYTQULac6rfd1HnR
-         wqs8aa3KpPYNMU/iS8RU7gujJmvwcZei2+8mgr4biHSxlEDfK/fEJMBQrg4Ov6WQMn
-         Xd6uKDKNKxDjF4h0wpfyPRjUbewJEUxWHeQ+ESR7RovV5uy1MEdFVZMXmtuwup6PpK
-         gelQyAxIBu9xQ==
-Date:   Mon, 25 Jul 2022 08:46:54 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        damien.lemoal@opensource.wdc.com, ebiggers@kernel.org,
-        pankydev8@gmail.com, Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCHv6 07/11] block/bounce: count bytes instead of sectors
-Message-ID: <Yt6s3uh5UijlYACV@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220610195830.3574005-1-kbusch@fb.com>
- <20220610195830.3574005-8-kbusch@fb.com>
- <a1cceb79-c72c-5a76-ed7a-156c09505692@acm.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 771D185A584;
+        Mon, 25 Jul 2022 15:43:35 +0000 (UTC)
+Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A8891415118;
+        Mon, 25 Jul 2022 15:43:30 +0000 (UTC)
+Date:   Mon, 25 Jul 2022 23:43:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, hch@lst.de, yukuai3@huawei.com,
+        "zhangyi (F)" <yi.zhang@huawei.com>, ming.lei@redhat.com
+Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
+ plug list
+Message-ID: <Yt66HebQ9//2ahq6@T590>
+References: <20220718123528.178714-1-yuyufen@huawei.com>
+ <YtZ4uSRqR/kLdqm+@T590>
+ <0baa5b04-7194-54fa-08a5-51425601343e@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a1cceb79-c72c-5a76-ed7a-156c09505692@acm.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0baa5b04-7194-54fa-08a5-51425601343e@huaweicloud.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 03:01:06PM -0700, Bart Van Assche wrote:
-> On 6/10/22 12:58, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > Individual bv_len's may not be a sector size.
-> > 
-> > Signed-off-by: Keith Busch <kbusch@kernel.org>
-> > Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> > Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
-> > ---
-> >   block/bounce.c | 13 ++++++++++---
-> >   1 file changed, 10 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/block/bounce.c b/block/bounce.c
-> > index 8f7b6fe3b4db..fbadf179601f 100644
-> > --- a/block/bounce.c
-> > +++ b/block/bounce.c
-> > @@ -205,19 +205,26 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
-> >   	int rw = bio_data_dir(*bio_orig);
-> >   	struct bio_vec *to, from;
-> >   	struct bvec_iter iter;
-> > -	unsigned i = 0;
-> > +	unsigned i = 0, bytes = 0;
-> >   	bool bounce = false;
-> > -	int sectors = 0;
-> > +	int sectors;
-> >   	bio_for_each_segment(from, *bio_orig, iter) {
-> >   		if (i++ < BIO_MAX_VECS)
-> > -			sectors += from.bv_len >> 9;
-> > +			bytes += from.bv_len;
-> >   		if (PageHighMem(from.bv_page))
-> >   			bounce = true;
-> >   	}
-> >   	if (!bounce)
-> >   		return;
-> > +	/*
-> > +	 * Individual bvecs might not be logical block aligned. Round down
-> > +	 * the split size so that each bio is properly block size aligned,
-> > +	 * even if we do not use the full hardware limits.
-> > +	 */
-> > +	sectors = ALIGN_DOWN(bytes, queue_logical_block_size(q)) >>
-> > +			SECTOR_SHIFT;
-> >   	if (sectors < bio_sectors(*bio_orig)) {
-> >   		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
-> >   		bio_chain(bio, *bio_orig);
+On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
+> Hi, Ming!
 > 
-> Do I see correctly that there are two changes in this patch: counting bytes
-> instead of sectors and also splitting at logical block boundaries instead of
-> a 512-byte boundary? Should this patch perhaps be split?
+> 在 2022/07/19 17:26, Ming Lei 写道:
+> > On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
+> > > We do test on a virtio scsi device (/dev/sda) and the default mq
+> > > scheduler is 'none'. We found a IO hung as following:
+> > > 
+> > > blk_finish_plug
+> > >    blk_mq_plug_issue_direct
+> > >        scsi_mq_get_budget
+> > >        //get budget_token fail and sdev->restarts=1
+> > > 
+> > > 			     	 scsi_end_request
+> > > 				   scsi_run_queue_async
+> > >                                     //sdev->restart=0 and run queue
+> > > 
+> > >       blk_mq_request_bypass_insert
+> > >          //add request to hctx->dispatch list
+> > 
+> > Here the issue shouldn't be related with scsi's get budget or
+> > scsi_run_queue_async.
+> > 
+> > If blk-mq adds request into ->dispatch_list, it is blk-mq core's
+> > responsibility to re-run queue for moving on. Can you investigate a
+> > bit more why blk-mq doesn't run queue after adding request to
+> > hctx dispatch list?
+> 
+> I think Yufen is probably thinking about the following Concurrent
+> scenario:
+> 
+> blk_mq_flush_plug_list
+> # assume there are three rq
+>  blk_mq_plug_issue_direct
+>   blk_mq_request_issue_directly
+>   # dispatch rq1, succeed
+>   blk_mq_request_issue_directly
+>   # dispatch rq2
+>    __blk_mq_try_issue_directly
+>     blk_mq_get_dispatch_budget
+>      scsi_mq_get_budget
+>       atomic_inc(&sdev->restarts);
+>       # rq2 failed to get budget
+>       # restarts is 1 now
+>                                         scsi_end_request
+>                                         # rq1 is completed
+>                                         ┊scsi_run_queue_async
+>                                         ┊ atomic_cmpxchg(&sdev->restarts,
+> old, 0) == old
+>                                         ┊ # set restarts to 0
+>                                         ┊ blk_mq_run_hw_queues
+>                                         ┊ # hctx->dispatch list is empty
+>   blk_mq_request_bypass_insert
+>   # insert rq2 to hctx->dispatch list
 
-The code previously would only split on a bvec boundary. All bvecs were logical
-block sized, so that part is not changing. We just needed to be able to split
-mid-bvec since the series enables unaligned offsets to match hardware
-capabilities.
+After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
+no matter if list_empty(list) is empty or not, queue will be run either from
+blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
+
+And rq2 should be visible to the run queue, just wondering why rq2 isn't
+issued finally?
+
+
+Thanks, 
+Ming
+
