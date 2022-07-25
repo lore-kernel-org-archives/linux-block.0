@@ -2,106 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E90C6C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jul 2022 15:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C69C43334
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 01:48:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232001AbiGXPWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jul 2022 11:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33424 "EHLO
+        id S231894AbiGYBsv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jul 2022 21:48:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbiGXPWH (ORCPT
+        with ESMTP id S229821AbiGYBsu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jul 2022 11:22:07 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEAA811C07;
-        Sun, 24 Jul 2022 08:22:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=RG/BJ3Nv9HakG4zVWqCXWL3uZp6IBIbE/vdVZRgFNzw=;
-        t=1658676126; x=1659885726; b=hyxJq9tjqYBSUs+yl2lXhjEasadf4QDDhUQtDVBgBTsOCXy
-        dXAS1NdbzZAH8t2GUlNLJhRhD49LM6qQYr6ikt7VEwb372PnhXfEw2eIErL3/1g/NmcQS7A1MmBoj
-        M7sI/c7TKKmGWAVMuqOX0QISRHvCSzFTYdLMvn4EDRAsr7qLMVn4yGnhfPIrpN9AlVZXuznPdF7KL
-        MRGo6/1aZIACWmI+uYVqBv6MGHPydotxxqBIszWJT+2aLy/cMHaEc5ZyPntvis9Hxxu9S7XG2Yi0g
-        ypD4kw1ai5Re/1SorP2ClE+MC/OBt+Q4GXVXOTKFomMo1MmltlwK5AiDCvwoP4Gg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.96)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1oFdQP-006zmj-2a;
-        Sun, 24 Jul 2022 17:21:45 +0200
-Message-ID: <4f8ab262d98ba2a4d0e106e127c171e75b52ad47.camel@sipsolutions.net>
-Subject: Re: [PATCH] docs: driver-api: firmware: add driver firmware
- guidelines. (v3)
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Dave Airlie <airlied@gmail.com>, torvalds@linux-foundation.org,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        gregkh@linuxfoundation.org, Daniel Vetter <daniel@ffwll.ch>,
-        mcgrof@kernel.org
-Cc:     linux-kernel@vger.kernel.org, dri-devel@lists.sf.net,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        alsa-devel@alsa-project.org, linux-media@vger.kernel.org,
-        linux-block@vger.kernel.org, Dave Airlie <airlied@redhat.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Harry Wentland <harry.wentland@amd.com>
-Date:   Sun, 24 Jul 2022 17:21:43 +0200
-In-Reply-To: <20220721044352.3110507-1-airlied@gmail.com>
-References: <20220721044352.3110507-1-airlied@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.3 (3.44.3-1.fc36) 
+        Sun, 24 Jul 2022 21:48:50 -0400
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8189ED62;
+        Sun, 24 Jul 2022 18:48:47 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id t2-20020a17090a4e4200b001f21572f3a4so8927875pjl.0;
+        Sun, 24 Jul 2022 18:48:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=HT09dBY8vUpXT4pAwp9hU5IYkpA64eMFd2Hf4rtewRU=;
+        b=Mm90oEayZG+T3cwxeBYyH+MVmHKkb/cUBKaLRzfnQ+jTnJ/4SVK23muAKkqteOmH1Q
+         dJcx4yWdTziLMA6gBTPI1pxS49cCkP4pEfgaO79Y+JsVkDujHYOljhTdd3LlK1K3b9af
+         +0g9iWBR8+Zc+3f+dphUjQ7+Iv9sRv8TYi4kt8GqV7E2QQX1Wlasf37HTRZ3VVt/5V2M
+         u3nw5wOSLp5Sph9joKwVp+etsU7mA4rjbUrKVzbQwhJ0vANDxx+ka84Jc4AAzSpC8Rib
+         42MFnN7jRwOGKIJpLTkof5g/yl2yEmPzbk4ICaZKx7+NA6If8z6Lha6oCsGTrUeDgOIU
+         TkZQ==
+X-Gm-Message-State: AJIora+7SbW+Jv1MH+ud6vM4zXZ7+M2yhtABbJXLRbizvVRksDhRmgzl
+        smd22rY9X89gGGsVZopDUZI=
+X-Google-Smtp-Source: AGRyM1uPN9pHcsZNA+/K1raafpFnBCZGJCaCSs0N23TarH3QJ1hL9Ma/JcNJv/aZrIv+78hDd3zv4w==
+X-Received: by 2002:a17:902:d48a:b0:16b:f0be:4e15 with SMTP id c10-20020a170902d48a00b0016bf0be4e15mr10344383plg.155.1658713726367;
+        Sun, 24 Jul 2022 18:48:46 -0700 (PDT)
+Received: from [192.168.3.217] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id d10-20020a170902654a00b0016d1e514ec5sm7772608pln.139.2022.07.24.18.48.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Jul 2022 18:48:45 -0700 (PDT)
+Message-ID: <57accb2a-828d-c532-d964-130a63faebe5@acm.org>
+Date:   Sun, 24 Jul 2022 18:48:44 -0700
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2 2/2] block/mq-deadline: Prioritize first request
+Content-Language: en-US
+To:     Wang You <wangyoua@uniontech.com>
+Cc:     axboe@kernel.dk, fio@vger.kernel.org, hch@lst.de,
+        jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
+        wangxiaohua@uniontech.com
+References: <f798c875-0bb9-add7-d7a3-4ac2a76e85d9@acm.org>
+ <20220723105909.440050-1-wangyoua@uniontech.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220723105909.440050-1-wangyoua@uniontech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2022-07-21 at 14:43 +1000, Dave Airlie wrote:
->=20
-> +Users switching to a newer kernel should *not* have to install newer
-> +firmware files to keep their hardware working. At the same time updated
-> +firmware files must not cause any regressions for users of older kernel
-> +releases.
+On 7/23/22 03:59, Wang You wrote:
+> Also, can I ask? If using fio or other tools, how should testing be done to get
+> more accurate and convincing data? Such as the perfectly sequential and random I/O
+> performance you mentioned above (fio's multi-threaded test does result in neither
+> perfectly sequential nor perfectly random, but single thread dispatch is too slow,
+> and cannot play the merge and sorting ability of elv).
 
-That seems sane, and certainly something we've done in wireless in the
-past.
+I'm not sure that there is agreement about for which data patterns to 
+measure performance to conclude that certain code changes improve 
+performance of an I/O scheduler.
 
-> +* Firmware files shall be designed in a way that it allows checking for
-> +  firmware ABI version changes. It is recommended that firmware files be
-> +  versioned with at least a major/minor version. It is suggested that
-> +  the firmware files in linux-firmware be named with some device
-> +  specific name, and just the major version. The firmware version should
-> +  be stored in the firmware header, or as an exception, as part of the
-> +  firmware file name,
+Thanks,
 
-Eh, I went to write a whole paragraph here and then read it again ...
-Maybe this should say "[t]he _full_ firmware version", to contrast with
-the previous sentence mentioning the "major version".
-
->  in order to let the driver detact any non-ABI
-
-typo - 'detect'
-
-> +  fixes/changes. The firmware files in linux-firmware should be
-> +  overwritten with the newest compatible major version.
->=20
-
-That's also a bit confusing IMHO - did that mean "minor version"? Or
-something? I mean ... if you overwrite a file that has the major version
-in the filename then by definition it is the same major version?
-
-> +  This means no major version bumps without the kernel retaining
-> +  backwards compatibility for the older major versions.
-
-Strictly reading this might require aeons of support for firmware
-version, if you have a release cadence of them like every 6 weeks for a
-new _major_ version (yes, because APIs change), then that's rather
-harsh. In practice we've often done this, but I think some reasonable
-cut-off could/should be there, such as dropping support after a
-reasonably long time frame (say a year?)
-
-Often though that's less a question of "does it still work" and rather
-one of "do I still support that" and the answer for the latter is
-obviously "no" much quicker than the former.
-
-johannes
+Bart.
