@@ -2,127 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F036CC43334
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 15:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EA8CCA473
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jul 2022 18:12:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234671AbiGYPnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jul 2022 11:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
+        id S234483AbiGYSMb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jul 2022 14:12:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230295AbiGYPnl (ORCPT
+        with ESMTP id S229470AbiGYSMa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jul 2022 11:43:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51D91398
-        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 08:43:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658763819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KNyB7toDFaNajhP2JDMJHQNTTUkvEH3wmLgI2/Fgc9o=;
-        b=TQkkX6HvJrfPZwRuxrQrojwVV9SlLRbbYBNeRJe18XJ0mNWR7qjQZUYQU/iYGnHp66bVnF
-        qc11m6HY57q5Ie0UoRpLvai9Bve+t/d2g8mZLAO0l8tA0Y9qTxMJy1/BnzzmS8gJvLixWs
-        g3ZW1wkRQqnzhP0+noZc5lcrs8RsVZ0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-294-T-D4Mgi0P8ilF8Bil2GiCg-1; Mon, 25 Jul 2022 11:43:36 -0400
-X-MC-Unique: T-D4Mgi0P8ilF8Bil2GiCg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 25 Jul 2022 14:12:30 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1154BF77;
+        Mon, 25 Jul 2022 11:12:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 771D185A584;
-        Mon, 25 Jul 2022 15:43:35 +0000 (UTC)
-Received: from T590 (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A8891415118;
-        Mon, 25 Jul 2022 15:43:30 +0000 (UTC)
-Date:   Mon, 25 Jul 2022 23:43:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, hch@lst.de, yukuai3@huawei.com,
-        "zhangyi (F)" <yi.zhang@huawei.com>, ming.lei@redhat.com
-Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
- plug list
-Message-ID: <Yt66HebQ9//2ahq6@T590>
-References: <20220718123528.178714-1-yuyufen@huawei.com>
- <YtZ4uSRqR/kLdqm+@T590>
- <0baa5b04-7194-54fa-08a5-51425601343e@huaweicloud.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9DE0FB80E4E;
+        Mon, 25 Jul 2022 18:12:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7248C341C6;
+        Mon, 25 Jul 2022 18:12:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658772747;
+        bh=qdWMQQKR8B6EADa6U6NBfxlIzi/aeUuQEIWc4wTtIJ4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XWhXckPekmLTNg1ZhroIC3wMS4JVLPCYsXHe5Fd86LEkStVLlwKwuRERjnfWICZBs
+         KwdMl4Ubwhhxz/SNyupEpf5ZQdsMAQipiMg8H4g3GRNnXlc6S8etHe+wcJ0+4ymVG7
+         ro6EoyxIDImJMuJQ98IuU3u3IslYx4Q3X1JEQSRvvWlmdxM/olx+9jEVK83Sgxk3S9
+         yrYLuIoHLs+3h9t2gNY/JPYpZ5OmfpnUkgYBFfvl+qFCxil+mzDEHaZVnrgR1UGvMP
+         HB/lbSEc1W8W/iVFQNNW3Ql/QUIkQRPG2kXFJXQBnfnZD5V0YIrLvKPLE06jEgA/hW
+         D6q+HLHyj18Tg==
+Date:   Mon, 25 Jul 2022 11:12:25 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jaegeuk Kim <jaegeuk@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Message-ID: <Yt7dCcG0ns85QqJe@sol.localdomain>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org>
+ <YtyoF89iOg8gs7hj@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0baa5b04-7194-54fa-08a5-51425601343e@huaweicloud.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+In-Reply-To: <YtyoF89iOg8gs7hj@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
-> Hi, Ming!
-> 
-> 在 2022/07/19 17:26, Ming Lei 写道:
-> > On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
-> > > We do test on a virtio scsi device (/dev/sda) and the default mq
-> > > scheduler is 'none'. We found a IO hung as following:
-> > > 
-> > > blk_finish_plug
-> > >    blk_mq_plug_issue_direct
-> > >        scsi_mq_get_budget
-> > >        //get budget_token fail and sdev->restarts=1
-> > > 
-> > > 			     	 scsi_end_request
-> > > 				   scsi_run_queue_async
-> > >                                     //sdev->restart=0 and run queue
-> > > 
-> > >       blk_mq_request_bypass_insert
-> > >          //add request to hctx->dispatch list
+On Sat, Jul 23, 2022 at 07:01:59PM -0700, Jaegeuk Kim wrote:
+> On 07/22, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
 > > 
-> > Here the issue shouldn't be related with scsi's get budget or
-> > scsi_run_queue_async.
-> > 
-> > If blk-mq adds request into ->dispatch_list, it is blk-mq core's
-> > responsibility to re-run queue for moving on. Can you investigate a
-> > bit more why blk-mq doesn't run queue after adding request to
-> > hctx dispatch list?
+> > Currently, if an f2fs filesystem is mounted with the mode=lfs and
+> > io_bits mount options, DIO reads are allowed but DIO writes are not.
+> > Allowing DIO reads but not DIO writes is an unusual restriction, which
+> > is likely to be surprising to applications, namely any application that
+> > both reads and writes from a file (using O_DIRECT).  This behavior is
+> > also incompatible with the proposed STATX_DIOALIGN extension to statx.
+> > Given this, let's drop the support for DIO reads in this configuration.
 > 
-> I think Yufen is probably thinking about the following Concurrent
-> scenario:
+> IIRC, we allowed DIO reads since applications complained a lower performance.
+> So, I'm afraid this change will make another confusion to users. Could
+> you please apply the new bahavior only for STATX_DIOALIGN?
 > 
-> blk_mq_flush_plug_list
-> # assume there are three rq
->  blk_mq_plug_issue_direct
->   blk_mq_request_issue_directly
->   # dispatch rq1, succeed
->   blk_mq_request_issue_directly
->   # dispatch rq2
->    __blk_mq_try_issue_directly
->     blk_mq_get_dispatch_budget
->      scsi_mq_get_budget
->       atomic_inc(&sdev->restarts);
->       # rq2 failed to get budget
->       # restarts is 1 now
->                                         scsi_end_request
->                                         # rq1 is completed
->                                         ┊scsi_run_queue_async
->                                         ┊ atomic_cmpxchg(&sdev->restarts,
-> old, 0) == old
->                                         ┊ # set restarts to 0
->                                         ┊ blk_mq_run_hw_queues
->                                         ┊ # hctx->dispatch list is empty
->   blk_mq_request_bypass_insert
->   # insert rq2 to hctx->dispatch list
 
-After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
-no matter if list_empty(list) is empty or not, queue will be run either from
-blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
+Well, the issue is that the proposed STATX_DIOALIGN fields cannot represent this
+weird case where DIO reads are allowed but not DIO writes.  So the question is
+whether this case actually matters, in which case we should make STATX_DIOALIGN
+distinguish between DIO reads and DIO writes, or whether it's some odd edge case
+that doesn't really matter, in which case we could just fix it or make
+STATX_DIOALIGN report that DIO is unsupported.  I was hoping that you had some
+insight here.  What sort of applications want DIO reads but not DIO writes?
+Is this common at all?
 
-And rq2 should be visible to the run queue, just wondering why rq2 isn't
-issued finally?
-
-
-Thanks, 
-Ming
-
+- Eric
