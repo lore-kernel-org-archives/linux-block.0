@@ -2,287 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CC1C43334
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 07:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D30C43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 08:33:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238399AbiGZHlR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 03:41:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54954 "EHLO
+        id S238575AbiGZId6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 04:33:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238600AbiGZHkt (ORCPT
+        with ESMTP id S238506AbiGZIdt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 03:40:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8130EB92
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 00:40:08 -0700 (PDT)
+        Tue, 26 Jul 2022 04:33:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4891F30F74
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 01:33:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658821207;
+        s=mimecast20190719; t=1658824428;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hltgeSOW0Iua0H7gjivvyjxxQniBMc+eE6kC6bAqHsw=;
-        b=fFYTb9GttD03hIr3TN9c0RLvoiBU/J1n12ePqE9arbxozFXvDQk2bPULmIB7aV5kbiHUE0
-        wyb1Xjq4Sq1xCMbB/tSZLlOI1kMMXBb+zMzkoUxpvu8+PTPFPiIL+9xsoV2toBDcDYgUqx
-        hYFYTm4NXBqu6ptafyBBhGbXc/q4fJs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=e/L41wz4KfwgumlSZP65sogrhzOFMrAJBy5CglxISY0=;
+        b=IjU3RpDfiKM724eHzS3KUgLKac+cIToSUSSg5f1h0WLeqRJZB3O2V2DZXkf1lFwdGImvAM
+        MEiy/2bChdqr7pNfyIt5vud+E3NaWGiT+hwGQXphdgLg/W0WvYUtZgAHAlKKgFPfUqAsMy
+        EI0T3kyESuMpTwzlSZuD6XylQen98Ak=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-436-90XLlW9vNf-tzUQkmPyjIQ-1; Tue, 26 Jul 2022 03:40:04 -0400
-X-MC-Unique: 90XLlW9vNf-tzUQkmPyjIQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84C0E1C05EBF;
-        Tue, 26 Jul 2022 07:40:03 +0000 (UTC)
-Received: from T590 (ovpn-8-32.pek2.redhat.com [10.72.8.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87EE01415118;
-        Tue, 26 Jul 2022 07:39:57 +0000 (UTC)
-Date:   Tue, 26 Jul 2022 15:39:52 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     Yu Kuai <yukuai3@huawei.com>, Yu Kuai <yukuai1@huaweicloud.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
-        "zhangyi (F)" <yi.zhang@huawei.com>
-Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
- plug list
-Message-ID: <Yt+aSH86dVCA1vux@T590>
-References: <Yt9HkP2mzH0ZTL1l@T590>
- <ba2b30f2-66d9-3acb-787d-fae1894fa5a6@huawei.com>
- <Yt9SMuSlCtwwzyEz@T590>
- <f91f136c-f109-3027-a666-29fe882d3426@huawei.com>
- <Yt9ZOFtzm9kfKWhc@T590>
- <6b070c7d-473a-cc96-def3-49826ca08aea@huawei.com>
- <Yt9duWU0Ez/uZIym@T590>
- <e77fbe38-3cf5-2074-4875-eb3e1df55807@huawei.com>
- <Yt9qjRc9CpdqtrgT@T590>
- <3f9d5423-ec40-ba8d-05c1-8f5634a5c792@huawei.com>
+ us-mta-363-XQ4IWrfeO8ag-W3s7T9RUw-1; Tue, 26 Jul 2022 04:33:46 -0400
+X-MC-Unique: XQ4IWrfeO8ag-W3s7T9RUw-1
+Received: by mail-ed1-f69.google.com with SMTP id e6-20020a056402190600b0043bde36ab23so5135622edz.11
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 01:33:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=e/L41wz4KfwgumlSZP65sogrhzOFMrAJBy5CglxISY0=;
+        b=6Q0yVObDpn1tXil90p4Hgli9imy2ufO2XoD62lslXfgGtbfQMwKeg4xXMIuZv1yzla
+         3275uQ4e9mA9vLw96h7/5+rtZuo5+i/I2GpwbPCqWE2DD01H3zL+1GWGlbeBgyhQBcsb
+         VNwrZ7mfqWbiymiXOT5CNbgQ0LU7EpEN+YYqkcdLLoDV8x4Y0Of8qy3svIsOIvfY0Cpz
+         Wz43ywbAT8ZEsSEa9T8nIBMo0DTl9eAvFe+aDDrMnU0YMntcMe76bb1gUBNfnZ/PKqoT
+         lTqKEg6vWGxIvLUZhr6A+fSraDOfu+HmNEsFMb+nPM+bksRYWG9SqfU3xWf5HltY+EbZ
+         ltvA==
+X-Gm-Message-State: AJIora/fOQSH2fg0bR/OBOje54E8bSAgA+uPhAWns9FqkYdJnN5UZNtk
+        GQ5jUfcp3z/4sL1rRd+HvFXOwO92TSKDCHXtW+gThGthi42d+syDLNyp6SIvnl78mv3C1WJqHUi
+        AD6A8jnKQqjVtkW/XnFK7J54YbOFoMjvaPyUlIPs=
+X-Received: by 2002:a05:6402:270d:b0:43c:2e9:53ae with SMTP id y13-20020a056402270d00b0043c02e953aemr8774243edd.135.1658824425587;
+        Tue, 26 Jul 2022 01:33:45 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tXBwVOVNTJFOTI1/3OFNE0xuh4x/y1Z/F50vSE0USDMvxeBb45wW+d5vqLult/8B2KtjlKRV3heicD+/8FRfY=
+X-Received: by 2002:a05:6402:270d:b0:43c:2e9:53ae with SMTP id
+ y13-20020a056402270d00b0043c02e953aemr8774238edd.135.1658824425401; Tue, 26
+ Jul 2022 01:33:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3f9d5423-ec40-ba8d-05c1-8f5634a5c792@huawei.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+References: <20220719025216.1395353-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20220719025216.1395353-1-shinichiro.kawasaki@wdc.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Tue, 26 Jul 2022 16:33:34 +0800
+Message-ID: <CAHj4cs_XGXhHZsipb-BA2O_acaeBjDXa-CDfY771=a_GfEaU6w@mail.gmail.com>
+Subject: Re: [PATCH blktests v2] common/cpuhotplug: allow _offline_cpu() call
+ in sub-shell
+To:     "Shin'ichiro Kawasaki" <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 01:01:41PM +0800, Yufen Yu wrote:
-> 
-> 
-> On 2022/7/26 12:16, Ming Lei wrote:
-> > On Tue, Jul 26, 2022 at 11:31:34AM +0800, Yu Kuai wrote:
-> > > 在 2022/07/26 11:21, Ming Lei 写道:
-> > > > On Tue, Jul 26, 2022 at 11:14:23AM +0800, Yu Kuai wrote:
-> > > > > Hi, Ming
-> > > > > 
-> > > > > 在 2022/07/26 11:02, Ming Lei 写道:
-> > > > > > On Tue, Jul 26, 2022 at 10:52:56AM +0800, Yu Kuai wrote:
-> > > > > > > Hi, Ming
-> > > > > > > 在 2022/07/26 10:32, Ming Lei 写道:
-> > > > > > > > On Tue, Jul 26, 2022 at 10:08:13AM +0800, Yu Kuai wrote:
-> > > > > > > > > 在 2022/07/26 9:46, Ming Lei 写道:
-> > > > > > > > > > On Tue, Jul 26, 2022 at 09:08:19AM +0800, Yu Kuai wrote:
-> > > > > > > > > > > Hi, Ming!
-> > > > > > > > > > > 
-> > > > > > > > > > > 在 2022/07/25 23:43, Ming Lei 写道:
-> > > > > > > > > > > > On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
-> > > > > > > > > > > > > Hi, Ming!
-> > > > > > > > > > > > > 
-> > > > > > > > > > > > > 在 2022/07/19 17:26, Ming Lei 写道:
-> > > > > > > > > > > > > > On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
-> > > > > > > > > > > > > > > We do test on a virtio scsi device (/dev/sda) and the default mq
-> > > > > > > > > > > > > > > scheduler is 'none'. We found a IO hung as following:
-> > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > blk_finish_plug
-> > > > > > > > > > > > > > >          blk_mq_plug_issue_direct
-> > > > > > > > > > > > > > >              scsi_mq_get_budget
-> > > > > > > > > > > > > > >              //get budget_token fail and sdev->restarts=1
-> > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > > 			     	 scsi_end_request
-> > > > > > > > > > > > > > > 				   scsi_run_queue_async
-> > > > > > > > > > > > > > >                                           //sdev->restart=0 and run queue
-> > > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > >             blk_mq_request_bypass_insert
-> > > > > > > > > > > > > > >                //add request to hctx->dispatch list
-> > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > Here the issue shouldn't be related with scsi's get budget or
-> > > > > > > > > > > > > > scsi_run_queue_async.
-> > > > > > > > > > > > > > 
-> > > > > > > > > > > > > > If blk-mq adds request into ->dispatch_list, it is blk-mq core's
-> > > > > > > > > > > > > > responsibility to re-run queue for moving on. Can you investigate a
-> > > > > > > > > > > > > > bit more why blk-mq doesn't run queue after adding request to
-> > > > > > > > > > > > > > hctx dispatch list?
-> > > > > > > > > > > > > 
-> > > > > > > > > > > > > I think Yufen is probably thinking about the following Concurrent
-> > > > > > > > > > > > > scenario:
-> > > > > > > > > > > > > 
-> > > > > > > > > > > > > blk_mq_flush_plug_list
-> > > > > > > > > > > > > # assume there are three rq
-> > > > > > > > > > > > >        blk_mq_plug_issue_direct
-> > > > > > > > > > > > >         blk_mq_request_issue_directly
-> > > > > > > > > > > > >         # dispatch rq1, succeed
-> > > > > > > > > > > > >         blk_mq_request_issue_directly
-> > > > > > > > > > > > >         # dispatch rq2
-> > > > > > > > > > > > >          __blk_mq_try_issue_directly
-> > > > > > > > > > > > >           blk_mq_get_dispatch_budget
-> > > > > > > > > > > > >            scsi_mq_get_budget
-> > > > > > > > > > > > >             atomic_inc(&sdev->restarts);
-> > > > > > > > > > > > >             # rq2 failed to get budget
-> > > > > > > > > > > > >             # restarts is 1 now
-> > > > > > > > > > > > >                                               scsi_end_request
-> > > > > > > > > > > > >                                               # rq1 is completed
-> > > > > > > > > > > > >                                               ┊scsi_run_queue_async
-> > > > > > > > > > > > >                                               ┊ atomic_cmpxchg(&sdev->restarts,
-> > > > > > > > > > > > > old, 0) == old
-> > > > > > > > > > > > >                                               ┊ # set restarts to 0
-> > > > > > > > > > > > >                                               ┊ blk_mq_run_hw_queues
-> > > > > > > > > > > > >                                               ┊ # hctx->dispatch list is empty
-> > > > > > > > > > > > >         blk_mq_request_bypass_insert
-> > > > > > > > > > > > >         # insert rq2 to hctx->dispatch list
-> > > > > > > > > > > > 
-> > > > > > > > > > > > After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
-> > > > > > > > > > > > no matter if list_empty(list) is empty or not, queue will be run either from
-> > > > > > > > > > > > blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
-> > > > > > > > > > > 
-> > > > > > > > > > > 1) while inserting rq2 to dispatch list, blk_mq_request_bypass_insert()
-> > > > > > > > > > > is called from blk_mq_try_issue_list_directly(), list_empty() won't
-> > > > > > > > > > > pass, thus thus blk_mq_request_bypass_insert() won't run queue.
-> > > > > > > > > > 
-> > > > > > > > > > Yeah, but in blk_mq_try_issue_list_directly() after rq2 is inserted to dispatch
-> > > > > > > > > > list, the loop is broken and blk_mq_try_issue_list_directly() returns to
-> > > > > > > > > > blk_mq_sched_insert_requests() in which list_empty() is false, so
-> > > > > > > > > > blk_mq_insert_requests() and blk_mq_run_hw_queue() are called, queue
-> > > > > > > > > > is still run.
-> > > > > > > > > > 
-> > > > > > > > > > Also not sure why you make rq3 involved, since the list is local list on
-> > > > > > > > > > stack, and it can be operated concurrently.
-> > > > > > > > > 
-> > > > > > > > > I make rq3 involved because there are some conditions that
-> > > > > > > > > blk_mq_insert_requests() and blk_mq_run_hw_queue() won't be called from
-> > > > > > > > > blk_mq_sched_insert_requests():
-> > > > > > > > 
-> > > > > > > > The two won't be called if list_empty() is true, and will be called if
-> > > > > > > > !list_empty().
-> > > > > > > > 
-> > > > > > > > That is why I mentioned run queue has been done after rq2 is added to
-> > > > > > > > ->dispatch_list.
-> > > > > > > 
-> > > > > > > I don't follow here, it's right after rq2 is inserted to dispatch list,
-> > > > > > > list is not empty, and blk_mq_sched_insert_requests() will be called.
-> > > > > > > However, do you think that it's impossible that
-> > > > > > > blk_mq_sched_insert_requests() can dispatch rq in the list and list
-> > > > > > > will become empty?
-> > > > > > 
-> > > > > > Please take a look at blk_mq_sched_insert_requests().
-> > > > > > 
-> > > > > > When codes runs into blk_mq_sched_insert_requests(), the following
-> > > > > > blk_mq_run_hw_queue() will be run always, how does list empty or not
-> > > > > > make a difference there?
-> > > > > 
-> > > > > This is strange, always blk_mq_run_hw_queue() is exactly what Yufen
-> > > > > tries to do in this patch, are we look at different code?
-> > > > 
-> > > > No.
-> > > > 
-> > > > > 
-> > > > > I'm copying blk_mq_sched_insert_requests() here, the code is from
-> > > > > latest linux-next:
-> > > > > 
-> > > > > 461 void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
-> > > > > 462                                 ┊ struct blk_mq_ctx *ctx,
-> > > > > 463                                 ┊ struct list_head *list, bool
-> > > > > run_queue_async)
-> > > > > 464 {
-> > > > > 465         struct elevator_queue *e;
-> > > > > 466         struct request_queue *q = hctx->queue;
-> > > > > 467
-> > > > > 468         /*
-> > > > > 469         ┊* blk_mq_sched_insert_requests() is called from flush plug
-> > > > > 470         ┊* context only, and hold one usage counter to prevent queue
-> > > > > 471         ┊* from being released.
-> > > > > 472         ┊*/
-> > > > > 473         percpu_ref_get(&q->q_usage_counter);
-> > > > > 474
-> > > > > 475         e = hctx->queue->elevator;
-> > > > > 476         if (e) {
-> > > > > 477                 e->type->ops.insert_requests(hctx, list, false);
-> > > > > 478         } else {
-> > > > > 479                 /*
-> > > > > 480                 ┊* try to issue requests directly if the hw queue isn't
-> > > > > 481                 ┊* busy in case of 'none' scheduler, and this way may
-> > > > > save
-> > > > > 482                 ┊* us one extra enqueue & dequeue to sw queue.
-> > > > > 483                 ┊*/
-> > > > > 484                 if (!hctx->dispatch_busy && !run_queue_async) {
-> > > > > 485                         blk_mq_run_dispatch_ops(hctx->queue,
-> > > > > 486                                 blk_mq_try_issue_list_directly(hctx,
-> > > > > list));
-> > > > > 487                         if (list_empty(list))
-> > > > > 488                                 goto out;
-> > > > > 489                 }
-> > > > > 490                 blk_mq_insert_requests(hctx, ctx, list);
-> > > > > 491         }
-> > > > > 492
-> > > > > 493         blk_mq_run_hw_queue(hctx, run_queue_async);
-> > > > > 494  out:
-> > > > > 495         percpu_ref_put(&q->q_usage_counter);
-> > > > > 496 }
-> > > > > 
-> > > > > Here in line 487, if list_empty() is true, out label will skip
-> > > > > run_queue().
-> > > > 
-> > > > If list_empty() is true, run queue is guaranteed to run
-> > > > in blk_mq_try_issue_list_directly() in case that BLK_STS_*RESOURCE
-> > > > is returned from blk_mq_request_issue_directly().
-> > > > 
-> > > > 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
-> > > > 		if (ret != BLK_STS_OK) {
-> > > > 			if (ret == BLK_STS_RESOURCE ||
-> > > > 					ret == BLK_STS_DEV_RESOURCE) {
-> > > > 				blk_mq_request_bypass_insert(rq, false,
-> > > > 							list_empty(list));	//run queue
-> > > > 				break;
-> > > > 			}
-> > > > 			blk_mq_end_request(rq, ret);
-> > > > 			errors++;
-> > > > 		} else
-> > > > 			queued++;
-> > > > 
-> > > > So why do you try to add one extra run queue?
-> > > 
-> > > Hi, Ming
-> > > 
-> > > Perhaps I didn't explain the scenario clearly, please notice that list
-> > > contain three rq is required.
-> > > 
-> > > 1) rq1 is dispatched successfuly
-> > > 2) rq2 failed to dispatch due to no budget, in this case
-> > >     - rq2 will insert to dispatch list
-> > >     - list is not emply yet, run queue won't called
-> > 
-> > In the case, blk_mq_try_issue_list_directly() returns to
-> > blk_mq_sched_insert_requests() immediately, then blk_mq_insert_requests()
-> > and blk_mq_run_hw_queue() will be run from blk_mq_sched_insert_requests()
-> > because the list isn't empty.
-> > 
-> > Right?
-> > 
-> 
-> hi Ming,
-> 
-> Here rq2 fail from blk_mq_plug_issue_direct() in blk_mq_flush_plug_list(),
-> not blk_mq_sched_insert_requests
+Hi Shin'ichiro
 
-OK, just wondering why Yufen's patch touches
-blk_mq_sched_insert_requests().
+This change introduced one new issue that the offline operation will
+be skipped when there are more than one test devs.
 
-Here the issue is in blk_mq_plug_issue_direct() itself, it is wrong to use last
-request of plug list to decide if run queue is needed since all the remained
-requests in plug list may be from other hctxs, and the simplest fix could be pass
-run_queue as true always to blk_mq_request_bypass_insert().
+# cat config
+TEST_DEVS=(/dev/nvme0n1 /dev/nvme1n1 /dev/nvme2n1)
+# ./check block/008
+block/008 => nvme0n1 (do IO while hotplugging CPUs)          [passed]
+    read iops  336729   ...  343317
+    runtime    12.791s  ...  12.498s
+block/008 => nvme1n1 (do IO while hotplugging CPUs)          [failed]
+    read iops          ...
+    runtime    0.225s  ...  0.225s
+    --- tests/block/008.out 2022-07-26 01:26:32.733912082 -0400
+    +++ /mnt/tests/kernel/storage/SSD/nvme_blktest/blktests/results/nvme1n1/block/008.out.bad
+2022-07-26 04:29:01.940374953 -0400
+    @@ -1,2 +1,3 @@
+     Running block/008
+    +Failed to offline CPU: offlining cpu but RESTORE_CPUS_ONLINE is not set
+     Test complete
+block/008 => nvme2n1 (do IO while hotplugging CPUs)          [failed]
+    read iops          ...
+    runtime    0.231s  ...  0.231s
+    --- tests/block/008.out 2022-07-26 01:26:32.733912082 -0400
+    +++ /mnt/tests/kernel/storage/SSD/nvme_blktest/blktests/results/nvme2n1/block/008.out.bad
+2022-07-26 04:29:02.210381850 -0400
+    @@ -1,2 +1,3 @@
+     Running block/008
+    +Failed to offline CPU: offlining cpu but RESTORE_CPUS_ONLINE is not set
+     Test complete
+
+On Tue, Jul 19, 2022 at 11:04 AM Shin'ichiro Kawasaki
+<shinichiro.kawasaki@wdc.com> wrote:
+>
+> The helper function _offline_cpu() sets a value to RESTORE_CPUS_ONLINE.
+> However, the commit bd6b882b2650 ("block/008: check CPU offline failure
+> due to many IRQs") put _offline_cpu() call in sub-shell, then the set
+> value to RESTORE_CPUS_ONLINE no longer affects function caller's
+> environment. This resulted in off-lined CPUs not restored by _cleanup()
+> when the test case block/008 calls only _offline_cpu() and does not call
+> _online_cpu().
+>
+> To fix the issue, set RESTORE_CPUS_ONLINE in _have_cpu_hotplug() in
+> place of _offline_cpu(). _have_cpu_hotplug() is less likely to be called
+> in sub-shell. In same manner, do not set RESTORE_CPUS_ONLINE in
+> _online_cpu() either. Check that RESTORE_CPUS_ONLINE is set in
+> _offline_cpu() to avoid unexpected CPUs left off-lined. This check also
+> avoids a shellcheck warning.
+>
+> Fixes: bd6b882b2650 ("block/008: check CPU offline failure due to many IRQs")
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> ---
+> Changes from v1:
+> * Change fix approach: fix _offline_cpu() instaed of block/008 test script.
+>
+>  common/cpuhotplug | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/common/cpuhotplug b/common/cpuhotplug
+> index 7facd0d..e91c3bc 100644
+> --- a/common/cpuhotplug
+> +++ b/common/cpuhotplug
+> @@ -27,17 +27,20 @@ _have_cpu_hotplug() {
+>                 SKIP_REASONS+=("CPU hotplugging is not supported")
+>                 return 1
+>         fi
+> +
+> +       RESTORE_CPUS_ONLINE=1
+>         return 0
+>  }
+>
+>  _online_cpu() {
+> -       # shellcheck disable=SC2034
+> -       RESTORE_CPUS_ONLINE=1
+>         echo 1 > "/sys/devices/system/cpu/cpu$1/online"
+>  }
+>
+>  _offline_cpu() {
+> -       # shellcheck disable=SC2034
+> -       RESTORE_CPUS_ONLINE=1
+> +       if [[ -z ${RESTORE_CPUS_ONLINE} ]]; then
+> +               echo "offlining cpu but RESTORE_CPUS_ONLINE is not set"
+> +               return 1
+> +       fi
+> +
+>         echo 0 > "/sys/devices/system/cpu/cpu$1/online"
+>  }
+> --
+> 2.36.1
+>
 
 
-Thanks,
-Ming
+-- 
+Best Regards,
+  Yi Zhang
 
