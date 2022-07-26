@@ -2,41 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD09C43334
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 03:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 382D4C43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 03:31:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231755AbiGZDba (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jul 2022 23:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39570 "EHLO
+        id S237547AbiGZDbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jul 2022 23:31:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231236AbiGZDb2 (ORCPT
+        with ESMTP id S237463AbiGZDbs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jul 2022 23:31:28 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E83E1EAD7
-        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 20:31:27 -0700 (PDT)
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LsMmN1DhRzWfGn;
-        Tue, 26 Jul 2022 11:27:32 +0800 (CST)
-Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+        Mon, 25 Jul 2022 23:31:48 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310F22A71B
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 20:31:40 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4LsMnq0PXNz1M8MX;
+        Tue, 26 Jul 2022 11:28:47 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 26 Jul 2022 11:31:25 +0800
-Received: from [10.174.177.235] (10.174.177.235) by
- dggpeml500009.china.huawei.com (7.185.36.209) with Microsoft SMTP Server
+ 15.1.2375.24; Tue, 26 Jul 2022 11:31:36 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 26 Jul 2022 11:31:24 +0800
-Message-ID: <695b7ef3-d0c8-b1db-c63b-ca1e029c4c03@huawei.com>
-Date:   Tue, 26 Jul 2022 11:31:23 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
+ 15.1.2375.24; Tue, 26 Jul 2022 11:31:35 +0800
 Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
  plug list
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai3@huawei.com>
-CC:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <hch@lst.de>,
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Yu Kuai <yukuai1@huaweicloud.com>, Yufen Yu <yuyufen@huawei.com>,
+        <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <hch@lst.de>,
         "zhangyi (F)" <yi.zhang@huawei.com>
 References: <YtZ4uSRqR/kLdqm+@T590>
  <0baa5b04-7194-54fa-08a5-51425601343e@huaweicloud.com>
@@ -45,21 +39,24 @@ References: <YtZ4uSRqR/kLdqm+@T590>
  <Yt9SMuSlCtwwzyEz@T590> <f91f136c-f109-3027-a666-29fe882d3426@huawei.com>
  <Yt9ZOFtzm9kfKWhc@T590> <6b070c7d-473a-cc96-def3-49826ca08aea@huawei.com>
  <Yt9duWU0Ez/uZIym@T590>
-From:   Yufen Yu <yuyufen@huawei.com>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <e77fbe38-3cf5-2074-4875-eb3e1df55807@huawei.com>
+Date:   Tue, 26 Jul 2022 11:31:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
 In-Reply-To: <Yt9duWU0Ez/uZIym@T590>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.177.235]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500009.china.huawei.com (7.185.36.209)
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022/7/26 11:21, Ming Lei wrote:
+在 2022/07/26 11:21, Ming Lei 写道:
 > On Tue, Jul 26, 2022 at 11:14:23AM +0800, Yu Kuai wrote:
 >> Hi, Ming
 >>
@@ -222,10 +219,6 @@ On 2022/7/26 11:21, Ming Lei wrote:
 > If list_empty() is true, run queue is guaranteed to run
 > in blk_mq_try_issue_list_directly() in case that BLK_STS_*RESOURCE
 > is returned from blk_mq_request_issue_directly().
-
-If request issue success here, this what I say in my patch.
-Then no one run queue.
-
 > 
 > 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
 > 		if (ret != BLK_STS_OK) {
@@ -241,9 +234,18 @@ Then no one run queue.
 > 			queued++;
 > 
 > So why do you try to add one extra run queue?
-> 
-> 
-> Thanks,
-> Ming
-> 
-> .
+
+Hi, Ming
+
+Perhaps I didn't explain the scenario clearly, please notice that list
+contain three rq is required.
+
+1) rq1 is dispatched successfuly
+2) rq2 failed to dispatch due to no budget, in this case
+    - rq2 will insert to dispatch list
+    - list is not emply yet, run queue won't called
+3) finally, blk_mq_sched_insert_requests() dispatch rq3 successfuly,
+and list will become empty, thus run queue still won't be called.
+
+Thanks,
+Kuai
