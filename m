@@ -2,73 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AFDAC00144
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 15:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5113DC3F6B0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 15:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239303AbiGZPuO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 11:50:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44004 "EHLO
+        id S234171AbiGZPzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 11:55:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239241AbiGZPuL (ORCPT
+        with ESMTP id S233208AbiGZPz1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 11:50:11 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7431BD0
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 08:50:09 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id v5-20020a5d9405000000b0067c98e0011dso2397701ion.1
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 08:50:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=9GYqC1SZgEt4OU0y/SLneyFSp1BWvBVjECk5yA8DcYM=;
-        b=2Urt9RdH2Ez4DrJ2J0bM1zhhGNQ5YsL6z/mc/Fs084uVX/QgFb1TReuUmj7TIV5zS2
-         FjjCbSOzNy+ls9yrUwSg1Xy1kXboOVUA0Un1XgJlVTcv62Aj0TcO6y5QpYwZlSgsvRSL
-         ITF8bu0dEyTs/eMiVHJGshnJ3xLOmCbOcFnys+e+7cDE6p8JuSNrNCDqFuN638YAPfg0
-         zTnsnePIo0TtNXFDuFDX65rUWAt5gZrY0utaUbcP2TAQeFfgPiF0ZcoGh7noh1ZrfX3U
-         OPhQRXgpVnzwRwnCkZlab5JomOTidRjvjsY3xQd/Z69qzEpyL8RsZBUi4hAkswPEqdws
-         uHlQ==
-X-Gm-Message-State: AJIora8+kOMuhSPtQaYm192x/qpdR08g5kBuToEcikd9MxyAUKa680PX
-        QKimb8WaNkiZRxAopZuJvp/McNLbVQVOkM1Z5QMGeVurXdo4
-X-Google-Smtp-Source: AGRyM1vBd0kqUwkUfm5c1V+ohC7MFmfH5XMdmZakPq54XdOfuY0OBKqF5lk3fVr3SxlyFz09/GlrCA3SVG/TcLfJN1P1MSUnspC3
+        Tue, 26 Jul 2022 11:55:27 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9ADAE37;
+        Tue, 26 Jul 2022 08:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=Ms6Eo/4vk2U2FvUSJ1ASbG7HxuQl+uR0mXnaHaYNTv4=; b=NrrgVQUsop8jszUXB0cv9CDrL+
+        fdEfO5urrJbCJWNS1Iq22L1BvAroUNoor2CQLfdd2fNdrd3IpBRHKvsxSYOo0vvWmym8s+v4433IL
+        y1rGN9rbsQ+UvIDbRjl0eOWA1J1Qc4CPH33eBIJYfVPowrgNDYqlXANBYBSkVqIHAY8T5hiM3eVzj
+        bzA9109KtzluUUx/kVOjSvMQWDprJiiWIwyH2jZiYrOkhSLoqIahhj2e9nvvPHfP6OEWaepTh3iLQ
+        9EDAlLY/HgG/NpsGsYFpP2sAW6PiYh6LvI5jOulinFHwJ3MJcCIZZSwUI6umqKiVvyjyiGmC/P1g4
+        7WdDWlCQ==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1oGMtz-000rlz-Bq; Tue, 26 Jul 2022 09:55:20 -0600
+Message-ID: <a9a1641a-aa5c-ce29-e4a4-c266f4494004@deltatee.com>
+Date:   Tue, 26 Jul 2022 09:55:13 -0600
 MIME-Version: 1.0
-X-Received: by 2002:a6b:3ec2:0:b0:67c:6baf:a51f with SMTP id
- l185-20020a6b3ec2000000b0067c6bafa51fmr6408311ioa.160.1658850609194; Tue, 26
- Jul 2022 08:50:09 -0700 (PDT)
-Date:   Tue, 26 Jul 2022 08:50:09 -0700
-In-Reply-To: <00000000000026864605c611cc51@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004bee3605e4b74106@google.com>
-Subject: Re: [syzbot] INFO: rcu detected stall in net_tx_action
-From:   syzbot <syzbot+3ba0493d523d007b3819@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, cgroups@vger.kernel.org, fweisbec@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, mingo@kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, tglx@linutronix.de, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-CA
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        iommu@lists.linux.dev, Stephen Bates <sbates@raithlin.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>
+References: <20220708165104.5005-1-logang@deltatee.com>
+ <20220726112906.GA2169@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20220726112906.GA2169@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: hch@lst.de, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, iommu@lists.linux.dev, sbates@raithlin.com, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v8 00/13] DMA Mapping P2PDMA Pages
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
 
-commit 0a9a25ca78437b39e691bcc3dc8240455b803d8d
-Author: Ming Lei <ming.lei@redhat.com>
-Date:   Fri Mar 18 13:01:43 2022 +0000
 
-    block: let blkcg_gq grab request queue's refcnt
+On 2022-07-26 05:29, Christoph Hellwig wrote:
+> I've applied this to the dma-mapping for-next branch.
+> 
+> I'd have liked a review from Robin, but as he seems to be out and the
+> rework was to fit his comments I'd rather have us unblocked before
+> the end of the merge window.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1004f05a080000
-start commit:   d6765985a42a Revert "be2net: disable bh with spin_lock in ..
-git tree:       net
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7ca96a2d153c74b0
-dashboard link: https://syzkaller.appspot.com/bug?extid=3ba0493d523d007b3819
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14c9edc8300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=172463c8300000
+Great thanks! If Robin has some feedback when he gets back I'd be happy
+to make a couple more cleanup patches.
 
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: block: let blkcg_gq grab request queue's refcnt
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Logan
