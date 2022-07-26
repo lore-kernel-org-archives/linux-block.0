@@ -2,610 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0585CCCA48B
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 12:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3B7C43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 12:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233319AbiGZMcb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 08:32:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37380 "EHLO
+        id S233745AbiGZMyQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 08:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233180AbiGZMcb (ORCPT
+        with ESMTP id S233370AbiGZMyN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 08:32:31 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F3D24BE6
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 05:32:28 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8E27168AA6; Tue, 26 Jul 2022 14:32:24 +0200 (CEST)
-Date:   Tue, 26 Jul 2022 14:32:24 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: Re: [PATCH 1/2] ublk_drv: store device parameters
-Message-ID: <20220726123224.GA9435@lst.de>
-References: <20220723150713.750369-1-ming.lei@redhat.com> <20220723150713.750369-2-ming.lei@redhat.com> <20220725064259.GA20796@lst.de> <Yt5BCtLi70Pits34@T590>
+        Tue, 26 Jul 2022 08:54:13 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A881EAF1;
+        Tue, 26 Jul 2022 05:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658840052; x=1690376052;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XTPxGAICxEWFhnYWflofvTlfguVuwOZweDno0+oKceE=;
+  b=YzU/s78boRoqoVCWzkJGGc+onhvDf4nHCbHDKFeNF8tCq1lbNkHsT3Jm
+   J4mdsXgXSe7zhSJ3GGBZloCzMjHUXvma45rXILabvDUgVn3+9vmAvDRaZ
+   kK0rif2uXCo+XH7Cnag5MTzxG7GQxAMlNkOIj9CrSjqzc2+aaCDFznGqD
+   WhGFzYap8tomqNvonel5eLuJIRDr4Ckl2aA2ImG2XB69XYGosds3EfdCG
+   FcSqgYY2TZzk5Sm3s3rf/sRIhDAjEkuja6uMcEAIqyrLJR4veTIRXPbDW
+   IU+ElkEu4h7dLHSNzOTA63G2p3WtG7nm0yqNaqvhw7UBg/47ODuwsJwil
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10419"; a="351937734"
+X-IronPort-AV: E=Sophos;i="5.93,193,1654585200"; 
+   d="scan'208";a="351937734"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2022 05:54:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,193,1654585200"; 
+   d="scan'208";a="627887764"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 26 Jul 2022 05:54:10 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oGK4f-0006oy-2d;
+        Tue, 26 Jul 2022 12:54:09 +0000
+Date:   Tue, 26 Jul 2022 20:53:12 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Michael Schmitz <schmitzmic@gmail.com>,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     kbuild-all@lists.01.org, linux-m68k@vger.kernel.org,
+        geert@linux-m68k.org, Michael Schmitz <schmitzmic@gmail.com>
+Subject: Re: [PATCH v8 2/2] block: add overflow checks for Amiga partition
+ support
+Message-ID: <202207262047.yRImNV4v-lkp@intel.com>
+References: <20220726045747.4779-3-schmitzmic@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yt5BCtLi70Pits34@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220726045747.4779-3-schmitzmic@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jul 25, 2022 at 03:06:50PM +0800, Ming Lei wrote:
-> There could be more parameters than the two types(), such as segments,
-> zoned, ..., also in future, feature related parameters can be added
-> in this way too, and most of them are optional.
+Hi Michael,
 
-Yes.  But just having a struct that grows is much cleaner and simpler
-than those indirections.  e.g something like this patch on top of this
-series.  With this new fields can just be added to the end of
-struct ublk_params.  Old kernels will ignore them, but due to the copy
-back of the parsed structure userspace can detect that if it cares:
+I love your patch! Perhaps something to improve:
 
- drivers/block/ublk_drv.c      |  320 +++++++++++++++------------------------------------------------------------------
- include/uapi/linux/ublk_cmd.h |   67 ++++++----------
- 2 files changed, 85 insertions(+), 302 deletions(-)
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v5.19-rc8 next-20220725]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 83fd65d8a2051..f9db59af12752 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -137,7 +137,7 @@ struct ublk_device {
- 	spinlock_t		mm_lock;
- 	struct mm_struct	*mm;
- 
--	struct xarray		paras;
-+	struct ublk_params	params;
- 
- 	struct completion	completion;
- 	unsigned int		nr_queues_ready;
-@@ -151,16 +151,6 @@ struct ublk_device {
- 	struct work_struct	stop_work;
- };
- 
--typedef int (ublk_para_validate)(const struct ublk_device *,
--		const struct ublk_para_header *);
--typedef void (ublk_para_apply)(struct ublk_device *ub,
--		const struct ublk_para_header *);
--
--struct ublk_para_ops {
--	ublk_para_validate *validate_fn;
--	ublk_para_apply *apply_fn;
--};
--
- static dev_t ublk_chr_devt;
- static struct class *ublk_chr_class;
- 
-@@ -172,231 +162,69 @@ static DEFINE_MUTEX(ublk_ctl_mutex);
- 
- static struct miscdevice ublk_misc;
- 
--static int ublk_dev_para_basic_validate(const struct ublk_device *ub,
--		const struct ublk_para_header *header)
-+static void ublk_init_default_params(struct ublk_device *ub)
- {
--	const struct ublk_basic_para *p = (struct ublk_basic_para *)header;
-+	struct ublk_params *p = &ub->params;
-+	struct ublksrv_ctrl_dev_info *info = &ub->dev_info;
- 
--	if (p->logical_bs_shift > PAGE_SHIFT)
--		return -EINVAL;
-+	p->logical_bs_shift = ilog2(info->block_size);
-+	p->physical_bs_shift = ilog2(info->block_size);
-+	p->io_opt_shift = ilog2(info->block_size);
-+	p->io_min_shift = ilog2(info->block_size);
- 
--	if (p->logical_bs_shift > p->physical_bs_shift)
--		return -EINVAL;
-+	p->max_sectors = info->rq_max_blocks << (ub->bs_shift - 9);
-+	p->dev_sectors = info->dev_blocks << (ub->bs_shift - 9);
- 
--	return 0;
-+	p->discard_granularity = PAGE_SIZE;
-+	p->max_discard_sectors = UINT_MAX >> 9;
-+	p->max_write_zeroes_sectors = UINT_MAX >> 9;
-+	p->max_discard_segments = 1;
- }
- 
--static void ublk_dev_para_basic_apply(struct ublk_device *ub,
--		const struct ublk_para_header *header)
-+static int ublk_params_apply(const struct ublk_device *ub,
-+		struct ublk_params *p)
- {
- 	struct request_queue *q = ub->ub_disk->queue;
--	const struct ublk_basic_para *p = (struct ublk_basic_para *)header;
-+
-+	if (p->logical_bs_shift > PAGE_SHIFT)
-+		return -EINVAL;
-+	if (p->logical_bs_shift > p->physical_bs_shift)
-+		return -EINVAL;
-+
-+	/* For now only single segment discards are supported */
-+	if (p->max_discard_sectors && p->max_discard_segments != 1)
-+		return -EINVAL;
- 
- 	blk_queue_logical_block_size(q, 1 << p->logical_bs_shift);
- 	blk_queue_physical_block_size(q, 1 << p->physical_bs_shift);
- 	blk_queue_io_min(q, 1 << p->io_min_shift);
- 	blk_queue_io_opt(q, 1 << p->io_opt_shift);
- 
--	blk_queue_write_cache(q, p->write_back_cache, p->fua);
--	if (!p->rotational)
--		blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
--	else
-+	blk_queue_write_cache(q, p->attrs & UBLK_ATTR_VOLATILE_CACHE,
-+			p->attrs & UBLK_ATTR_FUA);
-+	if (p->attrs & UBLK_ATTR_ROTATIONAL)
- 		blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
-+	else
-+		blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
- 
- 	blk_queue_max_hw_sectors(q, p->max_sectors);
- 	blk_queue_chunk_sectors(q, p->chunk_sectors);
- 	blk_queue_virt_boundary(q, p->virt_boundary_mask);
- 
--	if (p->read_only)
-+	if (p->attrs & UBLK_ATTR_READ_ONLY)
- 		set_disk_ro(ub->ub_disk, true);
- 
- 	set_capacity(ub->ub_disk, p->dev_sectors);
--}
--
--static int ublk_dev_para_discard_validate(const struct ublk_device *ub,
--		const struct ublk_para_header *header)
--{
--	const struct ublk_discard_para *p = (struct ublk_discard_para *)header;
--
--	/* So far, only support single segment discard */
--	if (p->max_discard_sectors && p->max_discard_segments != 1)
--		return -EINVAL;
--	return 0;
--}
--
--static void ublk_dev_para_discard_apply(struct ublk_device *ub,
--		const struct ublk_para_header *header)
--{
--	struct request_queue *q = ub->ub_disk->queue;
--	const struct ublk_discard_para *p = (struct ublk_discard_para *)
--		header;
- 
--	q->limits.discard_alignment = p->discard_alignment;
-+	q->limits.discard_alignment = p->discard_alignment_offset;
- 	q->limits.discard_granularity = p->discard_granularity;
- 	blk_queue_max_discard_sectors(q, p->max_discard_sectors);
- 	blk_queue_max_write_zeroes_sectors(q,
- 			p->max_write_zeroes_sectors);
- 	blk_queue_max_discard_segments(q, p->max_discard_segments);
--}
--
--static const unsigned int para_len[] = {
--	[UBLK_PARA_TYPE_BASIC] = sizeof(struct ublk_basic_para),
--	[UBLK_PARA_TYPE_DISCARD] = sizeof(struct ublk_discard_para),
--};
--
--static const struct ublk_para_ops para_ops[] = {
--	[UBLK_PARA_TYPE_BASIC] = {
--		.validate_fn = ublk_dev_para_basic_validate,
--		.apply_fn = ublk_dev_para_basic_apply,
--	},
--	[UBLK_PARA_TYPE_DISCARD] = {
--		.validate_fn = ublk_dev_para_discard_validate,
--		.apply_fn = ublk_dev_para_discard_apply,
--	},
--};
--
--static void ublk_update_dev_sectors(struct ublk_device *ub,
--		sector_t sectors)
--{
--	struct ublk_basic_para  *p = xa_load(&ub->paras,
--			UBLK_PARA_TYPE_BASIC);
--
--	if (p)
--		p->dev_sectors = (__u64)sectors;
--}
--
--static struct ublk_para_header *ublk_alloc_def_basic_para(
--		struct ublk_device *ub)
--{
--	struct ublk_basic_para  *p = kzalloc(sizeof(*p), GFP_KERNEL);
--	struct ublksrv_ctrl_dev_info *info = &ub->dev_info;
--
--	if (!p)
--		return NULL;
--
--	p->header.type = UBLK_PARA_TYPE_BASIC;
--	p->header.len = sizeof(*p);
--	p->logical_bs_shift = ilog2(info->block_size);
--	p->physical_bs_shift = ilog2(info->block_size);
--	p->io_opt_shift = ilog2(info->block_size);
--	p->io_min_shift = ilog2(info->block_size);
--	p->rotational = 0;
--	p->write_back_cache = 0;
--	p->fua = 0;
--	p->read_only = 0;
--
--	p->max_sectors = info->rq_max_blocks << (ub->bs_shift - 9);
--	p->chunk_sectors = 0;
--	p->virt_boundary_mask = 0;
--	p->dev_sectors = info->dev_blocks << (ub->bs_shift - 9);
--
--	return (struct ublk_para_header *)p;
--}
--
--static struct ublk_para_header *ublk_alloc_def_discard_para(
--		struct ublk_device *ub)
--{
--	struct ublk_discard_para  *p = kzalloc(sizeof(*p), GFP_KERNEL);
--
--	if (!p)
--		return NULL;
--
--	p->header.type = UBLK_PARA_TYPE_DISCARD;
--	p->header.len = sizeof(*p);
--
--	p->discard_alignment =	0;
--	p->discard_granularity = PAGE_SIZE;
--	p->max_discard_sectors = UINT_MAX >> 9;
--	p->max_write_zeroes_sectors = UINT_MAX >> 9;
--	p->max_discard_segments = 1;
--
--	return (struct ublk_para_header *)p;
--}
--
--static int ublk_validate_para_header(const struct ublk_device *ub,
--		const struct ublk_para_header *h)
--{
--	if (h->type >= UBLK_PARA_TYPE_LAST)
--		return -EINVAL;
--
--	if (h->len != para_len[h->type])
--		return -EINVAL;
--
- 	return 0;
- }
- 
--
--static int ublk_validate_para(const struct ublk_device *ub,
--		const struct ublk_para_header *h)
--{
--	int ret = ublk_validate_para_header(ub, h);
--
--	if (ret)
--		return ret;
--
--	if (para_ops[h->type].validate_fn)
--		return para_ops[h->type].validate_fn(ub, h);
--
--	return 0;
--}
--
--/* Old parameter with same type will be overridden */
--static int ublk_install_para(struct ublk_device *ub,
--		struct ublk_para_header *h)
--{
--	void *old;
--	int ret;
--
--	ret = ublk_validate_para(ub, h);
--	if (ret)
--		return ret;
--
--	old = xa_store(&ub->paras, h->type, h, GFP_KERNEL);
--	if (xa_is_err(old))
--		return xa_err(old);
--	kfree(old);
--	return 0;
--}
--
--static void ublk_apply_para(struct ublk_device *ub,
--		const struct ublk_para_header *h)
--{
--	if (para_ops[h->type].apply_fn)
--		para_ops[h->type].apply_fn(ub, h);
--}
--
--/* default parameters are allocated/installed before disk is allocated */
--static void ublk_install_def_paras(struct ublk_device *ub)
--{
--	struct ublk_para_header *h;
--
--	h = ublk_alloc_def_basic_para(ub);
--	if (h && ublk_install_para(ub, h))
--		kfree(h);
--
--	h = ublk_alloc_def_discard_para(ub);
--	if (h && ublk_install_para(ub, h))
--		kfree(h);
--}
--
--static void ublk_apply_paras(struct ublk_device *ub)
--{
--	struct ublk_para_header *h;
--	unsigned long type;
--
--	xa_for_each(&ub->paras, type, h)
--		ublk_apply_para(ub, h);
--}
--
--static void ublk_uninstall_paras(struct ublk_device *ub)
--{
--	unsigned long type;
--	void *p;
--
--	xa_for_each(&ub->paras, type, p)
--		kfree(p);
--}
--
- static inline bool ublk_can_use_task_work(const struct ublk_queue *ubq)
- {
- 	if (IS_BUILTIN(CONFIG_BLK_DEV_UBLK) &&
-@@ -1281,10 +1109,8 @@ static void ublk_cdev_rel(struct device *dev)
- 
- 	blk_mq_free_tag_set(&ub->tag_set);
- 	ublk_deinit_queues(ub);
--	ublk_uninstall_paras(ub);
- 	ublk_free_dev_number(ub);
- 	mutex_destroy(&ub->mutex);
--	xa_destroy(&ub->paras);
- 	kfree(ub);
- }
- 
-@@ -1397,8 +1223,7 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
- 	/* We may get disk size updated */
- 	if (dev_blocks) {
- 		ub->dev_info.dev_blocks = dev_blocks;
--		ublk_update_dev_sectors(ub,
--				dev_blocks << (ub->bs_shift - 9));
-+		ub->params.dev_sectors = dev_blocks << (ub->bs_shift - 9);
- 	}
- 
- 	disk = blk_mq_alloc_disk(&ub->tag_set, ub);
-@@ -1413,8 +1238,6 @@ static int ublk_ctrl_start_dev(struct io_uring_cmd *cmd)
- 	ub->dev_info.ublksrv_pid = ublksrv_pid;
- 	ub->ub_disk = disk;
- 
--	ublk_apply_paras(ub);
--
- 	get_device(&ub->cdev_dev);
- 	ret = add_disk(disk);
- 	if (ret) {
-@@ -1525,7 +1348,6 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	spin_lock_init(&ub->mm_lock);
- 	INIT_WORK(&ub->stop_work, ublk_stop_work_fn);
- 	INIT_DELAYED_WORK(&ub->monitor_work, ublk_daemon_monitor_work);
--	xa_init(&ub->paras);
- 
- 	ret = ublk_alloc_dev_number(ub, header->dev_id);
- 	if (ret < 0)
-@@ -1552,6 +1374,8 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 			ub->dev_info.nr_hw_queues, nr_cpu_ids);
- 	ublk_align_max_io_size(ub);
- 
-+	ublk_init_default_params(ub);
-+
- 	ret = ublk_init_queues(ub);
- 	if (ret)
- 		goto out_free_dev_number;
-@@ -1569,9 +1393,6 @@ static int ublk_ctrl_add_dev(struct io_uring_cmd *cmd)
- 	 * ublk_add_chdev() will cleanup everything if it fails.
- 	 */
- 	ret = ublk_add_chdev(ub);
--	if (!ret)
--		ublk_install_def_paras(ub);
--
- 	goto out_unlock;
- 
- out_free_tag_set:
-@@ -1674,84 +1495,65 @@ static int ublk_ctrl_get_dev_info(struct io_uring_cmd *cmd)
- 	return ret;
- }
- 
--static int ublk_ctrl_get_para(struct io_uring_cmd *cmd)
-+static int ublk_ctrl_get_params(struct io_uring_cmd *cmd)
- {
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	size_t psize = min_t(size_t, sizeof(struct ublk_params), header->len);
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	struct ublk_device *ub;
--	struct ublk_para_header ph;
--	struct ublk_para_header *para = NULL;
- 	int ret = 0;
- 
--	if (header->len <= sizeof(ph) || !header->addr)
-+	if (!header->addr)
- 		return -EINVAL;
- 
- 	ub = ublk_get_device_from_id(header->dev_id);
- 	if (!ub)
- 		return -EINVAL;
- 
--	ret = -EFAULT;
--	if (copy_from_user(&ph, argp, sizeof(ph)))
--		goto out_put;
--
--	ret = ublk_validate_para_header(ub, &ph);
--	if (ret)
--		goto out_put;
--
- 	mutex_lock(&ub->mutex);
--	para = xa_load(&ub->paras, ph.type);
--	mutex_unlock(&ub->mutex);
--	if (!para)
--		ret = -EINVAL;
--	else if (copy_to_user(argp, para, ph.len))
-+	if (copy_to_user(argp, &ub->params, psize))
- 		ret = -EFAULT;
--out_put:
-+	mutex_unlock(&ub->mutex);
- 	ublk_put_device(ub);
- 	return ret;
- }
- 
--static int ublk_ctrl_set_para(struct io_uring_cmd *cmd)
-+static int ublk_ctrl_set_params(struct io_uring_cmd *cmd)
- {
- 	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	size_t psize = min_t(size_t, sizeof(struct ublk_params), header->len);
- 	void __user *argp = (void __user *)(unsigned long)header->addr;
- 	struct ublk_device *ub;
--	struct ublk_para_header ph;
--	struct ublk_para_header *para = NULL;
-+	struct ublk_params params = {};
- 	int ret = -EFAULT;
- 
--	if (header->len <= sizeof(ph) || !header->addr)
-+	if (!header->addr)
- 		return -EINVAL;
- 
- 	ub = ublk_get_device_from_id(header->dev_id);
- 	if (!ub)
- 		return -EINVAL;
- 
--	if (copy_from_user(&ph, argp, sizeof(ph)))
-+	if (copy_from_user(&params, argp, psize))
- 		goto out_put;
- 
--	ret = ublk_validate_para_header(ub, &ph);
-+	/* parameters can only be changed when device isn't live */
-+	mutex_lock(&ub->mutex);
-+	if (ub->dev_info.state == UBLK_S_DEV_LIVE) {
-+		ret = -EACCES;
-+		goto out_unlock;
-+	}
-+	ret = ublk_params_apply(ub, &params);
- 	if (ret)
--		goto out_put;
-+		goto out_unlock;
- 
--	para = kmalloc(ph.len, GFP_KERNEL);
--	if (!para) {
--		ret = -ENOMEM;
--	} else if (copy_from_user(para, argp, ph.len)) {
-+	/* copy back the paramters that were actually applied */
-+	if (copy_to_user(argp, &ub->params, psize))
- 		ret = -EFAULT;
--	} else {
--		/* parameters can only be changed when device isn't live */
--		mutex_lock(&ub->mutex);
--		if (ub->dev_info.state != UBLK_S_DEV_LIVE)
--			ret = ublk_install_para(ub, para);
--		else
--			ret = -EACCES;
--		mutex_unlock(&ub->mutex);
--	}
-+out_unlock:
-+	mutex_unlock(&ub->mutex);
- out_put:
- 	ublk_put_device(ub);
--	if (ret)
--		kfree(para);
--
- 	return ret;
- }
- 
-@@ -1790,11 +1592,11 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_CMD_GET_QUEUE_AFFINITY:
- 		ret = ublk_ctrl_get_queue_affinity(cmd);
- 		break;
--	case UBLK_CMD_GET_PARA:
--		ret = ublk_ctrl_get_para(cmd);
-+	case UBLK_CMD_GET_PARAMS:
-+		ret = ublk_ctrl_get_params(cmd);
- 		break;
--	case UBLK_CMD_SET_PARA:
--		ret = ublk_ctrl_set_para(cmd);
-+	case UBLK_CMD_SET_PARAMS:
-+		ret = ublk_ctrl_set_params(cmd);
- 		break;
- 	default:
- 		break;
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 0f7be73987551..ce406bbede082 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -15,8 +15,8 @@
- #define	UBLK_CMD_DEL_DEV		0x05
- #define	UBLK_CMD_START_DEV	0x06
- #define	UBLK_CMD_STOP_DEV	0x07
--#define	UBLK_CMD_SET_PARA	0x08
--#define	UBLK_CMD_GET_PARA	0x09
-+#define	UBLK_CMD_SET_PARAMS	0x08
-+#define	UBLK_CMD_GET_PARAMS	0x09
- 
- /*
-  * IO commands, issued by ublk server, and handled by ublk driver.
-@@ -160,47 +160,28 @@ struct ublksrv_io_cmd {
- 	__u64	addr;
- };
- 
--/* ublk device parameter definition */
--enum {
--	UBLK_PARA_TYPE_BASIC,
--	UBLK_PARA_TYPE_DISCARD,
--	UBLK_PARA_TYPE_LAST,
--};
--
--struct ublk_para_header {
--	__u16 type;
--	__u16 len;
--} __attribute__ ((__packed__));
--
--struct ublk_basic_para {
--	struct ublk_para_header  header;
--	__u32   logical_bs_shift:6;
--	__u32   physical_bs_shift:6;
--	__u32	io_opt_shift:6;
--	__u32	io_min_shift:6;
--	__u32	rotational:1;
--	__u32	write_back_cache:1;
--	__u32	fua:1;
--	__u32	read_only:1;
--	__u32	unused:4;
--
--	__u32	max_sectors;
--	__u32	chunk_sectors;
--
--	__u64   dev_sectors;
--	__u64   virt_boundary_mask;
--};
--
--struct ublk_discard_para {
--	struct ublk_para_header  header;
--	__u32	discard_alignment;
--
--	__u32	discard_granularity;
--	__u32	max_discard_sectors;
--
--	__u32	max_write_zeroes_sectors;
--	__u16	max_discard_segments;
--	__u16	reserved0;
-+struct ublk_params {
-+	__u32		attrs;
-+#define UBLK_ATTR_READ_ONLY		(1 << 0)
-+#define UBLK_ATTR_ROTATIONAL		(1 << 1)
-+#define UBLK_ATTR_VOLATILE_CACHE	(1 << 2)
-+#define UBLK_ATTR_FUA			(1 << 3)
-+	__u8		logical_bs_shift;
-+	__u8		physical_bs_shift;
-+	__u8		io_opt_shift;
-+	__u8		io_min_shift;
-+	__u32		max_sectors;
-+	__u32		chunk_sectors;
-+	__u64		dev_sectors;
-+	__u64		virt_boundary_mask;
-+
-+	__u32		discard_alignment_offset;
-+	__u32		discard_granularity;
-+	__u32		max_discard_sectors;
-+	__u32		max_write_zeroes_sectors;
-+	__u16		max_discard_segments;
-+	__u8		reserved0[6];
-+	/* keep this 8 byte aligned */
- };
- 
- #endif
+url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Schmitz/Amiga-RDB-partition-support-fixes/20220726-125830
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: sparc-randconfig-s041-20220724 (https://download.01.org/0day-ci/archive/20220726/202207262047.yRImNV4v-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 12.1.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/ccbc09d2b458d51ac395c4f8ea7cf703f6e83fdf
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Michael-Schmitz/Amiga-RDB-partition-support-fixes/20220726-125830
+        git checkout ccbc09d2b458d51ac395c4f8ea7cf703f6e83fdf
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=sparc SHELL=/bin/bash block/partitions/
 
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+sparse warnings: (new ones prefixed by >>)
+>> block/partitions/amiga.c:132:30: sparse: sparse: cast to restricted __be32
+   block/partitions/amiga.c:133:25: sparse: sparse: cast to restricted __be32
+
+vim +132 block/partitions/amiga.c
+
+    35	
+    36	int amiga_partition(struct parsed_partitions *state)
+    37	{
+    38		Sector sect;
+    39		unsigned char *data;
+    40		struct RigidDiskBlock *rdb;
+    41		struct PartitionBlock *pb;
+    42		u64 start_sect, nr_sects;
+    43		sector_t blk, end_sect;
+    44		u32 cylblk;		/* rdb_CylBlocks = nr_heads*sect_per_track */
+    45		u32 nr_hd, nr_sect, lo_cyl, hi_cyl;
+    46		int part, res = 0;
+    47		unsigned int blksize = 1;	/* Multiplier for disk block size */
+    48		int slot = 1;
+    49	
+    50		for (blk = 0; ; blk++, put_dev_sector(sect)) {
+    51			if (blk == RDB_ALLOCATION_LIMIT)
+    52				goto rdb_done;
+    53			data = read_part_sector(state, blk, &sect);
+    54			if (!data) {
+    55				pr_err("Dev %s: unable to read RDB block %llu\n",
+    56				       state->disk->disk_name, (u64) blk);
+    57				res = -1;
+    58				goto rdb_done;
+    59			}
+    60			if (*(__be32 *)data != cpu_to_be32(IDNAME_RIGIDDISK))
+    61				continue;
+    62	
+    63			rdb = (struct RigidDiskBlock *)data;
+    64			if (checksum_block((__be32 *)data, be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F) == 0)
+    65				break;
+    66			/* Try again with 0xdc..0xdf zeroed, Windows might have
+    67			 * trashed it.
+    68			 */
+    69			*(__be32 *)(data+0xdc) = 0;
+    70			if (checksum_block((__be32 *)data,
+    71					be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F)==0) {
+    72				pr_err("Trashed word at 0xd0 in block %llu ignored in checksum calculation\n",
+    73				       (u64) blk);
+    74				break;
+    75			}
+    76	
+    77			pr_err("Dev %s: RDB in block %llu has bad checksum\n",
+    78			       state->disk->disk_name, (u64) blk);
+    79		}
+    80	
+    81		/* blksize is blocks per 512 byte standard block */
+    82		blksize = be32_to_cpu( rdb->rdb_BlockBytes ) / 512;
+    83	
+    84		{
+    85			char tmp[7 + 10 + 1 + 1];
+    86	
+    87			/* Be more informative */
+    88			snprintf(tmp, sizeof(tmp), " RDSK (%d)", blksize * 512);
+    89			strlcat(state->pp_buf, tmp, PAGE_SIZE);
+    90		}
+    91		blk = be32_to_cpu(rdb->rdb_PartitionList);
+    92		put_dev_sector(sect);
+    93		for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
+    94			/* Read in terms partition table understands */
+    95			if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
+    96				pr_err("Dev %s: overflow calculating partition block %llu! Skipping partitions %u and beyond\n",
+    97					state->disk->disk_name, (u64) blk, part);
+    98				break;
+    99			}
+   100			data = read_part_sector(state, blk, &sect);
+   101			if (!data) {
+   102				pr_err("Dev %s: unable to read partition block %llu\n",
+   103				       state->disk->disk_name, (u64) blk);
+   104				res = -1;
+   105				goto rdb_done;
+   106			}
+   107			pb  = (struct PartitionBlock *)data;
+   108			blk = be32_to_cpu(pb->pb_Next);
+   109			if (pb->pb_ID != cpu_to_be32(IDNAME_PARTITION))
+   110				continue;
+   111			if (checksum_block((__be32 *)pb, be32_to_cpu(pb->pb_SummedLongs) & 0x7F) != 0 )
+   112				continue;
+   113	
+   114			/* RDB gives us more than enough rope to hang ourselves with,
+   115			 * many times over (2^128 bytes if all fields max out).
+   116			 * Some careful checks are in order, so check for potential
+   117			 * overflows.
+   118			 * We are multiplying four 32 bit numbers to one sector_t!
+   119			 */
+   120	
+   121			nr_hd   = be32_to_cpu(pb->pb_Environment[NR_HD]);
+   122			nr_sect = be32_to_cpu(pb->pb_Environment[NR_SECT]);
+   123	
+   124			/* CylBlocks is total number of blocks per cylinder */
+   125			if (check_mul_overflow(nr_hd, nr_sect, &cylblk)) {
+   126				pr_err("Dev %s: heads*sects %u overflows u32, skipping partition!\n",
+   127					state->disk->disk_name, cylblk);
+   128				continue;
+   129			}
+   130	
+   131			/* check for consistency with RDB defined CylBlocks */
+ > 132			if (cylblk > be32_to_cpu(rdb->rdb_CylBlocks)) {
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
