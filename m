@@ -2,263 +2,304 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD60C43334
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 04:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7055C43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 05:01:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237434AbiGZE6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 00:58:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50746 "EHLO
+        id S237387AbiGZFBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 01:01:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237281AbiGZE56 (ORCPT
+        with ESMTP id S230410AbiGZFBr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 00:57:58 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE5F27B0A;
-        Mon, 25 Jul 2022 21:57:55 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id x24-20020a17090ab01800b001f21556cf48so16232177pjq.4;
-        Mon, 25 Jul 2022 21:57:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=yBYe/1OeLIDZf3DCFn7s0xzvaZcpCXWT7ebwUphe8tw=;
-        b=WrvK+hf7bJrTjpWsnxBmIKbx3R6z7SZ4hQHhyRjh9TtkXxibbG2KDGa9xVknYV+k64
-         4xmkv5BSNa+HMXVaMHnmLE+LU/a/y7ROfUxX/kSwl5WujrvQJJFZ6+i7ZswXbKEH2eGH
-         mnR9WyobkEr8TPyWnHwK1EakwB9fj+8i0nj4IzRU9nztGAwyupEVm8GCwYz6LFYqBwje
-         27tB8yLrYzAdnXbaLRAkeJ8QpOYnFshs87YijRTsrx/R3TsbUrPgo6czjwBWoN4o2ZVJ
-         odfYpuxr7VH6PdkgrfoFeUXSl8G8tOnevt1iShCI3ayC79dU+FuBr8kOOFFAxlwipiZM
-         5xmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=yBYe/1OeLIDZf3DCFn7s0xzvaZcpCXWT7ebwUphe8tw=;
-        b=WI8g8Xs6t9r+3MDgeFIeCbqQoKcdmPXYZ3r8KT4gMnPPNMfV2QuQtlwGCJ3RFcbp1e
-         5twEI/AzpclmRqF5Mc28AMgyLKVOmTfnwznYv9tZmH7VGw4zmFY9sHib8abpx3SsJs4E
-         8E2fIv68k8jQ/Q6vR+wV5UHlvtvjPOb6/vjWp4LIx2ZoGUCH8QpD58A+RQSCgSCyVWjW
-         t0a4EUlCBxYHPObqmQR7FJxdNkpwqYOl93R2i1MDxsx6PsEy01Ex4CxgeioX0+dJxBLc
-         OeeWSU0wrk9g3VKXg1SWGLW/yDmWbEvey98ntfUqiMCWpEMjYTUagVHYI+7c9Z1mo2yW
-         eTFQ==
-X-Gm-Message-State: AJIora+kFmmZ4X8+3oVm7gulVDB3GdgqIfZFmhdtljYLP81aFrD/HGLV
-        /rRIFaE7gLLfPOsjzd9X12dXLagG1HA=
-X-Google-Smtp-Source: AGRyM1vV2o4wv5ser+sRjctzCoT4bOhsUv+6TkJpr/K3yexHFvd3TwvqZlgoSIY9AfbESshB79ETRg==
-X-Received: by 2002:a17:90b:4d92:b0:1f1:be59:a60f with SMTP id oj18-20020a17090b4d9200b001f1be59a60fmr36176269pjb.152.1658811475063;
-        Mon, 25 Jul 2022 21:57:55 -0700 (PDT)
-Received: from xplor.waratah.dyndns.org (222-155-0-244-adsl.sparkbb.co.nz. [222.155.0.244])
-        by smtp.gmail.com with ESMTPSA id a189-20020a624dc6000000b0052b2e8d0894sm10930894pfb.16.2022.07.25.21.57.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 21:57:54 -0700 (PDT)
-Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
-        id 2AD29360333; Tue, 26 Jul 2022 16:57:51 +1200 (NZST)
-From:   Michael Schmitz <schmitzmic@gmail.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org,
-        Michael Schmitz <schmitzmic@gmail.com>
-Subject: [PATCH v8 2/2] block: add overflow checks for Amiga partition support
-Date:   Tue, 26 Jul 2022 16:57:47 +1200
-Message-Id: <20220726045747.4779-3-schmitzmic@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220726045747.4779-1-schmitzmic@gmail.com>
-References: <20220726045747.4779-1-schmitzmic@gmail.com>
+        Tue, 26 Jul 2022 01:01:47 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A138A2616
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 22:01:44 -0700 (PDT)
+Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LsPmY12RbzWfG2;
+        Tue, 26 Jul 2022 12:57:49 +0800 (CST)
+Received: from dggpeml500009.china.huawei.com (7.185.36.209) by
+ dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Jul 2022 13:01:42 +0800
+Received: from [10.174.177.235] (10.174.177.235) by
+ dggpeml500009.china.huawei.com (7.185.36.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Jul 2022 13:01:41 +0800
+Message-ID: <3f9d5423-ec40-ba8d-05c1-8f5634a5c792@huawei.com>
+Date:   Tue, 26 Jul 2022 13:01:41 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
+ plug list
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai3@huawei.com>
+CC:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <hch@lst.de>,
+        "zhangyi (F)" <yi.zhang@huawei.com>
+References: <Yt66HebQ9//2ahq6@T590>
+ <ab899ae0-91fc-48db-cc32-fdc57f61963a@huawei.com> <Yt9HkP2mzH0ZTL1l@T590>
+ <ba2b30f2-66d9-3acb-787d-fae1894fa5a6@huawei.com> <Yt9SMuSlCtwwzyEz@T590>
+ <f91f136c-f109-3027-a666-29fe882d3426@huawei.com> <Yt9ZOFtzm9kfKWhc@T590>
+ <6b070c7d-473a-cc96-def3-49826ca08aea@huawei.com> <Yt9duWU0Ez/uZIym@T590>
+ <e77fbe38-3cf5-2074-4875-eb3e1df55807@huawei.com> <Yt9qjRc9CpdqtrgT@T590>
+From:   Yufen Yu <yuyufen@huawei.com>
+In-Reply-To: <Yt9qjRc9CpdqtrgT@T590>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.177.235]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500009.china.huawei.com (7.185.36.209)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The Amiga partition parser module uses signed int for partition sector
-address and count, which will overflow for disks larger than 1 TB.
 
-Use u64 as type for sector address and size to allow using disks up to
-2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
-format allows to specify disk sizes up to 2^128 bytes (though native
-OS limitations reduce this somewhat, to max 2^68 bytes), so check for
-u64 overflow carefully to protect against overflowing sector_t.
 
-Bail out if sector addresses overflow 32 bits on kernels without LBD
-support.
+On 2022/7/26 12:16, Ming Lei wrote:
+> On Tue, Jul 26, 2022 at 11:31:34AM +0800, Yu Kuai wrote:
+>> 在 2022/07/26 11:21, Ming Lei 写道:
+>>> On Tue, Jul 26, 2022 at 11:14:23AM +0800, Yu Kuai wrote:
+>>>> Hi, Ming
+>>>>
+>>>> 在 2022/07/26 11:02, Ming Lei 写道:
+>>>>> On Tue, Jul 26, 2022 at 10:52:56AM +0800, Yu Kuai wrote:
+>>>>>> Hi, Ming
+>>>>>> 在 2022/07/26 10:32, Ming Lei 写道:
+>>>>>>> On Tue, Jul 26, 2022 at 10:08:13AM +0800, Yu Kuai wrote:
+>>>>>>>> 在 2022/07/26 9:46, Ming Lei 写道:
+>>>>>>>>> On Tue, Jul 26, 2022 at 09:08:19AM +0800, Yu Kuai wrote:
+>>>>>>>>>> Hi, Ming!
+>>>>>>>>>>
+>>>>>>>>>> 在 2022/07/25 23:43, Ming Lei 写道:
+>>>>>>>>>>> On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
+>>>>>>>>>>>> Hi, Ming!
+>>>>>>>>>>>>
+>>>>>>>>>>>> 在 2022/07/19 17:26, Ming Lei 写道:
+>>>>>>>>>>>>> On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
+>>>>>>>>>>>>>> We do test on a virtio scsi device (/dev/sda) and the default mq
+>>>>>>>>>>>>>> scheduler is 'none'. We found a IO hung as following:
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> blk_finish_plug
+>>>>>>>>>>>>>>          blk_mq_plug_issue_direct
+>>>>>>>>>>>>>>              scsi_mq_get_budget
+>>>>>>>>>>>>>>              //get budget_token fail and sdev->restarts=1
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> 			     	 scsi_end_request
+>>>>>>>>>>>>>> 				   scsi_run_queue_async
+>>>>>>>>>>>>>>                                           //sdev->restart=0 and run queue
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>             blk_mq_request_bypass_insert
+>>>>>>>>>>>>>>                //add request to hctx->dispatch list
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Here the issue shouldn't be related with scsi's get budget or
+>>>>>>>>>>>>> scsi_run_queue_async.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> If blk-mq adds request into ->dispatch_list, it is blk-mq core's
+>>>>>>>>>>>>> responsibility to re-run queue for moving on. Can you investigate a
+>>>>>>>>>>>>> bit more why blk-mq doesn't run queue after adding request to
+>>>>>>>>>>>>> hctx dispatch list?
+>>>>>>>>>>>>
+>>>>>>>>>>>> I think Yufen is probably thinking about the following Concurrent
+>>>>>>>>>>>> scenario:
+>>>>>>>>>>>>
+>>>>>>>>>>>> blk_mq_flush_plug_list
+>>>>>>>>>>>> # assume there are three rq
+>>>>>>>>>>>>        blk_mq_plug_issue_direct
+>>>>>>>>>>>>         blk_mq_request_issue_directly
+>>>>>>>>>>>>         # dispatch rq1, succeed
+>>>>>>>>>>>>         blk_mq_request_issue_directly
+>>>>>>>>>>>>         # dispatch rq2
+>>>>>>>>>>>>          __blk_mq_try_issue_directly
+>>>>>>>>>>>>           blk_mq_get_dispatch_budget
+>>>>>>>>>>>>            scsi_mq_get_budget
+>>>>>>>>>>>>             atomic_inc(&sdev->restarts);
+>>>>>>>>>>>>             # rq2 failed to get budget
+>>>>>>>>>>>>             # restarts is 1 now
+>>>>>>>>>>>>                                               scsi_end_request
+>>>>>>>>>>>>                                               # rq1 is completed
+>>>>>>>>>>>>                                               ┊scsi_run_queue_async
+>>>>>>>>>>>>                                               ┊ atomic_cmpxchg(&sdev->restarts,
+>>>>>>>>>>>> old, 0) == old
+>>>>>>>>>>>>                                               ┊ # set restarts to 0
+>>>>>>>>>>>>                                               ┊ blk_mq_run_hw_queues
+>>>>>>>>>>>>                                               ┊ # hctx->dispatch list is empty
+>>>>>>>>>>>>         blk_mq_request_bypass_insert
+>>>>>>>>>>>>         # insert rq2 to hctx->dispatch list
+>>>>>>>>>>>
+>>>>>>>>>>> After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
+>>>>>>>>>>> no matter if list_empty(list) is empty or not, queue will be run either from
+>>>>>>>>>>> blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
+>>>>>>>>>>
+>>>>>>>>>> 1) while inserting rq2 to dispatch list, blk_mq_request_bypass_insert()
+>>>>>>>>>> is called from blk_mq_try_issue_list_directly(), list_empty() won't
+>>>>>>>>>> pass, thus thus blk_mq_request_bypass_insert() won't run queue.
+>>>>>>>>>
+>>>>>>>>> Yeah, but in blk_mq_try_issue_list_directly() after rq2 is inserted to dispatch
+>>>>>>>>> list, the loop is broken and blk_mq_try_issue_list_directly() returns to
+>>>>>>>>> blk_mq_sched_insert_requests() in which list_empty() is false, so
+>>>>>>>>> blk_mq_insert_requests() and blk_mq_run_hw_queue() are called, queue
+>>>>>>>>> is still run.
+>>>>>>>>>
+>>>>>>>>> Also not sure why you make rq3 involved, since the list is local list on
+>>>>>>>>> stack, and it can be operated concurrently.
+>>>>>>>>
+>>>>>>>> I make rq3 involved because there are some conditions that
+>>>>>>>> blk_mq_insert_requests() and blk_mq_run_hw_queue() won't be called from
+>>>>>>>> blk_mq_sched_insert_requests():
+>>>>>>>
+>>>>>>> The two won't be called if list_empty() is true, and will be called if
+>>>>>>> !list_empty().
+>>>>>>>
+>>>>>>> That is why I mentioned run queue has been done after rq2 is added to
+>>>>>>> ->dispatch_list.
+>>>>>>
+>>>>>> I don't follow here, it's right after rq2 is inserted to dispatch list,
+>>>>>> list is not empty, and blk_mq_sched_insert_requests() will be called.
+>>>>>> However, do you think that it's impossible that
+>>>>>> blk_mq_sched_insert_requests() can dispatch rq in the list and list
+>>>>>> will become empty?
+>>>>>
+>>>>> Please take a look at blk_mq_sched_insert_requests().
+>>>>>
+>>>>> When codes runs into blk_mq_sched_insert_requests(), the following
+>>>>> blk_mq_run_hw_queue() will be run always, how does list empty or not
+>>>>> make a difference there?
+>>>>
+>>>> This is strange, always blk_mq_run_hw_queue() is exactly what Yufen
+>>>> tries to do in this patch, are we look at different code?
+>>>
+>>> No.
+>>>
+>>>>
+>>>> I'm copying blk_mq_sched_insert_requests() here, the code is from
+>>>> latest linux-next:
+>>>>
+>>>> 461 void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
+>>>> 462                                 ┊ struct blk_mq_ctx *ctx,
+>>>> 463                                 ┊ struct list_head *list, bool
+>>>> run_queue_async)
+>>>> 464 {
+>>>> 465         struct elevator_queue *e;
+>>>> 466         struct request_queue *q = hctx->queue;
+>>>> 467
+>>>> 468         /*
+>>>> 469         ┊* blk_mq_sched_insert_requests() is called from flush plug
+>>>> 470         ┊* context only, and hold one usage counter to prevent queue
+>>>> 471         ┊* from being released.
+>>>> 472         ┊*/
+>>>> 473         percpu_ref_get(&q->q_usage_counter);
+>>>> 474
+>>>> 475         e = hctx->queue->elevator;
+>>>> 476         if (e) {
+>>>> 477                 e->type->ops.insert_requests(hctx, list, false);
+>>>> 478         } else {
+>>>> 479                 /*
+>>>> 480                 ┊* try to issue requests directly if the hw queue isn't
+>>>> 481                 ┊* busy in case of 'none' scheduler, and this way may
+>>>> save
+>>>> 482                 ┊* us one extra enqueue & dequeue to sw queue.
+>>>> 483                 ┊*/
+>>>> 484                 if (!hctx->dispatch_busy && !run_queue_async) {
+>>>> 485                         blk_mq_run_dispatch_ops(hctx->queue,
+>>>> 486                                 blk_mq_try_issue_list_directly(hctx,
+>>>> list));
+>>>> 487                         if (list_empty(list))
+>>>> 488                                 goto out;
+>>>> 489                 }
+>>>> 490                 blk_mq_insert_requests(hctx, ctx, list);
+>>>> 491         }
+>>>> 492
+>>>> 493         blk_mq_run_hw_queue(hctx, run_queue_async);
+>>>> 494  out:
+>>>> 495         percpu_ref_put(&q->q_usage_counter);
+>>>> 496 }
+>>>>
+>>>> Here in line 487, if list_empty() is true, out label will skip
+>>>> run_queue().
+>>>
+>>> If list_empty() is true, run queue is guaranteed to run
+>>> in blk_mq_try_issue_list_directly() in case that BLK_STS_*RESOURCE
+>>> is returned from blk_mq_request_issue_directly().
+>>>
+>>> 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+>>> 		if (ret != BLK_STS_OK) {
+>>> 			if (ret == BLK_STS_RESOURCE ||
+>>> 					ret == BLK_STS_DEV_RESOURCE) {
+>>> 				blk_mq_request_bypass_insert(rq, false,
+>>> 							list_empty(list));	//run queue
+>>> 				break;
+>>> 			}
+>>> 			blk_mq_end_request(rq, ret);
+>>> 			errors++;
+>>> 		} else
+>>> 			queued++;
+>>>
+>>> So why do you try to add one extra run queue?
+>>
+>> Hi, Ming
+>>
+>> Perhaps I didn't explain the scenario clearly, please notice that list
+>> contain three rq is required.
+>>
+>> 1) rq1 is dispatched successfuly
+>> 2) rq2 failed to dispatch due to no budget, in this case
+>>     - rq2 will insert to dispatch list
+>>     - list is not emply yet, run queue won't called
+> 
+> In the case, blk_mq_try_issue_list_directly() returns to
+> blk_mq_sched_insert_requests() immediately, then blk_mq_insert_requests()
+> and blk_mq_run_hw_queue() will be run from blk_mq_sched_insert_requests()
+> because the list isn't empty.
+> 
+> Right?
+> 
 
-This bug was reported originally in 2012, and the fix was created by
-the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-discussed and reviewed on linux-m68k at that time but never officially
-submitted (now resubmitted as separate patch).
-This patch adds additional error checking and warning messages.
+hi Ming,
 
-Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
- block/partitions/amiga.c | 111 +++++++++++++++++++++++++++++++--------
- 1 file changed, 89 insertions(+), 22 deletions(-)
+Here rq2 fail from blk_mq_plug_issue_direct() in blk_mq_flush_plug_list(),
+not blk_mq_sched_insert_requests
 
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index f98191545d9a..7356b39cbe10 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -11,10 +11,18 @@
- #define pr_fmt(fmt) fmt
- 
- #include <linux/types.h>
-+#include <linux/mm_types.h>
-+#include <linux/overflow.h>
- #include <linux/affs_hardblocks.h>
- 
- #include "check.h"
- 
-+/* magic offsets in partition DosEnvVec */
-+#define NR_HD	3
-+#define NR_SECT	5
-+#define LO_CYL	9
-+#define	HI_CYL	10
-+
- static __inline__ u32
- checksum_block(__be32 *m, int size)
- {
-@@ -31,9 +39,12 @@ int amiga_partition(struct parsed_partitions *state)
- 	unsigned char *data;
- 	struct RigidDiskBlock *rdb;
- 	struct PartitionBlock *pb;
--	sector_t start_sect, nr_sects;
--	int blk, part, res = 0;
--	int blksize = 1;	/* Multiplier for disk block size */
-+	u64 start_sect, nr_sects;
-+	sector_t blk, end_sect;
-+	u32 cylblk;		/* rdb_CylBlocks = nr_heads*sect_per_track */
-+	u32 nr_hd, nr_sect, lo_cyl, hi_cyl;
-+	int part, res = 0;
-+	unsigned int blksize = 1;	/* Multiplier for disk block size */
- 	int slot = 1;
- 
- 	for (blk = 0; ; blk++, put_dev_sector(sect)) {
-@@ -41,8 +52,8 @@ int amiga_partition(struct parsed_partitions *state)
- 			goto rdb_done;
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			pr_err("Dev %s: unable to read RDB block %d\n",
--			       state->disk->disk_name, blk);
-+			pr_err("Dev %s: unable to read RDB block %llu\n",
-+			       state->disk->disk_name, (u64) blk);
- 			res = -1;
- 			goto rdb_done;
- 		}
-@@ -58,13 +69,13 @@ int amiga_partition(struct parsed_partitions *state)
- 		*(__be32 *)(data+0xdc) = 0;
- 		if (checksum_block((__be32 *)data,
- 				be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F)==0) {
--			pr_err("Trashed word at 0xd0 in block %d ignored in checksum calculation\n",
--			       blk);
-+			pr_err("Trashed word at 0xd0 in block %llu ignored in checksum calculation\n",
-+			       (u64) blk);
- 			break;
- 		}
- 
--		pr_err("Dev %s: RDB in block %d has bad checksum\n",
--		       state->disk->disk_name, blk);
-+		pr_err("Dev %s: RDB in block %llu has bad checksum\n",
-+		       state->disk->disk_name, (u64) blk);
- 	}
- 
- 	/* blksize is blocks per 512 byte standard block */
-@@ -80,11 +91,16 @@ int amiga_partition(struct parsed_partitions *state)
- 	blk = be32_to_cpu(rdb->rdb_PartitionList);
- 	put_dev_sector(sect);
- 	for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
--		blk *= blksize;	/* Read in terms partition table understands */
-+		/* Read in terms partition table understands */
-+		if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
-+			pr_err("Dev %s: overflow calculating partition block %llu! Skipping partitions %u and beyond\n",
-+				state->disk->disk_name, (u64) blk, part);
-+			break;
-+		}
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			pr_err("Dev %s: unable to read partition block %d\n",
--			       state->disk->disk_name, blk);
-+			pr_err("Dev %s: unable to read partition block %llu\n",
-+			       state->disk->disk_name, (u64) blk);
- 			res = -1;
- 			goto rdb_done;
- 		}
-@@ -95,19 +111,70 @@ int amiga_partition(struct parsed_partitions *state)
- 		if (checksum_block((__be32 *)pb, be32_to_cpu(pb->pb_SummedLongs) & 0x7F) != 0 )
- 			continue;
- 
--		/* Tell Kernel about it */
-+		/* RDB gives us more than enough rope to hang ourselves with,
-+		 * many times over (2^128 bytes if all fields max out).
-+		 * Some careful checks are in order, so check for potential
-+		 * overflows.
-+		 * We are multiplying four 32 bit numbers to one sector_t!
-+		 */
-+
-+		nr_hd   = be32_to_cpu(pb->pb_Environment[NR_HD]);
-+		nr_sect = be32_to_cpu(pb->pb_Environment[NR_SECT]);
-+
-+		/* CylBlocks is total number of blocks per cylinder */
-+		if (check_mul_overflow(nr_hd, nr_sect, &cylblk)) {
-+			pr_err("Dev %s: heads*sects %u overflows u32, skipping partition!\n",
-+				state->disk->disk_name, cylblk);
-+			continue;
-+		}
-+
-+		/* check for consistency with RDB defined CylBlocks */
-+		if (cylblk > be32_to_cpu(rdb->rdb_CylBlocks)) {
-+			pr_warn("Dev %s: cylblk %u > rdb_CylBlocks %u!\n",
-+				state->disk->disk_name, cylblk,
-+				be32_to_cpu(rdb->rdb_CylBlocks));
-+		}
-+
-+		/* RDB allows for variable logical block size -
-+		 * normalize to 512 byte blocks and check result.
-+		 */
-+
-+		if (check_mul_overflow(cylblk, blksize, &cylblk)) {
-+			pr_err("Dev %s: partition %u bytes per cyl. overflows u32, skipping partition!\n",
-+				state->disk->disk_name, part);
-+			continue;
-+		}
-+
-+		/* Calculate partition start and end. Limit of 32 bit on cylblk
-+		 * guarantees no overflow occurs if LBD support is enabled.
-+		 */
-+
-+		lo_cyl = be32_to_cpu(pb->pb_Environment[LO_CYL]);
-+		start_sect = ((u64) lo_cyl * cylblk);
-+
-+		hi_cyl = be32_to_cpu(pb->pb_Environment[HI_CYL]);
-+		nr_sects = (((u64) hi_cyl - lo_cyl + 1) * cylblk);
- 
--		nr_sects = ((sector_t) be32_to_cpu(pb->pb_Environment[10])
--			   + 1 - be32_to_cpu(pb->pb_Environment[9])) *
--			   be32_to_cpu(pb->pb_Environment[3]) *
--			   be32_to_cpu(pb->pb_Environment[5]) *
--			   blksize;
- 		if (!nr_sects)
- 			continue;
--		start_sect = (sector_t) be32_to_cpu(pb->pb_Environment[9]) *
--			     be32_to_cpu(pb->pb_Environment[3]) *
--			     be32_to_cpu(pb->pb_Environment[5]) *
--			     blksize;
-+
-+		/* Warn user if partition end overflows u32 (AmigaDOS limit) */
-+
-+		if ((start_sect + nr_sects) > UINT_MAX) {
-+			pr_warn("Dev %s: partition %u (%llu-%llu) needs 64 bit device support!\n",
-+				state->disk->disk_name, part,
-+				start_sect, start_sect + nr_sects);
-+		}
-+
-+		if (check_add_overflow(start_sect, nr_sects, &end_sect)) {
-+			pr_err("Dev %s: partition %u (%llu-%llu) needs LBD device support, skipping partition!\n",
-+				state->disk->disk_name, part,
-+				start_sect, (u64) end_sect);
-+			continue;
-+		}
-+
-+		/* Tell Kernel about it */
-+
- 		put_partition(state,slot++,start_sect,nr_sects);
- 		{
- 			/* Be even more informative to aid mounting */
--- 
-2.17.1
+blk_mq_flush_plug_list
 
+     if (!plug->multiple_queues && !plug->has_elevator && !from_schedule) {
+         struct request_queue *q;
+
+         rq = rq_list_peek(&plug->mq_list);
+         q = rq->q;
+
+         /*
+          * Peek first request and see if we have a ->queue_rqs() hook.
+          * If we do, we can dispatch the whole plug list in one go. We
+          * already know at this point that all requests belong to the
+          * same queue, caller must ensure that's the case.
+          *
+          * Since we pass off the full list to the driver at this point,
+          * we do not increment the active request count for the queue.
+          * Bypass shared tags for now because of that.
+          */
+         if (q->mq_ops->queue_rqs &&
+             !(rq->mq_hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)) {
+             blk_mq_run_dispatch_ops(q,
+                 __blk_mq_flush_plug_list(q, plug));
+             if (rq_list_empty(plug->mq_list))
+                 return;
+         }
+
+         blk_mq_run_dispatch_ops(q,
+                 blk_mq_plug_issue_direct(plug, false));  //rq2 insert into dispatch list
+         if (rq_list_empty(plug->mq_list))
+             return;
+     }
+
+     do {
+         blk_mq_dispatch_plug_list(plug, from_schedule);  //continue issue rq3 and success
+     } while (!rq_list_empty(plug->mq_list));
+
+> 
+> Thanks,
+> Ming
+> 
+> .
