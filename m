@@ -2,149 +2,287 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41303C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 06:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CC1C43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 07:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237951AbiGZGaT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 02:30:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48862 "EHLO
+        id S238399AbiGZHlR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 03:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237971AbiGZGaS (ORCPT
+        with ESMTP id S238600AbiGZHkt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 02:30:18 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2440C2602;
-        Mon, 25 Jul 2022 23:30:16 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LsRnk4zq3zKH4k;
-        Tue, 26 Jul 2022 14:28:58 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgCH6mnvid9iR3rPBA--.40199S3;
-        Tue, 26 Jul 2022 14:30:08 +0800 (CST)
-Subject: Re: [PATCH v2] blk-mq: fix io hung due to missing commit_rqs
-To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, osandov@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-References: <20220726033519.4002586-1-yukuai1@huaweicloud.com>
- <Yt9rrL62zW2orGys@T590>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c720cb4f-2e74-b319-c7e2-2672f2890ed7@huaweicloud.com>
-Date:   Tue, 26 Jul 2022 14:30:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 26 Jul 2022 03:40:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8130EB92
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 00:40:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658821207;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hltgeSOW0Iua0H7gjivvyjxxQniBMc+eE6kC6bAqHsw=;
+        b=fFYTb9GttD03hIr3TN9c0RLvoiBU/J1n12ePqE9arbxozFXvDQk2bPULmIB7aV5kbiHUE0
+        wyb1Xjq4Sq1xCMbB/tSZLlOI1kMMXBb+zMzkoUxpvu8+PTPFPiIL+9xsoV2toBDcDYgUqx
+        hYFYTm4NXBqu6ptafyBBhGbXc/q4fJs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-436-90XLlW9vNf-tzUQkmPyjIQ-1; Tue, 26 Jul 2022 03:40:04 -0400
+X-MC-Unique: 90XLlW9vNf-tzUQkmPyjIQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 84C0E1C05EBF;
+        Tue, 26 Jul 2022 07:40:03 +0000 (UTC)
+Received: from T590 (ovpn-8-32.pek2.redhat.com [10.72.8.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 87EE01415118;
+        Tue, 26 Jul 2022 07:39:57 +0000 (UTC)
+Date:   Tue, 26 Jul 2022 15:39:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     Yu Kuai <yukuai3@huawei.com>, Yu Kuai <yukuai1@huaweicloud.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
+        "zhangyi (F)" <yi.zhang@huawei.com>
+Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
+ plug list
+Message-ID: <Yt+aSH86dVCA1vux@T590>
+References: <Yt9HkP2mzH0ZTL1l@T590>
+ <ba2b30f2-66d9-3acb-787d-fae1894fa5a6@huawei.com>
+ <Yt9SMuSlCtwwzyEz@T590>
+ <f91f136c-f109-3027-a666-29fe882d3426@huawei.com>
+ <Yt9ZOFtzm9kfKWhc@T590>
+ <6b070c7d-473a-cc96-def3-49826ca08aea@huawei.com>
+ <Yt9duWU0Ez/uZIym@T590>
+ <e77fbe38-3cf5-2074-4875-eb3e1df55807@huawei.com>
+ <Yt9qjRc9CpdqtrgT@T590>
+ <3f9d5423-ec40-ba8d-05c1-8f5634a5c792@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <Yt9rrL62zW2orGys@T590>
-Content-Type: text/plain; charset=gbk; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCH6mnvid9iR3rPBA--.40199S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGw4UKFy3Kw15urWkCF1DGFg_yoW5Ww4rpF
-        WfGa15Aa1rtr4jqryxZa17C3W0vanxWrW7GryfKw13Z3WDKrZ2qrs3Jr13WFySkrs8CwsF
-        gF1UWryYqw1kurJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-        UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+In-Reply-To: <3f9d5423-ec40-ba8d-05c1-8f5634a5c792@huawei.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Ming!
-
-�� 2022/07/26 12:21, Ming Lei д��:
-> On Tue, Jul 26, 2022 at 11:35:19AM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Currently, in virtio_scsi, if 'bd->last' is not set to true while
->> dispatching request, such io will stay in driver's queue, and driver
->> will wait for block layer to dispatch more rqs. However, if block
->> layer failed to dispatch more rq, it should trigger commit_rqs to
->> inform driver.
->>
->> There is a problem in blk_mq_try_issue_list_directly() that commit_rqs
->> won't be called:
->>
->> // assume that queue_depth is set to 1, list contains two rq
->> blk_mq_try_issue_list_directly
->>   blk_mq_request_issue_directly
->>   // dispatch first rq
->>   // last is false
->>    __blk_mq_try_issue_directly
->>     blk_mq_get_dispatch_budget
->>     // succeed to get first budget
->>     __blk_mq_issue_directly
->>      scsi_queue_rq
->>       cmd->flags |= SCMD_LAST
->>        virtscsi_queuecommand
->>         kick = (sc->flags & SCMD_LAST) != 0
->>         // kick is false, first rq won't issue to disk
->>   queued++
->>
->>   blk_mq_request_issue_directly
->>   // dispatch second rq
->>    __blk_mq_try_issue_directly
->>     blk_mq_get_dispatch_budget
->>     // failed to get second budget
->>   ret == BLK_STS_RESOURCE
->>    blk_mq_request_bypass_insert
->>   // errors is still 0
->>
->>   if (!list_empty(list) || errors && ...)
->>    // won't pass, commit_rqs won't be called
->>
->> In this situation, first rq relied on second rq to dispatch, while
->> second rq relied on first rq to complete, thus they will both hung.
->> And same problem exists in blk_mq_dispatch_rq_list()
->>
->> Fix the problem by also treat 'BLK_STS_*RESOURCE' as 'errors' since
->> it means that request is not queued successfully.
->>
->> Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->> Changes in v2:
->>   - suggested by Ming, handle blk_mq_dispatch_rq_list() as well.
->>   - change title and modify commit message.
->>
->>   block/blk-mq.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 70177ee74295..ee1e065fe63f 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -1909,6 +1909,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->>   			fallthrough;
->>   		case BLK_STS_DEV_RESOURCE:
->>   			blk_mq_handle_dev_resource(rq, list);
->> +			errors++;
->>   			goto out;
->>   		case BLK_STS_ZONE_RESOURCE:
->>   			/*
->> @@ -1918,6 +1919,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->>   			 */
->>   			blk_mq_handle_zone_resource(rq, &zone_list);
->>   			needs_resource = true;
->> +			errors++;
+On Tue, Jul 26, 2022 at 01:01:41PM +0800, Yufen Yu wrote:
 > 
-> But accounting error here may break return value of
-> blk_mq_dispatch_rq_list(), see:
 > 
-> /* Returns true if we did some work AND can potentially do more. */
+> On 2022/7/26 12:16, Ming Lei wrote:
+> > On Tue, Jul 26, 2022 at 11:31:34AM +0800, Yu Kuai wrote:
+> > > 在 2022/07/26 11:21, Ming Lei 写道:
+> > > > On Tue, Jul 26, 2022 at 11:14:23AM +0800, Yu Kuai wrote:
+> > > > > Hi, Ming
+> > > > > 
+> > > > > 在 2022/07/26 11:02, Ming Lei 写道:
+> > > > > > On Tue, Jul 26, 2022 at 10:52:56AM +0800, Yu Kuai wrote:
+> > > > > > > Hi, Ming
+> > > > > > > 在 2022/07/26 10:32, Ming Lei 写道:
+> > > > > > > > On Tue, Jul 26, 2022 at 10:08:13AM +0800, Yu Kuai wrote:
+> > > > > > > > > 在 2022/07/26 9:46, Ming Lei 写道:
+> > > > > > > > > > On Tue, Jul 26, 2022 at 09:08:19AM +0800, Yu Kuai wrote:
+> > > > > > > > > > > Hi, Ming!
+> > > > > > > > > > > 
+> > > > > > > > > > > 在 2022/07/25 23:43, Ming Lei 写道:
+> > > > > > > > > > > > On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
+> > > > > > > > > > > > > Hi, Ming!
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > 在 2022/07/19 17:26, Ming Lei 写道:
+> > > > > > > > > > > > > > On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
+> > > > > > > > > > > > > > > We do test on a virtio scsi device (/dev/sda) and the default mq
+> > > > > > > > > > > > > > > scheduler is 'none'. We found a IO hung as following:
+> > > > > > > > > > > > > > > 
+> > > > > > > > > > > > > > > blk_finish_plug
+> > > > > > > > > > > > > > >          blk_mq_plug_issue_direct
+> > > > > > > > > > > > > > >              scsi_mq_get_budget
+> > > > > > > > > > > > > > >              //get budget_token fail and sdev->restarts=1
+> > > > > > > > > > > > > > > 
+> > > > > > > > > > > > > > > 			     	 scsi_end_request
+> > > > > > > > > > > > > > > 				   scsi_run_queue_async
+> > > > > > > > > > > > > > >                                           //sdev->restart=0 and run queue
+> > > > > > > > > > > > > > > 
+> > > > > > > > > > > > > > >             blk_mq_request_bypass_insert
+> > > > > > > > > > > > > > >                //add request to hctx->dispatch list
+> > > > > > > > > > > > > > 
+> > > > > > > > > > > > > > Here the issue shouldn't be related with scsi's get budget or
+> > > > > > > > > > > > > > scsi_run_queue_async.
+> > > > > > > > > > > > > > 
+> > > > > > > > > > > > > > If blk-mq adds request into ->dispatch_list, it is blk-mq core's
+> > > > > > > > > > > > > > responsibility to re-run queue for moving on. Can you investigate a
+> > > > > > > > > > > > > > bit more why blk-mq doesn't run queue after adding request to
+> > > > > > > > > > > > > > hctx dispatch list?
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > I think Yufen is probably thinking about the following Concurrent
+> > > > > > > > > > > > > scenario:
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > blk_mq_flush_plug_list
+> > > > > > > > > > > > > # assume there are three rq
+> > > > > > > > > > > > >        blk_mq_plug_issue_direct
+> > > > > > > > > > > > >         blk_mq_request_issue_directly
+> > > > > > > > > > > > >         # dispatch rq1, succeed
+> > > > > > > > > > > > >         blk_mq_request_issue_directly
+> > > > > > > > > > > > >         # dispatch rq2
+> > > > > > > > > > > > >          __blk_mq_try_issue_directly
+> > > > > > > > > > > > >           blk_mq_get_dispatch_budget
+> > > > > > > > > > > > >            scsi_mq_get_budget
+> > > > > > > > > > > > >             atomic_inc(&sdev->restarts);
+> > > > > > > > > > > > >             # rq2 failed to get budget
+> > > > > > > > > > > > >             # restarts is 1 now
+> > > > > > > > > > > > >                                               scsi_end_request
+> > > > > > > > > > > > >                                               # rq1 is completed
+> > > > > > > > > > > > >                                               ┊scsi_run_queue_async
+> > > > > > > > > > > > >                                               ┊ atomic_cmpxchg(&sdev->restarts,
+> > > > > > > > > > > > > old, 0) == old
+> > > > > > > > > > > > >                                               ┊ # set restarts to 0
+> > > > > > > > > > > > >                                               ┊ blk_mq_run_hw_queues
+> > > > > > > > > > > > >                                               ┊ # hctx->dispatch list is empty
+> > > > > > > > > > > > >         blk_mq_request_bypass_insert
+> > > > > > > > > > > > >         # insert rq2 to hctx->dispatch list
+> > > > > > > > > > > > 
+> > > > > > > > > > > > After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
+> > > > > > > > > > > > no matter if list_empty(list) is empty or not, queue will be run either from
+> > > > > > > > > > > > blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
+> > > > > > > > > > > 
+> > > > > > > > > > > 1) while inserting rq2 to dispatch list, blk_mq_request_bypass_insert()
+> > > > > > > > > > > is called from blk_mq_try_issue_list_directly(), list_empty() won't
+> > > > > > > > > > > pass, thus thus blk_mq_request_bypass_insert() won't run queue.
+> > > > > > > > > > 
+> > > > > > > > > > Yeah, but in blk_mq_try_issue_list_directly() after rq2 is inserted to dispatch
+> > > > > > > > > > list, the loop is broken and blk_mq_try_issue_list_directly() returns to
+> > > > > > > > > > blk_mq_sched_insert_requests() in which list_empty() is false, so
+> > > > > > > > > > blk_mq_insert_requests() and blk_mq_run_hw_queue() are called, queue
+> > > > > > > > > > is still run.
+> > > > > > > > > > 
+> > > > > > > > > > Also not sure why you make rq3 involved, since the list is local list on
+> > > > > > > > > > stack, and it can be operated concurrently.
+> > > > > > > > > 
+> > > > > > > > > I make rq3 involved because there are some conditions that
+> > > > > > > > > blk_mq_insert_requests() and blk_mq_run_hw_queue() won't be called from
+> > > > > > > > > blk_mq_sched_insert_requests():
+> > > > > > > > 
+> > > > > > > > The two won't be called if list_empty() is true, and will be called if
+> > > > > > > > !list_empty().
+> > > > > > > > 
+> > > > > > > > That is why I mentioned run queue has been done after rq2 is added to
+> > > > > > > > ->dispatch_list.
+> > > > > > > 
+> > > > > > > I don't follow here, it's right after rq2 is inserted to dispatch list,
+> > > > > > > list is not empty, and blk_mq_sched_insert_requests() will be called.
+> > > > > > > However, do you think that it's impossible that
+> > > > > > > blk_mq_sched_insert_requests() can dispatch rq in the list and list
+> > > > > > > will become empty?
+> > > > > > 
+> > > > > > Please take a look at blk_mq_sched_insert_requests().
+> > > > > > 
+> > > > > > When codes runs into blk_mq_sched_insert_requests(), the following
+> > > > > > blk_mq_run_hw_queue() will be run always, how does list empty or not
+> > > > > > make a difference there?
+> > > > > 
+> > > > > This is strange, always blk_mq_run_hw_queue() is exactly what Yufen
+> > > > > tries to do in this patch, are we look at different code?
+> > > > 
+> > > > No.
+> > > > 
+> > > > > 
+> > > > > I'm copying blk_mq_sched_insert_requests() here, the code is from
+> > > > > latest linux-next:
+> > > > > 
+> > > > > 461 void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
+> > > > > 462                                 ┊ struct blk_mq_ctx *ctx,
+> > > > > 463                                 ┊ struct list_head *list, bool
+> > > > > run_queue_async)
+> > > > > 464 {
+> > > > > 465         struct elevator_queue *e;
+> > > > > 466         struct request_queue *q = hctx->queue;
+> > > > > 467
+> > > > > 468         /*
+> > > > > 469         ┊* blk_mq_sched_insert_requests() is called from flush plug
+> > > > > 470         ┊* context only, and hold one usage counter to prevent queue
+> > > > > 471         ┊* from being released.
+> > > > > 472         ┊*/
+> > > > > 473         percpu_ref_get(&q->q_usage_counter);
+> > > > > 474
+> > > > > 475         e = hctx->queue->elevator;
+> > > > > 476         if (e) {
+> > > > > 477                 e->type->ops.insert_requests(hctx, list, false);
+> > > > > 478         } else {
+> > > > > 479                 /*
+> > > > > 480                 ┊* try to issue requests directly if the hw queue isn't
+> > > > > 481                 ┊* busy in case of 'none' scheduler, and this way may
+> > > > > save
+> > > > > 482                 ┊* us one extra enqueue & dequeue to sw queue.
+> > > > > 483                 ┊*/
+> > > > > 484                 if (!hctx->dispatch_busy && !run_queue_async) {
+> > > > > 485                         blk_mq_run_dispatch_ops(hctx->queue,
+> > > > > 486                                 blk_mq_try_issue_list_directly(hctx,
+> > > > > list));
+> > > > > 487                         if (list_empty(list))
+> > > > > 488                                 goto out;
+> > > > > 489                 }
+> > > > > 490                 blk_mq_insert_requests(hctx, ctx, list);
+> > > > > 491         }
+> > > > > 492
+> > > > > 493         blk_mq_run_hw_queue(hctx, run_queue_async);
+> > > > > 494  out:
+> > > > > 495         percpu_ref_put(&q->q_usage_counter);
+> > > > > 496 }
+> > > > > 
+> > > > > Here in line 487, if list_empty() is true, out label will skip
+> > > > > run_queue().
+> > > > 
+> > > > If list_empty() is true, run queue is guaranteed to run
+> > > > in blk_mq_try_issue_list_directly() in case that BLK_STS_*RESOURCE
+> > > > is returned from blk_mq_request_issue_directly().
+> > > > 
+> > > > 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+> > > > 		if (ret != BLK_STS_OK) {
+> > > > 			if (ret == BLK_STS_RESOURCE ||
+> > > > 					ret == BLK_STS_DEV_RESOURCE) {
+> > > > 				blk_mq_request_bypass_insert(rq, false,
+> > > > 							list_empty(list));	//run queue
+> > > > 				break;
+> > > > 			}
+> > > > 			blk_mq_end_request(rq, ret);
+> > > > 			errors++;
+> > > > 		} else
+> > > > 			queued++;
+> > > > 
+> > > > So why do you try to add one extra run queue?
+> > > 
+> > > Hi, Ming
+> > > 
+> > > Perhaps I didn't explain the scenario clearly, please notice that list
+> > > contain three rq is required.
+> > > 
+> > > 1) rq1 is dispatched successfuly
+> > > 2) rq2 failed to dispatch due to no budget, in this case
+> > >     - rq2 will insert to dispatch list
+> > >     - list is not emply yet, run queue won't called
+> > 
+> > In the case, blk_mq_try_issue_list_directly() returns to
+> > blk_mq_sched_insert_requests() immediately, then blk_mq_insert_requests()
+> > and blk_mq_run_hw_queue() will be run from blk_mq_sched_insert_requests()
+> > because the list isn't empty.
+> > 
+> > Right?
+> > 
+> 
+> hi Ming,
+> 
+> Here rq2 fail from blk_mq_plug_issue_direct() in blk_mq_flush_plug_list(),
+> not blk_mq_sched_insert_requests
 
-Yes, you're right. I'll try to fix that in v3.
+OK, just wondering why Yufen's patch touches
+blk_mq_sched_insert_requests().
+
+Here the issue is in blk_mq_plug_issue_direct() itself, it is wrong to use last
+request of plug list to decide if run queue is needed since all the remained
+requests in plug list may be from other hctxs, and the simplest fix could be pass
+run_queue as true always to blk_mq_request_bypass_insert().
+
 
 Thanks,
-Kuai
-> 
+Ming
 
