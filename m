@@ -2,116 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 824EEC04A68
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 18:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A7CC19F29
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 22:28:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbiGZSyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 14:54:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36318 "EHLO
+        id S231366AbiGZW2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 18:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239729AbiGZSyG (ORCPT
+        with ESMTP id S229703AbiGZW2P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 14:54:06 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B913206D;
-        Tue, 26 Jul 2022 11:54:05 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26QIjTjF000395;
-        Tue, 26 Jul 2022 18:53:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=jK2gCVPTH8hIAwxMHJ3UR7BzxHKJx/kZjhc0g9iMAc8=;
- b=Ip5RZR2I9HcjtFdReySSCf9QYscbte49210i+C7jw+DeddsjsXSFk2Mc0zWucqNV70GT
- UZ9OiNVG81PgE85+5gKNODbpoeL71Ie+E2EVLNqAjlP97RH1BA4DPd6vxyDrvyUav/lH
- rNswQJfJv81VmcxzRUfi9FicnycvGwxp+J/tbnJxwxbFsM7ApAhAqGqnp+XddubbZ6Kd
- OzwXUFkDeRyugNCJQ1/Vy74daJYcStiNTYUX5ChUF8+a340YF8zi7id5nc1dJMRSAj4A
- MM4Jj4ereWbyzS8FOVWSmgRAJnVKDCyZ/hqxYY83hqe7kCKeNlOXMifgcco1aOWPfBag Wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hjntr06u7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Jul 2022 18:53:49 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 26QIjd3k001219;
-        Tue, 26 Jul 2022 18:53:49 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hjntr06ts-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Jul 2022 18:53:49 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 26QIp81O008780;
-        Tue, 26 Jul 2022 18:53:48 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma01dal.us.ibm.com with ESMTP id 3hg98s1gvj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Jul 2022 18:53:48 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 26QIrl1t11010800
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Jul 2022 18:53:47 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5AE3A112062;
-        Tue, 26 Jul 2022 18:53:47 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDCDD112061;
-        Tue, 26 Jul 2022 18:53:46 +0000 (GMT)
-Received: from sig-9-77-138-167.ibm.com (unknown [9.77.138.167])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 26 Jul 2022 18:53:46 +0000 (GMT)
-Message-ID: <58654fc70b38694df98e51e8e310ce34cec01816.camel@linux.vnet.ibm.com>
-Subject: Re: [PATCH 4/4] arch_vars: create arch specific permanent store
-From:   Greg Joyce <gjoyce@linux.vnet.ibm.com>
-Reply-To: gjoyce@linux.vnet.ibm.com
+        Tue, 26 Jul 2022 18:28:15 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7720E275F2;
+        Tue, 26 Jul 2022 15:28:14 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id e8-20020a17090a280800b001f2fef7886eso317042pjd.3;
+        Tue, 26 Jul 2022 15:28:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=cUakA031uAGu8Qe1zvGTpC9ti0G9n32ARq56hwimi+k=;
+        b=Om+qM1FEpuSbNmSbFvVze5NdmtUYdZBdkRttycVxJm+9guJzRMmRUuWjfWcusPv54j
+         oTqcEJ6nZ1CR6O3KuKr08FcCm92NOf6k46WnpQncvXwhmQI4IJCkCfaaZSvi0B1ZlSin
+         Y1l84BsiWY+uLUKxHRKTY69XHAp739L3+uOmO6DV357sFnEUNYwdgJBEK8Feg/7FVDts
+         jFc0pVHY2Soln6MZITpfd1BCIvRCEBS0lQKEHOCxb82jwUJM6HjB47IGqlBbjtkTHUQU
+         FjjNX7+eKHgfzkA8eOfgImfkSNchl0ZVmq7B19Ea9KKOAOi57jEJ+BUp6DuA87++xENl
+         qqGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=cUakA031uAGu8Qe1zvGTpC9ti0G9n32ARq56hwimi+k=;
+        b=anqfeJDGF9sOOp5zUiWynVw6arwPmj5rJUkc4G7fmmzACkIuKwPnKi5uSKfcYiWydT
+         VB0oNz1CtwNZaYUPlZRKWQwtL6IGIM3C0KnesWr13PkJk8p7ac7+hpAciN1ss3gkJPFB
+         rRHToMbyFNmLNL2kyEgPp52UveVGg2m+IIAXQvUiZQgoxmuFpnJ+o3k2xisKNt9T1DOk
+         WyycfRI3BHBboNB1eVe+lyeJqUYG2M8Fm3v/UV+fH382ulWjRD+yzcAygZFW8Ztv4HN7
+         vneX+W/S3uhHUvuV2IZUWwZiXcmbyEaY3yfXOq0rnUGr17MbXdyb3H7yP4amYgKVS4ch
+         CKPQ==
+X-Gm-Message-State: AJIora/0XGSvdtqwxjt7HFY4Lhb7ud1sdmHFjqpF2Hjp9C6SWYG440Zv
+        JX8M70vbifrPBBvdo4lF+LKc7vw23Pg=
+X-Google-Smtp-Source: AGRyM1tQpmi7LswiniSLvv3ky+C0mF2WQ6FyvOdentniXQrQPQ6x6AgVAkt7PuFH6C7kZEWyxj96Yw==
+X-Received: by 2002:a17:90b:681:b0:1f2:147a:5e55 with SMTP id m1-20020a17090b068100b001f2147a5e55mr1174109pjz.159.1658874493899;
+        Tue, 26 Jul 2022 15:28:13 -0700 (PDT)
+Received: from ?IPV6:2001:df0:0:200c:a0c2:b058:643a:c5f9? ([2001:df0:0:200c:a0c2:b058:643a:c5f9])
+        by smtp.gmail.com with ESMTPSA id 1-20020a630d41000000b00412a708f38asm10479254pgn.35.2022.07.26.15.28.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jul 2022 15:28:13 -0700 (PDT)
+Message-ID: <c0911dfc-2ece-e7de-640d-2b4c010569ac@gmail.com>
+Date:   Wed, 27 Jul 2022 10:28:08 +1200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v8 2/2] block: add overflow checks for Amiga partition
+ support
+Content-Language: en-US
 To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, keyrings@vger.kernel.org,
-        dhowells@redhat.com, jarkko@kernel.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, greg@gilhooley.com, gjoyce@ibm.com
-Date:   Tue, 26 Jul 2022 13:53:46 -0500
-In-Reply-To: <YtezuVYVQnqX2IsY@infradead.org>
-References: <20220718210156.1535955-1-gjoyce@linux.vnet.ibm.com>
-         <20220718210156.1535955-5-gjoyce@linux.vnet.ibm.com>
-         <YtezuVYVQnqX2IsY@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hTi9DWJG_tf8497GjjoGIVFymTJZFO3R
-X-Proofpoint-GUID: x9NT1qgxzXc5J_0hLeFcHduzw3YZeFet
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-26_05,2022-07-26_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 mlxlogscore=999 impostorscore=0 phishscore=0 suspectscore=0
- mlxscore=0 spamscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207260071
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-m68k@vger.kernel.org, geert@linux-m68k.org
+References: <20220726045747.4779-1-schmitzmic@gmail.com>
+ <20220726045747.4779-3-schmitzmic@gmail.com> <Yt/TQOJQZEhZE+2p@infradead.org>
+From:   Michael Schmitz <schmitzmic@gmail.com>
+In-Reply-To: <Yt/TQOJQZEhZE+2p@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2022-07-20 at 00:50 -0700, Christoph Hellwig wrote:
-> On Mon, Jul 18, 2022 at 04:01:56PM -0500, gjoyce@linux.vnet.ibm.com
-> wrote:
-> > From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
-> > 
-> > Platforms that have a permanent key store may provide unique
-> > platform dependent functions to read/write variables. The
-> > default (weak) functions return -EOPNOTSUPP unless overridden
-> > by architecture/platform versions.
-> 
-> This is still lacking any useful implementation.  It also seems to be
-> used in patch 3 before it actually is used.
-> 
-> As the functionality seems optional I'd suggest to drop this patch
-> for
-> now and not call it from patch 3, and do a separate series later that
-> adds the infrastructure, at leat one useful backend and the caller.
+Hi Christoph,
 
-It's kind of a chicken and egg thing. I'd hoped to add the
-infrastructure and follow it up with another pseries specific patchset
-that provided platform specific implementations of those functions.
+On 26/07/22 23:42, Christoph Hellwig wrote:
+> On Tue, Jul 26, 2022 at 04:57:47PM +1200, Michael Schmitz wrote:
+>> The Amiga partition parser module uses signed int for partition sector
+>> address and count, which will overflow for disks larger than 1 TB.
+>>
+>> Use u64 as type for sector address and size to allow using disks up to
+>> 2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
+>> format allows to specify disk sizes up to 2^128 bytes (though native
+>> OS limitations reduce this somewhat, to max 2^68 bytes), so check for
+>> u64 overflow carefully to protect against overflowing sector_t.
+>>
+>> Bail out if sector addresses overflow 32 bits on kernels without LBD
+>> support.
+>>
+>> This bug was reported originally in 2012, and the fix was created by
+>> the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
+>> discussed and reviewed on linux-m68k at that time but never officially
+>> submitted (now resubmitted as separate patch).
+>> This patch adds additional error checking and warning messages.
+>>
+>> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
+>> Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
+>> Message-ID: <201206192146.09327.Martin@lichtvoll.de>
+>> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
+>> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>> ---
+>>   block/partitions/amiga.c | 111 +++++++++++++++++++++++++++++++--------
+>>   1 file changed, 89 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
+>> index f98191545d9a..7356b39cbe10 100644
+>> --- a/block/partitions/amiga.c
+>> +++ b/block/partitions/amiga.c
+>> @@ -11,10 +11,18 @@
+>>   #define pr_fmt(fmt) fmt
+>>   
+>>   #include <linux/types.h>
+>> +#include <linux/mm_types.h>
+>> +#include <linux/overflow.h>
+>>   #include <linux/affs_hardblocks.h>
+>>   
+>>   #include "check.h"
+>>   
+>> +/* magic offsets in partition DosEnvVec */
+>> +#define NR_HD	3
+>> +#define NR_SECT	5
+>> +#define LO_CYL	9
+>> +#define	HI_CYL	10
+> The last line has a tab after the #define while the previous three
+> don't.  Pick one style and stick to it for the others.
+>
+>>   		if (!data) {
+>> -			pr_err("Dev %s: unable to read RDB block %d\n",
+>> -			       state->disk->disk_name, blk);
+>> +			pr_err("Dev %s: unable to read RDB block %llu\n",
+>> +			       state->disk->disk_name, (u64) blk);
+> No need for the various printk casts, a sector_t is always an
+> unsigned long long.
 
-But I can break it up as you suggest. I'll include your other comments
-as well as the keyring suggestion from Hannes.
+Thanks, wil fix (and address the other issues raised).
+
+Cheers,
+
+     Michael
+
 
