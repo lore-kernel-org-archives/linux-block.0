@@ -2,133 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A6DC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 11:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3438C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 12:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232887AbiGZLv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 07:51:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59254 "EHLO
+        id S238087AbiGZMKY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 08:10:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230472AbiGZLv2 (ORCPT
+        with ESMTP id S238888AbiGZMKW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 07:51:28 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB1D2BB25;
-        Tue, 26 Jul 2022 04:51:27 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 39C0A1FD62;
-        Tue, 26 Jul 2022 11:51:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1658836286; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NmXEb+MCaJzubCv0tA1KqSSjkQkT0I7HTn2jJIRu3uA=;
-        b=YyxLwvdhMNHVl0jV0+3QHBUP1GBM0MxK5Pl/QuqoVMTpwInClhmngBFgqk2kXiCpoX2l3X
-        Z1nLc/r7hti33W91noWGcNyBTfzPm4i1tliDZye+yIycvrXAiXcrMbMMHo/feqZ8vrv8RM
-        9ZGdfxN3L/0OTHyZnlhC1p+XdzySt8Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1658836286;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NmXEb+MCaJzubCv0tA1KqSSjkQkT0I7HTn2jJIRu3uA=;
-        b=AAXUUjyjw/ncV9bQHVU+IBQEn3+ZlGakAMXWCOxRuLNezLELBLQwHPzZV6zYhCrG9OeoVD
-        zIhM/wSICdHb3eDw==
-Received: from quack3.suse.cz (unknown [10.100.200.198])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id CB44F2C15D;
-        Tue, 26 Jul 2022 11:51:24 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7C6A5A0680; Tue, 26 Jul 2022 13:51:24 +0200 (CEST)
-Date:   Tue, 26 Jul 2022 13:51:24 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     jack@suse.cz, axboe@kernel.dk, osandov@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH RFC v4] sbitmap: fix possible io hung due to lost wakeup
-Message-ID: <20220726115124.cbmcs3xgeqfwv7qw@quack3>
-References: <20220723024122.2990436-1-yukuai1@huaweicloud.com>
+        Tue, 26 Jul 2022 08:10:22 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76D5237C0;
+        Tue, 26 Jul 2022 05:10:19 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4LsbLB4tNvz6PY02;
+        Tue, 26 Jul 2022 20:09:06 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgAXFWin2d9iENLYBA--.43969S4;
+        Tue, 26 Jul 2022 20:10:17 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     axboe@kernel.dk, osandov@fb.com, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH v3] blk-mq: fix io hung due to missing commit_rqs
+Date:   Tue, 26 Jul 2022 20:22:24 +0800
+Message-Id: <20220726122224.1790882-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220723024122.2990436-1-yukuai1@huaweicloud.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgAXFWin2d9iENLYBA--.43969S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGry3AF1xWw43XFy3Jw13Arb_yoW5Zw1xpF
+        4fGa12kr40qr42vFyxuay7A3WIyws5GrW7WryfKw4aqFW5KrWIqrs3tr17WFyIyFs5uanI
+        gF45XryFqw1UArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat 23-07-22 10:41:22, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> There are two problems can lead to lost wakeup:
-> 
-> 1) invalid wakeup on the wrong waitqueue:
-> 
-> For example, 2 * wake_batch tags are put, while only wake_batch threads
-> are woken:
-> 
-> __sbq_wake_up
->  atomic_cmpxchg -> reset wait_cnt
-> 			__sbq_wake_up -> decrease wait_cnt
-> 			...
-> 			__sbq_wake_up -> wait_cnt is decreased to 0 again
-> 			 atomic_cmpxchg
-> 			 sbq_index_atomic_inc -> increase wake_index
-> 			 wake_up_nr -> wake up and waitqueue might be empty
->  sbq_index_atomic_inc -> increase again, one waitqueue is skipped
->  wake_up_nr -> invalid wake up because old wakequeue might be empty
-> 
-> To fix the problem, increasing 'wake_index' before resetting 'wait_cnt'.
-> 
-> 2) 'wait_cnt' can be decreased while waitqueue is empty
-> 
-> As pointed out by Jan Kara, following race is possible:
-> 
-> CPU1				CPU2
-> __sbq_wake_up			 __sbq_wake_up
->  sbq_wake_ptr()			 sbq_wake_ptr() -> the same
->  wait_cnt = atomic_dec_return()
->  /* decreased to 0 */
->  sbq_index_atomic_inc()
->  /* move to next waitqueue */
->  atomic_set()
->  /* reset wait_cnt */
->  wake_up_nr()
->  /* wake up on the old waitqueue */
-> 				 wait_cnt = atomic_dec_return()
-> 				 /*
-> 				  * decrease wait_cnt in the old
-> 				  * waitqueue, while it can be
-> 				  * empty.
-> 				  */
-> 
-> Fix the problem by waking up before updating 'wake_index' and
-> 'wait_cnt'.
-> 
-> With this patch, noted that 'wait_cnt' is still decreased in the old
-> empty waitqueue, however, the wakeup is redirected to a active waitqueue,
-> and the extra decrement on the old empty waitqueue is not handled.
-> 
-> Fixes: 88459642cba4 ("blk-mq: abstract tag allocation out into sbitmap library")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+From: Yu Kuai <yukuai3@huawei.com>
 
-The patch looks good to me now (just one typo fix below). Thanks for the
-fix! Feel free to add:
+Currently, in virtio_scsi, if 'bd->last' is not set to true while
+dispatching request, such io will stay in driver's queue, and driver
+will wait for block layer to dispatch more rqs. However, if block
+layer failed to dispatch more rq, it should trigger commit_rqs to
+inform driver.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+There is a problem in blk_mq_try_issue_list_directly() that commit_rqs
+won't be called:
 
+// assume that queue_depth is set to 1, list contains two rq
+blk_mq_try_issue_list_directly
+ blk_mq_request_issue_directly
+ // dispatch first rq
+ // last is false
+  __blk_mq_try_issue_directly
+   blk_mq_get_dispatch_budget
+   // succeed to get first budget
+   __blk_mq_issue_directly
+    scsi_queue_rq
+     cmd->flags |= SCMD_LAST
+      virtscsi_queuecommand
+       kick = (sc->flags & SCMD_LAST) != 0
+       // kick is false, first rq won't issue to disk
+ queued++
 
-> +	/*
-> +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
-> +	 * ensure that we see the batch size update before the wait
-> +	 * count is reset.
-> +	 *
-> +	 * Also pairs with the implicit barrier between becrementing wait_cnt
-							^^^ decrementing
+ blk_mq_request_issue_directly
+ // dispatch second rq
+  __blk_mq_try_issue_directly
+   blk_mq_get_dispatch_budget
+   // failed to get second budget
+ ret == BLK_STS_RESOURCE
+  blk_mq_request_bypass_insert
+ // errors is still 0
 
-								Honza
+ if (!list_empty(list) || errors && ...)
+  // won't pass, commit_rqs won't be called
 
+In this situation, first rq relied on second rq to dispatch, while
+second rq relied on first rq to complete, thus they will both hung.
+
+Fix the problem by also treat 'BLK_STS_*RESOURCE' as 'errors' since
+it means that request is not queued successfully.
+
+Same problem exists in blk_mq_dispatch_rq_list(), 'BLK_STS_*RESOURCE'
+can't be treated as 'errors' here, fix the problem by calling
+commit_rqs if queue_rq return 'BLK_STS_*RESOURCE'.
+
+Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+Changes in v3:
+ - as poinited out by Ming, v2 will break return value by treating
+ BLK_STS_*RESOURCE as errors.
+Changes in v2:
+ - suggested by Ming, handle blk_mq_dispatch_rq_list() as well.
+ - change title and modify commit message.
+
+ block/blk-mq.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 70177ee74295..7d26b222cbc9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1931,7 +1931,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	/* If we didn't flush the entire list, we could have told the driver
+ 	 * there was more coming, but that turned out to be a lie.
+ 	 */
+-	if ((!list_empty(list) || errors) && q->mq_ops->commit_rqs && queued)
++	if ((!list_empty(list) || errors || needs_resource ||
++	     ret == BLK_STS_DEV_RESOURCE) && q->mq_ops->commit_rqs && queued)
+ 		q->mq_ops->commit_rqs(hctx);
+ 	/*
+ 	 * Any items that need requeuing? Stuff them into hctx->dispatch,
+@@ -2680,6 +2681,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 		list_del_init(&rq->queuelist);
+ 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+ 		if (ret != BLK_STS_OK) {
++			errors++;
+ 			if (ret == BLK_STS_RESOURCE ||
+ 					ret == BLK_STS_DEV_RESOURCE) {
+ 				blk_mq_request_bypass_insert(rq, false,
+@@ -2687,7 +2689,6 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 				break;
+ 			}
+ 			blk_mq_end_request(rq, ret);
+-			errors++;
+ 		} else
+ 			queued++;
+ 	}
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.31.1
+
