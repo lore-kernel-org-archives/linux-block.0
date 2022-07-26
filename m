@@ -2,42 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99383C3F6B0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 17:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 611B4C00140
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 17:47:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234155AbiGZRo7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 13:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39492 "EHLO
+        id S239589AbiGZRr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 13:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbiGZRo7 (ORCPT
+        with ESMTP id S239600AbiGZRrZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 13:44:59 -0400
+        Tue, 26 Jul 2022 13:47:25 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4536F1001;
-        Tue, 26 Jul 2022 10:44:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0ED712D0A
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 10:47:24 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id AFD5668AA6; Tue, 26 Jul 2022 19:44:54 +0200 (CEST)
-Date:   Tue, 26 Jul 2022 19:44:54 +0200
+        id 9E54168AA6; Tue, 26 Jul 2022 19:47:21 +0200 (CEST)
+Date:   Tue, 26 Jul 2022 19:47:21 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] ublk_drv: fix double shift bug
-Message-ID: <20220726174454.GA13897@lst.de>
-References: <Yt/2R/+MJf/MSoyl@kili>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [PATCH 1/2] ublk_drv: store device parameters
+Message-ID: <20220726174721.GA14002@lst.de>
+References: <20220723150713.750369-1-ming.lei@redhat.com> <20220723150713.750369-2-ming.lei@redhat.com> <20220725064259.GA20796@lst.de> <Yt5BCtLi70Pits34@T590> <20220726123224.GA9435@lst.de> <Yt/4UBGtFDqr2SfA@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yt/2R/+MJf/MSoyl@kili>
+In-Reply-To: <Yt/4UBGtFDqr2SfA@T590>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Tue, Jul 26, 2022 at 10:21:04PM +0800, Ming Lei wrote:
+> But most of fields in ublk_params aren't required for one device,
+> sending them all isn't friendly from both userspace and kernel side.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I think it actually is easier for both.  For the kernel the benefit
+is pretty clear seen by this patch, and for userspae there also is
+a lot less boilerplate code.
 
-although as-is I would not call it a bug yet as we're not going out
-of unsigned long range yet.
+> Especially inside kernel, a big chunk buffer is allocated for
+> the structure, but only few fields are useful for one device. There can
+> be lots of ublk device, and total wasted memory can't be ignored.
+
+I think even right now the memory usage is less.  If a lot (and I mean
+a lot) new paramters are added, it might be slightly higher than the
+minimal config with an xarray, but not to the point where it matters.
+
+> If we group parameters, it is easier to extend by adding new parameter
+> type. One ublk device usually just uses several parameter types.
+> And the xarray implementation is simple enough too, which is just one
+> array, but really sparsed.
+
+Well, it isn't exactly simple.  And the apprach of a struct that just
+grows additional members has worked perfectly fine all over the kernel.
