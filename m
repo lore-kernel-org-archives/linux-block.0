@@ -2,140 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D8F5C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 04:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA111CCA489
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 04:57:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbiGZEVg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 00:21:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35848 "EHLO
+        id S230398AbiGZE56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 00:57:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbiGZEVf (ORCPT
+        with ESMTP id S237009AbiGZE54 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 00:21:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 18E4524BDD
-        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 21:21:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658809293;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vozal9Eu1i70NCpSRKE6fRuasNJPAr2zUeKK0YEFUFU=;
-        b=RRcHmQuCN/IO9ycv4ohTjaotKzuDzHzmrhnrncpqjvCDxkkMsxdNIBVLOlmXkBhVkylrmL
-        E8FqzajVgl7ROnQRUG/voSdrJxioEcGJJkznfXbdCp0eoMoRfgZA5JnznxLHaYIw1bInMR
-        tBkpxFqkfpM9+2n0mfR7XHE0q8K3pKg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-443-EdLU_uJYOAuBIAwHEL3kVQ-1; Tue, 26 Jul 2022 00:21:28 -0400
-X-MC-Unique: EdLU_uJYOAuBIAwHEL3kVQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3CA2E38025E1;
-        Tue, 26 Jul 2022 04:21:27 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9168794561;
-        Tue, 26 Jul 2022 04:21:09 +0000 (UTC)
-Date:   Tue, 26 Jul 2022 12:21:00 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, osandov@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH v2] blk-mq: fix io hung due to missing commit_rqs
-Message-ID: <Yt9rrL62zW2orGys@T590>
-References: <20220726033519.4002586-1-yukuai1@huaweicloud.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220726033519.4002586-1-yukuai1@huaweicloud.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+        Tue, 26 Jul 2022 00:57:56 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2E125E8C;
+        Mon, 25 Jul 2022 21:57:54 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id li4so1031900pjb.3;
+        Mon, 25 Jul 2022 21:57:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=W94qn3nGmVR/O4UrSjj7D/CmCTf8ayPCIaQqSAZ/DBA=;
+        b=j7KMIJrO4k530gQ37gHVT9sl9RU/VKp7nTo9uUFs43OZROSC4+N1lGHOUeDr2x4gKG
+         AQiFMrrPD474U8kTN7If/A6gFqYNacAiwOBGhV13gjfpj8K8wHb1OMv/eUlY1pnRM7tS
+         AK0dXWo8jbkBW+NTnS/KXH3Ryzd/c8hZCim/zWrS6qkfcuibqtld7EQfhO3xNKRqMtL3
+         +31l2+Xv3pKZbyHhgJNl2JkwObMGLeH+iWFg9v6jkQvMPEiYQsStcYWrQBAaKfhgWOcG
+         XMTSxyt4pVP7T3IjDR5FkcKTw1wYoS4qxQm0d/ZG17dUppWJWt2A3PBO/6oeoJu9JXCK
+         +A3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=W94qn3nGmVR/O4UrSjj7D/CmCTf8ayPCIaQqSAZ/DBA=;
+        b=vZEBfsH2ZxMD1zDgms6pPjYaelME6kxZwWRsLhg9CxhGT455gN9+xkfQhjQFI7T1Ok
+         hPQbEBf6ynvod9D68ecTiRrMkbhCb98704dKJ52E6wTjanbcBUFM1mE9rjQW9VuwxWa/
+         Yv2nHESwrOj0vPsCfUfhqNv1wpMFezCav6EkRLWjf/bjK/QjfxwCvZueCCpURcESkmcZ
+         VVJi3Bqh2RiTMCvQWEFdecLgEActZ6UYB1yZfOg4WWLFMIcdcLYwDeFWVfWUhOTMOyBx
+         V6Ya7u7KK47oOHu/cODDXHHFcwj8PCfPJfriGE52ky0EDQSw68IebBx2inY8MOv9rjrM
+         OvBw==
+X-Gm-Message-State: AJIora+dyLWylt4gswmklIqWG7qNmbH6mMVEvETvhnnHp4Sle5GdyLTN
+        EdTi3pyuYJ0lPu3k7D63Yak=
+X-Google-Smtp-Source: AGRyM1vUB1LDtsBxMotXVJJ1oKUD0bhNW2CnmTq27XG8xmNUcy2aruFoOl8MMjpFZfr8DR3o6rKmSg==
+X-Received: by 2002:a17:90a:fe07:b0:1f2:1a1e:e0db with SMTP id ck7-20020a17090afe0700b001f21a1ee0dbmr17905574pjb.106.1658811474126;
+        Mon, 25 Jul 2022 21:57:54 -0700 (PDT)
+Received: from xplor.waratah.dyndns.org (222-155-0-244-adsl.sparkbb.co.nz. [222.155.0.244])
+        by smtp.gmail.com with ESMTPSA id c22-20020a63ef56000000b0040d48cf046csm9271262pgk.55.2022.07.25.21.57.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jul 2022 21:57:53 -0700 (PDT)
+Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
+        id 8245E360326; Tue, 26 Jul 2022 16:57:50 +1200 (NZST)
+From:   Michael Schmitz <schmitzmic@gmail.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org,
+        Michael Schmitz <schmitzmic@gmail.com>
+Subject: [PATCH v8 1/2] block: fix signed int overflow in Amiga partition support
+Date:   Tue, 26 Jul 2022 16:57:46 +1200
+Message-Id: <20220726045747.4779-2-schmitzmic@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220726045747.4779-1-schmitzmic@gmail.com>
+References: <20220726045747.4779-1-schmitzmic@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 11:35:19AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Currently, in virtio_scsi, if 'bd->last' is not set to true while
-> dispatching request, such io will stay in driver's queue, and driver
-> will wait for block layer to dispatch more rqs. However, if block
-> layer failed to dispatch more rq, it should trigger commit_rqs to
-> inform driver.
-> 
-> There is a problem in blk_mq_try_issue_list_directly() that commit_rqs
-> won't be called:
-> 
-> // assume that queue_depth is set to 1, list contains two rq
-> blk_mq_try_issue_list_directly
->  blk_mq_request_issue_directly
->  // dispatch first rq
->  // last is false
->   __blk_mq_try_issue_directly
->    blk_mq_get_dispatch_budget
->    // succeed to get first budget
->    __blk_mq_issue_directly
->     scsi_queue_rq
->      cmd->flags |= SCMD_LAST
->       virtscsi_queuecommand
->        kick = (sc->flags & SCMD_LAST) != 0
->        // kick is false, first rq won't issue to disk
->  queued++
-> 
->  blk_mq_request_issue_directly
->  // dispatch second rq
->   __blk_mq_try_issue_directly
->    blk_mq_get_dispatch_budget
->    // failed to get second budget
->  ret == BLK_STS_RESOURCE
->   blk_mq_request_bypass_insert
->  // errors is still 0
-> 
->  if (!list_empty(list) || errors && ...)
->   // won't pass, commit_rqs won't be called
-> 
-> In this situation, first rq relied on second rq to dispatch, while
-> second rq relied on first rq to complete, thus they will both hung.
-> And same problem exists in blk_mq_dispatch_rq_list()
-> 
-> Fix the problem by also treat 'BLK_STS_*RESOURCE' as 'errors' since
-> it means that request is not queued successfully.
-> 
-> Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
-> Changes in v2:
->  - suggested by Ming, handle blk_mq_dispatch_rq_list() as well.
->  - change title and modify commit message.
-> 
->  block/blk-mq.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 70177ee74295..ee1e065fe63f 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1909,6 +1909,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->  			fallthrough;
->  		case BLK_STS_DEV_RESOURCE:
->  			blk_mq_handle_dev_resource(rq, list);
-> +			errors++;
->  			goto out;
->  		case BLK_STS_ZONE_RESOURCE:
->  			/*
-> @@ -1918,6 +1919,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->  			 */
->  			blk_mq_handle_zone_resource(rq, &zone_list);
->  			needs_resource = true;
-> +			errors++;
+The Amiga partition parser module uses signed int for partition sector
+address and count, which will overflow for disks larger than 1 TB.
 
-But accounting error here may break return value of
-blk_mq_dispatch_rq_list(), see:
+Use sector_t as type for sector address and size to allow using disks
+up to 2 TB without LBD support, and disks larger than 2 TB with LBD.
 
-/* Returns true if we did some work AND can potentially do more. */
+This bug was reported originally in 2012, and the fix was created by
+the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
+discussed and reviewed on linux-m68k at that time but never officially
+submitted. This patch differs from Joanne's patch only in its use of
+sector_t instead of unsigned int. No checking for overflows is done
+(see patch 2 of this series for that).
 
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
+Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
+Message-ID: <201206192146.09327.Martin@lichtvoll.de>
+Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
+Tested-by: Martin Steigerwald <Martin@lichtvoll.de>
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ block/partitions/amiga.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-thanks,
-Ming
+diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
+index 5c8624e26a54..f98191545d9a 100644
+--- a/block/partitions/amiga.c
++++ b/block/partitions/amiga.c
+@@ -31,7 +31,8 @@ int amiga_partition(struct parsed_partitions *state)
+ 	unsigned char *data;
+ 	struct RigidDiskBlock *rdb;
+ 	struct PartitionBlock *pb;
+-	int start_sect, nr_sects, blk, part, res = 0;
++	sector_t start_sect, nr_sects;
++	int blk, part, res = 0;
+ 	int blksize = 1;	/* Multiplier for disk block size */
+ 	int slot = 1;
+ 
+@@ -96,14 +97,14 @@ int amiga_partition(struct parsed_partitions *state)
+ 
+ 		/* Tell Kernel about it */
+ 
+-		nr_sects = (be32_to_cpu(pb->pb_Environment[10]) + 1 -
+-			    be32_to_cpu(pb->pb_Environment[9])) *
++		nr_sects = ((sector_t) be32_to_cpu(pb->pb_Environment[10])
++			   + 1 - be32_to_cpu(pb->pb_Environment[9])) *
+ 			   be32_to_cpu(pb->pb_Environment[3]) *
+ 			   be32_to_cpu(pb->pb_Environment[5]) *
+ 			   blksize;
+ 		if (!nr_sects)
+ 			continue;
+-		start_sect = be32_to_cpu(pb->pb_Environment[9]) *
++		start_sect = (sector_t) be32_to_cpu(pb->pb_Environment[9]) *
+ 			     be32_to_cpu(pb->pb_Environment[3]) *
+ 			     be32_to_cpu(pb->pb_Environment[5]) *
+ 			     blksize;
+-- 
+2.17.1
 
