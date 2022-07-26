@@ -2,168 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DB7C48BEA
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 14:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B942CC00140
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 14:15:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbiGZOMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 10:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51358 "EHLO
+        id S230024AbiGZOPa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 10:15:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiGZOMm (ORCPT
+        with ESMTP id S232427AbiGZOP3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 10:12:42 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204DC62F8;
-        Tue, 26 Jul 2022 07:12:42 -0700 (PDT)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26QE4JTF006134;
-        Tue, 26 Jul 2022 14:12:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : mime-version; s=corp-2022-7-12;
- bh=27D9EdK/99Ms0t5NEsQD5h9XUzjlcfaJezoJmgg1PoA=;
- b=CmPX8lM9rWd7RMFMK/sRpYJyqzZrh/DopTMQUGjARrTwkiW3glvS5cooiD2Xkpla4cOh
- 6nsCEM0I1ZYxCkLt7t6vj7cjEMnCuQu/JP7J1xZq0/zcL7XCenO9u9rm9kYerzyBjeII
- BQIFp6TJv7o5vsdEF9rE+hJhUC7jxvxbG6KBDAb8GLDZHYHBGc8Fs+Y8n8lkTx+rYwXz
- EP4AzFFTTMGTj4gmFsDUkliTu2yzpWQG15tuzQSgBH+ZjVM9gw2FWFjh62TPAGMjw2Tk
- ZkzPNXy+I06eoAU0Lydm2IEWHJ9SqGvBjUhptwKnT6kXQi9Oi4p/3uAfR6sy+DXia9Ve Xw== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3hg940pg07-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Jul 2022 14:12:37 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 26QCQgaE019867;
-        Tue, 26 Jul 2022 14:12:36 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3hh637txwb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Jul 2022 14:12:36 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D9W1w0RjL5Zcb3PZRZgOcbf+Xgze65eE/kJ2rVP/OG+UqaO+zAN6yu/15VFCMMG9AGjm5lP1ORqJipc6I10OUJnH3I2aTELr8wPUOC1FDXUwEeHfw3TiPIISTQnJaETMwLmXKTPZeFUE2Qhrtcwva+xjdfK1E1H+IuEGcqvzkf4YuHfwUHss6LuWgUR4TZDf/MItebc0+q/SGbHJ5JvqDvuNuODbpsRdj3gGEU3zikKa+LGfrYunSkCY3k2TMsgOat143w3VtBqzsyYpfKRJME10GUnylXCtt3EZuRRRLBsuoYNkqsIUok5KaIheXa25QXg+kQsMkWMKT7+sTdFs/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=27D9EdK/99Ms0t5NEsQD5h9XUzjlcfaJezoJmgg1PoA=;
- b=gMHNLpXwKcXphnPwVxsUGeKT6kMAdjGOzL1p7if1qLkjgeyqyPN7tvHPIvRDnLuWdNjMhnrj3h/GlcB8WBYcPaJPvGzQh8CFJwHmTLLMMTpXDOqe4xq3Yl44VkRFYxH2ati6B1Vx4vSHcNkG9VclEGfnpm0Q4DDR6Q0oDMGDCt+NxPBdXLbXt9Oy6fE2wVmNcM6gLhC1ebrp2jys01FVfiVJzs/UJ7HBnkfqSrY0f0nGtGocWU5Ww60TbtqF3lKZQHyirc6dVAKBe5Dt70GGN48VibFtdhYzdUmfzm+V6hEoJLRRaGZvE4HkzBWy3lr4a8jbBWTerjAqSrTfZ0uwjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Tue, 26 Jul 2022 10:15:29 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68ACDFE9;
+        Tue, 26 Jul 2022 07:15:27 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id l23so26452829ejr.5;
+        Tue, 26 Jul 2022 07:15:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=27D9EdK/99Ms0t5NEsQD5h9XUzjlcfaJezoJmgg1PoA=;
- b=hPM2ZKLhiL0aB7HVX7kMUFvXKtQlMRWscVa24nOz6l1sqPpbq82nEELEcJMm/732rE/gmSg9zqPkwMrCv2vEkAonp6AgE/cpyfGBUvK63hUQRRaILy0uSK6rsSVaR83mChzuRN1oMya73rRBO1cEnWDx6Uz4ZsuDKE3pdTx8K4g=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by CY4PR10MB1271.namprd10.prod.outlook.com
- (2603:10b6:910:4::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.20; Tue, 26 Jul
- 2022 14:12:33 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::24dc:9f9a:c139:5c97]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::24dc:9f9a:c139:5c97%4]) with mapi id 15.20.5458.025; Tue, 26 Jul 2022
- 14:12:33 +0000
-Date:   Tue, 26 Jul 2022 17:12:23 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [PATCH] ublk_drv: fix double shift bug
-Message-ID: <Yt/2R/+MJf/MSoyl@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-ClientProxiedBy: ZR0P278CA0001.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:16::11) To MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28)
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=O5E0FSZQiutol3hpHlFkaz9qPEKWwCCD554TzdxrSSo=;
+        b=MI4SaaeV9K8xywG0eA8PY60teUvlHzm4hyx40a8D8AoWPrN7KxU7RfDXtquYDI0xa0
+         kDpys0J2b9+ZTn+2TSH6/HhU4FRVvRAsmEVpT8zpX/65eEhtyFMeeQvp9FuV+BYPwLp9
+         Xex0vx8BxAzItBnlmmmgLR3MLJMXRwJt/Jim/m/rTxAur1Fd9OnZrjHoy6/bMfIeNQH2
+         Xs2roMDToNaNOoNdaPiekCqsyX8pa5ckI0tALBjFc8vQYIBxRsXae26TH6KVKAIy2HSA
+         MLQ8jyCvVK8Nbp7jlCnbgPS9KucmavwnOJDA4sCbDxlybtRfp9S1xXhsMiHbV3WIxZft
+         Dmcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=O5E0FSZQiutol3hpHlFkaz9qPEKWwCCD554TzdxrSSo=;
+        b=GIak55HN1UMGU0ll5Q2mEnvy3bEZtg2BFMEUhMAzxYKU+p404lnllKpU6y38k/QeRD
+         44/heQarPT2mfrtEKrSp5NEwpYyCNWpUwW3ALWPJ05prVKhJ+d6BwNtXAJfRDn1qDQUR
+         5uYdJVrCdlNL2FflC6dfRA83u43AkT/3lOKkZISDa1A/ln4tnNBNmmtIS++/nO0If/3d
+         t+UZxEOZkFZzHYvM46ouUX3dKb4CyG2d5yynw5hHjvVhptPdJGR+Vkdu2ilLvisRJgux
+         lNXDtUiMT3erIirECBQu1/mbosqgzZc4a6sncrq4uVUIjeMUC58r2OG02EIPrklYBiBM
+         2UCA==
+X-Gm-Message-State: AJIora/W4TmolrBn8P0JFAjpXSDDEf0ZxBcIMzRpGtDijl1yv/uvOQV1
+        IDExHOL4kT0plSrxiSSh4crAhQw1pfNEkBvAwszB+RG4xu7MCA==
+X-Google-Smtp-Source: AGRyM1uOuv6BFhxY6EWDgfOZQvxnwqigT/3vy6EMk7gMnXVcsqjivHqldN+fAfBGgxTUIYgbFxY3jDBOFM0ocFmzI1I=
+X-Received: by 2002:a17:907:6d1d:b0:72b:6d8a:ca64 with SMTP id
+ sa29-20020a1709076d1d00b0072b6d8aca64mr14325849ejc.371.1658844926056; Tue, 26
+ Jul 2022 07:15:26 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: fa3402da-2957-4940-0736-08da6f10e268
-X-MS-TrafficTypeDiagnostic: CY4PR10MB1271:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uQu7FOgC+C7SJy0u/Snqlf2CmMy72dUSig1SncwJfr47/PnyidimNNMgFPa6cPKlZns7gZQa11BvWl75tIKhxvB/YroMtQ77vNaH249CGrLIYSM8esv76C7ELN6r3/tlLPG47k51MqX6IW21xwSjbh+SV2/oHH7dh4EjNKyyAGvs84g/dZ3Kk81c0K+XKK0z42p0RGForvCC7i8rYvZ7dZ7IwzHvl44fjfZS77KfzRQJ5FZL37k91Xvf0fwj/GlQs6TSSdpdHh83VIm4ahRpxNQnABcu61rXOgPhRBhvvNDARBYaT+0VXlUeAV2FsNVjkXoBvpjeRcCUAz518JT19YLvnIFKUkyi3KS5Z4Nn/YURGHgLdIQtKyxy3FUQWKKeZ1JTSqEn0INFyVDgptmN3WtKX8jTWQq6vN0yfbkdWOP0QYlIcaIb8ddPKx+2nsXGoyr9KzGw2eWtcPcX59FH77sZ4lw2CLnMUj9zagPF++ULtWmpwqB7uKcrKFxEHvK8iemn2svAAtEkYGL694xlJFMCjdvzysDXswDGJjKxFM9FcprM7ow4AY3VADSJzlGylrXi4cPTVgI1b7A55GBU8XhwKV0iqMvwzH6vFkJLgSMSMHJ+8Y8F+BhPZxPTwT65ZpgCHam6x5dBoXb9Hi/9uMjxFEqtzhEz4vEcbVZgYROsu+6ldHcibNP621GCIPSwMK92upVebnytvvUf8eWympbXJoUS7ycGcs44M5yvn2PgMbMiCPP0XNGTzSdgPfKbakBs+ZTdqttz9/NnzNFiU39A8o7qw1MYzovqGlt3yvaGWd4T5lFjbsJ7VSFiwk1I
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(136003)(39860400002)(376002)(396003)(346002)(366004)(38350700002)(83380400001)(6666004)(2906002)(38100700002)(86362001)(4326008)(26005)(66476007)(66946007)(33716001)(110136005)(8676002)(66556008)(41300700001)(316002)(478600001)(8936002)(52116002)(9686003)(6512007)(6506007)(44832011)(186003)(4744005)(5660300002)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?saunf8sRvtFx+H7t9qekTZcBzHHdxw5MUnlMOBOFuH32ekmzF1Bh95TolKT8?=
- =?us-ascii?Q?Rl9cAVWdw3gCNiOStssPN9vFqmV1KhWhHu0iKjem2o/1zSFM0I6dtSM5htux?=
- =?us-ascii?Q?tOmN2HskuCtPeB7IFd0bAVYqZgAIaYcGXq7VOdWCbBgPtwiPBPviwLjE0cqU?=
- =?us-ascii?Q?zpCmmFctcRIlEH7iCjpxldGPIE14Szef7lPLTQdp5Uxj2DuGDZREI4JoXFNw?=
- =?us-ascii?Q?rng+1otcM7R6UR5D8xCe/ho0FFdbhOeHjTMmHFiypZ0hN45Fg+PwoiSXm/Ol?=
- =?us-ascii?Q?CBG9zvitLntCK1bxqRPrkuYuayerE20HZ4HXMTTNecfZE2fCBR7LMHF2OJ5z?=
- =?us-ascii?Q?9i+/9jEr83HLwsGLtTwHDNnqeoqLDAgnSEIumSKo+zaLt+3XmQu4mUchVUfM?=
- =?us-ascii?Q?Idu+w9sNnePaV7ErIvBuv10PSPELsRjqNc3lb+VV2k3cmD781Yn+q6vn0LdO?=
- =?us-ascii?Q?uDZh8foBAHr5k0gh5QtnLmc71L3hwUz2+pGqhmgxRYVp97+HCOAihbH08SKt?=
- =?us-ascii?Q?Hi+1pQY1/0QYhP8i7lvSsRvQPnjm6/HxIvlNcsGzKlK3v5lw18DVupge5uG0?=
- =?us-ascii?Q?hxbUThF408qlI8KtAsU9JEnokTeWIHGmciA2FAJVCFNEEAbMkLIOkoQq3g5P?=
- =?us-ascii?Q?1Ykq7DMlFI/LXr0xCTkEE5U6zm9OOJLdAj3EX4A7jhJ6xkJbnaJH2z9iUrrt?=
- =?us-ascii?Q?oqgudQFK9etfx+6wyFiqO31FsPqkcPLK51mRNc0UJ1ndchX8VyWroiUmp+5D?=
- =?us-ascii?Q?g+4JBj/OxofOp6ye9bqbz752eV522TOUb4PCMxW6YPWe1RSADiQjVecK2+Ft?=
- =?us-ascii?Q?iCXx6gGH8EiQqPnzabUa7I3QZds4qvnaILOubtRTuSjlDeGTO7tZ6LE4edOb?=
- =?us-ascii?Q?P/zBYZS85lkUxaklE77tXnHQOTQz7O11lRgD40tPRr0avMBAC55aOQN+i1nY?=
- =?us-ascii?Q?MU4Fj6DzGxYGWdoZZie4hOQSRxrruLu0Cv00IdHJXB+iWxgXk4fu3RKarnQN?=
- =?us-ascii?Q?6q/BrFBMs5bHJx4TmPozRMV7olY7Yoa6xXLdalR8qTxRn5PEOxP2UHZC1RzY?=
- =?us-ascii?Q?PVA5pMoEQaA9XmyGbfucWnyfCcDjl4caF/hMsFtX1QjrDloDViKLC032pM4S?=
- =?us-ascii?Q?za/yBLhzrrDePjBlum98T5zvtegRrP1o3CxFzZF419xO+AT6/O/Xjmxu8gem?=
- =?us-ascii?Q?ap1kXciDXYDgmL4yTkfebepUx3g3BmGbSQrzJe6Dr16ET95SCJG4TN0+UlY+?=
- =?us-ascii?Q?+EpXA6qfPfMFJi3Ds7OjwxLeduT1UkvNr7kL0rZiMR5bCADQjN9279HoTR8o?=
- =?us-ascii?Q?jjB+6CntmmN1BVEtUM+TzOxavuchzeVhN9UGI9i16VYeTR7ywXh3Y8g6wvuS?=
- =?us-ascii?Q?iZeMPkIz9VnDRzSh5mVx3pYejXyIu5EbdOin1sSYmhbqUQ+5Q6g9PsilohOF?=
- =?us-ascii?Q?WaHZEH84VleXqrhoWDATnsYmE3gKOAtE+8diMSeZy6Wf104CbsBAeDLHUYNT?=
- =?us-ascii?Q?xcq/RRH/X6Q/84U2c33nT6zXwyO2QS4qIgNMQzgsg9DNty8jtzcD03tF+Ug3?=
- =?us-ascii?Q?t8X8L1lDoSaTTr0I6vi3L3ciNrwv/cPq0V7Xg6ojfijWvYdWQ8Hh2EZjaQyE?=
- =?us-ascii?Q?yg=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa3402da-2957-4940-0736-08da6f10e268
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2022 14:12:33.5912
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FxOP8zHOwdHMuIMUeM990J/nUwcul6YL7kQjJ9JeVFdqn6irgis/+a4eIq++D4jUfKR3gAUtbuxuhhqIK3V7IvAqyfE+o7Wou5UwemRjIWY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR10MB1271
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-26_04,2022-07-26_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- suspectscore=0 mlxscore=0 bulkscore=0 adultscore=0 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2206140000 definitions=main-2207260054
-X-Proofpoint-GUID: hx0X6rK9XoLJvxvQpSTusG315RDGmURf
-X-Proofpoint-ORIG-GUID: hx0X6rK9XoLJvxvQpSTusG315RDGmURf
+From:   Wei Chen <harperchen1110@gmail.com>
+Date:   Tue, 26 Jul 2022 22:14:50 +0800
+Message-ID: <CAO4mrfeAjieDYWN5Fs7+Xt2jTAcH3wEoCosjLLySWFyqRZKGuA@mail.gmail.com>
+Subject: WARNING in floppy_shutdown
+To:     efremov@linux.com, axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The test/clear_bit() functions take a bit number, but this code is
-passing as shifted value.  It's the equivalent of saying BIT(BIT(0))
-instead of just BIT(0).
+Dear Linux Developer,
 
-This doesn't affect runtime because numbers are small and it's done
-consistently.
+Recently when using our tool to fuzz kernel, the following crash was triggered:
 
-Fixes: fa362045564e ("ublk: simplify ublk_ch_open and ublk_ch_release")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- drivers/block/ublk_drv.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+HEAD commit: 03c765b0e3b4 Linux 5.19-rc4
+git tree: upstream
+compiler: clang 12.0.0
+console output:
+https://drive.google.com/file/d/1o65iMAXWvfzQ34k_uGOn-sSvmxHi5CNP/view?usp=sharing
+Syzlang reproducer:
+https://drive.google.com/file/d/1pFy1YcRtfmZKA540VjsLlb0xnN79rOV4/view?usp=sharing
+C reproducer: https://drive.google.com/file/d/1fAwKZ6WIt-RdPMS57Kxhq2eBBZ1hzeZO/view?usp=sharing
+kernel config: https://drive.google.com/file/d/1lNGU17X6Ui1NDLE4XCRu3I6f9lzhCBcH/view?usp=sharing
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index f058f40b639c..67efad976205 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -124,8 +124,8 @@ struct ublk_device {
- 	struct cdev		cdev;
- 	struct device		cdev_dev;
- 
--#define UB_STATE_OPEN		(1 << 0)
--#define UB_STATE_USED		(1 << 1)
-+#define UB_STATE_OPEN		0
-+#define UB_STATE_USED		1
- 	unsigned long		state;
- 	int			ub_number;
- 
--- 
-2.35.1
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: Wei Chen <harperchen1110@gmail.com>
 
+floppy driver state
+-------------------
+now=4294986375 last interrupt=4294975340 diff=11035 last called
+handler=seek_interrupt
+timeout_message=lock fdc
+last output bytes:
+1a 90 4294975340
+ 0 90 4294975340
+ 3 80 4294975340
+d1 90 4294975340
+10 90 4294975340
+ 7 80 4294975340
+ 8 80 4294975340
+ 0 90 4294975340
+ f 80 4294975340
+ 0 90 4294975340
+ 8 80 4294975340
+ 1 90 4294975340
+ 4 80 4294975343
+ 0 90 4294975343
+ 4 80 4294981723
+ 0 90 4294981723
+ 4 80 4294981723
+ 0 90 4294981723
+ 4 80 4294981726
+ 0 90 4294981726
+last result at 4294981727
+last redo_fd_request at 4294981727
+status=80
+fdc_busy=1
+cont=0000000000000000
+current_req=0000000000000000
+command_status=-1
+
+floppy0: floppy timeout called
+no cont in shutdown!
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 16304 at drivers/block/floppy.c:999
+floppy_shutdown+0x2ec/0x310
+Modules linked in:
+CPU: 0 PID: 16304 Comm: kworker/u2:8 Not tainted 5.19.0-rc4+ #26
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Workqueue: floppy floppy_shutdown
+RIP: 0010:floppy_shutdown+0x2ec/0x310
+Code: aa ae 4a 0c 48 c7 c7 c0 45 77 8b 48 c7 c2 eb d6 dc 8c 48 c7 c1
+60 47 77 8b 31 c0 e8 91 b8 6d 05 e9 32 ff ff ff e8 44 66 78 fc <0f> 0b
+eb 9d 89 d9 80 e1 07 38 c1 0f 8c 32 fe ff ff 48 89 df e8 3b
+RSP: 0018:ffffc9000aa1fc48 EFLAGS: 00010293
+RAX: ffffffff85115b9c RBX: 0000000000000001 RCX: ffff88801ef54880
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff85115b33 R09: fffffbfff1b5b2e5
+R10: fffffbfff1b5b2e5 R11: 0000000000000000 R12: dffffc0000000000
+R13: ffff8880162fec08 R14: ffffffff8dad95e0 R15: 1ffff11003d010c3
+FS:  0000000000000000(0000) GS:ffff888063c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055ff43183fe8 CR3: 000000001f642000 CR4: 0000000000752ef0
+DR0: 0000000000000003 DR1: 0000000000000000 DR2: 0000000000000005
+DR3: 0000000000000006 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ process_one_work+0x88d/0x1250
+ worker_thread+0xaf5/0x13b0
+ kthread+0x27a/0x310
+ ret_from_fork+0x1f/0x30
+ </TASK>
+
+Best,
+Wei
