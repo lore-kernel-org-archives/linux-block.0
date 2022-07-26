@@ -2,190 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1D1C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 00:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69804C43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 01:08:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbiGZAm6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jul 2022 20:42:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36048 "EHLO
+        id S231865AbiGZBIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jul 2022 21:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiGZAm5 (ORCPT
+        with ESMTP id S229891AbiGZBIa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jul 2022 20:42:57 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5919B1B785
-        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 17:42:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 06986B810A9
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 00:42:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B54EC341C6;
-        Tue, 26 Jul 2022 00:42:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1658796172;
-        bh=ZlSVJLVS3OvshiLyljYYOOWIc2+jTRy8oIB7PoNcYM8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dj4yVxm58YeOMAiN5x0XaxO5k9P+0YKyko2ZwR0DQBze4PYhJn+ZZErSRpo+swcGB
-         Ua6LTEO0gTgQhoKV1YABSTnIS5eFVD46OT9qKFH6nnJK4hOR9PwDWjFleoGdl4ZeW5
-         KqsyRmtojwmdoQvRnzYK9NycEuZQWyKbxFO6I9kdt6gAIRyIcqU/2oT5tL7hsEacEN
-         SOBoJi6HD8yj9VrKCAlaW3Rj7hSCz7rFrHn899xCuiOkWbAfphNkrHR+VojL8ONlay
-         f+MYyMGGkZTxeFTSdeLpqC1lQOthw/fiv12XKo9GAsLEgJlD05UpwMfGz2B0n6J1GN
-         0KkqGLq3BxxAw==
-Date:   Mon, 25 Jul 2022 17:42:50 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Israel Rukshin <israelr@nvidia.com>
-Cc:     Linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Nitzan Carmi <nitzanc@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: Re: [PATCH 1/1] block: Add support for setting inline encryption key
- per block device
-Message-ID: <Yt84ihS95qsGWv1K@sol.localdomain>
-References: <1658316391-13472-1-git-send-email-israelr@nvidia.com>
- <1658316391-13472-2-git-send-email-israelr@nvidia.com>
+        Mon, 25 Jul 2022 21:08:30 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6297286C4
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 18:08:28 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LsJbJ53shzWf9L;
+        Tue, 26 Jul 2022 09:04:28 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Jul 2022 09:08:21 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Jul 2022 09:08:20 +0800
+Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
+ plug list
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+CC:     Yufen Yu <yuyufen@huawei.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <hch@lst.de>,
+        "zhangyi (F)" <yi.zhang@huawei.com>
+References: <20220718123528.178714-1-yuyufen@huawei.com>
+ <YtZ4uSRqR/kLdqm+@T590>
+ <0baa5b04-7194-54fa-08a5-51425601343e@huaweicloud.com>
+ <Yt66HebQ9//2ahq6@T590>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <ab899ae0-91fc-48db-cc32-fdc57f61963a@huawei.com>
+Date:   Tue, 26 Jul 2022 09:08:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1658316391-13472-2-git-send-email-israelr@nvidia.com>
+In-Reply-To: <Yt66HebQ9//2ahq6@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 20, 2022 at 02:26:31PM +0300, Israel Rukshin wrote:
-> +static int blk_crypto_ioctl_create_key(struct request_queue *q,
-> +				       void __user *argp)
-> +{
-> +	struct blk_crypto_set_key_arg arg;
-> +	u8 raw_key[BLK_CRYPTO_MAX_KEY_SIZE];
-> +	struct blk_crypto_key *blk_key;
-> +	int ret;
-> +
-> +	if (copy_from_user(&arg, argp, sizeof(arg)))
-> +		return -EFAULT;
-> +
-> +	if (memchr_inv(arg.reserved, 0, sizeof(arg.reserved)))
-> +		return -EINVAL;
-> +
-> +	if (!arg.raw_key_size)
-> +		return blk_crypto_destroy_default_key(q);
-> +
-> +	if (q->blk_key) {
-> +		pr_err("Crypto key is already configured\n");
-> +		return -EBUSY;
-> +	}
+Hi, Ming!
 
-Doesn't this need locking so that multiple executions of this ioctl can't run on
-the block device at the same time?
+在 2022/07/25 23:43, Ming Lei 写道:
+> On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
+>> Hi, Ming!
+>>
+>> 在 2022/07/19 17:26, Ming Lei 写道:
+>>> On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
+>>>> We do test on a virtio scsi device (/dev/sda) and the default mq
+>>>> scheduler is 'none'. We found a IO hung as following:
+>>>>
+>>>> blk_finish_plug
+>>>>     blk_mq_plug_issue_direct
+>>>>         scsi_mq_get_budget
+>>>>         //get budget_token fail and sdev->restarts=1
+>>>>
+>>>> 			     	 scsi_end_request
+>>>> 				   scsi_run_queue_async
+>>>>                                      //sdev->restart=0 and run queue
+>>>>
+>>>>        blk_mq_request_bypass_insert
+>>>>           //add request to hctx->dispatch list
+>>>
+>>> Here the issue shouldn't be related with scsi's get budget or
+>>> scsi_run_queue_async.
+>>>
+>>> If blk-mq adds request into ->dispatch_list, it is blk-mq core's
+>>> responsibility to re-run queue for moving on. Can you investigate a
+>>> bit more why blk-mq doesn't run queue after adding request to
+>>> hctx dispatch list?
+>>
+>> I think Yufen is probably thinking about the following Concurrent
+>> scenario:
+>>
+>> blk_mq_flush_plug_list
+>> # assume there are three rq
+>>   blk_mq_plug_issue_direct
+>>    blk_mq_request_issue_directly
+>>    # dispatch rq1, succeed
+>>    blk_mq_request_issue_directly
+>>    # dispatch rq2
+>>     __blk_mq_try_issue_directly
+>>      blk_mq_get_dispatch_budget
+>>       scsi_mq_get_budget
+>>        atomic_inc(&sdev->restarts);
+>>        # rq2 failed to get budget
+>>        # restarts is 1 now
+>>                                          scsi_end_request
+>>                                          # rq1 is completed
+>>                                          ┊scsi_run_queue_async
+>>                                          ┊ atomic_cmpxchg(&sdev->restarts,
+>> old, 0) == old
+>>                                          ┊ # set restarts to 0
+>>                                          ┊ blk_mq_run_hw_queues
+>>                                          ┊ # hctx->dispatch list is empty
+>>    blk_mq_request_bypass_insert
+>>    # insert rq2 to hctx->dispatch list
+> 
+> After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
+> no matter if list_empty(list) is empty or not, queue will be run either from
+> blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
 
-Also, the key is actually being associated with the request_queue.  I thought it
-was going to be the block_device?  Doesn't it have to be the block_device so
-that different partitions on the same disk can have different settings?
+1) while inserting rq2 to dispatch list, blk_mq_request_bypass_insert()
+is called from blk_mq_try_issue_list_directly(), list_empty() won't
+pass, thus thus blk_mq_request_bypass_insert() won't run queue.
 
-Also, the pr_err should be removed.  Likewise in several places below.
-
-> +
-> +	if (arg.raw_key_size > sizeof(raw_key))
-> +		return -EINVAL;
-> +
-> +	if (arg.data_unit_size > queue_logical_block_size(q)) {
-> +		pr_err("Data unit size is bigger than logical block size\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (copy_from_user(raw_key, u64_to_user_ptr(arg.raw_key_ptr),
-> +			   arg.raw_key_size)) {
-> +		ret = -EFAULT;
-> +		goto err;
-> +	}
-> +
-> +	blk_key = kzalloc(sizeof(*blk_key), GFP_KERNEL);
-> +	if (!blk_key) {
-> +		ret = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	ret = blk_crypto_init_key(blk_key, raw_key, arg.crypto_mode,
-> +				  sizeof(u64), arg.data_unit_size);
-> +	if (ret) {
-> +		pr_err("Failed to init inline encryption key\n");
-> +		goto key_err;
-> +	}
-> +
-> +	/* Block key size is taken from crypto mode */
-> +	if (arg.raw_key_size != blk_key->size) {
-> +		ret = -EINVAL;
-> +		goto key_err;
-> +	}
-
-The key size check above happens too late.  The easiest solution would be to add
-the key size as an argument to blk_crypto_init_key(), and make it validate the
-key size.
-
-> +	}
-> +	blk_key->q = q;
-> +	q->blk_key = blk_key;
-
-How does this interact with concurrent I/O?  Also, doesn't the block device's
-page cache need to be invalidated when a key is set or removed?
-
-> diff --git a/include/uapi/linux/blk-crypto.h b/include/uapi/linux/blk-crypto.h
-> new file mode 100644
-> index 000000000000..5a65ebaf6038
-> --- /dev/null
-> +++ b/include/uapi/linux/blk-crypto.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +
-> +#ifndef __UAPI_LINUX_BLK_CRYPTO_H
-> +#define __UAPI_LINUX_BLK_CRYPTO_H
-> +
-> +enum blk_crypto_mode_num {
-> +	BLK_ENCRYPTION_MODE_INVALID,
-> +	BLK_ENCRYPTION_MODE_AES_256_XTS,
-> +	BLK_ENCRYPTION_MODE_AES_128_CBC_ESSIV,
-> +	BLK_ENCRYPTION_MODE_ADIANTUM,
-> +	BLK_ENCRYPTION_MODE_MAX,
-> +};
-
-Instead of an enum, these should use #define's with explicit numbers.  Also,
-INVALID and MAX shouldn't be included.
-
-> +
-> +#endif /* __UAPI_LINUX_BLK_CRYPTO_H */
-> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> index bdf7b404b3e7..398a77895e96 100644
-> --- a/include/uapi/linux/fs.h
-> +++ b/include/uapi/linux/fs.h
-> @@ -121,6 +121,14 @@ struct fsxattr {
->  	unsigned char	fsx_pad[8];
->  };
->  
-> +struct blk_crypto_set_key_arg {
-> +	__u32 crypto_mode;
-> +	__u64 raw_key_ptr;
-> +	__u32 raw_key_size;
-> +	__u32 data_unit_size;
-> +	__u32 reserved[9];	/* must be zero */
-> +};
-
-The reserved fields should be __u64 so that it's easy to use them for pointers
-or other 64-bit data later if it becomes necessary.  Also, reserved fields
-should also be prefixed with "__".  Also, a padding field is needed between
-crypto_mode and raw_key_ptr.  Also, it would be a good idea to make the reserved
-space even larger, as people may want to add all sorts of weird settings here in
-the future (look at dm-crypt).
-
-The following might be good; it makes the whole struct a nice round size, 128
-bytes:
-
-struct blk_crypto_set_key_arg {
-	__u32 crypto_mode;
-	__u32 __reserved1;
-	__u64 raw_key_ptr;
-	__u32 raw_key_size;
-	__u32 data_unit_size;
-	__u64 __reserved2[13];
-};
-
-- Eric
+2) after blk_mq_sched_insert_requests() dispatchs rq3, list_empty() will
+pass, thus blk_mq_sched_insert_requests() won't run queue. (That's what
+yufen tries to fix.)
+> 
+> And rq2 should be visible to the run queue, just wondering why rq2 isn't
+> issued finally?
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
