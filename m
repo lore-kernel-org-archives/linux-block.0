@@ -2,96 +2,269 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F946C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 03:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FCCC43334
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 04:16:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230379AbiGZD6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jul 2022 23:58:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52818 "EHLO
+        id S231440AbiGZEQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 00:16:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbiGZD6r (ORCPT
+        with ESMTP id S230292AbiGZEQe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jul 2022 23:58:47 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72467FD12;
-        Mon, 25 Jul 2022 20:58:46 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id o20-20020a17090aac1400b001f2da729979so2537073pjq.0;
-        Mon, 25 Jul 2022 20:58:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:references:cc:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding;
-        bh=1HXAxcsQDaKzPYbXHjeo23Nx3+uF4ILpuxYJOUyBV+c=;
-        b=mJ6XQskAN/ytTCTp9Om7ol8kp+yyo6jn1CMz0b+qF5y6hFlFHpdFxJrw4MkXtbilvJ
-         vCM2i7vWNiM1msNztKlzHX+sIiVQY4weW+AQbpPmx60YiK/voihf87AKoQSrQy/w1vcT
-         R1+t3Jrn4e1fcTCAZRq3ng7xVh9yuf46+fqlO+G3YbJlGdUjGZDtF9Ffy+KfvTErGmno
-         Mf/J79pjatLr6QN5AZ4E2grw8uwl3Frt/KUjUtgahdAHbvcfQ/68pJgTTiVXflFUlfgW
-         I7vBxgdD+nt7nsnopPn6C0VPLLtryhNn/YEpzG4cQyBcQoy62ek4TXQzxB3rGXqmdVRq
-         qhXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
-        bh=1HXAxcsQDaKzPYbXHjeo23Nx3+uF4ILpuxYJOUyBV+c=;
-        b=cP+JhrZMGV5XDAkmwFPh9BpjekO/f6KBUpGuTK392hRilQG7p9dmMPqkT2zUnuTen8
-         xivfSQdFMRyEwm4GW3H6YwCK4xpmUSnonOn9ZQOQb+8k8bb+S3I4yqZ7hsKzVejgrpRL
-         hqk5G0u68krVdxqfrFU8UpiRGbNWH4w6zIABoAOo4XmRNyPvHQsgnP+Cj0cQmTXzZKPw
-         l/3kPBDjqAAToH8/mr18XaU13N/6P3niO51YWlPvhr05vA+aPFGUrN6sObvha5ibDyQG
-         XSj3E643RkLFiQI1eIzJC0Jt0ybTXScgFKjYpGT64fa3OwzYoVeVBKel0jW+OvKVyR9C
-         AqOA==
-X-Gm-Message-State: AJIora/L5Bk8lAYL1QJUBj2vNUE0Kzz+qAP5V1djZ+cemnMHEn7J1eVx
-        pq+Hf96S7YsOjm+9wDlbzxlD0NhsZgw=
-X-Google-Smtp-Source: AGRyM1tZaQf/khRoTm2qfT30SAaoCz74Jzmwm6+GtQi0n9i9kDiG9COqGG+yBqYyFKOR++by3YQI7w==
-X-Received: by 2002:a17:90b:3841:b0:1ef:f0ac:de55 with SMTP id nl1-20020a17090b384100b001eff0acde55mr36061649pjb.35.1658807925986;
-        Mon, 25 Jul 2022 20:58:45 -0700 (PDT)
-Received: from [10.1.1.24] (222-155-0-244-adsl.sparkbb.co.nz. [222.155.0.244])
-        by smtp.gmail.com with ESMTPSA id y4-20020a623204000000b0052bc48b6010sm8445849pfy.188.2022.07.25.20.58.42
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Jul 2022 20:58:45 -0700 (PDT)
-Subject: Re: [PATCH v7 2/2] block: add overflow checks for Amiga partition
- support
-To:     Jens Axboe <axboe@kernel.dk>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-block@vger.kernel.org
-References: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com>
- <1539570747-19906-3-git-send-email-schmitzmic@gmail.com>
- <2265295.ElGaqSPkdT@ananda> <5e45c2a8-b35e-9a15-18e6-2e3a7ad00f5f@kernel.dk>
- <e0b99db6-ab3e-1c6d-d431-99cee32c1ced@gmail.com>
- <71d9f2fe-42d1-2a09-a860-702b42a3a733@kernel.dk>
-Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org
-From:   Michael Schmitz <schmitzmic@gmail.com>
-Message-ID: <0bf2e4f9-a1c1-3847-a2b5-d9b9eaaa783a@gmail.com>
-Date:   Tue, 26 Jul 2022 15:58:40 +1200
-User-Agent: Mozilla/5.0 (X11; Linux ppc; rv:45.0) Gecko/20100101
- Icedove/45.4.0
+        Tue, 26 Jul 2022 00:16:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F150240AA
+        for <linux-block@vger.kernel.org>; Mon, 25 Jul 2022 21:16:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658808992;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g/LPlP9pBzxDdRIaAR3ztSSswhImmFbjLmLBfuTgHc4=;
+        b=VQM4M77N3wc/3Da5a3KiESYCXEv+wjUArixoJLAZMXOAN48bp8y0hnsZKmfOdJLswPn/nE
+        9EvFCz6AwCQiQp4h1vRNsPFAhOsCafAl3NAfuzaqmZnnjGkcs/E/VnkVYRQlIwA8K/qUK1
+        plFiBJU7ZWyP5w80dTrSQA7Uic7f2gc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-622-D55jvnfDOlaCsbFa54cfGg-1; Tue, 26 Jul 2022 00:16:25 -0400
+X-MC-Unique: D55jvnfDOlaCsbFa54cfGg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 25D9B801755;
+        Tue, 26 Jul 2022 04:16:25 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E72222026D64;
+        Tue, 26 Jul 2022 04:16:19 +0000 (UTC)
+Date:   Tue, 26 Jul 2022 12:16:13 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, Yufen Yu <yuyufen@huawei.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
+        "zhangyi (F)" <yi.zhang@huawei.com>
+Subject: Re: [PATCH] blk-mq: run queue after issuing the last request of the
+ plug list
+Message-ID: <Yt9qjRc9CpdqtrgT@T590>
+References: <Yt66HebQ9//2ahq6@T590>
+ <ab899ae0-91fc-48db-cc32-fdc57f61963a@huawei.com>
+ <Yt9HkP2mzH0ZTL1l@T590>
+ <ba2b30f2-66d9-3acb-787d-fae1894fa5a6@huawei.com>
+ <Yt9SMuSlCtwwzyEz@T590>
+ <f91f136c-f109-3027-a666-29fe882d3426@huawei.com>
+ <Yt9ZOFtzm9kfKWhc@T590>
+ <6b070c7d-473a-cc96-def3-49826ca08aea@huawei.com>
+ <Yt9duWU0Ez/uZIym@T590>
+ <e77fbe38-3cf5-2074-4875-eb3e1df55807@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <71d9f2fe-42d1-2a09-a860-702b42a3a733@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e77fbe38-3cf5-2074-4875-eb3e1df55807@huawei.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Tue, Jul 26, 2022 at 11:31:34AM +0800, Yu Kuai wrote:
+> 在 2022/07/26 11:21, Ming Lei 写道:
+> > On Tue, Jul 26, 2022 at 11:14:23AM +0800, Yu Kuai wrote:
+> > > Hi, Ming
+> > > 
+> > > 在 2022/07/26 11:02, Ming Lei 写道:
+> > > > On Tue, Jul 26, 2022 at 10:52:56AM +0800, Yu Kuai wrote:
+> > > > > Hi, Ming
+> > > > > 在 2022/07/26 10:32, Ming Lei 写道:
+> > > > > > On Tue, Jul 26, 2022 at 10:08:13AM +0800, Yu Kuai wrote:
+> > > > > > > 在 2022/07/26 9:46, Ming Lei 写道:
+> > > > > > > > On Tue, Jul 26, 2022 at 09:08:19AM +0800, Yu Kuai wrote:
+> > > > > > > > > Hi, Ming!
+> > > > > > > > > 
+> > > > > > > > > 在 2022/07/25 23:43, Ming Lei 写道:
+> > > > > > > > > > On Sat, Jul 23, 2022 at 10:50:03AM +0800, Yu Kuai wrote:
+> > > > > > > > > > > Hi, Ming!
+> > > > > > > > > > > 
+> > > > > > > > > > > 在 2022/07/19 17:26, Ming Lei 写道:
+> > > > > > > > > > > > On Mon, Jul 18, 2022 at 08:35:28PM +0800, Yufen Yu wrote:
+> > > > > > > > > > > > > We do test on a virtio scsi device (/dev/sda) and the default mq
+> > > > > > > > > > > > > scheduler is 'none'. We found a IO hung as following:
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > blk_finish_plug
+> > > > > > > > > > > > >         blk_mq_plug_issue_direct
+> > > > > > > > > > > > >             scsi_mq_get_budget
+> > > > > > > > > > > > >             //get budget_token fail and sdev->restarts=1
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > > 			     	 scsi_end_request
+> > > > > > > > > > > > > 				   scsi_run_queue_async
+> > > > > > > > > > > > >                                          //sdev->restart=0 and run queue
+> > > > > > > > > > > > > 
+> > > > > > > > > > > > >            blk_mq_request_bypass_insert
+> > > > > > > > > > > > >               //add request to hctx->dispatch list
+> > > > > > > > > > > > 
+> > > > > > > > > > > > Here the issue shouldn't be related with scsi's get budget or
+> > > > > > > > > > > > scsi_run_queue_async.
+> > > > > > > > > > > > 
+> > > > > > > > > > > > If blk-mq adds request into ->dispatch_list, it is blk-mq core's
+> > > > > > > > > > > > responsibility to re-run queue for moving on. Can you investigate a
+> > > > > > > > > > > > bit more why blk-mq doesn't run queue after adding request to
+> > > > > > > > > > > > hctx dispatch list?
+> > > > > > > > > > > 
+> > > > > > > > > > > I think Yufen is probably thinking about the following Concurrent
+> > > > > > > > > > > scenario:
+> > > > > > > > > > > 
+> > > > > > > > > > > blk_mq_flush_plug_list
+> > > > > > > > > > > # assume there are three rq
+> > > > > > > > > > >       blk_mq_plug_issue_direct
+> > > > > > > > > > >        blk_mq_request_issue_directly
+> > > > > > > > > > >        # dispatch rq1, succeed
+> > > > > > > > > > >        blk_mq_request_issue_directly
+> > > > > > > > > > >        # dispatch rq2
+> > > > > > > > > > >         __blk_mq_try_issue_directly
+> > > > > > > > > > >          blk_mq_get_dispatch_budget
+> > > > > > > > > > >           scsi_mq_get_budget
+> > > > > > > > > > >            atomic_inc(&sdev->restarts);
+> > > > > > > > > > >            # rq2 failed to get budget
+> > > > > > > > > > >            # restarts is 1 now
+> > > > > > > > > > >                                              scsi_end_request
+> > > > > > > > > > >                                              # rq1 is completed
+> > > > > > > > > > >                                              ┊scsi_run_queue_async
+> > > > > > > > > > >                                              ┊ atomic_cmpxchg(&sdev->restarts,
+> > > > > > > > > > > old, 0) == old
+> > > > > > > > > > >                                              ┊ # set restarts to 0
+> > > > > > > > > > >                                              ┊ blk_mq_run_hw_queues
+> > > > > > > > > > >                                              ┊ # hctx->dispatch list is empty
+> > > > > > > > > > >        blk_mq_request_bypass_insert
+> > > > > > > > > > >        # insert rq2 to hctx->dispatch list
+> > > > > > > > > > 
+> > > > > > > > > > After rq2 is added to ->dispatch_list in blk_mq_try_issue_list_directly(),
+> > > > > > > > > > no matter if list_empty(list) is empty or not, queue will be run either from
+> > > > > > > > > > blk_mq_request_bypass_insert() or blk_mq_sched_insert_requests().
+> > > > > > > > > 
+> > > > > > > > > 1) while inserting rq2 to dispatch list, blk_mq_request_bypass_insert()
+> > > > > > > > > is called from blk_mq_try_issue_list_directly(), list_empty() won't
+> > > > > > > > > pass, thus thus blk_mq_request_bypass_insert() won't run queue.
+> > > > > > > > 
+> > > > > > > > Yeah, but in blk_mq_try_issue_list_directly() after rq2 is inserted to dispatch
+> > > > > > > > list, the loop is broken and blk_mq_try_issue_list_directly() returns to
+> > > > > > > > blk_mq_sched_insert_requests() in which list_empty() is false, so
+> > > > > > > > blk_mq_insert_requests() and blk_mq_run_hw_queue() are called, queue
+> > > > > > > > is still run.
+> > > > > > > > 
+> > > > > > > > Also not sure why you make rq3 involved, since the list is local list on
+> > > > > > > > stack, and it can be operated concurrently.
+> > > > > > > 
+> > > > > > > I make rq3 involved because there are some conditions that
+> > > > > > > blk_mq_insert_requests() and blk_mq_run_hw_queue() won't be called from
+> > > > > > > blk_mq_sched_insert_requests():
+> > > > > > 
+> > > > > > The two won't be called if list_empty() is true, and will be called if
+> > > > > > !list_empty().
+> > > > > > 
+> > > > > > That is why I mentioned run queue has been done after rq2 is added to
+> > > > > > ->dispatch_list.
+> > > > > 
+> > > > > I don't follow here, it's right after rq2 is inserted to dispatch list,
+> > > > > list is not empty, and blk_mq_sched_insert_requests() will be called.
+> > > > > However, do you think that it's impossible that
+> > > > > blk_mq_sched_insert_requests() can dispatch rq in the list and list
+> > > > > will become empty?
+> > > > 
+> > > > Please take a look at blk_mq_sched_insert_requests().
+> > > > 
+> > > > When codes runs into blk_mq_sched_insert_requests(), the following
+> > > > blk_mq_run_hw_queue() will be run always, how does list empty or not
+> > > > make a difference there?
+> > > 
+> > > This is strange, always blk_mq_run_hw_queue() is exactly what Yufen
+> > > tries to do in this patch, are we look at different code?
+> > 
+> > No.
+> > 
+> > > 
+> > > I'm copying blk_mq_sched_insert_requests() here, the code is from
+> > > latest linux-next:
+> > > 
+> > > 461 void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
+> > > 462                                 ┊ struct blk_mq_ctx *ctx,
+> > > 463                                 ┊ struct list_head *list, bool
+> > > run_queue_async)
+> > > 464 {
+> > > 465         struct elevator_queue *e;
+> > > 466         struct request_queue *q = hctx->queue;
+> > > 467
+> > > 468         /*
+> > > 469         ┊* blk_mq_sched_insert_requests() is called from flush plug
+> > > 470         ┊* context only, and hold one usage counter to prevent queue
+> > > 471         ┊* from being released.
+> > > 472         ┊*/
+> > > 473         percpu_ref_get(&q->q_usage_counter);
+> > > 474
+> > > 475         e = hctx->queue->elevator;
+> > > 476         if (e) {
+> > > 477                 e->type->ops.insert_requests(hctx, list, false);
+> > > 478         } else {
+> > > 479                 /*
+> > > 480                 ┊* try to issue requests directly if the hw queue isn't
+> > > 481                 ┊* busy in case of 'none' scheduler, and this way may
+> > > save
+> > > 482                 ┊* us one extra enqueue & dequeue to sw queue.
+> > > 483                 ┊*/
+> > > 484                 if (!hctx->dispatch_busy && !run_queue_async) {
+> > > 485                         blk_mq_run_dispatch_ops(hctx->queue,
+> > > 486                                 blk_mq_try_issue_list_directly(hctx,
+> > > list));
+> > > 487                         if (list_empty(list))
+> > > 488                                 goto out;
+> > > 489                 }
+> > > 490                 blk_mq_insert_requests(hctx, ctx, list);
+> > > 491         }
+> > > 492
+> > > 493         blk_mq_run_hw_queue(hctx, run_queue_async);
+> > > 494  out:
+> > > 495         percpu_ref_put(&q->q_usage_counter);
+> > > 496 }
+> > > 
+> > > Here in line 487, if list_empty() is true, out label will skip
+> > > run_queue().
+> > 
+> > If list_empty() is true, run queue is guaranteed to run
+> > in blk_mq_try_issue_list_directly() in case that BLK_STS_*RESOURCE
+> > is returned from blk_mq_request_issue_directly().
+> > 
+> > 		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+> > 		if (ret != BLK_STS_OK) {
+> > 			if (ret == BLK_STS_RESOURCE ||
+> > 					ret == BLK_STS_DEV_RESOURCE) {
+> > 				blk_mq_request_bypass_insert(rq, false,
+> > 							list_empty(list));	//run queue
+> > 				break;
+> > 			}
+> > 			blk_mq_end_request(rq, ret);
+> > 			errors++;
+> > 		} else
+> > 			queued++;
+> > 
+> > So why do you try to add one extra run queue?
+> 
+> Hi, Ming
+> 
+> Perhaps I didn't explain the scenario clearly, please notice that list
+> contain three rq is required.
+> 
+> 1) rq1 is dispatched successfuly
+> 2) rq2 failed to dispatch due to no budget, in this case
+>    - rq2 will insert to dispatch list
+>    - list is not emply yet, run queue won't called
 
-Am 26.07.2022 um 15:40 schrieb Jens Axboe:
-> On 7/25/22 7:53 PM, Michael Schmitz wrote:
->> Hi Jens,
->>
->> there's been quite a bit of review on this patch series back in the
->> day (most of that would have been on linux-m68k IIRC; see Geert's
->> Reviewed-By tag), and I addressed the issues raised but as you say, it
->> did never get merged.
->>
->> I've found a copy of the linux-block repo that has these patches, will
->> see if I can get them updated to apply to current linux-block.
->
-> Thanks, please do resend them and we can get them applied.
+In the case, blk_mq_try_issue_list_directly() returns to
+blk_mq_sched_insert_requests() immediately, then blk_mq_insert_requests()
+and blk_mq_run_hw_queue() will be run from blk_mq_sched_insert_requests()
+because the list isn't empty.
 
-Will do - running final compile tests.
+Right?
 
-Cheers,
 
-	Michael
-
+Thanks,
+Ming
 
