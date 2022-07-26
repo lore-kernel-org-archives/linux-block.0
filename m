@@ -2,87 +2,379 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5113DC3F6B0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 15:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B99C04A68
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 17:38:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234171AbiGZPzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 11:55:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47404 "EHLO
+        id S239448AbiGZRi1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 13:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233208AbiGZPz1 (ORCPT
+        with ESMTP id S239356AbiGZRi0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 11:55:27 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9ADAE37;
-        Tue, 26 Jul 2022 08:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=Ms6Eo/4vk2U2FvUSJ1ASbG7HxuQl+uR0mXnaHaYNTv4=; b=NrrgVQUsop8jszUXB0cv9CDrL+
-        fdEfO5urrJbCJWNS1Iq22L1BvAroUNoor2CQLfdd2fNdrd3IpBRHKvsxSYOo0vvWmym8s+v4433IL
-        y1rGN9rbsQ+UvIDbRjl0eOWA1J1Qc4CPH33eBIJYfVPowrgNDYqlXANBYBSkVqIHAY8T5hiM3eVzj
-        bzA9109KtzluUUx/kVOjSvMQWDprJiiWIwyH2jZiYrOkhSLoqIahhj2e9nvvPHfP6OEWaepTh3iLQ
-        9EDAlLY/HgG/NpsGsYFpP2sAW6PiYh6LvI5jOulinFHwJ3MJcCIZZSwUI6umqKiVvyjyiGmC/P1g4
-        7WdDWlCQ==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oGMtz-000rlz-Bq; Tue, 26 Jul 2022 09:55:20 -0600
-Message-ID: <a9a1641a-aa5c-ce29-e4a4-c266f4494004@deltatee.com>
-Date:   Tue, 26 Jul 2022 09:55:13 -0600
+        Tue, 26 Jul 2022 13:38:26 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BE22B60B
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 10:38:22 -0700 (PDT)
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26QEJjjZ001473
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 10:38:22 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=upFvUplL9WdQZWsooaut7tyuD9AcqX5PVtTEGpxNelI=;
+ b=e5hbVdD/ed7NyPaNMj2hRayAJBf3EQpIyC4KxiilOcmLx5tjxHzCy6SCbMBUXxTppJfb
+ wxNyLI9wrHFbcsB5N/ia3m1MTpyDFVKnd9UoFxJMtLEz2FvKHw6Nn/VeYjpkHu9eOw+b
+ Ct1e8ZkHA3XbESBfhz9lT43c9mIqI5+00X4= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3hjhxashns-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 10:38:22 -0700
+Received: from twshared7556.02.ash8.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:21d::6) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 26 Jul 2022 10:38:21 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 78B33698E4B0; Tue, 26 Jul 2022 10:38:15 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 4/5] io_uring: add support for dma pre-mapping
+Date:   Tue, 26 Jul 2022 10:38:13 -0700
+Message-ID: <20220726173814.2264573-5-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220726173814.2264573-1-kbusch@fb.com>
+References: <20220726173814.2264573-1-kbusch@fb.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-CA
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        iommu@lists.linux.dev, Stephen Bates <sbates@raithlin.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>
-References: <20220708165104.5005-1-logang@deltatee.com>
- <20220726112906.GA2169@lst.de>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20220726112906.GA2169@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: hch@lst.de, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, iommu@lists.linux.dev, sbates@raithlin.com, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v8 00/13] DMA Mapping P2PDMA Pages
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: VGsaxWVTvEWKp4UcEzaS2r9dGmv_IEhM
+X-Proofpoint-GUID: VGsaxWVTvEWKp4UcEzaS2r9dGmv_IEhM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-07-26_05,2022-07-26_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Keith Busch <kbusch@kernel.org>
 
+Provide a new register operation that can request to pre-map a known
+bvec to the driver of the requested file descriptor's specific
+implementation. If successful, io_uring will use the returned dma tag
+for future fixed buffer requests to the same file.
 
-On 2022-07-26 05:29, Christoph Hellwig wrote:
-> I've applied this to the dma-mapping for-next branch.
-> 
-> I'd have liked a review from Robin, but as he seems to be out and the
-> rework was to fit his comments I'd rather have us unblocked before
-> the end of the merge window.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ include/uapi/linux/io_uring.h |  12 ++++
+ io_uring/io_uring.c           | 129 ++++++++++++++++++++++++++++++++++
+ io_uring/net.c                |   2 +-
+ io_uring/rsrc.c               |  13 +++-
+ io_uring/rsrc.h               |  16 ++++-
+ io_uring/rw.c                 |   2 +-
+ 6 files changed, 166 insertions(+), 8 deletions(-)
 
-Great thanks! If Robin has some feedback when he gets back I'd be happy
-to make a couple more cleanup patches.
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.=
+h
+index 1463cfecb56b..daacbe899d1d 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -485,6 +485,10 @@ enum {
+ 	IORING_REGISTER_NOTIFIERS		=3D 26,
+ 	IORING_UNREGISTER_NOTIFIERS		=3D 27,
+=20
++	/* dma map registered buffers */
++	IORING_REGISTER_MAP_BUFFERS		=3D 28,
++	IORING_REGISTER_UNMAP_BUFFERS		=3D 29,
++
+ 	/* this goes last */
+ 	IORING_REGISTER_LAST
+ };
+@@ -661,4 +665,12 @@ struct io_uring_recvmsg_out {
+ 	__u32 flags;
+ };
+=20
++struct io_uring_map_buffers {
++	__s32	fd;
++	__s32	buf_start;
++	__s32	buf_end;
++	__u32	flags;
++	__u64	rsvd[2];
++};
++
+ #endif
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index 1d600a63643b..12f7354e0423 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -3704,6 +3704,123 @@ static __cold int io_register_iowq_max_workers(st=
+ruct io_ring_ctx *ctx,
+ 	return ret;
+ }
+=20
++#ifdef CONFIG_BLOCK
++static int get_map_range(struct io_ring_ctx *ctx,
++			 struct io_uring_map_buffers *map, void __user *arg)
++{
++	int ret;
++
++	if (copy_from_user(map, arg, sizeof(*map)))
++		return -EFAULT;
++	if (map->flags || map->rsvd[0] || map->rsvd[1])
++		return -EINVAL;
++	if (map->buf_start < 0)
++		return -EINVAL;
++	if (map->buf_start >=3D ctx->nr_user_bufs)
++		return -EINVAL;
++	if (map->buf_end > ctx->nr_user_bufs)
++		map->buf_end =3D ctx->nr_user_bufs;
++
++	ret =3D map->buf_end - map->buf_start;
++	if (ret <=3D 0)
++		return -EINVAL;
++
++	return ret;
++}
++
++void io_dma_unmap(struct io_mapped_ubuf *imu)
++{
++	if (imu->dma_tag)
++		block_dma_unmap(imu->bdev, imu->dma_tag);
++}
++
++static int io_register_unmap_buffers(struct io_ring_ctx *ctx, void __use=
+r *arg)
++{
++	struct io_uring_map_buffers map;
++	int i, ret;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++	ret =3D get_map_range(ctx, &map, arg);
++	if (ret < 0)
++		return ret;
++
++	for (i =3D map.buf_start; i < map.buf_end; i++) {
++		struct io_mapped_ubuf *imu =3D ctx->user_bufs[i];
++
++		io_dma_unmap(imu);
++	}
++
++	return 0;
++}
++
++static int io_register_map_buffers(struct io_ring_ctx *ctx, void __user =
+*arg)
++{
++	struct io_uring_map_buffers map;
++	struct block_device *bdev;
++	struct file *file;
++	int ret, i;
++
++	if (!capable(CAP_SYS_ADMIN))
++		return -EPERM;
++
++	ret =3D get_map_range(ctx, &map, arg);
++	if (ret < 0)
++		return ret;
++
++	file =3D fget(map.fd);
++	if (!file)
++		return -EBADF;
++
++	if (S_ISBLK(file_inode(file)->i_mode))
++		bdev =3D I_BDEV(file->f_mapping->host);
++	else if (S_ISREG(file_inode(file)->i_mode))
++		bdev =3D file->f_inode->i_sb->s_bdev;
++	else
++		return -EOPNOTSUPP;
++
++	for (i =3D map.buf_start; i < map.buf_end; i++) {
++		struct io_mapped_ubuf *imu =3D ctx->user_bufs[i];
++		void *tag;
++
++		if (imu->dma_tag) {
++			ret =3D -EBUSY;
++			goto err;
++		}
++
++		tag =3D block_dma_map(bdev, imu->bvec, imu->nr_bvecs);
++		if (IS_ERR(tag)) {
++			ret =3D PTR_ERR(tag);
++			goto err;
++		}
++
++		imu->dma_tag =3D tag;
++		imu->dma_file =3D file;
++		imu->bdev =3D bdev;
++	}
++
++	fput(file);
++	return 0;
++err:
++	while (--i >=3D map.buf_start) {
++		struct io_mapped_ubuf *imu =3D ctx->user_bufs[i];
++
++		io_dma_unmap(imu);
++	}
++	fput(file);
++	return ret;
++}
++#else /* CONFIG_BLOCK */
++static int io_register_map_buffers(struct io_ring_ctx *ctx, void __user =
+*arg)
++{
++	return -EOPNOTSUPP;
++}
++static int io_register_unmap_buffers(struct io_ring_ctx *ctx, void __use=
+r *arg)
++{
++	return -EOPNOTSUPP;
++}
++#endif /* CONFIG_BLOCK */
++
+ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
+ 			       void __user *arg, unsigned nr_args)
+ 	__releases(ctx->uring_lock)
+@@ -3870,6 +3987,18 @@ static int __io_uring_register(struct io_ring_ctx =
+*ctx, unsigned opcode,
+ 			break;
+ 		ret =3D io_notif_unregister(ctx);
+ 		break;
++	case IORING_REGISTER_MAP_BUFFERS:
++		ret =3D -EINVAL;
++		if (!arg || nr_args !=3D 1)
++			break;
++		ret =3D io_register_map_buffers(ctx, arg);
++		break;
++	case IORING_REGISTER_UNMAP_BUFFERS:
++		ret =3D -EINVAL;
++		if (!arg || nr_args !=3D 1)
++			break;
++		ret =3D io_register_unmap_buffers(ctx, arg);
++		break;
+ 	default:
+ 		ret =3D -EINVAL;
+ 		break;
+diff --git a/io_uring/net.c b/io_uring/net.c
+index 8276b9537194..68a996318959 100644
+--- a/io_uring/net.c
++++ b/io_uring/net.c
+@@ -977,7 +977,7 @@ int io_sendzc(struct io_kiocb *req, unsigned int issu=
+e_flags)
+=20
+ 	if (zc->flags & IORING_RECVSEND_FIXED_BUF) {
+ 		ret =3D io_import_fixed(WRITE, &msg.msg_iter, req->imu,
+-					(u64)(uintptr_t)zc->buf, zc->len);
++					(u64)(uintptr_t)zc->buf, zc->len, NULL);
+ 		if (unlikely(ret))
+ 				return ret;
+ 	} else {
+diff --git a/io_uring/rsrc.c b/io_uring/rsrc.c
+index 59704b9ac537..1a7a8dedbbd5 100644
+--- a/io_uring/rsrc.c
++++ b/io_uring/rsrc.c
+@@ -148,6 +148,7 @@ static void io_buffer_unmap(struct io_ring_ctx *ctx, =
+struct io_mapped_ubuf **slo
+ 			unpin_user_page(imu->bvec[i].bv_page);
+ 		if (imu->acct_pages)
+ 			io_unaccount_mem(ctx, imu->acct_pages);
++		io_dma_unmap(imu);
+ 		kvfree(imu);
+ 	}
+ 	*slot =3D NULL;
+@@ -1285,6 +1286,7 @@ static int io_sqe_buffer_register(struct io_ring_ct=
+x *ctx, struct iovec *iov,
+ 	imu->ubuf =3D (unsigned long) iov->iov_base;
+ 	imu->ubuf_end =3D imu->ubuf + iov->iov_len;
+ 	imu->nr_bvecs =3D nr_pages;
++	imu->dma_tag =3D NULL;
+ 	*pimu =3D imu;
+ 	ret =3D 0;
+ done:
+@@ -1359,9 +1361,8 @@ int io_sqe_buffers_register(struct io_ring_ctx *ctx=
+, void __user *arg,
+ 	return ret;
+ }
+=20
+-int io_import_fixed(int ddir, struct iov_iter *iter,
+-			   struct io_mapped_ubuf *imu,
+-			   u64 buf_addr, size_t len)
++int io_import_fixed(int ddir, struct iov_iter *iter, struct io_mapped_ub=
+uf *imu,
++		    u64 buf_addr, size_t len, struct file *file)
+ {
+ 	u64 buf_end;
+ 	size_t offset;
+@@ -1379,6 +1380,12 @@ int io_import_fixed(int ddir, struct iov_iter *ite=
+r,
+ 	 * and advance us to the beginning.
+ 	 */
+ 	offset =3D buf_addr - imu->ubuf;
++	if (imu->dma_tag && file =3D=3D imu->dma_file) {
++		unsigned long nr_segs =3D (buf_addr & (PAGE_SIZE - 1)) +
++					(len >> PAGE_SHIFT);
++		iov_iter_dma_tag(iter, ddir, imu->dma_tag, offset, nr_segs, len);
++		return 0;
++	}
+ 	iov_iter_bvec(iter, ddir, imu->bvec, imu->nr_bvecs, offset + len);
+=20
+ 	if (offset) {
+diff --git a/io_uring/rsrc.h b/io_uring/rsrc.h
+index f3a9a177941f..6e63b7a57b34 100644
+--- a/io_uring/rsrc.h
++++ b/io_uring/rsrc.h
+@@ -50,6 +50,11 @@ struct io_mapped_ubuf {
+ 	u64		ubuf_end;
+ 	unsigned int	nr_bvecs;
+ 	unsigned long	acct_pages;
++	void		*dma_tag;
++	struct file	*dma_file;
++#ifdef CONFIG_BLOCK
++	struct block_device *bdev;
++#endif
+ 	struct bio_vec	bvec[];
+ };
+=20
+@@ -64,9 +69,14 @@ int io_queue_rsrc_removal(struct io_rsrc_data *data, u=
+nsigned idx,
+ void io_rsrc_node_switch(struct io_ring_ctx *ctx,
+ 			 struct io_rsrc_data *data_to_kill);
+=20
+-int io_import_fixed(int ddir, struct iov_iter *iter,
+-			   struct io_mapped_ubuf *imu,
+-			   u64 buf_addr, size_t len);
++int io_import_fixed(int ddir, struct iov_iter *iter, struct io_mapped_ub=
+uf *imu,
++		    u64 buf_addr, size_t len, struct file *file);
++
++#ifdef CONFIG_BLOCK
++void io_dma_unmap(struct io_mapped_ubuf *imu);
++#else
++static inline void io_dma_unmap(struct io_mapped_ubuf *imu) {}
++#endif
+=20
+ void __io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
+ int io_sqe_buffers_unregister(struct io_ring_ctx *ctx);
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 2b784795103c..9e2164d09adb 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -359,7 +359,7 @@ static struct iovec *__io_import_iovec(int ddir, stru=
+ct io_kiocb *req,
+ 	ssize_t ret;
+=20
+ 	if (opcode =3D=3D IORING_OP_READ_FIXED || opcode =3D=3D IORING_OP_WRITE=
+_FIXED) {
+-		ret =3D io_import_fixed(ddir, iter, req->imu, rw->addr, rw->len);
++		ret =3D io_import_fixed(ddir, iter, req->imu, rw->addr, rw->len, req->=
+file);
+ 		if (ret)
+ 			return ERR_PTR(ret);
+ 		return NULL;
+--=20
+2.30.2
 
-Logan
