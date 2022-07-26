@@ -2,106 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F431C43334
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 11:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A98CC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 11:45:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232542AbiGZLm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 07:42:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53682 "EHLO
+        id S233183AbiGZLpN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 07:45:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238913AbiGZLm6 (ORCPT
+        with ESMTP id S233161AbiGZLpL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 07:42:58 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E33CF2A438;
-        Tue, 26 Jul 2022 04:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CZoNUVo1igbcpZTrqOvs2Pa5+5Pl6Ps0T7FgFnqQLac=; b=YFJv3l+Blv122NP4DU9w3ZxtKn
-        QXc6wsYWgJLF7WXZNzFpuaY9vk0f3N24JZh9Z3kPZhOLEDpCNOqlnzcrq4sgTVLv6vZwxt4M5F8/F
-        UNUu7+zRmjFcBAg0hLASI2dsdM5a82s0AnpoA4Wu3INxRlVV2U7+9gJPtL/nvq6rnrwvfJ96l2WhX
-        RGlmqya+Y7zcYtls/B+J9oUR2yyqXjR+XPWzc5INj1N8D9KOjCnjn4bnjmuhMmmz4PQQ9I7JkiJ36
-        sTuS2SvKF2mzwts2UJCHiz94o6hoTxgdBtN5YXgiJKJqTy7rofsnB9ur56x34ZS/cGNsg0daFmmok
-        3gZmJPPQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oGIxk-00GEFF-VA; Tue, 26 Jul 2022 11:42:56 +0000
-Date:   Tue, 26 Jul 2022 04:42:56 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Michael Schmitz <schmitzmic@gmail.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-m68k@vger.kernel.org, geert@linux-m68k.org
-Subject: Re: [PATCH v8 2/2] block: add overflow checks for Amiga partition
- support
-Message-ID: <Yt/TQOJQZEhZE+2p@infradead.org>
-References: <20220726045747.4779-1-schmitzmic@gmail.com>
- <20220726045747.4779-3-schmitzmic@gmail.com>
+        Tue, 26 Jul 2022 07:45:11 -0400
+Received: from out199-17.us.a.mail.aliyun.com (out199-17.us.a.mail.aliyun.com [47.90.199.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74BE1D79
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 04:45:09 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VKVM13Y_1658835905;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VKVM13Y_1658835905)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Jul 2022 19:45:05 +0800
+From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+To:     axboe@kernel.dk, ming.lei@redhat.com
+Cc:     ZiyangZhang@linux.alibaba.com, linux-block@vger.kernel.org,
+        xiaoguang.wang@linux.alibaba.com
+Subject: [PATCH V2 1/2] ublk_cmd.h: add one new ublk command: UBLK_IO_NEED_GET_DATA
+Date:   Tue, 26 Jul 2022 19:44:04 +0800
+Message-Id: <20220726114405.116013-2-ZiyangZhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220726114405.116013-1-ZiyangZhang@linux.alibaba.com>
+References: <20220726114405.116013-1-ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220726045747.4779-3-schmitzmic@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jul 26, 2022 at 04:57:47PM +1200, Michael Schmitz wrote:
-> The Amiga partition parser module uses signed int for partition sector
-> address and count, which will overflow for disks larger than 1 TB.
-> 
-> Use u64 as type for sector address and size to allow using disks up to
-> 2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
-> format allows to specify disk sizes up to 2^128 bytes (though native
-> OS limitations reduce this somewhat, to max 2^68 bytes), so check for
-> u64 overflow carefully to protect against overflowing sector_t.
-> 
-> Bail out if sector addresses overflow 32 bits on kernels without LBD
-> support.
-> 
-> This bug was reported originally in 2012, and the fix was created by
-> the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-> discussed and reviewed on linux-m68k at that time but never officially
-> submitted (now resubmitted as separate patch).
-> This patch adds additional error checking and warning messages.
-> 
-> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-> Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-> Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-> Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
->  block/partitions/amiga.c | 111 +++++++++++++++++++++++++++++++--------
->  1 file changed, 89 insertions(+), 22 deletions(-)
-> 
-> diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-> index f98191545d9a..7356b39cbe10 100644
-> --- a/block/partitions/amiga.c
-> +++ b/block/partitions/amiga.c
-> @@ -11,10 +11,18 @@
->  #define pr_fmt(fmt) fmt
->  
->  #include <linux/types.h>
-> +#include <linux/mm_types.h>
-> +#include <linux/overflow.h>
->  #include <linux/affs_hardblocks.h>
->  
->  #include "check.h"
->  
-> +/* magic offsets in partition DosEnvVec */
-> +#define NR_HD	3
-> +#define NR_SECT	5
-> +#define LO_CYL	9
-> +#define	HI_CYL	10
+This patch add one new ublk command: UBLK_IO_NEED_GET_DATA. It is
+prepared for the next patch which uses this command and adds a new
+feature.
 
-The last line has a tab after the #define while the previous three
-don't.  Pick one style and stick to it for the others.
+Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+---
+ include/uapi/linux/ublk_cmd.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
->  		if (!data) {
-> -			pr_err("Dev %s: unable to read RDB block %d\n",
-> -			       state->disk->disk_name, blk);
-> +			pr_err("Dev %s: unable to read RDB block %llu\n",
-> +			       state->disk->disk_name, (u64) blk);
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index ca33092354ab..c986b4971423 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -28,12 +28,21 @@
+  *      this IO request, request's handling result is committed to ublk
+  *      driver, meantime FETCH_REQ is piggyback, and FETCH_REQ has to be
+  *      handled before completing io request.
++ *
++ * NEED_GET_DATA: only used for write requests to set io addr and copy data
++ *      When NEED_GET_DATA is set, ublksrv has to issue UBLK_IO_NEED_GET_DATA
++ *      command after ublk driver returns UBLK_IO_RES_NEED_GET_DATA.
++ *
++ *      It is only used if ublksrv set UBLK_F_NEED_GET_DATA flag
++ *      while starting a ublk device.
+  */
+ #define	UBLK_IO_FETCH_REQ		0x20
+ #define	UBLK_IO_COMMIT_AND_FETCH_REQ	0x21
++#define UBLK_IO_NEED_GET_DATA	0x22
+ 
+ /* only ABORT means that no re-fetch */
+ #define UBLK_IO_RES_OK			0
++#define UBLK_IO_RES_NEED_GET_DATA	1
+ #define UBLK_IO_RES_ABORT		(-ENODEV)
+ 
+ #define UBLKSRV_CMD_BUF_OFFSET	0
+@@ -54,6 +63,15 @@
+  */
+ #define UBLK_F_URING_CMD_COMP_IN_TASK	(1ULL << 1)
+ 
++/*
++ * User should issue io cmd again for write requests to
++ * set io buffer address and copy data from bio vectors
++ * to the userspace io buffer.
++ *
++ * In this mode, task_work is not used.
++ */
++#define UBLK_F_NEED_GET_DATA (1UL << 2)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
+-- 
+2.34.1
 
-No need for the various printk casts, a sector_t is always an
-unsigned long long.
