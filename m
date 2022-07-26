@@ -2,225 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12275CCA489
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 11:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A6DC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jul 2022 11:51:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232513AbiGZLpO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jul 2022 07:45:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54524 "EHLO
+        id S232887AbiGZLv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jul 2022 07:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233005AbiGZLpL (ORCPT
+        with ESMTP id S230472AbiGZLv2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jul 2022 07:45:11 -0400
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C131FB06
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 04:45:08 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R741e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VKVM13p_1658835905;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VKVM13p_1658835905)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Jul 2022 19:45:06 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     axboe@kernel.dk, ming.lei@redhat.com
-Cc:     ZiyangZhang@linux.alibaba.com, linux-block@vger.kernel.org,
-        xiaoguang.wang@linux.alibaba.com
-Subject: [PATCH V2 2/2] ublk_drv: add support for UBLK_IO_NEED_GET_DATA
-Date:   Tue, 26 Jul 2022 19:44:05 +0800
-Message-Id: <20220726114405.116013-3-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220726114405.116013-1-ZiyangZhang@linux.alibaba.com>
-References: <20220726114405.116013-1-ZiyangZhang@linux.alibaba.com>
+        Tue, 26 Jul 2022 07:51:28 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB1D2BB25;
+        Tue, 26 Jul 2022 04:51:27 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 39C0A1FD62;
+        Tue, 26 Jul 2022 11:51:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1658836286; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NmXEb+MCaJzubCv0tA1KqSSjkQkT0I7HTn2jJIRu3uA=;
+        b=YyxLwvdhMNHVl0jV0+3QHBUP1GBM0MxK5Pl/QuqoVMTpwInClhmngBFgqk2kXiCpoX2l3X
+        Z1nLc/r7hti33W91noWGcNyBTfzPm4i1tliDZye+yIycvrXAiXcrMbMMHo/feqZ8vrv8RM
+        9ZGdfxN3L/0OTHyZnlhC1p+XdzySt8Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1658836286;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NmXEb+MCaJzubCv0tA1KqSSjkQkT0I7HTn2jJIRu3uA=;
+        b=AAXUUjyjw/ncV9bQHVU+IBQEn3+ZlGakAMXWCOxRuLNezLELBLQwHPzZV6zYhCrG9OeoVD
+        zIhM/wSICdHb3eDw==
+Received: from quack3.suse.cz (unknown [10.100.200.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id CB44F2C15D;
+        Tue, 26 Jul 2022 11:51:24 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 7C6A5A0680; Tue, 26 Jul 2022 13:51:24 +0200 (CEST)
+Date:   Tue, 26 Jul 2022 13:51:24 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     jack@suse.cz, axboe@kernel.dk, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH RFC v4] sbitmap: fix possible io hung due to lost wakeup
+Message-ID: <20220726115124.cbmcs3xgeqfwv7qw@quack3>
+References: <20220723024122.2990436-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220723024122.2990436-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-UBLK_IO_NEED_GET_DATA is one ublk IO command. It is designed for a user
-application who wants to allocate IO buffer and set IO buffer address
-only after it receives an IO request from ublksrv. This is a reasonable
-scenario because these users may use a RPC framework as one IO backend
-to handle IO requests passed from ublksrv. And a RPC framework may
-allocate its own buffer(or memory pool).
+On Sat 23-07-22 10:41:22, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> There are two problems can lead to lost wakeup:
+> 
+> 1) invalid wakeup on the wrong waitqueue:
+> 
+> For example, 2 * wake_batch tags are put, while only wake_batch threads
+> are woken:
+> 
+> __sbq_wake_up
+>  atomic_cmpxchg -> reset wait_cnt
+> 			__sbq_wake_up -> decrease wait_cnt
+> 			...
+> 			__sbq_wake_up -> wait_cnt is decreased to 0 again
+> 			 atomic_cmpxchg
+> 			 sbq_index_atomic_inc -> increase wake_index
+> 			 wake_up_nr -> wake up and waitqueue might be empty
+>  sbq_index_atomic_inc -> increase again, one waitqueue is skipped
+>  wake_up_nr -> invalid wake up because old wakequeue might be empty
+> 
+> To fix the problem, increasing 'wake_index' before resetting 'wait_cnt'.
+> 
+> 2) 'wait_cnt' can be decreased while waitqueue is empty
+> 
+> As pointed out by Jan Kara, following race is possible:
+> 
+> CPU1				CPU2
+> __sbq_wake_up			 __sbq_wake_up
+>  sbq_wake_ptr()			 sbq_wake_ptr() -> the same
+>  wait_cnt = atomic_dec_return()
+>  /* decreased to 0 */
+>  sbq_index_atomic_inc()
+>  /* move to next waitqueue */
+>  atomic_set()
+>  /* reset wait_cnt */
+>  wake_up_nr()
+>  /* wake up on the old waitqueue */
+> 				 wait_cnt = atomic_dec_return()
+> 				 /*
+> 				  * decrease wait_cnt in the old
+> 				  * waitqueue, while it can be
+> 				  * empty.
+> 				  */
+> 
+> Fix the problem by waking up before updating 'wake_index' and
+> 'wait_cnt'.
+> 
+> With this patch, noted that 'wait_cnt' is still decreased in the old
+> empty waitqueue, however, the wakeup is redirected to a active waitqueue,
+> and the extra decrement on the old empty waitqueue is not handled.
+> 
+> Fixes: 88459642cba4 ("blk-mq: abstract tag allocation out into sbitmap library")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-This new feature (UBLK_F_NEED_GET_DATA) is optional for ublk users.
-Related userspace code has been added in ublksrv[1] as one pull request.
+The patch looks good to me now (just one typo fix below). Thanks for the
+fix! Feel free to add:
 
-Test cases for this feature are added in ublksrv and all the tests pass.
-The performance result shows that this new feature does bring additional
-latency because one IO is issued back to ublk_drv once again to copy data
-from bio vectors to user-provided data buffer. UBLK_IO_NEED_GET_DATA is
-suitable for bigger block size such as 512B or 1MB.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-[1] https://github.com/ming1/ubdsrv
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- drivers/block/ublk_drv.c | 88 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 79 insertions(+), 9 deletions(-)
+> +	/*
+> +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> +	 * ensure that we see the batch size update before the wait
+> +	 * count is reset.
+> +	 *
+> +	 * Also pairs with the implicit barrier between becrementing wait_cnt
+							^^^ decrementing
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 255b2de46a24..c2d2cd5ab25c 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -47,7 +47,9 @@
- #define UBLK_MINORS		(1U << MINORBITS)
- 
- /* All UBLK_F_* have to be included into UBLK_F_ALL */
--#define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY | UBLK_F_URING_CMD_COMP_IN_TASK)
-+#define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
-+		| UBLK_F_URING_CMD_COMP_IN_TASK \
-+		| UBLK_F_NEED_GET_DATA)
- 
- struct ublk_rq_data {
- 	struct callback_head work;
-@@ -86,6 +88,15 @@ struct ublk_uring_cmd_pdu {
-  */
- #define UBLK_IO_FLAG_ABORTED 0x04
- 
-+/*
-+ * UBLK_IO_FLAG_NEED_GET_DATA is set because IO command requires
-+ * get data buffer address from ublksrv.
-+ *
-+ * Then, bio data could be copied into this data buffer for a WRITE request
-+ * after the IO command is issued again and UBLK_IO_FLAG_NEED_GET_DATA is unset.
-+ */
-+#define UBLK_IO_FLAG_NEED_GET_DATA 0x08
-+
- struct ublk_io {
- 	/* userspace buffer address from io cmd */
- 	__u64	addr;
-@@ -163,11 +174,19 @@ static struct miscdevice ublk_misc;
- static inline bool ublk_can_use_task_work(const struct ublk_queue *ubq)
- {
- 	if (IS_BUILTIN(CONFIG_BLK_DEV_UBLK) &&
-+			!(ubq->flags & UBLK_F_NEED_GET_DATA) &&
- 			!(ubq->flags & UBLK_F_URING_CMD_COMP_IN_TASK))
- 		return true;
- 	return false;
- }
- 
-+static inline bool ublk_need_get_data(const struct ublk_queue *ubq)
-+{
-+	if (ubq->flags & UBLK_F_NEED_GET_DATA)
-+		return true;
-+	return false;
-+}
-+
- static struct ublk_device *ublk_get_device(struct ublk_device *ub)
- {
- 	if (kobject_get_unless_zero(&ub->cdev_dev.kobj))
-@@ -509,6 +528,21 @@ static void __ublk_fail_req(struct ublk_io *io, struct request *req)
- 	}
- }
- 
-+static void ubq_complete_io_cmd(struct ublk_io *io, int res)
-+{
-+	/* mark this cmd owned by ublksrv */
-+	io->flags |= UBLK_IO_FLAG_OWNED_BY_SRV;
-+
-+	/*
-+	 * clear ACTIVE since we are done with this sqe/cmd slot
-+	 * We can only accept io cmd in case of being not active.
-+	 */
-+	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
-+
-+	/* tell ublksrv one io request is coming */
-+	io_uring_cmd_done(io->cmd, res, 0);
-+}
-+
- #define UBLK_REQUEUE_DELAY_MS	3
- 
- static inline void __ublk_rq_task_work(struct request *req)
-@@ -531,6 +565,20 @@ static inline void __ublk_rq_task_work(struct request *req)
- 		return;
- 	}
- 
-+	if (ublk_need_get_data(ubq) &&
-+			(req_op(req) == REQ_OP_WRITE ||
-+			req_op(req) == REQ_OP_FLUSH) &&
-+			!(io->flags & UBLK_IO_FLAG_NEED_GET_DATA)) {
-+
-+		io->flags |= UBLK_IO_FLAG_NEED_GET_DATA;
-+
-+		pr_devel("%s: ublk_need_get_data. op %d, qid %d tag %d io_flags %x\n",
-+				__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags);
-+
-+		ubq_complete_io_cmd(io, UBLK_IO_RES_NEED_GET_DATA);
-+		return;
-+	}
-+
- 	mapped_bytes = ublk_map_io(ubq, req, io);
- 
- 	/* partially mapped, update io descriptor */
-@@ -553,17 +601,13 @@ static inline void __ublk_rq_task_work(struct request *req)
- 			mapped_bytes >> 9;
- 	}
- 
--	/* mark this cmd owned by ublksrv */
--	io->flags |= UBLK_IO_FLAG_OWNED_BY_SRV;
--
- 	/*
--	 * clear ACTIVE since we are done with this sqe/cmd slot
--	 * We can only accept io cmd in case of being not active.
-+	 * Anyway, we have handled UBLK_IO_NEED_GET_DATA for WRITE/FLUSH requests,
-+	 * or we did nothing for other types requests.
- 	 */
--	io->flags &= ~UBLK_IO_FLAG_ACTIVE;
-+	io->flags &= ~UBLK_IO_FLAG_NEED_GET_DATA;
- 
--	/* tell ublksrv one io request is coming */
--	io_uring_cmd_done(io->cmd, UBLK_IO_RES_OK, 0);
-+	ubq_complete_io_cmd(io, UBLK_IO_RES_OK);
- }
- 
- static void ublk_rq_task_work_cb(struct io_uring_cmd *cmd)
-@@ -846,6 +890,16 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
- 	mutex_unlock(&ub->mutex);
- }
- 
-+static void ublk_handle_need_get_data(struct ublk_device *ub, int q_id,
-+		int tag, struct io_uring_cmd *cmd)
-+{
-+	struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
-+	struct request *req = blk_mq_tag_to_rq(ub->tag_set.tags[q_id], tag);
-+
-+	pdu->req = req;
-+	io_uring_cmd_complete_in_task(cmd, ublk_rq_task_work_cb);
-+}
-+
- static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- {
- 	struct ublksrv_io_cmd *ub_cmd = (struct ublksrv_io_cmd *)cmd->cmd;
-@@ -884,6 +938,14 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		goto out;
- 	}
- 
-+	/*
-+	 * ensure that the user issues UBLK_IO_NEED_GET_DATA
-+	 * iff the driver have set the UBLK_IO_FLAG_NEED_GET_DATA.
-+	 */
-+	if ((!!(io->flags & UBLK_IO_FLAG_NEED_GET_DATA))
-+			^ (cmd_op == UBLK_IO_NEED_GET_DATA))
-+		goto out;
-+
- 	switch (cmd_op) {
- 	case UBLK_IO_FETCH_REQ:
- 		/* UBLK_IO_FETCH_REQ is only allowed before queue is setup */
-@@ -917,6 +979,14 @@ static int ublk_ch_uring_cmd(struct io_uring_cmd *cmd, unsigned int issue_flags)
- 		io->cmd = cmd;
- 		ublk_commit_completion(ub, ub_cmd);
- 		break;
-+	case UBLK_IO_NEED_GET_DATA:
-+		if (!(io->flags & UBLK_IO_FLAG_OWNED_BY_SRV))
-+			goto out;
-+		io->addr = ub_cmd->addr;
-+		io->cmd = cmd;
-+		io->flags |= UBLK_IO_FLAG_ACTIVE;
-+		ublk_handle_need_get_data(ub, ub_cmd->q_id, ub_cmd->tag, cmd);
-+		break;
- 	default:
- 		goto out;
- 	}
+								Honza
+
 -- 
-2.34.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
