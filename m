@@ -2,121 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98461C04A68
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 12:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2261AC04A68
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 13:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232769AbiG0MMb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 08:12:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56902 "EHLO
+        id S233413AbiG0NBf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 09:01:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232725AbiG0MM3 (ORCPT
+        with ESMTP id S233643AbiG0NBd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 08:12:29 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A894B0C9;
-        Wed, 27 Jul 2022 05:12:28 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LtCLQ43hkzl8gY;
-        Wed, 27 Jul 2022 20:11:26 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgD3_9OpK+Fip4oBBQ--.23248S3;
-        Wed, 27 Jul 2022 20:12:25 +0800 (CST)
-Subject: Re: [PATCH RESEND v6 0/8] bugfix and cleanup for blk-throttle
-To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, mkoutny@suse.com,
-        axboe@kernel.dk, ming.lei@redhat.com
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220701093441.885741-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <42a138ec-4144-5329-00ae-c094fe13137b@huaweicloud.com>
-Date:   Wed, 27 Jul 2022 20:12:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 27 Jul 2022 09:01:33 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A88A286E5
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 06:01:28 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id ez10so31208760ejc.13
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 06:01:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
+         :subject:content-transfer-encoding;
+        bh=tjvezBqiBXqz8FBLH0Yx0x2i6hqzOhN4UfrVGdiK8vg=;
+        b=mw5RDOKr/E9Nax6/5FkXdq/vYD1ybSqyEYy4nfXvrA9OhGsjb4NsMMwwp/UnHlw8Uo
+         wgjM7KECPtCalX/pxAyhtlLjcQ9rNpUIUbLpL8V6yiLdEOc3Uh5tw4bFkH8DF/V4rJ4g
+         JFqmbX7FISMQREmI76uAHt2SAvj6CEihmf2+6EncC0SlgcMVNxBHdTA3Z6driUVeQMpb
+         wuVeSZd48odVIYe4+e17ZS76IZ2H6LaH2+K1YOzrwaU83RNOAKf+iB3P4V/4N33Gca87
+         cHo9BHXybcV3mwETQaipjvMukbDkUAci4g/1fapm0Xgd50omt9QLcGqvS2noPBnL80Zh
+         jG6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:from:subject:content-transfer-encoding;
+        bh=tjvezBqiBXqz8FBLH0Yx0x2i6hqzOhN4UfrVGdiK8vg=;
+        b=T7NdcKcA1J2UeemfAb6wirJvo83vi3s427VJ6wsHlgBLT1ieE/MIHwFWcXjc48ZWtA
+         aOP7EXbJx1U0QO7t2crTOF/Gp2Jat79SX+Fa6XmZ+w9qul/tlHKecFMqE+NwgUjeIEni
+         36Lq3jeQQT/rq48z1qCp5RjOtiTEcUt8A/ArMLYDd3XJ3CL8yVZcl9nAlDx0UCN+R+7b
+         SYv+ZJe5zHxrH2+0TTVOE7t8lppXbzml89EnyOEYmvSjH7nnaRF1KRvwL0YUiank7Mkm
+         3X3UJCYeH6kbz1Y0fvNMEdMu9cNLguYbviXZTpxBNCG6F+fBJNWBvJJQ/Mhpk5L2n3Jz
+         GF2g==
+X-Gm-Message-State: AJIora9CJKpwNIPG/8iIiFIRfq57Q51IJOKp22uY+tlcTPS5l7B4Mg/E
+        l9IFt/mZ0GhANpDur2hmBnNNIMUWG3I=
+X-Google-Smtp-Source: AGRyM1uJR0RreDSFXkkMHaLYiQ8kUQxh+snDLLx8m4uUc/8rn+800qs/ehZ3sr7nNtCt5F+UXXQdEQ==
+X-Received: by 2002:a17:907:28d5:b0:72b:4d89:9c6d with SMTP id en21-20020a17090728d500b0072b4d899c6dmr17713913ejc.128.1658926886345;
+        Wed, 27 Jul 2022 06:01:26 -0700 (PDT)
+Received: from [192.168.2.27] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
+        by smtp.gmail.com with ESMTPSA id eg47-20020a05640228af00b0043bbcd94ee4sm10185201edb.51.2022.07.27.06.01.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jul 2022 06:01:25 -0700 (PDT)
+Message-ID: <975ea807-667d-3ef3-b3e2-26b22ea74029@gmail.com>
+Date:   Wed, 27 Jul 2022 15:01:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <20220701093441.885741-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgD3_9OpK+Fip4oBBQ--.23248S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WrWDWr4kZrWxXrW8Wr1rZwb_yoW8KrWDpF
-        Waqr45Cr4UJrnrCw43Gw43ZFW5Gws7Jwn8X3sxtw1fu3WqyryUtr1v9a1ruFyIyFZ7KrWI
-        qF1jqFn2ka4UZ37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1U
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+X-Mozilla-News-Host: news://nntp.lore.kernel.org:119
+Content-Language: en-US
+To:     linux-block <linux-block@vger.kernel.org>
+Cc:     Ondrej Kozina <okozina@redhat.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Subject: Errors in log with WRITE_ZEROES over loop on NFS
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Tejun
+Hi,
 
-Are you still interested in this patchset?
+We switched to using BLKZEROOUT ioctl in libcryptsetup, and now we see a lot of messages like
 
-ÔÚ 2022/07/01 17:34, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Resend v5 by a new mail address(huaweicloud.com) because old
-> address(huawei.com)has some problem that emails can end up in spam.
-> Please let me know if anyone still see this patchset end up in spam.
-> 
-> Changes in v6:
->   - rename parameter in patch 3
->   - add comments and reviewed tag for patch 4
-> Changes in v5:
->   - add comments in patch 4
->   - clear bytes/io_skipped in throtl_start_new_slice_with_credit() in
->   patch 4
->   - and cleanup patches 5-8
-> Changes in v4:
->   - add reviewed-by tag for patch 1
->   - add patch 2,3
->   - use a different way to fix io hung in patch 4
-> Changes in v3:
->   - fix a check in patch 1
->   - fix link err in patch 2 on 32-bit platform
->   - handle overflow in patch 2
-> Changes in v2:
->   - use a new solution suggested by Ming
->   - change the title of patch 1
->   - add patch 2
-> 
-> Patch 1 fix that blk-throttle can't work if multiple bios are throttle,
-> Patch 2 fix overflow while calculating wait time
-> Patch 3,4 fix io hung due to configuration updates.
-> Patch 5-8 are cleanup patches, there are no functional changes, just
-> some places that I think can be optimized during code review.
-> 
-> Previous version:
-> v1: https://lore.kernel.org/all/20220517134909.2910251-1-yukuai3@huawei.com/
-> v2: https://lore.kernel.org/all/20220518072751.1188163-1-yukuai3@huawei.com/
-> v3: https://lore.kernel.org/all/20220519085811.879097-1-yukuai3@huawei.com/
-> v4: https://lore.kernel.org/all/20220523082633.2324980-1-yukuai3@huawei.com/
-> v5: https://lore.kernel.org/all/20220528064330.3471000-1-yukuai3@huawei.com/
-> 
-> Yu Kuai (8):
->    blk-throttle: fix that io throttle can only work for single bio
->    blk-throttle: prevent overflow while calculating wait time
->    blk-throttle: factor out code to calculate ios/bytes_allowed
->    blk-throttle: fix io hung due to config updates
->    blk-throttle: use 'READ/WRITE' instead of '0/1'
->    blk-throttle: calling throtl_dequeue/enqueue_tg in pairs
->    blk-throttle: cleanup tg_update_disptime()
->    blk-throttle: clean up flag 'THROTL_TG_PENDING'
-> 
->   block/blk-throttle.c | 168 +++++++++++++++++++++++++++++--------------
->   block/blk-throttle.h |  16 +++--
->   2 files changed, 128 insertions(+), 56 deletions(-)
-> 
+  : operation not supported error, dev loop1, sector 0 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+
+But the operation succeeds (ioctl returns 0).
+
+As it seems, this happens when a loop device is allocated over a file on NFS mounted directory.
+Easy to reproduce (5.19-rc8) by doing this in NFS mounted dir:
+
+  # truncate -s 1M test.img
+  # losetup /dev/loop1 test.img
+  # fallocate -zn -l 1048576 /dev/loop1
+
+
+Shouldn't the block layer be quiet here and just switch to a different wipe method?
+(I think it happens in other cases.)
+
+It is perhaps just a benign message, but it can trigger some reports.
+
+Milan
 
