@@ -2,110 +2,238 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42936C19F2D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 08:53:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D77FDC04A68
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 12:11:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230257AbiG0IxA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 04:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37556 "EHLO
+        id S231894AbiG0MLW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 08:11:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231176AbiG0Iw7 (ORCPT
+        with ESMTP id S231430AbiG0MLV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 04:52:59 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B772046D8C
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 01:52:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1658911978; x=1690447978;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=FuJxPAQuEVxYFqdrcw7CgJn80w9jEhJ0pB1tM1eFiZY=;
-  b=bcYUyUVVdbEdRNGXjpur1hV1T+/PJAkKXsSWuLsVYtewcPdnmU/Bkp7Q
-   1XECgGmO9ISfEUKpaVq7aMvyvIRcs57GORTWzYMnkyK2y8MBOXsxLEcJZ
-   9wq6EidsBwdOZEed+x1VL6lFL28UEeaPHVc+DgoxraQMMbrQg3DW+ldgg
-   qnkZrpjWtLWYGdwqScfhhLwYMMgDjZqZK8BfAtOoM0xEMkBM/FTqwOka5
-   UXYjTo6kdWJYfaVGOJqF3leHRt++7NsBAGimbEQ209V8NyUX952Owoni7
-   qf37iZylisOm6wTueMNL7neVZutu9XpxGwgtM90F6dzXipcruTUSOiYR2
-   g==;
-X-IronPort-AV: E=Sophos;i="5.93,195,1654531200"; 
-   d="scan'208";a="205584989"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jul 2022 16:52:58 +0800
-IronPort-SDR: 09+gCHQjgEcL2B4+VwAZkGSUioDvj9Z/bTr/fSTBFZGFHq5lKbR81IDoY5a5f3N/Ti2aAv/Q5/
- pxyWLId9peKLhFsGdvZmTHRe/SqmrcL6Q3BQla19zjCQPnkxUVUO/zrAvs86GNITFtElxor7Tg
- Jwam1Ozm6t06xJTtpTWmtfjLle1hsN2GHYL6sJ4dRh72zR0tPbezKj1skSJNI36ogMlE8kDOEx
- Pow4dS09r7mqawMkf0jIAyjUTUZJzKVLmGJQBzcGmlZMJv487wHj/rBdWttD3owHk+95wLcDAJ
- RfetHZM2MELh/FBfRDulA+Kz
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 01:14:10 -0700
-IronPort-SDR: hFfG8tBt2UxA3j9/mQu8hNAy5BZQAy1BKWjtYn45sMHyWXcxca3NDlW/oyMQLDwW/OUYFLKHYb
- PrCOqxX4GT6JBd/yD6w8nWaFZEXZHFi3uu8aduA10lKeK3mn9RoYTGProA+5buqUxCegY629SV
- mK9TUtp1hs2eUu49Jl8Fik5g5oE38gBoifJ0Vwl9aFmFKc+bYZFcdscQxYJwKel8Q2b/nRsqCi
- 7svdbUBHOZ6uRiN91jqiW78YHwLYv/AOlZ0sAwE+twE4glMgxDTfPc+BYxF6RXuv4cnmb15t0L
- /Ks=
-WDCIronportException: Internal
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jul 2022 01:52:58 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 6/6] srp/rc: allow test with built-in sd_mod and sg drivers
-Date:   Wed, 27 Jul 2022 17:52:51 +0900
-Message-Id: <20220727085251.1474340-7-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220727085251.1474340-1-shinichiro.kawasaki@wdc.com>
-References: <20220727085251.1474340-1-shinichiro.kawasaki@wdc.com>
+        Wed, 27 Jul 2022 08:11:21 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D7DB43307;
+        Wed, 27 Jul 2022 05:11:19 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LtCK32j8szl8pD;
+        Wed, 27 Jul 2022 20:10:15 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP3 (Coremail) with SMTP id _Ch0CgDnSWliK+Fi5YEBBQ--.61681S3;
+        Wed, 27 Jul 2022 20:11:16 +0800 (CST)
+Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
+ 'num_groups_with_pending_reqs'
+To:     Paolo VALENTE <paolo.valente@unimore.it>
+Cc:     Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20220610021701.2347602-1-yukuai3@huawei.com>
+ <20220610021701.2347602-4-yukuai3@huawei.com>
+ <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
+ <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
+ <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
+ <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
+Date:   Wed, 27 Jul 2022 20:11:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgDnSWliK+Fi5YEBBQ--.61681S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxtrWfZr4ktF47Cr4fGFy3Jwb_yoW7Kr1kp3
+        yfKa17Ar4UXr1Sqr1Yq3WUXrySqryfAry8Wr1DJr1ftrnFyFn2qFnFvw4F9Fy8ZrZ3Jr12
+        vr1jg3sruw1UtFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The srp test group can be executed with built-in sd_mod and sg drivers.
-Check the drivers with _have_drivers() in place of _have_modules.
+Hi, Paolo
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/srp/rc | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Are you still interested in this patchset?
 
-diff --git a/tests/srp/rc b/tests/srp/rc
-index 94ee97c..46c75c6 100755
---- a/tests/srp/rc
-+++ b/tests/srp/rc
-@@ -28,13 +28,18 @@ is_lio_configured() {
- }
- 
- group_requires() {
--	local m name p required_modules
-+	local m name p required_drivers required_modules
- 
- 	_have_configfs || return
- 	if is_lio_configured; then
- 		SKIP_REASONS+=("LIO must be unloaded before the SRP tests are run")
- 		return
- 	fi
-+	required_drivers=(
-+		sd_mod
-+		sg
-+	)
-+	_have_drivers "${required_drivers[@]}"
- 	required_modules=(
- 		dm_multipath
- 		dm_queue_length
-@@ -51,9 +56,6 @@ group_requires() {
- 		scsi_dh_alua
- 		scsi_dh_emc
- 		scsi_dh_rdac
--		sd_mod
--		sd_mod
--		sg
- 		target_core_iblock
- 		target_core_mod
- 	)
--- 
-2.36.1
+在 2022/07/20 19:38, Yu Kuai 写道:
+> Hi
+>
+> 在 2022/07/20 19:24, Paolo VALENTE 写道:
+>>
+>>
+>>> Il giorno 12 lug 2022, alle ore 15:30, Yu Kuai 
+>>> <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
+>>>
+>>> Hi!
+>>>
+>>> I'm copying my reply with new mail address, because Paolo seems
+>>> didn't receive my reply.
+>>>
+>>> 在 2022/06/23 23:32, Paolo Valente 写道:
+>>>> Sorry for the delay.
+>>>>> Il giorno 10 giu 2022, alle ore 04:17, Yu Kuai <yukuai3@huawei.com 
+>>>>> <mailto:yukuai3@huawei.com>> ha scritto:
+>>>>>
+>>>>> Currently, bfq can't handle sync io concurrently as long as they
+>>>>> are not issued from root group. This is because
+>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>>>>> bfq_asymmetric_scenario().
+>>>>>
+>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+>>>>>
+>>>>> Before this patch:
+>>>>> 1) root group will never be counted.
+>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
+>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the 
+>>>>> requests.
+>>>>>
+>>>>> After this patch:
+>>>>> 1) root group is counted.
+>>>>> 2) Count if bfqg have pending requests.
+>>>>> 3) Don't count if bfqg complete all the requests.
+>>>>>
+>>>>> With this change, the occasion that only one group is activated 
+>>>>> can be
+>>>>> detected, and next patch will support concurrent sync io in the
+>>>>> occasion.
+>>>>>
+>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com 
+>>>>> <mailto:yukuai3@huawei.com>>
+>>>>> Reviewed-by: Jan Kara <jack@suse.cz <mailto:jack@suse.cz>>
+>>>>> ---
+>>>>> block/bfq-iosched.c | 42 ------------------------------------------
+>>>>> block/bfq-iosched.h | 18 +++++++++---------
+>>>>> block/bfq-wf2q.c    | 19 ++++---------------
+>>>>> 3 files changed, 13 insertions(+), 66 deletions(-)
+>>>>>
+>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>>>>> index 0ec21018daba..03b04892440c 100644
+>>>>> --- a/block/bfq-iosched.c
+>>>>> +++ b/block/bfq-iosched.c
+>>>>> @@ -970,48 +970,6 @@ void __bfq_weights_tree_remove(struct 
+>>>>> bfq_data *bfqd,
+>>>>> void bfq_weights_tree_remove(struct bfq_data *bfqd,
+>>>>>     struct bfq_queue *bfqq)
+>>>>> {
+>>>>> -struct bfq_entity *entity = bfqq->entity.parent;
+>>>>> -
+>>>>> -for_each_entity(entity) {
+>>>>> -struct bfq_sched_data *sd = entity->my_sched_data;
+>>>>> -
+>>>>> -if (sd->next_in_service || sd->in_service_entity) {
+>>>>> -/*
+>>>>> -* entity is still active, because either
+>>>>> -* next_in_service or in_service_entity is not
+>>>>> -* NULL (see the comments on the definition of
+>>>>> -* next_in_service for details on why
+>>>>> -* in_service_entity must be checked too).
+>>>>> -*
+>>>>> -* As a consequence, its parent entities are
+>>>>> -* active as well, and thus this loop must
+>>>>> -* stop here.
+>>>>> -*/
+>>>>> -break;
+>>>>> -}
+>>>>> -
+>>>>> -/*
+>>>>> -* The decrement of num_groups_with_pending_reqs is
+>>>>> -* not performed immediately upon the deactivation of
+>>>>> -* entity, but it is delayed to when it also happens
+>>>>> -* that the first leaf descendant bfqq of entity gets
+>>>>> -* all its pending requests completed. The following
+>>>>> -* instructions perform this delayed decrement, if
+>>>>> -* needed. See the comments on
+>>>>> -* num_groups_with_pending_reqs for details.
+>>>>> -*/
+>>>>> -if (entity->in_groups_with_pending_reqs) {
+>>>>> -entity->in_groups_with_pending_reqs = false;
+>>>>> -bfqd->num_groups_with_pending_reqs--;
+>>>>> -}
+>>>>> -}
+>>>> With this part removed, I'm missing how you handle the following
+>>>> sequence of events:
+>>>> 1.  a queue Q becomes non busy but still has dispatched requests, so
+>>>> it must not be removed from the counter of queues with pending reqs
+>>>> yet
+>>>> 2.  the last request of Q is completed with Q being still idle (non
+>>>> busy).  At this point Q must be removed from the counter.  It seems to
+>>>> me that this case is not handled any longer
+>>> Hi, Paolo
+>>>
+>>> 1) At first, patch 1 support to track if bfqq has pending requests, 
+>>> it's
+>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when the
+>>> first request is inserted to bfqq, and it's cleared when the last
+>>> request is completed(based on weights_tree insertion and removal).
+>>>
+>>
+>> In patch 1 I don't see the flag cleared for the request-completion 
+>> event :(
+>>
+>> The piece of code involved is this:
+>>
+>> static void bfq_completed_request(struct bfq_queue *bfqq, struct 
+>> bfq_data *bfqd)
+>> {
+>> u64 now_ns;
+>> u32 delta_us;
+>>
+>> bfq_update_hw_tag(bfqd);
+>>
+>> bfqd->rq_in_driver[bfqq->actuator_idx]--;
+>> bfqd->tot_rq_in_driver--;
+>> bfqq->dispatched--;
+>>
+>> if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq)) {
+>> /*
+>> * Set budget_timeout (which we overload to store the
+>> * time at which the queue remains with no backlog and
+>> * no outstanding request; used by the weight-raising
+>> * mechanism).
+>> */
+>> bfqq->budget_timeout = jiffies;
+>>
+>> bfq_weights_tree_remove(bfqd, bfqq);
+>> }
+>> ...
+>>
+>> Am I missing something?
+>
+> I add a new api bfq_del_bfqq_in_groups_with_pending_reqs() in patch 1
+> to clear the flag, and it's called both from bfq_del_bfqq_busy() and
+> bfq_completed_request(). I think you may miss the later:
+>
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0d46cb728bbf..0ec21018daba 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct 
+> bfq_queue *bfqq, struct bfq_data *bfqd)
+>           */
+>          bfqq->budget_timeout = jiffies;
+>
+> +        bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>          bfq_weights_tree_remove(bfqd, bfqq);
+>      }
+>
+> Thanks,
+> Kuai
+>>
+>> Thanks,
+>> Paolo
 
