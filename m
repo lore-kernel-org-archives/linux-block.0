@@ -2,155 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E45CC04A68
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DC9C19F2B
 	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:25:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236203AbiG0QZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 12:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50536 "EHLO
+        id S236219AbiG0QZe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 12:25:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236449AbiG0QYX (ORCPT
+        with ESMTP id S236507AbiG0QYZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 12:24:23 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435CB4E62B
+        Wed, 27 Jul 2022 12:24:25 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBBAB4E62F
         for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:19 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220727162258euoutp01e6d7bf1a1a8f97ed750d0aad3936634d~FvDZCG1cl2263722637euoutp01a
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 16:22:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220727162258euoutp01e6d7bf1a1a8f97ed750d0aad3936634d~FvDZCG1cl2263722637euoutp01a
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1658938979;
-        bh=o0r9RyB9vOAXtqPhFs52TIGpjJ3od4KdTmNo2ZjXDoo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BCY2nrqvSVZvShtnBpRlxL1Eo1eK9cSI+xvAlVfHEklBFny/jMs45GlcoHB+CWcQw
-         ziQ6LTNWkma0byf9IApZ5gETGKysjfj8scQz5KXukJAdiEqxlt1gT94X16g1wggIvs
-         03Yk42m3gTZtqt5ghS0/Li5GJYWTwZqrOhTcBeBs=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220727162257eucas1p2ba22d6ac666789dc7c83c0c09c8dd771~FvDXYuC2n0838408384eucas1p2E;
-        Wed, 27 Jul 2022 16:22:57 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id E9.E8.09580.16661E26; Wed, 27
-        Jul 2022 17:22:57 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220727162256eucas1p284a15532173cce3eca46eee0cee3acdd~FvDXATaOk2238722387eucas1p2n;
-        Wed, 27 Jul 2022 16:22:56 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220727162256eusmtrp23d991b641b5e5403010138b48180dea3~FvDW-f_cM0811608116eusmtrp20;
-        Wed, 27 Jul 2022 16:22:56 +0000 (GMT)
-X-AuditID: cbfec7f5-9adff7000000256c-ed-62e166617204
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id CD.1E.09095.06661E26; Wed, 27
-        Jul 2022 17:22:56 +0100 (BST)
-Received: from localhost (unknown [106.210.248.8]) by eusmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220727162256eusmtip1be6834eb505d89c9e19b839ab128d9cd~FvDWoSEpk0050700507eusmtip1i;
-        Wed, 27 Jul 2022 16:22:56 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
-        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
-Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        linux-block@vger.kernel.org, pankydev8@gmail.com,
-        bvanassche@acm.org, jaegeuk@kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH v8 10/11] dm: call dm_zone_endio after the target endio
- callback for zoned devices
-Date:   Wed, 27 Jul 2022 18:22:44 +0200
-Message-Id: <20220727162245.209794-11-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220727162245.209794-1-p.raghav@samsung.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=XZGZy0s7RnfoncuceJb1Wsb4ySM0ED0d66bgJt25KAs=; b=CqCnEwWPa3S38R1C/EqT7BNLYr
+        LQeBwFEWCEQ0CNEdRysZlhIWTlwMmjXa7f9gd3tCj4VcHOf1PwTe7RtxuznDiv2VGmlCrxsMOAB7/
+        XBqcGSDmcT5FwthyYrVMPmjccQDkZ9h7Qu1BJbPyzRN2l4ERGhN057m77FejQc+D5XSZRgrw/IgW+
+        xOndmZLdaaxWw7Ye/yJrpaw9BvsuTW09wDz8tzflKQWa3IMjCIOc2gc2hJ8pyzCnsU+gAGluC6QdN
+        NPgRQvS9E/5aUyXRDxcBPWuqhDLnBPoyHUf8XmIabZkJNUhqU87Bk8ZnDV9rvEGfk+f5zPvkS5dyg
+        NQsHQ8jA==;
+Received: from [2607:fb90:18d2:b6be:6d6f:ba8a:ca81:9775] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oGjoa-00FUkd-99; Wed, 27 Jul 2022 16:23:16 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 5/6] block: move bio_allowed_max_sectors to blk-merge.c
+Date:   Wed, 27 Jul 2022 12:22:59 -0400
+Message-Id: <20220727162300.3089193-6-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220727162300.3089193-1-hch@lst.de>
+References: <20220727162300.3089193-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrOKsWRmVeSWpSXmKPExsWy7djPc7qJaQ+TDH6f4bRYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
-        oe0rs8XnpS3sFmtuPmWxOHFL2kHA4/IVb4+ds+6ye1w+W+qxaVUnm8fmJfUeu282sHnsbL3P
-        6vF+31U2j74tqxg9Np+u9vi8Sc6j/UA3UwBPFJdNSmpOZllqkb5dAlfGqWc/mAo2c1V8v7GZ
-        qYHxAEcXIyeHhICJxO/jk1i7GLk4hARWMErc6TnKBOF8YZToWdXNClIlJPCZUWJJkx9Mx/Zz
-        j6CKljNKPJv0iRmi6DmjxMQ3wl2MHBxsAloSjZ3sIGERgWKJh+9aWUDqmQVmMUmcPvaYGaRG
-        WCBF4kOnE0gNi4CqxI9595hAbF4Ba4nDP9+wQeySl5h56TvYHE6g+OYp86BqBCVOznzCAmIz
-        A9U0b53NDDJfQmA5p8TbD//ZQeZLCLhIfD0jDjFHWOLV8S3sELaMxP+d85kg7GqJpzd+Q/W2
-        MEr071zPBtFrLdF3JgfEZBbQlFi/Sx+i3FHiyKMJUBV8EjfeCkJcwCcxadt0Zogwr0RHmxBE
-        tZLEzp9PoJZKSFxumsMCYXtIvDh3nHECo+IsJL/MQvLLLIS9CxiZVzGKp5YW56anFhvnpZbr
-        FSfmFpfmpesl5+duYgSmvdP/jn/dwbji1Ue9Q4xMHIyHGCU4mJVEeBOi7ycJ8aYkVlalFuXH
-        F5XmpBYfYpTmYFES503O3JAoJJCeWJKanZpakFoEk2Xi4JRqYDJ7Xcc+O+ecdfDsz3v5qkVu
-        mfmcvHH90Cc9MQfhI+H7euT4P3sIqi0uycmOm5mo/rjpwE++z/72+u4MAukfTi27ZZfpFlQ/
-        VyfQkmk5p5l2s7mk9u4P4qt6P0opHzIw5DRe1nwjccEPtu9ZVkr6gov+5xsGbfAoXrtDp3re
-        o2kFWuvfGEVtzvUzctYRSZXPtDv/TeXhqaQK51URTpFVR3gVtxl2nfez+mRuM/2iuRFH4OZX
-        5mLbtkn9XHreocJ4Xu+qA7qGV3OWbNVYO2W2mumZSNYd5Sf6rh7gFuJ+WZv1Tsn79+RXk5V2
-        uNR2ef/6xL73z5aYpNnu16awWhW+Wbrd4M5VkYjk9euXRdyrVmIpzkg01GIuKk4EAOeaQyvq
-        AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrBIsWRmVeSWpSXmKPExsVy+t/xu7oJaQ+TDL5t0LBYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
-        oe0rs8XnpS3sFmtuPmWxOHFL2kHA4/IVb4+ds+6ye1w+W+qxaVUnm8fmJfUeu282sHnsbL3P
-        6vF+31U2j74tqxg9Np+u9vi8Sc6j/UA3UwBPlJ5NUX5pSapCRn5xia1StKGFkZ6hpYWekYml
-        nqGxeayVkamSvp1NSmpOZllqkb5dgl7GqWc/mAo2c1V8v7GZqYHxAEcXIyeHhICJxPZzj5i6
-        GLk4hASWMkosnr2GDSIhIXF7YRMjhC0s8edaFxtE0VNGiTvbZzN3MXJwsAloSTR2soOYIgKV
-        Eme/yIKUMwssY5LYcEIGxBYWSJK4++wbC4jNIqAq8WPePSYQm1fAWuLwzzdQq+QlZl76zg5i
-        cwLFN0+ZB1YjJGAl8ezBRzaIekGJkzOfsEDMl5do3jqbeQKjwCwkqVlIUgsYmVYxiqSWFuem
-        5xYb6hUn5haX5qXrJefnbmIERum2Yz8372Cc9+qj3iFGJg7GQ4wSHMxKIrwJ0feThHhTEiur
-        Uovy44tKc1KLDzGaAt09kVlKNDkfmCbySuINzQxMDU3MLA1MLc2MlcR5PQs6EoUE0hNLUrNT
-        UwtSi2D6mDg4pRqYZKbt4p879bvdx3Ct3saNzj7d6WVmr7f3/lVgFKxskTa8d9DxQWn0ph6G
-        GczNNbZN6tN9K52inc1Moz8ePbfIPndaye6qTyt0rPbkSiy426n47cXrxODeEplT5pwpOpcN
-        9xVXCl0Rkctzeb3FrU/VZ9oahpZwvu/HhBe3CrNslHos6Gl1Mo/FbP08273HZcVrnoefP608
-        fZNpxfToG0tunL7d/mrXx1mJWV8iNSc38m054XrRrvl6weKynwbpqnc3svy6O1HlrXC63q+4
-        pdzWyy54zH+16eIEe1uftZmi+mqmb98c1VKouJY+WfcY/37tqTtsPBIdrvqd4f5qUyl0ubQr
-        250xdcNb1eTQDmYlluKMREMt5qLiRABGGKl5WwMAAA==
-X-CMS-MailID: 20220727162256eucas1p284a15532173cce3eca46eee0cee3acdd
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220727162256eucas1p284a15532173cce3eca46eee0cee3acdd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220727162256eucas1p284a15532173cce3eca46eee0cee3acdd
-References: <20220727162245.209794-1-p.raghav@samsung.com>
-        <CGME20220727162256eucas1p284a15532173cce3eca46eee0cee3acdd@eucas1p2.samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-dm_zone_endio() updates the bi_sector of orig bio for zoned devices that
-uses either native append or append emulation and it is called before the
-endio of the target. But target endio can still update the clone bio
-after dm_zone_endio is called, thereby, the orig bio does not contain
-the updated information anymore. Call dm_zone_endio for zoned devices
-after calling the target's endio function
+Move this helper into the only file where it is used.
 
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- drivers/md/dm.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ block/blk-merge.c | 10 ++++++++++
+ block/blk.h       | 10 ----------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 03ac6143b8aa..bc410ee04004 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1123,10 +1123,6 @@ static void clone_endio(struct bio *bio)
- 			disable_write_zeroes(md);
- 	}
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index ce73b3b6c2a71..c2bf8723f30c6 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -95,6 +95,16 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
+ 	return bio_will_gap(req->q, NULL, bio, req->bio);
+ }
  
--	if (static_branch_unlikely(&zoned_enabled) &&
--	    unlikely(bdev_is_zoned(bio->bi_bdev)))
--		dm_zone_endio(io, bio);
--
- 	if (endio) {
- 		int r = endio(ti, bio, &error);
- 		switch (r) {
-@@ -1155,6 +1151,10 @@ static void clone_endio(struct bio *bio)
- 		}
- 	}
- 
-+	if (static_branch_unlikely(&zoned_enabled) &&
-+	    unlikely(bdev_is_zoned(bio->bi_bdev)))
-+		dm_zone_endio(io, bio);
++/*
++ * The max size one bio can handle is UINT_MAX becasue bvec_iter.bi_size
++ * is defined as 'unsigned int', meantime it has to be aligned to with the
++ * logical block size, which is the minimum accepted unit by hardware.
++ */
++static unsigned int bio_allowed_max_sectors(struct request_queue *q)
++{
++	return round_down(UINT_MAX, queue_logical_block_size(q)) >> 9;
++}
 +
- 	if (static_branch_unlikely(&swap_bios_enabled) &&
- 	    unlikely(swap_bios_limit(ti, bio)))
- 		up(&md->swap_bios_semaphore);
+ static struct bio *bio_split_discard(struct bio *bio, struct request_queue *q,
+ 		unsigned *nsegs, struct bio_set *bs)
+ {
+diff --git a/block/blk.h b/block/blk.h
+index 1cc813241cd4f..19dd12ade8087 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -349,16 +349,6 @@ static inline void req_set_nomerge(struct request_queue *q, struct request *req)
+ 		q->last_merge = NULL;
+ }
+ 
+-/*
+- * The max size one bio can handle is UINT_MAX becasue bvec_iter.bi_size
+- * is defined as 'unsigned int', meantime it has to aligned to with logical
+- * block size which is the minimum accepted unit by hardware.
+- */
+-static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
+-{
+-	return round_down(UINT_MAX, queue_logical_block_size(q)) >> 9;
+-}
+-
+ /*
+  * Internal io_context interface
+  */
 -- 
-2.25.1
+2.30.2
 
