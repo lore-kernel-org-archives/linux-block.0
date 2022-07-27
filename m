@@ -2,160 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4140FC19F21
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 04:47:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE519C04A68
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 06:34:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230140AbiG0Erc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 00:47:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43044 "EHLO
+        id S229576AbiG0GeJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 02:34:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiG0Erb (ORCPT
+        with ESMTP id S229501AbiG0GeI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 00:47:31 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9DB83DBED
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 21:47:29 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id k1-20020a056e021a8100b002dd46be73fbso5422777ilv.6
-        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 21:47:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=/ub7C209U2i1ZQ26TnANhRBorghIVJMSqJvhdz+G0Mc=;
-        b=69RP2rmE43j6XlQZXbcYyE8gq+hxfEAr806SLIFk7X+Y9Q42hPOP4+01+4DZjQRx/k
-         RYDJRx7xsDhzlJQ9M+yhlFZTBXjLPD7xiosQO9+oQ7cKpZ+ofXE+80E2cpKcBAly9S25
-         ZbKa9oEgRTn13scb/YBSQhEnTR+N/QpCUbMXjRP+hXwZRteIPk4W8/Uep2vA1lQE6LsU
-         S4bF3lFFWfn+GUZ/xulQhyeMO2wcipp1S3lyRrf1FIyFUkpyRK6cBrc3vTBsODciBXRY
-         Rn/5/DOGL2B1AC4PQNCnrWIeHiO99G2cqLT9DOQ+ODQxZ51RCuEqGsQHMvhk341x6lr+
-         zhvQ==
-X-Gm-Message-State: AJIora+PQA+KGgcHnBNCLOp1DwAyID0u0s4aBEY7a1u2yCwhTwBwT8eS
-        Dt/99zjcvZ06h7xU2l9GFl5/OJQoPdJMTbqcMyUTnxvhG7+1
-X-Google-Smtp-Source: AGRyM1s68Awxg2ZiqZMLrzsfJehvdtNZsvf6v6K7eWxwWGVFDxTMke9zlKfi2ry5aaec13hvHDT2k9StqPEdRA7Pj9AuwUH4cCRw
+        Wed, 27 Jul 2022 02:34:08 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F1040BF0
+        for <linux-block@vger.kernel.org>; Tue, 26 Jul 2022 23:34:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1658903648; x=1690439648;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=XqexVmN/5hw3hAxzrXvD0sIusHWgnfRUVk4l6pi3Ikg=;
+  b=VrI+rGTzVTMGPspDJVCyYY0YYXrwyZh+56sIZGeFbWE2bvorbbON+TH2
+   4/0Ytaa5qdk1qcmOgXeBwX2VYnDghLMjEnePurR57NHYb2ohVgd19yI8O
+   t8ohyByI03rORKx3kKCfRJ8q7Nhh7+EMhz5cmMp02DbnsDuhjyC5+4qbD
+   7xSKhMBNROGTV7fv7McdAoy2sgzVEbZYPVxKUq9LuRNlvL/QsXPUKLzl1
+   AN//0INku8Vpd6zSotZ9KtU90Wd2lxcDUaCTzrVtpmN3NPSu2XXNGuoCB
+   WS7KNQAvwJQHn9FBIQWU1s642OZ0EezTHJBQSX3el+SB1tozP56sozkcd
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,195,1654531200"; 
+   d="scan'208";a="311333316"
+Received: from mail-mw2nam10lp2102.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.102])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jul 2022 14:34:06 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KG/ojZqFQM3Xt6cy0PAw6WlQcNx9oArholwcB7fv6mfeqV2B5gaiSYgtRbpik039UudGbeclSDb8Aokymwyer1kjNFadqCp0xvhvgwp0ofSXU2vwuA60/HWWrNwAGgYB3fS/MyL1hpdaP3I6eh+UaOtCJw50+CtNcuKRC1z2GVCsyd3+ZmebTUwgeEY0bkUj+cKPJakvMMzq0d0knyANoTo/4ojiSxq5X/ohXTTstJkmJT+zHzE0Shj8PgwHAHAeSsLGJmrqSa51UPeIzNJqQDPPgKHxbvXRwofOqkpi5R8VX7tMg0xDeGa2FpNrwmtDuD+5xELyclJgTHdtCqEM5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XqexVmN/5hw3hAxzrXvD0sIusHWgnfRUVk4l6pi3Ikg=;
+ b=HUPeMnl07WrO2gu8E7TdQmqEb7jp1nhUi6D3Chd1UWpAWRgvdrvtRGqC16Pl4+3UtSdenge9vQzekxE+uFL1QtWlZdo4BsouOZVvXBUVeClvxjuNlCqXp0f41CPulltI02UUR+Gs21UI0mcvCduN7Mb4ZHxZcpfNh7BUEpI8tLRR4Xb5PlkWFYO4/ebEnrlr6B+CC49S2v0+Yja+jCjP9+6X1pSiwlp/GnjbQm0mzP/kQDhCXQZfdAHhiJgEcp3gMRmaIDS2z6kNu6y9qGqxqEoqTCnbqaNC732my0btwHrqZIwvUfv/F10N5d1sTka8fH7va9f6ndFCSNUY/uSoXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XqexVmN/5hw3hAxzrXvD0sIusHWgnfRUVk4l6pi3Ikg=;
+ b=ctmJInKp0U/5vQKbPCarSJoWrj9XSiUZfS/elyWk5X/Yb2OP5zJhFQbRLDxirW5DUDNhpoYD5xEFDmi+vGOIh4OWcToA8o6wgOIUR6dcZSe9gVlN/J7kxMDY9mYM2fG/zDND+vt2uDQoXVHroi5YOc662hBK3jYWWCtH3Ec1UgE=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by BL0PR04MB4932.namprd04.prod.outlook.com (2603:10b6:208:58::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5458.20; Wed, 27 Jul
+ 2022 06:34:05 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ccb9:68a4:d8c4:89f5]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::ccb9:68a4:d8c4:89f5%9]) with mapi id 15.20.5458.025; Wed, 27 Jul 2022
+ 06:34:05 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 2/6] block: change the blk_queue_bounce calling convention
+Thread-Topic: [PATCH 2/6] block: change the blk_queue_bounce calling
+ convention
+Thread-Index: AQHYoR3QdpM06AjUn0CErgfhZs5jBg==
+Date:   Wed, 27 Jul 2022 06:34:04 +0000
+Message-ID: <PH0PR04MB7416102CBA2A3F9DCE9A1C0E9B979@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20220726183029.2950008-1-hch@lst.de>
+ <20220726183029.2950008-3-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7e04346f-378e-4f59-81d5-08da6f9a0076
+x-ms-traffictypediagnostic: BL0PR04MB4932:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: MlrGXU6en5lPr3jq1NyymbWRjAv5nWgRNCuWzksdCURqtO/kAIPQKoU4uSCFm5Nj5KGsgNIPFYnR49W+AI8MMsVEGDaJbhpQ14LfjBaQGcoOhD0yrsZszdF0dv8mHmoMmUV6TB7r6dIazsebT9k1583waCacTO/ISnq/lBeYWpNHoXKWIBOK/k8KaCm+eJmCYz+27aisOJvqs+5acaGBDiH+dITs6tssmWtDdcKwi7O9C4r6qoKTJ3wKco1PH1v6wyCcMqgV37t4vI+fniGwY2KVnCH6+YCKwJ3RkHf+fvfv22Q6RAuZ3/+ZS2QNfswYc1jLzGooOmmPvRWXVuf2aEsszEzd9JyxBF9bmHSrP5y7Lenrq6j2baVmdH9dmCQv83Y8JKK+6N3o6VpAMihVEfDoisiD95PAypN0vkLOSYcHD+TJBLflyDReLPq6srOAGpEsZsg7GIhZf2YM0iecd27SQUcLrja5zi/gqTpWTchXRceN7UF5DKVn0wyz81iz4HdI7JCivYIma5uSj79t7R6uAf8yJ9KlkzIiVT1rMnPP8d46RYckkQcZNBYdX4NheP+x8wvXgWP3nIBjF++l5i5txX8X2CheIzDy983oeGECoMijS3YVZXVmbThlk1/BQVLEGF3ypuV96NbbFeVNyrpt5unJf0Gj0J9vLCrroymtR/EUA9tN4Syd7y4ExnrV41LNj0T2sViszC1QvvAbaLWKnOF56uD0ikSX7lskjzShWQXDZYXInDQlALygTru4qkUeBn5ZvXwvgE2rWiyifKSv5u2RWIKHfK5LJLOGvcSIWmV7AdNciZtbtzs+8sgG
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(366004)(136003)(346002)(39860400002)(110136005)(71200400001)(4270600006)(41300700001)(8936002)(6506007)(316002)(55016003)(478600001)(5660300002)(91956017)(4326008)(66476007)(52536014)(7696005)(2906002)(19618925003)(9686003)(8676002)(66446008)(76116006)(66946007)(64756008)(66556008)(122000001)(86362001)(558084003)(82960400001)(38070700005)(33656002)(186003)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3Hlrk6NvA2yFmVi570DBZBDhUj9punteGPBzeSFs0OVkCAN+HjLWAgVOzohu?=
+ =?us-ascii?Q?wTLffQ5kUREVXxMwdSi4d6VIwTMHtV7cMwBfcoAIFdFOeJrlPJwgL6rNAxwp?=
+ =?us-ascii?Q?EshmFV7+D9fTwTiLM9YWtCAT4xsGTL9mM33g5sjr6w3MK6oaqkHrjsO9A5pc?=
+ =?us-ascii?Q?zfjQf5dU6CO/23PeQbOeXbf8dp/ZKxwLWdNu1wl92cGxielLKLZpGMzCXEjF?=
+ =?us-ascii?Q?SZ20b4wJgHICX2w9MERiXyh4vfvPqyaCIxVRc9oUo0PapybfCd2WDVTk0Wow?=
+ =?us-ascii?Q?QPf1ibOMebmWECrJ9yB2FUKCodDKkP1VlwWa0KTHacwZ5mKRJOV/oG2PDXUG?=
+ =?us-ascii?Q?V/NX3m/7xzkukHfiOg/WzTIqwt6ylPpZ6SzXy52IMlG2ohBWgm2rSssnSd0C?=
+ =?us-ascii?Q?/F1nh64yCzwDhMW/bDxTqNe3J+GtZ+Aa0P2nj4NcZiQ1GzJP1U0mVdTyzirE?=
+ =?us-ascii?Q?pPia4v3qGaZGrgenX22/OtRGNdErKhstZhXqW1tSMA97L+CfL7BfIyM+93mR?=
+ =?us-ascii?Q?Qe8rO3xHtpLTryAK8wPIkfWCFwc0jcEXrD5bkRXIqko3DxJfCXUcORx51/5m?=
+ =?us-ascii?Q?791Eorg9PqC/M02xDbbcI1ni9ab2UoWvbgvoWW+YUa2JIc14s1gP0RmjHAqo?=
+ =?us-ascii?Q?7jarMPsz/qnr/SwMRJo3csTQfzG3hJDZJ8Gkb8TACut672aKbwB6KJYacyNw?=
+ =?us-ascii?Q?VucHXCPpNMZJ+t7annWV1yUE/STTkh2rfL05+TQwQ9S+gmF3lNA3OskDZxP7?=
+ =?us-ascii?Q?92zmZYoB4mEUR+wbBwSekeQNW1f0ZGi+wO5GbG4o5Utnu1sJ9UujEzQgqV7Q?=
+ =?us-ascii?Q?/jpOrRss6kW24V5Ul8IXUH+k99ena94JQlTaq/szfjV9IITOCGmPjC9CGzL4?=
+ =?us-ascii?Q?McFbv6kv2lG61C6yby0XLdMVba2tAWzmsGDwF3mcVQOxzS+0fV/SNAsnVAzH?=
+ =?us-ascii?Q?RROQShB1yheblO2fOO6M/+KPcFCAVG7dosKMJVyJupF+EbbH9xgP9sNzZthI?=
+ =?us-ascii?Q?SYEZA2FR9vO6uFygcvvgI++RkpQ5lTalzIHx+kMJZw3ENXIm9y+d1FjY3hph?=
+ =?us-ascii?Q?8ZnqPIwEOziatEXTnxcVREOdLQafPOf2eR8F2fHSZ0t8VWbhCigqNIGi6tgc?=
+ =?us-ascii?Q?GX2zGyWer2s6WYWsf4bz489bOBtjY/xHe5PEiHJno6CQbP1KcTdFrdK655Ae?=
+ =?us-ascii?Q?YxIrXRNjrFjsu4/ZhWju2zMR5uSMyaLKoK7IDmfSoWERqfwzMOrcRiFACceZ?=
+ =?us-ascii?Q?nEHiObzTU6cdsBbJJo40mkDbdnPuOkS/otWB95PdOs9ypVptu3EuRoar79WM?=
+ =?us-ascii?Q?KM1FtYaS/4XkBOBquLGYd9Cc8K4styzrE7qizSuL2vyOAgRLvZcjYSCp/K6T?=
+ =?us-ascii?Q?Mv5Jk/o2pPodc0cpqwLnao/V2ODsj0xAhvYzOHIcwzgcvcHWnHwIELINGuEa?=
+ =?us-ascii?Q?BFJs8+jeDDo/NFMkeEYLv19BUKSUOOaDcor+xMad62uHPSyIiK89SmbK2qvw?=
+ =?us-ascii?Q?LryoDYDaR1B2DA3tsRxON004M4oJzSfYR4ZXQvMyxkc6jTcKESo2am24ItaG?=
+ =?us-ascii?Q?zK0WNzSCgrYRzyJruRPJ7irBcizzW9z+1EH4chda9ZCQfLFq1x0B1Zd+HU+4?=
+ =?us-ascii?Q?PsI5KXLxnwwW/pE+8RKHVsRpLGLZq3j8+u/kMpGMksw+TQOT2WTdO5nyg/v/?=
+ =?us-ascii?Q?8tRM+7otzVpcdx5rh958BdcLKJU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:1355:b0:63d:a9ab:7e30 with SMTP id
- i21-20020a056602135500b0063da9ab7e30mr7259013iov.119.1658897249041; Tue, 26
- Jul 2022 21:47:29 -0700 (PDT)
-Date:   Tue, 26 Jul 2022 21:47:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003f87b505e4c21d7b@google.com>
-Subject: [syzbot] WARNING in floppy_interrupt
-From:   syzbot <syzbot+7c9e87a5d6b088cd78a3@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e04346f-378e-4f59-81d5-08da6f9a0076
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jul 2022 06:34:04.9447
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: GkdJeOoFzeZ5ALFC3j82P8EEjpQ2bLsMKrHSu1Jofaa4pLFxfhzQeAPCq7DTrRZx69qsGMyHiv4AMpkiSGuf4z503j9UiLfCFHXoMUE3YBI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB4932
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    4a57a8400075 vf/remap: return the amount of bytes actually..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=119ac0fc080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cd73026ceaed1402
-dashboard link: https://syzkaller.appspot.com/bug?extid=7c9e87a5d6b088cd78a3
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7c9e87a5d6b088cd78a3@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 3 PID: 33 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 3 PID: 33 at drivers/block/floppy.c:999 floppy_interrupt+0x32b/0x3a0 drivers/block/floppy.c:1765
-Modules linked in:
-CPU: 3 PID: 33 Comm: ksoftirqd/3 Not tainted 5.19.0-rc6-syzkaller-00115-g4a57a8400075 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:floppy_interrupt+0x32b/0x3a0 drivers/block/floppy.c:1765
-Code: fe ff ff e8 87 25 e0 fc 0f b6 1d 80 24 89 0c 31 ff 89 de e8 77 21 e0 fc 84 db 0f 85 30 b6 ad 04 e9 18 fe ff ff e8 65 25 e0 fc <0f> 0b e9 1a ff ff ff e8 29 e1 2c fd e9 ed fd ff ff e8 1f e1 2c fd
-RSP: 0018:ffffc900005d8e58 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000100
-RDX: ffff888012229d80 RSI: ffffffff849a457b RDI: 0000000000000007
-RBP: 0000000000000001 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000002
-R13: ffffffff8499f800 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88802cb00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000f6f5c034 CR3: 000000000ba8e000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- floppy_hardint+0x1ad/0x200 arch/x86/include/asm/floppy.h:66
- __handle_irq_event_percpu+0x22b/0x880 kernel/irq/handle.c:158
- handle_irq_event_percpu kernel/irq/handle.c:193 [inline]
- handle_irq_event+0xa7/0x1e0 kernel/irq/handle.c:210
- handle_edge_irq+0x25f/0xd00 kernel/irq/chip.c:817
- generic_handle_irq_desc include/linux/irqdesc.h:158 [inline]
- handle_irq arch/x86/kernel/irq.c:231 [inline]
- __common_interrupt+0x9d/0x210 arch/x86/kernel/irq.c:250
- common_interrupt+0xa4/0xc0 arch/x86/kernel/irq.c:240
- </IRQ>
- <TASK>
- asm_common_interrupt+0x22/0x40 arch/x86/include/asm/idtentry.h:640
-RIP: 0010:__raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-RIP: 0010:_raw_spin_unlock_irqrestore+0x38/0x70 kernel/locking/spinlock.c:194
-Code: 74 24 10 e8 ca de e3 f7 48 89 ef e8 d2 5f e4 f7 81 e3 00 02 00 00 75 25 9c 58 f6 c4 02 75 2d 48 85 db 74 01 fb bf 01 00 00 00 <e8> 43 67 d7 f7 65 8b 05 fc fb 87 76 85 c0 74 0a 5b 5d c3 e8 90 46
-RSP: 0018:ffffc900005afbe0 EFLAGS: 00000206
-RAX: 0000000000000006 RBX: 0000000000000200 RCX: 1ffffffff1b77019
-RDX: 0000000000000000 RSI: 0000000000000101 RDI: 0000000000000001
-RBP: ffffffff91193240 R08: 0000000000000001 R09: 0000000000000001
-R10: fffffbfff2232648 R11: 0000000000000001 R12: 0000000000000002
-R13: 0000000000000002 R14: dead000000000100 R15: dffffc0000000000
- __debug_check_no_obj_freed lib/debugobjects.c:999 [inline]
- debug_check_no_obj_freed+0x20c/0x420 lib/debugobjects.c:1020
- slab_free_hook mm/slub.c:1729 [inline]
- slab_free_freelist_hook+0xeb/0x1c0 mm/slub.c:1780
- slab_free mm/slub.c:3536 [inline]
- kmem_cache_free+0xdd/0x5a0 mm/slub.c:3553
- i_callback+0x3f/0x70 fs/inode.c:249
- rcu_do_batch kernel/rcu/tree.c:2578 [inline]
- rcu_core+0x7b1/0x1880 kernel/rcu/tree.c:2838
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:571
- run_ksoftirqd kernel/softirq.c:934 [inline]
- run_ksoftirqd+0x2d/0x60 kernel/softirq.c:926
- smpboot_thread_fn+0x645/0x9c0 kernel/smpboot.c:164
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	74 24                	je     0x26
-   2:	10 e8                	adc    %ch,%al
-   4:	ca de e3             	lret   $0xe3de
-   7:	f7 48 89 ef e8 d2 5f 	testl  $0x5fd2e8ef,-0x77(%rax)
-   e:	e4 f7                	in     $0xf7,%al
-  10:	81 e3 00 02 00 00    	and    $0x200,%ebx
-  16:	75 25                	jne    0x3d
-  18:	9c                   	pushfq
-  19:	58                   	pop    %rax
-  1a:	f6 c4 02             	test   $0x2,%ah
-  1d:	75 2d                	jne    0x4c
-  1f:	48 85 db             	test   %rbx,%rbx
-  22:	74 01                	je     0x25
-  24:	fb                   	sti
-  25:	bf 01 00 00 00       	mov    $0x1,%edi
-* 2a:	e8 43 67 d7 f7       	callq  0xf7d76772 <-- trapping instruction
-  2f:	65 8b 05 fc fb 87 76 	mov    %gs:0x7687fbfc(%rip),%eax        # 0x7687fc32
-  36:	85 c0                	test   %eax,%eax
-  38:	74 0a                	je     0x44
-  3a:	5b                   	pop    %rbx
-  3b:	5d                   	pop    %rbp
-  3c:	c3                   	retq
-  3d:	e8                   	.byte 0xe8
-  3e:	90                   	nop
-  3f:	46                   	rex.RX
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+=0A=
