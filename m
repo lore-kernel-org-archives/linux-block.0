@@ -2,266 +2,410 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 943B5C19F28
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F12ADC04A68
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:24:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235026AbiG0QYh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 12:24:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
+        id S235270AbiG0QYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 12:24:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236203AbiG0QYR (ORCPT
+        with ESMTP id S235821AbiG0QX6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 12:24:17 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E314E60E
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:12 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220727162253euoutp020c67dac9b662f08a1042e33c64bd2041~FvDT2Xepv0949809498euoutp02h
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 16:22:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220727162253euoutp020c67dac9b662f08a1042e33c64bd2041~FvDT2Xepv0949809498euoutp02h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1658938973;
-        bh=bmsUIhH5Krf3Y93QZk8wMGkt40E+vbrfCAl2ZfzXFsk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=W8QLFiZfxGNaCEKMnvfjEjYvySW8dKoJtmUhqnBSNbRJUuJ8SldtiziT3U1wCUS+/
-         wllPoEGA8PFpqxWYUS4DM6THyrjxH14NWcoTd/txHoWrZWHTej0W1vI4XYoE+qDzRD
-         FJJ/w5bZ7ejNIdCur3atdEkKNk4p2Ft+rAs/XfJo=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220727162252eucas1p2d1d5681c130281324a73b4703be63e00~FvDSn8ez52169521695eucas1p2l;
-        Wed, 27 Jul 2022 16:22:52 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 40.C3.09664.B5661E26; Wed, 27
-        Jul 2022 17:22:52 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220727162251eucas1p12939ac3864fd8705ae139eb2d1087d8f~FvDSJxEkF1290212902eucas1p1C;
-        Wed, 27 Jul 2022 16:22:51 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220727162251eusmtrp2555dbc48e32b198aa34ad92aed686343~FvDSJEXCA0811608116eusmtrp2w;
-        Wed, 27 Jul 2022 16:22:51 +0000 (GMT)
-X-AuditID: cbfec7f2-d81ff700000025c0-ec-62e1665b6998
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 8A.1E.09095.B5661E26; Wed, 27
-        Jul 2022 17:22:51 +0100 (BST)
-Received: from localhost (unknown [106.210.248.8]) by eusmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220727162251eusmtip1dfc3f183a47358335b251e9c7f2f11bb~FvDRv8eGX0448504485eusmtip1C;
-        Wed, 27 Jul 2022 16:22:51 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
-        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
-Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        linux-block@vger.kernel.org, pankydev8@gmail.com,
-        bvanassche@acm.org, jaegeuk@kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v8 05/11] null_blk: allow non power of 2 zoned devices
-Date:   Wed, 27 Jul 2022 18:22:39 +0200
-Message-Id: <20220727162245.209794-6-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220727162245.209794-1-p.raghav@samsung.com>
+        Wed, 27 Jul 2022 12:23:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E0A24D80A
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=JmSXxosdX7QFn/NI8SdcmAyJheydOrq/sUF2ooYesdg=; b=uSPbCYnMFw9YVoOFm5f0hQJeeY
+        95i8+y0u4+i85BoYm3LhyyxcRvQNhf9CEfN6uEdh+7ezDxW3ksmqXT80+OULTtugJvGtGcS/JmgJK
+        4xJdcunPeqmsz9rCJS2oTSiMg4W/gA2QfYoUL1HAltQB5WWbMgQamW12IWAYEY4hwAcd9nuHW6P72
+        sAXJg9qrrDtBdA5/KZgsE3vV2uLMdqHyxHarCPeO5DvUPH7JlxjJa/twEanzmcZWyP1orePzf0f50
+        dUX566nkdPLPiQp3gL873cxEnqIt9QykvbN20DPSXPBVrXzOLHiXtnMMIZXsTwjayImUw3yCA45aD
+        +eEO979A==;
+Received: from [2607:fb90:18d2:b6be:6d6f:ba8a:ca81:9775] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oGjoQ-00FUcq-4B; Wed, 27 Jul 2022 16:23:06 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 1/6] block: change the blk_queue_split calling convention
+Date:   Wed, 27 Jul 2022 12:22:55 -0400
+Message-Id: <20220727162300.3089193-2-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220727162300.3089193-1-hch@lst.de>
+References: <20220727162300.3089193-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLKsWRmVeSWpSXmKPExsWy7djP87oxaQ+TDCZPZbJYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
-        oe0rs8WNCU8ZLT4vbWG3WHPzKYvFiVvSDoIel694e+ycdZfd4/LZUo9NqzrZPDYvqffYfbOB
-        zWNn631Wj/f7rrJ59G1Zxeix+XS1x+dNch7tB7qZAniiuGxSUnMyy1KL9O0SuDLO7TIvmG5S
-        sffefpYGxiuaXYwcHBICJhL/j6h1MXJxCAmsYJRYNX0rK4TzhVHi64wF7BDOZ0aJ/e0r2LoY
-        OcE6vr/9B1W1nFFi+4cvTBDOc0aJaf8nM4LMZRPQkmjsZAdpEBEolnj4rpUFpIZZ4ACTxIPb
-        LWCThAXcJE49vcICYrMIqEpMvTuTCcTmFbCS+HR/CTPENnmJmZe+gw3iFLCW2DxlHlSNoMTJ
-        mU/AepmBapq3zoaqX88pcX1aPYTtInFpxUsWCFtY4tXxLewQtozE/53zmSDsaomnN34zgxwn
-        IdDCKNG/cz0bJGCsJfrO5ICYzAKaEut36UOUO0pceXWcCaKCT+LGW0GIC/gkJm2bzgwR5pXo
-        aBOCqFaS2PnzCdRSCYnLTXOgjvGQWPi9n3kCo+IsJL/MQvLLLIS9CxiZVzGKp5YW56anFhvm
-        pZbrFSfmFpfmpesl5+duYgSmwNP/jn/awTj31Ue9Q4xMHIyHGCU4mJVEeBOi7ycJ8aYkVlal
-        FuXHF5XmpBYfYpTmYFES503O3JAoJJCeWJKanZpakFoEk2Xi4JRqYMp5dS7k5NkT4VwfOBtc
-        brYuXdYjsHa3or5M/URT58aU50U/FVr57tpe/8G3ce576z/clcabCow8Q+YyHOubW8JmVs34
-        8bHi518Ge5g92U9N+ZtZsipssZNaJPsBx3XHm0NmzViZ+knxVsmz2h8f57z3CP7FYq38ZWX1
-        38uJPXsYd3W927r0jk3hmpqZ1vJTTGJ+zxHpOWYzZ4t33/tCvtNPBfhOztqz98Y8D/vktf82
-        8a6P6S6xFJQScnoi5zo1/XD5Odbsng2dD8PzAqw1vUWFfVaFyd76f/Gax/wU02nzdcpOxfb9
-        NCss+Ge6iHdypM9aqU7OqzfffJmg0B4V//+BjvabK3VnXxkuFOJULlRiKc5INNRiLipOBABO
-        FLOe8AMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrLIsWRmVeSWpSXmKPExsVy+t/xu7rRaQ+TDO6vlbJYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
-        oe0rs8WNCU8ZLT4vbWG3WHPzKYvFiVvSDoIel694e+ycdZfd4/LZUo9NqzrZPDYvqffYfbOB
-        zWNn631Wj/f7rrJ59G1Zxeix+XS1x+dNch7tB7qZAnii9GyK8ktLUhUy8otLbJWiDS2M9Awt
-        LfSMTCz1DI3NY62MTJX07WxSUnMyy1KL9O0S9DLO7TIvmG5SsffefpYGxiuaXYycHBICJhLf
-        3/5j7WLk4hASWMooMeXFJnaIhITE7YVNjBC2sMSfa11sEEVPGSWebrgG1MHBwSagJdHYyQ5i
-        ighUSpz9IgtSwixwjkni5sVrbCC9wgJuEqeeXmEBsVkEVCWm3p3JBGLzClhJfLq/hBlivrzE
-        zEvfwfZyClhLbJ4yD6xGCKjm2YOPbBD1ghInZz4Bm8MMVN+8dTbzBEaBWUhSs5CkFjAyrWIU
-        SS0tzk3PLTbUK07MLS7NS9dLzs/dxAiM123Hfm7ewTjv1Ue9Q4xMHIyHGCU4mJVEeBOi7ycJ
-        8aYkVlalFuXHF5XmpBYfYjQFunsis5Rocj4wYeSVxBuaGZgamphZGphamhkrifN6FnQkCgmk
-        J5akZqemFqQWwfQxcXBKNTDlJqUZ8yxlf7JMvfTZonvHfzL9/1LyuHTnDv11pz+vi5kY7KzE
-        xvz7jLr9w4831VfU789ccmDlFfm7wocY4znuW0WmXLGfWXJl8qYmWY1tmkwS7wO/BBuetU1c
-        3XGcsWPW3XligkFhf7ffO5p9zop5ymrxyuhrAlxPft1+s+art4emxoGg6YtP3e6P3FbWk7Uv
-        rGfD5OeLt9cqzuc9qZkQWN/NvODg3VsiTOv01gQsrzP70/pW78hPvkrNxM9cX5aJPTzvHrgj
-        7rTBMuu36bYuL2+JNn1TP3TlJMeJj/cOhH5Ks893UBHY28H7ku3M5HmHJ/g+/N2o98Hm0Vv1
-        JZO+5EalPShcLtHCNPNyK4vaNCWW4oxEQy3mouJEAIWhMsdgAwAA
-X-CMS-MailID: 20220727162251eucas1p12939ac3864fd8705ae139eb2d1087d8f
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220727162251eucas1p12939ac3864fd8705ae139eb2d1087d8f
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220727162251eucas1p12939ac3864fd8705ae139eb2d1087d8f
-References: <20220727162245.209794-1-p.raghav@samsung.com>
-        <CGME20220727162251eucas1p12939ac3864fd8705ae139eb2d1087d8f@eucas1p1.samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the power of 2 based calculation with zone size to be generic in
-null_zone_no with optimization for power of 2 based zone sizes.
+The double indirect bio leads to somewhat suboptimal code generation.
+Instead return the (original or split) bio, and make sure the
+request_queue arguments to the lower level helpers is passed after the
+bio to avoid constant reshuffling of the argument passing registers.
 
-The nr_zones calculation in null_init_zoned_dev has been replaced with a
-division without special handling for power of 2 based zone sizes as
-this function is called only during the initialization and will not
-invoked in the hot path.
+Also give it and the helpers used to implement it more descriptive names.
 
-Performance Measurement:
-
-Device:
-zone size = 128M, blocksize=4k
-
-FIO cmd:
-
-fio --name=zbc --filename=/dev/nullb0 --direct=1 --zonemode=zbd  --size=23G
---io_size=<iosize> --ioengine=io_uring --iodepth=<iod> --rw=<mode> --bs=4k
---loops=4
-
-The following results are an average of 4 runs on AMD Ryzen 5 5600X with
-32GB of RAM:
-
-Sequential Write:
-
-x-----------------x---------------------------------x---------------------------------x
-|     IOdepth     |            8                    |            16                   |
-x-----------------x---------------------------------x---------------------------------x
-|                 |  KIOPS   |BW(MiB/s) | Lat(usec) |  KIOPS   |BW(MiB/s) | Lat(usec) |
-x-----------------x---------------------------------x---------------------------------x
-| Without patch   |  578     |  2257    |   12.80   |  576     |  2248    |   25.78   |
-x-----------------x---------------------------------x---------------------------------x
-|  With patch     |  581     |  2268    |   12.74   |  576     |  2248    |   25.85   |
-x-----------------x---------------------------------x---------------------------------x
-
-Sequential read:
-
-x-----------------x---------------------------------x---------------------------------x
-| IOdepth         |            8                    |            16                   |
-x-----------------x---------------------------------x---------------------------------x
-|                 |  KIOPS   |BW(MiB/s) | Lat(usec) |  KIOPS   |BW(MiB/s) | Lat(usec) |
-x-----------------x---------------------------------x---------------------------------x
-| Without patch   |  667     |  2605    |   11.79   |  675     |  2637    |   23.49   |
-x-----------------x---------------------------------x---------------------------------x
-|  With patch     |  667     |  2605    |   11.79   |  675     |  2638    |   23.48   |
-x-----------------x---------------------------------x---------------------------------x
-
-Random read:
-
-x-----------------x---------------------------------x---------------------------------x
-| IOdepth         |            8                    |            16                   |
-x-----------------x---------------------------------x---------------------------------x
-|                 |  KIOPS   |BW(MiB/s) | Lat(usec) |  KIOPS   |BW(MiB/s) | Lat(usec) |
-x-----------------x---------------------------------x---------------------------------x
-| Without patch   |  522     |  2038    |   15.05   |  514     |  2006    |   30.87   |
-x-----------------x---------------------------------x---------------------------------x
-|  With patch     |  522     |  2039    |   15.04   |  523     |  2042    |   30.33   |
-x-----------------x---------------------------------x---------------------------------x
-
-Minor variations are noticed in Sequential write with io depth 8 and
-in random read with io depth 16. But overall no noticeable differences
-were noticed
-
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
-Reviewed by: Adam Manzanares <a.manzanares@samsung.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/null_blk/main.c     |  5 ++---
- drivers/block/null_blk/null_blk.h |  6 ++++++
- drivers/block/null_blk/zoned.c    | 18 +++++++++++-------
- 3 files changed, 19 insertions(+), 10 deletions(-)
+ block/blk-merge.c             | 98 +++++++++++++++++------------------
+ block/blk-mq.c                |  4 +-
+ block/blk.h                   |  6 +--
+ drivers/block/drbd/drbd_req.c |  2 +-
+ drivers/block/pktcdvd.c       |  2 +-
+ drivers/block/ps3vram.c       |  2 +-
+ drivers/md/dm.c               |  6 +--
+ drivers/md/md.c               |  2 +-
+ drivers/nvme/host/multipath.c |  2 +-
+ drivers/s390/block/dcssblk.c  |  2 +-
+ include/linux/blkdev.h        |  2 +-
+ 11 files changed, 63 insertions(+), 65 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index c451c477978f..f1e0605dee94 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1976,9 +1976,8 @@ static int null_validate_conf(struct nullb_device *dev)
- 	if (dev->queue_mode == NULL_Q_BIO)
- 		dev->mbps = 0;
- 
--	if (dev->zoned &&
--	    (!dev->zone_size || !is_power_of_2(dev->zone_size))) {
--		pr_err("zone_size must be power-of-two\n");
-+	if (dev->zoned && !dev->zone_size) {
-+		pr_err("Invalid zero zone size\n");
- 		return -EINVAL;
- 	}
- 
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index 94ff68052b1e..ece6dded9508 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -83,6 +83,12 @@ struct nullb_device {
- 	unsigned int imp_close_zone_no;
- 	struct nullb_zone *zones;
- 	sector_t zone_size_sects;
-+	/*
-+	 * zone_size_sects_shift is only useful when the zone size is
-+	 * power of 2. This variable is set to zero when zone size is non
-+	 * power of 2.
-+	 */
-+	unsigned int zone_size_sects_shift;
- 	bool need_zone_res_mgmt;
- 	spinlock_t zone_res_lock;
- 
-diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-index 55a69e48ef8b..015f6823706c 100644
---- a/drivers/block/null_blk/zoned.c
-+++ b/drivers/block/null_blk/zoned.c
-@@ -16,7 +16,10 @@ static inline sector_t mb_to_sects(unsigned long mb)
- 
- static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
- {
--	return sect >> ilog2(dev->zone_size_sects);
-+	if (dev->zone_size_sects_shift)
-+		return sect >> dev->zone_size_sects_shift;
-+
-+	return div64_u64(sect, dev->zone_size_sects);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 4c8a699754c97..6e29fb28584ef 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -95,10 +95,8 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
+ 	return bio_will_gap(req->q, NULL, bio, req->bio);
  }
  
- static inline void null_lock_zone_res(struct nullb_device *dev)
-@@ -65,10 +68,6 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 	sector_t sector = 0;
- 	unsigned int i;
+-static struct bio *blk_bio_discard_split(struct request_queue *q,
+-					 struct bio *bio,
+-					 struct bio_set *bs,
+-					 unsigned *nsegs)
++static struct bio *bio_split_discard(struct bio *bio, struct request_queue *q,
++		unsigned *nsegs, struct bio_set *bs)
+ {
+ 	unsigned int max_discard_sectors, granularity;
+ 	int alignment;
+@@ -139,8 +137,8 @@ static struct bio *blk_bio_discard_split(struct request_queue *q,
+ 	return bio_split(bio, split_sectors, GFP_NOIO, bs);
+ }
  
--	if (!is_power_of_2(dev->zone_size)) {
--		pr_err("zone_size must be power-of-two\n");
--		return -EINVAL;
--	}
- 	if (dev->zone_size > dev->size) {
- 		pr_err("Zone size larger than device capacity\n");
- 		return -EINVAL;
-@@ -86,9 +85,14 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
- 	zone_capacity_sects = mb_to_sects(dev->zone_capacity);
- 	dev_capacity_sects = mb_to_sects(dev->size);
- 	dev->zone_size_sects = mb_to_sects(dev->zone_size);
--	dev->nr_zones = round_up(dev_capacity_sects, dev->zone_size_sects)
--		>> ilog2(dev->zone_size_sects);
+-static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
+-		struct bio *bio, struct bio_set *bs, unsigned *nsegs)
++static struct bio *bio_split_write_zeroes(struct bio *bio,
++		struct request_queue *q, unsigned *nsegs, struct bio_set *bs)
+ {
+ 	*nsegs = 0;
  
-+	if (is_power_of_2(dev->zone_size_sects))
-+		dev->zone_size_sects_shift = ilog2(dev->zone_size_sects);
-+	else
-+		dev->zone_size_sects_shift = 0;
-+
-+	dev->nr_zones =	DIV_ROUND_UP_SECTOR_T(dev_capacity_sects,
-+					      dev->zone_size_sects);
- 	dev->zones = kvmalloc_array(dev->nr_zones, sizeof(struct nullb_zone),
- 				    GFP_KERNEL | __GFP_ZERO);
- 	if (!dev->zones)
+@@ -161,8 +159,8 @@ static struct bio *blk_bio_write_zeroes_split(struct request_queue *q,
+  * requests that are submitted to a block device if the start of a bio is not
+  * aligned to a physical block boundary.
+  */
+-static inline unsigned get_max_io_size(struct request_queue *q,
+-				       struct bio *bio)
++static inline unsigned get_max_io_size(struct bio *bio,
++		struct request_queue *q)
+ {
+ 	unsigned pbs = queue_physical_block_size(q) >> SECTOR_SHIFT;
+ 	unsigned lbs = queue_logical_block_size(q) >> SECTOR_SHIFT;
+@@ -247,16 +245,16 @@ static bool bvec_split_segs(const struct request_queue *q,
+ }
+ 
+ /**
+- * blk_bio_segment_split - split a bio in two bios
+- * @q:    [in] request queue pointer
++ * bio_split_rw - split a bio in two bios
+  * @bio:  [in] bio to be split
+- * @bs:	  [in] bio set to allocate the clone from
++ * @q:    [in] request queue pointer
+  * @segs: [out] number of segments in the bio with the first half of the sectors
++ * @bs:	  [in] bio set to allocate the clone from
+  *
+  * Clone @bio, update the bi_iter of the clone to represent the first sectors
+  * of @bio and update @bio->bi_iter to represent the remaining sectors. The
+  * following is guaranteed for the cloned bio:
+- * - That it has at most get_max_io_size(@q, @bio) sectors.
++ * - That it has at most get_max_io_size(@bio, @q) sectors.
+  * - That it has at most queue_max_segments(@q) segments.
+  *
+  * Except for discard requests the cloned bio will point at the bi_io_vec of
+@@ -265,15 +263,13 @@ static bool bvec_split_segs(const struct request_queue *q,
+  * responsible for ensuring that @bs is only destroyed after processing of the
+  * split bio has finished.
+  */
+-static struct bio *blk_bio_segment_split(struct request_queue *q,
+-					 struct bio *bio,
+-					 struct bio_set *bs,
+-					 unsigned *segs)
++static struct bio *bio_split_rw(struct bio *bio, struct request_queue *q,
++		unsigned *segs, struct bio_set *bs)
+ {
+ 	struct bio_vec bv, bvprv, *bvprvp = NULL;
+ 	struct bvec_iter iter;
+ 	unsigned nsegs = 0, bytes = 0;
+-	const unsigned max_bytes = get_max_io_size(q, bio) << 9;
++	const unsigned max_bytes = get_max_io_size(bio, q) << 9;
+ 	const unsigned max_segs = queue_max_segments(q);
+ 
+ 	bio_for_each_bvec(bv, bio, iter) {
+@@ -320,34 +316,33 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ }
+ 
+ /**
+- * __blk_queue_split - split a bio and submit the second half
+- * @q:       [in] request_queue new bio is being queued at
+- * @bio:     [in, out] bio to be split
+- * @nr_segs: [out] number of segments in the first bio
++ * __bio_split_to_limits - split a bio to fit the queue limits
++ * @bio:     bio to be split
++ * @q:       request_queue new bio is being queued at
++ * @nr_segs: returns the number of segments in the returned bio
++ *
++ * Check if @bio needs splitting based on the queue limits, and if so split off
++ * a bio fitting the limits from the beginning of @bio and return it.  @bio is
++ * shortened to the remainder and re-submitted.
+  *
+- * Split a bio into two bios, chain the two bios, submit the second half and
+- * store a pointer to the first half in *@bio. If the second bio is still too
+- * big it will be split by a recursive call to this function. Since this
+- * function may allocate a new bio from q->bio_split, it is the responsibility
+- * of the caller to ensure that q->bio_split is only released after processing
+- * of the split bio has finished.
++ * The split bio is allocated from @q->bio_split, which is provided by the
++ * block layer.
+  */
+-void __blk_queue_split(struct request_queue *q, struct bio **bio,
++struct bio *__bio_split_to_limits(struct bio *bio, struct request_queue *q,
+ 		       unsigned int *nr_segs)
+ {
+-	struct bio *split = NULL;
++	struct bio *split;
+ 
+-	switch (bio_op(*bio)) {
++	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
+ 	case REQ_OP_SECURE_ERASE:
+-		split = blk_bio_discard_split(q, *bio, &q->bio_split, nr_segs);
++		split = bio_split_discard(bio, q, nr_segs, &q->bio_split);
+ 		break;
+ 	case REQ_OP_WRITE_ZEROES:
+-		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split,
+-				nr_segs);
++		split = bio_split_write_zeroes(bio, q, nr_segs, &q->bio_split);
+ 		break;
+ 	default:
+-		split = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
++		split = bio_split_rw(bio, q, nr_segs, &q->bio_split);
+ 		break;
+ 	}
+ 
+@@ -356,32 +351,35 @@ void __blk_queue_split(struct request_queue *q, struct bio **bio,
+ 		split->bi_opf |= REQ_NOMERGE;
+ 
+ 		blkcg_bio_issue_init(split);
+-		bio_chain(split, *bio);
+-		trace_block_split(split, (*bio)->bi_iter.bi_sector);
+-		submit_bio_noacct(*bio);
+-		*bio = split;
++		bio_chain(split, bio);
++		trace_block_split(split, bio->bi_iter.bi_sector);
++		submit_bio_noacct(bio);
++		return split;
+ 	}
++	return bio;
+ }
+ 
+ /**
+- * blk_queue_split - split a bio and submit the second half
+- * @bio: [in, out] bio to be split
++ * bio_split_to_limits - split a bio to fit the queue limits
++ * @bio:     bio to be split
++ *
++ * Check if @bio needs splitting based on the queue limits of @bio->bi_bdev, and
++ * if so split off a bio fitting the limits from the beginning of @bio and
++ * return it.  @bio is shortened to the remainder and re-submitted.
+  *
+- * Split a bio into two bios, chains the two bios, submit the second half and
+- * store a pointer to the first half in *@bio. Since this function may allocate
+- * a new bio from q->bio_split, it is the responsibility of the caller to ensure
+- * that q->bio_split is only released after processing of the split bio has
+- * finished.
++ * The split bio is allocated from @q->bio_split, which is provided by the
++ * block layer.
+  */
+-void blk_queue_split(struct bio **bio)
++struct bio *bio_split_to_limits(struct bio *bio)
+ {
+-	struct request_queue *q = bdev_get_queue((*bio)->bi_bdev);
++	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
+ 	unsigned int nr_segs;
+ 
+-	if (blk_may_split(q, *bio))
+-		__blk_queue_split(q, bio, &nr_segs);
++	if (bio_may_exceed_limits(bio, q))
++		return __bio_split_to_limits(bio, q, &nr_segs);
++	return bio;
+ }
+-EXPORT_SYMBOL(blk_queue_split);
++EXPORT_SYMBOL(bio_split_to_limits);
+ 
+ unsigned int blk_recalc_rq_segments(struct request *rq)
+ {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d716b7f3763f3..7a756ffb15679 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2816,8 +2816,8 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	blk_status_t ret;
+ 
+ 	blk_queue_bounce(q, &bio);
+-	if (blk_may_split(q, bio))
+-		__blk_queue_split(q, &bio, &nr_segs);
++	if (bio_may_exceed_limits(bio, q))
++		bio = __bio_split_to_limits(bio, q, &nr_segs);
+ 
+ 	if (!bio_integrity_prep(bio))
+ 		return;
+diff --git a/block/blk.h b/block/blk.h
+index c4b084bfe87c9..42d00d032bd2a 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -293,7 +293,7 @@ ssize_t part_timeout_show(struct device *, struct device_attribute *, char *);
+ ssize_t part_timeout_store(struct device *, struct device_attribute *,
+ 				const char *, size_t);
+ 
+-static inline bool blk_may_split(struct request_queue *q, struct bio *bio)
++static inline bool bio_may_exceed_limits(struct bio *bio, struct request_queue *q)
+ {
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
+@@ -316,8 +316,8 @@ static inline bool blk_may_split(struct request_queue *q, struct bio *bio)
+ 		bio->bi_io_vec->bv_len + bio->bi_io_vec->bv_offset > PAGE_SIZE;
+ }
+ 
+-void __blk_queue_split(struct request_queue *q, struct bio **bio,
+-			unsigned int *nr_segs);
++struct bio *__bio_split_to_limits(struct bio *bio, struct request_queue *q,
++		       unsigned int *nr_segs);
+ int ll_back_merge_fn(struct request *req, struct bio *bio,
+ 		unsigned int nr_segs);
+ bool blk_attempt_req_merge(struct request_queue *q, struct request *rq,
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 6d8dd14458c69..8f7f144e54f3a 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1608,7 +1608,7 @@ void drbd_submit_bio(struct bio *bio)
+ {
+ 	struct drbd_device *device = bio->bi_bdev->bd_disk->private_data;
+ 
+-	blk_queue_split(&bio);
++	bio = bio_split_to_limits(bio);
+ 
+ 	/*
+ 	 * what we "blindly" assume:
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index 01a15dbd9cde2..4cea3b08087ed 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2399,7 +2399,7 @@ static void pkt_submit_bio(struct bio *bio)
+ 	struct pktcdvd_device *pd = bio->bi_bdev->bd_disk->queue->queuedata;
+ 	struct bio *split;
+ 
+-	blk_queue_split(&bio);
++	bio = bio_split_to_limits(bio);
+ 
+ 	pkt_dbg(2, pd, "start = %6llx stop = %6llx\n",
+ 		(unsigned long long)bio->bi_iter.bi_sector,
+diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
+index d1e0fefec90ba..e1d080f680edf 100644
+--- a/drivers/block/ps3vram.c
++++ b/drivers/block/ps3vram.c
+@@ -586,7 +586,7 @@ static void ps3vram_submit_bio(struct bio *bio)
+ 
+ 	dev_dbg(&dev->core, "%s\n", __func__);
+ 
+-	blk_queue_split(&bio);
++	bio = bio_split_to_limits(bio);
+ 
+ 	spin_lock_irq(&priv->lock);
+ 	busy = !bio_list_empty(&priv->list);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 54c2a23f4e55c..a014a002298bd 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1091,7 +1091,7 @@ static sector_t max_io_len(struct dm_target *ti, sector_t sector)
+ 	 * Does the target need to split IO even further?
+ 	 * - varied (per target) IO splitting is a tenet of DM; this
+ 	 *   explains why stacked chunk_sectors based splitting via
+-	 *   blk_queue_split() isn't possible here.
++	 *   bio_split_to_limits() isn't possible here.
+ 	 */
+ 	if (!ti->max_io_len)
+ 		return len;
+@@ -1669,10 +1669,10 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+ 	is_abnormal = is_abnormal_io(bio);
+ 	if (unlikely(is_abnormal)) {
+ 		/*
+-		 * Use blk_queue_split() for abnormal IO (e.g. discard, etc)
++		 * Use bio_split_to_limits() for abnormal IO (e.g. discard, etc)
+ 		 * otherwise associated queue_limits won't be imposed.
+ 		 */
+-		blk_queue_split(&bio);
++		bio = bio_split_to_limits(bio);
+ 	}
+ 
+ 	init_clone_info(&ci, md, map, bio, is_abnormal);
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 35b895813c88b..afaf36b2f6ab8 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -442,7 +442,7 @@ static void md_submit_bio(struct bio *bio)
+ 		return;
+ 	}
+ 
+-	blk_queue_split(&bio);
++	bio = bio_split_to_limits(bio);
+ 
+ 	if (mddev->ro == 1 && unlikely(rw == WRITE)) {
+ 		if (bio_sectors(bio) != 0)
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index a22383844159e..f889b2271ddc3 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -346,7 +346,7 @@ static void nvme_ns_head_submit_bio(struct bio *bio)
+ 	 * different queue via blk_steal_bios(), so we need to use the bio_split
+ 	 * pool from the original queue to allocate the bvecs from.
+ 	 */
+-	blk_queue_split(&bio);
++	bio = bio_split_to_limits(bio);
+ 
+ 	srcu_idx = srcu_read_lock(&head->srcu);
+ 	ns = nvme_find_path(head);
+diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
+index 4d8d1759775ae..5187705bd0f39 100644
+--- a/drivers/s390/block/dcssblk.c
++++ b/drivers/s390/block/dcssblk.c
+@@ -863,7 +863,7 @@ dcssblk_submit_bio(struct bio *bio)
+ 	unsigned long source_addr;
+ 	unsigned long bytes_done;
+ 
+-	blk_queue_split(&bio);
++	bio = bio_split_to_limits(bio);
+ 
+ 	bytes_done = 0;
+ 	dev_info = bio->bi_bdev->bd_disk->private_data;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index d04bdf549efa9..5eef8d2eddc1c 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -864,9 +864,9 @@ void blk_request_module(dev_t devt);
+ extern int blk_register_queue(struct gendisk *disk);
+ extern void blk_unregister_queue(struct gendisk *disk);
+ void submit_bio_noacct(struct bio *bio);
++struct bio *bio_split_to_limits(struct bio *bio);
+ 
+ extern int blk_lld_busy(struct request_queue *q);
+-extern void blk_queue_split(struct bio **);
+ extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
+ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_sync_queue(struct request_queue *q);
 -- 
-2.25.1
+2.30.2
 
