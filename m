@@ -2,110 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E1FC04A68
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 15:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 764B8C19F28
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 15:26:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234063AbiG0PV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 11:21:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60910 "EHLO
+        id S233234AbiG0P0i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 11:26:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233964AbiG0PVu (ORCPT
+        with ESMTP id S233217AbiG0P0h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 11:21:50 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D2E1571F
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 08:21:48 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id h145so13790485iof.9
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 08:21:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=m9D4aRTTd1l7v7V2LibsBqRcCV4wVw/hGMe1VGtLEYU=;
-        b=OjBXxmK3rZJzqhCD1thCamxOk8yVe0Jfpr5OlHXB+qDqb0xT83XrCaXmbHsulJqMpC
-         d+Br8WyLksEaGAvDvIq3m1a1hrs0PKweNfKGu1acGuW9VuMIVsAoSASIQ+ufDZqmew0E
-         dgIDSkdYiy06DIuJqil1smg7OmOQIZ0LlI2PXUZWte77mPQNmr4DQWptXXwAoJUgi9yv
-         XCBAfT1z5F27zv68yFfowQlLKrdBIr96y4I/ycvFHaDkfx/HLVh2KSVO9W7PFzmP1XFM
-         X0DAbInx0UXAktyFuchIumzw9YXmALnpwP6haBqZdyqxAcbcrZzBx8NC+6Jyae/8niw+
-         le0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=m9D4aRTTd1l7v7V2LibsBqRcCV4wVw/hGMe1VGtLEYU=;
-        b=U8LbCKyc0LIgBFiBvhdmjkNPXtiPDoJeFVV9CQtKjqzNseM993ftjTzFCTOUW/TOEz
-         L0p02LTkVWIrkEHZA6KgVURQ/GZ7A7KVdT9FKysYV7aSsnBF9WCoqzaqspgKqgzoOIYI
-         IFWCtb98+bhLttjFyDC9MSiPFSnGHRvPiwDRU0y7lfopHSh2pxrx6LTyJhLhsRdbdTIy
-         lAB5vzM3qTP5kzTX7wJiS5t84RlOzJOJV211OmmaOtoIaQSEPAuW7PtfztkJFV8tbqbW
-         Rv9suNUl0elsdy2jZfucYx44qm0fD7DvDciXwwkAlUIg2F8hSGjxtknJwDfq6JU2kjzs
-         D7hw==
-X-Gm-Message-State: AJIora/wFmH1KndcjULlL0YaOEPaKswYUU0quxHkZ2oVofUmOMORYYYg
-        ade1I4Qw5E4HX8J6srLoFdK2vw==
-X-Google-Smtp-Source: AGRyM1uKWeYELIzQJPcBhoyigdj5YM//qChOtJ+4M1k2Jp38ll9FwQ5YYxqx1YYndmsnxKQmA7mgAg==
-X-Received: by 2002:a05:6638:d45:b0:340:5c58:51f4 with SMTP id d5-20020a0566380d4500b003405c5851f4mr8915622jak.280.1658935307618;
-        Wed, 27 Jul 2022 08:21:47 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x8-20020a0566022c4800b0067c09fd0b53sm8358300iov.21.2022.07.27.08.21.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jul 2022 08:21:47 -0700 (PDT)
-Message-ID: <41868484-07cd-2408-41c9-d48953b7a1af@kernel.dk>
-Date:   Wed, 27 Jul 2022 09:21:45 -0600
+        Wed, 27 Jul 2022 11:26:37 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E3043E41;
+        Wed, 27 Jul 2022 08:26:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Bp/g6eNlnCBAoZ0LWknApR0tx19tg/4ymXOK+EaQ2xI=; b=PGKLeNIv6uHmwfWjKHrBIZJjtU
+        YcVbDBx12Zx6rEP8m7PHB9OY5VmANeGtzN/g+el8JBPwOnDURJW68ZevdlXKf72dILCEjMA7z8QkS
+        ZC0PRbXypxE3ld9TjNqEg3nmZ16XaL8Dw0ZrqcAVPFvEKLrKUjgIfa8nhqPm9nvVP5CL0URUuE2Om
+        xPsiekYDg9QEe6MjhHuEUoQVbIEDMaaBxx2+RIehyCgEncFobpl1mM0T8zO1LHsAtwRmehd4wRpjF
+        IxCMBJrz/aCbsrztgCs3+w8AW5nWAq1l0QYziAyfTLMv84wgvMxkg3co2D3ofoV08tkfV4w9tQCb6
+        C43YC4rw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.95 #2 (Red Hat Linux))
+        id 1oGiva-00GPdH-T3;
+        Wed, 27 Jul 2022 15:26:26 +0000
+Date:   Wed, 27 Jul 2022 16:26:26 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hch@lst.de
+Subject: Re: [PATCH 4/5] io_uring: add support for dma pre-mapping
+Message-ID: <YuFZIrvTaKBQtml/@ZenIV>
+References: <20220726173814.2264573-1-kbusch@fb.com>
+ <20220726173814.2264573-5-kbusch@fb.com>
+ <YuFHeT0UaQsYssin@ZenIV>
+ <YuFQPYvOHzpVimJA@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [bug report] compiling error with latest linux-block/for-next
-Content-Language: en-US
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>
-References: <CAHj4cs8HjT6T8VCZtWzB1DzqHqcqex+bV6vdh2MdVwqNP9GH=A@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHj4cs8HjT6T8VCZtWzB1DzqHqcqex+bV6vdh2MdVwqNP9GH=A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YuFQPYvOHzpVimJA@kbusch-mbp.dhcp.thefacebook.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/22 9:18 AM, Yi Zhang wrote:
-> Hello
-> I found below compiling error[2] on latest linux-block/for-next[1],
-> pls check it.
+On Wed, Jul 27, 2022 at 08:48:29AM -0600, Keith Busch wrote:
+
+> > This, BTW, is completely insane - what happens if you follow that
+> > with close(map.fd)?  A bunch of dangling struct file references?
 > 
-> [1]
-> b8b914c06a6f (HEAD, origin/for-next) Merge branch
-> 'for-5.20/drivers-post' into for-next
+> This should have been tied to files registered with the io_uring instance
+> holding a reference, and cleaned up when the files are unregistered. I may be
+> missing some cases here, so I'll fix that up.
+
+???
+
+Your code does the following sequence:
+	file = fget(some number)
+	store the obtained pointer in a lot of places
+	fput(file)
+
+What is "may be missing" and what kind of "registration" could possibly
+help here?  As soon as fget() had returned the reference, another thread
+might have removed it from the descriptor table, leaving you the sole holder
+of reference to object.  In that case it will be destroyed by fput(), making
+its memory free for reuse.
+
+Looks like you have some very odd idea of what the struct file lifetime rules
+are...
+
+> > I really don't understand what you are trying to do here
 > 
-> [2]
-> In file included from ./include/linux/export.h:33,
->                  from ./include/linux/linkage.h:7,
->                  from ./include/linux/kernel.h:17,
->                  from io_uring/notif.c:1:
-> io_uring/notif.c: In function ?io_alloc_notif?:
-> io_uring/notif.c:52:23: error: implicit declaration of function
-> ?io_alloc_req_refill?; did you mean ?io_rsrc_refs_refill??
-> [-Werror=implicit-function-declaration]
->    52 |         if (unlikely(!io_alloc_req_refill(ctx)))
->       |                       ^~~~~~~~~~~~~~~~~~~
-> ./include/linux/compiler.h:78:45: note: in definition of macro ?unlikely?
->    78 | # define unlikely(x)    __builtin_expect(!!(x), 0)
->       |                                             ^
->   CC      kernel/trace/trace_seq.o
->   CC      drivers/mfd/stmpe.o
-> io_uring/notif.c:54:17: error: implicit declaration of function
-> ?io_alloc_req?; did you mean ?xa_alloc_irq??
-> [-Werror=implicit-function-declaration]
->    54 |         notif = io_alloc_req(ctx);
->       |                 ^~~~~~~~~~~~
->       |                 xa_alloc_irq
-> io_uring/notif.c:54:15: warning: assignment to ?struct io_kiocb *?
-> from ?int? makes pointer from integer without a cast
-> [-Wint-conversion]
->    54 |         notif = io_alloc_req(ctx);
->       |               ^
+> We want to register userspace addresses with the block_device just once. We can
+> skip costly per-IO setup this way.
 
-This is fixed in the current tree.
-
--- 
-Jens Axboe
-
+Explain, please.  How will those be used afterwards and how will IO be matched
+with the file you've passed here?
