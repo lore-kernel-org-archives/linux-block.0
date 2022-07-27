@@ -2,168 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4DAC19F2C
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86148C25B06
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235509AbiG0QYk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 12:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50232 "EHLO
+        id S235516AbiG0QYl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 12:24:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236162AbiG0QYQ (ORCPT
+        with ESMTP id S235386AbiG0QYF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 12:24:16 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19A94C62F
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:12 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220727162252euoutp02dad443e869a20157afcd63acd789ce9c~FvDTN-TQO1245112451euoutp02h
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 16:22:52 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220727162252euoutp02dad443e869a20157afcd63acd789ce9c~FvDTN-TQO1245112451euoutp02h
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1658938972;
-        bh=Bsc7ffoy0LhMbxzEuozZQbbuFTeAK8Q+M0p1bOnBh8c=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rol1d1lh/PYatN0HckrvAq5/kTBvDZ0gaxF61NoQFKnMPZBPNOgShU6H4ErDfmuql
-         Gs7DrNbM1K1pxjMhqqokS2uEqLZ3vAt1XhQVgRmqcM6Rncf3j7tVdGfiR5xYl+xihQ
-         gSK8Q5Eej7yhGDqiMyDgHmSpJ8u8rn6UfT0gT+gg=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220727162251eucas1p2adf92628ca134e6467ff47be0e7d1e12~FvDR4EsdW2169421694eucas1p2p;
-        Wed, 27 Jul 2022 16:22:51 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 2F.B3.09664.B5661E26; Wed, 27
-        Jul 2022 17:22:51 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220727162250eucas1p133e8a814fee934f7161866122ef93273~FvDRCXbtT1278312783eucas1p1p;
-        Wed, 27 Jul 2022 16:22:50 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220727162250eusmtrp27808e4608f064ce737a401d79ddefcfa~FvDRBmw-E0809408094eusmtrp28;
-        Wed, 27 Jul 2022 16:22:50 +0000 (GMT)
-X-AuditID: cbfec7f2-d81ff700000025c0-ea-62e1665ba4cc
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 69.1E.09095.A5661E26; Wed, 27
-        Jul 2022 17:22:50 +0100 (BST)
-Received: from localhost (unknown [106.210.248.8]) by eusmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220727162250eusmtip1cde27cb89575ab05491e19471e0ccebc~FvDQsZyIA0050700507eusmtip1f;
-        Wed, 27 Jul 2022 16:22:50 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
-        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
-Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        linux-block@vger.kernel.org, pankydev8@gmail.com,
-        bvanassche@acm.org, jaegeuk@kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v8 04/11] nvmet: Allow ZNS target to support non-power_of_2
- zone sizes
-Date:   Wed, 27 Jul 2022 18:22:38 +0200
-Message-Id: <20220727162245.209794-5-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220727162245.209794-1-p.raghav@samsung.com>
+        Wed, 27 Jul 2022 12:24:05 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3AD4E603
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=nEGchU77p4QUvjk9ENFRTDaA3ghZQQDcKFLJ+m9H1lU=; b=OJnU8TMq02Vhaqg4eMUZycTqYJ
+        JEnENeBXDy7attLa5fRLOCOnYw5m7eqk5wKLp2q5Xtm7uBKgdPZSE8lUKYvonOFgjlVx9e0Y8PweZ
+        6xBi/RWmHuTC6aTbVPT/uUY7d/zEMG01wiTvBXVn2YjWka9HvVRvapJZo4v1tq9DrRd2hjs8yUD3Z
+        fX43LF/YuG8OgpuzcH2/ocikm2Uj8M+hb3i7ICCP+ROgmKM0mQ+piOGlk2t7xZib7CtBSId3D4mMS
+        cm5OramNNSBimnX0vtHG8auvwwdfsirwVyOhgDbS1jOXRs24QYTd5tqHlJTc6YLsSzQGF9br08nL6
+        YZvL2AhA==;
+Received: from [2607:fb90:18d2:b6be:6d6f:ba8a:ca81:9775] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oGjoS-00FUex-SA; Wed, 27 Jul 2022 16:23:09 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH 2/6] block: change the blk_queue_bounce calling convention
+Date:   Wed, 27 Jul 2022 12:22:56 -0400
+Message-Id: <20220727162300.3089193-3-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220727162300.3089193-1-hch@lst.de>
+References: <20220727162300.3089193-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0xTVxj33Ht7e8tWuJTOfpMJWqPLUPGRhdyAW+Zilhtd5iPxSTascCmN
-        UElLtzGX0clL6iKNRQnl5YunjhJQsAyINFnLhmK2QkJVQGI7MwKodDgaAozLrZn//b7ze53v
-        5FC47LFoFaXRZnE6rSpdSYYQbc5A/+bE1LETW4eaJcyN4WKSufQigDNz9x/gTNdUuYjx3LVj
-        TOfVCxjTcONXjPHarDgzbxrBmK6HGxl3RwXJVNf6xIy5YAZnhsw+xPhr8sTMTY+PYHofRn4S
-        zroH9rB267CYdd83sC2NRSTbej2H/cVjJFl7/qiIfd49SLLnbzUitrXvNOtviWIL757D9r19
-        LGRHCpeu+ZrTbfn4eEhazWBMZnvYt+PzG4zootSEJBTQH0KdvZEwoRBKRtcjmLhSioThHwSL
-        i91Bxo+god5NvrYM+KqCqjoEBeZykTA8Q5DbM7U0UBRJx8CPRWLeIKf1MDaVv5yE034Mbru6
-        EE9E0Efg995KjMcEvR6ueXpJ3iul42GmM1gWDWV//rucI6EToLWkalkupcPhtzIvwWN8SZN7
-        uxzn84G2SeBns0/M5wC9C4ZtXwk5ETDuuiUW8HuwaK/GBHwafENzQW8egmK7jRS8CXD+XjoP
-        cfoDsHVsEeQ74VER/1y8IhSGJsOFG4TChbZSXDiWwtkCmaBWgj3gDZYCuM9UEAJm4bllHDej
-        tdY3drG+sYv1/97LCG9ECs6gz1Bz+m1a7ptYvSpDb9CqY5NPZbSgpQ/Yt+CavoMqx1/GOhBG
-        IQcCClfKpccTR0/IpCmq7O843akknSGd0ztQJEUoFdJkTbNKRqtVWdxJjsvkdK9ZjJKsMmKb
-        /K/8HmeUem9Jata05klTAxG/Ztf78ryX5OFsw/djr/ak1X00E3WSPlaJcpnLi0/nvjj0U3j1
-        u4WbHEkD2NN1xfNT04Mj7WZ1ghyb1XYeXDHQV/sgbqMluT8qdvJzy/REtFO7d2FiwXltXXdF
-        deto0t9G5+bMEvYqkedt3l36WYvp8JemHxSfHm0/0xSYLfafW7E/UmGfVLiOSBQ1T8wRZU31
-        VtdYIVb7IsYYkD5+hOLywSFfvb/Ay6Ymw0j0PUdKf6LHnWAojN/QvrVK/k7b6p6I2aN92W8F
-        Kp+FdcXdWXkzZyar42xoieivnX/Mhm0X7bDYAleMhw7kanLWW3pGlIQ+TbUtBtfpVf8BjbmT
-        Be8DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNIsWRmVeSWpSXmKPExsVy+t/xu7pRaQ+TDI59FbJYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
-        oe0rs8WNCU8ZLT4vbWG3WHPzKYvFiVvSDoIel694e+ycdZfd4/LZUo9NqzrZPDYvqffYfbOB
-        zWNn631Wj/f7rrJ59G1Zxeix+XS1x+dNch7tB7qZAnii9GyK8ktLUhUy8otLbJWiDS2M9Awt
-        LfSMTCz1DI3NY62MTJX07WxSUnMyy1KL9O0S9DKWXtUq2M5f8eqvWgPjVN4uRk4OCQETiStP
-        5zF2MXJxCAksZZSYueAsE0RCQuL2wiZGCFtY4s+1LjaIoqeMEgeefQNKcHCwCWhJNHayg5gi
-        ApUSZ7/IgpQwCzQyS0zqn80G0issECZxa8F9VhCbRUBVYvHNE2wg9bwCVhJf97BBjJeXmHnp
-        OzuIzSlgLbF5yjywE4SASp49+AhWwysgKHFy5hMWEJsZqL5562zmCYwCs5CkZiFJLWBkWsUo
-        klpanJueW2yoV5yYW1yal66XnJ+7iREYq9uO/dy8g3Heq496hxiZOBgPMUpwMCuJ8CZE308S
-        4k1JrKxKLcqPLyrNSS0+xGgKdPZEZinR5HxgssgriTc0MzA1NDGzNDC1NDNWEuf1LOhIFBJI
-        TyxJzU5NLUgtgulj4uCUamAK+Pg4qcZ+gZCj2h3nhxFS/339RJ1VHy2KU187Kf9KW2G8FdMh
-        Fqf43sWzeMOzDm76dV5lt6l0/pe5teUi/53F2hdee2CWG767ee7kc1JVex7P/HXfY05Odqeh
-        nv9CQYfauN3f1xS7bJrUrSa1YWlJ1Urmm90vtxifta1Wljxs9Tm8LWnXZfYF7s/zBHefb/bK
-        11FfdODfAn3Jj4eqOb0153I3bVl4QXB+eo/DwU/r93DvUxW0C17SeeYUq0bQWqEDnDNWKP83
-        X7X6WOy/damCcddP9y87uTG+tTsmtfHEtuV/t/Ud82zv4ckqcTcyvcVTdvXSg+SbZbXLDusx
-        Z5/vu/rHziu//sOaVUeW/1yoxFKckWioxVxUnAgAVOzeWV4DAAA=
-X-CMS-MailID: 20220727162250eucas1p133e8a814fee934f7161866122ef93273
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220727162250eucas1p133e8a814fee934f7161866122ef93273
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220727162250eucas1p133e8a814fee934f7161866122ef93273
-References: <20220727162245.209794-1-p.raghav@samsung.com>
-        <CGME20220727162250eucas1p133e8a814fee934f7161866122ef93273@eucas1p1.samsung.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A generic bdev_zone_no() helper is added to calculate zone number for a
-given sector in a block device. This helper internally uses disk_zone_no()
-to find the zone number.
+The double indirect bio leads to somewhat suboptimal code generation.
+Instead return the (original or split) bio, and make sure the
+request_queue arguments to the lower level helpers is passed after the
+bio to avoid constant reshuffling of the argument passing registers.
 
-Use the helper bdev_zone_no() to calculate nr of zones. This let's us
-make modifications to the math if needed in one place and adds now
-support for npo2 zone devices.
-
-Reviewed by: Adam Manzanares <a.manzanares@samsung.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 ---
- drivers/nvme/target/zns.c | 3 +--
- include/linux/blkdev.h    | 5 +++++
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ block/blk-mq.c |  2 +-
+ block/blk.h    | 10 ++++++----
+ block/bounce.c | 26 +++++++++++++-------------
+ 3 files changed, 20 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index c7ef69f29fe4..662f1a92f39b 100644
---- a/drivers/nvme/target/zns.c
-+++ b/drivers/nvme/target/zns.c
-@@ -241,8 +241,7 @@ static unsigned long nvmet_req_nr_zones_from_slba(struct nvmet_req *req)
- {
- 	unsigned int sect = nvmet_lba_to_sect(req->ns, req->cmd->zmr.slba);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7a756ffb15679..f469808579525 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2815,7 +2815,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	unsigned int nr_segs = 1;
+ 	blk_status_t ret;
  
--	return bdev_nr_zones(req->ns->bdev) -
--		(sect >> ilog2(bdev_zone_sectors(req->ns->bdev)));
-+	return bdev_nr_zones(req->ns->bdev) - bdev_zone_no(req->ns->bdev, sect);
+-	blk_queue_bounce(q, &bio);
++	bio = blk_queue_bounce(bio, q);
+ 	if (bio_may_exceed_limits(bio, q))
+ 		bio = __bio_split_to_limits(bio, q, &nr_segs);
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 42d00d032bd2a..1cc813241cd4f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -383,7 +383,7 @@ static inline void blk_throtl_bio_endio(struct bio *bio) { }
+ static inline void blk_throtl_stat_add(struct request *rq, u64 time) { }
+ #endif
+ 
+-void __blk_queue_bounce(struct request_queue *q, struct bio **bio);
++struct bio *__blk_queue_bounce(struct bio *bio, struct request_queue *q);
+ 
+ static inline bool blk_queue_may_bounce(struct request_queue *q)
+ {
+@@ -392,10 +392,12 @@ static inline bool blk_queue_may_bounce(struct request_queue *q)
+ 		max_low_pfn >= max_pfn;
  }
  
- static unsigned long get_nr_zones_from_buf(struct nvmet_req *req, u32 bufsize)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1be805223026..d1ef9b9552ed 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1350,6 +1350,11 @@ static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
- 	return BLK_ZONED_NONE;
+-static inline void blk_queue_bounce(struct request_queue *q, struct bio **bio)
++static inline struct bio *blk_queue_bounce(struct bio *bio,
++		struct request_queue *q)
+ {
+-	if (unlikely(blk_queue_may_bounce(q) && bio_has_data(*bio)))
+-		__blk_queue_bounce(q, bio);	
++	if (unlikely(blk_queue_may_bounce(q) && bio_has_data(bio)))
++		return __blk_queue_bounce(bio, q);
++	return bio;
  }
  
-+static inline unsigned int bdev_zone_no(struct block_device *bdev, sector_t sec)
-+{
-+	return disk_zone_no(bdev->bd_disk, sec);
-+}
-+
- static inline int queue_dma_alignment(const struct request_queue *q)
+ #ifdef CONFIG_BLK_CGROUP_IOLATENCY
+diff --git a/block/bounce.c b/block/bounce.c
+index c8f487af7be37..7cfcb242f9a11 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -199,24 +199,24 @@ static struct bio *bounce_clone_bio(struct bio *bio_src)
+ 	return NULL;
+ }
+ 
+-void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
++struct bio *__blk_queue_bounce(struct bio *bio_orig, struct request_queue *q)
  {
- 	return q ? q->dma_alignment : 511;
+ 	struct bio *bio;
+-	int rw = bio_data_dir(*bio_orig);
++	int rw = bio_data_dir(bio_orig);
+ 	struct bio_vec *to, from;
+ 	struct bvec_iter iter;
+ 	unsigned i = 0, bytes = 0;
+ 	bool bounce = false;
+ 	int sectors;
+ 
+-	bio_for_each_segment(from, *bio_orig, iter) {
++	bio_for_each_segment(from, bio_orig, iter) {
+ 		if (i++ < BIO_MAX_VECS)
+ 			bytes += from.bv_len;
+ 		if (PageHighMem(from.bv_page))
+ 			bounce = true;
+ 	}
+ 	if (!bounce)
+-		return;
++		return bio_orig;
+ 
+ 	/*
+ 	 * Individual bvecs might not be logical block aligned. Round down
+@@ -225,13 +225,13 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+ 	 */
+ 	sectors = ALIGN_DOWN(bytes, queue_logical_block_size(q)) >>
+ 			SECTOR_SHIFT;
+-	if (sectors < bio_sectors(*bio_orig)) {
+-		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
+-		bio_chain(bio, *bio_orig);
+-		submit_bio_noacct(*bio_orig);
+-		*bio_orig = bio;
++	if (sectors < bio_sectors(bio_orig)) {
++		bio = bio_split(bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
++		bio_chain(bio, bio_orig);
++		submit_bio_noacct(bio_orig);
++		bio_orig = bio;
+ 	}
+-	bio = bounce_clone_bio(*bio_orig);
++	bio = bounce_clone_bio(bio_orig);
+ 
+ 	/*
+ 	 * Bvec table can't be updated by bio_for_each_segment_all(),
+@@ -254,7 +254,7 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+ 		to->bv_page = bounce_page;
+ 	}
+ 
+-	trace_block_bio_bounce(*bio_orig);
++	trace_block_bio_bounce(bio_orig);
+ 
+ 	bio->bi_flags |= (1 << BIO_BOUNCED);
+ 
+@@ -263,6 +263,6 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+ 	else
+ 		bio->bi_end_io = bounce_end_io_write;
+ 
+-	bio->bi_private = *bio_orig;
+-	*bio_orig = bio;
++	bio->bi_private = bio_orig;
++	return bio;
+ }
 -- 
-2.25.1
+2.30.2
 
