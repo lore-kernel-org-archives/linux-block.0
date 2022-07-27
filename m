@@ -2,210 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39845C04A68
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75CF2C19F2B
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 16:24:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235738AbiG0QYt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 12:24:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50188 "EHLO
+        id S235783AbiG0QYu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 12:24:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236098AbiG0QYG (ORCPT
+        with ESMTP id S236303AbiG0QYT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 12:24:06 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6726A4E60C
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=mt63BJNlj/ri4/AeKhGq2mdMPOKH1/zYlxFrvB5PFVk=; b=fAkm+D6kGTYIXjTJ9aT9/+wadE
-        vE9o8MVVIkbnd++Ro+Y5lyfsAb3r42X0ArbEyzzaGEUgcuG6pbOlttOKbE0HWRbAT2cw/QMiM1rJk
-        NWbui7K5o3b26cSQIYXJgf9evvDOcWwfHDnNn1Tl219cZ41LaT41u8n5YCdSFUuEU86/FsrKvqDdM
-        JDTFUPfIKE5GnBceppftcm/ZOEpM7f4tKR1s3XsHcmfxrPgbU9cBO3JNvJGHvbk8ik4Y4fON6ER3K
-        4sWmg4s8YEq23E0cTXoOnligUGAVoups7wrc4bGPZNwejosu9ZtOlan5M2d1lrfQ/qTSlr+3oOCfV
-        DwlSUe1w==;
-Received: from [2607:fb90:18d2:b6be:6d6f:ba8a:ca81:9775] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oGjoV-00FUhE-Er; Wed, 27 Jul 2022 16:23:11 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCH 3/6] block: move ->bio_split to the gendisk
-Date:   Wed, 27 Jul 2022 12:22:57 -0400
-Message-Id: <20220727162300.3089193-4-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220727162300.3089193-1-hch@lst.de>
-References: <20220727162300.3089193-1-hch@lst.de>
+        Wed, 27 Jul 2022 12:24:19 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 117D54D167
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 09:23:15 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220727162256euoutp021b341a5de72cb44194754034a01cf18f~FvDW6Pdvr0990709907euoutp02L
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 16:22:56 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220727162256euoutp021b341a5de72cb44194754034a01cf18f~FvDW6Pdvr0990709907euoutp02L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1658938976;
+        bh=w5O8BVNbekPWS0uTFULfAlhiPgH30QywlTHY/GvNI4U=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=cA3D1ANXcWA/rH5h2KjUSuHkVXTo/XeE9N9GDtTqRgvDpdJhytcc3g0b/g5LQEWdu
+         k7VCRjMZDtr2JDr0durIrT3c8kETMYngI+T3o7Z+dy8gcQwJxYfZFLHBZEpSZj/iC/
+         s85tBllNt5V7zzKkmObvEJd/DFWcet2AIUfhf+5s=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220727162255eucas1p270f1762da9a9d8a41d40bde0664f9b65~FvDVcfZl82220522205eucas1p28;
+        Wed, 27 Jul 2022 16:22:55 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 28.E8.09580.F5661E26; Wed, 27
+        Jul 2022 17:22:55 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220727162254eucas1p1fd990f746d9f9870b8d58ee0bd01fedd~FvDVEOET21345313453eucas1p1m;
+        Wed, 27 Jul 2022 16:22:54 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220727162254eusmtrp1ea1f3eb33ea28187ca0b488efe6d40d1~FvDVCBW6T0298902989eusmtrp1P;
+        Wed, 27 Jul 2022 16:22:54 +0000 (GMT)
+X-AuditID: cbfec7f5-9adff7000000256c-e7-62e1665f73bc
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 99.8D.09038.E5661E26; Wed, 27
+        Jul 2022 17:22:54 +0100 (BST)
+Received: from localhost (unknown [106.210.248.8]) by eusmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220727162254eusmtip16a6354516571bc22aef68af1faaca7ef~FvDUtVvM_0065000650eusmtip1G;
+        Wed, 27 Jul 2022 16:22:54 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
+        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
+Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
+        linux-kernel@vger.kernel.org, hare@suse.de,
+        linux-block@vger.kernel.org, pankydev8@gmail.com,
+        bvanassche@acm.org, jaegeuk@kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: [PATCH v8 08/11] dm-zone: use generic helpers to calculate offset
+ from zone start
+Date:   Wed, 27 Jul 2022 18:22:42 +0200
+Message-Id: <20220727162245.209794-9-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220727162245.209794-1-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLKsWRmVeSWpSXmKPExsWy7djPc7rxaQ+TDFZuZrZYfbefzWLah5/M
+        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
+        oe0rs8WNCU8ZLT4vbWG3WHPzKYvFiVvSDoIel694e+ycdZfd4/LZUo9NqzrZPDYvqffYfbOB
+        zWNn631Wj/f7rrJ59G1Zxeix+XS1x+dNch7tB7qZAniiuGxSUnMyy1KL9O0SuDLeXzzNWnCe
+        q2L+j80sDYzXOboYOTkkBEwkLrcsYQexhQRWMEpMnSLWxcgFZH9hlJh46TAbhPOZUeJQ+1lm
+        mI4PtyaxQiSWM0psnzaPCcJ5ziixc/kJoFkcHGwCWhKNnWBjRQSKJR6+a2UBqWEWOMAk8eB2
+        CxtIjbBAjMSEpzkgNSwCqhJN226ygti8AlYSO/Z+glomLzHz0newOZwC1hKbp4DsAqkRlDg5
+        8wkLiM0MVNO8dTZU/XpOieZFCRC2i8SHvnNQcWGJV8e3sEPYMhKnJ/ewQNjVEk9v/GYGuU1C
+        oIVRon/nerDbJICW9Z3JATGZBTQl1u/Shyh3lNj04yUTRAWfxI23ghAX8ElM2jadGSLMK9HR
+        JgRRrSSx8+cTqKUSEpeb5kAt9ZBof3eUbQKj4iwkv8xC8ssshL0LGJlXMYqnlhbnpqcWG+el
+        lusVJ+YWl+al6yXn525iBKbA0/+Of93BuOLVR71DjEwcjIcYJTiYlUR4E6LvJwnxpiRWVqUW
+        5ccXleakFh9ilOZgURLnTc7ckCgkkJ5YkpqdmlqQWgSTZeLglGpgUty+wlJ217rSvexOD5eG
+        XHwWNt38yk7ecv8TsV7hvE5rYuqj3P7e614X3O5WvnkmX85ClVmCPwXeeuc+Mp/8b5a8vpvV
+        aufQ/B9rq4uk837e+HJkQcX2XMeVIekeZsq/J7xnmyr4K37qvMx7eb8/qldVMPjfK3iiNZV/
+        SmLOccFooylCNYFlL7Y0aij4WnIoXS7Tuylb+SQ1Nuqkfl+hQcZ/69LQVIu/p7cLde7SX9/1
+        OLu6UGerzXFui4kaRmlHztdIP91w2aFurWmTTWRop/vUs9+WHdT3vnLayKvs5vdSQ/V7hQF/
+        M6RuiMzRMTnSFLsl5FLy283TGafkKtb+nrLoPpvJxrNqrc+enstTYinOSDTUYi4qTgQARh0b
+        a/ADAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrLIsWRmVeSWpSXmKPExsVy+t/xu7pxaQ+TDOZPU7FYfbefzWLah5/M
+        Fr/Pnme22PtuNqvFzQM7mSz2LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
+        oe0rs8WNCU8ZLT4vbWG3WHPzKYvFiVvSDoIel694e+ycdZfd4/LZUo9NqzrZPDYvqffYfbOB
+        zWNn631Wj/f7rrJ59G1Zxeix+XS1x+dNch7tB7qZAnii9GyK8ktLUhUy8otLbJWiDS2M9Awt
+        LfSMTCz1DI3NY62MTJX07WxSUnMyy1KL9O0S9DLeXzzNWnCeq2L+j80sDYzXOboYOTkkBEwk
+        PtyaxApiCwksZZS4s8wUIi4hcXthEyOELSzx51oXWxcjF1DNU0aJP3O3sXcxcnCwCWhJNHaC
+        mSIClRJnv8iClDALnGOSuHnxGhtIr7BAlMSmL/eZQGwWAVWJpm03wXbxClhJ7Nj7iRlivrzE
+        zEvf2UFsTgFric1T5jFB3GMl8ezBRzaIekGJkzOfsIDYzED1zVtnM09gFJiFJDULSWoBI9Mq
+        RpHU0uLc9NxiI73ixNzi0rx0veT83E2MwHjdduznlh2MK1991DvEyMTBeIhRgoNZSYQ3Ifp+
+        khBvSmJlVWpRfnxRaU5q8SFGU6C7JzJLiSbnAxNGXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQ
+        QHpiSWp2ampBahFMHxMHp1QDk0331ldGj1tDHp2wZy2qWFu/4cXNjveJF0vkP7NMY1H85pnH
+        dLzr6ZvWrAvq9yMjZvffZytx8H/h475VmTfq/nRd2X+PEiS++vcYGp1Wv5EYd9lMZ3u306u5
+        S+8EvFFe5eE21fHbSZZ9WvuDd08vPNA4O/DUhDxdzcSlbOEXJrmnZP85UVi4da0Dq+G9Nao7
+        QoytN3339kta7979jeNTvz9PV5Xlzakiv4/VeiSKvJew5/vEc2DFK3flVRf4v4emXRFL2pny
+        JbeWa1U4Vx6zmJq32EbNtYu1Ih8X7xXKSczukFCqbF3rNfGs3vo3TteC586/tnXZNQPfC84b
+        d4p9+rTEQcdk4f8jvducBK2YlFiKMxINtZiLihMBaWW7FWADAAA=
+X-CMS-MailID: 20220727162254eucas1p1fd990f746d9f9870b8d58ee0bd01fedd
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20220727162254eucas1p1fd990f746d9f9870b8d58ee0bd01fedd
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220727162254eucas1p1fd990f746d9f9870b8d58ee0bd01fedd
+References: <20220727162245.209794-1-p.raghav@samsung.com>
+        <CGME20220727162254eucas1p1fd990f746d9f9870b8d58ee0bd01fedd@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only non-passthrough requests are split by the block layer and use the
-->bio_split bio_set.  Move it from the request_queue to the gendisk.
+Use the bdev_offset_from_zone_start() helper function to calculate
+the offset from zone start instead of using power of 2 based
+calculation.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/blk-core.c       | 9 +--------
- block/blk-merge.c      | 7 ++++---
- block/blk-sysfs.c      | 2 --
- block/genhd.c          | 8 +++++++-
- drivers/md/dm.c        | 2 +-
- include/linux/blkdev.h | 3 ++-
- 6 files changed, 15 insertions(+), 16 deletions(-)
+ drivers/md/dm-zone.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 123468b9d2e43..59f13d011949d 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -377,7 +377,6 @@ static void blk_timeout_work(struct work_struct *work)
- struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
- {
- 	struct request_queue *q;
--	int ret;
- 
- 	q = kmem_cache_alloc_node(blk_get_queue_kmem_cache(alloc_srcu),
- 			GFP_KERNEL | __GFP_ZERO, node_id);
-@@ -396,13 +395,9 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
- 	if (q->id < 0)
- 		goto fail_srcu;
- 
--	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, 0);
--	if (ret)
--		goto fail_id;
--
- 	q->stats = blk_alloc_queue_stats();
- 	if (!q->stats)
--		goto fail_split;
-+		goto fail_id;
- 
- 	q->node = node_id;
- 
-@@ -439,8 +434,6 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
- 
- fail_stats:
- 	blk_free_queue_stats(q->stats);
--fail_split:
--	bioset_exit(&q->bio_split);
- fail_id:
- 	ida_free(&blk_queue_ida, q->id);
- fail_srcu:
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 6e29fb28584ef..30872a3537648 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -331,18 +331,19 @@ static struct bio *bio_split_rw(struct bio *bio, struct request_queue *q,
- struct bio *__bio_split_to_limits(struct bio *bio, struct request_queue *q,
- 		       unsigned int *nr_segs)
- {
-+	struct bio_set *bs = &bio->bi_bdev->bd_disk->bio_split;
- 	struct bio *split;
- 
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
--		split = bio_split_discard(bio, q, nr_segs, &q->bio_split);
-+		split = bio_split_discard(bio, q, nr_segs, bs);
- 		break;
+diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+index 3dafc0e8b7a9..31c16aafdbfc 100644
+--- a/drivers/md/dm-zone.c
++++ b/drivers/md/dm-zone.c
+@@ -390,7 +390,9 @@ static bool dm_zone_map_bio_begin(struct mapped_device *md,
  	case REQ_OP_WRITE_ZEROES:
--		split = bio_split_write_zeroes(bio, q, nr_segs, &q->bio_split);
-+		split = bio_split_write_zeroes(bio, q, nr_segs, bs);
+ 	case REQ_OP_WRITE:
+ 		/* Writes must be aligned to the zone write pointer */
+-		if ((clone->bi_iter.bi_sector & (zsectors - 1)) != zwp_offset)
++		if ((bdev_offset_from_zone_start(md->disk->part0,
++						 clone->bi_iter.bi_sector)) != zwp_offset)
++
+ 			return false;
  		break;
- 	default:
--		split = bio_split_rw(bio, q, nr_segs, &q->bio_split);
-+		split = bio_split_rw(bio, q, nr_segs, bs);
- 		break;
- 	}
- 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index c0303026752d5..e1f009aba6fd2 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -779,8 +779,6 @@ static void blk_release_queue(struct kobject *kobj)
- 	if (queue_is_mq(q))
- 		blk_mq_release(q);
- 
--	bioset_exit(&q->bio_split);
+ 	case REQ_OP_ZONE_APPEND:
+@@ -602,11 +604,8 @@ void dm_zone_endio(struct dm_io *io, struct bio *clone)
+ 		 */
+ 		if (clone->bi_status == BLK_STS_OK &&
+ 		    bio_op(clone) == REQ_OP_ZONE_APPEND) {
+-			sector_t mask =
+-				(sector_t)bdev_zone_sectors(disk->part0) - 1;
 -
- 	if (blk_queue_has_srcu(q))
- 		cleanup_srcu_struct(q->srcu);
+ 			orig_bio->bi_iter.bi_sector +=
+-				clone->bi_iter.bi_sector & mask;
++				bdev_offset_from_zone_start(disk->part0, clone->bi_iter.bi_sector);
+ 		}
  
-diff --git a/block/genhd.c b/block/genhd.c
-index 44dfcf67ed96a..e3daebeaf9ae9 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1139,6 +1139,7 @@ static void disk_release(struct device *dev)
- 	WARN_ON_ONCE(disk_live(disk));
- 
- 	blkcg_exit_queue(disk->queue);
-+	bioset_exit(&disk->bio_split);
- 
- 	disk_release_events(disk);
- 	kfree(disk->random);
-@@ -1330,9 +1331,12 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- 	if (!disk)
- 		goto out_put_queue;
- 
-+	if (bioset_init(&disk->bio_split, BIO_POOL_SIZE, 0, 0))
-+		goto out_free_disk;
-+
- 	disk->bdi = bdi_alloc(node_id);
- 	if (!disk->bdi)
--		goto out_free_disk;
-+		goto out_free_bioset;
- 
- 	/* bdev_alloc() might need the queue, set before the first call */
- 	disk->queue = q;
-@@ -1370,6 +1374,8 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
- 	iput(disk->part0->bd_inode);
- out_free_bdi:
- 	bdi_put(disk->bdi);
-+out_free_bioset:
-+	bioset_exit(&disk->bio_split);
- out_free_disk:
- 	kfree(disk);
- out_put_queue:
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a014a002298bd..b7458f2dd3e45 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1693,7 +1693,7 @@ static void dm_split_and_process_bio(struct mapped_device *md,
- 	 */
- 	WARN_ON_ONCE(!dm_io_flagged(io, DM_IO_WAS_SPLIT));
- 	io->split_bio = bio_split(bio, io->sectors, GFP_NOIO,
--				  &md->queue->bio_split);
-+				  &md->disk->bio_split);
- 	bio_chain(io->split_bio, bio);
- 	trace_block_split(io->split_bio, bio->bi_iter.bi_sector);
- 	submit_bio_noacct(bio);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5eef8d2eddc1c..49dcd31e283e8 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -140,6 +140,8 @@ struct gendisk {
- 	struct request_queue *queue;
- 	void *private_data;
- 
-+	struct bio_set bio_split;
-+
- 	int flags;
- 	unsigned long state;
- #define GD_NEED_PART_SCAN		0
-@@ -531,7 +533,6 @@ struct request_queue {
- 
- 	struct blk_mq_tag_set	*tag_set;
- 	struct list_head	tag_set_list;
--	struct bio_set		bio_split;
- 
- 	struct dentry		*debugfs_dir;
- 	struct dentry		*sched_debugfs_dir;
+ 		return;
 -- 
-2.30.2
+2.25.1
 
