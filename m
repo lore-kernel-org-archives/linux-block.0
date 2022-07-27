@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1131EC19F29
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 08:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A82C04A68
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 08:52:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbiG0Iw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230056AbiG0Iw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 27 Jul 2022 04:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37518 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiG0Iw4 (ORCPT
+        with ESMTP id S229963AbiG0Iwz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 04:52:56 -0400
+        Wed, 27 Jul 2022 04:52:55 -0400
 Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D2946D83
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 01:52:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AE845F7F
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 01:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1658911975; x=1690447975;
+  t=1658911974; x=1690447974;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=WvOnCWOa9FoGp8j6yKay3efEtXc+6xbc6ZlBDhjCd6s=;
-  b=n8J2SStGIpptBYJYSEXHnrOQakm/oBAKQvOBfgInozCd4PALCrjAaCBX
-   kJ4MPZT6Gb6rnkrX0iHl2ig90Pzn60Afv578BF7Di3iFuRNJvaiHLbgU0
-   TL6kLdAwZdEwfIQrtpIE4xOI13pkiO0D5LX05yoZzjeMHS+ItpmW2gg21
-   kIkLQv/pCHN+5ufNjmkWHJyqUdQx1Tmqshkhs70Wuv256fKqav95V1E2Y
-   Ij+eYiv0UiLwh+FYuoVeDAWg/MXTT2HSy2e6dbEqWntB/rvIfoqouDoln
-   sbSCEVVxPB/zvDgMmVJ+tyNGqlJb4/JOE8kfx0EQRmqasFJRDT5EOnSdU
+  bh=jE1UUO61ZO/O5Zl3qaKzai51tWR1Wq2s6F5R7t0tbAc=;
+  b=o+j074DENN7YqoTG7OYphYrghBV4jn/ptmmVNE8tpePuz983h2dBxX/t
+   eqZmR6/CL8ryad7eEBV6GII5MvCV8nvjFNo6v6quDXLDgjEgH/enjt3tQ
+   01hf/xMbUgnDL5TypI4okM2jRbXv6FXZc03x/nhEjLPs6Mto8w3PgvKCN
+   +m8Uh4DSjdGN0P2XmaMiDcOWD/xyh0I0o2dDNwTUIJo8CDMa1WLgAshtq
+   QygPQkyercOg6dDnAxdMCEAf0CW9QGsMvLPsoNAglJfEHtPDal3HEjbqf
+   IAV7DGPP/+NINGcJpzzPrdwHgi3+Atnn+HnF90bNygdUizMa98/UhbT7V
    w==;
 X-IronPort-AV: E=Sophos;i="5.93,195,1654531200"; 
-   d="scan'208";a="205584975"
+   d="scan'208";a="205584974"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jul 2022 16:52:54 +0800
-IronPort-SDR: YVIEofBUA8lXs/+nkFUUWS7ZfLWAD2eLzaR25yWEnaufeINjCqdIJzq9EvVsosfYIa3XWR4/st
- AFRZtxRtTTEUXGB0BJujwO7yuWamloUaxyTtIv4tRd141gH8CiSSDLHLx/q57/bIsF3k2291kf
- /wlTO4EG9e5swZykSDR/7hAoPESaSDizsMm+EDe1f4CXxbpGQ3kgqSq/6tpKk2t0f/5h10pd+a
- gByOuDMJik0S0MyRJNg9dCUztrSiL2VSI3ZdADpOpYAMek2tTTL8bAwlQcntl0IjHhJY9e7V8W
- mdKLxjHLO56D/MnRis56/1Zf
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jul 2022 16:52:53 +0800
+IronPort-SDR: h+evnnAQTaQogwWSRo2aKl9vSj9ZFLzGxgrXAI6guSrt+haOUDwGxZWZ4O/EuM378ydaKj9Ehd
+ KzVCrt8In64FsP18G7Ux41VFyrmyELjt6HlQpIDRo6O60d8fn6EpKn85jpO18JTCELnqlP3JKn
+ vAQOa3uIl8hCjv1lq+fBpB2xTjCCVKmtNc8pOmZllKwaUsv1XrRr42bM85ao2Tw6HKCnPRCFmV
+ VZ0itMEcBensHCte1biJdClavipBdq36QM3oaHrwOxxspACGEWEc4pgy1HshJeukNNm5hxOaVd
+ rncRD8xfYo66HBUmtqonzhxQ
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 01:14:07 -0700
-IronPort-SDR: MdjPGhRUGRYvGQvvi2T81m6jYSKMDCwqqkISCwG9RRHUG7PXVD2JgkOv3snRziCkkhZKdP10lG
- KHeAWhAVhtDpiSX5d+BOIZ3U1VBDs0Z69qjnpk3mpZOtg3OFu5LwVTXrd/DYl7IdgMc/oUkB0/
- JPxIZKEHmkW13DAWRUzHfpXz3qbWyQSQPt8LjSI1F2o/J4piP9fdabVFPwlO0ovvXOZ/o9nVC6
- kcPsim12wFbMYuU03CShMJQQ7pdU9UDi2CsXxluB1Rtm8TRNqEKD3SyfyUu409D+AU2l7XDMKu
- jyI=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 01:14:06 -0700
+IronPort-SDR: a7TixAOU2A0pDnmX05byJ3t34g/gAafskW341Xc3VMtCCcxhmtVnH0KpJngaLfs1BZridxeAa2
+ 8H66wOyYYPyFeOVZXd4pHOTDwpTNM0GrjvqJ8E9jkt6vCjq2oLuKBN3cleaO0tLySQfXkzVXjd
+ an09m5fWOEAhCixnA9HALjHJsKzNPEI4ZHPZkm4hu3w757fwOpk2HkjzROKKp2t/oCJcZ8YB4T
+ grozRWKJVKM7cqD2nM/DyZxBMmpUI6BUszwJp5U7hWY9uIK2RKryxH8FbPM8rdoaFmV089jblx
+ TPc=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jul 2022 01:52:55 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jul 2022 01:52:54 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Christoph Hellwig <hch@lst.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 2/6] nbd/rc: load nbd module explicitly
-Date:   Wed, 27 Jul 2022 17:52:47 +0900
-Message-Id: <20220727085251.1474340-3-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 1/6] common/rc: avoid module load in _have_driver()
+Date:   Wed, 27 Jul 2022 17:52:46 +0900
+Message-Id: <20220727085251.1474340-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220727085251.1474340-1-shinichiro.kawasaki@wdc.com>
 References: <20220727085251.1474340-1-shinichiro.kawasaki@wdc.com>
@@ -64,75 +64,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After the commit "common/rc: avoid module load in _have_driver()",
-_have_driver() no longer loads specified module. However, nbd test cases
-and _have_nbd_netlink() function assume that the module is loaded by
-calling _have_driver(). This causes test case failures and unexpected
-skips. To fix them, load and unload modules explicitly in functions
-_start_nbd_server*(), _stop_nbd_server*() and _have_nbd_netlink().
+The helper function _have_driver() checks availability of the specified
+driver, or module, regardless whether it is loadable or not. When the
+driver is loadable, it loads the module for checking, but does not
+unload it. This makes following test cases fail.
 
+Such failure happens when nvmeof-mp test group is executed after nvme
+test group with tcp transport. _have_driver() for tcp transport loads
+nvmet and nvmet-tcp modules. nvmeof-mp test group tries to unload the
+nvmet module but it fails because of dependency to the nvmet-tcp module.
+
+To avoid the failure, do not load module in _have_driver() using -n
+dry run option of the modprobe command. While at it, fix a minor problem
+of modname '-' replacement. Currently, only the first '-' in modname is
+replaced with '_'. Replace all '-'s.
+
+Fixes: e9645877fbf0 ("common: add a helper if a driver is available")
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/nbd/rc | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ common/rc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/nbd/rc b/tests/nbd/rc
-index 9c1c15b..32eea45 100644
---- a/tests/nbd/rc
-+++ b/tests/nbd/rc
-@@ -28,17 +28,21 @@ _have_nbd() {
- }
+diff --git a/common/rc b/common/rc
+index 01df6fa..8150fee 100644
+--- a/common/rc
++++ b/common/rc
+@@ -30,9 +30,10 @@ _have_root() {
  
- _have_nbd_netlink() {
-+	local ret=0
-+
- 	if ! _have_nbd; then
+ _have_driver()
+ {
+-	local modname="${1/-/_}"
++	local modname="${1//-/_}"
+ 
+-	if [ ! -d "/sys/module/${modname}" ] && ! modprobe -q "${modname}"; then
++	if [[ ! -d "/sys/module/${modname}" ]] &&
++		   ! modprobe -qn "${modname}"; then
+ 		SKIP_REASONS+=("driver ${modname} is not available")
  		return 1
  	fi
- 	if ! _have_program genl-ctrl-list; then
- 		return 1
- 	fi
-+	modprobe -q nbd
- 	if ! genl-ctrl-list | grep -q nbd; then
- 		SKIP_REASONS+=("nbd does not support netlink")
--		return 1
-+		ret=1
- 	fi
--	return 0
-+	modprobe -qr nbd
-+	return $ret
- }
- 
- _wait_for_nbd_connect() {
-@@ -62,6 +66,7 @@ _wait_for_nbd_disconnect() {
- }
- 
- _start_nbd_server() {
-+	modprobe -q nbd
- 	truncate -s 10G "${TMPDIR}/export"
- 	cat > "${TMPDIR}/nbd.conf" << EOF
- [generic]
-@@ -73,17 +78,20 @@ EOF
- 
- _stop_nbd_server() {
- 	kill -SIGTERM "$(cat "${TMPDIR}/nbd.pid")"
-+	modprobe -qr nbd
- 	rm -f "${TMPDIR}/nbd.pid"
- 	rm -f "${TMPDIR}/export"
- }
- 
- _start_nbd_server_netlink() {
-+	modprobe -q nbd
- 	truncate -s 10G "${TMPDIR}/export"
- 	nbd-server 8000 "${TMPDIR}/export" >/dev/null 2>&1
- }
- 
- _stop_nbd_server_netlink() {
- 	killall -SIGTERM nbd-server
-+	modprobe -qr nbd
- 	rm -f "${TMPDIR}/export"
- }
- 
 -- 
 2.36.1
 
