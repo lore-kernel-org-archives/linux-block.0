@@ -2,115 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F4DAC04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 16:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAAFC19F2B
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 17:13:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231523AbiG1Qzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 12:55:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40654 "EHLO
+        id S229504AbiG1RNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 13:13:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbiG1Qzj (ORCPT
+        with ESMTP id S231277AbiG1RNh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 12:55:39 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FAE5550A5;
-        Thu, 28 Jul 2022 09:55:36 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id f11-20020a17090a4a8b00b001f2f7e32d03so5522593pjh.0;
-        Thu, 28 Jul 2022 09:55:36 -0700 (PDT)
+        Thu, 28 Jul 2022 13:13:37 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 133C261D7E
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 10:13:33 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id h132so2007022pgc.10
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 10:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc;
-        bh=/v3Gcn+hTL0SOyI/tztq8lNP5D0RrTqazuF4o/1KF3k=;
-        b=KhZWRDXn2xsiTaRpuC25WJC2oEAedK39KKmcClr8IAYxJKLTnKimRaDfLzkdZcQN0O
-         yhKQ1DOrbZYICCUCx7cFxq0fQbI3q/V/4/IcFYnleE9gemq31ZU9e+Vf8sryx0qKVHu0
-         taudKvAkkTIflxzG55p9RIeN1ji5KjqbvTr8wRNt6/ybqVSm9CLEIHsh0B6c3nrqeJkb
-         kz2oJruSwXOeZdvyOieGQotwUPsfmJWgVM38LrcLHIVXo0UQdqgPLqOhyf9ErM1VP0Mq
-         kyD9+JIyR7g/q/CNR7jAn/+uArIZcSFGqY3L0dUPjQBvffcMuHTqB9eMgI79oKVC8wSH
-         /R1Q==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=Dj+XIt7Kj/l6SD7NCw4yNqTfM/YIqZrgS8oOYqSBuoE=;
+        b=yX4s3CPW2g+H8VBBLsI5c66y7C/LZRcm+IWZLfhi6lIILHs08nhnDYvLlR4sOZBDCa
+         xYDsO0jYk9XtAp6jQ9BQn+MmsbIH3jCmgeuWt97oiKGRQqbZ9e0offpVoLbbJfb2TuHx
+         i8EXF3akanD/KYVWm6zj7i6fJQgbVbelFgse0SVcw5tVDdiiPrk/d6jCcam6tt21/HV/
+         9a18bB8xW+0GhgKDQPrrMFRcM7vzFhKO41beeOsAYPrhwcZ9O9eItAldguXOp/rin4Wx
+         ml/Z2699/jcWpP27HZLF4Lb9T/rI/1ephgvi7DA42EwN7nRyFcYkF92hn//rpdNdjAY1
+         QXlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc;
-        bh=/v3Gcn+hTL0SOyI/tztq8lNP5D0RrTqazuF4o/1KF3k=;
-        b=OXoi0Jw7HVvNcRlTB6vSVJeJouXG741tL6P3Z6LZZarPd1rRXV9xUkYxq76kGG9gXQ
-         aGQoYXsg8NFkD2EhYrZDJuoPlSs+2gNNUqG34p4t4ipCkeSpYynvFwmkfR+N6Q9N2Qb2
-         n0sWaCyh4R9xsGWz1E3cdwiFDhRRFrowuQcxAL2kmT3YgI7b7/RbvEUMi/Z4xr38BYRI
-         G+MihBRrbqCjWpDMepwxR/g3j9UAHgYRCJ4ZHYxLntZy8LKa5olGZVdapuVEL3ZA4FFv
-         Ad3Rl95RqxHVTh31rxeWO0FMgBCUUDgokQoETMC0F2WsPiA+5dogJPWZk2yOxxgtn5c1
-         oqag==
-X-Gm-Message-State: AJIora8xisGpsWUnRCIGwrK5mlBMMny7rjQGB3D0G8zgJIgojogcRhqY
-        4G5UFBVUZ1/GhpRJyPTjAA0=
-X-Google-Smtp-Source: AGRyM1v91WoHUfzBJ1uaof84UM74engDsn1pKS4xnYLdVfhv/5BBIuniD7LFRW3JxEk6r72ET/ecgw==
-X-Received: by 2002:a17:902:7089:b0:16c:91d7:e422 with SMTP id z9-20020a170902708900b0016c91d7e422mr27423533plk.73.1659027335302;
-        Thu, 28 Jul 2022 09:55:35 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id f77-20020a623850000000b00528d41a998csm1066688pfa.15.2022.07.28.09.55.34
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=Dj+XIt7Kj/l6SD7NCw4yNqTfM/YIqZrgS8oOYqSBuoE=;
+        b=3Hcb6ajsZ7gPAit0E8EU32wwyGFcinv0+7X/A/GmQC1jMpHj5l8y1vz0/U+yeW7t6w
+         3wpiqpr3rMBWg7X3QFYrsKn94qa44BrxSOMaTtXuCSKI2FF0zQKAEQMM3A0C1QrJoZuf
+         qgiU5hgWbImKLU2Q1b4I+QmmOLPIql81VIaEMuyoygkwD88XFHj4jyvxbqdgbuqZNu09
+         0yEZqENj978dMSCFC9pz2kOUFKee4YR77sQ89HE2sBkwnA/vJ2Pk9qlMWgMErYp80gum
+         5Gx62qdLuZpcDnMO+D0Y8lw/xH/O6FxKYUfUOcArcQy5hSd176pA5lbH8/MwlhJVEWze
+         If1g==
+X-Gm-Message-State: AJIora+GmhAUJJtsQSumnuvuTP0B9vLfaW3izDgqjRnB391jzp/tWey/
+        hFRJcw+6iIVZ+2rldsnRfAzyANiqaiMeoA==
+X-Google-Smtp-Source: AGRyM1u7Vc3bXmnuiSyRSxMJY17A/G0gmjQi4SlVhO5pOwLxcvvlwIKUSgPLbTYYdCgQ2BUOZUFZUQ==
+X-Received: by 2002:a05:6a00:1705:b0:525:4cac:fa65 with SMTP id h5-20020a056a00170500b005254cacfa65mr27500342pfc.40.1659028412306;
+        Thu, 28 Jul 2022 10:13:32 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x14-20020a170902a38e00b0016c20d40ee7sm1534523pla.174.2022.07.28.10.13.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 09:55:34 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 28 Jul 2022 06:55:33 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-        axboe@kernel.dk, ming.lei@redhat.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH RESEND v6 4/8] blk-throttle: fix io hung due to config
- updates
-Message-ID: <YuK/hXnFA+qu5EMB@slm.duckdns.org>
-References: <20220701093441.885741-1-yukuai1@huaweicloud.com>
- <20220701093441.885741-5-yukuai1@huaweicloud.com>
- <YuGGVxdlOVk/eF2l@slm.duckdns.org>
- <20220728093346.GA2281@blackbody.suse.cz>
- <0bbf3d0c-88c4-8120-3df3-960dda041864@huaweicloud.com>
+        Thu, 28 Jul 2022 10:13:31 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     colyli@suse.de
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+In-Reply-To: <20220719042724.8498-1-colyli@suse.de>
+References: <20220719042724.8498-1-colyli@suse.de>
+Subject: Re: [PATCH 0/1] bcache patche for Linux v5.20
+Message-Id: <165902841159.13194.11814918605797804157.b4-ty@kernel.dk>
+Date:   Thu, 28 Jul 2022 11:13:31 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0bbf3d0c-88c4-8120-3df3-960dda041864@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 28, 2022 at 06:34:44PM +0800, Yu Kuai wrote:
-> Hi
+On Tue, 19 Jul 2022 12:27:23 +0800, Coly Li wrote:
+> There is 1 patch from bcache submission, which removes 'EXPERIMENTAL'
+> from the bcache Kconfig item, now 'Asynchronous device registration'
+> option is not experimental anymore.
 > 
-> 在 2022/07/28 17:33, Michal Koutný 写道:
-> > On Wed, Jul 27, 2022 at 08:39:19AM -1000, Tejun Heo <tj@kernel.org> wrote:
-> > > I'm not quiet sure this is correct. What if the limit keeps changing across
-> > > different values? Then we'd be calculating the skipped amount based on the
-> > > last configuration only which would be incorrect.
-> > 
-> > When one change of configuration is correct, then all changes must be
-> > correct by induction. It's sufficient to take into account only the one
-> > old config and the new one.
-> > 
-> > This __tg_update_skipped() calculates bytes_skipped with the limit
-> > before the change and bytes_skipped are used (divided by) the new limit
-> > in tg_with_in_bps_limit().
-> > The accumulation of bytes_skipped across multiple changes (until slice
-> > properly ends) is proportional to how bytes_allowed would grow over
-> > time.
-> > That's why I find this correct (I admit I had to look back into my
-> > notes when this was first discussed).
-> > 
-> > HTH,
-> > Michal
-> > 
+> Please take it for v5.20. Thank you in advance to taking care of this.
 > 
-> Hi, Tejun
+> Coly Li
 > 
-> Michal already explain it very well, please let me know if you still
-> thinks there are better ways.
+> [...]
 
-Ah, I see, so it's integrating into the skipped counters across multiple
-updates. I think it can definitely use comments explaining how it's working
-but that looks okay.
+Applied, thanks!
 
-Thanks.
+[1/1] bcache: remove EXPERIMENTAL for Kconfig option 'Asynchronous device registration'
+      commit: 508e357579f07d43cb3feabe93b46bc1648ca5d9
 
+Best regards,
 -- 
-tejun
+Jens Axboe
+
+
