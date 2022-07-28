@@ -2,94 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11211C04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 08:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9768C3F6B0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 08:23:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234769AbiG1IIg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 04:08:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56604 "EHLO
+        id S234627AbiG1IXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 04:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233818AbiG1IIf (ORCPT
+        with ESMTP id S234381AbiG1IXL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 04:08:35 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5756161D72
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 01:08:35 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 1696A20D58;
-        Thu, 28 Jul 2022 08:08:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1658995714; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        Thu, 28 Jul 2022 04:23:11 -0400
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD7161DBA;
+        Thu, 28 Jul 2022 01:23:10 -0700 (PDT)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 0FE8A1C0003; Thu, 28 Jul 2022 10:23:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
+        t=1658996588;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=zK0Mm2z9vbknqkLEB5kQWG3idwkwtggudTRBFg9Cyuw=;
-        b=mPJzn5bg4/tHRJ7zMORCqWFuIqdNaB2/yRLqqRm3yOkTwAVTG5QJDC7OysyC/DMjtsyCfU
-        kVWAYYh+rpIra+KVlHb3jRlTdNWZtrTQHriqJe0WCxD6z+yFbxkKowUv8OohCnyxWE3Unt
-        5nBovpeGEghwB1N8811UZePcq+G+oJ8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1658995714;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zK0Mm2z9vbknqkLEB5kQWG3idwkwtggudTRBFg9Cyuw=;
-        b=xUUeX2VLcOtEkSnE/bJe7ouKKGceW73LOgoKo6/O471aCcQvNCyf9X8XOiWvuORLh9KKmF
-        DGZ7WN9lcH7aYiCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 02BCA13A7E;
-        Thu, 28 Jul 2022 08:08:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id XgIfAAJE4mIIJwAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 28 Jul 2022 08:08:34 +0000
-Message-ID: <b3999801-edbb-209b-9f99-f5b95bd21e65@suse.de>
-Date:   Thu, 28 Jul 2022 10:08:29 +0200
+        bh=EXfM02GFzA8ELpnDKlyOIJmK9T5oL5LwlIPHTBNZ798=;
+        b=X6lgA01XcFzrlnlOIHT7Y0KehfX6lFvZeL7ylIjA/9bAsKdg5i/1rt3bd3VPh9Uwmk5JT0
+        PtI11zG4C2DfgHZQWByy4HJEgtgldNTlTCprskJeeuSAfQpLj3LnkrGX8ArxhY355m6mAw
+        0JEA3Eni199N5DLQxMiVLxpPJq6zbUM=
+Date:   Thu, 28 Jul 2022 10:23:07 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+Message-ID: <20220728082307.GA15112@duo.ucw.cz>
+References: <YhXMu/GcceyDx637@B-P7TQMD6M-0146.local>
+ <a55211a1-a610-3d86-e21a-98751f20f21e@opensource.wdc.com>
+ <YhXsQdkOpBY2nmFG@B-P7TQMD6M-0146.local>
+ <3702afe7-2918-42e7-110b-efa75c0b58e8@opensource.wdc.com>
+ <YhbYOeMUv5+U1XdQ@B-P7TQMD6M-0146.local>
+ <YqFUc8jhYp5ijS/C@T590>
+ <YqFashbvU+v5lGZy@B-P7TQMD6M-0146.local>
+ <YqFx2GGACopPmLaM@T590>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 4/6] block: move the call to get_max_io_size out of
- blk_bio_segment_split
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20220727162300.3089193-1-hch@lst.de>
- <20220727162300.3089193-5-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220727162300.3089193-5-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="7JfCtLOvnd9MIVvH"
+Content-Disposition: inline
+In-Reply-To: <YqFx2GGACopPmLaM@T590>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/22 18:22, Christoph Hellwig wrote:
-> Prepare for reusing blk_bio_segment_split for (file system controlled)
-> splits of REQ_OP_ZONE_APPEND bios by letting the caller control the
-> maximum size of the bio.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> ---
->   block/blk-merge.c | 9 +++++----
->   1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Cheers,
+--7JfCtLOvnd9MIVvH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Hi!
+
+> > > If you have actual report, I am happy to take account into it, otherw=
+ise not
+> > > sure if it is worth of time/effort in thinking/addressing one pure th=
+eoretical
+> > > concern.
+> >=20
+> > Hi Ming,
+> >=20
+> > Thanks for your look & reply.
+> >=20
+> > That is not a wild guess. That is a basic difference between
+> > in-kernel native block-based drivers and user-space block drivers.
+>=20
+> Please look at my comment, wrt. your pure theoretical concern, userspace
+> block driver is same with kernel loop/nbd.
+>=20
+> Did you see such report on loop & nbd? Can you answer my questions wrt.
+> kernel thread B?
+
+Yes, nbd is known to deadlock under high loads. Don't do that.
+
+									Pavel
+--=20
+People of Russia, stop Putin before his war on Ukraine escalates.
+
+--7JfCtLOvnd9MIVvH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCYuJHawAKCRAw5/Bqldv6
+8gEoAJ9zmwt5woMTM0cAO4S+OR5Z1j5hgQCgmiyqaOqsiNQinTaL5FiPFvKgf78=
+=GB7n
+-----END PGP SIGNATURE-----
+
+--7JfCtLOvnd9MIVvH--
