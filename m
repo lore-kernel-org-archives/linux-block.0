@@ -2,58 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A832C19F2B
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 14:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9045BC19F2C
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 14:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231304AbiG1Op3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 10:45:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54044 "EHLO
+        id S231635AbiG1Op5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 10:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232730AbiG1Op0 (ORCPT
+        with ESMTP id S233270AbiG1Opw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 10:45:26 -0400
+        Thu, 28 Jul 2022 10:45:52 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D96B4474C1;
-        Thu, 28 Jul 2022 07:45:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202674C60C
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 07:45:51 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6A6F367373; Thu, 28 Jul 2022 16:45:20 +0200 (CEST)
-Date:   Thu, 28 Jul 2022 16:45:20 +0200
+        id 8460F67373; Thu, 28 Jul 2022 16:45:48 +0200 (CEST)
+Date:   Thu, 28 Jul 2022 16:45:48 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Tadeusz Struk <tadeusz.struk@linaro.org>, stable@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Christoph Hellwig <hch@lst.de>,
-        syzbot+4f441e6ca0fcad141421@syzkaller.appspotmail.com,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 5.10 1/2] block: split bio_kmalloc from bio_alloc_bioset
-Message-ID: <20220728144520.GA18285@lst.de>
-References: <20220718211226.506362-1-tadeusz.struk@linaro.org> <YtwM3uHugOOdDQZT@kroah.com> <YuKgW9BCNl8ChT/v@kroah.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: Re: [PATCH blktests 1/6] common/rc: avoid module load in
+ _have_driver()
+Message-ID: <20220728144548.GB18285@lst.de>
+References: <20220727085251.1474340-1-shinichiro.kawasaki@wdc.com> <20220727085251.1474340-2-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YuKgW9BCNl8ChT/v@kroah.com>
+In-Reply-To: <20220727085251.1474340-2-shinichiro.kawasaki@wdc.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 28, 2022 at 04:42:35PM +0200, Greg KH wrote:
-> > > Link: https://syzkaller.appspot.com/bug?id=a3416231e37024a75f2b95bd95db0d8ce8132a84
-> > 
-> > Both now queued up, thanks.
+On Wed, Jul 27, 2022 at 05:52:46PM +0900, Shin'ichiro Kawasaki wrote:
+> The helper function _have_driver() checks availability of the specified
+> driver, or module, regardless whether it is loadable or not. When the
+> driver is loadable, it loads the module for checking, but does not
+> unload it. This makes following test cases fail.
 > 
-> As was just reported, this breaks things all over the place:
-> 	https://lore.kernel.org/r/219030d8-3408-cc9d-7aec-1fb14ab891ce@roeck-us.net
+> Such failure happens when nvmeof-mp test group is executed after nvme
+> test group with tcp transport. _have_driver() for tcp transport loads
+> nvmet and nvmet-tcp modules. nvmeof-mp test group tries to unload the
+> nvmet module but it fails because of dependency to the nvmet-tcp module.
 > 
-> Note, I also had to add lots of fix-up patches on top of these two that
-> you missed, so odds are there are other fix-ups that I also missed.
-> 
-> Please go and test this again, and submit ALL patches that are needed
-> after they pass the proper testing and I will be glad to reconsider them
-> again.
+> To avoid the failure, do not load module in _have_driver() using -n
+> dry run option of the modprobe command. While at it, fix a minor problem
+> of modname '-' replacement. Currently, only the first '-' in modname is
+> replaced with '_'. Replace all '-'s.
 
-Why did this even get backported?  It was a cleanup that required a lot
-of prep work, and should not by itself fix anything.
+Looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
