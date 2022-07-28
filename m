@@ -2,103 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4A6C04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 01:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE8EC19F28
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 02:35:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234473AbiG1B4j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 21:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35382 "EHLO
+        id S236798AbiG1CfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 22:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234511AbiG1B4j (ORCPT
+        with ESMTP id S229618AbiG1CfR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 21:56:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7A0F358B4C
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 18:56:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1658973397;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KHZlToQdykohOisCXclAe9uYcYddXMxV8NXPaLhSb9Q=;
-        b=dAwMF73GTg1mbUfPe4PuEXAEnGTjhKhBdZPo1RlI68UuvwnVrr0Tbnj6vYsIA/E/c8znDE
-        2P7iOiI5tOn9iIhar3qHIGaLfLou0cKbSVM1X48P39+k9NS1nj63yxvg0ajCVsB03xOf+Q
-        kZDeajPfMHKkvNycPfrqjWDpNJNg6ew=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-194-7sbNobR9NUm6USzuu20eZw-1; Wed, 27 Jul 2022 21:56:36 -0400
-X-MC-Unique: 7sbNobR9NUm6USzuu20eZw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D1B9285A58D;
-        Thu, 28 Jul 2022 01:56:35 +0000 (UTC)
-Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0433640CF8E2;
-        Thu, 28 Jul 2022 01:56:31 +0000 (UTC)
-Date:   Thu, 28 Jul 2022 09:56:26 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V2 3/5] ublk_drv: add SET_PARAM/GET_PARAM control command
-Message-ID: <YuHsyusQZYTlUabu@T590>
-References: <20220727141628.985429-1-ming.lei@redhat.com>
- <20220727141628.985429-4-ming.lei@redhat.com>
- <20220727162234.GB18969@lst.de>
+        Wed, 27 Jul 2022 22:35:17 -0400
+Received: from mail105.syd.optusnet.com.au (mail105.syd.optusnet.com.au [211.29.132.249])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1868D13E85;
+        Wed, 27 Jul 2022 19:35:15 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-20-138.pa.nsw.optusnet.com.au [49.195.20.138])
+        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 25C0D10C8868;
+        Thu, 28 Jul 2022 12:35:13 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1oGtMl-0069Ji-VP; Thu, 28 Jul 2022 12:35:11 +1000
+Date:   Thu, 28 Jul 2022 12:35:11 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@fb.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de
+Subject: Re: [PATCH 4/5] io_uring: add support for dma pre-mapping
+Message-ID: <20220728023511.GX3600936@dread.disaster.area>
+References: <20220726173814.2264573-1-kbusch@fb.com>
+ <20220726173814.2264573-5-kbusch@fb.com>
+ <YuB09cZh7rmd260c@ZenIV>
+ <YuFEhQuFtyWcw7rL@kbusch-mbp.dhcp.thefacebook.com>
+ <YuFGCO7M29fr3bVB@ZenIV>
+ <YuFT+UYxd2QtDPe5@kbusch-mbp.dhcp.thefacebook.com>
+ <20220727223232.GV3600936@dread.disaster.area>
+ <YuHDeRImQPuuV2Mr@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220727162234.GB18969@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+In-Reply-To: <YuHDeRImQPuuV2Mr@kbusch-mbp.dhcp.thefacebook.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=VuxAv86n c=1 sm=1 tr=0 ts=62e1f5e2
+        a=cxZHBGNDieHvTKNp/pucQQ==:117 a=cxZHBGNDieHvTKNp/pucQQ==:17
+        a=kj9zAlcOel0A:10 a=RgO8CyIxsXoA:10 a=7-415B0cAAAA:8
+        a=DxEnDgycP0rwEceSJA4A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+On Wed, Jul 27, 2022 at 05:00:09PM -0600, Keith Busch wrote:
+> On Thu, Jul 28, 2022 at 08:32:32AM +1000, Dave Chinner wrote:
+> > On Wed, Jul 27, 2022 at 09:04:25AM -0600, Keith Busch wrote:
+> > > On Wed, Jul 27, 2022 at 03:04:56PM +0100, Al Viro wrote:
+> > > > On Wed, Jul 27, 2022 at 07:58:29AM -0600, Keith Busch wrote:
+> > > > > On Wed, Jul 27, 2022 at 12:12:53AM +0100, Al Viro wrote:
+> > > > > > On Tue, Jul 26, 2022 at 10:38:13AM -0700, Keith Busch wrote:
+> > > > > > 
+> > > > > > > +	if (S_ISBLK(file_inode(file)->i_mode))
+> > > > > > > +		bdev = I_BDEV(file->f_mapping->host);
+> > > > > > > +	else if (S_ISREG(file_inode(file)->i_mode))
+> > > > > > > +		bdev = file->f_inode->i_sb->s_bdev;
+> > > > > > 
+> > > > > > *blink*
+> > > > > > 
+> > > > > > Just what's the intended use of the second case here?
+> > > > > 
+> > > > > ??
+> > > > > 
+> > > > > The use case is same as the first's: dma map the user addresses to the backing
+> > > > > storage. There's two cases here because getting the block_device for a regular
+> > > > > filesystem file is different than a raw block device.
+> > > > 
+> > > > Excuse me, but "file on some filesystem + block number on underlying device"
+> > > > makes no sense as an API...
+> > > 
+> > > Sorry if I'm misunderstanding your concern here.
+> > > 
+> > > The API is a file descriptor + index range of registered buffers (which is a
+> > > pre-existing io_uring API). The file descriptor can come from opening either a
+> > > raw block device (ex: /dev/nvme0n1), or any regular file on a mounted
+> > > filesystem using nvme as a backing store.
+> > 
+> > That's fundamentally flawed. Filesystems can have multiple block
+> > devices backing them that the VFS doesn't actually know about (e.g.
+> > btrfs, XFS, etc). Further, some of these filesystems can spread
+> > indiivdual file data across mutliple block devices i.e. the backing
+> > bdev changes as file offset changes....
+> > 
+> > Filesystems might not even have a block device (NFS, CIFS, etc) -
+> > what happens if you call this function on a file belonging to such a
+> > filesystem?
+> 
+> The block_device driver has to opt-in to this feature. If a multi-device block
+> driver wants to opt-in to this, then it would be responsible to handle
+> translating that driver's specific cookie to whatever representation the
+> drivers it stacks atop require. Otherwise, the cookie threaded through the bio
+> is an opque value: nothing between io_uring and the block_device driver need to
+> decode it.
 
-On Wed, Jul 27, 2022 at 06:22:34PM +0200, Christoph Hellwig wrote:
-> As stated in the previous discussion I think this is a very bad idea
-> that leads to a lot of boiler plate code.  If you don't want to rely
+I'm not talking about "multi-device" block devices like we build
+with DM or MD to present a single stacked block device to the
+filesystem. I'm talking about the fact that both btrfs and XFS
+support multiple *independent* block devices in the one filesystem.
 
-But you never point out where the boiler plate code is, care to share
-what/where it is?
+i.e.:
 
-If you don't like xarray, we can replace it with one plain array
-from the beginning, this change is just in implementation level.
+# mkfs.xfs -r rtdev=/dev/nvme0n1 -l logdev=/dev/nvme1n1,size=2000m /dev/nvme2n1
+meta-data=/dev/nvme2n1           isize=512    agcount=4, agsize=22893287 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=0    bigtime=1 inobtcount=1 nrext64=0
+data     =                       bsize=4096   blocks=91573146, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =/dev/nvme1n1           bsize=4096   blocks=512000, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =/dev/nvme0n1           extsz=4096   blocks=91573146, rtextents=91573146
+#
 
-Given it is ABI interface, I'd suggest to consolidate it from the
-beginning.
+This builds an XFS filesystem which can write file data to either
+/dev/nvme0n1 or /dev/nvme2n1, and journal IO will get sent to a
+third block dev (/dev/nvme1n1).
 
-> on zeroed fields we can add a mask of valid fields, similar to how
-> e.g. the statx API works.
+So, which block device do we map for the DMA buffers that contain
+the file data for any given file in that filesystem? There is no
+guarantee that is is sb->s_bdev, because it only points at one of
+the two block devices that can contain file data.
 
-With one mask for marking valid fields, we still need to group
-fields, and one bit in mask has to represent one single group, and
-it can't represent each single field.
+Btrfs is similar, but it might stripe data across /dev/nvme0n1,
+/dev/nvme1n1 and /dev/nvme2n1 for a single file writes (and hence
+reads) and so needs separate DMA mappings for each block device just
+to do IO direct to/from one file....
 
-Also one length field has to be added in the header for keeping
-compatibility with old app.
+Indeed, for XFS there's no requirement that the block devices have
+the same capabilities or even storage types - the rtdev could be
+spinning disks, the logdev an nvme SSD, and the datadev is pmem. If
+XFs has to do something special, it queries the bdev it needs to
+operate on (e.g. DAX mappings are only allowed on pmem based
+devices).
 
-With the above two change, it becomes very similar with the approach
-in this patch.
+Hence it is invalid to assume that sb->s_bdev points at the actual
+block device the data for any given regular file is stored on. It is
+also invalid to assume the characteristics of the device in
+sb->s_bdev are common for all files in the filesystem.
 
-IMO there are more advantages in grouping parameter explicitly:
+IOWs, the only way you can make something like this work via
+filesystem mapping infrastructure to translate file offset to
+to a {dev, dev_offset} tuple to tell you what persistently mapped
+device buffers you need to use for IO to the given file {offset,len}
+range that IO needs to be done on....
 
-1) avoid big chunk of memory for storing lots of unnecessary parameter
-if the big params data structure is extended, and we just store whatever
-the userspace cares.
+Cheers,
 
-2) easy to add new type by just implementing two callbacks(both optionally),
-and code is actually well organized, and each callback just focuses on the
-interested parameter type 
-
-3) parameter is easier to verify, since we know each parameter's length and type.
-With mask, we can only know if one parameter type exists in the big
-parameters data structure or not.
-
-
-Thanks,
-Ming
-
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
