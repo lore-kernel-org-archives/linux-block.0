@@ -2,160 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE8EC19F28
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 02:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0A4C04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 02:54:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236798AbiG1CfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 22:35:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33764 "EHLO
+        id S234905AbiG1CyR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 22:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbiG1CfR (ORCPT
+        with ESMTP id S234759AbiG1CyN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 22:35:17 -0400
-Received: from mail105.syd.optusnet.com.au (mail105.syd.optusnet.com.au [211.29.132.249])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1868D13E85;
-        Wed, 27 Jul 2022 19:35:15 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-20-138.pa.nsw.optusnet.com.au [49.195.20.138])
-        by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 25C0D10C8868;
-        Thu, 28 Jul 2022 12:35:13 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1oGtMl-0069Ji-VP; Thu, 28 Jul 2022 12:35:11 +1000
-Date:   Thu, 28 Jul 2022 12:35:11 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@fb.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, hch@lst.de
-Subject: Re: [PATCH 4/5] io_uring: add support for dma pre-mapping
-Message-ID: <20220728023511.GX3600936@dread.disaster.area>
-References: <20220726173814.2264573-1-kbusch@fb.com>
- <20220726173814.2264573-5-kbusch@fb.com>
- <YuB09cZh7rmd260c@ZenIV>
- <YuFEhQuFtyWcw7rL@kbusch-mbp.dhcp.thefacebook.com>
- <YuFGCO7M29fr3bVB@ZenIV>
- <YuFT+UYxd2QtDPe5@kbusch-mbp.dhcp.thefacebook.com>
- <20220727223232.GV3600936@dread.disaster.area>
- <YuHDeRImQPuuV2Mr@kbusch-mbp.dhcp.thefacebook.com>
+        Wed, 27 Jul 2022 22:54:13 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A47954C8B
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 19:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1658976852; x=1690512852;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=GSr/pP4m0bHkfNC+g6XCtP9uY3KjMFGPPT9S8YRebJE=;
+  b=mxuroZ5p5urrDs286L5dW8LIbsMtmmwsIcdnYffQ9QYDSZSrSYs3OA8C
+   xjmTSlShPETXqBm/9PS4FMTa/YB3HiU2RcKrJZaW2gdWIR5JUJPGJVyyc
+   tT0K4LIWy6+Lyzb8gXTq62fNSDEApSp80g82L9MHp86DKOygqt4RtlCgp
+   jgqiA6STA20Ssa9jyf6uUOu0c07Omrr1CO32cvoxijF79omsxvQkDuZOh
+   VV3UrqE9XTvyIxHsi8AiuqKYBaEsWil7l1Wu/2qj01G+J6GYn0ZfIHLTx
+   a76cvfr6CKMc8KA90svBR2mX2NjZn9XfcocN65bAFhAwqvR01cnVns/2J
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,196,1654531200"; 
+   d="scan'208";a="311432502"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jul 2022 10:54:10 +0800
+IronPort-SDR: nxDnf5gYt3dWRy3dBFCDdi5VUN0OXl/HQwi7K0kkhnUblERqIwUo8mUBL6TJedglXJnQM2J+M3
+ Y9qU1JEb37UGFINgSRC9FfAckL2x/QvmJof0I/g5SpZrgR3VxIwJRB/3cOoi1NmhMnMHgjjZv4
+ z0XXJJ04VhkmXUQAUagQuYEeP9lbdORD8FNX8ffkuj8Ppwb2du/7JpoeAThosXgXCxOFza3/ae
+ grXqFBSJtXH6tKFJ3aoMf2IaMJB80QQy3pC3XagMC76p1iVUcI0p5skVVo2Mi/uPBPr/s/HHuv
+ c26rtzgejxchnTQ2YWn/TYUf
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 19:10:17 -0700
+IronPort-SDR: kzOyMM470b4KG/rWtlDzMR7e1UoJWZEQ4rUo2MCs5jOk903Z3TZfCUEitt9C8jY4DVtmbyrMPN
+ SvAFOdh31GUefGaSR9j8R8UTpuzcoBf7jX13fYbS+Q/qtubLD9DZ+j1P4NVt7uJxOUII7aG5jr
+ pq3ik2L08oL5p4rCaN7M75pMinMC3PPgtd6diMtwtXAiI04lOfnsAR4i64Hy6+wZZUbtcgJ+MK
+ vuCle9SJgJxK9Ol2YM5lr/Jv/Ru6hctYFfaHFo1gfLFI+Y1FRANqdSidVAPvHdWdHy7/u21A0V
+ m1Q=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 19:54:10 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LtZww6ssKz1Rwry
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 19:54:08 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1658976847; x=1661568848; bh=GSr/pP4m0bHkfNC+g6XCtP9uY3KjMFGPPT9
+        S8YRebJE=; b=iAJOSVTr2atboaLSeqpeZri+S/tNSsrkHPx1mz1zbwzdF01DBQc
+        waKcUZcHGbMLRL7E+eKen1a9JeWBM6bjHtrG3dg5HctisEKSlnjiqRAId1IKriTN
+        pOMFX54PQK8efX+3ZmACMszslwuajReZ7M1uqN5PhD4B7mVC7ncMQ/y8toKmyLr4
+        WuqpZzz26skvJhJYEHjbULz/9J9HKVtQuP+MaQJxgHRyNFS5jwt6VNEMWezf/J4x
+        fa3zIwVODklXpd8x+hCvrqA+Rqnvbguz3uMb96IaKsIKym0eYPRrxEQOByu09FAq
+        9uvbgYTQuHr8xCxzy6GDpMlxJjOgso2Qk8g==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id VCmsgJueSMX6 for <linux-block@vger.kernel.org>;
+        Wed, 27 Jul 2022 19:54:07 -0700 (PDT)
+Received: from [10.225.163.14] (unknown [10.225.163.14])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LtZwr6MMlz1RtVk;
+        Wed, 27 Jul 2022 19:54:04 -0700 (PDT)
+Message-ID: <8e0c4a9f-de4a-d53e-efef-0b27017ec78d@opensource.wdc.com>
+Date:   Thu, 28 Jul 2022 11:54:03 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YuHDeRImQPuuV2Mr@kbusch-mbp.dhcp.thefacebook.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.4 cv=VuxAv86n c=1 sm=1 tr=0 ts=62e1f5e2
-        a=cxZHBGNDieHvTKNp/pucQQ==:117 a=cxZHBGNDieHvTKNp/pucQQ==:17
-        a=kj9zAlcOel0A:10 a=RgO8CyIxsXoA:10 a=7-415B0cAAAA:8
-        a=DxEnDgycP0rwEceSJA4A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v8 01/11] block: make bdev_nr_zones and disk_zone_no
+ generic for npo2 zsze
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de, axboe@kernel.dk,
+        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
+Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
+        linux-kernel@vger.kernel.org, hare@suse.de,
+        linux-block@vger.kernel.org, pankydev8@gmail.com,
+        bvanassche@acm.org, jaegeuk@kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>
+References: <20220727162245.209794-1-p.raghav@samsung.com>
+ <CGME20220727162247eucas1p203fc14aa17ecbcb3e6215d5304bb0c85@eucas1p2.samsung.com>
+ <20220727162245.209794-2-p.raghav@samsung.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220727162245.209794-2-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jul 27, 2022 at 05:00:09PM -0600, Keith Busch wrote:
-> On Thu, Jul 28, 2022 at 08:32:32AM +1000, Dave Chinner wrote:
-> > On Wed, Jul 27, 2022 at 09:04:25AM -0600, Keith Busch wrote:
-> > > On Wed, Jul 27, 2022 at 03:04:56PM +0100, Al Viro wrote:
-> > > > On Wed, Jul 27, 2022 at 07:58:29AM -0600, Keith Busch wrote:
-> > > > > On Wed, Jul 27, 2022 at 12:12:53AM +0100, Al Viro wrote:
-> > > > > > On Tue, Jul 26, 2022 at 10:38:13AM -0700, Keith Busch wrote:
-> > > > > > 
-> > > > > > > +	if (S_ISBLK(file_inode(file)->i_mode))
-> > > > > > > +		bdev = I_BDEV(file->f_mapping->host);
-> > > > > > > +	else if (S_ISREG(file_inode(file)->i_mode))
-> > > > > > > +		bdev = file->f_inode->i_sb->s_bdev;
-> > > > > > 
-> > > > > > *blink*
-> > > > > > 
-> > > > > > Just what's the intended use of the second case here?
-> > > > > 
-> > > > > ??
-> > > > > 
-> > > > > The use case is same as the first's: dma map the user addresses to the backing
-> > > > > storage. There's two cases here because getting the block_device for a regular
-> > > > > filesystem file is different than a raw block device.
-> > > > 
-> > > > Excuse me, but "file on some filesystem + block number on underlying device"
-> > > > makes no sense as an API...
-> > > 
-> > > Sorry if I'm misunderstanding your concern here.
-> > > 
-> > > The API is a file descriptor + index range of registered buffers (which is a
-> > > pre-existing io_uring API). The file descriptor can come from opening either a
-> > > raw block device (ex: /dev/nvme0n1), or any regular file on a mounted
-> > > filesystem using nvme as a backing store.
-> > 
-> > That's fundamentally flawed. Filesystems can have multiple block
-> > devices backing them that the VFS doesn't actually know about (e.g.
-> > btrfs, XFS, etc). Further, some of these filesystems can spread
-> > indiivdual file data across mutliple block devices i.e. the backing
-> > bdev changes as file offset changes....
-> > 
-> > Filesystems might not even have a block device (NFS, CIFS, etc) -
-> > what happens if you call this function on a file belonging to such a
-> > filesystem?
+On 7/28/22 01:22, Pankaj Raghav wrote:
+> Adapt bdev_nr_zones and disk_zone_no function so that it can
+
+s/function/functions
+s/it/they
+
+> also work for non-power-of-2 zone sizes.
 > 
-> The block_device driver has to opt-in to this feature. If a multi-device block
-> driver wants to opt-in to this, then it would be responsible to handle
-> translating that driver's specific cookie to whatever representation the
-> drivers it stacks atop require. Otherwise, the cookie threaded through the bio
-> is an opque value: nothing between io_uring and the block_device driver need to
-> decode it.
+> As the existing deployments of zoned devices had power-of-2
 
-I'm not talking about "multi-device" block devices like we build
-with DM or MD to present a single stacked block device to the
-filesystem. I'm talking about the fact that both btrfs and XFS
-support multiple *independent* block devices in the one filesystem.
+had power-of-2 assumption -> assume that a device zone size is a power of
+2 number of sectors
 
-i.e.:
+Existing deployments still exist, so do not use the past tense please.
 
-# mkfs.xfs -r rtdev=/dev/nvme0n1 -l logdev=/dev/nvme1n1,size=2000m /dev/nvme2n1
-meta-data=/dev/nvme2n1           isize=512    agcount=4, agsize=22893287 blks
-         =                       sectsz=512   attr=2, projid32bit=1
-         =                       crc=1        finobt=1, sparse=1, rmapbt=0
-         =                       reflink=0    bigtime=1 inobtcount=1 nrext64=0
-data     =                       bsize=4096   blocks=91573146, imaxpct=25
-         =                       sunit=0      swidth=0 blks
-naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
-log      =/dev/nvme1n1           bsize=4096   blocks=512000, version=2
-         =                       sectsz=512   sunit=0 blks, lazy-count=1
-realtime =/dev/nvme0n1           extsz=4096   blocks=91573146, rtextents=91573146
-#
+> assumption, power-of-2 optimized calculation is kept for those devices.
+> 
+> There are no direct hot paths modified and the changes just
+> introduce one new branch per call.
+> 
+> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Reviewed-by: Adam Manzanares <a.manzanares@samsung.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-zoned.c      | 13 +++++++++----
+>  include/linux/blkdev.h |  8 +++++++-
+>  2 files changed, 16 insertions(+), 5 deletions(-)
+> 
+> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> index a264621d4905..dce9c95b4bcd 100644
+> --- a/block/blk-zoned.c
+> +++ b/block/blk-zoned.c
+> @@ -111,17 +111,22 @@ EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
+>   * bdev_nr_zones - Get number of zones
+>   * @bdev:	Target device
+>   *
+> - * Return the total number of zones of a zoned block device.  For a block
+> - * device without zone capabilities, the number of zones is always 0.
+> + * Return the total number of zones of a zoned block device, including the
+> + * eventual small last zone if present. For a block device without zone
+> + * capabilities, the number of zones is always 0.
+>   */
+>  unsigned int bdev_nr_zones(struct block_device *bdev)
+>  {
+>  	sector_t zone_sectors = bdev_zone_sectors(bdev);
+> +	sector_t capacity = bdev_nr_sectors(bdev);
+>  
+>  	if (!bdev_is_zoned(bdev))
+>  		return 0;
+> -	return (bdev_nr_sectors(bdev) + zone_sectors - 1) >>
+> -		ilog2(zone_sectors);
+> +
+> +	if (is_power_of_2(zone_sectors))
+> +		return (capacity + zone_sectors - 1) >> ilog2(zone_sectors);
+> +
+> +	return DIV_ROUND_UP_SECTOR_T(capacity, zone_sectors);
+>  }
+>  EXPORT_SYMBOL_GPL(bdev_nr_zones);
+>  
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index dccdf1551c62..85b832908f28 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -673,9 +673,15 @@ static inline unsigned int disk_nr_zones(struct gendisk *disk)
+>  
+>  static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
+>  {
+> +	sector_t zone_sectors = disk->queue->limits.chunk_sectors;
+> +
+>  	if (!blk_queue_is_zoned(disk->queue))
+>  		return 0;
+> -	return sector >> ilog2(disk->queue->limits.chunk_sectors);
+> +
+> +	if (is_power_of_2(zone_sectors))
+> +		return sector >> ilog2(zone_sectors);
+> +
+> +	return div64_u64(sector, zone_sectors);
+>  }
+>  
+>  static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
 
-This builds an XFS filesystem which can write file data to either
-/dev/nvme0n1 or /dev/nvme2n1, and journal IO will get sent to a
-third block dev (/dev/nvme1n1).
 
-So, which block device do we map for the DMA buffers that contain
-the file data for any given file in that filesystem? There is no
-guarantee that is is sb->s_bdev, because it only points at one of
-the two block devices that can contain file data.
-
-Btrfs is similar, but it might stripe data across /dev/nvme0n1,
-/dev/nvme1n1 and /dev/nvme2n1 for a single file writes (and hence
-reads) and so needs separate DMA mappings for each block device just
-to do IO direct to/from one file....
-
-Indeed, for XFS there's no requirement that the block devices have
-the same capabilities or even storage types - the rtdev could be
-spinning disks, the logdev an nvme SSD, and the datadev is pmem. If
-XFs has to do something special, it queries the bdev it needs to
-operate on (e.g. DAX mappings are only allowed on pmem based
-devices).
-
-Hence it is invalid to assume that sb->s_bdev points at the actual
-block device the data for any given regular file is stored on. It is
-also invalid to assume the characteristics of the device in
-sb->s_bdev are common for all files in the filesystem.
-
-IOWs, the only way you can make something like this work via
-filesystem mapping infrastructure to translate file offset to
-to a {dev, dev_offset} tuple to tell you what persistently mapped
-device buffers you need to use for IO to the given file {offset,len}
-range that IO needs to be done on....
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Damien Le Moal
+Western Digital Research
