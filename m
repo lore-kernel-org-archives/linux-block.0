@@ -2,125 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D705C3F6B0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 13:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 411AAC04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 13:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234101AbiG1NZq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 09:25:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34130 "EHLO
+        id S230047AbiG1N3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 09:29:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238051AbiG1NZp (ORCPT
+        with ESMTP id S229692AbiG1N3O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 09:25:45 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49A8039B92;
-        Thu, 28 Jul 2022 06:25:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CD239B80171;
-        Thu, 28 Jul 2022 13:25:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C213AC433D6;
-        Thu, 28 Jul 2022 13:25:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659014741;
-        bh=SIh451UOcr5P1ZCc5zO+DXTL5bn6jrzBhDakMU5uaXk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=d4fyPdHKmYH+9jSIi/OFSrp+usiba4BARaXzUEdw/Vg6F51YzPcr+GlXTj4J428uW
-         Vc5AdT3NPuKTnbs+tcvGw4jKh4x1G/qNx0ZXk4D+R2fFiKD9jV6x58uUZuZw0UgDtp
-         r9Ne4++h5myKt/d2wpYAhv/ulTKK6MZrgvBF88siYvLycPng7h8vf33oTTUltOd6dT
-         fXu19t8l4X6Ngn07OLOq1EEL0ZEXlM3YVFhHkGtwo/Zzw6rjyyjWqiRImgEaZDrqxy
-         mVm1vZYYi+JjZVBGHYvIFKaSFYBNt5p6TObsbNCMRFowbSqK5EOEAJAgI2qlSDAo4v
-         6OgN3S6YuuVVw==
-Date:   Thu, 28 Jul 2022 07:25:38 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Keith Busch <kbusch@fb.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, hch@lst.de
-Subject: Re: [PATCH 4/5] io_uring: add support for dma pre-mapping
-Message-ID: <YuKOUh6MJGGFuIm/@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220726173814.2264573-1-kbusch@fb.com>
- <20220726173814.2264573-5-kbusch@fb.com>
- <YuB09cZh7rmd260c@ZenIV>
- <YuFEhQuFtyWcw7rL@kbusch-mbp.dhcp.thefacebook.com>
- <YuFGCO7M29fr3bVB@ZenIV>
- <YuFT+UYxd2QtDPe5@kbusch-mbp.dhcp.thefacebook.com>
- <20220727223232.GV3600936@dread.disaster.area>
- <YuHDeRImQPuuV2Mr@kbusch-mbp.dhcp.thefacebook.com>
- <20220728023511.GX3600936@dread.disaster.area>
+        Thu, 28 Jul 2022 09:29:14 -0400
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1214D5A89B;
+        Thu, 28 Jul 2022 06:29:13 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id o3so1810616ple.5;
+        Thu, 28 Jul 2022 06:29:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=KVAZ1OoYcDPkaYDmhjB+rFFypTllysidvXvCw8//pAg=;
+        b=TIO/Lk8cyxCJ9TzKrfNogBZ8UM7NZILH2WWqNUi1aAKvL6c36ixeCiA4hPXgZMOVRu
+         H4BG6kAcbEksGZ4vrx4BARR8yEr1DMKfGOJwnD/vgQqvbOi6AvAOCDSamUrXyqx+2jRE
+         HBDIcT/Rl5Gdg/XNyHrim7SMFaKV8wxIRoZXclyOhxr+pgt1ZmBr5eKDKdoIN/fSxUG8
+         2ZOLKMO4N2z9bCBWlIug1/vD8HMqBNzrtveSTPwNBpKhG3304gssAEzNuWuPIeO0+xKC
+         pQYivV00Gh77WotBdhSea5g+g4R3MLwAmettACMSiWKAfy4gMv8uaGQbHJVCJyVAqb6B
+         DHOw==
+X-Gm-Message-State: AJIora81ynit4j4fCXxez8iHrrkzcvrhnpHqMQ6w4OxTMmnb3y/VpAlS
+        Vs4uHCqfUSEHJjeVBy0Hf+w=
+X-Google-Smtp-Source: AGRyM1sVlJ4VxZdri5AJaXpK+abw9sqfSjFByJuWKJUf33Qsr5XtcruBoEo93wrUA8fG42N8cHOiXg==
+X-Received: by 2002:a17:902:70c4:b0:16c:5306:9172 with SMTP id l4-20020a17090270c400b0016c53069172mr26736583plt.171.1659014952312;
+        Thu, 28 Jul 2022 06:29:12 -0700 (PDT)
+Received: from [192.168.3.217] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id h1-20020aa796c1000000b0052b66304d54sm742466pfq.74.2022.07.28.06.29.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jul 2022 06:29:11 -0700 (PDT)
+Message-ID: <514f85ce-84fc-1186-7169-a29d7118e8cc@acm.org>
+Date:   Thu, 28 Jul 2022 06:29:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220728023511.GX3600936@dread.disaster.area>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v8 02/11] block: allow blk-zoned devices to have
+ non-power-of-2 zone size
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>,
+        damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
+        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
+Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
+        linux-kernel@vger.kernel.org, hare@suse.de,
+        linux-block@vger.kernel.org, pankydev8@gmail.com,
+        jaegeuk@kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+References: <20220727162245.209794-1-p.raghav@samsung.com>
+ <CGME20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9@eucas1p2.samsung.com>
+ <20220727162245.209794-3-p.raghav@samsung.com>
+ <7984b969-9025-6b31-2645-da08daeefafb@acm.org>
+ <eed7d9ee-fd7f-e57c-598e-909dbb0d2380@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <eed7d9ee-fd7f-e57c-598e-909dbb0d2380@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 28, 2022 at 12:35:11PM +1000, Dave Chinner wrote:
-> On Wed, Jul 27, 2022 at 05:00:09PM -0600, Keith Busch wrote:
-> > The block_device driver has to opt-in to this feature. If a multi-device block
-> > driver wants to opt-in to this, then it would be responsible to handle
-> > translating that driver's specific cookie to whatever representation the
-> > drivers it stacks atop require. Otherwise, the cookie threaded through the bio
-> > is an opque value: nothing between io_uring and the block_device driver need to
-> > decode it.
+On 7/28/22 05:11, Pankaj Raghav wrote:
+> On 2022-07-28 01:16, Bart Van Assche wrote:
+>> The bdev_is_zone_start() name seems more clear to me than
+>> bdev_is_zone_aligned(). Has there already been a discussion about which
+>> name to use for this function?
+>>
+> The reason I did s/bdev_is_zone_start/bdev_is_zone_aligned is that this
+> name makes more sense for also checking if a given size is a multiple of
+> zone sectors for e.g., used in PATCH 9:
 > 
-> I'm not talking about "multi-device" block devices like we build
-> with DM or MD to present a single stacked block device to the
-> filesystem. I'm talking about the fact that both btrfs and XFS
-> support multiple *independent* block devices in the one filesystem.
+> -		if (len & (zone_sectors - 1)) {
+> +		if (!bdev_is_zone_aligned(bdev, len)) {
 > 
-> i.e.:
+> I felt `bdev_is_zone_aligned` fits the use case of checking if the
+> sector starts at the start of a zone and also check if a given length of
+> sectors also align with the zone sectors. bdev_is_zone_start does not
+> make the intention clear for the latter use case IMO.
 > 
-> # mkfs.xfs -r rtdev=/dev/nvme0n1 -l logdev=/dev/nvme1n1,size=2000m /dev/nvme2n1
-> meta-data=/dev/nvme2n1           isize=512    agcount=4, agsize=22893287 blks
->          =                       sectsz=512   attr=2, projid32bit=1
->          =                       crc=1        finobt=1, sparse=1, rmapbt=0
->          =                       reflink=0    bigtime=1 inobtcount=1 nrext64=0
-> data     =                       bsize=4096   blocks=91573146, imaxpct=25
->          =                       sunit=0      swidth=0 blks
-> naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
-> log      =/dev/nvme1n1           bsize=4096   blocks=512000, version=2
->          =                       sectsz=512   sunit=0 blks, lazy-count=1
-> realtime =/dev/nvme0n1           extsz=4096   blocks=91573146, rtextents=91573146
-> #
-> 
-> This builds an XFS filesystem which can write file data to either
-> /dev/nvme0n1 or /dev/nvme2n1, and journal IO will get sent to a
-> third block dev (/dev/nvme1n1).
-> 
-> So, which block device do we map for the DMA buffers that contain
-> the file data for any given file in that filesystem? There is no
-> guarantee that is is sb->s_bdev, because it only points at one of
-> the two block devices that can contain file data.
-> 
-> Btrfs is similar, but it might stripe data across /dev/nvme0n1,
-> /dev/nvme1n1 and /dev/nvme2n1 for a single file writes (and hence
-> reads) and so needs separate DMA mappings for each block device just
-> to do IO direct to/from one file....
-> 
-> Indeed, for XFS there's no requirement that the block devices have
-> the same capabilities or even storage types - the rtdev could be
-> spinning disks, the logdev an nvme SSD, and the datadev is pmem. If
-> XFs has to do something special, it queries the bdev it needs to
-> operate on (e.g. DAX mappings are only allowed on pmem based
-> devices).
-> 
-> Hence it is invalid to assume that sb->s_bdev points at the actual
-> block device the data for any given regular file is stored on. It is
-> also invalid to assume the characteristics of the device in
-> sb->s_bdev are common for all files in the filesystem.
-> 
-> IOWs, the only way you can make something like this work via
-> filesystem mapping infrastructure to translate file offset to
-> to a {dev, dev_offset} tuple to tell you what persistently mapped
-> device buffers you need to use for IO to the given file {offset,len}
-> range that IO needs to be done on....
+> But I am fine with going back to bdev_is_zone_start if you and Damien
+> feel strongly otherwise.
+The "zone start LBA" terminology occurs in ZBC-1, ZBC-2 and ZNS but 
+"zone aligned" not. I prefer "zone start" because it is clear, 
+unambiguous and because it has the same meaning as in the corresponding 
+standards documents. I propose to proceed as follows for checking 
+whether a number of LBAs is a multiple of the zone length:
+* Either use bdev_is_zone_start() directly.
+* Or introduce a synonym for bdev_is_zone_start() with an appropriate 
+name, e.g. bdev_is_zone_len_multiple().
 
-Thank you for the explanation. I understand now, sorry for my previous
-misunderstanding.
+Thanks,
 
-I may consider just initially supporting direct raw block devices if I can't
-find a viable solution quick enough.
+Bart.
