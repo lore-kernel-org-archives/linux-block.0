@@ -2,95 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6561C04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 13:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8424FC04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 14:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbiG1NaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 09:30:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36778 "EHLO
+        id S231310AbiG1OOx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 10:14:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbiG1NaV (ORCPT
+        with ESMTP id S231247AbiG1OOr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 09:30:21 -0400
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B3F1EAEC;
-        Thu, 28 Jul 2022 06:30:19 -0700 (PDT)
-Received: by mail-pf1-f177.google.com with SMTP id c3so1913908pfb.13;
-        Thu, 28 Jul 2022 06:30:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=RdplHWE21v7uW0csMEy8w+746Uk8pAL1Z4Zo/u66MRc=;
-        b=iPYRA0sQxRtHZ8dg4SXVqqJI/tiCu+BUxBEAjQXBblo0ze8KW5zjIW0+6zlfVTsego
-         STQdaHV7gbfVE17hcnruDgIK+cK32gzCpdE1myLmUC+jZ6vhaxpm7Dv4uP0/vNC0M9YJ
-         GukXwdGcIB2WbbMw1hJngWOFm0z/2Nlsg3RmJwJj8rrkDzIfMspQ8T9stbBs+Ue41vkf
-         f0/66rCSnlSEtt6uXNXuUdJGjXCLb7KJeSzkRGEXLEY0SKGtbqifqn6/RcuI70qGWcn1
-         /LKEkXg0IRHkk/KcGQQ9G/dmFbGqAn75fRAvTUTbmHq8wvtJODo4mT3mVbLZYwqjzx8h
-         OnxA==
-X-Gm-Message-State: AJIora/nHjGFSngHmrjVG8ghMDn2Vedcl4OXFb7aO3/jq+sXqLTYJSRU
-        PR3b+38qqJrbc3qHKOLW+L4=
-X-Google-Smtp-Source: AGRyM1sEeS4b6mgBviJJaeM6ot/oR6bsjRTH3rUY3cbgsPHiPvABhB/Is7CL9HzuiOI0PM2NkdpFeg==
-X-Received: by 2002:a63:1a56:0:b0:41b:3ef0:4eb1 with SMTP id a22-20020a631a56000000b0041b3ef04eb1mr8174445pgm.207.1659015019399;
-        Thu, 28 Jul 2022 06:30:19 -0700 (PDT)
-Received: from [192.168.3.217] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id b2-20020a170903228200b0016a7d9e6548sm1273348plh.262.2022.07.28.06.30.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Jul 2022 06:30:18 -0700 (PDT)
-Message-ID: <6ac6c0b3-ca3a-27da-0b8f-b4c39671bdab@acm.org>
-Date:   Thu, 28 Jul 2022 06:30:16 -0700
+        Thu, 28 Jul 2022 10:14:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8327222AD
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 07:14:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659017683;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MfLj6nimkQcdqEYY3XHx3f7brs8Urjc0+jJKTY+iX/g=;
+        b=UjVNoPmK56y1y/2P97OyRKk0ShHPwYiyNCVhAifkX+Hh8QSWUzBdubFlG1Yg6+T6gBT+Jt
+        dVQZQS9E+EGFuCZH4TO0ykgyvuoD/yjgfM+00H84SfIsS6WNuBqE+xH5q1DGYpwO6IoMMb
+        KiyyDzbArNm0SjvoAjKyhlvGqlQauKg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-142-30jeiqZvOdaxRnVUfDgtgA-1; Thu, 28 Jul 2022 10:14:40 -0400
+X-MC-Unique: 30jeiqZvOdaxRnVUfDgtgA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF8251C08971;
+        Thu, 28 Jul 2022 14:14:39 +0000 (UTC)
+Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 84DDD2166B29;
+        Thu, 28 Jul 2022 14:14:35 +0000 (UTC)
+Date:   Thu, 28 Jul 2022 22:14:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        xiaoguang.wang@linux.alibaba.com
+Subject: Re: [PATCH V4 2/2] ublk_drv: add support for UBLK_IO_NEED_GET_DATA
+Message-ID: <YuKZxpDNhzsKSXB+@T590>
+References: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
+ <3a21007ea1be8304246e654cebbd581ab0012623.1659011443.git.ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v8 00/11] support non power of 2 zoned device
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>,
-        damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
-        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
-Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        linux-block@vger.kernel.org, pankydev8@gmail.com,
-        jaegeuk@kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org
-References: <CGME20220727162246eucas1p1a758799f13d36ba99d30bf92cc5e2754@eucas1p1.samsung.com>
- <20220727162245.209794-1-p.raghav@samsung.com>
- <51255650-ddc2-4f3d-52e5-14007b9ff538@acm.org>
- <e0606903-c007-43f1-538f-b70ee607be0a@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <e0606903-c007-43f1-538f-b70ee607be0a@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a21007ea1be8304246e654cebbd581ab0012623.1659011443.git.ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/28/22 04:57, Pankaj Raghav wrote:
-> Hi Bart,
+On Thu, Jul 28, 2022 at 08:39:16PM +0800, ZiyangZhang wrote:
+> UBLK_IO_NEED_GET_DATA is one ublk IO command. It is designed for a user
+> application who wants to allocate IO buffer and set IO buffer address
+> only after it receives an IO request from ublksrv. This is a reasonable
+> scenario because these users may use a RPC framework as one IO backend
+> to handle IO requests passed from ublksrv. And a RPC framework may
+> allocate its own buffer(or memory pool).
 > 
-> On 2022-07-28 01:19, Bart Van Assche wrote:
->> On 7/27/22 09:22, Pankaj Raghav wrote:
->>> This series adds support to npo2 zoned devices in the block and nvme
->>> layer and a new **dm target** is added: dm-po2z-target. This new
->>> target will be initially used for filesystems such as btrfs and
->>> f2fs that does not have native npo2 zone support.
->>
->> Should any SCSI changes be included in this patch series? From sd_zbc.c:
->>
->>      if (!is_power_of_2(zone_blocks)) {
->>          sd_printk(KERN_ERR, sdkp,
->>                "Zone size %llu is not a power of two.\n",
->>                zone_blocks);
->>          return -EINVAL;
->>      }
->>
-> I would keep these changes out of the current patch series because it
-> will also increase the test scope. I think once the block layer
-> constraint is removed as a part of this series, we can work on the SCSI
-> changes in the next cycle.
+> This new feature (UBLK_F_NEED_GET_DATA) is optional for ublk users.
+> Related userspace code has been added in ublksrv[1] as one pull request.
+> 
+> Test cases for this feature are added in ublksrv and all the tests pass.
+> The performance result shows that this new feature does bring additional
+> latency because one IO is issued back to ublk_drv once again to copy data
+> from bio vectors to user-provided data buffer. UBLK_IO_NEED_GET_DATA is
+> suitable for bigger block size such as 512B or 1MB.
+> 
+> [1] https://github.com/ming1/ubdsrv
+> 
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 
-That's fine with me.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
 
 Thanks,
+Ming
 
-Bart.
