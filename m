@@ -2,251 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76483C19F29
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 12:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D677C04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 12:39:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238366AbiG1MZE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 08:25:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33488 "EHLO
+        id S238788AbiG1Mjo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 08:39:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238367AbiG1MZC (ORCPT
+        with ESMTP id S238111AbiG1Mjo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 08:25:02 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E706D2C4
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 05:25:01 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220728122458euoutp027328544b19732e8536fc860511920fd7~F-c3zMh8L0232002320euoutp02g
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 12:24:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220728122458euoutp027328544b19732e8536fc860511920fd7~F-c3zMh8L0232002320euoutp02g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1659011098;
-        bh=g0vMwBQ5DlDPVBGww017YlLtDSeGsxi+kmLcc7euZTI=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=Y1KyDvGrPXYfyK6XC/M4x/JkwIhu4aXUyQHYtZUWXm8d/Zecf5vj3d7ZmDOMFmhHS
-         B3rfiFXKxHGpQ/nzxj5GGdkkc4fY7ZR09vIuy3d0qgvpFDlp7YZc+6fwTJSjOSaGSO
-         7o25aYDR9VoWJAHmTdWl1W4gVLtDoudAGTZghaGE=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220728122458eucas1p2f6a3dc82c8874299cf12738d9323f961~F-c3fPVm81954419544eucas1p2e;
-        Thu, 28 Jul 2022 12:24:58 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 6C.41.09664.A1082E26; Thu, 28
-        Jul 2022 13:24:58 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220728122457eucas1p29f23e1181e0083319bf787dcbd10d36d~F-c3A2Q3O1768117681eucas1p2K;
-        Thu, 28 Jul 2022 12:24:57 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220728122457eusmtrp2effe5a2c79b67ca0f811eea703074aba~F-c2-2PWw0151001510eusmtrp2L;
-        Thu, 28 Jul 2022 12:24:57 +0000 (GMT)
-X-AuditID: cbfec7f2-d97ff700000025c0-8e-62e2801ae01f
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id DE.F6.09095.91082E26; Thu, 28
-        Jul 2022 13:24:57 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220728122457eusmtip208fb9038b74b0c501bf5a1b6918fc63c~F-c20eKYb3102831028eusmtip2h;
-        Thu, 28 Jul 2022 12:24:57 +0000 (GMT)
-Received: from [106.110.32.100] (106.110.32.100) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Thu, 28 Jul 2022 13:24:56 +0100
-Message-ID: <9eed99b8-7e35-841c-5ec1-97b7107f328f@samsung.com>
-Date:   Thu, 28 Jul 2022 14:24:56 +0200
+        Thu, 28 Jul 2022 08:39:44 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC3A6BD40
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 05:39:41 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R891e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VKfiKOB_1659011970;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VKfiKOB_1659011970)
+          by smtp.aliyun-inc.com;
+          Thu, 28 Jul 2022 20:39:39 +0800
+From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+To:     axboe@kernel.dk, ming.lei@redhat.com
+Cc:     ZiyangZhang@linux.alibaba.com, linux-block@vger.kernel.org,
+        xiaoguang.wang@linux.alibaba.com
+Subject: [PATCH V4 0/2] ublk: add support for UBLK_IO_NEED_GET_DATA
+Date:   Thu, 28 Jul 2022 20:39:14 +0800
+Message-Id: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-Subject: Re: [PATCH v8 02/11] block: allow blk-zoned devices to have
- non-power-of-2 zone size
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
-        <axboe@kernel.dk>, <snitzer@kernel.org>,
-        <Johannes.Thumshirn@wdc.com>
-CC:     <matias.bjorling@wdc.com>, <gost.dev@samsung.com>,
-        <linux-kernel@vger.kernel.org>, <hare@suse.de>,
-        <linux-block@vger.kernel.org>, <pankydev8@gmail.com>,
-        <bvanassche@acm.org>, <jaegeuk@kernel.org>, <dm-devel@redhat.com>,
-        <linux-nvme@lists.infradead.org>,
-        Luis Chamberlain <mcgrof@kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <e9663c20-65d5-48f5-3fe1-e3a8f5ab3214@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.110.32.100]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLKsWRmVeSWpSXmKPExsWy7djPc7pSDY+SDPY8FbFYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFnkWTmCxWrj7KZPFk/Sxmi79d95gs9t7Stri8aw6bxfxlT9ktJrR9Zba4
-        MeEpo8Wam09ZLE7cknbg97h8xdtj56y77B6Xz5Z6bFrVyeaxeUm9x+6bDWweO1vvs3q833cV
-        KHS62uPzJjmP9gPdTAHcUVw2Kak5mWWpRfp2CVwZJ6+sYi6YpVDx+uQXpgbGN5JdjJwcEgIm
-        Egvaetm6GLk4hARWMEosufqEHcL5wiixae1hVgjnM6PEhZcnGWFa9l2dywZiCwksZ5T48ywD
-        wgYq2vtfE6JhN6PEqe1LmEASvAJ2Erv3fWfuYuTgYBFQlVj1Ng4iLChxcuYTFhBbVCBSYs3u
-        s+wgtrBAvMSP44vA5jMLiEvcejIfbIyIQA+jxN/djCDzmQXWMUm0Hr3OBjKTTUBLorGTHcTk
-        FHCTOLeNFaJVU6J1+292CFteYvvbOcwQ5ytJTJh3nw3CrpVYe+wM2MMSAvc4JVY2PIRKuEg0
-        zvnKBGELS7w6voUdwpaR+L9zPlS8WuLpjd/MEM0tjBL9O9eD3SMhYC3RdyYHosZRYsHr54wQ
-        YT6JG28FIe7hk5i0bTrzBEbVWUghMQvJx7OQvDALyQsLGFlWMYqnlhbnpqcWG+allusVJ+YW
-        l+al6yXn525iBKbA0/+Of9rBOPfVR71DjEwcjIcYJTiYlUR4E6LvJwnxpiRWVqUW5ccXleak
-        Fh9ilOZgURLnTc7ckCgkkJ5YkpqdmlqQWgSTZeLglGpg0vKb8lt8Sf1t8aPbq/M3XDjVf8FA
-        LCHzd76nTbZW8wXRn76z61/Eaz96LDKj/eRCa419L4vFnesibj5q6nwXuFXBzKvCKOBAMZdV
-        S+Dr3MKSq8GhDnlHb/FaJh2a0up9Y+Mtiasbz/ELtR08n9r/UHSukU2jJ1fHRLl/T65Vlkh9
-        P7jvs3FC7dF3WR8kKoSnvKi7KP/eKz91ov2i92d/rpOcHs3xbrqrWtXnbx2NKgUtebPeXaxd
-        HdCxO+Gh3LzTPA1ncu4ZeG3Zrz+1amqV1a/tDg7nuczk7u1Vfy/IE7tlTS+j/jb1Kd8jvrY9
-        YfESL3UW3u0cwaBy9YvG1LPMhn12Ls18FxYKZWyo3BCnxFKckWioxVxUnAgASqZ/z/ADAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprMKsWRmVeSWpSXmKPExsVy+t/xe7qSDY+SDNrXG1isvtvPZjHtw09m
-        i99nzzNb7H03m9Viz6JJTBYrVx9lsniyfhazxd+ue0wWe29pW1zeNYfNYv6yp+wWE9q+Mlvc
-        mPCU0WLNzacsFiduSTvwe1y+4u2xc9Zddo/LZ0s9Nq3qZPPYvKTeY/fNBjaPna33WT3e77sK
-        FDpd7fF5k5xH+4FupgDuKD2bovzSklSFjPziElulaEMLIz1DSws9IxNLPUNj81grI1MlfTub
-        lNSczLLUIn27BL2Mk1dWMRfMUqh4ffILUwPjG8kuRk4OCQETiX1X57J1MXJxCAksZZR41fmG
-        ESIhI/Hpykd2CFtY4s+1Lqiij4wSH++eYoZwdjNK3Dn0igmkilfATmL3vu9ACQ4OFgFViVVv
-        4yDCghInZz5hAbFFBSIlHi5rAisXFoiX+HF8ERuIzSwgLnHryXywuIhAD6PE392MIPOZBdYx
-        SbQevQ5WJCTwm1Hixl8bkPlsAloSjZ3sICangJvEuW2sEGM0JVq3/2aHsOUltr+dwwxxv5LE
-        hHn32SDsWolX93czTmAUnYXkullIrpiFZNQsJKMWMLKsYhRJLS3OTc8tNtQrTswtLs1L10vO
-        z93ECEwd24793LyDcd6rj3qHGJk4GA8xSnAwK4nwJkTfTxLiTUmsrEotyo8vKs1JLT7EaAoM
-        oYnMUqLJ+cDklVcSb2hmYGpoYmZpYGppZqwkzutZ0JEoJJCeWJKanZpakFoE08fEwSnVwGTj
-        Vr3nVcDmZ3FPMstymM4kzrpaJtmwSWXxypzSOobkY0L/lt1Z/+3ejMOPnF5wGOXdu7g3aMmX
-        l/k5LDl3AtU9NKabhXySuDHfQrxFuHz3/T9O/Af7Iha1rsg8sYtdzVV499t7+0+5ZygHi+8o
-        mN+/9VvsvG/tkdyFB3d9uyfQeb1YgDXFxvHF2lu5fSG2le8s+SP61TdoiDw6VWUzq/bXCqXn
-        TLs40g5leaxp9/p5I4Uz2nRC0M6pphuMtbXyvZin691mDK29elLU+/zmqNSrBU2K5lwtm68I
-        XGeXqUja2y+ru+T106YvbGu+eLRUcgcLPjJq8XjxUu7usqX657JCD7MH7nqernNa/fDsaUos
-        xRmJhlrMRcWJAHz0XuCmAwAA
-X-CMS-MailID: 20220728122457eucas1p29f23e1181e0083319bf787dcbd10d36d
-X-Msg-Generator: CA
-X-RootMTR: 20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9
-References: <20220727162245.209794-1-p.raghav@samsung.com>
-        <CGME20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9@eucas1p2.samsung.com>
-        <20220727162245.209794-3-p.raghav@samsung.com>
-        <e9663c20-65d5-48f5-3fe1-e3a8f5ab3214@opensource.wdc.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-07-28 05:07, Damien Le Moal wrote:
-> On 7/28/22 01:22, Pankaj Raghav wrote:
->> Checking if a given sector is aligned to a zone is a common
->> operation that is performed for zoned devices. Add
->> bdev_is_zone_start helper to check for this instead of opencoding it
-> 
-> The patch actually introduces bdev_is_zone_aligned(). I agree with Bart
-> that bdev_is_zone_start() is a better name.
-I have posted my rationale behind this change in my reply to Bart. Let
-me know what you think.
->
+1. Introduction:
+UBLK_IO_NEED_GET_DATA is a new ublk IO command. It is designed for a user
+application who wants to allocate IO buffer and set IO buffer address
+only after it receives an IO request from ublksrv. This is a reasonable
+scenario because these users may use a RPC framework as one IO backend
+to handle IO requests passed from ublksrv. And a RPC framework may
+allocate its own buffer(or memory pool).
 
-<snip>
->>  		args->zone_sectors = zone->len;
->> -		args->nr_zones = (capacity + zone->len - 1) >> ilog2(zone->len);
->> +		args->nr_zones = div64_u64(capacity + zone->len - 1, zone->len);
-> 
-> 		args->nr_zones = disk_zone_no(disk, capacity);
-> 
-We are doing a round up with a division here mainly to take into account
-the last unequal zone if present. disk_zone_no does just a division so
-it won't account for the unequal last zone.
+This new feature (UBLK_F_NEED_GET_DATA) is optional for ublk users.
+Related userspace code has been added in ublksrv[1] as one pull request.
 
->>  	} else if (zone->start + args->zone_sectors < capacity) {
->>  		if (zone->len != args->zone_sectors) {
->>  			pr_warn("%s: Invalid zoned device with non constant zone size\n",
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 85b832908f28..1be805223026 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -634,6 +634,11 @@ static inline bool queue_is_mq(struct request_queue *q)
->>  	return q->mq_ops;
->>  }
->>  
->> +static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
->> +{
->> +	return bdev->bd_queue;	/* this is never NULL */
->> +}
->> +
->>  #ifdef CONFIG_PM
->>  static inline enum rpm_status queue_rpm_status(struct request_queue *q)
->>  {
->> @@ -665,6 +670,25 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
->>  	}
->>  }
->>  
->> +static inline bool bdev_is_zoned(struct block_device *bdev)
->> +{
->> +	struct request_queue *q = bdev_get_queue(bdev);
->> +
->> +	if (q)
->> +		return blk_queue_is_zoned(q);
->> +
->> +	return false;
->> +}
->> +
->> +static inline sector_t bdev_zone_sectors(struct block_device *bdev)
->> +{
->> +	struct request_queue *q = bdev_get_queue(bdev);
->> +
->> +	if (!blk_queue_is_zoned(q))
->> +		return 0;
->> +	return q->limits.chunk_sectors;
->> +}
->> +
->>  #ifdef CONFIG_BLK_DEV_ZONED
->>  static inline unsigned int disk_nr_zones(struct gendisk *disk)
->>  {
->> @@ -684,6 +708,30 @@ static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
->>  	return div64_u64(sector, zone_sectors);
->>  }
->>  
->> +static inline sector_t bdev_offset_from_zone_start(struct block_device *bdev,
->> +						   sector_t sec)
->> +{
->> +	sector_t zone_sectors = bdev_zone_sectors(bdev);
->> +	u64 remainder = 0;
->> +
->> +	if (!bdev_is_zoned(bdev))
->> +		return 0;
->> +
->> +	if (is_power_of_2(zone_sectors))
->> +		return sec & (zone_sectors - 1);
->> +
->> +	div64_u64_rem(sec, zone_sectors, &remainder);
->> +	return remainder;
->> +}
->> +
->> +static inline bool bdev_is_zone_aligned(struct block_device *bdev, sector_t sec)
->> +{
->> +	if (!bdev_is_zoned(bdev))
->> +		return false;
-> 
-> This is checked in bdev_offset_from_zone_start(). No need to add it again
-> here.
-> 
-bdev_offset_from_zone_start returns 0 if the device is not zoned, and
-the below check will then return `true`. That is why I explicitly return
-a false if the device is not zoned.
->> +
->> +	return bdev_offset_from_zone_start(bdev, sec) == 0;
->> +}
->> +
->>  static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
->>  {
->>  	if (!blk_queue_is_zoned(disk->queue))
->> @@ -728,6 +776,18 @@ static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
->>  {
->>  	return 0;
->>  }
->> +
->> +static inline sector_t bdev_offset_from_zone_start(struct block_device *bdev,
->> +						   sector_t sec)
->> +{
->> +	return 0;
->> +}
-> 
-> This one is not used when CONFIG_BLK_DEV_ZONED is not set. No need to
-> define it.
-> 
-Ok. I will remove it if it is not required.
->> +
->> +static inline bool bdev_is_zone_aligned(struct block_device *bdev, sector_t sec)
->> +{
+We have add some test cases in ublksrv and all of them pass. The
+performance result shows that this new feature does bring additional
+latency because one IO is issued back to ublk_drv once again to copy data
+from bio vectors to user-provided data buffer.
 
-> 
+2. Background:
+For now, ublk requires the user to set IO buffer address in advance(with
+last UBLK_IO_COMMIT_AND_FETCH_REQ command)so the user has to
+pre-allocate IO buffer.
+
+For READ requests, this work flow looks good because the data copy
+happens after user application gets a cqe and the kernel copies data.
+So user application can allocate IO buffer, copy data to be read into
+it, and issues a sqe with the newly allocated IO buffer.
+
+However, for WRITE requests, this work flow looks weird because
+the data copy happens in a task_work before the user application gets one
+cqe. So it is inconvenient for users who allocates(or fetch from a
+memory pool)buffer after it gets one request(and know the actual data
+size). For these users, they have to memcpy from ublksrv's pre-allocated
+buffer to their internal buffer(such as RPC buffer). We think this
+additional memcpy could be a bottleneck and it is avoidable.
+
+2. Design:
+Consider add a new feature flag: UBLK_F_NEED_GET_DATA.
+
+If user sets this new flag(through libublksrv) and pass it to kernel
+driver, ublk kernel driver should returns a cqe with
+UBLK_IO_RES_NEED_GET_DATA after a new blk-mq WRITE request comes.
+
+A user application now can allocate data buffer for writing and pass its
+address in UBLK_IO_NEED_GET_DATA command after ublk kernel driver returns
+cqe with UBLK_IO_RES_NEED_GET_DATA.
+
+After the kernel side gets the sqe (UBLK_IO_NEED_GET_DATA command), it
+now copies(address pinned, indeed) data to be written from bio vectors
+to newly returned IO data buffer.
+
+Finally, the kernel side returns UBLK_IO_RES_OK and ublksrv handles the
+IO request as usual.The new feature: UBLK_F_NEED_GET_DATA is enabled on
+demand ublksrv still can pre-allocate data buffers with task_work.
+
+3. Evaluation:
+Related userspace code and tests have been added in ublksrv[1] as one
+pull request. We evaluate performance based on this PR.
+
+We have tested write latency with:
+  (1)  No UBLK_F_NEED_GET_DATA(the old commit) as baseline
+  (2)  UBLK_F_NEED_GET_DATA enabled/disabled
+on demo_null and demo_event of newest ublksrv project.
+
+Config of fio:bs=4k, iodepth=1, numjobs=1, rw=write/randwrite, direct=1,
+ioengine=libaio.
+
+Here is the comparison of lat(usec) in fio:
+
+demo_null:
+write:        28.74(baseline) -- 28.77(disable) -- 57.20(enable)
+randwrite:    27.81(baseline) -- 28.51(disable) -- 54.81(enable)
+
+demo_event:
+write:        46.45(baseline) -- 43.31(disable) -- 75.50(enable)
+randwrite:    45.39(baseline) -- 43.66(disable) -- 76.02(enable)
+
+Looks like:
+  (1) UBLK_F_NEED_GET_DATA does not introduce additional overhead when
+      comparing baseline and disable.
+  (2) enabling UBLK_F_NEED_GET_DATA adds about two times more latency
+      than disabling it. And it is reasonable since the IO goes through
+      the total ublk IO stack(ubd_drv <--> ublksrv) once again.
+  (3) demo_null and demo_event are both null targets. And I think this
+      overhead is not too heavy if real data handling backend is used.
+
+Without UBLK_IO_NEED_GET_DATA, an additional memcpy(from pre-allocated
+ublksrv buffer to user's buffer) is necessary for a WRITE request.
+However, UBLK_IO_NEED_GET_DATA does bring addtional syscall
+(io_uring_enter). To prove the value of UBLK_IO_NEED_GET_DATA, we test
+the single IO latency (usec) of demo_null with:
+  (1) UBLK_F_NEED_GET_DATA disabled; additional memcpy
+  (2) UBLK_F_NEED_GET_DATA enabled
+
+Config of fio:iodepth=1, numjobs=1, rw=randwrite, direct=1,
+ioengine=libaio.
+
+For block size, we choose 4k/64k/128k/256k/512k/1m. Note that with 1m block
+size, the original IO request will be split into two blk-mq requests.
+
+Here is the comparison of lat(usec) in fio:
+
+                 2 memcpy, w/o NEED_GET_DATA     1 memcpy, w/ NEED_GET_DATA
+4k-randwrite:               9.65                            10.06
+64k-randwrite:              15.19                           13.38
+128k-randwrite:             19.47                           17.77
+256k-randwrite:             32.63                           25.33
+512k-randwrite:             90.57                           46.08
+1m-randwrite:               177.06                          117.26
+
+We find that with bigger block size, cases with one memcpy w/ NEED_GET_DATA
+result in lower latency than cases with two memcpy w/o NEED_GET_DATA.
+Therefore, we think NEED_GET_DATA is suitable for bigger block size,
+such as 512B or 1MB.
+
+[1] https://github.com/ming1/ubdsrv
+
+Since V3:
+
+(1) Touch and clear UBLK_IO_FLAG_NEED_GET_DATA only when
+    UBLK_F_NEED_GET_DATA is enabled.
+
+Since V2:
+
+(1) UBLK_IO_NEED_GET_DATA should support both built-in task_work_add() and
+    io_uring_cmd_complete_in_task()
+
+Since V1:
+
+(1) Add tests to compare (1)2 memcpy, w/o NEED_GET_DATA and (2)1 memcpy,
+    w/ NEED_GET_DATA to show value of UBLK_IO_NEED_GET_DATA.
+(2) rebase on the newest version of ublk_drv
+
+ZiyangZhang (2):
+  ublk_cmd.h: add one new ublk command: UBLK_IO_NEED_GET_DATA
+  ublk_drv: add support for UBLK_IO_NEED_GET_DATA
+
+ drivers/block/ublk_drv.c      | 106 ++++++++++++++++++++++++++++++----
+ include/uapi/linux/ublk_cmd.h |  18 ++++++
+ 2 files changed, 112 insertions(+), 12 deletions(-)
+
+-- 
+2.34.1
+
