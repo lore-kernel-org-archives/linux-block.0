@@ -2,98 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E493C04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 10:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E095C04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 10:37:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235354AbiG1Kev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 06:34:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59884 "EHLO
+        id S234823AbiG1Kha (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 06:37:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234823AbiG1Keu (ORCPT
+        with ESMTP id S234891AbiG1Kh3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 06:34:50 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10895422E6;
-        Thu, 28 Jul 2022 03:34:47 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Ltn7D3MLXzl64L;
-        Thu, 28 Jul 2022 18:33:44 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDn79NEZuJi4m8mBQ--.43697S3;
-        Thu, 28 Jul 2022 18:34:45 +0800 (CST)
-Subject: Re: [PATCH RESEND v6 4/8] blk-throttle: fix io hung due to config
- updates
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        Tejun Heo <tj@kernel.org>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
-        ming.lei@redhat.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20220701093441.885741-1-yukuai1@huaweicloud.com>
- <20220701093441.885741-5-yukuai1@huaweicloud.com>
- <YuGGVxdlOVk/eF2l@slm.duckdns.org> <20220728093346.GA2281@blackbody.suse.cz>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <0bbf3d0c-88c4-8120-3df3-960dda041864@huaweicloud.com>
-Date:   Thu, 28 Jul 2022 18:34:44 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 28 Jul 2022 06:37:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 69D94558E3
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 03:37:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659004647;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/Pt9UGM5sL/4q0ANiVGEpiameCcnFg9RmfFRb3A4csQ=;
+        b=TwQBuQnaNyNysxGYXKHoNkRXruKxj23kYrj8twKso/9q9N4bR6HsD0Y129beqFpY/1Ak6T
+        gh5TCau/e+kz25iDmp3uNqxLZaA3Iw3fVX9Q5jDaeSlQMqV6pfb3jWSK95MRyam1fV+MmR
+        9C8ax9vp+MJxJ7IX9wTbqyyVKwASioA=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-509-PFn0PLCzPhKyfBGYZqHKzQ-1; Thu, 28 Jul 2022 06:37:26 -0400
+X-MC-Unique: PFn0PLCzPhKyfBGYZqHKzQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88D45280049C;
+        Thu, 28 Jul 2022 10:37:25 +0000 (UTC)
+Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A307918EB5;
+        Thu, 28 Jul 2022 10:37:21 +0000 (UTC)
+Date:   Thu, 28 Jul 2022 18:37:17 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        xiaoguang.wang@linux.alibaba.com
+Subject: Re: [PATCH V3 1/2] ublk_cmd.h: add one new ublk command:
+ UBLK_IO_NEED_GET_DATA
+Message-ID: <YuJm3eJpLPH+XUB1@T590>
+References: <cover.1658999030.git.ZiyangZhang@linux.alibaba.com>
+ <bc8848ba3de5a9c75b8eeb638a95999921d11596.1658999030.git.ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <20220728093346.GA2281@blackbody.suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDn79NEZuJi4m8mBQ--.43697S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrtF4fZw43GF48Jr47uw43trb_yoWkJrb_ur
-        yFya1jyw15CFW0kanFga15Jry3Jw4UJrZ8Gw1Fyw4Ut34ftFs8Xa98K34Ivr1rJa1ayr1Y
-        qrZ5Xa1Iyw12gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VU1a9aPUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bc8848ba3de5a9c75b8eeb638a95999921d11596.1658999030.git.ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+On Thu, Jul 28, 2022 at 05:31:23PM +0800, ZiyangZhang wrote:
+> Add one new ublk command: UBLK_IO_NEED_GET_DATA. It is prepared for a new
+> feature designed for a user application who wants to allocate IO buffer
+> and set IO buffer address only after it receives an IO request from
+> ublksrv.
+> 
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 
-在 2022/07/28 17:33, Michal Koutný 写道:
-> On Wed, Jul 27, 2022 at 08:39:19AM -1000, Tejun Heo <tj@kernel.org> wrote:
->> I'm not quiet sure this is correct. What if the limit keeps changing across
->> different values? Then we'd be calculating the skipped amount based on the
->> last configuration only which would be incorrect.
-> 
-> When one change of configuration is correct, then all changes must be
-> correct by induction. It's sufficient to take into account only the one
-> old config and the new one.
-> 
-> This __tg_update_skipped() calculates bytes_skipped with the limit
-> before the change and bytes_skipped are used (divided by) the new limit
-> in tg_with_in_bps_limit().
-> The accumulation of bytes_skipped across multiple changes (until slice
-> properly ends) is proportional to how bytes_allowed would grow over
-> time.
-> That's why I find this correct (I admit I had to look back into my
-> notes when this was first discussed).
-> 
-> HTH,
-> Michal
-> 
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Hi, Tejun
-
-Michal already explain it very well, please let me know if you still
-thinks there are better ways.
 
 Thanks,
-Kuai
+Ming
 
