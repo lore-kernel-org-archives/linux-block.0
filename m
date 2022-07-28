@@ -2,82 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BF4C04A68
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jul 2022 23:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AABC04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 00:18:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbiG0XTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jul 2022 19:19:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46414 "EHLO
+        id S233061AbiG1ASs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jul 2022 20:18:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiG0XTq (ORCPT
+        with ESMTP id S230395AbiG1ASr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jul 2022 19:19:46 -0400
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AB5152DC9;
-        Wed, 27 Jul 2022 16:19:42 -0700 (PDT)
-Received: by mail-pj1-f50.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so471154pjf.2;
-        Wed, 27 Jul 2022 16:19:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kOepgtwcdLQRP/qRZeoxPArZsGP7iFtltMUiXWZxlTA=;
-        b=tY2wqxBhbn9ED5ntQXGfZBBks9gGvurFn6sqilqP77TsBC0B2P7jo/G7+I81iNbgqo
-         607caZN/vWRb6YkI75+6j31y3qOf6VGviIGOidumkzN+W1uaVeuOjSPigEdUPOCXAd+A
-         86kLkq7w0YEaefrFarspw1P+TvukOXAsc+O41P/vHE9p4niqbumydjUIGgDe3/Zdr1Kc
-         p3h0+3K2OMZ/XgnTu25z2dKyU+TUdp6Ols2hpmSThYvWjcA9qzsOj6uQhU7R/4hRubJe
-         zSh24iE8BI8HloJujvtAmeIoGG0wMbO0NiL5G5dRhhSv2hGQquAHvEPx03FO0re0ed1K
-         eKpg==
-X-Gm-Message-State: AJIora+0t3bEJXENua95U/PotGj6i9hSQ6ELB1dvyQdcORZueNV0L5nI
-        La8s5X6Kt6z9LLqYP71EX+I=
-X-Google-Smtp-Source: AGRyM1v4arIrU8OrBsKV8oknRZWNQ7p4sPrLDkPKFw6Y11E+aVKagxx/UxaZflYaD5XeZX1L1eA7ig==
-X-Received: by 2002:a17:903:2282:b0:16c:500f:b78e with SMTP id b2-20020a170903228200b0016c500fb78emr23736794plh.49.1658963981476;
-        Wed, 27 Jul 2022 16:19:41 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:a84e:2ec1:1b57:b033? ([2620:15c:211:201:a84e:2ec1:1b57:b033])
-        by smtp.gmail.com with ESMTPSA id q13-20020a65684d000000b00419cde333eesm12516908pgt.64.2022.07.27.16.19.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jul 2022 16:19:40 -0700 (PDT)
-Message-ID: <51255650-ddc2-4f3d-52e5-14007b9ff538@acm.org>
-Date:   Wed, 27 Jul 2022 16:19:38 -0700
+        Wed, 27 Jul 2022 20:18:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 299CC3CBC4
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 17:18:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658967525;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=169n3QudRfwB4tRIfa2gs2cb6GTxYFv8fBft6/2bDnk=;
+        b=Mn1GAKW28udFPSvkAvo+zaI5Iz2rBOgf9j56CaCR3e3iYJPepByDkC9f8KQsHGEC9vL5Mg
+        S96U3WyJKxUe6cJnd1P9HR1IKK0sTh923c/pT24H6CUS6woGPkB6MUXXDh5BegfcxaSmyH
+        fB3j81k/U8ddKRZ0ArFpp4aa1GE30fs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-vdbaxunqOceoQ-tcNltJGw-1; Wed, 27 Jul 2022 20:18:41 -0400
+X-MC-Unique: vdbaxunqOceoQ-tcNltJGw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 448A08037AF;
+        Thu, 28 Jul 2022 00:18:41 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CE4C52166B26;
+        Thu, 28 Jul 2022 00:18:36 +0000 (UTC)
+Date:   Thu, 28 Jul 2022 08:18:31 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [PATCH V2 1/5] ublk_drv: avoid to leak ublk device in case that
+ add_disk fails
+Message-ID: <YuHV11N1A45xwxyT@T590>
+References: <20220727141628.985429-1-ming.lei@redhat.com>
+ <20220727141628.985429-2-ming.lei@redhat.com>
+ <20220727162132.GA18969@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v8 00/11] support non power of 2 zoned device
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>,
-        damien.lemoal@opensource.wdc.com, hch@lst.de, axboe@kernel.dk,
-        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
-Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        linux-block@vger.kernel.org, pankydev8@gmail.com,
-        jaegeuk@kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org
-References: <CGME20220727162246eucas1p1a758799f13d36ba99d30bf92cc5e2754@eucas1p1.samsung.com>
- <20220727162245.209794-1-p.raghav@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220727162245.209794-1-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220727162132.GA18969@lst.de>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/27/22 09:22, Pankaj Raghav wrote:
-> This series adds support to npo2 zoned devices in the block and nvme
-> layer and a new **dm target** is added: dm-po2z-target. This new
-> target will be initially used for filesystems such as btrfs and
-> f2fs that does not have native npo2 zone support.
+On Wed, Jul 27, 2022 at 06:21:32PM +0200, Christoph Hellwig wrote:
+> maybe s/avoid/don't/ in the subject?
 
-Should any SCSI changes be included in this patch series? From sd_zbc.c:
+OK, will change in V3.
 
-	if (!is_power_of_2(zone_blocks)) {
-		sd_printk(KERN_ERR, sdkp,
-			  "Zone size %llu is not a power of two.\n",
-			  zone_blocks);
-		return -EINVAL;
-	}
+> 
+> > -	get_device(&ub->cdev_dev);
+> >  	ret = add_disk(disk);
+> >  	if (ret) {
+> >  		put_disk(disk);
+> >  		goto out_unlock;
+> 
+> Maybe just add a put_device here in the error branch to keep
+> things simple?
+
+That is fine.
+
+Another way is to add 'out_put_disk' error label which can be
+reused with previous error handling.
+
 
 Thanks,
+Ming
 
-Bart.
