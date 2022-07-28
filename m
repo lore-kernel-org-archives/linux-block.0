@@ -2,648 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8954C04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 04:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2D0C04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 04:38:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbiG1EdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 00:33:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54844 "EHLO
+        id S229887AbiG1EiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 00:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbiG1EdY (ORCPT
+        with ESMTP id S229597AbiG1EiX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 00:33:24 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E719057239
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 21:33:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1658982802; x=1690518802;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qYi9CddhMTc16oCfTA5/fPBxT6fjV6ZJpvffXNGyyMo=;
-  b=Nfzy1mz8OMODs4XkKfDdhgL9ZjxDqq95PgZK7h9QIYqSTixxsm1E46xm
-   AZlxPCrhSz1O1W+H8q2PzFI1TKrrQJYtLRd16vANGXeH44m3jweIhM14c
-   7pXkqLCZJDzeEMlRxaSQ6r7ghgd3jHu4PAb+AWHjRNk3BXDWKwnjlAixo
-   q/u/7j7Jsuj0H/UMS1g15MAR/mdFCAv8otVSSy1h55Oj6Qf5+aSH8RtGp
-   fziYpER6nh0dUUd66MmXTI6/t8GFYNZePzBauhe8Hj8XHaZx/0R44PQQi
-   Yc3xEbFB5vPrXABaOhu/saP+rESYifdWyCm5THADEHigDfO6GvdSP+Nmv
-   g==;
-X-IronPort-AV: E=Sophos;i="5.93,196,1654531200"; 
-   d="scan'208";a="311440699"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jul 2022 12:33:21 +0800
-IronPort-SDR: GwkVS3hNHYtcO27SWT/VGjfUNobiGdrkIRlVYJ3dONyOuE9Vsry1WDQ7s6Je4LCi368FhJsJIy
- kbKTjY0tGu0FDJWwqdmzUzND8YYAYgp9B01X0zWzTLwpehniIiyKGr/VYwz1aQEv/zcj17+4W9
- OG4K1Kh1xMP+FtjuFk9zkqwCQLAkB0GTSreE2X5WewbvjArnJPKi0ei5X4UXx2OHmRc2kAc9iD
- 85d4jjTrU4FvMZwuUhyJ5GSxNcFRHWfcmCPWOnrl23pZVQDJD9uxCIWFgIhCd+op83v6itfwBf
- acW2gKto9lSaTLPqEsjpmH2l
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 20:54:32 -0700
-IronPort-SDR: nidDN29995BcqGo5TqYNA9ZgbOFfeY3lpI78c3BZvNSNc7L2rDwSnVuC8RoER2wechIwv468Eo
- RvjWynw78e6eiORE9JkWY+HacEasrRnsunRzDwCwFFzW6+A4WPdnGtifH+slvetijsKS2LzL54
- DQOkmdecuhNoGATcR7aX20oAl9jsK9Y+R4AkW62n0FT19NSQtVxJ/szsiRgC9ihNy+8iEjgWo0
- zkUWERiT3cE6buig1/4evc1PTTfhiX8mH+VFD0+16efWz2dMXHIchLfPzTNr2DtHRiVLaxwcvK
- sVo=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jul 2022 21:33:22 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Ltd7P2VMlz1Rws0
-        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 21:33:21 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1658982796; x=1661574797; bh=qYi9CddhMTc16oCfTA5/fPBxT6fjV6ZJpvf
-        fXNGyyMo=; b=ku0lwH+u2dvyl1F0eUh8TkuHxT0+3vN8+PhPZHih44gNL5mNiM0
-        7PX4qNhHcpvp+fFxSVdZjPhsu7GautzKz2VIcLBfxWSrpY2XMhRo2Efx94Qwzy4S
-        Ym7JUvlzMJywF9toKzJeOVepdKAfGwFVhOm7YvkIVzOAAiT30eGzmbfGPLemMHiL
-        KSEZq+QzeC2HZjKF6hFqeNpO52MzeXk+yut7//Vn4TrNlhwFmBZvcxA2r5LgCYSC
-        PbOFJuA/NZ2Rm/thUZq+MegjgmbFACUZgSUV1pBCtq90ytj6ru5V5LBVHG9YyaTT
-        CHES8XUE7MpaoKLxZKObcwvgss2PUwEH9pg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id JSpjfmPgy-TD for <linux-block@vger.kernel.org>;
-        Wed, 27 Jul 2022 21:33:16 -0700 (PDT)
-Received: from [10.225.163.14] (unknown [10.225.163.14])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Ltd7G0cPXz1RtVk;
-        Wed, 27 Jul 2022 21:33:13 -0700 (PDT)
-Message-ID: <8fc11ae3-ddc4-4509-5374-04722a740bde@opensource.wdc.com>
-Date:   Thu, 28 Jul 2022 13:33:12 +0900
+        Thu, 28 Jul 2022 00:38:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E013149B55
+        for <linux-block@vger.kernel.org>; Wed, 27 Jul 2022 21:38:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1658983100;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9DtDWDoVfrxzOEcNfIZXcHuI2LgAUcYjmiM+joGvP8c=;
+        b=AvHBrP9J+RGsGmbbBBuL90F56Y4sejgJ80ODR0FYC/hUSIh0H7UWUcRzYcGSr9YGVvwjJw
+        7iD7P1lOjLhOJCFQPUb3sjY5MkbqmztCeDNII0e4gSqzSl31QyilKJxbEoUF7EIbAmqS0f
+        BegZW8HVwz8UivdaWuCv8QImg4Btc7w=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-106-wsfL5aqRNz2GEdk1SYu6SA-1; Thu, 28 Jul 2022 00:38:17 -0400
+X-MC-Unique: wsfL5aqRNz2GEdk1SYu6SA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AA53B1C05AB8;
+        Thu, 28 Jul 2022 04:38:16 +0000 (UTC)
+Received: from T590 (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D2EB32166B26;
+        Thu, 28 Jul 2022 04:38:09 +0000 (UTC)
+Date:   Thu, 28 Jul 2022 12:38:02 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: Re: [PATCH V2 3/5] ublk_drv: add SET_PARAM/GET_PARAM control command
+Message-ID: <YuISqrJMQVky57/4@T590>
+References: <20220727141628.985429-1-ming.lei@redhat.com>
+ <20220727141628.985429-4-ming.lei@redhat.com>
+ <20220727162234.GB18969@lst.de>
+ <YuHsyusQZYTlUabu@T590>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v8 11/11] dm: add power-of-2 zoned target for
- non-power-of-2 zoned devices
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de, axboe@kernel.dk,
-        snitzer@kernel.org, Johannes.Thumshirn@wdc.com
-Cc:     matias.bjorling@wdc.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        linux-block@vger.kernel.org, pankydev8@gmail.com,
-        bvanassche@acm.org, jaegeuk@kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <20220727162245.209794-1-p.raghav@samsung.com>
- <CGME20220727162257eucas1p2848a75c4aa7e559abb5d9ae0fbd374c1@eucas1p2.samsung.com>
- <20220727162245.209794-12-p.raghav@samsung.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220727162245.209794-12-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YuHsyusQZYTlUabu@T590>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/28/22 01:22, Pankaj Raghav wrote:
-> Only power-of-2(po2) zoned devices were supported in linux but now non
-> power-of-2(npo2) zoned device support has been added to the block layer.
-
-Please rephrase this spelling out "zone size" in the text. As mentioned
-before, "power-of-2(po2) zoned devices" is very unclear to people not
-familiar with zoned block devices.
-
+On Thu, Jul 28, 2022 at 09:56:26AM +0800, Ming Lei wrote:
+> Hi Christoph,
 > 
-> Filesystems such as F2FS and btrfs have support for zoned devices with
-> po2 zone size assumption. Before adding native support for npo2 zoned
-> devices, it was suggested to create a dm target for npo2 zoned device to
-> appear as a po2 target so that file systems can initially work without any
-> explicit changes by using this target.
+> On Wed, Jul 27, 2022 at 06:22:34PM +0200, Christoph Hellwig wrote:
+> > As stated in the previous discussion I think this is a very bad idea
+> > that leads to a lot of boiler plate code.  If you don't want to rely
 > 
-> The design of this target is very simple: introduce gaps between the
-> underlying device's zone size and the nearest po2 device zone size.
-> Device's actual zone size becomes the zone capacity of the target and
-> device's nearest po2 zone size becomes the target's zone size.
-
-The design of this target is very simple: remap the device zone size to
-the zone capacity and change the zone size to be the nearest power of 2
-numner of sectors.
-
+> But you never point out where the boiler plate code is, care to share
+> what/where it is?
 > 
-> For e.g., a device with a zone size/capacity of 3M will have an equivalent
-> target layout as follows:
+> If you don't like xarray, we can replace it with one plain array
+> from the beginning, this change is just in implementation level.
 > 
-> Device layout :-
-> zone capacity = 3M
-> zone size = 3M
+> Given it is ABI interface, I'd suggest to consolidate it from the
+> beginning.
 > 
-> |--------------|-------------|
-> 0             3M            6M
+> > on zeroed fields we can add a mask of valid fields, similar to how
+> > e.g. the statx API works.
 > 
-> Target layout :-
-> zone capacity=3M
-> zone size = 4M
+> With one mask for marking valid fields, we still need to group
+> fields, and one bit in mask has to represent one single group, and
+> it can't represent each single field.
 > 
-> |--------------|---|--------------|---|
-> 0             3M  4M             7M  8M
+> Also one length field has to be added in the header for keeping
+> compatibility with old app.
 > 
-> All IOs will be remapped from target to the actual device location.
-
-That is what DM does... Instead of this obvious statement, explain how the
-remapping is done.
-
+> With the above two change, it becomes very similar with the approach
+> in this patch.
 > 
-> The area between target's zone capacity and zone size will be emulated
-> in the target.
-> The read IOs that fall in the emulated gap area will return 0 filled
-> bio and all the other IOs in that area will result in an error.
-> If a read IO span across the emulated area boundary, then the IOs are
-> split across them. All other IO operations that span across the emulated
-> area boundary will result in an error.
+> IMO there are more advantages in grouping parameter explicitly:
 > 
-> The target can be easily created as follows:
-> dmsetup create <label> --table '0 <size_sects> po2z /dev/nvme<id>'
-
-0 -> <start offset> ? Or are you allowing only entire devices ?
-
+> 1) avoid big chunk of memory for storing lots of unnecessary parameter
+> if the big params data structure is extended, and we just store whatever
+> the userspace cares.
 > 
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Suggested-by: Hannes Reinecke <hare@suse.de>
-> ---
->  drivers/md/Kconfig            |   9 ++
->  drivers/md/Makefile           |   2 +
->  drivers/md/dm-po2z-target.c   | 261 ++++++++++++++++++++++++++++++++++
->  drivers/md/dm-table.c         |  13 +-
->  drivers/md/dm-zone.c          |   1 +
->  include/linux/device-mapper.h |   9 ++
->  6 files changed, 292 insertions(+), 3 deletions(-)
->  create mode 100644 drivers/md/dm-po2z-target.c
+> 2) easy to add new type by just implementing two callbacks(both optionally),
+> and code is actually well organized, and each callback just focuses on the
+> interested parameter type 
 > 
-> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-> index 998a5cfdbc4e..d58ccfee765b 100644
-> --- a/drivers/md/Kconfig
-> +++ b/drivers/md/Kconfig
-> @@ -518,6 +518,15 @@ config DM_FLAKEY
->  	help
->  	 A target that intermittently fails I/O for debugging purposes.
->  
-> +config DM_PO2Z
+> 3) parameter is easier to verify, since we know each parameter's length and type.
+> With mask, we can only know if one parameter type exists in the big
+> parameters data structure or not.
 
-Maybe DM_PO2_ZONE ?
+Another thing with putting everything into single structure is that the
+params structure will become a mess sooner or later, since all kinds of
+parameters will be added at the end, none of them are related.
 
-or DM_ZONE_PO2SIZE ?
-
-To be clearer...
-
-> +	tristate "Power-of-2 target for non power-of-2 zoned devices"
-
-...for zoned block devices with a zone size that is not a power of 2
-number of sectors.
-
-> +	depends on BLK_DEV_DM
-> +	depends on BLK_DEV_ZONED
-> +	help
-> +	  A target that converts a zoned device with non power-of-2 zone size to
-> +	  be power of 2. This is done by introducing gaps in between the zone
-
-...to have zones with size equal to a power of 2 n umber of sectors. And
-drop the "This done...".
-How the target works and how to use it should be documented under
-Documentation/admin-guide/device-mapper/
-
-> +	  capacity and the power of 2 zone size.
-> +
->  config DM_VERITY
->  	tristate "Verity target support"
->  	depends on BLK_DEV_DM
-> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-> index 270f694850ec..98af4ed98f73 100644
-> --- a/drivers/md/Makefile
-> +++ b/drivers/md/Makefile
-> @@ -26,6 +26,7 @@ dm-era-y	+= dm-era-target.o
->  dm-clone-y	+= dm-clone-target.o dm-clone-metadata.o
->  dm-verity-y	+= dm-verity-target.o
->  dm-zoned-y	+= dm-zoned-target.o dm-zoned-metadata.o dm-zoned-reclaim.o
-> +dm-po2z-y       += dm-po2z-target.o
-
-dm-po2zone ?
-
-Spelling out "zone" makes things clearer I think.
-
->  
->  md-mod-y	+= md.o md-bitmap.o
->  raid456-y	+= raid5.o raid5-cache.o raid5-ppl.o
-> @@ -60,6 +61,7 @@ obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
->  obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
->  obj-$(CONFIG_DM_DUST)		+= dm-dust.o
->  obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
-> +obj-$(CONFIG_DM_PO2Z)		+= dm-po2z.o
->  obj-$(CONFIG_DM_MULTIPATH)	+= dm-multipath.o dm-round-robin.o
->  obj-$(CONFIG_DM_MULTIPATH_QL)	+= dm-queue-length.o
->  obj-$(CONFIG_DM_MULTIPATH_ST)	+= dm-service-time.o
-> diff --git a/drivers/md/dm-po2z-target.c b/drivers/md/dm-po2z-target.c
-> new file mode 100644
-> index 000000000000..e9c5b7d00eda
-> --- /dev/null
-> +++ b/drivers/md/dm-po2z-target.c
-> @@ -0,0 +1,261 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2022 Samsung Electronics Co., Ltd.
-> + */
-> +
-> +#include <linux/device-mapper.h>
-> +
-> +#define DM_MSG_PREFIX "po2z"
-
-s/po2z/po2zone ?
-
-> +
-> +struct dm_po2z_target {
-> +	struct dm_dev *dev;
-> +	sector_t zone_size; /* Actual zone size of the underlying dev*/
-> +	sector_t zone_size_po2; /* zone_size rounded to the nearest po2 value */
-> +	sector_t zone_size_diff; /* diff between zone_size_po2 and zone_size */
-> +	u32 nr_zones;
-
-s/u32/unsigned int. This is not a hw driver.
-
-> +};
-> +
-> +static inline u32 npo2_zone_no(struct dm_po2z_target *dmh, sector_t sect)
-> +{
-> +	return div64_u64(sect, dmh->zone_size);
-> +}
-> +
-> +static inline u32 po2_zone_no(struct dm_po2z_target *dmh, sector_t sect)
-> +{
-> +	return sect >> ilog2(dmh->zone_size_po2);
-
-You could saves the shift as "zone_size_po2_shift" in struct dm_po2z_target.
-
-> +}
-> +
-> +static inline sector_t target_to_device_sect(struct dm_po2z_target *dmh,
-> +					     sector_t sect)
-> +{
-> +	u32 zone_idx = po2_zone_no(dmh, sect);
-> +
-> +	return sect - (zone_idx * dmh->zone_size_diff);
-
-The idx variable seems unnecessary. And use unsgined int, not u32.
-
-> +}
-> +
-> +static inline sector_t device_to_target_sect(struct dm_po2z_target *dmh,
-> +					     sector_t sect)
-> +{
-> +	u32 zone_idx = npo2_zone_no(dmh, sect);
-> +
-> +	return sect + (zone_idx * dmh->zone_size_diff);
-
-same.
-
-> +}
-> +
-> +/*
-> + * This target works on the complete zoned device. Partial mapping is not
-> + * supported.
-> + * Construct a zoned po2 logical device: <dev-path>
-> + */
-> +static int dm_po2z_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-> +{
-> +	struct dm_po2z_target *dmh = NULL;
-> +	int ret;
-> +	sector_t zone_size;
-> +	sector_t dev_capacity;
-> +
-> +	if (argc < 1)
-
-	if (argc != 1) ?
-
-> +		return -EINVAL;
-> +
-> +	dmh = kmalloc(sizeof(*dmh), GFP_KERNEL);
-> +	if (!dmh)
-> +		return -ENOMEM;
-> +
-> +	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table),
-> +			    &dmh->dev);
-> +
-> +	if (ret) {
-> +		ti->error = "Device lookup failed";
-> +		return ret;
-
-You are leaking dmh.
-
-> +	}
-> +
-> +	zone_size = bdev_zone_sectors(dmh->dev->bdev);
-> +	dev_capacity = get_capacity(dmh->dev->bdev->bd_disk);
-> +	if (ti->len != dev_capacity || ti->begin) {
-> +		DMERR("%pg Partial mapping of the target not supported",
-> +		      dmh->dev->bdev);
-
-dmh is leaked.
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (is_power_of_2(zone_size)) {
-> +		DMERR("%pg: this target is not useful for power-of-2 zoned devices",
-> +		      dmh->dev->bdev);
-> +		return -EINVAL;
-
-Same here.
-
-And as suggested before, we could simply warn here but let the target be
-created. If used with a power of 2 zone size device, it should still work.
-
-> +	}
-> +
-> +	dmh->zone_size = zone_size;
-> +	dmh->zone_size_po2 = 1 << get_count_order_long(zone_size);
-> +	dmh->zone_size_diff = dmh->zone_size_po2 - dmh->zone_size;
-> +	ti->private = dmh;
-> +	dmh->nr_zones = npo2_zone_no(dmh, ti->len);
-> +	ti->len = dmh->zone_size_po2 * dmh->nr_zones;
-> +
-> +	return 0;
-> +}
-> +
-> +static int dm_po2z_report_zones_cb(struct blk_zone *zone, unsigned int idx,
-> +				   void *data)
-> +{
-> +	struct dm_report_zones_args *args = data;
-> +	struct dm_po2z_target *dmh = args->tgt->private;
-> +
-> +	zone->start = device_to_target_sect(dmh, zone->start);
-> +	zone->wp = device_to_target_sect(dmh, zone->wp);
-
-You could simplify this to a single call to device_to_target_sect() by
-saving the diff between device zone start and remapped zone start and add
-that diff to the wp field.
-
-> +	zone->len = dmh->zone_size_po2;
-> +	args->next_sector = zone->start + zone->len;
-> +
-> +	return args->orig_cb(zone, args->zone_idx++, args->orig_data);
-> +}
-> +
-> +static int dm_po2z_report_zones(struct dm_target *ti,
-> +				struct dm_report_zones_args *args,
-> +				unsigned int nr_zones)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +	sector_t sect = po2_zone_no(dmh, args->next_sector) * dmh->zone_size;
-> +
-> +	return blkdev_report_zones(dmh->dev->bdev, sect, nr_zones,
-> +				   dm_po2z_report_zones_cb, args);
-> +}
-> +
-> +static int dm_po2z_end_io(struct dm_target *ti, struct bio *bio,
-> +			  blk_status_t *error)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +
-> +	if (bio->bi_status == BLK_STS_OK && bio_op(bio) == REQ_OP_ZONE_APPEND)
-> +		bio->bi_iter.bi_sector =
-> +			device_to_target_sect(dmh, bio->bi_iter.bi_sector);
-> +
-> +	return DM_ENDIO_DONE;
-> +}
-> +
-> +static void dm_po2z_io_hints(struct dm_target *ti, struct queue_limits *limits)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +
-> +	limits->chunk_sectors = dmh->zone_size_po2;
-> +}
-> +
-> +static bool bio_across_emulated_zone_area(struct dm_po2z_target *dmh,
-> +					  struct bio *bio)
-> +{
-> +	u32 zone_idx = po2_zone_no(dmh, bio->bi_iter.bi_sector);
-> +	sector_t size = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-
-Rename that to nr_sectors to be clear about the unit.
-
-> +
-> +	return (bio->bi_iter.bi_sector - (zone_idx * dmh->zone_size_po2) +
-> +		size) > dmh->zone_size;
-
-This is hard to read and actually seems very wrong. Shouldn't this be simply:
-
-	return bio->bi_iter.bi_sector + nr_sectors >
-		zone_idx * dmh->zone_size_po2 + dmh->zone_size;
-
-Thatis, check that the BIO goes beyond the zone capacity of the target.
-?
-
-> +}
-> +
-> +static int dm_po2z_map_read(struct dm_po2z_target *dmh, struct bio *bio)
-> +{
-> +	sector_t start_sect, size, relative_sect_in_zone, split_io_pos;
-> +	u32 zone_idx;
-> +
-> +	/*
-> +	 * Read does not extend into the emulated zone area (area between
-> +	 * zone capacity and zone size)
-> +	 */
-> +	if (!bio_across_emulated_zone_area(dmh, bio)) {
-
-hu... why not use dm_accept_partial_bio() in dm_po2z_map() to never have
-to deal with this here ? That is, dm_po2z_map_read() is called for any
-read BIO fully within the zone capacity. And create a
-dm_po2z_map_read_zero() helper for any read BIO that is after the zone
-capacity. Way simpler I think.
-
-> +		bio->bi_iter.bi_sector =
-> +			target_to_device_sect(dmh, bio->bi_iter.bi_sector);
-> +		return DM_MAPIO_REMAPPED;
-> +	}
-> +
-> +	start_sect = bio->bi_iter.bi_sector;
-> +	size = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-> +	zone_idx = po2_zone_no(dmh, start_sect);
-> +	relative_sect_in_zone = start_sect - (zone_idx * dmh->zone_size_po2);
-> +
-> +	/*
-> +	 * If the starting sector is in the emulated area then fill
-> +	 * all the bio with zeros. If bio is across emulated zone boundary,
-> +	 * split the bio across boundaries and fill zeros only for the
-> +	 * bio that is between the zone capacity and the zone size.
-> +	 */
-> +	if (relative_sect_in_zone < dmh->zone_size &&
-> +	    ((relative_sect_in_zone + size) > dmh->zone_size)) {
-> +		split_io_pos = (zone_idx * dmh->zone_size_po2) + dmh->zone_size;
-> +		dm_accept_partial_bio(bio, split_io_pos - start_sect);
-
-See above. Do that in dm_po2z_map(). This will simplify this function.
-
-> +		bio->bi_iter.bi_sector = target_to_device_sect(dmh, start_sect);
-> +
-> +		return DM_MAPIO_REMAPPED;
-> +	} else if (relative_sect_in_zone >= dmh->zone_size &&
-> +		   ((relative_sect_in_zone + size) > dmh->zone_size_po2)) {
-
-No need for the else after return. And this can NEVER happen since BIOs
-can never cross zone boundaries.
-
-> +		split_io_pos = (zone_idx + 1) * dmh->zone_size_po2;
-> +		dm_accept_partial_bio(bio, split_io_pos - start_sect);
-> +	}
-> +
-> +	zero_fill_bio(bio);
-> +	bio_endio(bio);
-> +	return DM_MAPIO_SUBMITTED;
-> +}
-> +
-> +static int dm_po2z_map(struct dm_target *ti, struct bio *bio)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +
-> +	bio_set_dev(bio, dmh->dev->bdev);
-> +	if (bio_sectors(bio) || op_is_zone_mgmt(bio_op(bio))) {
-> +		/*
-> +		 * Read operation on the emulated zone area (between zone capacity
-> +		 * and zone size) will fill the bio with zeroes. Any other operation
-> +		 * in the emulated area should return an error.
-> +		 */
-> +		if (bio_op(bio) == REQ_OP_READ)
-> +			return dm_po2z_map_read(dmh, bio);
-> +
-> +		if (!bio_across_emulated_zone_area(dmh, bio)) {
-> +			bio->bi_iter.bi_sector = target_to_device_sect(dmh,
-> +								       bio->bi_iter.bi_sector);
-> +			return DM_MAPIO_REMAPPED;
-> +		}
-> +		return DM_MAPIO_KILL;
-> +	}
-> +	return DM_MAPIO_REMAPPED;
-> +}
-> +
-> +static int dm_po2z_iterate_devices(struct dm_target *ti,
-> +				   iterate_devices_callout_fn fn, void *data)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +	sector_t len = dmh->nr_zones * dmh->zone_size;
-> +
-> +	return fn(ti, dmh->dev, 0, len, data);
-> +}
-> +
-> +static struct target_type dm_po2z_target = {
-> +	.name = "po2z",
-> +	.version = { 1, 0, 0 },
-> +	.features = DM_TARGET_ZONED_HM | DM_TARGET_EMULATED_ZONES,
-> +	.map = dm_po2z_map,
-> +	.end_io = dm_po2z_end_io,
-> +	.report_zones = dm_po2z_report_zones,
-> +	.iterate_devices = dm_po2z_iterate_devices,
-> +	.module = THIS_MODULE,
-> +	.io_hints = dm_po2z_io_hints,
-> +	.ctr = dm_po2z_ctr,
-> +};
-> +
-> +static int __init dm_po2z_init(void)
-> +{
-> +	int r = dm_register_target(&dm_po2z_target);
-> +
-> +	if (r < 0)
-> +		DMERR("register failed %d", r);
-> +
-> +	return r;
-
-Simplify:
-
-	return dm_register_target(&dm_po2z_target);
-
-> +}
-> +
-> +static void __exit dm_po2z_exit(void)
-> +{
-> +	dm_unregister_target(&dm_po2z_target);
-> +}
-> +
-> +/* Module hooks */
-> +module_init(dm_po2z_init);
-> +module_exit(dm_po2z_exit);
-> +
-> +MODULE_DESCRIPTION(DM_NAME "power-of-2 zoned target");
-> +MODULE_AUTHOR("Pankaj Raghav <p.raghav@samsung.com>");
-> +MODULE_LICENSE("GPL");
-> +
-
-the changes below should be a different prep patch.
-
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 534fddfc2b42..d77feff124af 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -1614,13 +1614,20 @@ static bool dm_table_supports_zoned_model(struct dm_table *t,
->  	return true;
->  }
->  
-> -static int device_not_matches_zone_sectors(struct dm_target *ti, struct dm_dev *dev,
-> +/*
-> + * Callback function to check for device zone sector across devices. If the
-> + * DM_TARGET_EMULATED_ZONES target feature flag is not set, then the target
-> + * should have the same zone sector as the underlying devices.
-> + */
-> +static int check_valid_device_zone_sectors(struct dm_target *ti, struct dm_dev *dev,
->  					   sector_t start, sector_t len, void *data)
->  {
->  	unsigned int *zone_sectors = data;
->  
-> -	if (!bdev_is_zoned(dev->bdev))
-> +	if (!bdev_is_zoned(dev->bdev) ||
-> +	    dm_target_supports_emulated_zones(ti->type))
->  		return 0;
-> +
->  	return bdev_zone_sectors(dev->bdev) != *zone_sectors;
->  }
->  
-> @@ -1646,7 +1653,7 @@ static int validate_hardware_zoned_model(struct dm_table *t,
->  	if (!zone_sectors)
->  		return -EINVAL;
->  
-> -	if (dm_table_any_dev_attr(t, device_not_matches_zone_sectors, &zone_sectors)) {
-> +	if (dm_table_any_dev_attr(t, check_valid_device_zone_sectors, &zone_sectors)) {
->  		DMERR("%s: zone sectors is not consistent across all zoned devices",
->  		      dm_device_name(t->md));
->  		return -EINVAL;
-> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> index 31c16aafdbfc..2b6b3883471f 100644
-> --- a/drivers/md/dm-zone.c
-> +++ b/drivers/md/dm-zone.c
-> @@ -302,6 +302,7 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
->  	if (dm_table_supports_zone_append(t)) {
->  		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
->  		dm_cleanup_zoned_dev(md);
-> +
->  		return 0;
->  	}
->  
-> diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-> index 920085dd7f3b..7dbd28b8de01 100644
-> --- a/include/linux/device-mapper.h
-> +++ b/include/linux/device-mapper.h
-> @@ -294,6 +294,15 @@ struct target_type {
->  #define dm_target_supports_mixed_zoned_model(type) (false)
->  #endif
->  
-> +#ifdef CONFIG_BLK_DEV_ZONED
-> +#define DM_TARGET_EMULATED_ZONES	0x00000400
-> +#define dm_target_supports_emulated_zones(type) \
-> +	((type)->features & DM_TARGET_EMULATED_ZONES)
-> +#else
-> +#define DM_TARGET_EMULATED_ZONES	0x00000000
-> +#define dm_target_supports_emulated_zones(type) (false)
-> +#endif
-> +
->  struct dm_target {
->  	struct dm_table *table;
->  	struct target_type *type;
+For example, Ziyang is working on userspace recovery feature which may
+need some data which can't be hold in single bit flag, meantime someone
+may work on zoned target implementation[1] which needs to send zoned
+parameter, and I am planning to add backing pages for handling running
+out of pages, which needs userspace to pre-allocate/send buffer to driver
+as backing page[s], ... Then all these unrelated parameters are added at
+the end, and the single structure becomes fatter and fatter, then become
+unreadable and hard to maintain.
 
 
--- 
-Damien Le Moal
-Western Digital Research
+[1] https://lore.kernel.org/qemu-devel/fa7de750-8def-c532-8c86-64c7505608e0@opensource.wdc.com/T/#u
+
+Thanks,
+Ming
+
