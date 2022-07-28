@@ -2,85 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAAAFC19F2B
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 17:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE80C04A68
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 20:20:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229504AbiG1RNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 13:13:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54366 "EHLO
+        id S231258AbiG1UUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 16:20:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231277AbiG1RNh (ORCPT
+        with ESMTP id S229456AbiG1UUr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 13:13:37 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 133C261D7E
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 10:13:33 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id h132so2007022pgc.10
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 10:13:33 -0700 (PDT)
+        Thu, 28 Jul 2022 16:20:47 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71A124096;
+        Thu, 28 Jul 2022 13:20:46 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id mf4so5026353ejc.3;
+        Thu, 28 Jul 2022 13:20:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=Dj+XIt7Kj/l6SD7NCw4yNqTfM/YIqZrgS8oOYqSBuoE=;
-        b=yX4s3CPW2g+H8VBBLsI5c66y7C/LZRcm+IWZLfhi6lIILHs08nhnDYvLlR4sOZBDCa
-         xYDsO0jYk9XtAp6jQ9BQn+MmsbIH3jCmgeuWt97oiKGRQqbZ9e0offpVoLbbJfb2TuHx
-         i8EXF3akanD/KYVWm6zj7i6fJQgbVbelFgse0SVcw5tVDdiiPrk/d6jCcam6tt21/HV/
-         9a18bB8xW+0GhgKDQPrrMFRcM7vzFhKO41beeOsAYPrhwcZ9O9eItAldguXOp/rin4Wx
-         ml/Z2699/jcWpP27HZLF4Lb9T/rI/1ephgvi7DA42EwN7nRyFcYkF92hn//rpdNdjAY1
-         QXlA==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=nkqSgnyYL6Nh9u23slZtaHJXCcQKzGcIFUK9lF9foro=;
+        b=Cgo5bUYULyvlPnEOEbyta+Z9qVjIZySqeyvHMkyiyH0AaFqFIrvLnIIQllofE6JocT
+         HcfzuHSTHWt4SeDtSIf9uutJNTUgvI+oIkbc2LFiXeljvKy1cUKzOCOO0KRpyoK7DjXc
+         rHR/eWdG3kbEWYkmepcIVn4PLqtXJHE4pcha0qQpk3bt0NpAWppTtiVkFLEhX+fhLsGl
+         iwfHtiChl+TFPQ2PZxjxmuhB0Rt36Af2UWHHrfscfh22W1fIIEC+Hwpez9H1KU1bNu6r
+         pw9cp9nVuuXYTs4bYFZ35wIccqPYf/K0cnEYfkWME7XQR7LDTOjME82i+zXSKNFDtW6n
+         3K4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=Dj+XIt7Kj/l6SD7NCw4yNqTfM/YIqZrgS8oOYqSBuoE=;
-        b=3Hcb6ajsZ7gPAit0E8EU32wwyGFcinv0+7X/A/GmQC1jMpHj5l8y1vz0/U+yeW7t6w
-         3wpiqpr3rMBWg7X3QFYrsKn94qa44BrxSOMaTtXuCSKI2FF0zQKAEQMM3A0C1QrJoZuf
-         qgiU5hgWbImKLU2Q1b4I+QmmOLPIql81VIaEMuyoygkwD88XFHj4jyvxbqdgbuqZNu09
-         0yEZqENj978dMSCFC9pz2kOUFKee4YR77sQ89HE2sBkwnA/vJ2Pk9qlMWgMErYp80gum
-         5Gx62qdLuZpcDnMO+D0Y8lw/xH/O6FxKYUfUOcArcQy5hSd176pA5lbH8/MwlhJVEWze
-         If1g==
-X-Gm-Message-State: AJIora+GmhAUJJtsQSumnuvuTP0B9vLfaW3izDgqjRnB391jzp/tWey/
-        hFRJcw+6iIVZ+2rldsnRfAzyANiqaiMeoA==
-X-Google-Smtp-Source: AGRyM1u7Vc3bXmnuiSyRSxMJY17A/G0gmjQi4SlVhO5pOwLxcvvlwIKUSgPLbTYYdCgQ2BUOZUFZUQ==
-X-Received: by 2002:a05:6a00:1705:b0:525:4cac:fa65 with SMTP id h5-20020a056a00170500b005254cacfa65mr27500342pfc.40.1659028412306;
-        Thu, 28 Jul 2022 10:13:32 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x14-20020a170902a38e00b0016c20d40ee7sm1534523pla.174.2022.07.28.10.13.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 10:13:31 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     colyli@suse.de
-Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-In-Reply-To: <20220719042724.8498-1-colyli@suse.de>
-References: <20220719042724.8498-1-colyli@suse.de>
-Subject: Re: [PATCH 0/1] bcache patche for Linux v5.20
-Message-Id: <165902841159.13194.11814918605797804157.b4-ty@kernel.dk>
-Date:   Thu, 28 Jul 2022 11:13:31 -0600
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=nkqSgnyYL6Nh9u23slZtaHJXCcQKzGcIFUK9lF9foro=;
+        b=e4p8mPWDy57nqEB+u7iaUXhR9RBcDWPVyzsvbSf/YBNX9uqM9JAqEj7lbxIds4+ytn
+         LWFfFWP84NPdfqvMBI2H/0OeGLp7IKiaLokCcKv5lNgmdsd9ZF2x3Si4spC1RX6zn1zc
+         pi7BNWmSvp2OTPHBei+AYaUhdwmQe7l6BZKpht6j9euut/ayGED2hSx18CtLodLx5w6z
+         Gz4YTbywGqOBaBWONfcC5S0tEYE9xpzZNSLMwoHK45eYXYiaQNCdaKG1OWy/vgXE5Aoa
+         1bMYi/VfJ8DWpBY++gCIj9xR9q7udU2tpu4OSw1krkyq1GuClMmhiAsQUbt3Sw80RAjd
+         T71Q==
+X-Gm-Message-State: AJIora/6bo0BtuW5FW0eso97Xb5q3hFB63Nof7cvWC8gOJyhpdTfP16K
+        C/hRx6quzPKJZTy7wgWnJYOE+nwD1JjuWB/H3Ac=
+X-Google-Smtp-Source: AGRyM1udQoKJoRnagV33t765UHc7wrcRS515vsTnz8/oAPR8Reo3fg+BpM4w7BU/4LsNVMU+ObsUgp3r08YqabyDE1M=
+X-Received: by 2002:a17:906:2ed7:b0:72f:d080:411 with SMTP id
+ s23-20020a1709062ed700b0072fd0800411mr431854eji.203.1659039645333; Thu, 28
+ Jul 2022 13:20:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <CANX2M5ZSuHONz-TPVdGcW3q_n6Z2DKLM6M8RfG+mORA9CCQRsQ@mail.gmail.com>
+ <CAKXUXMxVCCRB2uaAN68LZv6Fwe7zAkUmwCmsqB6pE=z_=cztMg@mail.gmail.com>
+In-Reply-To: <CAKXUXMxVCCRB2uaAN68LZv6Fwe7zAkUmwCmsqB6pE=z_=cztMg@mail.gmail.com>
+From:   Dipanjan Das <mail.dipanjan.das@gmail.com>
+Date:   Thu, 28 Jul 2022 13:20:33 -0700
+Message-ID: <CANX2M5b9PBp9i5v_akXshQqBFRT4dTHg+PR2pWpHPa5RBOEUTg@mail.gmail.com>
+Subject: Re: INFO: task hung in __floppy_read_block_0
+To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Cc:     Denis Efremov <efremov@linux.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        syzkaller <syzkaller@googlegroups.com>,
+        fleischermarius@googlemail.com, its.priyanka.bose@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 19 Jul 2022 12:27:23 +0800, Coly Li wrote:
-> There is 1 patch from bcache submission, which removes 'EXPERIMENTAL'
-> from the bcache Kconfig item, now 'Asynchronous device registration'
-> option is not experimental anymore.
-> 
-> Please take it for v5.20. Thank you in advance to taking care of this.
-> 
-> Coly Li
-> 
-> [...]
+On Thu, Jul 28, 2022 at 7:23 AM Lukas Bulwahn <lukas.bulwahn@gmail.com> wro=
+te:
+>
+> Dipanjan, are you really sure that you want to report a "INFO: task
+> hung" bug identified with your syzkaller instance? Especially for a
+> floppy driver, probably in your case even just an emulated one
+> (right?). Reading data from floppies was always very slow as far as I
+> remember those times...
 
-Applied, thanks!
+From the bugs reported by syzkaller in the past, we observed that
+several of these =E2=80=9CINFO: task hung in=E2=80=A6 =E2=80=9C reports wer=
+e considered and
+acted on, for example, this:
+https://groups.google.com/g/syzkaller-bugs/c/L0SBaHZ5bYc. For the
+reported issue, we noticed the read task stays blocked for 143
+seconds, which seemed to be one the higher, especially given that it
+is an emulated floppy drive (yes, you are right). If it deems normal,
+then we do apologize for our misassesment.
 
-[1/1] bcache: remove EXPERIMENTAL for Kconfig option 'Asynchronous device registration'
-      commit: 508e357579f07d43cb3feabe93b46bc1648ca5d9
+> Consider the severity of the issue and judge if you would like to
+> point out such a 'bug'.
+>
+> It might happen that:
+>
+> Due to bad judgement on your side, kernel developers and maintainers
+> will consider the value/severity of the provided bug reports overall
+> and then eventually simply ignore all reports that you send.
 
-Best regards,
--- 
-Jens Axboe
+That would be very unfortunate. Please allow me to explain how we, as
+a *small* academic team, are operating. If you closely follow our
+reportings we did in the last few days, the first =E2=80=9Cquality control=
+=E2=80=9D we
+are doing (to minimize the noise and frustration) is to make sure not
+to report any bug without a reproducer. Now, the unfortunate reality
+is that none of us is a pro kernel hacker with years of expertise in
+tinkering with Linux internals, which essentially means, no matter how
+hard we try, we cannot simply match up the combined level of expertise
+and competency of the people in these mailing groups. We are using our
+best judgement before reporting these bugs. Admittedly, we may be
+wrong, and we apologize in advance for such mishaps. The developers
+can confirm, or refute the reports (if they can spend a line or two
+why they think something we reported is not a problem, we would be
+grateful). In our defense, what we can say is that, in the last few
+days we responded to the developers who asked us to provide details of
+a bug, or test a patch. In fact, we are still in the process of
+responding to some of them, because being a small team, our turnaround
+time is higher than ideal. To answer you, simply ignoring all the
+reports we send might be too harsh (unfair?) to an academic group
+operating in good faith. Providing us pointers like you did above
+(thanks to Greg for helping us in some other thread), and letting us
+know what we did wrong will help us to align ourselves better with the
+reporting and patching workflow.
 
+> Dmitry and his team around syzkaller and syzbot can give you more
+> insights on learning a good judgement of what to report, how and when.
 
+We would very much appreciate any help (even positive criticism) from
+the community in this regard.
+
+--=20
+Thanks and Regards,
+
+Dipanjan
