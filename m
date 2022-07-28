@@ -2,91 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F704C04A68
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 09:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C63C3F6B0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jul 2022 09:33:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235196AbiG1JcD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jul 2022 05:32:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39442 "EHLO
+        id S235558AbiG1Jdv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jul 2022 05:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235533AbiG1JcC (ORCPT
+        with ESMTP id S235547AbiG1Jdt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jul 2022 05:32:02 -0400
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B7D61B0D
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 02:32:01 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VKexYOt_1659000717;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VKexYOt_1659000717)
-          by smtp.aliyun-inc.com;
-          Thu, 28 Jul 2022 17:31:58 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     axboe@kernel.dk, ming.lei@redhat.com
-Cc:     ZiyangZhang@linux.alibaba.com, linux-block@vger.kernel.org,
-        xiaoguang.wang@linux.alibaba.com
-Subject: [PATCH V3 1/2] ublk_cmd.h: add one new ublk command: UBLK_IO_NEED_GET_DATA
-Date:   Thu, 28 Jul 2022 17:31:23 +0800
-Message-Id: <bc8848ba3de5a9c75b8eeb638a95999921d11596.1658999030.git.ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1658999030.git.ZiyangZhang@linux.alibaba.com>
-References: <cover.1658999030.git.ZiyangZhang@linux.alibaba.com>
+        Thu, 28 Jul 2022 05:33:49 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 142A461D97;
+        Thu, 28 Jul 2022 02:33:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C0E3B209AA;
+        Thu, 28 Jul 2022 09:33:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1659000827; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SB6tJ4z7ixYCC4m5qWSYZT9XjUVOUuyqFKcfB92kx20=;
+        b=hRehc4W65y4S7gZEYw54uweayg3E0ArpqGQbQyLN0cKr7UkMOcM3LGxp1AJoL2gltZtfYf
+        9/67Du5A+am+IryU8wF2FrkwkiQm/O6/BS34np2EarxFoT4CF1HfFJuklyvvIzMp0NoZiW
+        cTWD9/HFZfvIDiF+6tNyd0lEkZR0wfI=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9058713A7E;
+        Thu, 28 Jul 2022 09:33:47 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id yCdBIvtX4mLxUAAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 28 Jul 2022 09:33:47 +0000
+Date:   Thu, 28 Jul 2022 11:33:46 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+        ming.lei@redhat.com, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH RESEND v6 4/8] blk-throttle: fix io hung due to config
+ updates
+Message-ID: <20220728093346.GA2281@blackbody.suse.cz>
+References: <20220701093441.885741-1-yukuai1@huaweicloud.com>
+ <20220701093441.885741-5-yukuai1@huaweicloud.com>
+ <YuGGVxdlOVk/eF2l@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="AqsLC8rIMeq19msA"
+Content-Disposition: inline
+In-Reply-To: <YuGGVxdlOVk/eF2l@slm.duckdns.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add one new ublk command: UBLK_IO_NEED_GET_DATA. It is prepared for a new
-feature designed for a user application who wants to allocate IO buffer
-and set IO buffer address only after it receives an IO request from
-ublksrv.
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- include/uapi/linux/ublk_cmd.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+--AqsLC8rIMeq19msA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index ca33092354ab..c986b4971423 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -28,12 +28,21 @@
-  *      this IO request, request's handling result is committed to ublk
-  *      driver, meantime FETCH_REQ is piggyback, and FETCH_REQ has to be
-  *      handled before completing io request.
-+ *
-+ * NEED_GET_DATA: only used for write requests to set io addr and copy data
-+ *      When NEED_GET_DATA is set, ublksrv has to issue UBLK_IO_NEED_GET_DATA
-+ *      command after ublk driver returns UBLK_IO_RES_NEED_GET_DATA.
-+ *
-+ *      It is only used if ublksrv set UBLK_F_NEED_GET_DATA flag
-+ *      while starting a ublk device.
-  */
- #define	UBLK_IO_FETCH_REQ		0x20
- #define	UBLK_IO_COMMIT_AND_FETCH_REQ	0x21
-+#define UBLK_IO_NEED_GET_DATA	0x22
- 
- /* only ABORT means that no re-fetch */
- #define UBLK_IO_RES_OK			0
-+#define UBLK_IO_RES_NEED_GET_DATA	1
- #define UBLK_IO_RES_ABORT		(-ENODEV)
- 
- #define UBLKSRV_CMD_BUF_OFFSET	0
-@@ -54,6 +63,15 @@
-  */
- #define UBLK_F_URING_CMD_COMP_IN_TASK	(1ULL << 1)
- 
-+/*
-+ * User should issue io cmd again for write requests to
-+ * set io buffer address and copy data from bio vectors
-+ * to the userspace io buffer.
-+ *
-+ * In this mode, task_work is not used.
-+ */
-+#define UBLK_F_NEED_GET_DATA (1UL << 2)
-+
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
--- 
-2.34.1
+On Wed, Jul 27, 2022 at 08:39:19AM -1000, Tejun Heo <tj@kernel.org> wrote:
+> I'm not quiet sure this is correct. What if the limit keeps changing across
+> different values? Then we'd be calculating the skipped amount based on the
+> last configuration only which would be incorrect.
 
+When one change of configuration is correct, then all changes must be
+correct by induction. It's sufficient to take into account only the one
+old config and the new one.
+
+This __tg_update_skipped() calculates bytes_skipped with the limit
+before the change and bytes_skipped are used (divided by) the new limit
+in tg_with_in_bps_limit().
+The accumulation of bytes_skipped across multiple changes (until slice
+properly ends) is proportional to how bytes_allowed would grow over
+time.
+That's why I find this correct (I admit I had to look back into my
+notes when this was first discussed).
+
+HTH,
+Michal
+
+--AqsLC8rIMeq19msA
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCYuJX3wAKCRAkDQmsBEOq
+uen2AP9DlRReKs7tBs0MfsBYoy0j+l23U/bpUzVeRFefU6hqBQD/dwu4UjPCbCwb
+oYbP30IoXD0s6tsiKY9PSyDBkf1xMAU=
+=r1c9
+-----END PGP SIGNATURE-----
+
+--AqsLC8rIMeq19msA--
