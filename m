@@ -2,131 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D844C00144
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 06:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC13C00144
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 06:59:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234907AbiG2GgU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 02:36:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
+        id S233742AbiG2G71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 02:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235245AbiG2GgH (ORCPT
+        with ESMTP id S232907AbiG2G70 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 02:36:07 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F37980F6D;
-        Thu, 28 Jul 2022 23:35:50 -0700 (PDT)
+        Fri, 29 Jul 2022 02:59:26 -0400
+X-Greylist: delayed 1110 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 28 Jul 2022 23:59:24 PDT
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF327E81A
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 23:59:24 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LvHn23bXWzl405;
-        Fri, 29 Jul 2022 14:34:46 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDn79PDf+NiMlVHBQ--.51285S3;
-        Fri, 29 Jul 2022 14:35:48 +0800 (CST)
-Subject: Re: [PATCH v3] blk-mq: fix io hung due to missing commit_rqs
-To:     axboe@kernel.dk
-Cc:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>,
-        osandov@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220726122224.1790882-1-yukuai1@huaweicloud.com>
- <YuCsNuVuVppgn9FL@T590>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <1ca6db8a-5780-45c6-064d-dd72c9f274c3@huaweicloud.com>
-Date:   Fri, 29 Jul 2022 14:35:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4LvHtg4Xrrz6PjSJ;
+        Fri, 29 Jul 2022 14:39:39 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgD3_9PlgONidnlHBQ--.46322S4;
+        Fri, 29 Jul 2022 14:40:52 +0800 (CST)
+From:   Zhang Wensheng <zhangwensheng@huaweicloud.com>
+To:     stable@vger.kernel.org
+Cc:     axboe@kernel.dk, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        john.fastabend@gmail.com, kpsingh@kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhangwensheng5@huawei.com, yukuai3@huawei.com
+Subject: [PATCH 5.10] block: fix null-deref in percpu_ref_put
+Date:   Fri, 29 Jul 2022 14:52:43 +0800
+Message-Id: <20220729065243.1786222-1-zhangwensheng@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <YuCsNuVuVppgn9FL@T590>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDn79PDf+NiMlVHBQ--.51285S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFyfuF4UtF48Xr47uFWDtwb_yoW8urW8pF
-        4xK3Wayan5tr4Utrn7XFW7ZFyFg39xX3y7GryfKw43ZayDKrW0qrs3tw13WFyIkFs5uwnF
-        gF4Dur9Ygw1kArJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUF9a9DU
-        UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CM-TRANSID: _Ch0CgD3_9PlgONidnlHBQ--.46322S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxur18Ar1fWF1xKr4kAr48Xrb_yoWrAry3pF
+        WDKF4Ikw10gr4UWrW8Jw47ZasFgw4qkFyxCa93KrWYyFnFgF1vvr1kCrs8Xr48Cr4kArWU
+        ZrWDWrsIkryUWFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28I
+        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
+        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+        IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
+        z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: x2kd0wpzhq2xhhqjqx5xdzvxpfor3voofrz/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
+From: Zhang Wensheng <zhangwensheng5@huawei.com>
 
-Can you please consider this patch for v5.20?
+In the use of q_usage_counter of request_queue, blk_cleanup_queue using
+"wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter))"
+to wait q_usage_counter becoming zero. however, if the q_usage_counter
+becoming zero quickly, and percpu_ref_exit will execute and ref->data
+will be freed, maybe another process will cause a null-defef problem
+like below:
 
-Thanks,
-Kuai
+	CPU0                             CPU1
+blk_cleanup_queue
+ blk_freeze_queue
+  blk_mq_freeze_queue_wait
+				scsi_end_request
+				 percpu_ref_get
+				 ...
+				 percpu_ref_put
+				  atomic_long_sub_and_test
+  percpu_ref_exit
+   ref->data -> NULL
+   				   ref->data->release(ref) -> null-deref
 
-ÔÚ 2022/07/27 11:08, Ming Lei Ð´µÀ:
-> On Tue, Jul 26, 2022 at 08:22:24PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> Currently, in virtio_scsi, if 'bd->last' is not set to true while
->> dispatching request, such io will stay in driver's queue, and driver
->> will wait for block layer to dispatch more rqs. However, if block
->> layer failed to dispatch more rq, it should trigger commit_rqs to
->> inform driver.
->>
->> There is a problem in blk_mq_try_issue_list_directly() that commit_rqs
->> won't be called:
->>
->> // assume that queue_depth is set to 1, list contains two rq
->> blk_mq_try_issue_list_directly
->>   blk_mq_request_issue_directly
->>   // dispatch first rq
->>   // last is false
->>    __blk_mq_try_issue_directly
->>     blk_mq_get_dispatch_budget
->>     // succeed to get first budget
->>     __blk_mq_issue_directly
->>      scsi_queue_rq
->>       cmd->flags |= SCMD_LAST
->>        virtscsi_queuecommand
->>         kick = (sc->flags & SCMD_LAST) != 0
->>         // kick is false, first rq won't issue to disk
->>   queued++
->>
->>   blk_mq_request_issue_directly
->>   // dispatch second rq
->>    __blk_mq_try_issue_directly
->>     blk_mq_get_dispatch_budget
->>     // failed to get second budget
->>   ret == BLK_STS_RESOURCE
->>    blk_mq_request_bypass_insert
->>   // errors is still 0
->>
->>   if (!list_empty(list) || errors && ...)
->>    // won't pass, commit_rqs won't be called
->>
->> In this situation, first rq relied on second rq to dispatch, while
->> second rq relied on first rq to complete, thus they will both hung.
->>
->> Fix the problem by also treat 'BLK_STS_*RESOURCE' as 'errors' since
->> it means that request is not queued successfully.
->>
->> Same problem exists in blk_mq_dispatch_rq_list(), 'BLK_STS_*RESOURCE'
->> can't be treated as 'errors' here, fix the problem by calling
->> commit_rqs if queue_rq return 'BLK_STS_*RESOURCE'.
->>
->> Fixes: d666ba98f849 ("blk-mq: add mq_ops->commit_rqs()")
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> 
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+Fix it by setting flag(QUEUE_FLAG_USAGE_COUNT_SYNC) to add synchronization
+mechanism, when ref->data->release is called, the flag will be setted,
+and the "wait_event" in blk_mq_freeze_queue_wait must wait flag becoming
+true as well, which will limit percpu_ref_exit to execute ahead of time.
+
+Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+---
+ block/blk-core.c       | 4 +++-
+ block/blk-mq.c         | 7 +++++++
+ include/linux/blk-mq.h | 1 +
+ include/linux/blkdev.h | 2 ++
+ 4 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 26664f2a139e..238d0f3cd279 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -385,7 +385,8 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 * prevent that blk_mq_run_hw_queues() accesses the hardware queues
+ 	 * after draining finished.
+ 	 */
+-	blk_freeze_queue(q);
++	blk_freeze_queue_start(q);
++	blk_mq_freeze_queue_wait_sync(q);
+ 
+ 	rq_qos_exit(q);
+ 
+@@ -500,6 +501,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
+ 	struct request_queue *q =
+ 		container_of(ref, struct request_queue, q_usage_counter);
+ 
++	blk_queue_flag_set(QUEUE_FLAG_USAGE_COUNT_SYNC, q);
+ 	wake_up_all(&q->mq_freeze_wq);
+ }
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c5d82b21a1cc..15c4e4530c87 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -134,6 +134,7 @@ void blk_freeze_queue_start(struct request_queue *q)
+ {
+ 	mutex_lock(&q->mq_freeze_lock);
+ 	if (++q->mq_freeze_depth == 1) {
++		blk_queue_flag_clear(QUEUE_FLAG_USAGE_COUNT_SYNC, q);
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		mutex_unlock(&q->mq_freeze_lock);
+ 		if (queue_is_mq(q))
+@@ -144,6 +145,12 @@ void blk_freeze_queue_start(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+ 
++void blk_mq_freeze_queue_wait_sync(struct request_queue *q)
++{
++	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter) &&
++			test_bit(QUEUE_FLAG_USAGE_COUNT_SYNC, &q->queue_flags));
++}
++
+ void blk_mq_freeze_queue_wait(struct request_queue *q)
+ {
+ 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index f8ea27423d1d..95b2c904375f 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -522,6 +522,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_unfreeze_queue(struct request_queue *q);
+ void blk_freeze_queue_start(struct request_queue *q);
+ void blk_mq_freeze_queue_wait(struct request_queue *q);
++void blk_mq_freeze_queue_wait_sync(struct request_queue *q);
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 98fdf5a31fd6..b61461e3a734 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -629,6 +629,8 @@ struct request_queue {
+ #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+ #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
+ #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
++/* sync for q_usage_counter */
++#define QUEUE_FLAG_USAGE_COUNT_SYNC    30
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP) |		\
+-- 
+2.31.1
 
