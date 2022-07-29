@@ -2,146 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69368C00144
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 09:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F46C19F2B
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 10:54:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235547AbiG2JJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 05:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44962 "EHLO
+        id S235148AbiG2Kya (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 06:54:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235494AbiG2JJX (ORCPT
+        with ESMTP id S230301AbiG2Ky3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 05:09:23 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206A785F87
-        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 02:09:21 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220729090918euoutp01f7cc13e4d37f29944dc89d2c28124ac2~GQbUb3yN_1067310673euoutp01C
-        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 09:09:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220729090918euoutp01f7cc13e4d37f29944dc89d2c28124ac2~GQbUb3yN_1067310673euoutp01C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1659085758;
-        bh=xUi/aumvkNNWLDf9OglW0aUO63Tnf9nSRETunbF1Zr0=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=FukMvNoJtks6GY6PBjOf5vVvRLF1AuGvjwRKU30hoaL7PGLjZv/yqU6VrJvg9xiJT
-         fclInjWUpeB2J+6geSmubKrALvwSkmwXz7oruVQtypA45umdF/KLsH3jKAwdtUSLup
-         JN0dRhWDilX0COnDstyIL1HumalKSbzdwwGp7eN4=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220729090918eucas1p2789e2f8c650aa31e0ecec8f1d2aff3d6~GQbUD7Cv72990229902eucas1p2D;
-        Fri, 29 Jul 2022 09:09:18 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id A5.C1.09580.EB3A3E26; Fri, 29
-        Jul 2022 10:09:18 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220729090918eucas1p1782d5db2070d20502d6534c7a7e37a22~GQbTtKK9o1900119001eucas1p1P;
-        Fri, 29 Jul 2022 09:09:18 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220729090918eusmtrp2cb36704469666cfa1381c86a8c45a6b0~GQbTsOxOd2132221322eusmtrp2O;
-        Fri, 29 Jul 2022 09:09:18 +0000 (GMT)
-X-AuditID: cbfec7f5-9adff7000000256c-0c-62e3a3be7352
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id A2.5E.09038.DB3A3E26; Fri, 29
-        Jul 2022 10:09:17 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220729090917eusmtip125a6d45cf8e112df70fc03b445c79919~GQbTh_gX13212032120eusmtip1G;
-        Fri, 29 Jul 2022 09:09:17 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.8) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 29 Jul 2022 10:09:15 +0100
-Message-ID: <f577e147-c692-97b1-3262-2684649b5eae@samsung.com>
-Date:   Fri, 29 Jul 2022 11:09:14 +0200
+        Fri, 29 Jul 2022 06:54:29 -0400
+X-Greylist: delayed 954 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 29 Jul 2022 03:54:27 PDT
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FC4186899;
+        Fri, 29 Jul 2022 03:54:27 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LvP954M6qzkk2B;
+        Fri, 29 Jul 2022 18:37:29 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP3 (Coremail) with SMTP id _Ch0CgB32mmnuONiUgtOBQ--.27701S4;
+        Fri, 29 Jul 2022 18:38:31 +0800 (CST)
+From:   Zhang Wensheng <zhangwensheng@huaweicloud.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        bpf@vger.kernel.org, yukuai3@huawei.com,
+        zhangwensheng@huaweicloud.com
+Subject: [PATCH -next] [RFC] block: fix null-deref in percpu_ref_put
+Date:   Fri, 29 Jul 2022 18:50:36 +0800
+Message-Id: <20220729105036.2202791-1-zhangwensheng@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-Subject: Re: [PATCH v8 02/11] block: allow blk-zoned devices to have
- non-power-of-2 zone size
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>,
-        <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
-        <axboe@kernel.dk>, <snitzer@kernel.org>,
-        <Johannes.Thumshirn@wdc.com>
-CC:     <matias.bjorling@wdc.com>, <gost.dev@samsung.com>,
-        <linux-kernel@vger.kernel.org>, <hare@suse.de>,
-        <linux-block@vger.kernel.org>, <pankydev8@gmail.com>,
-        <jaegeuk@kernel.org>, <dm-devel@redhat.com>,
-        <linux-nvme@lists.infradead.org>,
-        Luis Chamberlain <mcgrof@kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <514f85ce-84fc-1186-7169-a29d7118e8cc@acm.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.8]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIKsWRmVeSWpSXmKPExsWy7djP87r7Fj9OMlj7Sdxi9d1+NotpH34y
-        W/w+e57ZYu+72awWexZNYrJYufook8WT9bOYLf523WOy2HtL2+LyrjlsFvOXPWW3mND2ldni
-        xoSnjBZrbj5lsThxS9qB3+PyFW+PnbPusntcPlvqsWlVJ5vH5iX1HrtvNrB57Gy9z+rxft9V
-        oNDpao/Pm+Q82g90MwVwR3HZpKTmZJalFunbJXBl3Jq/k61gAVvFw3trWRsY21m7GDk5JARM
-        JG7POwBkc3EICaxglPi+/DuU84VR4mjXTCjnM6PEm3f9jDAt2z9sZoNILGeUOLz2GRNc1eOZ
-        S9hBqoQEdjJKPPxoBmLzCthJXGq9zwJiswioSsz/tJsZIi4ocXLmE7C4qECkxJrdZ8F6hQXi
-        JX4cX8QGYjMLiEvcejIfbIGIwFJGiX+3L4KtZhaYwSRx/PIqIIeDg01AS6KxE6yZU8Ba4sPW
-        HnaIZk2J1u2/oWx5ie1v5zBDvKAo0f99AxuEXSux9tgZdpCZEgL3OCWmztnFDpFwkejceRvq
-        Z2GJV8e3QMVlJP7vBLkIxK6WeHrjNzNEcwujRP/O9WAHSQBd0XcmB6LGUWLB6+eMEGE+iRtv
-        BSHu4ZOYtG068wRG1VlIYTELyc+zkLwwC8kLCxhZVjGKp5YW56anFhvnpZbrFSfmFpfmpesl
-        5+duYgSmwtP/jn/dwbji1Ue9Q4xMHIyHGCU4mJVEeAUCHicJ8aYkVlalFuXHF5XmpBYfYpTm
-        YFES503O3JAoJJCeWJKanZpakFoEk2Xi4JRqYHKLv6Y5b35ef7vnhYPf/XtDKtZKp91VWiG8
-        YuYMs50n/zipScx5d8XjgrHyDb44mZevvhVn3F6dUy/mpXmrWT3iTjKjm13ykpbaa3dbXpoc
-        YX68///WPOeEz+ZrS6Ri3/xwF+OQt5291zKqTuhE14Rvl/6YlX5V79ywhYnnuTsb77GgoEM3
-        C7Xe1li5Zhgn+CQerzqdXFS617/yceoGEfvuKzvN3y3UNl0T1Vxw81DEwX8Flswr5qfd9fp7
-        te7HrRT7t/svZ8pWXLHY0rLAXzPb4nb8kgYmp3OVcxjXfrv0UNZtz+kOo7aXk27wRm2PdOBL
-        f1gcK5pcPydjZdq+pbtv+Pwz72wsyjxhIa3mrMRSnJFoqMVcVJwIANbigGD0AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOKsWRmVeSWpSXmKPExsVy+t/xu7p7Fz9OMvhxx9pi9d1+NotpH34y
-        W/w+e57ZYu+72awWexZNYrJYufook8WT9bOYLf523WOy2HtL2+LyrjlsFvOXPWW3mND2ldni
-        xoSnjBZrbj5lsThxS9qB3+PyFW+PnbPusntcPlvqsWlVJ5vH5iX1HrtvNrB57Gy9z+rxft9V
-        oNDpao/Pm+Q82g90MwVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZ
-        pKTmZJalFunbJehl3Jq/k61gAVvFw3trWRsY21m7GDk5JARMJLZ/2MzWxcjFISSwlFHi1so7
-        jBAJGYlPVz6yQ9jCEn+udUEVfWSUWLWulRnC2cko8fDJLSaQKl4BO4lLrfdZQGwWAVWJ+Z92
-        M0PEBSVOznwCFhcViJR4uKwJrF5YIF7ix/FFbCA2s4C4xK0n85lAhoqAnDFn5hNGEIdZYAaT
-        xPHLq6B2X2OSePpkDdDlHBxsAloSjZ1g93EKWEt82NrDDjFJU6J1+28oW15i+9s5zBA/KEr0
-        f9/ABmHXSry6v5txAqPoLCQHzkJyyCwko2YhGbWAkWUVo0hqaXFuem6xkV5xYm5xaV66XnJ+
-        7iZGYArZduznlh2MK1991DvEyMTBeIhRgoNZSYRXIOBxkhBvSmJlVWpRfnxRaU5q8SFGU2Ao
-        TWSWEk3OByaxvJJ4QzMDU0MTM0sDU0szYyVxXs+CjkQhgfTEktTs1NSC1CKYPiYOTqkGJqb/
-        Zt1HuU4vLZG9u8NX7GFqi4HoEw3DJblmc5JSz+YtZS9v1dg46Xba7u/3uHa0zS10EUg4f/9k
-        RLAA+62wO2xVczqaJblPJ9+o3bW3Z6c2n7SQ5abefPcnhmstpht+eMe7vn/fxD/THov4R9Wn
-        LCzrOuf6YqlM0F5/PoV4xrmsdwKmbV6+yPvJ7D2LVJw5+l6zrzjtLi2tenwDq0SatfZeVw3x
-        n5Grjs7TeNTyT/e9TUvf/xeBxw7sqJCLv+E+W4z5YX51lOGCHxI5u04HbXc5uDW/Un9J/OSb
-        E/m7fJ4/eppR0ZXt+/PqAuZJb400yuXazopMys7pV7PdF7fTkidF7lq+/7m5leGvVGZGKLEU
-        ZyQaajEXFScCALp70FGqAwAA
-X-CMS-MailID: 20220729090918eucas1p1782d5db2070d20502d6534c7a7e37a22
-X-Msg-Generator: CA
-X-RootMTR: 20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9
-References: <20220727162245.209794-1-p.raghav@samsung.com>
-        <CGME20220727162248eucas1p2ff8c3c2b021bedcae3960024b4e269e9@eucas1p2.samsung.com>
-        <20220727162245.209794-3-p.raghav@samsung.com>
-        <7984b969-9025-6b31-2645-da08daeefafb@acm.org>
-        <eed7d9ee-fd7f-e57c-598e-909dbb0d2380@samsung.com>
-        <514f85ce-84fc-1186-7169-a29d7118e8cc@acm.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _Ch0CgB32mmnuONiUgtOBQ--.27701S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxArWDJrW5tFykKw1rCFyfWFg_yoWrZF4UpF
+        WDGF4akw10gr4DWry8Jw47ZasFgw4qkFy3CayfKrWYyF1qgFn2vr18Crs8XF48Cr4kArW5
+        ZrWDWwsIkryUWFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+        xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
+X-CM-SenderInfo: x2kd0wpzhq2xhhqjqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-07-28 15:29, Bart Van Assche wrote:
+From: Zhang Wensheng <zhangwensheng5@huawei.com>
 
->> But I am fine with going back to bdev_is_zone_start if you and Damien
->> feel strongly otherwise.
-> The "zone start LBA" terminology occurs in ZBC-1, ZBC-2 and ZNS but
-> "zone aligned" not. I prefer "zone start" because it is clear,
-> unambiguous and because it has the same meaning as in the corresponding
-> standards documents. I propose to proceed as follows for checking
-> whether a number of LBAs is a multiple of the zone length:
-> * Either use bdev_is_zone_start() directly.
-> * Or introduce a synonym for bdev_is_zone_start() with an appropriate
-> name, e.g. bdev_is_zone_len_multiple().
-> 
-Thanks for the clarification Bart. I will go with bdev_is_zone_start()
-as it is also a commonly used terminology.
-> Thanks,
-> 
-> Bart.
+A problem was find in stable 5.10 and the root cause of it like below.
+
+In the use of q_usage_counter of request_queue, blk_cleanup_queue using
+"wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter))"
+to wait q_usage_counter becoming zero. however, if the q_usage_counter
+becoming zero quickly, and percpu_ref_exit will execute and ref->data
+will be freed, maybe another process will cause a null-defef problem
+like below:
+
+	CPU0                             CPU1
+blk_cleanup_queue
+ blk_freeze_queue
+  blk_mq_freeze_queue_wait
+				scsi_end_request
+				 percpu_ref_get
+				 ...
+				 percpu_ref_put
+				  atomic_long_sub_and_test
+  percpu_ref_exit
+   ref->data -> NULL
+   				   ref->data->release(ref) -> null-deref
+
+Fix it by setting flag(QUEUE_FLAG_USAGE_COUNT_SYNC) to add synchronization
+mechanism, when ref->data->release is called, the flag will be setted,
+and the "wait_event" in blk_mq_freeze_queue_wait must wait flag becoming
+true as well, which will limit percpu_ref_exit to execute ahead of time.
+
+Although the problem was not reproduced in mainline, it may also has
+problem when the passthrough IO which will go directly to
+blk_cleanup_queue and cause the problem as well.
+
+Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+---
+ block/blk-core.c       | 4 +++-
+ block/blk-mq.c         | 7 +++++++
+ include/linux/blk-mq.h | 1 +
+ include/linux/blkdev.h | 2 ++
+ 4 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 27fb1357ad4b..4b73f46e62ec 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -312,7 +312,8 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 * prevent that blk_mq_run_hw_queues() accesses the hardware queues
+ 	 * after draining finished.
+ 	 */
+-	blk_freeze_queue(q);
++	blk_freeze_queue_start(q);
++	blk_mq_freeze_queue_wait_sync(q);
+ 
+ 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
+ 
+@@ -403,6 +404,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
+ 	struct request_queue *q =
+ 		container_of(ref, struct request_queue, q_usage_counter);
+ 
++	blk_queue_flag_set(QUEUE_FLAG_USAGE_COUNT_SYNC, q);
+ 	wake_up_all(&q->mq_freeze_wq);
+ }
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 93d9d60980fb..44e764257511 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -165,6 +165,7 @@ void blk_freeze_queue_start(struct request_queue *q)
+ {
+ 	mutex_lock(&q->mq_freeze_lock);
+ 	if (++q->mq_freeze_depth == 1) {
++		blk_queue_flag_clear(QUEUE_FLAG_USAGE_COUNT_SYNC, q);
+ 		percpu_ref_kill(&q->q_usage_counter);
+ 		mutex_unlock(&q->mq_freeze_lock);
+ 		if (queue_is_mq(q))
+@@ -175,6 +176,12 @@ void blk_freeze_queue_start(struct request_queue *q)
+ }
+ EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
+ 
++void blk_mq_freeze_queue_wait_sync(struct request_queue *q)
++{
++	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter) &&
++			test_bit(QUEUE_FLAG_USAGE_COUNT_SYNC, &q->queue_flags));
++}
++
+ void blk_mq_freeze_queue_wait(struct request_queue *q)
+ {
+ 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e2d9daf7e8dd..50fd56f85b31 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -868,6 +868,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
+ void blk_mq_unfreeze_queue(struct request_queue *q);
+ void blk_freeze_queue_start(struct request_queue *q);
+ void blk_mq_freeze_queue_wait(struct request_queue *q);
++void blk_mq_freeze_queue_wait_sync(struct request_queue *q);
+ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
+ 				     unsigned long timeout);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 2f7b43444c5f..93ed8b166d66 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -575,6 +575,8 @@ struct request_queue {
+ #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
+ #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
+ #define QUEUE_FLAG_SQ_SCHED     30	/* single queue style io dispatch */
++/* sync for q_usage_counter */
++#define QUEUE_FLAG_USAGE_COUNT_SYNC    31
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP) |		\
+-- 
+2.31.1
+
