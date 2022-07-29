@@ -2,168 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC13C00144
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 06:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1A5C00144
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 07:30:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233742AbiG2G71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 02:59:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
+        id S230071AbiG2HaM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 03:30:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232907AbiG2G70 (ORCPT
+        with ESMTP id S233974AbiG2HaL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 02:59:26 -0400
-X-Greylist: delayed 1110 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 28 Jul 2022 23:59:24 PDT
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF327E81A
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 23:59:24 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4LvHtg4Xrrz6PjSJ;
-        Fri, 29 Jul 2022 14:39:39 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgD3_9PlgONidnlHBQ--.46322S4;
-        Fri, 29 Jul 2022 14:40:52 +0800 (CST)
-From:   Zhang Wensheng <zhangwensheng@huaweicloud.com>
-To:     stable@vger.kernel.org
-Cc:     axboe@kernel.dk, ast@kernel.org, daniel@iogearbox.net,
-        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        john.fastabend@gmail.com, kpsingh@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhangwensheng5@huawei.com, yukuai3@huawei.com
-Subject: [PATCH 5.10] block: fix null-deref in percpu_ref_put
-Date:   Fri, 29 Jul 2022 14:52:43 +0800
-Message-Id: <20220729065243.1786222-1-zhangwensheng@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        Fri, 29 Jul 2022 03:30:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D73F264A
+        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 00:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659079809;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1F5r+eGikZzGLMBDfl3sb82FaGI83USRovPI3oRpJ4M=;
+        b=FyPM9jT9lrLKejJVizsNkZGr2j3uoiGwtv9dQvicFa6G/a4rm3dvw4NXQTccNFIDYaXBIN
+        gSrDqXx24gYgigeExOQOhHOHDjtwfsZLe/LzRiE1Z8abcE5AVlk3djPWXLnTG7ui9szlkJ
+        2r2c+t9k+jAOKFWHgU63vqQNM8HnzRw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-151-MWcsBPDkNV6JAUvr2Yd2iQ-1; Fri, 29 Jul 2022 03:30:05 -0400
+X-MC-Unique: MWcsBPDkNV6JAUvr2Yd2iQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5F206185A7BA;
+        Fri, 29 Jul 2022 07:30:05 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CBE2492C3B;
+        Fri, 29 Jul 2022 07:30:04 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 0/5] ublk_drv: add generic mechanism to get/set parameters
+Date:   Fri, 29 Jul 2022 15:29:49 +0800
+Message-Id: <20220729072954.1070514-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgD3_9PlgONidnlHBQ--.46322S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxur18Ar1fWF1xKr4kAr48Xrb_yoWrAry3pF
-        WDKF4Ikw10gr4UWrW8Jw47ZasFgw4qkFyxCa93KrWYyFnFgF1vvr1kCrs8Xr48Cr4kArWU
-        ZrWDWrsIkryUWFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28I
-        cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
-        IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI
-        42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
-        IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
-        z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: x2kd0wpzhq2xhhqjqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhang Wensheng <zhangwensheng5@huawei.com>
+Hello Jens,
 
-In the use of q_usage_counter of request_queue, blk_cleanup_queue using
-"wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter))"
-to wait q_usage_counter becoming zero. however, if the q_usage_counter
-becoming zero quickly, and percpu_ref_exit will execute and ref->data
-will be freed, maybe another process will cause a null-defef problem
-like below:
+The 1st two patches fixes ublk device leak or hang issue in case of some
+failure path, such as, failing to start device.
 
-	CPU0                             CPU1
-blk_cleanup_queue
- blk_freeze_queue
-  blk_mq_freeze_queue_wait
-				scsi_end_request
-				 percpu_ref_get
-				 ...
-				 percpu_ref_put
-				  atomic_long_sub_and_test
-  percpu_ref_exit
-   ref->data -> NULL
-   				   ref->data->release(ref) -> null-deref
+The 3rd patch adds two control commands for setting/getting device
+parameters in generic way, and easy to extend to add new parameter
+type.
 
-Fix it by setting flag(QUEUE_FLAG_USAGE_COUNT_SYNC) to add synchronization
-mechanism, when ref->data->release is called, the flag will be setted,
-and the "wait_event" in blk_mq_freeze_queue_wait must wait flag becoming
-true as well, which will limit percpu_ref_exit to execute ahead of time.
+The 4th patch adds two parameter type: basic and discard, and basic
+parameter covers basic block queue setting or someone which can't
+be grouped to other types, basic parameter has to be set; discard
+parameter is optional.
 
-Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
----
- block/blk-core.c       | 4 +++-
- block/blk-mq.c         | 7 +++++++
- include/linux/blk-mq.h | 1 +
- include/linux/blkdev.h | 2 ++
- 4 files changed, 13 insertions(+), 1 deletion(-)
+The 5th patch cleans UAPI of ublksrv_ctrl_dev_info, and userspace has
+to be updated for this driver change, so please consider this patchset
+for v5.20.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 26664f2a139e..238d0f3cd279 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -385,7 +385,8 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * prevent that blk_mq_run_hw_queues() accesses the hardware queues
- 	 * after draining finished.
- 	 */
--	blk_freeze_queue(q);
-+	blk_freeze_queue_start(q);
-+	blk_mq_freeze_queue_wait_sync(q);
- 
- 	rq_qos_exit(q);
- 
-@@ -500,6 +501,7 @@ static void blk_queue_usage_counter_release(struct percpu_ref *ref)
- 	struct request_queue *q =
- 		container_of(ref, struct request_queue, q_usage_counter);
- 
-+	blk_queue_flag_set(QUEUE_FLAG_USAGE_COUNT_SYNC, q);
- 	wake_up_all(&q->mq_freeze_wq);
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c5d82b21a1cc..15c4e4530c87 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -134,6 +134,7 @@ void blk_freeze_queue_start(struct request_queue *q)
- {
- 	mutex_lock(&q->mq_freeze_lock);
- 	if (++q->mq_freeze_depth == 1) {
-+		blk_queue_flag_clear(QUEUE_FLAG_USAGE_COUNT_SYNC, q);
- 		percpu_ref_kill(&q->q_usage_counter);
- 		mutex_unlock(&q->mq_freeze_lock);
- 		if (queue_is_mq(q))
-@@ -144,6 +145,12 @@ void blk_freeze_queue_start(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_freeze_queue_start);
- 
-+void blk_mq_freeze_queue_wait_sync(struct request_queue *q)
-+{
-+	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter) &&
-+			test_bit(QUEUE_FLAG_USAGE_COUNT_SYNC, &q->queue_flags));
-+}
-+
- void blk_mq_freeze_queue_wait(struct request_queue *q)
- {
- 	wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter));
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index f8ea27423d1d..95b2c904375f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -522,6 +522,7 @@ void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
-+void blk_mq_freeze_queue_wait_sync(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 98fdf5a31fd6..b61461e3a734 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -629,6 +629,8 @@ struct request_queue {
- #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
- #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
- #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
-+/* sync for q_usage_counter */
-+#define QUEUE_FLAG_USAGE_COUNT_SYNC    30
- 
- #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
- 				 (1 << QUEUE_FLAG_SAME_COMP) |		\
+Verified by all targets in the following branch:
+
+https://github.com/ming1/ubdsrv/tree/parameter
+
+Also all device data including parameters is exported as json in
+above tree.
+
+
+V3:
+- drop device reference after add_disk fails, as suggested by Christoph, 1/5
+- simplify the 3rd patch: replace xarray with plain array, remove
+  function table and avoid indirect call, then reduce boiler plate for
+  addressing Christoph's comment
+
+V2:
+- re-organize patches
+- limit parameter max length
+- take Christoph's approach to replace bitfields with flags, and use
+char type to define block size shift
+- add two fixes, which is triggered when testing set/get parameter
+  commands
+- cleanup uapi header
+
+
+Ming Lei (5):
+  ublk_drv: cancel device even though disk isn't up
+  ublk_drv: fix ublk device leak in case that add_disk fails
+  ublk_drv: add SET_PARAM/GET_PARAM control command
+  ublk_drv: add two parameter types
+  ublk_drv: cleanup ublksrv_ctrl_dev_info
+
+ drivers/block/ublk_drv.c      | 333 ++++++++++++++++++++++++++++++----
+ include/uapi/linux/ublk_cmd.h |  57 +++++-
+ 2 files changed, 352 insertions(+), 38 deletions(-)
+
 -- 
 2.31.1
 
