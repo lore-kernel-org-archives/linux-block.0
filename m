@@ -2,109 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1A5C00144
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 07:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0831BC00144
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 07:30:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbiG2HaM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 03:30:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41838 "EHLO
+        id S234595AbiG2HaR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 03:30:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233974AbiG2HaL (ORCPT
+        with ESMTP id S234316AbiG2HaP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 03:30:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D73F264A
-        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 00:30:10 -0700 (PDT)
+        Fri, 29 Jul 2022 03:30:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E98C5165AF
+        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 00:30:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659079809;
+        s=mimecast20190719; t=1659079812;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1F5r+eGikZzGLMBDfl3sb82FaGI83USRovPI3oRpJ4M=;
-        b=FyPM9jT9lrLKejJVizsNkZGr2j3uoiGwtv9dQvicFa6G/a4rm3dvw4NXQTccNFIDYaXBIN
-        gSrDqXx24gYgigeExOQOhHOHDjtwfsZLe/LzRiE1Z8abcE5AVlk3djPWXLnTG7ui9szlkJ
-        2r2c+t9k+jAOKFWHgU63vqQNM8HnzRw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1CcjT7ssBAqi22XKPqJyCqgtwUHpMb08crcGjfMtU5Q=;
+        b=HHZibjttLMr1IDRfBIrWxlfCaHVXLda2sIb/ZZ4T88kavH6N6zIy/7F0wKREX0MbeG99Ds
+        qgytmTsfC/UAAlhXMNtLGfPyyiGRtfMU2uIHdbJqmqeZeqW7tkht1/nnbCQQKRZag9DAPq
+        noLVWSAsB/2mBP3b9JxxCScFKgYU4pI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-151-MWcsBPDkNV6JAUvr2Yd2iQ-1; Fri, 29 Jul 2022 03:30:05 -0400
-X-MC-Unique: MWcsBPDkNV6JAUvr2Yd2iQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-330-ZCqBun3TPKCOEl_KTMWTZw-1; Fri, 29 Jul 2022 03:30:09 -0400
+X-MC-Unique: ZCqBun3TPKCOEl_KTMWTZw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5F206185A7BA;
-        Fri, 29 Jul 2022 07:30:05 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4DF653804519;
+        Fri, 29 Jul 2022 07:30:09 +0000 (UTC)
 Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CBE2492C3B;
-        Fri, 29 Jul 2022 07:30:04 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F581492C3B;
+        Fri, 29 Jul 2022 07:30:08 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/5] ublk_drv: add generic mechanism to get/set parameters
-Date:   Fri, 29 Jul 2022 15:29:49 +0800
-Message-Id: <20220729072954.1070514-1-ming.lei@redhat.com>
+Subject: [PATCH V3 1/5] ublk_drv: cancel device even though disk isn't up
+Date:   Fri, 29 Jul 2022 15:29:50 +0800
+Message-Id: <20220729072954.1070514-2-ming.lei@redhat.com>
+In-Reply-To: <20220729072954.1070514-1-ming.lei@redhat.com>
+References: <20220729072954.1070514-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Jens,
+Each ublk queue is started before adding disk, we have to cancel queues in
+ublk_stop_dev() so that ubq daemon can be exited, otherwise DEL_DEV command
+may hang forever.
 
-The 1st two patches fixes ublk device leak or hang issue in case of some
-failure path, such as, failing to start device.
+Also avoid to cancel queues two times by checking if queue is ready,
+otherwise use-after-free on io_uring may be triggered because ublk_stop_dev
+is called by ublk_remove() too.
 
-The 3rd patch adds two control commands for setting/getting device
-parameters in generic way, and easy to extend to add new parameter
-type.
+Fixes: 71f28f3136af ("ublk_drv: add io_uring based userspace block driver")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/block/ublk_drv.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-The 4th patch adds two parameter type: basic and discard, and basic
-parameter covers basic block queue setting or someone which can't
-be grouped to other types, basic parameter has to be set; discard
-parameter is optional.
-
-The 5th patch cleans UAPI of ublksrv_ctrl_dev_info, and userspace has
-to be updated for this driver change, so please consider this patchset
-for v5.20.
-
-Verified by all targets in the following branch:
-
-https://github.com/ming1/ubdsrv/tree/parameter
-
-Also all device data including parameters is exported as json in
-above tree.
-
-
-V3:
-- drop device reference after add_disk fails, as suggested by Christoph, 1/5
-- simplify the 3rd patch: replace xarray with plain array, remove
-  function table and avoid indirect call, then reduce boiler plate for
-  addressing Christoph's comment
-
-V2:
-- re-organize patches
-- limit parameter max length
-- take Christoph's approach to replace bitfields with flags, and use
-char type to define block size shift
-- add two fixes, which is triggered when testing set/get parameter
-  commands
-- cleanup uapi header
-
-
-Ming Lei (5):
-  ublk_drv: cancel device even though disk isn't up
-  ublk_drv: fix ublk device leak in case that add_disk fails
-  ublk_drv: add SET_PARAM/GET_PARAM control command
-  ublk_drv: add two parameter types
-  ublk_drv: cleanup ublksrv_ctrl_dev_info
-
- drivers/block/ublk_drv.c      | 333 ++++++++++++++++++++++++++++++----
- include/uapi/linux/ublk_cmd.h |  57 +++++-
- 2 files changed, 352 insertions(+), 38 deletions(-)
-
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 3f1906965ac8..7ece4c2ef062 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -788,16 +788,27 @@ static void ublk_daemon_monitor_work(struct work_struct *work)
+ 				UBLK_DAEMON_MONITOR_PERIOD);
+ }
+ 
++static inline bool ublk_queue_ready(struct ublk_queue *ubq)
++{
++	return ubq->nr_io_ready == ubq->q_depth;
++}
++
+ static void ublk_cancel_queue(struct ublk_queue *ubq)
+ {
+ 	int i;
+ 
++	if (!ublk_queue_ready(ubq))
++		return;
++
+ 	for (i = 0; i < ubq->q_depth; i++) {
+ 		struct ublk_io *io = &ubq->ios[i];
+ 
+ 		if (io->flags & UBLK_IO_FLAG_ACTIVE)
+ 			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0);
+ 	}
++
++	/* all io commands are canceled */
++	ubq->nr_io_ready = 0;
+ }
+ 
+ /* Cancel all pending commands, must be called after del_gendisk() returns */
+@@ -818,19 +829,14 @@ static void ublk_stop_dev(struct ublk_device *ub)
+ 	del_gendisk(ub->ub_disk);
+ 	ub->dev_info.state = UBLK_S_DEV_DEAD;
+ 	ub->dev_info.ublksrv_pid = -1;
+-	ublk_cancel_dev(ub);
+ 	put_disk(ub->ub_disk);
+ 	ub->ub_disk = NULL;
+  unlock:
++	ublk_cancel_dev(ub);
+ 	mutex_unlock(&ub->mutex);
+ 	cancel_delayed_work_sync(&ub->monitor_work);
+ }
+ 
+-static inline bool ublk_queue_ready(struct ublk_queue *ubq)
+-{
+-	return ubq->nr_io_ready == ubq->q_depth;
+-}
+-
+ /* device can only be started after all IOs are ready */
+ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+ {
 -- 
 2.31.1
 
