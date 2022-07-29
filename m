@@ -2,125 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 156BBC19F2B
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 07:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF0F0C00144
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 07:46:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234463AbiG2HkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 03:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50048 "EHLO
+        id S235269AbiG2Hqq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 03:46:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234874AbiG2HkC (ORCPT
+        with ESMTP id S235277AbiG2Hqa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 03:40:02 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F28281B24
-        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 00:39:57 -0700 (PDT)
-Received: from canpemm500002.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LvK9y6vL1zmV9X;
-        Fri, 29 Jul 2022 15:37:58 +0800 (CST)
-Received: from huawei.com (10.29.88.127) by canpemm500002.china.huawei.com
- (7.192.104.244) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 29 Jul
- 2022 15:39:50 +0800
-From:   Chao Leng <lengchao@huawei.com>
-To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>
-CC:     <hch@lst.de>, <sagi@grimberg.me>, <kbusch@kernel.org>,
-        <axboe@kernel.dk>, <lengchao@huawei.com>
-Subject: [PATCH 3/3] nvme: improve the quiesce time for blocking transports
-Date:   Fri, 29 Jul 2022 15:39:48 +0800
-Message-ID: <20220729073948.32696-4-lengchao@huawei.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20220729073948.32696-1-lengchao@huawei.com>
-References: <20220729073948.32696-1-lengchao@huawei.com>
+        Fri, 29 Jul 2022 03:46:30 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C02F5820F8
+        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 00:45:34 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220729074530euoutp01d410171f1854b934c2f2015782625f8b~GPSJw-Zn61777017770euoutp01X
+        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 07:45:30 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220729074530euoutp01d410171f1854b934c2f2015782625f8b~GPSJw-Zn61777017770euoutp01X
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1659080730;
+        bh=2JvP5q4s3KFrEayk/Q9vM7n8LVWKGMn9/c9LOwESMTw=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=jvCNwCH5AfMdg/nWkZy+l0jGwXj6X+oO9J4qnnAyfYG759yzITtJbKcnOIaTtQhpJ
+         gGTKKpXWzVs0ENN+7BePiAvaASbguCAasAfC0/800lffL4043CScJwXQ6tcmMR2q8C
+         ZGVpM125N4lFoz8LI4dCL+qYQHOsr+JLdOJJndh8=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220729074530eucas1p21ea3c19a45c637ef3d9ea2e96196ecd6~GPSJa76JX1134011340eucas1p2Z;
+        Fri, 29 Jul 2022 07:45:30 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 80.93.10067.A1093E26; Fri, 29
+        Jul 2022 08:45:30 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220729074530eucas1p270ac45caf3b18a52191551f8a743fa6d~GPSJFi8cZ2146621466eucas1p2q;
+        Fri, 29 Jul 2022 07:45:30 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220729074530eusmtrp1b27a38390c4717b0777540433b641bf0~GPSJEg2ci2539025390eusmtrp1J;
+        Fri, 29 Jul 2022 07:45:30 +0000 (GMT)
+X-AuditID: cbfec7f4-dd7ff70000002753-4a-62e3901aeb7b
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 85.80.09038.A1093E26; Fri, 29
+        Jul 2022 08:45:30 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220729074529eusmtip264c47380f46b3f8f37950cd2d57efb12~GPSI7HuWE0719907199eusmtip2D;
+        Fri, 29 Jul 2022 07:45:29 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.8) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 29 Jul 2022 08:45:27 +0100
+Message-ID: <4f6f9ea5-fac6-598d-fcaa-3cb24cb2d935@samsung.com>
+Date:   Fri, 29 Jul 2022 09:45:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.29.88.127]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500002.china.huawei.com (7.192.104.244)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.11.0
+Subject: Re: [PATCH v8 04/11] nvmet: Allow ZNS target to support
+ non-power_of_2 zone sizes
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
+        <axboe@kernel.dk>, <snitzer@kernel.org>,
+        <Johannes.Thumshirn@wdc.com>
+CC:     <matias.bjorling@wdc.com>, <gost.dev@samsung.com>,
+        <linux-kernel@vger.kernel.org>, <hare@suse.de>,
+        <linux-block@vger.kernel.org>, <pankydev8@gmail.com>,
+        <bvanassche@acm.org>, <jaegeuk@kernel.org>, <dm-devel@redhat.com>,
+        <linux-nvme@lists.infradead.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <137b8772-a2cc-f195-1c0d-476214fabd52@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.8]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPKsWRmVeSWpSXmKPExsWy7djPc7pSEx4nGWzeLGWx+m4/m8W0Dz+Z
+        LX6fPc9ssffdbFaLPYsmMVmsXH2UyeLJ+lnMFn+77jFZ7L2lbXF51xw2i/nLnrJbTGj7ymxx
+        Y8JTRos1N5+yWJy4Je3A73H5irfHzll32T0uny312LSqk81j85J6j903G9g8drbeZ/V4v+8q
+        UOh0tcfnTXIe7Qe6mQK4o7hsUlJzMstSi/TtErgy7vx/zlawlqNi99ab7A2Md9m6GDk5JARM
+        JKYvncfcxcjFISSwglHi45E9bBDOF0aJhY83sUI4nxkltr9eD9eyqG8OE0RiOaNE29GtzHBV
+        04/OYodwdjJKnD34kwmkhVfATqL3yUbGLkYODhYBVYnlHU4QYUGJkzOfsIDYogKREmt2n2UH
+        sYUFYiQO7TvGDGIzC4hL3HoyH2yMiEAPo8Tf3Ywg85kF1jFJtB69zgYyk01AS6Kxkx3E5BRw
+        k7hwTRCiVVOidftvdghbXmL72znMEA8oSvR/3wD1TK3E2mNnwE6WEHjEKTF10ht2iISLxJ+O
+        F4wQtrDEq+NboOIyEqcn97BA2NUST2/8ZoZobmGU6N+5HuweCQFrib4zORA1jhK3O1exQIT5
+        JG68hbqNT2LStunMExhVZyGFxCwkH89C8sIsJC8sYGRZxSieWlqcm55abJSXWq5XnJhbXJqX
+        rpecn7uJEZgGT/87/mUH4/JXH/UOMTJxMB5ilOBgVhLhFQh4nCTEm5JYWZValB9fVJqTWnyI
+        UZqDRUmcNzlzQ6KQQHpiSWp2ampBahFMlomDU6qByVxoTnbkSfY1HyRjjsZHC8c5NHK5JVbP
+        1lppd8B47dUsZ0uF7buTzX3luFa9dmn6wrDWVCSII7RLduWqHZrLTq2TVDDnd3bli2t+KyZq
+        6eXx1O2xw0FBN4YqvY4MK4Xfs/xCIl6IP/V+wqI9r2v2J1bhzzuXiMSdlokx5kl95HUkpndi
+        g5dGlq7HzmKxX0cbrnP7GoskqzxlWan9KUvh/F+mziOiP6fK9USszFFa9+6Hj2P9RM/+NJ+j
+        k2tLZ6fNaeBP2aPSHOzi8vXKq1dhrXzivBIqkofmPZnx4Ocm9YKOL9pKvjNPrfJTXXFuSfUF
+        wVSuV3aPElwkyyPv14grluSyVb251vko/+Dql0osxRmJhlrMRcWJAArgzZzyAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprEKsWRmVeSWpSXmKPExsVy+t/xe7pSEx4nGXzazGyx+m4/m8W0Dz+Z
+        LX6fPc9ssffdbFaLPYsmMVmsXH2UyeLJ+lnMFn+77jFZ7L2lbXF51xw2i/nLnrJbTGj7ymxx
+        Y8JTRos1N5+yWJy4Je3A73H5irfHzll32T0uny312LSqk81j85J6j903G9g8drbeZ/V4v+8q
+        UOh0tcfnTXIe7Qe6mQK4o/RsivJLS1IVMvKLS2yVog0tjPQMLS30jEws9QyNzWOtjEyV9O1s
+        UlJzMstSi/TtEvQy7vx/zlawlqNi99ab7A2Md9m6GDk5JARMJBb1zWHqYuTiEBJYyiixe/di
+        qISMxKcrH9khbGGJP9e6wOJCAh8ZJebfqIewdzJK7OnnAbF5Bewkep9sZOxi5OBgEVCVWN7h
+        BBEWlDg58wkLiC0qECnxcFkTE4gtLBAjcWjfMWYQm1lAXOLWk/lgcRGBHkaJv7sZQe5hFljH
+        JNF69DobxHG/GSXmPPwKtoBNQEuisZMdxOQUcJO4cE0QYo6mROv23+wQtrzE9rdzmCHOV5To
+        /74B6q1aiVf3dzNOYBSdheS8WUjOmIVk1CwkoxYwsqxiFEktLc5Nzy020itOzC0uzUvXS87P
+        3cQITBzbjv3csoNx5auPeocYmTgYDzFKcDArifAKBDxOEuJNSaysSi3Kjy8qzUktPsRoCgyi
+        icxSosn5wNSVVxJvaGZgamhiZmlgamlmrCTO61nQkSgkkJ5YkpqdmlqQWgTTx8TBKdXAtCCN
+        4yzz8SWbsivOi2UUPt29712/WOD5tgVvdni80OdNYbpVuU3NXZGr8carlTWNIef5Tb7Mu3k2
+        4YZlx9e1KRkfjn2qMzmpLnPN8ajpi40iSY8/zLSw0Pw7c8M8npOqOys+aESmxBSeLznToa2t
+        uLmCybLj8OUHqww2sd87cnPaHDOP5HSuBw/EjrxYsJv9/P8iy/O/rrXq11vfqO9+bxf28wqX
+        IMfRgPQs3ZM5Pb8mdN9qvjy3Ke2vfsSye6xmHUXvWZxPCT6SXvv6kqi4n9T7D1xaqsKRS0XF
+        Dxeeei5+QSb3rsiRnS4q80q2OD5aITUrK9j89Cpuiyebt3o5a/3Y+njNgos3m+a/XFrZ76XE
+        UpyRaKjFXFScCABRZxy8pQMAAA==
+X-CMS-MailID: 20220729074530eucas1p270ac45caf3b18a52191551f8a743fa6d
+X-Msg-Generator: CA
+X-RootMTR: 20220727162250eucas1p133e8a814fee934f7161866122ef93273
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220727162250eucas1p133e8a814fee934f7161866122ef93273
+References: <20220727162245.209794-1-p.raghav@samsung.com>
+        <CGME20220727162250eucas1p133e8a814fee934f7161866122ef93273@eucas1p1.samsung.com>
+        <20220727162245.209794-5-p.raghav@samsung.com>
+        <137b8772-a2cc-f195-1c0d-476214fabd52@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When work with nvme multipathing, if one path failed, the requests will
-be canceled and retry on another path. Before cancel the requests,
-nvme_stop_queues quiesce queues for all namespaces, now quiesce one by
-one, if there is a large set of namespaces, it will take long time.
-Because every synchronize_srcu may need more than 10 milliseconds,
-the total waiting time will be long.
-Quiesce all queues in parallel and start syncing for srcus of all
-queues, and then wait for all srcus to complete synchronization.
-The quiesce time and I/O fail over time can be largely reduced.
+On 2022-07-28 05:09, Damien Le Moal wrote:
 
-Signed-off-by: Chao Leng <lengchao@huawei.com>
----
- drivers/nvme/host/core.c | 38 ++++++++++++++++++++++++++++----------
- 1 file changed, 28 insertions(+), 10 deletions(-)
+>>  }
+> 
+> This change should go into patch 3. Otherwise, adding patch 3 only will
+> break the nvme target zone code.
+> 
+Ok.
+>>  
+>>  static unsigned long get_nr_zones_from_buf(struct nvmet_req *req, u32 bufsize)
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index 1be805223026..d1ef9b9552ed 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -1350,6 +1350,11 @@ static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>>  	return BLK_ZONED_NONE;
+>>  }
+>>  
+>> +static inline unsigned int bdev_zone_no(struct block_device *bdev, sector_t sec)
+>> +{
+>> +	return disk_zone_no(bdev->bd_disk, sec);
+>> +}
+>> +
+> 
+> This should go into a prep patch before patch 3.
+> 
+Bart commented in the earlier versions to see the new helpers along with
+its usage instead of having it separately in a prep patch.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index fcfa27e1078a..937d5802d41b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -21,6 +21,7 @@
- #include <linux/nvme_ioctl.h>
- #include <linux/pm_qos.h>
- #include <asm/unaligned.h>
-+#include <linux/rcupdate_wait.h>
- 
- #include "nvme.h"
- #include "fabrics.h"
-@@ -4916,14 +4917,6 @@ static void nvme_start_ns_queue(struct nvme_ns *ns)
- 		blk_mq_unquiesce_queue(ns->queue);
- }
- 
--static void nvme_stop_ns_queue(struct nvme_ns *ns)
--{
--	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
--		blk_mq_quiesce_queue(ns->queue);
--	else
--		blk_mq_wait_quiesce_done(ns->queue);
--}
--
- static void nvme_stop_ns_queue_nosync(struct nvme_ns *ns)
- {
- 	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
-@@ -4933,9 +4926,34 @@ static void nvme_stop_ns_queue_nosync(struct nvme_ns *ns)
- static void nvme_stop_blocking_queues(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
-+	int i, count;
-+	struct rcu_synchronize *rcu;
- 
--	list_for_each_entry(ns, &ctrl->namespaces, list)
--		nvme_stop_ns_queue(ns);
-+	count = 0;
-+	list_for_each_entry(ns, &ctrl->namespaces, list) {
-+		nvme_stop_ns_queue_nosync(ns);
-+		count++;
-+	}
-+
-+	rcu = kvmalloc(count * sizeof(*rcu), GFP_KERNEL);
-+	if (rcu) {
-+		i = 0;
-+		list_for_each_entry(ns, &ctrl->namespaces, list) {
-+			init_rcu_head(&rcu[i].head);
-+			init_completion(&rcu[i].completion);
-+			call_srcu(ns->queue->srcu, &rcu[i].head, wakeme_after_rcu);
-+			i++;
-+		}
-+
-+		for (i = 0; i < count; i++) {
-+			wait_for_completion(&rcu[i].completion);
-+			destroy_rcu_head(&rcu[i].head);
-+		}
-+		kvfree(rcu);
-+	} else {
-+		list_for_each_entry(ns, &ctrl->namespaces, list)
-+			blk_mq_wait_quiesce_done(ns->queue);
-+	}
- }
- 
- static void nvme_stop_nonblocking_queues(struct nvme_ctrl *ctrl)
--- 
-2.16.4
-
+>>  static inline int queue_dma_alignment(const struct request_queue *q)
+>>  {
+>>  	return q ? q->dma_alignment : 511;
+> 
+> 
