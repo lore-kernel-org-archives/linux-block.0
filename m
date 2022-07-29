@@ -2,255 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB7CC19F2A
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 06:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8CE9C00144
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jul 2022 06:12:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232739AbiG2GL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 02:11:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59278 "EHLO
+        id S233584AbiG2GMB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 02:12:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233584AbiG2GL5 (ORCPT
+        with ESMTP id S233892AbiG2GL6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 02:11:57 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047477C1B4
-        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 23:11:55 -0700 (PDT)
+        Fri, 29 Jul 2022 02:11:58 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B65E77D78B
+        for <linux-block@vger.kernel.org>; Thu, 28 Jul 2022 23:11:57 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LvHFR73stzl6xV;
-        Fri, 29 Jul 2022 14:10:51 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4LvHFD3bLTz6R4t8;
+        Fri, 29 Jul 2022 14:10:40 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgCnCWkneuNiP6ZGBQ--.22656S6;
-        Fri, 29 Jul 2022 14:11:54 +0800 (CST)
+        by APP3 (Coremail) with SMTP id _Ch0CgCnCWkneuNiP6ZGBQ--.22656S4;
+        Fri, 29 Jul 2022 14:11:53 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     stable@vger.kernel.org, hch@lst.de, axboe@kernel.dk,
         snitzer@redhat.com
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH stable 5.10 2/3] block: support delayed holder registration
-Date:   Fri, 29 Jul 2022 14:23:55 +0800
-Message-Id: <20220729062356.1663513-3-yukuai1@huaweicloud.com>
+Subject: [PATCH stable 5.10 0/3] dm: fix nullptr crash
+Date:   Fri, 29 Jul 2022 14:23:53 +0800
+Message-Id: <20220729062356.1663513-1-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220729062356.1663513-1-yukuai1@huaweicloud.com>
-References: <20220729062356.1663513-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgCnCWkneuNiP6ZGBQ--.22656S6
-X-Coremail-Antispam: 1UD129KBjvJXoW3GF4fJr1xtr1UZrW8XF4fZrb_yoWxZF4fpF
-        Z8KFZ5trW8JF47uFsFqa1UXFWYga18J3WxAry3KryIqrZxJrsYyF1fGry7XF93trZ2gFW7
-        JF45JrW29F10kaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9m14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2
-        IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
-        6r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
-        AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IY
-        s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
-        0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUc6pPUUUUU=
+X-CM-TRANSID: _Ch0CgCnCWkneuNiP6ZGBQ--.22656S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxWF4rCFyxJr45GrWrWF45KFg_yoW7Jr43pr
+        43Kr45Cr48Kr17JF43AF1UJr1UJr47AF1UXryxGr18J3Wj93WUXryUJr4UAryUJr4UZry7
+        tr1DJw48tr1UtaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+        AvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+        xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+From: Yu Kuai <yukuai3@huawei.com>
 
-commit d626338735909bc2b2e7cafc332f44ed41cfdeee upstream.
+This patchset backport three patches to fix a crash found by our test:
 
-device mapper needs to register holders before it is ready to do I/O.
-Currently it does so by registering the disk early, which can leave
-the disk and queue in a weird half state where the queue is registered
-with the disk, except for sysfs and the elevator.  And this state has
-been a bit promlematic before, and will get more so when sorting out
-the responsibilities between the queue and the disk.
+BUG: kernel NULL pointer dereference, address: 00000000000001a0
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0
+Oops: 0000 [#1] PREEMPT SMP
+CPU: 1 PID: 1317 Comm: mount Not tainted 5.10.0-16691-gf6076432827d-dirty #169
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-4
+RIP: 0010:__blk_mq_sched_bio_merge+0x9d/0x1a0
+Code: 87 1e 9d 89 d0 25 00 00 00 01 0f 85 ad 00 00 00 48 83 05 25 a1 37 0c 01 3
+RSP: 0018:ffffc90000473b50 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc90000473b98
+RDX: 0000000000001000 RSI: ffff8881080c7500 RDI: ffff888103a9cc18
+RBP: ffff88813bc80000 R08: 0000000000000001 R09: 0000000000000000
+R10: ffff88810710be30 R11: 0000000000000000 R12: ffff888103a9cc18
+R13: ffff8881080c7500 R14: 0000000000000001 R15: 0000000000000000
+FS:  00007f51bcdbb040(0000) GS:ffff88813bc80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000000001a0 CR3: 000000010d715000 CR4: 00000000000006e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-Support registering holders on an initialized but not registered disk
-instead by delaying the sysfs registration until the disk is registered.
+Call Trace:
+ blk_mq_submit_bio+0x115/0xd80
+ submit_bio_noacct+0x4ff/0x610
+ submit_bio+0xaa/0x1a0
+ submit_bh_wbc+0x1cb/0x2f0
+ submit_bh+0x17/0x20
+ ext4_read_bh+0x63/0x170
+ ext4_read_bh_lock+0x2c/0xd0
+ __ext4_sb_bread_gfp.isra.0+0xa0/0xf0
+ ext4_fill_super+0x21f/0x5610
+ ? pointer+0x31b/0x5a0
+ ? vsnprintf+0x131/0x7d0
+ mount_bdev+0x233/0x280
+ ? ext4_calculate_overhead+0x660/0x660
+ ext4_mount+0x19/0x30
+ legacy_get_tree+0x35/0x90
+ vfs_get_tree+0x29/0x100
+ ? capable+0x1d/0x30
+ path_mount+0x8a7/0x1150
+ do_mount+0x8d/0xc0
+ __se_sys_mount+0x14a/0x220
+ __x64_sys_mount+0x29/0x40
+ do_syscall_64+0x45/0x70
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x7f51bbe1623a
+Code: 48 8b 0d 51 dc 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 8
+RSP: 002b:00007fff173ae898 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 000056169a120030 RCX: 00007f51bbe1623a
+RDX: 000056169a120210 RSI: 000056169a120250 RDI: 000056169a120230
+RBP: 0000000000000000 R08: 0000000000000000 R09: 00007fff173ad798
+R10: 00000000c0ed0000 R11: 0000000000000246 R12: 000056169a120230
+R13: 000056169a120210 R14: 0000000000000000 R15: 00007f51bcbac184
+Modules linked in: dm_service_time dm_multipath
+CR2: 00000000000001a0
+---[ end trace ac5d86e09fdc7c98 ]---
+RIP: 0010:__blk_mq_sched_bio_merge+0x9d/0x1a0
+Code: 87 1e 9d 89 d0 25 00 00 00 01 0f 85 ad 00 00 00 48 83 05 25 a1 37 0c 01 3
+RSP: 0018:ffffc90000473b50 EFLAGS: 00010202
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc90000473b98
+RDX: 0000000000001000 RSI: ffff8881080c7500 RDI: ffff888103a9cc18
+RBP: ffff88813bc80000 R08: 0000000000000001 R09: 0000000000000000
+R10: ffff88810710be30 R11: 0000000000000000 R12: ffff888103a9cc18
+R13: ffff8881080c7500 R14: 0000000000000001 R15: 0000000000000000
+FS:  00007f51bcdbb040(0000) GS:ffff88813bc80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f10e97a5000 CR3: 000000010d715000 CR4: 00000000000006e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Kernel panic - not syncing: Fatal exception
+Kernel Offset: disabled
+---[ end Kernel panic - not syncing: Fatal exception ]---
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/genhd.c         | 10 ++++++
- fs/block_dev.c        | 74 +++++++++++++++++++++++++++++++++----------
- include/linux/genhd.h |  5 +++
- 3 files changed, 72 insertions(+), 17 deletions(-)
+root cause:
+t1 dm-mpath		t2 mount
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 2b11a2735285..da4642182702 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -732,6 +732,16 @@ static void register_disk(struct device *parent, struct gendisk *disk,
- 	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
- 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
- 
-+	/*
-+	 * XXX: this is a mess, can't wait for real error handling in add_disk.
-+	 * Make sure ->slave_dir is NULL if we failed some of the registration
-+	 * so that the cleanup in bd_unlink_disk_holder works properly.
-+	 */
-+	if (bd_register_pending_holders(disk) < 0) {
-+		kobject_put(disk->slave_dir);
-+		disk->slave_dir = NULL;
-+	}
-+
- 	if (disk->flags & GENHD_FL_HIDDEN)
- 		return;
- 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index a202c76fcf7f..8dc894c0f5f3 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1210,6 +1210,19 @@ static void del_symlink(struct kobject *from, struct kobject *to)
- 	sysfs_remove_link(from, kobject_name(to));
- }
- 
-+static int __link_disk_holder(struct block_device *bdev, struct gendisk *disk)
-+{
-+	int ret;
-+
-+	ret = add_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
-+	if (ret)
-+		return ret;
-+	ret = add_symlink(bdev->bd_part->holder_dir, &disk_to_dev(disk)->kobj);
-+	if (ret)
-+		del_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
-+	return ret;
-+}
-+
- /**
-  * bd_link_disk_holder - create symlinks between holding disk and slave bdev
-  * @bdev: the claimed slave bdev
-@@ -1252,7 +1265,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	WARN_ON_ONCE(!bdev->bd_holder);
- 
- 	/* FIXME: remove the following once add_disk() handles errors */
--	if (WARN_ON(!disk->slave_dir || !bdev->bd_part->holder_dir))
-+	if (WARN_ON(!bdev->bd_part->holder_dir))
- 		goto out_unlock;
- 
- 	holder = bd_find_holder_disk(bdev, disk);
-@@ -1271,13 +1284,13 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	holder->bdev = bdev;
- 	holder->refcnt = 1;
- 
--	ret = add_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
--	if (ret)
--		goto out_free;
--
--	ret = add_symlink(bdev->bd_part->holder_dir, &disk_to_dev(disk)->kobj);
--	if (ret)
--		goto out_del;
-+	if (disk->slave_dir) {
-+		ret = __link_disk_holder(bdev, disk);
-+		if (ret) {
-+			kfree(holder);
-+			goto out_unlock;
-+		}
-+	}
- 	/*
- 	 * bdev could be deleted beneath us which would implicitly destroy
- 	 * the holder directory.  Hold on to it.
-@@ -1285,12 +1298,6 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	kobject_get(bdev->bd_part->holder_dir);
- 
- 	list_add(&holder->list, &disk->slave_bdevs);
--	goto out_unlock;
--
--out_del:
--	del_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
--out_free:
--	kfree(holder);
- out_unlock:
- 	mutex_unlock(&bdev_holder->bd_mutex);
- 	bdput(bdev_holder);
-@@ -1298,6 +1305,13 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- }
- EXPORT_SYMBOL_GPL(bd_link_disk_holder);
- 
-+static void __unlink_disk_holder(struct block_device *bdev,
-+		struct gendisk *disk)
-+{
-+	del_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
-+	del_symlink(bdev->bd_part->holder_dir, &disk_to_dev(disk)->kobj);
-+}
-+
- /**
-  * bd_unlink_disk_holder - destroy symlinks created by bd_link_disk_holder()
-  * @bdev: the calimed slave bdev
-@@ -1321,9 +1335,8 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 	holder = bd_find_holder_disk(bdev, disk);
- 
- 	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
--		del_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
--		del_symlink(bdev->bd_part->holder_dir,
--			    &disk_to_dev(disk)->kobj);
-+		if (disk->slave_dir)
-+			__unlink_disk_holder(bdev, disk);
- 		kobject_put(bdev->bd_part->holder_dir);
- 		list_del_init(&holder->list);
- 		kfree(holder);
-@@ -1335,6 +1348,33 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
- EXPORT_SYMBOL_GPL(bd_unlink_disk_holder);
- #endif
- 
-+int bd_register_pending_holders(struct gendisk *disk)
-+{
-+	struct bd_holder_disk *holder;
-+	struct block_device *bdev = bdget_disk(disk, 0);
-+	int ret;
-+
-+	if (WARN_ON_ONCE(!bdev))
-+		return -ENOENT;
-+
-+	mutex_lock(&bdev->bd_mutex);
-+	list_for_each_entry(holder, &disk->slave_bdevs, list) {
-+		ret = __link_disk_holder(holder->bdev, disk);
-+		if (ret)
-+			goto out_undo;
-+	}
-+	mutex_unlock(&bdev->bd_mutex);
-+	bdput(bdev);
-+	return 0;
-+
-+out_undo:
-+	list_for_each_entry_continue_reverse(holder, &disk->slave_bdevs, list)
-+		__unlink_disk_holder(holder->bdev, disk);
-+	mutex_unlock(&bdev->bd_mutex);
-+	bdput(bdev);
-+	return ret;
-+}
-+
- /**
-  * check_disk_size_change - checks for disk size change and adjusts bdev size.
-  * @disk: struct gendisk to check
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 3e5049a527e6..3249f4b46700 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -385,6 +385,7 @@ long compat_blkdev_ioctl(struct file *, unsigned, unsigned long);
- #ifdef CONFIG_SYSFS
- int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk);
- void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk);
-+int bd_register_pending_holders(struct gendisk *disk);
- #else
- static inline int bd_link_disk_holder(struct block_device *bdev,
- 				      struct gendisk *disk)
-@@ -395,6 +396,10 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
- 					 struct gendisk *disk)
- {
- }
-+static inline int bd_register_pending_holders(struct gendisk *disk)
-+{
-+	return 0;
-+}
- #endif /* CONFIG_SYSFS */
- 
- #ifdef CONFIG_BLOCK
+alloc_dev
+ md->queue = blk_alloc_queue
+ add_disk_no_queue_reg
+
+dm_setup_md_queue
+ case DM_TYPE_REQUEST_BASED -> multipath
+  md->disk->fops = &dm_rq_blk_dops;
+			ext4_fill_super
+                        ┊__ext4_sb_bread_gfp
+                        ┊ ext4_read_bh
+                        ┊  submit_bio -> queue is not initialized yet
+                        ┊   __blk_mq_sched_bio_merge
+                        ┊    ctx = blk_mq_get_ctx(q); -> ctx is NULL
+  dm_mq_init_request_queue
+
+Patch 3 is the fix patch, and patch 1,2 is needed to backport patch 3.
+
+Please noted that there are lots of conficts between 5.10 and mainline,
+and I made plenty adaptations in these patches.
+
+I already tested this patchset with dmtest create/remove tests:
+
+dmtest run --suite thin-provisioning -t /Creation\Deletion/
+
+Christoph Hellwig (3):
+  block: look up holders by bdev
+  block: support delayed holder registration
+  dm: delay registering the gendisk
+
+ block/genhd.c             |  13 +++++
+ drivers/md/dm.c           |  24 +++++----
+ fs/block_dev.c            | 105 +++++++++++++++++++++++++++-----------
+ include/linux/blk_types.h |   3 --
+ include/linux/genhd.h     |   9 +++-
+ 5 files changed, 110 insertions(+), 44 deletions(-)
+
 -- 
 2.31.1
 
