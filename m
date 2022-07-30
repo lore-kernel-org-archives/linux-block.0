@@ -2,129 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DE8C04A68
-	for <linux-block@archiver.kernel.org>; Sat, 30 Jul 2022 11:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B63CC04A68
+	for <linux-block@archiver.kernel.org>; Sat, 30 Jul 2022 15:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234233AbiG3LR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Jul 2022 07:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37592 "EHLO
+        id S232856AbiG3PE2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Jul 2022 11:04:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234131AbiG3LRz (ORCPT
+        with ESMTP id S231148AbiG3PE1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Jul 2022 07:17:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F8A41EEDF
-        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 04:17:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659179873;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ajeH2EPldj0oFW5NJlh68z51lwf7zGjC5FfPekouKAo=;
-        b=K/oqLsJR9vzL6Ns280aqnin31IffffEJsIMPO7a7pO05QDFXGlQUb0a1rm2h9zm7CQg1sD
-        D65wEq9YJfj0/SR9s25f72Yicaricr34cb8tE158EX6u7QFOQ9yxQ7dzqA/NCGUy5n04oF
-        S/ga0FS4peZqNgFl/u4kwiRoZ9wrxns=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-13-Ok_HGvXdP6SII63yWAl8ww-1; Sat, 30 Jul 2022 07:17:50 -0400
-X-MC-Unique: Ok_HGvXdP6SII63yWAl8ww-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C008101A54E;
-        Sat, 30 Jul 2022 11:17:49 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CAC6A2026D07;
-        Sat, 30 Jul 2022 11:17:43 +0000 (UTC)
-Date:   Sat, 30 Jul 2022 19:17:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     syzbot <syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org, hdanton@sina.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, tj@kernel.org,
-        Yufen Yu <yuyufen@huawei.com>
-Subject: Re: [syzbot] possible deadlock in throtl_pending_timer_fn
-Message-ID: <YuUTUkxYFTKr6Ih3@T590>
-References: <000000000000921fd405db62096a@google.com>
- <0000000000004e96a405e4fd5051@google.com>
+        Sat, 30 Jul 2022 11:04:27 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3848818B08
+        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 08:04:26 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id s5-20020a17090a13c500b001f4da9ffe5fso912241pjf.5
+        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 08:04:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=8Zg17xtftYuS9FB0jNunpTdelhne7Uk+B80JlU8kgNU=;
+        b=R0OKwNAG6fK7Tb/TDz0NaUKHfL2Iq2jIfk8SO2XXftaYdPCSl7RtRTiJyDcvEQSSi4
+         gm0H2OuglhMecO5Eqg9NgtjAAImSyTS/ftKn3z7y/qPbIvnrwkhR2gFgmxgaO3oljm1R
+         X9M7GS/W+JnRJxxZ+5sm3PbjMp4oQj870I9iaVQKg1kv4mSTPVa5jhmzYH9ccba0sUjM
+         5L1jAA2xKvtOvmorbugCnVr4Oj1I6IicLH4kmtUekkNJF0yE+WRRv2K1Wb/tEMv5TSNR
+         tJO4HPLPQ4ZOb9vhovoIp77x3ipiUrOi9MNhonvfV2dxcGp+RIZAPl9AVqorRMdIbqzS
+         OKTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=8Zg17xtftYuS9FB0jNunpTdelhne7Uk+B80JlU8kgNU=;
+        b=Dem5FZsj9CvYx4LwblRWt66v/XlmUtdC5vWI1pzcsnfyCrrtfFPEQ0NZ3TYkIODF+b
+         iVdONIku4J0iyJX07haUckAK6I/LTuDe9Bb4XOYVP6Iqc2vUprZYCFsJV3CagPdwCHCi
+         O/MWtwaElsgf1y4HXAf6p0lh8XI/rV9CjBLZf+snBsux4HdhohQzIMdyf5tuY6sNnmpD
+         Eyr34b3RM7YtBFFV7djDo0jQr6OHXo/TeruJSyw/ryBIp9Uqgaa6ZF1rEG+LD8KqmHFt
+         NpPeMzbzKjPbI3WxPobIuUwAXgQL5W06K/HwLiSQ7CjIf8FppHfLZNWVTFh4dLl3Wpxt
+         tryQ==
+X-Gm-Message-State: ACgBeo1oh5nzEhrgyHrbMumsrUcioM3AtQWg16/N2aRfEiZUXVdoFJMx
+        uIKc3fjfrW/AHA/05uQxhhH8Aw==
+X-Google-Smtp-Source: AA6agR616cx6dk9qgxS2Qei2FFrE9KyqXM01Qlm078UDDK0KwseESaAs1XXtPPql20S4rYys0regFg==
+X-Received: by 2002:a17:90a:de12:b0:1f0:f213:cb9d with SMTP id m18-20020a17090ade1200b001f0f213cb9dmr9730681pjv.207.1659193465638;
+        Sat, 30 Jul 2022 08:04:25 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id s3-20020a170902ea0300b0016d763967f8sm5840312plg.107.2022.07.30.08.04.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 30 Jul 2022 08:04:25 -0700 (PDT)
+Message-ID: <1596ad46-1a21-f7ac-a335-059b7d6732f5@kernel.dk>
+Date:   Sat, 30 Jul 2022 09:04:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000004e96a405e4fd5051@google.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH V4 0/4] ublk_drv: add generic mechanism to get/set
+ parameters
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+References: <20220730092750.1118167-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220730092750.1118167-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 29, 2022 at 08:25:08PM -0700, syzbot wrote:
-> syzbot has bisected this issue to:
+On 7/30/22 3:27 AM, Ming Lei wrote:
+> Hello Jens,
 > 
-> commit 0a9a25ca78437b39e691bcc3dc8240455b803d8d
-> Author: Ming Lei <ming.lei@redhat.com>
-> Date:   Fri Mar 18 13:01:43 2022 +0000
+> The 1st two patches fixes ublk device leak or hang issue in case of some
+> failure path, such as, failing to start device.
 > 
->     block: let blkcg_gq grab request queue's refcnt
+> The 3rd patch adds two control commands for setting/getting device
+> parameters in generic way, and easy to extend to add new parameter
+> type.
 > 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16c3cfc2080000
-> start commit:   cb71b93c2dc3 Add linux-next specific files for 20220628
-> git tree:       linux-next
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=15c3cfc2080000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=11c3cfc2080000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=badbc1adb2d582eb
-> dashboard link: https://syzkaller.appspot.com/bug?extid=934ebb67352c8a490bf3
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17713dee080000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15d24952080000
+> The 4th patch cleans UAPI of ublksrv_ctrl_dev_info, and userspace needs
+> to be updated for this driver change, so please consider this patchset
+> for v5.20.
 > 
-> Reported-by: syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com
-> Fixes: 0a9a25ca7843 ("block: let blkcg_gq grab request queue's refcnt")
+> Verified by all targets in the following branch, and pass all built-in
+> tests.
 
-No, this lockdep warning isn't related with the above commit, which
-caused another regression, but fixed by commit d578c770c852
-("block: avoid calling blkg_free() in atomic context"). Looks syzbot
-can't recognize difference between the two different issues.
+This will miss the first pull request, but I've queued it up for this
+merge window.
 
-This specific issue of '[syzbot] possible deadlock in throtl_pending_timer_fn',
-is actually introduced by commit ("27029b4b18aa blkcg: fix memleak for iolatency").
-
-blk_throtl_exit() isn't safe to be called before blkg_destroy_all().
-
-The following change should avoid the issue:
-
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 869af9d72bcf..1606acb917fd 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1268,6 +1268,7 @@ static int blkcg_css_online(struct cgroup_subsys_state *css)
- int blkcg_init_queue(struct request_queue *q)
- {
- 	struct blkcg_gq *new_blkg, *blkg;
-+	bool need_exit_throtl = false;
- 	bool preloaded;
- 	int ret;
- 
-@@ -1301,7 +1302,7 @@ int blkcg_init_queue(struct request_queue *q)
- 
- 	ret = blk_iolatency_init(q);
- 	if (ret) {
--		blk_throtl_exit(q);
-+		need_exit_throtl = true;
- 		blk_ioprio_exit(q);
- 		goto err_destroy_all;
- 	}
-@@ -1310,6 +1311,8 @@ int blkcg_init_queue(struct request_queue *q)
- 
- err_destroy_all:
- 	blkg_destroy_all(q);
-+	if (need_exit_throtl)
-+		blk_throtl_exit(q);
- 	return ret;
- err_unlock:
- 	spin_unlock_irq(&q->queue_lock);
-
-
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
