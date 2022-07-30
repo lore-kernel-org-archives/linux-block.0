@@ -2,130 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ABE5C3F6B0
-	for <linux-block@archiver.kernel.org>; Sat, 30 Jul 2022 02:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB6EC04A68
+	for <linux-block@archiver.kernel.org>; Sat, 30 Jul 2022 03:25:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232629AbiG3CPO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jul 2022 22:15:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43094 "EHLO
+        id S239864AbiG3DZO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jul 2022 23:25:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231201AbiG3CPN (ORCPT
+        with ESMTP id S239755AbiG3DZM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jul 2022 22:15:13 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C553DAE;
-        Fri, 29 Jul 2022 19:15:10 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Lvnxm3GzGzl12M;
-        Sat, 30 Jul 2022 10:14:04 +0800 (CST)
-Received: from [10.174.176.103] (unknown [10.174.176.103])
-        by APP2 (Coremail) with SMTP id Syh0CgC3ui4qlORiRBZ9BQ--.53560S2;
-        Sat, 30 Jul 2022 10:15:07 +0800 (CST)
-Message-ID: <5b1e7489-df67-cbda-28f2-9d5442e48ce5@huaweicloud.com>
-Date:   Sat, 30 Jul 2022 10:15:06 +0800
+        Fri, 29 Jul 2022 23:25:12 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57EF8B7F
+        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 20:25:09 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id o5-20020a056e02102500b002ddcc65029cso3776059ilj.8
+        for <linux-block@vger.kernel.org>; Fri, 29 Jul 2022 20:25:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc;
+        bh=Le6CaLI6B5guGWuq3Gyd/hvNCiyTuMEnCMic+ruQwAg=;
+        b=mecafTnAqmdP467vYwNv+lrxl7btmJHZR22JiY97qJpt4Xa1iZSYTpxLaXBsnHDGlk
+         7kcnc7EUHAE1tsSu6dgVUMsai6iO8ljcHUNpv/lIrLCkgtmt4f0SvubQJctPfiE1VjpC
+         AFrpXLBxlboNItIW70uWbHb4DVPgkwOPIXAu4nZ2R+lHD55JBWhhhc6vbWnCBe6Nk545
+         6tZI4ApR6P1uER/VKw5ywyM5S5iTIi6w8IFAig/c81YzaNGvaH8fbophMaFk8Sw1i7Ln
+         3ZwButyDGJsoriF60fncKl0vpzE2e4CXbnzxWuz9zhZakuitJXpUjSK56q6P4cV2h9jW
+         JlHQ==
+X-Gm-Message-State: AJIora/Db5Re3Orx3xKhOWfnRFPFU76esQh5cqbeyOUnfzkvnrZBMeGt
+        sz/y6zt9Gk7ivqKKrtJzB330f72nPbpCv9frptS+q/8Q8PBs
+X-Google-Smtp-Source: AGRyM1uZmbuimnvUNNN7eYgZxebUEc8abU1NLOXrLNTLjgqi426QKsMvgCMdvZuw8bnYIkGGZLa27J5FmS+eqomTrhDSEVcJwthc
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Reply-To: zhangwensheng@huaweicloud.com
-Subject: Re: [PATCH -next] [RFC] block: fix null-deref in percpu_ref_put
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-        yukuai3@huawei.com
-References: <20220729105036.2202791-1-zhangwensheng@huaweicloud.com>
- <YuPnjI8oHx4dO3nr@T590>
-From:   "zhangwensheng (E)" <zhangwensheng@huaweicloud.com>
-In-Reply-To: <YuPnjI8oHx4dO3nr@T590>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgC3ui4qlORiRBZ9BQ--.53560S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF1UGw48KF4rXrW3uF43Awb_yoW8uFy7pF
-        WUtF45KF48GFZrKas5Aw17Z348Xr4Yya4fGa4xGryayr13Wa4Fqw47Cr4YqFZ7Ars7Zw4Y
-        qrWDWFsFvayq9a7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyGb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r1S6rWUM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1q6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-        k26cxKx2IYs7xG6r4j6FyUMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
-        xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU84xRDUUUUU==
-X-CM-SenderInfo: x2kd0wpzhq2xhhqjqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a92:c884:0:b0:2dc:bd44:84bf with SMTP id
+ w4-20020a92c884000000b002dcbd4484bfmr2389723ilo.86.1659151508737; Fri, 29 Jul
+ 2022 20:25:08 -0700 (PDT)
+Date:   Fri, 29 Jul 2022 20:25:08 -0700
+In-Reply-To: <000000000000921fd405db62096a@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004e96a405e4fd5051@google.com>
+Subject: Re: [syzbot] possible deadlock in throtl_pending_timer_fn
+From:   syzbot <syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, cgroups@vger.kernel.org, hdanton@sina.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, syzkaller-bugs@googlegroups.com, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi， Ming
+syzbot has bisected this issue to:
 
-I don't think this is a generic issue in percpu_ref, I sort out some 
-processes
-using percpu_ref like "part->ref", "blkg->refcnt" and 
-"ctx->reqs/ctx->users",
-they all use percpu_ref_exit after "release" done which will not cause 
-problem.
-so I think it should not change it in api(percpu_ref_put_many), and user 
-should
-to guarantee it.
+commit 0a9a25ca78437b39e691bcc3dc8240455b803d8d
+Author: Ming Lei <ming.lei@redhat.com>
+Date:   Fri Mar 18 13:01:43 2022 +0000
 
-thanks！
-Wensheng
+    block: let blkcg_gq grab request queue's refcnt
 
-在 2022/7/29 21:58, Ming Lei 写道:
-> On Fri, Jul 29, 2022 at 06:50:36PM +0800, Zhang Wensheng wrote:
->> From: Zhang Wensheng <zhangwensheng5@huawei.com>
->>
->> A problem was find in stable 5.10 and the root cause of it like below.
->>
->> In the use of q_usage_counter of request_queue, blk_cleanup_queue using
->> "wait_event(q->mq_freeze_wq, percpu_ref_is_zero(&q->q_usage_counter))"
->> to wait q_usage_counter becoming zero. however, if the q_usage_counter
->> becoming zero quickly, and percpu_ref_exit will execute and ref->data
->> will be freed, maybe another process will cause a null-defef problem
->> like below:
->>
->> 	CPU0                             CPU1
->> blk_cleanup_queue
->>   blk_freeze_queue
->>    blk_mq_freeze_queue_wait
->> 				scsi_end_request
->> 				 percpu_ref_get
->> 				 ...
->> 				 percpu_ref_put
->> 				  atomic_long_sub_and_test
->>    percpu_ref_exit
->>     ref->data -> NULL
->>     				   ref->data->release(ref) -> null-deref
->>
-> Looks it is one generic issue in percpu_ref, I think the following patch
-> should address it.
->
->
-> diff --git a/include/linux/percpu-refcount.h b/include/linux/percpu-refcount.h
-> index d73a1c08c3e3..07308bd36d83 100644
-> --- a/include/linux/percpu-refcount.h
-> +++ b/include/linux/percpu-refcount.h
-> @@ -331,8 +331,12 @@ static inline void percpu_ref_put_many(struct percpu_ref *ref, unsigned long nr)
->   
->   	if (__ref_is_percpu(ref, &percpu_count))
->   		this_cpu_sub(*percpu_count, nr);
-> -	else if (unlikely(atomic_long_sub_and_test(nr, &ref->data->count)))
-> -		ref->data->release(ref);
-> +	else {
-> +		percpu_ref_func_t	*release = ref->data->release;
-> +
-> +		if (unlikely(atomic_long_sub_and_test(nr, &ref->data->count)))
-> +			release(ref);
-> +	}
->   
->   	rcu_read_unlock();
->   }
->
->
-> Thanks,
-> Ming
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16c3cfc2080000
+start commit:   cb71b93c2dc3 Add linux-next specific files for 20220628
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=15c3cfc2080000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11c3cfc2080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=badbc1adb2d582eb
+dashboard link: https://syzkaller.appspot.com/bug?extid=934ebb67352c8a490bf3
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17713dee080000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15d24952080000
 
+Reported-by: syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com
+Fixes: 0a9a25ca7843 ("block: let blkcg_gq grab request queue's refcnt")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
