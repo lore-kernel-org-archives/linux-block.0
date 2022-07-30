@@ -2,76 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B63CC04A68
-	for <linux-block@archiver.kernel.org>; Sat, 30 Jul 2022 15:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A98DEC04A68
+	for <linux-block@archiver.kernel.org>; Sat, 30 Jul 2022 15:04:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232856AbiG3PE2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Jul 2022 11:04:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39052 "EHLO
+        id S233312AbiG3PEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Jul 2022 11:04:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231148AbiG3PE1 (ORCPT
+        with ESMTP id S231148AbiG3PEm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Jul 2022 11:04:27 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3848818B08
-        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 08:04:26 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id s5-20020a17090a13c500b001f4da9ffe5fso912241pjf.5
-        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 08:04:26 -0700 (PDT)
+        Sat, 30 Jul 2022 11:04:42 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08FE618B09
+        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 08:04:39 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id e8-20020a17090a280800b001f2fef7886eso7822922pjd.3
+        for <linux-block@vger.kernel.org>; Sat, 30 Jul 2022 08:04:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=8Zg17xtftYuS9FB0jNunpTdelhne7Uk+B80JlU8kgNU=;
-        b=R0OKwNAG6fK7Tb/TDz0NaUKHfL2Iq2jIfk8SO2XXftaYdPCSl7RtRTiJyDcvEQSSi4
-         gm0H2OuglhMecO5Eqg9NgtjAAImSyTS/ftKn3z7y/qPbIvnrwkhR2gFgmxgaO3oljm1R
-         X9M7GS/W+JnRJxxZ+5sm3PbjMp4oQj870I9iaVQKg1kv4mSTPVa5jhmzYH9ccba0sUjM
-         5L1jAA2xKvtOvmorbugCnVr4Oj1I6IicLH4kmtUekkNJF0yE+WRRv2K1Wb/tEMv5TSNR
-         tJO4HPLPQ4ZOb9vhovoIp77x3ipiUrOi9MNhonvfV2dxcGp+RIZAPl9AVqorRMdIbqzS
-         OKTw==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=a1dNFgmAm8Wu6Pzrflv+CooYyq/iuFTAYujsTCWijpA=;
+        b=vn+CAqxpJLIFJ4ymcVoSOlqZ1sFULAxNVLf8CWyRE7Wp0UAd0mLCiNkdGyCvkzpoQr
+         BCvIElmYI7Vtbo3Zll7mO+wfqQ1932b4VSZqwZkoKkauAS7kOpnVX2BU34uBl5J4fasa
+         5UZoQWGdki9jx64JauTnrtuQashLHLFUj3DDdbPklQsQT5xfOXWet8JXAYjLpQk3hV8M
+         FlT+2HqIMGc4ffzEE6phKZIcHrt5aSMliNPC3DkoP8EKL/I6JgwIlNXIkx3FDt80ITgM
+         jPk6Xlxe6yxFMw9QdxjmupV9hInZaUdn6TqcKSKx45Q5yang9kYiKICblZa/LYJL8zBZ
+         JxTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=8Zg17xtftYuS9FB0jNunpTdelhne7Uk+B80JlU8kgNU=;
-        b=Dem5FZsj9CvYx4LwblRWt66v/XlmUtdC5vWI1pzcsnfyCrrtfFPEQ0NZ3TYkIODF+b
-         iVdONIku4J0iyJX07haUckAK6I/LTuDe9Bb4XOYVP6Iqc2vUprZYCFsJV3CagPdwCHCi
-         O/MWtwaElsgf1y4HXAf6p0lh8XI/rV9CjBLZf+snBsux4HdhohQzIMdyf5tuY6sNnmpD
-         Eyr34b3RM7YtBFFV7djDo0jQr6OHXo/TeruJSyw/ryBIp9Uqgaa6ZF1rEG+LD8KqmHFt
-         NpPeMzbzKjPbI3WxPobIuUwAXgQL5W06K/HwLiSQ7CjIf8FppHfLZNWVTFh4dLl3Wpxt
-         tryQ==
-X-Gm-Message-State: ACgBeo1oh5nzEhrgyHrbMumsrUcioM3AtQWg16/N2aRfEiZUXVdoFJMx
-        uIKc3fjfrW/AHA/05uQxhhH8Aw==
-X-Google-Smtp-Source: AA6agR616cx6dk9qgxS2Qei2FFrE9KyqXM01Qlm078UDDK0KwseESaAs1XXtPPql20S4rYys0regFg==
-X-Received: by 2002:a17:90a:de12:b0:1f0:f213:cb9d with SMTP id m18-20020a17090ade1200b001f0f213cb9dmr9730681pjv.207.1659193465638;
-        Sat, 30 Jul 2022 08:04:25 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s3-20020a170902ea0300b0016d763967f8sm5840312plg.107.2022.07.30.08.04.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Jul 2022 08:04:25 -0700 (PDT)
-Message-ID: <1596ad46-1a21-f7ac-a335-059b7d6732f5@kernel.dk>
-Date:   Sat, 30 Jul 2022 09:04:24 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH V4 0/4] ublk_drv: add generic mechanism to get/set
- parameters
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-References: <20220730092750.1118167-1-ming.lei@redhat.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=a1dNFgmAm8Wu6Pzrflv+CooYyq/iuFTAYujsTCWijpA=;
+        b=to5BetllRRhvGqUropwfA5XHGOW2EQftA/+hYMBz91VO4Od4qFb8eRNkK8QoUQa5r5
+         5Qluot3tkd02UavMAXXRTXDu8KaX2xhQmbGrofff0QDOIkJepu+4ad3m1ueLMc4QFkUY
+         cZlINFXoMBs+UiddzP1QjBVBUpeNcg5JLWYW3exCXmYO5p9K9tdhAVJbrVLSxnzcuzNx
+         Zkv1NSY1R2y90IE3DFD8uTU8pxQ+06YHZ0x6NqWgN5UZaaV7ON2YNXyygVjwHGi79fNJ
+         2cwB4kvThda3J2TT+ah3wcZeQUPj2Xd+MxbvGZXHNdFklhoJa1Nt0mnqNKLeQcwnICdA
+         DMVQ==
+X-Gm-Message-State: ACgBeo1J6j+LKU/xjKUBTO0pHmT9XL2NS9wHy+mhk/If0RpCeFs4KOpw
+        fmRQ4QV3b/H1QHMA5v3e6VVgiVAhsaR4ug==
+X-Google-Smtp-Source: AA6agR4RfhcuoJgACGQ9Z5JoR2ye/lQd2d4hE05o4Gxldtt4OU5idQt1itfODnH9r63gvUqB5N0VxQ==
+X-Received: by 2002:a17:90a:6281:b0:1f2:1f17:4023 with SMTP id d1-20020a17090a628100b001f21f174023mr10359998pjj.243.1659193478280;
+        Sat, 30 Jul 2022 08:04:38 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id l13-20020a170903120d00b0016b8746132esm6026211plh.105.2022.07.30.08.04.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 30 Jul 2022 08:04:37 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
+To:     ming.lei@redhat.com
+Cc:     Christoph Hellwig <hch@lst.de>, ZiyangZhang@linux.alibaba.com,
+        linux-block@vger.kernel.org
 In-Reply-To: <20220730092750.1118167-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220730092750.1118167-1-ming.lei@redhat.com>
+Subject: Re: [PATCH V4 0/4] ublk_drv: add generic mechanism to get/set parameters
+Message-Id: <165919347748.47051.9597383073057729123.b4-ty@kernel.dk>
+Date:   Sat, 30 Jul 2022 09:04:37 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 7/30/22 3:27 AM, Ming Lei wrote:
-> Hello Jens,
-> 
+On Sat, 30 Jul 2022 17:27:46 +0800, Ming Lei wrote:
 > The 1st two patches fixes ublk device leak or hang issue in case of some
 > failure path, such as, failing to start device.
 > 
@@ -79,16 +72,21 @@ On 7/30/22 3:27 AM, Ming Lei wrote:
 > parameters in generic way, and easy to extend to add new parameter
 > type.
 > 
-> The 4th patch cleans UAPI of ublksrv_ctrl_dev_info, and userspace needs
-> to be updated for this driver change, so please consider this patchset
-> for v5.20.
-> 
-> Verified by all targets in the following branch, and pass all built-in
-> tests.
+> [...]
 
-This will miss the first pull request, but I've queued it up for this
-merge window.
+Applied, thanks!
 
+[1/4] ublk_drv: cancel device even though disk isn't up
+      commit: 90828a5e0d656f83f67929ece0a50ff0fb6ab7a3
+[2/4] ublk_drv: fix ublk device leak in case that add_disk fails
+      commit: ed772fe30a04e07e25313b62c0659b2bcf41195c
+[3/4] ublk_drv: add SET_PARAMS/GET_PARAMS control command
+      commit: 134ec0b02374bb85451ef90ab0d0bac233c945f1
+[4/4] ublk_drv: cleanup ublksrv_ctrl_dev_info
+      commit: 099d9b8d637b88a7718fe51129db4dc686ce9cea
+
+Best regards,
 -- 
 Jens Axboe
+
 
