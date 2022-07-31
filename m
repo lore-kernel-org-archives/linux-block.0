@@ -2,168 +2,190 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1891EC19F2C
-	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 07:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 868BFC00140
+	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 08:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236416AbiGaHKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Jul 2022 03:10:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
+        id S232200AbiGaIDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Jul 2022 04:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236410AbiGaHKA (ORCPT
+        with ESMTP id S229479AbiGaIDj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Jul 2022 03:10:00 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF262120AC;
-        Sun, 31 Jul 2022 00:09:59 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id bf13so7152475pgb.11;
-        Sun, 31 Jul 2022 00:09:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=YVVea980B8st8DA18ARnaDm7eXyjZl5zQLRXfKhT3UM=;
-        b=PqaaFnKVJy7/fLrOYcyuSlfWuoKRQmjHrjB/lcxbzvqbvVZbQovuf6tjUuJdCsMncO
-         ZNf9OF1fIShOw5FfVmk2r/KZmOnpNc9WXZ+Jv39SIP5eDAjLQ3PGLLeQEMnO/HuSX2z9
-         0zGh7rKO4nUm4lQp9PEHXP9hwYwqJL3GZ9W8iTIFw7sd26vpZ7aqSadtwJkbTI42WL8H
-         Gr3WWElGbtN1zgTsSRTNlE7S6G+1GRcBTKv2pcpdXqj9rAq+neGJeCXiGYU/YINFaNYd
-         FogiQ5cSW2L/TaOeHT5AldPOeC+UCFeKxJZuX3QsIy9uEOeRuWDAZbqChXmpMJGsAmf0
-         tAuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=YVVea980B8st8DA18ARnaDm7eXyjZl5zQLRXfKhT3UM=;
-        b=3Re31C8/eGn0aK8B1OjTMit2umO8FaCa81nhSmpsasGJG03EcB6KlBXxqdVsLfHv2p
-         UpC4NmCLh1uJvdx7q4KK7+LSVAl8UR7HtfBGfFseUQdcwOKbMdOeqxxpug1KI2Y2oaK6
-         jGUIiDNwyc9PL79+73ooY4x3xq301YTtslwz5La2BilEXmEVkGaH33mrkbovnUXjfRLb
-         cHJEJrpEg7MoezJMubPfdEDDsyrcswqZD2MIISRjgETAjIv51pmesLt9WmTp8kpR4TZG
-         +xdzr9D4v6WYSPZtxVNvolRqlMOOfZNZXZQxg31dOP6TI+eYvW9ZUWJP+IJIcXAZRzFz
-         ebOA==
-X-Gm-Message-State: AJIora9xZxWp61rkyjcKmNPSzT0YsWcVCJapnF240Gdcyzn/ZDXoLY/R
-        oZrEhrsa5EBAhihB505Xuw==
-X-Google-Smtp-Source: AGRyM1sep/xzs0hUqyqt4S9YvKeNZ1I4Z44CYT8pI0M3F75ZXvITvNN/ECFwrJEHULN+JSJADBziLQ==
-X-Received: by 2002:a65:6a55:0:b0:41b:7a0b:672c with SMTP id o21-20020a656a55000000b0041b7a0b672cmr9105366pgu.594.1659251399215;
-        Sun, 31 Jul 2022 00:09:59 -0700 (PDT)
-Received: from xps13.. ([240d:1a:c0d:9f00:4f2f:926a:23dd:8588])
-        by smtp.gmail.com with ESMTPSA id y21-20020a1709027c9500b0016bef6f6903sm6786755pll.72.2022.07.31.00.09.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Jul 2022 00:09:58 -0700 (PDT)
-From:   Shigeru Yoshida <shigeru.yoshida@gmail.com>
-To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
-Cc:     pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Shigeru Yoshida <shigeru.yoshida@gmail.com>
-Subject: [PATCH] virtio-blk: Avoid use-after-free on suspend/resume
-Date:   Sun, 31 Jul 2022 16:09:51 +0900
-Message-Id: <20220731070951.196831-1-shigeru.yoshida@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Sun, 31 Jul 2022 04:03:39 -0400
+Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB7ED66
+        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 01:03:37 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VKvgbsy_1659254613;
+Received: from 172.20.10.3(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VKvgbsy_1659254613)
+          by smtp.aliyun-inc.com;
+          Sun, 31 Jul 2022 16:03:34 +0800
+Message-ID: <4c6f7d83-183a-da98-a41a-5363db6f3297@linux.alibaba.com>
+Date:   Sun, 31 Jul 2022 16:03:30 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH V4 0/2] ublk: add support for UBLK_IO_NEED_GET_DATA
+Content-Language: en-US
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, xiaoguang.wang@linux.alibaba.com,
+        ming.lei@redhat.com
+References: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hctx->user_data is set to vq in virtblk_init_hctx().  However, vq is
-freed on suspend and reallocated on resume.  So, hctx->user_data is
-invalid after resume, and it will cause use-after-free accessing which
-will result in the kernel crash something like below:
+Hi Jens,
 
-[   22.428391] Call Trace:
-[   22.428899]  <TASK>
-[   22.429339]  virtqueue_add_split+0x3eb/0x620
-[   22.430035]  ? __blk_mq_alloc_requests+0x17f/0x2d0
-[   22.430789]  ? kvm_clock_get_cycles+0x14/0x30
-[   22.431496]  virtqueue_add_sgs+0xad/0xd0
-[   22.432108]  virtblk_add_req+0xe8/0x150
-[   22.432692]  virtio_queue_rqs+0xeb/0x210
-[   22.433330]  blk_mq_flush_plug_list+0x1b8/0x280
-[   22.434059]  __blk_flush_plug+0xe1/0x140
-[   22.434853]  blk_finish_plug+0x20/0x40
-[   22.435512]  read_pages+0x20a/0x2e0
-[   22.436063]  ? folio_add_lru+0x62/0xa0
-[   22.436652]  page_cache_ra_unbounded+0x112/0x160
-[   22.437365]  filemap_get_pages+0xe1/0x5b0
-[   22.437964]  ? context_to_sid+0x70/0x100
-[   22.438580]  ? sidtab_context_to_sid+0x32/0x400
-[   22.439979]  filemap_read+0xcd/0x3d0
-[   22.440917]  xfs_file_buffered_read+0x4a/0xc0
-[   22.441984]  xfs_file_read_iter+0x65/0xd0
-[   22.442970]  __kernel_read+0x160/0x2e0
-[   22.443921]  bprm_execve+0x21b/0x640
-[   22.444809]  do_execveat_common.isra.0+0x1a8/0x220
-[   22.446008]  __x64_sys_execve+0x2d/0x40
-[   22.446920]  do_syscall_64+0x37/0x90
-[   22.447773]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Please queue this patchset up for the 5.20 merge window.
 
-This patch fixes this issue by getting vq from vblk, and removes
-virtblk_init_hctx().
+UBLK_IO_NEED_GET_DATA is an important feature designed for Ming Lei's
+ublk_drv. All the patches have been reviewed by Ming and all test cases
+in his ublksrv[1] have been passed.
 
-Signed-off-by: Shigeru Yoshida <shigeru.yoshida@gmail.com>
----
- drivers/block/virtio_blk.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+[1] https://github.com/ming1/ubdsrv
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 6fc7850c2b0a..d756423e0059 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -101,6 +101,14 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
- 	}
- }
- 
-+static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct virtio_blk *vblk = hctx->queue->queuedata;
-+	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-+
-+	return vq;
-+}
-+
- static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
- {
- 	struct scatterlist hdr, status, *sgs[3];
-@@ -416,7 +424,7 @@ static void virtio_queue_rqs(struct request **rqlist)
- 	struct request *requeue_list = NULL;
- 
- 	rq_list_for_each_safe(rqlist, req, next) {
--		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
-+		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
- 		bool kick;
- 
- 		if (!virtblk_prep_rq_batch(req)) {
-@@ -837,7 +845,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
--	struct virtio_blk_vq *vq = hctx->driver_data;
-+	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
- 	struct virtblk_req *vbr;
- 	unsigned long flags;
- 	unsigned int len;
-@@ -862,22 +870,10 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 	return found;
- }
- 
--static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
--			  unsigned int hctx_idx)
--{
--	struct virtio_blk *vblk = data;
--	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
--
--	WARN_ON(vblk->tag_set.tags[hctx_idx] != hctx->tags);
--	hctx->driver_data = vq;
--	return 0;
--}
--
- static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.queue_rqs	= virtio_queue_rqs,
- 	.commit_rqs	= virtio_commit_rqs,
--	.init_hctx	= virtblk_init_hctx,
- 	.complete	= virtblk_request_done,
- 	.map_queues	= virtblk_map_queues,
- 	.poll		= virtblk_poll,
--- 
-2.37.1
 
+On 2022/7/28 20:39, ZiyangZhang wrote:
+> 1. Introduction:
+> UBLK_IO_NEED_GET_DATA is a new ublk IO command. It is designed for a user
+> application who wants to allocate IO buffer and set IO buffer address
+> only after it receives an IO request from ublksrv. This is a reasonable
+> scenario because these users may use a RPC framework as one IO backend
+> to handle IO requests passed from ublksrv. And a RPC framework may
+> allocate its own buffer(or memory pool).
+> 
+> This new feature (UBLK_F_NEED_GET_DATA) is optional for ublk users.
+> Related userspace code has been added in ublksrv[1] as one pull request.
+> 
+> We have add some test cases in ublksrv and all of them pass. The
+> performance result shows that this new feature does bring additional
+> latency because one IO is issued back to ublk_drv once again to copy data
+> from bio vectors to user-provided data buffer.
+> 
+> 2. Background:
+> For now, ublk requires the user to set IO buffer address in advance(with
+> last UBLK_IO_COMMIT_AND_FETCH_REQ command)so the user has to
+> pre-allocate IO buffer.
+> 
+> For READ requests, this work flow looks good because the data copy
+> happens after user application gets a cqe and the kernel copies data.
+> So user application can allocate IO buffer, copy data to be read into
+> it, and issues a sqe with the newly allocated IO buffer.
+> 
+> However, for WRITE requests, this work flow looks weird because
+> the data copy happens in a task_work before the user application gets one
+> cqe. So it is inconvenient for users who allocates(or fetch from a
+> memory pool)buffer after it gets one request(and know the actual data
+> size). For these users, they have to memcpy from ublksrv's pre-allocated
+> buffer to their internal buffer(such as RPC buffer). We think this
+> additional memcpy could be a bottleneck and it is avoidable.
+> 
+> 2. Design:
+> Consider add a new feature flag: UBLK_F_NEED_GET_DATA.
+> 
+> If user sets this new flag(through libublksrv) and pass it to kernel
+> driver, ublk kernel driver should returns a cqe with
+> UBLK_IO_RES_NEED_GET_DATA after a new blk-mq WRITE request comes.
+> 
+> A user application now can allocate data buffer for writing and pass its
+> address in UBLK_IO_NEED_GET_DATA command after ublk kernel driver returns
+> cqe with UBLK_IO_RES_NEED_GET_DATA.
+> 
+> After the kernel side gets the sqe (UBLK_IO_NEED_GET_DATA command), it
+> now copies(address pinned, indeed) data to be written from bio vectors
+> to newly returned IO data buffer.
+> 
+> Finally, the kernel side returns UBLK_IO_RES_OK and ublksrv handles the
+> IO request as usual.The new feature: UBLK_F_NEED_GET_DATA is enabled on
+> demand ublksrv still can pre-allocate data buffers with task_work.
+> 
+> 3. Evaluation:
+> Related userspace code and tests have been added in ublksrv[1] as one
+> pull request. We evaluate performance based on this PR.
+> 
+> We have tested write latency with:
+>   (1)  No UBLK_F_NEED_GET_DATA(the old commit) as baseline
+>   (2)  UBLK_F_NEED_GET_DATA enabled/disabled
+> on demo_null and demo_event of newest ublksrv project.
+> 
+> Config of fio:bs=4k, iodepth=1, numjobs=1, rw=write/randwrite, direct=1,
+> ioengine=libaio.
+> 
+> Here is the comparison of lat(usec) in fio:
+> 
+> demo_null:
+> write:        28.74(baseline) -- 28.77(disable) -- 57.20(enable)
+> randwrite:    27.81(baseline) -- 28.51(disable) -- 54.81(enable)
+> 
+> demo_event:
+> write:        46.45(baseline) -- 43.31(disable) -- 75.50(enable)
+> randwrite:    45.39(baseline) -- 43.66(disable) -- 76.02(enable)
+> 
+> Looks like:
+>   (1) UBLK_F_NEED_GET_DATA does not introduce additional overhead when
+>       comparing baseline and disable.
+>   (2) enabling UBLK_F_NEED_GET_DATA adds about two times more latency
+>       than disabling it. And it is reasonable since the IO goes through
+>       the total ublk IO stack(ubd_drv <--> ublksrv) once again.
+>   (3) demo_null and demo_event are both null targets. And I think this
+>       overhead is not too heavy if real data handling backend is used.
+> 
+> Without UBLK_IO_NEED_GET_DATA, an additional memcpy(from pre-allocated
+> ublksrv buffer to user's buffer) is necessary for a WRITE request.
+> However, UBLK_IO_NEED_GET_DATA does bring addtional syscall
+> (io_uring_enter). To prove the value of UBLK_IO_NEED_GET_DATA, we test
+> the single IO latency (usec) of demo_null with:
+>   (1) UBLK_F_NEED_GET_DATA disabled; additional memcpy
+>   (2) UBLK_F_NEED_GET_DATA enabled
+> 
+> Config of fio:iodepth=1, numjobs=1, rw=randwrite, direct=1,
+> ioengine=libaio.
+> 
+> For block size, we choose 4k/64k/128k/256k/512k/1m. Note that with 1m block
+> size, the original IO request will be split into two blk-mq requests.
+> 
+> Here is the comparison of lat(usec) in fio:
+> 
+>                  2 memcpy, w/o NEED_GET_DATA     1 memcpy, w/ NEED_GET_DATA
+> 4k-randwrite:               9.65                            10.06
+> 64k-randwrite:              15.19                           13.38
+> 128k-randwrite:             19.47                           17.77
+> 256k-randwrite:             32.63                           25.33
+> 512k-randwrite:             90.57                           46.08
+> 1m-randwrite:               177.06                          117.26
+> 
+> We find that with bigger block size, cases with one memcpy w/ NEED_GET_DATA
+> result in lower latency than cases with two memcpy w/o NEED_GET_DATA.
+> Therefore, we think NEED_GET_DATA is suitable for bigger block size,
+> such as 512B or 1MB.
+> 
+> [1] https://github.com/ming1/ubdsrv
+> 
+> Since V3:
+> 
+> (1) Touch and clear UBLK_IO_FLAG_NEED_GET_DATA only when
+>     UBLK_F_NEED_GET_DATA is enabled.
+> 
+> Since V2:
+> 
+> (1) UBLK_IO_NEED_GET_DATA should support both built-in task_work_add() and
+>     io_uring_cmd_complete_in_task()
+> 
+> Since V1:
+> 
+> (1) Add tests to compare (1)2 memcpy, w/o NEED_GET_DATA and (2)1 memcpy,
+>     w/ NEED_GET_DATA to show value of UBLK_IO_NEED_GET_DATA.
+> (2) rebase on the newest version of ublk_drv
+> 
+> ZiyangZhang (2):
+>   ublk_cmd.h: add one new ublk command: UBLK_IO_NEED_GET_DATA
+>   ublk_drv: add support for UBLK_IO_NEED_GET_DATA
+> 
+>  drivers/block/ublk_drv.c      | 106 ++++++++++++++++++++++++++++++----
+>  include/uapi/linux/ublk_cmd.h |  18 ++++++
+>  2 files changed, 112 insertions(+), 12 deletions(-)
+> 
