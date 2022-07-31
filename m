@@ -2,88 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3278DC25B07
-	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 03:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1891EC19F2C
+	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 07:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbiGaDIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Jul 2022 23:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51412 "EHLO
+        id S236416AbiGaHKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Jul 2022 03:10:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231517AbiGaDIb (ORCPT
+        with ESMTP id S236410AbiGaHKA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Jul 2022 23:08:31 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0687712D1B;
-        Sat, 30 Jul 2022 20:08:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BDE92B80C95;
-        Sun, 31 Jul 2022 03:08:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38810C433D6;
-        Sun, 31 Jul 2022 03:08:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659236908;
-        bh=tawPftnF94jyXfV2ZmURRfIrH7cFklH6ixzelkdY6vM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=q3PgaArNxgaBWU0TwQ7i9JXcghaMQBe+njO4dt2ETXSDmDPQdoUc7kkKPAs6gs3ir
-         dKRoNbPddLaqkyzJBf/s73FN4CsT+anw/YXvcsyO97vODzyrgtyheOGsSBeR/KmFd3
-         l0HBiL65yvRvJLakDLqAzgOSgRFqnAguq3ahykb2UuWx2Br0IJXjZSINU5XUHTnJvy
-         09CG02eD4Vi3eq0o/LgIqRCQhVi6MPDIfHxhjxTBZud5EIqVn9XiZ8CCn4JlzUMk9Q
-         cf87fjR7QKSKs8lTSQfBgORJxJjeLdihqWOr19SaKyrdWDL76pz/FbUB7a0sV6LfFe
-         l8+AbGlYl20tw==
-Date:   Sat, 30 Jul 2022 20:08:26 -0700
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        Sun, 31 Jul 2022 03:10:00 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF262120AC;
+        Sun, 31 Jul 2022 00:09:59 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id bf13so7152475pgb.11;
+        Sun, 31 Jul 2022 00:09:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=YVVea980B8st8DA18ARnaDm7eXyjZl5zQLRXfKhT3UM=;
+        b=PqaaFnKVJy7/fLrOYcyuSlfWuoKRQmjHrjB/lcxbzvqbvVZbQovuf6tjUuJdCsMncO
+         ZNf9OF1fIShOw5FfVmk2r/KZmOnpNc9WXZ+Jv39SIP5eDAjLQ3PGLLeQEMnO/HuSX2z9
+         0zGh7rKO4nUm4lQp9PEHXP9hwYwqJL3GZ9W8iTIFw7sd26vpZ7aqSadtwJkbTI42WL8H
+         Gr3WWElGbtN1zgTsSRTNlE7S6G+1GRcBTKv2pcpdXqj9rAq+neGJeCXiGYU/YINFaNYd
+         FogiQ5cSW2L/TaOeHT5AldPOeC+UCFeKxJZuX3QsIy9uEOeRuWDAZbqChXmpMJGsAmf0
+         tAuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=YVVea980B8st8DA18ARnaDm7eXyjZl5zQLRXfKhT3UM=;
+        b=3Re31C8/eGn0aK8B1OjTMit2umO8FaCa81nhSmpsasGJG03EcB6KlBXxqdVsLfHv2p
+         UpC4NmCLh1uJvdx7q4KK7+LSVAl8UR7HtfBGfFseUQdcwOKbMdOeqxxpug1KI2Y2oaK6
+         jGUIiDNwyc9PL79+73ooY4x3xq301YTtslwz5La2BilEXmEVkGaH33mrkbovnUXjfRLb
+         cHJEJrpEg7MoezJMubPfdEDDsyrcswqZD2MIISRjgETAjIv51pmesLt9WmTp8kpR4TZG
+         +xdzr9D4v6WYSPZtxVNvolRqlMOOfZNZXZQxg31dOP6TI+eYvW9ZUWJP+IJIcXAZRzFz
+         ebOA==
+X-Gm-Message-State: AJIora9xZxWp61rkyjcKmNPSzT0YsWcVCJapnF240Gdcyzn/ZDXoLY/R
+        oZrEhrsa5EBAhihB505Xuw==
+X-Google-Smtp-Source: AGRyM1sep/xzs0hUqyqt4S9YvKeNZ1I4Z44CYT8pI0M3F75ZXvITvNN/ECFwrJEHULN+JSJADBziLQ==
+X-Received: by 2002:a65:6a55:0:b0:41b:7a0b:672c with SMTP id o21-20020a656a55000000b0041b7a0b672cmr9105366pgu.594.1659251399215;
+        Sun, 31 Jul 2022 00:09:59 -0700 (PDT)
+Received: from xps13.. ([240d:1a:c0d:9f00:4f2f:926a:23dd:8588])
+        by smtp.gmail.com with ESMTPSA id y21-20020a1709027c9500b0016bef6f6903sm6786755pll.72.2022.07.31.00.09.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Jul 2022 00:09:58 -0700 (PDT)
+From:   Shigeru Yoshida <shigeru.yoshida@gmail.com>
+To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
+Cc:     pbonzini@redhat.com, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
-Message-ID: <YuXyKh8Zvr56rR4R@google.com>
-References: <20220722071228.146690-1-ebiggers@kernel.org>
- <20220722071228.146690-7-ebiggers@kernel.org>
- <YtyoF89iOg8gs7hj@google.com>
- <Yt7dCcG0ns85QqJe@sol.localdomain>
+        Shigeru Yoshida <shigeru.yoshida@gmail.com>
+Subject: [PATCH] virtio-blk: Avoid use-after-free on suspend/resume
+Date:   Sun, 31 Jul 2022 16:09:51 +0900
+Message-Id: <20220731070951.196831-1-shigeru.yoshida@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yt7dCcG0ns85QqJe@sol.localdomain>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07/25, Eric Biggers wrote:
-> On Sat, Jul 23, 2022 at 07:01:59PM -0700, Jaegeuk Kim wrote:
-> > On 07/22, Eric Biggers wrote:
-> > > From: Eric Biggers <ebiggers@google.com>
-> > > 
-> > > Currently, if an f2fs filesystem is mounted with the mode=lfs and
-> > > io_bits mount options, DIO reads are allowed but DIO writes are not.
-> > > Allowing DIO reads but not DIO writes is an unusual restriction, which
-> > > is likely to be surprising to applications, namely any application that
-> > > both reads and writes from a file (using O_DIRECT).  This behavior is
-> > > also incompatible with the proposed STATX_DIOALIGN extension to statx.
-> > > Given this, let's drop the support for DIO reads in this configuration.
-> > 
-> > IIRC, we allowed DIO reads since applications complained a lower performance.
-> > So, I'm afraid this change will make another confusion to users. Could
-> > you please apply the new bahavior only for STATX_DIOALIGN?
-> > 
-> 
-> Well, the issue is that the proposed STATX_DIOALIGN fields cannot represent this
-> weird case where DIO reads are allowed but not DIO writes.  So the question is
-> whether this case actually matters, in which case we should make STATX_DIOALIGN
-> distinguish between DIO reads and DIO writes, or whether it's some odd edge case
-> that doesn't really matter, in which case we could just fix it or make
-> STATX_DIOALIGN report that DIO is unsupported.  I was hoping that you had some
-> insight here.  What sort of applications want DIO reads but not DIO writes?
-> Is this common at all?
+hctx->user_data is set to vq in virtblk_init_hctx().  However, vq is
+freed on suspend and reallocated on resume.  So, hctx->user_data is
+invalid after resume, and it will cause use-after-free accessing which
+will result in the kernel crash something like below:
 
-I think there's no specific application to use the LFS mode at this
-moment, but I'd like to allow DIO read for zoned device which will be
-used for Android devices.
+[   22.428391] Call Trace:
+[   22.428899]  <TASK>
+[   22.429339]  virtqueue_add_split+0x3eb/0x620
+[   22.430035]  ? __blk_mq_alloc_requests+0x17f/0x2d0
+[   22.430789]  ? kvm_clock_get_cycles+0x14/0x30
+[   22.431496]  virtqueue_add_sgs+0xad/0xd0
+[   22.432108]  virtblk_add_req+0xe8/0x150
+[   22.432692]  virtio_queue_rqs+0xeb/0x210
+[   22.433330]  blk_mq_flush_plug_list+0x1b8/0x280
+[   22.434059]  __blk_flush_plug+0xe1/0x140
+[   22.434853]  blk_finish_plug+0x20/0x40
+[   22.435512]  read_pages+0x20a/0x2e0
+[   22.436063]  ? folio_add_lru+0x62/0xa0
+[   22.436652]  page_cache_ra_unbounded+0x112/0x160
+[   22.437365]  filemap_get_pages+0xe1/0x5b0
+[   22.437964]  ? context_to_sid+0x70/0x100
+[   22.438580]  ? sidtab_context_to_sid+0x32/0x400
+[   22.439979]  filemap_read+0xcd/0x3d0
+[   22.440917]  xfs_file_buffered_read+0x4a/0xc0
+[   22.441984]  xfs_file_read_iter+0x65/0xd0
+[   22.442970]  __kernel_read+0x160/0x2e0
+[   22.443921]  bprm_execve+0x21b/0x640
+[   22.444809]  do_execveat_common.isra.0+0x1a8/0x220
+[   22.446008]  __x64_sys_execve+0x2d/0x40
+[   22.446920]  do_syscall_64+0x37/0x90
+[   22.447773]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-> 
-> - Eric
+This patch fixes this issue by getting vq from vblk, and removes
+virtblk_init_hctx().
+
+Signed-off-by: Shigeru Yoshida <shigeru.yoshida@gmail.com>
+---
+ drivers/block/virtio_blk.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 6fc7850c2b0a..d756423e0059 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -101,6 +101,14 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
+ 	}
+ }
+ 
++static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
++{
++	struct virtio_blk *vblk = hctx->queue->queuedata;
++	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
++
++	return vq;
++}
++
+ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
+ {
+ 	struct scatterlist hdr, status, *sgs[3];
+@@ -416,7 +424,7 @@ static void virtio_queue_rqs(struct request **rqlist)
+ 	struct request *requeue_list = NULL;
+ 
+ 	rq_list_for_each_safe(rqlist, req, next) {
+-		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
++		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
+ 		bool kick;
+ 
+ 		if (!virtblk_prep_rq_batch(req)) {
+@@ -837,7 +845,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
+ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ {
+ 	struct virtio_blk *vblk = hctx->queue->queuedata;
+-	struct virtio_blk_vq *vq = hctx->driver_data;
++	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
+ 	struct virtblk_req *vbr;
+ 	unsigned long flags;
+ 	unsigned int len;
+@@ -862,22 +870,10 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ 	return found;
+ }
+ 
+-static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+-			  unsigned int hctx_idx)
+-{
+-	struct virtio_blk *vblk = data;
+-	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
+-
+-	WARN_ON(vblk->tag_set.tags[hctx_idx] != hctx->tags);
+-	hctx->driver_data = vq;
+-	return 0;
+-}
+-
+ static const struct blk_mq_ops virtio_mq_ops = {
+ 	.queue_rq	= virtio_queue_rq,
+ 	.queue_rqs	= virtio_queue_rqs,
+ 	.commit_rqs	= virtio_commit_rqs,
+-	.init_hctx	= virtblk_init_hctx,
+ 	.complete	= virtblk_request_done,
+ 	.map_queues	= virtblk_map_queues,
+ 	.poll		= virtblk_poll,
+-- 
+2.37.1
+
