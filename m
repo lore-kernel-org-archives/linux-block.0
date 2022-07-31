@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A89C00140
-	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 15:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E92F0C00140
+	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 15:03:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237285AbiGaPDu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Jul 2022 11:03:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52100 "EHLO
+        id S232434AbiGaPDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Jul 2022 11:03:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236703AbiGaPDr (ORCPT
+        with ESMTP id S237250AbiGaPDx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Jul 2022 11:03:47 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BB3DEE3
-        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 08:03:45 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id bh13so7614022pgb.4
-        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 08:03:45 -0700 (PDT)
+        Sun, 31 Jul 2022 11:03:53 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE50DF43
+        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 08:03:49 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id h28so2103001pfq.11
+        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 08:03:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=message-id:date:mime-version:user-agent:from:subject:to:cc
          :content-language:content-transfer-encoding;
-        bh=M+CHV26VHg2xl1f7Md0yb49iEnDIed1f5mqDuq1FcZ4=;
-        b=APRUx+PSU1G2ZJ1ocQhhalqwESQnVPNYWCD3/XDTqnWw2XTpiMHxAqZAnFxCATBjen
-         UyNuFRdI2yD94cIgReB6dXhaoqfCIZpOBdM9SPQ5ivTGXIyNR4W9+6cdiVk6pS+H+DC9
-         7bAJFlmYCMsR14ZbdwxvsDPOo6j1lBhIm1JKsryED6NAZVVcDj9ZVTuGQCIupqIcSS/x
-         2T8UOijFupO5k3ePPnJzl/q2nNlsHcQ0bUUcBmMCI9tjneBmmvvL47/5WWea1wkinjx3
-         ACU5YCU14y5McqvQOF1RnnqtCe//smnwPB5q8BLXknSMzW32VT7Xr1LOCX2nOQX81iA9
-         ewug==
+        bh=DVFoJl4onZaTMcZXwZwAdO6IbKXBG3Elf64djWgKXBM=;
+        b=hMgixFvxxSfhrg2Ai4r7L0VtMrFWHa1MER4gBgS9xfQmM2pT27L5ftbewUKyjdPyjW
+         r9+LssmpDYPRvKm0A3pPXndUrJLtib/jBbA4MQchQ+6/DzHYjLarJhwI9yqLBl9ECD/R
+         kOwW58IVSQsmbejndhIIWTd9F3sxaYx7zkpHWqF7yyoy6eHG4K6dwGuVX5aEDrt+N7A+
+         hzvqcjWQJLRZLhBvtX+bxFEKO/8vybn847yIyi2cj0RbH3KdhHP0F1ei5faO/4Oj+A8R
+         EAzxBXL2zRA7ue4sVMISvj56WsCr6qAmZbvi2d9Pg+9OyvdQ6T/sIsLyp9+ISIbp2m/v
+         yHvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:from
          :subject:to:cc:content-language:content-transfer-encoding;
-        bh=M+CHV26VHg2xl1f7Md0yb49iEnDIed1f5mqDuq1FcZ4=;
-        b=BfmE6q4aYJ5/BHXHe1OF4K471BrFUSvzuMYO396ZRePfKpq1s9+gONBJHOyUdEQCfw
-         oxlXutkwmOyBReDNpUZM5jUubFGviAFkorL2yWWsNy9No+qv3mzfLg9HCsJ8sEA3BLOu
-         prU17CUGYkOq3Za0eaCbMI8W1OxqpQo/lKQYimnUKChabiuwzY3bHDNVjG9kaEyPSPhb
-         USjeEi9AVkECG5/WcP+jvaCgL4jnPqdyQvsPB1SjBBdKsmCb0G9xJztQZJZEunyQsaKc
-         tVwv2bTKXGPtRKEj5KzdD9aN5qbj+O/Q7l5op9UFSrnK5FUVLmDFbV6mFlrQeYvdOR3F
-         jLLg==
-X-Gm-Message-State: AJIora/nXN5pGDd5eufmEG2IYBvFDEynYHa/PvT/PBdb9Maf4d9W95iD
-        4ggNGlxPudOoppwy3IIsPyynZjh9TxTDIw==
-X-Google-Smtp-Source: AGRyM1vh2xJB4D6dLdKYZIpE30hOluoynuE6XXmVaLqXFSLo7SgDoFRnM8YKZY4Hw0UpFkgTmoQ06g==
-X-Received: by 2002:a63:1f58:0:b0:41a:27e8:d669 with SMTP id q24-20020a631f58000000b0041a27e8d669mr10228030pgm.74.1659279824604;
-        Sun, 31 Jul 2022 08:03:44 -0700 (PDT)
+        bh=DVFoJl4onZaTMcZXwZwAdO6IbKXBG3Elf64djWgKXBM=;
+        b=KH3ImgZumOnRmG7/vwcyaFJg7sAIwPyGct9RQHXCoKmbM5WPtBZYWQGl3SdT/kgMep
+         S9Jik4Tg3wDxQBlVF0hr1gJAmjN8HBzCu1paWtGrzJ/bAHESIuIj+gk6SVwOq76ex3OS
+         6F8FkZeKm5PTlaOhvLSnAe6mszuKjli5jequg0/MdJaX2khkCPRC4ZPJi4KjkD30sbiG
+         MCqiWgSnXXXSVbq0v2rmp0NOZN70I8KFUAkDGSfb/u5ve4v0VPYU5Q0Vx9p+XBusfeQo
+         4Z6nyTliY3kxGbrCBDsnc0w2v3ruCPjvsmV/FoLJq5SdjQKCEFEa22FcXKPfAgxX2ZOa
+         2X9g==
+X-Gm-Message-State: AJIora/nirHGw5f9BVu7jb3C+zGLqLGTDoCFK3AaEZbn4730l0Hx+quo
+        +gW3giD1Jnc4nG6J5GIXJ5Ykq7QkgCXmSw==
+X-Google-Smtp-Source: AGRyM1sURHZfiX5wzHPXeR2AYrhP7Lk6Dv+I6i2w7bXyw4mEzFXSNOLocSlc5UTDsoyxW52cTR87VA==
+X-Received: by 2002:a63:1208:0:b0:411:9b47:f6cc with SMTP id h8-20020a631208000000b004119b47f6ccmr10037046pgl.79.1659279829242;
+        Sun, 31 Jul 2022 08:03:49 -0700 (PDT)
 Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b6-20020a17090a6e0600b001f31d6fe0f3sm7420090pjk.57.2022.07.31.08.03.43
+        by smtp.gmail.com with ESMTPSA id l185-20020a6391c2000000b0041bf7924fc4sm1060389pge.13.2022.07.31.08.03.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Jul 2022 08:03:44 -0700 (PDT)
-Message-ID: <83a24590-fe65-4b8c-9069-45ad8290a451@kernel.dk>
-Date:   Sun, 31 Jul 2022 09:03:43 -0600
+        Sun, 31 Jul 2022 08:03:48 -0700 (PDT)
+Message-ID: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk>
+Date:   Sun, 31 Jul 2022 09:03:47 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block changes for 5.20-rc1
+Subject: [GIT PULL] Block driver changes for 5.20-rc1
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Content-Language: en-US
@@ -66,540 +66,270 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-This pull request contains the core block changes queued up for 5.20. In
-detail:
+On top of the core block changes, here are the block driver changes for
+5.20-rc1. In detail:
 
-- Series improving the type checking of request flags (Bart)
+- NVMe pull request via Christoph
+	- add support for In-Band authentication (Hannes Reinecke)
+	- handle the persistent internal error AER (Michael Kelley)
+	- use in-capsule data for TCP I/O queue connect (Caleb Sander)
+	- remove timeout for getting RDMA-CM established event
+	  (Israel Rukshin)
+	- misc cleanups (Joel Granados, Sagi Grimberg, Chaitanya Kulkarni,
+	  Guixin Liu, Xiang wangx)
 
-- Ensure queue mapping for a single queues always picks the right queue
-  (Bart)
+- MD pull request via Song
+	- Improve raid5 lock contention, by Logan Gunthorpe.
+	- Misc fixes to raid5, by Logan Gunthorpe.
+	- Fix race condition with md_reap_sync_thread(), by Guoqing Jiang.
 
-- Series sanitizing the io priority handling (Jan)
+- Work on unifying the null_blk module parameters and configfs API
+  (Vincent)
 
-- rq-qos race fix (Jinke)
+- drbd bitmap IO error fix (Lars)
 
-- Reserved tags handling improvements (John)
+- Set of rnbd fixes (Guoqing, Md Haris)
 
-- Separate memory alignment from file/disk offset aligment for O_DIRECT
-  (Keith)
+- Remove experimental marker on bcache async device registration (Coly)
 
-- Add new ublk driver, userspace block driver using io_uring for
-  communication with the userspace backend (Ming)
+- Misc fixes and cleanups (Ming, Yu, Dan, Christophe
 
-- Use try_cmpxchg() to cleanup the code in various spots (Uros)
+Note that this will throw a merge conflict in
+drivers/block/drbd/drbd_bitmap.c due to the request flag changes from
+Bart. The resolution is trivial, just keep the new enum req_op:
 
-- Series finally removing bdevname() (Christoph)
-
-- Series cleaning up the zoned device handling (Christoph)
-
-- Series cleaning up the independent access range support (Christoph)
-
-- Series cleaning up and improving the block sysfs handling (Christoph)
-
-- Series cleaning up and improving teardown of block devices. This turns
-  the usual two step process into something that is simpler to implement
-  and handle in block drivers (Christoph)
-
-- Series cleaning up the chunk size handling (Christoph)
-
-- Misc cleanups and fixes (Bart, Bo, Dan, GuoYong, Jason, Keith, Liu,
-  Ming, Sebastian, Yang, Ying)
+diff --cc drivers/block/drbd/drbd_bitmap.c
+index 603f6828dd79,bd2133ef6e0a..7d9db33363de
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@@ -977,16 -990,17 +990,17 @@@ static inline sector_t drbd_md_last_bit
+  static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_hold(local)
+  {
+  	struct drbd_device *device = ctx->device;
+ -	unsigned int op = (ctx->flags & BM_AIO_READ) ? REQ_OP_READ : REQ_OP_WRITE;
+ +	enum req_op op = ctx->flags & BM_AIO_READ ? REQ_OP_READ : REQ_OP_WRITE;
+- 	struct bio *bio = bio_alloc_bioset(device->ldev->md_bdev, 1, op,
+- 					   GFP_NOIO, &drbd_md_io_bio_set);
+  	struct drbd_bitmap *b = device->bitmap;
++ 	struct bio *bio;
+  	struct page *page;
++ 	sector_t last_bm_sect;
++ 	sector_t first_bm_sect;
++ 	sector_t on_disk_sector;
+  	unsigned int len;
+  
+- 	sector_t on_disk_sector =
+- 		device->ldev->md.md_offset + device->ldev->md.bm_offset;
+- 	on_disk_sector += ((sector_t)page_nr) << (PAGE_SHIFT-9);
++ 	first_bm_sect = device->ldev->md.md_offset + device->ldev->md.bm_offset;
++ 	on_disk_sector = first_bm_sect + (((sector_t)page_nr) << (PAGE_SHIFT-SECTOR_SHIFT));
+  
+  	/* this might happen with very small
+  	 * flexible external meta data device,
 
 Please pull!
 
 
-The following changes since commit 03c765b0e3b4cb5063276b086c76f7a612856a9a:
+The following changes since commit ee78ec1077d37d1a4a0860589a65df8ae6d2255c:
 
-  Linux 5.19-rc4 (2022-06-26 14:22:10 -0700)
+  blk-mq: blk_mq_tag_busy is no need to return a value (2022-06-27 06:29:12 -0600)
 
 are available in the Git repository at:
 
-  git://git.kernel.dk/linux-block.git tags/for-5.20/block-2022-07-29
+  git://git.kernel.dk/linux-block.git tags/for-5.20/drivers-2022-07-29
 
-for you to fetch changes up to 8d9fdb6011b4d413271eba3a62e10f89efecc419:
+for you to fetch changes up to 508e357579f07d43cb3feabe93b46bc1648ca5d9:
 
-  ublk_drv: fix double shift bug (2022-07-26 12:30:07 -0600)
-
-----------------------------------------------------------------
-for-5.20/block-2022-07-29
+  bcache: remove EXPERIMENTAL for Kconfig option 'Asynchronous device registration' (2022-07-28 11:13:11 -0600)
 
 ----------------------------------------------------------------
-Bart Van Assche (70):
-      blk-iocost: Simplify ioc_rqos_done()
-      block: Rename a blk_mq_map_queue() argument
-      block: Make blk_mq_get_sq_hctx() select the proper hardware queue type
-      block: bfq: Remove an unused function definition
-      block: bfq: Fix kernel-doc headers
-      treewide: Rename enum req_opf into enum req_op
-      block: Use enum req_op where appropriate
-      block: Change the type of the last .rw_page() argument
-      block: Change the type of req_op() and bio_op() into enum req_op
-      block: Introduce the type blk_opf_t
-      block: Use the new blk_opf_t type
-      block/bfq: Use the new blk_opf_t type
-      block/mq-deadline: Use the new blk_opf_t type
-      block/kyber: Use the new blk_opf_t type
-      blktrace: Trace remapped requests correctly
-      blktrace: Use the new blk_opf_t type
-      block/brd: Use the enum req_op type
-      block/drbd: Use the enum req_op and blk_opf_t types
-      block/drbd: Combine two drbd_submit_peer_request() arguments
-      block/floppy: Fix a sparse warning
-      block/rnbd: Use blk_opf_t where appropriate
-      xen-blkback: Use the enum req_op and blk_opf_t types
-      block/zram: Use enum req_op where appropriate
-      nvdimm-btt: Use the enum req_op type
-      um: Use enum req_op where appropriate
-      dm/core: Reduce the size of struct dm_io_request
-      dm/core: Rename kcopyd_job.rw into kcopyd.op
-      dm/core: Combine request operation type and flags
-      dm/ebs: Change 'int rw' into 'enum req_op op'
-      dm/dm-flakey: Use the new blk_opf_t type
-      dm/dm-integrity: Combine request operation and flags
-      dm mirror log: Use the new blk_opf_t type
-      dm-snap: Combine request operation type and flags
-      dm/zone: Use the enum req_op type
-      dm/dm-zoned: Use the enum req_op type
-      md/core: Combine two sync_page_io() arguments
-      md/bcache: Combine two uuid_io() arguments
-      md/bcache: Combine two prio_io() arguments
-      md/raid1: Use the new blk_opf_t type
-      md/raid10: Use the new blk_opf_t type
-      md/raid5: Use the enum req_op and blk_opf_t types
-      nvme/host: Use the enum req_op and blk_opf_t types
-      nvme/target: Use the new blk_opf_t type
-      scsi/core: Improve static type checking
-      scsi/core: Change the return type of scsi_noretry_cmd() into bool
-      scsi/core: Use the new blk_opf_t type
-      scsi/device_handlers: Use the new blk_opf_t type
-      scsi/ufs: Rename a 'dir' argument into 'op'
-      scsi/target: Use the new blk_opf_t type
-      mm: Use the new blk_opf_t type
-      fs/buffer: Use the new blk_opf_t type
-      fs/buffer: Combine two submit_bh() and ll_rw_block() arguments
-      fs/direct-io: Reduce the size of struct dio
-      fs/mpage: Use the new blk_opf_t type
-      fs/btrfs: Use the enum req_op and blk_opf_t types
-      fs/ext4: Use the new blk_opf_t type
-      fs/f2fs: Use the enum req_op and blk_opf_t types
-      fs/gfs2: Use the enum req_op and blk_opf_t types
-      fs/hfsplus: Use the enum req_op and blk_opf_t types
-      fs/iomap: Use the new blk_opf_t type
-      fs/jbd2: Fix the documentation of the jbd2_write_superblock() callers
-      fs/nfs: Use enum req_op where appropriate
-      fs/nilfs2: Use the enum req_op and blk_opf_t types
-      fs/ntfs3: Use enum req_op where appropriate
-      fs/ocfs2: Use the enum req_op and blk_opf_t types
-      PM: Use the enum req_op and blk_opf_t types
-      fs/xfs: Use the enum req_op and blk_opf_t types
-      fs/zonefs: Use the enum req_op type for tracing request operations
-      fs/buffer: Fix the ll_rw_block() kernel-doc header
-      blktrace: Fix the blk_fill_rwbs() kernel-doc header
+for-5.20/drivers-2022-07-29
 
-Bo Liu (1):
-      block: Directly use ida_alloc()/free()
+----------------------------------------------------------------
+Caleb Sander (1):
+      nvme-tcp: use in-capsule data for I/O connect
 
-Christoph Hellwig (58):
-      block: factor out a chunk_size_left helper
-      dm: open code blk_max_size_offset in max_io_len
-      block: open code blk_max_size_offset in blk_rq_get_max_sectors
-      block: cleanup variable naming in get_max_io_size
-      block: fold blk_max_size_offset into get_max_io_size
-      block: move blk_queue_get_max_sectors to blk.h
-      mtip32xx: remove the device_status debugfs file
-      mtip32xx: fix device removal
-      block: remove QUEUE_FLAG_DEAD
-      block: stop setting the nomerges flags in blk_cleanup_queue
-      block: simplify disk shutdown
-      block: remove blk_cleanup_disk
-      block: simplify blktrace sysfs attribute creation
-      block: remove a superflous queue kobject reference
-      block: use default groups to register the queue attributes
-      block: remove the extra gendisk reference in __blk_mq_register_dev
-      blk-mq: rename blk_mq_sysfs_{,un}register
-      blk-mq: cleanup disk sysfs registration
-      block: move ->ia_ranges from the request_queue to the gendisk
-      block: simplify disk_set_independent_access_ranges
-      block: remove a superflous ifdef in blkdev.h
-      block: call blk_queue_free_zone_bitmaps from disk_release
-      block: use bdev_is_zoned instead of open coding it
-      block: simplify blk_mq_plug
-      block: simplify blk_check_zone_append
-      block: pass a gendisk to blk_queue_set_zoned
-      block: pass a gendisk to blk_queue_clear_zone_settings
-      block: pass a gendisk to blk_queue_free_zone_bitmaps
-      block: remove queue_max_open_zones and queue_max_active_zones
-      block: pass a gendisk to blk_queue_max_open_zones and blk_queue_max_active_zones
-      block: replace blkdev_nr_zones with bdev_nr_zones
-      block: use bdev based helpers in blkdev_zone_mgmt{,all}
-      nvmet:: use bdev based helpers in nvmet_bdev_zone_mgmt_emulate_all
-      dm-zoned: cleanup dmz_fixup_devices
-      block: remove blk_queue_zone_sectors
-      block: move zone related fields to struct gendisk
-      block: stop using bdevname in bdev_write_inode
-      block: stop using bdevname in __blkdev_issue_discard
-      drbd: stop using bdevname in drbd_report_io_error
-      pktcdvd: stop using bdevname in pkt_seq_show
-      pktcdvd: stop using bdevname in pkt_new_dev
-      rnbd-srv: remove the name field from struct rnbd_dev
-      ocfs2/cluster: remove the hr_dev_name field from struct o2hb_region
-      ext4: only initialize mmp_bdevname once
-      block: remove bdevname
-      ublk: remove UBLK_IO_F_INTEGRITY
-      ublk: add a MAINTAINERS entry
-      ublk: remove UBLK_IO_F_PREFLUSH
-      ublk: remove the empty open and release block device operations
-      ublk: simplify ublk_ch_open and ublk_ch_release
-      ublk: cleanup ublk_ctrl_uring_cmd
-      ublk: fold __ublk_create_dev into ublk_ctrl_add_dev
-      ublk: rewrite ublk_ctrl_get_queue_affinity to not rely on hctx->cpumask
-      ublk: defer disk allocation
-      blk-mq: fix error handling in __blk_mq_alloc_disk
-      block: call blk_mq_exit_queue from disk_release for never added disks
-      block: remove __blk_get_queue
-      ublk_drv: fix error handling of ublk_add_dev
+Chaitanya Kulkarni (2):
+      nvme: remove unused timeout parameter
+      nvme: fix qid param blk_mq_alloc_request_hctx
 
-Dan Carpenter (2):
-      ublk_drv: fix an IS_ERR() vs NULL check
-      ublk_drv: fix double shift bug
+Chris Webb (1):
+      md: Explicitly create command-line configured devices
 
-GuoYong Zheng (1):
-      bfq: Remove useless code in bfq_lookup_next_entity
+Christophe JAILLET (1):
+      block: null_blk: Use the bitmap API to allocate bitmaps
 
-Jan Kara (9):
-      block: fix default IO priority handling again
-      block: Return effective IO priority from get_current_ioprio()
-      block: Generalize get_current_ioprio() for any task
-      block: Make ioprio_best() static
-      block: Fix handling of tasks without ioprio in ioprio_get(2)
-      blk-ioprio: Remove unneeded field
-      blk-ioprio: Convert from rqos policy to direct call
-      block: Initialize bio priority earlier
-      block: Always initialize bio IO priority on submit
+Coly Li (1):
+      bcache: remove EXPERIMENTAL for Kconfig option 'Asynchronous device registration'
 
-Jason Yan (2):
-      blk-cgroup: factor out blkcg_iostat_update()
-      blk-cgroup: factor out blkcg_free_all_cpd()
+Dan Carpenter (1):
+      null_blk: fix ida error handling in null_add_dev()
 
-Jinke Han (1):
-      block: don't allow the same type rq_qos add more than once
+Guixin Liu (2):
+      nvme-pci: use nvme core helper to cancel requests in tagset
+      nvme-apple: use nvme core helper to cancel requests in tagset
 
-John Garry (6):
-      scsi: core: Remove reserved request time-out handling
-      blk-mq: Add a flag for reserved requests
-      blk-mq: Drop blk_mq_ops.timeout 'reserved' arg
-      scsi: fnic: Drop reserved request handling
-      blk-mq: Drop 'reserved' arg of busy_tag_iter_fn
-      blk-mq: Drop local variable for reserved tag
+Guoqing Jiang (9):
+      md: unlock mddev before reap sync_thread in action_store
+      rnbd-clt: open code send_msg_open in rnbd_clt_map_device
+      rnbd-clt: don't free rsp in msg_open_conf for map scenario
+      rnbd-clt: kill read_only from struct rnbd_clt_dev
+      rnbd-clt: reduce the size of struct rnbd_clt_dev
+      rnbd-clt: adjust the layout of struct rnbd_clt_dev
+      rnbd-clt: check capacity inside rnbd_clt_change_capacity
+      rnbd-clt: pass sector_t type for resize capacity
+      rnbd-clt: make rnbd_clt_change_capacity return void
 
-Keith Busch (11):
-      block: fix infinite loop for invalid zone append
-      block/bio: remove duplicate append pages code
-      block: export dma_alignment attribute
-      block: introduce bdev_dma_alignment helper
-      block: add a helper function for dio alignment
-      block/merge: count bytes instead of sectors
-      block/bounce: count bytes instead of sectors
-      iov: introduce iov_iter_aligned
-      block: introduce bdev_iter_is_aligned helper
-      block: relax direct io memory alignment
-      iomap: add support for dma aligned direct-io
+Hannes Reinecke (11):
+      crypto: add crypto_has_shash()
+      crypto: add crypto_has_kpp()
+      lib/base64: RFC4648-compliant base64 encoding
+      nvme: add definitions for NVMe In-Band authentication
+      nvme-fabrics: decode 'authentication required' connect error
+      nvme: implement In-Band authentication
+      nvme-auth: Diffie-Hellman key exchange support
+      nvmet: parse fabrics commands on io queues
+      nvmet: implement basic In-Band Authentication
+      nvmet-auth: Diffie-Hellman key exchange support
+      nvmet-auth: expire authentication sessions
 
-Liu Song (1):
-      blk-mq: blk_mq_tag_busy is no need to return a value
+Israel Rukshin (1):
+      nvme-rdma: remove timeout for getting RDMA-CM established event
 
-Ming Lei (8):
-      blk-mq: don't create hctx debugfs dir until q->debugfs_dir is created
-      ublk_drv: add io_uring based userspace block driver
-      ublk_drv: support to complete io command via task_work_add
-      ublk_drv: fix request queue leak
-      ublk_drv: fix build warning with -Wmaybe-uninitialized and one sparse warning
-      mmc: fix disk/queue leak in case of adding disk failure
-      ublk_drv: fix lockdep warning
-      ublk_drv: make sure that correct flags(features) returned to userspace
+Jens Axboe (2):
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.20/drivers
+      Merge tag 'nvme-5.20-2022-07-14' of git://git.infradead.org/nvme into for-5.20/drivers
 
-Sebastian Andrzej Siewior (1):
-      blk-mq: Don't disable preemption around __blk_mq_run_hw_queue().
+Joel Granados (1):
+      nvme-multipath: refactor nvme_mpath_add_disk
 
-Uros Bizjak (4):
-      block/rq_qos: Use atomic_try_cmpxchg in atomic_inc_below
-      block: Use try_cmpxchg in update_io_ticks
-      blk-iolatency: Use atomic{,64}_try_cmpxchg
-      blk-cgroup: Use atomic{,64}_try_cmpxchg
+Lars Ellenberg (1):
+      drbd: bm_page_async_io: fix spurious bitmap "IO error" on large volumes
 
-Yang Li (1):
-      ublk_drv: remove unneeded semicolon
+Logan Gunthorpe (25):
+      md/raid5-log: Drop extern decorators for function prototypes
+      md/raid5-ppl: Drop unused argument from ppl_handle_flush_request()
+      md/raid5: suspend the array for calls to log_exit()
+      md/raid5-cache: Take mddev_lock in r5c_journal_mode_show()
+      md/raid5-cache: Drop RCU usage of conf->log
+      md/raid5-cache: Clear conf->log after finishing work
+      md/raid5-cache: Annotate pslot with __rcu notation
+      md: Use enum for overloaded magic numbers used by mddev->curr_resync
+      md: Ensure resync is reported after it starts
+      md: Notify sysfs sync_completed in md_reap_sync_thread()
+      md/raid5: Make logic blocking check consistent with logic that blocks
+      md/raid5: Factor out ahead_of_reshape() function
+      md/raid5: Refactor raid5_make_request loop
+      md/raid5: Move stripe_add_to_batch_list() call out of add_stripe_bio()
+      md/raid5: Move common stripe get code into new find_get_stripe() helper
+      md/raid5: Factor out helper from raid5_make_request() loop
+      md/raid5: Drop the do_prepare flag in raid5_make_request()
+      md/raid5: Move read_seqcount_begin() into make_stripe_request()
+      md/raid5: Refactor for loop in raid5_make_request() into while loop
+      md/raid5: Keep a reference to last stripe_head for batch
+      md/raid5: Refactor add_stripe_bio()
+      md/raid5: Check all disks in a stripe_head for reshape progress
+      md/raid5: Pivot raid5_make_request()
+      md/raid5: Improve debug prints
+      md/raid5: Increase restriction on max segments per request
 
-Yang Yingliang (1):
-      ublk_drv: fix missing error return code in ublk_add_dev()
+Md Haris Iqbal (2):
+      block/rnbd-srv: Set keep_id to true after mutex_trylock
+      block/rnbd-srv: Replace sess_dev_list with index_idr
 
-Ying Sun (1):
-      block: remove "select BLK_RQ_IO_DATA_LEN" from BLK_CGROUP_IOCOST dependency
+Michael Kelley (1):
+      nvme: handle the persistent internal error AER
 
- Documentation/ABI/stable/sysfs-block        |    9 +
- Documentation/scsi/scsi_eh.rst              |    3 +-
- Documentation/scsi/scsi_mid_low_api.rst     |    2 +-
- MAINTAINERS                                 |    7 +
- arch/m68k/emu/nfblock.c                     |    4 +-
- arch/um/drivers/ubd_kern.c                  |    8 +-
- arch/xtensa/platforms/iss/simdisk.c         |    4 +-
- block/Kconfig                               |    1 -
- block/bdev.c                                |   10 +-
- block/bfq-cgroup.c                          |   34 +-
- block/bfq-iosched.c                         |   16 +-
- block/bfq-iosched.h                         |    8 +-
- block/bfq-wf2q.c                            |    5 +-
- block/bio.c                                 |  126 +--
- block/blk-cgroup-rwstat.h                   |    8 +-
- block/blk-cgroup.c                          |   76 +-
- block/blk-cgroup.h                          |   12 +-
- block/blk-core.c                            |   80 +-
- block/blk-flush.c                           |    6 +-
- block/blk-ia-ranges.c                       |   65 +-
- block/blk-ioc.c                             |    2 +
- block/blk-iocost.c                          |   22 +-
- block/blk-iolatency.c                       |   30 +-
- block/blk-ioprio.c                          |   57 +-
- block/blk-ioprio.h                          |    9 +
- block/blk-lib.c                             |    6 +-
- block/blk-merge.c                           |   79 +-
- block/blk-mq-debugfs-zoned.c                |    6 +-
- block/blk-mq-debugfs.c                      |   19 +-
- block/blk-mq-sysfs.c                        |   45 +-
- block/blk-mq-tag.c                          |   31 +-
- block/blk-mq-tag.h                          |   10 +-
- block/blk-mq.c                              |  105 +-
- block/blk-mq.h                              |   39 +-
- block/blk-rq-qos.c                          |   10 +-
- block/blk-rq-qos.h                          |   11 +-
- block/blk-settings.c                        |   11 +-
- block/blk-sysfs.c                           |   60 +-
- block/blk-throttle.c                        |    7 +-
- block/blk-wbt.c                             |   30 +-
- block/blk-zoned.c                           |   92 +-
- block/blk.h                                 |   34 +-
- block/bounce.c                              |   13 +-
- block/bsg-lib.c                             |    6 +-
- block/elevator.h                            |    2 +-
- block/fops.c                                |   28 +-
- block/genhd.c                               |   80 +-
- block/ioctl.c                               |    2 +-
- block/ioprio.c                              |   58 +-
- block/kyber-iosched.c                       |    8 +-
- block/mq-deadline.c                         |    4 +-
- block/partitions/core.c                     |    3 +-
- drivers/block/Kconfig                       |    9 +
- drivers/block/Makefile                      |    2 +
- drivers/block/amiflop.c                     |    2 +-
- drivers/block/aoe/aoeblk.c                  |    2 +-
- drivers/block/aoe/aoedev.c                  |    2 +-
- drivers/block/ataflop.c                     |    5 +-
- drivers/block/brd.c                         |    8 +-
- drivers/block/drbd/drbd_actlog.c            |    9 +-
- drivers/block/drbd/drbd_bitmap.c            |    2 +-
- drivers/block/drbd/drbd_int.h               |    5 +-
- drivers/block/drbd/drbd_main.c              |    4 +-
- drivers/block/drbd/drbd_receiver.c          |   24 +-
- drivers/block/drbd/drbd_req.c               |    6 +-
- drivers/block/drbd/drbd_worker.c            |    2 +-
- drivers/block/floppy.c                      |    8 +-
- drivers/block/loop.c                        |    3 +-
- drivers/block/mtip32xx/mtip32xx.c           |  307 +-----
- drivers/block/mtip32xx/mtip32xx.h           |    5 -
- drivers/block/n64cart.c                     |    2 +-
- drivers/block/nbd.c                         |    9 +-
- drivers/block/null_blk/main.c               |   15 +-
- drivers/block/null_blk/null_blk.h           |   12 +-
- drivers/block/null_blk/trace.h              |    2 +-
- drivers/block/null_blk/zoned.c              |   12 +-
- drivers/block/paride/pcd.c                  |    4 +-
- drivers/block/paride/pd.c                   |    6 +-
- drivers/block/paride/pf.c                   |    4 +-
- drivers/block/pktcdvd.c                     |   14 +-
- drivers/block/ps3disk.c                     |    4 +-
- drivers/block/ps3vram.c                     |    4 +-
- drivers/block/rbd.c                         |    2 +-
- drivers/block/rnbd/rnbd-clt.c               |    6 +-
- drivers/block/rnbd/rnbd-proto.h             |    7 +-
- drivers/block/rnbd/rnbd-srv-dev.c           |    1 -
- drivers/block/rnbd/rnbd-srv-dev.h           |    1 -
- drivers/block/rnbd/rnbd-srv-sysfs.c         |    5 +-
- drivers/block/rnbd/rnbd-srv.c               |    9 +-
- drivers/block/rnbd/rnbd-srv.h               |    3 +-
- drivers/block/sunvdc.c                      |    4 +-
- drivers/block/swim.c                        |    2 +-
- drivers/block/swim3.c                       |    2 +-
- drivers/block/sx8.c                         |    6 +-
- drivers/block/ublk_drv.c                    | 1545 +++++++++++++++++++++++++++
- drivers/block/virtio_blk.c                  |    3 +-
- drivers/block/xen-blkback/blkback.c         |    6 +-
- drivers/block/xen-blkfront.c                |    4 +-
- drivers/block/z2ram.c                       |    3 +-
- drivers/block/zram/zram_drv.c               |    8 +-
- drivers/cdrom/gdrom.c                       |    3 +-
- drivers/infiniband/ulp/srp/ib_srp.c         |    3 +-
- drivers/md/bcache/super.c                   |   27 +-
- drivers/md/dm-bufio.c                       |   26 +-
- drivers/md/dm-ebs-target.c                  |   15 +-
- drivers/md/dm-flakey.c                      |    8 +-
- drivers/md/dm-integrity.c                   |   76 +-
- drivers/md/dm-io.c                          |   38 +-
- drivers/md/dm-kcopyd.c                      |   26 +-
- drivers/md/dm-log.c                         |    8 +-
- drivers/md/dm-raid.c                        |    2 +-
- drivers/md/dm-raid1.c                       |   12 +-
- drivers/md/dm-snap-persistent.c             |   25 +-
- drivers/md/dm-table.c                       |    6 +-
- drivers/md/dm-writecache.c                  |   12 +-
- drivers/md/dm-zone.c                        |   88 +-
- drivers/md/dm-zoned-metadata.c              |    5 +-
- drivers/md/dm-zoned-target.c                |   25 +-
- drivers/md/dm-zoned.h                       |    2 +-
- drivers/md/dm.c                             |   33 +-
- drivers/md/md-bitmap.c                      |    6 +-
- drivers/md/md.c                             |   16 +-
- drivers/md/md.h                             |    3 +-
- drivers/md/raid1.c                          |   14 +-
- drivers/md/raid10.c                         |   22 +-
- drivers/md/raid5-cache.c                    |   12 +-
- drivers/md/raid5-ppl.c                      |   12 +-
- drivers/md/raid5.c                          |    3 +-
- drivers/memstick/core/ms_block.c            |    3 +-
- drivers/memstick/core/mspro_block.c         |    3 +-
- drivers/mmc/core/block.c                    |    6 +-
- drivers/mmc/core/queue.c                    |    4 +-
- drivers/mtd/mtd_blkdevs.c                   |    4 +-
- drivers/mtd/ubi/block.c                     |    4 +-
- drivers/nvdimm/btt.c                        |    8 +-
- drivers/nvdimm/pmem.c                       |    6 +-
- drivers/nvme/host/apple.c                   |    5 +-
- drivers/nvme/host/core.c                    |    5 +-
- drivers/nvme/host/fc.c                      |   18 +-
- drivers/nvme/host/ioctl.c                   |    4 +-
- drivers/nvme/host/multipath.c               |    4 +-
- drivers/nvme/host/nvme.h                    |    4 +-
- drivers/nvme/host/pci.c                     |    4 +-
- drivers/nvme/host/rdma.c                    |   15 +-
- drivers/nvme/host/tcp.c                     |   15 +-
- drivers/nvme/host/zns.c                     |    6 +-
- drivers/nvme/target/io-cmd-bdev.c           |   17 +-
- drivers/nvme/target/loop.c                  |   12 +-
- drivers/nvme/target/zns.c                   |   24 +-
- drivers/s390/block/dasd.c                   |    4 +-
- drivers/s390/block/dasd_genhd.c             |    4 +-
- drivers/s390/block/dasd_int.h               |    2 +-
- drivers/s390/block/dcssblk.c                |    8 +-
- drivers/s390/block/scm_blk.c                |    4 +-
- drivers/scsi/aacraid/comminit.c             |    2 +-
- drivers/scsi/aacraid/linit.c                |    2 +-
- drivers/scsi/device_handler/scsi_dh_alua.c  |    4 +-
- drivers/scsi/device_handler/scsi_dh_emc.c   |    2 +-
- drivers/scsi/device_handler/scsi_dh_hp_sw.c |    4 +-
- drivers/scsi/device_handler/scsi_dh_rdac.c  |    2 +-
- drivers/scsi/fnic/fnic_scsi.c               |   14 +-
- drivers/scsi/hosts.c                        |   14 +-
- drivers/scsi/mpi3mr/mpi3mr_os.c             |   16 +-
- drivers/scsi/scsi_error.c                   |   22 +-
- drivers/scsi/scsi_lib.c                     |   26 +-
- drivers/scsi/scsi_priv.h                    |    4 +-
- drivers/scsi/scsi_sysfs.c                   |    2 +-
- drivers/scsi/sd.c                           |   10 +-
- drivers/scsi/sd_zbc.c                       |   12 +-
- drivers/scsi/sr.c                           |    4 +-
- drivers/target/target_core_iblock.c         |    4 +-
- drivers/ufs/core/ufshcd.c                   |    4 +-
- drivers/ufs/core/ufshpb.c                   |    7 +-
- fs/btrfs/check-integrity.c                  |    4 +-
- fs/btrfs/compression.c                      |    6 +-
- fs/btrfs/compression.h                      |    2 +-
- fs/btrfs/extent_io.c                        |   18 +-
- fs/btrfs/inode.c                            |    4 +-
- fs/btrfs/raid56.c                           |    4 +-
- fs/buffer.c                                 |   61 +-
- fs/direct-io.c                              |   40 +-
- fs/ext4/ext4.h                              |    8 +-
- fs/ext4/fast_commit.c                       |    4 +-
- fs/ext4/mmp.c                               |   11 +-
- fs/ext4/super.c                             |   20 +-
- fs/f2fs/data.c                              |   11 +-
- fs/f2fs/f2fs.h                              |    6 +-
- fs/f2fs/node.c                              |    2 +-
- fs/f2fs/segment.c                           |    2 +-
- fs/gfs2/bmap.c                              |    5 +-
- fs/gfs2/dir.c                               |    5 +-
- fs/gfs2/log.c                               |    4 +-
- fs/gfs2/log.h                               |    2 +-
- fs/gfs2/lops.c                              |    4 +-
- fs/gfs2/lops.h                              |    2 +-
- fs/gfs2/meta_io.c                           |   18 +-
- fs/gfs2/quota.c                             |    2 +-
- fs/hfsplus/hfsplus_fs.h                     |    2 +-
- fs/hfsplus/part_tbl.c                       |    5 +-
- fs/hfsplus/super.c                          |    4 +-
- fs/hfsplus/wrapper.c                        |   12 +-
- fs/iomap/direct-io.c                        |   12 +-
- fs/isofs/compress.c                         |    2 +-
- fs/jbd2/commit.c                            |    8 +-
- fs/jbd2/journal.c                           |   25 +-
- fs/jbd2/recovery.c                          |    4 +-
- fs/mpage.c                                  |    6 +-
- fs/nfs/blocklayout/blocklayout.c            |   13 +-
- fs/nilfs2/btnode.c                          |    8 +-
- fs/nilfs2/btnode.h                          |    4 +-
- fs/nilfs2/btree.c                           |    6 +-
- fs/nilfs2/gcinode.c                         |    7 +-
- fs/nilfs2/mdt.c                             |   19 +-
- fs/ntfs/aops.c                              |    6 +-
- fs/ntfs/compress.c                          |    2 +-
- fs/ntfs/file.c                              |    2 +-
- fs/ntfs/logfile.c                           |    2 +-
- fs/ntfs/mft.c                               |    4 +-
- fs/ntfs3/file.c                             |    2 +-
- fs/ntfs3/fsntfs.c                           |    2 +-
- fs/ntfs3/inode.c                            |    2 +-
- fs/ntfs3/ntfs_fs.h                          |    2 +-
- fs/ocfs2/aops.c                             |    2 +-
- fs/ocfs2/buffer_head_io.c                   |    8 +-
- fs/ocfs2/cluster/heartbeat.c                |   75 +-
- fs/ocfs2/super.c                            |    2 +-
- fs/reiserfs/inode.c                         |    4 +-
- fs/reiserfs/journal.c                       |   12 +-
- fs/reiserfs/stree.c                         |    4 +-
- fs/reiserfs/super.c                         |    2 +-
- fs/udf/dir.c                                |    2 +-
- fs/udf/directory.c                          |    2 +-
- fs/udf/inode.c                              |    2 +-
- fs/ufs/balloc.c                             |    2 +-
- fs/xfs/xfs_bio_io.c                         |    2 +-
- fs/xfs/xfs_buf.c                            |    4 +-
- fs/xfs/xfs_linux.h                          |    2 +-
- fs/xfs/xfs_log_recover.c                    |    2 +-
- fs/zonefs/super.c                           |   22 +-
- fs/zonefs/trace.h                           |    4 +-
- include/linux/bio.h                         |   10 +-
- include/linux/blk-mq.h                      |   34 +-
- include/linux/blk_types.h                   |  119 ++-
- include/linux/blkdev.h                      |  224 ++--
- include/linux/blktrace_api.h                |   13 +-
- include/linux/buffer_head.h                 |    9 +-
- include/linux/dm-io.h                       |    4 +-
- include/linux/ioprio.h                      |   24 +-
- include/linux/jbd2.h                        |    2 +-
- include/linux/uio.h                         |    2 +
- include/linux/writeback.h                   |    4 +-
- include/scsi/scsi_cmnd.h                    |    4 +-
- include/scsi/scsi_device.h                  |    2 +-
- include/scsi/scsi_host.h                    |    2 +-
- include/trace/events/f2fs.h                 |   22 +-
- include/trace/events/jbd2.h                 |   12 +-
- include/trace/events/nilfs2.h               |    4 +-
- include/uapi/linux/ublk_cmd.h               |  161 +++
- kernel/power/swap.c                         |   29 +-
- kernel/trace/blktrace.c                     |   72 +-
- lib/iov_iter.c                              |   92 ++
- 261 files changed, 3635 insertions(+), 2158 deletions(-)
- create mode 100644 drivers/block/ublk_drv.c
- create mode 100644 include/uapi/linux/ublk_cmd.h
+Ming Lei (1):
+      null_blk: cleanup null_init_tag_set
+
+Sagi Grimberg (1):
+      nvme-loop: use nvme core helpers to cancel all requests in a tagset
+
+Song Liu (1):
+      MAINTAINERS: add patchwork link to linux-raid project
+
+Vincent Fu (2):
+      null_blk: add module parameters for 4 options
+      null_blk: add configfs variables for 2 options
+
+Xiang wangx (1):
+      nvme: remove a double word in a comment
+
+Yu Kuai (1):
+      nbd: add missing definition of pr_fmt
+
+Zhang Jiaming (1):
+      md: Fix spelling mistake in comments
+
+ Documentation/block/null_blk.rst       |   22 +
+ MAINTAINERS                            |    1 +
+ crypto/kpp.c                           |    6 +
+ crypto/shash.c                         |    6 +
+ drivers/block/drbd/drbd_bitmap.c       |   49 +-
+ drivers/block/nbd.c                    |    6 +-
+ drivers/block/null_blk/main.c          |  108 +++-
+ drivers/block/null_blk/null_blk.h      |    2 +
+ drivers/block/rnbd/rnbd-clt-sysfs.c    |    2 +-
+ drivers/block/rnbd/rnbd-clt.c          |  201 ++++---
+ drivers/block/rnbd/rnbd-clt.h          |   18 +-
+ drivers/block/rnbd/rnbd-srv.c          |   20 +-
+ drivers/block/rnbd/rnbd-srv.h          |    4 -
+ drivers/md/bcache/Kconfig              |    2 +-
+ drivers/md/dm-raid.c                   |    1 +
+ drivers/md/md-autodetect.c             |    1 +
+ drivers/md/md-cluster.c                |    4 +-
+ drivers/md/md.c                        |   76 ++-
+ drivers/md/md.h                        |   16 +
+ drivers/md/raid5-cache.c               |   40 +-
+ drivers/md/raid5-log.h                 |   77 ++-
+ drivers/md/raid5-ppl.c                 |    2 +-
+ drivers/md/raid5.c                     |  646 +++++++++++++-------
+ drivers/nvme/Kconfig                   |    1 +
+ drivers/nvme/Makefile                  |    1 +
+ drivers/nvme/common/Kconfig            |    4 +
+ drivers/nvme/common/Makefile           |    7 +
+ drivers/nvme/common/auth.c             |  482 +++++++++++++++
+ drivers/nvme/host/Kconfig              |   15 +
+ drivers/nvme/host/Makefile             |    1 +
+ drivers/nvme/host/apple.c              |    7 +-
+ drivers/nvme/host/auth.c               | 1017 ++++++++++++++++++++++++++++++++
+ drivers/nvme/host/core.c               |  190 +++++-
+ drivers/nvme/host/fabrics.c            |   94 ++-
+ drivers/nvme/host/fabrics.h            |    7 +
+ drivers/nvme/host/multipath.c          |    6 +-
+ drivers/nvme/host/nvme.h               |   39 +-
+ drivers/nvme/host/pci.c                |    6 +-
+ drivers/nvme/host/rdma.c               |   14 +-
+ drivers/nvme/host/tcp.c                |   13 +-
+ drivers/nvme/host/trace.c              |   32 +
+ drivers/nvme/target/Kconfig            |   15 +
+ drivers/nvme/target/Makefile           |    1 +
+ drivers/nvme/target/admin-cmd.c        |    4 +-
+ drivers/nvme/target/auth.c             |  525 +++++++++++++++++
+ drivers/nvme/target/configfs.c         |  138 ++++-
+ drivers/nvme/target/core.c             |   15 +
+ drivers/nvme/target/fabrics-cmd-auth.c |  545 +++++++++++++++++
+ drivers/nvme/target/fabrics-cmd.c      |   55 +-
+ drivers/nvme/target/loop.c             |    8 +-
+ drivers/nvme/target/nvmet.h            |   75 ++-
+ include/crypto/hash.h                  |    2 +
+ include/crypto/kpp.h                   |    2 +
+ include/linux/base64.h                 |   16 +
+ include/linux/nvme-auth.h              |   41 ++
+ include/linux/nvme.h                   |  213 ++++++-
+ lib/Makefile                           |    2 +-
+ lib/base64.c                           |  103 ++++
+ 58 files changed, 4474 insertions(+), 532 deletions(-)
+ create mode 100644 drivers/nvme/common/Kconfig
+ create mode 100644 drivers/nvme/common/Makefile
+ create mode 100644 drivers/nvme/common/auth.c
+ create mode 100644 drivers/nvme/host/auth.c
+ create mode 100644 drivers/nvme/target/auth.c
+ create mode 100644 drivers/nvme/target/fabrics-cmd-auth.c
+ create mode 100644 include/linux/base64.h
+ create mode 100644 include/linux/nvme-auth.h
+ create mode 100644 lib/base64.c
 
 -- 
 Jens Axboe
