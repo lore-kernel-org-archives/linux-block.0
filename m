@@ -2,77 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FCA8C00140
-	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 09:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E13C00140
+	for <linux-block@archiver.kernel.org>; Sun, 31 Jul 2022 10:23:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230370AbiGaJxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Jul 2022 05:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51340 "EHLO
+        id S236587AbiGaKXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Jul 2022 06:23:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232174AbiGaJxL (ORCPT
+        with ESMTP id S231267AbiGaKXn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Jul 2022 05:53:11 -0400
-Received: from 1wt.eu (wtarreau.pck.nerim.net [62.212.114.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10CB21208D;
-        Sun, 31 Jul 2022 02:53:09 -0700 (PDT)
-Received: (from willy@localhost)
-        by pcw.home.local (8.15.2/8.15.2/Submit) id 26V9r7Nm012264;
-        Sun, 31 Jul 2022 11:53:07 +0200
-Date:   Sun, 31 Jul 2022 11:53:07 +0200
-From:   Willy Tarreau <w@1wt.eu>
-To:     Dipanjan Das <mail.dipanjan.das@gmail.com>
-Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>,
-        fleischermarius@googlemail.com, its.priyanka.bose@gmail.com
-Subject: Re: INFO: task hung in __floppy_read_block_0
-Message-ID: <20220731095307.GA12211@1wt.eu>
-References: <CANX2M5ZSuHONz-TPVdGcW3q_n6Z2DKLM6M8RfG+mORA9CCQRsQ@mail.gmail.com>
- <CAKXUXMxVCCRB2uaAN68LZv6Fwe7zAkUmwCmsqB6pE=z_=cztMg@mail.gmail.com>
- <CANX2M5b9PBp9i5v_akXshQqBFRT4dTHg+PR2pWpHPa5RBOEUTg@mail.gmail.com>
+        Sun, 31 Jul 2022 06:23:43 -0400
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE23DE0D7
+        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 03:23:40 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id j29-20020a05600c1c1d00b003a2fdafdefbso4324737wms.2
+        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 03:23:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=bDJBVdCs0+Lkcsh+eqsSjWB2X6vyVGxKkU/1SIgk/yg=;
+        b=BI5kmBwPNwkMFLBkt22JSw2zSknJyWz9+5AlAfxFNph96/n2cTPSGncQgdu3yMqSHf
+         yDPTypU8u6oprmZmpJLsJutuecEsJWGJEAZ5lTTR3o77DCyqiRTRMPWaaKWT7pPf+BEB
+         gQwmHiE9YRtWH84rEkZs3H7+OwtMGWtTx/r7qz3y7FLMA/fj0s0NFsbRMY+2fRGmExpA
+         L3hqF9ofKMk8uIMjw9nVynzE5+2VWyHoG0aX6dAjS/jEzpVw9792oZ7S1X/4bA4XhDMG
+         3e1JNSxHeMhRnN1APMGT5xHe68OveOWxVreek3GS5w1jn3DIDP1G3VvUsGzoSE5UqXrc
+         VDiQ==
+X-Gm-Message-State: AJIora9KnziahOoqHMciVl2XA9U1ltv1XA6Q+KHE/ldjSClTH/ARvBls
+        1HxW8BVmYNYx6H3yRugMW50=
+X-Google-Smtp-Source: AGRyM1smIWdFLBeC22+ja52UBqgctV3T6np7Y5H2dchVlIkebia3ASdi3vEAq+v6Wzp4qk2wnC2/Jg==
+X-Received: by 2002:a05:600c:5128:b0:3a3:2160:7a7b with SMTP id o40-20020a05600c512800b003a321607a7bmr8099305wms.204.1659263019052;
+        Sun, 31 Jul 2022 03:23:39 -0700 (PDT)
+Received: from [10.100.102.14] (46-117-125-14.bb.netvision.net.il. [46.117.125.14])
+        by smtp.gmail.com with ESMTPSA id n2-20020a5d51c2000000b0021badf3cb26sm10032484wrv.63.2022.07.31.03.23.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Jul 2022 03:23:38 -0700 (PDT)
+Message-ID: <fc7a303f-0921-f784-a559-f03511f2e4be@grimberg.me>
+Date:   Sun, 31 Jul 2022 13:23:36 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANX2M5b9PBp9i5v_akXshQqBFRT4dTHg+PR2pWpHPa5RBOEUTg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 0/3] improve nvme quiesce time for large amount of
+ namespaces
+Content-Language: en-US
+To:     Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@kernel.dk
+References: <20220729073948.32696-1-lengchao@huawei.com>
+ <20220729142605.GA395@lst.de>
+ <1b3d753a-6ff5-bdf1-8c91-4b4760ea1736@huawei.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <1b3d753a-6ff5-bdf1-8c91-4b4760ea1736@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-On Thu, Jul 28, 2022 at 01:20:33PM -0700, Dipanjan Das wrote:
-> On Thu, Jul 28, 2022 at 7:23 AM Lukas Bulwahn <lukas.bulwahn@gmail.com> wrote:
-> >
-> > Dipanjan, are you really sure that you want to report a "INFO: task
-> > hung" bug identified with your syzkaller instance? Especially for a
-> > floppy driver, probably in your case even just an emulated one
-> > (right?). Reading data from floppies was always very slow as far as I
-> > remember those times...
-> 
-> >From the bugs reported by syzkaller in the past, we observed that
-> several of these "INFO: task hung in... " reports were considered and
-> acted on, for example, this:
-> https://groups.google.com/g/syzkaller-bugs/c/L0SBaHZ5bYc. For the
-> reported issue, we noticed the read task stays blocked for 143
-> seconds, which seemed to be one the higher, especially given that it
-> is an emulated floppy drive (yes, you are right). If it deems normal,
-> then we do apologize for our misassesment.
+>> Why can't we have a per-tagset quiesce flag and just wait for the
+>> one?  That also really nicely supports the problem with changes in
+>> the namespace list during that time.
+> Because If quiesce queues based on tagset, it is difficult to
+> distinguish non-IO queues. The I/O queues process is different
+> from other queues such as fabrics_q, admin_q, etc, which may cause
+> confusion in the code logic.
 
-FWIW I've been running the repro here on machine running 5.19-rc8 and
-equipped with a real floppy drive. The code is still running as I type,
-it sounds like it's destroying the floppy disk in it but after 12 minutes
-of torture, nothing happens.
+It is primarily the connect_q where we issue io queue connect...
+We should not quiesce the connect_q in nvme_stop_queues() as that
+relates to only namespaces queues.
 
-Thus I'm a bit confused about what to look for. It's very likely that
-there are still bugs left in this driver, but trying to identify them
-and to validate a fix will be difficult if they cannot be reproduced.
-Maybe they only happen under emulation due to timing issues.
+In the last attempt to do a tagset flag, we ended up having to do
+something like:
+--
+void nvme_stop_queues(struct nvme_ctrl *ctrl)
+{
+	blk_mq_quiesce_tagset(ctrl->tagset);
+	if (ctrl->connect_q)
+		blk_mq_unquiesce_queue(ctrl->connect_q);
+}
+EXPORT_SYMBOL_GPL(nvme_stop_queues);
+--
 
-As such, any hint about the exact setup and how long to wait to get
-the error would be much appreciated.
+But maybe we can avoid that, and because we allocate
+the connect_q ourselves, and fully know that it should
+not be apart of the tagset quiesce, perhaps we can introduce
+a new interface like:
+--
+static inline int nvme_ctrl_init_connect_q(struct nvme_ctrl *ctrl)
+{
+	ctrl->connect_q = blk_mq_init_queue_self_quiesce(ctrl->tagset);
+	if (IS_ERR(ctrl->connect_q))
+		return PTR_ERR(ctrl->connect_q);
+	return 0;
+}
+--
 
-Thanks,
-Willy
+And then blk_mq_quiesce_tagset can simply look into a per request-queue
+self_quiesce flag and skip as needed.
