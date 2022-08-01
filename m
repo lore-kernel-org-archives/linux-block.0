@@ -2,87 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F498C00140
-	for <linux-block@archiver.kernel.org>; Mon,  1 Aug 2022 02:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DB2C00144
+	for <linux-block@archiver.kernel.org>; Mon,  1 Aug 2022 03:29:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229937AbiHACsK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Jul 2022 22:48:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
+        id S237074AbiHAD3S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Jul 2022 23:29:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238640AbiHACsK (ORCPT
+        with ESMTP id S233109AbiHAD3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Jul 2022 22:48:10 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69AC713D41
-        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 19:48:09 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id o3so9257363ple.5
-        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 19:48:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=sIhpHEWmweS6rta1kFchPdJbnAjJYE5U/WARvW+n9u8=;
-        b=sPReVOsN/+ZNJ+uSbyMhqMFkyQo25DpSxv0jZr3kKa61uRfxFnFK8Ln/p4DZqQNrET
-         m8jXMJMDVSrPUcX+hMV6ZcHj6vwf6cD4EZZiffQSkRFp8JrboJ4C3f67rKpu2F6Dz2De
-         Szv50u+qjrc5BWUF5xWbP5F0L0Mls96N+fdrveOpYLbNKXSzhTswtLhgin7DmknvEBKS
-         hUWfb3Uc4pHjnyCUDLZV8ZtFxWUJM8siFMjr0ZfUntpKzDRQ0620bO5SdF30I+SG+din
-         BLbT3xLpjXcAGhyh6EUFejBV93X0FIORo8qm16Rzj2i2NYyF1J8WJBUmBiVr55Sp5UuY
-         rkJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=sIhpHEWmweS6rta1kFchPdJbnAjJYE5U/WARvW+n9u8=;
-        b=Q09lMCUuReDEH4fev8WetmkMr3vs8USjdgUCV4J/D6QrI/uc8HeU2hIcMlkjWgMZLB
-         yUNMXxjn8O+Zee1DTNbyHHXQ5E+U1nmxbOnOmrGrdCbj9mtWUKzb/20MFtD+bIps+IOO
-         ccbAgM7rXnpF+FeUBbKTW1rngAKM4uST0JzREeSKXTsIw8CKe76RJJqyuTYu/Ex6r7yJ
-         65wVFEBk36GEyA3ivVVgRLeoy5tppQUWbKo4qbD0kVaai5uQ7j8BAFSYjPujNKfC9xbk
-         hnIemUtEaQNseGymEUP39u8Iy014NcRhObJ3dbOnCDw255/Rc4x6Kh1S1XORPL0DCZTT
-         DDXg==
-X-Gm-Message-State: ACgBeo2LZfH8DexHJNUQofdfSnmlN/napMySBoXwLwPYB+prNZ60vk6W
-        zrgGw4TkOnQfQ9A+jkYx3RdQew==
-X-Google-Smtp-Source: AA6agR4/2HEvZmhjCuplruQuQ539pxPOuUJIEe9Fy8fStLUUYYh5/lgBGYi7hmZlk8fWrmf69f3uuQ==
-X-Received: by 2002:a17:90b:4b0a:b0:1f2:a904:8af7 with SMTP id lx10-20020a17090b4b0a00b001f2a9048af7mr16932999pjb.76.1659322088905;
-        Sun, 31 Jul 2022 19:48:08 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id p6-20020a170902780600b0016909be39e5sm7854608pll.177.2022.07.31.19.48.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 31 Jul 2022 19:48:08 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ZiyangZhang@linux.alibaba.com, ming.lei@redhat.com
-Cc:     xiaoguang.wang@linux.alibaba.com, linux-block@vger.kernel.org
-In-Reply-To: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
-References: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
-Subject: Re: [PATCH V4 0/2] ublk: add support for UBLK_IO_NEED_GET_DATA
-Message-Id: <165932208816.183707.5495009296503956559.b4-ty@kernel.dk>
-Date:   Sun, 31 Jul 2022 20:48:08 -0600
+        Sun, 31 Jul 2022 23:29:17 -0400
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94AF8101F8
+        for <linux-block@vger.kernel.org>; Sun, 31 Jul 2022 20:29:15 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VL.5hTq_1659324552;
+Received: from 30.15.222.160(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VL.5hTq_1659324552)
+          by smtp.aliyun-inc.com;
+          Mon, 01 Aug 2022 11:29:13 +0800
+Message-ID: <807e39e2-1124-2437-9576-082c27c95512@linux.alibaba.com>
+Date:   Mon, 1 Aug 2022 11:29:11 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.11.0
+Subject: Re: [PATCH V4 0/2] ublk: add support for UBLK_IO_NEED_GET_DATA
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, xiaoguang.wang@linux.alibaba.com,
+        Ming Lei <ming.lei@redhat.com>
+References: <cover.1659011443.git.ZiyangZhang@linux.alibaba.com>
+ <4c6f7d83-183a-da98-a41a-5363db6f3297@linux.alibaba.com>
+ <Yuc3dq50YoU3CVzP@T590> <70d3dc55-a877-c4c9-cafc-feebf150fbb7@kernel.dk>
+ <19236388-4ee0-28ee-c2f8-7fe88f445872@kernel.dk>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <19236388-4ee0-28ee-c2f8-7fe88f445872@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 28 Jul 2022 20:39:14 +0800, ZiyangZhang wrote:
-> 1. Introduction:
-> UBLK_IO_NEED_GET_DATA is a new ublk IO command. It is designed for a user
-> application who wants to allocate IO buffer and set IO buffer address
-> only after it receives an IO request from ublksrv. This is a reasonable
-> scenario because these users may use a RPC framework as one IO backend
-> to handle IO requests passed from ublksrv. And a RPC framework may
-> allocate its own buffer(or memory pool).
+On 2022/8/1 10:48, Jens Axboe wrote:
+> On 7/31/22 8:43 PM, Jens Axboe wrote:
+>> On 7/31/22 8:16 PM, Ming Lei wrote:
+>>> On Sun, Jul 31, 2022 at 04:03:30PM +0800, Ziyang Zhang wrote:
+>>>> Hi Jens,
+>>>>
+>>>> Please queue this patchset up for the 5.20 merge window.
+>>>>
+>>>> UBLK_IO_NEED_GET_DATA is an important feature designed for Ming Lei's
+>>>> ublk_drv. All the patches have been reviewed by Ming and all test cases
+>>>> in his ublksrv[1] have been passed.
+>>>
+>>> Hi Jens,
+>>>
+>>> This feature is helpful for existed projects to switch to ublk from similar
+>>> tech, so IMO the change makes sense.
+>>
+>> Can we get this resent against for-5.20/block? It doesn't apply anymore.
+>> Then we can still make the next release.
 > 
-> [...]
+> Turns it out was just a trivial reject, I fixed it up.
 
-Applied, thanks!
+Thanks for queuing it up.
 
-[1/2] ublk_cmd.h: add one new ublk command: UBLK_IO_NEED_GET_DATA
-      commit: 5af6c7916ed4b76e704f5badf13188be3e1eaec3
-[2/2] ublk_drv: add support for UBLK_IO_NEED_GET_DATA
-      commit: e363c522e6736855a663fd81f3cefa09e238a2d7
-
-Best regards,
--- 
-Jens Axboe
-
-
+Regards,
+Ziyang Zhang
