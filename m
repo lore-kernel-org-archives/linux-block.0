@@ -2,197 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DCBC00144
-	for <linux-block@archiver.kernel.org>; Mon,  1 Aug 2022 18:58:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CD6C19F2C
+	for <linux-block@archiver.kernel.org>; Mon,  1 Aug 2022 19:20:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233444AbiHAS6z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Aug 2022 14:58:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48542 "EHLO
+        id S232995AbiHATUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Aug 2022 15:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233505AbiHAS6y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Aug 2022 14:58:54 -0400
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CC6226568
-        for <linux-block@vger.kernel.org>; Mon,  1 Aug 2022 11:58:51 -0700 (PDT)
-Received: by mail-qk1-f171.google.com with SMTP id o21so9095662qkm.10
-        for <linux-block@vger.kernel.org>; Mon, 01 Aug 2022 11:58:51 -0700 (PDT)
+        with ESMTP id S232194AbiHATUT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Aug 2022 15:20:19 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 419846273;
+        Mon,  1 Aug 2022 12:20:18 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id bh13so10512475pgb.4;
+        Mon, 01 Aug 2022 12:20:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=heBhDPAZZcza0ZAAL/XaeCAoRWcoC2O1hG9RrLQTw+Q=;
+        b=FsrlOE4tsSZYBIhg7eL1cGLNkbr5s7AQ6MDD86FOtmiPsPlVzuukphx8rvCvD9lFrG
+         OYVMyEmS45kDwd8iEqotzTxYfQZtdH9O86Z46Rni4GbggDC1CsEM0s33s/QGSnWkQiq8
+         ieJTOtAzAsitMOtoBvKuDVqDK+NpqWs5eO9lrMy/iriWwE8H7QKSRoluPyjF+7wuYM2m
+         XKgdnVbL+6FBR/vPZKushZ9U4ceplKg2nCF6+ptHc1SZutef8Kx6hwOQmWZV1LHEvn35
+         9UQr6pO/J8Q7g+IoI8AqqKenCi9FwgE/MCBBmXlTX901iqMCPI3UscgT3E9llrn25Pzh
+         L/Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc;
-        bh=noKfAGA/6Igm9E6+GZzHCeI90DSjIQ4h0rHdnNbwrXg=;
-        b=l/hZydd01EaD6MLKHDoCfNexnQ4SMBk3J+1QAPrwCND/dsvmubKoThos5UU8UF+mSA
-         z9UP/fUgiAdhcI0TWKwDcVvZ6/SE8YN07rRLpMB+S0H9XCnMMuK43i8+VBcNBah7jHbM
-         OkXnWfBeHICq8j+Key3Sqjdc/NYv+RDBy6bf0ztVE7MpIiXZpbZDy6O02H4odGGOedHo
-         T5VtGRiTiLy/+KbJ85MM+rm+K63Sh7IvOx2KyCgL/ejmgSd3XrOuvK54plGBag36YpF0
-         yoAxS+JPi1M51QWmcOBfcLtHZ/GsZHRO6b+ocahwkMx8PdA8jVRa0FGfbQnK6t8Qbyvu
-         Ikbw==
-X-Gm-Message-State: AJIora+ZWV7lJvmz6KOsIstfYDf9gopqEZegshhyJxivU/sgb5y1ogcW
-        4xvgXME1JwIQmIHgsVYSSaDT
-X-Google-Smtp-Source: AGRyM1vVeSlVLvxMC6UPwEEP3npK0YTnqsmxTV0yEjLx7BD//M5FDl2rm13onmSCQSNOpcLZLy8JQg==
-X-Received: by 2002:ae9:e8c9:0:b0:6b5:e58b:7f5a with SMTP id a192-20020ae9e8c9000000b006b5e58b7f5amr12755389qkg.741.1659380330710;
-        Mon, 01 Aug 2022 11:58:50 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id x21-20020a05620a0b5500b006a793bde241sm8518820qkg.63.2022.08.01.11.58.50
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=heBhDPAZZcza0ZAAL/XaeCAoRWcoC2O1hG9RrLQTw+Q=;
+        b=uwQBJDjo3dIf1vK9UugVk5dkD4Uqs2a5DhC+sHtxoDnAe5YCs8i92Sx5m9Y78V2ffU
+         mqjKUP4wDq9Ep3R2NDWAr+hpJd8ga0g9SREN05OmqmrKwg27kCl3EAyQyLn/eMTvDXnb
+         mr+sjfxzy3LKd26prsaVCEEHY7gMgc/YyQq9zSGOKQcexnxkDE8jA+ABFp34pUCjXzqU
+         Tm3+QF5LtVPiESeOfDL6kA5zEw9o1tqmSZo+HKo0dTAPY7iZnTqeIPW8O1CFnKFTaLyS
+         KCJ8oWDp64JEwxJHXhqK7nABRxqpEBNG6sxM96X1UIcpAlqbCVlqD212vDtw/6xgDo0z
+         CAxw==
+X-Gm-Message-State: AJIora8CsQex9JWFXB/7ZBgilxwBq6z6aCzAcNmgfCyQXaE1BbyF8dGe
+        YIYKAiYnjhJeMWXobovV1DZ+s5dZLT8=
+X-Google-Smtp-Source: AGRyM1vHqknvJ1u8gmAcJyP+QQSyrQnRqaiz75jjFE5Xhn8w0b7H3adnxYr7Xs+Mi40lMMuAhModng==
+X-Received: by 2002:a05:6a00:14c1:b0:52b:4602:5af1 with SMTP id w1-20020a056a0014c100b0052b46025af1mr17111525pfu.24.1659381617595;
+        Mon, 01 Aug 2022 12:20:17 -0700 (PDT)
+Received: from localhost.localdomain (ec2-13-113-80-70.ap-northeast-1.compute.amazonaws.com. [13.113.80.70])
+        by smtp.gmail.com with ESMTPSA id a7-20020a1709027e4700b0016b865ea2ddsm9849318pln.85.2022.08.01.12.20.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 11:58:50 -0700 (PDT)
-Date:   Mon, 1 Aug 2022 14:58:49 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        JeongHyeon Lee <jhs2.lee@samsung.com>,
-        Jiang Jian <jiangjian@cdjrlc.com>,
-        Luo Meng <luomeng12@huawei.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Mike Christie <michael.christie@oracle.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Steven Lung <1030steven@gmail.com>,
-        Zhang Jiaming <jiaming@nfschina.com>
-Subject: [git pull] device mapper changes for 6.0
-Message-ID: <YugiaQ1TO+vT1FQ5@redhat.com>
+        Mon, 01 Aug 2022 12:20:17 -0700 (PDT)
+From:   Zhang Boyang <zhangboyang.id@gmail.com>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-kernel@vger.kernel.org,
+        Zhang Boyang <zhangboyang.id@gmail.com>
+Subject: [PATCH 6.0 RESEND] loop: introduce LO_FLAGS_NODEALLOC
+Date:   Tue,  2 Aug 2022 03:20:00 +0800
+Message-Id: <20220801192000.15365-1-zhangboyang.id@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Previously, for file-backed loop devices, REQ_OP_DISCARD and
+REQ_OP_WRITE_ZEROES (without REQ_NOUNMAP) are implemented using
+fallocate(FALLOC_FL_PUNCH_HOLE), which will cause the underlying file to
+be sparse and disk space freed. The users have no choice to prevent this
+this from happening.
 
-Stephen had to deal with a couple trivial merge conflicts late in this
-cycle, please see: https://lkml.org/lkml/2022/7/27/1819 and
-https://lkml.org/lkml/2022/7/28/302
+This patch introduces LO_FLAGS_NODEALLOC. With this flag set,
+REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES are forced to use
+fallocate(FALLOC_FL_ZERO_RANGE). The disk space of underlying file is
+kept allocated. This is useful if users, for example, want to use a
+preallocated file as the backing file.
 
-The following changes since commit 22d0c4080fe49299640d9d6c43154c49794c2825:
+Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+---
+ drivers/block/loop.c      | 17 +++++++++++++++--
+ include/uapi/linux/loop.h | 15 +++++++++++----
+ 2 files changed, 26 insertions(+), 6 deletions(-)
 
-  block: simplify disk_set_independent_access_ranges (2022-06-29 08:36:46 -0600)
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 084f9b8a0ba3..a52ef0787202 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -483,11 +483,15 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 		 * write zeroes the range.  Otherwise, punch them out.
+ 		 */
+ 		return lo_fallocate(lo, rq, pos,
+-			(rq->cmd_flags & REQ_NOUNMAP) ?
++			((rq->cmd_flags & REQ_NOUNMAP) ||
++			 (lo->lo_flags & LO_FLAGS_NODEALLOC)) ?
+ 				FALLOC_FL_ZERO_RANGE :
+ 				FALLOC_FL_PUNCH_HOLE);
+ 	case REQ_OP_DISCARD:
+-		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
++		return lo_fallocate(lo, rq, pos,
++			(lo->lo_flags & LO_FLAGS_NODEALLOC) ?
++				FALLOC_FL_ZERO_RANGE :
++				FALLOC_FL_PUNCH_HOLE);
+ 	case REQ_OP_WRITE:
+ 		if (cmd->use_aio)
+ 			return lo_rw_aio(lo, cmd, pos, WRITE);
+@@ -719,12 +723,20 @@ static ssize_t loop_attr_dio_show(struct loop_device *lo, char *buf)
+ 	return sysfs_emit(buf, "%s\n", dio ? "1" : "0");
+ }
+ 
++static ssize_t loop_attr_nodealloc_show(struct loop_device *lo, char *buf)
++{
++	int nodealloc = (lo->lo_flags & LO_FLAGS_NODEALLOC);
++
++	return sysfs_emit(buf, "%s\n", nodealloc ? "1" : "0");
++}
++
+ LOOP_ATTR_RO(backing_file);
+ LOOP_ATTR_RO(offset);
+ LOOP_ATTR_RO(sizelimit);
+ LOOP_ATTR_RO(autoclear);
+ LOOP_ATTR_RO(partscan);
+ LOOP_ATTR_RO(dio);
++LOOP_ATTR_RO(nodealloc);
+ 
+ static struct attribute *loop_attrs[] = {
+ 	&loop_attr_backing_file.attr,
+@@ -733,6 +745,7 @@ static struct attribute *loop_attrs[] = {
+ 	&loop_attr_autoclear.attr,
+ 	&loop_attr_partscan.attr,
+ 	&loop_attr_dio.attr,
++	&loop_attr_nodealloc.attr,
+ 	NULL,
+ };
+ 
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index 6f63527dd2ed..a6afd06ffa07 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -18,17 +18,24 @@ enum {
+ 	LO_FLAGS_AUTOCLEAR	= 4,
+ 	LO_FLAGS_PARTSCAN	= 8,
+ 	LO_FLAGS_DIRECT_IO	= 16,
++	LO_FLAGS_NODEALLOC	= 32,
+ };
+ 
+ /* LO_FLAGS that can be set using LOOP_SET_STATUS(64) */
+-#define LOOP_SET_STATUS_SETTABLE_FLAGS (LO_FLAGS_AUTOCLEAR | LO_FLAGS_PARTSCAN)
++#define LOOP_SET_STATUS_SETTABLE_FLAGS (LO_FLAGS_AUTOCLEAR		\
++					| LO_FLAGS_PARTSCAN		\
++					| LO_FLAGS_NODEALLOC)
+ 
+ /* LO_FLAGS that can be cleared using LOOP_SET_STATUS(64) */
+-#define LOOP_SET_STATUS_CLEARABLE_FLAGS (LO_FLAGS_AUTOCLEAR)
++#define LOOP_SET_STATUS_CLEARABLE_FLAGS (LO_FLAGS_AUTOCLEAR		\
++					 | LO_FLAGS_NODEALLOC)
+ 
+ /* LO_FLAGS that can be set using LOOP_CONFIGURE */
+-#define LOOP_CONFIGURE_SETTABLE_FLAGS (LO_FLAGS_READ_ONLY | LO_FLAGS_AUTOCLEAR \
+-				       | LO_FLAGS_PARTSCAN | LO_FLAGS_DIRECT_IO)
++#define LOOP_CONFIGURE_SETTABLE_FLAGS (LO_FLAGS_READ_ONLY		\
++				       | LO_FLAGS_AUTOCLEAR		\
++				       | LO_FLAGS_PARTSCAN		\
++				       | LO_FLAGS_DIRECT_IO		\
++				       | LO_FLAGS_NODEALLOC)
+ 
+ #include <asm/posix_types.h>	/* for __kernel_old_dev_t */
+ #include <linux/types.h>	/* for __u64 */
+-- 
+2.30.2
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-changes
-
-for you to fetch changes up to 9dd1cd3220eca534f2d47afad7ce85f4c40118d8:
-
-  dm: fix dm-raid crash if md_handle_request() splits bio (2022-07-28 17:36:30 -0400)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Refactor DM core's mempool allocation so that it clearer by not
-  being split acorss files.
-
-- Improve DM core's BLK_STS_DM_REQUEUE and BLK_STS_AGAIN handling.
-
-- Optimize DM core's more common bio splitting by eliminating the use
-  of bio cloning with bio_split+bio_chain. Shift that cloning cost to
-  the relatively unlikely dm_io requeue case that only occurs during
-  error handling. Introduces dm_io_rewind() that will clone a bio that
-  reflects the subset of the original bio that must be requeued.
-
-- Remove DM core's dm_table_get_num_targets() wrapper and audit all
-  dm_table_get_target() callers.
-
-- Fix potential for OOM with DM writecache target by setting a default
-  MAX_WRITEBACK_JOBS (set to 256MiB or 1/16 of total system memory,
-  whichever is smaller).
-
-- Fix DM writecache target's stats that are reported through
-  DM-specific table info.
-
-- Fix use-after-free crash in dm_sm_register_threshold_callback().
-
-- Refine DM core's Persistent Reservation handling in preparation for
-  broader work Mike Christie is doing to add compatibility with
-  Microsoft Windows Failover Cluster.
-
-- Fix various KASAN reported bugs in the DM raid target.
-
-- Fix DM raid target crash due to md_handle_request() bio splitting
-  that recurses to block core without properly initializing the bio's
-  bi_dev.
-
-- Fix some code comment typos and fix some Documentation formatting.
-
-----------------------------------------------------------------
-Bagas Sanjaya (1):
-      Documentation: dm writecache: Render status list as list
-
-Christoph Hellwig (2):
-      dm: unexport dm_get_reserved_rq_based_ios
-      dm: refactor dm_md_mempool allocation
-
-JeongHyeon Lee (1):
-      dm verity: fix checkpatch close brace error
-
-Jiang Jian (1):
-      dm raid: remove redundant "the" in parse_raid_params() comment
-
-Luo Meng (1):
-      dm thin: fix use-after-free crash in dm_sm_register_threshold_callback
-
-Mauro Carvalho Chehab (1):
-      Documentation: dm writecache: add blank line before optional parameters
-
-Mike Christie (4):
-      dm: Allow dm_call_pr to be used for path searches
-      dm: Start pr_reserve from the same starting path
-      dm: Fix PR release handling for non All Registrants
-      dm: Start pr_preempt from the same starting path
-
-Mike Snitzer (5):
-      dm table: remove dm_table_get_num_targets() wrapper
-      dm table: audit all dm_table_get_target() callers
-      dm table: rename dm_target variable in dm_table_add_target()
-      dm: return early from dm_pr_call() if DM device is suspended
-      dm: fix dm-raid crash if md_handle_request() splits bio
-
-Mikulas Patocka (8):
-      dm writecache: set a default MAX_WRITEBACK_JOBS
-      dm kcopyd: use __GFP_HIGHMEM when allocating pages
-      dm writecache: return void from functions
-      dm writecache: count number of blocks read, not number of read bios
-      dm writecache: count number of blocks written, not number of write bios
-      dm writecache: count number of blocks discarded, not number of discard bios
-      dm raid: fix address sanitizer warning in raid_status
-      dm raid: fix address sanitizer warning in raid_resume
-
-Ming Lei (3):
-      dm: improve BLK_STS_DM_REQUEUE and BLK_STS_AGAIN handling
-      dm: add dm_bio_rewind() API to DM core
-      dm: add two stage requeue mechanism
-
-Steven Lung (1):
-      dm cache: fix typo in 2 comment blocks
-
-Zhang Jiaming (1):
-      dm snapshot: fix typo in snapshot_map() comment
-
- .../admin-guide/device-mapper/writecache.rst       |  18 +-
- drivers/md/Makefile                                |   2 +-
- drivers/md/dm-cache-metadata.h                     |   2 +-
- drivers/md/dm-cache-target.c                       |   2 +-
- drivers/md/dm-core.h                               |  23 +-
- drivers/md/dm-ima.c                                |   5 +-
- drivers/md/dm-io-rewind.c                          | 166 ++++++++
- drivers/md/dm-ioctl.c                              |   6 +-
- drivers/md/dm-kcopyd.c                             |   2 +-
- drivers/md/dm-raid.c                               |   7 +-
- drivers/md/dm-rq.c                                 |   1 -
- drivers/md/dm-snap.c                               |   2 +-
- drivers/md/dm-table.c                              | 318 +++++++-------
- drivers/md/dm-thin-metadata.c                      |   7 +-
- drivers/md/dm-thin.c                               |   4 +-
- drivers/md/dm-verity-target.c                      |   7 +-
- drivers/md/dm-writecache.c                         |  43 +-
- drivers/md/dm-zone.c                               |   7 +-
- drivers/md/dm.c                                    | 462 +++++++++++++--------
- drivers/md/dm.h                                    |   4 -
- include/linux/device-mapper.h                      |   7 +-
- include/uapi/linux/dm-ioctl.h                      |   4 +-
- 22 files changed, 694 insertions(+), 405 deletions(-)
- create mode 100644 drivers/md/dm-io-rewind.c
