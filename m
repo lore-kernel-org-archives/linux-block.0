@@ -2,90 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6E0C00140
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 21:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C575CC19F2B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 22:24:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbiHBVvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 17:51:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
+        id S234498AbiHBWYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 18:24:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbiHBVvM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 17:51:12 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A3E2A940
-        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 14:51:11 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a7so15268415ejp.2
-        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 14:51:11 -0700 (PDT)
+        with ESMTP id S232051AbiHBWYS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 18:24:18 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B6F53D1A
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 15:24:16 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id g12so14849905pfb.3
+        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 15:24:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=5Rv79VJHIKSvpOIw2O5Fm8WohEUbhBV/qYyIN/5sZZo=;
-        b=B9D4g9WwzhG4R8cuR9n9EaCFkwSDiOqYzcsEtXxhTnadfT8wSySSDao6azrT6nYOS7
-         DLWQ+91KHujqQXXHJLG354VovSYvd7rg9/c1nyc70I/YAIFpLfVhJyv5GZzthlc8WTX1
-         d/K8uquolELySYwroIw5iWMA6KdvKt3SriZcg=
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=hNEYUAO92N4pCY8sKiISrxHLoe2N5y8rJIEZlA2rSfs=;
+        b=AezUzRCTINyyAI+D6BuA7DrFA6e074vhOiTwM+DnFo8c9F+wss42JH+Fxpf3N9mPUb
+         RtL1CMSohN3CDpGp6hPZZ+rkDQwvNGbKmzCmuVrlid0U4VlJd/sYtJ1h8pyE2+pYpH+i
+         u54WxctVY1qRX3Mdj04InMhcbuTXc2yFq94u80OSqKp/xM5Xq2Lh0sKCKAr5GO8IJUwe
+         3y0brH9+tSgtkjiG2/A+E33HNIrJdKss3WxXB15CwjrA53U2jka4x8KXc/YhJvVSNq0h
+         +joW+IqdUAyiEjrWu4+N6NMHW3XmzGewg82anFmufLvXqg7BGzkGgHYNPcuX9llDmGtL
+         d7VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=5Rv79VJHIKSvpOIw2O5Fm8WohEUbhBV/qYyIN/5sZZo=;
-        b=UOSV67quqzckSgV152WBmMCmy6/9r+DZQFDvnrZB0NmoVGJ7o83dW1UXohvJkgknFo
-         k4hl7NqlVc9dH8ObBJBjzqsHj0UhMt+4VPB0e96eQjzcxYKJl2k6FRv27d/zPZ43Yb1d
-         5+Lk6X8jfbUfSUCVwHPvD9TbQ9lkvZWBLG/DywVJBgKJ8bpRtxKUww+Op4yPiUSLJQpn
-         sKIJ74j0O8S1+rQG2dKJeFpOyV5m0ungALH5/WnO5IKcG9Rtcf+RcKs8aPt049ZVBywq
-         X/msBQqsT74P01GqM9yGGErXyELbkbE+KimAN4S7i07RbFDLi7UgFsWncX7O8ztPjiqH
-         2FkQ==
-X-Gm-Message-State: AJIora/CnNcXkxQfl38O+MvCwzt3n0O3zXVgjgeYC+UgunIdR+NFdDsE
-        oG405uVzfsvWHNCvQucFF2U0ZkklLoz/8f6Q
-X-Google-Smtp-Source: AGRyM1u7XEwbNKGANIfSkM/AMLGZhWh+Ky1HsHgqPJ1J58c87Ani9EqyTjIXZUpuoye3jxbubNPdaQ==
-X-Received: by 2002:a17:907:2e02:b0:72b:7f58:34a7 with SMTP id ig2-20020a1709072e0200b0072b7f5834a7mr17968025ejc.525.1659477069876;
-        Tue, 02 Aug 2022 14:51:09 -0700 (PDT)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com. [209.85.221.45])
-        by smtp.gmail.com with ESMTPSA id b15-20020a17090630cf00b0073022b796a7sm6165538ejb.93.2022.08.02.14.51.08
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hNEYUAO92N4pCY8sKiISrxHLoe2N5y8rJIEZlA2rSfs=;
+        b=d0a3cTFx8+TwG9ZJsFWN6VxvW/WtfJ4L45yEndRkrW5Hb+T+DXbbOUFr6MeSCwt5UG
+         SvR+12zei2OcokR5HvxkHTna8y5ovmHDOgc6OEd5OyRUVuU03ckE5VmItU1p+qoGQjqG
+         NVpvIT+8rkOLHUzwAPLcIaPBfsjazHSkc1ZqjIBRwtyqGw1KFCmaRTFJLpVGtP2fmOUk
+         UAPgQfCPzgVLQ55Lx8zEk6yf4K/hUqVfy1PKTseYv2l440YFjXLRUbJ8kqlPDOha8aMr
+         I3QtxRVAxnmDGf/lPB1kI9jrlGeZuK1sAKaBiG4hG8HcD3KYLqDsOmS01DNk2pFLaitP
+         lqPA==
+X-Gm-Message-State: ACgBeo2g8MctJaIL2IENFMGSYaagtfgg102RGbhkLxON7w+iRP8qH2yM
+        Dq3Tr+KaH5TDAFaDHk2BRSDjrw==
+X-Google-Smtp-Source: AA6agR7fpoNe1AlmQZAzmHvJHiPXg10hVWXeg8bpk5QGlrzyWOlzcnETs8uNL8Y9V83I/SYXRLpaDA==
+X-Received: by 2002:a63:9142:0:b0:41b:f217:8b83 with SMTP id l63-20020a639142000000b0041bf2178b83mr11704942pge.478.1659479056144;
+        Tue, 02 Aug 2022 15:24:16 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id im16-20020a170902bb1000b0016a7b9558f7sm157286plb.136.2022.08.02.15.24.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Aug 2022 14:51:09 -0700 (PDT)
-Received: by mail-wr1-f45.google.com with SMTP id z16so19328405wrh.12
-        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 14:51:08 -0700 (PDT)
-X-Received: by 2002:a5d:56cf:0:b0:21e:ce64:afe7 with SMTP id
- m15-20020a5d56cf000000b0021ece64afe7mr13924974wrw.281.1659477068521; Tue, 02
- Aug 2022 14:51:08 -0700 (PDT)
+        Tue, 02 Aug 2022 15:24:15 -0700 (PDT)
+Message-ID: <7d663c1a-67a2-159e-3f93-28ec18f3bd9d@kernel.dk>
+Date:   Tue, 2 Aug 2022 16:24:09 -0600
 MIME-Version: 1.0
-References: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk>
- <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
- <YumYKVWYnoALoSBR@kbusch-mbp.dhcp.thefacebook.com> <74bb310b-b602-14eb-85f7-4b08327b0092@kernel.dk>
-In-Reply-To: <74bb310b-b602-14eb-85f7-4b08327b0092@kernel.dk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 2 Aug 2022 14:50:52 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgAeL8+BYsy4mnut+y7sBF_+LXmW5bjUfegBpg8SisBJQ@mail.gmail.com>
-Message-ID: <CAHk-=wgAeL8+BYsy4mnut+y7sBF_+LXmW5bjUfegBpg8SisBJQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
 Subject: Re: [GIT PULL] Block driver changes for 5.20-rc1
-To:     Jens Axboe <axboe@kernel.dk>
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
         Sagi Grimberg <sagi@grimberg.me>,
         Hannes Reinecke <hare@suse.de>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk>
+ <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
+ <YumYKVWYnoALoSBR@kbusch-mbp.dhcp.thefacebook.com>
+ <74bb310b-b602-14eb-85f7-4b08327b0092@kernel.dk>
+ <CAHk-=wgAeL8+BYsy4mnut+y7sBF_+LXmW5bjUfegBpg8SisBJQ@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=wgAeL8+BYsy4mnut+y7sBF_+LXmW5bjUfegBpg8SisBJQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 2, 2022 at 2:35 PM Jens Axboe <axboe@kernel.dk> wrote:
->
->
-> As to testing, I'm going to punt that question to Hannes and Christoph,
-> as I have no way of testing that particular NVMe feature.
+On 8/2/22 3:50 PM, Linus Torvalds wrote:
+> On Tue, Aug 2, 2022 at 2:35 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>>
+>> As to testing, I'm going to punt that question to Hannes and Christoph,
+>> as I have no way of testing that particular NVMe feature.
+> 
+> I can't test the *feature* either.
+> 
+> But dammit, I test two very different build configurations, and both
+> of them failed miserably on this file.
+> 
+> Don't you get it? That file DOES NOT EVEN COMPILE.
+> 
+> I refuse to have anything to do with a pull request that doesn't even
+> pass some very fundamental build requirements for me. That implies a
+> level of lack of testing that just makes me go "No way am I touching
+> that tree".
 
-I can't test the *feature* either.
+I can tell you that I always compile the whole damn thing, and this one
+is no exception. The tree is also in for-next and has been for a long
+time, both the drivers and drivers-post branch. The build bot has also
+vetted both branches, individually, not just as the merged for-next.
 
-But dammit, I test two very different build configurations, and both
-of them failed miserably on this file.
+I take it this is only happening on clang, which is why I haven't seen
+it as I don't compile with clang. We can certainly add that to the usual
+pre-flight/post-merge list, but I'm a bit surprised that clang isn't
+being done by the build bots too.
 
-Don't you get it? That file DOES NOT EVEN COMPILE.
+If you want to make a clang build a hard requirement for any pull
+request, then that should be explicit and not illicit outbursts if
+that's just an implied assumption that it is being done. Really.
 
-I refuse to have anything to do with a pull request that doesn't even
-pass some very fundamental build requirements for me. That implies a
-level of lack of testing that just makes me go "No way am I touching
-that tree".
+-- 
+Jens Axboe
 
-                 Linus
