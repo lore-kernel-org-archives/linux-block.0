@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD9AC19F2C
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 13:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB00C19F28
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 13:52:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236974AbiHBNwn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 09:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50182 "EHLO
+        id S236987AbiHBNwo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 09:52:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236863AbiHBNwe (ORCPT
+        with ESMTP id S236858AbiHBNwe (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 09:52:34 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E414025285;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B56027CDF;
         Tue,  2 Aug 2022 06:52:25 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LxxGf1GMNzKPm8;
-        Tue,  2 Aug 2022 21:51:06 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LxxGg3K1WzKPmX;
+        Tue,  2 Aug 2022 21:51:07 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgDXLsMQLOlivtl0AA--.20757S7;
-        Tue, 02 Aug 2022 21:52:22 +0800 (CST)
+        by APP3 (Coremail) with SMTP id _Ch0CgDXLsMQLOlivtl0AA--.20757S10;
+        Tue, 02 Aug 2022 21:52:23 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     tj@kernel.org, mkoutny@suse.com, axboe@kernel.dk,
         ming.lei@redhat.com
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v7 3/9] blk-throttle: factor out code to calculate ios/bytes_allowed
-Date:   Tue,  2 Aug 2022 22:04:09 +0800
-Message-Id: <20220802140415.2960284-4-yukuai1@huaweicloud.com>
+Subject: [PATCH v7 6/9] blk-throttle: use 'READ/WRITE' instead of '0/1'
+Date:   Tue,  2 Aug 2022 22:04:12 +0800
+Message-Id: <20220802140415.2960284-7-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
 References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDXLsMQLOlivtl0AA--.20757S7
-X-Coremail-Antispam: 1UD129KBjvJXoWxuF48Ar18WF45CF17CFyDWrg_yoW5ZF17pr
-        Z3Gr1jgF4rX3WftF13Jws0vayrArn3AFyUJ3y3Xas5CF15uF1kJFnxZrW0yay8ZF97ua1f
-        Zw1Ut3ZrCr4DAFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
-        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
-        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
-        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
-        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2
-        xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v2
-        6r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2
-        Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_
-        Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMI
-        IF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd8n5UUUUU
-        =
+X-CM-TRANSID: _Ch0CgDXLsMQLOlivtl0AA--.20757S10
+X-Coremail-Antispam: 1UD129KBjvJXoW7KryfGryDGw4xuFWDAry3twb_yoW8JF4xpa
+        45Gr48Aa40qr4q9ry3Kr47XayYgan7ZrW3C393Ga1ayrW7JFnFgFnrZF90va18AFs3Can0
+        9ryUWrZ8GF1UG37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
+        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
+        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
+        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
+        UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,101 +60,38 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-No functional changes, new apis will be used in later patches to
-calculate wait time for throttled bios when new configuration is
-submitted.
+Make the code easier to read, like everywhere else.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-throttle.c | 51 +++++++++++++++++++++++++++-----------------
- 1 file changed, 31 insertions(+), 20 deletions(-)
+ block/blk-throttle.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index da1fae243321..0d9719c41fe2 100644
+index 237668328e98..907001eede85 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -754,33 +754,20 @@ static inline void throtl_trim_slice(struct throtl_grp *tg, bool rw)
- 		   tg->slice_start[rw], tg->slice_end[rw], jiffies);
- }
- 
--static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
--				  u32 iops_limit, unsigned long *wait)
-+static unsigned int calculate_io_allowed(u32 iops_limit,
-+					 unsigned long jiffy_elapsed)
+@@ -329,8 +329,8 @@ static struct bio *throtl_pop_queued(struct list_head *queued,
+ /* init a service_queue, assumes the caller zeroed it */
+ static void throtl_service_queue_init(struct throtl_service_queue *sq)
  {
--	bool rw = bio_data_dir(bio);
- 	unsigned int io_allowed;
--	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
- 	u64 tmp;
+-	INIT_LIST_HEAD(&sq->queued[0]);
+-	INIT_LIST_HEAD(&sq->queued[1]);
++	INIT_LIST_HEAD(&sq->queued[READ]);
++	INIT_LIST_HEAD(&sq->queued[WRITE]);
+ 	sq->pending_tree = RB_ROOT_CACHED;
+ 	timer_setup(&sq->pending_timer, throtl_pending_timer_fn, 0);
+ }
+@@ -1161,7 +1161,7 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
+ 		nr_disp += throtl_dispatch_tg(tg);
  
--	if (iops_limit == UINT_MAX) {
--		if (wait)
--			*wait = 0;
--		return true;
--	}
--
--	jiffy_elapsed = jiffies - tg->slice_start[rw];
--
--	/* Round up to the next throttle slice, wait time must be nonzero */
--	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
--
- 	/*
--	 * jiffy_elapsed_rnd should not be a big value as minimum iops can be
-+	 * jiffy_elapsed should not be a big value as minimum iops can be
- 	 * 1 then at max jiffy elapsed should be equivalent of 1 second as we
- 	 * will allow dispatch after 1 second and after that slice should
- 	 * have been trimmed.
- 	 */
+ 		sq = &tg->service_queue;
+-		if (sq->nr_queued[0] || sq->nr_queued[1])
++		if (sq->nr_queued[READ] || sq->nr_queued[WRITE])
+ 			tg_update_disptime(tg);
  
--	tmp = (u64)iops_limit * jiffy_elapsed_rnd;
-+	tmp = (u64)iops_limit * jiffy_elapsed;
- 	do_div(tmp, HZ);
- 
- 	if (tmp > UINT_MAX)
-@@ -788,6 +775,32 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 	else
- 		io_allowed = tmp;
- 
-+	return io_allowed;
-+}
-+
-+static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
-+{
-+	return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
-+}
-+
-+static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
-+				  u32 iops_limit, unsigned long *wait)
-+{
-+	bool rw = bio_data_dir(bio);
-+	unsigned int io_allowed;
-+	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
-+
-+	if (iops_limit == UINT_MAX) {
-+		if (wait)
-+			*wait = 0;
-+		return true;
-+	}
-+
-+	jiffy_elapsed = jiffies - tg->slice_start[rw];
-+
-+	/* Round up to the next throttle slice, wait time must be nonzero */
-+	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
-+	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
- 	if (tg->io_disp[rw] + 1 <= io_allowed) {
- 		if (wait)
- 			*wait = 0;
-@@ -824,9 +837,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
--	bytes_allowed = mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed_rnd,
--					    (u64)HZ);
--
-+	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
- 	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
- 		if (wait)
- 			*wait = 0;
+ 		if (nr_disp >= THROTL_QUANTUM)
 -- 
 2.31.1
 
