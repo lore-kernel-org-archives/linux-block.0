@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62CDC25B08
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 19:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC53C25B0F
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 19:37:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233557AbiHBThI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 15:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        id S233973AbiHBThG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 15:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233730AbiHBTgz (ORCPT
+        with ESMTP id S233538AbiHBTgz (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 15:36:55 -0400
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB2252E7F
-        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 12:36:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B6652DE5
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 12:36:52 -0700 (PDT)
 Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 272I2bd1027717
-        for <linux-block@vger.kernel.org>; Tue, 2 Aug 2022 12:36:53 -0700
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 272I2bYn027715
+        for <linux-block@vger.kernel.org>; Tue, 2 Aug 2022 12:36:51 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=dfhpVX5a0FbExIz4oOLV8XElGSKNhdl46Z9qFa/bAzI=;
- b=oqS1Pjft/dk3IuNIXTLxcenj2QEvw8qnTjAeC/psu1bTVHE4wkOLeoep/e/+lFnzX1Iu
- +ZZypGrDZF3kO1EPhzV2jernocYUneU85tf2KoqZPObm8DuD9fwMglIn9kLBTEjaKdqB
- yEx/XH4hmlPLIYKphkjKkdRDl2y70zYlyYI= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3hpy36mmdc-3
+ bh=P6XL6+4vlHhOnyN2gEfiiQaDrdsakH/0m5jhLuk8f1I=;
+ b=VS1yyPQ0RRLGYkLAz4KCxcB3Mkivf8ocbCt8zPMqZH42InERkSoQ8NYzB/hKcicAQbIa
+ WnmfykV6wk+wLqeivJCkv+4G1ETNt5RDbprYZtqPdGjRCTZ3LCHWZ0/LJ/QO6E4V6lbi
+ nIXxUfE2q35evX1ah5i9lAPH+mXu3/22R1U= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3hpy36mmd9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 12:36:53 -0700
-Received: from twshared8442.02.ash8.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 12:36:51 -0700
+Received: from twshared33626.07.ash9.facebook.com (2620:10d:c085:108::8) by
+ mail.thefacebook.com (2620:10d:c085:11d::6) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Tue, 2 Aug 2022 12:36:51 -0700
+ 15.1.2375.28; Tue, 2 Aug 2022 12:36:50 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id E02E46E59EFE; Tue,  2 Aug 2022 12:36:37 -0700 (PDT)
+        id CBDA26E59EF9; Tue,  2 Aug 2022 12:36:37 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
         <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
@@ -41,9 +41,9 @@ CC:     <axboe@kernel.dk>, <hch@lst.de>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Kernel Team <Kernel-team@fb.com>,
         Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 3/7] iov_iter: introduce type for preregistered dma tags
-Date:   Tue, 2 Aug 2022 12:36:29 -0700
-Message-ID: <20220802193633.289796-4-kbusch@fb.com>
+Subject: [PATCHv2 1/7] blk-mq: add ops to dma map bvec
+Date:   Tue, 2 Aug 2022 12:36:27 -0700
+Message-ID: <20220802193633.289796-2-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220802193633.289796-1-kbusch@fb.com>
 References: <20220802193633.289796-1-kbusch@fb.com>
@@ -51,8 +51,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: XanIcIMrkIU08PKglAZocGHZnoDmJozB
-X-Proofpoint-ORIG-GUID: XanIcIMrkIU08PKglAZocGHZnoDmJozB
+X-Proofpoint-GUID: PMveQDISQdW4WHu1DXm_xfZWBdO7j1rM
+X-Proofpoint-ORIG-GUID: PMveQDISQdW4WHu1DXm_xfZWBdO7j1rM
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-08-02_14,2022-08-02_01,2022-06-22_01
@@ -62,122 +62,96 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-Introduce a new iov_iter type representing a pre-registered DMA address
-tag. The tag is an opaque cookie specific to the lower level driver that
-created it, and can be referenced at any arbitrary offset.
+The same buffer may be used for many subsequent IO's. Instead of setting
+up the mapping per-IO, provide an interface that can allow a buffer to be
+premapped just once and referenced again later.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- include/linux/uio.h |  9 +++++++++
- lib/iov_iter.c      | 24 +++++++++++++++++++++---
- 2 files changed, 30 insertions(+), 3 deletions(-)
+ block/bdev.c           | 20 ++++++++++++++++++++
+ include/linux/blk-mq.h | 13 +++++++++++++
+ include/linux/blkdev.h | 16 ++++++++++++++++
+ 3 files changed, 49 insertions(+)
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 34ba4a731179..a55e4b86413a 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -26,6 +26,7 @@ enum iter_type {
- 	ITER_PIPE,
- 	ITER_XARRAY,
- 	ITER_DISCARD,
-+	ITER_DMA_TAG,
+diff --git a/block/bdev.c b/block/bdev.c
+index ce05175e71ce..c3d73ad86fae 100644
+--- a/block/bdev.c
++++ b/block/bdev.c
+@@ -1069,3 +1069,23 @@ void sync_bdevs(bool wait)
+ 	spin_unlock(&blockdev_superblock->s_inode_list_lock);
+ 	iput(old_inode);
+ }
++
++#ifdef CONFIG_HAS_DMA
++void *block_dma_map(struct block_device *bdev, struct bio_vec *bvec,
++		    int nr_vecs)
++{
++	struct request_queue *q =3D bdev_get_queue(bdev);
++
++	if (q->mq_ops && q->mq_ops->dma_map)
++		return q->mq_ops->dma_map(q, bvec, nr_vecs);
++	return ERR_PTR(-EINVAL);
++}
++
++void block_dma_unmap(struct block_device *bdev, void *dma_tag)
++{
++	struct request_queue *q =3D bdev_get_queue(bdev);
++
++	if (q->mq_ops && q->mq_ops->dma_unmap)
++		return q->mq_ops->dma_unmap(q, dma_tag);
++}
++#endif
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index effee1dc715a..e10aabb36c2c 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -639,6 +639,19 @@ struct blk_mq_ops {
+ 	 */
+ 	void (*show_rq)(struct seq_file *m, struct request *rq);
+ #endif
++
++#ifdef CONFIG_HAS_DMA
++	/**
++	 * @dma_map: Create a dma mapping. On success, returns an opaque cookie
++	 * that the can be referenced by the driver in future requests.
++	 */
++	void *(*dma_map)(struct request_queue *q, struct bio_vec *bvec, int nr_=
+vecs);
++
++	/**
++	 * @dma_unmap: Tear down a previously created dma mapping.
++	 */
++	void (*dma_unmap)(struct request_queue *q, void *dma_tag);
++#endif
  };
 =20
- struct iov_iter_state {
-@@ -46,6 +47,7 @@ struct iov_iter {
- 		const struct bio_vec *bvec;
- 		struct xarray *xarray;
- 		struct pipe_inode_info *pipe;
-+		void *dma_tag;
- 	};
- 	union {
- 		unsigned long nr_segs;
-@@ -85,6 +87,11 @@ static inline bool iov_iter_is_bvec(const struct iov_i=
-ter *i)
- 	return iov_iter_type(i) =3D=3D ITER_BVEC;
- }
+ enum {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 49dcd31e283e..efc5e805a46e 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1527,4 +1527,20 @@ struct io_comp_batch {
 =20
-+static inline bool iov_iter_is_dma_tag(const struct iov_iter *i)
+ #define DEFINE_IO_COMP_BATCH(name)	struct io_comp_batch name =3D { }
+=20
++#ifdef CONFIG_HAS_DMA
++void *block_dma_map(struct block_device *bdev, struct bio_vec *bvec,
++		    int nr_vecs);
++void block_dma_unmap(struct block_device *bdev, void *dma_tag);
++#else
++static inline void *block_dma_map(struct block_device *bdev,
++				  struct bio_vec *bvec, int nr_vecs)
 +{
-+	return iov_iter_type(i) =3D=3D ITER_DMA_TAG;
++	return ERR_PTR(-ENOTSUPP);
 +}
 +
- static inline bool iov_iter_is_pipe(const struct iov_iter *i)
- {
- 	return iov_iter_type(i) =3D=3D ITER_PIPE;
-@@ -229,6 +236,8 @@ void iov_iter_kvec(struct iov_iter *i, unsigned int d=
-irection, const struct kvec
- 			unsigned long nr_segs, size_t count);
- void iov_iter_bvec(struct iov_iter *i, unsigned int direction, const str=
-uct bio_vec *bvec,
- 			unsigned long nr_segs, size_t count);
-+void iov_iter_dma_tag(struct iov_iter *i, unsigned int direction, void *=
-dma_tag,
-+			unsigned int dma_offset, size_t count);
- void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pi=
-pe_inode_info *pipe,
- 			size_t count);
- void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t=
- count);
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 507e732ef7cf..d370b45d7f1b 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1077,6 +1077,9 @@ void iov_iter_advance(struct iov_iter *i, size_t si=
-ze)
- 		i->count -=3D size;
- 	} else if (iov_iter_is_discard(i)) {
- 		i->count -=3D size;
-+	} else if (iov_iter_is_dma_tag(i)) {
-+		i->iov_offset +=3D size;
-+		i->count -=3D size;
- 	}
- }
- EXPORT_SYMBOL(iov_iter_advance);
-@@ -1201,6 +1204,21 @@ void iov_iter_bvec(struct iov_iter *i, unsigned in=
-t direction,
- }
- EXPORT_SYMBOL(iov_iter_bvec);
-=20
-+void iov_iter_dma_tag(struct iov_iter *i, unsigned int direction,
-+			void *dma_tag, unsigned int dma_offset,
-+			size_t count)
++static inline void block_dma_unmap(struct block_device *bdev, void *dma_=
+tag)
 +{
-+	WARN_ON(direction & ~(READ | WRITE));
-+	*i =3D (struct iov_iter){
-+		.iter_type =3D ITER_DMA_TAG,
-+		.data_source =3D direction,
-+		.dma_tag =3D dma_tag,
-+		.iov_offset =3D dma_offset,
-+		.count =3D count
-+	};
 +}
-+EXPORT_SYMBOL(iov_iter_dma_tag);
++#endif
 +
- void iov_iter_pipe(struct iov_iter *i, unsigned int direction,
- 			struct pipe_inode_info *pipe,
- 			size_t count)
-@@ -2124,8 +2142,8 @@ EXPORT_SYMBOL(import_single_range);
-  */
- void iov_iter_restore(struct iov_iter *i, struct iov_iter_state *state)
- {
--	if (WARN_ON_ONCE(!iov_iter_is_bvec(i) && !iter_is_iovec(i)) &&
--			 !iov_iter_is_kvec(i))
-+	if (WARN_ON_ONCE(!iov_iter_is_bvec(i) && !iter_is_iovec(i) &&
-+			 !iov_iter_is_dma_tag(i)) && !iov_iter_is_kvec(i))
- 		return;
- 	i->iov_offset =3D state->iov_offset;
- 	i->count =3D state->count;
-@@ -2141,7 +2159,7 @@ void iov_iter_restore(struct iov_iter *i, struct io=
-v_iter_state *state)
- 	BUILD_BUG_ON(sizeof(struct iovec) !=3D sizeof(struct kvec));
- 	if (iov_iter_is_bvec(i))
- 		i->bvec -=3D state->nr_segs - i->nr_segs;
--	else
-+	else if (!iov_iter_is_dma_tag(i))
- 		i->iov -=3D state->nr_segs - i->nr_segs;
- 	i->nr_segs =3D state->nr_segs;
- }
+ #endif /* _LINUX_BLKDEV_H */
 --=20
 2.30.2
 
