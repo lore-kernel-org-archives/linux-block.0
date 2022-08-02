@@ -2,79 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607D1C00140
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 21:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C236CC00140
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 21:33:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235112AbiHBVaY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 17:30:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43170 "EHLO
+        id S236701AbiHBVdf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 17:33:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234846AbiHBVaT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 17:30:19 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 876BE62E6
-        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 14:30:17 -0700 (PDT)
+        with ESMTP id S236621AbiHBVde (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 17:33:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD569B1E5
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 14:33:33 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D4881B82104
-        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 21:30:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 955ECC4347C;
-        Tue,  2 Aug 2022 21:30:14 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 699FF6150C
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 21:33:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53F3AC433D6;
+        Tue,  2 Aug 2022 21:33:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659475814;
-        bh=yUP6mcS7vuRKfy50iKKNO1G0R26msZkRNNUJ3p0xrcc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=fxGDtSYuU5/2d9JWB29ZRUm5SNGs+2cqdSwxPa/PzTXkYffz/PSn3TvzDE06sgnA8
-         4pdP1u+9xHOgZJyIsrhgLhRbPNKEI3E1IPyWz6f7nGvh0Zp9+ug+fOIVtfMwP5w+mH
-         EQz5xY6wV6dKRUA0H6LyQNVHBZOeiPf8e46UF/Fw2JKN/eET8kBkqnmpJemEZ/13mF
-         aDLRqeOr6Qbf90BlKL6GyTzJZWZkkVmKYvKlFW5mTsLd5QX/Vm2aQFmjbjOYDPe0mV
-         Xsbx+NIB4n/L4J+BAEokYepjS7YRZGnhfmE4HL0D1alwsnWEYljh636XZR0wfrF4pL
-         t300VW7SmolJg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8129EC43142;
-        Tue,  2 Aug 2022 21:30:14 +0000 (UTC)
-Subject: Re: [git pull] device mapper changes for 6.0
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <YugiaQ1TO+vT1FQ5@redhat.com>
-References: <YugiaQ1TO+vT1FQ5@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <YugiaQ1TO+vT1FQ5@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-changes
-X-PR-Tracked-Commit-Id: 9dd1cd3220eca534f2d47afad7ce85f4c40118d8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8374cfe647a1f360be3228b949dd6d753c55c19c
-Message-Id: <165947581452.30731.17701893502534317271.pr-tracker-bot@kernel.org>
-Date:   Tue, 02 Aug 2022 21:30:14 +0000
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Bagas Sanjaya <bagasdotme@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        JeongHyeon Lee <jhs2.lee@samsung.com>,
-        Jiang Jian <jiangjian@cdjrlc.com>,
-        Luo Meng <luomeng12@huawei.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Mike Christie <michael.christie@oracle.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Steven Lung <1030steven@gmail.com>,
-        Zhang Jiaming <jiaming@nfschina.com>
+        s=k20201202; t=1659476012;
+        bh=aNQjE5MHk4wHIQN1+rjxh1O82xx+/v50O0iZcxkPCTI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZBRDec2cwFuaQ6Q7ecszKCgnoWoDS3XYE4SfMkmn+hvRPPy5otUwtUIp+3D7tr/gU
+         +1O1T7faxAa61jc+KVXrmIv8AVwGttTrSwhMYsohCJFMFc9NDfChWVV7Xhf71rzNEs
+         G9/kJDfMmVWFK8LFSm2a+mpt0r1pKIFTmvS0TaMA5hFPnPZLMjREmGJWwIlhFKhdeR
+         Lzt+clY9V7yxpgAzgtp9G2RIm3bAWUwTv1u19QCy51fe65I4EF+UvzPjsrcRwJa4Ey
+         E9zMaMJfpjpweeDWPMK7d7Buq55djYEQsf/1s5ts04iviWOyW8t9Uu24WMs0hA6dZs
+         ajuI0AC+n2sug==
+Date:   Tue, 2 Aug 2022 15:33:29 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [GIT PULL] Block driver changes for 5.20-rc1
+Message-ID: <YumYKVWYnoALoSBR@kbusch-mbp.dhcp.thefacebook.com>
+References: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk>
+ <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Mon, 1 Aug 2022 14:58:49 -0400:
+On Tue, Aug 02, 2022 at 02:18:57PM -0700, Linus Torvalds wrote:
+> And no, I don't want some "fix up broken code after the fact" commit
+> on top. I want that code excised, and I don't want to see another pull
+> request before it's (a) gone and (b) somebody has looked at where the
+> testing of this COMPLETELY failed.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-changes
+This issue was fixed more than 2 weeks ago, but wasn't included in this pull
+request. It's in the current block drivers-post tree, though:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8374cfe647a1f360be3228b949dd6d753c55c19c
+  https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.20/drivers-post&id=4dfbd5418763018f33acded0871fbbc22c8e4695
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Do you want us to rebase the nvme pull request with the above squashed into the
+original commit instead?
