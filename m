@@ -2,67 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 762A5C19F2B
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 05:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C317EC19F29
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 08:41:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231599AbiHBFLe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 01:11:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36966 "EHLO
+        id S232817AbiHBIlp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 04:41:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiHBFLd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 01:11:33 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0CF117599;
-        Mon,  1 Aug 2022 22:11:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6BD5DB8199B;
-        Tue,  2 Aug 2022 05:11:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B98B3C433D6;
-        Tue,  2 Aug 2022 05:11:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1659417090;
-        bh=edE86YHe/q+UpiENTiKCJQkihEbQZ912xpNdOfgB1Sg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=H9w2eocq/4AU5715YlhY4o0AL7v+nWPegP+cZ56VJsy+viDPkZd5jINfG9tT8sRZP
-         X+AEE2q2H0dp+n3VRUNmyW1YcYZSBMT0DMUhrr4JFUXtEyBxyBQjAmjOsi5RSIEgy6
-         E0I8JgM03iOBmVbHfzm2lwBg7fIM5lImYavP8Auw=
-Date:   Tue, 2 Aug 2022 07:11:24 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, stable@vger.kernel.org,
-        axboe@kernel.dk, snitzer@redhat.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH stable 5.10 1/3] block: look up holders by bdev
-Message-ID: <Yuix/CcmdKsSD+za@kroah.com>
-References: <20220729062356.1663513-1-yukuai1@huaweicloud.com>
- <20220729062356.1663513-2-yukuai1@huaweicloud.com>
- <Yue2rU2Y+xzvGU6x@kroah.com>
- <20220801180458.GA17425@lst.de>
+        with ESMTP id S232258AbiHBIlo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 04:41:44 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EB7815FF0
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 01:41:41 -0700 (PDT)
+Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20220802084139epoutp040e6608e6e9b273c4a602d2e046edb7a5~HeoUAICzU3185931859epoutp04j
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 08:41:39 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20220802084139epoutp040e6608e6e9b273c4a602d2e046edb7a5~HeoUAICzU3185931859epoutp04j
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1659429699;
+        bh=U2+1C8PyVM3+hskOZoTZthnT4tSJpiYEGUCuift9Ad8=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=C15jSF7Gc41WrPiviSYPX/D1Kjkhh9ggB9Je/XVVVJ/kFdco/mcstAxByDoCTXDU0
+         UwWDxLriwBmUsqA1hUSckDetw7QqeHsX5OjGtqTAKLIUQCbY+eKQ+0NIlWAJM63TNS
+         53Rek4BgZK9DknmrQt+KY46thnLbybBAEDZ6YOYk=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
+        20220802084139epcas1p474dbcd625e171018e9aeb919ab261110~HeoTyX_4O0481804818epcas1p4r;
+        Tue,  2 Aug 2022 08:41:39 +0000 (GMT)
+Received: from epsmges1p2.samsung.com (unknown [182.195.38.242]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4LxpPZ5fGWz4x9Q5; Tue,  2 Aug
+        2022 08:41:38 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        D1.13.09633.243E8E26; Tue,  2 Aug 2022 17:41:38 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220802084138epcas1p22d18382ac9a3ae0990c53e0273645755~HeoTLGGOb1164911649epcas1p2F;
+        Tue,  2 Aug 2022 08:41:38 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220802084138epsmtrp265f2cbe72f1307887fde4c4aff2ee696~HeoTKWPnn2317523175epsmtrp2V;
+        Tue,  2 Aug 2022 08:41:38 +0000 (GMT)
+X-AuditID: b6c32a36-075ff700000025a1-6c-62e8e3425619
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4A.B7.08802.243E8E26; Tue,  2 Aug 2022 17:41:38 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.101.104]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220802084138epsmtip1b99909611d302fe81cbc5b8d7f3a5b29~HeoS9bvb62656426564epsmtip1q;
+        Tue,  2 Aug 2022 08:41:38 +0000 (GMT)
+From:   JeongHyeon Lee <jhs2.lee@samsung.com>
+To:     minchan@kernel.org
+Cc:     ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        JeongHyeon Lee <jhs2.lee@samsung.com>
+Subject: [PATCH] zram: fix typos in comments
+Date:   Tue,  2 Aug 2022 17:41:34 +0900
+Message-Id: <20220802084134.27202-1-jhs2.lee@samsung.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220801180458.GA17425@lst.de>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpgk+LIzCtJLcpLzFFi42LZdljTQNfp8Yskg8uduhar7/azWVy6f4fV
+        Yu8tbYvLu+awWSz7+p7dYkPLLHaL3RsXsTmwe8xuuMjicflsqcemVZ1sHn1bVjF67Py0mdXj
+        8ya5ALaobJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wc
+        oEuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQVmBXrFibnFpXnpenmpJVaGBgZG
+        pkCFCdkZd/svshYs5ay4Mu0CYwPjbfYuRk4OCQETiY8tR9i6GLk4hAR2MErcWD+ZCcL5xCjR
+        0TaNGaRKSOAzkLONE6aja9ETVoiiXYwS/6/NYIFwvjBKnNq0gAmkik1AW+J2yyawHSICYhKP
+        v/wAs5kFljFK/JgaD2ILC+hInFp6ASzOIqAqsfDzAjCbV8BS4umnU4wQ2+Ql9h88ywwRF5Q4
+        OfMJC8QceYnmrbOZQRZLCFxil9i8YQEzRIOLxK7J16FsYYlXx7dAPSol8fndXjYIO1vi+oZD
+        LBB2icT3dY1A9RxAtr3E+0sWICazgKbE+l36EBWKEjt/z2WEWMsn8e5rDytENS8wgIQgSpQk
+        Vvy7BjVQQmLD4W6oRR4SDybNABsuJBAr0diVMIFRfhaSX2Yh+WUWwt4FjMyrGMVSC4pz01OL
+        DQuM4FGanJ+7iRGcFLXMdjBOevtB7xAjEwfjIUYJDmYlEd47Ls+ThHhTEiurUovy44tKc1KL
+        DzGaAkN3IrOUaHI+MC3nlcQbmlgamJgZmVgYWxqbKYnzrpp2OlFIID2xJDU7NbUgtQimj4mD
+        U6qBqZU53ySPl+XOgwVl80r2Tnjw4//OOcaNEi/frJ7kKzf384HIOgvefcluczq99yu+/nZq
+        KX9/t+PGzKwZSxddOL/+ffbf1zZx75q2nipUUDBn3soiYRsRbrKkbObXOb+W6OduWjvvwNO4
+        3XJFZnP/Je9gENdb9cY7QPi8z9uvezUyupTc3GR6pbjm/Jxw/dCiPX27np39rFH0+51SYHrq
+        2u9ZYvtVJLsdnl64la5cV3/6aun1LTvWM3EK2O+YwH9dbMJjbjsLO+GZ+17OjKlSK34VEmC4
+        RZOT/afko0us/mw5hYy5P2+ZN57+6m1X+yVzT2bdl0Nplxy5rDnuhfLKmP9QSXgaLGfgfz58
+        u5rrFSWW4oxEQy3mouJEAFIanMMTBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrILMWRmVeSWpSXmKPExsWy7bCSnK7T4xdJBh1nxCxW3+1ns7h0/w6r
+        xd5b2haXd81hs1j29T27xYaWWewWuzcuYnNg95jdcJHF4/LZUo9NqzrZPPq2rGL02PlpM6vH
+        501yAWxRXDYpqTmZZalF+nYJXBl3+y+yFizlrLgy7QJjA+Nt9i5GTg4JAROJrkVPWEFsIYEd
+        jBL/9ohAxCUkNmxaC1TDAWQLSxw+XNzFyAVU8olRYsEKiF42AW2J2y2bwGwRATGJx19+sIMU
+        MQusYZSYMvcwG0hCWEBH4tTSC2BFLAKqEgs/LwCzeQUsJZ5+OsUIsUxeYv/Bs8wQcUGJkzOf
+        sIDYzEDx5q2zmScw8s1CkpqFJLWAkWkVo2RqQXFuem6xYYFRXmq5XnFibnFpXrpecn7uJkZw
+        qGpp7WDcs+qD3iFGJg7GQ4wSHMxKIrx3XJ4nCfGmJFZWpRblxxeV5qQWH2KU5mBREue90HUy
+        XkggPbEkNTs1tSC1CCbLxMEp1cCkd0ukOD0p5mqS/eplb8qYtpQsOqm5imfHZL1NgSkHD0qd
+        nVdi6vIgw+4q/wmfOndVj0Vs+1LSTH4J6yZ5Kf3K+Jv2b/3DsjCuTUcEt7w10r79ctXc5gsT
+        O70vqwcIhTtUfXQRE/gkpldT66l5+wX7+RVRp+YLytSmiG83K3RwKrrJKLx77RLTuDCxE8rx
+        3nqudT7ufxcJfrii8XhWOLOJ9LvCH1fEMw53PD/88KjJMZW3SSyyTkc2Rb/Q0Xn3cwHjjvVF
+        Jxdd2r3nVl4vQ0HIFqVNU/9wZ1aU5ciEO897fyn0bZGav4PGaZ4L2R1uHK8Of69tTFCzVVNT
+        /nLQ63B7x93WYFHNXw09dYe/WSqxFGckGmoxFxUnAgDzk7AnxAIAAA==
+X-CMS-MailID: 20220802084138epcas1p22d18382ac9a3ae0990c53e0273645755
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220802084138epcas1p22d18382ac9a3ae0990c53e0273645755
+References: <CGME20220802084138epcas1p22d18382ac9a3ae0990c53e0273645755@epcas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 01, 2022 at 08:04:58PM +0200, Christoph Hellwig wrote:
-> On Mon, Aug 01, 2022 at 01:19:09PM +0200, Greg KH wrote:
-> > This is very different from the upstream version, and forces the change
-> > onto everyone, not just those who had CONFIG_BLOCK_HOLDER_DEPRECATED
-> > enabled like was done in the main kernel tree.
-> > 
-> > Why force this on all and not just use the same option?
-> 
-> I'm really worried about backports that are significantly different
-> from the original commit.  To the point where if they are so different
-> and we don't have a grave security or data integrity bug I'm really not
-> very much in favor of backporting them at all.
-> 
+- The double `range` is duplicated in comment, remove one.
+- change `syfs` to `sysfs`
 
-I agree, I'll drop this from my review queue now, thanks.
+Signed-off-by: JeongHyeon Lee <jhs2.lee@samsung.com>
+---
+ drivers/block/zram/zram_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-greg k-h
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index b8549c61ff2c..dc91d7587bbb 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -172,7 +172,7 @@ static inline bool valid_io_request(struct zram *zram,
+ 
+ 	end = start + (size >> SECTOR_SHIFT);
+ 	bound = zram->disksize >> SECTOR_SHIFT;
+-	/* out of range range */
++	/* out of range */
+ 	if (unlikely(start >= bound || end > bound || start > end))
+ 		return false;
+ 
+@@ -1917,7 +1917,7 @@ static int zram_add(void)
+ 	zram->disk->private_data = zram;
+ 	snprintf(zram->disk->disk_name, 16, "zram%d", device_id);
+ 
+-	/* Actual capacity set using syfs (/sys/block/zram<id>/disksize */
++	/* Actual capacity set using sysfs (/sys/block/zram<id>/disksize */
+ 	set_capacity(zram->disk, 0);
+ 	/* zram devices sort of resembles non-rotational disks */
+ 	blk_queue_flag_set(QUEUE_FLAG_NONROT, zram->disk->queue);
+-- 
+2.34.1
+
