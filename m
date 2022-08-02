@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E2EC19F2D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8456C3F6B0
 	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 13:52:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237003AbiHBNwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 09:52:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50304 "EHLO
+        id S236997AbiHBNwp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 09:52:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236763AbiHBNwj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 09:52:39 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFCB826AEE;
-        Tue,  2 Aug 2022 06:52:27 -0700 (PDT)
+        with ESMTP id S236871AbiHBNwf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 09:52:35 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E13D527B14;
+        Tue,  2 Aug 2022 06:52:26 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4LxxGh18yZz6RB9q;
-        Tue,  2 Aug 2022 21:51:08 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LxxGg0Q08zKPm2;
+        Tue,  2 Aug 2022 21:51:07 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgDXLsMQLOlivtl0AA--.20757S11;
-        Tue, 02 Aug 2022 21:52:24 +0800 (CST)
+        by APP3 (Coremail) with SMTP id _Ch0CgDXLsMQLOlivtl0AA--.20757S9;
+        Tue, 02 Aug 2022 21:52:23 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     tj@kernel.org, mkoutny@suse.com, axboe@kernel.dk,
         ming.lei@redhat.com
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v7 7/9] blk-throttle: calling throtl_dequeue/enqueue_tg in pairs
-Date:   Tue,  2 Aug 2022 22:04:13 +0800
-Message-Id: <20220802140415.2960284-8-yukuai1@huaweicloud.com>
+Subject: [PATCH v7 5/9] blk-throttle: improve handling of re-entered bio for bps limit
+Date:   Tue,  2 Aug 2022 22:04:11 +0800
+Message-Id: <20220802140415.2960284-6-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
 References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDXLsMQLOlivtl0AA--.20757S11
-X-Coremail-Antispam: 1UD129KBjvdXoWrKry8uF15tFWUKr1ftF1UJrb_yoWDtrX_uF
-        yfCr10kFn8Gwn2ya4rGF4rur9Y9w45WFyjgay0kFW2gF15Xwn8X39xJrZI9rsxAay8Cr4f
-        Ar1DWr4UArs2qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbDAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAVCq3wA2048vs2
-        IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28E
-        F7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr
-        1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0D
-        M2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjx
-        v20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1l
-        F7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2
-        IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
-        wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc4
-        0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AK
-        xVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-        4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQSdkU
-        UUUU=
+X-CM-TRANSID: _Ch0CgDXLsMQLOlivtl0AA--.20757S9
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr43Zry7KFyxKw4DAFW8Zwb_yoW8uF17pF
+        W7Xr95Gr1qgFnIgws5G3WfXFW5X3yrA345GrZ8G3W3JwnrGr1v9F1kGrWFk3yruF93Ca1k
+        Xwn2qryxAF4UGaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPF14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
+        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
+        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
+        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
+        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
+        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
+        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
+        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
+        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
+        wI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
+        W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTY
+        UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -60,37 +60,55 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-It's a little weird to call throtl_dequeue_tg() unconditionally in
-throtl_select_dispatch(), since it will be called in tg_update_disptime()
-again if some bio is still throttled. Thus call it later if there are no
-throttled bio. There are no functional changes.
+Currently, if new slice is started while bio is re-entered, such bio
+will count multiple times for bps limit. Since 'bytes_skipped'
+represents how many bytes will be skipped while dispatching bios, which
+can handle that case, increasing it instead of decreasing 'bytes_disp'.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-throttle.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-throttle.c | 8 ++++----
+ block/blk-throttle.h | 4 +++-
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 907001eede85..f7048f87b19f 100644
+index 621402cf2576..237668328e98 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -1156,13 +1156,13 @@ static int throtl_select_dispatch(struct throtl_service_queue *parent_sq)
- 		if (time_before(jiffies, tg->disptime))
- 			break;
+@@ -2183,14 +2183,14 @@ bool __blk_throtl_bio(struct bio *bio)
+ 		 * Splited bios can be re-entered because iops limit should be
+ 		 * counted again, however, bps limit should not. Since bps limit
+ 		 * will be counted again while dispatching it, compensate the
+-		 * over-accounting here. Noted that compensation can fail if
+-		 * new slice is started.
++		 * over-accounting here. Since decrement of 'bytes_disp' can't
++		 * handle the case that new slice is started, increase
++		 * 'bytes_skipped' instead.
+ 		 */
+ 		if (bio_flagged(bio, BIO_THROTTLED)) {
+ 			unsigned int bio_size = throtl_bio_data_size(bio);
  
--		throtl_dequeue_tg(tg);
--
- 		nr_disp += throtl_dispatch_tg(tg);
- 
- 		sq = &tg->service_queue;
- 		if (sq->nr_queued[READ] || sq->nr_queued[WRITE])
- 			tg_update_disptime(tg);
-+		else
-+			throtl_dequeue_tg(tg);
- 
- 		if (nr_disp >= THROTL_QUANTUM)
- 			break;
+-			if (tg->bytes_disp[rw] >= bio_size)
+-				tg->bytes_disp[rw] -= bio_size;
++			tg->bytes_skipped[rw] += bio_size;
+ 			if (tg->last_bytes_disp[rw] >= bio_size)
+ 				tg->last_bytes_disp[rw] -= bio_size;
+ 		}
+diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+index 0163aa9104c3..c9545616ba12 100644
+--- a/block/blk-throttle.h
++++ b/block/blk-throttle.h
+@@ -121,7 +121,9 @@ struct throtl_grp {
+ 	 * bytes/io are waited already in previous configuration, and they will
+ 	 * be used to calculate wait time under new configuration.
+ 	 *
+-	 * Number of bytes will be skipped in current slice
++	 * Number of bytes will be skipped in current slice. In addition, this
++	 * field will help to handle re-entered bio for bps limit, see details
++	 * in __blk_throtl_bio().
+ 	 */
+ 	uint64_t bytes_skipped[2];
+ 	/* Number of bio will be skipped in current slice */
 -- 
 2.31.1
 
