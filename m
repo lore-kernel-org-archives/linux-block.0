@@ -2,97 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8DEFC00140
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 23:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C5FC19F2C
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 23:25:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235087AbiHBXIy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 19:08:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55700 "EHLO
+        id S231194AbiHBXZW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 19:25:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235316AbiHBXIk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 19:08:40 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2135354AE1
-        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 16:08:29 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id bh13so13617744pgb.4
-        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 16:08:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=a2FHYG10ECB6dzDqRgSbkN2KxB6TTyRCqhBkif0/ZS4=;
-        b=5haLiU/PYWbHjr80idRyfQz/XHq8Lkx1Hr1sqYsH1eoSR21MIHGTc9DwWhV8wJwqnR
-         sbn1xl5rTn8dYQpsZhFxLQNpChy84S8lb8il5NrViRbFE/gyV9GT87HMAHt7nLrcOn78
-         S3du8JRBQraYGuhPWrROGD97ewlZuc8rZOeN/R1vKrLxPoSrMVBAxa113vyQWahRojAu
-         Mir4mI7CRg+xu4uKeCc/44BN2s4wjBkbMB/BqglDfJu64EsikT+jPbdqVwLWutYu92kN
-         2NrUXsgHprLnS5huWLqwHcnaT5bFiDyn8jy1bsOOq1VDiJ9NpfqlbgBMmfNjx8cDMjZv
-         vH2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=a2FHYG10ECB6dzDqRgSbkN2KxB6TTyRCqhBkif0/ZS4=;
-        b=IIcXSqe/khDvu6abj9n1HnpzqrpDAtDfYO/3goerTbPb3QPe2nWChznss9f0aiipeP
-         GpMMkopnY9xtsdhoBQK0Z7j89OD2fTeTHGKxJusm52+uT4rBsHlaUE//sW9LosehCJev
-         zAtZ3iXiBmstmH2BUyyzN1H2KzHb5peOd9dfecLRCiV0TXdAMM79Xn7tnwRic1a0nUoP
-         wNwHhe/mtZqnvk1tkeXFTs0T4yb9jQUMLRHZGGzDejn35d1ny18Gc67L1dW5MaKuLPAc
-         Vasr6OVlBnXgUU61IwZDfyQoq3EuLeFH6xQth7HFYaF8x0fv1AAlEtCto6LYVzfdL+AA
-         f9bg==
-X-Gm-Message-State: AJIora/uHBmR6/g648F82Tpc8KIzpo6dC4/k1yK5GG9eQaPHXXMO99Bx
-        i/Z88VimyanWZoFmx3qsbTnQJg==
-X-Google-Smtp-Source: AGRyM1uoYHLWqnYIKXy+SyhTAHbggUe4MMiSPOuUsImu1K3NXVSNRivtzVVJVFRvCdydTJxckK7diQ==
-X-Received: by 2002:a05:6a00:23d4:b0:52a:e5c1:caa7 with SMTP id g20-20020a056a0023d400b0052ae5c1caa7mr23196874pfc.62.1659481708550;
-        Tue, 02 Aug 2022 16:08:28 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j4-20020a170903028400b0016dd0242e22sm233228plr.156.2022.08.02.16.08.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Aug 2022 16:08:28 -0700 (PDT)
-Message-ID: <c1b1b619-9142-9818-0536-ce4b97d3e979@kernel.dk>
-Date:   Tue, 2 Aug 2022 17:08:26 -0600
+        with ESMTP id S229648AbiHBXZW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 19:25:22 -0400
+Received: from gnuweeb.org (gnuweeb.org [51.81.211.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859665F40;
+        Tue,  2 Aug 2022 16:25:20 -0700 (PDT)
+Received: from [192.168.88.254] (unknown [125.160.110.15])
+        by gnuweeb.org (Postfix) with ESMTPSA id EF8CE8060F;
+        Tue,  2 Aug 2022 23:25:16 +0000 (UTC)
+X-GW-Data: lPqxHiMPbJw1wb7CM9QUryAGzr0yq5atzVDdxTR0iA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gnuweeb.org;
+        s=default; t=1659482719;
+        bh=+au6dQlBqQIHJQgyGdW4Nb34wf6bajMRt7oudmw/yo4=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=gFXTqEcTqyl0/ej7COyaD6isAwgmie7aA2fAMxbf4A3wZbyjrmHLRchIVlj/RsV/p
+         OMXY0fANBx40iqGa2gX/Cxvx3H864UliDnl7DECdpDlkON2s/83iPgnLvxWKHND1wT
+         BotuQS5+le1vHJzh2whp1N2fVFBPHbDMwB/iJulNHL2dSwuJLzXIA44Y1nGxr7v/sf
+         nnKm63FpaQEQQZudRwEsDNoDrzZfGRAE8xU+xvfRAPqdpO4BCt2CHRRuLUoLHmyLkM
+         DpWO0SFIRp9B615YZ6mNwLgE1oqW0Rm6WocN8i+49AmmIfMAylZLBBhDyHLpewIm8c
+         BPf/hx2vhUoiw==
+Message-ID: <05dfe735-d146-ad5c-2f98-940032fd1f48@gnuweeb.org>
+Date:   Wed, 3 Aug 2022 06:25:14 +0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [GIT PULL] Block driver changes for 5.20-rc1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCHv2 6/7] io_uring: add support for dma pre-mapping
 Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk>
- <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
- <YumYKVWYnoALoSBR@kbusch-mbp.dhcp.thefacebook.com>
- <74bb310b-b602-14eb-85f7-4b08327b0092@kernel.dk>
- <CAHk-=wgAeL8+BYsy4mnut+y7sBF_+LXmW5bjUfegBpg8SisBJQ@mail.gmail.com>
- <7d663c1a-67a2-159e-3f93-28ec18f3bd9d@kernel.dk>
- <CAHk-=wgALRccia0ouYywoDAH7RDCpi3rwfjwT0TZ7gV4O1+qaA@mail.gmail.com>
- <38164718-0f09-76e5-a21d-2122613cdf73@kernel.dk>
- <CAHk-=wii5SG2=P1kStBYJ9JiK97GYZcYdozy-JP15qNcfQXF3g@mail.gmail.com>
- <2ae97675-383b-c2c7-9bed-6a9a55ce64f1@kernel.dk>
- <CAHk-=wjQpMT+Z-=B4QzGT_BkSe0kuqDuK+hBvOq7YTXKmM2HEQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CAHk-=wjQpMT+Z-=B4QzGT_BkSe0kuqDuK+hBvOq7YTXKmM2HEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Keith Busch <kbusch@fb.com>
+Cc:     Facebook Kernel Team <kernel-team@fb.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Keith Busch <kbusch@kernel.org>,
+        Fernanda Ma'rouf <fernandafmr12@gnuweeb.org>,
+        io-uring Mailing List <io-uring@vger.kernel.org>,
+        Linux Block Mailing List <linux-block@vger.kernel.org>,
+        Linux fsdevel Mailing List <linux-fsdevel@vger.kernel.org>,
+        Linux NVME Mailing List <linux-nvme@lists.infradead.org>
+References: <20220802193633.289796-1-kbusch@fb.com>
+ <20220802193633.289796-7-kbusch@fb.com>
+From:   Ammar Faizi <ammarfaizi2@gnuweeb.org>
+In-Reply-To: <20220802193633.289796-7-kbusch@fb.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/2/22 5:03 PM, Linus Torvalds wrote:
-> On Tue, Aug 2, 2022 at 3:59 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> Actually, I'm mistaken, on the build box it's running 11.3. So that
->> might explain it? I use 12.1 elsewhere.
+On 8/3/22 2:36 AM, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> It's possible this -Waddress error is new to gcc-12.
+> Provide a new register operation that can request to pre-map a known
+> bvec to the requested fixed file's specific implementation. If
+> successful, io_uring will use the returned dma tag for future fixed
+> buffer requests to the same file.
 > 
-> I try to keep most of my machines in sync just to avoid the pain of
-> different distro details, so I don't have gcc-11 around any more.
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+[...]
+> +static int io_register_map_buffers(struct io_ring_ctx *ctx, void __user *arg)
+> +{
+> +	struct io_uring_map_buffers map;
+> +	struct io_fixed_file *file_slot;
+> +	struct file *file;
+> +	int ret, i;
+> +
+> +	if (!capable(CAP_SYS_ADMIN))
+> +		return -EPERM;
+> +
+> +	ret = get_map_range(ctx, &map, arg);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	file_slot = io_fixed_file_slot(&ctx->file_table,
+> +			array_index_nospec(map.fd, ctx->nr_user_files));
+> +	if (!file_slot || !file_slot->file_ptr)
+> +		return -EBADF;
 
-I'll get gcc-12 back on it - I originally swapped back to 11 for
-building kernels to avoid spurious warnings with the new release.
+The @file_slot NULL-check doesn't make sense. The definition of
+io_fixed_file_slot() is:
+
+static inline struct io_fixed_file *
+io_fixed_file_slot(struct io_file_table *table, unsigned i)
+{
+         return &table->files[i];
+}
+
+which takes the address of an element in the array. So @file_slot
+should never be NULL, if it ever be, something has gone wrong.
+
+If you ever had @ctx->file_table.files being NULL in this path, you
+should NULL-check the @->files itself, *not* the return value of
+io_fixed_file_slot().
+
+IOW:
+
+...
+	// NULL check here.
+         if (!ctx->file_table.files)
+                 return -EBADF;
+
+         file_slot = io_fixed_file_slot(&ctx->file_table,
+                                        array_index_nospec(map.fd, ctx->nr_user_files));
+         if (!file_slot->file_ptr)
+                 return -EBADF;
+...
+
+>   	for (i = 0; i < ctx->nr_user_files; i++) {
+> -		struct file *file = io_file_from_index(&ctx->file_table, i);
+> +		struct io_fixed_file *f = io_fixed_file_slot(&ctx->file_table, i);
+> +		struct file *file;
+>   
+> -		if (!file)
+> +		if (!f)
+>   			continue;
+
+The same thing, this @f NULL-check is not needed.
+
+> -		if (io_fixed_file_slot(&ctx->file_table, i)->file_ptr & FFS_SCM)
+> +		if (f->file_ptr & FFS_SCM)
+>   			continue;
+> +
+> +		io_dma_unmap_file(ctx, f);
+> +		file = io_file_from_fixed(f);
+>   		io_file_bitmap_clear(&ctx->file_table, i);
+>   		fput(file);
+>   	}
 
 -- 
-Jens Axboe
-
+Ammar Faizi
