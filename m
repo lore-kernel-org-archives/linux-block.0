@@ -2,89 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2873C00140
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 05:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762A5C19F2B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 05:11:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232446AbiHBFFB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 01:05:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33598 "EHLO
+        id S231599AbiHBFLe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 01:11:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231599AbiHBFFA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 01:05:00 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E8E65BF;
-        Mon,  1 Aug 2022 22:04:59 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id s11so4762950edd.13;
-        Mon, 01 Aug 2022 22:04:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Y82hfpg6T6DnHBl0eGr+nPNpL/5TjcB5vAqOZt23ee4=;
-        b=cTCUmjrx0Eu58mdFSzfFDVH3IjrBV1VlqQcaOIquZeMs82x+1IxhEVa9V7ehFhIz8K
-         4SfimlfHVSG9PSrEzbXp2v4BiOF+cCXAVHkfj5K3W0EG2J4DC3zT5Qqr+4P4v5Y6r0OI
-         38cZdyfQDb3n7xT1pFMJnO22whKoVGwsjoWV+8JcRFtB4QK67aRL86yH5CYwxIDI2+eT
-         uTRPKQ0+VziAdhYpFB85+zfi5SwZxYYcMqjq/R/miMD0L1PyZFFKyC7nTdqWEAQ78TY0
-         DUb2875Yyi50e3l/RSt5mFhz9ch3dMLV/8rUdkP6DkSMHAvU37tbZ0qUiugqmb+74+nt
-         M3aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Y82hfpg6T6DnHBl0eGr+nPNpL/5TjcB5vAqOZt23ee4=;
-        b=Kl5zkxso/hBv4YvJhAXJ3lwUpg1G4t2mHbW/vjWtNrwl0ZLFYeYjfMqoE8GKihKu7F
-         pwlW/CsqsS/bFKYBrdID27BQPLSlJfBZqpUizWiO2QgJcu9igOCa6DU78/aEmromQvxv
-         lNOs6aNt4IwL8v0RdfSMS3E6pp8TLcDze+TAu3Lk8p0BE4XwIxgA54lWmdt5Z3IZDEy8
-         qlSnSJe0W3bZE+BOaHLfubalv9Ckyle08im2p5aJMmJl9uA+Lq40b3wNdyVZsOs+puhC
-         xoXLRL5ydokWcQlfvsT/LJHdh1DyS/SaBGOzh7v38q8HK0xF98CPQFx4JGKCoJH5+u2I
-         N+8A==
-X-Gm-Message-State: AJIora9KOPI5Or4D0tCzWc+guCUqKxKXK6/ohwZRIK93rLk22TrTLZ9v
-        ZWJwHQdAKiJTqueb4rK7+6gRt8HHUDCe/dUhcqg=
-X-Google-Smtp-Source: AGRyM1vEdWhU3Y1tZm3JHUujUTcNSEx040urz+bsEtVG7v5vNfBj3rpIAAS6UDPDvetxnRNI6x/Lc0NgdGcsFuBtBsM=
-X-Received: by 2002:a05:6402:4024:b0:43d:2067:f068 with SMTP id
- d36-20020a056402402400b0043d2067f068mr18000013eda.258.1659416698232; Mon, 01
- Aug 2022 22:04:58 -0700 (PDT)
+        with ESMTP id S229459AbiHBFLd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 01:11:33 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0CF117599;
+        Mon,  1 Aug 2022 22:11:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6BD5DB8199B;
+        Tue,  2 Aug 2022 05:11:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B98B3C433D6;
+        Tue,  2 Aug 2022 05:11:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1659417090;
+        bh=edE86YHe/q+UpiENTiKCJQkihEbQZ912xpNdOfgB1Sg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=H9w2eocq/4AU5715YlhY4o0AL7v+nWPegP+cZ56VJsy+viDPkZd5jINfG9tT8sRZP
+         X+AEE2q2H0dp+n3VRUNmyW1YcYZSBMT0DMUhrr4JFUXtEyBxyBQjAmjOsi5RSIEgy6
+         E0I8JgM03iOBmVbHfzm2lwBg7fIM5lImYavP8Auw=
+Date:   Tue, 2 Aug 2022 07:11:24 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, stable@vger.kernel.org,
+        axboe@kernel.dk, snitzer@redhat.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH stable 5.10 1/3] block: look up holders by bdev
+Message-ID: <Yuix/CcmdKsSD+za@kroah.com>
+References: <20220729062356.1663513-1-yukuai1@huaweicloud.com>
+ <20220729062356.1663513-2-yukuai1@huaweicloud.com>
+ <Yue2rU2Y+xzvGU6x@kroah.com>
+ <20220801180458.GA17425@lst.de>
 MIME-Version: 1.0
-References: <CANX2M5ZSuHONz-TPVdGcW3q_n6Z2DKLM6M8RfG+mORA9CCQRsQ@mail.gmail.com>
- <CAKXUXMxVCCRB2uaAN68LZv6Fwe7zAkUmwCmsqB6pE=z_=cztMg@mail.gmail.com>
- <CANX2M5b9PBp9i5v_akXshQqBFRT4dTHg+PR2pWpHPa5RBOEUTg@mail.gmail.com> <20220731095307.GA12211@1wt.eu>
-In-Reply-To: <20220731095307.GA12211@1wt.eu>
-From:   Dipanjan Das <mail.dipanjan.das@gmail.com>
-Date:   Mon, 1 Aug 2022 22:04:46 -0700
-Message-ID: <CANX2M5YxE31gSU804jm6U4T6uTeCTjgk1gfHM+ockpjHnXfDrw@mail.gmail.com>
-Subject: Re: INFO: task hung in __floppy_read_block_0
-To:     Willy Tarreau <w@1wt.eu>
-Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>,
-        fleischermarius@googlemail.com, its.priyanka.bose@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220801180458.GA17425@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jul 31, 2022 at 2:53 AM Willy Tarreau <w@1wt.eu> wrote:
->
-> Thus I'm a bit confused about what to look for. It's very likely that
-> there are still bugs left in this driver, but trying to identify them
-> and to validate a fix will be difficult if they cannot be reproduced.
-> Maybe they only happen under emulation due to timing issues.
->
-> As such, any hint about the exact setup and how long to wait to get
-> the error would be much appreciated.
+On Mon, Aug 01, 2022 at 08:04:58PM +0200, Christoph Hellwig wrote:
+> On Mon, Aug 01, 2022 at 01:19:09PM +0200, Greg KH wrote:
+> > This is very different from the upstream version, and forces the change
+> > onto everyone, not just those who had CONFIG_BLOCK_HOLDER_DEPRECATED
+> > enabled like was done in the main kernel tree.
+> > 
+> > Why force this on all and not just use the same option?
+> 
+> I'm really worried about backports that are significantly different
+> from the original commit.  To the point where if they are so different
+> and we don't have a grave security or data integrity bug I'm really not
+> very much in favor of backporting them at all.
+> 
 
-We can confirm that we were able to trigger the issue on the latest
-5.19 (commit: 3d7cb6b04c3f3115719235cc6866b10326de34cd) with the
-C-repro within a VM. We use this:
-https://syzkaller.appspot.com/text?tag=KernelConfig&x=cd73026ceaed1402
- config to build the kernel. The issue triggers after around 143
-seconds. For all the five times we tried, we were able to reproduce
-the issue deterministically every time. Please let us know if you need
-any other information.
+I agree, I'll drop this from my review queue now, thanks.
 
--- 
-Thanks and Regards,
-
-Dipanjan
+greg k-h
