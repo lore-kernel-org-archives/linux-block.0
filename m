@@ -2,84 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A87CDC00140
-	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 16:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB674C3F6B0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Aug 2022 19:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238239AbiHBQuI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 12:50:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55966 "EHLO
+        id S231814AbiHBThB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Aug 2022 15:37:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238188AbiHBQuH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 12:50:07 -0400
-Received: from 1wt.eu (wtarreau.pck.nerim.net [62.212.114.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E35E1101FE;
-        Tue,  2 Aug 2022 09:50:04 -0700 (PDT)
-Received: (from willy@localhost)
-        by pcw.home.local (8.15.2/8.15.2/Submit) id 272Go2L7021881;
-        Tue, 2 Aug 2022 18:50:02 +0200
-Date:   Tue, 2 Aug 2022 18:50:02 +0200
-From:   Willy Tarreau <w@1wt.eu>
-To:     Dipanjan Das <mail.dipanjan.das@gmail.com>
-Cc:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Denis Efremov <efremov@linux.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>,
-        fleischermarius@googlemail.com, its.priyanka.bose@gmail.com
-Subject: Re: INFO: task hung in __floppy_read_block_0
-Message-ID: <20220802165002.GA21797@1wt.eu>
-References: <CANX2M5ZSuHONz-TPVdGcW3q_n6Z2DKLM6M8RfG+mORA9CCQRsQ@mail.gmail.com>
- <CAKXUXMxVCCRB2uaAN68LZv6Fwe7zAkUmwCmsqB6pE=z_=cztMg@mail.gmail.com>
- <CANX2M5b9PBp9i5v_akXshQqBFRT4dTHg+PR2pWpHPa5RBOEUTg@mail.gmail.com>
- <20220731095307.GA12211@1wt.eu>
- <CANX2M5YxE31gSU804jm6U4T6uTeCTjgk1gfHM+ockpjHnXfDrw@mail.gmail.com>
+        with ESMTP id S233294AbiHBTgx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 15:36:53 -0400
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC14252FEE
+        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 12:36:49 -0700 (PDT)
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 272I2YMx027592
+        for <linux-block@vger.kernel.org>; Tue, 2 Aug 2022 12:36:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=45JgfRe+CWjDGcU8AbT5bsVYYCjWdG2sJd3W42Hx644=;
+ b=VRWp8lVZKF+xmCybnduOKK3I9fcMqM+QdV/5dx/xs2nyNiXNWhNpiLRQYuPPBob4+oy7
+ S5DM6erD8pyYVDiOrkeG3wR7x9h2iPVdwcYWKxgFoWAlQ5fxTeL2lSs136ApQuheOgdv
+ hnXQmTL2EU2V/ZEBm9e/kSwUvPT4DVkrOYQ= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3hpy36mmd0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 02 Aug 2022 12:36:48 -0700
+Received: from twshared7556.02.ash8.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 2 Aug 2022 12:36:47 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id D80E86E59EFB; Tue,  2 Aug 2022 12:36:37 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <io-uring@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv2 2/7] file: add ops to dma map bvec
+Date:   Tue, 2 Aug 2022 12:36:28 -0700
+Message-ID: <20220802193633.289796-3-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220802193633.289796-1-kbusch@fb.com>
+References: <20220802193633.289796-1-kbusch@fb.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANX2M5YxE31gSU804jm6U4T6uTeCTjgk1gfHM+ockpjHnXfDrw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: tkBrCY3giLOITsF1yihGw0dSGUNEWIGS
+X-Proofpoint-ORIG-GUID: tkBrCY3giLOITsF1yihGw0dSGUNEWIGS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-02_14,2022-08-02_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Keith Busch <kbusch@kernel.org>
 
-On Mon, Aug 01, 2022 at 10:04:46PM -0700, Dipanjan Das wrote:
-> On Sun, Jul 31, 2022 at 2:53 AM Willy Tarreau <w@1wt.eu> wrote:
-> >
-> > Thus I'm a bit confused about what to look for. It's very likely that
-> > there are still bugs left in this driver, but trying to identify them
-> > and to validate a fix will be difficult if they cannot be reproduced.
-> > Maybe they only happen under emulation due to timing issues.
-> >
-> > As such, any hint about the exact setup and how long to wait to get
-> > the error would be much appreciated.
-> 
-> We can confirm that we were able to trigger the issue on the latest
-> 5.19 (commit: 3d7cb6b04c3f3115719235cc6866b10326de34cd) with the
-> C-repro within a VM. We use this:
-> https://syzkaller.appspot.com/text?tag=KernelConfig&x=cd73026ceaed1402
->  config to build the kernel. The issue triggers after around 143
-> seconds. For all the five times we tried, we were able to reproduce
-> the issue deterministically every time. Please let us know if you need
-> any other information.
+The same buffer may be used for many subsequent IO's. Instead of setting
+up the mapping per-IO, provide an interface that can allow a buffer to
+be premapped just once and referenced again later, and implement for the
+block device file.
 
-Yep, I could reproduce it under qemu as well. I've added traces, and
-ugly things are happening with the lock (but I haven't understood what
-yet). What I saw was that process_fd_request() is first called under
-lock, then we drop the lock, then __floppy_read_block_0() is called
-under lock, which calls process_fd_request(), then the lock is dropped,
-wait_for_completion() is called, then process_fd_request() is called
-again without lock this time, and from there we're looping in
-fd_wait_for_completion. I need to dig into more details but it doesn't
-seem right to me that process_fd_request() is sometimes called under a
-lock and sometimes out, and that __floppy_read_block_0() is called with
-a lock held and it's relesed under it. I could have missed certain things
-due to the concurrent accesses but in any case I should probably not be
-observing this.
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/fops.c       | 20 ++++++++++++++++++++
+ fs/file.c          | 15 +++++++++++++++
+ include/linux/fs.h | 20 ++++++++++++++++++++
+ 3 files changed, 55 insertions(+)
 
-I'll try to dig deeper. I really don't know that area and I must confess
-it's not the most exciting to rediscover each time :-)
+diff --git a/block/fops.c b/block/fops.c
+index 29066ac5a2fa..db2d1e848f4b 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -670,6 +670,22 @@ static long blkdev_fallocate(struct file *file, int =
+mode, loff_t start,
+ 	return error;
+ }
+=20
++#ifdef CONFIG_HAS_DMA
++void *blkdev_dma_map(struct file *filp, struct bio_vec *bvec, int nr_vec=
+s)
++{
++	struct block_device *bdev =3D filp->private_data;
++
++	return block_dma_map(bdev, bvec, nr_vecs);
++}
++
++void blkdev_dma_unmap(struct file *filp, void *dma_tag)
++{
++	struct block_device *bdev =3D filp->private_data;
++
++	return block_dma_unmap(bdev, dma_tag);
++}
++#endif
++
+ const struct file_operations def_blk_fops =3D {
+ 	.open		=3D blkdev_open,
+ 	.release	=3D blkdev_close,
+@@ -686,6 +702,10 @@ const struct file_operations def_blk_fops =3D {
+ 	.splice_read	=3D generic_file_splice_read,
+ 	.splice_write	=3D iter_file_splice_write,
+ 	.fallocate	=3D blkdev_fallocate,
++#ifdef CONFIG_HAS_DMA
++	.dma_map	=3D blkdev_dma_map,
++	.dma_unmap	=3D blkdev_dma_unmap,
++#endif
+ };
+=20
+ static __init int blkdev_init(void)
+diff --git a/fs/file.c b/fs/file.c
+index 3bcc1ecc314a..767bf9d3205e 100644
+--- a/fs/file.c
++++ b/fs/file.c
+@@ -1307,3 +1307,18 @@ int iterate_fd(struct files_struct *files, unsigne=
+d n,
+ 	return res;
+ }
+ EXPORT_SYMBOL(iterate_fd);
++
++#ifdef CONFIG_HAS_DMA
++void *file_dma_map(struct file *file, struct bio_vec *bvec, int nr_vecs)
++{
++	if (file->f_op->dma_map)
++		return file->f_op->dma_map(file, bvec, nr_vecs);
++	return ERR_PTR(-EINVAL);
++}
++
++void file_dma_unmap(struct file *file, void *dma_tag)
++{
++	if (file->f_op->dma_unmap)
++		return file->f_op->dma_unmap(file, dma_tag);
++}
++#endif
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index c0d99b5a166b..befd8ea5821a 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -1964,6 +1964,10 @@ struct dir_context {
+ struct iov_iter;
+ struct io_uring_cmd;
+=20
++#ifdef CONFIG_HAS_DMA
++struct bio_vec;
++#endif
++
+ struct file_operations {
+ 	struct module *owner;
+ 	loff_t (*llseek) (struct file *, loff_t, int);
+@@ -2006,6 +2010,10 @@ struct file_operations {
+ 				   loff_t len, unsigned int remap_flags);
+ 	int (*fadvise)(struct file *, loff_t, loff_t, int);
+ 	int (*uring_cmd)(struct io_uring_cmd *ioucmd, unsigned int issue_flags)=
+;
++#ifdef CONFIG_HAS_DMA
++	void *(*dma_map)(struct file *, struct bio_vec *, int);
++	void (*dma_unmap)(struct file *, void *);
++#endif
+ } __randomize_layout;
+=20
+ struct inode_operations {
+@@ -3467,4 +3475,16 @@ extern int vfs_fadvise(struct file *file, loff_t o=
+ffset, loff_t len,
+ extern int generic_fadvise(struct file *file, loff_t offset, loff_t len,
+ 			   int advice);
+=20
++#ifdef CONFIG_HAS_DMA
++void *file_dma_map(struct file *file, struct bio_vec *bvec, int nr_vecs)=
+;
++void file_dma_unmap(struct file *file, void *dma_tag);
++#else
++static inline void *file_dma_map(struct file *file, struct bio_vec *bvec=
+,
++				 int nr_vecs)
++{
++	return ERR_PTR(-ENOTSUPP);
++}
++static inline void file_dma_unmap(struct file *file, void *dma_tag) {}
++#endif
++
+ #endif /* _LINUX_FS_H */
+--=20
+2.30.2
 
-Thanks,
-Willy
