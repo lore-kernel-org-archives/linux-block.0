@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78467C19F28
-	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 17:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BECD0C19F28
+	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 17:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237345AbiHCRLR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Aug 2022 13:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
+        id S236856AbiHCRSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Aug 2022 13:18:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236844AbiHCRLQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 13:11:16 -0400
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF5E1583D;
-        Wed,  3 Aug 2022 10:11:15 -0700 (PDT)
-Received: by mail-pj1-f48.google.com with SMTP id q7-20020a17090a7a8700b001f300db8677so2769001pjf.5;
-        Wed, 03 Aug 2022 10:11:15 -0700 (PDT)
+        with ESMTP id S236733AbiHCRSs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 13:18:48 -0400
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF5A53D25;
+        Wed,  3 Aug 2022 10:18:45 -0700 (PDT)
+Received: by mail-pg1-f175.google.com with SMTP id s206so15705857pgs.3;
+        Wed, 03 Aug 2022 10:18:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=o2afx9aZmzEdoWwdGDbShaY9b54ZclDxz5tctOo//Fo=;
-        b=7El/DZvJBhohLBUeCWp+TnY6nsmiBglx8zHtDWHe/Pnc6kuxuM1Z+e+fsYH/9djQ8n
-         wtkd3BT5RxWphmBszVVkCAOF4Aq0p4yAmJ0p0bLcORatEKCzmFgjylhWJHogD1wkenU7
-         jyg+xY+WfkIOe+u0372pZL6NDtSEKJ9qQ67Jh3UGRMq9Ul6fgfuGzz/+cf0Of1C8AAEJ
-         UoKBdDhQ45gD9efTHHvuM71OEwjq4VeIzWqkhDEK+H0f7WO1iMnXqEPvIYm+i1VL7iqz
-         T17gR1mCUWf7TG3sLSgL7FTVcv9lipPubaPfoL6AL51DABhhCQ1YD0ywDMqolztmAWpy
-         W/aw==
-X-Gm-Message-State: ACgBeo3iBRIF6mBUDhTmYuQDVMVjsvmIk3Y7JrO/JSkmONRN41fYAXUR
-        H1TENxdZJxp+w2spOF5ZisyutG8njHwQTA==
-X-Google-Smtp-Source: AA6agR6EBIzKze1/rFrYedIXXEbWGppFAk1TLH0M11oAyd1FFJw2h6QmbM00Fe9GucsJfuqW4gRWhw==
-X-Received: by 2002:a17:903:245:b0:16b:9c49:6b1c with SMTP id j5-20020a170903024500b0016b9c496b1cmr26089750plh.153.1659546675071;
-        Wed, 03 Aug 2022 10:11:15 -0700 (PDT)
+        bh=TwJQ/yYNiTQ3gXYdp9ajvzFbzU+GLcBJYBbzELtb76o=;
+        b=s1/LhoPkyIuCHoYXtI0/xSzZG6Y20M1bKWO9hMpP3Zz0CucvG8VrMsc2A6BOZaJWxq
+         OPIQHEtNgtXes0r8DNEy6n9KvnU0UMfo8gaoupIyzqkULbUrYfClyfjwlvJpIaNLh94X
+         l/1KdlIlNlRQIYXR2U8BK36DHo08q6y9nngUN2cgYGYLiiCMgqIzE/9Nj/+ABSFTEQSj
+         lrCj1Ta9PrYvHkHLyDkwHOJ+M5q3OJH/bhUZOPQtklnsroFY37kqwjNC5cUI5vmTzGuR
+         FxuKV5BHDXBSFeYa1tvKRUympIhkvBaoIS/12fzaIBk0+eJJ6DYYd2xJHd2IkMWdp7A0
+         eqOw==
+X-Gm-Message-State: ACgBeo1FtTgc7SmHlsWZtjPsi0N86T3Z9sJ1B6Mb/6SX6ci+d81UUijr
+        AnAIGdL0eKUC+11UNfEOwWU=
+X-Google-Smtp-Source: AGRyM1ut0iw8ACYHFdssYF1RXnkAJwY8ims1WoIWh5sfrKcVetqVvRyv8YyN43reQB04YYQHCbVNEQ==
+X-Received: by 2002:a05:6a00:3392:b0:52b:4896:b317 with SMTP id cm18-20020a056a00339200b0052b4896b317mr27047195pfb.17.1659547125023;
+        Wed, 03 Aug 2022 10:18:45 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:db71:edb7:462a:44af? ([2620:15c:211:201:db71:edb7:462a:44af])
-        by smtp.gmail.com with ESMTPSA id w127-20020a623085000000b0052df34124b4sm3552742pfw.84.2022.08.03.10.11.13
+        by smtp.gmail.com with ESMTPSA id d81-20020a621d54000000b0050dc76281f8sm3824637pfd.210.2022.08.03.10.18.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 10:11:14 -0700 (PDT)
-Message-ID: <d091dcf8-ce01-06cb-bff0-b41a5bb1ee86@acm.org>
-Date:   Wed, 3 Aug 2022 10:11:12 -0700
+        Wed, 03 Aug 2022 10:18:44 -0700 (PDT)
+Message-ID: <3dd40197-776d-9003-3c8f-1791587ade0b@acm.org>
+Date:   Wed, 3 Aug 2022 10:18:41 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [dm-devel] [PATCH v9 02/13] block:rearrange bdev_{is_zoned,
- zone_sectors, get_queue} helpers in blkdev.h
+Subject: Re: [dm-devel] [PATCH v9 03/13] block: allow blk-zoned devices to
+ have non-power-of-2 zone size
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, Johannes.Thumshirn@wdc.com,
         snitzer@kernel.org, axboe@kernel.dk,
@@ -51,12 +51,13 @@ To:     Pankaj Raghav <p.raghav@samsung.com>, Johannes.Thumshirn@wdc.com,
 Cc:     pankydev8@gmail.com, gost.dev@samsung.com,
         linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, dm-devel@redhat.com,
-        jaegeuk@kernel.org, matias.bjorling@wdc.com
+        jaegeuk@kernel.org, matias.bjorling@wdc.com,
+        Luis Chamberlain <mcgrof@kernel.org>
 References: <20220803094801.177490-1-p.raghav@samsung.com>
- <CGME20220803094804eucas1p1feea4b1bdae819f4c8750994ddd94803@eucas1p1.samsung.com>
- <20220803094801.177490-3-p.raghav@samsung.com>
+ <CGME20220803094805eucas1p1c68ba40d319331c2c34059f966ba2d83@eucas1p1.samsung.com>
+ <20220803094801.177490-4-p.raghav@samsung.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220803094801.177490-3-p.raghav@samsung.com>
+In-Reply-To: <20220803094801.177490-4-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -64,10 +65,12 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/3/22 02:47, Pankaj Raghav wrote:
-> Define bdev_is_zoned(), bdev_zone_sectors() and bdev_get_queue() earlier
-> in the blkdev.h include file.
-> 
-> This commit has no functional change, and it is a prep patch for allowing
-> zoned devices with non-power-of-2 zone sizes in the block layer.
+> +		if (!is_power_of_2(zone->len) && zone->capacity < zone->len) {
+> +			pr_err("%s: Invalid zone capacity: %lld with non power-of-2 zone size: %lld",
+> +			       disk->disk_name, zone->capacity, zone->len);
+
+If this patch series needs to be reposted, please leave out the second 
+and third colon (:) from the above error message. Once this comment has 
+been addressed, feel free to add:
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
