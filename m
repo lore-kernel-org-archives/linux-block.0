@@ -2,110 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD792C00140
-	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 02:22:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD82C19F28
+	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 09:48:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232190AbiHCCWP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Aug 2022 22:22:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46212 "EHLO
+        id S237459AbiHCJsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Aug 2022 05:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbiHCCWO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Aug 2022 22:22:14 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF79E13D1F
-        for <linux-block@vger.kernel.org>; Tue,  2 Aug 2022 19:22:12 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4LyFvp1CpzzKQ9X
-        for <linux-block@vger.kernel.org>; Wed,  3 Aug 2022 10:20:54 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP3 (Coremail) with SMTP id _Ch0CgDX38PG2+liV0+JAA--.19456S4;
-        Wed, 03 Aug 2022 10:22:11 +0800 (CST)
-From:   Yufen Yu <yuyufen@huaweicloud.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, yukuai3@huawei.com,
-        yuyufen@huawei.com, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH RESEND v2] blk-mq: run queue no matter whether the request is the last request
-Date:   Wed,  3 Aug 2022 10:33:55 +0800
-Message-Id: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S236046AbiHCJsN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 05:48:13 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6EA1F62F
+        for <linux-block@vger.kernel.org>; Wed,  3 Aug 2022 02:48:09 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220803094806euoutp013d43473078640e30df5a2ac34636275a~HzLnN_JXJ3204232042euoutp01w
+        for <linux-block@vger.kernel.org>; Wed,  3 Aug 2022 09:48:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220803094806euoutp013d43473078640e30df5a2ac34636275a~HzLnN_JXJ3204232042euoutp01w
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1659520086;
+        bh=AD8v/RK3vFIqsgabYiTtVZbPbcAOQ4zUOz/AmbfbvbE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iRXn0UmwY8hgWPVxsZu8A4quC3F9VbzMhhgCbJH3bi8sYQrS/a38E4joFjL2Sj98e
+         0eBSTpIQdpisjkixXy2QI+conYm5vRrmGFtEuMKDttQ3oflV0zmuy6UX0dC5TCSpia
+         WM7ITptkhlLkJzvwvmVL/VkVV6w6wbwaoV80V/kc=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220803094804eucas1p23f4f95acc37debaf32ebca7b7461228e~HzLlsvk8B2078320783eucas1p2-;
+        Wed,  3 Aug 2022 09:48:04 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 47.F2.09580.4544AE26; Wed,  3
+        Aug 2022 10:48:04 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220803094803eucas1p2ee8d16f3b6e08203ac9b4e0df6f53d9d~HzLlKJBYJ2274622746eucas1p2y;
+        Wed,  3 Aug 2022 09:48:03 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220803094803eusmtrp29abd99fd25b82a7151d193ea5f023056~HzLlJU8T40985609856eusmtrp2q;
+        Wed,  3 Aug 2022 09:48:03 +0000 (GMT)
+X-AuditID: cbfec7f5-9c3ff7000000256c-08-62ea44546ac3
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 9A.DB.09095.3544AE26; Wed,  3
+        Aug 2022 10:48:03 +0100 (BST)
+Received: from localhost (unknown [106.210.248.112]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220803094803eusmtip28563b2ce9e5f1b5ca2b66ba8b64b2160~HzLkybMHr1682216822eusmtip2o;
+        Wed,  3 Aug 2022 09:48:03 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     Johannes.Thumshirn@wdc.com, snitzer@kernel.org, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com, agk@redhat.com, hch@lst.de
+Cc:     dm-devel@redhat.com, matias.bjorling@wdc.com, gost.dev@samsung.com,
+        linux-kernel@vger.kernel.org, pankydev8@gmail.com,
+        jaegeuk@kernel.org, hare@suse.de, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, bvanassche@acm.org,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>
+Subject: [PATCH v9 01/13] block: make bdev_nr_zones and disk_zone_no generic
+ for npo2 zone size
+Date:   Wed,  3 Aug 2022 11:47:49 +0200
+Message-Id: <20220803094801.177490-2-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220803094801.177490-1-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDX38PG2+liV0+JAA--.19456S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFy3JF1rJryUtw4kWr1fCrg_yoW8CFW3pr
-        W5Ca1FkF9YqFsay348Ja1fG347Wr4DCrZrtF1UKr13Za98G397tFnYqr4UXw1Iyrs5AFsx
-        Grs8W3sxWw15Wa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCj
-        c4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-        Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY
-        6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
-        AIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UQzVbUUUUU=
-X-CM-SenderInfo: p1x13wthq6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJKsWRmVeSWpSXmKPExsWy7djP87ohLq+SDC4sFrWYfljRYv2pY8wW
+        q+/2s1lM+/CT2eL32fPMFnvfzWa1uHlgJ5PFnkWTmCxWrj7KZPFk/Sxmi79d95gs9t7Stri8
+        aw6bxfxlT9ktJrR9Zba4MeEpo8XnpS3sFmtuPmWxOHFL2kHY4/IVb4+ds+6ye1w+W+qxaVUn
+        m8fmJfUeu282sHnsbL3P6vF+31U2j74tqxg9Np+u9vi8Sc6j/UA3UwBPFJdNSmpOZllqkb5d
+        AlfG36ntTAVXRSqeTXjF1sA4S7CLkZNDQsBE4vb5NcxdjFwcQgIrGCW2H3jFBuF8YZS4tLKP
+        CcL5zChx7cMe1i5GDrCW7mO6EPHljBL7b/+Dan/JKPFt2kI2kCI2AS2Jxk52kLiIQDOjxN2/
+        PawgDrPAGyaJZct/s4MsFxZIlNjV/ZwNxGYRUJVouPGCCcTmFbCSmHn4OwvEgfISMy99B6vn
+        FLCWmPIPZBtIjaDEyZlPwGqYgWqat84Gu0JC4DCnxIYbS1ghml0kLm89ywRhC0u8Or6FHcKW
+        kfi/cz5UvFri6Y3fUM0tjBL9O9ezQfxpLdF3JgfEZBbQlFi/Sx+i3FHiRtt7dogKPokbbwUh
+        TuCTmLRtOjNEmFeio00IolpJYufPJ1BLJSQuN82B+spDYsLRzewTGBVnIXlmFpJnZiHsXcDI
+        vIpRPLW0ODc9tdg4L7Vcrzgxt7g0L10vOT93EyMwNZ7+d/zrDsYVrz7qHWJk4mA8xCjBwawk
+        wnvH5XmSEG9KYmVValF+fFFpTmrxIUZpDhYlcd7kzA2JQgLpiSWp2ampBalFMFkmDk6pBiYR
+        3Qj3p2uVHpZXxX42tGU49Lnnd35V4NTGy0pxuWeTDlnUFR+tiE77xvHVvSy65M62qwu3PK9j
+        1P0sFaBU9WLu5BK+27fDzxxK33TxsP5ZYYNVyu7rFbcGK3tM80h+UrJKcnbG5mzWZVWXV1++
+        YLU6J3Nu9Lcw9z8b4qRZtlX91H+9ZJ6Z1lTV+0lTChQ0XV94P721UHauStyFdQJdfu6n9rg1
+        Gxo2Xre6Z6u7YuIzhrsr2LX0Q7zy8vdxbnV+HxvHNnmCSNxhLakkl3PPl/KanmBeGs0ru6jU
+        qeje/8edp3udLqvPb39SmXbefDqDb/OBJdvPCXM4ca5gFnv9MamqMeqsXvI8A8u3slMepSqx
+        FGckGmoxFxUnAgDeHdQF/AMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrOIsWRmVeSWpSXmKPExsVy+t/xe7rBLq+SDPb80bOYfljRYv2pY8wW
+        q+/2s1lM+/CT2eL32fPMFnvfzWa1uHlgJ5PFnkWTmCxWrj7KZPFk/Sxmi79d95gs9t7Stri8
+        aw6bxfxlT9ktJrR9Zba4MeEpo8XnpS3sFmtuPmWxOHFL2kHY4/IVb4+ds+6ye1w+W+qxaVUn
+        m8fmJfUeu282sHnsbL3P6vF+31U2j74tqxg9Np+u9vi8Sc6j/UA3UwBPlJ5NUX5pSapCRn5x
+        ia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7G36ntTAVXRSqeTXjF1sA4
+        S7CLkYNDQsBEovuYbhcjF4eQwFJGiaULdzF1MXICxSUkbi9sYoSwhSX+XOtiA7GFBJ4zSjSd
+        5gbpZRPQkmjsZAfpFRHoZpS4fOYcK4jDLPCHSeLv0dMsIA3CAvESR0+3soLYLAKqEg03XoAt
+        4BWwkph5+DsLxAJ5iZmXvrOD2JwC1hJT/v1jhlhmJbHu7yxWiHpBiZMzn4DVMwPVN2+dzTyB
+        UWAWktQsJKkFjEyrGEVSS4tz03OLDfWKE3OLS/PS9ZLzczcxAmN427Gfm3cwznv1Ue8QIxMH
+        4yFGCQ5mJRHeOy7Pk4R4UxIrq1KL8uOLSnNSiw8xmgLdPZFZSjQ5H5hE8kriDc0MTA1NzCwN
+        TC3NjJXEeT0LOhKFBNITS1KzU1MLUotg+pg4OKUamPxrN894KbnldNZ3Ltf+tq3Wf4If6rB+
+        2flbIsxEsPpoUI/KNOMV0q171MMDT3iLbn3Ivia8wHvrqlV+M1xWLjtku/z0+VPBC5W4fPwm
+        1STvd1j+su5mReUF73X7l66tst3rm7dI/+1z1Q6W2T6bfm1ruc1skbV2S/PsRVsczr29ovpY
+        f4d+udXLTzs2fa/a2SJodV5HJmNjXLl6hOFiM+kKh0U5j18wb39rXNUSfnmywPaiCU+vc0+8
+        vfG8p9RM4cK5s5edEMg5sGbf2UO6O5R9lV5Y/NK9ucLen7cw4pIkM+/UQ+V7b/pl/JDfrxex
+        JY59yR41JT6WM49iDwfrSvfo/ZKfnL3yeNM5ybX8E1KUWIozEg21mIuKEwGNwBmyagMAAA==
+X-CMS-MailID: 20220803094803eucas1p2ee8d16f3b6e08203ac9b4e0df6f53d9d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20220803094803eucas1p2ee8d16f3b6e08203ac9b4e0df6f53d9d
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220803094803eucas1p2ee8d16f3b6e08203ac9b4e0df6f53d9d
+References: <20220803094801.177490-1-p.raghav@samsung.com>
+        <CGME20220803094803eucas1p2ee8d16f3b6e08203ac9b4e0df6f53d9d@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yufen Yu <yuyufen@huawei.com>
+Adapt bdev_nr_zones and disk_zone_no functions so that they can
+also work for non-power-of-2 zone sizes.
 
-We do test on a virtio scsi device (/dev/sda) and the default mq
-scheduler is 'none'. We found a IO hung as following:
+As the existing deployments assume that a device zone size is a power of
+2 number of sectors, power-of-2 optimized calculation is used for those
+devices.
 
-blk_finish_plug
-  blk_mq_plug_issue_direct
-      scsi_mq_get_budget
-      //get budget_token fail and sdev->restarts=1
+There are no direct hot paths modified and the changes just
+introduce one new branch per call.
 
-			     	 scsi_end_request
-				   scsi_run_queue_async
-                                   //sdev->restart=0 and run queue
-
-     blk_mq_request_bypass_insert
-        //add request to hctx->dispatch list
-
-  //continue to dispath plug list
-  blk_mq_dispatch_plug_list
-      blk_mq_try_issue_list_directly
-        //success issue all requests from plug list
-
-After .get_budget fail, scsi_mq_get_budget will increase 'restarts'.
-Normally, it will run hw queue when io complete and set 'restarts'
-as 0. But if we run queue before adding request to the dispatch list
-and blk_mq_dispatch_plug_list also success issue all requests, then
-on one will run queue, and the request will be stall in the dispatch
-list and cannot complete forever.
-
-It is wrong to use last request of plug list to decide if run queue is
-needed since all the remained requests in plug list may be from other
-hctxs. To fix the bug, pass run_queue as true always to
-blk_mq_request_bypass_insert().
-
-Fix-suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+Reviewed-by: Adam Manzanares <a.manzanares@samsung.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-zoned.c      | 13 +++++++++----
+ include/linux/blkdev.h |  8 +++++++-
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 93d9d60980fb..1eb13d57a946 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2568,7 +2568,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 			break;
- 		case BLK_STS_RESOURCE:
- 		case BLK_STS_DEV_RESOURCE:
--			blk_mq_request_bypass_insert(rq, false, last);
-+			blk_mq_request_bypass_insert(rq, false, true);
- 			blk_mq_commit_rqs(hctx, &queued, from_schedule);
- 			return;
- 		default:
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index a264621d4905..dce9c95b4bcd 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -111,17 +111,22 @@ EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
+  * bdev_nr_zones - Get number of zones
+  * @bdev:	Target device
+  *
+- * Return the total number of zones of a zoned block device.  For a block
+- * device without zone capabilities, the number of zones is always 0.
++ * Return the total number of zones of a zoned block device, including the
++ * eventual small last zone if present. For a block device without zone
++ * capabilities, the number of zones is always 0.
+  */
+ unsigned int bdev_nr_zones(struct block_device *bdev)
+ {
+ 	sector_t zone_sectors = bdev_zone_sectors(bdev);
++	sector_t capacity = bdev_nr_sectors(bdev);
+ 
+ 	if (!bdev_is_zoned(bdev))
+ 		return 0;
+-	return (bdev_nr_sectors(bdev) + zone_sectors - 1) >>
+-		ilog2(zone_sectors);
++
++	if (is_power_of_2(zone_sectors))
++		return (capacity + zone_sectors - 1) >> ilog2(zone_sectors);
++
++	return DIV_ROUND_UP_SECTOR_T(capacity, zone_sectors);
+ }
+ EXPORT_SYMBOL_GPL(bdev_nr_zones);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 84b13fdd34a7..ab82d1ff0cce 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -674,9 +674,15 @@ static inline unsigned int disk_nr_zones(struct gendisk *disk)
+ 
+ static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
+ {
++	sector_t zone_sectors = disk->queue->limits.chunk_sectors;
++
+ 	if (!blk_queue_is_zoned(disk->queue))
+ 		return 0;
+-	return sector >> ilog2(disk->queue->limits.chunk_sectors);
++
++	if (is_power_of_2(zone_sectors))
++		return sector >> ilog2(zone_sectors);
++
++	return div64_u64(sector, zone_sectors);
+ }
+ 
+ static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
 -- 
-2.31.1
+2.25.1
 
