@@ -2,87 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4827C19F2C
-	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 17:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 149DDC19F2C
+	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 18:06:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235731AbiHCRzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Aug 2022 13:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58202 "EHLO
+        id S229519AbiHCSGg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Aug 2022 14:06:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234206AbiHCRzM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 13:55:12 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA63F491C8
-        for <linux-block@vger.kernel.org>; Wed,  3 Aug 2022 10:55:09 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id j8so7558666ejx.9
-        for <linux-block@vger.kernel.org>; Wed, 03 Aug 2022 10:55:09 -0700 (PDT)
+        with ESMTP id S236148AbiHCSGd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 14:06:33 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9642C491C8
+        for <linux-block@vger.kernel.org>; Wed,  3 Aug 2022 11:06:31 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id t22so27560919lfg.1
+        for <linux-block@vger.kernel.org>; Wed, 03 Aug 2022 11:06:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=o87E+SV2UIzAz3s+EsvwV12ye0YHqLyv8nHd4iOPpu8=;
-        b=SGF0ncnTouMjq3zBYmCMp779RnZ8PwEnMrbg8ILR8Y4ffIOHZ7wKRsq3MFrGyzMCER
-         dGVf4CuBZGuCMufdGhLw5LLS45I5A6+E5YjHEWyL6jMt6Vbny8bA7n6pgjNKhU0iGPyo
-         Jk5pMZ83FR6JMEkKGWZzV0RE+v0v2GlXhmm8Y=
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A1n1Bq8CdodDpQBbrmMNPijVEFHqC9yamuOp6H0S1uk=;
+        b=p5uWqY08+EZf2sBZm33JVMn0gAiWjMCMZTJiVk/w55JBsJoKJ5IzjG86BWPCS+R4BD
+         WNQns/11XsXGbHlQtcYS/W2rX6piJFLif4XZ89ZyXMU7BaouGA4bmqI0Nuk7h1JFueXa
+         Yj3Xeyl4TwDk496vwO33R07sP1kawoHQC6bwTr1lrVtfmcAmKjxBxp3RNBg/speH8qXE
+         M4OMHZc/aejzDN/3LTULOXuSMutISS6D3NwcD6pTWUTfLqgq1HTzOb9+1rQTjWBrM48K
+         6rX30BrfayG9EjoeKAIPTwbG29Bp/TgH1rz9tP+MhiMg/gkBPPhx6P/GeoNUDXIwmyBT
+         5G8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=o87E+SV2UIzAz3s+EsvwV12ye0YHqLyv8nHd4iOPpu8=;
-        b=6ZFLBN3SR75tIKrRMM59FsxTRyK+uGEqPsTQbkPS/GIXOwWqFKgkdtUknag2moAiut
-         RFRVf43knbLr7T+XE1g/bO/JjATUmcWFvEF/Vtk3XRyiBilw5u25XIqB0n5J228N6SiS
-         vQY57bcEeSKDLmCHvRCweReDlSqEev3NB5kOSTJ1M8yD05xFoKzGccXwORB2JZrThP41
-         3MlRn4uZnne3R+5juXAapKUncl6bEGHHY5YU67I9zkS0u+s7RaVSghQT6L50JLAplnHU
-         bSkmrNo+9xCjR7CFg67e7X1XSPD0yHDKwxklmFvST0Wmg+llnQfw1+h4/pPPqNB5a/Zu
-         jYWg==
-X-Gm-Message-State: ACgBeo0/1H2GQ9KdFk9Brdj1QcyGt6rFFMFaCH0PciloERiwzGUmnTWP
-        FyVjCSQoe8IgmJfM8RO7V9ivKjmG/rmvZ9HP
-X-Google-Smtp-Source: AA6agR7dQsaDkPWzQqbJMGm/DPs+sm0Qo5TtERfnoKxU1tfY0t5ekcNOofmEc9JD7XJxWu+aKaLHuA==
-X-Received: by 2002:a17:907:1dcc:b0:730:80c1:fc77 with SMTP id og12-20020a1709071dcc00b0073080c1fc77mr11954875ejc.414.1659549308202;
-        Wed, 03 Aug 2022 10:55:08 -0700 (PDT)
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com. [209.85.221.53])
-        by smtp.gmail.com with ESMTPSA id g36-20020a056402322400b0043d4fe7f8e5sm6945027eda.73.2022.08.03.10.55.07
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 10:55:07 -0700 (PDT)
-Received: by mail-wr1-f53.google.com with SMTP id l22so22464856wrz.7
-        for <linux-block@vger.kernel.org>; Wed, 03 Aug 2022 10:55:07 -0700 (PDT)
-X-Received: by 2002:a5d:638b:0:b0:220:6e1a:8794 with SMTP id
- p11-20020a5d638b000000b002206e1a8794mr6276905wru.193.1659549307022; Wed, 03
- Aug 2022 10:55:07 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A1n1Bq8CdodDpQBbrmMNPijVEFHqC9yamuOp6H0S1uk=;
+        b=bP3/vz/EHnqxB3UN+NMp9ifbarVfyNDcFc2TqfdIFMGA478kRlft7dopyIcDb5UVwy
+         wXK2A0zRTrJSz9VZ5HHwXs920iAJgbOaQBew3HEoaC4CYzgpk+NCnkNVrw9eZs93EH/z
+         Jg1l7P1Bg/WXzhRbttaD5/XFCMl650kBmw5Wt1m6K0Zg+0DEouEpgL6tApVm79Pr0lkB
+         Sdd4i5oyrwTaCOHVLqao/PdWz/8sW+TuFSFIB025e7eGPzmuPJ9c7bViOzFoD49BwP2D
+         XHhx4ZJhoQvy5rx6lZwl5CQwek8rUItBXOK36Gs6rmibpGGTkw9HZE+Dr79CugMVk/k4
+         2Wzg==
+X-Gm-Message-State: ACgBeo0Qrt6QTDAyIxAim0YyXdjZB/4htR3KL5r2kErk/l4Z2N2tKb9k
+        Yk1jIQrzHyWMpLTuu20CA12z3wjIhCVn3RwkfNFWXQ==
+X-Google-Smtp-Source: AA6agR6Y2dm6U6UoJw9aZjVndxE8V2hhBL+GGq/vj7CVcu4Fg5IC1Z4fvHtlxTisvj/9PMjeZhqb24BWYCZ2hAcSjz8=
+X-Received: by 2002:ac2:4d4a:0:b0:48b:1f80:a93d with SMTP id
+ 10-20020ac24d4a000000b0048b1f80a93dmr1436411lfp.403.1659549989607; Wed, 03
+ Aug 2022 11:06:29 -0700 (PDT)
 MIME-Version: 1.0
 References: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk>
- <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
- <20220803173037.GA20921@lst.de> <CAHk-=wggzgFLY1CgLgBRmmpz6s3ZmktV+-sFfBYWeiiBb0VXsQ@mail.gmail.com>
- <20220803174959.GB21218@lst.de>
-In-Reply-To: <20220803174959.GB21218@lst.de>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 3 Aug 2022 10:54:50 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjoTqRLnmNVKvtCth7WCtCLXem9y4ZHx2tnsEcK01TToQ@mail.gmail.com>
-Message-ID: <CAHk-=wjoTqRLnmNVKvtCth7WCtCLXem9y4ZHx2tnsEcK01TToQ@mail.gmail.com>
+ <YumYKVWYnoALoSBR@kbusch-mbp.dhcp.thefacebook.com> <74bb310b-b602-14eb-85f7-4b08327b0092@kernel.dk>
+ <CAHk-=wgAeL8+BYsy4mnut+y7sBF_+LXmW5bjUfegBpg8SisBJQ@mail.gmail.com>
+ <7d663c1a-67a2-159e-3f93-28ec18f3bd9d@kernel.dk> <CAHk-=wgALRccia0ouYywoDAH7RDCpi3rwfjwT0TZ7gV4O1+qaA@mail.gmail.com>
+ <38164718-0f09-76e5-a21d-2122613cdf73@kernel.dk> <CAHk-=wii5SG2=P1kStBYJ9JiK97GYZcYdozy-JP15qNcfQXF3g@mail.gmail.com>
+ <2ae97675-383b-c2c7-9bed-6a9a55ce64f1@kernel.dk> <CAHk-=wjQpMT+Z-=B4QzGT_BkSe0kuqDuK+hBvOq7YTXKmM2HEQ@mail.gmail.com>
+ <c1b1b619-9142-9818-0536-ce4b97d3e979@kernel.dk> <3af4127a-f453-4cf7-f133-a181cce06f73@kernel.dk>
+ <CAHk-=whx-CA1QpFc_6587OmiJHb5+OYDR9aRQQh6=06oJWZG8Q@mail.gmail.com>
+ <CAKwvOdkpNRvD0kDe-j8N0Gkq+1Fdhd6=z-9ROm3gc12Sf0k-Kg@mail.gmail.com>
+ <552201a1-2248-b16e-1118-54373531a158@kernel.dk> <CAKwvOdm3RE14sNrKX9OS-2YrSjEgmq2VqZwXjRQ+yTUXR1FzNQ@mail.gmail.com>
+ <65d2a122-ef68-a6bc-44e8-bb21ad7b9255@kernel.dk>
+In-Reply-To: <65d2a122-ef68-a6bc-44e8-bb21ad7b9255@kernel.dk>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 3 Aug 2022 11:06:18 -0700
+Message-ID: <CAKwvOdmD10yK0r1H-M2PcnZgy3M0aA9gdkY0BErDOQ+KpBRxVQ@mail.gmail.com>
 Subject: Re: [GIT PULL] Block driver changes for 5.20-rc1
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
         Hannes Reinecke <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-toolchains <linux-toolchains@vger.kernel.org>,
+        Nick Clifton <nickc@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 3, 2022 at 10:50 AM Christoph Hellwig <hch@lst.de> wrote:
-> Because so far we've never made a big fuzz about a configuation
-> so obscrube that it takes build bot more than a week to find it.
++ Linux Toolchains, Nick Clifton (author of
+https://sourceware.org/git/?p=binutils-gdb.git;a=commit;h=ba951afb99912da01a6e8434126b8fac7aa75107)
+https://lore.kernel.org/linux-block/CAKwvOdkpNRvD0kDe-j8N0Gkq+1Fdhd6=z-9ROm3gc12Sf0k-Kg@mail.gmail.com/
+is the thread for context.
 
-That "obscure" config was a bog-standard "build the code".
+On Wed, Aug 3, 2022 at 10:45 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> I ran with the below and it silences the linker warning mentioned. I do
+> also see the below with my build (which aren't new with the option added
+> obviously, but not visible since I don't get the other noise):
+>
+> axboe@r7525 ~/gi/linux-block (test)> time make -j256 -s                      1.886s
+> ld: warning: .tmp_vmlinux.kallsyms1 has a LOAD segment with RWX permissions
+> ld: warning: .tmp_vmlinux.kallsyms2 has a LOAD segment with RWX permissions
+> ld: warning: vmlinux has a LOAD segment with RWX permissions
 
-It literally happens with "allmodconfig". I found it immediately after pulling.
+Not sure yet about these.  Looks like there's linker flags to disable
+warnings...but I don't recommend those.
+https://github.com/systemd/systemd/commit/b0e5bf0451a6bc94e6e7b2a1de668b75c63f38c8
+I wonder if they go away by fixing the boot issues described below?
 
-This is literally why I do full builds after every single pull request
-I do - I don't want to have build warnings in my tree.
+Otherwise, I think we need to find which section is the problematic
+one; I suspect the segment flagged as LOAD is composed of many
+sections, with possibly only one or a few that needs permissions
+adjusted.
 
-And I do expect people to make sure that their code has been
-sufficiently tested that my smoke-testing doesn't find immediate
-problems.
+> ld: warning: arch/x86/boot/compressed/efi_thunk_64.o: missing .note.GNU-stack section implies executable stack
+> ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
 
-           Linus
+Right, arch/x86/boot/compressed (and arch/x86/boot/) discard/reset
+KBUILD_AFLAGS (via the := assignment operator).
+
+So arch/x86/boot/Makefile and arch/x86/boot/compressed/Makefile also
+will need changes similar to the one you did below.
+
+Finally, if those parts of the code actually expect the stack to be
+executable (probably depends on some inline asm), I suspect we might
+get some kind of fault at runtime (though I don't know how the kernel
+handles segment permissions or even uses ELF segments).  Point being
+that -Wa,--noexecstack is somewhat a promise that we wont try to
+execute data on the stack as if it were code.  -Wa,--execstack is
+useful if we need to be able to do so, but we should be careful to
+limit that to individual translation units if they really truly need
+that.  The linker warning is more so about the current ambiguity since
+if the implicit default changes in the future, that could break code.
+Better for us to be explicit here, and disable executable stack unless
+strictly necessary and only as necessary IMO.  Personally, I think the
+current implicit default is wrong, but pragmatically I recognize that
+people have been used to the status quo for years, and changing it
+could break existing codebases.
+
+If you send the below diff with the two other additions I suggest to
+the x86 ML, the x86 maintainers might be able to comment if they're
+familiar with any possible cases where the stack is expected to be
+executable.
+
+> ld: warning: arch/x86/boot/compressed/vmlinux has a LOAD segment with RWX permissions
+> ld: warning: arch/x86/boot/pmjump.o: missing .note.GNU-stack section implies executable stack
+> ld: NOTE: This behaviour is deprecated and will be removed in a future version of the linker
+
+^ See above.
+
+> ld: warning: arch/x86/boot/setup.elf has a LOAD segment with RWX permissions
+>
+>
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 7854685c5f25..51824528a026 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -123,6 +123,7 @@ else
+>          CHECKFLAGS += -D__x86_64__
+>
+>          KBUILD_AFLAGS += -m64
+> +        KBUILD_AFLAGS += -Wa,--noexecstack
+>          KBUILD_CFLAGS += -m64
+>
+>          # Align jump targets to 1 byte, not the default 16 bytes:
+>
+> --
+> Jens Axboe
+>
+
+
+-- 
+Thanks,
+~Nick Desaulniers
