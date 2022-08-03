@@ -2,69 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24020C19F28
-	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 17:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36143C19F28
+	for <linux-block@archiver.kernel.org>; Wed,  3 Aug 2022 17:30:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237606AbiHCRYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Aug 2022 13:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34058 "EHLO
+        id S236492AbiHCRax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Aug 2022 13:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238033AbiHCRYp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 13:24:45 -0400
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8581154657;
-        Wed,  3 Aug 2022 10:24:44 -0700 (PDT)
-Received: by mail-pj1-f48.google.com with SMTP id f11-20020a17090a4a8b00b001f2f7e32d03so4096225pjh.0;
-        Wed, 03 Aug 2022 10:24:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=PLueRrdRrDSAZCsSnEuO7ryjbF4cDa5AGSQHDpCb7Jo=;
-        b=cnNUQOAfgHOxq55giri+w07WCRA5RjedrBU0T9+zvtAEjQOfNLx08oJWRT8RMiVhnK
-         VQAb2SoPT+QptujtB72Zgd1mrDrrzfeyPw1PpSc1eLFieuJwSnFtP5MHo2QVYNix/oVV
-         QhV53uoso0ybRES4++IxoRmnkaxyn8OcWsRU8D8CQbPmGkKUtZmjgf3vRTp0uqn3rsbA
-         41q6yZG8L0CdJE0YG35RvEaWNyN9shKkwvvxv6FICBxPdC8TpNi3j0hKIA3v3Y80ze8q
-         rltH2It7bJzel8UvPp8rSGz5GVXN+CKtG/j3fIZkIxdS/qP+gO+YICEaK5VD/x50/Erk
-         r5jA==
-X-Gm-Message-State: ACgBeo27UTtImrnkmqhsSt8zWKspPb7CTX/T5tCCw56d7JHeLUqCx6oF
-        vkgJu9GVwHSaPPfHvTMusXkU6CFNX1bXLw==
-X-Google-Smtp-Source: AA6agR4+errzcNzMPWB0CtPUqoFfU+/HvKqxJd9O453x9LrGJfJ/jGLweL2ivP559rQbToAj4CcR+Q==
-X-Received: by 2002:a17:90a:d58e:b0:1f4:f9a5:22a8 with SMTP id v14-20020a17090ad58e00b001f4f9a522a8mr5883087pju.58.1659547483870;
-        Wed, 03 Aug 2022 10:24:43 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:db71:edb7:462a:44af? ([2620:15c:211:201:db71:edb7:462a:44af])
-        by smtp.gmail.com with ESMTPSA id i18-20020a170902c95200b0016c2cdea409sm2217726pla.280.2022.08.03.10.24.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Aug 2022 10:24:43 -0700 (PDT)
-Message-ID: <9de2428b-96b8-883c-bd96-01a7763758e8@acm.org>
-Date:   Wed, 3 Aug 2022 10:24:40 -0700
+        with ESMTP id S238254AbiHCRao (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Aug 2022 13:30:44 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734BC13D32
+        for <linux-block@vger.kernel.org>; Wed,  3 Aug 2022 10:30:43 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id DA67E68AA6; Wed,  3 Aug 2022 19:30:37 +0200 (CEST)
+Date:   Wed, 3 Aug 2022 19:30:37 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [GIT PULL] Block driver changes for 5.20-rc1
+Message-ID: <20220803173037.GA20921@lst.de>
+References: <87f60512-9242-49d1-eae1-394eb7a34760@kernel.dk> <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [dm-devel] [PATCH v9 10/13] dm-table: allow zoned devices with
- non power-of-2 zone sizes
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, Johannes.Thumshirn@wdc.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, agk@redhat.com, hch@lst.de
-Cc:     pankydev8@gmail.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        jaegeuk@kernel.org, matias.bjorling@wdc.com
-References: <20220803094801.177490-1-p.raghav@samsung.com>
- <CGME20220803094813eucas1p2eab78901e97417ad52be1f8023db3d82@eucas1p2.samsung.com>
- <20220803094801.177490-11-p.raghav@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220803094801.177490-11-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wi+HuC_bs7VMTJSjp0vug9DRMY9+jKcsQryU9Eqofdxbg@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/3/22 02:47, Pankaj Raghav wrote:
-> Allow dm to support zoned devices with non power-of-2(po2) zone sizes as
-> the block layer now supports it.
+On Tue, Aug 02, 2022 at 02:18:57PM -0700, Linus Torvalds wrote:
+> This code cannot have gotten much testing at all.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+[...]
+
+> And no, I don't want some "fix up broken code after the fact" commit
+> on top. I want that code excised, and I don't want to see another pull
+> request before it's (a) gone and (b) somebody has looked at where the
+> testing of this COMPLETELY failed.
+> 
+
+Umm.  The warning is as you said totally reasonable, and we fixed it as
+soon as we got the report.  But it turns out my compiler certainly did
+not report it (gcc version 10.2.1 20210110 (Debian 10.2.1-6)), Jens's
+apparently also did not, and the regular build bot that is running on
+tons of architectures did not report it until 9 days after the patch
+was commited and pushed out, and until after Jens pulled it.
+
+So while the complaint that we failed to get it into the same pull
+request is entirely reasonable, the statement that it cannot have
+gotten much testing at all is a bit ridiculous.  It's also not that
+"I does not compile at all", but rather that -Werror makes a useful
+but mostly harmless warning fatal.
