@@ -2,129 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6186AC3F6B0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Aug 2022 16:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA8EC25B07
+	for <linux-block@archiver.kernel.org>; Thu,  4 Aug 2022 21:46:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231665AbiHDQm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Aug 2022 12:42:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51682 "EHLO
+        id S234719AbiHDVqT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Aug 2022 17:46:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231355AbiHDQm2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Aug 2022 12:42:28 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D453A485
-        for <linux-block@vger.kernel.org>; Thu,  4 Aug 2022 09:42:26 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id 17so56524pfy.0
-        for <linux-block@vger.kernel.org>; Thu, 04 Aug 2022 09:42:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=+CnBeoe7uqEcxaB+1aAe8bKxhqf9IbvpUHHTGwUqr4U=;
-        b=WmRCslE9kOuIR6KnPHmII1JL58W/uouaQW7Tcin9RLlyJDDrGFhgfwB1M8A5f3tMAf
-         Aw41mRetrEtddPH+vaIptXu8+gpN1C7OlGiMoXSm9a5QgNzUpBt7XodP79FPPQmegTNr
-         hkgUSOE7Lpj4XmSo7rksCTRKaD2kvBQ13I8sKOYpu/iFPLFofommLFjx9+DEntWY7s47
-         OLbnacVu6uy2MY34Qq5d6L6EoUtBTEFaheopOEHNog0y5QeQCkZmz0/TKyC38y8YBkt2
-         3h1Ab7b9GkCKg5PuFmOLIThaSSll6kXXslvaSgKdYWMHNv59lC432ht+tAV8ug48Ebfn
-         CU1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=+CnBeoe7uqEcxaB+1aAe8bKxhqf9IbvpUHHTGwUqr4U=;
-        b=wyN1evykby83cAy5q96vSKhe+UnyRd8BavKmGSk1LvWMtiocIy3XqVyMNrNDWU81Wy
-         EqzZF+Eo6pER0iPLJBilnyGczLaBCMmh2s+cc3cJjFCQBUr8iL/Tkt//uR+0KKCBxdZg
-         TTtbmnnXIBzffvth1+jqZLrhRCLUKs5yA4ShBqrWc1hKFM0GpXIMyngDV7j8DdaPUX+k
-         2s53YSV/TjXQ0X/lUBEwFMH/vdzgU4F1PQQPiVK4D5bJ+gqGm5Q5c9M3wdZfOm79me+t
-         ung/9renS3yirSFqZG9Z/fGqBDgSHBrinNmu4t175fDPCpUpOLSQMS7HyMWk0mCX/Q2t
-         r5FA==
-X-Gm-Message-State: ACgBeo0xbxhB6XcxfhGCeHr9M1Gxuv+WDE8773nxM+WgjWggooTaSxsT
-        U/Vs3TYB5ELIdOOgjHc+1z3oTg==
-X-Google-Smtp-Source: AA6agR6kMtN9endtZcnUlYAQ+oFGuA9Xrr1w70/pFRQoDTBxqaqU9fUwrglmB1vgkcAfMZVmAWfUrg==
-X-Received: by 2002:a63:5353:0:b0:419:f140:2dae with SMTP id t19-20020a635353000000b00419f1402daemr2253734pgl.526.1659631346066;
-        Thu, 04 Aug 2022 09:42:26 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s25-20020aa78bd9000000b0052e0b928c3csm1132114pfd.219.2022.08.04.09.42.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Aug 2022 09:42:25 -0700 (PDT)
-Message-ID: <d72ea27d-ba80-2b9b-11e0-7fff11c8bf3f@kernel.dk>
-Date:   Thu, 4 Aug 2022 10:42:24 -0600
+        with ESMTP id S233569AbiHDVqS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Aug 2022 17:46:18 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 388F315FE2;
+        Thu,  4 Aug 2022 14:46:17 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 274La8vn027538;
+        Thu, 4 Aug 2022 21:46:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=bI4zxYX9VKdRiXx+JLDGBK4cwXNBclkB5GpuQfxm4oc=;
+ b=RSdHQQlK7fji2/veD9uA9TOuc7K4HlVWOoIdOVBNtFR7OsHccAbZ9/5alXf7hLpbZhpb
+ 8x0zGofVi6J81TiRYmVqZeNEUnq+ETS03LkjJxZwuejoarJg5k2q1YQW2y/sVkkYfCDL
+ unJdQ6+Izd3kQRZ01fFOWdVPsaA7DUQEzb9EC7X7zlZF5pKJOf5qXtqGuerVEOuWajb0
+ 2Md0952fF29rTmxyU3R/CsbjeXJ/BY46EspQOe7U2H587D5PsZismGw1cSEGcudfgYFW
+ W5LRcoLNFd3tg5mXpQSCMtuOuQLBulFTCAnk+O9nxgzIEqopRRUg0OY7Tb7ljIjyPp1B pw== 
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3hrp6189gw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Aug 2022 21:46:11 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 274LM0Sh015911;
+        Thu, 4 Aug 2022 21:46:09 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3hmv98pnxe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 04 Aug 2022 21:46:09 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 274LkMY423396646
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 4 Aug 2022 21:46:22 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6937A11C04C;
+        Thu,  4 Aug 2022 21:46:06 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5615E11C04A;
+        Thu,  4 Aug 2022 21:46:06 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  4 Aug 2022 21:46:06 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id 3140BE0231; Thu,  4 Aug 2022 23:39:26 +0200 (CEST)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jiang Jian <jiangjian@cdjrlc.com>
+Subject: [PATCH 2/2] s390/dasd: Establish DMA alignment
+Date:   Thu,  4 Aug 2022 23:39:26 +0200
+Message-Id: <20220804213926.3361574-3-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220804213926.3361574-1-sth@linux.ibm.com>
+References: <20220804213926.3361574-1-sth@linux.ibm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCHv2 0/7] dma mapping optimisations
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, hch@lst.de,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kernel Team <Kernel-team@fb.com>
-References: <20220802193633.289796-1-kbusch@fb.com>
- <5f8fc910-8fad-f71a-704b-8017d364d0ed@kernel.dk>
- <YuvzqbcXwGUMtKmm@kbusch-mbp.dhcp.thefacebook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YuvzqbcXwGUMtKmm@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9P9NxUfFw0wqAvUavo1AUaH1oGgT9xVt
+X-Proofpoint-ORIG-GUID: 9P9NxUfFw0wqAvUavo1AUaH1oGgT9xVt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-04_03,2022-08-04_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ spamscore=0 clxscore=1011 mlxscore=0 phishscore=0 mlxlogscore=999
+ lowpriorityscore=0 priorityscore=1501 adultscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2206140000 definitions=main-2208040090
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/4/22 10:28 AM, Keith Busch wrote:
-> On Wed, Aug 03, 2022 at 02:52:11PM -0600, Jens Axboe wrote:
->> I ran this on my test box to see how we'd do. First the bad news:
->> smaller block size IO seems slower. I ran with QD=8 and used 24 drives,
->> and using t/io_uring (with registered buffers, polled, etc) and a 512b
->> block size I get:
->>
->> IOPS=44.36M, BW=21.66GiB/s, IOS/call=1/1
->> IOPS=44.64M, BW=21.80GiB/s, IOS/call=2/2
->> IOPS=44.69M, BW=21.82GiB/s, IOS/call=1/1
->> IOPS=44.55M, BW=21.75GiB/s, IOS/call=2/2
->> IOPS=44.93M, BW=21.94GiB/s, IOS/call=1/1
->> IOPS=44.79M, BW=21.87GiB/s, IOS/call=1/2
->>
->> and adding -D1 I get:
->>
->> IOPS=43.74M, BW=21.36GiB/s, IOS/call=1/1
->> IOPS=44.04M, BW=21.50GiB/s, IOS/call=1/1
->> IOPS=43.63M, BW=21.30GiB/s, IOS/call=2/2
->> IOPS=43.67M, BW=21.32GiB/s, IOS/call=1/1
->> IOPS=43.57M, BW=21.28GiB/s, IOS/call=1/2
->> IOPS=43.53M, BW=21.25GiB/s, IOS/call=2/1
->>
->> which does regress that workload.
-> 
-> Bummer, I would expect -D1 to be no worse. My test isn't nearly as consistent
-> as yours, so I'm having some trouble measuring. I'm only coming with a few
-> micro-optimizations that might help. A diff is below on top of this series. I
-> also created a branch with everything folded in here:
+From: Eric Farman <farman@linux.ibm.com>
 
-That seemed to do the trick! Don't pay any attention to the numbers
-being slightly different than before for -D0, it's a slightly different
-kernel. But same test, -d8 -s2 -c2, polled:
+linux-next commit bf8d08532bc1 ("iomap: add support for dma aligned
+direct-io") changes the alignment requirement to come from the block
+device rather than the block size, and the default alignment
+requirement is 512-byte boundaries. Since DASD I/O has page
+alignments for IDAW/TIDAW requests, let's override this value to
+restore the expected behavior.
 
--D0 -B1
-IOPS=45.39M, BW=22.16GiB/s, IOS/call=1/1
-IOPS=46.06M, BW=22.49GiB/s, IOS/call=2/1
-IOPS=45.70M, BW=22.31GiB/s, IOS/call=1/1
-IOPS=45.71M, BW=22.32GiB/s, IOS/call=2/2
-IOPS=45.83M, BW=22.38GiB/s, IOS/call=1/1
-IOPS=45.64M, BW=22.29GiB/s, IOS/call=2/2
+Make this change for both ECKD and DIAG disciplines, as they both
+would fall into this category. Leave FBA alone, since it is always
+comprised of 512-byte blocks.
 
--D1 -B1
-IOPS=45.94M, BW=22.43GiB/s, IOS/call=1/1
-IOPS=46.08M, BW=22.50GiB/s, IOS/call=1/1
-IOPS=46.27M, BW=22.59GiB/s, IOS/call=2/1
-IOPS=45.88M, BW=22.40GiB/s, IOS/call=1/1
-IOPS=46.18M, BW=22.55GiB/s, IOS/call=2/1
-IOPS=46.13M, BW=22.52GiB/s, IOS/call=2/2
-IOPS=46.40M, BW=22.66GiB/s, IOS/call=1/1
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Stefan Haberland <sth@linux.ibm.com>
+Signed-off-by: Stefan Haberland <sth@linux.ibm.com>
+---
+ drivers/s390/block/dasd_diag.c | 1 +
+ drivers/s390/block/dasd_eckd.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-which is a smidge higher, and definitely not regressing now.
-
+diff --git a/drivers/s390/block/dasd_diag.c b/drivers/s390/block/dasd_diag.c
+index e9edf3b6ed7c..94ee59864971 100644
+--- a/drivers/s390/block/dasd_diag.c
++++ b/drivers/s390/block/dasd_diag.c
+@@ -639,6 +639,7 @@ static void dasd_diag_setup_blk_queue(struct dasd_block *block)
+ 	/* With page sized segments each segment can be translated into one idaw/tidaw */
+ 	blk_queue_max_segment_size(q, PAGE_SIZE);
+ 	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
++	blk_queue_dma_alignment(q, PAGE_SIZE - 1);
+ }
+ 
+ static int dasd_diag_pe_handler(struct dasd_device *device,
+diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
+index 836838f7d686..3cc93e2e4e15 100644
+--- a/drivers/s390/block/dasd_eckd.c
++++ b/drivers/s390/block/dasd_eckd.c
+@@ -6626,6 +6626,7 @@ static void dasd_eckd_setup_blk_queue(struct dasd_block *block)
+ 	/* With page sized segments each segment can be translated into one idaw/tidaw */
+ 	blk_queue_max_segment_size(q, PAGE_SIZE);
+ 	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
++	blk_queue_dma_alignment(q, PAGE_SIZE - 1);
+ }
+ 
+ static struct ccw_driver dasd_eckd_driver = {
 -- 
-Jens Axboe
+2.34.1
 
