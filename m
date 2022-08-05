@@ -2,253 +2,335 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A7CC3F6B0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 21:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD9FC00140
+	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 22:55:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241253AbiHEVXr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Aug 2022 17:23:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49658 "EHLO
+        id S241291AbiHEWzd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Aug 2022 18:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240275AbiHEVXp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Aug 2022 17:23:45 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8679567C8D;
-        Fri,  5 Aug 2022 14:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659734623; x=1691270623;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=R+cx4naRn4EL5oWfO7JYH/qaE90sSoLCRakX+2FvYew=;
-  b=TJa3Xc6DenWHoCgnYo8p5ZRwe/JKEhnvwS5xqu3FrNBniSXtg/PrD8HW
-   mKYOdGpEXnila/TWgHURBaJPWX755ITTCpq9/Mdv/UEyWM03sTPFR52t5
-   iLPE+QlYt1+p/yH+i1Q9DBkHG15gHudmGsatAPFq65in9HltrGZO39PaI
-   Jsm4dG+hFt16D+kQZrOcDF3WfVKMpIrN3U3tog1GfM23/toNwdqt1Tt6d
-   XS/U+rLfvTVi1GaunI/+4BpcztQJVFvndC+Wf3fOdiiwgC3pbUIOL8hd1
-   sqzfk/SXXhdjA28inSNfhQor6B8G8NxRC4OMBJnHIQjOvpiQBRA+aGdlb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10430"; a="291519747"
-X-IronPort-AV: E=Sophos;i="5.93,216,1654585200"; 
-   d="scan'208";a="291519747"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 14:23:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,216,1654585200"; 
-   d="scan'208";a="603728097"
-Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 05 Aug 2022 14:23:33 -0700
-Received: from kbuild by e0eace57cfef with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oK4n6-000JkF-2P;
-        Fri, 05 Aug 2022 21:23:32 +0000
-Date:   Sat, 6 Aug 2022 05:22:47 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hch@lst.de
-Cc:     kbuild-all@lists.01.org, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        ming.lei@redhat.com, joshiiitr@gmail.com, gost.dev@samsung.com,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH 4/4] nvme: wire up async polling for io passthrough
- commands
-Message-ID: <202208060547.zSVYtFTN-lkp@intel.com>
-References: <20220805154226.155008-5-joshi.k@samsung.com>
+        with ESMTP id S241225AbiHEWzb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Aug 2022 18:55:31 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8803827FDE
+        for <linux-block@vger.kernel.org>; Fri,  5 Aug 2022 15:55:29 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id q30so4662052wra.11
+        for <linux-block@vger.kernel.org>; Fri, 05 Aug 2022 15:55:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=2GO+fYPYYdhr4xOWl2m/4iKEwI+55oeosrj++f5v5Qc=;
+        b=X9/1dkLRVIWfwlJWSjtJBPMHJfnB4HA1qJeaQh12tEdtJ1KFs39yjZC1PgFr0eirMM
+         g+26wmr9ZUUCGUTehoXC/4i+1P0kSgL0+ff6EkNwv6dHsj2BOKIcJJ03dyyyw4xZtZIZ
+         xDSx5uC+b3N0kzKiK2lYz43Aul9JfcUR9ZAbauuufyjrbLu4eKfYasX/vI4GIp6B6AzZ
+         E9qfUPdQqMmR9jKIbdbcBq25aoSJi+GG5X6cLBVWhhSW3gHXg2ePNExU1FA58cKYkYL0
+         ehGicEn/vBhZcJ6x5alPDtqANOFRPSNaOmpdzXk0GnhNMic5StBTcjjEoiHM+4rj0ey6
+         iN1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=2GO+fYPYYdhr4xOWl2m/4iKEwI+55oeosrj++f5v5Qc=;
+        b=pFVbEwOzHbGZBPCTCnVvE6hT0FnKygdHxVM3X7pDT37nDcV/PgsP3vHWSbGLJHca9K
+         5Pv7caDMM3T/nvCvMQngtClO8gGfZqPQNxW9SnFu87E2v8yOicDxceQd/5wLlrZQBF8i
+         f8GCjP6+wfwzBH6zndRbrY31w25gBeXAm+U8+VzrY2+jny1qjYBuX1W1ZKb3YmujEmb7
+         +dMuvjMzFJj3iUWMcATURyMZjaFxAqOO+OQtdmsyy4FgizCPvw1DbFOAelEWL8xXcOxm
+         4Af2ikk10PEmP4QJibuDkENs67bCnWQJuEltpWt8qXTdD7zdsXvZma5ewGS9OTuqu4bJ
+         elsg==
+X-Gm-Message-State: ACgBeo2nvQptUwY1BOR0XwyHSXOsrQOhysTgIFPOuXthcLdkHLeAxcxi
+        nB8wTDReo58GDOv1IsS9p8TLhSq62WE=
+X-Google-Smtp-Source: AA6agR53N/iQ5v2PRv8PnppAyHZO4JZXFl5rc6wTLIUssQnm4HcJqm8JYUY+qSgdLU9iwhROC9EhMA==
+X-Received: by 2002:a05:6000:1210:b0:21f:10cc:4e61 with SMTP id e16-20020a056000121000b0021f10cc4e61mr5583778wrx.497.1659740127174;
+        Fri, 05 Aug 2022 15:55:27 -0700 (PDT)
+Received: from localhost ([2a01:4b00:f41a:3600:df86:cebc:8870:2184])
+        by smtp.gmail.com with ESMTPSA id i3-20020a05600c290300b003a320e6f011sm2805889wmd.1.2022.08.05.15.55.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Aug 2022 15:55:26 -0700 (PDT)
+From:   luca.boccassi@gmail.com
+To:     linux-block@vger.kernel.org
+Cc:     hch@infradead.org, sbauer@plzdonthack.me,
+        Jonathan.Derrick@solidigmtechnology.com,
+        dougmill@linux.vnet.ibm.com, brauner@kernel.org,
+        gmazyland@gmail.com
+Subject: [PATCH v4] block: sed-opal: Add ioctl to return device status
+Date:   Fri,  5 Aug 2022 23:55:22 +0100
+Message-Id: <20220805225522.124199-1-luca.boccassi@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220805154226.155008-5-joshi.k@samsung.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Kanchan,
+From: "dougmill@linux.vnet.ibm.com" <dougmill@linux.vnet.ibm.com>
 
-Thank you for the patch! Yet something to improve:
+Provide a mechanism to retrieve basic status information about
+the device, including the "supported" flag indicating whether
+SED-OPAL is supported. The information returned is from the various
+feature descriptors received during the discovery0 step, and so
+this ioctl does nothing more than perform the discovery0 step
+and then save the information received. See "struct opal_status"
+and OPAL_FL_* bits for the status information currently returned.
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on linus/master]
-[cannot apply to hch-configfs/for-next v5.19]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Douglas Miller <dougmill@linux.vnet.ibm.com>
+Tested-by: Luca Boccassi <bluca@debian.org>
+---
+v2: https://patchwork.kernel.org/project/linux-block/patch/612795b5.tj7FMS9wzchsMzrK%25dougmill@linux.vnet.ibm.com/
+v3: resend on request, after rebasing and testing on my machine
+    https://patchwork.kernel.org/project/linux-block/patch/20220125215248.6489-1-luca.boccassi@gmail.com/
+v4: it's been more than 7 months and no alternative approach has appeared.
+    we really need to be able to identify and query the status of a sed-opal
+    device, so rebased and resending.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kanchan-Joshi/fs-add-file_operations-uring_cmd_iopoll/20220806-004320
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20220806/202208060547.zSVYtFTN-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/0964795577fbf09d8b315269504b5e87b5ac492b
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Kanchan-Joshi/fs-add-file_operations-uring_cmd_iopoll/20220806-004320
-        git checkout 0964795577fbf09d8b315269504b5e87b5ac492b
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+ block/opal_proto.h            |  5 ++
+ block/sed-opal.c              | 90 ++++++++++++++++++++++++++++++-----
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h | 12 +++++
+ 4 files changed, 96 insertions(+), 12 deletions(-)
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:
-   drivers/nvme/host/ioctl.c: In function 'nvme_ns_head_chr_uring_cmd_iopoll':
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
-     334 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
-     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |         ^~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |                            ^~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
-      49 |         compiletime_assert_rwonce_type(x);                              \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
-     334 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
-     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |         ^~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |                            ^~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
-      49 |         compiletime_assert_rwonce_type(x);                              \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
-     334 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
-     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |         ^~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |                            ^~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
-      49 |         compiletime_assert_rwonce_type(x);                              \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
-     334 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
-     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |         ^~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |                            ^~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
-      49 |         compiletime_assert_rwonce_type(x);                              \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
-     334 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
-     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
-      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
-         |         ^~~~~~~~~~~~~~~~~~
-   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
-      49 |         compiletime_assert_rwonce_type(x);                              \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/linux/compiler_types.h:310:27: note: in definition of macro '__unqual_scalar_typeof'
-     310 |                 _Generic((x),                                           \
-         |                           ^
-   include/asm-generic/rwonce.h:50:9: note: in expansion of macro '__READ_ONCE'
-      50 |         __READ_ONCE(x);                                                 \
-         |         ^~~~~~~~~~~
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
-   In file included from ./arch/x86/include/generated/asm/rwonce.h:1,
-                    from include/linux/compiler.h:248,
-                    from include/linux/ptrace.h:5,
-                    from drivers/nvme/host/ioctl.c:6:
->> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                                       ^~
-   include/asm-generic/rwonce.h:44:73: note: in definition of macro '__READ_ONCE'
-      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
-         |                                                                         ^
-   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
-     737 |                 bio = READ_ONCE(ioucmd->private);
-         |                       ^~~~~~~~~
-
-
-vim +737 drivers/nvme/host/ioctl.c
-
-   724	
-   725	int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd)
-   726	{
-   727		struct cdev *cdev = file_inode(ioucmd->file)->i_cdev;
-   728		struct nvme_ns_head *head = container_of(cdev, struct nvme_ns_head, cdev);
-   729		int srcu_idx = srcu_read_lock(&head->srcu);
-   730		struct nvme_ns *ns = nvme_find_path(head);
-   731		struct bio *bio;
-   732		int ret = 0;
-   733		struct request_queue *q;
-   734	
-   735		if (ns) {
-   736			rcu_read_lock();
- > 737			bio = READ_ONCE(ioucmd->private);
-   738			q = ns->queue;
-   739			if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio
-   740					&& bio->bi_bdev)
-   741				ret = bio_poll(bio, 0, 0);
-   742			rcu_read_unlock();
-   743		}
-   744		srcu_read_unlock(&head->srcu, srcu_idx);
-   745		return ret;
-   746	}
-   747	#endif /* CONFIG_NVME_MULTIPATH */
-   748	
-
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index b486b3ec7dc4..7152aa1f1a49 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -39,7 +39,12 @@ enum opal_response_token {
+ #define FIRST_TPER_SESSION_NUM	4096
+ 
+ #define TPER_SYNC_SUPPORTED 0x01
++/* FC_LOCKING features */
++#define LOCKING_SUPPORTED_MASK 0x01
++#define LOCKING_ENABLED_MASK 0x02
++#define LOCKED_MASK 0x04
+ #define MBR_ENABLED_MASK 0x10
++#define MBR_DONE_MASK 0x20
+ 
+ #define TINY_ATOM_DATA_MASK 0x3F
+ #define TINY_ATOM_SIGNED 0x40
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 9700197000f2..2e86a5c37eb6 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -74,8 +74,7 @@ struct parsed_resp {
+ };
+ 
+ struct opal_dev {
+-	bool supported;
+-	bool mbr_enabled;
++	u32 flags;
+ 
+ 	void *data;
+ 	sec_send_recv *send_recv;
+@@ -280,6 +279,30 @@ static bool check_tper(const void *data)
+ 	return true;
+ }
+ 
++static bool check_lcksuppt(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKING_SUPPORTED_MASK);
++}
++
++static bool check_lckenabled(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKING_ENABLED_MASK);
++}
++
++static bool check_locked(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKED_MASK);
++}
++
+ static bool check_mbrenabled(const void *data)
+ {
+ 	const struct d0_locking_features *lfeat = data;
+@@ -288,6 +311,14 @@ static bool check_mbrenabled(const void *data)
+ 	return !!(sup_feat & MBR_ENABLED_MASK);
+ }
+ 
++static bool check_mbrdone(const void *data)
++{
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & MBR_DONE_MASK);
++}
++
+ static bool check_sum(const void *data)
+ {
+ 	const struct d0_single_user_mode *sum = data;
+@@ -435,7 +466,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 	u32 hlen = be32_to_cpu(hdr->length);
+ 
+ 	print_buffer(dev->resp, hlen);
+-	dev->mbr_enabled = false;
++	dev->flags &= OPAL_FL_SUPPORTED;
+ 
+ 	if (hlen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
+ 		pr_debug("Discovery length overflows buffer (%zu+%u)/%u\n",
+@@ -461,7 +492,16 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 			check_geometry(dev, body);
+ 			break;
+ 		case FC_LOCKING:
+-			dev->mbr_enabled = check_mbrenabled(body->features);
++			if (check_lcksuppt(body->features))
++				dev->flags |= OPAL_FL_LOCKING_SUPPORTED;
++			if (check_lckenabled(body->features))
++				dev->flags |= OPAL_FL_LOCKING_ENABLED;
++			if (check_locked(body->features))
++				dev->flags |= OPAL_FL_LOCKED;
++			if (check_mbrenabled(body->features))
++				dev->flags |= OPAL_FL_MBR_ENABLED;
++			if (check_mbrdone(body->features))
++				dev->flags |= OPAL_FL_MBR_DONE;
+ 			break;
+ 		case FC_ENTERPRISE:
+ 		case FC_DATASTORE:
+@@ -2109,7 +2149,8 @@ static int check_opal_support(struct opal_dev *dev)
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+ 	ret = opal_discovery0_step(dev);
+-	dev->supported = !ret;
++	if (!ret)
++		dev->flags |= OPAL_FL_SUPPORTED;
+ 	mutex_unlock(&dev->dev_lock);
+ 
+ 	return ret;
+@@ -2148,6 +2189,7 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
+ 
+ 	INIT_LIST_HEAD(&dev->unlk_lst);
+ 	mutex_init(&dev->dev_lock);
++	dev->flags = 0;
+ 	dev->data = data;
+ 	dev->send_recv = send_recv;
+ 	if (check_opal_support(dev) != 0) {
+@@ -2528,7 +2570,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ 	if (!dev)
+ 		return false;
+ 
+-	if (!dev->supported)
++	if (!(dev->flags & OPAL_FL_SUPPORTED))
+ 		return false;
+ 
+ 	mutex_lock(&dev->dev_lock);
+@@ -2546,7 +2588,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ 			was_failure = true;
+ 		}
+ 
+-		if (dev->mbr_enabled) {
++		if (dev->flags & OPAL_FL_MBR_ENABLED) {
+ 			ret = __opal_set_mbr_done(dev, &suspend->unlk.session.opal_key);
+ 			if (ret)
+ 				pr_debug("Failed to set MBR Done in S3 resume\n");
+@@ -2620,6 +2662,24 @@ static int opal_generic_read_write_table(struct opal_dev *dev,
+ 	return ret;
+ }
+ 
++static int opal_get_status(struct opal_dev *dev, void __user *data)
++{
++	struct opal_status sts = {0};
++
++	/*
++	 * check_opal_support() error is not fatal,
++	 * !dev->supported is a valid condition
++	 */
++	if (!check_opal_support(dev)) {
++		sts.flags = dev->flags;
++	}
++	if (copy_to_user(data, &sts, sizeof(sts))) {
++		pr_debug("Error copying status to userspace\n");
++		return -EFAULT;
++	}
++	return 0;
++}
++
+ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ {
+ 	void *p;
+@@ -2629,12 +2689,14 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 		return -EACCES;
+ 	if (!dev)
+ 		return -ENOTSUPP;
+-	if (!dev->supported)
++	if (!(dev->flags & OPAL_FL_SUPPORTED))
+ 		return -ENOTSUPP;
+ 
+-	p = memdup_user(arg, _IOC_SIZE(cmd));
+-	if (IS_ERR(p))
+-		return PTR_ERR(p);
++	if (cmd & IOC_IN) {
++		p = memdup_user(arg, _IOC_SIZE(cmd));
++		if (IS_ERR(p))
++			return PTR_ERR(p);
++	}
+ 
+ 	switch (cmd) {
+ 	case IOC_OPAL_SAVE:
+@@ -2685,11 +2747,15 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_GENERIC_TABLE_RW:
+ 		ret = opal_generic_read_write_table(dev, p);
+ 		break;
++	case IOC_OPAL_GET_STATUS:
++		ret = opal_get_status(dev, arg);
++		break;
+ 	default:
+ 		break;
+ 	}
+ 
+-	kfree(p);
++	if (cmd & IOC_IN)
++		kfree(p);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(sed_ioctl);
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index 1ac0d712a9c3..6f837bb6c715 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -43,6 +43,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_MBR_DONE:
+ 	case IOC_OPAL_WRITE_SHADOW_MBR:
+ 	case IOC_OPAL_GENERIC_TABLE_RW:
++	case IOC_OPAL_GET_STATUS:
+ 		return true;
+ 	}
+ 	return false;
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index 6f5af1a84213..c55bc79e3128 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -132,6 +132,17 @@ struct opal_read_write_table {
+ 	__u64 priv;
+ };
+ 
++#define OPAL_FL_SUPPORTED		0x00000001
++#define OPAL_FL_LOCKING_SUPPORTED	0x00000002
++#define OPAL_FL_LOCKING_ENABLED		0x00000004
++#define OPAL_FL_LOCKED			0x00000008
++#define OPAL_FL_MBR_ENABLED		0x00000010
++#define OPAL_FL_MBR_DONE		0x00000020
++
++struct opal_status {
++	__u32 flags;
++};
++
+ #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
+ #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
+ #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
+@@ -148,5 +159,6 @@ struct opal_read_write_table {
+ #define IOC_OPAL_MBR_DONE           _IOW('p', 233, struct opal_mbr_done)
+ #define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 234, struct opal_shadow_mbr)
+ #define IOC_OPAL_GENERIC_TABLE_RW   _IOW('p', 235, struct opal_read_write_table)
++#define IOC_OPAL_GET_STATUS         _IOR('p', 236, struct opal_status)
+ 
+ #endif /* _UAPI_SED_OPAL_H */
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.35.1
+
