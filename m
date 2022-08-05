@@ -2,247 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F62C25B06
-	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 11:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93774C00140
+	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 15:55:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237897AbiHELUc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Aug 2022 07:20:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46214 "EHLO
+        id S241247AbiHEPzL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Aug 2022 11:55:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiHELU3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Aug 2022 07:20:29 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F60B488;
-        Fri,  5 Aug 2022 04:20:26 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Lzjlp6t5vzKGGR;
-        Fri,  5 Aug 2022 19:19:02 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP3 (Coremail) with SMTP id _Ch0CgDHRzH0_OxiZWTmAA--.5716S3;
-        Fri, 05 Aug 2022 19:20:21 +0800 (CST)
-Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Paolo VALENTE <paolo.valente@unimore.it>
-Cc:     Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220610021701.2347602-1-yukuai3@huawei.com>
- <20220610021701.2347602-4-yukuai3@huawei.com>
- <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
- <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
- <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
- <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
- <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <57689e84-e47d-29e2-327e-b8f172329681@huaweicloud.com>
-Date:   Fri, 5 Aug 2022 19:20:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S241271AbiHEPyv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Aug 2022 11:54:51 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6880874E34
+        for <linux-block@vger.kernel.org>; Fri,  5 Aug 2022 08:53:20 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220805155302epoutp03df356b5815404b3d5f93219e20759085~Ifc0zdWaq1815418154epoutp03Y
+        for <linux-block@vger.kernel.org>; Fri,  5 Aug 2022 15:53:02 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220805155302epoutp03df356b5815404b3d5f93219e20759085~Ifc0zdWaq1815418154epoutp03Y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1659714783;
+        bh=lVh3MRQWInchqFd9gbvHencVUc4hQ2iwy25Ef8ubq44=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=JtJoiMXqv/0PzUWjr+XI74zA8TmICWs0Oc6i0deXHqlydIQ9E05GwDbqRcFtz1mHo
+         D4hP9itOm340a+Oe9ae/+Q7+msTeWDIbLm/xuaU6krtChcMZShQT1ECivNE5V+NCAE
+         VKuijL9P7Ygqlr5uoSDii2ur4ks7SLuL/9UcTkwM=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20220805155302epcas5p46165492d2c0691f862f1b0e220e999bb~Ifc0JOsHe2142821428epcas5p4D;
+        Fri,  5 Aug 2022 15:53:02 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.180]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4Lzqqw3lYtz4x9Pq; Fri,  5 Aug
+        2022 15:53:00 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        50.4A.09662.CDC3DE26; Sat,  6 Aug 2022 00:53:00 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220805155300epcas5p1b98722e20990d0095238964e2be9db34~IfcyNoFxP2221822218epcas5p1i;
+        Fri,  5 Aug 2022 15:53:00 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220805155300epsmtrp2fccc82510b2b2ec3bd9879b9cbb86fcb~IfcyMxIIE2288122881epsmtrp2v;
+        Fri,  5 Aug 2022 15:53:00 +0000 (GMT)
+X-AuditID: b6c32a49-885ff700000025be-4f-62ed3cdcec20
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F2.B9.08905.CDC3DE26; Sat,  6 Aug 2022 00:53:00 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220805155258epsmtip240eb84dafda4d21247400ad62ff313e0~Ifcw3OxUL1210312103epsmtip2Y;
+        Fri,  5 Aug 2022 15:52:58 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     axboe@kernel.dk, hch@lst.de
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, ming.lei@redhat.com,
+        joshiiitr@gmail.com, gost.dev@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH 0/4] iopoll support for io_uring/nvme passthrough
+Date:   Fri,  5 Aug 2022 21:12:22 +0530
+Message-Id: <20220805154226.155008-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _Ch0CgDHRzH0_OxiZWTmAA--.5716S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxtrW3XrWruFy3WryDGFW8Crg_yoWxGrWUp3
-        yfKa17Ar4UXr1ftr1jq3WUXrySqryfJry8Wr1DJr1SyrnFyFn2qF12qw409Fy8ZrWkJr12
-        qr1UW3srZw1UtFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpnk+LIzCtJLcpLzFFi42LZdlhTU/eOzdskg45bMhar7/azWdw8sJPJ
+        YuXqo0wW71rPsVgc/f+WzeL828NMFntvaVvMX/aU3eLQ5GYmB06PnbPusntcPlvqsXlJvcfu
+        mw1sHu/3XWXz6NuyitHj8ya5APaobJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtz
+        JYW8xNxUWyUXnwBdt8wcoLuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQUmBXrF
+        ibnFpXnpenmpJVaGBgZGpkCFCdkZp3deYCk4KVKxd8Ee9gbG+/xdjJwcEgImEpufbmMDsYUE
+        djNKbJkR3MXIBWR/YpRov/aCBcL5xijRs3s6M0zHinfnoBJ7GSXeHG9gg3A+M0ocmNMC5HBw
+        sAloSlyYXArSICIgL/Hl9lqwBmaBQ4wSz5e8ApskLOAoMWv/KTCbRUBVYtvf/SwgNq+ApcTm
+        xbPZILbJS8y89J0dIi4ocXLmE7AaZqB489bZzCBDJQTesktMurOCEaLBRWJV9wdWCFtY4tXx
+        LewQtpTE53d7oYYmS1yaeY4Jwi6ReLznIJRtL9F6qp8Z5AFmoAfW79KH2MUn0fv7CRNIWEKA
+        V6KjTQiiWlHi3qSnUJvEJR7OWAJle0jcW9vEDgnSWInJ73+xT2CUm4Xkg1lIPpiFsGwBI/Mq
+        RsnUguLc9NRi0wLDvNRyeFwm5+duYgSnSC3PHYx3H3zQO8TIxMEIDE4OZiUR3p87XicJ8aYk
+        VlalFuXHF5XmpBYfYjQFButEZinR5Hxgks4riTc0sTQwMTMzM7E0NjNUEuf1uropSUggPbEk
+        NTs1tSC1CKaPiYNTqoGJb2GD70+hrRMDL9lEXmm8IbJ9aewdMVG+XT6NHQ2KQtUv2+SYy6Je
+        ZikcCli9d+eC8lLrNyeqN/7tMpOWeCGzO0d/yoOu9Jfb8lMaT02MdOXMfO3If4+fK8pPezNv
+        btntLTwbv0/7p686c1LzaTaTv8uvOG5Mfuyqc15tyUf5LvtXPQfV3NYuXefkxvmFzfH5zwCX
+        fr2Jx9TFzJsVJ+t/Szx942x9/oY9FYbh147mtP3Uyl6yO1nnkYW12GW1xAqTB5+Nrwt0lts/
+        ePFE/G/m+4stZyu2znrfaPVOq2kWX0Kautb6KXmLrT+2e18PfXP80sk962rLW78dZ14s91jV
+        8MdO5Rnnzm6IqnkW9T9TiaU4I9FQi7moOBEAWWhcdBoEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrALMWRmVeSWpSXmKPExsWy7bCSvO4dm7dJBg1trBar7/azWdw8sJPJ
+        YuXqo0wW71rPsVgc/f+WzeL828NMFntvaVvMX/aU3eLQ5GYmB06PnbPusntcPlvqsXlJvcfu
+        mw1sHu/3XWXz6NuyitHj8ya5APYoLpuU1JzMstQifbsErozTOy+wFJwUqdi7YA97A+N9/i5G
+        Tg4JAROJFe/OsXQxcnEICexmlFj+dBUrREJcovnaD3YIW1hi5b/n7BBFHxkl1kz4wtjFyMHB
+        JqApcWFyKUiNiICixMaPTYwgNcwCpxgl3h99wwKSEBZwlJi1/xQziM0ioCqx7e9+sDivgKXE
+        5sWz2SAWyEvMvPSdHSIuKHFy5hOwGmagePPW2cwTGPlmIUnNQpJawMi0ilEytaA4Nz232LDA
+        MC+1XK84Mbe4NC9dLzk/dxMjOJC1NHcwbl/1Qe8QIxMH4yFGCQ5mJRHenzteJwnxpiRWVqUW
+        5ccXleakFh9ilOZgURLnvdB1Ml5IID2xJDU7NbUgtQgmy8TBKdXA1K97t2TrtISe/O0rJnZ+
+        0A7ZE7M1Ypvrvta9jRPKf+uYTulQS5ptYOPC9URqz6mFJ22nGEb0iZitu/JM9fgyLf0UG4un
+        07rOTVvf8vMRu6X3iYUtEw5fm/ikWbJB88iUxAT36R+dnqhre++739ITyz67M3txa97FF1N3
+        c9e+2Pxt4bLfojY3/fZ1RC1zrndS3Sy3i1Vs7kKO0Jop1/9Fx+SpHqm4pnl1b6QSX8LPdC/N
+        FxtjNqs2zXfLFlv6mUf+WvKTj/3eL/19JWf87f8j9mhupeqtkgU151uZZxzesT/5senb0w+v
+        tj8qfm/bVMbJ3q/zdZaoJVtmANvFcycTfJR4rNxqa4X87z+3Tb2poMRSnJFoqMVcVJwIAO52
+        zfHTAgAA
+X-CMS-MailID: 20220805155300epcas5p1b98722e20990d0095238964e2be9db34
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
 X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220805155300epcas5p1b98722e20990d0095238964e2be9db34
+References: <CGME20220805155300epcas5p1b98722e20990d0095238964e2be9db34@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
-在 2022/07/27 20:11, Yu Kuai 写道:
-> Hi, Paolo
-> 
-> Are you still interested in this patchset?
+Series enables async polling on io_uring command, and nvme passthrough
+(for io-commands) is wired up to leverage that.
 
-Friendly ping...
-> 
-> 在 2022/07/20 19:38, Yu Kuai 写道:
->> Hi
->>
->> 在 2022/07/20 19:24, Paolo VALENTE 写道:
->>>
->>>
->>>> Il giorno 12 lug 2022, alle ore 15:30, Yu Kuai 
->>>> <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
->>>>
->>>> Hi!
->>>>
->>>> I'm copying my reply with new mail address, because Paolo seems
->>>> didn't receive my reply.
->>>>
->>>> 在 2022/06/23 23:32, Paolo Valente 写道:
->>>>> Sorry for the delay.
->>>>>> Il giorno 10 giu 2022, alle ore 04:17, Yu Kuai <yukuai3@huawei.com 
->>>>>> <mailto:yukuai3@huawei.com>> ha scritto:
->>>>>>
->>>>>> Currently, bfq can't handle sync io concurrently as long as they
->>>>>> are not issued from root group. This is because
->>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>>>> bfq_asymmetric_scenario().
->>>>>>
->>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>>>>
->>>>>> Before this patch:
->>>>>> 1) root group will never be counted.
->>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the 
->>>>>> requests.
->>>>>>
->>>>>> After this patch:
->>>>>> 1) root group is counted.
->>>>>> 2) Count if bfqg have pending requests.
->>>>>> 3) Don't count if bfqg complete all the requests.
->>>>>>
->>>>>> With this change, the occasion that only one group is activated 
->>>>>> can be
->>>>>> detected, and next patch will support concurrent sync io in the
->>>>>> occasion.
->>>>>>
->>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com 
->>>>>> <mailto:yukuai3@huawei.com>>
->>>>>> Reviewed-by: Jan Kara <jack@suse.cz <mailto:jack@suse.cz>>
->>>>>> ---
->>>>>> block/bfq-iosched.c | 42 ------------------------------------------
->>>>>> block/bfq-iosched.h | 18 +++++++++---------
->>>>>> block/bfq-wf2q.c    | 19 ++++---------------
->>>>>> 3 files changed, 13 insertions(+), 66 deletions(-)
->>>>>>
->>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>>>>> index 0ec21018daba..03b04892440c 100644
->>>>>> --- a/block/bfq-iosched.c
->>>>>> +++ b/block/bfq-iosched.c
->>>>>> @@ -970,48 +970,6 @@ void __bfq_weights_tree_remove(struct 
->>>>>> bfq_data *bfqd,
->>>>>> void bfq_weights_tree_remove(struct bfq_data *bfqd,
->>>>>>     struct bfq_queue *bfqq)
->>>>>> {
->>>>>> -struct bfq_entity *entity = bfqq->entity.parent;
->>>>>> -
->>>>>> -for_each_entity(entity) {
->>>>>> -struct bfq_sched_data *sd = entity->my_sched_data;
->>>>>> -
->>>>>> -if (sd->next_in_service || sd->in_service_entity) {
->>>>>> -/*
->>>>>> -* entity is still active, because either
->>>>>> -* next_in_service or in_service_entity is not
->>>>>> -* NULL (see the comments on the definition of
->>>>>> -* next_in_service for details on why
->>>>>> -* in_service_entity must be checked too).
->>>>>> -*
->>>>>> -* As a consequence, its parent entities are
->>>>>> -* active as well, and thus this loop must
->>>>>> -* stop here.
->>>>>> -*/
->>>>>> -break;
->>>>>> -}
->>>>>> -
->>>>>> -/*
->>>>>> -* The decrement of num_groups_with_pending_reqs is
->>>>>> -* not performed immediately upon the deactivation of
->>>>>> -* entity, but it is delayed to when it also happens
->>>>>> -* that the first leaf descendant bfqq of entity gets
->>>>>> -* all its pending requests completed. The following
->>>>>> -* instructions perform this delayed decrement, if
->>>>>> -* needed. See the comments on
->>>>>> -* num_groups_with_pending_reqs for details.
->>>>>> -*/
->>>>>> -if (entity->in_groups_with_pending_reqs) {
->>>>>> -entity->in_groups_with_pending_reqs = false;
->>>>>> -bfqd->num_groups_with_pending_reqs--;
->>>>>> -}
->>>>>> -}
->>>>> With this part removed, I'm missing how you handle the following
->>>>> sequence of events:
->>>>> 1.  a queue Q becomes non busy but still has dispatched requests, so
->>>>> it must not be removed from the counter of queues with pending reqs
->>>>> yet
->>>>> 2.  the last request of Q is completed with Q being still idle (non
->>>>> busy).  At this point Q must be removed from the counter.  It seems to
->>>>> me that this case is not handled any longer
->>>> Hi, Paolo
->>>>
->>>> 1) At first, patch 1 support to track if bfqq has pending requests, 
->>>> it's
->>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when the
->>>> first request is inserted to bfqq, and it's cleared when the last
->>>> request is completed(based on weights_tree insertion and removal).
->>>>
->>>
->>> In patch 1 I don't see the flag cleared for the request-completion 
->>> event :(
->>>
->>> The piece of code involved is this:
->>>
->>> static void bfq_completed_request(struct bfq_queue *bfqq, struct 
->>> bfq_data *bfqd)
->>> {
->>> u64 now_ns;
->>> u32 delta_us;
->>>
->>> bfq_update_hw_tag(bfqd);
->>>
->>> bfqd->rq_in_driver[bfqq->actuator_idx]--;
->>> bfqd->tot_rq_in_driver--;
->>> bfqq->dispatched--;
->>>
->>> if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq)) {
->>> /*
->>> * Set budget_timeout (which we overload to store the
->>> * time at which the queue remains with no backlog and
->>> * no outstanding request; used by the weight-raising
->>> * mechanism).
->>> */
->>> bfqq->budget_timeout = jiffies;
->>>
->>> bfq_weights_tree_remove(bfqd, bfqq);
->>> }
->>> ...
->>>
->>> Am I missing something?
->>
->> I add a new api bfq_del_bfqq_in_groups_with_pending_reqs() in patch 1
->> to clear the flag, and it's called both from bfq_del_bfqq_busy() and
->> bfq_completed_request(). I think you may miss the later:
->>
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 0d46cb728bbf..0ec21018daba 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct 
->> bfq_queue *bfqq, struct bfq_data *bfqd)
->>           */
->>          bfqq->budget_timeout = jiffies;
->>
->> +        bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
->>          bfq_weights_tree_remove(bfqd, bfqq);
->>      }
->>
->> Thanks,
->> Kuai
->>>
->>> Thanks,
->>> Paolo
-> 
-> .
-> 
+512b randread performance (KIOP) below:
+
+QD_batch    block    passthru    passthru-poll   block-poll
+1_1          80        81          158            157
+8_2         406       470          680            700
+16_4        620       656          931            920
+128_32      879       1056        1120            1132
+
+Polling is giving the clear win here.
+Upstream fio is used for testing.
+
+passthru command line:
+fio -iodepth=64 -rw=randread -ioengine=io_uring_cmd -bs=512 -numjobs=1
+-runtime=60 -group_reporting -iodepth_batch_submit=16
+-iodepth_batch_complete_min=1 -iodepth_batch_complete_max=16
+-cmd_type=nvme -hipri=0 -filename=/dev/ng1n1 -name=io_uring_cmd_64
+
+block command line:
+fio -direct=1 -iodepth=64 -rw=randread -ioengine=io_uring -bs=512
+-numjobs=1 -runtime=60 -group_reporting -iodepth_batch_submit=16
+-iodepth_batch_complete_min=1 -iodepth_batch_complete_max=16
+-hipri=0 -filename=/dev/nvme1n1 name=io_uring_64
+
+Bit of code  went into non-passthrough path for io_uring (patch 2) but I
+do not see that causing any performance regression.
+peak-perf test showed 2.3M IOPS with or without this series for
+block-io.
+
+io_uring: Running taskset -c 0,12 t/io_uring -b512 -d128 -c32 -s32 -p1
+-F1 -B1 -n2  /dev/nvme0n1
+submitter=0, tid=3089, file=/dev/nvme0n1, node=-1
+submitter=1, tid=3090, file=/dev/nvme0n1, node=-1
+polled=1, fixedbufs=1/0, register_files=1, buffered=0, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=128
+polled=1, fixedbufs=1/0, register_files=1, buffered=0, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=128
+IOPS=2.31M, BW=1126MiB/s, IOS/call=31/31
+IOPS=2.30M, BW=1124MiB/s, IOS/call=32/31
+IOPS=2.30M, BW=1123MiB/s, IOS/call=32/32 
+
+Kanchan Joshi (4):
+  fs: add file_operations->uring_cmd_iopoll
+  io_uring: add iopoll infrastructure for io_uring_cmd
+  block: export blk_rq_is_poll
+  nvme: wire up async polling for io passthrough commands
+
+ block/blk-mq.c                |  3 +-
+ drivers/nvme/host/core.c      |  1 +
+ drivers/nvme/host/ioctl.c     | 73 ++++++++++++++++++++++++++++++++---
+ drivers/nvme/host/multipath.c |  1 +
+ drivers/nvme/host/nvme.h      |  2 +
+ include/linux/blk-mq.h        |  1 +
+ include/linux/fs.h            |  1 +
+ include/linux/io_uring.h      |  8 +++-
+ io_uring/io_uring.c           |  6 +++
+ io_uring/opdef.c              |  1 +
+ io_uring/rw.c                 |  8 +++-
+ io_uring/uring_cmd.c          | 11 +++++-
+ 12 files changed, 105 insertions(+), 11 deletions(-)
+
+-- 
+2.25.1
 
