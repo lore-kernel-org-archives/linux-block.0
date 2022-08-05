@@ -2,150 +2,253 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E62C3F6B0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 19:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A7CC3F6B0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 21:23:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241114AbiHETKz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Aug 2022 15:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33044 "EHLO
+        id S241253AbiHEVXr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Aug 2022 17:23:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237004AbiHETKy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Aug 2022 15:10:54 -0400
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60802D106
-        for <linux-block@vger.kernel.org>; Fri,  5 Aug 2022 12:10:53 -0700 (PDT)
-Received: by mail-qk1-f176.google.com with SMTP id v1so2526772qkg.11
-        for <linux-block@vger.kernel.org>; Fri, 05 Aug 2022 12:10:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=M9gX/uf12sWsOSRDHrNVPPG966ZdqGBVh/pkIWrHveQ=;
-        b=VwE8xOmN8aCY6Wsxz87izWUvMfEO/5Bu+9zEJwu6R4EEOyVEe3gLJX6l1jWI58Qliz
-         /fhYfY2QqwDb21MGI5SK0Gxvqp2NYQsZ4lZvpbq8gWO/RzlgGp+yrEkGcceYZTgcr6J1
-         P4gQhQYHn7HFRS0w9w+pVczN4ZVhzMU68yr8MrUiltww90DmRcQAwfba4CF6DVd322UN
-         aMVBdmnWiWf2RzDP4nuSkdiVcmdKdtYCmMF52kNUvya5Z+iobwmmjLeKrU3K67yr1CwE
-         tYwi5p/K2Uwt8W5i1TQOohicsJHdzzycXaK7ST+8cxbi0Cpx3qqNk2ZwFFyRhaUof4h0
-         5uzg==
-X-Gm-Message-State: ACgBeo1ci4S7ZVrwTYvFzBSXJduy/qcdee7hqrxwJOIqLD5+w6rqZeK0
-        tLMNlILmy1uQzQgzJqBiCzsl
-X-Google-Smtp-Source: AA6agR4BAS+hM+EUim+IVcRyzqXoa4HKnh/Tj6GF+O0Vtd8DD4LdM/Qa2nW6CnG7PB2XkzY2m+F19A==
-X-Received: by 2002:a05:620a:2545:b0:6b6:6773:f278 with SMTP id s5-20020a05620a254500b006b66773f278mr6337214qko.390.1659726652464;
-        Fri, 05 Aug 2022 12:10:52 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id ew7-20020a05622a514700b0031eb65e1cb6sm3124914qtb.5.2022.08.05.12.10.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 12:10:52 -0700 (PDT)
-Date:   Fri, 5 Aug 2022 15:10:50 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Nathan Huckleberry <nhuck@google.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Sami Tolvanen <samitolvanen@google.com>
-Subject: [git pull] Additional device mapper changes for 6.0
-Message-ID: <Yu1rOopN++GWylUi@redhat.com>
-References: <YugiaQ1TO+vT1FQ5@redhat.com>
+        with ESMTP id S240275AbiHEVXp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Aug 2022 17:23:45 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8679567C8D;
+        Fri,  5 Aug 2022 14:23:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659734623; x=1691270623;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=R+cx4naRn4EL5oWfO7JYH/qaE90sSoLCRakX+2FvYew=;
+  b=TJa3Xc6DenWHoCgnYo8p5ZRwe/JKEhnvwS5xqu3FrNBniSXtg/PrD8HW
+   mKYOdGpEXnila/TWgHURBaJPWX755ITTCpq9/Mdv/UEyWM03sTPFR52t5
+   iLPE+QlYt1+p/yH+i1Q9DBkHG15gHudmGsatAPFq65in9HltrGZO39PaI
+   Jsm4dG+hFt16D+kQZrOcDF3WfVKMpIrN3U3tog1GfM23/toNwdqt1Tt6d
+   XS/U+rLfvTVi1GaunI/+4BpcztQJVFvndC+Wf3fOdiiwgC3pbUIOL8hd1
+   sqzfk/SXXhdjA28inSNfhQor6B8G8NxRC4OMBJnHIQjOvpiQBRA+aGdlb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10430"; a="291519747"
+X-IronPort-AV: E=Sophos;i="5.93,216,1654585200"; 
+   d="scan'208";a="291519747"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 14:23:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,216,1654585200"; 
+   d="scan'208";a="603728097"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 05 Aug 2022 14:23:33 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oK4n6-000JkF-2P;
+        Fri, 05 Aug 2022 21:23:32 +0000
+Date:   Sat, 6 Aug 2022 05:22:47 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hch@lst.de
+Cc:     kbuild-all@lists.01.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com, joshiiitr@gmail.com, gost.dev@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH 4/4] nvme: wire up async polling for io passthrough
+ commands
+Message-ID: <202208060547.zSVYtFTN-lkp@intel.com>
+References: <20220805154226.155008-5-joshi.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YugiaQ1TO+vT1FQ5@redhat.com>
+In-Reply-To: <20220805154226.155008-5-joshi.k@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi Kanchan,
 
-In my previous 6.0 pull request I should have forecast the potential
-for sending another one.
+Thank you for the patch! Yet something to improve:
 
-The changes in this pull request add an optional feature to the DM 
-verity target. These changes were proposed for inclussion on dm-devel
-a couple weeks before the merge window opened. I reviewed and worked
-the changes with Nathan and others for about a week. At that time the
-changes still had some clear issues (exposed with the additional
-testing Milan Broz provided in terms of a revised cryptsetup testsuite
-that introduced veritysetup's --use-tasklets). I had to put it aside
-once this merge window opened but Nathan continued to investigate.
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master]
+[cannot apply to hch-configfs/for-next v5.19]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Nathan found and fixed the remaining issues on Tuesday/Wednesday:
-https://listman.redhat.com/archives/dm-devel/2022-August/051766.html 
+url:    https://github.com/intel-lab-lkp/linux/commits/Kanchan-Joshi/fs-add-file_operations-uring_cmd_iopoll/20220806-004320
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: i386-allyesconfig (https://download.01.org/0day-ci/archive/20220806/202208060547.zSVYtFTN-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/0964795577fbf09d8b315269504b5e87b5ac492b
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Kanchan-Joshi/fs-add-file_operations-uring_cmd_iopoll/20220806-004320
+        git checkout 0964795577fbf09d8b315269504b5e87b5ac492b
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-Yesterday I then folded the fixes in, and refined the code a bit
-further in response. The crytpsetup testsuite passes now (both with
-and without the use of veritysetup's --use-tasklets flag).
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-All said: I think it worthwhile to merge these changes for 6.0, rather
-than hold until 6.1, now that we have confidence this _optional_ DM
-verity feature is working as expected. Please be aware there was a
-small linux-next merge fixup needed:
-https://lore.kernel.org/all/20220805125744.475531-1-broonie@kernel.org/T/
+All errors (new ones prefixed by >>):
 
-The following changes since commit 9dd1cd3220eca534f2d47afad7ce85f4c40118d8:
+   In file included from <command-line>:
+   drivers/nvme/host/ioctl.c: In function 'nvme_ns_head_chr_uring_cmd_iopoll':
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
+     334 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
+     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
+     334 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
+     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
+     334 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
+     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
+     334 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
+     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:28: note: in expansion of macro '__native_word'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                            ^~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/linux/compiler_types.h:334:23: note: in definition of macro '__compiletime_assert'
+     334 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler_types.h:354:9: note: in expansion of macro '_compiletime_assert'
+     354 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:36:9: note: in expansion of macro 'compiletime_assert'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/asm-generic/rwonce.h:49:9: note: in expansion of macro 'compiletime_assert_rwonce_type'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/linux/compiler_types.h:310:27: note: in definition of macro '__unqual_scalar_typeof'
+     310 |                 _Generic((x),                                           \
+         |                           ^
+   include/asm-generic/rwonce.h:50:9: note: in expansion of macro '__READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |         ^~~~~~~~~~~
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
+   In file included from ./arch/x86/include/generated/asm/rwonce.h:1,
+                    from include/linux/compiler.h:248,
+                    from include/linux/ptrace.h:5,
+                    from drivers/nvme/host/ioctl.c:6:
+>> drivers/nvme/host/ioctl.c:737:39: error: 'struct io_uring_cmd' has no member named 'private'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                                       ^~
+   include/asm-generic/rwonce.h:44:73: note: in definition of macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   drivers/nvme/host/ioctl.c:737:23: note: in expansion of macro 'READ_ONCE'
+     737 |                 bio = READ_ONCE(ioucmd->private);
+         |                       ^~~~~~~~~
 
-  dm: fix dm-raid crash if md_handle_request() splits bio (2022-07-28 17:36:30 -0400)
 
-are available in the Git repository at:
+vim +737 drivers/nvme/host/ioctl.c
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-changes-2
+   724	
+   725	int nvme_ns_head_chr_uring_cmd_iopoll(struct io_uring_cmd *ioucmd)
+   726	{
+   727		struct cdev *cdev = file_inode(ioucmd->file)->i_cdev;
+   728		struct nvme_ns_head *head = container_of(cdev, struct nvme_ns_head, cdev);
+   729		int srcu_idx = srcu_read_lock(&head->srcu);
+   730		struct nvme_ns *ns = nvme_find_path(head);
+   731		struct bio *bio;
+   732		int ret = 0;
+   733		struct request_queue *q;
+   734	
+   735		if (ns) {
+   736			rcu_read_lock();
+ > 737			bio = READ_ONCE(ioucmd->private);
+   738			q = ns->queue;
+   739			if (test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && bio
+   740					&& bio->bi_bdev)
+   741				ret = bio_poll(bio, 0, 0);
+   742			rcu_read_unlock();
+   743		}
+   744		srcu_read_unlock(&head->srcu, srcu_idx);
+   745		return ret;
+   746	}
+   747	#endif /* CONFIG_NVME_MULTIPATH */
+   748	
 
-for you to fetch changes up to 12907efde6ad984f2d76cc1a7dbaae132384d8a5:
-
-  dm verity: have verify_wq use WQ_HIGHPRI if "try_verify_in_tasklet" (2022-08-04 15:59:52 -0400)
-
-Please pull, thanks!
-Mike
-
-----------------------------------------------------------------
-- Add flags argument to dm_bufio_client_create and introduce
-  DM_BUFIO_CLIENT_NO_SLEEP flag to have dm-bufio use spinlock rather
-  than mutex for its locking.
-
-- Add optional "try_verify_in_tasklet" feature to DM verity target.
-  This feature gives users the option to improve IO latency by using a
-  tasklet to verify, using hashes in bufio's cache, rather than wait
-  to schedule a work item via workqueue. But if there is a bufio cache
-  miss, or an error, then the tasklet will fallback to using workqueue.
-
-- Incremental changes to both dm-bufio and the DM verity target to use
-  jump_label to minimize cost of branching associated with the niche
-  "try_verify_in_tasklet" feature. DM-bufio in particular is used by
-  quite a few other DM targets so it doesn't make sense to incur
-  additional bufio cost in those targets purely for the benefit of
-  this niche verity feature if the feature isn't ever used.
-
-- Optimize verity_verify_io, which is used by both workqueue and
-  tasklet based verification, if FEC is not configured or tasklet
-  based verification isn't used.
-
-- Remove DM verity target's verify_wq's use of the WQ_CPU_INTENSIVE
-  flag since it uses WQ_UNBOUND. Also, use the WQ_HIGHPRI flag if
-  "try_verify_in_tasklet" is specified.
-
-----------------------------------------------------------------
-Mike Snitzer (7):
-      dm verity: allow optional args to alter primary args handling
-      dm bufio: conditionally enable branching for DM_BUFIO_CLIENT_NO_SLEEP
-      dm verity: conditionally enable branching for "try_verify_in_tasklet"
-      dm verity: optimize verity_verify_io if FEC not configured
-      dm verity: only copy bvec_iter in verity_verify_io if in_tasklet
-      dm verity: remove WQ_CPU_INTENSIVE flag since using WQ_UNBOUND
-      dm verity: have verify_wq use WQ_HIGHPRI if "try_verify_in_tasklet"
-
-Nathan Huckleberry (3):
-      dm bufio: Add flags argument to dm_bufio_client_create
-      dm bufio: Add DM_BUFIO_CLIENT_NO_SLEEP flag
-      dm verity: Add optional "try_verify_in_tasklet" feature
-
- drivers/md/dm-bufio.c                         |  32 +++++-
- drivers/md/dm-ebs-target.c                    |   3 +-
- drivers/md/dm-integrity.c                     |   2 +-
- drivers/md/dm-snap-persistent.c               |   2 +-
- drivers/md/dm-verity-fec.c                    |   4 +-
- drivers/md/dm-verity-target.c                 | 160 ++++++++++++++++++++++----
- drivers/md/dm-verity.h                        |   6 +-
- drivers/md/persistent-data/dm-block-manager.c |   3 +-
- include/linux/dm-bufio.h                      |   8 +-
- 9 files changed, 187 insertions(+), 33 deletions(-)
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
