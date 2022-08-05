@@ -2,870 +2,460 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6F2C19F2D
-	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 01:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CE7C19F2D
+	for <linux-block@archiver.kernel.org>; Fri,  5 Aug 2022 02:45:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236933AbiHEByg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Aug 2022 21:54:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58754 "EHLO
+        id S236642AbiHECpG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Aug 2022 22:45:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235658AbiHEByf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Aug 2022 21:54:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9EB4101D0
-        for <linux-block@vger.kernel.org>; Thu,  4 Aug 2022 18:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659664471;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y7IhJ1I8ah4rV6RHwLX4QE30pMbYUMMqZT9Ptmd/kFY=;
-        b=KBc/W/GKQRq9LeVHbgFup1aJ3S+Yu8C+7bCgeN65s19ePlVjW4EF4Xm0kCoyzuF0iZrbZ+
-        u+SZ5q/0mtpvTmO6PX84FHvEOOoMZv23ay2UrbMcjWNhq4uxsD/EQpMXpBKCtbpxs7BYHn
-        bKO/XwKWcF4U8TpdXMaABvbyP2jget8=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-KTYT6FOJOHWR4cThxmuGvA-1; Thu, 04 Aug 2022 21:54:27 -0400
-X-MC-Unique: KTYT6FOJOHWR4cThxmuGvA-1
-Received: by mail-ed1-f71.google.com with SMTP id m22-20020a056402431600b0043d6a88130aso728319edc.18
-        for <linux-block@vger.kernel.org>; Thu, 04 Aug 2022 18:54:26 -0700 (PDT)
+        with ESMTP id S236906AbiHECpE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Aug 2022 22:45:04 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D44D71722
+        for <linux-block@vger.kernel.org>; Thu,  4 Aug 2022 19:45:02 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id bf13so1511923pgb.11
+        for <linux-block@vger.kernel.org>; Thu, 04 Aug 2022 19:45:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc;
+        bh=zDTb5g8Zwt3f56UvKa+2PAFj0rp3/8bMDAifz9FWj9o=;
+        b=2Rhgk29ZAQufxNVIkICVyntuO83SbCw2CQ3IZMtb/aTd6gMwrTKC6LEB3O3ab9VHPz
+         ij0ZA/6uOOZl0xJv16J+/1vkCFn2YNkH2v2KxnMaLBhx6apMF0kJ4QHiNgHx3jJzb7Yw
+         eNFZOCKLCOKYjgqNFjjE+pdDKZvpsUubpAdQeD+veH3NCa1cHJ9HdVPYdIzGTkni/yz3
+         ddZC/WzIzpp99Q4jIatQsV0XdRPdMRMDfOUxOuOKGrhujRxOdFoUpbNTSfR7rKFn4yAb
+         ulantx0gSiNYTFAzo/R5wT+1MqfriNmBTdeXnZmIhNJKQ8FOPz4WHjkHhC1KETHww83C
+         dpJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=y7IhJ1I8ah4rV6RHwLX4QE30pMbYUMMqZT9Ptmd/kFY=;
-        b=Ufad3O6dwZLfLSdZqAz8YO5QfK7zxOXGtA7p/X4UNweDmyRO6neXWOToLKdn4VEbMq
-         iviAzC4WBLx6lnYIZ7PH3EMZlHFghz1VSXaAWLYWu2t72tZoobgC9qXEeblNIOpGk5Lk
-         twbz4pjXUfy5quUZxUMCsYykyqM3Pj+XktJwHZYyPM9tvbRQ1g7gIXSOCP14UVWznOPi
-         Qxy/FX2RPudIEJmxFrSW5Y+CJ+eB454cLszpizZuVX/ox1nOkAxgWQ/eyyU5nr9A6dXx
-         6AccZJiHVm8fYwA4u3pNdOlGgD4/3l0BMVDHaz1+IICJl3DZkjia4KjEHjQRRyNEU7uO
-         5wTg==
-X-Gm-Message-State: ACgBeo1UEuqGWh07ctMiRGEfDGEr3JrPtK7528MD7EawMZs49ghmVW6M
-        nB1gvD4YObriKkxCA7+RSLC+n+LdmbX9FNqMhwDh8se6xrn7OurxHzOXm1GrZ1udIsgBw8u/zG+
-        R0fTCM+fp0V405g7pwXNivLcu2Wl2IQ26JF06/B0=
-X-Received: by 2002:a17:907:2707:b0:730:af0b:3572 with SMTP id w7-20020a170907270700b00730af0b3572mr3470747ejk.411.1659664465253;
-        Thu, 04 Aug 2022 18:54:25 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR74RTewyMa7O/I2xMhBnqBZBsUiyfFq0a7xkoP5eRl1uObEC5aFFPzKGIyVS1EF1S2JKCzHtrlmc4MIzhTEX6A=
-X-Received: by 2002:a17:907:2707:b0:730:af0b:3572 with SMTP id
- w7-20020a170907270700b00730af0b3572mr3470730ejk.411.1659664464847; Thu, 04
- Aug 2022 18:54:24 -0700 (PDT)
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc;
+        bh=zDTb5g8Zwt3f56UvKa+2PAFj0rp3/8bMDAifz9FWj9o=;
+        b=s/0eAK6ZTGEqnLfJsBGtjCGaV+j5knz9e4OTuz0VPJtPh8SpOWMcmJ58yyoMbci2pD
+         fXDBUrB23VKfRnDSNZIk3YMPM5KFcoLcC7NJqKdVfGHQFf36si2pbkiSQnM6kT03STdg
+         5FE63GdM2+cLwQWcCUmhdHIsBRz3kHRiQm1iAxEPykxM71p0bytjKijfQ4ZhoU7MSFgv
+         FCYIdXqYaqYQPuH/654ADzoaXtMmoo33qoVTUJNfa32Wqya7g/7jCdDGUGXWamuVpUIp
+         50/d0jmVOvIpk1R55LI/qvLZT6wYayKVwRDevNYoO6aUQfiNn7GoGV3/Pj7lvjez2SeM
+         u3pw==
+X-Gm-Message-State: ACgBeo32aqmgTg0Sd6g/BW+rzEO/MncZcGmBdfrGRyxeeEm+84qHvn4K
+        6WKxJuKbTvCm20Fi9UMDC73p0oWkU0X+WA==
+X-Google-Smtp-Source: AA6agR67aE5Ulb4LroINgHPjIkTBwPfv0C4G3t3ySziPXoiF+Jn/5QR4OFVjTo2QG8nR6ynKSKR3DA==
+X-Received: by 2002:a05:6a00:a8e:b0:527:9d23:c613 with SMTP id b14-20020a056a000a8e00b005279d23c613mr4670891pfl.53.1659667501658;
+        Thu, 04 Aug 2022 19:45:01 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id w6-20020a170902904600b0016bea74d11esm1590600plz.267.2022.08.04.19.45.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Aug 2022 19:45:01 -0700 (PDT)
+Message-ID: <49f205eb-a4e0-e091-5c21-24c548dcbacd@kernel.dk>
+Date:   Thu, 4 Aug 2022 20:45:00 -0600
 MIME-Version: 1.0
-References: <CAHj4cs_7kR6DXi19CWh3veespFT=cJSTD0YGEFt8tw_Y8fEqZA@mail.gmail.com>
- <CAHj4cs8zXRTPpHt0Xu5BtSGtERK8cgniwrRPygEL9R=6qxjT5w@mail.gmail.com>
- <3af8153e-5e7a-f803-4dd4-cf7088a9d7d4@nvidia.com> <CAHj4cs90B+=Sjr43Xf+DWXw=oMCFLNPmMdenhyQn9fG=-ZXtVA@mail.gmail.com>
- <SJ0PR19MB45449CEC5FCA24EBE6C9BB90F29F9@SJ0PR19MB4544.namprd19.prod.outlook.com>
-In-Reply-To: <SJ0PR19MB45449CEC5FCA24EBE6C9BB90F29F9@SJ0PR19MB4544.namprd19.prod.outlook.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Fri, 5 Aug 2022 09:54:13 +0800
-Message-ID: <CAHj4cs82ssuVX25yeHXhtqkkApxJbWDaoyOgq=0u5C4LWF2btg@mail.gmail.com>
-Subject: Re: [bug report][bisected] blktests nvme/tcp nvme/030 failed on
- latest linux-block/for-next
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "Belanger, Martin" <Martin.Belanger@dell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Followup block changes for 6.0-rc1
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 5, 2022 at 2:07 AM Belanger, Martin
-<Martin.Belanger@dell.com> wrote:
->
-> > -----Original Message-----
-> > From: Yi Zhang <yi.zhang@redhat.com>
-> > Sent: Thursday, August 4, 2022 5:50 AM
-> > To: linux-block; open list:NVM EXPRESS DRIVER
-> > Cc: Belanger, Martin; Chaitanya Kulkarni; Sagi Grimberg
-> > Subject: Re: [bug report][bisected] blktests nvme/tcp nvme/030 failed o=
-n
-> > latest linux-block/for-next
-> >
-> >
-> > [EXTERNAL EMAIL]
-> >
-> > I tried manually running the test, find after the discover cmd, the tar=
-get was
-> > connected, maybe that's why it break nvme/03 fail.
-> >
-> > # nvme discover -t tcp -a 127.0.0.1 -s 4420 Discovery Log Number of Rec=
-ords 3,
-> > Generation counter 4 =3D=3D=3D=3D=3DDiscovery Log Entry 0=3D=3D=3D=3D=
-=3D=3D
-> > trtype:  tcp
-> > adrfam:  ipv4
-> > subtype: current discovery subsystem
-> > treq:    not specified, sq flow control disable supported
-> > portid:  0
-> > trsvcid: 4420
-> > subnqn:  nqn.2014-08.org.nvmexpress.discovery
-> > traddr:  127.0.0.1
-> > eflags:  not specified
-> > sectype: none
-> > =3D=3D=3D=3D=3DDiscovery Log Entry 1=3D=3D=3D=3D=3D=3D
-> > trtype:  tcp
-> > adrfam:  ipv4
-> > subtype: nvme subsystem
-> > treq:    not specified, sq flow control disable supported
-> > portid:  0
-> > trsvcid: 4420
-> > subnqn:  blktests-subsystem-2
-> > traddr:  127.0.0.1
-> > eflags:  not specified
-> > sectype: none
-> > =3D=3D=3D=3D=3DDiscovery Log Entry 2=3D=3D=3D=3D=3D=3D
-> > trtype:  tcp
-> > adrfam:  ipv4
-> > subtype: nvme subsystem
-> > treq:    not specified, sq flow control disable supported
-> > portid:  0
-> > trsvcid: 4420
-> > subnqn:  blktests-subsystem-1
-> > traddr:  127.0.0.1
-> > eflags:  not specified
-> > sectype: none
-> >
-> > # lsblk
-> > NAME                              MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
-> > loop0                               7:0    0   512M  0 loop
-> > sda                                 8:0    0 119.2G  0 disk
-> > =E2=94=9C=E2=94=80sda1                              8:1    0   600M  0 =
-part /boot/efi
-> > =E2=94=9C=E2=94=80sda2                              8:2    0     1G  0 =
-part /boot
-> > =E2=94=94=E2=94=80sda3                              8:3    0 117.7G  0 =
-part
-> >   =E2=94=94=E2=94=80fedora_amd--speedway--01-root 253:0    0 117.7G  0 =
-lvm  /
-> > zram0                             252:0    0     8G  0 disk [SWAP]
-> > nvme1n1                           259:1    0   512M  0 disk
-> > nvme2n1                           259:3    0   512M  0 disk
-> >
-> > [  189.518600] nvmet: adding nsid 1 to subsystem blktests-subsystem-2
-> > [  189.536068] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-> > [  189.591744] nvmet_tcp: enabling port 0 (127.0.0.1:4420) [  205.97873=
-9]
-> > nvmet: creating discovery controller 1 for subsystem nqn.2014-
-> > 08.org.nvmexpress.discovery for NQN nqn.2014-
-> > 08.org.nvmexpress:uuid:03000200-0400-0500-0006-000700080009.
-> > [  206.000205] nvme nvme0: new ctrl: NQN "nqn.2014-
-> > 08.org.nvmexpress.discovery", addr 127.0.0.1:4420 [  206.017512] nvme
-> > nvme0: Removing ctrl: NQN "nqn.2014-08.org.nvmexpress.discovery"
-> > [  206.152307] nvmet: creating discovery controller 1 for subsystem nqn=
-.2014-
-> > 08.org.nvmexpress.discovery for NQN nqn.2014-
-> > 08.org.nvmexpress:uuid:03000200-0400-0500-0006-000700080009.
-> > [  206.172131] nvme nvme0: new ctrl: NQN "nqn.2014-
-> > 08.org.nvmexpress.discovery", addr 127.0.0.1:4420 [  206.205785] nvmet:
-> > creating nvm controller 2 for subsystem
-> > blktests-subsystem-2 for NQN
-> > nqn.2014-08.org.nvmexpress:uuid:03000200-0400-0500-0006-000700080009.
-> > [  206.224652] nvme nvme1: creating 128 I/O queues.
-> > [  206.341565] nvme nvme1: mapped 128/0/0 default/read/poll queues.
-> > [  206.463025] nvme nvme1: new ctrl: NQN "blktests-subsystem-2", addr
-> > 127.0.0.1:4420
-> > [  206.495150] nvmet: creating nvm controller 3 for subsystem
-> > blktests-subsystem-1 for NQN
-> > nqn.2014-08.org.nvmexpress:uuid:03000200-0400-0500-0006-000700080009.
-> > [  206.512928] nvme nvme2: creating 128 I/O queues.
-> > [  206.637515] nvme nvme2: mapped 128/0/0 default/read/poll queues.
-> > [  206.749717] nvme nvme2: new ctrl: NQN "blktests-subsystem-1", addr
-> > 127.0.0.1:4420
-> > [  206.761617] nvme nvme0: Removing ctrl: NQN "nqn.2014-
-> > 08.org.nvmexpress.discovery"
-> >
-> > On Thu, Aug 4, 2022 at 3:37 AM Chaitanya Kulkarni <chaitanyak@nvidia.co=
-m>
-> > wrote:
-> > >
-> > > (++ Martin Belanger)
-> > >
-> > > Martin,
-> > >
-> > > On 8/3/22 09:43, Yi Zhang wrote:
-> > > > So the bisect shows it was introduced from the below commit:
-> > > >
-> > > > commit 86c2457a8e8112f16af8fd10a3e1dd7a302c3c3e (refs/bisect/bad)
-> > > > Author: Martin Belanger <martin.belanger@dell.com>
-> > > > Date:   Tue Feb 8 14:33:46 2022 -0500
-> > > >
-> > > >      nvme: expose cntrltype and dctype through sysfs
-> > > >
-> > > > On Mon, Aug 1, 2022 at 8:37 PM Yi Zhang <yi.zhang@redhat.com> wrote=
-:
-> > > >>
-> > > >> Hello
-> > > >>
-> > > >> nvme/030 triggered several errors during CKI tests on
-> > > >> linux-block/for-next, pls help check it, and feel free to let me
-> > > >> know if you need any test/info, thanks.
->
-> Hi Chaitanya and Yi,
->
-> This commit (submitted last February) simply exposes two read-only attrib=
-utes
-> to the sysfs.
+Hi Linus,
 
-Seems it was not the culprit, but nvme/030 can pass after I revert
-that commit on v5.19.
+This is a rebase (and collapse of the fix with the original change) of
+the original driver pull request for this merge window, with the changes
+staged for a later pull queued into this branch as well. This pull
+request contains:
 
-Hi Sagi
+- NVMe pull requests via Christoph
+	- add support for In-Band authentication (Hannes Reinecke)
+	- handle the persistent internal error AER (Michael Kelley)
+	- use in-capsule data for TCP I/O queue connect (Caleb Sander)
+	- remove timeout for getting RDMA-CM established event
+	  (Israel Rukshin)
+	- misc cleanups (Joel Granados, Sagi Grimberg, Chaitanya Kulkarni,
+	  Guixin Liu, Xiang wangx)
+	- use command_id instead of req->tag in trace_nvme_complete_rq()
+	  (Bean Huo)
+	- various fixes for the new authentication code (Lukas Bulwahn,
+	  Dan Carpenter, Colin Ian King, Chaitanya Kulkarni,
+	  Hannes Reinecke)
+	- small cleanups (Liu Song, Christoph Hellwig)
+	- restore compat_ioctl support (Nick Bowler)
+	- make a nvmet-tcp workqueue lockdep-safe (Sagi Grimberg)
+	- enable generic interface (/dev/ngXnY) for unknown command sets
+	   (Joel Granados, Christoph Hellwig)
+	- don't always build constants.o (Christoph Hellwig)
+	- print the command name of aborted commands (Christoph Hellwig)
 
-I did more testing and finally found that reverting this udev rule
-change in nvme-cli fix the nvme/030 failure issue,  could you check
-it?
+- MD pull requests via Song
+	- Improve raid5 lock contention, by Logan Gunthorpe.
+	- Misc fixes to raid5, by Logan Gunthorpe.
+	- Fix race condition with md_reap_sync_thread(), by Guoqing Jiang.
+	- Fix potential deadlock with raid5_quiesce and
+          raid5_get_active_stripe, by Logan Gunthorpe.
+	- Refactoring md_alloc(), by Christoph"
+	- Fix md disk_name lifetime problems, by Christoph Hellwig
+	- Convert prepare_to_wait() to wait_woken() api, by
+          Logan Gunthorpe;
+	- Fix sectors_to_do bitmap issue, by Logan Gunthorpe.
 
-commit f86faaaa2a1ff319bde188dc8988be1ec054d238 (refs/bisect/bad)
-Author: Sagi Grimberg <sagi@grimberg.m
-Date:   Mon Jun 27 11:06:50 2022 +0300
+- Work on unifying the null_blk module parameters and configfs API
+  (Vincent)
 
-    udev: re-read the discovery log page when a discovery controller reconn=
-ected
+- drbd bitmap IO error fix (Lars)
 
-    When using persistent discovery controllers, if the discovery
-    controller loses connectivity and manage to reconnect after a while,
-    we need to retrieve again the discovery log page in order to learn
-    about possible changes that may have occurred during this time as
-    discovery log change events were lost.
+- Set of rnbd fixes (Guoqing, Md Haris)
 
-    Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
-    Signed-off-by: Daniel Wagner <dwagner@suse.de>
-    Link: https://lore.kernel.org/r/20220627080650.108936-1-sagi@grimberg.m=
-e
+- Remove experimental marker on bcache async device registration (Coly)
 
->
-> Sorry, but I'm not familiar with these test reports. What issue should I =
-be
-> looking for? I see a line with a "WARNING" label. Is that the problem?
+- Series from cleaning up the bio splitting (Christoph)
 
-yeah, from the below log, seems there are at least two issues, and I
-saw Maurizio already submit two patch to fix them:
+- Removal of the sx8 block driver. This hardware never really
+  widespread, and it didn't receive a lot of attention after the initial
+  merge of it back in 2005 (Christoph)
 
-[   87.107679] WARNING at kernel/locking/mutex.c:582 __mutex_lock+0xf73/0x1=
-3a0
-[   86.814147] nvmet_tcp: queue 60 unhandled state 5
+- A few fixes for s390 dasd (Eric, Jiang)
 
-https://lore.kernel.org/linux-nvme/20220802151922.480571-1-mlombard@redhat.=
-com/
-https://lore.kernel.org/linux-nvme/20220801080900.391575-1-mlombard@redhat.=
-com/
+- Followup set of fixes for ublk (Ming)
 
-> Martin
->
-> > > >>
-> > > >> # nvme_trtype=3Dtcp ./check nvme/030
-> > > >> nvme/030 (ensure the discovery generation counter is updated
-> > > >> appropriately)
-> > > >> WARNING: Test did not clean up tcp device: nvme0
-> > > >> nvme/030 (ensure the discovery generation counter is updated
-> > > >> appropriately) [failed]
-> > > >>      runtime    ...  1.037s
-> > > >>      --- tests/nvme/030.out 2022-07-31 21:17:30.609784852 -0400
-> > > >>      +++ /root/blktests/results/nodev/nvme/030.out.bad 2022-08-01
-> > > >> 08:27:44.503898074 -0400
-> > > >>      @@ -1,2 +1,3 @@
-> > > >>       Running nvme/030
-> > > >>      +failed to lookup subsystem for controller nvme0
-> > > >>       Test complete
-> > > >>
-> > > >> [   85.915692] run blktests nvme/030 at 2022-08-01 08:27:43
-> > > >> [   86.114525] nvmet: adding nsid 1 to subsystem blktests-subsyste=
-m-1
-> > > >> [   86.140842] nvmet_tcp: enabling port 0 (127.0.0.1:4420)
-> > > >> [   86.214420] nvmet: creating discovery controller 1 for subsyste=
-m
-> > > >> nqn.2014-08.org.nvmexpress.discovery for NQN
-> > > >> nqn.2014-08.org.nvmexpress:uuid:03000200-0400-0500-0006-
-> > 000700080009.
-> > > >> [   86.237110] nvme nvme0: new ctrl: NQN
-> > > >> "nqn.2014-08.org.nvmexpress.discovery", addr 127.0.0.1:4420
-> > > >> [   86.253530] nvme nvme0: Removing ctrl: NQN
-> > > >> "nqn.2014-08.org.nvmexpress.discovery"
-> > > >> [   86.331176] nvmet: adding nsid 1 to subsystem blktests-subsyste=
-m-2
-> > > >> [   86.383550] nvmet: creating discovery controller 1 for subsyste=
-m
-> > > >> nqn.2014-08.org.nvmexpress.discovery for NQN
-> > > >> nqn.2014-08.org.nvmexpress:uuid:03000200-0400-0500-0006-
-> > 000700080009.
-> > > >> [   86.403330] nvme nvme0: new ctrl: NQN
-> > > >> "nqn.2014-08.org.nvmexpress.discovery", addr 127.0.0.1:4420
-> > > >> [   86.434229] nvmet: creating discovery controller 2 for subsyste=
-m
-> > > >> nqn.2014-08.org.nvmexpress.discovery for NQN
-> > > >> nqn.2014-08.org.nvmexpress:uuid:03000200-0400-0500-0006-
-> > 000700080009.
-> > > >> [   86.454261] nvme nvme1: new ctrl: NQN
-> > > >> "nqn.2014-08.org.nvmexpress.discovery", addr 127.0.0.1:4420
-> > > >> [   86.469065] nvme nvme1: Removing ctrl: NQN
-> > > >> "nqn.2014-08.org.nvmexpress.discovery"
-> > > >> [   86.493389] nvmet: creating nvm controller 3 for subsystem
-> > > >> blktests-subsystem-1 for NQN
-> > > >> nqn.2014-08.org.nvmexpress:uuid:03000200-0400-0500-0006-
-> > 000700080009.
-> > > >> [   86.514580] nvme nvme2: creating 128 I/O queues.
-> > > >> [   86.635316] nvme nvme2: mapped 128/0/0 default/read/poll queues=
-.
-> > > >> [   86.781777] nvme nvme0: starting error recovery
-> > > >> [   86.788446] nvmet_tcp: queue 0 unhandled state 5
-> > > >> [   86.790669] nvmet: connect request for invalid subsystem
-> > > >> blktests-subsystem-1!
-> > > >> [   86.794306] nvme nvme0: Reconnecting in 10 seconds...
-> > > >> [   86.814147] nvmet_tcp: queue 60 unhandled state 5
-> > > >> [   86.819045] nvmet_tcp: queue 59 unhandled state 5
-> > > >> [   86.821804] nvmet_tcp: queue 122 unhandled state 5
-> > > >> [   86.823923] nvmet_tcp: queue 58 unhandled state 5
-> > > >> [   86.828818] nvmet_tcp: queue 121 unhandled state 5
-> > > >> [   86.833634] nvmet_tcp: queue 57 unhandled state 5
-> > > >> [   86.838816] nvmet_tcp: queue 126 unhandled state 5
-> > > >> [   86.843361] nvmet_tcp: queue 56 unhandled state 5
-> > > >> [   86.848247] nvmet_tcp: queue 125 unhandled state 5
-> > > >> [   86.853066] nvmet_tcp: queue 55 unhandled state 5
-> > > >> [   86.857953] nvmet_tcp: queue 124 unhandled state 5
-> > > >> [   86.862757] nvmet_tcp: queue 55 unhandled state 5
-> > > >> [   86.862787] nvmet_tcp: queue 54 unhandled state 5
-> > > >> [   86.862842] nvmet_tcp: queue 53 unhandled state 5
-> > > >> [   86.862894] nvmet_tcp: queue 52 unhandled state 5
-> > > >> [   86.862948] nvmet_tcp: queue 51 unhandled state 5
-> > > >> [   86.862999] nvmet_tcp: queue 50 unhandled state 5
-> > > >> [   86.863046] nvmet_tcp: queue 62 unhandled state 5
-> > > >> [   86.863095] nvmet_tcp: queue 61 unhandled state 5
-> > > >> [   86.867681] nvmet_tcp: queue 123 unhandled state 5
-> > > >> [   86.872592] nvmet_tcp: queue 56 unhandled state 5
-> > > >> [   86.872606] nvmet_tcp: queue 57 unhandled state 5
-> > > >> [   86.872616] nvmet_tcp: queue 58 unhandled state 5
-> > > >> [   86.877402] nvmet_tcp: queue 129 unhandled state 5
-> > > >> [   86.882190] nvmet_tcp: queue 59 unhandled state 5
-> > > >> [   86.882202] nvmet_tcp: queue 60 unhandled state 5
-> > > >> [   86.887055] nvmet_tcp: queue 128 unhandled state 5
-> > > >> [   86.891819] nvmet_tcp: queue 61 unhandled state 5
-> > > >> [   86.891830] nvmet_tcp: queue 62 unhandled state 5
-> > > >> [   86.896677] nvmet_tcp: queue 127 unhandled state 5
-> > > >> [   86.901354] nvmet_tcp: queue 121 unhandled state 5
-> > > >> [   86.901365] nvmet_tcp: queue 122 unhandled state 5
-> > > >> [   87.088674] nvme nvme0: Removing ctrl: NQN
-> > > >> "nqn.2014-08.org.nvmexpress.discovery"
-> > > >> [   87.096908] nvme nvme0: Property Set error: 880, offset 0x14
-> > > >> [   87.102953] ------------[ cut here ]------------
-> > > >> [   87.107668] DEBUG_LOCKS_WARN_ON(lock->magic !=3D lock)
-> > > >> [   87.107679] WARNING: CPU: 30 PID: 2499 at
-> > > >> kernel/locking/mutex.c:582 __mutex_lock+0xf73/0x13a0
-> > > >> [   87.121591] Modules linked in: loop nvmet_tcp nvmet nvme_tcp
-> > > >> nvme_fabrics nvme_core intel_rapl_msr intel_rapl_common
-> > amd64_edac
-> > > >> edac_mce_amd rfkill kvm_amd sunrpc vfat kvm fat ipmi_ssif joydev
-> > > >> irqbypass acpi_ipmi rapl e1000e pcspkr ipmi_si ipmi_devintf
-> > > >> i2c_piix4 k10temp ipmi_msghandler acpi_cpufreq fuse zram xfs
-> > > >> libcrc32c ast i2c_algo_bit drm_vram_helper sd_mod t10_pi
-> > > >> drm_kms_helper crc64_rocksoft_generic syscopyarea sysfillrect
-> > > >> crc64_rocksoft sysimgblt crc64 fb_sys_fops drm_ttm_helper
-> > > >> crct10dif_pclmul crc32_pclmul ttm crc32c_intel ahci libahci
-> > > >> ghash_clmulni_intel drm libata ccp sp5100_tco dm_mod
-> > > >> [   87.175439] CPU: 30 PID: 2499 Comm: nvme Not tainted 5.19.0-rc8=
-+ #1
-> > > >> [   87.181737] Hardware name: AMD Corporation Speedway/Speedway,
-> > BIOS
-> > > >> RSW100BB 11/14/2018
-> > > >> [   87.189857] RIP: 0010:__mutex_lock+0xf73/0x13a0
-> > > >> [   87.194388] Code: 08 84 d2 0f 85 0f 04 00 00 8b 05 60 28 f2 01 =
-85
-> > > >> c0 0f 85 f4 f1 ff ff 48 c7 c6 a0 46 6a ac 48 c7 c7 20 44 6a ac e8
-> > > >> ad
-> > > >> f1 ea ff <0f> 0b e9 da f1 ff ff e8 d1 de 5a fe e9 c6 f1 ff ff 48 c=
-7
-> > > >> c7
-> > > >> 80 19
-> > > >> [   87.213587] RSP: 0018:ffff889604037af0 EFLAGS: 00010286
-> > > >> [   87.218916] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
-> > 0000000000000000
-> > > >> [   87.226184] RDX: 0000000000000001 RSI: 0000000000000004 RDI:
-> > ffffed12c0806f4e
-> > > >> [   87.233453] RBP: ffff889604037c40 R08: 0000000000000001 R09:
-> > ffff889c1d7efccb
-> > > >> [   87.240728] R10: ffffed1383afdf99 R11: 0000000000000014 R12:
-> > 0000000000000000
-> > > >> [   87.247995] R13: dffffc0000000000 R14: ffff888e01517860 R15:
-> > ffff889604037dc0
-> > > >> [   87.255263] FS:  00007f0036b9a780(0000) GS:ffff889c1d600000(000=
-0)
-> > > >> knlGS:0000000000000000
-> > > >> [   87.263503] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > >> [   87.269359] CR2: 000055f3e1307000 CR3: 00000015c466c000 CR4:
-> > 00000000003506e0
-> > > >> [   87.276540] Call Trace:
-> > > >> [   87.279099]  <TASK>
-> > > >> [   87.281245]  ? mark_held_locks+0xa5/0xf0
-> > > >> [   87.285253]  ? nvme_tcp_stop_queue+0x50/0xa0 [nvme_tcp]
-> > > >> [   87.290498]  ? mutex_lock_io_nested+0x1220/0x1220
-> > > >> [   87.295352]  ? __cancel_work_timer+0x202/0x450
-> > > >> [   87.299800]  ? lockdep_hardirqs_on+0x79/0x100
-> > > >> [   87.304306]  ? mod_delayed_work_on+0xf0/0xf0
-> > > >> [   87.308575]  ? del_timer+0x110/0x110
-> > > >> [   87.312282]  ? lockdep_hardirqs_on_prepare.part.0+0x19f/0x390
-> > > >> [   87.318058]  ? nvme_tcp_stop_queue+0x50/0xa0 [nvme_tcp]
-> > > >> [   87.323437]  nvme_tcp_stop_queue+0x50/0xa0 [nvme_tcp]
-> > > >> [   87.328502]  nvme_tcp_delete_ctrl+0x93/0xd0 [nvme_tcp]
-> > > >> [   87.333798]  nvme_do_delete_ctrl+0x133/0x13d [nvme_core]
-> > > >> [   87.339224]  nvme_sysfs_delete.cold+0x8/0xd [nvme_core]
-> > > >> [   87.344564]  kernfs_fop_write_iter+0x359/0x530
-> > > >> [   87.349012]  new_sync_write+0x2b9/0x500
-> > > >> [   87.352985]  ? new_sync_read+0x4f0/0x4f0
-> > > >> [   87.356990]  ? lock_downgrade+0x130/0x130
-> > > >> [   87.361082]  ? lock_is_held_type+0xdd/0x130
-> > > >> [   87.365351]  ? lock_is_held_type+0xdd/0x130
-> > > >> [   87.369538]  vfs_write+0x639/0x9b0
-> > > >> [   87.373063]  ksys_write+0x106/0x1e0
-> > > >> [   87.376623]  ? __ia32_sys_read+0xa0/0xa0
-> > > >> [   87.380629]  ? lockdep_hardirqs_on_prepare.part.0+0x19f/0x390
-> > > >> [   87.386486]  ? syscall_enter_from_user_mode+0x20/0x70
-> > > >> [   87.391639]  do_syscall_64+0x3a/0x90
-> > > >> [   87.395291]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > >> [   87.400354] RIP: 0033:0x7f0036cb5bd4
-> > > >> [   87.404064] Code: 15 51 72 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff =
-ff
-> > > >> ff eb b7 0f 1f 00 f3 0f 1e fa 80 3d 2d fa 0d 00 00 74 13 b8 01 00
-> > > >> 00
-> > > >> 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 48 83 ec 28 48 89 5=
-4
-> > > >> 24
-> > > >> 18 48
-> > > >> [   87.423163] RSP: 002b:00007ffea6c242b8 EFLAGS: 00000202 ORIG_RA=
-X:
-> > > >> 0000000000000001
-> > > >> [   87.430875] RAX: ffffffffffffffda RBX: 000055f3e1306b30 RCX:
-> > 00007f0036cb5bd4
-> > > >> [   87.438059] RDX: 0000000000000001 RSI: 00007f0036de475e RDI:
-> > 0000000000000003
-> > > >> [   87.445293] RBP: 000055f3e1306610 R08: 000055f3e1307010 R09:
-> > 0000000000000073
-> > > >> [   87.452623] R10: 0000000000000000 R11: 0000000000000202 R12:
-> > 0000000000000003
-> > > >> [   87.459890] R13: 0000000000000000 R14: 000055f3e1306610 R15:
-> > 00007ffea6c26109
-> > > >> [   87.467164]  </TASK>
-> > > >> [   87.469398] irq event stamp: 18139
-> > > >> [   87.472869] hardirqs last  enabled at (18139): [<ffffffffa9e7a0=
-e9>]
-> > > >> __cancel_work_timer+0x179/0x450
-> > > >> [   87.482082] hardirqs last disabled at (18138): [<ffffffffa9e79a=
-3f>]
-> > > >> try_to_grab_pending+0x1ef/0x630
-> > > >> [   87.491294] softirqs last  enabled at (18104): [<ffffffffac4006=
-93>]
-> > > >> __do_softirq+0x693/0xafb
-> > > >> [   87.499890] softirqs last disabled at (17945): [<ffffffffa9e23e=
-a7>]
-> > > >> __irq_exit_rcu+0x1c7/0x2c0
-> > > >> [   87.508668] ---[ end trace 0000000000000000 ]---
-> > > >> [   87.546650] nvme nvme2: Removing ctrl: NQN "blktests-subsystem-=
-1"
-> > > >> [   87.553627] nvme nvme2: Connect command failed, error wo/DNR bi=
-t:
-> > -16388
-> > > >> [   87.560479] nvme nvme2: failed to connect queue: 122 ret=3D-4
-> > > >> [   87.566195]
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> > > >> [   87.573540] BUG: KASAN: use-after-free in
-> > blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.578916] nvme nvme2: failed to send request -32
-> > > >> [   87.580720] Read of size 4 at addr ffff8896046c7604 by task nvm=
-e/2308
-> > > >>
-> > > >> [   87.580731] CPU: 75 PID: 2308 Comm: nvme Tainted: G        W
-> > > >>   5.19.0-rc8+ #1
-> > > >> [   87.585689] nvme nvme2: Property Set error: 880, offset 0x14
-> > > >> [   87.592213] Hardware name: AMD Corporation Speedway/Speedway,
-> > BIOS
-> > > >> RSW100BB 11/14/2018
-> > > >> [   87.592220] Call Trace:
-> > > >> [   87.592224]  <TASK>
-> > > >> [   87.619909]  ? blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.624695]  dump_stack_lvl+0x4c/0x63
-> > > >> [   87.628492]  print_address_description.constprop.0+0x1f/0x1e0
-> > > >> [   87.634340]  ? blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.639212]  ? blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.644083]  print_report.cold+0x58/0x26b
-> > > >> [   87.648164]  ? rcu_read_lock_sched_held+0x10/0x70
-> > > >> [   87.652950]  ? lock_acquired+0x288/0x360
-> > > >> [   87.656945]  ? blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.661815]  kasan_report+0xe3/0x120
-> > > >> [   87.665451]  ? blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.670323]  blk_mq_tagset_busy_iter+0xa7c/0xd40
-> > > >> [   87.675020]  ? rcu_read_lock_sched_held+0x10/0x70
-> > > >> [   87.679803]  ? blk_mq_cancel_work_sync+0x50/0x50
-> > > >> [   87.684500]  ? percpu_ref_tryget_many.constprop.0+0x1a0/0x1a0
-> > > >> [   87.690347]  ? percpu_ref_tryget_many.constprop.0+0x1a0/0x1a0
-> > > >> [   87.696191]  ? wait_for_completion_io_timeout+0x20/0x20
-> > > >> [   87.701512]  blk_mq_tagset_wait_completed_request+0x81/0xc0
-> > > >> [   87.707180]  ? blk_mq_tagset_busy_iter+0xd40/0xd40
-> > > >> [   87.711966]  nvme_tcp_configure_io_queues.cold+0x90c/0xbc9
-> > [nvme_tcp]
-> > > >> [   87.718499]  ? nvme_tcp_alloc_queue+0x1e50/0x1e50 [nvme_tcp]
-> > > >> [   87.724326]  ? nvme_tcp_configure_admin_queue+0x688/0x840
-> > [nvme_tcp]
-> > > >> [   87.730789]  nvme_tcp_setup_ctrl+0x1b8/0x590 [nvme_tcp]
-> > > >> [   87.736103]  ? rcu_read_lock_sched_held+0x3f/0x70
-> > > >> [   87.740886]  nvme_tcp_create_ctrl+0x92d/0xbb0 [nvme_tcp]
-> > > >> [   87.746291]  nvmf_create_ctrl+0x2ee/0x8c0 [nvme_fabrics]
-> > > >> [   87.751697]  nvmf_dev_write+0xd3/0x170 [nvme_fabrics]
-> > > >> [   87.756749]  vfs_write+0x1bc/0x9b0
-> > > >> [   87.760280]  ksys_write+0x106/0x1e0
-> > > >> [   87.763829]  ? __ia32_sys_read+0xa0/0xa0
-> > > >> [   87.767818]  ? lockdep_hardirqs_on_prepare.part.0+0x19f/0x390
-> > > >> [   87.773660]  ? syscall_enter_from_user_mode+0x20/0x70
-> > > >> [   87.778802]  do_syscall_64+0x3a/0x90
-> > > >> [   87.782440]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > >> [   87.787492] RIP: 0033:0x7ffb8ff34bd4
-> > > >> [   87.791204] Code: 15 51 72 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff =
-ff
-> > > >> ff eb b7 0f 1f 00 f3 0f 1e fa 80 3d 2d fa 0d 00 00 74 13 b8 01 00
-> > > >> 00
-> > > >> 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 48 83 ec 28 48 89 5=
-4
-> > > >> 24
-> > > >> 18 48
-> > > >> [   87.810293] RSP: 002b:00007fff0fd6ca18 EFLAGS: 00000202 ORIG_RA=
-X:
-> > > >> 0000000000000001
-> > > >> [   87.817904] RAX: ffffffffffffffda RBX: 0000563964c22df0 RCX:
-> > 00007ffb8ff34bd4
-> > > >> [   87.825231] RDX: 00000000000000b2 RSI: 0000563964c22df0 RDI:
-> > 0000000000000004
-> > > >> [   87.832484] RBP: 0000000000000004 R08: 00000000000000b2 R09:
-> > 0000563964c22df0
-> > > >> [   87.839650] R10: 0000000000000000 R11: 0000000000000202 R12:
-> > 0000563964c20540
-> > > >> [   87.846978] R13: 00000000000000b2 R14: 00007ffb90063100 R15:
-> > 00007ffb9006313d
-> > > >> [   87.854238]  </TASK>
-> > > >>
-> > > >> [   87.857974] Allocated by task 2308:
-> > > >> [   87.861523]  kasan_save_stack+0x2f/0x50
-> > > >> [   87.865425]  __kasan_kmalloc+0x88/0xb0
-> > > >> [   87.869237]  blk_mq_init_tags+0x59/0x140
-> > > >> [   87.873137]  blk_mq_alloc_map_and_rqs+0x96/0x300
-> > > >> [   87.877904]  blk_mq_alloc_set_map_and_rqs+0x1b5/0x5d0
-> > > >> [   87.883042]  blk_mq_alloc_tag_set+0x4d4/0x920
-> > > >> [   87.887474]  nvme_tcp_configure_io_queues.cold+0x708/0xbc9
-> > [nvme_tcp]
-> > > >> [   87.894025]  nvme_tcp_setup_ctrl+0x1b8/0x590 [nvme_tcp]
-> > > >> [   87.899341]  nvme_tcp_create_ctrl+0x92d/0xbb0 [nvme_tcp]
-> > > >> [   87.904746]  nvmf_create_ctrl+0x2ee/0x8c0 [nvme_fabrics]
-> > > >> [   87.910149]  nvmf_dev_write+0xd3/0x170 [nvme_fabrics]
-> > > >> [   87.915288]  vfs_write+0x1bc/0x9b0
-> > > >> [   87.918747]  ksys_write+0x106/0x1e0
-> > > >> [   87.922294]  do_syscall_64+0x3a/0x90
-> > > >> [   87.925928]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > >>
-> > > >> [   87.932579] Freed by task 2504:
-> > > >> [   87.935771]  kasan_save_stack+0x2f/0x50
-> > > >> [   87.939669]  kasan_set_track+0x21/0x30
-> > > >> [   87.943479]  kasan_set_free_info+0x20/0x40
-> > > >> [   87.947642]  __kasan_slab_free+0x108/0x170
-> > > >> [   87.951806]  slab_free_freelist_hook+0x11e/0x1d0
-> > > >> [   87.956502]  kfree+0xe1/0x320
-> > > >> [   87.959518]  __blk_mq_free_map_and_rqs+0x15c/0x240
-> > > >> [   87.964390]  blk_mq_free_tag_set+0x65/0x3a0
-> > > >> [   87.968644]  nvme_tcp_teardown_io_queues.part.0+0x20a/0x2a0
-> > [nvme_tcp]
-> > > >> [   87.975282]  nvme_tcp_delete_ctrl+0x47/0xd0 [nvme_tcp]
-> > > >> [   87.980507]  nvme_do_delete_ctrl+0x133/0x13d [nvme_core]
-> > > >> [   87.985919]  nvme_sysfs_delete.cold+0x8/0xd [nvme_core]
-> > > >> [   87.991242]  kernfs_fop_write_iter+0x359/0x530
-> > > >> [   87.995765]  new_sync_write+0x2b9/0x500
-> > > >> [   87.999663]  vfs_write+0x639/0x9b0
-> > > >> [   88.003121]  ksys_write+0x106/0x1e0
-> > > >> [   88.006578]  do_syscall_64+0x3a/0x90
-> > > >> [   88.010198]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > >>
-> > > >> [   88.016920] The buggy address belongs to the object at
-> > ffff8896046c7600
-> > > >>                  which belongs to the cache kmalloc-256 of size 25=
-6
-> > > >> [   88.029648] The buggy address is located 4 bytes inside of
-> > > >>                  256-byte region [ffff8896046c7600,
-> > > >> ffff8896046c7700)
-> > > >>
-> > > >> [   88.042919] The buggy address belongs to the physical page:
-> > > >> [   88.048583] page:000000003565eedb refcount:1 mapcount:0
-> > > >> mapping:0000000000000000 index:0xffff8896046c5e00 pfn:0x16046c0
-> > > >> [   88.059561] head:000000003565eedb order:3 compound_mapcount:0
-> > > >> compound_pincount:0
-> > > >> [   88.067172] flags:
-> > > >> 0xd7ffffc0010200(slab|head|node=3D3|zone=3D2|lastcpupid=3D0x1fffff=
-)
-> > > >> [   88.074701] raw: 00d7ffffc0010200 ffff889480000950 ffff88948000=
-0950
-> > > >> ffff88810004cd80
-> > > >> [   88.082486] raw: ffff8896046c5e00 0000000000400010 00000001ffff=
-ffff
-> > > >> 0000000000000000
-> > > >> [   88.090432] page dumped because: kasan: bad access detected
-> > > >>
-> > > >> [   88.097608] Memory state around the buggy address:
-> > > >> [   88.102478]  ffff8896046c7500: fc fc fc fc fc fc fc fc fc fc fc=
- fc
-> > > >> fc fc fc fc
-> > > >> [   88.109821]  ffff8896046c7580: fc fc fc fc fc fc fc fc fc fc fc=
- fc
-> > > >> fc fc fc fc
-> > > >> [   88.117164] >ffff8896046c7600: fa fb fb fb fb fb fb fb fb fb fb=
- fb
-> > > >> fb fb fb fb
-> > > >> [   88.124507]                    ^
-> > > >> [   88.127790]  ffff8896046c7680: fb fb fb fb fb fb fb fb fb fb fb=
- fb
-> > > >> fb fb fb fb
-> > > >> [   88.135133]  ffff8896046c7700: fc fc fc fc fc fc fc fc fc fc fc=
- fc
-> > > >> fc fc fc fc
-> > > >> [   88.142476]
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> > > >> [   88.149905] ------------[ cut here ]------------
-> > > >> [   88.154619] refcount_t: underflow; use-after-free.
-> > > >> [   88.159439] WARNING: CPU: 75 PID: 2308 at lib/refcount.c:28
-> > > >> refcount_warn_saturate+0x12a/0x190
-> > > >> [   88.168241] Modules linked in: loop nvmet_tcp(-) nvmet nvme_tcp
-> > > >> nvme_fabrics nvme_core intel_rapl_msr intel_rapl_common
-> > amd64_edac
-> > > >> edac_mce_amd rfkill kvm_amd sunrpc vfat kvm fat ipmi_ssif joydev
-> > > >> irqbypass acpi_ipmi rapl e1000e pcspkr ipmi_si ipmi_devintf
-> > > >> i2c_piix4 k10temp ipmi_msghandler acpi_cpufreq fuse zram xfs
-> > > >> libcrc32c ast i2c_algo_bit drm_vram_helper sd_mod t10_pi
-> > > >> drm_kms_helper crc64_rocksoft_generic syscopyarea sysfillrect
-> > > >> crc64_rocksoft sysimgblt crc64 fb_sys_fops drm_ttm_helper
-> > > >> crct10dif_pclmul crc32_pclmul ttm crc32c_intel ahci libahci
-> > > >> ghash_clmulni_intel drm libata ccp sp5100_tco dm_mod
-> > > >> [   88.222334] CPU: 75 PID: 2308 Comm: nvme Tainted: G    B   W
-> > > >>   5.19.0-rc8+ #1
-> > > >> [   88.230129] Hardware name: AMD Corporation Speedway/Speedway,
-> > BIOS
-> > > >> RSW100BB 11/14/2018
-> > > >> [   88.238187] RIP: 0010:refcount_warn_saturate+0x12a/0x190
-> > > >> [   88.243602] Code: eb a1 0f b6 1d 87 59 2c 03 80 fb 01 0f 87 85 =
-9e
-> > > >> 30 01 83 e3 01 75 8c 48 c7 c7 60 99 8a ac c6 05 6b 59 2c 03 01 e8
-> > > >> c6
-> > > >> 98 29 01 <0f> 0b e9 72 ff ff ff 0f b6 1d 56 59 2c 03 80 fb 01 0f 8=
-7
-> > > >> 42 9e 30
-> > > >> [   88.262611] RSP: 0018:ffff8881695cfc68 EFLAGS: 00010282
-> > > >> [   88.267995] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
-> > 0000000000000000
-> > > >> [   88.275261] RDX: 0000000000000001 RSI: ffffffffac8ae120 RDI:
-> > ffffed102d2b9f7d
-> > > >> [   88.282525] RBP: 0000000000000003 R08: 0000000000000001 R09:
-> > ffff888c2ebfd387
-> > > >> [   88.289707] R10: ffffed1185d7fa70 R11: 0000000063666572 R12:
-> > ffff8888875e0490
-> > > >> [   88.297031] R13: ffff8888875e0000 R14: 00000000fffffffc R15:
-> > 0000000000000000
-> > > >> [   88.304208] FS:  00007ffb8fe39780(0000) GS:ffff888c2ea00000(000=
-0)
-> > > >> knlGS:0000000000000000
-> > > >> [   88.312417] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > >> [   88.318334] CR2: 0000563964c22860 CR3: 0000000dc1fb0000 CR4:
-> > 00000000003506e0
-> > > >> [   88.325510] Call Trace:
-> > > >> [   88.328073]  <TASK>
-> > > >> [   88.330218]  nvme_tcp_configure_io_queues.cold+0xb5c/0xbc9
-> > [nvme_tcp]
-> > > >> [   88.336782]  ? nvme_tcp_alloc_queue+0x1e50/0x1e50 [nvme_tcp]
-> > > >> [   88.342464]  ? nvme_tcp_configure_admin_queue+0x688/0x840
-> > [nvme_tcp]
-> > > >> [   88.348999]  nvme_tcp_setup_ctrl+0x1b8/0x590 [nvme_tcp]
-> > > >> [   88.354331]  ? rcu_read_lock_sched_held+0x3f/0x70
-> > > >> [   88.359127]  nvme_tcp_create_ctrl+0x92d/0xbb0 [nvme_tcp]
-> > > >> [   88.364477]  nvmf_create_ctrl+0x2ee/0x8c0 [nvme_fabrics]
-> > > >> [   88.369843]  nvmf_dev_write+0xd3/0x170 [nvme_fabrics]
-> > > >> [   88.375051]  vfs_write+0x1bc/0x9b0
-> > > >> [   88.378524]  ksys_write+0x106/0x1e0
-> > > >> [   88.382084]  ? __ia32_sys_read+0xa0/0xa0
-> > > >> [   88.386085]  ? lockdep_hardirqs_on_prepare.part.0+0x19f/0x390
-> > > >> [   88.391939]  ? syscall_enter_from_user_mode+0x20/0x70
-> > > >> [   88.397091]  do_syscall_64+0x3a/0x90
-> > > >> [   88.400737]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > >> [   88.405888] RIP: 0033:0x7ffb8ff34bd4
-> > > >> [   88.409446] Code: 15 51 72 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff =
-ff
-> > > >> ff eb b7 0f 1f 00 f3 0f 1e fa 80 3d 2d fa 0d 00 00 74 13 b8 01 00
-> > > >> 00
-> > > >> 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 48 83 ec 28 48 89 5=
-4
-> > > >> 24
-> > > >> 18 48
-> > > >> [   88.428608] RSP: 002b:00007fff0fd6ca18 EFLAGS: 00000202 ORIG_RA=
-X:
-> > > >> 0000000000000001
-> > > >> [   88.436319] RAX: ffffffffffffffda RBX: 0000563964c22df0 RCX:
-> > 00007ffb8ff34bd4
-> > > >> [   88.443583] RDX: 00000000000000b2 RSI: 0000563964c22df0 RDI:
-> > 0000000000000004
-> > > >> [   88.450760] RBP: 0000000000000004 R08: 00000000000000b2 R09:
-> > 0000563964c22df0
-> > > >> [   88.458001] R10: 0000000000000000 R11: 0000000000000202 R12:
-> > 0000563964c20540
-> > > >> [   88.465328] R13: 00000000000000b2 R14: 00007ffb90063100 R15:
-> > 00007ffb9006313d
-> > > >> [   88.472509]  </TASK>
-> > > >> [   88.474798] irq event stamp: 160688
-> > > >> [   88.478354] hardirqs last  enabled at (160687):
-> > > >> [<ffffffffac0a20d0>] _raw_spin_unlock_irqrestore+0x30/0x60
-> > > >> [   88.488184] hardirqs last disabled at (160688):
-> > > >> [<ffffffffac08bae7>] __schedule+0xb37/0x1820
-> > > >> [   88.496781] softirqs last  enabled at (160660):
-> > > >> [<ffffffffac400693>] __do_softirq+0x693/0xafb
-> > > >> [   88.505459] softirqs last disabled at (160651):
-> > > >> [<ffffffffa9e23ea7>] __irq_exit_rcu+0x1c7/0x2c0
-> > > >> [   88.514318] ---[ end trace 0000000000000000 ]---
-> > > >> [   88.518959] general protection fault, probably for non-canonica=
-l
-> > > >> address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> > > >> [   88.530580] KASAN: null-ptr-deref in range
-> > > >> [0x0000000000000000-0x0000000000000007]
-> > > >> [   88.538276] CPU: 75 PID: 2308 Comm: nvme Tainted: G    B   W
-> > > >>   5.19.0-rc8+ #1
-> > > >> [   88.546062] Hardware name: AMD Corporation Speedway/Speedway,
-> > BIOS
-> > > >> RSW100BB 11/14/2018
-> > > >> [   88.554112] RIP: 0010:__blk_mq_free_map_and_rqs+0x88/0x240
-> > > >> [   88.559690] Code: 00 00 48 8b 6b 68 41 89 f4 49 c1 e4 03 4c 01 =
-e5
-> > > >> 45 85 ed 0f 85 07 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 e9
-> > > >> 48
-> > > >> c1 e9 03 <80> 3c 01 00 0f 85 2e 01 00 00 4c 8b 6d 00 4d 85 ed 0f 8=
-4
-> > > >> df
-> > > >> 00 00
-> > > >> [   88.578774] RSP: 0018:ffff8881695cfc00 EFLAGS: 00010256
-> > > >> [   88.584088] RAX: dffffc0000000000 RBX: ffff8888875e0008 RCX:
-> > 0000000000000000
-> > > >> [   88.591254] RDX: 0000000000000080 RSI: 0000000000000000 RDI:
-> > ffff8888875e0060
-> > > >> [   88.598583] RBP: 0000000000000000 R08: 0000000000000001 R09:
-> > ffff888c2ebfd387
-> > > >> [   88.605837] R10: ffffed1185d7fa70 R11: 0000000063666572 R12:
-> > 0000000000000000
-> > > >> [   88.613090] R13: 0000000000000000 R14: ffff8888875e0070 R15:
-> > 0000000000000000
-> > > >> [   88.620255] FS:  00007ffb8fe39780(0000) GS:ffff888c2ea00000(000=
-0)
-> > > >> knlGS:0000000000000000
-> > > >> [   88.628552] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > >> [   88.634394] CR2: 0000563964c22860 CR3: 0000000dc1fb0000 CR4:
-> > 00000000003506e0
-> > > >> [   88.641648] Call Trace:
-> > > >> [   88.644046]  <TASK>
-> > > >> [   88.646253]  blk_mq_free_tag_set+0x65/0x3a0
-> > > >> [   88.650507]  ? refcount_warn_saturate+0x12c/0x190
-> > > >> [   88.655291]  nvme_tcp_configure_io_queues.cold+0xb86/0xbc9
-> > [nvme_tcp]
-> > > >> [   88.661845]  ? nvme_tcp_alloc_queue+0x1e50/0x1e50 [nvme_tcp]
-> > > >> [   88.667602]  ? nvme_tcp_configure_admin_queue+0x688/0x840
-> > [nvme_tcp]
-> > > >> [   88.674066]  nvme_tcp_setup_ctrl+0x1b8/0x590 [nvme_tcp]
-> > > >> [   88.679381]  ? rcu_read_lock_sched_held+0x3f/0x70
-> > > >> [   88.684077]  nvme_tcp_create_ctrl+0x92d/0xbb0 [nvme_tcp]
-> > > >> [   88.689553]  nvmf_create_ctrl+0x2ee/0x8c0 [nvme_fabrics]
-> > > >> [   88.694957]  nvmf_dev_write+0xd3/0x170 [nvme_fabrics]
-> > > >> [   88.700007]  vfs_write+0x1bc/0x9b0
-> > > >> [   88.703541]  ksys_write+0x106/0x1e0
-> > > >> [   88.707000]  ? __ia32_sys_read+0xa0/0xa0
-> > > >> [   88.711063]  ? lockdep_hardirqs_on_prepare.part.0+0x19f/0x390
-> > > >> [   88.716907]  ? syscall_enter_from_user_mode+0x20/0x70
-> > > >> [   88.722045]  do_syscall_64+0x3a/0x90
-> > > >> [   88.725682]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> > > >> [   88.730819] RIP: 0033:0x7ffb8ff34bd4
-> > > >> [   88.734455] Code: 15 51 72 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff =
-ff
-> > > >> ff eb b7 0f 1f 00 f3 0f 1e fa 80 3d 2d fa 0d 00 00 74 13 b8 01 00
-> > > >> 00
-> > > >> 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 48 83 ec 28 48 89 5=
-4
-> > > >> 24
-> > > >> 18 48
-> > > >> [   88.753451] RSP: 002b:00007fff0fd6ca18 EFLAGS: 00000202 ORIG_RA=
-X:
-> > > >> 0000000000000001
-> > > >> [   88.761132] RAX: ffffffffffffffda RBX: 0000563964c22df0 RCX:
-> > 00007ffb8ff34bd4
-> > > >> [   88.768371] RDX: 00000000000000b2 RSI: 0000563964c22df0 RDI:
-> > 0000000000000004
-> > > >> [   88.775700] RBP: 0000000000000004 R08: 00000000000000b2 R09:
-> > 0000563964c22df0
-> > > >> [   88.782865] R10: 0000000000000000 R11: 0000000000000202 R12:
-> > 0000563964c20540
-> > > >> [   88.790192] R13: 00000000000000b2 R14: 00007ffb90063100 R15:
-> > 00007ffb9006313d
-> > > >> [   88.797452]  </TASK>
-> > > >> [   88.799672] Modules linked in: loop nvmet_tcp(-) nvmet nvme_tcp
-> > > >> nvme_fabrics nvme_core intel_rapl_msr intel_rapl_common
-> > amd64_edac
-> > > >> edac_mce_amd rfkill kvm_amd sunrpc vfat kvm fat ipmi_ssif joydev
-> > > >> irqbypass acpi_ipmi rapl e1000e pcspkr ipmi_si ipmi_devintf
-> > > >> i2c_piix4 k10temp ipmi_msghandler acpi_cpufreq fuse zram xfs
-> > > >> libcrc32c ast i2c_algo_bit drm_vram_helper sd_mod t10_pi
-> > > >> drm_kms_helper crc64_rocksoft_generic syscopyarea sysfillrect
-> > > >> crc64_rocksoft sysimgblt crc64 fb_sys_fops drm_ttm_helper
-> > > >> crct10dif_pclmul crc32_pclmul ttm crc32c_intel ahci libahci
-> > > >> ghash_clmulni_intel drm libata ccp sp5100_tco dm_mod
-> > > >> [   88.853746] ---[ end trace 0000000000000000 ]---
-> > > >> [   88.858451] RIP: 0010:__blk_mq_free_map_and_rqs+0x88/0x240
-> > > >> [   88.863950] Code: 00 00 48 8b 6b 68 41 89 f4 49 c1 e4 03 4c 01 =
-e5
-> > > >> 45 85 ed 0f 85 07 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 e9
-> > > >> 48
-> > > >> c1 e9 03 <80> 3c 01 00 0f 85 2e 01 00 00 4c 8b 6d 00 4d 85 ed 0f 8=
-4
-> > > >> df
-> > > >> 00 00
-> > > >> [   88.883111] RSP: 0018:ffff8881695cfc00 EFLAGS: 00010256
-> > > >> [   88.888440] RAX: dffffc0000000000 RBX: ffff8888875e0008 RCX:
-> > 0000000000000000
-> > > >> [   88.895621] RDX: 0000000000000080 RSI: 0000000000000000 RDI:
-> > ffff8888875e0060
-> > > >> [   88.902946] RBP: 0000000000000000 R08: 0000000000000001 R09:
-> > ffff888c2ebfd387
-> > > >> [   88.910216] R10: ffffed1185d7fa70 R11: 0000000063666572 R12:
-> > 0000000000000000
-> > > >> [   88.917489] R13: 0000000000000000 R14: ffff8888875e0070 R15:
-> > 0000000000000000
-> > > >> [   88.924757] FS:  00007ffb8fe39780(0000) GS:ffff888c2ea00000(000=
-0)
-> > > >> knlGS:0000000000000000
-> > > >> [   88.932998] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > >> [   88.938854] CR2: 0000563964c22860 CR3: 0000000dc1fb0000 CR4:
-> > 00000000003506e0
-> > > >>
-> > > >> --
-> > > >> Best Regards,
-> > > >>    Yi Zhang
-> > > >
-> > >
-> > > Please have a look at this.
-> > >
-> > > -ck
-> > >
-> > >
-> >
-> >
-> > --
-> > Best Regards,
-> >   Yi Zhang
->
+- Support for UBLK_IO_NEED_GET_DATA for ublk (ZiyangZhang)
+
+- Fixes for the dio dma alignment (Keith)
+
+- Misc fixes and cleanups (Ming, Yu, Dan, Christophe
+
+Please pull!
 
 
---
-Best Regards,
-  Yi Zhang
+The following changes since commit 8374cfe647a1f360be3228b949dd6d753c55c19c:
+
+  Merge tag 'for-6.0/dm-changes' of git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm (2022-08-02 14:21:25 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/for-5.20/block-2022-08-04
+
+for you to fetch changes up to bc792884b76f0da2f5c9a8d720e430e2de9756f5:
+
+  s390/dasd: Establish DMA alignment (2022-08-04 16:19:15 -0600)
+
+----------------------------------------------------------------
+for-5.20/block-2022-08-04
+
+----------------------------------------------------------------
+Bean Huo (1):
+      nvme: use command_id instead of req->tag in trace_nvme_complete_rq()
+
+Caleb Sander (1):
+      nvme-tcp: use in-capsule data for I/O connect
+
+Chaitanya Kulkarni (4):
+      nvme: remove unused timeout parameter
+      nvme: fix qid param blk_mq_alloc_request_hctx
+      nvmet-auth: fix return value check in auth send
+      nvmet-auth: fix return value check in auth receive
+
+Chris Webb (1):
+      md: Explicitly create command-line configured devices
+
+Christoph Hellwig (34):
+      md: fix mddev->kobj lifetime
+      md: fix error handling in md_alloc
+      md: implement ->free_disk
+      md: rename md_free to md_kobj_release
+      md: factor out the rdev overlaps check from rdev_size_store
+      md: stop using for_each_mddev in md_do_sync
+      md: stop using for_each_mddev in md_notify_reboot
+      md: stop using for_each_mddev in md_exit
+      md: only delete entries from all_mddevs when the disk is freed
+      md: simplify md_open
+      remove the sx8 block driver
+      md: open code md_probe in autorun_devices
+      md: return the allocated devices from md_alloc
+      nvme: don't always build constants.o
+      nvme-pci: print the command name of aborted commands
+      nvme-pci: split nvme_alloc_admin_tags
+      nvme-pci: split nvme_dev_add
+      nvme-rdma: split nvme_rdma_alloc_tagset
+      nvme-tcp: split nvme_tcp_alloc_tagset
+      nvme-apple: stop casting function pointer signatures
+      nvmet: don't check for NULL pointer before kfree in nvmet_host_release
+      nvmet: fix a format specifier in nvmet_auth_ctrl_exponential
+      nvme: catch -ENODEV from nvme_revalidate_zones again
+      nvme: rename nvme_validate_or_alloc_ns to nvme_scan_ns
+      nvme: generalize the nvme_multi_css check in nvme_scan_ns
+      nvme: refactor namespace probing
+      nvme: factor out a nvme_ns_is_readonly helper
+      nvme: update MAINTAINERS for the new auth code
+      block: change the blk_queue_split calling convention
+      block: change the blk_queue_bounce calling convention
+      block: move ->bio_split to the gendisk
+      block: move the call to get_max_io_size out of blk_bio_segment_split
+      block: move bio_allowed_max_sectors to blk-merge.c
+      block: pass struct queue_limits to the bio splitting helpers
+
+Christophe JAILLET (1):
+      block: null_blk: Use the bitmap API to allocate bitmaps
+
+Colin Ian King (1):
+      nvmet-auth: fix a couple of spelling mistakes
+
+Coly Li (1):
+      bcache: remove EXPERIMENTAL for Kconfig option 'Asynchronous device registration'
+
+Dan Carpenter (3):
+      null_blk: fix ida error handling in null_add_dev()
+      nvme-auth: fix off by one checks
+      nvme-auth: uninitialized variable in nvme_auth_transform_key()
+
+Eric Farman (1):
+      s390/dasd: Establish DMA alignment
+
+Guixin Liu (2):
+      nvme-pci: use nvme core helper to cancel requests in tagset
+      nvme-apple: use nvme core helper to cancel requests in tagset
+
+Guoqing Jiang (9):
+      md: unlock mddev before reap sync_thread in action_store
+      rnbd-clt: open code send_msg_open in rnbd_clt_map_device
+      rnbd-clt: don't free rsp in msg_open_conf for map scenario
+      rnbd-clt: kill read_only from struct rnbd_clt_dev
+      rnbd-clt: reduce the size of struct rnbd_clt_dev
+      rnbd-clt: adjust the layout of struct rnbd_clt_dev
+      rnbd-clt: check capacity inside rnbd_clt_change_capacity
+      rnbd-clt: pass sector_t type for resize capacity
+      rnbd-clt: make rnbd_clt_change_capacity return void
+
+Hannes Reinecke (11):
+      crypto: add crypto_has_shash()
+      crypto: add crypto_has_kpp()
+      lib/base64: RFC4648-compliant base64 encoding
+      nvme: add definitions for NVMe In-Band authentication
+      nvme-fabrics: decode 'authentication required' connect error
+      nvme: implement In-Band authentication
+      nvme-auth: Diffie-Hellman key exchange support
+      nvmet: parse fabrics commands on io queues
+      nvmet: implement basic In-Band Authentication
+      nvmet-auth: Diffie-Hellman key exchange support
+      nvmet-auth: expire authentication sessions
+
+Israel Rukshin (1):
+      nvme-rdma: remove timeout for getting RDMA-CM established event
+
+Jackie Liu (1):
+      raid5: fix duplicate checks for rdev->saved_raid_disk
+
+Jiang Jian (1):
+      s390/dasd: drop unexpected word 'for' in comments
+
+Joel Granados (2):
+      nvme-multipath: refactor nvme_mpath_add_disk
+      nvme: enable generic interface (/dev/ngXnY) for unknown command sets
+
+Keith Busch (3):
+      block: ensure iov_iter advances for added pages
+      block: ensure bio_iov_add_page can't fail
+      block: fix leaking page ref on truncated direct io
+
+Lars Ellenberg (1):
+      drbd: bm_page_async_io: fix spurious bitmap "IO error" on large volumes
+
+Liu Song (1):
+      nvme-pci: remove useless assignment in nvme_pci_setup_prps
+
+Logan Gunthorpe (32):
+      md/raid5-log: Drop extern decorators for function prototypes
+      md/raid5-ppl: Drop unused argument from ppl_handle_flush_request()
+      md/raid5: suspend the array for calls to log_exit()
+      md/raid5-cache: Take mddev_lock in r5c_journal_mode_show()
+      md/raid5-cache: Drop RCU usage of conf->log
+      md/raid5-cache: Clear conf->log after finishing work
+      md/raid5-cache: Annotate pslot with __rcu notation
+      md: Use enum for overloaded magic numbers used by mddev->curr_resync
+      md: Ensure resync is reported after it starts
+      md: Notify sysfs sync_completed in md_reap_sync_thread()
+      md/raid5: Make logic blocking check consistent with logic that blocks
+      md/raid5: Factor out ahead_of_reshape() function
+      md/raid5: Refactor raid5_make_request loop
+      md/raid5: Move stripe_add_to_batch_list() call out of add_stripe_bio()
+      md/raid5: Move common stripe get code into new find_get_stripe() helper
+      md/raid5: Factor out helper from raid5_make_request() loop
+      md/raid5: Drop the do_prepare flag in raid5_make_request()
+      md/raid5: Move read_seqcount_begin() into make_stripe_request()
+      md/raid5: Refactor for loop in raid5_make_request() into while loop
+      md/raid5: Keep a reference to last stripe_head for batch
+      md/raid5: Refactor add_stripe_bio()
+      md/raid5: Check all disks in a stripe_head for reshape progress
+      md/raid5: Pivot raid5_make_request()
+      md/raid5: Improve debug prints
+      md/raid5: Increase restriction on max segments per request
+      md/raid5: Fix sectors_to_do bitmap overflow in raid5_make_request()
+      md/raid5: Convert prepare_to_wait() to wait_woken() api
+      md/raid5: Refactor raid5_get_active_stripe()
+      md/raid5: Make is_inactive_blocked() helper
+      md/raid5: Drop unnecessary call to r5c_check_stripe_cache_usage()
+      md/raid5: Move stripe_request_ctx up
+      md/raid5: Ensure batch_last is released before sleeping for quiesce
+
+Lukas Bulwahn (1):
+      nvmet-auth: select the intended CRYPTO_DH_RFC7919_GROUPS
+
+Md Haris Iqbal (2):
+      block/rnbd-srv: Set keep_id to true after mutex_trylock
+      block/rnbd-srv: Replace sess_dev_list with index_idr
+
+Michael Kelley (1):
+      nvme: handle the persistent internal error AER
+
+Mikulas Patocka (2):
+      md-raid: destroy the bitmap after destroying the thread
+      md-raid10: fix KASAN warning
+
+Ming Lei (4):
+      ublk_drv: cancel device even though disk isn't up
+      ublk_drv: fix ublk device leak in case that add_disk fails
+      ublk_drv: add SET_PARAMS/GET_PARAMS control command
+      ublk_drv: cleanup ublksrv_ctrl_dev_info
+
+Nick Bowler (1):
+      nvme: define compat_ioctl again to unbreak 32-bit userspace.
+
+Sagi Grimberg (2):
+      nvme-loop: use nvme core helpers to cancel all requests in a tagset
+      nvmet-tcp: fix lockdep complaint on nvmet_tcp_wq flush during queue teardown
+
+Song Liu (1):
+      MAINTAINERS: add patchwork link to linux-raid project
+
+Stephen Rothwell (1):
+      md: fix build failure for !MODULE
+
+Vincent Fu (2):
+      null_blk: add module parameters for 4 options
+      null_blk: add configfs variables for 2 options
+
+Wentao_Liang (1):
+      drivers:md:fix a potential use-after-free bug
+
+Xiang wangx (1):
+      nvme: remove a double word in a comment
+
+Yang Li (1):
+      md: remove unneeded semicolon
+
+Yu Kuai (1):
+      nbd: add missing definition of pr_fmt
+
+Zhang Jiaming (1):
+      md: Fix spelling mistake in comments
+
+ZiyangZhang (2):
+      ublk_cmd.h: add one new ublk command: UBLK_IO_NEED_GET_DATA
+      ublk_drv: add support for UBLK_IO_NEED_GET_DATA
+
+ Documentation/block/null_blk.rst       |   22 +
+ MAINTAINERS                            |    4 +-
+ block/bio-integrity.c                  |    2 +-
+ block/bio.c                            |   51 +-
+ block/blk-core.c                       |    9 +-
+ block/blk-merge.c                      |  185 ++--
+ block/blk-mq.c                         |    6 +-
+ block/blk-sysfs.c                      |    2 -
+ block/blk.h                            |   47 +-
+ block/bounce.c                         |   26 +-
+ block/genhd.c                          |    8 +-
+ crypto/kpp.c                           |    6 +
+ crypto/shash.c                         |    6 +
+ drivers/block/Kconfig                  |    9 -
+ drivers/block/Makefile                 |    2 -
+ drivers/block/drbd/drbd_bitmap.c       |   49 +-
+ drivers/block/drbd/drbd_req.c          |    2 +-
+ drivers/block/nbd.c                    |    6 +-
+ drivers/block/null_blk/main.c          |  108 ++-
+ drivers/block/null_blk/null_blk.h      |    2 +
+ drivers/block/pktcdvd.c                |    2 +-
+ drivers/block/ps3vram.c                |    2 +-
+ drivers/block/rnbd/rnbd-clt-sysfs.c    |    2 +-
+ drivers/block/rnbd/rnbd-clt.c          |  201 ++--
+ drivers/block/rnbd/rnbd-clt.h          |   18 +-
+ drivers/block/rnbd/rnbd-srv.c          |   20 +-
+ drivers/block/rnbd/rnbd-srv.h          |    4 -
+ drivers/block/sx8.c                    | 1582 --------------------------------
+ drivers/block/ublk_drv.c               |  348 ++++++-
+ drivers/md/bcache/Kconfig              |    2 +-
+ drivers/md/dm-raid.c                   |    1 +
+ drivers/md/dm.c                        |    8 +-
+ drivers/md/md-autodetect.c             |   21 +-
+ drivers/md/md-cluster.c                |    4 +-
+ drivers/md/md.c                        |  424 +++++----
+ drivers/md/md.h                        |   19 +
+ drivers/md/raid10.c                    |    5 +-
+ drivers/md/raid5-cache.c               |   40 +-
+ drivers/md/raid5-log.h                 |   77 +-
+ drivers/md/raid5-ppl.c                 |    2 +-
+ drivers/md/raid5.c                     |  727 ++++++++++-----
+ drivers/md/raid5.h                     |    2 +-
+ drivers/nvme/Kconfig                   |    1 +
+ drivers/nvme/Makefile                  |    1 +
+ drivers/nvme/common/Kconfig            |    4 +
+ drivers/nvme/common/Makefile           |    7 +
+ drivers/nvme/common/auth.c             |  483 ++++++++++
+ drivers/nvme/host/Kconfig              |   15 +
+ drivers/nvme/host/Makefile             |    4 +-
+ drivers/nvme/host/apple.c              |   28 +-
+ drivers/nvme/host/auth.c               | 1017 ++++++++++++++++++++
+ drivers/nvme/host/constants.c          |    3 +-
+ drivers/nvme/host/core.c               |  490 +++++++---
+ drivers/nvme/host/fabrics.c            |   94 +-
+ drivers/nvme/host/fabrics.h            |    7 +
+ drivers/nvme/host/multipath.c          |    9 +-
+ drivers/nvme/host/nvme.h               |   39 +-
+ drivers/nvme/host/pci.c                |  145 +--
+ drivers/nvme/host/rdma.c               |  106 ++-
+ drivers/nvme/host/tcp.c                |   95 +-
+ drivers/nvme/host/trace.c              |   32 +
+ drivers/nvme/host/trace.h              |    2 +-
+ drivers/nvme/target/Kconfig            |   15 +
+ drivers/nvme/target/Makefile           |    1 +
+ drivers/nvme/target/admin-cmd.c        |    4 +-
+ drivers/nvme/target/auth.c             |  525 +++++++++++
+ drivers/nvme/target/configfs.c         |  136 +++
+ drivers/nvme/target/core.c             |   15 +
+ drivers/nvme/target/fabrics-cmd-auth.c |  544 +++++++++++
+ drivers/nvme/target/fabrics-cmd.c      |   55 +-
+ drivers/nvme/target/loop.c             |    8 +-
+ drivers/nvme/target/nvmet.h            |   75 +-
+ drivers/nvme/target/tcp.c              |    3 +-
+ drivers/s390/block/dasd.c              |    2 +-
+ drivers/s390/block/dasd_diag.c         |    1 +
+ drivers/s390/block/dasd_eckd.c         |    1 +
+ drivers/s390/block/dcssblk.c           |    2 +-
+ include/crypto/hash.h                  |    2 +
+ include/crypto/kpp.h                   |    2 +
+ include/linux/base64.h                 |   16 +
+ include/linux/blkdev.h                 |    5 +-
+ include/linux/nvme-auth.h              |   41 +
+ include/linux/nvme.h                   |  213 ++++-
+ include/uapi/linux/ublk_cmd.h          |   80 +-
+ lib/Makefile                           |    2 +-
+ lib/base64.c                           |  103 +++
+ 86 files changed, 5640 insertions(+), 2856 deletions(-)
+ delete mode 100644 drivers/block/sx8.c
+ create mode 100644 drivers/nvme/common/Kconfig
+ create mode 100644 drivers/nvme/common/Makefile
+ create mode 100644 drivers/nvme/common/auth.c
+ create mode 100644 drivers/nvme/host/auth.c
+ create mode 100644 drivers/nvme/target/auth.c
+ create mode 100644 drivers/nvme/target/fabrics-cmd-auth.c
+ create mode 100644 include/linux/base64.h
+ create mode 100644 include/linux/nvme-auth.h
+ create mode 100644 lib/base64.c
+
+-- 
+Jens Axboe
 
