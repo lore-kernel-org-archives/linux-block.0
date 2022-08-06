@@ -2,58 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A17C25B0C
-	for <linux-block@archiver.kernel.org>; Sat,  6 Aug 2022 15:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DA5C19F2D
+	for <linux-block@archiver.kernel.org>; Sat,  6 Aug 2022 15:20:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbiHFPUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Aug 2022 11:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
+        id S231302AbiHFPUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Aug 2022 11:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231196AbiHFPUK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Aug 2022 11:20:10 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9A511A12
-        for <linux-block@vger.kernel.org>; Sat,  6 Aug 2022 08:20:09 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id v16-20020a17090abb9000b001f25244c65dso10777369pjr.2
-        for <linux-block@vger.kernel.org>; Sat, 06 Aug 2022 08:20:09 -0700 (PDT)
+        with ESMTP id S231196AbiHFPUM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Aug 2022 11:20:12 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96A6BD5
+        for <linux-block@vger.kernel.org>; Sat,  6 Aug 2022 08:20:10 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id u133so4615641pfc.10
+        for <linux-block@vger.kernel.org>; Sat, 06 Aug 2022 08:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=KQkxJ7Xt9ACG3CLAZzFZxHFZSW93HMroBHCMM5ScDhY=;
-        b=PpOGzcizOZkg0RFbAfq/VBwaHTwNveQxnWvIJZX5jiO4YFP8V7TcnI3N+Z2MEq6isr
-         ElX9mDWtl5+mDewuU3MpARtITiJNl1UvYZpgihG2/g+A/0bfIwldZaXAnJDU6MhO9xq1
-         O28LnFdujA+s7nVTaW4GgCtnS3/TM3f8DZREJeegD+yXeyGpdAcaz0Tbu0Q8Rrr2P8R9
-         0yvzJtGgVRMUiLwLqMw4hQofm+eh6n94b/VvBO/QSQdNa1g/MuADCST9LbRtU9panUDW
-         BksTxRIIi50RRGPIkO0HbBIHcRs4gIS165Kr6V6P6tvljM+9zM9YxCGmn4SSpeEAp/0s
-         Bgsg==
+        bh=Is5g6lb6jj60GAOGQvztYldquLbOFIsb6gndMPsDvCc=;
+        b=sO3dKXLjxpIn9RdifvvGk/uZk0/RRqOTSVDvgRUOJ4a5OWL30gQdJVFvqqTiNLHgyW
+         VL5U38tIyPRdqlQXRypNjxw2HtiQVkpqUP123TY1K8bzgaWIoXj/GaWGdN9xIBRjBPaV
+         /Tk3B31Oz1VsA2vhV5VdeahH4HnX+VNpSQHDvhN8GnhGtGRLdGGm1q0cMQAvhfPnQfT9
+         arbXf7mvGlildykuwYS6zfj2pT3hyrkxg0mH1gcnCjsW270sGP6WX/r8Ge9ck7KXCA5c
+         WC1WxfkF7za3W0hErq6l7NnQq8gP2IcWo2cO7njz5ytreh5k6GA5R4fLgFmnV08myiUt
+         hMdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=KQkxJ7Xt9ACG3CLAZzFZxHFZSW93HMroBHCMM5ScDhY=;
-        b=63krSit32QCgcVPOKkqqjU34d9d19XYBASbWjt/2u14JFdTLJGyuMJhUrKs7EmdpnI
-         UMhB9ed+j3mNIv3UUFeLaXuK5XVQvfd/I/tsJdXWJ4STW37/w+NjGKRml6MM/uwPGwNP
-         TV2QcdU3yuoSHkSU3mlXZgj40D1vUtXLGct2Pl+PO7fshK1fqs5GvGBPk4AdzuyEBkh1
-         ETPKlq8ehrMwuE/5C7wJLT6dmNEYrKkYPDfqu+J9/U86UiYrplGlg5ik+LnIUaWnnlb6
-         T6mh1rbvCTbhcpuv6GNcVdN7DOUq/m/IeYdX2AK4A8NgzqeBLNNx3qPg6WwMd4EcxUfj
-         Yxlg==
-X-Gm-Message-State: ACgBeo0ZzJUlRNHobAPFzYJrUuLzrb4luFCTbLVpWWGk9+hmx3FmCh6l
-        ocGIRq6ITgmFChs0uIOhFtu2zkj4zJYJAg==
-X-Google-Smtp-Source: AA6agR4Zyu06NMsedS3qStSFFnwVOul4lTIFw2LFfPB2a43FI8JEvX61ZP2eJ2NZnK0CMl4daxdZgw==
-X-Received: by 2002:a17:90b:4a4e:b0:1f5:431c:54f8 with SMTP id lb14-20020a17090b4a4e00b001f5431c54f8mr20943801pjb.161.1659799208925;
-        Sat, 06 Aug 2022 08:20:08 -0700 (PDT)
+        bh=Is5g6lb6jj60GAOGQvztYldquLbOFIsb6gndMPsDvCc=;
+        b=HFd5nBpnssGiW7qfc0JjjxbGXpgKaZenu9rlGK3Y6kXoabaPqK+g4T9IrRYJ+XnW/V
+         rOebJvyN6MiYT1pYL+ABIfHJJNpxI1l/lKGn2ENdyqza+sxWaF0f3CvAE8qYOXzyYFSL
+         N4QBhDL83bW+GonuAP4cY9GVCb9DJkr5OPu7J+WhnREgR/39kaWdZru+HLJtoSKqaIiB
+         HDQV6dPtG/WRYP6DrdgrdRLxGcbPgLcDvDyxH/oiC6TcwFufMKSNl0ztKSDnQdgczkbm
+         cwn+ETCElAszwGjbKlbHhVkiQNQYg91fQEro6vw/w5+O5WjBYuq2xAeR5n3M99DIPWFe
+         36xg==
+X-Gm-Message-State: ACgBeo2bUFWOkpg8gCaeb4GtSWy0qpAWhCAiGryvmD0RIVmZUJmksPsB
+        fcrBbpe6o6756tzhC5xmImxUQzWl/MdEbg==
+X-Google-Smtp-Source: AA6agR7HJzNOrYBhoT1aLsMsaWj5XkSpXpzxmOlKhG8ioFFEc4F2Zm/mDN3jZjCASytKKUI2Q02wrQ==
+X-Received: by 2002:a05:6a00:c96:b0:52e:979c:dd63 with SMTP id a22-20020a056a000c9600b0052e979cdd63mr10713198pfv.50.1659799209858;
+        Sat, 06 Aug 2022 08:20:09 -0700 (PDT)
 Received: from localhost.localdomain ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902f7c600b0016d1f6d1b99sm5158661plw.49.2022.08.06.08.20.08
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902f7c600b0016d1f6d1b99sm5158661plw.49.2022.08.06.08.20.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Aug 2022 08:20:08 -0700 (PDT)
+        Sat, 06 Aug 2022 08:20:09 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     joshi.k@samsung.com, kbusch@kernel.org,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/3] block: shrink rq_map_data a bit
-Date:   Sat,  6 Aug 2022 09:20:02 -0600
-Message-Id: <20220806152004.382170-2-axboe@kernel.dk>
+Subject: [PATCH 2/3] block: enable bio caching use for passthru IO
+Date:   Sat,  6 Aug 2022 09:20:03 -0600
+Message-Id: <20220806152004.382170-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220806152004.382170-1-axboe@kernel.dk>
 References: <20220806152004.382170-1-axboe@kernel.dk>
@@ -63,51 +63,84 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We don't need full ints for several of these members. Change the
-page_order and nr_entries to unsigned shorts, and the true/false from_user
-and null_mapped to booleans.
+bdev based polled O_DIRECT is currently quite a bit faster than
+passthru on the same device, and one of the reaons is that we're not
+able to use the bio caching for passthru IO.
 
-This shrinks the struct from 32 to 24 bytes on 64-bit archs.
+If REQ_POLLED is set on the request, use the fs bio set for grabbing a
+bio from the caches, if available. This saves 5-6% of CPU over head
+for polled passthru IO.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-map.c        | 2 +-
- include/linux/blk-mq.h | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ block/blk-map.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
 diff --git a/block/blk-map.c b/block/blk-map.c
-index df8b066cd548..4043c5809cd4 100644
+index 4043c5809cd4..5da03f2614eb 100644
 --- a/block/blk-map.c
 +++ b/block/blk-map.c
-@@ -158,7 +158,7 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
- 	bio_init(bio, NULL, bio->bi_inline_vecs, nr_pages, req_op(rq));
+@@ -231,6 +231,16 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
+ 	return ret;
+ }
  
- 	if (map_data) {
--		nr_pages = 1 << map_data->page_order;
-+		nr_pages = 1U << map_data->page_order;
- 		i = map_data->offset / PAGE_SIZE;
++static void bio_map_put(struct bio *bio)
++{
++	if (bio->bi_opf & REQ_ALLOC_CACHE) {
++		bio_put(bio);
++	} else {
++		bio_uninit(bio);
++		kfree(bio);
++	}
++}
++
+ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 		gfp_t gfp_mask)
+ {
+@@ -243,10 +253,19 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 	if (!iov_iter_count(iter))
+ 		return -EINVAL;
+ 
+-	bio = bio_kmalloc(nr_vecs, gfp_mask);
+-	if (!bio)
+-		return -ENOMEM;
+-	bio_init(bio, NULL, bio->bi_inline_vecs, nr_vecs, req_op(rq));
++	if (rq->cmd_flags & REQ_POLLED) {
++		blk_opf_t opf = rq->cmd_flags | REQ_ALLOC_CACHE;
++
++		bio = bio_alloc_bioset(NULL, nr_vecs, opf, gfp_mask,
++					&fs_bio_set);
++		if (!bio)
++			return -ENOMEM;
++	} else {
++		bio = bio_kmalloc(nr_vecs, gfp_mask);
++		if (!bio)
++			return -ENOMEM;
++		bio_init(bio, NULL, bio->bi_inline_vecs, nr_vecs, req_op(rq));
++	}
+ 
+ 	while (iov_iter_count(iter)) {
+ 		struct page **pages;
+@@ -304,8 +323,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 
+  out_unmap:
+ 	bio_release_pages(bio, false);
+-	bio_uninit(bio);
+-	kfree(bio);
++	bio_map_put(bio);
+ 	return ret;
+ }
+ 
+@@ -610,8 +628,7 @@ int blk_rq_unmap_user(struct bio *bio)
+ 
+ 		next_bio = bio;
+ 		bio = bio->bi_next;
+-		bio_uninit(next_bio);
+-		kfree(next_bio);
++		bio_map_put(next_bio);
  	}
- 	while (len) {
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index effee1dc715a..1f21590439d4 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -964,11 +964,11 @@ blk_status_t blk_insert_cloned_request(struct request *rq);
  
- struct rq_map_data {
- 	struct page **pages;
--	int page_order;
--	int nr_entries;
- 	unsigned long offset;
--	int null_mapped;
--	int from_user;
-+	unsigned short page_order;
-+	unsigned short nr_entries;
-+	bool null_mapped;
-+	bool from_user;
- };
- 
- int blk_rq_map_user(struct request_queue *, struct request *,
+ 	return ret;
 -- 
 2.35.1
 
