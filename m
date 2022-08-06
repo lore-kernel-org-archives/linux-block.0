@@ -2,72 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE319C25B0F
-	for <linux-block@archiver.kernel.org>; Sat,  6 Aug 2022 18:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 458AEC25B06
+	for <linux-block@archiver.kernel.org>; Sat,  6 Aug 2022 18:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbiHFSTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Aug 2022 14:19:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
+        id S229992AbiHFSbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Aug 2022 14:31:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241902AbiHFSTm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Aug 2022 14:19:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC3FE0F8
-        for <linux-block@vger.kernel.org>; Sat,  6 Aug 2022 11:19:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 481CB60F1A
-        for <linux-block@vger.kernel.org>; Sat,  6 Aug 2022 18:19:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AB6FAC43470;
-        Sat,  6 Aug 2022 18:19:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659809980;
-        bh=cdXVIPwRcZsFPL5zjexAZoz6neuuGIwlpDmgW7k058w=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=h0fs5fiW8oWkAheH4TU35P/zVEKOHgDWhRRRXuBcgiAclAlos2veYe2EJ5vI8V0Kn
-         Fyuk9Wm6YQVGHlCCPC2KjZVTWfQcCkzWOn69S+LBRLVUJ9jjNcFHHzUxJWWREJeb+W
-         EhqU5iqT6osucjps8l+Wa84+52LnlakHD3zGJEIrolMvK6bbSic2S9UVeNbbp+Qzw4
-         NyAqvhFRR1QJDvUUudykTk9fMsADxbkYItzTYhjYEBag6nbp+p3RkvRQKxZf2Ud3SS
-         eSFiviYxt9WjPuEUEjQ7yHGjKLqxTAl7rUtNdS3y/vDeev7MSIJJxGz9QQsCmliKs4
-         AMEXELeIUlO9A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 97028C43142;
-        Sat,  6 Aug 2022 18:19:40 +0000 (UTC)
-Subject: Re: [dm-devel] [git pull] Additional device mapper changes for 6.0
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Yu1rOopN++GWylUi@redhat.com>
-References: <YugiaQ1TO+vT1FQ5@redhat.com> <Yu1rOopN++GWylUi@redhat.com>
-X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
-X-PR-Tracked-Message-Id: <Yu1rOopN++GWylUi@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-changes-2
-X-PR-Tracked-Commit-Id: 12907efde6ad984f2d76cc1a7dbaae132384d8a5
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 20cf903a0c407cef19300e5c85a03c82593bde36
-Message-Id: <165980998061.27284.17220964359709259877.pr-tracker-bot@kernel.org>
-Date:   Sat, 06 Aug 2022 18:19:40 +0000
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers@kernel.org>,
+        with ESMTP id S233783AbiHFSa6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Aug 2022 14:30:58 -0400
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E1D0BF59
+        for <linux-block@vger.kernel.org>; Sat,  6 Aug 2022 11:30:56 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id cr9so813788qtb.13
+        for <linux-block@vger.kernel.org>; Sat, 06 Aug 2022 11:30:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=pxCEjkAH/HtacRN5ao0Jtr5KjS1Q4esBp2dJmtS6eP8=;
+        b=XoymoGcL5Ear0u2gGaPtznuLkOm/BfdooLjwC8lORFYv8pYBQEZg8VZ97xHYZq8uo+
+         PHJ805MAWKOrcoOjoYnLUFF/bdjzHH13lrqtA4arZE2xNB+/zodva2z8hmwSRJsIrNo3
+         zmPqYHo7kMbdKl0OVBzlDBDd4vmjPIYt82ELyfPiZSgcK4MDyUPrMraXZ77KrYsRWHDt
+         mIM7R1K+l8+6wkiOT2JKZPDbFMM6njGw98febdp5Ybyw5aQm5sOhCoAI1IfQe8fyy9mM
+         8RobIVfg2uyqrc7iPNNtJQUGE+N8J9gjAUwql2+fURZv0r7Uk11yYqKahhTX+w/6Tw1R
+         ebCg==
+X-Gm-Message-State: ACgBeo2+ED7eEXBjKH5VP8xszxRo9LV9n7xAY4iiba1Mdhjvffr/M3v/
+        WQGJnKTg+oR8ytTxMreyWqj6
+X-Google-Smtp-Source: AA6agR66ihkCqXOqjW9lbXOY78rAT6SFbRYf/9ykxcxvIFPf9ZA8xJwQD2o96NeUzK/ApPFqy2zDuw==
+X-Received: by 2002:a05:622a:81:b0:33f:f102:2845 with SMTP id o1-20020a05622a008100b0033ff1022845mr10327415qtw.30.1659810655165;
+        Sat, 06 Aug 2022 11:30:55 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id dm16-20020a05620a1d5000b006b8cb64110bsm6053398qkb.45.2022.08.06.11.30.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Aug 2022 11:30:54 -0700 (PDT)
+Date:   Sat, 6 Aug 2022 14:30:53 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
         Nathan Huckleberry <nhuck@google.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Sami Tolvanen <samitolvanen@google.com>,
         Milan Broz <gmazyland@gmail.com>,
-        Alasdair G Kergon <agk@redhat.com>
+        Eric Biggers <ebiggers@kernel.org>,
+        Sami Tolvanen <samitolvanen@google.com>
+Subject: Re: [git pull] Additional device mapper changes for 6.0
+Message-ID: <Yu6zXVPLmwjqGg4V@redhat.com>
+References: <YugiaQ1TO+vT1FQ5@redhat.com>
+ <Yu1rOopN++GWylUi@redhat.com>
+ <CAHk-=wj5w+Nga81wGmO6aYtcLrn6c_R_-gQrtnKwjzOZczko=A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wj5w+Nga81wGmO6aYtcLrn6c_R_-gQrtnKwjzOZczko=A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 5 Aug 2022 15:10:50 -0400:
+On Sat, Aug 06 2022 at  2:09P -0400,
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-changes-2
+> On Fri, Aug 5, 2022 at 12:10 PM Mike Snitzer <snitzer@kernel.org> wrote:
+> >
+> > All said: I think it worthwhile to merge these changes for 6.0, rather
+> > than hold until 6.1, now that we have confidence this _optional_ DM
+> > verity feature is working as expected. Please be aware there was a
+> > small linux-next merge fixup needed:
+> > https://lore.kernel.org/all/20220805125744.475531-1-broonie@kernel.org/T/
+> 
+> Well, more importantly, the verity_target version numbers clash.
+> 
+> I used the newer "{1, 9, 0}" version number, but if you want it to be
+> "{1, 9, 1}" to show that it's a superset of the previous one, you
+> should do that yourself.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/20cf903a0c407cef19300e5c85a03c82593bde36
+You did the right thing.
+ 
+> That said, the best option would be to remove version numbers
+> entirely. They are a completely broken concept as an ABI, and *never*
+> work.
+> 
+> Feature bitmasks work. Version numbers don't. Version numbers
+> fundamentally break when something is backported or any other
+> non-linearity happens.
+> 
+> Please don't use version numbers for ABI issues. Version numbers are
+> for human consumption, nothing more, and shouldn't be used for
+> anything that has semantics.
 
-Thank you!
+Yes, I know you mentioned this before and I said I'd look to switch to
+feature bitmasks. Yet here we are. Sorry about that, but I will take
+a serious look at fixing this over the next development cycle(s).
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+There is just quite a bit of innertia in these version numbers across
+all the disparate userspace tools that use DM. So the transition needs
+some design, planning and coordination but I'll get it done. Really ;)
+
+Thanks,
+Mike
