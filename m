@@ -2,166 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E28C25B0C
-	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 18:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F09F0C19F2A
+	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 18:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233143AbiHGSHh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Aug 2022 14:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48912 "EHLO
+        id S234126AbiHGSOj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Aug 2022 14:14:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232878AbiHGSHg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 14:07:36 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D916546
-        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 11:07:34 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220807180731epoutp01095a2224bccbacd47d8e5d1971f44f3b~JIkzS8W_U1523815238epoutp01U
-        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 18:07:31 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220807180731epoutp01095a2224bccbacd47d8e5d1971f44f3b~JIkzS8W_U1523815238epoutp01U
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1659895651;
-        bh=jUN5QvlR9Uy8Pfnu+8DKscjyRJsVvIsxU/bQybv/KcE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=CSIIRjnfE10WYAFycah0tH4Iz5/rd1Bu8M1jcHrdeE5EHaUYTLKRM8T8LWqRVItAD
-         Fr9Lh8kTxkCAcGuPtCWcxgLWsMad5r0r73o47bakGQG4n0qNm+LRgKaMDK7lLijVEY
-         A/41pLiftEI8Mwv5R+sG/kDU2ZjBkyi9cMn3TYB0=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20220807180729epcas5p4d37be7d1fd26a57b6b302007ae4c9106~JIkyQvsh32437724377epcas5p4f;
-        Sun,  7 Aug 2022 18:07:29 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.177]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4M16k80Vxfz4x9Pt; Sun,  7 Aug
-        2022 18:07:28 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        18.31.42669.F5FFFE26; Mon,  8 Aug 2022 03:07:27 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220807180727epcas5p204005d5094b9904b03c4d8b2e0c4ea9a~JIkwCjGS21226712267epcas5p22;
-        Sun,  7 Aug 2022 18:07:27 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220807180727epsmtrp184ceb6a4741dd7dc34b4105b718bc933~JIkwByUVf1302613026epsmtrp1M;
-        Sun,  7 Aug 2022 18:07:27 +0000 (GMT)
-X-AuditID: b6c32a4a-b3bff7000001a6ad-87-62efff5f4fbd
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        98.D4.08905.F5FFFE26; Mon,  8 Aug 2022 03:07:27 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220807180726epsmtip20b1de544073579885ae5decb1c1b2607~JIkus4M9A0243902439epsmtip2N;
-        Sun,  7 Aug 2022 18:07:25 +0000 (GMT)
-Date:   Sun, 7 Aug 2022 23:28:03 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, hch@lst.de,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, ming.lei@redhat.com,
-        joshiiitr@gmail.com, gost.dev@samsung.com
-Subject: Re: [PATCH 0/4] iopoll support for io_uring/nvme passthrough
-Message-ID: <20220807175803.GA13140@test-zns>
+        with ESMTP id S235543AbiHGSOQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 14:14:16 -0400
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEA1B9FFE
+        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 11:14:12 -0700 (PDT)
+Received: by mail-qt1-f179.google.com with SMTP id z3so5160892qtv.5
+        for <linux-block@vger.kernel.org>; Sun, 07 Aug 2022 11:14:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=uszpsfQkA+n/mZQMeMzaHtYhGxV7ZrgTx0FwG51IMxk=;
+        b=Nr+IvIEUv3j9mcE2Wccj5lIILgfbb/+2Uyohbv++sbcge/FNfjX3to2HZldFk5gFF1
+         7pqfgBa1XvibVPYdtFNm4zU7pLVs//DUH/fqavUZ/iua4rO3ZV2mpGn94mBut+WZ+UCa
+         tQPeMSKl39/u+RVMZu9rmdMdymJDQcvXW0ZxZ0iqogtsqJ3cTyexHMOseFwdiGZ07NxL
+         Z6bXWS5Kw+6n/s6hevWlQVBJjql/IaV3AjVQX4NV4+kCTo3sZi+A6dTi9fDVP6CJ/kkj
+         riFymk3BkX9G0V43eShpmd/Xygf0EkF3r+KyG3m/XoO6bpfdHe2lkV8NzqkitKSvzDPb
+         qcTQ==
+X-Gm-Message-State: ACgBeo0R2vUrC9Kg6+XC8ceCPUtx/QmcWF2Qe1P3laPbr+oOsjiNAU5Q
+        wBwYTFtfPH+birxuy0CBct0M
+X-Google-Smtp-Source: AA6agR6/KgTQI6IHVHe5/he7j5Khvjn4y41cYM25rOSJkcCqUqeqS34j9+6cwADmtwyEyP30dJ4JCw==
+X-Received: by 2002:ac8:5cc7:0:b0:342:f760:5bc0 with SMTP id s7-20020ac85cc7000000b00342f7605bc0mr2317560qta.658.1659896051683;
+        Sun, 07 Aug 2022 11:14:11 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id b19-20020ac844d3000000b00342f8143599sm1077098qto.13.2022.08.07.11.14.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Aug 2022 11:14:11 -0700 (PDT)
+Date:   Sun, 7 Aug 2022 14:14:09 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Nathan Huckleberry <nhuck@google.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Alasdair G Kergon <agk@redhat.com>
+Subject: Re: [git pull] Additional device mapper changes for 6.0
+Message-ID: <YvAA8fI37owuSe7y@redhat.com>
+References: <YugiaQ1TO+vT1FQ5@redhat.com>
+ <Yu1rOopN++GWylUi@redhat.com>
+ <CAHk-=wj5w+Nga81wGmO6aYtcLrn6c_R_-gQrtnKwjzOZczko=A@mail.gmail.com>
+ <Yu6zXVPLmwjqGg4V@redhat.com>
+ <CAHk-=wj+ywtyBEp7pmEKxgwRE+iJBct6iih=ssGk2EWqaYL_yg@mail.gmail.com>
+ <99e17678-8801-ac41-de20-a5f6f60da524@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <6bd091d6-e0e6-3095-fc6b-d32ec89db054@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrCJsWRmVeSWpSXmKPExsWy7bCmlm78//dJBu82W1msvtvPZnHzwE4m
-        i5WrjzJZvGs9x2Jx/u1hJotJh64xWuy9pW0xf9lTdotDk5uZHDg9ds66y+5x+Wypx6ZVnWwe
-        m5fUe+y+2cDm8X7fVTaPvi2rGD0+b5IL4IjKtslITUxJLVJIzUvOT8nMS7dV8g6Od443NTMw
-        1DW0tDBXUshLzE21VXLxCdB1y8wBOk5JoSwxpxQoFJBYXKykb2dTlF9akqqQkV9cYquUWpCS
-        U2BSoFecmFtcmpeul5daYmVoYGBkClSYkJ2x4ONWpoKdghU7b7ewNDAe5u1i5OSQEDCReNxx
-        jK2LkYtDSGA3o8SOU9MYQRJCAp8YJe4eMoVIfGOUOLS7gbWLkQOso79FHCK+l1Hi+/m9TBDO
-        M0aJ5a8PMIF0swioSDybv5kJpIFNQFPiwuRSkLCIgIJEz++VYNuYBU4xSqyYfoMZJCEs4Cox
-        4dIisM28AroSCzcuh7IFJU7OfMICYnMK2ErcbD8KFhcVUJY4sO042GIJgYUcEtenPGCC+MdF
-        4sLSNnYIW1ji1fEtULaUxMt+mHiyxKWZ56DqSyQe7zkIZdtLtJ7qBzuIWSBD4vm31UwQNp9E
-        7+8nTBDf80p0tAlBlCtK3Jv0lBXCFpd4OGMJlO0hcW9tEzskUG4zSbyb0sk+gVFuFpJ/ZiFZ
-        AWFbSXR+aGKdBbSCWUBaYvk/DghTU2L9Lv0FjKyrGCVTC4pz01OLTQuM8lLL4XGcnJ+7iRGc
-        XLW8djA+fPBB7xAjEwfjIUYJDmYlEd4ja98nCfGmJFZWpRblxxeV5qQWH2I0BcbPRGYp0eR8
-        YHrPK4k3NLE0MDEzMzOxNDYzVBLn9bq6KUlIID2xJDU7NbUgtQimj4mDU6qByWHXk5KH6j8U
-        It4Vx+XklbFaC38pf3FazPDwybojfZ7RreFNxxyy5m0teJggO+M8+768xl/1+iXWDPfU7WZ4
-        nG1yP7ZWI/m9lXs0u7B4ycH8Vds9vwc4htm8v7fB5nzM9j/c88sZWFmvfnBLM53OGc9WLF76
-        PSS2ZZdevcVpU+HqcuHw5bW7E16JJ/EyCJSujhD6WrPa7+StksObcrbarf7Fl1BWcfyOXutV
-        ib4bqsc2vQgsMFis6P7snciU1S+u/Tv/nvVl1+eovHcXfnwR+CfY/fOn6+PMF0efP9vycPGB
-        GQ09c2pvTk/wT1uyTVbS8FW1mlTZp0luv+4uUZwRob3sTOv6hvQXr+b3LtsUoMRSnJFoqMVc
-        VJwIAE5QTB83BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMLMWRmVeSWpSXmKPExsWy7bCSvG78//dJBqu+S1qsvtvPZnHzwE4m
-        i5WrjzJZvGs9x2Jx/u1hJotJh64xWuy9pW0xf9lTdotDk5uZHDg9ds66y+5x+Wypx6ZVnWwe
-        m5fUe+y+2cDm8X7fVTaPvi2rGD0+b5IL4IjisklJzcksSy3St0vgyrj/dC5LwWu+imWTXrE1
-        MPZzdzFycEgImEj0t4h3MXJxCAnsZpRYtvEuSxcjJ1BcXKL52g92CFtYYuW/5+wQRU8YJRpu
-        rAArYhFQkXg2fzMTyCA2AU2JC5NLQcIiAgoSPb9XsoHUMwucYpRYMf0GM0hCWMBVYsKlRYwg
-        Nq+ArsTCjcsZIYbeZpJ4/ewnM0RCUOLkzCdgC5gFzCTmbX7IDLKAWUBaYvk/DpAwp4CtxM32
-        o2BzRAWUJQ5sO840gVFwFpLuWUi6ZyF0L2BkXsUomVpQnJueW2xYYJiXWq5XnJhbXJqXrpec
-        n7uJERwvWpo7GLev+qB3iJGJg/EQowQHs5II75G175OEeFMSK6tSi/Lji0pzUosPMUpzsCiJ
-        817oOhkvJJCeWJKanZpakFoEk2Xi4JRqYMpy10n0uPvu2NbSA/usnzl+vznF+PRK5q7yb1cK
-        5nhdzM7h3in/rKVjtp6F2J7N7EvKf0z3uK8WI6n7eb8a16kJ24Ic77Udktz1KKhYwkvM4a3G
-        TXvPgALd9RND/Q+82Mcqz2Z4fP/3C2t8mBN+W3WEREkfnPCw4CpjacXHHr3zP0SM67MLZGU/
-        TZM/LGpR9IEn9gxrkMlZZaXL/xnLz/pUzD75ONUmWMPgr/PRj46/Zjvs6Dmy66/K457Lfw0E
-        n7X6ivM+2rY0JsjkZsO8kMvTL2ZNf7XGpbyy/kCw9AdX/7rso711S9qm9OxLeyzD+6QurLPB
-        /JDbe6FFnE6qjYerpU6llf4U+CAo9Fb6lRJLcUaioRZzUXEiAOeQ3vYGAwAA
-X-CMS-MailID: 20220807180727epcas5p204005d5094b9904b03c4d8b2e0c4ea9a
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----NuB4zix05mrs21-izUqZH_CfDXeHJwDu-cyxw2zCq-3u00NA=_54e9a_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220805155300epcas5p1b98722e20990d0095238964e2be9db34
-References: <CGME20220805155300epcas5p1b98722e20990d0095238964e2be9db34@epcas5p1.samsung.com>
-        <20220805154226.155008-1-joshi.k@samsung.com>
-        <78f0ac8e-cd45-d71d-4e10-e6d2f910ae45@kernel.dk>
-        <a2a5184d-f3ab-0941-6cc4-87cf231d5333@kernel.dk>
-        <Yu1dTRhrcOSXmYoN@kbusch-mbp.dhcp.thefacebook.com>
-        <6bd091d6-e0e6-3095-fc6b-d32ec89db054@kernel.dk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <99e17678-8801-ac41-de20-a5f6f60da524@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------NuB4zix05mrs21-izUqZH_CfDXeHJwDu-cyxw2zCq-3u00NA=_54e9a_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Sun, Aug 07 2022 at  3:37P -0400,
+Milan Broz <gmazyland@gmail.com> wrote:
 
-On Fri, Aug 05, 2022 at 12:15:24PM -0600, Jens Axboe wrote:
->On 8/5/22 12:11 PM, Keith Busch wrote:
->> On Fri, Aug 05, 2022 at 11:18:38AM -0600, Jens Axboe wrote:
->>> On 8/5/22 11:04 AM, Jens Axboe wrote:
->>>> On 8/5/22 9:42 AM, Kanchan Joshi wrote:
->>>>> Hi,
->>>>>
->>>>> Series enables async polling on io_uring command, and nvme passthrough
->>>>> (for io-commands) is wired up to leverage that.
->>>>>
->>>>> 512b randread performance (KIOP) below:
->>>>>
->>>>> QD_batch    block    passthru    passthru-poll   block-poll
->>>>> 1_1          80        81          158            157
->>>>> 8_2         406       470          680            700
->>>>> 16_4        620       656          931            920
->>>>> 128_32      879       1056        1120            1132
->>>>
->>>> Curious on why passthru is slower than block-poll? Are we missing
->>>> something here?
->>>
->>> I took a quick peek, running it here. List of items making it slower:
->>>
->>> - No fixedbufs support for passthru, each each request will go through
->>>   get_user_pages() and put_pages() on completion. This is about a 10%
->>>   change for me, by itself.
->>
->> Enabling fixed buffer support through here looks like it will take a
->> little bit of work. The driver needs an opcode or flag to tell it the
->> user address is a fixed buffer, and io_uring needs to export its
->> registered buffer for a driver like nvme to get to.
+> Hi,
+> 
+> Just a few notes on why we use target versions in libcryptsetup,
+> as I am perhaps one user of this field there.
+> 
+> TL;DR: it is *only* for hinting to users what is possibly wrong
+> after activation fails because there is *no* proper error reporting
+> from the device-mapper.
+
+DM's core and target versions aren't intended to be in service of
+error reporting. You abusing them like that is a fundamental problem.
+
+[[Unfortunate tangent but you've left me no choice:
+
+Your general tone and misinformation-using-broad-strokes makes me both
+sad and angry. I will restrain myself in this reply but your position
+drips with general FUD and loathing. This is way more "Milan being
+Milan" than I've ever experienced. Could be you've been storing it and
+it all just gushed out, no idea. But it's a lot to try to take with
+grace.
+
+As you know I'm a very direct person. I speak my mind too. But I've
+learned to try to avoid alarmist rhetoric that amounts to throwing
+people(s) under the bus (better late than never). But if you're going
+to resort that you better be _very_ certain it's justified. Yet as
+cathartic as it might seem, even then it isn't the correct answer. If
+you want to remain being respected please treat others with respect.
+
+Only you know why you are flailing about with such an attitude, please
+come to terms with that. I wish you well and certainly don't want DM
+to be some constant or reoccurring source of such negativity (for you
+or anyone).]]
+
+> On 06/08/2022 20:36, Linus Torvalds wrote:
+> > On Sat, Aug 6, 2022 at 11:30 AM Mike Snitzer <snitzer@kernel.org> wrote:
+> ...
+> > > Yes, I know you mentioned this before and I said I'd look to switch to
+> > > feature bitmasks. Yet here we are. Sorry about that, but I will take
+> > > a serious look at fixing this over the next development cycle(s).
+> 
+> Please don't just replace it with bitmaps.
+> 
+> It will not bring any better interface while adding more magic with
+> handling compatibility, as we need to use both... see below.
+
+(I saw your "below", it lacked a coherent explanation for why "we need
+to use both" as a rule moving forward)
+
+When done properly it will _not_ require both. The version number would
+be incremented one final time and would serve to allow existing
+userspace to run unmodified. But from that point on the bitmap flags
+should be used and all userspace converted to use them.
+
+> > Well, right now we're in the situation where there are certain kernels
+> > that say that they implement "version 1.9" of the thing, but they
+> > don't actually implement the "version 1.8.1" extensions.
+> 
+> I cannot speak for the others, but for veritysetup (libcryptsetup),
+> the worst that can happen is that the user will get a wrong error message
+> (or just a generic message "something failed, bye").
+
+You know how to send email to report specific problems and/or submit
+patches. But I really don't recall anything in this category being
+reported by you, certainly not recently... maybe you've just
+internalized or I somehow missed it?
+
+> (All the crypto options are tricky, I would like to keep at least basic
+> usability and better errors like "seems tasklets are not supported,
+> retrying without tasklets flags.")
+
+dm-verity's optional "try_verify_in_tasklet" is using tasklets as an
+implementation detail, if they cannot be used (e.g. for FEC) then why
+would fallback to normal verification using a workqueue be reported?
+
+Or are you referring to something you saw when using dm-crypt's
+no_{read,write}_workqueue options?
+
+Or are you saying that both the new dm-verity try_verify_in_tasklet
+option and the dm-crypt no_{read,write}_workqueue options should
+fallback to removing those flags and try without them?
+
+That is a level of AI I have no interest in adding or supporting.
+The user asked for something, if it isn't possible then it should
+fail.
+
+But please be more specific.
+
+> In principle, we use activation flags/options as Linus describes - try
+> to set it, then deal with the failure.
 >
->Yeah, it's not a straight forward thing. But if this will be used with
->recycled buffers, then it'll definitely be worthwhile to look into.
+> And *this* is the real problem that needs to be solved - there is no proper
+> userspace interface that says what went wrong.
+> 
+> The userspace sees only -EINVAL from ioctl() and a generic message.
 
-Had posted bio-cache and fixedbufs in the initial round but retracted
-to get the foundation settled first.
-https://lore.kernel.org/linux-nvme/20220308152105.309618-1-joshi.k@samsung.com/
+"Please extend the DM ioctls to somehow add ti->error to the userspace
+response" is a fine feature request. Should help no matter what.
 
-I see that you brought back bio-cache already. I can refresh fixedbufs.
-Completion-batching seems too tightly coupled to block-path.
+(Can look to have a phased approach to the error reporting payload,
+start with errno and error message, add more "structured" payload over
+time. Are you referring to JSON or some other format? Whatever systemd
+uses?).
 
-------NuB4zix05mrs21-izUqZH_CfDXeHJwDu-cyxw2zCq-3u00NA=_54e9a_
-Content-Type: text/plain; charset="utf-8"
+> Perhaps in the syslog is more info, but usually only at debug level
+> (that is often not visible), and parsing syslog is not the option for us either.
 
+All errors should be emitted with pr_err() using DMERR(). I've made a
+conscious effort to convert DMWARN() to DMERR() when appropriate. But
+I'll audit all the DM core code and then work through the various
+targets.
 
-------NuB4zix05mrs21-izUqZH_CfDXeHJwDu-cyxw2zCq-3u00NA=_54e9a_--
+If there are incorrect log levels being used it is a bug, please
+report and/or fix.
+
+> What is even more problematic is that the error string in DM target is
+> often set (e.g. ti->error = "Integrity profile tag size mismatch.";) but later
+> discarded, and it never reaches neither log nor userspace calling the failing
+> ioctl().
+
+Again, if you see a bug: please report and/or fix it.
+
+> If the device-mapper can fix this, we can easily thrash the magic that
+> consults the target version and determines what went wrong.
+
+There is no way to properly use version numbers to derive what
+actually went wrong. Could you narrow down and isolate the possible
+failure based on version in specific cases? Sure.. but it is insanely
+fragile (especially with stable@ and distro kernels).
+
+> Then you can forget the version and feature bitmaps and send
+> us a proper (ideally structured) error message in ioctl() reply.
+
+OK, I can just avoid switching to feature bitmaps entirely, stop
+bumping version numbers, and focus on better error reporting. Then all
+of userspace can rely on errors reported to fail and inform user
+actions.
+
+But I'm pretty confident lvm2 will have something to say on
+this... I'll take all input into consideration.
+
+Mike
