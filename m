@@ -2,130 +2,220 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045BFC25B0C
-	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 18:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F6EC19F2A
+	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 19:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235638AbiHGSqt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Aug 2022 14:46:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39278 "EHLO
+        id S229704AbiHGTxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Aug 2022 15:53:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235617AbiHGSqs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 14:46:48 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D5162BD4
-        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 11:46:47 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id 17so6742504plj.10
-        for <linux-block@vger.kernel.org>; Sun, 07 Aug 2022 11:46:47 -0700 (PDT)
+        with ESMTP id S229565AbiHGTxr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 15:53:47 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31AB6474
+        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 12:53:38 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id w3so9132077edc.2
+        for <linux-block@vger.kernel.org>; Sun, 07 Aug 2022 12:53:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc;
-        bh=fRF6tDwiED09Qm8+jjF0m2XwEBk/N1T42MZbGGhUU2s=;
-        b=sUfIjnfFg6C7BTgJCAUiobCnbcymxCqjth0VgNCg5PRpdOLoFXN06GP/722jVG/hut
-         4X/7qgNXMYcShr8q27lbxVxfQ21iOwZdtwyZmgX8B72vmSMeYt2fLKSFupJubJr7uXAz
-         bIz7blhJEPqDbCHiBgiaBkm9/9AiWj1jDbf2w0cgyUeGKRlvs72m0HeNSYhJBhb06cru
-         GAJV2EIdUH2dYA6Vj1qmWmrRyWb2wpxuW9W2/7qjWeavx9CM5E59Ip9GnyxEE0GLELSd
-         QQuhncoy6aalVGBpadAattGstyajxkl5ceqlxvc/h1nN4eA8unicErsc1OGzuRb8ytB2
-         Yjbg==
+        bh=KSNjU/g/uABeK7DgJdNs6bpwX7SttrPrrtSMzcFQBU4=;
+        b=YS+bg3+dthHvsLf+APaAuEwIfsa87dAkJ6XL9CGQZtr1aiJtX0D02R+wQuiAohq4Kz
+         Bh3qmQNfqdcddLZNg+2iFwN6n8+SrbLgwbIfRy0a2+qRuBB+MJwxHwKlQ3LPVZwmHpnz
+         WE4LRv/+G8ZumwPcbG2NOWWZrxYZBUmTvUnL8XE6Suffg/dqkz2UF9J8xAVEdp70ynzJ
+         FtpGr7xYl661N78VLK9TXS5HcOFXXVCE7OoRcSwQam/t+7Xarc4j5jEJzcuYItubOTjN
+         N/+5FVyBW+xxOxQF6monqPMaJHjmCHY2KGY+tcMM58bID/soNeCuQJ8HW0YcMq4WPDQO
+         lIwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=fRF6tDwiED09Qm8+jjF0m2XwEBk/N1T42MZbGGhUU2s=;
-        b=tGiaKQce+eNDa4CbCW1fUwbLuvJ3CQv3yDxDpEFcLNvY9xdcnONDGKiShIJR8M9nyn
-         QxAWkVzxvsgP0BMDQFDgpFfC/qcIjAp4dE1O/6SUxj4kjfer+MnohVPE7UjTUlov0WMV
-         TWCLnkrcxHsxLA+Cf5RUPtFv3lra2Hk0meiZ/ipzcCe4/OhCg7SR3VcwoDtM0aklJAKm
-         gEXCN+yQ3Y9enClsvyaI72hUEgJhcb7xTojWxos/BvYGRJnjevszQcSwJM3I2kcR1Tok
-         0FhTw2pXkFDOkWM1Ix5zy9Ldx9BeuKXJ+re92O6EUZarWY1AgWdVPmCpgyiAaex5iS9z
-         vU9A==
-X-Gm-Message-State: ACgBeo3MiJgHSpgRBpSRUSBCkJEk5ernNIQwMCRyqUX0g3FOIv7fUb41
-        h29v+UJQheLVnmDC9kx9B7mDWWNbiSM8aA==
-X-Google-Smtp-Source: AA6agR52R7nPXz6hA/NEJIpwExQy73zN+UQ2YPf1Pb4UGZRqFX/ApCGAZKP7G39++6dymp7prQKsLg==
-X-Received: by 2002:a17:902:c40a:b0:16e:cc02:b9ab with SMTP id k10-20020a170902c40a00b0016ecc02b9abmr15621295plk.81.1659898006947;
-        Sun, 07 Aug 2022 11:46:46 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id i25-20020a635419000000b0041c89bba5a8sm4787876pgb.25.2022.08.07.11.46.45
+        bh=KSNjU/g/uABeK7DgJdNs6bpwX7SttrPrrtSMzcFQBU4=;
+        b=Iu/QR7aRAEGSXHPSKW49V23a7Go6DaWRvxzC7JgbyrBOu/9DArnIHUV6ZqfJyrPAl7
+         J3jaM5NDbI2YzwiM29oqVzl5YwfWPFNoyAzwkBzRMDWawv8HZ0UhD6Ol1FlzxJ+v15Vl
+         JLWum7VuCuEv10VZhukJW0Xt3ES2V+oo5l0jKZAhrQgk7RIg2Q3E3H2Xypei/UADGq5J
+         M81799PIbcae44RVycQgaaAtJI77Mb1ghJq4tu0sO+5WAzxkVLXXBTpSmoMD5ly8oYs7
+         WandQXxfSG4xkKKpx32lXKMMhqrMVsEjAzlvoJpqCe/EYgW4CaOSNm5D/kx3FWb0T6K/
+         buGw==
+X-Gm-Message-State: ACgBeo38LHbGK5k7Bm+/amqonn7CVUCawj5zz9PsBKyWrBulfu/KAhNH
+        3CV8hGNrXWg/j1KhJNBc81RMNyhz2zZYmA==
+X-Google-Smtp-Source: AA6agR7x9Zl9jxGqHa/qimd6JaBS49eiXMcJU+FuL/emsWO/J+uT2G5Y1LOCkzPTsmZv/38KN8YGVQ==
+X-Received: by 2002:a05:6402:1e88:b0:43c:e8d4:bf27 with SMTP id f8-20020a0564021e8800b0043ce8d4bf27mr15616183edf.401.1659902017188;
+        Sun, 07 Aug 2022 12:53:37 -0700 (PDT)
+Received: from [192.168.2.28] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
+        by smtp.gmail.com with ESMTPSA id bf17-20020a0564021a5100b0043df042bfc6sm3566644edb.47.2022.08.07.12.53.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Aug 2022 11:46:46 -0700 (PDT)
-Message-ID: <068737bb-7729-decd-bd3b-60380c6443fc@kernel.dk>
-Date:   Sun, 7 Aug 2022 12:46:45 -0600
+        Sun, 07 Aug 2022 12:53:36 -0700 (PDT)
+Message-ID: <731828af-0ef3-ba04-7115-be8f1d41e1c5@gmail.com>
+Date:   Sun, 7 Aug 2022 21:53:35 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH 0/4] iopoll support for io_uring/nvme passthrough
+Subject: Re: [git pull] Additional device mapper changes for 6.0
 Content-Language: en-US
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Keith Busch <kbusch@kernel.org>, hch@lst.de,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, ming.lei@redhat.com,
-        joshiiitr@gmail.com, gost.dev@samsung.com
-References: <CGME20220805155300epcas5p1b98722e20990d0095238964e2be9db34@epcas5p1.samsung.com>
- <20220805154226.155008-1-joshi.k@samsung.com>
- <78f0ac8e-cd45-d71d-4e10-e6d2f910ae45@kernel.dk>
- <a2a5184d-f3ab-0941-6cc4-87cf231d5333@kernel.dk>
- <Yu1dTRhrcOSXmYoN@kbusch-mbp.dhcp.thefacebook.com>
- <6bd091d6-e0e6-3095-fc6b-d32ec89db054@kernel.dk>
- <20220807175803.GA13140@test-zns>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220807175803.GA13140@test-zns>
-Content-Type: text/plain; charset=UTF-8
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Nathan Huckleberry <nhuck@google.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Sami Tolvanen <samitolvanen@google.com>,
+        Alasdair G Kergon <agk@redhat.com>
+References: <YugiaQ1TO+vT1FQ5@redhat.com> <Yu1rOopN++GWylUi@redhat.com>
+ <CAHk-=wj5w+Nga81wGmO6aYtcLrn6c_R_-gQrtnKwjzOZczko=A@mail.gmail.com>
+ <Yu6zXVPLmwjqGg4V@redhat.com>
+ <CAHk-=wj+ywtyBEp7pmEKxgwRE+iJBct6iih=ssGk2EWqaYL_yg@mail.gmail.com>
+ <99e17678-8801-ac41-de20-a5f6f60da524@gmail.com>
+ <YvAA8fI37owuSe7y@redhat.com>
+From:   Milan Broz <gmazyland@gmail.com>
+In-Reply-To: <YvAA8fI37owuSe7y@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/7/22 11:58 AM, Kanchan Joshi wrote:
-> On Fri, Aug 05, 2022 at 12:15:24PM -0600, Jens Axboe wrote:
->> On 8/5/22 12:11 PM, Keith Busch wrote:
->>> On Fri, Aug 05, 2022 at 11:18:38AM -0600, Jens Axboe wrote:
->>>> On 8/5/22 11:04 AM, Jens Axboe wrote:
->>>>> On 8/5/22 9:42 AM, Kanchan Joshi wrote:
->>>>>> Hi,
->>>>>>
->>>>>> Series enables async polling on io_uring command, and nvme passthrough
->>>>>> (for io-commands) is wired up to leverage that.
->>>>>>
->>>>>> 512b randread performance (KIOP) below:
->>>>>>
->>>>>> QD_batch    block    passthru    passthru-poll   block-poll
->>>>>> 1_1          80        81          158            157
->>>>>> 8_2         406       470          680            700
->>>>>> 16_4        620       656          931            920
->>>>>> 128_32      879       1056        1120            1132
->>>>>
->>>>> Curious on why passthru is slower than block-poll? Are we missing
->>>>> something here?
->>>>
->>>> I took a quick peek, running it here. List of items making it slower:
->>>>
->>>> - No fixedbufs support for passthru, each each request will go through
->>>>   get_user_pages() and put_pages() on completion. This is about a 10%
->>>>   change for me, by itself.
->>>
->>> Enabling fixed buffer support through here looks like it will take a
->>> little bit of work. The driver needs an opcode or flag to tell it the
->>> user address is a fixed buffer, and io_uring needs to export its
->>> registered buffer for a driver like nvme to get to.
+Mike,
+
+there was nothing personal in my reply - sorry
+if you see it this way.
+
+Anyway, please stop ad-hominem attacks on me!
+
+I just described what I see as a problem that prevents
+us from dropping version parsing.
+
+Technical comments, below, but really, these should go to
+dm-devel only to not waste time of others.
+
+On 07/08/2022 20:14, Mike Snitzer wrote:
+>> TL;DR: it is *only* for hinting to users what is possibly wrong
+>> after activation fails because there is *no* proper error reporting
+>> from the device-mapper.
+> 
+> DM's core and target versions aren't intended to be in service of
+> error reporting. You abusing them like that is a fundamental problem.
+
+Perhaps, but there was nothing better. If I missed something,
+we can definitely make the code better.
+
+TBH, I do even think that it uses the same logic as libdevmapper library
+(and perhaps it dates even before I started to maintain it).
+
+I do not see fundamental problem here, though.
+
+I take is as "The dm-integrity was introduced in kernel/target X",
+then I do not expect it working in X-1...
+
+>> Please don't just replace it with bitmaps.
 >>
->> Yeah, it's not a straight forward thing. But if this will be used with
->> recycled buffers, then it'll definitely be worthwhile to look into.
+>> It will not bring any better interface while adding more magic with
+>> handling compatibility, as we need to use both... see below.
 > 
-> Had posted bio-cache and fixedbufs in the initial round but retracted
-> to get the foundation settled first.
-> https://lore.kernel.org/linux-nvme/20220308152105.309618-1-joshi.k@samsung.com/
+> (I saw your "below", it lacked a coherent explanation for why "we need
+> to use both" as a rule moving forward)
 > 
-> I see that you brought back bio-cache already. I can refresh fixedbufs.
+> When done properly it will _not_ require both. The version number would
+> be incremented one final time and would serve to allow existing
+> userspace to run unmodified. But from that point on the bitmap flags
+> should be used and all userspace converted to use them.
 
-Excellent, yes please bring back the fixedbufs. It's a 5-10% win,
-nothing to sneeze at.
+I just meant that if userspace want to support older kernels,
+we need to support both.
 
-> Completion-batching seems too tightly coupled to block-path.
+If it does not bring fixes for the problem I described, it is just
+more code with no effect (for libcryptsetup).
 
-It's really not, in fact it'd be even simpler to do for passthru. The
-rq->end_io handler just needs to know about it.
+But if you see other reasons, then of course it makes sense.
 
--- 
-Jens Axboe
+>> I cannot speak for the others, but for veritysetup (libcryptsetup),
+>> the worst that can happen is that the user will get a wrong error message
+>> (or just a generic message "something failed, bye").
+> 
+> You know how to send email to report specific problems and/or submit
+> patches. But I really don't recall anything in this category being
+> reported by you, certainly not recently... maybe you've just
+> internalized or I somehow missed it?
 
+I am sure I mentioned this, but years ago... what I am talking about
+
+1) Some ti->error messages are lost, e.g. in dm-crypt,
+   I think example is IV generators constructors
+   if (ret < 0) {
+      ti->error = "Error creating IV";
+   ...
+   (And yes, I should fix this myself.)
+
+
+2) Targets use macros like DMERR, these generate syslog message.
+    Getting these messages into userspace is problematic.
+
+    But perhaps this is more problem for libdevmapper we use.
+
+>> (All the crypto options are tricky, I would like to keep at least basic
+>> usability and better errors like "seems tasklets are not supported,
+>> retrying without tasklets flags.")
+> 
+> dm-verity's optional "try_verify_in_tasklet" is using tasklets as an
+> implementation detail, if they cannot be used (e.g. for FEC) then why
+> would fallback to normal verification using a workqueue be reported?
+
+I am talking about situation when user explicitly requests to use tasklets
+on CLI and kernel does not support it. Then there must be an error message.
+
+I am not sure if we should automatically fallback to non-tasklets,
+but we do this already in other situations (enable-discards, keyring support, ...)
+
+> 
+> Or are you referring to something you saw when using dm-crypt's
+> no_{read,write}_workqueue options?
+> 
+> Or are you saying that both the new dm-verity try_verify_in_tasklet
+> option and the dm-crypt no_{read,write}_workqueue options should
+> fallback to removing those flags and try without them?
+> 
+> That is a level of AI I have no interest in adding or supporting.
+> The user asked for something, if it isn't possible then it should
+> fail.
+
+And nobody asked for this as we are already doing this in userspace.
+
+It was really just example to demonstrate when we use target version.
+
+> "Please extend the DM ioctls to somehow add ti->error to the userspace
+> response" is a fine feature request. Should help no matter what.
+> 
+> (Can look to have a phased approach to the error reporting payload,
+> start with errno and error message, add more "structured" payload over
+> time. Are you referring to JSON or some other format? Whatever systemd
+> uses?).
+
+Great, let's discuss this later.
+
+> 
+>> Perhaps in the syslog is more info, but usually only at debug level
+>> (that is often not visible), and parsing syslog is not the option for us either.
+> 
+> All errors should be emitted with pr_err() using DMERR(). I've made a
+> conscious effort to convert DMWARN() to DMERR() when appropriate. But
+> I'll audit all the DM core code and then work through the various
+> targets.
+> 
+> If there are incorrect log levels being used it is a bug, please
+> report and/or fix.
+
+Yes, I tried to say that syslog itself as source is problematic
+(if you activate many devices in parallel; in multi-tenant environment
+when you should not see logs from different users etc).
+
+> There is no way to properly use version numbers to derive what
+> actually went wrong. Could you narrow down and isolate the possible
+> failure based on version in specific cases? Sure.. but it is insanely
+> fragile (especially with stable@ and distro kernels).
+
+It works pretty reliably for years with some minor exceptions that
+can be ignored.
+
+Milan
