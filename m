@@ -2,182 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92E20C3F6B0
-	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 18:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB54C3F6B0
+	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 18:45:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235150AbiHGSps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Aug 2022 14:45:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38234 "EHLO
+        id S235317AbiHGSpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Aug 2022 14:45:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231853AbiHGSpr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 14:45:47 -0400
+        with ESMTP id S235555AbiHGSpx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 14:45:53 -0400
 Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7920C2BD7
-        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 11:45:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FABB9585
+        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 11:45:52 -0700 (PDT)
 Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220807184544epoutp01e604ae298aa59a7cfdebb794acfda7e5~JJGLaF8MB0226902269epoutp01l
-        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 18:45:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220807184544epoutp01e604ae298aa59a7cfdebb794acfda7e5~JJGLaF8MB0226902269epoutp01l
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220807184551epoutp01d6f7b4f825a5b555bef0bc924f53e535~JJGRXYm040226902269epoutp01m
+        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 18:45:51 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220807184551epoutp01d6f7b4f825a5b555bef0bc924f53e535~JJGRXYm040226902269epoutp01m
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1659897944;
-        bh=dNDGoNtSy82gQ5DZRnxvo9DsOvTaJLP3HC+k2aL1q5E=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=KlmnJdW+cqSylKH+eCRluepmJukzJ7pU6vuq/j/Bjf4rWjowtNVkRLeI5Xwx6g0n5
-         OyFeBwyQUHidmo2OcidvTmqjX0+KL4bDKkpI6UMjbIsOynAew87xXtb+aygT0gWFwy
-         yz2Vl9MPQGxvMuxNfL0DL2xOpwhNE5qeWJ7Oa3As=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20220807184544epcas5p186e13e1335048706de0c10b2cc344fd8~JJGK-RbGe0979209792epcas5p17;
-        Sun,  7 Aug 2022 18:45:44 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.174]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4M17ZF5yRvz4x9Pp; Sun,  7 Aug
-        2022 18:45:41 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        s=mail20170921; t=1659897951;
+        bh=rdPsAxxvz7Zcyw0iMWU8XUYENn+3wN4ROlvI+GUBGXg=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=O/A0rsE5kkioCjy83q3WrDmok93Z4VdEbCBnzlfbP7KaLWiLKI7K1XM2LbBWf+lHX
+         B312nj9HS5GYJt4z9cRMUWKR3N9HsotTAfyQ4tLAB8/KpA4S+4wagz0z83B80fk4i3
+         nl5mXC3BpDZEYjNjSGkFf4Hk31zCfpPSaPrGKjZ8=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20220807184550epcas5p4d540192b1a2f33bcbadff32fb5ffee6c~JJGQzjwWU2500925009epcas5p4B;
+        Sun,  7 Aug 2022 18:45:50 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4M17ZN0HLTz4x9Pr; Sun,  7 Aug
+        2022 18:45:48 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
         epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EF.4F.09662.55800F26; Mon,  8 Aug 2022 03:45:41 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20220807184540epcas5p41f496a87fe65cff524740ddde071b4bb~JJGH4PONI2500925009epcas5p48;
-        Sun,  7 Aug 2022 18:45:40 +0000 (GMT)
+        70.5F.09662.B5800F26; Mon,  8 Aug 2022 03:45:47 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220807184547epcas5p23b4ef30467d65d1b81632e7c514fc192~JJGONytug2712827128epcas5p2F;
+        Sun,  7 Aug 2022 18:45:47 +0000 (GMT)
 Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220807184540epsmtrp19136506506469e80ef0c5b56e13c865f~JJGH3g5ux3253032530epsmtrp1K;
-        Sun,  7 Aug 2022 18:45:40 +0000 (GMT)
-X-AuditID: b6c32a49-885ff700000025be-c9-62f008553017
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220807184547epsmtrp277cfcbfc92f490e7349f90ccdf4e0506~JJGOM8vrX0248002480epsmtrp2p;
+        Sun,  7 Aug 2022 18:45:47 +0000 (GMT)
+X-AuditID: b6c32a49-86fff700000025be-d0-62f0085bdc63
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
         epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        1E.79.08802.45800F26; Mon,  8 Aug 2022 03:45:40 +0900 (KST)
+        AE.79.08802.B5800F26; Mon,  8 Aug 2022 03:45:47 +0900 (KST)
 Received: from localhost.localdomain (unknown [107.110.206.5]) by
         epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220807184539epsmtip293184cfaeb93d5abd27f140208ad23ef~JJGGaXGGM2084620846epsmtip2g;
-        Sun,  7 Aug 2022 18:45:39 +0000 (GMT)
+        20220807184546epsmtip23141023eab4008b1a5913e80bc88c964~JJGM56XMp2084620846epsmtip2h;
+        Sun,  7 Aug 2022 18:45:46 +0000 (GMT)
 From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     axboe@kernel.dk, hch@lst.de
 Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, ming.lei@redhat.com,
-        gost.dev@samsung.com, Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH for-next v2 0/4] iopoll support for io_uring/nvme
-Date:   Mon,  8 Aug 2022 00:06:03 +0530
-Message-Id: <20220807183607.352351-1-joshi.k@samsung.com>
+        gost.dev@samsung.com, Kanchan Joshi <joshi.k@samsung.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: [PATCH for-next v2 2/4] io_uring: add iopoll infrastructure for
+ io_uring_cmd
+Date:   Mon,  8 Aug 2022 00:06:05 +0530
+Message-Id: <20220807183607.352351-3-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220807183607.352351-1-joshi.k@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrFKsWRmVeSWpSXmKPExsWy7bCmhm4ox4ckg2cbdSxW3+1ns7h5YCeT
-        xcrVR5ks3rWeY7E4+v8tm8XeW9oW85c9Zbc4NLmZyYHD4/LZUo/NS+o9dt9sYPN4v+8qm0ff
-        llWMHp83yQWwRWXbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE
-        6Lpl5gBdo6RQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkpMCnQK07MLS7NS9fLSy2x
-        MjQwMDIFKkzIztjV3cdU0CVWsWPOYpYGxn8CXYycHBICJhLzp11n72Lk4hAS2M0o0XztDytI
-        QkjgE6PE+t92EInPjBK3lu1hhel4ve88G0RiF6PEtndb2OCqNr97BlTFwcEmoClxYXIpSIOI
-        gLzEl9trWUBqmAXWMkqc3vuFCaRGWMBRYssefRCTRUBVYudFDZByXgFLiZZzD9ghdslLzLz0
-        nR0iLihxcuYTFhCbGSjevHU2M8hICYF77BITL01nhmhwkThw7AmULSzx6vgWqEFSEi/726Ds
-        ZIlLM88xQdglEo/3HISy7SVaT/Uzg9zDDHT++l36ELv4JHp/PwG7WEKAV6KjTQiiWlHi3qSn
-        0CARl3g4YwmU7SFx6vVDdpByIYFYiZ4bKRMY5WYheWAWkgdmIexawMi8ilEytaA4Nz212LTA
-        MC+1HB6Ryfm5mxjBiVDLcwfj3Qcf9A4xMnEwHmKU4GBWEuE9svZ9khBvSmJlVWpRfnxRaU5q
-        8SFGU2CgTmSWEk3OB6bivJJ4QxNLAxMzMzMTS2MzQyVxXq+rm5KEBNITS1KzU1MLUotg+pg4
-        OKUamGZN4BFhW9vz2f5XaDp/VTGn3FLPSVeb/wn4nLt14dvrfzx617aZcIX+9XZ6m77DTFlu
-        +eXahC2lLydYHPWfrN96TCBPfQsv14O3cQoRZwWCFKdm2c5mtNzyYr3E502WilJqWRcjei6V
-        Tn0kP9PyhIx7S5Zh4KL4HTKTH+uc6/7BlzvLbIJBh4fd4ucnBJabvi28tmfHk1qH7x1SO8rn
-        pZsvLzTYaNyx6VyufnaiZXFr6qd5FidUHyb/iEuM+dN9udVjx2VzpRczX/dc8T0iKe2e6Gy2
-        NHCjvMjtpjvscl9urDkrLp5zztSBJ8zA1CPs9rPLT47ZTymMOuFwxTb/qMsCDmbLqENfdvcr
-        rTe8osRSnJFoqMVcVJwIAO7fZXcNBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCLMWRmVeSWpSXmKPExsWy7bCSvG4Ix4ckg65JWhar7/azWdw8sJPJ
-        YuXqo0wW71rPsVgc/f+WzWLvLW2L+cueslscmtzM5MDhcflsqcfmJfUeu282sHm833eVzaNv
-        yypGj8+b5ALYorhsUlJzMstSi/TtErgydnX3MRV0iVXsmLOYpYHxn0AXIyeHhICJxOt959m6
-        GLk4hAR2MEpcntvPDJEQl2i+9oMdwhaWWPnvOTtE0UdGiV99DaxdjBwcbAKaEhcml4LUiAgo
-        Smz82MQIUsMssJlR4tPpY8wgNcICjhJb9uiDmCwCqhI7L2qAlPMKWEq0nHsANV5eYual7+wQ
-        cUGJkzOfsIDYzEDx5q2zmScw8s1CkpqFJLWAkWkVo2RqQXFuem6xYYFRXmq5XnFibnFpXrpe
-        cn7uJkZwwGpp7WDcs+qD3iFGJg7GQ4wSHMxKIrxH1r5PEuJNSaysSi3Kjy8qzUktPsQozcGi
-        JM57oetkvJBAemJJanZqakFqEUyWiYNTqoFpXefu9VNC46LYFV/enPTsxJFjmQtcc3N83mfF
-        NM3bV57MtPLxPfWN5wr0m3VkDTi4tx14yv5UKq6th7X0r8LbiMJLvTaTmiovrwg75bbHO/nw
-        g9s+DKw6d3aJa3H4fppf8lbDaffu43sbT+2/+v00+5p/Jl+Ef50+MfWE0jXV2oOb08RiLS5V
-        zCyeq3p53b2uvWdn/r70LflrEb9ZvUzm2k8ZjP68S/Pe3wxuP8Bn6dWj/1nlP9es9yIbdy7f
-        Udyn03j425ZrZ102tL7qPqu1+PTyF/XTnlTsm9GxYeU/b6PKaYHTXyz8pssdvslC6Cl3lpTN
-        eo5XntffTFg49e2HFtGLGffOzU2c/O+tkkVk53QlluKMREMt5qLiRABtKK7PxwIAAA==
-X-CMS-MailID: 20220807184540epcas5p41f496a87fe65cff524740ddde071b4bb
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupjk+LIzCtJLcpLzFFi42LZdlhTXTea40OSwYTj1har7/azWdw8sJPJ
+        YuXqo0wW71rPsVgc/f+WzWLvLW2L+cueslscmtzMZPF5aQu7A6fH5bOlHpuX1HvsvtnA5vF+
+        31U2j74tqxg9Pm+SC2CLyrbJSE1MSS1SSM1Lzk/JzEu3VfIOjneONzUzMNQ1tLQwV1LIS8xN
+        tVVy8QnQdcvMATpJSaEsMacUKBSQWFyspG9nU5RfWpKqkJFfXGKrlFqQklNgUqBXnJhbXJqX
+        rpeXWmJlaGBgZApUmJCdcfKUecE1uYq9FzawNDD+kehi5OSQEDCR+PLqMVsXIxeHkMBuRokp
+        UxZAOZ8YJS4/OM4M4XxmlOhfeI4FpuXEpXfsEIldjBK3D25ngau6e/gfUxcjBwebgKbEhcml
+        IA0iAvISX26vBathFrjMKNHWOYUZJCEsEC7xoLWVEcRmEVCVOLuriQnE5hWwlJhx6RUjxDZ5
+        iZmXvrODzOQUsJLo2qIMUSIocXLmE7CDmIFKmrfOBrtUQuAvu0TfmxdMEL0uEk8a/7NC2MIS
+        r45vYYewpSQ+v9vLBmEnS1yaeQ6qvkTi8Z6DULa9ROupfmaQvcxAv6zfpQ+xi0+i9/cTsBcl
+        BHglOtqEIKoVJe5Negq1SVzi4YwlULaHxNTJq6CB2MsocWTLDLYJjPKzkLwwC8kLsxC2LWBk
+        XsUomVpQnJueWmxaYJiXWg6P1+T83E2M4ISp5bmD8e6DD3qHGJk4GA8xSnAwK4nwHln7PkmI
+        NyWxsiq1KD++qDQntfgQoykwiCcyS4km5wNTdl5JvKGJpYGJmZmZiaWxmaGSOK/X1U1JQgLp
+        iSWp2ampBalFMH1MHJxSDUx+8381veHVq+F+srnq5cZH26Zncqz/6WZzwqX06VvNKufcDZM3
+        JO2ZNVV+ot5Lo3brWz9f33r4dV387fLjh5y8ZqvYPNfJPZVf1bdJx7LlAW9tnvS7gwkrTbh9
+        W47vtHuzmOEY181puqmnLhy4oZ37Pvoio8Ceyu1JffUeEzO9NCeekCxy3/PqwY6S9IjjUo2V
+        snlX5lpqaDPXWjkY1hodPrg8vq5nB0slyzZXi2LVrevK5wuy/Kx51nixWFK4d3JM6M8ih7q0
+        7WfbZ4QzlEtvs5W6FBd2l/Xq/9TDGxxdVkmkOCy+2sDQPtlqzspZZ5SeMAparZ2Rs7e13+Sv
+        nvWtT5Uilt8T3H6ZSh9c8kuJpTgj0VCLuag4EQBBAUSDIQQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrALMWRmVeSWpSXmKPExsWy7bCSvG40x4ckg3WflS1W3+1ns7h5YCeT
+        xcrVR5ks3rWeY7E4+v8tm8XeW9oW85c9Zbc4NLmZyeLz0hZ2B06Py2dLPTYvqffYfbOBzeP9
+        vqtsHn1bVjF6fN4kF8AWxWWTkpqTWZZapG+XwJVx8pR5wTW5ir0XNrA0MP6R6GLk5JAQMJE4
+        cekdO4gtJLCDUeLzRiuIuLhE87Uf7BC2sMTKf8+BbC6gmo+MEnd/LWbuYuTgYBPQlLgwuRSk
+        RkRAUWLjxyZGkBpmgduMEnOnn2IBSQgLhEp8uLSbFcRmEVCVOLuriQnE5hWwlJhx6RUjxAJ5
+        iZmXvrODzOQUsJLo2qIMcY+lxNkLLcwQ5YISJ2c+ARvJDFTevHU28wRGgVlIUrOQpBYwMq1i
+        lEwtKM5Nzy02LDDKSy3XK07MLS7NS9dLzs/dxAgOdC2tHYx7Vn3QO8TIxMF4iFGCg1lJhPfI
+        2vdJQrwpiZVVqUX58UWlOanFhxilOViUxHkvdJ2MFxJITyxJzU5NLUgtgskycXBKNTCxBlXM
+        Xf2t8BbHl+635x/fvPDv1SX+xTv8y1g9YhV+rXjqYDWRoczO4t+hvNjrZ3k7b+mxKW6V39GZ
+        nKrm57oz+GaCk5K5U9VUP23l7tjJezJLJ+X+2mKwIZRpgUXx5KQ11QEMxx24Xyj2rApOXMHx
+        SmG+y/+bfmWq57teqcavPl7u/S/4U/o91rU7d0cLBQh1vzC8/Pm7EOMm15istF9qzzmPn9i+
+        6c4X8/8/dHaEfWosjjzS3T/hFMtX27PHWn5XT+9az8/B9y7KQKXq6Fav9mt3eDlZzQut1jYd
+        vOMZF1Mu/Wl7RcjkCK4bEez+4jPTmQPmbvm38JScNFfJlaTTLjPfpvrqdtwt3XjoiqcSS3FG
+        oqEWc1FxIgBIO8Fl4wIAAA==
+X-CMS-MailID: 20220807184547epcas5p23b4ef30467d65d1b81632e7c514fc192
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 CMS-TYPE: 105P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220807184540epcas5p41f496a87fe65cff524740ddde071b4bb
-References: <CGME20220807184540epcas5p41f496a87fe65cff524740ddde071b4bb@epcas5p4.samsung.com>
+X-CMS-RootMailID: 20220807184547epcas5p23b4ef30467d65d1b81632e7c514fc192
+References: <20220807183607.352351-1-joshi.k@samsung.com>
+        <CGME20220807184547epcas5p23b4ef30467d65d1b81632e7c514fc192@epcas5p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Put this up in the same way as iopoll is done for regular read/write IO.
+Make place for storing a cookie into struct io_uring_cmd on its
+submission. Perform the completion using the ->uring_cmd_iopoll handler.
 
-Series enables async polling on io_uring command, and nvme passthrough
-(for io-commands) is wired up to leverage that.
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+---
+ include/linux/io_uring.h |  8 ++++++--
+ io_uring/io_uring.c      |  6 ++++++
+ io_uring/opdef.c         |  1 +
+ io_uring/rw.c            |  8 +++++++-
+ io_uring/uring_cmd.c     | 11 +++++++++--
+ 5 files changed, 29 insertions(+), 5 deletions(-)
 
-Changes since v1:
-- corrected variable name (Jens)
-- fix for a warning (test-robot)
-
-Performance impact:
-Pre TLDR: polling gives clear win.
-
-512b randread performance (KIOPS):
-
-QD_batch    block    passthru    passthru-poll   block-poll
-1_1          80        81          158            157
-8_2         406       470          680            700
-16_4        620       656          931            920
-128_32      879       1056        1120            1132
-
-Upstream fio is used for testing. Polled queues set to 1 in nvme.
-
-passthru command line:
-fio -iodepth=64 -rw=randread -ioengine=io_uring_cmd -bs=512 -numjobs=1
--runtime=60 -group_reporting -iodepth_batch_submit=16
--iodepth_batch_complete_min=1 -iodepth_batch_complete_max=16
--cmd_type=nvme -hipri=0 -filename=/dev/ng1n1 -name=io_uring_cmd_64
-
-block command line:
-fio -direct=1 -iodepth=64 -rw=randread -ioengine=io_uring -bs=512
--numjobs=1 -runtime=60 -group_reporting -iodepth_batch_submit=16
--iodepth_batch_complete_min=1 -iodepth_batch_complete_max=16
--hipri=0 -filename=/dev/nvme1n1 name=io_uring_64
-
-Bit of code  went into non-passthrough path for io_uring (patch 2) but I
-do not see that causing any performance regression.
-peak-perf test showed 2.3M IOPS with or without this series for
-block-io.
-
-io_uring: Running taskset -c 0,12 t/io_uring -b512 -d128 -c32 -s32 -p1
--F1 -B1 -n2  /dev/nvme0n1
-submitter=0, tid=3089, file=/dev/nvme0n1, node=-1
-submitter=1, tid=3090, file=/dev/nvme0n1, node=-1
-polled=1, fixedbufs=1/0, register_files=1, buffered=0, QD=128
-Engine=io_uring, sq_ring=128, cq_ring=128
-polled=1, fixedbufs=1/0, register_files=1, buffered=0, QD=128
-Engine=io_uring, sq_ring=128, cq_ring=128
-IOPS=2.31M, BW=1126MiB/s, IOS/call=31/31
-IOPS=2.30M, BW=1124MiB/s, IOS/call=32/31
-IOPS=2.30M, BW=1123MiB/s, IOS/call=32/32 
-
-Kanchan Joshi (4):
-  fs: add file_operations->uring_cmd_iopoll
-  io_uring: add iopoll infrastructure for io_uring_cmd
-  block: export blk_rq_is_poll
-  nvme: wire up async polling for io passthrough commands
-
- block/blk-mq.c                |  3 +-
- drivers/nvme/host/core.c      |  1 +
- drivers/nvme/host/ioctl.c     | 73 ++++++++++++++++++++++++++++++++---
- drivers/nvme/host/multipath.c |  1 +
- drivers/nvme/host/nvme.h      |  2 +
- include/linux/blk-mq.h        |  1 +
- include/linux/fs.h            |  1 +
- include/linux/io_uring.h      |  8 +++-
- io_uring/io_uring.c           |  6 +++
- io_uring/opdef.c              |  1 +
- io_uring/rw.c                 |  8 +++-
- io_uring/uring_cmd.c          | 11 +++++-
- 12 files changed, 105 insertions(+), 11 deletions(-)
-
-
-base-commit: ece775e9aa8232963cc1bddf5cc91285db6233af
+diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+index 4a2f6cc5a492..58676c0a398f 100644
+--- a/include/linux/io_uring.h
++++ b/include/linux/io_uring.h
+@@ -20,8 +20,12 @@ enum io_uring_cmd_flags {
+ struct io_uring_cmd {
+ 	struct file	*file;
+ 	const void	*cmd;
+-	/* callback to defer completions to task context */
+-	void (*task_work_cb)(struct io_uring_cmd *cmd);
++	union {
++		/* callback to defer completions to task context */
++		void (*task_work_cb)(struct io_uring_cmd *cmd);
++		/* used for polled completion */
++		void *cookie;
++	};
+ 	u32		cmd_op;
+ 	u32		pad;
+ 	u8		pdu[32]; /* available inline for free use */
+diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+index b54218da075c..48a430a86b50 100644
+--- a/io_uring/io_uring.c
++++ b/io_uring/io_uring.c
+@@ -1296,6 +1296,12 @@ static int io_iopoll_check(struct io_ring_ctx *ctx, long min)
+ 			    wq_list_empty(&ctx->iopoll_list))
+ 				break;
+ 		}
++
++		if (task_work_pending(current)) {
++			mutex_unlock(&ctx->uring_lock);
++			io_run_task_work();
++			mutex_lock(&ctx->uring_lock);
++		}
+ 		ret = io_do_iopoll(ctx, !min);
+ 		if (ret < 0)
+ 			break;
+diff --git a/io_uring/opdef.c b/io_uring/opdef.c
+index 72dd2b2d8a9d..9a0df19306fe 100644
+--- a/io_uring/opdef.c
++++ b/io_uring/opdef.c
+@@ -466,6 +466,7 @@ const struct io_op_def io_op_defs[] = {
+ 		.needs_file		= 1,
+ 		.plug			= 1,
+ 		.name			= "URING_CMD",
++		.iopoll			= 1,
+ 		.async_size		= uring_cmd_pdu_size(1),
+ 		.prep			= io_uring_cmd_prep,
+ 		.issue			= io_uring_cmd,
+diff --git a/io_uring/rw.c b/io_uring/rw.c
+index 2b784795103c..1a4fb8a44b9a 100644
+--- a/io_uring/rw.c
++++ b/io_uring/rw.c
+@@ -1005,7 +1005,13 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
+ 		if (READ_ONCE(req->iopoll_completed))
+ 			break;
+ 
+-		ret = rw->kiocb.ki_filp->f_op->iopoll(&rw->kiocb, &iob, poll_flags);
++		if (req->opcode == IORING_OP_URING_CMD) {
++			struct io_uring_cmd *ioucmd = (struct io_uring_cmd *)rw;
++
++			ret = req->file->f_op->uring_cmd_iopoll(ioucmd);
++		} else
++			ret = rw->kiocb.ki_filp->f_op->iopoll(&rw->kiocb, &iob,
++							poll_flags);
+ 		if (unlikely(ret < 0))
+ 			return ret;
+ 		else if (ret)
+diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+index 0a421ed51e7e..5cc339fba8b8 100644
+--- a/io_uring/uring_cmd.c
++++ b/io_uring/uring_cmd.c
+@@ -49,7 +49,11 @@ void io_uring_cmd_done(struct io_uring_cmd *ioucmd, ssize_t ret, ssize_t res2)
+ 	io_req_set_res(req, 0, ret);
+ 	if (req->ctx->flags & IORING_SETUP_CQE32)
+ 		io_req_set_cqe32_extra(req, res2, 0);
+-	__io_req_complete(req, 0);
++	if (req->ctx->flags & IORING_SETUP_IOPOLL)
++		/* order with io_iopoll_req_issued() checking ->iopoll_completed */
++		smp_store_release(&req->iopoll_completed, 1);
++	else
++		__io_req_complete(req, 0);
+ }
+ EXPORT_SYMBOL_GPL(io_uring_cmd_done);
+ 
+@@ -89,8 +93,11 @@ int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
+ 		issue_flags |= IO_URING_F_SQE128;
+ 	if (ctx->flags & IORING_SETUP_CQE32)
+ 		issue_flags |= IO_URING_F_CQE32;
+-	if (ctx->flags & IORING_SETUP_IOPOLL)
++	if (ctx->flags & IORING_SETUP_IOPOLL) {
+ 		issue_flags |= IO_URING_F_IOPOLL;
++		req->iopoll_completed = 0;
++		WRITE_ONCE(ioucmd->cookie, NULL);
++	}
+ 
+ 	if (req_has_async_data(req))
+ 		ioucmd->cmd = req->async_data;
 -- 
 2.25.1
 
