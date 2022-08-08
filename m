@@ -2,159 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF996C25B0D
-	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 10:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E02C25B06
+	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 10:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242413AbiHHKUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Aug 2022 06:20:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43782 "EHLO
+        id S242644AbiHHKgr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Aug 2022 06:36:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242496AbiHHKUh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Aug 2022 06:20:37 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21C5864E1;
-        Mon,  8 Aug 2022 03:20:36 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id q30so10295743wra.11;
-        Mon, 08 Aug 2022 03:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=M0he5Go9fj5sZtod3L10U6cY98vEYvhLvSwdvfZFRy4=;
-        b=LG5qSNqT2JJX558617sZsTm/x1GVdc33O5C2ZvV9LFwSf0Taya3QKaq2FNjiT1gmXa
-         AO34vQAZY27gcplpKOG5AYWyOuQNFORHwsVKv/SZh1h72ITT60s7iF0KnDLeAp/EXh28
-         fTeoqglikt4zTo1yW1UkYcrysdR1yKPYFAxyQjC81W2nrJYMK4oclK9OWphrnDJ5pw47
-         9W3+qcd3fx7EhN0X/yMXvGcENFkZscwuSJFBb+MvJLaMZv13mriWR+vb3MYg88IiPvHG
-         HPb5z06HWUNDhnAyBxB+G0KaPQXQd96d5+PP+WLhl4xxqVDNzGW3YCI8FKdte+/VUfCW
-         vupQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=M0he5Go9fj5sZtod3L10U6cY98vEYvhLvSwdvfZFRy4=;
-        b=AbQdcMlEmVaa5BYv9LhjfPrcVMH390N+P+/gB/LlQAykDyx9ppNJNrdVsjhC+3XLKH
-         jr2BHAc3btRKkzhNsZYX7QSYHU7HCPzLD5aDAcDHiw1uqW5vFQl8wGMaxUljDVt+66wg
-         H4j5B+9Orkzbo09hDAgsqSGlyWDiC3QN6GG4YTwVt45bT2LW3cixquJpxDBAItyDIqB3
-         JOl6bs9oGxDisq3fmZM5WsyZIjxlMCgUuiovXkPDWb59F8ZfTMRFn8jQgPU0H/jpXTU9
-         3lq1dMnT2cb1LPSqVZfIarZZpnEHeOMfuBzY1nZF5ZRz3MawLkBQvUJ6IMtOSn1VRpQG
-         xqHQ==
-X-Gm-Message-State: ACgBeo1nnDekqN7gXoX8iLMhYyBXzI+9Cg0RzlHN/iRNAjDfEfolA++1
-        Pr8RlmTkf+c2i/6Tj/GPIuk=
-X-Google-Smtp-Source: AA6agR7ax8R8c9mQtUybOaqiiYYyNxIdrYTlId2y5BpG1dayZFvQX7I3r27NmErdCjerQN67iza3iw==
-X-Received: by 2002:a05:6000:1445:b0:220:7fcb:23a8 with SMTP id v5-20020a056000144500b002207fcb23a8mr10818474wrx.204.1659954034513;
-        Mon, 08 Aug 2022 03:20:34 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:310::22ef? ([2620:10d:c092:600::2:c70])
-        by smtp.gmail.com with ESMTPSA id d14-20020adfe84e000000b0021badf3cb26sm13111677wrn.63.2022.08.08.03.20.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Aug 2022 03:20:34 -0700 (PDT)
-Message-ID: <f2e5d71b-7eb7-5103-28c2-5e39c3c25aed@gmail.com>
-Date:   Mon, 8 Aug 2022 11:14:44 +0100
+        with ESMTP id S242453AbiHHKgl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Aug 2022 06:36:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 26850F580
+        for <linux-block@vger.kernel.org>; Mon,  8 Aug 2022 03:36:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659954996;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JrlhN6OnXlaGeR+OnC3zS/Ao0sQFhuM9furIjnmbtgo=;
+        b=hcYNnM313v1pKwENvuf9DyyhuSqCVOYDY7K1vtLExzz93lLfCJBp8QV0ZrnotuQBSxRrWa
+        aBLqPBTmILmnvdsdwHdukyGEcI83Wmj9s+6TyjpXU0SWASafSb19sVKrGHT9gYhcyHTu1J
+        vhaqZnUBe4QEvjcq/RgEY/hgMR8ObbI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-561-tTvGzXgWOmaSnPDIdS4NFg-1; Mon, 08 Aug 2022 06:36:35 -0400
+X-MC-Unique: tTvGzXgWOmaSnPDIdS4NFg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86CE918A662C;
+        Mon,  8 Aug 2022 10:36:35 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D7C591415125;
+        Mon,  8 Aug 2022 10:36:33 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-block@vger.kernel.org
+Cc:     sunke32@huawei.com, shinichiro.kawasaki@wdc.com
+Subject: [PATCH v2 blktests] src/mount_clear_sock.c: fix compiling error
+Date:   Mon,  8 Aug 2022 18:36:23 +0800
+Message-Id: <20220808103623.821142-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCHv3 2/7] file: add ops to dma map bvec
-Content-Language: en-US
-To:     Dave Chinner <david@fromorbit.com>,
-        Matthew Wilcox <willy@infradead.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kernel Team <Kernel-team@fb.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20220805162444.3985535-1-kbusch@fb.com>
- <20220805162444.3985535-3-kbusch@fb.com>
- <20220808002124.GG3861211@dread.disaster.area>
- <YvBjRfy4XzzBajTX@casper.infradead.org>
- <20220808021501.GH3861211@dread.disaster.area>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20220808021501.GH3861211@dread.disaster.area>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/8/22 03:15, Dave Chinner wrote:
-> On Mon, Aug 08, 2022 at 02:13:41AM +0100, Matthew Wilcox wrote:
->> On Mon, Aug 08, 2022 at 10:21:24AM +1000, Dave Chinner wrote:
->>>> +#ifdef CONFIG_HAS_DMA
->>>> +	void *(*dma_map)(struct file *, struct bio_vec *, int);
->>>> +	void (*dma_unmap)(struct file *, void *);
->>>> +#endif
->>>
->>> This just smells wrong. Using a block layer specific construct as a
->>> primary file operation parameter shouts "layering violation" to me.
->>
->> A bio_vec is also used for networking; it's in disguise as an skb_frag,
->> but it's there.
-> 
-> Which is just as awful. Just because it's done somewhere else
-> doesn't make it right.
-> 
->>> What we really need is a callout that returns the bdevs that the
->>> struct file is mapped to (one, or many), so the caller can then map
->>> the memory addresses to the block devices itself. The caller then
->>> needs to do an {file, offset, len} -> {bdev, sector, count}
->>> translation so the io_uring code can then use the correct bdev and
->>> dma mappings for the file offset that the user is doing IO to/from.
->>
->> I don't even know if what you're proposing is possible.  Consider a
->> network filesystem which might transparently be moved from one network
->> interface to another.  I don't even know if the filesystem would know
->> which network device is going to be used for the IO at the time of
->> IO submission.
-> 
-> Sure, but nobody is suggesting we support direct DMA buffer mapping
-> and reuse for network devices right now, whereas we have working
-> code for block devices in front of us.
+<linux/mount.h> and <sys/mount.h> are known pairs of headers that conflict
+See https://sourceware.org/glibc/wiki/Synchronizing_Headers
+$ make
+make -C src all
+make[1]: Entering directory '/root/blktests/src'
+cc  -O2 -Wall -Wshadow  -DHAVE_LINUX_BLKZONED_H -o mount_clear_sock mount_clear_sock.c
+In file included from /usr/include/linux/fs.h:19,
+                 from mount_clear_sock.c:15:
+/usr/include/linux/mount.h:95:6: error: redeclaration of ‘enum fsconfig_command’
+   95 | enum fsconfig_command {
+      |      ^~~~~~~~~~~~~~~~
+In file included from mount_clear_sock.c:11:
+/usr/include/sys/mount.h:189:6: note: originally defined here
+  189 | enum fsconfig_command
+      |      ^~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:96:9: error: redeclaration of enumerator ‘FSCONFIG_SET_FLAG’
+   96 |         FSCONFIG_SET_FLAG       = 0,    /* Set parameter, supplying no value */
+      |         ^~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:191:3: note: previous definition of ‘FSCONFIG_SET_FLAG’ with type ‘enum fsconfig_command’
+  191 |   FSCONFIG_SET_FLAG       = 0,    /* Set parameter, supplying no value */
+      |   ^~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:97:9: error: redeclaration of enumerator ‘FSCONFIG_SET_STRING’
+   97 |         FSCONFIG_SET_STRING     = 1,    /* Set parameter, supplying a string value */
+      |         ^~~~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:193:3: note: previous definition of ‘FSCONFIG_SET_STRING’ with type ‘enum fsconfig_command’
+  193 |   FSCONFIG_SET_STRING     = 1,    /* Set parameter, supplying a string value */
+      |   ^~~~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:98:9: error: redeclaration of enumerator ‘FSCONFIG_SET_BINARY’
+   98 |         FSCONFIG_SET_BINARY     = 2,    /* Set parameter, supplying a binary blob value */
+      |         ^~~~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:195:3: note: previous definition of ‘FSCONFIG_SET_BINARY’ with type ‘enum fsconfig_command’
+  195 |   FSCONFIG_SET_BINARY     = 2,    /* Set parameter, supplying a binary blob value */
+      |   ^~~~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:99:9: error: redeclaration of enumerator ‘FSCONFIG_SET_PATH’
+   99 |         FSCONFIG_SET_PATH       = 3,    /* Set parameter, supplying an object by path */
+      |         ^~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:197:3: note: previous definition of ‘FSCONFIG_SET_PATH’ with type ‘enum fsconfig_command’
+  197 |   FSCONFIG_SET_PATH       = 3,    /* Set parameter, supplying an object by path */
+      |   ^~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:100:9: error: redeclaration of enumerator ‘FSCONFIG_SET_PATH_EMPTY’
+  100 |         FSCONFIG_SET_PATH_EMPTY = 4,    /* Set parameter, supplying an object by (empty) path */
+      |         ^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:199:3: note: previous definition of ‘FSCONFIG_SET_PATH_EMPTY’ with type ‘enum fsconfig_command’
+  199 |   FSCONFIG_SET_PATH_EMPTY = 4,    /* Set parameter, supplying an object by (empty) path */
+      |   ^~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:101:9: error: redeclaration of enumerator ‘FSCONFIG_SET_FD’
+  101 |         FSCONFIG_SET_FD         = 5,    /* Set parameter, supplying an object by fd */
+      |         ^~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:201:3: note: previous definition of ‘FSCONFIG_SET_FD’ with type ‘enum fsconfig_command’
+  201 |   FSCONFIG_SET_FD         = 5,    /* Set parameter, supplying an object by fd */
+      |   ^~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:102:9: error: redeclaration of enumerator ‘FSCONFIG_CMD_CREATE’
+  102 |         FSCONFIG_CMD_CREATE     = 6,    /* Invoke superblock creation */
+      |         ^~~~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:203:3: note: previous definition of ‘FSCONFIG_CMD_CREATE’ with type ‘enum fsconfig_command’
+  203 |   FSCONFIG_CMD_CREATE     = 6,    /* Invoke superblock creation */
+      |   ^~~~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:103:9: error: redeclaration of enumerator ‘FSCONFIG_CMD_RECONFIGURE’
+  103 |         FSCONFIG_CMD_RECONFIGURE = 7,   /* Invoke superblock reconfiguration */
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/sys/mount.h:205:3: note: previous definition of ‘FSCONFIG_CMD_RECONFIGURE’ with type ‘enum fsconfig_command’
+  205 |   FSCONFIG_CMD_RECONFIGURE = 7,   /* Invoke superblock reconfiguration */
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/linux/mount.h:129:8: error: redefinition of ‘struct mount_attr’
+  129 | struct mount_attr {
+      |        ^~~~~~~~~~
+/usr/include/sys/mount.h:161:8: note: originally defined here
+  161 | struct mount_attr
+      |        ^~~~~~~~~~
 
-Networking is not so far away, with zerocopy tx landed the next target
-is peer-to-peer, i.e. transfers from a device memory. It's nothing
-new and was already tried out quite some time ago, but to be fair,
-it's not ready yet as this patchset. In any case, they have to use
-common infra, which means we can't rely on struct block_device.
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ src/mount_clear_sock.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-The first idea was to have a callback returning a struct device
-pointer and failing when the file can have multiple devices or change
-them on the fly. Networking already has a hook to assign a device to
-a socket, we just need to make it's immutable after the assignment.
- From the userspace perspective, if host memory mapping failed it can
-be re-registered as a normal io_uring registered buffer with no change
-in the API on the submission side.
-
-I like the idea to reserve ranges in the API for future use, but
-as I understand it, io_uring would need to do device lookups based on
-the I/O offset, which doesn't sound fast and I'm not convinced we want
-to go this way now. Could work if the specified range covers only one
-device but needs knowledge of how it's chunked and doesn't go well
-when devices alternate every 4KB or so.
-
-Another question is whether we want to have some kind of notion of
-device groups so the userspace doesn't have to register a buffer
-multiple times when the mapping can be shared b/w files.
-
-
-> What I want to see is broad-based generic block device based
-> filesysetm support, not niche functionality that can only work on a
-> single type of block device. Network filesystems and devices are a
-> *long* way from being able to do anything like this, so I don't see
-> a need to cater for them at this point in time.
-> 
-> When someone has a network device abstraction and network filesystem
-> that can do direct data placement based on that device abstraction,
-> then we can talk about the high level interface we should use to
-> drive it....
-> 
->> I think a totally different model is needed where we can find out if
->> the bvec contains pages which are already mapped to the device, and map
->> them if they aren't.  That also handles a DM case where extra devices
->> are hot-added to a RAID, for example.
-> 
-> I cannot form a picture of what you are suggesting from such a brief
-> description. Care to explain in more detail?
-
+diff --git a/src/mount_clear_sock.c b/src/mount_clear_sock.c
+index 984395e..5d9c900 100644
+--- a/src/mount_clear_sock.c
++++ b/src/mount_clear_sock.c
+@@ -12,7 +12,6 @@
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
+-#include <linux/fs.h>
+ #include <linux/nbd.h>
+ 
+ int main(int argc, char **argv)
 -- 
-Pavel Begunkov
+2.34.1
+
