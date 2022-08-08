@@ -2,116 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69ECC25B0C
-	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 02:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24526C3F6B0
+	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 03:32:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230362AbiHHCtR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Aug 2022 22:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41716 "EHLO
+        id S236956AbiHHDcQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Aug 2022 23:32:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbiHHCtR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 22:49:17 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D903032F;
-        Sun,  7 Aug 2022 19:49:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mOJLN4pYorTgDgHUp6RyWTSqCbw6XoYzTeB8WcDahEM=; b=t8zmrKPhyAb3QJgKN1uTD9Ypmk
-        tJSzdlfojH3XH9ChjIZHSo+6aD9vXhjSakknQO51Is6we1H3TH5JmW3gBIT4lFQFAozLsfQh/h5Yu
-        nDmds5ekTT73HR2G4e6ybbeAst0R4FAfb2LHB45TpITbJrGQzVHvagAIyaeYSAh4oqq8h8e6tBJt4
-        RAQ/lZO11jXr7TLfBH9Ua/rCz4bxZfx66PXHdW7nJng95xnCKTyKOQPOBvTdsfZbj501KyOgACz0f
-        R+0siTUbHJWulTiNrlZRVSpYMdfkKfzFckH6bwaKcv10SJKmnh9c0MOS9gC8MrM7szjijzExR2N1g
-        4ZHrJOSw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oKspJ-00DVmd-6q; Mon, 08 Aug 2022 02:49:09 +0000
-Date:   Mon, 8 Aug 2022 03:49:09 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kernel Team <Kernel-team@fb.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3 2/7] file: add ops to dma map bvec
-Message-ID: <YvB5pbsfM6QuR5Y7@casper.infradead.org>
-References: <20220805162444.3985535-1-kbusch@fb.com>
- <20220805162444.3985535-3-kbusch@fb.com>
- <20220808002124.GG3861211@dread.disaster.area>
- <YvBjRfy4XzzBajTX@casper.infradead.org>
- <20220808021501.GH3861211@dread.disaster.area>
+        with ESMTP id S237405AbiHHDcH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 23:32:07 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DA47679;
+        Sun,  7 Aug 2022 20:31:37 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M1MCT2l0RzKCgC;
+        Mon,  8 Aug 2022 11:30:13 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgCnkb2Vg_BiCdhFAA--.42849S3;
+        Mon, 08 Aug 2022 11:31:34 +0800 (CST)
+Subject: Re: [PATCH stable 5.10 1/3] block: look up holders by bdev
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, stable@vger.kernel.org,
+        axboe@kernel.dk, snitzer@redhat.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20220729062356.1663513-1-yukuai1@huaweicloud.com>
+ <20220729062356.1663513-2-yukuai1@huaweicloud.com>
+ <Yue2rU2Y+xzvGU6x@kroah.com> <20220801180458.GA17425@lst.de>
+ <Yuix/CcmdKsSD+za@kroah.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <b06f4667-d70e-54ee-6c6f-b68865ca61a4@huaweicloud.com>
+Date:   Mon, 8 Aug 2022 11:31:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220808021501.GH3861211@dread.disaster.area>
+In-Reply-To: <Yuix/CcmdKsSD+za@kroah.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgCnkb2Vg_BiCdhFAA--.42849S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur1fZFy7XrW5ZrWDXF47Jwb_yoW8CrWfpa
+        12qa9Ykws5GF48ta4xZ3WIkFn3twsayry3G3s5JrZ5uws0krySqrWxKFWUZryDWFs8Gr1I
+        9F4jk395uFn5tw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 08, 2022 at 12:15:01PM +1000, Dave Chinner wrote:
-> On Mon, Aug 08, 2022 at 02:13:41AM +0100, Matthew Wilcox wrote:
-> > On Mon, Aug 08, 2022 at 10:21:24AM +1000, Dave Chinner wrote:
-> > > > +#ifdef CONFIG_HAS_DMA
-> > > > +	void *(*dma_map)(struct file *, struct bio_vec *, int);
-> > > > +	void (*dma_unmap)(struct file *, void *);
-> > > > +#endif
-> > > 
-> > > This just smells wrong. Using a block layer specific construct as a
-> > > primary file operation parameter shouts "layering violation" to me.
-> > 
-> > A bio_vec is also used for networking; it's in disguise as an skb_frag,
-> > but it's there.
-> 
-> Which is just as awful. Just because it's done somewhere else
-> doesn't make it right.
-> 
-> > > What we really need is a callout that returns the bdevs that the
-> > > struct file is mapped to (one, or many), so the caller can then map
-> > > the memory addresses to the block devices itself. The caller then
-> > > needs to do an {file, offset, len} -> {bdev, sector, count}
-> > > translation so the io_uring code can then use the correct bdev and
-> > > dma mappings for the file offset that the user is doing IO to/from.
-> > 
-> > I don't even know if what you're proposing is possible.  Consider a
-> > network filesystem which might transparently be moved from one network
-> > interface to another.  I don't even know if the filesystem would know
-> > which network device is going to be used for the IO at the time of
-> > IO submission.
-> 
-> Sure, but nobody is suggesting we support direct DMA buffer mapping
-> and reuse for network devices right now, whereas we have working
-> code for block devices in front of us.
+Hi, Christoph
 
-But we have working code already (merged) in the networking layer for
-reusing pages that are mapped to particular devices.
+ÔÚ 2022/08/02 13:11, Greg KH Ð´µÀ:
+> On Mon, Aug 01, 2022 at 08:04:58PM +0200, Christoph Hellwig wrote:
+>> On Mon, Aug 01, 2022 at 01:19:09PM +0200, Greg KH wrote:
+>>> This is very different from the upstream version, and forces the change
+>>> onto everyone, not just those who had CONFIG_BLOCK_HOLDER_DEPRECATED
+>>> enabled like was done in the main kernel tree.
+>>>
+>>> Why force this on all and not just use the same option?
+>>
+>> I'm really worried about backports that are significantly different
+>> from the original commit.  To the point where if they are so different
+>> and we don't have a grave security or data integrity bug I'm really not
+>> very much in favor of backporting them at all.
+>>
 
-> What I want to see is broad-based generic block device based
-> filesysetm support, not niche functionality that can only work on a
-> single type of block device. Network filesystems and devices are a
-> *long* way from being able to do anything like this, so I don't see
-> a need to cater for them at this point in time.
-> 
-> When someone has a network device abstraction and network filesystem
-> that can do direct data placement based on that device abstraction,
-> then we can talk about the high level interface we should use to
-> drive it....
-> 
-> > I think a totally different model is needed where we can find out if
-> > the bvec contains pages which are already mapped to the device, and map
-> > them if they aren't.  That also handles a DM case where extra devices
-> > are hot-added to a RAID, for example.
-> 
-> I cannot form a picture of what you are suggesting from such a brief
-> description. Care to explain in more detail?
+I do understand that backporting these patches is not good, thanks for
+taking time on this patchset.
 
-Let's suppose you have a RAID 5 of NVMe devices.  One fails and now
-the RAID-5 is operating in degraded mode.  So you hot-unplug the failed
-device, plug in a new NVMe drive and add it to the RAID.  The pages now
-need to be DMA mapped to that new PCI device.
+I decided to push following patch in our version:
 
-What I'm saying is that the set of devices that the pages need to be
-mapped to is not static and cannot be known at "setup time", even given
-the additional information that you were proposing earlier in this thread.
-It has to be dynamically adjusted.
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 588e8b43efab..c047d5fcb325 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -2149,12 +2149,16 @@ int dm_setup_md_queue(struct mapped_device *md, 
+struct dm_table *t)
+
+         switch (type) {
+         case DM_TYPE_REQUEST_BASED:
+-               md->disk->fops = &dm_rq_blk_dops;
+                 r = dm_mq_init_request_queue(md, t);
+                 if (r) {
+                         DMERR("Cannot initialize queue for 
+request-based dm mapped device");
+                         return r;
+                 }
++               /*
++                * Change the fops after queue is initialized, so that 
+bio won't
++                * issued by rq-based path until that.
++                */
++               md->disk->fops = &dm_rq_blk_dops;
+                 break;
+         case DM_TYPE_BIO_BASED:
+         case DM_TYPE_DAX_BIO_BASED:
+
+
+This way only modify dm, and the problem can be fixed. If you guys think
+this is OK, I can send a patch for LTS. Otherwise, if you guys still
+think the null-ptr-def problem is uncommon and doesn't worth to fix,
+please ignore this mail.
+
+Thanks,
+Kuai
+> 
+> I agree, I'll drop this from my review queue now, thanks.
+> 
+> greg k-h
+> .
+> 
+
