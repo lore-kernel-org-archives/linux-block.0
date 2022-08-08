@@ -2,220 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F6EC19F2A
-	for <linux-block@archiver.kernel.org>; Sun,  7 Aug 2022 19:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3BDC25B07
+	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 00:21:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbiHGTxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Aug 2022 15:53:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34592 "EHLO
+        id S230385AbiHHAVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Aug 2022 20:21:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbiHGTxr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 15:53:47 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31AB6474
-        for <linux-block@vger.kernel.org>; Sun,  7 Aug 2022 12:53:38 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id w3so9132077edc.2
-        for <linux-block@vger.kernel.org>; Sun, 07 Aug 2022 12:53:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=KSNjU/g/uABeK7DgJdNs6bpwX7SttrPrrtSMzcFQBU4=;
-        b=YS+bg3+dthHvsLf+APaAuEwIfsa87dAkJ6XL9CGQZtr1aiJtX0D02R+wQuiAohq4Kz
-         Bh3qmQNfqdcddLZNg+2iFwN6n8+SrbLgwbIfRy0a2+qRuBB+MJwxHwKlQ3LPVZwmHpnz
-         WE4LRv/+G8ZumwPcbG2NOWWZrxYZBUmTvUnL8XE6Suffg/dqkz2UF9J8xAVEdp70ynzJ
-         FtpGr7xYl661N78VLK9TXS5HcOFXXVCE7OoRcSwQam/t+7Xarc4j5jEJzcuYItubOTjN
-         N/+5FVyBW+xxOxQF6monqPMaJHjmCHY2KGY+tcMM58bID/soNeCuQJ8HW0YcMq4WPDQO
-         lIwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=KSNjU/g/uABeK7DgJdNs6bpwX7SttrPrrtSMzcFQBU4=;
-        b=Iu/QR7aRAEGSXHPSKW49V23a7Go6DaWRvxzC7JgbyrBOu/9DArnIHUV6ZqfJyrPAl7
-         J3jaM5NDbI2YzwiM29oqVzl5YwfWPFNoyAzwkBzRMDWawv8HZ0UhD6Ol1FlzxJ+v15Vl
-         JLWum7VuCuEv10VZhukJW0Xt3ES2V+oo5l0jKZAhrQgk7RIg2Q3E3H2Xypei/UADGq5J
-         M81799PIbcae44RVycQgaaAtJI77Mb1ghJq4tu0sO+5WAzxkVLXXBTpSmoMD5ly8oYs7
-         WandQXxfSG4xkKKpx32lXKMMhqrMVsEjAzlvoJpqCe/EYgW4CaOSNm5D/kx3FWb0T6K/
-         buGw==
-X-Gm-Message-State: ACgBeo38LHbGK5k7Bm+/amqonn7CVUCawj5zz9PsBKyWrBulfu/KAhNH
-        3CV8hGNrXWg/j1KhJNBc81RMNyhz2zZYmA==
-X-Google-Smtp-Source: AA6agR7x9Zl9jxGqHa/qimd6JaBS49eiXMcJU+FuL/emsWO/J+uT2G5Y1LOCkzPTsmZv/38KN8YGVQ==
-X-Received: by 2002:a05:6402:1e88:b0:43c:e8d4:bf27 with SMTP id f8-20020a0564021e8800b0043ce8d4bf27mr15616183edf.401.1659902017188;
-        Sun, 07 Aug 2022 12:53:37 -0700 (PDT)
-Received: from [192.168.2.28] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id bf17-20020a0564021a5100b0043df042bfc6sm3566644edb.47.2022.08.07.12.53.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Aug 2022 12:53:36 -0700 (PDT)
-Message-ID: <731828af-0ef3-ba04-7115-be8f1d41e1c5@gmail.com>
-Date:   Sun, 7 Aug 2022 21:53:35 +0200
+        with ESMTP id S230362AbiHHAVm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Aug 2022 20:21:42 -0400
+Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B9A438AF;
+        Sun,  7 Aug 2022 17:21:35 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-193-158.pa.nsw.optusnet.com.au [49.181.193.158])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 9FFFB62CFF2;
+        Mon,  8 Aug 2022 10:21:25 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1oKqWK-00ARYL-Dl; Mon, 08 Aug 2022 10:21:24 +1000
+Date:   Mon, 8 Aug 2022 10:21:24 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Keith Busch <kbusch@fb.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCHv3 2/7] file: add ops to dma map bvec
+Message-ID: <20220808002124.GG3861211@dread.disaster.area>
+References: <20220805162444.3985535-1-kbusch@fb.com>
+ <20220805162444.3985535-3-kbusch@fb.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [git pull] Additional device mapper changes for 6.0
-Content-Language: en-US
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Nathan Huckleberry <nhuck@google.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Sami Tolvanen <samitolvanen@google.com>,
-        Alasdair G Kergon <agk@redhat.com>
-References: <YugiaQ1TO+vT1FQ5@redhat.com> <Yu1rOopN++GWylUi@redhat.com>
- <CAHk-=wj5w+Nga81wGmO6aYtcLrn6c_R_-gQrtnKwjzOZczko=A@mail.gmail.com>
- <Yu6zXVPLmwjqGg4V@redhat.com>
- <CAHk-=wj+ywtyBEp7pmEKxgwRE+iJBct6iih=ssGk2EWqaYL_yg@mail.gmail.com>
- <99e17678-8801-ac41-de20-a5f6f60da524@gmail.com>
- <YvAA8fI37owuSe7y@redhat.com>
-From:   Milan Broz <gmazyland@gmail.com>
-In-Reply-To: <YvAA8fI37owuSe7y@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220805162444.3985535-3-kbusch@fb.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=OJNEYQWB c=1 sm=1 tr=0 ts=62f0570e
+        a=SeswVvpAPK2RnNNwqI8AaA==:117 a=SeswVvpAPK2RnNNwqI8AaA==:17
+        a=kj9zAlcOel0A:10 a=biHskzXt2R4A:10 a=VwQbUJbxAAAA:8 a=7-415B0cAAAA:8
+        a=_eoJad-yVWRv8vzf4-wA:9 a=CjuIK1q_8ugA:10 a=AjGcO6oz07-iQ99wixmX:22
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Mike,
-
-there was nothing personal in my reply - sorry
-if you see it this way.
-
-Anyway, please stop ad-hominem attacks on me!
-
-I just described what I see as a problem that prevents
-us from dropping version parsing.
-
-Technical comments, below, but really, these should go to
-dm-devel only to not waste time of others.
-
-On 07/08/2022 20:14, Mike Snitzer wrote:
->> TL;DR: it is *only* for hinting to users what is possibly wrong
->> after activation fails because there is *no* proper error reporting
->> from the device-mapper.
+On Fri, Aug 05, 2022 at 09:24:39AM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
 > 
-> DM's core and target versions aren't intended to be in service of
-> error reporting. You abusing them like that is a fundamental problem.
-
-Perhaps, but there was nothing better. If I missed something,
-we can definitely make the code better.
-
-TBH, I do even think that it uses the same logic as libdevmapper library
-(and perhaps it dates even before I started to maintain it).
-
-I do not see fundamental problem here, though.
-
-I take is as "The dm-integrity was introduced in kernel/target X",
-then I do not expect it working in X-1...
-
->> Please don't just replace it with bitmaps.
->>
->> It will not bring any better interface while adding more magic with
->> handling compatibility, as we need to use both... see below.
+> The same buffer may be used for many subsequent IO's. Instead of setting
+> up the mapping per-IO, provide an interface that can allow a buffer to
+> be premapped just once and referenced again later, and implement for the
+> block device file.
 > 
-> (I saw your "below", it lacked a coherent explanation for why "we need
-> to use both" as a rule moving forward)
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  block/fops.c       | 20 ++++++++++++++++++++
+>  fs/file.c          | 15 +++++++++++++++
+>  include/linux/fs.h | 20 ++++++++++++++++++++
+>  3 files changed, 55 insertions(+)
 > 
-> When done properly it will _not_ require both. The version number would
-> be incremented one final time and would serve to allow existing
-> userspace to run unmodified. But from that point on the bitmap flags
-> should be used and all userspace converted to use them.
+> diff --git a/block/fops.c b/block/fops.c
+> index 29066ac5a2fa..db2d1e848f4b 100644
+> --- a/block/fops.c
+> +++ b/block/fops.c
+> @@ -670,6 +670,22 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+>  	return error;
+>  }
+>  
+> +#ifdef CONFIG_HAS_DMA
+> +void *blkdev_dma_map(struct file *filp, struct bio_vec *bvec, int nr_vecs)
+> +{
+> +	struct block_device *bdev = filp->private_data;
+> +
+> +	return block_dma_map(bdev, bvec, nr_vecs);
+> +}
+> +
+> +void blkdev_dma_unmap(struct file *filp, void *dma_tag)
+> +{
+> +	struct block_device *bdev = filp->private_data;
+> +
+> +	return block_dma_unmap(bdev, dma_tag);
+> +}
+> +#endif
+> +
+>  const struct file_operations def_blk_fops = {
+>  	.open		= blkdev_open,
+>  	.release	= blkdev_close,
+> @@ -686,6 +702,10 @@ const struct file_operations def_blk_fops = {
+>  	.splice_read	= generic_file_splice_read,
+>  	.splice_write	= iter_file_splice_write,
+>  	.fallocate	= blkdev_fallocate,
+> +#ifdef CONFIG_HAS_DMA
+> +	.dma_map	= blkdev_dma_map,
+> +	.dma_unmap	= blkdev_dma_unmap,
+> +#endif
+>  };
+>  
+>  static __init int blkdev_init(void)
+> diff --git a/fs/file.c b/fs/file.c
+> index 3bcc1ecc314a..767bf9d3205e 100644
+> --- a/fs/file.c
+> +++ b/fs/file.c
+> @@ -1307,3 +1307,18 @@ int iterate_fd(struct files_struct *files, unsigned n,
+>  	return res;
+>  }
+>  EXPORT_SYMBOL(iterate_fd);
+> +
+> +#ifdef CONFIG_HAS_DMA
+> +void *file_dma_map(struct file *file, struct bio_vec *bvec, int nr_vecs)
+> +{
+> +	if (file->f_op->dma_map)
+> +		return file->f_op->dma_map(file, bvec, nr_vecs);
+> +	return ERR_PTR(-EINVAL);
+> +}
+> +
+> +void file_dma_unmap(struct file *file, void *dma_tag)
+> +{
+> +	if (file->f_op->dma_unmap)
+> +		return file->f_op->dma_unmap(file, dma_tag);
+> +}
+> +#endif
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index 9f131e559d05..8652bad763f3 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -2092,6 +2092,10 @@ struct dir_context {
+>  struct iov_iter;
+>  struct io_uring_cmd;
+>  
+> +#ifdef CONFIG_HAS_DMA
+> +struct bio_vec;
+> +#endif
+> +
+>  struct file_operations {
+>  	struct module *owner;
+>  	loff_t (*llseek) (struct file *, loff_t, int);
+> @@ -2134,6 +2138,10 @@ struct file_operations {
+>  				   loff_t len, unsigned int remap_flags);
+>  	int (*fadvise)(struct file *, loff_t, loff_t, int);
+>  	int (*uring_cmd)(struct io_uring_cmd *ioucmd, unsigned int issue_flags);
+> +#ifdef CONFIG_HAS_DMA
+> +	void *(*dma_map)(struct file *, struct bio_vec *, int);
+> +	void (*dma_unmap)(struct file *, void *);
+> +#endif
+>  } __randomize_layout;
 
-I just meant that if userspace want to support older kernels,
-we need to support both.
+This just smells wrong. Using a block layer specific construct as a
+primary file operation parameter shouts "layering violation" to me.
 
-If it does not bring fixes for the problem I described, it is just
-more code with no effect (for libcryptsetup).
+Indeed, I can't see how this can be used by anything other than a
+block device file on a single, stand-alone block device. It's
+mapping a region of memory to something that has no file offset or
+length associated with it, and the implementation of the callout is
+specially pulling the bdev from the private file data.
 
-But if you see other reasons, then of course it makes sense.
+What we really need is a callout that returns the bdevs that the
+struct file is mapped to (one, or many), so the caller can then map
+the memory addresses to the block devices itself. The caller then
+needs to do an {file, offset, len} -> {bdev, sector, count}
+translation so the io_uring code can then use the correct bdev and
+dma mappings for the file offset that the user is doing IO to/from.
 
->> I cannot speak for the others, but for veritysetup (libcryptsetup),
->> the worst that can happen is that the user will get a wrong error message
->> (or just a generic message "something failed, bye").
-> 
-> You know how to send email to report specific problems and/or submit
-> patches. But I really don't recall anything in this category being
-> reported by you, certainly not recently... maybe you've just
-> internalized or I somehow missed it?
+For a stand-alone block device, the "get bdevs" callout is pretty
+simple. single device filesystems are trivial, too. XFS is trivial -
+it will return 1 or 2 block devices. stacked bdevs need to iterate
+recursively, as would filesystems like btrfs. Still, pretty easy,
+and for the case you care about here has almost zero overhead.
 
-I am sure I mentioned this, but years ago... what I am talking about
+Now you have a list of all the bdevs you are going to need to add
+dma mappings for, and you can call the bdev directly to set them up.
+THere is no need what-so-ever to do this through through the file
+operations layer - it's completely contained at the block device
+layer and below.
 
-1) Some ti->error messages are lost, e.g. in dm-crypt,
-   I think example is IV generators constructors
-   if (ret < 0) {
-      ti->error = "Error creating IV";
-   ...
-   (And yes, I should fix this myself.)
+Then, for each file IO range, we need a mapping callout in the file
+operations structure. That will take a  {file, offset, len} tuple
+and return a {bdev, sector, count} tuple that maps part or all of
+the file data.
 
+Again, for a standalone block device, this is simply a translation
+of filep->private to bdev, and offset,len from byte counts to sector
+counts. Trival, almost no overhead at all.
 
-2) Targets use macros like DMERR, these generate syslog message.
-    Getting these messages into userspace is problematic.
+For filesystems and stacked block devices, though, this gives you
+back all the information you need to select the right set of dma
+buffers and the {sector, count} information you need to issue the IO
+correctly. Setting this up is now all block device layer
+manipulation.[*]
 
-    But perhaps this is more problem for libdevmapper we use.
+This is where I think this patchset needs to go, not bulldoze
+through abstractions that get in the way because all you are
+implementing is a special fast path for a single niche use case. We
+know how to make it work with filesystems and stacked devices, so
+can we please start with an API that allows us to implement the
+functionality without having to completely rewrite all the code that
+you are proposing to add right now?
 
->> (All the crypto options are tricky, I would like to keep at least basic
->> usability and better errors like "seems tasklets are not supported,
->> retrying without tasklets flags.")
-> 
-> dm-verity's optional "try_verify_in_tasklet" is using tasklets as an
-> implementation detail, if they cannot be used (e.g. for FEC) then why
-> would fallback to normal verification using a workqueue be reported?
+Cheers,
 
-I am talking about situation when user explicitly requests to use tasklets
-on CLI and kernel does not support it. Then there must be an error message.
+Dave.
 
-I am not sure if we should automatically fallback to non-tasklets,
-but we do this already in other situations (enable-discards, keyring support, ...)
+[*] For the purposes of brevity, I'm ignoring the elephant in the
+middle of the room: how do you ensure that the filesystem doesn't
+run a truncate or hole punch while you have an outstanding DMA
+mapping and io_uring is doing IO direct to file offset via that
+mapping? i.e. how do you prevent such a non-filesystem controlled IO
+path from accessing to stale data (i.e.  use-after-free) of on-disk
+storage because there is nothing serialising it against other
+filesystem operations?
 
-> 
-> Or are you referring to something you saw when using dm-crypt's
-> no_{read,write}_workqueue options?
-> 
-> Or are you saying that both the new dm-verity try_verify_in_tasklet
-> option and the dm-crypt no_{read,write}_workqueue options should
-> fallback to removing those flags and try without them?
-> 
-> That is a level of AI I have no interest in adding or supporting.
-> The user asked for something, if it isn't possible then it should
-> fail.
+This is very similar to the direct storage access issues that
+DAX+RDMA and pNFS file layouts have. pNFS solves it with file layout
+leases, and DAX has all the hooks into the filesystems needed to use
+file layout leases in place, too. I'd suggest that IO via io_uring
+persistent DMA mappings outside the scope of the filesysetm
+controlled IO path also need layout lease guarantees to avoid user
+IO from racing with truncate, etc....
 
-And nobody asked for this as we are already doing this in userspace.
-
-It was really just example to demonstrate when we use target version.
-
-> "Please extend the DM ioctls to somehow add ti->error to the userspace
-> response" is a fine feature request. Should help no matter what.
-> 
-> (Can look to have a phased approach to the error reporting payload,
-> start with errno and error message, add more "structured" payload over
-> time. Are you referring to JSON or some other format? Whatever systemd
-> uses?).
-
-Great, let's discuss this later.
-
-> 
->> Perhaps in the syslog is more info, but usually only at debug level
->> (that is often not visible), and parsing syslog is not the option for us either.
-> 
-> All errors should be emitted with pr_err() using DMERR(). I've made a
-> conscious effort to convert DMWARN() to DMERR() when appropriate. But
-> I'll audit all the DM core code and then work through the various
-> targets.
-> 
-> If there are incorrect log levels being used it is a bug, please
-> report and/or fix.
-
-Yes, I tried to say that syslog itself as source is problematic
-(if you activate many devices in parallel; in multi-tenant environment
-when you should not see logs from different users etc).
-
-> There is no way to properly use version numbers to derive what
-> actually went wrong. Could you narrow down and isolate the possible
-> failure based on version in specific cases? Sure.. but it is insanely
-> fragile (especially with stable@ and distro kernels).
-
-It works pretty reliably for years with some minor exceptions that
-can be ignored.
-
-Milan
+-- 
+Dave Chinner
+david@fromorbit.com
