@@ -2,175 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B7F0C25B0C
-	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 14:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8CDC25B0C
+	for <linux-block@archiver.kernel.org>; Mon,  8 Aug 2022 15:28:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234872AbiHHOsb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Aug 2022 10:48:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40032 "EHLO
+        id S243722AbiHHP25 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Aug 2022 11:28:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbiHHOs3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Aug 2022 10:48:29 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 690A0B7F4
-        for <linux-block@vger.kernel.org>; Mon,  8 Aug 2022 07:48:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1659970107; x=1691506107;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=F1+Sxy+1lBVaSJWXdDtSLWjWhaVqQLanyKvcu0Jexr8=;
-  b=BW0msI/kjS3C1Oggp+Esk8m9anSBwyDFEB6OZT1RCuwrTwhNHKxJBKM1
-   nPnBhNVxI+IyIsaYjwy/lBeD83gNZRUbXu7F6aK0N4CWiVH3SEk/Kz4ED
-   wLiiHdLlP+pnrZ2FhNpemXt+NLqMv5Up/fGrhAJ2giWjFefNTSKrkI6fQ
-   zj9k+NPPamA60TnezNtDNLtXBxM6nOhjC2FSfTNHXd/VXLGH8zF396zjy
-   5KjpHmNZE9RE1V8nH2jlSaWzt3YdByyll+QCFZB5jMX+EwdNVgRPBDGLK
-   GX9H4P5MP9tx+ZK21l8DwT8Wl3ExaylIbuO3VYJwcghlb/gObKfytdJEp
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.93,222,1654531200"; 
-   d="scan'208";a="213140723"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Aug 2022 22:48:24 +0800
-IronPort-SDR: 1P9YnkkMWA7MhkMLI5H2qnl/y/32z64EviPwAUiqI9XY2oMsOVUiY3voGPqBeBtZCIwmqcPHQP
- fe9wgkaadWJ2BMjI82rvX6LGj5iNGiAq6GQIApjJZGXFWvza4IzimOWh3dyLKOwHNjBUjR9Bdq
- KuHL7mQ8CxklCw0WwrTqdLMlRFH+dG6qX5cpAnaqTC4poC9KvT2N8GND/ycSYmJLNNiesRbQvy
- hCCov6x2vtHCU+mNdm8p8YrfcZI9McUyVS24QT1yE+ko6E9P1FFMTfZkbXRKmusZVgaOiw1Za8
- oZN67R++y1/OKIlYJ9dHuG5S
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Aug 2022 07:09:23 -0700
-IronPort-SDR: U08wPGYkSr3G4jgdDdAYEOw/ln7+/4d0D5aBBMcAAEZeVzosYL/VxBrk2YKQgJ31ncM0lD+et2
- Db+Sff27aVgd1mQourYnFEvMtiWf9iFu/PNDwlTu0uMPhUmb/dFsUHX/2hF7n7JFrHm1uWpIEh
- m0jSbh4jILp2wkkUO3wRskdBOv76Gcn0HXJzvhkDLJ5PS9Fnp6iBqeaMU3hKn+UvtocROlbLIM
- htkPDJp+mKKQyKn4+Kamt22XZufO3mbPjAy/rlDlx+HpcgsjUsJoWMOOlTnzZxRRhNk5bgwR3c
- hPg=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Aug 2022 07:48:26 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M1fG14Tjsz1Rwnx
-        for <linux-block@vger.kernel.org>; Mon,  8 Aug 2022 07:48:25 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1659970104; x=1662562105; bh=F1+Sxy+1lBVaSJWXdDtSLWjWhaVqQLanyKv
-        cu0Jexr8=; b=W0863VK2Phuve7uXHL+nSiCCSldHWYV+RNQ2dKUW7RWPRAy2eDM
-        NbRWuCdfFFwenN+cwk4Z8fy0qdA8mJpOBy7SxzB8KtAColW2pwJU2fF0ZruDGYsO
-        2waeYmYmmiAZ6WZEAYU5rWHD4DoQClmLD3lnTcWGsSwKbtUzsU3krv49Ltu25sWJ
-        lsBgDFtz+r2vNOub3fDEVOaqmj2v+VALCbhyHrVxs2t/gvxc6C+a4ZVb7gc7I2rF
-        jeG4Goz7ITrI7vfHG1Y0sQOxyOpXguRI0D/v0wnPoUFQjwlvLmcFV71BG4j+CA8p
-        7ea6eOVNl6XlO08AVh1++P/8TSSGbY3sUmA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id VuziHXSrDwiM for <linux-block@vger.kernel.org>;
-        Mon,  8 Aug 2022 07:48:24 -0700 (PDT)
-Received: from [10.225.89.57] (gns5353.ad.shared [10.225.89.57])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M1fFz0RlZz1RtVk;
-        Mon,  8 Aug 2022 07:48:22 -0700 (PDT)
-Message-ID: <affa6eee-3b7c-105a-8f4a-35f1ed81f0cd@opensource.wdc.com>
-Date:   Mon, 8 Aug 2022 07:48:21 -0700
+        with ESMTP id S243628AbiHHP2z (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Aug 2022 11:28:55 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 896571409C;
+        Mon,  8 Aug 2022 08:28:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0667D60FF8;
+        Mon,  8 Aug 2022 15:28:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9187AC433D6;
+        Mon,  8 Aug 2022 15:28:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659972533;
+        bh=lpFQdsjZh8wL+uNBQDVltfnf7Gcs7geIK2yl0gZEZis=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DuabrMO3JhQYKj/lsRfa4eWTX5vJ/OD5elQ3cp0RJFhxmFivmc3uRLkaTf9DoIe5p
+         uBMCFwueUu+gmYNgHmsBBLIRJcRbgWsGfyul8JIm+fhLaMUYQLQAC/9/UWG+CTvckC
+         JL7A5Geed95RZ04FGpBOY8uJJrc8XgUNtNHupCWjiEr0pLg2i58LwXvXlyjXHP+LeK
+         urpTTbYRmuOxN6i+H6oUa1pVSnfzLMFLUzT2NQM/4qr6rQHTCaUVWa6PCQxUfta/Ic
+         idtNv4fQOtRMvL4hr5zKZR4ham7kYrM5t3MLhIkgA/E1vR5cfhPnISAjWdLWBwBZgR
+         Ai3mjsGZTfhvA==
+Date:   Mon, 8 Aug 2022 09:28:49 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, Keith Busch <kbusch@fb.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>
+Subject: Re: [PATCHv3 2/7] file: add ops to dma map bvec
+Message-ID: <YvErsVTIQqTykcbq@kbusch-mbp>
+References: <20220805162444.3985535-1-kbusch@fb.com>
+ <20220805162444.3985535-3-kbusch@fb.com>
+ <20220808002124.GG3861211@dread.disaster.area>
+ <YvBjRfy4XzzBajTX@casper.infradead.org>
+ <20220808021501.GH3861211@dread.disaster.area>
+ <YvB5pbsfM6QuR5Y7@casper.infradead.org>
+ <20220808073134.GI3861211@dread.disaster.area>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: fs/zonefs/./trace.h:22:1: sparse: sparse: cast to restricted
- blk_opf_t
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <jth@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-References: <202208061533.YBqXyzHm-lkp@intel.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <202208061533.YBqXyzHm-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220808073134.GI3861211@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/08/06 1:00, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-> head:   6614a3c3164a5df2b54abb0b3559f51041cf705b
-> commit: e46b5970496705127f9ae494c66e0242773097e8 fs/zonefs: Use the enum req_op type for tracing request operations
-> date:   3 weeks ago
-> config: arm64-randconfig-s052-20220804 (https://download.01.org/0day-ci/archive/20220806/202208061533.YBqXyzHm-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 12.1.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         # apt-get install sparse
->         # sparse version: v0.6.4-39-gce1a6720-dirty
->         # https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e46b5970496705127f9ae494c66e0242773097e8
->         git remote add linus https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->         git fetch --no-tags linus master
->         git checkout e46b5970496705127f9ae494c66e0242773097e8
->         # save the config file
->         mkdir build_dir && cp config build_dir/.config
->         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 SHELL=/bin/bash fs/zonefs/
+On Mon, Aug 08, 2022 at 05:31:34PM +1000, Dave Chinner wrote:
+> On Mon, Aug 08, 2022 at 03:49:09AM +0100, Matthew Wilcox wrote:
 > 
-> If you fix the issue, kindly add following tag where applicable
-> Reported-by: kernel test robot <lkp@intel.com>
+> > So you hot-unplug the failed
+> > device, plug in a new NVMe drive and add it to the RAID.  The pages now
+> > need to be DMA mapped to that new PCI device.
 > 
-> sparse warnings: (new ones prefixed by >>)
->    fs/zonefs/super.c: note: in included file (through include/trace/trace_events.h, include/trace/define_trace.h, fs/zonefs/trace.h):
->>> fs/zonefs/./trace.h:22:1: sparse: sparse: cast to restricted blk_opf_t
->>> fs/zonefs/./trace.h:22:1: sparse: sparse: cast to restricted blk_opf_t
->>> fs/zonefs/./trace.h:22:1: sparse: sparse: restricted blk_opf_t degrades to integer
->>> fs/zonefs/./trace.h:22:1: sparse: sparse: restricted blk_opf_t degrades to integer
->    fs/zonefs/super.c: note: in included file (through arch/arm64/include/asm/smp.h, include/linux/smp.h, arch/arm64/include/asm/arch_timer.h, ...):
->    arch/arm64/include/asm/percpu.h:127:1: sparse: sparse: cast truncates bits from constant value (ffffffff becomes ff)
->    arch/arm64/include/asm/percpu.h:127:1: sparse: sparse: cast truncates bits from constant value (ffffffff becomes ffff)
->    arch/arm64/include/asm/percpu.h:127:1: sparse: sparse: cast truncates bits from constant value (ffffffff becomes ff)
->    arch/arm64/include/asm/percpu.h:127:1: sparse: sparse: cast truncates bits from constant value (ffffffff becomes ffff)
+> yup, and now the dma tags for the mappings to that sub-device return
+> errors, which then tell the application that it needs to remap the
+> dma buffers it is using.
 > 
-> vim +22 fs/zonefs/./trace.h
-> 
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  21  
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27 @22  TRACE_EVENT(zonefs_zone_mgmt,
-> ff07a02e9e8e64 Bart Van Assche    2022-07-14  23  	    TP_PROTO(struct inode *inode, enum req_op op),
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  24  	    TP_ARGS(inode, op),
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  25  	    TP_STRUCT__entry(
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  26  			     __field(dev_t, dev)
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  27  			     __field(ino_t, ino)
-> e46b5970496705 Bart Van Assche    2022-07-14  28  			     __field(enum req_op, op)
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  29  			     __field(sector_t, sector)
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  30  			     __field(sector_t, nr_sectors)
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  31  	    ),
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  32  	    TP_fast_assign(
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  33  			   __entry->dev = inode->i_sb->s_dev;
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  34  			   __entry->ino = inode->i_ino;
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  35  			   __entry->op = op;
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  36  			   __entry->sector = ZONEFS_I(inode)->i_zsector;
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  37  			   __entry->nr_sectors =
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  38  				   ZONEFS_I(inode)->i_zone_size >> SECTOR_SHIFT;
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  39  	    ),
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  40  	    TP_printk("bdev=(%d,%d), ino=%lu op=%s, sector=%llu, nr_sectors=%llu",
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  41  		      show_dev(__entry->dev), (unsigned long)__entry->ino,
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  42  		      blk_op_str(__entry->op), __entry->sector,
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  43  		      __entry->nr_sectors
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  44  	    )
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  45  );
-> 62ab1aadcccd03 Johannes Thumshirn 2021-01-27  46  
+> That's just bog standard error handling - if a bdev goes away,
+> access to the dma tags have to return IO errors, and it is up to the
+> application level (i.e. the io_uring code) to handle that sanely.
 
-Bart,
+I didn't think anyone should see IO errors in such scenarios. This feature is
+more of an optional optimization, and everything should work as it does today
+if a tag becomes invalid.
 
-Are you going to send a patch to fix this or do you want me to do it ?
+For md raid or multi-device filesystem, I imagined this would return dma tag
+that demuxes to dma tags of the member devices. If any particular member device
+doesn't have a dma tag for whatever reason, the filesystem or md would
+transparently fall back to the registered bvec that it currently uses when it
+needs to do IO to that device.
 
-> 
-> :::::: The code at line 22 was first introduced by commit
-> :::::: 62ab1aadcccd037a7ced4ed99b4d46d2b4190183 zonefs: add tracepoints for file operations
-> 
-> :::::: TO: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> :::::: CC: Damien Le Moal <damien.lemoal@wdc.com>
-> 
+If you do a RAID hot-swap, MD could request a new dma tag for the new device
+without io_uring knowing about the event. MD can continue servicing new IO
+referencing its dma tag, and use the new device's tag only once the setup is
+complete.
 
-
--- 
-Damien Le Moal
-Western Digital Research
+I'm not familiar enough with the networking side, but I thought the file level
+abstraction would allow similar handling without io_uring's knowledge.
