@@ -2,61 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5040CC25B07
-	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 06:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEA5C25B07
+	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 07:16:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234444AbiHIGqT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Aug 2022 02:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53450 "EHLO
+        id S235002AbiHIHQi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Aug 2022 03:16:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233045AbiHIGqS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 02:46:18 -0400
+        with ESMTP id S233045AbiHIHQi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 03:16:38 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F21DC1929E;
-        Mon,  8 Aug 2022 23:46:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAD7A20BC1;
+        Tue,  9 Aug 2022 00:16:36 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id BCD3D68AA6; Tue,  9 Aug 2022 08:46:13 +0200 (CEST)
-Date:   Tue, 9 Aug 2022 08:46:13 +0200
+        id A29FD68AA6; Tue,  9 Aug 2022 09:16:32 +0200 (CEST)
+Date:   Tue, 9 Aug 2022 09:16:32 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Keith Busch <kbusch@fb.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, hch@lst.de,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kernel Team <Kernel-team@fb.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3 0/7] dma mapping optimisations
-Message-ID: <20220809064613.GA9040@lst.de>
-References: <20220805162444.3985535-1-kbusch@fb.com>
+To:     Mike Christie <michael.christie@oracle.com>
+Cc:     bvanassche@acm.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        hch@lst.de, linux-nvme@lists.infradead.org,
+        martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
+        james.bottomley@hansenpartnership.com
+Subject: Re: [PATCH v2 14/20] scsi: Retry pr_ops commands if a UA is
+ returned.
+Message-ID: <20220809071632.GA11161@lst.de>
+References: <20220809000419.10674-1-michael.christie@oracle.com> <20220809000419.10674-15-michael.christie@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220805162444.3985535-1-kbusch@fb.com>
+In-Reply-To: <20220809000419.10674-15-michael.christie@oracle.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I finally found some time to look over this, and I have some
-very high level problems with the implementations:
+On Mon, Aug 08, 2022 at 07:04:13PM -0500, Mike Christie wrote:
+> It's common to get a UA when doing PR commands. It could be due to a
+> target restarting, transport level relogin or other PR commands like a
+> release causing it. The upper layers don't get the sense and in some cases
+> have no idea if it's a SCSI device, so this has the sd layer retry.
 
- - the DMA streaming ops (dma_map_*) are only intended for short term
-   mappings, not for long living ones that can lead to starvation.
-   Especially with swiotlb, but also with some IOMMUs.  I think this
-   needs to be changed to an API that can allocate DMA mapped memory
-   using dma_alloc_noncoherent/dma_alloc_noncontigious for the device
-   and then give access to that to the user instead
- - I really do not like the special casing in the bio.  Did you try
-   to just stash away the DMA mapping information in an efficient
-   lookup data structure (e.g. rthashtable, but details might need
-   analysis and benchmarking) and thus touch very little code outside
-   of the driver I/O path and the place that performs the mapping?
- - the design seems to ignore DMA ownership.  Every time data in
-   transfered data needs to be transferred to and from the device,
-   take a look at Documentation/core-api/dma-api.rst and
-   Documentation/core-api/dma-api-howto.rst.
+This seems like another case for the generic in-kernel passthrugh
+command retry discussed in the other thread.
 
-As for the multiple devices discussion:  mapping memory for multiple
-devices is possible, but nontrivial to get right, mostly due to the
-ownership.  So unless we have a really good reason I'd suggest to
-not support this initially.
+Can you split out two series with just bug fixes for nvme and scsi
+as I think we should probably get those into 6.0, and then we can
+do the actual feature on top of those?
