@@ -2,60 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28590C25B07
-	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 14:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBF5C25B0C
+	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 14:51:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241197AbiHIOSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Aug 2022 10:18:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
+        id S243314AbiHIOvS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Aug 2022 10:51:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237529AbiHIOSu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 10:18:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFACCFD0A;
-        Tue,  9 Aug 2022 07:18:49 -0700 (PDT)
+        with ESMTP id S239238AbiHIOvS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 10:51:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B90DBC9F;
+        Tue,  9 Aug 2022 07:51:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 792766119A;
-        Tue,  9 Aug 2022 14:18:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3650AC433D6;
-        Tue,  9 Aug 2022 14:18:48 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D8842B8136E;
+        Tue,  9 Aug 2022 14:51:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BFA3C433D6;
+        Tue,  9 Aug 2022 14:51:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660054728;
-        bh=2LhUVq5qqhA07K3ujU4iHTLWET9cMKEYYfbz4Q7+IE8=;
+        s=k20201202; t=1660056674;
+        bh=iGCp19kVvCXGqnPjcIt+mU0Lhz4Q6PTrXmOH3mmJO/s=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Vl3medZy3zzJ4VtcvTvoAKMrq4GVgisF8Kb0JLF1h2fep5qGOC1AEKMYuNe1JLDWO
-         3rsqkIylRErTjywt81Sz2x0APpdaFOsWLwCBUUz/5sUx9H3ieuSPYeybwISETp+95g
-         MjoNcm1RybPY3HDupJV04qyIH32ycLmI0B8rW5nk0zne3Q7YJ9SFv6B+Tqxy+3g0iu
-         iwqTLtQ011MD6RrgVdq1mRoWAAOoLG/a3HxUDpmsIahaNN53eQNWRsRV1cNy+/FeT8
-         ljUqpNG9m3bA7n57aF4JiOtEBCVv2j5j3SQFxg2h7bQ+bgQ1Zp0rtM0l3rqA7EaZXl
-         7k3AW/+kXMYbQ==
-Date:   Tue, 9 Aug 2022 08:18:45 -0600
+        b=a26OssopesPq+maldubMeZ4Qo99gS0ynwF2G9FKqXWILrFsckZFVJqerLDEJXT301
+         TfwiPf+Gs5EKOMITBcK4RECDHtYhZcMKhsvUjR4BqNyeh5zeGXu6IRDDah6cB8YP1b
+         C5xr6hkiNuqXTD+Jkqb7l4B7bjfg9tmGwjTo1WR9Rs8qkJiJUsBTiuXHfY47GHFaFj
+         werR14RDCwbFSeQv9Ttqw8f9Gz3wIvJJXF/p3VBDi9tBZcrKb6EVglRec4A5bLvfOB
+         XSrMZKUo/JLKsv/lbt/I3Z85iPFT1L8EEsnLgF9MdQEQNwfXIPgiGnE3W9b6CWBEig
+         20tkeBKbMZYwQ==
+Date:   Tue, 9 Aug 2022 08:51:10 -0600
 From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kernel Team <Kernel-team@fb.com>
-Subject: Re: [PATCHv3 0/7] dma mapping optimisations
-Message-ID: <YvJsxZucjbQmEZP8@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220805162444.3985535-1-kbusch@fb.com>
- <20220809064613.GA9040@lst.de>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Mike Christie <michael.christie@oracle.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@kernel.org" <snitzer@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "james.bottomley@hansenpartnership.com" 
+        <james.bottomley@hansenpartnership.com>
+Subject: Re: [PATCH v2 09/20] nvme: Add helper to execute Reservation Report
+Message-ID: <YvJ0Xh61npH+M9HP@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220809000419.10674-1-michael.christie@oracle.com>
+ <20220809000419.10674-10-michael.christie@oracle.com>
+ <12b99b10-8353-0f72-f314-c453a4fc5b6a@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220809064613.GA9040@lst.de>
+In-Reply-To: <12b99b10-8353-0f72-f314-c453a4fc5b6a@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 09, 2022 at 08:46:13AM +0200, Christoph Hellwig wrote:
->  - the design seems to ignore DMA ownership.  Every time data in
->    transfered data needs to be transferred to and from the device,
->    take a look at Documentation/core-api/dma-api.rst and
->    Documentation/core-api/dma-api-howto.rst.
+On Tue, Aug 09, 2022 at 10:56:55AM +0000, Chaitanya Kulkarni wrote:
+> On 8/8/22 17:04, Mike Christie wrote:
+> > +
+> > +	c.common.opcode = nvme_cmd_resv_report;
+> > +	c.common.cdw10 = cpu_to_le32(nvme_bytes_to_numd(data_len));
+> > +	c.common.cdw11 = 1;
+> > +	*eds = true;
+> > +
+> > +retry:
+> > +	if (IS_ENABLED(CONFIG_NVME_MULTIPATH) &&
+> > +	    bdev->bd_disk->fops == &nvme_ns_head_ops)
+> > +		ret = nvme_send_ns_head_pr_command(bdev, &c, data, data_len);
+> > +	else
+> > +		ret = nvme_send_ns_pr_command(bdev->bd_disk->private_data, &c,
+> > +					      data, data_len);
+> > +	if (ret == NVME_SC_HOST_ID_INCONSIST && c.common.cdw11) {
+> > +		c.common.cdw11 = 0;
+> > +		*eds = false;
+> > +		goto retry;
+> 
+> Unconditional retries without any limit can create problems,
+> perhaps consider adding some soft limits.
 
-I have this doing appropriate dma_sync_single_for_{device,cpu} if we aren't
-using coherent memory. Is there more to ownership beyond that?
+It's already conditioned on cdw11, which is cleared to 0 on the 2nd try. Not
+that that's particularly clear. I'd suggest naming an enum value for it so the
+code tells us what the signficance of cdw11 is in this context (it's the
+Extended Data Structure control flag).
