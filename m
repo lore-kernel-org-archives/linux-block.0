@@ -2,86 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBF5C25B0C
-	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 14:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB437C25B07
+	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 15:58:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243314AbiHIOvS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Aug 2022 10:51:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37846 "EHLO
+        id S235725AbiHIP6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Aug 2022 11:58:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239238AbiHIOvS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 10:51:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B90DBC9F;
-        Tue,  9 Aug 2022 07:51:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D8842B8136E;
-        Tue,  9 Aug 2022 14:51:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BFA3C433D6;
-        Tue,  9 Aug 2022 14:51:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660056674;
-        bh=iGCp19kVvCXGqnPjcIt+mU0Lhz4Q6PTrXmOH3mmJO/s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=a26OssopesPq+maldubMeZ4Qo99gS0ynwF2G9FKqXWILrFsckZFVJqerLDEJXT301
-         TfwiPf+Gs5EKOMITBcK4RECDHtYhZcMKhsvUjR4BqNyeh5zeGXu6IRDDah6cB8YP1b
-         C5xr6hkiNuqXTD+Jkqb7l4B7bjfg9tmGwjTo1WR9Rs8qkJiJUsBTiuXHfY47GHFaFj
-         werR14RDCwbFSeQv9Ttqw8f9Gz3wIvJJXF/p3VBDi9tBZcrKb6EVglRec4A5bLvfOB
-         XSrMZKUo/JLKsv/lbt/I3Z85iPFT1L8EEsnLgF9MdQEQNwfXIPgiGnE3W9b6CWBEig
-         20tkeBKbMZYwQ==
-Date:   Tue, 9 Aug 2022 08:51:10 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     Mike Christie <michael.christie@oracle.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "snitzer@kernel.org" <snitzer@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "james.bottomley@hansenpartnership.com" 
-        <james.bottomley@hansenpartnership.com>
-Subject: Re: [PATCH v2 09/20] nvme: Add helper to execute Reservation Report
-Message-ID: <YvJ0Xh61npH+M9HP@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220809000419.10674-1-michael.christie@oracle.com>
- <20220809000419.10674-10-michael.christie@oracle.com>
- <12b99b10-8353-0f72-f314-c453a4fc5b6a@nvidia.com>
+        with ESMTP id S244775AbiHIP6L (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 11:58:11 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91740186EA
+        for <linux-block@vger.kernel.org>; Tue,  9 Aug 2022 08:58:09 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id c185so14339099oia.7
+        for <linux-block@vger.kernel.org>; Tue, 09 Aug 2022 08:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tyhicks-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=HUXaYVwE6orHodeBsCAxKkSFqqLupHxNZ2roYGcQJ3U=;
+        b=qLwOZH9UT3mHrvDuf0QBZ8Am9wtvtBRS7umuarT0r9UbJrssHJXWIg3h17TiycX1dn
+         qNENXZ3y9l8gp9q5l7k7gVd+1kToWHoZlaQeyXGNtDa1Fjdv5FtAHWLTAuo0i/HDTXtu
+         Ka+AzCyLNZ4IjM1vO/jXPagJT2MvcrqGBhTMTrTQldfvo9C7x7+I66tQNMdXJ+/72K87
+         yjjt59mRZjWUoigeMet/tlZrmNdPLPYXuEJpvtVGq7r0+3OrCGBlvcaO0FKvBuZHkbhU
+         n5a3agXQ6rwmxQV5QaRqMGukQA9NhloWit2Ndwft7b6D9v0HCU8O44NqoCkfz80MYgoW
+         8ghw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HUXaYVwE6orHodeBsCAxKkSFqqLupHxNZ2roYGcQJ3U=;
+        b=rqzdLA+kGLbcavmOEWmbOHpE7zkla76B7T6vERRT1fRRR6w1SkVY+85iWAVGXHDVtM
+         fHZqnU4ESIgL0SxppACQD2xcXhUr8IcsIK8juVPgbMDqgqNLAYUCHt0pxeBsADySAzJ8
+         DqorxwLm+vu9BB3C0AH7QdvewtPmC4AfaQGNwYHMfVvhS/zXRBHgv7ZrxvApYf0+QS5H
+         bO5JITQeMtHWCwUZ8cquGit6Bbjry1CwPg2FrZanCQROdvDoNsH6OuyLb4Xytg+CkWtb
+         c5tkNrs40c0AgPzbx+qWmYSrnYrTzM+nibb8EB78NNr/7rRjBMI4peg+QPjVA9iFaMNi
+         akdQ==
+X-Gm-Message-State: ACgBeo1XqRYkFzh+ep74va1cmdv/uUH8sQNB8q38ruz9JbwOv7vAuSiA
+        efjSWEWhFlon7EFjAYuxtaX3Wg==
+X-Google-Smtp-Source: AA6agR5yALJSQiqpyuDxfVXadUjpSlKzadaxwr3uRwJCazGWMfl76Mg96IgJ2CaNNqe5ceJ+1WIb5A==
+X-Received: by 2002:a05:6808:1889:b0:33b:2f70:cca0 with SMTP id bi9-20020a056808188900b0033b2f70cca0mr10801550oib.253.1660060688904;
+        Tue, 09 Aug 2022 08:58:08 -0700 (PDT)
+Received: from sequoia (162-237-133-238.lightspeed.rcsntx.sbcglobal.net. [162.237.133.238])
+        by smtp.gmail.com with ESMTPSA id c4-20020a056870c08400b0010e81e27b99sm3179258oad.17.2022.08.09.08.58.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Aug 2022 08:58:08 -0700 (PDT)
+Date:   Tue, 9 Aug 2022 10:57:50 -0500
+From:   Tyler Hicks <code@tyhicks.com>
+To:     Deven Bowers <deven.desai@linux.microsoft.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, dm-devel@redhat.com,
+        linux-doc@vger.kernel.org, roberto.sassu@huawei.com,
+        linux-security-module@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-audit@redhat.com,
+        linux-integrity@vger.kernel.org
+Subject: Re: [RFC PATCH v8 07/17] ipe: add auditing support
+Message-ID: <20220809155737.GA39351@sequoia>
+References: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1654714889-26728-8-git-send-email-deven.desai@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <12b99b10-8353-0f72-f314-c453a4fc5b6a@nvidia.com>
+In-Reply-To: <1654714889-26728-8-git-send-email-deven.desai@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 09, 2022 at 10:56:55AM +0000, Chaitanya Kulkarni wrote:
-> On 8/8/22 17:04, Mike Christie wrote:
-> > +
-> > +	c.common.opcode = nvme_cmd_resv_report;
-> > +	c.common.cdw10 = cpu_to_le32(nvme_bytes_to_numd(data_len));
-> > +	c.common.cdw11 = 1;
-> > +	*eds = true;
-> > +
-> > +retry:
-> > +	if (IS_ENABLED(CONFIG_NVME_MULTIPATH) &&
-> > +	    bdev->bd_disk->fops == &nvme_ns_head_ops)
-> > +		ret = nvme_send_ns_head_pr_command(bdev, &c, data, data_len);
-> > +	else
-> > +		ret = nvme_send_ns_pr_command(bdev->bd_disk->private_data, &c,
-> > +					      data, data_len);
-> > +	if (ret == NVME_SC_HOST_ID_INCONSIST && c.common.cdw11) {
-> > +		c.common.cdw11 = 0;
-> > +		*eds = false;
-> > +		goto retry;
-> 
-> Unconditional retries without any limit can create problems,
-> perhaps consider adding some soft limits.
+On 2022-06-08 12:01:19, Deven Bowers wrote:
+> +/**
+> + * getaudit: Read handler for the securityfs node, "ipe/success_audit"
+> + * @f: Supplies a file structure representing the securityfs node.
+> + * @data: Supplies a buffer passed to the read syscall
+> + * @len: Supplies the length of @data
+> + * @offset: unused.
+> + *
+> + * Return:
+> + * >0 - Success, Length of buffer written
+> + * <0 - Error
+> + */
+> +static ssize_t getaudit(struct file *f, char __user *data,
+> +			size_t len, loff_t *offset)
+> +{
+> +	const char *result;
+> +	struct ipe_context *ctx;
+> +
+> +	ctx = ipe_current_ctx();
+> +
+> +	rcu_read_lock();
+> +	result = ((READ_ONCE(ctx->success_audit)) ? "1" : "0");
+> +	rcu_read_unlock();
+> +
+> +	ipe_put_ctx(ctx);
+> +	return simple_read_from_buffer(data, len, offset, result, 2);
 
-It's already conditioned on cdw11, which is cleared to 0 on the 2nd try. Not
-that that's particularly clear. I'd suggest naming an enum value for it so the
-code tells us what the signficance of cdw11 is in this context (it's the
-Extended Data Structure control flag).
+While doing some internal testing, I noticed that some of the IPE files
+in securityfs (ipe/audit, ipe/enforce, and ipe/policies/*/active) are
+including the NULL terminator (size of 2) in the securityfs file
+contents. This is not common to do and this busybox build that my test
+machine is using even has some trouble when displaying those files with
+cat. I see all three instances of this pattern with this command:
+
+ $ git grep simple_read_from_buffer\(.*,\ 2\) security/ipe
+
+I think going to a length of 1 would be best.
+
+Tyler
