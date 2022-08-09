@@ -2,94 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D808C19F2D
-	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 13:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28590C25B07
+	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 14:18:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232429AbiHINGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Aug 2022 09:06:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55956 "EHLO
+        id S241197AbiHIOSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Aug 2022 10:18:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbiHINGd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 09:06:33 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E2036301;
-        Tue,  9 Aug 2022 06:06:30 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id AC0675FD04;
-        Tue,  9 Aug 2022 16:06:27 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1660050387;
-        bh=ssKIxzC2ShU+SldXTFLlZ+Dl4JtHvn5shdrgSl9CPWU=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=YIkdsG6Uo+IvPRMcbEF06rySeQtKa8HrH0sSVjoP+r4iN9dZOgPXF9g9+TDysF47W
-         D3joVgxDEmGTSe39ymnYUZQJeRut9xMv+2oZenwoNT27amlZs/VoXOyx+RXYcYvQyj
-         GgV50iRCR5JYVOhFw/eEEwf4obOs+Kr+ZigRgC2jDmSkOw/9S/0fPSgNo3qRlzUv8V
-         I8T8sWgA+5fIA1Q65zGRply8Eo+WbTsP2NhjdslAukMOc7i0nep7I6toL+tBiIZ+Fq
-         Tbz26HSAaLsNpsPO3HM0BlBDqKRhOkSVUPWQbeJfOaFWSNUO8BhWL/BaVnBr2pAD64
-         Sdv8i5fTw+Nxw==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Tue,  9 Aug 2022 16:06:26 +0300 (MSK)
-From:   Aleksey Romanov <AVRomanov@sberdevices.ru>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        "minchan@kernel.org" <minchan@kernel.org>
-CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "ngupta@vflare.org" <ngupta@vflare.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@chromium.org" <axboe@chromium.org>,
-        kernel <kernel@sberdevices.ru>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mnitenko@gmail.com" <mnitenko@gmail.com>,
-        Dmitry Rokosov <DDRokosov@sberdevices.ru>
-Subject: Re: [PATCH v5] zram: remove double compression logic
-Thread-Topic: [PATCH v5] zram: remove double compression logic
-Thread-Index: AQHYYGSpGpTThyrzfUuEhSUG0yum7a2m55QAgAAG+YA=
-Date:   Tue, 9 Aug 2022 13:06:19 +0000
-Message-ID: <20220809130543.4dnh5aa3kdxbmzje@cab-wsm-0029881.sigma.sbrf.ru>
-References: <20220505094443.11728-1-avromanov@sberdevices.ru>
- <YvJV8rU9bkqiy9iA@google.com>
-In-Reply-To: <YvJV8rU9bkqiy9iA@google.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <38CDFADF862CFF44A37B5B0A2247FDE0@sberdevices.ru>
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S237529AbiHIOSu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 10:18:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFACCFD0A;
+        Tue,  9 Aug 2022 07:18:49 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 792766119A;
+        Tue,  9 Aug 2022 14:18:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3650AC433D6;
+        Tue,  9 Aug 2022 14:18:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660054728;
+        bh=2LhUVq5qqhA07K3ujU4iHTLWET9cMKEYYfbz4Q7+IE8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Vl3medZy3zzJ4VtcvTvoAKMrq4GVgisF8Kb0JLF1h2fep5qGOC1AEKMYuNe1JLDWO
+         3rsqkIylRErTjywt81Sz2x0APpdaFOsWLwCBUUz/5sUx9H3ieuSPYeybwISETp+95g
+         MjoNcm1RybPY3HDupJV04qyIH32ycLmI0B8rW5nk0zne3Q7YJ9SFv6B+Tqxy+3g0iu
+         iwqTLtQ011MD6RrgVdq1mRoWAAOoLG/a3HxUDpmsIahaNN53eQNWRsRV1cNy+/FeT8
+         ljUqpNG9m3bA7n57aF4JiOtEBCVv2j5j3SQFxg2h7bQ+bgQ1Zp0rtM0l3rqA7EaZXl
+         7k3AW/+kXMYbQ==
+Date:   Tue, 9 Aug 2022 08:18:45 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>
+Subject: Re: [PATCHv3 0/7] dma mapping optimisations
+Message-ID: <YvJsxZucjbQmEZP8@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220805162444.3985535-1-kbusch@fb.com>
+ <20220809064613.GA9040@lst.de>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/09 10:46:00 #20084579
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220809064613.GA9040@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sergey,
+On Tue, Aug 09, 2022 at 08:46:13AM +0200, Christoph Hellwig wrote:
+>  - the design seems to ignore DMA ownership.  Every time data in
+>    transfered data needs to be transferred to and from the device,
+>    take a look at Documentation/core-api/dma-api.rst and
+>    Documentation/core-api/dma-api-howto.rst.
 
-On Tue, Aug 09, 2022 at 09:41:22PM +0900, Sergey Senozhatsky wrote:
-> On (22/05/05 12:44), Alexey Romanov wrote:
-> > @@ -1975,7 +1954,6 @@ static int zram_add(void)
-> >  	if (ZRAM_LOGICAL_BLOCK_SIZE =3D=3D PAGE_SIZE)
-> >  		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
-> > =20
-> > -	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
->=20
-> By the way, why did it remove QUEUE_FLAG_STABLE_WRITES bit?
-
-Minchan asked me to add this change and this description:
-
-"Since b09ab054b69b, zram has used QUEUE_FLAG_STABLE_WRITES to prevent
-buffer change between 1st and 2nd memory allocations. Since we remove
-second trial memory allocation logic, we could remove the STABLE_WRITES
-flag because there is no change buffer to be modified under us"
-
-This seems to be logical.
-
---=20
-Thank you,
-Alexey=
+I have this doing appropriate dma_sync_single_for_{device,cpu} if we aren't
+using coherent memory. Is there more to ownership beyond that?
