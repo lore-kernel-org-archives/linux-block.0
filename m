@@ -2,191 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E778C19F2D
-	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 19:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB84C25B06
+	for <linux-block@archiver.kernel.org>; Tue,  9 Aug 2022 22:19:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245475AbiHITdO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Aug 2022 15:33:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36938 "EHLO
+        id S229944AbiHIWTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Aug 2022 18:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245720AbiHITdF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 15:33:05 -0400
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9D12250A;
-        Tue,  9 Aug 2022 12:33:04 -0700 (PDT)
-Received: by mail-pj1-f46.google.com with SMTP id c19-20020a17090ae11300b001f2f94ed5c6so1798715pjz.1;
-        Tue, 09 Aug 2022 12:33:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=f+0qvG5LpZ/YCrirnG9rg8hMNbrBXBa71sPfrtvKm9k=;
-        b=ql8K1a0GRsOwdjQmw3bqWsqTlaoDUeSjApF2nBtg+B8lwg3xfu3+AUKfKCo0HeMKcg
-         DZAL4gCnSsU82o1XlWjwKih7cw3Rkx31p/99YipROZaXyXQJ8y9udNy6oCWEOPmGWxob
-         GmiaoP1YbWAv4qPnKoiSWdgzIYgFDZx4+yCrsiRu7/qmLqMgZHOEA9K5dYKsnQZ9Eksp
-         +4ELWxyGColWXG20dnpSf/iivMJVBHgl3qcQKXRYvyvoy3AQmpeMzEGJDM+A/VNSi2ee
-         Sm3jukwtxAsc33CbfhsPX2gEIrTNK3565WA3K4kVSRcv6WMwyqSe0m4GZeCKF7TSljYb
-         ubfA==
-X-Gm-Message-State: ACgBeo2cqEmDcr0Ch1SDhhrO9w5jbBFMfLgQu+0P6e2C5tKJn9I+AO3i
-        ciD2OtgGSHERpkQNDJOWwHiytlX3RT0=
-X-Google-Smtp-Source: AA6agR5b3k6/3uuXU2uCikVcoZWIFTOMmR2vQDrfIljSBaQQd1XN66Nj9Fx1iPA0NtYy8Ovw7IMVMA==
-X-Received: by 2002:a17:902:e891:b0:16f:a8:9b9c with SMTP id w17-20020a170902e89100b0016f00a89b9cmr24397129plg.8.1660073583617;
-        Tue, 09 Aug 2022 12:33:03 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:61e9:2f41:c2d4:73d? ([2620:15c:211:201:61e9:2f41:c2d4:73d])
-        by smtp.gmail.com with ESMTPSA id d14-20020a170902654e00b0016d12adc282sm11204466pln.147.2022.08.09.12.33.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Aug 2022 12:33:03 -0700 (PDT)
-Message-ID: <4768d11e-06c6-1b74-9822-b2421a3f59bb@acm.org>
-Date:   Tue, 9 Aug 2022 12:33:00 -0700
+        with ESMTP id S230140AbiHIWTg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Aug 2022 18:19:36 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1C827168;
+        Tue,  9 Aug 2022 15:19:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 72087B81A06;
+        Tue,  9 Aug 2022 22:19:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D133C433D6;
+        Tue,  9 Aug 2022 22:19:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660083572;
+        bh=wHVLGurtpig3wRrDEX8sCmkmlxVZ2CjSsnikZT1umF0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=t6wis/JyOLC1KdpDSETpCBf9M6HWsIb+juzYY2kVV6uYNj9bCPbgIv+KYaR9C0aKr
+         9tKzsCTQ/BxO91vz0LNiDH5GblE9TEWhWofwbeLZPnv+ULvlgUA09cGc5F5HlKF+v7
+         O1kCf0tEJe8TltO93/RQEZ0Ntre8LUUptexmQn+l0q77N+uk/x9s8TNhcMnAuV0w1D
+         dM9WCGJrgb2cJRPunJhE4gTJstIOXznZnwWkB8wuc20bDPMFGVabZ3ixn5543P8c3B
+         8L7IQK9HoTBk0SfhfHWHKs7kaP+N2LxJ9uQOIrdT/+MN4oB1o7D18XJ+u/8/hYyok9
+         FcRLkg7jlGRVw==
+Date:   Tue, 9 Aug 2022 15:19:31 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Zhang Boyang <zhangboyang.id@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Jan Kara <jack@suse.cz>, Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2 1/1] loop: introduce LO_FLAGS_NO_DEALLOC
+Message-ID: <YvLdc8GtbZ968qF6@magnolia>
+References: <20220806153022.83748-1-zhangboyang.id@gmail.com>
+ <20220806153022.83748-2-zhangboyang.id@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 12/20] block,nvme,scsi,dm: Add blk_status to pr_ops
- callouts.
-Content-Language: en-US
-To:     Mike Christie <michael.christie@oracle.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com
-References: <20220809000419.10674-1-michael.christie@oracle.com>
- <20220809000419.10674-13-michael.christie@oracle.com>
- <20220809072155.GF11161@lst.de>
- <4af2a4d3-04d1-966a-5fd5-5e443b593c8b@oracle.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <4af2a4d3-04d1-966a-5fd5-5e443b593c8b@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220806153022.83748-2-zhangboyang.id@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/9/22 11:08, Mike Christie wrote:
-> On 8/9/22 2:21 AM, Christoph Hellwig wrote:
->> On Mon, Aug 08, 2022 at 07:04:11PM -0500, Mike Christie wrote:
->>> To handle both cases, this patch adds a blk_status_t arg to the pr_ops
->>> callouts. The lower levels will convert their device specific error to
->>> the blk_status_t then the upper levels can easily check that code
->>> without knowing the device type. It also allows us to keep userspace
->>> compat where it expects a negative -Exyz error code if the command fails
->>> before it's sent to the device or a device/tranport specific value if the
->>> error is > 0.
->>
->> Why do we need two return values here?
+On Sat, Aug 06, 2022 at 11:30:22PM +0800, Zhang Boyang wrote:
+> Previously, for file-backed loop devices, REQ_OP_DISCARD and
+> REQ_OP_WRITE_ZEROES (without REQ_NOUNMAP) are implemented using
+> fallocate(FALLOC_FL_PUNCH_HOLE), which will cause the underlying file to
+> be sparse and disk space freed. The users have no choice to prevent this
+> this from happening.
 > 
-> I know the 2 return values are gross :) I can do it in one, but I wasn't sure
-> what's worse. See below for the other possible solutions. I think they are all
-> bad.
-> 
-> 
-> 0. Convert device specific conflict error to -EBADE then back:
-> 
-> sd_pr_command()
-> 
-> .....
-> 
-> /* would add similar check for NVME_SC_RESERVATION_CONFLICT in nvme */
-> if (result == SAM_STAT_CHECK_CONDITION)
-> 	return -EBADE;
-> else
-> 	return result;
-> 
-> 
-> LIO then just checks for -EBADE but when going to userspace we have to
-> convert:
-> 
-> 
-> blkdev_pr_register()
-> 
-> ...
-> 	result = ops->pr_register()
-> 	if (result < 0) {
-> 		/* For compat we must convert back to the nvme/scsi code */
-> 		if (result == -EBADE) {
-> 			/* need some helper for this that calls down the stack */
-> 			if (bdev == SCSI)
-> 				return SAM_STAT_RESERVATION_CONFLICT
-> 			else
-> 				return NVME_SC_RESERVATION_CONFLICT
-> 		} else
-> 			return blk_status_to_str(result)
-> 	} else
-> 		return result;
-> 
-> 
-> The conversion is kind of gross and I was thinking in the future it's going
-> to get worse. I'm going to want to have more advanced error handling in LIO
-> and dm-multipath. Like dm-multipath wants to know if an pr_op failed because
-> of a path failure, so it can retry another one, or a hard device/target error.
-> It would be nice for LIO if an PGR had bad/illegal values and the device
-> returned an error than I could detect that.
-> 
-> 
-> 1. Drop the -Exyz error type and use blk_status_t in the kernel:
-> 
-> sd_pr_command()
-> 
-> .....
-> if (result < 0)
-> 	return -errno_to_blk_status(result);
-> else if (result == SAM_STAT_CHECK_CONDITION)
-> 	return -BLK_STS_NEXUS;
-> else
-> 	return result;
-> 
-> blkdev_pr_register()
-> 
-> ...
-> 	result = ops->pr_register()
-> 	if (result < 0) {
-> 		/* For compat we must convert back to the nvme/scsi code */
-> 		if (result == -BLK_STS_NEXUS) {
-> 			/* need some helper for this that calls down the stack */
-> 			if (bdev == SCSI)
-> 				return SAM_STAT_RESERVATION_CONFLICT
-> 			else
-> 				return NVME_SC_RESERVATION_CONFLICT
-> 		} else
-> 			return blk_status_to_str(result)
-> 	} else
-> 		return result;
-> 
-> This has similar issues as #0 where we have to convert before returning to
-> userspace.
-> 
-> 
-> Note: In this case, if the block layer uses an -Exyz error code there's not
-> BLK_STS for then we would return -EIO to userspace now. I was thinking
-> that might not be ok but I could also just add a BLK_STS error code
-> for errors like EINVAL, EWOULDBLOCK, ENOMEM, etc so that doesn't happen.
-> 
-> 
-> 2. We could do something like below where the low levels are not changed but the
-> caller converts:
-> 
-> sd_pr_command()
-> 	/* no changes */
-> 
-> lio()
-> 	result = ops->pr_register()
-> 	if (result > 0) {
-> 		/* add some stacked helper again that goes through dm and
-> 		 * to the low level device
-> 		 */
-> 		if (bdev == SCSI) {
-> 			result = scsi_result_to_blk_status(result)
-> 		else
-> 			result = nvme_error_status(result)
-> 
-> 
-> This looks simple, but it felt wrong having upper layers having to
-> know the device type and calling conversion functions.
+> This patch introduces LO_FLAGS_NO_DEALLOC. With this flag set,
+> REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES are forced to use
+> fallocate(FALLOC_FL_ZERO_RANGE). The disk space of underlying file is
+> kept allocated. This is useful if users, for example, want to use a
+> preallocated file as the backing file.
 
-Has it been considered to introduce a new enumeration type instead of 
-choosing (0), (1) or (2)?
+Considering that discard isn't required to do anything, why not
+echo 0 | sudo tee /sys/block/loopX/queue/discard_max_bytes ?
 
-Thanks,
+--D
 
-Bart.
+> Signed-off-by: Zhang Boyang <zhangboyang.id@gmail.com>
+> ---
+>  drivers/block/loop.c      | 17 +++++++++++++++--
+>  include/uapi/linux/loop.h | 15 +++++++++++----
+>  2 files changed, 26 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 084f9b8a0ba3..36bd9906a154 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -483,11 +483,15 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+>  		 * write zeroes the range.  Otherwise, punch them out.
+>  		 */
+>  		return lo_fallocate(lo, rq, pos,
+> -			(rq->cmd_flags & REQ_NOUNMAP) ?
+> +			((rq->cmd_flags & REQ_NOUNMAP) ||
+> +			 (lo->lo_flags & LO_FLAGS_NO_DEALLOC)) ?
+>  				FALLOC_FL_ZERO_RANGE :
+>  				FALLOC_FL_PUNCH_HOLE);
+>  	case REQ_OP_DISCARD:
+> -		return lo_fallocate(lo, rq, pos, FALLOC_FL_PUNCH_HOLE);
+> +		return lo_fallocate(lo, rq, pos,
+> +			(lo->lo_flags & LO_FLAGS_NO_DEALLOC) ?
+> +				FALLOC_FL_ZERO_RANGE :
+> +				FALLOC_FL_PUNCH_HOLE);
+>  	case REQ_OP_WRITE:
+>  		if (cmd->use_aio)
+>  			return lo_rw_aio(lo, cmd, pos, WRITE);
+> @@ -719,12 +723,20 @@ static ssize_t loop_attr_dio_show(struct loop_device *lo, char *buf)
+>  	return sysfs_emit(buf, "%s\n", dio ? "1" : "0");
+>  }
+>  
+> +static ssize_t loop_attr_no_dealloc_show(struct loop_device *lo, char *buf)
+> +{
+> +	int no_dealloc = (lo->lo_flags & LO_FLAGS_NO_DEALLOC);
+> +
+> +	return sysfs_emit(buf, "%s\n", no_dealloc ? "1" : "0");
+> +}
+> +
+>  LOOP_ATTR_RO(backing_file);
+>  LOOP_ATTR_RO(offset);
+>  LOOP_ATTR_RO(sizelimit);
+>  LOOP_ATTR_RO(autoclear);
+>  LOOP_ATTR_RO(partscan);
+>  LOOP_ATTR_RO(dio);
+> +LOOP_ATTR_RO(no_dealloc);
+>  
+>  static struct attribute *loop_attrs[] = {
+>  	&loop_attr_backing_file.attr,
+> @@ -733,6 +745,7 @@ static struct attribute *loop_attrs[] = {
+>  	&loop_attr_autoclear.attr,
+>  	&loop_attr_partscan.attr,
+>  	&loop_attr_dio.attr,
+> +	&loop_attr_no_dealloc.attr,
+>  	NULL,
+>  };
+>  
+> diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+> index 6f63527dd2ed..91a0a8b1f298 100644
+> --- a/include/uapi/linux/loop.h
+> +++ b/include/uapi/linux/loop.h
+> @@ -18,17 +18,24 @@ enum {
+>  	LO_FLAGS_AUTOCLEAR	= 4,
+>  	LO_FLAGS_PARTSCAN	= 8,
+>  	LO_FLAGS_DIRECT_IO	= 16,
+> +	LO_FLAGS_NO_DEALLOC	= 32,
+>  };
+>  
+>  /* LO_FLAGS that can be set using LOOP_SET_STATUS(64) */
+> -#define LOOP_SET_STATUS_SETTABLE_FLAGS (LO_FLAGS_AUTOCLEAR | LO_FLAGS_PARTSCAN)
+> +#define LOOP_SET_STATUS_SETTABLE_FLAGS (LO_FLAGS_AUTOCLEAR		\
+> +					| LO_FLAGS_PARTSCAN		\
+> +					| LO_FLAGS_NO_DEALLOC)
+>  
+>  /* LO_FLAGS that can be cleared using LOOP_SET_STATUS(64) */
+> -#define LOOP_SET_STATUS_CLEARABLE_FLAGS (LO_FLAGS_AUTOCLEAR)
+> +#define LOOP_SET_STATUS_CLEARABLE_FLAGS (LO_FLAGS_AUTOCLEAR		\
+> +					 | LO_FLAGS_NO_DEALLOC)
+>  
+>  /* LO_FLAGS that can be set using LOOP_CONFIGURE */
+> -#define LOOP_CONFIGURE_SETTABLE_FLAGS (LO_FLAGS_READ_ONLY | LO_FLAGS_AUTOCLEAR \
+> -				       | LO_FLAGS_PARTSCAN | LO_FLAGS_DIRECT_IO)
+> +#define LOOP_CONFIGURE_SETTABLE_FLAGS (LO_FLAGS_READ_ONLY		\
+> +				       | LO_FLAGS_AUTOCLEAR		\
+> +				       | LO_FLAGS_PARTSCAN		\
+> +				       | LO_FLAGS_DIRECT_IO		\
+> +				       | LO_FLAGS_NO_DEALLOC)
+>  
+>  #include <asm/posix_types.h>	/* for __kernel_old_dev_t */
+>  #include <linux/types.h>	/* for __u64 */
+> -- 
+> 2.30.2
+> 
