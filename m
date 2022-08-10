@@ -2,176 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3A3C00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 16:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E018EC00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 16:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233239AbiHJQKM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 12:10:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37864 "EHLO
+        id S232051AbiHJQqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 12:46:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233343AbiHJQKJ (ORCPT
+        with ESMTP id S233075AbiHJQp6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 12:10:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 74B677C746
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 09:10:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660147807;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=EKo8MVKlyw+SXHb20Eh7M8mnIDKk4tia9D6xw3EgvBA=;
-        b=MaoFxXwKHVOMv1/3VVUFC875hs4K8RNeextOZSfUUxD8tIJX1IWFBuRTki8kzdADkXs1LF
-        cb6CcynKaz9SFFgcsnw7DCCDmtyzybmv+Hr/bTnmwvTIQgsv3jxk2AwazKufm5X4MGVdWe
-        q5hZ0Uw8WYtOhnRZIH+jJ/hSOroX+jM=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-561-SvBnclVDNvmpBjpud0chIQ-1; Wed, 10 Aug 2022 12:10:05 -0400
-X-MC-Unique: SvBnclVDNvmpBjpud0chIQ-1
-Received: by mail-pl1-f199.google.com with SMTP id m5-20020a170902f64500b0016d313f3ce7so10122258plg.23
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 09:10:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=EKo8MVKlyw+SXHb20Eh7M8mnIDKk4tia9D6xw3EgvBA=;
-        b=liMniKAHsDUdrs1iE+EJVA0Q8cV2iN3N5M6KtO371avXArYNVo0n7Z6IG6f6sdehV1
-         0jaAFxnMNEDylzG2rmei6045Ku9ELtr/QKUu59VrwECvUdb870ckBYeFZUsqpv1A6xJj
-         kj+3oNwuG5TszEQlefhwcNAPgO9KKJ5LH//FSCd6WSbAFekbjF2Z+sq3BsCct8wo2DrM
-         y5A+c/P6HvPEbYsNRdlQeKQlBJyo1plg3qEndYk68W/p8FZcNUU3a313xG3E2UhxvB/L
-         Jbhra8awHBNc1/zDol7ozngtds4FtSqcQnYkogVpqT85nJ1/R60Je0Kj8JBeIbwYmjUY
-         pELg==
-X-Gm-Message-State: ACgBeo2m5vV+SesHlKg/RMSfFhWSbBraOLcr6IY1eIJtge+UoKeS/MiE
-        6I+fHRcvkK+uOTSblRPqSgquei0P0aaMO+66g7J5Qt9aO635q87/3MSbACGeaqMNLryG65tt7G4
-        bl/ryj4kiSagKCX5vRXZteno=
-X-Received: by 2002:a17:90a:c205:b0:1f5:1041:a4ff with SMTP id e5-20020a17090ac20500b001f51041a4ffmr4421855pjt.14.1660147804216;
-        Wed, 10 Aug 2022 09:10:04 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5GLuV2/hBEjYTz01Fw2asicci9chTvjWSKIlU1dYjF3QgCwW0tiO66AT8MrmKNBgHK7p2k8A==
-X-Received: by 2002:a17:90a:c205:b0:1f5:1041:a4ff with SMTP id e5-20020a17090ac20500b001f51041a4ffmr4421830pjt.14.1660147803925;
-        Wed, 10 Aug 2022 09:10:03 -0700 (PDT)
-Received: from xps13.. ([240d:1a:c0d:9f00:4f2f:926a:23dd:8588])
-        by smtp.gmail.com with ESMTPSA id n11-20020a17090a928b00b001ef8780f873sm1810449pjo.39.2022.08.10.09.10.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Aug 2022 09:10:03 -0700 (PDT)
-From:   Shigeru Yoshida <syoshida@redhat.com>
-To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
-Cc:     pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        suwan.kim027@gmail.com, Shigeru Yoshida <syoshida@redhat.com>
-Subject: [PATCH v2] virtio-blk: Avoid use-after-free on suspend/resume
-Date:   Thu, 11 Aug 2022 01:09:48 +0900
-Message-Id: <20220810160948.959781-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.37.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 10 Aug 2022 12:45:58 -0400
+Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4254D18E04;
+        Wed, 10 Aug 2022 09:45:48 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 5AA815808B4;
+        Wed, 10 Aug 2022 12:35:55 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute3.internal (MEProxy); Wed, 10 Aug 2022 12:35:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        colorremedies.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to; s=fm1; t=1660149355; x=1660152955; bh=a5G2IQ23cL
+        Cu11/Dp61pjDw8jpOTjVuQZnVVwZuO120=; b=E5rcuw1Lzya7Hd9QgncERZJ+DM
+        3erv7Qs5pOlJ3aUk2u5R1Drx14Ej4xg9OFUX7RDcCfNpYFT/me+V7Ihsez/rdFfB
+        +56KLWTrqZBZcsPoDnfBY8reNZ+iyqRghhF7py4WzVd5FHuRo/O+nOH0ZM7uInAs
+        79QkukhEk6Ny3ntzeYWXr7f2B2+h1o0h/SiFTN5ubuJ6yshvbpm3mAA1368E8GLB
+        xEEGHdGJDiL+yfTJ64cNKY7TXY9jWUfGNJYymA5wNTJdMtf58p2Jmp32dclTOSzR
+        igoVEauuJ1Vp8M4cHOlVB19/ThpVOgog8r4iRdsdaHV/JSrby2HfJsjMN9/Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:message-id:mime-version
+        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1660149355; x=
+        1660152955; bh=a5G2IQ23cLCu11/Dp61pjDw8jpOTjVuQZnVVwZuO120=; b=i
+        QAlnvmltaI0+qqHZDEFRzJWpwhuxxw7oRyzuJbZUTBNRthP/6TGX5EtwfuZp0nFp
+        KLvyN2iz8RWxhBe6hLittmTZXZL2cKVFyQKVgItsCQYXl/dOytlP7qTebCIQP3v8
+        j18DXXOY9Sa9EZGKh/8dd41dPZPMNUDYzhpRVoZwgdfvXLjL6sUgm9mKqEzpUEtU
+        +NWZfGeM+UmLOHUYtRVHhA6jW/G9kvIu/MAyWU/YsUmGHQU4AMF+ruR8lbeeyH5N
+        6ohQGDpy0yjJlZWdBXkHNydNje37EwzzYgkBId7tOlHxt9saKkHo4u2szgHz5ivR
+        xEb22wBUL6ybtSGiGwjkQ==
+X-ME-Sender: <xms:at7zYihx_unb8Y37UslQb4rHWqNmFqyKW6Xqie9-5BQ9TdhFf6BIXQ>
+    <xme:at7zYjA61oOTOvUCq0Ik4EkLyFhQ0Oiqf-im02yPtZcw78osMtmD2Um4Et1SJbTRW
+    wbHLfMmxYt7p6dcyLg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdegvddguddttdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefofgggkfffhffvvefu
+    tgesthdtredtreertdenucfhrhhomhepfdevhhhrihhsucfouhhrphhhhidfuceolhhish
+    htshestgholhhorhhrvghmvgguihgvshdrtghomheqnecuggftrfgrthhtvghrnhepffei
+    gfefgeefleejfedtudelieetfefhtefhteejkefhtdevtdeufeffffdvteelnecuffhomh
+    grihhnpehhthhtphgujhhouhhrnhgrlhgurghuughithgurghnughpohhsthhgrhgvshhq
+    lhdrihhopdhgohhoghhlvgdrtghomhdpkhgvrhhnvghlrdhorhhgpdhkvghrnhgvlhdrug
+    hknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheplhhi
+    shhtshestgholhhorhhrvghmvgguihgvshdrtghomh
+X-ME-Proxy: <xmx:at7zYqE-HtauFBCyQ9yJuM4ehPc1mXFdvQWtu1wf5fF_im_u0VIj4A>
+    <xmx:at7zYrS8dPYG12zhatdeHSkEgAYfo36uF9UmvRoWZ6qLARhaicMLWQ>
+    <xmx:at7zYvzUcRunktnbi1VaVsyMdbCty0n-7JoscqAxHhEsWhTVZNbSkQ>
+    <xmx:a97zYq8FLEaBP3xE5IHCoY-YAJ7q5K6Ngc_M9zmPRtT9l2DrIw77-w>
+Feedback-ID: i06494636:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id C62691700082; Wed, 10 Aug 2022 12:35:54 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-811-gb808317eab-fm-20220801.001-gb808317e
+Mime-Version: 1.0
+Message-Id: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
+Date:   Wed, 10 Aug 2022 12:35:34 -0400
+From:   "Chris Murphy" <lists@colorremedies.com>
+To:     "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Cc:     "Josef Bacik" <josef@toxicpanda.com>
+Subject: stalling IO regression in linux 5.12
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hctx->user_data is set to vq in virtblk_init_hctx().  However, vq is
-freed on suspend and reallocated on resume.  So, hctx->user_data is
-invalid after resume, and it will cause use-after-free accessing which
-will result in the kernel crash something like below:
+CPU: Intel E5-2680 v3
+RAM: 128 G
+02:00.0 RAID bus controller [0104]: Broadcom / LSI MegaRAID SAS-3 3108 [Invader] [1000:005d] (rev 02), using megaraid_sas driver
+8 Disks: TOSHIBA AL13SEB600
 
-[   22.428391] Call Trace:
-[   22.428899]  <TASK>
-[   22.429339]  virtqueue_add_split+0x3eb/0x620
-[   22.430035]  ? __blk_mq_alloc_requests+0x17f/0x2d0
-[   22.430789]  ? kvm_clock_get_cycles+0x14/0x30
-[   22.431496]  virtqueue_add_sgs+0xad/0xd0
-[   22.432108]  virtblk_add_req+0xe8/0x150
-[   22.432692]  virtio_queue_rqs+0xeb/0x210
-[   22.433330]  blk_mq_flush_plug_list+0x1b8/0x280
-[   22.434059]  __blk_flush_plug+0xe1/0x140
-[   22.434853]  blk_finish_plug+0x20/0x40
-[   22.435512]  read_pages+0x20a/0x2e0
-[   22.436063]  ? folio_add_lru+0x62/0xa0
-[   22.436652]  page_cache_ra_unbounded+0x112/0x160
-[   22.437365]  filemap_get_pages+0xe1/0x5b0
-[   22.437964]  ? context_to_sid+0x70/0x100
-[   22.438580]  ? sidtab_context_to_sid+0x32/0x400
-[   22.439979]  filemap_read+0xcd/0x3d0
-[   22.440917]  xfs_file_buffered_read+0x4a/0xc0
-[   22.441984]  xfs_file_read_iter+0x65/0xd0
-[   22.442970]  __kernel_read+0x160/0x2e0
-[   22.443921]  bprm_execve+0x21b/0x640
-[   22.444809]  do_execveat_common.isra.0+0x1a8/0x220
-[   22.446008]  __x64_sys_execve+0x2d/0x40
-[   22.446920]  do_syscall_64+0x37/0x90
-[   22.447773]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-This patch fixes this issue by getting vq from vblk, and removes
-virtblk_init_hctx().
+The problem exhibits as increasing load, increasing IO pressure (PSI), and actual IO goes to zero. It never happens on kernel 5.11 series, and always happens after 5.12-rc1 and persists through 5.18.0. There's a new mix of behaviors with 5.19, I suspect the mm improvements in this series might be masking the problem.
 
-Fixes: 4e0400525691 ("virtio-blk: support polling I/O")
-Cc: "Suwan Kim" <suwan.kim027@gmail.com>
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- drivers/block/virtio_blk.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+The workload involves openqa, which spins up 30 qemu-kvm instances, and does a bunch of tests, generating quite a lot of writes: qcow2 files, and video in the form of many screenshots, and various log files, for each VM. These VMs are each in their own cgroup. As the problem begins, I see increasing IO pressure, and decreasing IO, for each qemu instance's cgroup, and the cgroups for httpd, journald, auditd, and postgresql. IO pressure goes to nearly ~99% and IO is literally 0.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 6fc7850c2b0a..d756423e0059 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -101,6 +101,14 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
- 	}
- }
- 
-+static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct virtio_blk *vblk = hctx->queue->queuedata;
-+	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-+
-+	return vq;
-+}
-+
- static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
- {
- 	struct scatterlist hdr, status, *sgs[3];
-@@ -416,7 +424,7 @@ static void virtio_queue_rqs(struct request **rqlist)
- 	struct request *requeue_list = NULL;
- 
- 	rq_list_for_each_safe(rqlist, req, next) {
--		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
-+		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
- 		bool kick;
- 
- 		if (!virtblk_prep_rq_batch(req)) {
-@@ -837,7 +845,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
--	struct virtio_blk_vq *vq = hctx->driver_data;
-+	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
- 	struct virtblk_req *vbr;
- 	unsigned long flags;
- 	unsigned int len;
-@@ -862,22 +870,10 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 	return found;
- }
- 
--static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
--			  unsigned int hctx_idx)
--{
--	struct virtio_blk *vblk = data;
--	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
--
--	WARN_ON(vblk->tag_set.tags[hctx_idx] != hctx->tags);
--	hctx->driver_data = vq;
--	return 0;
--}
--
- static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
- 	.queue_rqs	= virtio_queue_rqs,
- 	.commit_rqs	= virtio_commit_rqs,
--	.init_hctx	= virtblk_init_hctx,
- 	.complete	= virtblk_request_done,
- 	.map_queues	= virtblk_map_queues,
- 	.poll		= virtblk_poll,
--- 
-2.37.1
+The problem left unattended to progress will eventually result in a completely unresponsive system, with no kernel messages. It reproduces in the following configurations, the first two I provide links to full dmesg with sysrq+w:
 
+btrfs raid10 (native) on plain partitions [1]
+btrfs single/dup on dmcrypt on mdadm raid 10 and parity raid [2]
+XFS on dmcrypt on mdadm raid10 or parity raid
+
+I've started a bisect, but for some reason I haven't figured out I've started getting compiled kernels that don't boot the hardware. The failure is very early on such that the UUID for the root file system isn't found, but not much to go on as to why.[3] I have tested the first and last skipped commits in the bisect log below, they successfully boot a VM but not the hardware.
+
+Anyway, I'm kinda stuck at this point trying to narrow it down further. Any suggestions? Thanks.
+
+[1] btrfs raid10, plain partitions
+https://drive.google.com/file/d/1-oT3MX-hHYtQqI0F3SpgPjCIDXXTysLU/view?usp=sharing
+
+[2] btrfs single/dup, dmcrypt, mdadm raid10
+https://drive.google.com/file/d/1m_T3YYaEjBKUROz6dHt5_h92ZVRji9FM/view?usp=sharing
+
+[3] 
+$ git bisect log
+git bisect start
+# status: waiting for both good and bad commits
+# bad: [c03c21ba6f4e95e406a1a7b4c34ef334b977c194] Merge tag 'keys-misc-20210126' of git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs
+git bisect bad c03c21ba6f4e95e406a1a7b4c34ef334b977c194
+# status: waiting for good commit(s), bad commit known
+# good: [f40ddce88593482919761f74910f42f4b84c004b] Linux 5.11
+git bisect good f40ddce88593482919761f74910f42f4b84c004b
+# bad: [df24212a493afda0d4de42176bea10d45825e9a0] Merge tag 's390-5.12-1' of git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux
+git bisect bad df24212a493afda0d4de42176bea10d45825e9a0
+# good: [82851fce6107d5a3e66d95aee2ae68860a732703] Merge tag 'arm-dt-v5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
+git bisect good 82851fce6107d5a3e66d95aee2ae68860a732703
+# good: [99f1a5872b706094ece117368170a92c66b2e242] Merge tag 'nfsd-5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/cel/linux
+git bisect good 99f1a5872b706094ece117368170a92c66b2e242
+# bad: [9eef02334505411667a7b51a8f349f8c6c4f3b66] Merge tag 'locking-core-2021-02-17' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 9eef02334505411667a7b51a8f349f8c6c4f3b66
+# bad: [9820b4dca0f9c6b7ab8b4307286cdace171b724d] Merge tag 'for-5.12/drivers-2021-02-17' of git://git.kernel.dk/linux-block
+git bisect bad 9820b4dca0f9c6b7ab8b4307286cdace171b724d
+# good: [bd018bbaa58640da786d4289563e71c5ef3938c7] Merge tag 'for-5.12/libata-2021-02-17' of git://git.kernel.dk/linux-block
+git bisect good bd018bbaa58640da786d4289563e71c5ef3938c7
+# skip: [203c018079e13510f913fd0fd426370f4de0fd05] Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.12/drivers
+git bisect skip 203c018079e13510f913fd0fd426370f4de0fd05
+# skip: [49d1ec8573f74ff1e23df1d5092211de46baa236] block: manage bio slab cache by xarray
+git bisect skip 49d1ec8573f74ff1e23df1d5092211de46baa236
+# bad: [73d90386b559d6f4c3c5db5e6bb1b68aae8fd3e7] nvme: cleanup zone information initialization
+git bisect bad 73d90386b559d6f4c3c5db5e6bb1b68aae8fd3e7
+# skip: [71217df39dc67a0aeed83352b0d712b7892036a2] block, bfq: make waker-queue detection more robust
+git bisect skip 71217df39dc67a0aeed83352b0d712b7892036a2
+# bad: [8358c28a5d44bf0223a55a2334086c3707bb4185] block: fix memory leak of bvec
+git bisect bad 8358c28a5d44bf0223a55a2334086c3707bb4185
+# skip: [3a905c37c3510ea6d7cfcdfd0f272ba731286560] block: skip bio_check_eod for partition-remapped bios
+git bisect skip 3a905c37c3510ea6d7cfcdfd0f272ba731286560
+# skip: [3c337690d2ebb7a01fa13bfa59ce4911f358df42] block, bfq: avoid spurious switches to soft_rt of interactive queues
+git bisect skip 3c337690d2ebb7a01fa13bfa59ce4911f358df42
+# skip: [3e1a88ec96259282b9a8b45c3f1fda7a3ff4f6ea] bio: add a helper calculating nr segments to alloc
+git bisect skip 3e1a88ec96259282b9a8b45c3f1fda7a3ff4f6ea
+# skip: [4eb1d689045552eb966ebf25efbc3ce648797d96] blk-crypto: use bio_kmalloc in blk_crypto_clone_bio
+git bisect skip 4eb1d689045552eb966ebf25efbc3ce648797d96
+
+
+--
+Chris Murphy
