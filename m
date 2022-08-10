@@ -2,78 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E40EC00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 10:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FE7C00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 10:49:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230366AbiHJKXB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 06:23:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52358 "EHLO
+        id S231533AbiHJKtP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 06:49:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbiHJKXA (ORCPT
+        with ESMTP id S229534AbiHJKtP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 06:23:00 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1663D753B9
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 03:22:59 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id uj29so26977819ejc.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 03:22:59 -0700 (PDT)
+        Wed, 10 Aug 2022 06:49:15 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C5CB85FB8
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 03:49:12 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id gk3so26936550ejb.8
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 03:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=unimore.it; s=google;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc;
-        bh=sI8ZZBr1JuNoiGQh9KrzRGcAQTatYvynl+4y+qL068k=;
-        b=mmAfA8A0WBR4nMz9DKK7BUqcR2s5XjFTI3lL0Oqc1H0/wVZ6D3mOfq3Fm78hequ3uS
-         TmVvjAsqNfTCo3ArhNxxUU+RX/TBYOQXsjURCzsMX0Dz9JckVQkpyEgIraeIDBzNYnhs
-         +4esj0KvEgNPJ4Fr6tE4dAmFnwjMOcC8bPn9wnXjQ9vY7GACVrprD/lsQNN5dNuwqAIf
-         EkYDHxwxWohJiAmNXgVrR5wKUeP7plNkAIACk4X/doKOelbX6Mrt60+Ei4eUadFYoABW
-         Dfc5R9j12cjLIuB5wSVMJFXU2+qhbo1Doe2othtpJHjxOreoAaG0h1tyOThCfrQMxJFL
-         SpyQ==
+        bh=l9usa1vuL2H6KZQuz+LzUAEvl04HjNXt9CmOhLLJBSQ=;
+        b=BTCabf1ZCfvLejWJAHR1SmlS6q6MgM/0QU8EF47Wf41/rboIWcOWDmFYVni5+WIj86
+         7NeEzoDJZVzVZXjwTlGmnLn+NV9HhWuPbqf2Yyjnjpqy4nkDx42aw8s8wopgq98SJKpa
+         gZwfBWT9VSTz+FF8YmbCzGRxOa3BTQLc0ZZSI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc;
-        bh=sI8ZZBr1JuNoiGQh9KrzRGcAQTatYvynl+4y+qL068k=;
-        b=Z7yDm84uIkcm99W8nZOkRcYwVW0A9VFuuL43JnY5AHgV/JbO6A9amidOzzAufR/lO7
-         fXFCcK97tEn3SNW9RLjmWR1t0mZiGJlw/vvNMMTyik23cMxUGvdCYmWy5j+uVm6uNgvk
-         LmxQPIjnwiay4LEjXbRE2qsYCPNLUyuQ8tB5iWm3g0mMaJBNBohsEDciG8zQmSTkC6YK
-         NVjnS2N06KyBed+ghYY6irVRvzePA5DRgB4+NlpQMj2GM+Ieoj5mxxRxb4mYfzH9phv9
-         cwxdUY3h4tGEA+g2Fe0w4UceZ0a3bR7VpUocLSCZ6Cg6RLhHEy+YA8G3DIFoU3R4nji4
-         ec6g==
-X-Gm-Message-State: ACgBeo2EKKOfF1MXy5wRHXqAXIpNMrFuZr27pq9LE7Euy9aWu/aK1Yjq
-        E+11DtMHAoFRkIOBzEd1jriBNi4A9as/wA==
-X-Google-Smtp-Source: AA6agR61pmFrc+/6dzRSTmnWlyispHL7maEVDC61kJQ1n13aNi4qab1EsNKshRSyze06UpNcdqPiFQ==
-X-Received: by 2002:a17:906:845c:b0:730:bbf1:196a with SMTP id e28-20020a170906845c00b00730bbf1196amr19895946ejy.13.1660126977530;
-        Wed, 10 Aug 2022 03:22:57 -0700 (PDT)
+        bh=l9usa1vuL2H6KZQuz+LzUAEvl04HjNXt9CmOhLLJBSQ=;
+        b=OZDvm2oGYp61tcAKEGFu+Hdc0CK7c7hH6Egj9pRmrC2Z6gqjX829h3bBKzckhBeA7p
+         CE1DriiamCk3Jn4zZAG4zp8wKKGyZUCDuoYI1/x5BED2gCferwQ+p4KI6vOxFQdwhiaw
+         6vfNGqzZrqrTGbWd17aNfZi1vhBkgrFksIe26fo9E0jozdDbY0yEGHt2g4/EawtZP7Jn
+         0OSRrUfBfNP9cc3NEQ/h2AHPtqEzqN9bIutcFIplpspeIq5oD7o29IWmSBwXP25X7iW3
+         VKmjFIHjR6Q6pO9hvP7qVJbJQaIAN2v9GMfZmg8xdQUxa2ny6V2Wg+wvFYd+C6Vv1MhK
+         6eiw==
+X-Gm-Message-State: ACgBeo0GmGn0nc30nnQ1BVFzkgI0CLExvUlq0Dg/OpmkjMLV4lbPK9O0
+        swuunkcZll4mGA9IPlv8QK/wCmLJ/M1l
+X-Google-Smtp-Source: AA6agR5oQvEj/s7bSddVrjIAacVoWMaOUcaPEbxOsKLxnw3UtyE01z9/EZrnD+u6mN5X+ztmAhIkTg==
+X-Received: by 2002:a17:907:6d8c:b0:731:6c60:eced with SMTP id sb12-20020a1709076d8c00b007316c60ecedmr8306368ejc.266.1660128550558;
+        Wed, 10 Aug 2022 03:49:10 -0700 (PDT)
 Received: from mbp-di-paolo.station (net-93-70-86-43.cust.vodafonedsl.it. [93.70.86.43])
-        by smtp.gmail.com with ESMTPSA id f12-20020a17090631cc00b0072ee9790894sm2129835ejf.197.2022.08.10.03.22.55
+        by smtp.gmail.com with ESMTPSA id y12-20020a170906518c00b007306a4ecc9dsm2233295ejk.18.2022.08.10.03.49.07
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Aug 2022 03:22:56 -0700 (PDT)
+        Wed, 10 Aug 2022 03:49:08 -0700 (PDT)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 0/8] block, bfq: extend bfq to support multi-actuator
- drives
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <SJ0PR20MB44093D6FB740E543EDAAC002A0629@SJ0PR20MB4409.namprd20.prod.outlook.com>
-Date:   Wed, 10 Aug 2022 12:22:55 +0200
-Cc:     Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
-        Muhammad Ahmad <muhammad.ahmad@seagate.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>,
-        "andrea.righi@canonical.com" <andrea.righi@canonical.com>,
-        "glen.valante@linaro.org" <glen.valante@linaro.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Tyler Erickson <tyler.erickson@seagate.com>,
-        Michael English <michael.english@seagate.com>,
-        Andrew Ring <andrew.ring@seagate.com>,
-        Varun Boddu <varunreddy.boddu@seagate.com>
+Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
+ 'num_groups_with_pending_reqs'
+From:   Paolo Valente <paolo.valente@unimore.it>
+In-Reply-To: <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
+Date:   Wed, 10 Aug 2022 12:49:04 +0200
+Cc:     Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <74F8D5E8-0D56-413B-A3CA-7462D9C862D6@linaro.org>
-References: <20220623155335.6147-1-paolo.valente@linaro.org>
- <PH7PR20MB505849512979A89E8A66FB24F18E9@PH7PR20MB5058.namprd20.prod.outlook.com>
- <SJ0PR20MB44093D6FB740E543EDAAC002A0629@SJ0PR20MB4409.namprd20.prod.outlook.com>
-To:     Rory Chen <rory.c.chen@seagate.com>
+Message-Id: <55A07102-BE55-4606-9E32-64E884064FB9@unimore.it>
+References: <20220610021701.2347602-1-yukuai3@huawei.com>
+ <20220610021701.2347602-4-yukuai3@huawei.com>
+ <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
+ <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
+ <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
+ <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
+ <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -81,160 +75,203 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 9 ago 2022, alle ore 05:47, Rory Chen =
-<rory.c.chen@seagate.com> ha scritto:
+> Il giorno 27 lug 2022, alle ore 14:11, Yu Kuai =
+<yukuai1@huaweicloud.com> ha scritto:
 >=20
-> Resend the mail as plain text because previous mail with rich text =
-makes some mess and forget to add others at Seagate who worked on =
-validating the
-> patch as well(Muhammad, Michael, Andrew, Varun,Tyler)
->=20
-> Hi Paolo,
+> Hi, Paolo
 >=20
 
-Hi
+hi
 
-> I am from Seagate China and face a problem when I=E2=80=99m evaluating =
-the bfq patches. Could you please check?
-> Thanks
->=20
-> Issue statement
-> When running performance test on bfq patch, I observed warning message =
-"bfq_actuator_index: bio sector out of ranges: end=3D35156656128" and OS =
-hung suddenly after some hours.
-> The warning message is reported from function bfq_actuator_index which =
-determines IO request is in which index of actuators.  The =
-bio_end_sector is 35156656128 but the max LBA for the drive is =
-35156656127 so it=E2=80=99s beyond the LBA range.
-
-Yep, this sanity check fails if the end sector of a new IO does not
-belong to any sector range.
-
->  I captured the block trace and didn=E2=80=99t found request LBA =
-35156656128 instead only found max request LBA 35156656127.
-
-Maybe in the trace you see only start sectors?  The failed check si
-performed on end sectors instead.
-
-At any rate, there seems to be an off-by-one error in the value(s)
-stored in the sector field(s) of the blk_independent_access_range data
-structure.
-
-I guess we may need some help/feedback from people competent on this
-stuff.
-
-> I=E2=80=99m not sure if this warning message is related to later OS =
-hung.
+> Are you still interested in this patchset?
 >=20
 
-Not easy to say.  At any rate, we can try with a development version
-of bfq.  It can help us detect the possible cause of this hang.  But
-let's see where we get with this sector error first.
+Yes. Sorry for replying very late again.
 
-Thank you for testing this extended version of bfq,
+Probably the last fix that you suggest is enough, but I'm a little bit
+concerned that it may be a little hasty.  In fact, before this fix, we
+exchanged several messages, and I didn't seem to be very good at
+convincing you about the need to keep into account also in-service
+I/O.  So, my question is: are you sure that now you have a
+clear/complete understanding of this non-trivial matter?
+Consequently, are we sure that this last fix is most certainly all we
+need?  Of course, I will check on my own, but if you reassure me on
+this point, I will feel more confident.
+
+Thanks,
 Paolo
 
+> =E5=9C=A8 2022/07/20 19:38, Yu Kuai =E5=86=99=E9=81=93:
+>> Hi
+>>=20
+>> =E5=9C=A8 2022/07/20 19:24, Paolo VALENTE =E5=86=99=E9=81=93:
+>>>=20
+>>>=20
+>>>> Il giorno 12 lug 2022, alle ore 15:30, Yu Kuai =
+<yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
+>>>>=20
+>>>> Hi!
+>>>>=20
+>>>> I'm copying my reply with new mail address, because Paolo seems
+>>>> didn't receive my reply.
+>>>>=20
+>>>> =E5=9C=A8 2022/06/23 23:32, Paolo Valente =E5=86=99=E9=81=93:
+>>>>> Sorry for the delay.
+>>>>>> Il giorno 10 giu 2022, alle ore 04:17, Yu Kuai =
+<yukuai3@huawei.com <mailto:yukuai3@huawei.com>> ha scritto:
+>>>>>>=20
+>>>>>> Currently, bfq can't handle sync io concurrently as long as they
+>>>>>> are not issued from root group. This is because
+>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>>>>>> bfq_asymmetric_scenario().
+>>>>>>=20
+>>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+>>>>>>=20
+>>>>>> Before this patch:
+>>>>>> 1) root group will never be counted.
+>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
+>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the =
+requests.
+>>>>>>=20
+>>>>>> After this patch:
+>>>>>> 1) root group is counted.
+>>>>>> 2) Count if bfqg have pending requests.
+>>>>>> 3) Don't count if bfqg complete all the requests.
+>>>>>>=20
+>>>>>> With this change, the occasion that only one group is activated =
+can be
+>>>>>> detected, and next patch will support concurrent sync io in the
+>>>>>> occasion.
+>>>>>>=20
+>>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com =
+<mailto:yukuai3@huawei.com>>
+>>>>>> Reviewed-by: Jan Kara <jack@suse.cz <mailto:jack@suse.cz>>
+>>>>>> ---
+>>>>>> block/bfq-iosched.c | 42 =
+------------------------------------------
+>>>>>> block/bfq-iosched.h | 18 +++++++++---------
+>>>>>> block/bfq-wf2q.c    | 19 ++++---------------
+>>>>>> 3 files changed, 13 insertions(+), 66 deletions(-)
+>>>>>>=20
+>>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>>>>>> index 0ec21018daba..03b04892440c 100644
+>>>>>> --- a/block/bfq-iosched.c
+>>>>>> +++ b/block/bfq-iosched.c
+>>>>>> @@ -970,48 +970,6 @@ void __bfq_weights_tree_remove(struct =
+bfq_data *bfqd,
+>>>>>> void bfq_weights_tree_remove(struct bfq_data *bfqd,
+>>>>>>     struct bfq_queue *bfqq)
+>>>>>> {
+>>>>>> -struct bfq_entity *entity =3D bfqq->entity.parent;
+>>>>>> -
+>>>>>> -for_each_entity(entity) {
+>>>>>> -struct bfq_sched_data *sd =3D entity->my_sched_data;
+>>>>>> -
+>>>>>> -if (sd->next_in_service || sd->in_service_entity) {
+>>>>>> -/*
+>>>>>> -* entity is still active, because either
+>>>>>> -* next_in_service or in_service_entity is not
+>>>>>> -* NULL (see the comments on the definition of
+>>>>>> -* next_in_service for details on why
+>>>>>> -* in_service_entity must be checked too).
+>>>>>> -*
+>>>>>> -* As a consequence, its parent entities are
+>>>>>> -* active as well, and thus this loop must
+>>>>>> -* stop here.
+>>>>>> -*/
+>>>>>> -break;
+>>>>>> -}
+>>>>>> -
+>>>>>> -/*
+>>>>>> -* The decrement of num_groups_with_pending_reqs is
+>>>>>> -* not performed immediately upon the deactivation of
+>>>>>> -* entity, but it is delayed to when it also happens
+>>>>>> -* that the first leaf descendant bfqq of entity gets
+>>>>>> -* all its pending requests completed. The following
+>>>>>> -* instructions perform this delayed decrement, if
+>>>>>> -* needed. See the comments on
+>>>>>> -* num_groups_with_pending_reqs for details.
+>>>>>> -*/
+>>>>>> -if (entity->in_groups_with_pending_reqs) {
+>>>>>> -entity->in_groups_with_pending_reqs =3D false;
+>>>>>> -bfqd->num_groups_with_pending_reqs--;
+>>>>>> -}
+>>>>>> -}
+>>>>> With this part removed, I'm missing how you handle the following
+>>>>> sequence of events:
+>>>>> 1.  a queue Q becomes non busy but still has dispatched requests, =
+so
+>>>>> it must not be removed from the counter of queues with pending =
+reqs
+>>>>> yet
+>>>>> 2.  the last request of Q is completed with Q being still idle =
+(non
+>>>>> busy).  At this point Q must be removed from the counter.  It =
+seems to
+>>>>> me that this case is not handled any longer
+>>>> Hi, Paolo
+>>>>=20
+>>>> 1) At first, patch 1 support to track if bfqq has pending requests, =
+it's
+>>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when =
+the
+>>>> first request is inserted to bfqq, and it's cleared when the last
+>>>> request is completed(based on weights_tree insertion and removal).
+>>>>=20
+>>>=20
+>>> In patch 1 I don't see the flag cleared for the request-completion =
+event :(
+>>>=20
+>>> The piece of code involved is this:
+>>>=20
+>>> static void bfq_completed_request(struct bfq_queue *bfqq, struct =
+bfq_data *bfqd)
+>>> {
+>>> u64 now_ns;
+>>> u32 delta_us;
+>>>=20
+>>> bfq_update_hw_tag(bfqd);
+>>>=20
+>>> bfqd->rq_in_driver[bfqq->actuator_idx]--;
+>>> bfqd->tot_rq_in_driver--;
+>>> bfqq->dispatched--;
+>>>=20
+>>> if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq)) {
+>>> /*
+>>> * Set budget_timeout (which we overload to store the
+>>> * time at which the queue remains with no backlog and
+>>> * no outstanding request; used by the weight-raising
+>>> * mechanism).
+>>> */
+>>> bfqq->budget_timeout =3D jiffies;
+>>>=20
+>>> bfq_weights_tree_remove(bfqd, bfqq);
+>>> }
+>>> ...
+>>>=20
+>>> Am I missing something?
+>>=20
+>> I add a new api bfq_del_bfqq_in_groups_with_pending_reqs() in patch 1
+>> to clear the flag, and it's called both from bfq_del_bfqq_busy() and
+>> bfq_completed_request(). I think you may miss the later:
+>>=20
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 0d46cb728bbf..0ec21018daba 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct =
+bfq_queue *bfqq, struct bfq_data *bfqd)
+>>           */
+>>          bfqq->budget_timeout =3D jiffies;
+>>=20
+>> +        bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>>          bfq_weights_tree_remove(bfqd, bfqq);
+>>      }
+>>=20
+>> Thanks,
+>> Kuai
+>>>=20
+>>> Thanks,
+>>> Paolo
 >=20
-> Problem environment
-> Kernel base is 5.18.9
-> Test HDD drive is Seagate ST18000NM0092 dual actuator SATA.
-> Actuator LBA mapping by reading VPD B9
-> Concurrent positioning ranges VPD page:
-> LBA range number:0
-> number of storage elements:1
-> starting LBA:0x0
-> number of LBAs:0x417c00000 [17578328064]
-> LBA range number:1
-> number of storage elements:1
-> starting LBA:0x417c00000
-> number of LBAs:0x417c00000 [17578328064]
->=20
->=20
->=20
->=20
->=20
-> From: Paolo Valente <paolo.valente@linaro.org>
-> Sent: Thursday, June 23, 2022 8:53 AM
-> To: Jens Axboe <axboe@kernel.dk>
-> Cc: linux-block@vger.kernel.org <linux-block@vger.kernel.org>; =
-linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>; =
-jack@suse.cz <jack@suse.cz>; andrea.righi@canonical.com =
-<andrea.righi@canonical.com>; glen.valante@linaro.org =
-<glen.valante@linaro.org>; Arie van der Hoeven =
-<arie.vanderhoeven@seagate.com>; Paolo Valente =
-<paolo.valente@linaro.org>
-> Subject: [PATCH 0/8] block, bfq: extend bfq to support multi-actuator =
-drives
->=20
->=20
-> This message has originated from an External Source. Please use proper =
-judgment and caution when opening attachments, clicking links, or =
-responding to this email.
->=20
->=20
-> Hi,
-> this patch series extends BFQ so as to optimize I/O dispatch to
-> multi-actuator drives. In particular, this extension addresses the
-> following issue. Multi-actuator drives appear as a single device to
-> the I/O subsystem [1].  Yet they address commands to different
-> actuators internally, as a function of Logical Block Addressing
-> (LBAs). A given sector is reachable by only one of the actuators. For
-> example, Seagate=E2=80=99s Serial Advanced Technology Attachment =
-(SATA)
-> version contains two actuators and maps the lower half of the SATA LBA
-> space to the lower actuator and the upper half to the upper actuator.
->=20
-> Evidently, to fully utilize actuators, no actuator must be left idle
-> or underutilized while there is pending I/O for it. To reach this
-> goal, the block layer must somehow control the load of each actuator
-> individually. This series enriches BFQ with such a per-actuator
-> control, as a first step. Then it also adds a simple mechanism for
-> guaranteeing that actuators with pending I/O are never left idle.
->=20
-> See [1] for a more detailed overview of the problem and of the
-> solutions implemented in this patch series. There you will also find
-> some preliminary performance results.
->=20
-> Thanks,
-> Paolo
->=20
-> [1] =
-https://secure-web.cisco.com/1hcxnN1C3h1nW7mby7S66_LE8szirQwbQI0fBpYePrA0G=
-TWfyuQyl0GpZaOn32xMSkNT0BUQWloDHFzZ23aYDZdi8NfdrEFLY9pQDBblIvn08LRiTVoIOUC=
-8zWSG_r2PCyLtx3ppZq5cWOib_8azxteRRcbKWGdbLPSqg9hfSJSqltth0ByLONHEoI3p3e9QN=
-In6nVAeQbsT3aOQe-F95XrQvaPrFJXx6RGL9kDXyfkbXIHcdcLBf895gYBFn5S2WjBDQq2kzDz=
-ZOlc1HekRUhg0qDQcFY6NydVfrqNfLbpAHAth6KyREscQhVTMVREEVa1b6bQByX6grF5pn3pTI=
-o0lODyfX6yRmcbReSYNfOZ65ZPvp-nH530FQ-5nXoRxFf74WIKDrNTALs3xQvg03DH4jLez-T2=
-M9xEu-sfEDAEdTGF7BcnmBW6vrPO4_p3k4/https%3A%2F%2Fwww.linaro.org%2Fblog%2Fb=
-udget-fair-queueing-bfq-linux-io-scheduler-optimizations-for-multi-actuato=
-r-sata-hard-drives%2F
->=20
-> Davide Zini (3):
->  block, bfq: split also async bfq_queues on a per-actuator basis
->  block, bfq: inject I/O to underutilized actuators
->  block, bfq: balance I/O injection among underutilized actuators
->=20
-> Federico Gavioli (1):
->  block, bfq: retrieve independent access ranges from request queue
->=20
-> Paolo Valente (4):
->  block, bfq: split sync bfq_queues on a per-actuator basis
->  block, bfq: forbid stable merging of queues associated with different
->    actuators
->  block, bfq: turn scalar fields into arrays in bfq_io_cq
->  block, bfq: turn BFQ_NUM_ACTUATORS into BFQ_MAX_ACTUATORS
->=20
-> block/bfq-cgroup.c  |  97 +++++----
-> block/bfq-iosched.c | 488 +++++++++++++++++++++++++++++---------------
-> block/bfq-iosched.h | 149 ++++++++++----
-> block/bfq-wf2q.c    |   2 +-
-> 4 files changed, 493 insertions(+), 243 deletions(-)
->=20
-> --
-> 2.20.1
->=20
->=20
-> Seagate Internal
->=20
-> Seagate Internal
 
