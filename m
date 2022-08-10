@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E02C25B08
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 12:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECF1C00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 12:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229452AbiHJMdS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 08:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58564 "EHLO
+        id S231675AbiHJMgP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 08:36:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiHJMdR (ORCPT
+        with ESMTP id S231771AbiHJMgN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 08:33:17 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A527695E
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 05:33:16 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id q30so17549501wra.11
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 05:33:16 -0700 (PDT)
+        Wed, 10 Aug 2022 08:36:13 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46C3280F6E
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 05:36:09 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id z16so17529602wrh.12
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 05:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc;
-        bh=MpXhFk/aTcte4pFXdD6vfij4hME7IOaVu2CbphrxA8I=;
-        b=aRmlf70H6JiS9uzo1jFOxWX6iNoaqwloyYi09ppeUWfEJZDtrEqa2RwyMa9Ex9HwKf
-         YEfiZLGmWQN3mi+Cnv8lb/zkiq6rbrVYQd8AxpBqDHqIZqkYCrl+C4kVPylKw6BKXDPq
-         aUL8rZNGtWsrwiZf8rjyrSdom1lIgSoEgfdPlVwmhJp323h9tttc0tHky4SpeyHqMwrY
-         mwE2VlA6T5nbL9rkPpE/jNUwr70mHcQrf3ypcHrSuTb019Oh3GPrpfwkFp4U9W59Ct53
-         +JFcDrdBBRv5FUiFO+ikf4G2T/gh/OXLPv45RBM1cmUQIAjJNpMvXJXHyzBH7kAlGfBR
-         niRg==
+        bh=2xANSyGxIThAFaRlubSd56pUQEWvVdOYfDUT2vt6dAg=;
+        b=ly/AUrAL5AAJ9pd+1DwDfQP09c/XunU+oi2TGW77RbpLSASpjLvBfbXqVBieicRC8f
+         BcgU2UxR6wyps/atzNqBtD4akHxVJybMA4d90SVl9K8ovjlSODMOD6nMp269lKpriIVy
+         RPLSV/ynrHeFPcuz+Naw+msNizJcAY4C6CVlqJYxelu5c5VDgjw3ZYld5uOQRmg5IIXw
+         sWSnsnal3lzyuDwU+uwKAhU6W8JsvxVF82e6lrO2EepVUpV13Yv7D0jULAe5zwIaCf3y
+         28TSkvuvhVO29VQb1fG80E66FeppJYopRc3wmvzewRZi5/RdvrKa61U7K/Z3eBws39wx
+         pEpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc;
-        bh=MpXhFk/aTcte4pFXdD6vfij4hME7IOaVu2CbphrxA8I=;
-        b=eIm4nMIxiqE9P93UD9DYOsJYfRAgyPBQ/jluxIGwBJobXxyewKqu4DwWb8TBUY8KZC
-         9nn7F/GjSXoWaJtjIKD7/9krDZ0o/AfpqFEoQ8eDONZBZCvJK0ZWpWQ6DW7r68MpyITB
-         zPRZAvjoF/RwOkwYqiW/BuiAVmc0jhdPHCbdjvVpgaAlb4gmxY6Q4vN9W9UPt39nwag/
-         MuWUS6MmHmPUkt7e9WlzElpUUxT2LM/cfpQg+kTZPXFh9oEVk7gUmGo+4dUsAkcK0rf1
-         Vsrp+Ep8hzmElMecFFMwywPoIEoEJJVWFdMh75ipxQBK8t9J263GcFsZFzHqerHXzbsT
-         j0hw==
-X-Gm-Message-State: ACgBeo3HNhntnXzhxLpyI3eMmbmCI60e62B1qiTIdPZfaTNJEKIK5Gel
-        tCfXCfOd2bGEazZoSm9GOh/ybvZh1RI=
-X-Google-Smtp-Source: AA6agR6Kcn/IOAhDK/qk1yEX/o8nvFaoiLISi0U4kXqYbEPJIAkFrshmM3gpUeoFLw9sYI8bHv4LAg==
-X-Received: by 2002:a5d:6a01:0:b0:21a:338c:4862 with SMTP id m1-20020a5d6a01000000b0021a338c4862mr16608027wru.631.1660134794845;
-        Wed, 10 Aug 2022 05:33:14 -0700 (PDT)
+        bh=2xANSyGxIThAFaRlubSd56pUQEWvVdOYfDUT2vt6dAg=;
+        b=xB0eUqIXMH2afijqe3Xjp7/LCLmTmgTlZnJOV5FK1riScAyaNYSotkTi6FiwYBBWP4
+         I/nvF8W/YMXmnPIaNq+tIu3833ts7/ZwITr9VmsBllA0cewKzHu4xBxHJRZHutorAGMX
+         dM3sVWsJ2iOwYGdpc+l9Jhgbkw8nOA7S0DQsssoF7ad64CDYsuV+RQH5y91YqXpJmlwD
+         USMLpXwP7nyZDQAhxdULIC17v0ZjXLyiKzrmxaU1pIO12jyHhdZHd2KYoy0qJCNNurmM
+         OQs3He9c2/eapUj7X3ORqdzSqyDMCIOZFepz91icagCV/0/4C3X2IrCgN9S6T2dCdfN/
+         Gz/g==
+X-Gm-Message-State: ACgBeo3aig7s3RFzmGxErwxpre28Js3Gepj/TTOZtpg4mcpgt9WhGEJ+
+        jhoJ2/ewqZUf1L3gT1Y2kiTL4/oUg90=
+X-Google-Smtp-Source: AA6agR56fJb6Yla3I1/Mih3Tx57PZptZtUszTGv5+kkUAMRdnvZOOqb2L1Tdd1VLlwcXQjhwy74zlw==
+X-Received: by 2002:a05:6000:52:b0:21f:1396:a5f with SMTP id k18-20020a056000005200b0021f13960a5fmr16324035wrx.368.1660134967448;
+        Wed, 10 Aug 2022 05:36:07 -0700 (PDT)
 Received: from localhost ([2a01:4b00:f41a:3600:df86:cebc:8870:2184])
-        by smtp.gmail.com with ESMTPSA id p16-20020a05600c205000b003a37d8b864esm2200758wmg.30.2022.08.10.05.33.14
+        by smtp.gmail.com with ESMTPSA id bq4-20020a5d5a04000000b002206ba7430bsm17232301wrb.15.2022.08.10.05.36.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Aug 2022 05:33:14 -0700 (PDT)
+        Wed, 10 Aug 2022 05:36:07 -0700 (PDT)
 From:   luca.boccassi@gmail.com
 To:     linux-block@vger.kernel.org
 Cc:     hch@infradead.org, sbauer@plzdonthack.me,
         Jonathan.Derrick@solidigmtechnology.com,
         dougmill@linux.vnet.ibm.com, brauner@kernel.org,
         gmazyland@gmail.com
-Subject: [PATCH v5] block: sed-opal: Add ioctl to return device status
-Date:   Wed, 10 Aug 2022 13:33:12 +0100
-Message-Id: <20220810123312.18135-1-luca.boccassi@gmail.com>
+Subject: [PATCH v6] block: sed-opal: Add ioctl to return device status
+Date:   Wed, 10 Aug 2022 13:35:51 +0100
+Message-Id: <20220810123551.18268-1-luca.boccassi@gmail.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -74,6 +74,12 @@ this ioctl does nothing more than perform the discovery0 step
 and then save the information received. See "struct opal_status"
 and OPAL_FL_* bits for the status information currently returned.
 
+This is necessary to be able to check whether a device is OPAL
+enabled, set up, locked or unlocked from userspace programs
+like systemd-cryptsetup and libcryptsetup. Right now we just
+have to assume the user 'knows' or blindly attempt setup/lock/unlock
+operations.
+
 Signed-off-by: Douglas Miller <dougmill@linux.vnet.ibm.com>
 Tested-by: Luca Boccassi <bluca@debian.org>
 ---
@@ -85,6 +91,7 @@ v4: it's been more than 7 months and no alternative approach has appeared.
     device, so rebased and resending.
 v5: as requested by reviewer, add __32 reserved to the UAPI ioctl struct to align to 64
     bits and to reserve space for future expansion
+v6: as requested by reviewer, update commit message with use case
 
  block/opal_proto.h            |  5 ++
  block/sed-opal.c              | 90 ++++++++++++++++++++++++++++++-----
