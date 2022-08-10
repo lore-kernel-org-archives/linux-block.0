@@ -2,104 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3DEC00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 11:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD28C00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 11:29:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbiHJLAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 07:00:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59344 "EHLO
+        id S231368AbiHJL3Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 07:29:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231769AbiHJLAI (ORCPT
+        with ESMTP id S229816AbiHJL3Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 07:00:08 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA30E60535;
-        Wed, 10 Aug 2022 04:00:06 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id s206so14050297pgs.3;
-        Wed, 10 Aug 2022 04:00:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=kiZ0GjFPDluN3W8aPPsegpk1Obyz0Y2e2nbcQbNMIKk=;
-        b=WBo1j09+pUgd4BLk8uzp0Baa/VzIULafaH0Vqsbzo546R7Hen63C1BKlvodtNFhqiz
-         QYCEKcntPwLU7vds7E4kOr1ynSP/U4ds6q7ybM8PqCmSBaR1q1nIaRDeIx2SkGJvJsJ/
-         Z8wUburidhIWJWSpDxj7u5qPhu4ib+IMIAzLLNefE3aNQ3kHRDbmHiMtdIAbkt5wJCzw
-         V5leEpU3f56Ga1ouQHPUYZpyeytC0W5++xzRpRq+SuzC5PXYGzdrX7GyH4nypBR+XF9R
-         b87z+aXm5FEMxos3xJEDYC1cYhY1Us+BUbztdnjUq8iQbTkhZpWZfFEBTk27xKqO3Tg9
-         iYnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=kiZ0GjFPDluN3W8aPPsegpk1Obyz0Y2e2nbcQbNMIKk=;
-        b=g+I3Jqo7cWOU02U675aMgpCnBGTLnwxbY18LS46Fn3OpN6UzpQBPTqbkTwLHBgusZe
-         AfWK+N65b8RuKt9BQDLDekHZD6bOLEvp3MUiuYltopnVr8x6Zv1bWY96LsCl60Ci9ERq
-         OlHcfKoC0sEcbXPT7uLt1IAE2/aY7iwvKyPi1qfXdKzPWqfyvwbdlJzXp6mI+f3rkyAu
-         lydx5OCxC5GMUfrG9tmO3QKku7i2zdWYjqxyTc21qYkmnvIMOqVZKUJX5t5NaMCNoZYA
-         NI3VMnpplFYze8/NlHNnMCVD/SYQxUqGn4YJiiEYMUYKnqkt72ztBkfg+dRj6XI9vNRh
-         dpYw==
-X-Gm-Message-State: ACgBeo0nEqatQ2GTDBMMWuUIFLNyf3zGFd6GDBqdOgCT+Ec6NRNV/bmc
-        DhJ0/9qGYNQz6n8Xxs1ABB4=
-X-Google-Smtp-Source: AA6agR611g62PBer1d6V3DJjIyh8ixWzC0h3DHoPl+KpCYhB99O/QkBdcNpBmy0YN4O0issm10FKKg==
-X-Received: by 2002:a05:6a00:140d:b0:52a:d561:d991 with SMTP id l13-20020a056a00140d00b0052ad561d991mr27058495pfu.46.1660129206096;
-        Wed, 10 Aug 2022 04:00:06 -0700 (PDT)
-Received: from [0.0.0.0] (ec2-13-113-80-70.ap-northeast-1.compute.amazonaws.com. [13.113.80.70])
-        by smtp.gmail.com with ESMTPSA id e11-20020a17090301cb00b0016db6bd77f4sm12891114plh.117.2022.08.10.04.00.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Aug 2022 04:00:05 -0700 (PDT)
-Message-ID: <e5775cbb-bd2a-decf-ad81-a861d796e3fe@gmail.com>
-Date:   Wed, 10 Aug 2022 19:00:00 +0800
+        Wed, 10 Aug 2022 07:29:16 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075F961132;
+        Wed, 10 Aug 2022 04:29:10 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 73DBF5FD04;
+        Wed, 10 Aug 2022 14:29:07 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1660130947;
+        bh=3893O+vXqP3xpBy0WTDQBFqvN7inlJEYtIAjlmKsZKc=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+        b=CeQAaVMpSxvKuDiCNpACHwqV+n4SmmwSg/jSowbyYCDkQp6d8xbTwNNF+QO5nAYDp
+         WJeI3wV49SAK4EJmW4lpbItA2IXTO7Wb2DeNoo/WVbgJjI0wBDBwFUbviF4PeS/cbJ
+         WUKaDWVce8nj/kDo9QxnTcVuA9TzEHBD1FoChC/aQImWeGGtVMfMio2cC3sHZsteTG
+         qTuEB1KkAqYfz69q+hkKBqKCkJMwSkKEPQrhxhQAIg+DJ7uoOuYScgbBUoKiNXGJk7
+         G4Wnp+GHAKm+kuwtXuVxywRvvk+WMN/xcOBMEcqxLagfaka4i3Z7Db+xuCOiVr9OaM
+         PRzojm/yMlLKQ==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Wed, 10 Aug 2022 14:29:06 +0300 (MSK)
+From:   Alexey Romanov <avromanov@sberdevices.ru>
+To:     <minchan@kernel.org>, <ngupta@vflare.org>,
+        <senozhatsky@chromium.org>, <linux-block@vger.kernel.org>,
+        <axboe@chromium.org>
+CC:     <kernel@sberdevices.ru>, <linux-kernel@vger.kernel.org>,
+        <mnitenko@gmail.com>, Alexey Romanov <avromanov@sberdevices.ru>,
+        Dmitry Rokosov <ddrokosov@sberdevices.ru>
+Subject: [PATCH v1] zram: don't retry compress incompressible page
+Date:   Wed, 10 Aug 2022 14:28:57 +0300
+Message-ID: <20220810112857.90278-1-avromanov@sberdevices.ru>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH V2 1/1] loop: introduce LO_FLAGS_NO_DEALLOC
-Content-Language: en-US
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Jan Kara <jack@suse.cz>, Ming Lei <ming.lei@redhat.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-kernel@vger.kernel.org
-References: <20220806153022.83748-1-zhangboyang.id@gmail.com>
- <20220806153022.83748-2-zhangboyang.id@gmail.com> <YvLdc8GtbZ968qF6@magnolia>
-From:   Zhang Boyang <zhangboyang.id@gmail.com>
-In-Reply-To: <YvLdc8GtbZ968qF6@magnolia>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/10 06:38:00 #20089054
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+It doesn't make sense for us to retry to compress an uncompressible
+page (comp_len == PAGE_SIZE) in zsmalloc slowpath, because we will
+be storing it uncompressed anyway. We can avoid wasting time on
+another compression attempt. It is enough to take lock
+(zcomp_stream_get) and execute the code below.
 
-On 2022/8/10 06:19, Darrick J. Wong wrote:
-> 
-> Considering that discard isn't required to do anything, why not
-> echo 0 | sudo tee /sys/block/loopX/queue/discard_max_bytes ?
-> 
+This patch is made taking into account that commit 
+e7be8d1dd983156bbdd22c0319b71119a8fbb697 is reverted.
 
-Thanks for reviewing! This will disable discard completely (>=5.19), 
-thus the filesystem of backing file has no knowledge about what can be 
-freed. In contrast, my patch convert REQ_OP_DISCARD to 
-FALLOC_FL_ZERO_RANGE, the discarded parts of backing file is flagged 
-zeroed. So there is possibility for the filesystem of backing file to 
-discard (trim) the zeroed range, improving the write performance on, for 
-example, SSDs.
+Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
+---
+ drivers/block/zram/zram_drv.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-However, it seems only XFS with realtime discard enabled can do trim on 
-FALLOC_FL_ZERO_RANGE. All other filesystems (and XFS without realtime 
-discard) can't do trim on extents flagged zeroed. Batch discard like 
-FITRIM (used by `fstirm' tool) also can't help here, because no 
-filesystem track `allocated but flagged zeroed' extents at filesystem 
-level. I will probably write another patch to add the ability to trim 
-zeroed extents in single file to FITRIM. (Currently, FITRIM work on 
-filesystem level, not file level)
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index e0f850ab43aa..f51277a3aeaa 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1411,9 +1411,20 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ 		handle = zs_malloc(zram->mem_pool, comp_len,
+ 				GFP_NOIO | __GFP_HIGHMEM |
+ 				__GFP_MOVABLE);
+-		if (!IS_ERR((void *)handle))
++		if (IS_ERR((void *)handle))
++			return PTR_ERR((void *)handle);
++
++		if (comp_len != PAGE_SIZE)
+ 			goto compress_again;
+-		return PTR_ERR((void *)handle);
++
++		/*
++		 * If the page is not compressible, you need to acquire the lock and
++		 * execute the code below. The zcomp_stream_get() call is needed to
++		 * disable the cpu hotplug and grab the zstrm buffer back.
++		 * It is necessary that the dereferencing of the zstrm variable below
++		 * occurs correctly.
++		 */
++		zstrm = zcomp_stream_get(zram->comp);
+ 	}
+ 
+ 	alloced_pages = zs_get_total_pages(zram->mem_pool);
+-- 
+2.30.2
 
-Best Regards,
-Zhang Boyang
