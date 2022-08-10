@@ -2,109 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A3BAC3F6B0
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 19:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17901C25B07
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 22:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232960AbiHJTfJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 15:35:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
+        id S233269AbiHJWPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 18:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiHJTfI (ORCPT
+        with ESMTP id S233090AbiHJWPA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 15:35:08 -0400
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2487823F;
-        Wed, 10 Aug 2022 12:35:08 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id EA10C580A04;
-        Wed, 10 Aug 2022 15:35:03 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Wed, 10 Aug 2022 15:35:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660160103; x=
-        1660163703; bh=0vmr1fhdy+FAoUqaRAABEWacZoBorR05F3CyKvQXIo4=; b=h
-        ooNUhKSJiBC6+3cetzdzZHffKUq2FaeCpRRZvJL9VtexQlDJLokwYyeJXqAelzOQ
-        cLxh/TH46z1wy5VssQUWq+EpzINRzz7a3CCz/RugLHTo0zz7+bx8fQUzpQH0/DUe
-        ZwJAocZx4Aao76m9SF3dLrs+9y9xoPpOUCSHh/IAl6qvHL5DkWLmvc8266yRgodr
-        gb8+Jcuys+202gGXERC4MAAgYK0veWIkDC3ObuOG5qaKQtcpXGnHXFdm1R4isd/1
-        n+skRHAZj8wQ7+lbOdmaFvjN8aFP4sB2njEg4p5EHDT8UwoRDwdysMsfZzPDbbwU
-        Cbxd6livDaIzE5Me5+MMA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660160103; x=1660163703; bh=0vmr1fhdy+FAoUqaRAABEWacZoBo
-        rR05F3CyKvQXIo4=; b=0vfyS2DV8VWD8l4pKg81CY0oxBl50sbjJI4r8BkcNDhM
-        UaPe3ljK7reseVkcsiT5jpP3/9Ucjx8yyJlVpG/qfAM9iSCHWfE5MGN5vhO9kNlb
-        vvPgM2rHw+fPjZEPlrfWtt1iKsRyRtWRj8hjqYUwENu5SLH1a6V2CbVbHo2gESov
-        RNxRftpo9DgTx4O3muaIelIEXHwTChaLyGOf/982o7tw90z9yqUHrX+na8e1tKZl
-        ejMmNRQg9Qi60SY7qwG920dThqUutoTThuocdzCynxn9gKwVVh0j6Ryf0n1YeGyr
-        PbC4dB4DMC8VUGYXfB/JM0QjAYbQC9KGr4dezIHq5Q==
-X-ME-Sender: <xms:Zwj0YiYQdoCRSAsbqIH37r9h0FEf2GdA5BGj2Q8Gd6Yo8blfa3YtQA>
-    <xme:Zwj0YlYgxeOYjRfYopjXFO1JyjBYYxBFsDUgE1s2UHflpWxZGdpmsaOHBeJB0IvyY
-    8JMEmfskG5KTH1kSZ8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdegvddgudefiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdev
-    hhhrihhsucfouhhrphhhhidfuceolhhishhtshestgholhhorhhrvghmvgguihgvshdrtg
-    homheqnecuggftrfgrthhtvghrnhepgfdvueektdefgfefgfdtleffvdeileetgfefuddt
-    ffelueeiveeiveekhedtheeunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheplhhishhtshestgholhhorhhrvghmvgguihgvshdrtghomh
-X-ME-Proxy: <xmx:Zwj0Ys9gpHAsqJ7qAMRicerz0059rnEay9pMniPq_e7gjHe8lQJQoA>
-    <xmx:Zwj0YkqerqrCDFS6GI5QhqTLDWGU1D2wPwH1toBsIKqM_ahEpOq8Lw>
-    <xmx:Zwj0YtqlC-M05bTKfisojXLMnBn7wlalvDn1D067wCCBwq33OXVOEg>
-    <xmx:Zwj0Yk3Uz5uM6nnerfKhKNX0LWIMkoNS52MeQBxZI6v6LNGWoL0-wg>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 9B7B21700083; Wed, 10 Aug 2022 15:35:03 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-811-gb808317eab-fm-20220801.001-gb808317e
-Mime-Version: 1.0
-Message-Id: <ad78a32c-7790-4e21-be9f-81c5848a4953@www.fastmail.com>
-In-Reply-To: <cb1521d5-8b07-48d8-8b88-ca078828cf69@www.fastmail.com>
-References: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
- <YvPvghdv6lzVRm/S@localhost.localdomain>
- <2220d403-e443-4e60-b7c3-d149e402c13e@www.fastmail.com>
- <cb1521d5-8b07-48d8-8b88-ca078828cf69@www.fastmail.com>
-Date:   Wed, 10 Aug 2022 15:34:43 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Josef Bacik" <josef@toxicpanda.com>
-Cc:     "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: stalling IO regression in linux 5.12
-Content-Type: text/plain
+        Wed, 10 Aug 2022 18:15:00 -0400
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963DF8C031
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 15:14:59 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-f2a4c51c45so19487392fac.9
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 15:14:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=P25ltMRtJD/usTExdwvaP0sN/6HovIdZJUsoLXN0Pw8=;
+        b=u8XLY8KfuDWm4X0an7AhBB3+RHpm1zr9rrmHSl8QQfXvDFxZSrKbT4yJe1jNtNxbdj
+         icQnvzJNFel5LW4hi/hFIyTLptiBXldFpSPrpdSyrASCP9U71k8q2MAp1ERYsExXbQCD
+         /t9hI7fmuP3oah70A7aeAinrP+Oo25aUL7OsU6K/qKOe4QJqW/kEaLR82yDnIrHT7LG7
+         rqUBVczB4CxY+FIRT6LIqclNIVwb3IdZ2mr3JIjsnH6qLhA5KyM96rBRLx9H/zUQCTQh
+         1MCTqCA1xvBMDJx/JWNC/mc4giWEp+xcGcuqQw/qk5UYOoWpiwEazDmFKkTGepMFbCrb
+         20+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=P25ltMRtJD/usTExdwvaP0sN/6HovIdZJUsoLXN0Pw8=;
+        b=X6F5f6Ep0vCN5OaVYCBVV5YmQOUNhYMahq3P1qO6gfUni9ejdFcDyB3x9X9MR40It6
+         9O55qHisbMyZkQBw4mb1dQ3ke4LK9HxQ9wG0vl5yEUXz1/zwMVCGM1gDvjWVpvCzwFe9
+         kiH0bbzP9kKzMd4GCL+Ir8y9vsUsM+nlYTNroF55czn/Gi9DersWJ/T5s6+HZGdYkGRa
+         KRGT3ojOPSJxhuL/X1OEij23LiI0RpcjCylKTT8qOz7vzxt5pJYviFomHdVy1Za9lydY
+         OTwVFyOHxr/MCKuHgLvrhJ5W6r0daJf80fpF0JKCLHCvDPNK86og3B5w+a8XdyTuabBw
+         Zd1Q==
+X-Gm-Message-State: ACgBeo2h0Mhh1ey56zn4NvqQ4QL1rEmeSKPd7SRyrO7VemwZYR9qkHRy
+        W1Jh7KpHySaJjxLEE3zumOY+T9D+it++9SLS8Mxh
+X-Google-Smtp-Source: AA6agR7lpEDOex8Xn/nwOzvRwkqdwihfKzZXcNXKibctA4d/DBBgX+tHbeIJEnc8xR8utAk/bU+7O6/2CM/jJn7Pe3U=
+X-Received: by 2002:a05:6870:b41e:b0:116:5dc7:192a with SMTP id
+ x30-20020a056870b41e00b001165dc7192amr2465315oap.136.1660169698931; Wed, 10
+ Aug 2022 15:14:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220715191622.2310436-1-mcgrof@kernel.org> <a56d191e-a3a3-76b9-6ca3-782803d2600c@kernel.dk>
+ <YvP1jK/J4m8TE8BZ@bombadil.infradead.org> <CAHC9VhQnQqP1ww7fvCzKp_o1n7iMyYb564HSZy1Ed7k1-nD=jQ@mail.gmail.com>
+ <YvP+aiGcBsik+v3y@bombadil.infradead.org>
+In-Reply-To: <YvP+aiGcBsik+v3y@bombadil.infradead.org>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Wed, 10 Aug 2022 18:14:48 -0400
+Message-ID: <CAHC9VhS-8DCw3oG+VySo-bWsN=Kgz9o0T+47pL9jWdAZ3=+REA@mail.gmail.com>
+Subject: Re: [PATCH v2] lsm,io_uring: add LSM hooks for the new uring_cmd file op
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        casey@schaufler-ca.com, joshi.k@samsung.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        a.manzanares@samsung.com, javier@javigon.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On Wed, Aug 10, 2022, at 2:42 PM, Chris Murphy wrote:
-> On Wed, Aug 10, 2022, at 2:33 PM, Chris Murphy wrote:
->> On Wed, Aug 10, 2022, at 1:48 PM, Josef Bacik wrote:
->>
->>> To help narrow this down can you disable any IO controller you've got enabled
->>> and see if you can reproduce?  If you can sysrq+w is super helpful as it'll
->>> point us in the next direction to look.  Thanks,
->>
->> I'm not following, sorry. I can boot with 
->> systemd.unified_cgroup_hierarchy=0 to make sure it's all off, but we're 
->> not using an IO cgroup controllers specifically as far as I'm aware.
+On Wed, Aug 10, 2022 at 2:52 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> On Wed, Aug 10, 2022 at 02:39:54PM -0400, Paul Moore wrote:
+> > On Wed, Aug 10, 2022 at 2:14 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> > >
+> > > On Fri, Jul 15, 2022 at 01:28:35PM -0600, Jens Axboe wrote:
+> > > > On 7/15/22 1:16 PM, Luis Chamberlain wrote:
+> > > > > io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
+> > > > > add infrastructure for uring-cmd"), this extended the struct
+> > > > > file_operations to allow a new command which each subsystem can use
+> > > > > to enable command passthrough. Add an LSM specific for the command
+> > > > > passthrough which enables LSMs to inspect the command details.
+> > > > >
+> > > > > This was discussed long ago without no clear pointer for something
+> > > > > conclusive, so this enables LSMs to at least reject this new file
+> > > > > operation.
+> > > >
+> > > > From an io_uring perspective, this looks fine to me. It may be easier if
+> > > > I take this through my tree due to the moving of the files, or the
+> > > > security side can do it but it'd have to then wait for merge window (and
+> > > > post io_uring branch merge) to do so. Just let me know. If done outside
+> > > > of my tree, feel free to add:
+> > > >
+> > > > Acked-by: Jens Axboe <axboe@kernel.dk>
+> > >
+> > > Paul, Casey, Jens,
+> > >
+> > > should this be picked up now that we're one week into the merge window?
+> >
+> > Your timing is spot on!  I wrapped up a SELinux/SCTP issue by posting
+> > the patches yesterday and started on the io_uring/CMD patches this
+> > morning :)
+> >
+> > Give me a few days to get this finished, tested, etc. and I'll post a
+> > patchset with your main patch, the Smack patch from Casey, the SELinux
+> > patch, and the /dev/null patch so we can all give it a quick sanity
+> > check before I merge it into the LSM/stable branch and send it to
+> > Linus.  Does that sound okay?
 >
-> OK yeah that won't work because the workload requires cgroup2 or it won't run.
+> Works with me! But just note I'll be away on vacation starting tomorrow
+> in the woods looking for Bigfoot with my dog, so I won't be around. And
+> I suspect Linus plans to release 6.0 on Sunday, if the phb-crystall-ball [0]
+> is still as accurate.
 
-
-Booted with cgroup_disable=io, and confirmed cat /sys/fs/cgroup/cgroup.controllers does not list io.
-
-I'll rerun the workload now. Sometimes reproduces fast, other times a couple hours.
-
-
+No worries, hopefully we'll have something working its way towards
+Linus by the time you return.  Enjoy your time away.
 
 -- 
-Chris Murphy
+paul-moore.com
