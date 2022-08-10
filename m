@@ -2,101 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F8D6C25B07
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 18:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B56AC25B0C
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 18:52:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231739AbiHJSnE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 14:43:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47298 "EHLO
+        id S231557AbiHJSwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 14:52:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbiHJSnD (ORCPT
+        with ESMTP id S229567AbiHJSwd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 14:43:03 -0400
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE90321;
-        Wed, 10 Aug 2022 11:43:02 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 8D04E580902;
-        Wed, 10 Aug 2022 14:43:01 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Wed, 10 Aug 2022 14:43:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660156981; x=
-        1660160581; bh=jLKPYg8r1NWKdk49fFDpdK5qae/XsFnguQ1wMSjTmTo=; b=j
-        voINbCT7I34DAt8YlnXHdXbhohDUDl1XY9UryT5X3UbyLKV8Cm2dk2Ise8WlBqd7
-        1nEH8aoK6oHWzw+vUUksa6p+ixc7ISyR9nhdQ5H7adMVrKTUz1wtwu4z+gDJgFK8
-        HcIW4sglyTKAheCqk+nXraquVuV7m15vrXRZ/yyxStuGA5OXlZie/u/FWKGgoOrg
-        kxqrrt2+sO6t9F0CBxxJsBhDDrgbkzuKVCQbwtbiKk9T+Liawo6I8mJ4YE30iwUt
-        frQoFplUs0ZYoAlAU/vAo3KsC0k7wd1xLvoZgVJOWbQX7NptR91REaK6sOO5JLKH
-        ySQIVaZl2aSPb5LpolyUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660156981; x=1660160581; bh=jLKPYg8r1NWKdk49fFDpdK5qae/X
-        sFnguQ1wMSjTmTo=; b=EzwBop3RAVvNTG/DtwC3n8JGE2I78/II65Xbj98SF7l7
-        lT4zzF0fs0NJge3SjchB21PrstCTQuc3MCfu+d578kAMSuVk516g2RK3kmVkWfxW
-        s291/CCqRFRK7MFOh/l+Bp5ZE9gG/IhweejXJx4yC5iPyZporl97Tm0egwm3QKT9
-        41Q/qa2TKiv58UuXZVZ9XcDU5jbwNtS5MW5KT4NGXdWvHWCOQiZkFFDYeoaDSARO
-        ng4GRsNZb4HfBx2L6/ncyQMbTXil2xKqrJxoQ5XeL3WiOYS394H/rQ6hMRtSqpwD
-        UhsYS0ACemJZILDR+ewe6rpM6Y3NrL7M4yQQdaDdxw==
-X-ME-Sender: <xms:NfzzYhWCNuQn9fVQXz3T6nhp6J1tjwP-7gyZbibnfDoeCaVYH2uqGg>
-    <xme:NfzzYhldZo0af02BNme-_-mOtAu9TB5GZ_3rSwWDjzEfQUY1s0kPUECNHUNj4lHNf
-    -SbNTb7ry6M623AONw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdegvddguddviecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdev
-    hhhrihhsucfouhhrphhhhidfuceolhhishhtshestgholhhorhhrvghmvgguihgvshdrtg
-    homheqnecuggftrfgrthhtvghrnhepgfdvueektdefgfefgfdtleffvdeileetgfefuddt
-    ffelueeiveeiveekhedtheeunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheplhhishhtshestgholhhorhhrvghmvgguihgvshdrtghomh
-X-ME-Proxy: <xmx:NfzzYtZxpqSPMcDEcb9wunEzs4mhBo8tUU1M8SbGGKODqryMStDiCA>
-    <xmx:NfzzYkUoUG8J2SgR12g_Uh0Kevs7EPisA8sTtKrsiZHBoVBt5ikxRw>
-    <xmx:NfzzYrnnLpuvA6bx7fmPQMCetmOgGX7oMc15pRNZ02gZU0B7y4G3AA>
-    <xmx:NfzzYgzTf0SvU6stn5ePDNpMS45CQiQsyIksd-XiKARKz35tojJ6RQ>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 54B791700082; Wed, 10 Aug 2022 14:43:01 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-811-gb808317eab-fm-20220801.001-gb808317e
-Mime-Version: 1.0
-Message-Id: <cb1521d5-8b07-48d8-8b88-ca078828cf69@www.fastmail.com>
-In-Reply-To: <2220d403-e443-4e60-b7c3-d149e402c13e@www.fastmail.com>
-References: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
- <YvPvghdv6lzVRm/S@localhost.localdomain>
- <2220d403-e443-4e60-b7c3-d149e402c13e@www.fastmail.com>
-Date:   Wed, 10 Aug 2022 14:42:40 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Josef Bacik" <josef@toxicpanda.com>
-Cc:     "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: stalling IO regression in linux 5.12
-Content-Type: text/plain
+        Wed, 10 Aug 2022 14:52:33 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 273F882FA4;
+        Wed, 10 Aug 2022 11:52:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=30VFo5a7JeVy/w8TY1J+NJC1egtewPVjD1FM6RGYwBg=; b=s6a64YP8QczXD0JIqbxeiDGFqS
+        Sb/NlyQn4cZX6wLkeYRRQJZ5VKHXw5xK4FKWP00CCewYp9T3RgVmy9/p3NDkxPaQgwaTy6Ds4i8My
+        bNzcWFX0WFEIzg18D3mehTWJSl0H3V/YCa3T1RzgQSsGvoZAxvCgQciLnCn1FOT9JxTYPOUkp5AkH
+        WaSAhTo2r/YXVFA2Di8jdzsQsz8Wo1ZabEUXKjvIrsu9PazM6slOdEANhDJcHgrJuEPmEMXv2ScT2
+        rtb7kwooxIN0gRkh3xIyHPaN4Shz2qMltQj/+wXHU8/KjiUdflrMV6X1IH/BAScfYYMVLzKE1Licv
+        8wwjLBdw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oLqoc-00DuFN-CR; Wed, 10 Aug 2022 18:52:26 +0000
+Date:   Wed, 10 Aug 2022 11:52:26 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        casey@schaufler-ca.com, joshi.k@samsung.com,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        a.manzanares@samsung.com, javier@javigon.com
+Subject: Re: [PATCH v2] lsm,io_uring: add LSM hooks for the new uring_cmd
+ file op
+Message-ID: <YvP+aiGcBsik+v3y@bombadil.infradead.org>
+References: <20220715191622.2310436-1-mcgrof@kernel.org>
+ <a56d191e-a3a3-76b9-6ca3-782803d2600c@kernel.dk>
+ <YvP1jK/J4m8TE8BZ@bombadil.infradead.org>
+ <CAHC9VhQnQqP1ww7fvCzKp_o1n7iMyYb564HSZy1Ed7k1-nD=jQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHC9VhQnQqP1ww7fvCzKp_o1n7iMyYb564HSZy1Ed7k1-nD=jQ@mail.gmail.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Aug 10, 2022 at 02:39:54PM -0400, Paul Moore wrote:
+> On Wed, Aug 10, 2022 at 2:14 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >
+> > On Fri, Jul 15, 2022 at 01:28:35PM -0600, Jens Axboe wrote:
+> > > On 7/15/22 1:16 PM, Luis Chamberlain wrote:
+> > > > io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
+> > > > add infrastructure for uring-cmd"), this extended the struct
+> > > > file_operations to allow a new command which each subsystem can use
+> > > > to enable command passthrough. Add an LSM specific for the command
+> > > > passthrough which enables LSMs to inspect the command details.
+> > > >
+> > > > This was discussed long ago without no clear pointer for something
+> > > > conclusive, so this enables LSMs to at least reject this new file
+> > > > operation.
+> > >
+> > > From an io_uring perspective, this looks fine to me. It may be easier if
+> > > I take this through my tree due to the moving of the files, or the
+> > > security side can do it but it'd have to then wait for merge window (and
+> > > post io_uring branch merge) to do so. Just let me know. If done outside
+> > > of my tree, feel free to add:
+> > >
+> > > Acked-by: Jens Axboe <axboe@kernel.dk>
+> >
+> > Paul, Casey, Jens,
+> >
+> > should this be picked up now that we're one week into the merge window?
+> 
+> Your timing is spot on!  I wrapped up a SELinux/SCTP issue by posting
+> the patches yesterday and started on the io_uring/CMD patches this
+> morning :)
+> 
+> Give me a few days to get this finished, tested, etc. and I'll post a
+> patchset with your main patch, the Smack patch from Casey, the SELinux
+> patch, and the /dev/null patch so we can all give it a quick sanity
+> check before I merge it into the LSM/stable branch and send it to
+> Linus.  Does that sound okay?
 
+Works with me! But just note I'll be away on vacation starting tomorrow
+in the woods looking for Bigfoot with my dog, so I won't be around. And
+I suspect Linus plans to release 6.0 on Sunday, if the phb-crystall-ball [0]
+is still as accurate.
 
-On Wed, Aug 10, 2022, at 2:33 PM, Chris Murphy wrote:
-> On Wed, Aug 10, 2022, at 1:48 PM, Josef Bacik wrote:
->
->> To help narrow this down can you disable any IO controller you've got enabled
->> and see if you can reproduce?  If you can sysrq+w is super helpful as it'll
->> point us in the next direction to look.  Thanks,
->
-> I'm not following, sorry. I can boot with 
-> systemd.unified_cgroup_hierarchy=0 to make sure it's all off, but we're 
-> not using an IO cgroup controllers specifically as far as I'm aware.
+[0] http://deb.tandrin.de/phb-crystal-ball.htm
 
-OK yeah that won't work because the workload requires cgroup2 or it won't run.
-
-
--- 
-Chris Murphy
+  Luis
