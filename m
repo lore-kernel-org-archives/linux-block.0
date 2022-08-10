@@ -2,107 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E33C25B07
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 17:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4F5C19F2A
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 18:05:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbiHJRt2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 13:49:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
+        id S233533AbiHJSFP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 14:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232561AbiHJRtE (ORCPT
+        with ESMTP id S231424AbiHJSFN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 13:49:04 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CA08C456
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 10:48:56 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id u12so11815764qtk.0
-        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 10:48:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=b56RlgqsDjhndoKXh76AAfBh0fo34wRquvTp2LsFHgk=;
-        b=exB4l+5E6/quhEzaiSIDb4pdiGPX1b7hO2HymEU/s0Ly9NVmwcqirP380zissRt0EU
-         l7snuO/yv6izW4vfFWMEdB9B+D3ZVfwfxSr1WOYbDpIdqILXMI/K7LkiAKb+7oPxDfAJ
-         hvMf5BPeFLFvnTXDiQf2qoOGMSr1kEyaRmsWqOHzHzLHA0Ef4sYYjUkkFgQ+If6pcK5P
-         QP2rYx8ggkB2mQsu1SOwt0kvxoa+SZAhq0nCyBqRWQjksiwvXztpZ6vLKYwYnytRJsjW
-         yMZCuHzeO0c/9Ug/c5WtOF5FmRfQQc+7qd6WRT4Nd27y1o4/ilC5FSwm4ts7sYLDeN85
-         3fpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=b56RlgqsDjhndoKXh76AAfBh0fo34wRquvTp2LsFHgk=;
-        b=KHNHpI/9cM56lv3Au+Y6pT4iEE2YUJiOubPG7gEge2IxhC0e52SfbAFY18t6gvYBPY
-         AJgBwXIfRJP+xs0bzVxyQpfmn/GtMJmcDkUWMn3/EGPDyB6dcvQlB4X0H5e6wzfNdVMf
-         gmdHcWGkV+OXgsDUK4leEJpyd2EuKTTKLYRYwGV5ilv6HIMEVdUnMVYC7oEj7p6YKgfP
-         ivk3U5SDKqojD75oH8wOU5fP/tW1LCYGE0m955zRf0XBUjiO260Ja16BnMghSKk4nMmG
-         vki9df7EhtFG/OmDxsBPEV1VClPnXCnx8G6wqt7WNlzAh2Asr5bkZIGB7zeeFfqMlEpW
-         hSfw==
-X-Gm-Message-State: ACgBeo0jMiaZeB0xdFRnTAiQblCVToOP9umzyFHiXpIoTNaPEPu2hcKG
-        ZSuqSriscfmSwttdHn5YYab55Q==
-X-Google-Smtp-Source: AA6agR7N7ISFUfCzkKkyp2mKsj1gWbPB/HcnKeULzt0zI4kXHOGqvXsg6K3Ka5VQlyfKqj8EDn9sRw==
-X-Received: by 2002:a05:622a:3cf:b0:32c:1d47:2164 with SMTP id k15-20020a05622a03cf00b0032c1d472164mr25047708qtx.97.1660153735049;
-        Wed, 10 Aug 2022 10:48:55 -0700 (PDT)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id x14-20020a05620a258e00b006b9a89d408csm252567qko.100.2022.08.10.10.48.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Aug 2022 10:48:52 -0700 (PDT)
-Date:   Wed, 10 Aug 2022 13:48:50 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: stalling IO regression in linux 5.12
-Message-ID: <YvPvghdv6lzVRm/S@localhost.localdomain>
-References: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
+        Wed, 10 Aug 2022 14:05:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FC4B1A;
+        Wed, 10 Aug 2022 11:05:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 138CFB81611;
+        Wed, 10 Aug 2022 18:05:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11174C433D6;
+        Wed, 10 Aug 2022 18:05:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660154708;
+        bh=nhGr02sSN89GKEkq7FccjXFENhz9XIFY79Zk1MeBFDE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=giwdIhQSTRjg1XY592kRRArKEADaCYIFb0IfSAf5vSAAqZPkITd1VNS31sKmvjLHY
+         QZ5zTWD7x1qLyuh8xA3n7RFw4wR4aV4jBH78K2xHiYXQqMtPpepIUoftftH8NkARnz
+         froPTiPS0sbSWrcTJfKFysqmONFj/cExjXFDlcbqP1hTZrLlkVKbG0IlQYZ7h7519j
+         8jkQEU3HBANrmut4RcNOvhGZVr5yQBobhJGMqjYraFsHrpXfdjbgVU+drNYU2ER9Su
+         qD/ARUaZVD70Uc79Am1rehEVjBKYpmXPabLA1gSTrBhfCCwlKEiW+RwKzxvC9KxCcx
+         VFEPcUyWeyo1g==
+Date:   Wed, 10 Aug 2022 12:05:05 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>
+Subject: Re: [PATCHv3 0/7] dma mapping optimisations
+Message-ID: <YvPzUSx87VkwSH2C@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220805162444.3985535-1-kbusch@fb.com>
+ <20220809064613.GA9040@lst.de>
+ <YvKPTGf56v/3iSxg@kbusch-mbp.dhcp.thefacebook.com>
+ <20220809184137.GB15107@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
+In-Reply-To: <20220809184137.GB15107@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 10, 2022 at 12:35:34PM -0400, Chris Murphy wrote:
-> CPU: Intel E5-2680 v3
-> RAM: 128 G
-> 02:00.0 RAID bus controller [0104]: Broadcom / LSI MegaRAID SAS-3 3108 [Invader] [1000:005d] (rev 02), using megaraid_sas driver
-> 8 Disks: TOSHIBA AL13SEB600
+On Tue, Aug 09, 2022 at 08:41:37PM +0200, Christoph Hellwig wrote:
+> On Tue, Aug 09, 2022 at 10:46:04AM -0600, Keith Busch wrote:
 > 
+> > For swiotlb, though, we can error out the mapping if the requested memory uses
+> > swiotlb with the device: the driver's .dma_map() can return ENOTSUPP if
+> > is_swiotlb_buffer() is true. Would that be more acceptable?
 > 
-> The problem exhibits as increasing load, increasing IO pressure (PSI), and actual IO goes to zero. It never happens on kernel 5.11 series, and always happens after 5.12-rc1 and persists through 5.18.0. There's a new mix of behaviors with 5.19, I suspect the mm improvements in this series might be masking the problem.
-> 
-> The workload involves openqa, which spins up 30 qemu-kvm instances, and does a bunch of tests, generating quite a lot of writes: qcow2 files, and video in the form of many screenshots, and various log files, for each VM. These VMs are each in their own cgroup. As the problem begins, I see increasing IO pressure, and decreasing IO, for each qemu instance's cgroup, and the cgroups for httpd, journald, auditd, and postgresql. IO pressure goes to nearly ~99% and IO is literally 0.
-> 
-> The problem left unattended to progress will eventually result in a completely unresponsive system, with no kernel messages. It reproduces in the following configurations, the first two I provide links to full dmesg with sysrq+w:
-> 
-> btrfs raid10 (native) on plain partitions [1]
-> btrfs single/dup on dmcrypt on mdadm raid 10 and parity raid [2]
-> XFS on dmcrypt on mdadm raid10 or parity raid
-> 
-> I've started a bisect, but for some reason I haven't figured out I've started getting compiled kernels that don't boot the hardware. The failure is very early on such that the UUID for the root file system isn't found, but not much to go on as to why.[3] I have tested the first and last skipped commits in the bisect log below, they successfully boot a VM but not the hardware.
-> 
-> Anyway, I'm kinda stuck at this point trying to narrow it down further. Any suggestions? Thanks.
-> 
+> No, is_swiotlb_buffer and similar are not exported APIs.
 
-I looked at the traces, btrfs is stuck waiting on IO and blk tags, which means
-we've got a lot of outstanding requests and are waiting for them to finish so we
-can allocate more requests.
+The functions are implemented under 'include/linux/', indistinguishable from
+exported APIs. I think I understand why they are there, but they look the same
+as exported functions from a driver perspective.
 
-Additionally I'm seeing a bunch of the blkg async submit things, which are used
-when we have the block cgroup stuff turned on and compression enabled, so we
-punt any compressed bios to a per-cgroup async thread to submit the IO's in the
-appropriate block cgroup context.
+> More importantly with the various secure hypervisor schemes swiotlb is
+> unfortunately actually massively increasing these days.  On those systems all
+> streaming mappings use swiotlb.  And the only way to get any kind of
+> half-decent I/O performance would be the "special" premapped allocator, which
+> is another reason why I'd like to see it.
 
-This could mean we're just being overly mean and generating too many IO's, but
-since the IO goes to 0 I'm more inclined to believe there's a screw up in
-whatever IO cgroup controller you're using.
+Perhaps I'm being daft, but I'm totally missing why I should care if swiotlb
+leverages this feature. If you're using that, you've traded performance for
+security or compatibility already. If this idea can be used to make it perform
+better, then great, but that shouldn't be the reason to hold this up IMO.
 
-To help narrow this down can you disable any IO controller you've got enabled
-and see if you can reproduce?  If you can sysrq+w is super helpful as it'll
-point us in the next direction to look.  Thanks,
+This optimization needs to be easy to reach if we expect anyone to use it.
+Working with arbitrary user addresses with minimal additions to the user ABI
+was deliberate. If you want a special allocator, we can always add one later;
+this series doesn't affect that.
 
-Josef
+If this has potential to starve system resource though, I can constrain it to
+specific users like CAP_SYS_ADMIN, or maybe only memory allocated from
+hugetlbfs. Or perhaps a more complicated scheme of shuffling dma mapping
+resources on demand if that is an improvement over the status quo.
