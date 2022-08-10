@@ -2,105 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD28C00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 11:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EEDBC00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 11:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231368AbiHJL3Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 07:29:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56334 "EHLO
+        id S229782AbiHJLqD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 07:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbiHJL3Q (ORCPT
+        with ESMTP id S229628AbiHJLqD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 07:29:16 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 075F961132;
-        Wed, 10 Aug 2022 04:29:10 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 73DBF5FD04;
-        Wed, 10 Aug 2022 14:29:07 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1660130947;
-        bh=3893O+vXqP3xpBy0WTDQBFqvN7inlJEYtIAjlmKsZKc=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=CeQAaVMpSxvKuDiCNpACHwqV+n4SmmwSg/jSowbyYCDkQp6d8xbTwNNF+QO5nAYDp
-         WJeI3wV49SAK4EJmW4lpbItA2IXTO7Wb2DeNoo/WVbgJjI0wBDBwFUbviF4PeS/cbJ
-         WUKaDWVce8nj/kDo9QxnTcVuA9TzEHBD1FoChC/aQImWeGGtVMfMio2cC3sHZsteTG
-         qTuEB1KkAqYfz69q+hkKBqKCkJMwSkKEPQrhxhQAIg+DJ7uoOuYScgbBUoKiNXGJk7
-         G4Wnp+GHAKm+kuwtXuVxywRvvk+WMN/xcOBMEcqxLagfaka4i3Z7Db+xuCOiVr9OaM
-         PRzojm/yMlLKQ==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Wed, 10 Aug 2022 14:29:06 +0300 (MSK)
-From:   Alexey Romanov <avromanov@sberdevices.ru>
-To:     <minchan@kernel.org>, <ngupta@vflare.org>,
-        <senozhatsky@chromium.org>, <linux-block@vger.kernel.org>,
-        <axboe@chromium.org>
-CC:     <kernel@sberdevices.ru>, <linux-kernel@vger.kernel.org>,
-        <mnitenko@gmail.com>, Alexey Romanov <avromanov@sberdevices.ru>,
-        Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Subject: [PATCH v1] zram: don't retry compress incompressible page
-Date:   Wed, 10 Aug 2022 14:28:57 +0300
-Message-ID: <20220810112857.90278-1-avromanov@sberdevices.ru>
-X-Mailer: git-send-email 2.33.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/08/10 06:38:00 #20089054
-X-KSMG-AntiVirus-Status: Clean, skipped
+        Wed, 10 Aug 2022 07:46:03 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A775C953;
+        Wed, 10 Aug 2022 04:46:02 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id q7-20020a17090a7a8700b001f300db8677so1838133pjf.5;
+        Wed, 10 Aug 2022 04:46:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc;
+        bh=ei1ljbOBBQBSPmSvzrg9QAdPpWtXbrDjFPAODhjUGRU=;
+        b=nnYLI9q9ypTlhyS+QqNTEzY0nsk0KbZnJoUAEnjHOgB3VlOLXiPH4zGFOwybvU3y/c
+         PtjfQZtMfk48L29BZKe/Kyr/b0dxzTMJID2NvRl6YtSR/ui+LbxWXLpwFrZwwcsVQPzS
+         XGM694O9W3ocM+xy9zmJor7U91uvUsvEaS/qRV0wGanE/4y/KkQsLFOw5CZ/NkJ+9WRQ
+         J9jm9AUXp0C+k8Sh81dsgsCfzRTjRBu4TytqisfoyfTHps2QVtdBL0uny3XKC55V+PyT
+         0wi/1meO1LP+pcD0X7h2zhk7lgFLBX5XDNpmxeYto7Z2bTp7CD7w4IsDmezUZCWCg2Oy
+         +gSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc;
+        bh=ei1ljbOBBQBSPmSvzrg9QAdPpWtXbrDjFPAODhjUGRU=;
+        b=KP08BlYfiQJSLLBGjhONqvGWKsWhUJLwKvXRvs1MDFzl67dkEHkcaBKP6N+DsxQBCO
+         ze+pVtOS5PGXGiUGDADJs4l04FjaaFzqwt06xv1nh8iY7MLqNSlwHuqgXdW6nQ1jsgUS
+         sIbs8KeXd+srcRGMkVvcg/wmHLya1mZk4s7SbMh+eM3BsoVvlawttb9bKgTcQePNmK2t
+         ZeAOVMck+oPaHwsn1jIOHdn7NdlKKHLTuTHf+eWD2TL6DhGpTWhB+q482zLW4MMxTo7I
+         NnLJ1MmC9HlZj9nVM65soy4A4ScugfSJL88AlsoG6+7k+6wgAjfDqH5pS7p8el/vEIAQ
+         U6Zw==
+X-Gm-Message-State: ACgBeo096dHKAwJBrFysFzZsFqK4/0lJ1ZJ2IvVXQhuMOC9jyI+i/nA9
+        awCpnb4YOSi+LU/OkVH20Q==
+X-Google-Smtp-Source: AA6agR7VtaMkCxIfKdLmKiHOns2CVnpwhFlkABxv/J4LgWQlhoT554XdWQxiS/18TXDdHpvMKxb9wQ==
+X-Received: by 2002:a17:90b:4a0a:b0:1f4:e4fc:91d3 with SMTP id kk10-20020a17090b4a0a00b001f4e4fc91d3mr3300479pjb.67.1660131961540;
+        Wed, 10 Aug 2022 04:46:01 -0700 (PDT)
+Received: from localhost ([240d:1a:c0d:9f00:4f2f:926a:23dd:8588])
+        by smtp.gmail.com with ESMTPSA id x2-20020aa79a42000000b0052e0b928c3csm1712112pfj.219.2022.08.10.04.45.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Aug 2022 04:46:01 -0700 (PDT)
+Date:   Wed, 10 Aug 2022 20:45:56 +0900 (JST)
+Message-Id: <20220810.204556.441522765735488771.shigeru.yoshida@gmail.com>
+To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
+Cc:     pbonzini@redhat.com, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        shigeru.yoshida@gmail.com
+Subject: Re: [PATCH] virtio-blk: Avoid use-after-free on suspend/resume
+From:   Shigeru Yoshida <shigeru.yoshida@gmail.com>
+In-Reply-To: <20220731070951.196831-1-shigeru.yoshida@gmail.com>
+References: <20220731070951.196831-1-shigeru.yoshida@gmail.com>
+X-Mailer: Mew version 6.8 on Emacs 28.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It doesn't make sense for us to retry to compress an uncompressible
-page (comp_len == PAGE_SIZE) in zsmalloc slowpath, because we will
-be storing it uncompressed anyway. We can avoid wasting time on
-another compression attempt. It is enough to take lock
-(zcomp_stream_get) and execute the code below.
+ping?
 
-This patch is made taking into account that commit 
-e7be8d1dd983156bbdd22c0319b71119a8fbb697 is reverted.
-
-Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
----
- drivers/block/zram/zram_drv.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index e0f850ab43aa..f51277a3aeaa 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1411,9 +1411,20 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 		handle = zs_malloc(zram->mem_pool, comp_len,
- 				GFP_NOIO | __GFP_HIGHMEM |
- 				__GFP_MOVABLE);
--		if (!IS_ERR((void *)handle))
-+		if (IS_ERR((void *)handle))
-+			return PTR_ERR((void *)handle);
-+
-+		if (comp_len != PAGE_SIZE)
- 			goto compress_again;
--		return PTR_ERR((void *)handle);
-+
-+		/*
-+		 * If the page is not compressible, you need to acquire the lock and
-+		 * execute the code below. The zcomp_stream_get() call is needed to
-+		 * disable the cpu hotplug and grab the zstrm buffer back.
-+		 * It is necessary that the dereferencing of the zstrm variable below
-+		 * occurs correctly.
-+		 */
-+		zstrm = zcomp_stream_get(zram->comp);
- 	}
- 
- 	alloced_pages = zs_get_total_pages(zram->mem_pool);
--- 
-2.30.2
-
+On Sun, 31 Jul 2022 16:09:51 +0900, Shigeru Yoshida wrote:
+> hctx->user_data is set to vq in virtblk_init_hctx().  However, vq is
+> freed on suspend and reallocated on resume.  So, hctx->user_data is
+> invalid after resume, and it will cause use-after-free accessing which
+> will result in the kernel crash something like below:
+> 
+> [   22.428391] Call Trace:
+> [   22.428899]  <TASK>
+> [   22.429339]  virtqueue_add_split+0x3eb/0x620
+> [   22.430035]  ? __blk_mq_alloc_requests+0x17f/0x2d0
+> [   22.430789]  ? kvm_clock_get_cycles+0x14/0x30
+> [   22.431496]  virtqueue_add_sgs+0xad/0xd0
+> [   22.432108]  virtblk_add_req+0xe8/0x150
+> [   22.432692]  virtio_queue_rqs+0xeb/0x210
+> [   22.433330]  blk_mq_flush_plug_list+0x1b8/0x280
+> [   22.434059]  __blk_flush_plug+0xe1/0x140
+> [   22.434853]  blk_finish_plug+0x20/0x40
+> [   22.435512]  read_pages+0x20a/0x2e0
+> [   22.436063]  ? folio_add_lru+0x62/0xa0
+> [   22.436652]  page_cache_ra_unbounded+0x112/0x160
+> [   22.437365]  filemap_get_pages+0xe1/0x5b0
+> [   22.437964]  ? context_to_sid+0x70/0x100
+> [   22.438580]  ? sidtab_context_to_sid+0x32/0x400
+> [   22.439979]  filemap_read+0xcd/0x3d0
+> [   22.440917]  xfs_file_buffered_read+0x4a/0xc0
+> [   22.441984]  xfs_file_read_iter+0x65/0xd0
+> [   22.442970]  __kernel_read+0x160/0x2e0
+> [   22.443921]  bprm_execve+0x21b/0x640
+> [   22.444809]  do_execveat_common.isra.0+0x1a8/0x220
+> [   22.446008]  __x64_sys_execve+0x2d/0x40
+> [   22.446920]  do_syscall_64+0x37/0x90
+> [   22.447773]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> This patch fixes this issue by getting vq from vblk, and removes
+> virtblk_init_hctx().
+> 
+> Signed-off-by: Shigeru Yoshida <shigeru.yoshida@gmail.com>
+> ---
+>  drivers/block/virtio_blk.c | 24 ++++++++++--------------
+>  1 file changed, 10 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 6fc7850c2b0a..d756423e0059 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -101,6 +101,14 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
+>  	}
+>  }
+>  
+> +static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct virtio_blk *vblk = hctx->queue->queuedata;
+> +	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
+> +
+> +	return vq;
+> +}
+> +
+>  static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
+>  {
+>  	struct scatterlist hdr, status, *sgs[3];
+> @@ -416,7 +424,7 @@ static void virtio_queue_rqs(struct request **rqlist)
+>  	struct request *requeue_list = NULL;
+>  
+>  	rq_list_for_each_safe(rqlist, req, next) {
+> -		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
+> +		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
+>  		bool kick;
+>  
+>  		if (!virtblk_prep_rq_batch(req)) {
+> @@ -837,7 +845,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
+>  static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+>  {
+>  	struct virtio_blk *vblk = hctx->queue->queuedata;
+> -	struct virtio_blk_vq *vq = hctx->driver_data;
+> +	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
+>  	struct virtblk_req *vbr;
+>  	unsigned long flags;
+>  	unsigned int len;
+> @@ -862,22 +870,10 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+>  	return found;
+>  }
+>  
+> -static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+> -			  unsigned int hctx_idx)
+> -{
+> -	struct virtio_blk *vblk = data;
+> -	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
+> -
+> -	WARN_ON(vblk->tag_set.tags[hctx_idx] != hctx->tags);
+> -	hctx->driver_data = vq;
+> -	return 0;
+> -}
+> -
+>  static const struct blk_mq_ops virtio_mq_ops = {
+>  	.queue_rq	= virtio_queue_rq,
+>  	.queue_rqs	= virtio_queue_rqs,
+>  	.commit_rqs	= virtio_commit_rqs,
+> -	.init_hctx	= virtblk_init_hctx,
+>  	.complete	= virtblk_request_done,
+>  	.map_queues	= virtblk_map_queues,
+>  	.poll		= virtblk_poll,
+> -- 
+> 2.37.1
+> 
