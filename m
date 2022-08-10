@@ -2,150 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E018EC00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 16:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 200D8C00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 16:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232051AbiHJQqL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 12:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47640 "EHLO
+        id S229446AbiHJQu3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 12:50:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233075AbiHJQp6 (ORCPT
+        with ESMTP id S232627AbiHJQuQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 12:45:58 -0400
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4254D18E04;
-        Wed, 10 Aug 2022 09:45:48 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 5AA815808B4;
-        Wed, 10 Aug 2022 12:35:55 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Wed, 10 Aug 2022 12:35:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:message-id:mime-version:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1660149355; x=1660152955; bh=a5G2IQ23cL
-        Cu11/Dp61pjDw8jpOTjVuQZnVVwZuO120=; b=E5rcuw1Lzya7Hd9QgncERZJ+DM
-        3erv7Qs5pOlJ3aUk2u5R1Drx14Ej4xg9OFUX7RDcCfNpYFT/me+V7Ihsez/rdFfB
-        +56KLWTrqZBZcsPoDnfBY8reNZ+iyqRghhF7py4WzVd5FHuRo/O+nOH0ZM7uInAs
-        79QkukhEk6Ny3ntzeYWXr7f2B2+h1o0h/SiFTN5ubuJ6yshvbpm3mAA1368E8GLB
-        xEEGHdGJDiL+yfTJ64cNKY7TXY9jWUfGNJYymA5wNTJdMtf58p2Jmp32dclTOSzR
-        igoVEauuJ1Vp8M4cHOlVB19/ThpVOgog8r4iRdsdaHV/JSrby2HfJsjMN9/Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:message-id:mime-version
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1660149355; x=
-        1660152955; bh=a5G2IQ23cLCu11/Dp61pjDw8jpOTjVuQZnVVwZuO120=; b=i
-        QAlnvmltaI0+qqHZDEFRzJWpwhuxxw7oRyzuJbZUTBNRthP/6TGX5EtwfuZp0nFp
-        KLvyN2iz8RWxhBe6hLittmTZXZL2cKVFyQKVgItsCQYXl/dOytlP7qTebCIQP3v8
-        j18DXXOY9Sa9EZGKh/8dd41dPZPMNUDYzhpRVoZwgdfvXLjL6sUgm9mKqEzpUEtU
-        +NWZfGeM+UmLOHUYtRVHhA6jW/G9kvIu/MAyWU/YsUmGHQU4AMF+ruR8lbeeyH5N
-        6ohQGDpy0yjJlZWdBXkHNydNje37EwzzYgkBId7tOlHxt9saKkHo4u2szgHz5ivR
-        xEb22wBUL6ybtSGiGwjkQ==
-X-ME-Sender: <xms:at7zYihx_unb8Y37UslQb4rHWqNmFqyKW6Xqie9-5BQ9TdhFf6BIXQ>
-    <xme:at7zYjA61oOTOvUCq0Ik4EkLyFhQ0Oiqf-im02yPtZcw78osMtmD2Um4Et1SJbTRW
-    wbHLfMmxYt7p6dcyLg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdegvddguddttdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefofgggkfffhffvvefu
-    tgesthdtredtreertdenucfhrhhomhepfdevhhhrihhsucfouhhrphhhhidfuceolhhish
-    htshestgholhhorhhrvghmvgguihgvshdrtghomheqnecuggftrfgrthhtvghrnhepffei
-    gfefgeefleejfedtudelieetfefhtefhteejkefhtdevtdeufeffffdvteelnecuffhomh
-    grihhnpehhthhtphgujhhouhhrnhgrlhgurghuughithgurghnughpohhsthhgrhgvshhq
-    lhdrihhopdhgohhoghhlvgdrtghomhdpkhgvrhhnvghlrdhorhhgpdhkvghrnhgvlhdrug
-    hknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheplhhi
-    shhtshestgholhhorhhrvghmvgguihgvshdrtghomh
-X-ME-Proxy: <xmx:at7zYqE-HtauFBCyQ9yJuM4ehPc1mXFdvQWtu1wf5fF_im_u0VIj4A>
-    <xmx:at7zYrS8dPYG12zhatdeHSkEgAYfo36uF9UmvRoWZ6qLARhaicMLWQ>
-    <xmx:at7zYvzUcRunktnbi1VaVsyMdbCty0n-7JoscqAxHhEsWhTVZNbSkQ>
-    <xmx:a97zYq8FLEaBP3xE5IHCoY-YAJ7q5K6Ngc_M9zmPRtT9l2DrIw77-w>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id C62691700082; Wed, 10 Aug 2022 12:35:54 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-811-gb808317eab-fm-20220801.001-gb808317e
-Mime-Version: 1.0
-Message-Id: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
-Date:   Wed, 10 Aug 2022 12:35:34 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Cc:     "Josef Bacik" <josef@toxicpanda.com>
-Subject: stalling IO regression in linux 5.12
-Content-Type: text/plain
+        Wed, 10 Aug 2022 12:50:16 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1776C44
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 09:50:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1660150212; x=1691686212;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MPhBPhAk4HW37DruWZIta9vgWfqSrvKcKI7Hck6kxrg=;
+  b=d6JdCx+6y7uuh3sdYFqkD9lqEAGRON9dm5JyfQPC607AjVk4JtxuCrtb
+   UiCeUvKGpEw82ZoPXS6IATttswRFm2ul6tYDBqbANoC78Uj2a6aRvFXOH
+   i08xOihd1PVEd5EyrYd2TmyzWuIKkQuL3eeNwpCqoibfT/GiQktuNmjgJ
+   +2/noy6KVUB4MWa0+JhoDi3CtFgc5Cb/9/a5YlCJ92iZ82Y+AAiUChHYR
+   uMjuQke3ObUIPtLU0ZacUN1xy2R3R2VhHl/9y/PZrkg6oFf8bGw3Ucb5D
+   MyZAm3ZjSmqR6KkCKOB7H7jBxlkDr/x1+gDfyvwGEvmSbEpSGM1RiLhrZ
+   A==;
+X-IronPort-AV: E=Sophos;i="5.93,227,1654531200"; 
+   d="scan'208";a="208361419"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Aug 2022 00:50:12 +0800
+IronPort-SDR: nJB7s1NBwmfDZahtYPwq5f/i23o14IRvR7olK9xWosO7Q72xZWhb3UAKFStYeLXulN5tjv+wa9
+ Ut+zMG1xW60uwikyKM2R1vFnJM26lFutBKieWnp0z0KzGFwRu77/dg1MLtK6insS4tUKwT+fyy
+ yviAhVxyJKIBqXmDJGsUOrV0ql7AT1n7/nU6PFoq3G4MH/wOXmDCfPtqR9FEm9t41nAeL5u514
+ snqC7P+3q+LsRkNiYlE0EIq4F/Vi1gh7OKN35sr2c0Zdion/qU5Xm591pXtvQjHtxOVxyGxJRN
+ 7ZC6mExCgopWc21fyu5TgYXO
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Aug 2022 09:05:49 -0700
+IronPort-SDR: TFTRDFal4nJEKkFONXjOk4zpYVjdyWgXU+2FXAK4G+B+h3Y17OOzEx6mSQpqyZQIqPCsox06uy
+ 19KZgJNqKsy4c6yv7me3ld5AdJYwn6ff9u9lYg+8HhFoF2gDJnWg4fsjN6qTgmqCNdnLQIzpI1
+ YAYMtnWxiU0pb7VWZvxbHdeJ8ptWYebsCFx3TDBNmrIv56Kpr46jILQ61TGM4cg6mLmdzpnORD
+ twCjszUo172/Aq30hK3wG4knPf4Ul4zzLAallMz2fKJNH6K+PMz99lXwmjeB2abOYr20nF2NJ9
+ awo=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Aug 2022 09:50:14 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M2wsd4mDpz1Rwry
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 09:50:13 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1660150212; x=1662742213; bh=MPhBPhAk4HW37DruWZIta9vgWfqSrvKcKI7
+        Hck6kxrg=; b=Hus+eB7k8UsnGk3IrIrjCE803v/xkjX6BsuABSkqcW3s0ul8lt0
+        Z/JpUwIzXwz4s1+dDJELUqxf6Kd1b+InfY59QBO9Wj/h2ODDQIsphLl5y8jYrqDe
+        Y+13rfSUz26uDXpAgSZysJQBgAcIpSF60W4xbva8IBIb7JUaAfGbFDIv4KgL2mcE
+        IL4IS1hxRHtu356kOnM0+AxxCNrReglKYk3AtQApx4NvwIdwk3knKGJoFX0xjw+K
+        LNmhTt6/TygfFwH9uAesFy1U9pRnvXMwoJ5apvOALGePuIH9yvYKCNMReClcM9wr
+        1+IhP8ZvTdrEPu+YsIpXAOkKFxaEURpZD3A==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id NSNMfz_HVwX3 for <linux-block@vger.kernel.org>;
+        Wed, 10 Aug 2022 09:50:12 -0700 (PDT)
+Received: from [10.111.68.99] (c02drav6md6t.sdcorp.global.sandisk.com [10.111.68.99])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M2wsb51npz1RtVk;
+        Wed, 10 Aug 2022 09:50:11 -0700 (PDT)
+Message-ID: <700a5080-aea2-1a56-6bac-bebb03be8b47@opensource.wdc.com>
+Date:   Wed, 10 Aug 2022 09:50:11 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [PATCH v9 02/13] block:rearrange
+ bdev_{is_zoned,zone_sectors,get_queue} helpers in blkdev.h
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>, Johannes.Thumshirn@wdc.com,
+        snitzer@kernel.org, axboe@kernel.dk, agk@redhat.com, hch@lst.de
+Cc:     dm-devel@redhat.com, matias.bjorling@wdc.com, gost.dev@samsung.com,
+        linux-kernel@vger.kernel.org, pankydev8@gmail.com,
+        jaegeuk@kernel.org, hare@suse.de, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, bvanassche@acm.org
+References: <20220803094801.177490-1-p.raghav@samsung.com>
+ <CGME20220803094804eucas1p1feea4b1bdae819f4c8750994ddd94803@eucas1p1.samsung.com>
+ <20220803094801.177490-3-p.raghav@samsung.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220803094801.177490-3-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-CPU: Intel E5-2680 v3
-RAM: 128 G
-02:00.0 RAID bus controller [0104]: Broadcom / LSI MegaRAID SAS-3 3108 [Invader] [1000:005d] (rev 02), using megaraid_sas driver
-8 Disks: TOSHIBA AL13SEB600
+On 2022/08/03 2:47, Pankaj Raghav wrote:
+> Define bdev_is_zoned(), bdev_zone_sectors() and bdev_get_queue() earlier
+> in the blkdev.h include file.
+> 
+> This commit has no functional change, and it is a prep patch for allowing
+> zoned devices with non-power-of-2 zone sizes in the block layer.
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> Suggested-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  include/linux/blkdev.h | 48 +++++++++++++++++++++---------------------
+>  1 file changed, 24 insertions(+), 24 deletions(-)
+> 
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index ab82d1ff0cce..22f97427b60b 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -635,6 +635,11 @@ static inline bool queue_is_mq(struct request_queue *q)
+>  	return q->mq_ops;
+>  }
+>  
+> +static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+> +{
+> +	return bdev->bd_queue;	/* this is never NULL */
+> +}
+> +
+>  #ifdef CONFIG_PM
+>  static inline enum rpm_status queue_rpm_status(struct request_queue *q)
+>  {
+> @@ -666,6 +671,25 @@ static inline bool blk_queue_is_zoned(struct request_queue *q)
+>  	}
+>  }
+>  
+> +static inline bool bdev_is_zoned(struct block_device *bdev)
+> +{
+> +	struct request_queue *q = bdev_get_queue(bdev);
+> +
+> +	if (q)
+> +		return blk_queue_is_zoned(q);
+
+As noted with the comment in bdev_get_queue(), q is never null. So this all
+could be simplified to:
+
+	return blk_queue_is_zoned(bdev_get_queue(bdev));
+
+This could be done in a separate patch, or here as well.
+
+> +
+> +	return false;
+> +}
+> +
+> +static inline sector_t bdev_zone_sectors(struct block_device *bdev)
+> +{
+> +	struct request_queue *q = bdev_get_queue(bdev);
+> +
+> +	if (!blk_queue_is_zoned(q))
+> +		return 0;
+> +	return q->limits.chunk_sectors;
+> +}
+> +
+>  #ifdef CONFIG_BLK_DEV_ZONED
+>  static inline unsigned int disk_nr_zones(struct gendisk *disk)
+>  {
+> @@ -892,11 +916,6 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags);
+>  int iocb_bio_iopoll(struct kiocb *kiocb, struct io_comp_batch *iob,
+>  			unsigned int flags);
+>  
+> -static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
+> -{
+> -	return bdev->bd_queue;	/* this is never NULL */
+> -}
+> -
+>  /* Helper to convert BLK_ZONE_ZONE_XXX to its string format XXX */
+>  const char *blk_zone_cond_str(enum blk_zone_cond zone_cond);
+>  
+> @@ -1296,25 +1315,6 @@ static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
+>  	return BLK_ZONED_NONE;
+>  }
+>  
+> -static inline bool bdev_is_zoned(struct block_device *bdev)
+> -{
+> -	struct request_queue *q = bdev_get_queue(bdev);
+> -
+> -	if (q)
+> -		return blk_queue_is_zoned(q);
+> -
+> -	return false;
+> -}
+> -
+> -static inline sector_t bdev_zone_sectors(struct block_device *bdev)
+> -{
+> -	struct request_queue *q = bdev_get_queue(bdev);
+> -
+> -	if (!blk_queue_is_zoned(q))
+> -		return 0;
+> -	return q->limits.chunk_sectors;
+> -}
+> -
+>  static inline int queue_dma_alignment(const struct request_queue *q)
+>  {
+>  	return q ? q->dma_alignment : 511;
 
 
-The problem exhibits as increasing load, increasing IO pressure (PSI), and actual IO goes to zero. It never happens on kernel 5.11 series, and always happens after 5.12-rc1 and persists through 5.18.0. There's a new mix of behaviors with 5.19, I suspect the mm improvements in this series might be masking the problem.
-
-The workload involves openqa, which spins up 30 qemu-kvm instances, and does a bunch of tests, generating quite a lot of writes: qcow2 files, and video in the form of many screenshots, and various log files, for each VM. These VMs are each in their own cgroup. As the problem begins, I see increasing IO pressure, and decreasing IO, for each qemu instance's cgroup, and the cgroups for httpd, journald, auditd, and postgresql. IO pressure goes to nearly ~99% and IO is literally 0.
-
-The problem left unattended to progress will eventually result in a completely unresponsive system, with no kernel messages. It reproduces in the following configurations, the first two I provide links to full dmesg with sysrq+w:
-
-btrfs raid10 (native) on plain partitions [1]
-btrfs single/dup on dmcrypt on mdadm raid 10 and parity raid [2]
-XFS on dmcrypt on mdadm raid10 or parity raid
-
-I've started a bisect, but for some reason I haven't figured out I've started getting compiled kernels that don't boot the hardware. The failure is very early on such that the UUID for the root file system isn't found, but not much to go on as to why.[3] I have tested the first and last skipped commits in the bisect log below, they successfully boot a VM but not the hardware.
-
-Anyway, I'm kinda stuck at this point trying to narrow it down further. Any suggestions? Thanks.
-
-[1] btrfs raid10, plain partitions
-https://drive.google.com/file/d/1-oT3MX-hHYtQqI0F3SpgPjCIDXXTysLU/view?usp=sharing
-
-[2] btrfs single/dup, dmcrypt, mdadm raid10
-https://drive.google.com/file/d/1m_T3YYaEjBKUROz6dHt5_h92ZVRji9FM/view?usp=sharing
-
-[3] 
-$ git bisect log
-git bisect start
-# status: waiting for both good and bad commits
-# bad: [c03c21ba6f4e95e406a1a7b4c34ef334b977c194] Merge tag 'keys-misc-20210126' of git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs
-git bisect bad c03c21ba6f4e95e406a1a7b4c34ef334b977c194
-# status: waiting for good commit(s), bad commit known
-# good: [f40ddce88593482919761f74910f42f4b84c004b] Linux 5.11
-git bisect good f40ddce88593482919761f74910f42f4b84c004b
-# bad: [df24212a493afda0d4de42176bea10d45825e9a0] Merge tag 's390-5.12-1' of git://git.kernel.org/pub/scm/linux/kernel/git/s390/linux
-git bisect bad df24212a493afda0d4de42176bea10d45825e9a0
-# good: [82851fce6107d5a3e66d95aee2ae68860a732703] Merge tag 'arm-dt-v5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/soc/soc
-git bisect good 82851fce6107d5a3e66d95aee2ae68860a732703
-# good: [99f1a5872b706094ece117368170a92c66b2e242] Merge tag 'nfsd-5.12' of git://git.kernel.org/pub/scm/linux/kernel/git/cel/linux
-git bisect good 99f1a5872b706094ece117368170a92c66b2e242
-# bad: [9eef02334505411667a7b51a8f349f8c6c4f3b66] Merge tag 'locking-core-2021-02-17' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
-git bisect bad 9eef02334505411667a7b51a8f349f8c6c4f3b66
-# bad: [9820b4dca0f9c6b7ab8b4307286cdace171b724d] Merge tag 'for-5.12/drivers-2021-02-17' of git://git.kernel.dk/linux-block
-git bisect bad 9820b4dca0f9c6b7ab8b4307286cdace171b724d
-# good: [bd018bbaa58640da786d4289563e71c5ef3938c7] Merge tag 'for-5.12/libata-2021-02-17' of git://git.kernel.dk/linux-block
-git bisect good bd018bbaa58640da786d4289563e71c5ef3938c7
-# skip: [203c018079e13510f913fd0fd426370f4de0fd05] Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.12/drivers
-git bisect skip 203c018079e13510f913fd0fd426370f4de0fd05
-# skip: [49d1ec8573f74ff1e23df1d5092211de46baa236] block: manage bio slab cache by xarray
-git bisect skip 49d1ec8573f74ff1e23df1d5092211de46baa236
-# bad: [73d90386b559d6f4c3c5db5e6bb1b68aae8fd3e7] nvme: cleanup zone information initialization
-git bisect bad 73d90386b559d6f4c3c5db5e6bb1b68aae8fd3e7
-# skip: [71217df39dc67a0aeed83352b0d712b7892036a2] block, bfq: make waker-queue detection more robust
-git bisect skip 71217df39dc67a0aeed83352b0d712b7892036a2
-# bad: [8358c28a5d44bf0223a55a2334086c3707bb4185] block: fix memory leak of bvec
-git bisect bad 8358c28a5d44bf0223a55a2334086c3707bb4185
-# skip: [3a905c37c3510ea6d7cfcdfd0f272ba731286560] block: skip bio_check_eod for partition-remapped bios
-git bisect skip 3a905c37c3510ea6d7cfcdfd0f272ba731286560
-# skip: [3c337690d2ebb7a01fa13bfa59ce4911f358df42] block, bfq: avoid spurious switches to soft_rt of interactive queues
-git bisect skip 3c337690d2ebb7a01fa13bfa59ce4911f358df42
-# skip: [3e1a88ec96259282b9a8b45c3f1fda7a3ff4f6ea] bio: add a helper calculating nr segments to alloc
-git bisect skip 3e1a88ec96259282b9a8b45c3f1fda7a3ff4f6ea
-# skip: [4eb1d689045552eb966ebf25efbc3ce648797d96] blk-crypto: use bio_kmalloc in blk_crypto_clone_bio
-git bisect skip 4eb1d689045552eb966ebf25efbc3ce648797d96
-
-
---
-Chris Murphy
+-- 
+Damien Le Moal
+Western Digital Research
