@@ -2,65 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8355CC00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 05:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B33F6C00140
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 10:06:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230382AbiHJFxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 01:53:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
+        id S229699AbiHJKGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 06:06:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229611AbiHJFxc (ORCPT
+        with ESMTP id S229452AbiHJKGg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 01:53:32 -0400
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A4A85F82
-        for <linux-block@vger.kernel.org>; Tue,  9 Aug 2022 22:53:29 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VLtllU6_1660110789;
-Received: from localhost(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VLtllU6_1660110789)
-          by smtp.aliyun-inc.com;
-          Wed, 10 Aug 2022 13:53:27 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     ming.lei@redhat.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, xiaoguang.wang@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH] ublk_drv: update iod->addr for UBLK_IO_NEED_GET_DATA
-Date:   Wed, 10 Aug 2022 13:52:12 +0800
-Message-Id: <20220810055212.66417-1-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+        Wed, 10 Aug 2022 06:06:36 -0400
+Received: from server.procacorporacion.com (server.procacorporacion.com [147.135.51.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D2A6E888
+        for <linux-block@vger.kernel.org>; Wed, 10 Aug 2022 03:06:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=radiomontehebron.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:Message-ID:From:Date:Subject:To:Sender:Reply-To:Cc:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=pJM5NlUh+EeJ0jQGLGC9VyMRtgTT/rkzVjgGF6DcvSk=; b=GJdOJFkVnjOq9lSO+tDSwJVTy2
+        fwX97jmX9bJOv2DFTm6d8/YF4C1JmwWBqqyahi8+xHU+uarq+6OB+aeV3v13wXlq22d5D9fSq+gYg
+        t39MsYlI3YJ0fog2AXyIaYWByqSjz0HQ13h6dGLeNTNTFcVLMMWhVcLcGzEYsoqfXJfm3bHuTHiiB
+        VdOS+qIQsYtyTav5FeWp0SOTXcgFtuGWqwIYeSq100CmOFg86Mjbi8A5OAGD4mmmbAuS+pAIG+Hzc
+        +O5AMygRvGIyYGM1P7VF/VY8/qhLPgQ5WXTgesBXFAyCcTKF+HGZr+KEGQu5VBxjndUM1K1vfLspT
+        gTEAY9rQ==;
+Received: from wwradiomonteheb by server.procacorporacion.com with local (Exim 4.94.2)
+        (envelope-from <wwradiomonteheb@server.procacorporacion.com>)
+        id 1oLibh-0096bo-SF
+        for linux-block@vger.kernel.org; Wed, 10 Aug 2022 06:06:34 -0400
+To:     linux-block@vger.kernel.org
+Subject: DIE WELTFINANZKRISE KANN SIE REICH MACHEN!
+X-PHP-Script: radiomontehebron.com/index.php for 156.146.63.147
+X-PHP-Originating-Script: 1104:PHPMailer.php
+Date:   Wed, 10 Aug 2022 10:06:33 +0000
+From:   Josephwaple <linux-block@vger.kernel.org>
+Message-ID: <1m84kY71liHTdydFfU8fOjCdQ8ICuK7fsoYAylzcNo@radiomontehebron.com>
+X-Mailer: PHPMailer 6.5.0 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.procacorporacion.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [1104 993] / [47 12]
+X-AntiAbuse: Sender Address Domain - server.procacorporacion.com
+X-Get-Message-Sender-Via: server.procacorporacion.com: authenticated_id: wwradiomonteheb/only user confirmed/virtual account not confirmed
+X-Authenticated-Sender: server.procacorporacion.com: wwradiomonteheb
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: radiomontehebron.com:/public_html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If ublksrv sends UBLK_IO_NEED_GET_DATA with new allocated io buffer, we
-have to update iod->addr in task_work before calling io_uring_cmd_done().
-Then usersapce target can handle (write)io request with the new io
-buffer reading from updated iod.
+Message Body:
+Der Preisverfall von Bitcoin macht Sie zum Millionar https://telegra.ph/Passives-Einkommen-und-7500000-Euro-auf-KryptowГ¤hrung-869263-08-09
 
-Without this change, userspace target may touch a wrong io buffer!
-
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- drivers/block/ublk_drv.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 0b9bd9e02b53..98c345df6896 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -677,6 +677,11 @@ static inline void __ublk_rq_task_work(struct request *req)
- 		 * do the copy work.
- 		 */
- 		io->flags &= ~UBLK_IO_FLAG_NEED_GET_DATA;
-+		/* update iod->addr because ublksrv may have passed a new io buffer */
-+		ublk_get_iod(ubq, req->tag)->addr = io->addr;
-+		pr_devel("%s: update iod->addr: op %d, qid %d tag %d io_flags %x addr %llx\n",
-+				__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
-+				ublk_get_iod(ubq, req->tag)->addr);
- 	}
- 
- 	mapped_bytes = ublk_map_io(ubq, req, io);
--- 
-2.37.1
+--
+This e-mail was sent from a contact form on Company Logo (http://localhost/thinkupthemes_design)
 
