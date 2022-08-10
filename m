@@ -2,95 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B1EC00140
-	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 18:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 896F4C3F6B0
+	for <linux-block@archiver.kernel.org>; Wed, 10 Aug 2022 18:14:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231687AbiHJSIQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 14:08:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45966 "EHLO
+        id S231947AbiHJSOw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Aug 2022 14:14:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231213AbiHJSIQ (ORCPT
+        with ESMTP id S230433AbiHJSOv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 14:08:16 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2296B3AE66;
-        Wed, 10 Aug 2022 11:08:14 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id w14so14904835plp.9;
-        Wed, 10 Aug 2022 11:08:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=WAz9mh0IMcPdbiRN1XIuRByL3cLsDNo1Q7uXhFSH7jI=;
-        b=kycvjobjoL11wFj3wtElhmyJWrZ2B+EF11vjqLiHL5X7z97Ea9AP5xztT3xskAO/7t
-         SxDjw1iVR2ipVYRFF7idyGdkuj71jroXA/lOyvl86ggTjE0Ts6NMzbeQUQ8RzQPfB3WQ
-         Ul1SJUuEjeIfRCPiHrKZIovmwOnSjdNUS0YCHqppzcditcufWvaNYeYcHQYe1QDJzlvd
-         d7IOYYSnRPTSsDgyVH2QP9i9iV+sK7GC/JGvCBqDA9GAkRZeEhxu8AOsW/UJtXoSE0tL
-         MRyxznMA5FOVKIEGm9706quYpHc3/1urwXKfrOVvUu6bI/Ltk3wl5TAPCjqmAaPi1mqp
-         E7Lg==
-X-Gm-Message-State: ACgBeo3sbVefQmjLYpxIggKadMdPkhRTFjqocctUBUFNbyu8N9JFOg8e
-        xrsAVQUgDdGl7RDfw1io/gs=
-X-Google-Smtp-Source: AA6agR5jM/nbSx9z0HeWh1HFzKrkMa4Kzfp81C3UpA7WpcMCn3mLxDqfU0xqc4p9uyEAeY5jej6aDA==
-X-Received: by 2002:a17:903:11c7:b0:171:2818:4cd7 with SMTP id q7-20020a17090311c700b0017128184cd7mr7466175plh.136.1660154893409;
-        Wed, 10 Aug 2022 11:08:13 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:85c9:163f:8564:e41f? ([2620:15c:211:201:85c9:163f:8564:e41f])
-        by smtp.gmail.com with ESMTPSA id n28-20020a056a00213c00b0052b94e757ecsm2283678pfj.213.2022.08.10.11.08.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Aug 2022 11:08:12 -0700 (PDT)
-Message-ID: <8aa0e7a4-265c-21f4-bdb4-57641d15b7b9@acm.org>
-Date:   Wed, 10 Aug 2022 11:08:11 -0700
+        Wed, 10 Aug 2022 14:14:51 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB9275389;
+        Wed, 10 Aug 2022 11:14:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Wdyptz8v1uMMnY9kHa999mGXzTZq4vrNBD6JJO975pY=; b=xQFEJRje+5KYZsm78qd561Znmf
+        3i3ixO5ZS9RypJYMDJuHQ/VVnpJ5ey3altYugRYiy3drQQ8N8HWCpLpIYWlbqfVzPd17sMCFv8Wwo
+        izZECbe0a8Jql4C6P94qRJdH8aY8N50tF0PrsS3hEH0yraNcuryt6RA7MIrca9sLI6bBNLHri/ct+
+        hD/fsxAykUqXjtMYm7VZaDWQ4cLkVx46dpxm6MFZVzdxi7+jwbFNo7V4A92mrI60xAa/OVKRt9EIC
+        6P0AKidp0kYcs/a41sR1v+oma/Psnh5Y+5+x3BmIcUuS1ji2YRWet1IOUaTKtvIIqlC5nj2vjjyys
+        wMWXbB2A==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oLqE0-00De0o-Nx; Wed, 10 Aug 2022 18:14:36 +0000
+Date:   Wed, 10 Aug 2022 11:14:36 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        casey@schaufler-ca.com, paul@paul-moore.com, joshi.k@samsung.com,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     linux-security-module@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        a.manzanares@samsung.com, javier@javigon.com
+Subject: Re: [PATCH v2] lsm,io_uring: add LSM hooks for the new uring_cmd
+ file op
+Message-ID: <YvP1jK/J4m8TE8BZ@bombadil.infradead.org>
+References: <20220715191622.2310436-1-mcgrof@kernel.org>
+ <a56d191e-a3a3-76b9-6ca3-782803d2600c@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: fs/zonefs/./trace.h:22:1: sparse: sparse: cast to restricted
- blk_opf_t
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Johannes Thumshirn <jth@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-References: <202208061533.YBqXyzHm-lkp@intel.com>
- <affa6eee-3b7c-105a-8f4a-35f1ed81f0cd@opensource.wdc.com>
- <b3a6b038-ba0c-2242-3a29-5bcadcaa9d71@acm.org>
- <24b7e027-e098-269b-ccf7-b14deb499c33@opensource.wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <24b7e027-e098-269b-ccf7-b14deb499c33@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a56d191e-a3a3-76b9-6ca3-782803d2600c@kernel.dk>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/22 07:36, Damien Le Moal wrote:
-> On 2022/08/08 8:37, Bart Van Assche wrote:
->> Thanks for having taken a look. Please help with verifying whether the
->> following patch is sufficient to fix the reported warning: "[PATCH]
->> tracing: Suppress sparse warnings triggered by is_signed_type()"
->> (https://lore.kernel.org/all/20220717151047.19220-1-bvanassche@acm.org/).
+On Fri, Jul 15, 2022 at 01:28:35PM -0600, Jens Axboe wrote:
+> On 7/15/22 1:16 PM, Luis Chamberlain wrote:
+> > io-uring cmd support was added through ee692a21e9bf ("fs,io_uring:
+> > add infrastructure for uring-cmd"), this extended the struct
+> > file_operations to allow a new command which each subsystem can use
+> > to enable command passthrough. Add an LSM specific for the command
+> > passthrough which enables LSMs to inspect the command details.
+> > 
+> > This was discussed long ago without no clear pointer for something
+> > conclusive, so this enables LSMs to at least reject this new file
+> > operation.
 > 
-> With the current Linus tree, I do not see this sparse warning. However, applying
-> the above patch, "make M=fs/zonefs C=1" generates a lot of warnings:
+> From an io_uring perspective, this looks fine to me. It may be easier if
+> I take this through my tree due to the moving of the files, or the
+> security side can do it but it'd have to then wait for merge window (and
+> post io_uring branch merge) to do so. Just let me know. If done outside
+> of my tree, feel free to add:
+> 
+> Acked-by: Jens Axboe <axboe@kernel.dk>
 
-That doesn't make sense to me. My patch reduces the number of sparse 
-warnings that are reported.
+Paul, Casey, Jens,
 
-> make -j64 M=fs/zonefs C=1
->    CC [M]  fs/zonefs/super.o
->    CC [M]  fs/zonefs/sysfs.o
->    CHECK   fs/zonefs/sysfs.c
->    CHECK   fs/zonefs/super.c
-> fs/zonefs/sysfs.c: note: in included file (through include/linux/bitops.h,
-> include/linux/kernel.h, arch/x86/include/asm/percpu.h,
-> arch/x86/include/asm/preempt.h, include/linux/preempt.h,
-> include/linux/spinlock.h, ...):
-> ./arch/x86/include/asm/bitops.h:66:1: warning: unreplaced symbol 'return'
+should this be picked up now that we're one week into the merge window?
 
-I think that you are hitting a bug in sparse. See also 
-https://lore.kernel.org/all/e91d351c-3c16-e48d-7e9d-9f096c4acbc9@debian.org/T/. 
-I also see the above warnings if I use the sparse binary from Debian 
-testing. I do not see these sparse warnings if I download the sparse 
-source code and compile that source code myself.
-
-Bart.
+  Luis
