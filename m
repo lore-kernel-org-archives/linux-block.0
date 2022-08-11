@@ -2,178 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D0DC19F2A
-	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 13:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E3BC25B07
+	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 14:05:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234258AbiHKNRx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Aug 2022 09:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59180 "EHLO
+        id S234914AbiHKOFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Aug 2022 10:05:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234050AbiHKNRw (ORCPT
+        with ESMTP id S235614AbiHKOFg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Aug 2022 09:17:52 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7857C1A7
-        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 06:17:51 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220811131750euoutp012e6d562b637be0a39cde7b59331961ef~KTNBlNzsJ0550205502euoutp01g
-        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 13:17:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220811131750euoutp012e6d562b637be0a39cde7b59331961ef~KTNBlNzsJ0550205502euoutp01g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1660223870;
-        bh=Vun+gxn/6GGUdv/MRPXNdrbElNQFCuft36lThciOU28=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=O4xsWJm4cyq/4Yh0kN11fAjkgj2cpSM80dFLSBVBOmoH2STNgkj2OPqTg8iAx4FJF
-         l9dpnOldbBRSZjldGISht50wjzAusMdLbEjOcqpp+FfoKGNU0sexa4LuKrinANrVWT
-         JOQhMSV5f/BFc6lCfZceV3BjdlgZebPN6h0hqHcc=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220811131750eucas1p198d4a2f1cdb759f30a96e801edc14992~KTNBNGQux1197711977eucas1p1s;
-        Thu, 11 Aug 2022 13:17:50 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 2E.91.10067.E7105F26; Thu, 11
-        Aug 2022 14:17:50 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220811131749eucas1p2456bbf8f8a2538b9ecf9f5be0092b643~KTNA0jRaH1732617326eucas1p2I;
-        Thu, 11 Aug 2022 13:17:49 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220811131749eusmtrp1716c41bc4995b31c4e4725050f35189a~KTNAzmNiZ0860708607eusmtrp14;
-        Thu, 11 Aug 2022 13:17:49 +0000 (GMT)
-X-AuditID: cbfec7f4-dd7ff70000002753-ba-62f5017e867f
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id E4.A4.09038.D7105F26; Thu, 11
-        Aug 2022 14:17:49 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220811131749eusmtip1985b7f25892c387e44680c1d52d0068c~KTNAppwLl1773117731eusmtip1y;
-        Thu, 11 Aug 2022 13:17:49 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.43) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Thu, 11 Aug 2022 14:17:47 +0100
-Message-ID: <f3ec55d3-f1fe-1875-f8e7-f7c46d89b065@samsung.com>
-Date:   Thu, 11 Aug 2022 15:17:46 +0200
+        Thu, 11 Aug 2022 10:05:36 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFCA27CE1
+        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 07:05:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=eNVCBqUqn8SFOfBc/qsyONTEJOmB7aKbelzMUwsw9NI=; b=YLk5zhnM4QVq/Lvx+QZ5lzJDfY
+        jUXY19MHtdR0yowliSqrBqP/+6C4CbPHbAfLYJrg/9eSqXxxNUvtkvjwVg4EMgHzQ5iunEDhHIiKn
+        pA2Rq/9+N8atAUkeXqixmOQ1yXT+WkX55EM1KuGyoteAQOKsRCF0Jm4Fs9IrLIa2OpyXa6NhgEJAH
+        IJi4MGKNqDjDDf0o4bZ35OQ6+w8otGfF1JgwGGkbcS4a/8l4e/cDWZkCqESr9GjTP6Bj29yfCDTeR
+        pTnMuyN4to0alGtrr4RepPwrF9pO5/Dj5C3HHNJrcnlvQJM0x380HYClM8qYXOoa3oZjA+YcTvVWP
+        WmTArSGA==;
+Received: from [2001:4bb8:182:2eeb:8088:4912:c90b:f14d] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oM8oP-00D2Qy-EV; Thu, 11 Aug 2022 14:05:25 +0000
+Date:   Thu, 11 Aug 2022 16:05:25 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.0
+Message-ID: <YvUMpS5PxgJSykCB@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-Subject: Re: [PATCH v9 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        <Johannes.Thumshirn@wdc.com>, <snitzer@kernel.org>,
-        <axboe@kernel.dk>, <agk@redhat.com>, <hch@lst.de>
-CC:     <dm-devel@redhat.com>, <matias.bjorling@wdc.com>,
-        <gost.dev@samsung.com>, <linux-kernel@vger.kernel.org>,
-        <pankydev8@gmail.com>, <jaegeuk@kernel.org>, <hare@suse.de>,
-        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <bvanassche@acm.org>, Damien Le Moal <damien.lemoal@wdc.com>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <b73143fd-107d-177d-d647-f17a32b9423e@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.43]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCKsWRmVeSWpSXmKPExsWy7djPc7p1jF+TDG5MYbdYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
-        PWW3mND2ldlizc2nLBYnbkk7CHhcvuLtsXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j52t91k9
-        3u+7ChQ6Xe3xeZOcR/uBbqYA7igum5TUnMyy1CJ9uwSujCcb57EWvBKsOHBEtoFxH08XIyeH
-        hICJxITrn9m6GLk4hARWMEq0HrwG5XxhlNi2+Cg7hPOZUeLS3kmMMC0zfi5jhUgsZ5T4dXM+
-        G1xV76UzUM4uRok3fVeZQVp4BewkJh+/ywJiswioSjQ0z2eFiAtKnJz5BCwuKhApsWb3WaB9
-        HBzCAlkSL5/KgISZBcQlbj2ZzwQyU0RgAaPE6wWNYKuZBTYwSXz8384C0sAmoCXR2MkO0sAp
-        4CYx7ed2JohmTYnW7b/ZIWx5ie1v5zCDlEsIKElsnMAP8U2txNpjZ8DelBB4xSlx5OFZdoiE
-        i8Sz1zvZIGxhiVfHt0DFZSROT+5hgbCrJZ7e+M0M0dzCKNG/cz0bxAJrib4zORA1jhILT/ey
-        Q4T5JG68FYQ4h09i0rbpzBMYVWchhcQsJC/PQvLBLCQfLGBkWcUonlpanJueWmyUl1quV5yY
-        W1yal66XnJ+7iRGYEE//O/5lB+PyVx/1DjEycTAeYpTgYFYS4S1b9DlJiDclsbIqtSg/vqg0
-        J7X4EKM0B4uSOG9y5oZEIYH0xJLU7NTUgtQimCwTB6dUA1NX/kPnfwXv2oyrF7ldvhs758xj
-        hs6555Zmcsae9zmWY/XRw+DeMoWrZillB//kSbd94XyqqZ2mFlTPekWGpWbe2n3tgsGWZ4TY
-        J3TOdJnwx1Jrx5XijjsTbgr2tW03Pabftrxi4i6hgqiiDLUJlavar1f95/kza+viFUsWNiWu
-        erZM7G6u0kWhydV1emffbH0Rvbv006Smtmk+hXxTV3xi2+Qp9/d2ZXLY086PdWWHN1VX7dBd
-        vWZ359wXBT3bp6utUUv4MK08znQun2qDq4Lu9p1u988fYMiXPtIUmvWyaf6GR8Z7cx9ICWx/
-        JhBYsfTENYNJP3LjzC5J7lo2zTCaTZXJWntVssa21ENTn6sosRRnJBpqMRcVJwIAK5QPuvcD
-        AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJKsWRmVeSWpSXmKPExsVy+t/xu7q1jF+TDN690rBYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
-        PWW3mND2ldlizc2nLBYnbkk7CHhcvuLtsXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j52t91k9
-        3u+7ChQ6Xe3xeZOcR/uBbqYA7ig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NYKyNT
-        JX07m5TUnMyy1CJ9uwS9jCcb57EWvBKsOHBEtoFxH08XIyeHhICJxIyfy1i7GLk4hASWMkp0
-        nLzEApGQkfh05SM7hC0s8edaFxtE0UdGidVH1jBBOLsYJbZM7mMGqeIVsJOYfPwuWDeLgKpE
-        Q/N8Voi4oMTJmU/A4qICkRIPlzUxgdjCAlkS635OAYszC4hL3HoyH2yoiMACRonXCxrBbmIW
-        2MAkcXryTTaQKiGBP4wSk+9rdzFycLAJaEk0doKdxyngJjHt53YmiEGaEq3bf7ND2PIS29/O
-        YQYplxBQktg4gR/im1qJV/d3M05gFJ2F5LxZSM6YhWTSLCSTFjCyrGIUSS0tzk3PLTbSK07M
-        LS7NS9dLzs/dxAhMI9uO/dyyg3Hlq496hxiZOBgPMUpwMCuJ8JYt+pwkxJuSWFmVWpQfX1Sa
-        k1p8iNEUGEYTmaVEk/OBiSyvJN7QzMDU0MTM0sDU0sxYSZzXs6AjUUggPbEkNTs1tSC1CKaP
-        iYNTqoEpq2F2332RUgvfr/IOz9tf/nnptPtgm3t/QNwJ0WsdEi2m/C8jMisvsga8uHjKKrJJ
-        bpPOggnnj/UtXV5Vbm2r37/3+w4R8Wf7Fzp8/b6epy0y+c3E6BnSaxqMK748lHskE7xM+PV9
-        dnumjjsi75a9mPTNvMv6OHf4E+0n2SwCDq9mukTMOnNCN2penCn7hh+Tfmw7HF/cdq9TqnrO
-        ZfWpYYVPQ64q8DgsvbW06XucUNzvlGMGDA0FUwtSnxq7OjcvPrJmi9zxuT7MglFbfvxe//B8
-        R1Vc42XFVDMtxQXTDc5wMprwxK38P7Vi1dmrezYUuucqxPVV+63iLmVLKrFaPZvTnVfnQ5KO
-        +VkvhelKLMUZiYZazEXFiQDruVpsrAMAAA==
-X-CMS-MailID: 20220811131749eucas1p2456bbf8f8a2538b9ecf9f5be0092b643
-X-Msg-Generator: CA
-X-RootMTR: 20220803094816eucas1p1890ceb4faebaf4f0cdbc9581d1308672
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220803094816eucas1p1890ceb4faebaf4f0cdbc9581d1308672
-References: <20220803094801.177490-1-p.raghav@samsung.com>
-        <CGME20220803094816eucas1p1890ceb4faebaf4f0cdbc9581d1308672@eucas1p1.samsung.com>
-        <20220803094801.177490-14-p.raghav@samsung.com>
-        <b73143fd-107d-177d-d647-f17a32b9423e@opensource.wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The following changes since commit fa9db655d0e112c108fe838809608caf759bdf5e:
 
->> +==========
->> +dm-po2zone
->> +==========
->> +The dm-po2zone device mapper target exposes a zoned block device with a
->> +non-power-of-2(npo2) zone number of sectors as a power-of-2(po2) zone number
-> 
-> s/zone number of sectors/number of sectors per zone (zone size)
-> 
->> +of sectors.
->> +The filesystems that support zoned block devices such as F2FS and BTRFS
->> +assume po2 zone size sectors as the kernel has traditionally only supported
->> +those devices. However, as the kernel now supports zoned block devices with
->> +npo2 zone size sectors, the dm-po2zone target can be used by the filesystems
->> +before adding native support.
-> 
-> filesystems will not "use" the target. The user has to set up the target first
-> and the filesystem will run on top of it. Detail, but rewording this make it
-> clear that this is not an automatic thing magically happening.
-> 
-> Not that your patch series is lacking f2fs and btrfs patches to check for the
-> power of 2 zone size of the zoned device. Unless these checks are already in place ?
-> 
-btrfs already had these checks in place and f2fs patch to allow only po2
-zone size was already merged by Jaegeuk.
+  Merge tag 'for-5.20/block-2022-08-04' of git://git.kernel.dk/linux-block (2022-08-04 20:00:14 -0700)
 
-7f262f737502 ("f2fs: ensure only power of 2 zone sizes are allowed")
->> +
->> +Partial mapping of the underlying device is not supported by this target.
->> +
->> +Algorithm
->> +=========
->> +The device mapper target maps the underlying device's zone size to the
->> +zone capacity and changes the zone size to the nearest po2 number of sectors.
->> +The gap between the zone capacity and the zone size is emulated in the target.
->> +E.g., a zoned block device with a zone size (and capacity) of 3M will have an
->> +equivalent target layout with mapping as follows:
->> +
->> +::
->> +
->> +  0M           3M  4M        6M 8M
->> +  |             |  |          |  |
->> +  +x------------+--+x---------+--+x-------  Target
->> +  |x            |  |x         |  |x
->> +   x               x             x
->> +   x               x             x
->> +   x              x             x
->> +   x             x             x
->> +  |x            |x            |x
->> +  +x------------+x------------+x----------  Device
->> +  |             |             |
->> +  0M           3M            6M
->> +
+are available in the Git repository at:
+
+  git://git.infradead.org/nvme.git tags/nvme-6.0-2022-08-11
+
+for you to fetch changes up to f37527a09dac324c74bb341c841096395a2f2566:
+
+  nvme-pci: add NVME_QUIRK_BOGUS_NID for ADATA XPG GAMMIX S70 (2022-08-11 14:10:16 +0200)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.0
+
+ - print nvme connect Linux error codes properly (Amit Engel)
+ - fix the fc_appid_store return value (Christoph Hellwig)
+ - fix a typo in an error message (Christophe JAILLET)
+ - add another non-unique identifier quirk (Dennis P. Kliem)
+ - check if the queue is allocated before stopping it in nvme-tcp
+   (Maurizio Lombardi)
+ - restart admin queue if the caller needs to restart queue in nvme-fc
+   (Ming Lei)
+ - use kmemdup instead of kmalloc + memcpy in nvme-auth (Zhang Xiaoxu)
+
+----------------------------------------------------------------
+Amit Engel (1):
+      nvme-fabrics: parse nvme connect Linux error codes
+
+Christoph Hellwig (1):
+      nvme-fc: fix the fc_appid_store return value
+
+Christophe JAILLET (1):
+      nvme-fabrics: Fix a typo in an error message
+
+Dennis P. Kliem (1):
+      nvme-pci: add NVME_QUIRK_BOGUS_NID for ADATA XPG GAMMIX S70
+
+Maurizio Lombardi (1):
+      nvme-tcp: check if the queue is allocated before stopping it
+
+Ming Lei (1):
+      nvme-fc: restart admin queue if the caller needs to restart queue
+
+Zhang Xiaoxu (1):
+      nvmet-auth: use kmemdup instead of kmalloc + memcpy
+
+ drivers/nvme/host/fabrics.c            | 8 +++++++-
+ drivers/nvme/host/fc.c                 | 5 ++++-
+ drivers/nvme/host/pci.c                | 2 ++
+ drivers/nvme/host/tcp.c                | 3 +++
+ drivers/nvme/target/fabrics-cmd-auth.c | 4 ++--
+ 5 files changed, 18 insertions(+), 4 deletions(-)
