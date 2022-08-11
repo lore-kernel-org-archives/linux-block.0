@@ -2,173 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55116C19F2A
-	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 11:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA30C19F2A
+	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 11:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234998AbiHKLdf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Aug 2022 07:33:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35588 "EHLO
+        id S231250AbiHKLkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Aug 2022 07:40:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234452AbiHKLdD (ORCPT
+        with ESMTP id S235081AbiHKLkf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Aug 2022 07:33:03 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6676E96756;
-        Thu, 11 Aug 2022 04:32:44 -0700 (PDT)
-Received: from localhost.localdomain.localdomain (unknown [10.2.5.46])
-        by mail.loongson.cn (Coremail) with SMTP id AQAAf9BxHOTS6PRizJQNAA--.37999S2;
-        Thu, 11 Aug 2022 19:32:41 +0800 (CST)
-From:   Hongchen Zhang <zhanghongchen@loongson.cn>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hongchen Zhang <zhanghongchen@loongson.cn>
-Subject: [PATCH] blk-wbt: do not throttle swap write on processes other than kswapd
-Date:   Thu, 11 Aug 2022 19:32:25 +0800
-Message-Id: <1660217545-10697-1-git-send-email-zhanghongchen@loongson.cn>
-X-Mailer: git-send-email 1.8.3.1
-X-CM-TRANSID: AQAAf9BxHOTS6PRizJQNAA--.37999S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3Ww4rtw47KF15Ar4fJw4xZwb_yoW3ZF15pr
-        yUC340gw48JrnrAa4UAF1UZF4UJ34UCF4DJr1UJF1jvr1kXr1UXw17trW5Jw1DZr18Jry3
-        Jr1ktr1rtr48u3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUk214x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVCm-wCF04k2
-        0xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI
-        8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41l
-        IxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
-        AIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
-        z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfU5WlkUUUUU
-X-CM-SenderInfo: x2kd0w5krqwupkhqwqxorr0wxvrqhubq/
+        Thu, 11 Aug 2022 07:40:35 -0400
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E39A826ACC;
+        Thu, 11 Aug 2022 04:40:32 -0700 (PDT)
+Received: by mail-qv1-f41.google.com with SMTP id u8so13123271qvv.1;
+        Thu, 11 Aug 2022 04:40:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=m1vcPRXZY9358VOf0RRIxm3up9W1D3tTJDEWIQmiED4=;
+        b=1/sBDk78UW0lwBlCan1Dv9POw9QYtg9W2UBdB8AKissjD1LgvbjmrtWWjO0SHj+7qt
+         4VJWSizCrSCrP0SmrhyACk2q4sE1RUx1BCFSqHps6OIuF8TX7cueG3CZtAut8TZOQjwj
+         xtITyrPhD5GdGhBUJS0VuLdpCKfUMZdhTsBtOQC6UZAPAr0h70w/w8ZOE6qEohDVuX7l
+         cH1yNj/qyQCobF+bUfa2iGtXx0SIvDMdSNT1fsF2o/xmLH8gfXwnQw7Y3q15ACKTok0D
+         tspJbaUpsud/1KssVq7HjDO4j2xfH2zqF9pPsH9Lcxbj4x804yF1GZZyl90vNljKL2ZK
+         VxjQ==
+X-Gm-Message-State: ACgBeo3L1SodWqrTg5iuJKCpijW5pCrDA4StWcxCSPCsI7QP8+elnY20
+        0K0GP2ruYllPJYQIhbS9neLPL9JzRlGLFgns
+X-Google-Smtp-Source: AA6agR6oRlk1uiesoaFZA3edh3bms6Om4cT4gnHFWPI5ricPnE64PPK4tfKtOTNvdYcqdaWb9uKR1w==
+X-Received: by 2002:ad4:5cc3:0:b0:474:8dda:dfb6 with SMTP id iu3-20020ad45cc3000000b004748ddadfb6mr27828751qvb.82.1660218031840;
+        Thu, 11 Aug 2022 04:40:31 -0700 (PDT)
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com. [209.85.128.177])
+        by smtp.gmail.com with ESMTPSA id fz19-20020a05622a5a9300b00342fbe7f3a2sm1494718qtb.70.2022.08.11.04.40.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Aug 2022 04:40:30 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-32269d60830so169903817b3.2;
+        Thu, 11 Aug 2022 04:40:30 -0700 (PDT)
+X-Received: by 2002:a81:f47:0:b0:31f:434b:5ee with SMTP id 68-20020a810f47000000b0031f434b05eemr32968546ywp.383.1660218029924;
+ Thu, 11 Aug 2022 04:40:29 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220726045747.4779-1-schmitzmic@gmail.com> <20220726045747.4779-3-schmitzmic@gmail.com>
+ <Yt/TQOJQZEhZE+2p@infradead.org>
+In-Reply-To: <Yt/TQOJQZEhZE+2p@infradead.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Thu, 11 Aug 2022 13:40:18 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWW1=kXC14H6iUFF61sMOnsbfXodKS=mpdNbCtvgvjqKA@mail.gmail.com>
+Message-ID: <CAMuHMdWW1=kXC14H6iUFF61sMOnsbfXodKS=mpdNbCtvgvjqKA@mail.gmail.com>
+Subject: Re: [PATCH v8 2/2] block: add overflow checks for Amiga partition support
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Michael Schmitz <schmitzmic@gmail.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Linux/m68k" <linux-m68k@vger.kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When we do ltp test using large swap,we get the following error:
-[34196.558224] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[34196.566010] float_exp_log   D    0 16985  16971 0x00004000
-[34196.571462] Stack : 900000010a33bdd8 0000000000027100 900000027417d680 900000010dfc3778
-[34196.579421]         006200ca00000054 0000000000000004 000000fff424c000 9000000276ba8060
-[34196.587378]         0000000000000002 90000000014bdfa0 0000000000000000 9000000276ba8000
-[34196.595358]         900000010da17dd0 9000000276ba8068 9000000276ba8060 0000000000000002
-[34196.603313]         900000010dfc3778 9000000000c1df80 ffffffffffffffff 9000000000c2170c
-[34196.611269]         0000000000000001 900000010a33bdc0 900000010a177dd0 900000010da17dd0
-[34196.619224]         900000010a692d80 000000ff00000001 9000000276ba8060 900000010a33bea0
-[34196.627180]         900000010a692d80 000000fff424ce04 9000000276ba8060 9000000000c20b3c
-[34196.635135]         0000000000000070 9000000000c23a24 000000000000003a fffffffffffffffb
-[34196.643090]         000000fff365c8b0 000000fff365e8f0 0000000128259020 0000000128259130
-[34196.651045]         ...
-[34196.653469] Call Trace:
-[34196.655902] [<9000000000c1d7ac>] __schedule+0x4b4/0xc5c
-[34196.661094] [<9000000000c1df7c>] schedule+0x28/0x7c
-[34196.665940] [<9000000000c21708>] rwsem_down_read_failed+0xfc/0x164
-[34196.672082] [<9000000000c20b38>] down_read+0x50/0x58
-[34196.677013] [<9000000000c23a20>] do_page_fault+0xf4/0x58c
-[34196.682380] [<9000000000218220>] tlb_do_page_fault_0+0x110/0x128
-		...
-		...
-[34198.279088] Sending NMI from CPU 2 to CPUs 0-1,3:
-[34198.283761] NMI backtrace for cpu 1
-[34198.283763] NMI backtrace for cpu 3
-[34198.283764] NMI backtrace for cpu 0
-[34198.283767] CPU: 3 PID: 940 Comm: Xorg Not tainted 4.19.190+ #1
-[34198.283769] CPU: 0 PID: 1555 Comm: genload Not tainted 4.19.190+ #1
-[34198.283770] Hardware name: Loongson LM-LS3A5000-7A1000-1w-V01-pc_A2101/LM-LS3A5000-7A1000-1w-V01-pc_A2101, BIOS KL.4.1H.LM.D.028.220624.R 06/24/2022
-[34198.283770] $ 0   : 0000000000000000 90000000002465a4 9000000270e4c000 9000000270e4f220
-[34198.283773] $ 4   : 0000000000000001 0000000002f41000 900000026a8b1d40 9000000270e4f158
-[34198.283775] $ 8   : 0000000000000040 900000010aa9e798 0000000000000a00 00000000000000e1
-[34198.283776] $12   : 00000000000000b0 0000000000000004 0000000000000020 9000000276b66480
-[34198.283778] $16   : 900000000600ebf0 000000000000000b 0000000000002523 9000000000c30e30
-[34198.283780] $20   : 00000000eac0c6e6 90000000014485b8 9000000000fdff00 0000000000000000
-[34198.283781] $24   : 900000026d317840 fffffffffffffff5 0000000000000040 900000027d0fbe00
-[34198.283783] $28   : 0000000000000000 0000000000000001 90000000010ceb10 0000000000000000
-[34198.283789] era   : 90000000002465bc mod_delayed_work_on+0x84/0xac
-[34198.283790] ra    : 90000000002465a4 mod_delayed_work_on+0x6c/0xac
-[34198.283791] CSR crmd: 00000040
-[34198.283791] CSR prmd: 00000004
-[34198.283792] CSR ecfg: 00071fff
-[34198.283793] CSR estat: 9000000000fdff00
-[34198.283793] CSR euen: 900000026d317840
-[34198.283795] ExcCode : 3d (SubCode 3)
-[34198.283796] PrId  : 0014c011 (Loongson-64bit)
-[34198.283797] CPU: 0 PID: 1555 Comm: genload Not tainted 4.19.190+ #1
-[34198.283798] Hardware name: Loongson LM-LS3A5000-7A1000-1w-V01-pc_A2101/LM-LS3A5000-7A1000-1w-V01-pc_A2101, BIOS KL.4.1H.LM.D.028.220624.R 06/24/2022
-[34198.283799] Stack : 0000000000000000 9000000000c16888 9000000270e4c000 900000027c167df0
-[34198.283800]         0000000000000000 900000027c167df0 0000000000000000 900000000149d310
-[34198.283802]         0000000000000040 90000000014a7f80 0000000000000000 0000000000000088
-[34198.283804]         9000000000c16888 0000000000000007 0000000000000006 0000000000000007
-[34198.283805]         9000000006000768 000002cccd7c4b02 3032322e3832302e 363020522e343236
-[34198.283807]         00000000000003f3 0000000004bc4000 9000000000fdff00 ffff800000000000
-[34198.283808]         90000000010bb500 0000000000000000 0000000000000000 9000000000204f54
-[34198.283809]         9000000000ea53c0 0000000000000001 90000000010ceb10 0000000000000000
-[34198.283811]         9000000000209628 000000fff6cb38e8 00000000000000b0 0000000000000004
-[34198.283812]         0000000000000000 0000000000071fff 0000000000000000 90000000010bb500
-[34198.283814]         ...
-[34198.283815] Call Trace:
-[34198.283817] [<9000000000209628>] show_stack+0x34/0x13c
-[34198.283820] [<9000000000c16884>] dump_stack+0x98/0xd0
-[34198.283822] [<9000000000bfe430>] nmi_cpu_backtrace+0xe0/0xe8
-[34198.283823] [<9000000000204f68>] handle_backtrace+0x14/0x48
-[34198.283827] [<90000000002d8524>] flush_smp_call_function_queue+0xac/0x194
-[34198.283829] [<900000000020255c>] loongson3_ipi_interrupt+0xd4/0xec
-[34198.283831] [<90000000002034f0>] except_vec_vi_handler+0xac/0xdc
-[34198.283833] [<90000000002465bc>] mod_delayed_work_on+0x84/0xac
-[34198.283837] [<90000000006c3e74>] kblockd_mod_delayed_work_on+0x24/0x34
-[34198.283841] [<90000000006d4d88>] blk_mq_run_hw_queue+0xb0/0x128
-[34198.283843] [<90000000006d7a80>] blk_mq_flush_plug_list+0x178/0x29c
-[34198.283846] [<90000000006c9884>] blk_flush_plug_list+0xf0/0x298
-[34198.283848] [<900000000025d1bc>] io_schedule_prepare+0x40/0x58
-[34198.283850] [<9000000000c1e4fc>] io_schedule+0x14/0x40
-[34198.283853] [<9000000000704dc0>] wbt_wait+0x1b0/0x374
-[34198.283856] [<90000000006ebb30>] rq_qos_throttle+0x44/0x68
-[34198.283858] [<90000000006d7100>] blk_mq_make_request+0xd8/0x580
-[34198.283860] [<90000000006c74d4>] generic_make_request+0x11c/0x330
-[34198.283862] [<90000000006c77f8>] submit_bio+0x110/0x180
-[34198.283865] [<90000000003faa04>] __swap_writepage+0x174/0x434
-[34198.283868] [<90000000003b73cc>] pageout.isra.10+0x144/0x3d8
-[34198.283870] [<90000000003b9918>] shrink_page_list+0x7a8/0xe94
-[34198.283871] [<90000000003ba984>] shrink_inactive_list+0x248/0x70c
-[34198.283873] [<90000000003bb5bc>] shrink_node_memcg+0x1fc/0x748
-[34198.283874] [<90000000003bbbdc>] shrink_node+0xd4/0x4b8
-[34198.283875] [<90000000003bc0a8>] do_try_to_free_pages+0xe8/0x3c0
-[34198.283877] [<90000000003bc45c>] try_to_free_pages+0xdc/0x23c
-[34198.283880] [<90000000003a5c7c>] __alloc_pages_nodemask+0x5bc/0xffc
-[34198.283883] [<900000000040e314>] alloc_pages_vma+0x98/0x274
-[34198.283886] [<90000000003e5698>] __handle_mm_fault+0xd3c/0x14f0
-[34198.283887] [<90000000003e5f48>] handle_mm_fault+0xfc/0x248
-[34198.283889] [<9000000000c23a78>] do_page_fault+0x14c/0x58c
-[34198.283890] [<9000000000218348>] tlb_do_page_fault_1+0x110/0x128
+Hi Christoph,
 
-and we find out that it is because the __swap_writepage consumed too much
-time,so I think when call __swap_writepage to reclaim memory,it should
-complete ASAP.
+On Tue, Jul 26, 2022 at 1:43 PM Christoph Hellwig <hch@infradead.org> wrote:
+> On Tue, Jul 26, 2022 at 04:57:47PM +1200, Michael Schmitz wrote:
+> > The Amiga partition parser module uses signed int for partition sector
+> > address and count, which will overflow for disks larger than 1 TB.
+> >
+> > Use u64 as type for sector address and size to allow using disks up to
+> > 2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
+> > format allows to specify disk sizes up to 2^128 bytes (though native
+> > OS limitations reduce this somewhat, to max 2^68 bytes), so check for
+> > u64 overflow carefully to protect against overflowing sector_t.
+> >
+> > Bail out if sector addresses overflow 32 bits on kernels without LBD
+> > support.
+> >
+> > This bug was reported originally in 2012, and the fix was created by
+> > the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
+> > discussed and reviewed on linux-m68k at that time but never officially
+> > submitted (now resubmitted as separate patch).
+> > This patch adds additional error checking and warning messages.
+> >
+> > Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
+> > Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
+> > Message-ID: <201206192146.09327.Martin@lichtvoll.de>
+> > Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
+> > Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-For the above case,we should not do write back throttle when a process other
-than kswapd is writing data to swap,because it may be reclaiming memory.
+> > --- a/block/partitions/amiga.c
+> > +++ b/block/partitions/amiga.c
 
-Signed-off-by: Hongchen Zhang <zhanghongchen@loongson.cn>
----
- block/blk-wbt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> >               if (!data) {
+> > -                     pr_err("Dev %s: unable to read RDB block %d\n",
+> > -                            state->disk->disk_name, blk);
+> > +                     pr_err("Dev %s: unable to read RDB block %llu\n",
+> > +                            state->disk->disk_name, (u64) blk);
+>
+> No need for the various printk casts, a sector_t is always an
+> unsigned long long.
 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index a998200..d6323d0 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -554,7 +554,9 @@ static enum wbt_flags bio_to_wbt_flags(struct rq_wb *rwb, struct bio *bio)
- 			flags |= WBT_KSWAPD;
- 		if (bio_op(bio) == REQ_OP_DISCARD)
- 			flags |= WBT_DISCARD;
--		flags |= WBT_TRACKED;
-+		if (current_is_kswapd() ||
-+		    (bio->bi_end_io != end_swap_bio_write))
-+			flags |= WBT_TRACKED;
- 	}
- 	return flags;
- }
--- 
-1.8.3.1
+That is true, as of commit 72deb455b5ec619f
+("block: remove CONFIG_LBDAF") in v5.2.
+Since 4.9, 4.14, and 4.19 are still receiving stable updates, the
+cast should be re-added when this is backported.
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
