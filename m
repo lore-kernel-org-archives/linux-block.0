@@ -2,99 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F12C25B06
-	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 23:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F59C25B06
+	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 23:26:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236405AbiHKXEG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Aug 2022 19:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
+        id S235268AbiHKX0D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Aug 2022 19:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234601AbiHKXEF (ORCPT
+        with ESMTP id S235176AbiHKX0B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Aug 2022 19:04:05 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D6FB6E2FC
-        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 16:04:04 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id 17so18150981plj.10
-        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 16:04:04 -0700 (PDT)
+        Thu, 11 Aug 2022 19:26:01 -0400
+Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0598F941;
+        Thu, 11 Aug 2022 16:25:59 -0700 (PDT)
+Received: by mail-vk1-xa31.google.com with SMTP id q14so9678913vke.9;
+        Thu, 11 Aug 2022 16:25:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=XV3d3jsQUJYVJchztvaIBQqSUAMrrh69qI/8EtCuYe4=;
-        b=tAYpw4CDkWc6eiIf/KCP+KBGnVlg8ib0fvqDt5ayrPmOQ3UDOO3arWXihLT3hSbZKj
-         1pdlYcKzB+T4+SasFbEJMHOq/hP4vIojAIE07EA0aHkak71KSWZBqg5GapGWPMtJLR+T
-         GWQhqJ6aYuIolDRFFAQSA5ibYCoyfDyxmshgkCAZsT/x/Gq39TTr0V8mlZWHQNlKK+bo
-         VtX3WQYPMJWzrLJmDLGqRrEz1l878YJIcYf9Aei5WQqWVRInY6G8UDjqe/rXnqPky2As
-         vI59jAUyB/EIs2MwGoH2eStvS3NW2P0nzF4GRBOzPfpXoAezr8zzT3N5KjemNsHcQkk4
-         GAXg==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=Z/3c/f13BD6UjeEAmo6vUxRREzPPnc4YEqQv9afkgVc=;
+        b=Uy1/Wa7qyoxj3+x2u6VOkfR8q0VrissUQtRsubf7kkTf5Ntq+WSwaWFhexoWFqM/w+
+         rTDTiGJZdXD7RmYSnXxOhiLh9IHQVAWPCjKVChjiwsdudtbmYW8e3mu2ENVHAx+Dd7kG
+         ttimuBSd0PUZ/QrvMew8T/L4Y9dhnP3p5zhATaeGmg80capBbIF8ZBuSWxg0EFwcv98v
+         EbfJ69V0yvixc7tq9YZ91FuTPSk0/TH+3Nt+4lUc68HUq8jZnDubLOHMn34SuwhvIri8
+         UoX8bpTIsv0rtE4cPpXsNGxzMDBzeb+GUB8ewB53izYeVOZsrvLHiR8puT1GUYoCV0tq
+         raFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=XV3d3jsQUJYVJchztvaIBQqSUAMrrh69qI/8EtCuYe4=;
-        b=h/uX+p0+UEhTi6br+BG07s/EO+rJsu7G1CYT1SjmVtUzv0he2lGOgVB/pPR21UMSud
-         TXUfSrd5+Xjc15owgy8BLncGkLaQM8qQJoLMRSSGR9lb55mZk3CzeF7XkCTFXNScUwEZ
-         iUeTJ8ZBuhcdUgDmVpd087cN3IlW61k+nxYQ5bGsoak2GhTtlZZOXBCZnCL+MmQktka4
-         hgO08/0NueiYJVCoHaiu6jv4fdv0HKyv59mmzp617or+imYVk7VzdnF6rGwlyV5zGGmF
-         QmihHDqLIw02SdCC6AXAcLRmTgRQ2TjI4jd5meBOIr3EJrD6XFZmPbRFfQpTq3QBf6Tp
-         YZBQ==
-X-Gm-Message-State: ACgBeo2LWLFiNNSBlqiOr/mK2b6o7hFYr/plEmYV0xe35I529q1Gu2K+
-        AhEu4w+CHoP+fidH3nSHvikg9w==
-X-Google-Smtp-Source: AA6agR7c5ZybC8xsrpjrvhBO6n0LEHYhEqXt4UG2OAj9R+Pf2rUxq/CaSStiRwn5gSOKfUmkZxXwJA==
-X-Received: by 2002:a17:90a:b00b:b0:1f1:6023:dacd with SMTP id x11-20020a17090ab00b00b001f16023dacdmr10643291pjq.184.1660259043795;
-        Thu, 11 Aug 2022 16:04:03 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w186-20020a627bc3000000b005289ef6db79sm232168pfc.32.2022.08.11.16.04.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Aug 2022 16:04:03 -0700 (PDT)
-Message-ID: <05cfb9dc-c740-5764-35f9-b5636e0577cb@kernel.dk>
-Date:   Thu, 11 Aug 2022 17:04:01 -0600
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=Z/3c/f13BD6UjeEAmo6vUxRREzPPnc4YEqQv9afkgVc=;
+        b=giCM5syvNmi7gMoMj/Pasp0s76bfDbIezqNzltolY8XB8eLWjGhmeZa5uXSZQkqPJ+
+         Fk5zm1arc36PVMqgSwXhYRg2EUbtyyATefq7dcZ5YTmO75mqcQmbyrDho3E8kR9DYDk5
+         DJksY96WDXhS2fQ+75QOMP/42DeUmvgFOAn1O0KwdXdQG1cgPfyHQ5n3e9c3P4uMtUfW
+         eKyb5m7xY1RpasffM8xqIdUfxPqxLOzSr3Hb6J0/HpwvMm/yuCr37Cv3kxVWPG1easT9
+         iwgB4re7lqZ4y4wyZt9LelIQdHjH4kiatQ7V1Vrxm0olPCs0ljMP+O/2jMqTZ7pI/Ijc
+         hYVw==
+X-Gm-Message-State: ACgBeo0hUC2ZgzrOZhQMGeqhprJ1VHLTv5ChUnE5Ef8IkM/k6ihwYu82
+        t95ldfqquSFHPpGGfA+kIis=
+X-Google-Smtp-Source: AA6agR7Xd9nIhNp3jx0UJrnrQCfSISfHh2FtRwIg12f5DR7H9eKiurWK8PGYvxm2WkQz5IWt/8gg0Q==
+X-Received: by 2002:a1f:c117:0:b0:377:855a:4e9f with SMTP id r23-20020a1fc117000000b00377855a4e9fmr825613vkf.16.1660260357229;
+        Thu, 11 Aug 2022 16:25:57 -0700 (PDT)
+Received: from macondo.. ([2804:431:e7cc:d33f:249:c106:90c1:7b7f])
+        by smtp.gmail.com with ESMTPSA id g128-20020a1f2086000000b00375ecb78541sm502816vkg.12.2022.08.11.16.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Aug 2022 16:25:56 -0700 (PDT)
+From:   Rafael Mendonca <rafaelmendsr@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.de>
+Cc:     Rafael Mendonca <rafaelmendsr@gmail.com>,
+        syzbot+31c9594f6e43b9289b25@syzkaller.appspotmail.com,
+        Hillf Danton <hdanton@sina.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] block: Do not call blk_put_queue() if gendisk allocation fails
+Date:   Thu, 11 Aug 2022 20:23:37 -0300
+Message-Id: <20220811232338.254673-1-rafaelmendsr@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2] virtio-blk: Avoid use-after-free on suspend/resume
-Content-Language: en-US
-To:     Shigeru Yoshida <syoshida@redhat.com>, mst@redhat.com,
-        jasowang@redhat.com
-Cc:     pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        suwan.kim027@gmail.com
-References: <20220810160948.959781-1-syoshida@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220810160948.959781-1-syoshida@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/10/22 10:09 AM, Shigeru Yoshida wrote:
-> +static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
-> +{
-> +	struct virtio_blk *vblk = hctx->queue->queuedata;
-> +	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-> +
-> +	return vq;
-> +}
+Commit 6f8191fdf41d ("block: simplify disk shutdown") removed the call
+to blk_get_queue() during gendisk allocation but missed to remove the
+corresponding cleanup code blk_put_queue() for it. Thus, if the gendisk
+allocation fails, the request_queue refcount gets decremented and
+reaches 0, causing blk_mq_release() to be called with a hctx still
+alive. That triggers a WARNING report, as found by syzkaller:
 
-Would probably be cleaner as:
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 23016 at block/blk-mq.c:3881
+blk_mq_release+0xf8/0x3e0 block/blk-mq.c:3881
+[...] stripped
+RIP: 0010:blk_mq_release+0xf8/0x3e0 block/blk-mq.c:3881
+[...] stripped
+Call Trace:
+ <TASK>
+ blk_release_queue+0x153/0x270 block/blk-sysfs.c:780
+ kobject_cleanup lib/kobject.c:673 [inline]
+ kobject_release lib/kobject.c:704 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:721
+ __alloc_disk_node+0x4f7/0x610 block/genhd.c:1388
+ __blk_mq_alloc_disk+0x13b/0x1f0 block/blk-mq.c:3961
+ loop_add+0x3e2/0xaf0 drivers/block/loop.c:1978
+ loop_control_ioctl+0x133/0x620 drivers/block/loop.c:2150
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+[...] stripped
 
-static struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
-{
-	struct virtio_blk *vblk = hctx->queue->queuedata;
+Fixes: 6f8191fdf41d ("block: simplify disk shutdown")
+Reported-by: syzbot+31c9594f6e43b9289b25@syzkaller.appspotmail.com
+Suggested-by: Hillf Danton <hdanton@sina.com>
+Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
+---
+ block/genhd.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-	return &vblk->vqs[hctx->queue_num];
-}
-
-dropping the 'vq' variable, and also dropping the inline as the compiler
-will work that out anyway.
-
-Apart from that minor nit, looks good to me.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index b901fea1d55a..d36fabf0abc1 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1341,7 +1341,7 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
+ 
+ 	disk = kzalloc_node(sizeof(struct gendisk), GFP_KERNEL, node_id);
+ 	if (!disk)
+-		goto out_put_queue;
++		return NULL;
+ 
+ 	if (bioset_init(&disk->bio_split, BIO_POOL_SIZE, 0, 0))
+ 		goto out_free_disk;
+@@ -1390,8 +1390,6 @@ struct gendisk *__alloc_disk_node(struct request_queue *q, int node_id,
+ 	bioset_exit(&disk->bio_split);
+ out_free_disk:
+ 	kfree(disk);
+-out_put_queue:
+-	blk_put_queue(q);
+ 	return NULL;
+ }
+ 
 -- 
-Jens Axboe
+2.34.1
 
