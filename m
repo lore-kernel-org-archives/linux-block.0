@@ -2,131 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC24C00140
-	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 02:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C5BC25B0C
+	for <linux-block@archiver.kernel.org>; Thu, 11 Aug 2022 07:22:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233760AbiHKCYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Aug 2022 22:24:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45708 "EHLO
+        id S234113AbiHKHWh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Aug 2022 03:22:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233762AbiHKCYK (ORCPT
+        with ESMTP id S233535AbiHKHWg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Aug 2022 22:24:10 -0400
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEFB88DD9;
-        Wed, 10 Aug 2022 19:24:09 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 8083458082C;
-        Wed, 10 Aug 2022 22:24:08 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Wed, 10 Aug 2022 22:24:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660184648; x=
-        1660188248; bh=AByR1PJmDpTE0uFhsvdMKLFIvf9aRNuqEd1rQGv8pEc=; b=n
-        iwO99PQMqU1llLMD3SbZLGQAlp5d46lxCl6P2eGLuoRW7IWjqJRmcWhTjk6szpaA
-        DMhXFV3uoXXvNJiK6b6470MvPBcbnuJ1kW3aQFbhLPrMrQRhIKvHwhxVJuMsqApM
-        yfzm/bgaxNa1fI1KpkSIOjW1M3ooMi6nOo8kgH2CdTaqPKfMA1FIGLF+8JFkv9q7
-        J+RnQenlemrPiS/NTbIIOWhf7K3Q+IBYVxodQbSs9fzfGxCHbttNJo72TOnruxF1
-        MBGkQggMGODk7QZ/Zmt6Wf019XT2fszzIG7o0yknL45NXHD88U3p0OUcbWAZuenJ
-        s5trEinJlokUSiJzixKhQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660184648; x=1660188248; bh=AByR1PJmDpTE0uFhsvdMKLFIvf9a
-        RNuqEd1rQGv8pEc=; b=iMR01sRaRayHalljSLJIMUIAFCIg/69a3swUzHKrGyUD
-        rnEL19jK/1pOv5BZ8cCYXZ7zY+3vWkXuDo2mWB2/I7xIf/zCRP2TYpr+lTnSC3sl
-        7qjXb5TCI0cbsDuolACeyPg45VA2whdUFGzTLdQbp9poZoK47S7TUlApxHK7tO35
-        bJZaO7IWwVWE6qTcbG0FyVqfwhy7MUiV1AZOJ6H5QdPwdB47OHnLEuhGtpfsggBD
-        xOuiJP+lX/L1KKgJlUhL8tV509z09iUvHwjOA1vdlsLGJRjkeaJLKaRp43C6CFLw
-        fA3aXdZPOniSJJ0W2D18PWaZ3GLvA+kn7hbzqydINA==
-X-ME-Sender: <xms:SGj0Yl5nLBYWVdLJdk0x0el7mL6mNYeIIJQq2nqCBliUb4z4HIf1qA>
-    <xme:SGj0Yi6TZGzWOXCDeQLNbPzhcbbZ0oHDF-Ty4CRPGJHCQcmEvMzwH0rsxvfpN6QGq
-    _l-Rt51D2WzMcSObCw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdegfedgheelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdevhhhr
-    ihhsucfouhhrphhhhidfuceolhhishhtshestgholhhorhhrvghmvgguihgvshdrtghomh
-    eqnecuggftrfgrthhtvghrnhepuefftdffheekudeludefledvkefhgfeuleeuudetudeh
-    veetleeiveekjedttdfhnecuffhomhgrihhnpehrvgguhhgrthdrtghomhdpkhgvrhhnvg
-    hlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
-    mheplhhishhtshestgholhhorhhrvghmvgguihgvshdrtghomh
-X-ME-Proxy: <xmx:SGj0YsdW1gwbx1MHdyAr4z_pH-AR-lWwtAYyoutH59q2-05mmnoaDg>
-    <xmx:SGj0YuIokd9Jj2z3ekapzcS9StXlS7NXP4yrJZWeK2D2Q6mmMGVt1w>
-    <xmx:SGj0YpI4JYQ4wZq0gdPIMemjPOvzDayl5M0jonkvDzQDOhhrthGXfQ>
-    <xmx:SGj0YrzllhMerE3r4hCBOdwBE8IsNKrA2A7GksPi6232PKMnONWKtw>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 2ECE21700082; Wed, 10 Aug 2022 22:24:08 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-811-gb808317eab-fm-20220801.001-gb808317e
-Mime-Version: 1.0
-Message-Id: <20fffbb6-fec5-476f-8d8a-471f14572a0c@www.fastmail.com>
-In-Reply-To: <073b7d19-b02b-cbfc-9b61-dbacbf08ed93@gmx.com>
-References: <f7c14f0f-56e5-4748-a3f7-d44bc635b020@www.fastmail.com>
- <073b7d19-b02b-cbfc-9b61-dbacbf08ed93@gmx.com>
-Date:   Wed, 10 Aug 2022 22:21:31 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Qu Wenruo" <quwenruo.btrfs@gmx.com>,
-        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: 5.19.0: dnf install hangs when system is under load
-Content-Type: text/plain
+        Thu, 11 Aug 2022 03:22:36 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7A289CF4;
+        Thu, 11 Aug 2022 00:22:36 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 5F78068AA6; Thu, 11 Aug 2022 09:22:32 +0200 (CEST)
+Date:   Thu, 11 Aug 2022 09:22:32 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@fb.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>
+Subject: Re: [PATCHv3 0/7] dma mapping optimisations
+Message-ID: <20220811072232.GA13803@lst.de>
+References: <20220805162444.3985535-1-kbusch@fb.com> <20220809064613.GA9040@lst.de> <YvKPTGf56v/3iSxg@kbusch-mbp.dhcp.thefacebook.com> <20220809184137.GB15107@lst.de> <YvPzUSx87VkwSH2C@kbusch-mbp.dhcp.thefacebook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YvPzUSx87VkwSH2C@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Aug 10, 2022 at 12:05:05PM -0600, Keith Busch wrote:
+> The functions are implemented under 'include/linux/', indistinguishable from
+> exported APIs. I think I understand why they are there, but they look the same
+> as exported functions from a driver perspective.
 
+swiotlb.h is not a driver API.  There's two leftovers used by the drm
+code I'm trying to get fixed up, but in general the DMA API is the
+interface and swiotlb is just an implementation detail.
 
-On Wed, Aug 10, 2022, at 9:32 PM, Qu Wenruo wrote:
-> On 2022/8/11 00:19, Chris Murphy wrote:
->> Downstream bug - 5.19.0: dnf install hangs when system is under load
->> https://bugzilla.redhat.com/show_bug.cgi?id=2117326
->>
->> 5.19.0-65.fc37.x86_64
->>
->> Setup
->> btrfs raid10 on 8x plain partitions
->>
->> Command
->> sudo dnf install pciutils
->>
->> Reproducible:
->> About 1 in 3, correlates with the system being under heavy load, otherwise it's not happening
->>
->> Get stuck at
->> Running scriptlet: sg3_utils-1.46-3.fc36.x86_64   2/2
->>
->> ps aux status for dnf is D+, kill -9 does nothing, strace shows nothing. The hang last at least 10 minutes, didn't test beyond that.
->>
->> Full dmesg with sysrq+w is attached to the bug report.
->>
->> snippet
->>
->> [ 2268.057017] sysrq: Show Blocked State
->> [ 2268.057866] task:kworker/u97:11  state:D stack:    0 pid:  340 ppid:     2 flags:0x00004000
->> [ 2268.058361] Workqueue: writeback wb_workfn (flush-btrfs-1)
->> [ 2268.058825] Call Trace:
->> [ 2268.059261]  <TASK>
->> [ 2268.059692]  __schedule+0x335/0x1240
->> [ 2268.060145]  ? __blk_mq_sched_dispatch_requests+0xe0/0x130
->> [ 2268.060611]  schedule+0x4e/0xb0
->> [ 2268.061059]  io_schedule+0x42/0x70
->> [ 2268.061473]  blk_mq_get_tag+0x10c/0x290
->
-> All the hanging processes are waiting at blk_mq_get_tag(), thus I'm not
-> sure if it's really btrfs, or something in the block layer.
->
-> Adding block layer guys into the thread.
+> Perhaps I'm being daft, but I'm totally missing why I should care if swiotlb
+> leverages this feature. If you're using that, you've traded performance for
+> security or compatibility already. If this idea can be used to make it perform
+> better, then great, but that shouldn't be the reason to hold this up IMO.
 
-OK so it might just be the same problem I reported in this thread, which first appeared in the 5.12 merge window. The weird thing is, the 5.19 kernel is staying up for *days* unlike 5.12 through 5.18, except under heavy load I run dnf and then only dnf hangs.
+We firstly need to make sure that everything actually works on swiotlb, or
+any other implementation that properly implements the DMA API.
 
+And the fact that I/O performance currently sucks and we can fix it on
+the trusted hypervisor is an important consideration.  At least as
+importantant as micro-optimizing performance a little more on setups
+not using them.  So not taking care of both in one go seems rather silly
+for a feature that is in its current form pretty intrusive and thus needs
+a really good justification.
 
-https://lore.kernel.org/linux-btrfs/ad78a32c-7790-4e21-be9f-81c5848a4953@www.fastmail.com/T/#t
+> This optimization needs to be easy to reach if we expect anyone to use it.
+> Working with arbitrary user addresses with minimal additions to the user ABI
+> was deliberate. If you want a special allocator, we can always add one later;
+> this series doesn't affect that.
+> 
+> If this has potential to starve system resource though, I can constrain it to
+> specific users like CAP_SYS_ADMIN, or maybe only memory allocated from
+> hugetlbfs. Or perhaps a more complicated scheme of shuffling dma mapping
+> resources on demand if that is an improvement over the status quo.
 
--- 
-Chris Murphy
+Or just not bother with it at all.  Because with all those limits it
+really does not seems to be worth to an entirely need type of bio
+payload to the block layer and a lot of boilerplate to drivers.
