@@ -2,163 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBEBCC00140
-	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 08:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9C7C00140
+	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 09:31:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231447AbiHLIkH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Aug 2022 04:40:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49622 "EHLO
+        id S237707AbiHLJbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Aug 2022 05:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237246AbiHLIjz (ORCPT
+        with ESMTP id S232153AbiHLJbe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Aug 2022 04:39:55 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48D4EA8943
-        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 01:39:54 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d10so201238plr.6
-        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 01:39:54 -0700 (PDT)
+        Fri, 12 Aug 2022 05:31:34 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1105A11467
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 02:31:33 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id b6so309405wmq.5
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 02:31:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=0mUv/OIwNOgxr+AJ4heRTowHTjoovZ9rJeO39JRdzHw=;
-        b=VB83/M+Y1sA7CDYIIhOnldF01NWx2UVGgdgUGtJkC/d841QVGlYW10n4El6AptnGyd
-         6yUMuU60QfcGR51HWnMfZwXjoLJktV4WGrJ2v6IMFYmX80qc0csZDVYvpJ3UzCztXqPb
-         OvjEYni5Oiv403aW7AsqJ8/IADSD0Aigap1W5bsjjpfOiX37lYqdchX5YGOewOHEtmAg
-         a+SMtVxdP+XYijRV03ZBUyFxRqml98TU9hSdKpinUTAGeCqbbDOKH+RjdODPtCOqL1L9
-         CHCqUL2myzY4OWqrxqfq9+oz52FV4TLlFkuuEhW1GvjY0O4iFiJ8FvH5XJsVASTMjEit
-         3jBg==
+        d=linaro.org; s=google;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc;
+        bh=J8tlT7YO8qB4sKSoN7y2Ao83eWRyyP4+ue99CI5WF2c=;
+        b=Mj1bqzrYJljq9jpWElDlhgRYBpwuM895f5L3urP7d/Yhb1lJB3+WMCVOOP9snIQ1I1
+         fRCJup6PrtoMIQP/p00dYKrbZJJoo6WkeMr99arp0WsK7VrBLBPakclpx59hcC41PgvA
+         aY1eFPkMQOS9iuFf1ZX5mU/Ij4iN88zKqQVQoqrWjWbEMNcMsBR54Me6rIqsLOrjPIpC
+         s96hxaM0fsy3mEiSnrwRGQDZUCU19iAmQz1o/TyjTc1G5QcjDZK08kRxb/Iaf1ZPW7xC
+         9EJG7WLxxtLuTBZRs1vw1eKCyyAFSa/XrvCGN50dE6Fb1GHVE0zCcF9cfaDoEjECrRkl
+         dePw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=0mUv/OIwNOgxr+AJ4heRTowHTjoovZ9rJeO39JRdzHw=;
-        b=jnvCO2sZ6gM80JDtbAHWwnp8dR3/ILo/9s8W/N2mAme4d8s7g1PQFcZ/u9EcCScSRa
-         JtUyPoyHCfyT46LL7ImEZX5YBsW/HVqhj9KkDrXPnZLaYJNvXv8XydJ0BT4UmM9N4ypJ
-         YWUmyZq3/eC341EX1C/GxegNddj/ZZOTtjMJIVaMdG6io36G7msQUE5xA/GSaAcPrpNw
-         x7TzmanBywctXaSgN2VKriPxkwiXsNUEBMpQLGiQb3I2W1Gz3sJ1lwtVIUQ20eljqj+s
-         Hvy21dI7SfDOcCjFb5PPOonUipJ3HX6VMTPv2+TzjV77JmBK+vZ2pVSLVn3p5pZ7tmVj
-         66Pg==
-X-Gm-Message-State: ACgBeo0RD/zZ3dr6eN8XgJiEKRayse+HVyR0qkXQPQo/Y+iZTjRxons9
-        NUWW6QQA3tqlsIwIafcs+fhOyw==
-X-Google-Smtp-Source: AA6agR5JCZ0P5SLwlydBxzbVzuLE6/hH+PDfT82O/NI4bMajbGhU/hB6meTTkeWLycLO9ypB79ApTw==
-X-Received: by 2002:a17:903:120e:b0:16f:2e9:8c41 with SMTP id l14-20020a170903120e00b0016f02e98c41mr3065259plh.55.1660293593800;
-        Fri, 12 Aug 2022 01:39:53 -0700 (PDT)
-Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.230])
-        by smtp.gmail.com with ESMTPSA id k15-20020a170902c40f00b0016dd6929af5sm1109119plk.206.2022.08.12.01.39.51
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc;
+        bh=J8tlT7YO8qB4sKSoN7y2Ao83eWRyyP4+ue99CI5WF2c=;
+        b=E23gGb4FJM9k3nDlati47MSIeAApA4ZBBhzLSGq2iHEyBlTAz4AR5vC13Ez+Xe+NO3
+         u8p2kS03+N9Avq0OoFe0U7IUb/YOmo6iTLcokdRxKFLVwD28A2Gwt5UX4irUpQptH1Q7
+         XjLVPTaU/ZKVfsjlhVMBvNTpxrLFmh3h9fTgq9QGAPHg8pvYxREI+8Ijc7/sES0YMOW3
+         HGkoKP5XVbhiUrGH3plpwqXUnLI2N/s1s4JPqOpm9O7SQ0XnvdgHcCqOaCLDKAyjjCGR
+         uffbh9mDF2fgQJZrmx7yOt4iFhyuzHz096d/jk6XIdxwPnKgzhkGaE3tOyL7bg6XwB5H
+         rYYA==
+X-Gm-Message-State: ACgBeo0D8EOEpZwNkuJ1rEah+EptYIiqrJ2e+BGfh1S+u4lKVXUR0Cwe
+        wf0xq/ycZLW23pHSRlonN0Gaky1mx6q7vw==
+X-Google-Smtp-Source: AA6agR4svBtdz0KcIJWb67jGlv7KKb+EtZMjysnq9ybCXnrYz2Uujk60Mq4F0rOTL7+QP5Mjb+BzxA==
+X-Received: by 2002:a05:600c:1c28:b0:3a5:3e18:3e with SMTP id j40-20020a05600c1c2800b003a53e18003emr8021062wms.203.1660296680528;
+        Fri, 12 Aug 2022 02:31:20 -0700 (PDT)
+Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id o36-20020a05600c512400b003a5317f07b4sm10016930wms.37.2022.08.12.02.31.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Aug 2022 01:39:53 -0700 (PDT)
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH] blk-mq: move bio merge attempt to blk_mq_submit_bio()
-Date:   Fri, 12 Aug 2022 16:39:44 +0800
-Message-Id: <20220812083944.79616-1-zhouchengming@bytedance.com>
-X-Mailer: git-send-email 2.35.1
+        Fri, 12 Aug 2022 02:31:20 -0700 (PDT)
+Date:   Fri, 12 Aug 2022 10:31:18 +0100
+From:   Lee Jones <lee.jones@linaro.org>
+To:     "zhangwensheng (E)" <zhangwensheng@huaweicloud.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Lee Jones <lee@kernel.org>
+Subject: Re: Question: consult patch
+Message-ID: <YvYd5hG0RFK4uf6L@google.com>
+References: <420a6c4a-e526-4e8b-d5bd-563c40aa94e1@huaweicloud.com>
+ <YvXo1uCFA57t89Nv@infradead.org>
+ <902a45fe-1117-3f6a-b7b1-9b155e5dd984@huaweicloud.com>
+ <YvYAmmaJgvydex4p@google.com>
+ <f179ff36-e511-1bad-078f-71b8b19d404e@huaweicloud.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <f179ff36-e511-1bad-078f-71b8b19d404e@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We will try to get request from cache before alloc request, in
-both cases will first attempt bio merge.
+> thank you very much!
 
-This patch move this common part to blk_mq_submit_bio(), which
-simplify the code and avoid passing in the pointer of bio.
+Please refrain from top-posting.
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-mq.c | 32 ++++++++++++--------------------
- 1 file changed, 12 insertions(+), 20 deletions(-)
+> 在 2022/8/12 15:26, Lee Jones 写道:
+> > On Fri, 12 Aug 2022, zhangwensheng (E) wrote:
+> > 
+> > > Hi
+> > > 
+> > > In CVE list last week, there is a new cve reported in asop 4.14 like below:
+> > > Reference link: https://lore.kernel.org/all/CAODzB9rgMexvLjE=WuTm+SN8SfUggaZgWG-aBcy6cotppju6mw@mail.gmail.com/T/
+> > > 
+> > > ---
+> > > CVE-2022-20158: mm: backing-dev: Take a reference to the bdi in use to
+> > > prevent UAF
+> > > 
+> > > CVSS v3 score is not assigned.
+> > > 
+> > > AOSP kernel 4.14 contains following 2 patches.
+> > > - 69e8f03c5ced3e4e6fb4181f4dac185104e3420b ("mm: backing-dev: Take a
+> > > reference to the bdi in use to prevent UAF")
+> > > - 80d91b86a199798ee2321a0ab0f09e6e12764678 ("fs: explicitly unregister
+> > > per-superblock BDIs")
+> > > 
+> > > The first commit 69e8f03("mm: backing-dev: Take a reference to the bdi
+> > > in use to prevent UAF") is not merged in the mainline and stable
+> > > kernels.
+> > > Commit 80d91b8 was merged in 5.16-rc1(commit hash is
+> > > 0b3ea0926afb8dde70cfab00316ae0a70b93a7cc) which requires commit
+> > > c6fd3ac ("mm: export bdi_unregister") that exports symbol of
+> > > bdi_unregister().
+> > > 
+> > > Fixed status
+> > > mainline: [0b3ea0926afb8dde70cfab00316ae0a70b93a7cc]
+> > > ---
+> > > 
+> > > As mentioned above, patch 69e8f03c5ced ("mm: backing-dev: Take a
+> > > reference to the bdi in use to prevent UAF") in asop 4.14 can fix
+> > > a null dereference problem, form my analysis, may like below:
+> > > 
+> > > blk_cleanup_queue
+> > >      blk_put_queue
+> > >          kobject_put(&q->kobj)
+> > >                  blk_release_queue
+> > >                      blk_exit_queue
+> > >                          bdi_put
+> > >                              release_bdi  // bdi -> null
+> > > del_gendisk
+> > >      bdi_unregister(disk->queue->backing_dev_info) // null -> reference
+> > > 
+> > >  From my analysis, In asop 4.14 kernel, in loop_remove function, there is
+> > > such a timing that executing "blk_cleanup_queue" first and then
+> > > "del_gendisk".
+> > > but because of the refcnt of queue will add by hte line
+> > > "WARN_ON_ONCE(!blk_get_queue(disk->queue));" in "device_add_disk", which may
+> > > not result in "bdi_put" releasing bdi  in "blk_cleanup_queue".
+> > > 
+> > > I'm not sure where the problem is, so I want to ask Lee Jones who sent this
+> > > patch
+> > > for clarification.
+> > > 
+> > > Thanks!
+> > > 
+> > > Wensheng
+> > > 
+> > > 在 2022/8/12 13:44, Christoph Hellwig 写道:
+> > > > On Fri, Aug 12, 2022 at 11:34:59AM +0800, zhangwensheng (E) wrote:
+> > > > > Hi Lee ：
+> > > > >       I saw your patch because of CVE-2022-20158, the patch like below:
+> > > > > 
+> > > > > ---
+> > > > >       mm: backing-dev: Take a reference to the bdi in use to prevent UAF
+> > > > I can't see that patch anywhere, and I've not seen an bug report for it.
+> > > > 
+> > > > >       Because of a distinct lack of locking and/or reference taking,
+> > > > >       blk_cleanup_queue() puts the final taken reference to the bdi, which
+> > > > .. and blk_cleanup_queue also is gone upstream.
+> > > > 
+> > > > What am I missing?
+> > The issue reported in the aforementioned CVE was caused by a commit
+> > which was applied to an internal, device specific repository.  One
+> > that has never existed in Mainline.  I failed to reproduce the KASAN
+> > report in any upstream or stable tree without the offending patch
+> > applied.  The issue was fixed in all affected internal trees.
+> 
+> I'm sorry I didn't fully understand you. did you mean the CVE
+> was caused by a commit which was applied to an internal kernel
+> version?  What commitment can be displayed? and I know that
+> mainline do not have the problem because of some code refactoring,
+> But are there any problems with some other stable branches?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5ee62b95f3e5..aa091615e20b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2716,8 +2716,7 @@ static bool blk_mq_attempt_bio_merge(struct request_queue *q,
- 
- static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 					       struct blk_plug *plug,
--					       struct bio *bio,
--					       unsigned int nsegs)
-+					       struct bio *bio)
- {
- 	struct blk_mq_alloc_data data = {
- 		.q		= q,
-@@ -2729,9 +2728,6 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 	if (unlikely(bio_queue_enter(bio)))
- 		return NULL;
- 
--	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
--		goto queue_exit;
--
- 	rq_qos_throttle(q, bio);
- 
- 	if (plug) {
-@@ -2746,13 +2742,13 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 	rq_qos_cleanup(q, bio);
- 	if (bio->bi_opf & REQ_NOWAIT)
- 		bio_wouldblock_error(bio);
--queue_exit:
-+
- 	blk_queue_exit(q);
- 	return NULL;
- }
- 
- static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
--		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
-+		struct blk_plug *plug, struct bio *bio)
- {
- 	struct request *rq;
- 
-@@ -2762,14 +2758,9 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	if (!rq || rq->q != q)
- 		return NULL;
- 
--	if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
--		*bio = NULL;
--		return NULL;
--	}
--
--	if (blk_mq_get_hctx_type((*bio)->bi_opf) != rq->mq_hctx->type)
-+	if (blk_mq_get_hctx_type(bio->bi_opf) != rq->mq_hctx->type)
- 		return NULL;
--	if (op_is_flush(rq->cmd_flags) != op_is_flush((*bio)->bi_opf))
-+	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
- 		return NULL;
- 
- 	/*
-@@ -2778,9 +2769,9 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
- 	 * before we throttle.
- 	 */
- 	plug->cached_rq = rq_list_next(rq);
--	rq_qos_throttle(q, *bio);
-+	rq_qos_throttle(q, bio);
- 
--	rq->cmd_flags = (*bio)->bi_opf;
-+	rq->cmd_flags = bio->bi_opf;
- 	INIT_LIST_HEAD(&rq->queuelist);
- 	return rq;
- }
-@@ -2824,11 +2815,12 @@ void blk_mq_submit_bio(struct bio *bio)
- 
- 	bio_set_ioprio(bio);
- 
--	rq = blk_mq_get_cached_request(q, plug, &bio, nr_segs);
-+	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
-+		return;
-+
-+	rq = blk_mq_get_cached_request(q, plug, bio);
- 	if (!rq) {
--		if (!bio)
--			return;
--		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
-+		rq = blk_mq_get_new_requests(q, plug, bio);
- 		if (unlikely(!rq))
- 			return;
- 	}
+Yes, CVE-2022-20158 pertains to an issue on an internal repo.
+
+Mainline and Stable were unaffected.
+
 -- 
-2.36.1
-
+DEPRECATED: Please use lee@kernel.org
