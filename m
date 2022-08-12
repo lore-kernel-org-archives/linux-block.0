@@ -2,51 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF64C00140
-	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 21:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8F4C3F6B0
+	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 21:09:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232950AbiHLVEI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Aug 2022 17:04:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
+        id S229552AbiHLVI3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Aug 2022 17:08:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234747AbiHLVEH (ORCPT
+        with ESMTP id S233612AbiHLVII (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Aug 2022 17:04:07 -0400
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE181B4409
-        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 14:04:06 -0700 (PDT)
-Received: by mail-pg1-f172.google.com with SMTP id l64so1770863pge.0
-        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 14:04:06 -0700 (PDT)
+        Fri, 12 Aug 2022 17:08:08 -0400
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2434EB4426
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 14:08:08 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id t22so2053149pjy.1
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 14:08:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc;
-        bh=YQUAQSldISzLju8OPJYICJ9P0f9R1O3rjBo81hH5czw=;
-        b=df2Fsi3di4JBaNzYZUroa/y3DCMqrwghadeVuyHRSxr3Df+9WeiKxfMAOcpUb4I8Xb
-         Fzw+o5FlkJ7XN7m/e1k3d9A5ILywNmD21CvKKYuHqtM9v9oyEcValdHP5qo2VBmwMjf0
-         L2BKPqcT+vhmvvdhNVlvQcRWg+wKXALnpSBaarPadn7ir8L8t97rX4jvEfc5EuQT+VXe
-         g/FXTwspW5kefs38L9YoIMTt4TU+Vbbp7xQJOeo2Okt3zMXoVnoYirnsKPlTpumutvmZ
-         xMDXpd+4qo0JhKloq9/pkpyR6ehAdahEV7HAwO1YeOPYfVP6WCbsJ0cfmULx7RI5aacI
-         7B9w==
-X-Gm-Message-State: ACgBeo3vvXLqIKagTNn7zRvYACVhyATRG5dk96pOCaJEirH47NT0J2Tx
-        CB8m+0WtVTTjdmqRRxJgjMg=
-X-Google-Smtp-Source: AA6agR4O43acsIjRbpOSwGqB0CsnPrfj71ichTIuphffrq+e/6LSbEx6WYUaNdhuOXevI66WnpJAeQ==
-X-Received: by 2002:a63:8143:0:b0:41c:fc6f:681b with SMTP id t64-20020a638143000000b0041cfc6f681bmr4423388pgd.249.1660338246080;
-        Fri, 12 Aug 2022 14:04:06 -0700 (PDT)
+        bh=JF+DfDPjdjZJe3x+b+uTutFtpYGOzPTldsk0Iuh1MZE=;
+        b=ZQfIGauqdmWrUCc/LJ23C9NncwzIeMHOwD1+bAZSs8VekB1hYZmcyMbdVEHkUoj+vB
+         1d2bJnmrkrg6w9MjCgw1XptvfqkRm4Q0C1jfEGXfl6jeAfdrvQbNsdUHmuLkDZRS11p8
+         UNsCgN0S1tbC3/pnx6YY0pp7ruYyd3g3moAWDHu05a3MfGaYUQ1OuPHGwyN+12IzDeA3
+         GCh40oJOYAa4bGCgygQXg6vgEvRXmWpkNEw/r6z5S4eyh+PW99BbYgNbpazD0gV/9DEl
+         jhsA5mcX7a3ASsIk2iFCYTHEGdNnaBD7wIQbrrtIdRWpXs5mOQwY4vzYjlBohPq0dXwU
+         0C4w==
+X-Gm-Message-State: ACgBeo0K3ahj2uWK2mAPFN38d3UHEyIDpz5pjKgBoabO/O9lR/09RcjM
+        vAxqcKuYy0FwvC4KjGBWcWQ=
+X-Google-Smtp-Source: AA6agR7nna5pcHY7SZqJhBROb1WlRrfTeqA/br44ZaZ/8dRA9bl9t4CKSqCiT3fGbXm+SC3dfs1Efg==
+X-Received: by 2002:a17:90b:1a8f:b0:1f7:299d:9c08 with SMTP id ng15-20020a17090b1a8f00b001f7299d9c08mr6041129pjb.190.1660338487531;
+        Fri, 12 Aug 2022 14:08:07 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:2414:9f13:41de:d21d])
-        by smtp.gmail.com with ESMTPSA id b72-20020a621b4b000000b0052d3d08cd96sm2049159pfb.67.2022.08.12.14.04.04
+        by smtp.gmail.com with ESMTPSA id w62-20020a17090a6bc400b001f3095af6a9sm245905pjj.38.2022.08.12.14.08.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Aug 2022 14:04:05 -0700 (PDT)
+        Fri, 12 Aug 2022 14:08:06 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: [PATCH] block: Submit flush requests to the I/O scheduler
-Date:   Fri, 12 Aug 2022 14:03:55 -0700
-Message-Id: <20220812210355.2252143-1-bvanassche@acm.org>
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/6] Make blk_mq_map_queues() return void
+Date:   Fri, 12 Aug 2022 14:07:54 -0700
+Message-Id: <20220812210800.2253972-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -54,81 +52,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When submitting a REQ_OP_WRITE | REQ_FUA request to a zoned storage
-device, these requests must be passed to the (mq-deadline) I/O scheduler
-to ensure that these happen at the write pointer. It has been verfied
-that this patch prevents that write pointer violations happen
-sporadically when f2fs is using a zoned storage device.
+Hi Jens,
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq.c | 31 ++++---------------------------
- 1 file changed, 4 insertions(+), 27 deletions(-)
+The only block driver for which the .map_queues() callback can fail is null_blk. Since
+most blk_mq_map_queues() callers ignore the return value of this function, modify the
+null_blk driver such that its .map_queues() callback does not fail and change the
+blk_mq_map_queues() return type into void.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 5ee62b95f3e5..530aad95cc33 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2546,16 +2546,14 @@ static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
- 	return __blk_mq_try_issue_directly(rq->mq_hctx, rq, true, last);
- }
- 
--static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
-+static void blk_mq_plug_issue(struct blk_plug *plug, bool from_schedule)
- {
- 	struct blk_mq_hw_ctx *hctx = NULL;
- 	struct request *rq;
- 	int queued = 0;
--	int errors = 0;
- 
- 	while ((rq = rq_list_pop(&plug->mq_list))) {
- 		bool last = rq_list_empty(plug->mq_list);
--		blk_status_t ret;
- 
- 		if (hctx != rq->mq_hctx) {
- 			if (hctx)
-@@ -2563,29 +2561,9 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
- 			hctx = rq->mq_hctx;
- 		}
- 
--		ret = blk_mq_request_issue_directly(rq, last);
--		switch (ret) {
--		case BLK_STS_OK:
--			queued++;
--			break;
--		case BLK_STS_RESOURCE:
--		case BLK_STS_DEV_RESOURCE:
--			blk_mq_request_bypass_insert(rq, false, last);
--			blk_mq_commit_rqs(hctx, &queued, from_schedule);
--			return;
--		default:
--			blk_mq_end_request(rq, ret);
--			errors++;
--			break;
--		}
-+		blk_mq_sched_insert_request(rq, /*at_head=*/false,
-+			/*run_queue=*/last, /*async=*/false);
- 	}
--
--	/*
--	 * If we didn't flush the entire list, we could have told the driver
--	 * there was more coming, but that turned out to be a lie.
--	 */
--	if (errors)
--		blk_mq_commit_rqs(hctx, &queued, from_schedule);
- }
- 
- static void __blk_mq_flush_plug_list(struct request_queue *q,
-@@ -2655,8 +2633,7 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 				return;
- 		}
- 
--		blk_mq_run_dispatch_ops(q,
--				blk_mq_plug_issue_direct(plug, false));
-+		blk_mq_run_dispatch_ops(q, blk_mq_plug_issue(plug, false));
- 		if (rq_list_empty(plug->mq_list))
- 			return;
- 	}
+Please consider this patch series for the next merge window.
+
+Thanks,
+
+Bart.
+
+Bart Van Assche (6):
+  block: Change the return type of blk_mq_map_queues() into void
+  block: Change the return type of blk_mq_pci_map_queues() into void
+  block: Change the return type of blk_mq_virtio_map_queues() into void
+  scsi: Change the return type of .map_queues() into void
+  null_blk: Modify the behavior of null_map_queues()
+  block: Change the return type of .map_queues() into void
+
+ block/blk-mq-cpumap.c                     |  4 +---
+ block/blk-mq-pci.c                        |  7 +++----
+ block/blk-mq-rdma.c                       |  6 +++---
+ block/blk-mq-virtio.c                     |  7 ++++---
+ block/blk-mq.c                            | 10 ++++------
+ drivers/block/null_blk/main.c             |  8 ++++----
+ drivers/block/rnbd/rnbd-clt.c             |  4 +---
+ drivers/block/virtio_blk.c                |  4 +---
+ drivers/nvme/host/fc.c                    |  3 +--
+ drivers/nvme/host/pci.c                   |  4 +---
+ drivers/nvme/host/rdma.c                  |  4 +---
+ drivers/nvme/host/tcp.c                   |  4 +---
+ drivers/scsi/hisi_sas/hisi_sas_v2_hw.c    |  5 +----
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c    |  5 ++---
+ drivers/scsi/megaraid/megaraid_sas_base.c |  6 ++----
+ drivers/scsi/mpi3mr/mpi3mr_os.c           |  5 +----
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c      |  5 ++---
+ drivers/scsi/pm8001/pm8001_init.c         |  2 +-
+ drivers/scsi/qla2xxx/qla_nvme.c           |  6 +-----
+ drivers/scsi/qla2xxx/qla_os.c             | 10 ++++------
+ drivers/scsi/qlogicpti.c                  |  6 ++----
+ drivers/scsi/scsi_debug.c                 |  7 ++-----
+ drivers/scsi/scsi_lib.c                   |  4 ++--
+ drivers/scsi/smartpqi/smartpqi_init.c     |  6 +++---
+ drivers/scsi/virtio_scsi.c                |  4 ++--
+ drivers/ufs/core/ufshcd.c                 |  9 +++------
+ include/linux/blk-mq-pci.h                |  4 ++--
+ include/linux/blk-mq-rdma.h               |  2 +-
+ include/linux/blk-mq-virtio.h             |  2 +-
+ include/linux/blk-mq.h                    |  4 ++--
+ include/scsi/scsi_host.h                  |  2 +-
+ 31 files changed, 60 insertions(+), 99 deletions(-)
+
