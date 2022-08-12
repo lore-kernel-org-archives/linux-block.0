@@ -2,90 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D808C3F6B0
-	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 01:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 053F3C00140
+	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 03:35:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234688AbiHLBaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Aug 2022 21:30:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43602 "EHLO
+        id S236980AbiHLDfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Aug 2022 23:35:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234432AbiHLBau (ORCPT
+        with ESMTP id S229594AbiHLDfG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Aug 2022 21:30:50 -0400
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22E8F13D2C
-        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 18:30:48 -0700 (PDT)
-Received: by mail-qt1-f180.google.com with SMTP id c20so4998215qtw.8
-        for <linux-block@vger.kernel.org>; Thu, 11 Aug 2022 18:30:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc;
-        bh=yUY3y7VRwdC6vJJ5qbh6vFjQfNfR51ousKDLvXQmjxA=;
-        b=RzhP5i5iOil8JgSjK/A8hjBMNehzHnHSQibhW8VDwm9QJEZd/NXgRXjQEQI3UwVaJC
-         0xZFfvYobj0AQykco8Ss8BDagujlMJue2wwIY8KBYTcgBg82C4OYHzpPubBhDLicOwZ+
-         QkK9A+HtuO+jy71xQxZnKL0EalTmyaslp7B45SgUFoBh7ofKAPUih76M9epXMeNlXHlR
-         PDCwn2EOE0F/gUCvXsq4BFqWhGQU9JJyWzIZpH6suu23z2Zvozh+tkkHbSRpI0OaK10L
-         LdpjDdpD8G/zskRGpsLbqj7IuIjQNOiHxthMSQ+WFMu3Btw7C0esmymgnzL5NVzXSYwu
-         D+DQ==
-X-Gm-Message-State: ACgBeo19v3OGwQ4BgG0pyR1/zTrXze7PUWclqfsOaEaaLEstPeNFWA5z
-        4U/7Hms+6J5sXKKV4I2ASmVe
-X-Google-Smtp-Source: AA6agR5UJL/V77XrRkAMi1IA+MwyYdPA1zrHNsV15uH9IyLRY3wJ9BpRRbznCeYo40CI+asyvf6Nfg==
-X-Received: by 2002:a05:622a:104c:b0:343:587c:1bc8 with SMTP id f12-20020a05622a104c00b00343587c1bc8mr1756103qte.484.1660267847293;
-        Thu, 11 Aug 2022 18:30:47 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id s12-20020a05620a29cc00b006b6757a11fcsm756086qkp.36.2022.08.11.18.30.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Aug 2022 18:30:45 -0700 (PDT)
-Date:   Thu, 11 Aug 2022 21:30:44 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Nathan Huckleberry <nhuck@google.com>
-Subject: [git pull] device mapper fixes for 6.0-rc1
-Message-ID: <YvWtRMgKKKSEcEAr@redhat.com>
+        Thu, 11 Aug 2022 23:35:06 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F79A4040;
+        Thu, 11 Aug 2022 20:35:04 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M3q5m6f4XzlBjN;
+        Fri, 12 Aug 2022 11:33:48 +0800 (CST)
+Received: from [10.174.176.103] (unknown [10.174.176.103])
+        by APP2 (Coremail) with SMTP id Syh0CgBnn7tjyvVitbH3AA--.33911S2;
+        Fri, 12 Aug 2022 11:35:01 +0800 (CST)
+Message-ID: <420a6c4a-e526-4e8b-d5bd-563c40aa94e1@huaweicloud.com>
+Date:   Fri, 12 Aug 2022 11:34:59 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+To:     lee.jones@linaro.org
+Reply-To: zhangwensheng@huaweicloud.com
+From:   "zhangwensheng (E)" <zhangwensheng@huaweicloud.com>
+Subject: Question: consult patch
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgBnn7tjyvVitbH3AA--.33911S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKw1rKF15AF4DGF1rGFWUCFg_yoWkArb_X3
+        ykJas7Ww4jkr4kWF17Jr13XanxK3ZYqrW8Xa1DZ3y5try0qrs8Gr4rWwn5Gr4Igw4Iqrs8
+        tryDWrsIqw17WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_JFC_Wr1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jrv_JF1lIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
+X-CM-SenderInfo: x2kd0wpzhq2xhhqjqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi Lee ：
+     I saw your patch because of CVE-2022-20158, the patch like below:
 
-The following changes since commit 12907efde6ad984f2d76cc1a7dbaae132384d8a5:
+---
+     mm: backing-dev: Take a reference to the bdi in use to prevent UAF
 
-  dm verity: have verify_wq use WQ_HIGHPRI if "try_verify_in_tasklet" (2022-08-04 15:59:52 -0400)
+     KASAN reports a reproducible issue in the BDI handling code due to a
+     dereference of a previously freed pointer to 'struct backing_dev_info'
+     in bdi_unregister().
 
-are available in the Git repository at:
+     Because of a distinct lack of locking and/or reference taking,
+     blk_cleanup_queue() puts the final taken reference to the bdi, which
+     is then promptly freed by release_bdi().  However, del_gendisk() calls
+     bdi_unregister() after the fact, which then attempts to dereference
+     it causing the kernel to panic.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.0/dm-fixes
+     Bug: 182815710
+     Signed-off-by: Lee Jones <lee.jones@linaro.org>
+     Change-Id: Iaf3dadf3b983a4b7d74d4e273fc676350cfc387f
+---
 
-for you to fetch changes up to e3a7c2947b9e01b9cedd3f67849c0ae95f0fadfa:
+     I am sorry that I have some questions for this patch. According to
+     my analysis, I failed to find the relevant process may lead to null
+     pointer reference. can you show me "KASAN reports a reproducible issue"
+     that what the problem is?  thank you very much!
 
-  dm bufio: fix some cases where the code sleeps with spinlock held (2022-08-11 11:10:42 -0400)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- A few fixes for the DM verity and bufio changes from the 6.0 merge.
-
-- A smatch warning fix for DM writecache locking in writecache_map.
-
-----------------------------------------------------------------
-Mike Snitzer (3):
-      dm bufio: simplify DM_BUFIO_CLIENT_NO_SLEEP locking
-      dm verity: fix DM_VERITY_OPTS_MAX value yet again
-      dm verity: fix verity_parse_opt_args parsing
-
-Mikulas Patocka (2):
-      dm writecache: fix smatch warning about invalid return from writecache_map
-      dm bufio: fix some cases where the code sleeps with spinlock held
-
- drivers/md/dm-bufio.c         | 20 +++++++++++++-------
- drivers/md/dm-verity-target.c | 14 ++++++++++++--
- drivers/md/dm-writecache.c    |  3 ++-
- 3 files changed, 27 insertions(+), 10 deletions(-)
