@@ -2,137 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6924FC00140
-	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 06:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1C4C00140
+	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 07:25:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237275AbiHLG2R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Aug 2022 02:28:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36046 "EHLO
+        id S237342AbiHLHZ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Aug 2022 03:25:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237269AbiHLG1q (ORCPT
+        with ESMTP id S237325AbiHLHZy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Aug 2022 02:27:46 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF481A571B;
-        Thu, 11 Aug 2022 23:27:42 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4M3twl24DYz6T5F3;
-        Fri, 12 Aug 2022 14:26:15 +0800 (CST)
-Received: from [10.174.176.103] (unknown [10.174.176.103])
-        by APP4 (Coremail) with SMTP id gCh0CgDHGvjZ8vViLWf1AA--.10340S2;
-        Fri, 12 Aug 2022 14:27:37 +0800 (CST)
-Message-ID: <902a45fe-1117-3f6a-b7b1-9b155e5dd984@huaweicloud.com>
-Date:   Fri, 12 Aug 2022 14:27:37 +0800
+        Fri, 12 Aug 2022 03:25:54 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6079720BCE
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 00:25:49 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220812072544euoutp01f0473b273a546fa8ba17767aeb6b4230~KiC4jVBcl2313123131euoutp01U
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 07:25:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220812072544euoutp01f0473b273a546fa8ba17767aeb6b4230~KiC4jVBcl2313123131euoutp01U
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1660289144;
+        bh=PZsQf3iDA8wIHZWw0fJKxNZcUxFzh+Qp6mRoTJ+47pI=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=Y/4OGgfG/jqYWaBfYVs5GRFvI+enYczKqWf8HXw0YzFa4OxxjjELbIAfm7vZTs1dw
+         LhMdjiuDvzvTlLvV6n3YYG90xpCqX/zq1whZnnNF8o0Irze+n0mhKH/kjBAWDNTICM
+         OIIUOgONTldx+RHLKpXZpL+C2IoheJbKQtucSpC8=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220812072543eucas1p16de268e8d20b6b6596d02826ca4663b2~KiC4K812m0990809908eucas1p1H;
+        Fri, 12 Aug 2022 07:25:43 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id BF.F7.09664.77006F26; Fri, 12
+        Aug 2022 08:25:43 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220812072543eucas1p17481ebc371248a10ba678ac2367bca7a~KiC30R8Ur1207412074eucas1p1H;
+        Fri, 12 Aug 2022 07:25:43 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220812072543eusmtrp1732435be62682777d2e3252a58702ae4~KiC3zahY00802508025eusmtrp12;
+        Fri, 12 Aug 2022 07:25:43 +0000 (GMT)
+X-AuditID: cbfec7f2-d81ff700000025c0-6e-62f600779d02
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 3B.80.09095.77006F26; Fri, 12
+        Aug 2022 08:25:43 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220812072543eusmtip2f234d39b26ca1f6cc254757c34376da3~KiC3nN_KP0089400894eusmtip2p;
+        Fri, 12 Aug 2022 07:25:43 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.18) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 12 Aug 2022 08:25:26 +0100
+Message-ID: <b250d97d-d0f2-0f89-dc02-a1bf54f8e43f@samsung.com>
+Date:   Fri, 12 Aug 2022 09:25:18 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: Question: consult patch
-To:     Christoph Hellwig <hch@infradead.org>,
-        "zhangwensheng (E)" <zhangwensheng@huaweicloud.com>
-Cc:     lee.jones@linaro.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <420a6c4a-e526-4e8b-d5bd-563c40aa94e1@huaweicloud.com>
- <YvXo1uCFA57t89Nv@infradead.org>
-From:   "zhangwensheng (E)" <zhangwensheng@huaweicloud.com>
-Reply-To: zhangwensheng@huaweicloud.com
-In-Reply-To: <YvXo1uCFA57t89Nv@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDHGvjZ8vViLWf1AA--.10340S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxurW8Xry7KF4DKF48Aw4xZwb_yoW5Xw15pF
-        WrJr13JrW8JF48Gay7Gr17J34UAF1Ut34rJ34xJFyktr1rG3W29r1xWF129F48ur4kJr48
-        J3W5Jr40vryUJ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUozVbDU
-        UUU
-X-CM-SenderInfo: x2kd0wpzhq2xhhqjqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.11.0
+Subject: Re: [PATCH v10 13/13] dm: add power-of-2 target for zoned devices
+ with non power-of-2 zone sizes
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        <snitzer@kernel.org>, <axboe@kernel.dk>, <hch@lst.de>,
+        <agk@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <Johannes.Thumshirn@wdc.com>,
+        <bvanassche@acm.org>, <matias.bjorling@wdc.com>, <hare@suse.de>,
+        <gost.dev@samsung.com>, <linux-nvme@lists.infradead.org>,
+        <jaegeuk@kernel.org>, <pankydev8@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <dm-devel@redhat.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Joel Granados <j.granados@samsung.com>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <9cc04d5e-dfa5-6d48-b9e1-60d319ab2299@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.18]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCKsWRmVeSWpSXmKPExsWy7djP87rlDN+SDLrfmVusP3WM2WL13X42
+        i2kffjJb/D57ntmitf0bk8Xed7NZLfYsmsRksXL1USaLJ+tnMVv87boHlLilbXF51xw2i/nL
+        nrJbTGj7ymyx5uZTFosTt6QdBDwuX/H22DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we
+        7/ddBQqdrvb4vEnOo/1AN1MAdxSXTUpqTmZZapG+XQJXxo8dr1gLvnNX3GxawNLAeJSzi5GD
+        Q0LAROLuLd4uRi4OIYEVjBJ79i1n7WLkBHK+MEr8nSEDkfjMKLHyxVRGkARIw4HeR+wQieWM
+        Ei2vz7DDVe2a/pENwtnFKPHo8FOwFl4BO4n2eVfA5rIIqEo8+HOMHSIuKHFy5hMWEFtUIFJi
+        ze6z7CA3CQtkS0zssAEJMwuIS9x6Mp8JZKaIQAOjxPT9W8AcZoEfTBJbPk1jAmlgE9CSaOwE
+        m8kp4Cbx8/c8dohmTYnW7b+hbHmJ7W/nMEO8oCSxsO0OG4RdK7H2GMQHEgLPOCVOPPnFBJFw
+        kVjyaio7hC0s8er4FihbRuL05B4WCLta4umN38wQzS2MEv0717NBQtVaou9MDkSNI9CTt6DC
+        fBI33gpC3MMnMWnbdOYJjKqzkIJiFpKfZyF5YRaSFxYwsqxiFE8tLc5NTy02zEst1ytOzC0u
+        zUvXS87P3cQITIin/x3/tINx7quPeocYmTgYDzFKcDArifCWLfqcJMSbklhZlVqUH19UmpNa
+        fIhRmoNFSZw3OXNDopBAemJJanZqakFqEUyWiYNTqoGpvOpm8e+UI9v2O63Ri2X+I748fvVu
+        lVmalm3+Z7Jj5xy/FZLjuG5j4z2+ZY/8u60ZT1YzLRH8fO7iaVb2xIfVr1L8RCd2XPjy8e2/
+        bW0VJh2hKpW+czyDbdLbDUNn3vJ0SAl3+Xc6KWJTS5LE/+ZNwe9+6fg+/H/Ned8F37VhYpbr
+        V2jcXqy+/aPHF5lPf7VK1rxdbGBksfVbO7euyGr++cqb+v/0cmXWfBEPYS85+67blPnIm6TV
+        G6OfZAplzXWNfHe878Xy9CszJ0sdt3j4NsUxdNbXe9u2tZ1fvXXF6e/H7ld0/k9dq2frpnbh
+        3mqRA+byMkaGW//vXG/dbTc5p757Q+2x9ms+MWLOuj6/lViKMxINtZiLihMBUIqufPcDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprNKsWRmVeSWpSXmKPExsVy+t/xe7rlDN+SDI4ekrFYf+oYs8Xqu/1s
+        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
+        PWW3mND2ldlizc2nLBYnbkk7CHhcvuLtsXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j52t91k9
+        3u+7ChQ6Xe3xeZOcR/uBbqYA7ig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NYKyNT
+        JX07m5TUnMyy1CJ9uwS9jB87XrEWfOeuuNm0gKWB8ShnFyMnh4SAicSB3kfsXYxcHEICSxkl
+        bp5qY4ZIyEh8uvKRHcIWlvhzrYsNougjo8S8c3+YIJxdjBKbrs1hBKniFbCTaJ93hRXEZhFQ
+        lXjw5xg7RFxQ4uTMJywgtqhApMTDZU1AzRwcwgLZEhM7bEDCzALiEreezAebKSLQwCgxff8W
+        MIdZ4AeTxJZP06C2/WGUmPWmmxWkm01AS6KxE2wBp4CbxM/f89ghJmlKtG7/DWXLS2x/Owfq
+        HSWJhW132CDsWolX93czTmAUnYXkvllIDpmFZNQsJKMWMLKsYhRJLS3OTc8tNtQrTswtLs1L
+        10vOz93ECEwl24793LyDcd6rj3qHGJk4GA8xSnAwK4nwli36nCTEm5JYWZValB9fVJqTWnyI
+        0RQYSBOZpUST84HJLK8k3tDMwNTQxMzSwNTSzFhJnNezoCNRSCA9sSQ1OzW1ILUIpo+Jg1Oq
+        genY+6sHhEIdPS26ZuXbf7WWaWCJYtdg9w7bMPnPzc2dW3KnB3/iv7Egaa7vfvbEQkuVsCjf
+        PVP1dLTPzNp7X9++YU7cvSnnbf2Zdl43Xnfjnn95vsLqM/uvvdkYdaPpoe0Vz2n7HlTuPmMU
+        LDelOrPt2nHV5e/Pf1WLSjn994bIjt3+T+5r/ttzbOuzoHMxJYbs+Rplt5T2fNe9tT7q28S+
+        Gxv8P8hViBZlbfsibNq4X8Di0TZDsdspK/+WqnR2Ti3ffdpqZZ8O47rYU/cU4uOn8WjUPm+/
+        yqipdOo2R2yM1QGPrW6/Xq7SZhFL6Z3p6LrM4veJo4n7N0c+yPq8ZUfP0lhBi7+dDZOniXY9
+        LIxSYinOSDTUYi4qTgQARMUMOK4DAAA=
+X-CMS-MailID: 20220812072543eucas1p17481ebc371248a10ba678ac2367bca7a
+X-Msg-Generator: CA
+X-RootMTR: 20220811143058eucas1p247291685ffff7a75186947fd30b5c13f
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220811143058eucas1p247291685ffff7a75186947fd30b5c13f
+References: <20220811143043.126029-1-p.raghav@samsung.com>
+        <CGME20220811143058eucas1p247291685ffff7a75186947fd30b5c13f@eucas1p2.samsung.com>
+        <20220811143043.126029-14-p.raghav@samsung.com>
+        <9cc04d5e-dfa5-6d48-b9e1-60d319ab2299@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+Hi Damien,
 
-In CVE list last week, there is a new cve reported in asop 4.14 like below:
-Reference link: 
-https://lore.kernel.org/all/CAODzB9rgMexvLjE=WuTm+SN8SfUggaZgWG-aBcy6cotppju6mw@mail.gmail.com/T/
-
----
-CVE-2022-20158: mm: backing-dev: Take a reference to the bdi in use to
-prevent UAF
-
-CVSS v3 score is not assigned.
-
-AOSP kernel 4.14 contains following 2 patches.
-- 69e8f03c5ced3e4e6fb4181f4dac185104e3420b ("mm: backing-dev: Take a
-reference to the bdi in use to prevent UAF")
-- 80d91b86a199798ee2321a0ab0f09e6e12764678 ("fs: explicitly unregister
-per-superblock BDIs")
-
-The first commit 69e8f03("mm: backing-dev: Take a reference to the bdi
-in use to prevent UAF") is not merged in the mainline and stable
-kernels.
-Commit 80d91b8 was merged in 5.16-rc1(commit hash is
-0b3ea0926afb8dde70cfab00316ae0a70b93a7cc) which requires commit
-c6fd3ac ("mm: export bdi_unregister") that exports symbol of
-bdi_unregister().
-
-Fixed status
-mainline: [0b3ea0926afb8dde70cfab00316ae0a70b93a7cc]
----
-
-As mentioned above, patch 69e8f03c5ced ("mm: backing-dev: Take a
-reference to the bdi in use to prevent UAF") in asop 4.14 can fix
-a null dereference problem, form my analysis, may like below:
-
-blk_cleanup_queue
-     blk_put_queue
-         kobject_put(&q->kobj)
-                 blk_release_queue
-                     blk_exit_queue
-                         bdi_put
-                             release_bdi  // bdi -> null
-del_gendisk
-     bdi_unregister(disk->queue->backing_dev_info) // null -> reference
-
- From my analysis, In asop 4.14 kernel, in loop_remove function, there is
-such a timing that executing "blk_cleanup_queue" first and then 
-"del_gendisk".
-but because of the refcnt of queue will add by hte line
-"WARN_ON_ONCE(!blk_get_queue(disk->queue));" in "device_add_disk", which may
-not result in "bdi_put" releasing bdi  in "blk_cleanup_queue".
-
-I'm not sure where the problem is, so I want to ask Lee Jones who sent 
-this patch
-for clarification.
-
-Thanks!
-
-Wensheng
-
-在 2022/8/12 13:44, Christoph Hellwig 写道:
-> On Fri, Aug 12, 2022 at 11:34:59AM +0800, zhangwensheng (E) wrote:
->> Hi Lee ：
->>      I saw your patch because of CVE-2022-20158, the patch like below:
+>> |--------------|---|--------------|---|
+>> 0             3M  4M             7M  8M
 >>
->> ---
->>      mm: backing-dev: Take a reference to the bdi in use to prevent UAF
-> I can't see that patch anywhere, and I've not seen an bug report for it.
->
->>      Because of a distinct lack of locking and/or reference taking,
->>      blk_cleanup_queue() puts the final taken reference to the bdi, which
-> .. and blk_cleanup_queue also is gone upstream.
->
-> What am I missing?
-> .
+>> The area between target's zone capacity and zone size will be emulated
+>> in the target.
+>> The read IOs that fall in the emulated gap area will return 0 filled
+>> bio and all the other IOs in that area will result in an error.
+>> If a read IO span across the emulated area boundary, then the IOs are
+>> split across them. All other IO operations that span across the emulated
+>> area boundary will result in an error.
+>>
+>> The target can be easily created as follows:
+>> dmsetup create <label> --table '0 <size_sects> po2zone /dev/nvme<id>'
+>>
+>> Note that the target does not support partial mapping of the underlying
+>> device.
+>>
+>> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+>> Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+>> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
+>> Suggested-by: Hannes Reinecke <hare@suse.de>
+>> Reviewed-by: Joel Granados <j.granados@samsung.com>
+> 
+> You changed this patch. So it needs review again. Please do not carry previous
+> review tags in that case.
+> The changes were non-functional such as changing multiplication to
+shifts and rephrasing error messages.
 
+While I agree with your comment not to carry forward review tags if the
+patch has changed, I thought it might be too much to ask a reviewer to
+re-review for non-functional changes such as these. But I will request
+Joel to do a quick re-review.
+
+Thanks.
