@@ -2,115 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 015F2C00140
-	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 14:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6030C00140
+	for <linux-block@archiver.kernel.org>; Fri, 12 Aug 2022 14:48:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238213AbiHLOAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Aug 2022 10:00:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46902 "EHLO
+        id S237693AbiHLOs1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Aug 2022 10:48:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232085AbiHLOAc (ORCPT
+        with ESMTP id S237763AbiHLOs1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Aug 2022 10:00:32 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03EA32B9B;
-        Fri, 12 Aug 2022 07:00:30 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 75C513F7DF;
-        Fri, 12 Aug 2022 14:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1660312829;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mmMcxR3luXAAfZt0qQrsQU3WBRdPesjPfp6BxoGMRiI=;
-        b=pXBfwu6vovlebYiTuPDJU5B3y+fUhFb5MmDxrm9WhviztSGTbnoOLz7O7/nEYSHx23GQHJ
-        Xq6DOPbZwYKWJKwrT7GrizWOjt96bp6m2oISjaLfjyKtUFOpT8GuLXhdwdDnCZlcbqGIk9
-        JusymBeXY+tzH39FGQQeNxXGh1A+AGo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1660312829;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mmMcxR3luXAAfZt0qQrsQU3WBRdPesjPfp6BxoGMRiI=;
-        b=6uCtk6YNqCWUvLTpVyDa++OKjN5XsbhWcBGJ9RUa5c2KtvQcKEI9bV+dO2d+7ocOtyD1ld
-        UgJF/LSko6Qm3RBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 348CE13AAE;
-        Fri, 12 Aug 2022 14:00:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VbQ4C/1c9mJ5PAAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Fri, 12 Aug 2022 14:00:29 +0000
-Date:   Fri, 12 Aug 2022 16:00:26 +0200
-From:   Petr Vorel <pvorel@suse.cz>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.de>,
-        linux-xfs@vger.kernel.org
-Cc:     ltp@lists.linux.it
-Subject: Re: LTP test df01.sh detected different size of loop device in v5.19
-Message-ID: <YvZc+jvRdTLn8rus@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <YvZTpQFinpkB06p9@pevik>
- <YvZUfq+3HYwXEncw@pevik>
+        Fri, 12 Aug 2022 10:48:27 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB8DAB4E9
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 07:48:25 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id l64so1002896pge.0
+        for <linux-block@vger.kernel.org>; Fri, 12 Aug 2022 07:48:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=tmJm+SpCPyDqJ1lshIA1ETszu0sVt5hUjFD5g/2kg50=;
+        b=aJ+9o9HQcipIlVWgIit02PLYCSWZQby4S9kcexl1KVoRbd5IYGKzIN29a15kXcl3tH
+         kQLYYNSlzNAl1v02d7rPkfua47JAO3GOBNKFzUxavCTsZEeK1OYRR3BdVs4jJNmVoAoH
+         kNPqKF4KotAOzRhuCPRWLuFYoYVXZBp8OpCvop4KzhGmsXmUsZJNDBb316UO1IPRE2PV
+         o9sLm46JHvpK9rCWnkoSbovI/tG5xatcI24KnR2pt8q6nKRhLBxTbVHhauUr4NBYONjI
+         LI3kHQ//6JXOfOrrskh9QahS+X8WZUrfsr3TJ76YFK3ff1+5HijxA00HyJ/6XB/wd4ut
+         gYLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=tmJm+SpCPyDqJ1lshIA1ETszu0sVt5hUjFD5g/2kg50=;
+        b=DD26B8b7aUt/gjhO/YWy9gqkjwCuTVTCELk87OhWYNeH1DaLrlLpfEH14DXH27vgUV
+         8p87W9/ywG5c0f8ocIz6/LI/FPgWbDMxJ10fwv4yUQiP2iLIZrdEsujBllHN9vxl+JEx
+         2bBOkvOcJg7E1uAqah2US+KLaw9YEQhxpFHX4DPs7ufIaGzYZgIBspRa6jLzlZmomqjf
+         BMIVGzjrmjGmfphjunZCxcXnWTXbQLq/MUmzrTELFSqFXvBPefx8Fuhc/movkHOFMpMH
+         sg0qPhTS8/Axn4JhXX6ZxIMLIooRX8leLIF9AQzPwvyUvb6SrIi/1YU2G7CIdaXYVlNi
+         ABtA==
+X-Gm-Message-State: ACgBeo38VVaeE538jd55N/SVLlPmBgFsfsuDZvHF3rsBux5k2lO1By0j
+        APNKrS1QPygm3B/NhrYiaKC1aQ==
+X-Google-Smtp-Source: AA6agR6GZCf3r5KmUJM1S3uTXeEKj1oUGGU+qcmom++g7ekrhliqaeUv0A+Xqdt1Ba4yqQaLzwQyZw==
+X-Received: by 2002:a63:2dc5:0:b0:423:1abf:d0b3 with SMTP id t188-20020a632dc5000000b004231abfd0b3mr28018pgt.211.1660315704696;
+        Fri, 12 Aug 2022 07:48:24 -0700 (PDT)
+Received: from [10.4.217.209] ([139.177.225.231])
+        by smtp.gmail.com with ESMTPSA id u13-20020a170903124d00b0016db6bd77f4sm1898601plh.117.2022.08.12.07.48.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Aug 2022 07:48:24 -0700 (PDT)
+Message-ID: <686b645c-c4e1-357f-7c57-b961a1feeda0@bytedance.com>
+Date:   Fri, 12 Aug 2022 22:48:20 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvZUfq+3HYwXEncw@pevik>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.1.0
+Subject: Re: [PATCH] blk-mq: move bio merge attempt to blk_mq_submit_bio()
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220812083944.79616-1-zhouchengming@bytedance.com>
+ <330468da-a778-6cfc-ce46-a62566d71c8d@kernel.dk>
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <330468da-a778-6cfc-ce46-a62566d71c8d@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[ Cc LTP ML, sorry for the noise ]
-Petr
+On 2022/8/12 20:40, Jens Axboe wrote:
+> On 8/12/22 2:39 AM, Chengming Zhou wrote:
+>> We will try to get request from cache before alloc request, in
+>> both cases will first attempt bio merge.
+>>
+>> This patch move this common part to blk_mq_submit_bio(), which
+>> simplify the code and avoid passing in the pointer of bio.
+> 
+> I don't think this will work. If we get a cached request, then we
+> know we have a reference to the queue. If you swap these around,
+> then that's no longer the case and we can have a use-after-free if
+> the queue goes away.
+> 
 
-> > Hi all,
-
-> > LTP test df01.sh found different size of loop device in v5.19.
-> > Test uses loop device formatted on various file systems, only XFS fails.
-> > It randomly fails during verifying that loop size usage changes:
-
-> > grep ${TST_DEVICE} output | grep -q "${total}.*${used}" [1]
-
-> > How to reproduce:
-> > # PATH="/opt/ltp/testcases/bin:$PATH" df01.sh -f xfs # it needs several tries to hit
-
-> > df saved output:
-> > Filesystem     1024-blocks    Used Available Capacity Mounted on
-> > ...
-> > /dev/loop0          256672   16208    240464       7% /tmp/LTP_df01.1kRwoUCCR7/mntpoint
-> > df output:
-> > Filesystem     1024-blocks    Used Available Capacity Mounted on
-> > ...
-> > tmpfs               201780       0    201780       0% /run/user/0
-> > /dev/loop0          256672   15160    241512       6% /tmp/LTP_df01.1kRwoUCCR7/mntpoint
-> > => different size
-> > df01 4 TFAIL: 'df -k -P' failed, not expected.
-
-> > Also 'df -T -P' fails.
-
-> > It might be a false positive / bug in the test, but it's at least a changed behavior.
-> > I was able to reproduce it on v5.19 distro kernels (openSUSE, Debian).
-> > I haven't bisected (yet), nor checked Jens' git tree (maybe it has been fixed).
-
-> Forget to note dmesg "operation not supported error" warning on *each* run (even
-> successful) on affected v5.19:
-> [ 5097.594021] loop0: detected capacity change from 0 to 524288
-> [ 5097.658201] operation not supported error, dev loop0, sector 262192 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
-> [ 5097.675670] XFS (loop0): Mounting V5 Filesystem
-> [ 5097.681668] XFS (loop0): Ending clean mount
-> [ 5097.956445] XFS (loop0): Unmounting Filesystem
-
-> Kind regards,
-> Petr
-
-> > Kind regards,
-> > Petr
-
-> > [1] https://github.com/linux-test-project/ltp/blob/f42f6f3b4671f447b743afe8612917ba4362b8a6/testcases/commands/df/df01.sh#L103-L110
+Sorry, thanks for your reply!
