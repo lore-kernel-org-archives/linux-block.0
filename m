@@ -2,151 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A141C25B08
-	for <linux-block@archiver.kernel.org>; Sat, 13 Aug 2022 05:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1FDC25B08
+	for <linux-block@archiver.kernel.org>; Sat, 13 Aug 2022 05:59:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231569AbiHMF5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 Aug 2022 01:57:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39540 "EHLO
+        id S230147AbiHMF7H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 Aug 2022 01:59:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230147AbiHMF5J (ORCPT
+        with ESMTP id S229507AbiHMF7G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Aug 2022 01:57:09 -0400
+        Sat, 13 Aug 2022 01:59:06 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A59EB41D0D;
-        Fri, 12 Aug 2022 22:57:07 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M4VCD265QzlTMj;
-        Sat, 13 Aug 2022 13:55:52 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgCn3rovPfdiVMknAQ--.6446S4;
-        Sat, 13 Aug 2022 13:57:05 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3987B41D3F;
+        Fri, 12 Aug 2022 22:59:05 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M4VFF5nbqzKJY5;
+        Sat, 13 Aug 2022 13:57:37 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgA3PfqjPfdi_zsfAQ--.8775S3;
+        Sat, 13 Aug 2022 13:59:01 +0800 (CST)
+Subject: Re: [PATCH] sbitmap: fix possible io hung due to lost wakeup
+To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, axboe@kernel.dk,
+        osandov@fb.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20220803121504.212071-1-yukuai1@huaweicloud.com>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     viro@zeniv.linux.org.uk, hch@infradead.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH] fs: fix possible inconsistent mount device
-Date:   Sat, 13 Aug 2022 14:08:48 +0800
-Message-Id: <20220813060848.1457301-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+Message-ID: <d31edf9b-bae2-b1f0-b95b-743fd705ba25@huaweicloud.com>
+Date:   Sat, 13 Aug 2022 13:58:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20220803121504.212071-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgCn3rovPfdiVMknAQ--.6446S4
-X-Coremail-Antispam: 1UD129KBjvJXoWxZF4fury8Zw4ruF43CF4kWFg_yoW5Xr4UpF
-        W8Casakr4xGr43G3ySvFy5Ga4fX34xAay8J348Xr9FyFWqqF1xWFsxtF45uryxCFWrZFyf
-        Za18trWIkry7C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: gCh0CgA3PfqjPfdi_zsfAQ--.8775S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxuF48Wr4DWw1fury3XryxKrg_yoW7Jr4kpr
+        W3JF1vva9YyrWIywsrGr4jv3WF9w4vgrZrGr43Kw15Cr12qr1Ykr109r45ury8ArZ8W345
+        tr13JFZ3CFyUJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
         6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
         Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
         I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
-        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-        67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE14v26r1j6r4U
+        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUU
+        UU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+ÔÚ 2022/08/03 20:15, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> There are two problems can lead to lost wakeup:
+> 
+> 1) invalid wakeup on the wrong waitqueue:
+> 
+> For example, 2 * wake_batch tags are put, while only wake_batch threads
+> are woken:
+> 
+> __sbq_wake_up
+>   atomic_cmpxchg -> reset wait_cnt
+> 			__sbq_wake_up -> decrease wait_cnt
+> 			...
+> 			__sbq_wake_up -> wait_cnt is decreased to 0 again
+> 			 atomic_cmpxchg
+> 			 sbq_index_atomic_inc -> increase wake_index
+> 			 wake_up_nr -> wake up and waitqueue might be empty
+>   sbq_index_atomic_inc -> increase again, one waitqueue is skipped
+>   wake_up_nr -> invalid wake up because old wakequeue might be empty
+> 
+> To fix the problem, increasing 'wake_index' before resetting 'wait_cnt'.
+> 
+> 2) 'wait_cnt' can be decreased while waitqueue is empty
+> 
+> As pointed out by Jan Kara, following race is possible:
+> 
+> CPU1				CPU2
+> __sbq_wake_up			 __sbq_wake_up
+>   sbq_wake_ptr()			 sbq_wake_ptr() -> the same
+>   wait_cnt = atomic_dec_return()
+>   /* decreased to 0 */
+>   sbq_index_atomic_inc()
+>   /* move to next waitqueue */
+>   atomic_set()
+>   /* reset wait_cnt */
+>   wake_up_nr()
+>   /* wake up on the old waitqueue */
+> 				 wait_cnt = atomic_dec_return()
+> 				 /*
+> 				  * decrease wait_cnt in the old
+> 				  * waitqueue, while it can be
+> 				  * empty.
+> 				  */
+> 
+> Fix the problem by waking up before updating 'wake_index' and
+> 'wait_cnt'.
+> 
+> With this patch, noted that 'wait_cnt' is still decreased in the old
+> empty waitqueue, however, the wakeup is redirected to a active waitqueue,
+> and the extra decrement on the old empty waitqueue is not handled.
 
-If device support rename, for example dm, following concurrent scenario
-is possible:
-
-t1: mount		t2: rename
-
-mount_bdev
- blkdev_get_by_path
-  lookup_bdev(path, &dev);
-			dm_rename
-			// change device name
-   blkdev_get_by_dev
-...
-vfs_create_mount
- alloc_vfsmnt
-  // mnt->mnt_devname is set to old name
-
-Test cmd:
-dmsetup create test1 --table "0 100000 linear /dev/sda 0"
-mkfs.ext2 -F /dev/mapper/test1
-mount /dev/mapper/test1 /mnt/test &
-dmsetup rename test1 test2
-
-Test result(If the above scenario triggers):
-mount will show test1 is mounted:
-[root@localhost ~]# mount | grep test
-/dev/mapper/test1 on /mnt/test type ext2 (rw,relatime,errors=continue,user_xattr,acl)
-
-while lsblk show test2 is mounted:
-[root@localhost ~]# lsblk /dev/sda
-NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda       8:0    0  100G  0 disk
-â””â”€test2 252:0    0 48.8M  0 dm   /mnt/test
-
-Furthermore, if a new device with name test1 is created, lsblk will show
-that it's mounted:
-[root@localhost ~]# dmsetup create test1 --table "0 100000 linear /dev/sdb 0" && lsblk /dev/sdb
-NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sdb       8:16   0   10G  0 disk
-â””â”€test1 252:1    0 48.8M  0 dm   /mnt/test
-
-Fix the problem by checking dev_name again after bdev if found by
-blkdev_get_by_path() in mount_bdev().
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
-changes in v2: rebase to latest version
- fs/super.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
-
-diff --git a/fs/super.c b/fs/super.c
-index 734ed584a946..c738da299fc1 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1341,6 +1341,20 @@ static int test_bdev_super(struct super_block *s, void *data)
- 	return !(s->s_iflags & SB_I_RETIRED) && (void *)s->s_bdev == data;
- }
- 
-+static int check_dev_name(struct block_device *bdev, const char *dev_name)
-+{
-+	dev_t dev;
-+	int error = lookup_bdev(dev_name, &dev);
-+
-+	if (error)
-+		return error;
-+
-+	if (dev != bdev->bd_dev)
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
- struct dentry *mount_bdev(struct file_system_type *fs_type,
- 	int flags, const char *dev_name, void *data,
- 	int (*fill_super)(struct super_block *, void *, int))
-@@ -1357,6 +1371,15 @@ struct dentry *mount_bdev(struct file_system_type *fs_type,
- 	if (IS_ERR(bdev))
- 		return ERR_CAST(bdev);
- 
-+	/*
-+	 * Some drivers support device rename, for example dm, make sure the
-+	 * right bdev is found, otherwise inconsistent device and mountpoint
-+	 * will be shown in /proc/mounts.
-+	 */
-+	error = check_dev_name(bdev, dev_name);
-+	if (error)
-+		goto error_bdev;
-+
- 	/*
- 	 * once the super is inserted into the list by sget, s_umount
- 	 * will protect the lockfs code from trying to start a snapshot
--- 
-2.31.1
+friendly ping ...
+> 
+> Fixes: 88459642cba4 ("blk-mq: abstract tag allocation out into sbitmap library")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> ---
+> Changes in official version:
+> - fix spelling mistake in comments
+> - add review tag
+> Changes in rfc v4:
+>   - remove patch 1, which improve fairness with overhead
+>   - merge patch2 and patch 3
+> Changes in rfc v3:
+>   - rename patch 2, and add some comments.
+>   - add patch 3, which fixes a new issue pointed out by Jan Kara.
+> Changes in rfc v2:
+>   - split to spearate patches for different problem.
+>   - add fix tag
+> 
+>   previous versions:
+> rfc v1: https://lore.kernel.org/all/20220617141125.3024491-1-yukuai3@huawei.com/
+> rfc v2: https://lore.kernel.org/all/20220619080309.1630027-1-yukuai3@huawei.com/
+> rfc v3: https://lore.kernel.org/all/20220710042200.20936-1-yukuai1@huaweicloud.com/
+> rfc v4: https://lore.kernel.org/all/20220723024122.2990436-1-yukuai1@huaweicloud.com/
+>   lib/sbitmap.c | 55 ++++++++++++++++++++++++++++++---------------------
+>   1 file changed, 33 insertions(+), 22 deletions(-)
+> 
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 29eb0484215a..1aa55806f6a5 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -611,32 +611,43 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   		return false;
+>   
+>   	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+> -	if (wait_cnt <= 0) {
+> -		int ret;
+> +	/*
+> +	 * For concurrent callers of this, callers should call this function
+> +	 * again to wakeup a new batch on a different 'ws'.
+> +	 */
+> +	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
+> +		return true;
+>   
+> -		wake_batch = READ_ONCE(sbq->wake_batch);
+> +	if (wait_cnt > 0)
+> +		return false;
+>   
+> -		/*
+> -		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> -		 * ensure that we see the batch size update before the wait
+> -		 * count is reset.
+> -		 */
+> -		smp_mb__before_atomic();
+> +	wake_batch = READ_ONCE(sbq->wake_batch);
+>   
+> -		/*
+> -		 * For concurrent callers of this, the one that failed the
+> -		 * atomic_cmpxhcg() race should call this function again
+> -		 * to wakeup a new batch on a different 'ws'.
+> -		 */
+> -		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+> -		if (ret == wait_cnt) {
+> -			sbq_index_atomic_inc(&sbq->wake_index);
+> -			wake_up_nr(&ws->wait, wake_batch);
+> -			return false;
+> -		}
+> +	/*
+> +	 * Wake up first in case that concurrent callers decrease wait_cnt
+> +	 * while waitqueue is empty.
+> +	 */
+> +	wake_up_nr(&ws->wait, wake_batch);
+>   
+> -		return true;
+> -	}
+> +	/*
+> +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> +	 * ensure that we see the batch size update before the wait
+> +	 * count is reset.
+> +	 *
+> +	 * Also pairs with the implicit barrier between decrementing wait_cnt
+> +	 * and checking for waitqueue_active() to make sure waitqueue_active()
+> +	 * sees result of the wakeup if atomic_dec_return() has seen the result
+> +	 * of atomic_set().
+> +	 */
+> +	smp_mb__before_atomic();
+> +
+> +	/*
+> +	 * Increase wake_index before updating wait_cnt, otherwise concurrent
+> +	 * callers can see valid wait_cnt in old waitqueue, which can cause
+> +	 * invalid wakeup on the old waitqueue.
+> +	 */
+> +	sbq_index_atomic_inc(&sbq->wake_index);
+> +	atomic_set(&ws->wait_cnt, wake_batch);
+>   
+>   	return false;
+>   }
+> 
 
