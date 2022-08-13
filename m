@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4321C19F2D
-	for <linux-block@archiver.kernel.org>; Sat, 13 Aug 2022 10:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 128D3C19F2D
+	for <linux-block@archiver.kernel.org>; Sat, 13 Aug 2022 10:24:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiHMKQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 Aug 2022 06:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35830 "EHLO
+        id S235340AbiHMKYf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 Aug 2022 06:24:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238902AbiHMKQT (ORCPT
+        with ESMTP id S229507AbiHMKYd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Aug 2022 06:16:19 -0400
+        Sat, 13 Aug 2022 06:24:33 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1DBB11C3A
-        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2022 03:16:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D7C6C13F00
+        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2022 03:24:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660385775;
+        s=mimecast20190719; t=1660386271;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=kxuhdyECDecFWFU7Cl1otkHgGws3cgxQwNohBZWx2rk=;
-        b=eU5LAfdX78Eg9o57TecTcEqaBJBhzbVCbEF3uPi7/lFiNNRDL9bAK0qO9zFNdsBxszTSyB
-        AvAr3a72S+p3YRRE6fLpLgVeRgSkW0VHBz0teAJMdYk6TI/9QiwNH6TOpMklNPEXhD+wuu
-        /IkaKPrZFpsyUWdxj5O6F2wHWHtuB0Q=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=heBqhuSUvVQ3TQrvRJ1Ob4V7EQd/ob9YSqetyGF3pHU=;
+        b=Qgr7C5VKreRhVRdMM28ohBC8BQ4mkB4AtdubgnCZbZpMShDMt42Pub6q8tLUuwMRKDLt3Q
+        fz+Pmo6U0I5k9mqUw7u1lpP9P68tNTEahECFtZbw5oKAU7GjzVdGpN/pG6mTkObqLiRJ5i
+        2VhfUJDzLbQPZec3Mu06v17OHKpeU8c=
+Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
+ [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-557-KFXopwmNMCGTU6w-CEbXZA-1; Sat, 13 Aug 2022 06:16:14 -0400
-X-MC-Unique: KFXopwmNMCGTU6w-CEbXZA-1
-Received: by mail-yb1-f197.google.com with SMTP id 130-20020a250188000000b006777ce7728cso2565781ybb.4
-        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2022 03:16:14 -0700 (PDT)
+ us-mta-673-HAYU8hEuM1SQMT_r9M9gmQ-1; Sat, 13 Aug 2022 06:24:27 -0400
+X-MC-Unique: HAYU8hEuM1SQMT_r9M9gmQ-1
+Received: by mail-yb1-f199.google.com with SMTP id j144-20020a25d296000000b0067ba828624fso2553672ybg.16
+        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2022 03:24:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=kxuhdyECDecFWFU7Cl1otkHgGws3cgxQwNohBZWx2rk=;
-        b=L1jDcdo79Zo1t6GX2w5S30x9vbFpwLcO+17q9CipsBEZRI/ta3BLT1/IZ5SkpElU8x
-         Hvw44Ox3EGZK1Fz7Y/+oBv7GBg6qEmzt7x2n7vt0LS9g/LN4FC1XmHAnlrK5ZdCJv1Lj
-         CX+U20wweYOL602Ew5OM3PPHWDvJN8TXo5nx8tjE13shShzzETG00YGwu91Wnc+BoCQB
-         3TSFjACpTqS6H2jG/vctyLWDPCZYLKGtoGHhShR3Oich0gIloNHZQDElCy8bxocODRaO
-         vLN/kSZpczuW3TDza6EbHPVtz8nRyA7xPUz/MCgenCbBz8fVoh8ZG0TRyTqkHYDh+qrO
-         XR3Q==
-X-Gm-Message-State: ACgBeo07qHeU0yO+UCPLsO1GHSPDcrcwJG3X+O6RO4TWPf4viZF9nlPG
-        hyWCMduaG7MbcMPB3v9U40hRRjK8Z+q7dGRqiI+9DAm26ZLZlEzV7DvsIvYhoMI9omSptTs+6g8
-        6gPOtm+odPtmiN6SpRLcreutMAzF4xToB0YUTju8=
-X-Received: by 2002:a25:4986:0:b0:67b:c97f:6975 with SMTP id w128-20020a254986000000b0067bc97f6975mr5580744yba.520.1660385774126;
-        Sat, 13 Aug 2022 03:16:14 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7NjWJlCpq5v/LdS5iBE5MaUF9Uy4TO9uoUfKHGEPc8tk7Z9Aap2Y03s+8tgahkQ4js9czAizNOCruqQmyJrAM=
-X-Received: by 2002:a25:4986:0:b0:67b:c97f:6975 with SMTP id
- w128-20020a254986000000b0067bc97f6975mr5580733yba.520.1660385773904; Sat, 13
- Aug 2022 03:16:13 -0700 (PDT)
+        bh=heBqhuSUvVQ3TQrvRJ1Ob4V7EQd/ob9YSqetyGF3pHU=;
+        b=07eDsSToXusQgyEFQ4sskWmCKfr0+NfO/dhiKmiER30cgJjXpdbigKXocv2+f2BMQW
+         G9LJzupKu1guVKp8Rdwdxwm2452y9eKq/+iR+Tm/O+9ohpwmIww9dO0Og69yyYd92wJ9
+         Qn9b8iNpFjZaRAS8d/zuSnue6RHN6/nXCyBFsFAayT03bs6f5oyehbo1HynhSpTc42Kk
+         8celsT0vmiitSORsqDz6vAbvnLywhZ2hT+n10/VzHuV2v1ksxi8EIULwlWpZeicOlsEJ
+         I9srzwk7GsjnV9RudnNea7TeuhZKafcw2xpd9Na3UUXl6aGEf67fpN/42Jj7y5HFNNXc
+         +kIw==
+X-Gm-Message-State: ACgBeo1FLxQWN+PivWqMekaf3cd4ctULRKrAX8pwSRn7NTy2+n9eAsdN
+        sfO9DCxEdTZ9embqi+YU3ZU01NFv5FM5c6cSQypr8RPPRRDymfOeq6AddCd87MYQBdLWIHWkQyY
+        BkvaX5oL7VXM1vWYRNMiC9G0oPY6krRjK5oe5eOA=
+X-Received: by 2002:a81:9302:0:b0:324:ec5a:1f17 with SMTP id k2-20020a819302000000b00324ec5a1f17mr7018292ywg.226.1660386267060;
+        Sat, 13 Aug 2022 03:24:27 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7FbPxLmo8443x3qZlFs9PgllVE0ldgl5bvMQMulS8vdH6b+0nvi3IVIATGPNbqa4Cf5lfFi2RRfW067bSMS74=
+X-Received: by 2002:a81:9302:0:b0:324:ec5a:1f17 with SMTP id
+ k2-20020a819302000000b00324ec5a1f17mr7018285ywg.226.1660386266878; Sat, 13
+ Aug 2022 03:24:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220809091629.104682-1-ZiyangZhang@linux.alibaba.com> <20220809091629.104682-2-ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20220809091629.104682-2-ZiyangZhang@linux.alibaba.com>
+References: <20220809091629.104682-1-ZiyangZhang@linux.alibaba.com> <20220809091629.104682-3-ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20220809091629.104682-3-ZiyangZhang@linux.alibaba.com>
 From:   Ming Lei <ming.lei@redhat.com>
-Date:   Sat, 13 Aug 2022 18:16:02 +0800
-Message-ID: <CAFj5m9KacVsDkbLhXpOK71D5jq3Udqao1Gw9uT9boW_Ftr1xaA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] ublk_drv: check ubq_daemon_is_dying() in __ublk_rq_task_work()
+Date:   Sat, 13 Aug 2022 18:24:16 +0800
+Message-ID: <CAFj5m9K9pqNKvbvLKZmZx3u+TBB0TDGO2QSniNTe2BxqPByhGQ@mail.gmail.com>
+Subject: Re: [PATCH 2/3] ublk_drv: update comment for __ublk_fail_req()
 To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         xiaoguang.wang@linux.alibaba.com
@@ -66,39 +66,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 9, 2022 at 5:17 PM ZiyangZhang
+On Tue, Aug 9, 2022 at 5:18 PM ZiyangZhang
 <ZiyangZhang@linux.alibaba.com> wrote:
 >
-> Replace direct check on PF_EXITING in __ublk_rq_task_work() by the
-> existing wrapper. Also inline ubq_daemon_is_dying().
+> Since __ublk_rq_task_work always fails requests immediately during
+> exiting, __ublk_fail_req() is only called from abort context during
+> exiting. So lock is unnecessary.
 >
 > Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 > ---
->  drivers/block/ublk_drv.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
+>  drivers/block/ublk_drv.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 >
 > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 2b7d1db5c4a7..3797bd64c3c3 100644
+> index 3797bd64c3c3..bedef46f6abf 100644
 > --- a/drivers/block/ublk_drv.c
 > +++ b/drivers/block/ublk_drv.c
-> @@ -555,7 +555,7 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
->         return (struct ublk_uring_cmd_pdu *)&ioucmd->pdu;
+> @@ -605,11 +605,9 @@ static void ublk_complete_rq(struct request *req)
 >  }
 >
-> -static bool ubq_daemon_is_dying(struct ublk_queue *ubq)
-> +static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
->  {
->         return ubq->ubq_daemon->flags & PF_EXITING;
->  }
-> @@ -644,8 +644,7 @@ static inline void __ublk_rq_task_work(struct request *req)
->         struct ublk_device *ub = ubq->dev;
->         int tag = req->tag;
->         struct ublk_io *io = &ubq->ios[tag];
-> -       bool task_exiting = current != ubq->ubq_daemon ||
-> -               (current->flags & PF_EXITING);
-> +       bool task_exiting = current != ubq->ubq_daemon || ubq_daemon_is_dying(ubq);
+>  /*
+> - * __ublk_fail_req() may be called from abort context or ->ubq_daemon
+> - * context during exiting, so lock is required.
+> - *
+> - * Also aborting may not be started yet, keep in mind that one failed
+> - * request may be issued by block layer again.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+I'd suggest to keep the above two lines, since that is the exact issue
+in patch 3.
 
 Thanks,
 
