@@ -2,77 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DAFC25B08
-	for <linux-block@archiver.kernel.org>; Sat, 13 Aug 2022 07:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4321C19F2D
+	for <linux-block@archiver.kernel.org>; Sat, 13 Aug 2022 10:16:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234125AbiHMHZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 13 Aug 2022 03:25:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46814 "EHLO
+        id S229719AbiHMKQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 13 Aug 2022 06:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233812AbiHMHZQ (ORCPT
+        with ESMTP id S238902AbiHMKQT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 13 Aug 2022 03:25:16 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BD727B;
-        Sat, 13 Aug 2022 00:25:14 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M4X8v3MHHzlCn0;
-        Sat, 13 Aug 2022 15:23:59 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgD3+_jWUfdi1eAhAQ--.47704S3;
-        Sat, 13 Aug 2022 15:25:12 +0800 (CST)
-Subject: Re: [PATCH] fs: fix possible inconsistent mount device
-To:     Christoph Hellwig <hch@infradead.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20220813060848.1457301-1-yukuai1@huaweicloud.com>
- <YvdJMj5hNem2PMVh@infradead.org>
- <230cf303-b241-957d-f5aa-5d367eddeb3f@huaweicloud.com>
- <YvdPlDPX82NsC6/d@infradead.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <9317e272-7412-853a-a73c-5d9c43bd23c2@huaweicloud.com>
-Date:   Sat, 13 Aug 2022 15:25:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sat, 13 Aug 2022 06:16:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F1DBB11C3A
+        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2022 03:16:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660385775;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kxuhdyECDecFWFU7Cl1otkHgGws3cgxQwNohBZWx2rk=;
+        b=eU5LAfdX78Eg9o57TecTcEqaBJBhzbVCbEF3uPi7/lFiNNRDL9bAK0qO9zFNdsBxszTSyB
+        AvAr3a72S+p3YRRE6fLpLgVeRgSkW0VHBz0teAJMdYk6TI/9QiwNH6TOpMklNPEXhD+wuu
+        /IkaKPrZFpsyUWdxj5O6F2wHWHtuB0Q=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-557-KFXopwmNMCGTU6w-CEbXZA-1; Sat, 13 Aug 2022 06:16:14 -0400
+X-MC-Unique: KFXopwmNMCGTU6w-CEbXZA-1
+Received: by mail-yb1-f197.google.com with SMTP id 130-20020a250188000000b006777ce7728cso2565781ybb.4
+        for <linux-block@vger.kernel.org>; Sat, 13 Aug 2022 03:16:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=kxuhdyECDecFWFU7Cl1otkHgGws3cgxQwNohBZWx2rk=;
+        b=L1jDcdo79Zo1t6GX2w5S30x9vbFpwLcO+17q9CipsBEZRI/ta3BLT1/IZ5SkpElU8x
+         Hvw44Ox3EGZK1Fz7Y/+oBv7GBg6qEmzt7x2n7vt0LS9g/LN4FC1XmHAnlrK5ZdCJv1Lj
+         CX+U20wweYOL602Ew5OM3PPHWDvJN8TXo5nx8tjE13shShzzETG00YGwu91Wnc+BoCQB
+         3TSFjACpTqS6H2jG/vctyLWDPCZYLKGtoGHhShR3Oich0gIloNHZQDElCy8bxocODRaO
+         vLN/kSZpczuW3TDza6EbHPVtz8nRyA7xPUz/MCgenCbBz8fVoh8ZG0TRyTqkHYDh+qrO
+         XR3Q==
+X-Gm-Message-State: ACgBeo07qHeU0yO+UCPLsO1GHSPDcrcwJG3X+O6RO4TWPf4viZF9nlPG
+        hyWCMduaG7MbcMPB3v9U40hRRjK8Z+q7dGRqiI+9DAm26ZLZlEzV7DvsIvYhoMI9omSptTs+6g8
+        6gPOtm+odPtmiN6SpRLcreutMAzF4xToB0YUTju8=
+X-Received: by 2002:a25:4986:0:b0:67b:c97f:6975 with SMTP id w128-20020a254986000000b0067bc97f6975mr5580744yba.520.1660385774126;
+        Sat, 13 Aug 2022 03:16:14 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7NjWJlCpq5v/LdS5iBE5MaUF9Uy4TO9uoUfKHGEPc8tk7Z9Aap2Y03s+8tgahkQ4js9czAizNOCruqQmyJrAM=
+X-Received: by 2002:a25:4986:0:b0:67b:c97f:6975 with SMTP id
+ w128-20020a254986000000b0067bc97f6975mr5580733yba.520.1660385773904; Sat, 13
+ Aug 2022 03:16:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YvdPlDPX82NsC6/d@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3+_jWUfdi1eAhAQ--.47704S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYz7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0
-        xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-        14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-        IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY
-        6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-        73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+References: <20220809091629.104682-1-ZiyangZhang@linux.alibaba.com> <20220809091629.104682-2-ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20220809091629.104682-2-ZiyangZhang@linux.alibaba.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Sat, 13 Aug 2022 18:16:02 +0800
+Message-ID: <CAFj5m9KacVsDkbLhXpOK71D5jq3Udqao1Gw9uT9boW_Ftr1xaA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] ublk_drv: check ubq_daemon_is_dying() in __ublk_rq_task_work()
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        xiaoguang.wang@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Aug 9, 2022 at 5:17 PM ZiyangZhang
+<ZiyangZhang@linux.alibaba.com> wrote:
+>
+> Replace direct check on PF_EXITING in __ublk_rq_task_work() by the
+> existing wrapper. Also inline ubq_daemon_is_dying().
+>
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> ---
+>  drivers/block/ublk_drv.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 2b7d1db5c4a7..3797bd64c3c3 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -555,7 +555,7 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
+>         return (struct ublk_uring_cmd_pdu *)&ioucmd->pdu;
+>  }
+>
+> -static bool ubq_daemon_is_dying(struct ublk_queue *ubq)
+> +static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
+>  {
+>         return ubq->ubq_daemon->flags & PF_EXITING;
+>  }
+> @@ -644,8 +644,7 @@ static inline void __ublk_rq_task_work(struct request *req)
+>         struct ublk_device *ub = ubq->dev;
+>         int tag = req->tag;
+>         struct ublk_io *io = &ubq->ios[tag];
+> -       bool task_exiting = current != ubq->ubq_daemon ||
+> -               (current->flags & PF_EXITING);
+> +       bool task_exiting = current != ubq->ubq_daemon || ubq_daemon_is_dying(ubq);
 
-
-ÔÚ 2022/08/13 15:15, Christoph Hellwig Ð´µÀ:
-> On Sat, Aug 13, 2022 at 03:09:58PM +0800, Yu Kuai wrote:
->> Thanks for your reply. Do you think it's better to remove the rename
->> support from dm? Or it's better to add such limit?
-> 
-> It will probably be hard to entirely remove it.  But documentation
-> and a rate limited warning discouraging it seems like a good idea.
-
-Yes, that's a good idea.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
 Thanks,
-Kuai
 
