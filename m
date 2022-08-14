@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B769FC282E7
-	for <linux-block@archiver.kernel.org>; Sun, 14 Aug 2022 15:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E56C28B2B
+	for <linux-block@archiver.kernel.org>; Sun, 14 Aug 2022 15:42:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240868AbiHNPgv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Aug 2022 11:36:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
+        id S241205AbiHNPmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Aug 2022 11:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240993AbiHNPgE (ORCPT
+        with ESMTP id S241683AbiHNPmJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Aug 2022 11:36:04 -0400
+        Sun, 14 Aug 2022 11:42:09 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E331DA47;
-        Sun, 14 Aug 2022 08:31:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4FB1C11F;
+        Sun, 14 Aug 2022 08:33:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4414AB80B27;
-        Sun, 14 Aug 2022 15:31:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CBA5C43144;
-        Sun, 14 Aug 2022 15:31:21 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 062C2B80B27;
+        Sun, 14 Aug 2022 15:33:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B58B4C433B5;
+        Sun, 14 Aug 2022 15:33:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660491082;
+        s=k20201202; t=1660491206;
         bh=g8DqRUnEJ1CxvVsgj9EkQ/vTlZZXVk/+ZnUNVFzMwU4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FRbTuRE9qwfGao0mpqiiLUSiEzsjMgDeILIokj9wXYlrWfr/wZKO4L+WiLV0ObHFp
-         lBj2rY8KGh0fn4DtiYYIegOrSie3oUvX0BucPxptb27ivn3Qiq9x3BnbZZNzbCIDUs
-         XbpT5U0e911ftv6cY8R0ofZ+kFsewUjqeqeqxGcFbM/IlGR/C1Ztuj+t4mC8aRwKao
-         V0k1sWiAcsJqaam9Am37pEoJAEwMSA1W4XIp1eV+9EZ8cxlj0F/oDVq5lgPGF51LLg
-         O4xWVqKdNd3VuGoMTKv3ynfqB4ieDbAA4FQpnwy8JE9YaX1Ky+Pq/V0gIHAB4R0Jms
-         gRKcM4KuBtbdA==
+        b=uHnttjCJ0xbP7lA3OcE6GnjmvXa3NQvrI1FkZ4htgZxJQZfapYoVxLsnXlyd1py7d
+         GjiFaCd6Kf7MOcY363g9RnnoJCeOUz7OLKb+J0dzPrHzqmxv0CJfDjfrixjpPepd7N
+         fJpCwSIQc5liKMPlG5fSHiNPDvxcQiYkRh99TcRavhMSHAznGwYi2Lb4FqT01EH2gQ
+         71ehgqjQQ8ZwCXOZ5zJaztcruitco1AJblTe5+ogvabTh7PhlvdgTnS6Om19kdX6J+
+         MYJqf2IdkhqUdzxLSO1e3BIZoIag8AT62vvSS5qKQDF9ihrbiI1l0gb5HlDT/B+Kr6
+         HApokqYs1gRCQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
@@ -40,12 +40,12 @@ Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.18 23/56] zram: do not lookup algorithm in backends table
-Date:   Sun, 14 Aug 2022 11:29:53 -0400
-Message-Id: <20220814153026.2377377-23-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 19/46] zram: do not lookup algorithm in backends table
+Date:   Sun, 14 Aug 2022 11:32:20 -0400
+Message-Id: <20220814153247.2378312-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220814153026.2377377-1-sashal@kernel.org>
-References: <20220814153026.2377377-1-sashal@kernel.org>
+In-Reply-To: <20220814153247.2378312-1-sashal@kernel.org>
+References: <20220814153247.2378312-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
