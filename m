@@ -2,150 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFB6C282E7
-	for <linux-block@archiver.kernel.org>; Sun, 14 Aug 2022 15:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E01C25B06
+	for <linux-block@archiver.kernel.org>; Sun, 14 Aug 2022 17:13:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241239AbiHNPrZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Aug 2022 11:47:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52634 "EHLO
+        id S229614AbiHNRNV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Aug 2022 13:13:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241882AbiHNPqe (ORCPT
+        with ESMTP id S229379AbiHNRNV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Aug 2022 11:46:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E750227B13;
-        Sun, 14 Aug 2022 08:35:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EF6A260DDA;
-        Sun, 14 Aug 2022 15:34:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F43C433D6;
-        Sun, 14 Aug 2022 15:34:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660491299;
-        bh=9oSHigocV2XvvM+6VuFD2ZFWpYY21AKOJNsjAjIvVtg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Cbz10SFVv2rp8uTMVXyB5b2+hZUNHsWFXerrtkZwNcIrm3I5Hg6Xi6kdnfJOrdRVj
-         vlsnExkbWVfQdw+otFrkVam0Zxoay+Muz5HgmNnY4d33lepgzj1VKImVtbYhtopMpw
-         g4Fo+uCqL4LG0dAMj79yeZMVf1Bn9j9QTfPjlN7gRtSyQzklfqXiLdGAR66aQnXVyh
-         fCi0zlhZYqPCF4qyQMGm3u3tQkfm+tzoB41TAkHgIY6EWOA9El3LtvsGU0tGgp/8kV
-         jmeqBafz45Zwj/bFUtG4tDz5hvUOrZy821cuJ5ZPQpRuH+IolLXe8y7Dmw9Tr4Flkw
-         QxnUfs7CnSCTg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 14/31] zram: do not lookup algorithm in backends table
-Date:   Sun, 14 Aug 2022 11:34:14 -0400
-Message-Id: <20220814153431.2379231-14-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220814153431.2379231-1-sashal@kernel.org>
-References: <20220814153431.2379231-1-sashal@kernel.org>
+        Sun, 14 Aug 2022 13:13:21 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221C91BEB0
+        for <linux-block@vger.kernel.org>; Sun, 14 Aug 2022 10:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1660497199; x=1692033199;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=X00vM0XAZLUKuxxe9zHqRF23LLYBwbFlSCVd0VEzTmI=;
+  b=UqNYD4yjsZO90qGiPeXaR3GrvFR96wK84W+QGNHSv9nEKBgOfuyEqUnA
+   /SfmGuQBcrdpwYxYl+asFtS1kyA5HkpfrhmqOH7M/tQQR9PZe5SWo4POA
+   hz86eVARgHWLmYPIzCwjGiA8Kov1GMk/QiK8lZXSEKkU3XJCpBHtGqfvp
+   nwymz3Op/YUe+gDTmx45wT6WLI5GNWW+W4+YyRGNXhmTaSEjxuuMQbZTD
+   HwXVH8xdI3xBC8ltUKCT0hNohDt7axU/Hv8jP5p5hOByEZQ0H4et73D+L
+   6WHULTnXestb5qdqdv66Q/PVylCxg8vj3KcCAzHrrRTm4zHXiitPDaYe7
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.93,236,1654531200"; 
+   d="scan'208";a="320763900"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Aug 2022 01:13:19 +0800
+IronPort-SDR: dyUUDYOJfoSUF7Th1XwnkWbxOylgWT+858lbDQ6TEOeuXFAOUKgKr0gYI5vU2lYF9Sa5LbXDSq
+ pABi/SyTO2No7eGSRpk4501Eaky+LmEvZjljy85uDdkySa7X6LChdkmck/NNrS1rY9A1ODRBUI
+ mRpYfIJEimL0FC6o2evKcVayUWM9GM7JoFDmxdFFRKoSBgJPq0l5qWub1bzCHIBa+tSVHYKNem
+ xXdNjhL0HNqebRGpotzVEJKcAY0hXpgRPXW04Laie6c5XEpN17fODN7R7Vamn4VfgAsFJuBlIH
+ GyUS/LIwAx+7zdXQuU6/clfO
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Aug 2022 09:34:09 -0700
+IronPort-SDR: KpWjp14Cq/km4ruJaE9s9P7r1oz/kbuC2rDZ8wUP1Cl/Mq/nrBC7bd14QyvkEwURlxfyx8oGSh
+ JYybMFThLP4CSRply9rxlzS+GswFiw9KtIT3nPMVUOg0zF3qX3JCMnBtBobIJmpquG9DXQRDIf
+ NLV3S7x+p3ErXbmNmkxko/WtD7gwrp8/a7V7TNvNSGf+W1SJN6QTO8ssdUCycefMQIYCqrwIlK
+ LNjj68o5OGF/yAmSEBJPGJpZUEsSooBLvW4IFEpcbXnN9m/fYjak9/56kkdDjfs+acB4FAIL7C
+ +L0=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Aug 2022 10:13:20 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M5PBQ5gdmz1RwqM
+        for <linux-block@vger.kernel.org>; Sun, 14 Aug 2022 10:13:18 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1660497198; x=1663089199; bh=X00vM0XAZLUKuxxe9zHqRF23LLYBwbFlSCV
+        d0VEzTmI=; b=HYH0dMhMv2iUy28cxsk8l4CmPg6M6g07S3Ak0JO51cm0/fthka0
+        uoFULVB+eCkGvWxfuiOGI1fk7Hs/ATE+mqJ4EiDcBmcOK6zXPUlIQBW0LEdS+3N9
+        /5sfQmtuZiFZFdA9g9eF6F6KfXT0Msjr1blb9o+bXIGRkt4Z/ItlpQ/1iu1yLAQl
+        94Rsuut8bPPScdIT0B41rutOWdI77FStKf3CAWwE+OZKfpc0QA071qdz42RiqLKp
+        zdwutl02XEnXCq7hUa8Y0wumW8wYNqH2uzKgOpCBruqU10gI7SGazalFAdyCAprV
+        +AfXis0TIfKxOF2+pugViJXFilQm0faQXqg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Z38bFb8hbVeN for <linux-block@vger.kernel.org>;
+        Sun, 14 Aug 2022 10:13:18 -0700 (PDT)
+Received: from [10.225.89.57] (cnd1221sqt.ad.shared [10.225.89.57])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M5PBP53lsz1RtVk;
+        Sun, 14 Aug 2022 10:13:17 -0700 (PDT)
+Message-ID: <f4e10a9a-313d-ce24-c610-f4e8d072d4f4@opensource.wdc.com>
+Date:   Sun, 14 Aug 2022 10:13:16 -0700
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [PATCH] block: Submit flush requests to the I/O scheduler
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20220812210355.2252143-1-bvanassche@acm.org>
+ <20220813064142.GA10753@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220813064142.GA10753@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
+On 2022/08/12 23:41, Christoph Hellwig wrote:
+> On Fri, Aug 12, 2022 at 02:03:55PM -0700, Bart Van Assche wrote:
+>> When submitting a REQ_OP_WRITE | REQ_FUA request to a zoned storage
+>> device, these requests must be passed to the (mq-deadline) I/O scheduler
+>> to ensure that these happen at the write pointer.
+> 
+> Yes.
+> 
+> But maybe I'm stupid, but how is the patch related to fixing that?
+> blk_mq_plug_issue_direct is called from blk_mq_flush_plug_list for
+> only the !has_elevator case.  How does that change a thing?
 
-[ Upstream commit dc89997264de565999a1cb55db3f295d3a8e457b ]
+And writes to zoned drives never get plugged in the first place, scheduler
+present or not.
 
-Always use crypto_has_comp() so that crypto can lookup module, call
-usermodhelper to load the modules, wait for usermodhelper to finish and so
-on.  Otherwise crypto will do all of these steps under CPU hot-plug lock
-and this looks like too much stuff to handle under the CPU hot-plug lock.
-Besides this can end up in a deadlock when usermodhelper triggers a code
-path that attempts to lock the CPU hot-plug lock, that zram already holds.
+> 
+> Also please include a description of why these changes are otherwise
+> good and won't regress other cases.
+> 
+>> +		blk_mq_sched_insert_request(rq, /*at_head=*/false,
+>> +			/*run_queue=*/last, /*async=*/false);
+> 
+> I find thise comment style very hard to read.  Yes, maybe the three
+> bools here should become flags, but this is even worse than just
+> passing the arguments.
 
-An example of such deadlock:
 
-- path A. zram grabs CPU hot-plug lock, execs /sbin/modprobe from crypto
-  and waits for modprobe to finish
-
-disksize_store
- zcomp_create
-  __cpuhp_state_add_instance
-   __cpuhp_state_add_instance_cpuslocked
-    zcomp_cpu_up_prepare
-     crypto_alloc_base
-      crypto_alg_mod_lookup
-       call_usermodehelper_exec
-        wait_for_completion_killable
-         do_wait_for_common
-          schedule
-
-- path B. async work kthread that brings in scsi device. It wants to
-  register CPUHP states at some point, and it needs the CPU hot-plug
-  lock for that, which is owned by zram.
-
-async_run_entry_fn
- scsi_probe_and_add_lun
-  scsi_mq_alloc_queue
-   blk_mq_init_queue
-    blk_mq_init_allocated_queue
-     blk_mq_realloc_hw_ctxs
-      __cpuhp_state_add_instance
-       __cpuhp_state_add_instance_cpuslocked
-        mutex_lock
-         schedule
-
-- path C. modprobe sleeps, waiting for all aync works to finish.
-
-load_module
- do_init_module
-  async_synchronize_full
-   async_synchronize_cookie_domain
-    schedule
-
-[senozhatsky@chromium.org: add comment]
-  Link: https://lkml.kernel.org/r/20220624060606.1014474-1-senozhatsky@chromium.org
-Link: https://lkml.kernel.org/r/20220622023501.517125-1-senozhatsky@chromium.org
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Minchan Kim <minchan@kernel.org>
-Cc: Nitin Gupta <ngupta@vflare.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/zram/zcomp.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 33e3b76c4fa9..b08650417bf0 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -61,12 +61,6 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
- 
- bool zcomp_available_algorithm(const char *comp)
- {
--	int i;
--
--	i = sysfs_match_string(backends, comp);
--	if (i >= 0)
--		return true;
--
- 	/*
- 	 * Crypto does not ignore a trailing new line symbol,
- 	 * so make sure you don't supply a string containing
-@@ -215,6 +209,11 @@ struct zcomp *zcomp_create(const char *compress)
- 	struct zcomp *comp;
- 	int error;
- 
-+	/*
-+	 * Crypto API will execute /sbin/modprobe if the compression module
-+	 * is not loaded yet. We must do it here, otherwise we are about to
-+	 * call /sbin/modprobe under CPU hot-plug lock.
-+	 */
- 	if (!zcomp_available_algorithm(compress))
- 		return ERR_PTR(-EINVAL);
- 
 -- 
-2.35.1
-
+Damien Le Moal
+Western Digital Research
