@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E56C28B2B
-	for <linux-block@archiver.kernel.org>; Sun, 14 Aug 2022 15:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFB6C282E7
+	for <linux-block@archiver.kernel.org>; Sun, 14 Aug 2022 15:47:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241205AbiHNPmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Aug 2022 11:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39570 "EHLO
+        id S241239AbiHNPrZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Aug 2022 11:47:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241683AbiHNPmJ (ORCPT
+        with ESMTP id S241882AbiHNPqe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Aug 2022 11:42:09 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4FB1C11F;
-        Sun, 14 Aug 2022 08:33:29 -0700 (PDT)
+        Sun, 14 Aug 2022 11:46:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E750227B13;
+        Sun, 14 Aug 2022 08:35:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 062C2B80B27;
-        Sun, 14 Aug 2022 15:33:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B58B4C433B5;
-        Sun, 14 Aug 2022 15:33:25 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EF6A260DDA;
+        Sun, 14 Aug 2022 15:34:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F43C433D6;
+        Sun, 14 Aug 2022 15:34:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660491206;
-        bh=g8DqRUnEJ1CxvVsgj9EkQ/vTlZZXVk/+ZnUNVFzMwU4=;
+        s=k20201202; t=1660491299;
+        bh=9oSHigocV2XvvM+6VuFD2ZFWpYY21AKOJNsjAjIvVtg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uHnttjCJ0xbP7lA3OcE6GnjmvXa3NQvrI1FkZ4htgZxJQZfapYoVxLsnXlyd1py7d
-         GjiFaCd6Kf7MOcY363g9RnnoJCeOUz7OLKb+J0dzPrHzqmxv0CJfDjfrixjpPepd7N
-         fJpCwSIQc5liKMPlG5fSHiNPDvxcQiYkRh99TcRavhMSHAznGwYi2Lb4FqT01EH2gQ
-         71ehgqjQQ8ZwCXOZ5zJaztcruitco1AJblTe5+ogvabTh7PhlvdgTnS6Om19kdX6J+
-         MYJqf2IdkhqUdzxLSO1e3BIZoIag8AT62vvSS5qKQDF9ihrbiI1l0gb5HlDT/B+Kr6
-         HApokqYs1gRCQ==
+        b=Cbz10SFVv2rp8uTMVXyB5b2+hZUNHsWFXerrtkZwNcIrm3I5Hg6Xi6kdnfJOrdRVj
+         vlsnExkbWVfQdw+otFrkVam0Zxoay+Muz5HgmNnY4d33lepgzj1VKImVtbYhtopMpw
+         g4Fo+uCqL4LG0dAMj79yeZMVf1Bn9j9QTfPjlN7gRtSyQzklfqXiLdGAR66aQnXVyh
+         fCi0zlhZYqPCF4qyQMGm3u3tQkfm+tzoB41TAkHgIY6EWOA9El3LtvsGU0tGgp/8kV
+         jmeqBafz45Zwj/bFUtG4tDz5hvUOrZy821cuJ5ZPQpRuH+IolLXe8y7Dmw9Tr4Flkw
+         QxnUfs7CnSCTg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
@@ -40,12 +40,12 @@ Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>, axboe@kernel.dk,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 19/46] zram: do not lookup algorithm in backends table
-Date:   Sun, 14 Aug 2022 11:32:20 -0400
-Message-Id: <20220814153247.2378312-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 14/31] zram: do not lookup algorithm in backends table
+Date:   Sun, 14 Aug 2022 11:34:14 -0400
+Message-Id: <20220814153431.2379231-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220814153247.2378312-1-sashal@kernel.org>
-References: <20220814153247.2378312-1-sashal@kernel.org>
+In-Reply-To: <20220814153431.2379231-1-sashal@kernel.org>
+References: <20220814153431.2379231-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -118,10 +118,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 052aa3f65514..0916de952e09 100644
+index 33e3b76c4fa9..b08650417bf0 100644
 --- a/drivers/block/zram/zcomp.c
 +++ b/drivers/block/zram/zcomp.c
-@@ -63,12 +63,6 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
+@@ -61,12 +61,6 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
  
  bool zcomp_available_algorithm(const char *comp)
  {
@@ -134,7 +134,7 @@ index 052aa3f65514..0916de952e09 100644
  	/*
  	 * Crypto does not ignore a trailing new line symbol,
  	 * so make sure you don't supply a string containing
-@@ -217,6 +211,11 @@ struct zcomp *zcomp_create(const char *compress)
+@@ -215,6 +209,11 @@ struct zcomp *zcomp_create(const char *compress)
  	struct zcomp *comp;
  	int error;
  
