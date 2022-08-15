@@ -2,114 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 362D6C00140
-	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 09:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 784CCC3F6B0
+	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 09:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241327AbiHOJGL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Aug 2022 05:06:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
+        id S232108AbiHOJbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Aug 2022 05:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241184AbiHOJGL (ORCPT
+        with ESMTP id S232095AbiHOJbm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Aug 2022 05:06:11 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB4D2125E
-        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 02:06:09 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id l10so7037531lje.7
-        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 02:06:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=tf1vMIiecR0r0of3sA5ko3/A41BbAyaLyYN5Dj8JeKU=;
-        b=NQkuCecGLhbS102+DPU72DqgUZblpJJTYavx0kCqY9ghhzkHsDs6aaKTghbHvwfxd/
-         2bL4JO+M7GzVLsAPgfc9r1hW7KmlPa9KPFwrpvhXmGCP7SQzFsPy84gGVhF71MwBh5OO
-         e2n6xLg5mGvk0Ak8lNNqHb8o14cyN+GydhC3DvaeUSZblNKZ1o3oC516fOkDnWkr/f9w
-         AUDN1ZRTBklQ173+29WJL3Pa1qYYbK1/GEP5vzKTFfBuMUPMjVYmoLVRTs9BRffUAGAt
-         m/BDmBFBOk9G9vNkLqRewfcue7P8y2wbav0KqL742KVi9gwXV8P1PJUmao4WMHzUYwUA
-         BgWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=tf1vMIiecR0r0of3sA5ko3/A41BbAyaLyYN5Dj8JeKU=;
-        b=PsoGT8nc9q1RScGz8rHizakv5n/f7MizozBJJzpwDlH9Tht+98gB7Z5QcEezJ0Sr9U
-         81ZI4izy9oN9h7UZoNSi5+KcHMHH1T/YtxQt5+VPrmkKVznHpiAfGvJjtLg2Z4Kj41po
-         ScXqvGXBNUg+b4iiJsN3AccAl2AlIYTNAndSAZmyoVYIaDLGhfNbGnit5yTNmKj2BTRB
-         1Djgif40qowpBfKlZfOU8mDG8HdHZERf/vqaf0/0jFn3tck182Px9D6F9jwqpsdGCwH5
-         M4CyAmgWP8fjG0cjO1XdigN+9nzQrW4iJGUL0gCjNzwgwKWdZtISch5AapIJE/qwEXHO
-         WrxQ==
-X-Gm-Message-State: ACgBeo2Z9YFOgELl3iTX8l0ftMgBPuG0CC/DGuFT/HiicfZjShO0Nrym
-        ngvPAu4MqN75U7Y8bZePv7I=
-X-Google-Smtp-Source: AA6agR6Yn93L4ph9JdEiNHdR/pHgygC7DusfHDFHibSVk78XYN+lxTzBvG+zu3W1fV45hz3Xuq7uKw==
-X-Received: by 2002:a2e:3210:0:b0:25e:6091:d9a with SMTP id y16-20020a2e3210000000b0025e60910d9amr4412823ljy.343.1660554368050;
-        Mon, 15 Aug 2022 02:06:08 -0700 (PDT)
-Received: from localhost ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id j5-20020ac24545000000b0048b28acab8csm1040230lfm.64.2022.08.15.02.06.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Aug 2022 02:06:07 -0700 (PDT)
-Date:   Mon, 15 Aug 2022 11:06:06 +0200
-From:   Pankaj Raghav <pankydev8@gmail.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH] block: Submit flush requests to the I/O scheduler
-Message-ID: <20220815090606.lygbriic32tks45l@quentin>
-References: <20220812210355.2252143-1-bvanassche@acm.org>
- <20220813064142.GA10753@lst.de>
- <f4e10a9a-313d-ce24-c610-f4e8d072d4f4@opensource.wdc.com>
- <09689854-b7b7-9a5c-cda7-f1f4de42b5fe@acm.org>
+        Mon, 15 Aug 2022 05:31:42 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B401117F;
+        Mon, 15 Aug 2022 02:31:41 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id F3B4B20134;
+        Mon, 15 Aug 2022 09:31:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1660555900;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5h+6dMJXLvTUhDdgYsCYGE7DqfaiThyuBXafm3lVxnk=;
+        b=psJt9Ek0Mz6wTogTcV2x4KyVeR5jUkh7Ddsmp80L0+m8lbvb8m26j4Rh91pYtO7oV5dw6C
+        NPKyHtrJAJ990nI1PifeWLtdJyyw4As6NZa1O4Ktyl7lejv1s06CnrUIQlA4OGNrllFEIW
+        pUAuIR5uZz+rsWcqb5ynh/chHvomIkQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1660555900;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5h+6dMJXLvTUhDdgYsCYGE7DqfaiThyuBXafm3lVxnk=;
+        b=gSY3g1TpOIVFTT+Sp3UoBhTUnI33ePw+tJXSno2WTdLB9uVK6dqh0zM6WC+XSKFYp38QEX
+        cSZkSX5WlB1KZOCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 90D8D13A93;
+        Mon, 15 Aug 2022 09:31:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id i8EqIXsS+mKCWwAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Mon, 15 Aug 2022 09:31:39 +0000
+Date:   Mon, 15 Aug 2022 11:31:37 +0200
+From:   Petr Vorel <pvorel@suse.cz>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.de>,
+        linux-xfs@vger.kernel.org, ltp@lists.linux.it
+Subject: Re: LTP test df01.sh detected different size of loop device in v5.19
+Message-ID: <YvoSeTmLoQVxq7p9@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <YvZc+jvRdTLn8rus@pevik>
+ <YvZUfq+3HYwXEncw@pevik>
+ <YvZTpQFinpkB06p9@pevik>
+ <20220814224440.GR3600936@dread.disaster.area>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <09689854-b7b7-9a5c-cda7-f1f4de42b5fe@acm.org>
+In-Reply-To: <20220814224440.GR3600936@dread.disaster.area>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Aug 14, 2022 at 04:44:31PM -0700, Bart Van Assche wrote:
-> I agree that blk_mq_submit_bio() does not plug writes to zoned drives
-> because of the following code in blk_mq_plug():
-> 
-> /* Zoned block device write operation case: do not plug the BIO */
-> if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
-> 	return NULL;
-> 
-> However, I have not found any code in blk_execute_rq_nowait() that causes
-> the plugging mechanism to be skipped for zoned writes. Did I perhaps
-> overlook something? The current blk_execute_rq_nowait() implementation is as
-> follows:
-> 
-IIUC, blk_execute_rq_nowait() is used mainly by lower level drivers to send
-commands but current->plug is not initialized with blk_start_plug() in those
-drivers. So, the rqs are not added to the plug list.
+Hi Dave,
 
-I did a quick test with fio with the new uring_cmd IO path that uses
-blk_execute_rq_nowait() and it never plugged the rqs.
+> On Fri, Aug 12, 2022 at 03:20:37PM +0200, Petr Vorel wrote:
+> > Hi all,
 
-fio --filename=/dev/ng0n3 --size=128M --rw=write --bs=4k --zonemode=zbd --ioengine=io_uring_cmd --name=zoned
+> > LTP test df01.sh found different size of loop device in v5.19.
+> > Test uses loop device formatted on various file systems, only XFS fails.
+> > It randomly fails during verifying that loop size usage changes:
 
-Did you notice it otherwise?
+> > grep ${TST_DEVICE} output | grep -q "${total}.*${used}" [1]
 
-But I think it is better if we change current->plug to blk_mq_plug() to
-be on the safer side.
-> void blk_execute_rq_nowait(struct request *rq, bool at_head)
-> {
-> 	WARN_ON(irqs_disabled());
-> 	WARN_ON(!blk_rq_is_passthrough(rq));
-> 
-> 	blk_account_io_start(rq);
-> 	if (current->plug)
-> 		blk_add_rq_to_plug(current->plug, rq);
-> 	else
-> 		blk_mq_sched_insert_request(rq, at_head, true, false);
-> }
-> 
-> Thanks,
-> 
-> Bart.
+> > How to reproduce:
+> > # PATH="/opt/ltp/testcases/bin:$PATH" df01.sh -f xfs # it needs several tries to hit
 
--- 
-Pankaj Raghav
+> > df saved output:
+> > Filesystem     1024-blocks    Used Available Capacity Mounted on
+> > ...
+> > /dev/loop0          256672   16208    240464       7% /tmp/LTP_df01.1kRwoUCCR7/mntpoint
+> > df output:
+> > Filesystem     1024-blocks    Used Available Capacity Mounted on
+> > ...
+> > tmpfs               201780       0    201780       0% /run/user/0
+> > /dev/loop0          256672   15160    241512       6% /tmp/LTP_df01.1kRwoUCCR7/mntpoint
+> > => different size
+> > df01 4 TFAIL: 'df -k -P' failed, not expected.
+
+> Yup, most likely because we changed something in XFS related to
+> internal block reservation spaces. That is, the test is making
+> fundamentally flawed assumptions about filesystem used space
+> accounting.
+
+> It is wrong to assuming that the available capacity of a given empty
+> filesystem will never change.  Assumptions like this have been
+> invalid for decades because the available space can change based on
+> the underlying configuration or the filesystem. e.g. different
+> versions of mkfs.xfs set different default parameters and so simply
+> changing the version of xfsprogs you use between the two comparision
+> tests will make it fail....
+
+> And, well, XFS also has XFS_IOC_{GS}ET_RESBLKS ioctls that allow
+> userspace to change the amount of reserved blocks. They were
+> introduced in 1997, and since then we've changed the default
+> reservation the filesystem takes at least a dozen times.
+
+Thanks a lot for valuable info.
+
+> > > It might be a false positive / bug in the test, but it's at least a changed behavior.
+
+> Yup, any test that assumes "available space" does not change from
+> kernel version to kernel version is flawed. There is no guarantee
+> that this ever stays the same, nor that it needs to stay the same.
+I'm sorry I was not clear. Test [1] does not measure "available space" between
+kernel releases. It just run df command with parameters, saves it's output
+and compares "1024-blocks" and "Used" columns of df output with stat output:
+
+		local total=$(stat -f mntpoint --printf=%b)
+		local free=$(stat -f mntpoint --printf=%f)
+		local used=$((total-free))
+
+		local bsize=$(stat -f mntpoint --printf=%s)
+		total=$((($total * $bsize + 512)/ 1024))
+		used=$((($used * $bsize + 512) / 1024))
+
+And comparison with "$used" is what sometimes fails.
+
+BTW this happens on both distros when loop device is on tmpfs. I'm trying to
+trigger it on ext4 and btrfs, not successful so far. Looks like it's tmpfs
+related.
+
+If that's really expected, we might remove this check for used for XFS
+(not sure if check only for total makes sense).
+
+> > > I was able to reproduce it on v5.19 distro kernels (openSUSE, Debian).
+> > > I haven't bisected (yet), nor checked Jens' git tree (maybe it has been fixed).
+
+> > Forget to note dmesg "operation not supported error" warning on *each* run (even
+> > successful) on affected v5.19:
+> > [ 5097.594021] loop0: detected capacity change from 0 to 524288
+> > [ 5097.658201] operation not supported error, dev loop0, sector 262192 op 0x9:(WRITE_ZEROES) flags 0x8000800 phys_seg 0 prio class 0
+> > [ 5097.675670] XFS (loop0): Mounting V5 Filesystem
+> > [ 5097.681668] XFS (loop0): Ending clean mount
+> > [ 5097.956445] XFS (loop0): Unmounting Filesystem
+
+> That warning is from mkfs attempting to use fallocate(ZERO_RANGE) to
+> offload the zeroing of the journal to the block device. It would
+> seem that the loop device image file is being hosted on a filesystem
+> that does not support the fallocate() ZERO_RANGE (or maybe
+> PUNCH_HOLE) operation. That warning should simply be removed - it
+> serves no useful purpose to a user...
+Interesting. Which one of these two is not supported on tmpfs?
+
+Kind regards,
+Petr
+
+> CHeers,
+
+> Dave.
+
+[1] https://github.com/linux-test-project/ltp/blob/f42f6f3b4671f447b743afe8612917ba4362b8a6/testcases/commands/df/df01.sh
