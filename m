@@ -2,93 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC7FC25B06
-	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 02:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 362D6C00140
+	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 09:06:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231889AbiHOChf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Aug 2022 22:37:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33888 "EHLO
+        id S241327AbiHOJGL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Aug 2022 05:06:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiHOChf (ORCPT
+        with ESMTP id S241184AbiHOJGL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Aug 2022 22:37:35 -0400
-Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58BBC13D5C
-        for <linux-block@vger.kernel.org>; Sun, 14 Aug 2022 19:37:33 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VMCMo05_1660531048;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VMCMo05_1660531048)
-          by smtp.aliyun-inc.com;
-          Mon, 15 Aug 2022 10:37:31 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     ming.lei@redhat.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, xiaoguang.wang@linux.alibaba.com,
-        joseph.qi@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V2 3/3] ublk_drv: do not add a re-issued request aborted previously to ioucmd's task_work
-Date:   Mon, 15 Aug 2022 10:36:33 +0800
-Message-Id: <20220815023633.259825-4-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220815023633.259825-1-ZiyangZhang@linux.alibaba.com>
-References: <20220815023633.259825-1-ZiyangZhang@linux.alibaba.com>
+        Mon, 15 Aug 2022 05:06:11 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB4D2125E
+        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 02:06:09 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id l10so7037531lje.7
+        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 02:06:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=tf1vMIiecR0r0of3sA5ko3/A41BbAyaLyYN5Dj8JeKU=;
+        b=NQkuCecGLhbS102+DPU72DqgUZblpJJTYavx0kCqY9ghhzkHsDs6aaKTghbHvwfxd/
+         2bL4JO+M7GzVLsAPgfc9r1hW7KmlPa9KPFwrpvhXmGCP7SQzFsPy84gGVhF71MwBh5OO
+         e2n6xLg5mGvk0Ak8lNNqHb8o14cyN+GydhC3DvaeUSZblNKZ1o3oC516fOkDnWkr/f9w
+         AUDN1ZRTBklQ173+29WJL3Pa1qYYbK1/GEP5vzKTFfBuMUPMjVYmoLVRTs9BRffUAGAt
+         m/BDmBFBOk9G9vNkLqRewfcue7P8y2wbav0KqL742KVi9gwXV8P1PJUmao4WMHzUYwUA
+         BgWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=tf1vMIiecR0r0of3sA5ko3/A41BbAyaLyYN5Dj8JeKU=;
+        b=PsoGT8nc9q1RScGz8rHizakv5n/f7MizozBJJzpwDlH9Tht+98gB7Z5QcEezJ0Sr9U
+         81ZI4izy9oN9h7UZoNSi5+KcHMHH1T/YtxQt5+VPrmkKVznHpiAfGvJjtLg2Z4Kj41po
+         ScXqvGXBNUg+b4iiJsN3AccAl2AlIYTNAndSAZmyoVYIaDLGhfNbGnit5yTNmKj2BTRB
+         1Djgif40qowpBfKlZfOU8mDG8HdHZERf/vqaf0/0jFn3tck182Px9D6F9jwqpsdGCwH5
+         M4CyAmgWP8fjG0cjO1XdigN+9nzQrW4iJGUL0gCjNzwgwKWdZtISch5AapIJE/qwEXHO
+         WrxQ==
+X-Gm-Message-State: ACgBeo2Z9YFOgELl3iTX8l0ftMgBPuG0CC/DGuFT/HiicfZjShO0Nrym
+        ngvPAu4MqN75U7Y8bZePv7I=
+X-Google-Smtp-Source: AA6agR6Yn93L4ph9JdEiNHdR/pHgygC7DusfHDFHibSVk78XYN+lxTzBvG+zu3W1fV45hz3Xuq7uKw==
+X-Received: by 2002:a2e:3210:0:b0:25e:6091:d9a with SMTP id y16-20020a2e3210000000b0025e60910d9amr4412823ljy.343.1660554368050;
+        Mon, 15 Aug 2022 02:06:08 -0700 (PDT)
+Received: from localhost ([194.62.217.57])
+        by smtp.gmail.com with ESMTPSA id j5-20020ac24545000000b0048b28acab8csm1040230lfm.64.2022.08.15.02.06.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Aug 2022 02:06:07 -0700 (PDT)
+Date:   Mon, 15 Aug 2022 11:06:06 +0200
+From:   Pankaj Raghav <pankydev8@gmail.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH] block: Submit flush requests to the I/O scheduler
+Message-ID: <20220815090606.lygbriic32tks45l@quentin>
+References: <20220812210355.2252143-1-bvanassche@acm.org>
+ <20220813064142.GA10753@lst.de>
+ <f4e10a9a-313d-ce24-c610-f4e8d072d4f4@opensource.wdc.com>
+ <09689854-b7b7-9a5c-cda7-f1f4de42b5fe@acm.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09689854-b7b7-9a5c-cda7-f1f4de42b5fe@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In ublk_queue_rq(), Assume current request is a re-issued request aborted
-previously in monitor_work because the ubq_daemon(ioucmd's task) is
-PF_EXITING. For this request, we cannot call
-io_uring_cmd_complete_in_task() anymore because at that moment io_uring
-context may be freed in case that no inflight ioucmd exists. Otherwise,
-we may cause null-deref in ctx->fallback_work.
+On Sun, Aug 14, 2022 at 04:44:31PM -0700, Bart Van Assche wrote:
+> I agree that blk_mq_submit_bio() does not plug writes to zoned drives
+> because of the following code in blk_mq_plug():
+> 
+> /* Zoned block device write operation case: do not plug the BIO */
+> if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
+> 	return NULL;
+> 
+> However, I have not found any code in blk_execute_rq_nowait() that causes
+> the plugging mechanism to be skipped for zoned writes. Did I perhaps
+> overlook something? The current blk_execute_rq_nowait() implementation is as
+> follows:
+> 
+IIUC, blk_execute_rq_nowait() is used mainly by lower level drivers to send
+commands but current->plug is not initialized with blk_start_plug() in those
+drivers. So, the rqs are not added to the plug list.
 
-Add a check on UBLK_IO_FLAG_ABORTED to prevent the above situation. This
-check is safe and makes sense.
+I did a quick test with fio with the new uring_cmd IO path that uses
+blk_execute_rq_nowait() and it never plugged the rqs.
 
-Note: monitor_work sets UBLK_IO_FLAG_ABORTED and ends this request
-(releasing the tag). Then the request is restarted(allocating the tag)
-and we are here. Since releasing/allocating a tag implies smp_mb(),
-finding UBLK_IO_FLAG_ABORTED guarantees that here is a re-issued request
-aborted previously.
+fio --filename=/dev/ng0n3 --size=128M --rw=write --bs=4k --zonemode=zbd --ioengine=io_uring_cmd --name=zoned
 
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- drivers/block/ublk_drv.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+Did you notice it otherwise?
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 685a43b7ae6e..6a4a94b4cdf4 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -756,9 +756,25 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		if (task_work_add(ubq->ubq_daemon, &data->work, notify_mode))
- 			goto fail;
- 	} else {
--		struct io_uring_cmd *cmd = ubq->ios[rq->tag].cmd;
-+		struct ublk_io *io = &ubq->ios[rq->tag];
-+		struct io_uring_cmd *cmd = io->cmd;
- 		struct ublk_uring_cmd_pdu *pdu = ublk_get_uring_cmd_pdu(cmd);
- 
-+		/*
-+		 * If the check pass, we know that this is a re-issued request aborted
-+		 * previously in monitor_work because the ubq_daemon(cmd's task) is
-+		 * PF_EXITING. We cannot call io_uring_cmd_complete_in_task() anymore
-+		 * because this ioucmd's io_uring context may be freed now if no inflight
-+		 * ioucmd exists. Otherwise we may cause null-deref in ctx->fallback_work.
-+		 *
-+		 * Note: monitor_work sets UBLK_IO_FLAG_ABORTED and ends this request(releasing
-+		 * the tag). Then the request is re-started(allocating the tag) and we are here.
-+		 * Since releasing/allocating a tag implies smp_mb(), finding UBLK_IO_FLAG_ABORTED
-+		 * guarantees that here is a re-issued request aborted previously.
-+		 */
-+		if ((io->flags & UBLK_IO_FLAG_ABORTED))
-+			goto fail;
-+
- 		pdu->req = rq;
- 		io_uring_cmd_complete_in_task(cmd, ublk_rq_task_work_cb);
- 	}
+But I think it is better if we change current->plug to blk_mq_plug() to
+be on the safer side.
+> void blk_execute_rq_nowait(struct request *rq, bool at_head)
+> {
+> 	WARN_ON(irqs_disabled());
+> 	WARN_ON(!blk_rq_is_passthrough(rq));
+> 
+> 	blk_account_io_start(rq);
+> 	if (current->plug)
+> 		blk_add_rq_to_plug(current->plug, rq);
+> 	else
+> 		blk_mq_sched_insert_request(rq, at_head, true, false);
+> }
+> 
+> Thanks,
+> 
+> Bart.
+
 -- 
-2.27.0
-
+Pankaj Raghav
