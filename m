@@ -2,220 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B5B2C00140
-	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 13:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBB2C00140
+	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 16:31:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231592AbiHONii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Aug 2022 09:38:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51014 "EHLO
+        id S229684AbiHOQbU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Aug 2022 12:31:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230100AbiHONih (ORCPT
+        with ESMTP id S239369AbiHOQbM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Aug 2022 09:38:37 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291182127D
-        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 06:38:36 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220815133833euoutp0277fe0ba82cf963934f563d7791cfb43a~LiEPyn45g0397703977euoutp02Z
-        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 13:38:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220815133833euoutp0277fe0ba82cf963934f563d7791cfb43a~LiEPyn45g0397703977euoutp02Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1660570713;
-        bh=uinaqvipRzgM4fZTJ7/seCP1gQZj63jPFUT+oy/zEQo=;
-        h=Date:From:Subject:To:CC:In-Reply-To:References:From;
-        b=VTiOrSLC1BJ2t0y+nUyCM22s7H/Cy3I7EQG73gzv5eHbmNwd9NyResP0c+WBn+T/D
-         LDyoLcAfcqwAr4AvtJdGLDQS5k5xVEx7mhkxE7D2p0f6SKen50XzcUHyEoEHJl3m9r
-         Zn/PQq8puYJQQFyP3g14bLA3JLQheUvaeN/lzUnc=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220815133832eucas1p17529f151ac4728837b2786a4b87087d8~LiEPK3P4M1197311973eucas1p1-;
-        Mon, 15 Aug 2022 13:38:32 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 7A.BD.09580.85C4AF26; Mon, 15
-        Aug 2022 14:38:32 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220815133831eucas1p12bee88eaaf35ad2445603641816ad773~LiEOwjgJl1998419984eucas1p1T;
-        Mon, 15 Aug 2022 13:38:31 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220815133831eusmtrp2d0350406e80c2d8c17641c33ffdbcb3e~LiEOvg62u1625116251eusmtrp2W;
-        Mon, 15 Aug 2022 13:38:31 +0000 (GMT)
-X-AuditID: cbfec7f5-9c3ff7000000256c-4e-62fa4c582b28
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 33.16.09038.75C4AF26; Mon, 15
-        Aug 2022 14:38:31 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220815133831eusmtip28ecf5948d863ea24ae979c7e57830b70~LiEOgBsYl1524415244eusmtip2B;
-        Mon, 15 Aug 2022 13:38:31 +0000 (GMT)
-Received: from [106.110.32.100] (106.110.32.100) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Mon, 15 Aug 2022 14:38:30 +0100
-Message-ID: <b98ab80d-1bc0-a378-d438-09ef8b375836@samsung.com>
-Date:   Mon, 15 Aug 2022 15:38:29 +0200
+        Mon, 15 Aug 2022 12:31:12 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1B9140F3
+        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 09:31:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1660581070; x=1692117070;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CXyjCEkdqwCsAfu4st37lsVlUs22E4O97CKSx98wcPw=;
+  b=NQ5HzS3hv+TsMWXhl6otZYGuLimwKvIGT85e9EFTKFLP93n9MiwjSmFp
+   ragvp+zE7TVfDzvt+pgMSOtlc7qlPZCpko1/DBv9u5UqzmuSpEhZlIqdT
+   S9E9xifVdfvVlGftC/rL7NLDUdRHB/v3pUN1xcZxI980WUzkykJMmdLZm
+   iFj8wmieTlircnH/P7LygfFBAHgIZsNqYqztG8VVqwsYJd5YtJGIxDVmO
+   EewL7BJj20+rVH9A32myZAbdFzcbkqLW96wbJQwuUO/90KtqsWcwatKSL
+   fixh3hasb4wKdL9sxAk8hsgKttew4MFSPSyo5+JKPGCN0YgPDa6dRRSoE
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,238,1654531200"; 
+   d="scan'208";a="213810145"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Aug 2022 00:31:10 +0800
+IronPort-SDR: F2J7CftbQtybPQ4oB43K2zD5g2G8F5WtEneEhxhpffZIjklkAMvWLQZlg/ix+rdlJoZt0U7X6S
+ B0BHiG4uEznUWeNYLx3aR5GMEzvJBNLTdEGVPWMrtbZ8xN/H1WcJRdXj41rzg5x0GxtEk1CDTs
+ Lxl8119+R9mzskGCRPguiZwUld5YO++j1nKOn1TuyJJYE8s+0/anoJqGME4IlTQ5016M1NHPl3
+ uiIhi8fb09GpEfZEFz8a4+oenZX+KOT2yljncEKh5d07KVGSpaQ/JI/uy7MXNwydGBVwX76698
+ g+JIZSSQ7IUaqyG48jFTqgQx
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Aug 2022 08:51:59 -0700
+IronPort-SDR: b4OCjXWLmFYSnDtRsIcUTXZo5GzWHCTUUTk+btnGeaofk9ixPXaAU1nZ+HdmScpxfXOpZVeqJB
+ 8H7oozLFAFYjPFHSPsddYJ7A6+V01ECffM4zPA3lEkqhle6kDBTBctmN+NKaHIjbZXGJHx1Vxg
+ b5XpVTPPy/NsU5II6q4a5AexSIY6scracJJIDa7sX8fy8Sb1nlazIe2Oh3YaOR1ulrHvcWCpD2
+ OmT+yCuc+AonNc/3purjQ4SGIPraDRGuBzr7lZUqu6EWGRcdwJ9HhIO5/73TuMLXlziMnK8IX/
+ gfo=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Aug 2022 09:31:10 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M60CK65z3z1Rwnm
+        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 09:31:09 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1660581069; x=1663173070; bh=CXyjCEkdqwCsAfu4st37lsVlUs22E4O97CK
+        Sx98wcPw=; b=cfpnBj1r4cw0S424JInu0OB76L1HgQgIq4fWaD21LGMFme7N+xu
+        JZ9cfTa6x/A4pnXnZVr6/8hT+6rEjEVoM5JnvSqoLdkZJC9NrO+oQydStcQp9GGr
+        Ne2XlPrzzTj6mMkkaBd2ps9/dyOryUGpg8MgzXrdJqGshn0wCQ/UuwQwDJRvb74l
+        +iethkUaVk1AdZabqZOvnNHTyMzPIqFym0c10oonbElJZjVtREX/nWd1i38o8fZI
+        WRroQHyQLvBm52c+VeOzpG0vlbdj8sABSIFUSu4WLfpLyoR381eFzHK/s3beX297
+        FHMLNdzznEikoMPBRkYCNEb6fRWqqx9InGQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id p_4j9FhLIlIH for <linux-block@vger.kernel.org>;
+        Mon, 15 Aug 2022 09:31:09 -0700 (PDT)
+Received: from [10.11.46.122] (c02drav6md6t.sdcorp.global.sandisk.com [10.11.46.122])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M60CK1PyKz1RtVk;
+        Mon, 15 Aug 2022 09:31:09 -0700 (PDT)
+Message-ID: <b46c033c-493e-1f1e-42b9-f62c188b2434@opensource.wdc.com>
+Date:   Mon, 15 Aug 2022 09:31:08 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-From:   Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCH v10 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        <snitzer@kernel.org>, <axboe@kernel.dk>, <hch@lst.de>,
-        <agk@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <Johannes.Thumshirn@wdc.com>,
-        <bvanassche@acm.org>, <matias.bjorling@wdc.com>, <hare@suse.de>,
-        <gost.dev@samsung.com>, <linux-nvme@lists.infradead.org>,
-        <jaegeuk@kernel.org>, <pankydev8@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <dm-devel@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Joel Granados <j.granados@samsung.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [PATCH] block: Submit flush requests to the I/O scheduler
 Content-Language: en-US
-In-Reply-To: <bb4ab1f2-7e16-15a7-58b1-d37f6f3822fd@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20220812210355.2252143-1-bvanassche@acm.org>
+ <20220813064142.GA10753@lst.de>
+ <f4e10a9a-313d-ce24-c610-f4e8d072d4f4@opensource.wdc.com>
+ <09689854-b7b7-9a5c-cda7-f1f4de42b5fe@acm.org>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <09689854-b7b7-9a5c-cda7-f1f4de42b5fe@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.110.32.100]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGKsWRmVeSWpSXmKPExsWy7djP87oRPr+SDK494LNYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
-        PWW3mND2ldlizc2nLBYnbkk7CHhcvuLtsXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j52t91k9
-        3u+7ChQ6Xe3xeZOcR/uBbqYA7igum5TUnMyy1CJ9uwSujFvzDrIWPJGqeNH7k7WB8ZRoFyMn
-        h4SAicSpNQ+Zuhi5OIQEVjBKbGy+yQrhfGGUuL65gRHC+cwosbenjR2mpbFzCTtEYjmjRMuG
-        KaxwVesvfIUatptR4te1A2AtvAJ2Ei/m7mQFsVkEVCX+PlnPChEXlDg58wkLiC0qECmxZvdZ
-        oHoODjYBLaAVYKawQLbExA4bkJEiAg2MEtP3bwGbzyzwg0liy6dpTCC9zALiEreezAezOQXc
-        JFYfXskMEdeUaN3+mx3ClpfY/nYOM8QLShIT5t1ng7BrJdYeOwP2joTAM06Jnh93WCASLhIr
-        vr6AKhKWeHV8C9T/MhL/d0IskxColnh64zczRHMLo0T/zvVsIGdLCFhL9J3JgahxBHryFlSY
-        T+LGW0GIe/gkJm2bzjyBUXUWUlDMQvLOLCQvzELywgJGllWM4qmlxbnpqcXGeanlesWJucWl
-        eel6yfm5mxiBSfH0v+NfdzCuePVR7xAjEwfjIUYJDmYlEV7BFz+ShHhTEiurUovy44tKc1KL
-        DzFKc7AoifMmZ25IFBJITyxJzU5NLUgtgskycXBKNTBJX1yok74mrWp9X6yXY+aaee/a+UIX
-        pTHJTNgdeOMCx8O0aiflskS5Up31h86oMbsl7T32xjBK1+nmzsmzbb6qfos+2JByydRoZu3+
-        Pr3r326/ldqhyD41uGrPViPVJdZpoT7HV01c11F5T8VzidesaQdmnju8dkNjpia/7M4D75sT
-        TYWtNjkb9+VwX94o63BNNTdH4I1G+wJvdkfXcr9P8vdX8y7bufbtP5HFXXw7J5XvTfEUu5e6
-        dnVD86ffW2QK36p+8RfIMEtsvjaHubl2ztPv9h/eH6t69uyRs9q5X+svq6q8uDTd2Sai7MvX
-        z5pTZp9/qdR6gF3kY7CT+Czzxxf4S/Y3JLs6bwvecrRDiaU4I9FQi7moOBEAIL9EsfkDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFKsWRmVeSWpSXmKPExsVy+t/xe7rhPr+SDLrP6FmsP3WM2WL13X42
-        i2kffjJb/D57ntmitf0bk8Xed7NZLfYsmsRksXL1USaLJ+tnMVv87boHlLilbXF51xw2i/nL
-        nrJbTGj7ymyx5uZTFosTt6QdBDwuX/H22DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we
-        7/ddBQqdrvb4vEnOo/1AN1MAd5SeTVF+aUmqQkZ+cYmtUrShhZGeoaWFnpGJpZ6hsXmslZGp
-        kr6dTUpqTmZZapG+XYJexq15B1kLnkhVvOj9ydrAeEq0i5GTQ0LARKKxcwl7FyMXh5DAUkaJ
-        fR0/2SASMhKfrnxkh7CFJf5c62KDKPrIKPFw0n1GCGc3o8SqTRvBqngF7CRezN3JCmKzCKhK
-        /H2ynhUiLihxcuYTFhBbVCBS4uGyJqYuRg4ONgEtoNXsIKawQLbExA4bkJEiAg2MEtP3b2EC
-        cZgFfjBJbPk0jQmkV0jgD6PEhPXMIDazgLjErSfzweKcAm4Sqw+vhIprSrRu/80OYctLbH87
-        hxniAyWJCfPuQ31WK/Hq/m7GCYyis5CcNwvJ2FlIRs1CMmoBI8sqRpHU0uLc9NxiI73ixNzi
-        0rx0veT83E2MwESy7djPLTsYV776qHeIkYmD8RCjBAezkgiv4IsfSUK8KYmVValF+fFFpTmp
-        xYcYTYFhNJFZSjQ5H5jK8kriDc0MTA1NzCwNTC3NjJXEeT0LOhKFBNITS1KzU1MLUotg+pg4
-        OKUamDYzZc0Ln6szfWOr8tQwTv7v26Uf9y/ZHqHqYpdtGOL4/lb05XfHTCtsLuq4cr/uF3uu
-        2RK+zuC1L+PDyw/1d/sczmpeGLz1dpPO39tBH/vmLfjqM+ur8gG76Dez9p8oWuzO7HR3cXpr
-        +ov7eV0HE3yFF6pw7nJytGuePrcvlF1wS2/RweibqzI7IkyVJ4qvs815F5d2pfL/Id4LPzZP
-        tc9Iux1W62ab3XRq5Y26EMacY0tS5aXyzSuWCSfZCGx+V2Custqg/dzEsutpB6/FC4rENb04
-        xvcwrkS3g0fkiIP/LbsFm5R9I/gvt0i+r5Gv+7SctZq7P3jWU/5vKxOv8JfN1fOa7nvNcO2W
-        RFEmJZbijERDLeai4kQAXL0Z2K0DAAA=
-X-CMS-MailID: 20220815133831eucas1p12bee88eaaf35ad2445603641816ad773
-X-Msg-Generator: CA
-X-RootMTR: 20220811143058eucas1p247291685ffff7a75186947fd30b5c13f
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220811143058eucas1p247291685ffff7a75186947fd30b5c13f
-References: <20220811143043.126029-1-p.raghav@samsung.com>
-        <CGME20220811143058eucas1p247291685ffff7a75186947fd30b5c13f@eucas1p2.samsung.com>
-        <20220811143043.126029-14-p.raghav@samsung.com>
-        <bb4ab1f2-7e16-15a7-58b1-d37f6f3822fd@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Damien,
-
->> +static int dm_po2z_map_read_emulated_area(struct dm_po2z_target *dmh,
->> +					  struct bio *bio)
+On 2022/08/14 16:44, Bart Van Assche wrote:
+> On 8/14/22 10:13, Damien Le Moal wrote:
+>> And writes to zoned drives never get plugged in the first place, scheduler
+>> present or not.
 > 
-> This really should be called dm_po2z_handle_read() since it handles both cases
-> of read commands, with and without the accept partial. Note that this is
-> retesting the need for a split after that was already tested in dm_po2z_map()
-> with bio_across_emulated_zone_area(). So the code should be better organized to
-> avoid that repetition.
+> Hi Damien,
 > 
-> You can simplify the code by having bio_across_emulated_zone_area() return 0 for
-> a bio that does not cross the zone capacity and return the number of sectors up
-> to the zone capacity from the bio start if there is a cross. That value can then
-The offset will also be zero if the BIO starts at the zone capacity and
-dm_po2z_map will assume that the bio did not cross the emulated zone boundary.
-
-> be used to call dm_accept_partial_bio() directly in dm_po2z_map() for read
-> commands. That will make this function much simpler and essentially turn it into
-> dm_po2z_read_zeroes().
+> I agree that blk_mq_submit_bio() does not plug writes to zoned drives 
+> because of the following code in blk_mq_plug():
 > 
->> +{
+> /* Zoned block device write operation case: do not plug the BIO */
+> if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
+> 	return NULL;
+> 
+> However, I have not found any code in blk_execute_rq_nowait() that 
+> causes the plugging mechanism to be skipped for zoned writes. Did I 
+> perhaps overlook something? The current blk_execute_rq_nowait() 
+> implementation is as follows:
+> 
+> void blk_execute_rq_nowait(struct request *rq, bool at_head)
+> {
+> 	WARN_ON(irqs_disabled());
+> 	WARN_ON(!blk_rq_is_passthrough(rq));
+> 
+> 	blk_account_io_start(rq);
+> 	if (current->plug)
+> 		blk_add_rq_to_plug(current->plug, rq);
+> 	else
+> 		blk_mq_sched_insert_request(rq, at_head, true, false);
+> }
 
-What about something like this? We have one function:
-bio_in_emulated_zone_area() that checks if a BIO is partly or completely in the
-emulated zone area and also returns the offset from bio to the emulated zone
-boundary (zone capacity of the device).
+As far as I understand it, and checking the call sites, this is for LLD internal
+commands only. And I think Pankaj has a good point for a fix to this one. Though
+I would hate to see an LLD issue a write request though.
 
-/**
- * bio_in_emulated_zone_area - check if bio is in the emulated zone area
- * @dmh:	pozone target data
- * @bio:	bio
- * @offset:	bio offset to emulated zone boundary
- *
- * Check if a @bio is partly or completely in the emulated zone area. If the
- * @bio is partly in the emulated zone area, @offset
- * can be used to split the @bio across the emulated zone boundary. @offset
- * will be negative if the @bio completely lies in the emulated area.
- *  */
-static bool bio_in_emulated_zone_area(struct dm_po2z_target *dmh,
-					  struct bio *bio, int *offset)
-{
-	unsigned int zone_idx = po2_zone_no(dmh, bio->bi_iter.bi_sector);
-	sector_t nr_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-	sector_t relative_sect_in_zone =
-		bio->bi_iter.bi_sector - (zone_idx << dmh->zone_size_po2_shift);
+For f2fs, it seems to me that the problem is more with the code in
+block/blk-flush.c where functions bypassing the scheduler are used for writes,
+e.g. blk_insert_flush() / blk_mq_request_bypass_insert(). I am not 100% sure
+though but that definitely looks very suspicious.
 
-	*offset = dmh->zone_size - relative_sect_in_zone;
+> 
+> Thanks,
+> 
+> Bart.
 
-	return (relative_sect_in_zone + nr_sectors) > dmh->zone_size;
-}
 
-static int dm_po2z_read_zeroes(struct bio *bio)
-{
-	zero_fill_bio(bio);
-	bio_endio(bio);
-	return DM_MAPIO_SUBMITTED;
-}
-
-static int dm_po2z_remap_sector(struct dm_po2z_target *dmh, struct bio *bio)
-{
-	bio->bi_iter.bi_sector =
-		target_to_device_sect(dmh, bio->bi_iter.bi_sector);
-	return DM_MAPIO_REMAPPED;
-}
-
-static int dm_po2z_map(struct dm_target *ti, struct bio *bio)
-{
-	struct dm_po2z_target *dmh = ti->private;
-
-	bio_set_dev(bio, dmh->dev->bdev);
-	if (bio_sectors(bio) || op_is_zone_mgmt(bio_op(bio))) {
-		int split_io_pos;
-		if (!bio_in_emulated_zone_area(dmh, bio, &split_io_pos)) {
-			return dm_po2z_remap_sector(dmh, bio);
-		}
-		/*
-		 * Read operation on the emulated zone area (between zone capacity
-		 * and zone size) will fill the bio with zeroes. Any other operation
-		 * in the emulated area should return an error.
-		 */
-		if (bio_op(bio) == REQ_OP_READ) {
-			if (split_io_pos > 0) {
-				dm_accept_partial_bio(bio, split_io_pos);
-				return dm_po2z_remap_sector(dmh, bio);
-			}
-			return dm_po2z_read_zeroes(bio);
-		}
-		return DM_MAPIO_KILL;
-	}
-	return DM_MAPIO_REMAPPED;
-}
-
-Let me know what you think.
+-- 
+Damien Le Moal
+Western Digital Research
