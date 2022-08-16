@@ -2,173 +2,190 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AABBC28B2B
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 12:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A68CCC25B0E
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 13:15:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbiHPMWJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 08:22:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56176 "EHLO
+        id S234022AbiHPNPt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 09:15:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231776AbiHPMWI (ORCPT
+        with ESMTP id S231960AbiHPNPp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 08:22:08 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B561217065;
-        Tue, 16 Aug 2022 05:22:07 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 4C37837345;
-        Tue, 16 Aug 2022 12:22:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1660652526; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1YZdKJUujIVhtSIXvaGEXXbp4ZWZrHyQ4cBO+Ol5Uzc=;
-        b=jR/qir+F1KvQkprGo27HCBr/wg+RgDRjFlUcYrQpq0in+tS2B9OYkys3SX01TXNf104tpd
-        /b7YMDFrE0stbEzgGS7Y/LKHseiM7PdSdXhr4YtNarFcIV7kg6WUIVIIzMu6qBJtb/IaBG
-        weR4np2ArM4V5RHr4xxQV3Kmptm7xks=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 292381345B;
-        Tue, 16 Aug 2022 12:22:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id /Q6iCO6L+2KjSgAAMHmgww
-        (envelope-from <jgross@suse.com>); Tue, 16 Aug 2022 12:22:06 +0000
-Message-ID: <6ded15cd-381d-24f2-ab0f-bae31117bbc5@suse.com>
-Date:   Tue, 16 Aug 2022 14:22:05 +0200
+        Tue, 16 Aug 2022 09:15:45 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 116705A82B
+        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 06:15:42 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220816131540euoutp024b3b72f74b076d46af8280970e058e55~L1ZkQbwzK2470324703euoutp02h
+        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 13:15:40 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220816131540euoutp024b3b72f74b076d46af8280970e058e55~L1ZkQbwzK2470324703euoutp02h
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1660655741;
+        bh=AD8v/RK3vFIqsgabYiTtVZbPbcAOQ4zUOz/AmbfbvbE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=dYyKZA123aDKiTjZZO+uI37rOfEKyULct3Zl6s9XnlhQlb3/lN5lcEhAER3/roNBg
+         fMiTKMZAynq6Xf2XhVsDLtZ6+V5xXwWOJeYuEebr0KvGiJU9lKC8gSu3Cn3T5lerjQ
+         v6kKmqoyYG/knT+dY62H1nd2dOukeH0b3660ZwI0=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220816131539eucas1p26d86a5a1304108a25edff82219a984be~L1ZiaG4wu1906819068eucas1p2w;
+        Tue, 16 Aug 2022 13:15:39 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 5F.93.09664.A789BF26; Tue, 16
+        Aug 2022 14:15:38 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220816131538eucas1p173e1c91bada451ae8a37d5b4ba3550b0~L1Zh8-0O_0140201402eucas1p1T;
+        Tue, 16 Aug 2022 13:15:38 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220816131538eusmtrp1dfb31e16cfbde621e18d525b910130f4~L1Zh8CkPw0149801498eusmtrp19;
+        Tue, 16 Aug 2022 13:15:38 +0000 (GMT)
+X-AuditID: cbfec7f2-d81ff700000025c0-ff-62fb987ae852
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 99.A0.09095.A789BF26; Tue, 16
+        Aug 2022 14:15:38 +0100 (BST)
+Received: from localhost (unknown [106.210.248.74]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220816131538eusmtip2f55ebca3bea1379ed12c7563f930fe9d~L1ZhpwYZX1242312423eusmtip2t;
+        Tue, 16 Aug 2022 13:15:38 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     damien.lemoal@opensource.wdc.com, axboe@kernel.dk,
+        snitzer@kernel.org, hch@lst.de, agk@redhat.com
+Cc:     pankydev8@gmail.com, gost.dev@samsung.com, matias.bjorling@wdc.com,
+        hare@suse.de, bvanassche@acm.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
+        jaegeuk@kernel.org, Johannes.Thumshirn@wdc.com,
+        linux-block@vger.kernel.org, Pankaj Raghav <p.raghav@samsung.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>
+Subject: [PATCH v11 01/13] block: make bdev_nr_zones and disk_zone_no
+ generic for npo2 zone size
+Date:   Tue, 16 Aug 2022 15:15:24 +0200
+Message-Id: <20220816131536.189406-2-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220816131536.189406-1-p.raghav@samsung.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] block: fix repeated words in comments
-Content-Language: en-US
-To:     Jilin Yuan <yuanjilin@cdjrlc.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220816120952.56713-1-yuanjilin@cdjrlc.com>
-From:   Juergen Gross <jgross@suse.com>
-In-Reply-To: <20220816120952.56713-1-yuanjilin@cdjrlc.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------9TcQLo8nP9HQ5Mkv0SO1vvUj"
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBKsWRmVeSWpSXmKPExsWy7djPc7pVM34nGdzYb24x/bCixfpTx5gt
+        Vt/tZ7OY9uEns8Xvs+eZLfa+m81qcfPATiaLPYsmMVmsXH2UyeLJ+lnMFn+77jFZ7L2lbXF5
+        1xw2i/nLnrJbTGj7ymxxY8JTRovPS1vYLdbcfMpiceKWtIOwx+Ur3h47Z91l97h8ttRj06pO
+        No/NS+o9dt9sYPPY2Xqf1eP9vqtsHn1bVjF6bD5d7fF5k5xH+4FupgCeKC6blNSczLLUIn27
+        BK6Mv1PbmQquilQ8m/CKrYFxlmAXIyeHhICJxJwXL5m6GLk4hARWMErMvXOcDcL5wiixf/5h
+        FgjnM6PEusOLWWBabj/8wwqRWM4oMWfmGqiWF4wS8z9+BnI4ONgEtCQaO9lBGkQE0iWmtLwE
+        m8Qs0MUscffmcbCEsECSxNsbB5lBbBYBVYmFHUvZQXp5Bawk2ve5QiyTl5h56TtYOaeAtcS/
+        hlVgR/AKCEqcnPkEzGYGqmneOpsZZL6EwG5OiQ2XJjBCNLtIrLl9nQnCFpZ4dXwLO4QtI3F6
+        cg/UN9UST2/8hmpuYZTo37ke7AEJoG19Z3JATGYBTYn1u/Qhyh0luvYtYoGo4JO48VYQ4gQ+
+        iUnbpjNDhHklOtqEIKqVJHb+fAK1VELictMcqKUeEtsf3GKZwKg4C8kzs5A8Mwth7wJG5lWM
+        4qmlxbnpqcWGeanlesWJucWleel6yfm5mxiBifH0v+OfdjDOffVR7xAjEwfjIUYJDmYlEV7B
+        Fz+ShHhTEiurUovy44tKc1KLDzFKc7AoifMmZ25IFBJITyxJzU5NLUgtgskycXBKNTAxvDvy
+        ++3RF/qTpAwfcXx6pFvllSqypsew6Z5shsx81VBnzqdr3PjbFy68fHPFpmf+c7QPvq0p2fPk
+        VlWNT1NB50yp780nXqm81M3o19n23WaJ7+/m6DX6fybrzC9qmfdoQyPPyoPzGx/Y2LR1Z9/m
+        fLfsivWkKKNtLb8uM2qZ5F4N5NVczNhzJ8zCVcnHsfP4tH8q0b7MCVLvtVRUzOoW35iw/4uR
+        Uej5jScsve5/WRGQWreaJ1A2Vi48rcfwLPPDqDfLZvG9k/58niN+gtFmjxXln1SruWLlSqsq
+        zx5uYNBX4M6KU/6d+bpffLdYyRqxlIb5F3esXu8uHjFhuRvzb0HDKVPswp6EXgupfaTEUpyR
+        aKjFXFScCABAPECt+wMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrOIsWRmVeSWpSXmKPExsVy+t/xe7pVM34nGez7L2ox/bCixfpTx5gt
+        Vt/tZ7OY9uEns8Xvs+eZLfa+m81qcfPATiaLPYsmMVmsXH2UyeLJ+lnMFn+77jFZ7L2lbXF5
+        1xw2i/nLnrJbTGj7ymxxY8JTRovPS1vYLdbcfMpiceKWtIOwx+Ur3h47Z91l97h8ttRj06pO
+        No/NS+o9dt9sYPPY2Xqf1eP9vqtsHn1bVjF6bD5d7fF5k5xH+4FupgCeKD2bovzSklSFjPzi
+        ElulaEMLIz1DSws9IxNLPUNj81grI1MlfTublNSczLLUIn27BL2Mv1PbmQquilQ8m/CKrYFx
+        lmAXIyeHhICJxO2Hf1i7GLk4hASWMkrsvHCGDSIhIXF7YRMjhC0s8edaFxtE0TNGifsPmli6
+        GDk42AS0JBo72UFqRARyJRYt6wAbxCwwi1ni3LdJYIOEBRIk7u1aBmazCKhKLOxYyg7Syytg
+        JdG+zxVivrzEzEvfweZwClhL/GtYxQJiCwGVtB27zAxi8woISpyc+QQszgxU37x1NvMERoFZ
+        SFKzkKQWMDKtYhRJLS3OTc8tNtQrTswtLs1L10vOz93ECIzhbcd+bt7BOO/VR71DjEwcjIcY
+        JTiYlUR4BV/8SBLiTUmsrEotyo8vKs1JLT7EaAp09kRmKdHkfGASySuJNzQzMDU0MbM0MLU0
+        M1YS5/Us6EgUEkhPLEnNTk0tSC2C6WPi4JRqYDKVOCt+IvKjxbubL7tXMXBf3RXzKXORndlD
+        +YCfRWW/X3v7BbO83/OXwSKtU+tG19asLIc9LBN+76lLeCDqtX+JVbBs+3z+JW0fbJfo1e+M
+        mnTA+Cn/2d3R999KmFl9s3Hg0D3RJXvv8isZ/c86fL0yy7PW2QRsmzDHuFNu1q0zjzcq5y7R
+        EdkgpiB79utSh/huy6UN6iu8tX/Wtf8JfNx3cu/tHUFOGu+mWsewBbDo/0jrDly69O7K9suv
+        3T4WBtQuMHghzMS94SvvlUb1itQTbx74FscISHNfLctcZbZOiL8/9XpIx1YLu/jzVV8TMoL0
+        tgdqPawzlV7z2/HI3cgYtyi1h7o7A165L7lVqcRSnJFoqMVcVJwIALROnPtqAwAA
+X-CMS-MailID: 20220816131538eucas1p173e1c91bada451ae8a37d5b4ba3550b0
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20220816131538eucas1p173e1c91bada451ae8a37d5b4ba3550b0
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220816131538eucas1p173e1c91bada451ae8a37d5b4ba3550b0
+References: <20220816131536.189406-1-p.raghav@samsung.com>
+        <CGME20220816131538eucas1p173e1c91bada451ae8a37d5b4ba3550b0@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------9TcQLo8nP9HQ5Mkv0SO1vvUj
-Content-Type: multipart/mixed; boundary="------------cSoRuB31Eb67XX0KMBZ92bgR";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Jilin Yuan <yuanjilin@cdjrlc.com>, axboe@kernel.dk
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <6ded15cd-381d-24f2-ab0f-bae31117bbc5@suse.com>
-Subject: Re: [PATCH] block: fix repeated words in comments
-References: <20220816120952.56713-1-yuanjilin@cdjrlc.com>
-In-Reply-To: <20220816120952.56713-1-yuanjilin@cdjrlc.com>
+Adapt bdev_nr_zones and disk_zone_no functions so that they can
+also work for non-power-of-2 zone sizes.
 
---------------cSoRuB31Eb67XX0KMBZ92bgR
-Content-Type: multipart/mixed; boundary="------------0vTlOk0UD9WPngsIONQ8xbHp"
+As the existing deployments assume that a device zone size is a power of
+2 number of sectors, power-of-2 optimized calculation is used for those
+devices.
 
---------------0vTlOk0UD9WPngsIONQ8xbHp
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+There are no direct hot paths modified and the changes just
+introduce one new branch per call.
 
-T24gMTYuMDguMjIgMTQ6MDksIEppbGluIFl1YW4gd3JvdGU6DQo+ICAgRGVsZXRlIHRoZSBy
-ZWR1bmRhbnQgd29yZCAnY2FuJy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEppbGluIFl1YW4g
-PHl1YW5qaWxpbkBjZGpybGMuY29tPg0KPiAtLS0NCj4gICBibG9jay9iaW8uYyB8IDIgKy0N
-Cj4gICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4g
-DQo+IGRpZmYgLS1naXQgYS9ibG9jay9iaW8uYyBiL2Jsb2NrL2Jpby5jDQo+IGluZGV4IGY5
-MmQwMjIzMjQ3Yi4uYzg4M2Y4OTYzYzE0IDEwMDY0NA0KPiAtLS0gYS9ibG9jay9iaW8uYw0K
-PiArKysgYi9ibG9jay9iaW8uYw0KPiBAQCAtNTY3LDcgKzU2Nyw3IEBAIEVYUE9SVF9TWU1C
-T0woYmlvX2FsbG9jX2Jpb3NldCk7DQo+ICAgICogYmUgcmV1c2VkIGJ5IGNhbGxpbmcgYmlv
-X3VuaW5pdCgpIGJlZm9yZSBjYWxsaW5nIGJpb19pbml0KCkgYWdhaW4uDQo+ICAgICoNCj4g
-ICAgKiBOb3RlIHRoYXQgdW5saWtlIGJpb19hbGxvYygpIG9yIGJpb19hbGxvY19iaW9zZXQo
-KSBhbGxvY2F0aW9ucyBmcm9tIHRoaXMNCj4gLSAqIGZ1bmN0aW9uIGFyZSBub3QgYmFja2Vk
-IGJ5IGEgbWVtcG9vbCBjYW4gY2FuIGZhaWwuICBEbyBub3QgdXNlIHRoaXMgZnVuY3Rpb24N
-Cj4gKyAqIGZ1bmN0aW9uIGFyZSBub3QgYmFja2VkIGJ5IGEgbWVtcG9vbCBjYW4gZmFpbC4g
-IERvIG5vdCB1c2UgdGhpcyBmdW5jdGlvbg0KDQpUaGlzIHNlbnRlbmNlIGlzIHN0aWxsIG5v
-dCBjb3JyZWN0LiBJIGd1ZXNzIHRoZSBmaXJzdCAiY2FuIiBzaG91bGQgYmUgcmVwbGFjZWQN
-CndpdGggImFuZCIuDQoNCg0KSnVlcmdlbg0K
---------------0vTlOk0UD9WPngsIONQ8xbHp
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+Reviewed-by: Adam Manzanares <a.manzanares@samsung.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-zoned.c      | 13 +++++++++----
+ include/linux/blkdev.h |  8 +++++++-
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index a264621d4905..dce9c95b4bcd 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -111,17 +111,22 @@ EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
+  * bdev_nr_zones - Get number of zones
+  * @bdev:	Target device
+  *
+- * Return the total number of zones of a zoned block device.  For a block
+- * device without zone capabilities, the number of zones is always 0.
++ * Return the total number of zones of a zoned block device, including the
++ * eventual small last zone if present. For a block device without zone
++ * capabilities, the number of zones is always 0.
+  */
+ unsigned int bdev_nr_zones(struct block_device *bdev)
+ {
+ 	sector_t zone_sectors = bdev_zone_sectors(bdev);
++	sector_t capacity = bdev_nr_sectors(bdev);
+ 
+ 	if (!bdev_is_zoned(bdev))
+ 		return 0;
+-	return (bdev_nr_sectors(bdev) + zone_sectors - 1) >>
+-		ilog2(zone_sectors);
++
++	if (is_power_of_2(zone_sectors))
++		return (capacity + zone_sectors - 1) >> ilog2(zone_sectors);
++
++	return DIV_ROUND_UP_SECTOR_T(capacity, zone_sectors);
+ }
+ EXPORT_SYMBOL_GPL(bdev_nr_zones);
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 84b13fdd34a7..ab82d1ff0cce 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -674,9 +674,15 @@ static inline unsigned int disk_nr_zones(struct gendisk *disk)
+ 
+ static inline unsigned int disk_zone_no(struct gendisk *disk, sector_t sector)
+ {
++	sector_t zone_sectors = disk->queue->limits.chunk_sectors;
++
+ 	if (!blk_queue_is_zoned(disk->queue))
+ 		return 0;
+-	return sector >> ilog2(disk->queue->limits.chunk_sectors);
++
++	if (is_power_of_2(zone_sectors))
++		return sector >> ilog2(zone_sectors);
++
++	return div64_u64(sector, zone_sectors);
+ }
+ 
+ static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t sector)
+-- 
+2.25.1
 
-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
-jR/i1DG86lem3iBDXzXsZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------0vTlOk0UD9WPngsIONQ8xbHp--
-
---------------cSoRuB31Eb67XX0KMBZ92bgR--
-
---------------9TcQLo8nP9HQ5Mkv0SO1vvUj
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmL7i+0FAwAAAAAACgkQsN6d1ii/Ey8k
-LggAgZc3cEIadhgiZZHfY8EMvIFJiPwY2h0WMqyNt2D/Hii0QEa7cl60yU0AVOMD06CdnAu/oQOf
-zFo3LH5uPU8XO6t8g0n9WCwwDQWvievfcfgOMea+9fWICpZbuDJ4UwD4dUQKMnLYRDvSABpEMRVA
-vsvp0t7/Q7hlgnMsGKtWXbEYCIzpIatj0EFzKRn3tw9U17ClAnnD7VyngGLjgypevPINMXU3g7TX
-POSbGQsFQOPyUITVsNx8HGtRQy+vmuT8MAif3YAq8F6sO3QR0372lm87ZqhaGb9j/Yobdop7buHJ
-crbJivkDK29iDyMMOiga1VkN/4bWTs3EekM/GzfWkA==
-=UwQO
------END PGP SIGNATURE-----
-
---------------9TcQLo8nP9HQ5Mkv0SO1vvUj--
