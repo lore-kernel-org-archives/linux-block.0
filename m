@@ -2,107 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37388C28B2C
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 04:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C6EC282E7
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 06:30:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbiHPEXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 00:23:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60978 "EHLO
+        id S229949AbiHPGaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 02:30:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiHPEW4 (ORCPT
+        with ESMTP id S230028AbiHPG3g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 00:22:56 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C58337BB3D;
-        Mon, 15 Aug 2022 17:55:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4303A6125E;
-        Tue, 16 Aug 2022 00:55:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5212EC433C1;
-        Tue, 16 Aug 2022 00:55:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660611347;
-        bh=iu6B25e0sTxWSWP58J3cvJLRVLHWY1NS7egktCILRVc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=krd6+dWmORUQTM50F/8J5UTDFvQpmjgyE2xt2quw2vdfZh6niGmFxiiV4AIz32H48
-         v/54PgeHP2vwqXwK32ajRlxpPJzlh1estyjWKs69bXa2t8XK5AILpoD8G+6e6l6TN2
-         JacTQRI/ggjw/oFEBUWvGlPNpoBqWi7pvwHjXWTNYZ4waocnQ7ZvCRK+HV+rcPvgUj
-         rn2X10wArCcnKg5D/Bt2iE7+193xqZkmDFK77dfsfvgi03cysOyvwTWWYr7n7HZDYk
-         5Leu70it3DTXaYFTpbub7m2JQZmVrC/jYpJVhrCsVduHmj+8JAVU1IiAScCxzXl5Gb
-         5hx6GXtLZcXBw==
-Date:   Mon, 15 Aug 2022 17:55:45 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
-Message-ID: <YvrrEcw4E+rpDLwM@sol.localdomain>
-References: <20220722071228.146690-1-ebiggers@kernel.org>
- <20220722071228.146690-7-ebiggers@kernel.org>
- <YtyoF89iOg8gs7hj@google.com>
- <Yt7dCcG0ns85QqJe@sol.localdomain>
- <YuXyKh8Zvr56rR4R@google.com>
+        Tue, 16 Aug 2022 02:29:36 -0400
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 209067645F;
+        Mon, 15 Aug 2022 17:44:11 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-33387bf0c4aso8394877b3.11;
+        Mon, 15 Aug 2022 17:44:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc;
+        bh=CsC+j0kptQXyDU8jUOJJkLIgy9EO57j1cJI24xW/Lks=;
+        b=HR1SRzlAc6A+jKkxiSeTn7zBxq84sbDNzQ8EjnD5LQjD7/Jv4uCKQ7PsK4ShUN598D
+         YJ44WChMo+PTbLKHC939js2KpEenZpa0W6/X4lembTFpYdEySWoBKzMuqtGzARQ3KacB
+         JXqs+N6zQe3GNtFq3ya8BKPtYHhMltx7R5t38uzRMmO/utU/vyhaWt75JR1IZq+Lsih+
+         DrHoKI0NaeBpDZGdzn+ldMsTQCpENA9O5dOtKZdD/d4F47hFtJNl5SUlKRrisRD33t1F
+         eHeSDlq2Cs6guhlFXtEAWaa2NR1gYTRj8HBDamjN8gmXpmFfTN64ufkQ+bTcUEzEFN6c
+         /OsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=CsC+j0kptQXyDU8jUOJJkLIgy9EO57j1cJI24xW/Lks=;
+        b=mb1DN1siBbGfxtw68xUpMkZYKHScGtdXE1JbTxnLDLYWF02RA8RnkedHmCyKkqIiR1
+         FOynfoC6Uk/hpzdGHn1JqR0gCEUDc1uay2+geRmnRQnhSoFuZZBHimdnxCEVhM3l6yr7
+         WlXg4M0Vkj6QDeM891qMG9GjgxIu0x0PBfihwBvHu5Nc6dfy0Jwk1zbregjGN/38oEpQ
+         oW2V+FTSemTrpIBA2NeTRMJiEBAtiGGr1hyr6k05BJGLMODZW7SxJa/UgKUUUrBmA/19
+         JOEMKcMBPTO/TLPJu53x9QPbfoiVQMWg6naam/T/XqY9evg1k6ZyCfoLwpZbg1nb68G5
+         dWjQ==
+X-Gm-Message-State: ACgBeo1FEzm744jHGo6vgtYi2irfodNMeiKqnfRftdb0hcJiYCx+adDP
+        bNYbGOE6TXsx+qNK1ZfHlR7+jkdlRIRt3K8YgaN1VuxXAg9625A25OI=
+X-Google-Smtp-Source: AA6agR5A7f3m84c1TtI6f2r6XmTxvD13yN6Dg+5eE1cWCdEqLisdawEIlErejWKWe55LX3f7hyEwsc6WKkkCnwttmQc=
+X-Received: by 2002:a25:4282:0:b0:67a:6a4a:e138 with SMTP id
+ p124-20020a254282000000b0067a6a4ae138mr13665637yba.395.1660610650217; Mon, 15
+ Aug 2022 17:44:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YuXyKh8Zvr56rR4R@google.com>
+From:   Alec Ari <neotheuser@gmail.com>
+Date:   Mon, 15 Aug 2022 19:43:59 -0500
+Message-ID: <CAM5Ud7OqLyi=iSAT7fUuA2yZSqvhJ7hNZND=L5woMV9UxnBn8A@mail.gmail.com>
+Subject: [PATCH] init/Kconfig: Preserve mtimes in initramfs only if BLK_DEV_INITRD
+To:     linux-block@vger.kernel.org, linux-config@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jul 30, 2022 at 08:08:26PM -0700, Jaegeuk Kim wrote:
-> On 07/25, Eric Biggers wrote:
-> > On Sat, Jul 23, 2022 at 07:01:59PM -0700, Jaegeuk Kim wrote:
-> > > On 07/22, Eric Biggers wrote:
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > Currently, if an f2fs filesystem is mounted with the mode=lfs and
-> > > > io_bits mount options, DIO reads are allowed but DIO writes are not.
-> > > > Allowing DIO reads but not DIO writes is an unusual restriction, which
-> > > > is likely to be surprising to applications, namely any application that
-> > > > both reads and writes from a file (using O_DIRECT).  This behavior is
-> > > > also incompatible with the proposed STATX_DIOALIGN extension to statx.
-> > > > Given this, let's drop the support for DIO reads in this configuration.
-> > > 
-> > > IIRC, we allowed DIO reads since applications complained a lower performance.
-> > > So, I'm afraid this change will make another confusion to users. Could
-> > > you please apply the new bahavior only for STATX_DIOALIGN?
-> > > 
-> > 
-> > Well, the issue is that the proposed STATX_DIOALIGN fields cannot represent this
-> > weird case where DIO reads are allowed but not DIO writes.  So the question is
-> > whether this case actually matters, in which case we should make STATX_DIOALIGN
-> > distinguish between DIO reads and DIO writes, or whether it's some odd edge case
-> > that doesn't really matter, in which case we could just fix it or make
-> > STATX_DIOALIGN report that DIO is unsupported.  I was hoping that you had some
-> > insight here.  What sort of applications want DIO reads but not DIO writes?
-> > Is this common at all?
-> 
-> I think there's no specific application to use the LFS mode at this
-> moment, but I'd like to allow DIO read for zoned device which will be
-> used for Android devices.
-> 
+From: Alec Ari <alec@onelabs.com>
+Date: Mon, 15 Aug 2022 19:13:12 -0500
+Subject: crypto: Make FIPS_SIGNATURE_SELFTEST depend on CRYPTO_FIPS
 
-So if the zoned device feature becomes widely adopted, then STATX_DIOALIGN will
-be useless on all Android devices?  That sounds undesirable.  Are you sure that
-supporting DIO reads but not DIO writes actually works?  Does it not cause
-problems for existing applications?
+Would running FIPS selftests be necessary if FIPS is disabled?
 
-What we need to do is make a decision about whether this means we should build
-in a stx_dio_direction field (indicating no support / readonly support /
-writeonly support / readwrite support) into the API from the beginning.  If we
-don't do that, then I don't think we could simply add such a field later, as the
-statx_dio_*_align fields will have already been assigned their meaning.  I think
-we'd instead have to "duplicate" the API, with STATX_DIOROALIGN and
-statx_dio_ro_*_align fields.  That seems uglier than building a directional
-indicator into the API from the beginning.  On the other hand, requiring all
-programs to check stx_dio_direction would add complexity to using the API.
+Signed-off-by: Alec Ari <alec@onelabs.com>
+---
+ crypto/asymmetric_keys/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-Any thoughts on this?
-
-- Eric
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 3df3fe4ed..562bbd774 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -81,6 +81,7 @@ config FIPS_SIGNATURE_SELFTEST
+          This option causes some selftests to be run on the signature
+          verification code, using some built in data.  This is required
+          for FIPS.
++       depends on CRYPTO_FIPS
+        depends on KEYS
+        depends on ASYMMETRIC_KEY_TYPE
+        depends on PKCS7_MESSAGE_PARSER
+-- 
+2.37.2
