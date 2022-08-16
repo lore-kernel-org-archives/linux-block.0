@@ -2,567 +2,240 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 185B5C25B0E
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 16:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3DAC32773
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 16:42:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236018AbiHPQEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 12:04:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36214 "EHLO
+        id S236599AbiHPQmk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 12:42:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236025AbiHPQET (ORCPT
+        with ESMTP id S236145AbiHPQmj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 12:04:19 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C27E3340A
-        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 09:01:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1660665709; x=1692201709;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=gWta6mCRYZPmokqNjTVpFMpU8jnQuQs/z6XjFskr4pM=;
-  b=ZYQGaiOBD4PwZgQRqshv445PP8+/X6XQD7ym8XqlAvopRMg+Z0zdjY7J
-   YM4/Nr7QV8D5upAEDGdsBopphXbrwE2seR26VJ9YYkAeSLpnAtbGIAbMg
-   WC8NMsAf9CQa6Hf6BvS0bgxzCl0be5yi42V1ghOWXrAl+SlW7PvKUUSEQ
-   8gTEJXJIyLKOs9qZNnwGMWBp4RDKKPfV+HsZNfXFoPw9n78p0Tk3VXV1R
-   lL3CoPSWq9wmU5MnZmskCm8AlqRq+vuUbzM8puN+kAigJ9nWqNFoVg9pV
-   O9dX+fy+MzcOuaewcBPphZ2RROxczEYPd6mr7Qtpl40epNEN2oACAKQz7
-   w==;
-X-IronPort-AV: E=Sophos;i="5.93,241,1654531200"; 
-   d="scan'208";a="209382956"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Aug 2022 00:01:48 +0800
-IronPort-SDR: ydXUPCo+sgmHOcVBaEYOLLdpKBcyZwsIPjIGNBYyv4Tkaw9/BnQ5tgqXjElwjH6yRTw23jRLkN
- HcKaSTgl0Bui5ys4eRUI6Koqak1iuuNqb3aRrGFcZ7OB6Euiukgag4gZ/rqL8bAieG4//PVV/X
- 1AK7Z3f59fKxM+jEw3WNw+18gnct0VJihuZqjN7KEz2Smvw+0XM9VzBHPYFmVJdyopIkJMtIO5
- yE3WKXYRcQgsLqjpeRRKS1XAFcN3bs9umyzgW07hc7Tjj536rJKPbedbjKxzP7IuJzv43cqhqL
- xqgz7+K2Xm/QzHAvYMRBb9cc
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Aug 2022 08:17:16 -0700
-IronPort-SDR: ZtVtjUsJoDMluMdblF1ArBVKOWtqLWB+UoJk34GQdKWo1jCP6GzKM8U0A/v9B24xcgsdxFq6mW
- t0lgGhMY83dtluwhdZErfUszem+J9N25GKCAYGJziwZrYMMYXbQOfTwENkf2iIA9KV8oTeutYd
- dD03QXnWdjCRZ/Yv5ckLMiLdK6TJjBcKRXbO7REK38bLAqV2bgTeJS3SXd+Uyi93rjP6saNNNN
- QcZuOlj7z9vI6Kl+8DTqrskBSrtnqj8P4GfygJAbIGrgKBA8zKCfog+lx6TmA80S0OPSI36yFg
- iFo=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Aug 2022 09:01:49 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M6bW002F3z1Rws7
-        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 09:01:47 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1660665703; x=1663257704; bh=gWta6mCRYZPmokqNjTVpFMpU8jnQuQs/z6X
-        jFskr4pM=; b=exEEHzgpNFMiVy2vV4lAQuumkRtFf+HnydqaMIRKQR/NXVR+uUi
-        YafT2O1en39P/REwIa3hw7ZyEhgNnfbjKNC5RoCIAmug1XNAo9iV6AEtsYNNJuke
-        5i1/N/GTvLMOKFPe2puUJqdKdwvpyxpDVYhetFYtHdDNbM0l07IxEhr6mAw7Wxts
-        PQJmiJJQD1OlHsRsVHjpCWbEDkPaZfPEL34Z5oKy3IJZSy0MpgRjrHVs9uJ7s4W5
-        /PU3cgvDbwcPkt+OV3ZiHRQEC2VIx/gyu8fUsOEDzEga+xnXaqVoCdH1ztTAdnpm
-        UbScc3Q3atp1TdcaiQMkvDfvGj2AgMrOdew==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id kD5198t2wyke for <linux-block@vger.kernel.org>;
-        Tue, 16 Aug 2022 09:01:43 -0700 (PDT)
-Received: from [10.111.64.29] (c02drav6md6t.sdcorp.global.sandisk.com [10.111.64.29])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M6bVt6B61z1RtVk;
-        Tue, 16 Aug 2022 09:01:42 -0700 (PDT)
-Message-ID: <30790cae-5440-2447-a8b8-52a57fa16fa5@opensource.wdc.com>
-Date:   Tue, 16 Aug 2022 09:01:42 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [PATCH v11 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
-        snitzer@kernel.org, hch@lst.de, agk@redhat.com
-Cc:     pankydev8@gmail.com, gost.dev@samsung.com, matias.bjorling@wdc.com,
-        hare@suse.de, bvanassche@acm.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        jaegeuk@kernel.org, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-References: <20220816131536.189406-1-p.raghav@samsung.com>
- <CGME20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e@eucas1p2.samsung.com>
- <20220816131536.189406-14-p.raghav@samsung.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220816131536.189406-14-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Tue, 16 Aug 2022 12:42:39 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5099280E81
+        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 09:42:35 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id v4so5373668pgi.10
+        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 09:42:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dilger-ca.20210112.gappssmtp.com; s=20210112;
+        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
+         :from:from:to:cc;
+        bh=3UsEcGaqqxu6uaf6V7Db2UUvbrW1qQxZh0X1je5plvs=;
+        b=Zmvs6vXQj1YuzC5CpcL9ZdRSfRMxWuvJuG36+xzxXxSn/FnBKBWixBWCoOKIwrcf55
+         n46G64dAdkeAyCTOhtlwvPzc4Tk73T8CZOzBxW/yv7iUTcD5j+K09Xl78RS6JHAryYsH
+         dpl6GIflzqLKivwt8XMQjnVpsHzQ8A5k8FSijs3OEEXN9w0pRa/0S5IaJNPik48pckp6
+         C5aMtORn54V5bsaXmHvhAa1AZHkQKY6sgAgHPDjgbX8T2hQke1pSCge/sRvDRbpzK3+Q
+         NVCcQskda4YA0R3znKKkgXYcwZ4EYf0ewpN+JcDe6G59HZSOCmXZDesAM6+QGyO3VRhc
+         YGsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
+         :from:x-gm-message-state:from:to:cc;
+        bh=3UsEcGaqqxu6uaf6V7Db2UUvbrW1qQxZh0X1je5plvs=;
+        b=wXus/bKEtcrE0YHhYm//0oGpgUEyt0hP3vtCkTiB8kVG9qR3ZYzjddujocDiTNLSHO
+         +qPbE3LBVmKxFHNfp0hdecIe1KN0gHQVesmcKml/0z4E8+uv+pmt0HlyzVso1n83xtf9
+         H/moBf4NkQT/XFvXkdPOoJudRGVdXt++4ww36nT+9bM8ukaydSIkOZ/C2kTAF//M8iv2
+         T0mMtCI9n4r1cOYsWjg1ay9OsWhuqGyAKo6vft0a7rvSg6YJXBrkOANgl9zpP44GqDOC
+         EAjJ0+ofYVVrB+wrEzHDN+GhDqDVM2tGUuckI8deuLH/jqLt46IGicYhDmdhDPpXsjGK
+         +4Cg==
+X-Gm-Message-State: ACgBeo0+z+4ObL8zGp6QDXHd02x9ufib2T6xe75KA7+yqd8Xk+GOE3/J
+        qyxk+DJVsv6ZMawK/1xTF/EFIQ==
+X-Google-Smtp-Source: AA6agR5MxmTfKKDmbSJw3suGI5oZ/F470+FJjV7/Uj0jVLBbToS4xOkVs5Jg06J4aqmXnDRNRAtD/Q==
+X-Received: by 2002:a65:6d85:0:b0:429:9ce8:6a60 with SMTP id bc5-20020a656d85000000b004299ce86a60mr4399151pgb.352.1660668154762;
+        Tue, 16 Aug 2022 09:42:34 -0700 (PDT)
+Received: from cabot.adilger.int (S01061cabc081bf83.cg.shawcable.net. [70.77.221.9])
+        by smtp.gmail.com with ESMTPSA id z25-20020a656659000000b00419b66846fcsm7761270pgv.91.2022.08.16.09.42.32
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 16 Aug 2022 09:42:33 -0700 (PDT)
+From:   Andreas Dilger <adilger@dilger.ca>
+Message-Id: <D1CDACE3-EC7E-43E4-8F49-EEA2B6E71A41@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_55512B7B-3B73-458E-BB38-6700602A50E9";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Date:   Tue, 16 Aug 2022 10:42:29 -0600
+In-Reply-To: <20220816090312.GU3600936@dread.disaster.area>
+Cc:     Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        xfs <linux-xfs@vger.kernel.org>, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>,
+        Eric Biggers <ebiggers@kernel.org>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org> <YtyoF89iOg8gs7hj@google.com>
+ <Yt7dCcG0ns85QqJe@sol.localdomain> <YuXyKh8Zvr56rR4R@google.com>
+ <YvrrEcw4E+rpDLwM@sol.localdomain>
+ <20220816090312.GU3600936@dread.disaster.area>
+X-Mailer: Apple Mail (2.3273)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/08/16 6:15, Pankaj Raghav wrote:
-> Only zoned devices with power-of-2(po2) number of sectors per zone(zone
-> size) were supported in linux but now non power-of-2(npo2) zone sizes
-> support has been added to the block layer.
-> 
-> Filesystems such as F2FS and btrfs have support for zoned devices with
-> po2 zone size assumption. Before adding native support for npo2 zone
-> sizes, it was suggested to create a dm target for npo2 zone size device to
-> appear as a po2 zone size target so that file systems can initially
-> work without any explicit changes by using this target.
-> 
-> The design of this target is very simple: remap the device zone size to
-> the zone capacity and change the zone size to be the nearest power of 2
-> value.
-> 
-> For e.g., a device with a zone size/capacity of 3M will have an equivalent
-> target layout as follows:
-> 
-> Device layout :-
-> zone capacity = 3M
-> zone size = 3M
-> 
-> |--------------|-------------|
-> 0             3M            6M
-> 
-> Target layout :-
-> zone capacity=3M
-> zone size = 4M
-> 
-> |--------------|---|--------------|---|
-> 0             3M  4M             7M  8M
-> 
-> The area between target's zone capacity and zone size will be emulated
-> in the target.
-> The read IOs that fall in the emulated gap area will return 0 filled
-> bio and all the other IOs in that area will result in an error.
-> If a read IO span across the emulated area boundary, then the IOs are
-> split across them. All other IO operations that span across the emulated
-> area boundary will result in an error.
-> 
-> The target can be easily created as follows:
-> dmsetup create <label> --table '0 <size_sects> po2zone /dev/nvme<id>'
-> 
-> Note that the target does not support partial mapping of the underlying
-> device.
-> 
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Suggested-by: Hannes Reinecke <hare@suse.de>
-> ---
->  .../admin-guide/device-mapper/dm-po2zone.rst  |  71 +++++
->  .../admin-guide/device-mapper/index.rst       |   1 +
->  drivers/md/Kconfig                            |  10 +
->  drivers/md/Makefile                           |   2 +
->  drivers/md/dm-po2zone-target.c                | 260 ++++++++++++++++++
->  5 files changed, 344 insertions(+)
->  create mode 100644 Documentation/admin-guide/device-mapper/dm-po2zone.rst
->  create mode 100644 drivers/md/dm-po2zone-target.c
-> 
-> diff --git a/Documentation/admin-guide/device-mapper/dm-po2zone.rst b/Documentation/admin-guide/device-mapper/dm-po2zone.rst
-> new file mode 100644
-> index 000000000000..19dc215fbcca
-> --- /dev/null
-> +++ b/Documentation/admin-guide/device-mapper/dm-po2zone.rst
-> @@ -0,0 +1,71 @@
-> +==========
-> +dm-po2zone
-> +==========
-> +The dm-po2zone device mapper target exposes a zoned block device with a
-> +non-power-of-2(npo2) number of sectors per zone as a power-of-2(po2)
-> +number of sectors per zone(zone size).
-> +The filesystems that support zoned block devices such as F2FS and BTRFS
-> +assume po2 zone size as the kernel has traditionally only supported
-> +those devices. However, as the kernel now supports zoned block devices with
-> +npo2 zone sizes, the filesystems can run on top of the dm-po2zone target before
-> +adding native support.
-> +
-> +Partial mapping of the underlying device is not supported by this target.
-> +
-> +Algorithm
-> +=========
-> +The device mapper target maps the underlying device's zone size to the
-> +zone capacity and changes the zone size to the nearest po2 zone size.
-> +The gap between the zone capacity and the zone size is emulated in the target.
-> +E.g., a zoned block device with a zone size (and capacity) of 3M will have an
-> +equivalent target layout with mapping as follows:
-> +
-> +::
-> +
-> +  0M           3M  4M        6M 8M
-> +  |             |  |          |  |
-> +  +x------------+--+x---------+--+x-------  Target
-> +  |x            |  |x         |  |x
-> +   x               x             x
-> +   x               x             x
-> +   x              x             x
-> +   x             x             x
-> +  |x            |x            |x
-> +  +x------------+x------------+x----------  Device
-> +  |             |             |
-> +  0M           3M            6M
-> +
-> +A simple remap is performed for all the BIOs that do not cross the
-> +emulation gap area, i.e., the area between the zone capacity and size.
-> +
-> +If a BIO crosses the emulation gap area, the following operations are performed:
-> +
-> +	Read:
-> +		- If the BIO lies entirely in the emulation gap area, then zero out the BIO and complete it.
-> +		- If the BIO spans the emulation gap area, split the BIO across the zone capacity boundary
-> +                  and remap only the BIO within the zone capacity boundary. The other part of the split BIO
-> +                  will be zeroed out.
-> +
-> +	Other operations:
-> +                - Return an error
-> +
-> +Table parameters
-> +================
-> +
-> +::
-> +
-> +  <dev path>
-> +
-> +Mandatory parameters:
-> +
-> +    <dev path>:
-> +        Full pathname to the underlying block-device, or a
-> +        "major:minor" device-number.
-> +
-> +Examples
-> +========
-> +
-> +::
-> +
-> +  #!/bin/sh
-> +  echo "0 `blockdev --getsz $1` po2zone $1" | dmsetup create po2z
-> diff --git a/Documentation/admin-guide/device-mapper/index.rst b/Documentation/admin-guide/device-mapper/index.rst
-> index cde52cc09645..1fd04b5b0565 100644
-> --- a/Documentation/admin-guide/device-mapper/index.rst
-> +++ b/Documentation/admin-guide/device-mapper/index.rst
-> @@ -23,6 +23,7 @@ Device Mapper
->      dm-service-time
->      dm-uevent
->      dm-zoned
-> +    dm-po2zone
->      era
->      kcopyd
->      linear
-> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-> index 998a5cfdbc4e..638801b2449a 100644
-> --- a/drivers/md/Kconfig
-> +++ b/drivers/md/Kconfig
-> @@ -518,6 +518,16 @@ config DM_FLAKEY
->  	help
->  	 A target that intermittently fails I/O for debugging purposes.
->  
-> +config DM_PO2ZONE
-> +	tristate "Zoned block devices target emulating a power-of-2 number of sectors per zone"
-> +	depends on BLK_DEV_DM
-> +	depends on BLK_DEV_ZONED
-> +	help
-> +	  A target that converts a zoned block device with non-power-of-2(npo2)
-> +	  number of sectors per zone to be power-of-2(po2). Use this target for
-> +	  zoned block devices with npo2 number of sectors per zone until native
-> +	  support is added to the filesystems and applications.
-> +
->  config DM_VERITY
->  	tristate "Verity target support"
->  	depends on BLK_DEV_DM
-> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-> index 84291e38dca8..c23f81cc8789 100644
-> --- a/drivers/md/Makefile
-> +++ b/drivers/md/Makefile
-> @@ -26,6 +26,7 @@ dm-era-y	+= dm-era-target.o
->  dm-clone-y	+= dm-clone-target.o dm-clone-metadata.o
->  dm-verity-y	+= dm-verity-target.o
->  dm-zoned-y	+= dm-zoned-target.o dm-zoned-metadata.o dm-zoned-reclaim.o
-> +dm-po2zone-y	+= dm-po2zone-target.o
->  
->  md-mod-y	+= md.o md-bitmap.o
->  raid456-y	+= raid5.o raid5-cache.o raid5-ppl.o
-> @@ -60,6 +61,7 @@ obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
->  obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
->  obj-$(CONFIG_DM_DUST)		+= dm-dust.o
->  obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
-> +obj-$(CONFIG_DM_PO2ZONE)	+= dm-po2zone.o
->  obj-$(CONFIG_DM_MULTIPATH)	+= dm-multipath.o dm-round-robin.o
->  obj-$(CONFIG_DM_MULTIPATH_QL)	+= dm-queue-length.o
->  obj-$(CONFIG_DM_MULTIPATH_ST)	+= dm-service-time.o
-> diff --git a/drivers/md/dm-po2zone-target.c b/drivers/md/dm-po2zone-target.c
-> new file mode 100644
-> index 000000000000..15dee7e218f1
-> --- /dev/null
-> +++ b/drivers/md/dm-po2zone-target.c
-> @@ -0,0 +1,260 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2022 Samsung Electronics Co., Ltd.
-> + */
-> +
-> +#include <linux/device-mapper.h>
-> +
-> +#define DM_MSG_PREFIX "po2zone"
-> +
-> +struct dm_po2z_target {
-> +	struct dm_dev *dev;
-> +	sector_t zone_size; /* Actual zone size of the underlying dev*/
-> +	sector_t zone_size_po2; /* zone_size rounded to the nearest po2 value */
-> +	unsigned int zone_size_po2_shift;
-> +	sector_t zone_size_diff; /* diff between zone_size_po2 and zone_size */
-> +	unsigned int nr_zones;
-> +};
-> +
-> +static inline unsigned int npo2_zone_no(struct dm_po2z_target *dmh,
-> +					sector_t sect)
-> +{
-> +	return div64_u64(sect, dmh->zone_size);
-> +}
-> +
-> +static inline unsigned int po2_zone_no(struct dm_po2z_target *dmh,
-> +				       sector_t sect)
-> +{
-> +	return sect >> dmh->zone_size_po2_shift;
-> +}
-> +
-> +static inline sector_t target_to_device_sect(struct dm_po2z_target *dmh,
-> +					     sector_t sect)
-> +{
-> +	return sect - (po2_zone_no(dmh, sect) * dmh->zone_size_diff);
-> +}
-> +
-> +static inline sector_t device_to_target_sect(struct dm_po2z_target *dmh,
-> +					     sector_t sect)
-> +{
-> +	return sect + (npo2_zone_no(dmh, sect) * dmh->zone_size_diff);
-> +}
-> +
-> +/*
-> + * This target works on the complete zoned device. Partial mapping is not
-> + * supported.
-> + * Construct a zoned po2 logical device: <dev-path>
-> + */
-> +static int dm_po2z_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-> +{
-> +	struct dm_po2z_target *dmh = NULL;
-> +	int ret;
-> +	sector_t zone_size;
-> +	sector_t dev_capacity;
-> +
-> +	if (argc != 1)
-> +		return -EINVAL;
-> +
-> +	dmh = kmalloc(sizeof(*dmh), GFP_KERNEL);
-> +	if (!dmh)
-> +		return -ENOMEM;
-> +
-> +	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table),
-> +			    &dmh->dev);
-> +	if (ret) {
-> +		ti->error = "Device lookup failed";
-> +		kfree(dmh);
-> +		return ret;
-> +	}
-> +
-> +	if (!bdev_is_zoned(dmh->dev->bdev)) {
-> +		DMERR("%pg is not a zoned device", dmh->dev->bdev);
-> +		kfree(dmh);
-> +		return -EINVAL;
-> +	}
-> +
-> +	zone_size = bdev_zone_sectors(dmh->dev->bdev);
-> +	dev_capacity = get_capacity(dmh->dev->bdev->bd_disk);
-> +	if (ti->len != dev_capacity || ti->begin) {
-> +		DMERR("%pg Partial mapping of the target not supported",
-> +		      dmh->dev->bdev);
-> +		kfree(dmh);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (is_power_of_2(zone_size))
-> +		DMWARN("%pg: underlying device has a power-of-2 number of sectors per zone",
-> +		       dmh->dev->bdev);
-> +
-> +	dmh->zone_size = zone_size;
-> +	dmh->zone_size_po2 = 1 << get_count_order_long(zone_size);
-> +	dmh->zone_size_po2_shift = ilog2(dmh->zone_size_po2);
-> +	dmh->zone_size_diff = dmh->zone_size_po2 - dmh->zone_size;
-> +	ti->private = dmh;
-> +	ti->max_io_len = dmh->zone_size_po2;
-> +	dmh->nr_zones = npo2_zone_no(dmh, ti->len);
-> +	ti->len = dmh->zone_size_po2 * dmh->nr_zones;
-> +
-> +	return 0;
-> +}
-> +
-> +static int dm_po2z_report_zones_cb(struct blk_zone *zone, unsigned int idx,
-> +				   void *data)
-> +{
-> +	struct dm_report_zones_args *args = data;
-> +	struct dm_po2z_target *dmh = args->tgt->private;
-> +
-> +	zone->start = device_to_target_sect(dmh, zone->start);
-> +	zone->wp = device_to_target_sect(dmh, zone->wp);
-> +	zone->len = dmh->zone_size_po2;
-> +	args->next_sector = zone->start + zone->len;
-> +
-> +	return args->orig_cb(zone, args->zone_idx++, args->orig_data);
-> +}
-> +
-> +static int dm_po2z_report_zones(struct dm_target *ti,
-> +				struct dm_report_zones_args *args,
-> +				unsigned int nr_zones)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +	sector_t sect = po2_zone_no(dmh, args->next_sector) * dmh->zone_size;
-> +
-> +	return blkdev_report_zones(dmh->dev->bdev, sect, nr_zones,
-> +				   dm_po2z_report_zones_cb, args);
-> +}
-> +
-> +static int dm_po2z_end_io(struct dm_target *ti, struct bio *bio,
-> +			  blk_status_t *error)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +
-> +	if (bio->bi_status == BLK_STS_OK && bio_op(bio) == REQ_OP_ZONE_APPEND)
-> +		bio->bi_iter.bi_sector =
-> +			device_to_target_sect(dmh, bio->bi_iter.bi_sector);
-> +
-> +	return DM_ENDIO_DONE;
-> +}
-> +
-> +static void dm_po2z_io_hints(struct dm_target *ti, struct queue_limits *limits)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +
-> +	limits->chunk_sectors = dmh->zone_size_po2;
-> +}
-> +
-> +/**
-> + * bio_in_emulated_zone_area - check if bio is in the emulated zone area
-> + * @dmh:	pozone target data
-> + * @bio:	bio
-> + * @offset:	bio offset to emulated zone boundary
-> + *
-> + * Check if a @bio is partly or completely in the emulated zone area. If the
-> + * @bio is partly in the emulated zone area, @offset can be used to split
-> + * the @bio across the emulated zone boundary. @offset
-> + * will be negative if the @bio completely lies in the emulated area.
-> + *
-> + */
-> +static bool bio_in_emulated_zone_area(struct dm_po2z_target *dmh,
-> +				      struct bio *bio, int *offset)
 
-This function name reads like it is a block layer helper. It mat be less
-confucing to keep using the dm_po2z_ prefix for it.
+--Apple-Mail=_55512B7B-3B73-458E-BB38-6700602A50E9
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-> +{
-> +	unsigned int zone_idx = po2_zone_no(dmh, bio->bi_iter.bi_sector);
-> +	sector_t nr_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-> +	sector_t sector_offset =
-> +		bio->bi_iter.bi_sector - (zone_idx << dmh->zone_size_po2_shift);
-> +
-> +	*offset = dmh->zone_size - sector_offset;
-> +
-> +	return sector_offset + nr_sectors > dmh->zone_size;
-> +}
-> +
-> +static inline int dm_po2z_read_zeroes(struct bio *bio)
-> +{
-> +	zero_fill_bio(bio);
-> +	bio_endio(bio);
-> +	return DM_MAPIO_SUBMITTED;
-> +}
-> +
-> +static inline int dm_po2z_remap_sector(struct dm_po2z_target *dmh,
-> +				       struct bio *bio)
-> +{
-> +	bio->bi_iter.bi_sector =
-> +		target_to_device_sect(dmh, bio->bi_iter.bi_sector);
-> +	return DM_MAPIO_REMAPPED;
-> +}
-> +
-> +static int dm_po2z_map(struct dm_target *ti, struct bio *bio)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +	int split_io_pos;
-> +
-> +	bio_set_dev(bio, dmh->dev->bdev);
-> +
-> +	if (op_is_zone_mgmt(bio_op(bio)))
-> +		return dm_po2z_remap_sector(dmh, bio);
-> +
-> +	if (!bio_sectors(bio))
-> +		return DM_MAPIO_REMAPPED;
-> +
-> +	/*
-> +	 * Read operation on the emulated zone area (between zone capacity
-> +	 * and zone size) will fill the bio with zeroes. Any other operation
-> +	 * in the emulated area should return an error.
-> +	 */
-> +	if (!bio_in_emulated_zone_area(dmh, bio, &split_io_pos))
-> +		return dm_po2z_remap_sector(dmh, bio);
-> +
-> +	if (bio_op(bio) == REQ_OP_READ) {
-> +	/*
-> +	 * If the bio is across emulated zone boundary, split the bio at
-> +	 * the boundary.
-> +	 */
+On Aug 16, 2022, at 3:03 AM, Dave Chinner <david@fromorbit.com> wrote:
+>=20
+> On Mon, Aug 15, 2022 at 05:55:45PM -0700, Eric Biggers wrote:
+>> On Sat, Jul 30, 2022 at 08:08:26PM -0700, Jaegeuk Kim wrote:
+>>> On 07/25, Eric Biggers wrote:
+>>>> On Sat, Jul 23, 2022 at 07:01:59PM -0700, Jaegeuk Kim wrote:
+>>>>> On 07/22, Eric Biggers wrote:
+>>>>>> From: Eric Biggers <ebiggers@google.com>
+>>>>>>=20
+>>>>>> Currently, if an f2fs filesystem is mounted with the mode=3Dlfs =
+and
+>>>>>> io_bits mount options, DIO reads are allowed but DIO writes are =
+not.
+>>>>>> Allowing DIO reads but not DIO writes is an unusual restriction, =
+which
+>>>>>> is likely to be surprising to applications, namely any =
+application that
+>>>>>> both reads and writes from a file (using O_DIRECT).  This =
+behavior is
+>>>>>> also incompatible with the proposed STATX_DIOALIGN extension to =
+statx.
+>>>>>> Given this, let's drop the support for DIO reads in this =
+configuration.
+>>>>>=20
+>>>>> IIRC, we allowed DIO reads since applications complained a lower =
+performance.
+>>>>> So, I'm afraid this change will make another confusion to users. =
+Could
+>>>>> you please apply the new bahavior only for STATX_DIOALIGN?
+>>>>>=20
+>>>>=20
+>>>> Well, the issue is that the proposed STATX_DIOALIGN fields cannot =
+represent this
+>>>> weird case where DIO reads are allowed but not DIO writes.  So the =
+question is
+>>>> whether this case actually matters, in which case we should make =
+STATX_DIOALIGN
+>>>> distinguish between DIO reads and DIO writes, or whether it's some =
+odd edge case
+>>>> that doesn't really matter, in which case we could just fix it or =
+make
+>>>> STATX_DIOALIGN report that DIO is unsupported.  I was hoping that =
+you had some
+>>>> insight here.  What sort of applications want DIO reads but not DIO =
+writes?
+>>>> Is this common at all?
+>>>=20
+>>> I think there's no specific application to use the LFS mode at this
+>>> moment, but I'd like to allow DIO read for zoned device which will =
+be
+>>> used for Android devices.
+>>>=20
+>>=20
+>> So if the zoned device feature becomes widely adopted, then =
+STATX_DIOALIGN will
+>> be useless on all Android devices?  That sounds undesirable.  Are you =
+sure that
+>> supporting DIO reads but not DIO writes actually works?  Does it not =
+cause
+>> problems for existing applications?
+>=20
+> What purpose does DIO in only one direction actually serve? All it
+> means is that we're forcibly mixing buffered and direct IO to the
+> same file and that simply never ends well from a data coherency POV.
+>=20
+> Hence I'd suggest that mixing DIO reads and buffered writes like
+> this ends up exposing uses to the worst of both worlds - all of the
+> problems with none of the benefits...
+>=20
+>> What we need to do is make a decision about whether this means we =
+should
+>> build in a stx_dio_direction field (indicating no support / readonly
+>> support / writeonly support / readwrite support) into the API from =
+the
+>> beginning.  If we don't do that, then I don't think we could simply =
+add
+>> such a field later, as the statx_dio_*_align fields will have already
+>> been assigned their meaning.  I think we'd instead have to =
+"duplicate"
+>> the API, with STATX_DIOROALIGN and statx_dio_ro_*_align fields.  That
+>> seems uglier than building a directional indicator into the API from =
+the
+>> beginning.  On the other hand, requiring all programs to check
+>> stx_dio_direction would add complexity to using the API.
+>>=20
+>> Any thoughts on this?
+>=20
+> Decide whether partial, single direction DIO serves a useful purpose
+> before trying to work out what is needed in the API to indicate that
+> this sort of crazy will be supported....
 
-Weird indentation of the comments.
+Using read-only O_DIRECT makes sense for backup and other filesystem
+scanning tools that don't want to pollute the page cache of a system
+(which may be in use by other programs) while reading many files once.
 
-> +		if (split_io_pos > 0) {> +			dm_accept_partial_bio(bio, split_io_pos);
-> +			return dm_po2z_remap_sector(dmh, bio);
-> +		}
-> +		return dm_po2z_read_zeroes(bio);
-> +	}
-> +
-> +	return DM_MAPIO_KILL;
-> +}
-> +
-> +static int dm_po2z_iterate_devices(struct dm_target *ti,
-> +				   iterate_devices_callout_fn fn, void *data)
-> +{
-> +	struct dm_po2z_target *dmh = ti->private;
-> +	sector_t len = dmh->nr_zones * dmh->zone_size;
-> +
-> +	return fn(ti, dmh->dev, 0, len, data);
-> +}
-> +
-> +static struct target_type dm_po2z_target = {
-> +	.name = "po2zone",
-> +	.version = { 1, 0, 0 },
-> +	.features = DM_TARGET_ZONED_HM | DM_TARGET_EMULATED_ZONES,
-> +	.map = dm_po2z_map,
-> +	.end_io = dm_po2z_end_io,
-> +	.report_zones = dm_po2z_report_zones,
-> +	.iterate_devices = dm_po2z_iterate_devices,
-> +	.module = THIS_MODULE,
-> +	.io_hints = dm_po2z_io_hints,
-> +	.ctr = dm_po2z_ctr,
-> +};
-> +
-> +static int __init dm_po2z_init(void)
-> +{
-> +	return dm_register_target(&dm_po2z_target);
-> +}
-> +
-> +static void __exit dm_po2z_exit(void)
-> +{
-> +	dm_unregister_target(&dm_po2z_target);
-> +}
-> +
-> +/* Module hooks */
-> +module_init(dm_po2z_init);
-> +module_exit(dm_po2z_exit);
-> +
-> +MODULE_DESCRIPTION(DM_NAME "power-of-2 zoned target");
-> +MODULE_AUTHOR("Pankaj Raghav <p.raghav@samsung.com>");
-> +MODULE_LICENSE("GPL");
-> +
+Using interfaces like posix_fadvise(FADV_DONTNEED) to drop file cache
+afterward is both a hassle and problematic when reading very large files
+that would push out more important pages from cache before the large
+file's pages can be dropped.
 
 
--- 
-Damien Le Moal
-Western Digital Research
+IMHO, this whole discussion is putting the cart before the horse.
+Changing existing (and useful) IO behavior to accommodate an API that
+nobody has ever used, and is unlikely to even be widely used, doesn't
+make sense to me.  Most applications won't check or care about the new
+DIO size fields, since they've lived this long without statx() returning
+this info, and will just pick a "large enough" size (4KB, 1MB, whatever)
+that gives them the performance they need.  They *WILL* care if the app
+is suddenly unable to read data from a file in ways that have worked for
+a long time.
+
+Even if apps are modified to check these new DIO size fields, and then
+try to DIO write to a file in f2fs that doesn't allow it, then f2fs will
+return an error, which is what it would have done without the statx()
+changes, so no harm done AFAICS.
+
+Even with a more-complex DIO status return that handles a "direction"
+field (which IMHO is needlessly complex), there is always the potential
+for a TOCTOU race where a file changes between checking and access, so
+the userspace code would need to handle this.
+
+Cheers, Andreas
+
+
+
+
+
+
+--Apple-Mail=_55512B7B-3B73-458E-BB38-6700602A50E9
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAmL7yPUACgkQcqXauRfM
+H+C5yA/9G0OeBL/KETzAPM0Gdql84d9VCjortatITeNdwHUMtP26voBr8Q5A85dE
+vey+YGYSY1rcLrN9ORjCqJ9WRD3e77oXPapHyNlqgh+x2fxGgI8Ypb34fT0oB/vu
+YTRE3UgK0IEt2ZB76AnlSOtXzHGQrME4dUNTg9NcwDIEdJL3L4FUrykhozGqkFFu
+/zxI8KCATl2lEyuse7h7DYX187W1H1tSORo4Z7BpW7JcA0F4Bw0NoNET9nhV7PlS
+GW7QqOSt46Wf+w2V6HsUhVAbLJz+3XfQ1hVO+tp3cWfqRQ54DpcqJIL0HD73GQmY
+eR6m67atxsHO2tsgOaMxcaQwTNZrmZoPveHrS5oR2Eo+qWsVn4hp5pikFGp9fyuD
+V9cUm2yFCa/bKxhwTcfSTrEO8/R7rYVX3ppqP1HGO5t9xw0vSe8Mg+wBLFG45/L9
+Bk+vfgnffDluYw546hklgu+KqD0wVkfRKUEZcimT/4Vfyg5d1GPSXTLlnjm6lWq3
+i5Y2yf2PPo+Yx25qt65QC0VkRV1dsdPLuTI9MoyKTHgYc3MlPYJoK+Ohyq8CuHq/
+W6Qpib+UBC07fdA61Qw1yJR1TfIIJ+nNFzuXvAZvINFKRDQ87npdHpuoUul1lJ6p
+eXugihjhNr7Ny2hXArGDjA/lPjTfg6gf0EPZOezgajagFOyerH4=
+=1DeF
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_55512B7B-3B73-458E-BB38-6700602A50E9--
