@@ -2,81 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C6EC282E7
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 06:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F49C2BB41
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 06:46:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiHPGaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 02:30:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
+        id S230314AbiHPGqI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 02:46:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbiHPG3g (ORCPT
+        with ESMTP id S230206AbiHPGpp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 02:29:36 -0400
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 209067645F;
-        Mon, 15 Aug 2022 17:44:11 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-33387bf0c4aso8394877b3.11;
-        Mon, 15 Aug 2022 17:44:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc;
-        bh=CsC+j0kptQXyDU8jUOJJkLIgy9EO57j1cJI24xW/Lks=;
-        b=HR1SRzlAc6A+jKkxiSeTn7zBxq84sbDNzQ8EjnD5LQjD7/Jv4uCKQ7PsK4ShUN598D
-         YJ44WChMo+PTbLKHC939js2KpEenZpa0W6/X4lembTFpYdEySWoBKzMuqtGzARQ3KacB
-         JXqs+N6zQe3GNtFq3ya8BKPtYHhMltx7R5t38uzRMmO/utU/vyhaWt75JR1IZq+Lsih+
-         DrHoKI0NaeBpDZGdzn+ldMsTQCpENA9O5dOtKZdD/d4F47hFtJNl5SUlKRrisRD33t1F
-         eHeSDlq2Cs6guhlFXtEAWaa2NR1gYTRj8HBDamjN8gmXpmFfTN64ufkQ+bTcUEzEFN6c
-         /OsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc;
-        bh=CsC+j0kptQXyDU8jUOJJkLIgy9EO57j1cJI24xW/Lks=;
-        b=mb1DN1siBbGfxtw68xUpMkZYKHScGtdXE1JbTxnLDLYWF02RA8RnkedHmCyKkqIiR1
-         FOynfoC6Uk/hpzdGHn1JqR0gCEUDc1uay2+geRmnRQnhSoFuZZBHimdnxCEVhM3l6yr7
-         WlXg4M0Vkj6QDeM891qMG9GjgxIu0x0PBfihwBvHu5Nc6dfy0Jwk1zbregjGN/38oEpQ
-         oW2V+FTSemTrpIBA2NeTRMJiEBAtiGGr1hyr6k05BJGLMODZW7SxJa/UgKUUUrBmA/19
-         JOEMKcMBPTO/TLPJu53x9QPbfoiVQMWg6naam/T/XqY9evg1k6ZyCfoLwpZbg1nb68G5
-         dWjQ==
-X-Gm-Message-State: ACgBeo1FEzm744jHGo6vgtYi2irfodNMeiKqnfRftdb0hcJiYCx+adDP
-        bNYbGOE6TXsx+qNK1ZfHlR7+jkdlRIRt3K8YgaN1VuxXAg9625A25OI=
-X-Google-Smtp-Source: AA6agR5A7f3m84c1TtI6f2r6XmTxvD13yN6Dg+5eE1cWCdEqLisdawEIlErejWKWe55LX3f7hyEwsc6WKkkCnwttmQc=
-X-Received: by 2002:a25:4282:0:b0:67a:6a4a:e138 with SMTP id
- p124-20020a254282000000b0067a6a4ae138mr13665637yba.395.1660610650217; Mon, 15
- Aug 2022 17:44:10 -0700 (PDT)
+        Tue, 16 Aug 2022 02:45:45 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A017BFF202;
+        Mon, 15 Aug 2022 18:44:54 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4M6DSY46Xsz6S34Z;
+        Tue, 16 Aug 2022 09:43:25 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgBnu_iS9vpicjqdAQ--.63281S6;
+        Tue, 16 Aug 2022 09:44:53 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     jack@suse.cz, axboe@kernel.dk, paolo.valente@linaro.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH -next 2/3] block, bfq: remove useless checking in bfq_put_queue()
+Date:   Tue, 16 Aug 2022 09:56:30 +0800
+Message-Id: <20220816015631.1323948-3-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220816015631.1323948-1-yukuai1@huaweicloud.com>
+References: <20220816015631.1323948-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-From:   Alec Ari <neotheuser@gmail.com>
-Date:   Mon, 15 Aug 2022 19:43:59 -0500
-Message-ID: <CAM5Ud7OqLyi=iSAT7fUuA2yZSqvhJ7hNZND=L5woMV9UxnBn8A@mail.gmail.com>
-Subject: [PATCH] init/Kconfig: Preserve mtimes in initramfs only if BLK_DEV_INITRD
-To:     linux-block@vger.kernel.org, linux-config@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgBnu_iS9vpicjqdAQ--.63281S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrtw4rKw17uw13GFWfGry8Xwb_yoWkGrXEy3
+        WSgw10yF4UJFy5Cr1jkr13t3WUu3yrKrn7tFZ0qFn5XF12qF95AasrtryakFZ8C3yagay3
+        Jr1vqws8tr4rZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb-kFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
+        0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
+        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+        JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjYiiDUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Alec Ari <alec@onelabs.com>
-Date: Mon, 15 Aug 2022 19:13:12 -0500
-Subject: crypto: Make FIPS_SIGNATURE_SELFTEST depend on CRYPTO_FIPS
+From: Yu Kuai <yukuai3@huawei.com>
 
-Would running FIPS selftests be necessary if FIPS is disabled?
+'bfqq->bfqd' is ensured to set in bfq_init_queue(), and it will never
+change afterwards.
 
-Signed-off-by: Alec Ari <alec@onelabs.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- crypto/asymmetric_keys/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ block/bfq-iosched.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
-index 3df3fe4ed..562bbd774 100644
---- a/crypto/asymmetric_keys/Kconfig
-+++ b/crypto/asymmetric_keys/Kconfig
-@@ -81,6 +81,7 @@ config FIPS_SIGNATURE_SELFTEST
-          This option causes some selftests to be run on the signature
-          verification code, using some built in data.  This is required
-          for FIPS.
-+       depends on CRYPTO_FIPS
-        depends on KEYS
-        depends on ASYMMETRIC_KEY_TYPE
-        depends on PKCS7_MESSAGE_PARSER
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index c740b41fe0a4..f39067389b2b 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5255,9 +5255,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 	struct hlist_node *n;
+ 	struct bfq_group *bfqg = bfqq_group(bfqq);
+ 
+-	if (bfqq->bfqd)
+-		bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d",
+-			     bfqq, bfqq->ref);
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq, bfqq->ref);
+ 
+ 	bfqq->ref--;
+ 	if (bfqq->ref)
+@@ -5321,7 +5319,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 		hlist_del_init(&item->woken_list_node);
+ 	}
+ 
+-	if (bfqq->bfqd && bfqq->bfqd->last_completed_rq_bfqq == bfqq)
++	if (bfqq->bfqd->last_completed_rq_bfqq == bfqq)
+ 		bfqq->bfqd->last_completed_rq_bfqq = NULL;
+ 
+ 	kmem_cache_free(bfq_pool, bfqq);
 -- 
-2.37.2
+2.31.1
+
