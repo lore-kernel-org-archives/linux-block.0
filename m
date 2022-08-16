@@ -2,169 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5886FC3F6B0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 10:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF080C32792
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 10:29:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234341AbiHPKJk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 06:09:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36690 "EHLO
+        id S234638AbiHPK3h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 06:29:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229993AbiHPKJR (ORCPT
+        with ESMTP id S234402AbiHPK3A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 06:09:17 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 034E8C8779
-        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 01:02:40 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220816080235euoutp023d54ce7cde19fb84d36a57a6ee1aa9ec~LxIMtcUk10400304003euoutp02H
-        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 08:02:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220816080235euoutp023d54ce7cde19fb84d36a57a6ee1aa9ec~LxIMtcUk10400304003euoutp02H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1660636955;
-        bh=w+UeNKFPkWuzxd2gXXq4NTrE0Bz4wmcfIlzmDBOFbwQ=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=RAR1wRHu/BOFrAZmorCEpSM25V699cyBQtLPd69h0FXvshEQxlSaKx/gjdVWQ20Cp
-         +FQPly9vQ/mSkIcOax1fsW3h7PmR3/oPsL7/pbrf0qte37ScWjYTmwxnWdDAFtt+oF
-         4yrusIBitn8qORdscYpwxOjswQhyn8Onn0Fp09Y8=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220816080234eucas1p1944800b3870bef434c619543e727f2d8~LxIMQJt2H0475004750eucas1p1F;
-        Tue, 16 Aug 2022 08:02:34 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id DE.46.09580.A1F4BF26; Tue, 16
-        Aug 2022 09:02:34 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220816080234eucas1p2ec04f60bad4888c708d7c57f5aab5d47~LxIL0Fflp2135521355eucas1p2u;
-        Tue, 16 Aug 2022 08:02:34 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220816080234eusmtrp2222f44d8dffbb9c0cbd291bd2fceb90b~LxILy-Wxp1663716637eusmtrp2D;
-        Tue, 16 Aug 2022 08:02:34 +0000 (GMT)
-X-AuditID: cbfec7f5-9c3ff7000000256c-80-62fb4f1a8245
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id D8.4F.09095.A1F4BF26; Tue, 16
-        Aug 2022 09:02:34 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220816080234eusmtip2b83e83d28d6f473c7506bda77a4da005~LxILlzw4B1996419964eusmtip2c;
-        Tue, 16 Aug 2022 08:02:34 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.18) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Tue, 16 Aug 2022 09:02:31 +0100
-Message-ID: <dfb3bb5d-404c-90d9-5fa5-ee62639057bf@samsung.com>
-Date:   Tue, 16 Aug 2022 10:02:29 +0200
+        Tue, 16 Aug 2022 06:29:00 -0400
+Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D01D65E309;
+        Tue, 16 Aug 2022 02:03:14 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-52-176.pa.nsw.optusnet.com.au [49.181.52.176])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 7B45B62D403;
+        Tue, 16 Aug 2022 19:03:13 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1oNsTg-00Dk22-Ca; Tue, 16 Aug 2022 19:03:12 +1000
+Date:   Tue, 16 Aug 2022 19:03:12 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Message-ID: <20220816090312.GU3600936@dread.disaster.area>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org>
+ <YtyoF89iOg8gs7hj@google.com>
+ <Yt7dCcG0ns85QqJe@sol.localdomain>
+ <YuXyKh8Zvr56rR4R@google.com>
+ <YvrrEcw4E+rpDLwM@sol.localdomain>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-Subject: Re: [PATCH v10 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        <snitzer@kernel.org>, <axboe@kernel.dk>, <hch@lst.de>,
-        <agk@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <Johannes.Thumshirn@wdc.com>,
-        <bvanassche@acm.org>, <matias.bjorling@wdc.com>, <hare@suse.de>,
-        <gost.dev@samsung.com>, <linux-nvme@lists.infradead.org>,
-        <jaegeuk@kernel.org>, <pankydev8@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <dm-devel@redhat.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Joel Granados <j.granados@samsung.com>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <d4735d9e-31b6-0872-82a7-acbbd0cb5af5@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.18]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKKsWRmVeSWpSXmKPExsWy7djP87pS/r+TDJ4s0rVYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
-        PWW3mND2ldlizc2nLBYnbkk7CHhcvuLtsXPWXXaPy2dLPTat6mTz2Lyk3mP3zQY2j52t91k9
-        3u+7ChQ6Xe3xeZOcR/uBbqYA7igum5TUnMyy1CJ9uwSujEendzEX3OGqeN1zjLmB8TtbFyMn
-        h4SAicSbMz2MXYxcHEICKxglXu89wwLhfGGU+Ny5FSrzmVFi44oTzDAtu5YuYoJILGeUmPPi
-        ODtc1enD3cwQzi6gzIYORpAWXgE7ies/noO1swioSmw7/oYJIi4ocXLmExYQW1QgUmLN7rNA
-        kzg4hAWyJSZ22ICEmQXEJW49mQ+2TUSggVFi+v4tYA6zwA8miS2fpjGBNLAJaEk0doL1cgq4
-        SXxeEg/RqynRuv03O4QtL7H97RyoD5QkFrbdgQZArcTaY2fAHpAQeMYpsaJnE1TCRWLr7RNQ
-        trDEq+Nb2CFsGYn/O+czQdjVEk9v/GaGaG5hlOjfuZ4N5AgJAWuJvjM5EDWOQD/eggrzSdx4
-        KwhxD5/EpG3TmScwqs5CColZSF6eheSFWUheWMDIsopRPLW0ODc9tdg4L7Vcrzgxt7g0L10v
-        OT93EyMwJZ7+d/zrDsYVrz7qHWJk4mA8xCjBwawkwiv44keSEG9KYmVValF+fFFpTmrxIUZp
-        DhYlcd7kzA2JQgLpiSWp2ampBalFMFkmDk6pBqZi6+OqnsE5F3y+qb/Xzxc7Ybyg0vGo2uoS
-        n2tHXkQpfLCY95+9XfZC3znWBvGKF1XS4vsjjr41e2zKs2HSv3krpnhNzcjNOXXt85vJaaG7
-        1Bn2vmCW3flZ26WlgmmOalz886X6p/W6du77ucm83WOGTtZzgasntLa9WnJP79rFxABBP5/a
-        ALakXG3XHH+7Td2MP9wyJjRerfIvf6X7r+DFa2PbR8+Y7Wayp+beVPe++mnNv//OUe2/a11M
-        tkjlLnyaEs3mWJywUTB24vLNWjtq5kYceVwwbfpuz03HHrUwyxpnFjX3zfvYtl7l+4qLO4/d
-        /tSlKCh8+cQfri2317+5dLy910z2wXpth4TJP28osRRnJBpqMRcVJwIABKxREvgDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBKsWRmVeSWpSXmKPExsVy+t/xe7pS/r+TDHpfclusP3WM2WL13X42
-        i2kffjJb/D57ntmitf0bk8Xed7NZLfYsmsRksXL1USaLJ+tnMVv87boHlLilbXF51xw2i/nL
-        nrJbTGj7ymyx5uZTFosTt6QdBDwuX/H22DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we
-        7/ddBQqdrvb4vEnOo/1AN1MAd5SeTVF+aUmqQkZ+cYmtUrShhZGeoaWFnpGJpZ6hsXmslZGp
-        kr6dTUpqTmZZapG+XYJexqPTu5gL7nBVvO45xtzA+J2ti5GTQ0LARGLX0kVMXYxcHEICSxkl
-        Zj39zgyRkJH4dOUjO4QtLPHnWhdYg5DAR0aJWwvdIRp2MUqsunsPrIFXwE7i+o/nYDaLgKrE
-        tuNvmCDighInZz5hAbFFBSIlHi5rAopzcAgLZEtM7LABCTMLiEvcejIf7AgRgQZGien7t4A5
-        zAI/mCS2fJrGBLH5LZNE74p0kGY2AS2Jxk52EJNTwE3i85J4iDmaEq3bf7ND2PIS29/OgfpF
-        SWJh2x2oh2slXt3fzTiBUXQWkutmITljFpJRs5CMWsDIsopRJLW0ODc9t9hQrzgxt7g0L10v
-        OT93EyMwiWw79nPzDsZ5rz7qHWJk4mA8xCjBwawkwiv44keSEG9KYmVValF+fFFpTmrxIUZT
-        YBBNZJYSTc4HprG8knhDMwNTQxMzSwNTSzNjJXFez4KORCGB9MSS1OzU1ILUIpg+Jg5OqQam
-        ksR3Gy/v4Yy4Ivb65+78ouD3rY9SjepzNr5YckT9DktxhGi63AEODsHvPUs1/9v/NL1rrye1
-        UScw8P8Ssd+3ZT9tmehls8RBj8dqttwiVzlJRfva5eZuU+/khwuvcDv99dKhRbsO1cSvqTYQ
-        FHlQEPe/kPP72iLNEM5TKd5387vmdv2+F8jypObkbbcyvlWLUj7PW2i5IuDTWYGqd7vdn9h3
-        /fjMcqL++C6Rn1MMNum6ve6awvP5wj2JGydl303/XLt/TsVmx9xK57PPO+t/L72ZvfHK7PO2
-        6x7f78hawlPvxv1xyjpBC/fy6CPy29rvTnb5VXFIbtPdjTyfTh9a0eW7Nncql+Bttmrtvedu
-        rlBiKc5INNRiLipOBACnkEk0qwMAAA==
-X-CMS-MailID: 20220816080234eucas1p2ec04f60bad4888c708d7c57f5aab5d47
-X-Msg-Generator: CA
-X-RootMTR: 20220811143058eucas1p247291685ffff7a75186947fd30b5c13f
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220811143058eucas1p247291685ffff7a75186947fd30b5c13f
-References: <20220811143043.126029-1-p.raghav@samsung.com>
-        <CGME20220811143058eucas1p247291685ffff7a75186947fd30b5c13f@eucas1p2.samsung.com>
-        <20220811143043.126029-14-p.raghav@samsung.com>
-        <bb4ab1f2-7e16-15a7-58b1-d37f6f3822fd@opensource.wdc.com>
-        <b98ab80d-1bc0-a378-d438-09ef8b375836@samsung.com>
-        <d4735d9e-31b6-0872-82a7-acbbd0cb5af5@opensource.wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YvrrEcw4E+rpDLwM@sol.localdomain>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=e9dl9Yl/ c=1 sm=1 tr=0 ts=62fb5d51
+        a=O3n/kZ8kT9QBBO3sWHYIyw==:117 a=O3n/kZ8kT9QBBO3sWHYIyw==:17
+        a=kj9zAlcOel0A:10 a=biHskzXt2R4A:10 a=1XWaLZrsAAAA:8 a=7-415B0cAAAA:8
+        a=0f_GdJSvYQN_4D2ffm4A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Aug 15, 2022 at 05:55:45PM -0700, Eric Biggers wrote:
+> On Sat, Jul 30, 2022 at 08:08:26PM -0700, Jaegeuk Kim wrote:
+> > On 07/25, Eric Biggers wrote:
+> > > On Sat, Jul 23, 2022 at 07:01:59PM -0700, Jaegeuk Kim wrote:
+> > > > On 07/22, Eric Biggers wrote:
+> > > > > From: Eric Biggers <ebiggers@google.com>
+> > > > > 
+> > > > > Currently, if an f2fs filesystem is mounted with the mode=lfs and
+> > > > > io_bits mount options, DIO reads are allowed but DIO writes are not.
+> > > > > Allowing DIO reads but not DIO writes is an unusual restriction, which
+> > > > > is likely to be surprising to applications, namely any application that
+> > > > > both reads and writes from a file (using O_DIRECT).  This behavior is
+> > > > > also incompatible with the proposed STATX_DIOALIGN extension to statx.
+> > > > > Given this, let's drop the support for DIO reads in this configuration.
+> > > > 
+> > > > IIRC, we allowed DIO reads since applications complained a lower performance.
+> > > > So, I'm afraid this change will make another confusion to users. Could
+> > > > you please apply the new bahavior only for STATX_DIOALIGN?
+> > > > 
+> > > 
+> > > Well, the issue is that the proposed STATX_DIOALIGN fields cannot represent this
+> > > weird case where DIO reads are allowed but not DIO writes.  So the question is
+> > > whether this case actually matters, in which case we should make STATX_DIOALIGN
+> > > distinguish between DIO reads and DIO writes, or whether it's some odd edge case
+> > > that doesn't really matter, in which case we could just fix it or make
+> > > STATX_DIOALIGN report that DIO is unsupported.  I was hoping that you had some
+> > > insight here.  What sort of applications want DIO reads but not DIO writes?
+> > > Is this common at all?
+> > 
+> > I think there's no specific application to use the LFS mode at this
+> > moment, but I'd like to allow DIO read for zoned device which will be
+> > used for Android devices.
+> > 
 > 
-> I think this is way better. But I would still reorganize this like this:
+> So if the zoned device feature becomes widely adopted, then STATX_DIOALIGN will
+> be useless on all Android devices?  That sounds undesirable.  Are you sure that
+> supporting DIO reads but not DIO writes actually works?  Does it not cause
+> problems for existing applications?
+
+What purpose does DIO in only one direction actually serve? All it
+means is that we're forcibly mixing buffered and direct IO to the
+same file and that simply never ends well from a data coherency POV.
+
+Hence I'd suggest that mixing DIO reads and buffered writes like
+this ends up exposing uses to the worst of both worlds - all of the
+problems with none of the benefits...
+
+> What we need to do is make a decision about whether this means we should build
+> in a stx_dio_direction field (indicating no support / readonly support /
+> writeonly support / readwrite support) into the API from the beginning.  If we
+> don't do that, then I don't think we could simply add such a field later, as the
+> statx_dio_*_align fields will have already been assigned their meaning.  I think
+> we'd instead have to "duplicate" the API, with STATX_DIOROALIGN and
+> statx_dio_ro_*_align fields.  That seems uglier than building a directional
+> indicator into the API from the beginning.  On the other hand, requiring all
+> programs to check stx_dio_direction would add complexity to using the API.
 > 
-> static int dm_po2z_map(struct dm_target *ti, struct bio *bio)
-> {
->         struct dm_po2z_target *dmh = ti->private;
->         int split_io_pos;
-> 
->         bio_set_dev(bio, dmh->dev->bdev);
-> 
->         if (op_is_zone_mgmt(bio_op(bio)))
->                 return dm_po2z_remap_sector(dmh, bio);
-> 
->         if (!bio_sectors(bio))
->                 return DM_MAPIO_REMAPPED;
-> 
->         /*
->          * Read operation on the emulated zone area (between zone capacity
->          * and zone size) will fill the bio with zeroes. Any other operation
->          * in the emulated area should return an error.
->          */
->         if (!bio_in_emulated_zone_area(dmh, bio, &split_io_pos))
->                 return dm_po2z_remap_sector(dmh, bio);
-> 
->         if (bio_op(bio) == REQ_OP_READ) {
->                 if (split_io_pos > 0) {
->                         dm_accept_partial_bio(bio, split_io_pos);
->                         return dm_po2z_remap_sector(dmh, bio);
->                 }
->                 return dm_po2z_read_zeroes(bio);
->         }
-> 
->         return DM_MAPIO_KILL;
-> }
-> 
-> I find the code easier to follow this way.
-> 
-I agree. It is definitely easier to follow. I will make these changes
-and send the next version soon.
-> 
-> 
+> Any thoughts on this?
+
+Decide whether partial, single direction DIO serves a useful purpose
+before trying to work out what is needed in the API to indicate that
+this sort of crazy will be supported....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
