@@ -2,573 +2,347 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B79C25B0E
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 13:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1801C25B0E
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 14:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235604AbiHPNQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 09:16:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45816 "EHLO
+        id S232865AbiHPOHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 10:07:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235603AbiHPNP6 (ORCPT
+        with ESMTP id S233073AbiHPOHU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 09:15:58 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9693162A9A
-        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 06:15:55 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220816131553euoutp02f8def4855aae45f838daeb0107a26960~L1ZwKFUmJ2682126821euoutp02S
-        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 13:15:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220816131553euoutp02f8def4855aae45f838daeb0107a26960~L1ZwKFUmJ2682126821euoutp02S
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1660655753;
-        bh=PvnenMuRv4p19PPEMOW1GA5OXgVclqzULdTF9h0TpXk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Chr9StB+BuLCOZziSJvQFNcAbac7bnxFyktdQdTage+kX7iuSqRdEer5fQGfkvFx9
-         pvhOrv9jHAgW5+8DdtZUBozaDUQJN+6a8xUdmqsqsi5WgW1mMLCYRp0e7UQ/xXbMa+
-         GQbaKc3MDdn8yVdH8Oh4STKolwFhusk0tCQwJx7E=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220816131552eucas1p1709a353975f87319714174c850fd7b1d~L1ZunC-aD0140201402eucas1p1f;
-        Tue, 16 Aug 2022 13:15:52 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id AC.75.09580.7889BF26; Tue, 16
-        Aug 2022 14:15:52 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e~L1ZuLzZAy2105421054eucas1p2Y;
-        Tue, 16 Aug 2022 13:15:51 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220816131551eusmtrp1815fdc7c94e0639069a8d54ef394dfd4~L1ZuLA3xS0149801498eusmtrp1U;
-        Tue, 16 Aug 2022 13:15:51 +0000 (GMT)
-X-AuditID: cbfec7f5-9adff7000000256c-02-62fb98871665
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 4E.B0.09095.7889BF26; Tue, 16
-        Aug 2022 14:15:51 +0100 (BST)
-Received: from localhost (unknown [106.210.248.74]) by eusmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220816131551eusmtip2e31148a6f0507b64d252ad661f155c16~L1Zt06k2_1196811968eusmtip2e;
-        Tue, 16 Aug 2022 13:15:51 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     damien.lemoal@opensource.wdc.com, axboe@kernel.dk,
-        snitzer@kernel.org, hch@lst.de, agk@redhat.com
-Cc:     pankydev8@gmail.com, gost.dev@samsung.com, matias.bjorling@wdc.com,
-        hare@suse.de, bvanassche@acm.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        jaegeuk@kernel.org, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, Pankaj Raghav <p.raghav@samsung.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: [PATCH v11 13/13] dm: add power-of-2 target for zoned devices with
- non power-of-2 zone sizes
-Date:   Tue, 16 Aug 2022 15:15:36 +0200
-Message-Id: <20220816131536.189406-14-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220816131536.189406-1-p.raghav@samsung.com>
+        Tue, 16 Aug 2022 10:07:20 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A4EAF48D
+        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 07:07:19 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id a4so1041453wrq.1
+        for <linux-block@vger.kernel.org>; Tue, 16 Aug 2022 07:07:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=+LTOMzXw8v0ScwG6RsTU1mjk1haEuTJHtL6/3BbYL/8=;
+        b=LEhb0B1Z6PlxTz+UF4FHtnTDmrlji03p0XiuItEjbwQ66Nys/cGG9Hxe2teIc2QmJD
+         wQHh8UOYh4YSoc9OZPHj62UYtk0FbX/NT56IGTdFKG7ebGWEU0n4PmtvhoC7cGL3Vab0
+         o2BQhqR574czYarnoBlYKtMAMxoJNHDtUtLfDIUJ9VICLnHmcWwk6+Yz3+q1Bw2FCMiQ
+         zFRcznImtw0+LwwSugLncHaDIUbwPLq+V2drbZ+S0mwlDz84mpucDzV8XyApV6BdYVx8
+         Ku/yFr4A9OMXPeycp8jsdTYn/i+KWdQ48ljW8E7oW87ZgQKzEnTADvt3g/VucLxoGw+B
+         mjsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=+LTOMzXw8v0ScwG6RsTU1mjk1haEuTJHtL6/3BbYL/8=;
+        b=RZAsp6pWRAb2ddJqeu67c/Y0NKrOvRNExB4HuvnYS2/U+xnLUDTAyrBiIlec4VVhjM
+         16ikPfNZmrxKr1bOc2OxcimT1AZ3xe/ZxmJ4Wc7v0tv/FCAUjitwfIvnmij12JX5k6xQ
+         bG9hOIaEgFpyG0MvYOmh3XpQF5zMd8tqVOJhm0bAOqVBhXWA+w8Cxv806W3KwTK3MnlG
+         xs9vkW+woRguXXGOzq0tBYyq8bL/9wKw76nTDCHnijNtLBMTkvu+uIqlGv1NBeOXiCeR
+         COVVffTIfQFRiSzkr8DyhN6uZuH9KWMoPIDQwz6x2AfkEkzDOqwF39VipMjCorqVG6a/
+         QISA==
+X-Gm-Message-State: ACgBeo0iliE9qVxJMlYsRbBorrZmQJiHvfXmXGgRqa7tIqHqJYweZmPs
+        ZHKOdgOCPgaaM7X/7m+Hdg6OfuCCWcs=
+X-Google-Smtp-Source: AA6agR56tSN5vlwj90U3Gy4UFSFZAiNmFLYBBTMytuZZXh2+QeXcYBgsy59ohy7Yab0iOMaDI9MCBw==
+X-Received: by 2002:adf:d1e2:0:b0:223:611b:3f18 with SMTP id g2-20020adfd1e2000000b00223611b3f18mr11323506wrd.236.1660658837391;
+        Tue, 16 Aug 2022 07:07:17 -0700 (PDT)
+Received: from localhost ([137.220.125.106])
+        by smtp.gmail.com with ESMTPSA id p14-20020a5d4e0e000000b0020fff0ea0a3sm10251773wrt.116.2022.08.16.07.07.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Aug 2022 07:07:16 -0700 (PDT)
+From:   luca.boccassi@gmail.com
+To:     linux-block@vger.kernel.org
+Cc:     hch@infradead.org, Jonathan.Derrick@solidigmtechnology.com,
+        dougmill@linux.vnet.ibm.com, gmazyland@gmail.com, axboe@kernel.dk
+Subject: [PATCH v7] block: sed-opal: Add ioctl to return device status
+Date:   Tue, 16 Aug 2022 15:07:13 +0100
+Message-Id: <20220816140713.84893-1-luca.boccassi@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djPc7odM34nGTSvYrRYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWtw8sJPJYs+iSUwWK1cfZbJ4sn4Ws8XfrntA2VvaFpd3
-        zWGzmL/sKbvFhLavzBafl7awW6y5+ZTF4sQtaQchj8tXvD12zrrL7nH5bKnHplWdbB6bl9R7
-        7L7ZwOaxs/U+q8f7fVfZPPq2rGL02Hy62uPzJjmP9gPdTAE8UVw2Kak5mWWpRfp2CVwZ1yf0
-        MRWsKalYuqGugXF/TBcjJ4eEgIlE1/W5zF2MXBxCAisYJQ4uucwE4XxhlOiYf5QVwvnMKPF/
-        9UtGmJbn039BJZYzStxfsoYdwnnBKDFzyjeWLkYODjYBLYnGTnaQBhGBdIkpLS9ZQGxmgYnM
-        EtNmpIDYwkDxadc2s4HYLAKqEl0/FoEt4BWwlmj9dIQVYpm8xMxL38HmcALF/zWsYoGoEZQ4
-        OfMJ1Ex5ieats8F+kBBYzymx8tcHdohmF4lfn68xQdjCEq+Ob4GKy0icntzDAmFXSzy98Ruq
-        uYVRon/nejaQBySAtvWdyQExmQU0Jdbv0ocod5TYcO0LC0QFn8SNt4IQJ/BJTNo2nRkizCvR
-        0SYEUa0ksfPnE6ilEhKXm+ZALfWQ+NiwjH0Co+IsJM/MQvLMLIS9CxiZVzGKp5YW56anFhvn
-        pZbrFSfmFpfmpesl5+duYgSmw9P/jn/dwbji1Ue9Q4xMHIyHGCU4mJVEeAVf/EgS4k1JrKxK
-        LcqPLyrNSS0+xCjNwaIkzpucuSFRSCA9sSQ1OzW1ILUIJsvEwSnVwCRWWfR7W/Cr+5nF/qoL
-        i4/2xLzZEWL/V9pHunB2g3zduzk8k45+2svYceP5hysWhpN/HSnRks/5eSnzz9Ri+9T3LO6e
-        Fv2HcwS2z3V51hX18rCkdpRX6eJOueXss95aOLyc9NEkc5ut5/+s5B9JU3g+7tgyfwdr56bL
-        sncftZ0NeRPsY7hohUtdmeqL3QVzzLTXuG2//M932ocTWz4kybh28SleL0uSe2LvnTVDbr9K
-        2fc/+v+Xp5dsr5gZ1hdcu2tqFXvoqkVlrX+2fvvCOPniwvx7pcnTFXsFGievX6vjvCv5zdV3
-        uzdEvXdSuFGz+H2Kx77u5AdFUTfW2k0QsDZg1tmdX3p8nenqaVH5S+KUWIozEg21mIuKEwG1
-        R0hF9gMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrEIsWRmVeSWpSXmKPExsVy+t/xe7rtM34nGdx4I2+x/tQxZovVd/vZ
-        LKZ9+Mls8fvseWaL1vZvTBZ7381mtbh5YCeTxZ5Fk5gsVq4+ymTxZP0sZou/XfeAsre0LS7v
-        msNmMX/ZU3aLCW1fmS0+L21ht1hz8ymLxYlb0g5CHpeveHvsnHWX3ePy2VKPTas62Tw2L6n3
-        2H2zgc1jZ+t9Vo/3+66yefRtWcXosfl0tcfnTXIe7Qe6mQJ4ovRsivJLS1IVMvKLS2yVog0t
-        jPQMLS30jEws9QyNzWOtjEyV9O1sUlJzMstSi/TtEvQyrk/oYypYU1KxdENdA+P+mC5GTg4J
-        AROJ59N/sXYxcnEICSxllNh7eDMbREJC4vbCJkYIW1jiz7UusLiQwDNGieXHZLsYOTjYBLQk
-        GjvZQcIiArkSi5Z1gM1hFljILNGw5hVYvbBAqsSqOZ+ZQWwWAVWJrh+LwGbyClhLtH46wgox
-        X15i5qXvYIM4geL/GlaxQOyykmg7dpkZol5Q4uTMJ2BxZqD65q2zmScwCsxCkpqFJLWAkWkV
-        o0hqaXFuem6xoV5xYm5xaV66XnJ+7iZGYORuO/Zz8w7Gea8+6h1iZOJgPMQowcGsJMIr+OJH
-        khBvSmJlVWpRfnxRaU5q8SFGU6C7JzJLiSbnA1NHXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQ
-        QHpiSWp2ampBahFMHxMHp1QDk1NX+J26WPXiOOvFjMcXrGPg8vFf/7Q/VCe2Sn5HpHrRXNsV
-        D2W2+jSVFDdciV1UUuuuHfDi1f4lQTptnPvvLf/qHhoY/DrAdU3gji726Kbz7i9yH+TsTdA0
-        b2WsMe9nNpq+L/LUi2O6K0/M+34+zlVvxzGuVof51w7oN0XVhJY0t1VaNc22Kqvi9RT7Zma2
-        cP/lectXsXJM6V8nEGUUtWn/MlPbX7s82/cYVsw3Dk3i4/cLcXUV3GPl9C3uRsn6GRNYSwWu
-        pQkuvWV24qfOk0mfnRKnxXgZ7D9n2tA1/8cb+633ot3Xh97ZqPTq86sSp0zRhWKXTnAsPLLF
-        asHs2/vdE/cEZe3ax/aitJVLiaU4I9FQi7moOBEA7hQFAWUDAAA=
-X-CMS-MailID: 20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e
-References: <20220816131536.189406-1-p.raghav@samsung.com>
-        <CGME20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only zoned devices with power-of-2(po2) number of sectors per zone(zone
-size) were supported in linux but now non power-of-2(npo2) zone sizes
-support has been added to the block layer.
+From: "dougmill@linux.vnet.ibm.com" <dougmill@linux.vnet.ibm.com>
 
-Filesystems such as F2FS and btrfs have support for zoned devices with
-po2 zone size assumption. Before adding native support for npo2 zone
-sizes, it was suggested to create a dm target for npo2 zone size device to
-appear as a po2 zone size target so that file systems can initially
-work without any explicit changes by using this target.
+Provide a mechanism to retrieve basic status information about
+the device, including the "supported" flag indicating whether
+SED-OPAL is supported. The information returned is from the various
+feature descriptors received during the discovery0 step, and so
+this ioctl does nothing more than perform the discovery0 step
+and then save the information received. See "struct opal_status"
+and OPAL_FL_* bits for the status information currently returned.
 
-The design of this target is very simple: remap the device zone size to
-the zone capacity and change the zone size to be the nearest power of 2
-value.
+This is necessary to be able to check whether a device is OPAL
+enabled, set up, locked or unlocked from userspace programs
+like systemd-cryptsetup and libcryptsetup. Right now we just
+have to assume the user 'knows' or blindly attempt setup/lock/unlock
+operations.
 
-For e.g., a device with a zone size/capacity of 3M will have an equivalent
-target layout as follows:
-
-Device layout :-
-zone capacity = 3M
-zone size = 3M
-
-|--------------|-------------|
-0             3M            6M
-
-Target layout :-
-zone capacity=3M
-zone size = 4M
-
-|--------------|---|--------------|---|
-0             3M  4M             7M  8M
-
-The area between target's zone capacity and zone size will be emulated
-in the target.
-The read IOs that fall in the emulated gap area will return 0 filled
-bio and all the other IOs in that area will result in an error.
-If a read IO span across the emulated area boundary, then the IOs are
-split across them. All other IO operations that span across the emulated
-area boundary will result in an error.
-
-The target can be easily created as follows:
-dmsetup create <label> --table '0 <size_sects> po2zone /dev/nvme<id>'
-
-Note that the target does not support partial mapping of the underlying
-device.
-
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
-Suggested-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Douglas Miller <dougmill@linux.vnet.ibm.com>
+Tested-by: Luca Boccassi <bluca@debian.org>
+Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
+Acked-by: Christian Brauner (Microsoft) <brauner@kernel.org>
 ---
- .../admin-guide/device-mapper/dm-po2zone.rst  |  71 +++++
- .../admin-guide/device-mapper/index.rst       |   1 +
- drivers/md/Kconfig                            |  10 +
- drivers/md/Makefile                           |   2 +
- drivers/md/dm-po2zone-target.c                | 260 ++++++++++++++++++
- 5 files changed, 344 insertions(+)
- create mode 100644 Documentation/admin-guide/device-mapper/dm-po2zone.rst
- create mode 100644 drivers/md/dm-po2zone-target.c
+v2: https://patchwork.kernel.org/project/linux-block/patch/612795b5.tj7FMS9wzchsMzrK%25dougmill@linux.vnet.ibm.com/
+v3: resend on request, after rebasing and testing on my machine
+    https://patchwork.kernel.org/project/linux-block/patch/20220125215248.6489-1-luca.boccassi@gmail.com/
+v4: it's been more than 7 months and no alternative approach has appeared.
+    we really need to be able to identify and query the status of a sed-opal
+    device, so rebased and resending.
+v5: as requested by reviewer, add __32 reserved to the UAPI ioctl struct to align to 64
+    bits and to reserve space for future expansion
+v6: as requested by reviewer, update commit message with use case
+v7: as requested by reviewer, remove braces around single-line 'if'
+    added received acked-by/reviewed-by tags
 
-diff --git a/Documentation/admin-guide/device-mapper/dm-po2zone.rst b/Documentation/admin-guide/device-mapper/dm-po2zone.rst
-new file mode 100644
-index 000000000000..19dc215fbcca
---- /dev/null
-+++ b/Documentation/admin-guide/device-mapper/dm-po2zone.rst
-@@ -0,0 +1,71 @@
-+==========
-+dm-po2zone
-+==========
-+The dm-po2zone device mapper target exposes a zoned block device with a
-+non-power-of-2(npo2) number of sectors per zone as a power-of-2(po2)
-+number of sectors per zone(zone size).
-+The filesystems that support zoned block devices such as F2FS and BTRFS
-+assume po2 zone size as the kernel has traditionally only supported
-+those devices. However, as the kernel now supports zoned block devices with
-+npo2 zone sizes, the filesystems can run on top of the dm-po2zone target before
-+adding native support.
-+
-+Partial mapping of the underlying device is not supported by this target.
-+
-+Algorithm
-+=========
-+The device mapper target maps the underlying device's zone size to the
-+zone capacity and changes the zone size to the nearest po2 zone size.
-+The gap between the zone capacity and the zone size is emulated in the target.
-+E.g., a zoned block device with a zone size (and capacity) of 3M will have an
-+equivalent target layout with mapping as follows:
-+
-+::
-+
-+  0M           3M  4M        6M 8M
-+  |             |  |          |  |
-+  +x------------+--+x---------+--+x-------  Target
-+  |x            |  |x         |  |x
-+   x               x             x
-+   x               x             x
-+   x              x             x
-+   x             x             x
-+  |x            |x            |x
-+  +x------------+x------------+x----------  Device
-+  |             |             |
-+  0M           3M            6M
-+
-+A simple remap is performed for all the BIOs that do not cross the
-+emulation gap area, i.e., the area between the zone capacity and size.
-+
-+If a BIO crosses the emulation gap area, the following operations are performed:
-+
-+	Read:
-+		- If the BIO lies entirely in the emulation gap area, then zero out the BIO and complete it.
-+		- If the BIO spans the emulation gap area, split the BIO across the zone capacity boundary
-+                  and remap only the BIO within the zone capacity boundary. The other part of the split BIO
-+                  will be zeroed out.
-+
-+	Other operations:
-+                - Return an error
-+
-+Table parameters
-+================
-+
-+::
-+
-+  <dev path>
-+
-+Mandatory parameters:
-+
-+    <dev path>:
-+        Full pathname to the underlying block-device, or a
-+        "major:minor" device-number.
-+
-+Examples
-+========
-+
-+::
-+
-+  #!/bin/sh
-+  echo "0 `blockdev --getsz $1` po2zone $1" | dmsetup create po2z
-diff --git a/Documentation/admin-guide/device-mapper/index.rst b/Documentation/admin-guide/device-mapper/index.rst
-index cde52cc09645..1fd04b5b0565 100644
---- a/Documentation/admin-guide/device-mapper/index.rst
-+++ b/Documentation/admin-guide/device-mapper/index.rst
-@@ -23,6 +23,7 @@ Device Mapper
-     dm-service-time
-     dm-uevent
-     dm-zoned
-+    dm-po2zone
-     era
-     kcopyd
-     linear
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 998a5cfdbc4e..638801b2449a 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -518,6 +518,16 @@ config DM_FLAKEY
- 	help
- 	 A target that intermittently fails I/O for debugging purposes.
+ block/opal_proto.h            |  5 ++
+ block/sed-opal.c              | 89 ++++++++++++++++++++++++++++++-----
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h | 13 +++++
+ 4 files changed, 96 insertions(+), 12 deletions(-)
+
+diff --git a/block/opal_proto.h b/block/opal_proto.h
+index b486b3ec7dc4..7152aa1f1a49 100644
+--- a/block/opal_proto.h
++++ b/block/opal_proto.h
+@@ -39,7 +39,12 @@ enum opal_response_token {
+ #define FIRST_TPER_SESSION_NUM	4096
  
-+config DM_PO2ZONE
-+	tristate "Zoned block devices target emulating a power-of-2 number of sectors per zone"
-+	depends on BLK_DEV_DM
-+	depends on BLK_DEV_ZONED
-+	help
-+	  A target that converts a zoned block device with non-power-of-2(npo2)
-+	  number of sectors per zone to be power-of-2(po2). Use this target for
-+	  zoned block devices with npo2 number of sectors per zone until native
-+	  support is added to the filesystems and applications.
-+
- config DM_VERITY
- 	tristate "Verity target support"
- 	depends on BLK_DEV_DM
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index 84291e38dca8..c23f81cc8789 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -26,6 +26,7 @@ dm-era-y	+= dm-era-target.o
- dm-clone-y	+= dm-clone-target.o dm-clone-metadata.o
- dm-verity-y	+= dm-verity-target.o
- dm-zoned-y	+= dm-zoned-target.o dm-zoned-metadata.o dm-zoned-reclaim.o
-+dm-po2zone-y	+= dm-po2zone-target.o
+ #define TPER_SYNC_SUPPORTED 0x01
++/* FC_LOCKING features */
++#define LOCKING_SUPPORTED_MASK 0x01
++#define LOCKING_ENABLED_MASK 0x02
++#define LOCKED_MASK 0x04
+ #define MBR_ENABLED_MASK 0x10
++#define MBR_DONE_MASK 0x20
  
- md-mod-y	+= md.o md-bitmap.o
- raid456-y	+= raid5.o raid5-cache.o raid5-ppl.o
-@@ -60,6 +61,7 @@ obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
- obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
- obj-$(CONFIG_DM_DUST)		+= dm-dust.o
- obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
-+obj-$(CONFIG_DM_PO2ZONE)	+= dm-po2zone.o
- obj-$(CONFIG_DM_MULTIPATH)	+= dm-multipath.o dm-round-robin.o
- obj-$(CONFIG_DM_MULTIPATH_QL)	+= dm-queue-length.o
- obj-$(CONFIG_DM_MULTIPATH_ST)	+= dm-service-time.o
-diff --git a/drivers/md/dm-po2zone-target.c b/drivers/md/dm-po2zone-target.c
-new file mode 100644
-index 000000000000..15dee7e218f1
---- /dev/null
-+++ b/drivers/md/dm-po2zone-target.c
-@@ -0,0 +1,260 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022 Samsung Electronics Co., Ltd.
-+ */
-+
-+#include <linux/device-mapper.h>
-+
-+#define DM_MSG_PREFIX "po2zone"
-+
-+struct dm_po2z_target {
-+	struct dm_dev *dev;
-+	sector_t zone_size; /* Actual zone size of the underlying dev*/
-+	sector_t zone_size_po2; /* zone_size rounded to the nearest po2 value */
-+	unsigned int zone_size_po2_shift;
-+	sector_t zone_size_diff; /* diff between zone_size_po2 and zone_size */
-+	unsigned int nr_zones;
-+};
-+
-+static inline unsigned int npo2_zone_no(struct dm_po2z_target *dmh,
-+					sector_t sect)
+ #define TINY_ATOM_DATA_MASK 0x3F
+ #define TINY_ATOM_SIGNED 0x40
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index 9700197000f2..2c5327a0543a 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -74,8 +74,7 @@ struct parsed_resp {
+ };
+ 
+ struct opal_dev {
+-	bool supported;
+-	bool mbr_enabled;
++	u32 flags;
+ 
+ 	void *data;
+ 	sec_send_recv *send_recv;
+@@ -280,6 +279,30 @@ static bool check_tper(const void *data)
+ 	return true;
+ }
+ 
++static bool check_lcksuppt(const void *data)
 +{
-+	return div64_u64(sect, dmh->zone_size);
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKING_SUPPORTED_MASK);
 +}
 +
-+static inline unsigned int po2_zone_no(struct dm_po2z_target *dmh,
-+				       sector_t sect)
++static bool check_lckenabled(const void *data)
 +{
-+	return sect >> dmh->zone_size_po2_shift;
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKING_ENABLED_MASK);
 +}
 +
-+static inline sector_t target_to_device_sect(struct dm_po2z_target *dmh,
-+					     sector_t sect)
++static bool check_locked(const void *data)
 +{
-+	return sect - (po2_zone_no(dmh, sect) * dmh->zone_size_diff);
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & LOCKED_MASK);
 +}
 +
-+static inline sector_t device_to_target_sect(struct dm_po2z_target *dmh,
-+					     sector_t sect)
+ static bool check_mbrenabled(const void *data)
+ {
+ 	const struct d0_locking_features *lfeat = data;
+@@ -288,6 +311,14 @@ static bool check_mbrenabled(const void *data)
+ 	return !!(sup_feat & MBR_ENABLED_MASK);
+ }
+ 
++static bool check_mbrdone(const void *data)
 +{
-+	return sect + (npo2_zone_no(dmh, sect) * dmh->zone_size_diff);
++	const struct d0_locking_features *lfeat = data;
++	u8 sup_feat = lfeat->supported_features;
++
++	return !!(sup_feat & MBR_DONE_MASK);
 +}
 +
-+/*
-+ * This target works on the complete zoned device. Partial mapping is not
-+ * supported.
-+ * Construct a zoned po2 logical device: <dev-path>
-+ */
-+static int dm_po2z_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ static bool check_sum(const void *data)
+ {
+ 	const struct d0_single_user_mode *sum = data;
+@@ -435,7 +466,7 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 	u32 hlen = be32_to_cpu(hdr->length);
+ 
+ 	print_buffer(dev->resp, hlen);
+-	dev->mbr_enabled = false;
++	dev->flags &= OPAL_FL_SUPPORTED;
+ 
+ 	if (hlen > IO_BUFFER_LENGTH - sizeof(*hdr)) {
+ 		pr_debug("Discovery length overflows buffer (%zu+%u)/%u\n",
+@@ -461,7 +492,16 @@ static int opal_discovery0_end(struct opal_dev *dev)
+ 			check_geometry(dev, body);
+ 			break;
+ 		case FC_LOCKING:
+-			dev->mbr_enabled = check_mbrenabled(body->features);
++			if (check_lcksuppt(body->features))
++				dev->flags |= OPAL_FL_LOCKING_SUPPORTED;
++			if (check_lckenabled(body->features))
++				dev->flags |= OPAL_FL_LOCKING_ENABLED;
++			if (check_locked(body->features))
++				dev->flags |= OPAL_FL_LOCKED;
++			if (check_mbrenabled(body->features))
++				dev->flags |= OPAL_FL_MBR_ENABLED;
++			if (check_mbrdone(body->features))
++				dev->flags |= OPAL_FL_MBR_DONE;
+ 			break;
+ 		case FC_ENTERPRISE:
+ 		case FC_DATASTORE:
+@@ -2109,7 +2149,8 @@ static int check_opal_support(struct opal_dev *dev)
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+ 	ret = opal_discovery0_step(dev);
+-	dev->supported = !ret;
++	if (!ret)
++		dev->flags |= OPAL_FL_SUPPORTED;
+ 	mutex_unlock(&dev->dev_lock);
+ 
+ 	return ret;
+@@ -2148,6 +2189,7 @@ struct opal_dev *init_opal_dev(void *data, sec_send_recv *send_recv)
+ 
+ 	INIT_LIST_HEAD(&dev->unlk_lst);
+ 	mutex_init(&dev->dev_lock);
++	dev->flags = 0;
+ 	dev->data = data;
+ 	dev->send_recv = send_recv;
+ 	if (check_opal_support(dev) != 0) {
+@@ -2528,7 +2570,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ 	if (!dev)
+ 		return false;
+ 
+-	if (!dev->supported)
++	if (!(dev->flags & OPAL_FL_SUPPORTED))
+ 		return false;
+ 
+ 	mutex_lock(&dev->dev_lock);
+@@ -2546,7 +2588,7 @@ bool opal_unlock_from_suspend(struct opal_dev *dev)
+ 			was_failure = true;
+ 		}
+ 
+-		if (dev->mbr_enabled) {
++		if (dev->flags & OPAL_FL_MBR_ENABLED) {
+ 			ret = __opal_set_mbr_done(dev, &suspend->unlk.session.opal_key);
+ 			if (ret)
+ 				pr_debug("Failed to set MBR Done in S3 resume\n");
+@@ -2620,6 +2662,23 @@ static int opal_generic_read_write_table(struct opal_dev *dev,
+ 	return ret;
+ }
+ 
++static int opal_get_status(struct opal_dev *dev, void __user *data)
 +{
-+	struct dm_po2z_target *dmh = NULL;
-+	int ret;
-+	sector_t zone_size;
-+	sector_t dev_capacity;
++	struct opal_status sts = {0};
 +
-+	if (argc != 1)
-+		return -EINVAL;
-+
-+	dmh = kmalloc(sizeof(*dmh), GFP_KERNEL);
-+	if (!dmh)
-+		return -ENOMEM;
-+
-+	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table),
-+			    &dmh->dev);
-+	if (ret) {
-+		ti->error = "Device lookup failed";
-+		kfree(dmh);
-+		return ret;
++	/*
++	 * check_opal_support() error is not fatal,
++	 * !dev->supported is a valid condition
++	 */
++	if (!check_opal_support(dev))
++		sts.flags = dev->flags;
++	if (copy_to_user(data, &sts, sizeof(sts))) {
++		pr_debug("Error copying status to userspace\n");
++		return -EFAULT;
 +	}
-+
-+	if (!bdev_is_zoned(dmh->dev->bdev)) {
-+		DMERR("%pg is not a zoned device", dmh->dev->bdev);
-+		kfree(dmh);
-+		return -EINVAL;
-+	}
-+
-+	zone_size = bdev_zone_sectors(dmh->dev->bdev);
-+	dev_capacity = get_capacity(dmh->dev->bdev->bd_disk);
-+	if (ti->len != dev_capacity || ti->begin) {
-+		DMERR("%pg Partial mapping of the target not supported",
-+		      dmh->dev->bdev);
-+		kfree(dmh);
-+		return -EINVAL;
-+	}
-+
-+	if (is_power_of_2(zone_size))
-+		DMWARN("%pg: underlying device has a power-of-2 number of sectors per zone",
-+		       dmh->dev->bdev);
-+
-+	dmh->zone_size = zone_size;
-+	dmh->zone_size_po2 = 1 << get_count_order_long(zone_size);
-+	dmh->zone_size_po2_shift = ilog2(dmh->zone_size_po2);
-+	dmh->zone_size_diff = dmh->zone_size_po2 - dmh->zone_size;
-+	ti->private = dmh;
-+	ti->max_io_len = dmh->zone_size_po2;
-+	dmh->nr_zones = npo2_zone_no(dmh, ti->len);
-+	ti->len = dmh->zone_size_po2 * dmh->nr_zones;
-+
 +	return 0;
 +}
 +
-+static int dm_po2z_report_zones_cb(struct blk_zone *zone, unsigned int idx,
-+				   void *data)
-+{
-+	struct dm_report_zones_args *args = data;
-+	struct dm_po2z_target *dmh = args->tgt->private;
-+
-+	zone->start = device_to_target_sect(dmh, zone->start);
-+	zone->wp = device_to_target_sect(dmh, zone->wp);
-+	zone->len = dmh->zone_size_po2;
-+	args->next_sector = zone->start + zone->len;
-+
-+	return args->orig_cb(zone, args->zone_idx++, args->orig_data);
-+}
-+
-+static int dm_po2z_report_zones(struct dm_target *ti,
-+				struct dm_report_zones_args *args,
-+				unsigned int nr_zones)
-+{
-+	struct dm_po2z_target *dmh = ti->private;
-+	sector_t sect = po2_zone_no(dmh, args->next_sector) * dmh->zone_size;
-+
-+	return blkdev_report_zones(dmh->dev->bdev, sect, nr_zones,
-+				   dm_po2z_report_zones_cb, args);
-+}
-+
-+static int dm_po2z_end_io(struct dm_target *ti, struct bio *bio,
-+			  blk_status_t *error)
-+{
-+	struct dm_po2z_target *dmh = ti->private;
-+
-+	if (bio->bi_status == BLK_STS_OK && bio_op(bio) == REQ_OP_ZONE_APPEND)
-+		bio->bi_iter.bi_sector =
-+			device_to_target_sect(dmh, bio->bi_iter.bi_sector);
-+
-+	return DM_ENDIO_DONE;
-+}
-+
-+static void dm_po2z_io_hints(struct dm_target *ti, struct queue_limits *limits)
-+{
-+	struct dm_po2z_target *dmh = ti->private;
-+
-+	limits->chunk_sectors = dmh->zone_size_po2;
-+}
-+
-+/**
-+ * bio_in_emulated_zone_area - check if bio is in the emulated zone area
-+ * @dmh:	pozone target data
-+ * @bio:	bio
-+ * @offset:	bio offset to emulated zone boundary
-+ *
-+ * Check if a @bio is partly or completely in the emulated zone area. If the
-+ * @bio is partly in the emulated zone area, @offset can be used to split
-+ * the @bio across the emulated zone boundary. @offset
-+ * will be negative if the @bio completely lies in the emulated area.
-+ *
-+ */
-+static bool bio_in_emulated_zone_area(struct dm_po2z_target *dmh,
-+				      struct bio *bio, int *offset)
-+{
-+	unsigned int zone_idx = po2_zone_no(dmh, bio->bi_iter.bi_sector);
-+	sector_t nr_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-+	sector_t sector_offset =
-+		bio->bi_iter.bi_sector - (zone_idx << dmh->zone_size_po2_shift);
-+
-+	*offset = dmh->zone_size - sector_offset;
-+
-+	return sector_offset + nr_sectors > dmh->zone_size;
-+}
-+
-+static inline int dm_po2z_read_zeroes(struct bio *bio)
-+{
-+	zero_fill_bio(bio);
-+	bio_endio(bio);
-+	return DM_MAPIO_SUBMITTED;
-+}
-+
-+static inline int dm_po2z_remap_sector(struct dm_po2z_target *dmh,
-+				       struct bio *bio)
-+{
-+	bio->bi_iter.bi_sector =
-+		target_to_device_sect(dmh, bio->bi_iter.bi_sector);
-+	return DM_MAPIO_REMAPPED;
-+}
-+
-+static int dm_po2z_map(struct dm_target *ti, struct bio *bio)
-+{
-+	struct dm_po2z_target *dmh = ti->private;
-+	int split_io_pos;
-+
-+	bio_set_dev(bio, dmh->dev->bdev);
-+
-+	if (op_is_zone_mgmt(bio_op(bio)))
-+		return dm_po2z_remap_sector(dmh, bio);
-+
-+	if (!bio_sectors(bio))
-+		return DM_MAPIO_REMAPPED;
-+
-+	/*
-+	 * Read operation on the emulated zone area (between zone capacity
-+	 * and zone size) will fill the bio with zeroes. Any other operation
-+	 * in the emulated area should return an error.
-+	 */
-+	if (!bio_in_emulated_zone_area(dmh, bio, &split_io_pos))
-+		return dm_po2z_remap_sector(dmh, bio);
-+
-+	if (bio_op(bio) == REQ_OP_READ) {
-+	/*
-+	 * If the bio is across emulated zone boundary, split the bio at
-+	 * the boundary.
-+	 */
-+		if (split_io_pos > 0) {
-+			dm_accept_partial_bio(bio, split_io_pos);
-+			return dm_po2z_remap_sector(dmh, bio);
-+		}
-+		return dm_po2z_read_zeroes(bio);
+ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ {
+ 	void *p;
+@@ -2629,12 +2688,14 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 		return -EACCES;
+ 	if (!dev)
+ 		return -ENOTSUPP;
+-	if (!dev->supported)
++	if (!(dev->flags & OPAL_FL_SUPPORTED))
+ 		return -ENOTSUPP;
+ 
+-	p = memdup_user(arg, _IOC_SIZE(cmd));
+-	if (IS_ERR(p))
+-		return PTR_ERR(p);
++	if (cmd & IOC_IN) {
++		p = memdup_user(arg, _IOC_SIZE(cmd));
++		if (IS_ERR(p))
++			return PTR_ERR(p);
 +	}
+ 
+ 	switch (cmd) {
+ 	case IOC_OPAL_SAVE:
+@@ -2685,11 +2746,15 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_GENERIC_TABLE_RW:
+ 		ret = opal_generic_read_write_table(dev, p);
+ 		break;
++	case IOC_OPAL_GET_STATUS:
++		ret = opal_get_status(dev, arg);
++		break;
+ 	default:
+ 		break;
+ 	}
+ 
+-	kfree(p);
++	if (cmd & IOC_IN)
++		kfree(p);
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(sed_ioctl);
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index 1ac0d712a9c3..6f837bb6c715 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -43,6 +43,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_MBR_DONE:
+ 	case IOC_OPAL_WRITE_SHADOW_MBR:
+ 	case IOC_OPAL_GENERIC_TABLE_RW:
++	case IOC_OPAL_GET_STATUS:
+ 		return true;
+ 	}
+ 	return false;
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index 6f5af1a84213..2573772e2fb3 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -132,6 +132,18 @@ struct opal_read_write_table {
+ 	__u64 priv;
+ };
+ 
++#define OPAL_FL_SUPPORTED		0x00000001
++#define OPAL_FL_LOCKING_SUPPORTED	0x00000002
++#define OPAL_FL_LOCKING_ENABLED		0x00000004
++#define OPAL_FL_LOCKED			0x00000008
++#define OPAL_FL_MBR_ENABLED		0x00000010
++#define OPAL_FL_MBR_DONE		0x00000020
 +
-+	return DM_MAPIO_KILL;
-+}
-+
-+static int dm_po2z_iterate_devices(struct dm_target *ti,
-+				   iterate_devices_callout_fn fn, void *data)
-+{
-+	struct dm_po2z_target *dmh = ti->private;
-+	sector_t len = dmh->nr_zones * dmh->zone_size;
-+
-+	return fn(ti, dmh->dev, 0, len, data);
-+}
-+
-+static struct target_type dm_po2z_target = {
-+	.name = "po2zone",
-+	.version = { 1, 0, 0 },
-+	.features = DM_TARGET_ZONED_HM | DM_TARGET_EMULATED_ZONES,
-+	.map = dm_po2z_map,
-+	.end_io = dm_po2z_end_io,
-+	.report_zones = dm_po2z_report_zones,
-+	.iterate_devices = dm_po2z_iterate_devices,
-+	.module = THIS_MODULE,
-+	.io_hints = dm_po2z_io_hints,
-+	.ctr = dm_po2z_ctr,
++struct opal_status {
++	__u32 flags;
++	__u32 reserved;
 +};
 +
-+static int __init dm_po2z_init(void)
-+{
-+	return dm_register_target(&dm_po2z_target);
-+}
-+
-+static void __exit dm_po2z_exit(void)
-+{
-+	dm_unregister_target(&dm_po2z_target);
-+}
-+
-+/* Module hooks */
-+module_init(dm_po2z_init);
-+module_exit(dm_po2z_exit);
-+
-+MODULE_DESCRIPTION(DM_NAME "power-of-2 zoned target");
-+MODULE_AUTHOR("Pankaj Raghav <p.raghav@samsung.com>");
-+MODULE_LICENSE("GPL");
-+
+ #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
+ #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
+ #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
+@@ -148,5 +160,6 @@ struct opal_read_write_table {
+ #define IOC_OPAL_MBR_DONE           _IOW('p', 233, struct opal_mbr_done)
+ #define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 234, struct opal_shadow_mbr)
+ #define IOC_OPAL_GENERIC_TABLE_RW   _IOW('p', 235, struct opal_read_write_table)
++#define IOC_OPAL_GET_STATUS         _IOR('p', 236, struct opal_status)
+ 
+ #endif /* _UAPI_SED_OPAL_H */
 -- 
-2.25.1
+2.34.1
 
