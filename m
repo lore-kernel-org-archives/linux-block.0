@@ -2,144 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5133C25B0E
-	for <linux-block@archiver.kernel.org>; Mon, 15 Aug 2022 23:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E3FC25B0D
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 04:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353744AbiHOXi0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Aug 2022 19:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50960 "EHLO
+        id S229521AbiHPEGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 00:06:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353980AbiHOXhH (ORCPT
+        with ESMTP id S229597AbiHPEGO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Aug 2022 19:37:07 -0400
-Received: from sandeen.net (sandeen.net [63.231.237.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C8F3152425;
-        Mon, 15 Aug 2022 13:09:42 -0700 (PDT)
-Received: from [10.0.0.146] (liberator.sandeen.net [10.0.0.146])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by sandeen.net (Postfix) with ESMTPSA id 0E76379F0;
-        Mon, 15 Aug 2022 15:08:24 -0500 (CDT)
-Message-ID: <8d33a7a0-7a7c-47a1-ed84-83fd25089897@sandeen.net>
-Date:   Mon, 15 Aug 2022 15:09:41 -0500
+        Tue, 16 Aug 2022 00:06:14 -0400
+X-Greylist: delayed 307 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 15 Aug 2022 17:35:00 PDT
+Received: from relay0-g.mailbaby.net (relay0-g.mailbaby.net [64.20.38.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2653529A7
+        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 17:35:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbaby.net;
+ q=dns/txt; s=bambino; bh=BnHG3QU6jJwX/8OJ6Jd7Q8OIQOixrdiHvQtNUiv/Yqs=;
+ h=from:subject:date:message-id:to:mime-version:content-type:content-transfer-encoding;
+ b=MjcAW7STTvwBTczSkgpf3BMNTJJTr41AkoAmWLsdRdAMN+eudigDqk2yFYrFDzeMdMDNyn4Rj
+ hAzmnjfIcLI7XAJzb1cCbD5LkGB+zvvGKRiXiQXjvAe/R71b+AWr4wnVzuzROnlxTW9QOKSa5yf
+ qRcm+7TJ3hB22SN2dIZXZro=
+Received: from webhosting2008.is.cc ([174.138.177.194] webhosting2008.is.cc)
+ (Authenticated sender: webhosting2008)
+ by relay0-g.mailbaby.net (InterServerMTA) with ESMTPSA id 182a40e16d7000c5c4.001
+ for <linux-block@vger.kernel.org>
+ (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
+ Tue, 16 Aug 2022 00:29:23 +0000
+X-Zone-Loop: dd1672773688220c99811696430ae1b0b33c5dcdeec3
+ARC-Authentication-Results: i=1;        rspamd4.mailbaby.net;   auth=pass
+ smtp.auth=webhosting2008 smtp.mailfrom=alec@onelabs.com
+ARC-Seal: i=1; s=detka; d=mailbaby.net; t=1660609763; a=rsa-sha256;
+        cv=none;
+        b=AofTmjx1f3UDtyEiisXwcYTtRin7/wq4RJH2HEaGCj18jbxySrztKGr3dsA6hXrB/GRd0V
+        LxBs1NLSx5sZIYTC+hRHdqOq668RIL3MGZbYqe+UNV1+y3T41xFGzbFSAFKTeRv/GJ7zQp
+        Uht7QXfnmfXNcBQNXhORoUirZ0Fv1rDVRt/YLD9ilFtd3KkGq5I/RydkLmc3ctS10YPbYf
+        sc4Qi3qsLXUQdwHgWvQP8PIirAnRGJLJ18qh+PudXtxjcd5louT7tZqMsQewhd+JQLnb44
+        alaovjsLdd5y6iVFqaKuClUM1i6LY+eATKzhmVsQDK7rZg9PiyyBe8hiOFzqaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailbaby.net;        s=detka; t=1660609763;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:dkim-signature;
+        bh=BnHG3QU6jJwX/8OJ6Jd7Q8OIQOixrdiHvQtNUiv/Yqs=;
+        b=jP7EhPQfBp2Svv44lig4JLjN8EUgg05ze6Ofh+r+STkm/t1QgT49ztZ8Y3EgJJSI9p4RLO
+        IB6OYrV4WqsWQUN4hvw0+rk8j2xj33x8LF/DiOgiWD/QS9RmL13MjRtRe/X3MfdtRiUybu
+        0OIWAeE4DhWaxws+qI6oDua1dJe9sujDQuGS+pch3HALOs69n3QEBHad++8NULZNJtbawi
+        xoPxyFxhVvLdxDiN72wAdSMUD+IDbxF5TmxfUVqNT2NsdNUodg7sYPOojhn76XnXOihnqs
+        4l6LYMpR5S/IFT952V/VFAYcOtMwYxRbb1DPsMbzqtYX680vZHx96335Y528Wg==
+X-SPF:  pass
+X-Originating-IP: [174.138.177.194]
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=onelabs.com
+        ; s=default; h=Content-Transfer-Encoding:Content-Type:Message-ID:Subject:To:
+        From:Date:MIME-Version:Sender:Reply-To:Cc:Content-ID:Content-Description:
+        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=BnHG3QU6jJwX/8OJ6Jd7Q8OIQOixrdiHvQtNUiv/Yqs=; b=x/EKsD75geJsztUislulhGo/62
+        h6HjVX4fw6+Ln0frzVQNfLSAfnGV4c8bv22znxG9CWRKz8vOjPWtbkxyMfuj0WNOMT/Xr5pjnn6C0
+        ShQvLLdPajWvxhfAFCYpeOCXp2WBC7XiVrQz4hujR8TU303raHkKWC+V41844XbTEGsiED8pEkbEY
+        h9LOQNTqPYuuwzuztQkAFV2WL5/WHERKafUMIQs+eqsVMxAH+GARKXPiy3IdL9Zu2pZy+dzYZjxvi
+        QI6VeYOUzC6H6pxOn/vMy3A+zy/5WSoXdB1LEeb+nO6AlpMtfBjo32IwjbxsTMjrviAHo6JmIQ9Tk
+        PaJyAzMg==;
+Received: from [::1] (port=52270 helo=webhosting2008.is.cc)
+        by webhosting2008.is.cc with esmtpa (Exim 4.95)
+        (envelope-from <alec@onelabs.com>)
+        id 1oNkSQ-00BXnB-BP;
+        Mon, 15 Aug 2022 20:29:23 -0400
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Content-Language: en-US
-To:     Petr Vorel <pvorel@suse.cz>, Dave Chinner <david@fromorbit.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.de>,
-        linux-xfs@vger.kernel.org, ltp@lists.linux.it
-References: <YvZc+jvRdTLn8rus@pevik> <YvZUfq+3HYwXEncw@pevik>
- <YvZTpQFinpkB06p9@pevik> <20220814224440.GR3600936@dread.disaster.area>
- <YvoSeTmLoQVxq7p9@pevik>
-From:   Eric Sandeen <sandeen@sandeen.net>
-Subject: Re: LTP test df01.sh detected different size of loop device in v5.19
-In-Reply-To: <YvoSeTmLoQVxq7p9@pevik>
-Content-Type: text/plain; charset=UTF-8
+Date:   Mon, 15 Aug 2022 19:29:22 -0500
+From:   Alec Ari <alec@onelabs.com>
+To:     Linux Block <linux-block@vger.kernel.org>,
+        Linux Config <linux-config@vger.kernel.org>
+Subject: [PATCH] init/Kconfig: Preserve mtimes in initramfs only if
+ BLK_DEV_INITRD
+User-Agent: Roundcube Webmail/1.5.2
+Message-ID: <520759aec345e48adf6348ef3acc5310@onelabs.com>
+X-Sender: alec@onelabs.com
+Organization: ONE Labs
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
+X-From-Rewrite: unmodified, already matched
+X-AuthUser: alec@onelabs.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/15/22 4:31 AM, Petr Vorel wrote:
-> Hi Dave,
-> 
->> On Fri, Aug 12, 2022 at 03:20:37PM +0200, Petr Vorel wrote:
->>> Hi all,
-> 
->>> LTP test df01.sh found different size of loop device in v5.19.
->>> Test uses loop device formatted on various file systems, only XFS fails.
->>> It randomly fails during verifying that loop size usage changes:
-> 
->>> grep ${TST_DEVICE} output | grep -q "${total}.*${used}" [1]
-> 
->>> How to reproduce:
->>> # PATH="/opt/ltp/testcases/bin:$PATH" df01.sh -f xfs # it needs several tries to hit
-> 
->>> df saved output:
->>> Filesystem     1024-blocks    Used Available Capacity Mounted on
->>> ...
->>> /dev/loop0          256672   16208    240464       7% /tmp/LTP_df01.1kRwoUCCR7/mntpoint
->>> df output:
->>> Filesystem     1024-blocks    Used Available Capacity Mounted on
->>> ...
->>> tmpfs               201780       0    201780       0% /run/user/0
->>> /dev/loop0          256672   15160    241512       6% /tmp/LTP_df01.1kRwoUCCR7/mntpoint
->>> => different size
->>> df01 4 TFAIL: 'df -k -P' failed, not expected.
-> 
->> Yup, most likely because we changed something in XFS related to
->> internal block reservation spaces. That is, the test is making
->> fundamentally flawed assumptions about filesystem used space
->> accounting.
-> 
->> It is wrong to assuming that the available capacity of a given empty
->> filesystem will never change.  Assumptions like this have been
->> invalid for decades because the available space can change based on
->> the underlying configuration or the filesystem. e.g. different
->> versions of mkfs.xfs set different default parameters and so simply
->> changing the version of xfsprogs you use between the two comparision
->> tests will make it fail....
-> 
->> And, well, XFS also has XFS_IOC_{GS}ET_RESBLKS ioctls that allow
->> userspace to change the amount of reserved blocks. They were
->> introduced in 1997, and since then we've changed the default
->> reservation the filesystem takes at least a dozen times.
-> 
-> Thanks a lot for valuable info.
-> 
->>>> It might be a false positive / bug in the test, but it's at least a changed behavior.
-> 
->> Yup, any test that assumes "available space" does not change from
->> kernel version to kernel version is flawed. There is no guarantee
->> that this ever stays the same, nor that it needs to stay the same.
-> I'm sorry I was not clear. Test [1] does not measure "available space" between
-> kernel releases. It just run df command with parameters, saves it's output
-> and compares "1024-blocks" and "Used" columns of df output with stat output:
+ From: Alec Ari <alec@onelabs.com>
+Date: Mon, 15 Aug 2022 19:18:56 -0500
+Subject: init/Kconfig: Preserve mtimes in initramfs only if 
+BLK_DEV_INITRD
 
-Annotating what these do...
+Would preserving mtimes in initramfs prove useful if
+BLK_DEV_INITRD is disabled?
 
-> 		local total=$(stat -f mntpoint --printf=%b)  # number of blocks allocated
-> 		local free=$(stat -f mntpoint --printf=%f)   # free blocks in filesystem
-> 		local used=$((total-free))                   # (number of blocks free)
-> 
-> 		local bsize=$(stat -f mntpoint --printf=%s)  # block size ("for faster transfers")
-> 		total=$((($total * $bsize + 512)/ 1024))     # number of 1k blocks allocated?
-> 		used=$((($used * $bsize + 512) / 1024))      # number of 1k blocks used?
-> 
-> And comparison with "$used" is what sometimes fails.
-> 
-> BTW this happens on both distros when loop device is on tmpfs. I'm trying to
-> trigger it on ext4 and btrfs, not successful so far. Looks like it's tmpfs
-> related.
-> 
-> If that's really expected, we might remove this check for used for XFS
-> (not sure if check only for total makes sense).
+Signed-off-by: Alec Ari <alec@onelabs.com>
+---
+  init/Kconfig | 1 +
+  1 file changed, 1 insertion(+)
 
-It's kind of hard to follow this test, but it seems to be trying to
-ensure that df output is consistent with du (statfs) numbers, before
-and after creating and removing a 1MB file.  I guess it's literally
-testing df itself, i.e. that it actually presents the numbers it obtained
-from statfs.
+diff --git a/init/Kconfig b/init/Kconfig
+index 80fe60fa7..8322860a7 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1392,6 +1392,7 @@ config BOOT_CONFIG_EMBED_FILE
 
-AFAICT the difference in the failure is 1024 1K blocks, which is the size
-the file that's been created and removed during the test.
+  config INITRAMFS_PRESERVE_MTIME
+  	bool "Preserve cpio archive mtimes in initramfs"
++	depends on BLK_DEV_INITRD
+  	default y
+  	help
+  	  Each entry in an initramfs cpio archive carries an mtime value. When
+-- 
+2.37.2
 
-My best guess is that this is xfs inode deferred inode inactivation hanging
-onto the space a little longer than the test expects.
-
-This is probably because the new-ish xfs inode inactivation no longer blocks
-on inode garbage collection during statfs().
-
-IOWS, I think the test expects that free space is reflected in statfs numbers
-immediately after a file is removed, and that's no longer the case here. They
-change in between the df check and the statfs check.
-
-(The test isn't just checking that the values are correct, it is checking that
-the values are /immediately/ correct.)
-
-Putting a "sleep 1" after the "rm -f" in the test seems to fix it; IIRC
-the max time to wait for inodegc is 1s. This does slow the test down a bit.
-
--Eric
