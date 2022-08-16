@@ -2,117 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E3FC25B0D
-	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 04:06:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37388C28B2C
+	for <linux-block@archiver.kernel.org>; Tue, 16 Aug 2022 04:23:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbiHPEGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 00:06:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45904 "EHLO
+        id S229538AbiHPEXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 00:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbiHPEGO (ORCPT
+        with ESMTP id S229541AbiHPEW4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 00:06:14 -0400
-X-Greylist: delayed 307 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 15 Aug 2022 17:35:00 PDT
-Received: from relay0-g.mailbaby.net (relay0-g.mailbaby.net [64.20.38.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2653529A7
-        for <linux-block@vger.kernel.org>; Mon, 15 Aug 2022 17:35:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbaby.net;
- q=dns/txt; s=bambino; bh=BnHG3QU6jJwX/8OJ6Jd7Q8OIQOixrdiHvQtNUiv/Yqs=;
- h=from:subject:date:message-id:to:mime-version:content-type:content-transfer-encoding;
- b=MjcAW7STTvwBTczSkgpf3BMNTJJTr41AkoAmWLsdRdAMN+eudigDqk2yFYrFDzeMdMDNyn4Rj
- hAzmnjfIcLI7XAJzb1cCbD5LkGB+zvvGKRiXiQXjvAe/R71b+AWr4wnVzuzROnlxTW9QOKSa5yf
- qRcm+7TJ3hB22SN2dIZXZro=
-Received: from webhosting2008.is.cc ([174.138.177.194] webhosting2008.is.cc)
- (Authenticated sender: webhosting2008)
- by relay0-g.mailbaby.net (InterServerMTA) with ESMTPSA id 182a40e16d7000c5c4.001
- for <linux-block@vger.kernel.org>
- (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384);
- Tue, 16 Aug 2022 00:29:23 +0000
-X-Zone-Loop: dd1672773688220c99811696430ae1b0b33c5dcdeec3
-ARC-Authentication-Results: i=1;        rspamd4.mailbaby.net;   auth=pass
- smtp.auth=webhosting2008 smtp.mailfrom=alec@onelabs.com
-ARC-Seal: i=1; s=detka; d=mailbaby.net; t=1660609763; a=rsa-sha256;
-        cv=none;
-        b=AofTmjx1f3UDtyEiisXwcYTtRin7/wq4RJH2HEaGCj18jbxySrztKGr3dsA6hXrB/GRd0V
-        LxBs1NLSx5sZIYTC+hRHdqOq668RIL3MGZbYqe+UNV1+y3T41xFGzbFSAFKTeRv/GJ7zQp
-        Uht7QXfnmfXNcBQNXhORoUirZ0Fv1rDVRt/YLD9ilFtd3KkGq5I/RydkLmc3ctS10YPbYf
-        sc4Qi3qsLXUQdwHgWvQP8PIirAnRGJLJ18qh+PudXtxjcd5louT7tZqMsQewhd+JQLnb44
-        alaovjsLdd5y6iVFqaKuClUM1i6LY+eATKzhmVsQDK7rZg9PiyyBe8hiOFzqaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailbaby.net;        s=detka; t=1660609763;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:dkim-signature;
-        bh=BnHG3QU6jJwX/8OJ6Jd7Q8OIQOixrdiHvQtNUiv/Yqs=;
-        b=jP7EhPQfBp2Svv44lig4JLjN8EUgg05ze6Ofh+r+STkm/t1QgT49ztZ8Y3EgJJSI9p4RLO
-        IB6OYrV4WqsWQUN4hvw0+rk8j2xj33x8LF/DiOgiWD/QS9RmL13MjRtRe/X3MfdtRiUybu
-        0OIWAeE4DhWaxws+qI6oDua1dJe9sujDQuGS+pch3HALOs69n3QEBHad++8NULZNJtbawi
-        xoPxyFxhVvLdxDiN72wAdSMUD+IDbxF5TmxfUVqNT2NsdNUodg7sYPOojhn76XnXOihnqs
-        4l6LYMpR5S/IFT952V/VFAYcOtMwYxRbb1DPsMbzqtYX680vZHx96335Y528Wg==
-X-SPF:  pass
-X-Originating-IP: [174.138.177.194]
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=onelabs.com
-        ; s=default; h=Content-Transfer-Encoding:Content-Type:Message-ID:Subject:To:
-        From:Date:MIME-Version:Sender:Reply-To:Cc:Content-ID:Content-Description:
-        Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-        In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=BnHG3QU6jJwX/8OJ6Jd7Q8OIQOixrdiHvQtNUiv/Yqs=; b=x/EKsD75geJsztUislulhGo/62
-        h6HjVX4fw6+Ln0frzVQNfLSAfnGV4c8bv22znxG9CWRKz8vOjPWtbkxyMfuj0WNOMT/Xr5pjnn6C0
-        ShQvLLdPajWvxhfAFCYpeOCXp2WBC7XiVrQz4hujR8TU303raHkKWC+V41844XbTEGsiED8pEkbEY
-        h9LOQNTqPYuuwzuztQkAFV2WL5/WHERKafUMIQs+eqsVMxAH+GARKXPiy3IdL9Zu2pZy+dzYZjxvi
-        QI6VeYOUzC6H6pxOn/vMy3A+zy/5WSoXdB1LEeb+nO6AlpMtfBjo32IwjbxsTMjrviAHo6JmIQ9Tk
-        PaJyAzMg==;
-Received: from [::1] (port=52270 helo=webhosting2008.is.cc)
-        by webhosting2008.is.cc with esmtpa (Exim 4.95)
-        (envelope-from <alec@onelabs.com>)
-        id 1oNkSQ-00BXnB-BP;
-        Mon, 15 Aug 2022 20:29:23 -0400
+        Tue, 16 Aug 2022 00:22:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C58337BB3D;
+        Mon, 15 Aug 2022 17:55:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4303A6125E;
+        Tue, 16 Aug 2022 00:55:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5212EC433C1;
+        Tue, 16 Aug 2022 00:55:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660611347;
+        bh=iu6B25e0sTxWSWP58J3cvJLRVLHWY1NS7egktCILRVc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=krd6+dWmORUQTM50F/8J5UTDFvQpmjgyE2xt2quw2vdfZh6niGmFxiiV4AIz32H48
+         v/54PgeHP2vwqXwK32ajRlxpPJzlh1estyjWKs69bXa2t8XK5AILpoD8G+6e6l6TN2
+         JacTQRI/ggjw/oFEBUWvGlPNpoBqWi7pvwHjXWTNYZ4waocnQ7ZvCRK+HV+rcPvgUj
+         rn2X10wArCcnKg5D/Bt2iE7+193xqZkmDFK77dfsfvgi03cysOyvwTWWYr7n7HZDYk
+         5Leu70it3DTXaYFTpbub7m2JQZmVrC/jYpJVhrCsVduHmj+8JAVU1IiAScCxzXl5Gb
+         5hx6GXtLZcXBw==
+Date:   Mon, 15 Aug 2022 17:55:45 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jaegeuk Kim <jaegeuk@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Message-ID: <YvrrEcw4E+rpDLwM@sol.localdomain>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org>
+ <YtyoF89iOg8gs7hj@google.com>
+ <Yt7dCcG0ns85QqJe@sol.localdomain>
+ <YuXyKh8Zvr56rR4R@google.com>
 MIME-Version: 1.0
-Date:   Mon, 15 Aug 2022 19:29:22 -0500
-From:   Alec Ari <alec@onelabs.com>
-To:     Linux Block <linux-block@vger.kernel.org>,
-        Linux Config <linux-config@vger.kernel.org>
-Subject: [PATCH] init/Kconfig: Preserve mtimes in initramfs only if
- BLK_DEV_INITRD
-User-Agent: Roundcube Webmail/1.5.2
-Message-ID: <520759aec345e48adf6348ef3acc5310@onelabs.com>
-X-Sender: alec@onelabs.com
-Organization: ONE Labs
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-From-Rewrite: unmodified, already matched
-X-AuthUser: alec@onelabs.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YuXyKh8Zvr56rR4R@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
- From: Alec Ari <alec@onelabs.com>
-Date: Mon, 15 Aug 2022 19:18:56 -0500
-Subject: init/Kconfig: Preserve mtimes in initramfs only if 
-BLK_DEV_INITRD
+On Sat, Jul 30, 2022 at 08:08:26PM -0700, Jaegeuk Kim wrote:
+> On 07/25, Eric Biggers wrote:
+> > On Sat, Jul 23, 2022 at 07:01:59PM -0700, Jaegeuk Kim wrote:
+> > > On 07/22, Eric Biggers wrote:
+> > > > From: Eric Biggers <ebiggers@google.com>
+> > > > 
+> > > > Currently, if an f2fs filesystem is mounted with the mode=lfs and
+> > > > io_bits mount options, DIO reads are allowed but DIO writes are not.
+> > > > Allowing DIO reads but not DIO writes is an unusual restriction, which
+> > > > is likely to be surprising to applications, namely any application that
+> > > > both reads and writes from a file (using O_DIRECT).  This behavior is
+> > > > also incompatible with the proposed STATX_DIOALIGN extension to statx.
+> > > > Given this, let's drop the support for DIO reads in this configuration.
+> > > 
+> > > IIRC, we allowed DIO reads since applications complained a lower performance.
+> > > So, I'm afraid this change will make another confusion to users. Could
+> > > you please apply the new bahavior only for STATX_DIOALIGN?
+> > > 
+> > 
+> > Well, the issue is that the proposed STATX_DIOALIGN fields cannot represent this
+> > weird case where DIO reads are allowed but not DIO writes.  So the question is
+> > whether this case actually matters, in which case we should make STATX_DIOALIGN
+> > distinguish between DIO reads and DIO writes, or whether it's some odd edge case
+> > that doesn't really matter, in which case we could just fix it or make
+> > STATX_DIOALIGN report that DIO is unsupported.  I was hoping that you had some
+> > insight here.  What sort of applications want DIO reads but not DIO writes?
+> > Is this common at all?
+> 
+> I think there's no specific application to use the LFS mode at this
+> moment, but I'd like to allow DIO read for zoned device which will be
+> used for Android devices.
+> 
 
-Would preserving mtimes in initramfs prove useful if
-BLK_DEV_INITRD is disabled?
+So if the zoned device feature becomes widely adopted, then STATX_DIOALIGN will
+be useless on all Android devices?  That sounds undesirable.  Are you sure that
+supporting DIO reads but not DIO writes actually works?  Does it not cause
+problems for existing applications?
 
-Signed-off-by: Alec Ari <alec@onelabs.com>
----
-  init/Kconfig | 1 +
-  1 file changed, 1 insertion(+)
+What we need to do is make a decision about whether this means we should build
+in a stx_dio_direction field (indicating no support / readonly support /
+writeonly support / readwrite support) into the API from the beginning.  If we
+don't do that, then I don't think we could simply add such a field later, as the
+statx_dio_*_align fields will have already been assigned their meaning.  I think
+we'd instead have to "duplicate" the API, with STATX_DIOROALIGN and
+statx_dio_ro_*_align fields.  That seems uglier than building a directional
+indicator into the API from the beginning.  On the other hand, requiring all
+programs to check stx_dio_direction would add complexity to using the API.
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 80fe60fa7..8322860a7 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1392,6 +1392,7 @@ config BOOT_CONFIG_EMBED_FILE
+Any thoughts on this?
 
-  config INITRAMFS_PRESERVE_MTIME
-  	bool "Preserve cpio archive mtimes in initramfs"
-+	depends on BLK_DEV_INITRD
-  	default y
-  	help
-  	  Each entry in an initramfs cpio archive carries an mtime value. When
--- 
-2.37.2
-
+- Eric
