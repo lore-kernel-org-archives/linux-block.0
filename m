@@ -2,89 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3304DC25B08
-	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 10:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2322C25B08
+	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 11:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233998AbiHQKcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 06:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36762 "EHLO
+        id S236421AbiHQLti (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 07:49:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbiHQKcC (ORCPT
+        with ESMTP id S230366AbiHQLth (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 06:32:02 -0400
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5207379A74
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 03:32:01 -0700 (PDT)
-Received: by mail-wm1-f41.google.com with SMTP id z14-20020a7bc7ce000000b003a5db0388a8so1564356wmk.1
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 03:32:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=5r24GNrIg2yIQUrwarpvbccB2d84d4m/XO9IavCxkR7UqI6+6d9TGHW3/pUGWOfSFx
-         zxK0nGjSOJmH1yREjV8RYVeV8n3Yf1IBJn6c4YRVlqIeH6+BVRIgrFaFAKOW9XfcgPxQ
-         PEJUkAeKtZDBKt84+DSJfsOFm5VjdfesKk5zUhnXwzqNLEKlX86R/aCs/54z7Xg7pg7p
-         uotPrrM2r+3xh+Rbobniw6jNxQFcaW0aw/DRGiSyFLjWrfEnG5my/8ParPnoj4OTt9jR
-         Vr79mrd/b8zXU5ICOSFuW+TfmhuKssFhs9u4VYBYWXnwa2k8z5dWjCiLcDsjZIKiU12t
-         T3fA==
-X-Gm-Message-State: ACgBeo3GANbxcH6kFCpzoVEJ1rUUlyT2cqKGo2Jk6502GpSiXOjWcteI
-        TZd1X3kwswsR6fo4b/P0GG0=
-X-Google-Smtp-Source: AA6agR72yoMkjSFw5iwKx63+DUx5P/vKsgSqBuPrBVBpiznMXtPMZrwCzdpoNHgL7sLGUapL03qisQ==
-X-Received: by 2002:a05:600c:5102:b0:3a5:a46d:5d4b with SMTP id o2-20020a05600c510200b003a5a46d5d4bmr1818926wms.68.1660732319939;
-        Wed, 17 Aug 2022 03:31:59 -0700 (PDT)
-Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id j18-20020a05600c191200b003a5f54e3bbbsm1994824wmq.38.2022.08.17.03.31.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Aug 2022 03:31:59 -0700 (PDT)
-Message-ID: <69dcf8c1-814d-7f76-853f-aaa6c924c09a@grimberg.me>
-Date:   Wed, 17 Aug 2022 13:31:55 +0300
+        Wed, 17 Aug 2022 07:49:37 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC40431DDB;
+        Wed, 17 Aug 2022 04:49:36 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 03383201A5;
+        Wed, 17 Aug 2022 11:49:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1660736975; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P9RL09tmr+tZ/vOLgcQWE7dEd6UbM48lh2YL7kdzrPE=;
+        b=uFSF63luGP6k4L62bGGz9O9wwUCMkPIloV/HHaYo4ejUcxqNAxNOym5E4RrwRYO7vE0QUg
+        H7zpbQ2064mnsuH7VRgr+tT/iDIxTsMEd8Vb9l+ZFSiq2LuDxGim9pbn3cUe8NgRtL826R
+        wt0C22VB8Q2t5EW72u2uqFxl7Q5bc2g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1660736975;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P9RL09tmr+tZ/vOLgcQWE7dEd6UbM48lh2YL7kdzrPE=;
+        b=NU8RqFlDPKncfp8HT7v1NrsqZLXRpHospMMRHoNgoiOLLTyksBEJeCxhoyz10vULPNNL26
+        LrZwiqyUw+jknQAw==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id C1D292C178;
+        Wed, 17 Aug 2022 11:49:34 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id E18F8A066B; Wed, 17 Aug 2022 13:49:33 +0200 (CEST)
+Date:   Wed, 17 Aug 2022 13:49:33 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Holger =?utf-8?Q?Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
+Cc:     Chris Murphy <lists@colorremedies.com>,
+        Nikolay Borisov <nborisov@suse.com>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+Message-ID: <20220817114933.66c4g4xjsi4df2tg@quack3>
+References: <cb1521d5-8b07-48d8-8b88-ca078828cf69@www.fastmail.com>
+ <ad78a32c-7790-4e21-be9f-81c5848a4953@www.fastmail.com>
+ <e36fe80f-a33b-4750-b593-3108ba169611@www.fastmail.com>
+ <CAEzrpqe3rRTvH=s+-aXTtupn-XaCxe0=KUe_iQfEyHWp-pXb5w@mail.gmail.com>
+ <d48c7e95-e21e-dcdc-a776-8ae7bed566cb@kernel.dk>
+ <61e5ccda-a527-4fea-9850-91095ffa91c4@www.fastmail.com>
+ <4995baed-c561-421d-ba3e-3a75d6a738a3@www.fastmail.com>
+ <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
+ <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
+ <7c830487-95a6-b008-920b-8bc4a318f10a@applied-asynchrony.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 2/2] block: Change the return type of
- blk_mq_map_queues() into void
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jason Wang <jasowang@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        James Smart <james.smart@broadcom.com>,
-        John Garry <john.garry@huawei.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Nilesh Javali <njavali@marvell.com>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        Don Brace <don.brace@microchip.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Vincent Fu <vincent.fu@samsung.com>,
-        Bean Huo <beanhuo@micron.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Adrian Hunter <adrian.hunter@intel.com>
-References: <20220815170043.19489-1-bvanassche@acm.org>
- <20220815170043.19489-3-bvanassche@acm.org>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20220815170043.19489-3-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7c830487-95a6-b008-920b-8bc4a318f10a@applied-asynchrony.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On Wed 17-08-22 11:52:54, Holger Hoffstätte wrote:
+> On 2022-08-16 17:34, Chris Murphy wrote:
+> > 
+> > On Tue, Aug 16, 2022, at 11:25 AM, Nikolay Borisov wrote:
+> > > How about changing the scheduler either mq-deadline or noop, just
+> > > to see if this is also reproducible with a different scheduler. I
+> > > guess noop would imply the blk cgroup controller is going to be
+> > > disabled
+> > 
+> > I already reported on that: always happens with bfq within an hour or
+> > less. Doesn't happen with mq-deadline for ~25+ hours. Does happen
+> > with bfq with the above patches removed. Does happen with
+> > cgroup.disabled=io set.
+> > 
+> > Sounds to me like it's something bfq depends on and is somehow
+> > becoming perturbed in a way that mq-deadline does not, and has
+> > changed between 5.11 and 5.12. I have no idea what's under bfq that
+> > matches this description.
+> 
+> Chris, just a shot in the dark but can you try the patch from
+> 
+> https://lore.kernel.org/linux-block/20220803121504.212071-1-yukuai1@huaweicloud.com/
+> 
+> on top of something more recent than 5.12? Ideally 5.19 where it applies
+> cleanly.
+> 
+> No guarantees, I just remembered this patch and your problem sounds like
+> a lost wakeup. Maybe BFQ just drives the sbitmap in a way that triggers the
+> symptom.
+
+Yes, symptoms look similar and it happens for devices with shared tagsets
+(which megaraid sas is) but that problem usually appeared when there are
+lots of LUNs sharing the tagset so that number of tags available per LUN
+was rather low. Not sure if that is the case here but probably that patch
+is worth a try.
+
+Another thing worth trying is to compile the kernel without
+CONFIG_BFQ_GROUP_IOSCHED. That will essentially disable cgroup support in
+BFQ so we will see whether the problem may be cgroup related or not.
+
+Another interesting thing might be to dump
+/sys/kernel/debug/block/<device>/hctx*/{sched_tags,sched_tags_bitmap,tags,tags_bitmap}
+as the system is hanging. That should tell us whether tags are in fact in
+use or not when processes are blocking waiting for tags.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
