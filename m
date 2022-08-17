@@ -2,129 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2420C28B2B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 16:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A7CC25B08
+	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 16:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237693AbiHQQK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 12:10:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53856 "EHLO
+        id S234850AbiHQQbI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 12:31:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240956AbiHQQKY (ORCPT
+        with ESMTP id S236386AbiHQQbG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 12:10:24 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D54389C
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 09:10:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1660752619; x=1692288619;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=tGXL1veMClRR6J6COmjOo7zqJDj1I9afT5K0DiyexSs=;
-  b=Xz7nYeL3PSf3lLgiGCeJz9UcofjvxzWAcsr/NlPDXJ9A/UZ7kNpvX9fW
-   XYDkQN6jdTUNXuTI5tr9b4/kYVc6ISfx2J7e7da5c0HQBfpfAcrIfEk6x
-   QVoTmu1fYJbnKO+C7l70+GoxDQ3rSrH1zhZaHoEfHMk1BM282n03kISPm
-   BVa4b2/20GCOZKjrKJEqS35tLrglDtRrF+bWaLA4RkdLJUL3JeGh4rWE8
-   buhtDzZ4WAizHn9u90GzZatyQWDHbKz06MKgjsXk/F4WjtZaccgiNicXx
-   IONrz/3B8PUea7mdFqQokxdFerTNy+9RIqfZi9OnfpG4CM+Fv3ZgHfl+r
-   w==;
-X-IronPort-AV: E=Sophos;i="5.93,243,1654531200"; 
-   d="scan'208";a="321047341"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Aug 2022 00:10:18 +0800
-IronPort-SDR: jijUlydlNH7R+tcQK7zTg1FXRcQoYAEA6GlTuDI61cl/MtLEpluVZhq8kRGwF1oNC6FiArLXYb
- XpwRXCx2M2xCPk5uvp4SXBMYK2P4EQg6Rat+QBL/sqvzkmaf7QbKUMoGj2v6vJXrbN1JJ+fikb
- iBUU5U7cGx8L3H0e3SjYlHPlxdTMydwemxSBMSwk6EK+Erc8GGDWAfcqbInGE6lmvjK7OW8/0F
- npti0npYzA/uT5o6LDanc+I25EXkumJEtXVxbsPgZNx6rI++xzzsDenz2kwerV6OuhGzvK0qYu
- 7N25Jlisn/hXCxLjlWaFsOt8
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 08:31:06 -0700
-IronPort-SDR: Gm6VZsZnDqYoqsNzhn5nFK9JdjnGS2l0VZM0aeH6e/KAf7BpRNpLCLr9LlDkw00fSoyFCKso1F
- UOzATMzqKiS2dyzXwkhq0DlcQGJj68QFOhhwzPlNOBE0iIlhgXQWMHDULfQdOAN35E0/YQ7TXJ
- H0KT/t8ifxX5q62Fqs5RNUOeOywWvVtQxPRY+R981Lq+Sqhy3EbGm6Co4yTu7fFOYLjbKrgREN
- Xlp16+qm7cCrZapYA1bgP8sLGuuFB/CGowuDpGU3/lXCJhrIoCRGIee4Db3XPoxbO97rbnZflF
- v98=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 09:10:19 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M7CfL2b3Bz1RwsC
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 09:10:18 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1660752617; x=1663344618; bh=tGXL1veMClRR6J6COmjOo7zqJDj1I9afT5K
-        0DiyexSs=; b=m9BkyA42lhKQOlCHS75npA6KAXx1QnGZcXPa+ScENhVWJDJNb7B
-        CA4xAIg2JLIQh1qDtAFUfRAdEgicNU7AzvGl1UX407LVeNHE65d+ytCK6hieUVyP
-        GfegZ1iiJLB6FcIM+/XCOJO7XUf2WX7xe7nJat0qikxM2uttvMxMvTRO3z7r6ERf
-        ywpSS5GyDiYyH5Of0AxXUKuEzNQGyHY+oEQHV1sxk6T1Gk/2q/GT7quFCU/K4TUD
-        dfYtsC3MKMsJlsS/IgqSjBoNzukrcw9g15hSBhwy2cI7TC86JIrtSHtbDD025sK3
-        K8pihhaJ2GB2m9/g249orQLFyIo8N6bv99w==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id HuM1PULjeL7r for <linux-block@vger.kernel.org>;
-        Wed, 17 Aug 2022 09:10:17 -0700 (PDT)
-Received: from [10.11.46.122] (unknown [10.11.46.122])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M7CfJ44Fbz1RtVk;
-        Wed, 17 Aug 2022 09:10:16 -0700 (PDT)
-Message-ID: <840ce5cf-32d5-d694-cb79-2df871a607c9@opensource.wdc.com>
-Date:   Wed, 17 Aug 2022 09:10:16 -0700
+        Wed, 17 Aug 2022 12:31:06 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6F3DECC;
+        Wed, 17 Aug 2022 09:31:01 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 6557D1F9EA;
+        Wed, 17 Aug 2022 16:31:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1660753860; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=38RIYwPJSBj+njOW8lX/s5pnoWS5wLKDA4I+GoOrolk=;
+        b=xfV9Rckhj+asO11u/UkJKQhXnXgELLDbOaNOBGVBMjk7NQMkYiqAYBX1o0OagqPFrRF70e
+        YmU04ZaQ5rKQ5VMKMsgUMKHd5iolqgsutkWwp3WFUJqX5qu3mmGVpMW3hOJYfO7y7/JYgV
+        u7qmDwcS2qhlSR6voHEKX1ZT3wyKkHg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1660753860;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=38RIYwPJSBj+njOW8lX/s5pnoWS5wLKDA4I+GoOrolk=;
+        b=bxE6BSRzRcXaMkPBdHgvifBPkiUT/7wcRlKEu8w1ntaybjmj/C1jUfyxcVWyuuCVZastXU
+        CE8wYBxP5M0Yt7Dw==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id E3DB22C177;
+        Wed, 17 Aug 2022 16:30:59 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 3682CA066B; Wed, 17 Aug 2022 18:30:59 +0200 (CEST)
+Date:   Wed, 17 Aug 2022 18:30:59 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Chris Murphy <lists@colorremedies.com>
+Cc:     Jan Kara <jack@suse.cz>,
+        Holger =?utf-8?Q?Hoffst=C3=A4tte?= 
+        <holger@applied-asynchrony.com>,
+        Nikolay Borisov <nborisov@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+Message-ID: <20220817163059.kigrvdfmxfswmhls@quack3>
+References: <e36fe80f-a33b-4750-b593-3108ba169611@www.fastmail.com>
+ <CAEzrpqe3rRTvH=s+-aXTtupn-XaCxe0=KUe_iQfEyHWp-pXb5w@mail.gmail.com>
+ <d48c7e95-e21e-dcdc-a776-8ae7bed566cb@kernel.dk>
+ <61e5ccda-a527-4fea-9850-91095ffa91c4@www.fastmail.com>
+ <4995baed-c561-421d-ba3e-3a75d6a738a3@www.fastmail.com>
+ <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
+ <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
+ <7c830487-95a6-b008-920b-8bc4a318f10a@applied-asynchrony.com>
+ <20220817114933.66c4g4xjsi4df2tg@quack3>
+ <85a141ae-56a7-4dcd-b75a-04be4b276b3a@www.fastmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [PATCH v11 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
-        snitzer@kernel.org, hch@lst.de, agk@redhat.com
-Cc:     pankydev8@gmail.com, gost.dev@samsung.com, matias.bjorling@wdc.com,
-        hare@suse.de, bvanassche@acm.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        jaegeuk@kernel.org, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-References: <20220816131536.189406-1-p.raghav@samsung.com>
- <CGME20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e@eucas1p2.samsung.com>
- <20220816131536.189406-14-p.raghav@samsung.com>
- <30790cae-5440-2447-a8b8-52a57fa16fa5@opensource.wdc.com>
- <ab3ef674-c453-5b38-80b5-f41dcfed62bb@samsung.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <ab3ef674-c453-5b38-80b5-f41dcfed62bb@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <85a141ae-56a7-4dcd-b75a-04be4b276b3a@www.fastmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/08/17 0:35, Pankaj Raghav wrote:
-> Hi Damien,
->>> + */
->>> +static bool bio_in_emulated_zone_area(struct dm_po2z_target *dmh,
->>> +				      struct bio *bio, int *offset)
->>
->> This function name reads like it is a block layer helper. It mat be less
->> confucing to keep using the dm_po2z_ prefix for it.
->>
-> Good point. Even though it is a static function in the same file, it could
-> be confused for a block helper at the caller site.
->>> +{
->>> +	/*
->>> +	 * Read operation on the emulated zone area (between zone capacity
->>> +	 * and zone size) will fill the bio with zeroes. Any other operation
+On Wed 17-08-22 11:09:26, Chris Murphy wrote:
 > 
->>> +
->>> +	return DM_MAPIO_KILL;
->>> +}
->>
-> Do you see any more issues apart from the two you pointed out?
+> 
+> On Wed, Aug 17, 2022, at 7:49 AM, Jan Kara wrote:
+> 
+> >
+> > Another thing worth trying is to compile the kernel without
+> > CONFIG_BFQ_GROUP_IOSCHED. That will essentially disable cgroup support in
+> > BFQ so we will see whether the problem may be cgroup related or not.
+> 
+> The problem happens with a 5.12.0 kernel built without
+> CONFIG_BFQ_GROUP_IOSCHED.
 
-nope
+Thanks for testing! Just to answer your previous question: This is
+different from cgroup.disable=io because BFQ takes different code paths. So
+this makes it even less likely this is some obscure BFQ bug. Why BFQ could
+be different here from mq-deadline is that it artificially reduces device
+queue depth (it sets shallow_depth when allocating new tags) and maybe that
+triggers some bug in request tag allocation.
 
+BTW, are you sure the first problematic kernel is 5.12? Because support for
+shared tagsets was added to megaraid_sas driver in 5.11 (5.11-rc3 in
+particular - commit 81e7eb5bf08f3 ("Revert "Revert "scsi: megaraid_sas:
+Added support for shared host tagset for cpuhotplug"")) and that is one
+candidate I'd expect to start to trigger issues. BTW that may be an
+interesting thing to try: Can you boot with
+"megaraid_sas.host_tagset_enable = 0" kernel option and see whether the
+issue reproduces?
+
+								Honza
 -- 
-Damien Le Moal
-Western Digital Research
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
