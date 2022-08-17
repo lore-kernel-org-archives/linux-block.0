@@ -2,107 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56118C3F6B0
-	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 15:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2420C28B2B
+	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 16:10:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237476AbiHQPfN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 11:35:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52402 "EHLO
+        id S237693AbiHQQK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 12:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239742AbiHQPfH (ORCPT
+        with ESMTP id S240956AbiHQQKY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 11:35:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D513D647CF
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 08:35:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660750504;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3aBejiWlmL7KTluGGks2ap2v6Rw6S2N1hayNB2ffhKI=;
-        b=dfKSBps9EewaVTfup5KrKNDubofXU83xHJx3/AxgYoG1c1EKY0GMtYWfFE82UzQ5vIBjS/
-        iThJcqJq357fQX4DslOfRFfSMqFxYOmKyVvf4JFglOgJnarBeQ1/+1QZQN8IMxUZ4ikKvn
-        NVP5jJqQM2HAE4INkFaDB/0wg/lScRU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-599-P4u9hwP0OzSmE5K0jvDrUA-1; Wed, 17 Aug 2022 11:35:01 -0400
-X-MC-Unique: P4u9hwP0OzSmE5K0jvDrUA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDCA8802D2C;
-        Wed, 17 Aug 2022 15:35:00 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C2EC14583C0;
-        Wed, 17 Aug 2022 15:34:54 +0000 (UTC)
-Date:   Wed, 17 Aug 2022 23:34:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     Nikolay Borisov <nborisov@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Message-ID: <Yv0KmT8UYos2/4SX@T590>
-References: <CAEzrpqe3rRTvH=s+-aXTtupn-XaCxe0=KUe_iQfEyHWp-pXb5w@mail.gmail.com>
- <d48c7e95-e21e-dcdc-a776-8ae7bed566cb@kernel.dk>
- <61e5ccda-a527-4fea-9850-91095ffa91c4@www.fastmail.com>
- <4995baed-c561-421d-ba3e-3a75d6a738a3@www.fastmail.com>
- <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
- <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
- <CAFj5m9+6Vj3NdSg_n3nw1icscY1qr9f9SOvkWYyqpEtFBb_-1g@mail.gmail.com>
- <b236ca6e-2e69-4faf-9c95-642339d04543@www.fastmail.com>
- <Yv0A6UhioH3rbi0E@T590>
- <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
+        Wed, 17 Aug 2022 12:10:24 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D54389C
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 09:10:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1660752619; x=1692288619;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=tGXL1veMClRR6J6COmjOo7zqJDj1I9afT5K0DiyexSs=;
+  b=Xz7nYeL3PSf3lLgiGCeJz9UcofjvxzWAcsr/NlPDXJ9A/UZ7kNpvX9fW
+   XYDkQN6jdTUNXuTI5tr9b4/kYVc6ISfx2J7e7da5c0HQBfpfAcrIfEk6x
+   QVoTmu1fYJbnKO+C7l70+GoxDQ3rSrH1zhZaHoEfHMk1BM282n03kISPm
+   BVa4b2/20GCOZKjrKJEqS35tLrglDtRrF+bWaLA4RkdLJUL3JeGh4rWE8
+   buhtDzZ4WAizHn9u90GzZatyQWDHbKz06MKgjsXk/F4WjtZaccgiNicXx
+   IONrz/3B8PUea7mdFqQokxdFerTNy+9RIqfZi9OnfpG4CM+Fv3ZgHfl+r
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,243,1654531200"; 
+   d="scan'208";a="321047341"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Aug 2022 00:10:18 +0800
+IronPort-SDR: jijUlydlNH7R+tcQK7zTg1FXRcQoYAEA6GlTuDI61cl/MtLEpluVZhq8kRGwF1oNC6FiArLXYb
+ XpwRXCx2M2xCPk5uvp4SXBMYK2P4EQg6Rat+QBL/sqvzkmaf7QbKUMoGj2v6vJXrbN1JJ+fikb
+ iBUU5U7cGx8L3H0e3SjYlHPlxdTMydwemxSBMSwk6EK+Erc8GGDWAfcqbInGE6lmvjK7OW8/0F
+ npti0npYzA/uT5o6LDanc+I25EXkumJEtXVxbsPgZNx6rI++xzzsDenz2kwerV6OuhGzvK0qYu
+ 7N25Jlisn/hXCxLjlWaFsOt8
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 08:31:06 -0700
+IronPort-SDR: Gm6VZsZnDqYoqsNzhn5nFK9JdjnGS2l0VZM0aeH6e/KAf7BpRNpLCLr9LlDkw00fSoyFCKso1F
+ UOzATMzqKiS2dyzXwkhq0DlcQGJj68QFOhhwzPlNOBE0iIlhgXQWMHDULfQdOAN35E0/YQ7TXJ
+ H0KT/t8ifxX5q62Fqs5RNUOeOywWvVtQxPRY+R981Lq+Sqhy3EbGm6Co4yTu7fFOYLjbKrgREN
+ Xlp16+qm7cCrZapYA1bgP8sLGuuFB/CGowuDpGU3/lXCJhrIoCRGIee4Db3XPoxbO97rbnZflF
+ v98=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 09:10:19 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4M7CfL2b3Bz1RwsC
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 09:10:18 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1660752617; x=1663344618; bh=tGXL1veMClRR6J6COmjOo7zqJDj1I9afT5K
+        0DiyexSs=; b=m9BkyA42lhKQOlCHS75npA6KAXx1QnGZcXPa+ScENhVWJDJNb7B
+        CA4xAIg2JLIQh1qDtAFUfRAdEgicNU7AzvGl1UX407LVeNHE65d+ytCK6hieUVyP
+        GfegZ1iiJLB6FcIM+/XCOJO7XUf2WX7xe7nJat0qikxM2uttvMxMvTRO3z7r6ERf
+        ywpSS5GyDiYyH5Of0AxXUKuEzNQGyHY+oEQHV1sxk6T1Gk/2q/GT7quFCU/K4TUD
+        dfYtsC3MKMsJlsS/IgqSjBoNzukrcw9g15hSBhwy2cI7TC86JIrtSHtbDD025sK3
+        K8pihhaJ2GB2m9/g249orQLFyIo8N6bv99w==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id HuM1PULjeL7r for <linux-block@vger.kernel.org>;
+        Wed, 17 Aug 2022 09:10:17 -0700 (PDT)
+Received: from [10.11.46.122] (unknown [10.11.46.122])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4M7CfJ44Fbz1RtVk;
+        Wed, 17 Aug 2022 09:10:16 -0700 (PDT)
+Message-ID: <840ce5cf-32d5-d694-cb79-2df871a607c9@opensource.wdc.com>
+Date:   Wed, 17 Aug 2022 09:10:16 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.12.0
+Subject: Re: [PATCH v11 13/13] dm: add power-of-2 target for zoned devices
+ with non power-of-2 zone sizes
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
+        snitzer@kernel.org, hch@lst.de, agk@redhat.com
+Cc:     pankydev8@gmail.com, gost.dev@samsung.com, matias.bjorling@wdc.com,
+        hare@suse.de, bvanassche@acm.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
+        jaegeuk@kernel.org, Johannes.Thumshirn@wdc.com,
+        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+References: <20220816131536.189406-1-p.raghav@samsung.com>
+ <CGME20220816131551eucas1p218faf35348e78a73aaa87d5477ecdb2e@eucas1p2.samsung.com>
+ <20220816131536.189406-14-p.raghav@samsung.com>
+ <30790cae-5440-2447-a8b8-52a57fa16fa5@opensource.wdc.com>
+ <ab3ef674-c453-5b38-80b5-f41dcfed62bb@samsung.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <ab3ef674-c453-5b38-80b5-f41dcfed62bb@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 17, 2022 at 11:02:25AM -0400, Chris Murphy wrote:
+On 2022/08/17 0:35, Pankaj Raghav wrote:
+> Hi Damien,
+>>> + */
+>>> +static bool bio_in_emulated_zone_area(struct dm_po2z_target *dmh,
+>>> +				      struct bio *bio, int *offset)
+>>
+>> This function name reads like it is a block layer helper. It mat be less
+>> confucing to keep using the dm_po2z_ prefix for it.
+>>
+> Good point. Even though it is a static function in the same file, it could
+> be confused for a block helper at the caller site.
+>>> +{
+>>> +	/*
+>>> +	 * Read operation on the emulated zone area (between zone capacity
+>>> +	 * and zone size) will fill the bio with zeroes. Any other operation
 > 
-> 
-> On Wed, Aug 17, 2022, at 10:53 AM, Ming Lei wrote:
-> > On Wed, Aug 17, 2022 at 10:34:38AM -0400, Chris Murphy wrote:
-> >> 
-> >> 
-> >> On Wed, Aug 17, 2022, at 8:06 AM, Ming Lei wrote:
-> >> 
-> >> > blk-mq debugfs log is usually helpful for io stall issue, care to post
-> >> > the blk-mq debugfs log:
-> >> >
-> >> > (cd /sys/kernel/debug/block/$disk && find . -type f -exec grep -aH . {} \;)
-> >> 
-> >> This is only sda
-> >> https://drive.google.com/file/d/1aAld-kXb3RUiv_ShAvD_AGAFDRS03Lr0/view?usp=sharing
-> >
-> > From the log, there isn't any in-flight IO request.
-> >
-> > So please confirm that it is collected after the IO stall is triggered.
-> 
-> Yes, iotop reports no reads or writes at the time of collection. IO pressure 99% for auditd, systemd-journald, rsyslogd, and postgresql, with increasing pressure from all the qemu processes.
-> 
-> Keep in mind this is a raid10, so maybe it's enough for just one block device IO to stall and the whole thing stops? That's why I included all block devices.
-> 
+>>> +
+>>> +	return DM_MAPIO_KILL;
+>>> +}
+>>
+> Do you see any more issues apart from the two you pointed out?
 
-From the 2nd log of blockdebugfs-all.txt, still not see any in-flight IO on
-request based block devices, but sda is _not_ included in this log, and
-only sdi, sdg and sdf are collected, is that expected?
+nope
 
-BTW, all request based block devices should be observed in blk-mq debugfs.
-
-
-
-thanks,
-Ming
-
+-- 
+Damien Le Moal
+Western Digital Research
