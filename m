@@ -2,135 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF52FC25B08
-	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 11:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 721F1C25B08
+	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 12:07:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234199AbiHQL5c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 07:57:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51248 "EHLO
+        id S239263AbiHQMH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 08:07:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238700AbiHQL5b (ORCPT
+        with ESMTP id S239362AbiHQMHl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 07:57:31 -0400
-Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D247782D3B;
-        Wed, 17 Aug 2022 04:57:30 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.west.internal (Postfix) with ESMTP id 830E72B059F6;
-        Wed, 17 Aug 2022 07:57:29 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Wed, 17 Aug 2022 07:57:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:from:from:in-reply-to:in-reply-to
-        :message-id:mime-version:references:reply-to:sender:subject
-        :subject:to:to; s=fm1; t=1660737449; x=1660741049; bh=nMczVAGpca
-        7H++XwV1RmIcObkzLoHhiXbmBHdwyghyU=; b=WLdp1RQQHgQVxczuf7pW15tSAX
-        2fY2owzazhdQ4Vag4SdC9OvQD8X0ecFf+Jh6e8dyXMnXQuMPp/BdL+jyeMnuOE4H
-        OPnuYzkxkoycBiFkTuCPpA1UXkQ9QdD/Dox/EZ+pXrpaTck4gM7ixADCvMqyuSMd
-        Z0DxqNifJ4mCdf+mow2fZTea6WzwqGYe3tYwdI7gu8iPV7JJYqmIVBPsO0keMjWQ
-        /0Y7t79djaGZTlH9vwhfsT8EAcZhY4/yQ1MUG8wwd2ENASQ0Rge0IG/taXYjwcaP
-        FB69dJMdB3vd398ro1EN64h4y1T4rPL2Q/l+OONmI1Z/JnP8AXYl/OSWIBfA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1660737449; x=
-        1660741049; bh=nMczVAGpca7H++XwV1RmIcObkzLoHhiXbmBHdwyghyU=; b=R
-        iAymQvL3bRE/7i5N7wzVWFFiIJBHAFb9Iu1SgWK8qjROI9K64jqeK8ZKnhYQZyYc
-        E9FctukwQssAcs4io5G+Jl26u3y3uOV/DrRmHiP1+rdSQI0sxSiofx0G12aApgls
-        1iWyAfjYhXJkKLtg8UIIwYDshHkyGJLPnedA+BfpDtKhBtDTNcHjWf3ece6tSOla
-        +V3kY2eVhXAceF72W+Xkpwaw7Y79WUh2ec7tTlXK22PQ6lJpNwipV1GifC/D20yD
-        5N07Zu0GJ0jZU9Gm2Md5ntVrhFtHR2nRVeNZeYrMEcoHpGyqADP4Vwav26oCD2/h
-        eNREEVANYr+vdC9Fj1fLg==
-X-ME-Sender: <xms:qNf8YszTflyRWtfnrTxUUjg5vtRs0YnAhDZLgZM9DI6hIEFW3eGaTw>
-    <xme:qNf8YgSST8TyNSyW0qTaLH1_5GzFK-FAK813JKzPUDrf6NI-mwezl6hbW4eIsTo9o
-    y_IhV5Q2bkabBP5ts0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehiedggeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdev
-    hhhrihhsucfouhhrphhhhidfuceolhhishhtshestgholhhorhhrvghmvgguihgvshdrtg
-    homheqnecuggftrfgrthhtvghrnhepveeghfeiveehvdeukedvtedtfefhuddtleekffek
-    keefheeivdehgfffleeileehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehlihhsthhssegt
-    ohhlohhrrhgvmhgvughivghsrdgtohhm
-X-ME-Proxy: <xmx:qNf8YuUbIR5u7-J8-kfy02ZP1F7u2Lr4nnPsg4WUZUQWmxablxAV_A>
-    <xmx:qNf8YqgKKCVBREfK53UjS7SVMpKYhYxd8pJn9jWhhN-6rXyZYng_6A>
-    <xmx:qNf8YuA9w4okB2zFZj1q-14wr4jP22Qrphc5rR0e7tEU5WA5crYjwA>
-    <xmx:qNf8Yg3EuJ2WJnaeBEuH_VtUTLZmf1dJjyjoSUd_piCre7y6D9C7OsOuzjY>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 761291700082; Wed, 17 Aug 2022 07:57:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
-Mime-Version: 1.0
-Message-Id: <8b361f8e-cc4f-466c-90f0-031a43436af2@www.fastmail.com>
-In-Reply-To: <7c830487-95a6-b008-920b-8bc4a318f10a@applied-asynchrony.com>
+        Wed, 17 Aug 2022 08:07:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43CB9883FA
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 05:07:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660738024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uvED31tz28w3zR0MRsRpAF+4dRa0mrzWJzSKyavcZMM=;
+        b=TpOUYd6Nk3jdrpmp41LJCoXXzz5JI0lPMuHGvbxQ6sTqByk9OJe4L9NOMMtf19Q0+199uS
+        Ciig3F9XPyTqcSPzLmtZ7JWm2e9FZLzxXtb6M2x6Wh0/lBFL+9kJTe3rCoN6MHU/C35N6U
+        RVj+J0HOI2K5sEg29SjG2/0UVRStpr0=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-437-ueJrywy6O5qOtdd6gEiwXQ-1; Wed, 17 Aug 2022 08:07:03 -0400
+X-MC-Unique: ueJrywy6O5qOtdd6gEiwXQ-1
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-329a474c437so150943687b3.18
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 05:07:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=uvED31tz28w3zR0MRsRpAF+4dRa0mrzWJzSKyavcZMM=;
+        b=ie0YOaHVLpsfQJ7DpHDcMkI66rNsPBhY445z1dyPCjRfmNurL9b5fxB4BjP8DneZ96
+         Cmn4d3B2NkgI66TElci62IldrN815HNW/X3kKmn62R9uSiFVF/dEcQkOdjsDZ021Sohc
+         gIOlZi1WEhn152nEkwCxEMzduwcqfUpfSCWlgDTA3ra0PMQzQCo0KvboiJUKyF2/Cjfk
+         L6/q0Z5zCpntwFmHRzmFPe8KehgKiI/eDEUx2irhHelr1qfhvOvpYOdZ4W5ew2Rl/Hlm
+         DR5cv6QsyHY+5O6j3VqMJ8F+Hp38PMo7AT4JqLX4VBof+7Ug0WH7eWx7Yc4lQC0Ui+xo
+         5gCw==
+X-Gm-Message-State: ACgBeo2ALudIKYV7cAFPTXuWqts8yMlTlBTHh0yS6yKJrE3n0wapyRRr
+        lOUi63l/0XjpAYIbNXy9v/XZY3PBPpAIvfF8yEfbSTFsbWprLmAcGjJrvPIErpW/eei47XGchhQ
+        PuVKp3TyChKFA/PJwPm2HxXM9z3vqCfijKvYBK0E=
+X-Received: by 2002:a25:e209:0:b0:67c:234a:f08c with SMTP id h9-20020a25e209000000b0067c234af08cmr19261950ybe.19.1660738022541;
+        Wed, 17 Aug 2022 05:07:02 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR62CJmKIVjjGO862klgBFeJm3NBx72xx36Q9rR58vnUPEUrkGjik0Yn2s8sx5yftCEoPxhb1gkbhMxTvLwwrcg=
+X-Received: by 2002:a25:e209:0:b0:67c:234a:f08c with SMTP id
+ h9-20020a25e209000000b0067c234af08cmr19261926ybe.19.1660738022293; Wed, 17
+ Aug 2022 05:07:02 -0700 (PDT)
+MIME-Version: 1.0
 References: <e38aa76d-6034-4dde-8624-df1745bb17fc@www.fastmail.com>
- <YvPvghdv6lzVRm/S@localhost.localdomain>
- <2220d403-e443-4e60-b7c3-d149e402c13e@www.fastmail.com>
- <cb1521d5-8b07-48d8-8b88-ca078828cf69@www.fastmail.com>
- <ad78a32c-7790-4e21-be9f-81c5848a4953@www.fastmail.com>
- <e36fe80f-a33b-4750-b593-3108ba169611@www.fastmail.com>
- <CAEzrpqe3rRTvH=s+-aXTtupn-XaCxe0=KUe_iQfEyHWp-pXb5w@mail.gmail.com>
- <d48c7e95-e21e-dcdc-a776-8ae7bed566cb@kernel.dk>
- <61e5ccda-a527-4fea-9850-91095ffa91c4@www.fastmail.com>
- <4995baed-c561-421d-ba3e-3a75d6a738a3@www.fastmail.com>
- <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
+ <YvPvghdv6lzVRm/S@localhost.localdomain> <2220d403-e443-4e60-b7c3-d149e402c13e@www.fastmail.com>
+ <cb1521d5-8b07-48d8-8b88-ca078828cf69@www.fastmail.com> <ad78a32c-7790-4e21-be9f-81c5848a4953@www.fastmail.com>
+ <e36fe80f-a33b-4750-b593-3108ba169611@www.fastmail.com> <CAEzrpqe3rRTvH=s+-aXTtupn-XaCxe0=KUe_iQfEyHWp-pXb5w@mail.gmail.com>
+ <d48c7e95-e21e-dcdc-a776-8ae7bed566cb@kernel.dk> <61e5ccda-a527-4fea-9850-91095ffa91c4@www.fastmail.com>
+ <4995baed-c561-421d-ba3e-3a75d6a738a3@www.fastmail.com> <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
  <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
- <7c830487-95a6-b008-920b-8bc4a318f10a@applied-asynchrony.com>
-Date:   Wed, 17 Aug 2022 07:57:07 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     =?UTF-8?Q?Holger_Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>,
-        "Nikolay Borisov" <nborisov@suse.com>,
-        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
-        "Paolo Valente" <paolo.valente@linaro.org>
-Cc:     Linux-RAID <linux-raid@vger.kernel.org>,
+In-Reply-To: <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Wed, 17 Aug 2022 20:06:51 +0800
+Message-ID: <CAFj5m9+6Vj3NdSg_n3nw1icscY1qr9f9SOvkWYyqpEtFBb_-1g@mail.gmail.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+To:     Chris Murphy <lists@colorremedies.com>
+Cc:     Nikolay Borisov <nborisov@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
-        "Josef Bacik" <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        Josef Bacik <josef@toxicpanda.com>,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello Chris,
 
-
-On Wed, Aug 17, 2022, at 5:52 AM, Holger Hoffst=C3=A4tte wrote:
-> On 2022-08-16 17:34, Chris Murphy wrote:
->>=20
->> On Tue, Aug 16, 2022, at 11:25 AM, Nikolay Borisov wrote:
->>> How about changing the scheduler either mq-deadline or noop, just
->>> to see if this is also reproducible with a different scheduler. I
->>> guess noop would imply the blk cgroup controller is going to be
->>> disabled
->>=20
->> I already reported on that: always happens with bfq within an hour or
->> less. Doesn't happen with mq-deadline for ~25+ hours. Does happen
->> with bfq with the above patches removed. Does happen with
->> cgroup.disabled=3Dio set.
->>=20
->> Sounds to me like it's something bfq depends on and is somehow
->> becoming perturbed in a way that mq-deadline does not, and has
->> changed between 5.11 and 5.12. I have no idea what's under bfq that
->> matches this description.
+On Tue, Aug 16, 2022 at 11:35 PM Chris Murphy <lists@colorremedies.com> wrote:
 >
-> Chris, just a shot in the dark but can you try the patch from
 >
-> https://lore.kernel.org/linux-block/20220803121504.212071-1-yukuai1@hu=
-aweicloud.com/
 >
-> on top of something more recent than 5.12? Ideally 5.19 where it appli=
-es
-> cleanly.
+...
+>
+> I already reported on that: always happens with bfq within an hour or less. Doesn't happen with mq-deadline for ~25+ hours. Does happen with bfq with the above patches removed. Does happen with cgroup.disabled=io set.
+>
+> Sounds to me like it's something bfq depends on and is somehow becoming perturbed in a way that mq-deadline does not, and has changed between 5.11 and 5.12. I have no idea what's under bfq that matches this description.
+>
 
-The problem doesn't reliably reproduce on 5.19. A patch for 5.12..5.18 w=
-ould be much more testable.
+blk-mq debugfs log is usually helpful for io stall issue, care to post
+the blk-mq debugfs log:
 
+(cd /sys/kernel/debug/block/$disk && find . -type f -exec grep -aH . {} \;)
 
---=20
-Chris Murphy
+Thanks,
+Ming
+
