@@ -2,88 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73BE8C32771
-	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 00:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8D1C25B0E
+	for <linux-block@archiver.kernel.org>; Wed, 17 Aug 2022 01:13:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237573AbiHQA3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Aug 2022 20:29:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37332 "EHLO
+        id S238099AbiHQBNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Aug 2022 21:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237647AbiHQA27 (ORCPT
+        with ESMTP id S229453AbiHQBNo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Aug 2022 20:28:59 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F90986706;
-        Tue, 16 Aug 2022 17:28:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 73805B81B73;
-        Wed, 17 Aug 2022 00:28:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFA79C433D6;
-        Wed, 17 Aug 2022 00:28:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660696133;
-        bh=Rzz/M8Q0tiosyOZooUlRGvQSVZx536FrRe7zGsi+7Dw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uDp3WaZXGKqZH0pV5Z0TDzxsQtrGn65ZZXCECzYW9UwwnAs7mmtdEbJSUDJJJyx9R
-         yyZmjsgCkJs61FOGksO1agxe+1a9xtLouGvWG1jjSzv+MtyC9AeA3F0F7RG/NGFH1x
-         4t63u6v4IUzyAvNjQ4aqDN5Df2jHeQWK9mrCw4uaupqzjGu+aicLoN5MBb3c/csfOm
-         41/IaGQdhmnc69iKD2xj4AIFt8q+Btc65x5tToMCg9ou1f7R8jPG8SCFAlc1Rcy9vy
-         hv22HRnIjxYuL9sXZML7i8ty/6H+jMfuHBg4NKkyGFF6kuIXHWzKjf9hxh4HYuhyZN
-         EIAxyxL1ddFDg==
-Date:   Tue, 16 Aug 2022 17:28:52 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: RFC: what to do about fscrypt vs block device interaction
-Message-ID: <Yvw2REXUEgvQQTWg@sol.localdomain>
-References: <20220721125929.1866403-1-hch@lst.de>
- <YtpfyZ8Dr9duVr45@sol.localdomain>
- <20220722160349.GA10142@lst.de>
- <Ytrrbd0F6OBdMcTv@gmail.com>
+        Tue, 16 Aug 2022 21:13:44 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D47D2B604;
+        Tue, 16 Aug 2022 18:13:42 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4M6qk41Nnxz6TDPS;
+        Wed, 17 Aug 2022 09:12:12 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgB3fOnCQPxi9Iy7AQ--.34571S3;
+        Wed, 17 Aug 2022 09:13:40 +0800 (CST)
+Subject: Re: [PATCH v7 1/9] blk-throttle: fix that io throttle can only work
+ for single bio
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
+ <20220802140415.2960284-2-yukuai1@huaweicloud.com>
+ <Yvvx+/d2+OMROUOe@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <712e0f29-94ba-d3d3-ce21-cba4d6092008@huaweicloud.com>
+Date:   Wed, 17 Aug 2022 09:13:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ytrrbd0F6OBdMcTv@gmail.com>
+In-Reply-To: <Yvvx+/d2+OMROUOe@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgB3fOnCQPxi9Iy7AQ--.34571S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxury3GFyrCry5WFy7Kw47CFg_yoWrXFW3pF
+        yxWF95Gr4vqrn7KrnxJ3WaqF9avrWrAr98GFy5G3W5Arn8KrnIqr17ur4F9ayfuF95Cw40
+        vr1vqF97Ca1UJFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jul 22, 2022 at 06:24:45PM +0000, Eric Biggers wrote:
-> On Fri, Jul 22, 2022 at 06:03:49PM +0200, Christoph Hellwig wrote:
-> > > To avoid that, I think we could go through and evict all the
-> > > blk_crypto_keys (i.e. call fscrypt_destroy_prepared_key() on the
-> > > fscrypt_prepared_keys embedded in each fscrypt_master_key) during the
-> > > unmount itself, separating it from the destruction of the key objects
-> > > from the keyring subsystem's perspective. That could happen in the
-> > > moved call to fscrypt_sb_free().
-> 
-> Note: for iterating through the keys in ->s_master_keys, I'd try something like
-> assoc_array_iterate(&sb->s_master_keys->keys, fscrypt_teardown_key, sb)
-> 
-> > 
-> > I'll give this a try.
-> > 
-> > What would be a good test suite or set of tests to make sure I don't
-> > break fscrypt operation?
-> 
-> You can run xfstests on ext4 and f2fs with "-g encrypt", both with and without
-> the inlinecrypt mount option.
-> https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html#tests shows the
-> commands to do this with kvm-xfstests, but it can also be done with regular
-> xfstests.  Note that for the inlinecrypt mount option to work you'll need a
-> kernel with CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK=y and
-> CONFIG_FS_ENCRYPTION_INLINE_CRYPT=y.
-> 
-> There are relevant things that aren't tested by this, such as f2fs's
-> multi-device support and whether the blk-crypto keys really get evicted, but
-> that's the best we have.
+Hi, Tejun
 
-FYI, I'm working on a patchset that will address the issue with
-blk_crypto_evict_key() that you were having trouble with here.  It turns out
-there are some actual bugs caused by how fscrypt does things with
-->s_master_keys, so I'm planning a larger cleanup that changes ->s_master_keys
-to be a regular hash table instead, with lifetime rules adjusted accordingly.
+ÔÚ 2022/08/17 3:37, Tejun Heo Ð´µÀ:
+> On Tue, Aug 02, 2022 at 10:04:07PM +0800, Yu Kuai wrote:
+> ...
+>> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+>> support to count splited bios for iops limit, thus it adds flaged bio
+>                                                               ^
+>                                                               flagged
+> 
+>> checking in tg_with_in_bps_limit() so that splited bios will only count
+>                                               ^
+>                                               split
+> 
+>> once for bps limit, however, it introduce a new problem that io throttle
+>> won't work if multiple bios are throttled.
+>>
+>> In order to fix the problem, at first, don't skip flaged bio in
+>> tg_with_in_bps_limit(), however, this will break that splited bios should
+>> only count once for bps limit. And this patch tries to avoid
+>> over-accounting by decrementing it first in __blk_throtl_bio(), and
+>> then counting it again while dispatching it.
+>>
+>> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Please cc stable w/ version tag.
+> 
+>> ---
+>>   block/blk-throttle.c | 26 ++++++++++++++++++++------
+>>   1 file changed, 20 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+>> index 9f5fe62afff9..2957e2c643f4 100644
+>> --- a/block/blk-throttle.c
+>> +++ b/block/blk-throttle.c
+>> @@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+>>   	unsigned int bio_size = throtl_bio_data_size(bio);
+>>   
+>>   	/* no need to throttle if this bio's bytes have been accounted */
+>> -	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
+>> +	if (bps_limit == U64_MAX) {
+>>   		if (wait)
+>>   			*wait = 0;
+>>   		return true;
+>> @@ -921,11 +921,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+>>   	unsigned int bio_size = throtl_bio_data_size(bio);
+>>   
+>>   	/* Charge the bio to the group */
+>> -	if (!bio_flagged(bio, BIO_THROTTLED)) {
+>> -		tg->bytes_disp[rw] += bio_size;
+>> -		tg->last_bytes_disp[rw] += bio_size;
+>> -	}
+>> -
+>> +	tg->bytes_disp[rw] += bio_size;
+>> +	tg->last_bytes_disp[rw] += bio_size;
+>>   	tg->io_disp[rw]++;
+>>   	tg->last_io_disp[rw]++;
+>>   
+>> @@ -2121,6 +2118,23 @@ bool __blk_throtl_bio(struct bio *bio)
+>>   			tg->last_low_overflow_time[rw] = jiffies;
+>>   		throtl_downgrade_check(tg);
+>>   		throtl_upgrade_check(tg);
+>> +
+>> +		/*
+>> +		 * Splited bios can be re-entered because iops limit should be
+>                     ^                ^^^^^^^^^^^^^
+>                     Split            re-enter
+> 
+>> +		 * counted again, however, bps limit should not. Since bps limit
+>> +		 * will be counted again while dispatching it, compensate the
+>> +		 * over-accounting here. Noted that compensation can fail if
+>> +		 * new slice is started.
+> 
+> I can't really follow the comment. Please improve the explanation.
+> 
+>> +		 */
+>> +		if (bio_flagged(bio, BIO_THROTTLED)) {
+>> +			unsigned int bio_size = throtl_bio_data_size(bio);
+>> +
+>> +			if (tg->bytes_disp[rw] >= bio_size)
+>> +				tg->bytes_disp[rw] -= bio_size;
+>> +			if (tg->last_bytes_disp[rw] >= bio_size)
+>> +				tg->last_bytes_disp[rw] -= bio_size;
+>> +		}
+> 
+> So, as a fix for the immediate problem, I guess this might do but this feels
+> really fragile. How can we be certain that re-entering only happens because
+> of splitting? What if future core development changes that? It seems to be
+> solving the problem in the wrong place. Shouldn't we flag the bio indicating
+> that it's split when we're splitting the bio so that we only limit them for
+> iops in the first place?
+> 
+Splited bio is tracked in __bio_clone:
 
-- Eric
+if (bio_flagged(bio_src, BIO_THROTTLED))
+	bio_set_flag(bio, BIO_THROTTLED);
+
+And currenty, the iops limit and bps limit are treated differently,
+however there are only one flag 'BIO_THROTTLED' and they can't be
+distinguished.
+
+Perhaps I can use two flags, for example BIO_IOPS_THROTTLED and
+BIO_BPS_THROTTLED, this way only iops limit can be handled and bps
+limit can be skipped for splited bio.
+
+What do you think?
+
+Thanks,
+Kuai
+> Thanks.
+> 
+
