@@ -2,105 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C97F4C00140
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 09:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F51C00140
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 09:44:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234388AbiHRJ3r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 05:29:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36332 "EHLO
+        id S236969AbiHRJoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 05:44:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233816AbiHRJ3q (ORCPT
+        with ESMTP id S242603AbiHRJoR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 05:29:46 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 429297F112;
-        Thu, 18 Aug 2022 02:29:43 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M7fgv49wJzKMvT;
-        Thu, 18 Aug 2022 17:28:11 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAXHfqDBv5ibCYCAg--.62434S3;
-        Thu, 18 Aug 2022 17:29:41 +0800 (CST)
-Subject: Re: [PATCH v7 9/9] blk-throttle: clean up flag 'THROTL_TG_PENDING'
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
- <20220802140415.2960284-10-yukuai1@huaweicloud.com>
- <Yvv6kk/RD5LT+3dk@slm.duckdns.org>
- <65d93ec6-2465-35f1-314f-f092ce631100@huaweicloud.com>
- <Yv0rR9gBL0qbYeXp@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <841b7b5a-b908-649a-c09d-32c8de5f1c14@huaweicloud.com>
-Date:   Thu, 18 Aug 2022 17:29:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 18 Aug 2022 05:44:17 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD89AFAD5;
+        Thu, 18 Aug 2022 02:44:15 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27I9iBDg006855;
+        Thu, 18 Aug 2022 09:44:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : references : cc : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JiF/cybh1Bde9Wop9QTcigKTsMN5Hvkz8vlESEossD8=;
+ b=gPeO2JbN5aELFVU0zwsUodWHPGYqiHlrm8d5vnQoUy/0JgJPrkB/df8Lcs+jsz6vh7M5
+ Z29njVqcbPSElZd8WGeri94bMUJfCU1qSYnc7mPaJhqcQ1CdBKh6DouhaAO1uiEjKRts
+ ZlvnIBRMC8qlDUdmYJbj6p7NIX8gfRuUurlhWWPYaGTrqzSu5GNuu8144dprFuvvLJaf
+ 7aXodaz674SIvAX261/sGcGvZnj/35+so1J+esgjEOMn2VRnl9lcyP/pBwEs0ydocE4G
+ BteIgUfksBSqfpDgaP0zNtTx8d7DEHTho2YEN8DxZlCt6VYZyd9cz9BeyaU8pa58O+0Z AQ== 
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1k22800x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 09:44:11 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27I9LYNL031432;
+        Thu, 18 Aug 2022 09:44:10 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma02dal.us.ibm.com with ESMTP id 3hx3kadg91-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 09:44:10 +0000
+Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27I9i9be47055254
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 09:44:09 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 64DAB6A051;
+        Thu, 18 Aug 2022 09:44:09 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B3DFA6A047;
+        Thu, 18 Aug 2022 09:44:00 +0000 (GMT)
+Received: from [9.43.127.90] (unknown [9.43.127.90])
+        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 09:43:58 +0000 (GMT)
+Message-ID: <0d1621b1-6654-34f1-9630-7cf5881a8eaf@linux.vnet.ibm.com>
+Date:   Thu, 18 Aug 2022 15:13:56 +0530
 MIME-Version: 1.0
-In-Reply-To: <Yv0rR9gBL0qbYeXp@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXHfqDBv5ibCYCAg--.62434S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrZr1xAr1xGFyfAr13Xw1fWFg_yoWkZFbE93
-        4YkrZ7Kwn5ZrsxAanxKrn0va9rWF1rWry7Xry8Jw1DXryfXFn8GFWqqw4fuay5C3yfAFnx
-        ur1DJa18Ar12gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [linux] [5.19.0] task hung for indefinite time with call traces
+ when rebooted with Kexec
+Content-Language: en-US
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <4c93ce0b-8e04-1f03-e4ce-7c763719169c@linux.vnet.ibm.com>
+ <6b5267ee-9372-3862-614a-298f7bd9ae60@I-love.SAKURA.ne.jp>
+Cc:     abdhalee@linux.vnet.ibm.com, mputtash@linux.vnet.com,
+        sachinp@linux.vnet.com
+From:   Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+In-Reply-To: <6b5267ee-9372-3862-614a-298f7bd9ae60@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Sfz9BJZy_UGEzcY5BkfPVp80frY8apST
+X-Proofpoint-GUID: Sfz9BJZy_UGEzcY5BkfPVp80frY8apST
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_02,2022-08-16_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 adultscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180031
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Tejun!
+Greetings,
 
-ÔÚ 2022/08/18 1:54, Tejun Heo Ð´µÀ:
-> Hello,
-> 
-> On Wed, Aug 17, 2022 at 09:45:13AM +0800, Yu Kuai wrote:
->>> I don't know whether this is better or not. It's minutely less lines of code
->>> but also makes the code a bit more fragile. I'm ambivalent. At any rate,
->>> please move these trivial patches to the head of the series or post them
->>> separately.
+
+Please find the location in source code from where i am seeing the call 
+traces generating
+
+File : kernel/hung_task.c
+
+         /*
+          * Ok, the task did not get scheduled for more than 2 minutes,
+          * complain:
+          */
+         if (sysctl_hung_task_warnings) {
+                 if (sysctl_hung_task_warnings > 0)
+                         sysctl_hung_task_warnings--;
+                 pr_err("INFO: task %s:%d blocked for more than %ld 
+seconds.\n",
+                        t->comm, t->pid, (jiffies - t->last_switch_time) 
+/ HZ);
+                 pr_err("      %s %s %.*s\n",
+                         print_tainted(), init_utsname()->release,
+                         (int)strcspn(init_utsname()->version, " "),
+                         init_utsname()->version);
+                 pr_err("\"echo 0 > 
+/proc/sys/kernel/hung_task_timeout_secs\""
+                         " disables this message.\n");
+                 sched_show_task(t);
+                 hung_task_show_lock = true;
+
+                 if (sysctl_hung_task_all_cpu_backtrace)
+                         hung_task_show_all_bt = true;
+         }
+
+         touch_nmi_watchdog();
+}
+
+
+On 8/6/22 15:30, Tetsuo Handa wrote:
+> On 2022/08/05 15:54, Tasmiya Nalatwad wrote:
+>> Greetings,
 >>
->> Can I ask why do you think this patch makes the code a bit more fragile?
+>> [linux] [5.19.0] task hung for indefinite time with call traces when rebooted with Kexec, A restart is required to recover the machine.
 > 
-> It's just one step further removed. Before, the flag was trivially in sync
-> with the on queue status. After, the relationship is more indirect and
-> easier to break accidentally. Not that it's a major problem. Just not sure
-> what the benefit of the change is.
-
-If you are worried about that, I can keep the flag, then the last two
-patches will cleanup:
-
-Before, the flag will be set and cleared frequently when each each bio
-is handled.
-
-After, the flag will only set then the first bio is throttled, and
-it's cleared when last bio is dispatched.
-
-Of course, if you think this cleanup is not necessary, I'll drop the
-last two patches.
-
-Thanks,
-Kuai
+> kexec is waiting for workqueues ("kworker/3:1" and "kworker/3:0") to complete.
+> If this problem happens only when rebooting with kexec, something in kexec path
+> might be preventing these workqueues from completing.
 > 
->> By the way, I'll post these trivial patches separately.
+> Anyway, please repost with locations in source code like syzbot report does.
 > 
-> Sounds great.
+> [ 1104.673153] task:kworker/3:1     state:D stack:    0 pid:  221 ppid:     2 flags:0x00000800
+> [ 1104.673160] Workqueue: fc_wq_0 fc_rport_final_delete [scsi_transport_fc]
+> [ 1104.673170] Call Trace:
+> [ 1104.673173] [c0000000060eb860] [0000000000000004] 0x4 (unreliable)
+> [ 1104.673178] [c0000000060eba50] [c00000000001e378] __switch_to+0x288/0x4a0
+> [ 1104.673185] [c0000000060ebab0] [c000000000d23e84] __schedule+0x2c4/0x8c0
+> [ 1104.673190] [c0000000060ebb80] [c000000000d244e8] schedule+0x68/0x130
+> [ 1104.673196] [c0000000060ebbb0] [c0000000008d4574] scsi_remove_target+0x314/0x390
 > 
-> Thanks.
+> [ 1104.673233] task:kworker/3:0     state:D stack:    0 pid:227332 ppid:     2 flags:0x00000880
+> [ 1104.673237] Workqueue: fc_wq_0 fc_rport_final_delete [scsi_transport_fc]
+> [ 1104.673243] Call Trace:
+> [ 1104.673244] [c0000000726bb860] [c0000000001b9cb4] enqueue_entity+0x184/0x4f0 (unreliable)
+> [ 1104.673250] [c0000000726bba50] [c00000000001e378] __switch_to+0x288/0x4a0
+> [ 1104.673254] [c0000000726bbab0] [c000000000d23e84] __schedule+0x2c4/0x8c0
+> [ 1104.673258] [c0000000726bbb80] [c000000000d244e8] schedule+0x68/0x130
+> [ 1104.673262] [c0000000726bbbb0] [c0000000008d4574] scsi_remove_target+0x314/0x390
+> [
+> [ 1104.673295] task:kexec           state:D stack:    0 pid:228289 ppid:     1 flags:0x00040080
+> [ 1104.673299] Call Trace:
+> [ 1104.673301] [c000000069147510] [c00000000001e378] __switch_to+0x288/0x4a0
+> [ 1104.673305] [c000000069147570] [c000000000d23e84] __schedule+0x2c4/0x8c0
+> [ 1104.673309] [c000000069147640] [c000000000d244e8] schedule+0x68/0x130
+> [ 1104.673313] [c000000069147670] [c000000000d2e028] schedule_timeout+0x348/0x3f0
+> [ 1104.673317] [c000000069147750] [c000000000d2554c] wait_for_completion+0xcc/0x2b0
+> [ 1104.673321] [c0000000691477d0] [c00000000017cbe8] flush_workqueue+0x158/0x520
+> [ 1104.673325] [c000000069147870] [c00000000017d068] drain_workqueue+0xb8/0x240
+> [ 1104.673329] [c000000069147930] [c0000000001825e0] destroy_workqueue+0x60/0x420
+> [ 1104.673333] [c0000000691479c0] [c0080000009291e4] fc_remove_host+0x21c/0x280 [scsi_transport_fc]
+> 
 > 
 
+-- 
+Regards,
+Tasmiya Nalatwad
+IBM Linux Technology Center
