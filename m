@@ -2,112 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BB4C25B08
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 01:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28FEDC3F6B0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 01:16:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231939AbiHRBDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 21:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34960 "EHLO
+        id S235185AbiHRBQf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 21:16:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233425AbiHRBDh (ORCPT
+        with ESMTP id S231627AbiHRBQf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 21:03:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5232AC7A
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 18:03:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660784612;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=C60ajPdlC/CsFP22IBpGKTjlxuh488qoa5A4DbUUh+Y=;
-        b=TIFTsTlz1ofYz8MZ10G0BNg7xApfTdJyve7izl1WtolFbyJgitLNg5fA0we9ekrduI5ccP
-        QGUFkQubAkYW3XtLhW1s7+cEFF9r22gbqlLSoUW+/mPrBlsUJ8qXzq8RLH0YLtUVP5Z0Ol
-        EAumzGezIgqC+fi3gxKN79wVgGbFEas=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-388-Aug8zyljPeaUXo98D8mcwQ-1; Wed, 17 Aug 2022 21:03:28 -0400
-X-MC-Unique: Aug8zyljPeaUXo98D8mcwQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D1C23C01D9F;
-        Thu, 18 Aug 2022 01:03:28 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 705F6492C3B;
-        Thu, 18 Aug 2022 01:03:20 +0000 (UTC)
-Date:   Thu, 18 Aug 2022 09:03:15 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     Nikolay Borisov <nborisov@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Message-ID: <Yv2P0zyoVvz35w/m@T590>
-References: <61e5ccda-a527-4fea-9850-91095ffa91c4@www.fastmail.com>
- <4995baed-c561-421d-ba3e-3a75d6a738a3@www.fastmail.com>
- <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
- <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
- <CAFj5m9+6Vj3NdSg_n3nw1icscY1qr9f9SOvkWYyqpEtFBb_-1g@mail.gmail.com>
- <b236ca6e-2e69-4faf-9c95-642339d04543@www.fastmail.com>
- <Yv0A6UhioH3rbi0E@T590>
- <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
- <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
+        Wed, 17 Aug 2022 21:16:35 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13EDA91D30;
+        Wed, 17 Aug 2022 18:16:32 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4M7Rks366zz6R9dc;
+        Thu, 18 Aug 2022 09:15:01 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP1 (Coremail) with SMTP id cCh0CgBXXOnskv1ixcflAQ--.22050S3;
+        Thu, 18 Aug 2022 09:16:30 +0800 (CST)
+Subject: Re: [PATCH v7 4/9] blk-throttle: fix io hung due to configuration
+ updates
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai3@huawei.com >> yukuai (C)" <yukuai3@huawei.com>
+References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
+ <20220802140415.2960284-5-yukuai1@huaweicloud.com>
+ <Yvv3jcycOguuEbA3@slm.duckdns.org>
+ <215b4842-c09f-d622-7127-c8b1d9ce3aa9@huaweicloud.com>
+ <Yv0q7T5Eg6MzOIuU@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <d82305ef-1672-a648-f0b6-882bef1659f1@huaweicloud.com>
+Date:   Thu, 18 Aug 2022 09:16:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+In-Reply-To: <Yv0q7T5Eg6MzOIuU@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cCh0CgBXXOnskv1ixcflAQ--.22050S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kw1kWFWfJw47KF45CFyxuFg_yoW8XrW8pr
+        48tF4kta1DX3srA3ZFv3W2qwnYyr48WFW5Jr98G3Wrt3Z8WryIgrs2kr4rCFy09r48Jay0
+        v34Sq3s5Ars5AFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 17, 2022 at 12:34:42PM -0400, Chris Murphy wrote:
-> 
-> 
-> On Wed, Aug 17, 2022, at 11:34 AM, Ming Lei wrote:
-> 
-> > From the 2nd log of blockdebugfs-all.txt, still not see any in-flight IO on
-> > request based block devices, but sda is _not_ included in this log, and
-> > only sdi, sdg and sdf are collected, is that expected?
-> 
-> While the problem was happening I did
-> 
-> cd /sys/kernel/debug/block
-> find . -type f -exec grep -aH . {} \;
-> 
-> The file has the nodes out of order, but I don't know enough about the interface to see if there are things that are missing, or what it means.
-> 
-> 
-> > BTW, all request based block devices should be observed in blk-mq debugfs.
-> 
-> /sys/kernel/debug/block contains
-> 
-> drwxr-xr-x.  2 root root 0 Aug 17 15:20 md0
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sda
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdb
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdc
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdd
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sde
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdf
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdg
-> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdh
-> drwxr-xr-x.  4 root root 0 Aug 17 15:20 sdi
-> drwxr-xr-x.  2 root root 0 Aug 17 15:20 zram0
+Hi, Tejun!
 
-OK, so lots of devices are missed in your log, and the following command
-is supposed to work for collecting log from all block device's debugfs:
+ÔÚ 2022/08/18 1:52, Tejun Heo Ð´µÀ:
+> On Wed, Aug 17, 2022 at 09:30:30AM +0800, Yu Kuai wrote:
+>>> Would it be easier if the fields were signed? It's fragile and odd to
+>>> explain "these are unsigned but if they underflow they behave just like
+>>> signed when added" when they can just be signed. Also, I have a hard time
+>>> understand what "preempt" means above.
+>>
+>> I think preempt shound never happen based on current FIFO
+>> implementation, perhaps
+> 
+> Can you elaborate what "preempt" is?
 
-(cd /sys/kernel/debug/block/ && find . -type f -exec grep -aH . {} \;)
+Here preempt means that the bio that is throttled later somehow get
+dispatched earlier, Michal thinks it's better to comment that the code
+still works fine in this particular scenario.
 
+> 
+>>>> +	if (bps_limit != U64_MAX)
+>>>> +		tg->bytes_skipped[rw] +=
+>>>> +			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+>>>> +			tg->bytes_disp[rw];
+>>>> +	if (iops_limit != UINT_MAX)
+>>>> +		tg->io_skipped[rw] +=
+>>>> +			calculate_io_allowed(iops_limit, jiffy_elapsed) -
+>>>> +			tg->io_disp[rw];
+>>>
+>>> So, this is calculating the budgets to carry over. Can we name them
+>>> accordingly? I don't know what "skipped" means.
+>>
+>> Yeah, thanks for you advice, art of naming is a little hard for me...
+>> How do you think about these name: extended_bytes/io_budget?
+> 
+> How about carryover_{ios|bytes}?
+
+Yes, that sounds good.
+
+By the way, should I use 'ios' here instead of 'io'? I was confused
+because there are many places that is using 'io' currently.
 
 Thanks,
-Ming
+Kuai
+> 
+> Thanks.
+> 
 
