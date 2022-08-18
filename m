@@ -2,180 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5307AC25B0E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 21:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C01DAC32774
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 21:08:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346296AbiHRVAy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 17:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
+        id S1346519AbiHRVIJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 17:08:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346188AbiHRVAG (ORCPT
+        with ESMTP id S1346520AbiHRVHX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 17:00:06 -0400
-Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00719D34D9
-        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 14:00:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple; d=sang-engineering.com; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=k1; bh=qDmf4Bsrxo6BfokqhIhswvHdmlz
-        bGFO97gi1JjH+g84=; b=3ucEsOmN++mJRNj7FiDelgxQnlSibfh7rztOzEuGLXe
-        SsZZjIvrf4smV4yTX+r8FnqqmWfisBc7MjGt2NKVdGkkNELc1FMgzwP9oi3vnab2
-        2/Vgmtq6Shz1953l38O3SRsYc2PRQddfuFKfWN7lM+gVJFVeHa0hH6RxjPg/Hrz8
-        =
-Received: (qmail 3959462 invoked from network); 18 Aug 2022 22:59:58 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 18 Aug 2022 22:59:58 +0200
-X-UD-Smtp-Session: l3s3148p1@Qf2lQ4rmc7Iucref
-From:   Wolfram Sang <wsa+renesas@sang-engineering.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Geoff Levand <geoff@infradead.org>, Jim Paris <jim@jtan.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH] block: move from strlcpy with unused retval to strscpy
-Date:   Thu, 18 Aug 2022 22:59:57 +0200
-Message-Id: <20220818205958.6552-1-wsa+renesas@sang-engineering.com>
-X-Mailer: git-send-email 2.35.1
+        Thu, 18 Aug 2022 17:07:23 -0400
+Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF0EA30D;
+        Thu, 18 Aug 2022 14:03:25 -0700 (PDT)
+Received: from dread.disaster.area (pa49-181-52-176.pa.nsw.optusnet.com.au [49.181.52.176])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id A681E62D490;
+        Fri, 19 Aug 2022 07:03:00 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1oOmfL-00EjSC-6k; Fri, 19 Aug 2022 07:02:59 +1000
+Date:   Fri, 19 Aug 2022 07:02:59 +1000
+From:   Dave Chinner <david@fromorbit.com>
+To:     Eric Sandeen <sandeen@sandeen.net>
+Cc:     Petr Vorel <pvorel@suse.cz>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        Hannes Reinecke <hare@suse.de>, linux-xfs@vger.kernel.org,
+        ltp@lists.linux.it
+Subject: Re: LTP test df01.sh detected different size of loop device in v5.19
+Message-ID: <20220818210259.GG3600936@dread.disaster.area>
+References: <YvZc+jvRdTLn8rus@pevik>
+ <YvZUfq+3HYwXEncw@pevik>
+ <YvZTpQFinpkB06p9@pevik>
+ <20220814224440.GR3600936@dread.disaster.area>
+ <YvoSeTmLoQVxq7p9@pevik>
+ <8d33a7a0-7a7c-47a1-ed84-83fd25089897@sandeen.net>
+ <Yv5Z7eu5RGnutMly@pevik>
+ <f03c6929-9a14-dd58-3726-dd2c231d0981@sandeen.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f03c6929-9a14-dd58-3726-dd2c231d0981@sandeen.net>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=OJNEYQWB c=1 sm=1 tr=0 ts=62fea908
+        a=O3n/kZ8kT9QBBO3sWHYIyw==:117 a=O3n/kZ8kT9QBBO3sWHYIyw==:17
+        a=kj9zAlcOel0A:10 a=biHskzXt2R4A:10 a=VwQbUJbxAAAA:8 a=7-415B0cAAAA:8
+        a=goNm9uWxpVm3eJU7WO0A:9 a=CjuIK1q_8ugA:10 a=AjGcO6oz07-iQ99wixmX:22
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Follow the advice of the below link and prefer 'strscpy' in this
-subsystem. Conversion is 1:1 because the return value is not used.
-Generated by a coccinelle script.
+On Thu, Aug 18, 2022 at 11:05:33AM -0500, Eric Sandeen wrote:
+> On 8/18/22 10:25 AM, Petr Vorel wrote:
+> > Hi Eric, all,
+> > 
+> 
+> ...
+> 
+> > 
+> >> IOWS, I think the test expects that free space is reflected in statfs numbers
+> >> immediately after a file is removed, and that's no longer the case here. They
+> >> change in between the df check and the statfs check.
+> > 
+> >> (The test isn't just checking that the values are correct, it is checking that
+> >> the values are /immediately/ correct.)
+> > 
+> >> Putting a "sleep 1" after the "rm -f" in the test seems to fix it; IIRC
+> >> the max time to wait for inodegc is 1s. This does slow the test down a bit.
+> > 
+> > Sure, it looks like we can sleep just 50ms on my hw (although better might be to
+> > poll for the result [1]), I just wanted to make sure there is no bug/regression
+> > before hiding it with sleep.
+> > 
+> > Thanks for your input!
+> > 
+> > Kind regards,
+> > Petr
+> > 
+> > [1] https://people.kernel.org/metan/why-sleep-is-almost-never-acceptable-in-tests
+> > 
+> >> -Eric
+> > 
+> > +++ testcases/commands/df/df01.sh
+> > @@ -63,6 +63,10 @@ df_test()
+> >  		tst_res TFAIL "'$cmd' failed."
+> >  	fi
+> >  
+> > +	if [ "$DF_FS_TYPE" = xfs ]; then
+> > +		tst_sleep 50ms
+> > +	fi
+> > +
+> 
+> Probably worth at least a comment as to why ...
+> 
+> Dave / Darrick / Brian - I'm not sure how long it might take to finish inodegc?
+> A too-short sleep will let the flakiness remain ...
 
-Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
-Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
----
- drivers/block/brd.c               |  2 +-
- drivers/block/drbd/drbd_nl.c      |  2 +-
- drivers/block/mtip32xx/mtip32xx.c | 12 ++++++------
- drivers/block/ps3vram.c           |  2 +-
- drivers/block/zram/zram_drv.c     |  6 +++---
- 5 files changed, 12 insertions(+), 12 deletions(-)
+For a single 1MB file? inodegc is delayed 1 jiffie (max 10ms).
+If it's processed immediately because everything else is idle and
+nothing blocks, it will be done in 250-500 microsends.
 
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index 859499cd1ff8..20acc4a1fd6d 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -397,7 +397,7 @@ static int brd_alloc(int i)
- 	disk->minors		= max_part;
- 	disk->fops		= &brd_fops;
- 	disk->private_data	= brd;
--	strlcpy(disk->disk_name, buf, DISK_NAME_LEN);
-+	strscpy(disk->disk_name, buf, DISK_NAME_LEN);
- 	set_capacity(disk, rd_size * 2);
- 	
- 	/*
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index 013d355a2033..864c98e74875 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -4752,7 +4752,7 @@ void notify_helper(enum drbd_notification_type type,
- 	struct drbd_genlmsghdr *dh;
- 	int err;
- 
--	strlcpy(helper_info.helper_name, name, sizeof(helper_info.helper_name));
-+	strscpy(helper_info.helper_name, name, sizeof(helper_info.helper_name));
- 	helper_info.helper_name_len = min(strlen(name), sizeof(helper_info.helper_name));
- 	helper_info.helper_status = status;
- 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 562725d222a7..815d77ba6381 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1397,15 +1397,15 @@ static void mtip_dump_identify(struct mtip_port *port)
- 	if (!port->identify_valid)
- 		return;
- 
--	strlcpy(cbuf, (char *)(port->identify+10), 21);
-+	strscpy(cbuf, (char *)(port->identify + 10), 21);
- 	dev_info(&port->dd->pdev->dev,
- 		"Serial No.: %s\n", cbuf);
- 
--	strlcpy(cbuf, (char *)(port->identify+23), 9);
-+	strscpy(cbuf, (char *)(port->identify + 23), 9);
- 	dev_info(&port->dd->pdev->dev,
- 		"Firmware Ver.: %s\n", cbuf);
- 
--	strlcpy(cbuf, (char *)(port->identify+27), 41);
-+	strscpy(cbuf, (char *)(port->identify + 27), 41);
- 	dev_info(&port->dd->pdev->dev, "Model: %s\n", cbuf);
- 
- 	dev_info(&port->dd->pdev->dev, "Security: %04x %s\n",
-@@ -1421,13 +1421,13 @@ static void mtip_dump_identify(struct mtip_port *port)
- 	pci_read_config_word(port->dd->pdev, PCI_REVISION_ID, &revid);
- 	switch (revid & 0xFF) {
- 	case 0x1:
--		strlcpy(cbuf, "A0", 3);
-+		strscpy(cbuf, "A0", 3);
- 		break;
- 	case 0x3:
--		strlcpy(cbuf, "A2", 3);
-+		strscpy(cbuf, "A2", 3);
- 		break;
- 	default:
--		strlcpy(cbuf, "?", 2);
-+		strscpy(cbuf, "?", 2);
- 		break;
- 	}
- 	dev_info(&port->dd->pdev->dev,
-diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
-index e1d080f680ed..c76e0148eada 100644
---- a/drivers/block/ps3vram.c
-+++ b/drivers/block/ps3vram.c
-@@ -745,7 +745,7 @@ static int ps3vram_probe(struct ps3_system_bus_device *dev)
- 	gendisk->flags |= GENHD_FL_NO_PART;
- 	gendisk->fops = &ps3vram_fops;
- 	gendisk->private_data = dev;
--	strlcpy(gendisk->disk_name, DEVICE_NAME, sizeof(gendisk->disk_name));
-+	strscpy(gendisk->disk_name, DEVICE_NAME, sizeof(gendisk->disk_name));
- 	set_capacity(gendisk, priv->size >> 9);
- 	blk_queue_max_segments(gendisk->queue, BLK_MAX_SEGMENTS);
- 	blk_queue_max_segment_size(gendisk->queue, BLK_MAX_SEGMENT_SIZE);
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 92cb929a45b7..be435304af29 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -499,7 +499,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
- 	}
- 
--	strlcpy(file_name, buf, PATH_MAX);
-+	strscpy(file_name, buf, PATH_MAX);
- 	/* ignore trailing newline */
- 	sz = strlen(file_name);
- 	if (sz > 0 && file_name[sz - 1] == '\n')
-@@ -1031,7 +1031,7 @@ static ssize_t comp_algorithm_store(struct device *dev,
- 	char compressor[ARRAY_SIZE(zram->compressor)];
- 	size_t sz;
- 
--	strlcpy(compressor, buf, sizeof(compressor));
-+	strscpy(compressor, buf, sizeof(compressor));
- 	/* ignore trailing newline */
- 	sz = strlen(compressor);
- 	if (sz > 0 && compressor[sz - 1] == '\n')
-@@ -1952,7 +1952,7 @@ static int zram_add(void)
- 	if (ret)
- 		goto out_cleanup_disk;
- 
--	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
-+	strscpy(zram->compressor, default_compressor, sizeof(zram->compressor));
- 
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
+Of course, the moment you put such tests in a VM on a host that is
+running other VMs nothing is ever idle and inodegc delays are
+outside the control of the guest kernel/filesystem....
+
+Cheers,
+
+Dave.
 -- 
-2.35.1
-
+Dave Chinner
+david@fromorbit.com
