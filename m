@@ -2,72 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C956C00140
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 10:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E1FDC00140
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 10:55:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241368AbiHRKUR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 06:20:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35656 "EHLO
+        id S244188AbiHRKz4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 06:55:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239631AbiHRKUQ (ORCPT
+        with ESMTP id S243613AbiHRKzz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 06:20:16 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5134B71BC3;
-        Thu, 18 Aug 2022 03:20:14 -0700 (PDT)
-Received: from fsav112.sakura.ne.jp (fsav112.sakura.ne.jp [27.133.134.239])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 27IAK98G072182;
-        Thu, 18 Aug 2022 19:20:09 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav112.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp);
- Thu, 18 Aug 2022 19:20:09 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav112.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 27IAK9M8072179
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 18 Aug 2022 19:20:09 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <0c65db46-ec21-a3e5-87a8-6b3f2fadb607@I-love.SAKURA.ne.jp>
-Date:   Thu, 18 Aug 2022 19:20:08 +0900
+        Thu, 18 Aug 2022 06:55:55 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018058C474
+        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 03:55:54 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id j7so1301059wrh.3
+        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 03:55:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=ksVlvId0YTvF7f5xsAy5+jgvuwgxLHE1yytq8bAKYaA=;
+        b=JwGn1tlEiTvx4lWffF6NUw9+0IoCuAHQvv07kkWztCYcwH3SvtmFoIANZXhiEeK7tZ
+         WCHajadjNtgmLV6V4feu3x+R9SMg15BN+mibUgzlvih7G4dIGSLrKO84+T2p9aFZyUk4
+         DyIeMHSC50D7qgvDMbpruTTJm9gEd282VhEy6e3BU7Siq0UDMajReZWMFZTp2h/hNust
+         qfcvlPaaDiAX6tioS8EY/c+uyTzIfVz5D09F8yOrB5e8Y+XGb6MTnkZCl59y5a3+5Sun
+         JERH0Y4jNxRPLfqjXzQyXJJ87kSjdVh2HDjWzUE9oGFoNcAe3PJOgFCD1Mv9yj+lz53o
+         94RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=ksVlvId0YTvF7f5xsAy5+jgvuwgxLHE1yytq8bAKYaA=;
+        b=d5u1vj9ethcp7akNMHzdJPKXQCgJzyZbWjaK72qge4gTzItaINn2WdmT6AUE2XtQ0v
+         jABWuwXMWLRFC8wMKxNkK643YPuHsOfilgr2M72fBf9vOw6YZki1RxQ1/dVb++7JAjga
+         ju89PYJ1L9vLrr1hgxbP/m3sPaDJGtQsOytVaDxanBZZ0qpZBVmo0d+ruaIpv16/EfIg
+         IeD2cGJpAXA/5+efgvDFtmg/s/q6M0zpX4paAtI30o9O91nucEIjJSsTYW/lvZxFQ7jr
+         jDVd0IaEtfXjvbfRWrETyXTnLc8DS38T1lrppfUl43Tn3mWt3SAouBJNKZYQtReGtA5R
+         LCSQ==
+X-Gm-Message-State: ACgBeo28FWUWhDq8AFQP9djTQDFZin4NwzUlG2oL9T+aaTQvkAtmDjfh
+        s7VP+hE7pd6dA0So0rYnQPves5O4I8ZP/g==
+X-Google-Smtp-Source: AA6agR5jj8xkU6PWcW4g61f0NhkvUFUpVAkk8YdECQc4LeQ4zip2SWFIBCDlF7nLabOylu3eRH00zA==
+X-Received: by 2002:a5d:434a:0:b0:21d:aa7e:b1bb with SMTP id u10-20020a5d434a000000b0021daa7eb1bbmr1378880wrr.619.1660820153498;
+        Thu, 18 Aug 2022 03:55:53 -0700 (PDT)
+Received: from lb01533.fkb.profitbricks.net ([85.214.13.132])
+        by smtp.gmail.com with ESMTPSA id j25-20020a05600c1c1900b003a5ce167a68sm5114085wms.7.2022.08.18.03.55.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Aug 2022 03:55:53 -0700 (PDT)
+From:   Md Haris Iqbal <haris.iqbal@ionos.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com
+Subject: [PATCH for-next 0/1] Add trace event support to RNBD
+Date:   Thu, 18 Aug 2022 12:55:50 +0200
+Message-Id: <20220818105551.110490-1-haris.iqbal@ionos.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [linux] [5.19.0] task hung for indefinite time with call traces
- when rebooted with Kexec
-Content-Language: en-US
-To:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Cc:     abdhalee@linux.vnet.ibm.com, mputtash@linux.vnet.com,
-        sachinp@linux.vnet.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <4c93ce0b-8e04-1f03-e4ce-7c763719169c@linux.vnet.ibm.com>
- <6b5267ee-9372-3862-614a-298f7bd9ae60@I-love.SAKURA.ne.jp>
- <0d1621b1-6654-34f1-9630-7cf5881a8eaf@linux.vnet.ibm.com>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <0d1621b1-6654-34f1-9630-7cf5881a8eaf@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Please check https://elinux.org/images/1/14/Linuxkerneldebugging.pdf for example.
+Hi Jens,
 
-e.g. ./scripts/faddr2line vmlinux scsi_remove_target+0x314/0x390
+Please consider to include following change to the next merge window.
 
-On 2022/08/18 18:43, Tasmiya Nalatwad wrote:
-> Please find the location in source code from where i am seeing the call traces generating
-> 
-> On 8/6/22 15:30, Tetsuo Handa wrote:
->> On 2022/08/05 15:54, Tasmiya Nalatwad wrote:
->>> Greetings,
->>>
->>> [linux] [5.19.0] task hung for indefinite time with call traces when rebooted with Kexec, A restart is required to recover the machine.
->>
->> kexec is waiting for workqueues ("kworker/3:1" and "kworker/3:0") to complete.
->> If this problem happens only when rebooting with kexec, something in kexec path
->> might be preventing these workqueues from completing.
->>
->> Anyway, please repost with locations in source code like syzbot report does.
+It adds trace event to rnbd-srv
+
+Santosh Pradhan (1):
+  block/rnbd-srv: Add event tracing support
+
+ drivers/block/rnbd/Makefile         |   5 +-
+ drivers/block/rnbd/rnbd-srv-trace.c |  17 +++
+ drivers/block/rnbd/rnbd-srv-trace.h | 207 ++++++++++++++++++++++++++++
+ drivers/block/rnbd/rnbd-srv.c       |  19 ++-
+ 4 files changed, 241 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/block/rnbd/rnbd-srv-trace.c
+ create mode 100644 drivers/block/rnbd/rnbd-srv-trace.h
+
+-- 
+2.25.1
 
