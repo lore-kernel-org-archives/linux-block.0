@@ -2,114 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E52C3F6B0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 01:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6334C25B08
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 01:26:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234548AbiHRBXo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 21:23:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34214 "EHLO
+        id S242573AbiHRB02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 21:26:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233588AbiHRBXo (ORCPT
+        with ESMTP id S233625AbiHRB01 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 21:23:44 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5B59FA87;
-        Wed, 17 Aug 2022 18:23:42 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4M7RvN3D9nzlGFq;
-        Thu, 18 Aug 2022 09:22:24 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgBnu_iclP1ikMHzAQ--.33655S3;
-        Thu, 18 Aug 2022 09:23:40 +0800 (CST)
-Subject: Re: [PATCH v7 1/9] blk-throttle: fix that io throttle can only work
- for single bio
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
- <20220802140415.2960284-2-yukuai1@huaweicloud.com>
- <Yvvx+/d2+OMROUOe@slm.duckdns.org>
- <712e0f29-94ba-d3d3-ce21-cba4d6092008@huaweicloud.com>
- <Yv0qbDR+cxKeZ3nD@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <83c8b253-2ebb-5af6-8ce1-6dc3b84cf182@huaweicloud.com>
-Date:   Thu, 18 Aug 2022 09:23:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 17 Aug 2022 21:26:27 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC01A1A64
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 18:26:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1660785987; x=1692321987;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=o7hlT8+mLCjbW3IqeANXZCdmPwcudZha5JZ9LEKR9nI=;
+  b=kJGRB7eAvUhccX25Lua3Op+MFmrcoIwVxHzb0nwjFG1oyLNbwHz9W2Ne
+   Jvwo9MJX394X5g5s7Ez9kmRPR05rk4wdQbV5ryJ78F8BjISmy3R9VF3aW
+   wpue+ayoaLqrOHtHuT6sPssjE/TSRPEuGwvc62uCRoEzDi9GpwjGDvm66
+   A3hPLtzl+p19reE5g15/1lRgo4GOtWEx4d+/e/K15Ns0MfF8rFdu5A0Or
+   iJriMT2odhtGQZfAsM++IXz8lHK86xlX6M6wX3P4aW6WcN4pjAqzTXWRn
+   qXcbsFOWquLmh0OsWF0dQUwK5rPtOr9ZXL0xNyYaMl9HOWoli7zkI2LMI
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,244,1654531200"; 
+   d="scan'208";a="321085636"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Aug 2022 09:26:26 +0800
+IronPort-SDR: URK9ocawuvbzMr8lFlaS8k9aGBXtTodDnMXz75y1syIbnZOnzvE6SARY/y5V1bHwOd/ZnwP8H9
+ cLiRDWfoMdhHQVy7Xakcqpi6z/5ETA12Z+OL00rCoGEHim9zls/sDQtrIcGNmg/HrKfKEhwR3d
+ oR51L3jU7HZ/9cMnPLJYMBu2PcdnWRdFIMolwrAQkGu/nfdfsl/nPqvVl2EhS3wnGSbueePLwz
+ LeNpnKI0sjFMzHBqkfHxovg+j9upiaC3n2yl1xH8dTNUnr5xUF/804oQJtLRtYudctIgPEnOUX
+ VYBr1Hh0i+8lL3SmlZuI66dL
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 17:41:53 -0700
+IronPort-SDR: BQ5UylKMkdgdM3ef+GbfnWRXLQTpC8d16OmWrbAdDHRuvwO992cJR1/pkuevUU+yzZyHBC7zNH
+ A1Rfo8lBd5xcDS51ukw7VlLWdkXpRD6piDWHoGpr28g7Au2++rCCUvR/tU2oVGjUJsJjNj+YWe
+ DsKYo8uP4WJ58Rk4fd+H6q3oyvWEIFd+HpE3Y9xYqZZ3PXBfYfIiGAbKfpXX3+4x4++AzssR5c
+ DROkZzTNl2ZRsY4IDTa6RGqapdzj36VVDKMkEieZV9GLsWXJnqEChqlVeMk02x3nt+4N2svicz
+ IOU=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
+  by uls-op-cesaip01.wdc.com with ESMTP; 17 Aug 2022 18:26:26 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 0/6] fix module check issues
+Date:   Thu, 18 Aug 2022 10:26:18 +0900
+Message-Id: <20220818012624.71544-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-In-Reply-To: <Yv0qbDR+cxKeZ3nD@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBnu_iclP1ikMHzAQ--.33655S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw1rtw43tFyxAw1xKryDKFg_yoW8Ar18pF
-        WIq3WktF4qyF1293Z7tw129Fnayr4rZr1Yyr98Gr12y34UGr1SkrWIqF45urs3ur4kCa1j
-        qF48tF98G3y5ZFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
-        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-        BIdaVFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Tejun!
+Current blktests have unexpected test case failures caused by module
+availability checks. This series addresses two issues related to module check
+and fix the failures.
 
-ÔÚ 2022/08/18 1:50, Tejun Heo Ð´µÀ:
-> Hello,
-> 
-> On Wed, Aug 17, 2022 at 09:13:38AM +0800, Yu Kuai wrote:
->>> So, as a fix for the immediate problem, I guess this might do but this feels
->>> really fragile. How can we be certain that re-entering only happens because
->>> of splitting? What if future core development changes that? It seems to be
->>> solving the problem in the wrong place. Shouldn't we flag the bio indicating
->>> that it's split when we're splitting the bio so that we only limit them for
->>> iops in the first place?
->>
->> Splited bio is tracked in __bio_clone:
-> 
-> As the word is used in commit messages and comments, the past perfect form
-> of the verb "split" is "split". It looks like "splitted" is used in rare
-> cases but dictionary says it's an archaic form.
+The first issue is caused by module load by _have_driver(). When this helper
+function checks the specified module (or driver) is available, it loads the
+module using modprobe command. It leaves the module loaded and affects following
+test cases. The first patch addresses this issue. The second patch avoids side
+affects of the first patch on nbd test cases.
 
-Ok, thanks for pointing it out, I'll change that in next iteration.
-> 
->> if (bio_flagged(bio_src, BIO_THROTTLED))
->> 	bio_set_flag(bio, BIO_THROTTLED);
->>
->> And currenty, the iops limit and bps limit are treated differently,
->> however there are only one flag 'BIO_THROTTLED' and they can't be
->> distinguished.
->>
->> Perhaps I can use two flags, for example BIO_IOPS_THROTTLED and
->> BIO_BPS_THROTTLED, this way only iops limit can be handled and bps
->> limit can be skipped for splited bio.
->>
->> What do you think?
-> 
-> I think the code would be a lot more intuitive and less fragile if we used
-> two flags but the bits in the bi_flags field are a scarce resource
-> unfortunately. Even then, I think the right thing to do here is using two
-> flags.
+The second issue is in _have_modules(). Recently, _have_driver() helper function
+was introduced to provide similar but different feature from _have_modules().
+However, it turned out that _have_modules() is not working as expected and does
+exactly same check as _have_driver(). The third patch fixes _have_module() to
+work as expected. This change makes block/001 and srp test group skipped.
+Following three patches adjust skip conditions not to skip the test cases.
 
-Yes, the field 'bio->bi_flags' is unsigned short, and there are only two
-bits left. I'll use the new sulution which will acquire a new bit.
+Changes from v1:
+* 1st patch: added Reviewed-by tag
+* 4th patch: added changes in new test cases
 
-Thanks,
-Kuai
-> 
-> Thanks.
-> 
+Shin'ichiro Kawasaki (6):
+  common/rc: avoid module load in _have_driver()
+  nbd/rc: load nbd module explicitly
+  common/rc: ensure modules are loadable in _have_modules()
+  common,tests: replace _have_driver() with _have_drivers()
+  block/001: use _have_drivers() in place of _have_modules()
+  srp/rc: allow test with built-in sd_mod and sg drivers
+
+ common/null_blk |  2 +-
+ common/rc       | 43 ++++++++++++++++++++++++++++++++++++-------
+ tests/block/001 |  3 ++-
+ tests/nbd/rc    | 14 +++++++++++---
+ tests/nvme/rc   | 12 +++++-------
+ tests/scsi/rc   |  2 +-
+ tests/srp/rc    | 10 ++++++----
+ tests/zbd/009   |  2 +-
+ tests/zbd/010   |  2 +-
+ 9 files changed, 64 insertions(+), 26 deletions(-)
+
+-- 
+2.37.1
 
