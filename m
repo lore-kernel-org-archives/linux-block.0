@@ -2,88 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F545C00140
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 13:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EF3C00140
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 13:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244796AbiHRNkB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 09:40:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46982 "EHLO
+        id S244700AbiHRNur (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 09:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244583AbiHRNjR (ORCPT
+        with ESMTP id S245307AbiHRNue (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 09:39:17 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466AE5F12E
-        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 06:39:16 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id y187so1112502iof.0
-        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 06:39:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc;
-        bh=TMQSZUCZC8D0qnlqKDQ8wCig9O22hkmyWeg060C7Dqw=;
-        b=iAOlAo6JwIKEc1AT6NzgBjmRJqXf3ZYQBfB+0/4GExt7Z3TvLuQl3CiKLSaxR+qH6J
-         Khrk+rPGCGJkIvlvtTHx+OopONEwliQtqc/t1LQK8wll6ZsHmLgittD1DArkCTxkkBj7
-         Sh1kmF6q1SClD5gtbVTlbebQibXo+50J4CfU5j+bAWYMaxtKEUTcDlNHuusirdoPH9L4
-         kZdg9EN1W/1bwvHrTUB5+3Jqu5rgw0rveN5fbdvNN/Gxnb2GQSUAwo6YvWCxx7diKjeo
-         GHAR5JuixydbMfHsMbC88RlmEyDTDj67zO42cMJKPoZdlaQfnJ9Be3B9ET+IUYEqlni5
-         n5MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=TMQSZUCZC8D0qnlqKDQ8wCig9O22hkmyWeg060C7Dqw=;
-        b=bqAzFWmtv647mmlKBSQY1GlOoWV9B+sO+GRG5kskyx+wHwfG9Wb3cWBMdSf9wCA1ix
-         NalPpbJzEfh1sIeCOwVCVZF06uX7JsWiwZ0w92akv3cm0uN6pa12hwkValEFR4LDtlv/
-         mXoBvUP3bZ0j2p8/Y7V0km1T0ELrT+PuJ8QWQVGXxoILshwuaUWJmr5Qcg9Nj8fFquBB
-         RCQDs3Oy2XxxD9MdEfyo/UzbdB5OvIblwxlwJiGN4XjAAQ0rJQrlPnWEVq62vRQPfcX3
-         cBwdiytEXKzv6774vAAK5lOQ1h1oPUg+Rm+X2TwWxoyQ+fN3ZwZRF5Gl3hf/DBHrGOrx
-         VNvQ==
-X-Gm-Message-State: ACgBeo0kcRRRQccshZSlbRhQm0lbZKNHIkUzXr+AXZAfniCOcYQgGhMF
-        f8zUbZF8VkwJUCaadG2uxmOGgEeAZDHbBg==
-X-Google-Smtp-Source: AA6agR43uRqzzOVYll13LQflWopeR9e3K+6odb3eDKggDjHWpYI0yIujnbq516dQV2LKbWQ/RhmnUg==
-X-Received: by 2002:a5d:844d:0:b0:67c:a76d:85cd with SMTP id w13-20020a5d844d000000b0067ca76d85cdmr1426124ior.191.1660829954597;
-        Thu, 18 Aug 2022 06:39:14 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id i28-20020a056e021d1c00b002e0f21f0be4sm655007ila.27.2022.08.18.06.39.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Aug 2022 06:39:14 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     yuyufen@huaweicloud.com
-Cc:     yuyufen@huawei.com, linux-block@vger.kernel.org,
-        yukuai3@huawei.com, ming.lei@redhat.com
-In-Reply-To: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
-References: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
-Subject: Re: [PATCH RESEND v2] blk-mq: run queue no matter whether the request is the last request
-Message-Id: <166082995377.9130.11768988688286847060.b4-ty@kernel.dk>
-Date:   Thu, 18 Aug 2022 07:39:13 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Thu, 18 Aug 2022 09:50:34 -0400
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF4FBB9;
+        Thu, 18 Aug 2022 06:50:29 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id B24AB580847;
+        Thu, 18 Aug 2022 09:50:28 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute3.internal (MEProxy); Thu, 18 Aug 2022 09:50:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        colorremedies.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660830628; x=
+        1660834228; bh=JrWFwbCtn41niA34uNUTGzKOa60xVpzU+xS6F63mBuk=; b=x
+        genQHvVViPsfshnTiNUWobTMSLkmLCImNPOcT3Dc0xK9xoQ1J8XQC1W8fFIIS4lK
+        P/4wWrOchGCVlf0ogXih7crYxV3pTvaoilztu7Z7UlcucO9w01lqWkvdKntYT3qu
+        VMgUiV6A0hPIJ4A76qkxEw6HDo6ZUl//Wfnym/evbQcxAweJFVuMB44sSxbUcjVf
+        gYx3iuQq9ZhkenTdonmjrbct87c9jyuZlhM9kY+PUiorhZnjNwJ+4P4WQjMyzVQx
+        YlX/n1T4s91l9/CThxc4cYVPRd/2Iwf1pJwWPzljxAEOrOp0PcvI955jVT/wO+es
+        Dgb6ZBQv9OG2MiC1cDJxA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1660830628; x=1660834228; bh=JrWFwbCtn41niA34uNUTGzKOa60x
+        VpzU+xS6F63mBuk=; b=yStHHx4uC/vnnp1i9wGZk94xvh/jiSULPJjeC1e5NG0a
+        s0aQ1HkP2kis1v5o7RPvQxLlRih3YuGsLVp2KMvnKvboPpHFGK1aaHQwKFrX9wBy
+        k2/kYlydGRXI522YI0wFhw/PnbR5nl4djeiF3KNipeVGOivqzdilsON2iekuGWNT
+        WkV14IvAXKZ/2Hq+yeg2m9KOtIp5IVXqSCTSHIBauIymtCN/6Gq9sipqYcsqqJCk
+        S4647BZkNZkRzYcO/n3mZuAmIXSfT2n91pLHNsYDOWrbNUHxnoLLN3ZH5TUg83mK
+        bxIkNIxKjPdDSL6lyM1pqbJgSWhNhlc4VJiPX6xyYQ==
+X-ME-Sender: <xms:pEP-YnHDxWKDkyDnHD5gon8nELjEuDVuJMguC8NzulIcaBfxSjyPjg>
+    <xme:pEP-YkXZ7S1B9xfXvPdClTnnIWc7-VwldtsQzmbPk8S_apn2iuEN222hoJWk9Qz4E
+    Uy6yl5sifj-eYBzOmE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehledggeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedfvehh
+    rhhishcuofhurhhphhihfdcuoehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtoh
+    hmqeenucggtffrrghtthgvrhhnpefgvdeukedtfefgfefgtdelffdvieeltefgfedutdff
+    leeuieevieevkeehtdehueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtohhm
+X-ME-Proxy: <xmx:pEP-YpLYdVibr6u3RS0w-JWWfItk_DsFPLdRd__CKfGE_zmIBk1fqw>
+    <xmx:pEP-YlHOOxKf9tpuXSfAYp7feNTi3iC4O0I-ryfuD6u1hQHRKbpmUg>
+    <xmx:pEP-YtViwys_vKarLCXa1KxAlkiwOHTDPxvUhLP8U5pPh3gHA-SNfQ>
+    <xmx:pEP-YsE-xMoxK7S8p6ZNGeFf6A3phPeIGofE2plBDgH1_zqz05s4fQ>
+Feedback-ID: i06494636:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 28CF11700082; Thu, 18 Aug 2022 09:50:28 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
+Mime-Version: 1.0
+Message-Id: <aadeb600-4e3a-4b69-bc17-fd2918c5b061@www.fastmail.com>
+In-Reply-To: <Yv3NIQlDL0T3lstU@T590>
+References: <Yv0A6UhioH3rbi0E@T590>
+ <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
+ <Yv0KmT8UYos2/4SX@T590>
+ <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
+ <Yv2P0zyoVvz35w/m@T590>
+ <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
+ <Yv2w+Tuhw1RAoXI5@T590>
+ <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
+ <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
+ <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
+ <Yv3NIQlDL0T3lstU@T590>
+Date:   Thu, 18 Aug 2022 09:50:07 -0400
+From:   "Chris Murphy" <lists@colorremedies.com>
+To:     "Ming Lei" <ming.lei@redhat.com>
+Cc:     "Nikolay Borisov" <nborisov@suse.com>,
+        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
+        "Paolo Valente" <paolo.valente@linaro.org>,
+        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "Josef Bacik" <josef@toxicpanda.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 3 Aug 2022 10:33:55 +0800, Yufen Yu wrote:
-> From: Yufen Yu <yuyufen@huawei.com>
-> 
-> We do test on a virtio scsi device (/dev/sda) and the default mq
-> scheduler is 'none'. We found a IO hung as following:
-> 
-> blk_finish_plug
->   blk_mq_plug_issue_direct
->       scsi_mq_get_budget
->       //get budget_token fail and sdev->restarts=1
-> 
-> [...]
 
-Applied, thanks!
 
-[1/1] blk-mq: run queue no matter whether the request is the last request
-      commit: d3b38596875dbc709b4e721a5873f4663d8a9ea2
+On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
 
-Best regards,
+>
+> Also please test the following one too:
+>
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 5ee62b95f3e5..d01c64be08e2 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx 
+> *hctx, struct list_head *list,
+>  		if (!needs_restart ||
+>  		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
+>  			blk_mq_run_hw_queue(hctx, true);
+> -		else if (needs_restart && needs_resource)
+> +		else if (needs_restart && (needs_resource ||
+> +					blk_mq_is_shared_tags(hctx->flags)))
+>  			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+> 
+>  		blk_mq_update_dispatch_busy(hctx, true);
+>
+
+Should I test both patches at the same time, or separately? On top of v5.17 clean, or with b6e68ee82585 still reverted?
+
 -- 
-Jens Axboe
-
-
+Chris Murphy
