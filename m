@@ -2,139 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA72EC00140
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 18:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B72C00140
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 20:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345012AbiHRSxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 14:53:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
+        id S1345521AbiHRUIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 16:08:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345235AbiHRSw6 (ORCPT
+        with ESMTP id S1345656AbiHRUHq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 14:52:58 -0400
-Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585E9C2E84;
-        Thu, 18 Aug 2022 11:52:57 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 842235801B4;
-        Thu, 18 Aug 2022 14:52:56 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Thu, 18 Aug 2022 14:52:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660848776; x=
-        1660852376; bh=Ts6SgEwcKB+gnnxX0Mg89SPTORlM9/ZfOczJIVc1pgY=; b=s
-        jHZfKEnrAWU7KnQmcdIQeoJaQKZ9a7y4Lzssq43mdkqlnmN38vMUWHeAVGl/92p9
-        EF5j2pfU/3ibfgMCIu+DPLxxLbhqlPCxe1krQs+xeoO/U/nB3NdR5hE3TXYXM7wX
-        ybnhDKA4MwlnPQ84ekJb8uD0ladMlnMxQol4eKsdHhZVXH76m85+kDT72CanzoOl
-        vURpyj2wIbWOaocr7PxF6u9BiusjRxYGHmGWqCNEWBrTZOWWRnfPL+xCcrDtyPv1
-        Q//iIxRkuneguH1OZX+KoE2msbjl33EIuqay+K6L10+1t5KqPqog/sYFMVzgWL0t
-        q/jvnk0S2Ww9xE8N98+kg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660848776; x=1660852376; bh=Ts6SgEwcKB+gnnxX0Mg89SPTORlM
-        9/ZfOczJIVc1pgY=; b=LHrMOXycIBvofkcqKnNkKZGsoW75RVE5rbIm62q68gef
-        hgNUfn66xH9tYrXJJj7hT4Uz+n0RSsuo5wHwjPeBycW6myH75JFXzd3HC9BhnxkJ
-        G3xRsIyQz+jRXb1BIcs07qYtffwjbR90MtF/mHBoTaxBYJiYJdR961qAAUmp8l/0
-        kpF+wQxfMIt9d0cgf0Wrji8rME8JBarxujmwI42L8PZw6IgLG//U1rMKt1HuqjII
-        G0mAqPR0Pc9/hIBt6try1mTR2JEq2D8Cjxxf3Jdo/0pyiZ/EhjkrYRzoJY0UVlot
-        yFNDPxRp4+VFE/QA3s6Jj9R3naFTKbpXxFfEUAbSag==
-X-ME-Sender: <xms:h4r-YmQ9WP2krC5G1entLJ7EUPya8p4CoU9562V313IWfSqAGQ7wYg>
-    <xme:h4r-YrwX4L2Xo8eZA1rkNZxVfMbkgQlG9SM6_7s3duRx0u5ilrUsIe3iOkVsHMd9u
-    N6Mf7i-Y_2T13YQCUk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehledguddtgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefofgggkfgjfhffhffv
-    vefutgesthdtredtreertdenucfhrhhomhepfdevhhhrihhsucfouhhrphhhhidfuceolh
-    hishhtshestgholhhorhhrvghmvgguihgvshdrtghomheqnecuggftrfgrthhtvghrnhep
-    feehleeiudegueelteffueehgeektefgtdevvedufffgjedvgeevleejhfdvfefhnecuff
-    homhgrihhnpehgohhoghhlvgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgr
-    rhgrmhepmhgrihhlfhhrohhmpehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtoh
-    hm
-X-ME-Proxy: <xmx:h4r-Yj1bbQ4madkVb0dx8BXBTl3dA1aeP0_Bg0NB73CzngWa6DM_yw>
-    <xmx:h4r-YiATqKs_aiFBNkKsfRUT_YaG9Bi6INsyAP09-vwxXEIwIEVMLg>
-    <xmx:h4r-YviogrXyWGUyIkP0dcrda1UG_9Xbc3abPNgOXpXgvjR3mRT6Rw>
-    <xmx:iIr-YvgIryn7QxtJm1dMEBop9bbI4FM64_OAQUUsWm2E0QVeCs0UWQ>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id DD34E1700082; Thu, 18 Aug 2022 14:52:55 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
-Mime-Version: 1.0
-Message-Id: <bfaa8b43-519f-4e4c-b04b-a37b0ee9babf@www.fastmail.com>
-In-Reply-To: <Yv3K4G/Sv2KDEqif@T590>
-References: <Yv0A6UhioH3rbi0E@T590>
- <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
- <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
- <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
- <Yv2w+Tuhw1RAoXI5@T590>
- <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
- <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
- <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
- <Yv3K4G/Sv2KDEqif@T590>
-Date:   Thu, 18 Aug 2022 14:52:34 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Ming Lei" <ming.lei@redhat.com>
-Cc:     "Nikolay Borisov" <nborisov@suse.com>,
-        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
-        "Paolo Valente" <paolo.valente@linaro.org>,
-        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "Josef Bacik" <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Content-Type: text/plain
+        Thu, 18 Aug 2022 16:07:46 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E38D31D0
+        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 13:02:30 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id w14so2381071plp.9
+        for <linux-block@vger.kernel.org>; Thu, 18 Aug 2022 13:02:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=dRbRKHviGp/b7CwYVDBVCa/DsxyS1q3SURr6YJnN5E8=;
+        b=H8HJei8UInhN7JB9q2x14lOKy254AUjnRL+zOrUFV8kJn61l/wK+lLUMacQg4Hrv7g
+         20Ill8co78+dzWWzeNxGl8qe/rDdcIy9yGfEIxGWdbdzwY2+Otz/hOaQNKzp/+HKqILK
+         onC+4gkLwGoMIbRkNrauLjgv65LZGVTBWYq1rFObCts87Nk5XquQ7RA/lzY/0gvS6OIF
+         tWr0uOMmjP8pGXAlbW8blDnAL46EyST3eVGmym55LeXXOdWYX8vwuwO4yiZeyk1b2mOu
+         aOvzKuZ4evYiamg0RbpCGi37MQBQHSWKoMT6X2bzt1w52CWNO7BO08BFE4nfYrOacQSD
+         i1+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=dRbRKHviGp/b7CwYVDBVCa/DsxyS1q3SURr6YJnN5E8=;
+        b=Eyc5XudkQnw0JCOqmW4FCOzawOkI2rwd8VnlG5zagm1ntcA2Qz/nafkthd1R5JhnAv
+         5w0p5BudA+UnO7zYsgZq/7+1G3LsAi/aD9VL3UP3qL/iM+YaM7AY0Giv3KhGuCnUs3DE
+         ARKGGdro9/hef2zZEsYX5Tu7fcIHfVlz/BrGqM07VQ1THhObb3Fn+kBwATLvDTS9VJaX
+         rQQqMqyMmh9eXozFD9kZqBzpmVAJUGF2dedknxFJ2ZIjYd3pgjTEq9jDG0HK3RvZXRr3
+         25LDyNmyXyQ1fuzuNG708CpouEUab8s7QxDXMcRHYrizTbIE2Y/YcV31uDprowsIFmHE
+         U+kw==
+X-Gm-Message-State: ACgBeo2ik+o8SZStRXkqGnYg9K5JoArBWSuN7ftRUXtV5a4zJIiA6B7B
+        GbuZAYHjxFI/SMU4E6VAHPES9jDhrzk=
+X-Google-Smtp-Source: AA6agR4mJyk/dxKAS2p7LMwSDIrWs7wPB9Qi413Dv0gSukYuoX+n5fAs4eyMdVTtUmlLd/XFYvG/qQ==
+X-Received: by 2002:a17:90b:1943:b0:1f7:b63e:60db with SMTP id nk3-20020a17090b194300b001f7b63e60dbmr10344805pjb.241.1660852932761;
+        Thu, 18 Aug 2022 13:02:12 -0700 (PDT)
+Received: from [192.168.51.14] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id s23-20020a170902a51700b0016909be39e5sm1740417plq.177.2022.08.18.13.02.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Aug 2022 13:02:11 -0700 (PDT)
+Message-ID: <e17212c6-d7dc-514e-e51d-ac818863a80c@gmail.com>
+Date:   Thu, 18 Aug 2022 13:02:08 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH blktests v2 1/6] common/rc: avoid module load in
+ _have_driver()
+Content-Language: en-US
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20220818012624.71544-1-shinichiro.kawasaki@wdc.com>
+ <20220818012624.71544-2-shinichiro.kawasaki@wdc.com>
+From:   Bart Van Assche <bart.vanassche@gmail.com>
+In-Reply-To: <20220818012624.71544-2-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On Thu, Aug 18, 2022, at 1:15 AM, Ming Lei wrote:
-> On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
->> 
->> 
->> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
->> > On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
->> >> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
->> >>
->> >>> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
->> 
->> Same boot, 3rd log. But the load is above 300 so I kinda need to sysrq+b soon.
->> 
->> https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=sharing
->> 
->
-> Please test the following patch and see if it makes a difference:
->
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index a4f7c101b53b..8e8d77e79dd6 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -44,7 +44,10 @@ void __blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
->  	 */
->  	smp_mb();
+On 8/17/22 18:26, Shin'ichiro Kawasaki wrote:
+> The helper function _have_driver() checks availability of the specified
+> driver, or module, regardless whether it is loadable or not. When the
+> driver is loadable, it loads the module for checking, but does not
+> unload it. This makes following test cases fail.
 > 
-> -	blk_mq_run_hw_queue(hctx, true);
-> +	if (blk_mq_is_shared_tags(hctx->flags))
-> +		blk_mq_run_hw_queues(hctx->queue, true);
-> +	else
-> +		blk_mq_run_hw_queue(hctx, true);
->  }
+> Such failure happens when nvmeof-mp test group is executed after nvme
+> test group with tcp transport. _have_driver() for tcp transport loads
+> nvmet and nvmet-tcp modules. nvmeof-mp test group tries to unload the
+> nvmet module but it fails because of dependency to the nvmet-tcp module.
 > 
->  static int sched_rq_cmp(void *priv, const struct list_head *a,
+> To avoid the failure, do not load module in _have_driver() using -n
+> dry run option of the modprobe command. While at it, fix a minor problem
+> of modname '-' replacement. Currently, only the first '-' in modname is
+> replaced with '_'. Replace all '-'s.
+> 
+> Fixes: e9645877fbf0 ("common: add a helper if a driver is available")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   common/rc | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/common/rc b/common/rc
+> index 01df6fa..8150fee 100644
+> --- a/common/rc
+> +++ b/common/rc
+> @@ -30,9 +30,10 @@ _have_root() {
+>   
+>   _have_driver()
+>   {
+> -	local modname="${1/-/_}"
+> +	local modname="${1//-/_}"
+>   
+> -	if [ ! -d "/sys/module/${modname}" ] && ! modprobe -q "${modname}"; then
+> +	if [[ ! -d "/sys/module/${modname}" ]] &&
+> +		   ! modprobe -qn "${modname}"; then
+>   		SKIP_REASONS+=("driver ${modname} is not available")
+>   		return 1
+>   	fi
 
+There are two (unrelated?) changes in this patch but only one change has 
+been explained in the patch description :-(
 
-I still get a stall. By the time I noticed it, I can't run any new commands (they just hang) so I had to sysrq+b. Let me know if I should rerun the test in order to capture block debug log.
-
-
--- 
-Chris Murphy
+Bart.
