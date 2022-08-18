@@ -2,145 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C0FC25B08
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 03:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FDEC25B08
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 03:33:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243103AbiHRDZE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 23:25:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47196 "EHLO
+        id S236181AbiHRDc7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 23:32:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242748AbiHRDZD (ORCPT
+        with ESMTP id S238701AbiHRDc6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 23:25:03 -0400
+        Wed, 17 Aug 2022 23:32:58 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3365C961
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 20:25:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EC29018A
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 20:32:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660793100;
+        s=mimecast20190719; t=1660793576;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3MPK+GM2uD1yCea/zMrRjLKC1MQOzHK2bgMfr6/LwJY=;
-        b=FCOmCd1zTMP5ewQVtkF9vmSuU6PSbpAxg90/p2egm0jjjMQ/EyLY/Wu3Oghmyd6OZmHmOw
-        iJYltkxLzMEk3XNSBMdGOHQO3JH9hRhAwnj4ustgoShDfwc7r6PefoZE/3afJn5Z6LePKM
-        JJ40DVEghTBYKa0t21eGNOR6a7HZ4FE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-463-ZFERLax1Opu6ZvU_1l8PDQ-1; Wed, 17 Aug 2022 23:24:56 -0400
-X-MC-Unique: ZFERLax1Opu6ZvU_1l8PDQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F1EC3804197;
-        Thu, 18 Aug 2022 03:24:55 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0487E2026D4C;
-        Thu, 18 Aug 2022 03:24:46 +0000 (UTC)
-Date:   Thu, 18 Aug 2022 11:24:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     Nikolay Borisov <nborisov@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Message-ID: <Yv2w+Tuhw1RAoXI5@T590>
-References: <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
- <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
- <CAFj5m9+6Vj3NdSg_n3nw1icscY1qr9f9SOvkWYyqpEtFBb_-1g@mail.gmail.com>
- <b236ca6e-2e69-4faf-9c95-642339d04543@www.fastmail.com>
- <Yv0A6UhioH3rbi0E@T590>
- <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
- <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
- <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
+        bh=CnSkXgG5vlVmmHn7RVnWUaE/zfht4AYlOxzHk7kfQng=;
+        b=BYQIaQtIELUwdP/0meZMOByCfqB0S+gU+E5LHH4bwcEqx1h1H1J6ZzGuWMh6DLwdsUS5lE
+        rTvdaiugJb/P0RNlYTngVO+9RfU8LB7gxIFYRscOVjr2nSmOtq1cuTTahRsjUTSYfhEgQt
+        qXYC+dcKJreF9ZD/vHFMRU+fcAj7cWc=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-377-cMqkLvSvPKGic5oFADErkw-1; Wed, 17 Aug 2022 23:32:55 -0400
+X-MC-Unique: cMqkLvSvPKGic5oFADErkw-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-334ab1f0247so7141967b3.7
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 20:32:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=CnSkXgG5vlVmmHn7RVnWUaE/zfht4AYlOxzHk7kfQng=;
+        b=SELsrf4QrymsXxO8cURobqh6hpXerI+r7Ikqdce+V+e64NlF8X2LsF/hhVWHqTdYJ4
+         54RxMpX92qa7EXL7fSbhSdWL7UBzGEN/5bQfxFDmjAxR7YfTfXztVEwuQVUOWCVcPmk/
+         rhClhUv5qsrXewL2Hb2b9ABmhyAh5vUFG9/WoFgQiK7TPoc79hF3GBYoyOupqWPVtDLD
+         ey55gtUGyrOPAVVOrl5C9zwX5GbbXlc/SdXTtqIWepfkK0ym7KqhbSWWgURuhVCuAhDn
+         28PAX6j3cX2sOIypOrhal/Ozs9tyuRg5ujJ51laTbPTiGt/taf/Zkazu696xKLQXpK8+
+         DAJQ==
+X-Gm-Message-State: ACgBeo1r4MUJy/pZYJbI2j37PJopUvJuk2+KoHDDXuY9zd9hlR/aEpdX
+        I5ILXg48QsGiRQHsdGmHNITUoDQGe7xkcYaWiYHXvP7f110SqVgDaantl39gfayOxTd3LJ+HeRX
+        ZQlCHSX1ysRr7iGBI8+aJmlCAlti7Q7CE56y1Tlk=
+X-Received: by 2002:a81:5716:0:b0:335:41fc:feea with SMTP id l22-20020a815716000000b0033541fcfeeamr1081117ywb.305.1660793574898;
+        Wed, 17 Aug 2022 20:32:54 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR58Bdj0aI1r+5X89YYZ7cHcFvRu0jChH2boC2bti4hBzyVirPHL2aaj3NMT0cCcm11wzzdg4+hXaLIBCdIcgU8=
+X-Received: by 2002:a81:5716:0:b0:335:41fc:feea with SMTP id
+ l22-20020a815716000000b0033541fcfeeamr1081109ywb.305.1660793574704; Wed, 17
+ Aug 2022 20:32:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+References: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
+In-Reply-To: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Thu, 18 Aug 2022 11:32:43 +0800
+Message-ID: <CAFj5m9J71n_ZJk4NgXWqd8Wf1ELDWyMLTEHDKnMiJqOdkd+Xbg@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2] blk-mq: run queue no matter whether the request
+ is the last request
+To:     Yufen Yu <yuyufen@huaweicloud.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, yukuai3@huawei.com,
+        yuyufen@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 17, 2022 at 10:30:39PM -0400, Chris Murphy wrote:
-> 
-> 
-> On Wed, Aug 17, 2022, at 9:03 PM, Ming Lei wrote:
-> > On Wed, Aug 17, 2022 at 12:34:42PM -0400, Chris Murphy wrote:
-> >> 
-> >> 
-> >> On Wed, Aug 17, 2022, at 11:34 AM, Ming Lei wrote:
-> >> 
-> >> > From the 2nd log of blockdebugfs-all.txt, still not see any in-flight IO on
-> >> > request based block devices, but sda is _not_ included in this log, and
-> >> > only sdi, sdg and sdf are collected, is that expected?
-> >> 
-> >> While the problem was happening I did
-> >> 
-> >> cd /sys/kernel/debug/block
-> >> find . -type f -exec grep -aH . {} \;
-> >> 
-> >> The file has the nodes out of order, but I don't know enough about the interface to see if there are things that are missing, or what it means.
-> >> 
-> >> 
-> >> > BTW, all request based block devices should be observed in blk-mq debugfs.
-> >> 
-> >> /sys/kernel/debug/block contains
-> >> 
-> >> drwxr-xr-x.  2 root root 0 Aug 17 15:20 md0
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sda
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdb
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdc
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdd
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sde
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdf
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdg
-> >> drwxr-xr-x. 51 root root 0 Aug 17 15:20 sdh
-> >> drwxr-xr-x.  4 root root 0 Aug 17 15:20 sdi
-> >> drwxr-xr-x.  2 root root 0 Aug 17 15:20 zram0
-> >
-> > OK, so lots of devices are missed in your log, and the following command
-> > is supposed to work for collecting log from all block device's debugfs:
-> >
-> > (cd /sys/kernel/debug/block/ && find . -type f -exec grep -aH . {} \;)
-> 
-> OK here it is:
-> 
-> https://drive.google.com/file/d/18nEOx2Ghsqx8uII6nzWpCFuYENHuQd-f/view?usp=sharing
+On Wed, Aug 3, 2022 at 10:22 AM Yufen Yu <yuyufen@huaweicloud.com> wrote:
+>
+> From: Yufen Yu <yuyufen@huawei.com>
+>
+> We do test on a virtio scsi device (/dev/sda) and the default mq
+> scheduler is 'none'. We found a IO hung as following:
+>
+> blk_finish_plug
+>   blk_mq_plug_issue_direct
+>       scsi_mq_get_budget
+>       //get budget_token fail and sdev->restarts=1
+>
+>                                  scsi_end_request
+>                                    scsi_run_queue_async
+>                                    //sdev->restart=0 and run queue
+>
+>      blk_mq_request_bypass_insert
+>         //add request to hctx->dispatch list
+>
+>   //continue to dispath plug list
+>   blk_mq_dispatch_plug_list
+>       blk_mq_try_issue_list_directly
+>         //success issue all requests from plug list
+>
+> After .get_budget fail, scsi_mq_get_budget will increase 'restarts'.
+> Normally, it will run hw queue when io complete and set 'restarts'
+> as 0. But if we run queue before adding request to the dispatch list
+> and blk_mq_dispatch_plug_list also success issue all requests, then
+> on one will run queue, and the request will be stall in the dispatch
+> list and cannot complete forever.
+>
+> It is wrong to use last request of plug list to decide if run queue is
+> needed since all the remained requests in plug list may be from other
+> hctxs. To fix the bug, pass run_queue as true always to
+> blk_mq_request_bypass_insert().
+>
+> Fix-suggested-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 93d9d60980fb..1eb13d57a946 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2568,7 +2568,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
+>                         break;
+>                 case BLK_STS_RESOURCE:
+>                 case BLK_STS_DEV_RESOURCE:
+> -                       blk_mq_request_bypass_insert(rq, false, last);
+> +                       blk_mq_request_bypass_insert(rq, false, true);
+>                         blk_mq_commit_rqs(hctx, &queued, from_schedule);
+>                         return;
+>                 default:
 
-The above log shows that the io stall happens on sdd, where:
+Fixes: dc5fc361d891 ("block: attempt direct issue of plug list")
 
-1) 616 requests pending from scheduler queue
-
-grep "busy=" blockdebugfs-all2.txt | grep sdd | grep sched | awk -F "=" '{s+=$2} END {print s}'
-616
-
-2) 11 requests pending from ./sdd/hctx2/dispatch for more than 300 seconds
-
-Recently we seldom observe io hang from dispatch list, except for the
-following two:
-
-https://lore.kernel.org/linux-block/20220803023355.3687360-1-yuyufen@huaweicloud.com/
-https://lore.kernel.org/linux-block/20220726122224.1790882-1-yukuai1@huaweicloud.com/
-
-BTW, what is the output of the following log?
-
-	(cd /sys/block/sdd/device && find . -type f -exec grep -aH . {} \;)
-
-Also the above log shows that host_tagset_enable support is still
-crippled on v5.12, I guess the issue may not be triggered(or pretty hard)
-after you update to d97e594c5166 ("blk-mq: Use request queue-wide tags for
-tagset-wide sbitmap"), or v5.14.
-
-
-
-thanks,
+Thanks,
 Ming
 
