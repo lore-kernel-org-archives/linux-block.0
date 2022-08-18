@@ -2,59 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D02C32771
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 01:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B4AC28B2B
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 01:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242574AbiHRB0c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 21:26:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35660 "EHLO
+        id S242601AbiHRB0e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Aug 2022 21:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242600AbiHRB0c (ORCPT
+        with ESMTP id S242600AbiHRB0d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 21:26:32 -0400
+        Wed, 17 Aug 2022 21:26:33 -0400
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98851A1A4D
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 18:26:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE99A031B
+        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 18:26:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1660785991; x=1692321991;
+  t=1660785992; x=1692321992;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=PqmQnyM3qKpwghVIz6xzLRKD6Pyldj2w2Y8ZoWnvYvQ=;
-  b=o6xtCprG7H7Bp7JNMPN04emd+G81XaX3e+RtEpX66irpUv0pF3HT2ZLL
-   UaUjGOnB9EFDiItthQ7ZoemY3kDbkXfRLlLvW+UqiU4Q0iiZZPiSw+0yh
-   Gbgut5ppuUPQBNXF41QacqDqMN0v1tua4/ru6FIoOO+lkMpz4XP/qYZ1X
-   kz7jX6PBVJ7RTskKj9MFvllqzqrhMQbxLIFO1LIWosrCixA5bGAwEy+WF
-   bKnEer60JSvC3WOhjh3CwFJiT0xxLY8vcEzMKXouRiDgHdRVDmstFl7H0
-   Ub2jPsEZjnDwzZulQNRn8r73ub6VylpybjMEZF4Rkr+ywpqY7Pm4kma3g
+  bh=gidMCjksyDoobZco5DsPMXmlo5oysRo95C8k0fCVQHk=;
+  b=K8+5sVN5N+siSoMYjwEFwbTZs7fPXEHm2RnJTEs4XdS7qZQG3cB7liWa
+   +Rf138kab7y+SgQVplOdeRJ1G94Pm12nK6wxR0/b1Drw8i/TMjVh+SWoA
+   t1o3rktkWEd9rrph+ahuS69OFfM4lTMAyWKucIIeQojSsAnDEYA2z958r
+   sv1A1pzbJMmbqD2ojYsWcB81zvPq0thb6EX7ZCqFwCqLOuVzNZi9KgbDR
+   n7eM0C31MQEJXvMDNpyAeZV9q32vnNvGd1hXvpCUZPg83aKSFy0zSQeoU
+   aF+FquQVFLxuYR6DJid0oJx41F2UVyF1aiOLBeMet4CUAEYzpRB1RqLYN
    w==;
 X-IronPort-AV: E=Sophos;i="5.93,244,1654531200"; 
-   d="scan'208";a="321085644"
+   d="scan'208";a="321085647"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Aug 2022 09:26:31 +0800
-IronPort-SDR: ehEvzukAONQgoqgn27d2zFjWsKe3OA8HujRa1566Tc0uopyHq2Y96g8WerIM2NOggsIrct3z78
- fti2SUlmIxa+stABaBzoHVcmn0Vg4KJlFGVDrNywE3HmJ4WJtRM3ipO3IuLS3c/+PLB5CZLt0t
- taarWJUOAnPK0tW/UNvU6lzqpOopR9L5E3MAbcxhKZRonL/HM70eq7cmWUcKMinQe8M/KjR25N
- +7VsEY4tABwi2tXeV7dZzNSdP5d+0U8EJH6D6SZPDx7ep59hjZO4jRibprINRL7L25Urr/ZyHv
- VjAiCBVwskA77DNPDXQbtFuI
+  by ob1.hgst.iphmx.com with ESMTP; 18 Aug 2022 09:26:32 +0800
+IronPort-SDR: uNymg+GCsDhwO3Vo3IJXUfmGqNBT/bNahLgXV8o/QjRTTAYxUuGK5sSqbbpmXp96cU+9q0gaIS
+ Qguxv09+Y+sZaPe1GM6N7+oF89CroGR8nyaT+X8eXSjqEMfCFgGQAWHGjUxCbDrL1H/GqIrnmx
+ 9tAQxlyG94cWdr4JNgeb0NBaRNOUmRdw/dDSNQ7tNuHiFePlDNGNa11hHW1yz2RmgW6VQBYeYd
+ sEGT2M8Bmdlaii9rViaU1bu1Qb8fpNR6RS7mSfuHUq60A9VgqqyVd5OH/x0h+mgVIrg0FIfwog
+ 0dNaVmZSuJCXvnV+Xty4WpEk
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 17:41:58 -0700
-IronPort-SDR: BgWDNkaume6irAMSgX9SHaoAk/I3kQndzyQTv2H0Ha0hMGm4XJD0/ZKD+ieTMcsEWCo24nGEqL
- rK3eooZLHOSz5qJdK7kc0xdgvCVEZIbqJAUWRExaG6HblOtdwZe2AS3hlGTR1Z73pVI0zOj1Ae
- e3xEJzqGmsyjFyPYU7Tu4lyMn2EDMrko77wUui2MyxBUF9RzJ4t6XEctyZXOKUo46KN5GZEvmp
- Xm/1f18Wm4kvbkyAAA8n7mcCz8E+kHIYrIh5jw3EExGnqXOLyeSzzEno5j/Kp0t1KDAVntpUJS
- ehU=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Aug 2022 17:41:59 -0700
+IronPort-SDR: We15CybPik55AKWzSPc/BJp3u9isR28UR5vYDbOYp38S47x3gkXW8wnrIVin2uHhK+XpOxwMuK
+ zRpC/shlKljcNfo2ILwtjzPUmOlO+Y2xgyiNDTQbiJW9Uvc9bw/cICrbTH//jscsSRKP3d92S9
+ lL4eJLtKtWb2ETqD+mGBCtEa8ywGTDkDepbjgSQQ5MsEYkTUXMsll+Ic9qM/785+LFUjvjqw/D
+ O2uGd8Z0FIdaqeO+qPsHGlwGqvfuYXet5eqm/cGS0KBApSlb9A/42ngBptb88y03siaKbR7ePU
+ 2Ws=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip01.wdc.com with ESMTP; 17 Aug 2022 18:26:31 -0700
+  by uls-op-cesaip01.wdc.com with ESMTP; 17 Aug 2022 18:26:32 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Christoph Hellwig <hch@lst.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v2 5/6] block/001: use _have_drivers() in place of _have_modules()
-Date:   Thu, 18 Aug 2022 10:26:23 +0900
-Message-Id: <20220818012624.71544-6-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 6/6] srp/rc: allow test with built-in sd_mod and sg drivers
+Date:   Thu, 18 Aug 2022 10:26:24 +0900
+Message-Id: <20220818012624.71544-7-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220818012624.71544-1-shinichiro.kawasaki@wdc.com>
 References: <20220818012624.71544-1-shinichiro.kawasaki@wdc.com>
@@ -64,28 +64,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The drivers sd_mod and sr_mod do not need to be loadable. Replace the
-check with _have_drivers() and allow test with built-in modules.
+The srp test group can be executed with built-in sd_mod and sg drivers.
+Check the drivers with _have_drivers() in place of _have_modules.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/block/001 | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/srp/rc | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/tests/block/001 b/tests/block/001
-index 5f05fa8..a84d0a1 100755
---- a/tests/block/001
-+++ b/tests/block/001
-@@ -13,7 +13,8 @@ DESCRIPTION="stress device hotplugging"
- TIMED=1
- 
- requires() {
--	_have_scsi_debug && _have_modules sd_mod sr_mod
-+	_have_scsi_debug
-+	_have_drivers sd_mod sr_mod
+diff --git a/tests/srp/rc b/tests/srp/rc
+index 94ee97c..46c75c6 100755
+--- a/tests/srp/rc
++++ b/tests/srp/rc
+@@ -28,13 +28,18 @@ is_lio_configured() {
  }
  
- stress_scsi_debug() {
+ group_requires() {
+-	local m name p required_modules
++	local m name p required_drivers required_modules
+ 
+ 	_have_configfs || return
+ 	if is_lio_configured; then
+ 		SKIP_REASONS+=("LIO must be unloaded before the SRP tests are run")
+ 		return
+ 	fi
++	required_drivers=(
++		sd_mod
++		sg
++	)
++	_have_drivers "${required_drivers[@]}"
+ 	required_modules=(
+ 		dm_multipath
+ 		dm_queue_length
+@@ -51,9 +56,6 @@ group_requires() {
+ 		scsi_dh_alua
+ 		scsi_dh_emc
+ 		scsi_dh_rdac
+-		sd_mod
+-		sd_mod
+-		sg
+ 		target_core_iblock
+ 		target_core_mod
+ 	)
 -- 
 2.37.1
 
