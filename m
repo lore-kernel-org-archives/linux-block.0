@@ -2,124 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EF3C00140
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 13:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4886C3F6B0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 14:31:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244700AbiHRNur (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 09:50:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44498 "EHLO
+        id S245349AbiHRObI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 10:31:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245307AbiHRNue (ORCPT
+        with ESMTP id S245204AbiHRObH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 09:50:34 -0400
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF4FBB9;
-        Thu, 18 Aug 2022 06:50:29 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id B24AB580847;
-        Thu, 18 Aug 2022 09:50:28 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Thu, 18 Aug 2022 09:50:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660830628; x=
-        1660834228; bh=JrWFwbCtn41niA34uNUTGzKOa60xVpzU+xS6F63mBuk=; b=x
-        genQHvVViPsfshnTiNUWobTMSLkmLCImNPOcT3Dc0xK9xoQ1J8XQC1W8fFIIS4lK
-        P/4wWrOchGCVlf0ogXih7crYxV3pTvaoilztu7Z7UlcucO9w01lqWkvdKntYT3qu
-        VMgUiV6A0hPIJ4A76qkxEw6HDo6ZUl//Wfnym/evbQcxAweJFVuMB44sSxbUcjVf
-        gYx3iuQq9ZhkenTdonmjrbct87c9jyuZlhM9kY+PUiorhZnjNwJ+4P4WQjMyzVQx
-        YlX/n1T4s91l9/CThxc4cYVPRd/2Iwf1pJwWPzljxAEOrOp0PcvI955jVT/wO+es
-        Dgb6ZBQv9OG2MiC1cDJxA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660830628; x=1660834228; bh=JrWFwbCtn41niA34uNUTGzKOa60x
-        VpzU+xS6F63mBuk=; b=yStHHx4uC/vnnp1i9wGZk94xvh/jiSULPJjeC1e5NG0a
-        s0aQ1HkP2kis1v5o7RPvQxLlRih3YuGsLVp2KMvnKvboPpHFGK1aaHQwKFrX9wBy
-        k2/kYlydGRXI522YI0wFhw/PnbR5nl4djeiF3KNipeVGOivqzdilsON2iekuGWNT
-        WkV14IvAXKZ/2Hq+yeg2m9KOtIp5IVXqSCTSHIBauIymtCN/6Gq9sipqYcsqqJCk
-        S4647BZkNZkRzYcO/n3mZuAmIXSfT2n91pLHNsYDOWrbNUHxnoLLN3ZH5TUg83mK
-        bxIkNIxKjPdDSL6lyM1pqbJgSWhNhlc4VJiPX6xyYQ==
-X-ME-Sender: <xms:pEP-YnHDxWKDkyDnHD5gon8nELjEuDVuJMguC8NzulIcaBfxSjyPjg>
-    <xme:pEP-YkXZ7S1B9xfXvPdClTnnIWc7-VwldtsQzmbPk8S_apn2iuEN222hoJWk9Qz4E
-    Uy6yl5sifj-eYBzOmE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehledggeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedfvehh
-    rhhishcuofhurhhphhihfdcuoehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtoh
-    hmqeenucggtffrrghtthgvrhhnpefgvdeukedtfefgfefgtdelffdvieeltefgfedutdff
-    leeuieevieevkeehtdehueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtohhm
-X-ME-Proxy: <xmx:pEP-YpLYdVibr6u3RS0w-JWWfItk_DsFPLdRd__CKfGE_zmIBk1fqw>
-    <xmx:pEP-YlHOOxKf9tpuXSfAYp7feNTi3iC4O0I-ryfuD6u1hQHRKbpmUg>
-    <xmx:pEP-YtViwys_vKarLCXa1KxAlkiwOHTDPxvUhLP8U5pPh3gHA-SNfQ>
-    <xmx:pEP-YsE-xMoxK7S8p6ZNGeFf6A3phPeIGofE2plBDgH1_zqz05s4fQ>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 28CF11700082; Thu, 18 Aug 2022 09:50:28 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
-Mime-Version: 1.0
-Message-Id: <aadeb600-4e3a-4b69-bc17-fd2918c5b061@www.fastmail.com>
-In-Reply-To: <Yv3NIQlDL0T3lstU@T590>
-References: <Yv0A6UhioH3rbi0E@T590>
- <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
- <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
- <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
- <Yv2w+Tuhw1RAoXI5@T590>
- <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
- <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
- <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
- <Yv3NIQlDL0T3lstU@T590>
-Date:   Thu, 18 Aug 2022 09:50:07 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Ming Lei" <ming.lei@redhat.com>
-Cc:     "Nikolay Borisov" <nborisov@suse.com>,
-        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
-        "Paolo Valente" <paolo.valente@linaro.org>,
-        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "Josef Bacik" <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Content-Type: text/plain
+        Thu, 18 Aug 2022 10:31:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F37B9F96;
+        Thu, 18 Aug 2022 07:31:05 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27IEQYck016278;
+        Thu, 18 Aug 2022 14:30:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=tmVVL7O/qn1TjOlvqXwvP1/LiHg+Auw2h/LEJhl9vkE=;
+ b=rrKUcLjfzciFadbzAWgEQOz/Ixqlu6sMcKWOOqLgGSNuj3FkII/yoMK8rfXEDYECvF1Z
+ BTRcyunecu+kyrVKiVOZGV3IsQLnibtfjdar6nJ21GOtFNfqg5VDMHNggOXLsU/gKrZ2
+ 6PjG4sWaLKouwZh3cKIwkAEYurandcUQhsDEArgM3GyZYHe6rW2px68EkvSsDAWSPUSI
+ ZOswIcZwhDvYn5fNkYUY8Tp0zUY8zBmmOP1Q2E2domiFGJbU8X9byGPdM3vDnf3vm9DC
+ 1OnrMhsnpVuFeL0F5p+RisWIPoUpNK81FqEYZXgrU3Q7YpHzWe+Q6I0H0MzpQvmMDI6N /A== 
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j1nxkkb1r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:30:50 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27IEL7xb021351;
+        Thu, 18 Aug 2022 14:30:50 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+        by ppma03wdc.us.ibm.com with ESMTP id 3j1gh6t00j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Aug 2022 14:30:50 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27IEUnPF066286
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Aug 2022 14:30:49 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C9067805E;
+        Thu, 18 Aug 2022 14:30:49 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11B7B7805F;
+        Thu, 18 Aug 2022 14:30:47 +0000 (GMT)
+Received: from rhel-laptop.ibm.com.com (unknown [9.160.121.241])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 18 Aug 2022 14:30:47 +0000 (GMT)
+From:   gjoyce@linux.vnet.ibm.com
+To:     linux-block@vger.kernel.org
+Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
+        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
+        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
+        gjoyce@linux.vnet.ibm.com, linux-efi@vger.kernel.org,
+        keyrings@vger.kernel.org
+Subject: [PATCH v2 0/3 RESEND] sed-opal: keyrings, discovery, revert, key store
+Date:   Thu, 18 Aug 2022 09:30:42 -0500
+Message-Id: <20220818143045.680972-1-gjoyce@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7MTW7VbcQgNFi_6fggS-iI80-yP4aBRD
+X-Proofpoint-ORIG-GUID: 7MTW7VbcQgNFi_6fggS-iI80-yP4aBRD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-18_12,2022-08-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 impostorscore=0 bulkscore=0 suspectscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 malwarescore=0 mlxscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208180050
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+
+TCG SED Opal is a specification from The Trusted Computing Group
+that allows self encrypting storage devices (SED) to be locked at
+power on and require an authentication key to unlock the drive.
+
+The current SED Opal implementation in the block driver
+requires that authentication keys be provided in an ioctl
+so that they can be presented to the underlying SED
+capable drive. Currently, the key is typically entered by
+a user with an application like sedutil or sedcli. While
+this process works, it does not lend itself to automation
+like unlock by a udev rule.
+
+The SED block driver has been extended so it can alternatively
+obtain a key from a sed-opal kernel keyring. The SED ioctls
+will indicate the source of the key, either directly in the
+ioctl data or from the keyring.
+
+Two new SED ioctls have also been added. These are:
+  1) IOC_OPAL_REVERT_LSP to revert LSP state
+  2) IOC_OPAL_DISCOVERY to discover drive capabilities/state
+
+change log:
+	- removed platform functions for persistent key storage
+	- replaced key update logic with key_create_or_update()
+	- minor bracing and padding changes
+	- add error returns
+	- opal_key structure is application provided but kernel
+	  verified
+	- added brief description of TCG SED Opal
+
+Greg Joyce (3):
+  block: sed-opal: Implement IOC_OPAL_DISCOVERY
+  block: sed-opal: Implement IOC_OPAL_REVERT_LSP
+  block: sed-opal: keyring support for SED Opal keys
+
+ block/Kconfig                 |   1 +
+ block/opal_proto.h            |   4 +
+ block/sed-opal.c              | 252 +++++++++++++++++++++++++++++++++-
+ include/linux/sed-opal.h      |   5 +
+ include/uapi/linux/sed-opal.h |  25 +++-
+ 5 files changed, 281 insertions(+), 6 deletions(-)
 
 
-On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
-
->
-> Also please test the following one too:
->
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 5ee62b95f3e5..d01c64be08e2 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx 
-> *hctx, struct list_head *list,
->  		if (!needs_restart ||
->  		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
->  			blk_mq_run_hw_queue(hctx, true);
-> -		else if (needs_restart && needs_resource)
-> +		else if (needs_restart && (needs_resource ||
-> +					blk_mq_is_shared_tags(hctx->flags)))
->  			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
-> 
->  		blk_mq_update_dispatch_busy(hctx, true);
->
-
-Should I test both patches at the same time, or separately? On top of v5.17 clean, or with b6e68ee82585 still reverted?
-
+Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+Reported-by: kernel test robot <lkp@intel.com>
+base-commit: ff6992735ade75aae3e35d16b17da1008d753d28
 -- 
-Chris Murphy
+2.27.0
+
