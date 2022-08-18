@@ -2,130 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FDEC25B08
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 03:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07628C3F6B0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 04:12:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236181AbiHRDc7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Aug 2022 23:32:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
+        id S242872AbiHREMr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 00:12:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238701AbiHRDc6 (ORCPT
+        with ESMTP id S231547AbiHREMq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Aug 2022 23:32:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EC29018A
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 20:32:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660793576;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CnSkXgG5vlVmmHn7RVnWUaE/zfht4AYlOxzHk7kfQng=;
-        b=BYQIaQtIELUwdP/0meZMOByCfqB0S+gU+E5LHH4bwcEqx1h1H1J6ZzGuWMh6DLwdsUS5lE
-        rTvdaiugJb/P0RNlYTngVO+9RfU8LB7gxIFYRscOVjr2nSmOtq1cuTTahRsjUTSYfhEgQt
-        qXYC+dcKJreF9ZD/vHFMRU+fcAj7cWc=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-377-cMqkLvSvPKGic5oFADErkw-1; Wed, 17 Aug 2022 23:32:55 -0400
-X-MC-Unique: cMqkLvSvPKGic5oFADErkw-1
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-334ab1f0247so7141967b3.7
-        for <linux-block@vger.kernel.org>; Wed, 17 Aug 2022 20:32:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=CnSkXgG5vlVmmHn7RVnWUaE/zfht4AYlOxzHk7kfQng=;
-        b=SELsrf4QrymsXxO8cURobqh6hpXerI+r7Ikqdce+V+e64NlF8X2LsF/hhVWHqTdYJ4
-         54RxMpX92qa7EXL7fSbhSdWL7UBzGEN/5bQfxFDmjAxR7YfTfXztVEwuQVUOWCVcPmk/
-         rhClhUv5qsrXewL2Hb2b9ABmhyAh5vUFG9/WoFgQiK7TPoc79hF3GBYoyOupqWPVtDLD
-         ey55gtUGyrOPAVVOrl5C9zwX5GbbXlc/SdXTtqIWepfkK0ym7KqhbSWWgURuhVCuAhDn
-         28PAX6j3cX2sOIypOrhal/Ozs9tyuRg5ujJ51laTbPTiGt/taf/Zkazu696xKLQXpK8+
-         DAJQ==
-X-Gm-Message-State: ACgBeo1r4MUJy/pZYJbI2j37PJopUvJuk2+KoHDDXuY9zd9hlR/aEpdX
-        I5ILXg48QsGiRQHsdGmHNITUoDQGe7xkcYaWiYHXvP7f110SqVgDaantl39gfayOxTd3LJ+HeRX
-        ZQlCHSX1ysRr7iGBI8+aJmlCAlti7Q7CE56y1Tlk=
-X-Received: by 2002:a81:5716:0:b0:335:41fc:feea with SMTP id l22-20020a815716000000b0033541fcfeeamr1081117ywb.305.1660793574898;
-        Wed, 17 Aug 2022 20:32:54 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR58Bdj0aI1r+5X89YYZ7cHcFvRu0jChH2boC2bti4hBzyVirPHL2aaj3NMT0cCcm11wzzdg4+hXaLIBCdIcgU8=
-X-Received: by 2002:a81:5716:0:b0:335:41fc:feea with SMTP id
- l22-20020a815716000000b0033541fcfeeamr1081109ywb.305.1660793574704; Wed, 17
- Aug 2022 20:32:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
-In-Reply-To: <20220803023355.3687360-1-yuyufen@huaweicloud.com>
-From:   Ming Lei <ming.lei@redhat.com>
-Date:   Thu, 18 Aug 2022 11:32:43 +0800
-Message-ID: <CAFj5m9J71n_ZJk4NgXWqd8Wf1ELDWyMLTEHDKnMiJqOdkd+Xbg@mail.gmail.com>
-Subject: Re: [PATCH RESEND v2] blk-mq: run queue no matter whether the request
- is the last request
-To:     Yufen Yu <yuyufen@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, yukuai3@huawei.com,
-        yuyufen@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 18 Aug 2022 00:12:46 -0400
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D738E0F3;
+        Wed, 17 Aug 2022 21:12:45 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id A39A1580EA6;
+        Thu, 18 Aug 2022 00:12:43 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute3.internal (MEProxy); Thu, 18 Aug 2022 00:12:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        colorremedies.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660795963; x=
+        1660799563; bh=p5RQmR6ERx2tDB2QJRfxZE9rzRDcq3welkce5QeUbYs=; b=O
+        oKnylvE/AVYyogIvJltr/srgIDHK8Sanss7o+l3SKKyBopX/mtCW5wbCyZy/V2rq
+        +nb3s71owFWYOhZcNRBlnjE+Nuu1GAJeTobApxWPn8z0E9Uh9u7KraqyC3RK9Q5X
+        bn5cYfofLRhsymLUDfpY20Ja8IK1tJdYVD+q/IO8mxDB0ajDIq6ukB+NXvvupsq4
+        jv+xz/gWuGS3G4E7GUjGgdtWUzgxJxE8Crhm4OcbGCXyYEfGNvN5vtXvMhfZtvpW
+        ng1ZAksd3ska/qruZqOl4f0Ey0pW0Nl4MxslmsCesKMj9PzLzZg+JSQ4cyliPfvv
+        5dM2lnG2WN2fhfAeB5Sxw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1660795963; x=1660799563; bh=p5RQmR6ERx2tDB2QJRfxZE9rzRDc
+        q3welkce5QeUbYs=; b=yLEoXdwl1f+R2Klw8SFe3faAxLUwIZaDdvGtjh1oY3sa
+        AXMTbC0erEKcBMfzElMoBVTxXjW7f2HWL+fltGSdAZHjwXPlU6C2AVM+1jByfueu
+        5GfnRLCNK2l3Bd6GGpkMZGjc4KXGEIxhhOmeW7+R4U/65b7ZMARKOuxIkUdyflAv
+        8jbX6oeSGZ1aoFwAG+AcffCo19xGA7NVcnMlXY8IWC34uhrVX+I1kwrj+ul1nNjo
+        SZ48mQqu17oyX8O6hLvsrUoWxqyicSuxdQe+WzMh8gNeMOhA5m4lcKlQMGujD5Os
+        rsEIFuPoc/W1vUxK/QGq3VHZ2+DNSwEu4q/uHbJRTQ==
+X-ME-Sender: <xms:O7z9YouZUCIdNefgZKrAji9Yrrg89_Zga4ZgABfjOBgNTqzK9YpDBA>
+    <xme:O7z9YldeXmRkigaEtd2j_sER2o9lCavrwBhjXFPnnpJaTssbCMgSmI7Hoa87XzvUS
+    WfNk0twRXEE9y5FxqA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehjedgkeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    goufhushhpvggtthffohhmrghinhculdegledmnecujfgurhepofgfggfkjghffffhvfev
+    ufgtsehttdertderredtnecuhfhrohhmpedfvehhrhhishcuofhurhhphhihfdcuoehlih
+    hsthhssegtohhlohhrrhgvmhgvughivghsrdgtohhmqeenucggtffrrghtthgvrhhnpeef
+    heeliedugeeuleetffeuheegkeetgfdtveevudffgfejvdegveeljefhvdefhfenucffoh
+    hmrghinhepghhoohhglhgvrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghr
+    rghmpehmrghilhhfrhhomheplhhishhtshestgholhhorhhrvghmvgguihgvshdrtghomh
+X-ME-Proxy: <xmx:O7z9YjythObrJkGGDGalvsYnnQfaqfHCMVwaTqt6IZ7Fs1z9W-8yiw>
+    <xmx:O7z9YrMWVVr9mJSHxNiluU5-QE9WKXBGOXIDrOKiDPc6iecTsex5MQ>
+    <xmx:O7z9Yo9A50sqhrivp7MzhNrklWt1nXXH58fI2HA8D7tDpZUj0pEKZw>
+    <xmx:O7z9YlMsiIqdQxl7YP1Mdb-HEOIKjPleDumdMgmKjklpQOEkRM9CGg>
+Feedback-ID: i06494636:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 0C4551700082; Thu, 18 Aug 2022 00:12:42 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
+Mime-Version: 1.0
+Message-Id: <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
+In-Reply-To: <Yv2w+Tuhw1RAoXI5@T590>
+References: <dcd8beea-d2d9-e692-6e5d-c96b2d29dfd1@suse.com>
+ <2b8a38fa-f15f-45e8-8caa-61c5f8cd52de@www.fastmail.com>
+ <CAFj5m9+6Vj3NdSg_n3nw1icscY1qr9f9SOvkWYyqpEtFBb_-1g@mail.gmail.com>
+ <b236ca6e-2e69-4faf-9c95-642339d04543@www.fastmail.com>
+ <Yv0A6UhioH3rbi0E@T590>
+ <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
+ <Yv0KmT8UYos2/4SX@T590>
+ <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
+ <Yv2P0zyoVvz35w/m@T590>
+ <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
+ <Yv2w+Tuhw1RAoXI5@T590>
+Date:   Thu, 18 Aug 2022 00:12:21 -0400
+From:   "Chris Murphy" <lists@colorremedies.com>
+To:     "Ming Lei" <ming.lei@redhat.com>
+Cc:     "Nikolay Borisov" <nborisov@suse.com>,
+        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
+        "Paolo Valente" <paolo.valente@linaro.org>,
+        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "Josef Bacik" <josef@toxicpanda.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 3, 2022 at 10:22 AM Yufen Yu <yuyufen@huaweicloud.com> wrote:
->
-> From: Yufen Yu <yuyufen@huawei.com>
->
-> We do test on a virtio scsi device (/dev/sda) and the default mq
-> scheduler is 'none'. We found a IO hung as following:
->
-> blk_finish_plug
->   blk_mq_plug_issue_direct
->       scsi_mq_get_budget
->       //get budget_token fail and sdev->restarts=1
->
->                                  scsi_end_request
->                                    scsi_run_queue_async
->                                    //sdev->restart=0 and run queue
->
->      blk_mq_request_bypass_insert
->         //add request to hctx->dispatch list
->
->   //continue to dispath plug list
->   blk_mq_dispatch_plug_list
->       blk_mq_try_issue_list_directly
->         //success issue all requests from plug list
->
-> After .get_budget fail, scsi_mq_get_budget will increase 'restarts'.
-> Normally, it will run hw queue when io complete and set 'restarts'
-> as 0. But if we run queue before adding request to the dispatch list
-> and blk_mq_dispatch_plug_list also success issue all requests, then
-> on one will run queue, and the request will be stall in the dispatch
-> list and cannot complete forever.
->
-> It is wrong to use last request of plug list to decide if run queue is
-> needed since all the remained requests in plug list may be from other
-> hctxs. To fix the bug, pass run_queue as true always to
-> blk_mq_request_bypass_insert().
->
-> Fix-suggested-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 93d9d60980fb..1eb13d57a946 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2568,7 +2568,7 @@ static void blk_mq_plug_issue_direct(struct blk_plug *plug, bool from_schedule)
->                         break;
->                 case BLK_STS_RESOURCE:
->                 case BLK_STS_DEV_RESOURCE:
-> -                       blk_mq_request_bypass_insert(rq, false, last);
-> +                       blk_mq_request_bypass_insert(rq, false, true);
->                         blk_mq_commit_rqs(hctx, &queued, from_schedule);
->                         return;
->                 default:
 
-Fixes: dc5fc361d891 ("block: attempt direct issue of plug list")
 
-Thanks,
-Ming
+On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
 
+> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
+
+https://drive.google.com/file/d/1n8f66pVLCwQTJ0PMd71EiUZoeTWQk3dB/view?usp=sharing
+
+This time it happened pretty quickly. This log is soon after triple digit load and no IO, but not as fully developed as before. The system has become entirely unresponsive to new commands, so I have to issue sysrq+b - if I let it go too long even that won't work.
+
+-- 
+Chris Murphy
