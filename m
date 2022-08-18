@@ -2,226 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A34C32773
-	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 17:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA72EC00140
+	for <linux-block@archiver.kernel.org>; Thu, 18 Aug 2022 18:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345356AbiHRRDc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Aug 2022 13:03:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35174 "EHLO
+        id S1345012AbiHRSxG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Aug 2022 14:53:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345375AbiHRRCt (ORCPT
+        with ESMTP id S1345235AbiHRSw6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Aug 2022 13:02:49 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7813CAC8C;
-        Thu, 18 Aug 2022 10:01:09 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 059FA1FD45;
-        Thu, 18 Aug 2022 17:01:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1660842068;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KhtZwrDmDTXEuf9qp93qnXpXLLL8o6aGNkdAdLwLQPw=;
-        b=L+XHxvkR716i6M9t+Wn3t+rOYgEufeUwnBC9AW2/4NQhdwfICBE94AVqlNpK3zNWiYptPI
-        fBOWQzGlSJTVurHfenFvyKKu2PC6MGkFBZfQWZxGEiJT6n5Q1l5DHDkVx25EsI93G0Vq+5
-        gzR5MZel4Ilq+57NLIzBL0XUj6PcuDs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1660842068;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KhtZwrDmDTXEuf9qp93qnXpXLLL8o6aGNkdAdLwLQPw=;
-        b=zBb8gkibfMQD1SAsQwMlBVQ7vPc+GvdbY5QsExkBEm/aGbhnlbyooxOqHyHLVq/pGSlOW9
-        7q7etrzWN7RMQjAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 95A56133B5;
-        Thu, 18 Aug 2022 17:01:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id U4SDIlNw/mJqOgAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Thu, 18 Aug 2022 17:01:07 +0000
-Date:   Thu, 18 Aug 2022 19:01:05 +0200
-From:   Petr Vorel <pvorel@suse.cz>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     Eric Sandeen <sandeen@sandeen.net>,
-        Dave Chinner <david@fromorbit.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.de>,
-        linux-xfs@vger.kernel.org, ltp@lists.linux.it
-Subject: Re: LTP test df01.sh detected different size of loop device in v5.19
-Message-ID: <Yv5wUcLpIR0hwbmI@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <YvZc+jvRdTLn8rus@pevik>
- <YvZUfq+3HYwXEncw@pevik>
- <YvZTpQFinpkB06p9@pevik>
- <20220814224440.GR3600936@dread.disaster.area>
- <YvoSeTmLoQVxq7p9@pevik>
- <8d33a7a0-7a7c-47a1-ed84-83fd25089897@sandeen.net>
- <Yv5Z7eu5RGnutMly@pevik>
- <f03c6929-9a14-dd58-3726-dd2c231d0981@sandeen.net>
- <Yv5oaxsX6z2qxxF3@magnolia>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yv5oaxsX6z2qxxF3@magnolia>
+        Thu, 18 Aug 2022 14:52:58 -0400
+Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585E9C2E84;
+        Thu, 18 Aug 2022 11:52:57 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 842235801B4;
+        Thu, 18 Aug 2022 14:52:56 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute3.internal (MEProxy); Thu, 18 Aug 2022 14:52:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        colorremedies.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm1; t=1660848776; x=
+        1660852376; bh=Ts6SgEwcKB+gnnxX0Mg89SPTORlM9/ZfOczJIVc1pgY=; b=s
+        jHZfKEnrAWU7KnQmcdIQeoJaQKZ9a7y4Lzssq43mdkqlnmN38vMUWHeAVGl/92p9
+        EF5j2pfU/3ibfgMCIu+DPLxxLbhqlPCxe1krQs+xeoO/U/nB3NdR5hE3TXYXM7wX
+        ybnhDKA4MwlnPQ84ekJb8uD0ladMlnMxQol4eKsdHhZVXH76m85+kDT72CanzoOl
+        vURpyj2wIbWOaocr7PxF6u9BiusjRxYGHmGWqCNEWBrTZOWWRnfPL+xCcrDtyPv1
+        Q//iIxRkuneguH1OZX+KoE2msbjl33EIuqay+K6L10+1t5KqPqog/sYFMVzgWL0t
+        q/jvnk0S2Ww9xE8N98+kg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1660848776; x=1660852376; bh=Ts6SgEwcKB+gnnxX0Mg89SPTORlM
+        9/ZfOczJIVc1pgY=; b=LHrMOXycIBvofkcqKnNkKZGsoW75RVE5rbIm62q68gef
+        hgNUfn66xH9tYrXJJj7hT4Uz+n0RSsuo5wHwjPeBycW6myH75JFXzd3HC9BhnxkJ
+        G3xRsIyQz+jRXb1BIcs07qYtffwjbR90MtF/mHBoTaxBYJiYJdR961qAAUmp8l/0
+        kpF+wQxfMIt9d0cgf0Wrji8rME8JBarxujmwI42L8PZw6IgLG//U1rMKt1HuqjII
+        G0mAqPR0Pc9/hIBt6try1mTR2JEq2D8Cjxxf3Jdo/0pyiZ/EhjkrYRzoJY0UVlot
+        yFNDPxRp4+VFE/QA3s6Jj9R3naFTKbpXxFfEUAbSag==
+X-ME-Sender: <xms:h4r-YmQ9WP2krC5G1entLJ7EUPya8p4CoU9562V313IWfSqAGQ7wYg>
+    <xme:h4r-YrwX4L2Xo8eZA1rkNZxVfMbkgQlG9SM6_7s3duRx0u5ilrUsIe3iOkVsHMd9u
+    N6Mf7i-Y_2T13YQCUk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehledguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefofgggkfgjfhffhffv
+    vefutgesthdtredtreertdenucfhrhhomhepfdevhhhrihhsucfouhhrphhhhidfuceolh
+    hishhtshestgholhhorhhrvghmvgguihgvshdrtghomheqnecuggftrfgrthhtvghrnhep
+    feehleeiudegueelteffueehgeektefgtdevvedufffgjedvgeevleejhfdvfefhnecuff
+    homhgrihhnpehgohhoghhlvgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgr
+    rhgrmhepmhgrihhlfhhrohhmpehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtoh
+    hm
+X-ME-Proxy: <xmx:h4r-Yj1bbQ4madkVb0dx8BXBTl3dA1aeP0_Bg0NB73CzngWa6DM_yw>
+    <xmx:h4r-YiATqKs_aiFBNkKsfRUT_YaG9Bi6INsyAP09-vwxXEIwIEVMLg>
+    <xmx:h4r-YviogrXyWGUyIkP0dcrda1UG_9Xbc3abPNgOXpXgvjR3mRT6Rw>
+    <xmx:iIr-YvgIryn7QxtJm1dMEBop9bbI4FM64_OAQUUsWm2E0QVeCs0UWQ>
+Feedback-ID: i06494636:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id DD34E1700082; Thu, 18 Aug 2022 14:52:55 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
+Mime-Version: 1.0
+Message-Id: <bfaa8b43-519f-4e4c-b04b-a37b0ee9babf@www.fastmail.com>
+In-Reply-To: <Yv3K4G/Sv2KDEqif@T590>
+References: <Yv0A6UhioH3rbi0E@T590>
+ <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
+ <Yv0KmT8UYos2/4SX@T590>
+ <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
+ <Yv2P0zyoVvz35w/m@T590>
+ <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
+ <Yv2w+Tuhw1RAoXI5@T590>
+ <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
+ <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
+ <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
+ <Yv3K4G/Sv2KDEqif@T590>
+Date:   Thu, 18 Aug 2022 14:52:34 -0400
+From:   "Chris Murphy" <lists@colorremedies.com>
+To:     "Ming Lei" <ming.lei@redhat.com>
+Cc:     "Nikolay Borisov" <nborisov@suse.com>,
+        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
+        "Paolo Valente" <paolo.valente@linaro.org>,
+        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "Josef Bacik" <josef@toxicpanda.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Thu, Aug 18, 2022 at 11:05:33AM -0500, Eric Sandeen wrote:
-> > On 8/18/22 10:25 AM, Petr Vorel wrote:
-> > > Hi Eric, all,
 
 
-> > ...
+On Thu, Aug 18, 2022, at 1:15 AM, Ming Lei wrote:
+> On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
+>> 
+>> 
+>> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
+>> > On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
+>> >> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
+>> >>
+>> >>> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
+>> 
+>> Same boot, 3rd log. But the load is above 300 so I kinda need to sysrq+b soon.
+>> 
+>> https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=sharing
+>> 
+>
+> Please test the following patch and see if it makes a difference:
+>
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index a4f7c101b53b..8e8d77e79dd6 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -44,7 +44,10 @@ void __blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+>  	 */
+>  	smp_mb();
+> 
+> -	blk_mq_run_hw_queue(hctx, true);
+> +	if (blk_mq_is_shared_tags(hctx->flags))
+> +		blk_mq_run_hw_queues(hctx->queue, true);
+> +	else
+> +		blk_mq_run_hw_queue(hctx, true);
+>  }
+> 
+>  static int sched_rq_cmp(void *priv, const struct list_head *a,
 
 
-> > >> IOWS, I think the test expects that free space is reflected in statfs numbers
-> > >> immediately after a file is removed, and that's no longer the case here. They
-> > >> change in between the df check and the statfs check.
+I still get a stall. By the time I noticed it, I can't run any new commands (they just hang) so I had to sysrq+b. Let me know if I should rerun the test in order to capture block debug log.
 
-> > >> (The test isn't just checking that the values are correct, it is checking that
-> > >> the values are /immediately/ correct.)
 
-> > >> Putting a "sleep 1" after the "rm -f" in the test seems to fix it; IIRC
-> > >> the max time to wait for inodegc is 1s. This does slow the test down a bit.
-
-> > > Sure, it looks like we can sleep just 50ms on my hw (although better might be to
-> > > poll for the result [1]), I just wanted to make sure there is no bug/regression
-> > > before hiding it with sleep.
-
-> > > Thanks for your input!
-
-> > > Kind regards,
-> > > Petr
-
-> > > [1] https://people.kernel.org/metan/why-sleep-is-almost-never-acceptable-in-tests
-
-> > >> -Eric
-
-> > > +++ testcases/commands/df/df01.sh
-> > > @@ -63,6 +63,10 @@ df_test()
-> > >  		tst_res TFAIL "'$cmd' failed."
-> > >  	fi
-
-> > > +	if [ "$DF_FS_TYPE" = xfs ]; then
-> > > +		tst_sleep 50ms
-> > > +	fi
-> > > +
-
-> > Probably worth at least a comment as to why ...
-
-Sure, that was just to document possible fix. BTW even 200ms was not reliable in
-the long run => not a good solution.
-
-> > Dave / Darrick / Brian - I'm not sure how long it might take to finish inodegc?
-> > A too-short sleep will let the flakiness remain ...
-
-> A fsfreeze -f / fsfreeze -u cycle will force all the background garbage
-> collection to run to completion when precise free space accounting is
-> being tested.
-Thanks for a hint, do you mean to put it into df_test after creating file with
-dd to wrap second df_verify (calls df) and df_check (runs stat and compare values)?
-Because that does not help - it fails when running in the loop (managed to break after 5th run).
-
-Kind regards,
-Petr
-
-df_test()
-{
-	local cmd="$1 -P"
-
-	df_verify $cmd
-	if [ $? -ne 0 ]; then
-		return
-	fi
-
-	df_check $cmd
-	if [ $? -ne 0 ]; then
-		tst_res TFAIL "'$cmd' failed, not expected."
-		return
-	fi
-
-	ROD_SILENT dd if=/dev/zero of=mntpoint/testimg bs=1024 count=1024
-
-	if [ "$DF_FS_TYPE" = xfs ]; then
-		fsfreeze -f $TST_MNTPOINT
-	fi
-
-	df_verify $cmd
-
-	df_check $cmd
-	if [ $? -eq 0 ]; then
-		tst_res TPASS "'$cmd' passed."
-	else
-		tst_res TFAIL "'$cmd' failed."
-	fi
-
-	if [ "$DF_FS_TYPE" = xfs ]; then
-		fsfreeze -u $TST_MNTPOINT
-	fi
-
-	ROD_SILENT rm -rf mntpoint/testimg
-
-	# flush file system buffers, then we can get the actual sizes.
-	sync
-}
-
-df_verify()
-{
-	$@ >output 2>&1
-	if [ $? -ne 0 ]; then
-		grep -q -E "unrecognized option | invalid option" output
-		if [ $? -eq 0 ]; then
-			tst_res TCONF "'$@' not supported."
-			return 32
-		else
-			tst_res TFAIL "'$@' failed."
-			cat output
-			return 1
-		fi
-	fi
-}
-
-df_check()
-{
-	if [ "$(echo $@)" = "df -i -P" ]; then
-		local total=$(stat -f mntpoint --printf=%c)
-		local free=$(stat -f mntpoint --printf=%d)
-		local used=$((total-free))
-	else
-		local total=$(stat -f mntpoint --printf=%b)
-		local free=$(stat -f mntpoint --printf=%f)
-		local used=$((total-free))
-		local bsize=$(stat -f mntpoint --printf=%s)
-		total=$((($total * $bsize + 512)/ 1024))
-		used=$((($used * $bsize + 512) / 1024))
-	fi
-
-	grep ${TST_DEVICE} output | grep -q "${total}.*${used}"
-	if [ $? -ne 0 ]; then
-		echo "total: ${total}, used: ${used}"
-		echo "df saved output:"
-		cat output
-		echo "df output:"
-		$@
-		return 1
-	fi
-}
-
-> --D
-
-> > -Eric
-
-> > >  	ROD_SILENT rm -rf mntpoint/testimg
-
-> > >  	# flush file system buffers, then we can get the actual sizes.
-
+-- 
+Chris Murphy
