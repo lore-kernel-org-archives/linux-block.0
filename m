@@ -2,118 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED39C32771
-	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 15:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55035C28B2B
+	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 16:18:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349666AbiHSPYz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Aug 2022 11:24:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43100 "EHLO
+        id S1351579AbiHSQSU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Aug 2022 12:18:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349689AbiHSPYy (ORCPT
+        with ESMTP id S1352515AbiHSQQ5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Aug 2022 11:24:54 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689417C536
-        for <linux-block@vger.kernel.org>; Fri, 19 Aug 2022 08:24:53 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id u15so755022ejt.6
-        for <linux-block@vger.kernel.org>; Fri, 19 Aug 2022 08:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=QcjuSMkjgvmcMVSZtEnP4HKDq1IJJzuLOO5WZsbK0+U=;
-        b=agmJAUC8jfOsl/gS4hT8lv5H6fTz01qf2pe3Iv5R9j9Ate9ewR22RfAhjEhwJ6X7ah
-         6i2gUSjqWAQUwG7vDL22TL3OJ2DhWyK4iGyCxaZDkZBo8C5fdnjLhkpYDW7Sa1kKJ0m9
-         nTTLPu80zYWs5VKFI/soqsQZ2m3SZwMJLkyAN+lFaM/+QA0zpsdobhOAVHSxJY09NVpJ
-         unBTEPM3BaQo8lZAI/3LxHBqdI4Xtjfj+l91HslXfgpBHq8BMYj8CpA31LlMMIn6dSW8
-         vv42Aj7Ht2909aymuONX4UFmgeVzYDTPM0HNunn/RXfrH17hgsFeGl4AuF4WAgPFBbnL
-         B9iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=QcjuSMkjgvmcMVSZtEnP4HKDq1IJJzuLOO5WZsbK0+U=;
-        b=pKyJd7dIsySlmyJYb7ZIZR0xvkhNdCu8qEN2+BcbtUX8WTpDCKYyPwwcN9KlwPRPUz
-         9+fU7PhbkWZumOpn51qa4D6rxJUPH19be/XOZ/i+kL7mob6MqLR2Dz3s4wInGIOLp9TX
-         1SONqm28KPUhXXI+/EgHN91kE46fvBpAlOvOxJAvhbjS/I8Vopew75kPBgROQX7DTP1s
-         yaN82/OS6tgS9wLe1387edD8BIrcOKSX8RGfC5Wmn1Yj4Lec9/YY/2pW2pvsgLzBENgV
-         fNmLBPpFkOQdN1WX2NVdfdR/oUsVL2HHMlGmgRj7xc56XcyRxZOKFzNS2mp1tn12ce2v
-         9KAw==
-X-Gm-Message-State: ACgBeo3AP7EUNwJwRAe3KE+nuvexwtMD2VoM8YKBjItZuplC4W/zWiNK
-        ClPxAnvVqYU3Fi71/YvL3iXUdA==
-X-Google-Smtp-Source: AA6agR5mq+T7k3AHmZCAgqpwHVwskje+A0igISLSMji1ANW7KLAUFwidL9UZ9jQ29SXqclEdOTfxgg==
-X-Received: by 2002:a17:907:7fa5:b0:730:5d54:4c24 with SMTP id qk37-20020a1709077fa500b007305d544c24mr5248538ejc.641.1660922691995;
-        Fri, 19 Aug 2022 08:24:51 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id h10-20020aa7c60a000000b0043cc2c9f5adsm3270313edq.40.2022.08.19.08.24.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Aug 2022 08:24:51 -0700 (PDT)
-Message-ID: <a6d3e3a8-f0a6-dffc-c3b6-45d81efc7664@linbit.com>
-Date:   Fri, 19 Aug 2022 17:24:50 +0200
+        Fri, 19 Aug 2022 12:16:57 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2EBC116ECE;
+        Fri, 19 Aug 2022 09:00:13 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C2B1B2051C;
+        Fri, 19 Aug 2022 16:00:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1660924811;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1EOPRaUipOJxcZOITEcfDSR5J7gAs1mJruhQw7ACMlA=;
+        b=smCeWKPTuJhSif5sFZ4Prn5bYmJO+mDoSbkTHJKVWW66GzH7wQ1uw+ea0D8K4+7AMWBBgo
+        wW+6I3DO+SzqwAeMD/eDwunsv/a7agp+jDAeaTLLarSgX7QyCgGNfltvmBrwcpws/rDp6+
+        JqogaYLIKSyExQcgEHCa/cXb1pIBaKE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1660924811;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1EOPRaUipOJxcZOITEcfDSR5J7gAs1mJruhQw7ACMlA=;
+        b=tnazJTR5H/s2WuWaiLEGCBInYSOSLgfJUdRxxUgjgF4Q3+o6xzmZ4mPS8hojQkdeo9XlZ+
+        eeayDImQEn+oIzDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 35C5D13AC1;
+        Fri, 19 Aug 2022 16:00:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id iOwRCouz/2JbGwAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Fri, 19 Aug 2022 16:00:11 +0000
+Date:   Fri, 19 Aug 2022 18:00:09 +0200
+From:   Petr Vorel <pvorel@suse.cz>
+To:     Eric Sandeen <sandeen@redhat.com>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        Eric Sandeen <sandeen@sandeen.net>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.de>,
+        linux-xfs@vger.kernel.org, ltp@lists.linux.it
+Subject: Re: LTP test df01.sh detected different size of loop device in v5.19
+Message-ID: <Yv+ziab2IiVIsqN6@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <YvZUfq+3HYwXEncw@pevik>
+ <YvZTpQFinpkB06p9@pevik>
+ <20220814224440.GR3600936@dread.disaster.area>
+ <YvoSeTmLoQVxq7p9@pevik>
+ <8d33a7a0-7a7c-47a1-ed84-83fd25089897@sandeen.net>
+ <Yv5Z7eu5RGnutMly@pevik>
+ <f03c6929-9a14-dd58-3726-dd2c231d0981@sandeen.net>
+ <Yv5oaxsX6z2qxxF3@magnolia>
+ <Yv5wUcLpIR0hwbmI@pevik>
+ <974cc110-d47e-5fae-af5f-e2e610720e2d@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH] block: move from strlcpy with unused retval to strscpy
-Content-Language: en-US
-To:     Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Geoff Levand <geoff@infradead.org>, Jim Paris <jim@jtan.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-References: <20220818205958.6552-1-wsa+renesas@sang-engineering.com>
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20220818205958.6552-1-wsa+renesas@sang-engineering.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <974cc110-d47e-5fae-af5f-e2e610720e2d@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 18.08.22 um 22:59 schrieb Wolfram Sang:
-> Follow the advice of the below link and prefer 'strscpy' in this
-> subsystem. Conversion is 1:1 because the return value is not used.
-> Generated by a coccinelle script.
-> 
-> Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> ---
->  drivers/block/brd.c               |  2 +-
->  drivers/block/drbd/drbd_nl.c      |  2 +-
+> On 8/18/22 12:01 PM, Petr Vorel wrote:
+> >> On Thu, Aug 18, 2022 at 11:05:33AM -0500, Eric Sandeen wrote:
+> >>> On 8/18/22 10:25 AM, Petr Vorel wrote:
+> >>>> Hi Eric, all,
 
-For the drbd part:
 
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+> >>> ...
 
->  drivers/block/mtip32xx/mtip32xx.c | 12 ++++++------
->  drivers/block/ps3vram.c           |  2 +-
->  drivers/block/zram/zram_drv.c     |  6 +++---
->  5 files changed, 12 insertions(+), 12 deletions(-)
-...
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> index 013d355a2033..864c98e74875 100644
-> --- a/drivers/block/drbd/drbd_nl.c
-> +++ b/drivers/block/drbd/drbd_nl.c
-> @@ -4752,7 +4752,7 @@ void notify_helper(enum drbd_notification_type type,
->  	struct drbd_genlmsghdr *dh;
->  	int err;
->  
-> -	strlcpy(helper_info.helper_name, name, sizeof(helper_info.helper_name));
-> +	strscpy(helper_info.helper_name, name, sizeof(helper_info.helper_name));
->  	helper_info.helper_name_len = min(strlen(name), sizeof(helper_info.helper_name));
->  	helper_info.helper_status = status;
->
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+
+> >>>>> IOWS, I think the test expects that free space is reflected in statfs numbers
+> >>>>> immediately after a file is removed, and that's no longer the case here. They
+> >>>>> change in between the df check and the statfs check.
+
+> >>>>> (The test isn't just checking that the values are correct, it is checking that
+> >>>>> the values are /immediately/ correct.)
+
+> >>>>> Putting a "sleep 1" after the "rm -f" in the test seems to fix it; IIRC
+> >>>>> the max time to wait for inodegc is 1s. This does slow the test down a bit.
+
+> >>>> Sure, it looks like we can sleep just 50ms on my hw (although better might be to
+> >>>> poll for the result [1]), I just wanted to make sure there is no bug/regression
+> >>>> before hiding it with sleep.
+
+> >>>> Thanks for your input!
+
+> >>>> Kind regards,
+> >>>> Petr
+
+> >>>> [1] https://people.kernel.org/metan/why-sleep-is-almost-never-acceptable-in-tests
+
+> >>>>> -Eric
+
+> >>>> +++ testcases/commands/df/df01.sh
+> >>>> @@ -63,6 +63,10 @@ df_test()
+> >>>>  		tst_res TFAIL "'$cmd' failed."
+> >>>>  	fi
+
+> >>>> +	if [ "$DF_FS_TYPE" = xfs ]; then
+> >>>> +		tst_sleep 50ms
+> >>>> +	fi
+> >>>> +
+
+> >>> Probably worth at least a comment as to why ...
+
+> > Sure, that was just to document possible fix. BTW even 200ms was not reliable in
+> > the long run => not a good solution.
+
+> >>> Dave / Darrick / Brian - I'm not sure how long it might take to finish inodegc?
+> >>> A too-short sleep will let the flakiness remain ...
+
+> >> A fsfreeze -f / fsfreeze -u cycle will force all the background garbage
+> >> collection to run to completion when precise free space accounting is
+> >> being tested.
+> > Thanks for a hint, do you mean to put it into df_test after creating file with
+> > dd to wrap second df_verify (calls df) and df_check (runs stat and compare values)?
+> > Because that does not help - it fails when running in the loop (managed to break after 5th run).
+
+> I think it would go after you remove the file, to ensure that no space usage
+> changes are pending when you check.
+
+> <tests>
+
+> This seems to work fine (pseudopatch):
+
+>         ROD_SILENT rm -rf mntpoint/testimg
+
+> +       # Ensure free space change can be seen by statfs
+> +       fsfreeze -f $TST_MNTPOINT
+> +       fsfreeze -u $TST_MNTPOINT
+It looks like it works. We might add small binary which just calls these 2
+ioctl (FIFREEZE and FITHAW), just to be friendly to people on embedded
+environment with minimal dependencies (yes, some people might not install
+util-linux).
+
+>         # flush file system buffers, then we can get the actual sizes.
+>         sync
+
+
+> (although: what's the difference between $TST_MNTPOINT and mountpoint/ ?)
+Thanks for a report, fixed in 96ae882d3 ("df01.sh: Use $TST_MNTPOINT")
+
+> You just don't want to accidentally freeze the root filesystem ;)
+Sure :)
+
+Kind regards,
+Petr
+
+> -Eric
+
+
