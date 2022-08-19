@@ -2,142 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F7AC32773
-	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 19:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D64C32772
+	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 19:30:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351533AbiHSTVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Aug 2022 15:21:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41822 "EHLO
+        id S1350206AbiHSTaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Aug 2022 15:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351547AbiHSTVJ (ORCPT
+        with ESMTP id S1349705AbiHSTav (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Aug 2022 15:21:09 -0400
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55889115587;
-        Fri, 19 Aug 2022 12:20:53 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 3D19358036A;
-        Fri, 19 Aug 2022 15:20:47 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Fri, 19 Aug 2022 15:20:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm2; t=1660936847; x=
-        1660940447; bh=CvyHEbh2ZUEdzkoT+B+txpRgO4O1L+8cWUke1mfGNqg=; b=j
-        +ZEf1oMeiB338QYixL3bIOoDb0NNjvkmt7hQU1i4eIOF50eddqy8v9pAGxh0m46q
-        RnRhVW136WStCAel6iih1ILI4Q2k94glo/uEyhZ9TW6Po0yCjQEH3btLar0K72H3
-        x7We5MSIn48pNkLR3NdCSx+dIzTjxxEYN7aYzHN7lS0jbx9xU3bfrGBSepJoKQmN
-        q9ipu4sZWpY1YP34AGAJQNBN3J2PPpfD+tx3POr+BBYU49oKgl7vrfuGbG2Hp3xo
-        Kd3CN2mN1BSPqE5N2xgIdeN1jrLsW8Obv5Vp5ApXCoGkSZ29rvW9y651r18p+yvR
-        ktFJbeFJ1PJCMZV73uhqw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1660936847; x=1660940447; bh=CvyHEbh2ZUEdzkoT+B+txpRgO4O1
-        L+8cWUke1mfGNqg=; b=UPZCIu6efQhc7D2iSor4+HmuPDRBdw7/wvPEEw49GPLM
-        ns11K54N67th5zKCsCfukPtXGpMw4eYtr/VYBbuuP0iH0X9nobO2uDA5DJBlsAF+
-        0vYR8DzLO851e7u2ZGaez4AixR1fFqkGSzqB5FFOyBL2mVNH5pZqeLPhhEd6MxDd
-        ODk+A8bXtImj4jNKT3Svkocq/nagtXhCi5X8T3ERQ7JnA9FR327gR/E8LcPSiMoI
-        M2F8Tv2I5pWPA+/hfMeLfyE67Z6oS7RvASaG1evpaMNu/mHbQFADy9vWBCTgfOg7
-        EN2ABWXldiVMol87q3Ype5MMLuMZ8/Id7gkIdyBriw==
-X-ME-Sender: <xms:juL_Yg3OcJJLrKDOOZGUaRBGawGPz72En179-B6wxuwg6ANlVbuiyA>
-    <xme:juL_YrGFGTXDdHGZR9vMIuPvnweVCUhUj_6Esoc9OI6SxHO5qkh0opC21RSjO78Z-
-    EZSBaU_DWW4Up1UKSo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdeiuddgudeflecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefofgggkfgjfhffhffv
-    vefutgesthdtredtreertdenucfhrhhomhepfdevhhhrihhsucfouhhrphhhhidfuceolh
-    hishhtshestgholhhorhhrvghmvgguihgvshdrtghomheqnecuggftrfgrthhtvghrnhep
-    feehleeiudegueelteffueehgeektefgtdevvedufffgjedvgeevleejhfdvfefhnecuff
-    homhgrihhnpehgohhoghhlvgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgr
-    rhgrmhepmhgrihhlfhhrohhmpehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtoh
-    hm
-X-ME-Proxy: <xmx:juL_Yo5Khz7EQFsOc9QNRbOxGW2Jhj_gFmWWzIHnfhLVdQ6s-WRc1A>
-    <xmx:juL_Yp2-YVDJEq6af8iXFwSkcytbw61NzY1m8vshjwOJNcUXZaxhhA>
-    <xmx:juL_YjH73iV4Yf-TF3DetbtSJcnztdNAdJKpit10kCT83bppXWixqQ>
-    <xmx:j-L_Yi3eI5Ve0w4acMgNG9LwFJ9p6v7mTEVBMaewD_OGDJCtB-lmYA>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 3607717003FD; Fri, 19 Aug 2022 15:20:46 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
-Mime-Version: 1.0
-Message-Id: <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
-In-Reply-To: <Yv3NIQlDL0T3lstU@T590>
-References: <Yv0A6UhioH3rbi0E@T590>
- <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
- <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
- <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
- <Yv2w+Tuhw1RAoXI5@T590>
- <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
- <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
- <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
- <Yv3NIQlDL0T3lstU@T590>
-Date:   Fri, 19 Aug 2022 15:20:25 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Ming Lei" <ming.lei@redhat.com>
-Cc:     "Nikolay Borisov" <nborisov@suse.com>,
-        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
-        "Paolo Valente" <paolo.valente@linaro.org>,
-        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "Josef Bacik" <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Content-Type: text/plain
+        Fri, 19 Aug 2022 15:30:51 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3ADB958A;
+        Fri, 19 Aug 2022 12:30:49 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 91B871FB18;
+        Fri, 19 Aug 2022 19:30:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1660937448;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pw1NmHI9KzQxdz8dkkDOr++f6TIODk7Z6Hgc2C2acxU=;
+        b=MyYG8uqZp040tpE2MMzr5Ho4jKb7zfvN+/ROClufN5R8I/2VG5JhiMd6SyMmETC51TYzCF
+        QJpsquR3ejRsdSCgdD4+F4rNIUMBpbP/9TIcfHOymue+Eg0B3XycROGj1o3B9EeXO3p50h
+        BvKC0rWypmhJVgTlDM8styypiRy4hFQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1660937448;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pw1NmHI9KzQxdz8dkkDOr++f6TIODk7Z6Hgc2C2acxU=;
+        b=5xlLLG4bjE5ZBzdsjXx1CBk8khPg575IaSkbqPGIUubqKtgq6qlmFlydKTf7fRC+DHH7G4
+        /0pLB7xvSwtIBPCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 12B8513AE9;
+        Fri, 19 Aug 2022 19:30:48 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id feo7Aujk/2LLWQAAMHmgww
+        (envelope-from <pvorel@suse.cz>); Fri, 19 Aug 2022 19:30:48 +0000
+Date:   Fri, 19 Aug 2022 21:30:46 +0200
+From:   Petr Vorel <pvorel@suse.cz>
+To:     "Bird, Tim" <Tim.Bird@sony.com>
+Cc:     Eric Sandeen <sandeen@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        Eric Sandeen <sandeen@sandeen.net>, Jan Kara <jack@suse.cz>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Dave Chinner <david@fromorbit.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        "ltp@lists.linux.it" <ltp@lists.linux.it>
+Subject: Re: [LTP] LTP test df01.sh detected different size of loop device in
+ v5.19
+Message-ID: <Yv/k5tblR0QLQT1q@pevik>
+Reply-To: Petr Vorel <pvorel@suse.cz>
+References: <20220814224440.GR3600936@dread.disaster.area>
+ <YvoSeTmLoQVxq7p9@pevik>
+ <8d33a7a0-7a7c-47a1-ed84-83fd25089897@sandeen.net>
+ <Yv5Z7eu5RGnutMly@pevik>
+ <f03c6929-9a14-dd58-3726-dd2c231d0981@sandeen.net>
+ <Yv5oaxsX6z2qxxF3@magnolia>
+ <Yv5wUcLpIR0hwbmI@pevik>
+ <974cc110-d47e-5fae-af5f-e2e610720e2d@redhat.com>
+ <Yv+ziab2IiVIsqN6@pevik>
+ <BYAPR13MB25036BC8089554DABE287CC2FD6C9@BYAPR13MB2503.namprd13.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR13MB25036BC8089554DABE287CC2FD6C9@BYAPR13MB2503.namprd13.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
-> On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
->> 
->> 
->> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
->> > On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
->> >> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
->> >>
->> >>> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
->> 
->> Same boot, 3rd log. But the load is above 300 so I kinda need to sysrq+b soon.
->> 
->> https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=sharing
->> 
->
-> Also please test the following one too:
->
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 5ee62b95f3e5..d01c64be08e2 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx 
-> *hctx, struct list_head *list,
->  		if (!needs_restart ||
->  		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
->  			blk_mq_run_hw_queue(hctx, true);
-> -		else if (needs_restart && needs_resource)
-> +		else if (needs_restart && (needs_resource ||
-> +					blk_mq_is_shared_tags(hctx->flags)))
->  			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
-> 
->  		blk_mq_update_dispatch_busy(hctx, true);
->
+> > -----Original Message-----
+> > From: ltp <ltp-bounces+tim.bird=sony.com@lists.linux.it> On Behalf Of Petr Vorel
+
+> > > On 8/18/22 12:01 PM, Petr Vorel wrote:
+> > > >> On Thu, Aug 18, 2022 at 11:05:33AM -0500, Eric Sandeen wrote:
+> > > >>> On 8/18/22 10:25 AM, Petr Vorel wrote:
+> > > >>>> Hi Eric, all,
 
 
-With just this patch on top of 5.17.0, it still hangs. I've captured block debugfs log:
-https://drive.google.com/file/d/1ic4YHxoL9RrCdy_5FNdGfh_q_J3d_Ft0/view?usp=sharing
+> > > >>> ...
 
 
+> > > >>>>> IOWS, I think the test expects that free space is reflected in statfs numbers
+> > > >>>>> immediately after a file is removed, and that's no longer the case here. They
+> > > >>>>> change in between the df check and the statfs check.
 
--- 
-Chris Murphy
+> > > >>>>> (The test isn't just checking that the values are correct, it is checking that
+> > > >>>>> the values are /immediately/ correct.)
+
+> > > >>>>> Putting a "sleep 1" after the "rm -f" in the test seems to fix it; IIRC
+> > > >>>>> the max time to wait for inodegc is 1s. This does slow the test down a bit.
+
+> > > >>>> Sure, it looks like we can sleep just 50ms on my hw (although better might be to
+> > > >>>> poll for the result [1]), I just wanted to make sure there is no bug/regression
+> > > >>>> before hiding it with sleep.
+
+> > > >>>> Thanks for your input!
+
+> > > >>>> Kind regards,
+> > > >>>> Petr
+
+> > > >>>> [1] https://people.kernel.org/metan/why-sleep-is-almost-never-acceptable-in-tests
+
+> > > >>>>> -Eric
+
+> > > >>>> +++ testcases/commands/df/df01.sh
+> > > >>>> @@ -63,6 +63,10 @@ df_test()
+> > > >>>>  		tst_res TFAIL "'$cmd' failed."
+> > > >>>>  	fi
+
+> > > >>>> +	if [ "$DF_FS_TYPE" = xfs ]; then
+> > > >>>> +		tst_sleep 50ms
+> > > >>>> +	fi
+> > > >>>> +
+
+> > > >>> Probably worth at least a comment as to why ...
+
+> > > > Sure, that was just to document possible fix. BTW even 200ms was not reliable in
+> > > > the long run => not a good solution.
+
+> > > >>> Dave / Darrick / Brian - I'm not sure how long it might take to finish inodegc?
+> > > >>> A too-short sleep will let the flakiness remain ...
+
+> > > >> A fsfreeze -f / fsfreeze -u cycle will force all the background garbage
+> > > >> collection to run to completion when precise free space accounting is
+> > > >> being tested.
+> > > > Thanks for a hint, do you mean to put it into df_test after creating file with
+> > > > dd to wrap second df_verify (calls df) and df_check (runs stat and compare values)?
+> > > > Because that does not help - it fails when running in the loop (managed to break after 5th run).
+
+> > > I think it would go after you remove the file, to ensure that no space usage
+> > > changes are pending when you check.
+
+> > > <tests>
+
+> > > This seems to work fine (pseudopatch):
+
+> > >         ROD_SILENT rm -rf mntpoint/testimg
+
+> > > +       # Ensure free space change can be seen by statfs
+> > > +       fsfreeze -f $TST_MNTPOINT
+> > > +       fsfreeze -u $TST_MNTPOINT
+> > It looks like it works. We might add small binary which just calls these 2
+> > ioctl (FIFREEZE and FITHAW), just to be friendly to people on embedded
+> > environment with minimal dependencies (yes, some people might not install
+> > util-linux).
+
+> Thank you!!  It's good to know that small embedded systems are still
+> considered, and the consideration is much appreciated!  :-)
+
+> Let me know if you'd like me to try writing the utility.
+Thank you, Tim! I'll Cc you when sending this patch (likely next week).
+
+You might also appreciate our effort to lower down loop device size (used for
+all_filesystems): https://lore.kernel.org/ltp/Yv%2FkVXSK0xJGb3RO@pevik/
+
+Kind regards,
+Petr
+
+>  -- Tim
+
