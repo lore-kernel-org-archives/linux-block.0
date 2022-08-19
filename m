@@ -2,106 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D41FEC28B2B
-	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 17:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F7AC32773
+	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 19:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351047AbiHSRzO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Aug 2022 13:55:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39424 "EHLO
+        id S1351533AbiHSTVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Aug 2022 15:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351220AbiHSRyu (ORCPT
+        with ESMTP id S1351547AbiHSTVJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Aug 2022 13:54:50 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4389184ECC;
-        Fri, 19 Aug 2022 10:35:23 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id k14so4935413pfh.0;
-        Fri, 19 Aug 2022 10:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc;
-        bh=HJOADyjEijTZgHMmhk5s3Tca02tMu8m4cNUu2EhYaAU=;
-        b=fdmiJtb9RMBLJTQ+Xgl/kx6fm6FmEyy0L/lYlYxIWJX5k3m+R5z3YbZgU7aYih8WAc
-         sAmQjBqm9+W17s6M38OvDRgjiaSaOqlC0SCu+JBOU3BI1QYBGiJOsQ+t76kaxgeBcVGJ
-         NuCOoSKl8ukmGAzUbJrV5NkBVynK+S6LGQjUYKInpZa7u/wu9ffgjzLdBX0VsxlKllze
-         1VjABlNkXWdpcbqbtajq/AT7I3QwDIS9ZOX2ev3qXXy/waWCcM9UnVkD2OOyffE+BsUR
-         ZRZQCqFQ25mZ5LqtHndedni2VRA0mWJ1bu8qjDcUWiWZEPkPcZiQmUfAl3l5vL+MdaJs
-         46vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc;
-        bh=HJOADyjEijTZgHMmhk5s3Tca02tMu8m4cNUu2EhYaAU=;
-        b=fMpIqFjexyWXUNpjOBoyThm/LCu/sacwSJruEYbesWRFU3J3dCvR5kz3iGVZF7hZGF
-         1t//iqk/lv37ZOqbj0yymmrD2F8YyqSM282mE1gBHqrbMx3NkJ37jEbxOAC+ojyhvjka
-         W8zx3lt9KUMhVYzKRv4zdFb9hj5+bN69JITRyhPzNxt2+AoQmKrhPjC9KaE5zzdj3HdI
-         ey9mr8rO98098U+7t4HHp1B00KTCgwO7NsAjlF84+NCSVOPt5TOEXpOY0GZaWuimkh47
-         ewiesEvhWlAUZFl/QMvhCrhP7wAjBeqJ4j7OHdf+lUlW4aCcLsYaZNDwieaa3+GOuNfk
-         XW3Q==
-X-Gm-Message-State: ACgBeo1yoItwAIg4zkUFZf5Nz2WnAoffiCJfdqDFysglCHtuxfltawdF
-        ZCbHJBmD0AKjpfdAHedc8pBfRecml7o=
-X-Google-Smtp-Source: AA6agR4oZ1QImb2//4w2oB/fgGghUe4I3us2MzRuh0RNXn7NIGpxiEUSBf0ktiEmz2DtHEXYyrshdQ==
-X-Received: by 2002:a63:dc56:0:b0:419:e9df:28ce with SMTP id f22-20020a63dc56000000b00419e9df28cemr7006612pgj.48.1660930522661;
-        Fri, 19 Aug 2022 10:35:22 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:db7d])
-        by smtp.gmail.com with ESMTPSA id c9-20020a170902d48900b0016db43e5212sm3489712plg.175.2022.08.19.10.35.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Aug 2022 10:35:22 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 19 Aug 2022 07:35:20 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v7 9/9] blk-throttle: clean up flag 'THROTL_TG_PENDING'
-Message-ID: <Yv/J2CXNdEimfqlv@slm.duckdns.org>
-References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
- <20220802140415.2960284-10-yukuai1@huaweicloud.com>
- <Yvv6kk/RD5LT+3dk@slm.duckdns.org>
- <65d93ec6-2465-35f1-314f-f092ce631100@huaweicloud.com>
- <Yv0rR9gBL0qbYeXp@slm.duckdns.org>
- <841b7b5a-b908-649a-c09d-32c8de5f1c14@huaweicloud.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <841b7b5a-b908-649a-c09d-32c8de5f1c14@huaweicloud.com>
+        Fri, 19 Aug 2022 15:21:09 -0400
+Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55889115587;
+        Fri, 19 Aug 2022 12:20:53 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 3D19358036A;
+        Fri, 19 Aug 2022 15:20:47 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute3.internal (MEProxy); Fri, 19 Aug 2022 15:20:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        colorremedies.com; h=cc:cc:content-type:date:date:from:from
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm2; t=1660936847; x=
+        1660940447; bh=CvyHEbh2ZUEdzkoT+B+txpRgO4O1L+8cWUke1mfGNqg=; b=j
+        +ZEf1oMeiB338QYixL3bIOoDb0NNjvkmt7hQU1i4eIOF50eddqy8v9pAGxh0m46q
+        RnRhVW136WStCAel6iih1ILI4Q2k94glo/uEyhZ9TW6Po0yCjQEH3btLar0K72H3
+        x7We5MSIn48pNkLR3NdCSx+dIzTjxxEYN7aYzHN7lS0jbx9xU3bfrGBSepJoKQmN
+        q9ipu4sZWpY1YP34AGAJQNBN3J2PPpfD+tx3POr+BBYU49oKgl7vrfuGbG2Hp3xo
+        Kd3CN2mN1BSPqE5N2xgIdeN1jrLsW8Obv5Vp5ApXCoGkSZ29rvW9y651r18p+yvR
+        ktFJbeFJ1PJCMZV73uhqw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1660936847; x=1660940447; bh=CvyHEbh2ZUEdzkoT+B+txpRgO4O1
+        L+8cWUke1mfGNqg=; b=UPZCIu6efQhc7D2iSor4+HmuPDRBdw7/wvPEEw49GPLM
+        ns11K54N67th5zKCsCfukPtXGpMw4eYtr/VYBbuuP0iH0X9nobO2uDA5DJBlsAF+
+        0vYR8DzLO851e7u2ZGaez4AixR1fFqkGSzqB5FFOyBL2mVNH5pZqeLPhhEd6MxDd
+        ODk+A8bXtImj4jNKT3Svkocq/nagtXhCi5X8T3ERQ7JnA9FR327gR/E8LcPSiMoI
+        M2F8Tv2I5pWPA+/hfMeLfyE67Z6oS7RvASaG1evpaMNu/mHbQFADy9vWBCTgfOg7
+        EN2ABWXldiVMol87q3Ype5MMLuMZ8/Id7gkIdyBriw==
+X-ME-Sender: <xms:juL_Yg3OcJJLrKDOOZGUaRBGawGPz72En179-B6wxuwg6ANlVbuiyA>
+    <xme:juL_YrGFGTXDdHGZR9vMIuPvnweVCUhUj_6Esoc9OI6SxHO5qkh0opC21RSjO78Z-
+    EZSBaU_DWW4Up1UKSo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdeiuddgudeflecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enogfuuhhsphgvtghtffhomhgrihhnucdlgeelmdenucfjughrpefofgggkfgjfhffhffv
+    vefutgesthdtredtreertdenucfhrhhomhepfdevhhhrihhsucfouhhrphhhhidfuceolh
+    hishhtshestgholhhorhhrvghmvgguihgvshdrtghomheqnecuggftrfgrthhtvghrnhep
+    feehleeiudegueelteffueehgeektefgtdevvedufffgjedvgeevleejhfdvfefhnecuff
+    homhgrihhnpehgohhoghhlvgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgr
+    rhgrmhepmhgrihhlfhhrohhmpehlihhsthhssegtohhlohhrrhgvmhgvughivghsrdgtoh
+    hm
+X-ME-Proxy: <xmx:juL_Yo5Khz7EQFsOc9QNRbOxGW2Jhj_gFmWWzIHnfhLVdQ6s-WRc1A>
+    <xmx:juL_Yp2-YVDJEq6af8iXFwSkcytbw61NzY1m8vshjwOJNcUXZaxhhA>
+    <xmx:juL_YjH73iV4Yf-TF3DetbtSJcnztdNAdJKpit10kCT83bppXWixqQ>
+    <xmx:j-L_Yi3eI5Ve0w4acMgNG9LwFJ9p6v7mTEVBMaewD_OGDJCtB-lmYA>
+Feedback-ID: i06494636:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 3607717003FD; Fri, 19 Aug 2022 15:20:46 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
+Mime-Version: 1.0
+Message-Id: <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
+In-Reply-To: <Yv3NIQlDL0T3lstU@T590>
+References: <Yv0A6UhioH3rbi0E@T590>
+ <f633c476-bdc9-40e2-a93f-29601979f833@www.fastmail.com>
+ <Yv0KmT8UYos2/4SX@T590>
+ <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
+ <Yv2P0zyoVvz35w/m@T590>
+ <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
+ <Yv2w+Tuhw1RAoXI5@T590>
+ <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
+ <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
+ <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
+ <Yv3NIQlDL0T3lstU@T590>
+Date:   Fri, 19 Aug 2022 15:20:25 -0400
+From:   "Chris Murphy" <lists@colorremedies.com>
+To:     "Ming Lei" <ming.lei@redhat.com>
+Cc:     "Nikolay Borisov" <nborisov@suse.com>,
+        "Jens Axboe" <axboe@kernel.dk>, "Jan Kara" <jack@suse.cz>,
+        "Paolo Valente" <paolo.valente@linaro.org>,
+        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        "Josef Bacik" <josef@toxicpanda.com>
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 18, 2022 at 05:29:39PM +0800, Yu Kuai wrote:
-> Hi, Tejun!
-> 
-> 在 2022/08/18 1:54, Tejun Heo 写道:
-> > Hello,
-> > 
-> > On Wed, Aug 17, 2022 at 09:45:13AM +0800, Yu Kuai wrote:
-> > > > I don't know whether this is better or not. It's minutely less lines of code
-> > > > but also makes the code a bit more fragile. I'm ambivalent. At any rate,
-> > > > please move these trivial patches to the head of the series or post them
-> > > > separately.
-> > > 
-> > > Can I ask why do you think this patch makes the code a bit more fragile?
-> > 
-> > It's just one step further removed. Before, the flag was trivially in sync
-> > with the on queue status. After, the relationship is more indirect and
-> > easier to break accidentally. Not that it's a major problem. Just not sure
-> > what the benefit of the change is.
-> 
-> If you are worried about that, I can keep the flag, then the last two
-> patches will cleanup:
 
-I wasn't necessarily worried. It's more that I couldn't tell why the code is
-better afterwards. Maybe update the commit message to explain why the new
-code is better?
 
-Thanks.
+On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
+> On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
+>> 
+>> 
+>> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
+>> > On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
+>> >> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
+>> >>
+>> >>> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
+>> 
+>> Same boot, 3rd log. But the load is above 300 so I kinda need to sysrq+b soon.
+>> 
+>> https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=sharing
+>> 
+>
+> Also please test the following one too:
+>
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 5ee62b95f3e5..d01c64be08e2 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx 
+> *hctx, struct list_head *list,
+>  		if (!needs_restart ||
+>  		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
+>  			blk_mq_run_hw_queue(hctx, true);
+> -		else if (needs_restart && needs_resource)
+> +		else if (needs_restart && (needs_resource ||
+> +					blk_mq_is_shared_tags(hctx->flags)))
+>  			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+> 
+>  		blk_mq_update_dispatch_busy(hctx, true);
+>
+
+
+With just this patch on top of 5.17.0, it still hangs. I've captured block debugfs log:
+https://drive.google.com/file/d/1ic4YHxoL9RrCdy_5FNdGfh_q_J3d_Ft0/view?usp=sharing
+
+
 
 -- 
-tejun
+Chris Murphy
