@@ -2,247 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE0AC38145
-	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 22:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C65A7C32792
+	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 23:09:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242389AbiHSWcJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Aug 2022 18:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35330 "EHLO
+        id S243456AbiHSXJz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Aug 2022 19:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242340AbiHSWcI (ORCPT
+        with ESMTP id S236190AbiHSXJy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Aug 2022 18:32:08 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927F0104459;
-        Fri, 19 Aug 2022 15:32:07 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27JLvs0B015024;
-        Fri, 19 Aug 2022 22:31:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=KAa9srvtohGx10nqbc0IgqDTkenaOUYDx3Izv8j+uUg=;
- b=sM8o8h7fKQSAdc4V2hhUNudeBPZPyXBWIYX/v6ZR3GlTCsLsDKdbm+JxRJcDVHD0bCss
- 8aKE+Y37Yri9vf/owWjPPxNjzxvTfiJh+VOZDtXAMtFovQu2PYIU6dr7rvsVdgqH3Cc9
- gN33ZnwjQPm8HCYuKJp36vBKWHytXdhRTGZfV2D8uuagVXvCz5P2SjgLOc0i/7cjNKEe
- N+5564dvCLVDg+1LVEL8Zt/sdysf36p8hZ4MHjpy4eTI3SU9nU3ViQ3H6Bk/i5QpWEER
- AfgbbQu9Pihu/c5DnxsqGpqgcxNxbPMaZ8AJiIDxzHxfa1uv+Cg+ZPtSFKVltd8Opz63 Sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j2jw7gqfh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 22:31:47 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27JML5KG011189;
-        Fri, 19 Aug 2022 22:31:46 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3j2jw7gqfa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 22:31:46 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27JMLX93005677;
-        Fri, 19 Aug 2022 22:31:45 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
-        by ppma05wdc.us.ibm.com with ESMTP id 3hx3kaqb6h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Aug 2022 22:31:45 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27JMVjhS25952710
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Aug 2022 22:31:45 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 127296A05F;
-        Fri, 19 Aug 2022 22:31:45 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B567D6A05A;
-        Fri, 19 Aug 2022 22:31:43 +0000 (GMT)
-Received: from rhel-laptop.ibm.com.com (unknown [9.65.239.18])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 19 Aug 2022 22:31:43 +0000 (GMT)
-From:   gjoyce@linux.vnet.ibm.com
-To:     linux-block@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org, jonathan.derrick@linux.dev,
-        brking@linux.vnet.ibm.com, msuchanek@suse.de, mpe@ellerman.id.au,
-        nayna@linux.ibm.com, axboe@kernel.dk, akpm@linux-foundation.org,
-        gjoyce@linux.vnet.ibm.com, linux-efi@vger.kernel.org,
-        keyrings@vger.kernel.org, dhowells@redhat.com, jarkko@kernel.org
-Subject: [PATCH v4 2/3] powerpc/pseries: PLPKS SED Opal keystore support
-Date:   Fri, 19 Aug 2022 17:31:37 -0500
-Message-Id: <20220819223138.1457091-3-gjoyce@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220819223138.1457091-1-gjoyce@linux.vnet.ibm.com>
-References: <20220819223138.1457091-1-gjoyce@linux.vnet.ibm.com>
+        Fri, 19 Aug 2022 19:09:54 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D554F6B2;
+        Fri, 19 Aug 2022 16:09:53 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4AA04B8280F;
+        Fri, 19 Aug 2022 23:09:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93BD3C433C1;
+        Fri, 19 Aug 2022 23:09:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660950591;
+        bh=jyQMlfDyLfQswfrcmubQj7ukvdgCEoTA8LhJP39mZNY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QuOfKLcTLqSxarEIMozH41HlKKSXIw1Ha5z+iGobBTp0XC/190sxrbX4xymxeQZFF
+         3WudYVrb63Ic60WpCeWYRRbbMC6sNiKGVAznV8UysIUN6uVjyi5NDY0XFhaprIuD8A
+         pF59daiDM0+L9HkOjVyll+2uPITOtrvjzgrPS16r1XJmBV5ma+KvcLc+BHhqr03upy
+         fMsLt1xcBM7/2jnJiXFv+FJPXeiiS+0sz7tw4jOhLuKIjQw+8yi7bYCZL/cqb3a2bJ
+         OHxlSv4rJUDd6AvnKU3c4q61YHoNXW9ZdFJr7Qw7jTpstVUaoUe5id8DJL1pk0juet
+         AgN1uJU3z9Rkg==
+Date:   Fri, 19 Aug 2022 16:09:48 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Andreas Dilger <adilger@dilger.ca>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        xfs <linux-xfs@vger.kernel.org>, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Message-ID: <YwAYPFxW7VV4M9D1@sol.localdomain>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org>
+ <YtyoF89iOg8gs7hj@google.com>
+ <Yt7dCcG0ns85QqJe@sol.localdomain>
+ <YuXyKh8Zvr56rR4R@google.com>
+ <YvrrEcw4E+rpDLwM@sol.localdomain>
+ <20220816090312.GU3600936@dread.disaster.area>
+ <D1CDACE3-EC7E-43E4-8F49-EEA2B6E71A41@dilger.ca>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sslPlRYGF1XJ2crWZVWc7McGjzt2fUkW
-X-Proofpoint-GUID: R84sbELsnrJkWagdXOjptO0zoB6Yh9tx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-19_12,2022-08-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
- impostorscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
- suspectscore=0 clxscore=1015 spamscore=0 lowpriorityscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208190082
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D1CDACE3-EC7E-43E4-8F49-EEA2B6E71A41@dilger.ca>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Greg Joyce <gjoyce@linux.vnet.ibm.com>
+On Tue, Aug 16, 2022 at 10:42:29AM -0600, Andreas Dilger wrote:
+> 
+> IMHO, this whole discussion is putting the cart before the horse.
+> Changing existing (and useful) IO behavior to accommodate an API that
+> nobody has ever used, and is unlikely to even be widely used, doesn't
+> make sense to me.  Most applications won't check or care about the new
+> DIO size fields, since they've lived this long without statx() returning
+> this info, and will just pick a "large enough" size (4KB, 1MB, whatever)
+> that gives them the performance they need.  They *WILL* care if the app
+> is suddenly unable to read data from a file in ways that have worked for
+> a long time.
+> 
+> Even if apps are modified to check these new DIO size fields, and then
+> try to DIO write to a file in f2fs that doesn't allow it, then f2fs will
+> return an error, which is what it would have done without the statx()
+> changes, so no harm done AFAICS.
+> 
+> Even with a more-complex DIO status return that handles a "direction"
+> field (which IMHO is needlessly complex), there is always the potential
+> for a TOCTOU race where a file changes between checking and access, so
+> the userspace code would need to handle this.
+> 
 
-Define operations for SED Opal to read/write keys
-from POWER LPAR Platform KeyStore(PLPKS). This allows
-for non-volatile storage of SED Opal keys.
+I'm having trouble making sense of your argument here; you seem to be saying
+that STATX_DIOALIGN isn't useful, so it doesn't matter if we design it
+correctly?  That line of reasoning is concerning, as it's certainly intended to
+be useful, and if it's not useful there's no point in adding it.
 
-Signed-off-by: Greg Joyce <gjoyce@linux.vnet.ibm.com>
----
- arch/powerpc/platforms/pseries/Makefile       |   1 +
- .../powerpc/platforms/pseries/plpks_sed_ops.c | 124 ++++++++++++++++++
- 2 files changed, 125 insertions(+)
- create mode 100644 arch/powerpc/platforms/pseries/plpks_sed_ops.c
+Are there any specific concerns that you have, besides TOCTOU races and the lack
+of support for read-only DIO?
 
-diff --git a/arch/powerpc/platforms/pseries/Makefile b/arch/powerpc/platforms/pseries/Makefile
-index 14e143b946a3..b7fea9e48a58 100644
---- a/arch/powerpc/platforms/pseries/Makefile
-+++ b/arch/powerpc/platforms/pseries/Makefile
-@@ -29,6 +29,7 @@ obj-$(CONFIG_PPC_SPLPAR)	+= vphn.o
- obj-$(CONFIG_PPC_SVM)		+= svm.o
- obj-$(CONFIG_FA_DUMP)		+= rtas-fadump.o
- obj-$(CONFIG_PSERIES_PLPKS) += plpks.o
-+obj-$(CONFIG_PSERIES_PLPKS) += plpks_sed_ops.o
- 
- obj-$(CONFIG_SUSPEND)		+= suspend.o
- obj-$(CONFIG_PPC_VAS)		+= vas.o vas-sysfs.o
-diff --git a/arch/powerpc/platforms/pseries/plpks_sed_ops.c b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
-new file mode 100644
-index 000000000000..833226738448
---- /dev/null
-+++ b/arch/powerpc/platforms/pseries/plpks_sed_ops.c
-@@ -0,0 +1,124 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * POWER Platform specific code for non-volatile SED key access
-+ * Copyright (C) 2022 IBM Corporation
-+ *
-+ * Define operations for SED Opal to read/write keys
-+ * from POWER LPAR Platform KeyStore(PLPKS).
-+ *
-+ * Self Encrypting Drives(SED) key storage using PLPKS
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/ioctl.h>
-+#include <linux/sed-opal-key.h>
-+#include "plpks.h"
-+
-+/*
-+ * structure that contains all SED data
-+ */
-+struct plpks_sed_object_data {
-+	u_char version;
-+	u_char pad1[7];
-+	u_long authority;
-+	u_long range;
-+	u_int  key_len;
-+	u_char key[32];
-+};
-+
-+#define PLPKS_PLATVAR_POLICY            WORLDREADABLE
-+#define PLPKS_PLATVAR_OS_COMMON         4
-+
-+#define PLPKS_SED_OBJECT_DATA_V0        0
-+#define PLPKS_SED_MANGLED_LABEL         "/default/pri"
-+#define PLPKS_SED_COMPONENT             "sed-opal"
-+#define PLPKS_SED_KEY                   "opal-boot-pin"
-+
-+/*
-+ * authority is admin1 and range is global
-+ */
-+#define PLPKS_SED_AUTHORITY  0x0000000900010001
-+#define PLPKS_SED_RANGE      0x0000080200000001
-+
-+void plpks_init_var(struct plpks_var *var, char *keyname)
-+{
-+	var->name = keyname;
-+	var->namelen = strlen(keyname);
-+	if (strcmp(PLPKS_SED_KEY, keyname) == 0) {
-+		var->name = PLPKS_SED_MANGLED_LABEL;
-+		var->namelen = strlen(keyname);
-+	}
-+	var->policy = PLPKS_PLATVAR_POLICY;
-+	var->os = PLPKS_PLATVAR_OS_COMMON;
-+	var->data = NULL;
-+	var->datalen = 0;
-+	var->component = PLPKS_SED_COMPONENT;
-+}
-+
-+/*
-+ * Read the SED Opal key from PLPKS given the label
-+ */
-+int sed_read_key(char *keyname, char *key, u_int *keylen)
-+{
-+	struct plpks_var var;
-+	struct plpks_sed_object_data *data;
-+	u_int offset = 0;
-+	int ret;
-+
-+	plpks_init_var(&var, keyname);
-+
-+	offset = offsetof(struct plpks_sed_object_data, key);
-+
-+	ret = plpks_read_os_var(&var);
-+	if (ret != 0)
-+		return ret;
-+
-+	if (offset > var.datalen)
-+		offset = 0;
-+
-+	data = (struct plpks_sed_object_data *)var.data;
-+	*keylen = be32_to_cpu(data->key_len);
-+
-+	if (var.data) {
-+		memcpy(key, var.data + offset, var.datalen - offset);
-+		key[*keylen] = '\0';
-+		kfree(var.data);
-+	}
-+
-+	return 0;
-+}
-+
-+/*
-+ * Write the SED Opal key to PLPKS given the label
-+ */
-+int sed_write_key(char *keyname, char *key, u_int keylen)
-+{
-+	struct plpks_var var;
-+	struct plpks_sed_object_data data;
-+	struct plpks_var_name vname;
-+
-+	plpks_init_var(&var, keyname);
-+
-+	var.datalen = sizeof(struct plpks_sed_object_data);
-+	var.data = (u8 *)&data;
-+
-+	/* initialize SED object */
-+	data.version = PLPKS_SED_OBJECT_DATA_V0;
-+	data.authority = cpu_to_be64(PLPKS_SED_AUTHORITY);
-+	data.range = cpu_to_be64(PLPKS_SED_RANGE);
-+	memset(&data.pad1, '\0', sizeof(data.pad1));
-+	data.key_len = cpu_to_be32(keylen);
-+	memcpy(data.key, (char *)key, keylen);
-+
-+	/*
-+	 * Key update requires remove first. The return value
-+	 * is ignored since it's okay if the key doesn't exist.
-+	 */
-+	vname.namelen = var.namelen;
-+	vname.name = var.name;
-+	plpks_remove_var(var.component, var.os, vname);
-+
-+	return plpks_write_var(var);
-+}
--- 
-gjoyce@linux.vnet.ibm.com
+I don't think that TOCTOU races are a real concern here.  Generally DIO
+constraints would only change if the application doing DIO intentionally does
+something to the file, or if there are changes that involve the filesystem being
+taken offline, e.g. the filesystem being mounted with significantly different
+options or being moved to a different block device.  And, well, everything else
+in stat()/statx() is subject to TOCTOU as well, but is still used...
 
+- Eric
