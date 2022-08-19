@@ -2,175 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D64C32772
-	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 19:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 917A7C32771
+	for <linux-block@archiver.kernel.org>; Fri, 19 Aug 2022 20:56:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350206AbiHSTaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Aug 2022 15:30:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57494 "EHLO
+        id S1352214AbiHSU43 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Aug 2022 16:56:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349705AbiHSTav (ORCPT
+        with ESMTP id S1352079AbiHSU4Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Aug 2022 15:30:51 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3ADB958A;
-        Fri, 19 Aug 2022 12:30:49 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 91B871FB18;
-        Fri, 19 Aug 2022 19:30:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1660937448;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pw1NmHI9KzQxdz8dkkDOr++f6TIODk7Z6Hgc2C2acxU=;
-        b=MyYG8uqZp040tpE2MMzr5Ho4jKb7zfvN+/ROClufN5R8I/2VG5JhiMd6SyMmETC51TYzCF
-        QJpsquR3ejRsdSCgdD4+F4rNIUMBpbP/9TIcfHOymue+Eg0B3XycROGj1o3B9EeXO3p50h
-        BvKC0rWypmhJVgTlDM8styypiRy4hFQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1660937448;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pw1NmHI9KzQxdz8dkkDOr++f6TIODk7Z6Hgc2C2acxU=;
-        b=5xlLLG4bjE5ZBzdsjXx1CBk8khPg575IaSkbqPGIUubqKtgq6qlmFlydKTf7fRC+DHH7G4
-        /0pLB7xvSwtIBPCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 12B8513AE9;
-        Fri, 19 Aug 2022 19:30:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id feo7Aujk/2LLWQAAMHmgww
-        (envelope-from <pvorel@suse.cz>); Fri, 19 Aug 2022 19:30:48 +0000
-Date:   Fri, 19 Aug 2022 21:30:46 +0200
-From:   Petr Vorel <pvorel@suse.cz>
-To:     "Bird, Tim" <Tim.Bird@sony.com>
-Cc:     Eric Sandeen <sandeen@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        Eric Sandeen <sandeen@sandeen.net>, Jan Kara <jack@suse.cz>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        "ltp@lists.linux.it" <ltp@lists.linux.it>
-Subject: Re: [LTP] LTP test df01.sh detected different size of loop device in
- v5.19
-Message-ID: <Yv/k5tblR0QLQT1q@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20220814224440.GR3600936@dread.disaster.area>
- <YvoSeTmLoQVxq7p9@pevik>
- <8d33a7a0-7a7c-47a1-ed84-83fd25089897@sandeen.net>
- <Yv5Z7eu5RGnutMly@pevik>
- <f03c6929-9a14-dd58-3726-dd2c231d0981@sandeen.net>
- <Yv5oaxsX6z2qxxF3@magnolia>
- <Yv5wUcLpIR0hwbmI@pevik>
- <974cc110-d47e-5fae-af5f-e2e610720e2d@redhat.com>
- <Yv+ziab2IiVIsqN6@pevik>
- <BYAPR13MB25036BC8089554DABE287CC2FD6C9@BYAPR13MB2503.namprd13.prod.outlook.com>
+        Fri, 19 Aug 2022 16:56:25 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A4AEA8
+        for <linux-block@vger.kernel.org>; Fri, 19 Aug 2022 13:56:22 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id a22so5315540pfg.3
+        for <linux-block@vger.kernel.org>; Fri, 19 Aug 2022 13:56:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc;
+        bh=8+IfiWRKL+MQ/1/EAfazVxov40f3SAKzLdawV25F/EU=;
+        b=IfWP453Cv578LklJX8Kv/lqYygdzcDHWs5b31OMNpqNz9aBGOwqHMyXTHFSf8p9/Pt
+         +de4DoMoG/0u8eaEVnFO/7OD9uYk2sAv+t9uoKSAzsX+Hy7kvquli5vy1qk4U7IT4q7U
+         8NB6i8YRdbf+2akf9+GQWUTT3X7nyVkP0FK2tf6yhispsN25FL8Sb/VydWsAkU6OwuBt
+         Gni/kRMzzjMD7XVZ4TtzR9mjHVt4Jmj1FqQmY7Ht2yfNJopG3rHB+Qra20S/gJFHrskV
+         Tsijfjn3w1rb+Xh/+4HnJaKejZgu4U4XjtN4+1sCbyCBjf1fS0Q71s/Wp3MMA0CCUjkP
+         c2uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc;
+        bh=8+IfiWRKL+MQ/1/EAfazVxov40f3SAKzLdawV25F/EU=;
+        b=oDGdSiLF2LGHWWbc3aLJqB3mG8n2ntKVMBvd8gdSF+ifHZ1M1+ZdpdXqhhsGZtwj1Y
+         29xbPa08wtjp+yvUGIQ6CXit4qDtmqFF0/X/uzgg99C318P0g84v/0YO//aq5abKgPe5
+         CNmYXCPbbrbdFiHGctqIWNuZXss2LUHZYDrCn2cv5rU4nY8pqnlR5Ihi1ZrBS9XM+Mnj
+         EIVwgklVmIp2GKJDxmiaw9f7ny3WWmfUuZ6WwC35TTJfoAAtHayiPLhl5138sFfKNe0Y
+         y7yOUnf0qxVp+KnMeRHWHbJNyI2jN0gaRkkHDsMKAz1Ho9azZjPNgTCcLVv7ls90uqlM
+         4z0w==
+X-Gm-Message-State: ACgBeo2rShTfft5NtTg6N9pAmimO7Mxi8D+GMpnstSKefde99PehVfha
+        f51MhCVSjNoo3Hx6yFkwilMm7w==
+X-Google-Smtp-Source: AA6agR7T667f8sV4aTprnUUCejdY7pKARzfKXPPQ5tNaWZWHNnh0okLru8Ot7FYjYRlvWUhLDNzJ5g==
+X-Received: by 2002:a63:4e25:0:b0:41c:62a2:ecc3 with SMTP id c37-20020a634e25000000b0041c62a2ecc3mr7810620pgb.596.1660942581614;
+        Fri, 19 Aug 2022 13:56:21 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id l18-20020a170903005200b001712c008f99sm3584603pla.11.2022.08.19.13.56.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Aug 2022 13:56:21 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     luca.boccassi@gmail.com, linux-block@vger.kernel.org
+Cc:     gmazyland@gmail.com, dougmill@linux.vnet.ibm.com,
+        hch@infradead.org, Jonathan.Derrick@solidigmtechnology.com
+In-Reply-To: <20220816140713.84893-1-luca.boccassi@gmail.com>
+References: <20220816140713.84893-1-luca.boccassi@gmail.com>
+Subject: Re: [PATCH v7] block: sed-opal: Add ioctl to return device status
+Message-Id: <166094258060.37308.11668013247195344136.b4-ty@kernel.dk>
+Date:   Fri, 19 Aug 2022 20:56:20 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR13MB25036BC8089554DABE287CC2FD6C9@BYAPR13MB2503.namprd13.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, 16 Aug 2022 15:07:13 +0100, luca.boccassi@gmail.com wrote:
+> From: "dougmill@linux.vnet.ibm.com" <dougmill@linux.vnet.ibm.com>
+> 
+> Provide a mechanism to retrieve basic status information about
+> the device, including the "supported" flag indicating whether
+> SED-OPAL is supported. The information returned is from the various
+> feature descriptors received during the discovery0 step, and so
+> this ioctl does nothing more than perform the discovery0 step
+> and then save the information received. See "struct opal_status"
+> and OPAL_FL_* bits for the status information currently returned.
+> 
+> [...]
 
+Applied, thanks!
 
-> > -----Original Message-----
-> > From: ltp <ltp-bounces+tim.bird=sony.com@lists.linux.it> On Behalf Of Petr Vorel
+[1/1] block: sed-opal: Add ioctl to return device status
+      commit: 5ba3cd2f94a4fbc952f7a343a267e5c570412dd8
 
-> > > On 8/18/22 12:01 PM, Petr Vorel wrote:
-> > > >> On Thu, Aug 18, 2022 at 11:05:33AM -0500, Eric Sandeen wrote:
-> > > >>> On 8/18/22 10:25 AM, Petr Vorel wrote:
-> > > >>>> Hi Eric, all,
+Best regards,
+-- 
+Jens Axboe
 
-
-> > > >>> ...
-
-
-> > > >>>>> IOWS, I think the test expects that free space is reflected in statfs numbers
-> > > >>>>> immediately after a file is removed, and that's no longer the case here. They
-> > > >>>>> change in between the df check and the statfs check.
-
-> > > >>>>> (The test isn't just checking that the values are correct, it is checking that
-> > > >>>>> the values are /immediately/ correct.)
-
-> > > >>>>> Putting a "sleep 1" after the "rm -f" in the test seems to fix it; IIRC
-> > > >>>>> the max time to wait for inodegc is 1s. This does slow the test down a bit.
-
-> > > >>>> Sure, it looks like we can sleep just 50ms on my hw (although better might be to
-> > > >>>> poll for the result [1]), I just wanted to make sure there is no bug/regression
-> > > >>>> before hiding it with sleep.
-
-> > > >>>> Thanks for your input!
-
-> > > >>>> Kind regards,
-> > > >>>> Petr
-
-> > > >>>> [1] https://people.kernel.org/metan/why-sleep-is-almost-never-acceptable-in-tests
-
-> > > >>>>> -Eric
-
-> > > >>>> +++ testcases/commands/df/df01.sh
-> > > >>>> @@ -63,6 +63,10 @@ df_test()
-> > > >>>>  		tst_res TFAIL "'$cmd' failed."
-> > > >>>>  	fi
-
-> > > >>>> +	if [ "$DF_FS_TYPE" = xfs ]; then
-> > > >>>> +		tst_sleep 50ms
-> > > >>>> +	fi
-> > > >>>> +
-
-> > > >>> Probably worth at least a comment as to why ...
-
-> > > > Sure, that was just to document possible fix. BTW even 200ms was not reliable in
-> > > > the long run => not a good solution.
-
-> > > >>> Dave / Darrick / Brian - I'm not sure how long it might take to finish inodegc?
-> > > >>> A too-short sleep will let the flakiness remain ...
-
-> > > >> A fsfreeze -f / fsfreeze -u cycle will force all the background garbage
-> > > >> collection to run to completion when precise free space accounting is
-> > > >> being tested.
-> > > > Thanks for a hint, do you mean to put it into df_test after creating file with
-> > > > dd to wrap second df_verify (calls df) and df_check (runs stat and compare values)?
-> > > > Because that does not help - it fails when running in the loop (managed to break after 5th run).
-
-> > > I think it would go after you remove the file, to ensure that no space usage
-> > > changes are pending when you check.
-
-> > > <tests>
-
-> > > This seems to work fine (pseudopatch):
-
-> > >         ROD_SILENT rm -rf mntpoint/testimg
-
-> > > +       # Ensure free space change can be seen by statfs
-> > > +       fsfreeze -f $TST_MNTPOINT
-> > > +       fsfreeze -u $TST_MNTPOINT
-> > It looks like it works. We might add small binary which just calls these 2
-> > ioctl (FIFREEZE and FITHAW), just to be friendly to people on embedded
-> > environment with minimal dependencies (yes, some people might not install
-> > util-linux).
-
-> Thank you!!  It's good to know that small embedded systems are still
-> considered, and the consideration is much appreciated!  :-)
-
-> Let me know if you'd like me to try writing the utility.
-Thank you, Tim! I'll Cc you when sending this patch (likely next week).
-
-You might also appreciate our effort to lower down loop device size (used for
-all_filesystems): https://lore.kernel.org/ltp/Yv%2FkVXSK0xJGb3RO@pevik/
-
-Kind regards,
-Petr
-
->  -- Tim
 
