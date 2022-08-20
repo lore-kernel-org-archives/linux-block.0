@@ -2,124 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9232C25B08
-	for <linux-block@archiver.kernel.org>; Sat, 20 Aug 2022 07:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 259AFC25B08
+	for <linux-block@archiver.kernel.org>; Sat, 20 Aug 2022 11:56:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343663AbiHTHA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Aug 2022 03:00:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
+        id S241433AbiHTL45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Aug 2022 07:56:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243758AbiHTHA6 (ORCPT
+        with ESMTP id S230061AbiHTL44 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Aug 2022 03:00:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 122C7C274A
-        for <linux-block@vger.kernel.org>; Sat, 20 Aug 2022 00:00:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660978856;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KPdKF7NqQbYWJNAZGbU7fSXV546gMmrYZuRP+B0Ko2s=;
-        b=AapS/aEZaOlG9syRMo2oLuMXu3kdeT5/EUPtZSUTWpCylPMpn1SjW+tWcPXCBTvMQ9YTOs
-        JQXUDPvSB1sQGp/xqvHyTQdDa2enaUUpR21QGLKRjEaS+KDHVEzN+3p0+4hDygn/x/bU4c
-        g3WsoDeD1lO246mjRfJ5uWpFqWlTiwg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-509-2n2OG7CWME6p8qoOGZJWWg-1; Sat, 20 Aug 2022 03:00:52 -0400
-X-MC-Unique: 2n2OG7CWME6p8qoOGZJWWg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D61BD85A581;
-        Sat, 20 Aug 2022 07:00:51 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B6334492CA4;
-        Sat, 20 Aug 2022 07:00:44 +0000 (UTC)
-Date:   Sat, 20 Aug 2022 15:00:39 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     Nikolay Borisov <nborisov@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
+        Sat, 20 Aug 2022 07:56:56 -0400
+X-Greylist: delayed 909 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 20 Aug 2022 04:56:55 PDT
+Received: from sender-of-o50.zoho.in (sender-of-o50.zoho.in [103.117.158.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E64248E2
+        for <linux-block@vger.kernel.org>; Sat, 20 Aug 2022 04:56:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1660995689; cv=none; 
+        d=zohomail.in; s=zohoarc; 
+        b=bzuIDQA+sR7ZiWE9DXMgKg0fHNUajlNkGygoTkXW2MW91KjrK5GL9eOKirNwxsPs/bJnNxQhnrknPFPij2k245WT0qW3D9ehEf52EbnOgIYV5FcRmt0UP5siCMl70q70faYcZAIhWPVIxmBHPr5TFhT/a2VU0hP4X9HwO8DZyjU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+        t=1660995689; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
+        bh=OwlirewM9MHK3jNUDVvfjUe6e2E0DI0dbUmH8k2UzYQ=; 
+        b=GenioD5MecWkzSLRl/rhBypTtzqh1kkoLFw6k0FFqzkxpS8oGBx2LQASZNBlwQiz/k/4V4pgo3lArz+X2njw4pConEvuJE/v7KG8BpzgJNyeYx7OKReBvZjRVN85YedcxivMXxYTRPt4qmBYAqWdgMypT1LoMkK5opXE1HDkF0s=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+        dkim=pass  header.i=siddh.me;
+        spf=pass  smtp.mailfrom=code@siddh.me;
+        dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1660995689;
+        s=zmail; d=siddh.me; i=code@siddh.me;
+        h=From:From:To:To:Cc:Cc:Message-ID:Subject:Subject:Date:Date:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
+        bh=OwlirewM9MHK3jNUDVvfjUe6e2E0DI0dbUmH8k2UzYQ=;
+        b=fbzEaX1s4LxtB1mccW6+EkXK8lpWzjKTQ6YE28zZS4Z1v0I+Fjkwh9aFFNlfRXMo
+        oLl/vzp3vCh/x/gPreCbabPT6O+WmH2NSifKmHL3//s7PlDfHdeTVUoHkhGW4duTx4w
+        3wcFsrXaZborYmXeobgoRkGXwvLhjr5Xo4i6GcaE=
+Received: from localhost.localdomain (43.250.157.244 [43.250.157.244]) by mx.zoho.in
+        with SMTPS id 1660995687489847.0225686061804; Sat, 20 Aug 2022 17:11:27 +0530 (IST)
+From:   Siddh Raman Pant <code@siddh.me>
+To:     Jens Axboe <axboe@kernel.dk>, Carlos Llamas <cmllamas@google.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
         linux-kernel <linux-kernel@vger.kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Message-ID: <YwCGlyDMhWubqKoL@T590>
-References: <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
- <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
- <Yv2w+Tuhw1RAoXI5@T590>
- <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
- <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
- <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
- <Yv3NIQlDL0T3lstU@T590>
- <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
+        linux-kernel-mentees 
+        <linux-kernel-mentees@lists.linuxfoundation.org>,
+        syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com,
+        stable@vger.kernel.org
+Message-ID: <20220820114105.8792-1-code@siddh.me>
+Subject: [PATCH] loop: Correct UAPI definitions to match with driver
+Date:   Sat, 20 Aug 2022 17:11:05 +0530
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 19, 2022 at 03:20:25PM -0400, Chris Murphy wrote:
-> 
-> 
-> On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
-> > On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
-> >> 
-> >> 
-> >> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
-> >> > On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
-> >> >> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
-> >> >>
-> >> >>> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
-> >> 
-> >> Same boot, 3rd log. But the load is above 300 so I kinda need to sysrq+b soon.
-> >> 
-> >> https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=sharing
-> >> 
-> >
-> > Also please test the following one too:
-> >
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 5ee62b95f3e5..d01c64be08e2 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx 
-> > *hctx, struct list_head *list,
-> >  		if (!needs_restart ||
-> >  		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-> >  			blk_mq_run_hw_queue(hctx, true);
-> > -		else if (needs_restart && needs_resource)
-> > +		else if (needs_restart && (needs_resource ||
-> > +					blk_mq_is_shared_tags(hctx->flags)))
-> >  			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
-> > 
-> >  		blk_mq_update_dispatch_busy(hctx, true);
-> >
-> 
-> 
-> With just this patch on top of 5.17.0, it still hangs. I've captured block debugfs log:
-> https://drive.google.com/file/d/1ic4YHxoL9RrCdy_5FNdGfh_q_J3d_Ft0/view?usp=sharing
+Syzkaller has reported a warning in iomap_iter(), which got
+triggered due to a call to iomap_iter_done() which has:
+=09WARN_ON_ONCE(iter->iomap.offset > iter->pos);
 
-The log is similar with before, and the only difference is RESTART not
-set.
+The warning was triggered because `pos` was being negative.
+I was having offset =3D 0, pos =3D -2950420705881096192.
 
-Also follows another patch merged to v5.18 and it fixes io stall too, feel free to test it:
+This ridiculously negative value smells of an overflow, and sure
+it is.
 
-8f5fea65b06d blk-mq: avoid extending delays of active hctx from blk_mq_delay_run_hw_queues
+The userspace can configure a loop using an ioctl call, wherein
+a configuration of type loop_config is passed (see lo_ioctl()'s
+case on line 1550 of drivers/block/loop.c). This proceeds to call
+loop_configure() which in turn calls loop_set_status_from_info()
+(see line 1050 of loop.c), passing &config->info which is of type
+loop_info64*. This function then sets the appropriate values, like
+the offset.
 
+The problem here is loop_device has lo_offset of type loff_t
+(see line 52 of loop.c), which is typdef-chained to long long,
+whereas loop_info64 has lo_offset of type __u64 (see line 56 of
+include/uapi/linux/loop.h).
 
+The function directly copies offset from info to the device as
+follows (See line 980 of loop.c):
+=09lo->lo_offset =3D info->lo_offset;
 
-Thanks, 
-Ming
+This results in the encountered overflow (in my case, the RHS
+was 15496323367828455424).
+
+Thus, convert the type definitions in loop_info64 to their
+signed counterparts in order to match definitions in loop_device,
+and check for negative value during loop_set_status_from_info().
+
+Bug report: https://syzkaller.appspot.com/bug?id=3Dc620fe14aac810396d3c3edc=
+9ad73848bf69a29e
+Reported-and-tested-by: syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.c=
+om
+Cc: stable@vger.kernel.org
+Signed-off-by: Siddh Raman Pant <code@siddh.me>
+---
+Unless I am missing any other uses or quirks of UAPI loop_info64,
+I think this won't introduce regression, since if something is
+working, it will continue to work. If something does break, then
+it was relying on overflows, which is anyways an incorrect way
+to go about.
+
+Also, it seems even the 32-bit compatibility structure uses the
+signed types (compat_loop_info uses compat_int_t which is s32),
+so this patch should be fine.
+
+ drivers/block/loop.c      |  3 +++
+ include/uapi/linux/loop.h | 12 ++++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index e3c0ba93c1a3..4ca20ce3158d 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -977,6 +977,9 @@ loop_set_status_from_info(struct loop_device *lo,
+ =09=09return -EINVAL;
+ =09}
+=20
++=09if (info->lo_offset < 0 || info->lo_sizelimit < 0)
++=09=09return -EINVAL;
++
+ =09lo->lo_offset =3D info->lo_offset;
+ =09lo->lo_sizelimit =3D info->lo_sizelimit;
+ =09memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
+index 6f63527dd2ed..973565f38f9d 100644
+--- a/include/uapi/linux/loop.h
++++ b/include/uapi/linux/loop.h
+@@ -53,12 +53,12 @@ struct loop_info64 {
+ =09__u64=09=09   lo_device;=09=09=09/* ioctl r/o */
+ =09__u64=09=09   lo_inode;=09=09=09/* ioctl r/o */
+ =09__u64=09=09   lo_rdevice;=09=09=09/* ioctl r/o */
+-=09__u64=09=09   lo_offset;
+-=09__u64=09=09   lo_sizelimit;/* bytes, 0 =3D=3D max available */
+-=09__u32=09=09   lo_number;=09=09=09/* ioctl r/o */
+-=09__u32=09=09   lo_encrypt_type;=09=09/* obsolete, ignored */
+-=09__u32=09=09   lo_encrypt_key_size;=09=09/* ioctl w/o */
+-=09__u32=09=09   lo_flags;
++=09__s64=09=09   lo_offset;
++=09__s64=09=09   lo_sizelimit;/* bytes, 0 =3D=3D max available */
++=09__s32=09=09   lo_number;=09=09=09/* ioctl r/o */
++=09__s32=09=09   lo_encrypt_type;=09=09/* obsolete, ignored */
++=09__s32=09=09   lo_encrypt_key_size;=09=09/* ioctl w/o */
++=09__s32=09=09   lo_flags;
+ =09__u8=09=09   lo_file_name[LO_NAME_SIZE];
+ =09__u8=09=09   lo_crypt_name[LO_NAME_SIZE];
+ =09__u8=09=09   lo_encrypt_key[LO_KEY_SIZE]; /* ioctl w/o */
+--=20
+2.35.1
+
 
