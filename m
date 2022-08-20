@@ -2,153 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259AFC25B08
-	for <linux-block@archiver.kernel.org>; Sat, 20 Aug 2022 11:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD70C32792
+	for <linux-block@archiver.kernel.org>; Sat, 20 Aug 2022 15:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241433AbiHTL45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Aug 2022 07:56:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50384 "EHLO
+        id S1345987AbiHTPhr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Aug 2022 11:37:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230061AbiHTL44 (ORCPT
+        with ESMTP id S1345407AbiHTPhq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Aug 2022 07:56:56 -0400
-X-Greylist: delayed 909 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 20 Aug 2022 04:56:55 PDT
-Received: from sender-of-o50.zoho.in (sender-of-o50.zoho.in [103.117.158.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E64248E2
-        for <linux-block@vger.kernel.org>; Sat, 20 Aug 2022 04:56:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1660995689; cv=none; 
-        d=zohomail.in; s=zohoarc; 
-        b=bzuIDQA+sR7ZiWE9DXMgKg0fHNUajlNkGygoTkXW2MW91KjrK5GL9eOKirNwxsPs/bJnNxQhnrknPFPij2k245WT0qW3D9ehEf52EbnOgIYV5FcRmt0UP5siCMl70q70faYcZAIhWPVIxmBHPr5TFhT/a2VU0hP4X9HwO8DZyjU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-        t=1660995689; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
-        bh=OwlirewM9MHK3jNUDVvfjUe6e2E0DI0dbUmH8k2UzYQ=; 
-        b=GenioD5MecWkzSLRl/rhBypTtzqh1kkoLFw6k0FFqzkxpS8oGBx2LQASZNBlwQiz/k/4V4pgo3lArz+X2njw4pConEvuJE/v7KG8BpzgJNyeYx7OKReBvZjRVN85YedcxivMXxYTRPt4qmBYAqWdgMypT1LoMkK5opXE1HDkF0s=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-        dkim=pass  header.i=siddh.me;
-        spf=pass  smtp.mailfrom=code@siddh.me;
-        dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1660995689;
-        s=zmail; d=siddh.me; i=code@siddh.me;
-        h=From:From:To:To:Cc:Cc:Message-ID:Subject:Subject:Date:Date:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-        bh=OwlirewM9MHK3jNUDVvfjUe6e2E0DI0dbUmH8k2UzYQ=;
-        b=fbzEaX1s4LxtB1mccW6+EkXK8lpWzjKTQ6YE28zZS4Z1v0I+Fjkwh9aFFNlfRXMo
-        oLl/vzp3vCh/x/gPreCbabPT6O+WmH2NSifKmHL3//s7PlDfHdeTVUoHkhGW4duTx4w
-        3wcFsrXaZborYmXeobgoRkGXwvLhjr5Xo4i6GcaE=
-Received: from localhost.localdomain (43.250.157.244 [43.250.157.244]) by mx.zoho.in
-        with SMTPS id 1660995687489847.0225686061804; Sat, 20 Aug 2022 17:11:27 +0530 (IST)
-From:   Siddh Raman Pant <code@siddh.me>
-To:     Jens Axboe <axboe@kernel.dk>, Carlos Llamas <cmllamas@google.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-kernel-mentees 
-        <linux-kernel-mentees@lists.linuxfoundation.org>,
-        syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com,
-        stable@vger.kernel.org
-Message-ID: <20220820114105.8792-1-code@siddh.me>
-Subject: [PATCH] loop: Correct UAPI definitions to match with driver
-Date:   Sat, 20 Aug 2022 17:11:05 +0530
-X-Mailer: git-send-email 2.35.1
+        Sat, 20 Aug 2022 11:37:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20DC6AA12
+        for <linux-block@vger.kernel.org>; Sat, 20 Aug 2022 08:37:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661009864;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CSUDwEi1svTWS13A5fcvj35eehBaJVIHJlmeSdMUK/M=;
+        b=cx1EAOZFIZNVYkUlcg2+QrxMupJaHKVBd/yPygNDCsxdyUQOQ8rd2xcKUTr5CUtAM0yywo
+        izedAR11QX9rMSNcAtvRtfYeTWQ4m+/iXwkuRenBVTcuGHxH5rX+OC9lyBAm4aX3PABXha
+        DZ+Ue0RpTWsDiR42GwihLzGsm+JewIM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-265-XuRm_QaKMr6n7YKEl2IZbA-1; Sat, 20 Aug 2022 11:37:43 -0400
+X-MC-Unique: XuRm_QaKMr6n7YKEl2IZbA-1
+Received: by mail-ed1-f71.google.com with SMTP id r12-20020a05640251cc00b00440647ec649so4457805edd.21
+        for <linux-block@vger.kernel.org>; Sat, 20 Aug 2022 08:37:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=CSUDwEi1svTWS13A5fcvj35eehBaJVIHJlmeSdMUK/M=;
+        b=EI7nJBH5lD4wj9Yl4LORNOEB2KKyAwJUpBQZZBNYTe13IiZRI4+jbDOybkt375qzTM
+         wzkKxfELpiMyy6jqvaZR7Rz36mLeB9JBqnC9wfzvnzvIxBOO3dxRu4ylyw2an+zHrEiA
+         Tk0slYViZsu8exZRxaIATAwSaY/EeDJe2etYJQQ8NkzVTQI20Z964cxupY6gBzCzhi9E
+         DpG8yDs5zhceOPHeS/LrQ2PvWvghWXUvfBh6K8JoCH5gewGoeZ6J3UTozBMzfLWcW21l
+         Xql2kuInnHzkZCZPPxUpANAeN4O6D7bnmm8YS4lczKhbBcuxO2X9sgzImif7b/3pBqjA
+         XLfg==
+X-Gm-Message-State: ACgBeo2C72cBvby4BSgaFXLmBSLXFZJom/cba0gz1VLKIq/t7siFbm1G
+        dBEBfXCKY/bL8KmoOquze1Cwd7nrAmQbDiZNxwOKYrQsoX+VjQVEMCMio5GmzKkyheupuVLNcwH
+        kOURLrF2SlQ97OKjBihpv2U8=
+X-Received: by 2002:a05:6402:3495:b0:43d:d76e:e9ff with SMTP id v21-20020a056402349500b0043dd76ee9ffmr10158396edc.227.1661009862300;
+        Sat, 20 Aug 2022 08:37:42 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR56NKhopv/ioAeFb925MKnrc4gMGSU/vLUjnbjCFZdK2VcWWVNy8nDcXS+vYMB17jvhSSMtNQ==
+X-Received: by 2002:a05:6402:3495:b0:43d:d76e:e9ff with SMTP id v21-20020a056402349500b0043dd76ee9ffmr10158391edc.227.1661009862150;
+        Sat, 20 Aug 2022 08:37:42 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c1e:bf00:d69d:5353:dba5:ee81? (2001-1c00-0c1e-bf00-d69d-5353-dba5-ee81.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:d69d:5353:dba5:ee81])
+        by smtp.gmail.com with ESMTPSA id ku7-20020a170907788700b0073d15dfdc09sm2324594ejc.11.2022.08.20.08.37.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Aug 2022 08:37:41 -0700 (PDT)
+Message-ID: <1c4ffc37-df00-0487-2e4e-79b5178d9741@redhat.com>
+Date:   Sat, 20 Aug 2022 17:37:40 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
-Content-Type: text/plain; charset=utf8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: 6.0-rc1 regression block (blk_mq) / RCU task stuck errors +
+ block-io hang
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, rcu@vger.kernel.org
+References: <dd6844e7-f338-a4e9-2dad-0960e25b2ca1@redhat.com>
+ <17ccd5ae-0268-1bee-7822-1352f4c676ba@acm.org>
+From:   Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <17ccd5ae-0268-1bee-7822-1352f4c676ba@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Syzkaller has reported a warning in iomap_iter(), which got
-triggered due to a call to iomap_iter_done() which has:
-=09WARN_ON_ONCE(iter->iomap.offset > iter->pos);
+Hi Bart,
 
-The warning was triggered because `pos` was being negative.
-I was having offset =3D 0, pos =3D -2950420705881096192.
+On 8/19/22 16:49, Bart Van Assche wrote:
+> On 8/19/22 05:01, Hans de Goede wrote:
+>> I've been dogfooding 6.0-rc1 on my main workstation and I have hit
+>> this pretty serious bug, serious enough for me to go back to 5.19
+>>
+>> My dmesg is showing various blk_mq (RCU?) related lockdep splats
+>> followed by some tasks getting stuck on disk-IO. E.g. "sync"
+>> is guaranteed to hang, but other tasks too.
+>>
+>> This seems to be mainly the case on "sd" disks (both sata
+>> and USB) where as my main nvme drive seems fine, which has
+>> probably saved me from worse issues...
+>>
+>> Here are 4 task stuck reports from my last boot, where
+>> I had to turn off the machine by keeping the power button
+>> pressed for 4 seconds.
+>>
+>> [ ... ]
+>>
+>> Sorry for not being able to write a better bug-report but I don't have
+>> the time to dive into this deeper. I hope this report is enough for
+>> someone to have a clue what is going on.
+> 
+> Thank you for the detailed report. I think this report is detailed enough to root-cause this issue, something that was not possible before this report.
+> 
+> Please help with verifying whether this patch fixes this issue: "[PATCH] scsi: sd: Revert "Rework asynchronous resume support"" (https://lore.kernel.org/linux-scsi/20220816172638.538734-1-bvanassche@acm.org/).
 
-This ridiculously negative value smells of an overflow, and sure
-it is.
+Thanks that is very useful. I'm running 6.0-rc1 with this
+patch added now and so far I've not seen the problem re-occur.
 
-The userspace can configure a loop using an ioctl call, wherein
-a configuration of type loop_config is passed (see lo_ioctl()'s
-case on line 1550 of drivers/block/loop.c). This proceeds to call
-loop_configure() which in turn calls loop_set_status_from_info()
-(see line 1050 of loop.c), passing &config->info which is of type
-loop_info64*. This function then sets the appropriate values, like
-the offset.
+I was also seeing 6.0 suspend/resume issues on 2 laptops with
+sata disks (rather then NVME) which I did not yet get around
+to collecting logs from / reporting. I'm happy to report that
+those suspend/resume issues are also fixed by this.
 
-The problem here is loop_device has lo_offset of type loff_t
-(see line 52 of loop.c), which is typdef-chained to long long,
-whereas loop_info64 has lo_offset of type __u64 (see line 56 of
-include/uapi/linux/loop.h).
+I'll reply to the patch with my Tested-by for this.
 
-The function directly copies offset from info to the device as
-follows (See line 980 of loop.c):
-=09lo->lo_offset =3D info->lo_offset;
+Regards,
 
-This results in the encountered overflow (in my case, the RHS
-was 15496323367828455424).
-
-Thus, convert the type definitions in loop_info64 to their
-signed counterparts in order to match definitions in loop_device,
-and check for negative value during loop_set_status_from_info().
-
-Bug report: https://syzkaller.appspot.com/bug?id=3Dc620fe14aac810396d3c3edc=
-9ad73848bf69a29e
-Reported-and-tested-by: syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.c=
-om
-Cc: stable@vger.kernel.org
-Signed-off-by: Siddh Raman Pant <code@siddh.me>
----
-Unless I am missing any other uses or quirks of UAPI loop_info64,
-I think this won't introduce regression, since if something is
-working, it will continue to work. If something does break, then
-it was relying on overflows, which is anyways an incorrect way
-to go about.
-
-Also, it seems even the 32-bit compatibility structure uses the
-signed types (compat_loop_info uses compat_int_t which is s32),
-so this patch should be fine.
-
- drivers/block/loop.c      |  3 +++
- include/uapi/linux/loop.h | 12 ++++++------
- 2 files changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index e3c0ba93c1a3..4ca20ce3158d 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -977,6 +977,9 @@ loop_set_status_from_info(struct loop_device *lo,
- =09=09return -EINVAL;
- =09}
-=20
-+=09if (info->lo_offset < 0 || info->lo_sizelimit < 0)
-+=09=09return -EINVAL;
-+
- =09lo->lo_offset =3D info->lo_offset;
- =09lo->lo_sizelimit =3D info->lo_sizelimit;
- =09memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
-diff --git a/include/uapi/linux/loop.h b/include/uapi/linux/loop.h
-index 6f63527dd2ed..973565f38f9d 100644
---- a/include/uapi/linux/loop.h
-+++ b/include/uapi/linux/loop.h
-@@ -53,12 +53,12 @@ struct loop_info64 {
- =09__u64=09=09   lo_device;=09=09=09/* ioctl r/o */
- =09__u64=09=09   lo_inode;=09=09=09/* ioctl r/o */
- =09__u64=09=09   lo_rdevice;=09=09=09/* ioctl r/o */
--=09__u64=09=09   lo_offset;
--=09__u64=09=09   lo_sizelimit;/* bytes, 0 =3D=3D max available */
--=09__u32=09=09   lo_number;=09=09=09/* ioctl r/o */
--=09__u32=09=09   lo_encrypt_type;=09=09/* obsolete, ignored */
--=09__u32=09=09   lo_encrypt_key_size;=09=09/* ioctl w/o */
--=09__u32=09=09   lo_flags;
-+=09__s64=09=09   lo_offset;
-+=09__s64=09=09   lo_sizelimit;/* bytes, 0 =3D=3D max available */
-+=09__s32=09=09   lo_number;=09=09=09/* ioctl r/o */
-+=09__s32=09=09   lo_encrypt_type;=09=09/* obsolete, ignored */
-+=09__s32=09=09   lo_encrypt_key_size;=09=09/* ioctl w/o */
-+=09__s32=09=09   lo_flags;
- =09__u8=09=09   lo_file_name[LO_NAME_SIZE];
- =09__u8=09=09   lo_crypt_name[LO_NAME_SIZE];
- =09__u8=09=09   lo_encrypt_key[LO_KEY_SIZE]; /* ioctl w/o */
---=20
-2.35.1
-
+Hans
 
