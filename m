@@ -2,88 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEE6C32772
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 07:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AA2C28D13
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 07:26:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232856AbiHVHUw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 03:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41784 "EHLO
+        id S233215AbiHVH0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 03:26:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231273AbiHVHUv (ORCPT
+        with ESMTP id S232526AbiHVHZ4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 03:20:51 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7B315710
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 00:20:50 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id t5so12636064edc.11
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 00:20:50 -0700 (PDT)
+        Mon, 22 Aug 2022 03:25:56 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F1929CA3;
+        Mon, 22 Aug 2022 00:25:54 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id y141so9504782pfb.7;
+        Mon, 22 Aug 2022 00:25:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=F0eTKf5DOX0wXYq76Nn5DVIrzBJZwnUOHLl3EuWXgp0=;
-        b=XcXFtA08CzEybh9IuOMt4POK+MRhZWYHiy8GYmQuokYrWSh5GyGiBKGwN/mTm99FSQ
-         dW2q4rSbM38XwJL8o35eRQfqa89YAjRBiQc3DBE/EBTtpfJlVYCPT1vF479oIsAjYuWv
-         vMlEncBqdJSELOjOHHXfSZTTY+vpe/yk8QeCPIcXkUep8599qwCASa5jJVDNLgijFefb
-         K/NV3p0wVj4OAI5fP2TD1PES9jg72/gdekvyEN9nMpxniGrMR+nNYoFWsvSPMXZTVBw8
-         PFxoc1BOiclQf1Mkxx75bp8e4sX66hEEbD0fzKXapV5ummHrSZY22xkyjxOj8RRIz3Cm
-         xWQg==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc;
+        bh=msDkfbAvjPj8tG1+VbcyJyurZyD89z+69jjtCZT96Cw=;
+        b=Wm8Ji1NHluqt74CopL6xSV0sx0lEWK55ZRr+ompfbpqjBuTbFHU8kiCO46OANmUSMP
+         +I4sNY9RvnDKp3fB0C6rXVUNkiWkILHs2+xC1t+U2NHmbvSspDBomtr/f3aHzGVznzv/
+         SaNQChOeWNEV1BOjEp3byhGvdsTZalvTGy9HQ9UcsA/bDVY4mIxl20ARf35ceYjgT4LI
+         wKabvHKz4Bb3n66vzbfYgHaHWzE2gLVwbNq9SJrIAPwZNnA1+urGvpvqHxuFakHMQlBb
+         t3P8IVcve2cLPI12k+dFsMDNBYWncQ+t0xzVus9MqggqoXYR/JadregHgH8nkRjEBUV+
+         3AVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=F0eTKf5DOX0wXYq76Nn5DVIrzBJZwnUOHLl3EuWXgp0=;
-        b=R1m00KlcN37Qzc/m3UDbRCIlJS6Ml2FHVdVy76r0kbZdPTrRAxhz+wCvJCMPOuiHTB
-         IVM3fzFXMSJYG/23NDxv4v0Z+XbwNQHM47V6YBivnN2LmOJwedwoLW95zETn6y+YerRl
-         PXWIHlk6Ms8x5/QL7K2e5m7EtjUbne7ayfpU5WJd0dKhh79f75xJfX3/GFLSNIYl6+Zm
-         njLfxZqP1BWc/CeAJSgToj9Ryg4HdoVm5lFgIGFdqIiWzUX5i1euuk7rx+4xX9zFrhR9
-         5P3j+yeAPMfodM61qORdtggJ7Iep6BYCS2mCSu6nVgJel2J6jjql79mOCRHNJdnyS92e
-         Q5Tw==
-X-Gm-Message-State: ACgBeo0bmJXpPM9Y8rjU1k3qidecRPELufFv6Gg7jxMJlgbAholMJIeT
-        dk+N/0/5ECrrena3dwkASsZlletGSxiLx8bUSFVSAurPFNk=
-X-Google-Smtp-Source: AA6agR4eSgHqRi4IGOfcwIIp5HBgidkjj7suqzREoWZmCMt90FHMLp0HgdElpJXezVgo/kUxO00UtexYL8m7da6z4i4=
-X-Received: by 2002:a50:9f44:0:b0:445:dfca:87da with SMTP id
- b62-20020a509f44000000b00445dfca87damr14776061edf.105.1661152848849; Mon, 22
- Aug 2022 00:20:48 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc;
+        bh=msDkfbAvjPj8tG1+VbcyJyurZyD89z+69jjtCZT96Cw=;
+        b=wFvLJPDLHxO5s6CAgjlIlBR0b4JH+dCaRJTx52pizjcYu+zCSmIuQsxQlqO4jsmK+3
+         e2B6SB7Z6hqRvUeq8nHBbAXOwSsr7H/qnBG/+pTnueupK4PJIgEZlNwb3Gby3xKtDMCc
+         rI/3EHS52V7AF42EWd18eUAnlIVytLURDoEBR81HFol47QA5IMonkRxVHtQPCk10/1Sj
+         v6g5bWd9u9Rx6+XByqdHm8s5GNm5EuDkUQjdJHjerAmkUTBBdN8Yn8L3OKmznAWkzk44
+         GDeieQeJGEtTm+DR0yX4r+q/Z5l60UWRzxQHaDWk31s+z1BUd7p0X0A71pGDteTR1gj/
+         7bHQ==
+X-Gm-Message-State: ACgBeo0bJ1VmCBZ8JxVNXwGjABWHvMMry/BmoFgOqxCftKUObXkqI5Fk
+        XZNIgybRsBnnAp2Yhc0ncoU=
+X-Google-Smtp-Source: AA6agR6rUdzkK82sm1UBcvd5xL8mxZXyJiI+lw59UgR63AlGd2zrshfJy4MVXbMQxPnnTsDxddlEGQ==
+X-Received: by 2002:a63:d0:0:b0:41b:c075:acb5 with SMTP id 199-20020a6300d0000000b0041bc075acb5mr15768848pga.480.1661153154100;
+        Mon, 22 Aug 2022 00:25:54 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id i5-20020a635405000000b004298d7b6e70sm6717648pgb.54.2022.08.22.00.25.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Aug 2022 00:25:53 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Sun, 21 Aug 2022 21:25:52 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v7 1/9] blk-throttle: fix that io throttle can only work
+ for single bio
+Message-ID: <YwMvgN0YxNvkC1gm@slm.duckdns.org>
+References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
+ <20220802140415.2960284-2-yukuai1@huaweicloud.com>
+ <Yvvx+/d2+OMROUOe@slm.duckdns.org>
+ <712e0f29-94ba-d3d3-ce21-cba4d6092008@huaweicloud.com>
+ <Yv0qbDR+cxKeZ3nD@slm.duckdns.org>
+ <83c8b253-2ebb-5af6-8ce1-6dc3b84cf182@huaweicloud.com>
+ <b1791e41-4945-a0d8-8067-3841ce10fddd@huaweicloud.com>
 MIME-Version: 1.0
-References: <20220822061745.152010-1-hch@lst.de>
-In-Reply-To: <20220822061745.152010-1-hch@lst.de>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Mon, 22 Aug 2022 09:20:38 +0200
-Message-ID: <CAMGffEkPi00R3EZTae8vAodt60Z0=jYYzP+NvRavk_Uzu-S6vg@mail.gmail.com>
-Subject: Re: rnbd cleanups
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b1791e41-4945-a0d8-8067-3841ce10fddd@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 22, 2022 at 8:17 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> Hi all,
->
-> this series has a few simple rnbd cleanups.
->
-> Slightly related question:  why does rnbd send the max_hw_sectors value
-> to the client given that it can't in any way be used by the client?
-Hi Christoph,
+Hello,
 
-Thanks for the cleanup, it all looks good.
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
+On Mon, Aug 22, 2022 at 11:06:44AM +0800, Yu Kuai wrote:
+> While implementing the new method, I found that there seems to be a
+> misunderstanding here, the code seems to try to add flag to split bio
+> so that it won't be throttled again for bps limit, however:
+> 
+> 1) for blk throttle, split bio is issued directly and will never be
+> throttled again, while orignal bio will go through throttle path again.
+> 2) if cloned bio is directed to a new disk, the flag is cleared anyway.
 
-Regarding the max_hw_sectors, you are right, client doesn't use it, we
-should clean it up.
+Doesn't that make the current code correct then? But you were seeing
+incorrect behaviors, right?
 
-Thanks!
+Thanks.
 
-
->
-> Diffstat:
->  drivers/block/rnbd/Makefile       |    1
->  drivers/block/rnbd/rnbd-srv.c     |   92 +++++++++++++++-----------------------
->  drivers/block/rnbd/rnbd-srv.h     |    2
->  drivers/block/rnbd/rnbd-srv-dev.c |   43 -----------------
->  drivers/block/rnbd/rnbd-srv-dev.h |   64 --------------------------
->  5 files changed, 39 insertions(+), 163 deletions(-)
+-- 
+tejun
