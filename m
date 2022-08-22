@@ -2,112 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E4EC32774
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 13:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5597C32774
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 16:23:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232195AbiHVN5G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 09:57:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42962 "EHLO
+        id S236984AbiHVQXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 12:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234708AbiHVN5E (ORCPT
+        with ESMTP id S236956AbiHVQXU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 09:57:04 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64AE339B91
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 06:57:03 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id n202so2820764iod.6
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 06:57:03 -0700 (PDT)
+        Mon, 22 Aug 2022 12:23:20 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6739B52
+        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 09:23:14 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id j21so16873934ejs.0
+        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 09:23:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=ib/uMymF5+XNmj9CnV9csDPHB6vvJCiiK11Zzs0//Jo=;
-        b=EDuQ4buGleTcKfvCw23coExOvCbUAzI8sUpMSc4dQ611CttUzIghSxMgt73tGKhS8D
-         6pvoGLZmgOPxftVCyWqsCgyG3O4mnwSiM5U0KN56tQuPWD+VjtCwlJTUVxhJm2C+AF9N
-         66HmhomZXPeJQPwRyvekEEf2WVaRct9lHVYdjjsReInfbrBgqdPCmaV8JvufpFzrzoi1
-         iCSU1a3bzQzTN65fdZPL/yBNLpjAGZ5AtEMJp7LIFo4hkBaKVkLxj+Anf3aiPgzcRyG+
-         vxKb2KRVqDnLAGhzxaoBViA6uiPS4h1z2UG3i5OIBoeFS7JETiC8+E3lQzmfqFrCQg6/
-         EjmA==
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=EE1aqTdlibrHEF4utdqSiRW8iT6Z8Qft9Gec3pOWS0g=;
+        b=h4OKsmPm8lcsxxenj4LPbgeTgsMkILQHX3JN0PBkW0ER9H/i6rbclf2vnROuC539tp
+         q1ttjv/U6JRT7tEp+89YY/EGYs+zSR694DFa/0SQutGl712zsHCAzACH8e55HrPCrO8M
+         c8rha1v1NRRwdWTCNZ9LxX30Qha4oZ09F7qQnguyjrb9dCy35aM6Qhlau7q2hhO6N/er
+         w6w9wcbj70eUw3ZrM8SzfTGiTX9/V+2n1p/RMQwh14Vjt4esnKKKtw4oZLrulcczG1kR
+         TLrTaHNYMZcX2Wg77LWORSeDFEgjCkPN6Qela44dsUkC91askOcGTcmsrE0YdvjidBnM
+         Wdsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=ib/uMymF5+XNmj9CnV9csDPHB6vvJCiiK11Zzs0//Jo=;
-        b=NZWPjSyOMRzlS+Oy8xCDQX5ezPgi1xxxO5aUV+y0IEX7roMI6JygbWEkxnMR/6aXE8
-         MYVVeRknXDsR9HIbzNt3viOmhbi3S8hY3wP3Au6BZr83mIqNwBaWRfA1zyG28qRwP7la
-         DH+I6cYm8y0rnVX1EDqZHQSUdtps8csWHm21ny6uk/nCuXnHyHNrS88BKkk0XhAtZIIs
-         /cjeiScksRzRjqGs88RVZHgWHwfmd5eI/iC88zKVo4rPb8OohA71KSYNIlMxHKrlKM2n
-         c5ukBmD9/241vZLJK7RyfXc78Yd92UsYUsI7hi2zxO7mUr7pRVFamBPSpi7AXk+d4d9+
-         8N9A==
-X-Gm-Message-State: ACgBeo2DXXXuAjKrJzH0sFR+GOd2DGdd0YsIzlevGCHmZRRmmnBbmJ5z
-        DLrZMKwKM9HDFJaWsf4iFsxDvH3bROV+0g==
-X-Google-Smtp-Source: AA6agR4GjGKcDPdckeO5eL5nzbL557wMJa/3RRxLuXSRhxI4wUMIsTWmjqOnMzKW5fVgalt/4DO2ow==
-X-Received: by 2002:a05:6638:440b:b0:344:c317:82e6 with SMTP id bp11-20020a056638440b00b00344c31782e6mr9258900jab.21.1661176622733;
-        Mon, 22 Aug 2022 06:57:02 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id z16-20020a05660217d000b0067c47eb46desm5931177iox.47.2022.08.22.06.57.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Aug 2022 06:57:02 -0700 (PDT)
-Message-ID: <023b3e08-8782-cde9-4eda-ea419d461bf4@kernel.dk>
-Date:   Mon, 22 Aug 2022 07:57:01 -0600
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=EE1aqTdlibrHEF4utdqSiRW8iT6Z8Qft9Gec3pOWS0g=;
+        b=RLcLZ+ai/Ga3EwLYFTjuIdp71fZoYlYh/mceJBVmG/41iS0tVzG97IwCST4FIaWW5Q
+         ZystFD7yoMoctXGpeCfNTR/0UusPnrnwDwJhqdoUihWrHBz0uR0m7GOoF5bTuYV1+Jmx
+         TXu5KqHbCKBYrA2zNbupXCRfvve9a9Z1o+9WH6bSlBqoadszmT2pLio7lf95+cs9okMZ
+         AaA+FfFv+04b9z2JKjea+tXyh89r2KiTbRlwZ7OAAZJwnC6Pwnga4r2O6D+08ORGTSAZ
+         7hgptINqzqRzWWdbjPq1UwZpEgPj/vdhtns/3zeMn9l5uN9WkeFRzxD8mS8QVy3e+nbC
+         KVAA==
+X-Gm-Message-State: ACgBeo2KMaZnQR359QHsvUEqYVbVBBAJZoOjvJcGRVFDyQ2XeQZQDn4p
+        /r1c7R1fGGGIIwwHZosEbjIq/lUcQAUgOOOpbig=
+X-Google-Smtp-Source: AA6agR78XtD4OIwdwPqQCsdn94fsZCYoTrPNaBPJO2Yudx4dlxP/Qh2vppqjJ8UjkUieYCp7EXOT5OOvMxfq5vBElD4=
+X-Received: by 2002:a17:907:2816:b0:73d:7af2:37f5 with SMTP id
+ eb22-20020a170907281600b0073d7af237f5mr4639645ejc.588.1661185393254; Mon, 22
+ Aug 2022 09:23:13 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH v7 2/2] block: add overflow checks for Amiga partition
- support
-Content-Language: en-US
-To:     Michael Schmitz <schmitzmic@gmail.com>,
-        Martin Steigerwald <martin@lichtvoll.de>,
-        linux-block@vger.kernel.org
-Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org,
-        Christoph Hellwig <hch@infradead.org>
-References: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com>
- <71d9f2fe-42d1-2a09-a860-702b42a3a733@kernel.dk>
- <0bf2e4f9-a1c1-3847-a2b5-d9b9eaaa783a@gmail.com>
- <2669426.mvXUDI8C0e@lichtvoll.de>
- <6fa2c159-e7c7-2d2c-04b5-54c2b2c9a24e@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <6fa2c159-e7c7-2d2c-04b5-54c2b2c9a24e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAPBb6MUP5sH2Ohgrm4UE9ygOF2nKK4dEYWsrwfDUbSMH5Lb=ew@mail.gmail.com>
+ <CAFNWusbavuD9vMuTjV0fEFjTCnMCd1+HPkUC+GsF2FYewrDJ_Q@mail.gmail.com>
+ <CAPBb6MW0Ou8CcWCD-n+9-B0daiviP1Uk9A9C0QBp=B2oFECF3w@mail.gmail.com>
+ <CAFNWusYr_3FjZtALxjq8ty=-FvWqzW=j1K7Mynuz0W9Vh8tD5A@mail.gmail.com> <CAPBb6MV74xgOKUBfej3etF4ZDuVEHhGciCwYyzOBfOBY27v2qg@mail.gmail.com>
+In-Reply-To: <CAPBb6MV74xgOKUBfej3etF4ZDuVEHhGciCwYyzOBfOBY27v2qg@mail.gmail.com>
+From:   Kim Suwan <suwan.kim027@gmail.com>
+Date:   Tue, 23 Aug 2022 01:23:02 +0900
+Message-ID: <CAFNWusYobFdqaEj12ND7Ee9pT+GRxPQwYNEEAG1LMEXCgUQjDA@mail.gmail.com>
+Subject: Re: WARN_ON_ONCE reached with "virtio-blk: support mq_ops->queue_rqs()"
+To:     Alexandre Courbot <acourbot@chromium.org>
+Cc:     linux-block@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/21/22 5:46 AM, Michael Schmitz wrote:
-> Martin,
-> 
-> Am 22.08.2022 um 08:59 schrieb Martin Steigerwald:
->> Michael Schmitz - 26.07.22, 05:58:40 CEST:
->>> Am 26.07.2022 um 15:40 schrieb Jens Axboe:
->>>> On 7/25/22 7:53 PM, Michael Schmitz wrote:
->>>>> Hi Jens,
->>>>>
->>>>> there's been quite a bit of review on this patch series back in the
->>>>> day (most of that would have been on linux-m68k IIRC; see Geert's
->>>>> Reviewed-By tag), and I addressed the issues raised but as you say,
->>>>> it did never get merged.
->>>>>
->>>>> I've found a copy of the linux-block repo that has these patches,
->>>>> will see if I can get them updated to apply to current
->>>>> linux-block.>
->>>> Thanks, please do resend them and we can get them applied.
->>>
->>> Will do - running final compile tests.
->>
->> Just reminding. Did this go in meanwhile?
-> 
-> Not yet, at last count.
-> 
-> Christoph had reviewed v8 and I've addressed his comments in v9.
-> Should have added his Reviewed-by tag for both patches perhaps, not
-> just patch 1.
-> 
-> Shall I resend v9 with that omission rectified, Jens?
+Hi Alexandre,
 
-Yes please, thanks.
+On Mon, Aug 22, 2022 at 4:03 PM Alexandre Courbot <acourbot@chromium.org> wrote:
+>
+> Hi Suwan, apologies for taking so long to come back to this.
+>
+> On Tue, Aug 2, 2022 at 11:50 PM Kim Suwan <suwan.kim027@gmail.com> wrote:
+> >
+> > Hi Alexandre
+> >
+> > On Tue, Aug 2, 2022 at 11:12 AM Alexandre Courbot <acourbot@chromium.org> wrote:
+> > >
+> > >  Hi Suwan,
+> > >
+> > > Thanks for the fast reply!
+> > >
+> > > On Tue, Aug 2, 2022 at 1:55 AM Kim Suwan <suwan.kim027@gmail.com> wrote:
+> > > >
+> > > > Hi Alexandre,
+> > > >
+> > > > Thanks for reporting the issue.
+> > > >
+> > > > I think a possible scenario is that request fails at
+> > > > virtio_queue_rqs() and it is passed to normal path (virtio_queue_rq).
+> > > >
+> > > > In this procedure, It is possible that blk_mq_start_request()
+> > > > was called twice changing request state from MQ_RQ_IN_FLIGHT to
+> > > > MQ_RQ_IN_FLIGHT.
+> > >
+> > > I have checked whether virtblk_prep_rq_batch() within
+> > > virtio_queue_rqs() ever returns 0, and it looks like it never happens.
+> > > So as far as I can tell all virtio_queue_rqs() are processed
+> > > successfully - but maybe the request can also fail further down the
+> > > line? Is there some extra instrumentation I can do to check that?
+> > >
+> >
+> > I'm looking at one more suspicious code.
+> > If virtblk_add_req() fails within virtblk_add_req_batch(),
+> > virtio_queue_rqs() passes the failed request to the normal path also
+> > (virtio_queue_rq). Then, it can call blk_mq_start_request() twice.
+> >
+> > Because I can't reproduce the issue on my vm, Could you test
+> > the below patch?
+> > I defer the blk_mq_start_request() call after virtblk_add_req()
+> > to ensure that we call blk_mq_start_request() after all the
+> > preparations finish.
+>
+> Your patch seems to solve the problem! I am not seeing the warning
+> anymore and the block device looks happy.
 
--- 
-Jens Axboe
+Good news! Thanks for the test!
+
+> Let me know if I can do anything else.
+
+Could you test one more patch?
+I move blk_mq_start_request(req) before spinlock() to reduce time
+holding the lock within virtio_queue_rq().
+If it is ok, I will send the patch.
+
+Regards,
+Suwan Kim
+
+---
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 30255fcaf181..73a0620a7cff 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -322,8 +322,6 @@ static blk_status_t virtblk_prep_rq(struct
+blk_mq_hw_ctx *hctx,
+        if (unlikely(status))
+                return status;
+
+-       blk_mq_start_request(req);
+-
+        vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
+        if (unlikely(vbr->sg_table.nents < 0)) {
+                virtblk_cleanup_cmd(req);
+@@ -349,6 +347,8 @@ static blk_status_t virtio_queue_rq(struct
+blk_mq_hw_ctx *hctx,
+        if (unlikely(status))
+                return status;
+
++       blk_mq_start_request(req);
++
+        spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+        err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
+        if (err) {
+@@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
+                        virtblk_unmap_data(req, vbr);
+                        virtblk_cleanup_cmd(req);
+                        rq_list_add(requeue_list, req);
++               } else {
++                       blk_mq_start_request(req);
+                }
+        }
