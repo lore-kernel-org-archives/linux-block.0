@@ -2,236 +2,307 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8C3C28D13
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 11:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 817A7C32772
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 12:25:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234096AbiHVLnk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 07:43:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42454 "EHLO
+        id S235026AbiHVMZk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 08:25:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234679AbiHVLni (ORCPT
+        with ESMTP id S235016AbiHVMZc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 07:43:38 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4C4ACE1D
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 04:43:31 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220822114327epoutp012a32a41a499c8eeaa0522b312fbbbb06~NqAwHpp7H0769307693epoutp015
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 11:43:27 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220822114327epoutp012a32a41a499c8eeaa0522b312fbbbb06~NqAwHpp7H0769307693epoutp015
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1661168607;
-        bh=mHKVy64fvQwEHttDwVFpew5lOtV9Pkp4/InewqY+Zcg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=itDUjCIa1v9zYjiIwBCJOzLzu5a4kL5w0mMTKV/iwijOXiHf2Iy3exvf0BYt4ml7r
-         pWIMTSMANBNHpmKoAxVrs43sWaF1234Duk/KMNUO8nXDRdp6vjENg/2m5G1BatTr56
-         uT5DaEEuxSjsDpIJHomhvb+XYKX/6OTCDTirpQCY=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20220822114326epcas5p4ddc3c41ea0067ffb772f3ee7dff54b5c~NqAvMHphA3098530985epcas5p4G;
-        Mon, 22 Aug 2022 11:43:26 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.178]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4MB9V42Cw0z4x9Pp; Mon, 22 Aug
-        2022 11:43:24 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4E.67.18001.CDB63036; Mon, 22 Aug 2022 20:43:24 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220822114323epcas5p13ce13ff2e9cd58d26994ad9d49937443~NqAtETRUz1976919769epcas5p1R;
-        Mon, 22 Aug 2022 11:43:23 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220822114323epsmtrp260703c0cfe8ed9e831498e6ac4f6973c~NqAtDedWC2395923959epsmtrp2L;
-        Mon, 22 Aug 2022 11:43:23 +0000 (GMT)
-X-AuditID: b6c32a4a-2c3ff70000004651-33-63036bdc26d6
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        2E.45.18644.BDB63036; Mon, 22 Aug 2022 20:43:23 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220822114322epsmtip1acbf72566f7156d21a19c87232dbfd66~NqAraPOe01007410074epsmtip1S;
-        Mon, 22 Aug 2022 11:43:21 +0000 (GMT)
-Date:   Mon, 22 Aug 2022 17:03:41 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, ming.lei@redhat.com,
-        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH for-next 2/4] io_uring: introduce fixed buffer support
- for io_uring_cmd
-Message-ID: <20220822113341.GA31599@test-zns>
+        Mon, 22 Aug 2022 08:25:32 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6A4E0F;
+        Mon, 22 Aug 2022 05:25:31 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CC56F68AA6; Mon, 22 Aug 2022 14:25:27 +0200 (CEST)
+Date:   Mon, 22 Aug 2022 14:25:27 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 0/2] fscrypt: rework filesystem-level keyring
+Message-ID: <20220822122527.GA14620@lst.de>
+References: <20220820190210.169734-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3294f1e9-1946-2fbf-d5cd-fcdff9288f72@gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJJsWRmVeSWpSXmKPExsWy7bCmhu6dbOZkg45VfBZNE/4yW8xZtY3R
-        YvXdfjaLmwd2MlmsXH2UyeJd6zkWi0mHrjFa7L2lbTF/2VN2i0OTm5kcuDx2zrrL7nH5bKnH
-        plWdbB6bl9R77L7ZwObxft9VNo++LasYPT5vkgvgiMq2yUhNTEktUkjNS85PycxLt1XyDo53
-        jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAG6UEmhLDGnFCgUkFhcrKRvZ1OUX1qSqpCRX1xi
-        q5RakJJTYFKgV5yYW1yal66Xl1piZWhgYGQKVJiQnXGy7wtTwX7lijmd15gaGDfJdjFyckgI
-        mEjsOXCLpYuRi0NIYDejxKummcwQzidGiUddF5ggnM+MEjeOvmWDaXlz7hxUYhejRFvHU0YI
-        5xmjxMEfS1hBqlgEVCVO914GGszBwSagKXFhcilIWERAW+L19UPsIDazwF1GiS1/tEBsYYFY
-        ifezWplAynkFdCU+bFEDCfMKCEqcnPmEBcTmFLCVePCxG8wWFVCWOLDtONgNEgJrOSSOXZjJ
-        AnGci8TzeVuhDhWWeHV8CzuELSXx+d1eqHiyxKWZIA+A2CUSj/cchLLtJVpP9TND3JYh8ffr
-        DkYIm0+i9/cTsNskBHglOtqEIMoVJe5NesoKYYtLPJyxBMr2ADq/ARo+Hxgltq9vZ5nAKDcL
-        yT+zkKyAsK0kOj80sc4CWsEsIC2x/B8HhKkpsX6X/gJG1lWMkqkFxbnpqcWmBUZ5qeXwOE7O
-        z93ECE6zWl47GB8++KB3iJGJg/EQowQHs5IIb/VFhmQh3pTEyqrUovz4otKc1OJDjKbA2JnI
-        LCWanA9M9Hkl8YYmlgYmZmZmJpbGZoZK4rxTtBmThQTSE0tSs1NTC1KLYPqYODilGpiC/csY
-        ore2ndDJ+Rmiza6pF/+8c/rBV88WfiqznnQnymRi9QSP4p+1q+IuXFRmZNueZG22xrn/kvqL
-        Fl0b70nXd+g216n9uX28+NrP4Gd/rRRWrz74Z3e7htGhxuzkJYpfXsScj78x+YvPAc7OWb+6
-        4nK1OFcdPLX1Z/cdNo21z25Hq1xcpvHwbMC6WXrzZCpEcsLOf6xUyBC3j3t75VetWAjT1j+h
-        b95dEc7Zqt+8/tWBw29akxdsaLrW5X9XQkjkMutxjbsXp35q/PY5fod5SnuBGrNdhbijeO33
-        Lcd6N584Me/D5aDipXZVMVO7Uy9sExa6fCPoTfHJF+EzlKu3ljR0pF7sclLZ+3fxA305JZbi
-        jERDLeai4kQAt+YiQzwEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrBLMWRmVeSWpSXmKPExsWy7bCSnO7tbOZkg/bTRhZNE/4yW8xZtY3R
-        YvXdfjaLmwd2MlmsXH2UyeJd6zkWi0mHrjFa7L2lbTF/2VN2i0OTm5kcuDx2zrrL7nH5bKnH
-        plWdbB6bl9R77L7ZwObxft9VNo++LasYPT5vkgvgiOKySUnNySxLLdK3S+DKeDxjBmPBR4WK
-        eXs/sDYw/pPqYuTkkBAwkXhz7hxTFyMXh5DADkaJF70TWCES4hLN136wQ9jCEiv/PWeHKHrC
-        KLFz2k82kASLgKrE6d7LLF2MHBxsApoSFyaXgoRFBLQlXl8/BFbPLHCXUeLmw/tMIAlhgViJ
-        97NamUDqeQV0JT5sUYOY+YFR4svO38wgNbwCghInZz5hAbGZBcwk5m1+yAxSzywgLbH8HwdI
-        mFPAVuLBx26wElEBZYkD244zTWAUnIWkexaS7lkI3QsYmVcxSqYWFOem5xYbFhjlpZbrFSfm
-        Fpfmpesl5+duYgRHjpbWDsY9qz7oHWJk4mA8xCjBwawkwlt9kSFZiDclsbIqtSg/vqg0J7X4
-        EKM0B4uSOO+FrpPxQgLpiSWp2ampBalFMFkmDk6pBqY07SXs8bETz/zeJuh/cZ8QW8TC3peP
-        5nMvfLLkbf00iUVfblisrF+W+czi84uLG0W29GQfFY95MsfniX+l9fPIFZNXyl1KdKtd4rfr
-        bXCG+gW9z3c9jXdxvBJe7bk8LYxbes8jZ99TP94wxHtcvn9qv6flfMfX237f89F8MNtCdNfs
-        7uiykLXJrXM353L8j7WSdN3i3nN/527+yzbP9hx8sU/+2ovK61ZvynmzZ/ox1d47mvxq5dKt
-        S1pk03ZeLmuu0F4nr/oubqm0QNv76aefzpK+XBV7beOF2oOrdr07eFRX5IFFUz1H246s/++c
-        F19habCYMNHGxEdN/5BXYNKXk8pCVxadmakuoKW759FHUyWW4oxEQy3mouJEAIEzWcoLAwAA
-X-CMS-MailID: 20220822114323epcas5p13ce13ff2e9cd58d26994ad9d49937443
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_9979a_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220819104038epcas5p265c9385cfd9189d20ebfffeaa4d5efae
-References: <20220819103021.240340-1-joshi.k@samsung.com>
-        <CGME20220819104038epcas5p265c9385cfd9189d20ebfffeaa4d5efae@epcas5p2.samsung.com>
-        <20220819103021.240340-3-joshi.k@samsung.com>
-        <3294f1e9-1946-2fbf-d5cd-fcdff9288f72@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220820190210.169734-1-ebiggers@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_9979a_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Sat, Aug 20, 2022 at 12:02:08PM -0700, Eric Biggers wrote:
+> This series reworks the filesystem-level keyring to not use the keyrings
+> subsystem as part of its internal implementation (except for ->mk_users,
+> which remains unchanged for now).  This fixes several issues, described
+> in the first patch.  This is also a prerequisite for removing the direct
+> use of struct request_queue from filesystem code, as discussed at
+> https://lore.kernel.org/linux-fscrypt/20220721125929.1866403-1-hch@lst.de/T/#u
 
-On Mon, Aug 22, 2022 at 11:58:24AM +0100, Pavel Begunkov wrote:
->On 8/19/22 11:30, Kanchan Joshi wrote:
->>From: Anuj Gupta <anuj20.g@samsung.com>
->>
->>Add IORING_OP_URING_CMD_FIXED opcode that enables sending io_uring
->>command with previously registered buffers. User-space passes the buffer
->>index in sqe->buf_index, same as done in read/write variants that uses
->>fixed buffers.
->>
->>Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
->>Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->>---
->>  include/linux/io_uring.h      |  5 ++++-
->>  include/uapi/linux/io_uring.h |  1 +
->>  io_uring/opdef.c              | 10 ++++++++++
->>  io_uring/rw.c                 |  3 ++-
->>  io_uring/uring_cmd.c          | 18 +++++++++++++++++-
->>  5 files changed, 34 insertions(+), 3 deletions(-)
->>
->>diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
->>index 60aba10468fc..40961d7c3827 100644
->>--- a/include/linux/io_uring.h
->>+++ b/include/linux/io_uring.h
->>@@ -5,6 +5,8 @@
->>  #include <linux/sched.h>
->>  #include <linux/xarray.h>
->>+#include<uapi/linux/io_uring.h>
->>+
->>  enum io_uring_cmd_flags {
->>  	IO_URING_F_COMPLETE_DEFER	= 1,
->>  	IO_URING_F_UNLOCKED		= 2,
->>@@ -15,6 +17,7 @@ enum io_uring_cmd_flags {
->>  	IO_URING_F_SQE128		= 4,
->>  	IO_URING_F_CQE32		= 8,
->>  	IO_URING_F_IOPOLL		= 16,
->>+	IO_URING_F_FIXEDBUFS		= 32,
->>  };
->>  struct io_uring_cmd {
->>@@ -33,7 +36,7 @@ struct io_uring_cmd {
->>  #if defined(CONFIG_IO_URING)
->>  int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
->>-		struct iov_iter *iter, void *ioucmd)
->>+		struct iov_iter *iter, void *ioucmd);
->
->Please try to compile the first patch separately
+Nice, this looks great to me. Something like the patch below would be
+good to include with this series for the current merge window, I can then
+attack the block layer side for the release after that.
 
-Indeed, this should have been part of that patch. Thanks.
+---
+From e038171b286e2747cbc54e36a8d0e0d6b8a2071e Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Mon, 22 Aug 2022 14:08:52 +0200
+Subject: fscrypt: work on block_device instead of request_queues
 
->>  void io_uring_cmd_done(struct io_uring_cmd *cmd, ssize_t ret, ssize_t res2);
->>  void io_uring_cmd_complete_in_task(struct io_uring_cmd *ioucmd,
->>  			void (*task_work_cb)(struct io_uring_cmd *));
->>diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
->>index 1463cfecb56b..80ea35d1ed5c 100644
->>--- a/include/uapi/linux/io_uring.h
->>+++ b/include/uapi/linux/io_uring.h
->>@@ -203,6 +203,7 @@ enum io_uring_op {
->>  	IORING_OP_SOCKET,
->>  	IORING_OP_URING_CMD,
->>  	IORING_OP_SENDZC_NOTIF,
->>+	IORING_OP_URING_CMD_FIXED,
->
->I don't think it should be another opcode, is there any
->control flags we can fit it in?
+request_queues are a block layer implementation detail that should not
+leak into file systems.  Change the fscrypt inline crypto code to
+retrieve block devices instead of request_queues from the file system.
+As part of that clean up the interaction with multi-device file systems
+by returning both the number of devices and the actual device array
+in a single method call.
 
-using sqe->rw_flags could be another way.
-But I think that may create bit of disharmony in user-space.
-Current choice (IORING_OP_URING_CMD_FIXED) is along the same lines as
-IORING_OP_READ/WRITE_FIXED. User-space uses new opcode, and sends the
-buffer by filling sqe->buf_index. 
-So must we take a different way?
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/crypto/inline_crypt.c | 73 ++++++++++++++++++++--------------------
+ fs/f2fs/super.c          | 24 ++++++-------
+ include/linux/fscrypt.h  | 21 ++++++------
+ 3 files changed, 58 insertions(+), 60 deletions(-)
 
->>  	/* this goes last, obviously */
->>  	IORING_OP_LAST,
->>diff --git a/io_uring/opdef.c b/io_uring/opdef.c
->>index 9a0df19306fe..7d5731b84c92 100644
->>--- a/io_uring/opdef.c
->>+++ b/io_uring/opdef.c
->>@@ -472,6 +472,16 @@ const struct io_op_def io_op_defs[] = {
->>  		.issue			= io_uring_cmd,
->>  		.prep_async		= io_uring_cmd_prep_async,
->>  	},
->>+	[IORING_OP_URING_CMD_FIXED] = {
->>+		.needs_file		= 1,
->>+		.plug			= 1,
->>+		.name			= "URING_CMD_FIXED",
->>+		.iopoll			= 1,
->>+		.async_size		= uring_cmd_pdu_size(1),
->>+		.prep			= io_uring_cmd_prep,
->>+		.issue			= io_uring_cmd,
->>+		.prep_async		= io_uring_cmd_prep_async,
->>+	},
->>  	[IORING_OP_SENDZC_NOTIF] = {
->>  		.name			= "SENDZC_NOTIF",
->>  		.needs_file		= 1,
->>diff --git a/io_uring/rw.c b/io_uring/rw.c
->>index 1a4fb8a44b9a..3c7b94bffa62 100644
->>--- a/io_uring/rw.c
->>+++ b/io_uring/rw.c
->>@@ -1005,7 +1005,8 @@ int io_do_iopoll(struct io_ring_ctx *ctx, bool force_nonspin)
->>  		if (READ_ONCE(req->iopoll_completed))
->>  			break;
->>-		if (req->opcode == IORING_OP_URING_CMD) {
->>+		if (req->opcode == IORING_OP_URING_CMD ||
->>+				req->opcode == IORING_OP_URING_CMD_FIXED) {
->
->I don't see the changed chunk upstream
+diff --git a/fs/crypto/inline_crypt.c b/fs/crypto/inline_crypt.c
+index f75dcb403c365..88ca838fa1b25 100644
+--- a/fs/crypto/inline_crypt.c
++++ b/fs/crypto/inline_crypt.c
+@@ -21,20 +21,21 @@
+ 
+ #include "fscrypt_private.h"
+ 
+-static int fscrypt_get_num_devices(struct super_block *sb)
++static struct block_device **fscrypt_get_devices(struct super_block *sb,
++						 unsigned int *num_devs)
+ {
+-	if (sb->s_cop->get_num_devices)
+-		return sb->s_cop->get_num_devices(sb);
+-	return 1;
+-}
++	struct block_device **devs;
+ 
+-static void fscrypt_get_devices(struct super_block *sb, int num_devs,
+-				struct block_device **devs)
+-{
+-	if (num_devs == 1)
+-		devs[0] = sb->s_bdev;
+-	else
+-		sb->s_cop->get_devices(sb, devs);
++	if (sb->s_cop->get_devices) {
++		devs = sb->s_cop->get_devices(sb, num_devs);
++		if (devs)
++			return devs;
++	}
++	devs = kmalloc(sizeof(*devs), GFP_KERNEL);
++	if (!devs)
++		return ERR_PTR(-ENOMEM);
++	devs[0] = sb->s_bdev;
++	return devs;
+ }
+ 
+ static unsigned int fscrypt_get_dun_bytes(const struct fscrypt_info *ci)
+@@ -76,6 +77,7 @@ static void fscrypt_log_blk_crypto_impl(struct fscrypt_mode *mode,
+ 
+ 	for (i = 0; i < num_devs; i++) {
+ 		struct request_queue *q = bdev_get_queue(devs[i]);
++
+ 		if (!IS_ENABLED(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) ||
+ 		    __blk_crypto_cfg_supported(q->crypto_profile, cfg)) {
+ 			if (!xchg(&mode->logged_blk_crypto_native, 1))
+@@ -94,8 +96,8 @@ int fscrypt_select_encryption_impl(struct fscrypt_info *ci)
+ 	const struct inode *inode = ci->ci_inode;
+ 	struct super_block *sb = inode->i_sb;
+ 	struct blk_crypto_config crypto_cfg;
+-	int num_devs;
+ 	struct block_device **devs;
++	unsigned int num_devs;
+ 	int i;
+ 
+ 	/* The file must need contents encryption, not filenames encryption */
+@@ -130,12 +132,10 @@ int fscrypt_select_encryption_impl(struct fscrypt_info *ci)
+ 	crypto_cfg.crypto_mode = ci->ci_mode->blk_crypto_mode;
+ 	crypto_cfg.data_unit_size = sb->s_blocksize;
+ 	crypto_cfg.dun_bytes = fscrypt_get_dun_bytes(ci);
+-	num_devs = fscrypt_get_num_devices(sb);
+-	devs = kmalloc_array(num_devs, sizeof(*devs), GFP_KERNEL);
+-	if (!devs)
+-		return -ENOMEM;
+-	fscrypt_get_devices(sb, num_devs, devs);
+ 
++	devs = fscrypt_get_devices(sb, &num_devs);
++	if (IS_ERR(devs))
++		return PTR_ERR(devs);
+ 	for (i = 0; i < num_devs; i++) {
+ 		if (!blk_crypto_config_supported(bdev_get_queue(devs[i]),
+ 						 &crypto_cfg))
+@@ -159,8 +159,8 @@ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+ 	struct super_block *sb = inode->i_sb;
+ 	enum blk_crypto_mode_num crypto_mode = ci->ci_mode->blk_crypto_mode;
+ 	struct blk_crypto_key *blk_key;
+-	int num_devs;
+ 	struct block_device **devs = NULL;
++	unsigned int num_devs;
+ 	int err;
+ 	int i;
+ 
+@@ -176,22 +176,25 @@ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+ 	}
+ 
+ 	/* Start using blk-crypto on all the filesystem's block devices. */
+-	num_devs = fscrypt_get_num_devices(sb);
+-	devs = kmalloc_array(num_devs, sizeof(*devs), GFP_KERNEL);
+-	if (!devs) {
+-		err = -ENOMEM;
++	devs = fscrypt_get_devices(sb, &num_devs);
++	if (IS_ERR(devs)) {
++		err = PTR_ERR(devs);
+ 		goto out;
+ 	}
+-	fscrypt_get_devices(sb, num_devs, devs);
+ 	for (i = 0; i < num_devs; i++) {
+ 		err = blk_crypto_start_using_key(blk_key,
+ 						 bdev_get_queue(devs[i]));
+-		if (err) {
+-			fscrypt_err(inode,
+-				    "error %d starting to use blk-crypto", err);
+-			goto out;
+-		}
++		if (err)
++			break;
+ 	}
++	kfree(devs);
++
++	if (err) {
++		fscrypt_err(inode,
++			    "error %d starting to use blk-crypto", err);
++		goto out;
++	}
++
+ 	/*
+ 	 * Pairs with the smp_load_acquire() in fscrypt_is_key_prepared().
+ 	 * I.e., here we publish ->blk_key with a RELEASE barrier so that
+@@ -199,10 +202,8 @@ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+ 	 * possible for per-mode keys, not for per-file keys.
+ 	 */
+ 	smp_store_release(&prep_key->blk_key, blk_key);
+-	blk_key = NULL;
+-	err = 0;
++	return 0;
+ out:
+-	kfree(devs);
+ 	kfree_sensitive(blk_key);
+ 	return err;
+ }
+@@ -211,15 +212,13 @@ void fscrypt_destroy_inline_crypt_key(struct super_block *sb,
+ 				      struct fscrypt_prepared_key *prep_key)
+ {
+ 	struct blk_crypto_key *blk_key = prep_key->blk_key;
+-	int num_devs;
+ 	struct block_device **devs;
++	unsigned int num_devs;
+ 	int i;
+ 
+ 	/* Evict the key from all the filesystem's block devices. */
+-	num_devs = fscrypt_get_num_devices(sb);
+-	devs = kmalloc_array(num_devs, sizeof(*devs), GFP_KERNEL);
+-	if (devs) {
+-		fscrypt_get_devices(sb, num_devs, devs);
++	devs = fscrypt_get_devices(sb, &num_devs);
++	if (IS_ERR(devs)) {
+ 		for (i = 0; i < num_devs; i++)
+ 			blk_crypto_evict_key(bdev_get_queue(devs[i]), blk_key);
+ 		kfree(devs);
+diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+index 7dcac93e00eba..26817b5aeac78 100644
+--- a/fs/f2fs/super.c
++++ b/fs/f2fs/super.c
+@@ -3039,23 +3039,24 @@ static void f2fs_get_ino_and_lblk_bits(struct super_block *sb,
+ 	*lblk_bits_ret = 8 * sizeof(block_t);
+ }
+ 
+-static int f2fs_get_num_devices(struct super_block *sb)
++static struct block_device **f2fs_get_devices(struct super_block *sb,
++					      unsigned int *num_devs)
+ {
+ 	struct f2fs_sb_info *sbi = F2FS_SB(sb);
++	struct block_device **devs;
++	int i;
+ 
+-	if (f2fs_is_multi_device(sbi))
+-		return sbi->s_ndevs;
+-	return 1;
+-}
++	if (!f2fs_is_multi_device(sbi))
++		return NULL;
+ 
+-static void f2fs_get_devices(struct super_block *sb,
+-			     struct block_device **bdevs)
+-{
+-	struct f2fs_sb_info *sbi = F2FS_SB(sb);
+-	int i;
++	devs = kmalloc_array(sbi->s_ndevs, sizeof(*devs), GFP_KERNEL);
++	if (!devs)
++		return ERR_PTR(-ENOMEM);
+ 
+ 	for (i = 0; i < sbi->s_ndevs; i++)
+-		bdevs[i] = FDEV(i).bdev;
++		devs[i] = FDEV(i).bdev;
++	*num_devs = sbi->s_ndevs;
++	return devs;
+ }
+ 
+ static const struct fscrypt_operations f2fs_cryptops = {
+@@ -3066,7 +3067,6 @@ static const struct fscrypt_operations f2fs_cryptops = {
+ 	.empty_dir		= f2fs_empty_dir,
+ 	.has_stable_inodes	= f2fs_has_stable_inodes,
+ 	.get_ino_and_lblk_bits	= f2fs_get_ino_and_lblk_bits,
+-	.get_num_devices	= f2fs_get_num_devices,
+ 	.get_devices		= f2fs_get_devices,
+ };
+ #endif
+diff --git a/include/linux/fscrypt.h b/include/linux/fscrypt.h
+index 5097dbd048a4a..ea6485cb0e351 100644
+--- a/include/linux/fscrypt.h
++++ b/include/linux/fscrypt.h
+@@ -161,23 +161,22 @@ struct fscrypt_operations {
+ 				      int *ino_bits_ret, int *lblk_bits_ret);
+ 
+ 	/*
+-	 * Return the number of block devices to which the filesystem may write
+-	 * encrypted file contents.
++	 * Return an array of pointers to the block devices to which the file
++	 * system may write encrypted file contents, NULL if the file system
++	 * only has a single device or an ERR_PTR() on error.
++	 *
++	 * On successful return, *num_devs is set to the number of devices in
++	 * the returned array.
+ 	 *
+ 	 * If the filesystem can use multiple block devices (other than block
+ 	 * devices that aren't used for encrypted file contents, such as
+ 	 * external journal devices), and wants to support inline encryption,
+ 	 * then it must implement this function.  Otherwise it's not needed.
++	 *
++	 * The returned array must be freed by the caller using kfree().
+ 	 */
+-	int (*get_num_devices)(struct super_block *sb);
+-
+-	/*
+-	 * If ->get_num_devices() returns a value greater than 1, then this
+-	 * function is called to get the array of block devices that the
+-	 * filesystem is using.
+-	 */
+-	void (*get_devices)(struct super_block *sb,
+-			    struct block_device **bdev);
++	struct block_device **(*get_devices)(struct super_block *sb,
++					     unsigned int *num_devs);
+ };
+ 
+ static inline struct fscrypt_info *fscrypt_get_info(const struct inode *inode)
+-- 
+2.30.2
 
-Right, it is on top of iopoll support (plus one more series mentioned in
-covered letter). Here is the link - 
-https://lore.kernel.org/linux-block/20220807183607.352351-1-joshi.k@samsung.com/
-It would be great if you could review that.
-
-------_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_9979a_
-Content-Type: text/plain; charset="utf-8"
-
-
-------_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_9979a_--
