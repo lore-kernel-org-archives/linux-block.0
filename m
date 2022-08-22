@@ -2,64 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51614C32789
-	for <linux-block@archiver.kernel.org>; Sun, 21 Aug 2022 20:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE0FC00140
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 03:06:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231461AbiHUU7k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Aug 2022 16:59:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40602 "EHLO
+        id S232167AbiHVDGw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Aug 2022 23:06:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230281AbiHUU7j (ORCPT
+        with ESMTP id S231359AbiHVDGu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Aug 2022 16:59:39 -0400
-Received: from mail.lichtvoll.de (luna.lichtvoll.de [194.150.191.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D39E20BF5;
-        Sun, 21 Aug 2022 13:59:38 -0700 (PDT)
-Received: from 127.0.0.1 (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384)
-        (No client certificate requested)
-        by mail.lichtvoll.de (Postfix) with ESMTPSA id 7B2214C45AF;
-        Sun, 21 Aug 2022 22:59:34 +0200 (CEST)
-From:   Martin Steigerwald <martin@lichtvoll.de>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Michael Schmitz <schmitzmic@gmail.com>
-Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org
-Subject: Re: [PATCH v7 2/2] block: add overflow checks for Amiga partition support
-Date:   Sun, 21 Aug 2022 22:59:32 +0200
-Message-ID: <2669426.mvXUDI8C0e@lichtvoll.de>
-In-Reply-To: <0bf2e4f9-a1c1-3847-a2b5-d9b9eaaa783a@gmail.com>
-References: <1539570747-19906-1-git-send-email-schmitzmic@gmail.com> <71d9f2fe-42d1-2a09-a860-702b42a3a733@kernel.dk> <0bf2e4f9-a1c1-3847-a2b5-d9b9eaaa783a@gmail.com>
+        Sun, 21 Aug 2022 23:06:50 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D1A18373;
+        Sun, 21 Aug 2022 20:06:48 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4M9y0B1mMxz6V2TB;
+        Mon, 22 Aug 2022 11:05:14 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgCn3rrF8gJjlLq4Ag--.54125S3;
+        Mon, 22 Aug 2022 11:06:46 +0800 (CST)
+Subject: Re: [PATCH v7 1/9] blk-throttle: fix that io throttle can only work
+ for single bio
+To:     Yu Kuai <yukuai1@huaweicloud.com>, Tejun Heo <tj@kernel.org>
+Cc:     mkoutny@suse.com, axboe@kernel.dk, ming.lei@redhat.com,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20220802140415.2960284-1-yukuai1@huaweicloud.com>
+ <20220802140415.2960284-2-yukuai1@huaweicloud.com>
+ <Yvvx+/d2+OMROUOe@slm.duckdns.org>
+ <712e0f29-94ba-d3d3-ce21-cba4d6092008@huaweicloud.com>
+ <Yv0qbDR+cxKeZ3nD@slm.duckdns.org>
+ <83c8b253-2ebb-5af6-8ce1-6dc3b84cf182@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <b1791e41-4945-a0d8-8067-3841ce10fddd@huaweicloud.com>
+Date:   Mon, 22 Aug 2022 11:06:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Authentication-Results: mail.lichtvoll.de;
-        auth=pass smtp.auth=martin smtp.mailfrom=martin@lichtvoll.de
+In-Reply-To: <83c8b253-2ebb-5af6-8ce1-6dc3b84cf182@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgCn3rrF8gJjlLq4Ag--.54125S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7trWUKry3Xw48Aw48GrWrAFb_yoW8tF45pF
+        WIva1vkFWqyrn29F4xtr1Y9Fnayr4rZr45Zry5Jry7Z3s8Cr1SkrWIqr1Ykrnrur4kC3Wj
+        vF4kt3s3GrW5ArJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
+        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCT
+        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Michael Schmitz - 26.07.22, 05:58:40 CEST:
-> Am 26.07.2022 um 15:40 schrieb Jens Axboe:
-> > On 7/25/22 7:53 PM, Michael Schmitz wrote:
-> >> Hi Jens,
-> >> 
-> >> there's been quite a bit of review on this patch series back in the
-> >> day (most of that would have been on linux-m68k IIRC; see Geert's
-> >> Reviewed-By tag), and I addressed the issues raised but as you say,
-> >> it did never get merged.
-> >> 
-> >> I've found a copy of the linux-block repo that has these patches,
-> >> will see if I can get them updated to apply to current
-> >> linux-block.> 
-> > Thanks, please do resend them and we can get them applied.
+Hi,
+
+在 2022/08/18 9:23, Yu Kuai 写道:
+> Hi, Tejun!
 > 
-> Will do - running final compile tests.
+> 在 2022/08/18 1:50, Tejun Heo 写道:
+>> Hello,
+>>
+>> On Wed, Aug 17, 2022 at 09:13:38AM +0800, Yu Kuai wrote:
+>>>> So, as a fix for the immediate problem, I guess this might do but 
+>>>> this feels
+>>>> really fragile. How can we be certain that re-entering only happens 
+>>>> because
+>>>> of splitting? What if future core development changes that? It seems 
+>>>> to be
+>>>> solving the problem in the wrong place. Shouldn't we flag the bio 
+>>>> indicating
+>>>> that it's split when we're splitting the bio so that we only limit 
+>>>> them for
+>>>> iops in the first place?
+>>>
+>>> Splited bio is tracked in __bio_clone:
+>>
+>> As the word is used in commit messages and comments, the past perfect 
+>> form
+>> of the verb "split" is "split". It looks like "splitted" is used in rare
+>> cases but dictionary says it's an archaic form.
+> 
+> Ok, thanks for pointing it out, I'll change that in next iteration.
+>>
+>>> if (bio_flagged(bio_src, BIO_THROTTLED))
+>>>     bio_set_flag(bio, BIO_THROTTLED);
 
-Just reminding. Did this go in meanwhile?
+While implementing the new method, I found that there seems to be a
+misunderstanding here, the code seems to try to add flag to split bio
+so that it won't be throttled again for bps limit, however:
 
-Thanks,
--- 
-Martin
-
+1) for blk throttle, split bio is issued directly and will never be
+throttled again, while orignal bio will go through throttle path again.
+2) if cloned bio is directed to a new disk, the flag is cleared anyway.
+>>>
+>>> And currenty, the iops limit and bps limit are treated differently,
+>>> however there are only one flag 'BIO_THROTTLED' and they can't be
+>>> distinguished.
+>>>
+>>> Perhaps I can use two flags, for example BIO_IOPS_THROTTLED and
+>>> BIO_BPS_THROTTLED, this way only iops limit can be handled and bps
+>>> limit can be skipped for splited bio.
+>>>
+>>> What do you think?
+>>
+>> I think the code would be a lot more intuitive and less fragile if we 
+>> used
+>> two flags but the bits in the bi_flags field are a scarce resource
+>> unfortunately. Even then, I think the right thing to do here is using two
+>> flags.
+> 
+> Yes, the field 'bio->bi_flags' is unsigned short, and there are only two
+> bits left. I'll use the new sulution which will acquire a new bit.
+> 
+> Thanks,
+> Kuai
+>>
+>> Thanks.
+>>
+> 
+> .
+> 
 
