@@ -2,248 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019EAC28D13
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 06:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5CCEC32774
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 06:25:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232678AbiHVGSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 02:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37410 "EHLO
+        id S232724AbiHVGZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 02:25:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229915AbiHVGSA (ORCPT
+        with ESMTP id S233118AbiHVGZk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 02:18:00 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F0A27177
-        for <linux-block@vger.kernel.org>; Sun, 21 Aug 2022 23:17:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=0Q8mJOPYBUmxjpWOzMposJNP4qEgZR6D/zBbAyYLSzM=; b=zbfPNxnWfua5gWwL0W9ixkdl5i
-        PEqWysochYm9qSAVYI2qH/bwmbcCgd8mLjBGpZMzyd8zGWt7Kkp8VyNIKWRvU3O5jXVcRGeSOfqng
-        IZAu6jhELQQp6EQlZi4EIu6WpADCLeTLgZl0BQ9axomY+zc4Jns5htj832glY4QmWgQRwKyGyFLwp
-        jSGELS3mzWdIUhxBsB8qUKfwsHpMdYtoFuOm1gA2I7jPUlJAQHOFSRwi8gz7cIVT6jSnodKcc47ec
-        0m15QU+HKwhLiY+KOmqhbHDZlr+fBo402LnHWKRxsrox6d3/4j93we0yjusfHpwlzZTKlywpiD9io
-        EcqerK3g==;
-Received: from [2001:4bb8:198:6528:7eb3:3a42:932d:eeba] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oQ0l3-005MCG-I6; Mon, 22 Aug 2022 06:17:57 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 4/4] rnbd-srv: remove struct rnbd_dev
-Date:   Mon, 22 Aug 2022 08:17:45 +0200
-Message-Id: <20220822061745.152010-5-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220822061745.152010-1-hch@lst.de>
-References: <20220822061745.152010-1-hch@lst.de>
+        Mon, 22 Aug 2022 02:25:40 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCE1012D20
+        for <linux-block@vger.kernel.org>; Sun, 21 Aug 2022 23:25:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1661149537; x=1692685537;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=94Y1pqjTC9hF+iRWRZQuS7Fd1jcku5g6wecsJpN3ogM=;
+  b=KApufU3plueAemg4aoAfnleSNWlCGkgJQ7oXQmT/F3/lKgOifmAjs/e3
+   MBMy6Jj9My6grx73Wcjo80huWZhxyQ1wdoCa4Ln64MZHLM+Iw9C37foxt
+   FQBIF5d++CWTZr6fCyZIBkXkNUzL/Kf5n2/F0l4/ByzT1NN8llDaSN4l1
+   FmZ8n1TkO33RdIcbAHJ6vXcJ5H8LMBAVbIw051r1m09Vvuwi4ntsK8YHr
+   5WU2+UHLrMYrHMJFEXxK50YCOcOPOdUf0ZPsNNYnTkU9VbJ2eOxmB2b+Z
+   yT/yh8wYoP92uadQW3nM1P2y+Yfb/DZYZzQwbXDFyjKavq2umikGRUp9Z
+   A==;
+X-IronPort-AV: E=Sophos;i="5.93,254,1654531200"; 
+   d="scan'208";a="313576507"
+Received: from mail-bn7nam10lp2103.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.103])
+  by ob1.hgst.iphmx.com with ESMTP; 22 Aug 2022 14:25:34 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QnW3Jpby+0nq1x8FoSA8Q6pu+o2HTiYpLPUT53MIm+G4mz5E7ugprLsTU2xJiiM4EOhMh3MFWqgAdncgeE5FeA07eZ4KadliZSpPOQXE2rzeYtJmoJns6/QktLTNuCLTxHylM+xBBRz/ET8Dx4PD6+suxhzH4D+eeYyrNFwlbt9vdOqyryJ/S0GuwHuZB5hey2+lu14byudAl6qHZPkekz5Yuxf0jfIPjGmw550+BDmyILXDy6GXI6jaPUVTRzZuHifhsBMbun86u0r7yLgsomPU1JPjxjXdyaikK8kNeYgDpkR+dllOD54FW2BZhUL+Lhm9zNw3JjyVPuPWHXaKKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=94Y1pqjTC9hF+iRWRZQuS7Fd1jcku5g6wecsJpN3ogM=;
+ b=hA4l89jA82eIMCbX2wuySmrbotYr5OgRoDqLQtFUJvTBDTl7g4XwMPSxq/ZrymTxNqV/LauKwEgJSR41I79ROtGMgBPSTsfXVjfrpUm/RF3oCGqMWvT+ae6mHhTVAI9MTK9Z3fVhOcCH9gXy216WFpdtH8A/oDeipEsU7Rhk+Cp7A0P9BcPfpKURlXPbmv6TasKQj6YhkHNoD4cQi2Wa/IKbVAL3CMIVPPmcKmrlTsYo/zCiB8iP/z5fqF+zwCUdSZ+4E1ueUneg70okHzwS2YnC39NolQg6NBmHmtuFUMkBRHspWOOe5RlBcu4mDFVvAGAmFjN6M7wcRzD46hOe7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=94Y1pqjTC9hF+iRWRZQuS7Fd1jcku5g6wecsJpN3ogM=;
+ b=B7Ogafb/l5xACCwwsGoebgU1yjeLmjHsY8F24XIH/RmJigiMQC65m9rd3m1x+YQjTWi2foKjI6p/4R9+CTPY3dKnFNQemuMPN0CBS5MQ537pdZD7ZvPHAUo4sSxH26uTCv/r+Md+Al0yoM+Gbfcx/6ibLhlIRfr0RfVCuC9g1qA=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BL0PR04MB5105.namprd04.prod.outlook.com (2603:10b6:208:55::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5546.22; Mon, 22 Aug 2022 06:25:33 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c7e:a51:e59a:d633]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c7e:a51:e59a:d633%6]) with mapi id 15.20.5546.022; Mon, 22 Aug 2022
+ 06:25:32 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH blktests v3 4/6] common,tests: replace _have_driver() with
+ _have_drivers()
+Thread-Topic: [PATCH blktests v3 4/6] common,tests: replace _have_driver()
+ with _have_drivers()
+Thread-Index: AQHYs6+U6JmLkm1njkOeFqHgW8QFra243EoAgAGcTAA=
+Date:   Mon, 22 Aug 2022 06:25:32 +0000
+Message-ID: <20220822062532.6jqtrpxharorhhzh@shindev>
+References: <20220819093920.84992-1-shinichiro.kawasaki@wdc.com>
+ <20220819093920.84992-5-shinichiro.kawasaki@wdc.com>
+ <20220821054952.GC25878@lst.de>
+In-Reply-To: <20220821054952.GC25878@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a16586cc-318a-4f77-f2eb-08da84071e02
+x-ms-traffictypediagnostic: BL0PR04MB5105:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pED2j2y//GVEuxUkMBmhydqg2JRpRQ0mNDmbhgWiS6WZgro6xu1Vlr+Q2MImnrMCQ8DIeNqHA75hkaw43EEwBfpCgmm+BSRHdttUsYUntqXoeYin+GDBJqU/zzhO/JbzMZlvKRRMXt++sVnUAFUbn2bH7KBVqGDiTQPLN4nQ93oe49nZFvtBoxosKvRJQ0Fe4AJemXWLJ2iRPvIFgW2mxcQ8cEdYwCDVuMTybtJgybqtDix8RuUuoFXHBxxDt6AH+jsrooXv0oiD1G4L6gxLOdmVVRUKoNqn40es4RWDhPfHPhPszCnEEq2/18gwDzZHzSNEwrAOHGoCdB0I95YEQugw2shjN8TPimqvTDpbMt9IoTS38etFlYvSkaftHvEKpU6zDeGk2o6vmJuoWBG1jIzJYRya2Tn2hzIwzlmTbIENtZGWsVNKeuBB9NuCxw639N53wbV/+FkhBbZ0K8Cydswc6o3A0/tiCUgTjOqIrF8aTRGM6cpR5/npCHqHpHYjh/rDOZtxXfhyBN1032voyuCJQeFtPhe3XjdUUrJKFkEW7NnCgbB3c2mCRzwm3/EPtsqRpruhQvcsTqIWBg+QBrwaDq6y0wOkfwYkVqtPu2+fpEsR4SqRZheG9kKy3FACA192WrW7BPY0GSfChZwVZbDWMUf7Dz6ikfm0cq1ZiXe8yfwpLrMSWLMhvpR+wK+Dcy+CRiI98eT1hWzmL+PCns0iq5m7ezbRQgTUH+KYK79gIK29JAy9egbnsM23wekD/6AP74n83SbS4LtatKW1aw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(7916004)(376002)(366004)(136003)(346002)(396003)(39860400002)(6486002)(478600001)(316002)(6916009)(9686003)(26005)(6506007)(5660300002)(8936002)(71200400001)(4744005)(6512007)(44832011)(1076003)(2906002)(86362001)(186003)(41300700001)(54906003)(82960400001)(38100700002)(38070700005)(33716001)(66446008)(4326008)(64756008)(8676002)(122000001)(76116006)(91956017)(66946007)(66556008)(66476007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?sLrAw0I3JHLTvAgjpIj99EZ7poC9F4rJAAOkMsNDBxmdzD/6ZjKikbcIVNMO?=
+ =?us-ascii?Q?oJPOknMdhsll3xP4N9sSU7u9Tfo7opcW15fkJxkAj7rrsw7Jo6DoK2iJcT2j?=
+ =?us-ascii?Q?7xqmJzxWe1rhAVTzFiBliGWxZXvtBCXVNxCLozbwWJz7LlUdEyHrZmNCkYBT?=
+ =?us-ascii?Q?32MSVWIezZXyHR0i0wcjLoY5jA2hCgtQXniKualY6LipKMZuZtSO11OLILqd?=
+ =?us-ascii?Q?ygWI0VfGwLfi/shYyHYjaDpP2gBft2190Mo60YwAxHdcOQarbWCxhZjrl8gc?=
+ =?us-ascii?Q?iC6GVopIv1MeJRdK2304Zqk8KcaTRge2Km6nOJjMifXCGCIWISYdxEGDhp69?=
+ =?us-ascii?Q?DujQtqFmTdFkHiEEHdfERFVAgmFi3XJH4xZUl5gqqi2gVa3nifu65LVsfcbB?=
+ =?us-ascii?Q?ugbgvloZFSre0L3D1CIa2Ico2KcCJ4foB9PsMsIRWhWXf84cvvAJbM3o89ss?=
+ =?us-ascii?Q?YGCdwok7+Mi0PTgKKUaNQzb/zvYy0bQhAlochrD/BYva+3PHPcgahmESPRk8?=
+ =?us-ascii?Q?xp4gUHMTh3FbN+cWymq1k7S8VJuJZu2xSCqKcvLKCupVbci3CRVjQ8qeI5UV?=
+ =?us-ascii?Q?r/uzbQkLq9xDNNDVpQnGdhuYwnGMPoX2pRHwPWWA/ZMPes0qtdVPWRCw91RT?=
+ =?us-ascii?Q?IyNXDBZn88Y7Bn+oQcckvGWd9BtpANsNYl1cDXcbQE2q1nNlKc37IYdYzcPd?=
+ =?us-ascii?Q?5EOUCtqlknPF+uuliSiq6+8AR1KGKOcihfAoTwWdO0EA842CMEbWEA4HXnlN?=
+ =?us-ascii?Q?oF4LXHZk+5baIq3hrFMvXZBxo0/BHXOmCWsvi2i0XvnhXkzszREE4AthP5Tq?=
+ =?us-ascii?Q?30AGiWp7a22nnN2w+lfUG1dWsP1KRbuluSNgAd9NNdhOTscQowxq6/IN1Qo6?=
+ =?us-ascii?Q?m0Nd7Ily1lKC3r/uA5opasxQbSA9FNIPcy7PJ0eF/n2cZVuMwCawJ67sBqMs?=
+ =?us-ascii?Q?IhlUPCEvulcyNg5pt7LA4WHzpJ3xOBoiBcwUDlJdmz/nBwGEhnIfCUzXCA16?=
+ =?us-ascii?Q?fH9XulaLwPhRhAittNZJqIfeuL26Ycr3/ykB4YeLtWUyC1S7VOSPjbtTbO9n?=
+ =?us-ascii?Q?8HpZyj1muE8YR99jUmiPSCbvbK0Jbtnze05+uN0rBjC5S1f6LQ/wdqzVufCU?=
+ =?us-ascii?Q?mX6EQoMAmBB4hJZmrexIYR1i4YHbfe13DrOxywqsLDok4qXQjfwSvTJymX1G?=
+ =?us-ascii?Q?kH6hQqR7zx0dLuJDXPOIT50pB/KLOAXjZ465ePBThdyZn6cONGCBIXlMDPjH?=
+ =?us-ascii?Q?DMUjy1DuOhee4SZ0tTG+/Ppzy5As8uOKUFy95KKjmWP6v92WRSJv7uEurIY8?=
+ =?us-ascii?Q?T5m/eXSz9+BXDgZywjt1zeSZqCmo+cl/udQJ5Kj03NVZQKlJjpXiAt0Gd3UI?=
+ =?us-ascii?Q?XdsBNPw0V2STvNBFQvmrV2h37ci2UcDMibaf34F09438lACDsSSIDHRrfSoh?=
+ =?us-ascii?Q?RIODel8WHwD6mz2bc1guK5HXkoVM0h8H/9rBgsMYV1ccG2LaSzhlwxmM02HJ?=
+ =?us-ascii?Q?LHtneLg+qC47zCmq6Leo9CGeUeEsZh8vk+NEW17l09gVzDWX+/SiGEIL/lLa?=
+ =?us-ascii?Q?XbBEGqLxtDbd5xVVEHfwdv3ZrJ2sX+xXyIeTDwbYealfaQsMC5elrJ6HAeVE?=
+ =?us-ascii?Q?lsTCOMn2jpOmEclZQq0AuT8=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <0D2D815BCB622746951E1510C972C914@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a16586cc-318a-4f77-f2eb-08da84071e02
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Aug 2022 06:25:32.9337
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mCfby8YJzmXnEsO6yWewAb6gkTjqCMor7GXzo15jiMLcKiPfS93EC2ySEa5WBFyl+beB/AXXFC6zwqodVbxVVP0MW2jCHn6EISqDIpUwTzs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB5105
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Given that rnbd_srv_sess_dev already has an open_flags member, there
-is no need for the rnbd_dev indirection as a simple block_device pointer
-works just as well.
+On Aug 21, 2022 / 07:49, Christoph Hellwig wrote:
+> I always found _have_modules rather strange as multiple lines to check
+> for one driver at a time seems more readable.=20
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/rnbd/rnbd-srv-dev.h | 20 --------------
- drivers/block/rnbd/rnbd-srv.c     | 46 ++++++++++++-------------------
- drivers/block/rnbd/rnbd-srv.h     |  2 +-
- 3 files changed, 18 insertions(+), 50 deletions(-)
- delete mode 100644 drivers/block/rnbd/rnbd-srv-dev.h
+Okay, that will be a bit simpler. I'll drop this patch from the series. Ins=
+tead,
+will add a patch which will replace _have_modules with _have_module.
 
-diff --git a/drivers/block/rnbd/rnbd-srv-dev.h b/drivers/block/rnbd/rnbd-srv-dev.h
-deleted file mode 100644
-index abaf77d68e5b9..0000000000000
---- a/drivers/block/rnbd/rnbd-srv-dev.h
-+++ /dev/null
-@@ -1,20 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-or-later */
--/*
-- * RDMA Network Block Driver
-- *
-- * Copyright (c) 2014 - 2018 ProfitBricks GmbH. All rights reserved.
-- * Copyright (c) 2018 - 2019 1&1 IONOS Cloud GmbH. All rights reserved.
-- * Copyright (c) 2019 - 2020 1&1 IONOS SE. All rights reserved.
-- */
--#ifndef RNBD_SRV_DEV_H
--#define RNBD_SRV_DEV_H
--
--#include <linux/fs.h>
--#include "rnbd-proto.h"
--
--struct rnbd_dev {
--	struct block_device	*bdev;
--	fmode_t			blk_open_flags;
--};
--
--#endif /* RNBD_SRV_DEV_H */
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index be238b625c2c0..4bcb7d0b29c7b 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -13,7 +13,6 @@
- #include <linux/blkdev.h>
- 
- #include "rnbd-srv.h"
--#include "rnbd-srv-dev.h"
- #include "rnbd-srv-trace.h"
- 
- MODULE_DESCRIPTION("RDMA Network Block Device Server");
-@@ -146,7 +145,7 @@ static int process_rdma(struct rnbd_srv_session *srv_sess,
- 	priv->sess_dev = sess_dev;
- 	priv->id = id;
- 
--	bio = bio_alloc(sess_dev->rnbd_dev->bdev, 1,
-+	bio = bio_alloc(sess_dev->bdev, 1,
- 			rnbd_to_bio_flags(le32_to_cpu(msg->rw)), GFP_KERNEL);
- 	if (bio_add_page(bio, virt_to_page(data), datalen,
- 			offset_in_page(data)) != datalen) {
-@@ -220,9 +219,7 @@ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id)
- 	rnbd_put_sess_dev(sess_dev);
- 	wait_for_completion(&dc); /* wait for inflights to drop to zero */
- 
--	blkdev_put(sess_dev->rnbd_dev->bdev,
--		   sess_dev->rnbd_dev->blk_open_flags);
--	kfree(sess_dev->rnbd_dev);
-+	blkdev_put(sess_dev->bdev, sess_dev->open_flags);
- 	mutex_lock(&sess_dev->dev->lock);
- 	list_del(&sess_dev->dev_list);
- 	if (sess_dev->open_flags & FMODE_WRITE)
-@@ -509,14 +506,14 @@ static int rnbd_srv_check_update_open_perm(struct rnbd_srv_dev *srv_dev,
- }
- 
- static struct rnbd_srv_dev *
--rnbd_srv_get_or_create_srv_dev(struct rnbd_dev *rnbd_dev,
-+rnbd_srv_get_or_create_srv_dev(struct block_device *bdev,
- 				struct rnbd_srv_session *srv_sess,
- 				enum rnbd_access_mode access_mode)
- {
- 	int ret;
- 	struct rnbd_srv_dev *new_dev, *dev;
- 
--	new_dev = rnbd_srv_init_srv_dev(rnbd_dev->bdev);
-+	new_dev = rnbd_srv_init_srv_dev(bdev);
- 	if (IS_ERR(new_dev))
- 		return new_dev;
- 
-@@ -536,7 +533,7 @@ rnbd_srv_get_or_create_srv_dev(struct rnbd_dev *rnbd_dev,
- static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
- 					struct rnbd_srv_sess_dev *sess_dev)
- {
--	struct block_device *bdev = sess_dev->rnbd_dev->bdev;
-+	struct block_device *bdev = sess_dev->bdev;
- 
- 	rsp->hdr.type = cpu_to_le16(RNBD_MSG_OPEN_RSP);
- 	rsp->device_id = cpu_to_le32(sess_dev->device_id);
-@@ -561,7 +558,7 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
- static struct rnbd_srv_sess_dev *
- rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
- 			      const struct rnbd_msg_open *open_msg,
--			      struct rnbd_dev *rnbd_dev, fmode_t open_flags,
-+			      struct block_device *bdev, fmode_t open_flags,
- 			      struct rnbd_srv_dev *srv_dev)
- {
- 	struct rnbd_srv_sess_dev *sdev = rnbd_sess_dev_alloc(srv_sess);
-@@ -573,7 +570,7 @@ rnbd_srv_create_set_sess_dev(struct rnbd_srv_session *srv_sess,
- 
- 	strscpy(sdev->pathname, open_msg->dev_name, sizeof(sdev->pathname));
- 
--	sdev->rnbd_dev		= rnbd_dev;
-+	sdev->bdev		= bdev;
- 	sdev->sess		= srv_sess;
- 	sdev->dev		= srv_dev;
- 	sdev->open_flags	= open_flags;
-@@ -680,9 +677,9 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 	struct rnbd_srv_dev *srv_dev;
- 	struct rnbd_srv_sess_dev *srv_sess_dev;
- 	const struct rnbd_msg_open *open_msg = msg;
-+	struct block_device *bdev;
- 	fmode_t open_flags;
- 	char *full_path;
--	struct rnbd_dev *rnbd_dev;
- 	struct rnbd_msg_open_rsp *rsp = data;
- 
- 	trace_process_msg_open(srv_sess, open_msg);
-@@ -719,33 +716,25 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 		goto reject;
- 	}
- 
--	rnbd_dev = kzalloc(sizeof(*rnbd_dev), GFP_KERNEL);
--	if (!rnbd_dev) {
--		ret = -ENOMEM;
--		goto free_path;
--	}
--
--	rnbd_dev->blk_open_flags = open_flags;
--	rnbd_dev->bdev = blkdev_get_by_path(full_path, open_flags, THIS_MODULE);
--	if (IS_ERR(rnbd_dev->bdev)) {
--		ret = PTR_ERR(rnbd_dev->bdev);
-+	bdev = blkdev_get_by_path(full_path, open_flags, THIS_MODULE);
-+	if (IS_ERR(bdev)) {
-+		ret = PTR_ERR(bdev);
- 		pr_err("Opening device '%s' on session %s failed, failed to open the block device, err: %d\n",
- 		       full_path, srv_sess->sessname, ret);
--		kfree(rnbd_dev);
- 		goto free_path;
- 	}
- 
--	srv_dev = rnbd_srv_get_or_create_srv_dev(rnbd_dev, srv_sess,
-+	srv_dev = rnbd_srv_get_or_create_srv_dev(bdev, srv_sess,
- 						  open_msg->access_mode);
- 	if (IS_ERR(srv_dev)) {
- 		pr_err("Opening device '%s' on session %s failed, creating srv_dev failed, err: %ld\n",
- 		       full_path, srv_sess->sessname, PTR_ERR(srv_dev));
- 		ret = PTR_ERR(srv_dev);
--		goto rnbd_dev_close;
-+		goto blkdev_put;
- 	}
- 
- 	srv_sess_dev = rnbd_srv_create_set_sess_dev(srv_sess, open_msg,
--						     rnbd_dev, open_flags,
-+						     bdev, open_flags,
- 						     srv_dev);
- 	if (IS_ERR(srv_sess_dev)) {
- 		pr_err("Opening device '%s' on session %s failed, creating sess_dev failed, err: %ld\n",
-@@ -760,7 +749,7 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 	 */
- 	mutex_lock(&srv_dev->lock);
- 	if (!srv_dev->dev_kobj.state_in_sysfs) {
--		ret = rnbd_srv_create_dev_sysfs(srv_dev, rnbd_dev->bdev);
-+		ret = rnbd_srv_create_dev_sysfs(srv_dev, bdev);
- 		if (ret) {
- 			mutex_unlock(&srv_dev->lock);
- 			rnbd_srv_err(srv_sess_dev,
-@@ -802,9 +791,8 @@ static int process_msg_open(struct rnbd_srv_session *srv_sess,
- 		mutex_unlock(&srv_dev->lock);
- 	}
- 	rnbd_put_srv_dev(srv_dev);
--rnbd_dev_close:
--	blkdev_put(rnbd_dev->bdev, rnbd_dev->blk_open_flags);
--	kfree(rnbd_dev);
-+blkdev_put:
-+	blkdev_put(bdev, open_flags);
- free_path:
- 	kfree(full_path);
- reject:
-diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
-index 081bceaf4ae9e..f5962fd31d62e 100644
---- a/drivers/block/rnbd/rnbd-srv.h
-+++ b/drivers/block/rnbd/rnbd-srv.h
-@@ -46,7 +46,7 @@ struct rnbd_srv_dev {
- struct rnbd_srv_sess_dev {
- 	/* Entry inside rnbd_srv_dev struct */
- 	struct list_head		dev_list;
--	struct rnbd_dev			*rnbd_dev;
-+	struct block_device		*bdev;
- 	struct rnbd_srv_session		*sess;
- 	struct rnbd_srv_dev		*dev;
- 	struct kobject                  kobj;
--- 
-2.30.2
-
+--=20
+Shin'ichiro Kawasaki=
