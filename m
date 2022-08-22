@@ -2,160 +2,346 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5597C32774
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 16:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF236C32772
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 19:10:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236984AbiHVQXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 12:23:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40580 "EHLO
+        id S238262AbiHVTKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 15:10:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236956AbiHVQXU (ORCPT
+        with ESMTP id S238464AbiHVTKf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 12:23:20 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6739B52
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 09:23:14 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id j21so16873934ejs.0
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 09:23:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=EE1aqTdlibrHEF4utdqSiRW8iT6Z8Qft9Gec3pOWS0g=;
-        b=h4OKsmPm8lcsxxenj4LPbgeTgsMkILQHX3JN0PBkW0ER9H/i6rbclf2vnROuC539tp
-         q1ttjv/U6JRT7tEp+89YY/EGYs+zSR694DFa/0SQutGl712zsHCAzACH8e55HrPCrO8M
-         c8rha1v1NRRwdWTCNZ9LxX30Qha4oZ09F7qQnguyjrb9dCy35aM6Qhlau7q2hhO6N/er
-         w6w9wcbj70eUw3ZrM8SzfTGiTX9/V+2n1p/RMQwh14Vjt4esnKKKtw4oZLrulcczG1kR
-         TLrTaHNYMZcX2Wg77LWORSeDFEgjCkPN6Qela44dsUkC91askOcGTcmsrE0YdvjidBnM
-         Wdsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=EE1aqTdlibrHEF4utdqSiRW8iT6Z8Qft9Gec3pOWS0g=;
-        b=RLcLZ+ai/Ga3EwLYFTjuIdp71fZoYlYh/mceJBVmG/41iS0tVzG97IwCST4FIaWW5Q
-         ZystFD7yoMoctXGpeCfNTR/0UusPnrnwDwJhqdoUihWrHBz0uR0m7GOoF5bTuYV1+Jmx
-         TXu5KqHbCKBYrA2zNbupXCRfvve9a9Z1o+9WH6bSlBqoadszmT2pLio7lf95+cs9okMZ
-         AaA+FfFv+04b9z2JKjea+tXyh89r2KiTbRlwZ7OAAZJwnC6Pwnga4r2O6D+08ORGTSAZ
-         7hgptINqzqRzWWdbjPq1UwZpEgPj/vdhtns/3zeMn9l5uN9WkeFRzxD8mS8QVy3e+nbC
-         KVAA==
-X-Gm-Message-State: ACgBeo2KMaZnQR359QHsvUEqYVbVBBAJZoOjvJcGRVFDyQ2XeQZQDn4p
-        /r1c7R1fGGGIIwwHZosEbjIq/lUcQAUgOOOpbig=
-X-Google-Smtp-Source: AA6agR78XtD4OIwdwPqQCsdn94fsZCYoTrPNaBPJO2Yudx4dlxP/Qh2vppqjJ8UjkUieYCp7EXOT5OOvMxfq5vBElD4=
-X-Received: by 2002:a17:907:2816:b0:73d:7af2:37f5 with SMTP id
- eb22-20020a170907281600b0073d7af237f5mr4639645ejc.588.1661185393254; Mon, 22
- Aug 2022 09:23:13 -0700 (PDT)
+        Mon, 22 Aug 2022 15:10:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9969150060;
+        Mon, 22 Aug 2022 12:09:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EAAC1611EB;
+        Mon, 22 Aug 2022 19:09:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D247C43470;
+        Mon, 22 Aug 2022 19:09:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661195351;
+        bh=CEz0U84h1VnpwxeDHmIBe3cV02cBnqQBBBJ87mDRENw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=etPBVMKMSbJI0u4BB1dspYI0qg2hw2UoTXh3jqG/HvWZVe43sTHr4Va9qtd/rwWwt
+         /gCC80imT+Vcl8eI6mNeHabyx/q5vlxcUxeTP5/hlXPh3DQUbv7v0/Cb3QMfVIO2wK
+         bKl+JFjJXiCWOZv1L++OEXm0gXDo2sfeAd1ZH7q8cDix+VLUGZAtzOLfUF4HxV3Rs/
+         oV+GQFhdE6J5wI0panNpoGxwrkd0bStGoDGGe7xFsK/SOSWLp3HT1oBEpxBKQz6GjO
+         nBk0ppWnEkDo++0MaEFopQbgNSQ4zqqKl4wBzyQePNoztbD34WYafIJf5aTEBWvCNo
+         VYAj/jb2SD0hg==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-fscrypt@vger.kernel.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v3 3/3] fscrypt: work on block_devices instead of request_queues
+Date:   Mon, 22 Aug 2022 12:08:12 -0700
+Message-Id: <20220822190812.54581-4-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20220822190812.54581-1-ebiggers@kernel.org>
+References: <20220822190812.54581-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-References: <CAPBb6MUP5sH2Ohgrm4UE9ygOF2nKK4dEYWsrwfDUbSMH5Lb=ew@mail.gmail.com>
- <CAFNWusbavuD9vMuTjV0fEFjTCnMCd1+HPkUC+GsF2FYewrDJ_Q@mail.gmail.com>
- <CAPBb6MW0Ou8CcWCD-n+9-B0daiviP1Uk9A9C0QBp=B2oFECF3w@mail.gmail.com>
- <CAFNWusYr_3FjZtALxjq8ty=-FvWqzW=j1K7Mynuz0W9Vh8tD5A@mail.gmail.com> <CAPBb6MV74xgOKUBfej3etF4ZDuVEHhGciCwYyzOBfOBY27v2qg@mail.gmail.com>
-In-Reply-To: <CAPBb6MV74xgOKUBfej3etF4ZDuVEHhGciCwYyzOBfOBY27v2qg@mail.gmail.com>
-From:   Kim Suwan <suwan.kim027@gmail.com>
-Date:   Tue, 23 Aug 2022 01:23:02 +0900
-Message-ID: <CAFNWusYobFdqaEj12ND7Ee9pT+GRxPQwYNEEAG1LMEXCgUQjDA@mail.gmail.com>
-Subject: Re: WARN_ON_ONCE reached with "virtio-blk: support mq_ops->queue_rqs()"
-To:     Alexandre Courbot <acourbot@chromium.org>
-Cc:     linux-block@vger.kernel.org,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Alexandre,
+From: Christoph Hellwig <hch@lst.de>
 
-On Mon, Aug 22, 2022 at 4:03 PM Alexandre Courbot <acourbot@chromium.org> wrote:
->
-> Hi Suwan, apologies for taking so long to come back to this.
->
-> On Tue, Aug 2, 2022 at 11:50 PM Kim Suwan <suwan.kim027@gmail.com> wrote:
-> >
-> > Hi Alexandre
-> >
-> > On Tue, Aug 2, 2022 at 11:12 AM Alexandre Courbot <acourbot@chromium.org> wrote:
-> > >
-> > >  Hi Suwan,
-> > >
-> > > Thanks for the fast reply!
-> > >
-> > > On Tue, Aug 2, 2022 at 1:55 AM Kim Suwan <suwan.kim027@gmail.com> wrote:
-> > > >
-> > > > Hi Alexandre,
-> > > >
-> > > > Thanks for reporting the issue.
-> > > >
-> > > > I think a possible scenario is that request fails at
-> > > > virtio_queue_rqs() and it is passed to normal path (virtio_queue_rq).
-> > > >
-> > > > In this procedure, It is possible that blk_mq_start_request()
-> > > > was called twice changing request state from MQ_RQ_IN_FLIGHT to
-> > > > MQ_RQ_IN_FLIGHT.
-> > >
-> > > I have checked whether virtblk_prep_rq_batch() within
-> > > virtio_queue_rqs() ever returns 0, and it looks like it never happens.
-> > > So as far as I can tell all virtio_queue_rqs() are processed
-> > > successfully - but maybe the request can also fail further down the
-> > > line? Is there some extra instrumentation I can do to check that?
-> > >
-> >
-> > I'm looking at one more suspicious code.
-> > If virtblk_add_req() fails within virtblk_add_req_batch(),
-> > virtio_queue_rqs() passes the failed request to the normal path also
-> > (virtio_queue_rq). Then, it can call blk_mq_start_request() twice.
-> >
-> > Because I can't reproduce the issue on my vm, Could you test
-> > the below patch?
-> > I defer the blk_mq_start_request() call after virtblk_add_req()
-> > to ensure that we call blk_mq_start_request() after all the
-> > preparations finish.
->
-> Your patch seems to solve the problem! I am not seeing the warning
-> anymore and the block device looks happy.
+request_queues are a block layer implementation detail that should not
+leak into file systems.  Change the fscrypt inline crypto code to
+retrieve block devices instead of request_queues from the file system.
+As part of that, clean up the interaction with multi-device file systems
+by returning both the number of devices and the actual device array in a
+single method call.
 
-Good news! Thanks for the test!
-
-> Let me know if I can do anything else.
-
-Could you test one more patch?
-I move blk_mq_start_request(req) before spinlock() to reduce time
-holding the lock within virtio_queue_rq().
-If it is ok, I will send the patch.
-
-Regards,
-Suwan Kim
-
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+[ebiggers: bug fixes and minor tweaks]
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 30255fcaf181..73a0620a7cff 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -322,8 +322,6 @@ static blk_status_t virtblk_prep_rq(struct
-blk_mq_hw_ctx *hctx,
-        if (unlikely(status))
-                return status;
+ fs/crypto/inline_crypt.c | 107 ++++++++++++++++++++-------------------
+ fs/f2fs/super.c          |  24 ++++-----
+ include/linux/fscrypt.h  |  21 ++++----
+ 3 files changed, 76 insertions(+), 76 deletions(-)
 
--       blk_mq_start_request(req);
--
-        vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
-        if (unlikely(vbr->sg_table.nents < 0)) {
-                virtblk_cleanup_cmd(req);
-@@ -349,6 +347,8 @@ static blk_status_t virtio_queue_rq(struct
-blk_mq_hw_ctx *hctx,
-        if (unlikely(status))
-                return status;
-
-+       blk_mq_start_request(req);
+diff --git a/fs/crypto/inline_crypt.c b/fs/crypto/inline_crypt.c
+index a3225fe2291361..afcdd8bb3fa7c3 100644
+--- a/fs/crypto/inline_crypt.c
++++ b/fs/crypto/inline_crypt.c
+@@ -21,20 +21,22 @@
+ 
+ #include "fscrypt_private.h"
+ 
+-static int fscrypt_get_num_devices(struct super_block *sb)
++static struct block_device **fscrypt_get_devices(struct super_block *sb,
++						 unsigned int *num_devs)
+ {
+-	if (sb->s_cop->get_num_devices)
+-		return sb->s_cop->get_num_devices(sb);
+-	return 1;
+-}
++	struct block_device **devs;
+ 
+-static void fscrypt_get_devices(struct super_block *sb, int num_devs,
+-				struct request_queue **devs)
+-{
+-	if (num_devs == 1)
+-		devs[0] = bdev_get_queue(sb->s_bdev);
+-	else
+-		sb->s_cop->get_devices(sb, devs);
++	if (sb->s_cop->get_devices) {
++		devs = sb->s_cop->get_devices(sb, num_devs);
++		if (devs)
++			return devs;
++	}
++	devs = kmalloc(sizeof(*devs), GFP_KERNEL);
++	if (!devs)
++		return ERR_PTR(-ENOMEM);
++	devs[0] = sb->s_bdev;
++	*num_devs = 1;
++	return devs;
+ }
+ 
+ static unsigned int fscrypt_get_dun_bytes(const struct fscrypt_info *ci)
+@@ -68,15 +70,17 @@ static unsigned int fscrypt_get_dun_bytes(const struct fscrypt_info *ci)
+  * helpful for debugging problems where the "wrong" implementation is used.
+  */
+ static void fscrypt_log_blk_crypto_impl(struct fscrypt_mode *mode,
+-					struct request_queue **devs,
+-					int num_devs,
++					struct block_device **devs,
++					unsigned int num_devs,
+ 					const struct blk_crypto_config *cfg)
+ {
+-	int i;
++	unsigned int i;
+ 
+ 	for (i = 0; i < num_devs; i++) {
++		struct request_queue *q = bdev_get_queue(devs[i]);
 +
-        spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
-        err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
-        if (err) {
-@@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
-                        virtblk_unmap_data(req, vbr);
-                        virtblk_cleanup_cmd(req);
-                        rq_list_add(requeue_list, req);
-+               } else {
-+                       blk_mq_start_request(req);
-                }
-        }
+ 		if (!IS_ENABLED(CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK) ||
+-		    __blk_crypto_cfg_supported(devs[i]->crypto_profile, cfg)) {
++		    __blk_crypto_cfg_supported(q->crypto_profile, cfg)) {
+ 			if (!xchg(&mode->logged_blk_crypto_native, 1))
+ 				pr_info("fscrypt: %s using blk-crypto (native)\n",
+ 					mode->friendly_name);
+@@ -93,9 +97,9 @@ int fscrypt_select_encryption_impl(struct fscrypt_info *ci)
+ 	const struct inode *inode = ci->ci_inode;
+ 	struct super_block *sb = inode->i_sb;
+ 	struct blk_crypto_config crypto_cfg;
+-	int num_devs;
+-	struct request_queue **devs;
+-	int i;
++	struct block_device **devs;
++	unsigned int num_devs;
++	unsigned int i;
+ 
+ 	/* The file must need contents encryption, not filenames encryption */
+ 	if (!S_ISREG(inode->i_mode))
+@@ -123,20 +127,20 @@ int fscrypt_select_encryption_impl(struct fscrypt_info *ci)
+ 		return 0;
+ 
+ 	/*
+-	 * On all the filesystem's devices, blk-crypto must support the crypto
+-	 * configuration that the file would use.
++	 * On all the filesystem's block devices, blk-crypto must support the
++	 * crypto configuration that the file would use.
+ 	 */
+ 	crypto_cfg.crypto_mode = ci->ci_mode->blk_crypto_mode;
+ 	crypto_cfg.data_unit_size = sb->s_blocksize;
+ 	crypto_cfg.dun_bytes = fscrypt_get_dun_bytes(ci);
+-	num_devs = fscrypt_get_num_devices(sb);
+-	devs = kmalloc_array(num_devs, sizeof(*devs), GFP_KERNEL);
+-	if (!devs)
+-		return -ENOMEM;
+-	fscrypt_get_devices(sb, num_devs, devs);
++
++	devs = fscrypt_get_devices(sb, &num_devs);
++	if (IS_ERR(devs))
++		return PTR_ERR(devs);
+ 
+ 	for (i = 0; i < num_devs; i++) {
+-		if (!blk_crypto_config_supported(devs[i], &crypto_cfg))
++		if (!blk_crypto_config_supported(bdev_get_queue(devs[i]),
++						 &crypto_cfg))
+ 			goto out_free_devs;
+ 	}
+ 
+@@ -157,10 +161,10 @@ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+ 	struct super_block *sb = inode->i_sb;
+ 	enum blk_crypto_mode_num crypto_mode = ci->ci_mode->blk_crypto_mode;
+ 	struct blk_crypto_key *blk_key;
+-	int num_devs;
+-	struct request_queue **devs = NULL;
++	struct block_device **devs;
++	unsigned int num_devs;
++	unsigned int i;
+ 	int err;
+-	int i;
+ 
+ 	blk_key = kmalloc(sizeof(*blk_key), GFP_KERNEL);
+ 	if (!blk_key)
+@@ -174,21 +178,23 @@ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+ 	}
+ 
+ 	/* Start using blk-crypto on all the filesystem's block devices. */
+-	num_devs = fscrypt_get_num_devices(sb);
+-	devs = kmalloc_array(num_devs, sizeof(*devs), GFP_KERNEL);
+-	if (!devs) {
+-		err = -ENOMEM;
++	devs = fscrypt_get_devices(sb, &num_devs);
++	if (IS_ERR(devs)) {
++		err = PTR_ERR(devs);
+ 		goto out;
+ 	}
+-	fscrypt_get_devices(sb, num_devs, devs);
+ 	for (i = 0; i < num_devs; i++) {
+-		err = blk_crypto_start_using_key(blk_key, devs[i]);
+-		if (err) {
+-			fscrypt_err(inode,
+-				    "error %d starting to use blk-crypto", err);
+-			goto out;
+-		}
++		err = blk_crypto_start_using_key(blk_key,
++						 bdev_get_queue(devs[i]));
++		if (err)
++			break;
++	}
++	kfree(devs);
++	if (err) {
++		fscrypt_err(inode, "error %d starting to use blk-crypto", err);
++		goto out;
+ 	}
++
+ 	/*
+ 	 * Pairs with the smp_load_acquire() in fscrypt_is_key_prepared().
+ 	 * I.e., here we publish ->blk_key with a RELEASE barrier so that
+@@ -196,10 +202,9 @@ int fscrypt_prepare_inline_crypt_key(struct fscrypt_prepared_key *prep_key,
+ 	 * possible for per-mode keys, not for per-file keys.
+ 	 */
+ 	smp_store_release(&prep_key->blk_key, blk_key);
+-	blk_key = NULL;
+-	err = 0;
++	return 0;
++
+ out:
+-	kfree(devs);
+ 	kfree_sensitive(blk_key);
+ 	return err;
+ }
+@@ -208,17 +213,15 @@ void fscrypt_destroy_inline_crypt_key(struct super_block *sb,
+ 				      struct fscrypt_prepared_key *prep_key)
+ {
+ 	struct blk_crypto_key *blk_key = prep_key->blk_key;
+-	int num_devs;
+-	struct request_queue **devs;
+-	int i;
++	struct block_device **devs;
++	unsigned int num_devs;
++	unsigned int i;
+ 
+ 	/* Evict the key from all the filesystem's block devices. */
+-	num_devs = fscrypt_get_num_devices(sb);
+-	devs = kmalloc_array(num_devs, sizeof(*devs), GFP_KERNEL);
+-	if (devs) {
+-		fscrypt_get_devices(sb, num_devs, devs);
++	devs = fscrypt_get_devices(sb, &num_devs);
++	if (!IS_ERR(devs)) {
+ 		for (i = 0; i < num_devs; i++)
+-			blk_crypto_evict_key(devs[i], blk_key);
++			blk_crypto_evict_key(bdev_get_queue(devs[i]), blk_key);
+ 		kfree(devs);
+ 	}
+ 	kfree_sensitive(blk_key);
+diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+index 2451623c05a7a8..26817b5aeac781 100644
+--- a/fs/f2fs/super.c
++++ b/fs/f2fs/super.c
+@@ -3039,23 +3039,24 @@ static void f2fs_get_ino_and_lblk_bits(struct super_block *sb,
+ 	*lblk_bits_ret = 8 * sizeof(block_t);
+ }
+ 
+-static int f2fs_get_num_devices(struct super_block *sb)
++static struct block_device **f2fs_get_devices(struct super_block *sb,
++					      unsigned int *num_devs)
+ {
+ 	struct f2fs_sb_info *sbi = F2FS_SB(sb);
++	struct block_device **devs;
++	int i;
+ 
+-	if (f2fs_is_multi_device(sbi))
+-		return sbi->s_ndevs;
+-	return 1;
+-}
++	if (!f2fs_is_multi_device(sbi))
++		return NULL;
+ 
+-static void f2fs_get_devices(struct super_block *sb,
+-			     struct request_queue **devs)
+-{
+-	struct f2fs_sb_info *sbi = F2FS_SB(sb);
+-	int i;
++	devs = kmalloc_array(sbi->s_ndevs, sizeof(*devs), GFP_KERNEL);
++	if (!devs)
++		return ERR_PTR(-ENOMEM);
+ 
+ 	for (i = 0; i < sbi->s_ndevs; i++)
+-		devs[i] = bdev_get_queue(FDEV(i).bdev);
++		devs[i] = FDEV(i).bdev;
++	*num_devs = sbi->s_ndevs;
++	return devs;
+ }
+ 
+ static const struct fscrypt_operations f2fs_cryptops = {
+@@ -3066,7 +3067,6 @@ static const struct fscrypt_operations f2fs_cryptops = {
+ 	.empty_dir		= f2fs_empty_dir,
+ 	.has_stable_inodes	= f2fs_has_stable_inodes,
+ 	.get_ino_and_lblk_bits	= f2fs_get_ino_and_lblk_bits,
+-	.get_num_devices	= f2fs_get_num_devices,
+ 	.get_devices		= f2fs_get_devices,
+ };
+ #endif
+diff --git a/include/linux/fscrypt.h b/include/linux/fscrypt.h
+index d86f43bd955029..3a3f7cb7b90f67 100644
+--- a/include/linux/fscrypt.h
++++ b/include/linux/fscrypt.h
+@@ -161,24 +161,21 @@ struct fscrypt_operations {
+ 				      int *ino_bits_ret, int *lblk_bits_ret);
+ 
+ 	/*
+-	 * Return the number of block devices to which the filesystem may write
+-	 * encrypted file contents.
++	 * Return an array of pointers to the block devices to which the
++	 * filesystem may write encrypted file contents, NULL if the filesystem
++	 * only has a single such block device, or an ERR_PTR() on error.
++	 *
++	 * On successful non-NULL return, *num_devs is set to the number of
++	 * devices in the returned array.  The caller must free the returned
++	 * array using kfree().
+ 	 *
+ 	 * If the filesystem can use multiple block devices (other than block
+ 	 * devices that aren't used for encrypted file contents, such as
+ 	 * external journal devices), and wants to support inline encryption,
+ 	 * then it must implement this function.  Otherwise it's not needed.
+ 	 */
+-	int (*get_num_devices)(struct super_block *sb);
+-
+-	/*
+-	 * If ->get_num_devices() returns a value greater than 1, then this
+-	 * function is called to get the array of request_queues that the
+-	 * filesystem is using -- one per block device.  (There may be duplicate
+-	 * entries in this array, as block devices can share a request_queue.)
+-	 */
+-	void (*get_devices)(struct super_block *sb,
+-			    struct request_queue **devs);
++	struct block_device **(*get_devices)(struct super_block *sb,
++					     unsigned int *num_devs);
+ };
+ 
+ static inline struct fscrypt_info *fscrypt_get_info(const struct inode *inode)
+-- 
+2.37.2
+
