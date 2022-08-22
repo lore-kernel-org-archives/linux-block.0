@@ -2,75 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA42C28D13
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 21:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F601C3F6B0
+	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 21:12:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237923AbiHVVMr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 17:12:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36606 "EHLO
+        id S237717AbiHVVMt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 17:12:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237917AbiHVVMo (ORCPT
+        with ESMTP id S237919AbiHVVMo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 22 Aug 2022 17:12:44 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA5952839;
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D8D558DD;
         Mon, 22 Aug 2022 14:12:43 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so12636992pjf.2;
+Received: by mail-pl1-x62b.google.com with SMTP id 20so11042765plo.10;
         Mon, 22 Aug 2022 14:12:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc;
-        bh=Qqhe4dGTXI0LJAzpRWcBaxc07OdXWSOgcInlZlsxK5Q=;
-        b=KSF4PMenZoPIitoMl71A7HkBX7U6tXwdDeE94jUJc0ddPiNcMfS8avusFBLEOYBxuE
-         hJG2TMzAfAaoN0C5XWVh627toC/1dkzLhVhEy8o3w4+aSU53BOKO7W4ry0qPfAgxD6gW
-         B9yl9H61tOFLxeve1k0gifsmkQ6fqxUeXX5Gj5qBegZSCqdFFpWV43MAFbBIR4NG08Mi
-         MIU0Qps2o1VafP7TIXV0j5wTpVs4VmzLme456cwF6Cpikb0z4xxCWR7wqcE5yCL+/nag
-         v6TQSVjizjUPaYHLNj28LOavUeDQgm42RO8hVtXsS9F+427VBMiUIhhufauEMyfTaIyt
-         bCvQ==
+        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
+         :cc;
+        bh=N/X2QE0vyj5059Rl5tVrIDqj6J5xUx1xeSxzqqjIZwk=;
+        b=A9LhYVupLFArYEg2GXauf91psX284WIhJQKEVDD8trGIlyhhqntsy1tcMIHqlgNndq
+         jU+ApOrRpfbeTzJyg27aBn21DFsPE4H7+1Kxb4rB8DQ2KGRkWBZgUC5vU7QBaPLPxl0t
+         O2g6+oa9gnDdMbB7Q6d0yucccGChVoCLm5eMl9M31p9KvMKKcE9m4bE7M+mlSU4IB7vW
+         jqoc41gUn7qzHeAejOFkIKx7IOk/bTVsuul6+KNbTNenm8YuXoVW6TdyaceCtl04CJD4
+         oT8F/oU6SCgNHuj+2PSQqyFuYUtJpDvdGSW/je8/N2w9ydqYJVqW+Q7SCD3lwOMhjXZh
+         m7Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=Qqhe4dGTXI0LJAzpRWcBaxc07OdXWSOgcInlZlsxK5Q=;
-        b=duis++ibVM9RvsPu9nX9NjJQ/TWzi3GhDE8WXr+v9jsj1E64vAVw3JGqj9j1lv9V6m
-         uG52Y41jz27noZ/SnDBtwBuYSpcOy3opOKtt96UI3sIT/htOk6wG5jhYooI5lRkZM/3S
-         QAuu+pdriO+X3ZLeKSKnwYfSy/eyhjW0/7Couh+p/kv5UhUtYqL5orxi7i8nSMJdEJN7
-         va/8SptV/9rzWdKcA6lZFWwzuwhrZgFSw5oPnzzNqgQXR8t6NW93KNnOo5l7HcLaVS5i
-         TimAFm9ftbUve4hV/Fj8DTdxqaTw7SyXleI697uabh7GuYl/LZQK4AeFd7hd7BcjL89m
-         5kGA==
-X-Gm-Message-State: ACgBeo12tKdjqZLjB0DhutIp7j4o3HN+6LGAqotlIj5AmKm2id+ikvgz
-        iPACAXDe5FD5kwpJomUfehQ=
-X-Google-Smtp-Source: AA6agR504BPg0N5bsYIJP15IrGpzIOT82zeZG4MOBibfM5cyez+Dq540lAomfgUDosmJ5BGhLmcNPw==
-X-Received: by 2002:a17:902:e5cc:b0:16f:1e31:da6c with SMTP id u12-20020a170902e5cc00b0016f1e31da6cmr21792721plf.66.1661202762628;
-        Mon, 22 Aug 2022 14:12:42 -0700 (PDT)
+        h=references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc;
+        bh=N/X2QE0vyj5059Rl5tVrIDqj6J5xUx1xeSxzqqjIZwk=;
+        b=ueXsB47CZxgN16jnscxIEUC54XDBXXlg6aFNSjqwG3qMTog5wwoLh8CYTSKVX/CcEl
+         UUruvaFUunTJazkiaMMJWAL3an4P/sKAZSNeE6+2/Wu/2vDF87L04C5lNJL9IIZuWm8C
+         CMFPB0jGB9hcaQB+uduvxzxaNjSCglKVW6CXA1fA1RgdtusEYQPJTmlRDDGHchROHD8k
+         u/ijjCWseVp2JcEyR/0xfyfSdy7bgFL69ty3Tv411CAnwVvBX4USwVX5UjHItwBw1qMU
+         FBvlb13mKQT/I0UkVTm1T/6tRJiiDV5lG780sYMSMTgNZ3XzRmcoXracVNYAqaOoQWXw
+         IyRQ==
+X-Gm-Message-State: ACgBeo2BFaZ9lc0/R3ZsxZoW3ytTNCuu/NJa8NAt6x8fVu/2PGWxf70V
+        aVbZfDSpQSnJBWrt6RAwZSgJROMx4uM=
+X-Google-Smtp-Source: AA6agR7VqNIKa4r3H8A7If6mRs7XoVKt9kVYuEJr+/K3ThRsx2klVL8SKZT3kPE30OaLG7qIR/pGoQ==
+X-Received: by 2002:a17:902:d484:b0:16f:161c:ac3f with SMTP id c4-20020a170902d48400b0016f161cac3fmr21541438plg.107.1661202763306;
+        Mon, 22 Aug 2022 14:12:43 -0700 (PDT)
 Received: from xplor.waratah.dyndns.org (222-155-0-244-adsl.sparkbb.co.nz. [222.155.0.244])
-        by smtp.gmail.com with ESMTPSA id f14-20020a65590e000000b00422c003cf78sm7831920pgu.82.2022.08.22.14.12.42
+        by smtp.gmail.com with ESMTPSA id 83-20020a621756000000b0052b84ca900csm9099112pfx.62.2022.08.22.14.12.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 14:12:42 -0700 (PDT)
+        Mon, 22 Aug 2022 14:12:43 -0700 (PDT)
 Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
-        id 289F136031A; Tue, 23 Aug 2022 09:12:39 +1200 (NZST)
+        id 1D9D236031F; Tue, 23 Aug 2022 09:12:40 +1200 (NZST)
 From:   Michael Schmitz <schmitzmic@gmail.com>
 To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de
-Subject: [PATCH v9 0/2 RESEND #2] Amiga RDB partition support fixes
-Date:   Tue, 23 Aug 2022 09:12:34 +1200
-Message-Id: <20220822211236.9023-1-schmitzmic@gmail.com>
+Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de,
+        Michael Schmitz <schmitzmic@gmail.com>, stable@vger.kernel.org
+Subject: [PATCH v9 RESEND #2 1/2] block: fix signed int overflow in Amiga partition support
+Date:   Tue, 23 Aug 2022 09:12:35 +1200
+Message-Id: <20220822211236.9023-2-schmitzmic@gmail.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220822211236.9023-1-schmitzmic@gmail.com>
+References: <20220822211236.9023-1-schmitzmic@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The simple fix still leaves ample room for overflows in calculating start
-address and size of a RDB partition, though such overflows should only be 
-seen in rather unusual cases. To address these potential overflows, checks
-are added in the second patch of this series. Comments by Geert have been   
-addressed in full. 
+The Amiga partition parser module uses signed int for partition sector
+address and count, which will overflow for disks larger than 1 TB.
 
-Reviewed-by tags by Geert and Christoph added. Fixes and prerequisites
-for stable backport added. 
+Use sector_t as type for sector address and size to allow using disks
+up to 2 TB without LBD support, and disks larger than 2 TB with LBD.
 
-Cheers,
+This bug was reported originally in 2012, and the fix was created by
+the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
+discussed and reviewed on linux-m68k at that time but never officially
+submitted. This patch differs from Joanne's patch only in its use of
+sector_t instead of unsigned int. No checking for overflows is done
+(see patch 2 of this series for that).
 
-        Michael
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
+Fixes: 1da177e4c3f41524 ("Linux-2.6.12-rc2")
+Cc: <stable@vger.kernel.org> # 5.2
+Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
+Message-ID: <201206192146.09327.Martin@lichtvoll.de>
+Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
+Tested-by: Martin Steigerwald <Martin@lichtvoll.de>
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 
+---
 
+Changes from v3:
+
+- split off change of sector address type as quick fix.
+- cast to sector_t in sector address calculations.
+- move overflow checking to separate patch for more thorough review.
+
+Changes from v4:
+
+Andreas Schwab:
+- correct cast to sector_t in sector address calculations
+
+Changes from v7:
+
+Christoph Hellwig
+- correct style issues
+---
+ block/partitions/amiga.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
+index 5c8624e26a54..85c5c79aae48 100644
+--- a/block/partitions/amiga.c
++++ b/block/partitions/amiga.c
+@@ -31,7 +31,8 @@ int amiga_partition(struct parsed_partitions *state)
+ 	unsigned char *data;
+ 	struct RigidDiskBlock *rdb;
+ 	struct PartitionBlock *pb;
+-	int start_sect, nr_sects, blk, part, res = 0;
++	sector_t start_sect, nr_sects;
++	int blk, part, res = 0;
+ 	int blksize = 1;	/* Multiplier for disk block size */
+ 	int slot = 1;
+ 
+@@ -96,14 +97,14 @@ int amiga_partition(struct parsed_partitions *state)
+ 
+ 		/* Tell Kernel about it */
+ 
+-		nr_sects = (be32_to_cpu(pb->pb_Environment[10]) + 1 -
+-			    be32_to_cpu(pb->pb_Environment[9])) *
++		nr_sects = ((sector_t)be32_to_cpu(pb->pb_Environment[10]) + 1 -
++			   be32_to_cpu(pb->pb_Environment[9])) *
+ 			   be32_to_cpu(pb->pb_Environment[3]) *
+ 			   be32_to_cpu(pb->pb_Environment[5]) *
+ 			   blksize;
+ 		if (!nr_sects)
+ 			continue;
+-		start_sect = be32_to_cpu(pb->pb_Environment[9]) *
++		start_sect = (sector_t)be32_to_cpu(pb->pb_Environment[9]) *
+ 			     be32_to_cpu(pb->pb_Environment[3]) *
+ 			     be32_to_cpu(pb->pb_Environment[5]) *
+ 			     blksize;
+-- 
+2.17.1
 
