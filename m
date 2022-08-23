@@ -2,168 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BB0C32796
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 16:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2180C32772
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 16:34:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240022AbiHWQ0K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Aug 2022 12:26:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42088 "EHLO
+        id S244868AbiHWQei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Aug 2022 12:34:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244723AbiHWQYR (ORCPT
+        with ESMTP id S244873AbiHWQdv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Aug 2022 12:24:17 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B15280266
-        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 05:46:23 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220823121907euoutp010e9c930f5e912ef42e016552d64458a5~N_JMADpE61598415984euoutp01k
-        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 12:19:07 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220823121907euoutp010e9c930f5e912ef42e016552d64458a5~N_JMADpE61598415984euoutp01k
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1661257147;
-        bh=tGdXrZOo82rW1rnRJeQcvmwRabixUhHDV5CM9X+9nHY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oWkNe0G17lXCJ7G8rs0qrk07xlnKpLD9K+tu0o/tOjUmqFvbcrNEJxntDxpBKoXD5
-         W8+A0QrgJNPgH+mHVi125yYnZO85TpAJeqAmYqBZUyF9gt6et2VRnJv010QobJEm1p
-         HxaAHyR5s8ehZFiKGKVsYJqJkCrxYg8jpkVL4x9Y=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220823121906eucas1p2b498a4fa7a14789c5a022656defcd8d6~N_JKburp41813918139eucas1p2I;
-        Tue, 23 Aug 2022 12:19:06 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id B8.71.07817.AB5C4036; Tue, 23
-        Aug 2022 13:19:06 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220823121905eucas1p14db498525742a606137e098b3cb8f70b~N_JJ_aYve1880718807eucas1p1L;
-        Tue, 23 Aug 2022 12:19:05 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220823121905eusmtrp17d1ef42f075448144496ad55cf54a82e~N_JJ9TVL_1042010420eusmtrp18;
-        Tue, 23 Aug 2022 12:19:05 +0000 (GMT)
-X-AuditID: cbfec7f4-8abff70000011e89-56-6304c5ba6dcf
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 91.81.10862.9B5C4036; Tue, 23
-        Aug 2022 13:19:05 +0100 (BST)
-Received: from localhost (unknown [106.210.248.52]) by eusmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220823121905eusmtip14552535383f77899aa661c1dcf6903db~N_JJnzsN40871108711eusmtip1p;
-        Tue, 23 Aug 2022 12:19:05 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, hch@lst.de
-Cc:     pankydev8@gmail.com, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, hare@suse.de,
-        jaegeuk@kernel.org, linux-kernel@vger.kernel.org,
-        matias.bjorling@wdc.com, gost.dev@samsung.com, bvanassche@acm.org,
-        linux-nvme@lists.infradead.org,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v12 04/13] nvmet: Allow ZNS target to support non-power_of_2
- zone sizes
-Date:   Tue, 23 Aug 2022 14:18:50 +0200
-Message-Id: <20220823121859.163903-5-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220823121859.163903-1-p.raghav@samsung.com>
+        Tue, 23 Aug 2022 12:33:51 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 771019FA86
+        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 07:51:03 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id o14-20020a17090a0a0e00b001fabfd3369cso14902778pjo.5
+        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 07:51:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=2OCHz3jaq9ji7FCyQ19Mwipf2lkMm1M6du4jKkL5WtY=;
+        b=eCsX87bOlCxcvTYGpqMXnoNyL29ocJvQSVi9DD5w60s9uOVik+BSULEfezjDLneBuR
+         K9oU1If70li76n+/Jh0DjXOr461bfGnk0ow19HfDYuafHK4d1+tHUvs/7/WATsBVTFde
+         74HkgDKDFMHYIsboHWyP5LBYvHhmC8iqq95U5oKAMxL4EMqG1keKm8Tu1jYSdE4EswdO
+         rGCqs+yJjqQHW6dGUds653ecFsY/27sMCD/Lm9i6SehyDc0vs3N5JJd3geBKkifyI1ec
+         3vHqv8KFQ91yaib+tnuKqiDe8Kd7mOVqMue3bBXMDYB/4Fp/lHCNf3AneUEj+NPXMgIf
+         S/Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=2OCHz3jaq9ji7FCyQ19Mwipf2lkMm1M6du4jKkL5WtY=;
+        b=LA8Wy5WcbeIYYejkDFftRwL80LDOywgIA68JYVcZOr4sfwncENbiRiGzc+hIeX+jhM
+         q7tHZkrcq+SACjPUNoCcJH8+Q1MZ1CwJA0cwkbn+XCL6a2YTsQukM3Mhl/5tA7AF8n1J
+         rcMoIk8KN6xpt1dKUEhq1EUhiMbjIijnX2N/LYuiN/rcOl6decbk9nWSfPqfmC5bRSx8
+         WDb4pwPxiYb/f/p3Eq2k3BrEwwpti7PGZhDwCDljMfCLH3rNdEZzEnRiq7ZWV0BTdT2y
+         EiDeIuUL/62+jyk8BwOL+AfeCRyHmEWGmaboHTs4Qg1NJ+9kjAgPOKaXGY/UDS6kQSHg
+         LDbw==
+X-Gm-Message-State: ACgBeo2OVS92j8pyJzCDEr73JALrIQaOI1Y2kIduu6EMe7NxXZMq8PBf
+        yS4cDx9yluVm5AGbSJJhJ0tEf1Szsi53sg==
+X-Google-Smtp-Source: AA6agR4u6UST9DFB3v2PSq5Zlf/RzX5fGdw+5JizFGZiVyqL96wJ/TniZRgJGs1pPHv4AMTnvTEfDg==
+X-Received: by 2002:a17:902:d3cb:b0:172:bf02:a979 with SMTP id w11-20020a170902d3cb00b00172bf02a979mr21307313plb.100.1661266262875;
+        Tue, 23 Aug 2022 07:51:02 -0700 (PDT)
+Received: from localhost.localdomain ([114.200.4.15])
+        by smtp.googlemail.com with ESMTPSA id l8-20020a170903244800b0016bea74d11esm6822724pls.267.2022.08.23.07.50.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Aug 2022 07:51:01 -0700 (PDT)
+From:   Suwan Kim <suwan.kim027@gmail.com>
+To:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        stefanha@redhat.com, acourbot@chromium.org
+Cc:     linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, suwan.kim027@gmail.com
+Subject: [PATCH] virtio-blk: Fix WARN_ON_ONCE in virtio_queue_rq()
+Date:   Tue, 23 Aug 2022 23:50:05 +0900
+Message-Id: <20220823145005.26356-1-suwan.kim027@gmail.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djP87q7jrIkGyycy2Kx/tQxZovVd/vZ
-        LKZ9+Mls8fvseWaLve9ms1rcPLCTyWLPoklMFitXH2WyeLJ+FrPF3657TBZ7b2lbXN41h81i
-        /rKn7BYT2r4yW9yY8JTR4vPSFnaLNTefslicuCXtIORx+Yq3x85Zd9k9Lp8t9di0qpPNY/OS
-        eo/dNxvYPHa23mf1eL/vKptH35ZVjB6bT1d7fN4k59F+oJspgCeKyyYlNSezLLVI3y6BK2P2
-        plssBaf4K561bGNtYFzC28XIySEhYCKxbuJdFhBbSGAFo8S6RRldjFxA9hdGiT9d61ggnM+M
-        Ep0HL7LAdLRt384MkVgOVLVnLROE84JR4taEG2xdjBwcbAJaEo2d7CANIgLpEl+/bmAEqWEW
-        6GeWaHy+AiwhLBApMbPjLCuIzSKgKjF9zSx2kF5eASuJ9eviIJbJS8y89B2snFPAWmLe0lOM
-        IDavgKDEyZlPwA5iBqpp3job7CAJgd2cEp2HFjBCNLtI/Pn3jQ3CFpZ4dXwLO4QtI3F6cg/U
-        N9UST2/8hmpuYZTo37ke7AEJoG19Z3JATGYBTYn1u/Qhyh0lbq2fzARRwSdx460gxAl8EpO2
-        TWeGCPNKdLQJQVQrSez8+QRqqYTE5aY5UEs9JLa938c2gVFxFpJnZiF5ZhbC3gWMzKsYxVNL
-        i3PTU4uN8lLL9YoTc4tL89L1kvNzNzEC0+Hpf8e/7GBc/uqj3iFGJg7GQ4wSHMxKIrzVFxmS
-        hXhTEiurUovy44tKc1KLDzFKc7AoifMmZ25IFBJITyxJzU5NLUgtgskycXBKNTBNirGYZHMn
-        imH31mihgA8Ve0We3vhie8XgYriM3KusFb4uWrluRxZFrr53+sihmdEzF6j+XFz/+aeYezh7
-        yr38E2fDF897zhOt2jHnROo789KIySd1+A4+WbxJZfnnWYt1XVb6KM53UF/86PlfyVkXoj0K
-        IjcyP5Jql+p7+fq6Z1XbopxDxiEOM8/KPddgrEg7sbDwZ51ufbvxBPd7BkFvWywSdqoYJRZ2
-        GV6XZTW9Z+VaemMmM0eXy5GHga6bHVWqGZiNcoz07+oLc966u7pzSazV9jVLbpjHvXApbnvo
-        aX6Wa+bnjU51My9+lOEU4G6dY9qY1XT18KbPStKK+34UfeFVsQvR8pBv/aL0skWJpTgj0VCL
-        uag4EQDnm9ki9gMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMIsWRmVeSWpSXmKPExsVy+t/xu7o7j7IkGzR8UrBYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLPF3nezWS1uHtjJZLFn0SQmi5WrjzJZPFk/i9nib9c9Jou9t7QtLu+aw2Yx
-        f9lTdosJbV+ZLW5MeMpo8XlpC7vFmptPWSxO3JJ2EPK4fMXbY+esu+wel8+Wemxa1cnmsXlJ
-        vcfumw1sHjtb77N6vN93lc2jb8sqRo/Np6s9Pm+S82g/0M0UwBOlZ1OUX1qSqpCRX1xiqxRt
-        aGGkZ2hpoWdkYqlnaGwea2VkqqRvZ5OSmpNZllqkb5eglzF70y2WglP8Fc9atrE2MC7h7WLk
-        5JAQMJFo276duYuRi0NIYCmjxP5PqxkhEhIStxc2QdnCEn+udbFBFD1jlJh6+ySQw8HBJqAl
-        0djJDlIjIpArcXjzBCaQGmaB+cwSr54/ZAZJCAuES+y6foAJxGYRUJWYvmYWO0gvr4CVxPp1
-        cRDz5SVmXvoONodTwFpi3tJTYHuFgErm3/rEBmLzCghKnJz5hAXEZgaqb946m3kCo8AsJKlZ
-        SFILGJlWMYqklhbnpucWG+kVJ+YWl+al6yXn525iBMbutmM/t+xgXPnqo94hRiYOxkOMEhzM
-        SiK81RcZkoV4UxIrq1KL8uOLSnNSiw8xmgKdPZFZSjQ5H5g88kriDc0MTA1NzCwNTC3NjJXE
-        eT0LOhKFBNITS1KzU1MLUotg+pg4OKUamKYfV9pvtbR/uZLb/8i5Ow++u+jgFxvUsvP0zccz
-        JDyeXT14bM65T2rNIve6DPnMBH1dF7zyfhgTxT5hjdz8DYrBLvcZbF4HHbNj4mnJL7zySOSs
-        5sVnx9UanndciD4U8NJ+rfGbf3fWMCl2TJUSk07sLj9VfN7g+/2OJ5GOj1xqn8m3vltku0z+
-        E3frt8U7/78p2RlYmLP7f4Gk0H+GzhNLZVxZz/s6MyYlh+989HS6bUbzqUDbi6IpL/jfXzmY
-        PcVrp5nD3+NNSrxbHy97sSfotWz9lBm/ldbpP/u5Kd9xgqlDynv7Vw/Pfwld7j7lb8gD/cOR
-        V1r7Jxw8Lik2sXZ56OxjDiFCLKvP+QXyL72jxFKckWioxVxUnAgAWnF0ImYDAAA=
-X-CMS-MailID: 20220823121905eucas1p14db498525742a606137e098b3cb8f70b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220823121905eucas1p14db498525742a606137e098b3cb8f70b
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220823121905eucas1p14db498525742a606137e098b3cb8f70b
-References: <20220823121859.163903-1-p.raghav@samsung.com>
-        <CGME20220823121905eucas1p14db498525742a606137e098b3cb8f70b@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A generic bdev_zone_no() helper is added to calculate zone number for a
-given sector in a block device. This helper internally uses disk_zone_no()
-to find the zone number.
+If a request fails at virtio_queue_rqs(), it is inserted to requeue_list
+and passed to virtio_queue_rq(). Then blk_mq_start_request() can be called
+again at virtio_queue_rq() and trigger WARN_ON_ONCE like below trace because
+request state was already set to MQ_RQ_IN_FLIGHT in virtio_queue_rqs()
+despite the failure.
 
-Use the helper bdev_zone_no() to calculate nr of zones. This let's us
-make modifications to the math if needed in one place and adds now
-support for zoned devices with non po2 zone size.
+[    1.890468] ------------[ cut here ]------------
+[    1.890776] WARNING: CPU: 2 PID: 122 at block/blk-mq.c:1143
+blk_mq_start_request+0x8a/0xe0
+[    1.891045] Modules linked in:
+[    1.891250] CPU: 2 PID: 122 Comm: journal-offline Not tainted 5.19.0+ #44
+[    1.891504] Hardware name: ChromiumOS crosvm, BIOS 0
+[    1.891739] RIP: 0010:blk_mq_start_request+0x8a/0xe0
+[    1.891961] Code: 12 80 74 22 48 8b 4b 10 8b 89 64 01 00 00 8b 53
+20 83 fa ff 75 08 ba 00 00 00 80 0b 53 24 c1 e1 10 09 d1 89 48 34 5b
+41 5e c3 <0f> 0b eb b8 65 8b 05 2b 39 b6 7e 89 c0 48 0f a3 05 39 77 5b
+01 0f
+[    1.892443] RSP: 0018:ffffc900002777b0 EFLAGS: 00010202
+[    1.892673] RAX: 0000000000000000 RBX: ffff888004bc0000 RCX: 0000000000000000
+[    1.892952] RDX: 0000000000000000 RSI: ffff888003d7c200 RDI: ffff888004bc0000
+[    1.893228] RBP: 0000000000000000 R08: 0000000000000001 R09: ffff888004bc0100
+[    1.893506] R10: ffffffffffffffff R11: ffffffff8185ca10 R12: ffff888004bc0000
+[    1.893797] R13: ffffc90000277900 R14: ffff888004ab2340 R15: ffff888003d86e00
+[    1.894060] FS:  00007ffa143a4640(0000) GS:ffff88807dd00000(0000)
+knlGS:0000000000000000
+[    1.894412] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.894682] CR2: 00005648577d9088 CR3: 00000000053da004 CR4: 0000000000170ee0
+[    1.894953] Call Trace:
+[    1.895139]  <TASK>
+[    1.895303]  virtblk_prep_rq+0x1e5/0x280
+[    1.895509]  virtio_queue_rq+0x5c/0x310
+[    1.895710]  ? virtqueue_add_sgs+0x95/0xb0
+[    1.895905]  ? _raw_spin_unlock_irqrestore+0x16/0x30
+[    1.896133]  ? virtio_queue_rqs+0x340/0x390
+[    1.896453]  ? sbitmap_get+0xfa/0x220
+[    1.896678]  __blk_mq_issue_directly+0x41/0x180
+[    1.896906]  blk_mq_plug_issue_direct+0xd8/0x2c0
+[    1.897115]  blk_mq_flush_plug_list+0x115/0x180
+[    1.897342]  blk_add_rq_to_plug+0x51/0x130
+[    1.897543]  blk_mq_submit_bio+0x3a1/0x570
+[    1.897750]  submit_bio_noacct_nocheck+0x418/0x520
+[    1.897985]  ? submit_bio_noacct+0x1e/0x260
+[    1.897989]  ext4_bio_write_page+0x222/0x420
+[    1.898000]  mpage_process_page_bufs+0x178/0x1c0
+[    1.899451]  mpage_prepare_extent_to_map+0x2d2/0x440
+[    1.899603]  ext4_writepages+0x495/0x1020
+[    1.899733]  do_writepages+0xcb/0x220
+[    1.899871]  ? __seccomp_filter+0x171/0x7e0
+[    1.900006]  file_write_and_wait_range+0xcd/0xf0
+[    1.900167]  ext4_sync_file+0x72/0x320
+[    1.900308]  __x64_sys_fsync+0x66/0xa0
+[    1.900449]  do_syscall_64+0x31/0x50
+[    1.900595]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+[    1.900747] RIP: 0033:0x7ffa16ec96ea
+[    1.900883] Code: b8 4a 00 00 00 0f 05 48 3d 00 f0 ff ff 77 41 c3
+48 83 ec 18 89 7c 24 0c e8 e3 02 f8 ff 8b 7c 24 0c 89 c2 b8 4a 00 00
+00 0f 05 <48> 3d 00 f0 ff ff 77 36 89 d7 89 44 24 0c e8 43 03 f8 ff 8b
+44 24
+[    1.901302] RSP: 002b:00007ffa143a3ac0 EFLAGS: 00000293 ORIG_RAX:
+000000000000004a
+[    1.901499] RAX: ffffffffffffffda RBX: 0000560277ec6fe0 RCX: 00007ffa16ec96ea
+[    1.901696] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000016
+[    1.901884] RBP: 0000560277ec5910 R08: 0000000000000000 R09: 00007ffa143a4640
+[    1.902082] R10: 00007ffa16e4d39e R11: 0000000000000293 R12: 00005602773f59e0
+[    1.902459] R13: 0000000000000000 R14: 00007fffbfc007ff R15: 00007ffa13ba4000
+[    1.902763]  </TASK>
+[    1.902877] ---[ end trace 0000000000000000 ]---
 
-Reviewed by: Adam Manzanares <a.manzanares@samsung.com>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+This patch defers the execution of blk_mq_start_request() after
+virtblk_add_req() within virtio_queue_rqs(). virtblk_add_req() is the last
+preparation step to submit a request to virtqueue. So we can ensure that
+we call blk_mq_start_request() after all the preparations finish.
+
+In virtio_queue_rq(), call blk_mq_start_request() before virtblk_add_req()
+to avoid its execution inside spinlock.
+
+Fixes: 0e9911fa768f ("virtio-blk: support mq_ops->queue_rqs()")
+Reported-by: Alexandre Courbot <acourbot@chromium.org>
+Tested-by: Alexandre Courbot <acourbot@chromium.org>
+Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
 ---
- drivers/nvme/target/zns.c | 3 +--
- include/linux/blkdev.h    | 5 +++++
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ drivers/block/virtio_blk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index c7ef69f29fe4..662f1a92f39b 100644
---- a/drivers/nvme/target/zns.c
-+++ b/drivers/nvme/target/zns.c
-@@ -241,8 +241,7 @@ static unsigned long nvmet_req_nr_zones_from_slba(struct nvmet_req *req)
- {
- 	unsigned int sect = nvmet_lba_to_sect(req->ns, req->cmd->zmr.slba);
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 30255fcaf181..73a0620a7cff 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -322,8 +322,6 @@ static blk_status_t virtblk_prep_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (unlikely(status))
+ 		return status;
  
--	return bdev_nr_zones(req->ns->bdev) -
--		(sect >> ilog2(bdev_zone_sectors(req->ns->bdev)));
-+	return bdev_nr_zones(req->ns->bdev) - bdev_zone_no(req->ns->bdev, sect);
- }
+-	blk_mq_start_request(req);
+-
+ 	vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
+ 	if (unlikely(vbr->sg_table.nents < 0)) {
+ 		virtblk_cleanup_cmd(req);
+@@ -349,6 +347,8 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (unlikely(status))
+ 		return status;
  
- static unsigned long get_nr_zones_from_buf(struct nvmet_req *req, u32 bufsize)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index d0d66a0db224..b2636dcca105 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1340,6 +1340,11 @@ static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
- 	return BLK_ZONED_NONE;
- }
- 
-+static inline unsigned int bdev_zone_no(struct block_device *bdev, sector_t sec)
-+{
-+	return disk_zone_no(bdev->bd_disk, sec);
-+}
++	blk_mq_start_request(req);
 +
- static inline int queue_dma_alignment(const struct request_queue *q)
- {
- 	return q ? q->dma_alignment : 511;
+ 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+ 	err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
+ 	if (err) {
+@@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
+ 			virtblk_unmap_data(req, vbr);
+ 			virtblk_cleanup_cmd(req);
+ 			rq_list_add(requeue_list, req);
++		} else {
++			blk_mq_start_request(req);
+ 		}
+ 	}
+ 
 -- 
-2.25.1
+2.26.3
 
