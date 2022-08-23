@@ -2,322 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 466B3C28D13
-	for <linux-block@archiver.kernel.org>; Mon, 22 Aug 2022 21:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1E4C32774
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 00:13:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234036AbiHVVMu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 17:12:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
+        id S239094AbiHWANa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 20:13:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237911AbiHVVMq (ORCPT
+        with ESMTP id S239058AbiHWAMi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 17:12:46 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0924DB20;
-        Mon, 22 Aug 2022 14:12:44 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id s206so10517850pgs.3;
-        Mon, 22 Aug 2022 14:12:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc;
-        bh=CHMD7ViEoir19ulN0n/TmFDdy0sPIFiFNZ+oytn7T3Q=;
-        b=ixe6FKSwlovcyxR6vpt4UPib2Mj7rmTCQ8opZ7L8eMyOPmzefc9xgYYuSEsHbtQfcN
-         3nvyMATUOZYVtEx4ahdUTGIqZV0j1hbeVKTKgOEb9RUSVj7jf1foq40a8/9ddPfa+XL9
-         t3aUbcMycxn78lrcAAFzNCnpEVQW4wfLWhXXhXB2nRYoRZnIFksqJCpRjQlta+wVD7q3
-         wDBFSnfe0YNyk7eDGCIdTjsJCDVBxHC70zzOaPMI57b68tCMMJx8yGFCFtXX7chpTq5R
-         cmIwp28/jF9NCKmYWa8sB2Q10YUsu+YjP4//+B9QGsd5br7oQL8KYMcXnhrtV8cICEkG
-         XLEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc;
-        bh=CHMD7ViEoir19ulN0n/TmFDdy0sPIFiFNZ+oytn7T3Q=;
-        b=KIq36hUEYMQiGoVYozwdNJoLeIWRDXuBKLXlh5s2tTz+UqCVhnqR7NpdX/f83OC9Au
-         Idrvk/fS+oJut/4eTXwJbj9OnvcT9cZ57vMZiJ5koFFdDq8q/pgZtm8n75mz/w6xLHIx
-         Hz5jwzooPXf6qAK3CCjZQpu/3XY6YZadiSb42QYLjG/yoyIOSVI8qqWyNnRz1zBKRFyH
-         VzgZzO5JkBGUgtZJz+mkq2A0RAXGt14O75r9/ybWz4aUYQ1Oe7T5tPJeI4FwN1Eyq3j+
-         0N3OmMTMqD3p7sHjxLVFYVJPjbrtPHHC3N/IGs7Q/B6tOi2DFjMc0DscdkpM/vcRdeUt
-         TYgA==
-X-Gm-Message-State: ACgBeo1xYptFYvwy1jk7wkZ6WoqbqsXHoek1xWFTIwxppvpAqV08htOc
-        rYKUg4MXCgi1kqdozRHjhgc=
-X-Google-Smtp-Source: AA6agR6H4atjR4N1uYffvRjgWmfWtR4Kj1KcGcDXxAyQ7p9WxRBiKL1ByVONtqJYyVOsD87pgNIogw==
-X-Received: by 2002:a63:6ac3:0:b0:41d:17dc:eb66 with SMTP id f186-20020a636ac3000000b0041d17dceb66mr17875090pgc.384.1661202764339;
-        Mon, 22 Aug 2022 14:12:44 -0700 (PDT)
-Received: from xplor.waratah.dyndns.org (222-155-0-244-adsl.sparkbb.co.nz. [222.155.0.244])
-        by smtp.gmail.com with ESMTPSA id e3-20020a056a0000c300b00536d3ac847csm1633158pfj.0.2022.08.22.14.12.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 14:12:44 -0700 (PDT)
-Received: by xplor.waratah.dyndns.org (Postfix, from userid 1000)
-        id D2B3E360326; Tue, 23 Aug 2022 09:12:40 +1200 (NZST)
-From:   Michael Schmitz <schmitzmic@gmail.com>
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     linux-m68k@vger.kernel.org, geert@linux-m68k.org, hch@lst.de,
-        Michael Schmitz <schmitzmic@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH v9 RESEND #2 2/2] block: add overflow checks for Amiga partition support
-Date:   Tue, 23 Aug 2022 09:12:36 +1200
-Message-Id: <20220822211236.9023-3-schmitzmic@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220822211236.9023-1-schmitzmic@gmail.com>
-References: <20220822211236.9023-1-schmitzmic@gmail.com>
+        Mon, 22 Aug 2022 20:12:38 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FD205755C
+        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 17:11:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1661213517; x=1692749517;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=J1w/86XmIqvOXwxEi/D/Lt7LbKGIN84rtG5VGV8hn1A=;
+  b=pua2wYNRCtYr7yzp/kXySSIjlJwDhcrWEGA0uqeMT+/ESEw5A4zr3noG
+   q91DScXO7/YvU+bDz/wWTopjlXZ4Pj/BHZjw8gbIZ96IrqNLmGHjXWgUD
+   T5w9cIeJkG7IW0miaWQ3VywCyl2jiPjHbfshdTLKyhmm30TGSt9mDfLWN
+   Nhx92vaP7I9IBNo7VHJEPdzTKne0ZKVt1ozjOBjryX/MyW2A8HMFA51fn
+   q12T6pPHg4IVeJeP9jX5S/G01j73cskpjIGoHaHycMco88tdVAhcHse6g
+   Hw6k0BEjBlIKj3GLdv6H6lgf+TZrX1PnEC9rb/VOnBoo7q6FutYtRDlRM
+   A==;
+X-IronPort-AV: E=Sophos;i="5.93,255,1654531200"; 
+   d="scan'208";a="313645294"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Aug 2022 08:11:55 +0800
+IronPort-SDR: J1VrChCDVT2FCf8t/BVLsQhidvo8D12uyGA7XC7Miccdix5TeK7uGMAooGYf5hER6RMow+BVZs
+ RBKWoeE9hZpEy+S9T9RKysAfeSMOeG5/NbOjNsdUbjtVMI5piiGpnvPo+OZahhFznDLUkhlQM6
+ 990mhC6FAGoQlQzK6qhcuuqfDJle4VcT0iyWlw+7zIt7urrm9RlnOCCCMMKf3rXiRIfvCKAMZ4
+ osZ2iZkG1dCyp+4Et2vCYz6RAZiYsXXIiolSf9sVr9r1yBr/DfFJjmg2j26+ELaaFSOHhSuRc4
+ 7k7xVTcGCynk7mDe2YYz0LFc
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Aug 2022 16:32:35 -0700
+IronPort-SDR: OKONwNO4zSGxTa02jaydNVWIg16hta7wCWCEit+GNYH6dWfEYI7MVpQKl7Xr7JK5YdqyxX0ZQd
+ BiziGDT1+gkV50+p7VFGw+x1x9x0Lq9574jyEaot1oKTwO/2ld44G04p7ocje6/5QcFD3t+BHD
+ zWIpALZAG28A6rSHsbqd1oTThDeKK0rysnknXCDSzCAnE9DNY/dSwgbTnROLbyMTpbAxh93KRf
+ wHI7xmMMEsnSrwHVdQ0CH5is6+nlgeRAVMVXLeMRmp7hsD0ikzuVv9aC5IRnlUR5Uz/kJToUge
+ gxM=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
+  by uls-op-cesaip01.wdc.com with ESMTP; 22 Aug 2022 17:11:54 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v4 0/6] fix module check issues
+Date:   Tue, 23 Aug 2022 09:11:47 +0900
+Message-Id: <20220823001154.114624-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.37.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The Amiga partition parser module uses signed int for partition sector
-address and count, which will overflow for disks larger than 1 TB.
+Current blktests have unexpected test case failures caused by module
+availability checks. This series addresses two issues related to module check
+and fix the failures.
 
-Use u64 as type for sector address and size to allow using disks up to
-2 TB without LBD support, and disks larger than 2 TB with LBD. The RBD
-format allows to specify disk sizes up to 2^128 bytes (though native
-OS limitations reduce this somewhat, to max 2^68 bytes), so check for
-u64 overflow carefully to protect against overflowing sector_t.
+The first issue is caused by module load by _have_driver(). When this helper
+function checks the specified module (or driver) is available, it loads the
+module using modprobe command. It leaves the module loaded and affects following
+test cases. The first patch addresses this issue. The second patch avoids side
+affects of the first patch on nbd test cases.
 
-Bail out if sector addresses overflow 32 bits on kernels without LBD
-support.
+The second issue is in _have_modules(). Recently, _have_driver() helper function
+was introduced to provide similar but different feature from _have_modules().
+However, it turned out that _have_modules() is not working as expected and does
+exactly same check as _have_driver(). The third patch fixes _have_modules() to
+work as expected. This change makes block/001 and srp test group skipped.
+Following two patches adjust skip conditions not to skip the test cases.
 
-This bug was reported originally in 2012, and the fix was created by
-the RDB author, Joanne Dow <jdow@earthlink.net>. A patch had been
-discussed and reviewed on linux-m68k at that time but never officially
-submitted (now resubmitted as separate patch).
-This patch adds additional error checking and warning messages.
-
-Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=43511
-Fixes: 1da177e4c3f41524 ("Linux-2.6.12-rc2")
-Cc: <stable@vger.kernel.org> # 5.2
-Reported-by: Martin Steigerwald <Martin@lichtvoll.de>
-Message-ID: <201206192146.09327.Martin@lichtvoll.de>
-Signed-off-by: Michael Schmitz <schmitzmic@gmail.com>
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Reviewed-by: Christoph Hellwig <hch@infradead.org>
-
----
-
-Changes from RFC:
-
-- use u64 instead of sector_t, since that may be u32 without LBD support
-- check multiplication overflows each step - 3 u32 values may exceed u64!
-- warn against use on AmigaDOS if partition data overflow u32 sector count.
-- warn if partition CylBlocks larger than what's stored in the RDSK header.
-- bail out if we were to overflow sector_t (32 or 64 bit).
-
-Changes from v1:
-
-Kars de Jong:
-- use defines for magic offsets in DosEnvec struct
-
-Geert Uytterhoeven:
-- use u64 cast for multiplications of u32 numbers
-- use array3_size for overflow checks
-- change pr_err to pr_warn
-- discontinue use of pr_cont
-- reword log messages
-- drop redundant nr_sects overflow test
-- warn against 32 bit overflow for each affected partition
-- skip partitions that overflow sector_t size instead of aborting scan
-
-Changes from v2:
-
-- further trim 32 bit overflow test
-- correct duplicate types.h inclusion introduced in v2
+The last patch is an additional clean up to change _have_modules() to
+_have_module() to make its usage consistent with _have_driver().
 
 Changes from v3:
+* Dropped 4th patch and added new 6th patch
+* Added Reviewed-by tags
 
-- split off sector address type fix for independent review
-- change blksize to unsigned
-- use check_mul_overflow() instead of array3_size()
-- rewrite checks to avoid 64 bit divisions in check_mul_overflow()
+Changes from v2:
+* 1st patch: kept single bracket style
+* 3rd patch: replaced find -or option with -o
+* 4th patch: adjusted to the 1st patch change
+* 6th patch: simplified _have_drivers() arguments
 
-Changes from v5:
+Changes from v1:
+* 1st patch: added Reviewed-by tag
+* 4th patch: added changes in new test cases
 
-Geert Uytterhoeven:
-- correct ineffective u64 cast to avoid 32 bit mult. overflow
-- fix mult. overflow in partition block address calculation
+Shin'ichiro Kawasaki (6):
+  common/rc: avoid module load in _have_driver()
+  nbd/rc: load nbd module explicitly
+  common/rc: ensure modules are loadable in _have_modules()
+  block/001: use _have_driver() in place of _have_modules()
+  srp/rc: allow test with built-in sd_mod and sg drivers
+  common,tests: replace _have_modules() with _have_module()
 
-Changes from v6:
+ common/rc          | 40 ++++++++++++++++++++++++----------------
+ common/scsi_debug  |  2 +-
+ tests/block/001    |  4 +++-
+ tests/nbd/004      |  2 +-
+ tests/nbd/rc       | 12 ++++++++++--
+ tests/nvmeof-mp/rc | 32 +++++++++++++++-----------------
+ tests/srp/015      |  2 +-
+ tests/srp/rc       | 45 +++++++++++++++++++++------------------------
+ tests/zbd/010      |  2 +-
+ 9 files changed, 77 insertions(+), 64 deletions(-)
 
-Geert Uytterhoeven:
-- don't fail hard on partition block address overflow
-
-Changes from v7:
-
-- replace bdevname(state->bdev, b) by state->disk->disk_name
-- drop warn_no_part conditionals
-- remove remaining warn_no_part
-
-Changes from v8:
-
-Christoph Hellwig:
-- whitespace fix, drop unnecessary u64 casts
-
-kbuid warning:
-- sparse warning fix
----
- block/partitions/amiga.c | 103 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 85 insertions(+), 18 deletions(-)
-
-diff --git a/block/partitions/amiga.c b/block/partitions/amiga.c
-index 85c5c79aae48..e28a4b917822 100644
---- a/block/partitions/amiga.c
-+++ b/block/partitions/amiga.c
-@@ -11,10 +11,18 @@
- #define pr_fmt(fmt) fmt
- 
- #include <linux/types.h>
-+#include <linux/mm_types.h>
-+#include <linux/overflow.h>
- #include <linux/affs_hardblocks.h>
- 
- #include "check.h"
- 
-+/* magic offsets in partition DosEnvVec */
-+#define NR_HD	3
-+#define NR_SECT	5
-+#define LO_CYL	9
-+#define HI_CYL	10
-+
- static __inline__ u32
- checksum_block(__be32 *m, int size)
- {
-@@ -31,9 +39,12 @@ int amiga_partition(struct parsed_partitions *state)
- 	unsigned char *data;
- 	struct RigidDiskBlock *rdb;
- 	struct PartitionBlock *pb;
--	sector_t start_sect, nr_sects;
--	int blk, part, res = 0;
--	int blksize = 1;	/* Multiplier for disk block size */
-+	u64 start_sect, nr_sects;
-+	sector_t blk, end_sect;
-+	u32 cylblk;		/* rdb_CylBlocks = nr_heads*sect_per_track */
-+	u32 nr_hd, nr_sect, lo_cyl, hi_cyl;
-+	int part, res = 0;
-+	unsigned int blksize = 1;	/* Multiplier for disk block size */
- 	int slot = 1;
- 
- 	for (blk = 0; ; blk++, put_dev_sector(sect)) {
-@@ -41,7 +52,7 @@ int amiga_partition(struct parsed_partitions *state)
- 			goto rdb_done;
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			pr_err("Dev %s: unable to read RDB block %d\n",
-+			pr_err("Dev %s: unable to read RDB block %llu\n",
- 			       state->disk->disk_name, blk);
- 			res = -1;
- 			goto rdb_done;
-@@ -58,12 +69,12 @@ int amiga_partition(struct parsed_partitions *state)
- 		*(__be32 *)(data+0xdc) = 0;
- 		if (checksum_block((__be32 *)data,
- 				be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F)==0) {
--			pr_err("Trashed word at 0xd0 in block %d ignored in checksum calculation\n",
-+			pr_err("Trashed word at 0xd0 in block %llu ignored in checksum calculation\n",
- 			       blk);
- 			break;
- 		}
- 
--		pr_err("Dev %s: RDB in block %d has bad checksum\n",
-+		pr_err("Dev %s: RDB in block %llu has bad checksum\n",
- 		       state->disk->disk_name, blk);
- 	}
- 
-@@ -80,10 +91,15 @@ int amiga_partition(struct parsed_partitions *state)
- 	blk = be32_to_cpu(rdb->rdb_PartitionList);
- 	put_dev_sector(sect);
- 	for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
--		blk *= blksize;	/* Read in terms partition table understands */
-+		/* Read in terms partition table understands */
-+		if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
-+			pr_err("Dev %s: overflow calculating partition block %llu! Skipping partitions %u and beyond\n",
-+				state->disk->disk_name, blk, part);
-+			break;
-+		}
- 		data = read_part_sector(state, blk, &sect);
- 		if (!data) {
--			pr_err("Dev %s: unable to read partition block %d\n",
-+			pr_err("Dev %s: unable to read partition block %llu\n",
- 			       state->disk->disk_name, blk);
- 			res = -1;
- 			goto rdb_done;
-@@ -95,19 +111,70 @@ int amiga_partition(struct parsed_partitions *state)
- 		if (checksum_block((__be32 *)pb, be32_to_cpu(pb->pb_SummedLongs) & 0x7F) != 0 )
- 			continue;
- 
--		/* Tell Kernel about it */
-+		/* RDB gives us more than enough rope to hang ourselves with,
-+		 * many times over (2^128 bytes if all fields max out).
-+		 * Some careful checks are in order, so check for potential
-+		 * overflows.
-+		 * We are multiplying four 32 bit numbers to one sector_t!
-+		 */
-+
-+		nr_hd   = be32_to_cpu(pb->pb_Environment[NR_HD]);
-+		nr_sect = be32_to_cpu(pb->pb_Environment[NR_SECT]);
-+
-+		/* CylBlocks is total number of blocks per cylinder */
-+		if (check_mul_overflow(nr_hd, nr_sect, &cylblk)) {
-+			pr_err("Dev %s: heads*sects %u overflows u32, skipping partition!\n",
-+				state->disk->disk_name, cylblk);
-+			continue;
-+		}
-+
-+		/* check for consistency with RDB defined CylBlocks */
-+		if (cylblk > be32_to_cpu((__be32)rdb->rdb_CylBlocks)) {
-+			pr_warn("Dev %s: cylblk %u > rdb_CylBlocks %u!\n",
-+				state->disk->disk_name, cylblk,
-+				be32_to_cpu(rdb->rdb_CylBlocks));
-+		}
-+
-+		/* RDB allows for variable logical block size -
-+		 * normalize to 512 byte blocks and check result.
-+		 */
-+
-+		if (check_mul_overflow(cylblk, blksize, &cylblk)) {
-+			pr_err("Dev %s: partition %u bytes per cyl. overflows u32, skipping partition!\n",
-+				state->disk->disk_name, part);
-+			continue;
-+		}
-+
-+		/* Calculate partition start and end. Limit of 32 bit on cylblk
-+		 * guarantees no overflow occurs if LBD support is enabled.
-+		 */
-+
-+		lo_cyl = be32_to_cpu(pb->pb_Environment[LO_CYL]);
-+		start_sect = ((u64) lo_cyl * cylblk);
-+
-+		hi_cyl = be32_to_cpu(pb->pb_Environment[HI_CYL]);
-+		nr_sects = (((u64) hi_cyl - lo_cyl + 1) * cylblk);
- 
--		nr_sects = ((sector_t)be32_to_cpu(pb->pb_Environment[10]) + 1 -
--			   be32_to_cpu(pb->pb_Environment[9])) *
--			   be32_to_cpu(pb->pb_Environment[3]) *
--			   be32_to_cpu(pb->pb_Environment[5]) *
--			   blksize;
- 		if (!nr_sects)
- 			continue;
--		start_sect = (sector_t)be32_to_cpu(pb->pb_Environment[9]) *
--			     be32_to_cpu(pb->pb_Environment[3]) *
--			     be32_to_cpu(pb->pb_Environment[5]) *
--			     blksize;
-+
-+		/* Warn user if partition end overflows u32 (AmigaDOS limit) */
-+
-+		if ((start_sect + nr_sects) > UINT_MAX) {
-+			pr_warn("Dev %s: partition %u (%llu-%llu) needs 64 bit device support!\n",
-+				state->disk->disk_name, part,
-+				start_sect, start_sect + nr_sects);
-+		}
-+
-+		if (check_add_overflow(start_sect, nr_sects, &end_sect)) {
-+			pr_err("Dev %s: partition %u (%llu-%llu) needs LBD device support, skipping partition!\n",
-+				state->disk->disk_name, part,
-+				start_sect, end_sect);
-+			continue;
-+		}
-+
-+		/* Tell Kernel about it */
-+
- 		put_partition(state,slot++,start_sect,nr_sects);
- 		{
- 			/* Be even more informative to aid mounting */
 -- 
-2.17.1
+2.37.1
 
