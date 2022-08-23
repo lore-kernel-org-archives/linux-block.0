@@ -2,128 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD57C32774
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 17:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE6AC32774
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 18:03:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234472AbiHWR0d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Aug 2022 13:26:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58864 "EHLO
+        id S233761AbiHWSDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Aug 2022 14:03:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236053AbiHWRZx (ORCPT
+        with ESMTP id S233797AbiHWSCk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Aug 2022 13:25:53 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7287D7B7;
-        Tue, 23 Aug 2022 08:04:03 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id r16so17346902wrm.6;
-        Tue, 23 Aug 2022 08:04:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=UWD/zYOImijIaCRJjQ6Qdr+9a5CKuV8fnJ1O7aG/PXw=;
-        b=dPG+yykmRC3fUMbUTYUtwPC8aaaIFXjBLd9EYlvJVTgwqkRac5HyYMpunGbqnj53tE
-         26KhntFBaodTiOj4py+G3Tz+h1kFdWKbYP5vEU9iRY6PX/2yNgdPLq+ftcHST8F2WxdQ
-         fSezYvRysrN2CyOqUes7OC6qMr/fWJalQGpolw0S3rRWFdWu77Rh7uBu3KG0AAL0ntdd
-         VK8jo5doaPdtQ6wOiY8/tQpT2H5JrDhbx0ztqGYb4VnKxAzeUT/pNWT9OBb+cx3nFuYV
-         S9HiAr1OU4T4r1fRvyE7MXY4KgV7UMVe/kq5t6O8pdNiAn52Hc+g6SFDe/Ljm6yulib+
-         GwRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=UWD/zYOImijIaCRJjQ6Qdr+9a5CKuV8fnJ1O7aG/PXw=;
-        b=Tcz7Q7Oggxq6KnvV6Ffzpb9HoIS8Q2gOwO/8LJ9uULCFte5sMWkB8A+eVj7wrRHEos
-         iOZz3flL5ROwJDptp27jm3a/QSgYf+0me4yvC+fk/SxGG3g/I1cJ8quvobbGN2f8igoy
-         8ArYf+Oids0b7ti9muaMwfJ+L4DrnzwYRsSyP76JlKuVIhZgPkKpKnauP2MN0tMWhb4M
-         u1IzdEzG+O8AfPNdAKk3UtHzdeBsIGfHh8iUyyYVKygDic0CC2K6aV/XNMrF8Y3cB3HF
-         AnCRSjLZ8QpcW/HNQtPD6KeJyiyXOpwSz2NI448Abtay0U6zlqz5Vwyzv28KHWLm7BJN
-         jHtg==
-X-Gm-Message-State: ACgBeo2EI0GIZm1oQTJTIpT7yO2UPujDYjdYBRfUbHM/pCqPE35CrXf9
-        LUjXyYWpVxobKHbYBg6hPNC5ridxsIEcyg==
-X-Google-Smtp-Source: AA6agR7/AJKDJ3fmGGjB2rFV9CtiSShlIbldfYUUc9bkFO95ho+PLDHlcvH1bMCehtEzHkEogVbHVg==
-X-Received: by 2002:a5d:5010:0:b0:225:611c:55fc with SMTP id e16-20020a5d5010000000b00225611c55fcmr4283164wrt.553.1661267041437;
-        Tue, 23 Aug 2022 08:04:01 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id bn26-20020a056000061a00b0021d7b41255esm14907690wrb.98.2022.08.23.08.04.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 08:04:01 -0700 (PDT)
-From:   Uros Bizjak <ubizjak@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Uros Bizjak <ubizjak@gmail.com>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] sbitmap: Use atomic_{,long}_try_cmpxchg in sbitmap.c
-Date:   Tue, 23 Aug 2022 17:03:52 +0200
-Message-Id: <20220823150352.3455-1-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Tue, 23 Aug 2022 14:02:40 -0400
+Received: from sender-of-o50.zoho.in (sender-of-o50.zoho.in [103.117.158.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DCB599273;
+        Tue, 23 Aug 2022 09:08:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1661270904; cv=none; 
+        d=zohomail.in; s=zohoarc; 
+        b=JVbN+o5FIkISrOPZjQPBvu7OtJzN5G0kKXh7ZPoAz8eC9NXnhSBCwprJ6TF2X4asewUz/yenEjwIgIiPvLrA7h+gta3HpdyFjm/it43ikI5+9wNwfLVLviOJtDC/xGXV3bGjlXRUCujm9SpOVaq3drWXLZSvwhqoBBU0fy27ePc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+        t=1661270904; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
+        bh=UjlKgz2xV4xjj14J2LSVuB5e7dOd3HlE+vr/w0QgVZY=; 
+        b=WHiautuSleOVUZ1HN15b6q2eN4Ww7jAUeZeBaFmfgFha3QC3VZ6/scZ9Y+VW9vjc15EGDVqhfCgOuZYGfcUweOcwWB1Laku9NzJ16nPd7k1BqQTnK0vz3vfyxlfwNGFC2fUoieItEf4hb8xUopcSr2i23hzmLIx/hKUAF0ayeHM=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+        dkim=pass  header.i=siddh.me;
+        spf=pass  smtp.mailfrom=code@siddh.me;
+        dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1661270904;
+        s=zmail; d=siddh.me; i=code@siddh.me;
+        h=From:From:To:To:Cc:Cc:Message-ID:Subject:Subject:Date:Date:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
+        bh=UjlKgz2xV4xjj14J2LSVuB5e7dOd3HlE+vr/w0QgVZY=;
+        b=eDrovX6Mi9EX6AYter3SwakhVr0/cg9vJe4zqQeZYHzPotfHPdliEIV8aT8Se/om
+        GZaiYUGXu4AGTvESCJVUbDwa7nMZ8K0o3KIYLKZH2E7DHzPqBwzC3mWJLwKRd+HzdZE
+        66aJYjlRmyaZHmfJ5MDJQfYAxHlUy5MvydthSLG0=
+Received: from localhost.localdomain (103.249.234.81 [103.249.234.81]) by mx.zoho.in
+        with SMTPS id 166127090391618.64430756700915; Tue, 23 Aug 2022 21:38:23 +0530 (IST)
+From:   Siddh Raman Pant <code@siddh.me>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-kernel-mentees 
+        <linux-kernel-mentees@lists.linuxfoundation.org>,
+        syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com,
+        stable@vger.kernel.org
+Message-ID: <20220823160810.181275-1-code@siddh.me>
+Subject: [PATCH v2] loop: Check for overflow while configuring loop
+Date:   Tue, 23 Aug 2022 21:38:10 +0530
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use atomic_long_try_cmpxchg instead of
-atomic_long_cmpxchg (*ptr, old, new) == old in __sbitmap_queue_get_batch
-and atomic_try_cmpxchg instead of atomic_cmpxchg (*ptr, old, new) == old
-in __sbq_wake_up. x86 CMPXCHG instruction returns success in ZF flag, so
-this change saves a compare after cmpxchg (and related move instruction
-in front of cmpxchg).
+The userspace can configure a loop using an ioctl call, wherein
+a configuration of type loop_config is passed (see lo_ioctl()'s
+case on line 1550 of drivers/block/loop.c). This proceeds to call
+loop_configure() which in turn calls loop_set_status_from_info()
+(see line 1050 of loop.c), passing &config->info which is of type
+loop_info64*. This function then sets the appropriate values, like
+the offset.
 
-Also, atomic_long_cmpxchg implicitly assigns old *ptr value to "old"
-when cmpxchg fails, enabling further code simplifications.
+loop_device has lo_offset of type loff_t (see line 52 of loop.c),
+which is typdef-chained to long long, whereas loop_info64 has
+lo_offset of type __u64 (see line 56 of include/uapi/linux/loop.h).
 
-No functional change intended.
+The function directly copies offset from info to the device as
+follows (See line 980 of loop.c):
+=09lo->lo_offset =3D info->lo_offset;
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+This results in an overflow, which triggers a warning in iomap_iter()
+due to a call to iomap_iter_done() which has:
+=09WARN_ON_ONCE(iter->iomap.offset > iter->pos);
+
+Thus, check for negative value during loop_set_status_from_info().
+
+Bug report: https://syzkaller.appspot.com/bug?id=3Dc620fe14aac810396d3c3edc=
+9ad73848bf69a29e
+Reported-and-tested-by: syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.c=
+om
+Cc: stable@vger.kernel.org
+Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Signed-off-by: Siddh Raman Pant <code@siddh.me>
 ---
- lib/sbitmap.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+Changes since v1:
+- Do not break userspace API, so check loop_device for overflow.
+- Use EOVERFLOW instead of EINVAL.
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 29eb0484215a..32392e65b98f 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -534,16 +534,16 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
- 		if (nr + nr_tags <= map_depth) {
- 			atomic_long_t *ptr = (atomic_long_t *) &map->word;
- 			int map_tags = min_t(int, nr_tags, map_depth);
--			unsigned long val, ret;
-+			unsigned long val;
- 
- 			get_mask = ((1UL << map_tags) - 1) << nr;
-+			val = READ_ONCE(map->word);
- 			do {
--				val = READ_ONCE(map->word);
- 				if ((val & ~get_mask) != val)
- 					goto next;
--				ret = atomic_long_cmpxchg(ptr, val, get_mask | val);
--			} while (ret != val);
--			get_mask = (get_mask & ~ret) >> nr;
-+			} while (!atomic_long_try_cmpxchg(ptr, &val,
-+							  get_mask | val));
-+			get_mask = (get_mask & ~val) >> nr;
- 			if (get_mask) {
- 				*offset = nr + (index << sb->shift);
- 				update_alloc_hint_after_get(sb, depth, hint,
-@@ -612,8 +612,6 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 
- 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
- 	if (wait_cnt <= 0) {
--		int ret;
--
- 		wake_batch = READ_ONCE(sbq->wake_batch);
- 
- 		/*
-@@ -628,8 +626,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 		 * atomic_cmpxhcg() race should call this function again
- 		 * to wakeup a new batch on a different 'ws'.
- 		 */
--		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
--		if (ret == wait_cnt) {
-+		if (atomic_try_cmpxchg(&ws->wait_cnt, &wait_cnt, wake_batch)) {
- 			sbq_index_atomic_inc(&sbq->wake_index);
- 			wake_up_nr(&ws->wait, wake_batch);
- 			return false;
--- 
-2.37.1
+ drivers/block/loop.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index e3c0ba93c1a3..ad92192c7d61 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -979,6 +979,11 @@ loop_set_status_from_info(struct loop_device *lo,
+=20
+ =09lo->lo_offset =3D info->lo_offset;
+ =09lo->lo_sizelimit =3D info->lo_sizelimit;
++
++=09/* loff_t vars have been assigned __u64 */
++=09if (lo->lo_offset < 0 || lo->lo_sizelimit < 0)
++=09=09return -EOVERFLOW;
++
+ =09memcpy(lo->lo_file_name, info->lo_file_name, LO_NAME_SIZE);
+ =09lo->lo_file_name[LO_NAME_SIZE-1] =3D 0;
+ =09lo->lo_flags =3D info->lo_flags;
+--=20
+2.35.1
+
 
