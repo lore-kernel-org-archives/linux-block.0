@@ -2,199 +2,198 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05E0C28D13
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 03:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C955CC32793
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 05:22:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239213AbiHWDWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 23:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48666 "EHLO
+        id S239917AbiHWFWg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Aug 2022 01:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240044AbiHWDWT (ORCPT
+        with ESMTP id S239904AbiHWFWf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 23:22:19 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269BE50718
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 20:22:16 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id s3-20020a17090a2f0300b001facfc6fdbcso12651775pjd.1
-        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 20:22:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dilger-ca.20210112.gappssmtp.com; s=20210112;
-        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
-         :from:from:to:cc;
-        bh=t5TO7xdQGMXaC5TRTQFcqhFSnLRjgf1D8C0Y6A6YDxE=;
-        b=WmzvvmXH5e7wP/UE3SOCEoTxUnalykJ3N3TkckdsZzxqPN6OxAvOMEhsFJIg72/pec
-         dV+HIGE92uLWsaavfgjKM+C+A5n4EiV88XdKFsoxydVAFe5nmQZ3wXK7pbUiZnpPSViH
-         9wcRuFbEeMk6CuUC5TU2Fsvnjo++S7A79RBLzB6Aur+2C1mdRPNWR6V9hkWGd33kuaZ6
-         xcCba0irYI0fzWODf7B+oUYh3cw5uD53qZpQUEbxAvY5/4dbEDBWYTz1DS09LYro3uwm
-         G9+kpUhWzIhcfbKMcEQU1XlfvHYa+Duf15Pq6vyDet2odUshI95kkV9niiVxvoEj4EEl
-         OWIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
-         :from:x-gm-message-state:from:to:cc;
-        bh=t5TO7xdQGMXaC5TRTQFcqhFSnLRjgf1D8C0Y6A6YDxE=;
-        b=K+DPfO0gpjfsEyRK2GXp3u2vGQ9bfaJYIa58SoHLKwh2PlXbdvxEeWmgu3vEyfTL4v
-         MppYK2xwOv3SL4+hPBrW5I4MC4ZdXLfbaaEJ+LSPzReNBeH4slkw2lVSmWDqPIK9GfLt
-         n5vunxtG58Thbog0lquFHcvp82wuSS8Wa1MI2YZCbm/d3tEb6zRGyGmZtNyBshNbqe70
-         VjU53E+w5cOXsn2id553ZWKyfvkfnhRbxeCpJ8Mx3CkSjP5gfOisNEhs1x08N4JBkTyw
-         i41ktlYh3ds4UgY8j5Z/QIeWa9AlStHx9YowxaGXE2qRcvjaYIQ9F4RnoIIn+A9d8W9E
-         SnSw==
-X-Gm-Message-State: ACgBeo03EjctjAssWaQEVLiJKAaqvevaso7bAMWFe4oCZGI68i+iARTP
-        Q68r+W6gOhpRNc1Nf0hIhYxLuA==
-X-Google-Smtp-Source: AA6agR6bYAoLnjuq/NI/816MPUccS4/TdIQzRNkgRVQfsY/JSoRbcW6B7pyoAJACabZ0K9rJNxD0pA==
-X-Received: by 2002:a17:903:18b:b0:16e:f09c:919b with SMTP id z11-20020a170903018b00b0016ef09c919bmr23613380plg.135.1661224935485;
-        Mon, 22 Aug 2022 20:22:15 -0700 (PDT)
-Received: from cabot.adilger.int (S01061cabc081bf83.cg.shawcable.net. [70.77.221.9])
-        by smtp.gmail.com with ESMTPSA id b9-20020a1709027e0900b00172d52b7c03sm5372011plm.125.2022.08.22.20.22.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Aug 2022 20:22:14 -0700 (PDT)
-From:   Andreas Dilger <adilger@dilger.ca>
-Message-Id: <21923F1E-1C54-44FB-AF7C-4CD8B4B35433@dilger.ca>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
-Date:   Mon, 22 Aug 2022 21:22:11 -0600
-In-Reply-To: <YwAYPFxW7VV4M9D1@sol.localdomain>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        linux-f2fs-devel@lists.sourceforge.net,
-        xfs <linux-xfs@vger.kernel.org>, linux-api@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-References: <20220722071228.146690-1-ebiggers@kernel.org>
- <20220722071228.146690-7-ebiggers@kernel.org> <YtyoF89iOg8gs7hj@google.com>
- <Yt7dCcG0ns85QqJe@sol.localdomain> <YuXyKh8Zvr56rR4R@google.com>
- <YvrrEcw4E+rpDLwM@sol.localdomain>
- <20220816090312.GU3600936@dread.disaster.area>
- <D1CDACE3-EC7E-43E4-8F49-EEA2B6E71A41@dilger.ca>
- <YwAYPFxW7VV4M9D1@sol.localdomain>
-X-Mailer: Apple Mail (2.3273)
+        Tue, 23 Aug 2022 01:22:35 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A6451A2C;
+        Mon, 22 Aug 2022 22:22:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661232154; x=1692768154;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wy6WE4BSFS1ZfWH9ztxUHavzMVRtvmcIr8EplprCa+8=;
+  b=emZz3Cmo4G1mjQFdjJxfvVxAFlkyUB2Gh5ARZILw/N26uyiXiuiKvAJv
+   yMyMkRihkQWkNJu33MtD0BszngoXPluD5cAjvtjJ3a3H3MGDA47Ro00sO
+   +4hL/2nrBSnX2y7VSfkgiOAnp+YruoG8CaN/Ok7n3d81fAmmynHuPTbUu
+   KdMQWr9x0EdEULuW6PTrUzFi/Wev6r0Hh+UD34xO3Ple6VKs6UvT83ub9
+   DkVbYS9Paj7NDBUHkigdrSgAcySc+sIL4PJOTNs9IYMtVfs5oVeYvf5AJ
+   yzb4nGDVX2W4/t8RYTny6hMvrvGtLqWEPQ4zAgXmUtPs4vA+DBHiR8ixh
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10447"; a="294383553"
+X-IronPort-AV: E=Sophos;i="5.93,256,1654585200"; 
+   d="scan'208";a="294383553"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2022 22:22:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,256,1654585200"; 
+   d="scan'208";a="642307329"
+Received: from lkp-server01.sh.intel.com (HELO dd9b29378baa) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 22 Aug 2022 22:22:31 -0700
+Received: from kbuild by dd9b29378baa with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oQMMx-0001DV-02;
+        Tue, 23 Aug 2022 05:22:31 +0000
+Date:   Tue, 23 Aug 2022 13:22:17 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Michael Schmitz <schmitzmic@gmail.com>,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Cc:     kbuild-all@lists.01.org, linux-m68k@vger.kernel.org,
+        geert@linux-m68k.org, hch@lst.de,
+        Michael Schmitz <schmitzmic@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v9 RESEND #2 2/2] block: add overflow checks for Amiga
+ partition support
+Message-ID: <202208231319.Ng5RTzzg-lkp@intel.com>
+References: <20220822211236.9023-3-schmitzmic@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220822211236.9023-3-schmitzmic@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Michael,
 
---Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+I love your patch! Perhaps something to improve:
 
-On Aug 19, 2022, at 5:09 PM, Eric Biggers <ebiggers@kernel.org> wrote:
->=20
-> On Tue, Aug 16, 2022 at 10:42:29AM -0600, Andreas Dilger wrote:
->>=20
->> IMHO, this whole discussion is putting the cart before the horse.
->> Changing existing (and useful) IO behavior to accommodate an API that
->> nobody has ever used, and is unlikely to even be widely used, doesn't
->> make sense to me.  Most applications won't check or care about the =
-new
->> DIO size fields, since they've lived this long without statx() =
-returning
->> this info, and will just pick a "large enough" size (4KB, 1MB, =
-whatever)
->> that gives them the performance they need.  They *WILL* care if the =
-app
->> is suddenly unable to read data from a file in ways that have worked =
-for
->> a long time.
->>=20
->> Even if apps are modified to check these new DIO size fields, and =
-then
->> try to DIO write to a file in f2fs that doesn't allow it, then f2fs =
-will
->> return an error, which is what it would have done without the statx()
->> changes, so no harm done AFAICS.
->>=20
->> Even with a more-complex DIO status return that handles a "direction"
->> field (which IMHO is needlessly complex), there is always the =
-potential
->> for a TOCTOU race where a file changes between checking and access, =
-so
->> the userspace code would need to handle this.
->=20
-> I'm having trouble making sense of your argument here; you seem to be =
-saying
-> that STATX_DIOALIGN isn't useful, so it doesn't matter if we design it
-> correctly?  That line of reasoning is concerning, as it's certainly =
-intended
-> to be useful, and if it's not useful there's no point in adding it.
->=20
-> Are there any specific concerns that you have, besides TOCTOU races =
-and the
-> lack of support for read-only DIO?
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.0-rc2 next-20220822]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-My main concern is disabling useful functionality that exists today to =
-appease
-the new DIO size API.  Whether STATX_DIOALIGN will become widely used by
-applications or not is hard to say at this point.
+url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Schmitz/Amiga-RDB-partition-support-fixes/20220823-051457
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: i386-randconfig-s002 (https://download.01.org/0day-ci/archive/20220823/202208231319.Ng5RTzzg-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/6b86551e8891f07839a8c3ad19e3f770b0f738e9
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Michael-Schmitz/Amiga-RDB-partition-support-fixes/20220823-051457
+        git checkout 6b86551e8891f07839a8c3ad19e3f770b0f738e9
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash block/partitions/
 
-If there were separate STATX_DIOREAD and STATX_DIOWRITE flags in the =
-returned
-data, and the alignment is provided as it is today, that would be enough =
-IMHO
-to address the original use case without significant complexity.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-> I don't think that TOCTOU races are a real concern here.  Generally =
-DIO
-> constraints would only change if the application doing DIO =
-intentionally does
-> something to the file, or if there are changes that involve the =
-filesystem
-> being taken offline, e.g. the filesystem being mounted with =
-significantly
-> different options or being moved to a different block device.  And, =
-well,
-> everything else in stat()/statx() is subject to TOCTOU as well, but is =
-still
-> used...
+sparse warnings: (new ones prefixed by >>)
+>> block/partitions/amiga.c:132:30: sparse: sparse: cast to restricted __be32
+   block/partitions/amiga.c:133:25: sparse: sparse: cast to restricted __be32
 
-I was thinking of background filesystem operations like compression, LVM
-migration to new storage with a different sector size, etc. that may =
-change
-the DIO characteristics of the file even while it is open.  Not that I =
-think
-this will happen frequently, but it is possible, and applications =
-shouldn't
-explode if the DIO parameters change and they get an error.
+vim +132 block/partitions/amiga.c
 
-Cheers, Andreas
+    35	
+    36	int amiga_partition(struct parsed_partitions *state)
+    37	{
+    38		Sector sect;
+    39		unsigned char *data;
+    40		struct RigidDiskBlock *rdb;
+    41		struct PartitionBlock *pb;
+    42		u64 start_sect, nr_sects;
+    43		sector_t blk, end_sect;
+    44		u32 cylblk;		/* rdb_CylBlocks = nr_heads*sect_per_track */
+    45		u32 nr_hd, nr_sect, lo_cyl, hi_cyl;
+    46		int part, res = 0;
+    47		unsigned int blksize = 1;	/* Multiplier for disk block size */
+    48		int slot = 1;
+    49	
+    50		for (blk = 0; ; blk++, put_dev_sector(sect)) {
+    51			if (blk == RDB_ALLOCATION_LIMIT)
+    52				goto rdb_done;
+    53			data = read_part_sector(state, blk, &sect);
+    54			if (!data) {
+    55				pr_err("Dev %s: unable to read RDB block %llu\n",
+    56				       state->disk->disk_name, blk);
+    57				res = -1;
+    58				goto rdb_done;
+    59			}
+    60			if (*(__be32 *)data != cpu_to_be32(IDNAME_RIGIDDISK))
+    61				continue;
+    62	
+    63			rdb = (struct RigidDiskBlock *)data;
+    64			if (checksum_block((__be32 *)data, be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F) == 0)
+    65				break;
+    66			/* Try again with 0xdc..0xdf zeroed, Windows might have
+    67			 * trashed it.
+    68			 */
+    69			*(__be32 *)(data+0xdc) = 0;
+    70			if (checksum_block((__be32 *)data,
+    71					be32_to_cpu(rdb->rdb_SummedLongs) & 0x7F)==0) {
+    72				pr_err("Trashed word at 0xd0 in block %llu ignored in checksum calculation\n",
+    73				       blk);
+    74				break;
+    75			}
+    76	
+    77			pr_err("Dev %s: RDB in block %llu has bad checksum\n",
+    78			       state->disk->disk_name, blk);
+    79		}
+    80	
+    81		/* blksize is blocks per 512 byte standard block */
+    82		blksize = be32_to_cpu( rdb->rdb_BlockBytes ) / 512;
+    83	
+    84		{
+    85			char tmp[7 + 10 + 1 + 1];
+    86	
+    87			/* Be more informative */
+    88			snprintf(tmp, sizeof(tmp), " RDSK (%d)", blksize * 512);
+    89			strlcat(state->pp_buf, tmp, PAGE_SIZE);
+    90		}
+    91		blk = be32_to_cpu(rdb->rdb_PartitionList);
+    92		put_dev_sector(sect);
+    93		for (part = 1; blk>0 && part<=16; part++, put_dev_sector(sect)) {
+    94			/* Read in terms partition table understands */
+    95			if (check_mul_overflow(blk, (sector_t) blksize, &blk)) {
+    96				pr_err("Dev %s: overflow calculating partition block %llu! Skipping partitions %u and beyond\n",
+    97					state->disk->disk_name, blk, part);
+    98				break;
+    99			}
+   100			data = read_part_sector(state, blk, &sect);
+   101			if (!data) {
+   102				pr_err("Dev %s: unable to read partition block %llu\n",
+   103				       state->disk->disk_name, blk);
+   104				res = -1;
+   105				goto rdb_done;
+   106			}
+   107			pb  = (struct PartitionBlock *)data;
+   108			blk = be32_to_cpu(pb->pb_Next);
+   109			if (pb->pb_ID != cpu_to_be32(IDNAME_PARTITION))
+   110				continue;
+   111			if (checksum_block((__be32 *)pb, be32_to_cpu(pb->pb_SummedLongs) & 0x7F) != 0 )
+   112				continue;
+   113	
+   114			/* RDB gives us more than enough rope to hang ourselves with,
+   115			 * many times over (2^128 bytes if all fields max out).
+   116			 * Some careful checks are in order, so check for potential
+   117			 * overflows.
+   118			 * We are multiplying four 32 bit numbers to one sector_t!
+   119			 */
+   120	
+   121			nr_hd   = be32_to_cpu(pb->pb_Environment[NR_HD]);
+   122			nr_sect = be32_to_cpu(pb->pb_Environment[NR_SECT]);
+   123	
+   124			/* CylBlocks is total number of blocks per cylinder */
+   125			if (check_mul_overflow(nr_hd, nr_sect, &cylblk)) {
+   126				pr_err("Dev %s: heads*sects %u overflows u32, skipping partition!\n",
+   127					state->disk->disk_name, cylblk);
+   128				continue;
+   129			}
+   130	
+   131			/* check for consistency with RDB defined CylBlocks */
+ > 132			if (cylblk > be32_to_cpu((__be32)rdb->rdb_CylBlocks)) {
 
-
-
-
-
-
---Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
-
-iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAmMER+MACgkQcqXauRfM
-H+D5gBAAjf5qhCdnFlyRgIkdcPs1zELiCu4+Jw0PH5rkavcu3tVPwEBTCbHxXVMN
-6ZsFra7ARjxxj58mUSEtN9NDHwpiQreGlgqDoP+uYYb3EwiFZstja2fl0mTAytE5
-lMb8zBxkfCh8xexTnnVk7ULsOrTO+/xYTUbmRIqQvK6PTicVuO6H8FtzYFHjilnn
-/RZ8yRCndDsFmRpZCApwy26cPcP3UyrtUqz8rKk1iy5oBIC1ALvx8baYjY/Wi7Fs
-vMq1ExdKsjPPVQT5dmj1ISPRXpxTGezKhqvxNvbR/IMwKW2PzEMZzClRQnYKuWe5
-GBu6zW0mWe5l+Bg1amzve/WteBX/5i6rrkknoD58zBL8SL4LDh+uQGaM2q7EzegR
-lEc1/IpOtR1WrfmP+tOqEIfdwa4jMikNm4NKHYoQA2OQcxEzmYgtBHeeVbGOFCEq
-PRKVZbxxF2bVFWuBVbsSbAar9o6G6Ucm11LBDHkKEpn8RTqN/UeXBrcslIk9NczK
-2qtnn0jbek1OgtMEpGaajobjeqBqQUIC6/cUkU0S7Ga1LsV7D8eH5TV9EF3rWwLe
-0MJ2IWgAmbMDp7gYNVZYrsJJMrqcjphRO33u2JvwFisboKU1DD4qtfnG1vvF8u1n
-RHpWdRBE/l0VC15dWox4zVKfVgH52rkeKE8ZVkTj83NDSIidz94=
-=WmyJ
------END PGP SIGNATURE-----
-
---Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
