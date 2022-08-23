@@ -2,113 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4DAC32772
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 19:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F17E6C32772
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 19:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232591AbiHWTiG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Aug 2022 15:38:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59272 "EHLO
+        id S230185AbiHWTus (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Aug 2022 15:50:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230394AbiHWThd (ORCPT
+        with ESMTP id S232328AbiHWTub (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Aug 2022 15:37:33 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BEADA262F;
-        Tue, 23 Aug 2022 11:34:13 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id pm13so5850080pjb.5;
-        Tue, 23 Aug 2022 11:34:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc;
-        bh=JfIVW5EAwcziVt6ePzGMkVRPbB2bi7yV+a8QRJJ7RgI=;
-        b=q2ExPiLlmr3rFwyGKyFXlMV0seXxl2bOW/vbx0cJKPMa41O8h0U5Zh4IcGSH/ZVlfA
-         tGxkmod7yD4lDznK3zTaxdLioXjnbXJuP5pTi8fvgtB4XP0Zw1RAjUNS19hYVgSqLprg
-         Iu5kjJ4wOVLnNfmSZ0WYps4ZaILOqbrjOz6ENcqZ7z4BF23tEAPFkIJJGqJJsb65I4jL
-         dWoWCcSPW5Xk+5pn15qtd/aOLzGUSPf4kzTDKOvcbryapOxCZResD/Jw7kbtaancyk97
-         7zU6ZDOeKvDffRu3TqYryVn6skyhNVDmt5NIj8EC1ejkiew4bYHycaz+J/mb1mEpmwzf
-         oVCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc;
-        bh=JfIVW5EAwcziVt6ePzGMkVRPbB2bi7yV+a8QRJJ7RgI=;
-        b=4VFXlO7ok755vA880UDygPrPPp0tUIZnBtTposDz5dRTHzmYwGBVrRH07RUMDFgQEQ
-         Mn4R54u5BEFfpjHQ+OvcKb7PxA6RKOckk+D43yfeBLA6O77YYu6lRyv6+OFnqm+dpYe5
-         eVBV/KnfG7VAoIJxd5g+YC3H6AgRCqmq03iGNOQ0nagjqY5vQ4OCIxCyVNBflKNIh/XG
-         OHAGlEOwGMXy8JlDzJLmKpNT9KBFdoaXhE/5uyMpOBqf6OfSfeEgDMCi+Wgk+UR0B0Z+
-         jWjh5CIYAeXxElSUVwCYu4uu8TF/f3EvBD7p8uC2qNRS2UJ36Ij+dSrmOkwfTTls1x2D
-         u8DQ==
-X-Gm-Message-State: ACgBeo2rKeYRX4ccLgZ3YeBeNqUP7kkPNDGANel6MjTngLJTFJuzZGar
-        oUTWSiqDAIKLLHAa15jjvgQ=
-X-Google-Smtp-Source: AA6agR4k77gYNs28ebZLcJfF5hB6Kw5jzDg+UqpjOg+Arvubt7GuKXOlWpjHjwYiz7G1YBG3pgwA+g==
-X-Received: by 2002:a17:902:6bc9:b0:173:f3f:4a8c with SMTP id m9-20020a1709026bc900b001730f3f4a8cmr1401690plt.96.1661279652870;
-        Tue, 23 Aug 2022 11:34:12 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:90fa])
-        by smtp.gmail.com with ESMTPSA id d131-20020a621d89000000b0050dc76281e0sm11011205pfd.186.2022.08.23.11.34.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 11:34:12 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 23 Aug 2022 08:34:10 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH 4/4] blk-throttle: cleanup throtl_dequeue_tg()
-Message-ID: <YwUdouGld9Z7K8r1@slm.duckdns.org>
-References: <20220823013810.406075-1-yukuai1@huaweicloud.com>
- <20220823013810.406075-5-yukuai1@huaweicloud.com>
+        Tue, 23 Aug 2022 15:50:31 -0400
+X-Greylist: delayed 6351 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 23 Aug 2022 11:54:01 PDT
+Received: from server1.zero-servers.net (unknown [96.127.160.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2826DDFC
+        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 11:54:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=zero-homepage.jp; s=default; h=Content-Type:MIME-Version:Message-ID:From:
+        Date:Subject:To:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=5K6Uha1Q8UBr+rFZ5cPMEQ3OfQt6ouRMPgLevD98rmw=; b=IBwDP70D5d9dPXWTYJH2n37d/R
+        w0oVVkP161TDk8bxdfSxF99F7vX8+GI+pW975lKIcyO90Ac+QWsOXBp4943w60eyeZ7w50S46pyIM
+        x27vgbzRGVdpnzDQ46+Kqoivv/dgO8bBDbDW/qpYlOasr1Pge9r9wN93/O3UH81suYgvgNkrtJeV/
+        9JHGoA6Ul55FAnB7jftb/92Bwtcf1n2XjMrWVaX0vtQY7q6m+9Xx/JZYGsxikAWIWfBUwEDX3RPOk
+        t7VOlg2lFzFUhqGD4MCDBHfbnmKPjJyH7Wg9BEE+2ps4gC40GWnEjvhXKDIxBwhqFSo1inRomv0aS
+        Y0LX3A9g==;
+Received: from zero by server48.zero-servers.net with local (Exim 4.95)
+        (envelope-from <zero@server48.zero-servers.net>)
+        id 1oQXNZ-0007Nj-7b
+        for linux-block@vger.kernel.org;
+        Tue, 23 Aug 2022 12:07:53 -0500
+To:     linux-block@vger.kernel.org
+Subject: =?us-ascii?Q?Zero&Co.,Ltd_"CNBC:_Mude_von_Arbeit_und_Schulde?=  =?us-ascii?Q?n=3F_Raus_aus_dieser_Scheie=3F"?=
+X-PHP-Script: zero-homepage.jp/index.php for 191.101.31.39
+X-PHP-Originating-Script: 1029:PHPMailer.php
+Date:   Tue, 23 Aug 2022 17:07:53 +0000
+From:   "Zero&Co.,Ltd" <contact@zero-homepage.jp>
+Message-ID: <I4rLyTLtLQuXZBSe4jSIcWTN79189Z1JaLWeWMnhWPI@zero-homepage.jp>
+X-Mailer: PHPMailer 6.6.0 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220823013810.406075-5-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server48.zero-servers.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [1029 994] / [47 12]
+X-AntiAbuse: Sender Address Domain - server48.zero-servers.net
+X-Get-Message-Sender-Via: server48.zero-servers.net: authenticated_id: zero/from_h
+X-Authenticated-Sender: server48.zero-servers.net: contact@zero-homepage.jp
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 23, 2022 at 09:38:10AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Now that throtl_dequeue_tg() is called when the last bio is dispatched,
-> there is no need to check the flag THROTL_TG_PENDING, since it's ensured
-> to be set when bio is throttled.
-> 
-> There are no functional changes.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->  block/blk-throttle.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 47142a1dd102..e47506a8ef47 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -570,14 +570,11 @@ static void throtl_enqueue_tg(struct throtl_grp *tg)
->  
->  static void throtl_dequeue_tg(struct throtl_grp *tg)
->  {
-> -	if (tg->flags & THROTL_TG_PENDING) {
-> -		struct throtl_service_queue *parent_sq =
-> -			tg->service_queue.parent_sq;
-> +	struct throtl_service_queue *parent_sq = tg->service_queue.parent_sq;
->  
-> -		throtl_rb_erase(&tg->rb_node, parent_sq);
-> -		--parent_sq->nr_pending;
-> -		tg->flags &= ~THROTL_TG_PENDING;
-> -	}
-> +	throtl_rb_erase(&tg->rb_node, parent_sq);
-> +	--parent_sq->nr_pending;
-> +	tg->flags &= ~THROTL_TG_PENDING;
+Hi, JamesCeack
 
-Yeah, I don't know about this one. This breaks the symmetry with
-throtl_enqueue_tg() and it's a bit odd that we aren't at least
-WARN_ON_ONCE() on the flag given what the flag tracks. If you want to do
-this, I think the prev approach of just removing the flag is better as that
-was symmetric at least.
+Thanks you for your contact us.
+We`re going to reply within 24 hours.
 
-Thanks.
+Message Body:
+Nicht genug Geld fur irgendetwas? Es gibt einen Ausgang http://manchester-united-news.dorayazilim.com/DW-6331
 
 -- 
-tejun
+This email was sent from Zero&Co.,Ltd automatically.
+
