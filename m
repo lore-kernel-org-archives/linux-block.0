@@ -2,87 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ABABC32772
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 17:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD57C32774
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 17:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244009AbiHWRLs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Aug 2022 13:11:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41720 "EHLO
+        id S234472AbiHWR0d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Aug 2022 13:26:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344305AbiHWRKl (ORCPT
+        with ESMTP id S236053AbiHWRZx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Aug 2022 13:10:41 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8123E15B169
-        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 06:37:50 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 202so12288420pgc.8
-        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 06:37:50 -0700 (PDT)
+        Tue, 23 Aug 2022 13:25:53 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7287D7B7;
+        Tue, 23 Aug 2022 08:04:03 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id r16so17346902wrm.6;
+        Tue, 23 Aug 2022 08:04:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc;
-        bh=n7iR6psZ0iOUa2Hyhot7GU8syOFqaZ9ER5oGtEDczdg=;
-        b=gzwKQkZXZT1UZ65SM/9R7Cl/ZDlYyhZQznytLr5Xu3snKGW/n6vebjP7SWs+snSeJZ
-         LOqBtED5BU9MJhTK4LHepgdwhSfNq6yrJySt3Og5p50NhnanNKmYZB88beBshEgcCjA4
-         ja9+yF6oNDFw8UK1TWra5d0nKp0+x6ic/UgdqwVk0wJTTt0HmmyVOptAm2cKZ3SZ6am8
-         6sr6hG2k9GisAKOAu69KMupuHuX5DMNsU4MuMkvJqtkdMNBQ9yr36vZ6b+exebrF364R
-         HCdrrR9J8dr6HnWMTWm1diPzzC5mUrQsM1qDkRa8YyZm1SJE+dniIod67iMCnhD32pNc
-         /edQ==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=UWD/zYOImijIaCRJjQ6Qdr+9a5CKuV8fnJ1O7aG/PXw=;
+        b=dPG+yykmRC3fUMbUTYUtwPC8aaaIFXjBLd9EYlvJVTgwqkRac5HyYMpunGbqnj53tE
+         26KhntFBaodTiOj4py+G3Tz+h1kFdWKbYP5vEU9iRY6PX/2yNgdPLq+ftcHST8F2WxdQ
+         fSezYvRysrN2CyOqUes7OC6qMr/fWJalQGpolw0S3rRWFdWu77Rh7uBu3KG0AAL0ntdd
+         VK8jo5doaPdtQ6wOiY8/tQpT2H5JrDhbx0ztqGYb4VnKxAzeUT/pNWT9OBb+cx3nFuYV
+         S9HiAr1OU4T4r1fRvyE7MXY4KgV7UMVe/kq5t6O8pdNiAn52Hc+g6SFDe/Ljm6yulib+
+         GwRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=n7iR6psZ0iOUa2Hyhot7GU8syOFqaZ9ER5oGtEDczdg=;
-        b=HJsG/FqvnTKdD3gVQizgpTBinYyablMxkIigHna+wFkd8OWJ3rKGuSd01aMQQWi3P/
-         e8y10tpDIFtZbtR9dzyunvmkW6T2uWyOBEogHM+3xaPYoWIf26y9nK7QYVNbevNPhYJQ
-         djR+0KQCSUljzv5LyfbG0lLCDUdNzOwD3sXz7Hw2KDDKBuUcgNewCqCJHtaySbDyI+5E
-         o6XZfOOJVlbhevtbla09iwxaPjqxW4k24UB2z8aISEna8fcuf8kXJ3Kf9/DdF4lDS/j2
-         t3Ha+A80mTEZ70Lv96mSmTVGy2t7/ybSLazcXa1egV1t2eafdBvcKC3LRe3PDwC7dvtR
-         A44Q==
-X-Gm-Message-State: ACgBeo1y+oFECtFfHmo43YPEPdQtnh0fS6tcNdsLc2nTtP0Gu2ai1JVg
-        K/+Sgq1I6lftVzgL3l08dpc5Hw==
-X-Google-Smtp-Source: AA6agR43WZ/zqeBIRZ1JCqy6cCBGpWEy4XEWjFD62cNl4VC+iQfzRPpGQ8X0bfc8NEw4vlV4qrBnbQ==
-X-Received: by 2002:a62:1b12:0:b0:536:715c:4d96 with SMTP id b18-20020a621b12000000b00536715c4d96mr12590248pfb.77.1661261869924;
-        Tue, 23 Aug 2022 06:37:49 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u6-20020a170902e5c600b0016d88dc7745sm10512985plf.259.2022.08.23.06.37.48
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=UWD/zYOImijIaCRJjQ6Qdr+9a5CKuV8fnJ1O7aG/PXw=;
+        b=Tcz7Q7Oggxq6KnvV6Ffzpb9HoIS8Q2gOwO/8LJ9uULCFte5sMWkB8A+eVj7wrRHEos
+         iOZz3flL5ROwJDptp27jm3a/QSgYf+0me4yvC+fk/SxGG3g/I1cJ8quvobbGN2f8igoy
+         8ArYf+Oids0b7ti9muaMwfJ+L4DrnzwYRsSyP76JlKuVIhZgPkKpKnauP2MN0tMWhb4M
+         u1IzdEzG+O8AfPNdAKk3UtHzdeBsIGfHh8iUyyYVKygDic0CC2K6aV/XNMrF8Y3cB3HF
+         AnCRSjLZ8QpcW/HNQtPD6KeJyiyXOpwSz2NI448Abtay0U6zlqz5Vwyzv28KHWLm7BJN
+         jHtg==
+X-Gm-Message-State: ACgBeo2EI0GIZm1oQTJTIpT7yO2UPujDYjdYBRfUbHM/pCqPE35CrXf9
+        LUjXyYWpVxobKHbYBg6hPNC5ridxsIEcyg==
+X-Google-Smtp-Source: AA6agR7/AJKDJ3fmGGjB2rFV9CtiSShlIbldfYUUc9bkFO95ho+PLDHlcvH1bMCehtEzHkEogVbHVg==
+X-Received: by 2002:a5d:5010:0:b0:225:611c:55fc with SMTP id e16-20020a5d5010000000b00225611c55fcmr4283164wrt.553.1661267041437;
+        Tue, 23 Aug 2022 08:04:01 -0700 (PDT)
+Received: from localhost.localdomain ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id bn26-20020a056000061a00b0021d7b41255esm14907690wrb.98.2022.08.23.08.04.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 06:37:48 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     jack@suse.cz, osandov@fb.com, yukuai1@huaweicloud.com
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        yi.zhang@huawei.com, yukuai3@huawei.com
-In-Reply-To: <20220803121504.212071-1-yukuai1@huaweicloud.com>
-References: <20220803121504.212071-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH] sbitmap: fix possible io hung due to lost wakeup
-Message-Id: <166126186831.27028.2544657181662350295.b4-ty@kernel.dk>
-Date:   Tue, 23 Aug 2022 07:37:48 -0600
+        Tue, 23 Aug 2022 08:04:01 -0700 (PDT)
+From:   Uros Bizjak <ubizjak@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Uros Bizjak <ubizjak@gmail.com>, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] sbitmap: Use atomic_{,long}_try_cmpxchg in sbitmap.c
+Date:   Tue, 23 Aug 2022 17:03:52 +0200
+Message-Id: <20220823150352.3455-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 3 Aug 2022 20:15:04 +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> There are two problems can lead to lost wakeup:
-> 
-> 1) invalid wakeup on the wrong waitqueue:
-> 
-> For example, 2 * wake_batch tags are put, while only wake_batch threads
-> are woken:
-> 
-> [...]
+Use atomic_long_try_cmpxchg instead of
+atomic_long_cmpxchg (*ptr, old, new) == old in __sbitmap_queue_get_batch
+and atomic_try_cmpxchg instead of atomic_cmpxchg (*ptr, old, new) == old
+in __sbq_wake_up. x86 CMPXCHG instruction returns success in ZF flag, so
+this change saves a compare after cmpxchg (and related move instruction
+in front of cmpxchg).
 
-Applied, thanks!
+Also, atomic_long_cmpxchg implicitly assigns old *ptr value to "old"
+when cmpxchg fails, enabling further code simplifications.
 
-[1/1] sbitmap: fix possible io hung due to lost wakeup
-      commit: 040b83fcecfb86f3225d3a5de7fd9b3fbccf83b4
+No functional change intended.
 
-Best regards,
+Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+---
+ lib/sbitmap.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 29eb0484215a..32392e65b98f 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -534,16 +534,16 @@ unsigned long __sbitmap_queue_get_batch(struct sbitmap_queue *sbq, int nr_tags,
+ 		if (nr + nr_tags <= map_depth) {
+ 			atomic_long_t *ptr = (atomic_long_t *) &map->word;
+ 			int map_tags = min_t(int, nr_tags, map_depth);
+-			unsigned long val, ret;
++			unsigned long val;
+ 
+ 			get_mask = ((1UL << map_tags) - 1) << nr;
++			val = READ_ONCE(map->word);
+ 			do {
+-				val = READ_ONCE(map->word);
+ 				if ((val & ~get_mask) != val)
+ 					goto next;
+-				ret = atomic_long_cmpxchg(ptr, val, get_mask | val);
+-			} while (ret != val);
+-			get_mask = (get_mask & ~ret) >> nr;
++			} while (!atomic_long_try_cmpxchg(ptr, &val,
++							  get_mask | val));
++			get_mask = (get_mask & ~val) >> nr;
+ 			if (get_mask) {
+ 				*offset = nr + (index << sb->shift);
+ 				update_alloc_hint_after_get(sb, depth, hint,
+@@ -612,8 +612,6 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 
+ 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+ 	if (wait_cnt <= 0) {
+-		int ret;
+-
+ 		wake_batch = READ_ONCE(sbq->wake_batch);
+ 
+ 		/*
+@@ -628,8 +626,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 		 * atomic_cmpxhcg() race should call this function again
+ 		 * to wakeup a new batch on a different 'ws'.
+ 		 */
+-		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+-		if (ret == wait_cnt) {
++		if (atomic_try_cmpxchg(&ws->wait_cnt, &wait_cnt, wake_batch)) {
+ 			sbq_index_atomic_inc(&sbq->wake_index);
+ 			wake_up_nr(&ws->wait, wake_batch);
+ 			return false;
 -- 
-Jens Axboe
-
+2.37.1
 
