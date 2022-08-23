@@ -2,264 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCCFC32789
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 03:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05E0C28D13
+	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 03:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240021AbiHWDUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Aug 2022 23:20:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46526 "EHLO
+        id S239213AbiHWDWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Aug 2022 23:22:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239954AbiHWDUH (ORCPT
+        with ESMTP id S240044AbiHWDWT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Aug 2022 23:20:07 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6380B4CA0B;
-        Mon, 22 Aug 2022 20:20:06 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MBZF26MxDzKwQj;
-        Tue, 23 Aug 2022 11:18:30 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP1 (Coremail) with SMTP id cCh0CgDXkO1fRwRj66O+Ag--.4888S8;
-        Tue, 23 Aug 2022 11:20:04 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     axboe@kernel.dk, tj@kernel.org, ming.lei@redhat.com,
-        mkoutny@suse.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v8 4/4] blk-throttle: fix io hung due to configuration updates
-Date:   Tue, 23 Aug 2022 11:31:30 +0800
-Message-Id: <20220823033130.874230-5-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220823033130.874230-1-yukuai1@huaweicloud.com>
-References: <20220823033130.874230-1-yukuai1@huaweicloud.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgDXkO1fRwRj66O+Ag--.4888S8
-X-Coremail-Antispam: 1UD129KBjvJXoW3GFyDGr1DGFyDWr48GrWktFb_yoWxtry8pF
-        WFkrs0qw45Xan7KFZxC3Z0yay0qws7Jry3J3y7Gr15AF1YkryktFn8ZrWYyay8AF97uFWI
-        vw1qgF9xCF42vrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUPY14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-        kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-        14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-        kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-        wI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-        4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUQSdkU
-        UUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+        Mon, 22 Aug 2022 23:22:19 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269BE50718
+        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 20:22:16 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id s3-20020a17090a2f0300b001facfc6fdbcso12651775pjd.1
+        for <linux-block@vger.kernel.org>; Mon, 22 Aug 2022 20:22:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dilger-ca.20210112.gappssmtp.com; s=20210112;
+        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
+         :from:from:to:cc;
+        bh=t5TO7xdQGMXaC5TRTQFcqhFSnLRjgf1D8C0Y6A6YDxE=;
+        b=WmzvvmXH5e7wP/UE3SOCEoTxUnalykJ3N3TkckdsZzxqPN6OxAvOMEhsFJIg72/pec
+         dV+HIGE92uLWsaavfgjKM+C+A5n4EiV88XdKFsoxydVAFe5nmQZ3wXK7pbUiZnpPSViH
+         9wcRuFbEeMk6CuUC5TU2Fsvnjo++S7A79RBLzB6Aur+2C1mdRPNWR6V9hkWGd33kuaZ6
+         xcCba0irYI0fzWODf7B+oUYh3cw5uD53qZpQUEbxAvY5/4dbEDBWYTz1DS09LYro3uwm
+         G9+kpUhWzIhcfbKMcEQU1XlfvHYa+Duf15Pq6vyDet2odUshI95kkV9niiVxvoEj4EEl
+         OWIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:to:cc:in-reply-to:date:subject:mime-version:message-id
+         :from:x-gm-message-state:from:to:cc;
+        bh=t5TO7xdQGMXaC5TRTQFcqhFSnLRjgf1D8C0Y6A6YDxE=;
+        b=K+DPfO0gpjfsEyRK2GXp3u2vGQ9bfaJYIa58SoHLKwh2PlXbdvxEeWmgu3vEyfTL4v
+         MppYK2xwOv3SL4+hPBrW5I4MC4ZdXLfbaaEJ+LSPzReNBeH4slkw2lVSmWDqPIK9GfLt
+         n5vunxtG58Thbog0lquFHcvp82wuSS8Wa1MI2YZCbm/d3tEb6zRGyGmZtNyBshNbqe70
+         VjU53E+w5cOXsn2id553ZWKyfvkfnhRbxeCpJ8Mx3CkSjP5gfOisNEhs1x08N4JBkTyw
+         i41ktlYh3ds4UgY8j5Z/QIeWa9AlStHx9YowxaGXE2qRcvjaYIQ9F4RnoIIn+A9d8W9E
+         SnSw==
+X-Gm-Message-State: ACgBeo03EjctjAssWaQEVLiJKAaqvevaso7bAMWFe4oCZGI68i+iARTP
+        Q68r+W6gOhpRNc1Nf0hIhYxLuA==
+X-Google-Smtp-Source: AA6agR6bYAoLnjuq/NI/816MPUccS4/TdIQzRNkgRVQfsY/JSoRbcW6B7pyoAJACabZ0K9rJNxD0pA==
+X-Received: by 2002:a17:903:18b:b0:16e:f09c:919b with SMTP id z11-20020a170903018b00b0016ef09c919bmr23613380plg.135.1661224935485;
+        Mon, 22 Aug 2022 20:22:15 -0700 (PDT)
+Received: from cabot.adilger.int (S01061cabc081bf83.cg.shawcable.net. [70.77.221.9])
+        by smtp.gmail.com with ESMTPSA id b9-20020a1709027e0900b00172d52b7c03sm5372011plm.125.2022.08.22.20.22.14
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Aug 2022 20:22:14 -0700 (PDT)
+From:   Andreas Dilger <adilger@dilger.ca>
+Message-Id: <21923F1E-1C54-44FB-AF7C-4CD8B4B35433@dilger.ca>
+Content-Type: multipart/signed;
+ boundary="Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+Subject: Re: [PATCH v4 6/9] f2fs: don't allow DIO reads but not DIO writes
+Date:   Mon, 22 Aug 2022 21:22:11 -0600
+In-Reply-To: <YwAYPFxW7VV4M9D1@sol.localdomain>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        xfs <linux-xfs@vger.kernel.org>, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+References: <20220722071228.146690-1-ebiggers@kernel.org>
+ <20220722071228.146690-7-ebiggers@kernel.org> <YtyoF89iOg8gs7hj@google.com>
+ <Yt7dCcG0ns85QqJe@sol.localdomain> <YuXyKh8Zvr56rR4R@google.com>
+ <YvrrEcw4E+rpDLwM@sol.localdomain>
+ <20220816090312.GU3600936@dread.disaster.area>
+ <D1CDACE3-EC7E-43E4-8F49-EEA2B6E71A41@dilger.ca>
+ <YwAYPFxW7VV4M9D1@sol.localdomain>
+X-Mailer: Apple Mail (2.3273)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
 
-If new configuration is submitted while a bio is throttled, then new
-waiting time is recalculated regardless that the bio might already wait
-for some time:
+--Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-tg_conf_updated
- throtl_start_new_slice
-  tg_update_disptime
-  throtl_schedule_next_dispatch
+On Aug 19, 2022, at 5:09 PM, Eric Biggers <ebiggers@kernel.org> wrote:
+>=20
+> On Tue, Aug 16, 2022 at 10:42:29AM -0600, Andreas Dilger wrote:
+>>=20
+>> IMHO, this whole discussion is putting the cart before the horse.
+>> Changing existing (and useful) IO behavior to accommodate an API that
+>> nobody has ever used, and is unlikely to even be widely used, doesn't
+>> make sense to me.  Most applications won't check or care about the =
+new
+>> DIO size fields, since they've lived this long without statx() =
+returning
+>> this info, and will just pick a "large enough" size (4KB, 1MB, =
+whatever)
+>> that gives them the performance they need.  They *WILL* care if the =
+app
+>> is suddenly unable to read data from a file in ways that have worked =
+for
+>> a long time.
+>>=20
+>> Even if apps are modified to check these new DIO size fields, and =
+then
+>> try to DIO write to a file in f2fs that doesn't allow it, then f2fs =
+will
+>> return an error, which is what it would have done without the statx()
+>> changes, so no harm done AFAICS.
+>>=20
+>> Even with a more-complex DIO status return that handles a "direction"
+>> field (which IMHO is needlessly complex), there is always the =
+potential
+>> for a TOCTOU race where a file changes between checking and access, =
+so
+>> the userspace code would need to handle this.
+>=20
+> I'm having trouble making sense of your argument here; you seem to be =
+saying
+> that STATX_DIOALIGN isn't useful, so it doesn't matter if we design it
+> correctly?  That line of reasoning is concerning, as it's certainly =
+intended
+> to be useful, and if it's not useful there's no point in adding it.
+>=20
+> Are there any specific concerns that you have, besides TOCTOU races =
+and the
+> lack of support for read-only DIO?
 
-Then io hung can be triggered by always submmiting new configuration
-before the throttled bio is dispatched.
+My main concern is disabling useful functionality that exists today to =
+appease
+the new DIO size API.  Whether STATX_DIOALIGN will become widely used by
+applications or not is hard to say at this point.
 
-Fix the problem by respecting the time that throttled bio already waited.
-In order to do that, add new fields to record how many bytes/io are
-waited, and use it to calculate wait time for throttled bio under new
-configuration.
+If there were separate STATX_DIOREAD and STATX_DIOWRITE flags in the =
+returned
+data, and the alignment is provided as it is today, that would be enough =
+IMHO
+to address the original use case without significant complexity.
 
-Some simple test:
-1)
-cd /sys/fs/cgroup/blkio/
-echo $$ > cgroup.procs
-echo "8:0 2048" > blkio.throttle.write_bps_device
-{
-        sleep 2
-        echo "8:0 1024" > blkio.throttle.write_bps_device
-} &
-dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
+> I don't think that TOCTOU races are a real concern here.  Generally =
+DIO
+> constraints would only change if the application doing DIO =
+intentionally does
+> something to the file, or if there are changes that involve the =
+filesystem
+> being taken offline, e.g. the filesystem being mounted with =
+significantly
+> different options or being moved to a different block device.  And, =
+well,
+> everything else in stat()/statx() is subject to TOCTOU as well, but is =
+still
+> used...
 
-2)
-cd /sys/fs/cgroup/blkio/
-echo $$ > cgroup.procs
-echo "8:0 1024" > blkio.throttle.write_bps_device
-{
-        sleep 4
-        echo "8:0 2048" > blkio.throttle.write_bps_device
-} &
-dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
+I was thinking of background filesystem operations like compression, LVM
+migration to new storage with a different sector size, etc. that may =
+change
+the DIO characteristics of the file even while it is open.  Not that I =
+think
+this will happen frequently, but it is possible, and applications =
+shouldn't
+explode if the DIO parameters change and they get an error.
 
-test results: io finish time
-	before this patch	with this patch
-1)	10s			6s
-2)	8s			6s
+Cheers, Andreas
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 58 +++++++++++++++++++++++++++++++++++++++-----
- block/blk-throttle.h |  9 +++++++
- 2 files changed, 61 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 757b620f0f2d..679e08c0714c 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -639,6 +639,8 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- {
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
-+	tg->carryover_bytes[rw] = 0;
-+	tg->carryover_ios[rw] = 0;
- 
- 	/*
- 	 * Previous slice has expired. We must have trimmed it after last
-@@ -656,12 +658,17 @@ static inline void throtl_start_new_slice_with_credit(struct throtl_grp *tg,
- 		   tg->slice_end[rw], jiffies);
- }
- 
--static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw)
-+static inline void throtl_start_new_slice(struct throtl_grp *tg, bool rw,
-+					  bool clear_carryover)
- {
- 	tg->bytes_disp[rw] = 0;
- 	tg->io_disp[rw] = 0;
- 	tg->slice_start[rw] = jiffies;
- 	tg->slice_end[rw] = jiffies + tg->td->throtl_slice;
-+	if (clear_carryover) {
-+		tg->carryover_bytes[rw] = 0;
-+		tg->carryover_ios[rw] = 0;
-+	}
- 
- 	throtl_log(&tg->service_queue,
- 		   "[%c] new slice start=%lu end=%lu jiffies=%lu",
-@@ -783,6 +790,41 @@ static u64 calculate_bytes_allowed(u64 bps_limit, unsigned long jiffy_elapsed)
- 	return mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed, (u64)HZ);
- }
- 
-+static void __tg_update_carryover(struct throtl_grp *tg, bool rw)
-+{
-+	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
-+	u64 bps_limit = tg_bps_limit(tg, rw);
-+	u32 iops_limit = tg_iops_limit(tg, rw);
-+
-+	/*
-+	 * If config is updated while bios are still throttled, calculate and
-+	 * accumulate how many bytes/ios are waited across changes. And
-+	 * carryover_bytes/ios will be used to calculate new wait time under new
-+	 * configuration.
-+	 */
-+	if (bps_limit != U64_MAX)
-+		tg->carryover_bytes[rw] +=
-+			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
-+			tg->bytes_disp[rw];
-+	if (iops_limit != UINT_MAX)
-+		tg->carryover_ios[rw] +=
-+			calculate_io_allowed(iops_limit, jiffy_elapsed) -
-+			tg->io_disp[rw];
-+}
-+
-+static void tg_update_carryover(struct throtl_grp *tg)
-+{
-+	if (tg->service_queue.nr_queued[READ])
-+		__tg_update_carryover(tg, READ);
-+	if (tg->service_queue.nr_queued[WRITE])
-+		__tg_update_carryover(tg, WRITE);
-+
-+	/* see comments in struct throtl_grp for meaning of these fields. */
-+	throtl_log(&tg->service_queue, "%s: %llu %llu %u %u\n", __func__,
-+		   tg->carryover_bytes[READ], tg->carryover_bytes[WRITE],
-+		   tg->carryover_ios[READ], tg->carryover_ios[WRITE]);
-+}
-+
- static bool tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 				 u32 iops_limit, unsigned long *wait)
- {
-@@ -800,7 +842,8 @@ static bool tg_within_iops_limit(struct throtl_grp *tg, struct bio *bio,
- 
- 	/* Round up to the next throttle slice, wait time must be nonzero */
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
--	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
-+	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
-+		     tg->carryover_ios[rw];
- 	if (tg->io_disp[rw] + 1 <= io_allowed) {
- 		if (wait)
- 			*wait = 0;
-@@ -837,7 +880,8 @@ static bool tg_within_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 		jiffy_elapsed_rnd = tg->td->throtl_slice;
- 
- 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
--	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
-+	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
-+			tg->carryover_bytes[rw];
- 	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
- 		if (wait)
- 			*wait = 0;
-@@ -898,7 +942,7 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
- 	 * slice and it should be extended instead.
- 	 */
- 	if (throtl_slice_used(tg, rw) && !(tg->service_queue.nr_queued[rw]))
--		throtl_start_new_slice(tg, rw);
-+		throtl_start_new_slice(tg, rw, true);
- 	else {
- 		if (time_before(tg->slice_end[rw],
- 		    jiffies + tg->td->throtl_slice))
-@@ -1332,8 +1376,8 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	 * that a group's limit are dropped suddenly and we don't want to
- 	 * account recently dispatched IO with new low rate.
- 	 */
--	throtl_start_new_slice(tg, READ);
--	throtl_start_new_slice(tg, WRITE);
-+	throtl_start_new_slice(tg, READ, false);
-+	throtl_start_new_slice(tg, WRITE, false);
- 
- 	if (tg->flags & THROTL_TG_PENDING) {
- 		tg_update_disptime(tg);
-@@ -1361,6 +1405,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 		v = U64_MAX;
- 
- 	tg = blkg_to_tg(ctx.blkg);
-+	tg_update_carryover(tg);
- 
- 	if (is_u64)
- 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
-@@ -1547,6 +1592,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 		return ret;
- 
- 	tg = blkg_to_tg(ctx.blkg);
-+	tg_update_carryover(tg);
- 
- 	v[0] = tg->bps_conf[READ][index];
- 	v[1] = tg->bps_conf[WRITE][index];
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index 45c6f3c1dfe0..a25e9e356d17 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -121,6 +121,15 @@ struct throtl_grp {
- 	uint64_t last_bytes_disp[2];
- 	unsigned int last_io_disp[2];
- 
-+	/*
-+	 * The following two fields are updated when new configuration is
-+	 * submitted while some bios are still throttled, they record how many
-+	 * bytes/ios are waited already in previous configuration, and they will
-+	 * be used to calculate wait time under new configuration.
-+	 */
-+	uint64_t carryover_bytes[2];
-+	unsigned int carryover_ios[2];
-+
- 	unsigned long last_check_time;
- 
- 	unsigned long latency_target; /* us */
--- 
-2.31.1
 
+
+
+
+--Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAmMER+MACgkQcqXauRfM
+H+D5gBAAjf5qhCdnFlyRgIkdcPs1zELiCu4+Jw0PH5rkavcu3tVPwEBTCbHxXVMN
+6ZsFra7ARjxxj58mUSEtN9NDHwpiQreGlgqDoP+uYYb3EwiFZstja2fl0mTAytE5
+lMb8zBxkfCh8xexTnnVk7ULsOrTO+/xYTUbmRIqQvK6PTicVuO6H8FtzYFHjilnn
+/RZ8yRCndDsFmRpZCApwy26cPcP3UyrtUqz8rKk1iy5oBIC1ALvx8baYjY/Wi7Fs
+vMq1ExdKsjPPVQT5dmj1ISPRXpxTGezKhqvxNvbR/IMwKW2PzEMZzClRQnYKuWe5
+GBu6zW0mWe5l+Bg1amzve/WteBX/5i6rrkknoD58zBL8SL4LDh+uQGaM2q7EzegR
+lEc1/IpOtR1WrfmP+tOqEIfdwa4jMikNm4NKHYoQA2OQcxEzmYgtBHeeVbGOFCEq
+PRKVZbxxF2bVFWuBVbsSbAar9o6G6Ucm11LBDHkKEpn8RTqN/UeXBrcslIk9NczK
+2qtnn0jbek1OgtMEpGaajobjeqBqQUIC6/cUkU0S7Ga1LsV7D8eH5TV9EF3rWwLe
+0MJ2IWgAmbMDp7gYNVZYrsJJMrqcjphRO33u2JvwFisboKU1DD4qtfnG1vvF8u1n
+RHpWdRBE/l0VC15dWox4zVKfVgH52rkeKE8ZVkTj83NDSIidz94=
+=WmyJ
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_8E3621BA-8A02-4654-8DC0-856F43CB7C0C--
