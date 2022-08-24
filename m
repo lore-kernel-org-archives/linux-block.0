@@ -2,135 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44968C00140
-	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 17:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 715D3C00140
+	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 19:31:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240197AbiHXRch (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Aug 2022 13:32:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40302 "EHLO
+        id S238359AbiHXTbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Aug 2022 15:31:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240198AbiHXRcc (ORCPT
+        with ESMTP id S239966AbiHXTa1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Aug 2022 13:32:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7197E00F
-        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 10:32:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661362349;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3SxvzmbfXBys/uUI/1Xzbbd4NhELb1JncuSp2gy3f7o=;
-        b=TbQmE22VgbBJBdfv4hRlF+eYX6aPE0dV+JDBTC0dM3adXN2Elpw7eKs2ty/67xrPhei0pe
-        ApHQW+cKN+mh4C8E8ekjhk8K0TDqhfmscnUOYQyb/o1qTbR4VfSi5HCQey9LMpfsrFgds1
-        9MwJ/8wEp/CORQka+xwIyStay/KsFr4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-4ATjl8YdPNSzaGtmbrR8pQ-1; Wed, 24 Aug 2022 13:32:28 -0400
-X-MC-Unique: 4ATjl8YdPNSzaGtmbrR8pQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 24 Aug 2022 15:30:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE946CF52
+        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 12:30:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB66E18812C0;
-        Wed, 24 Aug 2022 17:32:27 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.66])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 40BFB40CF8EF;
-        Wed, 24 Aug 2022 17:32:26 +0000 (UTC)
-Date:   Wed, 24 Aug 2022 13:32:25 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Kim Suwan <suwan.kim027@gmail.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        acourbot@chromium.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] virtio-blk: Fix WARN_ON_ONCE in virtio_queue_rq()
-Message-ID: <YwZgqf5kMqKHwcxR@fedora>
-References: <20220823145005.26356-1-suwan.kim027@gmail.com>
- <YwU/EVxT0a6q2BfD@fedora>
- <CAFNWusaXc3H78kx1wxUDLht3PuV0A_VxvdmmY-yMJNefvih-1Q@mail.gmail.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C759E617D1
+        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 19:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0964C433D6;
+        Wed, 24 Aug 2022 19:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661369425;
+        bh=EjEkceTcDMRPq7SE+IFmrDf/ElAQgezgcCxdFFNM18c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Fj+mI9u25lE9Qu+YzLrLkc+rwBnXKNnfuVktUXSR6oB2aWW/uN6Jxr/uQpNyoep4i
+         7+wloadK2fYAKfUSOGRuQBPc+Fje8TLwj375DgToUp6oSlHVH+dMu5npnSvo532vIM
+         sOEQmoJxwrWvzIbjh8H8pq8Dz7BGuxC9mmIa0gqADDAmhx6wNP5QrMOOL4KYJQ5TLJ
+         7Pww2i2I6TBJzvuvIY6spOFLxMDQbepWKWf2ZRe6FVoJUg5Yr9mHiuMNYPW8Ly9NQt
+         8Alp5Gz2xd8dLLXRGJKl7sTIv0Q2mFYPPAHwWOi4YHPCPqTdvB+JWrjtzVIXQJx8wy
+         5es2/4bg75dtw==
+Date:   Wed, 24 Aug 2022 13:30:22 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Keith Busch <kbusch@fb.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] sbitmap: fix batched wait_cnt accounting
+Message-ID: <YwZ8Tgz/UE6mkbC1@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220824170023.3241858-1-kbusch@fb.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="wZ49M233+TjXIU1/"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFNWusaXc3H78kx1wxUDLht3PuV0A_VxvdmmY-yMJNefvih-1Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+In-Reply-To: <20220824170023.3241858-1-kbusch@fb.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Aug 24, 2022 at 10:00:23AM -0700, Keith Busch wrote:
+> +static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
+>  {
+>  	struct sbq_wait_state *ws;
+> -	unsigned int wake_batch;
+> -	int wait_cnt;
+> +	int wake_batch, wait_cnt, sub;
+>  
+>  	ws = sbq_wake_ptr(sbq);
+> -	if (!ws)
+> +	if (!ws || !(*nr))
+>  		return false;
+>  
+> -	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+> +	wake_batch = READ_ONCE(sbq->wake_batch);
+> +	sub = min3(wake_batch, *nr, atomic_read(&ws->wait_cnt));
+> +	wait_cnt = atomic_sub_return(sub, &ws->wait_cnt);
+> +	*nr -= sub;
+> +
+>  	/*
+>  	 * For concurrent callers of this, callers should call this function
+>  	 * again to wakeup a new batch on a different 'ws'.
 
---wZ49M233+TjXIU1/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'll need to send a new version. The code expects 'wait_cnt' to be 0 in order
+to wake up waiters, but if two batched completions have different amounts of
+cleared bits, one thread may see > 0, the other may see < 0, and no one will
+make progress. 
 
-On Wed, Aug 24, 2022 at 10:16:10PM +0900, Kim Suwan wrote:
-> Hi Stefan,
->=20
-> On Wed, Aug 24, 2022 at 5:56 AM Stefan Hajnoczi <stefanha@redhat.com> wro=
-te:
-> >
-> > On Tue, Aug 23, 2022 at 11:50:05PM +0900, Suwan Kim wrote:
-> > > @@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_b=
-lk_vq *vq,
-> > >                       virtblk_unmap_data(req, vbr);
-> > >                       virtblk_cleanup_cmd(req);
-> > >                       rq_list_add(requeue_list, req);
-> > > +             } else {
-> > > +                     blk_mq_start_request(req);
-> > >               }
-> >
-> > The device may see new requests as soon as virtblk_add_req() is called
-> > above. Therefore the device may complete the request before
-> > blk_mq_start_request() is called.
-> >
-> > rq->io_start_time_ns =3D ktime_get_ns() will be after the request was
-> > actually submitted.
-> >
-> > I think blk_mq_start_request() needs to be called before
-> > virtblk_add_req().
-> >
->=20
-> But if blk_mq_start_request() is called before virtblk_add_req()
-> and virtblk_add_req() fails, it can trigger WARN_ON_ONCE() at
-> virtio_queue_rq().
->=20
-> With regard to the race condition between virtblk_add_req() and
-> completion, I think that the race condition can not happen because
-> virtblk_add_req() holds vq lock with irq saving and completion side
-> (virtblk_done, virtblk_poll) need to acquire the vq lock also.
-> Moreover, virtblk_done() is irq context so I think it can not be
-> executed until virtblk_add_req() releases the lock.
-
-I agree there is no race condition regarding the ordering of
-blk_mq_start_request() and request completion. The spinlock prevents
-that and I wasn't concerned about that part.
-
-The issue is that the timestamp will be garbage. If we capture the
-timestamp during/after the request is executing, then the collected
-statistics will be wrong.
-
-Can you look for another solution that doesn't break the timestamp?
-
-FWIW I see that the rq->state state machine allows returning to the idle
-state once the request has been started: __blk_mq_requeue_request().
-
-Stefan
-
---wZ49M233+TjXIU1/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMGYKkACgkQnKSrs4Gr
-c8hF+gf6AhXhzLB6TCjRg/U/ved3Yj0e/lR75NkPlvmJiGu3ncW3AU01UY5hFNoO
-9S2+RbCGhGSNji8n8Rqu4OxDAZaRgYJ1USCDhZs4HF+lNU/IHTUYoge29pcqyCoW
-PI6bWLpY0luidnMqxKlcLsAExsl7u+vlxUOBGxlgvgKEP1V3HHCs8/spBiMEJRUJ
-Kp1xxPWP439HxTZm1BSDFwXx+aWakWDEXzF8qPBu9hvyhDtVjCaedWXDjKQPqxHh
-xvmd+n9qLMkOQyp8s8z1CUP/hbH2p7fXQB6F5YI0G2HMfrSfWbN2MrmeRB4g/ZD3
-Frb0ABhrgQnbuVDLB/nsaM/ewyYzjQ==
-=S6B9
------END PGP SIGNATURE-----
-
---wZ49M233+TjXIU1/--
-
+I think we may need to do atomic_dec_return() in a loop so that a completer is
+guaranteed to eventually see '0'.
