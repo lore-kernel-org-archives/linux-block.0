@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E60A0C00140
-	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 05:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B00C32792
+	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 05:49:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232570AbiHXFtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Aug 2022 01:49:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46482 "EHLO
+        id S233648AbiHXFtE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Aug 2022 01:49:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233212AbiHXFs7 (ORCPT
+        with ESMTP id S233212AbiHXFtD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Aug 2022 01:48:59 -0400
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36856861D0;
-        Tue, 23 Aug 2022 22:48:54 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R621e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VN5zTYO_1661320119;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VN5zTYO_1661320119)
+        Wed, 24 Aug 2022 01:49:03 -0400
+Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58E8F8689D;
+        Tue, 23 Aug 2022 22:48:56 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VN5zTeA_1661320133;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VN5zTeA_1661320133)
           by smtp.aliyun-inc.com;
-          Wed, 24 Aug 2022 13:48:52 +0800
+          Wed, 24 Aug 2022 13:48:53 +0800
 From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 To:     ming.lei@redhat.com, axboe@kernel.dk
 Cc:     xiaoguang.wang@linux.alibaba.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, joseph.qi@linux.alibaba.com,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [RFC PATCH 1/9] ublk_drv: check 'current' instead of 'ubq_daemon'
-Date:   Wed, 24 Aug 2022 13:47:36 +0800
-Message-Id: <20220824054744.77812-2-ZiyangZhang@linux.alibaba.com>
+Subject: [RFC PATCH 3/9] ublk_drv: add a helper to get ioucmd from pdu
+Date:   Wed, 24 Aug 2022 13:47:38 +0800
+Message-Id: <20220824054744.77812-4-ZiyangZhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220824054744.77812-1-ZiyangZhang@linux.alibaba.com>
 References: <20220824054744.77812-1-ZiyangZhang@linux.alibaba.com>
@@ -36,47 +36,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This check is not atomic. So with recovery feature, ubq_daemon may be
-updated simultaneously by recovery task. Instead, check 'current' is
-safe here because 'current' never changes.
-
-Also add comment explaining this check, which is really important for
-understanding recovery feature.
+We store pointer of task_work in pdu. And we should get ioucmd from pdu
+since we prepare to only pass ioucmd to task_work function.
 
 Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 ---
- drivers/block/ublk_drv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/block/ublk_drv.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 6a4a94b4cdf4..c39b67d7133d 100644
+index e08f636b0b9d..8add6e3ae15f 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -645,14 +645,22 @@ static inline void __ublk_rq_task_work(struct request *req)
- 	struct ublk_device *ub = ubq->dev;
- 	int tag = req->tag;
- 	struct ublk_io *io = &ubq->ios[tag];
--	bool task_exiting = current != ubq->ubq_daemon || ubq_daemon_is_dying(ubq);
- 	unsigned int mapped_bytes;
+@@ -555,6 +555,12 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
+ 	return (struct ublk_uring_cmd_pdu *)&ioucmd->pdu;
+ }
  
- 	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
- 			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
- 			ublk_get_iod(ubq, req->tag)->addr);
- 
--	if (unlikely(task_exiting)) {
-+	/*
-+	 * Task is exiting if either:
-+	 *
-+	 * (1) current != ubq_daemon.
-+	 * io_uring_cmd_complete_in_task() tries to run task_work
-+	 * in a workqueue if ubq_daemon(cmd's task) is PF_EXITING.
-+	 *
-+	 * (2) current->flags & PF_EXITING.
-+	 */
-+	if (unlikely(current != ubq->ubq_daemon || current->flags & PF_EXITING)) {
- 		blk_mq_end_request(req, BLK_STS_IOERR);
- 		mod_delayed_work(system_wq, &ub->monitor_work, 0);
- 		return;
++static inline struct io_uring_cmd *ublk_uring_cmd_from_pdu(
++			struct ublk_uring_cmd_pdu *pdu)
++{
++	return container_of((u8 *)pdu, struct io_uring_cmd, pdu[0]);
++}
++
+ static inline bool ubq_daemon_is_dying(struct ublk_queue *ubq)
+ {
+ 	return ubq->ubq_daemon->flags & PF_EXITING;
 -- 
 2.27.0
 
