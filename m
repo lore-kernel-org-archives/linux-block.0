@@ -2,97 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5377C00140
-	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 12:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B90C00140
+	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 13:16:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235183AbiHXMxt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Aug 2022 08:53:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53550 "EHLO
+        id S236232AbiHXNQY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Aug 2022 09:16:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235661AbiHXMxj (ORCPT
+        with ESMTP id S235253AbiHXNQY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Aug 2022 08:53:39 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E7796760
-        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 05:53:38 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id c2so15602747plo.3
-        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 05:53:38 -0700 (PDT)
+        Wed, 24 Aug 2022 09:16:24 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D083DBF3
+        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 06:16:22 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id z2so22020844edc.1
+        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 06:16:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=4x7rCbb98jj2MaSBdFm3SDEQp0i7SVqT+8rNiIgDvNQ=;
-        b=rciuwxHpu+evpljQNfKJs+0b1dm0bOGf5k6J4GfJ8Ob2IKOQQrElCqhhYKDsCIIjl0
-         h/tsTCQrEI6c4+WjnVOEhYSt42CA9ky8fTpdqnMSizqPvWuwMgXbMsOEBN4/qbQ5RJ6K
-         WKaHxejxgDk5o0x3wvahIeAo8FdrxqQc9IaGT9ncDJC+6ufUu5Q2rEDXvBfUlqiTBvJo
-         d2S+WEo4OjaJci8aN0GrQupoKi9P9KbiR+J2DN64lO23y+D0bY08felAedr/11/FUTP7
-         AdQsPuCGg6OTPw1xE1ZDnbfobion26t++Hy4Ac9io7PbM52n6wfVNEb6NdubzgCenD4t
-         jgQA==
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=9ZX9mHa+dW5Pscz7wJSd23y4ej0zn7AgqqZBm8xZJt8=;
+        b=N85N8ZzwgHkgBU3m7+EkiqII0fNvqxLV9Xe9YnV06PK820xql4WKoRnpVpM4s0r8c9
+         GXrNIN9iAJ5WWlldUjYBSfmfIWpscyA6tfoaeRtIDHhvF9bS20mulAb3acOKHF4eN0uE
+         7Kviq+cxFGDpgMwaV1aUH3eT0OHr5Sy/zjtNx045WAMi8879dIzzVSwzRHuXKFBVVakI
+         TLUWECzqOMEWEBujMP9GVOZjIOwxjaxAr2MJb+dAUjjCi4XKii16cKz+4ABfdEQF30+r
+         Pb9sa1J6dGIWN5mSdkBlXMRAda9X8FdPP/mNQ0sXYCoKSJaNXU4QJvD7URpsNIUc6lvX
+         /O6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=4x7rCbb98jj2MaSBdFm3SDEQp0i7SVqT+8rNiIgDvNQ=;
-        b=LJduDCts7zFOSbY5Gyc+evjeK45r1DqIyUFdx4OT2Menc1oOEz2rlp/Gm97Bet4Smx
-         erhitmVqXr7++GEAywsXjdxF8i4TsuHVrlNiZYbJcXKmk/z6VrHAML1i8ZD8I3/ZJmJe
-         FISlhc4ytt8Kejodgcw698oTypWw6r77fByvYJIMQjJQSNcZDt7RbXO4gmjR1lVEBuAx
-         wWGC6rF68gLHmrIt44AxH7/lFCNk3BZOZCXCqniSMQe31rgTyo+aMeLGykmWWbpUkKzi
-         RId3HJUpk2KoMOfwO0RdwFpb0GCH7zSnhVGB4KzCNEL8qVHpHHVg2MOGkXs2lNXL0+3m
-         pbBg==
-X-Gm-Message-State: ACgBeo3Beh8rzvPC138MzZXIUMDAFTs4VNCA5lVdiSxp3DkJRQUYKSrp
-        OootwxqZBOLQvKoPq0GNGoFUU4+g5cluBA==
-X-Google-Smtp-Source: AA6agR77A1nkMFGgKB89xERjp52vEWHB5SOhbqG7h6vi9MrZLvKLm1L+Fj0SrOLng6jFSwdPvfIbQA==
-X-Received: by 2002:a17:903:258e:b0:173:10fb:10d6 with SMTP id jb14-20020a170903258e00b0017310fb10d6mr4172092plb.67.1661345617755;
-        Wed, 24 Aug 2022 05:53:37 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s19-20020a635253000000b0040d75537824sm6722788pgl.86.2022.08.24.05.53.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Aug 2022 05:53:37 -0700 (PDT)
-Message-ID: <202a2d80-5290-452e-db8e-3a0c10b79840@kernel.dk>
-Date:   Wed, 24 Aug 2022 06:53:35 -0600
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=9ZX9mHa+dW5Pscz7wJSd23y4ej0zn7AgqqZBm8xZJt8=;
+        b=ky/EciM6qjGxCllsIqiJ8c8mLUZSnBePsj6iLaGp5kohmt0rCpTMziZ4buQSvZxT0h
+         9De1ioPrb5feZOdBHJdIY6E5CDF7Qtse6qz0yjksyeIgAfh0V1m9BszkXCeHE1fovWfd
+         hhDRIF4wB9yQYxj0m1hX40PSXWO+tZXhEKI8k04GsYYh9Cqhd0uSFWQYiVqU6pv2Hbho
+         gNla+YDmMHhv3lx/l4LhduaQun8aWHrWvzEVoXBa2IBUY/CDSivwud4cLnFt7He44oh6
+         PbMd3cCd+0Dhr5EggoG88CEX88g6p/12RrelDG6JcQkZeuN/1Uufc6MC/CxtFe3eRm7j
+         mgMw==
+X-Gm-Message-State: ACgBeo205vcr/YIL90w6AL8T90iLCtPxcibZFVhAnQJRzOGi5lomQyH+
+        eA72rd9RyDzwZT3/FxdfagdSN5SJpm1j85T3KYE=
+X-Google-Smtp-Source: AA6agR6VpGoeYtKw+cpnENYsf80iXylonPbMe1Rs+RREAVNYP7P3zV1NA5CuiDauyO3V9xKRe72gL016OjFcgQivVgQ=
+X-Received: by 2002:a05:6402:320d:b0:446:bc66:5a6a with SMTP id
+ g13-20020a056402320d00b00446bc665a6amr7525398eda.326.1661346981258; Wed, 24
+ Aug 2022 06:16:21 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH v2] loop: Check for overflow while configuring loop
-Content-Language: en-US
-To:     Siddh Raman Pant <code@siddh.me>
-Cc:     linux-kernel-mentees 
-        <linux-kernel-mentees@lists.linuxfoundation.org>,
-        stable <stable@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        syzbot+a8e049cd3abd342936b6 
-        <syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com>
-References: <20220823160810.181275-1-code@siddh.me>
- <166127140632.124225.483036207879834754.b4-ty@kernel.dk>
- <182cee8e2a7.5a62eb4811173.7413734946973464259@siddh.me>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <182cee8e2a7.5a62eb4811173.7413734946973464259@siddh.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220823145005.26356-1-suwan.kim027@gmail.com> <YwU/EVxT0a6q2BfD@fedora>
+In-Reply-To: <YwU/EVxT0a6q2BfD@fedora>
+From:   Kim Suwan <suwan.kim027@gmail.com>
+Date:   Wed, 24 Aug 2022 22:16:10 +0900
+Message-ID: <CAFNWusaXc3H78kx1wxUDLht3PuV0A_VxvdmmY-yMJNefvih-1Q@mail.gmail.com>
+Subject: Re: [PATCH] virtio-blk: Fix WARN_ON_ONCE in virtio_queue_rq()
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        acourbot@chromium.org, linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/24/22 2:12 AM, Siddh Raman Pant wrote:
-> On Tue, 23 Aug 2022 21:46:46 +0530  Jens Axboe  wrote:
->> Applied, thanks!
->>
->> [1/1] loop: Check for overflow while configuring loop
->>       commit: f11ebc7347340d291ba032a3872e40d3283fc351
-> 
-> Thanks!
-> 
-> Though, it seems that you have used the mailing list's address
-> (linux-kernel-mentees@lists.linuxfoundation.org) in the author
-> field instead of the Signed-off email.
+Hi Stefan,
 
-Weird! I'll let Konstantin know about this one, I've manually
-fixed it up.
+On Wed, Aug 24, 2022 at 5:56 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> On Tue, Aug 23, 2022 at 11:50:05PM +0900, Suwan Kim wrote:
+> > @@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
+> >                       virtblk_unmap_data(req, vbr);
+> >                       virtblk_cleanup_cmd(req);
+> >                       rq_list_add(requeue_list, req);
+> > +             } else {
+> > +                     blk_mq_start_request(req);
+> >               }
+>
+> The device may see new requests as soon as virtblk_add_req() is called
+> above. Therefore the device may complete the request before
+> blk_mq_start_request() is called.
+>
+> rq->io_start_time_ns = ktime_get_ns() will be after the request was
+> actually submitted.
+>
+> I think blk_mq_start_request() needs to be called before
+> virtblk_add_req().
+>
 
--- 
-Jens Axboe
+But if blk_mq_start_request() is called before virtblk_add_req()
+and virtblk_add_req() fails, it can trigger WARN_ON_ONCE() at
+virtio_queue_rq().
 
+With regard to the race condition between virtblk_add_req() and
+completion, I think that the race condition can not happen because
+virtblk_add_req() holds vq lock with irq saving and completion side
+(virtblk_done, virtblk_poll) need to acquire the vq lock also.
+Moreover, virtblk_done() is irq context so I think it can not be
+executed until virtblk_add_req() releases the lock.
 
+Regards,
+Suwan Kim
