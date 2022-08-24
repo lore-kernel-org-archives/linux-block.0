@@ -2,74 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE3CC3F6B0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 08:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D705EC00140
+	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 11:37:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbiHXIMy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Aug 2022 04:12:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51708 "EHLO
+        id S234831AbiHXLhH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Aug 2022 07:37:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231207AbiHXIMw (ORCPT
+        with ESMTP id S229542AbiHXLhH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Aug 2022 04:12:52 -0400
-Received: from sender-of-o50.zoho.in (sender-of-o50.zoho.in [103.117.158.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99E685AB1;
-        Wed, 24 Aug 2022 01:12:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1661328756; cv=none; 
-        d=zohomail.in; s=zohoarc; 
-        b=DSlC6MNqXJEKuLWWv9hD5ReOtHPCoIIspX9WVJYwx76RtxpYjqB3NGMU3dedRU3CL1lSicqv3EZfUcnhQ1EJIyaNSME4Ri4EKFI9jmwB5/XzPNh0OL9ammAtpqD7c+41CFO2mL6ydJ8/IvNIpIRJHgo7BvTjDy/4c6AI/9+xwus=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-        t=1661328756; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=nxuDlBnh7rD26c84GHsAUGHCF7GK79bwk7nQ3eQxjyY=; 
-        b=eLZ9qpm4vxcJ0enFIjDW/CuyYqacaj3hvYJNWkUIU3lQ6Qmp2Snj7Q1uCQEVHyZaoLtKVXmJ+pb6dSbFJDou1TXhFrAQWVyQ65YIjaWtEQrf11pFVd8nEkcEa75iS3JIAgg8JmVKNe8q3sQ/4V6fxnRE8UyNxwJLN+MVlZbBbo8=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-        dkim=pass  header.i=siddh.me;
-        spf=pass  smtp.mailfrom=code@siddh.me;
-        dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1661328756;
-        s=zmail; d=siddh.me; i=code@siddh.me;
-        h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-        bh=nxuDlBnh7rD26c84GHsAUGHCF7GK79bwk7nQ3eQxjyY=;
-        b=QXUy31uj4dbboP+XiXGdXmL43R95UeAcwm0xOMj/EcZneZkZEKQG6FCsq/pMFLcU
-        mlWD6fj6JCJ9uOXfnN/r9w616HiOgvi2fB8VSl+IxO65Kzi7SB0N2+i5MmCFcs+wT+A
-        +zSVw/g3xbbuxu0s5eMM9Z9DXsRVvezkiOxewFWs=
-Received: from mail.zoho.in by mx.zoho.in
-        with SMTP id 1661328745149618.5620763655653; Wed, 24 Aug 2022 13:42:25 +0530 (IST)
-Date:   Wed, 24 Aug 2022 13:42:25 +0530
-From:   Siddh Raman Pant <code@siddh.me>
-To:     "Jens Axboe" <axboe@kernel.dk>
-Cc:     "linux-kernel-mentees" 
-        <linux-kernel-mentees@lists.linuxfoundation.org>,
-        "stable" <stable@vger.kernel.org>,
-        "linux-block" <linux-block@vger.kernel.org>,
-        "linux-kernel" <linux-kernel@vger.kernel.org>,
-        "syzbot+a8e049cd3abd342936b6" 
-        <syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com>
-Message-ID: <182cee8e2a7.5a62eb4811173.7413734946973464259@siddh.me>
-In-Reply-To: <166127140632.124225.483036207879834754.b4-ty@kernel.dk>
-References: <20220823160810.181275-1-code@siddh.me> <166127140632.124225.483036207879834754.b4-ty@kernel.dk>
-Subject: Re: [PATCH v2] loop: Check for overflow while configuring loop
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Importance: Medium
-User-Agent: Zoho Mail
-X-Mailer: Zoho Mail
+        Wed, 24 Aug 2022 07:37:07 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7042082779
+        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 04:37:01 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=gumi@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VN7OdNk_1661341013;
+Received: from nu1m11355.sqa.nu8.tbsite.net(mailfrom:gumi@linux.alibaba.com fp:SMTPD_---0VN7OdNk_1661341013)
+          by smtp.aliyun-inc.com;
+          Wed, 24 Aug 2022 19:36:59 +0800
+From:   Gu Mi <gumi@linux.alibaba.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Gu Mi <gumi@linux.alibaba.com>
+Subject: [PATCH] block: I/O error occurs during SATA disk stress test
+Date:   Wed, 24 Aug 2022 19:36:50 +0800
+Message-Id: <1661341010-80107-1-git-send-email-gumi@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 23 Aug 2022 21:46:46 +0530  Jens Axboe  wrote:
-> Applied, thanks!
-> 
-> [1/1] loop: Check for overflow while configuring loop
->       commit: f11ebc7347340d291ba032a3872e40d3283fc351
+The problem occurs in two async processes, One is when a new IO
+calls the blk_mq_start_request() interface to start sending,The other
+is that the block layer timer process calls the blk_mq_req_expired
+interface to check whether there is an IO timeout.
 
-Thanks!
+When an instruction out of sequence occurs between blk_add_timer
+and WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in the interface
+blk_mq_start_request,at this time, the block timer is checking the
+new IO timeout, Since the req status has been set to MQ_RQ_IN_FLIGHT
+and req->deadline is 0 at this time, the new IO will be misjudged as
+a timeout.
 
-Though, it seems that you have used the mailing list's address
-(linux-kernel-mentees@lists.linuxfoundation.org) in the author
-field instead of the Signed-off email.
+Our repair plan is for the deadline to be 0, and we do not think
+that a timeout occurs. At the same time, because the jiffies of the
+32-bit system will be reversed shortly after the system is turned on,
+we will add 1 jiffies to the deadline at this time.
 
-Thanks,
-Siddh
+Signed-off-by: Gu Mi <gumi@linux.alibaba.com>
+---
+ block/blk-mq.c      | 2 ++
+ block/blk-timeout.c | 4 ++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4b90d2d..6defaa1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1451,6 +1451,8 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+ 		return false;
+ 
+ 	deadline = READ_ONCE(rq->deadline);
++	if (unlikely(deadline == 0))
++		return false;
+ 	if (time_after_eq(jiffies, deadline))
+ 		return true;
+ 
+diff --git a/block/blk-timeout.c b/block/blk-timeout.c
+index 1b8de041..6fc5088 100644
+--- a/block/blk-timeout.c
++++ b/block/blk-timeout.c
+@@ -140,6 +140,10 @@ void blk_add_timer(struct request *req)
+ 	req->rq_flags &= ~RQF_TIMED_OUT;
+ 
+ 	expiry = jiffies + req->timeout;
++#ifndef CONFIG_64BIT
++/* In case INITIAL_JIFFIES wraps on 32-bit */
++	expiry |= 1UL;
++#endif
+ 	WRITE_ONCE(req->deadline, expiry);
+ 
+ 	/*
+-- 
+1.8.3.1
+
