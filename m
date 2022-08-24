@@ -2,95 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D14F1C00140
-	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 07:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE3CC3F6B0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 08:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233890AbiHXHwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Aug 2022 03:52:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33754 "EHLO
+        id S233212AbiHXIMy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Aug 2022 04:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231146AbiHXHwT (ORCPT
+        with ESMTP id S231207AbiHXIMw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Aug 2022 03:52:19 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4CAD7FF91;
-        Wed, 24 Aug 2022 00:52:17 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id y141so15736549pfb.7;
-        Wed, 24 Aug 2022 00:52:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=DJjiIOEQIs2TIKhR//KHHq8rrYIG6LWPSmpI7MagC8A=;
-        b=RJeW7TjH0W0m2aMCi8A+OeEI8DUHjL8V4R9Voj3QkrMGNiBRhHPIwiaso1FB3paIMn
-         9TyXbKLguCUAcGGsP/tsXaoGtJ6rDgBVDsalLBd7RMG/BaD38/W4amWj7UOEyYHjPS5t
-         AJcTck6EtlyRm4M//t77OTAKtbZGahm+bt/S38OxQYTY+n5qyCZz5vT7pOzX0Gr/2i/9
-         g7F7EXU366k0fWE3qQWQKb0s5wKUu2d1nZL/KUW5pRiFTDTgvjFFZJDqWEwlgFo6QGNk
-         BW63WbTP2AREfjZ3le5iW1lzraB/Jrp32VRWvId2r5gvrwDIRJATJfziSdYFmnMKj8r8
-         4z1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=DJjiIOEQIs2TIKhR//KHHq8rrYIG6LWPSmpI7MagC8A=;
-        b=4oB9OKLs1ODLhxPIxu3bJ21eQbSmkYiLtoODBRzxrr2Z5VrNcOjg1QjxxnWlr5QSif
-         cTNlR2LeEt4DBH8BwX3O9g/mGab1qnMWo1ge7nrVy3KmoXHYVUT8wzlVpOda4UBIqG7m
-         PWK9qe4oIyR8n+qDhPgPE+EieR9FcxSnZAVHso7etJtHdPPVGiZVpTlH5UdZtBXe1Kmd
-         MXg7h3idpalJwSG8NzMco+k2s6PvtVXQncHDTXiTy8Cg/SX3AApSSC4syUjdjzO8SwTh
-         P6JTtepvCV9Jtj5cMVTDg3RGdM1Q5gBMAaqgaSILIgCnbtt0/c2hnqFzUC1TrwIJMzSj
-         A4AQ==
-X-Gm-Message-State: ACgBeo2PsaqCyaC166viDqu5NgeKE233XirysxSlfZKf3sDl4cD2tjfX
-        AWpxLxdVTbez7ZnAWd3+324dgIeaGJg=
-X-Google-Smtp-Source: AA6agR5vHD0sbTiQkRo4KBVBdNU52zes8p9ItPkp4mCk7foV+vyKsHdm5GD6xrPsQGV8l6kmtj0QsQ==
-X-Received: by 2002:a63:8aca:0:b0:42b:b13:b252 with SMTP id y193-20020a638aca000000b0042b0b13b252mr3199618pgd.246.1661327537236;
-        Wed, 24 Aug 2022 00:52:17 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id e62-20020a621e41000000b0052da33fe7d2sm12424499pfe.95.2022.08.24.00.52.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Aug 2022 00:52:16 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: ye.xingchen@zte.com.cn
-To:     axboe@kernel.dk
-Cc:     haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ye xingchen <ye.xingchen@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH linux-next] block/rnbd-clt: Remove the unneeded result variable
-Date:   Wed, 24 Aug 2022 07:52:13 +0000
-Message-Id: <20220824075213.221397-1-ye.xingchen@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Wed, 24 Aug 2022 04:12:52 -0400
+Received: from sender-of-o50.zoho.in (sender-of-o50.zoho.in [103.117.158.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99E685AB1;
+        Wed, 24 Aug 2022 01:12:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1661328756; cv=none; 
+        d=zohomail.in; s=zohoarc; 
+        b=DSlC6MNqXJEKuLWWv9hD5ReOtHPCoIIspX9WVJYwx76RtxpYjqB3NGMU3dedRU3CL1lSicqv3EZfUcnhQ1EJIyaNSME4Ri4EKFI9jmwB5/XzPNh0OL9ammAtpqD7c+41CFO2mL6ydJ8/IvNIpIRJHgo7BvTjDy/4c6AI/9+xwus=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+        t=1661328756; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=nxuDlBnh7rD26c84GHsAUGHCF7GK79bwk7nQ3eQxjyY=; 
+        b=eLZ9qpm4vxcJ0enFIjDW/CuyYqacaj3hvYJNWkUIU3lQ6Qmp2Snj7Q1uCQEVHyZaoLtKVXmJ+pb6dSbFJDou1TXhFrAQWVyQ65YIjaWtEQrf11pFVd8nEkcEa75iS3JIAgg8JmVKNe8q3sQ/4V6fxnRE8UyNxwJLN+MVlZbBbo8=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+        dkim=pass  header.i=siddh.me;
+        spf=pass  smtp.mailfrom=code@siddh.me;
+        dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1661328756;
+        s=zmail; d=siddh.me; i=code@siddh.me;
+        h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+        bh=nxuDlBnh7rD26c84GHsAUGHCF7GK79bwk7nQ3eQxjyY=;
+        b=QXUy31uj4dbboP+XiXGdXmL43R95UeAcwm0xOMj/EcZneZkZEKQG6FCsq/pMFLcU
+        mlWD6fj6JCJ9uOXfnN/r9w616HiOgvi2fB8VSl+IxO65Kzi7SB0N2+i5MmCFcs+wT+A
+        +zSVw/g3xbbuxu0s5eMM9Z9DXsRVvezkiOxewFWs=
+Received: from mail.zoho.in by mx.zoho.in
+        with SMTP id 1661328745149618.5620763655653; Wed, 24 Aug 2022 13:42:25 +0530 (IST)
+Date:   Wed, 24 Aug 2022 13:42:25 +0530
+From:   Siddh Raman Pant <code@siddh.me>
+To:     "Jens Axboe" <axboe@kernel.dk>
+Cc:     "linux-kernel-mentees" 
+        <linux-kernel-mentees@lists.linuxfoundation.org>,
+        "stable" <stable@vger.kernel.org>,
+        "linux-block" <linux-block@vger.kernel.org>,
+        "linux-kernel" <linux-kernel@vger.kernel.org>,
+        "syzbot+a8e049cd3abd342936b6" 
+        <syzbot+a8e049cd3abd342936b6@syzkaller.appspotmail.com>
+Message-ID: <182cee8e2a7.5a62eb4811173.7413734946973464259@siddh.me>
+In-Reply-To: <166127140632.124225.483036207879834754.b4-ty@kernel.dk>
+References: <20220823160810.181275-1-code@siddh.me> <166127140632.124225.483036207879834754.b4-ty@kernel.dk>
+Subject: Re: [PATCH v2] loop: Check for overflow while configuring loop
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: ye xingchen <ye.xingchen@zte.com.cn>
+On Tue, 23 Aug 2022 21:46:46 +0530  Jens Axboe  wrote:
+> Applied, thanks!
+> 
+> [1/1] loop: Check for overflow while configuring loop
+>       commit: f11ebc7347340d291ba032a3872e40d3283fc351
 
-Return the value from rtrs_clt_rdma_cq_direct() directly instead of
-storing it in another redundant variable.
+Thanks!
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
----
- drivers/block/rnbd/rnbd-clt.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Though, it seems that you have used the mailing list's address
+(linux-kernel-mentees@lists.linuxfoundation.org) in the author
+field instead of the Signed-off email.
 
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 9d01e7ab33e4..78334da74d8b 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1159,10 +1159,8 @@ static int rnbd_rdma_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- {
- 	struct rnbd_queue *q = hctx->driver_data;
- 	struct rnbd_clt_dev *dev = q->dev;
--	int cnt;
- 
--	cnt = rtrs_clt_rdma_cq_direct(dev->sess->rtrs, hctx->queue_num);
--	return cnt;
-+	return rtrs_clt_rdma_cq_direct(dev->sess->rtrs, hctx->queue_num);
- }
- 
- static void rnbd_rdma_map_queues(struct blk_mq_tag_set *set)
--- 
-2.25.1
+Thanks,
+Siddh
