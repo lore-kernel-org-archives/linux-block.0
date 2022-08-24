@@ -2,100 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7ECC32772
-	for <linux-block@archiver.kernel.org>; Tue, 23 Aug 2022 20:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FAA8C32793
+	for <linux-block@archiver.kernel.org>; Wed, 24 Aug 2022 01:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbiHWU46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Aug 2022 16:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
+        id S233167AbiHXBPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Aug 2022 21:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbiHWU46 (ORCPT
+        with ESMTP id S233176AbiHXBPg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Aug 2022 16:56:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD106F249
-        for <linux-block@vger.kernel.org>; Tue, 23 Aug 2022 13:56:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661288216;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=G6GpA8BrAqKd3EaQ4iUJ+jQPbV5hdMrDQRA6EhvsCCY=;
-        b=KObN0Yhf0n4s6+D8uBbdB8ZuOAS9cDEAy7aD/J6UvY5PpeUvG9l/5G8o2PQSEn2qoZuTqm
-        6g1l77F4PxZwiSDEkOcBrrkDTZIe8jlVLn+PNAqv5twvR5ZvtZtVK4pWVUVwhbSRNS4826
-        y7KmRqBIBvoaSSZl6nn0ogSI/1bBLMg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-170-1CUsF1F-OmWakf1N3rcxUQ-1; Tue, 23 Aug 2022 16:56:51 -0400
-X-MC-Unique: 1CUsF1F-OmWakf1N3rcxUQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 669C0803301;
-        Tue, 23 Aug 2022 20:56:51 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.115])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CC9541121315;
-        Tue, 23 Aug 2022 20:56:50 +0000 (UTC)
-Date:   Tue, 23 Aug 2022 16:56:49 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        acourbot@chromium.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] virtio-blk: Fix WARN_ON_ONCE in virtio_queue_rq()
-Message-ID: <YwU/EVxT0a6q2BfD@fedora>
-References: <20220823145005.26356-1-suwan.kim027@gmail.com>
+        Tue, 23 Aug 2022 21:15:36 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4E763B942;
+        Tue, 23 Aug 2022 18:15:35 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MC7Qv4vmsz6S686;
+        Wed, 24 Aug 2022 09:13:59 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgBXQLy0ewVjY6sPAw--.59906S3;
+        Wed, 24 Aug 2022 09:15:33 +0800 (CST)
+Subject: Re: [PATCH v8 1/4] blk-throttle: fix that io throttle can only work
+ for single bio
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, mkoutny@suse.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20220823033130.874230-1-yukuai1@huaweicloud.com>
+ <20220823033130.874230-2-yukuai1@huaweicloud.com>
+ <YwUXTL+8E/sPcEUB@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <73c72914-e27d-b261-e040-2dd31e8a6b9f@huaweicloud.com>
+Date:   Wed, 24 Aug 2022 09:15:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="Im5Dzx+o78egGwqe"
-Content-Disposition: inline
-In-Reply-To: <20220823145005.26356-1-suwan.kim027@gmail.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+In-Reply-To: <YwUXTL+8E/sPcEUB@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgBXQLy0ewVjY6sPAw--.59906S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4xZr4fGr13Xr18Zr15CFg_yoWfWrc_ZF
+        4YyrWxGw18uFs7AF1jyF45WrZIgrWfW3s7uw4vgFy7tw1rA3s09Fs5Kr92yrW5X3yrKr9I
+        qw109ayrCryS9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr1j
+        6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
+        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+        AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
+        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
+        C2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi, Tejun
 
---Im5Dzx+o78egGwqe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+ÔÚ 2022/08/24 2:07, Tejun Heo Ð´µÀ:
+> Hello,
+> 
+> Should have asked you earlier but with the BIO_THROTTLED flag setting from
+> clone removed, with single BIO_THROTTLED flag, does the fix still require
+> bytes subtraction? If we can do single flag and we don't need the bytes
+> subtraction, might as well just stay with single flag?
 
-On Tue, Aug 23, 2022 at 11:50:05PM +0900, Suwan Kim wrote:
-> @@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
->  			virtblk_unmap_data(req, vbr);
->  			virtblk_cleanup_cmd(req);
->  			rq_list_add(requeue_list, req);
-> +		} else {
-> +			blk_mq_start_request(req);
->  		}
+Do you mean 'compensate the over-accounting' for bytes subtraction? If
+so, yes, it's not required.
 
-The device may see new requests as soon as virtblk_add_req() is called
-above. Therefore the device may complete the request before
-blk_mq_start_request() is called.
+This patch actually set two flags when bio is throttled and
+dispatched, and only iops flag is cleared after the original bio is
+split. If only one flag can be used, the way that I come up with is
+that let iops limit become default, which means bio is always counted
+for iops limit each time blk_throtl_bio() is called. I'm not quite
+sure yet if iops limit can be counted excessively this way in some
+special scenario...
 
-rq->io_start_time_ns = ktime_get_ns() will be after the request was
-actually submitted.
-
-I think blk_mq_start_request() needs to be called before
-virtblk_add_req().
-
-Stefan
-
---Im5Dzx+o78egGwqe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMFPxAACgkQnKSrs4Gr
-c8jiqQf/dQaaWu+Y3F9hESOhMyKVdRc88dF4/wgzl4PX7S/aBvAK18a2kq3Fd+yx
-zf5E5zf18bPIdOMiEUwW4KsezYZlQZYArev/xuzEUDFnKKTKg7eJhAJ0w3xPH/Bu
-19ZQ4rR/8a3WJlJYcAHS0bZEHZN11GdFo3wobbzcy43kNuOf45PTJISe/SaWLRrj
-k+qCF1ocbxGxo5RZeRHDXZGtYFDa0OQjMKJToNT9umZN8kPQaiC7YAutYD81r+Jl
-fSjEZtlIwAIZJgx3F2oCrqSopAQ34jYQgkpUCUnOgsblL2XW95l/V5wJ5lxrVolT
-ljH3Tr5GPLqKzHmJ8+5XoGJVop0lpA==
-=cybs
------END PGP SIGNATURE-----
-
---Im5Dzx+o78egGwqe--
+Thanks,
+Kuai
+> 
+> Thanks.
+> 
 
