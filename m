@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF854C32774
-	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 15:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20628C32774
+	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 15:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241145AbiHYPZD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Aug 2022 11:25:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34924 "EHLO
+        id S242315AbiHYPZE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Aug 2022 11:25:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241995AbiHYPYp (ORCPT
+        with ESMTP id S241972AbiHYPYp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 25 Aug 2022 11:24:45 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53F5DB99E1;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DBABB95B5;
         Thu, 25 Aug 2022 08:24:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=K5Jc8scvLUvhDTN44UnDRvk62eVtMjOsLaEb4UWxg7M=; b=TAse/YlGEzCihIsPGWyu6RMzTu
-        yVK3Z1T9yYnlVtvmVzsxxqVjBgdqX7sn3+vugZG+YautHnMksjYjBxO4uRGs2yNGc5Zd70AHnj/8t
-        OKgc66oyUrOurIsgqvHKdljgGD8qK7+t6en6l3GHHZ72iJvO63y0vSn64Yj1tDJxqglXS2TuNjpOC
-        5DDMrI6DkZCYkhfmF6vz1VZopGSU1I5Hl3KwpXsNddsfPYhPRCJsXyvh3WFofP9kODtJTQslzXHFP
-        di3HWbMlwtbBe5NGrNBDOqE53/6YQC7Q13W2bgh1/aEpIKI05z9wd8VybMTyt/0ZG+4gsxawAYGoa
-        098afT0Q==;
+        bh=Zco/cq2uLRvV+s+4HkHZAZF2wQKOR8FuVA8Uucgnt08=; b=ECzpmWpGfFN3FSN3MXglMySWFq
+        2/AyvUP5mc5dsTnuux+42Fb10+vKI4gPCs10aAmDZbYoZBwUmNwUGysjQ2BuYBQpsvZ9MWElt96CC
+        bBjlqVLRj+av4OPvi1lgmo3s95qcB+a6q7ZpddFxRXCVbyQ00iLx/6NcZwRINyXwJUl/6x3FaBCFo
+        J8pPdkOHtrhU+wGWGLJdb2zwmskLsaqFcwcodC4kLN7+M30fYzYMaIm8+MCZlyrayUO/+R1Znp3oy
+        EiQoV2+fW6SxljxTyfuMnJ+vpiDzNUKchWev7FIQaywEwCZgXQU09yjQLzpHaoy4OsXgKoRj5NCXN
+        Esl7IF9A==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1oREij-0086MB-QX; Thu, 25 Aug 2022 09:24:39 -0600
+        id 1oREik-0086M9-On; Thu, 25 Aug 2022 09:24:39 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1oREie-0001ec-8l; Thu, 25 Aug 2022 09:24:32 -0600
+        id 1oREif-0001es-0Y; Thu, 25 Aug 2022 09:24:33 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -57,8 +57,8 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 25 Aug 2022 09:24:20 -0600
-Message-Id: <20220825152425.6296-4-logang@deltatee.com>
+Date:   Thu, 25 Aug 2022 09:24:25 -0600
+Message-Id: <20220825152425.6296-9-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220825152425.6296-1-logang@deltatee.com>
 References: <20220825152425.6296-1-logang@deltatee.com>
@@ -67,84 +67,52 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v9 3/8] block: add check when merging zone device pages
+Subject: [PATCH v9 8/8] ABI: sysfs-bus-pci: add documentation for p2pmem allocate
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consecutive zone device pages should not be merged into the same sgl
-or bvec segment with other types of pages or if they belong to different
-pgmaps. Otherwise getting the pgmap of a given segment is not possible
-without scanning the entire segment. This helper returns true either if
-both pages are not zone device pages or both pages are zone device
-pages with the same pgmap.
-
-Add a helper to determine if zone device pages are mergeable and use
-this helper in page_is_mergeable().
+Add documentation for the p2pmem/allocate binary file which allows
+for allocating p2pmem buffers in userspace for passing to drivers
+that support them. (Currently only O_DIRECT to NVMe devices.)
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/bio.c            |  2 ++
- include/linux/mmzone.h | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ Documentation/ABI/testing/sysfs-bus-pci | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 3d3a2678fea2..969607bc1f4d 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -865,6 +865,8 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 		return false;
- 	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
- 		return false;
-+	if (!zone_device_pages_have_same_pgmap(bv->bv_page, page))
-+		return false;
+diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+index 6fc2c2efe8ab..dca5e032b4fa 100644
+--- a/Documentation/ABI/testing/sysfs-bus-pci
++++ b/Documentation/ABI/testing/sysfs-bus-pci
+@@ -171,7 +171,7 @@ Description:
+ 		binary file containing the Vital Product Data for the
+ 		device.  It should follow the VPD format defined in
+ 		PCI Specification 2.1 or 2.2, but users should consider
+-		that some devices may have incorrectly formatted data.  
++		that some devices may have incorrectly formatted data.
+ 		If the underlying VPD has a writable section then the
+ 		corresponding section of this file will be writable.
  
- 	*same_page = ((vec_end_addr & PAGE_MASK) == page_addr);
- 	if (*same_page)
-diff --git a/include/linux/mmzone.h b/include/linux/mmzone.h
-index e24b40c52468..2c31915b057e 100644
---- a/include/linux/mmzone.h
-+++ b/include/linux/mmzone.h
-@@ -794,6 +794,25 @@ static inline bool is_zone_device_page(const struct page *page)
- {
- 	return page_zonenum(page) == ZONE_DEVICE;
- }
-+
-+/*
-+ * Consecutive zone device pages should not be merged into the same sgl
-+ * or bvec segment with other types of pages or if they belong to different
-+ * pgmaps. Otherwise getting the pgmap of a given segment is not possible
-+ * without scanning the entire segment. This helper returns true either if
-+ * both pages are not zone device pages or both pages are zone device pages
-+ * with the same pgmap.
-+ */
-+static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
-+						     const struct page *b)
-+{
-+	if (is_zone_device_page(a) != is_zone_device_page(b))
-+		return false;
-+	if (!is_zone_device_page(a))
-+		return true;
-+	return a->pgmap == b->pgmap;
-+}
-+
- extern void memmap_init_zone_device(struct zone *, unsigned long,
- 				    unsigned long, struct dev_pagemap *);
- #else
-@@ -801,6 +820,11 @@ static inline bool is_zone_device_page(const struct page *page)
- {
- 	return false;
- }
-+static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
-+						     const struct page *b)
-+{
-+	return true;
-+}
- #endif
+@@ -407,6 +407,16 @@ Description:
+ 	        file contains a '1' if the memory has been published for
+ 		use outside the driver that owns the device.
  
- static inline bool folio_is_zone_device(const struct folio *folio)
++What:		/sys/bus/pci/devices/.../p2pmem/allocate
++Date:		August 2022
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		Thes attribute allows mapping p2pmem into userspace. For
++		each mmap() call on this file, the kernel will allocate
++		a chunk of Peer-to-Peer memory for use in Peer-to-Peer
++		transactions. This memory can be used in O_DIRECT calls
++		to NVMe backed files for Peer-to-Peer copies.
++
+ What:		/sys/bus/pci/devices/.../link/clkpm
+ 		/sys/bus/pci/devices/.../link/l0s_aspm
+ 		/sys/bus/pci/devices/.../link/l1_aspm
 -- 
 2.30.2
 
