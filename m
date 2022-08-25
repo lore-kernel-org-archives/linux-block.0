@@ -2,159 +2,218 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A13C28D13
-	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 04:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3715DC04AA5
+	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 06:09:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbiHYE2E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Aug 2022 00:28:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39380 "EHLO
+        id S229834AbiHYGJ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Aug 2022 02:09:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbiHYE2D (ORCPT
+        with ESMTP id S229553AbiHYGJz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Aug 2022 00:28:03 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7ECB7696C
-        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 21:28:00 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220825042758epoutp02602cc5fb4e7aca6ae3152c8fefe49be9~OfAY992Df1095510955epoutp02G
-        for <linux-block@vger.kernel.org>; Thu, 25 Aug 2022 04:27:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220825042758epoutp02602cc5fb4e7aca6ae3152c8fefe49be9~OfAY992Df1095510955epoutp02G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1661401678;
-        bh=JJuWaWBA983uY23liNhORH0Mh82FAHzv6ulhPTviZ4A=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=n9oBHfGGh+dkZw6T4Io5SHFr1XXKVRF/mMRgEwvfnDdUBor+yfIL6dKEuQ5lYvk3A
-         L0VZVc9Vk0vkbFyRMr1srFUHWdbD10Jnro+hDB1IGnu01dcbuEmUv9YgBOCo+dvCa1
-         SBXWQJLGuQmEkhohtf1teWiOuBmP/9Ex4D9SrYDU=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20220825042757epcas5p37271c9b4890ba1ae41c96fc192d5a2a5~OfAYFXIPb2043620436epcas5p31;
-        Thu, 25 Aug 2022 04:27:57 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.178]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4MCqhD1C4Cz4x9Q4; Thu, 25 Aug
-        2022 04:27:56 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F7.C0.25709.C4AF6036; Thu, 25 Aug 2022 13:27:56 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220825042755epcas5p1b74cb6accae9ec3f25cc8d15d313fcbc~OfAWHl5GF0167101671epcas5p1C;
-        Thu, 25 Aug 2022 04:27:55 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220825042755epsmtrp222750ad10fa10264323e48d4d19a62bd~OfAWGkW9b1831518315epsmtrp2L;
-        Thu, 25 Aug 2022 04:27:55 +0000 (GMT)
-X-AuditID: b6c32a49-a71ff7000000646d-d3-6306fa4caa0c
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        44.EA.14392.B4AF6036; Thu, 25 Aug 2022 13:27:55 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220825042753epsmtip22acbe0211b824db0a2630278fd0ae467~OfAUcmvsI0868208682epsmtip29;
-        Thu, 25 Aug 2022 04:27:53 +0000 (GMT)
-Date:   Thu, 25 Aug 2022 09:48:13 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "hare@suse.de" <hare@suse.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Matias Bjorling <Matias.Bjorling@wdc.com>
-Subject: Re: [ANNOUNCE] CFP: Zoned Storage Microconference - Linux Plumbers
- Conference 2022
-Message-ID: <20220825041813.GA32607@test-zns>
+        Thu, 25 Aug 2022 02:09:55 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B16083CBF2
+        for <linux-block@vger.kernel.org>; Wed, 24 Aug 2022 23:09:52 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 73F715C7BA;
+        Thu, 25 Aug 2022 06:09:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1661407791; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kwcOpY3F5XtP0jX7EiZRywIo9Gg4HIyiw9AuiEK6394=;
+        b=kyb2dsCTepC2JWS2UKDLBuTK8LaKYRFCu65paR13HEBj/mOv3NG16TvAjjkx7+Hj4qAMYg
+        Bl4ngRgIzaFV1PjkaK2vLtbanCow5sk/R0FSXFxKkZZiw89Nd4BdSgVwoAsotbb5BaQcsC
+        rwg4Kx2ywqt85zufkBDqmTyZS7Ra8Lw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1661407791;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kwcOpY3F5XtP0jX7EiZRywIo9Gg4HIyiw9AuiEK6394=;
+        b=0F7hvm48xyqOEAb2aS3j6haWdLD0LBZmCtEuPnietPyJCbis0XjmpkgiQ+diK4cOV71Q8c
+        REY8bzy4Do+erLAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5290213A89;
+        Thu, 25 Aug 2022 06:09:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id sjAkEy8SB2ObMQAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 25 Aug 2022 06:09:51 +0000
+Message-ID: <bda24921-8fcb-8e22-6685-2614ce1bec5f@suse.de>
+Date:   Thu, 25 Aug 2022 08:09:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <589cb29e-d2aa-085f-db83-fa718f4fbef2@opensource.wdc.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHJsWRmVeSWpSXmKPExsWy7bCmhq7PL7Zkg4mX2CymH1a0mPbhJ7PF
-        77PnmS32vpvNarFn0SQmi723tC0uPV7BbrFn70kWi8u75rBZTGj7ymxxY8JTRgduj8tXvD02
-        repk89jZep/V4/2+q2wefVtWMXpsPl3t8XmTnEf7gW6mAI6obJuM1MSU1CKF1Lzk/JTMvHRb
-        Je/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wcoCuVFMoSc0qBQgGJxcVK+nY2RfmlJakK
-        GfnFJbZKqQUpOQUmBXrFibnFpXnpenmpJVaGBgZGpkCFCdkZv9rvsBccF6iY/OY0UwPjbL4u
-        Rk4OCQETiVun37F0MXJxCAnsZpTYtH0eK0hCSOATo0T3Fy2IxDdGiQ2r57LAdLQ+28AGkdjL
-        KLG27TwThPOMUeLMr0WMIFUsAqoSB641AdkcHGwCmhIXJpeChEUETCXe9rSCrWMW+MMssfT2
-        MWaQhLBArMT6jjVMIDavgK7E1F9f2CBsQYmTM5+AbeYUcJOY9XU3WFxUQFniwLbjYIslBNZy
-        SBxuvckEcZ6LxOpFX5khbGGJV8e3sEPYUhKf3+1lg7CTJS7NPAdVXyLxeM9BKNteovVUP1gv
-        s0CGxKUV3VA2n0Tv7ydMIM9ICPBKdLQJQZQrStyb9JQVwhaXeDhjCZTtIfGyqZcdHnR3Vs1h
-        ncAoNwvJP7OQrICwrSQ6PzSxzgJawSwgLbH8HweEqSmxfpf+AkbWVYySqQXFuempxaYFhnmp
-        5fBITs7P3cQITrhanjsY7z74oHeIkYmD8RCjBAezkgiv1TGWZCHelMTKqtSi/Pii0pzU4kOM
-        psD4mcgsJZqcD0z5eSXxhiaWBiZmZmYmlsZmhkrivFO0GZOFBNITS1KzU1MLUotg+pg4OKUa
-        mCJqHvjydb5d96hSzHhFxmW9vWdjnTYsyY9YKOMSEbJ2wu0FvN6b3m+v+rROqcJJobQvKWb7
-        73Ux3h+ZQrcc31x2fPWrxdzGrOfunE7z3bX7kkHG1/MaET72YueWPbD8s/bm/spG6bVzNYum
-        zjjoIx/FW6Hy4rHLWuHLTnodXi+17076dFehI1027sVRv5SyH2/LXPX4PgeVvjJcvU2NSSNY
-        2UjvQ+2SS01a8ecqXF+EvVzoY2865z77ryP8my7MabKKs2USkLO+N39T+oMpB9Tbth003XrI
-        5NCiSUtcUha95d1zQM/ZJaXqfZ7YQp4t+0UXqb6b7L3I79PH84mM871u32s66vqM/XVG7vwP
-        +0OVWIozEg21mIuKEwFJCHwWQQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNLMWRmVeSWpSXmKPExsWy7bCSvK73L7Zkg1vrVS2mH1a0mPbhJ7PF
-        77PnmS32vpvNarFn0SQmi723tC0uPV7BbrFn70kWi8u75rBZTGj7ymxxY8JTRgduj8tXvD02
-        repk89jZep/V4/2+q2wefVtWMXpsPl3t8XmTnEf7gW6mAI4oLpuU1JzMstQifbsEroybf76z
-        F/zkrbjwML+B8Tl3FyMnh4SAiUTrsw1sXYxcHEICuxkl1jfcZINIiEs0X/vBDmELS6z89xzM
-        FhJ4wijRs84UxGYRUJU4cK2JsYuRg4NNQFPiwuRSkLCIgKnE255WFpCZzAINLBJvTl9nBUkI
-        C8RKrO9YwwRi8wroSkz99QVq8TdGibb9GxghEoISJ2c+YQGxmQXMJOZtfsgMsoBZQFpi+T8O
-        kDCngJvErK+7we4UFVCWOLDtONMERsFZSLpnIemehdC9gJF5FaNkakFxbnpusWGBYV5quV5x
-        Ym5xaV66XnJ+7iZGcPxoae5g3L7qg94hRiYOxkOMEhzMSiK8VsdYkoV4UxIrq1KL8uOLSnNS
-        iw8xSnOwKInzXug6GS8kkJ5YkpqdmlqQWgSTZeLglGpgmiAaerlQqOTmN07t33MV3aJO1P+z
-        sWuZdsv4cpr2um3ZV/pY1t5s5fkgpBGxgYn1eLNqTOwX9ua/AZciLWe9eWzizfF++qacsm+f
-        Z1dnWzXFnO/z/q7Hy3Orsc8iJZJns8D0NhmGhm4jle1+2zs5ujLcuO5d/TNJIHXG+2ntAU6H
-        PIurt18M2t0tPmPiqRMHwl3aZsRn671vO5d6YjK/2ZtTTN+rHeo4zpYEfZXZr/966aYyM/FZ
-        WY7WZ9Vczh2UdTfc/ftQxuJVwf1G6vcWeslzKGcc2px3dn+WWc/317tKnOt1k/c+Cf+sy838
-        ePuFv+5Z6xf4la91M66ZHr30KEc4x91HJxsXVK69sqRNiaU4I9FQi7moOBEAaSYJoQ4DAAA=
-X-CMS-MailID: 20220825042755epcas5p1b74cb6accae9ec3f25cc8d15d313fcbc
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_a7674_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220522220139uscas1p1e3426b4457e0753c701e9917fe3ec6d2
-References: <CGME20220522220139uscas1p1e3426b4457e0753c701e9917fe3ec6d2@uscas1p1.samsung.com>
-        <20220522220128.GA347919@bgt-140510-bm01>
-        <89b2bb4b-1848-22cc-9814-6cb6726afc18@acm.org>
-        <589cb29e-d2aa-085f-db83-fa718f4fbef2@opensource.wdc.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCHv2] sbitmap: fix batched wait_cnt accounting
+Content-Language: en-US
+To:     Keith Busch <kbusch@fb.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Cc:     Keith Busch <kbusch@kernel.org>
+References: <20220824201440.127782-1-kbusch@fb.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20220824201440.127782-1-kbusch@fb.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_a7674_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On 8/24/22 22:14, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Batched completions can clear multiple bits, but we're only decrementing
+> the wait_cnt by one each time. This can cause waiters to never be woken,
+> stalling IO. Use the batched count instead.
+> 
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=215679
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+> v1->v2:
+> 
+>    Use atomic_try_cmpxchg instead of direct subtraction to prevent a race
+>    between two batched completions.
+> 
+>    Remove 'wait_cnt < 0' condition since it's not possible anymore.
+> 
+>    Repeat wake up while waiters exist and more bits are unaccounted.
+> 
+>   block/blk-mq-tag.c      |  2 +-
+>   include/linux/sbitmap.h |  3 ++-
+>   lib/sbitmap.c           | 32 ++++++++++++++++++--------------
+>   3 files changed, 21 insertions(+), 16 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 8e3b36d1cb57..9eb968e14d31 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -196,7 +196,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>   		 * other allocations on previous queue won't be starved.
+>   		 */
+>   		if (bt != bt_prev)
+> -			sbitmap_queue_wake_up(bt_prev);
+> +			sbitmap_queue_wake_up(bt_prev, 1);
+>   
+>   		ws = bt_wait_ptr(bt, data->hctx);
+>   	} while (1);
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index 8f5a86e210b9..4d2d5205ab58 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -575,8 +575,9 @@ void sbitmap_queue_wake_all(struct sbitmap_queue *sbq);
+>    * sbitmap_queue_wake_up() - Wake up some of waiters in one waitqueue
+>    * on a &struct sbitmap_queue.
+>    * @sbq: Bitmap queue to wake up.
+> + * @nr: Number of bits cleared.
+>    */
+> -void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
+> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr);
+>   
+>   /**
+>    * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 1f31147872e6..6fd3bc22c2e7 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -600,28 +600,33 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>   	return NULL;
+>   }
+>   
+> -static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+> +static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
 
-On Wed, Aug 24, 2022 at 05:15:28PM -0700, Damien Le Moal wrote:
->On 2022/08/24 16:43, Bart Van Assche wrote:
->> On 5/22/22 15:01, Adam Manzanares wrote:
->>> Zoned Storage Devices (SMR HDDs and ZNS SSDs) have demonstrated that they can
->>> improve storage capacity, throughput, and latency over conventional storage
->>> devices for many workloads. Zoned storage technology is deployed at scale in
->>> some of the largest data centers in the world. There's already a
->>> well-established set of storage vendors with increasing device availability and
->>> a mature software foundation for interacting with zoned storage devices is
->>> available. Zoned storage software support is evolving and their is room for
->>> increased file-system support and additional userspace applications.
->>>
->>> The Zoned Storage microconference focuses on evolving the Linux zoned
->>> storage ecosystem by improving kernel support, file systems, and applications.
->>> In addition, the forum allows us to open the discussion to incorporate and grow
->>> the zoned storage community making sure to meet everyone's needs and
->>> expectations. Finally, it is an excellent opportunity for anyone interested in
->>> zoned storage devices to meet and discuss how we can move the ecosystem forward
->>> together.
->>
->> Hi Adam,
->>
->> On https://protect2.fireeye.com/v1/url?k=755e6c2c-14d5791a-755fe763-000babff9b5d-6defb9d76a932655&q=1&e=e97b90a0-a315-4359-9fee-2976775b532e&u=https%3A%2F%2Flpc.events%2Fevent%2F16%2Fcontributions%2F1147%2F I see four speakers
->> but no agenda? Will an agenda be added before the microconference starts?
->
->And the speaker list is not up-to-date either. I am a speaker too :)
+Why is '*nr' a pointer? It's always used as a value, so what does 
+promoting it to a point buys you?
 
-This page shows the agenda: https://lpc.events/event/16/sessions/149/#20220914
+>   {
+>   	struct sbq_wait_state *ws;
+> -	unsigned int wake_batch;
+> -	int wait_cnt;
+> +	int wake_batch, wait_cnt, sub, cur;
+>   
+>   	ws = sbq_wake_ptr(sbq);
+>   	if (!ws)
+>   		return false;
+>   
+> -	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+> +	wake_batch = READ_ONCE(sbq->wake_batch);
+> +	do {
+> +		cur = atomic_read(&ws->wait_cnt);
+> +		sub = min3(wake_batch, *nr, cur);
+> +		wait_cnt = cur - sub;
+> +	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
+> +
+> +	*nr -= sub;
+> +
+>   	/*
+>   	 * For concurrent callers of this, callers should call this function
+>   	 * again to wakeup a new batch on a different 'ws'.
+>   	 */
+> -	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
+> +	if (!waitqueue_active(&ws->wait))
+>   		return true;
+>   
+>   	if (wait_cnt > 0)
+> -		return false;
+> -
+> -	wake_batch = READ_ONCE(sbq->wake_batch);
+> +		return *nr > 0;
+>   
+>   	/*
+>   	 * Wake up first in case that concurrent callers decrease wait_cnt
+> @@ -649,15 +654,14 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   	sbq_index_atomic_inc(&sbq->wake_index);
+>   	atomic_set(&ws->wait_cnt, wake_batch);
+>   
+> -	return false;
+> +	return *nr > 0;
+>   }
+>   
+> -void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+> +void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
+>   {
+> -	while (__sbq_wake_up(sbq))
+> +	while (__sbq_wake_up(sbq, &nr))
+>   		;
+>   }
+> -EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+>   
+>   static inline void sbitmap_update_cpu_hint(struct sbitmap *sb, int cpu, int tag)
+>   {
+> @@ -694,7 +698,7 @@ void sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, int offset,
+>   		atomic_long_andnot(mask, (atomic_long_t *) addr);
+>   
+>   	smp_mb__after_atomic();
+> -	sbitmap_queue_wake_up(sbq);
+> +	sbitmap_queue_wake_up(sbq, nr_tags);
+>   	sbitmap_update_cpu_hint(&sbq->sb, raw_smp_processor_id(),
+>   					tags[nr_tags - 1] - offset);
+>   }
+> @@ -722,7 +726,7 @@ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+>   	 * waiter. See the comment on waitqueue_active().
+>   	 */
+>   	smp_mb__after_atomic();
+> -	sbitmap_queue_wake_up(sbq);
+> +	sbitmap_queue_wake_up(sbq, 1);
+>   	sbitmap_update_cpu_hint(&sbq->sb, cpu, nr);
+>   }
+>   EXPORT_SYMBOL_GPL(sbitmap_queue_clear);
 
-------_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_a7674_
-Content-Type: text/plain; charset="utf-8"
+Cheers,
 
-
-------_GKj2UxOoZMooFpgW.UaNJF5RnPKrhbpXXK.PgNceyCDa.V5=_a7674_--
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
