@@ -2,115 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA1DC28D13
-	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 15:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D1FC65C0F
+	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 15:24:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240663AbiHYPXm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Aug 2022 11:23:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33822 "EHLO
+        id S241877AbiHYPYz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Aug 2022 11:24:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239089AbiHYPXl (ORCPT
+        with ESMTP id S241906AbiHYPYo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Aug 2022 11:23:41 -0400
-X-Greylist: delayed 1051 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 25 Aug 2022 08:23:38 PDT
-Received: from matoro.tk (unknown [IPv6:2600:1700:4b10:9d80::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8199DB9408;
-        Thu, 25 Aug 2022 08:23:38 -0700 (PDT)
-DKIM-Signature: a=rsa-sha256; bh=AuAC64zMFikVQyOsFvSed5o9/crqW6vUnJOdVdTX1bc=;
- c=relaxed/relaxed; d=matoro.tk;
- h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:In-Reply-To:Message-Id:Message-Id:References:References:Autocrypt:Openpgp;
- i=@matoro.tk; s=20220801; t=1661439948; v=1; x=1661871948;
- b=HJtHo/m3mAL67rsOyV2HRrRp7hqfGXn4hpNwNzCBGVvVx3PxMxJoruJgF//TrwTe7gyCiUzL
- xNnKRubKcezNfRzN9LzubC0zYlARqwY5rD6tHisXvOKh3S3KDf2ibOPQI4UEdOhK0hkO0nueQHq
- qYq7FpmKmjqlqWmkR1poCfdTwsGaqS5LLAQzNnmF9xZzDMkNI99sgQRAOolQ2+Ah5edLbzxTnIy
- DH0RiiBhfxDGlfYYaQrYq58VTlKhEbOktgPiNdc3vbUeDpxn7EBi/PCxGR3iijV7DeAtKt3EEjy
- /btyeTwQynOF8TMEcd4As4a/CloFyfCCp3Qi4NdZCjTyT5H69vuhpBNE0Iq8x3NPqSe9c0R6n89
- +K86hR7XMrtHaFFwaHiziMLTH6BanuWZSt5XG08fh06WDv1LDyvyGNYjqUxHQaI/GvsbOElS8A8
- fCJWuob2oLMnoE8bzIHnjPgVSFq8phTqR0JarONYdgrgih0LUn5YM/4gfOXsN3uSF+AAJG5TVUB
- BDq5X6QUzkriPSr16CgI9Sp+xIxnZXcmKhPR42FMt1s4bbVwOeC8aKJYbfV+JwBFKYg9U42U6+/
- BVDGmIHt7Msl4+k67nDuEpVozBTnuMlNZXJNskgKQvg+kl/l/UHsF67Quba2BJ9SAakn7YT4Zrm
- buqiHEerQ4M=
-Received: by matoro.tk (envelope-sender
- <matoro_mailinglist_kernel@matoro.tk>) with ESMTPS id 0e5fc778; Thu, 25 Aug
- 2022 11:05:48 -0400
-MIME-Version: 1.0
-Date:   Thu, 25 Aug 2022 11:05:48 -0400
-From:   matoro <matoro_mailinglist_kernel@matoro.tk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Meelis Roos <mroos@linux.ee>, Matthew Wilcox <willy@infradead.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+        Thu, 25 Aug 2022 11:24:44 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B4DB99CD;
+        Thu, 25 Aug 2022 08:24:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=bxGrkGTTo43LTZ3Nm3zOWeDThYeDqrWiHdm9e0oQNtA=; b=kaCDplg1OtHM0O9TJKdP6tqye0
+        iCd6ssgN+loS7aD1+RS5HH/D/rM4BLjTvajFn813m4lsxD+O+Ek4zi+rZTHtuV58HvPV93K/HPRmv
+        pEFdRa8OZIovbUc+urFK9Te6Py/uNojEQw1d+1K4uLXWMRkpHL96ZwVzgvy4yPbVQwZIJkO/cuNkN
+        UA4ThK12k/0QDNvrphI0wQyJw3yMRn/IU4hBw8wrQacTuz/b6mE7Ah5KqfwbpIkoarZ7fslwWdOse
+        zx3IIUBKsWxl1xBiEDOuD0qBbzxHqz2P2JUNN+FQA7oWNXiLDV9/VpPiUGiDPcOjomfOezHtajKbP
+        sbBleevA==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1oREij-0086M9-QV; Thu, 25 Aug 2022 09:24:38 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1oREid-0001eV-VM; Thu, 25 Aug 2022 09:24:32 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
         linux-mm@kvack.org
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-In-Reply-To: <20190221132916.GA22886@quack2.suse.cz>
-References: <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
- <20190216174536.GC23000@mit.edu>
- <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
- <20190218120209.GC20919@quack2.suse.cz>
- <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
- <20190219132026.GA28293@quack2.suse.cz>
- <20190219144454.GB12668@bombadil.infradead.org>
- <d444f653-9b99-5e9b-3b47-97f824c29b0e@linux.ee>
- <20190220094813.GA27474@quack2.suse.cz>
- <2381c264-92f5-db43-b6a5-8e00bd881fef@linux.ee>
- <20190221132916.GA22886@quack2.suse.cz>
-Message-ID: <97dbffaefa65a83b36e1ec134fd53a66@matoro.tk>
-X-Sender: matoro_mailinglist_kernel@matoro.tk
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 25 Aug 2022 09:24:18 -0600
+Message-Id: <20220825152425.6296-2-logang@deltatee.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220825152425.6296-1-logang@deltatee.com>
+References: <20220825152425.6296-1-logang@deltatee.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH v9 1/8] mm: introduce FOLL_PCI_P2PDMA to gate getting PCI P2PDMA pages
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello all, I know this is quite an old thread.  I recently acquired some 
-alpha hardware and have run into this exact same problem on the latest 
-stable kernel (5.18 and 5.19).  CONFIG_COMPACTION seems to be totally 
-broken and causes userspace to be extremely unstable - random segfaults, 
-corruption of glibc data structures, gcc ICEs etc etc - seems most 
-noticable during tasks with heavy I/O load.
+GUP Callers that expect PCI P2PDMA pages can now set FOLL_PCI_P2PDMA to
+allow obtaining P2PDMA pages. If GUP is called without the flag and a
+P2PDMA page is found, it will return an error.
 
-My hardware is a DS15 (Titan), so only slightly newer than the Tsunamis 
-mentioned earlier.  The problem is greatly exacerbated when using a 
-machine-optimized kernel (CONFIG_ALPHA_TITAN) over one with 
-CONFIG_ALPHA_GENERIC.  But it still doesn't go away on a generic kernel, 
-just pops up less often, usually very I/O heavy tasks like checking out 
-a tag in the kernel repo.
+FOLL_PCI_P2PDMA cannot be set if FOLL_LONGTERM is set.
 
-However all of this seems to be dependent on CONFIG_COMPACTION.  With 
-this toggled off all problems disappear, regardless of other options.  I 
-tried reverting the commit 88dbcbb3a4847f5e6dfeae952d3105497700c128 
-mentioned earlier in the thread (the structure has moved to a different 
-file but was otherwise the same), but it unfortunately did not make a 
-difference.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ include/linux/mm.h |  1 +
+ mm/gup.c           | 22 +++++++++++++++++++++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
-Since this doesn't seem to have a known cause or an easy fix, would it 
-be reasonable to just add a Kconfig dep to disable it automatically on 
-alpha?
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 3bedc449c14d..37a3e91e6e77 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2891,6 +2891,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+ #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
+ #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
+ #define FOLL_FAST_ONLY	0x80000	/* gup_fast: prevent fall-back to slow gup */
++#define FOLL_PCI_P2PDMA	0x100000 /* allow returning PCI P2PDMA pages */
+ 
+ /*
+  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
+diff --git a/mm/gup.c b/mm/gup.c
+index 732825157430..79aea452619e 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -566,6 +566,12 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 		goto out;
+ 	}
+ 
++	if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
++		     is_pci_p2pdma_page(page))) {
++		page = ERR_PTR(-EREMOTEIO);
++		goto out;
++	}
++
+ 	VM_BUG_ON_PAGE((flags & FOLL_PIN) && PageAnon(page) &&
+ 		       !PageAnonExclusive(page), page);
+ 
+@@ -1015,6 +1021,9 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
+ 	if ((gup_flags & FOLL_LONGTERM) && vma_is_fsdax(vma))
+ 		return -EOPNOTSUPP;
+ 
++	if ((gup_flags & FOLL_LONGTERM) && (gup_flags & FOLL_PCI_P2PDMA))
++		return -EOPNOTSUPP;
++
+ 	if (vma_is_secretmem(vma))
+ 		return -EFAULT;
+ 
+@@ -2359,6 +2368,10 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
+ 		VM_BUG_ON(!pfn_valid(pte_pfn(pte)));
+ 		page = pte_page(pte);
+ 
++		if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
++			     is_pci_p2pdma_page(page)))
++			goto pte_unmap;
++
+ 		folio = try_grab_folio(page, 1, flags);
+ 		if (!folio)
+ 			goto pte_unmap;
+@@ -2438,6 +2451,12 @@ static int __gup_device_huge(unsigned long pfn, unsigned long addr,
+ 			undo_dev_pagemap(nr, nr_start, flags, pages);
+ 			break;
+ 		}
++
++		if (!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)) {
++			undo_dev_pagemap(nr, nr_start, flags, pages);
++			break;
++		}
++
+ 		SetPageReferenced(page);
+ 		pages[*nr] = page;
+ 		if (unlikely(!try_grab_page(page, flags))) {
+@@ -2926,7 +2945,8 @@ static int internal_get_user_pages_fast(unsigned long start,
+ 
+ 	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
+ 				       FOLL_FORCE | FOLL_PIN | FOLL_GET |
+-				       FOLL_FAST_ONLY | FOLL_NOFAULT)))
++				       FOLL_FAST_ONLY | FOLL_NOFAULT |
++				       FOLL_PCI_P2PDMA)))
+ 		return -EINVAL;
+ 
+ 	if (gup_flags & FOLL_PIN)
+-- 
+2.30.2
 
-Thank you!
-
--------- Original Message --------
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-Date: 2019-02-21 08:29
- From: Jan Kara <jack@suse.cz>
-To: Meelis Roos <mroos@linux.ee>
-
-On Thu 21-02-19 01:23:50, Meelis Roos wrote:
-> > > First, I found out that both the problematic alphas had memory compaction and
-> > > page migration and bounce buffers turned on, and working alphas had them off.
-> > >
-> > > Next, turing off these options makes the problematic alphas work.
-> >
-> > OK, thanks for testing! Can you narrow down whether the problem is due to
-> > CONFIG_BOUNCE or CONFIG_MIGRATION + CONFIG_COMPACTION? These are two
-> > completely different things so knowing where to look will help. Thanks!
-> 
-> Tested both.
-> 
-> Just CONFIG_MIGRATION + CONFIG_COMPACTION breaks the alpha.
-> Just CONFIG_BOUNCE has no effect in 5 tries.
-
-OK, so page migration is problematic. Thanks for confirmation!
-
-								Honza
