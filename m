@@ -2,63 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1860EECAAD4
-	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 21:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A79ECAAA3
+	for <linux-block@archiver.kernel.org>; Thu, 25 Aug 2022 21:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244183AbiHYVvR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Aug 2022 17:51:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60212 "EHLO
+        id S233108AbiHYVxr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Aug 2022 17:53:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243975AbiHYVuv (ORCPT
+        with ESMTP id S243871AbiHYVxq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Aug 2022 17:50:51 -0400
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB9F474D7;
-        Thu, 25 Aug 2022 14:50:49 -0700 (PDT)
-Received: by mail-pf1-f181.google.com with SMTP id z187so21056872pfb.12;
-        Thu, 25 Aug 2022 14:50:49 -0700 (PDT)
+        Thu, 25 Aug 2022 17:53:46 -0400
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72FA33CBD3;
+        Thu, 25 Aug 2022 14:53:45 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id g19so2799533pfb.0;
+        Thu, 25 Aug 2022 14:53:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc;
-        bh=A1GDSS4ZswYZdPLm/xFYMxcSzWgFZQdBzdkCHj25ONs=;
-        b=UzP0SV502OQyMH0z5e5q2Pfzjbt3o026Cb9KKFiRT3cC7mFHxxA09x5qJBlhrZtyyD
-         SbaeOOHm9vJktEaN93j/n6aiJ7rUhQ48cBCXBfSbwhV8hUvRXs0mFjPuUpatPdZW30mz
-         omw4rJs3xm/VdrjB21SkX3QMi7UwQxAUWw6FkZ+orBEfsJHnC8epVRMj4vLC9fu2qxlw
-         iqIAoI6WkYc7Vn0EbW33TS03lAwAcwK31+6Nya04JeILNIKwnj7qMj71BhDc7ZHBFch4
-         gQ8LBrqQ3NVhrCSxrTygFBPw5l2H8HvYfR2KSgw3zd7ebv4JXBlcicbkmM09MLMDY1tq
-         1w+w==
-X-Gm-Message-State: ACgBeo1l9gKykkRX+AXo0JDoS0T19xyTlKFozQvFlBRZM4GUyfS5JGNY
-        QMa7GjZKunbj+F+hg9j5eJU=
-X-Google-Smtp-Source: AA6agR4mlNQNlswjcYi/OOqa2VKdvYxaaS8E9JPwi6wD85RRMAlmfsBiW/v3/FllaJ/9tjyjR3F0Cw==
-X-Received: by 2002:a63:e20c:0:b0:42b:4467:e0f4 with SMTP id q12-20020a63e20c000000b0042b4467e0f4mr874532pgh.576.1661464248859;
-        Thu, 25 Aug 2022 14:50:48 -0700 (PDT)
+        bh=PoKbqdZjqcMil3GUCh8PrCnRMNvOIz0uCEqvIuzke58=;
+        b=grvscDb5M8s3FlXE/0PaeHXXMbtBlRx5VzlQJJSPkbUN2tSiqqeMbFECQE7b1uA9S3
+         cbOeezWyRSUE0QlfIcp7Py4Ulw+aOXDgl5qx/blHo8Oplci+ez14tgW1DRDxsHkMM1va
+         OiNCrEejcztmU82w8KLuXWyJBgFm/4YHeMabCriTjjrwxDg7g1A4ysIrGV5Pn7GO3fMy
+         g3HmbujHhi/JEtoNTxjP/MZsvtCsTZVOWlxSx26q4W2gJ3jiwoO+qQLJMyWm9BE+lBfO
+         swYrdHL/+HYaEkm61EZcjrLGq1rSH/oqmkimQg9rUAR4Fe7qkZtYA8OWNfcWV1Fvg7tQ
+         3wBg==
+X-Gm-Message-State: ACgBeo3qw+uEtjc/2wQ9IwUygowvAMt1ARTjrrhhcc+u+PVnFV9QEPwf
+        udk8g/Wi1/urYsR1Aq3fkvQ=
+X-Google-Smtp-Source: AA6agR4oitY7DdgWzlDg0toNkuqiso8T3oQu+9kbXRQF5gO1MpCeX6jwibhLOIeQZecVmG/fiQTvbA==
+X-Received: by 2002:a05:6a00:3497:b0:536:d6a8:6f62 with SMTP id cp23-20020a056a00349700b00536d6a86f62mr1039067pfb.79.1661464424600;
+        Thu, 25 Aug 2022 14:53:44 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:349c:3078:d005:5a7e? ([2620:15c:211:201:349c:3078:d005:5a7e])
-        by smtp.gmail.com with ESMTPSA id i12-20020a17090332cc00b001713af9e85dsm36928plr.180.2022.08.25.14.50.47
+        by smtp.gmail.com with ESMTPSA id d8-20020a17090a3b0800b001fb0a363c18sm195698pjc.52.2022.08.25.14.53.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Aug 2022 14:50:48 -0700 (PDT)
-Message-ID: <1dcffde8-ded6-b665-58a4-0f9f091b2a8e@acm.org>
-Date:   Thu, 25 Aug 2022 14:50:45 -0700
+        Thu, 25 Aug 2022 14:53:43 -0700 (PDT)
+Message-ID: <9e81fd1e-b206-dd8d-4c27-1aa5cdcf4e10@acm.org>
+Date:   Thu, 25 Aug 2022 14:53:41 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-Subject: Re: [dm-devel] [PATCH v12 08/13] dm-zoned: ensure only power of 2
- zone sizes are allowed
+Subject: Re: [PATCH v12 09/13] dm-zone: use generic helpers to calculate
+ offset from zone start
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, agk@redhat.com,
         snitzer@kernel.org, axboe@kernel.dk,
         damien.lemoal@opensource.wdc.com, hch@lst.de
 Cc:     pankydev8@gmail.com, Johannes.Thumshirn@wdc.com,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        gost.dev@samsung.com, jaegeuk@kernel.org, matias.bjorling@wdc.com,
+        linux-block@vger.kernel.org, dm-devel@redhat.com, hare@suse.de,
+        jaegeuk@kernel.org, linux-kernel@vger.kernel.org,
+        matias.bjorling@wdc.com, gost.dev@samsung.com,
+        linux-nvme@lists.infradead.org,
         Luis Chamberlain <mcgrof@kernel.org>
 References: <20220823121859.163903-1-p.raghav@samsung.com>
- <CGME20220823121909eucas1p113c0c29f7e28d0ee3e1161f7da243baf@eucas1p1.samsung.com>
- <20220823121859.163903-9-p.raghav@samsung.com>
+ <CGME20220823121911eucas1p2a55dec72a6d780123e6c7655aee72457@eucas1p2.samsung.com>
+ <20220823121859.163903-10-p.raghav@samsung.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220823121859.163903-9-p.raghav@samsung.com>
+In-Reply-To: <20220823121859.163903-10-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -66,13 +67,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 8/23/22 05:18, Pankaj Raghav wrote:
-> From: Luis Chamberlain <mcgrof@kernel.org>
-> 
-> dm-zoned relies on the assumption that the zone size is a
-> power-of-2(po2) and the zone capacity is same as the zone size.
-> 
-> Ensure only po2 devices can be used as dm-zoned target until a native
-> support for zoned devices with non-po2 zone size is added.
-
+> Use the bdev_offset_from_zone_start() helper function to calculate
+> the offset from zone start instead of using power of 2 based
+> calculation.
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-
