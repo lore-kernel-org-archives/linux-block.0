@@ -2,79 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34F0FECAAD5
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 16:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 429E9ECAAD5
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 16:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244383AbiHZQGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 12:06:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33512 "EHLO
+        id S1344158AbiHZQPn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 12:15:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230339AbiHZQGq (ORCPT
+        with ESMTP id S231512AbiHZQP3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 12:06:46 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD28D41A5
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 09:06:43 -0700 (PDT)
-Received: by mail-pj1-f51.google.com with SMTP id i7-20020a17090adc0700b001fd7ccbec3cso252480pjv.0
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 09:06:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=HstNGJfk5Arqm9BrcEVg2a/rhvyFyXDTLuukw7Xd4tg=;
-        b=B34QrmRBcBeE8tvXgMKkp9dbzhYbDSyt25IoPz5kpOP5xGmbAh4FMn0ohQgIQBXLjI
-         Gzi4RYe0G4oyAPqBm57mMrElPy23A+Y/H9wL4T46qfh6AgQlIPoUCMa7Nwx0WEiM8YEa
-         Tn8ruJ0O9lt0whW6Dh2qhWcgrQ+T9RdUapZnxiZgbiW2DPcceCXU9gy1YiaL4j36g5Xd
-         ehqdrzg+EmFLxzWC+V6Io76+VkkfXWZYt/a+ttqVUMUfXo1gPfe92SQPCE3upBUUePCm
-         BAeg54ccrGBh+cSs/jGZkPACCB2hUamxjOJ2o4YvmWEb77R0ZFrgO8OtPMhwe/7G/ZBg
-         rTtg==
-X-Gm-Message-State: ACgBeo3yIqvvGwcKfZkUIbcIiNExDYVX9tl5dkh1aqam1MNXnHU9uv/+
-        9Vi3e62AXviiBqDdNs5kK60=
-X-Google-Smtp-Source: AA6agR4+NFIEYmAmMTeW3wqMJUuuNWOLJdNBOirtX6ZcyfR5fx4hWbeaKFnuNsqSQ7yCnybTRnHUqA==
-X-Received: by 2002:a17:90b:1e53:b0:1fb:3aba:372e with SMTP id pi19-20020a17090b1e5300b001fb3aba372emr5237099pjb.34.1661530002677;
-        Fri, 26 Aug 2022 09:06:42 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:a12:b4b9:f1b3:ec63? ([2620:15c:211:201:a12:b4b9:f1b3:ec63])
-        by smtp.gmail.com with ESMTPSA id o1-20020a62cd01000000b0052d432b4cc0sm1914409pfg.33.2022.08.26.09.06.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Aug 2022 09:06:41 -0700 (PDT)
-Message-ID: <f95bf278-e999-2068-01bd-c01f363e66a5@acm.org>
-Date:   Fri, 26 Aug 2022 09:06:40 -0700
+        Fri, 26 Aug 2022 12:15:29 -0400
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 690DFA2869;
+        Fri, 26 Aug 2022 09:15:24 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id CC0055C05D4;
+        Fri, 26 Aug 2022 12:15:23 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Fri, 26 Aug 2022 12:15:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
+         h=cc:cc:content-transfer-encoding:content-type:date:date:from
+        :from:in-reply-to:message-id:mime-version:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1661530523; x=1661616923; bh=2X
+        pK+MsnzSh3YxXW1jI/LTxDkomrIwNcVnN1BvA8HKs=; b=Gj24PpiaInCrHO2Nnr
+        N0ZxqlcfGR/NP5Y/qiNNXxXfLMRqUOW6g7jamo3g/rYlojpljy+Ex+mcELoLsZzp
+        O8aH9cvZb7gjcJVT/xkd3qqUVrR5B3Xpwl2fRZ9+X/juAr2NwbJHVCwuWTKBo0hF
+        v18Q/BSt4j3IFbB8j4cEyJxZcnD8YBLnW1fmoMAO0lzNQZ1ldoUYDNmlLPaXvaZX
+        rgyFcT1HiXH9zV6MG11hMvSAqgwCDoaDrg6OZxnP+qRSXY75x8oQECUyu43mZ1Jk
+        8YSgrM632qckjMk2ILGmEva+Xf76UO+U6o/wqkT+zEkTJLDLhERBEDO1445XIAou
+        3S1A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:date:date:feedback-id:feedback-id:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm1; t=1661530523; x=1661616923; bh=2XpK+MsnzSh3Y
+        xXW1jI/LTxDkomrIwNcVnN1BvA8HKs=; b=izAHRUFD+UxY2v8i3Dd8fOenj5Cm+
+        09JhWOvl8mDXLayVo/3AV3iNV0iEagOskknCOHySaElCvU4bU86Pg1qiJKN0a9nH
+        pYjl/f9ROvAt0X1xYZGeG/URaA9QwHVBg6cNDP9cdBzhTEyJJHSRoFuedDCfgJw8
+        Ug8OKuJUmTWV1GnSFDm3IzsxuYiBKIVK+9cQF5kEtAyVXwwrJXdEQVYn3skuiEj2
+        CrrX7vBbY8Fs/cc7gLvLONZasHiq44X/CbHHvCGZW9iUbzZzKAvjNnHJwxNKe7Sy
+        ra5iVzkECgGjOazs9a9835NbfdmuVafEf/wjyA2LH1Y/DDmYbz4l7YnrA==
+X-ME-Sender: <xms:m_EIYy1zNyu8r-LJrp1O1RCtivWzyzwRjQtFJ65LtQFlsIjXpc6T_A>
+    <xme:m_EIY1GUiLOLUrtX1ly6Glgj6KUFB1KxVi8uS1mGXXUFBCl9EojB8lCNoaQJHiK1P
+    u8jdbP3ChgN4E3UKBk>
+X-ME-Received: <xmr:m_EIY65EdBYZLFzvUR0nqm1_zoSkLJKZdvj8WXLojIR8zVxRmxqZOArIB6_9PMp2C8sr>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdejhedgleekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepkfffgggfvfevhffutgfgsehtjeertddtfeejnecuhfhrohhmpeffuhhsthih
+    ucforggsvgcuoeguuhhsthihseguuhhsthihmhgrsggvrdgtohhmqeenucggtffrrghtth
+    gvrhhnpeeuhfevheeltddtveegiedvfeffteeghefgfeevjeffgfdtfeevtdeivdduveeu
+    ueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhrvgguhhgrthdrtghomhdpghhith
+    hhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
+    rhhomhepughushhthiesughushhthihmrggsvgdrtghomh
+X-ME-Proxy: <xmx:m_EIYz3-gH4uCMdEGDa5GjXhE9-gRCtXBD-gdSRccCE83yAGNdWsgg>
+    <xmx:m_EIY1HS1kNZVz030Qv9pmiRvIy4K1EjT26RwSjq1tua4WNH0MUOlA>
+    <xmx:m_EIY8_u_oT7-tB01CcEjdjKzXDyZbJjp6jBqIJKzxh-3V7y4BH3qg>
+    <xmx:m_EIY6R40ZwCfgf1-QrQqbACoyzUy5bGWXwR0qkdK6hL5pI-tLjQEA>
+Feedback-ID: i13394474:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 26 Aug 2022 12:15:22 -0400 (EDT)
+Message-ID: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
+Date:   Fri, 26 Aug 2022 12:15:22 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
+ Thunderbird/91.8.0
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, gumi@linux.alibaba.com,
-        damien.lemoal@opensource.wdc.com
-Cc:     linux-block@vger.kernel.org
-References: <000a01d8b8fb$7b4a7950$71df6bf0$@linux.alibaba.com>
- <81c70a13-0317-49b7-c3b6-61f6aaa21c10@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <81c70a13-0317-49b7-c3b6-61f6aaa21c10@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     hch@lst.de
+From:   Dusty Mabe <dusty@dustymabe.com>
+Subject: regression caused by block: freeze the queue earlier in del_gendisk
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/26/22 06:36, Jens Axboe wrote:
-> That aside, I think there's a misunderstanding here. v1 has some
-> parts and v2 has others. Please post a v3 that has the hunk
-> that guarantees that deadline always has the lowest bit set if
-> assigned, and the !deadline check as well.
+Hey All,
 
-Hi Jens,
+I think I've found a regression introduced by:
 
-Would it be considered acceptable to store the request state (rq->state) 
-in the lowest two bits of rq->deadline? This would reduce the deadline 
-resolution a little bit but I think that's acceptable. Except for 
-blk_abort_request(), all changes of rq->state and rq->deadline are 
-already serialized. So with this approach only blk_abort_request() would 
-have to use an atomic-compare-exchange loop.
+a09b314 o block: freeze the queue earlier in del_gendisk
 
-Thanks,
+In Fedora CoreOS we have tests that set up RAID1 on the /boot/ and /root/ partitions
+and then subsequently removes one of the disks to simulate a failure. Sometime recently
+this test started timing out occasionally. Looking a bit closer it appears instances are
+getting stuck during reboot with a bunch of looping messages:
 
-Bart.
+```
+[   17.978854] block device autoloading is deprecated and will be removed.
+[   17.982555] block device autoloading is deprecated and will be removed.
+[   17.985537] block device autoloading is deprecated and will be removed.
+[   17.987546] block device autoloading is deprecated and will be removed.
+[   17.989540] block device autoloading is deprecated and will be removed.
+[   17.991547] block device autoloading is deprecated and will be removed.
+[   17.993555] block device autoloading is deprecated and will be removed.
+[   17.995539] block device autoloading is deprecated and will be removed.
+[   17.997577] block device autoloading is deprecated and will be removed.
+[   17.999544] block device autoloading is deprecated and will be removed.
+[   22.979465] blkdev_get_no_open: 1666 callbacks suppressed
+...
+...
+...
+[  618.221270] blkdev_get_no_open: 1664 callbacks suppressed
+[  618.221273] block device autoloading is deprecated and will be removed.
+[  618.224274] block device autoloading is deprecated and will be removed.
+[  618.227267] block device autoloading is deprecated and will be removed.
+[  618.229274] block device autoloading is deprecated and will be removed.
+[  618.231277] block device autoloading is deprecated and will be removed.
+[  618.233277] block device autoloading is deprecated and will be removed.
+[  618.235282] block device autoloading is deprecated and will be removed.
+[  618.237370] block device autoloading is deprecated and will be removed.
+[  618.239356] block device autoloading is deprecated and will be removed.
+[  618.241290] block device autoloading is deprecated and will be removed.
+```
 
+Using the Fedora kernels I narrowed it down to being introduced between 
+`kernel-5.19.0-0.rc3.27.fc37` (good) and `kernel-5.19.0-0.rc4.33.fc37` (bad).
+
+I then did a bisect and found:
+
+```
+$ git bisect bad
+a09b314005f3a0956ebf56e01b3b80339df577cc is the first bad commit
+commit a09b314005f3a0956ebf56e01b3b80339df577cc
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Tue Jun 14 09:48:27 2022 +0200
+
+    block: freeze the queue earlier in del_gendisk
+    
+    Freeze the queue earlier in del_gendisk so that the state does not
+    change while we remove debugfs and sysfs files.
+    
+    Ming mentioned that being able to observer request in debugfs might
+    be useful while the queue is being frozen in del_gendisk, which is
+    made possible by this change.
+    
+    Signed-off-by: Christoph Hellwig <hch@lst.de>
+    Link: https://lore.kernel.org/r/20220614074827.458955-5-hch@lst.de
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+ block/genhd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+```
+
+Reverting this commit on top of latest git master (4c612826b) gave me successful results.
+
+Any ideas on what could be amiss here? Luckily the patch is tiny so hopefully it might
+be obvious.
+
+More details (including logs) in the following locations:
+
+- https://bugzilla.redhat.com/show_bug.cgi?id=2121791
+- https://github.com/coreos/fedora-coreos-tracker/issues/1282
+
+
+Thanks!
+Dusty
 
