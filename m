@@ -2,119 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E230ECAAD6
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 11:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0338ECAAA3
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 11:26:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344269AbiHZLE5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 07:04:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47686 "EHLO
+        id S245290AbiHZL01 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 07:26:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343565AbiHZLEc (ORCPT
+        with ESMTP id S245078AbiHZL00 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 07:04:32 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1E31B7A2;
-        Fri, 26 Aug 2022 04:04:10 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 5D84A33A78;
-        Fri, 26 Aug 2022 11:04:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1661511849; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Fri, 26 Aug 2022 07:26:26 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6941FB99C1;
+        Fri, 26 Aug 2022 04:26:25 -0700 (PDT)
+Subject: Re: [PATCH] rnbd-srv: remove 'dir' argument from rnbd_srv_rdma_ev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1661513183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FFOOohnuss0N6Iie9i/7dzCuPjr92PFh/YAiHWF3gM4=;
-        b=NatBhYTr6ApHxghgYmknxe6iN3Rr+EBBUSoY5mmnOzPzzwwArg7zWdJtYkxPrOeF2mlNgI
-        klmIvSpO1fXEiWxdUEi0er1eDXTj4n8vKWTPMVOfHgTD7EIAIX2ltg7nvQRBd1Se1sdEew
-        pIcmxtCCFuS6EfkuoTZDekdtwME53uc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1661511849;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FFOOohnuss0N6Iie9i/7dzCuPjr92PFh/YAiHWF3gM4=;
-        b=oFYrTGr9oU6N1KQoe9qQFm1PH+3BubRR+/a2dPtLGQeGvVdJrFaTP3tCdiLTW3fIMO/95N
-        +bBBpumRUSF9EXCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1D37E13A7E;
-        Fri, 26 Aug 2022 11:04:09 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id YsM3BqmoCGPYawAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Fri, 26 Aug 2022 11:04:09 +0000
-Message-ID: <bf093f5c-bd0b-e843-d9e5-a4edf0f70cae@suse.cz>
-Date:   Fri, 26 Aug 2022 13:04:08 +0200
+        bh=EDEDV4Za64xDzQejgmqdr6o7gDUf8GyuO67eOl/XmIw=;
+        b=jZ82XdsCkOAy3b15Wj2VsWsqM4CIjUk99LoWDmayYcRgsWLQSZ1wc/Qmv60OtwJOt7yPXX
+        CQpPpcPghXIf6G2SqW48TKbbcc5tHe+14XR5BlPPy/zCmqEnmiJFRGmKsImdSGuS0/O1sJ
+        gfB4+2hKVlPcoufwzaU4v6GNoa52Ka4=
+To:     Jinpu Wang <jinpu.wang@ionos.com>
+Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, jgg@ziepe.ca,
+        leon@kernel.org, linux-block@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+References: <20220826081117.21687-1-guoqing.jiang@linux.dev>
+ <CAMGffEku8H3RubkQGq1Cjy8pP8B+95coT+b2J6VxSAQx-kKmmg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+Message-ID: <aa3a4d50-2e71-a185-09ac-79bd34f9c8e6@linux.dev>
+Date:   Fri, 26 Aug 2022 19:26:17 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+In-Reply-To: <CAMGffEku8H3RubkQGq1Cjy8pP8B+95coT+b2J6VxSAQx-kKmmg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>,
-        matoro <matoro_mailinglist_kernel@matoro.tk>
-Cc:     Meelis Roos <mroos@linux.ee>, Matthew Wilcox <willy@infradead.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, vbabka@suse.com
-References: <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
- <20190218120209.GC20919@quack2.suse.cz>
- <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
- <20190219132026.GA28293@quack2.suse.cz>
- <20190219144454.GB12668@bombadil.infradead.org>
- <d444f653-9b99-5e9b-3b47-97f824c29b0e@linux.ee>
- <20190220094813.GA27474@quack2.suse.cz>
- <2381c264-92f5-db43-b6a5-8e00bd881fef@linux.ee>
- <20190221132916.GA22886@quack2.suse.cz>
- <97dbffaefa65a83b36e1ec134fd53a66@matoro.tk>
- <20220826105513.eo5otoujtz75u7dg@quack3>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20220826105513.eo5otoujtz75u7dg@quack3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/26/22 12:55, Jan Kara wrote:
-> On Thu 25-08-22 11:05:48, matoro wrote:
->> Hello all, I know this is quite an old thread.  I recently acquired some
->> alpha hardware and have run into this exact same problem on the latest
->> stable kernel (5.18 and 5.19).  CONFIG_COMPACTION seems to be totally broken
->> and causes userspace to be extremely unstable - random segfaults, corruption
->> of glibc data structures, gcc ICEs etc etc - seems most noticable during
->> tasks with heavy I/O load.
->> 
->> My hardware is a DS15 (Titan), so only slightly newer than the Tsunamis
->> mentioned earlier.  The problem is greatly exacerbated when using a
->> machine-optimized kernel (CONFIG_ALPHA_TITAN) over one with
->> CONFIG_ALPHA_GENERIC.  But it still doesn't go away on a generic kernel,
->> just pops up less often, usually very I/O heavy tasks like checking out a
->> tag in the kernel repo.
->> 
->> However all of this seems to be dependent on CONFIG_COMPACTION.  With this
->> toggled off all problems disappear, regardless of other options.  I tried
->> reverting the commit 88dbcbb3a4847f5e6dfeae952d3105497700c128 mentioned
->> earlier in the thread (the structure has moved to a different file but was
->> otherwise the same), but it unfortunately did not make a difference.
->> 
->> Since this doesn't seem to have a known cause or an easy fix, would it be
->> reasonable to just add a Kconfig dep to disable it automatically on alpha?
-> 
-> Thanks for report. I guess this just confirms that migration of pagecache
-> pages is somehow broken on Alpha. Maybe we are missing to flush some cache
-> specific for Alpha? Or maybe the page migration code is not safe wrt the
-> peculiar memory ordering Alpha has... I think this will need someone with
-> Alpha HW and willingness to dive into MM internals to debug this. Added
-> Vlasta to CC mostly for awareness and in case it rings some bells :).
 
-Hi, doesn't ring any bells unfortunately. Does corruption also happen when
-mmapping a file and applying mbind() with MPOL_MF_MOVE or migrate_pages()?
-That should allow more controlled migration experimens than through
-compaction. But that would also need a NUMA machine or a fakenuma support,
-dunno if alpha has that?
+
+On 8/26/22 6:48 PM, Jinpu Wang wrote:
+> On Fri, Aug 26, 2022 at 10:11 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
+>> Since all callers (process_{read,write}) set id->dir, no need to
+>> pass 'dir' again.
+>>
+>> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+>> ---
+>>   drivers/block/rnbd/rnbd-srv.c          | 9 ++++-----
+>>   drivers/block/rnbd/rnbd-srv.h          | 1 +
+>>   drivers/infiniband/ulp/rtrs/rtrs-srv.c | 4 ++--
+>>   drivers/infiniband/ulp/rtrs/rtrs.h     | 3 +--
+>>   4 files changed, 8 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+>> index 3f6c268e04ef..9600715f1029 100644
+>> --- a/drivers/block/rnbd/rnbd-srv.c
+>> +++ b/drivers/block/rnbd/rnbd-srv.c
+>> @@ -368,10 +368,9 @@ static int process_msg_sess_info(struct rnbd_srv_session *srv_sess,
+>>                                   const void *msg, size_t len,
+>>                                   void *data, size_t datalen);
+>>
+>> -static int rnbd_srv_rdma_ev(void *priv,
+>> -                           struct rtrs_srv_op *id, int dir,
+>> -                           void *data, size_t datalen, const void *usr,
+>> -                           size_t usrlen)
+>> +static int rnbd_srv_rdma_ev(void *priv, struct rtrs_srv_op *id,
+>> +                           void *data, size_t datalen,
+>> +                           const void *usr, size_t usrlen)
+>>   {
+>>          struct rnbd_srv_session *srv_sess = priv;
+>>          const struct rnbd_msg_hdr *hdr = usr;
+>> @@ -398,7 +397,7 @@ static int rnbd_srv_rdma_ev(void *priv,
+>>                  break;
+>>          default:
+>>                  pr_warn("Received unexpected message type %d with dir %d from session %s\n",
+>> -                       type, dir, srv_sess->sessname);
+>> +                       type, id->dir, srv_sess->sessname);
+>>                  return -EINVAL;
+>>          }
+>>
+>> diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
+>> index 081bceaf4ae9..5a0ef6c2b5c7 100644
+>> --- a/drivers/block/rnbd/rnbd-srv.h
+>> +++ b/drivers/block/rnbd/rnbd-srv.h
+>> @@ -14,6 +14,7 @@
+>>   #include <linux/kref.h>
+>>
+>>   #include <rtrs.h>
+>> +#include <rtrs-srv.h>
+> why do we need this?
+
+Otherwise, compiler complains
+
+drivers/block/rnbd/rnbd-srv.c: In function ‘rnbd_srv_rdma_ev’:
+drivers/block/rnbd/rnbd-srv.c:400:33: error: invalid use of undefined 
+type ‘struct rtrs_srv_op’
+   400 |                         type, id->dir, srv_sess->sessname);
+
+Thanks,
+Guoqing
