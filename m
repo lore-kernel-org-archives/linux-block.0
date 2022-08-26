@@ -2,63 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53262ECAAD4
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 10:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E230ECAAD6
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 11:05:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344011AbiHZKzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 06:55:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56156 "EHLO
+        id S1344269AbiHZLE5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 07:04:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245100AbiHZKzR (ORCPT
+        with ESMTP id S1343565AbiHZLEc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 06:55:17 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BEDC1C11B;
-        Fri, 26 Aug 2022 03:55:15 -0700 (PDT)
+        Fri, 26 Aug 2022 07:04:32 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1E31B7A2;
+        Fri, 26 Aug 2022 04:04:10 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A42F91F9EF;
-        Fri, 26 Aug 2022 10:55:13 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5D84A33A78;
+        Fri, 26 Aug 2022 11:04:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1661511313; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1661511849; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PJjPoLSdn1Ab7WC5trQqNg3byZqTk6tSEArhcgceCXk=;
-        b=OW9svkO3+fb0D8mMUaCVQ0Rf0VCHAigtpnLAA9SUHMU/fRhUZyXg/OrSLETY5Fa6Flr9UB
-        8W31DSEgjYx9MFKnb+mk9SNtavV8OLzytuOLed6O8PDJbFeWEUCKfMz7qZoDe+D09ywRcp
-        AmNU+Lz2EzHqN4zmvFN8MSSRB/zDTDc=
+        bh=FFOOohnuss0N6Iie9i/7dzCuPjr92PFh/YAiHWF3gM4=;
+        b=NatBhYTr6ApHxghgYmknxe6iN3Rr+EBBUSoY5mmnOzPzzwwArg7zWdJtYkxPrOeF2mlNgI
+        klmIvSpO1fXEiWxdUEi0er1eDXTj4n8vKWTPMVOfHgTD7EIAIX2ltg7nvQRBd1Se1sdEew
+        pIcmxtCCFuS6EfkuoTZDekdtwME53uc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1661511313;
+        s=susede2_ed25519; t=1661511849;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PJjPoLSdn1Ab7WC5trQqNg3byZqTk6tSEArhcgceCXk=;
-        b=UNzojhwqTFs/+RBrjZjarLlWGH52nY2a1OQ+YNAEbC/RTvipGG6ZeDQLGKQZyZBW4EQ8D7
-        tExFnSYeG3UedIBw==
+        bh=FFOOohnuss0N6Iie9i/7dzCuPjr92PFh/YAiHWF3gM4=;
+        b=oFYrTGr9oU6N1KQoe9qQFm1PH+3BubRR+/a2dPtLGQeGvVdJrFaTP3tCdiLTW3fIMO/95N
+        +bBBpumRUSF9EXCw==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9541713A7E;
-        Fri, 26 Aug 2022 10:55:13 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1D37E13A7E;
+        Fri, 26 Aug 2022 11:04:09 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id pnpsJJGmCGOwZwAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 26 Aug 2022 10:55:13 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 278BFA0679; Fri, 26 Aug 2022 12:55:13 +0200 (CEST)
-Date:   Fri, 26 Aug 2022 12:55:13 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     matoro <matoro_mailinglist_kernel@matoro.tk>
-Cc:     Jan Kara <jack@suse.cz>, Meelis Roos <mroos@linux.ee>,
-        Matthew Wilcox <willy@infradead.org>,
+        id YsM3BqmoCGPYawAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Fri, 26 Aug 2022 11:04:09 +0000
+Message-ID: <bf093f5c-bd0b-e843-d9e5-a4edf0f70cae@suse.cz>
+Date:   Fri, 26 Aug 2022 13:04:08 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>,
+        matoro <matoro_mailinglist_kernel@matoro.tk>
+Cc:     Meelis Roos <mroos@linux.ee>, Matthew Wilcox <willy@infradead.org>,
         "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
         LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
         linux-mm@kvack.org, vbabka@suse.com
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-Message-ID: <20220826105513.eo5otoujtz75u7dg@quack3>
 References: <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
  <20190218120209.GC20919@quack2.suse.cz>
  <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
@@ -69,71 +72,49 @@ References: <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
  <2381c264-92f5-db43-b6a5-8e00bd881fef@linux.ee>
  <20190221132916.GA22886@quack2.suse.cz>
  <97dbffaefa65a83b36e1ec134fd53a66@matoro.tk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97dbffaefa65a83b36e1ec134fd53a66@matoro.tk>
+ <20220826105513.eo5otoujtz75u7dg@quack3>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <20220826105513.eo5otoujtz75u7dg@quack3>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 25-08-22 11:05:48, matoro wrote:
-> Hello all, I know this is quite an old thread.  I recently acquired some
-> alpha hardware and have run into this exact same problem on the latest
-> stable kernel (5.18 and 5.19).  CONFIG_COMPACTION seems to be totally broken
-> and causes userspace to be extremely unstable - random segfaults, corruption
-> of glibc data structures, gcc ICEs etc etc - seems most noticable during
-> tasks with heavy I/O load.
+On 8/26/22 12:55, Jan Kara wrote:
+> On Thu 25-08-22 11:05:48, matoro wrote:
+>> Hello all, I know this is quite an old thread.  I recently acquired some
+>> alpha hardware and have run into this exact same problem on the latest
+>> stable kernel (5.18 and 5.19).  CONFIG_COMPACTION seems to be totally broken
+>> and causes userspace to be extremely unstable - random segfaults, corruption
+>> of glibc data structures, gcc ICEs etc etc - seems most noticable during
+>> tasks with heavy I/O load.
+>> 
+>> My hardware is a DS15 (Titan), so only slightly newer than the Tsunamis
+>> mentioned earlier.  The problem is greatly exacerbated when using a
+>> machine-optimized kernel (CONFIG_ALPHA_TITAN) over one with
+>> CONFIG_ALPHA_GENERIC.  But it still doesn't go away on a generic kernel,
+>> just pops up less often, usually very I/O heavy tasks like checking out a
+>> tag in the kernel repo.
+>> 
+>> However all of this seems to be dependent on CONFIG_COMPACTION.  With this
+>> toggled off all problems disappear, regardless of other options.  I tried
+>> reverting the commit 88dbcbb3a4847f5e6dfeae952d3105497700c128 mentioned
+>> earlier in the thread (the structure has moved to a different file but was
+>> otherwise the same), but it unfortunately did not make a difference.
+>> 
+>> Since this doesn't seem to have a known cause or an easy fix, would it be
+>> reasonable to just add a Kconfig dep to disable it automatically on alpha?
 > 
-> My hardware is a DS15 (Titan), so only slightly newer than the Tsunamis
-> mentioned earlier.  The problem is greatly exacerbated when using a
-> machine-optimized kernel (CONFIG_ALPHA_TITAN) over one with
-> CONFIG_ALPHA_GENERIC.  But it still doesn't go away on a generic kernel,
-> just pops up less often, usually very I/O heavy tasks like checking out a
-> tag in the kernel repo.
-> 
-> However all of this seems to be dependent on CONFIG_COMPACTION.  With this
-> toggled off all problems disappear, regardless of other options.  I tried
-> reverting the commit 88dbcbb3a4847f5e6dfeae952d3105497700c128 mentioned
-> earlier in the thread (the structure has moved to a different file but was
-> otherwise the same), but it unfortunately did not make a difference.
-> 
-> Since this doesn't seem to have a known cause or an easy fix, would it be
-> reasonable to just add a Kconfig dep to disable it automatically on alpha?
+> Thanks for report. I guess this just confirms that migration of pagecache
+> pages is somehow broken on Alpha. Maybe we are missing to flush some cache
+> specific for Alpha? Or maybe the page migration code is not safe wrt the
+> peculiar memory ordering Alpha has... I think this will need someone with
+> Alpha HW and willingness to dive into MM internals to debug this. Added
+> Vlasta to CC mostly for awareness and in case it rings some bells :).
 
-Thanks for report. I guess this just confirms that migration of pagecache
-pages is somehow broken on Alpha. Maybe we are missing to flush some cache
-specific for Alpha? Or maybe the page migration code is not safe wrt the
-peculiar memory ordering Alpha has... I think this will need someone with
-Alpha HW and willingness to dive into MM internals to debug this. Added
-Vlasta to CC mostly for awareness and in case it rings some bells :).
-
-								Honza
-
-> -------- Original Message --------
-> Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-> Date: 2019-02-21 08:29
-> From: Jan Kara <jack@suse.cz>
-> To: Meelis Roos <mroos@linux.ee>
-> 
-> On Thu 21-02-19 01:23:50, Meelis Roos wrote:
-> > > > First, I found out that both the problematic alphas had memory compaction and
-> > > > page migration and bounce buffers turned on, and working alphas had them off.
-> > > >
-> > > > Next, turing off these options makes the problematic alphas work.
-> > >
-> > > OK, thanks for testing! Can you narrow down whether the problem is due to
-> > > CONFIG_BOUNCE or CONFIG_MIGRATION + CONFIG_COMPACTION? These are two
-> > > completely different things so knowing where to look will help. Thanks!
-> > 
-> > Tested both.
-> > 
-> > Just CONFIG_MIGRATION + CONFIG_COMPACTION breaks the alpha.
-> > Just CONFIG_BOUNCE has no effect in 5 tries.
-> 
-> OK, so page migration is problematic. Thanks for confirmation!
-> 
-> 								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Hi, doesn't ring any bells unfortunately. Does corruption also happen when
+mmapping a file and applying mbind() with MPOL_MF_MOVE or migrate_pages()?
+That should allow more controlled migration experimens than through
+compaction. But that would also need a NUMA machine or a fakenuma support,
+dunno if alpha has that?
