@@ -2,140 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030A1ECAAD4
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 16:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BBC4ECAAA3
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 16:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344452AbiHZQS4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 12:18:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52406 "EHLO
+        id S230436AbiHZQ3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 12:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245720AbiHZQSz (ORCPT
+        with ESMTP id S229447AbiHZQ3k (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 12:18:55 -0400
-Received: from matoro.tk (unknown [IPv6:2600:1700:4b10:9d80::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11871D91C5;
-        Fri, 26 Aug 2022 09:18:48 -0700 (PDT)
-DKIM-Signature: a=rsa-sha256; bh=rngoAUfTvl93BSKur1UsnUCm+wAmd5fS1fyUrfe3Tjk=;
- c=relaxed/relaxed; d=matoro.tk;
- h=Subject:Subject:Sender:To:To:Cc:Cc:From:From:Date:Date:MIME-Version:MIME-Version:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Reply-To:In-Reply-To:In-Reply-To:Message-Id:Message-Id:References:References:Autocrypt:Openpgp;
- i=@matoro.tk; s=20220801; t=1661530580; v=1; x=1661962580;
- b=l+iFCCbnYuqIIc0pzyehnyH4fQBERr+/rAXMhG1iop5tqOPsVsGvIMpTegIekbm8TXssaOti
- jI3R54FA9hiSAc7J3+LxKY9GJ6hqo/82DNv/y+vOag+8l32rl62HhHyE0oyiFro7yyqUDy57SWd
- W/Nzpf62Ic7w9A89l/eAF3Lcit/b7MwJQqbVCxts+NoSFhh18fz8JgB4atmqfz3jq5Psexteu1e
- vY7qlZTfdgpaTPkBTOemcI3LjHHeN1bL7z7F5qSijL7iVGyXCzhc/mN0NBXfCajdSZZn5aEdG1+
- vmrcCgzAqZXFqHyLMkBFrworatzVG8zCNK40SkkKsySVB6NZeOw4JIHg/JZVuunWO7gEtu+k7yx
- wR+oUlD8BWIKjOY2RP4zIfzfeB+NW/7Lw3olP8mwHA6iNGk/CA3xXOmdnfv05H2a2C6qU+a1VCf
- Gj2EYSLW2MOIsFQ6/WW9nzR++S/rNWBSabI5OyQ2lPWB5yQALBA09qND3bH1/lUNdpOI+OxRSlG
- d0ojZoa/u+Rxm47DRLrG2IOjVd2k9yi83Onbeml9zr0MPlFZvfm+ltTPYeaMsWC4NJCaVoqKaUa
- uWhT9tvD3NnSSBJAtZieKSlQB1hEKC1AYU9YKU/d5MoCUuguqIE2BKR/SYj48LfNfssPIIk1CwM
- 7WwM+aNxfQI=
-Received: by matoro.tk (envelope-sender
- <matoro_mailinglist_kernel@matoro.tk>) with ESMTPS id 66436cf2; Fri, 26 Aug
- 2022 12:16:20 -0400
+        Fri, 26 Aug 2022 12:29:40 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45846DF679;
+        Fri, 26 Aug 2022 09:29:40 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id i8-20020a17090a65c800b001fd602afda2so2173732pjs.4;
+        Fri, 26 Aug 2022 09:29:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=lBvvh8CMBUZ2sjFkD26Cqoc4+9rLr06nz33vMiatlKg=;
+        b=zGlgpTZt7y4RuOIBm6obh5ay0lNUw1pt0yg1FMs/sfje7TG9bWtM6JBc93CxIhu8vT
+         GL1ueW4b+4uuHbNXthoP4cVkE6rCb/o6cbVSQjhI95GKXsiNn053k2abZPJfuGz8tsrw
+         4pyN9LlZVGxOVyrNZtbdG4fpCxuRswvGFEaCR7bk4qA9AdrAOKuxYE3L2y8ueKnztw/2
+         seoDdeOpqtaorJVv+ddcsuoM5qbr1nOklg6c4zZbuyT42n//3RSbxYvZdXULo33tqxgE
+         CxrZq9u6MbZd2NbJykSvghGNQcWwFL2VM7gMongl4iqI/ECpNrSUp7E9MR3zBDUCO/sr
+         9Wdw==
+X-Gm-Message-State: ACgBeo0NDvvK9Vz3KEQvuoevodCNXxksV9mw8vKe88bz7Gebjibc8sXU
+        Vxv14akl1B3y2naYC1DL9xCoPWOpvPnjrw==
+X-Google-Smtp-Source: AA6agR7vd7jE0Y5Ib+TqvdaFovHQP0nydl+a10cj01d60/tG2Hj7/bbclaJKgdJa5dhuJjDKvnN5RQ==
+X-Received: by 2002:a17:902:f650:b0:172:8ee1:7f40 with SMTP id m16-20020a170902f65000b001728ee17f40mr4444648plg.101.1661531379674;
+        Fri, 26 Aug 2022 09:29:39 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:a12:b4b9:f1b3:ec63? ([2620:15c:211:201:a12:b4b9:f1b3:ec63])
+        by smtp.gmail.com with ESMTPSA id x36-20020a17090a6c2700b001fa867105a3sm1939818pjj.4.2022.08.26.09.29.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Aug 2022 09:29:38 -0700 (PDT)
+Message-ID: <5ffb520f-d86f-be3e-4239-2f31c681ede2@acm.org>
+Date:   Fri, 26 Aug 2022 09:29:36 -0700
 MIME-Version: 1.0
-Date:   Fri, 26 Aug 2022 12:16:19 -0400
-From:   matoro <matoro_mailinglist_kernel@matoro.tk>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     Jan Kara <jack@suse.cz>, Meelis Roos <mroos@linux.ee>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, vbabka@suse.com
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-In-Reply-To: <bf093f5c-bd0b-e843-d9e5-a4edf0f70cae@suse.cz>
-References: <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
- <20190218120209.GC20919@quack2.suse.cz>
- <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
- <20190219132026.GA28293@quack2.suse.cz>
- <20190219144454.GB12668@bombadil.infradead.org>
- <d444f653-9b99-5e9b-3b47-97f824c29b0e@linux.ee>
- <20190220094813.GA27474@quack2.suse.cz>
- <2381c264-92f5-db43-b6a5-8e00bd881fef@linux.ee>
- <20190221132916.GA22886@quack2.suse.cz>
- <97dbffaefa65a83b36e1ec134fd53a66@matoro.tk>
- <20220826105513.eo5otoujtz75u7dg@quack3>
- <bf093f5c-bd0b-e843-d9e5-a4edf0f70cae@suse.cz>
-Message-ID: <1ef4d01e1fb81656544c296fe11f41b4@matoro.tk>
-X-Sender: matoro_mailinglist_kernel@matoro.tk
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [syzbot] upstream boot error: BUG: unable to handle kernel paging
+ request in blk_mq_map_swqueue
+Content-Language: en-US
+To:     Aleksandr Nogikh <nogikh@google.com>
+Cc:     Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+ea55456e1ff28ef7f9ff@syzkaller.appspotmail.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev,
+        'Aleksandr Nogikh' via syzkaller-bugs 
+        <syzkaller-bugs@googlegroups.com>
+References: <0000000000004c3b1405e6b7de26@google.com>
+ <f70b1cf7-0291-6ebc-68f8-db9c68963255@acm.org>
+ <CANp29Y7bgwDzd47E6h8gseYuu5YXF-ABRrhVXFXS-HF7PhF-Dw@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CANp29Y7bgwDzd47E6h8gseYuu5YXF-ABRrhVXFXS-HF7PhF-Dw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-At least according to the docs I see, fakenuma is x86-specific.  There 
-are multi-socket machines, but the one I have is single-socket 
-single-core.
-
-I can provide access to this machine to play around with it though!  
-Either simple shell access or serial access if some kernel poking is 
-needed.
-
-Would that be helpful or is a NUMA system going to be required for 
-debugging?
-
--------- Original Message --------
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-Date: 2022-08-26 07:04
- From: Vlastimil Babka <vbabka@suse.cz>
-To: Jan Kara <jack@suse.cz>, matoro 
-<matoro_mailinglist_kernel@matoro.tk>
-
-On 8/26/22 12:55, Jan Kara wrote:
-> On Thu 25-08-22 11:05:48, matoro wrote:
->> Hello all, I know this is quite an old thread.  I recently acquired 
->> some
->> alpha hardware and have run into this exact same problem on the latest
->> stable kernel (5.18 and 5.19).  CONFIG_COMPACTION seems to be totally 
->> broken
->> and causes userspace to be extremely unstable - random segfaults, 
->> corruption
->> of glibc data structures, gcc ICEs etc etc - seems most noticable 
->> during
->> tasks with heavy I/O load.
->> 
->> My hardware is a DS15 (Titan), so only slightly newer than the 
->> Tsunamis
->> mentioned earlier.  The problem is greatly exacerbated when using a
->> machine-optimized kernel (CONFIG_ALPHA_TITAN) over one with
->> CONFIG_ALPHA_GENERIC.  But it still doesn't go away on a generic 
->> kernel,
->> just pops up less often, usually very I/O heavy tasks like checking 
->> out a
->> tag in the kernel repo.
->> 
->> However all of this seems to be dependent on CONFIG_COMPACTION.  With 
->> this
->> toggled off all problems disappear, regardless of other options.  I 
->> tried
->> reverting the commit 88dbcbb3a4847f5e6dfeae952d3105497700c128 
->> mentioned
->> earlier in the thread (the structure has moved to a different file but 
->> was
->> otherwise the same), but it unfortunately did not make a difference.
->> 
->> Since this doesn't seem to have a known cause or an easy fix, would it 
->> be
->> reasonable to just add a Kconfig dep to disable it automatically on 
->> alpha?
+On 8/26/22 06:15, Aleksandr Nogikh wrote:
+> Syzbot would have included the USB mailing list and the USB
+> maintainers if it saw that the bug might be related to this subsystem.
+> The bot's guess was that it was the BLOCK LAYER subsystem, so it Cc'd
+> only the general lists and linux-block@vger.kernel.org
 > 
-> Thanks for report. I guess this just confirms that migration of 
-> pagecache
-> pages is somehow broken on Alpha. Maybe we are missing to flush some 
-> cache
-> specific for Alpha? Or maybe the page migration code is not safe wrt 
-> the
-> peculiar memory ordering Alpha has... I think this will need someone 
-> with
-> Alpha HW and willingness to dive into MM internals to debug this. Added
-> Vlasta to CC mostly for awareness and in case it rings some bells :).
+> Is there anything in this bug report that can reliably indicate that
+> the bug has to do with USB? If there is, we can definitely adjust our
+> guilty subsystem recognition logic.
 
-Hi, doesn't ring any bells unfortunately. Does corruption also happen 
-when
-mmapping a file and applying mbind() with MPOL_MF_MOVE or 
-migrate_pages()?
-That should allow more controlled migration experimens than through
-compaction. But that would also need a NUMA machine or a fakenuma 
-support,
-dunno if alpha has that?
+Hi Aleksandr,
+  I may have been to fast with my conclusion that the root cause is in 
+the USB subsystem.
+
+Regarding your question, can syzbot inspect the console log and scan for 
+"scsi host%d: %s" strings? The text next to the colon comes from the 
+SCSI host template "name" member and hence indicates which SCSI LLD 
+driver is involved.
+
+Thanks,
+
+Bart.
