@@ -2,89 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E481ECAAA3
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 21:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0BFECAAA3
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 21:20:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231247AbiHZVPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 17:15:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57214 "EHLO
+        id S1344267AbiHZVUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 17:20:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231643AbiHZVPI (ORCPT
+        with ESMTP id S239997AbiHZVUs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 17:15:08 -0400
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09EB26C3
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 14:15:05 -0700 (PDT)
-Received: by mail-pl1-f179.google.com with SMTP id v23so2603903plo.9
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 14:15:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=8yljTrp0ZmVDvm5z7PoXYCFKrdB4dGD4Cu78mtLW4TI=;
-        b=p9wzR2U1/92ZBLwLnF8uAxw8h3U55uef6g/d2/ecSlneg1skohAq5EDjHsR4QDxqb3
-         IzjggrvbpH+lSr/XnAVxAzXEBvJuGVW+yBVhgbnGbsVBcwkicRSGCYJD5LFm5ocKiK3z
-         wPf6y3k1PBYqcHTOs+7W2EwZT5BZLuVP5Hmio5HDMNCpUceg//2ykiGtwhI/vO9C/B3k
-         Pu1FgO5E+d8hyTgeSvLWHeWTXUUbOAC1yAJP93z0EQ+OrQy0IuLaLLGXAHFQFgXT9wgn
-         zC8tw4amkoogBIrxZDVkBIlc2R1435aPunl8yeljPQBc5SryDborYzAhYyWl7+ZUAxqY
-         3bog==
-X-Gm-Message-State: ACgBeo3YpzYmQkW8EMle5bxSbiL6AKs4z+9Eb5KccWXnS4k3Tk6y6Kru
-        U2ytxsrmoUFamYurPdKf3VLatrWeuIc=
-X-Google-Smtp-Source: AA6agR4TzFYQjYbyGwq6vJSAl2KVl5qw6383Kro6B+vbj6zGSLYNu3f2KNtzAZ3zDfsZguG7rS33lw==
-X-Received: by 2002:a17:902:e744:b0:173:569:279c with SMTP id p4-20020a170902e74400b001730569279cmr5268258plf.156.1661548505057;
-        Fri, 26 Aug 2022 14:15:05 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:a12:b4b9:f1b3:ec63? ([2620:15c:211:201:a12:b4b9:f1b3:ec63])
-        by smtp.gmail.com with ESMTPSA id u14-20020a63f64e000000b0041c30f78fa6sm1855503pgj.69.2022.08.26.14.15.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Aug 2022 14:15:04 -0700 (PDT)
-Message-ID: <33f221f4-7e34-be2c-5409-0abc9517874f@acm.org>
-Date:   Fri, 26 Aug 2022 14:15:01 -0700
+        Fri, 26 Aug 2022 17:20:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3ED17E02;
+        Fri, 26 Aug 2022 14:20:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E3CF160B7C;
+        Fri, 26 Aug 2022 21:20:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82C48C433D6;
+        Fri, 26 Aug 2022 21:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661548842;
+        bh=zDVwVvEz5cYYLi/EBJNO2sYvyri0aAIP70HkgcMjqnk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WKT07LmZtYErAiiJ9Tm1cdjtABt72S8nnGKXhNRa5LxwOZy+aHV19commDHWAW6al
+         d5Z7d+6BuIMa2/RSstIZVnjA158bVCu6DFKFgaKosx7xfDaJV0ozsr/l3RePhXEgEv
+         eh/d8Q/jlFn7ucMsKc0t8GABxxo+Nrrr0yJT+uQzJfW3ZT8BnYTQGrvIxzujuVA1Pc
+         zpXKRpjFD2Y3kRNzcny480fCNxTxyfDaP7G/9YJAUovY3Bmn63dzmyBT9xZP37SaE/
+         hrD5w82TRDxe4MDafSHR1JCxrDS4msMBeJeyG7REFcLnJosijRfob2++xLzCEY4ln2
+         AFeflr6GG6L4w==
+From:   SeongJae Park <sj@kernel.org>
+To:     Maximilian Heyne <mheyne@amazon.de>
+Cc:     SeongJae Park <sj@kernel.org>, jgross@suse.com,
+        roger.pau@citrix.com, marmarek@invisiblethingslab.com,
+        xen-devel@lists.xenproject.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 2/2] xen-blkfront: Advertise feature-persistent as user requested
+Date:   Fri, 26 Aug 2022 21:20:39 +0000
+Message-Id: <20220826212039.50736-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220826142658.GA77627@dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com>
+References: 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
-Content-Language: en-US
-To:     Gu Mi <gumi@linux.alibaba.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com
-Cc:     linux-block@vger.kernel.org
-References: <1661411393-98514-1-git-send-email-gumi@linux.alibaba.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <1661411393-98514-1-git-send-email-gumi@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/25/22 00:09, Gu Mi wrote:
-> The problem occurs in two async processes, One is when a new IO
-> calls the blk_mq_start_request() interface to start sending,The other
-> is that the block layer timer process calls the blk_mq_req_expired
-> interface to check whether there is an IO timeout.
-> 
-> When an instruction out of sequence occurs between blk_add_timer
-> and WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in the interface
-> blk_mq_start_request,at this time, the block timer is checking the
-> new IO timeout, Since the req status has been set to MQ_RQ_IN_FLIGHT
-> and req->deadline is 0 at this time, the new IO will be misjudged as
-> a timeout.
-> 
-> Our repair plan is for the deadline to be 0, and we do not think
-> that a timeout occurs. At the same time, because the jiffies of the
-> 32-bit system will be reversed shortly after the system is turned on,
-> we will add 1 jiffies to the deadline at this time.
+Hi Max,
 
-Hi Gu,
+On Fri, 26 Aug 2022 14:26:58 +0000 Maximilian Heyne <mheyne@amazon.de> wrote:
 
-With which kernel version has this race been observed? Since commit 
-2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in 
-blk_mq_tagset_busy_iter") the request reference count is increased 
-before the timeout handler (blk_mq_check_expired()) is called. Do you 
-agree that since then it is no longer possible that 
-blk_mq_start_request() is called while blk_mq_check_expired() is in 
-progress?
+> On Thu, Aug 25, 2022 at 04:15:11PM +0000, SeongJae Park wrote:
+> > 
+> > Commit e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter
+> > when connect") made blkback to advertise its support of the persistent
+> > grants feature only if the user sets the 'feature_persistent' parameter
+> > of the driver and the frontend advertised its support of the feature.
+> > However, following commit 402c43ea6b34 ("xen-blkfront: Apply
+> > 'feature_persistent' parameter when connect") made the blkfront to work
+> > in the same way.  That is, blkfront also advertises its support of the
+> > persistent grants feature only if the user sets the 'feature_persistent'
+> > parameter of the driver and the backend advertised its support of the
+> > feature.
+> > 
+> > Hence blkback and blkfront will never advertise their support of the
+> > feature but wait until the other advertises the support, even though
+> > users set the 'feature_persistent' parameters of the drivers.  As a
+> > result, the persistent grants feature is disabled always regardless of
+> > the 'feature_persistent' values[1].
+> > 
+> > The problem comes from the misuse of the semantic of the advertisement
+> > of the feature.  The advertisement of the feature should means only
+> > availability of the feature not the decision for using the feature.
+> > However, current behavior is working in the wrong way.
+> > 
+> > This commit fixes the issue by making the blkfront advertises its
+> > support of the feature as user requested via 'feature_persistent'
+> > parameter regardless of the otherend's support of the feature.
+> > 
+> > [1] https://lore.kernel.org/xen-devel/bd818aba-4857-bc07-dc8a-e9b2f8c5f7cd@suse.com/
+> > 
+> > Fixes: 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
+> > Cc: <stable@vger.kernel.org> # 5.10.x
+> > Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+> > Suggested-by: Juergen Gross <jgross@suse.com>
+> > Signed-off-by: SeongJae Park <sj@kernel.org>
+> > ---
+> >  drivers/block/xen-blkfront.c | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> > index 8e56e69fb4c4..dfae08115450 100644
+> > --- a/drivers/block/xen-blkfront.c
+> > +++ b/drivers/block/xen-blkfront.c
+> > @@ -213,6 +213,9 @@ struct blkfront_info
+> >         unsigned int feature_fua:1;
+> >         unsigned int feature_discard:1;
+> >         unsigned int feature_secdiscard:1;
+> > +       /* Connect-time cached feature_persistent parameter */
+> > +       unsigned int feature_persistent_parm:1;
+> > +       /* Persistent grants feature negotiation result */
+> >         unsigned int feature_persistent:1;
+> >         unsigned int bounce:1;
+> >         unsigned int discard_granularity;
+> > @@ -1848,7 +1851,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+> >                 goto abort_transaction;
+> >         }
+> >         err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+> > -                       info->feature_persistent);
+> > +                       info->feature_persistent_parm);
+> >         if (err)
+> >                 dev_warn(&dev->dev,
+> >                          "writing persistent grants feature to xenbus");
+> > @@ -2281,7 +2284,8 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+> >         if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
+> >                 blkfront_setup_discard(info);
+> > 
+> > -       if (feature_persistent)
+> > +       info->feature_persistent_parm = feature_persistent;
+> 
+> I think setting this here is too late because "feature-persistent" was already
+> written to xenstore via talk_to_blkback but with default 0. So during the
+> connect blkback will not see that the guest supports the feature and falls back
+> to no persistent grants.
+> 
+> Tested only this patch with some hacky dom0 kernel that doesn't have the patch
+> from your series yet. Will do more testing next week.
+
+Appreciate for your test!  And you're right, this patch is not fixing the issue
+completely.  That is, commit 402c43ea6b34 ("xen-blkfront: Apply
+'feature_persistent' parameter when connect") introduced two bugs.  One is the
+misuse of the semantic of the advertisement.  It's fixed by this patch.  The
+second bug, which you found here, is caching the parameter in a wrong place.
+
+In detail, blkfront does the advertisement before connect (for init and resume)
+and then negotiation after connected.  And the blkback does the negotiation
+first, and then the advertisement during the establishing the connection.
+Hence, blkback should cache the parameter just before the negotiation logic
+while blkfront should do that just before the advertisement logic.
+
+The blkback behavior change commit (e94c6101e151) did the work in the right
+place, but the blkfront behavior change commit didn't.
+
+So, I guess below change would fix the issue entirely when applied together
+with this patch.  Any opinion, please?
+
+
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index dfae08115450..7d3bde271e69 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -1850,6 +1850,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+                message = "writing protocol";
+                goto abort_transaction;
+        }
++       info->feature_persistent_parm = feature_persistent;
+        err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+                        info->feature_persistent_parm);
+        if (err)
+@@ -2284,7 +2285,6 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+        if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
+                blkfront_setup_discard(info);
+
+-       info->feature_persistent_parm = feature_persistent;
+        if (info->feature_persistent_parm)
+                info->feature_persistent =
+                        !!xenbus_read_unsigned(info->xbdev->otherend,
+
 
 Thanks,
+SJ
 
-Bart.
+
+> 
+> > +       if (info->feature_persistent_parm)
+> >                 info->feature_persistent =
+> >                         !!xenbus_read_unsigned(info->xbdev->otherend,
+> >                                                "feature-persistent", 0);
+> > --
+> > 2.25.1
+> > 
+> 
