@@ -2,91 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84B7ECAAA3
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 01:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 484C7ECAAA2
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 01:27:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232033AbiHZBHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Aug 2022 21:07:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50226 "EHLO
+        id S244449AbiHZB1L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Aug 2022 21:27:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243798AbiHZBHd (ORCPT
+        with ESMTP id S244409AbiHZB1J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Aug 2022 21:07:33 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 713AEC926B;
-        Thu, 25 Aug 2022 18:07:31 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MDM8v2LDyzl7l4;
-        Fri, 26 Aug 2022 09:06:07 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP1 (Coremail) with SMTP id cCh0CgA3POnPHAhjtyA7Aw--.53022S3;
-        Fri, 26 Aug 2022 09:07:29 +0800 (CST)
-Subject: Re: [PATCH v8 1/4] blk-throttle: fix that io throttle can only work
- for single bio
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, mkoutny@suse.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220823033130.874230-1-yukuai1@huaweicloud.com>
- <20220823033130.874230-2-yukuai1@huaweicloud.com>
- <YwUXTL+8E/sPcEUB@slm.duckdns.org>
- <73c72914-e27d-b261-e040-2dd31e8a6b9f@huaweicloud.com>
- <Ywe8Uz4Gy6j/EsUg@slm.duckdns.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <de0466d4-f501-da13-c3ee-0798c2761d9f@huaweicloud.com>
-Date:   Fri, 26 Aug 2022 09:07:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <Ywe8Uz4Gy6j/EsUg@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cCh0CgA3POnPHAhjtyA7Aw--.53022S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrZrWxtryUZF4xWFWxKw47twb_yoWfJrb_AF
-        4IvayxJwn8Z3Z2yF13ta18u39xWFWrX3yxZ34UJrWaqayrX3Z8uF4rtws8Aa4rWw4F9r9I
-        9w1agw45C3ya9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+        Thu, 25 Aug 2022 21:27:09 -0400
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50ABEA7225;
+        Thu, 25 Aug 2022 18:27:02 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=liusong@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VNGOONg_1661477190;
+Received: from localhost(mailfrom:liusong@linux.alibaba.com fp:SMTPD_---0VNGOONg_1661477190)
+          by smtp.aliyun-inc.com;
+          Fri, 26 Aug 2022 09:27:00 +0800
+From:   Liu Song <liusong@linux.alibaba.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-mq: determine in advance whether batch alloc can be performed
+Date:   Fri, 26 Aug 2022 09:26:30 +0800
+Message-Id: <1661477190-86862-1-git-send-email-liusong@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Tejun
+From: Liu Song <liusong@linux.alibaba.com>
 
-ÔÚ 2022/08/26 2:15, Tejun Heo Ð´µÀ:
-> On Wed, Aug 24, 2022 at 09:15:32AM +0800, Yu Kuai wrote:
->> This patch actually set two flags when bio is throttled and
->> dispatched, and only iops flag is cleared after the original bio is
->> split. If only one flag can be used, the way that I come up with is
->> that let iops limit become default, which means bio is always counted
->> for iops limit each time blk_throtl_bio() is called. I'm not quite
->> sure yet if iops limit can be counted excessively this way in some
->> special scenario...
-> 
-> I don't think we have a path where we clone and re-submit other than
-> splitting. What do you think about renaming the flag to BIO_BPS_THROTTLED
-> and just assuming that IOPS is always applied?
+Some conditions for judging whether batch alloc can be performed are
+included in "blk_mq_get_tags", and this function is only used by
+"__blk_mq_alloc_requests_batch".
 
-Yes, I didn't found such path myself, this way sounds good. I'll send a
-new version soon.
+This patch introduced a helper "can_do_batch_alloc" to prepend the
+judgment condition and avoid unnecessary function calls.
 
-Thanks,
-Kuai
-> 
-> Thanks.
-> 
+Signed-off-by: Liu Song <liusong@linux.alibaba.com>
+---
+ block/blk-mq-tag.c |  3 ---
+ block/blk-mq.c     | 11 ++++++++++-
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 8e3b36d..cda3987 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -115,9 +115,6 @@ unsigned long blk_mq_get_tags(struct blk_mq_alloc_data *data, int nr_tags,
+ 	struct sbitmap_queue *bt = &tags->bitmap_tags;
+ 	unsigned long ret;
+ 
+-	if (data->shallow_depth ||data->flags & BLK_MQ_REQ_RESERVED ||
+-	    data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+-		return 0;
+ 	ret = __sbitmap_queue_get_batch(bt, nr_tags, offset);
+ 	*offset += tags->nr_reserved_tags;
+ 	return ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3c1e6b6..330c618 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -437,6 +437,15 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	return rq_list_pop(data->cached_rq);
+ }
+ 
++static inline bool can_do_batch_alloc(struct blk_mq_alloc_data *data)
++{
++	if (data->nr_tags > 1 && !(data->shallow_depth ||
++		data->flags & BLK_MQ_REQ_RESERVED ||
++		data->hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
++		return true;
++	return false;
++}
++
+ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ {
+ 	struct request_queue *q = data->q;
+@@ -480,7 +489,7 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
+ 	/*
+ 	 * Try batched alloc if we want more than 1 tag.
+ 	 */
+-	if (data->nr_tags > 1) {
++	if (can_do_batch_alloc(data)) {
+ 		rq = __blk_mq_alloc_requests_batch(data, alloc_time_ns);
+ 		if (rq)
+ 			return rq;
+-- 
+1.8.3.1
 
