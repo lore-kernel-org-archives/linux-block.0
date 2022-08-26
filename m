@@ -2,171 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28590ECAAA2
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 01:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9242AECAAA3
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 01:41:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235238AbiHZBby (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Aug 2022 21:31:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33174 "EHLO
+        id S232281AbiHZBl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Aug 2022 21:41:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbiHZBby (ORCPT
+        with ESMTP id S244405AbiHZBlz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Aug 2022 21:31:54 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2216E63F2F
-        for <linux-block@vger.kernel.org>; Thu, 25 Aug 2022 18:31:50 -0700 (PDT)
-Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220826013144epoutp03ed9e45a3e3fec30096521892ae9b7111~OwPzfMBUJ3177531775epoutp03S
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 01:31:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220826013144epoutp03ed9e45a3e3fec30096521892ae9b7111~OwPzfMBUJ3177531775epoutp03S
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1661477504;
-        bh=7YWSaAaY196+mgvc+7xItDckKEh7b0FnGVSctrZ62QM=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=lF6BhQYXGAR1RgUhU0ZM2Txesjs6KUGkNVosF0qjFBzz2b3EnnnDUuHWsdttHsbuF
-         R/TxaBQ8xDca63T9tGTI6CPmdE/hHCSkQfBwIid3bLbi/6WwGuxZn+iKqH2WmQJmi7
-         llLI/v/fYsv9g3EZ1DpN2mWSinqinF/tCrok+czQ=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20220826013144epcas1p44b2e52d6b6d2b8ec6d7a8fd18ecc8fec~OwPzASnt-1450514505epcas1p42;
-        Fri, 26 Aug 2022 01:31:44 +0000 (GMT)
-Received: from epsmges1p1.samsung.com (unknown [182.195.36.225]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4MDMkS07rpz4x9Q2; Fri, 26 Aug
-        2022 01:31:44 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        75.8F.15591.F7228036; Fri, 26 Aug 2022 10:31:43 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220826013143epcas1p36fd947d2f65448f535864329d912f00d~OwPyN6Hzg2963829638epcas1p3W;
-        Fri, 26 Aug 2022 01:31:43 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220826013143epsmtrp2b7e26d8841d76197c2db1eba73093823~OwPyNDlJc1948019480epsmtrp2b;
-        Fri, 26 Aug 2022 01:31:43 +0000 (GMT)
-X-AuditID: b6c32a35-eabff70000003ce7-4a-6308227f6cb5
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E9.EF.18644.F7228036; Fri, 26 Aug 2022 10:31:43 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.98.109]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220826013143epsmtip212e6d818e2cdba6111828dcc7574a49c~OwPyA4UjH2638426384epsmtip2C;
-        Fri, 26 Aug 2022 01:31:43 +0000 (GMT)
-From:   Manjong Lee <mj0123.lee@samsung.com>
-To:     mj0123.lee@samsung.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        nanich.lee@samsung.com, yt0928.kim@samsung.com,
-        junho89.kim@samsung.com, jisoo2146.oh@samsung.com,
-        sbeom16.kim@samsung.com
-Subject: [PATCH 1/1] blk-mq: added case for cpu offline during send_ipi in
- rq_complete
-Date:   Fri, 26 Aug 2022 10:31:36 +0900
-Message-Id: <20220826013136.16763-1-mj0123.lee@samsung.com>
-X-Mailer: git-send-email 2.32.0
+        Thu, 25 Aug 2022 21:41:55 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C491B2DB5
+        for <linux-block@vger.kernel.org>; Thu, 25 Aug 2022 18:41:53 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id cb8so333114qtb.0
+        for <linux-block@vger.kernel.org>; Thu, 25 Aug 2022 18:41:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=xqUSge3GltL7hMvYfNTmVzGZjAXw2C9lysy6WWTZt+8=;
+        b=AsOLSnuoFJCAHyf0Onfm9v+Ksctp8nyH5reY1vgwgobUxLoOwPm+q1JUoRC0bFN597
+         jgWIDsDnXRDqbk6E0+ctNhXsNGN2fLf46rOqm9S7tg9Q2jrlJPUF0jjCZjqLmqhCRVX3
+         3JBudBSDn4J5jo6shbflX5DXFUIHY2UdlI2QE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=xqUSge3GltL7hMvYfNTmVzGZjAXw2C9lysy6WWTZt+8=;
+        b=RrJT/UzEMRXpv1+v89RiMXYvbomEbdVqSJKSLEJklzkqvPukntUE4sR8Ui4/EUMZ5r
+         04R3ma8AIUBT3OJkvtuXmZAjZ6uma5ZAU/XRpERb0R+V9oMaxUPwAVKmjtfBRGEwiM6t
+         dnNITgQFo2YJ+r/tijPazSYc9WdlDRo6+UQHc0EqsrB/hflf1cWV9wm52pHnsU4cXmiv
+         bClvHUhLPaA1Fl+/cmkBKqyIYmjllJZcli7L+wDTMRwgZGE+pnyHQVEWlO/UFgUScM7s
+         ikDMTUIFjoUIthTiDZFC6voyIykW/bxHjBGEPVbpZDR9T5g6Qe8fAB3SPqmXkoDGlPfG
+         xftg==
+X-Gm-Message-State: ACgBeo13xWcJYztcr9vKOmbCBHjFQHw1cO4k0K081+pto6eH9WW9Yzm+
+        jcg+kiOZJJAPe1qXxeGoWYyRTA9n9s+0ZQ==
+X-Google-Smtp-Source: AA6agR7T9qtI95hgsW9wMhJxWMVFbH2J3m+POh5PMxtQNq3GeqqdLQyBL8TwGwZDPY7YuqweIWAEKA==
+X-Received: by 2002:a05:622a:1a92:b0:344:6866:b701 with SMTP id s18-20020a05622a1a9200b003446866b701mr6235389qtc.310.1661478112242;
+        Thu, 25 Aug 2022 18:41:52 -0700 (PDT)
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
+        by smtp.gmail.com with ESMTPSA id e64-20020a376943000000b006bc192d277csm730889qkc.10.2022.08.25.18.41.51
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Aug 2022 18:41:51 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-334dc616f86so2081787b3.8
+        for <linux-block@vger.kernel.org>; Thu, 25 Aug 2022 18:41:51 -0700 (PDT)
+X-Received: by 2002:a25:7616:0:b0:695:9024:1c23 with SMTP id
+ r22-20020a257616000000b0069590241c23mr5722032ybc.177.1661478110731; Thu, 25
+ Aug 2022 18:41:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplk+LIzCtJLcpLzFFi42LZdlhTV7deiSPZYNlKS4vVd/vZLHqeNLFa
-        fH1YbLH3lrbF5V1z2Cymb57DbHHt/hl2izn/77FanDv5idVi3mMHi/V7f7I5cHtcPlvq0bdl
-        FaPH501yAcxR2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6
-        bpk5QMcoKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgrMCvSKE3OLS/PS9fJSS6wM
-        DQyMTIEKE7Izpi5YwF7wlq9i9znWBsbFPF2MnBwSAiYSR5pvMXcxcnEICexglFh34iU7hPOJ
-        UWJBx2NGCOczo8SO7+vYYFo2HjkF1bKLUWLuwclscFX7dr1mAaliE9CSWP7sAjuILSKQIXHp
-        0QSwDmaQJbNnLANLCAtESHS+XcsMYrMIqEo8friAEcTmFbCW+LxsBjvEOnmJU8sOMkHEBSVO
-        znwCtoAZKN68dTbYUAmBa+wS959fhmpwkfg2eT8LhC0s8er4Fqi4lMTnd3uhfiiW2HJrMlAN
-        B5BdIdHbFQsRNpb49PkzI0iYWUBTYv0ufYiwosTO33MZIdbySbz72sMK0ckr0dEmBFGiIrG7
-        +RvcojevDjBC2B4Su08cAbOFBGIlNj6byjyBUX4WkmdmIXlmFsLiBYzMqxjFUguKc9NTiw0L
-        DOGRmpyfu4kRnB61THcwTnz7Qe8QIxMH4yFGCQ5mJRFeq2MsyUK8KYmVValF+fFFpTmpxYcY
-        TYHBO5FZSjQ5H5ig80riDU0sDUzMjEwsjC2NzZTEefW0GZOFBNITS1KzU1MLUotg+pg4OKUa
-        mKyMi2vUXx9fvVP09H7FVdGT752Jj3rerLfmE4fqZZaMN42nD/I282elufTs3V7natylKJFR
-        KqnukH8wQIz3ydRKgSVzyxV439i96jM8puch8H2vbNauy3ltGVze3P7hOtxH2aVusdmueRHv
-        /4vx8WxJKw1pNdfwW8dkIoK5HFiZJX+s2R73faf7BuH3q9ab+bQyXZ+eYXcglLtqqaBA5Gv5
-        x5/DYzYU72qe4cSsd+rkY0PeQ5vW7ghJVM7bwaBXLReTm/XykaPq6rxJ3MZp+q9mWojfsu/j
-        WyDJ8Xnj65ZjDEcnT//yROdqxLM9h5gzztjfYbRaHvbJWPiYcDnnZ/cbpev65u9Ibz5lXV+v
-        xFKckWioxVxUnAgAKJcoghgEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMLMWRmVeSWpSXmKPExsWy7bCSvG69EkeywaQj4har7/azWfQ8aWK1
-        +Pqw2GLvLW2Ly7vmsFlM3zyH2eLa/TPsFnP+32O1OHfyE6vFvMcOFuv3/mRz4Pa4fLbUo2/L
-        KkaPz5vkApijuGxSUnMyy1KL9O0SuDKmLljAXvCWr2L3OdYGxsU8XYycHBICJhIbj5xiBrGF
-        BHYwSnRPq4aIS0nMW9vA1sXIAWQLSxw+XNzFyAVU8pFRYt29CWD1bAJaEsufXWAHsUUEciQ+
-        tq9iByliFjjAKNF18RYTSEJYIEyibUcXWBGLgKrE44cLGEFsXgFric/LZrBDLJOXOLXsIBNE
-        XFDi5MwnLCA2M1C8eets5gmMfLOQpGYhSS1gZFrFKJlaUJybnltsWGCUl1quV5yYW1yal66X
-        nJ+7iREcrlpaOxj3rPqgd4iRiYPxEKMEB7OSCK/VMZZkId6UxMqq1KL8+KLSnNTiQ4zSHCxK
-        4rwXuk7GCwmkJ5akZqemFqQWwWSZODilGpjcttt5b1wqKePcbrbPfqGpvULwCtFULaMQXacS
-        hbQy3oa1jEE9x7IPp2uFsawWcG0t/+hiKvhI7MPBLa8m3pQ9k7fsAdtqsy/bnrI9Y04VLbM/
-        +cFVdtLVsjezY5pCqibOMv/ufuDvHPPS//E77v80de/s59dS5eJje5q1dMf6MNfsXmG5i+LO
-        7P+L7Pre8ViU1RZyMq37JPTT8+VN3XTXcz0OK6+UGp++Fz5p3/OzoaePV0yeF3GOK971lZ+y
-        gaRkul2KgcXPBz6tW6JU3daGb1nxw/Z5Wbnuyifpy1YfYD2VlXLip7dd8VTzx2ffWseGbDNm
-        ZfqxJk0m9mrNHMlw1W2utSm6c5axrup6psRSnJFoqMVcVJwIAOrO9AXGAgAA
-X-CMS-MailID: 20220826013143epcas1p36fd947d2f65448f535864329d912f00d
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220826013143epcas1p36fd947d2f65448f535864329d912f00d
-References: <CGME20220826013143epcas1p36fd947d2f65448f535864329d912f00d@epcas1p3.samsung.com>
+References: <20220823145005.26356-1-suwan.kim027@gmail.com>
+ <YwU/EVxT0a6q2BfD@fedora> <CAFNWusaXc3H78kx1wxUDLht3PuV0A_VxvdmmY-yMJNefvih-1Q@mail.gmail.com>
+ <YwZgqf5kMqKHwcxR@fedora> <CAFNWusbESeNm6f7wqvUpEhu9HYxN=FgzmBBBx3m0UvRXvzjqDQ@mail.gmail.com>
+In-Reply-To: <CAFNWusbESeNm6f7wqvUpEhu9HYxN=FgzmBBBx3m0UvRXvzjqDQ@mail.gmail.com>
+From:   Alexandre Courbot <acourbot@chromium.org>
+Date:   Fri, 26 Aug 2022 10:41:39 +0900
+X-Gmail-Original-Message-ID: <CAPBb6MUOP9j_Zd4tu0=rLKu2T3w6h-XhSOkU_ei70vJywHcPqA@mail.gmail.com>
+Message-ID: <CAPBb6MUOP9j_Zd4tu0=rLKu2T3w6h-XhSOkU_ei70vJywHcPqA@mail.gmail.com>
+Subject: Re: [PATCH] virtio-blk: Fix WARN_ON_ONCE in virtio_queue_rq()
+To:     Suwan Kim <suwan.kim027@gmail.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+        pbonzini@redhat.com, linux-block@vger.kernel.org,
+        virtualization <virtualization@lists.linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a request complete then send ipi to original cpu which issued request.
-If cpu offline during this process, send_ipi might fail.
-However, there is currently no code to handle this error case.
-This may cause in missing request complete.
-Therefore, if send_ipi fails due to cpu offline, the request complete
-has to be processed directly from the cpu where it is running.
+On Thu, Aug 25, 2022 at 11:50 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
+>
+> On Thu, Aug 25, 2022 at 2:32 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >
+> > On Wed, Aug 24, 2022 at 10:16:10PM +0900, Kim Suwan wrote:
+> > > Hi Stefan,
+> > >
+> > > On Wed, Aug 24, 2022 at 5:56 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > > >
+> > > > On Tue, Aug 23, 2022 at 11:50:05PM +0900, Suwan Kim wrote:
+> > > > > @@ -409,6 +409,8 @@ static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
+> > > > >                       virtblk_unmap_data(req, vbr);
+> > > > >                       virtblk_cleanup_cmd(req);
+> > > > >                       rq_list_add(requeue_list, req);
+> > > > > +             } else {
+> > > > > +                     blk_mq_start_request(req);
+> > > > >               }
+> > > >
+> > > > The device may see new requests as soon as virtblk_add_req() is called
+> > > > above. Therefore the device may complete the request before
+> > > > blk_mq_start_request() is called.
+> > > >
+> > > > rq->io_start_time_ns = ktime_get_ns() will be after the request was
+> > > > actually submitted.
+> > > >
+> > > > I think blk_mq_start_request() needs to be called before
+> > > > virtblk_add_req().
+> > > >
+> > >
+> > > But if blk_mq_start_request() is called before virtblk_add_req()
+> > > and virtblk_add_req() fails, it can trigger WARN_ON_ONCE() at
+> > > virtio_queue_rq().
+> > >
+> > > With regard to the race condition between virtblk_add_req() and
+> > > completion, I think that the race condition can not happen because
+> > > virtblk_add_req() holds vq lock with irq saving and completion side
+> > > (virtblk_done, virtblk_poll) need to acquire the vq lock also.
+> > > Moreover, virtblk_done() is irq context so I think it can not be
+> > > executed until virtblk_add_req() releases the lock.
+> >
+> > I agree there is no race condition regarding the ordering of
+> > blk_mq_start_request() and request completion. The spinlock prevents
+> > that and I wasn't concerned about that part.
+> >
+> > The issue is that the timestamp will be garbage. If we capture the
+> > timestamp during/after the request is executing, then the collected
+> > statistics will be wrong.
+> >
+> > Can you look for another solution that doesn't break the timestamp?
+> >
+> > FWIW I see that the rq->state state machine allows returning to the idle
+> > state once the request has been started: __blk_mq_requeue_request().
+>
+> I considered blk_mq_requeue_request() to handle error cases but
+> I didn't use it because I think it can make the error path request
+> processing slower than requeuing an error request to plug list again.
+>
+> But there doesn't seem to be any other option that doesn't break
+> the timestamp.
+>
+> As you said, I will use __blk_mq_requeue_request() and send
+> new patch soon.
+>
+> To Alexandre,
+>
+> I will share new diff soon. Could you please test one more time?
 
-Signed-off-by: Manjong Lee <mj0123.lee@samsung.com>
-Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
-Signed-off-by: Junho Kim <junho89.kim@samsung.com>
----
- block/blk-mq.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3c1e6b6d991d..f2ce79708c5e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1064,17 +1064,22 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
- 	return cpu_online(rq->mq_ctx->cpu);
- }
- 
--static void blk_mq_complete_send_ipi(struct request *rq)
-+static int blk_mq_complete_send_ipi(struct request *rq)
- {
- 	struct llist_head *list;
- 	unsigned int cpu;
-+	int ret = 0;
- 
- 	cpu = rq->mq_ctx->cpu;
- 	list = &per_cpu(blk_cpu_done, cpu);
- 	if (llist_add(&rq->ipi_list, list)) {
- 		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
--		smp_call_function_single_async(cpu, &rq->csd);
-+		ret = smp_call_function_single_async(cpu, &rq->csd);
-+		if (ret)
-+			llist_del_all(list);
- 	}
-+
-+	return ret;
- }
- 
- static void blk_mq_raise_softirq(struct request *rq)
-@@ -1099,10 +1104,9 @@ bool blk_mq_complete_request_remote(struct request *rq)
- 	if (rq->cmd_flags & REQ_POLLED)
- 		return false;
- 
--	if (blk_mq_complete_need_ipi(rq)) {
--		blk_mq_complete_send_ipi(rq);
--		return true;
--	}
-+	if (blk_mq_complete_need_ipi(rq))
-+		if (!blk_mq_complete_send_ipi(rq))
-+			return true;
- 
- 	if (rq->q->nr_hw_queues == 1) {
- 		blk_mq_raise_softirq(rq);
--- 
-2.32.0
-
+Absolutely! Thanks for looking into this.
