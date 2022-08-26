@@ -2,221 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C295ECAAA3
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 20:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E481ECAAA3
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 21:15:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234955AbiHZUJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 16:09:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53556 "EHLO
+        id S231247AbiHZVPJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 17:15:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229561AbiHZUJ3 (ORCPT
+        with ESMTP id S231643AbiHZVPI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 16:09:29 -0400
-Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD789753E;
-        Fri, 26 Aug 2022 13:09:27 -0700 (PDT)
-Message-ID: <09bb7615-cf72-7f1e-9158-2ce231c0dda8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1661544565;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UjyohoxGONTRXH/EZQWHg7Vd8WDGSLA0ChZFPqsLFMI=;
-        b=ZHQH6E21r5gQpUgfSZBO9eiEUtPRX/u1oIU4YQ7WNNbzWB8WSsWqYXKPARo2bI2poJNQ8F
-        yqsew0MWPtW8pYmzHQEQ+yOdwY7yA/U+AwAYrHKiKUzmI6+Q0j2x9y2GChb2zdYiZikRWh
-        xQ03RPlpEMGxSQ8QT1K9gdENVhUD1nI=
-Date:   Fri, 26 Aug 2022 14:09:22 -0600
+        Fri, 26 Aug 2022 17:15:08 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09EB26C3
+        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 14:15:05 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id v23so2603903plo.9
+        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 14:15:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=8yljTrp0ZmVDvm5z7PoXYCFKrdB4dGD4Cu78mtLW4TI=;
+        b=p9wzR2U1/92ZBLwLnF8uAxw8h3U55uef6g/d2/ecSlneg1skohAq5EDjHsR4QDxqb3
+         IzjggrvbpH+lSr/XnAVxAzXEBvJuGVW+yBVhgbnGbsVBcwkicRSGCYJD5LFm5ocKiK3z
+         wPf6y3k1PBYqcHTOs+7W2EwZT5BZLuVP5Hmio5HDMNCpUceg//2ykiGtwhI/vO9C/B3k
+         Pu1FgO5E+d8hyTgeSvLWHeWTXUUbOAC1yAJP93z0EQ+OrQy0IuLaLLGXAHFQFgXT9wgn
+         zC8tw4amkoogBIrxZDVkBIlc2R1435aPunl8yeljPQBc5SryDborYzAhYyWl7+ZUAxqY
+         3bog==
+X-Gm-Message-State: ACgBeo3YpzYmQkW8EMle5bxSbiL6AKs4z+9Eb5KccWXnS4k3Tk6y6Kru
+        U2ytxsrmoUFamYurPdKf3VLatrWeuIc=
+X-Google-Smtp-Source: AA6agR4TzFYQjYbyGwq6vJSAl2KVl5qw6383Kro6B+vbj6zGSLYNu3f2KNtzAZ3zDfsZguG7rS33lw==
+X-Received: by 2002:a17:902:e744:b0:173:569:279c with SMTP id p4-20020a170902e74400b001730569279cmr5268258plf.156.1661548505057;
+        Fri, 26 Aug 2022 14:15:05 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:a12:b4b9:f1b3:ec63? ([2620:15c:211:201:a12:b4b9:f1b3:ec63])
+        by smtp.gmail.com with ESMTPSA id u14-20020a63f64e000000b0041c30f78fa6sm1855503pgj.69.2022.08.26.14.15.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Aug 2022 14:15:04 -0700 (PDT)
+Message-ID: <33f221f4-7e34-be2c-5409-0abc9517874f@acm.org>
+Date:   Fri, 26 Aug 2022 14:15:01 -0700
 MIME-Version: 1.0
-Subject: Re: [PATCH v12 03/13] block: allow blk-zoned devices to have
- non-power-of-2 zone size
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Jonathan Derrick <jonathan.derrick@linux.dev>
-To:     Pankaj Raghav <p.raghav@samsung.com>, agk@redhat.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, hch@lst.de
-Cc:     pankydev8@gmail.com, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, hare@suse.de,
-        jaegeuk@kernel.org, linux-kernel@vger.kernel.org,
-        matias.bjorling@wdc.com, gost.dev@samsung.com, bvanassche@acm.org,
-        linux-nvme@lists.infradead.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20220823121859.163903-1-p.raghav@samsung.com>
- <CGME20220823121904eucas1p1cdedb3e9af928e25564f46e70765d39b@eucas1p1.samsung.com>
- <20220823121859.163903-4-p.raghav@samsung.com>
- <1dc85f87-7146-ccd2-bbf4-e3077dd7a548@linux.dev>
-In-Reply-To: <1dc85f87-7146-ccd2-bbf4-e3077dd7a548@linux.dev>
+To:     Gu Mi <gumi@linux.alibaba.com>, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com
+Cc:     linux-block@vger.kernel.org
+References: <1661411393-98514-1-git-send-email-gumi@linux.alibaba.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <1661411393-98514-1-git-send-email-gumi@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 8/25/22 00:09, Gu Mi wrote:
+> The problem occurs in two async processes, One is when a new IO
+> calls the blk_mq_start_request() interface to start sending,The other
+> is that the block layer timer process calls the blk_mq_req_expired
+> interface to check whether there is an IO timeout.
+> 
+> When an instruction out of sequence occurs between blk_add_timer
+> and WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in the interface
+> blk_mq_start_request,at this time, the block timer is checking the
+> new IO timeout, Since the req status has been set to MQ_RQ_IN_FLIGHT
+> and req->deadline is 0 at this time, the new IO will be misjudged as
+> a timeout.
+> 
+> Our repair plan is for the deadline to be 0, and we do not think
+> that a timeout occurs. At the same time, because the jiffies of the
+> 32-bit system will be reversed shortly after the system is turned on,
+> we will add 1 jiffies to the deadline at this time.
 
+Hi Gu,
 
-On 8/26/2022 2:06 PM, Jonathan Derrick wrote:
-> 
-> 
-> On 8/23/2022 6:18 AM, Pankaj Raghav wrote:
->> Checking if a given sector is aligned to a zone is a common
->> operation that is performed for zoned devices. Add
->> bdev_is_zone_start helper to check for this instead of opencoding it
->> everywhere.
->>
->> Convert the calculations on zone size to be generic instead of relying on
->> power-of-2(po2) based arithmetic in the block layer using the helpers
->> wherever possible.
->>
->> The only hot path affected by this change for zoned devices with po2
->> zone size is in blk_check_zone_append() but bdev_is_zone_start() 
->> helper is
->> used to optimize the calculation for po2 zone sizes.
->>
->> Finally, allow zoned devices with non po2 zone sizes provided that their
->> zone capacity and zone size are equal. The main motivation to allow zoned
->> devices with non po2 zone size is to remove the unmapped LBA between
->> zone capcity and zone size for devices that cannot have a po2 zone
->> capacity.
->>
->> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
->> Reviewed-by: Hannes Reinecke <hare@suse.de>
->> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
->> ---
->>   block/blk-core.c       |  2 +-
->>   block/blk-zoned.c      | 24 ++++++++++++++++++------
->>   include/linux/blkdev.h | 30 ++++++++++++++++++++++++++++++
->>   3 files changed, 49 insertions(+), 7 deletions(-)
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index a0d1104c5590..1cb519220ffb 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -563,7 +563,7 @@ static inline blk_status_t 
->> blk_check_zone_append(struct request_queue *q,
->>           return BLK_STS_NOTSUPP;
->>       /* The bio sector must point to the start of a sequential zone */
->> -    if (bio->bi_iter.bi_sector & (bdev_zone_sectors(bio->bi_bdev) - 
->> 1) ||
->> +    if (!bdev_is_zone_start(bio->bi_bdev, bio->bi_iter.bi_sector) ||
->>           !bio_zone_is_seq(bio))
->>           return BLK_STS_IOERR;
->> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
->> index dce9c95b4bcd..6806c69c81dc 100644
->> --- a/block/blk-zoned.c
->> +++ b/block/blk-zoned.c
->> @@ -285,10 +285,10 @@ int blkdev_zone_mgmt(struct block_device *bdev, 
->> enum req_op op,
->>           return -EINVAL;
->>       /* Check alignment (handle eventual smaller last zone) */
->> -    if (sector & (zone_sectors - 1))
->> +    if (!bdev_is_zone_start(bdev, sector))
->>           return -EINVAL;
->> -    if ((nr_sectors & (zone_sectors - 1)) && end_sector != capacity)
->> +    if (!bdev_is_zone_start(bdev, nr_sectors) && end_sector != capacity)
->>           return -EINVAL;
->>       /*
->> @@ -486,14 +486,26 @@ static int blk_revalidate_zone_cb(struct 
->> blk_zone *zone, unsigned int idx,
->>        * smaller last zone.
->>        */
->>       if (zone->start == 0) {
->> -        if (zone->len == 0 || !is_power_of_2(zone->len)) {
->> -            pr_warn("%s: Invalid zoned device with non power of two 
->> zone size (%llu)\n",
->> -                disk->disk_name, zone->len);
->> +        if (zone->len == 0) {
->> +            pr_warn("%s: Invalid zero zone size", disk->disk_name);
->> +            return -ENODEV;
->> +        }
->> +
->> +        /*
->> +         * Non power-of-2 zone size support was added to remove the
->> +         * gap between zone capacity and zone size. Though it is 
->> technically
->> +         * possible to have gaps in a non power-of-2 device, Linux 
->> requires
->> +         * the zone size to be equal to zone capacity for non power-of-2
->> +         * zoned devices.
->> +         */
->> +        if (!is_power_of_2(zone->len) && zone->capacity < zone->len) {
->> +            pr_err("%s: Invalid zone capacity %lld with non 
->> power-of-2 zone size %lld",
->> +                   disk->disk_name, zone->capacity, zone->len);
->>               return -ENODEV;
->>           }
->>           args->zone_sectors = zone->len;
->> -        args->nr_zones = (capacity + zone->len - 1) >> ilog2(zone->len);
->> +        args->nr_zones = div64_u64(capacity + zone->len - 1, zone->len);
->>       } else if (zone->start + args->zone_sectors < capacity) {
->>           if (zone->len != args->zone_sectors) {
->>               pr_warn("%s: Invalid zoned device with non constant zone 
->> size\n",
->> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->> index 84e7881262e3..d0d66a0db224 100644
->> --- a/include/linux/blkdev.h
->> +++ b/include/linux/blkdev.h
->> @@ -704,6 +704,30 @@ static inline unsigned int disk_zone_no(struct 
->> gendisk *disk, sector_t sector)
->>       return div64_u64(sector, zone_sectors);
->>   }
->> +static inline sector_t bdev_offset_from_zone_start(struct 
->> block_device *bdev,
->> +                           sector_t sec)
->> +{
->> +    sector_t zone_sectors = bdev_zone_sectors(bdev);
->> +    u64 remainder = 0;
->> +
->> +    if (!bdev_is_zoned(bdev))
->> +        return 0;
-> See below
-> 
->> +
->> +    if (is_power_of_2(zone_sectors))
->> +        return sec & (zone_sectors - 1);
->> +
->> +    div64_u64_rem(sec, zone_sectors, &remainder);
->> +    return remainder;
->> +}
->> +
->> +static inline bool bdev_is_zone_start(struct block_device *bdev, 
->> sector_t sec)
->> +{
->> +    if (!bdev_is_zoned(bdev))
->> +        return false;
-> Duplicating the same check above, and the check above is less clear in 
-> the case of !zoned since it returns 0 and not some warning that makes 
-> sense in the case of zoned check on !zoned bdev.
-> Can you simply exclude above check?
-Nevermind, just noticed bdev_offset_from_zone_start is used in later 
-patches.
+With which kernel version has this race been observed? Since commit 
+2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in 
+blk_mq_tagset_busy_iter") the request reference count is increased 
+before the timeout handler (blk_mq_check_expired()) is called. Do you 
+agree that since then it is no longer possible that 
+blk_mq_start_request() is called while blk_mq_check_expired() is in 
+progress?
 
-> 
-> 
->> +
->> +    return bdev_offset_from_zone_start(bdev, sec) == 0;
->> +}
->> +
->>   static inline bool disk_zone_is_seq(struct gendisk *disk, sector_t 
->> sector)
->>   {
->>       if (!blk_queue_is_zoned(disk->queue))
->> @@ -748,6 +772,12 @@ static inline unsigned int disk_zone_no(struct 
->> gendisk *disk, sector_t sector)
->>   {
->>       return 0;
->>   }
->> +
->> +static inline bool bdev_is_zone_start(struct block_device *bdev, 
->> sector_t sec)
->> +{
->> +    return false;
->> +}
->> +
->>   static inline unsigned int bdev_max_open_zones(struct block_device 
->> *bdev)
->>   {
->>       return 0;
+Thanks,
+
+Bart.
