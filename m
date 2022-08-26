@@ -2,164 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDDCCECAAD5
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 11:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30661ECAAD4
+	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 13:16:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230132AbiHZL6U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 07:58:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45412 "EHLO
+        id S240884AbiHZNP7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 09:15:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237428AbiHZL6T (ORCPT
+        with ESMTP id S1344188AbiHZNPu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 07:58:19 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D563A50F0
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 04:58:18 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id bj12so2675476ejb.13
-        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 04:58:18 -0700 (PDT)
+        Fri, 26 Aug 2022 09:15:50 -0400
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7738E2CE03
+        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 06:15:49 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id 67so1616704vsv.2
+        for <linux-block@vger.kernel.org>; Fri, 26 Aug 2022 06:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc;
-        bh=1THcw+a8SwxA43ZD9QbjIVgiovkQji8vpJjzTsOyrL0=;
-        b=KOBUL3rqBYieWU0O4wX5Agk+0YmkzjE5kdrm/Ufl9XZqub4HgXZ6QthWjKbr2B7H5r
-         4HTSJZykvjwgOT4SaUxip6ICcBH2Sfoj6qnKQWmNfYtjggUnEWPN26X1wwom95VGk1BF
-         psArnrWukl/AbUCHkkHVYPlIvipQf9rKOaNqWoFLtcT6e4+cfNkBNFrpSGBQEfp4PANm
-         8rcwHrS0NJwoTnFF0RUYhRCfL/sZ9yuAv8PZB/brrk7713pbnQWEBAMCTXAiL609Hawu
-         Esl2fg7wR9i774BwVNaftJEdntjM1lfBsR3RPyV9IcATOEyGn1N4l6CTS4ZJxmeWf1qv
-         Q9Vg==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=59n2uy6bMEwTPlHrLsIoQ5BkYFCiua3TbUF1n0ZR9DU=;
+        b=sfPFXHYL7jV0UIzY3/KsSjEWT9yyeK3p5Rpqe8jJVcARI5WGAIzGTt/2yxKZSLVjVX
+         Q+0RzoD9n4L0jjfOqIWpjm2GdKdjbNzVPmOhPFIpAQKJoyV+PH7L1vJaa/cno3peCdss
+         wh4/vFmRhgVHhl2ce0Tbx3UXmq2kyFrAigUwQd877n/uKQffc9vuGWQ72augd3lfoBda
+         CDDOnn7MXSmIgj/qYt/+SYfR2miAlH1xZLfhClF4ZTOo7QQvaYRqTPNteyvkn2JGHw61
+         awzIBLy1IfrVQKlDikieqjlgLUXeYEJrEBopXpdAfs1cAit9LvT2zomNrJ+6GiWx4Lvy
+         ZFTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=1THcw+a8SwxA43ZD9QbjIVgiovkQji8vpJjzTsOyrL0=;
-        b=acSyu/SqxZel9mLq9+faSgMQSRdtVUk/R704+dSFpYUFCruTb0Q/E3fMt3xSQjUxPv
-         NmgJNItKUn2q9tU+1FbdNqzOfBqZ55yXErOINlaYMyhX+CA8dRD6XLChAuPiYRZgHu7l
-         6JVsCsJKR7nYNXipg4MAjeMY1I3KC5hutKy9dS2l9f+xKFxLmDofi+7XHEKZcgoOkmtv
-         nQJ4Cpg7b2zCoRA+1yqJaWPox+Dxwi8d0COr21UTEfWYzylK4ljnibdlcbRcn7zW4bzW
-         85df2m1j4AKdL2uOJR0E8QUA8Fx6cEHjjoBwSGO9RwOfAqhz3baRDAqDYAGwf24745Mb
-         WN/g==
-X-Gm-Message-State: ACgBeo2DpZkkm3e5umG8xigkmlHWAjE2vOlRunOZR696o8lACoJ0VJpo
-        ilPtgBa/Xr4FPCaQeAbotKd6z5bEJ01+vl41NtTL7g==
-X-Google-Smtp-Source: AA6agR5kfuGiXz677+CDziuefQJMpoEK0XCUJK6UdUx2HhGyJb15ez0kqIofSmGOZe4/ogmQmuSHM4CrF9GW2d5Ps8g=
-X-Received: by 2002:a17:907:8a0c:b0:73d:becd:b35c with SMTP id
- sc12-20020a1709078a0c00b0073dbecdb35cmr5326955ejc.204.1661515096833; Fri, 26
- Aug 2022 04:58:16 -0700 (PDT)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=59n2uy6bMEwTPlHrLsIoQ5BkYFCiua3TbUF1n0ZR9DU=;
+        b=g4dPqhwUtsPMWUkx7Fh7RVI8tEBybth1RHMkMnx4ZG8ts2n9h5TUGlc/yvXbY1RF6P
+         bCFEGDdOjLTftnXKbQZpXa31c8m/PglMPzzXowTo/lJ9kq2LUajJ50O8KOeVj7O/3qo1
+         fZqNZZpUJQd6my9ST6ETsASCqiVHAyOKii7KOGeI3+tInInB+hDAr56XNmIYJnXlFmB2
+         c2yE9XzcpsNIH6p3z2eXzIZAp0+5IS10+CtiV2b0/CTLkwp75QSpRG8x1AKVmG0NPhTy
+         RzELKrsT5UMfr6n6KbGr7fnKMenlpow8LF/Y6Xzb9MFa0o5dUct3Vj8AqEX9Wm2nZ1Ke
+         2ZMw==
+X-Gm-Message-State: ACgBeo0C21X13SnsztKahx7MKei5w+1F4KO7d1mvDZ/9nUOZ0InPhckw
+        7DV1i2YvsdzlUX2Mr3BcdXL4uNGw7VSIVI+oyt+4iQ==
+X-Google-Smtp-Source: AA6agR6PlDujz+oXUVecvczTK/svEkHdtMJ4EBTSmLSES/3EDjMO7G84YLviv2jT2w9h1v5ElNQH1l3nlLy4nr3zxVo=
+X-Received: by 2002:a05:6102:5348:b0:390:8a9c:5376 with SMTP id
+ bq8-20020a056102534800b003908a9c5376mr3074445vsb.53.1661519748475; Fri, 26
+ Aug 2022 06:15:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220826081117.21687-1-guoqing.jiang@linux.dev>
- <CAMGffEku8H3RubkQGq1Cjy8pP8B+95coT+b2J6VxSAQx-kKmmg@mail.gmail.com>
- <aa3a4d50-2e71-a185-09ac-79bd34f9c8e6@linux.dev> <CAMGffEkRo104Cp6+KX8NtS0ud+DHM6ftjmHyxjiQa=zJ7tFzog@mail.gmail.com>
- <c4fb6007-91f9-6d2c-4888-d49a08dd297e@linux.dev>
-In-Reply-To: <c4fb6007-91f9-6d2c-4888-d49a08dd297e@linux.dev>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Fri, 26 Aug 2022 13:58:06 +0200
-Message-ID: <CAMGffEkAYOJPAPaHDspk-JfJNNF96pHWnrCwYzROFZxPBBO+Fw@mail.gmail.com>
-Subject: Re: [PATCH] rnbd-srv: remove 'dir' argument from rnbd_srv_rdma_ev
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, jgg@ziepe.ca,
-        leon@kernel.org, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
+References: <0000000000004c3b1405e6b7de26@google.com> <f70b1cf7-0291-6ebc-68f8-db9c68963255@acm.org>
+In-Reply-To: <f70b1cf7-0291-6ebc-68f8-db9c68963255@acm.org>
+From:   Aleksandr Nogikh <nogikh@google.com>
+Date:   Fri, 26 Aug 2022 15:15:37 +0200
+Message-ID: <CANp29Y7bgwDzd47E6h8gseYuu5YXF-ABRrhVXFXS-HF7PhF-Dw@mail.gmail.com>
+Subject: Re: [syzbot] upstream boot error: BUG: unable to handle kernel paging
+ request in blk_mq_map_swqueue
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+ea55456e1ff28ef7f9ff@syzkaller.appspotmail.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, llvm@lists.linux.dev,
+        "'Aleksandr Nogikh' via syzkaller-bugs" 
+        <syzkaller-bugs@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 1:38 PM Guoqing Jiang <guoqing.jiang@linux.dev> wro=
-te:
+On Thu, Aug 25, 2022 at 7:48 PM Bart Van Assche <bvanassche@acm.org> wrote:
 >
+> On 8/20/22 20:24, syzbot wrote:
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    3cc40a443a04 Merge tag 'nios2_fixes_v6.0' of git://git.ker..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=13cf3c7b080000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=f267ed4fb258122a
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=ea55456e1ff28ef7f9ff
+> > compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+ea55456e1ff28ef7f9ff@syzkaller.appspotmail.com
+> >
+> > scsi 0:0:1:0: Direct-Access     Google   PersistentDisk   1    PQ: 0 ANSI: 6
+> > BUG: unable to handle page fault for address: ffffdc0000000000
+> > #PF: supervisor read access in kernel mode
+> > #PF: error_code(0x0000) - not-present page
+> > PGD 12026067
+> > P4D 12026067 PUD 0
+> > Oops: 0000 [#1] PREEMPT SMP KASAN
+> > CPU: 1 PID: 46 Comm: kworker/u4:3 Not tainted 6.0.0-rc1-syzkaller-00017-g3cc40a443a04 #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/22/2022
+> > Workqueue: events_unbound async_run_entry_fn
+> > RIP: 0010:blk_mq_map_swqueue+0xa86/0x1630 block/blk-mq.c:3722
+> > Code: 00 00 fc ff df 43 0f b6 04 37 84 c0 0f 85 49 02 00 00 41 0f b7 45 00 8d 48 01 66 41 89 4d 00 48 8d 1c c3 48 89 d8 48 c1 e8 03 <42> 80 3c 30 00 4c 8b 7c 24 68 74 08 48 89 df e8 36 7b c1 fd 48 8b
+> > RSP: 0000:ffffc90000b77380 EFLAGS: 00010a06
+> > RAX: 1fffe00000000000 RBX: ffff000000000000 RCX: 0000000000000001
+> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+> > RBP: ffffc90000b774f0 R08: ffffffff841bbbaa R09: ffffed1004143326
+> > R10: ffffed1004143326 R11: 1ffff11004143325 R12: dffffc0000000000
+> > R13: ffff888020a1998e R14: dffffc0000000000 R15: 1ffff11004143331
+> > FS:  0000000000000000(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: ffffdc0000000000 CR3: 000000000ca8e000 CR4: 00000000003506e0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > Call Trace:
+> >   <TASK>
+> >   blk_mq_init_allocated_queue+0x1a31/0x1c20 block/blk-mq.c:4119
+> >   blk_mq_init_queue_data block/blk-mq.c:3908 [inline]
+> >   blk_mq_init_queue+0x9f/0x120 block/blk-mq.c:3918
+> >   scsi_alloc_sdev+0x697/0x9d0 drivers/scsi/scsi_scan.c:335
+> >   scsi_probe_and_add_lun+0x1d1/0x4ab0 drivers/scsi/scsi_scan.c:1191
+> >   __scsi_scan_target+0x1fb/0x10e0 drivers/scsi/scsi_scan.c:1673
+> >   scsi_scan_channel drivers/scsi/scsi_scan.c:1761 [inline]
+> >   scsi_scan_host_selected+0x394/0x6c0 drivers/scsi/scsi_scan.c:1790
+> >   do_scsi_scan_host drivers/scsi/scsi_scan.c:1929 [inline]
+> >   do_scan_async+0x12e/0x7b0 drivers/scsi/scsi_scan.c:1939
+> >   async_run_entry_fn+0xa6/0x400 kernel/async.c:127
+> >   process_one_work+0x81c/0xd10 kernel/workqueue.c:2289
+> >   worker_thread+0xb14/0x1330 kernel/workqueue.c:2436
+> >   kthread+0x266/0x300 kernel/kthread.c:376
+> >   ret_from_fork+0x1f/0x30
+> >   </TASK>
+> > Modules linked in:
+> > CR2: ffffdc0000000000
+> > ---[ end trace 0000000000000000 ]---
+> > RIP: 0010:blk_mq_map_swqueue+0xa86/0x1630 block/blk-mq.c:3722
+> > Code: 00 00 fc ff df 43 0f b6 04 37 84 c0 0f 85 49 02 00 00 41 0f b7 45 00 8d 48 01 66 41 89 4d 00 48 8d 1c c3 48 89 d8 48 c1 e8 03 <42> 80 3c 30 00 4c 8b 7c 24 68 74 08 48 89 df e8 36 7b c1 fd 48 8b
+> > RSP: 0000:ffffc90000b77380 EFLAGS: 00010a06
+> > RAX: 1fffe00000000000 RBX: ffff000000000000 RCX: 0000000000000001
+> > RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+> > RBP: ffffc90000b774f0 R08: ffffffff841bbbaa R09: ffffed1004143326
+> > R10: ffffed1004143326 R11: 1ffff11004143325 R12: dffffc0000000000
+> > R13: ffff888020a1998e R14: dffffc0000000000 R15: 1ffff11004143331
+> > FS:  0000000000000000(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: ffffdc0000000000 CR3: 000000000ca8e000 CR4: 00000000003506e0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > ----------------
+> > Code disassembly (best guess), 5 bytes skipped:
+> >     0:        43 0f b6 04 37          movzbl (%r15,%r14,1),%eax
+> >     5:        84 c0                   test   %al,%al
+> >     7:        0f 85 49 02 00 00       jne    0x256
+> >     d:        41 0f b7 45 00          movzwl 0x0(%r13),%eax
+> >    12:        8d 48 01                lea    0x1(%rax),%ecx
+> >    15:        66 41 89 4d 00          mov    %cx,0x0(%r13)
+> >    1a:        48 8d 1c c3             lea    (%rbx,%rax,8),%rbx
+> >    1e:        48 89 d8                mov    %rbx,%rax
+> >    21:        48 c1 e8 03             shr    $0x3,%rax
+> > * 25: 42 80 3c 30 00          cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+> >    2a:        4c 8b 7c 24 68          mov    0x68(%rsp),%r15
+> >    2f:        74 08                   je     0x39
+> >    31:        48 89 df                mov    %rbx,%rdi
+> >    34:        e8 36 7b c1 fd          callq  0xfdc17b6f
+> >    39:        48                      rex.W
+> >    3a:        8b                      .byte 0x8b
 >
+> Hi Dmitry,
 >
-> On 8/26/22 7:29 PM, Jinpu Wang wrote:
-> > On Fri, Aug 26, 2022 at 1:26 PM Guoqing Jiang <guoqing.jiang@linux.dev>=
- wrote:
-> >>
-> >>
-> >> On 8/26/22 6:48 PM, Jinpu Wang wrote:
-> >>> On Fri, Aug 26, 2022 at 10:11 AM Guoqing Jiang <guoqing.jiang@linux.d=
-ev> wrote:
-> >>>> Since all callers (process_{read,write}) set id->dir, no need to
-> >>>> pass 'dir' again.
-> >>>>
-> >>>> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-> >>>> ---
-> >>>>    drivers/block/rnbd/rnbd-srv.c          | 9 ++++-----
-> >>>>    drivers/block/rnbd/rnbd-srv.h          | 1 +
-> >>>>    drivers/infiniband/ulp/rtrs/rtrs-srv.c | 4 ++--
-> >>>>    drivers/infiniband/ulp/rtrs/rtrs.h     | 3 +--
-> >>>>    4 files changed, 8 insertions(+), 9 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd=
--srv.c
-> >>>> index 3f6c268e04ef..9600715f1029 100644
-> >>>> --- a/drivers/block/rnbd/rnbd-srv.c
-> >>>> +++ b/drivers/block/rnbd/rnbd-srv.c
-> >>>> @@ -368,10 +368,9 @@ static int process_msg_sess_info(struct rnbd_sr=
-v_session *srv_sess,
-> >>>>                                    const void *msg, size_t len,
-> >>>>                                    void *data, size_t datalen);
-> >>>>
-> >>>> -static int rnbd_srv_rdma_ev(void *priv,
-> >>>> -                           struct rtrs_srv_op *id, int dir,
-> >>>> -                           void *data, size_t datalen, const void *=
-usr,
-> >>>> -                           size_t usrlen)
-> >>>> +static int rnbd_srv_rdma_ev(void *priv, struct rtrs_srv_op *id,
-> >>>> +                           void *data, size_t datalen,
-> >>>> +                           const void *usr, size_t usrlen)
-> >>>>    {
-> >>>>           struct rnbd_srv_session *srv_sess =3D priv;
-> >>>>           const struct rnbd_msg_hdr *hdr =3D usr;
-> >>>> @@ -398,7 +397,7 @@ static int rnbd_srv_rdma_ev(void *priv,
-> >>>>                   break;
-> >>>>           default:
-> >>>>                   pr_warn("Received unexpected message type %d with =
-dir %d from session %s\n",
-> >>>> -                       type, dir, srv_sess->sessname);
-> >>>> +                       type, id->dir, srv_sess->sessname);
-> >>>>                   return -EINVAL;
-> >>>>           }
-> >>>>
-> >>>> diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd=
--srv.h
-> >>>> index 081bceaf4ae9..5a0ef6c2b5c7 100644
-> >>>> --- a/drivers/block/rnbd/rnbd-srv.h
-> >>>> +++ b/drivers/block/rnbd/rnbd-srv.h
-> >>>> @@ -14,6 +14,7 @@
-> >>>>    #include <linux/kref.h>
-> >>>>
-> >>>>    #include <rtrs.h>
-> >>>> +#include <rtrs-srv.h>
-> >>> why do we need this?
-> >> Otherwise, compiler complains
-> >>
-> >> drivers/block/rnbd/rnbd-srv.c: In function =E2=80=98rnbd_srv_rdma_ev=
-=E2=80=99:
-> >> drivers/block/rnbd/rnbd-srv.c:400:33: error: invalid use of undefined
-> >> type =E2=80=98struct rtrs_srv_op=E2=80=99
-> >>     400 |                         type, id->dir, srv_sess->sessname);
-> >>
-> >> Thanks,
-> >> Guoqing
-> > ah, okay, this reminds me, why we have dir there, we don't want to
-> > export too much detail regarding the rtrs_srv_op to
-> > rnbd-server, it is supposed to be transparent  to rnbd-srv.
->
-> What is the issue with more details are exported from rtrs-srv? Both of
-> the modules
-> are run in the same machine.
-with including rtrs-srv.h, the code size is bigger, not to mention
-many unnecessary
-info are exported to rnbd-srv module, ideally we want to have
-rnbd/rtrs layered properly
-with clear separation.
-
->
-> And I guess we can just pass parameters with register after remove an
-> argument,
-> otherwise need to push/pop stack with more than six parameters for x64.
-I doubt it makes any notable performance change.
+> This issue and also another report that has been shared recently on the
+> linux-scsi mailing list look like USB issues to me. Who is the right person
+> to make sure that the USB mailing list is included for USB related issues?
 >
 > Thanks,
-> Guoqing
-Thx!
+>
+> Bart.
+
+Hi Bart,
+
+Syzbot would have included the USB mailing list and the USB
+maintainers if it saw that the bug might be related to this subsystem.
+The bot's guess was that it was the BLOCK LAYER subsystem, so it Cc'd
+only the general lists and linux-block@vger.kernel.org
+
+Is there anything in this bug report that can reliably indicate that
+the bug has to do with USB? If there is, we can definitely adjust our
+guilty subsystem recognition logic.
+
+--
+Best Regards
+Aleksandr
+
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/f70b1cf7-0291-6ebc-68f8-db9c68963255%40acm.org.
