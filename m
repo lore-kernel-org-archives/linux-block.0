@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCB7ECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 26 Aug 2022 21:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBFAC0502A
+	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 00:27:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232244AbiHZV73 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 17:59:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41506 "EHLO
+        id S232048AbiH0A1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Aug 2022 20:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231131AbiHZV73 (ORCPT
+        with ESMTP id S231216AbiH0A1F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 17:59:29 -0400
+        Fri, 26 Aug 2022 20:27:05 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B959FCCE3D;
-        Fri, 26 Aug 2022 14:59:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF49DE9AA4;
+        Fri, 26 Aug 2022 17:27:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5607E615D2;
-        Fri, 26 Aug 2022 21:59:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B3DC433D6;
-        Fri, 26 Aug 2022 21:59:25 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 61C6C6188F;
+        Sat, 27 Aug 2022 00:27:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A274C433B5;
+        Sat, 27 Aug 2022 00:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661551166;
-        bh=5xR3EC5MWZoN0OXGdyuL9WrQBUm1gv5VQ3OGVer9NL8=;
+        s=k20201202; t=1661560023;
+        bh=g6Fczq+e4vFz11SSps3NqjieFBOu+DQYPjNgDy5r3lw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fnKGIUyipaVboyQ8u4/rlhxDe0P+rbyGQEJuzGfBPJFpXkh6wENXpFpYyZwKDVwPk
-         NKcpT3VxV6YTynepeMmkTIdN0lshrk7tEOr2vXbD/Yg+cGwaYzQYG22xdTDPwcXzb5
-         MfKASkYhoOxm7xzZ1T4dDce00BjoIeDwo5Skh0Wdma6erSawLtpDttiTvMItG5PYhV
-         A7SqGCPkZJVC4t81aAVx1UWhL/grl8YV5fynpZ5y6t/LsFgJD/V0L4or15tcHRQpN6
-         addZA9KMTMc5ZZQjZfPA2sI9INIVJNw80lKjG6zwv4WHxD33r67mZk9trURh/tZh7b
-         kOgaYqsURBkBw==
+        b=ImkjkNubGAUiWTVWzvfUdrzLtU2ouJrgeCmEeKKIawAKqALjnZVjuPGICQoLTKwYu
+         Zn+yPUgXfE7VWwMLI2PVmEdBQWK71Lqrrlds08eiz5LsN6e7efwPxEcKEEGh3XiucX
+         DX+YRkSRC4m3S7AIY6//ZoyYQ0b3M+CR9g8WCHSEYxLGgXwfA5Wuwp/ZzXJQynpenl
+         pfod1mRgIt3S7e8q/d37DfNN8lmDfG69vznxec8M3iMt8CQa+v4//EK77YzO7phuQT
+         eMqD4rzJNmMdZfdCNwosLNo+xFlxkxRXUCYMSDtrqnlo7erw+YKmaGAglRvCZ3477Q
+         K6hrE2LwT3zEg==
 From:   SeongJae Park <sj@kernel.org>
 To:     SeongJae Park <sj@kernel.org>
 Cc:     Maximilian Heyne <mheyne@amazon.de>, jgross@suse.com,
@@ -40,8 +40,8 @@ Cc:     Maximilian Heyne <mheyne@amazon.de>, jgross@suse.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org
 Subject: Re: [PATCH 2/2] xen-blkfront: Advertise feature-persistent as user requested
-Date:   Fri, 26 Aug 2022 21:59:24 +0000
-Message-Id: <20220826215924.50813-1-sj@kernel.org>
+Date:   Sat, 27 Aug 2022 00:27:00 +0000
+Message-Id: <20220827002700.54181-1-sj@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220826212039.50736-1-sj@kernel.org>
 References: 
@@ -140,19 +140,6 @@ On Fri, 26 Aug 2022 21:20:39 +0000 SeongJae Park <sj@kernel.org> wrote:
 > 'feature_persistent' parameter when connect") introduced two bugs.  One is the
 > misuse of the semantic of the advertisement.  It's fixed by this patch.  The
 > second bug, which you found here, is caching the parameter in a wrong place.
-
-To be fair, I think we should say the misuse of the semantic issue came from
-the initial commit[1] that uses only one field for the two different
-information (availability of the feature and decision to use the feature), and
-the mis-placed caching has introduced by the behavior change commit[2].
-
-[1] 74a852479c68 ("xen-blkfront: add a parameter for disabling of persistent grants")
-[2] 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
-
-
-Thanks,
-SJ
-
 > 
 > In detail, blkfront does the advertisement before connect (for init and resume)
 > and then negotiation after connected.  And the blkback does the negotiation
@@ -187,6 +174,14 @@ SJ
 >         if (info->feature_persistent_parm)
 >                 info->feature_persistent =
 >                         !!xenbus_read_unsigned(info->xbdev->otherend,
+
+FWIW, 'feature_persistent' variable definition should be moved to above of
+'talk_to_blkback()'.  Otherwise, build would fail.
+
+
+Thanks,
+SJ
+
 > 
 > 
 > Thanks,
