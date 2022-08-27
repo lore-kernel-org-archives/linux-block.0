@@ -2,144 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C77F3C3DA6B
-	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 07:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB98C0502C
+	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 08:36:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232403AbiH0HIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Aug 2022 03:08:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37754 "EHLO
+        id S233937AbiH0IgU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Aug 2022 04:36:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231469AbiH0HIE (ORCPT
+        with ESMTP id S233015AbiH0IgT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Aug 2022 03:08:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E1986FF6;
-        Sat, 27 Aug 2022 00:08:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A18AF6100A;
-        Sat, 27 Aug 2022 07:08:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B027CC433C1;
-        Sat, 27 Aug 2022 07:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661584082;
-        bh=p0KRSMvvBhsJs0c03pHNWDIW9Qt/EnRrmOnfStK+zqg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uLvlkjUnktj26RRTEJeF29+/+JHbO8XAS/9V4Wiki8lnjsjbLKVT97mLLImiN+62c
-         +EpOM247AJ37EeTTDfES3liBnoAa62LtOVdbsIQCqAZwgFhq/a3G9Q8kzPhPMxXk9m
-         rI9+KpZadUhXkoHHIFuHm87iZR3ytO2piFQYvBFmhjQ2mNF3wkkcgxI7suT8JRZ2A+
-         DVAmVSkYyz4wKEJ+nVPeqplcAYgBznkFuKsC7aSdTh8p6ucLWwQ57+nxuAjSNnTHyK
-         qfHYoDrflvFMbCIYPiKxfJG6x9FoBVXZzhDJ9CEuhsJ3Awv6lodlmAAmAtepC2dyQo
-         AvX8PSILJ/IBA==
-Date:   Sat, 27 Aug 2022 00:07:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jeff Layton <jlayton@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v4 0/9] make statx() return DIO alignment information
-Message-ID: <YwnCz/4K8lGS91n+@sol.localdomain>
-References: <20220722071228.146690-1-ebiggers@kernel.org>
- <3543250c8157c3e0e7e410b268121e4d7d3e9bc2.camel@kernel.org>
+        Sat, 27 Aug 2022 04:36:19 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 725E9B0887;
+        Sat, 27 Aug 2022 01:36:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AAJdBdWOI3pDpYQqb7bGq8aMPrUPBUqrHObEO7HIuzte9iX+cDJiX6+ChHnthHuWlcZp4c46+YLhvMV3J1kuN1DAnFyDKGhnWqopRleHxdV1vJz3wjrtvkdiFGP4nbC2h/gcjsTQ2xZZYPEdWk/Ci0vBHzKNV0/fTN7IZe+tRTuKU35nAWgkCniz0Q3LzGP90eoV/iO+nckrVT3Xe2x0Gbn9i93reBvTvU+Eq0dNpQ5jym1ZLfrYYZdVoFS8wsYOuwdTvP7hBq/XqHnCge2Y/3Xru1ujwsGuSMOdoiAM/dmpHdX0z5ngeAMbrmtdTMTSXxzT1VvJChAFi8suBDA0UA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UO9IhewdmpPOqvg3QpSZ5kTO1SJPtnuFZRi+d4vMGI4=;
+ b=O5+JbVTMnM3QYfSOa4LGo5c+9DLOyEg3GkOF5kPSeCogWj2ne0wWZ6LMkQADg3A3RM7IQ7SDxZwTUAVEd5HaKt2pfjo0/bJEC5CIXUsJR4VenzPuKLNTUH+tSjq+aoySaTXfpcw+YUgEIdrpHfBiYyg/NVS4S9w0RLmilc4jtqePcctFPRkqm/MpIlR8lM19e5eQqRFWtKqY9FmQggTVKqcReOMh7cU/TfHzbB617oEX10LzirdE+Iaur67vby1Z4XTuZWYsKQAakcKZD82RFcDT+6xWwPefXULgSc3fuLu1noXN/udzDVmg/BRwAXi1xDghOx+yl/ngCjuzCKq5Sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.235) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UO9IhewdmpPOqvg3QpSZ5kTO1SJPtnuFZRi+d4vMGI4=;
+ b=ePgpzUylfyGRiv8r47Kk55aMbrdcsdCdGrWr0bN2dNtm1rU3HU+WfB/1iKO6h+U1LuHyoKnYvUHPurCp6IXYfJOAVFJdC/yVPFhbLF6VZwgVTphMBAPnCd13MhKBkVKPhiPBSTCTuLZJPEkobcFefhRaDkJZyvvD17kGLd58pBFpyuce3KarbyS6j1+cppmzLHUWGNbUXEBkqBS56YA3WuJeZxgWcqNNC8WnRCMO2WTNQ3v1gXpABhmHrp4nrqlrwtk/asWJphTRIsZSvmhiO7CjTLoLjlO2bYzzPZ2XjpDG0awDTc67Ybp6a17USVR4VS2y/0cxH/Qg81tQFPYjJw==
+Received: from DM5PR07CA0092.namprd07.prod.outlook.com (2603:10b6:4:ae::21) by
+ PH8PR12MB7027.namprd12.prod.outlook.com (2603:10b6:510:1be::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.16; Sat, 27 Aug
+ 2022 08:36:12 +0000
+Received: from DM6NAM11FT047.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:ae:cafe::a9) by DM5PR07CA0092.outlook.office365.com
+ (2603:10b6:4:ae::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15 via Frontend
+ Transport; Sat, 27 Aug 2022 08:36:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.235)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.235 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.235; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.235) by
+ DM6NAM11FT047.mail.protection.outlook.com (10.13.172.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5566.15 via Frontend Transport; Sat, 27 Aug 2022 08:36:11 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ DRHQMAIL107.nvidia.com (10.27.9.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.38; Sat, 27 Aug 2022 08:36:11 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.29; Sat, 27 Aug 2022 01:36:10 -0700
+Received: from sandstorm.attlocal.net (10.127.8.9) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.986.29 via Frontend
+ Transport; Sat, 27 Aug 2022 01:36:10 -0700
+From:   John Hubbard <jhubbard@nvidia.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-xfs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: [PATCH 1/6] mm/gup: introduce pin_user_page()
+Date:   Sat, 27 Aug 2022 01:36:02 -0700
+Message-ID: <20220827083607.2345453-2-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20220827083607.2345453-1-jhubbard@nvidia.com>
+References: <20220827083607.2345453-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3543250c8157c3e0e7e410b268121e4d7d3e9bc2.camel@kernel.org>
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 64fbdea3-33e1-42f3-e854-08da8807326b
+X-MS-TrafficTypeDiagnostic: PH8PR12MB7027:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qnlb2BznKuv8HSR/mOMAdLL3epBJdze+9vbcf+5R1g1XlS+98sCJbl1S4qPk+1WdMa8i82GsCphaSdMgT+43MrcYVLxMY4LmSP6zn2AzLJa28esn7gqkx20aO+nRwTWj4+pD5raxucC0Xp7lIxtFtTiISaeGPnmS2cFK1qoLHqsU6rW5AYY0AWZV9Kqt5zS9ZAFHFjUaumIC99/dcjEyDjI6W3btlj2lbRaUXil/NseqpUgUBAxG7dR4pe0WwCTzfxOSPdeAbQnENJxc6rGj2GLnTKTXx56JZil30dezGUXxOSAJliQgna0OPaEOfkUWm51NlgphKLv1EWd0ODFqIIExYXgIpKmdDcHerJIEJOC1MkVt4P2m25/4viCsQyVAJH6nI9zBEGVeDNVEH4kefpBdLMwyj6AQwSpMC8X1+k8wD/T1sXrm2Z74nbaDqpCmXaxCVZv6CyVQA356qVrHXAGmgnQppWw5hhdnEx/e7R+Q9D5WmD+El0QAOgFEBPIQj9fFjh2V8I25EjSWtURVQBN1NOc9y2mnIZz/2HqXy1G2+qbj7vWUcauZ62RiMoCpCUVHF/iP3LYwvvy6Ho4C0F7s4MmEcvbZAX6Rg59GveOCyJ4CzmTFscuJfagklCSfH3Q9N92d1BvKTNOYg6RKI7Ou9B852gNDQVkDl2HqYgxxS3du9NZJrhHoKe6VJoK79kU5oGqN/Fe3mM1mMAKJ1mHJMqWT9zfUK8LjazyDzHGalG3U9LGMWnrsejcDLDj6KGok4NbLzoZzE/GYdQ8w/y/f795NSfRHBbJZiDhTvF6NZt/95KO7VfQIyGQBNiHm0o/l7zlEYGcDUcje3QI1iPsp2Pz/fh6FgqRYceUmbC4=
+X-Forefront-Antispam-Report: CIP:12.22.5.235;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(136003)(396003)(39860400002)(46966006)(36840700001)(40470700004)(6666004)(8936002)(81166007)(4326008)(36756003)(7416002)(8676002)(40460700003)(356005)(82740400003)(70586007)(82310400005)(40480700001)(5660300002)(186003)(2906002)(86362001)(70206006)(2616005)(1076003)(47076005)(426003)(336012)(26005)(107886003)(83380400001)(36860700001)(316002)(6916009)(54906003)(41300700001)(478600001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2022 08:36:11.7334
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64fbdea3-33e1-42f3-e854-08da8807326b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.235];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT047.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7027
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 01:19:37PM -0400, Jeff Layton wrote:
-> On Fri, 2022-07-22 at 00:12 -0700, Eric Biggers wrote:
-> > This patchset makes the statx() system call return direct I/O (DIO)
-> > alignment information.  This allows userspace to easily determine
-> > whether a file supports DIO, and if so with what alignment restrictions.
-> > 
-> > Patch 1 adds the basic VFS support for STATX_DIOALIGN.  Patch 2 wires it
-> > up for all block device files.  The remaining patches wire it up for
-> > regular files on ext4, f2fs, and xfs.  Support for regular files on
-> > other filesystems can be added later.
-> > 
-> > I've also written a man-pages patch, which I'm sending separately.
-> > 
-> > Note, f2fs has one corner case where DIO reads are allowed but not DIO
-> > writes.  The proposed statx fields can't represent this.  My proposal
-> > (patch 6) is to just eliminate this case, as it seems much too weird.
-> > But I'd appreciate any feedback on that part.
-> > 
-> > This patchset applies to v5.19-rc7.
-> > 
-> > Changed v3 => v4:
-> >    - Added xfs support.
-> > 
-> >    - Moved the helper function for block devices into block/bdev.c.
-> >    
-> >    - Adjusted the ext4 patch to not introduce a bug where misaligned DIO
-> >      starts being allowed on encrypted files when it gets combined with
-> >      the patch "iomap: add support for dma aligned direct-io" that is
-> >      queued in the block tree for 5.20.
-> > 
-> >    - Made a simplification in fscrypt_dio_supported().
-> > 
-> > Changed v2 => v3:
-> >    - Dropped the stx_offset_align_optimal field, since its purpose
-> >      wasn't clearly distinguished from the existing stx_blksize.
-> > 
-> >    - Renamed STATX_IOALIGN to STATX_DIOALIGN, to reflect the new focus
-> >      on DIO only.
-> > 
-> >    - Similarly, renamed stx_{mem,offset}_align_dio to
-> >      stx_dio_{mem,offset}_align, to reflect the new focus on DIO only.
-> > 
-> >    - Wired up STATX_DIOALIGN on block device files.
-> > 
-> > Changed v1 => v2:
-> >    - No changes.
-> > 
-> > Eric Biggers (9):
-> >   statx: add direct I/O alignment information
-> >   vfs: support STATX_DIOALIGN on block devices
-> >   fscrypt: change fscrypt_dio_supported() to prepare for STATX_DIOALIGN
-> >   ext4: support STATX_DIOALIGN
-> >   f2fs: move f2fs_force_buffered_io() into file.c
-> >   f2fs: don't allow DIO reads but not DIO writes
-> >   f2fs: simplify f2fs_force_buffered_io()
-> >   f2fs: support STATX_DIOALIGN
-> >   xfs: support STATX_DIOALIGN
-> > 
-> >  block/bdev.c              | 25 ++++++++++++++++++++
-> >  fs/crypto/inline_crypt.c  | 49 +++++++++++++++++++--------------------
-> >  fs/ext4/ext4.h            |  1 +
-> >  fs/ext4/file.c            | 37 ++++++++++++++++++++---------
-> >  fs/ext4/inode.c           | 36 ++++++++++++++++++++++++++++
-> >  fs/f2fs/f2fs.h            | 45 -----------------------------------
-> >  fs/f2fs/file.c            | 45 ++++++++++++++++++++++++++++++++++-
-> >  fs/stat.c                 | 14 +++++++++++
-> >  fs/xfs/xfs_iops.c         |  9 +++++++
-> >  include/linux/blkdev.h    |  4 ++++
-> >  include/linux/fscrypt.h   |  7 ++----
-> >  include/linux/stat.h      |  2 ++
-> >  include/uapi/linux/stat.h |  4 +++-
-> >  13 files changed, 190 insertions(+), 88 deletions(-)
-> > 
-> > base-commit: ff6992735ade75aae3e35d16b17da1008d753d28
-> 
-> Hi Eric,
-> 
-> Can I ask what your plans are with this set? I didn't see it in
-> linux-next yet, so I wasn't sure when you were looking to get it merged.
-> I'm working on patches to add a new statx field for the i_version
-> counter as well and I want to make sure that our work doesn't collide.
-> 
+pin_user_page() is an externally-usable version of try_grab_page(), but
+with semantics that match get_page(), so that it can act as a drop-in
+replacement for get_page(). Specifically, pin_user_page() has a void
+return type.
 
-I've just sent v5.  I guess I'll try to get it merged for 6.1.  We were a bit
-stuck on the read-only DIO issue.  All things considered though, including that
-Christoph thinks it's possible for f2fs to support DIO writes on zoned block
-devices, I'm willing to bet that read-only DIO doesn't really matter enough for
-it to be worth it to add a direction field to STATX_DIOALIGN (which would make
-it harder to use STATX_DIOALIGN, as the field would always have to be checked).
+pin_user_page() elevates a page's refcount using FOLL_PIN rules. This
+means that the caller must release the page via unpin_user_page().
 
-- Eric
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ include/linux/mm.h |  1 +
+ mm/gup.c           | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+)
+
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 982f2607180b..85a105157334 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1869,6 +1869,7 @@ long pin_user_pages_remote(struct mm_struct *mm,
+ long get_user_pages(unsigned long start, unsigned long nr_pages,
+ 			    unsigned int gup_flags, struct page **pages,
+ 			    struct vm_area_struct **vmas);
++void pin_user_page(struct page *page);
+ long pin_user_pages(unsigned long start, unsigned long nr_pages,
+ 		    unsigned int gup_flags, struct page **pages,
+ 		    struct vm_area_struct **vmas);
+diff --git a/mm/gup.c b/mm/gup.c
+index 5abdaf487460..245ccb41ed8c 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -3213,6 +3213,39 @@ long pin_user_pages(unsigned long start, unsigned long nr_pages,
+ }
+ EXPORT_SYMBOL(pin_user_pages);
+ 
++/**
++ * pin_user_page() - apply a FOLL_PIN reference to a page
++ *
++ * @page: the page to be pinned.
++ *
++ * This is similar to get_user_pages(), except that the page's refcount is
++ * elevated using FOLL_PIN, instead of FOLL_GET.
++ *
++ * IMPORTANT: The caller must release the page via unpin_user_page().
++ *
++ */
++void pin_user_page(struct page *page)
++{
++	struct folio *folio = page_folio(page);
++
++	WARN_ON_ONCE(folio_ref_count(folio) <= 0);
++
++	/*
++	 * Similar to try_grab_page(): be sure to *also*
++	 * increment the normal page refcount field at least once,
++	 * so that the page really is pinned.
++	 */
++	if (folio_test_large(folio)) {
++		folio_ref_add(folio, 1);
++		atomic_add(1, folio_pincount_ptr(folio));
++	} else {
++		folio_ref_add(folio, GUP_PIN_COUNTING_BIAS);
++	}
++
++	node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, 1);
++}
++EXPORT_SYMBOL(pin_user_page);
++
+ /*
+  * pin_user_pages_unlocked() is the FOLL_PIN variant of
+  * get_user_pages_unlocked(). Behavior is the same, except that this one sets
+-- 
+2.37.2
+
