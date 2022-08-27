@@ -2,198 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBFAC0502A
-	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 00:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C640AC0502E
+	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 07:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232048AbiH0A1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Aug 2022 20:27:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51636 "EHLO
+        id S232922AbiH0HBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Aug 2022 03:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231216AbiH0A1F (ORCPT
+        with ESMTP id S229453AbiH0HBe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Aug 2022 20:27:05 -0400
+        Sat, 27 Aug 2022 03:01:34 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF49DE9AA4;
-        Fri, 26 Aug 2022 17:27:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FC998D3F6;
+        Sat, 27 Aug 2022 00:01:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 61C6C6188F;
-        Sat, 27 Aug 2022 00:27:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A274C433B5;
-        Sat, 27 Aug 2022 00:27:02 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4882060FF6;
+        Sat, 27 Aug 2022 07:01:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E483C433B5;
+        Sat, 27 Aug 2022 07:01:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661560023;
-        bh=g6Fczq+e4vFz11SSps3NqjieFBOu+DQYPjNgDy5r3lw=;
+        s=k20201202; t=1661583690;
+        bh=999EIC9kZJkekVqVLTcGQG6rSacP6CreHwcuNLapaP0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ImkjkNubGAUiWTVWzvfUdrzLtU2ouJrgeCmEeKKIawAKqALjnZVjuPGICQoLTKwYu
-         Zn+yPUgXfE7VWwMLI2PVmEdBQWK71Lqrrlds08eiz5LsN6e7efwPxEcKEEGh3XiucX
-         DX+YRkSRC4m3S7AIY6//ZoyYQ0b3M+CR9g8WCHSEYxLGgXwfA5Wuwp/ZzXJQynpenl
-         pfod1mRgIt3S7e8q/d37DfNN8lmDfG69vznxec8M3iMt8CQa+v4//EK77YzO7phuQT
-         eMqD4rzJNmMdZfdCNwosLNo+xFlxkxRXUCYMSDtrqnlo7erw+YKmaGAglRvCZ3477Q
-         K6hrE2LwT3zEg==
-From:   SeongJae Park <sj@kernel.org>
-To:     SeongJae Park <sj@kernel.org>
-Cc:     Maximilian Heyne <mheyne@amazon.de>, jgross@suse.com,
-        roger.pau@citrix.com, marmarek@invisiblethingslab.com,
-        xen-devel@lists.xenproject.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] xen-blkfront: Advertise feature-persistent as user requested
-Date:   Sat, 27 Aug 2022 00:27:00 +0000
-Message-Id: <20220827002700.54181-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220826212039.50736-1-sj@kernel.org>
-References: 
+        b=KCIJwHUkmXU6bi1foHzgtpkUzvAeD+VbDPALoi9gBeVxcfN3V16yK8oD1oBm5Q+jt
+         JdTMTpXplEBoRDihN7zdti14JfShTbJilcE0cfZk2eEFGdIbyMzTogc3DkY2j+WnE2
+         f2B1DRSlsPLcw2qB5BBjgKR8r/D127waNhkPbWfBMMUjGEo9SKODe6SHZDT+KgKbLp
+         mWNf68s93CENq//sWiF3ZLaIUmyPDJK8AjjnWfCaQ8wzjxiC7OKXScCFqo5GltwXGI
+         ifXdBP8Qx4obXZ0TFX52ez8Tr0MqsMwBsyDQp31fSbcgZNwdt9Qq2xPBXn/yEFguZ3
+         yu5uMrn+aC9Rw==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH v5 1/8] statx: add direct I/O alignment information
+Date:   Fri, 26 Aug 2022 23:58:44 -0700
+Message-Id: <20220827065851.135710-2-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20220827065851.135710-1-ebiggers@kernel.org>
+References: <20220827065851.135710-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 26 Aug 2022 21:20:39 +0000 SeongJae Park <sj@kernel.org> wrote:
+From: Eric Biggers <ebiggers@google.com>
 
-> Hi Max,
-> 
-> On Fri, 26 Aug 2022 14:26:58 +0000 Maximilian Heyne <mheyne@amazon.de> wrote:
-> 
-> > On Thu, Aug 25, 2022 at 04:15:11PM +0000, SeongJae Park wrote:
-> > > 
-> > > Commit e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter
-> > > when connect") made blkback to advertise its support of the persistent
-> > > grants feature only if the user sets the 'feature_persistent' parameter
-> > > of the driver and the frontend advertised its support of the feature.
-> > > However, following commit 402c43ea6b34 ("xen-blkfront: Apply
-> > > 'feature_persistent' parameter when connect") made the blkfront to work
-> > > in the same way.  That is, blkfront also advertises its support of the
-> > > persistent grants feature only if the user sets the 'feature_persistent'
-> > > parameter of the driver and the backend advertised its support of the
-> > > feature.
-> > > 
-> > > Hence blkback and blkfront will never advertise their support of the
-> > > feature but wait until the other advertises the support, even though
-> > > users set the 'feature_persistent' parameters of the drivers.  As a
-> > > result, the persistent grants feature is disabled always regardless of
-> > > the 'feature_persistent' values[1].
-> > > 
-> > > The problem comes from the misuse of the semantic of the advertisement
-> > > of the feature.  The advertisement of the feature should means only
-> > > availability of the feature not the decision for using the feature.
-> > > However, current behavior is working in the wrong way.
-> > > 
-> > > This commit fixes the issue by making the blkfront advertises its
-> > > support of the feature as user requested via 'feature_persistent'
-> > > parameter regardless of the otherend's support of the feature.
-> > > 
-> > > [1] https://lore.kernel.org/xen-devel/bd818aba-4857-bc07-dc8a-e9b2f8c5f7cd@suse.com/
-> > > 
-> > > Fixes: 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
-> > > Cc: <stable@vger.kernel.org> # 5.10.x
-> > > Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-> > > Suggested-by: Juergen Gross <jgross@suse.com>
-> > > Signed-off-by: SeongJae Park <sj@kernel.org>
-> > > ---
-> > >  drivers/block/xen-blkfront.c | 8 ++++++--
-> > >  1 file changed, 6 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > > index 8e56e69fb4c4..dfae08115450 100644
-> > > --- a/drivers/block/xen-blkfront.c
-> > > +++ b/drivers/block/xen-blkfront.c
-> > > @@ -213,6 +213,9 @@ struct blkfront_info
-> > >         unsigned int feature_fua:1;
-> > >         unsigned int feature_discard:1;
-> > >         unsigned int feature_secdiscard:1;
-> > > +       /* Connect-time cached feature_persistent parameter */
-> > > +       unsigned int feature_persistent_parm:1;
-> > > +       /* Persistent grants feature negotiation result */
-> > >         unsigned int feature_persistent:1;
-> > >         unsigned int bounce:1;
-> > >         unsigned int discard_granularity;
-> > > @@ -1848,7 +1851,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
-> > >                 goto abort_transaction;
-> > >         }
-> > >         err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
-> > > -                       info->feature_persistent);
-> > > +                       info->feature_persistent_parm);
-> > >         if (err)
-> > >                 dev_warn(&dev->dev,
-> > >                          "writing persistent grants feature to xenbus");
-> > > @@ -2281,7 +2284,8 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
-> > >         if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
-> > >                 blkfront_setup_discard(info);
-> > > 
-> > > -       if (feature_persistent)
-> > > +       info->feature_persistent_parm = feature_persistent;
-> > 
-> > I think setting this here is too late because "feature-persistent" was already
-> > written to xenstore via talk_to_blkback but with default 0. So during the
-> > connect blkback will not see that the guest supports the feature and falls back
-> > to no persistent grants.
-> > 
-> > Tested only this patch with some hacky dom0 kernel that doesn't have the patch
-> > from your series yet. Will do more testing next week.
-> 
-> Appreciate for your test!  And you're right, this patch is not fixing the issue
-> completely.  That is, commit 402c43ea6b34 ("xen-blkfront: Apply
-> 'feature_persistent' parameter when connect") introduced two bugs.  One is the
-> misuse of the semantic of the advertisement.  It's fixed by this patch.  The
-> second bug, which you found here, is caching the parameter in a wrong place.
-> 
-> In detail, blkfront does the advertisement before connect (for init and resume)
-> and then negotiation after connected.  And the blkback does the negotiation
-> first, and then the advertisement during the establishing the connection.
-> Hence, blkback should cache the parameter just before the negotiation logic
-> while blkfront should do that just before the advertisement logic.
-> 
-> The blkback behavior change commit (e94c6101e151) did the work in the right
-> place, but the blkfront behavior change commit didn't.
-> 
-> So, I guess below change would fix the issue entirely when applied together
-> with this patch.  Any opinion, please?
-> 
-> 
-> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> index dfae08115450..7d3bde271e69 100644
-> --- a/drivers/block/xen-blkfront.c
-> +++ b/drivers/block/xen-blkfront.c
-> @@ -1850,6 +1850,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
->                 message = "writing protocol";
->                 goto abort_transaction;
->         }
-> +       info->feature_persistent_parm = feature_persistent;
->         err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
->                         info->feature_persistent_parm);
->         if (err)
-> @@ -2284,7 +2285,6 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
->         if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
->                 blkfront_setup_discard(info);
-> 
-> -       info->feature_persistent_parm = feature_persistent;
->         if (info->feature_persistent_parm)
->                 info->feature_persistent =
->                         !!xenbus_read_unsigned(info->xbdev->otherend,
+Traditionally, the conditions for when DIO (direct I/O) is supported
+were fairly simple.  For both block devices and regular files, DIO had
+to be aligned to the logical block size of the block device.
 
-FWIW, 'feature_persistent' variable definition should be moved to above of
-'talk_to_blkback()'.  Otherwise, build would fail.
+However, due to filesystem features that have been added over time (e.g.
+multi-device support, data journalling, inline data, encryption, verity,
+compression, checkpoint disabling, log-structured mode), the conditions
+for when DIO is allowed on a regular file have gotten increasingly
+complex.  Whether a particular regular file supports DIO, and with what
+alignment, can depend on various file attributes and filesystem mount
+options, as well as which block device(s) the file's data is located on.
 
+Moreover, the general rule of DIO needing to be aligned to the block
+device's logical block size was recently relaxed to allow user buffers
+(but not file offsets) aligned to the DMA alignment instead.  See
+commit bf8d08532bc1 ("iomap: add support for dma aligned direct-io").
 
-Thanks,
-SJ
+XFS has an ioctl XFS_IOC_DIOINFO that exposes DIO alignment information.
+Uplifting this to the VFS is one possibility.  However, as discussed
+(https://lore.kernel.org/linux-fsdevel/20220120071215.123274-1-ebiggers@kernel.org/T/#u),
+this ioctl is rarely used and not known to be used outside of
+XFS-specific code.  It was also never intended to indicate when a file
+doesn't support DIO at all, nor was it intended for block devices.
 
-> 
-> 
-> Thanks,
-> SJ
-> 
-> 
-> > 
-> > > +       if (info->feature_persistent_parm)
-> > >                 info->feature_persistent =
-> > >                         !!xenbus_read_unsigned(info->xbdev->otherend,
-> > >                                                "feature-persistent", 0);
-> > > --
-> > > 2.25.1
-> > > 
-> > 
+Therefore, let's expose this information via statx().  Add the
+STATX_DIOALIGN flag and two new statx fields associated with it:
+
+* stx_dio_mem_align: the alignment (in bytes) required for user memory
+  buffers for DIO, or 0 if DIO is not supported on the file.
+
+* stx_dio_offset_align: the alignment (in bytes) required for file
+  offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
+  on the file.  This will only be nonzero if stx_dio_mem_align is
+  nonzero, and vice versa.
+
+Note that as with other statx() extensions, if STATX_DIOALIGN isn't set
+in the returned statx struct, then these new fields won't be filled in.
+This will happen if the file is neither a regular file nor a block
+device, or if the file is a regular file and the filesystem doesn't
+support STATX_DIOALIGN.  It might also happen if the caller didn't
+include STATX_DIOALIGN in the request mask, since statx() isn't required
+to return unrequested information.
+
+This commit only adds the VFS-level plumbing for STATX_DIOALIGN.  For
+regular files, individual filesystems will still need to add code to
+support it.  For block devices, a separate commit will wire it up too.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/stat.c                 | 2 ++
+ include/linux/stat.h      | 2 ++
+ include/uapi/linux/stat.h | 4 +++-
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/fs/stat.c b/fs/stat.c
+index 9ced8860e0f35d..a7930d74448304 100644
+--- a/fs/stat.c
++++ b/fs/stat.c
+@@ -611,6 +611,8 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
+ 	tmp.stx_dev_major = MAJOR(stat->dev);
+ 	tmp.stx_dev_minor = MINOR(stat->dev);
+ 	tmp.stx_mnt_id = stat->mnt_id;
++	tmp.stx_dio_mem_align = stat->dio_mem_align;
++	tmp.stx_dio_offset_align = stat->dio_offset_align;
+ 
+ 	return copy_to_user(buffer, &tmp, sizeof(tmp)) ? -EFAULT : 0;
+ }
+diff --git a/include/linux/stat.h b/include/linux/stat.h
+index 7df06931f25d85..ff277ced50e9fd 100644
+--- a/include/linux/stat.h
++++ b/include/linux/stat.h
+@@ -50,6 +50,8 @@ struct kstat {
+ 	struct timespec64 btime;			/* File creation time */
+ 	u64		blocks;
+ 	u64		mnt_id;
++	u32		dio_mem_align;
++	u32		dio_offset_align;
+ };
+ 
+ #endif
+diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+index 1500a0f58041ae..7cab2c65d3d7fc 100644
+--- a/include/uapi/linux/stat.h
++++ b/include/uapi/linux/stat.h
+@@ -124,7 +124,8 @@ struct statx {
+ 	__u32	stx_dev_minor;
+ 	/* 0x90 */
+ 	__u64	stx_mnt_id;
+-	__u64	__spare2;
++	__u32	stx_dio_mem_align;	/* Memory buffer alignment for direct I/O */
++	__u32	stx_dio_offset_align;	/* File offset alignment for direct I/O */
+ 	/* 0xa0 */
+ 	__u64	__spare3[12];	/* Spare space for future expansion */
+ 	/* 0x100 */
+@@ -152,6 +153,7 @@ struct statx {
+ #define STATX_BASIC_STATS	0x000007ffU	/* The stuff in the normal stat struct */
+ #define STATX_BTIME		0x00000800U	/* Want/got stx_btime */
+ #define STATX_MNT_ID		0x00001000U	/* Got stx_mnt_id */
++#define STATX_DIOALIGN		0x00002000U	/* Want/got direct I/O alignment info */
+ 
+ #define STATX__RESERVED		0x80000000U	/* Reserved for future struct statx expansion */
+ 
+-- 
+2.37.2
+
