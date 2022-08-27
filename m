@@ -2,67 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D56C0502A
-	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 13:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 351D1C0502E
+	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 15:34:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbiH0NLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Aug 2022 09:11:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45586 "EHLO
+        id S233501AbiH0Pe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Aug 2022 11:34:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbiH0NLD (ORCPT
+        with ESMTP id S230144AbiH0Pe5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Aug 2022 09:11:03 -0400
-Received: from out199-4.us.a.mail.aliyun.com (out199-4.us.a.mail.aliyun.com [47.90.199.4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1774C61C;
-        Sat, 27 Aug 2022 06:10:56 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=liusong@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VNO2NEf_1661605851;
-Received: from 30.39.65.74(mailfrom:liusong@linux.alibaba.com fp:SMTPD_---0VNO2NEf_1661605851)
-          by smtp.aliyun-inc.com;
-          Sat, 27 Aug 2022 21:10:52 +0800
-Message-ID: <84ad96a6-2dcd-2a5d-f526-74484324ee79@linux.alibaba.com>
-Date:   Sat, 27 Aug 2022 21:10:50 +0800
+        Sat, 27 Aug 2022 11:34:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D601EC74;
+        Sat, 27 Aug 2022 08:34:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C865A60B87;
+        Sat, 27 Aug 2022 15:34:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4B3C433D6;
+        Sat, 27 Aug 2022 15:34:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661614494;
+        bh=OwdC3zQvx/KCzeSOjSzdhVsw26TrxSO5sfbmeSj3vF8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bXmb0bD8ESyNwnRhmb8IR14oLDFELGHgM5LbDriucEEumr3NzmxZa3KYqDkTDA84U
+         ob5PwgU3nlrEsIUThmRhklgxtfWxXONGAo3XfnYjJ/K0R5ZHrHSASCq5WFXqxGxZbA
+         pnl2HIEXo3yTpIt6sSXX07EEcxRGw5QnhFmjNbCuwvt1bk5dbaShy30tgXRfh6VWCb
+         +lleWEXp6G02g40n6LJx5+RIz77SsYmEqsElHu0c6tTJzFso2fF1DMd+yWC2HyEbKI
+         a0Fu1555e1QfSccC1hDHagmRilh25cKV8qw9KrbXliotwabiE6mxisiJYjtHwwc3ZX
+         cCABO4ZAwi3vA==
+Date:   Sat, 27 Aug 2022 08:34:53 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v5 8/8] xfs: support STATX_DIOALIGN
+Message-ID: <Ywo5nQpqKNUzm/0y@magnolia>
+References: <20220827065851.135710-1-ebiggers@kernel.org>
+ <20220827065851.135710-9-ebiggers@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.0.3
-Subject: Re: [PATCH] blk-mq: determine in advance whether batch alloc can be
- performed
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1661477190-86862-1-git-send-email-liusong@linux.alibaba.com>
- <4fff9af8-90c3-86f9-37c7-75dcd3e95dc0@kernel.dk>
-From:   Liu Song <liusong@linux.alibaba.com>
-In-Reply-To: <4fff9af8-90c3-86f9-37c7-75dcd3e95dc0@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220827065851.135710-9-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Aug 26, 2022 at 11:58:51PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add support for STATX_DIOALIGN to xfs, so that direct I/O alignment
+> restrictions are exposed to userspace in a generic way.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-On 2022/8/26 21:33, Jens Axboe wrote:
-> On 8/25/22 7:26 PM, Liu Song wrote:
->> From: Liu Song <liusong@linux.alibaba.com>
->>
->> Some conditions for judging whether batch alloc can be performed are
->> included in "blk_mq_get_tags", and this function is only used by
->> "__blk_mq_alloc_requests_batch".
->>
->> This patch introduced a helper "can_do_batch_alloc" to prepend the
->> judgment condition and avoid unnecessary function calls.
-> Curious if you saw any differences from this? Or do you just consider
-> it a cleanup?
->
-Hi
+Looks good to me; I particularly like the adjustment to report the
+device's DMA alignment.  Someone should probably fix DIONINFO, or
+perhaps turn it into a getattr wrapper and hoist it?  IMHO none of those
+suggestions are necessary to land this patch, though.
 
-This patch aggregates the judgment conditions for whether batch alloc 
-can be used,
-which can be considered as clean up.
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
 
-If it can be determined at the first judgment that batch alloc cannot be 
-used, the
-overhead of calling "blk_mq_get_tags" once will be reduced, are some 
-differences.
+--D
 
-
-Thanks
-
+> ---
+>  fs/xfs/xfs_iops.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
+> index 45518b8c613c9a..f51c60d7e2054a 100644
+> --- a/fs/xfs/xfs_iops.c
+> +++ b/fs/xfs/xfs_iops.c
+> @@ -604,6 +604,16 @@ xfs_vn_getattr(
+>  		stat->blksize = BLKDEV_IOSIZE;
+>  		stat->rdev = inode->i_rdev;
+>  		break;
+> +	case S_IFREG:
+> +		if (request_mask & STATX_DIOALIGN) {
+> +			struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
+> +			struct block_device	*bdev = target->bt_bdev;
+> +
+> +			stat->result_mask |= STATX_DIOALIGN;
+> +			stat->dio_mem_align = bdev_dma_alignment(bdev) + 1;
+> +			stat->dio_offset_align = bdev_logical_block_size(bdev);
+> +		}
+> +		fallthrough;
+>  	default:
+>  		stat->blksize = xfs_stat_blksize(ip);
+>  		stat->rdev = 0;
+> -- 
+> 2.37.2
+> 
