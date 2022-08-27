@@ -2,98 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 351D1C0502E
-	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 15:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDF5C54EE9
+	for <linux-block@archiver.kernel.org>; Sat, 27 Aug 2022 22:27:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233501AbiH0Pe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Aug 2022 11:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37258 "EHLO
+        id S229542AbiH0W1t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Aug 2022 18:27:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230144AbiH0Pe5 (ORCPT
+        with ESMTP id S229455AbiH0W1t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Aug 2022 11:34:57 -0400
+        Sat, 27 Aug 2022 18:27:49 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D601EC74;
-        Sat, 27 Aug 2022 08:34:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620B642AEC;
+        Sat, 27 Aug 2022 15:27:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C865A60B87;
-        Sat, 27 Aug 2022 15:34:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4B3C433D6;
-        Sat, 27 Aug 2022 15:34:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661614494;
-        bh=OwdC3zQvx/KCzeSOjSzdhVsw26TrxSO5sfbmeSj3vF8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bXmb0bD8ESyNwnRhmb8IR14oLDFELGHgM5LbDriucEEumr3NzmxZa3KYqDkTDA84U
-         ob5PwgU3nlrEsIUThmRhklgxtfWxXONGAo3XfnYjJ/K0R5ZHrHSASCq5WFXqxGxZbA
-         pnl2HIEXo3yTpIt6sSXX07EEcxRGw5QnhFmjNbCuwvt1bk5dbaShy30tgXRfh6VWCb
-         +lleWEXp6G02g40n6LJx5+RIz77SsYmEqsElHu0c6tTJzFso2fF1DMd+yWC2HyEbKI
-         a0Fu1555e1QfSccC1hDHagmRilh25cKV8qw9KrbXliotwabiE6mxisiJYjtHwwc3ZX
-         cCABO4ZAwi3vA==
-Date:   Sat, 27 Aug 2022 08:34:53 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v5 8/8] xfs: support STATX_DIOALIGN
-Message-ID: <Ywo5nQpqKNUzm/0y@magnolia>
-References: <20220827065851.135710-1-ebiggers@kernel.org>
- <20220827065851.135710-9-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220827065851.135710-9-ebiggers@kernel.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DEB6F60EB5;
+        Sat, 27 Aug 2022 22:27:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CCCAC433D7;
+        Sat, 27 Aug 2022 22:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1661639267;
+        bh=mP4LJW5/Ex8VVFzSK0tQqGy9Pf6M8NRGpWXThg5YJsY=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fPCCHHBOCVt1Xlfm2Z5i/Pjl8wfTghEDGD0JFOt4WwDmgOEkru94oGjVnHGqnx/ch
+         gQUe2uK6/r2IS2bj5FoIuojGJWJ0Ygto2fKaREz/DqcTJmhucEE0ruirhkci7F9fps
+         g2F/It6cmXai1gbLalpP+edxEzs+snNPwjjIR5co=
+Date:   Sat, 27 Aug 2022 15:27:45 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-xfs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/6] block: add dio_w_*() wrappers for pin, unpin user
+ pages
+Message-Id: <20220827152745.3dcd05e98b3a4383af650a72@linux-foundation.org>
+In-Reply-To: <20220827083607.2345453-3-jhubbard@nvidia.com>
+References: <20220827083607.2345453-1-jhubbard@nvidia.com>
+        <20220827083607.2345453-3-jhubbard@nvidia.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 11:58:51PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Sat, 27 Aug 2022 01:36:03 -0700 John Hubbard <jhubbard@nvidia.com> wrote:
+
+> Background: The Direct IO part of the block infrastructure is being
+> changed to use pin_user_page*() and unpin_user_page*() calls, in place
+> of a mix of get_user_pages_fast(), get_page(), and put_page(). These
+> have to be changed over all at the same time, for block, bio, and all
+> filesystems. However, most filesystems can be changed via iomap and core
+> filesystem routines, so let's get that in place, and then continue on
+> with converting the remaining filesystems (9P, CIFS) and anything else
+> that feeds pages into bio that ultimately get released via
+> bio_release_pages().
 > 
-> Add support for STATX_DIOALIGN to xfs, so that direct I/O alignment
-> restrictions are exposed to userspace in a generic way.
+> Add a new config parameter, CONFIG_BLK_USE_PIN_USER_PAGES_FOR_DIO, and
+> dio_w_*() wrapper functions. The dio_w_ prefix was chosen for
+> uniqueness, so as to ease a subsequent kernel-wide rename via
+> search-and-replace. Together, these allow the developer to choose
+> between these sets of routines, for Direct IO code paths:
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-
-Looks good to me; I particularly like the adjustment to report the
-device's DMA alignment.  Someone should probably fix DIONINFO, or
-perhaps turn it into a getattr wrapper and hoist it?  IMHO none of those
-suggestions are necessary to land this patch, though.
-
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-
---D
-
-> ---
->  fs/xfs/xfs_iops.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> a) pin_user_pages_fast()
+>     pin_user_page()
+>     unpin_user_page()
 > 
-> diff --git a/fs/xfs/xfs_iops.c b/fs/xfs/xfs_iops.c
-> index 45518b8c613c9a..f51c60d7e2054a 100644
-> --- a/fs/xfs/xfs_iops.c
-> +++ b/fs/xfs/xfs_iops.c
-> @@ -604,6 +604,16 @@ xfs_vn_getattr(
->  		stat->blksize = BLKDEV_IOSIZE;
->  		stat->rdev = inode->i_rdev;
->  		break;
-> +	case S_IFREG:
-> +		if (request_mask & STATX_DIOALIGN) {
-> +			struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
-> +			struct block_device	*bdev = target->bt_bdev;
+> b) get_user_pages_fast()
+>     get_page()
+>     put_page()
+> 
+> CONFIG_BLK_USE_PIN_USER_PAGES_FOR_DIO is a temporary setting, and may
+> be deleted once the conversion is complete. In the meantime, developers
+> can enable this in order to try out each filesystem.
+> 
+> Please remember that these /proc/vmstat items (below) should normally
+> contain the same values as each other, except during the middle of
+> pin/unpin operations. As such, they can be helpful when monitoring test
+> runs:
+> 
+>     nr_foll_pin_acquired
+>     nr_foll_pin_released
+> 
+> ...
+>
+> +static inline void dio_w_unpin_user_pages(struct page **pages,
+> +					  unsigned long npages)
+> +{
+> +	unsigned long i;
 > +
-> +			stat->result_mask |= STATX_DIOALIGN;
-> +			stat->dio_mem_align = bdev_dma_alignment(bdev) + 1;
-> +			stat->dio_offset_align = bdev_logical_block_size(bdev);
-> +		}
-> +		fallthrough;
->  	default:
->  		stat->blksize = xfs_stat_blksize(ip);
->  		stat->rdev = 0;
-> -- 
-> 2.37.2
-> 
+> +	for (i = 0; i < npages; i++)
+> +		put_page(pages[i]);
+> +}
+
+release_pages()?  Might be faster if many of the pages are page_count()==1.
+
+(release_pages() was almost as simple as the above when I added it a
+million years ago.  But then progress happened).
+
