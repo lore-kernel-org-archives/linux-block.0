@@ -2,211 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEC5ECAAA2
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 02:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77000C0502A
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 02:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbiH2CI2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Aug 2022 22:08:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45474 "EHLO
+        id S229687AbiH2CL0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Aug 2022 22:11:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbiH2CI1 (ORCPT
+        with ESMTP id S229679AbiH2CLZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Aug 2022 22:08:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748A12F008
-        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 19:08:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661738905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KIRE7tLozpF13xOfhfNz9hpJ1HAcNIfOccgt3ayzJTM=;
-        b=AvhAwZ0wtz4uQQDqYwfn5n4wl1Yzy+5ne+FWJ9Q9yhRp0cLR5D4jk4aGlULaXg+bJtcoKX
-        XLRPxgn8iFjztkCErFmm5Xl20Q4Vjy8PtBR9n4yqWWwTGy9EGPqRTqNod+oqTDyajF7xMN
-        kS2uzBiqQj6lKb8FRvTufUQ9u19xUpc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-235-PO_VuX-wMBaFVBYLINPJrQ-1; Sun, 28 Aug 2022 22:08:22 -0400
-X-MC-Unique: PO_VuX-wMBaFVBYLINPJrQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D563B1C05136;
-        Mon, 29 Aug 2022 02:08:21 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 63B412026D64;
-        Mon, 29 Aug 2022 02:08:15 +0000 (UTC)
-Date:   Mon, 29 Aug 2022 10:08:11 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, ming.lei@redhat.com
-Subject: Re: [RFC PATCH 0/9] ublk_drv: add USER_RECOVERY support
-Message-ID: <Ywwfi7Dgi0JC2kQ/@T590>
-References: <20220824054744.77812-1-ZiyangZhang@linux.alibaba.com>
+        Sun, 28 Aug 2022 22:11:25 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FA91EC58;
+        Sun, 28 Aug 2022 19:11:22 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MGDR84DtXzl6nJ;
+        Mon, 29 Aug 2022 10:09:56 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgAnenNFIAxjqVZKAA--.51100S4;
+        Mon, 29 Aug 2022 10:11:19 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     axboe@kernel.dk, tj@kernel.org, mkoutny@suse.com,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        cgroups@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH v9 0/4] blk-throttle bugfix
+Date:   Mon, 29 Aug 2022 10:22:36 +0800
+Message-Id: <20220829022240.3348319-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220824054744.77812-1-ZiyangZhang@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgAnenNFIAxjqVZKAA--.51100S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cw1xZFWfWFyUCFW3ZF4xWFg_yoW5Jry8pF
+        Wfurs8Cr17CrnrGw43Ca12gFy5Kan5Xr1UWrnxJw1ruF4q9ryUCwn29w45uFyIvrZ7K34I
+        qrsrtF92yryUZ37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+        Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+        xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+        MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+        0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
+        xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+        fUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 01:47:35PM +0800, ZiyangZhang wrote:
-> ublk_drv is a driver simply passes all blk-mq rqs to ublksrv[1] in
-> userspace. For each ublk queue, there is one ubq_daemon(pthread).
-> All ubq_daemons share the same process which opens /dev/ublkcX.
-> The ubq_daemon code infinitely loops on io_uring_enter() to
-> send/receive io_uring cmds which pass information of blk-mq
-> rqs.
-> 
-> Now, if one ubq_daemon(pthread) or the process crashes, ublk_drv
-> must abort the dying ubq, stop the device and release everything.
-> This is not a good choice in practice because users do not expect
-> aborted requests, I/O errors and a released device. They may want
-> a recovery machenism so that no requests are aborted and no I/O
-> error occurs. Anyway, users just want everything works as uaual.
+From: Yu Kuai <yukuai3@huawei.com>
 
-I understand the requirement is that both /dev/ublkbN and /dev/ublkcN
-won't be deleted & re-added from user viewpoint after user recovery,
-so the device context won't be lost.
+Changes in v9:
+ - renaming the flag BIO_THROTTLED to BIO_BPS_THROTTLED, and always
+ apply iops limit in path 1;
+ - add tag for patch 4
+Changes in v8:
+ - use a new solution in patch 1
+ - move cleanups to a separate patchset
+ - rename bytes/io_skipped to carryover_bytes/ios in patch 4
+Changes in v7:
+ - add patch 5 to improve handling of re-entered bio for bps limit
+ - as suggested by Tejun, add some comments
+ - sdd some Acked tag by Tejun
+Changes in v6:
+ - rename parameter in patch 3
+ - add comments and reviewed tag for patch 4
+Changes in v5:
+ - add comments in patch 4
+ - clear bytes/io_skipped in throtl_start_new_slice_with_credit() in
+ patch 4
+ - and cleanup patches 5-8
+Changes in v4:
+ - add reviewed-by tag for patch 1
+ - add patch 2,3
+ - use a different way to fix io hung in patch 4
+Changes in v3:
+ - fix a check in patch 1
+ - fix link err in patch 2 on 32-bit platform
+ - handle overflow in patch 2
+Changes in v2:
+ - use a new solution suggested by Ming
+ - change the title of patch 1
+ - add patch 2
 
-> 
-> This RFC patchset implements USER_RECOVERY support. If the process
-> crashes, we allow ublksrv to provide new process and ubq_daemons.
-> We do not support single ubq_daemon(pthread) recovery because a
-> pthread rarely crashes.
-> 
-> Recovery feature is quite useful for products do not expect to
-> return any I/O error to frontend users.
+Patch 1 fix that blk-throttle can't work if multiple bios are throttle.
+Patch 2 fix overflow while calculating wait time.
+Patch 3,4 fix io hung due to configuration updates.
 
-That looks one very ideal requirement. To be honest, no any block driver
-can guarantee that 100%, so it is just one soft requirement?
+Previous version:
+v1: https://lore.kernel.org/all/20220517134909.2910251-1-yukuai3@huawei.com/
+v2: https://lore.kernel.org/all/20220518072751.1188163-1-yukuai3@huawei.com/
+v3: https://lore.kernel.org/all/20220519085811.879097-1-yukuai3@huawei.com/
+v4: https://lore.kernel.org/all/20220523082633.2324980-1-yukuai3@huawei.com/
+v5: https://lore.kernel.org/all/20220528064330.3471000-1-yukuai3@huawei.com/
+v6: https://lore.kernel.org/all/20220701093441.885741-1-yukuai1@huaweicloud.com/
+v7: https://lore.kernel.org/all/20220802140415.2960284-1-yukuai1@huaweicloud.com/
+v8: https://lore.kernel.org/all/20220823033130.874230-1-yukuai1@huaweicloud.com/
 
-Cause memory allocation may fail, network may be disconnected,
-re-creating pthread or process may fail too, ...
+Yu Kuai (4):
+  blk-throttle: fix that io throttle can only work for single bio
+  blk-throttle: prevent overflow while calculating wait time
+  blk-throttle: factor out code to calculate ios/bytes_allowed
+  blk-throttle: fix io hung due to configuration updates
 
-> In detail, we support
-> this scenario:
-> (1) The /dev/ublkc0 is opened by process 0;
-> (2) Fio is running on /dev/ublkb0 exposed by ublk_drv and all
->     rqs are handled by process 0.
-> (3) Process 0 suddenly crashes(e.g. segfault);
-> (4) Fio is still running and submit IOs(but these IOs cannot
->     complete now)
-> (5) User recovers with process 1 and attach it to /dev/ublkc0
-> (6) All rqs are handled by process 1 now and IOs can be
->     completed now.
-> 
-> Note: The backend must tolerate double-write because we re-issue
-> a rq sent to the old(dying) process before. We allow users to
-> choose whether re-issue these rqs or not, please see patch 7 for
-> more detail.
-> 
-> We provide a sample script here to simulate the above steps:
-> 
-> ***************************script***************************
-> LOOPS=10
-> 
-> __ublk_get_pid() {
-> 	pid=`./ublk list -n 0 | grep "pid" | awk '{print $7}'`
-> 	echo $pid
-> }
-> 
-> ublk_recover_kill()
-> {
-> 	for CNT in `seq $LOOPS`; do
-> 		dmesg -C
->                 pid=`__ublk_get_pid`
->                 echo -e "*** kill $pid now ***"
-> 		kill -9 $pid
-> 		sleep 2
->                 echo -e "*** recover now ***"
->                 ./ublk recover -n 0
+ block/bio.c               |   2 -
+ block/blk-throttle.c      | 137 +++++++++++++++++++++++++-------------
+ block/blk-throttle.h      |  11 ++-
+ include/linux/bio.h       |   2 +-
+ include/linux/blk_types.h |   2 +-
+ 5 files changed, 104 insertions(+), 50 deletions(-)
 
-The current behavior is that /dev/ublkb* is removed after device is
-aborted because ubq daemon is killed.
-
-What if 'ublk recover' command isn't sent? So the current behavior
-without recovery is changed? Or just changed with this feature enabled?
-
-BTW, I do not mean the change isn't reasonable, but suggest to document
-the user visible change, so it can get reviewed from either user
-viewpoint and technical point.
-
-> 		sleep 4
-> 	done
-> }
-> 
-> ublk_test()
-> {
->         dmesg -C
->         echo -e "*** add ublk device ***"
->         ./ublk add -t null -d 4 -i 1
->         sleep 2
->         echo -e "*** start fio ***"
->         fio --bs=4k \
->             --filename=/dev/ublkb0 \
->             --runtime=100s \
->             --rw=read &
->         sleep 4
->         ublk_recover_kill
->         wait
->         echo -e "*** delete ublk device ***"
->         ./ublk del -n 0
-> }
-> 
-> for CNT in `seq 4`; do
->         modprobe -rv ublk_drv
->         modprobe ublk_drv
->         echo -e "************ round $CNT ************"
->         ublk_test
->         sleep 5
-> done
-> ***************************script***************************
-> 
-> You may run it with our modified ublksrv[3] which supports
-> recovey feature. No I/O error occurs and you can verify it
-> by typing
->     $ perf-tools/bin/tpoint block:block_rq_error
-> 
-> The basic idea of USER_RECOVERY is quite straightfoward:
-> 
-> (1) release/free everything belongs to the dying process.
-> 
->     Note: Since ublk_drv does save information about user process,
->     this work is important because we don't expect any resource
->     lekage. Particularly, ioucmds from the dying ubq_daemons
->     need to be completed(freed). Current ublk_drv code cannot satisfy
->     our need while considering USER_RECOVERY. So we refactor some code
->     shown in patch 1-5 to gracefully free all ioucmds.
-> 
-> (2) init ublk queues including requeuing/aborting rqs.
-> 
-> (3) allow new ubq_daemons issue FETCH_REQ.
-> 
-> Here is steps to reocver:
-> 
-> (1) For a user, after a process crash(how he detect a crash is not related
->     to this patchset), he sends START_USER_RECOVERY ctrl-cmd to
-
-I'd suggest to describe crash detector a bit at least, as one whole use case,
-crash detector should be the input of the use case of user recovery, which is
-usually one part of use case when modeling software requirement/design.
-
-Such as, crash is detected after the ubq daemon pthread/process is crashed?
-Will you consider io hang in the daemon pthread/process? IMO, long-term,
-the crash detector utility should be part of ublksrv.
-
-We don't implement ublk driver's IO timeout yet, but that implementation may be
-related with this recovery feature closely, such as, one simple approach is to
-kill ubq-daemon if we can't move on after retrying several times, then
-let userspace detect & recovery.
-
-
-Thanks,
-Ming
+-- 
+2.31.1
 
