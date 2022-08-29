@@ -2,134 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E08DFECAAD4
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 04:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE80ECAAD4
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 04:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbiH2EDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Aug 2022 00:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39190 "EHLO
+        id S229560AbiH2EHm convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Aug 2022 00:07:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbiH2EDf (ORCPT
+        with ESMTP id S229533AbiH2EHk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2022 00:03:35 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E27D41D3B;
-        Sun, 28 Aug 2022 21:03:34 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id 72so6996998pfx.9;
-        Sun, 28 Aug 2022 21:03:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc;
-        bh=/d1aCoj8mwhQkz6vc1Xqxkc26Va3irgGJEolPmhseeg=;
-        b=eA3WGcD66qm9XgvBqd9G9EtOdEfoYHifkvzr4Rv9RR9TaTlWa5iguQ358dJld+6CcS
-         18d0rsmtgfs4GP2zSuvA+rVmVW0Yq5HNgRSZho/bL8WhgCID7zj2hiqsmGLDCbXnmXdK
-         aGLk7xpU1S2zhVK23R1hovWs7brS5QzSQf1zLiGNwJdxifjiQ8NB4OCDHSwXiMmXS9iH
-         jHZRPs7mgvLec4UwVTQCXj1sxyE6uEAQs1xxmmJMryXrGTKLw1vPeXpnB5XVlufPPWe0
-         sHjVq82/FUQSPhwxVPoHce4G7XkmUeKg7BDuh7RA3bGNut9hTvDT3lzkbwIdvM/7mrIM
-         T66A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc;
-        bh=/d1aCoj8mwhQkz6vc1Xqxkc26Va3irgGJEolPmhseeg=;
-        b=xAwbYrV61X1uVIBZplptpudSRmSkTG3KsWjHMpQcd6B2a2ndczj+wYBVwqeW9i4lYV
-         W0pgMv3Qh8QdHkxumtOxksH+HV+2fVzrwAy0/pIaAY7UIa3jMbhD8T8w+/A9eS3ioFvP
-         uRK1sBhdN1z2Q9Ki97D4erWsmukvx2YcBPL7lKuEpG2F1taI1AtOSLtB22br6oM79DCH
-         ntPHVXYSsTExYdxFpQ3fCjiPbKIM6JPUdPt19vT4Y61y9gsCb5bMcIvJhb6rJgV9ArDJ
-         bHoVMIDg8Fj8UxG7phBZfooEEVLRf6TU2JfnVsJy1DXBl4tpbhhBNu19o5et5xN7sX9/
-         SgLQ==
-X-Gm-Message-State: ACgBeo212Eep1P1EeDWURy9CLFNmm+OEuIL1UgXwFcY9MJd9lxgr0EM/
-        cCStf7TU1OnCbx1XQ1FAktg=
-X-Google-Smtp-Source: AA6agR48/BdpEtyPznQaYdZaC5K7yfxYs+GsD7XuYijpwa6LlkPYYt7llOKdJuiyrlng0Qk5Ay7MpQ==
-X-Received: by 2002:a63:8248:0:b0:42b:b607:f74f with SMTP id w69-20020a638248000000b0042bb607f74fmr6474993pgd.70.1661745813821;
-        Sun, 28 Aug 2022 21:03:33 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id f17-20020aa79691000000b00538405dfe4asm965263pfk.111.2022.08.28.21.03.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Aug 2022 21:03:33 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Sun, 28 Aug 2022 18:03:32 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, mkoutny@suse.com, ming.lei@redhat.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH v9 1/4] blk-throttle: fix that io throttle can only work
- for single bio
-Message-ID: <Yww6lPQaz/Lk4lL6@slm.duckdns.org>
-References: <20220829022240.3348319-1-yukuai1@huaweicloud.com>
- <20220829022240.3348319-2-yukuai1@huaweicloud.com>
+        Mon, 29 Aug 2022 00:07:40 -0400
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A7D30551
+        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 21:07:38 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=gumi@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VNW3YsK_1661746055;
+Received: from LR9115VM81021(mailfrom:gumi@linux.alibaba.com fp:SMTPD_---0VNW3YsK_1661746055)
+          by smtp.aliyun-inc.com;
+          Mon, 29 Aug 2022 12:07:36 +0800
+From:   <gumi@linux.alibaba.com>
+To:     "'Bart Van Assche'" <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <damien.lemoal@opensource.wdc.com>
+Cc:     <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
+Date:   Mon, 29 Aug 2022 12:07:35 +0800
+Message-ID: <000401d8bb5c$df344640$9d9cd2c0$@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220829022240.3348319-2-yukuai1@huaweicloud.com>
+Content-Type: text/plain;
+        charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: Adi7XN4DrcD67lsLRUOJTUTEJt7R/Q==
+Content-Language: zh-cn
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 29, 2022 at 10:22:37AM +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Test scripts:
-> cd /sys/fs/cgroup/blkio/
-> echo "8:0 1024" > blkio.throttle.write_bps_device
-> echo $$ > cgroup.procs
-> dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
-> dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
-> 
-> Test result:
-> 10240 bytes (10 kB, 10 KiB) copied, 10.0134 s, 1.0 kB/s
-> 10240 bytes (10 kB, 10 KiB) copied, 10.0135 s, 1.0 kB/s
-> 
-> The problem is that the second bio is finished after 10s instead of 20s.
-> 
-> Root cause:
-> 1) second bio will be flagged:
-> 
-> __blk_throtl_bio
->  while (true) {
->   ...
->   if (sq->nr_queued[rw]) -> some bio is throttled already
->    break
->  };
->  bio_set_flag(bio, BIO_THROTTLED); -> flag the bio
-> 
-> 2) flagged bio will be dispatched without waiting:
-> 
-> throtl_dispatch_tg
->  tg_may_dispatch
->   tg_with_in_bps_limit
->    if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED))
->     *wait = 0; -> wait time is zero
->     return true;
-> 
-> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-> support to count split bios for iops limit, thus it adds flagged bio
-> checking in tg_with_in_bps_limit() so that split bios will only count
-> once for bps limit, however, it introduce a new problem that io throttle
-> won't work if multiple bios are throttled.
-> 
-> In order to fix the problem, handle iops/bps limit in different ways:
-> 
-> 1) for iops limit, there is no flag to record if the bio is throttled,
->    and iops is always applied.
-> 2) for bps limit, original bio will be flagged with BIO_BPS_THROTTLED,
->    and io throttle will ignore bio with the flag.
-> 
-> Noted this patch also remove the code to set flag in __bio_clone(), it's
-> introduced in commit 111be8839817 ("block-throttle: avoid double
-> charge"), and author thinks split bio can be resubmited and throttled
-> again, which is wrong because split bio will continue to dispatch from
-> caller.
-> 
-> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+On 8/28/22 20:25, gumi@linux.alibaba.com wrote:
+> This problem occurs on kernel version 5.10, and i read this commit you 
+> mentioned. The problem I observed is not a problem of req re-used 
+> fixed by commit 2e315dc07df0, but a different problem. The specific 
+> scene is this: A new IO has called blk_mq_start_request() to start 
+> sending, and an instruction out of sequence occurs between
+> blk_add_timer() and WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in 
+> blk_mq_start_request(), so the req->state is set to MQ_RQ_IN_FLIGHT, 
+> but req->deadline still 0, and at this very moment, timeout
+> handler(blk_mq_check_expired()) check if this new IO times out,  this 
+> condition(if (time_after_eq(jiffies, deadline)) in
+> blk_mq_req_expired() called by blk_mq_check_expired()) will is true.
+> The end result is that this new IO is considered to have timed out. I 
+> looked at the latest kernel code and the problem persists, do you 
+> agree with my analysis process?
+It seems unlikely to me that the above analysis is correct. If this problem would occur with recent kernel versions, I think that it would already have been reported by other Linux users.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Thanks,
 
-Thanks.
+Bart.
 
--- 
-tejun
+---
+
+Hi Bart,
+
+First of all, this problem is not easy to be tested. We have tested it hundreds of times, and the recurrence is low probability. Basically, it needs to run continuously for 15-20 days under the high pressure test.
+After analyzing the reason, we modified it according to the method of V1, and continued to test for more than 30 days, and this problem did not appear. Finally I decided to submit this patch to upstream.
+According to our code analysis, this problem scenario is one that may occur under polar probability, please re-examine my analysis process.
+
+Thanks,
+
+Gu Mi 
+
+
+
+
