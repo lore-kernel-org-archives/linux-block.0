@@ -2,85 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D688ECAAA2
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 03:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BD6ECAAA2
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 03:30:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbiH2DZv convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Aug 2022 23:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34756 "EHLO
+        id S229510AbiH2Daw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Aug 2022 23:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229579AbiH2DZj (ORCPT
+        with ESMTP id S229620AbiH2Dav (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Aug 2022 23:25:39 -0400
-Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27111EED6
-        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 20:25:36 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=gumi@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VNVnMuO_1661743533;
-Received: from LR9115VM81021(mailfrom:gumi@linux.alibaba.com fp:SMTPD_---0VNVnMuO_1661743533)
-          by smtp.aliyun-inc.com;
-          Mon, 29 Aug 2022 11:25:34 +0800
-From:   <gumi@linux.alibaba.com>
-To:     "'Bart Van Assche'" <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <damien.lemoal@opensource.wdc.com>
-Cc:     <linux-block@vger.kernel.org>
-Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
-Date:   Mon, 29 Aug 2022 11:25:33 +0800
-Message-ID: <002001d8bb57$000eabe0$002c03a0$@linux.alibaba.com>
+        Sun, 28 Aug 2022 23:30:51 -0400
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33B71EC57
+        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 20:30:49 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id u9-20020a17090a1f0900b001fde6477464so196702pja.4
+        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 20:30:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=euuNRCHum+BxvFSas9ULJVPRpdf2sR1Xdf6yPAhw4gg=;
+        b=LUyj5ejMM5QFXfd7TZOX7HB6Ug7tneKInmN3xO+IOvx1RPJ7JKCS7duI9co6IY18+4
+         n2GXJ9ywIXKkBh23boJN9hlnC6WX8kvOh8XzOruIlf3BRV6HNQrySNISzVldiF1OVuFV
+         5i11itha+vdiBNc3fdLXnFfbKYn44zt0QYuaH51Q8fL6xJ8y1h8Qao9uOK7KFPM3Yrnp
+         ZzfiJGGb5Ty+53nf0x3aaQxtZS0DxGCMie1Hu5dd/pHL4n7nHKfG7oV4vWoBLNPB0Ymb
+         NM92uOtVGEeZPcCN4lP1pcdwut+8yDX3ghT1pPf0SzpgYipZrxeXg8cwT5wIQhft3LWT
+         q7vw==
+X-Gm-Message-State: ACgBeo238QEe5p+W6wjfHRI4JDqRnbvo8KpyGzFm3NVEUYMeI7yen8B0
+        p27LQfM/qxlzReFBKDK/544=
+X-Google-Smtp-Source: AA6agR4pDHdrhOMdjIRvl/wP/YFpRlaG00Ygs9wymI+UVl6HaXPQU0wGgjZhPPlTwzlg3hwsRJPY0A==
+X-Received: by 2002:a17:902:e94f:b0:173:d0d:c4f5 with SMTP id b15-20020a170902e94f00b001730d0dc4f5mr14529877pll.167.1661743849234;
+        Sun, 28 Aug 2022 20:30:49 -0700 (PDT)
+Received: from [172.20.0.236] ([12.219.165.6])
+        by smtp.gmail.com with ESMTPSA id nh16-20020a17090b365000b001fd8316db51sm1930643pjb.7.2022.08.28.20.30.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Aug 2022 20:30:48 -0700 (PDT)
+Message-ID: <19dcc0d6-fe26-a9db-4d39-794ec78c94be@acm.org>
+Date:   Sun, 28 Aug 2022 20:30:46 -0700
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: Adi7Vv5UwmI2V3CoSp+Rf4KspXirmg==
-Content-Language: zh-cn
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
+Content-Language: en-US
+To:     gumi@linux.alibaba.com, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com
+Cc:     linux-block@vger.kernel.org
+References: <002001d8bb57$000eabe0$002c03a0$@linux.alibaba.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <002001d8bb57$000eabe0$002c03a0$@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
-
-On 8/25/22 00:09, Gu Mi wrote:
-> The problem occurs in two async processes, One is when a new IO calls 
-> the blk_mq_start_request() interface to start sending,The other is 
-> that the block layer timer process calls the blk_mq_req_expired 
-> interface to check whether there is an IO timeout.
-> 
-> When an instruction out of sequence occurs between blk_add_timer and 
-> WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in the interface 
-> blk_mq_start_request,at this time, the block timer is checking the new 
-> IO timeout, Since the req status has been set to MQ_RQ_IN_FLIGHT and 
-> req->deadline is 0 at this time, the new IO will be misjudged as a 
-> timeout.
-> 
-> Our repair plan is for the deadline to be 0, and we do not think that 
-> a timeout occurs. At the same time, because the jiffies of the 32-bit 
-> system will be reversed shortly after the system is turned on, we will 
-> add 1 jiffies to the deadline at this time.
-
-Hi Gu,
-
-With which kernel version has this race been observed? Since commit
-2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in
-blk_mq_tagset_busy_iter") the request reference count is increased before the timeout handler (blk_mq_check_expired()) is called. Do you agree that since then it is no longer possible that
-blk_mq_start_request() is called while blk_mq_check_expired() is in progress?
+On 8/28/22 20:25, gumi@linux.alibaba.com wrote:
+> This problem occurs on kernel version 5.10, and i read this commit
+> you mentioned. The problem I observed is not a problem of req re-used
+> fixed by commit 2e315dc07df0, but a different problem. The specific
+> scene is this: A new IO has called blk_mq_start_request() to start
+> sending, and an instruction out of sequence occurs between
+> blk_add_timer() and WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in
+> blk_mq_start_request(), so the req->state is set to MQ_RQ_IN_FLIGHT,
+> but req->deadline still 0, and at this very moment, timeout
+> handler(blk_mq_check_expired()) check if this new IO times out,  this
+> condition(if (time_after_eq(jiffies, deadline)) in
+> blk_mq_req_expired() called by blk_mq_check_expired()) will is true.
+> The end result is that this new IO is considered to have timed out. I
+> looked at the latest kernel code and the problem persists, do you
+> agree with my analysis process?
+It seems unlikely to me that the above analysis is correct. If this 
+problem would occur with recent kernel versions, I think that it would 
+already have been reported by other Linux users.
 
 Thanks,
 
 Bart.
- 
----
-
-Hi Bart,
-
-
-This problem occurs on kernel version 5.10, and i read this commit you mentioned. The problem I observed is not a problem of req re-used fixed by commit 2e315dc07df0, but 
-a different problem. The specific scene is this: A new IO has called blk_mq_start_request() to start sending, and an instruction out of sequence occurs between blk_add_timer() and 
-WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in blk_mq_start_request(), so the req->state is set to MQ_RQ_IN_FLIGHT, but req->deadline still 0, and at this very moment, timeout handler(blk_mq_check_expired())
-check if this new IO times out,  this condition(if (time_after_eq(jiffies, deadline)) in blk_mq_req_expired() called by blk_mq_check_expired()) will is true. The end result is that this new IO is considered to have timed out.
-I looked at the latest kernel code and the problem persists, do you agree with my analysis process?
-
-Thanks,
-
-Gu Mi.
-
