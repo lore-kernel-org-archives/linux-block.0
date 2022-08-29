@@ -2,259 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26980ECAAA2
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 04:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08DFECAAD4
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 04:03:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229446AbiH2EBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Aug 2022 00:01:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36300 "EHLO
+        id S229552AbiH2EDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Aug 2022 00:03:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbiH2EAy (ORCPT
+        with ESMTP id S229533AbiH2EDf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2022 00:00:54 -0400
-Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B4CD1A832;
-        Sun, 28 Aug 2022 21:00:52 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VNW3uM1_1661745649;
-Received: from 30.97.56.171(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VNW3uM1_1661745649)
-          by smtp.aliyun-inc.com;
-          Mon, 29 Aug 2022 12:00:50 +0800
-Message-ID: <2c5def30-7116-7a0d-860d-74e1d36a91c6@linux.alibaba.com>
-Date:   Mon, 29 Aug 2022 12:00:49 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [RFC PATCH 0/9] ublk_drv: add USER_RECOVERY support
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        Mon, 29 Aug 2022 00:03:35 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E27D41D3B;
+        Sun, 28 Aug 2022 21:03:34 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id 72so6996998pfx.9;
+        Sun, 28 Aug 2022 21:03:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc;
+        bh=/d1aCoj8mwhQkz6vc1Xqxkc26Va3irgGJEolPmhseeg=;
+        b=eA3WGcD66qm9XgvBqd9G9EtOdEfoYHifkvzr4Rv9RR9TaTlWa5iguQ358dJld+6CcS
+         18d0rsmtgfs4GP2zSuvA+rVmVW0Yq5HNgRSZho/bL8WhgCID7zj2hiqsmGLDCbXnmXdK
+         aGLk7xpU1S2zhVK23R1hovWs7brS5QzSQf1zLiGNwJdxifjiQ8NB4OCDHSwXiMmXS9iH
+         jHZRPs7mgvLec4UwVTQCXj1sxyE6uEAQs1xxmmJMryXrGTKLw1vPeXpnB5XVlufPPWe0
+         sHjVq82/FUQSPhwxVPoHce4G7XkmUeKg7BDuh7RA3bGNut9hTvDT3lzkbwIdvM/7mrIM
+         T66A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc;
+        bh=/d1aCoj8mwhQkz6vc1Xqxkc26Va3irgGJEolPmhseeg=;
+        b=xAwbYrV61X1uVIBZplptpudSRmSkTG3KsWjHMpQcd6B2a2ndczj+wYBVwqeW9i4lYV
+         W0pgMv3Qh8QdHkxumtOxksH+HV+2fVzrwAy0/pIaAY7UIa3jMbhD8T8w+/A9eS3ioFvP
+         uRK1sBhdN1z2Q9Ki97D4erWsmukvx2YcBPL7lKuEpG2F1taI1AtOSLtB22br6oM79DCH
+         ntPHVXYSsTExYdxFpQ3fCjiPbKIM6JPUdPt19vT4Y61y9gsCb5bMcIvJhb6rJgV9ArDJ
+         bHoVMIDg8Fj8UxG7phBZfooEEVLRf6TU2JfnVsJy1DXBl4tpbhhBNu19o5et5xN7sX9/
+         SgLQ==
+X-Gm-Message-State: ACgBeo212Eep1P1EeDWURy9CLFNmm+OEuIL1UgXwFcY9MJd9lxgr0EM/
+        cCStf7TU1OnCbx1XQ1FAktg=
+X-Google-Smtp-Source: AA6agR48/BdpEtyPznQaYdZaC5K7yfxYs+GsD7XuYijpwa6LlkPYYt7llOKdJuiyrlng0Qk5Ay7MpQ==
+X-Received: by 2002:a63:8248:0:b0:42b:b607:f74f with SMTP id w69-20020a638248000000b0042bb607f74fmr6474993pgd.70.1661745813821;
+        Sun, 28 Aug 2022 21:03:33 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id f17-20020aa79691000000b00538405dfe4asm965263pfk.111.2022.08.28.21.03.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Aug 2022 21:03:33 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Sun, 28 Aug 2022 18:03:32 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, mkoutny@suse.com, ming.lei@redhat.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        joseph.qi@linux.alibaba.com
-References: <20220824054744.77812-1-ZiyangZhang@linux.alibaba.com>
- <Ywwfi7Dgi0JC2kQ/@T590>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <Ywwfi7Dgi0JC2kQ/@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        cgroups@vger.kernel.org, yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH v9 1/4] blk-throttle: fix that io throttle can only work
+ for single bio
+Message-ID: <Yww6lPQaz/Lk4lL6@slm.duckdns.org>
+References: <20220829022240.3348319-1-yukuai1@huaweicloud.com>
+ <20220829022240.3348319-2-yukuai1@huaweicloud.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220829022240.3348319-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/8/29 10:08, Ming Lei wrote:
-> On Wed, Aug 24, 2022 at 01:47:35PM +0800, ZiyangZhang wrote:
->> ublk_drv is a driver simply passes all blk-mq rqs to ublksrv[1] in
->> userspace. For each ublk queue, there is one ubq_daemon(pthread).
->> All ubq_daemons share the same process which opens /dev/ublkcX.
->> The ubq_daemon code infinitely loops on io_uring_enter() to
->> send/receive io_uring cmds which pass information of blk-mq
->> rqs.
->>
->> Now, if one ubq_daemon(pthread) or the process crashes, ublk_drv
->> must abort the dying ubq, stop the device and release everything.
->> This is not a good choice in practice because users do not expect
->> aborted requests, I/O errors and a released device. They may want
->> a recovery machenism so that no requests are aborted and no I/O
->> error occurs. Anyway, users just want everything works as uaual.
+On Mon, Aug 29, 2022 at 10:22:37AM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> I understand the requirement is that both /dev/ublkbN and /dev/ublkcN
-> won't be deleted & re-added from user viewpoint after user recovery,
-> so the device context won't be lost.
-
-Yes, after the 'process' is killed or crashed(such as segmentation fault)
-both /dev/ublkb0 and /dev/ublkc0 is not deleted.
-
+> Test scripts:
+> cd /sys/fs/cgroup/blkio/
+> echo "8:0 1024" > blkio.throttle.write_bps_device
+> echo $$ > cgroup.procs
+> dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+> dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
 > 
->>
->> This RFC patchset implements USER_RECOVERY support. If the process
->> crashes, we allow ublksrv to provide new process and ubq_daemons.
->> We do not support single ubq_daemon(pthread) recovery because a
->> pthread rarely crashes.
->>
->> Recovery feature is quite useful for products do not expect to
->> return any I/O error to frontend users.
+> Test result:
+> 10240 bytes (10 kB, 10 KiB) copied, 10.0134 s, 1.0 kB/s
+> 10240 bytes (10 kB, 10 KiB) copied, 10.0135 s, 1.0 kB/s
 > 
-> That looks one very ideal requirement. To be honest, no any block driver
-> can guarantee that 100%, so it is just one soft requirement?
+> The problem is that the second bio is finished after 10s instead of 20s.
 > 
-> Cause memory allocation may fail, network may be disconnected,
-> re-creating pthread or process may fail too, ...
-
-Yes, I know there are many other problem which may cause a failure.
-
-The recovery mechanism only guarantees that rqs sent to ublksrv
-before crash are not aborted. Instead, ublk_drv re-issues the request
-itself and fio does not konw about it. Of course the backend must
-tolerate a double-write/read.
-
+> Root cause:
+> 1) second bio will be flagged:
 > 
->> In detail, we support
->> this scenario:
->> (1) The /dev/ublkc0 is opened by process 0;
->> (2) Fio is running on /dev/ublkb0 exposed by ublk_drv and all
->>     rqs are handled by process 0.
->> (3) Process 0 suddenly crashes(e.g. segfault);
->> (4) Fio is still running and submit IOs(but these IOs cannot
->>     complete now)
->> (5) User recovers with process 1 and attach it to /dev/ublkc0
->> (6) All rqs are handled by process 1 now and IOs can be
->>     completed now.
->>
->> Note: The backend must tolerate double-write because we re-issue
->> a rq sent to the old(dying) process before. We allow users to
->> choose whether re-issue these rqs or not, please see patch 7 for
->> more detail.
->>
->> We provide a sample script here to simulate the above steps:
->>
->> ***************************script***************************
->> LOOPS=10
->>
->> __ublk_get_pid() {
->> 	pid=`./ublk list -n 0 | grep "pid" | awk '{print $7}'`
->> 	echo $pid
->> }
->>
->> ublk_recover_kill()
->> {
->> 	for CNT in `seq $LOOPS`; do
->> 		dmesg -C
->>                 pid=`__ublk_get_pid`
->>                 echo -e "*** kill $pid now ***"
->> 		kill -9 $pid
->> 		sleep 2
->>                 echo -e "*** recover now ***"
->>                 ./ublk recover -n 0
+> __blk_throtl_bio
+>  while (true) {
+>   ...
+>   if (sq->nr_queued[rw]) -> some bio is throttled already
+>    break
+>  };
+>  bio_set_flag(bio, BIO_THROTTLED); -> flag the bio
 > 
-> The current behavior is that /dev/ublkb* is removed after device is
-> aborted because ubq daemon is killed.
+> 2) flagged bio will be dispatched without waiting:
 > 
-> What if 'ublk recover' command isn't sent? So the current behavior
-> without recovery is changed? Or just changed with this feature enabled?
-
-No, I do not change the default behavior. You can verify this by running
-generic/002 and generic/003. These tests passes with either recovery enabled
-or disabled.
-
-
-(1) With recovery disabled, the monitor_work scheduled periodically or
-    STOP_DEV ctrl-cmd issued manually can cleanup everything and remove the
-    gendisk.
-
-(2)With recovery enabled, the monitor_work is not scheduled anymore, see
-   patch 9. So after a crash，all resources are still in kernel.
-   Then, there are two options for a user:
-    (a) You don't want to recover it, so just send STOP_DEV ctrl-cmd. This will
-        schedule monitor_work once and cleanup everything. Please see patch 5.
-    (b) You want to recover it, so just send START_RECOVERY ctrl-cmd. Then you
-        HAVE TO start a new process and send END_RECOVERY.
-
-Note: Actually I am thinking what if a user has sent START_RECOVERY but he fails
-to start a new process. I have a rough idea: just abort all rqs after we unqiuesce
-the request queue. But that is not included in this RFC patchset because I
-want to make it simpler. Maybe we can consider it later?
-
+> throtl_dispatch_tg
+>  tg_may_dispatch
+>   tg_with_in_bps_limit
+>    if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED))
+>     *wait = 0; -> wait time is zero
+>     return true;
 > 
-> BTW, I do not mean the change isn't reasonable, but suggest to document
-> the user visible change, so it can get reviewed from either user
-> viewpoint and technical point.
+> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> support to count split bios for iops limit, thus it adds flagged bio
+> checking in tg_with_in_bps_limit() so that split bios will only count
+> once for bps limit, however, it introduce a new problem that io throttle
+> won't work if multiple bios are throttled.
 > 
->> 		sleep 4
->> 	done
->> }
->>
->> ublk_test()
->> {
->>         dmesg -C
->>         echo -e "*** add ublk device ***"
->>         ./ublk add -t null -d 4 -i 1
->>         sleep 2
->>         echo -e "*** start fio ***"
->>         fio --bs=4k \
->>             --filename=/dev/ublkb0 \
->>             --runtime=100s \
->>             --rw=read &
->>         sleep 4
->>         ublk_recover_kill
->>         wait
->>         echo -e "*** delete ublk device ***"
->>         ./ublk del -n 0
->> }
->>
->> for CNT in `seq 4`; do
->>         modprobe -rv ublk_drv
->>         modprobe ublk_drv
->>         echo -e "************ round $CNT ************"
->>         ublk_test
->>         sleep 5
->> done
->> ***************************script***************************
->>
->> You may run it with our modified ublksrv[3] which supports
->> recovey feature. No I/O error occurs and you can verify it
->> by typing
->>     $ perf-tools/bin/tpoint block:block_rq_error
->>
->> The basic idea of USER_RECOVERY is quite straightfoward:
->>
->> (1) release/free everything belongs to the dying process.
->>
->>     Note: Since ublk_drv does save information about user process,
->>     this work is important because we don't expect any resource
->>     lekage. Particularly, ioucmds from the dying ubq_daemons
->>     need to be completed(freed). Current ublk_drv code cannot satisfy
->>     our need while considering USER_RECOVERY. So we refactor some code
->>     shown in patch 1-5 to gracefully free all ioucmds.
->>
->> (2) init ublk queues including requeuing/aborting rqs.
->>
->> (3) allow new ubq_daemons issue FETCH_REQ.
->>
->> Here is steps to reocver:
->>
->> (1) For a user, after a process crash(how he detect a crash is not related
->>     to this patchset), he sends START_USER_RECOVERY ctrl-cmd to
+> In order to fix the problem, handle iops/bps limit in different ways:
 > 
-> I'd suggest to describe crash detector a bit at least, as one whole use case,
-> crash detector should be the input of the use case of user recovery, which is
-> usually one part of use case when modeling software requirement/design.
-
-This patchset tries to answer only one question: After a process crash, how to
-re-attach the device by another process. So I do not consider other questions
-too much, such as:
-(1) How to detect a crash?
-(2) Is IO hang a crash? Should we kill the process?
-(3) What if a blk-mq rq timeout? Does the process dies? Should we kill the process?
-
-I think we can answer them after kernel-support of USER_RECOVERY is available.
-
-
-For now I only try to directly kill the process in testcases and manually inject
-a crash in handle_io_async().
-
+> 1) for iops limit, there is no flag to record if the bio is throttled,
+>    and iops is always applied.
+> 2) for bps limit, original bio will be flagged with BIO_BPS_THROTTLED,
+>    and io throttle will ignore bio with the flag.
 > 
-> Such as, crash is detected after the ubq daemon pthread/process is crashed?
-> Will you consider io hang in the daemon pthread/process? IMO, long-term,
-> the crash detector utility should be part of ublksrv.
-
-Yes, we should design a crash detector in ublksrv. For IO hang, my idea is that:
-
-(1) the ublksrv_tgt code should handle it if user runs ublksrv directly.
-
-(2) the backend should handle it if user only uses libublksrv and embeds it inside
-    the backend code.
-
+> Noted this patch also remove the code to set flag in __bio_clone(), it's
+> introduced in commit 111be8839817 ("block-throttle: avoid double
+> charge"), and author thinks split bio can be resubmited and throttled
+> again, which is wrong because split bio will continue to dispatch from
+> caller.
 > 
-> We don't implement ublk driver's IO timeout yet, but that implementation may be
-> related with this recovery feature closely, such as, one simple approach is to
-> kill ubq-daemon if we can't move on after retrying several times, then
-> let userspace detect & recovery.
+> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-You mean the ublk_drv can kill the ubq_daemon? I have not consider this case yet...
+Acked-by: Tejun Heo <tj@kernel.org>
 
-BTW, I don't think we should put too much logic(IO hang, detector) in ublk_drv
-because it should only pass-through rqs to userpsace. We should make ublk_drv simple.
-Accept a new daemon and re-attach it to /dev/ublkb0 is what it can do I think.
+Thanks.
 
-
-Regards,
-Zhang
+-- 
+tejun
