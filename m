@@ -2,135 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8118ECAAD5
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 13:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E999ECAAD5
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 16:08:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbiH2NoA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Aug 2022 09:44:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
+        id S230227AbiH2QIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Aug 2022 12:08:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbiH2Nn7 (ORCPT
+        with ESMTP id S229502AbiH2QIQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2022 09:43:59 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C691D9413C
-        for <linux-block@vger.kernel.org>; Mon, 29 Aug 2022 06:43:55 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id kk26so15742950ejc.11
-        for <linux-block@vger.kernel.org>; Mon, 29 Aug 2022 06:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=JmNnBz360ICvTuyulOMiVni7Ij1DUnsSDNhiIpTqsUk=;
-        b=DyUunINlMdxMn0kC/W7hZ6zP4jALP3cPh9EsH4wd7tKiuIi2qkNeo1AtvFOrpJ0CFh
-         UpiW3x0ixWkxdgOGdlhfKcnc6zyz2wjyBx3aEP1Q+7b5wSBmUYBfjWxEEH/4acJmYMAT
-         TatPODd37Hgh+myZ/Lzx61yBiuFD8FMqvLwX0RogwjUUqv+MvcNGqwnPjAvqIKirCe/K
-         9SFE6VhMiUVEjgoWTT3nkokLlJaH/ii0Q0HgPhMM4yqXq6cB/Doj7yCqVXOPv98vMsG2
-         2hhlA40yadCNqN8BS0/vMOFJsZWcY96IqMK3zwRqnsgbDCmhEd+KyLtwWa3OYXQPAOut
-         iH8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=JmNnBz360ICvTuyulOMiVni7Ij1DUnsSDNhiIpTqsUk=;
-        b=QFZ1jXyzBuCVJqQvgH71T1dFPg6J1c+9ee6T2a/MkTd3+gB/g17z3RF2dx95upH7R3
-         GRJWqEBjjs/mXgnN8O1JcWmJGtBEpDqb8znhwTQTaNjUISfHhs09da4v+UWOiKMeUPts
-         NlCEp4W4hM7wUatgu85pORuwNomu0ZFmhgluQsRn1xNQGNMLLqcMeY7VV3NMuJ0IkjTi
-         C235d0Vh7Vch4FbkoVqxZQo1Cqz7h6z2fTHWkFhwEB/Ya3baijK+0OvozsTKw+1Cul4K
-         NmN1LJIljctnGQaZ3RCvjqtn3O9+41+VzlS8mLBnhQDdszA3dmQPZSEtaQCfxNOGFZJO
-         rHhA==
-X-Gm-Message-State: ACgBeo17sgBj6sV3aleLIxmLKLevOsGHfjMfd9UaXjV9Zmr6SPOphVa8
-        B4icWVOsWzzS1iZ/c5Gp6F1Z9lqRhf8bH+LLKSU4gQ==
-X-Google-Smtp-Source: AA6agR7jlcTamH+MHq78d+5WPrpSBkAb7eWVJpdJLUSu9XwRcRz08BW3sLQAY4ezkiMjwVZFPyWDOdxBLbdsJQAT6tI=
-X-Received: by 2002:a17:907:75ec:b0:741:484b:3ca4 with SMTP id
- jz12-20020a17090775ec00b00741484b3ca4mr7341238ejc.316.1661780634320; Mon, 29
- Aug 2022 06:43:54 -0700 (PDT)
+        Mon, 29 Aug 2022 12:08:16 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46ECE86B7A;
+        Mon, 29 Aug 2022 09:08:13 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id CB8A6227E4;
+        Mon, 29 Aug 2022 16:08:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1661789291; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PGbWwfYuYN9T84wUp5KX7hENmHOxLt+bOTLxbPFr6cs=;
+        b=Nz1DGpzfoyENhZNtQaMGDJXT2EGuJi02N9O2TjnP3C7kjF7GBdJ9i0keBKz9wTGzpq4R+b
+        J+1+lahpOmmUy/XQKckOlDAXrewROaSvkEy/OEUJJHRZE2k9l2bw3cN30Ksra6fe8nTL89
+        3VAAHD8HpHvlgddeyw67uD4L+0G/hfM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1661789291;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PGbWwfYuYN9T84wUp5KX7hENmHOxLt+bOTLxbPFr6cs=;
+        b=uWr6d3d+E9HF7DuQEGYclf7K4yBkjwT1b9FAlRObNlmpiMlQ6+mTxnqJxBgw5uD6CwbPQd
+        AMW5jFIeY6HdVwBA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E31071352A;
+        Mon, 29 Aug 2022 16:08:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vlVgN2rkDGNfGAAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 29 Aug 2022 16:08:10 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 0F8C0A066D; Mon, 29 Aug 2022 18:08:08 +0200 (CEST)
+Date:   Mon, 29 Aug 2022 18:08:08 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 5/6] NFS: direct-io: convert to FOLL_PIN pages
+Message-ID: <20220829160808.rwkkiuelipr3huxk@quack3>
+References: <20220827083607.2345453-1-jhubbard@nvidia.com>
+ <20220827083607.2345453-6-jhubbard@nvidia.com>
+ <YwqfWoAE2Awp4YvT@ZenIV>
+ <353f18ac-0792-2cb7-6675-868d0bd41d3d@nvidia.com>
+ <Ywq5ILRNxsbWvFQe@ZenIV>
+ <Ywq5VrSrY341UVpL@ZenIV>
+ <217b4a17-1355-06c5-291e-7980c0d3cea6@nvidia.com>
 MIME-Version: 1.0
-References: <20220826081117.21687-1-guoqing.jiang@linux.dev>
- <YwxuYrJJRBDxsJ8X@unreal> <d969d7bf-d2a3-05aa-26e5-41628f74b8ab@linux.dev>
-In-Reply-To: <d969d7bf-d2a3-05aa-26e5-41628f74b8ab@linux.dev>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Mon, 29 Aug 2022 15:43:43 +0200
-Message-ID: <CAMGffE=-Dsr=s1X=00+y1UcOhHC=FJ-9guQAWTDoHLTRBQ7Qaw@mail.gmail.com>
-Subject: Re: [PATCH] rnbd-srv: remove 'dir' argument from rnbd_srv_rdma_ev
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc:     Leon Romanovsky <leon@kernel.org>, haris.iqbal@ionos.com,
-        axboe@kernel.dk, jgg@ziepe.ca, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <217b4a17-1355-06c5-291e-7980c0d3cea6@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Aug 29, 2022 at 3:33 PM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
->
->
->
-> On 8/29/22 3:44 PM, Leon Romanovsky wrote:
-> > On Fri, Aug 26, 2022 at 04:11:17PM +0800, Guoqing Jiang wrote:
-> >> Since all callers (process_{read,write}) set id->dir, no need to
-> >> pass 'dir' again.
+On Sun 28-08-22 21:59:49, John Hubbard wrote:
+> On 8/27/22 17:39, Al Viro wrote:
+> > On Sun, Aug 28, 2022 at 01:38:57AM +0100, Al Viro wrote:
+> >> On Sat, Aug 27, 2022 at 04:55:18PM -0700, John Hubbard wrote:
+> >>> On 8/27/22 15:48, Al Viro wrote:
+> >>>> On Sat, Aug 27, 2022 at 01:36:06AM -0700, John Hubbard wrote:
+> >>>>> Convert the NFS Direct IO layer to use pin_user_pages_fast() and
+> >>>>> unpin_user_page(), instead of get_user_pages_fast() and put_page().
+> >>>>
+> >>>> Again, this stuff can be hit with ITER_BVEC iterators
+> >>>>
+> >>>>> -		result = iov_iter_get_pages_alloc2(iter, &pagevec,
+> >>>>> +		result = dio_w_iov_iter_pin_pages_alloc(iter, &pagevec,
+> >>>>>  						  rsize, &pgbase);
+> >>>>
+> >>>> and this will break on those.
+> >>>
+> >>> If anyone has an example handy, of a user space program that leads
+> >>> to this situation (O_DIRECT with ITER_BVEC), it would really help
+> >>> me reach enlightenment a lot quicker in this area. :)
 > >>
-> >> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-> >> ---
-> >>   drivers/block/rnbd/rnbd-srv.c          | 9 ++++-----
-> >>   drivers/block/rnbd/rnbd-srv.h          | 1 +
-> >>   drivers/infiniband/ulp/rtrs/rtrs-srv.c | 4 ++--
-> >>   drivers/infiniband/ulp/rtrs/rtrs.h     | 3 +--
-> >>   4 files changed, 8 insertions(+), 9 deletions(-)
->
-> > I applied the patch and cleanup of rtrs-srv.h can be done later.
->
-> Thanks! I suppose below
->
-> > So decouple it from rtrs-srv.h and hide everything that not-needed to be
-> > exported to separate header file.
->
-> means move 'struct rtrs_srv_op' to rtrs.h, which seems not appropriate to me
-> because both client and server include the header. Pls correct me if I
-> am wrong.
->
-> Since process_{read,write} prints direction info if ctx->ops.rdma_ev
-> fails, how
-> about remove the 'dir' info from rnbd_srv_rdma_ev? Then we  don't need to
-> include rtrs-srv.h.
->
-> diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-> index 431c6da19d3f..d07ff3ba560c 100644
-> --- a/drivers/block/rnbd/rnbd-srv.c
-> +++ b/drivers/block/rnbd/rnbd-srv.c
-> @@ -387,8 +387,8 @@ static int rnbd_srv_rdma_ev(void *priv, struct
-> rtrs_srv_op *id,
->                                              datalen);
->                  break;
->          default:
-> -               pr_warn("Received unexpected message type %d with dir %d
-> from session %s\n",
-> -                       type, id->dir, srv_sess->sessname);
-> +               pr_warn("Received unexpected message type %d from
-> session %s\n",
-> +                       type, srv_sess->sessname);
->                  return -EINVAL;
->          }
->
-> diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
-> index 5a0ef6c2b5c7..081bceaf4ae9 100644
-> --- a/drivers/block/rnbd/rnbd-srv.h
-> +++ b/drivers/block/rnbd/rnbd-srv.h
-> @@ -14,7 +14,6 @@
->   #include <linux/kref.h>
->
->   #include <rtrs.h>
-> -#include <rtrs-srv.h>
->   #include "rnbd-proto.h"
->   #include "rnbd-log.h"
->
->
-> Thoughts?
-I like the idea. Please post a formal patch based on leon's
-https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=wip/leon-for-next
+> >> Er...  splice(2) to O_DIRECT-opened file on e.g. ext4?  Or
+> >> sendfile(2) to the same, for that matter...
+> > 
+> > s/ext4/nfs/ to hit this particular codepath, obviously.
+> 
+> OK, I have a solution to this that's pretty easy:
+> 
+> 1) Get rid of the user_backed_iter(i) check in
+> dio_w_iov_iter_pin_pages() and dio_w_iov_iter_pin_pages_alloc(), and
+> 
+> 2) At the call sites, match up the unpin calls appropriately.
+> 
+> ...and apply a similar fix for the fuse conversion patch.
+> 
+> However, the core block/bio conversion in patch 4 still does depend upon
+> a key assumption, which I got from a 2019 email discussion with
+> Christoph Hellwig and others here [1], which says:
+> 
+>     "All pages released by bio_release_pages should come from
+>      get_get_user_pages...".
+> 
+> I really hope that still holds true. Otherwise this whole thing is in
+> trouble.
+> 
+> [1] https://lore.kernel.org/kvm/20190724053053.GA18330@infradead.org/
 
-Thx!
->
-> Thanks,
-> Guoqing
+Well as far as I've checked that discussion, Christoph was aware of pipe
+pages etc. (i.e., bvecs) entering direct IO code. But he had some patches
+[2] which enabled GUP to work for bvecs as well (using the kernel mapping
+under the hood AFAICT from a quick glance at the series). I suppose we
+could also handle this in __iov_iter_get_pages_alloc() by grabbing pin
+reference instead of plain get_page() for the case of bvec iter. That way
+we should have only pinned pages in bio_release_pages() even for the bvec
+case.
+
+[2] http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/gup-bvec
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
