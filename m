@@ -2,144 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E999ECAAD5
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 16:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42F25C54EE9
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 16:33:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230227AbiH2QIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Aug 2022 12:08:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52642 "EHLO
+        id S229591AbiH2QdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Aug 2022 12:33:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbiH2QIQ (ORCPT
+        with ESMTP id S229488AbiH2QdH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2022 12:08:16 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46ECE86B7A;
-        Mon, 29 Aug 2022 09:08:13 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Mon, 29 Aug 2022 12:33:07 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7E2252B6;
+        Mon, 29 Aug 2022 09:33:06 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id CB8A6227E4;
-        Mon, 29 Aug 2022 16:08:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1661789291; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        by sin.source.kernel.org (Postfix) with ESMTPS id 1EE6FCE130F;
+        Mon, 29 Aug 2022 16:33:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EF56C433D6;
+        Mon, 29 Aug 2022 16:32:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kNQTi4K8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1661790778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=PGbWwfYuYN9T84wUp5KX7hENmHOxLt+bOTLxbPFr6cs=;
-        b=Nz1DGpzfoyENhZNtQaMGDJXT2EGuJi02N9O2TjnP3C7kjF7GBdJ9i0keBKz9wTGzpq4R+b
-        J+1+lahpOmmUy/XQKckOlDAXrewROaSvkEy/OEUJJHRZE2k9l2bw3cN30Ksra6fe8nTL89
-        3VAAHD8HpHvlgddeyw67uD4L+0G/hfM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1661789291;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PGbWwfYuYN9T84wUp5KX7hENmHOxLt+bOTLxbPFr6cs=;
-        b=uWr6d3d+E9HF7DuQEGYclf7K4yBkjwT1b9FAlRObNlmpiMlQ6+mTxnqJxBgw5uD6CwbPQd
-        AMW5jFIeY6HdVwBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E31071352A;
-        Mon, 29 Aug 2022 16:08:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id vlVgN2rkDGNfGAAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 29 Aug 2022 16:08:10 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 0F8C0A066D; Mon, 29 Aug 2022 18:08:08 +0200 (CEST)
-Date:   Mon, 29 Aug 2022 18:08:08 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 5/6] NFS: direct-io: convert to FOLL_PIN pages
-Message-ID: <20220829160808.rwkkiuelipr3huxk@quack3>
-References: <20220827083607.2345453-1-jhubbard@nvidia.com>
- <20220827083607.2345453-6-jhubbard@nvidia.com>
- <YwqfWoAE2Awp4YvT@ZenIV>
- <353f18ac-0792-2cb7-6675-868d0bd41d3d@nvidia.com>
- <Ywq5ILRNxsbWvFQe@ZenIV>
- <Ywq5VrSrY341UVpL@ZenIV>
- <217b4a17-1355-06c5-291e-7980c0d3cea6@nvidia.com>
+        bh=3F5bs6wEmRDmdIQe96V5iwCeWjK5YoVTeKEuPdxSfN4=;
+        b=kNQTi4K8egLdu1zNarBL47SQOYWe4WMkhvHrAwskcAG/1adfCVQBMB0gvduSpWFDbav2Tj
+        2LIfVOx4v++zHCwTjVPKSR+kizVUx5w5Af4coUKZm2ZWFtmVrqoa79XBz+/8OYj2RpZKfG
+        GTXOi7IPk9NkM/oVEZTI4HyRLLvuSmE=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1de32b3b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Mon, 29 Aug 2022 16:32:58 +0000 (UTC)
+Date:   Mon, 29 Aug 2022 12:32:54 -0400
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+        pabeni@redhat.com, jiri@resnulli.us, johannes@sipsolutions.net,
+        linux-block@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org,
+        linux-wpan@vger.kernel.org, wireguard@lists.zx2c4.com,
+        linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-pm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-cifs@vger.kernel.org, cluster-devel@redhat.com,
+        mptcp@lists.linux.dev, lvs-devel@vger.kernel.org,
+        netfilter-devel@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dev@openvswitch.org,
+        linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Subject: Re: [PATCH net-next] genetlink: start to validate reserved header
+ bytes
+Message-ID: <YwzqNgj/bJoawrwh@zx2c4.com>
+References: <20220825001830.1911524-1-kuba@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <217b4a17-1355-06c5-291e-7980c0d3cea6@nvidia.com>
+In-Reply-To: <20220825001830.1911524-1-kuba@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun 28-08-22 21:59:49, John Hubbard wrote:
-> On 8/27/22 17:39, Al Viro wrote:
-> > On Sun, Aug 28, 2022 at 01:38:57AM +0100, Al Viro wrote:
-> >> On Sat, Aug 27, 2022 at 04:55:18PM -0700, John Hubbard wrote:
-> >>> On 8/27/22 15:48, Al Viro wrote:
-> >>>> On Sat, Aug 27, 2022 at 01:36:06AM -0700, John Hubbard wrote:
-> >>>>> Convert the NFS Direct IO layer to use pin_user_pages_fast() and
-> >>>>> unpin_user_page(), instead of get_user_pages_fast() and put_page().
-> >>>>
-> >>>> Again, this stuff can be hit with ITER_BVEC iterators
-> >>>>
-> >>>>> -		result = iov_iter_get_pages_alloc2(iter, &pagevec,
-> >>>>> +		result = dio_w_iov_iter_pin_pages_alloc(iter, &pagevec,
-> >>>>>  						  rsize, &pgbase);
-> >>>>
-> >>>> and this will break on those.
-> >>>
-> >>> If anyone has an example handy, of a user space program that leads
-> >>> to this situation (O_DIRECT with ITER_BVEC), it would really help
-> >>> me reach enlightenment a lot quicker in this area. :)
-> >>
-> >> Er...  splice(2) to O_DIRECT-opened file on e.g. ext4?  Or
-> >> sendfile(2) to the same, for that matter...
-> > 
-> > s/ext4/nfs/ to hit this particular codepath, obviously.
-> 
-> OK, I have a solution to this that's pretty easy:
-> 
-> 1) Get rid of the user_backed_iter(i) check in
-> dio_w_iov_iter_pin_pages() and dio_w_iov_iter_pin_pages_alloc(), and
-> 
-> 2) At the call sites, match up the unpin calls appropriately.
-> 
-> ...and apply a similar fix for the fuse conversion patch.
-> 
-> However, the core block/bio conversion in patch 4 still does depend upon
-> a key assumption, which I got from a 2019 email discussion with
-> Christoph Hellwig and others here [1], which says:
-> 
->     "All pages released by bio_release_pages should come from
->      get_get_user_pages...".
-> 
-> I really hope that still holds true. Otherwise this whole thing is in
-> trouble.
-> 
-> [1] https://lore.kernel.org/kvm/20190724053053.GA18330@infradead.org/
+Hi Jakub,
 
-Well as far as I've checked that discussion, Christoph was aware of pipe
-pages etc. (i.e., bvecs) entering direct IO code. But he had some patches
-[2] which enabled GUP to work for bvecs as well (using the kernel mapping
-under the hood AFAICT from a quick glance at the series). I suppose we
-could also handle this in __iov_iter_get_pages_alloc() by grabbing pin
-reference instead of plain get_page() for the case of bvec iter. That way
-we should have only pinned pages in bio_release_pages() even for the bvec
-case.
+On Wed, Aug 24, 2022 at 05:18:30PM -0700, Jakub Kicinski wrote:
+> diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
+> index d0f3b6d7f408..0c0644e762e5 100644
+> --- a/drivers/net/wireguard/netlink.c
+> +++ b/drivers/net/wireguard/netlink.c
+> @@ -621,6 +621,7 @@ static const struct genl_ops genl_ops[] = {
+>  static struct genl_family genl_family __ro_after_init = {
+>  	.ops = genl_ops,
+>  	.n_ops = ARRAY_SIZE(genl_ops),
+> +	.resv_start_op = WG_CMD_SET_DEVICE + 1,
+>  	.name = WG_GENL_NAME,
+>  	.version = WG_GENL_VERSION,
+>  	.maxattr = WGDEVICE_A_MAX,
 
-[2] http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/gup-bvec
+FWIW, I wouldn't object to just leaving this at zero. I don't know of
+any wireguard userspaces doing anything with the reserved header field.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jason
