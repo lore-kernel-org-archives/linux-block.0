@@ -2,91 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A30C0502A
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 03:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D688ECAAA2
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 03:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229767AbiH2DHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Aug 2022 23:07:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39940 "EHLO
+        id S229536AbiH2DZv convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Aug 2022 23:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbiH2DHK (ORCPT
+        with ESMTP id S229579AbiH2DZj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Aug 2022 23:07:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401663DF0D
-        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 20:07:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661742428;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Db/ObBgPT0I5ltsCA8YROcuIZJ9I4YfuTZDGnkPg1TU=;
-        b=S4xzuLD5RqcleKzKpGojQpSZtV6uSTyhE3sV6mVmsjx7loTcjWPFJ5vm1JL+ugEgoCAtUJ
-        gor6WpZqy4b2UPvUX00cmqdzxzYDPCXkXiASjV8q6To1KgKOos0aJNoZn+YEFVFLenqJfb
-        EdXEGH9TcfMzMlmVYFxU8eB8YO8WCaA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-382-QjFASFHYPYyFh2F6WRHltg-1; Sun, 28 Aug 2022 23:07:05 -0400
-X-MC-Unique: QjFASFHYPYyFh2F6WRHltg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AD104801231;
-        Mon, 29 Aug 2022 03:07:04 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9F303C15BB3;
-        Mon, 29 Aug 2022 03:07:00 +0000 (UTC)
-Date:   Mon, 29 Aug 2022 11:06:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, ming.lei@redhat.com
-Subject: Re: [RFC PATCH 3/9] ublk_drv: add a helper to get ioucmd from pdu
-Message-ID: <YwwtUVl51B0ve0So@T590>
-References: <20220824054744.77812-1-ZiyangZhang@linux.alibaba.com>
- <20220824054744.77812-4-ZiyangZhang@linux.alibaba.com>
+        Sun, 28 Aug 2022 23:25:39 -0400
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27111EED6
+        for <linux-block@vger.kernel.org>; Sun, 28 Aug 2022 20:25:36 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=gumi@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VNVnMuO_1661743533;
+Received: from LR9115VM81021(mailfrom:gumi@linux.alibaba.com fp:SMTPD_---0VNVnMuO_1661743533)
+          by smtp.aliyun-inc.com;
+          Mon, 29 Aug 2022 11:25:34 +0800
+From:   <gumi@linux.alibaba.com>
+To:     "'Bart Van Assche'" <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <damien.lemoal@opensource.wdc.com>
+Cc:     <linux-block@vger.kernel.org>
+Subject: Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
+Date:   Mon, 29 Aug 2022 11:25:33 +0800
+Message-ID: <002001d8bb57$000eabe0$002c03a0$@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220824054744.77812-4-ZiyangZhang@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Content-Type: text/plain;
+        charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: Adi7Vv5UwmI2V3CoSp+Rf4KspXirmg==
+Content-Language: zh-cn
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 01:47:38PM +0800, ZiyangZhang wrote:
-> We store pointer of task_work in pdu. And we should get ioucmd from pdu
-> since we prepare to only pass ioucmd to task_work function.
+Re: [PATCH v2] block: I/O error occurs during SATA disk stress test
+
+On 8/25/22 00:09, Gu Mi wrote:
+> The problem occurs in two async processes, One is when a new IO calls 
+> the blk_mq_start_request() interface to start sending,The other is 
+> that the block layer timer process calls the blk_mq_req_expired 
+> interface to check whether there is an IO timeout.
 > 
-> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-> ---
->  drivers/block/ublk_drv.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> When an instruction out of sequence occurs between blk_add_timer and 
+> WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in the interface 
+> blk_mq_start_request,at this time, the block timer is checking the new 
+> IO timeout, Since the req status has been set to MQ_RQ_IN_FLIGHT and 
+> req->deadline is 0 at this time, the new IO will be misjudged as a 
+> timeout.
 > 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index e08f636b0b9d..8add6e3ae15f 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -555,6 +555,12 @@ static inline struct ublk_uring_cmd_pdu *ublk_get_uring_cmd_pdu(
->  	return (struct ublk_uring_cmd_pdu *)&ioucmd->pdu;
->  }
->  
-> +static inline struct io_uring_cmd *ublk_uring_cmd_from_pdu(
-> +			struct ublk_uring_cmd_pdu *pdu)
-> +{
-> +	return container_of((u8 *)pdu, struct io_uring_cmd, pdu[0]);
-> +}
-> +
+> Our repair plan is for the deadline to be 0, and we do not think that 
+> a timeout occurs. At the same time, because the jiffies of the 32-bit 
+> system will be reversed shortly after the system is turned on, we will 
+> add 1 jiffies to the deadline at this time.
 
-Patch isn't supposed to be written in this way, it is one helper, either
-change its caller in this patch, or merge this one wth the patch which
-applies it.
+Hi Gu,
 
-Also looks this change belong to include/linux/io_uring.h if you think
-it is useful.
+With which kernel version has this race been observed? Since commit
+2e315dc07df0 ("blk-mq: grab rq->refcount before calling ->fn in
+blk_mq_tagset_busy_iter") the request reference count is increased before the timeout handler (blk_mq_check_expired()) is called. Do you agree that since then it is no longer possible that
+blk_mq_start_request() is called while blk_mq_check_expired() is in progress?
 
-thanks,
-Ming
+Thanks,
+
+Bart.
+ 
+---
+
+Hi Bart,
+
+
+This problem occurs on kernel version 5.10, and i read this commit you mentioned. The problem I observed is not a problem of req re-used fixed by commit 2e315dc07df0, but 
+a different problem. The specific scene is this: A new IO has called blk_mq_start_request() to start sending, and an instruction out of sequence occurs between blk_add_timer() and 
+WRITE_ONCE(rq->state,MQ_RQ_IN_FLIGHT) in blk_mq_start_request(), so the req->state is set to MQ_RQ_IN_FLIGHT, but req->deadline still 0, and at this very moment, timeout handler(blk_mq_check_expired())
+check if this new IO times out,  this condition(if (time_after_eq(jiffies, deadline)) in blk_mq_req_expired() called by blk_mq_check_expired()) will is true. The end result is that this new IO is considered to have timed out.
+I looked at the latest kernel code and the problem persists, do you agree with my analysis process?
+
+Thanks,
+
+Gu Mi.
 
