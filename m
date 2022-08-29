@@ -2,77 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE09DECAAD5
-	for <linux-block@archiver.kernel.org>; Sun, 28 Aug 2022 15:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2252AC0502F
+	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 00:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229692AbiH1PRO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Aug 2022 11:17:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47600 "EHLO
+        id S229531AbiH2ASs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Aug 2022 20:18:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiH1PRO (ORCPT
+        with ESMTP id S229516AbiH2ASr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Aug 2022 11:17:14 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157432C671;
-        Sun, 28 Aug 2022 08:17:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=8gXF7LrjbKoSgfLGKGIuajoO7CoREzc8fLsSZQdzPlg=; b=yTkSWc9nNMUzCqS7oNnJtE2kpg
-        kkHaBow+DcWIU5zrUQKvGkBmLG9KpdmX6gnELWKmu0Mm66LRmiUliN4F57uLIXB5r2m+wjZ64dr8q
-        vYDBikIFruImgS5CoC3PO7JfgqRKzfAzMCccSOPnHZ5QeJ/yu+WqVb2upE0Vw2ZcOzxUUigaxLLh1
-        5rK5c+wDPQcNHMTMhQp+V7J7mjtsNyp2pLHjKFgY4y6rrBHojygH/ogjZtnUIPvs/IkUcEvRDSH5C
-        ScD0krHUHcx8uPf5iQoZ7syycPzN7E2717uLJaI76KGyruCLhqkaquXBDXb9uVcFdfkrwDBFkN40H
-        lOHJHebw==;
-Received: from [2601:1c0:6280:3f0::a6b3]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oSK24-000CxF-FY; Sun, 28 Aug 2022 15:17:04 +0000
-Message-ID: <e304cb66-4890-5770-fca3-156c3428bf3d@infradead.org>
-Date:   Sun, 28 Aug 2022 08:17:02 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH] Docs: ublk: add ublk document
-Content-Language: en-US
-To:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-doc@vger.kernel.org,
+        Sun, 28 Aug 2022 20:18:47 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D212A96F;
+        Sun, 28 Aug 2022 17:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661732325; x=1693268325;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mk5UPQJPubSdANz7LkgFR4Rv6GSap6ZQud459DTNGWU=;
+  b=mFCVdaO6l0yaIMSftGLkmfKZvtqW2c70EcWwoXPKTXLYhO6jvBK5n1Fn
+   ysG1F8M3j2i7+kAq0CZVCWDz1sn6UCkxzeUJGBlX1nWPLhlpFw9BUrx55
+   ZcBrB1hM6rooKcR9ezK1kR3HggMAUzNzfFORHsHyct7YzQtDVvTZFoL5p
+   KR9kDXhM0OW6RFtPcTuZ967mRJkLUzan+HOTOuyRbdMiNn6H5MEoaPet1
+   uu9AAVDPdlXIEmDSgG8G1gjxC1fIpt7ShJIENaGum+rJkgluJpB0o7kx1
+   Hqb/YdBzC379ybSAc/04BllzA9KtJCdqYrAAjNcYN6wP9Ezj52qHsdkxg
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10453"; a="296053861"
+X-IronPort-AV: E=Sophos;i="5.93,271,1654585200"; 
+   d="scan'208";a="296053861"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2022 17:18:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,271,1654585200"; 
+   d="scan'208";a="753445007"
+Received: from lkp-server01.sh.intel.com (HELO fc16deae1c42) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 28 Aug 2022 17:18:42 -0700
+Received: from kbuild by fc16deae1c42 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oSSUD-0001lh-1Y;
+        Mon, 29 Aug 2022 00:18:41 +0000
+Date:   Mon, 29 Aug 2022 08:18:16 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     kbuild-all@lists.01.org, linux-doc@vger.kernel.org,
         linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
         "Richard W . M . Jones" <rjones@redhat.com>,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
         Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Subject: Re: [PATCH] Docs: ublk: add ublk document
+Message-ID: <202208290807.1BIaKsuK-lkp@intel.com>
 References: <20220828045003.537131-1-ming.lei@redhat.com>
- <YwtiTr3E4b9c+Vcl@debian.me>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <YwtiTr3E4b9c+Vcl@debian.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220828045003.537131-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ming,
 
+I love your patch! Perhaps something to improve:
 
-On 8/28/22 05:40, Bagas Sanjaya wrote:
->  Zero copy
->  ---------
->  
-> -Wrt. zero copy support, it is one generic requirement for nbd, fuse or
-> -similar drivers, one problem Xiaoguang mentioned is that pages mapped to
-> -userspace can't be remapped any more in kernel with existed mm interfaces,
-> -and it can be involved when submitting direct IO to /dev/ublkb*. Also
-> -Xiaoguang reported that big request may benefit from zero copy a lot,
-> -such as >= 256KB IO.
-> +Wrt. zero copy support, which is a generic requirement for nbd, fuse or
-> +similar drivers, a problem Xiaoguang mentioned is that pages mapped to
-> +userspace can't be remapped any more in kernel with existing mm interfaces.
-> +This can occurs when destining direct IO to ``/dev/ublkb*``. Also
-> +he reported that big requests (>= 256 KB IO) may benefit a lot from zero copy.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on lwn-2.6/docs-next linus/master v6.0-rc2 next-20220826]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I suggest eliminating "Wrt." also.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/Docs-ublk-add-ublk-document/20220828-125214
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+reproduce:
+        # https://github.com/intel-lab-lkp/linux/commit/4cd40d237bac08efb23668766ba39b36a0b1632a
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ming-Lei/Docs-ublk-add-ublk-document/20220828-125214
+        git checkout 4cd40d237bac08efb23668766ba39b36a0b1632a
+        make menuconfig
+        # enable CONFIG_COMPILE_TEST, CONFIG_WARN_MISSING_DOCUMENTS, CONFIG_WARN_ABI_ERRORS
+        make htmldocs
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> Documentation/block/ublk.rst: WARNING: document isn't included in any toctree
 
 -- 
-~Randy
+0-DAY CI Kernel Test Service
+https://01.org/lkp
