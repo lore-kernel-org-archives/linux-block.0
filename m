@@ -2,185 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DBFC0502E
-	for <linux-block@archiver.kernel.org>; Mon, 29 Aug 2022 19:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E349EECAAD4
+	for <linux-block@archiver.kernel.org>; Tue, 30 Aug 2022 00:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbiH2T7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Aug 2022 15:59:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32996 "EHLO
+        id S229565AbiH3AAl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Aug 2022 20:00:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiH2T7d (ORCPT
+        with ESMTP id S229450AbiH3AAk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Aug 2022 15:59:33 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2067.outbound.protection.outlook.com [40.107.237.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEABB91D2E;
-        Mon, 29 Aug 2022 12:59:30 -0700 (PDT)
+        Mon, 29 Aug 2022 20:00:40 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2765E569
+        for <linux-block@vger.kernel.org>; Mon, 29 Aug 2022 17:00:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1661817639; x=1693353639;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Kba22XmPQNKYj8ZsKp2ILM15F/Hq3TaNVV2pAEZHuTQ=;
+  b=DBV1UJOu8/nNqxiCn/NeiI27YT5LmR+ZoXwvpocFdCVlEmEmxW40Gg0n
+   dDFZ9daIVI/KgpBn42rCWpoDUYkKi2JeCP6Il9Y4CwJhNPoWYsSXIASZX
+   HPDBrqsR8HfzLDE96fVtMgsUqhTjA6eODjZfjyCcdwqwDcEAScSdt+2wR
+   tEPt4mJV7oRm9ZYb+SkUXGhWpoZzvgLpKYmAqUShwjnbyYeIrhwi/qZrQ
+   EcufmwlMSzFRyJ2HFpxorzWOlEs2zvKtjCBa3ni9Hd3aDeT+5N+2NdllJ
+   J1ubob4e8Ua8CywkMu9B5LKD9oHTirVHry1CPInX9CIecWzNFbvfcKQFS
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.93,273,1654531200"; 
+   d="scan'208";a="322077344"
+Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
+  by ob1.hgst.iphmx.com with ESMTP; 30 Aug 2022 08:00:38 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=c1AkLwsrp4Y6tI+lmj0pNDuEfiipWiZhDRMrdwJp82ehney9P269II6Bp9LaFk7CWZNr4hWTknuN+FoRUV8B7+KTEX0KveVOeDS0WqjoRvvCOTRAidFtkhfllTdfvIuVZ+a2g3yGeovVp4bvf8uMeAWjhq3kKlUljUqLHjsygDDcLvMzp7M6aXZHcajZTqkch3y5Qox0gCPsPI0TQp9/G91F0EfJjUblNnh8K76HwY7y3EYQciKNGxsuAsBsn4M3A+1jbNtX2SKjCT9DB/QYzo20wfwyPUjSJL7mzK0Bp5UN0+mIyhThrG3jMVDGKU3rEwW+POiN34AHzYqJr6G+Ow==
+ b=DWscuYUCVJwQnpjHUdWeQYXm+Zmsb6X7dAD1d3Pgz87gVaGo9vTC0yWWj9jtVtas7J1CnmzxnO4OaV8nb3El/8W0ZRaBTU8HojGz69BF5HdkYWI5/+QNpDEXHT/4M8d77V1FBZO8n0l6QEswHRGQw+MiCzM/qeMIDpQRNFPrU3R5Un3nE6Rjzxg2x4IA9oSlI8T51Ny4h1/H3MeRl7poRntA9+j/XY1bWF5dJwE7TSk+ww0KcqnC3aWULYQs4F3ksYP942jlO+rp8IYCEryaVydgcB3qnerL9258e0AxsWLpGTCtw175n+folyTKcrfWAQzQ75qoE/53JQUZRtq1aA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gFPzLcOxvuTyn7mwkI/rmNcZWjcVSS/mW7TKV4BlpD0=;
- b=l+IuMzfBWprX58ltNyDSJ/lzzU/2mDHRVW/QNDg13EEl4oqEmv1o+sZ8j6DC3I/u8oE/rpXLE2q3NS4KYLkhtpEJe4LQ5NY+9dS/dR0A+MyRL4Ixw5olIq5ye/RUEV2nvnQp/13FIcYUhHi2HIEATh/8C1eP9hNEzo8ISVUMpWcbi0uVcAH/IfAjK+TuryUKl1k2X1D73xK3xUoSq+T19TKUsMQnv8wzeQVCGev379DCLbz/3GF6gANL7iHcA86L4KFGycuADa/o/C42cE9nL1s6b85NWrbq+9PBOYRoWTrSBE6/wi8yKNUlrQKJaa0vqx4UTaoEe9Ik+9CmIiUyxA==
+ bh=Kba22XmPQNKYj8ZsKp2ILM15F/Hq3TaNVV2pAEZHuTQ=;
+ b=X4edtkg1w9rZiHdNF1ydZtHFVcCw8WbCazwQSp1FfwzBmilFIRAixxwE7CzXbUyOFpXUPbpfn7v2VDIuGPghqein6q4P5DoDu7YOU3r/p5GTJs0RohsEeXDXashtYABEQ++XDRwhE6N3YfZACYIcp9uWBggAMiZKKxaMa5WfTau0ANx08JHxkFdKlS3IGdWW4vEVNg2rtEuSiPpl98H1ElGYCoTGoorEbcjG9U32Pr0P19dFaGmnvP9pDDJlnPbCDBoPHPrQtG/MvD4M1e6PVewlYbITm+VBhDmMtpg47xJcroEYtfgUxwRATN5MXVHaAXtPq2b0sVvn1h7SsuH9FA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gFPzLcOxvuTyn7mwkI/rmNcZWjcVSS/mW7TKV4BlpD0=;
- b=BljByNRD2UTPn1FPEk2IbzuPCoh+3/OBXdmFc0hvXS0YkmGaTaOi1rSy11oj3Q2UuQciIC5cIzhGhnIxbqBquVXpDqvkF7PFzrHFQ4wl5eDoHPR1/9pVTtH41RJufKOe+5EmA8A2HTuuowjSvRxyaRfY+TEtoXdoh9VR2Hj1j6peK1xi0IIBnoN861+tM4QN5kPqLz1pArWXSxGrmSgoZd0pzMTA84YeNvn7oj+lPFKWL2YdejlXETceesARbJC3+RdccKjKU0GHISjG/yGO8DdkxnzeU4klJIcYroChhWx1EXhN+3I21NEGhv4Q49zdGx2G7iI2QX5kPuPlndankA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by DM5PR1201MB0060.namprd12.prod.outlook.com (2603:10b6:4:51::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.14; Mon, 29 Aug
- 2022 19:59:28 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::508d:221c:9c9e:e1a5]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::508d:221c:9c9e:e1a5%8]) with mapi id 15.20.5566.021; Mon, 29 Aug 2022
- 19:59:28 +0000
-Message-ID: <a53b2d14-687a-16c9-2f63-4f94876f8b3c@nvidia.com>
-Date:   Mon, 29 Aug 2022 12:59:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH 5/6] NFS: direct-io: convert to FOLL_PIN pages
+ bh=Kba22XmPQNKYj8ZsKp2ILM15F/Hq3TaNVV2pAEZHuTQ=;
+ b=wAZfF537e6enb8mRGkBp1QgK0NZ6Rh5UnICgOVSarRYd9uQqT1oyIlA8oCPLDDFiu7uSVsqk+Znq/shAksdYcsd8Iwrz3aYl6JYUlx0ScGfIrRkRr9IWIbjxTxPneJ0wWeuKsMMz0VN8xyZrPLCRGRYTcLKWA0smPzMI/rydbGk=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ CH0PR04MB7970.namprd04.prod.outlook.com (2603:10b6:610:eb::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5566.14; Tue, 30 Aug 2022 00:00:36 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c7e:a51:e59a:d633]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c7e:a51:e59a:d633%8]) with mapi id 15.20.5566.021; Tue, 30 Aug 2022
+ 00:00:36 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH blktests v4 0/6] fix module check issues
+Thread-Topic: [PATCH blktests v4 0/6] fix module check issues
+Thread-Index: AQHYtoT6kioMTkqSHk6pmPbn5n/KhK3GmgSA
+Date:   Tue, 30 Aug 2022 00:00:36 +0000
+Message-ID: <20220830000035.nb52bbnlg6g4c3lh@shindev>
+References: <20220823001154.114624-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <20220823001154.114624-1-shinichiro.kawasaki@wdc.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20220827083607.2345453-1-jhubbard@nvidia.com>
- <20220827083607.2345453-6-jhubbard@nvidia.com> <YwqfWoAE2Awp4YvT@ZenIV>
- <353f18ac-0792-2cb7-6675-868d0bd41d3d@nvidia.com> <Ywq5ILRNxsbWvFQe@ZenIV>
- <Ywq5VrSrY341UVpL@ZenIV> <217b4a17-1355-06c5-291e-7980c0d3cea6@nvidia.com>
- <20220829160808.rwkkiuelipr3huxk@quack3>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20220829160808.rwkkiuelipr3huxk@quack3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR07CA0081.namprd07.prod.outlook.com
- (2603:10b6:a03:12b::22) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a17f0f4f-0064-41e7-1e83-08da8a1aaaa7
+x-ms-traffictypediagnostic: CH0PR04MB7970:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DDxAe3+pY5z90pl8lqzYPTaP1F6AIhmVfmTdKbxmI/KY4XqdS3aIBaVt6WXeRQOPLsSN/Xvwk20lKKTqMeRmsjjtoNTFByKfR6F5lIpMSkc8lA6ruS6001G9hHkbwZ9T1acJKszPAXOv6OCjiQ9zU5KtudWRv0vy+lQnftNWrBApq/lQ+eST5t8Ift2ZEf8yCrApyLJRESDypuARy1SaBzftIWLHtYx38LL+kNISMFehDKQkhGuYNoNh8KSNHB7asohpUF3FjYecZJPbTunMzGcT/W93hUKMsMSyyAm9omMpOP31PrhlUyJ06sdsafs/HSMy7SU1HVva8mMFltCO5AQx5fZYlSVdQobfZg3I4cYojIF0ZBV0SjJTO/ZcCTxwpZgOCcluJFdH+/64vrZJ0Sfamr2HEGbOjqXPnUsplNLVwNRQmux5+kTgQcRLhZynZuby57t+XR6oEShzyYTGXFaTtBpP/crSbxb8wr7oyfdJOFOIQqQUlhRBrscT7sGR3LGtEmq6sJMNPOe+aAkZmggrIGkp3uBlrlUxomPlqgawFzNNImIWq6IZzZvD7+oglTiH8k1VE9RDaixRLvhQeeZDfHvLK4JE9yy/wXMid8Nnoot5Liw8ABEUfiJqCplXHFcx8vyYBA0z1NpXnY6pfELfAOABrRcsdEgVlzwvap1gsJAWEeiULEYmlblw7lQyevw+ClLlpLuvh9RxieDm3WwM4GiRfcD/2chEtuVpwbTRjsx6MSJVd8aqne0sNFV5wUKoogUhRSIjv7fsXPkbTA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(4636009)(136003)(346002)(376002)(39860400002)(366004)(396003)(6506007)(38070700005)(33716001)(82960400001)(6512007)(26005)(122000001)(2906002)(9686003)(316002)(54906003)(83380400001)(38100700002)(71200400001)(6916009)(66446008)(66476007)(64756008)(66556008)(4326008)(8936002)(44832011)(41300700001)(8676002)(76116006)(5660300002)(66946007)(6486002)(186003)(1076003)(478600001)(86362001)(91956017);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GLRJx04u5Jyp7fiJ79JY//tBweEhLPIG9y00wAaHRgxKvQfmUPaTSv4noh0R?=
+ =?us-ascii?Q?gYU62uhHvUSGcJSqUuoDLj+IJ1JwD3NAnQnwjSTJdVHQff50Y7rOjX8m/5Rw?=
+ =?us-ascii?Q?98t+vZiFEWpjlw11YwFs8YaRnIuQdA/pJ5mgc9ORBM5CfD7hoAvWHAcjOOZy?=
+ =?us-ascii?Q?nAsDb669FFE78QYxHuN3owgtV0ukfTjPh8rH0VXM/9P5Im+6YtXExvWjj5+5?=
+ =?us-ascii?Q?ThVrDFKGKqWzQrIrwCQVTy3ice+Tho7dMAvjueWtiykwaL5NSOsQ0Ks8wwMg?=
+ =?us-ascii?Q?1j/Vw/5Uj2dnR6F/yuo5pFuGL3n9t8imQNVD6mh7sfSDNbDTrPlQXK1wm4f2?=
+ =?us-ascii?Q?kpegO6XQ+n5pxKxSnMFFIEUk33rqktklwlyuJiTWUrr0x44a/d0coEPKxcOs?=
+ =?us-ascii?Q?JMKhMgGktk3ycJWpYBzRT9V0Dz8xV/aXcsVbhW0Xl2mCp/r6zVKVp8+f9C9H?=
+ =?us-ascii?Q?cSPBm8P2xlo95NI//uXBWKNmDZ342OELDjeCHfkPMM9+cnMptD/WcMyeRsrn?=
+ =?us-ascii?Q?xVgFqGm3XJpnb1nNqxgQQIxGeYuXTbfYiLOD5NkeQplj3SgsL0Kdf5BV9nW9?=
+ =?us-ascii?Q?Wrrv3l3quBEh3ZojxHc0rUCLc8tfzwWo1ZoNCoS77m4aIF6tXahSeoxZCQmz?=
+ =?us-ascii?Q?HntTTappQyU1gqfl5CWGhnVVviXSqDqlsLjSax6hjW8iMwxeqDnDSRjb7gqm?=
+ =?us-ascii?Q?+wiC7HNbJHXi+UTs6fNuo8p1dS+v+jz7CSCxqyXpKkcZ8DQX/XRpVySvqAyD?=
+ =?us-ascii?Q?9qU5SC8Yrq89HsP+B2knoxj425Gut9zIYFja/eQUJdcru9H/oQCiTMOBM7yJ?=
+ =?us-ascii?Q?UQW91W7v0IQ3ExqTeWRcFzja7hJZ1IJwog4NLvvoe1k8+X7Ajvm+tH3EsI46?=
+ =?us-ascii?Q?A3h9rSySwurVm5bwTwWHrFcWejgBH1x+arFlyQ1NCTqhWz26Vy0yCc3FhwWi?=
+ =?us-ascii?Q?yLSagL5b+jFRDG8pfJEK5i60qnHPxUPS2PWsHhpTpc+XuxOfreAALTwpHlPh?=
+ =?us-ascii?Q?1XpS3/RKLWyWLwY3nszsAp4cAb0yPb3eY9qWirD972xgFLI2II+XMWTlVAuY?=
+ =?us-ascii?Q?ZTHNUL0ReLDj9QLVtsfnCFyNJGK94s0uOJPk8uPmC0TjjIyblZf5yDbc0evU?=
+ =?us-ascii?Q?0CzWqZ/HnJAlu7ziAK/a9uPjEDK4w/RJdQVTPT7mzsF/d6LVCBkpd543iggh?=
+ =?us-ascii?Q?E5lO6JvUYWS6nZGyz7z/R44ZH7SY8ddYuZ4fkAF6kB0muuwptbq2ldB1ObU6?=
+ =?us-ascii?Q?uwAmNc4jgowbwGVvGl/XSY43AWVanc93BJ3/KkZcsrYM6TbmBmXHH2l7vy/u?=
+ =?us-ascii?Q?A76dlKIm8J16n4zoNpnEC98b1/tQ4VswwBZdRzqbrHtH749zV+e7kHYBkycV?=
+ =?us-ascii?Q?hEdQh0zbNZtDLkL4kDpDyjfVTRvABxF6MgaDnR2JJiVYiPVoeCdaGzlknCZM?=
+ =?us-ascii?Q?60TzUvb97TVYnKGwjza2+hPSdHQD7uDd00+SaLrWXs4aqoifzDb3cf2p/urD?=
+ =?us-ascii?Q?x9XglNT0iHNjHnNQn0zk07lR3Bx2RzUhWsKgWioEoD3c4CiLFHO7sv/OTiPf?=
+ =?us-ascii?Q?ImBT9nnnrFXCH3QhkZhcwYugYOpgc/PQbZr2rvTNKKzaBH4R2gLBfap2a2yk?=
+ =?us-ascii?Q?AyxXO4A4GuZB4h2yw+YEzS0=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A64A27379790E54F92192F3FFBAD0F45@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0eeb3af4-38ac-4931-949d-08da89f8fb38
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB0060:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BVCaPOxry/8pLoVgB4z7GzNLrZauWwmba9ioTWFX6BKwGL6Hk63LnB6WBTB7w1QAw2FIzbpHy1TkAWpVrw3E1WlnIelDOsNXes+z6o/k8psitT52v78Io+qBejAtrm27L6RnmAkfhtMWg16/QiuG5Ve4LnYnwG+Jj0Iy9Wi2W7WdNsL0dez6ncW1RM/e40qh4rkKRA7V1ur0rou3udZxoMuPy9c0oo694N7WNSxJqA9W940ugfurLzOZ28BZXATZLRD7fvLiJqLrOULuTu4IIdXRqPvOHD9L4DA4rF9n4PqCR4PcbEvY+HeMJ3Rgmo0878OVMdGQDcDFxq2KCNdxJRn0u2tNoCF8XxaXIP6MTSO4Bx49EfOihHdZupSHN2SOf/IcAjKDPwEiEuvB3hW3679eckg3f0qtkduUbeZ8M2iuLq20J43OmGdK9hJHhWzG0b34PB4xzoyP1Cz+6wMtqTZvCrcNCIWkFUtIbDsudKUmsvhzq+BP4uCdeCMR0tuf43NGYztGezS9Ojy6B5Qb0+TeS5c6IryMlDHg951yfqMVeWJzC5S/XgGrpR8TSLA0FTiGMJd+ArNL723+/3SrR/kCbADqiW2cUeuHqL3JwdTt4Y50NVkr1mDBFHzXv0PHDEcn5bcz6FateWzRvDk9jiyeJB7FwzTn6QPb3fgjbVEL9E0FGgA9wLtMRd/ro8Qc6BR7czZnBanKUrY2ceFZvLalg6SjtdyI/SFiumTBgUxXBjMQBJiZyAOzeOklDH29yT0dBtjPTtKn68f1/aw8l/qTOewYNZxdfRfeo8RtiOsrPzChmcFA0oeDUCaFGmaLgJOxL13T6RGKQZUQS0CKDigQsneOjCcW6rRY4NDeUC6OdJZKjNIfNaqGM+Fa4ey+
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(346002)(396003)(39860400002)(366004)(136003)(41300700001)(2616005)(7416002)(478600001)(83380400001)(8936002)(966005)(36756003)(6486002)(5660300002)(31686004)(2906002)(38100700002)(186003)(66476007)(8676002)(6916009)(66556008)(54906003)(4326008)(31696002)(6512007)(86362001)(26005)(6506007)(66946007)(316002)(53546011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dlJnTDNYTzZtT3FTTXRsRkxqZFM3Q2xjd3lpTFVsNkIwNUxBeXk3c0NiVGVz?=
- =?utf-8?B?TXcwdU8zUnpLYlBOUUUxT1M0ejdCVXZiSVFUY1J6cno4dkl1b0R3Q0o2blBE?=
- =?utf-8?B?T1IxWnZFS2RwUjRlZVJnbVUwNGFycThyNHdYemlrWlJPdnltdjI4Ui90Kyt4?=
- =?utf-8?B?bVFhYnJXTytKMFZYRTZ5cVFyMU1oL2tFQ2VncVFNbmpTOUZsemp5Z1QvQW8x?=
- =?utf-8?B?WTgrNmRaOHl6SlJKbXJDWGlpNER0djNRUjc0ZE1kc05oVWQ1c0VPY3lWYkNE?=
- =?utf-8?B?TUNoNmM1MzZMMFA3RlMvVm1jWGdNMkhHZ3pPWUhtM0NmV2M2K0MySWljZTFD?=
- =?utf-8?B?TXZBM2xHeTVkbzdKU2VYS252ckJQbC9aYTFqZ3J1aTg1VWd0VzhSNEx5Uko4?=
- =?utf-8?B?eUcwTmxaRWtPVWRzZzk0U2lkRFJ3dnJpbW1ZclRSbERvVEVMM0xXbk1tU0x6?=
- =?utf-8?B?eldEQ1hEcG1JRFpCcFEvOU03VnJWQ1o2MVg5dWRmeEhmRUxRVGVhQURORVZU?=
- =?utf-8?B?UnZWS2hEUS9lQTV6SC9seGpHOTZHK0tUU1h4THJYS1kvbThxbHp6ams5UDVu?=
- =?utf-8?B?MkNJUGF5YkQwV0hvVlZsY05HUlo2R0lGYms2Y0ZKa1JmOEtsYlNGR0pSNytC?=
- =?utf-8?B?ZEJrakpJdUdGd21BeHp4RVVFa0ZIZFlpelFUMVpCTm41eWgrUnhrZnZINWZt?=
- =?utf-8?B?bFlaTVdLQnZNQ2JTUVdkUUdKVWJpUnQ3YlVZQ2ZCZHplRzhBS096b1h2NjFZ?=
- =?utf-8?B?Wjh3RWQ2L2UyUmxiWXgwenNaV0k3VENvTXlzZGJnTklaYk81S1hvZ01QV01D?=
- =?utf-8?B?dTF6c1JEL2duRVBGb0pMMHplSm5ZZUxmbDIxWjdwMVZSUFdSOHVXM29HMU1M?=
- =?utf-8?B?aW9uK3UvTGoreUxjTFBjMWM4NGQwNjVjSFFtNkgrMXhQeVFaaXJoUUNTMnBu?=
- =?utf-8?B?ditvMnVYaDQ3TG5rWHE4YVZKNXRYMGJ0d0wxNnk4Z3NmQ0Z1TU1CbW1ObjFk?=
- =?utf-8?B?Z3JxSnI4aHhWYWpFcXFpcERHeFh3UXVKZjRNc3BoN010SGtTc01ENFJBaWVk?=
- =?utf-8?B?S28rSGV4YTdGTjduWVpHejdJU011cEM1RlIzZmc1dlg1WFZxbHFDWlZlbnNF?=
- =?utf-8?B?TVdRazdHQXdLeFZPWjNvbjBRRU0zckpRTUUzcTNBZVJWdE9sWnBpOHNVWE1S?=
- =?utf-8?B?RTBLZ1pEdVVVNW8zeGxWcGNMcWE5VGZqSy9XQTBncVhYMGhVdVZqQUIvbm9D?=
- =?utf-8?B?c045clFQM2dGazVuVHRBSjdydlo2UEMvQUlJaEtxaDJQTzVLYzdtVVprOE8y?=
- =?utf-8?B?Ym80RzNPU0xkZWxlTVRBRlNOaVR2bWhsNlkrYWxxaU0rS2pqT1RQR2RObnJk?=
- =?utf-8?B?NXBxVVdGVW01cWpaT1VjRTdBdGl0djFaZGpTSDI2aWtpc3J0TGtEN1ZTb1gz?=
- =?utf-8?B?SEszdHd2ejEvSDczNXhFdEcvUFAwSmtTcWtpOFNHWFNZdGs0RlBCL3g5RDQr?=
- =?utf-8?B?TmZWcmQxOFpTV0NMTC9LZWhFdUw0VUxBdlIvaWJHRkwwYzJYWU1SNkpVV0g2?=
- =?utf-8?B?OEdjS1RDdE1qbkFlUTJYMkFoT0x2T3ZYWlhtbFBzWHJnTWFCMjFCR0UrZ3FB?=
- =?utf-8?B?b0hpT01LYkpIWnVFZ1A4WCtoTW9qYXFMbEZmSndWNm5IUThtSXB0a2hreXhX?=
- =?utf-8?B?T1RHN3VoTVY3S2hZLzNRQ3FqM3RDSERUaFlvcStINUVlTWJqc05lallKd3Zr?=
- =?utf-8?B?RzQxek9xc3BmVnNKRGxpNUFuVUFFZk9mM0ZnUXFoZFJVSjV4RXV1aEhTZXZB?=
- =?utf-8?B?WnVWMUgybUhQUjBVUitWYnFaMWxXbHBlcVpGenpSZDJ6aGR1TnZsSTlkaElD?=
- =?utf-8?B?WVFvY3BuWmFtRVZQWURqcC9xWk8yejdQNngwV0NUWW14ajZDWDNOYnJ2SjlM?=
- =?utf-8?B?VXMwZTlWeWNocWlFc3VoNnB5QmdveU1Dd1M2Q0JyTCsxZFVBMXZCWis5ckRw?=
- =?utf-8?B?TzJhS0lFU05iclZwMjVjOEdrdzVmazBGcjZQTm4wVm83czJpdjhQNTN2dDdq?=
- =?utf-8?B?Ni9TMVF6Zy9yWmdkZXF6RDN5THkrVThDTFNqNDVHODcxSTg0elZjSkVrY2pJ?=
- =?utf-8?Q?VdSh4c2rrwvKTgr++Km8yqKvU?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0eeb3af4-38ac-4931-949d-08da89f8fb38
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
+X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2022 19:59:28.7592
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a17f0f4f-0064-41e7-1e83-08da8a1aaaa7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2022 00:00:36.2895
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D9EqWsMPy5LNCjbmk2oYkF7Rv+nr7lcxFfHc21y6sFXY15ipC303+gSZ7s/ggqwCW9uhlsG1pTZodO+/3uwdCQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0060
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8Wm/JzaoRPZUO9P7CjA4vuaGT5Qw8CNA9jb9TmMVMNBTbvWjneBO71b4cyqGKhTti/YzjFxvKWC9q6E1zQ5gzuwWLZpxRf8wLls4RJ/jIN8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR04MB7970
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/29/22 09:08, Jan Kara wrote:
->> However, the core block/bio conversion in patch 4 still does depend upon
->> a key assumption, which I got from a 2019 email discussion with
->> Christoph Hellwig and others here [1], which says:
->>
->>     "All pages released by bio_release_pages should come from
->>      get_get_user_pages...".
->>
->> I really hope that still holds true. Otherwise this whole thing is in
->> trouble.
->>
->> [1] https://lore.kernel.org/kvm/20190724053053.GA18330@infradead.org/
-> 
-> Well as far as I've checked that discussion, Christoph was aware of pipe
-> pages etc. (i.e., bvecs) entering direct IO code. But he had some patches
-> [2] which enabled GUP to work for bvecs as well (using the kernel mapping
-> under the hood AFAICT from a quick glance at the series). I suppose we
-> could also handle this in __iov_iter_get_pages_alloc() by grabbing pin
-> reference instead of plain get_page() for the case of bvec iter. That way
-> we should have only pinned pages in bio_release_pages() even for the bvec
-> case.
+On Aug 23, 2022 / 09:11, Shin'ichiro Kawasaki wrote:
+> Current blktests have unexpected test case failures caused by module
+> availability checks. This series addresses two issues related to module c=
+heck
+> and fix the failures.
+>=20
+> The first issue is caused by module load by _have_driver(). When this hel=
+per
+> function checks the specified module (or driver) is available, it loads t=
+he
+> module using modprobe command. It leaves the module loaded and affects fo=
+llowing
+> test cases. The first patch addresses this issue. The second patch avoids=
+ side
+> affects of the first patch on nbd test cases.
+>=20
+> The second issue is in _have_modules(). Recently, _have_driver() helper f=
+unction
+> was introduced to provide similar but different feature from _have_module=
+s().
+> However, it turned out that _have_modules() is not working as expected an=
+d does
+> exactly same check as _have_driver(). The third patch fixes _have_modules=
+() to
+> work as expected. This change makes block/001 and srp test group skipped.
+> Following two patches adjust skip conditions not to skip the test cases.
+>=20
+> The last patch is an additional clean up to change _have_modules() to
+> _have_module() to make its usage consistent with _have_driver().
 
-OK, thanks, that looks viable. So, that approach assumes that the
-remaining two cases in __iov_iter_get_pages_alloc() will never end up
-being released via bio_release_pages():
+I've applied this series to the upstream. Thanks for the reviews.
 
-    iov_iter_is_pipe(i)
-    iov_iter_is_xarray(i)
-
-I'm actually a little worried about ITER_XARRAY, which is a recent addition.
-It seems to be used in ways that are similar to ITER_BVEC, and cephfs is
-using it. It's probably OK for now, for this series, which doesn't yet
-convert cephfs.
-
-
-> 
-> [2] http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/gup-bvec
-
-Yes, I had looked through that again before sending this. The problem
-for me was that that it didn't have to deal with releasing pages
-differently (and therefore, differentiating between FOLL_PIN and
-FOLL_GET pages). But it did enable GUP to handle bvecs, so with that
-applied, one could then make the original claim about bio_release_pages()
-and GUP, yes.
-
-
-thanks,
-
--- 
-John Hubbard
-NVIDIA
+--=20
+Shin'ichiro Kawasaki=
