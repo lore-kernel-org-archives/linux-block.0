@@ -2,193 +2,296 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B77BECAAD5
-	for <linux-block@archiver.kernel.org>; Tue, 30 Aug 2022 20:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD794C3DA6B
+	for <linux-block@archiver.kernel.org>; Tue, 30 Aug 2022 21:42:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231824AbiH3UDx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Aug 2022 16:03:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43136 "EHLO
+        id S231567AbiH3Vm0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Aug 2022 17:42:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231822AbiH3UDU (ORCPT
+        with ESMTP id S231590AbiH3VmY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Aug 2022 16:03:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D343228700
-        for <linux-block@vger.kernel.org>; Tue, 30 Aug 2022 13:02:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661889728;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cW58ouZi5bApb29zm+DkyKyBdHjuVGS0ZeiR6baf+Ic=;
-        b=DVqGHQEBP9CCeF/Lj+m9xp+NQU8sRDEuMuGH1x2u2qAioAMwp/k3Ey2/WR5HpP9p5hBLSG
-        zfh0PkCONAbFCsQEmpX1CXmDOqDmZXa63Q7Ik4GHHhwal7oYZcTQChZtwTAiSWBPZ0Vmv1
-        TEEiTyAa184Xn5wQomm8EQnrKu842/c=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-91-NVjpObPfOwWOMI5ORS92Kg-1; Tue, 30 Aug 2022 16:02:05 -0400
-X-MC-Unique: NVjpObPfOwWOMI5ORS92Kg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6FC4E3C01DE6;
-        Tue, 30 Aug 2022 20:02:04 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.81])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE8EE492C3B;
-        Tue, 30 Aug 2022 20:02:03 +0000 (UTC)
-Date:   Tue, 30 Aug 2022 16:02:02 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        acourbot@chromium.org, hch@infradead.org,
-        linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2] virtio-blk: Fix WARN_ON_ONCE in virtio_queue_rq()
-Message-ID: <Yw5suoV+pYAJ26VV@fedora>
-References: <20220830150153.12627-1-suwan.kim027@gmail.com>
+        Tue, 30 Aug 2022 17:42:24 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB79F7D1DF;
+        Tue, 30 Aug 2022 14:42:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kia6xP9vAGncaI733rfkg+lU8kovM1EBhfeC9Dh4h5GM3HJTLd/x+qXaIvdQXfzYTiAPlTS5ETt6veqkJqia+I9VgtY3wPJtmc0DZ9A9FiHsWpvenK6JpzZsJadPWTPvWqJco5CVNhYahqrYMIIyzSGn8QglRAmQ7czEtZxCoFcfqIEqsYkl5YYaM90vHie7no80lxV0vzaLtcXx+7vxgRsLA9ktcc+qhFdmhIrTKgc8WHsXRCQ6EZq2r043F5q2ot6nK1e5m9dOwMW+PUDn6d0EnU9x1bg41CRvugj7SbNkIPKH7oaO3ntEOOvDHmIa7Nk1mh8YeV05LOAHDjUFPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LjVwidUR1XHm3oyqPfRwoIbfyrA0owIjpLt7qjxk428=;
+ b=j4dDC7lHQJ91WbDLi2dCoyXE5Zu5Z+laz8ALtFlUv8iWWsxM4IIrJyS8CmhJ20jrF/pCTO1O12VjUT5XdTs3VNFeTxxLwSG0TudageLy9Xp49PYBjvCbRkUQUn+nO6E9islw46ygNakM8/tenybLu3zwIiUL59jY4yzZZ6Dg/7C3/lBXSkXbTOicDRh3wvje3IkkFNhYKHFkt8nKi+vCG3i2BFq8I5rpzjp52NSOWk3jPsRrW/oJHmgtDWK531ING0mpkxZXyebt5gL2YxU4ZwQ68vx2EnmQ5rPNAM6O8rocW4O8UBgXA2Su6xsWsqRVWQL0mQ6jIADD8cqIR1SGSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LjVwidUR1XHm3oyqPfRwoIbfyrA0owIjpLt7qjxk428=;
+ b=mcRd9+FryZycC/TjF7VWVHW3ojyIkK7A3Ezl7e1/qvayBvxrTTsY+mJeOKxjc66/GPLAksd/I/yhNUhtuvJHytQFX060GzYFkJHrtaaXAiqMFods39prR+2K7H1jDIuBcdG6YmJOeEbeznE5ldz70nfJ8dUSgqXFhMYJT+RoOuYniQ9MQqGx1XhZyxAz4997onTZpyBMtjDZrzmDfO7/yEr2CPlDnUR+MeXy6i6svEHd+qXciTNCJDmyMNX+GN7JXAsRRg711ds/Kg7RLADdhizjVSaODDfqYZI08QjYWf5Byyed1W0u8yPI1BTnPWxCPgGuUYPHahxgxWhQSJWGOw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
+ by CH0PR12MB5057.namprd12.prod.outlook.com (2603:10b6:610:e0::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Tue, 30 Aug
+ 2022 21:42:19 +0000
+Received: from BY5PR12MB4130.namprd12.prod.outlook.com
+ ([fe80::508d:221c:9c9e:e1a5]) by BY5PR12MB4130.namprd12.prod.outlook.com
+ ([fe80::508d:221c:9c9e:e1a5%9]) with mapi id 15.20.5588.010; Tue, 30 Aug 2022
+ 21:42:19 +0000
+Message-ID: <3a0a814e-1317-2cc4-045d-296df9181d39@nvidia.com>
+Date:   Tue, 30 Aug 2022 14:42:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH 1/6] mm/gup: introduce pin_user_page()
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+References: <20220827083607.2345453-1-jhubbard@nvidia.com>
+ <20220827083607.2345453-2-jhubbard@nvidia.com>
+ <10a9d33a-58a3-10b3-690b-53100d4e5440@redhat.com>
+ <a47eef63-0f29-2185-f044-854ffaefae9c@nvidia.com>
+ <5aa08b4f-251e-a63d-c36c-324a04ba24f4@redhat.com>
+From:   John Hubbard <jhubbard@nvidia.com>
+In-Reply-To: <5aa08b4f-251e-a63d-c36c-324a04ba24f4@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0103.namprd03.prod.outlook.com
+ (2603:10b6:a03:333::18) To BY5PR12MB4130.namprd12.prod.outlook.com
+ (2603:10b6:a03:20b::16)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="ZK6dBVToNTN+i8uE"
-Content-Disposition: inline
-In-Reply-To: <20220830150153.12627-1-suwan.kim027@gmail.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c7c195f3-4685-404c-cfbe-08da8ad083e9
+X-MS-TrafficTypeDiagnostic: CH0PR12MB5057:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nBQCM5Ey5wTCDf5est56dDQI/MCXgNj3oTQQPgZJoAxn5kFEZOGFmd2eODPRyqkwOGGYphMMuRt0M4dxJDomR8DG8CruCikKOarvc1A8CDULeQP+MrQVeiYYxAWBmrZIOeU/iCNmzpGXoX5wyoQAujYqfvendxchHxMnZ4bHLO5/vGiwqsfT9YELJVIWGgsY0mn39na2F9raLp+3JQ4JWMXMOFNpCP7meCGpsfQgV1KoygFM85/UNfKvmhIi9OFErq7qPFddOgn0om5ywF+WEDJcKPicrHhZsAtl/aIDwYTdj84pj4jH0saG5gqgR2jV4RdvBxHT3KodADLcshKwmWycS+bA9HVTStsfCjym85tPD5zAwBy6G5om2qUlBSt3/YmxeFn0fm8p/GJGyI1COymEb4kfvKGs9JW1NiY4HblFVl355sT6JpFeg0YZ9UyX+5PGF4eC0pIkVaPU+SXApeLBJdtZvH1tvHS2cELoWV/z2+3AxF8mtEdFuk2oMlfOFmQ4ST/bIiBcGcfsQTebdjWHoS32l4mtj/O/M1eOpHu0jK1F4VEL668ayzqw13xXllP4G2kgoLXSyp6cX6p9bE+1OJ+g9Tgs7aJAkkRHfBiywyqmJ2b3G0BZA925Sv36u8Eqm09xoQ63MQ73TqQVLNwLJSAf91X5KaoT6Hb8ct1/TBW6GgqALJt7WxUIczfRso7n+GWWjTWJXDd9IHr8rLkpqr5i3mi8Q8S5+u1rj3DxblHMcHB1ZBKj36csS32agzF85ndz4HSHAxXiUxfYvOFRWgEUs1oWFV3e4+iwFNw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(136003)(39860400002)(346002)(366004)(376002)(110136005)(66946007)(478600001)(36756003)(54906003)(316002)(31686004)(66556008)(8676002)(38100700002)(66476007)(6486002)(4326008)(41300700001)(8936002)(5660300002)(7416002)(6506007)(26005)(6512007)(2906002)(83380400001)(53546011)(186003)(6666004)(31696002)(2616005)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eVYxUWRUdEtLV0Jtc2dnaG15UHlIdVVRdzl5TFJzNTZtT2x1TlNzemVoT29x?=
+ =?utf-8?B?d2JzQzQ5SHJFRjUweE5KVnJiTDgzenZiZXdEbDRlMDdWWm5rVTdaYjNyRGg5?=
+ =?utf-8?B?bytCL1RNTi9VNTkydW9Qamt2akdscVZlNGtKTmV1MlF6MHZXeXlHZ2hxR0NL?=
+ =?utf-8?B?QmRFcEVoZ0Fqa0MrUHRrT1VGSE1CdFI0WkxXN3VLMFR2MVIvODl4NTlPcHp6?=
+ =?utf-8?B?VlpVS0swdjlMNXpoWmIwN1FhUnl5T21ZeU5YZFJ1bkFCd3BQN3M3NlJiZFZC?=
+ =?utf-8?B?UDZ0QVBOUFlONEpuVCt6M2VKWVhzc3JKdmM5c0J0WGN6RmZMbzZYdXBTRFAz?=
+ =?utf-8?B?YTZJSHN4TFgxblhXdGNmWWlaVVpqNWxUWG1LRDhSaFNzRE4rMmthSTlyYjhY?=
+ =?utf-8?B?NkxZdTBzUmN4by9td0plMjV5M1UrS1dJOG96Q2VHQUNOQlg0TzAyS0pWcys3?=
+ =?utf-8?B?Y2N2SkJ3VDJTYllkTGFkSmttMktQb0czQnZWaFY1VTVaR1J5cWhGUlBVcEto?=
+ =?utf-8?B?WVdnbXlObWswTStkakt3bDBHdy91VkJRd2orTDNhWitZNnBiMW1xcytRa050?=
+ =?utf-8?B?Nk9KTml5S2QvY1lWbHV4NTRiY29tOWNWRnVrUjJBZHMzTVl2QmtwT1V6eS9M?=
+ =?utf-8?B?NExRTjVDRlduNjdaS1RxWEFIU09Zd0dmQkszcmFPTU1pTm1CeHphbkxTelVH?=
+ =?utf-8?B?ZE43THBQRWhBdHc2MlhUMEdBdzBtcWlCUlVmV0tNdlJDZlorVGswbm1wc1BQ?=
+ =?utf-8?B?ZEJ1UisxSmEzK25JdlZsZDFudmRjdUdqZ1JnYkxiUGlPT1NuSXcrVGFyVHZV?=
+ =?utf-8?B?RHFySlM5MVFJUnExMWtqQ3VDdjUvZDdkYnBEMGNyY2p2V1h6TTA1RWFTQW1h?=
+ =?utf-8?B?eWlqVUtDWnE4T2hiejJMZldaZ2tYSlBUSEUrazY4Q011S1IxZGNFbks5Y0ZS?=
+ =?utf-8?B?bkxmbS9Ga0loNzhnVUVqRVZtQUFCMTJwZE5nOXdjNHhXVmZRYVJnNHFIOHV2?=
+ =?utf-8?B?NDJzeW9SdlZDdkVIMFhmU3JEaDBaN3AydkpjOFdyMlpBRW1mMUtxTlI5TjBr?=
+ =?utf-8?B?N2ZnZGxPODFkRGtFZ3MrbUliMDVvaWlhUHZmU3AwUUt5bzhKazAzL2x6R0FE?=
+ =?utf-8?B?SFlDMmszSnNDRlpKLy8yNUFzeWtWeGZCNnJDamVncHFqL2FuU3lwR2FsbVVV?=
+ =?utf-8?B?V2ovQkd0d04vdm5mbkFTdVo1Q2F5WlRDUkxhdllhMWxHWkRSWWJOajhweEFT?=
+ =?utf-8?B?QWhBL0Zocm04MUZpOGlWNllZVkxoamRWMXN5eUdsNC9ZUHVEVFFWczE5MUR5?=
+ =?utf-8?B?WUtKZHR2VUNXMUpGWUNKWWlGNUVIS2oveVBnOGJOanhsM2Z0MWJsbEVpblZx?=
+ =?utf-8?B?MGxTcXlGTEdobWF6b1J0T2NRcEZBVEF5WmlMdVRwNWFCcGZ2Vm1PUnUrV01h?=
+ =?utf-8?B?bzVBb0lVckF0d0JaQ2VXUjg1UVJvNU9JL05wN2tCdHJYTjVFZUlWMzQvVGVV?=
+ =?utf-8?B?eTBHMFNZVFlHaFFCbWhJUEJ1UmVrNDU3Z0xHaDVTeDN0VGFDbzBWMXcycFFC?=
+ =?utf-8?B?REduMkFMVlprbXRxT25PNjlYYTRtRkFOU2xNMGhKUlNXai81OFFhL1FJQXhE?=
+ =?utf-8?B?UGhXMGxFc2QvQ0dkcUVsUzlnTmtRT2R3ZXVONmZTZkRmamZWQnIrNDRHdXBE?=
+ =?utf-8?B?eC9qQ1dMZ1UxaUtTeTVVS25qaHQxS2RkQzVEM29OeFZHbjJlUUwyTThRWEFt?=
+ =?utf-8?B?NGlyUGlFL3ZVaGVmb0FNUWdDeEgramJJeUdUNHFTNGhSY0kxR1NSd3NtWlRv?=
+ =?utf-8?B?QllwNUpEK1FVRVJQYmpNYW5jaWcyNVQ3elNWSkJMUWR4SDJKck1ZdEk4NE5j?=
+ =?utf-8?B?b3pITFJkbmc0L3pnZXRWTFN5RjF2VURPSkl5VUdKYXFpUk5XNEIzZVFZRmo2?=
+ =?utf-8?B?UFpZMnI1dDg5eUhlL05CT1d0N0xlbGU2M3J2U2x3Znk5M25vRVNGd1lDL040?=
+ =?utf-8?B?ZS9TNW1PdXdBM1lkS3JNUHcvUWNqaGdBVkVCUXoyVjAwTEM0Yk1OVFc2cE5N?=
+ =?utf-8?B?QnBxd1dBUjBibG1oMHIxbFJwSjRJUHJoOGgvMDFkWUdZdithelZ4cEFrbFp3?=
+ =?utf-8?Q?/NtUqJL21ttOdmT/HqnhIstI7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7c195f3-4685-404c-cfbe-08da8ad083e9
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2022 21:42:19.8409
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pOeJXuUJ76IDVYMnOLaIkF8hvSQe5LD3/1bq20Py+8W7FxECs1O/oJlUvtAAjT3pdSyXIoDeD+uTymRRyhXzHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5057
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 8/30/22 05:17, David Hildenbrand wrote:
+> On 29.08.22 21:33, John Hubbard wrote:
+>> On 8/29/22 05:07, David Hildenbrand wrote:
+>>>> +/**
+>>>> + * pin_user_page() - apply a FOLL_PIN reference to a page
+>>>> + *
+>>>> + * @page: the page to be pinned.
+>>>> + *
+>>>> + * This is similar to get_user_pages(), except that the page's refcount is
+>>>> + * elevated using FOLL_PIN, instead of FOLL_GET.
+>>
+>> Actually, my commit log has a more useful documentation of this routine,
+>> and given the questions below, I think I'll change to that:
+>>
+>>  * pin_user_page() is an externally-usable version of try_grab_page(), but with
+>>  * semantics that match get_page(), so that it can act as a drop-in replacement
+>>  * for get_page().
+>>  *
+>>  * pin_user_page() elevates a page's refcount using FOLL_PIN rules. This means
+>>  * that the caller must release the page via unpin_user_page().
+> 
+> Some thoughts:
+> 
+> a) Can we generalize such that pages with a dedicated pincount
+> (multi-page folios) are also covered? Maybe avoiding the refcount
+> terminology would be best.
+> 
+> b) Should we directly work on folios?
+> 
+> c) Would it be valid to pass in a tail page right now?
 
---ZK6dBVToNTN+i8uE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I would fervently prefer to defer those kinds of questions and ideas,
+because the call sites are dealing simply in pages. And this is 
+really for file system call sites. The folio conversion is a larger
+thing. Below...
 
-On Wed, Aug 31, 2022 at 12:01:53AM +0900, Suwan Kim wrote:
-> If a request fails at virtio_queue_rqs(), it is inserted to requeue_list
-> and passed to virtio_queue_rq(). Then blk_mq_start_request() can be called
-> again at virtio_queue_rq() and trigger WARN_ON_ONCE like below trace beca=
-use
-> request state was already set to MQ_RQ_IN_FLIGHT in virtio_queue_rqs()
-> despite the failure.
->=20
-> [    1.890468] ------------[ cut here ]------------
-> [    1.890776] WARNING: CPU: 2 PID: 122 at block/blk-mq.c:1143
-> blk_mq_start_request+0x8a/0xe0
-> [    1.891045] Modules linked in:
-> [    1.891250] CPU: 2 PID: 122 Comm: journal-offline Not tainted 5.19.0+ =
-#44
-> [    1.891504] Hardware name: ChromiumOS crosvm, BIOS 0
-> [    1.891739] RIP: 0010:blk_mq_start_request+0x8a/0xe0
-> [    1.891961] Code: 12 80 74 22 48 8b 4b 10 8b 89 64 01 00 00 8b 53
-> 20 83 fa ff 75 08 ba 00 00 00 80 0b 53 24 c1 e1 10 09 d1 89 48 34 5b
-> 41 5e c3 <0f> 0b eb b8 65 8b 05 2b 39 b6 7e 89 c0 48 0f a3 05 39 77 5b
-> 01 0f
-> [    1.892443] RSP: 0018:ffffc900002777b0 EFLAGS: 00010202
-> [    1.892673] RAX: 0000000000000000 RBX: ffff888004bc0000 RCX: 000000000=
-0000000
-> [    1.892952] RDX: 0000000000000000 RSI: ffff888003d7c200 RDI: ffff88800=
-4bc0000
-> [    1.893228] RBP: 0000000000000000 R08: 0000000000000001 R09: ffff88800=
-4bc0100
-> [    1.893506] R10: ffffffffffffffff R11: ffffffff8185ca10 R12: ffff88800=
-4bc0000
-> [    1.893797] R13: ffffc90000277900 R14: ffff888004ab2340 R15: ffff88800=
-3d86e00
-> [    1.894060] FS:  00007ffa143a4640(0000) GS:ffff88807dd00000(0000)
-> knlGS:0000000000000000
-> [    1.894412] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.894682] CR2: 00005648577d9088 CR3: 00000000053da004 CR4: 000000000=
-0170ee0
-> [    1.894953] Call Trace:
-> [    1.895139]  <TASK>
-> [    1.895303]  virtblk_prep_rq+0x1e5/0x280
-> [    1.895509]  virtio_queue_rq+0x5c/0x310
-> [    1.895710]  ? virtqueue_add_sgs+0x95/0xb0
-> [    1.895905]  ? _raw_spin_unlock_irqrestore+0x16/0x30
-> [    1.896133]  ? virtio_queue_rqs+0x340/0x390
-> [    1.896453]  ? sbitmap_get+0xfa/0x220
-> [    1.896678]  __blk_mq_issue_directly+0x41/0x180
-> [    1.896906]  blk_mq_plug_issue_direct+0xd8/0x2c0
-> [    1.897115]  blk_mq_flush_plug_list+0x115/0x180
-> [    1.897342]  blk_add_rq_to_plug+0x51/0x130
-> [    1.897543]  blk_mq_submit_bio+0x3a1/0x570
-> [    1.897750]  submit_bio_noacct_nocheck+0x418/0x520
-> [    1.897985]  ? submit_bio_noacct+0x1e/0x260
-> [    1.897989]  ext4_bio_write_page+0x222/0x420
-> [    1.898000]  mpage_process_page_bufs+0x178/0x1c0
-> [    1.899451]  mpage_prepare_extent_to_map+0x2d2/0x440
-> [    1.899603]  ext4_writepages+0x495/0x1020
-> [    1.899733]  do_writepages+0xcb/0x220
-> [    1.899871]  ? __seccomp_filter+0x171/0x7e0
-> [    1.900006]  file_write_and_wait_range+0xcd/0xf0
-> [    1.900167]  ext4_sync_file+0x72/0x320
-> [    1.900308]  __x64_sys_fsync+0x66/0xa0
-> [    1.900449]  do_syscall_64+0x31/0x50
-> [    1.900595]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> [    1.900747] RIP: 0033:0x7ffa16ec96ea
-> [    1.900883] Code: b8 4a 00 00 00 0f 05 48 3d 00 f0 ff ff 77 41 c3
-> 48 83 ec 18 89 7c 24 0c e8 e3 02 f8 ff 8b 7c 24 0c 89 c2 b8 4a 00 00
-> 00 0f 05 <48> 3d 00 f0 ff ff 77 36 89 d7 89 44 24 0c e8 43 03 f8 ff 8b
-> 44 24
-> [    1.901302] RSP: 002b:00007ffa143a3ac0 EFLAGS: 00000293 ORIG_RAX:
-> 000000000000004a
-> [    1.901499] RAX: ffffffffffffffda RBX: 0000560277ec6fe0 RCX: 00007ffa1=
-6ec96ea
-> [    1.901696] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000=
-0000016
-> [    1.901884] RBP: 0000560277ec5910 R08: 0000000000000000 R09: 00007ffa1=
-43a4640
-> [    1.902082] R10: 00007ffa16e4d39e R11: 0000000000000293 R12: 000056027=
-73f59e0
-> [    1.902459] R13: 0000000000000000 R14: 00007fffbfc007ff R15: 00007ffa1=
-3ba4000
-> [    1.902763]  </TASK>
-> [    1.902877] ---[ end trace 0000000000000000 ]---
->=20
-> To avoid calling blk_mq_start_request() twice, This patch moves the
-> execution of blk_mq_start_request() to the end of virtblk_prep_rq().
-> And instead of requeuing failed request to plug list in the error path of
-> virtblk_add_req_batch(), it uses blk_mq_requeue_request() to change failed
-> request state to MQ_RQ_IDLE. Then virtblk can safely handle the request
-> on the next trial.
->=20
-> Fixes: 0e9911fa768f ("virtio-blk: support mq_ops->queue_rqs()")
-> Reported-by: Alexandre Courbot <acourbot@chromium.org>
-> Tested-by: Alexandre Courbot <acourbot@chromium.org>
-> Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
-> ---
-> v1 -> v2
->  - Call blk_mq_start_request() after virtblk_add_req() can break the time=
-stamp.
->    So move virtblk_add_req() before blk_mq_start_request().
->  - Use blk_mq_requeue_request() instead of requeuing failed request to pl=
-ug list
->    if virtblk_add_req() fails within virtblk_add_req_batch().=20
->=20
->=20
->  drivers/block/virtio_blk.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+>>
+>>>> + *
+>>>> + * IMPORTANT: The caller must release the page via unpin_user_page().
+>>>> + *
+>>>> + */
+>>>> +void pin_user_page(struct page *page)
+>>>> +{
+>>>> +	struct folio *folio = page_folio(page);
+>>>> +
+>>>> +	WARN_ON_ONCE(folio_ref_count(folio) <= 0);
+>>>> +
+>>>
+>>> We should warn if the page is anon and !exclusive.
+>>
+>> That would be sort of OK, because pin_user_page() is being created
+>> specifically for file system (O_DIRECT cases) use, and so the pages
+>> should mostly be file-backed, rather than anon. Although I'm a little
+>> vague about whether all of these iov_iter cases are really always
+>> file-backed pages, especially for cases such as splice(2) to an
+>> O_DIRECT-opened file, that Al Viro mentioned [1].
+> 
+> If we can, we should document that this interface is not for anonymous
+> pages and WARN if pinning an anonymous page via this interface.
 
-Thanks for solving the timestamp issue. I'm not familiar enough which
-blk_mq_requeue_request() to confirm this version is correct, but from
-the virtio_blk perspective:
+Yes. OK, I've rewritten the documentation again, and changed the 
+warning to just 
 
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+    WARN_ON_ONCE(PageAnon(page));
 
---ZK6dBVToNTN+i8uE
-Content-Type: application/pgp-signature; name="signature.asc"
+So it looks like this now, what do you think?
 
------BEGIN PGP SIGNATURE-----
+/**
+ * pin_user_page() - apply a FOLL_PIN reference to a file-backed page that the
+ * caller already owns.
+ *
+ * @page: the page to be pinned.
+ *
+ * pin_user_page() elevates a page's refcount using FOLL_PIN rules. This means
+ * that the caller must release the page via unpin_user_page().
+ *
+ * pin_user_page() is intended as a drop-in replacement for get_page(). This
+ * provides a way for callers to do a subsequent unpin_user_page() on the
+ * affected page. However, it is only intended for use by callers (file systems,
+ * block/bio) that have a file-backed page. Anonymous pages are not expected nor
+ * supported, and will generate a warning.
+ *
+ * pin_user_page() may also be thought of as an externally-usable version of
+ * try_grab_page(), but with semantics that match get_page(), so that it can act
+ * as a drop-in replacement for get_page().
+ *
+ * IMPORTANT: The caller must release the page via unpin_user_page().
+ *
+ */
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMObLkACgkQnKSrs4Gr
-c8g1uAgAlDNL1Yig+q7heahlaW2ccDoI9dZJl6M88hP41Ca5gwd65HTZ4nweFfhd
-yvckcUdxf2V8X9IvbR6ia3EufRFpn64aEZ3a3ar2IGrPHYKp9ZL4pDitzoP6zif+
-UMW8GJJ3kUPVN4IwsTzaw0UffMwQ1Nt1rYkPUrh/drGp8O0UJ/CbX3PmbDnvDnpR
-EyYyUyhOahuXOfwiHLG++bGC+SKB4pnw2s8TCj65uzhp4qqZa01pnn7hKWL3SN/d
-vqbAW42SaFKsLbRxuA0ETW725HGpoXTVi+LUPpF2aUwlsAiTqAFvILsi9j5rypsE
-iu7bFOJ0NQqaKZyfX6jMY2mnWi/BKg==
-=cnOA
------END PGP SIGNATURE-----
+> 
+> The only reasonable way to obtain a pin on an anonymous page is via the
+> page table. Here, FOLL_PIN should be used to do the right thing -- for
+> example, unshare first (break COW) instead of pinning a shared anonymous
+> page.
+> 
+> Nothing would speak against duplicating such a pin using this interface
+> (we'd have to sanity check that the page we're pinning may already be
+> pinned), but I assume the pages we pin here are *not* necessarily
+> obtained via GUP FOLL_PIN.
+> 
+> I would be curious under which scenarios we could end up here with an
+> anonymous page and how we obtained that reference (if not via GUP).
 
---ZK6dBVToNTN+i8uE--
+Let's see if the warning ever fires. I expect not, but if it does,
+then I can add the !PageAnonExclusive qualifier to the warning.
 
+> 
+>>
+>> Can you walk me through the reasoning for why we need to keep out
+>> anon shared pages? 
+> 
+> We make sure to only pin anonymous pages that are exclusive and check
+> when unpinning -- see sanity_check_pinned_pages(), there is also a
+> comment in there -- that pinned anonymous pages are in fact still
+> exclusive, otherwise we might have a BUG lurking somewhere that can
+> result in memory corruptions or leaking information between processes.
+> 
+> For example, once we'd pinned an anonymous pages that are not marked
+> exclusive (!PageAnonExclusive), or we'd be sharing a page that is
+> pinned, the next write fault would replace the page in the user page
+> table due to breaking COW, and the GUP pin would point at a different
+> page than the page table.
+
+Right, OK it all clicks together, thanks for that.
+
+> 
+> Disallowing pinning of anon pages that may be shared in any case
+> (FOLL_LONGTERM or not) simplifies GUP handling and allows for such
+> sanity checks.
+> 
+> (side note: after recent VM_BUG_ON discussions we might want to convert
+> the VM_BUG_ON_PAGE in sanity_check_pinned_pages())
+> 
+>>
+>>>
+>>> I assume the intend is to use pin_user_page() only to duplicate pins, right?
+>>>
+>>
+>> Well, yes or no, depending on your use of the term "pin":
+>>
+>> pin_user_page() is used on a page that already has a refcount >= 1 (so
+>> no worries about speculative pinning should apply here), but the page
+>> does not necessarily have any FOLL_PIN's applied to it yet (so it's not
+>> "pinned" in the FOLL_PIN sense).
+> 
+> Okay, then we should really figure out if/how anonymous pages could end
+> up here. I assume they can't, really. But let's see :)
+> 
+> 
+
+Yes, again, the warning will reveal that. Which reminds me that I also
+have it on my list to also write some test cases that do things like Al
+Viro suggested: ITER_BVEC + O_DIRECT.
+
+
+thanks,
+
+-- 
+John Hubbard
+NVIDIA
