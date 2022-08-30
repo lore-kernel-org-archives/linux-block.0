@@ -2,141 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F7C5ECAAD4
-	for <linux-block@archiver.kernel.org>; Tue, 30 Aug 2022 09:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5ABECAAD4
+	for <linux-block@archiver.kernel.org>; Tue, 30 Aug 2022 09:46:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231293AbiH3JPi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Aug 2022 05:15:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44880 "EHLO
+        id S229737AbiH3Jqa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Aug 2022 05:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231288AbiH3JPf (ORCPT
+        with ESMTP id S229824AbiH3Jq1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Aug 2022 05:15:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859A885FCC;
-        Tue, 30 Aug 2022 02:15:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 25830615AF;
-        Tue, 30 Aug 2022 09:15:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F722C433D6;
-        Tue, 30 Aug 2022 09:15:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661850927;
-        bh=0rCKjtciXq7v8NAdMwNUpKFAV7bH3z1yw3HXxLkc038=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PVwwsNBnBm640JzQk8Kab8hp1F4C9Z1erAgsv+pQtJDmEwkQ/n2H8lUHuab+GG3za
-         Xm3T9C3Ah/nNWto6gp7d8ItrKTD3tMYqWJTNlJokLbAoWKvkexy3VnKeeAnrIsJJIL
-         POm/Wgt76E2Ax2bhpgspJLSmIqT2TZZvB6uhe7v1No+8HB59qCwXJwVZlUXysHEknK
-         eVWGeLn7YEgtbb59HvlWXHEhs3XktHVCkK8ncWQCGQIIkuzkpzW3xF2dErTRadD4tC
-         xzTBascDHFc1o1gBUFwiVW7ZzxbTKA+NaGMULsztASGIJiJRfizKg/GAeeC0zR7cx6
-         H22/5Z2y3Kqzw==
-Date:   Tue, 30 Aug 2022 12:15:23 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc:     Jinpu Wang <jinpu.wang@ionos.com>, haris.iqbal@ionos.com,
-        axboe@kernel.dk, jgg@ziepe.ca, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH] rnbd-srv: remove 'dir' argument from rnbd_srv_rdma_ev
-Message-ID: <Yw3VK/qbixMW7U6z@unreal>
-References: <20220826081117.21687-1-guoqing.jiang@linux.dev>
- <YwxuYrJJRBDxsJ8X@unreal>
- <d969d7bf-d2a3-05aa-26e5-41628f74b8ab@linux.dev>
- <CAMGffE=-Dsr=s1X=00+y1UcOhHC=FJ-9guQAWTDoHLTRBQ7Qaw@mail.gmail.com>
- <Yw3N0ALRz5xcBunA@unreal>
- <a8774cb1-fa99-33cd-f681-527de1e079be@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a8774cb1-fa99-33cd-f681-527de1e079be@linux.dev>
+        Tue, 30 Aug 2022 05:46:27 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A05A8CFB;
+        Tue, 30 Aug 2022 02:46:23 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=liusong@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VNkne02_1661852747;
+Received: from localhost(mailfrom:liusong@linux.alibaba.com fp:SMTPD_---0VNkne02_1661852747)
+          by smtp.aliyun-inc.com;
+          Tue, 30 Aug 2022 17:46:21 +0800
+From:   Liu Song <liusong@linux.alibaba.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] blk-mq: change bio_set_ioprio to inline
+Date:   Tue, 30 Aug 2022 17:45:46 +0800
+Message-Id: <1661852746-117244-1-git-send-email-liusong@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 04:57:19PM +0800, Guoqing Jiang wrote:
-> 
-> 
-> On 8/30/22 4:44 PM, Leon Romanovsky wrote:
-> > On Mon, Aug 29, 2022 at 03:43:43PM +0200, Jinpu Wang wrote:
-> > > On Mon, Aug 29, 2022 at 3:33 PM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
-> > > > 
-> > > > 
-> > > > On 8/29/22 3:44 PM, Leon Romanovsky wrote:
-> > > > > On Fri, Aug 26, 2022 at 04:11:17PM +0800, Guoqing Jiang wrote:
-> > > > > > Since all callers (process_{read,write}) set id->dir, no need to
-> > > > > > pass 'dir' again.
-> > > > > > 
-> > > > > > Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-> > > > > > ---
-> > > > > >    drivers/block/rnbd/rnbd-srv.c          | 9 ++++-----
-> > > > > >    drivers/block/rnbd/rnbd-srv.h          | 1 +
-> > > > > >    drivers/infiniband/ulp/rtrs/rtrs-srv.c | 4 ++--
-> > > > > >    drivers/infiniband/ulp/rtrs/rtrs.h     | 3 +--
-> > > > > >    4 files changed, 8 insertions(+), 9 deletions(-)
-> > > > > I applied the patch and cleanup of rtrs-srv.h can be done later.
-> > > > Thanks! I suppose below
-> > > > 
-> > > > > So decouple it from rtrs-srv.h and hide everything that not-needed to be
-> > > > > exported to separate header file.
-> > > > means move 'struct rtrs_srv_op' to rtrs.h, which seems not appropriate to me
-> > > > because both client and server include the header. Pls correct me if I
-> > > > am wrong.
-> > > > 
-> > > > Since process_{read,write} prints direction info if ctx->ops.rdma_ev
-> > > > fails, how
-> > > > about remove the 'dir' info from rnbd_srv_rdma_ev? Then we  don't need to
-> > > > include rtrs-srv.h.
-> > > > 
-> > > > diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-> > > > index 431c6da19d3f..d07ff3ba560c 100644
-> > > > --- a/drivers/block/rnbd/rnbd-srv.c
-> > > > +++ b/drivers/block/rnbd/rnbd-srv.c
-> > > > @@ -387,8 +387,8 @@ static int rnbd_srv_rdma_ev(void *priv, struct
-> > > > rtrs_srv_op *id,
-> > > >                                               datalen);
-> > > >                   break;
-> > > >           default:
-> > > > -               pr_warn("Received unexpected message type %d with dir %d
-> > > > from session %s\n",
-> > > > -                       type, id->dir, srv_sess->sessname);
-> > > > +               pr_warn("Received unexpected message type %d from
-> > > > session %s\n",
-> > > > +                       type, srv_sess->sessname);
-> > > >                   return -EINVAL;
-> > > >           }
-> > > > 
-> > > > diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
-> > > > index 5a0ef6c2b5c7..081bceaf4ae9 100644
-> > > > --- a/drivers/block/rnbd/rnbd-srv.h
-> > > > +++ b/drivers/block/rnbd/rnbd-srv.h
-> > > > @@ -14,7 +14,6 @@
-> > > >    #include <linux/kref.h>
-> > > > 
-> > > >    #include <rtrs.h>
-> > > > -#include <rtrs-srv.h>
-> > > >    #include "rnbd-proto.h"
-> > > >    #include "rnbd-log.h"
-> > > > 
-> > > > 
-> > > > Thoughts?
-> > > I like the idea. Please post a formal patch based on leon's
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=wip/leon-for-next
-> > I squashed this hunk into original patch.
-> 
-> Great, thank you!
-> 
-> If possible, to better reflect the change, please at your convenience to
-> replace the original commit
-> message with below.
-> 
-> "Since process_{read,write} already prints direction info if
-> ctx->ops.rdma_ev fails, no need to pass 'dir'"
+From: Liu Song <liusong@linux.alibaba.com>
 
-Done, as long as patches are in wip/* branches, we can rebase them.
+Change "bio_set_ioprio" to inline to avoid calling overhead.
 
-Thanks
+Signed-off-by: Liu Song <liusong@linux.alibaba.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> Thanks,
-> Guoqing
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c96c8c4..a17bc83 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2766,7 +2766,7 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 	return rq;
+ }
+ 
+-static void bio_set_ioprio(struct bio *bio)
++static inline void bio_set_ioprio(struct bio *bio)
+ {
+ 	/* Nobody set ioprio so far? Initialize it based on task's nice value */
+ 	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) == IOPRIO_CLASS_NONE)
+-- 
+1.8.3.1
+
