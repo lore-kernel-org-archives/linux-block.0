@@ -2,244 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31ECAC0502C
-	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 04:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECE8ECAAD8
+	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 04:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232101AbiHaEUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 00:20:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42120 "EHLO
+        id S229457AbiHaE7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 00:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231620AbiHaETe (ORCPT
+        with ESMTP id S231351AbiHaE7u (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 00:19:34 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE4FB7763;
-        Tue, 30 Aug 2022 21:19:08 -0700 (PDT)
+        Wed, 31 Aug 2022 00:59:50 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46B111113
+        for <linux-block@vger.kernel.org>; Tue, 30 Aug 2022 21:59:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1661921987; x=1693457987;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=kDk/ltENv3lkUlRzoiqJN0eaBfj6RO2owM0OIuy6JKw=;
+  b=aK/ZxYrfM4oD7Bqen3colJMr3sv8v4odA04uqAU3EjSDhAxt0xgWcqtm
+   gHmf6Gir4JfM821F9XUJrX4z6ACQz67yrvpR/B9IeHuNhmH2jRzziCQNB
+   7hnXYzKkS8Uoxhxx/aRU8SzAU53rKSYjJgpXxNPZSYW0iL+i8EGwKITmn
+   eCFnQo3Pb0M7Ozx1YLJyuxw/8LQk39lwMFBXlViwEzfyIAc77gDrtEEzO
+   btoFYyTexcnI0ULRp+HLIdV3TVGG3Z/zro2DypacuhvZEQfyo0+PItg/r
+   YdFhCgnv3mngDSnMDBTeuETF5vzClYx75vvmDKMGcRcZ15gVLMp6778rc
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.93,276,1654531200"; 
+   d="scan'208";a="215258617"
+Received: from mail-dm6nam11lp2174.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.174])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Aug 2022 12:59:46 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TYinaZuGih8oHR1FDQjWX60Hlqf9lLXdsLkXtbHFQB5tThgYdMHJOog+X60aPiI85pl6UjH0hVjRLPEjoF0X1E4zXDOZZceVHUQC7oezVSmBjlge1xjPdVyMFb09HPgN4vkK0Gm8gr6T8jtKXqmju6gvKTGl4JMtZ9M/rnHF57UzrQ79dFr/yR0SpF4Hw7mtDLD35475HD3xkGq9tMT+NnzwiIgXmaHOWixKga7zFGJzW0ccZWHY8Pr6W21GBxzTr2Tkc/IdTDHlAy/ERCa+wyCdTdp/28l1sxWiIS/jlsYHFngWPwmo2jS/2K0n8IAqymNjReTB7/G4OHyyVgSLtQ==
+ b=NP8Hzvn9ynzg9xOleMpYo0r90rGaUlMtnRSqRuIoOeWEXG0rr5BjAJoYgTUZ5xL4ThfpPJblnLtTD2NjA0f7tE2ruRvyQp97DaLZM2t3bOx9EWJMgjRT+iOLM3qlCHlAMAWV8XrZJccMLLU2zKNXXtKB2/hgE6cMGO5b3JtxuGXpsS/ZVRk7LHyhvpXM/+8rlOwLv4dookKaRMGYS6a4BvQWXeolzCVkj/MScgjRi+Xe64es6TraQVqSaqF/sZ7CeWHCNSzCgs/3iV46Z27g9HKAGjSlnV/u2hsmguYMXitPFesHMPvpzQiqRTQOYhcysyS/nh2ajMnDH7ja8/N1JA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OhzEKD6XzVqcKpciBei7NKL/0bYb8BFurKTQDrfYJWg=;
- b=XgQR27T45eyFoKqM2ndJ7oLbY4ZvIRy0oVBT2LUA45oSnOBjTblgm01EMKpnVZZnBdpX3uTeDrLUKX3IK4WWx8vHIBWZ2D8KHRoSETAfnWFYnt4i9NlpNuhPbXcRCU3DEKRoeJ3bKJ7497+K4G2UjF7Dj7q40S0GGev4Ar6MMPkjKbREWbA0LAjV3U6xCPIKcss/ieHDXBd3WYk2hFovUDKZ05xi8bfxHtj//lsdJgSED/YucJzjnERpezjVHLL9aqTZ9iyoUfcQlkr4Has2QSOZAU4GySvTIZDdyh+bPlB3wRZFoxus20pDPQL+l5o96zkdYFLEXjvnuZGu9XpmCw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=vq7F3IalmoI4gW1tPCzfuAS5D07cHWSslSw8OtdMy5I=;
+ b=NtJmz5y7JBL5k6drjIV+FPlEFHUqiy8snOs/xSjlzkfsBj/Dn9PEQXmqnCD9wQ6K72eAnWBmFmD7E9Z25ZmAfjDE/Haqbz05I7FNPIZ9XJqNqjmHNzcfXNXhuBS3cE+rrHoFnoT75knfMP2qoqf1FxVTXpt7BNPP9JPHUcHboNHbxYtv+6WHDlYtR7PXw7EpdtPx0dVIMpygk8W9ADsAzZyrMFkV4lePZQ26jXZJJj5dd579NrThnJFPT74gH6RMkg47N/VyeVhd7bxnClQFgQhoB+6ApY38DH768RxC1o1WJaysB6ikIeceK6BGrD5FXch9ad6s5e+3G6m6eFwfGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OhzEKD6XzVqcKpciBei7NKL/0bYb8BFurKTQDrfYJWg=;
- b=JqT08abPFL8rlg+NDrO9y44a5Us5dLOWl4ObUbXQscf2X/Qi9qlcZLAITfAyKnZx9X4Ce1ypuUFCeFwCfq6cNYzgfEs9RK1UDZxq0ia0wMxpAhZ2m1IwCHE8GT5t6A/O2yQRu0IhJYNwub+d8oD9tEXwWVPm+ZfOmk5XaXycK8OA4tigWbHW4opfYhBaIg2k+G04+whEYZU+AocoCP38QxyWivQOv/Q4x9G0jLsaevC5rCuaVRAxmkzZ3XtzbFstN6sLyNj6ZiaJGgFuMnLXkQ8AF0728G6VuGdEe2ViRQZvVhjNfwDjJibRiEfbyq5muU2onUtL2MViy3CIHzUH7w==
-Received: from DM6PR02CA0072.namprd02.prod.outlook.com (2603:10b6:5:177::49)
- by MN2PR12MB4583.namprd12.prod.outlook.com (2603:10b6:208:26e::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Wed, 31 Aug
- 2022 04:19:06 +0000
-Received: from DM6NAM11FT090.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:177:cafe::dc) by DM6PR02CA0072.outlook.office365.com
- (2603:10b6:5:177::49) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.16 via Frontend
- Transport; Wed, 31 Aug 2022 04:19:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- DM6NAM11FT090.mail.protection.outlook.com (10.13.172.184) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5588.10 via Frontend Transport; Wed, 31 Aug 2022 04:19:05 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.38; Wed, 31 Aug
- 2022 04:18:56 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Tue, 30 Aug
- 2022 21:18:55 -0700
-Received: from sandstorm.attlocal.net (10.127.8.14) by mail.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server id 15.2.986.29 via Frontend
- Transport; Tue, 30 Aug 2022 21:18:54 -0700
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-xfs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-        <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>,
-        John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v2 7/7] fuse: convert direct IO paths to use FOLL_PIN
-Date:   Tue, 30 Aug 2022 21:18:43 -0700
-Message-ID: <20220831041843.973026-8-jhubbard@nvidia.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220831041843.973026-1-jhubbard@nvidia.com>
-References: <20220831041843.973026-1-jhubbard@nvidia.com>
+ bh=vq7F3IalmoI4gW1tPCzfuAS5D07cHWSslSw8OtdMy5I=;
+ b=zCoFRwwb6eNX1EbdJIC5kCnIgSQJPq3wqS4JZ4vd08WBJ5H9rdur12uvUtySVCyoX6dqNJzQh+gNJ4N1BihcwItAcnuvmgIplwNN5ZCFSFCqXuncPHBBnsl6y1HRIGi2bL8AmPwNFEnI45TPpPoeVITjLUrF7psu1B+pquyG8Og=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ DM5PR04MB0874.namprd04.prod.outlook.com (2603:10b6:4:3c::38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5566.15; Wed, 31 Aug 2022 04:59:47 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c7e:a51:e59a:d633]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::c7e:a51:e59a:d633%8]) with mapi id 15.20.5566.021; Wed, 31 Aug 2022
+ 04:59:47 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+CC:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH blktests] nvme: add dh module requirement for tests that
+ involve dh groups
+Thread-Topic: [PATCH blktests] nvme: add dh module requirement for tests that
+ involve dh groups
+Thread-Index: AQHYu4JqMzYWLRy0pU+II16FtTMMiK3G3+4AgAAmugCAADeMgIAAMuUAgAEE3QA=
+Date:   Wed, 31 Aug 2022 04:59:46 +0000
+Message-ID: <20220831045946.3elujhdydvqkkhv4@shindev>
+References: <20220829083614.874878-1-sagi@grimberg.me>
+ <20220830044632.j7k45lhdlyvksrxh@shindev>
+ <05548286-8d18-e3b4-06db-640c9d6b1399@grimberg.me>
+ <20220830102357.yahkv5qfr2ewa7uh@shindev>
+ <a5c3c8e7-4b0a-9930-8f90-e534d2a82bdf@grimberg.me>
+In-Reply-To: <a5c3c8e7-4b0a-9930-8f90-e534d2a82bdf@grimberg.me>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: de91393f-aa5c-4436-1dd3-08da8b0da081
+x-ms-traffictypediagnostic: DM5PR04MB0874:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CQ14xXCIb9pYV1WeZdiGRzQOePoByF+Cfl/I69pedSkbWmSoPl4V9fL0Pr1gIhaODasUmoGq46IB0UWMsJ98B3o9egova3Ly1YgE6IEaZZBN3zMmYY+4bwaoGPP5EZ2w5aD+PNmvhTxne4fOi+NwcHaNpfLXCr5H3DWVCOqE1/ZZNElzUK8aaHRTULarEkiK/HgGlJtGVSzmZqWeHDUhoW32gnB2eDI3EAE5moVRDehF+PbFiZuIFm9X7PrFT57901U0WjU3yVt5yx479bzg6khoQO+bQMH+q6KTzQd4USKwVRXGezVIxPAGfy5U/pcNUIMsyl9N0wA7ypCE1TAENtNysQg96hKnVFyUTHidBhECwOr07CLoa3jC5VPJE3qtF0B9l3AC3372ZJZx+B3mBYfQHk6NzbmcNrO+sc5E9NJiYo/V1bvaTuawDoMu6zdnNZi0lXyE3tScPv7Xl1Js/EubrZlEEj5YUwBoeN9LyZBusJShIjvB+eAHzRK1uAlSwHZBpcxOg4u+angkREgp8PsVyGHDqd/7KR0lk/iyQK+xDqeETF7Bg3ObuP/4yzdLL8b22WKBvxsWJLKA5fw/Ru6S8qvkKvxiC0MhmHht+UsBh/CnY6+G+lRrzr4xFTd3nk51mMoN3CQsv0TxhLylcohZQ7MlR6UCJWFzy7/77A1aPGYRGO356+6I4Ve6Kvm3lM4AY3cwipjeSCNBLKSpuXKTP3CVBuvzBDzOE+GV454o7ttCI8TkPEbBlz21A+PFZlVRYy4hLAcck4qO/y/O8Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(7916004)(376002)(346002)(366004)(396003)(39860400002)(136003)(38100700002)(66556008)(66946007)(66446008)(4326008)(64756008)(8676002)(76116006)(82960400001)(66476007)(122000001)(38070700005)(91956017)(6506007)(1076003)(186003)(26005)(6486002)(83380400001)(478600001)(71200400001)(9686003)(41300700001)(316002)(2906002)(6916009)(86362001)(6512007)(54906003)(8936002)(33716001)(4744005)(5660300002)(44832011);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?uq/XXnywr5q7KM1/IRdMGxn9BZEbSkUEvExcYJolJZYL/d4AljiNYYwtWEd0?=
+ =?us-ascii?Q?R4WbwM6F6VZrULKxhiw4WiaU5+5MYcLFLNEQG7i9lXMvk8C9ebfXXPHVocpj?=
+ =?us-ascii?Q?oHhFxDHer9Gr+Ad4A/K+6AEUAaDVJJMsIUz6GwqFzzTzZFlxYJ8g7a+tht4b?=
+ =?us-ascii?Q?uZ571ta9WhMTzRRndAZNZYM4TEk39nCH+i5/TXV7ASXbD7wJZz8F1KxFFFo5?=
+ =?us-ascii?Q?33NwDjm4OKtlwRYaXt0ZOgCJkTSs1fAfk+xgti/uz/Wgv8/K992q98APMGcE?=
+ =?us-ascii?Q?BA9TVnFVHHTi17pB25FQg3oYUGQQS9SbEpFjQCckFYE90afTHa6UoqNXgMjI?=
+ =?us-ascii?Q?1Upzr8RJQpHm6u14iQcvqLyG8pqsAn3yBgC8R19pEefUgvSiiLq88ZpxqjXo?=
+ =?us-ascii?Q?ac/ci2ku2DSeA91MDXOg4kRn7oGOM1mGIRK5fd2elc9xpPhZ8H+ITRksjREX?=
+ =?us-ascii?Q?tKygETZtj/eVgiOzZ9X8a6jYADNdJxIr2CzHFgGzD7GNzpACBlNrXq7AF9t9?=
+ =?us-ascii?Q?QUfL3FKW72HsZw438bYz45Pb2s8bnVYIY9XrY1yN4VRimVskJ7Y3syAQEQGE?=
+ =?us-ascii?Q?CTIrEVVY/5Gnz7pO98jkl2ovdrOUF13GzgHvPww+CG+7dD8GXKXb62NLOhsz?=
+ =?us-ascii?Q?sIMhgBngZeihCxi/FgPePA063NA6oUZS0gPRLaOVTW6SKZnQHs4P4L276Kzg?=
+ =?us-ascii?Q?hY3XRkeoSSvauzu1Gn0xNshdYrpwvW/BMuvWoBuuYba617a5F2J9ZJHWUS9j?=
+ =?us-ascii?Q?+CUg6Apw4mYb0PqaTujC4kE6yWVB6pU/jCiJXD9MMQYhAnoTXX6jrc+oHuJl?=
+ =?us-ascii?Q?O6i1CvqDvMzsGJxrbpxNywJQXT5u2JHmel+/SDmyoKTZ0aY2qSlxccUt3FCi?=
+ =?us-ascii?Q?HQ/JlHWJznlMxDTg/TTKeaGvx3HkbbaaeorWv4K5ivaP+Et20bCbFo+iyT0C?=
+ =?us-ascii?Q?kj8sHObbMNGS+2hy7MdOVnmWnvWNy3+3+WSnzlco3tpN/7DMgiTVC0oL3m5k?=
+ =?us-ascii?Q?NCGpW9S3xh+wnN0YjKlynLnIC6eixEdQdOZD/2OI6XSQO8X2svWPpIwJPSKS?=
+ =?us-ascii?Q?t8gZy7T072B0RmHKsffI8/YAzBe2kGK8j69KBDm3po+5qKgFw26XKPgU+c39?=
+ =?us-ascii?Q?eLK2IwNRUwcj2JgarMtbjbKw6Wx9HIfyoYRrw2YhBEk72NmZyE6YxAZqoxhu?=
+ =?us-ascii?Q?eDVhAI7Lu5MqYJG+4PnC5HSrn7dhaX/hUnFvljDfZ+WikbyLtGi8pE6VxkB5?=
+ =?us-ascii?Q?HV7v+IdV9LLexDdIRO/C0Vx/4OHlVpUim2qhEQd33B63OOJAYajIHNpQ7C4L?=
+ =?us-ascii?Q?GKneoC4cVJTTSdF3e9yw62B7rh2wiwZtPE8HfflnuHK9/aNWAr6mQ1RjqxSQ?=
+ =?us-ascii?Q?6/VSnqSJowFPI7nI4FFh8gVMf/OWEaaBkScHQodAyaSNep4Dny3UdNKbuyI1?=
+ =?us-ascii?Q?uGbxMSnISoqW5o+e8g5+cnh8iIz8xAM7umJzp66DQ8S3nIaqK8qDFC1prXEw?=
+ =?us-ascii?Q?vS1Z/QsjogfpGan2y5m+/QHjpONzyuyaKaXiQ/aTJHtD29fuHAnR1kKIaq2i?=
+ =?us-ascii?Q?xgKXr8mbwCKHov44NVCArQwOf+TpHvixdNBZbLFUSpe0TruWl59k8Pc10xfS?=
+ =?us-ascii?Q?K/8X65JqXvqxQQsOl/R39VM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <54EC33B1239BDD44B213E1D8ECD9D670@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4177b4fa-919c-4dfa-0ee4-08da8b07f176
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4583:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xWsdieSEkCNlw6X9Yi+FSt7oZEGAYsVVqxfcBmQDoF7X4xVBaVnfM6x4LTVpKAT/sJ/hjJwfynmp1NI8LyCJgk1GQ/8k/PMPItApg87SMODymjeNJ/SbZEleEG2by09acv1Egw2LJ4WaEzAvVw8YQgriyRfeYN1/P2vEgFYjYmQEvZPmHfYevJD8a5DmZ2QKp6cl2lZD1gMiKHc2ZQycP6kFHpV3lkWUTD+xZmyc5ac03D84EvtGU820xyJQRr8wmwR7hdnGRFZinBjsAf8Hng8SnAUa8CnQ3twlFv4Qmyjv34oQEnl5pZ5HrkuexjWZOwPX1STOjC/hDxLePj1mTZeHYv2DjoMggd5LPg3AxMzpeVTGku3McbvIqNaBqnr5XsolcOXI8pspGzb3LrfhLVi80W4yfHFJcvXPjVUo6NGmhgZrx4pQA+2e31+/pUQwdNF+g1ry97gbi2kEQEtnNspjqonHO+Sk+vs4r6ixiW4GfYuJQZx35Phw5ITLxXYrgMIdjN0L7ik7dxXajNKj+jd2NzvKBHSwD399Phhw0yIbUQ8xXRaAut3o11Vky282BtlJ4hKQ2vScAf1Xn7MKF5pMvKEPEOzVaxOW46s4b/u6hJUYl4tGprVBOTHABlU4nPzz3dDz2P6rMr4kdh1/2XneqX7pvnGs7M2Hujz7xZYOtQjtLXlRk2j+Oru+3+xEPHbgXlVPqOKn58g7ky5sdYn7/AOTxTKZq032Eb1FPxYmx8mbRd4SaIgxrzIPQeJSt5s82U+qDPQtEJuOnd9VuYG82BqctoZKdzvCaT97hks=
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(346002)(136003)(376002)(36840700001)(40470700004)(46966006)(41300700001)(40460700003)(107886003)(6666004)(82310400005)(36756003)(2906002)(4326008)(8676002)(26005)(316002)(6916009)(54906003)(478600001)(40480700001)(82740400003)(356005)(81166007)(426003)(336012)(47076005)(186003)(2616005)(86362001)(70586007)(36860700001)(8936002)(1076003)(5660300002)(7416002)(83380400001)(70206006)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2022 04:19:05.7018
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: de91393f-aa5c-4436-1dd3-08da8b0da081
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2022 04:59:46.9373
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4177b4fa-919c-4dfa-0ee4-08da8b07f176
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT090.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4583
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ozcmSWsQBmWdQmCnR2JsUCJJCSodlWpIk1i4JmyZNeLdQmf75THPyRuyCf6XyN1RZBfsbpAaYjm8OebWJeEkq36LJbGtyLDj+EmepAV9QAU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0874
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Convert the fuse filesystem to use pin_user_pages_fast() and
-unpin_user_page(), instead of get_user_pages_fast() and put_page().
+On Aug 30, 2022 / 16:26, Sagi Grimberg wrote:
 
-The user of pin_user_pages_fast() depends upon:
+[...]
 
-1) CONFIG_BLK_USE_PIN_USER_PAGES_FOR_DIO, and
+> > Unfortunately, your patch does not avoid the failure after the recent c=
+ommit
+> > 06a0ba866d90 ("common/rc: avoid module load in _have_driver()"). As the=
+ commit
+> > title says, _have_driver no longer has the side-effect to leave the dh_=
+generic
+> > module loaded. Instead, I suggest to load dh_generic in the test() func=
+tion:
+> >=20
+> > diff --git a/tests/nvme/043 b/tests/nvme/043
+> > index 381ae75..dbe9d3f 100755
+> > --- a/tests/nvme/043
+> > +++ b/tests/nvme/043
+> > @@ -40,6 +40,8 @@ test() {
+> >=20
+> >          _setup_nvmet
+> >=20
+> > +       modprobe -q dh_generic
+> > +
+> >          truncate -s 512M "${file_path}"
+> >=20
+> >          _create_nvmet_subsystem "${subsys_name}" "${file_path}"
+> > @@ -88,5 +90,7 @@ test() {
+> >=20
+> >          rm "${file_path}"
+> >=20
+> > +       modprobe -qr dh_generic
+> > +
+> >          echo "Test complete"
+> >   }
+> >=20
+>=20
+> That's fine with me, can you prepare an alternative patch for it?
 
-2) User-space-backed pages or ITER_BVEC pages.
+Sure, will post it soon.
 
-Signed-off-by: John Hubbard <jhubbard@nvidia.com>
----
- fs/fuse/dev.c    | 11 +++++++++--
- fs/fuse/file.c   | 32 +++++++++++++++++++++-----------
- fs/fuse/fuse_i.h |  1 +
- 3 files changed, 31 insertions(+), 13 deletions(-)
-
-diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
-index 51897427a534..5de98a7a45b1 100644
---- a/fs/fuse/dev.c
-+++ b/fs/fuse/dev.c
-@@ -675,7 +675,12 @@ static void fuse_copy_finish(struct fuse_copy_state *cs)
- 			flush_dcache_page(cs->pg);
- 			set_page_dirty_lock(cs->pg);
- 		}
--		put_page(cs->pg);
-+		if (!cs->pipebufs &&
-+		    (user_backed_iter(cs->iter) || iov_iter_is_bvec(cs->iter)))
-+			dio_w_unpin_user_page(cs->pg);
-+
-+		else
-+			put_page(cs->pg);
- 	}
- 	cs->pg = NULL;
- }
-@@ -730,7 +735,9 @@ static int fuse_copy_fill(struct fuse_copy_state *cs)
- 		}
- 	} else {
- 		size_t off;
--		err = iov_iter_get_pages2(cs->iter, &page, PAGE_SIZE, 1, &off);
-+
-+		err = dio_w_iov_iter_pin_pages(cs->iter, &page, PAGE_SIZE, 1,
-+					       &off);
- 		if (err < 0)
- 			return err;
- 		BUG_ON(!err);
-diff --git a/fs/fuse/file.c b/fs/fuse/file.c
-index 1a3afd469e3a..01da38928d0b 100644
---- a/fs/fuse/file.c
-+++ b/fs/fuse/file.c
-@@ -625,14 +625,19 @@ void fuse_read_args_fill(struct fuse_io_args *ia, struct file *file, loff_t pos,
- }
- 
- static void fuse_release_user_pages(struct fuse_args_pages *ap,
--				    bool should_dirty)
-+				    bool should_dirty, bool is_user_or_bvec)
- {
- 	unsigned int i;
- 
--	for (i = 0; i < ap->num_pages; i++) {
--		if (should_dirty)
--			set_page_dirty_lock(ap->pages[i]);
--		put_page(ap->pages[i]);
-+	if (is_user_or_bvec) {
-+		dio_w_unpin_user_pages_dirty_lock(ap->pages, ap->num_pages,
-+						  should_dirty);
-+	} else {
-+		for (i = 0; i < ap->num_pages; i++) {
-+			if (should_dirty)
-+				set_page_dirty_lock(ap->pages[i]);
-+			put_page(ap->pages[i]);
-+		}
- 	}
- }
- 
-@@ -733,7 +738,7 @@ static void fuse_aio_complete_req(struct fuse_mount *fm, struct fuse_args *args,
- 	struct fuse_io_priv *io = ia->io;
- 	ssize_t pos = -1;
- 
--	fuse_release_user_pages(&ia->ap, io->should_dirty);
-+	fuse_release_user_pages(&ia->ap, io->should_dirty, io->is_user_or_bvec);
- 
- 	if (err) {
- 		/* Nothing */
-@@ -1414,10 +1419,10 @@ static int fuse_get_user_pages(struct fuse_args_pages *ap, struct iov_iter *ii,
- 	while (nbytes < *nbytesp && ap->num_pages < max_pages) {
- 		unsigned npages;
- 		size_t start;
--		ret = iov_iter_get_pages2(ii, &ap->pages[ap->num_pages],
--					*nbytesp - nbytes,
--					max_pages - ap->num_pages,
--					&start);
-+		ret = dio_w_iov_iter_pin_pages(ii, &ap->pages[ap->num_pages],
-+					       *nbytesp - nbytes,
-+					       max_pages - ap->num_pages,
-+					       &start);
- 		if (ret < 0)
- 			break;
- 
-@@ -1483,6 +1488,10 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
- 		fl_owner_t owner = current->files;
- 		size_t nbytes = min(count, nmax);
- 
-+		/* For use in fuse_release_user_pages(): */
-+		io->is_user_or_bvec = user_backed_iter(iter) ||
-+				      iov_iter_is_bvec(iter);
-+
- 		err = fuse_get_user_pages(&ia->ap, iter, &nbytes, write,
- 					  max_pages);
- 		if (err && !nbytes)
-@@ -1498,7 +1507,8 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
- 		}
- 
- 		if (!io->async || nres < 0) {
--			fuse_release_user_pages(&ia->ap, io->should_dirty);
-+			fuse_release_user_pages(&ia->ap, io->should_dirty,
-+						io->is_user_or_bvec);
- 			fuse_io_free(ia);
- 		}
- 		ia = NULL;
-diff --git a/fs/fuse/fuse_i.h b/fs/fuse/fuse_i.h
-index 488b460e046f..6ee7f72e29eb 100644
---- a/fs/fuse/fuse_i.h
-+++ b/fs/fuse/fuse_i.h
-@@ -290,6 +290,7 @@ struct fuse_io_priv {
- 	struct kiocb *iocb;
- 	struct completion *done;
- 	bool blocking;
-+	bool is_user_or_bvec;
- };
- 
- #define FUSE_IO_PRIV_SYNC(i) \
--- 
-2.37.2
-
+--=20
+Shin'ichiro Kawasaki=
