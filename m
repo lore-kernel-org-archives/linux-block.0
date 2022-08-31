@@ -2,215 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2BEECAAD4
-	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 15:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB29ECAAD4
+	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 16:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230181AbiHaPy6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 11:54:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38416 "EHLO
+        id S231726AbiHaQRz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 12:17:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231419AbiHaPyn (ORCPT
+        with ESMTP id S231755AbiHaQRu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 11:54:43 -0400
-Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C98E1AB4FE;
-        Wed, 31 Aug 2022 08:54:41 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VNrdoMu_1661961264;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VNrdoMu_1661961264)
-          by smtp.aliyun-inc.com;
-          Wed, 31 Aug 2022 23:54:37 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     ming.lei@redhat.com, axboe@kernel.dk
-Cc:     xiaoguang.wang@linux.alibaba.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [RFC PATCH V2 6/6] ublk_drv: add START_USER_RECOVERY and END_USER_RECOVERY support
-Date:   Wed, 31 Aug 2022 23:51:36 +0800
-Message-Id: <20220831155136.23434-7-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220831155136.23434-1-ZiyangZhang@linux.alibaba.com>
-References: <20220831155136.23434-1-ZiyangZhang@linux.alibaba.com>
+        Wed, 31 Aug 2022 12:17:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE3D4D4F72;
+        Wed, 31 Aug 2022 09:17:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7E0B261958;
+        Wed, 31 Aug 2022 16:17:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6D7C433C1;
+        Wed, 31 Aug 2022 16:17:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661962665;
+        bh=2d72f6ZKuMN8oZ4S4xSp9+IUsC77vGcpoLIrln4q3HU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=E/zoiqW0CXelaAIpNPabokQCPHML9pmxsjeAaHpoc9tiVZd3jKRKxr3yRVOv3bryn
+         hNfAGxDcQNLx8hEjr6PAQ4zNzsm3c/5cQzfFC4uA11MqzX1+0NVaiXDOr9w1Gs9/mL
+         9qBI+Gr6m5KH69e0y4pZO4t45IGF5h60K2INVzu8tKEhmmU/s6hqXjscz0RIkbmWjU
+         Up8lUA3GpjduwLZq0rpelh2qn2byGkKceUj2HxerzNgQZ/h/mvBF6LgoAGF2tZVcDd
+         KTMiaTHLWBorZxCuRnJc0tVviqiDEEsgwZZUNTuAx6m3GdYcpp9fKnKKoWu02gihcr
+         ANFoxeRDrjaWw==
+From:   SeongJae Park <sj@kernel.org>
+To:     Pratyush Yadav <ptyadav@amazon.de>
+Cc:     SeongJae Park <sj@kernel.org>, jgross@suse.com,
+        roger.pau@citrix.com, marmarek@invisiblethingslab.com,
+        mheyne@amazon.de, xen-devel@lists.xenproject.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] xen-blkback: Advertise feature-persistent as user requested
+Date:   Wed, 31 Aug 2022 16:17:43 +0000
+Message-Id: <20220831161743.93872-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220831153259.fzdkgbi76hmxa67a@yadavpratyush.com>
+References: 
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-START_USER_RECOVERY and END_USER_RECOVERY are two new control commands
-to support user recovery feature.
+Hi Pratyush,
 
-After a crash, user should send START_USER_RECOVERY, it will:
-(1) check if (a)current ublk_device is UBLK_S_DEV_RECOVERING which was
-    set by monitor_work and (b)the file struct is released. We always
-	expect crash of the ublksrv 'process', not exit of a single
-	ubq_daemon 'pthread'.
-(2) reinit all ubqs, including:
-    (a) put the dying task(thread) and reset ->ubq_daemon to NULL.
-    (b) reset all ublk_io.
-(3) reset ub->mm to NULL.
+On Wed, 31 Aug 2022 15:47:50 +0000 Pratyush Yadav <ptyadav@amazon.de> wrote:
 
-Then, user should start a new 'process' and send FETCH_REQ on each
-ubq_daemon.
+> Hi,
+> 
+> On 25/08/22 04:15PM, SeongJae Park wrote:
+> > Commit e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter
+> > when connect") made blkback to advertise its support of the persistent
+> > grants feature only if the user sets the 'feature_persistent' parameter
+> > of the driver and the frontend advertised its support of the feature.
+> > However, following commit 402c43ea6b34 ("xen-blkfront: Apply
+> > 'feature_persistent' parameter when connect") made the blkfront to work
+> > in the same way.  That is, blkfront also advertises its support of the
+> > persistent grants feature only if the user sets the 'feature_persistent'
+> > parameter of the driver and the backend advertised its support of the
+> > feature.
+> > 
+> > Hence blkback and blkfront will never advertise their support of the
+> > feature but wait until the other advertises the support, even though
+> > users set the 'feature_persistent' parameters of the drivers.  As a
+> > result, the persistent grants feature is disabled always regardless of
+> > the 'feature_persistent' values[1].
+> > 
+> > The problem comes from the misuse of the semantic of the advertisement
+> > of the feature.  The advertisement of the feature should means only
+> > availability of the feature not the decision for using the feature.
+> > However, current behavior is working in the wrong way.
+> > 
+> > This commit fixes the issue by making the blkback advertises its support
+> > of the feature as user requested via 'feature_persistent' parameter
+> > regardless of the otherend's support of the feature.
+> > 
+> > [1] https://lore.kernel.org/xen-devel/bd818aba-4857-bc07-dc8a-e9b2f8c5f7cd@suse.com/
+> > 
+> > Fixes: e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter when connect")
+> > Cc: <stable@vger.kernel.org> # 5.10.x
+> > Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+> > Suggested-by: Juergen Gross <jgross@suse.com>
+> > Signed-off-by: SeongJae Park <sj@kernel.org>
+> > ---
+> >  drivers/block/xen-blkback/common.h | 3 +++
+> >  drivers/block/xen-blkback/xenbus.c | 6 ++++--
+> >  2 files changed, 7 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+> > index bda5c815e441..a28473470e66 100644
+> > --- a/drivers/block/xen-blkback/common.h
+> > +++ b/drivers/block/xen-blkback/common.h
+> > @@ -226,6 +226,9 @@ struct xen_vbd {
+> >  	sector_t		size;
+> >  	unsigned int		flush_support:1;
+> >  	unsigned int		discard_secure:1;
+> > +	/* Connect-time cached feature_persistent parameter value */
+> > +	unsigned int		feature_gnt_persistent_parm:1;
+> > +	/* Persistent grants feature negotiation result */
+> >  	unsigned int		feature_gnt_persistent:1;
+> >  	unsigned int		overflow_max_grants:1;
+> >  };
+> > diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> > index ee7ad2fb432d..c0227dfa4688 100644
+> > --- a/drivers/block/xen-blkback/xenbus.c
+> > +++ b/drivers/block/xen-blkback/xenbus.c
+> > @@ -907,7 +907,7 @@ static void connect(struct backend_info *be)
+> >  	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
+> >  
+> >  	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+> > -			be->blkif->vbd.feature_gnt_persistent);
+> > +			be->blkif->vbd.feature_gnt_persistent_parm);
+> >  	if (err) {
+> >  		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
+> >  				 dev->nodename);
+> > @@ -1085,7 +1085,9 @@ static int connect_ring(struct backend_info *be)
+> >  		return -ENOSYS;
+> >  	}
+> >  
+> > -	blkif->vbd.feature_gnt_persistent = feature_persistent &&
+> > +	blkif->vbd.feature_gnt_persistent_parm = feature_persistent;
+> 
+> If feature_gnt_persistent_parm is always going to be equal to 
+> feature_persistent, then why introduce it at all? Why not just use 
+> feature_persistent directly? This way you avoid adding an extra flag 
+> whose purpose is not immediately clear, and you also avoid all the mess 
+> with setting this flag at the right time.
 
-Finally, user should send END_USER_RECOVERY, it will:
-(1) wait for all new ubq_daemons getting ready.
-(2) unquiesce the request queue and expect incoming ublk_queue_rq()
-(3) convert state to UBLK_S_DEV_LIVE
-(4) schedule monitor_work again
+Mainly because the parameter should read twice (once for advertisement, and
+once later just before the negotitation, for checking if we advertised or not),
+and the user might change the parameter value between the two reads.
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- drivers/block/ublk_drv.c | 130 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+For the detailed available sequence of the race, you could refer to the prior
+conversation[1].
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 0e185d1fa2c4..2d1f3e032606 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -1964,6 +1964,130 @@ static int ublk_ctrl_set_params(struct io_uring_cmd *cmd)
- 	return ret;
- }
- 
-+static void ublk_queue_start_recovery(struct ublk_device *ub, struct ublk_queue *ubq)
-+{
-+	int i;
-+
-+	/* All old ioucmds have to be completed/canceled by io_uring_cmd_done(). */
-+	WARN_ON_ONCE(ubq->nr_io_ready);
-+
-+	/* old daemon is PF_EXITING, put it now */
-+	put_task_struct(ubq->ubq_daemon);
-+	/* have to set it to NULL, otherwise ub won't accept new FETCH_REQ */
-+	ubq->ubq_daemon = NULL;
-+
-+	for (i = 0; i < ubq->q_depth; i++) {
-+		struct ublk_io *io = &ubq->ios[i];
-+
-+		/* forget everything now and be ready for new FETCH_REQ */
-+		io->flags = 0;
-+		io->cmd = NULL;
-+		io->addr = 0;
-+	}
-+}
-+
-+static int ublk_ctrl_start_recovery(struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	struct ublk_device *ub;
-+	int ret = -EINVAL;
-+	int i;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return ret;
-+
-+	mutex_lock(&ub->mutex);
-+
-+	if (!ublk_can_use_recovery(ub))
-+		goto out_unlock;
-+
-+	/*
-+	 * START_RECOVERY is only allowd after:
-+	 *
-+	 * (1) UB_STATE_OPEN is not set, which means the dying process is exited
-+	 *     and related io_uring ctx is freed so file struct of /dev/ublkcX is
-+	 *     released.
-+	 *
-+	 * (2) UBLK_S_DEV_RECOVERING is set, which means the monitor_work:
-+	 *     (a)has requeued all inflight rqs whose io_flags is ACTIVE
-+	 *     (b)has requeued/aborted all inflight rqs whose io_flags is NOT ACTIVE
-+	 *     (c)has completed/camceled all ioucmds owned by ther dying process
-+	 */
-+	if (test_bit(UB_STATE_OPEN, &ub->state) ||
-+			ub->dev_info.state != UBLK_S_DEV_RECOVERING) {
-+		ret = -EBUSY;
-+		goto out_unlock;
-+	}
-+
-+	pr_devel("%s: start recovery for dev id %d.\n", __func__, header->dev_id);
-+
-+	for (i = 0; i < ub->dev_info.nr_hw_queues; i++) {
-+		struct ublk_queue *ubq = ublk_get_queue(ub, i);
-+
-+		WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq)));
-+		pr_devel("%s: prepare for recovering qid %d\n", __func__, ubq->q_id);
-+		ublk_queue_start_recovery(ub, ubq);
-+	}
-+
-+	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
-+	ub->mm = NULL;
-+	ub->nr_queues_ready = 0;
-+	init_completion(&ub->completion);
-+	ret = 0;
-+
-+ out_unlock:
-+	mutex_unlock(&ub->mutex);
-+	ublk_put_device(ub);
-+	return ret;
-+}
-+
-+static int ublk_ctrl_end_recovery(struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	int ublksrv_pid = (int)header->data[0];
-+	struct ublk_device *ub;
-+	int ret = -EINVAL;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return ret;
-+
-+	pr_devel("%s: Waiting for new ubq_daemon is ready, dev id %d...\n",
-+			__func__, header->dev_id);
-+	/* wait until new ubq_daemon sending all FETCH_REQ */
-+	wait_for_completion_interruptible(&ub->completion);
-+	pr_devel("%s: All new ubq_daemon is ready, dev id %d\n",
-+			__func__, header->dev_id);
-+
-+	mutex_lock(&ub->mutex);
-+
-+	if (!ublk_can_use_recovery(ub))
-+		goto out_unlock;
-+
-+	/* monitor_work should set UBLK_S_DEV_RECOVERING */
-+	if (ub->dev_info.state != UBLK_S_DEV_RECOVERING) {
-+		ret = -EBUSY;
-+		goto out_unlock;
-+	}
-+	ub->dev_info.ublksrv_pid = ublksrv_pid;
-+	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
-+			__func__, ublksrv_pid, header->dev_id);
-+	blk_mq_unquiesce_queue(ub->ub_disk->queue);
-+	pr_devel("%s: queue unquiesced, dev id %d.\n",
-+			__func__, header->dev_id);
-+
-+	ub->dev_info.state = UBLK_S_DEV_LIVE;
-+	schedule_delayed_work(&ub->monitor_work, UBLK_DAEMON_MONITOR_PERIOD);
-+	/* We are good to redo requests now */
-+	blk_mq_kick_requeue_list(ub->ub_disk->queue);
-+	ret = 0;
-+ out_unlock:
-+	mutex_unlock(&ub->mutex);
-+	ublk_put_device(ub);
-+	return ret;
-+}
-+
- static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
-@@ -2005,6 +2129,12 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_CMD_SET_PARAMS:
- 		ret = ublk_ctrl_set_params(cmd);
- 		break;
-+	case UBLK_CMD_START_USER_RECOVERY:
-+		ret = ublk_ctrl_start_recovery(cmd);
-+		break;
-+	case UBLK_CMD_END_USER_RECOVERY:
-+		ret = ublk_ctrl_end_recovery(cmd);
-+		break;
- 	default:
- 		break;
- 	}
--- 
-2.27.0
+[1] https://lore.kernel.org/linux-block/20200922111259.GJ19254@Air-de-Roger/
 
+
+Thanks,
+SJ
+
+> 
+> > +	blkif->vbd.feature_gnt_persistent =
+> > +		blkif->vbd.feature_gnt_persistent_parm &&
+> >  		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
+> >  
+> >  	blkif->vbd.overflow_max_grants = 0;
+> > -- 
+> > 2.25.1
+> > 
+> > 
+> 
