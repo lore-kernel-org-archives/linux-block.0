@@ -2,148 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3342BECAAD4
-	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 20:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED48DECAAD4
+	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 21:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbiHaUAT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 16:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50934 "EHLO
+        id S232266AbiHaV3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 17:29:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231231AbiHaUAR (ORCPT
+        with ESMTP id S232329AbiHaV3o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 16:00:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F35C7B7B7
-        for <linux-block@vger.kernel.org>; Wed, 31 Aug 2022 13:00:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661976015;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NZSBGjtmVjGMgM+CxXs9jtX0UzV7LjjMgYj58UR9vM0=;
-        b=eq0ZxQpRDQ2nes7hwsxECBxbajC4+a24iEWDZYFBUL1cgjHLOlsAlbJGfm9s380XUXtqNr
-        gO33Gdw0SdRXF4HsSBBdMiw/V94ezqeenL39DsmxjPReh6n5ygp0q8w8pFiVM6j3+Vx4E5
-        tj8B0i6dBvRHgZBWzsYdTw0DREN873w=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-255-mvcKhCd7Memq8jXq-lDU4w-1; Wed, 31 Aug 2022 16:00:09 -0400
-X-MC-Unique: mvcKhCd7Memq8jXq-lDU4w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 31 Aug 2022 17:29:44 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29FC0BCB4;
+        Wed, 31 Aug 2022 14:19:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F04A9964082;
-        Wed, 31 Aug 2022 20:00:08 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.75])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 40B702166B2A;
-        Wed, 31 Aug 2022 20:00:07 +0000 (UTC)
-Date:   Wed, 31 Aug 2022 16:00:06 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "Richard W . M . Jones" <rjones@redhat.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Subject: Re: [PATCH] Docs: ublk: add ublk document
-Message-ID: <Yw+9xkKx6cgeiSyN@fedora>
-References: <20220828045003.537131-1-ming.lei@redhat.com>
- <Yw4rcz23R3ofn6H6@fedora>
- <e9df4ed8-a0ea-661f-9947-b18fa1d2145f@linux.alibaba.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 73318B82371;
+        Wed, 31 Aug 2022 21:19:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8826FC433D6;
+        Wed, 31 Aug 2022 21:19:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661980793;
+        bh=EuFVtF27UHzZ95m2iAVZr88pBg2NFFrI0iNLOelRyrg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Wljct3mBAodbROj8O/9kcBwlEJPrCw4g2YpmVaVswGofxdOZBYvrIE8+6eh9YfBir
+         klg/v3l7dfsHdTX/SQxogCaudW9U6u7Wz+t1mLOORCl8zws8d83jAwrHCCgFVtw+X0
+         +MIS81RaFP9pSm2aLQVGY1p5T8j/tr8Yu3ob9Tkj5O+2h8lSEX6jzIYeIknePODM2x
+         zXXQak7U22takWnvrBDyCc2LOBM6JxjOEi98IUOj5EBTrxZgddGU0lVtKQwNxHlrzG
+         VZVwDYklnwrT8kqS+2ziWX65x4wuzl5efs6oClsQnV+pbWPGo0XPFuGaJBfCtgiRk5
+         zpw1BC5hLlrAQ==
+Date:   Wed, 31 Aug 2022 15:19:49 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Kernel Team <Kernel-team@fb.com>
+Subject: Re: [PATCHv3 0/7] dma mapping optimisations
+Message-ID: <Yw/Qdf+280vZSYU4@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220805162444.3985535-1-kbusch@fb.com>
+ <20220809064613.GA9040@lst.de>
+ <YvKPTGf56v/3iSxg@kbusch-mbp.dhcp.thefacebook.com>
+ <20220809184137.GB15107@lst.de>
+ <YvPzUSx87VkwSH2C@kbusch-mbp.dhcp.thefacebook.com>
+ <20220811072232.GA13803@lst.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="cC3A+mjn3pxIXJxb"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e9df4ed8-a0ea-661f-9947-b18fa1d2145f@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+In-Reply-To: <20220811072232.GA13803@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Aug 11, 2022 at 09:22:32AM +0200, Christoph Hellwig wrote:
+> On Wed, Aug 10, 2022 at 12:05:05PM -0600, Keith Busch wrote:
+> > The functions are implemented under 'include/linux/', indistinguishable from
+> > exported APIs. I think I understand why they are there, but they look the same
+> > as exported functions from a driver perspective.
+> 
+> swiotlb.h is not a driver API.  There's two leftovers used by the drm
+> code I'm trying to get fixed up, but in general the DMA API is the
+> interface and swiotlb is just an implementation detail.
+> 
+> > Perhaps I'm being daft, but I'm totally missing why I should care if swiotlb
+> > leverages this feature. If you're using that, you've traded performance for
+> > security or compatibility already. If this idea can be used to make it perform
+> > better, then great, but that shouldn't be the reason to hold this up IMO.
+> 
+> We firstly need to make sure that everything actually works on swiotlb, or
+> any other implementation that properly implements the DMA API.
+> 
+> And the fact that I/O performance currently sucks and we can fix it on
+> the trusted hypervisor is an important consideration.  At least as
+> importantant as micro-optimizing performance a little more on setups
+> not using them.  So not taking care of both in one go seems rather silly
+> for a feature that is in its current form pretty intrusive and thus needs
+> a really good justification.
 
---cC3A+mjn3pxIXJxb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry for the delay response; I had some trouble with test setup.
 
-On Wed, Aug 31, 2022 at 02:31:12PM +0800, Ziyang Zhang wrote:
-> On 2022/8/30 23:23, Stefan Hajnoczi wrote:
-> > On Sun, Aug 28, 2022 at 12:50:03PM +0800, Ming Lei wrote:
-> >> +- UBLK_IO_NEED_GET_DATA
-> >> +  ublksrv pre-allocates IO buffer for each IO at default, any new pro=
-ject
-> >> +  should use this IO buffer to communicate with ublk driver. But exis=
-ted
-> >> +  project may not work or be changed to in this way, so add this comm=
-and
-> >> +  to provide chance for userspace to use its existed buffer for handl=
-ing
-> >> +  IO.
-> >=20
-> > I find it hard to understand this paragraph. It seems the
-> > UBLK_IO_NEED_GET_DATA command allows userspace to set up something
-> > related to IO buffers. What exactly does this command do?
->=20
-> Let me explain UBLK_IO_NEED_GET_DATA since it is designed by myself.
->=20
-> Without UBLK_IO_NEED_GET_DATA, ublk_drv will copy data from biovecs
-> into a pre-allocated buffer(addr is passed with the last COMMIT_AMD_FETCH=
- ioucmd)
-> while processing a WRITE request. Please consider two cases:
->=20
-> (1)  if the backend(such as a dist-storage system using RPC) provides the=
- data
->      buffer, it has to provide the buffer IN ADVANCE(before sending the l=
-ast
->      COMMIT_AMD_FETCH) without knowing any knowledge of this incoming req=
-uest.
->      This makes existing backend very hard to adapt to ublk because they =
-may
->      want to know the data length or other attributes of the new request.
->=20
-> (2) If the backend does not provide the data buffer IN ADVANCE, ublksrv m=
-ust
->     pre-allocates data buffer. So a additional data copy from ublksrv to
->     the backend(such as a RPC mempool) is unavoidable.
->=20
-> With UBLK_IO_NEED_GET_DATA, the WRITE request will be firstly issued to u=
-blksrv
-> without data copy. Then, backend gets the request and it can allocate data
-> buffer and embed its addr inside a new ioucmd. After the kernel driver ge=
-ts the
-> ioucmd, the data copy happens(from biovecs to backend's buffer). Finally,
-> the backend gets the request again with data to be written and it can tru=
-ly
-> handle the request.
+Okay, I will restart developing this with swiotlb in mind.
 
-Thanks for the explanation. Maybe it can be included in the
-documentation.
+In the mean time, I wanted to share some results with this series because I'm
+thinking this might be past the threshold for when we can drop the "micro-"
+prefix on optimisations.
 
-This reminds me of io_uring's IOSQE_BUFFER_SELECT where userspace
-provides the kernel with a buffer pool and the kernel selects buffers.
-It doesn't require an extra io_uring command roundtrip
-(UBLK_IO_NEED_GET_DATA).
+The most significant data points are these:
 
-Did you already look at IOSQE_BUFFER_SELECT and decide a similar
-approach won't work for your use case?
+  * submission latency stays the same regardless of the transfer size or depth
+  * IOPs is always equal or better (usually better) with up to 50% reduced
+    cpu cost
 
-Stefan
+Based on this, I do think this type of optimisation is worth having a something
+like a new bio type. I know this introduces some complications in the io-path,
+but it is pretty minimal and doesn't add any size penalties to common structs
+for drivers that don't use them.
 
---cC3A+mjn3pxIXJxb
-Content-Type: application/pgp-signature; name="signature.asc"
+Test details:
 
------BEGIN PGP SIGNATURE-----
+  fio with ioengine=io_uring
+    'none': using __user void*
+    'bvec': using buf registered with IORING_REGISTER_BUFFERS
+    'dma': using buf registered with IORING_REGISTER_MAP_BUFFERS (new)
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMPvcYACgkQnKSrs4Gr
-c8jgfgf/QEpkKMLMe8nPNb1uSxKF82wwizozhSZjPK3s/hWDuH8q26FDCmtJcCrD
-9vanvREyKgUcRxhsDDcly0ng0groWGNZEB1j2zvdmHE9AwizLoQIFcdmPXlNEcwu
-1i8L7m8pJIpQ+ED9eMBv0mfgRuXK5JqD5DteSvDF/vqfcgkBvFr14yaBdTyKm7UX
-Id+/jNhzEeIK/I5vQ5C5nuHQrHPF5M5Rlu9YPLiVKa5o/mjK8G5AoaZcA8Jn4KID
-t6BSWE8NUWTHWcThz1JH96d1MZhx3neF86WpBMhiSYMSnNFa1kXPUdxD3IKUh6tO
-oQErGxR8YERTSLYkOVOWOncTCmr5UA==
-=AVxB
------END PGP SIGNATURE-----
+  intel_iommu=on
 
---cC3A+mjn3pxIXJxb--
+Results:
+
+(submission latency [slat] in nano-seconds)
+Q-Depth 1:
+
+ Size |  Premap  |   IOPs  |  slat  | sys-cpu%
+ .....|..........|.........|........|.........
+ 4k   |    none  |  41.4k  |  2126  |   16.47%
+      |    bvec  |  43.8k  |  1843  |   15.79%
+      |     dma  |  46.8k  |  1504  |   14.94%
+ 16k  |    none  |  33.3k  |  3279  |   17.78%
+      |    bvec  |  33.9k  |  2607  |   14.59%
+      |     dma  |  40.2k  |  1490  |   12.57%
+ 64k  |    none  |  18.7k  |  6778  |   18.22%
+      |    bvec  |  20.0k  |  4626  |   13.80%
+      |     dma  |  22.6k  |  1586  |    7.58%
+
+Q-Depth 16:
+
+ Size |  Premap  |   IOPs  |  slat  | sys-cpu%
+ .....|..........|.........|........|.........
+ 4k   |    none  |   207k  |  3657  |   72.81%
+      |    bvec  |   219k  |  3369  |   71.55%
+      |     dma  |   310k  |  2237  |   60.16%
+ 16k  |    none  |   164k  |  5024  |   78.38%
+      |    bvec  |   177k  |  4553  |   76.29%
+      |     dma  |   186k  |  1880  |   43.56%
+ 64k  |    none  |  46.7k  |  4424  |   30.51%
+      |    bvec  |  46.7k  |  4389  |   29.42%
+      |     dma  |  46.7k  |  1574  |   15.61%
 
