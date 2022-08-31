@@ -2,82 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D5BFECAAD4
-	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 15:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB69ECAAD4
+	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 15:53:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232156AbiHaPw7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 11:52:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36194 "EHLO
+        id S231968AbiHaPxV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 11:53:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232078AbiHaPws (ORCPT
+        with ESMTP id S232126AbiHaPxI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 11:52:48 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F20AB4C7;
-        Wed, 31 Aug 2022 08:52:44 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VNrdnqz_1661961149;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VNrdnqz_1661961149)
-          by smtp.aliyun-inc.com;
-          Wed, 31 Aug 2022 23:52:41 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     ming.lei@redhat.com, axboe@kernel.dk
-Cc:     xiaoguang.wang@linux.alibaba.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [RFC PATCH V2 1/6] ublk_drv: check 'current' instead of 'ubq_daemon'
-Date:   Wed, 31 Aug 2022 23:51:31 +0800
-Message-Id: <20220831155136.23434-2-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220831155136.23434-1-ZiyangZhang@linux.alibaba.com>
-References: <20220831155136.23434-1-ZiyangZhang@linux.alibaba.com>
+        Wed, 31 Aug 2022 11:53:08 -0400
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99CA3AED89;
+        Wed, 31 Aug 2022 08:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1661961181; x=1693497181;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=vyta+/0lDuDRefxlgv1vkaHwbgOICyXw1l+oC05BEd8=;
+  b=mafclWGesZ3jvzZETYDcjf4bC8djX5xdvQtADiiwinehnSIOaHFjnWWZ
+   kL0FB0QgYZ/4JyASV4c37L0KekWDItM20Fdmcl3qDKPCVrzSH02NfqVcC
+   Jg73Ppls/v0U6UjP8rqEVSD9pZUNXXlTFbbDWVhnVzmZ7gLiHZsVKL0u1
+   c=;
+X-IronPort-AV: E=Sophos;i="5.93,278,1654560000"; 
+   d="scan'208";a="125407135"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 15:50:53 +0000
+Received: from EX13D08EUB002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1e-0bfdb89e.us-east-1.amazon.com (Postfix) with ESMTPS id C7B80E00BA;
+        Wed, 31 Aug 2022 15:50:49 +0000 (UTC)
+Received: from EX13MTAUWB001.ant.amazon.com (10.43.161.207) by
+ EX13D08EUB002.ant.amazon.com (10.43.166.232) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.38; Wed, 31 Aug 2022 15:50:48 +0000
+Received: from dev-dsk-ptyadav-1c-613f0921.eu-west-1.amazon.com (10.15.8.155)
+ by mail-relay.amazon.com (10.43.161.249) with Microsoft SMTP Server id
+ 15.0.1497.38 via Frontend Transport; Wed, 31 Aug 2022 15:50:47 +0000
+Received: by dev-dsk-ptyadav-1c-613f0921.eu-west-1.amazon.com (Postfix, from userid 23027615)
+        id 0804D25976; Wed, 31 Aug 2022 15:50:45 +0000 (UTC)
+Date:   Wed, 31 Aug 2022 15:50:45 +0000
+From:   Pratyush Yadav <ptyadav@amazon.de>
+To:     SeongJae Park <sj@kernel.org>
+CC:     <jgross@suse.com>, <roger.pau@citrix.com>,
+        <marmarek@invisiblethingslab.com>, <mheyne@amazon.de>,
+        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>
+Subject: Re: [PATCH 2/2] xen-blkfront: Advertise feature-persistent as user
+ requested
+Message-ID: <20220831155045.kxopdchlc67fmi5n@yadavpratyush.com>
+References: <20220825161511.94922-1-sj@kernel.org>
+ <20220825161511.94922-3-sj@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220825161511.94922-3-sj@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This check is not atomic. So with recovery feature, ubq_daemon may be
-modified simultaneously by recovery task. Instead, check 'current' is
-safe here because 'current' never changes.
+On 25/08/22 04:15PM, SeongJae Park wrote:
+> Commit e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter
+> when connect") made blkback to advertise its support of the persistent
+> grants feature only if the user sets the 'feature_persistent' parameter
+> of the driver and the frontend advertised its support of the feature.
+> However, following commit 402c43ea6b34 ("xen-blkfront: Apply
+> 'feature_persistent' parameter when connect") made the blkfront to work
+> in the same way.  That is, blkfront also advertises its support of the
+> persistent grants feature only if the user sets the 'feature_persistent'
+> parameter of the driver and the backend advertised its support of the
+> feature.
+> 
+> Hence blkback and blkfront will never advertise their support of the
+> feature but wait until the other advertises the support, even though
+> users set the 'feature_persistent' parameters of the drivers.  As a
+> result, the persistent grants feature is disabled always regardless of
+> the 'feature_persistent' values[1].
+> 
+> The problem comes from the misuse of the semantic of the advertisement
+> of the feature.  The advertisement of the feature should means only
+> availability of the feature not the decision for using the feature.
+> However, current behavior is working in the wrong way.
+> 
+> This commit fixes the issue by making the blkfront advertises its
+> support of the feature as user requested via 'feature_persistent'
+> parameter regardless of the otherend's support of the feature.
+> 
+> [1] https://lore.kernel.org/xen-devel/bd818aba-4857-bc07-dc8a-e9b2f8c5f7cd@suse.com/
+> 
+> Fixes: 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
+> Cc: <stable@vger.kernel.org> # 5.10.x
+> Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+> Suggested-by: Juergen Gross <jgross@suse.com>
+> Signed-off-by: SeongJae Park <sj@kernel.org>
+> ---
+>  drivers/block/xen-blkfront.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> index 8e56e69fb4c4..dfae08115450 100644
+> --- a/drivers/block/xen-blkfront.c
+> +++ b/drivers/block/xen-blkfront.c
+> @@ -213,6 +213,9 @@ struct blkfront_info
+>  	unsigned int feature_fua:1;
+>  	unsigned int feature_discard:1;
+>  	unsigned int feature_secdiscard:1;
+> +	/* Connect-time cached feature_persistent parameter */
+> +	unsigned int feature_persistent_parm:1;
+> +	/* Persistent grants feature negotiation result */
+>  	unsigned int feature_persistent:1;
+>  	unsigned int bounce:1;
+>  	unsigned int discard_granularity;
+> @@ -1848,7 +1851,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+>  		goto abort_transaction;
+>  	}
+>  	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+> -			info->feature_persistent);
+> +			info->feature_persistent_parm);
+>  	if (err)
+>  		dev_warn(&dev->dev,
+>  			 "writing persistent grants feature to xenbus");
+> @@ -2281,7 +2284,8 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+>  	if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
+>  		blkfront_setup_discard(info);
+>  
+> -	if (feature_persistent)
+> +	info->feature_persistent_parm = feature_persistent;
 
-Also add comment explaining this check, which is really important for
-understanding recovery feature.
+Same question as before. Why not just use feature_persistent directly?
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/ublk_drv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+> +	if (info->feature_persistent_parm)
+>  		info->feature_persistent =
+>  			!!xenbus_read_unsigned(info->xbdev->otherend,
+>  					       "feature-persistent", 0);
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 6a4a94b4cdf4..c39b67d7133d 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -645,14 +645,22 @@ static inline void __ublk_rq_task_work(struct request *req)
- 	struct ublk_device *ub = ubq->dev;
- 	int tag = req->tag;
- 	struct ublk_io *io = &ubq->ios[tag];
--	bool task_exiting = current != ubq->ubq_daemon || ubq_daemon_is_dying(ubq);
- 	unsigned int mapped_bytes;
- 
- 	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
- 			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
- 			ublk_get_iod(ubq, req->tag)->addr);
- 
--	if (unlikely(task_exiting)) {
-+	/*
-+	 * Task is exiting if either:
-+	 *
-+	 * (1) current != ubq_daemon.
-+	 * io_uring_cmd_complete_in_task() tries to run task_work
-+	 * in a workqueue if ubq_daemon(cmd's task) is PF_EXITING.
-+	 *
-+	 * (2) current->flags & PF_EXITING.
-+	 */
-+	if (unlikely(current != ubq->ubq_daemon || current->flags & PF_EXITING)) {
- 		blk_mq_end_request(req, BLK_STS_IOERR);
- 		mod_delayed_work(system_wq, &ub->monitor_work, 0);
- 		return;
--- 
-2.27.0
+Aside: IMO this would look nicer as below:
 
+	info->feature_persistent = feature_persistent && !!xenbus_read_unsigned();
