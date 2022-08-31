@@ -2,252 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C93FECAAD4
-	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 15:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B776CECAAD4
+	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 15:49:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231431AbiHaPfU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 11:35:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57148 "EHLO
+        id S229481AbiHaPtQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 11:49:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231694AbiHaPfR (ORCPT
+        with ESMTP id S232169AbiHaPsP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 11:35:17 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61935543FA
-        for <linux-block@vger.kernel.org>; Wed, 31 Aug 2022 08:35:14 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 88E231F37F;
-        Wed, 31 Aug 2022 15:35:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1661960113; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=trrkY591c5st3byh+F0E2ziWNSsMYB4bhkWSq5zwiyM=;
-        b=ahe55cM/aF7nCMqPNoswYaKrHLhj3XBx5pBu2Qw27FmzIJ4y62DJBv6NU0KrpVljNNJDPP
-        RTwjFxRF1aoGBrZUXdh4jmpyClTbcpaz7mNNid6m/VtNNJs5HREWBzWBSgxVy+3CVZb9nD
-        EE7x2PJk/MTJH/tznQKZfsdGU/p2maw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1661960113;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=trrkY591c5st3byh+F0E2ziWNSsMYB4bhkWSq5zwiyM=;
-        b=9Fo7Unrr3TcTyqe75vKu9R6Gxfq37QHRN6L+JRw5JzLVNNmb4X6jeMMQ2B+nqthSXQd66R
-        cLyIteX5LjyqSMBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 787F513A7C;
-        Wed, 31 Aug 2022 15:35:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VktkHbF/D2PGbwAAMHmgww
-        (envelope-from <dwagner@suse.de>); Wed, 31 Aug 2022 15:35:13 +0000
-From:   Daniel Wagner <dwagner@suse.de>
-To:     linux-block@vger.kernel.org
-Cc:     Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH blktests v2] nvme/045: test queue count changes on reconnect
-Date:   Wed, 31 Aug 2022 17:35:06 +0200
-Message-Id: <20220831153506.28234-1-dwagner@suse.de>
-X-Mailer: git-send-email 2.37.2
+        Wed, 31 Aug 2022 11:48:15 -0400
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16E76140D4;
+        Wed, 31 Aug 2022 08:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1661960891; x=1693496891;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=y+fkgIc9fvNBrkNoyidj8kDyZUg8P/MCawXruROBWFs=;
+  b=BvnX8v7tP5wOrwXpnipTpmMbz+dabx6j71fKwAT3wIfsmkHoQRveJtqw
+   XFKyXYuGgDadZL6Y/Kh02Fi6I06/7j6KJSumASFjOQ1UqmB32zeWzalqj
+   yyHLtKLN09IMtfxpjoIht8DnYTBSz3liyFTBxH0YpB2qIwjY/5mJugAx0
+   s=;
+X-IronPort-AV: E=Sophos;i="5.93,278,1654560000"; 
+   d="scan'208";a="1049979248"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-5bed4ba5.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 15:47:53 +0000
+Received: from EX13D08EUC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2a-5bed4ba5.us-west-2.amazon.com (Postfix) with ESMTPS id CC52E8E23E;
+        Wed, 31 Aug 2022 15:47:52 +0000 (UTC)
+Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
+ EX13D08EUC001.ant.amazon.com (10.43.164.184) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.38; Wed, 31 Aug 2022 15:47:51 +0000
+Received: from dev-dsk-ptyadav-1c-613f0921.eu-west-1.amazon.com (10.15.8.155)
+ by mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP Server id
+ 15.0.1497.38 via Frontend Transport; Wed, 31 Aug 2022 15:47:50 +0000
+Received: by dev-dsk-ptyadav-1c-613f0921.eu-west-1.amazon.com (Postfix, from userid 23027615)
+        id 8E5ED25976; Wed, 31 Aug 2022 15:47:50 +0000 (UTC)
+Date:   Wed, 31 Aug 2022 15:47:50 +0000
+From:   Pratyush Yadav <ptyadav@amazon.de>
+To:     SeongJae Park <sj@kernel.org>
+CC:     <jgross@suse.com>, <roger.pau@citrix.com>,
+        <marmarek@invisiblethingslab.com>, <mheyne@amazon.de>,
+        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <stable@vger.kernel.org>
+Subject: Re: [PATCH 1/2] xen-blkback: Advertise feature-persistent as user
+ requested
+Message-ID: <20220831153259.fzdkgbi76hmxa67a@yadavpratyush.com>
+References: <20220825161511.94922-1-sj@kernel.org>
+ <20220825161511.94922-2-sj@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220825161511.94922-2-sj@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The target is allowed to change the number of I/O queues. Test if the
-host is able to reconnect in this scenario.
+Hi,
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
----
+On 25/08/22 04:15PM, SeongJae Park wrote:
+> Commit e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter
+> when connect") made blkback to advertise its support of the persistent
+> grants feature only if the user sets the 'feature_persistent' parameter
+> of the driver and the frontend advertised its support of the feature.
+> However, following commit 402c43ea6b34 ("xen-blkfront: Apply
+> 'feature_persistent' parameter when connect") made the blkfront to work
+> in the same way.  That is, blkfront also advertises its support of the
+> persistent grants feature only if the user sets the 'feature_persistent'
+> parameter of the driver and the backend advertised its support of the
+> feature.
+> 
+> Hence blkback and blkfront will never advertise their support of the
+> feature but wait until the other advertises the support, even though
+> users set the 'feature_persistent' parameters of the drivers.  As a
+> result, the persistent grants feature is disabled always regardless of
+> the 'feature_persistent' values[1].
+> 
+> The problem comes from the misuse of the semantic of the advertisement
+> of the feature.  The advertisement of the feature should means only
+> availability of the feature not the decision for using the feature.
+> However, current behavior is working in the wrong way.
+> 
+> This commit fixes the issue by making the blkback advertises its support
+> of the feature as user requested via 'feature_persistent' parameter
+> regardless of the otherend's support of the feature.
+> 
+> [1] https://lore.kernel.org/xen-devel/bd818aba-4857-bc07-dc8a-e9b2f8c5f7cd@suse.com/
+> 
+> Fixes: e94c6101e151 ("xen-blkback: Apply 'feature_persistent' parameter when connect")
+> Cc: <stable@vger.kernel.org> # 5.10.x
+> Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+> Suggested-by: Juergen Gross <jgross@suse.com>
+> Signed-off-by: SeongJae Park <sj@kernel.org>
+> ---
+>  drivers/block/xen-blkback/common.h | 3 +++
+>  drivers/block/xen-blkback/xenbus.c | 6 ++++--
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
+> index bda5c815e441..a28473470e66 100644
+> --- a/drivers/block/xen-blkback/common.h
+> +++ b/drivers/block/xen-blkback/common.h
+> @@ -226,6 +226,9 @@ struct xen_vbd {
+>  	sector_t		size;
+>  	unsigned int		flush_support:1;
+>  	unsigned int		discard_secure:1;
+> +	/* Connect-time cached feature_persistent parameter value */
+> +	unsigned int		feature_gnt_persistent_parm:1;
+> +	/* Persistent grants feature negotiation result */
+>  	unsigned int		feature_gnt_persistent:1;
+>  	unsigned int		overflow_max_grants:1;
+>  };
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index ee7ad2fb432d..c0227dfa4688 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -907,7 +907,7 @@ static void connect(struct backend_info *be)
+>  	xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
+>  
+>  	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+> -			be->blkif->vbd.feature_gnt_persistent);
+> +			be->blkif->vbd.feature_gnt_persistent_parm);
+>  	if (err) {
+>  		xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
+>  				 dev->nodename);
+> @@ -1085,7 +1085,9 @@ static int connect_ring(struct backend_info *be)
+>  		return -ENOSYS;
+>  	}
+>  
+> -	blkif->vbd.feature_gnt_persistent = feature_persistent &&
+> +	blkif->vbd.feature_gnt_persistent_parm = feature_persistent;
 
-changes
-v2:
- - detect if attr_qid_max is available
-v1:
- - https://lore.kernel.org/linux-block/20220831120900.13129-1-dwagner@suse.de/
+If feature_gnt_persistent_parm is always going to be equal to 
+feature_persistent, then why introduce it at all? Why not just use 
+feature_persistent directly? This way you avoid adding an extra flag 
+whose purpose is not immediately clear, and you also avoid all the mess 
+with setting this flag at the right time.
 
- tests/nvme/046     | 133 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/046.out |   3 +
- tests/nvme/rc      |  10 ++++
- 3 files changed, 146 insertions(+)
- create mode 100755 tests/nvme/046
- create mode 100644 tests/nvme/046.out
-
-diff --git a/tests/nvme/046 b/tests/nvme/046
-new file mode 100755
-index 000000000000..428d596c93b9
---- /dev/null
-+++ b/tests/nvme/046
-@@ -0,0 +1,133 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2022 Daniel Wagner, SUSE Labs
-+#
-+# Test queue count changes on reconnect
-+
-+. tests/nvme/rc
-+
-+DESCRIPTION="Test queue count changes on reconnect"
-+QUICK=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_loop
-+	_require_nvme_trtype_is_fabrics
-+	_require_min_cpus 2
-+}
-+
-+_detect_subsys_attr() {
-+	local attr="$1"
-+	local file_path="${TMPDIR}/img"
-+	local subsys_name="blktests-feature-detect"
-+	local cfs_path="${NVMET_CFS}/subsystems/${subsys_name}"
-+	local port
-+
-+	truncate -s 1M "${file_path}"
-+
-+	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
-+		"b92842df-a394-44b1-84a4-92ae7d112332"
-+	port="$(_create_nvmet_port "${nvme_trtype}")"
-+
-+	local val=1
-+	[[ -f "${cfs_path}/${attr}" ]] && val=0
-+
-+	_remove_nvmet_subsystem "${subsys_name}"
-+
-+	_remove_nvmet_port "${port}"
-+
-+	rm "${file_path}"
-+
-+	return "${val}"
-+}
-+
-+def_state_timeout=20
-+
-+nvmf_wait_for_state() {
-+	local subsys_name="$1"
-+	local state="$2"
-+	local timeout="${3:-$def_state_timeout}"
-+
-+	local nvmedev=$(_find_nvme_dev "${subsys_name}")
-+	local state_file="/sys/class/nvme-fabrics/ctl/${nvmedev}/state"
-+
-+	local start_time=$(date +%s)
-+	local end_time
-+
-+	while ! grep -q "${state}" "${state_file}"; do
-+		sleep 1
-+		end_time=$(date +%s)
-+                if (( end_time - start_time > timeout )); then
-+                        echo "expected state \"${state}\" not " \
-+			     "reached within ${timeout} seconds"
-+                        break
-+                fi
-+	done
-+}
-+
-+nvmet_set_max_qid() {
-+	local port="$1"
-+	local subsys_name="$2"
-+	local max_qid="$3"
-+
-+	_remove_nvmet_subsystem_from_port "${port}" "${subsys_name}"
-+	nvmf_wait_for_state "${subsys_name}" "connecting"
-+
-+	_set_nvmet_attr_qid_max "${subsys_name}" "${max_qid}"
-+
-+	_add_nvmet_subsys_to_port "${port}" "${subsys_name}"
-+	nvmf_wait_for_state "${subsys_name}" "live"
-+}
-+
-+test() {
-+	local port
-+	local subsys_name="blktests-subsystem-1"
-+	local hostid
-+	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local file_path="${TMPDIR}/img"
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	hostid="$(uuidgen)"
-+	if [ -z "$hostid" ] ; then
-+		echo "uuidgen failed"
-+		return 1
-+	fi
-+
-+	_setup_nvmet
-+
-+	if ! _detect_subsys_attr "attr_qid_max"; then
-+		SKIP_REASONS+=("missing attr_qid_max feature")
-+		return 1
-+	fi
-+
-+	truncate -s 512M "${file_path}"
-+
-+	_create_nvmet_subsystem "${subsys_name}" "${file_path}" \
-+		"b92842df-a394-44b1-84a4-92ae7d112861"
-+	port="$(_create_nvmet_port "${nvme_trtype}")"
-+	_add_nvmet_subsys_to_port "${port}" "${subsys_name}"
-+	_create_nvmet_host "${subsys_name}" "${hostnqn}"
-+
-+	_nvme_connect_subsys "${nvme_trtype}" "${subsys_name}" \
-+			     "" "" \
-+			     "${hostnqn}" "${hostid}"
-+
-+	nvmf_wait_for_state "${subsys_name}" "live"
-+
-+	nvmet_set_max_qid "${port}" "${subsys_name}" 1
-+	nvmet_set_max_qid "${port}" "${subsys_name}" 128
-+
-+	_nvme_disconnect_subsys "${subsys_name}"
-+
-+	_remove_nvmet_subsystem_from_port "${port}" "${subsys_name}"
-+	_remove_nvmet_subsystem "${subsys_name}"
-+
-+	_remove_nvmet_port "${port}"
-+
-+	_remove_nvmet_host "${hostnqn}"
-+
-+	rm "${file_path}"
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/046.out b/tests/nvme/046.out
-new file mode 100644
-index 000000000000..f1a967d540b7
---- /dev/null
-+++ b/tests/nvme/046.out
-@@ -0,0 +1,3 @@
-+Running nvme/046
-+NQN:blktests-subsystem-1 disconnected 1 controller(s)
-+Test complete
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index 6d4397a7f043..9e4fe9c8ba6c 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -544,6 +544,16 @@ _set_nvmet_dhgroup() {
- 	     "${cfs_path}/dhchap_dhgroup"
- }
- 
-+_set_nvmet_attr_qid_max() {
-+	local nvmet_subsystem="$1"
-+	local qid_max="$2"
-+	local cfs_path="${NVMET_CFS}/subsystems/${nvmet_subsystem}"
-+
-+	if [[ -f "${cfs_path}/attr_qid_max" ]]; then
-+		echo $qid_max > "${cfs_path}/attr_qid_max"
-+	fi
-+}
-+
- _find_nvme_dev() {
- 	local subsys=$1
- 	local subsysnqn
--- 
-2.37.2
-
+> +	blkif->vbd.feature_gnt_persistent =
+> +		blkif->vbd.feature_gnt_persistent_parm &&
+>  		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
+>  
+>  	blkif->vbd.overflow_max_grants = 0;
+> -- 
+> 2.25.1
+> 
+> 
