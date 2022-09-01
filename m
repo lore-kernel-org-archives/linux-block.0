@@ -2,180 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E20ECAAD3
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 08:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB11ECAAD1
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 08:55:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234132AbiIAITY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 04:19:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57254 "EHLO
+        id S233179AbiIAIzE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 04:55:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233979AbiIAITX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 04:19:23 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C418BD2917;
-        Thu,  1 Sep 2022 01:19:21 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MJDS11vrczKHQ5;
-        Thu,  1 Sep 2022 16:17:37 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgA3inMEaxBjFgPfAA--.12124S3;
-        Thu, 01 Sep 2022 16:19:18 +0800 (CST)
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Chris Murphy <lists@colorremedies.com>,
-        Nikolay Borisov <nborisov@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
- <Yv2w+Tuhw1RAoXI5@T590>
- <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
- <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
- <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
- <Yv3NIQlDL0T3lstU@T590>
- <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
- <YwCGlyDMhWubqKoL@T590>
- <297cbb87-87aa-2e1d-1fc3-8e96c241f28f@huaweicloud.com>
- <20220901080336.glpv4i3hyae2zkpk@quack3>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <ee48bdc1-1020-78ca-a90e-ef958171a05f@huaweicloud.com>
-Date:   Thu, 1 Sep 2022 16:19:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S233109AbiIAIzD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 04:55:03 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5120818E11;
+        Thu,  1 Sep 2022 01:55:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1662022480;
+        bh=GV/S2fa4BRD9sgfDYFGhgBDWCnIN/LI3VF1N618OQbk=;
+        h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+        b=ll2pNi/18AlK3/05pm7AP5+KwYb5rBY7U0zAWtORHV1eyPWDiB7fkNJIAeZxxA4nx
+         Puv+9cbPn7cML/qTpbJexC8sdPbsER+dg4YmVxLn/7iwBWRRmd6Y8VnCpkH8CAPuMK
+         v5VYLKwpVd1RNq4XKN0GQiYzMH3JzEAVuqroprDw=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx105
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MyKHc-1pJRB52Bum-00yheR; Thu, 01
+ Sep 2022 10:54:40 +0200
+Message-ID: <de16bd58-3f14-01d9-9de5-6a79792c62c7@gmx.com>
+Date:   Thu, 1 Sep 2022 16:54:32 +0800
 MIME-Version: 1.0
-In-Reply-To: <20220901080336.glpv4i3hyae2zkpk@quack3>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgA3inMEaxBjFgPfAA--.12124S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr4UtFyrCFykuFWrGFWruFg_yoWrJFyUpF
-        Wrta1Yyan8tr10y34Iy3Wjqr15twn0kr98WF1rtw43JrnFgr98Kr4IqrWY9Fn5Zrs5Cr47
-        tryjyFyxWr15Z37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH 01/17] block: export bio_split_rw
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20220901074216.1849941-1-hch@lst.de>
+ <20220901074216.1849941-2-hch@lst.de>
+From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
+In-Reply-To: <20220901074216.1849941-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:mmM5D6IZ1oaD0qr6/5AZUuLakSmec4LkeDGuyL6NG6UsGRxIShO
+ Ol0y89iD+KBDwpfXMslDF2cXH3+0E+O/2N9byrJSY5eMxnLfODCO6ZqqoFAz0yQ0HBYWzzA
+ WkCO6XXt73F8mc+bv9K6VS54DzpwmsQxutK3VvCdFw5qHGpF39Um15krwrJzCoQnoyab98Z
+ 893bUcKMwft9eUfxb5WqA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:y336Ou2v+Do=:pPFJqieV7LQPq5oYQffwfb
+ mCJyCPk/V6kLOQFqynGbuXg+YAsEq2pYyM+a4J3qvLKMCCWqfCuv0oHBfpVKTZe+FrSMitvY5
+ VE5V4bcFL7n0/7qWwQJvHNilua4fMIjypUrkEL7ZnNz8o8oVQUibHcivaEcaj8qSFv+9g9H30
+ HjEsYWcyxM5CeqPkp8fbE218sVKawmW992ePu6mRFtDOTB+w66QfrRpU6f7Ya0yoIYO6kGUzN
+ joXpv/rxQPW39RUmVk4Nq7DDina/OKL7xGYLB4ZXgiaIQHAQJ4DP+JQ0+KmVQ9yxQaYYVfZJ7
+ j9pGSkIVyrPfLM90S09TZDcdsMsBp4qBDYAR4I/fnA5XHuSjdBmyHqIsyiWuPKqhsyMYcBBu4
+ 2U4rkI1COm7PR5YxH+N0JW59xjlz7no2NkcqlBgY+CFOLGFZsH262FSSAoVsUujIME8ECA37R
+ N/I0m05BzDxR/rW+CjE7jpiKYfbWF32LuIosG9hP23HxW3z60nfKBFE5pdXzrEYDReCedHVbC
+ LMILp2irVwAwceMHrNV0VNpSBPVWo+reYkjb2ZSbrRAvU+ZcG6xuePLiXcIHEpJRL+tMjWuxD
+ Trpa/y53ywfSIcH6MCkND0reqQfZhjUYQ/JWoiYJSii8PvOvwSD3+zzFI/7HM56uv5xAcpUGB
+ /vi0Fr68WAq1TXqVCFJ57pkSU95kOdxqAlS1Jw0T5gv2GG4+2ZzLuLP9oQbJUSEjL5I+0nTlb
+ T9lRPFfkXJ5GYTWm8nEZO0/M4sWb2qSUyDymBK2/Hst3eI7TbLPGAQ9Ve0jBX4b1pWZd3OzWn
+ PKmx6QedHW7/EGLKtZHvG5p2V2ZdpwkRWETyGyfThhS5GXvSsqhtIvK+0+pMdSuqANgfOgcXs
+ fXtcwjUBrZZAVOiKQuNoBa1cCGrzRd9JY1CAq73kPtf+y6uzlOmWW3+G3dgYkkoqpJmqygs3x
+ sUn27DgTVJvKEKd/Lh+sw3UGDXSKs7UBc6pe7xQALpIB5Eg15efbE0OimPpaewtBAzqEvUmyU
+ pSpqvz9Mkw72X6qRQUwgOxsxgFuQ85G5H9Fvawhvb6heFsH6Vfot0V5fQqvs604JAAgCbD4hm
+ fhcG3UtEotilieWUA9FgMgUFiZgSXV5kfzNSgk26rof6XZCZhV688JBYw==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/09/01 16:03, Jan Kara 写道:
-> On Thu 01-09-22 15:02:03, Yu Kuai wrote:
->> Hi, Chris
->>
->> 在 2022/08/20 15:00, Ming Lei 写道:
->>> On Fri, Aug 19, 2022 at 03:20:25PM -0400, Chris Murphy wrote:
->>>>
->>>>
->>>> On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
->>>>> On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
->>>>>>
->>>>>>
->>>>>> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
->>>>>>> On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
->>>>>>>> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
->>>>>>>>
->>>>>>>>> OK, can you post the blk-mq debugfs log after you trigger it on v5.17?
->>>>>>
->>>>>> Same boot, 3rd log. But the load is above 300 so I kinda need to sysrq+b soon.
->>>>>>
->>>>>> https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=sharing
->>>>>>
->>>>>
->>>>> Also please test the following one too:
->>>>>
->>>>>
->>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>>> index 5ee62b95f3e5..d01c64be08e2 100644
->>>>> --- a/block/blk-mq.c
->>>>> +++ b/block/blk-mq.c
->>>>> @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx
->>>>> *hctx, struct list_head *list,
->>>>>    		if (!needs_restart ||
->>>>>    		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
->>>>>    			blk_mq_run_hw_queue(hctx, true);
->>>>> -		else if (needs_restart && needs_resource)
->>>>> +		else if (needs_restart && (needs_resource ||
->>>>> +					blk_mq_is_shared_tags(hctx->flags)))
->>>>>    			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
->>>>>
->>>>>    		blk_mq_update_dispatch_busy(hctx, true);
->>>>>
->>>>
->>>>
->>>> With just this patch on top of 5.17.0, it still hangs. I've captured block debugfs log:
->>>> https://drive.google.com/file/d/1ic4YHxoL9RrCdy_5FNdGfh_q_J3d_Ft0/view?usp=sharing
->>>
->>> The log is similar with before, and the only difference is RESTART not
->>> set.
->>>
->>> Also follows another patch merged to v5.18 and it fixes io stall too, feel free to test it:
->>>
->>> 8f5fea65b06d blk-mq: avoid extending delays of active hctx from blk_mq_delay_run_hw_queues
->>
->> Have you tried this patch?
->>
->> We meet a similar problem in our test, and I'm pretty sure about the
->> situation at the scene,
->>
->> Our test environment：nvme with bfq ioscheduler,
->>
->> How io is stalled:
->>
->> 1. hctx1 dispatch rq from bfq in service queue, bfqq becomes empty,
->> dispatch somehow fails and rq is inserted to hctx1->dispatch, new run
->> work is queued.
->>
->> 2. other hctx tries to dispatch rq, however, in service bfqq is
->> empty, bfq_dispatch_request return NULL, thus
->> blk_mq_delay_run_hw_queues is called.
->>
->> 3. for the problem described in above patch，run work from "hctx1"
->> can be stalled.
->>
->> Above patch should fix this io stall, however, it seems to me bfq do
->> have some problems that in service bfqq doesn't expire under following
->> situation:
->>
->> 1. dispatched rqs don't complete
->> 2. no new rq is issued to bfq
-> 
-> And I guess:
-> 3. there are requests queued in other bfqqs
-> ?
 
-Yes, of course, other bfqqs still have requests, but current
-implementation have flaws that even if other bfqqs doesn't have
-requests, bfq_asymmetric_scenario() can still return true because
-num_groups_with_pending_reqs > 0. We tried to fix this, however, there
-seems to be some misunderstanding with Paolo, and it's not applied to
-mainline yet...
+
+On 2022/9/1 15:42, Christoph Hellwig wrote:
+> bio_split_rw can be used by file systems to split and incoming write
+> bio into multiple bios fitting the hardware limit for use as ZONE_APPEND
+> bios.  Export it for initial use in btrfs.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/blk-merge.c   | 3 ++-
+>   include/linux/bio.h | 4 ++++
+>   2 files changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index ff04e9290715a..e68295462977b 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -267,7 +267,7 @@ static bool bvec_split_segs(struct queue_limits *lim=
+, const struct bio_vec *bv,
+>    * responsible for ensuring that @bs is only destroyed after processin=
+g of the
+>    * split bio has finished.
+>    */
+> -static struct bio *bio_split_rw(struct bio *bio, struct queue_limits *l=
+im,
+> +struct bio *bio_split_rw(struct bio *bio, struct queue_limits *lim,
+
+I found the queue_limits structure pretty scary, while we only have very
+limited members used in this case:
+
+- lim->virt_boundary_mask
+   Used in bvec_gap_to_prev()
+
+- lim->max_segments
+
+- lim->seg_boundary_mask
+- lim->max_segment_size
+   Used in bvec_split_segs()
+
+- lim->logical_block_size
+
+Not familiar with block layer, thus I'm wondering do btrfs really need a
+full queue_limits structure to call bio_split_rw().
+
+Or can we have a simplified wrapper?
+
+IIRC inside btrfs we only need two cases for bio split:
+
+- Split for stripe boundary
+
+- Split for OE/zoned boundary
 
 Thanks,
-Kuai
-> 
-> Otherwise I don't see a point in expiring current bfqq because there's
-> nothing bfq could do anyway. But under normal circumstances the request
-> completion should not take so long so I don't think it would be really
-> worth it to implement some special mechanism for this in bfq.
-> 
-> 								Honza
-> 
+Qu
 
+>   		unsigned *segs, struct bio_set *bs, unsigned max_bytes)
+>   {
+>   	struct bio_vec bv, bvprv, *bvprvp =3D NULL;
+> @@ -317,6 +317,7 @@ static struct bio *bio_split_rw(struct bio *bio, str=
+uct queue_limits *lim,
+>   	bio_clear_polled(bio);
+>   	return bio_split(bio, bytes >> SECTOR_SHIFT, GFP_NOIO, bs);
+>   }
+> +EXPORT_SYMBOL_GPL(bio_split_rw);
+>
+>   /**
+>    * __bio_split_to_limits - split a bio to fit the queue limits
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index ca22b06700a94..46890f8235401 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -12,6 +12,8 @@
+>
+>   #define BIO_MAX_VECS		256U
+>
+> +struct queue_limits;
+> +
+>   static inline unsigned int bio_max_segs(unsigned int nr_segs)
+>   {
+>   	return min(nr_segs, BIO_MAX_VECS);
+> @@ -375,6 +377,8 @@ static inline void bip_set_seed(struct bio_integrity=
+_payload *bip,
+>   void bio_trim(struct bio *bio, sector_t offset, sector_t size);
+>   extern struct bio *bio_split(struct bio *bio, int sectors,
+>   			     gfp_t gfp, struct bio_set *bs);
+> +struct bio *bio_split_rw(struct bio *bio, struct queue_limits *lim,
+> +		unsigned *segs, struct bio_set *bs, unsigned max_bytes);
+>
+>   /**
+>    * bio_next_split - get next @sectors from a bio, splitting if necessa=
+ry
