@@ -2,62 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDE7ECAAD1
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5751CECAAD8
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:42:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233109AbiIAHmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 03:42:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
+        id S233495AbiIAHm3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 03:42:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbiIAHmY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:42:24 -0400
-Received: from mail.fadrush.pl (mail.fadrush.pl [54.37.225.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA17F10DE7C
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 00:42:23 -0700 (PDT)
-Received: by mail.fadrush.pl (Postfix, from userid 1002)
-        id BEFB022788; Thu,  1 Sep 2022 07:41:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fadrush.pl; s=mail;
-        t=1662018142; bh=bD6j9gIFU6CLTaCGl0Ow9oeIxtirvTfMeNZSfLEZQ+I=;
-        h=Date:From:To:Subject:From;
-        b=i0v+0cRi3u8lut/RKDMgXy+GmowWedbQpZ9+tpAc5neaAYnAWnlEUlyd0gi60MDt6
-         zSbm2lia275YKGsR6qZ9oq4urLKmEY8D1ybqkRRUGuLTWGeexKl5ghIQzM6gGMJHt4
-         aPK8KjCZnBRRJrPu77WwuI6HBmAfmNUQV7F3H+ynxOUdI0QIhIvJXOCxUYNWdDiQwW
-         AWYBfLIPfujSQwJfgSiwPooRCFpTw5S/2WJlrClwtAeJOkaSbp4YuldT9N7XaaQkL0
-         POCskNTsLUg/bzbKEahMLabHd0hQaDCP75PMm3v/2weVaCWiIlJEq9ypOLmNkIjwNL
-         EzenJ3z5ndM0g==
-Received: by mail.fadrush.pl for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 07:41:15 GMT
-Message-ID: <20220901064500-0.1.1d.bpg8.0.3a8piib82j@fadrush.pl>
-Date:   Thu,  1 Sep 2022 07:41:15 GMT
-From:   "Jakub Olejniczak" <jakub.olejniczak@fadrush.pl>
-To:     <linux-block@vger.kernel.org>
-Subject: =?UTF-8?Q?Zwi=C4=99kszenie_p=C5=82ynno=C5=9Bci_finansowej?=
-X-Mailer: mail.fadrush.pl
+        with ESMTP id S233632AbiIAHm1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:42:27 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FC011D92F;
+        Thu,  1 Sep 2022 00:42:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=wxUc/dypL4JMwiJXvvioz7M8d2sEfLuwK1C5YZR0euw=; b=EkhJnMmXQDx7zfPV5SAXZQ4Zsg
+        KKEitwv5J/qc5XjZEW5diR2e3o3A8QDyrsRBeU0vmFfTdsJBsBLE54LgZd4LDoIjpYRNdTJqxDaob
+        QAshM0xVjo+XTD2C2l5VqPJZbhWfyMJy5dOsPGGugi/S9h/QB7xkWAFzS8kPE5JqO7TLm6SSW/vDT
+        gMRn75CycGR9HeLaxUVKr+pVfIBZPGpS35Psyyi90UC23D2Kivt+Ie/3qtHMAKZ8h8u+62e/qqQfo
+        Yd6rvZOX/A3HCeeIrEYxsJt2ukXMaXoWw6Zw89jyHtNhpEsKtdK1E0nB1m4GtujDAyhOeAehzN9tK
+        9DIOrJFA==;
+Received: from 213-225-1-14.nat.highway.a1.net ([213.225.1.14] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oTeqC-00ANU6-1n; Thu, 01 Sep 2022 07:42:20 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: consolidate btrfs checksumming, repair and bio splitting
+Date:   Thu,  1 Sep 2022 10:41:59 +0300
+Message-Id: <20220901074216.1849941-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Hi all,
 
-kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC chcia=C5=82bym za=
-proponowa=C4=87 wygodne rozwi=C4=85zanie, kt=C3=B3re umo=C5=BCliwi Pa=C5=84=
-stwa firmie stabilny rozw=C3=B3j.=20
+this series moves a large amount of duplicate code below btrfs_submit_bio
+into what I call the 'storage' layer.  Instead of duplicating code to
+checksum, check checksums and repair and split bios in all the caller
+of btrfs_submit_bio (buffered I/O, direct I/O, compressed I/O, encoded
+I/O), the work is done one in a central place, often more optiomal and
+without slight changes in behavior.  Once that is done the upper layers
+also don't need to split the bios for extent boundaries, as the storage
+layer can do that itself, including splitting the bios for the zone
+append limits for zoned I/O.
 
-Konkurencyjne otoczenie wymaga ci=C4=85g=C5=82ego ulepszania i poszerzeni=
-a oferty, co z kolei wi=C4=85=C5=BCe si=C4=99 z konieczno=C5=9Bci=C4=85 i=
-nwestowania. Brak odpowiedniego kapita=C5=82u powa=C5=BCnie ogranicza tem=
-po rozwoju firmy.
+The split work is inspired by an earlier series from Qu, from which it
+also reuses a few patches.
 
-Od wielu lat z powodzeniem pomagam firmom w uzyskaniu najlepszej formy fi=
-nansowania z banku oraz UE. Mam sta=C5=82ych Klient=C3=B3w, kt=C3=B3rzy n=
-adal ch=C4=99tnie korzystaj=C4=85 z moich us=C5=82ug, a tak=C5=BCe poleca=
-j=C4=85 je innym.
+Note: this adds a fair amount of code to volumes.c, which already is
+quite large.  It might make sense to add a prep patch to move
+btrfs_submit_bio into a new bio.c file, but I only want to do that
+if we have agreement on the move as the conflicts will be painful
+when rebasing.
 
-Czy chcieliby Pa=C5=84stwo skorzysta=C4=87 z pomocy wykwalifikowanego i d=
-o=C5=9Bwiadczonego doradcy finansowego?
+A git tree is also available:
 
+    git://git.infradead.org/users/hch/misc.git btrfs-bio-split
 
-Pozdrawiam
-Jakub Olejniczak
+Gitweb:
+
+    http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/btrfs-bio-split
+
+Diffstat:
+ block/blk-merge.c                |    3 
+ fs/btrfs/btrfs_inode.h           |    5 
+ fs/btrfs/compression.c           |  273 ++------------
+ fs/btrfs/compression.h           |    3 
+ fs/btrfs/ctree.h                 |   24 -
+ fs/btrfs/disk-io.c               |  198 +---------
+ fs/btrfs/disk-io.h               |    6 
+ fs/btrfs/extent-io-tree.h        |   19 
+ fs/btrfs/extent_io.c             |  739 ++------------------------------------
+ fs/btrfs/extent_io.h             |   32 -
+ fs/btrfs/file-item.c             |   67 +--
+ fs/btrfs/inode.c                 |  664 ++++------------------------------
+ fs/btrfs/ordered-data.h          |    1 
+ fs/btrfs/tests/extent-io-tests.c |    1 
+ fs/btrfs/volumes.c               |  753 +++++++++++++++++++++++++++++++--------
+ fs/btrfs/volumes.h               |   83 +---
+ fs/btrfs/zoned.c                 |   69 +--
+ fs/btrfs/zoned.h                 |   16 
+ fs/iomap/direct-io.c             |   10 
+ include/linux/bio.h              |    4 
+ include/linux/iomap.h            |    1 
+ include/trace/events/btrfs.h     |    2 
+ 22 files changed, 924 insertions(+), 2049 deletions(-)
