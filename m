@@ -2,103 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5169AECAAD1
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 18:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CECECAAD3
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 19:17:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232665AbiIASnd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 14:43:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59704 "EHLO
+        id S232404AbiIATRG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 15:17:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231484AbiIASnc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 14:43:32 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A18452807
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 11:43:31 -0700 (PDT)
-Received: by mail-io1-f71.google.com with SMTP id be26-20020a056602379a00b0068b50a068baso9373544iob.11
-        for <linux-block@vger.kernel.org>; Thu, 01 Sep 2022 11:43:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=tSm8RJxZnQES9hrhXTPiqnJb2qljBW6PGF4rDckYcBU=;
-        b=M88pSEzaN8URGMqHY4Br5UNCC2LhVr9SdgbwbOOOnXylqgpCOeIxzhKUdXgO6embYe
-         H0aTkHNTlcIE6umGBO1P+0jpoMdQVhhGDS2bGB/xnfEa7QRPJzfijQaZ6NqXpX9Ci9h7
-         rNaamYNq0++3N3vt0sMqZglepYxccGHtm5LpSKgtUEd825/5zZpnDizuD8NEhG9jFS3T
-         VrZUwUXXsM8L+SL1jq52/jJqQn25Jz8gRL4VW0nUuJZEDCr6t72Chriaukjfr8iHSmGe
-         Xw7aJR+q1f4q+9hamZEfBumP69lDzQI1HZBn2fkEERz/ih7GV+M1i1lHNBdTudFf58On
-         1Mgg==
-X-Gm-Message-State: ACgBeo1lZAM4FYyQAXIUs9Yh7dA4S9k8fzG8P0WRmLIixjaB/6d3D4Ev
-        GJSvEBWBw2RnvDuNJOtvFjtUtl4KhXHsaPByZOViqKIP0fEr
-X-Google-Smtp-Source: AA6agR6ql9AjVH9LUPRZ2P8yA8RUqQd1MM1pz0LeQkxKH9hEtNfnFWcqV2+JI9Nodvy0fRGhQbv0Qt5qi/CHOPcXa90sPkYqb7VE
+        with ESMTP id S232301AbiIATRF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 15:17:05 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA1075FCF;
+        Thu,  1 Sep 2022 12:17:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=mn3VERy0s8rwu2J3nmnzKseb1Xv+6b55gPqcv2R29Do=; b=YzaqHznkMBYAnCSOLqSHdegCox
+        YKGC4eoem9/8GT5zgWrOSDaNjktJxP8yRvpJYQxa1Z8TVgSJMiKxRYBzMwVpxfst2k9K0nTOV1HBS
+        g+ph5690L3SgBn1e1YgO7JjiEYivUW+H3wpACNHc9roxwPBpKqP9k77Y82r0mkv/FNfPaaPUHfTvB
+        p4qZfGw6uCBlrSY263wg1z6zYHA/Re3+5UA8DJ6RvGYmERMmO74bYgDyuhsaCDe3OouNe43APnOcv
+        6drCz4JVkp2sBvXA1RP/eGJ/WdeAGxetZaWgUxT+1aOmV3OaCU44xJq4EEu+L4J8FIFcXmhtYUgpU
+        1D7gy7Vw==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1oTpgS-00Dx2S-Se; Thu, 01 Sep 2022 13:17:01 -0600
+Message-ID: <fb9d7948-43fe-87c5-5275-70f280181ad1@deltatee.com>
+Date:   Thu, 1 Sep 2022 13:16:54 -0600
 MIME-Version: 1.0
-X-Received: by 2002:a6b:580e:0:b0:689:af21:6f3f with SMTP id
- m14-20020a6b580e000000b00689af216f3fmr16490897iob.116.1662057810886; Thu, 01
- Sep 2022 11:43:30 -0700 (PDT)
-Date:   Thu, 01 Sep 2022 11:43:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006a06a005e7a1fd95@google.com>
-Subject: [syzbot] WARNING in floppy_shutdown
-From:   syzbot <syzbot+046fef2eab0d7c657ca0@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-CA
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20220825152425.6296-1-logang@deltatee.com>
+ <20220825152425.6296-8-logang@deltatee.com> <YxDb2MyRx6o/wDAz@kroah.com>
+ <4a4bca1e-bebf-768f-92d4-92eb8ae714e1@deltatee.com>
+ <YxDhEO9ycZDTnbZm@kroah.com>
+ <cc9a24a8-dd3a-9d21-d9a7-5ee4b0ad7a57@deltatee.com>
+ <YxD7uZYaV75gJS9d@kroah.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <YxD7uZYaV75gJS9d@kroah.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v9 7/8] PCI/P2PDMA: Allow userspace VMA allocations
+ through sysfs
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    10d4879f9ef0 Merge tag 'thermal-6.0-rc3' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13ba5d33080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=312be25752c7fe30
-dashboard link: https://syzkaller.appspot.com/bug?extid=046fef2eab0d7c657ca0
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+046fef2eab0d7c657ca0@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 3723 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 2 PID: 3723 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
-WARNING: CPU: 2 PID: 3723 at drivers/block/floppy.c:999 floppy_shutdown.cold+0x7b/0xaa drivers/block/floppy.c:1892
-Modules linked in:
-CPU: 2 PID: 3723 Comm: kworker/u16:3 Not tainted 6.0.0-rc2-syzkaller-00283-g10d4879f9ef0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-Workqueue: floppy floppy_shutdown
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
-RIP: 0010:floppy_shutdown.cold+0x7b/0xaa drivers/block/floppy.c:1892
-Code: 05 7e 95 f9 07 20 66 63 8a e8 99 37 77 f8 48 8b 1d 72 43 60 03 31 ff 83 e3 01 89 de e8 16 8b 2b f8 84 db 74 07 e8 8d 8e 2b f8 <0f> 0b e8 86 8e 2b f8 48 8b 35 0f 94 f9 07 bf 08 00 00 00 48 c7 c2
-RSP: 0018:ffffc90003147d00 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: ffff888014c16080 RSI: ffffffff894fab83 RDI: 0000000000000001
-RBP: 0000000000000282 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
-R13: ffffc90003147da8 R14: ffff888014efd100 R15: ffff888011875800
-FS:  0000000000000000(0000) GS:ffff88802c800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000563743531680 CR3: 000000001a5d6000 CR4: 0000000000150ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e4/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On 2022-09-01 12:36, Greg Kroah-Hartman wrote:
+> On Thu, Sep 01, 2022 at 12:14:25PM -0600, Logan Gunthorpe wrote:
+>> Well we haven't plugged in a remove call into p2pdma, that would be more
+>> work and more interfaces touching the PCI code. Note: this code isn't a
+>> driver but a set of PCI helpers available to other PCI drivers.
+>> Everything that's setup is using the devm interfaces and gets torn down
+>> with the same. So I don't really see the benefit of making the change
+>> you propose.
+> 
+> The issue is the classic one with the devm helpers.  They do not lend
+> themselves to resource management issues that require ordering or other
+> sort of dependencies.  Please do not use them here, just put in a remove
+> callback as you eventually will need it anyway, as you have a strong
+> requirement for what gets freed when, and the devm api does not provide
+> for that well.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+This surprises me. Can you elaborate on this classic issue?
+
+I've definitely seen uses of devm that expect the calls will be torn
+down in reverse order they are added. The existing p2pdma code will
+certainly fail quite significantly if a devm_kzalloc() releases its
+memory before the devm_memmap_pages() cleans up. There's also already an
+action that is used to cleanup before the last devm_kzalloc() call
+happens. If ordering is not guaranteed, then devm seems fairly broken
+and unusable and I'd have to drop all uses from this code and go back to
+the error prone method. Also what's the point of
+devm_add_action_or_reset() if it doesn't guarantee the ordering or the
+release?
+
+But if it's that important I can make the change to these patches for v10.
+
+Logan
