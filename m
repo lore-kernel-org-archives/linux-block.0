@@ -2,141 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED48DECAAD4
-	for <linux-block@archiver.kernel.org>; Wed, 31 Aug 2022 21:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7907C0502C
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 00:38:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232266AbiHaV3p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 17:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57448 "EHLO
+        id S230056AbiIAAim (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 20:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232329AbiHaV3o (ORCPT
+        with ESMTP id S232112AbiIAAil (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 17:29:44 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29FC0BCB4;
-        Wed, 31 Aug 2022 14:19:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 73318B82371;
-        Wed, 31 Aug 2022 21:19:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8826FC433D6;
-        Wed, 31 Aug 2022 21:19:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661980793;
-        bh=EuFVtF27UHzZ95m2iAVZr88pBg2NFFrI0iNLOelRyrg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Wljct3mBAodbROj8O/9kcBwlEJPrCw4g2YpmVaVswGofxdOZBYvrIE8+6eh9YfBir
-         klg/v3l7dfsHdTX/SQxogCaudW9U6u7Wz+t1mLOORCl8zws8d83jAwrHCCgFVtw+X0
-         +MIS81RaFP9pSm2aLQVGY1p5T8j/tr8Yu3ob9Tkj5O+2h8lSEX6jzIYeIknePODM2x
-         zXXQak7U22takWnvrBDyCc2LOBM6JxjOEi98IUOj5EBTrxZgddGU0lVtKQwNxHlrzG
-         VZVwDYklnwrT8kqS+2ziWX65x4wuzl5efs6oClsQnV+pbWPGo0XPFuGaJBfCtgiRk5
-         zpw1BC5hLlrAQ==
-Date:   Wed, 31 Aug 2022 15:19:49 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@fb.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Kernel Team <Kernel-team@fb.com>
-Subject: Re: [PATCHv3 0/7] dma mapping optimisations
-Message-ID: <Yw/Qdf+280vZSYU4@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220805162444.3985535-1-kbusch@fb.com>
- <20220809064613.GA9040@lst.de>
- <YvKPTGf56v/3iSxg@kbusch-mbp.dhcp.thefacebook.com>
- <20220809184137.GB15107@lst.de>
- <YvPzUSx87VkwSH2C@kbusch-mbp.dhcp.thefacebook.com>
- <20220811072232.GA13803@lst.de>
+        Wed, 31 Aug 2022 20:38:41 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69DDAFE057;
+        Wed, 31 Aug 2022 17:38:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=pAUCRheD7HEjVi/ypvCmDmDlGNpLzHPc+8Ry1BLGL5Y=; b=Kkt/ouct9XIMw6tkOmsU6S4gh0
+        m0aJRIol5LWmRPlMQj6EEcUbBd6CL+yJgxrzADT1Wf4exlM1w2B2Y+elhLK/xDSiNb5IXf9nRPHgD
+        QjwWzunxbAmTwk68UOmqRMuAV2798RKPDIsqzqeinPmWVr0BEr8hXs4WNMYw9ptH/PlsoIgQ2VtRa
+        QfsfNpmxbm5W0JGnHVtKlwXEKt33ktMGCPx2QvIKidb3ZAUk4/ImLf5Z3IP3dx7GZWeM1jAx2DZ88
+        vGTWM4OPiRSVC5Pkow1cvRVGFwb/9rxFEgEAcWniGihBMrZSR6pHMtXNYHrf9fmx7BSpC/ZX1TGME
+        nUdUtbPQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.95 #2 (Red Hat Linux))
+        id 1oTYDt-00AnMP-NE;
+        Thu, 01 Sep 2022 00:38:21 +0000
+Date:   Thu, 1 Sep 2022 01:38:21 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jan Kara <jack@suse.cz>
+Cc:     John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 5/6] NFS: direct-io: convert to FOLL_PIN pages
+Message-ID: <Yw/+/U9GFaNnARdk@ZenIV>
+References: <20220827083607.2345453-1-jhubbard@nvidia.com>
+ <20220827083607.2345453-6-jhubbard@nvidia.com>
+ <YwqfWoAE2Awp4YvT@ZenIV>
+ <353f18ac-0792-2cb7-6675-868d0bd41d3d@nvidia.com>
+ <Ywq5ILRNxsbWvFQe@ZenIV>
+ <Ywq5VrSrY341UVpL@ZenIV>
+ <217b4a17-1355-06c5-291e-7980c0d3cea6@nvidia.com>
+ <20220829160808.rwkkiuelipr3huxk@quack3>
+ <a53b2d14-687a-16c9-2f63-4f94876f8b3c@nvidia.com>
+ <20220831094349.boln4jjajkdtykx3@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220811072232.GA13803@lst.de>
+In-Reply-To: <20220831094349.boln4jjajkdtykx3@quack3>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Aug 11, 2022 at 09:22:32AM +0200, Christoph Hellwig wrote:
-> On Wed, Aug 10, 2022 at 12:05:05PM -0600, Keith Busch wrote:
-> > The functions are implemented under 'include/linux/', indistinguishable from
-> > exported APIs. I think I understand why they are there, but they look the same
-> > as exported functions from a driver perspective.
+On Wed, Aug 31, 2022 at 11:43:49AM +0200, Jan Kara wrote:
+
+> So after looking into that a bit more, I think a clean approach would be to
+> provide iov_iter_pin_pages2() and iov_iter_pages_alloc2(), under the hood
+> in __iov_iter_get_pages_alloc() make sure we use pin_user_page() instead of
+> get_page() in all the cases (using this in pipe_get_pages() and
+> iter_xarray_get_pages() is easy) and then make all bio handling use the
+> pinning variants for iters. I think at least iov_iter_is_pipe() case needs
+> to be handled as well because as I wrote above, pipe pages can enter direct
+> IO code e.g. for splice(2).
 > 
-> swiotlb.h is not a driver API.  There's two leftovers used by the drm
-> code I'm trying to get fixed up, but in general the DMA API is the
-> interface and swiotlb is just an implementation detail.
-> 
-> > Perhaps I'm being daft, but I'm totally missing why I should care if swiotlb
-> > leverages this feature. If you're using that, you've traded performance for
-> > security or compatibility already. If this idea can be used to make it perform
-> > better, then great, but that shouldn't be the reason to hold this up IMO.
-> 
-> We firstly need to make sure that everything actually works on swiotlb, or
-> any other implementation that properly implements the DMA API.
-> 
-> And the fact that I/O performance currently sucks and we can fix it on
-> the trusted hypervisor is an important consideration.  At least as
-> importantant as micro-optimizing performance a little more on setups
-> not using them.  So not taking care of both in one go seems rather silly
-> for a feature that is in its current form pretty intrusive and thus needs
-> a really good justification.
+> Also I think that all iov_iter_get_pages2() (or the _alloc2 variant) users
+> actually do want the "pin page" semantics in the end (they are accessing
+> page contents) so eventually we should convert them all to
+> iov_iter_pin_pages2() and remove iov_iter_get_pages2() altogether. But this
+> will take some more conversion work with networking etc. so I'd start with
+> converting bios only.
 
-Sorry for the delay response; I had some trouble with test setup.
+Not sure, TBH...
 
-Okay, I will restart developing this with swiotlb in mind.
+FWIW, quite a few of the callers of iov_iter_get_pages2() do *NOT* need to
+grab any references for BVEC/XARRAY/PIPE cases.  What's more, it would be
+bloody useful to have a variant that doesn't grab references for
+!iter->user_backed case - that could be usable for KVEC as well, simplifying
+several callers.
 
-In the mean time, I wanted to share some results with this series because I'm
-thinking this might be past the threshold for when we can drop the "micro-"
-prefix on optimisations.
+Requirements:
+	* recepients of those struct page * should have a way to make
+dropping the page refs conditional (obviously); bio machinery can be told
+to do so.
+	* callers should *NOT* do something like
+	"set an ITER_BVEC iter, with page references grabbed and stashed in
+bio_vec array, call async read_iter() and drop the references in array - the
+refs we grab in dio will serve"
+Note that for sync IO that pattern is fine whether we grab/drop anything
+inside read_iter(); for async we could take depopulating the bio_vec
+array to the IO completion or downstream of that.
+	* the code dealing with the references returned by iov_iter_..._pages
+should *NOT* play silly buggers with refcounts - something like "I'll grab
+a reference, start DMA and report success; page will stay around until I
+get around to dropping the ref and callers don't need to wait for that" deep
+in the bowels of infinibad stack (or something equally tasteful) is seriously
+asking for trouble.
 
-The most significant data points are these:
+Future plans from the last cycle included iov_iter_find_pages{,_alloc}() that
+would *not* grab references on anything other than IOVEC and UBUF (would advance
+the iterator, same as iov_iter_get_pages2(), though). Then iov_iter_get_...()
+would become a wrapper for that.  After that - look into switching the users
+of ..._get_... to ..._find_....   Hadn't done much in that direction yet,
+though - need to redo the analysis first.
 
-  * submission latency stays the same regardless of the transfer size or depth
-  * IOPs is always equal or better (usually better) with up to 50% reduced
-    cpu cost
-
-Based on this, I do think this type of optimisation is worth having a something
-like a new bio type. I know this introduces some complications in the io-path,
-but it is pretty minimal and doesn't add any size penalties to common structs
-for drivers that don't use them.
-
-Test details:
-
-  fio with ioengine=io_uring
-    'none': using __user void*
-    'bvec': using buf registered with IORING_REGISTER_BUFFERS
-    'dma': using buf registered with IORING_REGISTER_MAP_BUFFERS (new)
-
-  intel_iommu=on
-
-Results:
-
-(submission latency [slat] in nano-seconds)
-Q-Depth 1:
-
- Size |  Premap  |   IOPs  |  slat  | sys-cpu%
- .....|..........|.........|........|.........
- 4k   |    none  |  41.4k  |  2126  |   16.47%
-      |    bvec  |  43.8k  |  1843  |   15.79%
-      |     dma  |  46.8k  |  1504  |   14.94%
- 16k  |    none  |  33.3k  |  3279  |   17.78%
-      |    bvec  |  33.9k  |  2607  |   14.59%
-      |     dma  |  40.2k  |  1490  |   12.57%
- 64k  |    none  |  18.7k  |  6778  |   18.22%
-      |    bvec  |  20.0k  |  4626  |   13.80%
-      |     dma  |  22.6k  |  1586  |    7.58%
-
-Q-Depth 16:
-
- Size |  Premap  |   IOPs  |  slat  | sys-cpu%
- .....|..........|.........|........|.........
- 4k   |    none  |   207k  |  3657  |   72.81%
-      |    bvec  |   219k  |  3369  |   71.55%
-      |     dma  |   310k  |  2237  |   60.16%
- 16k  |    none  |   164k  |  5024  |   78.38%
-      |    bvec  |   177k  |  4553  |   76.29%
-      |     dma  |   186k  |  1880  |   43.56%
- 64k  |    none  |  46.7k  |  4424  |   30.51%
-      |    bvec  |  46.7k  |  4389  |   29.42%
-      |     dma  |  46.7k  |  1574  |   15.61%
-
+That primitive might very well do FOLL_PIN instead of FOLL_GET for IOVEC and
+UBUF...
