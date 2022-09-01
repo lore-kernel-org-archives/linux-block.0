@@ -2,281 +2,435 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68894ECAAD4
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 01:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8305CECAAD1
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 01:34:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231837AbiIABeE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Aug 2022 21:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55072 "EHLO
+        id S232588AbiIABeW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Aug 2022 21:34:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232685AbiIABdu (ORCPT
+        with ESMTP id S232635AbiIABeU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Aug 2022 21:33:50 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2087.outbound.protection.outlook.com [40.107.92.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D50155D7E;
-        Wed, 31 Aug 2022 18:33:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b5VyuSwFR+wOQBx+cOz5TqUNRlPu0dHU0tyq+PA/pOQwX7hlY85tsDLVNI+Nzyefi7T6D6rv93TmzKbnzKUUBdGTedhvCdT2S8vpCXUaYOJz8xd8kmQjVrcvu8+oFQehpGeXEeqMFnw0jfn3pM9lXyPwQLoDwrtRQF3Kcm5QTZk99sv7/lt9wcEo83MuwfJL31hk0LttUVUU19vw7IRt+26wSILC1r2s/+OnT8Y3B8KJdxZOBloCtfhv+3rX4xYwGCETlGuL2/13TuYVYkrwn7ydh4KwsDrajfgivr4T/+T02fxwCT9+PwLwVYxG9w+Is4gqpSCfq1UXVHtfPI/QGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z6qOEojSYDmibJdsNFsejax4jww5xD+CQiyq5aAKg7U=;
- b=YLRD8yqrfaq/pmEbW/sZjrfLucHV5Iq3xRNwqbTHpSzjOmt+MzHqZ4iJiieLE1h47MOW3pZ0OOUZ0Tz7LXtkmTMVUXe3YYWmQ3HTt5fx856xyiLjcgTpLEdNItUNFtz0ou9hE7GKMhkOeH7wHGC2s6kmAe7thcbll7o93IJZ4ZBP5EN5b3avdkItqr0dUYFyW64O0FNtbamW2h52dWr8vYdZcRvzlX0u43+xTyDOUx+mT8lBAIqnUFUw1zE1j8l9tpB0jLHwt5vWGV7jmipE6Dmb2quwjmrpO1fkA8DlBo4K6LAIXBmBfwsyWSM13DX9p0a7KBcNbr2s8d3GTIH0FQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z6qOEojSYDmibJdsNFsejax4jww5xD+CQiyq5aAKg7U=;
- b=aX0atnJ7fWz4VSZJeQMZeyCr/ctZCZ1y8r5rBT2CeX+9V6Cdd2sCggnMdPDPI8pZJ0PAZDl4FAtYeKdxZNYIAR1oeCGGFdIPNCtmWQFRLlHQS+iVNfg1dA3B/8FIcgkA/By/1NyLuLN9toqsm7J6df5jpukNNWP+8vMDXWDD3pBhLeI4QUJrFy+ud+otxN1bHYcxUIN1gML79xY8hvRrFp7fNCYQeFGFcpt2epacBUf+vqdM/7mnKq56q7bij76xUxS3XlPxr9KsD/L+TWuVkZuGZLx3Iw7J8AQnPumWCgoQqyXtaLNhCDU59sAMqonD6to9JijbWWBNAoxcqIrgfQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by DM4PR12MB6182.namprd12.prod.outlook.com (2603:10b6:8:a8::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.21; Thu, 1 Sep
- 2022 01:33:33 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::508d:221c:9c9e:e1a5]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::508d:221c:9c9e:e1a5%9]) with mapi id 15.20.5588.010; Thu, 1 Sep 2022
- 01:33:33 +0000
-Message-ID: <06d2caf4-eff1-f537-aa33-c4f0220a9f80@nvidia.com>
-Date:   Wed, 31 Aug 2022 18:33:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH v2 7/7] fuse: convert direct IO paths to use FOLL_PIN
-Content-Language: en-US
-To:     Miklos Szeredi <miklos@szeredi.hu>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@infradead.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-References: <20220831041843.973026-1-jhubbard@nvidia.com>
- <20220831041843.973026-8-jhubbard@nvidia.com>
- <CAJfpegvdTqdk9rs-yaEp1aqav4=t9qSpQri7gW8zzb+t7+_88A@mail.gmail.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <CAJfpegvdTqdk9rs-yaEp1aqav4=t9qSpQri7gW8zzb+t7+_88A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR07CA0088.namprd07.prod.outlook.com
- (2603:10b6:a03:12b::29) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+        Wed, 31 Aug 2022 21:34:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F17E155A5D
+        for <linux-block@vger.kernel.org>; Wed, 31 Aug 2022 18:34:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661996058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9VuMDLHtMdhizH6iq4bHugnSO5cpHcYLImDJPvC8JjU=;
+        b=J/BdiMjHQ58eS0n1MAeBk42X4PFlU+kdqSKqP56R/xY1fx3BpeQ9RbMdYJUQb4TMFdNchq
+        Z0Cu6kPFy12SkQSpISrqD5I5aFM8KfC1lPbAnag5y7Ixqs5UHLzbWYJIvxYIjMUWc6f9qI
+        fbk2XkML+x3ahFl+VWQmtbZ0ZRAhCv8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-649-I0FmLEsiMmyBdVGf5rk0dQ-1; Wed, 31 Aug 2022 21:34:14 -0400
+X-MC-Unique: I0FmLEsiMmyBdVGf5rk0dQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7C2C3803901;
+        Thu,  1 Sep 2022 01:34:13 +0000 (UTC)
+Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 44B1C2026D4C;
+        Thu,  1 Sep 2022 01:34:06 +0000 (UTC)
+Date:   Thu, 1 Sep 2022 09:34:04 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Richard W . M . Jones" <rjones@redhat.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH] Docs: ublk: add ublk document
+Message-ID: <YxAMDBCOshzQqSfq@T590>
+References: <20220828045003.537131-1-ming.lei@redhat.com>
+ <Yw4rcz23R3ofn6H6@fedora>
+ <e9df4ed8-a0ea-661f-9947-b18fa1d2145f@linux.alibaba.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cd08146e-3409-4a53-8bdc-08da8bb9fbaa
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6182:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dHYM1SCfGd+ySSVfJnBg6KYIufj99Dm1pUSd/L9++cB5GXXT8KcMi3IoPIp4UETHgm7RhL5Wrn8nSuva67JELxoB8TOk9pU94bU0QQwjzhfqa+IfxaWFrnTGi6NCKJNbsWs5iNbkjLJzt3IwBs3WmhOgtyPI7dtdFMK1gbiTosungR+zwfHLs4+faD//69NVtTf18Axh2F6zYbOZq2KOZbltW77atqxWy7rfsyjBBl1ccIMOtUkKKMigNzkJ7BwQjHz4xwNZJsH6PGUnYwRLcDISbKqAsNzO43bm9XLPysgcfsY+IicsLIyyPe409WYkHx+4uiqV9NJAuVF5CDvR6bFHZSE0+G5sIxkBmMO/9iD7yOhJlv/YrUxHwhxSMsC9mMTFMj8zw8ByBlxeu4edFcxWBALGhSl6TPmY8TPUUj/y00vPhcl/Bd+BKbb+fM1ybiJSjZ3m13M0REa8hJnMPSH58Z8JxEhB1zd25x5R4ChA09mX4fn7pixTjLqlq1xxLqDpaHNfW1VINLnH53N+DeZRFcOHi3BnW1mqgWFPSDgnHm3+jXYm+TIg4GsNr7qSn/wYAJhQJY8aSBZlc5wVJtyp1hiWHrKD6rHq6gCbydNfAVeKxn3CGDzS7VwP4nHA9FsikylesBGMyFfcyPbqtAqRSJx1sNzlaK01ag+riC3kZxA0IrqgHQgy9ql/peYh13NcuBAN8OAwPk9qkCKULZDrWG3B+VQldwl2QBMQ6h6O7Km5E7K76tUlziWiRwHOwRu3bBViVO2Xpz9nmfK1Db6gv0hqMcwM6mohzDmWIhN6n9t/ACX6y86G0LbnBGpxnisx7QBTHB1Vvb4GTMkE2Le9vuMk0MwjO4o4x8sUrZ5KdOgqY5ODRcwoRn3q4V/K
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(366004)(396003)(346002)(136003)(6512007)(53546011)(478600001)(2616005)(966005)(26005)(6506007)(41300700001)(186003)(6486002)(83380400001)(5660300002)(8936002)(7416002)(54906003)(6916009)(316002)(2906002)(66946007)(66556008)(8676002)(4326008)(66476007)(38100700002)(31696002)(86362001)(31686004)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RlZLczJnaHBUaHVDc0xyb2tuVWhrcVJUWDNvZWx5RW1UL1poZjR0UW5HcDM0?=
- =?utf-8?B?R0M0Ukk5ZHpieWhhVU84cVd6OGRNeFdSKzRKUWl3OWZ3NVZJT01TUzBnL2Z6?=
- =?utf-8?B?M0FUWmN5dHpvNDBoUDRMSWlBbENaMVRSUW1BcHFnUDBrRFo5dTd5dmJRa2U3?=
- =?utf-8?B?aDgrbklOWTdBVUxJQ3psYzNYdkhwTGVHYXkxQ2dKcXlPWmZpVFBpR0E1VEdE?=
- =?utf-8?B?K1JKdWowOFI3UlljOXJCNWt2KysvL2pETko4RFRHWk85WTVaMVNnZWxTanRs?=
- =?utf-8?B?eTU4b256anM1T3ZJWjVpU1cvcVZuK3pJZXNkWk5lTjRFY0F6US9kMFNaaDZw?=
- =?utf-8?B?aGZDU1ZhaVl6S2FXeERJd3dDTzBrYVg3TWo1R0JQaDdLUXRBMi90dy9LbUE5?=
- =?utf-8?B?ZDBVb2RITjZlMjAwUXh3eVdNYW1oQXlvTXF5djFvOS80UDVZQ0hxbWV6YndH?=
- =?utf-8?B?Z2RqVlNSUUMrZUZ6WWRONlgxSDZIN0RLbGo0UkVuendoYkFnRS8rL2syUm1W?=
- =?utf-8?B?ODZIeEFzZ0xKbkFDV1J4TitZQVp6Ni8zVzBwQUVCbThxS1Frd3RYVUZJcVpC?=
- =?utf-8?B?NytBbXE1aWVEL2JrVjN5cFYyRGNEbmlCV3BPVkhCcm1lT3hjSTFST3kzYzho?=
- =?utf-8?B?K0haWW1rZmFOU2djbmV1cERSaE9vM3pjVWJZMVltZXVwRFBUTVNZa3NWc1JB?=
- =?utf-8?B?NVBoc2Jkc2YvZ0szUWJGYXBsa1dxNk56am01RjEyMzdRYUE1REZzK0ZLNlZn?=
- =?utf-8?B?bGh3Q2lURVhkeVlReGMxeW5Mc05OQ3BKTGhaQ09RMHVuSkhzWVoxazJ2VEgv?=
- =?utf-8?B?OUtlZ1dvL0JrODZoZTc4anA1T3BjVW9weGQxd1Z4MWNEbG93OHIzSHFNZ2E5?=
- =?utf-8?B?QWJRYi9tOEE1eFpnM3RSc0ZqN1p1QWtUS3NDYnhOQWZsSFlKdDhxMk9ndWFL?=
- =?utf-8?B?Qjh3L29PYnMwYnEvNlhBZlpacG1uNFlSYmxYeVI4clFoSWxvQ3JDUjZVSHhT?=
- =?utf-8?B?ZEh2a2FVVkVpbCtVUjZpdlorQ3h1UlZpcHhWZkxsU3MvemJDM1BRZHQ4d1ZO?=
- =?utf-8?B?MVduRUxXSW4xWDlRWDQvV20vS2l0eEdacG9UbDNGeWx4ODMrc0ZWOURKZ2NO?=
- =?utf-8?B?dlpMMGVwWVhUS2ljY1BBeXh6S3J5aFVBVFJwSUlMbUMvR1N1c0toK1JmZS84?=
- =?utf-8?B?OGZiSnBjUGZ3SnpnREtTUzFPZDdsRmNrWjhEWWRTbEl5ZnJoMzM0dGN4Mzll?=
- =?utf-8?B?aHlaNzVpRDJxQ2Y3cFV5SFZXWVZrQTBSb3hyNG80MXFsYXhOd1BkejB5WWw0?=
- =?utf-8?B?emx2NUZEMDJwa1lpU0VFcUtnYkRYbWlCTkN3bHN2U3ZBQmhwVDlBTkhMTThC?=
- =?utf-8?B?QlVtdEcyR3JOeUpTRW9SdXV5dGJUZlFGV0lxM0x0VE5ZTjJ1S1NqVFJYOUVO?=
- =?utf-8?B?dVIwb2cwS3RrenNaaGZ5QWpTK2IxTEcrY2NjTHJOWHZwMlJtYUN2UElYejNs?=
- =?utf-8?B?ME1hdGNmS2czL2V6VXdDOFNnRGdaWWF5MCtWVTNJd2NwMTRXVHpTVExFMHNi?=
- =?utf-8?B?cXZQYm5BeVk3dEF2QXEvbitrNGdHUGs3cnB2UGJwMDF4Wnd1Z1Z4akk5a1RU?=
- =?utf-8?B?cWcxZVorWWliZmx6Rzh4UnROTWFXWDlmOFBFU2traWgyb1ZrUUJheW9zZnJD?=
- =?utf-8?B?alNNakYzV09sWkpsMkRNZlVlQlEvOU9YeSs4V1Y3U3hCUXczcDFsaUZIVm5K?=
- =?utf-8?B?TzF6N25kTlF2Z2RQamNSd09Ob0RiWkxseWU2cDZOdW1tcExESTM0NVZVQnBR?=
- =?utf-8?B?ZmFXUUU1YjJxNXRCaU1URlA5R3p6clNvK0l3WmFwMHE5L2JSUkJhWHY1b0Mw?=
- =?utf-8?B?SlRjK2pERFZpbHZwVXp6bzFkcFV3N0FwTjRjQnlPYnZQZjA0dmF1MVZtNzl6?=
- =?utf-8?B?RXVOUGxKZ1BLdllPZlFJQTdMRzFFRXZMaDZDNTRKcUpIbVFGNjRaNGVuZmZr?=
- =?utf-8?B?R3FJU0JBcnlQWnZIc2duTzJ3UHZqbjRwd2ZCaFd3OWp3SDF2YkhJckdiRSsw?=
- =?utf-8?B?OVN1NDcyS1REQXJqcjhaRmN0VVhVOWViQi9XRllNWlRTMlBBUnNjaDhZWEV5?=
- =?utf-8?Q?1kZ2fDTH2pYsDFvoUFFrNQoLK?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd08146e-3409-4a53-8bdc-08da8bb9fbaa
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2022 01:33:33.6002
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 40ziBdwV/tMJbALFAfGMORSQGmCCEjKv5oW5D/Nre+5zW/xS50yY+atgOHSxV8/JzVuZboRLK3OenWYEdSCvtA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6182
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9df4ed8-a0ea-661f-9947-b18fa1d2145f@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/31/22 03:37, Miklos Szeredi wrote:
-
-Hi Miklos,
-
-Thanks for looking at this, I'll accept all of these suggestions.
-
-> On Wed, 31 Aug 2022 at 06:19, John Hubbard <jhubbard@nvidia.com> wrote:
->>
->> Convert the fuse filesystem to use pin_user_pages_fast() and
->> unpin_user_page(), instead of get_user_pages_fast() and put_page().
->>
->> The user of pin_user_pages_fast() depends upon:
->>
->> 1) CONFIG_BLK_USE_PIN_USER_PAGES_FOR_DIO, and
->>
->> 2) User-space-backed pages or ITER_BVEC pages.
->>
->> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
->> ---
->>  fs/fuse/dev.c    | 11 +++++++++--
->>  fs/fuse/file.c   | 32 +++++++++++++++++++++-----------
->>  fs/fuse/fuse_i.h |  1 +
->>  3 files changed, 31 insertions(+), 13 deletions(-)
->>
->> diff --git a/fs/fuse/dev.c b/fs/fuse/dev.c
->> index 51897427a534..5de98a7a45b1 100644
->> --- a/fs/fuse/dev.c
->> +++ b/fs/fuse/dev.c
->> @@ -675,7 +675,12 @@ static void fuse_copy_finish(struct fuse_copy_state *cs)
->>                         flush_dcache_page(cs->pg);
->>                         set_page_dirty_lock(cs->pg);
->>                 }
->> -               put_page(cs->pg);
->> +               if (!cs->pipebufs &&
->> +                   (user_backed_iter(cs->iter) || iov_iter_is_bvec(cs->iter)))
->> +                       dio_w_unpin_user_page(cs->pg);
->> +
->> +               else
->> +                       put_page(cs->pg);
+On Wed, Aug 31, 2022 at 02:31:12PM +0800, Ziyang Zhang wrote:
+> On 2022/8/30 23:23, Stefan Hajnoczi wrote:
+> > On Sun, Aug 28, 2022 at 12:50:03PM +0800, Ming Lei wrote:
+> >> ublk document is missed when merging ublk driver, so add it now.
+> >>
+> >> Cc: Jonathan Corbet <corbet@lwn.net>
+> >> Cc: Richard W.M. Jones <rjones@redhat.com>
+> >> Cc: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> >> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> >> Cc: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+> >> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> >> ---
+> >>  Documentation/block/ublk.rst | 203 +++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 203 insertions(+)
+> >>  create mode 100644 Documentation/block/ublk.rst
+> >>
+> >> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+> >> new file mode 100644
+> >> index 000000000000..9e8f7ba518a3
+> >> --- /dev/null
+> >> +++ b/Documentation/block/ublk.rst
+> >> @@ -0,0 +1,203 @@
+> >> +.. SPDX-License-Identifier: GPL-2.0
+> >> +
+> >> +==========================================
+> >> +Userspace block device driver(ublk driver)
+> > 
+> > Usually there is a space before '('. There are more instances throughout
+> > the document.
+> > 
+> >> +==========================================
+> >> +
+> >> +Overview
+> >> +========
+> >> +
+> >> +ublk is one generic framework for implementing block device logic from
+> >> +userspace. It is very helpful to move virtual block drivers into userspace,
+> >> +such as loop, nbd and similar block drivers. It can help to implement new
+> >> +virtual block device, such as ublk-qcow2, and there was several attempts
+> >> +of implementing qcow2 driver in kernel.
+> > 
+> > This paragraph doesn't give specific reasons why userspace block devices
+> > are "very helpful".
+> > 
+> > Userspace block devices are attractive because:
+> > - They can be written many programming languages.
+> > - They can use libraries that are not available in the kernel.
+> > - They can be debugged with tools familiar to application developers.
+> > - Crashes do not kernel panic the machine.
+> > - Bugs are likely to have a lower security impact than bugs in kernel
+> >   code.
+> > - They can be installed and updated independently of the kernel.
+> > 
+> > I think including this list makes it clear why userspace block devices
+> > are appropriate in certain cases.
 > 
-> Why not move the logic into a helper and pass a "bool pinned" argument?
+> +1, this list is really attractive to ublk developers/users.
+> 
+> > 
+> >> +
+> >> +ublk block device(``/dev/ublkb*``) is added by ublk driver. Any IO request
+> >> +submitted to ublk device will be forwarded to ublk's userspace part(
+> >> +ublksrv [1]), and after the IO is handled by ublksrv, the result is
+> >> +committed back to ublk driver, then ublk IO request can be completed. With
+> >> +this way, any specific IO handling logic is totally done inside ublksrv,
+> >> +and ublk driver doe _not_ handle any device specific IO logic, such as
+> > 
+> > s/doe/does/
+> > 
+> >> +loop's IO handling, NBD's IO communication, or qcow2's IO mapping, ...
+> >> +
+> >> +/dev/ublkbN is driven by blk-mq request based driver, each request is
+> >> +assigned by one queue wide unique tag. ublksrv assigns unique tag to each
+> >> +IO too, which is 1:1 mapped with IO of /dev/ublkb*.
+> > 
+> > Is "/dev/ublkbN" the same as "/dev/ublkb*"? Please use one term consistently.
+> > 
+> >> +
+> >> +Both the IO request forward and IO handling result committing are done via
+> >> +io_uring passthrough command, that is why ublk is also one io_uring based
+> > 
+> > s/also one/a/
+> > 
+> >> +block driver. It has been observed that io_uring passthrough command can get
+> >> +better IOPS than block IO. So ublk is one high performance implementation
+> >> +of userspace block device.
+> > 
+> > I think this sentence means "Therefore ublk uses io_uring passthrough
+> > commands to implement userspace block devices in a performant way".
+> > 
+> >> Not only IO request communication is done by
+> >> +io_uring, but also the preferred IO handling in ublksrv is io_uring based
+> >> +approach too.
+> >> +
+> >> +ublk provides control interface to set/get ublk block device parameters, and
+> >> +the interface is extendable and kabi compatible, so basically any ublk request
+> >> +queue's parameter or ublk generic feature parameters can be set/get via this
+> >> +extendable interface. So ublk is generic userspace block device framework, such
+> >> +as, it is easy to setup one ublk device with specified block parameters from
+> > 
+> > "such as" -> "and as such"
+> > 
+> >> +userspace.
+> >> +
+> >> +How to use ublk
+> >> +===============
+> >> +
+> >> +After building ublksrv[1], ublk block device(``/dev/ublkb*``) can be added
+> > 
+> > It might be worth separating two use cases:
+> > 
+> > - Quickstart and people who just want to use existing ublksrv
+> >   functionality.
+> > 
+> > - Developers who are writing their own ublk server (e.g. rjones' nbdkit).
+> > 
+> > ublksrv isn't needed, it's possible to code directly against the ublk
+> > driver UAPI. I think it's worth pointing this out so it's clear to
+> > people when and why you would use ublksrv and also when to code against
+> > the ublk driver UAPI.
+> > 
+> > The documentation currently leaves it to the reader to figure out that
+> > ublksrv is just one possible userspace server implementation.
+> 
+> +1. Although now ublksrv seems to be the only one userspace implementation, I
+> expect that developers can directly use ublk_drv's UAPI. Maybe I will do
+> so while embedding ublk into our own backend.
 
-OK, will do. 
+Yeah, anyone can do that.
 
-It's not yet clear from the discussion in the other thread with Jan and Al [1],
-if I'll end up keeping this check:
+But when there is any bug you want to ask for help from community, can
+you share your use case? Or is it easy for you to do so? At that time,
+you still need to figure out how to trigger it in one open source
+implementation, then share the use case. Otherwise, not sure if
+community can help you easily.
 
-    user_backed_iter(cs->iter) || iov_iter_is_bvec(cs->iter)
-
-...but if it stays, then the helper is a good idea.
+There will be more functions or features added to ublksrv/ublk driver, it
+really needs one open source project to verify/test. You may say the
+feature is verified in your private/closed source environment, but
+usually not good, cause no one can reproduce it.
 
 > 
->>         }
->>         cs->pg = NULL;
->>  }
->> @@ -730,7 +735,9 @@ static int fuse_copy_fill(struct fuse_copy_state *cs)
->>                 }
->>         } else {
->>                 size_t off;
->> -               err = iov_iter_get_pages2(cs->iter, &page, PAGE_SIZE, 1, &off);
->> +
->> +               err = dio_w_iov_iter_pin_pages(cs->iter, &page, PAGE_SIZE, 1,
->> +                                              &off);
->>                 if (err < 0)
->>                         return err;
->>                 BUG_ON(!err);
->> diff --git a/fs/fuse/file.c b/fs/fuse/file.c
->> index 1a3afd469e3a..01da38928d0b 100644
->> --- a/fs/fuse/file.c
->> +++ b/fs/fuse/file.c
->> @@ -625,14 +625,19 @@ void fuse_read_args_fill(struct fuse_io_args *ia, struct file *file, loff_t pos,
->>  }
->>
->>  static void fuse_release_user_pages(struct fuse_args_pages *ap,
->> -                                   bool should_dirty)
->> +                                   bool should_dirty, bool is_user_or_bvec)
->>  {
->>         unsigned int i;
->>
->> -       for (i = 0; i < ap->num_pages; i++) {
->> -               if (should_dirty)
->> -                       set_page_dirty_lock(ap->pages[i]);
->> -               put_page(ap->pages[i]);
->> +       if (is_user_or_bvec) {
->> +               dio_w_unpin_user_pages_dirty_lock(ap->pages, ap->num_pages,
->> +                                                 should_dirty);
->> +       } else {
->> +               for (i = 0; i < ap->num_pages; i++) {
->> +                       if (should_dirty)
->> +                               set_page_dirty_lock(ap->pages[i]);
->> +                       put_page(ap->pages[i]);
->> +               }
+> > 
+> >> +and deleted by the utility, then existed block IO applications can talk with
+> >> +it.
+> >> +
+> >> +See usage details in README[2] of ublksrv, for example of ublk-loop:
+> >> +
+> >> +- add ublk device:
+> >> +  ublk add -t loop -f ublk-loop.img
+> >> +
+> >> +- use it:
+> >> +  mkfs.xfs /dev/ublkb0
+> >> +  mount /dev/ublkb0 /mnt
+> >> +  ....                     # all IOs are handled by io_uring!!!
+> >> +  umount /mnt
+> >> +
+> >> +- get ublk dev info:
+> >> +  ublk list
+> >> +
+> >> +- delete ublk device
+> >> +  ublk del -a
+> >> +  ublk del -n $ublk_dev_id
+> >> +
+> >> +Design
+> >> +======
+> >> +
+> >> +Control plane
+> >> +-------------
+> >> +
+> >> +ublk driver provides global misc device node(``/dev/ublk-control``) for
+> >> +managing and controlling ublk devices with help of several control commands:
+> >> +
+> >> +- UBLK_CMD_ADD_DEV
+> >> +  Add one ublk char device(``/dev/ublkc*``) which is talked with ublksrv wrt.
+> > 
+> > It may be clearer to say "the server" or "userspace" instead of
+> > "ublksrv", since that is the name of a specific server implementation
+> > and people may develop other servers.
+> > 
+> >> +  IO command communication. Basic device info is sent together with this
+> >> +  command, see UAPI structure of ublksrv_ctrl_dev_info, such as nr_hw_queues,
+> >> +  queue_depth, and max IO request buffer size, which info is negotiated with
+> >> +  ublk driver and sent back to ublksrv. After this command is completed, the
+> >> +  basic device info can't be changed any more.
+> >> +
+> >> +- UBLK_CMD_SET_PARAMS / UBLK_CMD_GET_PARAMS
+> >> +  Set or get ublk device's parameters, which can be generic feature related,
+> >> +  or request queue limit related, but can't be IO logic specific, cause ublk
+> >> +  driver does not handle any IO logic. This command has to be sent before
+> >> +  sending UBLK_CMD_START_DEV.
+> >> +
+> >> +- UBLK_CMD_START_DEV
+> >> +  After ublksrv prepares userspace resource such as, creating per-queue
+> >> +  pthread & io_ruing for handling ublk IO, this command is set for ublk
+> > 
+> > s/io_ruing/io_uring/
+> > 
+> >> +  driver to allocate & expose /dev/ublkb*. Parameters set via
+> >> +  UBLK_CMD_SET_PARAMS are applied for creating /dev/ublkb*.
+> >> +
+> >> +- UBLK_CMD_STOP_DEV
+> >> +  Quiesce IO on /dev/ublkb* and delete the disk. After this command returns,
+> >> +  ublksrv can release resource, such as destroy per-queue pthread & io_uring
+> >> +  for handling io command.
+> >> +
+> >> +- UBLK_CMD_DEL_DEV
+> >> +  Delete /dev/ublkc*. After this command returns, the allocated ublk device
+> >> +  number can be reused.
+> >> +
+> >> +- UBLK_CMD_GET_QUEUE_AFFINITY
+> >> +  After /dev/ublkc is added, ublk driver creates block layer tagset, so each
+> >> +  queue's affinity info is available, ublksrv sends UBLK_CMD_GET_QUEUE_AFFINITY
+> >> +  to retrieve queue affinity info, so ublksrv can setup the per-queue context
+> >> +  efficiently, such as bind affine CPUs with IO pthread, and try to allocate
+> >> +  buffers in IO thread context.
+> >> +
+> >> +- UBLK_CMD_GET_DEV_INFO
+> >> +  For retrieve device info of ublksrv_ctrl_dev_info. And it is ublksrv's
+> >> +  responsibility to save IO target specific info in userspace.
+> >> +
+> >> +Data plane
+> >> +----------
+> >> +
+> >> +ublksrv needs to create per-queue IO pthread & io_uring for handling IO
+> >> +command (io_uring passthrough command), and the per-queue IO pthread
+> >> +focuses on IO handling and shouldn't handle any control & management
+> >> +task.
+> >> +
+> >> +ublksrv's IO is assigned by one unique tag, which is 1:1 mapping with IO
+> >> +request of /dev/ublkb*.
+> >> +
+> >> +UAPI structure of ublksrv_io_desc is defined for describing each IO from
+> >> +ublk driver. One fixed mmaped area(array) on /dev/ublkc* is provided for
+> >> +exporting IO info to ublksrv, such as IO offset, length, OP/flags and
+> >> +buffer address. Each ublksrv_io_desc instance can be indexed via queue id
+> >> +and IO tag directly.
+> >> +
+> >> +Following IO commands are communicated via io_uring passthrough command,
+> >> +and each command is only for forwarding ublk IO and committing IO result
+> >> +with specified IO tag in the command data:
+> >> +
+> >> +- UBLK_IO_FETCH_REQ
+> >> +  Sent from ublksrv IO pthread for fetching future coming IO request
+> >> +  issued to /dev/ublkb*. This command is just sent once from ublksrv IO
+> >> +  pthread for ublk driver to setup IO forward environment.
+> >> +
+> >> +- UBLK_IO_COMMIT_AND_FETCH_REQ
+> >> +  After one IO request is issued to /dev/ublkb*, ublk driver stores this
+> >> +  IO's ublksrv_io_desc to the specified mapped area, then the previous
+> >> +  received IO command of this IO tag, either UBLK_IO_FETCH_REQ or
+> >> +  UBLK_IO_COMMIT_AND_FETCH_REQ, is completed, so ulksrv gets the IO
+> >> +  notification via io_uring.
+> >> +
+> >> +  After ublksrv handles this IO, this IO's result is committed back to ublk
+> >> +  driver by sending UBLK_IO_COMMIT_AND_FETCH_REQ back. Once ublkdrv received
+> >> +  this command, it parses the IO result and complete the IO request to
+> >> +  /dev/ublkb*. Meantime setup environment for fetching future IO request
+> >> +  with this IO tag. So UBLK_IO_COMMIT_AND_FETCH_REQ is reused for both
+> >> +  fetching request and committing back IO result.
+> >> +
+> >> +- UBLK_IO_NEED_GET_DATA
+> >> +  ublksrv pre-allocates IO buffer for each IO at default, any new project
+> >> +  should use this IO buffer to communicate with ublk driver. But existed
+> >> +  project may not work or be changed to in this way, so add this command
+> >> +  to provide chance for userspace to use its existed buffer for handling
+> >> +  IO.
+> > 
+> > I find it hard to understand this paragraph. It seems the
+> > UBLK_IO_NEED_GET_DATA command allows userspace to set up something
+> > related to IO buffers. What exactly does this command do?
 > 
-> Same here.
+> Let me explain UBLK_IO_NEED_GET_DATA since it is designed by myself.
+> 
+> Without UBLK_IO_NEED_GET_DATA, ublk_drv will copy data from biovecs
+> into a pre-allocated buffer(addr is passed with the last COMMIT_AMD_FETCH ioucmd)
+> while processing a WRITE request. Please consider two cases:
+> 
+> (1)  if the backend(such as a dist-storage system using RPC) provides the data
+>      buffer, it has to provide the buffer IN ADVANCE(before sending the last
+>      COMMIT_AMD_FETCH) without knowing any knowledge of this incoming request.
 
-Yes. Definitely belongs in a helper function. I was thinking, "don't
-go that far, because the code will eventually get deleted anyway", but
-you are right. :)
+The max buffer bytes is defined in ublksrv_ctrl_dev_info, and that is
+max length of any incoming io request.
+
+I explained it in last email, this way won't waste memory, and needn't extra
+swap out too.
+
+>      This makes existing backend very hard to adapt to ublk because they may
+>      want to know the data length or other attributes of the new request.
+
+It is just for existing project.
+
+Any new project can read the data from the pre-allocated buffer
+directly. That is exactly the handling flow: ublksrv gets one request from
+ublk driver, then let backend handle the request.
 
 > 
->>         }
->>  }
->>
->> @@ -733,7 +738,7 @@ static void fuse_aio_complete_req(struct fuse_mount *fm, struct fuse_args *args,
->>         struct fuse_io_priv *io = ia->io;
->>         ssize_t pos = -1;
->>
->> -       fuse_release_user_pages(&ia->ap, io->should_dirty);
->> +       fuse_release_user_pages(&ia->ap, io->should_dirty, io->is_user_or_bvec);
->>
->>         if (err) {
->>                 /* Nothing */
->> @@ -1414,10 +1419,10 @@ static int fuse_get_user_pages(struct fuse_args_pages *ap, struct iov_iter *ii,
->>         while (nbytes < *nbytesp && ap->num_pages < max_pages) {
->>                 unsigned npages;
->>                 size_t start;
->> -               ret = iov_iter_get_pages2(ii, &ap->pages[ap->num_pages],
->> -                                       *nbytesp - nbytes,
->> -                                       max_pages - ap->num_pages,
->> -                                       &start);
->> +               ret = dio_w_iov_iter_pin_pages(ii, &ap->pages[ap->num_pages],
->> +                                              *nbytesp - nbytes,
->> +                                              max_pages - ap->num_pages,
->> +                                              &start);
->>                 if (ret < 0)
->>                         break;
->>
->> @@ -1483,6 +1488,10 @@ ssize_t fuse_direct_io(struct fuse_io_priv *io, struct iov_iter *iter,
->>                 fl_owner_t owner = current->files;
->>                 size_t nbytes = min(count, nmax);
->>
->> +               /* For use in fuse_release_user_pages(): */
->> +               io->is_user_or_bvec = user_backed_iter(iter) ||
->> +                                     iov_iter_is_bvec(iter);
->> +
+> (2) If the backend does not provide the data buffer IN ADVANCE, ublksrv must
+>     pre-allocates data buffer. So a additional data copy from ublksrv to
+>     the backend(such as a RPC mempool) is unavoidable.
+
+Can you explain why backend can't use the pre-allocated buffer directly? Before
+backend completes the io request, the io request and buffer won't be reused, that
+is owned by this tag/slot.
+
 > 
-> How about io->is_pinned?  And a iov_iter_is_pinned() helper?
+> With UBLK_IO_NEED_GET_DATA, the WRITE request will be firstly issued to ublksrv
+> without data copy. Then, backend gets the request and it can allocate data
+> buffer and embed its addr inside a new ioucmd. After the kernel driver gets the
+> ioucmd, the data copy happens(from biovecs to backend's buffer). Finally,
+> the backend gets the request again with data to be written and it can truly
+> handle the request.
 
-Agreed, is_pinned is a better name, and the helper (if we end up needing
-that logic) also sounds good.
+That is definitely inefficient, and I won't encourage any new project to
+use this command.
+
+> 
+> > 
+> >> +
+> >> +- data copy between ublkserv IO buffer and ublk block IO request
+> > 
+> > s/ublkserv/ublksrv/
+> > 
+> >> +  ublk driver needs to copy ublk block IO request pages into ublksrv buffer
+> >> +  (pages) first for WRITE before notifying ublksrv of the coming IO, so
+> >> +  ublksrv can hanldle WRITE request.
+> > 
+> > s/hanldle/handle/
+> > 
+> >> +
+> >> +  After ublksrv handles READ request and sends UBLK_IO_COMMIT_AND_FETCH_REQ
+> >> +  to ublksrv, ublkdrv needs to copy read ublksrv buffer(pages) to the ublk
+> >> +  IO request pages.
+> 
+> ublksrv sends UBLK_IO_COMMIT_AND_FETCH_REQ to "ublkdrv", not "ublksrv", I think.
+> 
+> BTW, "ublkdrv" is very similar to "ublksrv"... Maybe we should use "ublk_drv"?
+> 
+> > 
+> > In the READ case userspace doesn't know exactly when the ublk driver is
+> > done copying in the buffer. I guess this isn't a problem because the
+> > userspace buffer will be reused when the next request is fetched?
+> 
+> In the READ case, userspace does not know exactly when the data copy happens.
+
+ublksrv just needs to write data to the buffer, then send the buffer
+with UBLK_IO_COMMIT_AND_FETCH_REQ to driver, and driver will copy the
+data to request's pages.
+
+Why does the userspace need to know when the copy happens?
+
+> 
+> The data buffer(add is passed with current UBLK_IO_COMMIT_AND_FETCH_REQ) is
+> reused for a future request(the same tag).
+
+Yeah, that is why it is completely safe since the future request can
+only come _after_ ublk driver has copied the previous buffer to request
+pages.
+
+> 
+> More specifically, whthout UBLK_IO_NEED_GET_DATA, if the future request is a
+> write request, this buffer is filled with biovecs' data before ublk_drv passes
+> the request to userspace. BTW, that's why UBLK_IO_NEED_GET_DATA is introduced.
+> Otherwise the read buffer is actually reused for a future write buffer...
+
+Not sure I get your point, but in short UBLK_IO_NEED_GET_DATA is only
+for legacy uses.
 
 
-[1] https://lore.kernel.org/r/20220831094349.boln4jjajkdtykx3@quack3
+Thanks,
+Ming
 
-thanks,
-
--- 
-John Hubbard
-NVIDIA
