@@ -2,124 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF78ECAAD2
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AAFAECAAD3
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:33:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232896AbiIAHHN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 03:07:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56830 "EHLO
+        id S233950AbiIAHdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 03:33:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233331AbiIAHGh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:06:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD0AA111AEA
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 00:06:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662015978;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eeBUu9nEhT4Kc4CwsZdP2lrb/xjOrC7tj07BpY9X5O8=;
-        b=iTaTa6+4v8eBqX680IWs43/+scilZ0ZHuHdviueLPDES72a+5wxePyD++IgMFPh2jQvlvX
-        NSY25gCP9G53TIE7Luf00f0qXuA2RwyhHxROppaYNLhC7rjMn13PRG/1iF3T9ynlQo2zLw
-        hXRpr9pcBp2zwkPqnmILqFf2Slr3OUk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-620-2PaaNq9yOrG3TBDajA1iqw-1; Thu, 01 Sep 2022 03:06:15 -0400
-X-MC-Unique: 2PaaNq9yOrG3TBDajA1iqw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CDC8485A58A;
-        Thu,  1 Sep 2022 07:06:14 +0000 (UTC)
-Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AE802026D4C;
-        Thu,  1 Sep 2022 07:06:09 +0000 (UTC)
-Date:   Thu, 1 Sep 2022 15:06:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dusty Mabe <dusty@dustymabe.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-raid@vger.kernel.org
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Message-ID: <YxBZ4BBjxvAkvI2A@T590>
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
+        with ESMTP id S233801AbiIAHcm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:32:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC9E65808
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 00:29:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=oZ37gH4GcI6zuhqYXKYXANHATWQQe0itpTonSt2Fnqc=; b=vT1cmbGXj+1w6CirL0UtCN0cVg
+        sR2SCy0EqGDal5Kzxk51u1M0ODyTt4YwiMdpd+NjIqg04rNb3FsuPYrbx7Yw/en7TnDCo+71cEXqp
+        EPwKt8VqPx5hAojNHKRmJ1H16CC8umB0f9RcZCtVtpOB76JTqrWOWTVSX7y6Sq5ctYpCgZk3LRefE
+        V2IHWU/C1JYnyQiBLxc0YgtmGLjg+BffDoj+e+SO8RD2yIwzh5GAI5I2lAkcyAhQBjdI/s2t6hKtO
+        7xxrviRtYzrGbVke4gXVrSdqlZJdhuffuQ3LaQwkuHmMm4MsoAYkiJh2ozPMmCK2lJC09o0RPm69h
+        qAAKM6Xg==;
+Received: from 213-225-1-14.nat.highway.a1.net ([213.225.1.14] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oTeeC-00AK0L-6f; Thu, 01 Sep 2022 07:29:56 +0000
+Date:   Thu, 1 Sep 2022 10:29:51 +0300
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.0
+Message-ID: <YxBfb38kb18Im/QB@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Dusty,
+The following changes since commit 645b5ed871f408c9826a61276b97ea14048d439c:
 
-On Fri, Aug 26, 2022 at 12:15:22PM -0400, Dusty Mabe wrote:
-> Hey All,
-> 
-> I think I've found a regression introduced by:
-> 
-> a09b314 o block: freeze the queue earlier in del_gendisk
-> 
-> In Fedora CoreOS we have tests that set up RAID1 on the /boot/ and /root/ partitions
-> and then subsequently removes one of the disks to simulate a failure. Sometime recently
+  Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.0 (2022-08-24 13:58:37 -0600)
 
-Do you have test case which doesn't need raid1 over /boot or /root? such
-as by create raid1 over two disks, then mount & remove one of device, ...
+are available in the Git repository at:
 
-It isn't easy to setup/observe such test case and observe what is wrong.
+  git://git.infradead.org/nvme.git tags/nvme-6.0-2022-09-01
 
-> this test started timing out occasionally. Looking a bit closer it appears instances are
-> getting stuck during reboot with a bunch of looping messages:
-> 
-> ```
-> [   17.978854] block device autoloading is deprecated and will be removed.
-> [   17.982555] block device autoloading is deprecated and will be removed.
-> [   17.985537] block device autoloading is deprecated and will be removed.
-> [   17.987546] block device autoloading is deprecated and will be removed.
-> [   17.989540] block device autoloading is deprecated and will be removed.
-> [   17.991547] block device autoloading is deprecated and will be removed.
-> [   17.993555] block device autoloading is deprecated and will be removed.
-> [   17.995539] block device autoloading is deprecated and will be removed.
-> [   17.997577] block device autoloading is deprecated and will be removed.
-> [   17.999544] block device autoloading is deprecated and will be removed.
-> [   22.979465] blkdev_get_no_open: 1666 callbacks suppressed
-> ...
-> ...
-> ...
-> [  618.221270] blkdev_get_no_open: 1664 callbacks suppressed
-> [  618.221273] block device autoloading is deprecated and will be removed.
-> [  618.224274] block device autoloading is deprecated and will be removed.
-> [  618.227267] block device autoloading is deprecated and will be removed.
-> [  618.229274] block device autoloading is deprecated and will be removed.
-> [  618.231277] block device autoloading is deprecated and will be removed.
-> [  618.233277] block device autoloading is deprecated and will be removed.
-> [  618.235282] block device autoloading is deprecated and will be removed.
-> [  618.237370] block device autoloading is deprecated and will be removed.
-> [  618.239356] block device autoloading is deprecated and will be removed.
-> [  618.241290] block device autoloading is deprecated and will be removed.
-> ```
-> 
-> Using the Fedora kernels I narrowed it down to being introduced between 
-> `kernel-5.19.0-0.rc3.27.fc37` (good) and `kernel-5.19.0-0.rc4.33.fc37` (bad).
-> 
-> I then did a bisect and found:
-> 
-> ```
-> $ git bisect bad
-> a09b314005f3a0956ebf56e01b3b80339df577cc is the first bad commit
-> commit a09b314005f3a0956ebf56e01b3b80339df577cc
-> Author: Christoph Hellwig <hch@lst.de>
-> Date:   Tue Jun 14 09:48:27 2022 +0200
-> 
->     block: freeze the queue earlier in del_gendisk
+for you to fetch changes up to 478814a5584197fa1fb18377653626e3416e7cd6:
 
-It is a bit hard to associate the above commit with reported issue.
+  nvmet-tcp: fix unhandled tcp states in nvmet_tcp_state_change() (2022-08-31 07:58:10 +0300)
 
+----------------------------------------------------------------
+nvme fixes for Linux 6.0
 
-Thanks,
-Ming
+ - error handling fix for the new auth code (Hannes Reinecke)
+ - fix unhandled tcp states in nvmet_tcp_state_change (Maurizio Lombardi)
+ - add NVME_QUIRK_BOGUS_NID for Lexar NM610 (Shyamin Ayesh)
 
+----------------------------------------------------------------
+Hannes Reinecke (1):
+      nvmet-auth: add missing goto in nvmet_setup_auth()
+
+Maurizio Lombardi (1):
+      nvmet-tcp: fix unhandled tcp states in nvmet_tcp_state_change()
+
+Shyamin Ayesh (1):
+      nvme-pci: add NVME_QUIRK_BOGUS_NID for Lexar NM610
+
+ drivers/nvme/host/pci.c    | 2 ++
+ drivers/nvme/target/auth.c | 1 +
+ drivers/nvme/target/tcp.c  | 3 +++
+ 3 files changed, 6 insertions(+)
