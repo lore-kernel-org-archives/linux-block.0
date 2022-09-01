@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CED0ECAAD3
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B8EECAAD1
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:44:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232714AbiIAHoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 03:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34806 "EHLO
+        id S233651AbiIAHoI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 03:44:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233756AbiIAHnM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:43:12 -0400
+        with ESMTP id S234053AbiIAHnh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:43:37 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58B81257FC;
-        Thu,  1 Sep 2022 00:43:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0970B1257F1;
+        Thu,  1 Sep 2022 00:43:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=k/bCRqhIEe5EhCH7REQnZWBBj0b2P9XHUMRdc2s+emM=; b=RJro6QENp+ATJxjQYZBSEm2m6k
-        H9IF1Owaw6OuVJZmyYl3RtIdOuu2muedMSl8OC099YK+EJXkDH4LLua9j0GUjK2GT/MnHuHhDAnR0
-        /S+Cycno1M4TpgpltNq/mTv4wZL6pM07ekiX4mGanWFKT+pL/IBuD5BF3e85X4dKxa0srgrx5iBxb
-        1N7F3srEeW3h/BNPVF5HxYXvdHFfW7rCZcK4r+GgtiegnakSgWRYTG3Qh8qnvwIc/7CZ8BRB2nSOY
-        aI18DV5QFCYLsIgHKBH15smQTpjvVwIxDxLUnZs83iLdOunBGc0aRUKAZ6FH0cRPmhnBFP4GDpSrc
-        PUsdyPXQ==;
+        bh=BcknqeZiBU7AfUTFnagzOoaBAn7P6DlrRAHe430S5NY=; b=l8ySUqRFcax7ifTq824G4bo2uG
+        +ez/WKKM34hhZ1j9okNSPxOPmm83PfkHWYcMdBfcO4f9eL9Uv43YsRUTVliezK4uGKPXdx7AkUZzq
+        nTIWjqzmbjdOyEdSOQh9b80OI4ns1n/UyUtGDGoCWVT4GS549E+22DoHEDdMTN8SDJ9LnpexTnjBF
+        PXjDuiGe0yxMe9/jE2yIc6o91Q/3f2wuMELt82+ZYriwEkpuk6gH0LxGA8TC4kAVvn3irnhWz/cqO
+        sUIqBFA+wjDkJ6VDnMwO5Q6fcxj7JY30s7Y/ghKE/G2LOcP4qcTrA1b9jfW509FTnKzzOSniiHSzE
+        40YUsBow==;
 Received: from 213-225-1-14.nat.highway.a1.net ([213.225.1.14] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oTeqv-00ANj6-36; Thu, 01 Sep 2022 07:43:06 +0000
+        id 1oTer6-00ANmz-SF; Thu, 01 Sep 2022 07:43:17 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
         David Sterba <dsterba@suse.com>
@@ -36,9 +36,9 @@ Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
         Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
         "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
         linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 11/17] btrfs: remove stripe boundary calculation for encoded I/O
-Date:   Thu,  1 Sep 2022 10:42:10 +0300
-Message-Id: <20220901074216.1849941-12-hch@lst.de>
+Subject: [PATCH 14/17] btrfs: remove now spurious bio submission helpers
+Date:   Thu,  1 Sep 2022 10:42:13 +0300
+Message-Id: <20220901074216.1849941-15-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220901074216.1849941-1-hch@lst.de>
 References: <20220901074216.1849941-1-hch@lst.de>
@@ -49,66 +49,118 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Qu Wenruo <wqu@suse.com>
+Just call btrfs_submit_bio and btrfs_submit_compressed_read directly from
+submit_one_bio now that all additional functionality has moved into
+btrfs_submit_bio.
 
-Stop looking at the stripe boundary in
-btrfs_encoded_read_regular_fill_pages() now that that btrfs_submit_bio
-can split bios.
-
-Signed-off-by: Qu Wenruo <wqu@suse.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/btrfs/inode.c | 23 ++---------------------
- 1 file changed, 2 insertions(+), 21 deletions(-)
+ fs/btrfs/ctree.h     |  3 ---
+ fs/btrfs/disk-io.c   |  6 ------
+ fs/btrfs/disk-io.h   |  1 -
+ fs/btrfs/extent_io.c | 11 ++++++-----
+ fs/btrfs/inode.c     | 22 ----------------------
+ 5 files changed, 6 insertions(+), 37 deletions(-)
 
+diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
+index 33c3c394e43e3..5e57e3c6a1fd6 100644
+--- a/fs/btrfs/ctree.h
++++ b/fs/btrfs/ctree.h
+@@ -3372,9 +3372,6 @@ void btrfs_inode_safe_disk_i_size_write(struct btrfs_inode *inode, u64 new_i_siz
+ u64 btrfs_file_extent_end(const struct btrfs_path *path);
+ 
+ /* inode.c */
+-void btrfs_submit_data_write_bio(struct inode *inode, struct bio *bio, int mirror_num);
+-void btrfs_submit_data_read_bio(struct inode *inode, struct bio *bio,
+-			int mirror_num, enum btrfs_compression_type compress_type);
+ bool btrfs_data_csum_ok(struct btrfs_bio *bbio, struct btrfs_device *dev,
+ 			u32 bio_offset, struct bio_vec *bv);
+ struct extent_map *btrfs_get_extent_fiemap(struct btrfs_inode *inode,
+diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
+index ceee039b65ea0..014c06c74155f 100644
+--- a/fs/btrfs/disk-io.c
++++ b/fs/btrfs/disk-io.c
+@@ -648,12 +648,6 @@ int btree_csum_one_bio(struct btrfs_bio *bbio)
+ 	return ret;
+ }
+ 
+-void btrfs_submit_metadata_bio(struct inode *inode, struct bio *bio, int mirror_num)
+-{
+-	bio->bi_opf |= REQ_META;
+-	btrfs_submit_bio(btrfs_sb(inode->i_sb), bio, mirror_num);
+-}
+-
+ #ifdef CONFIG_MIGRATION
+ static int btree_migrate_folio(struct address_space *mapping,
+ 		struct folio *dst, struct folio *src, enum migrate_mode mode)
+diff --git a/fs/btrfs/disk-io.h b/fs/btrfs/disk-io.h
+index 9d4e0e36f7bb9..3a7ef2352c968 100644
+--- a/fs/btrfs/disk-io.h
++++ b/fs/btrfs/disk-io.h
+@@ -80,7 +80,6 @@ void btrfs_drop_and_free_fs_root(struct btrfs_fs_info *fs_info,
+ int btrfs_validate_metadata_buffer(struct btrfs_bio *bbio,
+ 				   struct page *page, u64 start, u64 end,
+ 				   int mirror);
+-void btrfs_submit_metadata_bio(struct inode *inode, struct bio *bio, int mirror_num);
+ #ifdef CONFIG_BTRFS_FS_RUN_SANITY_TESTS
+ struct btrfs_root *btrfs_alloc_dummy_root(struct btrfs_fs_info *fs_info);
+ #endif
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 46a3f0e33fb69..33e80f8dd0b1b 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -198,12 +198,13 @@ static void submit_one_bio(struct btrfs_bio_ctrl *bio_ctrl)
+ 	btrfs_bio(bio)->file_offset = page_offset(bv->bv_page) + bv->bv_offset;
+ 
+ 	if (!is_data_inode(inode))
+-		btrfs_submit_metadata_bio(inode, bio, mirror_num);
+-	else if (btrfs_op(bio) == BTRFS_MAP_WRITE)
+-		btrfs_submit_data_write_bio(inode, bio, mirror_num);
++		bio->bi_opf |= REQ_META;
++
++	if (btrfs_op(bio) == BTRFS_MAP_READ &&
++	    bio_ctrl->compress_type != BTRFS_COMPRESS_NONE)
++		btrfs_submit_compressed_read(inode, bio, mirror_num);
+ 	else
+-		btrfs_submit_data_read_bio(inode, bio, mirror_num,
+-					   bio_ctrl->compress_type);
++		btrfs_submit_bio(btrfs_sb(inode->i_sb), bio, mirror_num);
+ 
+ 	/* The bio is owned by the end_io handler now */
+ 	bio_ctrl->bio = NULL;
 diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 833ea647f7887..399381a4f8e69 100644
+index 25194e75c0812..9c562d36e4570 100644
 --- a/fs/btrfs/inode.c
 +++ b/fs/btrfs/inode.c
-@@ -10025,7 +10025,6 @@ int btrfs_encoded_read_regular_fill_pages(struct btrfs_inode *inode,
- 					  u64 file_offset, u64 disk_bytenr,
- 					  u64 disk_io_size, struct page **pages)
- {
--	struct btrfs_fs_info *fs_info = inode->root->fs_info;
- 	struct btrfs_encoded_read_private priv = {
- 		.inode = inode,
- 		.file_offset = file_offset,
-@@ -10033,33 +10032,15 @@ int btrfs_encoded_read_regular_fill_pages(struct btrfs_inode *inode,
- 	};
- 	unsigned long i = 0;
- 	u64 cur = 0;
--	int ret;
+@@ -2662,28 +2662,6 @@ int btrfs_extract_ordered_extent(struct btrfs_bio *bbio)
+ 	return ret;
+ }
  
- 	init_waitqueue_head(&priv.wait);
- 	/*
--	 * Submit bios for the extent, splitting due to bio or stripe limits as
--	 * necessary.
-+	 * Submit bios for the extent, splitting due to bio limits as necessary.
- 	 */
- 	while (cur < disk_io_size) {
--		struct extent_map *em;
--		struct btrfs_io_geometry geom;
- 		struct bio *bio = NULL;
--		u64 remaining;
-+		u64 remaining = disk_io_size - cur;
- 
--		em = btrfs_get_chunk_map(fs_info, disk_bytenr + cur,
--					 disk_io_size - cur);
--		if (IS_ERR(em)) {
--			ret = PTR_ERR(em);
--		} else {
--			ret = btrfs_get_io_geometry(fs_info, em, BTRFS_MAP_READ,
--						    disk_bytenr + cur, &geom);
--			free_extent_map(em);
--		}
--		if (ret) {
--			WRITE_ONCE(priv.status, errno_to_blk_status(ret));
--			break;
--		}
--		remaining = min(geom.len, disk_io_size - cur);
- 		while (bio || remaining) {
- 			size_t bytes = min_t(u64, remaining, PAGE_SIZE);
- 
+-void btrfs_submit_data_write_bio(struct inode *inode, struct bio *bio, int mirror_num)
+-{
+-	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
+-
+-	btrfs_submit_bio(fs_info, bio, mirror_num);
+-}
+-
+-void btrfs_submit_data_read_bio(struct inode *inode, struct bio *bio,
+-			int mirror_num, enum btrfs_compression_type compress_type)
+-{
+-	if (compress_type != BTRFS_COMPRESS_NONE) {
+-		/*
+-		 * btrfs_submit_compressed_read will handle completing the bio
+-		 * if there were any errors, so just return here.
+-		 */
+-		btrfs_submit_compressed_read(inode, bio, mirror_num);
+-		return;
+-	}
+-
+-	btrfs_submit_bio(btrfs_sb(inode->i_sb), bio, mirror_num);
+-}
+-
+ /*
+  * given a list of ordered sums record them in the inode.  This happens
+  * at IO completion time based on sums calculated at bio submission time.
 -- 
 2.30.2
 
