@@ -2,77 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AAFAECAAD3
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDE7ECAAD1
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 07:42:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233950AbiIAHdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 03:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
+        id S233109AbiIAHmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 03:42:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233801AbiIAHcm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:32:42 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC9E65808
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 00:29:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=oZ37gH4GcI6zuhqYXKYXANHATWQQe0itpTonSt2Fnqc=; b=vT1cmbGXj+1w6CirL0UtCN0cVg
-        sR2SCy0EqGDal5Kzxk51u1M0ODyTt4YwiMdpd+NjIqg04rNb3FsuPYrbx7Yw/en7TnDCo+71cEXqp
-        EPwKt8VqPx5hAojNHKRmJ1H16CC8umB0f9RcZCtVtpOB76JTqrWOWTVSX7y6Sq5ctYpCgZk3LRefE
-        V2IHWU/C1JYnyQiBLxc0YgtmGLjg+BffDoj+e+SO8RD2yIwzh5GAI5I2lAkcyAhQBjdI/s2t6hKtO
-        7xxrviRtYzrGbVke4gXVrSdqlZJdhuffuQ3LaQwkuHmMm4MsoAYkiJh2ozPMmCK2lJC09o0RPm69h
-        qAAKM6Xg==;
-Received: from 213-225-1-14.nat.highway.a1.net ([213.225.1.14] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oTeeC-00AK0L-6f; Thu, 01 Sep 2022 07:29:56 +0000
-Date:   Thu, 1 Sep 2022 10:29:51 +0300
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for Linux 6.0
-Message-ID: <YxBfb38kb18Im/QB@infradead.org>
+        with ESMTP id S232377AbiIAHmY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 03:42:24 -0400
+Received: from mail.fadrush.pl (mail.fadrush.pl [54.37.225.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA17F10DE7C
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 00:42:23 -0700 (PDT)
+Received: by mail.fadrush.pl (Postfix, from userid 1002)
+        id BEFB022788; Thu,  1 Sep 2022 07:41:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fadrush.pl; s=mail;
+        t=1662018142; bh=bD6j9gIFU6CLTaCGl0Ow9oeIxtirvTfMeNZSfLEZQ+I=;
+        h=Date:From:To:Subject:From;
+        b=i0v+0cRi3u8lut/RKDMgXy+GmowWedbQpZ9+tpAc5neaAYnAWnlEUlyd0gi60MDt6
+         zSbm2lia275YKGsR6qZ9oq4urLKmEY8D1ybqkRRUGuLTWGeexKl5ghIQzM6gGMJHt4
+         aPK8KjCZnBRRJrPu77WwuI6HBmAfmNUQV7F3H+ynxOUdI0QIhIvJXOCxUYNWdDiQwW
+         AWYBfLIPfujSQwJfgSiwPooRCFpTw5S/2WJlrClwtAeJOkaSbp4YuldT9N7XaaQkL0
+         POCskNTsLUg/bzbKEahMLabHd0hQaDCP75PMm3v/2weVaCWiIlJEq9ypOLmNkIjwNL
+         EzenJ3z5ndM0g==
+Received: by mail.fadrush.pl for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 07:41:15 GMT
+Message-ID: <20220901064500-0.1.1d.bpg8.0.3a8piib82j@fadrush.pl>
+Date:   Thu,  1 Sep 2022 07:41:15 GMT
+From:   "Jakub Olejniczak" <jakub.olejniczak@fadrush.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: =?UTF-8?Q?Zwi=C4=99kszenie_p=C5=82ynno=C5=9Bci_finansowej?=
+X-Mailer: mail.fadrush.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 645b5ed871f408c9826a61276b97ea14048d439c:
+Dzie=C5=84 dobry,
 
-  Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-6.0 (2022-08-24 13:58:37 -0600)
+kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC chcia=C5=82bym za=
+proponowa=C4=87 wygodne rozwi=C4=85zanie, kt=C3=B3re umo=C5=BCliwi Pa=C5=84=
+stwa firmie stabilny rozw=C3=B3j.=20
 
-are available in the Git repository at:
+Konkurencyjne otoczenie wymaga ci=C4=85g=C5=82ego ulepszania i poszerzeni=
+a oferty, co z kolei wi=C4=85=C5=BCe si=C4=99 z konieczno=C5=9Bci=C4=85 i=
+nwestowania. Brak odpowiedniego kapita=C5=82u powa=C5=BCnie ogranicza tem=
+po rozwoju firmy.
 
-  git://git.infradead.org/nvme.git tags/nvme-6.0-2022-09-01
+Od wielu lat z powodzeniem pomagam firmom w uzyskaniu najlepszej formy fi=
+nansowania z banku oraz UE. Mam sta=C5=82ych Klient=C3=B3w, kt=C3=B3rzy n=
+adal ch=C4=99tnie korzystaj=C4=85 z moich us=C5=82ug, a tak=C5=BCe poleca=
+j=C4=85 je innym.
 
-for you to fetch changes up to 478814a5584197fa1fb18377653626e3416e7cd6:
+Czy chcieliby Pa=C5=84stwo skorzysta=C4=87 z pomocy wykwalifikowanego i d=
+o=C5=9Bwiadczonego doradcy finansowego?
 
-  nvmet-tcp: fix unhandled tcp states in nvmet_tcp_state_change() (2022-08-31 07:58:10 +0300)
 
-----------------------------------------------------------------
-nvme fixes for Linux 6.0
-
- - error handling fix for the new auth code (Hannes Reinecke)
- - fix unhandled tcp states in nvmet_tcp_state_change (Maurizio Lombardi)
- - add NVME_QUIRK_BOGUS_NID for Lexar NM610 (Shyamin Ayesh)
-
-----------------------------------------------------------------
-Hannes Reinecke (1):
-      nvmet-auth: add missing goto in nvmet_setup_auth()
-
-Maurizio Lombardi (1):
-      nvmet-tcp: fix unhandled tcp states in nvmet_tcp_state_change()
-
-Shyamin Ayesh (1):
-      nvme-pci: add NVME_QUIRK_BOGUS_NID for Lexar NM610
-
- drivers/nvme/host/pci.c    | 2 ++
- drivers/nvme/target/auth.c | 1 +
- drivers/nvme/target/tcp.c  | 3 +++
- 3 files changed, 6 insertions(+)
+Pozdrawiam
+Jakub Olejniczak
