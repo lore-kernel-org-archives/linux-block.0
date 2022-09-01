@@ -2,112 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CECECAAD3
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 19:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12160ECAAD5
+	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 19:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232404AbiIATRG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 15:17:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
+        id S232065AbiIATdP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 15:33:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232301AbiIATRF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 15:17:05 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA1075FCF;
-        Thu,  1 Sep 2022 12:17:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=mn3VERy0s8rwu2J3nmnzKseb1Xv+6b55gPqcv2R29Do=; b=YzaqHznkMBYAnCSOLqSHdegCox
-        YKGC4eoem9/8GT5zgWrOSDaNjktJxP8yRvpJYQxa1Z8TVgSJMiKxRYBzMwVpxfst2k9K0nTOV1HBS
-        g+ph5690L3SgBn1e1YgO7JjiEYivUW+H3wpACNHc9roxwPBpKqP9k77Y82r0mkv/FNfPaaPUHfTvB
-        p4qZfGw6uCBlrSY263wg1z6zYHA/Re3+5UA8DJ6RvGYmERMmO74bYgDyuhsaCDe3OouNe43APnOcv
-        6drCz4JVkp2sBvXA1RP/eGJ/WdeAGxetZaWgUxT+1aOmV3OaCU44xJq4EEu+L4J8FIFcXmhtYUgpU
-        1D7gy7Vw==;
-Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oTpgS-00Dx2S-Se; Thu, 01 Sep 2022 13:17:01 -0600
-Message-ID: <fb9d7948-43fe-87c5-5275-70f280181ad1@deltatee.com>
-Date:   Thu, 1 Sep 2022 13:16:54 -0600
+        with ESMTP id S234042AbiIATdO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 15:33:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43A38982F;
+        Thu,  1 Sep 2022 12:33:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 70ECA61DEF;
+        Thu,  1 Sep 2022 19:33:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0971C433D6;
+        Thu,  1 Sep 2022 19:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662060792;
+        bh=Pl43GYt6Xsc/ANMGGsY4FRqWrbIBaTw6SVq8MHkVlFs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ZlWrYLUtM87oJ66958+byIVSwRs09ENVP/W42o9oocn7HaYiu/XKLb8X6wcrXrlVy
+         nv/MTQpOkpOWC/2y6gyhxXTE3it53EuluzxehIX2libyt1KBRpauiHEAkBpwZawOvw
+         vrCoZ2lwJQ5UJvD50/ysEQIxUsdYQRqrBitNcXv0dbb7NKmZnkAHTjsbxzdCX1AUdu
+         ylgeC81ZRHuDK0HbZcFCPl4qIE9hpF8PVhOu2KI0qeSjrXgSnmh9a5YehgcLpvP4CZ
+         /1rF0hYQ5b/e/ZhHFAzoss4RgKZM5vbyPh8+NBBVBrqUCrO7pJv6BVP/XeUlFihoUb
+         j/GFuNHHOFbZg==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-fscrypt@vger.kernel.org
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v4 0/3] fscrypt: rework keyring and stop using request_queue
+Date:   Thu,  1 Sep 2022 12:32:05 -0700
+Message-Id: <20220901193208.138056-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-CA
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20220825152425.6296-1-logang@deltatee.com>
- <20220825152425.6296-8-logang@deltatee.com> <YxDb2MyRx6o/wDAz@kroah.com>
- <4a4bca1e-bebf-768f-92d4-92eb8ae714e1@deltatee.com>
- <YxDhEO9ycZDTnbZm@kroah.com>
- <cc9a24a8-dd3a-9d21-d9a7-5ee4b0ad7a57@deltatee.com>
- <YxD7uZYaV75gJS9d@kroah.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <YxD7uZYaV75gJS9d@kroah.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v9 7/8] PCI/P2PDMA: Allow userspace VMA allocations
- through sysfs
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Patch 1 of this series reworks the fscrypt filesystem-level keyring to
+not use the keyrings subsystem as part of its internal implementation
+(except for ->mk_users, which remains unchanged for now).  This fixes
+several issues, described in the patch itself.  This is also a
+prerequisite for eliminating the direct use of struct request_queue from
+filesystem code, as discussed at
+https://lore.kernel.org/linux-fscrypt/20220721125929.1866403-1-hch@lst.de/T/#u
+
+Patches 2-3 eliminate the direct uses of struct request_queue from
+fs/crypto/ that don't require block layer changes.  (The remaining uses
+will be eliminated later by changing some of the blk-crypto functions.)
+
+Changed in v4:
+    - Restored a NULL check in fscrypt_destroy_inline_crypt_key() that
+      I had accidentally dropped.
+    - Tweaked patches 2 and 3 slightly so that patch 2 no longer makes
+      as many changes that patch 3 then undoes.
+
+Changed in v3:
+    - Added patch "fscrypt: work on block_devices instead of request_queues"
+
+Changed in v2:
+    - Don't compare uninitialized bytes of struct fscrypt_key_specifier
+    - Don't use refcount_dec_and_lock() unnecessarily
+    - Other minor cleanups
+
+Christoph Hellwig (1):
+  fscrypt: work on block_devices instead of request_queues
+
+Eric Biggers (2):
+  fscrypt: stop using keyrings subsystem for fscrypt_master_key
+  fscrypt: stop holding extra request_queue references
+
+ fs/crypto/fscrypt_private.h |  74 ++++--
+ fs/crypto/hooks.c           |  10 +-
+ fs/crypto/inline_crypt.c    | 147 ++++++-----
+ fs/crypto/keyring.c         | 495 +++++++++++++++++++-----------------
+ fs/crypto/keysetup.c        |  89 +++----
+ fs/crypto/keysetup_v1.c     |   4 +-
+ fs/crypto/policy.c          |   8 +-
+ fs/f2fs/super.c             |  24 +-
+ fs/super.c                  |   2 +-
+ include/linux/fs.h          |   2 +-
+ include/linux/fscrypt.h     |  25 +-
+ 11 files changed, 462 insertions(+), 418 deletions(-)
 
 
-On 2022-09-01 12:36, Greg Kroah-Hartman wrote:
-> On Thu, Sep 01, 2022 at 12:14:25PM -0600, Logan Gunthorpe wrote:
->> Well we haven't plugged in a remove call into p2pdma, that would be more
->> work and more interfaces touching the PCI code. Note: this code isn't a
->> driver but a set of PCI helpers available to other PCI drivers.
->> Everything that's setup is using the devm interfaces and gets torn down
->> with the same. So I don't really see the benefit of making the change
->> you propose.
-> 
-> The issue is the classic one with the devm helpers.  They do not lend
-> themselves to resource management issues that require ordering or other
-> sort of dependencies.  Please do not use them here, just put in a remove
-> callback as you eventually will need it anyway, as you have a strong
-> requirement for what gets freed when, and the devm api does not provide
-> for that well.
+base-commit: 1c23f9e627a7b412978b4e852793c5e3c3efc555
+-- 
+2.37.2
 
-This surprises me. Can you elaborate on this classic issue?
-
-I've definitely seen uses of devm that expect the calls will be torn
-down in reverse order they are added. The existing p2pdma code will
-certainly fail quite significantly if a devm_kzalloc() releases its
-memory before the devm_memmap_pages() cleans up. There's also already an
-action that is used to cleanup before the last devm_kzalloc() call
-happens. If ordering is not guaranteed, then devm seems fairly broken
-and unusable and I'd have to drop all uses from this code and go back to
-the error prone method. Also what's the point of
-devm_add_action_or_reset() if it doesn't guarantee the ordering or the
-release?
-
-But if it's that important I can make the change to these patches for v10.
-
-Logan
