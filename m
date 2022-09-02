@@ -2,184 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C1D3C38145
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 11:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25414C38145
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 12:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236058AbiIBLMA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 07:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S235645AbiIBMCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 08:02:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235830AbiIBLLd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 07:11:33 -0400
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D491EC7B90;
-        Fri,  2 Sep 2022 04:11:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1662117089; x=1693653089;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6syYNqYADgJ/uyZ9pJBWRfO0mouP2N6IJMJoILo4HW0=;
-  b=P+/xjhKqYpWc9umHw7ARMbJ163HgF9/nytW7tYnuWORlFdrRcPuaOe+z
-   z9HFreuszZZ9tx9PJcL9+EHkk6kaqS6r68NhGYUJlF744EnCcwb9ersNt
-   7f8q+r7UTG2J1P8uy5xe2BBzW3fkCyNgN17q0iEw4CfaUDskpuj1aW+XL
-   g=;
-X-IronPort-AV: E=Sophos;i="5.93,283,1654560000"; 
-   d="scan'208";a="236927472"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-92ba9394.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 11:11:15 +0000
-Received: from EX13D05EUC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2a-92ba9394.us-west-2.amazon.com (Postfix) with ESMTPS id 9051B4558C;
-        Fri,  2 Sep 2022 11:11:12 +0000 (UTC)
-Received: from EX13MTAUWA001.ant.amazon.com (10.43.160.58) by
- EX13D05EUC001.ant.amazon.com (10.43.164.118) with Microsoft SMTP Server (TLS)
- id 15.0.1497.38; Fri, 2 Sep 2022 11:11:11 +0000
-Received: from dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com (10.15.57.183)
- by mail-relay.amazon.com (10.43.160.118) with Microsoft SMTP Server id
- 15.0.1497.38 via Frontend Transport; Fri, 2 Sep 2022 11:11:09 +0000
-Received: by dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com (Postfix, from userid 5466572)
-        id 58D8226F6; Fri,  2 Sep 2022 11:11:08 +0000 (UTC)
-Date:   Fri, 2 Sep 2022 11:11:08 +0000
-From:   Maximilian Heyne <mheyne@amazon.de>
-To:     Pratyush Yadav <ptyadav@amazon.de>
-CC:     SeongJae Park <sj@kernel.org>, <jgross@suse.com>,
-        <roger.pau@citrix.com>, <marmarek@invisiblethingslab.com>,
-        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stable@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] xen-blkback: Advertise feature-persistent as user
- requested
-Message-ID: <20220902111108.GA27172@dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com>
-References: <20220831165824.94815-1-sj@kernel.org>
- <20220831165824.94815-2-sj@kernel.org>
- <20220902095207.y3whbc5mw4hyqphg@yadavpratyush.com>
+        with ESMTP id S235498AbiIBMCN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 08:02:13 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F7CB1B85
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 05:02:10 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220902120207euoutp011f83e206cd5b354e35c73232cf45ee09~RCXMHN0Fb2599825998euoutp01C
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 12:02:07 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220902120207euoutp011f83e206cd5b354e35c73232cf45ee09~RCXMHN0Fb2599825998euoutp01C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662120127;
+        bh=jiI5Em5yN7LXCzd4BU0QPHZ2+BpULve8s7MVTfLpnpk=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=CD9DpNIQSQKNTw/2R7CunR6t1+/v4Xwggx+98RtRQ7nOHRwlvPoBAeCh8ti0FMQP5
+         sRMBiuACDRXtWvRZ7v4PuZcz7CtKfGxyceo0xeUmsij+L4aFy2l9UKpKJk4vkaX3BY
+         WM6i9SZJWgJQSj/+NGVjU9eXjUGBPqB6nwmny4aw=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220902120206eucas1p2718c2f0ddf87452f3dd1bf6349e92563~RCXLpFLBu3079630796eucas1p2Y;
+        Fri,  2 Sep 2022 12:02:06 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 0A.52.07817.EB0F1136; Fri,  2
+        Sep 2022 13:02:06 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220902120206eucas1p1bff06c1bc60d068c2807bad75ce342f2~RCXLHFq-_3031230312eucas1p1R;
+        Fri,  2 Sep 2022 12:02:06 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220902120206eusmtrp2bce39382a0e300c0c835ba79a2b355f1~RCXLGKl2C0333103331eusmtrp2D;
+        Fri,  2 Sep 2022 12:02:06 +0000 (GMT)
+X-AuditID: cbfec7f4-8abff70000011e89-78-6311f0bee919
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id D5.24.07473.DB0F1136; Fri,  2
+        Sep 2022 13:02:05 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220902120205eusmtip11c33df1e1d97a92b6e98a09492ea4d42~RCXK7TqlI3188931889eusmtip1z;
+        Fri,  2 Sep 2022 12:02:05 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.27) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 2 Sep 2022 13:02:04 +0100
+Message-ID: <96f90e1d-aa0f-1c76-bfc9-a87e978ad655@samsung.com>
+Date:   Fri, 2 Sep 2022 14:02:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220902095207.y3whbc5mw4hyqphg@yadavpratyush.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.11.0
+Subject: Re: [PATCH v12 12/13] dm: introduce DM_EMULATED_ZONES target type
+Content-Language: en-US
+To:     Mike Snitzer <snitzer@redhat.com>
+CC:     <agk@redhat.com>, <snitzer@kernel.org>, <axboe@kernel.dk>,
+        <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
+        <pankydev8@gmail.com>, <Johannes.Thumshirn@wdc.com>,
+        <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
+        <hare@suse.de>, <jaegeuk@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <matias.bjorling@wdc.com>,
+        <gost.dev@samsung.com>, <bvanassche@acm.org>,
+        <linux-nvme@lists.infradead.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <YxFOS8fq8AeE5mkf@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.27]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrIKsWRmVeSWpSXmKPExsWy7djP87r7PggmG5zfIWux/tQxZovVd/vZ
+        LKZ9+Mls8fvseWaLve9ms1rsWTSJyWLl6qNMFk/Wz2K2+Nt1j8li7y1ti8u75rBZzF/2lN1i
+        QttXZos1N5+yWJy4JW3RtvEro4OAx+Ur3h47Z91l97h8ttRj06pONo/NS+o9dt9sYPPY2Xqf
+        1eP9vqtAodPVHp83yXm0H+hmCuCO4rJJSc3JLEst0rdL4Mr4saeNraCHs2JaS2ED4zr2LkZO
+        DgkBE4klK2ezdDFycQgJrGCUmHhnCVhCSOALo8STAzIQ9mdGid6t/DANm/69ZYVoWM4oMfXM
+        PEYIB6io8fpydghnJ6PEwcctrCAtvAJ2Ert3dLGA2CwCKhJrL79ngYgLSpyc+QTMFhWIlFiz
+        +yzYamEBL4m5H/4ygdjMAuISt57MB7I5OEQEVCVuTXMBmc8sMJ1Z4tWMRewgcTYBLYnGTrBW
+        TiDz+54dLBCtmhKt23+zQ9jyEtvfzmGG+EBJ4uSylUwQdq3E2mNnoEHxiFPiwr4yCNtFYtOD
+        ZkYIW1ji1fEtUDUyEv93zofqrZZ4euM3M8g9EgItjBL9O9ezgdwjIWAt0XcmB6LGUeLm2+3s
+        EGE+iRtvBSHO4ZOYtG068wRG1VlIATELycOzkHwwC8kHCxhZVjGKp5YW56anFhvlpZbrFSfm
+        Fpfmpesl5+duYgSmwtP/jn/Zwbj81Ue9Q4xMHIyHGCU4mJVEeKceFkgW4k1JrKxKLcqPLyrN
+        SS0+xCjNwaIkzpucuSFRSCA9sSQ1OzW1ILUIJsvEwSnVwOQScp/VeVXdxNqYvoCJjb51KnO8
+        dndrTl2j9+xA2FbXhedvNGst3yDjvNFX4RdjzgOd3k6dI9zc8zwSszKVVzallzxv4jpmKf1X
+        2eTZ7lShDbODAm6fzKnhOTsl6fj7CLZb6YLKvPcWt6dE38/aaapx8PGnG/4zC7/0pEjbvdpY
+        uEhPd5/9hitMrC5KP7NW9vwP/Sdq+y5oruvh0EdyWtuCJ+pxlluEq55zWxJy4+2DSPW5wUyd
+        BmXm5/hF7+x7dde9k63a8deEy/m95jpXiv8UHzu2wbMlQu9h14fLRctO+Oc/KjvX873hSmKP
+        9LkVWzhYjvWVfShsLdwe+Zj17/3FXQEXPt89tu3Tq9VytkosxRmJhlrMRcWJACswvdv0AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOKsWRmVeSWpSXmKPExsVy+t/xu7p7PwgmGyxqsrZYf+oYs8Xqu/1s
+        FtM+/GS2+H32PLPF3nezWS32LJrEZLFy9VEmiyfrZzFb/O26x2Sx95a2xeVdc9gs5i97ym4x
+        oe0rs8Wam09ZLE7ckrZo2/iV0UHA4/IVb4+ds+6ye1w+W+qxaVUnm8fmJfUeu282sHnsbL3P
+        6vF+31Wg0Olqj8+b5DzaD3QzBXBH6dkU5ZeWpCpk5BeX2CpFG1oY6RlaWugZmVjqGRqbx1oZ
+        mSrp29mkpOZklqUW6dsl6GX82NPGVtDDWTGtpbCBcR17FyMnh4SAicSmf29ZQWwhgaWMEgff
+        6UHEZSQ+XfkIVSMs8edaF1sXIxdQzUdGiY9tZ1khnJ2MEoumb2QCqeIVsJPYvaOLBcRmEVCR
+        WHv5PQtEXFDi5MwnYLaoQKTEw2VNYPXCAl4Scz/8BbOZBcQlbj2ZD2RzcIgIqErcmuYCMp9Z
+        YDqzxKsZi9ghrrvHKLH3RxFIDZuAlkRjJ1iYE8j8vmcHC8QYTYnW7b/ZIWx5ie1v5zBDPKAk
+        cXLZSiYIu1bi1f3djBMYRWchuW4WkitmIRk1C8moBYwsqxhFUkuLc9Nziw31ihNzi0vz0vWS
+        83M3MQJTyLZjPzfvYJz36qPeIUYmDsZDjBIczEoivFMPCyQL8aYkVlalFuXHF5XmpBYfYjQF
+        BtFEZinR5HxgEssriTc0MzA1NDGzNDC1NDNWEuf1LOhIFBJITyxJzU5NLUgtgulj4uCUamCy
+        aLXrmNTIfD896G5c0iXX/0Y24n48L2QOm1wMfGCiZBu26uhTBtvQE18/TpcXtC9wFHj7W/2F
+        aUsX69tVTfOlNEPkKnvcu3b+TnaIef06bPoO6bP/rjnLfJ1wnO3+wu9zZr0yUUnl0l5b3RLx
+        513cjllVh8PZFk3I2DhnyaLutveXK61Pv0yPW3L98JGKvLP22fOtS/P91vbH5Lbejgg/n/6W
+        i0VW/Yy8u5ZLo+nM02GKhvs13bZ7lVWVHT2W6LXyY/tcbh+DY7vOGMy8+CJwy/SoN2FNM0ND
+        K/5EPXCv/ZRx8+Lj56sfSF+rV7jO/XbGcusUJtOvBzimqXRvs/18r/K+ou1fhlsv3kXb93Yr
+        sRRnJBpqMRcVJwIAHouRhqoDAAA=
+X-CMS-MailID: 20220902120206eucas1p1bff06c1bc60d068c2807bad75ce342f2
+X-Msg-Generator: CA
+X-RootMTR: 20220823121914eucas1p2f4445066c23cdae4fca80f7b0268815b
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220823121914eucas1p2f4445066c23cdae4fca80f7b0268815b
+References: <20220823121859.163903-1-p.raghav@samsung.com>
+        <CGME20220823121914eucas1p2f4445066c23cdae4fca80f7b0268815b@eucas1p2.samsung.com>
+        <20220823121859.163903-13-p.raghav@samsung.com>
+        <YxFOS8fq8AeE5mkf@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 02, 2022 at 09:53:22AM +0000, Pratyush Yadav wrote:
-> On 31/08/22 04:58PM, SeongJae Park wrote:
-> > The advertisement of the persistent grants feature (writing
-> > 'feature-persistent' to xenbus) should mean not the decision for using
-> > the feature but only the availability of the feature.  However, commit
-> > aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent
-> > grants") made a field of blkback, which was a place for saving only the
-> > negotiation result, to be used for yet another purpose: caching of the
-> > 'feature_persistent' parameter value.  As a result, the advertisement,
-> > which should follow only the parameter value, becomes inconsistent.
-> > 
-> > This commit fixes the misuse of the semantic by making blkback saves the
-> > parameter value in a separate place and advertises the support based on
-> > only the saved value.
-> > 
-> > Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
-> > Cc: <stable@vger.kernel.org> # 5.10.x
-> > Suggested-by: Juergen Gross <jgross@suse.com>
-> > Signed-off-by: SeongJae Park <sj@kernel.org>
-> > ---
-> >  drivers/block/xen-blkback/common.h | 3 +++
-> >  drivers/block/xen-blkback/xenbus.c | 6 ++++--
-> >  2 files changed, 7 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-> > index bda5c815e441..a28473470e66 100644
-> > --- a/drivers/block/xen-blkback/common.h
-> > +++ b/drivers/block/xen-blkback/common.h
-> > @@ -226,6 +226,9 @@ struct xen_vbd {
-> >         sector_t                size;
-> >         unsigned int            flush_support:1;
-> >         unsigned int            discard_secure:1;
-> > +       /* Connect-time cached feature_persistent parameter value */
-> > +       unsigned int            feature_gnt_persistent_parm:1;
+On 2022-09-02 02:28, Mike Snitzer wrote:
+> On Tue, Aug 23 2022 at  8:18P -0400,
+> Pankaj Raghav <p.raghav@samsung.com> wrote:
 > 
-> Continuing over from the previous version:
+>> Introduce a new target type DM_EMULATED_ZONES for targets with
+>> a different number of sectors per zone (aka zone size) than the underlying
+>> device zone size.
+>>
+>> This target type is introduced as the existing zoned targets assume
+>> that the target and the underlying device have the same zone size.
+>> The new target: dm-po2zone will use this new target
+>> type as it emulates the zone boundary that is different from the
+>> underlying zoned device.
+>>
+>> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+>> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 > 
-> > > If feature_gnt_persistent_parm is always going to be equal to 
-> > > feature_persistent, then why introduce it at all? Why not just use 
-> > > feature_persistent directly? This way you avoid adding an extra flag 
-> > > whose purpose is not immediately clear, and you also avoid all the 
-> > > mess with setting this flag at the right time.
-> >
-> > Mainly because the parameter should read twice (once for 
-> > advertisement, and once later just before the negotitation, for 
-> > checking if we advertised or not), and the user might change the 
-> > parameter value between the two reads.
-> >
-> > For the detailed available sequence of the race, you could refer to the 
-> > prior conversation[1].
-> >
-> > [1] https://lore.kernel.org/linux-block/20200922111259.GJ19254@Air-de-Roger/
+> This patch's use of "target type" jargon isn't valid. 
 > 
-> Okay, I see. Thanks for the pointer. But still, I think it would be 
-> better to not maintain two copies of the value. How about doing:
+> Please say "target feature flag" and rename DM_EMULATED_ZONES to
+> DM_TARGET_EMULATED_ZONES in the subject and header.
+> Good catch. I will fix it up for the next version.
+> But, with those fixed:
 > 
-> 	blkif->vbd.feature_gnt_persistent =
-> 		xenbus_read_unsigned(dev->nodename, "feature-persistent", 0) &&
-> 		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
+> Signed-off-by: Mike Snitzer <snitzer@kernel.org>
 > 
-> This makes it quite clear that we only enable persistent grants if 
-> _both_ ends support it. We can do the same for blkfront.
-
-Currently, the feature-persistent xenstore entry is written to from connect()
-which is called after connect_ring(). So it's not available like this.  Perhaps
-it's possible to delay the decision whether to use persistent grants until
-connect().
-
+You mean <Reviewed-By> ? :)
+> (fyi, I'll review patch 13, the dm-po2zone target, tomorrow)
 > 
-> > +       /* Persistent grants feature negotiation result */
-> >         unsigned int            feature_gnt_persistent:1;
-> >         unsigned int            overflow_max_grants:1;
-> >  };
-> > diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> > index ee7ad2fb432d..c0227dfa4688 100644
-> > --- a/drivers/block/xen-blkback/xenbus.c
-> > +++ b/drivers/block/xen-blkback/xenbus.c
-> > @@ -907,7 +907,7 @@ static void connect(struct backend_info *be)
-> >         xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
-> > 
-> >         err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
-> > -                       be->blkif->vbd.feature_gnt_persistent);
-> > +                       be->blkif->vbd.feature_gnt_persistent_parm);
-> >         if (err) {
-> >                 xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
-> >                                  dev->nodename);
-> > @@ -1085,7 +1085,9 @@ static int connect_ring(struct backend_info *be)
-> >                 return -ENOSYS;
-> >         }
-> > 
-> > -       blkif->vbd.feature_gnt_persistent = feature_persistent &&
-> > +       blkif->vbd.feature_gnt_persistent_parm = feature_persistent;
-> > +       blkif->vbd.feature_gnt_persistent =
-> > +               blkif->vbd.feature_gnt_persistent_parm &&
-> >                 xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
-> > 
-> >         blkif->vbd.overflow_max_grants = 0;
-> > --
-> > 2.25.1
-> > 
-> 
-> -- 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+Thanks.
