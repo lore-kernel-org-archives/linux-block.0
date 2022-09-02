@@ -2,163 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C89C54EE9
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 09:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8E7DC6FA83
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 10:01:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235782AbiIBJx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 05:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33738 "EHLO
+        id S235753AbiIBKBR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 06:01:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235901AbiIBJxo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 05:53:44 -0400
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C17E82D19;
-        Fri,  2 Sep 2022 02:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1662112422; x=1693648422;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RYkyDTlCTvMrlOLx7kj+NLb70k5rmvCjtCTCfEk9Kmg=;
-  b=Rs4DN1ao4A5zAJOp4/ga33eur9LYSt/+aOu7rSU/FVEltgPXLZgmZHJ2
-   sqFSwUmvy9fohozDpV3lbNSvFUBD5X5Frlp92xiWzRHhyD7+qPRUESJVY
-   HqrnWwH2KlPS0FDNfMei320H6+E9xk8+9pIiTxiUaN6bG9TN7AV3dAnYA
-   I=;
-X-IronPort-AV: E=Sophos;i="5.93,283,1654560000"; 
-   d="scan'208";a="255514482"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-1f9d5b26.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 09:53:26 +0000
-Received: from EX13D08EUB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2b-1f9d5b26.us-west-2.amazon.com (Postfix) with ESMTPS id E124945026;
-        Fri,  2 Sep 2022 09:53:25 +0000 (UTC)
-Received: from EX13MTAUWA001.ant.amazon.com (10.43.160.58) by
- EX13D08EUB002.ant.amazon.com (10.43.166.232) with Microsoft SMTP Server (TLS)
- id 15.0.1497.38; Fri, 2 Sep 2022 09:53:25 +0000
-Received: from dev-dsk-ptyadav-1c-613f0921.eu-west-1.amazon.com (10.15.8.155)
- by mail-relay.amazon.com (10.43.160.118) with Microsoft SMTP Server id
- 15.0.1497.38 via Frontend Transport; Fri, 2 Sep 2022 09:53:23 +0000
-Received: by dev-dsk-ptyadav-1c-613f0921.eu-west-1.amazon.com (Postfix, from userid 23027615)
-        id 65C212599D; Fri,  2 Sep 2022 09:53:22 +0000 (UTC)
-Date:   Fri, 2 Sep 2022 09:53:22 +0000
-From:   Pratyush Yadav <ptyadav@amazon.de>
-To:     SeongJae Park <sj@kernel.org>
-CC:     <jgross@suse.com>, <roger.pau@citrix.com>,
-        <marmarek@invisiblethingslab.com>, <mheyne@amazon.de>,
-        <xen-devel@lists.xenproject.org>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <stable@vger.kernel.org>
-Subject: Re: [PATCH v2 1/3] xen-blkback: Advertise feature-persistent as user
- requested
-Message-ID: <20220902095207.y3whbc5mw4hyqphg@yadavpratyush.com>
-References: <20220831165824.94815-1-sj@kernel.org>
- <20220831165824.94815-2-sj@kernel.org>
+        with ESMTP id S235786AbiIBKBO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 06:01:14 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55BC857E6
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 03:01:05 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1662112864;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ryc23aBP6jaM8QX0YaocyAt9qya4INPwIJEUNguUjMQ=;
+        b=iCJOaaySpU+Ri/nvOy+m8L1+yuMlS+/lnv5RAuhE8FFIgN6thJaOm6sxwXM+gYZX7wMJeD
+        ItJFHb85SD2OuaTwdqKXdVDsBNtnTHfA7TgWWoI5hYFySFS8lc0GGUBxtqMPzJA7lN6Sk1
+        ba3SoCQs9/cZblpYr7tROolvz8zj0eE=
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH V2 2/3] rnbd-srv: make process_msg_close returns void
+Date:   Fri,  2 Sep 2022 18:00:54 +0800
+Message-Id: <20220902100055.25724-3-guoqing.jiang@linux.dev>
+In-Reply-To: <20220902100055.25724-1-guoqing.jiang@linux.dev>
+References: <20220902100055.25724-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20220831165824.94815-2-sj@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 31/08/22 04:58PM, SeongJae Park wrote:
-> The advertisement of the persistent grants feature (writing
-> 'feature-persistent' to xenbus) should mean not the decision for using
-> the feature but only the availability of the feature.  However, commit
-> aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent
-> grants") made a field of blkback, which was a place for saving only the
-> negotiation result, to be used for yet another purpose: caching of the
-> 'feature_persistent' parameter value.  As a result, the advertisement,
-> which should follow only the parameter value, becomes inconsistent.
-> 
-> This commit fixes the misuse of the semantic by making blkback saves the
-> parameter value in a separate place and advertises the support based on
-> only the saved value.
-> 
-> Fixes: aac8a70db24b ("xen-blkback: add a parameter for disabling of persistent grants")
-> Cc: <stable@vger.kernel.org> # 5.10.x
-> Suggested-by: Juergen Gross <jgross@suse.com>
-> Signed-off-by: SeongJae Park <sj@kernel.org>
-> ---
->  drivers/block/xen-blkback/common.h | 3 +++
->  drivers/block/xen-blkback/xenbus.c | 6 ++++--
->  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-> index bda5c815e441..a28473470e66 100644
-> --- a/drivers/block/xen-blkback/common.h
-> +++ b/drivers/block/xen-blkback/common.h
-> @@ -226,6 +226,9 @@ struct xen_vbd {
->         sector_t                size;
->         unsigned int            flush_support:1;
->         unsigned int            discard_secure:1;
-> +       /* Connect-time cached feature_persistent parameter value */
-> +       unsigned int            feature_gnt_persistent_parm:1;
+Change the return type to void given it always returns 0.
 
-Continuing over from the previous version:
+Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Acked-by: Md Haris Iqbal <haris.iqbal@ionos.com>
+---
+ drivers/block/rnbd/rnbd-srv.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-> > If feature_gnt_persistent_parm is always going to be equal to 
-> > feature_persistent, then why introduce it at all? Why not just use 
-> > feature_persistent directly? This way you avoid adding an extra flag 
-> > whose purpose is not immediately clear, and you also avoid all the 
-> > mess with setting this flag at the right time.
->
-> Mainly because the parameter should read twice (once for 
-> advertisement, and once later just before the negotitation, for 
-> checking if we advertised or not), and the user might change the 
-> parameter value between the two reads.
->
-> For the detailed available sequence of the race, you could refer to the 
-> prior conversation[1].
->
-> [1] https://lore.kernel.org/linux-block/20200922111259.GJ19254@Air-de-Roger/
-
-Okay, I see. Thanks for the pointer. But still, I think it would be 
-better to not maintain two copies of the value. How about doing:
-
-	blkif->vbd.feature_gnt_persistent =
-		xenbus_read_unsigned(dev->nodename, "feature-persistent", 0) &&
-		xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
-
-This makes it quite clear that we only enable persistent grants if 
-_both_ ends support it. We can do the same for blkfront.
-
-> +       /* Persistent grants feature negotiation result */
->         unsigned int            feature_gnt_persistent:1;
->         unsigned int            overflow_max_grants:1;
->  };
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index ee7ad2fb432d..c0227dfa4688 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -907,7 +907,7 @@ static void connect(struct backend_info *be)
->         xen_blkbk_barrier(xbt, be, be->blkif->vbd.flush_support);
-> 
->         err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
-> -                       be->blkif->vbd.feature_gnt_persistent);
-> +                       be->blkif->vbd.feature_gnt_persistent_parm);
->         if (err) {
->                 xenbus_dev_fatal(dev, err, "writing %s/feature-persistent",
->                                  dev->nodename);
-> @@ -1085,7 +1085,9 @@ static int connect_ring(struct backend_info *be)
->                 return -ENOSYS;
->         }
-> 
-> -       blkif->vbd.feature_gnt_persistent = feature_persistent &&
-> +       blkif->vbd.feature_gnt_persistent_parm = feature_persistent;
-> +       blkif->vbd.feature_gnt_persistent =
-> +               blkif->vbd.feature_gnt_persistent_parm &&
->                 xenbus_read_unsigned(dev->otherend, "feature-persistent", 0);
-> 
->         blkif->vbd.overflow_max_grants = 0;
-> --
-> 2.25.1
-> 
-
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index a229dd87c322..8d011652a15c 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -339,7 +339,7 @@ void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev,
+ 	mutex_unlock(&sess->lock);
+ }
+ 
+-static int process_msg_close(struct rnbd_srv_session *srv_sess,
++static void process_msg_close(struct rnbd_srv_session *srv_sess,
+ 			     void *data, size_t datalen, const void *usr,
+ 			     size_t usrlen)
+ {
+@@ -351,13 +351,12 @@ static int process_msg_close(struct rnbd_srv_session *srv_sess,
+ 	sess_dev = rnbd_get_sess_dev(le32_to_cpu(close_msg->device_id),
+ 				      srv_sess);
+ 	if (IS_ERR(sess_dev))
+-		return 0;
++		return;
+ 
+ 	rnbd_put_sess_dev(sess_dev);
+ 	mutex_lock(&srv_sess->lock);
+ 	rnbd_srv_destroy_dev_session_sysfs(sess_dev);
+ 	mutex_unlock(&srv_sess->lock);
+-	return 0;
+ }
+ 
+ static int process_msg_open(struct rnbd_srv_session *srv_sess,
+@@ -387,7 +386,7 @@ static int rnbd_srv_rdma_ev(void *priv,
+ 	case RNBD_MSG_IO:
+ 		return process_rdma(srv_sess, id, data, datalen, usr, usrlen);
+ 	case RNBD_MSG_CLOSE:
+-		ret = process_msg_close(srv_sess, data, datalen, usr, usrlen);
++		process_msg_close(srv_sess, data, datalen, usr, usrlen);
+ 		break;
+ 	case RNBD_MSG_OPEN:
+ 		ret = process_msg_open(srv_sess, usr, usrlen, data, datalen);
 -- 
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
+2.31.1
+
