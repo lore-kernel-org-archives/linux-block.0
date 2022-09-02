@@ -2,114 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FF6ECAAD5
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 16:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F924ECAAD5
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 18:43:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235328AbiIBQxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 12:53:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33418 "EHLO
+        id S230057AbiIBSna (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 14:43:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236265AbiIBQxe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 12:53:34 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F0C109520;
-        Fri,  2 Sep 2022 09:53:33 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.nyi.internal (Postfix) with ESMTP id 1A4575C0098;
-        Fri,  2 Sep 2022 12:53:33 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute3.internal (MEProxy); Fri, 02 Sep 2022 12:53:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        colorremedies.com; h=cc:cc:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm2; t=1662137613; x=
-        1662224013; bh=6qA7lebsNoe0qaVBnLzE2yT/XJd2sQGK0XBPJNKv/Yw=; b=R
-        xVZNXHhzt0puvbLyE74kkQojDQ6606NuOmpXNUfDcAuYJXojglnpBsoqvR+EF5JY
-        TD8R9hLB54s1Iu0F4tSFJkUPoPwul1TBCN7g2Bvci5K5w2ryMnR+ZXPA7MHnLD1p
-        SnSHvY67/nQ7HTEc4jqnbIFb2IZ1AtMJ/CUzWeDJJVFcM0kKwsrSZB6u+tIMI0W+
-        WEGvofwCAUMuBEvpix4emT/2Ay3f22iZ4NaMCFXnM7dYmRi4o1AqhTQghdOBodvz
-        91YIEDXrU1sHxWFnBYU2PdPnWrMFwiovVz6vlVLfRIC4s4zartQgoWh43OPSB9Vb
-        sEYIA49IY2/fVyZP1v9yQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1662137613; x=1662224013; bh=6qA7lebsNoe0qaVBnLzE2yT/XJd2
-        sQGK0XBPJNKv/Yw=; b=y/v5sBx1o5vTLrrrv61Gjsn2XKPMwdezDpEhws2B3kNh
-        WAtiRUOb94sJ+78+igrFGQwEtVnn0bOn+OQ09cucpEikR+xBtE7UHesz3RQgunv3
-        QFbfZ6Q7ccpHhON/qwkjyTf6kia3SohZg8y8zaNbpZuyVBomkIvGETnuQiWBxTtf
-        DmuFw+LsGfkKNVkwBLAhvzJNLaWTcUSsBVVZo6TPTUvzp2LzIo8FJA4xLpFGxhud
-        OSzYr3mCNnfPp4WNl+Rtr6Q+H0rRbv9nwl3WaDr9U/HQhRfm9SXMBKA7h1IvqS4m
-        AxlcJme9w2vSaZ62TkoIXpjBKqLoBIMYVgAg5rO14g==
-X-ME-Sender: <xms:DDUSY8dA8g3XXog0_9F1_EMugWcFLU-f3b5bV0gta4BS5xrG1STsOg>
-    <xme:DDUSY-N6wifJZfplB7aqW1NojTTNKvo4Ht3cFCmSFZUamVP3VMmjkNTawjEyjTDHt
-    xFoN_7xz7jPOcXkMRU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdeltddguddtkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdev
-    hhhrihhsucfouhhrphhhhidfuceolhhishhtshestgholhhorhhrvghmvgguihgvshdrtg
-    homheqnecuggftrfgrthhtvghrnhepgfdvueektdefgfefgfdtleffvdeileetgfefuddt
-    ffelueeiveeiveekhedtheeunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheplhhishhtshestgholhhorhhrvghmvgguihgvshdrtghomh
-X-ME-Proxy: <xmx:DDUSY9ic2sLq_d63iiVOJ4ugHQEmX-_2aQ7mcleWR4UdRMUoBa5ILw>
-    <xmx:DDUSYx9EAoygpWJ4TIAAnKD9U3VX6rl6INLrJuIEnyUSGnVT7XF1Vg>
-    <xmx:DDUSY4ufApFGEpaTRKuh3EJHCUcym536CyCPqZeXawTZUBZ0gQEkZQ>
-    <xmx:DTUSY6KqPCwzhdpbGyIkEyprtpSE5WV8E_X6YpLtK7Ec6Ee3m0BGNw>
-Feedback-ID: i06494636:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id F3EE41700082; Fri,  2 Sep 2022 12:53:31 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-841-g7899e99a45-fm-20220811.002-g7899e99a
-Mime-Version: 1.0
-Message-Id: <a8bf11e4-8d2f-4fe8-9d6d-533c7b19db8d@www.fastmail.com>
-In-Reply-To: <297cbb87-87aa-2e1d-1fc3-8e96c241f28f@huaweicloud.com>
-References: <Yv0KmT8UYos2/4SX@T590>
- <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
- <Yv2P0zyoVvz35w/m@T590>
- <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
- <Yv2w+Tuhw1RAoXI5@T590>
- <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
- <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
- <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
- <Yv3NIQlDL0T3lstU@T590>
- <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
- <YwCGlyDMhWubqKoL@T590>
- <297cbb87-87aa-2e1d-1fc3-8e96c241f28f@huaweicloud.com>
-Date:   Fri, 02 Sep 2022 12:53:10 -0400
-From:   "Chris Murphy" <lists@colorremedies.com>
-To:     "Yu Kuai" <yukuai1@huaweicloud.com>,
-        "Ming Lei" <ming.lei@redhat.com>, "Jan Kara" <jack@suse.cz>
-Cc:     "Nikolay Borisov" <nborisov@suse.com>,
-        "Jens Axboe" <axboe@kernel.dk>,
-        "Paolo Valente" <paolo.valente@linaro.org>,
-        "Btrfs BTRFS" <linux-btrfs@vger.kernel.org>,
-        Linux-RAID <linux-raid@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        "Josef Bacik" <josef@toxicpanda.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: stalling IO regression since linux 5.12, through 5.18
-Content-Type: text/plain
+        with ESMTP id S230025AbiIBSn2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 14:43:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5561E114C70
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 11:43:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662144206;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7Ygx506LgmFK7L1KUAyuf5pe5qs+tRV+yvCiaInsACw=;
+        b=JweQv4mpthRJ2JK5IxWu6Q4Bryn/BdJdJ6hqGWAxsCv1dByAzWBiqyoj/i/8wd2gci7cFN
+        k932ZiUodqlmlz8pCe0jgoaP/RiTPvHkRrD37MQvUBSQoqupLyaeiz7cXSmERwkwDxZtb2
+        4K8e8mblY0PDhcrvjMXs2NzkV8UW1F4=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-172-eLsKf2R8MtWIh_SX3eIDYg-1; Fri, 02 Sep 2022 14:43:25 -0400
+X-MC-Unique: eLsKf2R8MtWIh_SX3eIDYg-1
+Received: by mail-qt1-f199.google.com with SMTP id z6-20020ac875c6000000b0034454b14c91so2159522qtq.15
+        for <linux-block@vger.kernel.org>; Fri, 02 Sep 2022 11:43:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=7Ygx506LgmFK7L1KUAyuf5pe5qs+tRV+yvCiaInsACw=;
+        b=h6yH3NU5UuK3S9Ws8z7rtgX8MLZcAfnc6ARK/kr8wtI0iN/AZShj9YLBwRKYh9WPXn
+         rw9Eg/ZTfLDmjWPXLATWo+cTHTsmki+ep6d4R7qIEBGIBl7FIlhFoSfEHDrBnv3bCPuR
+         kb4NAhgR/J3Ib6fjl3ETHzPo9AyCE4Iy1mVTKGyPCWYElW/kiPUG9ahq4OnNSDSnn8T/
+         XqZ+JklPsKjYWDPuZ1aAQJVYnukYkszM5s4iFt6IixfDXipTwqHaVaR72WRN67mlX3yw
+         DXftq5EGggz8S2yW/1vzY881bIyDncTnQs2sSsz2HqmdlO33n07/9d1z1aNL++QkaE0n
+         b27A==
+X-Gm-Message-State: ACgBeo1llrBWcSQ5dUROWW3oEw/PLLjZG2zgW+CR/JiRDLki99F9VzH6
+        AHspCgu/F87gfIGffnjRMhC1nzJjFx4RHY0hFFJZFBE1h9tLjcWTt0h0seEC0jIbo/juK3I7S6j
+        RfCX+Mcjp5LzVo5z7kflRoQ==
+X-Received: by 2002:a05:6214:c8f:b0:499:21eb:ba3b with SMTP id r15-20020a0562140c8f00b0049921ebba3bmr11683313qvr.97.1662144204575;
+        Fri, 02 Sep 2022 11:43:24 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7K6nBjFNlybScTP7Kemi+J2G3yUcqV9Mva+4TXiBdaw+VSNZOrU4SppDL6kJQ3vHr68+qN5A==
+X-Received: by 2002:a05:6214:c8f:b0:499:21eb:ba3b with SMTP id r15-20020a0562140c8f00b0049921ebba3bmr11683298qvr.97.1662144204338;
+        Fri, 02 Sep 2022 11:43:24 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id c4-20020ac84e04000000b00344f936bfc0sm1406919qtw.33.2022.09.02.11.43.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Sep 2022 11:43:23 -0700 (PDT)
+Date:   Fri, 2 Sep 2022 14:43:22 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com, hch@lst.de, pankydev8@gmail.com,
+        Johannes.Thumshirn@wdc.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, hare@suse.de, jaegeuk@kernel.org,
+        linux-kernel@vger.kernel.org, matias.bjorling@wdc.com,
+        gost.dev@samsung.com, bvanassche@acm.org,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH v12 12/13] dm: introduce DM_EMULATED_ZONES target type
+Message-ID: <YxJOyq8Pf2vIExFf@redhat.com>
+References: <20220823121859.163903-1-p.raghav@samsung.com>
+ <CGME20220823121914eucas1p2f4445066c23cdae4fca80f7b0268815b@eucas1p2.samsung.com>
+ <20220823121859.163903-13-p.raghav@samsung.com>
+ <YxFOS8fq8AeE5mkf@redhat.com>
+ <96f90e1d-aa0f-1c76-bfc9-a87e978ad655@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96f90e1d-aa0f-1c76-bfc9-a87e978ad655@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Sep 02 2022 at  8:02P -0400,
+Pankaj Raghav <p.raghav@samsung.com> wrote:
 
+> On 2022-09-02 02:28, Mike Snitzer wrote:
+> > On Tue, Aug 23 2022 at  8:18P -0400,
+> > Pankaj Raghav <p.raghav@samsung.com> wrote:
+> > 
+> >> Introduce a new target type DM_EMULATED_ZONES for targets with
+> >> a different number of sectors per zone (aka zone size) than the underlying
+> >> device zone size.
+> >>
+> >> This target type is introduced as the existing zoned targets assume
+> >> that the target and the underlying device have the same zone size.
+> >> The new target: dm-po2zone will use this new target
+> >> type as it emulates the zone boundary that is different from the
+> >> underlying zoned device.
+> >>
+> >> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> >> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> > 
+> > This patch's use of "target type" jargon isn't valid. 
+> > 
+> > Please say "target feature flag" and rename DM_EMULATED_ZONES to
+> > DM_TARGET_EMULATED_ZONES in the subject and header.
+> > Good catch. I will fix it up for the next version.
+> > But, with those fixed:
+> > 
+> > Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+> > 
+> You mean <Reviewed-By> ? :)
 
-On Thu, Sep 1, 2022, at 3:02 AM, Yu Kuai wrote:
-> Hi, Chris
+Ah, yes Reviewed-By, force of habit ;)
 
-
->> Also follows another patch merged to v5.18 and it fixes io stall too, feel free to test it:
->> 
->> 8f5fea65b06d blk-mq: avoid extending delays of active hctx from blk_mq_delay_run_hw_queues
->
-> Have you tried this patch?
-
-The problem happens on 5.18 series kernels. But takes longer. Once I regain access to this setup, I can try to reproduce on 5.18 and 5.19, and provide block debugfs logs. 
-
-
--- 
-Chris Murphy
