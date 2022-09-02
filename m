@@ -2,170 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDCDC38145
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 01:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A894BECAAD2
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 03:45:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234765AbiIBB7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 21:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60628 "EHLO
+        id S231577AbiIBDp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 23:45:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234678AbiIBB72 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 21:59:28 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C88A99C7
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 18:59:27 -0700 (PDT)
+        with ESMTP id S233680AbiIBDpX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 23:45:23 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7771EAD6
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 20:45:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1662083967; x=1693619967;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=hmi4fA20yl+crdbD+cyzbGeImsRtqQImsVakk6DVim4=;
-  b=VsJ/LmMSTd1jTWEdNbPFUExy6VC7efZXdc1V/uJ1//NDKp9/ZjFWVSO3
-   l6b/ZI8D67icVGtrllVrqHvAlhAb20I+YV+Axt1NmaPyF4UT+NVUQjyMR
-   rHad0/MKWt9edesL/+QXb0fAM9FXHzIOw+OowH+rcxjIIOZNifoKp+Om5
-   t3zPPYEBdinizDQB3qbHwbykhOIlwXUlw5EstViIivH4KpGqjr3aViYXh
-   WJDhiva+Ge+nAktYEmeCGgzR5ZJRm25ueh369KA7W94zDvGqCoJVmlsBT
-   dDxQQBDKyPFK/CeOn30PlYo858UmApelXT5HgY7KBkx6+81nSmvJZ2r/i
-   w==;
+  t=1662090320; x=1693626320;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8Xg2twERZf8VQ5EQr3UEn1lYBqldRIsW5jD1cS2dOVk=;
+  b=O1k1fziFcKzQyDUiG1C+BztfYXQkqV1gMkLUwBZ2N2y5q8sICFFlLmki
+   7IqFU20YO1ChXu+WgP0oi4bfr/YO0F7Ieq0acQZuHSRej+8/qSexdKALD
+   7p6pLTjOoM6/N9oiXI/Zj8+lrWRbUX7wJr3ZPt2dROOHsj6Gn7UurMO7j
+   BaFqmQWKcQnHRzNQWFZC5y31SvzTXOUqDY//aKPw678BSHY3lRPTPfrFH
+   cvshRTJmbh2bu0Ncqz8FV2POHuMe19eosdGpQymuOPFQDHvH2KUlvaIwO
+   UCrWXOauK5oKQcW+z+OEGUGocTQzvuQ9sCnNPIKFwU2yC64uMA04D7Ier
+   g==;
 X-IronPort-AV: E=Sophos;i="5.93,281,1654531200"; 
-   d="scan'208";a="210284051"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 09:59:25 +0800
-IronPort-SDR: os9tx1lt0YvRU1pU3FmLWYc5uOBNj+P17X/DzAqt92IB0UtLIeyy7teJxq1YUxhhLcL3j8uhyg
- D6/jmMZUT3x+Y1PogGZDbTgofHCCbXS8wqwP3kXEui4EcOv5yPEazD/C+Xy96eZwi/JKqYriSI
- Ga+6vmGARVRv+Vu4dRYFEAguABOqNau3MXrS7P9yngNitaVzqL9SXGvE44VHbTlg6o+ZwUb/HG
- mbEatzwAc7l+a6cQL+RXi5jrmmMXrgeQ7eiZKw4V74LzVgKSsyK4TVEwoY42MrNsh8kJyl9/sD
- vZr9cAiNQuFmIn6J3eLZ+1fX
+   d="scan'208";a="322404151"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 11:45:18 +0800
+IronPort-SDR: 4LQYEkZV/cCCWekU8zPsHw78EafEKxNn5AY7grwLQgJtLTzUB78wBElOPuFkPJo8WRrQCHe4ln
+ fRuoOxsanqmctctm3EGcIwn4/rW1f39TMmbyXm3L+J9+jVa5XwKh/WNRttxs5jhO1yozVctz0F
+ z435uML8nLNEYCwXBL8GcGajmEBaU3N1ipjnshjEhbeWh0YwAV970Sg27lAT3UHH3ylD6sN3mJ
+ p/WCR2eDKGxkk7W0wa76Dr6UkGCXLvwUOh53wzOw6nW8O0uu8uvvaGqRDg6MvGABMxD6M2EAbn
+ TyBLEa8REnM0xz6LtI/5E9Ax
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 18:14:31 -0700
-IronPort-SDR: keGN2Kl79Mj9wzGIUB1eKhYQ806MvapgnFsF6iNaernbhgR/YtATbP0bto2aGsQ8BVAqxDZ/p8
- C925aR9UYjk5tfydkG9qAX0kTgp04ktkjw3AQHHg13XDKV/viFhRqgjGxQDHGyNo2/wurvP63z
- zimw2yr03arxmnp6wXTa3fedEzaJc6mz+PLhlEiGIgKcU9MlnJVfXaKzNplsB+TFv09yLt5GXs
- VUuz7HOqm4hNSVD9qZi/LS4kBpIc6clseTouoRvmX0KoAGF4ZFjcfcHqxohfN2DmUacDJbQFN2
- DJ8=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 20:05:46 -0700
+IronPort-SDR: WN076x+vL8SdsA7t6BZLvRV5rPYFrHcrEXK1uOZ3fThU2Dij3oE9jY/qS//ueIQPRS2KYWAtTr
+ Pbunkh+G2uW7f3cQ/m6oLBFB/Ufpz/jAjR6gl5Lve/FfBdIOec1JJaJOGaVWuNjZ3DPQc5Ua6g
+ pIB63Ku2qMUtAgWsj8V0aVZWHs9Kv9wuR4qtDL12+pHn1smzxu+6pDH06Ny5cROPWwgmiGV/Ai
+ w4Frfhowr71VKeavTgwcaH1muHc2IPsgh0nVIy3NhsMBn29y7OCXRk/UWpQU3rQXSz/QTCpo6l
+ 1iY=
 WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 18:59:26 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MJh193GHsz1Rwtm
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 18:59:25 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:references:to:from:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1662083964; x=1664675965; bh=hmi4fA20yl+crdbD+cyzbGeImsRtqQImsVa
-        kk6DVim4=; b=hKCRXiO7WYClkrRcbzSiijjmciqDBZrrfeKWlekjT63Xng9DCZS
-        fr/3mbddvWMzPYYJaY1zv5F3OX3CQucxffd7GM+E/iByLtT3/6IEKabqg2wPBNM5
-        zOKC9e603bRPhHAFXrLaRiIzR2vrrt6/zLQDUuFLUGjnob5/fpYV/tpW92eLo6sJ
-        sVpbHOj/7rcFZzjcoklnC5kOYRL5OUqaklKmMaPozO+g3pw3uFzEb0LsCv+Yi29Y
-        qnIC54GO+FpV92is+T1Cg7a1eJzlwk5mZvBPGTcyQebPW/ht1dVjfaUL/7jblFd1
-        dl7NLKWCjQlidPAuKQ2Tx5o4qjIjKk5b1OA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 4mV-N1VJ8fYn for <linux-block@vger.kernel.org>;
-        Thu,  1 Sep 2022 18:59:24 -0700 (PDT)
-Received: from [10.225.163.56] (unknown [10.225.163.56])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MJh162Ks6z1RvLy;
-        Thu,  1 Sep 2022 18:59:22 -0700 (PDT)
-Message-ID: <32fea8c5-fcc2-001c-eb10-3138e16b0e74@opensource.wdc.com>
-Date:   Fri, 2 Sep 2022 10:59:21 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH 15/17] btrfs: calculate file system wide queue limit for
- zoned mode
-Content-Language: en-US
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Sep 2022 20:45:17 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20220901074216.1849941-1-hch@lst.de>
- <20220901074216.1849941-16-hch@lst.de>
- <429d26b8-f7d8-6365-a2fa-f4ed892182e4@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <429d26b8-f7d8-6365-a2fa-f4ed892182e4@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 0/5] improve _have_driver() module load issue solution
+Date:   Fri,  2 Sep 2022 12:45:11 +0900
+Message-Id: <20220902034516.223173-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.37.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/2/22 10:56, Damien Le Moal wrote:
-> On 9/1/22 16:42, Christoph Hellwig wrote:
->> To be able to split a write into properly sized zone append commands,
->> we need a queue_limits structure that contains the least common
->> denominator suitable for all devices.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> ---
->>  fs/btrfs/ctree.h |  4 +++-
->>  fs/btrfs/zoned.c | 36 ++++++++++++++++++------------------
->>  fs/btrfs/zoned.h |  1 -
->>  3 files changed, 21 insertions(+), 20 deletions(-)
->>
->> diff --git a/fs/btrfs/ctree.h b/fs/btrfs/ctree.h
->> index 5e57e3c6a1fd6..a37129363e184 100644
->> --- a/fs/btrfs/ctree.h
->> +++ b/fs/btrfs/ctree.h
->> @@ -1071,8 +1071,10 @@ struct btrfs_fs_info {
->>  	 */
->>  	u64 zone_size;
->>  
->> -	/* Max size to emit ZONE_APPEND write command */
->> +	/* Constraints for ZONE_APPEND commands: */
->> +	struct queue_limits limits;
->>  	u64 max_zone_append_size;
-> 
-> Can't we get rid of this one and have the code directly use
-> fs_info->limits.max_zone_append_sectors through a little helper doing a
-> conversion to bytes (a 9 bit shift) ?
+The commit 06a0ba866d90 ("common/rc: avoid module load in _have_driver()")
+removed module load from _have_driver(). However, it turned out that it was not
+a good solution. In the recent discussion for module load preparation for nvme
+test cases, it was pointed out no module load in _have_driver() is confusing and
+adding complexity [1]:
 
-Note: Only a suggestion, not sure that would be much of a cleanup.
+ - Without module load in _have_driver(), explicit module load and unload are
+   required in number of test cases. Boiler plates.
+ - The module unload is not always safe. Need care if the module unload is
+   expected or not.
+ - The module load needs error handling.
 
-> 
-> [...]
->>  	/* Count zoned devices */
->>  	list_for_each_entry(device, &fs_devices->devices, dev_list) {
->>  		enum blk_zoned_model model;
->> @@ -685,11 +677,9 @@ int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info)
->>  				ret = -EINVAL;
->>  				goto out;
->>  			}
->> -			if (!max_zone_append_size ||
->> -			    (zone_info->max_zone_append_size &&
->> -			     zone_info->max_zone_append_size < max_zone_append_size))
->> -				max_zone_append_size =
->> -					zone_info->max_zone_append_size;
->> +			blk_stack_limits(lim,
->> +					 &bdev_get_queue(device->bdev)->limits,
->> +					 0);
-> 
-> This does:
-> 
-> 	t->max_zone_append_sectors = min(t->max_zone_append_sectors,
->                                         b->max_zone_append_sectors);
-> 
-> So if we are mixing zoned and non-zoned devices in a multi-dev volume,
-> we'll end up with max_zone_append_sectors being 0. The previous code
-> prevented that.
-> 
-> Note that I am not sure if it is allowed to mix zoned and non-zoned drives
-> in the same volume. Given that we have a fake zone emulation for non-zoned
-> drives with zoned btrfs, I do not see why it would not work. But I may be
-> wrong.
-> 
+I can think of a new helper function to address the comments above, but it will
+look like _have_driver() with module load. Hence, I suggest to revert back some
+part of the the commit 06a0ba866d90 to load modules in _have_driver() (Sorry
+Christoph, Bart for doing this on the commit you reviewed). As a better
+solution, I propose to record the modules loaded in _have_driver() and unload
+them at each test case end, regardless of the test case is skipped or executed.
+I confirmed this fix avoids the issue that the commit 06a0ba866d90 tried to fix.
+
+In this series, 4th patch is the core change in _have_driver. 1st, 2nd and 3rd
+patches are clean-up preparation patches for the 4th patch. 5th patch reverts
+changes in nbd/rc, which is no longer required after the 4th patch.
+
+[1] https://lore.kernel.org/linux-block/89aedf1d-ae08-adef-db29-17e5bf85d054@grimberg.me/
+
+Shin'ichiro Kawasaki (5):
+  check: clean up _run_test()
+  common,tests: rename unload_module() to _unload_module()
+  check,common/rc: move _unload_module() from common/rc to check
+  check,common/rc: load module in _have_driver() and unload after test
+  Revert "nbd/rc: load nbd module explicitly"
+
+ check                      | 36 +++++++++++++++++++++++++++++++-----
+ common/multipath-over-rdma |  4 ++--
+ common/rc                  | 26 ++++++++++----------------
+ tests/nbd/rc               | 12 ++----------
+ tests/nvmeof-mp/rc         | 12 ++++++------
+ tests/srp/rc               |  8 ++++----
+ 6 files changed, 55 insertions(+), 43 deletions(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.37.1
 
