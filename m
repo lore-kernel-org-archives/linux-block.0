@@ -2,165 +2,374 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E46DBECAAD5
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 15:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA02C38145
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 15:36:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237040AbiIBPeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 11:34:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48438 "EHLO
+        id S237068AbiIBPgm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 11:36:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236326AbiIBPeU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 11:34:20 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEFF39B;
-        Fri,  2 Sep 2022 08:18:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1662131936; x=1693667936;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=mYwUc3DW8Mn7bZLU2+hcqgMJTdTcfSZGFGA9if2dLpk=;
-  b=GwizmdfzEb3Cv1n3eBNt2T55729SOyjWprkS677kEt6SPMvPMEkYpiju
-   +AXZddoO/MBHxLiBdvB4bAF3RVvwmoDV0WYxutE6il/vnRl3PBzOMwBn7
-   iop1W24VJFb3nU55/tMZuVrLlpkigdr8eb+UDpTljvaGuefQBhDztPbE2
-   COdL29HlFROulop7V7adJYtpNUA5Z+jcpYrwJwoXwHxIwoHkjzgEBVWSt
-   D48FF3J3jJfo/JVpgWWEMNomNokpWTAmjlrsdRSOafKH2lO/L/0o8PGwY
-   WpwqSZvyx2qzHY24WtK/7Nj1BHdCqHQfeTz4NXBozMKxxCU1uGbZq5kQZ
-   g==;
-X-IronPort-AV: E=Sophos;i="5.93,283,1654531200"; 
-   d="scan'208";a="314628391"
-Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 23:18:55 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XUyjfiZoX8W5SAy3fq2jBargA50QL4jwV4MgVygbZVcJStn+YR2HopBapI9pd9jLnr9ahCoBYTdwxhiTqWaVUfrb+i2A/MScxXNRR4IuOgiCOiPMlHnK/Kbc+/gkKcrQVdQIFzMrN8haVhHal5S0ikgaIP2/L0Tv/1/IszqwHVgNN6PvULujBK11R98a0sIsYv4UI/HGNEl0Mc0Tdvy2cGXRJmXrm/qc5QRT2X1YBn4h/biLcuacXVU8MkJY2Fs+axTWNDVXwtmXVrnacArtr5JDFBWD8xO7C29uP1x0MprN9DC1c5ZTMikfdzObpcrESKB6Kdma13QNQIJALr9tGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o2A1uoCW2AJuVIE2w/y15L3MxvZp9R+cz14mXYxkMGA=;
- b=Ik17BeyF9na3/B4x4SizmCEeWP1TCyEwXGmKIrORXbxT0lRMTyT+a7qQWkzyF99DDftGkQb7TmtZC9a8sFZV9MM1NOZ2EFFFhaX3TRbl71SUACuX+BpWtmenHKMNjpezWl/Ewt2cYX58UrRkXrG8GkjAduV4E5Q/jNvcDe7FPogmAip4Tdez8ZXzhQ/k69icWCC34IcYKRPOm3JfTM/LP9ma5RjM5eQBz8/EFICOhoOuEjCxtGCXZYsfYLYScytv9HIlwqn9+sSZVeDCCZGbLFNACm1d3IuGsKQrELnyTo2M/jsCMcehlSgvLAfTD0D3ljitFzJ0yk+qL/srYYPQeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o2A1uoCW2AJuVIE2w/y15L3MxvZp9R+cz14mXYxkMGA=;
- b=S6lV5NG7+266sAGL7TiiVDZ99IvnG20O+M/dArkGKzXnAf1dFw/XUcERqSJfLQm19PLRoAOrsXnzOXNPs6R2FBc84F0UTICNJH82OJoU/JxUFDPFhU7n1rU/u6J6roiqCMDJuk6SLgg5oUSfIZGAqRQFX/A49U+AUEbcjQSrrxc=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.19; Fri, 2 Sep
- 2022 15:18:53 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::bc05:f34a:403b:745c]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::bc05:f34a:403b:745c%8]) with mapi id 15.20.5588.015; Fri, 2 Sep 2022
- 15:18:53 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>
-CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting
-Thread-Topic: consolidate btrfs checksumming, repair and bio splitting
-Thread-Index: AQHYvdZkzfjbXHDoM0mHBIw1hzgYgA==
-Date:   Fri, 2 Sep 2022 15:18:53 +0000
-Message-ID: <PH0PR04MB741603DA3C8B9A1AA99AD2819B7A9@PH0PR04MB7416.namprd04.prod.outlook.com>
-References: <20220901074216.1849941-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8283c9d5-3241-4c38-609b-08da8cf6721b
-x-ms-traffictypediagnostic: BYAPR04MB4965:EE_
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 32/0X6fb3dB6sVN/qeAWYuB/c2qyRG+tv6W9bPegU17GfRrqJk4QT93AnKubzpZVEfUEOKlFfBTMvAaaXx8WSe2JLSyoGtTnjzv+HQO0nO7mAtMPYjakJi/whZaPrFDylboT9nstTtrjDsAKPMjWn4L4I0FBUuiF1jS5dUiM1NwCE400qscKdqbIYPOTPToP4DgiiVoDZz/Hd1rnMDiyGFCAw8oEG+TGCTQ57gQosCILd8JmgmKtVf3q8QjbeTXboX2dnkkX3rPydGgw2BtfeKkNewqGt8dJJSrFVsVpazZ1QaN0nk8trnJ0DvB9urxeBaPgzCu13K99n1Rb+bLhRImu1l+iuo1uMt0Me8mJyivIVZzXmTE+yoEZ7tKzOY0S2489NKz2cJVtyj+r6+YJ0U9uI3AwK+Z5gYrDJkUHOlhjPfQbxdgRTxt1p1ikQiWkKgn5TRkraTRcl8A9rX7kaHyvQ7wt4BkfVdSaSY+j9QpJRn5tfCq5fjH4i/GaAv8JMnxoE38Vs76O/naxZf4g4VZme/jPKLxExHgKp+0Pc5kx/Ta6jq069bBGDbiX96yfyMUzCq/ivU6g2vQY1axBiwld3tbGcEAq++ZCVmnbu1fOs9EwchusF1Sh9xTtbxTnJs3OoZpas0IN8hhNy+AJnIeWm8ZQc/wuNojXyBc3NRNh6sQLT5YcM4YaO98Ekqasb32O88dV5vrrMuam9wPnkbu5kQzkc6ZiGsOi/So2mSc886F3TUENLYaiPIJ6ZW5fXF34Jm1KfcnzDB58WUxhdw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(376002)(39860400002)(366004)(396003)(2906002)(6506007)(66446008)(316002)(110136005)(41300700001)(64756008)(91956017)(8936002)(66476007)(55016003)(66946007)(66556008)(8676002)(4326008)(76116006)(54906003)(478600001)(33656002)(53546011)(7696005)(9686003)(71200400001)(7416002)(82960400001)(186003)(5660300002)(38100700002)(83380400001)(86362001)(52536014)(38070700005)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TA70hkslaZMKy8Yiaa+w+5H+0+0VuOxsLHpAx4EdHjC8nns3RMZTaJSxGtQ+?=
- =?us-ascii?Q?C86BXtfInForycZZ6i1PK2kovhzGnNl0WpCV6B4c0MpZEptfX3fY1cC3zYTy?=
- =?us-ascii?Q?Lt2BfYNaDk5i3zbxSymyWo9/u4rzPAZwxRDC88EP2osTwXuOEw6mu0JGLfiI?=
- =?us-ascii?Q?HyTizWCn1DDoRGQ9Yzk09pwpajvIvRRMMJ54FV0nhhiIeEYu8hEf2ZXYTVHG?=
- =?us-ascii?Q?i0vZn9O/kwWpaYnOuZLKkfiStuWz3q4oDpNnWiBT93mxUPuqNG7DT07Ij/+b?=
- =?us-ascii?Q?h+1/kq8c/PgucWCy6+o4d6glhVkfXxLHkWmC6U62q/IJWzTY9G2GjW/i/Atk?=
- =?us-ascii?Q?+5TT9QTeaFmMhhlpyf5gITkX8Jbs6q+cWqmm6OhsNNTKFFovMbt8qK7uaTdq?=
- =?us-ascii?Q?Lla9MX9uW8vAYnjot2Lw3WOVzrklBQkoysN3dWMYVcp6bQiZzeDMkl8y2wsT?=
- =?us-ascii?Q?yyNi6uKP/BNyuEiFM2eTYIMeW72H7qgPuaZSKkhLTJxMy2zG56i7h/HV88vf?=
- =?us-ascii?Q?uiktsGfHbLlxgbw9pQtiSQXsOLaqna+IQtYqwru+LzejYb9H14MkU8A5WLLc?=
- =?us-ascii?Q?D6ann3BFWylKlL9h+Hx68xVxwvMmHyWkcAmouB2kGTWHdrAxzZfolHS4d15n?=
- =?us-ascii?Q?WQ1wNMomUTIHL10rJ5ed6qtzWV+57s08iGVHtBdinJluaCFa8sij88+KTGSM?=
- =?us-ascii?Q?jGY9XQ5AIngeezczpfSfXkuOTKLGklEcD06wM3iOxF7SXim5CVPNkG0IRyGR?=
- =?us-ascii?Q?+DukkdUdgq/webrHklky0kLfg22LcMGPsLvr7x0iwDoPdiGD3SPZ8sMHep5/?=
- =?us-ascii?Q?ip8H9ngM+JD8V5YMTLCK+BDVfkQjKnpAFNWVEe7o9XAAHje+1fXn66okTUfG?=
- =?us-ascii?Q?rIU0dvsMiU3rj5ehSUGKejGHe4OpuWiapR8E2A2my70DPHkJwOF5ZwmdLMzc?=
- =?us-ascii?Q?O9z/VKNFK8ChIdzVYrSngy9gL+dleq3oyV3WOi7qkEHpwxDOKQ48OAuTMw3N?=
- =?us-ascii?Q?9wB8+2njwwD/StIDPXwd0uB2i4AzAOfm1hpiN4PkCRuUhYX4A/BF/YjUSa43?=
- =?us-ascii?Q?TTX1Ce5M9M56aVZoZn7iQImvuM3ODXnx9yjmnjbUiPYTXgLlq99maEkkSb/L?=
- =?us-ascii?Q?KrcFS+R0/ZqcqXptbefuGWhtkRMMGIbeoq/2yu4gDba/1d8WT+KNbYJgDcpW?=
- =?us-ascii?Q?KJAJ7VSwR/yzdVEzXCsnHvKztIOe3daNKj0/GSbzxI5aGdLMlU0wAeZUFvZ/?=
- =?us-ascii?Q?cX00yym0jmuynKFyeBlF9DC8HU9YNA4oRXNNzKWg7MwrDfcBeyFehtvzC7X8?=
- =?us-ascii?Q?3mJz//s4iTGpsiuYoe/ytZiAc06Tl47Vt3tKBKjGp4wSKzTzRERFaAE5chEk?=
- =?us-ascii?Q?PkObgTRr2FWFb/gboSgl105w3wiPeiIPvxbVjck0I0laqRH0MjnA6q8pMhin?=
- =?us-ascii?Q?oKem4pTjbi65cdptu71SXHzgZ4hzAIvusTbmL59IdZdcTEhsvq9iKynnk/AG?=
- =?us-ascii?Q?et36G4jowD4VfWAIIfWTMTixCoKBvIGiZGf1bLjagS7g2ozJQ2Iy589bvFNl?=
- =?us-ascii?Q?ItNnFsvljJlt+/WmnX0bwJycArhHGHleuEkE4RR3gBu7zbXRwqSuPAKJTR/9?=
- =?us-ascii?Q?1YFncpCgsgQb0F3RNsV8/qoRQzdd0Jvz9xSUgGMwV3oTz4kG4Q+rISRJMCg4?=
- =?us-ascii?Q?bWD25Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S237072AbiIBPgE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 11:36:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4380D2019B
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 08:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662132187;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=CDGdbHFqa7i9J43dGRJwuYHzAKBveVK/qbBaL0hU8KY=;
+        b=eQT2q5Agm6wjfQfr0ZluXqXPukG3pNtXb47jg9qjGWrQ4gtTUgplISXmCwSpeccLutIk8+
+        6FJ8ilrqwnkhFM/xG7hfnG0i+2iMNEUIYMIdfwNsWHOZ5GP4U52oozMtJZY25W98D8ECaq
+        gFt5JCS0uN1RIAbaoeKbmzwKezAW6io=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-182-vmysYn2AOZ6KQRFkHfzhFA-1; Fri, 02 Sep 2022 11:23:05 -0400
+X-MC-Unique: vmysYn2AOZ6KQRFkHfzhFA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5D62218E0044;
+        Fri,  2 Sep 2022 15:23:04 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 22D44492C3B;
+        Fri,  2 Sep 2022 15:23:02 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Richard W . M . Jones" <rjones@redhat.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V4 1/1] Documentation: document ublk
+Date:   Fri,  2 Sep 2022 23:23:02 +0800
+Message-Id: <20220902152302.757375-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8283c9d5-3241-4c38-609b-08da8cf6721b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Sep 2022 15:18:53.0430
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ySe6biONnrFtYubnWTuPpxTUad7N5g20SwexL6VLaG1wS+Xv0xNdVz1elnLBjPG2yIFHC2ha/sPPNWE1zeO6ZMF30m/M4jaIy2SY5F6VpV8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4965
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01.09.22 09:42, Christoph Hellwig wrote:=0A=
-> Hi all,=0A=
-> =0A=
-> this series moves a large amount of duplicate code below btrfs_submit_bio=
-=0A=
-> into what I call the 'storage' layer.  Instead of duplicating code to=0A=
-> checksum, check checksums and repair and split bios in all the caller=0A=
-> of btrfs_submit_bio (buffered I/O, direct I/O, compressed I/O, encoded=0A=
-> I/O), the work is done one in a central place, often more optiomal and=0A=
-> without slight changes in behavior.  Once that is done the upper layers=
-=0A=
-> also don't need to split the bios for extent boundaries, as the storage=
-=0A=
-> layer can do that itself, including splitting the bios for the zone=0A=
-> append limits for zoned I/O.=0A=
-> =0A=
-> The split work is inspired by an earlier series from Qu, from which it=0A=
-> also reuses a few patches.=0A=
-> =0A=
-> Note: this adds a fair amount of code to volumes.c, which already is=0A=
-> quite large.  It might make sense to add a prep patch to move=0A=
-> btrfs_submit_bio into a new bio.c file, but I only want to do that=0A=
-> if we have agreement on the move as the conflicts will be painful=0A=
-> when rebasing.=0A=
-=0A=
-This series on top of misc-next passes my usual zoned null_blk fstests=0A=
-setup without regressions.=0A=
-=0A=
-Tested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+Add documentation for ublk subsystem. It was supposed to be documented when
+merging the driver, but missing at that time.
+
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Richard W.M. Jones <rjones@redhat.com>
+Cc: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V4:
+    - trivial grammar fix and patch subject change, from Bagas Sanjaya 
+V3:
+    - add more words on UBLK_IO_NEED_GET_DATA, from Ziyang
+    - improve grammar & fix warning on 'make htmldocs', from Bagas Sanjaya
+    - other trivial change, suggested by Richard W.M. Jones
+V2:
+    - integrate all kinds of cleanup from Bagas Sanjaya
+    - add 'why useful' paragraph from Stefan
+    - replace ublksrv with ublksrv for representing generic ublk
+      userspace for convenience of reference, as suggested by Stefan
+    - add entry to block/index.rst for removing ktest waring
+    - add MAINTAINER entry
+    - add more references, such as zero copy and nbdublk
+    - thanks review/suggestion from Bagas Sanjaya, Richard W.M. Jones, Stefan Hajnoczi
+    and ZiyangZhang
+
+ Documentation/block/index.rst |   1 +
+ Documentation/block/ublk.rst  | 253 ++++++++++++++++++++++++++++++++++
+ MAINTAINERS                   |   1 +
+ 3 files changed, 255 insertions(+)
+ create mode 100644 Documentation/block/ublk.rst
+
+diff --git a/Documentation/block/index.rst b/Documentation/block/index.rst
+index 68f115f2b1c6..c4c73db748a8 100644
+--- a/Documentation/block/index.rst
++++ b/Documentation/block/index.rst
+@@ -23,3 +23,4 @@ Block
+    stat
+    switching-sched
+    writeback_cache_control
++   ublk
+diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+new file mode 100644
+index 000000000000..2122d1a4a541
+--- /dev/null
++++ b/Documentation/block/ublk.rst
+@@ -0,0 +1,253 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++===========================================
++Userspace block device driver (ublk driver)
++===========================================
++
++Overview
++========
++
++ublk is a generic framework for implementing block device logic from userspace.
++The motivation behind it is that moving virtual block drivers into userspace,
++such as loop, nbd and similar can be very helpful. It can help to implement
++new virtual block device such as ublk-qcow2 (there are several attempts of
++implementing qcow2 driver in kernel).
++
++Userspace block devices are attractive because:
++
++- They can be written many programming languages.
++- They can use libraries that are not available in the kernel.
++- They can be debugged with tools familiar to application developers.
++- Crashes do not kernel panic the machine.
++- Bugs are likely to have a lower security impact than bugs in kernel
++  code.
++- They can be installed and updated independently of the kernel.
++- They can be used to simulate block device easily with user specified
++  parameters/setting for test/debug purpose
++
++ublk block device (``/dev/ublkb*``) is added by ublk driver. Any IO request
++on the device will be forwarded to ublk userspace program. For convenience,
++in this document, ``ublk server`` refers to generic ublk userspace
++program. ``ublksrv`` [#userspace]_ is one of such implementation. It
++provides ``libublksrv`` [#userspace_lib]_ library for developing specific
++user block device conveniently, while also generic type block device is
++included, such as loop and null. Richard W.M. Jones wrote userspace nbd device
++``nbdublk`` [#userspace_nbdublk]_  based on ``libublksrv`` [#userspace_lib]_.
++
++After the IO is handled by userspace, the result is committed back to the
++driver, thus completing the request cycle. This way, any specific IO handling
++logic is totally done by userspace, such as loop's IO handling, NBD's IO
++communication, or qcow2's IO mapping.
++
++``/dev/ublkb*`` is driven by blk-mq request-based driver. Each request is
++assigned by one queue wide unique tag. ublk server assigns unique tag to each
++IO too, which is 1:1 mapped with IO of ``/dev/ublkb*``.
++
++Both the IO request forward and IO handling result committing are done via
++``io_uring`` passthrough command; that is why ublk is also one io_uring based
++block driver. It has been observed that using io_uring passthrough command can
++give better IOPS than block IO; which is why ublk is one of high performance
++implementation of userspace block device: not only IO request communication is
++done by io_uring, but also the preferred IO handling in ublk server is io_uring
++based approach too.
++
++ublk provides control interface to set/get ublk block device parameters.
++The interface is extendable and kabi compatible: basically any ublk request
++queue's parameter or ublk generic feature parameters can be set/get via the
++interface. Thus, ublk is generic userspace block device framework.
++For example, it is easy to setup a ublk device with specified block
++parameters from userspace.
++
++Using ublk
++==========
++
++ublk requires userspace ublk server to handle real block device logic.
++
++Below is example of using ``ublksrv`` to provide ublk-based loop device.
++
++- add a device::
++
++     ublk add -t loop -f ublk-loop.img
++
++- format with xfs, then use it::
++
++     mkfs.xfs /dev/ublkb0
++     mount /dev/ublkb0 /mnt
++     # do anything. all IOs are handled by io_uring
++     ...
++     umount /mnt
++
++- list the devices with their info::
++
++     ublk list
++
++- delete the device::
++
++     ublk del -a
++     ublk del -n $ublk_dev_id
++
++See usage details in README of ``ublksrv`` [#userspace_readme]_.
++
++Design
++======
++
++Control plane
++-------------
++
++ublk driver provides global misc device node (``/dev/ublk-control``) for
++managing and controlling ublk devices with help of several control commands:
++
++- ``UBLK_CMD_ADD_DEV``
++
++  Add a ublk char device (``/dev/ublkc*``) which is talked with ublk server
++  WRT IO command communication. Basic device info is sent together with this
++  command. It sets UAPI structure of ``ublksrv_ctrl_dev_info``,
++  such as ``nr_hw_queues``, ``queue_depth``, and max IO request buffer size,
++  for which the info is negotiated with the driver and sent back to the server.
++  When this command is completed, the basic device info is immutable.
++
++- ``UBLK_CMD_SET_PARAMS`` / ``UBLK_CMD_GET_PARAMS``
++
++  Set or get parameters of the device, which can be either generic feature
++  related, or request queue limit related, but can't be IO logic specific,
++  because the driver does not handle any IO logic. This command has to be
++  sent before sending ``UBLK_CMD_START_DEV``.
++
++- ``UBLK_CMD_START_DEV``
++
++  After the server prepares userspace resources (such as creating per-queue
++  pthread & io_uring for handling ublk IO), this command is sent to the
++  driver for allocating & exposing ``/dev/ublkb*``. Parameters set via
++  ``UBLK_CMD_SET_PARAMS`` are applied for creating the device.
++
++- ``UBLK_CMD_STOP_DEV``
++
++  Halt IO on ``/dev/ublkb*`` and remove the device. When this command returns,
++  ublk server will release resources (such as destroying per-queue pthread &
++  io_uring).
++
++- ``UBLK_CMD_DEL_DEV``
++
++  Remove ``/dev/ublkc*``. When this command returns, the allocated ublk device
++  number can be reused.
++
++- ``UBLK_CMD_GET_QUEUE_AFFINITY``
++
++  When ``/dev/ublkc`` is added, the driver creates block layer tagset, so
++  that each queue's affinity info is available. The server sends
++  ``UBLK_CMD_GET_QUEUE_AFFINITY`` to retrieve queue affinity info. It can
++  set up the per-queue context efficiently, such as bind affine CPUs with IO
++  pthread and try to allocate buffers in IO thread context.
++
++- ``UBLK_CMD_GET_DEV_INFO``
++
++  For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
++  responsibility to save IO target specific info in userspace.
++
++Data plane
++----------
++
++ublk server needs to create per-queue IO pthread & io_uring for handling IO
++commands via io_uring passthrough. The per-queue IO pthread
++focuses on IO handling and shouldn't handle any control & management
++tasks.
++
++The's IO is assigned by a unique tag, which is 1:1 mapping with IO
++request of ``/dev/ublkb*``.
++
++UAPI structure of ``ublksrv_io_desc`` is defined for describing each IO from
++the driver. A fixed mmaped area (array) on ``/dev/ublkc*`` is provided for
++exporting IO info to the server; such as IO offset, length, OP/flags and
++buffer address. Each ``ublksrv_io_desc`` instance can be indexed via queue id
++and IO tag directly.
++
++The following IO commands are communicated via io_uring passthrough command,
++and each command is only for forwarding the IO and committing the result
++with specified IO tag in the command data:
++
++- ``UBLK_IO_FETCH_REQ``
++
++  Sent from the server IO pthread for fetching future incoming IO requests
++  destined to ``/dev/ublkb*``. This command is sent only once from the server
++  IO pthread for ublk driver to setup IO forward environment.
++
++- ``UBLK_IO_COMMIT_AND_FETCH_REQ``
++
++  When an IO request is destined to ``/dev/ublkb*``, the driver stores
++  the IO's ``ublksrv_io_desc`` to the specified mapped area; then the
++  previous received IO command of this IO tag (either ``UBLK_IO_FETCH_REQ``
++  or ``UBLK_IO_COMMIT_AND_FETCH_REQ)`` is completed, so the server gets
++  the IO notification via io_uring.
++
++  After the server handles the IO, its result is committed back to the
++  driver by sending ``UBLK_IO_COMMIT_AND_FETCH_REQ`` back. Once ublkdrv
++  received this command, it parses the result and complete the request to
++  ``/dev/ublkb*``. In the meantime setup environment for fetching future
++  requests with the same IO tag. That is, ``UBLK_IO_COMMIT_AND_FETCH_REQ``
++  is reused for both fetching request and committing back IO result.
++
++- ``UBLK_IO_NEED_GET_DATA``
++
++  With ``UBLK_F_NEED_GET_DATA`` enabled, the WRITE request will be firstly
++  issued to ublk server without data copy. Then, IO backend of ublk server
++  receives the request and it can allocate data buffer and embed its addr
++  inside this new io command. After the kernel driver gets the command,
++  data copy is done from request pages to this backend's buffer. Finally,
++  backend receives the request again with data to be written and it can
++  truly handle the request.
++
++  ``UBLK_IO_NEED_GET_DATA`` adds one additional round-trip and one
++  io_uring_enter() syscall. Any user thinks that it may lower performance
++  should not enable UBLK_F_NEED_GET_DATA. ublk server pre-allocates IO
++  buffer for each IO by default. Any new project should try to use this
++  buffer to communicate with ublk driver. However, existing project may
++  break or not able to consume the new buffer interface; that's why this
++  command is added for backwards compatibility so that existing projects
++  can still consume existing buffers.
++
++- data copy between ublk server IO buffer and ublk block IO request
++
++  The driver needs to copy the block IO request pages into the server buffer
++  (pages) first for WRITE before notifying the server of the coming IO, so
++  that the server can handle WRITE request.
++
++  When the server handles READ request and sends
++  ``UBLK_IO_COMMIT_AND_FETCH_REQ`` to the server, ublkdrv needs to copy
++  the server buffer (pages) read to the IO request pages.
++
++Future development
++==================
++
++Container-aware ublk deivice
++----------------------------
++
++ublk driver doesn't handle any IO logic. Its function is well defined
++for now and very limited userspace interfaces are needed, which is also
++well defined too. It is possible to make ublk devices container-aware block
++devices in future as Stefan Hajnoczi suggested [#stefan]_, by removing
++ADMIN privilege.
++
++Zero copy
++---------
++
++Zero copy is a generic requirement for nbd, fuse or similar drivers. A
++problem [#xiaoguang]_ Xiaoguang mentioned is that pages mapped to userspace
++can't be remapped any more in kernel with existing mm interfaces. This can
++occurs when destining direct IO to ``/dev/ublkb*``. Also, he reported that
++big requests (IO size >= 256 KB) may benefit a lot from zero copy.
++
++
++References
++==========
++
++.. [#userspace] https://github.com/ming1/ubdsrv
++
++.. [#userspace_lib] https://github.com/ming1/ubdsrv/tree/master/lib
++
++.. [#userspace_nbdublk] https://gitlab.com/rwmjones/libnbd/-/tree/nbdublk
++
++.. [#userspace_readme] https://github.com/ming1/ubdsrv/blob/master/README
++
++.. [#stefan] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.localdomain/
++
++.. [#xiaoguang] https://lore.kernel.org/linux-block/YoOr6jBfgVm8GvWg@stefanha-x1.localdomain/
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f512b430c7cb..08a5c465a160 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -20760,6 +20760,7 @@ UBLK USERSPACE BLOCK DRIVER
+ M:	Ming Lei <ming.lei@redhat.com>
+ L:	linux-block@vger.kernel.org
+ S:	Maintained
++F:	Documentation/block/index.rst
+ F:	drivers/block/ublk_drv.c
+ F:	include/uapi/linux/ublk_cmd.h
+ 
+-- 
+2.31.1
+
