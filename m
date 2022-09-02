@@ -2,139 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5916AECAAD3
-	for <linux-block@archiver.kernel.org>; Thu,  1 Sep 2022 20:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18025ECAAD3
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 00:16:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234885AbiIAUWd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 16:22:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33308 "EHLO
+        id S233151AbiIBAQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 20:16:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233374AbiIAUWb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 16:22:31 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217A76F24D
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 13:22:30 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id bf4-20020a056602368400b0068baaa4f99bso11720iob.3
-        for <linux-block@vger.kernel.org>; Thu, 01 Sep 2022 13:22:30 -0700 (PDT)
+        with ESMTP id S231357AbiIBAQb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 20:16:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6CA5A2F1
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 17:16:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662077789;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BJXkmWS8fs1OJFQDlt9uEZ42yIaPYlfbQFXo4qcCOho=;
+        b=XghEN3ex6dj8EhqOOlzXMzGip9zWYpIxvF2vmoplvuk31itrVWKZRXa9nA0Jt3URJ+XqOi
+        FsuTcrz3Y3vQapBIZkPhwyK+8hEc/T/8hDaxp28Fdq7xxwLsEYVoMAvFdzBGGPR02vbbHn
+        bFU3azEbGIT7DsW0TeyDLOdC5QgOIf4=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-665-viT1NE8WPoO3AFr24LD7hw-1; Thu, 01 Sep 2022 20:16:28 -0400
+X-MC-Unique: viT1NE8WPoO3AFr24LD7hw-1
+Received: by mail-qv1-f72.google.com with SMTP id ls9-20020a0562145f8900b004990aeb7bd6so303701qvb.4
+        for <linux-block@vger.kernel.org>; Thu, 01 Sep 2022 17:16:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=BTFxe77WWd3NzcfLpg8ofoPcbrQKuZjmz/hqFy6+W8I=;
-        b=YIHj7EV7JSF3F6/r766mgaOaa/5RLpYIKUU4TDreFI0HtTLIRMf+8oJSZue8CzjEha
-         XYGo/Ed47LbARzmxTvfdhSpeMBeSyzpvAwo5cRQXVcfdwT73nMGrX2/LXWsHruL31aJg
-         ck7FeArAR21Kuui6PdqSuvWQT6qs59hhc7y/IwfE9mTubwqEqPoz1U5VlLGzGiWBWE/0
-         dT+ing+NuKD13Rc1YkAUODFdPNyQdE2dcymFEmKCeV7VxE1E8rhPuGNrkvJiYagGEA1+
-         t0grFvwYTcUaEnGy/K8lv1hwYfH+VX976X5oNAev8cfJJYoOWxRcZVH0xkuvVlq3i+1f
-         10Gw==
-X-Gm-Message-State: ACgBeo3vzC4raFF55biANmFuv7DmDSGFyeXI6K9w2M4V/hJEdjmK1g3N
-        BeurOQeAZYB0JA3QLFa7cx6seuji6psDwVzS7oRmOPQ8I7/F
-X-Google-Smtp-Source: AA6agR7gvwViqI19wdSQETxaBt6FWFc8WlMRc9kl3GMEX6z/rfV2CenGPBsZ6HJFWVIX7hNNdqcRX++Q3esAzk6DjzOONMs69j8O
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=BJXkmWS8fs1OJFQDlt9uEZ42yIaPYlfbQFXo4qcCOho=;
+        b=M+qItEw+cTzM++19KOpQnXdTL+6CUJtfY0DbfhVtgm/mm67uz0te8+/+NKsNBgca3i
+         LqG6oaPFLim3y8Qz0fCsJreooOb9GzqolrwSiX4Fj+QJGQkbaQVrtW+MSujLHPHqnI02
+         RH/KLmrM4NxpINohh25BD2CeRpt2a5sBfxjsslxZSUwdGp5UX6qPf0maxABR80D6tzBY
+         LkTPGSPpmrRdRKNy6LpoWA5S7/RlM39wOtBLu4by+4x3pVw1MHa3vcNPHNxmnIimfhkg
+         p1NjhRfNFwiAQTFB59ptdKxbKzyu+cXv/2XMz5lR+t8KyKrYmJkdIJP7xiYD9zLu88eF
+         RMDQ==
+X-Gm-Message-State: ACgBeo1Z0nYXaMMzzU3ninBtfUYHJvCrURKeRaMHsmj1iFGd/aHjcmnv
+        hndEltruNdfvsx9TuD4agqH27+q12EYBTj7phn1M4edfCSbZcyb3oaoNSljNXJZOT+ofIctcf6w
+        Hw84xehZAdIo9geL5hQXCIA==
+X-Received: by 2002:ac8:5a09:0:b0:344:69c7:d405 with SMTP id n9-20020ac85a09000000b0034469c7d405mr26543399qta.158.1662077787574;
+        Thu, 01 Sep 2022 17:16:27 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6xfpUx4j6Jfald4N7jmwOFuH/AS+dP1NbvYV//P7CHrd0ECl3dDoJBwQdLGwkp4TF0/VDNjg==
+X-Received: by 2002:ac8:5a09:0:b0:344:69c7:d405 with SMTP id n9-20020ac85a09000000b0034469c7d405mr26543381qta.158.1662077787384;
+        Thu, 01 Sep 2022 17:16:27 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id i7-20020a05620a404700b006b5cc25535fsm297002qko.99.2022.09.01.17.16.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 17:16:26 -0700 (PDT)
+Date:   Thu, 1 Sep 2022 20:16:25 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com, hch@lst.de, bvanassche@acm.org,
+        pankydev8@gmail.com, Johannes.Thumshirn@wdc.com,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        gost.dev@samsung.com, jaegeuk@kernel.org, matias.bjorling@wdc.com,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH v12 08/13] dm-zoned: ensure only power of 2 zone sizes
+ are allowed
+Message-ID: <YxFLWcY/xSqyqORO@redhat.com>
+References: <20220823121859.163903-1-p.raghav@samsung.com>
+ <CGME20220823121909eucas1p113c0c29f7e28d0ee3e1161f7da243baf@eucas1p1.samsung.com>
+ <20220823121859.163903-9-p.raghav@samsung.com>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2c95:b0:689:e4e2:2c02 with SMTP id
- i21-20020a0566022c9500b00689e4e22c02mr15267879iow.94.1662063749454; Thu, 01
- Sep 2022 13:22:29 -0700 (PDT)
-Date:   Thu, 01 Sep 2022 13:22:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000615f3905e7a35f9d@google.com>
-Subject: [syzbot] general protection fault in start_motor (2)
-From:   syzbot <syzbot+30e9df1b3f1d5117d77f@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220823121859.163903-9-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue, Aug 23 2022 at  8:18P -0400,
+Pankaj Raghav <p.raghav@samsung.com> wrote:
 
-syzbot found the following issue on:
+> From: Luis Chamberlain <mcgrof@kernel.org>
+> 
+> dm-zoned relies on the assumption that the zone size is a
+> power-of-2(po2) and the zone capacity is same as the zone size.
+> 
+> Ensure only po2 devices can be used as dm-zoned target until a native
+> support for zoned devices with non-po2 zone size is added.
+> 
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 
-HEAD commit:    10d4879f9ef0 Merge tag 'thermal-6.0-rc3' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=116400e5080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=312be25752c7fe30
-dashboard link: https://syzkaller.appspot.com/bug?extid=30e9df1b3f1d5117d77f
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=126b8675080000
+Reviewed-by: Mike Snitzer <snitzer@kernel.org>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+30e9df1b3f1d5117d77f@syzkaller.appspotmail.com
-
-floppy1: FDC access conflict!
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 12 Comm: kworker/u16:1 Not tainted 6.0.0-rc2-syzkaller-00283-g10d4879f9ef0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-Workqueue: floppy floppy_work_workfn
-RIP: 0010:start_motor+0x3a/0x3f0 drivers/block/floppy.c:1905
-Code: 08 e8 7a 39 e0 fc 48 8b 1d 63 54 ae 0c 48 b8 00 00 00 00 00 fc ff df 0f b6 2d b2 3e ae 0c 48 89 da 48 c1 ea 03 89 e9 41 89 ed <0f> b6 04 02 83 e1 03 41 83 e5 03 84 c0 74 08 3c 03 0f 8e be 02 00
-RSP: 0018:ffffc900005ffc98 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: ffffffff849b0096 RDI: ffffffff849b2f00
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff849b2f00
-R13: 0000000000000001 R14: ffff888012459400 R15: ffff888011875800
-FS:  0000000000000000(0000) GS:ffff88802c900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0afb5ff718 CR3: 000000001b6a0000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- floppy_ready+0x83/0x1940 drivers/block/floppy.c:1932
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e4/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:start_motor+0x3a/0x3f0 drivers/block/floppy.c:1905
-Code: 08 e8 7a 39 e0 fc 48 8b 1d 63 54 ae 0c 48 b8 00 00 00 00 00 fc ff df 0f b6 2d b2 3e ae 0c 48 89 da 48 c1 ea 03 89 e9 41 89 ed <0f> b6 04 02 83 e1 03 41 83 e5 03 84 c0 74 08 3c 03 0f 8e be 02 00
-RSP: 0018:ffffc900005ffc98 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
-RDX: 0000000000000000 RSI: ffffffff849b0096 RDI: ffffffff849b2f00
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff849b2f00
-R13: 0000000000000001 R14: ffff888012459400 R15: ffff888011875800
-FS:  0000000000000000(0000) GS:ffff88802c900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0afb5ff718 CR3: 00000000284ad000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	08 e8                	or     %ch,%al
-   2:	7a 39                	jp     0x3d
-   4:	e0 fc                	loopne 0x2
-   6:	48 8b 1d 63 54 ae 0c 	mov    0xcae5463(%rip),%rbx        # 0xcae5470
-   d:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  14:	fc ff df
-  17:	0f b6 2d b2 3e ae 0c 	movzbl 0xcae3eb2(%rip),%ebp        # 0xcae3ed0
-  1e:	48 89 da             	mov    %rbx,%rdx
-  21:	48 c1 ea 03          	shr    $0x3,%rdx
-  25:	89 e9                	mov    %ebp,%ecx
-  27:	41 89 ed             	mov    %ebp,%r13d
-* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
-  2e:	83 e1 03             	and    $0x3,%ecx
-  31:	41 83 e5 03          	and    $0x3,%r13d
-  35:	84 c0                	test   %al,%al
-  37:	74 08                	je     0x41
-  39:	3c 03                	cmp    $0x3,%al
-  3b:	0f                   	.byte 0xf
-  3c:	8e                   	.byte 0x8e
-  3d:	be                   	.byte 0xbe
-  3e:	02 00                	add    (%rax),%al
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
