@@ -2,218 +2,215 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD90ECAAD5
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 18:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AD75C6FA82
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 18:56:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230088AbiIBSrG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 14:47:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59490 "EHLO
+        id S229629AbiIBS4E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 14:56:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229956AbiIBSrF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 14:47:05 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9349D41BE;
-        Fri,  2 Sep 2022 11:47:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:References:Cc:To:From:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=PqVz82vunw7RduM37pHXxkZOsTDf9dFgFE3ITMuOtdI=; b=JataSn/skoSH64/P2bM9NmNrAx
-        mtcVSJPKUZre0aOJvsQWYO+m3EToEpFrs1dRNUkw3+G/Ex+d7h2xidgzqDIolkfvqfYKNmwMgQ6N2
-        nfOvHRz1L7uBTrWccDr+1s2raUkJLHrtuW5Q1MZgSQWd/puBO+3hmKiiOx3snBgxeIpGio7Qfh1jG
-        kfY2bRCTReU/XgwV/0rdcflfSW3goRF0dY7BScNu/mTlToq4FFVx7eUCEY2vhw8UQp9Vg7mnpAhfD
-        3X+fPIysjV3e6PZb+4GD+nOkpjQnnjwKYXAgvOnMNVwOcVxoklWjjHcYj1l8vBM0/aFmAlKglKlMH
-        jZ9FIP4A==;
-Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oUBgz-00Eklo-54; Fri, 02 Sep 2022 12:47:02 -0600
-Message-ID: <db8cd049-c78b-1aa0-dcd0-0feb8c6cb25c@deltatee.com>
-Date:   Fri, 2 Sep 2022 12:46:54 -0600
+        with ESMTP id S229759AbiIBS4D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 14:56:03 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F6D5EEC5E
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 11:56:01 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220902185555epoutp02ba18522e86394b81260a06299e6d366a~RIAfgX_EF0904909049epoutp02T
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 18:55:55 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220902185555epoutp02ba18522e86394b81260a06299e6d366a~RIAfgX_EF0904909049epoutp02T
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662144955;
+        bh=4eLYZnr6xFbgq4GxcRAahDAAw7otRIbJYrXiu6bjolg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=T74VFScqDbiBa9+/m8IuJIPLjTKV5Xqvvg2FI5elMlDM4gyKJq0s92NLMJWVFKBq3
+         pcSFVR0+7pOlXo+Ygjcf5bAh0JDUJFsgOpLw4orViM8wVhmZsgCc9jEiT1ZitBvV9d
+         2mvY/QZknX57p+GoyL+f6MNK37xfdcw+jEczou6c=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20220902185555epcas5p2d39ee95cd1fcaa04403b566617f6460e~RIAfCzqap3127031270epcas5p2v;
+        Fri,  2 Sep 2022 18:55:55 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4MK6Z108YLz4x9Pp; Fri,  2 Sep
+        2022 18:55:53 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A4.91.59633.8B152136; Sat,  3 Sep 2022 03:55:52 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220902185552epcas5p1a3bd8094fb643fb03adbfbc72ddbe10d~RIAcnaua00646106461epcas5p1r;
+        Fri,  2 Sep 2022 18:55:52 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220902185552epsmtrp2debe40835de617a7d42661c2c1a19de9~RIAcmuU1z3263532635epsmtrp2o;
+        Fri,  2 Sep 2022 18:55:52 +0000 (GMT)
+X-AuditID: b6c32a49-dfdff7000000e8f1-ca-631251b830c9
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EA.50.14392.8B152136; Sat,  3 Sep 2022 03:55:52 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220902185551epsmtip15d28ee76bdbbdbc6e42b1cb33a6e5164~RIAbY5F9z3257232572epsmtip1n;
+        Fri,  2 Sep 2022 18:55:51 +0000 (GMT)
+Date:   Sat, 3 Sep 2022 00:16:08 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH for-next v3 0/4] fixed-buffer for uring-cmd/passthrough
+Message-ID: <20220902184608.GA6902@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-From:   Logan Gunthorpe <logang@deltatee.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20220825152425.6296-1-logang@deltatee.com>
- <20220825152425.6296-8-logang@deltatee.com> <YxDb2MyRx6o/wDAz@kroah.com>
- <4a4bca1e-bebf-768f-92d4-92eb8ae714e1@deltatee.com>
- <YxDhEO9ycZDTnbZm@kroah.com>
- <cc9a24a8-dd3a-9d21-d9a7-5ee4b0ad7a57@deltatee.com>
- <YxD7uZYaV75gJS9d@kroah.com>
- <fb9d7948-43fe-87c5-5275-70f280181ad1@deltatee.com>
- <YxGad5h2Nn/Ejslc@kroah.com>
-Content-Language: en-CA
-In-Reply-To: <YxGad5h2Nn/Ejslc@kroah.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v9 7/8] PCI/P2PDMA: Allow userspace VMA allocations
- through sysfs
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+In-Reply-To: <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmlu6OQKFkg01tFhZzVm1jtFh9t5/N
+        4uaBnUwWK1cfZbJ413qOxWLSoWuMFntvaVvMX/aU3YHDY+esu+wel8+Wemxa1cnmsXlJvcfu
+        mw1sHn1bVjF6fN4kF8AelW2TkZqYklqkkJqXnJ+SmZduq+QdHO8cb2pmYKhraGlhrqSQl5ib
+        aqvk4hOg65aZA3SSkkJZYk4pUCggsbhYSd/Opii/tCRVISO/uMRWKbUgJafApECvODG3uDQv
+        XS8vtcTK0MDAyBSoMCE7o6l9P1vBArmKT/dEGhi3SHQxcnBICJhILD2f18XIxSEksJtR4tjJ
+        BewQzidGiXsbLzFDON8YJTZsXg3kcIJ1/OlewAKR2MsosfjLajYI5xmjxNyjl8GqWARUJA7u
+        us4IsoNNQFPiwuRSkLCIgIJEz++VbCA2s8AqRokpv6RBbGEBb4mmvgdgrbwCOhI77h+HsgUl
+        Ts58wgIyhlPAVmLhr0qQsKiAssSBbceZQNZKCEzkkJjVsw3qOBeJ30c6mCBsYYlXx7ewQ9hS
+        Ep/f7WWDsJMlLs08B1VTIvF4z0Eo216i9VQ/M8RtGRJbn05ghbD5JHp/P2GCBBevREebEES5
+        osS9SU9ZIWxxiYczlkDZHhJH+mexwENx0rbLLBMY5WYheWcWkhUQtpVE54cmIJsDyJaWWP6P
+        A8LUlFi/S38BI+sqRsnUguLc9NRi0wLDvNRyeAwn5+duYgQnUS3PHYx3H3zQO8TIxMF4iFGC
+        g1lJhHfqYYFkId6UxMqq1KL8+KLSnNTiQ4ymwNiZyCwlmpwPTON5JfGGJpYGJmZmZiaWxmaG
+        SuK8U7QZk4UE0hNLUrNTUwtSi2D6mDg4pRqYksvOzGtT76wKOz7PP1SwylafdfnjCWmPgi1/
+        X9vwN4U75Gr6K+/LS/oibtpbSgTzHzSpM3LJMYgI+NV87/TN89PDVtfneLjFHDZxlI29PMWs
+        5E+vzOUHBYqaxnu9TnvF7mVd7F2r//axmVMZ4yPHg49++HffcN7nKZ8c87La6qrDijTeGq0r
+        SyQlZJg+sjRdOyT2OmCJMe8X9mzfR1orG8LaPT63Xjzrbrpo8t2l/16GbWpbelW2pjvddYmH
+        S4vV5lWL/wQvnTnxekRj5awv3+8LP2UJfPjy//0KjR1eW5u1OT9Nsf5xKmph3pm3UWn7r6Xk
+        zwyJNlY6u1tSwCj+32K926cTs9XzDJkel5gqsRRnJBpqMRcVJwIA1JxDQisEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBLMWRmVeSWpSXmKPExsWy7bCSnO6OQKFkg9PPpC3mrNrGaLH6bj+b
+        xc0DO5ksVq4+ymTxrvUci8WkQ9cYLfbe0raYv+wpuwOHx85Zd9k9Lp8t9di0qpPNY/OSeo/d
+        NxvYPPq2rGL0+LxJLoA9issmJTUnsyy1SN8ugStjSe9floJL0hU3Ls5mbGBsEOti5OSQEDCR
+        +NO9gKWLkYtDSGA3o8T9j/eZIBLiEs3XfrBD2MISK/89Z4coesIosXtbCyNIgkVAReLgrutA
+        NgcHm4CmxIXJpSBhEQEFiZ7fK9lAbGaBVYwSU35Jg9jCAt4STX0PmEFsXgEdiR33jzNDzPzE
+        KHHp+ylWiISgxMmZT1ggms0k5m1+yAwyn1lAWmL5Pw4Qk1PAVmLhr0qQClEBZYkD244zTWAU
+        nIWkeRaS5lkIzQsYmVcxSqYWFOem5xYbFhjmpZbrFSfmFpfmpesl5+duYgRHhpbmDsbtqz7o
+        HWJk4mA8xCjBwawkwjv1sECyEG9KYmVValF+fFFpTmrxIUZpDhYlcd4LXSfjhQTSE0tSs1NT
+        C1KLYLJMHJxSDUysbf/r+KZE7VU23/MtXfNx9FZVXuHAL15vtteZK/3NeSWS9u7yvNTM0Pv8
+        1yIevY4VbmLlauPSln/ptfbMi+JvBzaKTNz3z/JU8/WzjIXTjzhdN1R8YrZgdnNxf3jk0ZL/
+        RwKnS+27dq2P81my7rXXPjJyG95dKRORv58/109kytzn976nPZ2cL1M442CjvMGzZTqLjEJ/
+        iN250qeu4nKXZ+r8souVfxmrZ9YvdW/jm/zFjv/3zN+dJgc5jDNjI7i2rz4s3zn7eFy0Ztap
+        Ki+th0qf3+j4qPU9M1tuX9QyYc/C21ffL3M22T15JW+Te+OcBdMPpk3m0D41RVwltNrsTARr
+        nHOknfwmEdOy3Y5KLMUZiYZazEXFiQBSUX0O+wIAAA==
+X-CMS-MailID: 20220902185552epcas5p1a3bd8094fb643fb03adbfbc72ddbe10d
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_445cb_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf
+References: <CGME20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf@epcas5p1.samsung.com>
+        <20220902151657.10766-1-joshi.k@samsung.com>
+        <f1e8a7fa-a1f8-c60a-c365-b2164421f98d@kernel.dk>
+        <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_445cb_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
+On Fri, Sep 02, 2022 at 10:32:16AM -0600, Jens Axboe wrote:
+>On 9/2/22 10:06 AM, Jens Axboe wrote:
+>> On 9/2/22 9:16 AM, Kanchan Joshi wrote:
+>>> Hi,
+>>>
+>>> Currently uring-cmd lacks the ability to leverage the pre-registered
+>>> buffers. This series adds the support in uring-cmd, and plumbs
+>>> nvme passthrough to work with it.
+>>>
+>>> Using registered-buffers showed peak-perf hike from 1.85M to 2.17M IOPS
+>>> in my setup.
+>>>
+>>> Without fixedbufs
+>>> *****************
+>>> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
+>>> submitter=0, tid=5256, file=/dev/ng0n1, node=-1
+>>> polled=0, fixedbufs=0/0, register_files=1, buffered=1, QD=128
+>>> Engine=io_uring, sq_ring=128, cq_ring=128
+>>> IOPS=1.85M, BW=904MiB/s, IOS/call=32/31
+>>> IOPS=1.85M, BW=903MiB/s, IOS/call=32/32
+>>> IOPS=1.85M, BW=902MiB/s, IOS/call=32/32
+>>> ^CExiting on signal
+>>> Maximum IOPS=1.85M
+>>
+>> With the poll support queued up, I ran this one as well. tldr is:
+>>
+>> bdev (non pt)	122M IOPS
+>> irq driven	51-52M IOPS
+>> polled		71M IOPS
+>> polled+fixed	78M IOPS
 
-On 2022-09-01 23:53, Greg Kroah-Hartman wrote:
-> On Thu, Sep 01, 2022 at 01:16:54PM -0600, Logan Gunthorpe wrote:
->> This surprises me. Can you elaborate on this classic issue?
-> 
-> There's long threads about it on the ksummit discuss mailing list and
-> other places.
+except first one, rest three entries are for passthru? somehow I didn't
+see that big of a gap. I will try to align my setup in coming days.
 
-I've managed to find one such thread dealing with lifetime issues of
-different objects and bugs that are common with mistakes with its usage.
-I've dealt with similar issues in the past, but as best as I can see 
-there are no lifetime issues in this code.
+>> Looking at profiles, it looks like the bio is still being allocated
+>> and freed and not dipping into the alloc cache, which is using a
+>> substantial amount of CPU. I'll poke a bit and see what's going on...
+>
+>It's using the fs_bio_set, and that doesn't have the PERCPU alloc cache
+>enabled. With the below, we then do:
 
-> I have never used devm_add_action_or_reset() so I can't say why it is
-> there.  I am just pointing out that manually messing with a sysfs group
-> from a driver is a huge flag that something is wrong.  A driver should
-> almost never be touching a raw kobject or calling any sysfs_* call if
-> all is normal, which is why I questioned this.
+Thanks for the find.
 
-In this case we need to remove the specifc sysfs file to teardown any
-vmas earlier in the remove sequence than it would be done normally. Whether
-we do that through devm or remove() doesn't change the fact that we need
-to access the dev->kobj to do that early.
+>polled+fixed	82M
+>
+>I suspect the remainder is due to the lack of batching on the request
+>freeing side, at least some of it. Haven't really looked deeper yet.
+>
+>One issue I saw - try and use passthrough polling without having any
+>poll queues defined and it'll stall just spinning on completions. You
+>need to ensure that these are processed as well - look at how the
+>non-passthrough io_uring poll path handles it.
 
->> But if it's that important I can make the change to these patches for v10.
-> 
-> Try it the way I suggest, with a remove() callback, and see if that
-> looks simpler and easier to follow and maintain over time.
+Had tested this earlier, and it used to run fine. And it does not now.
+I see that io are getting completed, irq-completion is arriving in nvme
+and it is triggering task-work based completion (by calling
+io_uring_cmd_complete_in_task). But task-work never got called and
+therefore no completion happened.
 
-See the diff at the bottom of this email. I can apply it on top of this
-patch, but IMO it is neither easier to follow nor maintain. Unless you 
-have a different suggestion...
+io_uring_cmd_complete_in_task -> io_req_task_work_add -> __io_req_task_work_add
 
-Thanks,
+Seems task work did not get added. Something about newly added
+IORING_SETUP_DEFER_TASKRUN changes the scenario.
 
-Logan
+static inline void __io_req_task_work_add(struct io_kiocb *req, bool allow_local)
+{
+        struct io_uring_task *tctx = req->task->io_uring;
+        struct io_ring_ctx *ctx = req->ctx;
+        struct llist_node *node;
 
---
+        if (allow_local && ctx->flags & IORING_SETUP_DEFER_TASKRUN) {
+                io_req_local_work_add(req);
+                return;
+        }
+	....
 
-diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index a6ed6bbca214..4e1211a2a6cd 100644
---- a/drivers/pci/p2pdma.c
-+++ b/drivers/pci/p2pdma.c
-@@ -206,6 +206,23 @@ static const struct dev_pagemap_ops p2pdma_pgmap_ops = {
- 	.page_free = p2pdma_page_free,
- };
- 
-+void pci_p2pdma_remove(struct pci_dev *pdev)
-+{
-+	if (!rcu_access_pointer(pdev->p2pdma))
-+		return;
-+
-+	/*
-+	 * Any userspace mappings must be unmapped before the
-+	 * devm_memremap_pages() release happens, otherwise a device remove
-+	 * will hang on any processes that have pages mapped. To avoid this,
-+	 * remove the alloc attribute from sysfs which will call
-+	 * unmap_mapping_range() on the inode and teardown any existing
-+	 * userspace mappings.
-+	 */
-+	sysfs_remove_file_from_group(&pdev->dev.kobj, &p2pmem_alloc_attr.attr,
-+				     p2pmem_group.name);
-+}
-+
- static void pci_p2pdma_release(void *data)
- {
- 	struct pci_dev *pdev = data;
-@@ -257,19 +274,6 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
- 	return error;
- }
- 
--static void pci_p2pdma_unmap_mappings(void *data)
--{
--	struct pci_dev *pdev = data;
--
--	/*
--	 * Removing the alloc attribute from sysfs will call
--	 * unmap_mapping_range() on the inode, teardown any existing userspace
--	 * mappings and prevent new ones from being created.
--	 */
--	sysfs_remove_file_from_group(&pdev->dev.kobj, &p2pmem_alloc_attr.attr,
--				     p2pmem_group.name);
--}
--
- /**
-  * pci_p2pdma_add_resource - add memory for use as p2p memory
-  * @pdev: the device to add the memory to
-@@ -328,11 +332,6 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
- 		goto pgmap_free;
- 	}
- 
--	error = devm_add_action_or_reset(&pdev->dev, pci_p2pdma_unmap_mappings,
--					 pdev);
--	if (error)
--		goto pages_free;
--
- 	p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
- 	error = gen_pool_add_owner(p2pdma->pool, (unsigned long)addr,
- 			pci_bus_address(pdev, bar) + offset,
-diff --git a/drivers/pci/pci-driver.c b/drivers/pci/pci-driver.c
-index 49238ddd39ee..a096f2723eac 100644
---- a/drivers/pci/pci-driver.c
-+++ b/drivers/pci/pci-driver.c
-@@ -471,6 +471,8 @@ static void pci_device_remove(struct device *dev)
- 	struct pci_dev *pci_dev = to_pci_dev(dev);
- 	struct pci_driver *drv = pci_dev->driver;
- 
-+	pci_p2pdma_remove(pci_dev);
-+
- 	if (drv->remove) {
- 		pm_runtime_get_sync(dev);
- 		drv->remove(pci_dev);
-diff --git a/drivers/pci/pci.h b/drivers/pci/pci.h
-index 785f31086313..1c5c901a2fcc 100644
---- a/drivers/pci/pci.h
-+++ b/drivers/pci/pci.h
-@@ -774,4 +774,12 @@ static inline pci_power_t mid_pci_get_power_state(struct pci_dev *pdev)
- }
- #endif
- 
-+#ifdef CONFIG_PCI_P2PDMA
-+void pci_p2pdma_remove(struct pci_dev *dev);
-+#else
-+static inline void pci_p2pdma_remove(struct pci_dev *dev);
-+{
-+}
-+#endif
-+
- #endif /* DRIVERS_PCI_H */
+To confirm, I commented that in t/io_uring and it runs fine.
+Please see if that changes anything for you? I will try to find the
+actual fix tomorow.
+
+diff --git a/t/io_uring.c b/t/io_uring.c
+index d893b7b2..ac5f60e0 100644
+--- a/t/io_uring.c
++++ b/t/io_uring.c
+@@ -460,7 +460,6 @@ static int io_uring_setup(unsigned entries, struct io_uring_params *p)
+
+        p->flags |= IORING_SETUP_COOP_TASKRUN;
+        p->flags |= IORING_SETUP_SINGLE_ISSUER;
+-       p->flags |= IORING_SETUP_DEFER_TASKRUN;
+ retry:
+        ret = syscall(__NR_io_uring_setup, entries, p);
+        if (!ret)
 
 
 
+------pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_445cb_
+Content-Type: text/plain; charset="utf-8"
 
 
-
-
-
+------pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_445cb_--
