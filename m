@@ -2,104 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60BC7ECAAD3
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 00:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A455ECAAD3
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 01:39:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233582AbiIBA3F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 20:29:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34388 "EHLO
+        id S234085AbiIBBi7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 21:38:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232561AbiIBA3E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 20:29:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27B296750
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 17:29:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662078543;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JoL26AsmguCoQC8iT7uL94/0V02t17IP8zjffwCfRFk=;
-        b=HTleWPQF9AuxVr7rHAYALwMIr9d9MM209Qp2nlGjNaIFqvMwh8jdAxUJdmFd1CYcw/P5YF
-        HGUN0Pm0cjOttQyvnxwsBnxLYWDP9W9tzCz1sB+Nu2Ti7ylHpR562o34yqdRFe7LroEzvY
-        d0ZiGrko99AQZZ71/NFzVzejIZRvuTI=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-453-onLTrBeBMzal0GKNHdxdeQ-1; Thu, 01 Sep 2022 20:29:01 -0400
-X-MC-Unique: onLTrBeBMzal0GKNHdxdeQ-1
-Received: by mail-qt1-f198.google.com with SMTP id cm10-20020a05622a250a00b003437b745ccdso401318qtb.18
-        for <linux-block@vger.kernel.org>; Thu, 01 Sep 2022 17:29:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=JoL26AsmguCoQC8iT7uL94/0V02t17IP8zjffwCfRFk=;
-        b=3ntFuGDTfEQI5A1EQ5IX4Urr8aiHuaW0de62jlUk1KszFQL7ihY9IiyahkWHQvqwQ7
-         bD+hGk/uq5BYdofSrRm9KdXrORqhGAyPN224AOjE1eCyzW+ZLSfSmlWoJuAzWKUQI7GK
-         kjHdnHQNKgPk7R8MoN+025vMIP9DgTBvd8izeIlyTbmlzrLv9BgjLnzjtE4nlSYubTww
-         wMZ9HDlYI0oVigAyekUx7Qqcwxv/NGHO+pLLQmJpbO7nP8s8gaiodQlu1Ug37eActcbc
-         FXftTsa6yGPcIu5A3EjCsw4WwhpbI8q9bcUhr+sg1RjHm9nTsCUN/QQfL/8z57k3I7PC
-         EJuQ==
-X-Gm-Message-State: ACgBeo1RogYx8rmmCmTu+tOYm1AUTTlmLkA9u57qoh5vdK/NaGYSGA7r
-        Ga9lZBweRzO7gHHvlLpPGK51cpgST4X8bZi3zK1x3qIg4Naaw02mxPtUIy3GLEynuvwWn4XS+Xl
-        deHy9tXulrlEqd08Wnm9Cqw==
-X-Received: by 2002:a05:622a:56:b0:344:50e3:3363 with SMTP id y22-20020a05622a005600b0034450e33363mr26078605qtw.217.1662078541488;
-        Thu, 01 Sep 2022 17:29:01 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4ummQqIzdjpLP2wlMT3mmzaahpZ4roXiEIZrDjJAlvbH341hXfcfEvnw7FaTjjSfTvav+c8Q==
-X-Received: by 2002:a05:622a:56:b0:344:50e3:3363 with SMTP id y22-20020a05622a005600b0034450e33363mr26078588qtw.217.1662078541288;
-        Thu, 01 Sep 2022 17:29:01 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id 15-20020ac84e8f000000b0031f0b43629dsm180519qtp.23.2022.09.01.17.29.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 17:29:00 -0700 (PDT)
-Date:   Thu, 1 Sep 2022 20:28:59 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, hch@lst.de, pankydev8@gmail.com,
-        Johannes.Thumshirn@wdc.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, hare@suse.de, jaegeuk@kernel.org,
-        linux-kernel@vger.kernel.org, matias.bjorling@wdc.com,
-        gost.dev@samsung.com, bvanassche@acm.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v12 12/13] dm: introduce DM_EMULATED_ZONES target type
-Message-ID: <YxFOS8fq8AeE5mkf@redhat.com>
-References: <20220823121859.163903-1-p.raghav@samsung.com>
- <CGME20220823121914eucas1p2f4445066c23cdae4fca80f7b0268815b@eucas1p2.samsung.com>
- <20220823121859.163903-13-p.raghav@samsung.com>
+        with ESMTP id S232810AbiIBBi6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 21:38:58 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B36A8312
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 18:38:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1662082737; x=1693618737;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fkjhkfssw14V/+Vwqu+T+FisZXpvkRyRc6YH1qGQjpc=;
+  b=pHRgaYJ/AdDHipl1MzFGGbF9z5hdysda5igteYwnGwqogILX+6guxXYd
+   y2TeoQAwieoO9VIJR6PGnkJMV1bu21FT35DcTK6BQpFHIoZY07lHetXa/
+   lYAbxIFU1qHd+nDL4rfxR3J7baXZN2Cx47l5hUsCME6lMg1APQjuTR4TU
+   BHyMusi6jRGD7GM3L/gPphKpNdLagEtJeTau5lPpQu49H0QBtUhKafoJW
+   qbPYdPm0iZeOfUQuuXQp/J3bM7tKNNCYaX5z+eHYJUMKtsn2bKjIBov6O
+   C5DyepYIhV+Dv4X9q4dz7Rty/nNc1EsFvKBztPr0PT69r1ulXJdLbeSCq
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,281,1654531200"; 
+   d="scan'208";a="215449439"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 09:38:55 +0800
+IronPort-SDR: NCm+Y5M6opkrXKqnL9nOuqSMaKCzWZfjOQ25bWXD085j0IpQ2JIAYGKYbM9wYG1xMh7iH+s75E
+ +w/qh0stgkQRLPsIBUhfG+7rZk26yafxnqlmsNgkheCWqPHL27QXyZweE6rK+95cpZa/KoBN+x
+ pMzR+KVHknfEaYLBJt5UYNmE8CGRDScyL7u1UqZqdn7dOkUUcogrIQFR31SUlfu6ngqXCOPe64
+ xIZbEui9nIaNjUXbwENUy/F1kmrLE8UZm4w5DRxTLpYfkSr0IPsqYqHMwfoMU+1YQOITq2mV6U
+ 2ORZQfa9H0ClNVs2WOI+N3hA
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 17:59:24 -0700
+IronPort-SDR: 66Ibi2qLOg8DvRrO6nPX3wGZWToISGagpffr1KKV5NyZZCy645wpiAiZkLFVlL8sG/Q8d1K29F
+ MPFz0xMWY5Rd5Io3h5iyTtThpJRFkLRH5pXNg/2QPkmxiK5MaZb7MaIkrnptACN8zH2rCXe7fe
+ K/QzT0hXdLhalF6hPP/vzXAd4tRsfkcgfSfa64YsIfz8IzCfgBTpDAwRziyPATTRhcRn3L956d
+ IUDgeeAQFAU+zA7gBJ1T9y+5WAJ6N0eCA9/o+KBAemTIpYTPPephOhfdjjouz1JiSO6S8oqbxr
+ gE8=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 18:38:56 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MJgYW2d2wz1Rx15
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 18:38:55 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1662082734; x=1664674735; bh=fkjhkfssw14V/+Vwqu+T+FisZXpvkRyRc6Y
+        H1qGQjpc=; b=oDNr1Rs28CmLnSi10thx8HyLuiOkOC/iTGVJ3LM6oIcTWTypKtk
+        GEy3MdWhdq/z8QZCv0tXAk8htvcb9A4CF+zS+Di6l4SalNwMVbOHfXHk8k4mTy+a
+        /2qWrw6FlpeQzKFf7JOaWqpHoRfpSNDWmvq0rh1Ri8Lq6Amtp1EnsQpXYC6b5wQj
+        2VnvPgLhiCUz4cZ7EOU98fdXUgDpY3hvst6YiZhdbZpUl43gpId9mveZ4DDan7oY
+        UUEYV212QWjTaL0yZ7HMvElMxJ9xwDNr5NOfGgmBxh/VRh7ZCKuMp7rjRS8F4Sed
+        6U9Ir5GpDSYYUaxQTddOJsKnUsqcEB7KkLQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 0w-CsC0vVoCR for <linux-block@vger.kernel.org>;
+        Thu,  1 Sep 2022 18:38:54 -0700 (PDT)
+Received: from [10.225.163.56] (unknown [10.225.163.56])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MJgYS2ngTz1RvLy;
+        Thu,  1 Sep 2022 18:38:52 -0700 (PDT)
+Message-ID: <c2e15bee-cd4d-9699-621d-986029f337b6@opensource.wdc.com>
+Date:   Fri, 2 Sep 2022 10:38:50 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220823121859.163903-13-p.raghav@samsung.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH 17/17] iomap: remove IOMAP_F_ZONE_APPEND
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20220901074216.1849941-1-hch@lst.de>
+ <20220901074216.1849941-18-hch@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220901074216.1849941-18-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Aug 23 2022 at  8:18P -0400,
-Pankaj Raghav <p.raghav@samsung.com> wrote:
+On 9/1/22 16:42, Christoph Hellwig wrote:
+> No users left now that btrfs takes REQ_OP_WRITE bios from iomap and
+> splits and converts them to REQ_OP_ZONE_APPEND internally.
 
-> Introduce a new target type DM_EMULATED_ZONES for targets with
-> a different number of sectors per zone (aka zone size) than the underlying
-> device zone size.
+Hu... I wanted to use that for zonefs for doing ZONE APPEND with AIOs...
+Need to revisit that code anyway, so fine for now.
+
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+
 > 
-> This target type is introduced as the existing zoned targets assume
-> that the target and the underlying device have the same zone size.
-> The new target: dm-po2zone will use this new target
-> type as it emulates the zone boundary that is different from the
-> underlying zoned device.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/iomap/direct-io.c  | 10 ++--------
+>  include/linux/iomap.h |  1 -
+>  2 files changed, 2 insertions(+), 9 deletions(-)
 > 
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 4eb559a16c9ed..9e883a9f80388 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -217,16 +217,10 @@ static inline blk_opf_t iomap_dio_bio_opflags(struct iomap_dio *dio,
+>  {
+>  	blk_opf_t opflags = REQ_SYNC | REQ_IDLE;
+>  
+> -	if (!(dio->flags & IOMAP_DIO_WRITE)) {
+> -		WARN_ON_ONCE(iomap->flags & IOMAP_F_ZONE_APPEND);
+> +	if (!(dio->flags & IOMAP_DIO_WRITE))
+>  		return REQ_OP_READ;
+> -	}
+> -
+> -	if (iomap->flags & IOMAP_F_ZONE_APPEND)
+> -		opflags |= REQ_OP_ZONE_APPEND;
+> -	else
+> -		opflags |= REQ_OP_WRITE;
+>  
+> +	opflags |= REQ_OP_WRITE;
+>  	if (use_fua)
+>  		opflags |= REQ_FUA;
+>  	else
+> diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+> index 238a03087e17e..ee6d511ef29dd 100644
+> --- a/include/linux/iomap.h
+> +++ b/include/linux/iomap.h
+> @@ -55,7 +55,6 @@ struct vm_fault;
+>  #define IOMAP_F_SHARED		0x04
+>  #define IOMAP_F_MERGED		0x08
+>  #define IOMAP_F_BUFFER_HEAD	0x10
+> -#define IOMAP_F_ZONE_APPEND	0x20
+>  
+>  /*
+>   * Flags set by the core iomap code during operations:
 
-This patch's use of "target type" jargon isn't valid. 
-
-Please say "target feature flag" and rename DM_EMULATED_ZONES to
-DM_TARGET_EMULATED_ZONES in the subject and header.
-
-But, with those fixed:
-
-Signed-off-by: Mike Snitzer <snitzer@kernel.org>
-
-(fyi, I'll review patch 13, the dm-po2zone target, tomorrow)
+-- 
+Damien Le Moal
+Western Digital Research
 
