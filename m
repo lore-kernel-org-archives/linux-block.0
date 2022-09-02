@@ -2,158 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2966C6FA83
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 19:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D33B5C6FA82
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 20:55:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230318AbiIBTca (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 15:32:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53174 "EHLO
+        id S229595AbiIBUz4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 16:55:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230308AbiIBTc3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 15:32:29 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B783AE4D
-        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 12:32:27 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id jm11so2744250plb.13
-        for <linux-block@vger.kernel.org>; Fri, 02 Sep 2022 12:32:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=Ry9qz4Ug3drArxnbcnODIH8HPoQFI54s25GygjQ0sKo=;
-        b=a0ajXOH9mNVz1/N39f8ZJF3YF5bhV30o5rq0H70STqonqeujYUpv8MdBDfAieLFM31
-         D5ICdUml4P3QyjlTxszdCBv//G/JfLZ/s7AhMVFbKt9jSuIJsxPOjaZNKGGfg5zmxZ53
-         ZGnL69DW31DvDxV1thYJzfYbcore8G5fXx/boUVbY9xwQ2jADEFMU8U21aJJVoYbE0+r
-         oUwVmDrABBHjBMxSs28k/bVcg7pMegIvipgJC3798fzaTSaR5lZWP3QUz9WUD9lJ6SWa
-         kpV8X6vf2/ndocxO9Op+ScnK0aAwtWA+zC32sTb2c8zXgcS8Mo6dfjx0k7FkLeFPm4Eu
-         qPeA==
+        with ESMTP id S230426AbiIBUzv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 16:55:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB33543D1
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 13:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662152122;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=e/i1xNela7arfufOlEWSIrFxi0oQo+ouwTHhQRBJeIY=;
+        b=QmNeXyOhkMEj57sXm1+1Xg6S/er5x7DfqkrGw96NAyF+R1dub3ZyQ3R7r0GEWgiBlYhTr0
+        riJ+WpA+HUGbHlx4G00kOxZq91k2h155bFsMK+a3qmvlnLQt5CTODdhY1D39mUO+hgLR53
+        Vwvx0nIfO+9kHSPxeT0rvJ7e9q1KjZo=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-206-ZCOmP26zMiK5VPAN-_l4gw-1; Fri, 02 Sep 2022 16:55:21 -0400
+X-MC-Unique: ZCOmP26zMiK5VPAN-_l4gw-1
+Received: by mail-qv1-f69.google.com with SMTP id ll5-20020a056214598500b0049905d71166so2018948qvb.14
+        for <linux-block@vger.kernel.org>; Fri, 02 Sep 2022 13:55:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Ry9qz4Ug3drArxnbcnODIH8HPoQFI54s25GygjQ0sKo=;
-        b=dcxkN5X0P3pXGhyyOu5ZqGHJvhYgyz0OlIjkupcDdwTd8+9CACbhF/QkprB/IodR1o
-         S7JTvFS0R3GpawjBxcB/q0bUtJVf1YsHnY8ckFdCQuJtgNP8djIZdoHqanbgS32joqAL
-         /6nJCjp51mFMKB3sv5xSq4cBKFbFrPcJrw59Ozp256wCxK2oTXNmUEuHzL6YBULwRc/U
-         tV0b4VQn99VA9RfEH19agUIdqeZoKBg+qjCDcjFNi9m6zrANVil9d3FtLh1B/b4wzVK4
-         mIuR6bPf6xk3Fedsqu39u8WeJ4jhz4IxO32VZZl8scpq1O16bMVIDz6xB942pOsE+hEU
-         ETFg==
-X-Gm-Message-State: ACgBeo2r/scH/2vO07D1vKipwsm7HRNAE0woYk/gB6w5YT9NKEZNLFMy
-        hGfKH595IvKFP02K6WIor87rbA==
-X-Google-Smtp-Source: AA6agR7Usv6PTE2jWCD39oaTpKAjmsJJNSWV0Z5hO6DIhiMc6IBH89jSLLrfTK3l0y2fIOTnHoozyg==
-X-Received: by 2002:a17:90b:3e86:b0:1f5:2b4f:7460 with SMTP id rj6-20020a17090b3e8600b001f52b4f7460mr6509336pjb.97.1662147147188;
-        Fri, 02 Sep 2022 12:32:27 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u6-20020a62d446000000b00537f7d04fb3sm2244296pfl.145.2022.09.02.12.32.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Sep 2022 12:32:26 -0700 (PDT)
-Message-ID: <48856ca4-5158-154e-a1f5-124aadc9780f@kernel.dk>
-Date:   Fri, 2 Sep 2022 13:32:24 -0600
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=e/i1xNela7arfufOlEWSIrFxi0oQo+ouwTHhQRBJeIY=;
+        b=nQQKNpVmhlsEHIwUreLawl2wKWD9uAur5Z94cHLxapfxC+eAE37TCrXoRbs/2FoSQP
+         pxNecwMdTqyCGA+FipMBwCi2ik3nCxiJYgXfRW2GZ3Nviumi/rHJh4dVrzfLlrTh6Cj5
+         JjCjos7ebW0h7k7iUQNpoYWsh/z+9Q0+x/ewTrSSN1Gc8374e5mCnZtiI+qrHBCjX2FP
+         rQVx1y7rDbbH+ATkKKKP7sqibxsbZoWVSRnv16hJt9xHtGiEY39LWpj0glgfP8FpFDz0
+         et1gyiUAc9fQpWHBC47d+3ql6ZoF1P2EC2BKadeyj6DihLOH89c46PWByv+034fDqmb5
+         Wiow==
+X-Gm-Message-State: ACgBeo1QQO4MSy0OXNb95IAni8RCgaq/ifqXxqej9zQEcI99mYfIDOKG
+        FIv70WjxPVVbjrJ+IDDXwzI8PufYGmSrZPpy/R4LqYlf8Gxi4RPqU3PADg1EOCmwF3m5ZDBOwtJ
+        eBm2rHXzzFOX6hXizgAt97Q==
+X-Received: by 2002:ac8:574f:0:b0:344:5a94:28fc with SMTP id 15-20020ac8574f000000b003445a9428fcmr30044835qtx.670.1662152120814;
+        Fri, 02 Sep 2022 13:55:20 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7htZ5gZN01TeQlX/VJoxT2IaqgKvr8JeqKIGVMnyaeNem7TxDPPSJJMlag+j644UTpDAvlmQ==
+X-Received: by 2002:ac8:574f:0:b0:344:5a94:28fc with SMTP id 15-20020ac8574f000000b003445a9428fcmr30044821qtx.670.1662152120587;
+        Fri, 02 Sep 2022 13:55:20 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id fw10-20020a05622a4a8a00b0034361fb2f75sm1584123qtb.22.2022.09.02.13.55.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Sep 2022 13:55:19 -0700 (PDT)
+Date:   Fri, 2 Sep 2022 16:55:18 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>
+Cc:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com, hch@lst.de,
+        Damien Le Moal <damien.lemoal@wdc.com>, bvanassche@acm.org,
+        pankydev8@gmail.com,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        gost.dev@samsung.com, jaegeuk@kernel.org, matias.bjorling@wdc.com
+Subject: Re: [PATCH v12 13/13] dm: add power-of-2 target for zoned devices
+ with non power-of-2 zone sizes
+Message-ID: <YxJttvB2Z5I58SQ5@redhat.com>
+References: <20220823121859.163903-1-p.raghav@samsung.com>
+ <CGME20220823121915eucas1p10296d6a2ab00de5e73791a7d6b8e39de@eucas1p1.samsung.com>
+ <20220823121859.163903-14-p.raghav@samsung.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH for-next v3 0/4] fixed-buffer for uring-cmd/passthrough
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com
-References: <CGME20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf@epcas5p1.samsung.com>
- <20220902151657.10766-1-joshi.k@samsung.com>
- <f1e8a7fa-a1f8-c60a-c365-b2164421f98d@kernel.dk>
- <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
- <20220902184608.GA6902@test-zns>
-Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220902184608.GA6902@test-zns>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220823121859.163903-14-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/2/22 12:46 PM, Kanchan Joshi wrote:
-> On Fri, Sep 02, 2022 at 10:32:16AM -0600, Jens Axboe wrote:
->> On 9/2/22 10:06 AM, Jens Axboe wrote:
->>> On 9/2/22 9:16 AM, Kanchan Joshi wrote:
->>>> Hi,
->>>>
->>>> Currently uring-cmd lacks the ability to leverage the pre-registered
->>>> buffers. This series adds the support in uring-cmd, and plumbs
->>>> nvme passthrough to work with it.
->>>>
->>>> Using registered-buffers showed peak-perf hike from 1.85M to 2.17M IOPS
->>>> in my setup.
->>>>
->>>> Without fixedbufs
->>>> *****************
->>>> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
->>>> submitter=0, tid=5256, file=/dev/ng0n1, node=-1
->>>> polled=0, fixedbufs=0/0, register_files=1, buffered=1, QD=128
->>>> Engine=io_uring, sq_ring=128, cq_ring=128
->>>> IOPS=1.85M, BW=904MiB/s, IOS/call=32/31
->>>> IOPS=1.85M, BW=903MiB/s, IOS/call=32/32
->>>> IOPS=1.85M, BW=902MiB/s, IOS/call=32/32
->>>> ^CExiting on signal
->>>> Maximum IOPS=1.85M
->>>
->>> With the poll support queued up, I ran this one as well. tldr is:
->>>
->>> bdev (non pt)??? 122M IOPS
->>> irq driven??? 51-52M IOPS
->>> polled??????? 71M IOPS
->>> polled+fixed??? 78M IOPS
-> 
-> except first one, rest three entries are for passthru? somehow I didn't
-> see that big of a gap. I will try to align my setup in coming days.
+On Tue, Aug 23 2022 at  8:18P -0400,
+Pankaj Raghav <p.raghav@samsung.com> wrote:
 
-Right, sorry it was badly labeled. First one is bdev with polling,
-registered buffers, etc. The others are all the passthrough mode. polled
-goes to 74M with the caching fix, so it's about a 74M -> 82M bump using
-registered buffers with passthrough and polling.
+> Only zoned devices with power-of-2(po2) number of sectors per zone(zone
+> size) were supported in linux but now non power-of-2(npo2) zone sizes
+> support has been added to the block layer.
+> 
+> Filesystems such as F2FS and btrfs have support for zoned devices with
+> po2 zone size assumption. Before adding native support for npo2 zone
+> sizes, it was suggested to create a dm target for npo2 zone size device to
+> appear as a po2 zone size target so that file systems can initially
+> work without any explicit changes by using this target.
+> 
+> The design of this target is very simple: remap the device zone size to
+> the zone capacity and change the zone size to be the nearest power of 2
+> value.
+> 
+> For e.g., a device with a zone size/capacity of 3M will have an equivalent
+> target layout as follows:
+> 
+> Device layout :-
+> zone capacity = 3M
+> zone size = 3M
+> 
+> |--------------|-------------|
+> 0             3M            6M
+> 
+> Target layout :-
+> zone capacity=3M
+> zone size = 4M
+> 
+> |--------------|---|--------------|---|
+> 0             3M  4M             7M  8M
+> 
+> The area between target's zone capacity and zone size will be emulated
+> in the target.
+> The read IOs that fall in the emulated gap area will return 0 filled
+> bio and all the other IOs in that area will result in an error.
+> If a read IO span across the emulated area boundary, then the IOs are
+> split across them. All other IO operations that span across the emulated
+> area boundary will result in an error.
+> 
+> The target can be easily created as follows:
+> dmsetup create <label> --table '0 <size_sects> po2zone /dev/nvme<id>'
+> 
+> Note that the target does not support partial mapping of the underlying
+> device.
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Suggested-by: Hannes Reinecke <hare@suse.de>
 
->> polled+fixed??? 82M
->>
->> I suspect the remainder is due to the lack of batching on the request
->> freeing side, at least some of it. Haven't really looked deeper yet.
->>
->> One issue I saw - try and use passthrough polling without having any
->> poll queues defined and it'll stall just spinning on completions. You
->> need to ensure that these are processed as well - look at how the
->> non-passthrough io_uring poll path handles it.
-> 
-> Had tested this earlier, and it used to run fine. And it does not now.
-> I see that io are getting completed, irq-completion is arriving in nvme
-> and it is triggering task-work based completion (by calling
-> io_uring_cmd_complete_in_task). But task-work never got called and
-> therefore no completion happened.
-> 
-> io_uring_cmd_complete_in_task -> io_req_task_work_add -> __io_req_task_work_add
-> 
-> Seems task work did not get added. Something about newly added
-> IORING_SETUP_DEFER_TASKRUN changes the scenario.
-> 
-> static inline void __io_req_task_work_add(struct io_kiocb *req, bool allow_local)
-> {
-> ?????? struct io_uring_task *tctx = req->task->io_uring;
-> ?????? struct io_ring_ctx *ctx = req->ctx;
-> ?????? struct llist_node *node;
-> 
-> ?????? if (allow_local && ctx->flags & IORING_SETUP_DEFER_TASKRUN) {
-> ?????????????? io_req_local_work_add(req);
-> ?????????????? return;
-> ?????? }
-> ????....
-> 
-> To confirm, I commented that in t/io_uring and it runs fine.
-> Please see if that changes anything for you? I will try to find the
-> actual fix tomorow.
 
-Ah gotcha, yes that actually makes a lot of sense. I wonder if regular
-polling is then also broken without poll queues if
-IORING_SETUP_DEFER_TASKRUN is set. It should be, I'll check into
-io_iopoll_check().
+This target needs more review from those who Suggested-by it.
 
--- 
-Jens Axboe
+And the header and docs needs to address:
+
+1) why is a partial mapping of the underlying device disallowed?
+2) why is it assumed all IO is read-only? (talk to me and others like
+   we don't know the inherent limitations of this class of zoned hw)
+
+On a code level:
+1) are you certain you're properly failing all writes?
+   - are writes allowed to the "zone capacity area" but _not_
+     allowed to the "emulated zone area"? (if yes, _please document_). 
+2) yes, you absolutely need to implement the .status target_type hook
+   (for both STATUS and TABLE).
+3) really not loving the nested return (of DM_MAPIO_SUBMITTED or
+   DM_MAPIO_REMAPPED) from methods called from dm_po2z_map().  Would
+   prefer to not have to do a depth-first search to see where and when
+   dm_po2z_map() returns a DM_MAPIO_XXX unless there is a solid
+   justification for it.  To me it just obfuscates the DM interface a
+   bit too much. 
+
+Otherwise, pretty clean code and nothing weird going on.
+
+I look forward to seeing your next (final?) revision of this patchset.
+
+Thanks,
+Mike
+
