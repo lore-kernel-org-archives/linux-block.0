@@ -2,77 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD29ECAAA1
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 23:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 430B7C54EE9
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 23:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbiIBXrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 19:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57072 "EHLO
+        id S230138AbiIBXsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 19:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbiIBXq7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 19:46:59 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619C194138;
-        Fri,  2 Sep 2022 16:46:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:References:Cc:To:From:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=tdSEJSc6M60H3vdwpPTVi6BuVF7V/BZRhYM7gk9QbLg=; b=fJGbGnsuCnlzItsYbMvLKx/S96
-        IEuh2MrPOwVyD2YJG7jxMCUJ3QzMvWnpyzC35QwHhNT05rk9Q4liFpif7djdeZK+aw+LAMnBcCTQt
-        Q5sDaMDcKVxJ9P7zsMp2XgV6qlxYH7lQp4ZQbJf0o1IILAB9N/295JtXrJmrvMbjJZ0nSsYu8IVv/
-        r0mN9zfWOU+Jyu4wkNjQWUL/44ueh3G4ZkmqcZxZIH3qXrKU9QCInBrX0hCshgdyzYWrv/xQ+ieyX
-        ugpbDhwqT3RVy2S0Mg+3EwxRX7bJ0JCMQSzU0g/jUmA/VidUR7j8aunCYg7xWpuNBFeKOBRzwLg2j
-        D3BXaJWQ==;
-Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oUGNE-00EoIo-JC; Fri, 02 Sep 2022 17:46:57 -0600
-Message-ID: <d338b978-325b-b066-5b14-5ec42ae2b1e6@deltatee.com>
-Date:   Fri, 2 Sep 2022 17:46:55 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-CA
-From:   Logan Gunthorpe <logang@deltatee.com>
+        with ESMTP id S229965AbiIBXsN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 19:48:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B1F106DA4
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 16:48:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C847061E2F
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 23:48:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C312C433D6;
+        Fri,  2 Sep 2022 23:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662162487;
+        bh=7NtCRWYJLgPmRIoSaKK+qUEaB0/zHmxUChB5HWWBwTc=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=jGK2C2Oh6v8fat4Wvcqj4KO7TthN3FWkikZbXll2ggmWDl3Jo2w4pek8b5SssOiST
+         QU5pdBO59c3fm2X/S4Y+toOoUdL8fE+WQmML49goU5raQpxNCTq9sGhYotJt71KSfV
+         FnwjAbpZpdQK24SHNLMB7vbpyF8hjg45Xo5jrBNQSgE2Ys+HOqd9tcH/xWOWqaNXtj
+         ljNEDjzRC8AsuUUALCM3G1WpnkwKgqI7K/jfNqWzl76k+ZIvxDa2XeNpzobM4ES7M6
+         FX5/2xWLj5SgDmpdSI6W7f/jOCIMbPgRbnk+rAD2xJinP0CAyYy0kIyVYOKsDZ1yLW
+         aISXFIc/5bosw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2ACC9E924E0;
+        Fri,  2 Sep 2022 23:48:07 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.0-rc4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <2e744edd-4b72-4071-99c2-c09848460490@kernel.dk>
+References: <2e744edd-4b72-4071-99c2-c09848460490@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2e744edd-4b72-4071-99c2-c09848460490@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-02
+X-PR-Tracked-Commit-Id: 7a3d2225f1ae9e591fefd65c3bb1715dc54d96f1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d895ec7938c431fe61a731939da76a6461bc6133
+Message-Id: <166216248716.12135.774948156901432321.pr-tracker-bot@kernel.org>
+Date:   Fri, 02 Sep 2022 23:48:07 +0000
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Song Liu <song@kernel.org>
-References: <7f3b87b6-b52a-f737-51d7-a4eec5c44112@deltatee.com>
-In-Reply-To: <7f3b87b6-b52a-f737-51d7-a4eec5c44112@deltatee.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-raid@vger.kernel.org, song@kernel.org
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: Deadlock Issue with blk-wbt and raid5+journal
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The pull request you sent on Fri, 2 Sep 2022 10:39:11 -0600:
 
+> git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-02
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d895ec7938c431fe61a731939da76a6461bc6133
 
-On 2022-08-25 16:19, Logan Gunthorpe wrote:
-> Given the conditions of hitting the bug, I fully expected this to be an
-> issue in the raid code, but unless I'm missing something, it sure looks
-> to me like a deadlock issue in the wbt code, which makes me wonder why
-> nobody else has hit it. Is there something else I'm missing that are
-> supposed to be waking up these processes? Or something weird about the
-> raid5+journal+loop code that is causing wb_recent_wait() to always be false?
+Thank you!
 
-I've made some progress on this nasty bug. I've got far enough to know it's not
-related to the blk-wbt or the block layer.
-
-Turns out a bunch of bios are stuck queued in a blk_plug in the md_raid5 
-thread while that thread appears to be stuck in an infinite loop (so it never
-schedules or does anything to flush the plug). 
-
-I'm still debugging to try and find out the root cause of that infinite loop, 
-but I just wanted to send an update that the previous place I was stuck at
-was not correct.
-
-Logan
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
