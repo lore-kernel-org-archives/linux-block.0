@@ -2,126 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A50ECAAD5
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 18:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2966C6FA83
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 19:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229730AbiIBS6p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 14:58:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52402 "EHLO
+        id S230318AbiIBTca (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 15:32:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230156AbiIBS6o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 14:58:44 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BFFEF003
-        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 11:58:38 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220902185836epoutp02cda589a9f16537a4f67fba35e43888ac~RIC1sQEzC1651316513epoutp02Y
-        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 18:58:36 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220902185836epoutp02cda589a9f16537a4f67fba35e43888ac~RIC1sQEzC1651316513epoutp02Y
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1662145116;
-        bh=vZgFcYCNz9sOq+MfM6Ajj7GAN1JckOZLmNg/M/49pVs=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=sIEAr6P+l0w7kITFlPXPjdcM8vt+dSZaFt6o3hDor0/TRpvLMq3fGfJRFconEvefz
-         VsL1B+0QIBWZE+KLIR3/EKHc6Bgb0Rppkq52kvU+zsKcRnJyduSZIyIl2hw0z1Z+Q3
-         zC4qTcp7HSfg/8BllKHHbmKVY1nBrAqMotdT458Q=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20220902185836epcas5p3c1b776572fbff1ba86549b5016082c12~RIC1Ksq461157611576epcas5p3v;
-        Fri,  2 Sep 2022 18:58:36 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.176]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4MK6d573kpz4x9Pp; Fri,  2 Sep
-        2022 18:58:33 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        2F.8C.53458.95252136; Sat,  3 Sep 2022 03:58:33 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20220902185833epcas5p4ca187bcdc8f38797277a32c7f1960e89~RICyaX88L2247722477epcas5p4b;
-        Fri,  2 Sep 2022 18:58:33 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220902185833epsmtrp152dfd6b43b807b7c1a5e9f00b923fdff~RICyZ0NTP2258322583epsmtrp1I;
-        Fri,  2 Sep 2022 18:58:33 +0000 (GMT)
-X-AuditID: b6c32a4a-a5bff7000000d0d2-13-63125259e839
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        CE.63.18644.95252136; Sat,  3 Sep 2022 03:58:33 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220902185832epsmtip13a646a5932ee7ead9891d72f5c46b4fe~RICx9km7u3256932569epsmtip1u;
-        Fri,  2 Sep 2022 18:58:32 +0000 (GMT)
-Date:   Sat, 3 Sep 2022 00:18:50 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH for-next] block: enable per-cpu bio caching for the fs
- bio set
-Message-ID: <20220902184850.GB6902@test-zns>
+        with ESMTP id S230308AbiIBTc3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 15:32:29 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B783AE4D
+        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 12:32:27 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id jm11so2744250plb.13
+        for <linux-block@vger.kernel.org>; Fri, 02 Sep 2022 12:32:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=Ry9qz4Ug3drArxnbcnODIH8HPoQFI54s25GygjQ0sKo=;
+        b=a0ajXOH9mNVz1/N39f8ZJF3YF5bhV30o5rq0H70STqonqeujYUpv8MdBDfAieLFM31
+         D5ICdUml4P3QyjlTxszdCBv//G/JfLZ/s7AhMVFbKt9jSuIJsxPOjaZNKGGfg5zmxZ53
+         ZGnL69DW31DvDxV1thYJzfYbcore8G5fXx/boUVbY9xwQ2jADEFMU8U21aJJVoYbE0+r
+         oUwVmDrABBHjBMxSs28k/bVcg7pMegIvipgJC3798fzaTSaR5lZWP3QUz9WUD9lJ6SWa
+         kpV8X6vf2/ndocxO9Op+ScnK0aAwtWA+zC32sTb2c8zXgcS8Mo6dfjx0k7FkLeFPm4Eu
+         qPeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Ry9qz4Ug3drArxnbcnODIH8HPoQFI54s25GygjQ0sKo=;
+        b=dcxkN5X0P3pXGhyyOu5ZqGHJvhYgyz0OlIjkupcDdwTd8+9CACbhF/QkprB/IodR1o
+         S7JTvFS0R3GpawjBxcB/q0bUtJVf1YsHnY8ckFdCQuJtgNP8djIZdoHqanbgS32joqAL
+         /6nJCjp51mFMKB3sv5xSq4cBKFbFrPcJrw59Ozp256wCxK2oTXNmUEuHzL6YBULwRc/U
+         tV0b4VQn99VA9RfEH19agUIdqeZoKBg+qjCDcjFNi9m6zrANVil9d3FtLh1B/b4wzVK4
+         mIuR6bPf6xk3Fedsqu39u8WeJ4jhz4IxO32VZZl8scpq1O16bMVIDz6xB942pOsE+hEU
+         ETFg==
+X-Gm-Message-State: ACgBeo2r/scH/2vO07D1vKipwsm7HRNAE0woYk/gB6w5YT9NKEZNLFMy
+        hGfKH595IvKFP02K6WIor87rbA==
+X-Google-Smtp-Source: AA6agR7Usv6PTE2jWCD39oaTpKAjmsJJNSWV0Z5hO6DIhiMc6IBH89jSLLrfTK3l0y2fIOTnHoozyg==
+X-Received: by 2002:a17:90b:3e86:b0:1f5:2b4f:7460 with SMTP id rj6-20020a17090b3e8600b001f52b4f7460mr6509336pjb.97.1662147147188;
+        Fri, 02 Sep 2022 12:32:27 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u6-20020a62d446000000b00537f7d04fb3sm2244296pfl.145.2022.09.02.12.32.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Sep 2022 12:32:26 -0700 (PDT)
+Message-ID: <48856ca4-5158-154e-a1f5-124aadc9780f@kernel.dk>
+Date:   Fri, 2 Sep 2022 13:32:24 -0600
 MIME-Version: 1.0
-In-Reply-To: <f2863702-e54c-cd74-efcf-8cb238be1a7c@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCKsWRmVeSWpSXmKPExsWy7bCmum5kkFCywaWdlhar7/azWey9pe3A
-        5HH5bKnH501yAUxR2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkou
-        PgG6bpk5QMOVFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQUmBXrFibnFpXnpenmp
-        JVaGBgZGpkCFCdkZixviCrazVay684SxgfEMaxcjJ4eEgInEurbnQDYXh5DAbkaJV43fmCGc
-        T4wSzZ1rWCCcz4wSP98sZYJpaTx3BqpqF6PEmaUTGSGcZ4wSTQ13mEGqWARUJBZc3weU4OBg
-        E9CUuDC5FCQsIqAg0fN7JRuIzSxgL3Fm+1SwO4QFQiR2TD/KCGLzCuhIfJ3WDGULSpyc+YQF
-        xOYUsJV48GYGWL2ogLLEgW3HmUD2SgjsYpf4uGM2G8R1LhK/9i6DulRY4tXxLewQtpTEy/42
-        KDtZ4tLMc1A1JRKP9xyEsu0lWk/1M0MclyExa80VdgibT6L39xMmkF8kBHglOtqEIMoVJe5N
-        egoNR3GJhzOWQNkeEtu6/0HDZAIwTJ4vZZ/AKDcLyT+zkKyAsK0kOj80sc4CWsEsIC2x/B8H
-        hKkpsX6X/gJG1lWMkqkFxbnpqcWmBUZ5qeXwOE7Oz93ECE5uWl47GB8++KB3iJGJg/EQowQH
-        s5II79TDAslCvCmJlVWpRfnxRaU5qcWHGE2B0TORWUo0OR+YXvNK4g1NLA1MzMzMTCyNzQyV
-        xHmnaDMmCwmkJ5akZqemFqQWwfQxcXBKNTA5v1Jb42u/IYrtS1KfaZn+5HWq3psf/bt9qPvd
-        lLqbmyZbxh2s3miw99z0p/ukgte72OnUXdRIc83Z9kTrXvZqjX8iml2mMzzfXV+gxDOtevZS
-        FacDIuHt1dMEAzIWmIjIr9brqvKvm3636jHDjn3mKQ05xoK62t0eRVzTirqWnrn0N/nAphUu
-        Hy6+m/Rl6we+snfdq0xfPlebVXub84ds6Q5tA5moffNezbzumK0SuWD12qOvO054WeR6boo+
-        c/JbYGNMwVHTn3Vq3fODdiZacojHLFzQOd/Y/ZN7S8rVmv9+brUTVm+2y124gXWXoe67Uwt+
-        9x7Y85IvbdHM80kabYkSIV+eVtQo/fm+ZE+rEktxRqKhFnNRcSIAQxMFgvcDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrILMWRmVeSWpSXmKPExsWy7bCSnG5kkFCywa+5Yhar7/azWey9pe3A
-        5HH5bKnH501yAUxRXDYpqTmZZalF+nYJXBkXOzezF7xkrjizZiZbA+MM5i5GTg4JAROJxnNn
-        gGwuDiGBHYwSz3ZugUqISzRf+8EOYQtLrPz3HMjmACp6wiixJAskzCKgIrHg+j5GkDCbgKbE
-        hcmlIGERAQWJnt8r2UBsZgF7iTPbp7KC2MICIRI7ph9lBLF5BXQkvk5rZoRYO4FRYsPeNqiE
-        oMTJmU9YIJrNJOZtfsgMMp9ZQFpi+T8OkDCngK3EgzczwGaKCihLHNh2nGkCo+AsJN2zkHTP
-        QuhewMi8ilEytaA4Nz232LDAKC+1XK84Mbe4NC9dLzk/dxMjOFS1tHYw7ln1Qe8QIxMH4yFG
-        CQ5mJRHeqYcFkoV4UxIrq1KL8uOLSnNSiw8xSnOwKInzXug6GS8kkJ5YkpqdmlqQWgSTZeLg
-        lGpgWiHsV/IohDHKo/F7hVjEmudyD3M7f3y52zRz7R7fNcmih8yfyN606j5UtWRW6omqTu1L
-        0zjOcfk6LP/R/aNrT/8F/fQ1t2f2nZITnzCh94BVovL3gp9/eNW3bcvku7q+LvGPR2eN/YTy
-        q+u5l3UfObJHYZqCY2zrQS3Dp0azCuT+bYpW2RP89vW3lJ71p6vPT3uVax8dZON41LcjWjxK
-        SP/1PaWeWzrih6dpdf+M0/x1RX8id2V49YlZHpU9q1bu6TIJ+So45+aTiIyHgn+en3G9+WRO
-        8eR77zbK2ta+tLWYsO9h1vLk6bWx5Rpeu+2YH8q4v3fb5/PKZCpfLWuksWmGpX/HusKZ+wye
-        eE3pV2Ipzkg01GIuKk4EAOSHKyfEAgAA
-X-CMS-MailID: 20220902185833epcas5p4ca187bcdc8f38797277a32c7f1960e89
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----zvU9B7RYhoxo0n0NtQiMJbd43ri29uhJZ9UzgKuz80Y8n-YR=_44437_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220902164254epcas5p42cc0e01559b6bce45d9bda336b091c5f
-References: <CGME20220902164254epcas5p42cc0e01559b6bce45d9bda336b091c5f@epcas5p4.samsung.com>
-        <f2863702-e54c-cd74-efcf-8cb238be1a7c@kernel.dk>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [PATCH for-next v3 0/4] fixed-buffer for uring-cmd/passthrough
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+References: <CGME20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf@epcas5p1.samsung.com>
+ <20220902151657.10766-1-joshi.k@samsung.com>
+ <f1e8a7fa-a1f8-c60a-c365-b2164421f98d@kernel.dk>
+ <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
+ <20220902184608.GA6902@test-zns>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220902184608.GA6902@test-zns>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------zvU9B7RYhoxo0n0NtQiMJbd43ri29uhJZ9UzgKuz80Y8n-YR=_44437_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On 9/2/22 12:46 PM, Kanchan Joshi wrote:
+> On Fri, Sep 02, 2022 at 10:32:16AM -0600, Jens Axboe wrote:
+>> On 9/2/22 10:06 AM, Jens Axboe wrote:
+>>> On 9/2/22 9:16 AM, Kanchan Joshi wrote:
+>>>> Hi,
+>>>>
+>>>> Currently uring-cmd lacks the ability to leverage the pre-registered
+>>>> buffers. This series adds the support in uring-cmd, and plumbs
+>>>> nvme passthrough to work with it.
+>>>>
+>>>> Using registered-buffers showed peak-perf hike from 1.85M to 2.17M IOPS
+>>>> in my setup.
+>>>>
+>>>> Without fixedbufs
+>>>> *****************
+>>>> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
+>>>> submitter=0, tid=5256, file=/dev/ng0n1, node=-1
+>>>> polled=0, fixedbufs=0/0, register_files=1, buffered=1, QD=128
+>>>> Engine=io_uring, sq_ring=128, cq_ring=128
+>>>> IOPS=1.85M, BW=904MiB/s, IOS/call=32/31
+>>>> IOPS=1.85M, BW=903MiB/s, IOS/call=32/32
+>>>> IOPS=1.85M, BW=902MiB/s, IOS/call=32/32
+>>>> ^CExiting on signal
+>>>> Maximum IOPS=1.85M
+>>>
+>>> With the poll support queued up, I ran this one as well. tldr is:
+>>>
+>>> bdev (non pt)??? 122M IOPS
+>>> irq driven??? 51-52M IOPS
+>>> polled??????? 71M IOPS
+>>> polled+fixed??? 78M IOPS
+> 
+> except first one, rest three entries are for passthru? somehow I didn't
+> see that big of a gap. I will try to align my setup in coming days.
 
-On Fri, Sep 02, 2022 at 10:42:45AM -0600, Jens Axboe wrote:
->This is useful for polled IO on a file, or for polled IO with the
->io_uring passthrough mechanism. If bio allocations are done with
->REQ_POLLED for those cases, then initializing the bio set with
->BIOSET_PERCPU_CACHE enables the local per-cpu cache which eliminates
->allocations (and frees) of bio structs when possible.
->
->Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Right, sorry it was badly labeled. First one is bdev with polling,
+registered buffers, etc. The others are all the passthrough mode. polled
+goes to 74M with the caching fix, so it's about a 74M -> 82M bump using
+registered buffers with passthrough and polling.
 
-Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+>> polled+fixed??? 82M
+>>
+>> I suspect the remainder is due to the lack of batching on the request
+>> freeing side, at least some of it. Haven't really looked deeper yet.
+>>
+>> One issue I saw - try and use passthrough polling without having any
+>> poll queues defined and it'll stall just spinning on completions. You
+>> need to ensure that these are processed as well - look at how the
+>> non-passthrough io_uring poll path handles it.
+> 
+> Had tested this earlier, and it used to run fine. And it does not now.
+> I see that io are getting completed, irq-completion is arriving in nvme
+> and it is triggering task-work based completion (by calling
+> io_uring_cmd_complete_in_task). But task-work never got called and
+> therefore no completion happened.
+> 
+> io_uring_cmd_complete_in_task -> io_req_task_work_add -> __io_req_task_work_add
+> 
+> Seems task work did not get added. Something about newly added
+> IORING_SETUP_DEFER_TASKRUN changes the scenario.
+> 
+> static inline void __io_req_task_work_add(struct io_kiocb *req, bool allow_local)
+> {
+> ?????? struct io_uring_task *tctx = req->task->io_uring;
+> ?????? struct io_ring_ctx *ctx = req->ctx;
+> ?????? struct llist_node *node;
+> 
+> ?????? if (allow_local && ctx->flags & IORING_SETUP_DEFER_TASKRUN) {
+> ?????????????? io_req_local_work_add(req);
+> ?????????????? return;
+> ?????? }
+> ????....
+> 
+> To confirm, I commented that in t/io_uring and it runs fine.
+> Please see if that changes anything for you? I will try to find the
+> actual fix tomorow.
 
-------zvU9B7RYhoxo0n0NtQiMJbd43ri29uhJZ9UzgKuz80Y8n-YR=_44437_
-Content-Type: text/plain; charset="utf-8"
+Ah gotcha, yes that actually makes a lot of sense. I wonder if regular
+polling is then also broken without poll queues if
+IORING_SETUP_DEFER_TASKRUN is set. It should be, I'll check into
+io_iopoll_check().
 
-
-------zvU9B7RYhoxo0n0NtQiMJbd43ri29uhJZ9UzgKuz80Y8n-YR=_44437_--
+-- 
+Jens Axboe
