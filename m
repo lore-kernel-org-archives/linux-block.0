@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E4DC6FA83
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 03:45:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCDDECAAD2
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 03:45:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235307AbiIBDp3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 23:45:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36618 "EHLO
+        id S233769AbiIBDpa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 23:45:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235357AbiIBDp1 (ORCPT
+        with ESMTP id S235356AbiIBDp1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 23:45:27 -0400
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45B602A24F
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 20:45:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5F541EAD6
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 20:45:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1662090325; x=1693626325;
+  t=1662090324; x=1693626324;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Vk0eJ8lsz1a98jZ70czxJnVa9yr/83zvWoTmuaOaYEo=;
-  b=cK+E2qZdg26lfQSd4py2y4CvBQ7SJf/kCPr1Ysh5KI0aam+0TEFOW12t
-   cl5Llz77LsCcKVpZgPrJ/ldv/W/Phf+nm1fO2znSXhJklS6y0irC/kg68
-   zfQD04UwMrNIW48GHaaoOrj7vDCjt1dKe11dySPnuLs4COgVrDhnNE+9o
-   bl/mz6LtIFtf35y58w/w1htKUE8S32ZSIjaBFKkfZHA7PZa8AB5NsQ80e
-   mWJZRfl7EybZ4uq/UatWAKeZm2hoK389EvMeTVrExAb8z+wXj2G/3Yv61
-   2gH0p8FY/ZBPKNvWWJU6n6t5hV/MX5VYFrLESADVXBspacPIBDxrqly84
-   g==;
+  bh=RLRiQgEDMy2HV4ND1KbrWwYnIjENVIT1saTaZ5sA81U=;
+  b=XLVssJDG8HaE/UegELjreXnIV29t6RHKHAVJjJqsYtgve/MHnd+pAXl1
+   T2avarGlXdTXA5M3hAhbWZ/8nsifLl6FPcbgy13Nq2yo1KKb7omCSULOV
+   3aMhRwZUCFnjO7Ir3/2llGPmJNrw4dEQINRG80MjM46pduUN2IlHRAVyZ
+   j0KoNzkKNWqHriZ5eJvA8Dl/PUuwIKhS2Zo0UAmfWMfDq+6oW9AffqGnE
+   Byszi7vnwfYAjlTs2IzMyhebwgx9Ym7iq/nA4+CIYcoie4hwtB6mVjvn/
+   wksCm5tQM8teHfHirmukzh0xRWG3dN3rqH/jHDYatiKFFa5dmpFgSEcfm
+   A==;
 X-IronPort-AV: E=Sophos;i="5.93,281,1654531200"; 
-   d="scan'208";a="322404169"
+   d="scan'208";a="322404168"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 11:45:24 +0800
-IronPort-SDR: vJdordwn4qEvDk/zVPulSZWJeOQkTpHGI6faev4uRKBhjensMi5jA5FFwbH4oruqlSk/gWUW0y
- aYT0CUgPSKudnW5w5Z3hx6qOVULnfPEwC7LUqaVLXGVz8SzYQ12Aw1vSkKhmOBGhi3hMzO2VtR
- ZBAuPO6/y+2GoGXygJkUEf5RDZ2lwJqFSw6lSmzTmZV2V/V0ZXK4HF6tID/iapl7mJXyDxVdh9
- eyTqqwwjI32cQmtQiAY2opotdHT0RBaYRN9ntWn3+gsK1L9jEk08loexWGtr3rYgDAoXtAvtaK
- 6ufhzOzR2KSr8B9+yQOLvmfi
+  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 11:45:23 +0800
+IronPort-SDR: RrxPFc9F19i2NGdZ4DCQyNAX0ZqqVpjkDU0XoVj8k0ODgZzWFsKFS9qdXFSgvHrstBimxLSUpQ
+ Ttz0hlBMAl+tOiDi7F9y0S64SSlb4jQEiaOtTj7g6IeIyLMqvObUzZbXfssJcbbj7uxuYm5q/r
+ Hf7WMlkf2Qwxt+h1xl3AHVnwEOjVgPeaaRAc5A80BojB+qEDeXW4IBW3n8HbgFdH+Dff4VtFC4
+ xVfe+xuzkgRTKnGqys8UxV7Pk7YT4vHgj6/6ZN9RXF+drMhyC8yBLweIUtkCOEFuoC6A6oBieR
+ Q+WVzX1lbct/LDBoCi7GNQHV
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 20:05:53 -0700
-IronPort-SDR: 2RZw9NvKwETdiuIpABB6cVwrHvXr1DlAy2RVHExxzYL7EDzt44aRPfMUgeKbvIu0NSgtSpN3nx
- 7QoeUol+V/2f4CsDGvSvyAfY2YWf6goMVvIWZbxC9paC8mas6T5n9DJCV0UqJ2C+/ji2eVHt3L
- mmYxJ3feWx8mH8cR03lfZ7gaInBNslpnV01e3Xugya9MZi1Zbcnh4nW/wDqr2XHtEl+lkw65Jq
- PyKbIcg2IWYSt4by6hg8C2M+KbBUyzaefbn6IJ2EjkcEWoh7iRv4rU6m9mfi1RZ7AQil7mOqEq
- mYc=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 20:05:51 -0700
+IronPort-SDR: 7rPdPEpbF52LM+k19JdXfxw3W5JoHI69B0jlDSFzm7KdqxVQTqZkmYLA6cUDVDOMFLdux9T0vY
+ SmMepXKOukRlcEuJrmSDRZp7MN08IXhw1aDiKNp8zOtCtRTaed5iHNOVIbzEU8NP6bKfBBTr+Z
+ xIOaVkWQrNRl95Gp49VjGFCm7fd4Vq50S/Kst1nxwA+WHeVAp8MAjZYxqaHqFLlcAP4XZ6SdBD
+ 83G/YISnA0C2ov/iYEDI+/OeSaJ0Fr+/nOT2isZYxGomOZfsxlzYPO6dROJcK5C033LAAOz8+d
+ 5Mg=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Sep 2022 20:45:24 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Sep 2022 20:45:22 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -54,9 +54,9 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 5/5] Revert "nbd/rc: load nbd module explicitly"
-Date:   Fri,  2 Sep 2022 12:45:16 +0900
-Message-Id: <20220902034516.223173-6-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 4/5] check,common/rc: load module in _have_driver() and unload after test
+Date:   Fri,  2 Sep 2022 12:45:15 +0900
+Message-Id: <20220902034516.223173-5-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220902034516.223173-1-shinichiro.kawasaki@wdc.com>
 References: <20220902034516.223173-1-shinichiro.kawasaki@wdc.com>
@@ -66,73 +66,98 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit 78271b8bb8c939e1d0b9cfa3ea321a4ed06635bd.
+The commit 06a0ba866d90 ("common/rc: avoid module load in
+_have_driver()") removed module load from _have_driver(). However, it
+was pointed out no module load in _have_driver() is confusing and adds
+complexity [1]. It requires explicit module loads and unloads in number
+of test cases. The module unloads must be checked if unload is safe or
+not. Also module load error must be handled. To avoid these complexity,
+a new helper function would be required, but it will be look like the
+_have_driver() with module load.
 
-Once I thought explicit nbd module load in nbd/rc is required due to the
-commit 06a0ba866d90 ("common/rc: avoid module load in _have_driver()").
-However, it was not a good solution and _have_driver() was modified
-again to load module. Hence, revert explicit nbd module load in nbd/rc.
+Then revert back the feature to load module in _have_driver(). To
+address the issue that the commit 06a0ba866d90 tried to fix, record the
+modules loaded by _have_driver() in MODULES_TO_UNLOAD array. Unload
+the recorded modules after each test case processing completed. This
+avoids the side-effect by the modules loaded by _have_driver().
 
+[1] https://lore.kernel.org/linux-block/89aedf1d-ae08-adef-db29-17e5bf85d054@grimberg.me/
+
+Fixes: 06a0ba866d90 ("common/rc: avoid module load in _have_driver()")
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/nbd/rc | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ check     | 13 +++++++++++++
+ common/rc | 13 ++++++++++---
+ 2 files changed, 23 insertions(+), 3 deletions(-)
 
-diff --git a/tests/nbd/rc b/tests/nbd/rc
-index 32eea45..9c1c15b 100644
---- a/tests/nbd/rc
-+++ b/tests/nbd/rc
-@@ -28,21 +28,17 @@ _have_nbd() {
+diff --git a/check b/check
+index 5f57386..34e96c4 100755
+--- a/check
++++ b/check
+@@ -452,6 +452,16 @@ _unload_module() {
+ 	return 1
  }
  
- _have_nbd_netlink() {
--	local ret=0
--
- 	if ! _have_nbd; then
++_unload_modules() {
++	local i
++
++	for ((i=${#MODULES_TO_UNLOAD[@]}; i > 0; i--)); do
++		_unload_module "${MODULES_TO_UNLOAD[i-1]}" 10
++	done
++
++	unset MODULES_TO_UNLOAD
++}
++
+ _run_test() {
+ 	TEST_NAME="$1"
+ 	CAN_BE_ZONED=0
+@@ -459,6 +469,7 @@ _run_test() {
+ 	DMESG_FILTER="cat"
+ 	RUN_FOR_ZONED=0
+ 	FALLBACK_DEVICE=0
++	MODULES_TO_UNLOAD=()
+ 
+ 	local ret=0
+ 
+@@ -538,6 +549,8 @@ _run_test() {
+ 		fi
+ 	fi
+ 
++	_unload_modules
++
+ 	return $ret
+ }
+ 
+diff --git a/common/rc b/common/rc
+index 9bc0dbc..a764b57 100644
+--- a/common/rc
++++ b/common/rc
+@@ -43,17 +43,24 @@ _module_file_exists()
+ }
+ 
+ # Check that the specified module or driver is available, regardless of whether
+-# it is built-in or built separately as a module.
++# it is built-in or built separately as a module. Load the module if it is
++# loadable and not yet loaded. In this case, the loaded module is unloaded at
++# test case end regardless of whether the test case is skipped or executed.
+ _have_driver()
+ {
+ 	local modname="${1//-/_}"
+ 
+-	if [ ! -d "/sys/module/${modname}" ] &&
+-		   ! modprobe -qn "${modname}"; then
++	if [ -d "/sys/module/${modname}" ]; then
++		return 0
++	fi
++
++	if ! modprobe -q "${modname}"; then
+ 		SKIP_REASONS+=("driver ${modname} is not available")
  		return 1
  	fi
- 	if ! _have_program genl-ctrl-list; then
- 		return 1
- 	fi
--	modprobe -q nbd
- 	if ! genl-ctrl-list | grep -q nbd; then
- 		SKIP_REASONS+=("nbd does not support netlink")
--		ret=1
-+		return 1
- 	fi
--	modprobe -qr nbd
--	return $ret
-+	return 0
- }
  
- _wait_for_nbd_connect() {
-@@ -66,7 +62,6 @@ _wait_for_nbd_disconnect() {
- }
- 
- _start_nbd_server() {
--	modprobe -q nbd
- 	truncate -s 10G "${TMPDIR}/export"
- 	cat > "${TMPDIR}/nbd.conf" << EOF
- [generic]
-@@ -78,20 +73,17 @@ EOF
- 
- _stop_nbd_server() {
- 	kill -SIGTERM "$(cat "${TMPDIR}/nbd.pid")"
--	modprobe -qr nbd
- 	rm -f "${TMPDIR}/nbd.pid"
- 	rm -f "${TMPDIR}/export"
- }
- 
- _start_nbd_server_netlink() {
--	modprobe -q nbd
- 	truncate -s 10G "${TMPDIR}/export"
- 	nbd-server 8000 "${TMPDIR}/export" >/dev/null 2>&1
- }
- 
- _stop_nbd_server_netlink() {
- 	killall -SIGTERM nbd-server
--	modprobe -qr nbd
- 	rm -f "${TMPDIR}/export"
++	MODULES_TO_UNLOAD+=("${modname}")
++
+ 	return 0
  }
  
 -- 
