@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A894BECAAD2
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 03:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3F5ECAAA1
+	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 03:45:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231577AbiIBDp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Sep 2022 23:45:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36388 "EHLO
+        id S233680AbiIBDp1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Sep 2022 23:45:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233680AbiIBDpX (ORCPT
+        with ESMTP id S235307AbiIBDpX (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Thu, 1 Sep 2022 23:45:23 -0400
 Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7771EAD6
-        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 20:45:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF371EC4D
+        for <linux-block@vger.kernel.org>; Thu,  1 Sep 2022 20:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1662090320; x=1693626320;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8Xg2twERZf8VQ5EQr3UEn1lYBqldRIsW5jD1cS2dOVk=;
-  b=O1k1fziFcKzQyDUiG1C+BztfYXQkqV1gMkLUwBZ2N2y5q8sICFFlLmki
-   7IqFU20YO1ChXu+WgP0oi4bfr/YO0F7Ieq0acQZuHSRej+8/qSexdKALD
-   7p6pLTjOoM6/N9oiXI/Zj8+lrWRbUX7wJr3ZPt2dROOHsj6Gn7UurMO7j
-   BaFqmQWKcQnHRzNQWFZC5y31SvzTXOUqDY//aKPw678BSHY3lRPTPfrFH
-   cvshRTJmbh2bu0Ncqz8FV2POHuMe19eosdGpQymuOPFQDHvH2KUlvaIwO
-   UCrWXOauK5oKQcW+z+OEGUGocTQzvuQ9sCnNPIKFwU2yC64uMA04D7Ier
-   g==;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+hi6RyCKfTtr3DMi2eEnpO/6akt85B6JcggBgLY6cew=;
+  b=DNRAgxg6XIMD8CrxTx6iHgKAG3yoOfEM1We5u9pLq7zjNbHDdlqtLrnb
+   pWmXjO5Lm58n7MixC5xNecPUZ7ehFhL70lfYf/pLmGgRYhnPA5hVGXpco
+   upOOlK0YhHXYGYOhArPdjyYAmni8i8CK8RHDoDERGADeAHVgJi9F33wYI
+   LZrUl8du4yXY/0lyvm8GoBJuTgufW6QkwKxE5lB+QQ5krw8iel66/o79A
+   WCpyQ5REuvZ2CLdq2A9S56sWtFmbGBT53+BBTNm0Ve3I1i4dhRSfHqlfY
+   zrcKFtT72DVEX60TRTsID1mfCIBAzN0r8U4pwcofwdNr7qkvMifgrrtKO
+   w==;
 X-IronPort-AV: E=Sophos;i="5.93,281,1654531200"; 
-   d="scan'208";a="322404151"
+   d="scan'208";a="322404159"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 11:45:18 +0800
-IronPort-SDR: 4LQYEkZV/cCCWekU8zPsHw78EafEKxNn5AY7grwLQgJtLTzUB78wBElOPuFkPJo8WRrQCHe4ln
- fRuoOxsanqmctctm3EGcIwn4/rW1f39TMmbyXm3L+J9+jVa5XwKh/WNRttxs5jhO1yozVctz0F
- z435uML8nLNEYCwXBL8GcGajmEBaU3N1ipjnshjEhbeWh0YwAV970Sg27lAT3UHH3ylD6sN3mJ
- p/WCR2eDKGxkk7W0wa76Dr6UkGCXLvwUOh53wzOw6nW8O0uu8uvvaGqRDg6MvGABMxD6M2EAbn
- TyBLEa8REnM0xz6LtI/5E9Ax
+  by ob1.hgst.iphmx.com with ESMTP; 02 Sep 2022 11:45:19 +0800
+IronPort-SDR: 1y48n6aIlCx5wsZ5MD6TC2cFfzBbyIIONf0CpxYXd8YLvNsIc+u74A/V6J8U2Y9scCGEc0vdrs
+ B6vYpfNUBzgp1JGuVxG/lRmnqyKQ1ccUXwFByzuOSr8RDDQxV9qNQ9k2PGzt0vp1NZgLISmqxO
+ MrbuUhEPyGxfepqlCNh0m7tk3bMD2XszYflt7n4iJGXCqdSMz/pq0LMwzMyBb/gc7Vs+C/nM3+
+ Xz2y0fX8S4bdXiBhXQ7mBuIH+RY7Xh9dNfHODt0h79sA7jgtWWtZ7+7iKPu8sFeeSNRmsngV4G
+ g4k0weLfY5Zod7Rn9f+ElGQf
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 20:05:46 -0700
-IronPort-SDR: WN076x+vL8SdsA7t6BZLvRV5rPYFrHcrEXK1uOZ3fThU2Dij3oE9jY/qS//ueIQPRS2KYWAtTr
- Pbunkh+G2uW7f3cQ/m6oLBFB/Ufpz/jAjR6gl5Lve/FfBdIOec1JJaJOGaVWuNjZ3DPQc5Ua6g
- pIB63Ku2qMUtAgWsj8V0aVZWHs9Kv9wuR4qtDL12+pHn1smzxu+6pDH06Ny5cROPWwgmiGV/Ai
- w4Frfhowr71VKeavTgwcaH1muHc2IPsgh0nVIy3NhsMBn29y7OCXRk/UWpQU3rQXSz/QTCpo6l
- 1iY=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Sep 2022 20:05:47 -0700
+IronPort-SDR: hpwv2grAuwVZ0rFra5IhIGAnxGJKzDRSzO9djJw/mIuoPSZ/q6/zyeM31nH5NTWnfqPHQpxTg/
+ pMvMThq+978EL8ko0vZdShBaWn/RON+C0BbmnQgWz6kTFx2OS5L1Tcz138ZYcnInMA2fxKbHcX
+ etpiJ9emeT0mTCvBfzSNcmX5OTk4XJKIPAVtaz0L1QAv6GfgAc2frqXLf8ol+VSXP362bS86+5
+ cIasu/nyInXWZP1cB2Wz1laAPVOFX6OoJNj56eUs96GbL0KJ9168gCQwrxvpqAY2UWrRXG29AV
+ PNg=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Sep 2022 20:45:17 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Sep 2022 20:45:18 -0700
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     Christoph Hellwig <hch@lst.de>,
@@ -54,57 +54,75 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Chaitanya Kulkarni <kch@nvidia.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests 0/5] improve _have_driver() module load issue solution
-Date:   Fri,  2 Sep 2022 12:45:11 +0900
-Message-Id: <20220902034516.223173-1-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 1/5] check: clean up _run_test()
+Date:   Fri,  2 Sep 2022 12:45:12 +0900
+Message-Id: <20220902034516.223173-2-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20220902034516.223173-1-shinichiro.kawasaki@wdc.com>
+References: <20220902034516.223173-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The commit 06a0ba866d90 ("common/rc: avoid module load in _have_driver()")
-removed module load from _have_driver(). However, it turned out that it was not
-a good solution. In the recent discussion for module load preparation for nvme
-test cases, it was pointed out no module load in _have_driver() is confusing and
-adding complexity [1]:
+Avoid duplicated declarations and returns of local variable 'ret' in
+_run_test(). This is a preparation for a following commit.
 
- - Without module load in _have_driver(), explicit module load and unload are
-   required in number of test cases. Boiler plates.
- - The module unload is not always safe. Need care if the module unload is
-   expected or not.
- - The module load needs error handling.
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ check | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-I can think of a new helper function to address the comments above, but it will
-look like _have_driver() with module load. Hence, I suggest to revert back some
-part of the the commit 06a0ba866d90 to load modules in _have_driver() (Sorry
-Christoph, Bart for doing this on the commit you reviewed). As a better
-solution, I propose to record the modules loaded in _have_driver() and unload
-them at each test case end, regardless of the test case is skipped or executed.
-I confirmed this fix avoids the issue that the commit 06a0ba866d90 tried to fix.
-
-In this series, 4th patch is the core change in _have_driver. 1st, 2nd and 3rd
-patches are clean-up preparation patches for the 4th patch. 5th patch reverts
-changes in nbd/rc, which is no longer required after the 4th patch.
-
-[1] https://lore.kernel.org/linux-block/89aedf1d-ae08-adef-db29-17e5bf85d054@grimberg.me/
-
-Shin'ichiro Kawasaki (5):
-  check: clean up _run_test()
-  common,tests: rename unload_module() to _unload_module()
-  check,common/rc: move _unload_module() from common/rc to check
-  check,common/rc: load module in _have_driver() and unload after test
-  Revert "nbd/rc: load nbd module explicitly"
-
- check                      | 36 +++++++++++++++++++++++++++++++-----
- common/multipath-over-rdma |  4 ++--
- common/rc                  | 26 ++++++++++----------------
- tests/nbd/rc               | 12 ++----------
- tests/nvmeof-mp/rc         | 12 ++++++------
- tests/srp/rc               |  8 ++++----
- 6 files changed, 55 insertions(+), 43 deletions(-)
-
+diff --git a/check b/check
+index e6c321c..85e0569 100755
+--- a/check
++++ b/check
+@@ -447,6 +447,8 @@ _run_test() {
+ 	RUN_FOR_ZONED=0
+ 	FALLBACK_DEVICE=0
+ 
++	local ret=0
++
+ 	# Ensure job control monitor mode is off in the sub-shell for test case
+ 	# runs to suppress job status output.
+ 	set +m
+@@ -461,14 +463,13 @@ _run_test() {
+ 
+ 		RESULTS_DIR="$OUTPUT/nodev"
+ 		_call_test test
+-		local ret=$?
++		ret=$?
+ 		if (( RUN_ZONED_TESTS && CAN_BE_ZONED )); then
+ 			RESULTS_DIR="$OUTPUT/nodev_zoned"
+ 			RUN_FOR_ZONED=1
+ 			_call_test test
+ 			ret=$(( ret || $? ))
+ 		fi
+-		return $ret
+ 	else
+ 		if [[ ${#TEST_DEVS[@]} -eq 0 ]] && \
+ 			declare -fF fallback_device >/dev/null; then
+@@ -494,7 +495,6 @@ _run_test() {
+ 			requires
+ 		fi
+ 
+-		local ret=0
+ 		for TEST_DEV in "${TEST_DEVS[@]}"; do
+ 			TEST_DEV_SYSFS="${TEST_DEV_SYSFS_DIRS["$TEST_DEV"]}"
+ 			TEST_DEV_PART_SYSFS="${TEST_DEV_PART_SYSFS_DIRS["$TEST_DEV"]}"
+@@ -523,9 +523,9 @@ _run_test() {
+ 			unset "TEST_DEV_PART_SYSFS_DIRS[${TEST_DEVS[0]}]"
+ 			TEST_DEVS=()
+ 		fi
+-
+-		return $ret
+ 	fi
++
++	return $ret
+ }
+ 
+ _run_group() {
 -- 
 2.37.1
 
