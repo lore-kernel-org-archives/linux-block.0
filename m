@@ -2,173 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42764C38145
-	for <linux-block@archiver.kernel.org>; Sat,  3 Sep 2022 13:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1940CC54EE9
+	for <linux-block@archiver.kernel.org>; Sat,  3 Sep 2022 17:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230303AbiICNrW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Sep 2022 09:47:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43286 "EHLO
+        id S229698AbiICRAs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Sep 2022 13:00:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbiICNrT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Sep 2022 09:47:19 -0400
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F4253014;
-        Sat,  3 Sep 2022 06:47:18 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id 013E55C0107;
-        Sat,  3 Sep 2022 09:47:18 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Sat, 03 Sep 2022 09:47:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
-         h=cc:cc:content-transfer-encoding:content-type:date:date:from
-        :from:in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm3; t=1662212837; x=
-        1662299237; bh=uqDIkoyxcAMiLmXCE3T3UrD+uLp05BUSMisS7iDN1Kw=; b=O
-        gRFQnaRZg/o6hYZlLv4MYMlwQ49w1vK3/ype0108eXWyHfY2queZv5XsedkO0pf6
-        9x0ktvjmVe1Qxxr+PTw4DTsUZ+1W+wzYM/nYtgg9RzBjrnQYzefj52pXNgDrkFcV
-        T4By6z+hGcl5YtW9VYotyYSj2p1SdsHXR8+jnlb0zLj3jWE6e5llgb3Muvr1VXB5
-        FzpKuPJeOidKurbGb4tQrg+gKNWiN1+mjerZ7RDPc2fbjdR1CIctg9ne1b9cSdDh
-        HHNOcx/gIU1gyZd+n08NRpRTYQX2f6/2Wn9PLEa6eZvobP+l7IatubeeVK5TrFa7
-        eKdtZrmACwe7Hnbm5y+gA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1662212837; x=
-        1662299237; bh=uqDIkoyxcAMiLmXCE3T3UrD+uLp05BUSMisS7iDN1Kw=; b=p
-        wSgTwVIvhQW6a4auSR1rqi3UsKAn5Bbo6f8gOOgsxkXmOmYnzlfwKM7L4dHftGWh
-        eZOP/vrBUNcE/GsIDlwiVa7sQR/UgMbEVMJUckyN1X4gkHhnEirCX82p6wLIwaFA
-        t0EVseORcxC3gRKqGFYbtSI8OW0f7NbniCt+Rs9nQg++Jh/v1kA6ARRoz20e+Kh4
-        pyg+5aeAmNTPzikfqeumrBDUVgDe9I/TeIpfr5Uk5yzhNchjNGb0wt49kO5hq9H2
-        gCplq7fKI/nseI/bPoL7W6ZxnLDqCYgnZ1M7hY2Q8tUVtjOGzydes3kmxP0Xs7LW
-        r18CGMfz/5k8BBo6vusqA==
-X-ME-Sender: <xms:5VoTY9e1AGDg3BTPDv8uf-R-7RxYm-RnUOkplh6YDnP0NflUPHxFXQ>
-    <xme:5VoTY7Oy1t9Svr_qW8JJOfsHcYejrWC8KscPmE73UHIuu420fdii9100ocI9i4duL
-    trZ4LsK64lTbsyx-Ug>
-X-ME-Received: <xmr:5VoTY2hAWyGlARHEN6MuKN_jiQ6bsKrjEVC0uxB-ao1zVBFxhDSOWmtkk4dqvBmRTFgV>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdelvddgjeduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtfeejnecuhfhrohhmpeffuhhs
-    thihucforggsvgcuoeguuhhsthihseguuhhsthihmhgrsggvrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeeguedtgfffvedvieegtddvtefgvdevgfduvdeuveduveeifeegjefgjeff
-    veekueenucffohhmrghinhepghhithhhuhgsrdgtohhmpdguvghsihhgnhdrmhgupdhrvg
-    guhhgrthdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhl
-    fhhrohhmpeguuhhsthihseguuhhsthihmhgrsggvrdgtohhm
-X-ME-Proxy: <xmx:5VoTY29IewREcGRfLOxnwYTPMcptPqG45vvDc_8Twnjky7b0MRKWEA>
-    <xmx:5VoTY5tVKfBd-l5wmX2-hXPhnyTMhpI8lubOvFqkfzd0-k4uujJdLQ>
-    <xmx:5VoTY1FRTTr9LsPdRrNYzUI_xc2pBbiEp2Fyx20UhUSnwp52Z5qHzw>
-    <xmx:5VoTYzJDjjX7XzViucQKBM1P7EAKg476WMAtmXNXcbRJNpMeDyb80g>
-Feedback-ID: i13394474:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 3 Sep 2022 09:47:17 -0400 (EDT)
-Message-ID: <c09fe083-e94f-17ad-43a5-4f7748fab751@dustymabe.com>
-Date:   Sat, 3 Sep 2022 09:47:16 -0400
+        with ESMTP id S230158AbiICRAr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Sep 2022 13:00:47 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7F3D402CE
+        for <linux-block@vger.kernel.org>; Sat,  3 Sep 2022 10:00:46 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id n65-20020a17090a5ac700b001fbb4fad865so4919203pji.1
+        for <linux-block@vger.kernel.org>; Sat, 03 Sep 2022 10:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=+QQA4kmqlZ35Q9KKy4uiiOptiO8D9lsejYD6WEYmE3s=;
+        b=nUIquInPQF+Vuc0kBJcJtkVAOf+0nG29BJiGkM0lyLDfVbz8EUpgyOuG7jp5cJwjrF
+         uOO8Bg3yWUJ4o6OGTphq3Cq9UsujyQyNhtugvBJzHc7nPrcr0t68l8W45vOgPn6bsZsa
+         wSClzXAMiKXulUR+smYJ/DyhTbE1+Te09RQ1UqRGVh/n/f6pf94sU20k7ZfYSFXSNRRD
+         C+uEgVb1mm/zJrWXAR30KlmV8p16uL1nQFjBxWqlPWjF8NVvhjuFKaRUG2CorZ+kvmJw
+         Kdvsv9ZZUHpZjCaKMQ+gN86A2FcfShJwjdIHoP4oBsiIfIIXsBzol9hI5rNpK3NpS9r6
+         1TMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=+QQA4kmqlZ35Q9KKy4uiiOptiO8D9lsejYD6WEYmE3s=;
+        b=crkt323ZKp7q3T035JIcrEobGDWJyP3oyxdyoZHIjGZRkozFOdi7NdOEFud1ixpNVi
+         vd19djHj+V9Uo08DCxsxsC23RDPLwrJ09aey4skRFmEgsZ2tkycdt+o1Yx1IPVd05Muf
+         NMi10vlG9PKulguR6VuSffhmLUBE4WII383UaA88ZB65BULeRIgmVBa5DZ6XZxfI2H/u
+         g1ysni/UOpub5QKhpVyPksM5/6plmY7uGMEgOsSWsFsRL/yJA2Rmdrcvk3jOqucI0ONO
+         w8A7wsEAmrg2CLljOtV3+VgqVh48qflutH66z9CMOn2owk3Eq9+d5Eg2nf0ssPMMTZyl
+         CAxw==
+X-Gm-Message-State: ACgBeo0I1jorKKeKBWf3yc4exioRaa6v4XuQFWojn97jOO57vqHWD2WH
+        qIFK26aBD8dRPjuazrT4SygaAJ1teMh0XQ==
+X-Google-Smtp-Source: AA6agR4TH6UeLZwuJxAnHsCNafpBxYf6GeIod3zTkM8qkV5uPlNKTQxrWMC8VWxUSFUcj2cYFBCPjA==
+X-Received: by 2002:a17:903:4043:b0:174:dd99:a589 with SMTP id n3-20020a170903404300b00174dd99a589mr27848171pla.56.1662224445803;
+        Sat, 03 Sep 2022 10:00:45 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id w29-20020aa79a1d000000b0052d24402e52sm4159231pfj.79.2022.09.03.10.00.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 03 Sep 2022 10:00:45 -0700 (PDT)
+Message-ID: <75c6c9ea-a5b4-1ef5-7ff1-10735fac743e@kernel.dk>
+Date:   Sat, 3 Sep 2022 11:00:43 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [PATCH for-next v3 0/4] fixed-buffer for uring-cmd/passthrough
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        linux-raid@vger.kernel.org
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
- <YxBZ4BBjxvAkvI2A@T590>
-From:   Dusty Mabe <dusty@dustymabe.com>
-In-Reply-To: <YxBZ4BBjxvAkvI2A@T590>
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+References: <CGME20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf@epcas5p1.samsung.com>
+ <20220902151657.10766-1-joshi.k@samsung.com>
+ <f1e8a7fa-a1f8-c60a-c365-b2164421f98d@kernel.dk>
+ <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
+ <20220902184608.GA6902@test-zns>
+ <48856ca4-5158-154e-a1f5-124aadc9780f@kernel.dk>
+ <c62c977d-9e81-c84c-e17c-e057295c071e@kernel.dk>
+In-Reply-To: <c62c977d-9e81-c84c-e17c-e057295c071e@kernel.dk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 9/2/22 3:25 PM, Jens Axboe wrote:
+> On 9/2/22 1:32 PM, Jens Axboe wrote:
+>> On 9/2/22 12:46 PM, Kanchan Joshi wrote:
+>>> On Fri, Sep 02, 2022 at 10:32:16AM -0600, Jens Axboe wrote:
+>>>> On 9/2/22 10:06 AM, Jens Axboe wrote:
+>>>>> On 9/2/22 9:16 AM, Kanchan Joshi wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> Currently uring-cmd lacks the ability to leverage the pre-registered
+>>>>>> buffers. This series adds the support in uring-cmd, and plumbs
+>>>>>> nvme passthrough to work with it.
+>>>>>>
+>>>>>> Using registered-buffers showed peak-perf hike from 1.85M to 2.17M IOPS
+>>>>>> in my setup.
+>>>>>>
+>>>>>> Without fixedbufs
+>>>>>> *****************
+>>>>>> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
+>>>>>> submitter=0, tid=5256, file=/dev/ng0n1, node=-1
+>>>>>> polled=0, fixedbufs=0/0, register_files=1, buffered=1, QD=128
+>>>>>> Engine=io_uring, sq_ring=128, cq_ring=128
+>>>>>> IOPS=1.85M, BW=904MiB/s, IOS/call=32/31
+>>>>>> IOPS=1.85M, BW=903MiB/s, IOS/call=32/32
+>>>>>> IOPS=1.85M, BW=902MiB/s, IOS/call=32/32
+>>>>>> ^CExiting on signal
+>>>>>> Maximum IOPS=1.85M
+>>>>>
+>>>>> With the poll support queued up, I ran this one as well. tldr is:
+>>>>>
+>>>>> bdev (non pt)??? 122M IOPS
+>>>>> irq driven??? 51-52M IOPS
+>>>>> polled??????? 71M IOPS
+>>>>> polled+fixed??? 78M IOPS
+
+Followup on this, since t/io_uring didn't correctly detect NUMA nodes
+for passthrough.
+
+With the current tree and the patchset I just sent for iopoll and the
+caching fix that's in the block tree, here's the final score:
+
+polled+fixed passthrough	105M IOPS
+
+which is getting pretty close to the bdev polled fixed path as well.
+I think that is starting to look pretty good!
+
+[...]
+submitter=22, tid=4768, file=/dev/ng22n1, node=8
+submitter=23, tid=4769, file=/dev/ng23n1, node=8
+polled=1, fixedbufs=1/0, register_files=1, buffered=1, QD=128
+Engine=io_uring, sq_ring=128, cq_ring=128
+IOPS=102.51M, BW=50.05GiB/s, IOS/call=32/31
+IOPS=105.29M, BW=51.41GiB/s, IOS/call=31/32
+IOPS=105.34M, BW=51.43GiB/s, IOS/call=32/31
+IOPS=105.37M, BW=51.45GiB/s, IOS/call=32/32
+IOPS=105.37M, BW=51.45GiB/s, IOS/call=31/31
+IOPS=105.38M, BW=51.45GiB/s, IOS/call=31/31
+IOPS=105.35M, BW=51.44GiB/s, IOS/call=32/32
+IOPS=105.49M, BW=51.51GiB/s, IOS/call=32/31
+^CExiting on signal
+Maximum IOPS=105.49M
 
 
-On 9/1/22 03:06, Ming Lei wrote:
-> Hi Dusty,
+-- 
+Jens Axboe
 
-Hi Ming,
 
-> 
-> On Fri, Aug 26, 2022 at 12:15:22PM -0400, Dusty Mabe wrote:
->> Hey All,
->>
->> I think I've found a regression introduced by:
->>
->> a09b314 o block: freeze the queue earlier in del_gendisk
->>
->> In Fedora CoreOS we have tests that set up RAID1 on the /boot/ and /root/ partitions
->> and then subsequently removes one of the disks to simulate a failure. Sometime recently
-> 
-> Do you have test case which doesn't need raid1 over /boot or /root? such
-> as by create raid1 over two disks, then mount & remove one of device, ...
-> 
-> It isn't easy to setup/observe such test case and observe what is wrong.
-
-I don't have such a test case. For Fedora CoreOS we have a very
-specific partition layout [1] so it's not easy to change that
-and continue to run our test framework.
-
-That being said there are plenty of people in the bug report [2]
-that are reporint seeing this as well, so they might have other
-test cases they can share.
-
-[1] https://github.com/coreos/fedora-coreos-tracker/blob/main/Design.md#disk-layout
-[2] https://bugzilla.redhat.com/show_bug.cgi?id=2121791
-
-> 
->> this test started timing out occasionally. Looking a bit closer it appears instances are
->> getting stuck during reboot with a bunch of looping messages:
->>
->> ```
->> [   17.978854] block device autoloading is deprecated and will be removed.
->> [   17.982555] block device autoloading is deprecated and will be removed.
->> [   17.985537] block device autoloading is deprecated and will be removed.
->> [   17.987546] block device autoloading is deprecated and will be removed.
->> [   17.989540] block device autoloading is deprecated and will be removed.
->> [   17.991547] block device autoloading is deprecated and will be removed.
->> [   17.993555] block device autoloading is deprecated and will be removed.
->> [   17.995539] block device autoloading is deprecated and will be removed.
->> [   17.997577] block device autoloading is deprecated and will be removed.
->> [   17.999544] block device autoloading is deprecated and will be removed.
->> [   22.979465] blkdev_get_no_open: 1666 callbacks suppressed
->> ...
->> ...
->> ...
->> [  618.221270] blkdev_get_no_open: 1664 callbacks suppressed
->> [  618.221273] block device autoloading is deprecated and will be removed.
->> [  618.224274] block device autoloading is deprecated and will be removed.
->> [  618.227267] block device autoloading is deprecated and will be removed.
->> [  618.229274] block device autoloading is deprecated and will be removed.
->> [  618.231277] block device autoloading is deprecated and will be removed.
->> [  618.233277] block device autoloading is deprecated and will be removed.
->> [  618.235282] block device autoloading is deprecated and will be removed.
->> [  618.237370] block device autoloading is deprecated and will be removed.
->> [  618.239356] block device autoloading is deprecated and will be removed.
->> [  618.241290] block device autoloading is deprecated and will be removed.
->> ```
->>
->> Using the Fedora kernels I narrowed it down to being introduced between 
->> `kernel-5.19.0-0.rc3.27.fc37` (good) and `kernel-5.19.0-0.rc4.33.fc37` (bad).
->>
->> I then did a bisect and found:
->>
->> ```
->> $ git bisect bad
->> a09b314005f3a0956ebf56e01b3b80339df577cc is the first bad commit
->> commit a09b314005f3a0956ebf56e01b3b80339df577cc
->> Author: Christoph Hellwig <hch@lst.de>
->> Date:   Tue Jun 14 09:48:27 2022 +0200
->>
->>     block: freeze the queue earlier in del_gendisk
-> 
-> It is a bit hard to associate the above commit with reported issue.
-
-Indeed, though I think now there is enough emperical evidence that
-points directly at this commit. It may ultimately end up as not the
-root cause, but it's definitely related.
-
-Dusty
