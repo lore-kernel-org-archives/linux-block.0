@@ -2,67 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 430B7C54EE9
-	for <linux-block@archiver.kernel.org>; Fri,  2 Sep 2022 23:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F669ECAAA1
+	for <linux-block@archiver.kernel.org>; Sat,  3 Sep 2022 02:02:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230138AbiIBXsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Sep 2022 19:48:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58242 "EHLO
+        id S231371AbiICCC1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Sep 2022 22:02:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229965AbiIBXsN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 19:48:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B1F106DA4
-        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 16:48:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C847061E2F
-        for <linux-block@vger.kernel.org>; Fri,  2 Sep 2022 23:48:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C312C433D6;
-        Fri,  2 Sep 2022 23:48:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662162487;
-        bh=7NtCRWYJLgPmRIoSaKK+qUEaB0/zHmxUChB5HWWBwTc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=jGK2C2Oh6v8fat4Wvcqj4KO7TthN3FWkikZbXll2ggmWDl3Jo2w4pek8b5SssOiST
-         QU5pdBO59c3fm2X/S4Y+toOoUdL8fE+WQmML49goU5raQpxNCTq9sGhYotJt71KSfV
-         FnwjAbpZpdQK24SHNLMB7vbpyF8hjg45Xo5jrBNQSgE2Ys+HOqd9tcH/xWOWqaNXtj
-         ljNEDjzRC8AsuUUALCM3G1WpnkwKgqI7K/jfNqWzl76k+ZIvxDa2XeNpzobM4ES7M6
-         FX5/2xWLj5SgDmpdSI6W7f/jOCIMbPgRbnk+rAD2xJinP0CAyYy0kIyVYOKsDZ1yLW
-         aISXFIc/5bosw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2ACC9E924E0;
-        Fri,  2 Sep 2022 23:48:07 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.0-rc4
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <2e744edd-4b72-4071-99c2-c09848460490@kernel.dk>
-References: <2e744edd-4b72-4071-99c2-c09848460490@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <2e744edd-4b72-4071-99c2-c09848460490@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-02
-X-PR-Tracked-Commit-Id: 7a3d2225f1ae9e591fefd65c3bb1715dc54d96f1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d895ec7938c431fe61a731939da76a6461bc6133
-Message-Id: <166216248716.12135.774948156901432321.pr-tracker-bot@kernel.org>
-Date:   Fri, 02 Sep 2022 23:48:07 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S229995AbiICCC0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Sep 2022 22:02:26 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2457C8754;
+        Fri,  2 Sep 2022 19:02:25 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id l3so3460305plb.10;
+        Fri, 02 Sep 2022 19:02:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=0r8NdBT69RFwnbmp10XxWtUK9Y1Ejmq1k4v6A4hzneo=;
+        b=GhQjQLoIoAvqMoQdOANmkoeHLSE0pfXQtORW3OTALIpdmNgRKWcTj481ookqkXtJll
+         N5BX0QDe8XZOZXxEGdZIWkkjfkXWCIvNvPWumc656iaJBhspBURL6EfMDRb6oB67dLHI
+         8GqLsOJHDlgwyJiTM3YdK8/grJv8GDu/H5zvS3G4KbRPwGHSTTTkXbwakL8OoPDBdtEA
+         0As0hbx8ITZTzkb3d2CXPSxTu7HEIpqR8tT9Chq4MlErDkn6jjsed0MmMAMZfexgF2V8
+         sB+mKnoctKtxw8ce81j1VQruXQHPXvTkYo2mb7q6+C4P+dxpkVCnYxWFreHTd+wttLPG
+         E2tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=0r8NdBT69RFwnbmp10XxWtUK9Y1Ejmq1k4v6A4hzneo=;
+        b=iwmrETAm1FSgL2BpbBGzgC8UmVywgIzBz6GwZSc0hA9mLazHVxhJ8eBCzBNdh+s/aE
+         slNlYKnP2yKg54suTT/sBeYR/f+X6bPO2oPUDxV/D3N4MWcz+4Kf8J2+XciKTQO96JaT
+         W+30UJhh5rRlsaOsFgRByV3oyXpQyh3i6jP1QQ0b+lndbodAPWYATnV7kXkhdSJWU13k
+         jn3hwKQBacnTagYZaEIstjGe5ZR3l79IO89Ks09gsfnpnrck3d9R1OYsbixZIH4XHhyX
+         AcBHSnC97BL7thvLDYij9SjQ2+yRNwUO6mjQDk7sVHVJCH5ixEBC2VU3qCk4tq8gOZ6V
+         Kgog==
+X-Gm-Message-State: ACgBeo1Xc0Q6gyECPzvzACsze73EJcMtFZJQCxF8Ie5lTUWzblm5T91E
+        fUUbqIBJ2yzs1bo0MA7tuLo=
+X-Google-Smtp-Source: AA6agR5umDytfLJWGJ31jQHzA1SX7xHEXon07O/CUD2fTkmCYxtzjkRskWzMLHTeROQFqXiAFfWPtQ==
+X-Received: by 2002:a17:90b:4f44:b0:1f5:1310:9e7f with SMTP id pj4-20020a17090b4f4400b001f513109e7fmr7787676pjb.235.1662170545075;
+        Fri, 02 Sep 2022 19:02:25 -0700 (PDT)
+Received: from [192.168.43.80] (subs09b-223-255-225-224.three.co.id. [223.255.225.224])
+        by smtp.gmail.com with ESMTPSA id u195-20020a6279cc000000b00537eb00850asm2584816pfc.130.2022.09.02.19.02.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Sep 2022 19:02:24 -0700 (PDT)
+Message-ID: <103bba65-cc98-fd83-515a-de7dfa719e5a@gmail.com>
+Date:   Sat, 3 Sep 2022 09:02:14 +0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH V4 1/1] Documentation: document ublk
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Richard W . M . Jones" <rjones@redhat.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+References: <20220902152302.757375-1-ming.lei@redhat.com>
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <20220902152302.757375-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 2 Sep 2022 10:39:11 -0600:
+On 9/2/22 22:23, Ming Lei wrote:
+> Add documentation for ublk subsystem. It was supposed to be documented when
+> merging the driver, but missing at that time.
+> 
 
-> git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-02
+LGTM, thanks.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d895ec7938c431fe61a731939da76a6461bc6133
-
-Thank you!
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+An old man doll... just what I always wanted! - Clara
