@@ -2,96 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA907ECAAD3
-	for <linux-block@archiver.kernel.org>; Sun,  4 Sep 2022 12:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C68BDC6FA82
+	for <linux-block@archiver.kernel.org>; Sun,  4 Sep 2022 17:11:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbiIDMjS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Sep 2022 08:39:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46832 "EHLO
+        id S233945AbiIDRLS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Sep 2022 13:11:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbiIDMjR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Sep 2022 08:39:17 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D47F23F1CF
-        for <linux-block@vger.kernel.org>; Sun,  4 Sep 2022 05:39:16 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id c24so5899440pgg.11
-        for <linux-block@vger.kernel.org>; Sun, 04 Sep 2022 05:39:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=NbFG56hK+I6GviLATYTXzCpVIXX+44MuvGDwFE5SfwM=;
-        b=xzyJcQpgvut0s4RE8zd33agXqmjjNt1mLSZsGUSEp2+e4dZOPWh181FPHEaxpe97w7
-         TybRZRTXcuahrhmVZ99Zpj8gUMxyFhvXzvM2vNdSw4pMbXNehF5jqfcdLmX9TIAb3j92
-         EYrMGgT4s56noJSXdCI4VIefKmMF8oRqxA1M5rT2ARuKhIzVkER0H+MsCU3wy1Ogk7rV
-         AHeH+j9IiHJBaBSBz+WiM4itVdrVqZg8G/CBWY6e0rSYebRNcubl8bdB6mADcybXKvYp
-         eQPTQEsC7JQvjHfv97qyy7pMnK/NDdLswmsZySjV/URvLkWX7tQyLg91AtQ3tRV3bII8
-         ezlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=NbFG56hK+I6GviLATYTXzCpVIXX+44MuvGDwFE5SfwM=;
-        b=sLqi+Heo4wfB2MjDPrJxwY0EhsoOnd8MSd9t2AAgjKPyCIXuWTxfg3EkI3LuJy71sB
-         eOd1jwdjIraHZIV/Dg36w/qDuL8O2gd6EPsFlGaYaLq+I0BImXRZGtYOw5MXvScZXo8z
-         FKHn7zwQMimooccac/ZLjeYRHPNixKo5mO28jjSggOfiPz52UmBG8pW8Zu2E2GSZeSXL
-         b4VO1VJW3wDR2fwyrYV4QQXJoj+c9tB10KP8SsIVqXcShOPRm79Xx3vqJ7fZWcREXkiE
-         idibZuPIaZ6l8RcPtch+6sNBZGvJno8jjWEziBAjqcFU6CF3LdeYFj/cqPm+3qauJf01
-         AbGg==
-X-Gm-Message-State: ACgBeo06mkeCBwNakKV+djZYiOoEaZA59HHCH+Z/JJ44kvMDHcxC0FCH
-        RLoTNgLkaXZvKscgaGyUlRn1CzBzPftn7A==
-X-Google-Smtp-Source: AA6agR5m+kdWymz+svuz8b9E37QQGz6i9hVDY7GYh1QqktTo2wAypCWl7OhphIeeCaGrPrR2nVZOOw==
-X-Received: by 2002:a63:fa53:0:b0:42c:18d3:6a6 with SMTP id g19-20020a63fa53000000b0042c18d306a6mr27946571pgk.79.1662295155967;
-        Sun, 04 Sep 2022 05:39:15 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id a5-20020aa78e85000000b005379c1368e4sm5692068pfr.179.2022.09.04.05.39.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Sep 2022 05:39:15 -0700 (PDT)
-Message-ID: <e742813b-ce5c-0d58-205b-1626f639b1bd@kernel.dk>
-Date:   Sun, 4 Sep 2022 06:39:14 -0600
+        with ESMTP id S229748AbiIDRLS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Sep 2022 13:11:18 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638A91E3F3
+        for <linux-block@vger.kernel.org>; Sun,  4 Sep 2022 10:11:15 -0700 (PDT)
+Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220904171113epoutp02be0a1aaa210f6e983a7701d1da8be5b3~Rt3pVrXy82674726747epoutp029
+        for <linux-block@vger.kernel.org>; Sun,  4 Sep 2022 17:11:13 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220904171113epoutp02be0a1aaa210f6e983a7701d1da8be5b3~Rt3pVrXy82674726747epoutp029
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662311473;
+        bh=tsEmhgItPqXvRj7zrNCpSgjcLUOilwhKixm5RIY8Qp0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lZrfaWVc8A2qGORD5tjB4ck3TCW6mH8e0Tr1oTaRc1SkknCqz5uLF0eSCuuyQHmwS
+         AZqhL4q1Cy1+pMaHhggwxBTu2Y+JCSbSdpJ/QWMSs0ammfjurbgDxvACQvhBfBkGSo
+         xjt7xMK0n1cj8i4Hip6Z7Iag5WkNlrp6wUcJ2K78=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20220904171111epcas5p3f1bd57a4222ec35ef2aab29834c1937d~Rt3n1RXNm0778507785epcas5p3Z;
+        Sun,  4 Sep 2022 17:11:11 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4MLJ8F3Kcyz4x9Pp; Sun,  4 Sep
+        2022 17:11:09 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        4C.BB.54060.D2CD4136; Mon,  5 Sep 2022 02:11:09 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220904171108epcas5p24669be049be6fc1f1aedf84c2117e878~Rt3k6CxVy2324323243epcas5p2a;
+        Sun,  4 Sep 2022 17:11:08 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220904171108epsmtrp22a16f3bbc02e786f73ab68e4b242c4fc~Rt3k5VZ6t1030310303epsmtrp2g;
+        Sun,  4 Sep 2022 17:11:08 +0000 (GMT)
+X-AuditID: b6c32a4b-e33fb7000000d32c-76-6314dc2d91be
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        70.DF.14392.C2CD4136; Mon,  5 Sep 2022 02:11:08 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220904171107epsmtip235d661ffe30d0acce520a98d725d9759~Rt3jv4zJE1560915609epsmtip2r;
+        Sun,  4 Sep 2022 17:11:07 +0000 (GMT)
+Date:   Sun, 4 Sep 2022 22:31:24 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH for-next v3 0/4] fixed-buffer for uring-cmd/passthrough
+Message-ID: <20220904170124.GC10536@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCHv3] sbitmap: fix batched wait_cnt accounting
-Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org, Keith Busch <kbusch@fb.com>
-Cc:     pankydev8@gmail.com, Keith Busch <kbusch@kernel.org>, hare@suse.de
-References: <20220825145312.1217900-1-kbusch@fb.com>
- <166205058410.59240.3725947759855970973.b4-ty@kernel.dk>
-In-Reply-To: <166205058410.59240.3725947759855970973.b4-ty@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <75c6c9ea-a5b4-1ef5-7ff1-10735fac743e@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFJsWRmVeSWpSXmKPExsWy7bCmpq7uHZFkg03vRC3mrNrGaLH6bj+b
+        xc0DO5ksVq4+ymTxrvUci8WkQ9cYLfbe0raYv+wpuwOHx85Zd9k9Lp8t9di0qpPNY/OSeo/d
+        NxvYPPq2rGL0+LxJLoA9KtsmIzUxJbVIITUvOT8lMy/dVsk7ON453tTMwFDX0NLCXEkhLzE3
+        1VbJxSdA1y0zB+gkJYWyxJxSoFBAYnGxkr6dTVF+aUmqQkZ+cYmtUmpBSk6BSYFecWJucWle
+        ul5eaomVoYGBkSlQYUJ2xrxNp1kKZolUHHzWz9zA+Eugi5GTQ0LAROLh9m1sXYxcHEICuxkl
+        7v7cAOV8YpR4s/IYE4TzjVFi45/l7DAtk7c9Z4VI7GWU6HlzFKrqGaNE07rFTCBVLAIqEjd/
+        /2TuYuTgYBPQlLgwuRQkLCKgINHzeyUbiM0ssIpRYsovaRBbWMBboqnvATOIzSugK/H64xN2
+        CFtQ4uTMJywgNqeArcTVzvNgNaICyhIHth1ngjiok0Ni5UwXCNtF4uC3+8wQtrDEq+NboI6W
+        kvj8bi8bhJ0scWnmOajeEonHew5C2fYSraf6mSFuy5DYdW0uC4TNJ9H7+wkTyCsSArwSHW1C
+        EOWKEvcmPWWFsMUlHs5YAmV7SBzpn8UCCZJ1zBJ3bsxhnsAoNwvJO7OQrICwrSQ6PzSxzgJa
+        wSwgLbH8HweEqSmxfpf+AkbWVYySqQXFuempxaYFxnmp5fA4Ts7P3cQITqRa3jsYHz34oHeI
+        kYmD8RCjBAezkghvyg6RZCHelMTKqtSi/Pii0pzU4kOMpsDYmcgsJZqcD0zleSXxhiaWBiZm
+        ZmYmlsZmhkrivFO0GZOFBNITS1KzU1MLUotg+pg4OKUamCwXl53PqVjzXnAm6/kmvdRcpi97
+        LQo36u2JmrG/L+eeOOPK7OQHDKH/HXpNfpvFftzQ+M4vYuatIjOHx0opU71EyuuurJLtnJIR
+        8ihDiaVarH+R+vlntVs6vHh3XUq3NxLd66U9tcpl5t7kfx/uzW5Z5ecjxl11bOl2jbozE/00
+        8uxDkvmFVE92CEcYffad0Dn1k/7JPx6iG7f0Jxw8fc9+4rsbZqXHpqbGan2wSLjAenhdppOU
+        esbh1bevO/GLannuupPze6M812zDZs99ri/ntGX3XjscKs2z9+8D1sTT2l/Y/yn+di90Udl/
+        TuvX7d9Tcs9EftWdW79xw9HMUI1p9oZRq7k8vsvf2rp4ixJLcUaioRZzUXEiAFwV680tBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOLMWRmVeSWpSXmKPExsWy7bCSvK7OHZFkg77NWhZzVm1jtFh9t5/N
+        4uaBnUwWK1cfZbJ413qOxWLSoWuMFntvaVvMX/aU3YHDY+esu+wel8+Wemxa1cnmsXlJvcfu
+        mw1sHn1bVjF6fN4kF8AexWWTkpqTWZZapG+XwJXx6OJ8toIzghUbe8wbGI/xdTFyckgImEhM
+        3vacFcQWEtjNKHH/lwZEXFyi+doPdghbWGLlv+dANhdQzRNGiX99B5lBEiwCKhI3f/8Esjk4
+        2AQ0JS5MLgUJiwgoSPT8XskGYjMLrGKUmPJLGsQWFvCWaOp7ANbKK6Ar8frjE6iZ65glHnz+
+        xAiREJQ4OfMJC0SzmcS8zQ/B5jMLSEss/8cBEuYUsJW42nkebI6ogLLEgW3HmSYwCs5C0j0L
+        SfcshO4FjMyrGCVTC4pz03OLDQsM81LL9YoTc4tL89L1kvNzNzGC40JLcwfj9lUf9A4xMnEw
+        HmKU4GBWEuFN2SGSLMSbklhZlVqUH19UmpNafIhRmoNFSZz3QtfJeCGB9MSS1OzU1ILUIpgs
+        EwenVANT6crIlKb/C57lft9cypr84otHX94C+0vqJ44a3asRe37MsznGkzFUawLvl2N1K+J2
+        H1Z59VpDO6tK4efcL83upWY8G9zuzvEu7bKYkc58xKDh3Pf5mnlbRA8w1pU+fhsrv27V6o3b
+        98kunr1V9K10r94DXkaTNTHX4qfo3GKQ/+K/afUW1l+fVBZ/3e/0z6Am7U/gNL33ry7Iu2lE
+        XRINOBlwoNDRZ83GxSVTm71uzLo6QVrlj4XYubNhPOdan9jc/Lp0z5TJa65+MD3rwC+m+iv9
+        /bFMmaWpz5qYL3X0de2R/yTE9m/+Dn7RXy2FG85fXsaWJ3Kz9+n139MO86Sf9Zpg0LX+tadq
+        R8r5+5x5bUosxRmJhlrMRcWJAJupLT36AgAA
+X-CMS-MailID: 20220904171108epcas5p24669be049be6fc1f1aedf84c2117e878
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----STjx0DdB5XWzR39.p0qqcVQtF-toHyOxq53rKg1ScZo20x2r=_daa78_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf
+References: <CGME20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf@epcas5p1.samsung.com>
+        <20220902151657.10766-1-joshi.k@samsung.com>
+        <f1e8a7fa-a1f8-c60a-c365-b2164421f98d@kernel.dk>
+        <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
+        <20220902184608.GA6902@test-zns>
+        <48856ca4-5158-154e-a1f5-124aadc9780f@kernel.dk>
+        <c62c977d-9e81-c84c-e17c-e057295c071e@kernel.dk>
+        <75c6c9ea-a5b4-1ef5-7ff1-10735fac743e@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/1/22 10:43 AM, Jens Axboe wrote:
-> On Thu, 25 Aug 2022 07:53:12 -0700, Keith Busch wrote:
->> From: Keith Busch <kbusch@kernel.org>
->>
->> Batched completions can clear multiple bits, but we're only decrementing
->> the wait_cnt by one each time. This can cause waiters to never be woken,
->> stalling IO. Use the batched count instead.
->>
->>
->> [...]
-> 
-> Applied, thanks!
-> 
-> [1/1] sbitmap: fix batched wait_cnt accounting
->       commit: 16ede66973c84f890c03584f79158dd5b2d725f5
+------STjx0DdB5XWzR39.p0qqcVQtF-toHyOxq53rKg1ScZo20x2r=_daa78_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-This is causing CPU stalls for me running make -j256 with the source
-hosted on an ATA device with QD=32. It's not running with a scheduler.
-It just goes spammy on most/all CPUs so  hard to get a real trace out of
-it, but it looks like we're just looping forever off
-sbitmap_queue_wake_up().
+On Sat, Sep 03, 2022 at 11:00:43AM -0600, Jens Axboe wrote:
+>On 9/2/22 3:25 PM, Jens Axboe wrote:
+>> On 9/2/22 1:32 PM, Jens Axboe wrote:
+>>> On 9/2/22 12:46 PM, Kanchan Joshi wrote:
+>>>> On Fri, Sep 02, 2022 at 10:32:16AM -0600, Jens Axboe wrote:
+>>>>> On 9/2/22 10:06 AM, Jens Axboe wrote:
+>>>>>> On 9/2/22 9:16 AM, Kanchan Joshi wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> Currently uring-cmd lacks the ability to leverage the pre-registered
+>>>>>>> buffers. This series adds the support in uring-cmd, and plumbs
+>>>>>>> nvme passthrough to work with it.
+>>>>>>>
+>>>>>>> Using registered-buffers showed peak-perf hike from 1.85M to 2.17M IOPS
+>>>>>>> in my setup.
+>>>>>>>
+>>>>>>> Without fixedbufs
+>>>>>>> *****************
+>>>>>>> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
+>>>>>>> submitter=0, tid=5256, file=/dev/ng0n1, node=-1
+>>>>>>> polled=0, fixedbufs=0/0, register_files=1, buffered=1, QD=128
+>>>>>>> Engine=io_uring, sq_ring=128, cq_ring=128
+>>>>>>> IOPS=1.85M, BW=904MiB/s, IOS/call=32/31
+>>>>>>> IOPS=1.85M, BW=903MiB/s, IOS/call=32/32
+>>>>>>> IOPS=1.85M, BW=902MiB/s, IOS/call=32/32
+>>>>>>> ^CExiting on signal
+>>>>>>> Maximum IOPS=1.85M
+>>>>>>
+>>>>>> With the poll support queued up, I ran this one as well. tldr is:
+>>>>>>
+>>>>>> bdev (non pt)??? 122M IOPS
+>>>>>> irq driven??? 51-52M IOPS
+>>>>>> polled??????? 71M IOPS
+>>>>>> polled+fixed??? 78M IOPS
+>
+>Followup on this, since t/io_uring didn't correctly detect NUMA nodes
+>for passthrough.
+>
+>With the current tree and the patchset I just sent for iopoll and the
+>caching fix that's in the block tree, here's the final score:
+>
+>polled+fixed passthrough	105M IOPS
+>
+>which is getting pretty close to the bdev polled fixed path as well.
+>I think that is starting to look pretty good!
+Great! In my setup (single disk/numa-node), current kernel shows-
 
-I'm going to revert this one for now until we can investigate what is
-going on here.
+Block MIOPS
+***********
+command:t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -P1 -n1 /dev/nvme0n1
+plain: 1.52
+plain+fb: 1.77
+plain+poll: 2.23
+plain+fb+poll: 2.61
 
--- 
-Jens Axboe
+Passthru MIOPS
+**************
+command:t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -P1 -u1 -n1 /dev/ng0n1
+plain: 1.78
+plain+fb: 2.08
+plain+poll: 2.21
+plain+fb+poll: 2.69
+
+
+------STjx0DdB5XWzR39.p0qqcVQtF-toHyOxq53rKg1ScZo20x2r=_daa78_
+Content-Type: text/plain; charset="utf-8"
+
+
+------STjx0DdB5XWzR39.p0qqcVQtF-toHyOxq53rKg1ScZo20x2r=_daa78_--
