@@ -2,85 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA97ECAAD4
-	for <linux-block@archiver.kernel.org>; Sat,  3 Sep 2022 17:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 825CFECAAD4
+	for <linux-block@archiver.kernel.org>; Sun,  4 Sep 2022 11:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229509AbiICR32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Sep 2022 13:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
+        id S230174AbiIDLX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Sep 2022 07:23:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiICR30 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Sep 2022 13:29:26 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C07DE73
-        for <linux-block@vger.kernel.org>; Sat,  3 Sep 2022 10:29:23 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id h188so4590272pgc.12
-        for <linux-block@vger.kernel.org>; Sat, 03 Sep 2022 10:29:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
-        bh=52EnIjUfy6s2MnVsro/QtNEzT4FZRbZlA+cF6ZAg+Wc=;
-        b=b3lV3R8ldIi3MCKRhV6deyZC4NhsHDdqZ97ILrzPfb4nqT/XyhYXGOvOGVDlHJ2/BP
-         jmHVBSlA3x89pc1hfAjrnYfQ1vAPMKUlxydcY4Etx6LR+1ZTzfJ4Au5uO9JdwAUf7RwU
-         DANm5uPNz39ZOLud1mMo2YX2C9L9yLRu74goHMWcjyHRJbxmAG8bvNPeuTz6cJHbwDCU
-         JdA5pn+nBsC2efVOOxxjMrcsQ8Llx47n8yhIrD2+bL8MiP+Y8XDCII+vXXftfSt+cdB7
-         QCcl0SyjcUtloKeCT2NCk0RsLZk3Whdgx0a95C5ogFa2k6JRoBmSTsiNi3AiFW0I2KVf
-         GeZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=52EnIjUfy6s2MnVsro/QtNEzT4FZRbZlA+cF6ZAg+Wc=;
-        b=5Nh53AsnqMHYfXWsW2dXZgsABU4GsjqVK+XYs/yLD00xnyqoxtZFKIZKsELMDtc4pc
-         MncZsCB7s+gca4evH5+JYGe1lNP1jkkJoVyncdtCWohS/YXKIy6o4ltScNrCmO2T/IJk
-         ArvaYpIJVQV5ZS1B5vPXjUKvNk0hSjTN9GJeWoaVtRJ/FTT6I3koCEmuKebE61Wdnrvm
-         YNCunVL11S8gFRtCqWkx1hpdDn4U3CwgXWWopkCXIVRW/Fv7bi+e5aSH8tPkEPvCKDBq
-         u/04jPdJy0gBeVMCSfBNSuSbJYDHFl3Tnk68V9pQf5A+ZYgA1j5D9qbDtLSO+MjU3a/E
-         eUTw==
-X-Gm-Message-State: ACgBeo1yiH6fQQNdUH8VhDGaujr5wtTNHVoe8G3K0juzIGVIQ4J2XNvL
-        WFHNgtqs0+GfnT9RfAgfquc57Pqqa3KKZw==
-X-Google-Smtp-Source: AA6agR5+P9sYS+tZCQIJ8X0AF0yNL6O39mJifEjp2OoxZMxI5zstlPkvk7+qYGeKHTAiVR91cqdjNA==
-X-Received: by 2002:a63:25c7:0:b0:42c:450a:20e6 with SMTP id l190-20020a6325c7000000b0042c450a20e6mr24139067pgl.277.1662226163200;
-        Sat, 03 Sep 2022 10:29:23 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c14-20020a056a00008e00b0053ab9c18d3csm4362065pfj.14.2022.09.03.10.29.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Sep 2022 10:29:22 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20220823103819.395776-1-ming.lei@redhat.com>
-References: <20220823103819.395776-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] block: don't add partitions if GD_SUPPRESS_PART_SCAN is set
-Message-Id: <166222616124.223043.14028529491012837737.b4-ty@kernel.dk>
-Date:   Sat, 03 Sep 2022 11:29:21 -0600
+        with ESMTP id S229569AbiIDLX6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Sep 2022 07:23:58 -0400
+Received: from out199-1.us.a.mail.aliyun.com (out199-1.us.a.mail.aliyun.com [47.90.199.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8353FA1B;
+        Sun,  4 Sep 2022 04:23:55 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R871e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VOFzx1Y_1662290630;
+Received: from 172.20.10.3(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VOFzx1Y_1662290630)
+          by smtp.aliyun-inc.com;
+          Sun, 04 Sep 2022 19:23:51 +0800
+Message-ID: <8984c9be-6ef0-95c7-ec02-e1213f3d45a1@linux.alibaba.com>
+Date:   Sun, 4 Sep 2022 19:23:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.10.0-dev-65ba7
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [RFC PATCH V2 5/6] ublk_drv: consider recovery feature in
+ aborting mechanism
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+References: <20220831155136.23434-1-ZiyangZhang@linux.alibaba.com>
+ <20220831155136.23434-6-ZiyangZhang@linux.alibaba.com>
+ <CAFj5m9J2vrqh0U11iVtxdDUPcxDWRPA0K+14e9Si61QGySRq8w@mail.gmail.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <CAFj5m9J2vrqh0U11iVtxdDUPcxDWRPA0K+14e9Si61QGySRq8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 23 Aug 2022 18:38:19 +0800, Ming Lei wrote:
-> Commit b9684a71fca7 ("block, loop: support partitions without scanning")
-> adds GD_SUPPRESS_PART_SCAN for replacing part function of
-> GENHD_FL_NO_PART. But looks blk_add_partitions() is missed, since
-> loop doesn't want to add partitions if GENHD_FL_NO_PART was set.
-> And it causes regression on libblockdev (as called from udisks) which
-> operates with the LO_FLAGS_PARTSCAN.
+On 2022/9/3 21:30, Ming Lei wrote:
+> On Wed, Aug 31, 2022 at 11:54 PM ZiyangZhang
+> <ZiyangZhang@linux.alibaba.com> wrote:
+>>
+>> We change the default behavior of aborting machenism. Now monitor_work
+>> will not be manually scheduled by ublk_queue_rq() or task_work after a
+>> ubq_daemon or process is dying(PF_EXITING). The monitor work should
+>> find a dying ubq_daemon or a crash process by itself. Then, it can
 > 
-> [...]
+> Looks you don't consider one dying ubq_daemon as one crash candidate.
+> Most io implementation is done in the ubq pthread, so it should be
+> covered by the crash recovery.
+> 
+>> start the aborting machenism. We do such modification is because we want
+>> to strictly separate the STOP_DEV procedure and monitor_work. More
+>> specifically, we ensure that monitor_work must not be scheduled after
+>> we start deleting gendisk and ending(aborting) all inflight rqs. In this
+>> way we are easy to consider recovery feature and unify it into existing
+>> aborting mechanism. Really we do not want too many "if can_use_recovery"
+>> checks.
+> 
+> Frankly speaking, not sure we need to invent new wheel for the
+> 'aborting' mechanism.
+> 
+> In theory, you needn't change the current monitor work and cancel
+> dev/queue. What you need is how to handle the dying ubq daemon:
+> 
+> 1) without user recovery, delete disk if any ubq daemon is died.
+> 
+> 2) with user recovery:
+>     - quiesce request queue and wait until all inflight requests are
+> requeued(become IDLE);
+>     - call io_uring_cmd_done for any active io slot
+>     - send one kobj_uevent(KOBJ_CHANGE) to notify userspace for handling
+>       the potential crash; if it is confirmed as crash by userspace,
+>       userspace will send command to handle it.
+>     (this way will simplify userspace too, since we can add one utility
+>     and provide it via udev script for handling rec
+> 
+> Checking one flag lockless is usually not safe, also not sure why we
+> need such flag here, and the original check is supposed to work.
+> 
+> overy)
+> 
+>>
+>> With recovery feature disabled and after a ubq_daemon crash:
+>> (1) monitor_work notices the crash and schedules stop_work
+> 
+> driver can't figure out if it is crash, and it can just see if the
+> ubq deamon is died or not. And crash detection logic should be done
+> in userspace, IMO.
+> 
+>> (2) stop_work calls ublk_stop_dev()
+>> (3) In ublk_stop_dev():
+>>     (a) It sets 'force_abort', which prevents new rqs in ublk_queue_rq();
+> 
+> Please don't add new flag in fast path lockless, and the original check
+> is supposed to be reused for recovery feature.
+> 
+>>             If ublk_queue_rq() does not see it, rqs can still be ended(aborted)
+>>                 in fallback wq.
+>>         (b) Then it cancels monitor_work;
+>>         (c) Then it schedules abort_work which ends(aborts) all inflight rqs.
+>>         (d) At the same time del_gendisk() is called.
+>>         (e) Finally, we complete all ioucmds.
+>>
+>> Note: we do not change the existing behavior with reocvery disabled. Note
+>> that STOP_DEV ctrl-cmd can be processed without reagrd to monitor_work.
+>>
+>> With recovery feature enabled and after a process crash:
+>> (1) monitor_work notices the crash and all ubq_daemon are dying.
+>>     We do not consider a "single" ubq_daemon(pthread) crash. Please send
+>>         STOP_DEV ctrl-cmd which calling ublk_stop_dev() for this case.
+> 
+> Can you consider why you don't consider it as one crash? IMO, most of
+> userspace block logic is run in ubq_daemon, so it is reasonable to
+> consider it.
+> 
+> ublk_reinit_dev() is supposed to be run in standalone context, just like
+> ublk_stop_dev(), we need monitor_work to provide forward progress,
+> so don't run wait in monitor work.
+> 
+> And please don't change this model for making forward progress.
+> 
+> 
 
-Applied, thanks!
+Hi, Ming.
 
-[1/1] block: don't add partitions if GD_SUPPRESS_PART_SCAN is set
-      commit: 748008e1da926a814cc0a054c81ca614408b1b0c
+I will take your advice and provide V4 soon. Here is the new design:
 
-Best regards,
--- 
-Jens Axboe
+(0) No modification in fast patch. We just requeue rqs with a dying ubq_daemon
+    and schedule monitor_work immediately.
+    
+    BTW: I think here we should call 'blk_mq_delay_kick_requeue_list()' after
+    requeuing a rq. Otherwise del_gendisk() in ublk_stop_dev() hangs.
 
+(1) Add quiesce_work, which is scheduled by monitor_work after a ubq_daemon
+    is dying with recovery enabled.
 
+(2) quiesce_work runs ublk_quiesce_dev(). It accquires the ub lock, and
+    quiescses the request queue(only once). On each dying ubq, call
+    ublk_quiesce_queue(). It waits until all inflight rqs(ACTIVE) are
+    requeued(IDLE). Finally it completes all ioucmds.
+    Note: So We need to add a per ubq flag 'quiesced', which means
+    we have done this 'quiesce && clean' stuff on the ubq.
+
+(3) After the request queue is quiesced, change ub's state to STATE_QUIESCED.
+    This state can be checked by GET_DEV_INFO ctrl-cmd, just like STATE_LIVE. So
+    user can detect a crash by sending GET_DEV_INFO and getting STATE_QUIESCED
+    back.
+    
+    BTW, I'm unsure that sending one kobj_uevent(KOBJ_CHANGE) really helps. Users
+    have may ways to detect a dying process/pthread. For example, they can 'ps'
+    ublksrv_pid or check ub's state by GET_DEV_INFO ctrl-cmd. Anyway, this work
+    can be done in the future. We can introduce a better way to detect a crash.
+    For this patchset, let's focus on how to deal with a dying ubq_daemon.
+    Do you agree?
+
+(4) Do not change ublk_stop_dev(). BTW, ublk_stop_dev() and ublk_quiescd_dev()
+    exclude each other by accqiring ub lock.
+
+(5) ublk_stop_dev() has to consider a quiesced ubq. It should unquiesce request
+    queue(only once) if it is quiesced. There is nothing else ublk_stop_dev()
+    has to do. Inflight rqs requeued before will be aborted naturally by
+    del_gendisk().
+
+(6) ublk_quiesce_dev() cannot be run after gendisk is removed(STATE_DEAD).
+
+(7) No need to run ublk_quiesce_queue() on a 'quiesced' ubq by checking the flag.
+    Note: I think this check is safe here.
+
+(8) START_USER_RECOVERY needs to consider both a dying process and pthread(ubq_daemon).
+
+    For a dying process, it has to reset ub->dev_info.ublksrv_pid and ub->mm. This can
+    by done by passing a qid = -1 in ctrl-cmd. We should make sure all ubq_daemons
+    are dying in this case.
+    
+    otherwise it is a dying pthread. Only this ubq is reinit. Users may send many
+    START_USER_RECOVERY with different qid to recover many ubqs.
+
+ 
+Thanks for reviewing patches.
+
+Regards,
+Zhang.
