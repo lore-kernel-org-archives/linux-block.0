@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89290ECAAD5
-	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 10:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E97ECAAD3
+	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 10:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236977AbiIEKWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Sep 2022 06:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33516 "EHLO
+        id S236787AbiIEK2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Sep 2022 06:28:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237183AbiIEKVg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 06:21:36 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97912C664;
-        Mon,  5 Sep 2022 03:20:24 -0700 (PDT)
+        with ESMTP id S237632AbiIEK2j (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 06:28:39 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB4C114E;
+        Mon,  5 Sep 2022 03:28:38 -0700 (PDT)
 Received: from canpemm500002.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MLkvk3tr0zbkbJ;
-        Mon,  5 Sep 2022 18:16:50 +0800 (CST)
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MLl6N5vkTznV2y;
+        Mon,  5 Sep 2022 18:26:04 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by canpemm500002.china.huawei.com
  (7.192.104.244) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 5 Sep
- 2022 18:20:22 +0800
+ 2022 18:28:36 +0800
 From:   Miaohe Lin <linmiaohe@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <linmiaohe@huawei.com>
-Subject: [PATCH] blk-mq: remove unneeded needs_restart check
-Date:   Mon, 5 Sep 2022 18:19:50 +0800
-Message-ID: <20220905101950.4606-1-linmiaohe@huawei.com>
+Subject: [PATCH] block: remove unneeded return value of bio_check_ro()
+Date:   Mon, 5 Sep 2022 18:27:54 +0800
+Message-ID: <20220905102754.1942-1-linmiaohe@huawei.com>
 X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
@@ -40,27 +40,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If code reaches here, needs_restart must be true. Remove this unneeded
-needs_restart check. No functional change intended.
+bio_check_ro() always return false now. Remove this unneeded return value
+and cleanup the sole caller. No functional change intended.
 
 Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
 ---
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-core.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b9f6989cb5bd..be7de99622a2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1992,7 +1992,7 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
- 		if (!needs_restart ||
- 		    (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
- 			blk_mq_run_hw_queue(hctx, true);
--		else if (needs_restart && needs_resource)
-+		else if (needs_resource)
- 			blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a0d1104c5590..fe6b27e3a513 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -487,18 +487,15 @@ static int __init fail_make_request_debugfs(void)
+ late_initcall(fail_make_request_debugfs);
+ #endif /* CONFIG_FAIL_MAKE_REQUEST */
  
- 		blk_mq_update_dispatch_busy(hctx, true);
+-static inline bool bio_check_ro(struct bio *bio)
++static inline void bio_check_ro(struct bio *bio)
+ {
+ 	if (op_is_write(bio_op(bio)) && bdev_read_only(bio->bi_bdev)) {
+ 		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+-			return false;
++			return;
+ 		pr_warn("Trying to write to read-only block-device %pg\n",
+ 			bio->bi_bdev);
+ 		/* Older lvm-tools actually trigger this */
+-		return false;
+ 	}
+-
+-	return false;
+ }
+ 
+ static noinline int should_fail_bio(struct bio *bio)
+@@ -722,8 +719,7 @@ void submit_bio_noacct(struct bio *bio)
+ 
+ 	if (should_fail_bio(bio))
+ 		goto end_io;
+-	if (unlikely(bio_check_ro(bio)))
+-		goto end_io;
++	bio_check_ro(bio);
+ 	if (!bio_flagged(bio, BIO_REMAPPED)) {
+ 		if (unlikely(bio_check_eod(bio)))
+ 			goto end_io;
 -- 
 2.23.0
 
