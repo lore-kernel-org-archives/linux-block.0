@@ -2,163 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D40AECAAD3
-	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 12:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35974C54EE9
+	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 13:15:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237012AbiIEM5b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Sep 2022 08:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35732 "EHLO
+        id S237446AbiIENPh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Sep 2022 09:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236981AbiIEM53 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 08:57:29 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F37205DF
-        for <linux-block@vger.kernel.org>; Mon,  5 Sep 2022 05:57:28 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220905125717euoutp0299b23a496ae38eb8e14851186f8581f8~R_DNuWM_G0930409304euoutp02d
-        for <linux-block@vger.kernel.org>; Mon,  5 Sep 2022 12:57:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220905125717euoutp0299b23a496ae38eb8e14851186f8581f8~R_DNuWM_G0930409304euoutp02d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1662382637;
-        bh=0NOo6f/pWYXuPoQFfjEOXBVE2XC8pCS60UOPZi9RzHU=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=NN+9eXvzx0lqZ+64NZjyuQcp9cbTMwvnURrGMqQAJOLw4mJGZta+4rDN3bpUCMeLV
-         1c1uJC0Bwsodqxj30MPpsMMv7aGMcuANdoOtdk7VtJduK6Ejo8JGZNEad5/Wimjl9F
-         3/o1M2L9YH+PblB1DjmCavRP82rbafXmBnnxAYN4=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220905125712eucas1p27c789651a573fe2b0f6774b0a5c7889f~R_DI2eCzV1056610566eucas1p2j;
-        Mon,  5 Sep 2022 12:57:12 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 1D.2C.19378.722F5136; Mon,  5
-        Sep 2022 13:57:11 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220905125711eucas1p12e53a64104034b1a8dca6ada0a79cf94~R_DIcHdgG1238212382eucas1p1v;
-        Mon,  5 Sep 2022 12:57:11 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220905125711eusmtrp20c331e84f5a49de8bce1b5aa4250139d~R_DIbOf650766107661eusmtrp2u;
-        Mon,  5 Sep 2022 12:57:11 +0000 (GMT)
-X-AuditID: cbfec7f5-a35ff70000014bb2-e1-6315f2279068
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 15.CB.10862.722F5136; Mon,  5
-        Sep 2022 13:57:11 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220905125711eusmtip19aba6d939273cea0e9076ccec1896a95~R_DILN56f3006530065eusmtip1b;
-        Mon,  5 Sep 2022 12:57:11 +0000 (GMT)
-Received: from [106.110.32.100] (106.110.32.100) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Mon, 5 Sep 2022 13:57:10 +0100
-Message-ID: <67726654-2c13-2c41-c002-30dc99db8497@samsung.com>
-Date:   Mon, 5 Sep 2022 14:57:08 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-Subject: Re: [PATCH v12 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
+        with ESMTP id S236609AbiIENPX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 09:15:23 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F3B21267;
+        Mon,  5 Sep 2022 06:15:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1662383721; x=1693919721;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=czVkjIiov5bidj5X9RcXPCVHeClCSNPwBA6ExcvCCMU=;
+  b=FVU59+MoQwgiRKA9IviPuSvKqtgrG1GP0vVe37BkXmHGDFG/g1LkaHeO
+   kLfyI2Hd3hoLf+sftLPvCodPmG3qm88PMS6q82BhfFOqYDgel6WQaHbu/
+   qjDYa8hVJPwQqqUUAh2jcBmCYWw7uFWAHHLnO97OrD/FH9w65dbVJwY73
+   UZiyBk+RBzxrftaj8x1c/vAVZGum/hqNw3/UC7P3kAVj5W1WN5mEZ2K8y
+   ztqlKgSEJj2NGeWPV7Cp7fl5yOfyVcWeA3+bXUGktPxpaBYr30Scf1p4r
+   gSXsnaYtJqj3Zhh24Zktm4d0Q1H6fy0C/mq+sBP2+nr3wOnAMWn4Gu457
+   g==;
+X-IronPort-AV: E=Sophos;i="5.93,291,1654531200"; 
+   d="scan'208";a="314819068"
+Received: from mail-bn8nam12lp2169.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.169])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2022 21:15:19 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iCEFOheyHwvYKVWdkDaOdvEXI90Ch6kM29if90lVm+k0MBDKSnftV6moFWQ7x9toUtPqsyANXbZTu+DmavZ+NjnLxe11lN9tphw27ItTkQtHHQUkwYJ1Zz2iRm5lf0ugHW6tnWePavNE7u32Ej8aTZsp9gbSzXauSYLbId//fohztVjoWNcGGCZhBAASRa6hCuyoEwjyTjBz0/zuhSAoWiJsWhy2d7o6Xd+Z3dKyTSVU4Nw3/WRaudt/Z7aEoLI+lRpPWa3lIZLI4p2JIgUNTfCbET0uQklAJogR9ZmxFz4vopoouI9Z0zevhrV7aHNH9cKiy54DnlWSG9nrBfGc7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UyJMjQqlZJF+dF9gNV5Hv+wTWNp8abrclhj5fPAZdUo=;
+ b=oa46kwgtSbYIn2Ui1ZLzCxaJp7SIHpPCOdPIUMqIJf8amj22n413PvZicQoC/uEaKX1rAXAiBqj3jEIQ40fA6gP4TGnWmk3a2j7blQp/KEnBvdO33xSYtjKfwNcKTR0Yz5/1MpvdxaXixP32IkClW8w4B/CTwecLPIuIwgBkRYFyGmC1YdeRXTWwwwGNmrdOBlqc8HZzLcEVtBCaKsr+N0kPGkkhp1+/YpMZ1N/UV1jBPNAV/bZa0YlAYzWKKVpfxPMya7BqOEmAoxJjGAM7JiN5UQ5GtFwb1jeMrnEEtMLzZmkPytHVWQKVcNGjgZAHYlIthI3EYVmZpdASJAwzjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UyJMjQqlZJF+dF9gNV5Hv+wTWNp8abrclhj5fPAZdUo=;
+ b=xlATfznAbAVVtTToCb+cD4ulvIZNIesdBkpj/MaqPsbM4XTK7cY8zEINr+3LBcRGn2gwgAjdcVYa7pP/y7lCWlINmO6l3bskkkEQryflRLJzI8IKebelE8UtteC6xGom4RLzKVAJwYv62aI2fLB/biHqhKu+8f3zughRw/yIDR4=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by BN7PR04MB4083.namprd04.prod.outlook.com (2603:10b6:406:c4::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.18; Mon, 5 Sep
+ 2022 13:15:16 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::bc05:f34a:403b:745c]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::bc05:f34a:403b:745c%8]) with mapi id 15.20.5588.018; Mon, 5 Sep 2022
+ 13:15:16 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 16/17] btrfs: split zone append bios in btrfs_submit_bio
+Thread-Topic: [PATCH 16/17] btrfs: split zone append bios in btrfs_submit_bio
+Thread-Index: AQHYvdaJyAEeDCU+DUSQMj+EHyZpYA==
+Date:   Mon, 5 Sep 2022 13:15:16 +0000
+Message-ID: <PH0PR04MB74166908EB6DF6C586B5AC539B7F9@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20220901074216.1849941-1-hch@lst.de>
+ <20220901074216.1849941-17-hch@lst.de>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Mike Snitzer <snitzer@redhat.com>
-CC:     <agk@redhat.com>, <snitzer@kernel.org>, <axboe@kernel.dk>,
-        <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@wdc.com>, <bvanassche@acm.org>,
-        <pankydev8@gmail.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
-        <gost.dev@samsung.com>, <jaegeuk@kernel.org>,
-        <matias.bjorling@wdc.com>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <YxJwd7xcZRdznsYz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.110.32.100]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPKsWRmVeSWpSXmKPExsWy7djP87rqn0STDbattbRYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWqxcfZTJ4sn6WcwWf7vuAcVuaVtc3jWHzWL+sqfsFhPa
-        vjJbrLn5lMXixC1pi7aNXxkdBDwuX/H22DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we
-        7/ddZfP4vEnOo/1AN1MAVxSXTUpqTmZZapG+XQJXxpEnKxkL1vJV3Nhwnb2BcRV3FyMnh4SA
-        icSb93vZuxi5OIQEVjBK9FxcxAbhfGGU+DZrLSuE85lR4ta1uUwwLSvXvGGBSCxnlDjweSUz
-        XFXvgbNQzi5GiYfrp7GCtPAK2EmcebkYqJ2Dg0VARaL3pCREWFDi5MwnLCC2qECkxJrdZ9lB
-        bGGBbImlfcfBbGYBcYlbT+aDtYoIqErcmuYCET7ELHHhRjZImE1AS6KxE6yaE8h833OaCaJE
-        U6J1+2+oKfIS29/OYYa4X0liwrz7bBB2rcTaY2fA3pcQeMQpcWV9KyNEwkVi7co/UEXCEq+O
-        b2GHsGUk/u+cDw2IaomnN34zQzS3MEr071zPBnKQhIC1RN+ZHIgaR4n9C84zQ4T5JG68FYS4
-        h09i0rbpzBMYVWchBcQsJA/PQvLCLCQvLGBkWcUonlpanJueWmycl1quV5yYW1yal66XnJ+7
-        iRGYBk//O/51B+OKVx/1DjEycTAeYpTgYFYS4U3ZIZIsxJuSWFmVWpQfX1Sak1p8iFGag0VJ
-        nDc5c0OikEB6YklqdmpqQWoRTJaJg1Oqgalsziu3+lPvtAqrbp5f8SKMU+I5U3vIfd8odrXH
-        bOKX+HN7t5w58ILZamXZJBXbG97X9AyPbDEwPKZjG7WwzkhA/at00YOGt/ed5gsmWMyQXDhX
-        9rnggoBqt4uylZ1Nt+zd5h2YFx/W8aw2vW3WziZBTfHLnc/q+xiVSswr5d6kRkyP1Qr2CvFZ
-        um/vzgdMNkUHI64LvtNNt/BQfv1i9WEWmRPsH+aUe3VXmO1WCOdcveTCX9lHG6PvLEu7Zajw
-        Wk6w1tZub+rTo9OyOZb+eJ/yNsV5nkHu1faJjg/kmiWMO3heXPr0N/6x7qFy1RfuhicXHD1x
-        8fitKfYrt219UX5bl/P0huqy6pyjK+e9rldiKc5INNRiLipOBACZzGsn8gMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCKsWRmVeSWpSXmKPExsVy+t/xu7rqn0STDY5MlLJYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWqxcfZTJ4sn6WcwWf7vuAcVuaVtc3jWHzWL+sqfsFhPa
-        vjJbrLn5lMXixC1pi7aNXxkdBDwuX/H22DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we
-        7/ddZfP4vEnOo/1AN1MAV5SeTVF+aUmqQkZ+cYmtUrShhZGeoaWFnpGJpZ6hsXmslZGpkr6d
-        TUpqTmZZapG+XYJexpEnKxkL1vJV3Nhwnb2BcRV3FyMnh4SAicTKNW9YQGwhgaWMEpN+Z0PE
-        ZSQ+XfnIDmELS/y51sXWxcgFVPORUeLd00usEM4uRok9e+6yglTxCthJnHm5mKmLkYODRUBF
-        ovekJERYUOLkzCdgC0QFIiUeLmtiArGFBbIllvYdB1vALCAucevJfLBWEQFViVvTXEDGMwsc
-        YpZY1buZCWLXP0aJE+vmM4MUsQloSTR2gvVyApnve04zQczRlGjd/htqprzE9rdzmCEeUJKY
-        MO8+G4RdK/Hq/m7GCYyis5CcNwvJGbOQjJqFZNQCRpZVjCKppcW56bnFRnrFibnFpXnpesn5
-        uZsYgclj27GfW3Ywrnz1Ue8QIxMH4yFGCQ5mJRHelB0iyUK8KYmVValF+fFFpTmpxYcYTYFB
-        NJFZSjQ5H5i+8kriDc0MTA1NzCwNTC3NjJXEeT0LOhKFBNITS1KzU1MLUotg+pg4OKUamIQC
-        /od7nHUxdV+YvTZi47Z1XRVHtuy92nU+i5vh5z/269ei7XcsW61yTHyTyI2Li45GzKhQYcoJ
-        3fVm8hOXL2YO+3ZEPThscE+mVv5d8b6t2TI/VB5c+XVIuHv66qtHtdvv5bbKyLjoMufXek4x
-        XHrjsn3KYrODRUfUfx1VvP5B5OXpKf8qEsTtXsetZ7tU+TJ6gU3Ix+x3m7j+7z3NFdMb8P7G
-        joyjje9lv1ez79h47nyhxF2jDbGc/zK6LPovpteZfT/KusxZuWSbiR8Pb5RAsvhaMUZFU34r
-        o1TxRT9Pz5hv2qQh2LayVTplps2944v+ufVrTf6c8Oz15VxN+QX7d62InpP7wlty6lP3LfVK
-        LMUZiYZazEXFiQDE0KUFpwMAAA==
-X-CMS-MailID: 20220905125711eucas1p12e53a64104034b1a8dca6ada0a79cf94
-X-Msg-Generator: CA
-X-RootMTR: 20220823121915eucas1p10296d6a2ab00de5e73791a7d6b8e39de
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220823121915eucas1p10296d6a2ab00de5e73791a7d6b8e39de
-References: <20220823121859.163903-1-p.raghav@samsung.com>
-        <CGME20220823121915eucas1p10296d6a2ab00de5e73791a7d6b8e39de@eucas1p1.samsung.com>
-        <20220823121859.163903-14-p.raghav@samsung.com>
-        <YxJttvB2Z5I58SQ5@redhat.com> <YxJwd7xcZRdznsYz@redhat.com>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0cb0632d-b6a5-4a09-c8f3-08da8f40acc5
+x-ms-traffictypediagnostic: BN7PR04MB4083:EE_
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ZsaYgIOAP/s/8kNnB+iV59+Z1W8yPfpS3C4yGpyuY481D/gaHC52JYBxdBiiKxk/rDJ2vI2qJpoH7l9hE8LDVaAwwBfurWYcZ6ONSQJ+FKqLoW/jQTOY9yOqDockX7RviXvG6pa5JV0vnbvQd+2hWg2Vt16VUbN8bCXlx/GPK7h7yewyEE252mN6KjLOGxUCxAOaevKR+v7N10HotSo9Y24r6AM+ANxs9nQ3VCsAFWiexXfPo3qwAMLb2PhcwDZypRxK5EGbS5NJAuk1pnOgFx7SX6YnIRyC151ontldfNLHg7eX0ofVF7pI7Ttc1EdiNNCsK3f1M2tLRWwTdz6d3o39FG13iAy1o80/wf7gf/Uk5QRwHvnaWzwHRhgEwjtPwAJEiBcRwlkvBbF5CuZTsKvvKeGhV41z/PO8plb1xGNt7+VN2H+eUw2Ed4Yk3lR8eCNvQTSz3GBXsJc4Y1AGAJqARy6FMosQ589h4VwX2qbw1zFttRbFsmVyJy6jxZtyykVHA0C7qjoGrGPlizRKMy41SP/VK4VkpHqx2+xryQFivuSz9aW9XdLk4D3KFhi1UAc3/2qbE1E5JuBm+Jp7RK/pQZcHBcjft2XNZzHR23dbTavxGfe7PoIDX/aioygrOnvMaQbhlCodWB6TEj96M2Ukaz17+8YamIfbQkXnTURXczwhVcs/yAHIEWHxvdnzLQ1chyjkrlKzqYdKM2sQ7HJFfQEG9xTbrDxSGGAy2mjl+5pdC+7LFSoGocntZA1eETVHsjfH0yKn7CiaCY/0hA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(39860400002)(396003)(366004)(346002)(376002)(316002)(6506007)(53546011)(110136005)(9686003)(54906003)(7696005)(55016003)(7416002)(4744005)(38070700005)(8936002)(33656002)(5660300002)(52536014)(2906002)(478600001)(86362001)(4326008)(64756008)(82960400001)(66476007)(66446008)(8676002)(76116006)(91956017)(66556008)(66946007)(122000001)(41300700001)(71200400001)(186003)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VdE7t5aNk+wwm3hQm7aMZfOzlivcfzEuqZDwvzucSIwZJEIU+rCZtuDwXijc?=
+ =?us-ascii?Q?DpKoUOvtfa3Fbtkl8uMxBG/SP4aKTdfXk6D5ckSbkFxb64yLecp2ivxLGoJ4?=
+ =?us-ascii?Q?yVzGLy5rVigF+KkYVQhjq8482gpoxwa0AxUHdOMJdJ9PJHc+JawUb27lz8PU?=
+ =?us-ascii?Q?7sHvYz/m2NXktS4KDwa3rvt/urNGSXg6AGBGLhpIkN66Bksu7faSELf3OJ7q?=
+ =?us-ascii?Q?K18J3c/5h9CPC8nSzYpLeZTt9rD542EOpV9/GPwO9RBS5CSy21UHEkgFBXHM?=
+ =?us-ascii?Q?tnz8qCEXpqpHjbG3Hc1Xn4qd7fDUY4J4np0zf0SapWTmyIAnF/1WOXmlLm3n?=
+ =?us-ascii?Q?CQXVBB3Xw4Ttidlke0oAhynr5HuWKRY2smwEbacRAxW4dQ+TGQ4PzIfD/VuD?=
+ =?us-ascii?Q?eL6pP8pxFtxjOC4s4LfUBymAKqmnhqPl2U8Aw8kgdhaBS6zjEvbSfK6O3QCO?=
+ =?us-ascii?Q?rjHh5U+AY5H4qy0kM85zkZM/R8YsGSZVky7LVONRn6w7v9EUVV7GpIJujC81?=
+ =?us-ascii?Q?vbkr8mpmVuowx/8epow/tGmF0dpxGbovaFrfFebwSmI0IjvbxRWPPWKGbYZw?=
+ =?us-ascii?Q?o0XGxLkfm3zIUWbeaHudG6+sFvR7NkVJ8l4bqgxTbNwLr962yypGZLWtqa+n?=
+ =?us-ascii?Q?BMUDERqMn/L6EWZGxcyzTcBSP9+kAsY8oDbB0H1KqMsOxQbHE5GhdKhRneAc?=
+ =?us-ascii?Q?EpDVsbI9Ikx5hbn9Gr3vf3U6unBwIP9aY4j3yaC3NBqMU8SmhaW48SGxJOOl?=
+ =?us-ascii?Q?2YxPsn3Cr8W16Ob+zsMip4ClMnYj+AnYqgUdHQPURIzJJ+6pmoQSsPrhVgfm?=
+ =?us-ascii?Q?xfpYEwakW2WctxVazkpM5iC47tYGqgsNgxqsJdPwJS3pWj1ZTOCPDVtZoMdy?=
+ =?us-ascii?Q?q6tODKyTIhfnY3VnFeaETq0F+t1C+LX6oVePaIfapPPJhs8DnZywAKvl3/bj?=
+ =?us-ascii?Q?pC44PHsoNj3aDjefHyIh4h5cnqYnMJosE+0IfvTO0NLlTM72GwkzHc33Ouxy?=
+ =?us-ascii?Q?iuaRypFGWUQUDfR5TuvtlUDqv19Q6Yj57tp0oZHKVdDUKxkLigkJXH/flZnX?=
+ =?us-ascii?Q?w8qaUxFGm3zSNpIf20u8P1EA/r46sEqWDISfCGrLnAKQtPj6yNzjSkN5xJsO?=
+ =?us-ascii?Q?kPgECX4kKRiO8EYSa8zg88CNs3ytEJBtfgYxNhs3GZxnjzTJC46/3ogXijdE?=
+ =?us-ascii?Q?xJjf4Yd2heoThuwoGPlZTp56YGljgzEbltlxeyRMMKH7VG9Rgv8OHDCnE4NX?=
+ =?us-ascii?Q?bq4Lphf3ox6fQGednVLuwgmD+hgt/dLYzF/ylpvqGb67C4UVX5bTi3xpbMs4?=
+ =?us-ascii?Q?j81+fUgUQwlQtwzK+8vI0VUg1z4/E5RwC4ylFt53C/sWRyxZ0t1b6zV4MHwK?=
+ =?us-ascii?Q?z+DqLoK/QHOYsiRv2lZgRL0OLzZuuDK31lNokQylJ/2Th9+7799Wfoyv9tDA?=
+ =?us-ascii?Q?5d+wUQytjqIOGceBWxfbp/OrBYgApxVtaHepAvGjlpkiWbl+0EvgUK9+TbHI?=
+ =?us-ascii?Q?1svqUbMjk0gC4UqXr4SfFvrCDxpN0dCYk5hscUH4fJ7VpjyP7NWlA64k9zjo?=
+ =?us-ascii?Q?Fo/z511BFhrokNLllzdL9QdYLW1YYd5gV+VrLiiU90UX4F6oGqk6c31xoxKo?=
+ =?us-ascii?Q?WtWFZrIy/cWrIBasyxCyXKX1UKX4sBtxhI2IH5Eu70nGo010VHL+56bF8jR+?=
+ =?us-ascii?Q?+tqBLLOpPojQ6xAGrUCBa25HmpA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cb0632d-b6a5-4a09-c8f3-08da8f40acc5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2022 13:15:16.5043
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PPDpYtUbW+ozmLZSaKM6mxIE7a++P+TTgfCIooqCpAKA9zMNcs3QmFzc7/5tC5Lv091KDxboscqPBlBe3Ka2qROOvgr1TSZntv4X0Gftld8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR04MB4083
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->>
->> 1) why is a partial mapping of the underlying device disallowed?
->> 2) why is it assumed all IO is read-only? (talk to me and others like
->>    we don't know the inherent limitations of this class of zoned hw)
->>
->> On a code level:
->> 1) are you certain you're properly failing all writes?
->>    - are writes allowed to the "zone capacity area" but _not_
->>      allowed to the "emulated zone area"? (if yes, _please document_). 
->> 2) yes, you absolutely need to implement the .status target_type hook
->>    (for both STATUS and TABLE).
->> 3) really not loving the nested return (of DM_MAPIO_SUBMITTED or
->>    DM_MAPIO_REMAPPED) from methods called from dm_po2z_map().  Would
->>    prefer to not have to do a depth-first search to see where and when
->>    dm_po2z_map() returns a DM_MAPIO_XXX unless there is a solid
->>    justification for it.  To me it just obfuscates the DM interface a
->>    bit too much. 
->>
->> Otherwise, pretty clean code and nothing weird going on.
->>
->> I look forward to seeing your next (final?) revision of this patchset.
-> 
-> Thinking further.. I'm left confused about just what the heck this
-> target is assuming.
-> 
-> E.g.: feels like its exposing a readonly end of the zone is very
-> bi-polar... yet no hint to upper layer it shouldn't write to that
-> read-only end (the "emulated zone").. but there has to be some zoned
-> magic assumed?  And I'm just naive?
-> 
-
-You are absolutely right about "zoned magic". Applications that use a zoned
-block device are aware of the zone capacity and zone size. BLKREPORTZONE
-ioctl is typically used to get the zone information from a zoned block device.
-
-This target adjusts the zone report so that zone size and zone capacity are
-modified correctly (see dm_po2z_report_zones() and
-dm_po2z_report_zones_cb() functions).
+On 01.09.22 09:43, Christoph Hellwig wrote:=0A=
+> -		if (btrfs_dev_is_sequential(dev, physical)) {=0A=
+> -			u64 zone_start =3D round_down(physical,=0A=
+> -						    dev->fs_info->zone_size);=0A=
+> -=0A=
+> -			bio->bi_iter.bi_sector =3D zone_start >> SECTOR_SHIFT;=0A=
+> -		} else {=0A=
+> -			bio->bi_opf &=3D ~REQ_OP_ZONE_APPEND;=0A=
+> -			bio->bi_opf |=3D REQ_OP_WRITE;=0A=
+> -		}=0A=
+> +		ASSERT(btrfs_dev_is_sequential(dev, physical));=0A=
+> +		bio->bi_iter.bi_sector =3D zone_start >> SECTOR_SHIFT;=0A=
+=0A=
+That ASSERT() will trigger on conventional zones, won't it?=0A=
