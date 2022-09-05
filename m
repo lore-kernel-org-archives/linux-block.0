@@ -2,137 +2,250 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C66ECAAA1
-	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 03:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5EFECAAA1
+	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 06:03:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235420AbiIEDyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Sep 2022 23:54:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50230 "EHLO
+        id S231909AbiIEGDY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Sep 2022 02:03:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235843AbiIEDyd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 4 Sep 2022 23:54:33 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55AF260EF
-        for <linux-block@vger.kernel.org>; Sun,  4 Sep 2022 20:54:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1662350071; x=1693886071;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=CgWI7pXo/iFPZ6k4JkJ0VyK0XDakMC57Y0/q2O6Q7+Y=;
-  b=k5pkypB0QzL5wpOf8CJ+WmJly0LsVX3f/nBTzabjowCbMg0sch5eSeht
-   /NTCabMQRzu/7SaRCbewv7UrFqXqcAJKL9oWJEhPHJjFJhLXCrMmY2MV0
-   JfZUwYlQPlLQmC3U8IgZS5yq7DaeDemrk6CAPIxhqjPFVrbHNr7lKvZT9
-   TWUZuyLkFms78GjhBbfiahULc+kJ7xU6QVD2Fk+q8x66D6ar3LEbXvKja
-   1ddXN53KOlQZ5Zi98cBG+TjDZRr2kp8waTq9gBi4jUJcbkwYBBpCbrgTA
-   d/rLe9ZwbnI5pMXzbls6MoijraJCwH9F2x9MRrIrSVMj0mTTmTdrpkYUX
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.93,290,1654531200"; 
-   d="scan'208";a="210977850"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Sep 2022 11:54:22 +0800
-IronPort-SDR: Kl+27hp8dYm56cJulUK3a0kelgvewVoHTrMzPtBlGeMC6sNtdjVpJMpjvUgWjOVh5zrwLd5kaz
- nPURMJNTmSLsZSfIslRGtUB/tHFIQXWncCiC9ApJkWZzvgwuW6R4RdIlGPAQgUrjVip3fPb3PS
- 6FmoWBIvBjqDJuiNHq7VpQ4Hro/NeV3TyEf6D4q/UTuJFoZZzWFKU9lFf/3SVM0RphjhgQfn6Y
- gdmbhcC/ikPb9QLNhr6wa7VZ/HkigSERZK8iZooTTCLg1hzaUypRANoq6lX/VjJ3b3jSIem6On
- qGzg/QyZLNEs8y77PYsO4rXd
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2022 20:14:47 -0700
-IronPort-SDR: 2yIYA+c+bbWJlgOwFXUqTyWBuCC/JYv6rOk3o4RacMnAxsQfmUnToh/+/g+AFJbLCIIWUmDzZX
- Py/qRBQUdKiVFY4/WTSplj5/yeMiJQnLJ+MXay/ea9JtyevvdLBby48i1WAwvzeDBRcgzWVBEz
- rQl/yRi2hip95WMW/lYF2zuYxIdc20kuyoz5HnMsXW4RqcAge72Fc5IM3iB5xERdsKM5PWrKBX
- gF9KXq7RT3yKPEcbOlCWtBnITajL/CsPyhAnijAN75UcuZufHaq8WCA2XGafwE5TOhuFR4mvOL
- EoA=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2022 20:54:22 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MLZQQ2Y8pz1Rwrq
-        for <linux-block@vger.kernel.org>; Sun,  4 Sep 2022 20:54:22 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1662350061; x=1664942062; bh=CgWI7pXo/iFPZ6k4JkJ0VyK0XDakMC57Y0/
-        q2O6Q7+Y=; b=an25YydaQGwwCDDtb0A16UCvnEVVBD1BNr2csbHOZCAfNePowTA
-        2FuyJqosaLx0vu89m8BiXWrQFi3eXYLe0n8FHTvegKd492Efkg36bV0B8znkHTCT
-        cm1c8P2QCSA7Q4+udePuHFYg8bJ2bO+WhAfPiD/QJvt2mfPVJ2j41gJuWfoaB4sD
-        AuKiV/ckIXpBDG2NSyzRUcP5Hd2u085BNQNZph5AIV7E6jaGMLad4KiFlnClaPGb
-        lSvpecyUpyMi7VkH5nw9A3XXTVGS/X6g1nMqmAv2tlT4srwX/6pWYs+HyNK6EKh3
-        CyRvQBah66e5r6Q31FUJ4yCCm/mdIDOjutA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id OOcxGbU5RJ0o for <linux-block@vger.kernel.org>;
-        Sun,  4 Sep 2022 20:54:21 -0700 (PDT)
-Received: from [10.225.163.60] (unknown [10.225.163.60])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MLZQN5P4nz1RvLy;
-        Sun,  4 Sep 2022 20:54:20 -0700 (PDT)
-Message-ID: <ea747f8e-257c-a4f6-6dce-5ea26de4083f@opensource.wdc.com>
-Date:   Mon, 5 Sep 2022 12:54:19 +0900
+        with ESMTP id S236391AbiIEGC6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 02:02:58 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A449A240BA
+        for <linux-block@vger.kernel.org>; Sun,  4 Sep 2022 23:02:07 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20220905060203epoutp04ee1aba78b8f15189586d605c868a7c5a~R4YqrAlU01255612556epoutp04L
+        for <linux-block@vger.kernel.org>; Mon,  5 Sep 2022 06:02:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20220905060203epoutp04ee1aba78b8f15189586d605c868a7c5a~R4YqrAlU01255612556epoutp04L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662357723;
+        bh=Uf3dhMGModSRR0bvHGNauCIcf1H2H99Qaa3T3nL9ivc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=LIq2nsbB6CsW2m/143BQiiglDeEfwzoIUDRtLAYBo6kmZnVX2lzxXxiEkSnwqPjR5
+         c5//Xy28Qqq8FVIftzzug5RduFCwU88xskC8Da3gCdDXtqAM95sT3dIkM6IaV40/sa
+         ZAf+PQI0YsyzXui1cfuJ9zLew44zTw/32LVQPcX8=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20220905060202epcas5p2649a3ac7e256bb83dc21071f4f0540c0~R4YqIxah23121031210epcas5p2k;
+        Mon,  5 Sep 2022 06:02:02 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4MLdFf3Rlqz4x9QH; Mon,  5 Sep
+        2022 06:01:58 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        52.3D.54060.2D095136; Mon,  5 Sep 2022 15:01:54 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20220905060154epcas5p392129e8fc4b020f61add67a01150997d~R4Yii-FcJ2814528145epcas5p3l;
+        Mon,  5 Sep 2022 06:01:54 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220905060154epsmtrp26c0f1471daaace44a1715fc64013e13c~R4YiiDix81777817778epsmtrp2B;
+        Mon,  5 Sep 2022 06:01:54 +0000 (GMT)
+X-AuditID: b6c32a4b-e33fb7000000d32c-e9-631590d222d6
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        FA.4A.14392.2D095136; Mon,  5 Sep 2022 15:01:54 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220905060153epsmtip1e31feaf0b8127d20b5ce62469215d1f6~R4YhQr75U1936619366epsmtip1d;
+        Mon,  5 Sep 2022 06:01:52 +0000 (GMT)
+Date:   Mon, 5 Sep 2022 11:22:09 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH for-next v3 0/4] fixed-buffer for uring-cmd/passthrough
+Message-ID: <20220905055209.GA26487@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] block/blk-map: Remove set but unused variable 'added'
-Content-Language: en-US
-To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Abaci Robot <abaci@linux.alibaba.com>
-References: <20220905022553.77178-1-jiapeng.chong@linux.alibaba.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220905022553.77178-1-jiapeng.chong@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <7c0fced8-11b0-fcd9-ac47-662af979b207@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGJsWRmVeSWpSXmKPExsWy7bCmlu6lCaLJBguOGVrMWbWN0WL13X42
+        i5sHdjJZrFx9lMniXes5FotJh64xWuy9pW0xf9lTdgcOj52z7rJ7XD5b6rFpVSebx+Yl9R67
+        bzawefRtWcXo8XmTXAB7VLZNRmpiSmqRQmpecn5KZl66rZJ3cLxzvKmZgaGuoaWFuZJCXmJu
+        qq2Si0+ArltmDtBJSgpliTmlQKGAxOJiJX07m6L80pJUhYz84hJbpdSClJwCkwK94sTc4tK8
+        dL281BIrQwMDI1OgwoTsjEknXrAXzFeq2LBfvYHxkHQXIweHhICJxJo+/y5GLg4hgd2MEmdn
+        fGCFcD4xSuz4+oK9i5ETyPnGKLFpeQKIDdLQ+ruNDSK+l1HizBJ5iIZnjBJ7pn9jAkmwCKhI
+        XNqzjglkA5uApsSFyaUgYREBBYme3yvBepkFVjFKTPklDWILC3hLNPU9YAYp5xXQlWjukAMJ
+        8woISpyc+YQFxOYUsJW4sm8KWKuogLLEgW3HmUDWSghM5JC48PM4E8RtLhJ7535kg7CFJV4d
+        38IOYUtJfH63FyqeLHFp5jmo+hKJx3sOQtn2Eq2n+pkhbsuQOHP3JNSdfBK9v58wQQKLV6Kj
+        TQiiXFHi3qSnrBC2uMTDGUugbA+JI/2zWCBB0soisXpeE8sERrlZSP6ZhWQFhG0l0fmhiXUW
+        0ApmAWmJ5f84IExNifW79Bcwsq5ilEwtKM5NTy02LTDOSy2Hx29yfu4mRnAC1fLewfjowQe9
+        Q4xMHIyHGCU4mJVEeFN2iCQL8aYkVlalFuXHF5XmpBYfYjQFxs5EZinR5HxgCs8riTc0sTQw
+        MTMzM7E0NjNUEuedos2YLCSQnliSmp2aWpBaBNPHxMEp1cC0ZPdfHrlZBlvXWuzMSskv0Imd
+        vkbqbbnrnQPRRbEl2vKci60VM6oTl7PfN/8kHBV93P19dP3L5K8XHJsLd7m3TWiPSwy5PuNr
+        832hi0cWndN5tubsfc/ex6mrKxonvZrzYi5n+M89fye4FSQ9fDfl5yvVTJXTE3MvcRx/eldP
+        a3dKyXyGG0un7Is+UMj18+jb9x+OKCTcif7EveujY7aW+62VGd/sbnl/29T/raQwlc3pW8gC
+        lyDxkBrR6JO59lqdPyNk8xRFc/vnfEs/VabjJnnjgVmjX4TT96yLz9hr2z+pOzx7p2ucmvop
+        bath1fSDBly/9Fj293UemDGz/0v+216hO+/WSBrVS95h3XZZiaU4I9FQi7moOBEAEcOs2SkE
+        AAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGLMWRmVeSWpSXmKPExsWy7bCSnO6lCaLJBr+XiljMWbWN0WL13X42
+        i5sHdjJZrFx9lMniXes5FotJh64xWuy9pW0xf9lTdgcOj52z7rJ7XD5b6rFpVSebx+Yl9R67
+        bzawefRtWcXo8XmTXAB7FJdNSmpOZllqkb5dAlfG4uMuBeflK5pW/WJpYOyT7GLk5JAQMJFo
+        /d3G1sXIxSEksJtRYsODeUwQCXGJ5ms/2CFsYYmV/56zQxQ9YZS4v/QvM0iCRUBF4tKedUAN
+        HBxsApoSFyaXgoRFBBQken6vZAOxmQVWMUpM+SUNYgsLeEs09T1gBinnFdCVaO6QAwkLCbSy
+        SBw9lQli8woISpyc+YQFotVMYt7mh2DlzALSEsv/cYCEOQVsJa7smwI2XVRAWeLAtuNMExgF
+        ZyHpnoWkexZC9wJG5lWMkqkFxbnpucWGBYZ5qeV6xYm5xaV56XrJ+bmbGMFRoaW5g3H7qg96
+        hxiZOBgPMUpwMCuJ8KbsEEkW4k1JrKxKLcqPLyrNSS0+xCjNwaIkznuh62S8kEB6Yklqdmpq
+        QWoRTJaJg1Oqgelc/8VL6+TPL1oRF8W94sKXipYpojP1+H4wV6aEKTTssp68V/Nq0I/KoM4z
+        SdpWFyIUo0OvWfI5nFvzsn/u34q7y30WuXw78HzHV74vhxskv1ywkhW7edl91iFp+TnvrT7Z
+        Fb3gf6fuknD21a+cU493FPzMnumVprp6xsN3J97XMZ1ObhLt6NwyqUfy+9vVQqIn3x7bxbf/
+        2KGsXTKzrToeagSVvlj/5a7P2gNfz0zKm/VSXjvbPeJbmOHngp0brdNLt17ZbBboNOOjW/3S
+        OC/FxCOnQ1gOcU4/uvS6dOE16YRJmeqZxYH2Fs8rUjPs11pdTH635ZKt3JvqSv/lB6OlLhhI
+        6HnJrf1wvX/bkSI+JZbijERDLeai4kQAidHSrPkCAAA=
+X-CMS-MailID: 20220905060154epcas5p392129e8fc4b020f61add67a01150997d
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----W1bEPTvsorsTcy9-0QGogbD0KLvGmowfrJUeCoG.R5S2F01G=_dd767_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf
+References: <CGME20220902152701epcas5p1d4aca8eebc90fb96ac7ed5a8270816cf@epcas5p1.samsung.com>
+        <20220902151657.10766-1-joshi.k@samsung.com>
+        <f1e8a7fa-a1f8-c60a-c365-b2164421f98d@kernel.dk>
+        <2b4a935c-a6b1-6e42-ceca-35a8f09d8f46@kernel.dk>
+        <20220902184608.GA6902@test-zns>
+        <48856ca4-5158-154e-a1f5-124aadc9780f@kernel.dk>
+        <c62c977d-9e81-c84c-e17c-e057295c071e@kernel.dk>
+        <75c6c9ea-a5b4-1ef5-7ff1-10735fac743e@kernel.dk>
+        <20220904170124.GC10536@test-zns>
+        <7c0fced8-11b0-fcd9-ac47-662af979b207@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/5/22 11:25, Jiapeng Chong wrote:
-> The variable added is not effectively used in the function, so delete
-> it.
-> 
-> block/blk-map.c:273:16: warning: variable 'added' set but not used.
-> 
-> Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=2049
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-> ---
->  block/blk-map.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-map.c b/block/blk-map.c
-> index 2fbe298d3822..a06919822a73 100644
-> --- a/block/blk-map.c
-> +++ b/block/blk-map.c
-> @@ -270,7 +270,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->  	while (iov_iter_count(iter)) {
->  		struct page **pages, *stack_pages[UIO_FASTIOV];
->  		ssize_t bytes;
-> -		size_t offs, added = 0;
-> +		size_t offs = 0;
+------W1bEPTvsorsTcy9-0QGogbD0KLvGmowfrJUeCoG.R5S2F01G=_dd767_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-offs is initialized with the call to iov_iter_get_pages_alloc2() so I do
-not think it needs to be initialized to 0 here, unless you have a compiler
-or sparse warning. If that is the case, this should be mentioned in the
-commit message too.
+On Sun, Sep 04, 2022 at 02:17:33PM -0600, Jens Axboe wrote:
+>On 9/4/22 11:01 AM, Kanchan Joshi wrote:
+>> On Sat, Sep 03, 2022 at 11:00:43AM -0600, Jens Axboe wrote:
+>>> On 9/2/22 3:25 PM, Jens Axboe wrote:
+>>>> On 9/2/22 1:32 PM, Jens Axboe wrote:
+>>>>> On 9/2/22 12:46 PM, Kanchan Joshi wrote:
+>>>>>> On Fri, Sep 02, 2022 at 10:32:16AM -0600, Jens Axboe wrote:
+>>>>>>> On 9/2/22 10:06 AM, Jens Axboe wrote:
+>>>>>>>> On 9/2/22 9:16 AM, Kanchan Joshi wrote:
+>>>>>>>>> Hi,
+>>>>>>>>>
+>>>>>>>>> Currently uring-cmd lacks the ability to leverage the pre-registered
+>>>>>>>>> buffers. This series adds the support in uring-cmd, and plumbs
+>>>>>>>>> nvme passthrough to work with it.
+>>>>>>>>>
+>>>>>>>>> Using registered-buffers showed peak-perf hike from 1.85M to 2.17M IOPS
+>>>>>>>>> in my setup.
+>>>>>>>>>
+>>>>>>>>> Without fixedbufs
+>>>>>>>>> *****************
+>>>>>>>>> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
+>>>>>>>>> submitter=0, tid=5256, file=/dev/ng0n1, node=-1
+>>>>>>>>> polled=0, fixedbufs=0/0, register_files=1, buffered=1, QD=128
+>>>>>>>>> Engine=io_uring, sq_ring=128, cq_ring=128
+>>>>>>>>> IOPS=1.85M, BW=904MiB/s, IOS/call=32/31
+>>>>>>>>> IOPS=1.85M, BW=903MiB/s, IOS/call=32/32
+>>>>>>>>> IOPS=1.85M, BW=902MiB/s, IOS/call=32/32
+>>>>>>>>> ^CExiting on signal
+>>>>>>>>> Maximum IOPS=1.85M
+>>>>>>>>
+>>>>>>>> With the poll support queued up, I ran this one as well. tldr is:
+>>>>>>>>
+>>>>>>>> bdev (non pt)??? 122M IOPS
+>>>>>>>> irq driven??? 51-52M IOPS
+>>>>>>>> polled??????? 71M IOPS
+>>>>>>>> polled+fixed??? 78M IOPS
+>>>
+>>> Followup on this, since t/io_uring didn't correctly detect NUMA nodes
+>>> for passthrough.
+>>>
+>>> With the current tree and the patchset I just sent for iopoll and the
+>>> caching fix that's in the block tree, here's the final score:
+>>>
+>>> polled+fixed passthrough??? 105M IOPS
+>>>
+>>> which is getting pretty close to the bdev polled fixed path as well.
+>>> I think that is starting to look pretty good!
+>> Great! In my setup (single disk/numa-node), current kernel shows-
+>>
+>> Block MIOPS
+>> ***********
+>> command:t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -P1 -n1 /dev/nvme0n1
+>> plain: 1.52
+>> plain+fb: 1.77
+>> plain+poll: 2.23
+>> plain+fb+poll: 2.61
+>>
+>> Passthru MIOPS
+>> **************
+>> command:t/io_uring -b512 -d128 -c32 -s32 -p0 -F1 -B0 -O0 -P1 -u1 -n1 /dev/ng0n1
+>> plain: 1.78
+>> plain+fb: 2.08
+>> plain+poll: 2.21
+>> plain+fb+poll: 2.69
+>
+>Interesting, here's what I have:
+>
+>Block MIOPS
+>============
+>plain: 2.90
+>plain+fb: 3.0
+>plain+poll: 4.04
+>plain+fb+poll: 5.09	
+>
+>Passthru MIPS
+>=============
+>plain: 2.37
+>plain+fb: 2.84
+>plain+poll: 3.65
+>plain+fb+poll: 4.93
+>
+>This is a gen2 optane
+same. Do you see same 'FW rev' as below?
 
->  		int npages;
->  
->  		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
-> @@ -306,7 +306,6 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->  					break;
->  				}
->  
-> -				added += n;
->  				bytes -= n;
->  				offs = 0;
->  			}
+# nvme list
+Node                  SN                   Model                                    Namespace Usage                      Format           FW Rev
+--------------------- -------------------- ---------------------------------------- --------- -------------------------- ---------------- --------
+/dev/nvme0n1          PHAL11730018400AGN   INTEL SSDPF21Q400GB                      1         400.09  GB / 400.09  GB    512   B +  0 B   L0310200
 
--- 
-Damien Le Moal
-Western Digital Research
 
+>, it maxes out at right around 5.1M IOPS. Note that
+>I have disabled iostats and merges generally in my runs:
+>
+>echo 0 > /sys/block/nvme0n1/queue/iostats
+>echo 2 > /sys/block/nvme0n1/queue/nomerges
+>
+>which will impact block more than passthru obviously, particularly
+>the nomerges. iostats should have a similar impact on both of them (but
+>I haven't tested either of those without those disabled).
+
+bit improvment after disabling, but for all entries.
+
+block
+=====
+plain: 1.6
+plain+FB: 1.91
+plain+poll: 2.36
+plain+FB+poll: 2.85
+
+passthru
+========
+plain: 1.9
+plain+FB: 2.2
+plain+poll: 2.4
+plain+FB+poll: 2.9
+
+Maybe there is something about my kernel-config that prevents from
+reaching to expected peak (i.e. 5.1M). Will check more.
+
+
+
+
+
+------W1bEPTvsorsTcy9-0QGogbD0KLvGmowfrJUeCoG.R5S2F01G=_dd767_
+Content-Type: text/plain; charset="utf-8"
+
+
+------W1bEPTvsorsTcy9-0QGogbD0KLvGmowfrJUeCoG.R5S2F01G=_dd767_--
