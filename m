@@ -2,73 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A75D7ECAAD5
-	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 06:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1084ECAAD5
+	for <linux-block@archiver.kernel.org>; Mon,  5 Sep 2022 06:44:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236731AbiIEGes (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Sep 2022 02:34:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
+        id S235710AbiIEGon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Sep 2022 02:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236672AbiIEGeT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 02:34:19 -0400
-Received: from out199-2.us.a.mail.aliyun.com (out199-2.us.a.mail.aliyun.com [47.90.199.2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C6993CBDE;
-        Sun,  4 Sep 2022 23:33:48 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VOMk2nI_1662359576;
-Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0VOMk2nI_1662359576)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Sep 2022 14:33:11 +0800
-From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH v2] block/blk-map: Remove set but unused variable 'added'
-Date:   Mon,  5 Sep 2022 14:32:53 +0800
-Message-Id: <20220905063253.120082-1-jiapeng.chong@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+        with ESMTP id S236301AbiIEGoi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 02:44:38 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C19F65;
+        Sun,  4 Sep 2022 23:44:36 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1AB6868AFE; Mon,  5 Sep 2022 08:44:32 +0200 (CEST)
+Date:   Mon, 5 Sep 2022 08:44:31 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 01/17] block: export bio_split_rw
+Message-ID: <20220905064431.GC2092@lst.de>
+References: <20220901074216.1849941-1-hch@lst.de> <20220901074216.1849941-2-hch@lst.de> <de16bd58-3f14-01d9-9de5-6a79792c62c7@gmx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <de16bd58-3f14-01d9-9de5-6a79792c62c7@gmx.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The variable added is not effectively used in the function, so delete
-it.
+On Thu, Sep 01, 2022 at 04:54:32PM +0800, Qu Wenruo wrote:
+> I found the queue_limits structure pretty scary, while we only have very
+> limited members used in this case:
+>
+> - lim->virt_boundary_mask
+>   Used in bvec_gap_to_prev()
+>
+> - lim->max_segments
+>
+> - lim->seg_boundary_mask
+> - lim->max_segment_size
+>   Used in bvec_split_segs()
+>
+> - lim->logical_block_size
+>
+> Not familiar with block layer, thus I'm wondering do btrfs really need a
+> full queue_limits structure to call bio_split_rw().
 
-block/blk-map.c:273:16: warning: variable 'added' set but not used.
+Well, the queue limits is what the block layer uses for communicating
+the I/O size limitations, and thus both bio_split_rw and the stacking
+layer helpers operate on it. 
 
-Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=2049
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
----
-Changes in v2:
-  -Remove offs initialization.
+> Or can we have a simplified wrapper?
 
- block/blk-map.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I don't think we can simplify anything here.  The alternative would
+be to open code the I/O path logic, which means a lot more code that
+needs to be maintained and has a high probability to get out of sync
+with the block layer logic.  So I'd much rather share this code
+between everything that stacks block devices, be that to represent
+another block device on the top like dm/md or for a 'direct' stacking
+in the file system like btrfs does.
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 2fbe298d3822..8d1e84b04b4a 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -270,7 +270,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 	while (iov_iter_count(iter)) {
- 		struct page **pages, *stack_pages[UIO_FASTIOV];
- 		ssize_t bytes;
--		size_t offs, added = 0;
-+		size_t offs;
- 		int npages;
- 
- 		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
-@@ -306,7 +306,6 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 					break;
- 				}
- 
--				added += n;
- 				bytes -= n;
- 				offs = 0;
- 			}
--- 
-2.20.1.7.g153144c
+> IIRC inside btrfs we only need two cases for bio split:
+>
+> - Split for stripe boundary
+>
+> - Split for OE/zoned boundary
 
+No.  For zoned devices we all limitations for bio, basically all that
+you mentioned above.
