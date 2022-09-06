@@ -2,205 +2,237 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C7AC6FA86
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 01:04:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DADECAAA1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 01:12:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231436AbiIFBEG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Sep 2022 21:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37950 "EHLO
+        id S229735AbiIFBMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Sep 2022 21:12:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiIFBEE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 21:04:04 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2046.outbound.protection.outlook.com [40.107.244.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7977549B4F;
-        Mon,  5 Sep 2022 18:04:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TI8TUschPIFEMe9fUKY9kOLyo9auw7hNlMxPEKHfFN9SExzf77frwmwmcKyZILdBMw4ih+SH42jF69N73lpDXrdnSP/fkHNm9AyJux2JLubULatnXCLc+54D41w5TUXEz0M5fnMHKavT8OYBYDqiDLmhNmEIcMXa1Kefyv4jSRI064A6XFo68kKpEhtVVUwuyV+hnN+FjNi6MB1Lk3LL2zzUlONmTWZ/TJlRZJxyvQwepeLxRHwt7JH4ubLKaT+sKNoR3iZFE8PRfUPvv44kXxz56IyAx8rXhhPXnYjrLsKBvGfNrXDFcBQkyImetH5Q7E1ZSfbLSdnYNkohLYE/7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AbBTW9MS9VdIwR+ThmDyqpbVrU068CfturVqUnEnUF4=;
- b=Cux43ljrXniBaQzsc0SsotWOJaNFhOayMA+0HdW63pvt3xdT+W1S8dluJuxA5Wk/Zr+/sMvmVkyyLcpD/G1InS8XUKc8adpxzvmo8X2AH5jw24Ng2+R4spzdEL9NwLeVD52Hk693/lQBxjFqxHRkch7tVnk1gJwC5P1wOGAwkPM2wx22tvkuJ2dBjReb5L0gBcE5pE4zQWO/fAsYcQiUNlyOeK7nULPXrQJLxcIytey1Tt+7MJwOpm2L8AANMQkFTwTKePyiyNotPRMYeDPaSkv+9MgSZOFAKQw75wWHWJ4SB9K4SD0ITTh9IvROF1Phqv1stbl3GAtvkp/PsrFy5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AbBTW9MS9VdIwR+ThmDyqpbVrU068CfturVqUnEnUF4=;
- b=lDYPaFjUJ94CSbmxsazei/7KvIgvzcVN8PbHrbW7mCvo5n5f61tSPMxDbBmr2YvCWRHSbsY2BxE6wNCuH8KI6X1edgOtjCivXADrhIQZRc6SKYYBqtDDHpMOEzgIJcuoWkn3lVm5j27AF7JkctIED/aOg7/LV3SJ4sqG5gZ+E1JBeiPdRUpmosGGy1q6kXzO4MGx2xXAME2X7EAGRVeZGGvjL4j4XlGDjiB6u4i0To4nBcduhbnCPNA4Ra0hlF4ZpaUVZm1cY+e0fXJUmKL/ILXdRO9Ed5lGVwFi/meIXpnd9q2ySuBFM/c964jUrWANlKncl/2oRXb/tD5SjCNLJg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com (2603:10b6:a03:20b::16)
- by MW4PR12MB6732.namprd12.prod.outlook.com (2603:10b6:303:1ea::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.14; Tue, 6 Sep
- 2022 01:04:02 +0000
-Received: from BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::508d:221c:9c9e:e1a5]) by BY5PR12MB4130.namprd12.prod.outlook.com
- ([fe80::508d:221c:9c9e:e1a5%9]) with mapi id 15.20.5588.018; Tue, 6 Sep 2022
- 01:04:02 +0000
-Message-ID: <082bfb32-be2a-0fc4-6818-2730e904c000@nvidia.com>
-Date:   Mon, 5 Sep 2022 18:03:59 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH v9 8/8] ABI: sysfs-bus-pci: add documentation for p2pmem
- allocate
-Content-Language: en-US
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20220825152425.6296-1-logang@deltatee.com>
- <20220825152425.6296-9-logang@deltatee.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-In-Reply-To: <20220825152425.6296-9-logang@deltatee.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0023.namprd03.prod.outlook.com
- (2603:10b6:a03:33a::28) To BY5PR12MB4130.namprd12.prod.outlook.com
- (2603:10b6:a03:20b::16)
+        with ESMTP id S229531AbiIFBMX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Sep 2022 21:12:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 663FE5F218
+        for <linux-block@vger.kernel.org>; Mon,  5 Sep 2022 18:12:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662426741;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/ApCnciwJ1mb5up7ml58pgOir0AUmZsOdBdtbsuYeq8=;
+        b=czmJOB1JpA8WuAEOD6ejn/0d0oq170wNC6+L2HFRS4sEFYa6/8ZX2HAI9ld0AO8M9zIuOG
+        81IU/j0sa9YuxSgH/ulYQ7gpyuDr+sT4yTYAHG7p8zRpiK2kwnJ3Q19+p7BBDjfs4MCbKy
+        OCz11tLbIViZlY2ii30NXKL5IFXtVlI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-244-yHYLvRvMOrKbakOxPbp9rg-1; Mon, 05 Sep 2022 21:12:19 -0400
+X-MC-Unique: yHYLvRvMOrKbakOxPbp9rg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 427B28037AA;
+        Tue,  6 Sep 2022 01:12:19 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DF9C40D296C;
+        Tue,  6 Sep 2022 01:12:12 +0000 (UTC)
+Date:   Tue, 6 Sep 2022 09:12:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, ming.lei@redhat.com
+Subject: Re: [RFC PATCH V2 5/6] ublk_drv: consider recovery feature in
+ aborting mechanism
+Message-ID: <YxaeZ1Ap4IxaKSlL@T590>
+References: <20220831155136.23434-1-ZiyangZhang@linux.alibaba.com>
+ <20220831155136.23434-6-ZiyangZhang@linux.alibaba.com>
+ <CAFj5m9J2vrqh0U11iVtxdDUPcxDWRPA0K+14e9Si61QGySRq8w@mail.gmail.com>
+ <8984c9be-6ef0-95c7-ec02-e1213f3d45a1@linux.alibaba.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 967079d0-7870-4ad5-e8dc-08da8fa3afd5
-X-MS-TrafficTypeDiagnostic: MW4PR12MB6732:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SY5SZlTl1vPPCQ3SO4Nj8Gx4zLhqiQ9BBc35lhVZOJuG4/cWq2qS0+dDMU3cz+4n0Dw75jB1hEyuH49Q/dNpQBQGTOXcRSULM0vqtDJDR/2NSb0zgCJNqcniWSxnLVDm55T0wOJwuFiWtD6rglnfSVd3DrlL0tNcJ1p8envfQkRrRVlzX7tDLATpdgXnE3KzbYMS8Ec0i6eceqqKT+hkl63jD+97n8LY9rTv8L462JwSzz6p8p7HOUjh1bBM2bEZXTXN4yPB4B9u/l0Hhe0jfVlj5whgbm0PVKIjvh0oNksTjNyn6hYq1kVYwLYUMxZ0a5Q497/+RrPX8yh88CCFnH/R0Ujk/EfR+/bYIWacjUOJzr7aQKBgoA0qdk3BJxAkXy8Bf0mrzj/qr793pj3yg/AE4Vt+vC8e0bt2yhSPMGalsYlGQrhZEipTyGyM+I968rPnCzfgX6qxG7MUK4E8vB31Tke1EM2Nf8MjuGIiDtIxwVKUn6axjEmIH7W81gkXxkAfKbSmj+gMOeB93xrmgW2rNhrTukx1MAP8Trm9jiMWyJf4rQBIxctSM7/uw15aOkFfIytTGjLd3hvIPxfgoH5a6A0G8AybLyxaMzILI03pFULjTD0KfmWdYRU99WHxKRE5fDA4KhgMbN4EWH81/S1AVx9RZlSwD+PpKMPWDZj8uByUckdgEmQTn5qHV72yi+5kBcsO0GAR6Rp5hHK6V6qQbCWHhiUeDnPPFBhaEEEdCyKuIp9opD8LlzobR4GIgUbSaPgTlu+CoIownEzSbxQGEmJrfXdCMjnb2Rf+YUI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR12MB4130.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(376002)(366004)(136003)(346002)(396003)(31686004)(83380400001)(66556008)(316002)(66946007)(38100700002)(66476007)(54906003)(2906002)(8676002)(4326008)(7416002)(53546011)(6506007)(31696002)(186003)(8936002)(5660300002)(478600001)(6486002)(26005)(6512007)(6666004)(36756003)(86362001)(2616005)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDl0NldZUDJlNzFVYkdPZ0x1S0J6ODREYXY0eXZRaXNMUkE3bzdDYlQzNXRl?=
- =?utf-8?B?MWhFeEYybHRoNEFNemRYLzZ3R2VyemxqaURtQWtNSjY0Slp0NklGVnB1UTNR?=
- =?utf-8?B?cFRXUWNrRHRFK0I1RUx4VFFCUWpnL2xIOHpNYWxVcW53VDJEUXgxM1VmVWZl?=
- =?utf-8?B?Uy84QzJ1bVVmeUdPR3NTQmRDTnN4L1NpK3pReUNjT00rNWhIS005RDI2Zkg0?=
- =?utf-8?B?RlF5MUxYUmdLcEkvL0dJVTlkbHJUMGtYcDdMN3lPRU5BTnNWY3RBMzdSWFk3?=
- =?utf-8?B?QTJoakgrNjNwOVNBS2t5eStCNTBaOFNTWEg5ME4wSytmeFFJVWx4UEhsWGxs?=
- =?utf-8?B?TzFRcThsdVNUU2ZDNUZCV1l2TXpoY1hQcVhIZldab0d4bkFVNFE1SkVCandt?=
- =?utf-8?B?Y0xUS2gvdG5QdVhheXpIbmFOTFpSYmdRQWdIaytINnNiNnhYZGZOV1FrV3ll?=
- =?utf-8?B?a3g1Y3hZT2tENHJuU05KMktySEVlTlRmTmdRN0c4cE1zWnM5SE1CWUdHOWJ1?=
- =?utf-8?B?TjBwS3UyMytYamdvVUZNYU5LdDhHVGY4SXlNZ3BGL0M1WmRQQ28ya2lsbno1?=
- =?utf-8?B?M1ZSeFIxQnFIS1VidVg2ZEQzeTdxZlhucXZsU0RwUDZqVkJNRFMyMit6MHZT?=
- =?utf-8?B?SGI5NGlHYThpcHhHWTV2UHlGNWppU3ZqQnFUWndKMUc1THpmRW0zaTU5dmlt?=
- =?utf-8?B?MnNBaUNvL0NKRVNvVDhnR0FHRTR1YmlnSExlR1plZ3E1aFAzWDh4dko3dHZp?=
- =?utf-8?B?T21Gd3hKcXNTQmY4ZS9nTnZGZlN0STBTZGI1eHNOR3FZWVBsK2hpVkszRG41?=
- =?utf-8?B?V1NzV0g3cmlEeWFJV08xa3FTVlIwbUY5ZVl2RUNaNEtwWFllR1krc3RQcnYr?=
- =?utf-8?B?ZFcrc2lGQnRIMzljV1Q1SE8wOHNUTEM1Y3BoZDFIYTRuNjNyUjUxVkVlV2pi?=
- =?utf-8?B?ZWRYYmk3SGh0ampJWUVCOE9FV2tHajJaMmIyQ3hNSFNwdDRsTTl5VzdJV2FW?=
- =?utf-8?B?eForbjdnTVdLWlQ4bHFPdkVCYUZ5RVF6M1dxOWFBN1daWVRwWVZkVFVtWkhW?=
- =?utf-8?B?Yzl3N0ZNdzhVMHo3MWFUb2tuYXdnQWhKUHNmTVBET0NSYmN0WHJvdlJFZGZj?=
- =?utf-8?B?TmxtYXVsTTRKTjRGNkxRVUpPUS81ckU0RFRFQkhUMmp5a3FwcldnWlNKWito?=
- =?utf-8?B?T3ZVZ2ZzYVJEaU5jMm1jaERSeThTaDg2TVNUa09iNWEyMTY1NHV2S0RiS3Fj?=
- =?utf-8?B?NmxtQ1o3NWlJZ2lQNUtTNnorM2wzVkt3UnZ1TEFrN2d4NHNUemZ5T2xmWjVM?=
- =?utf-8?B?MXhBd2FQeVE5R1ByVHRDRE5kMVcxdUk5Lzh3ZWd4NVZMWEhKZkdvbmlGRFhm?=
- =?utf-8?B?NzZGQVJSUWFXR1dsOTJlaHpCbTduYjVBMmpuZUgxMkRrd0FNc0w4VGRTa1ky?=
- =?utf-8?B?aVcybWV2SGYwMG1pTllQbFVjcmFoUk41dFo2SDA2S3JJTnplOTF2WnZONTYw?=
- =?utf-8?B?UE1mNTJpbVZGS1hHTEIzNnprak5lLy8zdmVDWC9tZDRMRVBBQ3dpOThieldt?=
- =?utf-8?B?U0FGRURhaE9RT3pVSG5Pc21PMWsrMUxKRDhMdWZocm5OdVllWEhob0EzUU1C?=
- =?utf-8?B?OGRkdWc1NkN3NzF4OWRxcS9URXNBc1hLTDhUcSszRXV0ZS9MbituV0RtNUY0?=
- =?utf-8?B?RlhjQkt5SmJRc3dLemdvV2xscEZianVEcW41dXJWRFRZcmRkakppTUU1TXJB?=
- =?utf-8?B?MEdZQ05OaVFyVGMrcnRmaGJ0bjI4K3Y4aFlxUkdrc1cvQVBqdTMvbmFRMUh6?=
- =?utf-8?B?R1FTZ1JpZzFVQ1FFTERuSGZldlJsUXloVDhkZUJjTVJTZlB2Q1V6bDVTdkN2?=
- =?utf-8?B?Ymc5YWVYN1U2T1ZHNjN5NEExcE9KeGxacEMxR0FrTTN3TzhIV05XQnBGZmw5?=
- =?utf-8?B?Q2UrclpwY2NydjE5bDM0M3V5T2VKNWM4aHFPZkRUM1VCdDJtZEp6UmFzWHVP?=
- =?utf-8?B?bXBuVjRCaVpBWWN1QjZ3QS9IUDRsbElFSnkyUFNWWWhINkpWam9DYWpITnRH?=
- =?utf-8?B?S2VuS2EwSmR2dytVbTdrSGlmT2l0VzJXMDB3ZnpqMzNlaGZ6VlhYV0lRVmJt?=
- =?utf-8?B?ekNSYldnbzIzdksxbThtTmJqZjhkaUxlMEl6bndPUUZzVTdNRnR3dXdvYlNP?=
- =?utf-8?B?b3c9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 967079d0-7870-4ad5-e8dc-08da8fa3afd5
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4130.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 01:04:02.1475
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1WokUuAzWVmkZrri9r6cNnFyD+S306FaIIT29ySSEbX1LSUQv9GNWj9byMRDfQVnFHbEazi73vQeodNvbm+yYQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6732
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8984c9be-6ef0-95c7-ec02-e1213f3d45a1@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 8/25/22 08:24, Logan Gunthorpe wrote:
-> Add documentation for the p2pmem/allocate binary file which allows
-> for allocating p2pmem buffers in userspace for passing to drivers
-> that support them. (Currently only O_DIRECT to NVMe devices.)
+On Sun, Sep 04, 2022 at 07:23:49PM +0800, Ziyang Zhang wrote:
+> On 2022/9/3 21:30, Ming Lei wrote:
+> > On Wed, Aug 31, 2022 at 11:54 PM ZiyangZhang
+> > <ZiyangZhang@linux.alibaba.com> wrote:
+> >>
+> >> We change the default behavior of aborting machenism. Now monitor_work
+> >> will not be manually scheduled by ublk_queue_rq() or task_work after a
+> >> ubq_daemon or process is dying(PF_EXITING). The monitor work should
+> >> find a dying ubq_daemon or a crash process by itself. Then, it can
+> > 
+> > Looks you don't consider one dying ubq_daemon as one crash candidate.
+> > Most io implementation is done in the ubq pthread, so it should be
+> > covered by the crash recovery.
+> > 
+> >> start the aborting machenism. We do such modification is because we want
+> >> to strictly separate the STOP_DEV procedure and monitor_work. More
+> >> specifically, we ensure that monitor_work must not be scheduled after
+> >> we start deleting gendisk and ending(aborting) all inflight rqs. In this
+> >> way we are easy to consider recovery feature and unify it into existing
+> >> aborting mechanism. Really we do not want too many "if can_use_recovery"
+> >> checks.
+> > 
+> > Frankly speaking, not sure we need to invent new wheel for the
+> > 'aborting' mechanism.
+> > 
+> > In theory, you needn't change the current monitor work and cancel
+> > dev/queue. What you need is how to handle the dying ubq daemon:
+> > 
+> > 1) without user recovery, delete disk if any ubq daemon is died.
+> > 
+> > 2) with user recovery:
+> >     - quiesce request queue and wait until all inflight requests are
+> > requeued(become IDLE);
+> >     - call io_uring_cmd_done for any active io slot
+> >     - send one kobj_uevent(KOBJ_CHANGE) to notify userspace for handling
+> >       the potential crash; if it is confirmed as crash by userspace,
+> >       userspace will send command to handle it.
+> >     (this way will simplify userspace too, since we can add one utility
+> >     and provide it via udev script for handling rec
+> > 
+> > Checking one flag lockless is usually not safe, also not sure why we
+> > need such flag here, and the original check is supposed to work.
+> > 
+> > overy)
+> > 
+> >>
+> >> With recovery feature disabled and after a ubq_daemon crash:
+> >> (1) monitor_work notices the crash and schedules stop_work
+> > 
+> > driver can't figure out if it is crash, and it can just see if the
+> > ubq deamon is died or not. And crash detection logic should be done
+> > in userspace, IMO.
+> > 
+> >> (2) stop_work calls ublk_stop_dev()
+> >> (3) In ublk_stop_dev():
+> >>     (a) It sets 'force_abort', which prevents new rqs in ublk_queue_rq();
+> > 
+> > Please don't add new flag in fast path lockless, and the original check
+> > is supposed to be reused for recovery feature.
+> > 
+> >>             If ublk_queue_rq() does not see it, rqs can still be ended(aborted)
+> >>                 in fallback wq.
+> >>         (b) Then it cancels monitor_work;
+> >>         (c) Then it schedules abort_work which ends(aborts) all inflight rqs.
+> >>         (d) At the same time del_gendisk() is called.
+> >>         (e) Finally, we complete all ioucmds.
+> >>
+> >> Note: we do not change the existing behavior with reocvery disabled. Note
+> >> that STOP_DEV ctrl-cmd can be processed without reagrd to monitor_work.
+> >>
+> >> With recovery feature enabled and after a process crash:
+> >> (1) monitor_work notices the crash and all ubq_daemon are dying.
+> >>     We do not consider a "single" ubq_daemon(pthread) crash. Please send
+> >>         STOP_DEV ctrl-cmd which calling ublk_stop_dev() for this case.
+> > 
+> > Can you consider why you don't consider it as one crash? IMO, most of
+> > userspace block logic is run in ubq_daemon, so it is reasonable to
+> > consider it.
+> > 
+> > ublk_reinit_dev() is supposed to be run in standalone context, just like
+> > ublk_stop_dev(), we need monitor_work to provide forward progress,
+> > so don't run wait in monitor work.
+> > 
+> > And please don't change this model for making forward progress.
+> > 
+> > 
 > 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->  Documentation/ABI/testing/sysfs-bus-pci | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
+> Hi, Ming.
 > 
-> diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
-> index 6fc2c2efe8ab..dca5e032b4fa 100644
-> --- a/Documentation/ABI/testing/sysfs-bus-pci
-> +++ b/Documentation/ABI/testing/sysfs-bus-pci
-> @@ -171,7 +171,7 @@ Description:
->  		binary file containing the Vital Product Data for the
->  		device.  It should follow the VPD format defined in
->  		PCI Specification 2.1 or 2.2, but users should consider
-> -		that some devices may have incorrectly formatted data.  
-> +		that some devices may have incorrectly formatted data.
->  		If the underlying VPD has a writable section then the
->  		corresponding section of this file will be writable.
->  
-> @@ -407,6 +407,16 @@ Description:
->  	        file contains a '1' if the memory has been published for
->  		use outside the driver that owns the device.
->  
-> +What:		/sys/bus/pci/devices/.../p2pmem/allocate
-> +Date:		August 2022
-> +Contact:	Logan Gunthorpe <logang@deltatee.com>
-> +Description:
-> +		Thes attribute allows mapping p2pmem into userspace. For
+> I will take your advice and provide V4 soon. Here is the new design:
+> 
+> (0) No modification in fast patch. We just requeue rqs with a dying ubq_daemon
+>     and schedule monitor_work immediately.
+>     
+>     BTW: I think here we should call 'blk_mq_delay_kick_requeue_list()' after
+>     requeuing a rq. Otherwise del_gendisk() in ublk_stop_dev() hangs.
 
-s/Thes/This/
+No.
 
-Actually, the sentence goes on to say "file", which refers to the same
-thing as "attribute". So maybe just saying "This attribute" would be
-slightly clearer? So:
+IMO you can add one helper for either ending or adding request in
+requeue list, then code is still clean.
 
-		This file allows mapping p2pmem into userspace. For
+And when you call del_gendisk() in case of being in recovery state,
+blk_mq_unquiesce_queue() will handle/abort them and make del_gendisk()
+move on.
+
+> 
+> (1) Add quiesce_work, which is scheduled by monitor_work after a ubq_daemon
+>     is dying with recovery enabled.
+> 
+> (2) quiesce_work runs ublk_quiesce_dev(). It accquires the ub lock, and
+>     quiescses the request queue(only once). On each dying ubq, call
+>     ublk_quiesce_queue(). It waits until all inflight rqs(ACTIVE) are
+>     requeued(IDLE). Finally it completes all ioucmds.
+>     Note: So We need to add a per ubq flag 'quiesced', which means
+>     we have done this 'quiesce && clean' stuff on the ubq.
+
+ubq->nr_io_ready should be reused for checking if the queue is quiesced.
+It is actually same with current usage.
+
+> 
+> (3) After the request queue is quiesced, change ub's state to STATE_QUIESCED.
+>     This state can be checked by GET_DEV_INFO ctrl-cmd, just like STATE_LIVE. So
+>     user can detect a crash by sending GET_DEV_INFO and getting STATE_QUIESCED
+>     back.
+>     
+>     BTW, I'm unsure that sending one kobj_uevent(KOBJ_CHANGE) really helps. Users
+>     have may ways to detect a dying process/pthread. For example, they can 'ps'
+>     ublksrv_pid or check ub's state by GET_DEV_INFO ctrl-cmd. Anyway, this work
+>     can be done in the future. We can introduce a better way to detect a crash.
+>     For this patchset, let's focus on how to deal with a dying ubq_daemon.
+>     Do you agree?
+
+kobj_uevent(KOBJ_CHANGE) is useful, which can avoid userspace's polling on
+device. That provides one accurate chance for userspace utility to confirm
+if it is one really crash.
+
+And checking if ubq daemon/process is crashed is really userspace's
+responsibility, but sending the uevent after ubq daemon/process is dying
+is helpful for userspace to run the check, at least polling can be
+avoided, or done in time.
+
+If you don't want to add it from beginning, that is fine, and we can do it
+after your patchset is merged.
+
+> 
+> (4) Do not change ublk_stop_dev(). BTW, ublk_stop_dev() and ublk_quiescd_dev()
+>     exclude each other by accqiring ub lock.
+> 
+> (5) ublk_stop_dev() has to consider a quiesced ubq. It should unquiesce request
+>     queue(only once) if it is quiesced. There is nothing else ublk_stop_dev()
+>     has to do. Inflight rqs requeued before will be aborted naturally by
+>     del_gendisk().
+> 
+> (6) ublk_quiesce_dev() cannot be run after gendisk is removed(STATE_DEAD).
+> 
+> (7) No need to run ublk_quiesce_queue() on a 'quiesced' ubq by checking the flag.
+>     Note: I think this check is safe here.
+> 
+> (8) START_USER_RECOVERY needs to consider both a dying process and pthread(ubq_daemon).
+> 
+>     For a dying process, it has to reset ub->dev_info.ublksrv_pid and ub->mm. This can
+>     by done by passing a qid = -1 in ctrl-cmd. We should make sure all ubq_daemons
+>     are dying in this case.
+>     
+>     otherwise it is a dying pthread. Only this ubq is reinit. Users may send many
+>     START_USER_RECOVERY with different qid to recover many ubqs.
+
+The simplest handling might be to exit all ublk queues first, and re-create one
+new process to recover all since the request queue is required to be
+quiesced first, and all ublk queue is actually quiesced too. So from user
+viewpoint, there is nothing visible comparing with just recovering
+single ubq daemon/pthread.
 
 
-With the typo fix and optionally the "attribute" change (up to you),
-please feel free to add:
-
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
-
-
-thanks,
-
--- 
-John Hubbard
-NVIDIA
-
-> +		each mmap() call on this file, the kernel will allocate
-> +		a chunk of Peer-to-Peer memory for use in Peer-to-Peer
-> +		transactions. This memory can be used in O_DIRECT calls
-> +		to NVMe backed files for Peer-to-Peer copies.
-> +
->  What:		/sys/bus/pci/devices/.../link/clkpm
->  		/sys/bus/pci/devices/.../link/l0s_aspm
->  		/sys/bus/pci/devices/.../link/l1_aspm
+Thanks,
+Ming
 
