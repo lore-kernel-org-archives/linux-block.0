@@ -2,150 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D34BBC54EE9
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 06:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF8AECAAA1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 07:11:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232126AbiIFG5s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 02:57:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
+        id S232938AbiIFHLD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 03:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233371AbiIFG5n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 02:57:43 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B3C72EF5
-        for <linux-block@vger.kernel.org>; Mon,  5 Sep 2022 23:57:40 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220906065738epoutp012f8437e6bd98e762304341d4a06d5296~SMyfmn_qh2484024840epoutp01g
-        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 06:57:38 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220906065738epoutp012f8437e6bd98e762304341d4a06d5296~SMyfmn_qh2484024840epoutp01g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1662447458;
-        bh=mXtYey9BOEe5meXH32KaatPnqUaXnW09cu8qczFDkDo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=m50SVdIWBZJy2Fu2A0Q9ET0UAlV4AxW/ZymI1ovqlCoLhvFa7P0/PMJazU28eta9n
-         irkzuqAa04yggvQUWTyW4P8M6SR67u7ncO1FSjjp9OP6xFYIf8CCJeyl/BgLCXTaP9
-         dAYC1Q2YEk9CuA9iFbCd2j7w7JcBsfU7XGYjFfAQ=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20220906065738epcas5p427593c0a86c7d9364be297853b9f97df~SMyfI3V7F0623406234epcas5p4P;
-        Tue,  6 Sep 2022 06:57:38 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.175]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4MMGRM4s3Cz4x9QD; Tue,  6 Sep
-        2022 06:57:35 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        13.58.53458.A5FE6136; Tue,  6 Sep 2022 15:57:31 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220906065730epcas5p3156f8ce73a64434da190d0ce686ac2ea~SMyX9sZcZ1813218132epcas5p3E;
-        Tue,  6 Sep 2022 06:57:30 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220906065730epsmtrp26ab3fbe6c5bd47e4901908e41793478c~SMyX8uV522471624716epsmtrp2o;
-        Tue,  6 Sep 2022 06:57:30 +0000 (GMT)
-X-AuditID: b6c32a4a-caffb7000000d0d2-f6-6316ef5a4055
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A1.C7.14392.A5FE6136; Tue,  6 Sep 2022 15:57:30 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220906065728epsmtip1e2f77be2882ae7b80d66ad6fbd6fee07~SMyVzFD3k1609616096epsmtip1W;
-        Tue,  6 Sep 2022 06:57:28 +0000 (GMT)
-Date:   Tue, 6 Sep 2022 12:17:45 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, kbusch@kernel.org, asml.silence@gmail.com,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH for-next v4 3/4] block: add helper to map bvec iterator
- for passthrough
-Message-ID: <20220906064745.GB27127@test-zns>
+        with ESMTP id S232770AbiIFHLB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 03:11:01 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2070.outbound.protection.outlook.com [40.107.244.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFFFEF59A;
+        Tue,  6 Sep 2022 00:10:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VIVsCKVJf3wmtjER4ljTFXHMN8KSX6ZswTNccskJ2jLdWAFVp4nlQ0sDnDMmeEhdEndft2RslZwcJ5Q92Rj+OcdpyzEto+dQv5B77f4mgd3UAJ9K+A84c8Ht6qQiwI9IwbkCO4ozXU+ZFcchWBnXOBY0nxJHJQ5X4MgDsrYrsclmx/G3/K+o1n9S0B23h86FQ/cnTHWfxYX/hibaT9hEVXPmGQCTDNUhdBX88EQKtmrok7huZa5ISMTP3KgV0ZnJY/hS8P2uEcVHTXVRowezFJEaK3+0MEzxs/UPaP06OoSLjmt703IFCjMJAC6vUQzxHrEW3B4WUs4CW4VBntZaCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iNb+7Ukaw5YmVz8o4zeFvFfwLlsvokJvmwbInUTyNW4=;
+ b=jltmcw6jzKrbOO/kkFhpbosG6kjX7TqF32CCtRYSBZ0F1DPTjZkanTNjlUlk8HUxYgK4Y1o9NU6NWrd9jeHdnZwRG3BO/H0BCmGdh4TYLMYhkrE5CJ9/S/1Wb+WTrCzBKwAPMhUiDWJzEMBhc+dvlyf5x4j9yNO1jKemynvZZObZwSFB2hOErw3hUAuMl8cRjJdp6pkO2z4bSaJI1G2UzLUeBVTaRhTJfjpBgzZr8jcfXXqgcwe7n5yYR4Z9V2qm9X4rVgOV0gjnUR6G3Jm/Sv3RlQSpfJJvZuFrRG4DfY5/mXeJhdUKZj36XzXvweR2pNZMeEk4mqHexIJZ1040mA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iNb+7Ukaw5YmVz8o4zeFvFfwLlsvokJvmwbInUTyNW4=;
+ b=lHp86kIl/vdBRTAUY1ZoNlZQY7TskA89hSoVpLpLEq5uNdHC7YxaRDlOcT2j5vIxH+N6mhdyu20Au6uzbK3JMFph51s/OgxtDDm42hyn3WnIbA9w8T0/tsB9RNgR493eZNVzctkdgH37DguqDhjw8xPX+xmJdkEnWh9lHwxmgQ/lP3vL7xnw8PmvQN4zL2V9q6XJolj8aiF/SHQ40jQ2wsUoOszUqoYumBn7dJA1NJRPn26w4boiHC1DfjkL4BVX+XwXFDZxfwZh/kSAJ3feLKHF/7WlV/a608hK6GDgQiJnBlGolj1bNxK8nZlFwTSXCk9qcwW9PBiK65aQgT0XiA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB4140.namprd12.prod.outlook.com (2603:10b6:5:221::13)
+ by SJ1PR12MB6124.namprd12.prod.outlook.com (2603:10b6:a03:459::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.14; Tue, 6 Sep
+ 2022 07:10:58 +0000
+Received: from DM6PR12MB4140.namprd12.prod.outlook.com
+ ([fe80::e0c5:bb15:a743:7ddb]) by DM6PR12MB4140.namprd12.prod.outlook.com
+ ([fe80::e0c5:bb15:a743:7ddb%3]) with mapi id 15.20.5588.018; Tue, 6 Sep 2022
+ 07:10:58 +0000
+Message-ID: <50d1d649-cb41-3031-c459-bbd38295c619@nvidia.com>
+Date:   Tue, 6 Sep 2022 00:10:54 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v2 0/7] convert most filesystems to pin_user_pages_fast()
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+References: <20220831041843.973026-1-jhubbard@nvidia.com>
+ <YxbqUvDJ/rJsLMPZ@infradead.org>
+From:   John Hubbard <jhubbard@nvidia.com>
+In-Reply-To: <YxbqUvDJ/rJsLMPZ@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR05CA0074.namprd05.prod.outlook.com
+ (2603:10b6:a03:e0::15) To DM6PR12MB4140.namprd12.prod.outlook.com
+ (2603:10b6:5:221::13)
 MIME-Version: 1.0
-In-Reply-To: <20220906063329.GA27127@test-zns>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDJsWRmVeSWpSXmKPExsWy7bCmpm70e7Fkg1dnWCyaJvxltpizahuj
-        xeq7/WwWNw/sZLJYufook8W71nMsFpMOXWO02HtL22L+sqfsDpweO2fdZfe4fLbUY9OqTjaP
-        zUvqPXbfbGDz6NuyitHj8ya5APaobJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtz
-        JYW8xNxUWyUXnwBdt8wcoLuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQUmBXrF
-        ibnFpXnpenmpJVaGBgZGpkCFCdkZD9a8YSqYwlPRecS2gXEFVxcjJ4eEgIlEw4pDzCC2kMBu
-        RonWD0BxLiD7E6PEk6a1bBDON0aJ68efs8B0zFjcwgqR2MsosWpWHxOE84xRYuGGT4wgVSwC
-        KhJ3tpwE6uDgYBPQlLgwuRQkLCKgJPH01VlGkHpmgStAK7rWMYEkhAViJf71HgWzeQV0JZ7v
-        3MkKYQtKnJz5BGwzp4CexNxpr9lAbFEBZYkD246DLZYQmMshsfNlIxvIMgkBF4mvZzQhLhWW
-        eHV8CzuELSXx+d1eNgg7WeLSzHNMEHaJxOM9B6Fse4nWU/3MIGOYBTIkLj3IAQkzC/BJ9P5+
-        wgQxnVeio00IolpR4t6kp6wQtrjEwxlLoGwPibNNG9ghQfKHUWLP0ntMExjlZiH5ZhbChllg
-        G6wkOj80sUKEpSWW/+OAMDUl1u/SX8DIuopRMrWgODc9tdi0wCgvtRwewcn5uZsYwclUy2sH
-        48MHH/QOMTJxMB5ilOBgVhLhTdkhkizEm5JYWZValB9fVJqTWnyI0RQYOROZpUST84HpPK8k
-        3tDE0sDEzMzMxNLYzFBJnHeKNmOykEB6YklqdmpqQWoRTB8TB6dUA1NoxNdZW/9vnhL8cK2j
-        15/SA7wzNsX039387OOVPfJre3quH9ySOd+V61E6t+3VPW2b9oUt/Jf1z+Wch2jhuqUMylwS
-        lR6brj/3jPlyvdMia27QkZRpFzxtrHW2hQnzyP6RO8+6d2mBf+1G6/X/GfnX/ugv65m1W/zS
-        Dd0ZX4Vfvfgiyv7hfmK4jFnqUi3ppHK+BfMF1ky98TXjHOObzSKe+ic3THt0zff+5BvVzfv7
-        2ibNSo740Xbj2sOvr5+vlsqYf232qiRxjp7/j5qXbpnCMX1v2/HrATXidzVyTnhURBuaCQuJ
-        fdVd1zbF7dmuRRm357bsnK18cYPVHKbGJXIs135cfNixSaDlMvNOV5sPIUosxRmJhlrMRcWJ
-        ACS53jUvBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrHLMWRmVeSWpSXmKPExsWy7bCSnG7Ue7Fkg1WdyhZNE/4yW8xZtY3R
-        YvXdfjaLmwd2MlmsXH2UyeJd6zkWi0mHrjFa7L2lbTF/2VN2B06PnbPusntcPlvqsWlVJ5vH
-        5iX1HrtvNrB59G1ZxejxeZNcAHsUl01Kak5mWWqRvl0CV8amfSeZC45xVvyf/oO9gfELexcj
-        J4eEgInEjMUtrF2MXBxCArsZJf73n2CESIhLNF/7AVUkLLHy33MwW0jgCaPEoheuIDaLgIrE
-        nS0nWboYOTjYBDQlLkwuBQmLCChJPH11lhFkJrPAFUaJP/uXsIIkhAViJf71HmUCsXkFdCWe
-        79wJtfgfo8SGd9PZIBKCEidnPmEBsZkFzCTmbX7IDLKAWUBaYvk/DpAwp4CexNxpr8HKRQWU
-        JQ5sO840gVFwFpLuWUi6ZyF0L2BkXsUomVpQnJueW2xYYJiXWq5XnJhbXJqXrpecn7uJERwl
-        Wpo7GLev+qB3iJGJg/EQowQHs5IIb8oOkWQh3pTEyqrUovz4otKc1OJDjNIcLErivBe6TsYL
-        CaQnlqRmp6YWpBbBZJk4OKUamPoW1Ytfr8p4u/+9uYKIopOd7Nknd2U1Xn7um7nH6MSc145C
-        ok/fC3yZWi3yp0nx7XJvpceVvb/bp16KvOvO3dnlwJWfYX6JM8bilUKr7zmmiLLumv3rVC22
-        sMy6wtjsEVelVHzy/uKfSffrei7+W6L8Jf+sfNC+1p1dZZvZ9ny7e+DIyYfV4suqFFcdu29Z
-        9K/40v1dV90Pyzf9/lt+zPaRenej0QyvY7zym7hZMk7tKvQQ4FPQOzdBdXaTeZ/DtRXz1x+d
-        MuuXfYZIaWevMvONlI6vCe4L+BuWaKaqf/y22plvKfvcCXN6vVbtP3FU7ej1PX9k5jbGrJ2m
-        7hz9ZY+AyJGt/WsPc/Zd/7tM5LQSS3FGoqEWc1FxIgCkF7MGAQMAAA==
-X-CMS-MailID: 20220906065730epcas5p3156f8ce73a64434da190d0ce686ac2ea
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_5165d_"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220905135851epcas5p3d107b140fd6cba1feb338c1a31c4feb1
-References: <20220905134833.6387-1-joshi.k@samsung.com>
-        <CGME20220905135851epcas5p3d107b140fd6cba1feb338c1a31c4feb1@epcas5p3.samsung.com>
-        <20220905134833.6387-4-joshi.k@samsung.com> <20220906062522.GA1566@lst.de>
-        <20220906063329.GA27127@test-zns>
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d22c25b8-575b-433b-eebd-08da8fd6f286
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6124:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jodpvIVTVK0ji/+hMCffESmTpY6g+kmM9ujGurTLnVCotEStRW6U5+05rKtdlj1+A8raNIyc/BiL01fm07yRD+kx2IbYN8ImbK/O/7qjwvZCGzG5eO6kY6AD+yRQsCY14XVLHVntrkMCruSFcSvonVySsqadegNZxPMcN9+2iv/NsYDRXe1Qi/XRR4JwWllw3Qy35kyLytv28WyEQLYVfdVqilsuOoCBEb1hCJlOQitCcW6zcGLSdtgX/YLIFJBKguARKI0hrEHlaO3ggyJ1FLm3ba/JJ1iJWjqQlL3Ef4QhxYQRcSJmv+nnRAHPalNRvzt7lkSK4vHBpna/J32GVQUa50gLgMCkM31c7Y2XPavLzs9eY3FxJSf/7weC9ij+Rq2+axXnHoszTl/fDEhsQFXwHe3xEV7Z8a1jiR58qu3pEzwvRFlKQKLn8s+vt/koqbWf7DoKK2/VaAiL3KNTvrFb72bPmoJah0GH5s5hPAcSXXhXgTBS/VJIJMGq0N7pVG6i2av5AA6vwYuDxTMJZug14XY4P1MZfCG36ANTIdXSuQKkFnN5cJkDhW1l8vUGBwXI54fbIUB+kPqK1T07FiWKIyQcM/Ig6P7qqxxvQBTZ3V9uvaj1aGfE3Be/Olyqgwt2N4XDy2IWTccivujRB1U2vkOaEaaWxPHULCYwsOTjJxLpZnxbWe+tpeUod6LNkLrCQGExDGSwqhag06iqIXbqnrgJtPnQpmnBY9IMRvbrMRe5EwHx793/vaoTXNRz6r+1mtdbJOHnaJsb2C/CLbzc2qqSOL9QwF2FTlfwFTE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4140.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(396003)(39860400002)(346002)(376002)(86362001)(83380400001)(66476007)(31696002)(4326008)(31686004)(8676002)(478600001)(66946007)(38100700002)(41300700001)(6486002)(5660300002)(6666004)(54906003)(8936002)(6916009)(2906002)(316002)(66556008)(26005)(53546011)(6512007)(36756003)(6506007)(186003)(7416002)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R05yWkpDS3poUmJPdXl2MnhkbmdEa1ZBZnhqUk1URk0ybjUrRE5MZ1FWL1Uw?=
+ =?utf-8?B?T0gxWCtYRmlPT2FrVGhhZHRFQXYrNk1KOThhdUNBN3ZSQ0JJazg2YkFJTDZu?=
+ =?utf-8?B?ZFVXM3hjb2Z3eTlqai96UlpkdlNxSzk4aE5mK1R2OTBGWXZxVTEzSlNwektB?=
+ =?utf-8?B?TG9ad3l0SDF2a001QTc2SVJtSHJvVE0venlXNC9oaUMxUEdTNDREemZhWDFx?=
+ =?utf-8?B?WWVqdFBhYy9uYUhLd1B6dy9VbEcvZmJIQWkwMGVxcXROcXlZUzNOVEpqWEho?=
+ =?utf-8?B?dWgxY1hkMXlBSHdQcUluKy9jNEtPLzYrYmlIRDhCcnI5eXA3NzFoWEpsTnRP?=
+ =?utf-8?B?VVIyT3pJNEllMTJOelptcXE0SldTd3huMGw1cS9nU1JvRGtCd2FrSW9ic2NG?=
+ =?utf-8?B?cjJLYlhoQkRnT2ljYThQME5WbVFvM0xoZTRmdmtYR3ZJdFRGbFVNMTQ4WEhQ?=
+ =?utf-8?B?SXo1Qi9OTmp4Qkd4a040NXk1eTcrREtRVUZnZnJ2N1hRQVJFTndXRnh1ZjNu?=
+ =?utf-8?B?RWtrTklKaUp1Vm1sakdRRERBMkROeGZPRmlsZUtwV2JtMk5nRHR1bWxPSnNi?=
+ =?utf-8?B?R1BWNXVDSkx5MVVRRC90TjVHd3ZadTM1ZXBKT1V5OW8zTVJ2S0RRRDBqMTRO?=
+ =?utf-8?B?c3lkOFovS01DZEJ6azkyYzNkNC9mVm1LR3I2UmI5QTBpMU5GekRtN0dRWFhB?=
+ =?utf-8?B?ejFCeE1aT2tTcm5oME9DMWptQXBCN2lZOFYxenQ1OFNvTUVaNjcybFZ3d2E5?=
+ =?utf-8?B?bWJNdC9PVVJKSFdqNEtmZlZZVjlRR3RtTHM4V280Y0Jaemt6K0o0M3BDRkNW?=
+ =?utf-8?B?TXVnM2JPVGZGcTdXVThBbjloRFh1QUlXdlhvVUJRcWY4ak85VnFieExMN2lN?=
+ =?utf-8?B?VGwveHRjV0dIM2g1TGZpRmEvTE5yVUlwbXBRN0t4RDhNc1FHMDFLWTdOcDlw?=
+ =?utf-8?B?REd2RnhDSG1QbXBybXREcVJXd25rYTdaODZ1YytSUWFtWFkweW9FVE5QS1dm?=
+ =?utf-8?B?bEVZZUhDdzdtSUxsYkMvTGx6VGVJY2lVejJoL2VYdnh0VmF5UkhDV2VMTGhJ?=
+ =?utf-8?B?K1lkbTZ6TkN2M2ZhOE53YzhDNzlMZVYvT2ZzOXV5RzhGOFV1dFZ3ZHlicUpO?=
+ =?utf-8?B?dFJrRG1TNllpUlgzc1JNZDhJQllsUE1URlc1Z2g2d05iWnBiOFo4bWQrWVFz?=
+ =?utf-8?B?UEkzWGs2RnZVMU1WOWFPcXZpOEJtbVYwaERGUTR2SFNjSjM0YU5Qc285clZ6?=
+ =?utf-8?B?OE1XcDN4RitlZm5yazJ4dlA2RzBPVmhsMGUycnVaL1BXQjZQLzF0VDVlNzlB?=
+ =?utf-8?B?ZkJ0TTUydlVpNGhxT3BsUDBCaXhmVFRGSm9naHFxUDRMTFJvMUdpb0Y3eGRQ?=
+ =?utf-8?B?enVINlVxMkY2Q0s0WUliNmV3VWVvMGZldHF0V0lvQ2p2Wjh3OStKY2d5TGFP?=
+ =?utf-8?B?MG9SK2JOZ0dDbG93OWN6OEsvYnpBT0tob3NQdXVsNC9WOW5QZE9oSGpIajVu?=
+ =?utf-8?B?U0J3MkRQanpjNG1YblBXUHZWbDl6K2ltS2tUclhtUlNuWXhkT1Q5Uit5V1dN?=
+ =?utf-8?B?VUUzaTlWdDEwbWZ6WGhVUW5NRDVMRDJPOTdMLzM3U09oMytNQ0RXMkN2VUFI?=
+ =?utf-8?B?STZ3UERnTG4xekV2RG9ERFQzUVNWLzYyZm04WmZ3ejNyMVZSVjhYS1pMQy9K?=
+ =?utf-8?B?Mi82MHNWZk8xL3hFMFRKR1gwNFlsVXZGVHpoVG1MT0dhSDk0akw4anMzcFhU?=
+ =?utf-8?B?TXZNRjVvT3hqb1BKVWlEK1pNWlRLQllRcnhQL2RIWmlTd0RQbURGc1NYNytY?=
+ =?utf-8?B?bFFET1dxNlZGdHlINS9WcDQyNHZDQ0RNZ3ZQWTBidkk0Z081T2NlUG05TnJC?=
+ =?utf-8?B?NVg5VlJLQy8wWDJud08xa21BSnU4TS9RcExyT3ZvRWttZzQ0cFZNZDZBbTVJ?=
+ =?utf-8?B?NXUranRTeGVoQlh1dER6Y2h3bWVSZVZ5RXphcTJUcHJoa1plbzBpY0dvZVVw?=
+ =?utf-8?B?M0FZSUFsKzVqM1RGNE9FZVp0d0RKcUc3c0lGR0ZXYUxkWmxMazBQbUIxOEh4?=
+ =?utf-8?B?T0RJRXFJNDNpVGxlcnpVSEdWcnlHakhaSk1od2Jzakx2S0xkZWdtclU5OGRj?=
+ =?utf-8?Q?nKi2lw3yDTwovv9F6W8rm09/R?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d22c25b8-575b-433b-eebd-08da8fd6f286
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4140.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 07:10:58.4173
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s5AxGk4mI1fipVPKcM3PTSVBdM1I9C7tA/XND0ful3ibjq70XCh7f73Kds0fbSnKYnjr1GDC3qrseuSDdgrhBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6124
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_5165d_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On 9/5/22 23:36, Christoph Hellwig wrote:
+> On Tue, Aug 30, 2022 at 09:18:36PM -0700, John Hubbard wrote:
+>> The conversion is temporarily guarded by
+>> CONFIG_BLK_USE_PIN_USER_PAGES_FOR_DIO. In the future (not part of this
+>> series), when we are certain that all filesystems have converted their
+>> Direct IO paths to FOLL_PIN, then we can do the final step, which is to
+>> get rid of CONFIG_BLK_USE_PIN_USER_PAGES_FOR_DIO and search-and-replace
+>> the dio_w_*() functions with their final names (see bvec.h changes).
+> 
+> What is the the point of these wrappers?  We should be able to
+> convert one caller at a time in an entirely safe way.
 
-On Tue, Sep 06, 2022 at 12:03:29PM +0530, Kanchan Joshi wrote:
->On Tue, Sep 06, 2022 at 08:25:22AM +0200, Christoph Hellwig wrote:
->>On Mon, Sep 05, 2022 at 07:18:32PM +0530, Kanchan Joshi wrote:
->>>+static struct bio *bio_map_get(struct request *rq, unsigned int nr_vecs,
->>> 		gfp_t gfp_mask)
->>> {
->>>@@ -259,13 +252,31 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
->>> 		bio = bio_alloc_bioset(NULL, nr_vecs, opf, gfp_mask,
->>> 					&fs_bio_set);
->>> 		if (!bio)
->>>-			return -ENOMEM;
->>>+			return NULL;
->>
->>This context looks weird?  That bio_alloc_bioset should not be there,
->>as biosets are only used for file system I/O, which this is not.
->
->if you think it's a deal-breaker, maybe I can add a new bioset in nvme and
->pass that as argument to this helper. Would you prefer that over the
->current approach.
+I would be delighted if that were somehow possible. Every time I think
+it's possible, it has fallen apart. The fact that bio_release_pages()
+will need to switch over from put_page() to unpin_user_page(), combined
+with the fact that there are a lot of callers that submit bios, has
+led me to the current approach.
 
-seems I responded without looking carefully. The bioset addition is not
-part of this series. It got added earlier [1] [2], as part of optimizing
-polled-io on file/passthru path.
+What did you have in mind?
 
-[1] https://lore.kernel.org/linux-block/20220806152004.382170-3-axboe@kernel.dk/
-[2] https://lore.kernel.org/linux-block/f2863702-e54c-cd74-efcf-8cb238be1a7c@kernel.dk/
+thanks,
 
-------pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_5165d_
-Content-Type: text/plain; charset="utf-8"
+-- 
+John Hubbard
+NVIDIA
 
-
-------pcQIgMQ_HVXS4qWPbWHvSbnTt3jWAgM.sCJInyI3qCVu2Rgf=_5165d_--
