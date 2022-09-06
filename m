@@ -2,53 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D190AC38145
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 23:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A487ECAAA1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 23:00:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiIFXAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229795AbiIFXAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 6 Sep 2022 19:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229849AbiIFXAh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 19:00:37 -0400
+        with ESMTP id S229661AbiIFXAi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 19:00:38 -0400
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D87F7E03D
-        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 16:00:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904B52B639
+        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 16:00:37 -0700 (PDT)
 Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 286F3P1F018679
-        for <linux-block@vger.kernel.org>; Tue, 6 Sep 2022 16:00:35 -0700
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 286Mse28018768
+        for <linux-block@vger.kernel.org>; Tue, 6 Sep 2022 16:00:36 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=facebook;
- bh=r2lQa3t1UMzc6JgvyfiufHyfCGfvROv2bUlwSj39Q00=;
- b=SzBFHb24yjtrKcVVXQo3c863iT0dNE5Wj+Ie/JuDqDwdd8lqubtioxM1qT2NZJ5eUUxv
- Cy2GzZ074q1QvjIQp/LzIEFftpWjOzL4FOLTyw5yAoHGwkN9dvdiRSflILK6Xt+vUwsI
- j/gIZ3IQhYLkc+yGKdgEOYpELJQrJFdgcf4= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3jc4eyt966-1
+ : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=facebook; bh=rAGgpzVlQCp3oDb07MJiMkiNOXWEd2leUOKvHZRl/dM=;
+ b=HQ20sqiIrP9otCn96yM6454hyXwi6ZGTGYPdLmwLmyNIeuaCm+L0R37u+/GBW71LBa+x
+ wS7XFOBDN80abZ04H1vXiK2MPMl8ciK8g8ij0XcwlFpGbPh3C2Mz6cCWgsEQo/tn+xGw
+ FrVPpllA0E1W5GC1Q7rO/+t4ezm+NC4BcUE= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3jc4eyt96b-2
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 16:00:35 -0700
-Received: from twshared2273.16.frc2.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 16:00:36 -0700
+Received: from twshared30313.14.frc2.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 6 Sep 2022 16:00:34 -0700
+ 15.1.2375.31; Tue, 6 Sep 2022 16:00:35 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id D836E84BC4B3; Tue,  6 Sep 2022 16:00:30 -0700 (PDT)
+        id C6C1E84BC4B0; Tue,  6 Sep 2022 16:00:30 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
 CC:     Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 1/2] sbitmap: check waitqueue_active prior to decrement
-Date:   Tue, 6 Sep 2022 16:00:28 -0700
-Message-ID: <20220906230029.1287526-2-kbusch@fb.com>
+Subject: [PATCHv3 0/2] sbitmap wake fixes
+Date:   Tue, 6 Sep 2022 16:00:27 -0700
+Message-ID: <20220906230029.1287526-1-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220906230029.1287526-1-kbusch@fb.com>
-References: <20220906230029.1287526-1-kbusch@fb.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: K6k_nmFNzSRjLN8MvjjuVi2u12OQTCYY
-X-Proofpoint-ORIG-GUID: K6k_nmFNzSRjLN8MvjjuVi2u12OQTCYY
+X-Proofpoint-GUID: K8RQFDeTrVS5kxJYJuWtvuqqcWtKLL3N
+X-Proofpoint-ORIG-GUID: K8RQFDeTrVS5kxJYJuWtvuqqcWtKLL3N
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
  definitions=2022-09-06_09,2022-09-06_02,2022-06-22_01
@@ -58,43 +55,23 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-The bitmap wait state may have set an active count, but doesn't have an
-active waiter due to racing with adding it. If that happens, the state's
-wait_cnt will be set at the wrong value, and could prevent future wakes
-until the atomic_dec wraps back to 0.
+changes from v2:
 
-Check the waitqueue_active before decrementing so that we don't need to
-account for fixing it up after.
+  Adding a prep patch that fixes a condition that can leave the wait_cnt
+  at the wrong value.
 
-Fixes: 040b83fcecfb8 ("sbitmap: fix possible io hung due to lost wakeup")
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- lib/sbitmap.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+  Changed the number to wake up to account for the number of bits
+  released in previous batches instead of just the current batch.
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index a39b1a877366..ad0670b580d3 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -609,12 +609,16 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq=
-)
- 	if (!ws)
- 		return false;
-=20
-+	if (!waitqueue_active(&ws->wait))
-+		return true;
-+
- 	wait_cnt =3D atomic_dec_return(&ws->wait_cnt);
-+
- 	/*
- 	 * For concurrent callers of this, callers should call this function
- 	 * again to wakeup a new batch on a different 'ws'.
- 	 */
--	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
-+	if (wait_cnt < 0)
- 		return true;
-=20
- 	if (wait_cnt > 0)
+Keith Busch (2):
+  sbitmap: check waitqueue_active prior to decrement
+  sbitmap: fix batched wait_cnt accounting
+
+ block/blk-mq-tag.c      |  2 +-
+ include/linux/sbitmap.h |  3 ++-
+ lib/sbitmap.c           | 36 ++++++++++++++++++++----------------
+ 3 files changed, 23 insertions(+), 18 deletions(-)
+
 --=20
 2.30.2
 
