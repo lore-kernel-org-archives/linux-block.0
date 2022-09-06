@@ -2,112 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EA3C6FA83
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 10:21:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95734ECAAD5
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 13:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239291AbiIFKVR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 06:21:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56254 "EHLO
+        id S240290AbiIFNGs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 09:06:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232752AbiIFKVM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 06:21:12 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A5B41D28;
-        Tue,  6 Sep 2022 03:21:08 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8B1691F9B8;
-        Tue,  6 Sep 2022 10:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1662459667; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JRzzxJnv5MaykTq7esKm/SId3jWkWiPAdjMo5oqrhRE=;
-        b=KxJvAYQmECJdKHflrlphoK6jMea5m356jipctQWsyyBn2mXvuIKqE/JpJczXYmkvoH9nO8
-        NoOB88iSwiI2Ub8MVRt1ql+V2Du8naLMoby+IJylMg9zSLiTlT9sPsRaZXQbR44F6irWgs
-        wfZCT1dxVKV4e5PjvHq5w10DQUscpmI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1662459667;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JRzzxJnv5MaykTq7esKm/SId3jWkWiPAdjMo5oqrhRE=;
-        b=plZXEtxGbS1qVODpVEpx1mvVcKzPPQXJbGzq02JAcGOhoP0DN1kZuv58cv4wa0hVHaZblC
-        6/YkhJlMFnkIsNAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6F33D13A7A;
-        Tue,  6 Sep 2022 10:21:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id M/EfGxMfF2POBgAAMHmgww
-        (envelope-from <jack@suse.cz>); Tue, 06 Sep 2022 10:21:07 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 053EBA067E; Tue,  6 Sep 2022 12:21:06 +0200 (CEST)
-Date:   Tue, 6 Sep 2022 12:21:06 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>, Jan Kara <jack@suse.cz>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <20220906102106.q23ovgyjyrsnbhkp@quack3>
-References: <20220831041843.973026-1-jhubbard@nvidia.com>
- <20220831041843.973026-5-jhubbard@nvidia.com>
- <YxbtF1O8+kXhTNaj@infradead.org>
- <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
- <Yxb7YQWgjHkZet4u@infradead.org>
+        with ESMTP id S239979AbiIFNGs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 09:06:48 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808F258B43
+        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 06:06:44 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id fv3so5094114pjb.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 06:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=hUilgeHP0biCxsciT92z9y8bpDsjjbeBXQD/8msdltU=;
+        b=GNIWuM9ISomgaI/MfitDMgzaSir/kv+ZiB7ykUG2JOEKioLzlKVIKzosdx3Gr1VZNN
+         FSyjgitEn0OlLuUwBj2EKYYhuA8aLqigTBk1n05agFHu9TeGsM2Oy4dxutyDDiB/Kp0q
+         g/rs0M+JjhZ6KPqyCIf9xmLsAItYR8v3SejXlDNl/xUw0z3xVOH9YFEZ/PdO9X2FFFKS
+         P4euUSP1/v3VHzh5WqkrA600b469pljHUiNI8QZSjczO3F1Qj8ymAh80e35446W96mOE
+         urk/jacqVYb2DQ8MHSdSUIGUfDrWb1YGpO2ROSah0jbUKf4theoc5vr4uFzUe74s50Vs
+         DF8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=hUilgeHP0biCxsciT92z9y8bpDsjjbeBXQD/8msdltU=;
+        b=kysj5S8NQNZoY23hm5BrWqXzIWrh27eCeHUefmjFqM0AfzuelQl4NdysMUSrz4dRoI
+         9RyXIj4Vp0+bk/eoFWCLEOVJUtPBTYQkgIvNKgVUz5F0jtkunibYv8fR+vUcqFR7nk1s
+         xb0neyX/NHzlT9iATaWIagX+SJe/nWIOeE6XTLmNOJblfqxiYWjeWyffpfA3gTbnsa+4
+         K+16GkwIjUfOkg1+PPTzfCKLad3KRqWxgzt5mSeADs//jACQw9Bpg5drPMvn5dqOI6ZW
+         DUdwVgRuam6PZqy/Qr2xBOQsJhjJ17apl3xF39uDt1JNm4L5ul11zVC9mabNWidtwRUi
+         3w4g==
+X-Gm-Message-State: ACgBeo2CV/m6esJ8k3vc2VO+4afMxm/FLHesNMLyZIpl2+L7L8WTwjS4
+        DxAFhDFNU7UCP7y15Q6TKoYFFQ==
+X-Google-Smtp-Source: AA6agR65LNUY4ND6VirT9/iIW5+aJ6BogblGjGp/Ah6rCqXQ1W0A40gbtwhWH0/EwhhBy8biBCwTgA==
+X-Received: by 2002:a17:90a:ac2:b0:1fd:fad1:e506 with SMTP id r2-20020a17090a0ac200b001fdfad1e506mr25026991pje.66.1662469603875;
+        Tue, 06 Sep 2022 06:06:43 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id n12-20020a170902d2cc00b00174c1855cd9sm9819866plc.267.2022.09.06.06.06.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Sep 2022 06:06:42 -0700 (PDT)
+Message-ID: <2ad36f9d-6472-f748-b013-9678ad94e8d0@kernel.dk>
+Date:   Tue, 6 Sep 2022 07:06:40 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yxb7YQWgjHkZet4u@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.2
+Subject: Re: [PATCH for-next v4 3/4] block: add helper to map bvec iterator
+ for passthrough
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>
+Cc:     kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        Anuj Gupta <anuj20.g@samsung.com>
+References: <20220905134833.6387-1-joshi.k@samsung.com>
+ <CGME20220905135851epcas5p3d107b140fd6cba1feb338c1a31c4feb1@epcas5p3.samsung.com>
+ <20220905134833.6387-4-joshi.k@samsung.com> <20220906062522.GA1566@lst.de>
+ <20220906063329.GA27127@test-zns> <20220906065122.GA2190@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220906065122.GA2190@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 06-09-22 00:48:49, Christoph Hellwig wrote:
-> On Tue, Sep 06, 2022 at 12:44:28AM -0700, John Hubbard wrote:
-> > OK, that part is clear.
-> > 
-> > >  - for the pin case don't use the existing bvec helper at all, but
-> > >    copy the logic for the block layer for not pinning.
-> > 
-> > I'm almost, but not quite sure I get the idea above. Overall, what
-> > happens to bvec pages? Leave the get_page() pin in place for FOLL_GET
-> > (or USE_FOLL_GET), I suppose, but do...what, for FOLL_PIN callers?
+On 9/6/22 12:51 AM, Christoph Hellwig wrote:
+> On Tue, Sep 06, 2022 at 12:03:29PM +0530, Kanchan Joshi wrote:
+>>> This context looks weird?  That bio_alloc_bioset should not be there,
+>>> as biosets are only used for file system I/O, which this is not.
+>>
+>> if you think it's a deal-breaker, maybe I can add a new bioset in nvme and
+>> pass that as argument to this helper. Would you prefer that over the
+>> current approach.
 > 
-> Do not change anyhing for FOLL_GET callers, as they are on the way out
-> anyway.
-> 
-> For FOLL_PIN callers, never pin bvec and kvec pages:  For file systems
-> not acquiring a reference is obviously safe, and the other callers will
-> need an audit, but I can't think of why it woul  ever be unsafe.
+> The whole point is that biosets exist to allow for forward progress
+> guarantees required for file system I/O.  For passthrough I/O
+> bio_kmalloc is perfectly fine and much simpler.  Adding yet another
+> bio_set just makes things even worse.
 
-Are you sure about "For file systems not acquiring a reference is obviously
-safe"? I can see places e.g. in orangefs, afs, etc. which create bvec iters
-from pagecache pages. And then we have iter_file_splice_write() which
-creates bvec from pipe pages (which can also be pagecache pages if
-vmsplice() is used). So perhaps there are no lifetime issues even without
-acquiring a reference (but looking at the code I would not say it is
-obvious) but I definitely don't see how it would be safe to not get a pin
-to signal to filesystem backing the pagecache page that there is DMA
-happening to/from the page.
+It's a performance concern too, efficiency is much worse by using
+kmalloc+kfree for passthrough. You don't get bio caching that way.
 
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
