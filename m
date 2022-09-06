@@ -2,96 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95734ECAAD5
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 13:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F048FC6FA83
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 16:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240290AbiIFNGs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 09:06:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
+        id S234073AbiIFQo5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 12:44:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239979AbiIFNGs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 09:06:48 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808F258B43
-        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 06:06:44 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id fv3so5094114pjb.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 06:06:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=hUilgeHP0biCxsciT92z9y8bpDsjjbeBXQD/8msdltU=;
-        b=GNIWuM9ISomgaI/MfitDMgzaSir/kv+ZiB7ykUG2JOEKioLzlKVIKzosdx3Gr1VZNN
-         FSyjgitEn0OlLuUwBj2EKYYhuA8aLqigTBk1n05agFHu9TeGsM2Oy4dxutyDDiB/Kp0q
-         g/rs0M+JjhZ6KPqyCIf9xmLsAItYR8v3SejXlDNl/xUw0z3xVOH9YFEZ/PdO9X2FFFKS
-         P4euUSP1/v3VHzh5WqkrA600b469pljHUiNI8QZSjczO3F1Qj8ymAh80e35446W96mOE
-         urk/jacqVYb2DQ8MHSdSUIGUfDrWb1YGpO2ROSah0jbUKf4theoc5vr4uFzUe74s50Vs
-         DF8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=hUilgeHP0biCxsciT92z9y8bpDsjjbeBXQD/8msdltU=;
-        b=kysj5S8NQNZoY23hm5BrWqXzIWrh27eCeHUefmjFqM0AfzuelQl4NdysMUSrz4dRoI
-         9RyXIj4Vp0+bk/eoFWCLEOVJUtPBTYQkgIvNKgVUz5F0jtkunibYv8fR+vUcqFR7nk1s
-         xb0neyX/NHzlT9iATaWIagX+SJe/nWIOeE6XTLmNOJblfqxiYWjeWyffpfA3gTbnsa+4
-         K+16GkwIjUfOkg1+PPTzfCKLad3KRqWxgzt5mSeADs//jACQw9Bpg5drPMvn5dqOI6ZW
-         DUdwVgRuam6PZqy/Qr2xBOQsJhjJ17apl3xF39uDt1JNm4L5ul11zVC9mabNWidtwRUi
-         3w4g==
-X-Gm-Message-State: ACgBeo2CV/m6esJ8k3vc2VO+4afMxm/FLHesNMLyZIpl2+L7L8WTwjS4
-        DxAFhDFNU7UCP7y15Q6TKoYFFQ==
-X-Google-Smtp-Source: AA6agR65LNUY4ND6VirT9/iIW5+aJ6BogblGjGp/Ah6rCqXQ1W0A40gbtwhWH0/EwhhBy8biBCwTgA==
-X-Received: by 2002:a17:90a:ac2:b0:1fd:fad1:e506 with SMTP id r2-20020a17090a0ac200b001fdfad1e506mr25026991pje.66.1662469603875;
-        Tue, 06 Sep 2022 06:06:43 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id n12-20020a170902d2cc00b00174c1855cd9sm9819866plc.267.2022.09.06.06.06.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Sep 2022 06:06:42 -0700 (PDT)
-Message-ID: <2ad36f9d-6472-f748-b013-9678ad94e8d0@kernel.dk>
-Date:   Tue, 6 Sep 2022 07:06:40 -0600
+        with ESMTP id S239228AbiIFQoA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 12:44:00 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E421106;
+        Tue,  6 Sep 2022 09:24:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A25E2B818D4;
+        Tue,  6 Sep 2022 16:24:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D5CC433C1;
+        Tue,  6 Sep 2022 16:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662481463;
+        bh=I9HEnsbD64k69AXnJTEmM71NuSK/jsrCbllGo7OZAcE=;
+        h=From:To:Cc:Subject:Date:From;
+        b=oGNhKoZ23xmRmuMfF5By9jdWcF+k0B2GSVOYstp81XQgpGtsjDdL+emiHg7zYoqMj
+         IflTD2XbgUMEVE/Eq55++YXOFYXbNtIs8Gmh4D6kxh0WCjoFV2wYWFFrXiAIP0sotW
+         sVPNy5kCa//2GRAZX2RitE35UUcpj++7o4GjeAnIO5cfR6zH3DGGR6970lnX1UCQ7G
+         lzKflOjgv6TtMc7FcduohNII9+XludVGhDPdV8Q4YxDYfRfUE0PCsybDCpBZjUn0dx
+         +ZQxwz7p95fO4m4IyNAHH1pMMwsmcNjx3DNhIWXEM4EfoVws9j9iTM1KyjDy5d4N/t
+         udVbnIp9osezw==
+From:   SeongJae Park <sj@kernel.org>
+To:     stable@vger.kernel.org
+Cc:     gregkh@linuxfoundation.org, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        SeongJae Park <sj@kernel.org>,
+        =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
+        <marmarek@invisiblethingslab.com>, Juergen Gross <jgross@suse.com>
+Subject: [PATCH for-stable-5.10.y] xen-blkfront: Cache feature_persistent value before advertisement
+Date:   Tue,  6 Sep 2022 16:24:14 +0000
+Message-Id: <20220906162414.105452-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH for-next v4 3/4] block: add helper to map bvec iterator
- for passthrough
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Kanchan Joshi <joshi.k@samsung.com>
-Cc:     kbusch@kernel.org, asml.silence@gmail.com,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <20220905134833.6387-1-joshi.k@samsung.com>
- <CGME20220905135851epcas5p3d107b140fd6cba1feb338c1a31c4feb1@epcas5p3.samsung.com>
- <20220905134833.6387-4-joshi.k@samsung.com> <20220906062522.GA1566@lst.de>
- <20220906063329.GA27127@test-zns> <20220906065122.GA2190@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220906065122.GA2190@lst.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/6/22 12:51 AM, Christoph Hellwig wrote:
-> On Tue, Sep 06, 2022 at 12:03:29PM +0530, Kanchan Joshi wrote:
->>> This context looks weird?  That bio_alloc_bioset should not be there,
->>> as biosets are only used for file system I/O, which this is not.
->>
->> if you think it's a deal-breaker, maybe I can add a new bioset in nvme and
->> pass that as argument to this helper. Would you prefer that over the
->> current approach.
-> 
-> The whole point is that biosets exist to allow for forward progress
-> guarantees required for file system I/O.  For passthrough I/O
-> bio_kmalloc is perfectly fine and much simpler.  Adding yet another
-> bio_set just makes things even worse.
+commit fe8f65b018effbf473f53af3538d0c1878b8b329 upstream.
 
-It's a performance concern too, efficiency is much worse by using
-kmalloc+kfree for passthrough. You don't get bio caching that way.
+Xen blkfront advertises its support of the persistent grants feature
+when it first setting up and when resuming in 'talk_to_blkback()'.
+Then, blkback reads the advertised value when it connects with blkfront
+and decides if it will use the persistent grants feature or not, and
+advertises its decision to blkfront.  Blkfront reads the blkback's
+decision and it also makes the decision for the use of the feature.
 
+Commit 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter
+when connect"), however, made the blkfront's read of the parameter for
+disabling the advertisement, namely 'feature_persistent', to be done
+when it negotiate, not when advertise.  Therefore blkfront advertises
+without reading the parameter.  As the field for caching the parameter
+value is zero-initialized, it always advertises as the feature is
+disabled, so that the persistent grants feature becomes always disabled.
+
+This commit fixes the issue by making the blkfront does parmeter caching
+just before the advertisement.
+
+Fixes: 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
+Cc: <stable@vger.kernel.org> # 5.10.x
+Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Signed-off-by: SeongJae Park <sj@kernel.org>
+Tested-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
+Reviewed-by: Juergen Gross <jgross@suse.com>
+Link: https://lore.kernel.org/r/20220831165824.94815-4-sj@kernel.org
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+
+This patch is a manual backport of the upstream commit on the 5.10.y
+kernel.  Please note that this patch can be applied on the latest 5.10.y
+only after the preceding patch[1] is applied.
+
+[1] https://lore.kernel.org/stable/20220906132819.016040100@linuxfoundation.org/
+
+ drivers/block/xen-blkfront.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 9d5460f6e0ff..6f33d62331b1 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -1852,6 +1852,12 @@ static void free_info(struct blkfront_info *info)
+ 	kfree(info);
+ }
+ 
++/* Enable the persistent grants feature. */
++static bool feature_persistent = true;
++module_param(feature_persistent, bool, 0644);
++MODULE_PARM_DESC(feature_persistent,
++		"Enables the persistent grants feature");
++
+ /* Common code used when first setting up, and when resuming. */
+ static int talk_to_blkback(struct xenbus_device *dev,
+ 			   struct blkfront_info *info)
+@@ -1943,6 +1949,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
+ 		message = "writing protocol";
+ 		goto abort_transaction;
+ 	}
++	info->feature_persistent_parm = feature_persistent;
+ 	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
+ 			info->feature_persistent_parm);
+ 	if (err)
+@@ -2019,12 +2026,6 @@ static int negotiate_mq(struct blkfront_info *info)
+ 	return 0;
+ }
+ 
+-/* Enable the persistent grants feature. */
+-static bool feature_persistent = true;
+-module_param(feature_persistent, bool, 0644);
+-MODULE_PARM_DESC(feature_persistent,
+-		"Enables the persistent grants feature");
+-
+ /**
+  * Entry point to this code when a new device is created.  Allocate the basic
+  * structures and the ring buffer for communication with the backend, and
+@@ -2394,7 +2395,6 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
+ 	if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
+ 		blkfront_setup_discard(info);
+ 
+-	info->feature_persistent_parm = feature_persistent;
+ 	if (info->feature_persistent_parm)
+ 		info->feature_persistent =
+ 			!!xenbus_read_unsigned(info->xbdev->otherend,
 -- 
-Jens Axboe
-
+2.25.1
 
