@@ -2,75 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A09C54EE9
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 09:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D47ECAAA1
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 09:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233628AbiIFJha (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 05:37:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50508 "EHLO
+        id S233015AbiIFJqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 05:46:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235897AbiIFJh3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 05:37:29 -0400
+        with ESMTP id S232869AbiIFJqC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 05:46:02 -0400
 Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24C0B6581C
-        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 02:37:26 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id bj12so21773639ejb.13
-        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 02:37:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 942ED760D6
+        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 02:45:59 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id lz22so1045342ejb.3
+        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 02:45:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=unimore.it; s=google;
+        d=linaro.org; s=google;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date;
-        bh=8ab4/KXC/VCJGrAM6wTzpCaYMhm/3tELW6Q/pF3d2yg=;
-        b=L3k2+HgNwBNOQ+ow8ojCGK5dmzXXckSbJ+ltZKHL+uHxZCqB3njwCzg4VdkEf9pYyo
-         EHv2NqYduPH+u4g9bR0foiCS+VYuNHJVpX8cgX5XNnWyA4eA9MNFy81mtKNNXVKGyXYu
-         sMK0dhdUQPuxSHK/l42tDAlBU7HRuTmuzbk2g=
+        bh=VtLdd7vkvDTE4ZQfVBsC4VxzNjo0K0INFc86CHoi1Co=;
+        b=mDh9NxcPOaUlXnZU9kI6p49EzyANeI/LZ/y/fSYtsOIvabWsGS3h3W73ZJoc6x9ssj
+         wF/MwocRBvfg9Ld/ylStXfB9bX2roLVCzU/XGTDAEVE95ZqQj82bKJlynZe4a0OGqfkn
+         jzneNXhMPz2+h7fS7RP9+OLMaMh2doQOn26aAbPbVdRTrgf/R3lAPetQeRY74o+BwzCA
+         cNvWkYPTZ5tZf0mRBkX7vcX4BrLDvOfFZpmMNC8pH6tulrg+3KlJbnmcHc3UBPSHdqR9
+         W2+hq9eEmZ0faXJCBHCuVfjXjhr9vDGLGA0l8tdMdqINkIX7CG6ayVTUCxxOtIYscUIW
+         8SXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=8ab4/KXC/VCJGrAM6wTzpCaYMhm/3tELW6Q/pF3d2yg=;
-        b=PBJ7UcbLKAmjqTjSYb0p5dnYgVP4rCD7OeYQWhFWVwGwZrkdXiWFvHs/uLOAUlWpG/
-         NOCM43+e6e16Sr71xhmVc2j8xwZA7rlx9ZTF4APjTJ9rJsYZJWCUTEKsnlWMhnB+jeQ9
-         XIlXQBGltvxEZ9psyZC8NBFrmxGY4wwq+6Io/+XExPEj6BnvuOyuJ/l2Zy3rQLKElbjQ
-         A4fmLQCmnUHx2k6x/ZvU9YmGMM0Bhl0FmcWTMBlWtx9h/VlNjymu+j4td9p7PEUcZZ3b
-         veVcrRrF22NakNTcQc/2HuiDA41Fjqg8WYZebQKd9WAVZVH7byJfs7zxERX/lceanIYp
-         5+oA==
-X-Gm-Message-State: ACgBeo0EjYZvn96l6bL6ar5+XeIXtZaSLF1O4B9CwacbMekba0aVsM+e
-        JnwQfe8BaIgO+Ae+sKYLXw5G
-X-Google-Smtp-Source: AA6agR5oMrn7st5T+/R0moL8sWUBXk+gefDuxpdDuSrvcue7dAZwiiodmMrEtXkB8slie9xV103N4Q==
-X-Received: by 2002:a17:906:7954:b0:742:7a6:b179 with SMTP id l20-20020a170906795400b0074207a6b179mr24629684ejo.679.1662457044644;
-        Tue, 06 Sep 2022 02:37:24 -0700 (PDT)
+        bh=VtLdd7vkvDTE4ZQfVBsC4VxzNjo0K0INFc86CHoi1Co=;
+        b=xp2emRpoYxg+aJBLDoEvefJhyQIpljMQx9vCgAQdyCZUPljX/6Tt66VciEgPr7svHH
+         5uBPRExxx0x5MiodowokoPNL5vUL2K3MS7RPQCWcxdRxqcTegBzHGcZ5OQvuMa57c0MO
+         4IVnauXUUi8N1KLdof+nT2QNHuj3pEZlZS8tvqmzZBNrnvX64MGMCl7rfJs/kTWynaQw
+         DXjnhb4OPiDIG1733iM6Gj0dKKrcgbUg8IWx4jkN3jD7vppXMaHamCPP+xsbSKrS6mYD
+         1BRUJX/jB/9LQu7KZzdePHkcyxxiOppmcmB7l/hcjest8Po+mnZX0zhRtqXP+ep1ZnPZ
+         e8Jg==
+X-Gm-Message-State: ACgBeo23dNcx83TQBB7LHRCWlNWvUyrfaQ6RTz6rwxn/c8ytXUX4AVp/
+        PRL+3eZ4tH4YpLBnRvu5AqKonGw13L07zw==
+X-Google-Smtp-Source: AA6agR6kYrPMIegCZ/MD9J95k2Z6B0Ycf9T8Cat6OfFamb+zoIbBd/kPLFPHo3yGBug8Z1F/Da++sA==
+X-Received: by 2002:a17:906:9c82:b0:6e1:1d6c:914c with SMTP id fj2-20020a1709069c8200b006e11d6c914cmr1145411ejc.769.1662457557672;
+        Tue, 06 Sep 2022 02:45:57 -0700 (PDT)
 Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id g15-20020a170906538f00b0076f927ed0f1sm265565ejo.127.2022.09.06.02.37.23
+        by smtp.gmail.com with ESMTPSA id 10-20020a170906300a00b00738795e7d9bsm6273344ejz.2.2022.09.06.02.45.56
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Sep 2022 02:37:24 -0700 (PDT)
+        Tue, 06 Sep 2022 02:45:56 -0700 (PDT)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-From:   Paolo Valente <paolo.valente@unimore.it>
-In-Reply-To: <e6b53794-f93f-92b2-1f45-35ae81a28a5c@huaweicloud.com>
-Date:   Tue, 6 Sep 2022 11:37:22 +0200
-Cc:     Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
+Subject: Re: stalling IO regression since linux 5.12, through 5.18
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <297cbb87-87aa-2e1d-1fc3-8e96c241f28f@huaweicloud.com>
+Date:   Tue, 6 Sep 2022 11:45:54 +0200
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Chris Murphy <lists@colorremedies.com>,
+        Jan Kara <jack@suse.cz>, Nikolay Borisov <nborisov@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
+        Linux-RAID <linux-raid@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
         "yukuai (C)" <yukuai3@huawei.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <F758A356-EE6B-4B7B-95E2-6414616C77E4@unimore.it>
-References: <20220610021701.2347602-1-yukuai3@huawei.com>
- <20220610021701.2347602-4-yukuai3@huawei.com>
- <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
- <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
- <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
- <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
- <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
- <55A07102-BE55-4606-9E32-64E884064FB9@unimore.it>
- <5cb0e5bc-feec-86d6-6f60-3c28ee625efd@huaweicloud.com>
- <D89DCF20-27D8-4F8F-B8B0-FD193FC4F18D@unimore.it>
- <e6b53794-f93f-92b2-1f45-35ae81a28a5c@huaweicloud.com>
+Message-Id: <69523E26-6A87-4C8A-A5CD-D37A28018109@linaro.org>
+References: <Yv0KmT8UYos2/4SX@T590>
+ <35f0d608-7448-4276-8922-19a23d8f9049@www.fastmail.com>
+ <Yv2P0zyoVvz35w/m@T590>
+ <568465de-5c3b-4d94-a74b-5b83ce2f942f@www.fastmail.com>
+ <Yv2w+Tuhw1RAoXI5@T590>
+ <9f2f608a-cd5f-4736-9e6d-07ccc2eca12c@www.fastmail.com>
+ <a817431f-276f-4aab-9ff8-c3e397494339@www.fastmail.com>
+ <5426d0f9-6539-477d-8feb-2b49136b960f@www.fastmail.com>
+ <Yv3NIQlDL0T3lstU@T590>
+ <0f731b0a-fbd5-4e7b-a3df-0ed63360c1e0@www.fastmail.com>
+ <YwCGlyDMhWubqKoL@T590>
+ <297cbb87-87aa-2e1d-1fc3-8e96c241f28f@huaweicloud.com>
 To:     Yu Kuai <yukuai1@huaweicloud.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
@@ -79,295 +87,114 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 26 ago 2022, alle ore 04:34, Yu Kuai =
+> Il giorno 1 set 2022, alle ore 09:02, Yu Kuai =
 <yukuai1@huaweicloud.com> ha scritto:
 >=20
-> Hi, Paolo!
+> Hi, Chris
 >=20
-> =E5=9C=A8 2022/08/25 22:59, Paolo Valente =E5=86=99=E9=81=93:
->>> Il giorno 11 ago 2022, alle ore 03:19, Yu Kuai =
-<yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
+> =E5=9C=A8 2022/08/20 15:00, Ming Lei =E5=86=99=E9=81=93:
+>> On Fri, Aug 19, 2022 at 03:20:25PM -0400, Chris Murphy wrote:
 >>>=20
->>> Hi, Paolo
 >>>=20
->>> =E5=9C=A8 2022/08/10 18:49, Paolo Valente =E5=86=99=E9=81=93:
->>>>> Il giorno 27 lug 2022, alle ore 14:11, Yu Kuai =
-<yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
+>>> On Thu, Aug 18, 2022, at 1:24 AM, Ming Lei wrote:
+>>>> On Thu, Aug 18, 2022 at 12:27:04AM -0400, Chris Murphy wrote:
 >>>>>=20
->>>>> Hi, Paolo
 >>>>>=20
->>>> hi
->>>>> Are you still interested in this patchset?
+>>>>> On Thu, Aug 18, 2022, at 12:18 AM, Chris Murphy wrote:
+>>>>>> On Thu, Aug 18, 2022, at 12:12 AM, Chris Murphy wrote:
+>>>>>>> On Wed, Aug 17, 2022, at 11:41 PM, Ming Lei wrote:
+>>>>>>>=20
+>>>>>>>> OK, can you post the blk-mq debugfs log after you trigger it on =
+v5.17?
 >>>>>=20
->>>> Yes. Sorry for replying very late again.
->>>> Probably the last fix that you suggest is enough, but I'm a little =
-bit
->>>> concerned that it may be a little hasty.  In fact, before this fix, =
-we
->>>> exchanged several messages, and I didn't seem to be very good at
->>>> convincing you about the need to keep into account also in-service
->>>> I/O.  So, my question is: are you sure that now you have a
+>>>>> Same boot, 3rd log. But the load is above 300 so I kinda need to =
+sysrq+b soon.
+>>>>>=20
+>>>>> =
+https://drive.google.com/file/d/1375H558kqPTdng439rvG6LuXXWPXLToo/view?usp=
+=3Dsharing
+>>>>>=20
+>>>>=20
+>>>> Also please test the following one too:
+>>>>=20
+>>>>=20
+>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>>> index 5ee62b95f3e5..d01c64be08e2 100644
+>>>> --- a/block/blk-mq.c
+>>>> +++ b/block/blk-mq.c
+>>>> @@ -1991,7 +1991,8 @@ bool blk_mq_dispatch_rq_list(struct =
+blk_mq_hw_ctx
+>>>> *hctx, struct list_head *list,
+>>>>  		if (!needs_restart ||
+>>>>  		    (no_tag && =
+list_empty_careful(&hctx->dispatch_wait.entry)))
+>>>>  			blk_mq_run_hw_queue(hctx, true);
+>>>> -		else if (needs_restart && needs_resource)
+>>>> +		else if (needs_restart && (needs_resource ||
+>>>> +					=
+blk_mq_is_shared_tags(hctx->flags)))
+>>>>  			blk_mq_delay_run_hw_queue(hctx, =
+BLK_MQ_RESOURCE_DELAY);
+>>>>=20
+>>>>  		blk_mq_update_dispatch_busy(hctx, true);
+>>>>=20
 >>>=20
->>> I'm confused here, I'm pretty aware that in-service I/O(as said =
-pending
->>> requests is the patchset) should be counted, as you suggested in v7, =
-are
->>> you still thinking that the way in this patchset is problematic?
 >>>=20
->>> I'll try to explain again that how to track is bfqq has pending =
-pending
->>> requests, please let me know if you still think there are some =
-problems:
->>>=20
->>> patch 1 support to track if bfqq has pending requests, it's
->>> done by setting the flag 'entity->in_groups_with_pending_reqs' when =
-the
->>> first request is inserted to bfqq, and it's cleared when the last
->>> request is completed. specifically the flag is set in
->>> bfq_add_bfqq_busy() when 'bfqq->dispatched' if false, and it's =
-cleared
->>> both in bfq_completed_request() and bfq_del_bfqq_busy() when
->>> 'bfqq->diapatched' is false.
->>>=20
->> This general description seems correct to me. Have you already sent a =
-new version of your patchset?
+>>> With just this patch on top of 5.17.0, it still hangs. I've captured =
+block debugfs log:
+>>> =
+https://drive.google.com/file/d/1ic4YHxoL9RrCdy_5FNdGfh_q_J3d_Ft0/view?usp=
+=3Dsharing
+>> The log is similar with before, and the only difference is RESTART =
+not
+>> set.
+>> Also follows another patch merged to v5.18 and it fixes io stall too, =
+feel free to test it:
+>> 8f5fea65b06d blk-mq: avoid extending delays of active hctx from =
+blk_mq_delay_run_hw_queues
 >=20
-> It's glad that we finially on the same page here.
+> Have you tried this patch?
+>=20
+> We meet a similar problem in our test, and I'm pretty sure about the
+> situation at the scene,
+>=20
+> Our test environment=EF=BC=9Anvme with bfq ioscheduler,
+>=20
+> How io is stalled:
+>=20
+> 1. hctx1 dispatch rq from bfq in service queue, bfqq becomes empty,
+> dispatch somehow fails and rq is inserted to hctx1->dispatch, new run
+> work is queued.
+>=20
+> 2. other hctx tries to dispatch rq, however, in service bfqq is
+> empty, bfq_dispatch_request return NULL, thus
+> blk_mq_delay_run_hw_queues is called.
+>=20
+> 3. for the problem described in above patch=EF=BC=8Crun work from =
+"hctx1"
+> can be stalled.
+>=20
+> Above patch should fix this io stall, however, it seems to me bfq do
+> have some problems that in service bfqq doesn't expire under following
+> situation:
+>=20
+> 1. dispatched rqs don't complete
+> 2. no new rq is issued to bfq
 >=20
 
-Yep. Sorry for my chronicle delay.
+There may be one more important problem: is bfq_finish_requeue_request
+eventually invoked for the failed rq?  If it is not, then a memory
+leak follows, because recounting gets unavoidably unbalanced.
 
-> Please take a look at patch 1, which already impelement the above
-> descriptions, it seems to me there is no need to send a new version
-> for now. If you think there are still some other problems, please let
-> me know.
->=20
-
-Patch 1 seems ok to me. I seem to have only one pending comment on this =
-patch (3/4) instead. Let me paste previous stuff here for your =
-convenience:
-
->>=20
->> -	/*
->> -	 * Next function is invoked last, because it causes bfqq to be
->> -	 * freed if the following holds: bfqq is not in service and
->> -	 * has no dispatched request. DO NOT use bfqq after the next
->> -	 * function invocation.
->> -	 */
-> I would really love it if you leave this comment.  I added it after
-> suffering a lot for a nasty UAF.  Of course the first sentence may
-> need to be adjusted if the code that precedes it is to be removed.
-> Same as above, if this patch is applied, this function will be gone.
-
-yes, but this comment now must be moved forward.
-
-Looking forward for a new complete version, for a new review.  I'll do
-my best to reply quicker.
+In contrast, if bfq_finish_requeue_request is correctly invoked, then
+no stall should occur.
 
 Thanks,
 Paolo
 
-
-
-
-
 > Thanks,
 > Kuai
 >> Thanks,
->> Paolo
->>> Thanks,
->>> Kuai
->>>> clear/complete understanding of this non-trivial matter?
->>>> Consequently, are we sure that this last fix is most certainly all =
-we
->>>> need?  Of course, I will check on my own, but if you reassure me on
->>>> this point, I will feel more confident.
->>>> Thanks,
->>>> Paolo
->>>>> =E5=9C=A8 2022/07/20 19:38, Yu Kuai =E5=86=99=E9=81=93:
->>>>>> Hi
->>>>>>=20
->>>>>> =E5=9C=A8 2022/07/20 19:24, Paolo VALENTE =E5=86=99=E9=81=93:
->>>>>>>=20
->>>>>>>=20
->>>>>>>> Il giorno 12 lug 2022, alle ore 15:30, Yu Kuai =
-<yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com> =
-<mailto:yukuai1@huaweicloud.com>> ha scritto:
->>>>>>>>=20
->>>>>>>> Hi!
->>>>>>>>=20
->>>>>>>> I'm copying my reply with new mail address, because Paolo seems
->>>>>>>> didn't receive my reply.
->>>>>>>>=20
->>>>>>>> =E5=9C=A8 2022/06/23 23:32, Paolo Valente =E5=86=99=E9=81=93:
->>>>>>>>> Sorry for the delay.
->>>>>>>>>> Il giorno 10 giu 2022, alle ore 04:17, Yu Kuai =
-<yukuai3@huawei.com <mailto:yukuai3@huawei.com> =
-<mailto:yukuai3@huawei.com>> ha scritto:
->>>>>>>>>>=20
->>>>>>>>>> Currently, bfq can't handle sync io concurrently as long as =
-they
->>>>>>>>>> are not issued from root group. This is because
->>>>>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>>>>>>>> bfq_asymmetric_scenario().
->>>>>>>>>>=20
->>>>>>>>>> The way that bfqg is counted into =
-'num_groups_with_pending_reqs':
->>>>>>>>>>=20
->>>>>>>>>> Before this patch:
->>>>>>>>>> 1) root group will never be counted.
->>>>>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>>>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the =
-requests.
->>>>>>>>>>=20
->>>>>>>>>> After this patch:
->>>>>>>>>> 1) root group is counted.
->>>>>>>>>> 2) Count if bfqg have pending requests.
->>>>>>>>>> 3) Don't count if bfqg complete all the requests.
->>>>>>>>>>=20
->>>>>>>>>> With this change, the occasion that only one group is =
-activated can be
->>>>>>>>>> detected, and next patch will support concurrent sync io in =
-the
->>>>>>>>>> occasion.
->>>>>>>>>>=20
->>>>>>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com =
-<mailto:yukuai3@huawei.com> <mailto:yukuai3@huawei.com>>
->>>>>>>>>> Reviewed-by: Jan Kara <jack@suse.cz <mailto:jack@suse.cz> =
-<mailto:jack@suse.cz>>
->>>>>>>>>> ---
->>>>>>>>>> block/bfq-iosched.c | 42 =
-------------------------------------------
->>>>>>>>>> block/bfq-iosched.h | 18 +++++++++---------
->>>>>>>>>> block/bfq-wf2q.c    | 19 ++++---------------
->>>>>>>>>> 3 files changed, 13 insertions(+), 66 deletions(-)
->>>>>>>>>>=20
->>>>>>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>>>>>>>>> index 0ec21018daba..03b04892440c 100644
->>>>>>>>>> --- a/block/bfq-iosched.c
->>>>>>>>>> +++ b/block/bfq-iosched.c
->>>>>>>>>> @@ -970,48 +970,6 @@ void __bfq_weights_tree_remove(struct =
-bfq_data *bfqd,
->>>>>>>>>> void bfq_weights_tree_remove(struct bfq_data *bfqd,
->>>>>>>>>>     struct bfq_queue *bfqq)
->>>>>>>>>> {
->>>>>>>>>> -struct bfq_entity *entity =3D bfqq->entity.parent;
->>>>>>>>>> -
->>>>>>>>>> -for_each_entity(entity) {
->>>>>>>>>> -struct bfq_sched_data *sd =3D entity->my_sched_data;
->>>>>>>>>> -
->>>>>>>>>> -if (sd->next_in_service || sd->in_service_entity) {
->>>>>>>>>> -/*
->>>>>>>>>> -* entity is still active, because either
->>>>>>>>>> -* next_in_service or in_service_entity is not
->>>>>>>>>> -* NULL (see the comments on the definition of
->>>>>>>>>> -* next_in_service for details on why
->>>>>>>>>> -* in_service_entity must be checked too).
->>>>>>>>>> -*
->>>>>>>>>> -* As a consequence, its parent entities are
->>>>>>>>>> -* active as well, and thus this loop must
->>>>>>>>>> -* stop here.
->>>>>>>>>> -*/
->>>>>>>>>> -break;
->>>>>>>>>> -}
->>>>>>>>>> -
->>>>>>>>>> -/*
->>>>>>>>>> -* The decrement of num_groups_with_pending_reqs is
->>>>>>>>>> -* not performed immediately upon the deactivation of
->>>>>>>>>> -* entity, but it is delayed to when it also happens
->>>>>>>>>> -* that the first leaf descendant bfqq of entity gets
->>>>>>>>>> -* all its pending requests completed. The following
->>>>>>>>>> -* instructions perform this delayed decrement, if
->>>>>>>>>> -* needed. See the comments on
->>>>>>>>>> -* num_groups_with_pending_reqs for details.
->>>>>>>>>> -*/
->>>>>>>>>> -if (entity->in_groups_with_pending_reqs) {
->>>>>>>>>> -entity->in_groups_with_pending_reqs =3D false;
->>>>>>>>>> -bfqd->num_groups_with_pending_reqs--;
->>>>>>>>>> -}
->>>>>>>>>> -}
->>>>>>>>> With this part removed, I'm missing how you handle the =
-following
->>>>>>>>> sequence of events:
->>>>>>>>> 1.  a queue Q becomes non busy but still has dispatched =
-requests, so
->>>>>>>>> it must not be removed from the counter of queues with pending =
-reqs
->>>>>>>>> yet
->>>>>>>>> 2.  the last request of Q is completed with Q being still idle =
-(non
->>>>>>>>> busy).  At this point Q must be removed from the counter.  It =
-seems to
->>>>>>>>> me that this case is not handled any longer
->>>>>>>> Hi, Paolo
->>>>>>>>=20
->>>>>>>> 1) At first, patch 1 support to track if bfqq has pending =
-requests, it's
->>>>>>>> done by setting the flag 'entity->in_groups_with_pending_reqs' =
-when the
->>>>>>>> first request is inserted to bfqq, and it's cleared when the =
-last
->>>>>>>> request is completed(based on weights_tree insertion and =
-removal).
->>>>>>>>=20
->>>>>>>=20
->>>>>>> In patch 1 I don't see the flag cleared for the =
-request-completion event :(
->>>>>>>=20
->>>>>>> The piece of code involved is this:
->>>>>>>=20
->>>>>>> static void bfq_completed_request(struct bfq_queue *bfqq, struct =
-bfq_data *bfqd)
->>>>>>> {
->>>>>>> u64 now_ns;
->>>>>>> u32 delta_us;
->>>>>>>=20
->>>>>>> bfq_update_hw_tag(bfqd);
->>>>>>>=20
->>>>>>> bfqd->rq_in_driver[bfqq->actuator_idx]--;
->>>>>>> bfqd->tot_rq_in_driver--;
->>>>>>> bfqq->dispatched--;
->>>>>>>=20
->>>>>>> if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq)) {
->>>>>>> /*
->>>>>>> * Set budget_timeout (which we overload to store the
->>>>>>> * time at which the queue remains with no backlog and
->>>>>>> * no outstanding request; used by the weight-raising
->>>>>>> * mechanism).
->>>>>>> */
->>>>>>> bfqq->budget_timeout =3D jiffies;
->>>>>>>=20
->>>>>>> bfq_weights_tree_remove(bfqd, bfqq);
->>>>>>> }
->>>>>>> ...
->>>>>>>=20
->>>>>>> Am I missing something?
->>>>>>=20
->>>>>> I add a new api bfq_del_bfqq_in_groups_with_pending_reqs() in =
-patch 1
->>>>>> to clear the flag, and it's called both from bfq_del_bfqq_busy() =
-and
->>>>>> bfq_completed_request(). I think you may miss the later:
->>>>>>=20
->>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>>>>> index 0d46cb728bbf..0ec21018daba 100644
->>>>>> --- a/block/bfq-iosched.c
->>>>>> +++ b/block/bfq-iosched.c
->>>>>> @@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct =
-bfq_queue *bfqq, struct bfq_data *bfqd)
->>>>>>           */
->>>>>>          bfqq->budget_timeout =3D jiffies;
->>>>>>=20
->>>>>> +        bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
->>>>>>          bfq_weights_tree_remove(bfqd, bfqq);
->>>>>>      }
->>>>>>=20
->>>>>> Thanks,
->>>>>> Kuai
->>>>>>>=20
->>>>>>> Thanks,
->>>>>>> Paolo
->>>>>=20
->>>> .
->=20
+>> Ming
+>> .
 
