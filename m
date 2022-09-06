@@ -2,55 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B8A6ECAAA1
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 04:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 789D0C6FA83
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 06:25:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232493AbiIFEeL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 00:34:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S232957AbiIFGZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 02:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231947AbiIFEeK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 00:34:10 -0400
+        with ESMTP id S237992AbiIFGZ2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 02:25:28 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A95BA5E564;
-        Mon,  5 Sep 2022 21:34:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F147C52448;
+        Mon,  5 Sep 2022 23:25:26 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id A35DB68AA6; Tue,  6 Sep 2022 06:34:04 +0200 (CEST)
-Date:   Tue, 6 Sep 2022 06:34:04 +0200
+        id 096F468AA6; Tue,  6 Sep 2022 08:25:22 +0200 (CEST)
+Date:   Tue, 6 Sep 2022 08:25:22 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 04/17] btrfs: handle checksum validation and repair at
- the storage layer
-Message-ID: <20220906043404.GA32181@lst.de>
-References: <20220901074216.1849941-1-hch@lst.de> <20220901074216.1849941-5-hch@lst.de> <ffd39ae8-a7fb-1a75-a2d5-b601cb802b9c@gmx.com> <20220905064816.GD2092@lst.de> <227328cc-a41c-be15-ab9f-fa81419b7348@gmx.com> <20220905143100.GA5426@lst.de> <7e674801-2f6c-68f6-dcea-527771843587@gmx.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+        asml.silence@gmail.com, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH for-next v4 3/4] block: add helper to map bvec iterator
+ for passthrough
+Message-ID: <20220906062522.GA1566@lst.de>
+References: <20220905134833.6387-1-joshi.k@samsung.com> <CGME20220905135851epcas5p3d107b140fd6cba1feb338c1a31c4feb1@epcas5p3.samsung.com> <20220905134833.6387-4-joshi.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7e674801-2f6c-68f6-dcea-527771843587@gmx.com>
+In-Reply-To: <20220905134833.6387-4-joshi.k@samsung.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 06:34:40AM +0800, Qu Wenruo wrote:
->> I thought about that.  And I suspect it probably is the right thing
->> to do.  I'm mostly stayed away from it because it doesn't really
->> help with the goal in this series, and I also don't have good
->> code coverage to fail comfortable touching the metadata checksum
->> handling and repair.  I can offer this sneaky deal:  if someone
->> help creating good metadata repair coverage in xfstests, I will look
->> into this next.
->
-> Then may I take this work since it's mostly independent and you can
-> continue your existing work without being distracted?
+On Mon, Sep 05, 2022 at 07:18:32PM +0530, Kanchan Joshi wrote:
+> +static struct bio *bio_map_get(struct request *rq, unsigned int nr_vecs,
+>  		gfp_t gfp_mask)
+>  {
+> @@ -259,13 +252,31 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>  		bio = bio_alloc_bioset(NULL, nr_vecs, opf, gfp_mask,
+>  					&fs_bio_set);
+>  		if (!bio)
+> -			return -ENOMEM;
+> +			return NULL;
 
-Fine with me as well.
+This context looks weird?  That bio_alloc_bioset should not be there,
+as biosets are only used for file system I/O, which this is not.
