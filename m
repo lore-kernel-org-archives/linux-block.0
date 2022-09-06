@@ -2,107 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E34C5C6FA86
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 17:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3D5C38145
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 21:28:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234753AbiIFRGA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 13:06:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
+        id S229895AbiIFV2X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 17:28:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbiIFRFm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 13:05:42 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71902DDF;
-        Tue,  6 Sep 2022 09:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=oQfM+bbedgrkFi9Dsc85HjLHDXM0DDmDD1eypkwzHoM=; b=D58L0g/IbRJh0NwzF1kBsWd+Sp
-        b5rUpHebAhlqXJVTYhn7VJeETG6epcXYVUe3HnihWpolRiQFsxdX7FQUp1tmYW/B4jqW4hn/Rp+Jk
-        Jq3yo6xlTaeaEljYRVbASSeSwrvunYqqBafdoBgbFO6BVZfVg5xeqSwz8YCIzz1BqQulVG8GYhiQW
-        Z9QPU88VVEly+0Y+BvB1f5zpXlCsxmIcy55BrN73xxsKSF8+/U1iry3rB4/TTWNMYnfGWbH6zyxWd
-        lB7nAn02WSXZgMpn/R0eqy57Fqqb2NJjEgadbl0CJNJc1y0GkaKqZlgtVL1J8Xjvg+xyZxW+5mRsF
-        GyNaxlJg==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1oVboX-000Gty-8S; Tue, 06 Sep 2022 10:52:42 -0600
-Message-ID: <8d76a5b2-3185-369e-caf6-4670d4339fce@deltatee.com>
-Date:   Tue, 6 Sep 2022 10:52:37 -0600
+        with ESMTP id S229939AbiIFV2Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 17:28:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20648BADB0;
+        Tue,  6 Sep 2022 14:28:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 759D8B81A65;
+        Tue,  6 Sep 2022 21:27:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8797DC433B5;
+        Tue,  6 Sep 2022 21:27:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662499675;
+        bh=dCZeZmBCEnwc86WWX7Ly3DyLI7yhO7+PsPdUpFb40oU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=uqf84Q+gXCZSzgXwZHheeS+21eyn/rsBhdyxH+30/5ZYwAsXM6O4hbRZcA8Ci+0sj
+         dk3ZMM5KZMkJXn58MkyXhtOmQRLuBYKk6cQ0lbQlQbvLSR8Z9gcwvaEInubN2HgkvI
+         kUQgeK6SmmuUIMQGmr9puVKqlS9Swc54V4EkJUqwdja/hoW2DvoYeOVue3j41MssL8
+         l1LHimEc09fOLUKhrDc/unzbcxWYiRrrGAeberAgNswIPKo1VMpg2khdZNUlALEqpO
+         gOyMf1YTRVrRmKoJ28W4r8hj4u40SM6/wtjAOHrgvF9MpMmqPi4ryQN1Kh97h+M3Yx
+         0qtrlDES7RGOw==
+Date:   Tue, 6 Sep 2022 15:27:51 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     jack@suse.cz, axboe@kernel.dk, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH] sbitmap: fix possible io hung due to lost wakeup
+Message-ID: <Yxe7V3yfBcADoYLE@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220803121504.212071-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Content-Language: en-CA
-To:     John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20220825152425.6296-1-logang@deltatee.com>
- <20220825152425.6296-3-logang@deltatee.com>
- <24ee706f-b70c-28d0-15a7-13d0dc9254bb@nvidia.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <24ee706f-b70c-28d0-15a7-13d0dc9254bb@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: jhubbard@nvidia.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v9 2/8] iov_iter: introduce
- iov_iter_get_pages_[alloc_]flags()
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220803121504.212071-1-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Aug 03, 2022 at 08:15:04PM +0800, Yu Kuai wrote:
+>  	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+> -	if (wait_cnt <= 0) {
+> -		int ret;
+> +	/*
+> +	 * For concurrent callers of this, callers should call this function
+> +	 * again to wakeup a new batch on a different 'ws'.
+> +	 */
+> +	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
+> +		return true;
 
+If wait_cnt is '0', but the waitqueue_active happens to be false due to racing
+with add_wait_queue(), this returns true so the caller will retry. The next
+atomic_dec will set the current waitstate wait_cnt < 0, which also forces an
+early return true. When does the wake up happen, or wait_cnt and wait_index get
+updated in that case?
 
-On 2022-09-05 17:21, John Hubbard wrote:
-> Looking ahead, interestingly enough, it turns out that this approach to
-> the wrappers is really pretty close to what I posted in patch 4/7 of my
-> "convert most filesystems to pin_user_pages_fast()" series [1]. Instead
-> of passing gup_flags through, I tried to avoid that (because FOLL_PIN
-> is, as a mild design preference, supposed to remain internal to gup.c),
-> but given that you need to do it, I think I can just build on top of
-> your approach, and pass in FOLL_PIN via your new gup_flags arg.
-
-Seems to me like we could just provide the one exported function with a
-flag then use an static inline helper for the pin version. That would
-help keep the FOLL_PIN flag contained as you like.
-
-> Along those lines, I've copied you in on "New topic branch for block + 
-> gup work?", let's see what happens over there.
+  
+> -		wake_batch = READ_ONCE(sbq->wake_batch);
+> +	if (wait_cnt > 0)
+> +		return false;
+>  
+> -		/*
+> -		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> -		 * ensure that we see the batch size update before the wait
+> -		 * count is reset.
+> -		 */
+> -		smp_mb__before_atomic();
+> +	wake_batch = READ_ONCE(sbq->wake_batch);
+>  
+> -		/*
+> -		 * For concurrent callers of this, the one that failed the
+> -		 * atomic_cmpxhcg() race should call this function again
+> -		 * to wakeup a new batch on a different 'ws'.
+> -		 */
+> -		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+> -		if (ret == wait_cnt) {
+> -			sbq_index_atomic_inc(&sbq->wake_index);
+> -			wake_up_nr(&ws->wait, wake_batch);
+> -			return false;
+> -		}
+> +	/*
+> +	 * Wake up first in case that concurrent callers decrease wait_cnt
+> +	 * while waitqueue is empty.
+> +	 */
+> +	wake_up_nr(&ws->wait, wake_batch);
+>  
+> -		return true;
+> -	}
+> +	/*
+> +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> +	 * ensure that we see the batch size update before the wait
+> +	 * count is reset.
+> +	 *
+> +	 * Also pairs with the implicit barrier between decrementing wait_cnt
+> +	 * and checking for waitqueue_active() to make sure waitqueue_active()
+> +	 * sees result of the wakeup if atomic_dec_return() has seen the result
+> +	 * of atomic_set().
+> +	 */
+> +	smp_mb__before_atomic();
+> +
+> +	/*
+> +	 * Increase wake_index before updating wait_cnt, otherwise concurrent
+> +	 * callers can see valid wait_cnt in old waitqueue, which can cause
+> +	 * invalid wakeup on the old waitqueue.
+> +	 */
+> +	sbq_index_atomic_inc(&sbq->wake_index);
+> +	atomic_set(&ws->wait_cnt, wake_batch);
+>  
+>  	return false;
+>  }
+> -- 
+> 2.31.1
 > 
-> [1] https://lore.kernel.org/r/20220831041843.973026-1-jhubbard@nvidia.com
-
-Thanks for the review. All the feedback makes sense. I'll apply all the
-changes from you and Christoph for the next version.
-
-I'm happy to base the next version off of any other changes to the iov
-functions. I suspect my patches can hold off a cycle or two more while
-we do it. Let me know if you'd like some help making the conversions,
-I'm also fine to do some work to aid with the effort.
-
-Thanks,
-
-Logan
-
