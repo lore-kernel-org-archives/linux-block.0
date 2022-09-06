@@ -2,138 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F048FC6FA83
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 16:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E34C5C6FA86
+	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 17:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234073AbiIFQo5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 12:44:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60810 "EHLO
+        id S234753AbiIFRGA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 13:06:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239228AbiIFQoA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 12:44:00 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E421106;
-        Tue,  6 Sep 2022 09:24:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A25E2B818D4;
-        Tue,  6 Sep 2022 16:24:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D5CC433C1;
-        Tue,  6 Sep 2022 16:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662481463;
-        bh=I9HEnsbD64k69AXnJTEmM71NuSK/jsrCbllGo7OZAcE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=oGNhKoZ23xmRmuMfF5By9jdWcF+k0B2GSVOYstp81XQgpGtsjDdL+emiHg7zYoqMj
-         IflTD2XbgUMEVE/Eq55++YXOFYXbNtIs8Gmh4D6kxh0WCjoFV2wYWFFrXiAIP0sotW
-         sVPNy5kCa//2GRAZX2RitE35UUcpj++7o4GjeAnIO5cfR6zH3DGGR6970lnX1UCQ7G
-         lzKflOjgv6TtMc7FcduohNII9+XludVGhDPdV8Q4YxDYfRfUE0PCsybDCpBZjUn0dx
-         +ZQxwz7p95fO4m4IyNAHH1pMMwsmcNjx3DNhIWXEM4EfoVws9j9iTM1KyjDy5d4N/t
-         udVbnIp9osezw==
-From:   SeongJae Park <sj@kernel.org>
-To:     stable@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        SeongJae Park <sj@kernel.org>,
-        =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>, Juergen Gross <jgross@suse.com>
-Subject: [PATCH for-stable-5.10.y] xen-blkfront: Cache feature_persistent value before advertisement
-Date:   Tue,  6 Sep 2022 16:24:14 +0000
-Message-Id: <20220906162414.105452-1-sj@kernel.org>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S229932AbiIFRFm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 13:05:42 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71902DDF;
+        Tue,  6 Sep 2022 09:52:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=oQfM+bbedgrkFi9Dsc85HjLHDXM0DDmDD1eypkwzHoM=; b=D58L0g/IbRJh0NwzF1kBsWd+Sp
+        b5rUpHebAhlqXJVTYhn7VJeETG6epcXYVUe3HnihWpolRiQFsxdX7FQUp1tmYW/B4jqW4hn/Rp+Jk
+        Jq3yo6xlTaeaEljYRVbASSeSwrvunYqqBafdoBgbFO6BVZfVg5xeqSwz8YCIzz1BqQulVG8GYhiQW
+        Z9QPU88VVEly+0Y+BvB1f5zpXlCsxmIcy55BrN73xxsKSF8+/U1iry3rB4/TTWNMYnfGWbH6zyxWd
+        lB7nAn02WSXZgMpn/R0eqy57Fqqb2NJjEgadbl0CJNJc1y0GkaKqZlgtVL1J8Xjvg+xyZxW+5mRsF
+        GyNaxlJg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1oVboX-000Gty-8S; Tue, 06 Sep 2022 10:52:42 -0600
+Message-ID: <8d76a5b2-3185-369e-caf6-4670d4339fce@deltatee.com>
+Date:   Tue, 6 Sep 2022 10:52:37 -0600
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Content-Language: en-CA
+To:     John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20220825152425.6296-1-logang@deltatee.com>
+ <20220825152425.6296-3-logang@deltatee.com>
+ <24ee706f-b70c-28d0-15a7-13d0dc9254bb@nvidia.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <24ee706f-b70c-28d0-15a7-13d0dc9254bb@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jhubbard@nvidia.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v9 2/8] iov_iter: introduce
+ iov_iter_get_pages_[alloc_]flags()
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit fe8f65b018effbf473f53af3538d0c1878b8b329 upstream.
 
-Xen blkfront advertises its support of the persistent grants feature
-when it first setting up and when resuming in 'talk_to_blkback()'.
-Then, blkback reads the advertised value when it connects with blkfront
-and decides if it will use the persistent grants feature or not, and
-advertises its decision to blkfront.  Blkfront reads the blkback's
-decision and it also makes the decision for the use of the feature.
 
-Commit 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter
-when connect"), however, made the blkfront's read of the parameter for
-disabling the advertisement, namely 'feature_persistent', to be done
-when it negotiate, not when advertise.  Therefore blkfront advertises
-without reading the parameter.  As the field for caching the parameter
-value is zero-initialized, it always advertises as the feature is
-disabled, so that the persistent grants feature becomes always disabled.
+On 2022-09-05 17:21, John Hubbard wrote:
+> Looking ahead, interestingly enough, it turns out that this approach to
+> the wrappers is really pretty close to what I posted in patch 4/7 of my
+> "convert most filesystems to pin_user_pages_fast()" series [1]. Instead
+> of passing gup_flags through, I tried to avoid that (because FOLL_PIN
+> is, as a mild design preference, supposed to remain internal to gup.c),
+> but given that you need to do it, I think I can just build on top of
+> your approach, and pass in FOLL_PIN via your new gup_flags arg.
 
-This commit fixes the issue by making the blkfront does parmeter caching
-just before the advertisement.
+Seems to me like we could just provide the one exported function with a
+flag then use an static inline helper for the pin version. That would
+help keep the FOLL_PIN flag contained as you like.
 
-Fixes: 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
-Cc: <stable@vger.kernel.org> # 5.10.x
-Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-Signed-off-by: SeongJae Park <sj@kernel.org>
-Tested-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-Reviewed-by: Juergen Gross <jgross@suse.com>
-Link: https://lore.kernel.org/r/20220831165824.94815-4-sj@kernel.org
-Signed-off-by: Juergen Gross <jgross@suse.com>
----
+> Along those lines, I've copied you in on "New topic branch for block + 
+> gup work?", let's see what happens over there.
+> 
+> [1] https://lore.kernel.org/r/20220831041843.973026-1-jhubbard@nvidia.com
 
-This patch is a manual backport of the upstream commit on the 5.10.y
-kernel.  Please note that this patch can be applied on the latest 5.10.y
-only after the preceding patch[1] is applied.
+Thanks for the review. All the feedback makes sense. I'll apply all the
+changes from you and Christoph for the next version.
 
-[1] https://lore.kernel.org/stable/20220906132819.016040100@linuxfoundation.org/
+I'm happy to base the next version off of any other changes to the iov
+functions. I suspect my patches can hold off a cycle or two more while
+we do it. Let me know if you'd like some help making the conversions,
+I'm also fine to do some work to aid with the effort.
 
- drivers/block/xen-blkfront.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Thanks,
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 9d5460f6e0ff..6f33d62331b1 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1852,6 +1852,12 @@ static void free_info(struct blkfront_info *info)
- 	kfree(info);
- }
- 
-+/* Enable the persistent grants feature. */
-+static bool feature_persistent = true;
-+module_param(feature_persistent, bool, 0644);
-+MODULE_PARM_DESC(feature_persistent,
-+		"Enables the persistent grants feature");
-+
- /* Common code used when first setting up, and when resuming. */
- static int talk_to_blkback(struct xenbus_device *dev,
- 			   struct blkfront_info *info)
-@@ -1943,6 +1949,7 @@ static int talk_to_blkback(struct xenbus_device *dev,
- 		message = "writing protocol";
- 		goto abort_transaction;
- 	}
-+	info->feature_persistent_parm = feature_persistent;
- 	err = xenbus_printf(xbt, dev->nodename, "feature-persistent", "%u",
- 			info->feature_persistent_parm);
- 	if (err)
-@@ -2019,12 +2026,6 @@ static int negotiate_mq(struct blkfront_info *info)
- 	return 0;
- }
- 
--/* Enable the persistent grants feature. */
--static bool feature_persistent = true;
--module_param(feature_persistent, bool, 0644);
--MODULE_PARM_DESC(feature_persistent,
--		"Enables the persistent grants feature");
--
- /**
-  * Entry point to this code when a new device is created.  Allocate the basic
-  * structures and the ring buffer for communication with the backend, and
-@@ -2394,7 +2395,6 @@ static void blkfront_gather_backend_features(struct blkfront_info *info)
- 	if (xenbus_read_unsigned(info->xbdev->otherend, "feature-discard", 0))
- 		blkfront_setup_discard(info);
- 
--	info->feature_persistent_parm = feature_persistent;
- 	if (info->feature_persistent_parm)
- 		info->feature_persistent =
- 			!!xenbus_read_unsigned(info->xbdev->otherend,
--- 
-2.25.1
+Logan
 
