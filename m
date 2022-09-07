@@ -2,76 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A487ECAAA1
-	for <linux-block@archiver.kernel.org>; Tue,  6 Sep 2022 23:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA59C38145
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 00:45:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbiIFXAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 19:00:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51206 "EHLO
+        id S229449AbiIGApJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Sep 2022 20:45:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229661AbiIFXAi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 19:00:38 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904B52B639
-        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 16:00:37 -0700 (PDT)
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 286Mse28018768
-        for <linux-block@vger.kernel.org>; Tue, 6 Sep 2022 16:00:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=facebook; bh=rAGgpzVlQCp3oDb07MJiMkiNOXWEd2leUOKvHZRl/dM=;
- b=HQ20sqiIrP9otCn96yM6454hyXwi6ZGTGYPdLmwLmyNIeuaCm+L0R37u+/GBW71LBa+x
- wS7XFOBDN80abZ04H1vXiK2MPMl8ciK8g8ij0XcwlFpGbPh3C2Mz6cCWgsEQo/tn+xGw
- FrVPpllA0E1W5GC1Q7rO/+t4ezm+NC4BcUE= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3jc4eyt96b-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 06 Sep 2022 16:00:36 -0700
-Received: from twshared30313.14.frc2.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::5) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 6 Sep 2022 16:00:35 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id C6C1E84BC4B0; Tue,  6 Sep 2022 16:00:30 -0700 (PDT)
-From:   Keith Busch <kbusch@fb.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 0/2] sbitmap wake fixes
-Date:   Tue, 6 Sep 2022 16:00:27 -0700
-Message-ID: <20220906230029.1287526-1-kbusch@fb.com>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S229558AbiIGApI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 20:45:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C54772852
+        for <linux-block@vger.kernel.org>; Tue,  6 Sep 2022 17:45:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662511506;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IWbBY2Vma6qLbzeS+8YTI+hqv9KeinttN4dUddHRaGg=;
+        b=Akq5HTuttA2appyMqYBM4BFjkL/XCi8G+++iy2EUszbeg05VY19tZ3SEKhts5yxbfItcXH
+        rLJcp6ycaIGbv7FYwQLoc/kQcVWCfyY8zDdlVMrav551WpjBH8XFqvlxSOe84qkvk1EuXd
+        4pIfu2smgXZiKjtmPfMyFJU2KOrg4Rg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-319-RL7OylbtP1OI7Tm1awSYIg-1; Tue, 06 Sep 2022 20:45:01 -0400
+X-MC-Unique: RL7OylbtP1OI7Tm1awSYIg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E9723C0F361;
+        Wed,  7 Sep 2022 00:45:01 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D32CC2026D4C;
+        Wed,  7 Sep 2022 00:44:57 +0000 (UTC)
+Date:   Wed, 7 Sep 2022 08:44:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] kernel: export task_work_add
+Message-ID: <Yxfpg0qBVG6ojMEu@T590>
+References: <20220829040013.549212-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: K8RQFDeTrVS5kxJYJuWtvuqqcWtKLL3N
-X-Proofpoint-ORIG-GUID: K8RQFDeTrVS5kxJYJuWtvuqqcWtKLL3N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-06_09,2022-09-06_02,2022-06-22_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220829040013.549212-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On Mon, Aug 29, 2022 at 12:00:13PM +0800, Ming Lei wrote:
+> Firstly task_work_add() is used in several drivers. In ublk driver's
+> usage, request batching submission can only be applied with task_work_add,
+> and usually get better IOPS.
+> 
+> Secondly from this API's definition, the added work is always run in
+> the task context, and when task is exiting, either the work is rejected
+> to be added, or drained in do_exit(). In this way, not see obvious
+> disadvantage or potential issue by exporting it for module's usage.
+> 
+> So export it, then ublk driver can get simplified, meantime with better
+> performance.
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-changes from v2:
+Hello Guys,
 
-  Adding a prep patch that fixes a condition that can leave the wait_cnt
-  at the wrong value.
+Gentle ping...
 
-  Changed the number to wake up to account for the number of bits
-  released in previous batches instead of just the current batch.
 
-Keith Busch (2):
-  sbitmap: check waitqueue_active prior to decrement
-  sbitmap: fix batched wait_cnt accounting
-
- block/blk-mq-tag.c      |  2 +-
- include/linux/sbitmap.h |  3 ++-
- lib/sbitmap.c           | 36 ++++++++++++++++++++----------------
- 3 files changed, 23 insertions(+), 18 deletions(-)
-
---=20
-2.30.2
+Thanks,
+Ming
 
