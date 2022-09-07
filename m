@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A3B8C6FA89
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 21:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE63C38145
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 21:17:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbiIGVMl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Sep 2022 17:12:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38794 "EHLO
+        id S230056AbiIGVRX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 17:17:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230084AbiIGVMk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 17:12:40 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6721BC2FAB
-        for <linux-block@vger.kernel.org>; Wed,  7 Sep 2022 14:12:38 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id f4so11472394qkl.7
-        for <linux-block@vger.kernel.org>; Wed, 07 Sep 2022 14:12:38 -0700 (PDT)
+        with ESMTP id S229502AbiIGVRW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 17:17:22 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A076FA03
+        for <linux-block@vger.kernel.org>; Wed,  7 Sep 2022 14:17:21 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id h27so11479465qkk.9
+        for <linux-block@vger.kernel.org>; Wed, 07 Sep 2022 14:17:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=V1MPWICjNbVej9alvDqcw5ZrURtoJsrV949+/FBaEQ8=;
-        b=BjHkzBZKoRPIJvwkLFDCvXN43YYDxubEuHIfBWgPqt0au5f5ON5tyn6QZxGqy5EMZq
-         z2YvpKmBwyDqmbILzOrvHuI9YAI7WTuPpS4jljnj+2cUeLTZPORg5OdLqgBXuSxrYI4Z
-         EMo7mYrz2S+qAfc3euniPpEYE7KxDnrKFKm/V1xPcvbQ44fErTNl3ZVYkZ9H9tjqMm6H
-         Tap2FGysqqfdqZ9amw5e04BjUw9vDYJ2HbEk3DbrB5zt+Q23S0c9IJRL5dxvB7htGKHQ
-         QkjkAAtVsrrCfAqH5Si8CwSyOcj9dh9zq1c+0lamuDIKFxvp1PUZN1POufVlfvh5ehUy
-         vA/g==
+        bh=wlbYT4g/i1s7x7g2nKFCgX1XT2I9wFkMIk2KMBdguIQ=;
+        b=iVaYbd6O4QTDogZP46oKns26mhO1DYRueB11OAt9U0BT9Dbd3KplizaW+BUwzL6CZt
+         GZPwWmg0B4abZt3iFuxv4tRE23aQAm/3yLf4EkrERTRLpLICO210iF99+blmP7zJAEBx
+         UWiypDt8ITMja8YOBhX0Aa0tFgt1PtvnATi9DtrSV2OuqQp80E7OiYNPpLtHX/4ZmLA1
+         PB69T5Qp4OcYujGk2OoedW9rGDZk2CoH/qxTtzQHHJCktQdEqjE3eB65b9AIm2FKQrCK
+         cz0XxxJ84LCBw1CJUW6692WBWQjUfwiygwyMbkQqlLGn5E/NMJmJuBKM2wZeEg8WoRwS
+         iHew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=V1MPWICjNbVej9alvDqcw5ZrURtoJsrV949+/FBaEQ8=;
-        b=pg9j9I0nQi2xFmjnlH0mUYFCt7HOZ7NnYlUE0qhLbC7VIjnOZYEtjNlm/n/hRYcWn6
-         pTcZuRY52y+I5enkpsNP9gK7WkTizMAF0flCku7wPO0k5pBR9d3UFH8ohD7ixvYLXDmp
-         bRoI+VDuuYsSHtScYAc30bJtn8+G4KMEBy32CCoqKPgfi5im0sMdy5DoLr+wOGXIxpwE
-         kToGBj5OSgqP3WH/0BZUIbKyImfQF1ZhSJiRocU4S5eo6oy3XVHLcYWV65GjMAa9puAB
-         vV6ZVLuZ97LoekFvqyissbv28VTGfojhLX2MJI5Qo7ON/fp8zW4zpAXdi//FPAPm3a8B
-         HXzA==
-X-Gm-Message-State: ACgBeo2W5ao/qNRuOCjbMeg0CbtiT7ze3752Fnn+rzT9b7C7+NSdEncH
-        iLWi6Z9NPll4mU//L8c5RnvWRg==
-X-Google-Smtp-Source: AA6agR6dqO5hs1i8teqOq2Q7WHsu4pem6GGM9f+pJ4IGoEV9bZ7Z64EjMjRWvAiPHYbn6xLB5jsYBA==
-X-Received: by 2002:a05:620a:24c6:b0:6ba:c24d:8304 with SMTP id m6-20020a05620a24c600b006bac24d8304mr4166545qkn.325.1662585157257;
-        Wed, 07 Sep 2022 14:12:37 -0700 (PDT)
+        bh=wlbYT4g/i1s7x7g2nKFCgX1XT2I9wFkMIk2KMBdguIQ=;
+        b=1f0aZuB67ob9iAsb7lD0/+N7FxPQ7gR5akg81sxwgC72/p5gFcJN4CODjQwXSb1Pu4
+         KfJeuxtzrw2grVRfxp0DeoUn7yZCqZfKTnSlFhWAPsl4m/kGbvUknS4vhsu3aLtYlFCC
+         mnQsvmSsf5XasHEwwnmdpp1AcmlmMB+m+Gq6E4USU3sOMPnb1V/073UWevrERwx1l4gq
+         0wZn3u1pxu4LBtznl6WqfZO6E0JpOZFMlNSGhAjq28q04p+OVjEmFU3nG59NK3ovPUVk
+         kRjW+JpAEy9uEOJEBYOUd01z8Kg41JhPQJMUxHRdXKv+l5l55tRGI7myfDCnaxH6GDjh
+         1ZSg==
+X-Gm-Message-State: ACgBeo0CL0otx6x9W31Vw2OGYqQHRUfE0pDmCTsTAjCV8V7IpzB74sXX
+        a6vrNYQFDW67iBEoHfTaEgjGCoLA0Q/H1cbz
+X-Google-Smtp-Source: AA6agR6ovkqf93+nQzPH17gK8EoWayRf7zthEgRDQrCgEOzBVnvj2o5aM3MNB4pidxyBSZ5kdJ+PEA==
+X-Received: by 2002:a05:620a:284c:b0:6b8:6e70:cd95 with SMTP id h12-20020a05620a284c00b006b86e70cd95mr4139852qkp.247.1662585440762;
+        Wed, 07 Sep 2022 14:17:20 -0700 (PDT)
 Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id z1-20020ac87f81000000b0031eddc83560sm14161112qtj.90.2022.09.07.14.12.36
+        by smtp.gmail.com with ESMTPSA id ay39-20020a05620a17a700b006a65c58db99sm14514653qkb.64.2022.09.07.14.17.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 14:12:36 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 17:12:35 -0400
+        Wed, 07 Sep 2022 14:17:20 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 17:17:18 -0400
 From:   Josef Bacik <josef@toxicpanda.com>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
@@ -57,27 +57,32 @@ Cc:     Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
         Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
         "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
         linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 14/17] btrfs: remove now spurious bio submission helpers
-Message-ID: <YxkJQ9/CuYo8ytTi@localhost.localdomain>
+Subject: Re: [PATCH 16/17] btrfs: split zone append bios in btrfs_submit_bio
+Message-ID: <YxkKXrY2lmH+l3Zl@localhost.localdomain>
 References: <20220901074216.1849941-1-hch@lst.de>
- <20220901074216.1849941-15-hch@lst.de>
+ <20220901074216.1849941-17-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220901074216.1849941-15-hch@lst.de>
+In-Reply-To: <20220901074216.1849941-17-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 10:42:13AM +0300, Christoph Hellwig wrote:
-> Just call btrfs_submit_bio and btrfs_submit_compressed_read directly from
-> submit_one_bio now that all additional functionality has moved into
-> btrfs_submit_bio.
+On Thu, Sep 01, 2022 at 10:42:15AM +0300, Christoph Hellwig wrote:
+> The current btrfs zoned device support is a little cumbersome in the data
+> I/O path as it requires the callers to not support more I/O than the
+> supported ZONE_APPEND size by the underlying device.  This leads to a lot
+> of extra accounting.  Instead change btrfs_submit_bio so that it can take
+> write bios of arbitrary size and form from the upper layers, and just
+> split them internally to the ZONE_APPEND queue limits.  Then remove all
+> the upper layer warts catering to limited write sized on zoned devices,
+> including the extra refcount in the compressed_bio.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
 Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Thanks,
+tho I'd trust the zoned guys reviews over mine here.  Thanks,
 
 Josef
