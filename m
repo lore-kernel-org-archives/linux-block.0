@@ -2,113 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E943C54EE9
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 09:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C0FC38145
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 10:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbiIGJKN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Sep 2022 05:10:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47896 "EHLO
+        id S230159AbiIGKX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 06:23:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbiIGJKL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 05:10:11 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84D174B84;
-        Wed,  7 Sep 2022 02:10:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S231224AbiIGKXm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 06:23:42 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8EE2FFF3;
+        Wed,  7 Sep 2022 03:23:20 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3A50B617D8;
-        Wed,  7 Sep 2022 09:10:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFE0C433C1;
-        Wed,  7 Sep 2022 09:10:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662541808;
-        bh=a6rxNDyNfNYsftFOTgasxTViBPk+jSbvU4105tQOkhw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WbUGnYmnyFUJoHmUJJNdkTfTbKlPdXgHPr6kq8a5AS52w8H4F2fLqyyuPqnpfXV8k
-         37Zvs4OH5t6Hisr1Kr1ar+Srb4OFC2sceheTmucJeYWHEk0UabmunmqGt+Rmk/BZA+
-         MIBjoqwWGIc1EU3fa/Pn7cfW3nZvtyCJNLWYMQY+jxycJNzGnHvEuiUs0DKarv6FSg
-         XcNIBcxLDyRBP1Qbu0guN/v1Kfnb3RRqgCT2UJ3oHI7Yc1I2V8NTb8eTLSB5xrknjZ
-         ATDIZfsT+DqdOdZMjCbb2DP99VSiZ1Mj/Xnsu3jHmWSU81XAYsNmH/NaXvzC45Ug5c
-         w/N7bwzH1xjJw==
-Date:   Wed, 7 Sep 2022 11:10:02 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v5 1/8] statx: add direct I/O alignment information
-Message-ID: <20220907091002.6ay72r4tgk5g6rma@wittgenstein>
-References: <20220827065851.135710-1-ebiggers@kernel.org>
- <20220827065851.135710-2-ebiggers@kernel.org>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5CF91202D9;
+        Wed,  7 Sep 2022 10:23:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1662546199; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZVOd6VzsLq3+2NgXLsXG6WSVb5nAQHjklm2vBJj3gwc=;
+        b=TMZULmgGJ0UGAVZEZTXt9pmTbssAEI/3djKPfcbHzpu6CgidfMr61+CPQKNw59KqBGP1xU
+        xiLNLKo1bnwQlfgixzCsBl24v7Z6gM28BUoGn8oO+cj77zf43eWf41llI/8DKNFRjBgJv0
+        5MAv8c6A0hjgjPM3+YN6QHYgChNndkA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1662546199;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZVOd6VzsLq3+2NgXLsXG6WSVb5nAQHjklm2vBJj3gwc=;
+        b=sXg8w4N1dtErwl6IQ18gxM8+GY6Lufmi0vT/rUwna9qS6bA34X2RvvNGXkn79LOFX8B13k
+        p7yGsx2ekFe3P2DA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4C12813A66;
+        Wed,  7 Sep 2022 10:23:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id QLqQEhdxGGOCRwAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 07 Sep 2022 10:23:19 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id CFD10A067E; Wed,  7 Sep 2022 12:23:18 +0200 (CEST)
+Date:   Wed, 7 Sep 2022 12:23:18 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, axboe@kernel.dk,
+        osandov@fb.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH] sbitmap: fix possible io hung due to lost wakeup
+Message-ID: <20220907102318.pdpzpmhah2m3ptbn@quack3>
+References: <20220803121504.212071-1-yukuai1@huaweicloud.com>
+ <Yxe7V3yfBcADoYLE@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220827065851.135710-2-ebiggers@kernel.org>
+In-Reply-To: <Yxe7V3yfBcADoYLE@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Aug 26, 2022 at 11:58:44PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Tue 06-09-22 15:27:51, Keith Busch wrote:
+> On Wed, Aug 03, 2022 at 08:15:04PM +0800, Yu Kuai wrote:
+> >  	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+> > -	if (wait_cnt <= 0) {
+> > -		int ret;
+> > +	/*
+> > +	 * For concurrent callers of this, callers should call this function
+> > +	 * again to wakeup a new batch on a different 'ws'.
+> > +	 */
+> > +	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
+> > +		return true;
 > 
-> Traditionally, the conditions for when DIO (direct I/O) is supported
-> were fairly simple.  For both block devices and regular files, DIO had
-> to be aligned to the logical block size of the block device.
-> 
-> However, due to filesystem features that have been added over time (e.g.
-> multi-device support, data journalling, inline data, encryption, verity,
-> compression, checkpoint disabling, log-structured mode), the conditions
-> for when DIO is allowed on a regular file have gotten increasingly
-> complex.  Whether a particular regular file supports DIO, and with what
-> alignment, can depend on various file attributes and filesystem mount
-> options, as well as which block device(s) the file's data is located on.
-> 
-> Moreover, the general rule of DIO needing to be aligned to the block
-> device's logical block size was recently relaxed to allow user buffers
-> (but not file offsets) aligned to the DMA alignment instead.  See
-> commit bf8d08532bc1 ("iomap: add support for dma aligned direct-io").
-> 
-> XFS has an ioctl XFS_IOC_DIOINFO that exposes DIO alignment information.
-> Uplifting this to the VFS is one possibility.  However, as discussed
-> (https://lore.kernel.org/linux-fsdevel/20220120071215.123274-1-ebiggers@kernel.org/T/#u),
-> this ioctl is rarely used and not known to be used outside of
-> XFS-specific code.  It was also never intended to indicate when a file
-> doesn't support DIO at all, nor was it intended for block devices.
-> 
-> Therefore, let's expose this information via statx().  Add the
-> STATX_DIOALIGN flag and two new statx fields associated with it:
-> 
-> * stx_dio_mem_align: the alignment (in bytes) required for user memory
->   buffers for DIO, or 0 if DIO is not supported on the file.
-> 
-> * stx_dio_offset_align: the alignment (in bytes) required for file
->   offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
->   on the file.  This will only be nonzero if stx_dio_mem_align is
->   nonzero, and vice versa.
-> 
-> Note that as with other statx() extensions, if STATX_DIOALIGN isn't set
-> in the returned statx struct, then these new fields won't be filled in.
-> This will happen if the file is neither a regular file nor a block
-> device, or if the file is a regular file and the filesystem doesn't
-> support STATX_DIOALIGN.  It might also happen if the caller didn't
-> include STATX_DIOALIGN in the request mask, since statx() isn't required
-> to return unrequested information.
-> 
-> This commit only adds the VFS-level plumbing for STATX_DIOALIGN.  For
-> regular files, individual filesystems will still need to add code to
-> support it.  For block devices, a separate commit will wire it up too.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Darrick J. Wong <djwong@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
+> If wait_cnt is '0', but the waitqueue_active happens to be false due to racing
+> with add_wait_queue(), this returns true so the caller will retry.
 
-Looks good to me,
-Reviewed-by: Christian Brauner (Microsoft) <brauner@kernel.org>
+Well, note that sbq_wake_ptr() called to obtain 'ws' did waitqueue_active()
+check. So !waitqueue_active() should really happen only if waiter was woken
+up by someone else or so. Not that it would matter much but I wanted to
+point it out.
+
+> The next atomic_dec will set the current waitstate wait_cnt < 0, which
+> also forces an early return true. When does the wake up happen, or
+> wait_cnt and wait_index get updated in that case?
+
+I guess your concern could be rephrased as: Who's going to ever set
+ws->wait_cnt to value > 0 if we ever exit with wait_cnt == 0 due to
+!waitqueue_active() condition?
+
+And that is a good question and I think that's a bug in this patch. I think
+we need something like:
+
+	...
+	/*
+	 * For concurrent callers of this, callers should call this function
+	 * again to wakeup a new batch on a different 'ws'.
+	 */
+	if (wait_cnt < 0)
+		return true;
+	/*
+	 * If we decremented queue without waiters, retry to avoid lost
+	 * wakeups.
+	 */
+	if (wait_cnt > 0)
+		return !waitqueue_active(&ws->wait);
+
+	/*
+	 * When wait_cnt == 0, we have to be particularly careful as we are
+	 * responsible to reset wait_cnt regardless whether we've actually
+	 * woken up anybody. But in case we didn't wakeup anybody, we still
+	 * need to retry.
+	 */
+	ret = !waitqueue_active(&ws->wait);
+	wake_batch = READ_ONCE(sbq->wake_batch);
+	/*
+	 * Wake up first in case that concurrent callers decrease wait_cnt
+	 * while waitqueue is empty.
+	 */
+	wake_up_nr(&ws->wait, wake_batch);
+	...
+
+	return ret;
+
+Does this fix your concern Keith?
+
+								Honza
+
+> 
+>   
+> > -		wake_batch = READ_ONCE(sbq->wake_batch);
+> > +	if (wait_cnt > 0)
+> > +		return false;
+> >  
+> > -		/*
+> > -		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> > -		 * ensure that we see the batch size update before the wait
+> > -		 * count is reset.
+> > -		 */
+> > -		smp_mb__before_atomic();
+> > +	wake_batch = READ_ONCE(sbq->wake_batch);
+> >  
+> > -		/*
+> > -		 * For concurrent callers of this, the one that failed the
+> > -		 * atomic_cmpxhcg() race should call this function again
+> > -		 * to wakeup a new batch on a different 'ws'.
+> > -		 */
+> > -		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+> > -		if (ret == wait_cnt) {
+> > -			sbq_index_atomic_inc(&sbq->wake_index);
+> > -			wake_up_nr(&ws->wait, wake_batch);
+> > -			return false;
+> > -		}
+> > +	/*
+> > +	 * Wake up first in case that concurrent callers decrease wait_cnt
+> > +	 * while waitqueue is empty.
+> > +	 */
+> > +	wake_up_nr(&ws->wait, wake_batch);
+> >  
+> > -		return true;
+> > -	}
+> > +	/*
+> > +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> > +	 * ensure that we see the batch size update before the wait
+> > +	 * count is reset.
+> > +	 *
+> > +	 * Also pairs with the implicit barrier between decrementing wait_cnt
+> > +	 * and checking for waitqueue_active() to make sure waitqueue_active()
+> > +	 * sees result of the wakeup if atomic_dec_return() has seen the result
+> > +	 * of atomic_set().
+> > +	 */
+> > +	smp_mb__before_atomic();
+> > +
+> > +	/*
+> > +	 * Increase wake_index before updating wait_cnt, otherwise concurrent
+> > +	 * callers can see valid wait_cnt in old waitqueue, which can cause
+> > +	 * invalid wakeup on the old waitqueue.
+> > +	 */
+> > +	sbq_index_atomic_inc(&sbq->wake_index);
+> > +	atomic_set(&ws->wait_cnt, wake_batch);
+> >  
+> >  	return false;
+> >  }
+> > -- 
+> > 2.31.1
+> > 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
