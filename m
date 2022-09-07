@@ -2,195 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C0FC38145
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 10:24:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0728DC38145
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 13:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbiIGKX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Sep 2022 06:23:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58048 "EHLO
+        id S230013AbiIGNIe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 09:08:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbiIGKXm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 06:23:42 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8EE2FFF3;
-        Wed,  7 Sep 2022 03:23:20 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 5CF91202D9;
-        Wed,  7 Sep 2022 10:23:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1662546199; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZVOd6VzsLq3+2NgXLsXG6WSVb5nAQHjklm2vBJj3gwc=;
-        b=TMZULmgGJ0UGAVZEZTXt9pmTbssAEI/3djKPfcbHzpu6CgidfMr61+CPQKNw59KqBGP1xU
-        xiLNLKo1bnwQlfgixzCsBl24v7Z6gM28BUoGn8oO+cj77zf43eWf41llI/8DKNFRjBgJv0
-        5MAv8c6A0hjgjPM3+YN6QHYgChNndkA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1662546199;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZVOd6VzsLq3+2NgXLsXG6WSVb5nAQHjklm2vBJj3gwc=;
-        b=sXg8w4N1dtErwl6IQ18gxM8+GY6Lufmi0vT/rUwna9qS6bA34X2RvvNGXkn79LOFX8B13k
-        p7yGsx2ekFe3P2DA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4C12813A66;
-        Wed,  7 Sep 2022 10:23:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id QLqQEhdxGGOCRwAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 07 Sep 2022 10:23:19 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id CFD10A067E; Wed,  7 Sep 2022 12:23:18 +0200 (CEST)
-Date:   Wed, 7 Sep 2022 12:23:18 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, axboe@kernel.dk,
-        osandov@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH] sbitmap: fix possible io hung due to lost wakeup
-Message-ID: <20220907102318.pdpzpmhah2m3ptbn@quack3>
-References: <20220803121504.212071-1-yukuai1@huaweicloud.com>
- <Yxe7V3yfBcADoYLE@kbusch-mbp.dhcp.thefacebook.com>
+        with ESMTP id S229963AbiIGNId (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 09:08:33 -0400
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A927E31F;
+        Wed,  7 Sep 2022 06:08:07 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 73so13549447pga.1;
+        Wed, 07 Sep 2022 06:08:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=HpnGD2A5QEDoI0b8szeNdkO2l9HYpACZ+X4q96YODug=;
+        b=ptGAAgmGZp4RqEaP0G7fogYd0oCurTj5ceJO4gA7H6Nk2Rzz6fYBJFCw9sBUOdh8VQ
+         lc049i3bwvht0/AO1OpQH615zarRUvgufp5R9MuM4oeteWq/xsLPLLJ3NJQuiVCwCFxF
+         kqDA0bubq6+oG1gmeYVTP47rqkdU/rMDzGNoAN4a/z4SJy9ADK02TlLXWg9c9frDZ9nI
+         8FZGX0Sh3W9GZVsLjoDHk3LHPUNXpkPXPSfs724HFXM/GII/ld4L0syjHTwecye6PCmv
+         0mq1+xWiBeI1KLc3itsRNFzluU/WJZX7SGr8jTO6v8zCTic8wYFIaMZvbWET0w3pNZrF
+         Wwpg==
+X-Gm-Message-State: ACgBeo3S5X57GK5QFOYU2JPQ5sUaZPNn7cT+nKhzeL4kqf72ym9sGJnQ
+        YzvPVcR71eupy6INi7qeijTbUrQ3/L8=
+X-Google-Smtp-Source: AA6agR4R9vIVS9EnVhTy8P63dQhHevDyRLASFWR9vdqY/SqHJ5iKSGIv9lC1ETVW6UK0k/YRTMO/Pw==
+X-Received: by 2002:a63:de07:0:b0:434:d973:5dff with SMTP id f7-20020a63de07000000b00434d9735dffmr3400015pgg.44.1662556087173;
+        Wed, 07 Sep 2022 06:08:07 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id e24-20020a63f558000000b0042c5a1715d7sm10441942pgk.83.2022.09.07.06.08.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Sep 2022 06:08:06 -0700 (PDT)
+Message-ID: <5a1b3716-bcf8-8c37-2bd5-44e885de1f48@acm.org>
+Date:   Wed, 7 Sep 2022 06:08:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yxe7V3yfBcADoYLE@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH] kernel: export task_work_add
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20220829040013.549212-1-ming.lei@redhat.com>
+Content-Language: en-US
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220829040013.549212-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 06-09-22 15:27:51, Keith Busch wrote:
-> On Wed, Aug 03, 2022 at 08:15:04PM +0800, Yu Kuai wrote:
-> >  	wait_cnt = atomic_dec_return(&ws->wait_cnt);
-> > -	if (wait_cnt <= 0) {
-> > -		int ret;
-> > +	/*
-> > +	 * For concurrent callers of this, callers should call this function
-> > +	 * again to wakeup a new batch on a different 'ws'.
-> > +	 */
-> > +	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
-> > +		return true;
+On 8/28/22 21:00, Ming Lei wrote:
+> Firstly task_work_add() is used in several drivers. In ublk driver's
+> usage, request batching submission can only be applied with task_work_add,
+> and usually get better IOPS.
 > 
-> If wait_cnt is '0', but the waitqueue_active happens to be false due to racing
-> with add_wait_queue(), this returns true so the caller will retry.
-
-Well, note that sbq_wake_ptr() called to obtain 'ws' did waitqueue_active()
-check. So !waitqueue_active() should really happen only if waiter was woken
-up by someone else or so. Not that it would matter much but I wanted to
-point it out.
-
-> The next atomic_dec will set the current waitstate wait_cnt < 0, which
-> also forces an early return true. When does the wake up happen, or
-> wait_cnt and wait_index get updated in that case?
-
-I guess your concern could be rephrased as: Who's going to ever set
-ws->wait_cnt to value > 0 if we ever exit with wait_cnt == 0 due to
-!waitqueue_active() condition?
-
-And that is a good question and I think that's a bug in this patch. I think
-we need something like:
-
-	...
-	/*
-	 * For concurrent callers of this, callers should call this function
-	 * again to wakeup a new batch on a different 'ws'.
-	 */
-	if (wait_cnt < 0)
-		return true;
-	/*
-	 * If we decremented queue without waiters, retry to avoid lost
-	 * wakeups.
-	 */
-	if (wait_cnt > 0)
-		return !waitqueue_active(&ws->wait);
-
-	/*
-	 * When wait_cnt == 0, we have to be particularly careful as we are
-	 * responsible to reset wait_cnt regardless whether we've actually
-	 * woken up anybody. But in case we didn't wakeup anybody, we still
-	 * need to retry.
-	 */
-	ret = !waitqueue_active(&ws->wait);
-	wake_batch = READ_ONCE(sbq->wake_batch);
-	/*
-	 * Wake up first in case that concurrent callers decrease wait_cnt
-	 * while waitqueue is empty.
-	 */
-	wake_up_nr(&ws->wait, wake_batch);
-	...
-
-	return ret;
-
-Does this fix your concern Keith?
-
-								Honza
-
+> Secondly from this API's definition, the added work is always run in
+> the task context, and when task is exiting, either the work is rejected
+> to be added, or drained in do_exit(). In this way, not see obvious
+> disadvantage or potential issue by exporting it for module's usage.
 > 
->   
-> > -		wake_batch = READ_ONCE(sbq->wake_batch);
-> > +	if (wait_cnt > 0)
-> > +		return false;
-> >  
-> > -		/*
-> > -		 * Pairs with the memory barrier in sbitmap_queue_resize() to
-> > -		 * ensure that we see the batch size update before the wait
-> > -		 * count is reset.
-> > -		 */
-> > -		smp_mb__before_atomic();
-> > +	wake_batch = READ_ONCE(sbq->wake_batch);
-> >  
-> > -		/*
-> > -		 * For concurrent callers of this, the one that failed the
-> > -		 * atomic_cmpxhcg() race should call this function again
-> > -		 * to wakeup a new batch on a different 'ws'.
-> > -		 */
-> > -		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
-> > -		if (ret == wait_cnt) {
-> > -			sbq_index_atomic_inc(&sbq->wake_index);
-> > -			wake_up_nr(&ws->wait, wake_batch);
-> > -			return false;
-> > -		}
-> > +	/*
-> > +	 * Wake up first in case that concurrent callers decrease wait_cnt
-> > +	 * while waitqueue is empty.
-> > +	 */
-> > +	wake_up_nr(&ws->wait, wake_batch);
-> >  
-> > -		return true;
-> > -	}
-> > +	/*
-> > +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
-> > +	 * ensure that we see the batch size update before the wait
-> > +	 * count is reset.
-> > +	 *
-> > +	 * Also pairs with the implicit barrier between decrementing wait_cnt
-> > +	 * and checking for waitqueue_active() to make sure waitqueue_active()
-> > +	 * sees result of the wakeup if atomic_dec_return() has seen the result
-> > +	 * of atomic_set().
-> > +	 */
-> > +	smp_mb__before_atomic();
-> > +
-> > +	/*
-> > +	 * Increase wake_index before updating wait_cnt, otherwise concurrent
-> > +	 * callers can see valid wait_cnt in old waitqueue, which can cause
-> > +	 * invalid wakeup on the old waitqueue.
-> > +	 */
-> > +	sbq_index_atomic_inc(&sbq->wake_index);
-> > +	atomic_set(&ws->wait_cnt, wake_batch);
-> >  
-> >  	return false;
-> >  }
-> > -- 
-> > 2.31.1
-> > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> So export it, then ublk driver can get simplified, meantime with better
+> performance.
+
+If task_work_add() is exported, shouldn't task_work_cancel() be exported
+too? Anyway:
+
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
