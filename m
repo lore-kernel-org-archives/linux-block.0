@@ -2,341 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A1E6ECAAA1
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 01:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1BC7ECAAD3
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 07:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiIGBQa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Sep 2022 21:16:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59612 "EHLO
+        id S229604AbiIGHWg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 03:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiIGBQ3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Sep 2022 21:16:29 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B9880F5C;
-        Tue,  6 Sep 2022 18:16:27 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MMknW0pbWzklTn;
-        Wed,  7 Sep 2022 09:14:55 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgC3VW_p8BdjSXfqAQ--.36493S3;
-        Wed, 07 Sep 2022 09:16:26 +0800 (CST)
-Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-To:     Paolo Valente <paolo.valente@unimore.it>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220610021701.2347602-1-yukuai3@huawei.com>
- <20220610021701.2347602-4-yukuai3@huawei.com>
- <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
- <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
- <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
- <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
- <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
- <55A07102-BE55-4606-9E32-64E884064FB9@unimore.it>
- <5cb0e5bc-feec-86d6-6f60-3c28ee625efd@huaweicloud.com>
- <D89DCF20-27D8-4F8F-B8B0-FD193FC4F18D@unimore.it>
- <e6b53794-f93f-92b2-1f45-35ae81a28a5c@huaweicloud.com>
- <F758A356-EE6B-4B7B-95E2-6414616C77E4@unimore.it>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5e0b44b4-46cc-b3c6-1d93-00a0a683eda8@huaweicloud.com>
-Date:   Wed, 7 Sep 2022 09:16:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229671AbiIGHWf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 03:22:35 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE81290C5E;
+        Wed,  7 Sep 2022 00:22:34 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 698B76732D; Wed,  7 Sep 2022 09:22:31 +0200 (CEST)
+Date:   Wed, 7 Sep 2022 09:22:31 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Dusty Mabe <dusty@dustymabe.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, hch@lst.de
+Subject: Re: regression caused by block: freeze the queue earlier in
+ del_gendisk
+Message-ID: <20220907072231.GA23826@lst.de>
+References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
 MIME-Version: 1.0
-In-Reply-To: <F758A356-EE6B-4B7B-95E2-6414616C77E4@unimore.it>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgC3VW_p8BdjSXfqAQ--.36493S3
-X-Coremail-Antispam: 1UD129KBjvJXoWfGF4rZF4xur1UXr43GFy8Xwb_yoWDtryrpr
-        W5Ga1UAr4UXr1UJr1Utr1UXr10q34fJryUXr1DJr1UAr1qyFn7JF17tr18ury8Xr18Jr12
-        qr1UXr9rXr1UJFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1U
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Paolo!
+Just curious:  what is the underlying device (or more speicifically
+driver) under the md raids?
 
-在 2022/09/06 17:37, Paolo Valente 写道:
+On Fri, Aug 26, 2022 at 12:15:22PM -0400, Dusty Mabe wrote:
+> Hey All,
+> 
+> I think I've found a regression introduced by:
+> 
+> a09b314 o block: freeze the queue earlier in del_gendisk
+> 
+> In Fedora CoreOS we have tests that set up RAID1 on the /boot/ and /root/ partitions
+> and then subsequently removes one of the disks to simulate a failure. Sometime recently
+> this test started timing out occasionally. Looking a bit closer it appears instances are
+> getting stuck during reboot with a bunch of looping messages:
+> 
+> ```
+> [   17.978854] block device autoloading is deprecated and will be removed.
+> [   17.982555] block device autoloading is deprecated and will be removed.
+> [   17.985537] block device autoloading is deprecated and will be removed.
+> [   17.987546] block device autoloading is deprecated and will be removed.
+> [   17.989540] block device autoloading is deprecated and will be removed.
+> [   17.991547] block device autoloading is deprecated and will be removed.
+> [   17.993555] block device autoloading is deprecated and will be removed.
+> [   17.995539] block device autoloading is deprecated and will be removed.
+> [   17.997577] block device autoloading is deprecated and will be removed.
+> [   17.999544] block device autoloading is deprecated and will be removed.
+> [   22.979465] blkdev_get_no_open: 1666 callbacks suppressed
+> ...
+> ...
+> ...
+> [  618.221270] blkdev_get_no_open: 1664 callbacks suppressed
+> [  618.221273] block device autoloading is deprecated and will be removed.
+> [  618.224274] block device autoloading is deprecated and will be removed.
+> [  618.227267] block device autoloading is deprecated and will be removed.
+> [  618.229274] block device autoloading is deprecated and will be removed.
+> [  618.231277] block device autoloading is deprecated and will be removed.
+> [  618.233277] block device autoloading is deprecated and will be removed.
+> [  618.235282] block device autoloading is deprecated and will be removed.
+> [  618.237370] block device autoloading is deprecated and will be removed.
+> [  618.239356] block device autoloading is deprecated and will be removed.
+> [  618.241290] block device autoloading is deprecated and will be removed.
+> ```
+> 
+> Using the Fedora kernels I narrowed it down to being introduced between 
+> `kernel-5.19.0-0.rc3.27.fc37` (good) and `kernel-5.19.0-0.rc4.33.fc37` (bad).
+> 
+> I then did a bisect and found:
+> 
+> ```
+> $ git bisect bad
+> a09b314005f3a0956ebf56e01b3b80339df577cc is the first bad commit
+> commit a09b314005f3a0956ebf56e01b3b80339df577cc
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Tue Jun 14 09:48:27 2022 +0200
+> 
+>     block: freeze the queue earlier in del_gendisk
+>     
+>     Freeze the queue earlier in del_gendisk so that the state does not
+>     change while we remove debugfs and sysfs files.
+>     
+>     Ming mentioned that being able to observer request in debugfs might
+>     be useful while the queue is being frozen in del_gendisk, which is
+>     made possible by this change.
+>     
+>     Signed-off-by: Christoph Hellwig <hch@lst.de>
+>     Link: https://lore.kernel.org/r/20220614074827.458955-5-hch@lst.de
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+>  block/genhd.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> ```
+> 
+> Reverting this commit on top of latest git master (4c612826b) gave me successful results.
+> 
+> Any ideas on what could be amiss here? Luckily the patch is tiny so hopefully it might
+> be obvious.
+> 
+> More details (including logs) in the following locations:
+> 
+> - https://bugzilla.redhat.com/show_bug.cgi?id=2121791
+> - https://github.com/coreos/fedora-coreos-tracker/issues/1282
 > 
 > 
->> Il giorno 26 ago 2022, alle ore 04:34, Yu Kuai <yukuai1@huaweicloud.com> ha scritto:
->>
->> Hi, Paolo!
->>
->> 在 2022/08/25 22:59, Paolo Valente 写道:
->>>> Il giorno 11 ago 2022, alle ore 03:19, Yu Kuai <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
->>>>
->>>> Hi, Paolo
->>>>
->>>> 在 2022/08/10 18:49, Paolo Valente 写道:
->>>>>> Il giorno 27 lug 2022, alle ore 14:11, Yu Kuai <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
->>>>>>
->>>>>> Hi, Paolo
->>>>>>
->>>>> hi
->>>>>> Are you still interested in this patchset?
->>>>>>
->>>>> Yes. Sorry for replying very late again.
->>>>> Probably the last fix that you suggest is enough, but I'm a little bit
->>>>> concerned that it may be a little hasty.  In fact, before this fix, we
->>>>> exchanged several messages, and I didn't seem to be very good at
->>>>> convincing you about the need to keep into account also in-service
->>>>> I/O.  So, my question is: are you sure that now you have a
->>>>
->>>> I'm confused here, I'm pretty aware that in-service I/O(as said pending
->>>> requests is the patchset) should be counted, as you suggested in v7, are
->>>> you still thinking that the way in this patchset is problematic?
->>>>
->>>> I'll try to explain again that how to track is bfqq has pending pending
->>>> requests, please let me know if you still think there are some problems:
->>>>
->>>> patch 1 support to track if bfqq has pending requests, it's
->>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when the
->>>> first request is inserted to bfqq, and it's cleared when the last
->>>> request is completed. specifically the flag is set in
->>>> bfq_add_bfqq_busy() when 'bfqq->dispatched' if false, and it's cleared
->>>> both in bfq_completed_request() and bfq_del_bfqq_busy() when
->>>> 'bfqq->diapatched' is false.
->>>>
->>> This general description seems correct to me. Have you already sent a new version of your patchset?
->>
->> It's glad that we finially on the same page here.
->>
-> 
-> Yep. Sorry for my chronicle delay.
-
-Better late than never 😁
-> 
->> Please take a look at patch 1, which already impelement the above
->> descriptions, it seems to me there is no need to send a new version
->> for now. If you think there are still some other problems, please let
->> me know.
->>
-> 
-> Patch 1 seems ok to me. I seem to have only one pending comment on this patch (3/4) instead. Let me paste previous stuff here for your convenience:
-That sounds good.
-
-> 
->>>
->>> -	/*
->>> -	 * Next function is invoked last, because it causes bfqq to be
->>> -	 * freed if the following holds: bfqq is not in service and
->>> -	 * has no dispatched request. DO NOT use bfqq after the next
->>> -	 * function invocation.
->>> -	 */
->> I would really love it if you leave this comment.  I added it after
->> suffering a lot for a nasty UAF.  Of course the first sentence may
->> need to be adjusted if the code that precedes it is to be removed.
->> Same as above, if this patch is applied, this function will be gone.
-> 
-> yes, but this comment now must be moved forward.
-> 
-> Looking forward for a new complete version, for a new review.  I'll do
-> my best to reply quicker.
-I'll send a new version soon, perhaps I'll also add the following
-cleanups to this patchset.
-
-Thanks,
-Kuai
-> 
-> Thanks,
-> Paolo
-> 
-> 
-> 
-> 
-> 
->> Thanks,
->> Kuai
->>> Thanks,
->>> Paolo
->>>> Thanks,
->>>> Kuai
->>>>> clear/complete understanding of this non-trivial matter?
->>>>> Consequently, are we sure that this last fix is most certainly all we
->>>>> need?  Of course, I will check on my own, but if you reassure me on
->>>>> this point, I will feel more confident.
->>>>> Thanks,
->>>>> Paolo
->>>>>> 在 2022/07/20 19:38, Yu Kuai 写道:
->>>>>>> Hi
->>>>>>>
->>>>>>> 在 2022/07/20 19:24, Paolo VALENTE 写道:
->>>>>>>>
->>>>>>>>
->>>>>>>>> Il giorno 12 lug 2022, alle ore 15:30, Yu Kuai <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com> <mailto:yukuai1@huaweicloud.com>> ha scritto:
->>>>>>>>>
->>>>>>>>> Hi!
->>>>>>>>>
->>>>>>>>> I'm copying my reply with new mail address, because Paolo seems
->>>>>>>>> didn't receive my reply.
->>>>>>>>>
->>>>>>>>> 在 2022/06/23 23:32, Paolo Valente 写道:
->>>>>>>>>> Sorry for the delay.
->>>>>>>>>>> Il giorno 10 giu 2022, alle ore 04:17, Yu Kuai <yukuai3@huawei.com <mailto:yukuai3@huawei.com> <mailto:yukuai3@huawei.com>> ha scritto:
->>>>>>>>>>>
->>>>>>>>>>> Currently, bfq can't handle sync io concurrently as long as they
->>>>>>>>>>> are not issued from root group. This is because
->>>>>>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>>>>>>>>> bfq_asymmetric_scenario().
->>>>>>>>>>>
->>>>>>>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>>>>>>>>>
->>>>>>>>>>> Before this patch:
->>>>>>>>>>> 1) root group will never be counted.
->>>>>>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>>>>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
->>>>>>>>>>>
->>>>>>>>>>> After this patch:
->>>>>>>>>>> 1) root group is counted.
->>>>>>>>>>> 2) Count if bfqg have pending requests.
->>>>>>>>>>> 3) Don't count if bfqg complete all the requests.
->>>>>>>>>>>
->>>>>>>>>>> With this change, the occasion that only one group is activated can be
->>>>>>>>>>> detected, and next patch will support concurrent sync io in the
->>>>>>>>>>> occasion.
->>>>>>>>>>>
->>>>>>>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com <mailto:yukuai3@huawei.com> <mailto:yukuai3@huawei.com>>
->>>>>>>>>>> Reviewed-by: Jan Kara <jack@suse.cz <mailto:jack@suse.cz> <mailto:jack@suse.cz>>
->>>>>>>>>>> ---
->>>>>>>>>>> block/bfq-iosched.c | 42 ------------------------------------------
->>>>>>>>>>> block/bfq-iosched.h | 18 +++++++++---------
->>>>>>>>>>> block/bfq-wf2q.c    | 19 ++++---------------
->>>>>>>>>>> 3 files changed, 13 insertions(+), 66 deletions(-)
->>>>>>>>>>>
->>>>>>>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>>>>>>>>>> index 0ec21018daba..03b04892440c 100644
->>>>>>>>>>> --- a/block/bfq-iosched.c
->>>>>>>>>>> +++ b/block/bfq-iosched.c
->>>>>>>>>>> @@ -970,48 +970,6 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
->>>>>>>>>>> void bfq_weights_tree_remove(struct bfq_data *bfqd,
->>>>>>>>>>>      struct bfq_queue *bfqq)
->>>>>>>>>>> {
->>>>>>>>>>> -struct bfq_entity *entity = bfqq->entity.parent;
->>>>>>>>>>> -
->>>>>>>>>>> -for_each_entity(entity) {
->>>>>>>>>>> -struct bfq_sched_data *sd = entity->my_sched_data;
->>>>>>>>>>> -
->>>>>>>>>>> -if (sd->next_in_service || sd->in_service_entity) {
->>>>>>>>>>> -/*
->>>>>>>>>>> -* entity is still active, because either
->>>>>>>>>>> -* next_in_service or in_service_entity is not
->>>>>>>>>>> -* NULL (see the comments on the definition of
->>>>>>>>>>> -* next_in_service for details on why
->>>>>>>>>>> -* in_service_entity must be checked too).
->>>>>>>>>>> -*
->>>>>>>>>>> -* As a consequence, its parent entities are
->>>>>>>>>>> -* active as well, and thus this loop must
->>>>>>>>>>> -* stop here.
->>>>>>>>>>> -*/
->>>>>>>>>>> -break;
->>>>>>>>>>> -}
->>>>>>>>>>> -
->>>>>>>>>>> -/*
->>>>>>>>>>> -* The decrement of num_groups_with_pending_reqs is
->>>>>>>>>>> -* not performed immediately upon the deactivation of
->>>>>>>>>>> -* entity, but it is delayed to when it also happens
->>>>>>>>>>> -* that the first leaf descendant bfqq of entity gets
->>>>>>>>>>> -* all its pending requests completed. The following
->>>>>>>>>>> -* instructions perform this delayed decrement, if
->>>>>>>>>>> -* needed. See the comments on
->>>>>>>>>>> -* num_groups_with_pending_reqs for details.
->>>>>>>>>>> -*/
->>>>>>>>>>> -if (entity->in_groups_with_pending_reqs) {
->>>>>>>>>>> -entity->in_groups_with_pending_reqs = false;
->>>>>>>>>>> -bfqd->num_groups_with_pending_reqs--;
->>>>>>>>>>> -}
->>>>>>>>>>> -}
->>>>>>>>>> With this part removed, I'm missing how you handle the following
->>>>>>>>>> sequence of events:
->>>>>>>>>> 1.  a queue Q becomes non busy but still has dispatched requests, so
->>>>>>>>>> it must not be removed from the counter of queues with pending reqs
->>>>>>>>>> yet
->>>>>>>>>> 2.  the last request of Q is completed with Q being still idle (non
->>>>>>>>>> busy).  At this point Q must be removed from the counter.  It seems to
->>>>>>>>>> me that this case is not handled any longer
->>>>>>>>> Hi, Paolo
->>>>>>>>>
->>>>>>>>> 1) At first, patch 1 support to track if bfqq has pending requests, it's
->>>>>>>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when the
->>>>>>>>> first request is inserted to bfqq, and it's cleared when the last
->>>>>>>>> request is completed(based on weights_tree insertion and removal).
->>>>>>>>>
->>>>>>>>
->>>>>>>> In patch 1 I don't see the flag cleared for the request-completion event :(
->>>>>>>>
->>>>>>>> The piece of code involved is this:
->>>>>>>>
->>>>>>>> static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
->>>>>>>> {
->>>>>>>> u64 now_ns;
->>>>>>>> u32 delta_us;
->>>>>>>>
->>>>>>>> bfq_update_hw_tag(bfqd);
->>>>>>>>
->>>>>>>> bfqd->rq_in_driver[bfqq->actuator_idx]--;
->>>>>>>> bfqd->tot_rq_in_driver--;
->>>>>>>> bfqq->dispatched--;
->>>>>>>>
->>>>>>>> if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq)) {
->>>>>>>> /*
->>>>>>>> * Set budget_timeout (which we overload to store the
->>>>>>>> * time at which the queue remains with no backlog and
->>>>>>>> * no outstanding request; used by the weight-raising
->>>>>>>> * mechanism).
->>>>>>>> */
->>>>>>>> bfqq->budget_timeout = jiffies;
->>>>>>>>
->>>>>>>> bfq_weights_tree_remove(bfqd, bfqq);
->>>>>>>> }
->>>>>>>> ...
->>>>>>>>
->>>>>>>> Am I missing something?
->>>>>>>
->>>>>>> I add a new api bfq_del_bfqq_in_groups_with_pending_reqs() in patch 1
->>>>>>> to clear the flag, and it's called both from bfq_del_bfqq_busy() and
->>>>>>> bfq_completed_request(). I think you may miss the later:
->>>>>>>
->>>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>>>>>> index 0d46cb728bbf..0ec21018daba 100644
->>>>>>> --- a/block/bfq-iosched.c
->>>>>>> +++ b/block/bfq-iosched.c
->>>>>>> @@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
->>>>>>>            */
->>>>>>>           bfqq->budget_timeout = jiffies;
->>>>>>>
->>>>>>> +        bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
->>>>>>>           bfq_weights_tree_remove(bfqd, bfqq);
->>>>>>>       }
->>>>>>>
->>>>>>> Thanks,
->>>>>>> Kuai
->>>>>>>>
->>>>>>>> Thanks,
->>>>>>>> Paolo
->>>>>>
->>>>> .
->>
-> 
-> .
-> 
-
+> Thanks!
+> Dusty
+---end quoted text---
