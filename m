@@ -2,129 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E54F8C54EE9
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 16:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E600C38145
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 17:27:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230374AbiIGQmV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Sep 2022 12:42:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45094 "EHLO
+        id S230011AbiIGR1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 13:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229941AbiIGQmP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 12:42:15 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A561B760FC;
-        Wed,  7 Sep 2022 09:41:52 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 32E8833F2D;
-        Wed,  7 Sep 2022 16:41:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1662568911; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q6tOcNdtfFU3h01fMPnmLVH8bomBdNq7Oqmv2FQpXEA=;
-        b=rBXrqdSrIf0kgAXJiAQ+wTgPQhRvW0WCEX6CcQi0LnpBLlk0uu3m/F26IV8BTZHWWp13iv
-        nPC2WCOeXiTdgOUWYAdDXct1irh3uCOjkCjKIQlh1cLDEv7yxPkPJpkPb9eGj4KN6/nZ8p
-        hUR6odgLbdwGFqltXR39eIBZPkSqpeg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1662568911;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q6tOcNdtfFU3h01fMPnmLVH8bomBdNq7Oqmv2FQpXEA=;
-        b=vncHjWdKL5K7o+84s+DptSAhlOr0WFNomHISBRMXXR4eprSqCJYXvVjEKDWTVYcDZANQ1t
-        jAZ7ynqc4kL2TwCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 25C0213A66;
-        Wed,  7 Sep 2022 16:41:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id XsssCc/JGGMZeAAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 07 Sep 2022 16:41:51 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id A8857A067E; Wed,  7 Sep 2022 18:41:50 +0200 (CEST)
-Date:   Wed, 7 Sep 2022 18:41:50 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>,
-        axboe@kernel.dk, osandov@fb.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH] sbitmap: fix possible io hung due to lost wakeup
-Message-ID: <20220907164150.tykjl3jsctjddcnq@quack3>
-References: <20220803121504.212071-1-yukuai1@huaweicloud.com>
- <Yxe7V3yfBcADoYLE@kbusch-mbp.dhcp.thefacebook.com>
- <20220907102318.pdpzpmhah2m3ptbn@quack3>
- <YxinFEYRCU/QuQ5w@kbusch-mbp.dhcp.thefacebook.com>
+        with ESMTP id S229515AbiIGR1e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 13:27:34 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D353881B04
+        for <linux-block@vger.kernel.org>; Wed,  7 Sep 2022 10:27:33 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id j6so10995681qkl.10
+        for <linux-block@vger.kernel.org>; Wed, 07 Sep 2022 10:27:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=sOJSFaykwA71BM98SyYsFLb6fIMi8ySU+zYqTYP9bc4=;
+        b=lN8CxxKRIuPWjEOgSoZDvX6twhOYfL3Ethh3d6ax4lwlse73go5Cw5kUAxPRZ5EHc6
+         o5+7VylM43zMPXYIkijSH5ew6ssQ/yLKhWFU8fl/WwkW/RiCtsI69TJznTs5U4aCV78L
+         InhhnnupX/mZOKVEcsBBFXLxfy/BNtXcMr+cvM3j2+MrxY6WsvWnrlOJbTpkjTIzutt7
+         VhVQj4sLhWbs4Z/7haL7TyhFBLilcPMku892+BkzblD4hbgt47OTujp7oMSIhF2XCGhk
+         zTzddwz/KbRAHpOaiA0f3Vo2w8LoiAkXKUCIQ9ZmzYx4CsMUdnuylkcVaxQSnUswzv6m
+         r7zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=sOJSFaykwA71BM98SyYsFLb6fIMi8ySU+zYqTYP9bc4=;
+        b=pdbLdMfPfN+XYKHR9c+coY875yJF5Q+gH6Zd94Ts0+phigpIP6n79p45NmALgeaxVd
+         BBzBiBZsQT5igI4F+f29HTNLvrccLao4sJqgZYf1hEF61aDrGOgbxtKL3GZx37oxhUNZ
+         i4FcioySg/39UE1iNcu+SN3d63yIbQFjmgzpTOh/sLdWRPkIQBO5u54Wr7CVWSR8nEPp
+         V5YRRPO7cJ1w51G/q1Xyulk9/x02uVKgcnhlABs//8AGW2arjnxO5E5Y/wF/CSIsgyPF
+         W/9o2prpl+AmPjsTrhNPwLBkBp3383pjFPF46pmGyk+Blj83V3VMajEaemfyOCN5GbOM
+         5PrQ==
+X-Gm-Message-State: ACgBeo1yZDmZdNsfb+EWcn0lTTSfSkI4UCPgmY40RAF5OBMmKJ+gVBvL
+        IAkdK5jTTdx3fgIWIfmY4eiLGg==
+X-Google-Smtp-Source: AA6agR4+oBzuazP2mneC5bji7XTtzimB5QvY91JcE6Zp0ly/g79PWWAzf5vSEBI6QH793GlX1IP5Gg==
+X-Received: by 2002:ae9:e519:0:b0:6bc:475:abd4 with SMTP id w25-20020ae9e519000000b006bc0475abd4mr3475473qkf.310.1662571652857;
+        Wed, 07 Sep 2022 10:27:32 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id gb3-20020a05622a598300b00359961365f1sm1647235qtb.68.2022.09.07.10.27.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 10:27:32 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 13:27:25 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Shigeru Yoshida <syoshida@redhat.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+38e6c55d4969a14c1534@syzkaller.appspotmail.com
+Subject: Re: [PATCH] nbd: Fix hung when signal interrupts
+ nbd_start_device_ioctl()
+Message-ID: <YxjUfQUc66B+N1e7@localhost.localdomain>
+References: <20220907163502.577561-1-syoshida@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YxinFEYRCU/QuQ5w@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <20220907163502.577561-1-syoshida@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 07-09-22 08:13:40, Keith Busch wrote:
-> On Wed, Sep 07, 2022 at 12:23:18PM +0200, Jan Kara wrote:
-> > On Tue 06-09-22 15:27:51, Keith Busch wrote:
-> > > On Wed, Aug 03, 2022 at 08:15:04PM +0800, Yu Kuai wrote:
-> > > >  	wait_cnt = atomic_dec_return(&ws->wait_cnt);
-> > > > -	if (wait_cnt <= 0) {
-> > > > -		int ret;
-> > > > +	/*
-> > > > +	 * For concurrent callers of this, callers should call this function
-> > > > +	 * again to wakeup a new batch on a different 'ws'.
-> > > > +	 */
-> > > > +	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
-> > > > +		return true;
-> > > 
-> > > If wait_cnt is '0', but the waitqueue_active happens to be false due to racing
-> > > with add_wait_queue(), this returns true so the caller will retry.
-> > 
-> > Well, note that sbq_wake_ptr() called to obtain 'ws' did waitqueue_active()
-> > check. So !waitqueue_active() should really happen only if waiter was woken
-> > up by someone else or so. Not that it would matter much but I wanted to
-> > point it out.
-> > 
-> > > The next atomic_dec will set the current waitstate wait_cnt < 0, which
-> > > also forces an early return true. When does the wake up happen, or
-> > > wait_cnt and wait_index get updated in that case?
-> > 
-> > I guess your concern could be rephrased as: Who's going to ever set
-> > ws->wait_cnt to value > 0 if we ever exit with wait_cnt == 0 due to
-> > !waitqueue_active() condition?
-> > 
-> > And that is a good question and I think that's a bug in this patch. I think
-> > we need something like:
-> > 
-> > 	...
-> > 	/*
-> > 	 * For concurrent callers of this, callers should call this function
-> > 	 * again to wakeup a new batch on a different 'ws'.
-> > 	 */
-> > 	if (wait_cnt < 0)
-> > 		return true;
-> > 	/*
-> > 	 * If we decremented queue without waiters, retry to avoid lost
-> > 	 * wakeups.
-> > 	 */
-> > 	if (wait_cnt > 0)
-> > 		return !waitqueue_active(&ws->wait);
+On Thu, Sep 08, 2022 at 01:35:02AM +0900, Shigeru Yoshida wrote:
+> syzbot reported hung task [1].  The following program is a simplified
+> version of the reproducer:
 > 
-> I'm not sure about this part. We've already decremented, so the freed bit is
-> accounted for against the batch. Returning true here may double-count the freed
-> bit, right?
+> int main(void)
+> {
+> 	int sv[2], fd;
+> 
+> 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0)
+> 		return 1;
+> 	if ((fd = open("/dev/nbd0", 0)) < 0)
+> 		return 1;
+> 	if (ioctl(fd, NBD_SET_SIZE_BLOCKS, 0x81) < 0)
+> 		return 1;
+> 	if (ioctl(fd, NBD_SET_SOCK, sv[0]) < 0)
+> 		return 1;
+> 	if (ioctl(fd, NBD_DO_IT) < 0)
+> 		return 1;
+> 	return 0;
+> }
+> 
+> When signal interrupt nbd_start_device_ioctl() waiting the condition
+> atomic_read(&config->recv_threads) == 0, the task can hung because it
+> waits the completion of the inflight IOs.
+> 
+> This patch fixes the issue by clearing queue, not just shutdown, when
+> signal interrupt nbd_start_device_ioctl().
+> 
+> Link: https://syzkaller.appspot.com/bug?id=7d89a3ffacd2b83fdd39549bc4d8e0a89ef21239 [1]
+> Reported-by: syzbot+38e6c55d4969a14c1534@syzkaller.appspotmail.com
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 
-Yes, we may wake up waiters unnecessarily frequently. But that's a
-performance issue at worst and only if it happens frequently. So I don't
-think it matters in practice (famous last words ;).
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Thanks,
+
+Josef
