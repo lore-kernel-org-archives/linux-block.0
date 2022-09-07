@@ -2,52 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56462C38145
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 20:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F33C54EE9
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 20:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiIGUdk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Sep 2022 16:33:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54882 "EHLO
+        id S229718AbiIGUhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 16:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiIGUdj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 16:33:39 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C55DBD1EA
-        for <linux-block@vger.kernel.org>; Wed,  7 Sep 2022 13:33:38 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id i15so2954596qvp.5
-        for <linux-block@vger.kernel.org>; Wed, 07 Sep 2022 13:33:38 -0700 (PDT)
+        with ESMTP id S229478AbiIGUhB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 16:37:01 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EA7B7E807
+        for <linux-block@vger.kernel.org>; Wed,  7 Sep 2022 13:36:58 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id j6so11393105qkl.10
+        for <linux-block@vger.kernel.org>; Wed, 07 Sep 2022 13:36:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=Xg9usTdk0o6C+zSe1YOKjC4WC1xdzLzB/PM0uNLkIkI=;
-        b=5RGjXJezlOJDqW62jqniKE9nd0sCKFqd+pYdoNP/51fCNJDmLNWYBG9knRZwzwHqHQ
-         UMgwSQii1aaCB6KLAlPZFNIJ9X/vHHJ2SAX/7GFNQCwNh+u8/uBj9hCY/wV8d1RXTd75
-         6ApqvxuIfqn4TbiYSpOaXS/W0TBJsRsKZuEjdpecIjpOwmnYpHcpwTUv57XP4Ht7D78w
-         mVm24HglVdIr/kcd3zYb4sOHP7EIN/ncTFd9vEdk35fP2PUet4blXGVuKQ9nM3mhGN8w
-         ChIhwxcgGR3WwEBpuE9y88JfjhhwjBa4voxnTiCFoRM0oCAIe3eJ/ywhGfx3aYrNcQG0
-         u9tQ==
+        bh=C1BHBcAsOSyQRMHN3OzwuxzeT1VFxcXC8BZIu2j3tLU=;
+        b=g4iyp/DXOUn/ZrDVhsoOcC4O19DxkXrUzEUGqZJeMDf1QDm7j+TIK67zTZE0aBBgTv
+         Rou6b+1gXbQu1cuDCXd+2CRzTqHOBFNt/ZWll/fMJ1OneI95xjIalMd5u4iEXMFtiE0D
+         JWLa16oSFqFYLp8L+CN920pVmpKlKDmn7HIdQuRAPWDxBMPy8zoulX1uVp+ixgl52cxD
+         lRJyeYc1TO6O7dMzvgWUAFTjqE9EayVdT7PBt1Ij6iCLofjy64+ZMWc63DFJfm532gNt
+         01jYFqBs0V6+InjoL/7OagoBIKcvWEe+SYL/Nvz2hdauS3/PUSx/6wkVluTDF+dQ8pUD
+         5X+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Xg9usTdk0o6C+zSe1YOKjC4WC1xdzLzB/PM0uNLkIkI=;
-        b=H+e4Fq3s0WQIOe9UwDy7K3Lxc6r/DpJ+a/4F5TFTO6yiGucMzp0qr88A/6WbpKrawo
-         sKgO22wN7MBPA+t5dwBQPVETiIf2188sYeVy9cLvkD7M0xJ5lJ3VNemUggLjdd43NRo8
-         TuGKMVW0sJ9q8SsCDTGLp5O3egviKWstIntmscFnsgUl1WRaiNct0ATTOBeO6yVXy5f8
-         SCvlfWi+qRI68NzhYL6JNXEmhGU9QWdK8+Xc3RQYrrCIiWV4ytYGnOEBYiNXFvFZT+w4
-         mmvR8+TzzHxkmfy9Fqb6zbJTpvp1OMmCJAN0Pl5wTPdGqQ7AY91qSb4KKBk8Z+vC7hrc
-         1tLA==
-X-Gm-Message-State: ACgBeo2TL8Bjowd1c1jts4wgcSiU8A4Nl/oV9rirG+UN86VEil2qwQdH
-        nW98esTOWcupvRbI3I/IyPY+O4nWOgitYCMk
-X-Google-Smtp-Source: AA6agR6+PDEDIx9U94oK9gOGRgiesvdxSGyJ98dR/RxQZopxV5T9kYkTdfx7Z4YPCtjmyEfo8KkPFw==
-X-Received: by 2002:a05:6214:230a:b0:46e:3890:afcb with SMTP id gc10-20020a056214230a00b0046e3890afcbmr4831985qvb.59.1662582817038;
-        Wed, 07 Sep 2022 13:33:37 -0700 (PDT)
+        bh=C1BHBcAsOSyQRMHN3OzwuxzeT1VFxcXC8BZIu2j3tLU=;
+        b=nNGizMQyVWBcwCCL0wFtih1UAjV7rT+r3onjZEoi64UmeJ7+T2MX7yIYb99sB/sFUV
+         aPj8yFqTEjBHKaEB5nqCznuojtCOsExGlQzeTSvq3ydmicQRH1pgFRz9az/FzEMUv27L
+         UpXW4nNeDZ60noJZmn3jdrb+H2d0O8glAK1Ha7Wk9He2dNgaYPqM37MfDpe04Y2ZHUgl
+         ccBm/Qv60nMETwLaU+F6XfuPLak2R81T0HTyTWdoKs9YskAf6uxALy9jNqoMD6oshspx
+         K2I2RuwZw6wTXhhH4lj3jFIZT2Q+7ANnyvE8zhGViuMPNTCG+l9m1M1iyy3rOPDLG/LB
+         hbnA==
+X-Gm-Message-State: ACgBeo2IAQ9xzfBq8XwvXqubOHvbktxErn4SrPANMURsZdkQ6A9/CrXR
+        AXno56PKTXi3lh3HH5jvwH7gNA==
+X-Google-Smtp-Source: AA6agR7WbFK3hNsj7u4rSvbpte5v8Bf/PMRPFx6mZwZZNtClyjs2s0puEF5jTalrINZMmUDKYAWMkQ==
+X-Received: by 2002:a37:aa04:0:b0:6bc:56c0:63c9 with SMTP id t4-20020a37aa04000000b006bc56c063c9mr4070160qke.449.1662583017073;
+        Wed, 07 Sep 2022 13:36:57 -0700 (PDT)
 Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id cd9-20020a05622a418900b00342fdc4004fsm13275230qtb.52.2022.09.07.13.33.36
+        by smtp.gmail.com with ESMTPSA id q11-20020a05620a0d8b00b006bbf85cad0fsm15708263qkl.20.2022.09.07.13.36.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 13:33:36 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 16:33:35 -0400
+        Wed, 07 Sep 2022 13:36:56 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 16:36:55 -0400
 From:   Josef Bacik <josef@toxicpanda.com>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
@@ -57,70 +57,27 @@ Cc:     Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
         Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
         "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
         linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 05/17] btrfs: handle checksum generation in the storage
- layer
-Message-ID: <YxkAHwUx8SsJzRYJ@localhost.localdomain>
+Subject: Re: [PATCH 06/17] btrfs: handle recording of zoned writes in the
+ storage layer
+Message-ID: <YxkA539zjxA3OvwV@localhost.localdomain>
 References: <20220901074216.1849941-1-hch@lst.de>
- <20220901074216.1849941-6-hch@lst.de>
+ <20220901074216.1849941-7-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220901074216.1849941-6-hch@lst.de>
+In-Reply-To: <20220901074216.1849941-7-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 10:42:04AM +0300, Christoph Hellwig wrote:
-> Instead of letting the callers of btrfs_submit_bio deal with checksumming
-> the (meta)data in the bio and making decisions on when to offload the
-> checksumming to the bio, leave that to btrfs_submit_bio.  Do do so the
-> existing btrfs_submit_bio function is split into an upper and a lower
-> half, so that the lower half can be offloaded to a workqueue.
-> 
-> The driver-private REQ_DRV flag is used to indicate the special 'bio must
-> be contained in a single ordered extent case' that is used by the
-> compressed write case instead of passing a new flag all the way down the
-> stack.
-> 
-> Note that this changes the behavior for direct writes to raid56 volumes so
-> that async checksum offloading is not skipped when more I/O is expected.
-> This runs counter to the argument explaining why it was done, although I
-> can't measure any affects of the change.  Commits later in this series
-> will make sure the entire direct writes is offloaded to the workqueue
-> at once and thus make sure it is sent to the raid56 code from a single
-> thread.
+On Thu, Sep 01, 2022 at 10:42:05AM +0300, Christoph Hellwig wrote:
+> Move the code that splits the ordered extents and records the physical
+> location for them to the storage layer so that the higher level consumers
+> don't have to care about physical block numbers at all.  This will also
+> allow to eventually remove accounting for the zone append write sizes in
+> the upper layer with a little bit more block layer work.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/btrfs/compression.c |  13 +--
->  fs/btrfs/ctree.h       |   4 +-
->  fs/btrfs/disk-io.c     | 170 ++-------------------------------
->  fs/btrfs/disk-io.h     |   5 -
->  fs/btrfs/extent_io.h   |   3 -
->  fs/btrfs/file-item.c   |  25 ++---
->  fs/btrfs/inode.c       |  89 +-----------------
->  fs/btrfs/volumes.c     | 208 ++++++++++++++++++++++++++++++++++++-----
->  fs/btrfs/volumes.h     |   7 +-
->  9 files changed, 215 insertions(+), 309 deletions(-)
-> 
-> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-> index f932415a4f1df..53f9e123712b0 100644
-> --- a/fs/btrfs/compression.c
-> +++ b/fs/btrfs/compression.c
-> @@ -351,9 +351,9 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
->  	u64 cur_disk_bytenr = disk_start;
->  	u64 next_stripe_start;
->  	blk_status_t ret = BLK_STS_OK;
-> -	int skip_sum = inode->flags & BTRFS_INODE_NODATASUM;
->  	const bool use_append = btrfs_use_zone_append(inode, disk_start);
-> -	const enum req_op bio_op = use_append ? REQ_OP_ZONE_APPEND : REQ_OP_WRITE;
-> +	const enum req_op bio_op = REQ_BTRFS_ONE_ORDERED |
-> +		(use_append ? REQ_OP_ZONE_APPEND : REQ_OP_WRITE);
->  
-
-I'd rather see this as a separate change.  Keeping logical changes to themselves
-makes it easier to figure out what was going on when we look back at the
-history.  Other than that you can add
 
 Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
