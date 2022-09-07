@@ -2,75 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7229C38145
-	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 08:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C64C6FA83
+	for <linux-block@archiver.kernel.org>; Wed,  7 Sep 2022 08:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230014AbiIGImF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Sep 2022 04:42:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41490 "EHLO
+        id S229707AbiIGIpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Sep 2022 04:45:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbiIGImE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 04:42:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2253AF0D0
-        for <linux-block@vger.kernel.org>; Wed,  7 Sep 2022 01:41:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662539931;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=v7tXqiRu6Q/ASgIKZPVujZFkCxqS9SjkhigXRzRcRk0=;
-        b=ZLNvGvSo1rCnTYLeyyyqxSU2s5LhBKtOdMbXMj9snouGQ8oirzu5Vcgt5KC3jnR7J3rEHD
-        RfwTnaSjCw6oFoR5JOuGy6EDBhw+JZ1PzBglz3O47Vkleci7loEHQL93IXZoEt3if4+G4N
-        SVvCYTsEOeUG1n+gQqUrig5BtSrBAzo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-460-zdi2S9TtMO-e-EHkgYTvBg-1; Wed, 07 Sep 2022 04:38:48 -0400
-X-MC-Unique: zdi2S9TtMO-e-EHkgYTvBg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80F398041BE;
-        Wed,  7 Sep 2022 08:38:47 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2050C1415102;
-        Wed,  7 Sep 2022 08:38:42 +0000 (UTC)
-Date:   Wed, 7 Sep 2022 16:38:37 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Dusty Mabe <dusty@dustymabe.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Message-ID: <YxhYjaA3CrMz5njZ@T590>
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
- <YxBZ4BBjxvAkvI2A@T590>
- <20220907073324.GB23826@lst.de>
+        with ESMTP id S229572AbiIGIpm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Sep 2022 04:45:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E3C72EE1;
+        Wed,  7 Sep 2022 01:45:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=EBn6+PekQ9HgWpOyL3HjDLpM5I9iK8a5/LWby5GXm9w=; b=oVetsvWLvH5eTqsi2zWONtOAC3
+        rpZ6+qvDKI37kr2ze2cMlVgkhAfvPg6uiUWsrUYR9ZcUyYQNl4xeK1t6c4whmVHD1E23Mhxgz01wR
+        vXF5bBSal2savl00zL3GewiEwtqdPIW0eH0UH4EbDt3Wi2PxSzFltT2mdaBrlbik3gmpqAjya3jSQ
+        NGIUR67sBaEfsENy+OvVHmXQ7qCuMwLTtqbOKQl1Wv+5Kl/t2anvwTp1DeYUFuU8DAs/eLpqyNY3y
+        FxW4UOxkCgD0Il8Z5AF1hAzQ0cfHvx1nSsH2xsI4w6iHAzjsFq53EgVIyPzPpxzmtV9iZ+vo4btdE
+        qjixFbYg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oVqgY-004SGZ-4V; Wed, 07 Sep 2022 08:45:26 +0000
+Date:   Wed, 7 Sep 2022 01:45:26 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
+Message-ID: <YxhaJktqtHw3QTSG@infradead.org>
+References: <20220831041843.973026-1-jhubbard@nvidia.com>
+ <20220831041843.973026-5-jhubbard@nvidia.com>
+ <YxbtF1O8+kXhTNaj@infradead.org>
+ <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
+ <Yxb7YQWgjHkZet4u@infradead.org>
+ <20220906102106.q23ovgyjyrsnbhkp@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220907073324.GB23826@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+In-Reply-To: <20220906102106.q23ovgyjyrsnbhkp@quack3>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 07, 2022 at 09:33:24AM +0200, Christoph Hellwig wrote:
-> On Thu, Sep 01, 2022 at 03:06:08PM +0800, Ming Lei wrote:
-> > It is a bit hard to associate the above commit with reported issue.
+On Tue, Sep 06, 2022 at 12:21:06PM +0200, Jan Kara wrote:
+> > For FOLL_PIN callers, never pin bvec and kvec pages:  For file systems
+> > not acquiring a reference is obviously safe, and the other callers will
+> > need an audit, but I can't think of why it woul  ever be unsafe.
 > 
-> So the messages clearly are about something trying to open a device
-> that went away at the block layer, but somehow does not get removed
-> in time by udev (which seems to be a userspace bug in CoreOS).  But
-> even with that we really should not hang.
+> Are you sure about "For file systems not acquiring a reference is obviously
+> safe"? I can see places e.g. in orangefs, afs, etc. which create bvec iters
+> from pagecache pages. And then we have iter_file_splice_write() which
+> creates bvec from pipe pages (which can also be pagecache pages if
+> vmsplice() is used). So perhaps there are no lifetime issues even without
+> acquiring a reference (but looking at the code I would not say it is
+> obvious) but I definitely don't see how it would be safe to not get a pin
+> to signal to filesystem backing the pagecache page that there is DMA
+> happening to/from the page.
 
-The new device should be allocated from md_probe() via blk_request_module(),
-and the underlying devices are virtio-blk from the fedora BZ2121791.
-
-[1] https://bugzilla.redhat.com/show_bug.cgi?id=2121791
-
-Thanks,
-Ming
-
+I mean in the context of iov_iter_get_pages callers, that is direct
+I/O.  Direct callers of iov_iter_bvec which then pass that iov to
+->read_iter / ->write_iter will need to hold references (those are
+the references that the callers of iov_iter_get_pages rely on!).
