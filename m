@@ -2,89 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F07CAC54EE9
-	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 11:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7CBC54EE9
+	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 13:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbiIHLtx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Sep 2022 07:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
+        id S232242AbiIHNKe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Sep 2022 09:10:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231513AbiIHLts (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 07:49:48 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D5112D1B;
-        Thu,  8 Sep 2022 04:49:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S232208AbiIHNKL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 09:10:11 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D95415FF1
+        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 06:09:46 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F3D1FB820D2;
-        Thu,  8 Sep 2022 11:49:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF07C433C1;
-        Thu,  8 Sep 2022 11:49:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1662637782;
-        bh=g4qAFqq0hkSEXU7h41NwOrSRebV9g97WbblautAhiGc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CvlluBFgH6xIjm3hHG8D1G1s3TD1tETbo6RehWyIp5CurslvAK3zSZSQj2VMFgsb+
-         cZ+kO+ytLc0o6rN57jAmkto7PHUoxc4p3YCxH8sw4SBnPqzwtABiRu4Qa47mr4c7AZ
-         SGNgc85z35csPsyuu3zfWjSsddZHWGnJWCqmdMDk=
-Date:   Thu, 8 Sep 2022 13:50:04 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     SeongJae Park <sj@kernel.org>
-Cc:     stable@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= 
-        <marmarek@invisiblethingslab.com>, Juergen Gross <jgross@suse.com>
-Subject: Re: [PATCH for-stable-5.10.y] xen-blkfront: Cache feature_persistent
- value before advertisement
-Message-ID: <YxnW7P7TYBu4ZCXS@kroah.com>
-References: <20220906162414.105452-1-sj@kernel.org>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 41B88226E9;
+        Thu,  8 Sep 2022 13:09:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1662642584; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=3XK2g1KYCQSWB32aWM3ILawrLpfSrkuh2E6DAH5ExVU=;
+        b=iVVQHdBS3ihVIRWgTKw7iYfT99OrhiSA2sPtVTqqfPXoX9e8WS3MmUQBlAmJGt8vendR8A
+        n1HeZpZoXmbvJhU1sjEGd7TAsjv7vZDQbc5HNoaACrIVzzrZUE/W0+laAt9wWy0Bi7bIP8
+        NvcIwIpI7aw3F5oxFcR1rIofTUzil0Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1662642584;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=3XK2g1KYCQSWB32aWM3ILawrLpfSrkuh2E6DAH5ExVU=;
+        b=GMiJUn+f+XTGWnDKsP0yjczmsj8Q8DGWZ+Fwzq4TEK6epi1brzysmEqVSdPkH2lPSex4XQ
+        XKGCAePlryDUt7Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1C3151322C;
+        Thu,  8 Sep 2022 13:09:44 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id /WPYBpjpGWPBNAAAMHmgww
+        (envelope-from <jack@suse.cz>); Thu, 08 Sep 2022 13:09:44 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 8852DA067E; Thu,  8 Sep 2022 15:09:42 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>,
+        Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>
+Subject: [PATCH] sbitmap: Avoid leaving waitqueue in invalid state in __sbq_wake_up()
+Date:   Thu,  8 Sep 2022 15:09:37 +0200
+Message-Id: <20220908130937.2795-1-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2109; h=from:subject; bh=R6Lz0vD46CGPRpgDhfIea2NzhVZvYixGW9XGfwcJ6Z4=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBjGemJrfmnY8ackOLJjBHgDbG3WADL/SSWkNc+99Hn kieA4W+JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYxnpiQAKCRCcnaoHP2RA2ZhHCA Ct3YoY6tON4fmU0uFQToGupobp243JqaPRvz+6kca5N7zLdDLXBpYBHaXtXYuxBsIS2qcJ4SKz+jmJ HaO9qtBzyvdSt9Fs35hgaMP7gx/8UXsiSex6XuYa+sLHkoTJW7DaOV47lBY/JY5MnWc5q60GmbY9uy XuZX+Xi5wtKG4hCO8kvLk0vfoosmZ3jH0e9y9gRJ/EAoXwvcmqBXn4PiP+VpdI+FdOgpFv8r1J+qv8 oNH9j+vblAqtpWwM03c3yTTYkU0x4DoQgbTLLPf/nVlPBIJyByNhA1MaM2b072LbBdZf5P6X4OOZ0h OgIWbrWYgbL3VZMHHDB3I44wrAOwcd
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220906162414.105452-1-sj@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 04:24:14PM +0000, SeongJae Park wrote:
-> commit fe8f65b018effbf473f53af3538d0c1878b8b329 upstream.
-> 
-> Xen blkfront advertises its support of the persistent grants feature
-> when it first setting up and when resuming in 'talk_to_blkback()'.
-> Then, blkback reads the advertised value when it connects with blkfront
-> and decides if it will use the persistent grants feature or not, and
-> advertises its decision to blkfront.  Blkfront reads the blkback's
-> decision and it also makes the decision for the use of the feature.
-> 
-> Commit 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter
-> when connect"), however, made the blkfront's read of the parameter for
-> disabling the advertisement, namely 'feature_persistent', to be done
-> when it negotiate, not when advertise.  Therefore blkfront advertises
-> without reading the parameter.  As the field for caching the parameter
-> value is zero-initialized, it always advertises as the feature is
-> disabled, so that the persistent grants feature becomes always disabled.
-> 
-> This commit fixes the issue by making the blkfront does parmeter caching
-> just before the advertisement.
-> 
-> Fixes: 402c43ea6b34 ("xen-blkfront: Apply 'feature_persistent' parameter when connect")
-> Cc: <stable@vger.kernel.org> # 5.10.x
-> Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-> Signed-off-by: SeongJae Park <sj@kernel.org>
-> Tested-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-> Reviewed-by: Juergen Gross <jgross@suse.com>
-> Link: https://lore.kernel.org/r/20220831165824.94815-4-sj@kernel.org
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> ---
-> 
-> This patch is a manual backport of the upstream commit on the 5.10.y
-> kernel.  Please note that this patch can be applied on the latest 5.10.y
-> only after the preceding patch[1] is applied.
-> 
-> [1] https://lore.kernel.org/stable/20220906132819.016040100@linuxfoundation.org/
+When __sbq_wake_up() decrements wait_cnt to 0 but races with someone
+else waking the waiter on the waitqueue (so the waitqueue becomes
+empty), it exits without reseting wait_cnt to wake_batch number. Once
+wait_cnt is 0, nobody will ever reset the wait_cnt or wake the new
+waiters resulting in possible deadlocks or busyloops. Fix the problem by
+making sure we reset wait_cnt even if we didn't wake up anybody in the
+end.
 
-Now queued up, thanks.
+Fixes: 040b83fcecfb ("sbitmap: fix possible io hung due to lost wakeup")
+Reported-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ lib/sbitmap.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-greg k-h
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index a39b1a877366..47cd8fb894ba 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -604,6 +604,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 	struct sbq_wait_state *ws;
+ 	unsigned int wake_batch;
+ 	int wait_cnt;
++	bool ret;
+ 
+ 	ws = sbq_wake_ptr(sbq);
+ 	if (!ws)
+@@ -614,12 +615,23 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 	 * For concurrent callers of this, callers should call this function
+ 	 * again to wakeup a new batch on a different 'ws'.
+ 	 */
+-	if (wait_cnt < 0 || !waitqueue_active(&ws->wait))
++	if (wait_cnt < 0)
+ 		return true;
+ 
++	/*
++	 * If we decremented queue without waiters, retry to avoid lost
++	 * wakeups.
++	 */
+ 	if (wait_cnt > 0)
+-		return false;
++		return !waitqueue_active(&ws->wait);
+ 
++	/*
++	 * When wait_cnt == 0, we have to be particularly careful as we are
++	 * responsible to reset wait_cnt regardless whether we've actually
++	 * woken up anybody. But in case we didn't wakeup anybody, we still
++	 * need to retry.
++	 */
++	ret = !waitqueue_active(&ws->wait);
+ 	wake_batch = READ_ONCE(sbq->wake_batch);
+ 
+ 	/*
+@@ -648,7 +660,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 	sbq_index_atomic_inc(&sbq->wake_index);
+ 	atomic_set(&ws->wait_cnt, wake_batch);
+ 
+-	return false;
++	return ret;
+ }
+ 
+ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+-- 
+2.35.3
+
