@@ -2,156 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DDCC38145
-	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 13:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F43AC38145
+	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 14:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232320AbiIHNRw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Sep 2022 09:17:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58974 "EHLO
+        id S232624AbiIHOjx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Sep 2022 10:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232381AbiIHNRu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 09:17:50 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C34F56C4;
-        Thu,  8 Sep 2022 06:17:47 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1oWHPc-0007J4-NY; Thu, 08 Sep 2022 15:17:44 +0200
-Message-ID: <00f37e8e-47d7-63bf-2349-7cbbc663111a@leemhuis.info>
-Date:   Thu, 8 Sep 2022 15:17:44 +0200
+        with ESMTP id S232091AbiIHOjQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 10:39:16 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B27146626
+        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 07:39:10 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id n202so14225099iod.6
+        for <linux-block@vger.kernel.org>; Thu, 08 Sep 2022 07:39:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=rzm8TQHe9gl6P7pIMQLwU11bCbB3fo6dFTISRAfXJZE=;
+        b=UntEMM9h4WWHfaUsNMwGapgQg1DErJ+mXNDRHnZzJAAvVYkppfo6gJ4VB2GOYnKOq/
+         6YRMRAOO+5stEtJExJLUatN16oR5tIhW0X4aSMisD5Ou6nlmSU6ytXhbld6nM9wt2fq/
+         LIDmdh7SfsaXx1fbCkGU9rhSmnZ1ieKr5Kg7QaDYB0v8cvyNMbyJU0k2Xs2oTBP3KCeR
+         PGVO/6bAnm7oPmVGnIDRCEVK+LF189bjsLm7bku7PCiP20v1P/oEJZfoD4gZP+8QXYI4
+         iuv+nXyzo66gfrqEXLhEAoUvaX7KHhCeWWAcfHLiLC4j9st2Mu4EcmJ55FEGB2K9kCRk
+         yVaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=rzm8TQHe9gl6P7pIMQLwU11bCbB3fo6dFTISRAfXJZE=;
+        b=DipDTCVH2MKOlI8TrBah/fnwYIGI7zBzYika+l6ISzyGNattuKdQQD99Hpjb1gWGK9
+         /joOTVJ9RofeuWTkVcvKOyYbQ41p1HlIiBZkPdJGKM/fveBrH8rXUUM54adj2LDW95HD
+         HmHixpPFsSbhKEpwbhR4fQ9RziF3Zec7BuwJxgN8QPPsXBOJMDWIUOjdmwZT6z4kHbhU
+         TH+fVstergV9ghDmJNAMqjQEZRTejFKO1KqNXaBHpe8i0/toiyk7ZA/CCku0D1YlUd+r
+         9rCIXF71xqILyn6CNcbmose76eb1HayyfpGT0rolpRdvOHCBjk3c4qDJyjHcMC0hongd
+         Qwxg==
+X-Gm-Message-State: ACgBeo2/WB5YnuTdfpVktc8FsDhXdrNl+MKme9PMXVMFfckQJo1eQMG5
+        qA/BScSi009ZLjBX1x00z3hbJMSnbEAYNQ==
+X-Google-Smtp-Source: AA6agR4SLtTpmvHBLjqvB4W/gyaaF1tbTBeaMZhtiocEcrjhJ521UkFXVUMQd2calUHLTqI3lcNmew==
+X-Received: by 2002:a5e:9417:0:b0:689:f25c:6f7d with SMTP id q23-20020a5e9417000000b00689f25c6f7dmr4140607ioj.123.1662647950096;
+        Thu, 08 Sep 2022 07:39:10 -0700 (PDT)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id q5-20020a02b045000000b003572ae30370sm2137453jah.145.2022.09.08.07.39.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Sep 2022 07:39:09 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Yu Kuai <yukuai1@huaweicloud.com>
+In-Reply-To: <20220908130937.2795-1-jack@suse.cz>
+References: <20220908130937.2795-1-jack@suse.cz>
+Subject: Re: [PATCH] sbitmap: Avoid leaving waitqueue in invalid state in __sbq_wake_up()
+Message-Id: <166264794928.470510.10920690449555414358.b4-ty@kernel.dk>
+Date:   Thu, 08 Sep 2022 08:39:09 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [loop] efcfec579f: mdadm-selftests.12imsm-r0_2d-grow-r0_3d.fail
- #forregzbot
-Content-Language: en-US, de-DE
-To:     regressions@lists.linux.dev
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        lkp@lists.01.org
-References: <YvEgyQM/Wi0E2J3J@xsang-OptiPlex-9020>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <YvEgyQM/Wi0E2J3J@xsang-OptiPlex-9020>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1662643068;811e6a42;
-X-HE-SMSGID: 1oWHPc-0007J4-NY
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.10.0-dev-65ba7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TWIMC: this mail is primarily send for documentation purposes and for
-regzbot, my Linux kernel regression tracking bot. These mails usually
-contain '#forregzbot' in the subject, to make them easy to spot and filter.
+On Thu, 8 Sep 2022 15:09:37 +0200, Jan Kara wrote:
+> When __sbq_wake_up() decrements wait_cnt to 0 but races with someone
+> else waking the waiter on the waitqueue (so the waitqueue becomes
+> empty), it exits without reseting wait_cnt to wake_batch number. Once
+> wait_cnt is 0, nobody will ever reset the wait_cnt or wake the new
+> waiters resulting in possible deadlocks or busyloops. Fix the problem by
+> making sure we reset wait_cnt even if we didn't wake up anybody in the
+> end.
+> 
+> [...]
 
-Hi, this is your Linux kernel regression tracker. Top-posting for once,
-to make this easily accessible to everyone.
+Applied, thanks!
 
-As per recent general discussions with the 0-day folks, I'm dropping
-below regression report from the list of tracked issues, as this report
-didn't gain any traction. That for example can happen (often without any
-reply!) if the developers considered the regression of no practical
-relevance, as they assume it only materializes in micro-benchmarks, is
-due to a broken test case, or some fluke.
+[1/1] sbitmap: Avoid leaving waitqueue in invalid state in __sbq_wake_up()
+      commit: 48c033314f372478548203c583529f53080fd078
 
-Not sure if that or something else is the reason why this particular
-report didn't gain any traction, but I lack the bandwidth to follow-up
-on each and every regression 0-day bot found and reported. At the
-same time I don't want to keep these reports in the list of tracked
-issues forever, as that creates noise and makes it harder to spot the
-important issues in regzbot's reports and lists. That's why I hereby
-remove it:
+Best regards,
+-- 
+Jens Axboe
 
-#regzbot invalid: 0-day report that didn't get traction; likely of no
-relevance, not sure
 
-Ciao, Thorsten
-
-On 08.08.22 16:42, kernel test robot wrote:
-> 
-> (pleased be noted we found the issue still exists on latest maineline,
-> so report though the commit is old, FYI)
-> 
-> 
-> Greeting,
-> 
-> FYI, we noticed the following commit (built with gcc-11):
-> 
-> commit: efcfec579f6139528c9e6925eca2bc4a36da65c6 ("loop: fix no-unmap write-zeroes request behavior")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> 
-> in testcase: mdadm-selftests
-> version: mdadm-selftests-x86_64-5f41845-1_20220518
-> with following parameters:
-> 
-> 	disk: 1HDD
-> 	test_prefix: 12
-> 	ucode: 0x28
-> 
-> 
-> 
-> on test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-4790T CPU @ 2.70GHz with 16G memory
-> 
-> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
-> 
-> 
-> 
-> 
-> If you fix the issue, kindly add following tag
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> 
-> 2022-08-05 18:01:28 mkdir -p /var/tmp
-> 2022-08-05 18:01:28 mke2fs -t ext3 -b 4096 -J size=4 -q /dev/sda1
-> 2022-08-05 18:02:00 mount -t ext3 /dev/sda1 /var/tmp
-> sed -e 's/{DEFAULT_METADATA}/1.2/g' \
-> -e 's,{MAP_PATH},/run/mdadm/map,g'  mdadm.8.in > mdadm.8
-> /usr/bin/install -D -m 644 mdadm.8 /usr/share/man/man8/mdadm.8
-> /usr/bin/install -D -m 644 mdmon.8 /usr/share/man/man8/mdmon.8
-> /usr/bin/install -D -m 644 md.4 /usr/share/man/man4/md.4
-> /usr/bin/install -D -m 644 mdadm.conf.5 /usr/share/man/man5/mdadm.conf.5
-> /usr/bin/install -D -m 644 udev-md-raid-creating.rules /lib/udev/rules.d/01-md-raid-creating.rules
-> /usr/bin/install -D -m 644 udev-md-raid-arrays.rules /lib/udev/rules.d/63-md-raid-arrays.rules
-> /usr/bin/install -D -m 644 udev-md-raid-assembly.rules /lib/udev/rules.d/64-md-raid-assembly.rules
-> /usr/bin/install -D -m 644 udev-md-clustered-confirm-device.rules /lib/udev/rules.d/69-md-clustered-confirm-device.rules
-> /usr/bin/install -D  -m 755 mdadm /sbin/mdadm
-> /usr/bin/install -D  -m 755 mdmon /sbin/mdmon
-> Testing on linux-5.4.0-rc2-00010-gefcfec579f6139 kernel
-> /lkp/benchmarks/mdadm-selftests/tests/12imsm-r0_2d-grow-r0_3d... 
-> 	ERROR: dmesg prints errors when testing 12imsm-r0_2d-grow-r0_3d! 
-> 
-> FAILED - see /var/tmp/12imsm-r0_2d-grow-r0_3d.log and /var/tmp/fail12imsm-r0_2d-grow-r0_3d.log for details
-> Testing on linux-5.4.0-rc2-00010-gefcfec579f6139 kernel
-> /lkp/benchmarks/mdadm-selftests/tests/12imsm-r0_2d-grow-r0_4d... 
-> 	ERROR: dmesg prints errors when testing 12imsm-r0_2d-grow-r0_4d! 
-> 
-> FAILED - see /var/tmp/12imsm-r0_2d-grow-r0_4d.log and /var/tmp/fail12imsm-r0_2d-grow-r0_4d.log for details
-> Testing on linux-5.4.0-rc2-00010-gefcfec579f6139 kernel
-> /lkp/benchmarks/mdadm-selftests/tests/12imsm-r0_2d-grow-r0_5d... 
-> 	ERROR: dmesg prints errors when testing 12imsm-r0_2d-grow-r0_5d! 
-> 
-> FAILED - see /var/tmp/12imsm-r0_2d-grow-r0_5d.log and /var/tmp/fail12imsm-r0_2d-grow-r0_5d.log for details
-> Testing on linux-5.4.0-rc2-00010-gefcfec579f6139 kernel
-> /lkp/benchmarks/mdadm-selftests/tests/12imsm-r0_3d-grow-r0_4d... 
-> 	ERROR: dmesg prints errors when testing 12imsm-r0_3d-grow-r0_4d! 
-> 
-> FAILED - see /var/tmp/12imsm-r0_3d-grow-r0_4d.log and /var/tmp/fail12imsm-r0_3d-grow-r0_4d.log for details
-> Testing on linux-5.4.0-rc2-00010-gefcfec579f6139 kernel
-> /lkp/benchmarks/mdadm-selftests/tests/12imsm-r5_3d-grow-r5_4d... succeeded
-> Testing on linux-5.4.0-rc2-00010-gefcfec579f6139 kernel
-> /lkp/benchmarks/mdadm-selftests/tests/12imsm-r5_3d-grow-r5_5d... succeeded
-> 
-> 
-> 
-> To reproduce:
-> 
->         git clone https://github.com/intel/lkp-tests.git
->         cd lkp-tests
->         sudo bin/lkp install job.yaml           # job file is attached in this email
->         bin/lkp split-job --compatible job.yaml # generate the yaml file for lkp run
->         sudo bin/lkp run generated-yaml-file
-> 
->         # if come across any failure that blocks the test,
->         # please remove ~/.lkp and /lkp dir to run from a clean state.
-> 
-> 
-> #regzbot introduced: efcfec579f
-> 
