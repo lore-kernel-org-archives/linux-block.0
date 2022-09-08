@@ -2,85 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0750BC38145
-	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 16:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 502C4C54EE9
+	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 18:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229455AbiIHQUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Sep 2022 12:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
+        id S232295AbiIHSph (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Sep 2022 14:45:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230330AbiIHQUy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 12:20:54 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89770E7FAD
-        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 09:20:52 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id z191so389407iof.10
-        for <linux-block@vger.kernel.org>; Thu, 08 Sep 2022 09:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=7dIs3wIU/eOuY42tjUqQIb5hvTxPnOyZmdhm58qw250=;
-        b=g+GRDZEFcMsYo9rekqdIoa5Hg2iXa3uKfZ46Kt+XF33CAkT5r2PuNlezw6p7CqOkRJ
-         ZTzhch5ZNm2rCTZ//ncC0HGQjZH+z4M9RE3ouRfslW3H/boUfvJjXWL2bok/ySkIqn+y
-         lkKrbLWSUCuXZtKTy0jWIKcU28JZRDDtWckN1msYo3e/WWZ4W3b2RdHYB14Z4aGMaMbR
-         sqr09sIBnlUQRR1wWiPp1FwvqVY4zFWiHaUgyMQbubzILOJqviZw3xDrqFhsOwjkOauv
-         wBR+1Yw3bSzkUEMwA6p/HuwYNEMzHU2qvnoWs9oKVOvX5Xy5i28WQkBOHo3VKtRFU1Dx
-         mCjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=7dIs3wIU/eOuY42tjUqQIb5hvTxPnOyZmdhm58qw250=;
-        b=HjuN3CgDdBYWDsh5zDHhLY16pEEnI52iK3vN0RDnk+FR2tG5WNhCVzsbuB0zIJEFel
-         Tu6GWOgXytumlzDKVGkQDCoN2zfVI1BRV+5oOmtsm88mZ+Nd4SMoDFY/ZQ3OHPbOLe4D
-         B9xLN44PMjAJ9DYoKW+o7ShC4Zbc9MF4mXQgHhYGx90IwaaJ/8ZnFGOkxdDUS510P7E4
-         Bz0A4Sp3wBpjfy77r4tB8eahWY9oLyeEjtqB/W9zkUl+OHOgOahW0IIOgOAuRrHgLgTX
-         A8Jl04SPn7ckKAh9RJ3HfpPp9r63PyXZTtwEqfgYo3lmA+U0JlG+Cwl8lnqU3MEH74gM
-         +1pg==
-X-Gm-Message-State: ACgBeo2PGOOTNgSNcTlvOKqp+aeaWKJoWHESy5J13PkjMAmfP++8rhSe
-        JUpnj0Ccd+60SMDDW9o+r18V5w==
-X-Google-Smtp-Source: AA6agR7VJ8j0hKXexix+zZNZGjqFwxTKwdptIZ3mwCSF5QurOjI2nsEuLfEZ2lkPEf15lqjmVu4xMg==
-X-Received: by 2002:a05:6638:3e0a:b0:34c:ff3:57ff with SMTP id co10-20020a0566383e0a00b0034c0ff357ffmr5342528jab.105.1662654051747;
-        Thu, 08 Sep 2022 09:20:51 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id d91-20020a0285e4000000b003584d00a0b9sm205077jai.20.2022.09.08.09.20.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Sep 2022 09:20:51 -0700 (PDT)
-Message-ID: <a2db93db-4cca-5a72-62c9-75f76f19221d@kernel.dk>
-Date:   Thu, 8 Sep 2022 10:20:49 -0600
+        with ESMTP id S232286AbiIHSpg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 14:45:36 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB25832E0
+        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 11:45:32 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220908184529epoutp0205170960a94a57e21dd517ed6b18aa5b~S9vGJx5740060300603epoutp02O
+        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 18:45:29 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220908184529epoutp0205170960a94a57e21dd517ed6b18aa5b~S9vGJx5740060300603epoutp02O
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662662729;
+        bh=etID3tAPfm1+JvOZ3BYza6dohn9MxI+tzX18nZ3boSI=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=UawL5kRSgxYlX3FpR4GpKogkWVXyb+Sc/SyZ27cXvmZnTH3KaO3eZO/k2mdjQdbYj
+         5PQmDliRrAPVDIc+/CRoMI1+Z5YhWqqE9UR6BFr9yOQW6AW/7NJ1JFyhaH9TUhgXHV
+         4GEzJBWWOBPxaIQkIefn46PXMdbHpdKA5wp2ihos=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20220908184528epcas5p17ef96cc743cd7d71770211b5a6599b09~S9vE4WCel0840908409epcas5p1r;
+        Thu,  8 Sep 2022 18:45:28 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4MNp3968tBz4x9Pp; Thu,  8 Sep
+        2022 18:45:25 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        94.FE.59633.5483A136; Fri,  9 Sep 2022 03:45:25 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20220908184525epcas5p4cec88afa56beb0e5222e23c2344dbc8a~S9vCCXzVF0530505305epcas5p4Y;
+        Thu,  8 Sep 2022 18:45:25 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220908184525epsmtrp11b511f9c926f6f2c22c31b76253a0350~S9vCBnaVe2970229702epsmtrp1e;
+        Thu,  8 Sep 2022 18:45:25 +0000 (GMT)
+X-AuditID: b6c32a49-dfdff7000000e8f1-2b-631a3845e924
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        22.DD.14392.5483A136; Fri,  9 Sep 2022 03:45:25 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220908184523epsmtip2921bf26f848457db6323b6fe0aa52e80~S9vAuXv492343623436epsmtip2v;
+        Thu,  8 Sep 2022 18:45:23 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+        asml.silence@gmail.com
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        Kanchan Joshi <joshi.k@samsung.com>
+Subject: [PATCH for-next v6 0/5] fixed-buffer for uring-cmd/passthru
+Date:   Fri,  9 Sep 2022 00:05:06 +0530
+Message-Id: <20220908183511.2253-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.0
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YxoLsUEjritZcoK9@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YxoLsUEjritZcoK9@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmk+LIzCtJLcpLzFFi42LZdlhTS9fVQirZ4OIEfYs5q7YxWqy+289m
+        cfPATiaLlauPMlm8az3HYnH0/1s2i0mHrjFa7L2lbTF/2VN2B06PnbPusntcPlvqsWlVJ5vH
+        5iX1HrtvNrB59G1ZxejxeZNcAHtUtk1GamJKapFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5
+        kkJeYm6qrZKLT4CuW2YO0F1KCmWJOaVAoYDE4mIlfTubovzSklSFjPziElul1IKUnAKTAr3i
+        xNzi0rx0vbzUEitDAwMjU6DChOyMsw8eMBZ84KnY+X4RcwNjL1cXIyeHhICJxPoTjWxdjFwc
+        QgK7GSXezpnJDuF8YpRY8uAHaxcjB5DzjVGirxqm4dCu5YwgtpDAXkaJ9j2+EPWfGSX2HbvA
+        DFLPJqApcWFyKUiNiICXxP3b71lBapgFZjBKrO54zQ5SIyzgItH/NBCkhkVAVeL5ta/sIDav
+        gLnE/vUrWSB2yUvMvPQdKi4ocXLmE7A4M1C8eetsZoial+wS3zf5Q9guEqfPvGOHsIUlXh3f
+        AmVLSbzsb4OykyUuzTzHBGGXSDzecxDKtpdoPdUPdj4z0Pnrd+lDrOKT6P39hAkkLCHAK9HR
+        JgRRrShxb9JTVghbXOLhjCVQtofEywVfmSChEytx7OdxpgmMcrOQPDALyQOzEJYtYGRexSiZ
+        WlCcm55abFpgmJdaDo/H5PzcTYzg1KjluYPx7oMPeocYmTgYDzFKcDArifCKrpVIFuJNSays
+        Si3Kjy8qzUktPsRoCgzVicxSosn5wOScVxJvaGJpYGJmZmZiaWxmqCTOO0WbMVlIID2xJDU7
+        NbUgtQimj4mDU6qByeX96c48t5d1S7IT1rh+XSLfo1KUHnFLrVWdoefuFNYLLY67yiK+Fk2f
+        xvdTbdfbb48e7RO8ZZHmmlHr80X6W1X9bN/q9fc38Eqvz1vXdlj2jR1HaqzMel6fJmPR04/F
+        Z4mLphvaxk5yLq2w7JisJFSorr419m+DpseXaaZnuT+UJO6/+UstZPMdtfcX/u++VPT90EUj
+        w5PV97pj5Xuv7wnb5e1msiiGTZ7j9cF9CYaTL3UEnJ4359y0zas9TqmqKur8zL+0j6vowKVN
+        em68iRX7uxTK5/smxfn/X3D47uvXW+V/7t+9wenXX8/vdSs+O00vO3lb6ujBaK/T/UzdoZHm
+        lQZa5Qkqf7qFCn81K7EUZyQaajEXFScCAKQ2h7gWBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrPLMWRmVeSWpSXmKPExsWy7bCSvK6rhVSywd3zPBZzVm1jtFh9t5/N
+        4uaBnUwWK1cfZbJ413qOxeLo/7dsFpMOXWO02HtL22L+sqfsDpweO2fdZfe4fLbUY9OqTjaP
+        zUvqPXbfbGDz6NuyitHj8ya5APYoLpuU1JzMstQifbsEroyzDx4wFnzgqdj5fhFzA2MvVxcj
+        J4eEgInEoV3LGbsYuTiEBHYzSqxdf48ZIiEu0XztBzuELSyx8t9zdoiij4wS7c9Os3QxcnCw
+        CWhKXJhcClIjIhAgcbDxMlgNs8AcRonLl/ewg9QIC7hI9D8NBKlhEVCVeH7tK9hMXgFzif3r
+        V7JAzJeXmHnpO1RcUOLkzCdgcWagePPW2cwTGPlmIUnNQpJawMi0ilEytaA4Nz232LDAMC+1
+        XK84Mbe4NC9dLzk/dxMjOIy1NHcwbl/1Qe8QIxMH4yFGCQ5mJRFe0bUSyUK8KYmVValF+fFF
+        pTmpxYcYpTlYlMR5L3SdjBcSSE8sSc1OTS1ILYLJMnFwSjUwbUlturF+swf3ut3SAu6eW1U7
+        t6nlrjp4t/xrMaMy7++2p5UrF4ps2BGy2E3fYc3Oc2tifpmcTvN2W97VItrjM0HJadWMH972
+        Z0/ZudR4JeiYWuh5Ngfaqp3zeLhFvm2qFEdwhrO5fBrPh9kv1JU8kv5MzmZwux1xaqlXz1TJ
+        wtTNNk6ballmKl2pzpD5nqKoOeu17dTaONXPKRw+S/6k3lo6PW3ijp+WtbeNb82Uz/i08Ncq
+        4y+PTpm/j8vP5zdd9MZxbqxxrJpkc23f54ZzvMsfrruprZP03lfTfltg/9tljV3PtI9mLApW
+        knnUvFd0QsN53v032KtexDxayPigQJW/cY+V0pliqdKzn4uVWIozEg21mIuKEwHN/4Ts0gIA
+        AA==
+X-CMS-MailID: 20220908184525epcas5p4cec88afa56beb0e5222e23c2344dbc8a
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220908184525epcas5p4cec88afa56beb0e5222e23c2344dbc8a
+References: <CGME20220908184525epcas5p4cec88afa56beb0e5222e23c2344dbc8a@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/8/22 9:35 AM, Christoph Hellwig wrote:
-> The following changes since commit 748008e1da926a814cc0a054c81ca614408b1b0c:
-> 
->   block: don't add partitions if GD_SUPPRESS_PART_SCAN is set (2022-09-03 11:29:03 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.0-2022-09-08
+Currently uring-cmd lacks the ability to leverage the pre-registered
+buffers. This series adds that support in uring-cmd, and plumbs
+nvme passthrough to work with it.
 
-Pulled, thanks.
+Using registered-buffers showed IOPS hike from 1.9M to 2.2M in my tests.
+
+Patch 1, 3, 4 = prep
+Patch 2 = expand io_uring command to use registered-buffers
+Patch 5 = expand nvme passthrough to use registered-buffers
+
+Changes since v5:
+- Patch 4: newly addd, to split a nvme function into two
+- Patch 3: folded cleanups in bio_map_user_iov (Chaitanya, Pankaj)
+- Rebase to latest for-next
+
+Changes since v4:
+- Patch 1, 2: folded all review comments of Jens
+
+Changes since v3:
+- uring_cmd_flags, change from u16 to u32 (Jens)
+- patch 3, add another helper to reduce code-duplication (Jens)
+
+Changes since v2:
+- Kill the new opcode, add a flag instead (Pavel)
+- Fix standalone build issue with patch 1 (Pavel)
+
+Changes since v1:
+- Fix a naming issue for an exported helper
+
+
+Anuj Gupta (2):
+  io_uring: add io_uring_cmd_import_fixed
+  io_uring: introduce fixed buffer support for io_uring_cmd
+
+Kanchan Joshi (3):
+  nvme: refactor nvme_alloc_user_request
+  block: add helper to map bvec iterator for passthrough
+  nvme: wire up fixed buffer support for nvme passthrough
+
+ block/blk-map.c               |  87 ++++++++++++++++++++---
+ drivers/nvme/host/ioctl.c     | 126 +++++++++++++++++++++-------------
+ include/linux/blk-mq.h        |   1 +
+ include/linux/io_uring.h      |  10 ++-
+ include/uapi/linux/io_uring.h |   9 +++
+ io_uring/uring_cmd.c          |  26 ++++++-
+ 6 files changed, 199 insertions(+), 60 deletions(-)
 
 -- 
-Jens Axboe
-
+2.25.1
 
