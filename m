@@ -2,424 +2,341 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25022C38145
-	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 10:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D89C6FA82
+	for <linux-block@archiver.kernel.org>; Thu,  8 Sep 2022 10:57:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230053AbiIHKyR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Sep 2022 06:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45294 "EHLO
+        id S229574AbiIHK53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Sep 2022 06:57:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229801AbiIHKyQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 06:54:16 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59020F7548
-        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 03:54:14 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id y3so37179826ejc.1
-        for <linux-block@vger.kernel.org>; Thu, 08 Sep 2022 03:54:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date;
-        bh=dTTp3UPbIUZ484c7Rv7tFudBLX8O9RKutGfh3CuJqww=;
-        b=rX80mENez1R/TY76z09PYBLIJuoWB9vCbsfxWPwPxvGvyTVZ6ILr/cK9m7EA9eO4G9
-         qJvRBrlhTZ+Ilge1T58ecxuuHwUsus5TNBf5FPBfmaXY2pPtUNchMrivW+4XA/hgMx4G
-         VfAaQaVMtZBmJRiNYrHWKcqOc7o+4DdcBlegmLdGodvic+uRzgpP3SFItrnCZBIf3eiY
-         aJ96XHzRkEcV47dlOO/WWK8Q8EKFCdwGHCIWl/dEPIvEcuqzGXlgXn7Wz8gc9e5rxs1G
-         jWHomxuvUXzqmDbnsUGTSGha8Dbt+PA7Kd0bOpOiUlad/dcjdPpwwiRA2plHJimPVd7C
-         qrWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=dTTp3UPbIUZ484c7Rv7tFudBLX8O9RKutGfh3CuJqww=;
-        b=o/c3mVl43s940N3UKUvN+Z7Nj55NxOGveIdcylB/uju6v1Mhugn/uuYLJZdKCYD5Xq
-         Z0A/0LnsqelFDt0098cGT41BfU9ksLxIQAG4rWBd+dwFbey57fKd4FdJcRHwTM8Quhqi
-         FsrpsD4/J4Gvv0hbzihbleHTY6cuUash89/e2pT5+CrW7s5HSps15YxfDvxIek9OCGGs
-         ZuJIPEsHnzrLYitYaThE4B34wtVMAg6a/G9LEIcLne78qZ+FgvPtC7/vjq9oECBr0NOU
-         8HJy+Gqm5pjacxu2gjJffVqpOkDLh3G9hylhtJ42xARbT9bLtej88FKEMcOYAo4LvpQc
-         XOKQ==
-X-Gm-Message-State: ACgBeo2PxHmlCmnZC0aAvkbRY1GjV9EWqRBRF1/IozfjqBV0Z2guwZgf
-        /UhImd/b8R0XZbDBG8tFZAGOZg==
-X-Google-Smtp-Source: AA6agR4pSUGvCh1aYOhFwZs7MOoKuqElGcYstFgQJ4eEsnunMuVQ8vfa/5KNo4j9UgmocXqs4Y8jrA==
-X-Received: by 2002:a17:906:cc5d:b0:741:38a8:a50a with SMTP id mm29-20020a170906cc5d00b0074138a8a50amr5483007ejb.650.1662634452844;
-        Thu, 08 Sep 2022 03:54:12 -0700 (PDT)
-Received: from wifi-122-dhcprange-122-207.wifi.unimo.it (wifi-122-dhcprange-122-207.wifi.unimo.it. [155.185.122.207])
-        by smtp.gmail.com with ESMTPSA id g10-20020a170906538a00b00774f2fbfcbbsm569727ejo.38.2022.09.08.03.54.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Sep 2022 03:54:11 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH 0/8] block, bfq: extend bfq to support multi-actuator
- drives
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <SJ0PR20MB44098A7A5D1904FD68DFE73BA0409@SJ0PR20MB4409.namprd20.prod.outlook.com>
-Date:   Thu, 8 Sep 2022 12:54:07 +0200
-Cc:     Tyler Erickson <tyler.erickson@seagate.com>,
-        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
-        Muhammad Ahmad <muhammad.ahmad@seagate.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>,
-        "andrea.righi@canonical.com" <andrea.righi@canonical.com>,
-        "glen.valante@linaro.org" <glen.valante@linaro.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Michael English <michael.english@seagate.com>,
-        Andrew Ring <andrew.ring@seagate.com>,
-        Varun Boddu <varunreddy.boddu@seagate.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D21B6E4C-F190-4B53-88A7-4650020DB6A5@linaro.org>
-References: <20220623155335.6147-1-paolo.valente@linaro.org>
- <PH7PR20MB505849512979A89E8A66FB24F18E9@PH7PR20MB5058.namprd20.prod.outlook.com>
- <SJ0PR20MB44093D6FB740E543EDAAC002A0629@SJ0PR20MB4409.namprd20.prod.outlook.com>
- <74F8D5E8-0D56-413B-A3CA-7462D9C862D6@linaro.org>
- <SJ0PR20MB4409EA5AC40DE61ED7A4BB13A0659@SJ0PR20MB4409.namprd20.prod.outlook.com>
- <DS7PR20MB4782D8436B69B7EF53749425896D9@DS7PR20MB4782.namprd20.prod.outlook.com>
- <21A4C080-7FFB-4ABF-86C6-E8E05BD83E6C@linaro.org>
- <SJ0PR20MB44098A7A5D1904FD68DFE73BA0409@SJ0PR20MB4409.namprd20.prod.outlook.com>
-To:     Rory Chen <rory.c.chen@seagate.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        with ESMTP id S229941AbiIHK52 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Sep 2022 06:57:28 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DCD44DF31
+        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 03:57:24 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220908105722epoutp035638915a1fab7b258cd0aeef5dadd2d4~S3WX2wfhV3261532615epoutp03A
+        for <linux-block@vger.kernel.org>; Thu,  8 Sep 2022 10:57:22 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220908105722epoutp035638915a1fab7b258cd0aeef5dadd2d4~S3WX2wfhV3261532615epoutp03A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662634642;
+        bh=WCme1aYTyqbvRVk/gZZfUAz8p0NMlfrGWOhsd5PGpS0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=I9ep2PtPr9VMH5RGKync8/6Mfx9TLO71X0dDah4nOs0R0tAHlzSUr9YkQ14dTj6Nm
+         OYlq+0gwj+fhyYsHCAPmaME5dKDmYiVPNVpjigEuNlOsKbmiRNfJsUcVVl7IqD8ksV
+         28RIcPYyKjlO+BjtUoWTzdWDvWoz7YVFakoB0Lno=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+        20220908105722epcas5p313b5d287914ab898af687b0676cc5aa4~S3WXbuDDe0170001700epcas5p3-;
+        Thu,  8 Sep 2022 10:57:22 +0000 (GMT)
+Received: from epsmges5p1new.samsung.com (unknown [182.195.38.181]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4MNbg34zbqz4x9Pr; Thu,  8 Sep
+        2022 10:57:19 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        80.55.59633.F8AC9136; Thu,  8 Sep 2022 19:57:19 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20220908105719epcas5p3188ed6057a199556851e54aa4539ead0~S3WU_mXQf2942929429epcas5p3M;
+        Thu,  8 Sep 2022 10:57:19 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220908105719epsmtrp12f20d97a8f4983aa160adffbbcbc16f6~S3WU901751413214132epsmtrp1R;
+        Thu,  8 Sep 2022 10:57:19 +0000 (GMT)
+X-AuditID: b6c32a49-dfdff7000000e8f1-55-6319ca8f7b34
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        74.F1.18644.F8AC9136; Thu,  8 Sep 2022 19:57:19 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220908105718epsmtip227b1ee1a026a0bdf6e1c6049637b7b58~S3WT4_qsn0629906299epsmtip2d;
+        Thu,  8 Sep 2022 10:57:18 +0000 (GMT)
+Date:   Thu, 8 Sep 2022 16:17:34 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH for-next v5 4/4] nvme: wire up fixed buffer support for
+ nvme passthrough
+Message-ID: <20220908104734.GA15034@test-zns>
+MIME-Version: 1.0
+In-Reply-To: <26490329-5b51-7334-1e2a-44edfe75d8fa@nvidia.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnk+LIzCtJLcpLzFFi42LZdlhTQ7f/lGSywfNVahar7/azWbw/+JjV
+        YuXqo0wW71rPsVhMOnSN0WLvLW2L+cuesjuwe1w+W+qxaVUnm8fmJfUeu282sHn0Nr9j8/i8
+        SS6ALSrbJiM1MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwfo
+        ECWFssScUqBQQGJxsZK+nU1RfmlJqkJGfnGJrVJqQUpOgUmBXnFibnFpXrpeXmqJlaGBgZEp
+        UGFCdsaK/jesBbudK9b/Os/SwDhBu4uRk0NCwESi4eJlti5GLg4hgd2MEg9nr2SFcD4xSmx7
+        vJsZwvnMKHG8cS1QGQdYy+22Uoj4LkaJjWuWQXU8Y5SY1zaZCaSIRUBFYv/COhCTTUBT4sLk
+        UpBtIgJ6Eldv3WAHKWcWWMUk0dm/ix0kISwQJ3F5804wm1dAV+L0wffMELagxMmZT1hAbE4B
+        O4kTFx6A2aICyhIHth1nAhkkIdDIIbH5znwmiONcJLpXx0O8Jizx6vgWdghbSuJlfxuUnSxx
+        aeY5Jgi7ROLxnoNQtr1E66l+sL3MAhkSnxonQdl8Er2/n0CN55XoaBOCKFeUuDfpKSuELS7x
+        cMYSKNtD4u/NOYyQIHnPKHH/9if2CYxys5C8MwvJCgjbSqLzQxPrLKAVzALSEsv/cUCYmhLr
+        d+kvYGRdxSiZWlCcm55abFpgmJdaDo/i5PzcTYzglKnluYPx7oMPeocYmTgYDzFKcDArifCK
+        rpVIFuJNSaysSi3Kjy8qzUktPsRoCoydicxSosn5wKSdVxJvaGJpYGJmZmZiaWxmqCTOO0Wb
+        MVlIID2xJDU7NbUgtQimj4mDU6qBKfmdU+mGL+1i85kll2kvWvNlXXfMlD89qj4r2e9Ma/dI
+        KEoMn7Z7jvo+FuPErnUnJx/+v9RzV/wvQwXNG0v4bpdNeLehhGGr5z6VoE1St9oFfzJ+PzlT
+        Pvj2+u1xJ74LxB8SnH8t8ckZs3edvMsMHuxZ2Ft54tj64OvKTmtmRzefEv9tGamg/f1NjKn4
+        xdsMzOsbl/uu26p/cKJrIStTSHfXUoabKh4WUR5Tt63a8aJhq/rxIIcfE87Gcy6eeSU7vZI1
+        /6bpKzZW5tXC0b/sOhTrg99whsh/Y+6TOvC+IOLh05pvRzfddZzlo7/fgsf2Gtf6S+p7p3QG
+        3/yS6mYvlmzSt/VW895g42P7wrdEPFBiKc5INNRiLipOBADN4K45IgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHLMWRmVeSWpSXmKPExsWy7bCSvG7/Kclkg3OrBCxW3+1ns3h/8DGr
+        xcrVR5ks3rWeY7GYdOgao8XeW9oW85c9ZXdg97h8ttRj06pONo/NS+o9dt9sYPPobX7H5vF5
+        k1wAWxSXTUpqTmZZapG+XQJXxsK1+9gK3jpUHNp/lrmB8Y5GFyMHh4SAicTtttIuRi4OIYEd
+        jBIvjvxg6WLkBIqLSzRf+8EOYQtLrPz3nB2i6AmjxPwjHUwgzSwCKhL7F9aBmGwCmhIXJpeC
+        lIsI6ElcvXUDrJxZYBWTxPqFjWBzhAXiJC5v3glm8wroSpw++J4ZYuZ7RomJXzezQCQEJU7O
+        fAJmMwuYSczb/JAZZAGzgLTE8n8cIGFOATuJExcegJWICihLHNh2nGkCo+AsJN2zkHTPQuhe
+        wMi8ilEytaA4Nz232LDAKC+1XK84Mbe4NC9dLzk/dxMjOAq0tHYw7ln1Qe8QIxMH4yFGCQ5m
+        JRFe0bUSyUK8KYmVValF+fFFpTmpxYcYpTlYlMR5L3SdjBcSSE8sSc1OTS1ILYLJMnFwSjUw
+        yXqs9ZKrrDm2r+nX5ic7uR8/dGfP38bC7h9m+MC1d5vbH8Gn7SvmXXwzt8J35317lqpZT/WU
+        zkts4jM5+fBl0jFHj51fky/FBnFoSq7gtLFQNmTyi/i63SZN6afqqTON2ib9exelP/y+6ZjZ
+        z7Z/nzYe8rJK/rxolV/98hsP3ZnStjI06NzfV8C1cG64SY2b01Wfcw//nYg8t+gk+ye/qm+X
+        rp9bt5kv1fb0hb2RjybPnRPnbDJBv7SxXeCWgt2isNMS/GKhed/v8FlpB585/ODYwm9cax/t
+        /V8WezBbgMOq88VMxnuSFb2qFy4IKXzSv2bR6CrUHMQien0z58e//cVf4iYfz5yyjJlfM+3A
+        FCWW4oxEQy3mouJEAGxmMO7xAgAA
+X-CMS-MailID: 20220908105719epcas5p3188ed6057a199556851e54aa4539ead0
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----3GC0G0c67CHFz-pUzO9qV37oeXJmKwYP9xQRy1YHFCjbzJ45=_f071b_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220906063733epcas5p22984174bd6dbb2571152fea18af90924
+References: <20220906062721.62630-1-joshi.k@samsung.com>
+        <CGME20220906063733epcas5p22984174bd6dbb2571152fea18af90924@epcas5p2.samsung.com>
+        <20220906062721.62630-5-joshi.k@samsung.com>
+        <26490329-5b51-7334-1e2a-44edfe75d8fa@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------3GC0G0c67CHFz-pUzO9qV37oeXJmKwYP9xQRy1YHFCjbzJ45=_f071b_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
+
+On Wed, Sep 07, 2022 at 02:51:31PM +0000, Chaitanya Kulkarni wrote:
+>
+>>   	req = nvme_alloc_user_request(q, cmd, ubuffer, bufflen, meta_buffer,
+>> -			meta_len, meta_seed, &meta, timeout, vec, 0, 0);
+>> +			meta_len, meta_seed, &meta, timeout, vec, 0, 0, NULL, 0);
+>>   	if (IS_ERR(req))
+>>   		return PTR_ERR(req);
+>
+>14 Arguments to the function!
+>
+>Kanchan, I'm not pointing out to this patch it has happened over
+>the years, I think it is high time we find a way to trim this
+>down.
+>
+>Least we can do is to pass a structure member than 14 different
+>arguments, is everyone okay with it ?
+>
+Maybe it's just me, but there is something (unrelatedness) about these
+fields which makes packing all these into a single container feel bit 
+unnatural (or do you already have a good name for such struct?). 
+
+So how about we split the nvme_alloc_user_request into two.
+That will also serve the purpose. 
+Here is a patch that creates
+- new nvme_alloc_user_request with 5 parameters
+- new nvme_map_user_request with 8 parameters
 
 
-> Il giorno 8 set 2022, alle ore 04:46, Rory Chen =
-<rory.c.chen@seagate.com> ha scritto:
->=20
-> I change the comparison condition and it can eliminate the warning.
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index 548aca8b5b9f..cb2fa4db50dd 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -65,18 +65,10 @@ static int nvme_finish_user_metadata(struct request *req, void __user *ubuf,
+ }
 
-Yep. The crash you reported also goes away?
+ static struct request *nvme_alloc_user_request(struct request_queue *q,
+-               struct nvme_command *cmd, void __user *ubuffer,
+-               unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+-               u32 meta_seed, void **metap, unsigned timeout, bool vec,
++               struct nvme_command *cmd, unsigned timeout,
+                blk_opf_t rq_flags, blk_mq_req_flags_t blk_flags)
+ {
+-       bool write = nvme_is_write(cmd);
+-       struct nvme_ns *ns = q->queuedata;
+-       struct block_device *bdev = ns ? ns->disk->part0 : NULL;
+        struct request *req;
+-       struct bio *bio = NULL;
+-       void *meta = NULL;
+-       int ret;
 
-> <               if (end >=3D iar->sector + 1 && end < iar->sector + =
-iar->nr_sectors + 1)
->>              if (end >=3D iar->sector && end < iar->sector + =
-iar->nr_sectors)
->=20
-> I don't know if this change is appropriate
+        req = blk_mq_alloc_request(q, nvme_req_op(cmd) | rq_flags, blk_flags);
+        if (IS_ERR(req))
+@@ -86,49 +78,61 @@ static struct request *nvme_alloc_user_request(struct request_queue *q,
+        if (timeout)
+                req->timeout = timeout;
+        nvme_req(req)->flags |= NVME_REQ_USERCMD;
++       return req;
++}
 
-Unfortunately your change conflicts with the standard code, taken from
-the original patches on access ranges [1].  I've CCed Damien, the
-author of this patch series.
+-       if (ubuffer && bufflen) {
+-               if (!vec)
+-                       ret = blk_rq_map_user(q, req, NULL, ubuffer, bufflen,
+-                               GFP_KERNEL);
+-               else {
+-                       struct iovec fast_iov[UIO_FASTIOV];
+-                       struct iovec *iov = fast_iov;
+-                       struct iov_iter iter;
+-
+-                       ret = import_iovec(rq_data_dir(req), ubuffer, bufflen,
+-                                       UIO_FASTIOV, &iov, &iter);
+-                       if (ret < 0)
+-                               goto out;
+-                       ret = blk_rq_map_user_iov(q, req, NULL, &iter,
+-                                       GFP_KERNEL);
+-                       kfree(iov);
+-               }
+-               if (ret)
++static int nvme_map_user_request(struct request *req, void __user *ubuffer,
++               unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
++               u32 meta_seed, void **metap, bool vec)
++{
++       struct request_queue *q = req->q;
++       struct nvme_ns *ns = q->queuedata;
++       struct block_device *bdev = ns ? ns->disk->part0 : NULL;
++       struct bio *bio = NULL;
++       void *meta = NULL;
++       int ret;
++
++       if (!ubuffer || !bufflen)
++               return 0;
++
++       if (!vec)
++               ret = blk_rq_map_user(q, req, NULL, ubuffer, bufflen,
++                       GFP_KERNEL);
++       else {
++               struct iovec fast_iov[UIO_FASTIOV];
++               struct iovec *iov = fast_iov;
++               struct iov_iter iter;
++
++               ret = import_iovec(rq_data_dir(req), ubuffer, bufflen,
++                               UIO_FASTIOV, &iov, &iter);
++               if (ret < 0)
+                        goto out;
+-               bio = req->bio;
+-               if (bdev)
+-                       bio_set_dev(bio, bdev);
+-               if (bdev && meta_buffer && meta_len) {
+-                       meta = nvme_add_user_metadata(bio, meta_buffer, meta_len,
+-                                       meta_seed, write);
+-                       if (IS_ERR(meta)) {
+-                               ret = PTR_ERR(meta);
+-                               goto out_unmap;
+-                       }
+-                       req->cmd_flags |= REQ_INTEGRITY;
+-                       *metap = meta;
++               ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
++               kfree(iov);
++       }
++       bio = req->bio;
++       if (ret)
++               goto out_unmap;
++       if (bdev)
++               bio_set_dev(bio, bdev);
++       if (bdev && meta_buffer && meta_len) {
++               meta = nvme_add_user_metadata(bio, meta_buffer, meta_len,
++                               meta_seed, req_op(req) == REQ_OP_DRV_OUT);
++               if (IS_ERR(meta)) {
++                       ret = PTR_ERR(meta);
++                       goto out_unmap;
+                }
++               req->cmd_flags |= REQ_INTEGRITY;
++               *metap = meta;
+        }
 
-[1] =
-https://lwn.net/ml/linux-block/20210909023545.1101672-2-damien.lemoal@wdc.=
-com/
+-       return req;
++       return ret;
 
-Thanks,
-Paolo
+ out_unmap:
+        if (bio)
+                blk_rq_unmap_user(bio);
+ out:
+-       blk_mq_free_request(req);
+-       return ERR_PTR(ret);
++       return ret;
+ }
 
-> but  bio_end_sector deducting 1 said by Tyler seems to make sense.
->=20
-> From: Paolo Valente <paolo.valente@linaro.org>
-> Sent: Thursday, August 25, 2022 10:45 PM
-> To: Tyler Erickson <tyler.erickson@seagate.com>
-> Cc: Rory Chen <rory.c.chen@seagate.com>; Arie van der Hoeven =
-<arie.vanderhoeven@seagate.com>; Muhammad Ahmad =
-<muhammad.ahmad@seagate.com>; linux-block@vger.kernel.org =
-<linux-block@vger.kernel.org>; linux-kernel@vger.kernel.org =
-<linux-kernel@vger.kernel.org>; Jan Kara <jack@suse.cz>; =
-andrea.righi@canonical.com <andrea.righi@canonical.com>; =
-glen.valante@linaro.org <glen.valante@linaro.org>; axboe@kernel.dk =
-<axboe@kernel.dk>; Michael English <michael.english@seagate.com>; Andrew =
-Ring <andrew.ring@seagate.com>; Varun Boddu =
-<varunreddy.boddu@seagate.com>
-> Subject: Re: [PATCH 0/8] block, bfq: extend bfq to support =
-multi-actuator drives
->=20
->=20
-> This message has originated from an External Source. Please use proper =
-judgment and caution when opening attachments, clicking links, or =
-responding to this email.
->=20
->=20
-> Hi
->=20
->> Il giorno 18 ago 2022, alle ore 17:40, Tyler Erickson =
-<tyler.erickson@seagate.com> ha scritto:
->>=20
->> The libata layer is reporting correctly after the changes I =
-submitted.
->>=20
->> The drive reports the actuator ranges as a starting LBA and a count =
-of LBAs for the range.
->> If the code reading the reported values simply does startingLBA + =
-range, this is an incorrect ending LBA for that actuator. This is =
-because LBAs are zero indexed and this simple addition is not taking =
-that into account.
->> The proper way to get the endingLBA is startingLBA + range - 1 to get =
-the last LBA value for where to issue a final IO read/write to account =
-for LBA values starting at zero rather than one.
->>=20
->> Here is an example from the output in SeaChest/openSeaChest:
->> =3D=3D=3D=3DConcurrent Positioning Ranges=3D=3D=3D=3D
->>=20
->> Range#     #Elements            Lowest LBA          # of LBAs
->>  0            1                                               0       =
-    17578328064
->>  1            1                         17578328064           =
-17578328064
->>=20
->> If using the incorrect formula to get the final LBA for actuator 0, =
-you would get 17578328064, but this is the starting LBA reported by the =
-drive for actuator 1.
->> So to be consistent for all ranges, the final LBA for a given =
-actuator should be calculated as starting LBA + range - 1.
->>=20
->=20
-> Ok
->=20
->> I had reached out to Seagate's T10 and T13 representatives for =
-clarification and verification and this is most likely what is causing =
-the error is a missing - 1 somewhere after getting the information =
-reported by the device. They agreed that the reporting from the drive =
-and the SCSI to ATA translation is correct.
->>=20
->> I'm not sure where this is being read and calculated, but it is not =
-an error in the low-level libata or sd level of the kernel. It may be in =
-bfq, or it may be in some other place after the sd layer.
->=20
-> This apparent mistake is in the macro bio_end_sector (defined in
-> include/linux/bio.h), which seems to be translated as sector+size.
-> Jens, can you shed a light on this point?
->=20
-> Thanks,
-> Paolo
->=20
->> I know there were some additions to read this and report it up the =
-stack, but I did not think those were wrong as they seemed to pass the =
-drive reported information up the stack.
->>=20
->> Tyler Erickson
->> Seagate Technology
->>=20
->>=20
->> Seagate Internal
->>=20
->> -----Original Message-----
->> From: Rory Chen <rory.c.chen@seagate.com>
->> Sent: Wednesday, August 10, 2022 6:59 AM
->> To: Paolo Valente <paolo.valente@linaro.org>
->> Cc: Arie van der Hoeven <arie.vanderhoeven@seagate.com>; Muhammad =
-Ahmad <muhammad.ahmad@seagate.com>; linux-block@vger.kernel.org; =
-linux-kernel@vger.kernel.org; Jan Kara <jack@suse.cz>; =
-andrea.righi@canonical.com; glen.valante@linaro.org; axboe@kernel.dk; =
-Tyler Erickson <tyler.erickson@seagate.com>; Michael English =
-<michael.english@seagate.com>; Andrew Ring <andrew.ring@seagate.com>; =
-Varun Boddu <varunreddy.boddu@seagate.com>
->> Subject: Re: [PATCH 0/8] block, bfq: extend bfq to support =
-multi-actuator drives
->>=20
->> The block trace shows the start sector is 35156656120 and transfer =
-length is 8 sectors, which is within the max LBA 35156656127 of drive. =
-And this IO is completed successfully from the slice of parsed block =
-trace though reporting the warning message.
->> 8,64   7       13     0.039401337 19176  Q  RA 35156656120 + 8 =
-[systemd-udevd]
->> 8,64   7       15     0.039403946 19176  P   N [systemd-udevd]
->> 8,64   7       16     0.039405132 19176  I  RA 35156656120 + 8 =
-[systemd-udevd]
->> 8,64   7       18     0.039411554 19176  D  RA 35156656120 + 8 =
-[systemd-udevd]
->> 8,64   0       40     0.039479055     0  C  RA 35156656120 + 8 [0]
->>=20
->> It may need to know where calculate "bio_end_sector" value as =
-35156656128. I have patched libata and sd driver for Dual Actuator.
->>=20
->>=20
->>=20
->> From: Paolo Valente <paolo.valente@linaro.org>
->> Sent: Wednesday, August 10, 2022 6:22 PM
->> To: Rory Chen <rory.c.chen@seagate.com>
->> Cc: Arie van der Hoeven <arie.vanderhoeven@seagate.com>; Muhammad =
-Ahmad <muhammad.ahmad@seagate.com>; linux-block@vger.kernel.org =
-<linux-block@vger.kernel.org>; linux-kernel@vger.kernel.org =
-<linux-kernel@vger.kernel.org>; Jan Kara <jack@suse.cz>; =
-andrea.righi@canonical.com <andrea.righi@canonical.com>; =
-glen.valante@linaro.org <glen.valante@linaro.org>; axboe@kernel.dk =
-<axboe@kernel.dk>; Tyler Erickson <tyler.erickson@seagate.com>; Michael =
-English <michael.english@seagate.com>; Andrew Ring =
-<andrew.ring@seagate.com>; Varun Boddu <varunreddy.boddu@seagate.com>
->> Subject: Re: [PATCH 0/8] block, bfq: extend bfq to support =
-multi-actuator drives
->>=20
->>=20
->> This message has originated from an External Source. Please use =
-proper judgment and caution when opening attachments, clicking links, or =
-responding to this email.
->>=20
->>=20
->>> Il giorno 9 ago 2022, alle ore 05:47, Rory Chen =
-<rory.c.chen@seagate.com> ha scritto:
->>>=20
->>> Resend the mail as plain text because previous mail with rich text
->>> makes some mess and forget to add others at Seagate who worked on
->>> validating the patch as well(Muhammad, Michael, Andrew, Varun,Tyler)
->>>=20
->>> Hi Paolo,
->>>=20
->>=20
->> Hi
->>=20
->>> I am from Seagate China and face a problem when I'm evaluating the =
-bfq patches. Could you please check?
->>> Thanks
->>>=20
->>> Issue statement
->>> When running performance test on bfq patch, I observed warning =
-message "bfq_actuator_index: bio sector out of ranges: end=3D35156656128" =
-and OS hung suddenly after some hours.
->>> The warning message is reported from function bfq_actuator_index =
-which determines IO request is in which index of actuators.  The =
-bio_end_sector is 35156656128 but the max LBA for the drive is =
-35156656127 so it's beyond the LBA range.
->>=20
->> Yep, this sanity check fails if the end sector of a new IO does not =
-belong to any sector range.
->>=20
->>> I captured the block trace and didn't found request LBA 35156656128 =
-instead only found max request LBA 35156656127.
->>=20
->> Maybe in the trace you see only start sectors?  The failed check si =
-performed on end sectors instead.
->>=20
->> At any rate, there seems to be an off-by-one error in the value(s) =
-stored in the sector field(s) of the blk_independent_access_range data =
-structure.
->>=20
->> I guess we may need some help/feedback from people competent on this =
-stuff.
->>=20
->>> I'm not sure if this warning message is related to later OS hung.
->>>=20
->>=20
->> Not easy to say.  At any rate, we can try with a development version =
-of bfq.  It can help us detect the possible cause of this hang.  But =
-let's see where we get with this sector error first.
->>=20
->> Thank you for testing this extended version of bfq, Paolo
->>=20
->>>=20
->>> Problem environment
->>> Kernel base is 5.18.9
->>> Test HDD drive is Seagate ST18000NM0092 dual actuator SATA.
->>> Actuator LBA mapping by reading VPD B9 Concurrent positioning ranges
->>> VPD page:
->>> LBA range number:0
->>> number of storage elements:1
->>> starting LBA:0x0
->>> number of LBAs:0x417c00000 [17578328064] LBA range number:1 number =
-of
->>> storage elements:1 starting LBA:0x417c00000 number of =
-LBAs:0x417c00000
->>> [17578328064]
->>>=20
->>>=20
->>>=20
->>>=20
->>>=20
->>> From: Paolo Valente <paolo.valente@linaro.org>
->>> Sent: Thursday, June 23, 2022 8:53 AM
->>> To: Jens Axboe <axboe@kernel.dk>
->>> Cc: linux-block@vger.kernel.org <linux-block@vger.kernel.org>;
->>> linux-kernel@vger.kernel.org <linux-kernel@vger.kernel.org>;
->>> jack@suse.cz <jack@suse.cz>; andrea.righi@canonical.com
->>> <andrea.righi@canonical.com>; glen.valante@linaro.org
->>> <glen.valante@linaro.org>; Arie van der Hoeven
->>> <arie.vanderhoeven@seagate.com>; Paolo Valente
->>> <paolo.valente@linaro.org>
->>> Subject: [PATCH 0/8] block, bfq: extend bfq to support =
-multi-actuator
->>> drives
->>>=20
->>>=20
->>> This message has originated from an External Source. Please use =
-proper judgment and caution when opening attachments, clicking links, or =
-responding to this email.
->>>=20
->>>=20
->>> Hi,
->>> this patch series extends BFQ so as to optimize I/O dispatch to
->>> multi-actuator drives. In particular, this extension addresses the
->>> following issue. Multi-actuator drives appear as a single device to
->>> the I/O subsystem [1].  Yet they address commands to different
->>> actuators internally, as a function of Logical Block Addressing
->>> (LBAs). A given sector is reachable by only one of the actuators. =
-For
->>> example, Seagate's Serial Advanced Technology Attachment (SATA)
->>> version contains two actuators and maps the lower half of the SATA =
-LBA
->>> space to the lower actuator and the upper half to the upper =
-actuator.
->>>=20
->>> Evidently, to fully utilize actuators, no actuator must be left idle
->>> or underutilized while there is pending I/O for it. To reach this
->>> goal, the block layer must somehow control the load of each actuator
->>> individually. This series enriches BFQ with such a per-actuator
->>> control, as a first step. Then it also adds a simple mechanism for
->>> guaranteeing that actuators with pending I/O are never left idle.
->>>=20
->>> See [1] for a more detailed overview of the problem and of the
->>> solutions implemented in this patch series. There you will also find
->>> some preliminary performance results.
->>>=20
->>> Thanks,
->>> Paolo
->>>=20
->>> [1]
->>> =
-https://secure-web.cisco.com/1hcxnN1C3h1nW7mby7S66_LE8szirQwbQI0fBpYeP
->>> =
-rA0GTWfyuQyl0GpZaOn32xMSkNT0BUQWloDHFzZ23aYDZdi8NfdrEFLY9pQDBblIvn08LR
->>> =
-iTVoIOUC8zWSG_r2PCyLtx3ppZq5cWOib_8azxteRRcbKWGdbLPSqg9hfSJSqltth0ByLO
->>> =
-NHEoI3p3e9QNIn6nVAeQbsT3aOQe-F95XrQvaPrFJXx6RGL9kDXyfkbXIHcdcLBf895gYB
->>> =
-Fn5S2WjBDQq2kzDzZOlc1HekRUhg0qDQcFY6NydVfrqNfLbpAHAth6KyREscQhVTMVREEV
->>> =
-a1b6bQByX6grF5pn3pTIo0lODyfX6yRmcbReSYNfOZ65ZPvp-nH530FQ-5nXoRxFf74WIK
->>> =
-DrNTALs3xQvg03DH4jLez-T2M9xEu-sfEDAEdTGF7BcnmBW6vrPO4_p3k4/https%3A%2F
->>> =
-%2Fwww.linaro.org%2Fblog%2Fbudget-fair-queueing-bfq-linux-io-scheduler
->>> -optimizations-for-multi-actuator-sata-hard-drives%2F
->>>=20
->>> Davide Zini (3):
->>> block, bfq: split also async bfq_queues on a per-actuator basis
->>> block, bfq: inject I/O to underutilized actuators  block, bfq: =
-balance
->>> I/O injection among underutilized actuators
->>>=20
->>> Federico Gavioli (1):
->>> block, bfq: retrieve independent access ranges from request queue
->>>=20
->>> Paolo Valente (4):
->>> block, bfq: split sync bfq_queues on a per-actuator basis  block,
->>> bfq: forbid stable merging of queues associated with different
->>>  actuators
->>> block, bfq: turn scalar fields into arrays in bfq_io_cq  block, bfq:
->>> turn BFQ_NUM_ACTUATORS into BFQ_MAX_ACTUATORS
->>>=20
->>> block/bfq-cgroup.c  |  97 +++++----
->>> block/bfq-iosched.c | 488 =
-+++++++++++++++++++++++++++++---------------
->>> block/bfq-iosched.h | 149 ++++++++++----
->>> block/bfq-wf2q.c    |   2 +-
->>> 4 files changed, 493 insertions(+), 243 deletions(-)
->>>=20
->>> --
->>> 2.20.1
->>>=20
->>>=20
->>> Seagate Internal
->>>=20
->>> Seagate Internal
->>=20
->> Seagate Internal
->=20
-> Seagate Internal
+ static int nvme_submit_user_cmd(struct request_queue *q,
+@@ -141,13 +145,16 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+        struct bio *bio;
+        int ret;
 
+-       req = nvme_alloc_user_request(q, cmd, ubuffer, bufflen, meta_buffer,
+-                       meta_len, meta_seed, &meta, timeout, vec, 0, 0);
++       req = nvme_alloc_user_request(q, cmd, timeout, 0, 0);
+        if (IS_ERR(req))
+                return PTR_ERR(req);
+
+-       bio = req->bio;
++       ret = nvme_map_user_request(req, ubuffer, bufflen, meta_buffer,
++                       meta_len, meta_seed, &meta, vec);
++       if (ret)
++               goto out;
+
++       bio = req->bio;
+        ret = nvme_execute_passthru_rq(req);
+
+        if (result)
+@@ -157,6 +164,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+                                                meta_len, ret);
+        if (bio)
+                blk_rq_unmap_user(bio);
++out:
+        blk_mq_free_request(req);
+        return ret;
+ }
+@@ -418,6 +426,7 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+        blk_opf_t rq_flags = 0;
+        blk_mq_req_flags_t blk_flags = 0;
+        void *meta = NULL;
++       int ret;
+
+        if (!capable(CAP_SYS_ADMIN))
+                return -EACCES;
+@@ -457,13 +466,17 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+                rq_flags |= REQ_POLLED;
+
+ retry:
+-       req = nvme_alloc_user_request(q, &c, nvme_to_user_ptr(d.addr),
+-                       d.data_len, nvme_to_user_ptr(d.metadata),
+-                       d.metadata_len, 0, &meta, d.timeout_ms ?
+-                       msecs_to_jiffies(d.timeout_ms) : 0, vec, rq_flags,
+-                       blk_flags);
++       req = nvme_alloc_user_request(q, &c,
++                       d.timeout_ms ? msecs_to_jiffies(d.timeout_ms) : 0,
++                       rq_flags, blk_flags);
+        if (IS_ERR(req))
+                return PTR_ERR(req);
++
++       ret = nvme_map_user_request(req, nvme_to_user_ptr(d.addr),
++                       d.data_len, nvme_to_user_ptr(d.metadata),
++                       d.metadata_len, 0, &meta, vec);
++       if (ret)
++               goto out_err;
+        req->end_io = nvme_uring_cmd_end_io;
+        req->end_io_data = ioucmd;
+
+@@ -486,6 +499,9 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+
+        blk_execute_rq_nowait(req, false);
+        return -EIOCBQUEUED;
++out_err:
++       blk_mq_free_request(req);
++       return ret;
+ }
+
+ static bool is_ctrl_ioctl(unsigned int cmd)
+
+
+------3GC0G0c67CHFz-pUzO9qV37oeXJmKwYP9xQRy1YHFCjbzJ45=_f071b_
+Content-Type: text/plain; charset="utf-8"
+
+
+------3GC0G0c67CHFz-pUzO9qV37oeXJmKwYP9xQRy1YHFCjbzJ45=_f071b_--
