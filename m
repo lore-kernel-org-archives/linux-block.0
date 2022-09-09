@@ -2,67 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC9FECAAA1
-	for <linux-block@archiver.kernel.org>; Fri,  9 Sep 2022 19:14:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8808ECAAA1
+	for <linux-block@archiver.kernel.org>; Fri,  9 Sep 2022 19:19:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbiIITOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Sep 2022 15:14:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41514 "EHLO
+        id S229651AbiIITTi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Sep 2022 15:19:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbiIITOE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2022 15:14:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D41A1116C9
-        for <linux-block@vger.kernel.org>; Fri,  9 Sep 2022 12:14:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C4D0620BB
-        for <linux-block@vger.kernel.org>; Fri,  9 Sep 2022 19:13:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BAD0CC433C1;
-        Fri,  9 Sep 2022 19:13:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662750838;
-        bh=LkZ3KifbhgKno0oFDcKtbxzZI0aafpcqqGnDoQAiobs=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=tbfPn9hfvStyj3GvPZi6VLz7AuNYLzh1X1oid29BEZRq55q6hdWfy4TVhdXh7m6yH
-         a2Gzxhkhj8xRiaSZXlRyZIANS/O11SKwTdTRLOTO/SRdahEXJeNDHJWBEQncBk/5j3
-         rJy4DA0hj+kz7mPMzO+dGOCeZtuX9ez4ojA5yiVF2QBdlT9pYq5kYkfnPFRDU1JD/L
-         Kqvns8sIfuVD5PFwqBhsJ1B+kbDWGyAWds+sXlwuECuxrj4KpFN3BIletQsFXNY2o0
-         K8OTFShRx4R2GCHwLTHR874I8W+48oUuRFcRN0dBsfZhIeQThcSAGdOyV4UoRJRG2d
-         NN0/DkKLdJxOA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A9AD3C4166E;
-        Fri,  9 Sep 2022 19:13:58 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.0-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <54f4f268-c33c-d1a1-4b38-75f9206be4e9@kernel.dk>
-References: <54f4f268-c33c-d1a1-4b38-75f9206be4e9@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <54f4f268-c33c-d1a1-4b38-75f9206be4e9@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-09
-X-PR-Tracked-Commit-Id: 745ed37277c5a7202180aa276c87db1362c90fe5
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9ebc0ecb21b53e1a592f4ac9af927f7ff605f306
-Message-Id: <166275083869.6812.698735554888168084.pr-tracker-bot@kernel.org>
-Date:   Fri, 09 Sep 2022 19:13:58 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S229478AbiIITTh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2022 15:19:37 -0400
+Received: from mail.baikalelectronics.com (mail.baikalelectronics.com [87.245.175.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB03F12AAF;
+        Fri,  9 Sep 2022 12:19:34 -0700 (PDT)
+Received: from mail (mail.baikal.int [192.168.51.25])
+        by mail.baikalelectronics.com (Postfix) with ESMTP id E8885DBA;
+        Fri,  9 Sep 2022 22:23:10 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.baikalelectronics.com E8885DBA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baikalelectronics.ru; s=mail; t=1662751391;
+        bh=g/qnbR3kmCe/hsDgvp6zCp5qkLBtvy6bgBjvx6x6e8w=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=YES6vKyJfvMMdrO20kNxAanHBoFyOZ10pFXxE7G1x4aD++ilUms+nwqjVLYPDYEDD
+         7KE5Frp3PJ6w++pm8zZ0XWDuVTnhPWxcgWSNMuspnYaVeh+L5e5CPxHUDOR5k5Fo88
+         C90Jhz+tvIVTQlW1sFqCSYEiGhodiDd9T0xPo0M8=
+Received: from localhost (192.168.168.10) by mail (192.168.51.25) with
+ Microsoft SMTP Server (TLS) id 15.0.1395.4; Fri, 9 Sep 2022 22:19:20 +0300
+From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
+To:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        Revanth Rajashekar <revanth.rajashekar@intel.com>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Guenter Roeck <linux@roeck-us.net>
+CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Serge Semin <fancer.lancer@gmail.com>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH 1/2] nvme-hwmon: Cache-line-align the NVME SMART log-buffer
+Date:   Fri, 9 Sep 2022 22:19:15 +0300
+Message-ID: <20220909191916.16013-2-Sergey.Semin@baikalelectronics.ru>
+In-Reply-To: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
+References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 9 Sep 2022 11:28:19 -0600:
+Recent commit 52fde2c07da6 ("nvme: set dma alignment to dword") has caused
+a regression on our platform. It turned out that the nvme_get_log() method
+invocation caused the nvme_hwmon_data structure instance corruption. In
+particular the nvme_hwmon_data.ctrl pointer was overwritten either with
+zeros or with garbage. After some researches we discovered that the
+problem happened even before the actual NVME DMA execution, but during the
+buffer mapping. Since our platform was DMA-noncoherent the mapping implied
+the cache-lines invalidations or write-backs depending on the
+DMA-direction parameter. In case of the NVME SMART log getting the DMA
+was performed from-device-to-memory, thus the cache-invalidation was
+activated during the buffer mapping. Since the log-buffer wasn't
+cache-line aligned the cache-invalidation caused the neighbour data
+discard. The neighbouring data turned to be the data surrounding the
+buffer in the framework of the nvme_hwmon_data structure.
 
-> git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-09
+In order to fix that we need to make sure that the whole log-buffer is
+defined within the cache-line-aligned memory region so the
+cache-invalidation procedure wouldn't involve the adjacent data. By doing
+so we not only get rid from the denoted problem but also fulfill the
+requirement explicitly described in [1].
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9ebc0ecb21b53e1a592f4ac9af927f7ff605f306
+After a deeper researches we found out that the denoted commit wasn't a
+root cause of the problem. It just revealed the invalidity by activating
+the DMA-based NVME SMART log getting performed in the framework of the
+NVME hwmon driver. The problem was here since the initial commit of the
+driver.
 
-Thank you!
+[1] Documentation/core-api/dma-api.rst
 
+Fixes: 400b6a7b13a3 ("nvme: Add hardware monitoring support")
+Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
+
+---
+
+Folks, I've thoroughly studied the whole NVME subsystem looking for
+similar problems. Turned out there is one more place which may cause the
+same issue. It's connected with the opal_dev.{cmd,req} buffers passed to
+the nvme_sec_submit() method. The rest of the buffers involved in the NVME
+DMA are either allocated by kmalloc (must be cache-line-aligned by design)
+or bounced-buffered if allocated on the stack (see the blk_rq_map_kern()
+method implementation).
+---
+ drivers/nvme/host/hwmon.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nvme/host/hwmon.c b/drivers/nvme/host/hwmon.c
+index 0a586d712920..94192ab7a02d 100644
+--- a/drivers/nvme/host/hwmon.c
++++ b/drivers/nvme/host/hwmon.c
+@@ -10,9 +10,10 @@
+ 
+ #include "nvme.h"
+ 
++/* DMA-noncoherent platforms require the cache-aligned buffers */
+ struct nvme_hwmon_data {
++	struct nvme_smart_log log ____cacheline_aligned;
+ 	struct nvme_ctrl *ctrl;
+-	struct nvme_smart_log log;
+ 	struct mutex read_lock;
+ };
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.37.2
+
