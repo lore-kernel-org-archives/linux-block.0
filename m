@@ -2,99 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30585ECAAD5
-	for <linux-block@archiver.kernel.org>; Fri,  9 Sep 2022 19:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96ABAECAAD3
+	for <linux-block@archiver.kernel.org>; Fri,  9 Sep 2022 19:46:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230254AbiIITTs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Sep 2022 15:19:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52878 "EHLO
+        id S232139AbiIITq6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Sep 2022 15:46:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbiIITTm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2022 15:19:42 -0400
-Received: from mail.baikalelectronics.com (mail.baikalelectronics.com [87.245.175.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 75D0D2A42B;
-        Fri,  9 Sep 2022 12:19:40 -0700 (PDT)
-Received: from mail (mail.baikal.int [192.168.51.25])
-        by mail.baikalelectronics.com (Postfix) with ESMTP id 3D9A2DBB;
-        Fri,  9 Sep 2022 22:23:11 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.baikalelectronics.com 3D9A2DBB
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baikalelectronics.ru; s=mail; t=1662751391;
-        bh=k04JpT/Stk+B/Zc/3fGfPQL4s7cQC+RHy2d6ex7akDU=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=O4gzvBhHAEGnSNm1f2kkZ6UEROqGLedhiAQeKD2i2IPo4oHcWkAVshH5GltVljce7
-         PudFDDrmSGjqMFYD5fBijw38Upb/+TrRtwNPdD3nUpAlpRee9joZr4YINs3kF+CCCd
-         YSIPFPKpAb7az2+yxffnEs0ilQlNlpMIxlPTfu5g=
-Received: from localhost (192.168.168.10) by mail (192.168.51.25) with
- Microsoft SMTP Server (TLS) id 15.0.1395.4; Fri, 9 Sep 2022 22:19:21 +0300
-From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
-To:     Jonathan Derrick <jonathan.derrick@intel.com>,
+        with ESMTP id S231157AbiIITqW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2022 15:46:22 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26DE54A11C;
+        Fri,  9 Sep 2022 12:42:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4F23CB82607;
+        Fri,  9 Sep 2022 19:42:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE4DC433D6;
+        Fri,  9 Sep 2022 19:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662752558;
+        bh=J4h0e1eeHD+F345cJw7D5vWTYQ3cTiWfm7V+L/GXkrY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mPGhEzE0ic9kseOm2K6qxxz0hcm3QgU3PIGTsapTt3Gu6YUZuEMV7JcNfIe+lT+Jj
+         giFnL2k3y8frDA1x//9/UPSfAVNfq7/KPteflKfEKeGcNc3uQX/Lefq56eMVmJtJOG
+         HXKiGzA4ekzDFUW5102gMIwlvxz2U2UUCr0jD/3ltTpS0Rt+nn88I+o9pM6Sw9tjaB
+         58RQ7mjb7/ku5gfAdYxzf2OYfC4ecDPrRyPxkUMTHXGE8YVdq3mRu62R11cta9/Vo8
+         JHjg5RHBWSKGFBqcB2qpxkTevxEhwItTGUQ9V6HJ0kNmvQK7RXIWAWt6XFw5oPNrhT
+         0Zu4cU4jkz45A==
+Date:   Fri, 9 Sep 2022 13:42:34 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
         Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@lst.de>,
         Sagi Grimberg <sagi@grimberg.me>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>,
-        Scott Bauer <scott.bauer@intel.com>
-CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Guenter Roeck <linux@roeck-us.net>,
         Serge Semin <fancer.lancer@gmail.com>,
         Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
         Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH 2/2] block: sed-opal: Cache-line-align the cmd/resp buffers
-Date:   Fri, 9 Sep 2022 22:19:16 +0300
-Message-ID: <20220909191916.16013-3-Sergey.Semin@baikalelectronics.ru>
-In-Reply-To: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] nvme-hwmon: Cache-line-align the NVME SMART
+ log-buffer
+Message-ID: <YxuXKrkVbGBJwxRS@kbusch-mbp.dhcp.thefacebook.com>
 References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
+ <20220909191916.16013-2-Sergey.Semin@baikalelectronics.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MAIL.baikal.int (192.168.51.25) To mail (192.168.51.25)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220909191916.16013-2-Sergey.Semin@baikalelectronics.ru>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In accordance with [1] the DMA-able memory buffers must be
-cacheline-aligned otherwise the cache writing-back and invalidation
-performed during the mapping may cause the adjacent data being lost. It's
-specifically required for the DMA-noncoherent platforms. Seeing the
-opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
-drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
-respectively we must make sure the passed buffers are cacheline-aligned to
-prevent the denoted problem.
+On Fri, Sep 09, 2022 at 10:19:15PM +0300, Serge Semin wrote:
+> Recent commit 52fde2c07da6 ("nvme: set dma alignment to dword") has caused
+> 
+> Folks, I've thoroughly studied the whole NVME subsystem looking for
+> similar problems. Turned out there is one more place which may cause the
+> same issue. It's connected with the opal_dev.{cmd,req} buffers passed to
+> the nvme_sec_submit() method. The rest of the buffers involved in the NVME
+> DMA are either allocated by kmalloc (must be cache-line-aligned by design)
+> or bounced-buffered if allocated on the stack (see the blk_rq_map_kern()
+> method implementation).
 
-[1] Documentation/core-api/dma-api.rst
+What about user space addresses? We can map those with cacheline offsets.
 
-Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
-Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
----
- block/sed-opal.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> ---
+>  drivers/nvme/host/hwmon.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nvme/host/hwmon.c b/drivers/nvme/host/hwmon.c
+> index 0a586d712920..94192ab7a02d 100644
+> --- a/drivers/nvme/host/hwmon.c
+> +++ b/drivers/nvme/host/hwmon.c
+> @@ -10,9 +10,10 @@
+>  
+>  #include "nvme.h"
+>  
+> +/* DMA-noncoherent platforms require the cache-aligned buffers */
+>  struct nvme_hwmon_data {
+> +	struct nvme_smart_log log ____cacheline_aligned;
+>  	struct nvme_ctrl *ctrl;
+> -	struct nvme_smart_log log;
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9700197000f2..222acbd1f03a 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -73,6 +73,7 @@ struct parsed_resp {
- 	struct opal_resp_tok toks[MAX_TOKS];
- };
- 
-+/* Presumably DMA-able buffers must be cache-aligned */
- struct opal_dev {
- 	bool supported;
- 	bool mbr_enabled;
-@@ -88,8 +89,8 @@ struct opal_dev {
- 	u64 lowest_lba;
- 
- 	size_t pos;
--	u8 cmd[IO_BUFFER_LENGTH];
--	u8 resp[IO_BUFFER_LENGTH];
-+	u8 cmd[IO_BUFFER_LENGTH] ____cacheline_aligned;
-+	u8 resp[IO_BUFFER_LENGTH] ____cacheline_aligned;
- 
- 	struct parsed_resp parsed;
- 	size_t prev_d_len;
--- 
-2.37.2
+So this by chance happened to work before 52fde2c07da6 because the field
+started at a 4-byte offset on your arch?
 
+The change looks good.
+
+Reviewed-by: Keith Busch <kbusch@kernel.org>
