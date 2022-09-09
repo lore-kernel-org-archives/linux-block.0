@@ -2,198 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B97FECAAD3
-	for <linux-block@archiver.kernel.org>; Fri,  9 Sep 2022 18:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC9FECAAA1
+	for <linux-block@archiver.kernel.org>; Fri,  9 Sep 2022 19:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbiIISmb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Sep 2022 14:42:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41890 "EHLO
+        id S230032AbiIITOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Sep 2022 15:14:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiIISma (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2022 14:42:30 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEB011EA8B
-        for <linux-block@vger.kernel.org>; Fri,  9 Sep 2022 11:42:28 -0700 (PDT)
-Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 289GkcPw023759
-        for <linux-block@vger.kernel.org>; Fri, 9 Sep 2022 11:42:28 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=facebook; bh=smP1nVT+g1RiQmIuRst03PDOC/seCJc9lTj2yAhVTd0=;
- b=IZBk8fg66SJFZ+qdmFce1bs77jYJ2d043rVg+lEbko0yzqx12UUShBKd3nCfK+k7s9Q8
- u55hOWps5IIu1IbLNmHq1t0Fu2DTBEYwwPixHhCrRCSCL4CINOWlDZGoANQIyH9Wb3BM
- l5d/ytErOpO084u6CkKcYfmGdg8XXdCgW/w= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3jfk74s0yu-5
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 09 Sep 2022 11:42:27 -0700
-Received: from twshared5413.23.frc3.facebook.com (2620:10d:c085:208::11) by
- mail.thefacebook.com (2620:10d:c085:11d::7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Fri, 9 Sep 2022 11:42:26 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id D19438698CCC; Fri,  9 Sep 2022 11:42:16 -0700 (PDT)
-From:   Keith Busch <kbusch@fb.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv5] sbitmap: fix batched wait_cnt accounting
-Date:   Fri, 9 Sep 2022 11:40:22 -0700
-Message-ID: <20220909184022.1709476-1-kbusch@fb.com>
-X-Mailer: git-send-email 2.30.2
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 7qriKGziVB-zVi6bw7_bTzZzTgzRxNfn
-X-Proofpoint-GUID: 7qriKGziVB-zVi6bw7_bTzZzTgzRxNfn
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-09_08,2022-09-09_01,2022-06-22_01
+        with ESMTP id S230406AbiIITOE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Sep 2022 15:14:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D41A1116C9
+        for <linux-block@vger.kernel.org>; Fri,  9 Sep 2022 12:14:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5C4D0620BB
+        for <linux-block@vger.kernel.org>; Fri,  9 Sep 2022 19:13:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BAD0CC433C1;
+        Fri,  9 Sep 2022 19:13:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662750838;
+        bh=LkZ3KifbhgKno0oFDcKtbxzZI0aafpcqqGnDoQAiobs=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=tbfPn9hfvStyj3GvPZi6VLz7AuNYLzh1X1oid29BEZRq55q6hdWfy4TVhdXh7m6yH
+         a2Gzxhkhj8xRiaSZXlRyZIANS/O11SKwTdTRLOTO/SRdahEXJeNDHJWBEQncBk/5j3
+         rJy4DA0hj+kz7mPMzO+dGOCeZtuX9ez4ojA5yiVF2QBdlT9pYq5kYkfnPFRDU1JD/L
+         Kqvns8sIfuVD5PFwqBhsJ1B+kbDWGyAWds+sXlwuECuxrj4KpFN3BIletQsFXNY2o0
+         K8OTFShRx4R2GCHwLTHR874I8W+48oUuRFcRN0dBsfZhIeQThcSAGdOyV4UoRJRG2d
+         NN0/DkKLdJxOA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A9AD3C4166E;
+        Fri,  9 Sep 2022 19:13:58 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.0-rc5
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <54f4f268-c33c-d1a1-4b38-75f9206be4e9@kernel.dk>
+References: <54f4f268-c33c-d1a1-4b38-75f9206be4e9@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <54f4f268-c33c-d1a1-4b38-75f9206be4e9@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-09
+X-PR-Tracked-Commit-Id: 745ed37277c5a7202180aa276c87db1362c90fe5
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 9ebc0ecb21b53e1a592f4ac9af927f7ff605f306
+Message-Id: <166275083869.6812.698735554888168084.pr-tracker-bot@kernel.org>
+Date:   Fri, 09 Sep 2022 19:13:58 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+The pull request you sent on Fri, 9 Sep 2022 11:28:19 -0600:
 
-Batched completions can clear multiple bits, but we're only decrementing
-the wait_cnt by one each time. This can cause waiters to never be woken,
-stalling IO. Use the batched count instead.
+> git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-09
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D215679
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
-v4->v5:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/9ebc0ecb21b53e1a592f4ac9af927f7ff605f306
 
-  Changed back to minimizing the decrement amount for the wait count in
-  order to spread the notification across wait states fairly.
+Thank you!
 
- block/blk-mq-tag.c      |  2 +-
- include/linux/sbitmap.h |  3 ++-
- lib/sbitmap.c           | 37 +++++++++++++++++++++++--------------
- 3 files changed, 26 insertions(+), 16 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 8e3b36d1cb57..9eb968e14d31 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -196,7 +196,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *d=
-ata)
- 		 * other allocations on previous queue won't be starved.
- 		 */
- 		if (bt !=3D bt_prev)
--			sbitmap_queue_wake_up(bt_prev);
-+			sbitmap_queue_wake_up(bt_prev, 1);
-=20
- 		ws =3D bt_wait_ptr(bt, data->hctx);
- 	} while (1);
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 8f5a86e210b9..4d2d5205ab58 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -575,8 +575,9 @@ void sbitmap_queue_wake_all(struct sbitmap_queue *sbq);
-  * sbitmap_queue_wake_up() - Wake up some of waiters in one waitqueue
-  * on a &struct sbitmap_queue.
-  * @sbq: Bitmap queue to wake up.
-+ * @nr: Number of bits cleared.
-  */
--void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
-+void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr);
-=20
- /**
-  * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &str=
-uct
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index cbfd2e677d87..624fa7f118d1 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -599,24 +599,31 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbi=
-tmap_queue *sbq)
- 	return NULL;
- }
-=20
--static bool __sbq_wake_up(struct sbitmap_queue *sbq)
-+static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
- {
- 	struct sbq_wait_state *ws;
- 	unsigned int wake_batch;
--	int wait_cnt;
-+	int wait_cnt, cur, sub;
- 	bool ret;
-=20
-+	if (*nr <=3D 0)
-+		return false;
-+
- 	ws =3D sbq_wake_ptr(sbq);
- 	if (!ws)
- 		return false;
-=20
--	wait_cnt =3D atomic_dec_return(&ws->wait_cnt);
--	/*
--	 * For concurrent callers of this, callers should call this function
--	 * again to wakeup a new batch on a different 'ws'.
--	 */
--	if (wait_cnt < 0)
--		return true;
-+	cur =3D atomic_read(&ws->wait_cnt);
-+	do {
-+		/*
-+		 * For concurrent callers of this, callers should call this
-+		 * function again to wakeup a new batch on a different 'ws'.
-+		 */
-+		if (cur =3D=3D 0)
-+			return true;
-+		sub =3D min(*nr, cur);
-+		wait_cnt =3D cur - sub;
-+	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
-=20
- 	/*
- 	 * If we decremented queue without waiters, retry to avoid lost
-@@ -625,6 +632,8 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 	if (wait_cnt > 0)
- 		return !waitqueue_active(&ws->wait);
-=20
-+	*nr -=3D sub;
-+
- 	/*
- 	 * When wait_cnt =3D=3D 0, we have to be particularly careful as we are
- 	 * responsible to reset wait_cnt regardless whether we've actually
-@@ -660,12 +669,12 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 	sbq_index_atomic_inc(&sbq->wake_index);
- 	atomic_set(&ws->wait_cnt, wake_batch);
-=20
--	return ret;
-+	return ret || *nr;
- }
-=20
--void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
-+void sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
- {
--	while (__sbq_wake_up(sbq))
-+	while (__sbq_wake_up(sbq, &nr))
- 		;
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
-@@ -705,7 +714,7 @@ void sbitmap_queue_clear_batch(struct sbitmap_queue *sb=
-q, int offset,
- 		atomic_long_andnot(mask, (atomic_long_t *) addr);
-=20
- 	smp_mb__after_atomic();
--	sbitmap_queue_wake_up(sbq);
-+	sbitmap_queue_wake_up(sbq, nr_tags);
- 	sbitmap_update_cpu_hint(&sbq->sb, raw_smp_processor_id(),
- 					tags[nr_tags - 1] - offset);
- }
-@@ -733,7 +742,7 @@ void sbitmap_queue_clear(struct sbitmap_queue *sbq, uns=
-igned int nr,
- 	 * waiter. See the comment on waitqueue_active().
- 	 */
- 	smp_mb__after_atomic();
--	sbitmap_queue_wake_up(sbq);
-+	sbitmap_queue_wake_up(sbq, 1);
- 	sbitmap_update_cpu_hint(&sbq->sb, cpu, nr);
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_clear);
---=20
-2.30.2
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
