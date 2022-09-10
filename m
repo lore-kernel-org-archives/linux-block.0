@@ -2,102 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D335ECAAD3
-	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 12:35:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 921D1ECAAD3
+	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 14:34:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbiIJMft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Sep 2022 08:35:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49226 "EHLO
+        id S229544AbiIJOeT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Sep 2022 10:34:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiIJMfs (ORCPT
+        with ESMTP id S229730AbiIJOeD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Sep 2022 08:35:48 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 603CD45040;
-        Sat, 10 Sep 2022 05:35:47 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id a14so3018178ljj.8;
-        Sat, 10 Sep 2022 05:35:47 -0700 (PDT)
+        Sat, 10 Sep 2022 10:34:03 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8B795301B;
+        Sat, 10 Sep 2022 07:33:37 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id pj10so4028643pjb.2;
+        Sat, 10 Sep 2022 07:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=ylankE0Ntcy0fsfQcuqcC6SNPzukIG6CjHTnu9Jh3Qw=;
-        b=m0j2q/wOOyX3sBYygCXuf0GnAJujmOFo7EMdTErAa7sxWkqNTWnaVnXVBgbItew1PR
-         H1ZpKn6ij5A7tzWhxS1U+LBe2qbuh141TFxjZQl7aSI4dsknFOr5w8B78TVDLILswE20
-         J2UM+cmXt9JvaoIfSVuU03E4eHlWjzQWEoosHlGodaDN38+9O1w05ghVJzSZgANOI4MZ
-         Bk09wNS7slZRxakCNeRyA1SUiG0q0C/DN8ZPOzbeWFs9rhUE/hluKrath+zb1leShmtf
-         uNRN+Mx+KOIo4YMVbAl0alNUQHkfzQ/J1qo2wTY9+f/NnI1mD5iW9jqwgn4WJjyG6AeN
-         Z7wQ==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date;
+        bh=r9dCl7QhjCZXvtpCmodoTGwKF+jhrQb09rsPLN1AZYY=;
+        b=daWbxKwCfJ9fWeKWKg07Zm8xLPXdxLUm626AwPcfeWMcljAT49UkJ2C2lN+G/WaWHB
+         KTnBGT+1sVLuwtIS70HjbicpBr0DMv5acelE4db3yNHspPITt0kD+XABdrNEo8o45VDY
+         CeuP+dqKcsdq1cHQATRZiAoLttsVQ0J79Ax91bKRIWnRTmua3fxd378a+v+GV36YOGUF
+         gk/JT2r7ScBdEQMYkzdBDw9h2GJDAEzf+P4UlLlRCnvtqMuFalG+Gx50CIx6mQrlCZn9
+         nx7sB0B6Hf/DVwcpg2s+YR/BSV/9a0obSR7gADiNo3VN7DBhdfF0tBITu737l8yK6iMG
+         9a0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=ylankE0Ntcy0fsfQcuqcC6SNPzukIG6CjHTnu9Jh3Qw=;
-        b=T3UZV1ohQsWwsE+ti+0hZ9O5UqYq4UyH+BnluWzmOuBeNDHtxpFmSM9zi/RlMVm9yn
-         6d3ozLrFolxohCiql59b2WDGuttoPhp64VcNVhEG6g7JWJNSxv81pCCmISdikjdB7IXu
-         Y1YsOin8dkqbUvZfDlIssMn415WYF1O1qsGxH/mIYUNNpniUppYfFDjKod87T1j28zF/
-         ZZ2PNiLuUSwetq+KrEM/Y7X8jjmw2FUZCZ9zOrUfe2gqkinTx6GSZIIgzvzPMFf2wq/P
-         W9CAkBMvfAParGDhwGHiKKp/vLcui48i6c0T2h3G+Q58pTZtmbkFxlXPLp4Cf7R/9uMb
-         DGyQ==
-X-Gm-Message-State: ACgBeo3sib1eBwMnaCCnnDglHqdnC+DH9kmuun8F1if4kZEjRZY1b47/
-        ZrzOLfsDcvqcWSDMSwQJxmU=
-X-Google-Smtp-Source: AA6agR7AEhYcjxJXjLPhbXBdf+MXAQzDChKDVE1xSxa0FIjE57ci1fPhV4Eba3gXLB1Lx6IGlLnRaA==
-X-Received: by 2002:a05:651c:2d0:b0:25e:6c94:59d5 with SMTP id f16-20020a05651c02d000b0025e6c9459d5mr5644442ljo.488.1662813345560;
-        Sat, 10 Sep 2022 05:35:45 -0700 (PDT)
-Received: from mobilestation ([95.79.140.178])
-        by smtp.gmail.com with ESMTPSA id a19-20020a056512201300b0048a757d1303sm243827lfb.217.2022.09.10.05.35.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Sep 2022 05:35:44 -0700 (PDT)
-Date:   Sat, 10 Sep 2022 15:35:42 +0300
-From:   Serge Semin <fancer.lancer@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date;
+        bh=r9dCl7QhjCZXvtpCmodoTGwKF+jhrQb09rsPLN1AZYY=;
+        b=i6C9gXkTgloi/A31YJM+eSeTbAQaMChyAq9qbWvZQml4Ob68IkR/rrSIIIJfuckh47
+         btbYe5m2sycnPZ94p0maerOMsvnpb+jJGQfHga2DfGaZ8hX+uQdE5JmguSdssVf7Pn7F
+         qLTl6qbNGV36kVSq+CMo2sIIT5HrtmEKJG9bCIR/ja/+qTaJ/dInn5V7aCgZYyw8LNKg
+         wHp92ZXGBBvyz8UgdjTgiTCv1Kqx5QlX6ITRGIjbaZ+QodDEGVZfyHUpMdb4kb5Y0SJ0
+         OFmB0iRJB+WYL+vFwTZY1+h0bkEjQ2MnyINWINx4+EOUUqZioBcaXq3lrniOiiybpOQ0
+         Ujvg==
+X-Gm-Message-State: ACgBeo0L5i9s5CZGzByRdc5FYc1jZqMYeJ8rXNKZaTGn/j/n2VFVzxxP
+        usgSkf7aP4fxYevepjDsclc=
+X-Google-Smtp-Source: AA6agR6jTqCa7me4rGP7gL1yUCl5YRTMNspblb2vT1sA0U6ZBNjNZjPx0jIS11Sn2TcCnGKa0KOq+Q==
+X-Received: by 2002:a17:902:b106:b0:176:70e2:df21 with SMTP id q6-20020a170902b10600b0017670e2df21mr18841963plr.127.1662820412978;
+        Sat, 10 Sep 2022 07:33:32 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id y75-20020a62644e000000b005365aee486bsm1755899pfb.192.2022.09.10.07.33.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Sep 2022 07:33:32 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <7ff5df5b-8816-4454-70d2-656f87d6b970@roeck-us.net>
+Date:   Sat, 10 Sep 2022 07:33:30 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 1/2] nvme-hwmon: Cache-line-align the NVME SMART
+ log-buffer
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
         Revanth Rajashekar <revanth.rajashekar@intel.com>,
         Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
         Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
-        Guenter Roeck <linux@roeck-us.net>,
+        Serge Semin <fancer.lancer@gmail.com>,
         Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
         Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] nvme-hwmon: Cache-line-align the NVME SMART
- log-buffer
-Message-ID: <20220910123542.tzxg2blegw55z5fj@mobilestation>
 References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
  <20220909191916.16013-2-Sergey.Semin@baikalelectronics.ru>
  <20220910053045.GA23052@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From:   Guenter Roeck <linux@roeck-us.net>
 In-Reply-To: <20220910053045.GA23052@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 10, 2022 at 07:30:45AM +0200, Christoph Hellwig wrote:
+On 9/9/22 22:30, Christoph Hellwig wrote:
 > I think this will work, but unless we have to I'd generally prefer
 > to just split dta that is DMAed into into a separate allocation.
 > That is, do a separate kmalloc for the nvme_smart_log structure.
-
-Well, both approaches will solve the denoted problem. I am just
-wondering why do you think that the kmalloc-ed buffer is more
-preferable? IMO it is a bit less suitable since increases the memory
-granularity - two kmalloc's instead of one. Moreover it makes the code
-a bit more complex for the same reason of having two mallocs and two
-frees. Meanwhile using the ____cacheline_aligned qualifier to prevent
-the noncoherent DMA problem is a standard approach.
-
-What would be the best solution if we had a qualifier like this:
-#ifdef CONFIG_DMA_NONCOHERENT
-#define ____dma_buffer ____cacheline_aligned
-#else
-#define ____dma_buffer
-#endif
-and used it instead of the direct ____cacheline_aligned utilization.
-
--Sergey
-
 > 
 > Guenter, is this ok with you?
+
+Seems to be a bit overkill, but sure.
+
+Guenter
