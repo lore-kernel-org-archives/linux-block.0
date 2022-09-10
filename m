@@ -2,61 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15354ECAAD5
-	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 05:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C36C6FA82
+	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 06:51:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbiIJFcH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Sep 2022 01:32:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40154 "EHLO
+        id S229732AbiIJGvU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Sep 2022 02:51:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiIJFcG (ORCPT
+        with ESMTP id S229550AbiIJGvT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Sep 2022 01:32:06 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A7080496;
-        Fri,  9 Sep 2022 22:32:05 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 3939F68B05; Sat, 10 Sep 2022 07:32:03 +0200 (CEST)
-Date:   Sat, 10 Sep 2022 07:32:03 +0200
+        Sat, 10 Sep 2022 02:51:19 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E062B18F;
+        Fri,  9 Sep 2022 23:51:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=5boGn7vQhK1/qyQ9CrG6mQXzf4WCqUbSGuj00WF3en4=; b=GJmfyYiSjVHZYw5b9vVusVFTJt
+        0PSWAGmPJboxa1YQqL5UH68Ksc+TeI9ogIFTsYh+fzj77xXzUEnAUEKXJjUy4pHujRM5ZRP9JXgdC
+        7k7z+FVbg+sn2ZDxX9yRO5VKSjwvR3h21uqvVq8qDBCl8lxf1TL6tQIVuc+dRWQNDRQSNItRDrU5C
+        C8/67qIXRinUlBjrmE9fRTTmYP0f+2rhs7rOxts84LIB3Hx8yX6GrxJnDnRHaannnal3fweRkxY2j
+        vTW8FnRKjlw+Bqvq4H5tMP3x/cYsjXdtnGnXghp9lRL7bdMuTuln7DQ7JH2AT/hxr3YVD+2zgluAt
+        /UC45XtQ==;
+Received: from [2001:4bb8:198:38af:e8dc:dbbd:a9d:5c54] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oWuKX-006pZ6-Rp; Sat, 10 Sep 2022 06:51:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>
-Cc:     Jonathan Derrick <jonathan.derrick@intel.com>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>,
-        Scott Bauer <scott.bauer@intel.com>,
-        Serge Semin <fancer.lancer@gmail.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: sed-opal: Cache-line-align the cmd/resp
- buffers
-Message-ID: <20220910053203.GB23052@lst.de>
-References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru> <20220909191916.16013-3-Sergey.Semin@baikalelectronics.ru>
+To:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
+        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
+Subject: improve pagecache PSI annotations
+Date:   Sat, 10 Sep 2022 08:50:53 +0200
+Message-Id: <20220910065058.3303831-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220909191916.16013-3-Sergey.Semin@baikalelectronics.ru>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 09, 2022 at 10:19:16PM +0300, Serge Semin wrote:
-> In accordance with [1] the DMA-able memory buffers must be
-> cacheline-aligned otherwise the cache writing-back and invalidation
-> performed during the mapping may cause the adjacent data being lost. It's
-> specifically required for the DMA-noncoherent platforms. Seeing the
-> opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
-> drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
-> respectively we must make sure the passed buffers are cacheline-aligned to
-> prevent the denoted problem.
+Hi all,
 
-Same comment as for the previous one, this should work, but I think
-separate allocations for the DMAable buffers would document the intent
-much better.  Given that the opal initialization isn't a fast path
-I don't think that the overhead should matter either.
+currently the VM tries to abuse the block layer submission path for
+the page cache PSI annotations.  This series instead annotates the
+->read_folio and ->readahead calls in the core VM code, and then
+only deals with the odd direct add_to_page_cache_lru calls manually.
+
+Diffstat:
+ block/bio.c               |    8 --------
+ block/blk-core.c          |   17 -----------------
+ fs/btrfs/compression.c    |   14 ++++++++++++--
+ fs/direct-io.c            |    2 --
+ fs/erofs/zdata.c          |   13 ++++++++++++-
+ include/linux/blk_types.h |    1 -
+ include/linux/pagemap.h   |    2 ++
+ kernel/sched/psi.c        |    2 ++
+ mm/filemap.c              |    7 +++++++
+ mm/readahead.c            |   22 ++++++++++++++++++----
+ 10 files changed, 53 insertions(+), 35 deletions(-)
