@@ -2,34 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C0BC6FA8B
-	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 06:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B304CC6FA86
+	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 11:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbiIJGvg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Sep 2022 02:51:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53786 "EHLO
+        id S229614AbiIJLcc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Sep 2022 07:32:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230135AbiIJGv0 (ORCPT
+        with ESMTP id S229585AbiIJLcb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Sep 2022 02:51:26 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B4B75CF1;
-        Fri,  9 Sep 2022 23:51:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=fQqaIwOPxSuMna00dQRnvLHVvXRo+zAlkdWprGAd+Cc=; b=TY6vqRLMJhvweO+6nWY/Yk6QCH
-        2wbbFyPkYsHGjWKYBe7GnKXWBeP7BegsJdll9FnrtOthJp4dUf1Kvsl5a/qlVyFhFhLHEPwEE0WQL
-        wDaXd5YpJFiR0RumNIFaRd1Po+fn9GcxeyCCNfN1fJY7mmjO9rTpn8caq4TXFBBayzRcOc6bu4NKh
-        IoDNIXl5IexFES5+qwaLTG71wyLwN1NbONFzYKyCJUeec2R61kCjzTUcXjZLj0pLvBFd+WW7ty19m
-        JKcjT5Dzix0LV4x4Q6R9PV7MhsSEKNMJR6LZPTnwjwtyUHob7eNK6sy3hKBwQOGcSJCPj2NHLWdC9
-        4OgUvzQQ==;
-Received: from [2001:4bb8:198:38af:e8dc:dbbd:a9d:5c54] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oWuKj-006pb8-02; Sat, 10 Sep 2022 06:51:17 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+        Sat, 10 Sep 2022 07:32:31 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71C153033
+        for <linux-block@vger.kernel.org>; Sat, 10 Sep 2022 04:32:28 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 29so6165683edv.2
+        for <linux-block@vger.kernel.org>; Sat, 10 Sep 2022 04:32:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=oO2f6puxNv2WM0203jHJ9dATLxOnB/EAhNK0gKh1Fco=;
+        b=ZH5YuCofNtiX91aOQ8okF8wGG31vLQnBuGTbsJIxq6skqZDH7RvK+S6Wg/jL8kGMG0
+         wxALhNndMloVN1pmlZYgbSnkA4WugVPm6xPyUnDyPXtNQrabmBlb3doY3JHFHpEwdDOn
+         UCMlcq27n8LGY/fiI8rrezsaIzsFdm7yeal6QiEIrx2i6u5RSvNr3NejNRbuoylCf6VT
+         1NmPWSzvA4lzXHfElWpQVZrWn1GOb5l1rdycwSX1lGO4Q9iha+7RREdHfUFuABmzTqNy
+         MS6wyNdM+htzk0aYqzebY8yDNHwmUT2SYl/24SW+F1b30ss1/TkgEA7qVOS7cSXPX2Wb
+         gdkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=oO2f6puxNv2WM0203jHJ9dATLxOnB/EAhNK0gKh1Fco=;
+        b=520N/dFZ+Fx0qkDpjvnSbDr1y6tB9ItB6cgrNxbgKj8Z18Zg7ZTP/wGNwwTl7PSK3v
+         WH9WkkgcounXpNsU6Wp5LSd0+BtHC3/QmdcmnITprXqvKLsDLebQenL8w5Bu/u8YjJY4
+         yc3XxXvK2H4fwm0bQPS2icQEwd2BhmuiMswH3TPiixh+3GIdu8mMMwfbiPq9ymGdGPZe
+         tHR/iMHrmuuVsGCcfmy7rVsA+1uY9olIf3+dmfhU2MAkpkrbBMz7IMAEWxgzIjiufB/7
+         ZZXdiZfXnsriAJonM76u0H6IbhCngtCBGX8jq6CxXgR6seH1qNrxtVVfzDHfIOIQ1GaQ
+         sTWA==
+X-Gm-Message-State: ACgBeo3awXOiJMce+H5FrymFZ01kJbvMZwsC+wKOk3Gzd5LKwF6dxDAd
+        kHSMr2vPOgOsJAVs7XSky4H3qA==
+X-Google-Smtp-Source: AA6agR7ABzhvw0hLX7UM5YEGmj7ooKpj1BWh9U8hMic6ls9gEZTIgOqBBSoD7neml/f66zDsZ4trLA==
+X-Received: by 2002:a05:6402:280f:b0:44e:ee5c:da6b with SMTP id h15-20020a056402280f00b0044eee5cda6bmr15219418ede.256.1662809547250;
+        Sat, 10 Sep 2022 04:32:27 -0700 (PDT)
+Received: from [10.41.110.194] ([77.241.232.28])
+        by smtp.gmail.com with ESMTPSA id g2-20020a17090604c200b00731582babcasm1625186eja.71.2022.09.10.04.32.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 10 Sep 2022 04:32:26 -0700 (PDT)
+Message-ID: <c76b45ad-c4ef-5166-fec3-a05e2febcce3@kernel.dk>
+Date:   Sat, 10 Sep 2022 05:32:25 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: improve pagecache PSI annotations
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Matthew Wilcox <willy@infradead.org>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Suren Baghdasaryan <surenb@google.com>,
         Andrew Morton <akpm@linux-foundation.org>
@@ -38,81 +67,40 @@ Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
         Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
         linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
-Subject: [PATCH 4/5] erofs: add manual PSI accounting for the compressed address space
-Date:   Sat, 10 Sep 2022 08:50:57 +0200
-Message-Id: <20220910065058.3303831-5-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220910065058.3303831-1-hch@lst.de>
 References: <20220910065058.3303831-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220910065058.3303831-1-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-erofs uses an additional address space for compressed data read from disk
-in addition to the one directly associated with the inode.  Reading into
-the lower address space is open coded using add_to_page_cache_lru instead
-of using the filemap.c helper for page allocation micro-optimizations,
-which means it is not covered by the MM PSI annotations for ->read_folio
-and ->readahead, so add manual ones instead.
+On 9/10/22 12:50 AM, Christoph Hellwig wrote:
+> Hi all,
+> 
+> currently the VM tries to abuse the block layer submission path for
+> the page cache PSI annotations.  This series instead annotates the
+> ->read_folio and ->readahead calls in the core VM code, and then
+> only deals with the odd direct add_to_page_cache_lru calls manually.
+> 
+> Diffstat:
+>  block/bio.c               |    8 --------
+>  block/blk-core.c          |   17 -----------------
+>  fs/btrfs/compression.c    |   14 ++++++++++++--
+>  fs/direct-io.c            |    2 --
+>  fs/erofs/zdata.c          |   13 ++++++++++++-
+>  include/linux/blk_types.h |    1 -
+>  include/linux/pagemap.h   |    2 ++
+>  kernel/sched/psi.c        |    2 ++
+>  mm/filemap.c              |    7 +++++++
+>  mm/readahead.c            |   22 ++++++++++++++++++----
+>  10 files changed, 53 insertions(+), 35 deletions(-)
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/erofs/zdata.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Nice! It's always bothered me that we have this weird layering
+here.
 
-diff --git a/fs/erofs/zdata.c b/fs/erofs/zdata.c
-index 5792ca9e0d5ef..143a101a36887 100644
---- a/fs/erofs/zdata.c
-+++ b/fs/erofs/zdata.c
-@@ -7,6 +7,7 @@
- #include "zdata.h"
- #include "compress.h"
- #include <linux/prefetch.h>
-+#include <linux/psi.h>
- 
- #include <trace/events/erofs.h>
- 
-@@ -1365,6 +1366,8 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
- 	struct block_device *last_bdev;
- 	unsigned int nr_bios = 0;
- 	struct bio *bio = NULL;
-+	/* initialize to 1 to make skip psi_memstall_leave unless needed */
-+	unsigned long pflags = 1;
- 
- 	bi_private = jobqueueset_init(sb, q, fgq, force_fg);
- 	qtail[JQ_BYPASS] = &q[JQ_BYPASS]->head;
-@@ -1414,10 +1417,15 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
- 			if (bio && (cur != last_index + 1 ||
- 				    last_bdev != mdev.m_bdev)) {
- submit_bio_retry:
-+				if (!pflags)
-+					psi_memstall_leave(&pflags);
- 				submit_bio(bio);
- 				bio = NULL;
- 			}
- 
-+			if (unlikely(PageWorkingset(page)))
-+				psi_memstall_enter(&pflags);
-+
- 			if (!bio) {
- 				bio = bio_alloc(mdev.m_bdev, BIO_MAX_VECS,
- 						REQ_OP_READ, GFP_NOIO);
-@@ -1445,8 +1453,11 @@ static void z_erofs_submit_queue(struct z_erofs_decompress_frontend *f,
- 			move_to_bypass_jobqueue(pcl, qtail, owned_head);
- 	} while (owned_head != Z_EROFS_PCLUSTER_TAIL);
- 
--	if (bio)
-+	if (bio) {
-+		if (!pflags)
-+			psi_memstall_leave(&pflags);
- 		submit_bio(bio);
-+	}
- 
- 	/*
- 	 * although background is preferred, no one is pending for submission.
 -- 
-2.30.2
+Jens Axboe
+
 
