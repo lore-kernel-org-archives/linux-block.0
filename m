@@ -2,109 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C486CECAAD5
-	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 11:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D335ECAAD3
+	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 12:35:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbiIJLeH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Sep 2022 07:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51030 "EHLO
+        id S229491AbiIJMft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 10 Sep 2022 08:35:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbiIJLeG (ORCPT
+        with ESMTP id S229446AbiIJMfs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Sep 2022 07:34:06 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1BA5303A
-        for <linux-block@vger.kernel.org>; Sat, 10 Sep 2022 04:34:05 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id l14so9836521eja.7
-        for <linux-block@vger.kernel.org>; Sat, 10 Sep 2022 04:34:05 -0700 (PDT)
+        Sat, 10 Sep 2022 08:35:48 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 603CD45040;
+        Sat, 10 Sep 2022 05:35:47 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id a14so3018178ljj.8;
+        Sat, 10 Sep 2022 05:35:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=8Ag6mHz6RaJKAvIf3yWG8/NFxf6UdfL+MIDBEsLCyN8=;
-        b=rt56lu4zDxtfFC0gCwopFBFWhVClMEv05ZLa6FVTJvWQfkY2PRelXahCVRkTH0W0EE
-         SDi7Jg1T1Uk7Cgx8nOrb1llp4a5ljwV0hdWJLnKvHp44g8AGFKUUuXIYEu47fVHTnc+/
-         8wGHkEV4bRaaeVojMOyW1sd84KJqpHyhoHmwKscMTML1EIFROO1ffCslzJIrMkPlYesA
-         CBTvyvCmvmcJsItPrNfbGgD6LX3xXNlU+Uvr8Wo01rpF/CTHcxytcMd7P56VsFix0FeR
-         nYU0jAzsSdPZvhNnm7dXkuhgwaXZBEfS/U1FJvc3Zvz9IP4l/XZZ4aGZLlBa7gaLGUT8
-         q2nw==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=ylankE0Ntcy0fsfQcuqcC6SNPzukIG6CjHTnu9Jh3Qw=;
+        b=m0j2q/wOOyX3sBYygCXuf0GnAJujmOFo7EMdTErAa7sxWkqNTWnaVnXVBgbItew1PR
+         H1ZpKn6ij5A7tzWhxS1U+LBe2qbuh141TFxjZQl7aSI4dsknFOr5w8B78TVDLILswE20
+         J2UM+cmXt9JvaoIfSVuU03E4eHlWjzQWEoosHlGodaDN38+9O1w05ghVJzSZgANOI4MZ
+         Bk09wNS7slZRxakCNeRyA1SUiG0q0C/DN8ZPOzbeWFs9rhUE/hluKrath+zb1leShmtf
+         uNRN+Mx+KOIo4YMVbAl0alNUQHkfzQ/J1qo2wTY9+f/NnI1mD5iW9jqwgn4WJjyG6AeN
+         Z7wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=8Ag6mHz6RaJKAvIf3yWG8/NFxf6UdfL+MIDBEsLCyN8=;
-        b=T6XNcLOWkQveuKcmIljGU2vWcExwHC/3KMG++BnElUmu4F/1qmPwGl7K4i4cKugPll
-         I1izt29XI9MhZwvKwQa34i79V3uEtXKYaTrF3R1delJumL6UVoUj2AltbxWdBXDypuq+
-         Vvzt5lPtHMeA8aNZZDmIZuEXrW8GN2YjNZL2ki+Zmn3OZHkY5XEoYci6+3CUZOrXPlnB
-         C192DUVKCVY/o/fcfodKpzYNScRJ2atOOUvytPc71/JUUWwSV96vJF62ueJJs7akbESV
-         05EhWHQjZfRM8esGs6GW0TDxQz0eb29M+iLGX83bLPSvL5ULWSzGCsepFIzSYqjzicUr
-         Z5nw==
-X-Gm-Message-State: ACgBeo3K7LqwwD4fewk7ZKmNrm5t81eod9QoixtNmzaYKEEWYR8MJsaf
-        RSWFoN8FT7t/r4ehlRjI980xqg==
-X-Google-Smtp-Source: AA6agR6l/1o9KPVR6GtRSUN/6LhKnQUVR80O3xKSuOcDWQt5wKNsZnh3qcOtdZWGGeWimCE3wtzgXg==
-X-Received: by 2002:a17:906:9750:b0:77b:6f08:986f with SMTP id o16-20020a170906975000b0077b6f08986fmr1210041ejy.416.1662809644338;
-        Sat, 10 Sep 2022 04:34:04 -0700 (PDT)
-Received: from [10.41.110.194] ([77.241.232.19])
-        by smtp.gmail.com with ESMTPSA id s1-20020a056402014100b0044e8d0682b2sm2014194edu.71.2022.09.10.04.34.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 10 Sep 2022 04:34:03 -0700 (PDT)
-Message-ID: <bcabe527-7940-8658-1728-28d64bd3cf80@kernel.dk>
-Date:   Sat, 10 Sep 2022 05:34:02 -0600
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=ylankE0Ntcy0fsfQcuqcC6SNPzukIG6CjHTnu9Jh3Qw=;
+        b=T3UZV1ohQsWwsE+ti+0hZ9O5UqYq4UyH+BnluWzmOuBeNDHtxpFmSM9zi/RlMVm9yn
+         6d3ozLrFolxohCiql59b2WDGuttoPhp64VcNVhEG6g7JWJNSxv81pCCmISdikjdB7IXu
+         Y1YsOin8dkqbUvZfDlIssMn415WYF1O1qsGxH/mIYUNNpniUppYfFDjKod87T1j28zF/
+         ZZ2PNiLuUSwetq+KrEM/Y7X8jjmw2FUZCZ9zOrUfe2gqkinTx6GSZIIgzvzPMFf2wq/P
+         W9CAkBMvfAParGDhwGHiKKp/vLcui48i6c0T2h3G+Q58pTZtmbkFxlXPLp4Cf7R/9uMb
+         DGyQ==
+X-Gm-Message-State: ACgBeo3sib1eBwMnaCCnnDglHqdnC+DH9kmuun8F1if4kZEjRZY1b47/
+        ZrzOLfsDcvqcWSDMSwQJxmU=
+X-Google-Smtp-Source: AA6agR7AEhYcjxJXjLPhbXBdf+MXAQzDChKDVE1xSxa0FIjE57ci1fPhV4Eba3gXLB1Lx6IGlLnRaA==
+X-Received: by 2002:a05:651c:2d0:b0:25e:6c94:59d5 with SMTP id f16-20020a05651c02d000b0025e6c9459d5mr5644442ljo.488.1662813345560;
+        Sat, 10 Sep 2022 05:35:45 -0700 (PDT)
+Received: from mobilestation ([95.79.140.178])
+        by smtp.gmail.com with ESMTPSA id a19-20020a056512201300b0048a757d1303sm243827lfb.217.2022.09.10.05.35.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Sep 2022 05:35:44 -0700 (PDT)
+Date:   Sat, 10 Sep 2022 15:35:42 +0300
+From:   Serge Semin <fancer.lancer@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        Revanth Rajashekar <revanth.rajashekar@intel.com>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] nvme-hwmon: Cache-line-align the NVME SMART
+ log-buffer
+Message-ID: <20220910123542.tzxg2blegw55z5fj@mobilestation>
+References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
+ <20220909191916.16013-2-Sergey.Semin@baikalelectronics.ru>
+ <20220910053045.GA23052@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH 1/5] mm: add PSI accounting around ->read_folio and
- ->readahead calls
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
-References: <20220910065058.3303831-1-hch@lst.de>
- <20220910065058.3303831-2-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220910065058.3303831-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220910053045.GA23052@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/10/22 12:50 AM, Christoph Hellwig wrote:
-> @@ -2390,8 +2392,13 @@ static int filemap_read_folio(struct file *file, filler_t filler,
->  	 * fails.
->  	 */
->  	folio_clear_error(folio);
-> +
->  	/* Start the actual read. The read will unlock the page. */
-> +	if (unlikely(workingset))
-> +		psi_memstall_enter(&pflags);
->  	error = filler(file, folio);
-> +	if (unlikely(workingset))
-> +		psi_memstall_leave(&pflags);
->  	if (error)
->  		return error;
+On Sat, Sep 10, 2022 at 07:30:45AM +0200, Christoph Hellwig wrote:
+> I think this will work, but unless we have to I'd generally prefer
+> to just split dta that is DMAed into into a separate allocation.
+> That is, do a separate kmalloc for the nvme_smart_log structure.
 
-I think this would read better as:
+Well, both approaches will solve the denoted problem. I am just
+wondering why do you think that the kmalloc-ed buffer is more
+preferable? IMO it is a bit less suitable since increases the memory
+granularity - two kmalloc's instead of one. Moreover it makes the code
+a bit more complex for the same reason of having two mallocs and two
+frees. Meanwhile using the ____cacheline_aligned qualifier to prevent
+the noncoherent DMA problem is a standard approach.
 
-  	/* Start the actual read. The read will unlock the page. */
-	if (unlikely(workingset)) {
-		psi_memstall_enter(&pflags);
-		error = filler(file, folio);
-		psi_memstall_leave(&pflags);
-	} else {
-		error = filler(file, folio);
-	}
-  	if (error)
-  		return error;
+What would be the best solution if we had a qualifier like this:
+#ifdef CONFIG_DMA_NONCOHERENT
+#define ____dma_buffer ____cacheline_aligned
+#else
+#define ____dma_buffer
+#endif
+and used it instead of the direct ____cacheline_aligned utilization.
 
--- 
-Jens Axboe
+-Sergey
+
+> 
+> Guenter, is this ok with you?
