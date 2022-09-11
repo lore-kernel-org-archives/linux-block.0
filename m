@@ -2,72 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FCD7C6FA82
-	for <linux-block@archiver.kernel.org>; Sat, 10 Sep 2022 18:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D76C9C54EE9
+	for <linux-block@archiver.kernel.org>; Sun, 11 Sep 2022 16:29:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiIJS1B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 10 Sep 2022 14:27:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59602 "EHLO
+        id S229492AbiIKQ3C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Sep 2022 12:29:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiIJS1A (ORCPT
+        with ESMTP id S229441AbiIKQ3B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 10 Sep 2022 14:27:00 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7108C41D27;
-        Sat, 10 Sep 2022 11:26:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HzbaF/w2gu/Kp3W2KzeU3D5B1emioVuvk2oKXIlN0co=; b=hm0jlUjj5UPTktuEEfUHRHbtOL
-        h5E5opUGiLigsiUuo00mrPc/A4xSEK8VCx+Yx+3vbGl8ODfANdUXogLnu7f5zh29M33K+0qsQ/es7
-        0xTIeKa1vqEKoFetp/WoYtCPF63JIlhvk76Rm/3uAW6SG6gLhu1HtMF1559ykvfauNUIOqkPbJCfj
-        SIoFYzlt82k3xuVcsZtHS43gi4yUwtW69NwP0xZHAbA5vyoTXRt5vhNkTe5yeDQjOohy7QJmhScaI
-        aDGg00fQdrkBdudzVC5CiEHwVo3HXgsI09f4qFaQknUW4ND6l2DYCkrfLZYuIEhUDs75cOwkuqbmG
-        2b9Uyy1w==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oX5Bb-00EFd2-Lx; Sat, 10 Sep 2022 18:26:35 +0000
-Date:   Sat, 10 Sep 2022 19:26:35 +0100
-From:   Matthew Wilcox <willy@infradead.org>
+        Sun, 11 Sep 2022 12:29:01 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB9462E686;
+        Sun, 11 Sep 2022 09:28:58 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 9so7013348ljr.2;
+        Sun, 11 Sep 2022 09:28:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=7SSYiogdPwy5AgzgPl2zf3eDXRMfkA0ZYbT+p4MLVEs=;
+        b=YfbaiPM2c0SQ88+hOjCzIUtdHE9Ib6zAL1KQnXLN/8bjSuRNK9YpRj6KcNxGljUbwj
+         mWrbVhBr1Evz8nwZxWcOFR/bEpT2ZS+WnX5olxlxfvBq3iGI01zYlrg2/+XSJd+J79EB
+         3TdsWh5qY3c7RkJF82zYUuatGsnc4Aczj523odKFdkpGBElAalXWuWVxk670UpBOSMpo
+         A7BtpbXAVhgjCu/pDicsPhmcn5J+k66yykPXWcz8ciEM2D1sBzopAfwoFKpcRVkIbT4r
+         MVpyYm0bQ2A4b6sh5d2tBcnlyuXBSHmIxSWg0iFdgs6UIJaYYHRPzT/Zzo9oKhQ2796Y
+         m+vA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=7SSYiogdPwy5AgzgPl2zf3eDXRMfkA0ZYbT+p4MLVEs=;
+        b=M8DOoSs8wrdr22n4p0BW2zi/99U+8pZH5xHBubpKOe6HJkeaJdHVmvGg4NY83dJZTb
+         B0coWa3zB8ssI2LCcs8U2cAxtfEdchLxoL+LszE0yGc+Xr9oJkPya9YF6j64YJjtg4Dz
+         XMFZaLBOtI/bdWbm4zfS4SGpB9QPBRzfcwON8iNVRwc5dzV10LkQyEWCWUF0XDBtD4tx
+         2jVj2Sg2GckjLHY9h1bp43PychWYoQrY7PlDIXhKdCw9WsEXEPUNRBWf0SGVEBu5us/B
+         ey/3s0Kgsn966BY2JsMpixYWfmel+EcsdWlb1wVU+6rMyl760N3PnWhEEF6Ij/u3RJ7H
+         DjXA==
+X-Gm-Message-State: ACgBeo2z4I4oxvfGXrACD+T4ShnDhWqDT81FQOCjALr5QBd+s51wlnQI
+        9QNmTwni4ECU7Vhv7X3gdy/H5+Uxu7AcwQ==
+X-Google-Smtp-Source: AA6agR4Zi+innVbGnXfYvPwkXVoV8gF6dyCBDra6YdCBc01e/sbcUiiqLusPVyrZiraGkKfsgQJcqw==
+X-Received: by 2002:a2e:890f:0:b0:26b:ddca:863e with SMTP id d15-20020a2e890f000000b0026bddca863emr4819481lji.30.1662913737349;
+        Sun, 11 Sep 2022 09:28:57 -0700 (PDT)
+Received: from mobilestation ([95.79.140.178])
+        by smtp.gmail.com with ESMTPSA id n26-20020a05651203fa00b0049876c2befasm453542lfq.289.2022.09.11.09.28.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Sep 2022 09:28:56 -0700 (PDT)
+Date:   Sun, 11 Sep 2022 19:28:54 +0300
+From:   Serge Semin <fancer.lancer@gmail.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
-Subject: Re: [PATCH 1/5] mm: add PSI accounting around ->read_folio and
- ->readahead calls
-Message-ID: <YxzW2wZzhaDvjS1c@casper.infradead.org>
-References: <20220910065058.3303831-1-hch@lst.de>
- <20220910065058.3303831-2-hch@lst.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        Revanth Rajashekar <revanth.rajashekar@intel.com>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Rafael Antognolli <Rafael.Antognolli@intel.com>,
+        Scott Bauer <scott.bauer@intel.com>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] block: sed-opal: Cache-line-align the cmd/resp
+ buffers
+Message-ID: <20220911162854.ivoeyzilpboplldw@mobilestation>
+References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
+ <20220909191916.16013-3-Sergey.Semin@baikalelectronics.ru>
+ <20220910053203.GB23052@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220910065058.3303831-2-hch@lst.de>
+In-Reply-To: <20220910053203.GB23052@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 10, 2022 at 08:50:54AM +0200, Christoph Hellwig wrote:
-> @@ -480,11 +487,14 @@ static inline int ra_alloc_folio(struct readahead_control *ractl, pgoff_t index,
->  	if (index == mark)
->  		folio_set_readahead(folio);
->  	err = filemap_add_folio(ractl->mapping, folio, index, gfp);
-> -	if (err)
-> +	if (err) {
->  		folio_put(folio);
-> -	else
-> -		ractl->_nr_pages += 1UL << order;
-> -	return err;
-> +		return err;
-> +	}
-> +
-> +	ractl->_nr_pages += 1UL << order;
-> +	ractl->_workingset = folio_test_workingset(folio);
+Hello Christoph
 
-I don't have time to look at this properly right now (about to catch a
-bus to the plane), but I think this should be |=, not =?
+On Sat, Sep 10, 2022 at 07:32:03AM +0200, Christoph Hellwig wrote:
+> On Fri, Sep 09, 2022 at 10:19:16PM +0300, Serge Semin wrote:
+> > In accordance with [1] the DMA-able memory buffers must be
+> > cacheline-aligned otherwise the cache writing-back and invalidation
+> > performed during the mapping may cause the adjacent data being lost. It's
+> > specifically required for the DMA-noncoherent platforms. Seeing the
+> > opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
+> > drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
+> > respectively we must make sure the passed buffers are cacheline-aligned to
+> > prevent the denoted problem.
+>
+ 
+> Same comment as for the previous one, this should work, but I think
+> separate allocations for the DMAable buffers would document the intent
+> much better.  Given that the opal initialization isn't a fast path
+> I don't think that the overhead should matter either.
 
+Thanks for the comment. I see your point. Let's hear the subsystem
+maintainers out for their opinion regarding the most suitable solution
+in this case. If they get to agree with you I'll resend the series
+with altered fixes.
+
+-Sergey
