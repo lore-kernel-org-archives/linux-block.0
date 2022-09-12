@@ -2,78 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF33C6FA86
-	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 00:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD395ECAAA1
+	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 05:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbiILAyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Sep 2022 20:54:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35530 "EHLO
+        id S229502AbiILFqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Sep 2022 01:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiILAyX (ORCPT
+        with ESMTP id S229565AbiILFqJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Sep 2022 20:54:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF6927CF5;
-        Sun, 11 Sep 2022 17:54:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4F007B80C68;
-        Mon, 12 Sep 2022 00:54:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F45C433D6;
-        Mon, 12 Sep 2022 00:54:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662944059;
-        bh=WDVtmnzEsaEU55TuvLxBRymxTuYaVUC9hgjRIe0bHt0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZoxnvrqSSY20wV65g7z6/rwjE02vykYR2j0xgsMFiTFS3wcFoXQgc7ddRv8HVfb3f
-         Kwr6X2fw2mafz42Qbx5YdEIQQnsRulU5GDprmsG01tejmSwgFvr4Jx1B47ZL2SiCcG
-         Eyn7qIRIzb0YqpOmcociLL5XyxfDzbh0zkynyL7M0TA1icIoVgkGtGXOVtBvjI1oIN
-         Iw8cbqxwN+hQUZueBTkmVgQV2RAaCxx5KdzDrA5EkbLK7xfUqnQisUx0ldrLzg3M1r
-         oaH/BIP5FZbUDfOMoORvOPkiaFMoOUQT1g/YGC/jN8fIFwm06y/Lc3y+CcDBzZnAwH
-         78iOtWwzF2Ivg==
-Date:   Sun, 11 Sep 2022 19:54:12 -0500
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v5 0/8] make statx() return DIO alignment information
-Message-ID: <Yx6DNIorJ86IWk5q@quark>
-References: <20220827065851.135710-1-ebiggers@kernel.org>
- <YxfE8zjqkT6Zn+Vn@quark>
+        Mon, 12 Sep 2022 01:46:09 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C781CB00
+        for <linux-block@vger.kernel.org>; Sun, 11 Sep 2022 22:46:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1662961563; x=1694497563;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XpPy4bTOe2MsRyBsKXzx6AeMXQTRzfO8zyfgvbfOt44=;
+  b=CQVpC+k5eB8ooGSNM9JReZ3U8JueT9zq4Kq/X4sx3ecM3d95lJTYfT2x
+   qrE2tV56zVu6fVpcRFzZkgUEUHE2Ucyotr2ZOF6s3UH9gMERFGJkomkKJ
+   NJuwokt1TBgluy3R/jRQIZpM1hQ0dvxgF3TUWaoc7YvkrZMjTx16l7LK3
+   kDM3pvkxQrYWTOjlqVqqb9eEC0P47+MlnlAKXfEq562bnfvdwGqvYNQKH
+   1F42Fcw5HJt+Ou60cSuD90uRipCSLDAx4JiQcxP2oZK8uc/C8AHZHboPO
+   b8t9BxLhzHRDCpjdHoQMEAHCOHw/+JQra53jmL1TkJBl4EkC/xsUiUef2
+   g==;
+X-IronPort-AV: E=Sophos;i="5.93,308,1654531200"; 
+   d="scan'208";a="209505681"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Sep 2022 13:46:02 +0800
+IronPort-SDR: PZ6OT9NER5BBX0qWjzHpDFPgCTc+6IVrcQ6Xx5FNur2/1sqYW0Y9GOuz1n32yUn7X9nkb87ECh
+ OWyIYHdtZqYcKvltravydc2AKvpH2r4uD+RmsNPy2YNU4JLWjoYiWs3Fy2szDzlfdKdju9Kpd1
+ NdPkjYHTsjm69pQdReIFsUS7wt1Gb+OyvO2fEseiok48S/BLAaxBlR1aULbmgDuIdZERzrBSa8
+ +ZUAKGYPnahKdkan2qURk7KVEPcigpGHBVDuZG/eZVevUgrsx8eb36DhNra7mDacijUHaAbyAv
+ UPoMoN3Oy9JnFXMYvsAepU6D
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2022 22:06:18 -0700
+IronPort-SDR: 0LP4e5T152G4LPzN7rTcREWumfNt9Q7/aqLSLSMY1IBj0fCp46pZ3OMdJeHaeVYEEU8P4t1h1G
+ 3nim3UkOVQdYy19chZhvN6Sh9SMEFas/sw2AqvKPTbhM2p9N8/4lsK3j/QVk1z+26NRr+pFcrX
+ strV4TjX/YUo38A6UjzbLiIJ9Lb0S7AO4/1BhVgl20u+lARbazxRld/KUl1chIaDUwoK2o//d7
+ E66Lh6Im5gOBPAEfL7vob63FaGoisFyOx2JUIoqI/uyvoEhEBr1XhjMa4od/tKkyF5hnEzIRqt
+ BRo=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
+  by uls-op-cesaip01.wdc.com with ESMTP; 11 Sep 2022 22:46:02 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] common/rc: support compressed module files
+Date:   Mon, 12 Sep 2022 14:46:00 +0900
+Message-Id: <20220912054600.310858-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YxfE8zjqkT6Zn+Vn@quark>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 03:08:51PM -0700, Eric Biggers wrote:
-> On Fri, Aug 26, 2022 at 11:58:43PM -0700, Eric Biggers wrote:
-> > This patchset makes the statx() system call return direct I/O (DIO)
-> > alignment information.  This allows userspace to easily determine
-> > whether a file supports DIO, and if so with what alignment restrictions.
-> 
-> Al, any thoughts on this patchset, and do you plan to apply it for 6.1?  Ideally
-> this would go through the VFS tree.  If not, I suppose I'll need to have it
-> added to linux-next and send the pull request myself.
-> 
-> - Eric
+The commit 8017ea524367 ("common/rc: ensure modules are loadable in
+_have_modules()") introduced a helper function _module_file_exists()
+which assumes module files have extension ".ko". However, the assumption
+is not true when module files are compressed. In this case, extensions
+of modules files have abbreviations of compression algorithm such as
+".ko.xz",".ko.gz" or ".ko.zstd". This results in module file existence
+check failure and unexpected test skips.
 
-Seems that it's up to me, then.
+Fix this by changing module file search condition to cover module file
+extensions with the compression algorithm abbreviations.
 
-Stephen, can you add my git branch for this patchset to linux-next?
+Fixes: 8017ea524367 ("common/rc: ensure modules are loadable in _have_modules()")
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Link: https://github.com/osandov/blktests/issues/101
+---
+ common/rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-URL: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-Branch: statx-dioalign
+diff --git a/common/rc b/common/rc
+index a764b57..e490041 100644
+--- a/common/rc
++++ b/common/rc
+@@ -36,8 +36,8 @@ _module_file_exists()
+ 	local -i count
+ 
+ 	libpath="/lib/modules/$(uname -r)/kernel"
+-	count=$(find "$libpath" -name "$ko_underscore" -o \
+-		     -name "$ko_hyphen" | wc -l)
++	count=$(find "$libpath" -name "$ko_underscore*" -o \
++		     -name "$ko_hyphen*" | wc -l)
+ 	((count)) && return 0
+ 	return 1
+ }
+-- 
+2.37.1
 
-This is targeting the 6.1 merge window with a pull request to Linus.
-
-Thanks!
-
-- Eric
