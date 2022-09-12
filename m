@@ -2,98 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD395ECAAA1
-	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 05:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6839EC6FA82
+	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 06:11:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbiILFqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Sep 2022 01:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45248 "EHLO
+        id S229496AbiILGLA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Sep 2022 02:11:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbiILFqJ (ORCPT
+        with ESMTP id S229447AbiILGK6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Sep 2022 01:46:09 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C781CB00
-        for <linux-block@vger.kernel.org>; Sun, 11 Sep 2022 22:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1662961563; x=1694497563;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XpPy4bTOe2MsRyBsKXzx6AeMXQTRzfO8zyfgvbfOt44=;
-  b=CQVpC+k5eB8ooGSNM9JReZ3U8JueT9zq4Kq/X4sx3ecM3d95lJTYfT2x
-   qrE2tV56zVu6fVpcRFzZkgUEUHE2Ucyotr2ZOF6s3UH9gMERFGJkomkKJ
-   NJuwokt1TBgluy3R/jRQIZpM1hQ0dvxgF3TUWaoc7YvkrZMjTx16l7LK3
-   kDM3pvkxQrYWTOjlqVqqb9eEC0P47+MlnlAKXfEq562bnfvdwGqvYNQKH
-   1F42Fcw5HJt+Ou60cSuD90uRipCSLDAx4JiQcxP2oZK8uc/C8AHZHboPO
-   b8t9BxLhzHRDCpjdHoQMEAHCOHw/+JQra53jmL1TkJBl4EkC/xsUiUef2
-   g==;
-X-IronPort-AV: E=Sophos;i="5.93,308,1654531200"; 
-   d="scan'208";a="209505681"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Sep 2022 13:46:02 +0800
-IronPort-SDR: PZ6OT9NER5BBX0qWjzHpDFPgCTc+6IVrcQ6Xx5FNur2/1sqYW0Y9GOuz1n32yUn7X9nkb87ECh
- OWyIYHdtZqYcKvltravydc2AKvpH2r4uD+RmsNPy2YNU4JLWjoYiWs3Fy2szDzlfdKdju9Kpd1
- NdPkjYHTsjm69pQdReIFsUS7wt1Gb+OyvO2fEseiok48S/BLAaxBlR1aULbmgDuIdZERzrBSa8
- +ZUAKGYPnahKdkan2qURk7KVEPcigpGHBVDuZG/eZVevUgrsx8eb36DhNra7mDacijUHaAbyAv
- UPoMoN3Oy9JnFXMYvsAepU6D
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2022 22:06:18 -0700
-IronPort-SDR: 0LP4e5T152G4LPzN7rTcREWumfNt9Q7/aqLSLSMY1IBj0fCp46pZ3OMdJeHaeVYEEU8P4t1h1G
- 3nim3UkOVQdYy19chZhvN6Sh9SMEFas/sw2AqvKPTbhM2p9N8/4lsK3j/QVk1z+26NRr+pFcrX
- strV4TjX/YUo38A6UjzbLiIJ9Lb0S7AO4/1BhVgl20u+lARbazxRld/KUl1chIaDUwoK2o//d7
- E66Lh6Im5gOBPAEfL7vob63FaGoisFyOx2JUIoqI/uyvoEhEBr1XhjMa4od/tKkyF5hnEzIRqt
- BRo=
-WDCIronportException: Internal
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
-  by uls-op-cesaip01.wdc.com with ESMTP; 11 Sep 2022 22:46:02 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] common/rc: support compressed module files
-Date:   Mon, 12 Sep 2022 14:46:00 +0900
-Message-Id: <20220912054600.310858-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.37.1
+        Mon, 12 Sep 2022 02:10:58 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B720A1EC43
+        for <linux-block@vger.kernel.org>; Sun, 11 Sep 2022 23:10:56 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id o5so2352786wms.1
+        for <linux-block@vger.kernel.org>; Sun, 11 Sep 2022 23:10:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=B1Edghr8vqH9ZPQm+sb2jTxjtkq1RNTuah3Qw0uGLlI=;
+        b=2XpJsGTpzXgMcAI65G9JZbFYeo6DFsrivCa4Ka2orphnxlAaiCjVD7f4emRkLi92KF
+         4OJPIVyOpzRTvW+RFOvAMyGdgquuek2oiof46iSAxdQrU3CqjzSimSDPbzHxIAQD5Rg2
+         NaANYLpPPYoQC5GinQ7tSXLOgIQ1rLoUz20KW3TYf0055PcqxNAWqZWaQ+9OW14hEvJM
+         m5zVnayNUfN54alKMQh36NDyK+81i8cktR1wFACOlagloIIRQ17Pox8K0nnVpZzspEpy
+         YyU3aCCbp37PE9W1nURiBOthxhCNF6m5JITz5nXnOC814WEQN3YSEuPvYstdeE1HHHE/
+         D7oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=B1Edghr8vqH9ZPQm+sb2jTxjtkq1RNTuah3Qw0uGLlI=;
+        b=lo5DpAid9A+Hx3AYf5Za4hlYZgR4K7SFPxoICVc+ykjmRw84aL0hOd3bR6UFQMGodd
+         N8bxv7/7fE94IJpmGNQYoje5NuZW0b5Zj3Q/U8u5lmXjyqQI5ZfKEL9wSHcb/E8qRy9Z
+         5YWoyRwOqunk7J/kic4Ic32dcmXSWFXp3k73qqlK69Ev0yDQwdM2hBd057oo3EjrngFl
+         HU4pfNvlSnd81gdOOf5G4BPUK/6BR99s6A5UKsebvBNYyOu2A0VRzTs2DoUtyDHgAztw
+         uEV6ymuiQ/hm50MOPBMBlicCTbizGcAxu5YCDBPgL5tBbnR/viel5NPyWPB70FqdyD2Z
+         Q54A==
+X-Gm-Message-State: ACgBeo2HPDWNzEXDAhebJ0H9UrDT2baZdYbB6nXnG/WFQdNPoy0gDUHB
+        Irgjka8VM0u4soBRBbOU39UfrQN/7FIjb5Yq/7I=
+X-Google-Smtp-Source: AA6agR585pAbkxCoj974vst4SHbj5HjX6jUGhX07lu9vUDq7qBhzI6BSiRCs+F99evmB9PIpDfMOoQ==
+X-Received: by 2002:a05:600c:1e8b:b0:3a6:1a09:2a89 with SMTP id be11-20020a05600c1e8b00b003a61a092a89mr12443613wmb.108.1662963054858;
+        Sun, 11 Sep 2022 23:10:54 -0700 (PDT)
+Received: from [127.0.0.1] ([185.122.133.20])
+        by smtp.gmail.com with ESMTPSA id h14-20020a5d430e000000b00228dcf471e8sm6276062wrq.56.2022.09.11.23.10.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 11 Sep 2022 23:10:54 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, Keith Busch <kbusch@fb.com>
+Cc:     Keith Busch <kbusch@kernel.org>
+In-Reply-To: <20220909184022.1709476-1-kbusch@fb.com>
+References: <20220909184022.1709476-1-kbusch@fb.com>
+Subject: Re: [PATCHv5] sbitmap: fix batched wait_cnt accounting
+Message-Id: <166296305412.55873.17622965267596423832.b4-ty@kernel.dk>
+Date:   Mon, 12 Sep 2022 00:10:54 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.10.0-dev-65ba7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The commit 8017ea524367 ("common/rc: ensure modules are loadable in
-_have_modules()") introduced a helper function _module_file_exists()
-which assumes module files have extension ".ko". However, the assumption
-is not true when module files are compressed. In this case, extensions
-of modules files have abbreviations of compression algorithm such as
-".ko.xz",".ko.gz" or ".ko.zstd". This results in module file existence
-check failure and unexpected test skips.
+On Fri, 9 Sep 2022 11:40:22 -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Batched completions can clear multiple bits, but we're only decrementing
+> the wait_cnt by one each time. This can cause waiters to never be woken,
+> stalling IO. Use the batched count instead.
+> 
+> 
+> [...]
 
-Fix this by changing module file search condition to cover module file
-extensions with the compression algorithm abbreviations.
+Applied, thanks!
 
-Fixes: 8017ea524367 ("common/rc: ensure modules are loadable in _have_modules()")
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Link: https://github.com/osandov/blktests/issues/101
----
- common/rc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[1/1] sbitmap: fix batched wait_cnt accounting
+      commit: 4acb83417cadfdcbe64215f9d0ddcf3132af808e
 
-diff --git a/common/rc b/common/rc
-index a764b57..e490041 100644
---- a/common/rc
-+++ b/common/rc
-@@ -36,8 +36,8 @@ _module_file_exists()
- 	local -i count
- 
- 	libpath="/lib/modules/$(uname -r)/kernel"
--	count=$(find "$libpath" -name "$ko_underscore" -o \
--		     -name "$ko_hyphen" | wc -l)
-+	count=$(find "$libpath" -name "$ko_underscore*" -o \
-+		     -name "$ko_hyphen*" | wc -l)
- 	((count)) && return 0
- 	return 1
- }
+Best regards,
 -- 
-2.37.1
+Jens Axboe
+
 
