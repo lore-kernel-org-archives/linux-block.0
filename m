@@ -2,165 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66BFDECAAD5
-	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 15:33:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA30EC6FA83
+	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 16:53:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230162AbiILPdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Sep 2022 11:33:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
+        id S229703AbiILQxn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Sep 2022 12:53:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbiILPdy (ORCPT
+        with ESMTP id S229630AbiILQxl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Sep 2022 11:33:54 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 401092AC48;
-        Mon, 12 Sep 2022 08:33:53 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id E8E1B203C4;
-        Mon, 12 Sep 2022 15:33:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1662996831;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eRpjiBTXPA34slJCEVvqta+I3LTtT85gBwO0gzk+thc=;
-        b=VWyqSWKbD8LfsNkEZC6EfWdMhvQPVUdRjk4fuYRSvzsQEKrce6OwrVOAdkzMBS+wiq2JY5
-        akEn052RhfK8DuSDzFpXLpel3PV/i3bgfauRV9s3y5tv1gP4xqAGKyh0U3fHMHaJXaMA0+
-        qSbhiUWWNwPX7E4t4wrz8TraWqGJA7A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1662996831;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eRpjiBTXPA34slJCEVvqta+I3LTtT85gBwO0gzk+thc=;
-        b=hwTtR/8JTQzhvO35pkm4yWhMWS+i/ViXhcrAXDNSu6OFhBd2TME2kaufjoQXSL7nbHj4M7
-        lJhly5+/lT1fk1AA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7D94F139E0;
-        Mon, 12 Sep 2022 15:33:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id MKGgHV9RH2OaYgAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Mon, 12 Sep 2022 15:33:51 +0000
-Date:   Mon, 12 Sep 2022 17:28:25 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
-Subject: Re: [PATCH 3/5] btrfs: add manual PSI accounting for compressed reads
-Message-ID: <20220912152825.GH32411@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20220910065058.3303831-1-hch@lst.de>
- <20220910065058.3303831-4-hch@lst.de>
+        Mon, 12 Sep 2022 12:53:41 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E92B21E3F
+        for <linux-block@vger.kernel.org>; Mon, 12 Sep 2022 09:53:41 -0700 (PDT)
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+        by m0089730.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 28CAVGk0016638
+        for <linux-block@vger.kernel.org>; Mon, 12 Sep 2022 09:53:40 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=facebook; bh=6Kw/BDvffn4PftytYruFc9QNt6h0V44NwW5Z6uqGXk0=;
+ b=nV94FpkPrCmCHgu0Lc014aNPvdsjlsOYKTnVrXwZahQo+gek+olVwj45uPzBeLkXw8lh
+ fz/oNT6tkenrpcNKObJfHshS6tUOqgUrLEc21rAxACwRKnmf5aNHbmhbIYJ8ng+omRwq
+ 1sJZKPCY2bJaRpQae1LdSNJg9JUMkPJB+RY= 
+Received: from maileast.thefacebook.com ([163.114.130.16])
+        by m0089730.ppops.net (PPS) with ESMTPS id 3jgp39bjet-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Mon, 12 Sep 2022 09:53:40 -0700
+Received: from twshared13579.04.prn5.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::6) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 12 Sep 2022 09:53:39 -0700
+Received: by dev1180.prn1.facebook.com (Postfix, from userid 425415)
+        id 46DBB206F89C; Mon, 12 Sep 2022 09:53:31 -0700 (PDT)
+From:   Stefan Roesch <shr@fb.com>
+To:     <kernel-team@fb.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>
+CC:     <shr@fb.com>, <io-uring@vger.kernel.org>
+Subject: [PATCH v1] block: blk_queue_enter() / __bio_queue_enter() must return -EAGAIN for nowait
+Date:   Mon, 12 Sep 2022 09:53:25 -0700
+Message-ID: <20220912165325.2858746-1-shr@fb.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220910065058.3303831-4-hch@lst.de>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: uj_q66OpZt2e0EUb5vMcAwOl-ybMUzf1
+X-Proofpoint-ORIG-GUID: uj_q66OpZt2e0EUb5vMcAwOl-ybMUzf1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-12_12,2022-09-12_02,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 10, 2022 at 08:50:56AM +0200, Christoph Hellwig wrote:
-> btrfs compressed reads try to always read the entire compressed chunk,
-> even if only a subset is requested.  Currently this is covered by the
-> magic PSI accounting underneath submit_bio, but that is about to go
-> away. Instead add manual psi_memstall_{enter,leave} annotations.
-> 
-> Note that for readahead this really should be using readahead_expand,
-> but the additionals reads are also done for plain ->read_folio where
-> readahead_expand can't work, so this overall logic is left as-is for
-> now.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Today blk_queue_enter() and __bio_queue_enter() return -EBUSY for the
+nowait code path. This is not correct: they should return -EAGAIN
+instead.
 
-With some small fixups,
+This problem was detected by fio. The following command exposed the
+above problem:
 
-Acked-by: David Sterba <dsterba@suse.com>
+t/io_uring -p0 -d128 -b4096 -s32 -c32 -F1 -B0 -R0 -X1 -n24 -P1 -u1 -O0 /d=
+ev/ng0n1
 
->  fs/btrfs/compression.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-> index e84d22c5c6a83..f7889a00e0055 100644
-> --- a/fs/btrfs/compression.c
-> +++ b/fs/btrfs/compression.c
-> @@ -15,6 +15,7 @@
->  #include <linux/string.h>
->  #include <linux/backing-dev.h>
->  #include <linux/writeback.h>
-> +#include <linux/psi.h>
->  #include <linux/slab.h>
->  #include <linux/sched/mm.h>
->  #include <linux/log2.h>
-> @@ -519,7 +520,8 @@ static u64 bio_end_offset(struct bio *bio)
->   */
->  static noinline int add_ra_bio_pages(struct inode *inode,
->  				     u64 compressed_end,
-> -				     struct compressed_bio *cb)
-> +				     struct compressed_bio *cb,
-> +				     unsigned long *pflags)
->  {
->  	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
->  	unsigned long end_index;
-> @@ -588,6 +590,9 @@ static noinline int add_ra_bio_pages(struct inode *inode,
->  			continue;
->  		}
->  
-> +		if (unlikely(PageWorkingset(page)))
+By applying the patch, the retry case is handled correctly in the slow
+path.
 
-Please drop the 'unlikely', in this case it does not seem to make much
-sense.
+Signed-off-by: Stefan Roesch <shr@fb.com>
+---
+ block/blk-core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> +			psi_memstall_enter(pflags);
-> +
->  		ret = set_page_extent_mapped(page);
->  		if (ret < 0) {
->  			unlock_page(page);
-> @@ -674,6 +679,8 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
->  	u64 em_len;
->  	u64 em_start;
->  	struct extent_map *em;
-> +	/* initialize to 1 to make skip psi_memstall_leave unless needed */
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a0d1104c5590..651057c4146b 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -295,7 +295,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_r=
+eq_flags_t flags)
+=20
+ 	while (!blk_try_enter_queue(q, pm)) {
+ 		if (flags & BLK_MQ_REQ_NOWAIT)
+-			return -EBUSY;
++			return -EAGAIN;
+=20
+ 		/*
+ 		 * read pair of barrier in blk_freeze_queue_start(), we need to
+@@ -325,7 +325,7 @@ int __bio_queue_enter(struct request_queue *q, struct=
+ bio *bio)
+ 			if (test_bit(GD_DEAD, &disk->state))
+ 				goto dead;
+ 			bio_wouldblock_error(bio);
+-			return -EBUSY;
++			return -EAGAIN;
+ 		}
+=20
+ 		/*
 
-First letter in comment should be upper case unless it's an identifier.
+base-commit: 80e78fcce86de0288793a0ef0f6acf37656ee4cf
+--=20
+2.30.2
 
-> +	unsigned long pflags = 1;
->  	blk_status_t ret;
->  	int ret2;
->  	int i;
-> @@ -729,7 +736,7 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
->  		goto fail;
->  	}
->  
-> -	add_ra_bio_pages(inode, em_start + em_len, cb);
-> +	add_ra_bio_pages(inode, em_start + em_len, cb, &pflags);
->  
->  	/* include any pages we added in add_ra-bio_pages */
->  	cb->len = bio->bi_iter.bi_size;
-> @@ -810,6 +817,9 @@ void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
->  		}
->  	}
->  
-> +	if (!pflags)
-> +		psi_memstall_leave(&pflags);
-> +
->  	if (refcount_dec_and_test(&cb->pending_ios))
->  		finish_compressed_bio_read(cb);
->  	return;
-> -- 
-> 2.30.2
-> 
