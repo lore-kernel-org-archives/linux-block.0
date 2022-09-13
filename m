@@ -2,136 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F71C6FA82
-	for <linux-block@archiver.kernel.org>; Tue, 13 Sep 2022 02:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E2F2C54EE9
+	for <linux-block@archiver.kernel.org>; Tue, 13 Sep 2022 04:18:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbiIMCgO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Sep 2022 22:36:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49492 "EHLO
+        id S229533AbiIMESg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Sep 2022 00:18:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229888AbiIMCgN (ORCPT
+        with ESMTP id S229482AbiIMESd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Sep 2022 22:36:13 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACBFE014;
-        Mon, 12 Sep 2022 19:36:12 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.nyi.internal (Postfix) with ESMTP id AEB225C00EA;
-        Mon, 12 Sep 2022 22:36:09 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 12 Sep 2022 22:36:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dustymabe.com;
-         h=cc:cc:content-transfer-encoding:content-type:date:date:from
-        :from:in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm2; t=1663036569; x=
-        1663122969; bh=2Y0K8tT92lqyheJEd8IWcFQWbT2X7STc+YgZ6ML8spM=; b=3
-        YUd3jSFrLK17JWXtqIra2VXM3qDEjtNamQv1ZYnq+G6OAqANCDBasFwKTm0XU+x+
-        XNiQhLsFKT7tnWy8ROlqKru470SSPWd57P9U3b8PLP/yxEOZpY9J7XkAbaqZ6b0G
-        3i5jqGQA3HpwzKuYG0WwTqko0gOXks/fF0rOMkoTjYOoxSRG3iK1Ic+d1Te+KD8G
-        AC+N2I6QLT3pKwB/GcGayIzQFS0gG0bNHqh3TNNWYQJBDy9j3RaH9C03RyYtow/g
-        dTSp2lnru0Zim5in2Zk7PhnoysLPFA04Lds3bCOPScrRpZjBm4iTPjmtZIAh0cUx
-        fOBNnDxXwvxNq0ixzwTkg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1663036569; x=
-        1663122969; bh=2Y0K8tT92lqyheJEd8IWcFQWbT2X7STc+YgZ6ML8spM=; b=n
-        yhoiDHaknz2Qj7XFj6LsI8geC7LOVWzev4p78cjf8lW2ZbJr9QMfMSK/T+WwY8VT
-        kOPWOfYRORIe6cmz8P1ECQJrkZjzN3pUPTWKdeuy6QVZARULZkCzpDKXp0X4q6EU
-        1Es6T7rehmtl0UMPUWus02nP3zOIFyy8SjHj6YPGDNaS9ZPF+ujEtlvmRR9bszdV
-        e3yPZ0K6HSDfpDILJ8J+YKyukM/FhVtIgd8eGUdKVcpHxADB8WuFTm42yW71MFlh
-        +Jgz7jH7Ol7WxlG5xdvTNXkYmfX+AJrFDkKr8TVcTQ1eGdJ/YAEov4CaxAB/B0x0
-        +Qr7DJho1RGabxlPYRdSA==
-X-ME-Sender: <xms:mewfY4KeMWyjcHoFNp7Db885_4aSSQOpml98pwRPXE3Fz-HFCyQ3Ng>
-    <xme:mewfY4JlV8nAFK1_A8Ac5kQg2HyYxs3ZVF1ud8DR2urVnJjU0fJ_739MTZ-7hAwsy
-    pseBLsoEiqquAjAwHk>
-X-ME-Received: <xmr:mewfY4tcoYaCIF_k-NB0fM1YkqGxTYuVmqOx7_NkNJ7ZcxHV-_J-z5y5T6ptnQNS5JAf>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedufedgiedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtfeejnecuhfhrohhmpeffuhhs
-    thihucforggsvgcuoeguuhhsthihseguuhhsthihmhgrsggvrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeeiffffuefgtdfhgfekfedtkedtteefgfevueelueefueegvdehteeulefg
-    ueekkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    guuhhsthihseguuhhsthihmhgrsggvrdgtohhm
-X-ME-Proxy: <xmx:mewfY1a14GqtKEQVx1pXjerM_1H7CkWj3Vo5ktAuDTSGGBKF5x5rAQ>
-    <xmx:mewfY_Y9JGDst9iEnZEGqosj4zZQG6cxOFhG8Cf2k1e__LldSIohrA>
-    <xmx:mewfYxACyHIYIgEgCkLso0Pxn87mNRBB7ddhfFXFYs63TGhQTD1JWA>
-    <xmx:mewfY-UVfl77ECw7ihqmcz-4EpY5e6yRTGwHilqaEG7QiHH_KxvkPA>
-Feedback-ID: i13394474:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 12 Sep 2022 22:36:08 -0400 (EDT)
-Message-ID: <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
-Date:   Mon, 12 Sep 2022 22:36:08 -0400
+        Tue, 13 Sep 2022 00:18:33 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 984814F65F;
+        Mon, 12 Sep 2022 21:18:31 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VPccy5z_1663042704;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VPccy5z_1663042704)
+          by smtp.aliyun-inc.com;
+          Tue, 13 Sep 2022 12:18:29 +0800
+From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+To:     ming.lei@redhat.com
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V3 0/7] ublk_drv: add USER_RECOVERY support
+Date:   Tue, 13 Sep 2022 12:17:00 +0800
+Message-Id: <20220913041707.197334-1-ZiyangZhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
- <YxBZ4BBjxvAkvI2A@T590> <20220907073324.GB23826@lst.de>
- <Yxr4SD4d0rZ9TZik@T590> <20220912071618.GA4971@lst.de>
- <Yx/jLTknQm9VeHi4@T590>
-From:   Dusty Mabe <dusty@dustymabe.com>
-In-Reply-To: <Yx/jLTknQm9VeHi4@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+ublk_drv is a driver simply passes all blk-mq rqs to userspace
+target(such as ublksrv[1]). For each ublk queue, there is one
+ubq_daemon(pthread). All ubq_daemons share the same process
+which opens /dev/ublkcX. The ubq_daemon code infinitely loops on
+io_uring_enter() to send/receive io_uring cmds which pass
+information of blk-mq rqs.
 
+Since the real IO handler(the process/thread opening /dev/ublkcX) is
+in userspace, it could crash if:
+(1) the user kills -9 it because of IO hang on backend, system
+    reboot, etc...
+(2) the process/thread catches a exception(segfault, divisor error,
+oom...) Therefore, the kernel driver has to deal with a dying
+ubq_daemon or the process.
 
-On 9/12/22 21:55, Ming Lei wrote:
-> On Mon, Sep 12, 2022 at 09:16:18AM +0200, Christoph Hellwig wrote:
->> On Fri, Sep 09, 2022 at 04:24:40PM +0800, Ming Lei wrote:
->>> On Wed, Sep 07, 2022 at 09:33:24AM +0200, Christoph Hellwig wrote:
->>>> On Thu, Sep 01, 2022 at 03:06:08PM +0800, Ming Lei wrote:
->>>>> It is a bit hard to associate the above commit with reported issue.
->>>>
->>>> So the messages clearly are about something trying to open a device
->>>> that went away at the block layer, but somehow does not get removed
->>>> in time by udev (which seems to be a userspace bug in CoreOS).  But
->>>> even with that we really should not hang.
->>>
->>> Xiao Ni provides one script[1] which can reproduce the issue more or less.
->>
->> I've run the reproduced 10000 times on current mainline, and while
->> it prints one of the autoloading messages per run, I've not actually
->> seen any kind of hang.
-> 
-> I can't reproduce the hang too.
+Now, if one ubq_daemon(pthread) or the process crashes, ublk_drv
+must abort the dying ubq, stop the device and release everything.
+This is not a good choice in practice because users do not expect
+aborted requests, I/O errors and a released device. They may want
+a recovery machenism so that no requests are aborted and no I/O
+error occurs. Anyway, users just want everything works as usual.
 
-I obviously can reproduce the issue with the test in our Fedora CoreOS
-test suite. It's part of a framework (i.e. it's not simple some script
-you can run) but it is very reproducible so one can add some instrumentation
-to the kernel and feed it through a build/test cycle to see different
-results or logs.
+This patchset implements USER_RECOVERY support. If the process
+or any ubq_daemon(pthread) crashes(exits accidentally), we allow
+user to provide new process and ubq_daemons.
 
-I'm willing to share this with other people (maybe a screen share or
-some written down instructions) if anyone would be interested.
+Note: The responsibility of recovery belongs to the user who opens
+/dev/ublkcX. After a crash, the kernel driver only switch the
+device's state to be ready for recovery(START_USER_RECOVERY) or
+termination(STOP_DEV). The state is defined as UBLK_S_DEV_QUIESCED.
+This patchset does not provide how to detect such a crash in userspace.
+The user has may ways to do so. For example, user may:
+(1) send GET_DEV_INFO on specific dev_id and check if its state is
+    UBLK_S_DEV_QUIESCED.
+(2) 'ps' on ublksrv_pid.
 
+Recovery feature is quite useful for real products. In detail,
+we support this scenario:
+(1) The /dev/ublkc0 is opened by process 0.
+(2) Fio is running on /dev/ublkb0 exposed by ublk_drv and all
+    rqs are handled by process 0.
+(3) Process 0 suddenly crashes(e.g. segfault);
+(4) Fio is still running and submit IOs(but these IOs cannot
+    be dispatched now)
+(5) User starts process 1 and attach it to /dev/ublkc0
+(6) All rqs are handled by process 1 now and IOs can be
+    completed now.
 
-> 
-> What I meant is that new raid disk can be added by mdadm after stopping
-> the imsm container and raid disk with the autoloading messages printed,
-> I understand this behavior isn't correct, but I am not familiar with
-> raid enough.
-> 
-> It might be related with the delay deleting gendisk from wq & md kobj
-> release handler.
-> 
-> During reboot, if mdadm does this stupid thing without stopping, the hang
-> could be caused.
-> 
-> I think the root cause is that why mdadm tries to open/add new raid bdev
-> crazily during reboot.
-> 
-  
-Dusty
+Note: The backend must tolerate double-write because we re-issue
+a rq sent to the old process 0 before.
+
+We provide a sample script here to simulate the above steps:
+
+***************************script***************************
+LOOPS=10
+
+__ublk_get_pid() {
+	pid=`./ublk list -n 0 | grep "pid" | awk '{print $7}'`
+	echo $pid
+}
+
+ublk_recover_kill()
+{
+	for CNT in `seq $LOOPS`; do
+		dmesg -C
+                pid=`__ublk_get_pid`
+                echo -e "*** kill $pid now ***"
+		kill -9 $pid
+		sleep 6
+                echo -e "*** recover now ***"
+                ./ublk recover -n 0
+		sleep 6
+	done
+}
+
+ublk_test()
+{
+        echo -e "*** add ublk device ***"
+        ./ublk add -t null -d 4 -i 1
+        sleep 2
+        echo -e "*** start fio ***"
+        fio --bs=4k \
+            --filename=/dev/ublkb0 \
+            --runtime=140s \
+            --rw=read &
+        sleep 4
+        ublk_recover_kill
+        wait
+        echo -e "*** delete ublk device ***"
+        ./ublk del -n 0
+}
+
+for CNT in `seq 4`; do
+        modprobe -rv ublk_drv
+        modprobe ublk_drv
+        echo -e "************ round $CNT ************"
+        ublk_test
+        sleep 5
+done
+***************************script***************************
+
+You may run it with our modified ublksrv[2] which supports
+recovery feature. No I/O error occurs and you can verify it
+by typing
+    $ perf-tools/bin/tpoint block:block_rq_error
+
+The basic idea of USER_RECOVERY is quite straightfoward:
+(1) quiesce ublk queues and requeue/abort rqs.
+(2) release/free everything belongs to the dying process.
+    Note: Since ublk_drv does save information about user process,
+    this work is important because we don't expect any resource
+    lekage. Particularly, ioucmds from the dying ubq_daemons
+    need to be completed(freed).
+(3) allow new ubq_daemons issue FETCH_REQ.
+    Note: ublk_ch_uring_cmd() checks some status and flags. We
+    have to set them to a correct value.
+
+Here is steps to reocver:
+(1) monitor_work finds one dying ubq_daemon, and it should
+    schedule quiesce_work.
+(2) quiesce_work must (a)quiesce request queue to ban any incoming
+    ublk_queue_rq(), (b)requeue/abort inflightrqs, (c)complete old
+	ioucmds. Then the ublk device is ready for recovery or stop.
+(3) The user sends START_USER_RECOVERY ctrl-cmd to /dev/ublk-control
+    with a dev_id X (such as 3 for /dev/ublkc3).
+(4) Then ublk_drv should perpare for a new process to attach /dev/ublkcX.
+    All ublk_io structures are cleared and ubq_daemons are reset.
+(5) Then, user should start a new process and ubq_daemons(pthreads) and
+    send FETCH_REQ by io_uring_enter() to make all ubqs be ready. The
+    user must correctly setup queues, flags and so on(how to persist
+    user's information is not related to this patchset).
+(6) The user sends END_USER_RECOVERY ctrl-cmd to /dev/ublk-control with a
+    dev_id X.
+(7) After receiving END_USER_RECOVERY, ublk_drv waits for all ubq_daemons
+    getting ready. Then it unquiesces request queue and new rqs are
+    allowed.
+
+You should use ublksrv[2] and tests[3] provided by us. We add 3 additional
+tests to verify that recovery feature works. Our code will be PR-ed to
+Ming's repo soon.
+
+[1] https://github.com/ming1/ubdsrv
+[2] https://github.com/old-memories/ubdsrv/tree/recovery-v1
+[3] https://github.com/old-memories/ubdsrv/tree/recovery-v1/tests/generic
+
+Since V2:
+(1) run ublk_quiesce_dev() in a standalone work.
+(2) do not run monitor_work after START_USER_RECOVERY is handled.
+(3) refactor recovery feature code so that it does not affect current code.
+
+Since V1:
+(1) refactor cover letter. Add intruduction on "how to detect a crash" and
+    "why we need recovery feature".
+(2) do not refactor task_work and ublk_queue_rq().
+(3) allow users freely stop/recover the device.
+(4) add comment on ublk_cancel_queue().
+(5) refactor monitor_work and aborting machenism since we add recovery
+    machenism in monitor_work.
+
+ZiyangZhang (7):
+  ublk_drv: check 'current' instead of 'ubq_daemon'
+  ublk_drv: refactor ublk_cancel_queue()
+  ublk_drv: define macros for recovery feature and check them
+  ublk_drv: requeue rqs with recovery feature enabled
+  ublk_drv: consider recovery feature in aborting mechanism
+  ublk_drv: add START_USER_RECOVERY and END_USER_RECOVERY support
+  ublk_drv: do not run monitor_work while ub's state is QUIESCED
+
+ drivers/block/ublk_drv.c      | 409 ++++++++++++++++++++++++++++++++--
+ include/uapi/linux/ublk_cmd.h |   7 +
+ 2 files changed, 398 insertions(+), 18 deletions(-)
+
+-- 
+2.27.0
+
