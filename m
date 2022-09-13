@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0BD5C54EE9
-	for <linux-block@archiver.kernel.org>; Tue, 13 Sep 2022 04:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA81C54EE9
+	for <linux-block@archiver.kernel.org>; Tue, 13 Sep 2022 04:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbiIMES4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Sep 2022 00:18:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37366 "EHLO
+        id S230060AbiIMES7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Sep 2022 00:18:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229988AbiIMESv (ORCPT
+        with ESMTP id S229967AbiIMESx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Sep 2022 00:18:51 -0400
-Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B0453D2B;
-        Mon, 12 Sep 2022 21:18:47 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VPccy7U_1663042709;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VPccy7U_1663042709)
+        Tue, 13 Sep 2022 00:18:53 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB7C5467D;
+        Mon, 12 Sep 2022 21:18:50 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VPccyDn_1663042725;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VPccyDn_1663042725)
           by smtp.aliyun-inc.com;
-          Tue, 13 Sep 2022 12:18:44 +0800
+          Tue, 13 Sep 2022 12:18:48 +0800
 From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 To:     ming.lei@redhat.com
 Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         joseph.qi@linux.alibaba.com,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V3 1/7] ublk_drv: check 'current' instead of 'ubq_daemon'
-Date:   Tue, 13 Sep 2022 12:17:01 +0800
-Message-Id: <20220913041707.197334-2-ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V3 2/7] ublk_drv: refactor ublk_cancel_queue()
+Date:   Tue, 13 Sep 2022 12:17:02 +0800
+Message-Id: <20220913041707.197334-3-ZiyangZhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220913041707.197334-1-ZiyangZhang@linux.alibaba.com>
 References: <20220913041707.197334-1-ZiyangZhang@linux.alibaba.com>
@@ -37,48 +37,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This check is not atomic. So with recovery feature, ubq_daemon may be
-modified simultaneously by recovery task. Instead, check 'current' is
-safe here because 'current' never changes.
+Assume only a few FETCH_REQ ioucmds are sent to ublk_drv, then the
+ubq_daemon exits, We have to call io_uring_cmd_done() for all ioucmds
+received so that io_uring ctx will not leak.
 
-Also add comment explaining this check, which is really important for
-understanding recovery feature.
+ublk_cancel_queue() may be called before START_DEV or after STOP_DEV,
+we decrease ubq->nr_io_ready and clear UBLK_IO_FLAG_ACTIVE so that we
+won't call io_uring_cmd_done() twice for one ioucmd to avoid UAF. Also
+clearing UBLK_IO_FLAG_ACTIVE makes the code more reasonable.
 
 Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/block/ublk_drv.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 6a4a94b4cdf4..c39b67d7133d 100644
+index c39b67d7133d..0c6db0978ed0 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -645,14 +645,22 @@ static inline void __ublk_rq_task_work(struct request *req)
- 	struct ublk_device *ub = ubq->dev;
- 	int tag = req->tag;
- 	struct ublk_io *io = &ubq->ios[tag];
--	bool task_exiting = current != ubq->ubq_daemon || ubq_daemon_is_dying(ubq);
- 	unsigned int mapped_bytes;
+@@ -963,22 +963,39 @@ static inline bool ublk_queue_ready(struct ublk_queue *ubq)
+ 	return ubq->nr_io_ready == ubq->q_depth;
+ }
  
- 	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
- 			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
- 			ublk_get_iod(ubq, req->tag)->addr);
++/* If ublk_cancel_queue() is called before sending START_DEV(), ->mutex
++ * provides protection on above update.
++ *
++ * If ublk_cancel_queue() is called after sending START_DEV(), disk is
++ * deleted first, UBLK_IO_RES_ABORT is returned so that any new io
++ * command can't be issued to driver, so updating on io flags and
++ * nr_io_ready is safe here.
++ *
++ * Also ->nr_io_ready is guaranteed to become zero after ublk_cance_queue()
++ * returns since request queue is either frozen or not present in both two
++ * cases.
++ */
+ static void ublk_cancel_queue(struct ublk_queue *ubq)
+ {
+ 	int i;
  
--	if (unlikely(task_exiting)) {
-+	/*
-+	 * Task is exiting if either:
-+	 *
-+	 * (1) current != ubq_daemon.
-+	 * io_uring_cmd_complete_in_task() tries to run task_work
-+	 * in a workqueue if ubq_daemon(cmd's task) is PF_EXITING.
-+	 *
-+	 * (2) current->flags & PF_EXITING.
-+	 */
-+	if (unlikely(current != ubq->ubq_daemon || current->flags & PF_EXITING)) {
- 		blk_mq_end_request(req, BLK_STS_IOERR);
- 		mod_delayed_work(system_wq, &ub->monitor_work, 0);
+-	if (!ublk_queue_ready(ubq))
++	if (!ubq->nr_io_ready)
  		return;
+ 
+ 	for (i = 0; i < ubq->q_depth; i++) {
+ 		struct ublk_io *io = &ubq->ios[i];
+ 
+-		if (io->flags & UBLK_IO_FLAG_ACTIVE)
++		if (io->flags & UBLK_IO_FLAG_ACTIVE) {
++			pr_devel("%s: done old cmd: qid %d tag %d\n",
++					__func__, ubq->q_id, i);
+ 			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0);
++			io->flags &= ~UBLK_IO_FLAG_ACTIVE;
++			ubq->nr_io_ready--;
++		}
+ 	}
+ 
+ 	/* all io commands are canceled */
+-	ubq->nr_io_ready = 0;
++	WARN_ON_ONCE(ubq->nr_io_ready);
+ }
+ 
+ /* Cancel all pending commands, must be called after del_gendisk() returns */
 -- 
 2.27.0
 
