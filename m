@@ -2,132 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 358BEC6FA83
-	for <linux-block@archiver.kernel.org>; Mon, 12 Sep 2022 22:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71417ECAAA1
+	for <linux-block@archiver.kernel.org>; Tue, 13 Sep 2022 01:56:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbiILWYO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Sep 2022 18:24:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51996 "EHLO
+        id S229873AbiIMB4R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Sep 2022 21:56:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbiILWYN (ORCPT
+        with ESMTP id S229754AbiIMB4Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Sep 2022 18:24:13 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EEDE65F1;
-        Mon, 12 Sep 2022 15:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1663021436;
-        bh=dVYey6kX8HxM0ATJ7S2IOLNNMkzqjNlLh6p6O+I09XY=;
-        h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=S0glBTIY8L2NP9l24Fv/nKR1VzAJeQnaLF0Oa54qSeh8Q4gnCPSvwQZjXiZiEN5RV
-         J1uBswZjjrVLgdBxDtBeAzXpRVlrxusc+yIvBHFv80WPOOq1Bnf/O+RnE/RNEKATSU
-         kdwEw3crfczPYRP+w25cr8qRg0n2rM8nWh3a+EqE=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1Mt757-1pM80o1pnd-00tXXT; Tue, 13
- Sep 2022 00:23:56 +0200
-Message-ID: <375416d7-a847-faf4-cbf6-fd5ab2294408@gmx.com>
-Date:   Tue, 13 Sep 2022 06:23:48 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH 07/17] btrfs: allow btrfs_submit_bio to split bios
+        Mon, 12 Sep 2022 21:56:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF76A52465
+        for <linux-block@vger.kernel.org>; Mon, 12 Sep 2022 18:56:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663034172;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=H19OXg6EPz5UTCCwATfQC0KcwPAzRjXZ1tHwdeetkOA=;
+        b=TerZ5sd+ajCOrw8iY9glyw0wJ7nr8OFOsy8nXZZJqqWf3dzLRrNEcxonvV55c6x4xg3u/s
+        9y15XwPB/+xEbwzNgbG+nDNKS1OogEr8zBOfsLtFhtfo6m30woTNdGeGaBhliZKfW+cgZp
+        +dzbGTKFdycVd/g39lwqULjJLT9aP5w=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-481-iPiUOx5dNDOBcDUyHR6stQ-1; Mon, 12 Sep 2022 21:56:09 -0400
+X-MC-Unique: iPiUOx5dNDOBcDUyHR6stQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7050E38164C1;
+        Tue, 13 Sep 2022 01:56:08 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42F19C15BA4;
+        Tue, 13 Sep 2022 01:56:02 +0000 (UTC)
+Date:   Tue, 13 Sep 2022 09:55:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Qu Wenruo <wqu@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>, linux-block@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20220901074216.1849941-1-hch@lst.de>
- <20220901074216.1849941-8-hch@lst.de>
- <9a34f412-59eb-7bcd-5d09-7afd468c81af@gmx.com> <20220912135528.GA723@lst.de>
-Content-Language: en-US
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-In-Reply-To: <20220912135528.GA723@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:oAwZpdzWYQU52gb+G5mQ6usxncW5NmPCnahO5XD7fRUhLqU1qaT
- Cs5dqRX/nRKQEYOtb5hzvOFJTMjb7OUQp2mF5dIu1QCbFiKdBAOFZQsIC42vAPdO0AOGAwA
- VP49BHL3zQgr0RvEDwdAueqFD8PeUnCJ9HhEH8Am/fMRTJRJ/GKx1rCRQOGz8OUzdz1S1sY
- ci8K8Q4vVS+Hc5lg1Uglw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UMUYDL5RZ+0=:G4XJJqiQpLov4gyrYpRgWj
- tpHMO17zwg1SFQtZpeeTyYRfGAfTxOpGv/oTGQDz8lVSI+RMK7QIwsklScBEHS3pm08sXbadv
- mxMxcYN7sxkgC/ApjOqO9wwGF792xUDe3O+avWhLiMNScwBwHevJd9y9moqKntQH8w0jVabfF
- ABcQhIcnVkf8m4MYiQbwNf6oKfaLW9lt/kSgn/2R6NTPAPw1r3Id1Wzu9PFad8VLLx07hMa1P
- i0mtKFhIZ1pD0JiBF08mAER/YDTgZkqJQu9O/dk3Z++Iw1JTPbZbBhaCOpRUSqmVPVcVeLAoX
- ZwPuIAY1bhEJW3vschl9EJep0D75fqe8IUMDhKiCCghqGCXh8CakEVvIykrTv8hWQsm411oSD
- gRURdpB35V6gP2N+gRKbGuGPFubPf5Arlx9Ezc19G+MBRDcCPKHLb8IRqIhlndq62fx6GjA2G
- AvEErzOymfCBCWvOHCLqtDuzBtZiIVPJmuJaiIE3b5sWvte/YgrasMvti416wSzolw9hp/zoO
- +Cmkd8J1eGvwZLyxOgYq6IPXzYP2BuIOuN7XDCQF2x2HLqOqMecR4ZkTZa7tV6uR84cikUIKm
- vtcjPULVAkMfT6vvLMNf4WVoIvz9tawBqdzgj1jVOzevCdpQxP3fS87ycEr/tV9yjG7PXDI3d
- ddFZDN5FLlYtV/a5wFd+BUz1xsMFbokcHUJRz+7WQVHcmRC5FW88t2pBhJEHxarfj+9bv0QK5
- oQS2YxZ/QQy0DmVL5L7wUPEC0dstOo+X9LFNvYDY533u2CPWJr+q/rTwhD8CeQ23NaN5jvKRZ
- r48YbkqV4eAkJ2Jq/6xYIS3JfIAyaU+gEyEXvcIvDslGa0PXGBRwhD2q3RhwcVBsq006QIGNX
- 0FYgGi+mztDZOSA90rJAi7Dnc0sGUapwa1gK367JZCImVK1SFz65JBjcOp0OXNuHznGQNMhZv
- 66s11mKI5iSx2HKN2EiaLMsGS+2NVVIDtut0/PfmxsA6gGM19CnQpMp0t4zdsNtlW2AWCGGZ+
- qC+z0uxDUO25QJ8x+7KfbDmzCA02G6zEbAEvrRWnFCeUfWPDZgqokvAfDy4UK1elnLkVbUbKY
- cKod32b2GOhyovjZnOUGAj8RqUOChJViMIz/yauDgCWnR/+OOlFToBFMQvWaaR19sRCwvOxlM
- senDHYkwiUWgfcERR81PRjml8c
+Cc:     Dusty Mabe <dusty@dustymabe.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: regression caused by block: freeze the queue earlier in
+ del_gendisk
+Message-ID: <Yx/jLTknQm9VeHi4@T590>
+References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
+ <YxBZ4BBjxvAkvI2A@T590>
+ <20220907073324.GB23826@lst.de>
+ <Yxr4SD4d0rZ9TZik@T590>
+ <20220912071618.GA4971@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220912071618.GA4971@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Sep 12, 2022 at 09:16:18AM +0200, Christoph Hellwig wrote:
+> On Fri, Sep 09, 2022 at 04:24:40PM +0800, Ming Lei wrote:
+> > On Wed, Sep 07, 2022 at 09:33:24AM +0200, Christoph Hellwig wrote:
+> > > On Thu, Sep 01, 2022 at 03:06:08PM +0800, Ming Lei wrote:
+> > > > It is a bit hard to associate the above commit with reported issue.
+> > > 
+> > > So the messages clearly are about something trying to open a device
+> > > that went away at the block layer, but somehow does not get removed
+> > > in time by udev (which seems to be a userspace bug in CoreOS).  But
+> > > even with that we really should not hang.
+> > 
+> > Xiao Ni provides one script[1] which can reproduce the issue more or less.
+> 
+> I've run the reproduced 10000 times on current mainline, and while
+> it prints one of the autoloading messages per run, I've not actually
+> seen any kind of hang.
+
+I can't reproduce the hang too.
+
+What I meant is that new raid disk can be added by mdadm after stopping
+the imsm container and raid disk with the autoloading messages printed,
+I understand this behavior isn't correct, but I am not familiar with
+raid enough.
+
+It might be related with the delay deleting gendisk from wq & md kobj
+release handler.
+
+During reboot, if mdadm does this stupid thing without stopping, the hang
+could be caused.
+
+I think the root cause is that why mdadm tries to open/add new raid bdev
+crazily during reboot.
 
 
-On 2022/9/12 21:55, Christoph Hellwig wrote:
-> On Mon, Sep 12, 2022 at 08:20:37AM +0800, Qu Wenruo wrote:
->> Sorry for the late reply, but I still have a question related the
->> chained bio way.
->>
->> Since we go the chained method, it means, if we hit an error for the
->> splitted bio, the whole bio will be marked error.
->
-> The only chained bios in the sense of using bio chaining are the
-> writes to the multiple legs of mirrored volumes.
->
->> Especially for read bios, that can be a problem (currently only for
->> RAID10 though), which can affect the read repair behavior.
->>
->> E.g. we have a 4-disks RAID10 looks like this:
->>
->> Disk 1 (unreliable): Mirror 1 of logical range [X, X + 64K)
->> Disk 2 (reliable):   Mirror 2 of logical range [X, X + 64K)
->> Disk 3 (reliable):   Mirror 1 of logical range [X + 64K, X + 128K)
->> Disk 4 (unreliable): Mirror 2 of logical range [X + 64K, X + 128K)
->>
->> And we submit a read for range [X, X + 128K)
->>
->> The first 64K will use mirror 1, thus reading from Disk 1.
->> The second 64K will also use mirror 1, thus read from Disk 2.
->>
->> But the first 64K read failed due to whatever reason, thus we mark the
->> whole range error, and needs to go repair code.
->
-> With the code posted in this series that is not what happens.  Instead
-> the checksum validation and then repair happen when the read from
-> mirror 1 / disk 1 completes, but before the results are propagated
-> up.  That was the prime reason why I had to move the repair code
-> below btrfs_submit_bio (that it happend to removed code and consolidate
-> the exact behavior is a nice side-effect).
->
->> Does the read-repair code now has something to compensate the chained
->> behavior?
->
-> It doesn't compensate it, but it is invoked at a low enough level so
-> that this problem does not happen.
+Thanks, 
+Ming
 
-You're completely right, it's the 4th patch putting the verification
-code into the endio function, thus the verification is still done
-per-splitted-bio.
-
-I really should review the whole series in one go...
-
-Then it looks pretty good to me.
-
-Reviewed-by: Qu Wenruo <wqu@suse.com>
-
-Thanks,
-Qu
