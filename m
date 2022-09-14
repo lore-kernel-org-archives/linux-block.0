@@ -2,184 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6B4C54EE9
-	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 01:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13622C6FA82
+	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 03:51:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbiINBzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Sep 2022 21:55:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48174 "EHLO
+        id S229845AbiINDvm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Sep 2022 23:51:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230093AbiINBzS (ORCPT
+        with ESMTP id S229824AbiINDvl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Sep 2022 21:55:18 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2800C476F1;
-        Tue, 13 Sep 2022 18:55:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MS3Jd2Zk6z6R4xv;
-        Wed, 14 Sep 2022 09:53:21 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgDXKXN_NCFjGB1DAw--.26821S3;
-        Wed, 14 Sep 2022 09:55:13 +0800 (CST)
-Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Paolo Valente <paolo.valente@unimore.it>,
-        Jan Kara <jack@suse.cz>
-Cc:     cgroups@vger.kernel.org, linux-block <linux-block@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220610021701.2347602-1-yukuai3@huawei.com>
- <20220610021701.2347602-4-yukuai3@huawei.com>
- <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
- <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
- <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
- <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
- <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
- <55A07102-BE55-4606-9E32-64E884064FB9@unimore.it>
- <5cb0e5bc-feec-86d6-6f60-3c28ee625efd@huaweicloud.com>
- <D89DCF20-27D8-4F8F-B8B0-FD193FC4F18D@unimore.it>
- <e6b53794-f93f-92b2-1f45-35ae81a28a5c@huaweicloud.com>
- <F758A356-EE6B-4B7B-95E2-6414616C77E4@unimore.it>
- <5e0b44b4-46cc-b3c6-1d93-00a0a683eda8@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <f89eb61b-7912-5916-1a12-039e32bebe70@huaweicloud.com>
-Date:   Wed, 14 Sep 2022 09:55:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 13 Sep 2022 23:51:41 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 430606F26F;
+        Tue, 13 Sep 2022 20:51:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=TsvPRmshdxnvSY7tVAecRy6+/ce+5hAWcS0J6w4JVyE=; b=utEF1SOCThG3gcFxitxIjq3WGs
+        IHfq+Z1KW6tA+eL0Sb+cwipStWaYLjhRhDVZ8GZwNeZmjvBd05BRjtyauZaHH7ZZsrmJ5jQ9m7NYH
+        t5YnppvGuDY68g9HYjVC2w5Z2W2ZRP72TY/rLYf5gK5zcB6xl2TQzc8waMQW+L4/KmLbLr+tX1SHf
+        wva/bWAZqkuKFcKia9aZdCn5gJ0/PD4X1KzRVwCHXE2T9wrl7lomyCDzaAAQRhl9Ob3eHi4ibY6gS
+        2A/E8y+stzUFsaCfnKU1fUsoMPrEmJ9V+q/Xc7gYpbpZ/qBuLSMLG/JKoH2axtiXJ3qbsfdU1SaT+
+        ODK9JccA==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1oYJQj-00G2aP-2o;
+        Wed, 14 Sep 2022 03:51:17 +0000
+Date:   Wed, 14 Sep 2022 04:51:17 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
+Message-ID: <YyFPtTtxYozCuXvu@ZenIV>
+References: <20220831041843.973026-1-jhubbard@nvidia.com>
+ <20220831041843.973026-5-jhubbard@nvidia.com>
+ <YxbtF1O8+kXhTNaj@infradead.org>
+ <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
+ <Yxb7YQWgjHkZet4u@infradead.org>
+ <20220906102106.q23ovgyjyrsnbhkp@quack3>
+ <YxhaJktqtHw3QTSG@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <5e0b44b4-46cc-b3c6-1d93-00a0a683eda8@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDXKXN_NCFjGB1DAw--.26821S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxGw1xur1xtrWxCr13Zr1rCrg_yoWrJw1rpa
-        y8Ga1Ykr4UJr12ywn7tr1UXryrt3y3Jr98Wr1DJryUCr1qvFn7KF42qr4Y9rZ7Xr4kWw17
-        Xr4jqr97Zw1jya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
-        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-        BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YxhaJktqtHw3QTSG@infradead.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-在 2022/09/07 9:16, Yu Kuai 写道:
-> Hi, Paolo!
+On Wed, Sep 07, 2022 at 01:45:26AM -0700, Christoph Hellwig wrote:
+> On Tue, Sep 06, 2022 at 12:21:06PM +0200, Jan Kara wrote:
+> > > For FOLL_PIN callers, never pin bvec and kvec pages:  For file systems
+> > > not acquiring a reference is obviously safe, and the other callers will
+> > > need an audit, but I can't think of why it woul  ever be unsafe.
+> > 
+> > Are you sure about "For file systems not acquiring a reference is obviously
+> > safe"? I can see places e.g. in orangefs, afs, etc. which create bvec iters
+> > from pagecache pages. And then we have iter_file_splice_write() which
+> > creates bvec from pipe pages (which can also be pagecache pages if
+> > vmsplice() is used). So perhaps there are no lifetime issues even without
+> > acquiring a reference (but looking at the code I would not say it is
+> > obvious) but I definitely don't see how it would be safe to not get a pin
+> > to signal to filesystem backing the pagecache page that there is DMA
+> > happening to/from the page.
 > 
-> 在 2022/09/06 17:37, Paolo Valente 写道:
->>
->>
->>> Il giorno 26 ago 2022, alle ore 04:34, Yu Kuai 
->>> <yukuai1@huaweicloud.com> ha scritto:
->>>
->>> Hi, Paolo!
->>>
->>> 在 2022/08/25 22:59, Paolo Valente 写道:
->>>>> Il giorno 11 ago 2022, alle ore 03:19, Yu Kuai 
->>>>> <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
->>>>>
->>>>> Hi, Paolo
->>>>>
->>>>> 在 2022/08/10 18:49, Paolo Valente 写道:
->>>>>>> Il giorno 27 lug 2022, alle ore 14:11, Yu Kuai 
->>>>>>> <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha 
->>>>>>> scritto:
->>>>>>>
->>>>>>> Hi, Paolo
->>>>>>>
->>>>>> hi
->>>>>>> Are you still interested in this patchset?
->>>>>>>
->>>>>> Yes. Sorry for replying very late again.
->>>>>> Probably the last fix that you suggest is enough, but I'm a little 
->>>>>> bit
->>>>>> concerned that it may be a little hasty.  In fact, before this 
->>>>>> fix, we
->>>>>> exchanged several messages, and I didn't seem to be very good at
->>>>>> convincing you about the need to keep into account also in-service
->>>>>> I/O.  So, my question is: are you sure that now you have a
->>>>>
->>>>> I'm confused here, I'm pretty aware that in-service I/O(as said 
->>>>> pending
->>>>> requests is the patchset) should be counted, as you suggested in 
->>>>> v7, are
->>>>> you still thinking that the way in this patchset is problematic?
->>>>>
->>>>> I'll try to explain again that how to track is bfqq has pending 
->>>>> pending
->>>>> requests, please let me know if you still think there are some 
->>>>> problems:
->>>>>
->>>>> patch 1 support to track if bfqq has pending requests, it's
->>>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when 
->>>>> the
->>>>> first request is inserted to bfqq, and it's cleared when the last
->>>>> request is completed. specifically the flag is set in
->>>>> bfq_add_bfqq_busy() when 'bfqq->dispatched' if false, and it's cleared
->>>>> both in bfq_completed_request() and bfq_del_bfqq_busy() when
->>>>> 'bfqq->diapatched' is false.
->>>>>
->>>> This general description seems correct to me. Have you already sent 
->>>> a new version of your patchset?
->>>
->>> It's glad that we finially on the same page here.
->>>
->>
->> Yep. Sorry for my chronicle delay.
-> 
-> Better late than never 😁
->>
->>> Please take a look at patch 1, which already impelement the above
->>> descriptions, it seems to me there is no need to send a new version
->>> for now. If you think there are still some other problems, please let
->>> me know.
->>>
->>
->> Patch 1 seems ok to me. I seem to have only one pending comment on 
->> this patch (3/4) instead. Let me paste previous stuff here for your 
->> convenience:
-> That sounds good.
-> 
->>
->>>>
->>>> -    /*
->>>> -     * Next function is invoked last, because it causes bfqq to be
->>>> -     * freed if the following holds: bfqq is not in service and
->>>> -     * has no dispatched request. DO NOT use bfqq after the next
->>>> -     * function invocation.
->>>> -     */
->>> I would really love it if you leave this comment.  I added it after
->>> suffering a lot for a nasty UAF.  Of course the first sentence may
->>> need to be adjusted if the code that precedes it is to be removed.
->>> Same as above, if this patch is applied, this function will be gone.
+> I mean in the context of iov_iter_get_pages callers, that is direct
+> I/O.  Direct callers of iov_iter_bvec which then pass that iov to
+> ->read_iter / ->write_iter will need to hold references (those are
+> the references that the callers of iov_iter_get_pages rely on!).
 
-Hi, I'm curious while I'm trying to add the comment, before this
-patchset, can bfqq be freed when bfq_weights_tree_remove is called?
+Unless I'm misreading Jan, the question is whether they should get or
+pin.  AFAICS, anyone who passes the sucker to ->read_iter() (or ->recvmsg(),
+or does direct copy_to_iter()/zero_iter(), etc.) is falling under
+=================================================================================
+CASE 5: Pinning in order to write to the data within the page
+-------------------------------------------------------------
+Even though neither DMA nor Direct IO is involved, just a simple case of "pin,
+write to a page's data, unpin" can cause a problem. Case 5 may be considered a
+superset of Case 1, plus Case 2, plus anything that invokes that pattern. In
+other words, if the code is neither Case 1 nor Case 2, it may still require
+FOLL_PIN, for patterns like this:
 
-bfq_completed_request
-  bfqq->dispatched--
-  if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq))
-   bfq_weights_tree_remove(bfqd, bfqq);
+Correct (uses FOLL_PIN calls):
+    pin_user_pages()
+    write to the data within the pages
+    unpin_user_pages()
 
-  // continue to use bfqq
+INCORRECT (uses FOLL_GET calls):
+    get_user_pages()
+    write to the data within the pages
+    put_page()
+=================================================================================
 
-It seems to me this is problematic if so, because bfqq is used after
-bfq_weights_tree_remove() is called.
+Regarding iter_file_splice_write() case, do we need to pin pages
+when we are not going to modify the data in those?
 
-Thanks,
-Kuai
+The same goes for afs, AFAICS; I started to type "... and everything that passes
+WRITE to iov_iter_bvec()", but...
+drivers/vhost/vringh.c:1165:            iov_iter_bvec(&iter, READ, iov, ret, translated);
+drivers/vhost/vringh.c:1198:            iov_iter_bvec(&iter, WRITE, iov, ret, translated);
+is backwards - READ is for data destinations, comes with copy_to_iter(); WRITE is
+for data sources and it comes with copy_from_iter()...
+I'm really tempted to slap
+	if (WARN_ON(i->data_source))
+		return 0;
+into copy_to_iter() et.al., along with its opposite for copy_from_iter().
+And see who comes screaming...  Things like
+        if (unlikely(iov_iter_is_pipe(i) || iov_iter_is_discard(i))) {
+                WARN_ON(1);
+                return 0;
+        }
+in e.g. csum_and_copy_from_iter() would be replaced by that, and become
+easier to understand...
+These two are also getting it wrong, BTW:
+drivers/target/target_core_file.c:340:  iov_iter_bvec(&iter, READ, bvec, sgl_nents, len);
+drivers/target/target_core_file.c:476:  iov_iter_bvec(&iter, READ, bvec, nolb, len);
 
