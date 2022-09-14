@@ -2,57 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC42ECAAD3
-	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 14:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D78ECAAD3
+	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 16:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiINOwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Sep 2022 10:52:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
+        id S229943AbiINQnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Sep 2022 12:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiINOwh (ORCPT
+        with ESMTP id S229953AbiINQnD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2022 10:52:37 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739C51A83D;
-        Wed, 14 Sep 2022 07:52:35 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id BAC0A339CE;
-        Wed, 14 Sep 2022 14:52:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1663167153; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wCNnJsTvzDL0Ox0oJoto7Z0gWCmReDnFFpxhGEpv45M=;
-        b=lK0OJflOFaTVBDNJGHIUSBQa3bUT+rqVNAOzb42o4ScXiVv1vJMQE0dPHLHRbiDHdkVX+G
-        ilzuajvlwOM16QdSohRsh+XSCBQylRQrUx0g9xl98uhPJsdjw2Ldg1BHMs/m3TIcc1fk2J
-        LV7soPZ1H7wl7Yj+sCJSmuokSlTfFg8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1663167153;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wCNnJsTvzDL0Ox0oJoto7Z0gWCmReDnFFpxhGEpv45M=;
-        b=HDEaQIgQZQFxnGUVEGHKXrWl+9KmSpSPW44OQxNkxlot3B2fvH+wLLh/l5Cqrf2pJkcL8Y
-        zx1SOSVooD/X0tAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A8895134B3;
-        Wed, 14 Sep 2022 14:52:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id n84lKbHqIWMbQAAAMHmgww
-        (envelope-from <jack@suse.cz>); Wed, 14 Sep 2022 14:52:33 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 38F74A0680; Wed, 14 Sep 2022 16:52:33 +0200 (CEST)
-Date:   Wed, 14 Sep 2022 16:52:33 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        Wed, 14 Sep 2022 12:43:03 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF956E8B5;
+        Wed, 14 Sep 2022 09:43:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=drGd84Y88D87DtABnnd7yh6bhIO3nFxVGZfiNKSay/w=; b=NJ6SAfFns58rMbVH+azyEAlIBe
+        P6n1bn9OXiF4fmUEUpqXGV/bE106qYmZbX/MwFVbHxtW6ssgk2PCE8UfNTQg1aWm+yynxcJ9j7g08
+        8/tgQ5onCzhF8MKSQaEQ6zA3aarCv+3D7yqjX8P1okh4bYNOq1WFHE1a4IQDf5KHdx5u5zA+Wymlc
+        S+7i9ko/VpxQnZRAsQ62an08GtRr8DVSaNW3j49A/qLEWP1M+neWYX1OVsjvTIT7LfH477m66cmRa
+        Nyt7CbCvmVkXs5Lmdv1xX0vhwGMMyYK/hJL+vP9XhDhzkKBGXkATkAHo1w7IXkb8b+clGQVzjQxRV
+        f5T3UCDA==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1oYVTE-00GF4L-1R;
+        Wed, 14 Sep 2022 16:42:40 +0000
+Date:   Wed, 14 Sep 2022 17:42:40 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@infradead.org>,
         John Hubbard <jhubbard@nvidia.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Jens Axboe <axboe@kernel.dk>,
@@ -66,7 +45,7 @@ Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
         linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
         linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <20220914145233.cyeljaku4egeu4x2@quack3>
+Message-ID: <YyIEgD8ksSZTsUdJ@ZenIV>
 References: <20220831041843.973026-1-jhubbard@nvidia.com>
  <20220831041843.973026-5-jhubbard@nvidia.com>
  <YxbtF1O8+kXhTNaj@infradead.org>
@@ -75,69 +54,44 @@ References: <20220831041843.973026-1-jhubbard@nvidia.com>
  <20220906102106.q23ovgyjyrsnbhkp@quack3>
  <YxhaJktqtHw3QTSG@infradead.org>
  <YyFPtTtxYozCuXvu@ZenIV>
+ <20220914145233.cyeljaku4egeu4x2@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YyFPtTtxYozCuXvu@ZenIV>
+In-Reply-To: <20220914145233.cyeljaku4egeu4x2@quack3>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 14-09-22 04:51:17, Al Viro wrote:
-> On Wed, Sep 07, 2022 at 01:45:26AM -0700, Christoph Hellwig wrote:
-> > On Tue, Sep 06, 2022 at 12:21:06PM +0200, Jan Kara wrote:
-> > > > For FOLL_PIN callers, never pin bvec and kvec pages:  For file systems
-> > > > not acquiring a reference is obviously safe, and the other callers will
-> > > > need an audit, but I can't think of why it woul  ever be unsafe.
-> > > 
-> > > Are you sure about "For file systems not acquiring a reference is obviously
-> > > safe"? I can see places e.g. in orangefs, afs, etc. which create bvec iters
-> > > from pagecache pages. And then we have iter_file_splice_write() which
-> > > creates bvec from pipe pages (which can also be pagecache pages if
-> > > vmsplice() is used). So perhaps there are no lifetime issues even without
-> > > acquiring a reference (but looking at the code I would not say it is
-> > > obvious) but I definitely don't see how it would be safe to not get a pin
-> > > to signal to filesystem backing the pagecache page that there is DMA
-> > > happening to/from the page.
+On Wed, Sep 14, 2022 at 04:52:33PM +0200, Jan Kara wrote:
+> > =================================================================================
+> > CASE 5: Pinning in order to write to the data within the page
+> > -------------------------------------------------------------
+> > Even though neither DMA nor Direct IO is involved, just a simple case of "pin,
+> > write to a page's data, unpin" can cause a problem. Case 5 may be considered a
+> > superset of Case 1, plus Case 2, plus anything that invokes that pattern. In
+> > other words, if the code is neither Case 1 nor Case 2, it may still require
+> > FOLL_PIN, for patterns like this:
 > > 
-> > I mean in the context of iov_iter_get_pages callers, that is direct
-> > I/O.  Direct callers of iov_iter_bvec which then pass that iov to
-> > ->read_iter / ->write_iter will need to hold references (those are
-> > the references that the callers of iov_iter_get_pages rely on!).
+> > Correct (uses FOLL_PIN calls):
+> >     pin_user_pages()
+> >     write to the data within the pages
+> >     unpin_user_pages()
+> > 
+> > INCORRECT (uses FOLL_GET calls):
+> >     get_user_pages()
+> >     write to the data within the pages
+> >     put_page()
+> > =================================================================================
 > 
-> Unless I'm misreading Jan, the question is whether they should get or
-> pin.  AFAICS, anyone who passes the sucker to ->read_iter() (or ->recvmsg(),
-> or does direct copy_to_iter()/zero_iter(), etc.) is falling under
-> =================================================================================
-> CASE 5: Pinning in order to write to the data within the page
-> -------------------------------------------------------------
-> Even though neither DMA nor Direct IO is involved, just a simple case of "pin,
-> write to a page's data, unpin" can cause a problem. Case 5 may be considered a
-> superset of Case 1, plus Case 2, plus anything that invokes that pattern. In
-> other words, if the code is neither Case 1 nor Case 2, it may still require
-> FOLL_PIN, for patterns like this:
-> 
-> Correct (uses FOLL_PIN calls):
->     pin_user_pages()
->     write to the data within the pages
->     unpin_user_pages()
-> 
-> INCORRECT (uses FOLL_GET calls):
->     get_user_pages()
->     write to the data within the pages
->     put_page()
-> =================================================================================
+> Yes, that was my point.
 
-Yes, that was my point.
+The thing is, at which point do we pin those pages?  pin_user_pages() works by
+userland address; by the time we get to any of those we have struct page
+references and no idea whether they are still mapped anywhere.
 
-> Regarding iter_file_splice_write() case, do we need to pin pages
-> when we are not going to modify the data in those?
-
-Strictly speaking not. So far we are pinning pages even if they serve as
-data source because it is simpler not to bother about data access direction
-but I'm not really aware of anything that would mandate that.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+How would that work?  What protects the area where you want to avoid running
+into pinned pages from previously acceptable page getting pinned?  If "they
+must have been successfully unmapped" is a part of what you are planning, we
+really do have a problem...
