@@ -2,144 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AA3ECAAD8
-	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 06:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8CDBECAAD8
+	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 07:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiINGFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Sep 2022 02:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43906 "EHLO
+        id S229614AbiINHmr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Sep 2022 03:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbiINGFp (ORCPT
+        with ESMTP id S229484AbiINHmp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2022 02:05:45 -0400
-Received: from mail.itouring.de (mail.itouring.de [IPv6:2a01:4f8:a0:4463::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB1663F3B
-        for <linux-block@vger.kernel.org>; Tue, 13 Sep 2022 23:05:43 -0700 (PDT)
-Received: from tux.applied-asynchrony.com (p5ddd7cb4.dip0.t-ipconnect.de [93.221.124.180])
-        by mail.itouring.de (Postfix) with ESMTPSA id 9F21E103762;
-        Wed, 14 Sep 2022 08:05:41 +0200 (CEST)
-Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
-        by tux.applied-asynchrony.com (Postfix) with ESMTP id 21D4BF01609;
-        Wed, 14 Sep 2022 08:05:41 +0200 (CEST)
-Subject: Re: wbt_lat_usec still set despite wbt disabled by BFQ
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "zhangyi (F)" <yi.zhang@huawei.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <a5041479-f417-2b95-b645-56e665a7e557@applied-asynchrony.com>
- <17e0e889-e848-0bd3-3203-cb4e9b801462@huaweicloud.com>
- <f731dab6-7f55-42d1-53fd-b656d75e5620@applied-asynchrony.com>
- <59272bf8-a53e-d3e8-d7eb-44391ddc97fe@huaweicloud.com>
- <13a8e0d9-08b0-a110-57d6-086b23dba9a7@applied-asynchrony.com>
- <4f1ec88a-909c-611f-bfa4-19be9553ebda@huaweicloud.com>
-From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <fb7b8224-70e7-7597-5a84-82293991573a@applied-asynchrony.com>
-Date:   Wed, 14 Sep 2022 08:05:41 +0200
+        Wed, 14 Sep 2022 03:42:45 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA2CB72846;
+        Wed, 14 Sep 2022 00:42:43 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id r134so11575963iod.8;
+        Wed, 14 Sep 2022 00:42:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=eEJP1a06euOUkeamXUOBqTVk6cOzV4UikY8/ESrIyRY=;
+        b=KOphLKJ3+hwlS6nZaQ4YEA0WaQfpIP4XVSCk1gIwY4I/17KYNBpXa7+Bk41lcTHsVS
+         ZwjbzBd9qUJ0hBUquLvBoWFVly0FkaxNJptwExzGQx7KuMMT4yFwIbf1CoDjq+oit28I
+         DnDSCWJnEQcluOwuex4ehfcZXqe3BerrYpWmMDzFeipmgtQiHV35iHipca/iIyeBIHfI
+         mxkT8gmtayt+0VGLLwirfWMYdCVTFb31NodwgYyyWITSWqsySkQeqLjnhYbCwXFL2/9Z
+         Aw3f5NIle1O72sULU1Xq2q4d0AiI74H+f+xNN4pkGwqCHKFHXeBmXWlFrqN6qnC6SbJB
+         zudw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=eEJP1a06euOUkeamXUOBqTVk6cOzV4UikY8/ESrIyRY=;
+        b=H1xftIt6vGlHVU0zPYqfsNKLToNKv7AIbH5IMrd38PJ7HIF+US8krgVe4CT+1jaaF8
+         H6WoW8AVKe6Chj3yk1TXiJ/XUWhIJmTJRWyDkZFLjrs1s6vQgS4phXIhL4pSIntfN/hI
+         kKFfwUmxzTpD065PPa9LqsOgcwg9H05oNRxLZMey8H0nys+u/tBae+jDKt9oUlmRUduM
+         QtSZHvRMUSKymFdCgQpvviAZagpoGJCnDkQrswd5UUnLvlR0cqLPtXw3+DTt6dWLCSDK
+         utun2z1GJZUB6qXeJa1KyxAQ3Bqsf8+LjdfX34LnGDpTRQt6Is92X+48TeVS+LqtN6El
+         kIUg==
+X-Gm-Message-State: ACgBeo3mfcnDMKg1H+ja8S9wcOxM3lPG1hyuhXK4qBdu8YQImGEHgiub
+        5RixKlt5X5nWmWr6jKO/TGp8VzplawgaQHHv
+X-Google-Smtp-Source: AA6agR5WbiUDfLzu/L1mNDFsxGgK5mjvbfR77vgsTVPDCICbJExWvVAPbmqL7WG9vyDLx7N3g6V3Ew==
+X-Received: by 2002:a05:6638:2406:b0:349:ffed:2310 with SMTP id z6-20020a056638240600b00349ffed2310mr18412937jat.78.1663141363148;
+        Wed, 14 Sep 2022 00:42:43 -0700 (PDT)
+Received: from pxchen-personal.ics.uci.edu (dhcp-055171.ics.uci.edu. [128.195.55.171])
+        by smtp.gmail.com with ESMTPSA id w18-20020a92db52000000b002f163ff9df2sm6261061ilq.19.2022.09.14.00.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Sep 2022 00:42:40 -0700 (PDT)
+From:   Ping-Xiang Chen <p.x.chen.1005@gmail.com>
+X-Google-Original-From: Ping-Xiang Chen <p.x.chen@uci.edu>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ping-Xiang Chen <p.x.chen@uci.edu>
+Subject: [PATCH] block: fix comment typo in submit_bio of block-core.c.
+Date:   Wed, 14 Sep 2022 00:42:37 -0700
+Message-Id: <20220914074237.31621-1-p.x.chen@uci.edu>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <4f1ec88a-909c-611f-bfa4-19be9553ebda@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-09-14 03:35, Yu Kuai wrote:
-[snip]
-> Thanks for the test, it turns out this way doesn't select bfq as default
-> as I expected...
-> 
-> wbt can show min_lat_nsec despite that wbt can be disabled by
-> wbt_disable_default(), I do miss that previously...
-> 
-> Can you try the following patch again?
-> 
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index a630d657c054..3e8adb95ff02 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -467,10 +467,14 @@ static ssize_t queue_io_timeout_store(struct request_queue *q, const char *page,
-> 
->   static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
->   {
-> +       u64 lat;
-> +
->          if (!wbt_rq_qos(q))
->                  return -EINVAL;
-> 
-> -       return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
-> +       lat = wbt_disabled(q) ? 0 : div_u64(wbt_get_min_lat(q), 1000);
-> +
-> +       return sprintf(page, "%llu\n", lat);
->   }
-> 
->   static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
-> @@ -493,6 +497,9 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
->                          return ret;
->          }
-> 
-> +       if (wbt_disabled(q))
-> +               return -EINVAL;
-> +
->          if (val == -1)
->                  val = wbt_default_latency_nsec(q);
->          else if (val >= 0)
-> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> index 26ee6ca66a93..55d1015ef117 100644
-> --- a/block/blk-wbt.c
-> +++ b/block/blk-wbt.c
-> @@ -423,6 +423,13 @@ static void wbt_update_limits(struct rq_wb *rwb)
->          rwb_wake_all(rwb);
->   }
-> 
-> +bool wbt_disabled(struct request_queue *q)
-> +{
-> +       struct rq_qos *rqos = wbt_rq_qos(q);
-> +
-> +       return !rqos || RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT;
-> +}
-> +
->   u64 wbt_get_min_lat(struct request_queue *q)
->   {
->          struct rq_qos *rqos = wbt_rq_qos(q);
-> diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-> index 1a49b6ac397c..4252b8077257 100644
-> --- a/block/blk-wbt.h
-> +++ b/block/blk-wbt.h
-> @@ -94,6 +94,7 @@ void wbt_enable_default(struct request_queue *, bool);
-> 
->   u64 wbt_get_min_lat(struct request_queue *q);
->   void wbt_set_min_lat(struct request_queue *q, u64 val);
-> +bool wbt_disabled(struct request_queue *);
-> 
->   void wbt_set_write_cache(struct request_queue *, bool);
-> 
+This patch fix a comment typo in block-core.c.
 
-This one works! :)
+Signed-off-by: Ping-Xiang Chen <p.x.chen@uci.edu>
+---
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-After boot:
+diff --git a/block/blk-core.c b/block/blk-core.c
+index a0d1104c5590..7a7e89453935 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -814,7 +814,7 @@ EXPORT_SYMBOL(submit_bio_noacct);
+  *
+  * The success/failure status of the request, along with notification of
+  * completion, is delivered asynchronously through the ->bi_end_io() callback
+- * in @bio.  The bio must NOT be touched by thecaller until ->bi_end_io() has
++ * in @bio.  The bio must NOT be touched by the caller until ->bi_end_io() has
+  * been called.
+  */
+ void submit_bio(struct bio *bio)
+-- 
+2.34.1
 
-$cat /sys/block/sdc/queue/scheduler
-mq-deadline [bfq] none
-$cat /sys/block/sdc/queue/wbt_lat_usec
-0
-
-Changing schedulers  back and forth - here on a device with different
-default - also works:
-
-$cat /sys/block/sda/queue/scheduler
-[mq-deadline] bfq none
-$cat /sys/block/sda/queue/wbt_lat_usec
-2000
-$echo bfq > /sys/block/sda/queue/scheduler
-$cat /sys/block/sda/queue/wbt_lat_usec
-0
-$echo deadline > /sys/block/sda/queue/scheduler
-$cat /sys/block/sda/queue/wbt_lat_usec
-2000
-
-Feel free to add my Reported-by and Tested-by.
-
-cheers!
-Holger
