@@ -2,328 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFECC54EE9
-	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 01:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6B4C54EE9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 01:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229718AbiINBgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Sep 2022 21:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45020 "EHLO
+        id S230094AbiINBzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Sep 2022 21:55:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbiINBgH (ORCPT
+        with ESMTP id S230093AbiINBzS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Sep 2022 21:36:07 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAA36B8D6
-        for <linux-block@vger.kernel.org>; Tue, 13 Sep 2022 18:36:01 -0700 (PDT)
+        Tue, 13 Sep 2022 21:55:18 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2800C476F1;
+        Tue, 13 Sep 2022 18:55:15 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MS2tQ0RTLzKPxN
-        for <linux-block@vger.kernel.org>; Wed, 14 Sep 2022 09:34:06 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MS3Jd2Zk6z6R4xv;
+        Wed, 14 Sep 2022 09:53:21 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgBH53D9LyFjrHRCAw--.50131S3;
-        Wed, 14 Sep 2022 09:35:58 +0800 (CST)
-Subject: Re: wbt_lat_usec still set despite wbt disabled by BFQ
-To:     =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        "zhangyi (F)" <yi.zhang@huawei.com>,
+        by APP2 (Coremail) with SMTP id Syh0CgDXKXN_NCFjGB1DAw--.26821S3;
+        Wed, 14 Sep 2022 09:55:13 +0800 (CST)
+Subject: Re: [PATCH -next v10 3/4] block, bfq: refactor the counting of
+ 'num_groups_with_pending_reqs'
+To:     Yu Kuai <yukuai1@huaweicloud.com>,
+        Paolo Valente <paolo.valente@unimore.it>,
+        Jan Kara <jack@suse.cz>
+Cc:     cgroups@vger.kernel.org, linux-block <linux-block@vger.kernel.org>,
+        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
         "yukuai (C)" <yukuai3@huawei.com>
-References: <a5041479-f417-2b95-b645-56e665a7e557@applied-asynchrony.com>
- <17e0e889-e848-0bd3-3203-cb4e9b801462@huaweicloud.com>
- <f731dab6-7f55-42d1-53fd-b656d75e5620@applied-asynchrony.com>
- <59272bf8-a53e-d3e8-d7eb-44391ddc97fe@huaweicloud.com>
- <13a8e0d9-08b0-a110-57d6-086b23dba9a7@applied-asynchrony.com>
+References: <20220610021701.2347602-1-yukuai3@huawei.com>
+ <20220610021701.2347602-4-yukuai3@huawei.com>
+ <27F2DF19-7CC6-42C5-8CEB-43583EB4AE46@linaro.org>
+ <abdbb5db-e280-62f8-0670-536fcb8ec4d9@huaweicloud.com>
+ <C2CF100A-9A7C-4300-9A70-1295BC939C66@unimore.it>
+ <9b2d667f-6636-9347-08a1-8bd0aa2346f2@huaweicloud.com>
+ <2f94f241-445f-1beb-c4a8-73f6efce5af2@huaweicloud.com>
+ <55A07102-BE55-4606-9E32-64E884064FB9@unimore.it>
+ <5cb0e5bc-feec-86d6-6f60-3c28ee625efd@huaweicloud.com>
+ <D89DCF20-27D8-4F8F-B8B0-FD193FC4F18D@unimore.it>
+ <e6b53794-f93f-92b2-1f45-35ae81a28a5c@huaweicloud.com>
+ <F758A356-EE6B-4B7B-95E2-6414616C77E4@unimore.it>
+ <5e0b44b4-46cc-b3c6-1d93-00a0a683eda8@huaweicloud.com>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <4f1ec88a-909c-611f-bfa4-19be9553ebda@huaweicloud.com>
-Date:   Wed, 14 Sep 2022 09:35:57 +0800
+Message-ID: <f89eb61b-7912-5916-1a12-039e32bebe70@huaweicloud.com>
+Date:   Wed, 14 Sep 2022 09:55:11 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <13a8e0d9-08b0-a110-57d6-086b23dba9a7@applied-asynchrony.com>
+In-Reply-To: <5e0b44b4-46cc-b3c6-1d93-00a0a683eda8@huaweicloud.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgBH53D9LyFjrHRCAw--.50131S3
-X-Coremail-Antispam: 1UD129KBjvJXoW3XFyDJFy5Xw48Zw1xZw1DWrg_yoWfGFyUp3
-        4kJF12kFWagF40qry8twnrX343Kr18K3srXry8GFWFyrsFkr12qa18Wr1jgF18ArZ7CFsr
-        Xr15trZxZr17W3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID: Syh0CgDXKXN_NCFjGB1DAw--.26821S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGw1xur1xtrWxCr13Zr1rCrg_yoWrJw1rpa
+        y8Ga1Ykr4UJr12ywn7tr1UXryrt3y3Jr98Wr1DJryUCr1qvFn7KF42qr4Y9rZ7Xr4kWw17
+        Xr4jqr97Zw1jya7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
         rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
         1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
         JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
         CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
         2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfU5WlkUU
-        UUU
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWr
+        Zr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
+        BIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Holger
 
-在 2022/09/14 0:13, Holger Hoffstätte 写道:
-> On 2022-09-13 16:20, Yu Kuai wrote:
+
+在 2022/09/07 9:16, Yu Kuai 写道:
+> Hi, Paolo!
+> 
+> 在 2022/09/06 17:37, Paolo Valente 写道:
 >>
 >>
->> 在 2022/09/13 22:12, Holger Hoffstätte 写道:
->>> On 2022-09-13 15:39, Yu Kuai wrote:
->>>> Hi, Holger
+>>> Il giorno 26 ago 2022, alle ore 04:34, Yu Kuai 
+>>> <yukuai1@huaweicloud.com> ha scritto:
+>>>
+>>> Hi, Paolo!
+>>>
+>>> 在 2022/08/25 22:59, Paolo Valente 写道:
+>>>>> Il giorno 11 ago 2022, alle ore 03:19, Yu Kuai 
+>>>>> <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha scritto:
+>>>>>
+>>>>> Hi, Paolo
+>>>>>
+>>>>> 在 2022/08/10 18:49, Paolo Valente 写道:
+>>>>>>> Il giorno 27 lug 2022, alle ore 14:11, Yu Kuai 
+>>>>>>> <yukuai1@huaweicloud.com <mailto:yukuai1@huaweicloud.com>> ha 
+>>>>>>> scritto:
+>>>>>>>
+>>>>>>> Hi, Paolo
+>>>>>>>
+>>>>>> hi
+>>>>>>> Are you still interested in this patchset?
+>>>>>>>
+>>>>>> Yes. Sorry for replying very late again.
+>>>>>> Probably the last fix that you suggest is enough, but I'm a little 
+>>>>>> bit
+>>>>>> concerned that it may be a little hasty.  In fact, before this 
+>>>>>> fix, we
+>>>>>> exchanged several messages, and I didn't seem to be very good at
+>>>>>> convincing you about the need to keep into account also in-service
+>>>>>> I/O.  So, my question is: are you sure that now you have a
+>>>>>
+>>>>> I'm confused here, I'm pretty aware that in-service I/O(as said 
+>>>>> pending
+>>>>> requests is the patchset) should be counted, as you suggested in 
+>>>>> v7, are
+>>>>> you still thinking that the way in this patchset is problematic?
+>>>>>
+>>>>> I'll try to explain again that how to track is bfqq has pending 
+>>>>> pending
+>>>>> requests, please let me know if you still think there are some 
+>>>>> problems:
+>>>>>
+>>>>> patch 1 support to track if bfqq has pending requests, it's
+>>>>> done by setting the flag 'entity->in_groups_with_pending_reqs' when 
+>>>>> the
+>>>>> first request is inserted to bfqq, and it's cleared when the last
+>>>>> request is completed. specifically the flag is set in
+>>>>> bfq_add_bfqq_busy() when 'bfqq->dispatched' if false, and it's cleared
+>>>>> both in bfq_completed_request() and bfq_del_bfqq_busy() when
+>>>>> 'bfqq->diapatched' is false.
+>>>>>
+>>>> This general description seems correct to me. Have you already sent 
+>>>> a new version of your patchset?
+>>>
+>>> It's glad that we finially on the same page here.
+>>>
+>>
+>> Yep. Sorry for my chronicle delay.
+> 
+> Better late than never 😁
+>>
+>>> Please take a look at patch 1, which already impelement the above
+>>> descriptions, it seems to me there is no need to send a new version
+>>> for now. If you think there are still some other problems, please let
+>>> me know.
+>>>
+>>
+>> Patch 1 seems ok to me. I seem to have only one pending comment on 
+>> this patch (3/4) instead. Let me paste previous stuff here for your 
+>> convenience:
+> That sounds good.
+> 
+>>
 >>>>
->>>> 在 2022/08/18 1:12, Holger Hoffstätte 写道:
->>>>>
->>>>> I just noticed that my device configured with BFQ still shows 
->>>>> wbt_lat_usec
->>>>> as configured, despite the fact that BFQ disables WBT in 
->>>>> bfq_init_queue [1]:
->>>>>
->>>>> $cat /sys/block/sdc/queue/scheduler
->>>>> mq-deadline [bfq] none
->>>>> $cat /sys/block/sdc/queue/wbt_lat_usec
->>>>> 75000
->>>>>
->>>>> Is this supposed to be 0 (since it's disabled) or is sysfs confused?
->>>>>
->>>>> Thanks,
->>>>> Holger
->>>>
->>>> I'm reviewing wbt codes recently, and I found that this problem will
->>>> happen if the default elevator is bfq. I'll try to fix this, do you 
->>>> mind
->>>> if I add reported-by tag?
->>>
->>> Do not mind at all - thank you for looking into it!
->>> Let me know if I can test a patch or help in some other way.
->>>
->>> Btw not sure what "default scheduler" means here, I set my schedulers 
->>> via
->>> udev rules. In this case:
->>>
->>> ACTION=="add", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", 
->>> ATTR{queue/scheduler}="bfq"
->>>
->>
->> Default means the elevator is bfq when device is created.
->>
->> Perhaps can you try the following patch?
->>
->>      blk-wbt: don't enable throttling if default elevator is bfq
->>
->>      Commit b5dc5d4d1f4f ("block,bfq: Disable writeback throttling") 
->> tries to
->>      disable wbt for bfq, it's done by calling wbt_disable_default() in
->>      bfq_init_queue(). However, wbt is still enabled if default 
->> elevator is
->>      bfq:
->>
->>      device_add_disk
->>       elevator_init_mq
->>        bfq_init_queue
->>         wbt_disable_default -> done nothing
->>
->>       blk_register_queue
->>        wbt_enable_default -> wbt is enabled
->>
->>      Fix the problem by checking elevator name if wbt_enable_default() is
->>      called from blk_register_queue().
->>
->>
->> diff --git a/block/elevator.h b/block/elevator.h
->> index 3f0593b3bf9d..ccded343cf27 100644
->> --- a/block/elevator.h
->> +++ b/block/elevator.h
->> @@ -104,6 +104,11 @@ struct elevator_queue
->>          DECLARE_HASHTABLE(hash, ELV_HASH_BITS);
->>   };
->>
->> +static inline bool check_elevator_name(struct elevator_queue *elevator,
->> +                                      const char *name)
->> +{
->> +       return !strcmp(elevator->type->elevator_name, name);
->> +}
->>   /*
->>    * block elevator interface
->>    */
->>
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 7ea427817f7f..f769c90744fd 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -7045,7 +7045,7 @@ static void bfq_exit_queue(struct elevator_queue 
->> *e)
->>   #endif
->>
->>          blk_stat_disable_accounting(bfqd->queue);
->> -       wbt_enable_default(bfqd->queue);
->> +       wbt_enable_default(bfqd->queue, false);
->>
->>          kfree(bfqd);
->>   }
->> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
->> index e1f009aba6fd..a630d657c054 100644
->> --- a/block/blk-sysfs.c
->> +++ b/block/blk-sysfs.c
->> @@ -843,7 +843,7 @@ int blk_register_queue(struct gendisk *disk)
->>                  goto put_dev;
->>
->>          blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
->> -       wbt_enable_default(q);
->> +       wbt_enable_default(q, true);
->>          blk_throtl_register_queue(q);
->>
->>          /* Now everything is ready and send out KOBJ_ADD uevent */
->> diff --git a/block/blk-wbt.c b/block/blk-wbt.c
->> index 246467926253..26ee6ca66a93 100644
->> --- a/block/blk-wbt.c
->> +++ b/block/blk-wbt.c
->> @@ -27,6 +27,7 @@
->>
->>   #include "blk-wbt.h"
->>   #include "blk-rq-qos.h"
->> +#include "elevator.h"
->>
->>   #define CREATE_TRACE_POINTS
->>   #include <trace/events/wbt.h>
->> @@ -636,10 +637,14 @@ void wbt_set_write_cache(struct request_queue 
->> *q, bool write_cache_on)
->>   /*
->>    * Enable wbt if defaults are configured that way
->>    */
->> -void wbt_enable_default(struct request_queue *q)
->> +void wbt_enable_default(struct request_queue *q, bool check_elevator)
->>   {
->>          struct rq_qos *rqos = wbt_rq_qos(q);
->>
->> +       if (check_elevator && q->elevator &&
->> +           check_elevator_name(q->elevator, "bfq"))
->> +               return;
->> +
->>          /* Throttling already enabled? */
->>          if (rqos) {
->>                  if (RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT)
->> diff --git a/block/blk-wbt.h b/block/blk-wbt.h
->> index 7e44eccc676d..1a49b6ac397c 100644
->> --- a/block/blk-wbt.h
->> +++ b/block/blk-wbt.h
->> @@ -90,7 +90,7 @@ static inline unsigned int wbt_inflight(struct rq_wb 
->> *rwb)
->>
->>   int wbt_init(struct request_queue *);
->>   void wbt_disable_default(struct request_queue *);
->> -void wbt_enable_default(struct request_queue *);
->> +void wbt_enable_default(struct request_queue *, bool);
->>
->>   u64 wbt_get_min_lat(struct request_queue *q);
->>   void wbt_set_min_lat(struct request_queue *q, u64 val);
->> @@ -108,7 +108,8 @@ static inline int wbt_init(struct request_queue *q)
->>   static inline void wbt_disable_default(struct request_queue *q)
->>   {
->>   }
->> -static inline void wbt_enable_default(struct request_queue *q)
->> +static inline void wbt_enable_default(struct request_queue *q,
->> +                                     bool check_elevator)
->>   {
->>   }
->>   static inline void wbt_set_write_cache(struct request_queue *q, bool 
->> wc)
->>
-> 
-> So that didn't help, unfortunately.
-> 
-> Directly after boot (with the above udev rule):
-> 
-> $cat /sys/block/sdc/queue/scheduler
-> mq-deadline [bfq] none
-> $cat /sys/block/sdc/queue/wbt_lat_usec
-> 75000
-> 
-> Changing the scheduler back and forth also does not help:
-> 
-> $echo mq-deadline > /sys/block/sdc/queue/scheduler
-> $echo bfq > /sys/block/sdc/queue/scheduler
-> $cat /sys/block/sdc/queue/wbt_lat_usec
-> 75000
+>>>> -    /*
+>>>> -     * Next function is invoked last, because it causes bfqq to be
+>>>> -     * freed if the following holds: bfqq is not in service and
+>>>> -     * has no dispatched request. DO NOT use bfqq after the next
+>>>> -     * function invocation.
+>>>> -     */
+>>> I would really love it if you leave this comment.  I added it after
+>>> suffering a lot for a nasty UAF.  Of course the first sentence may
+>>> need to be adjusted if the code that precedes it is to be removed.
+>>> Same as above, if this patch is applied, this function will be gone.
 
-Thanks for the test, it turns out this way doesn't select bfq as default
-as I expected...
+Hi, I'm curious while I'm trying to add the comment, before this
+patchset, can bfqq be freed when bfq_weights_tree_remove is called?
 
-wbt can show min_lat_nsec despite that wbt can be disabled by
-wbt_disable_default(), I do miss that previously...
+bfq_completed_request
+  bfqq->dispatched--
+  if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq))
+   bfq_weights_tree_remove(bfqd, bfqq);
 
-Can you try the following patch again?
+  // continue to use bfqq
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index a630d657c054..3e8adb95ff02 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -467,10 +467,14 @@ static ssize_t queue_io_timeout_store(struct 
-request_queue *q, const char *page,
+It seems to me this is problematic if so, because bfqq is used after
+bfq_weights_tree_remove() is called.
 
-  static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
-  {
-+       u64 lat;
-+
-         if (!wbt_rq_qos(q))
-                 return -EINVAL;
-
--       return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
-+       lat = wbt_disabled(q) ? 0 : div_u64(wbt_get_min_lat(q), 1000);
-+
-+       return sprintf(page, "%llu\n", lat);
-  }
-
-  static ssize_t queue_wb_lat_store(struct request_queue *q, const char 
-*page,
-@@ -493,6 +497,9 @@ static ssize_t queue_wb_lat_store(struct 
-request_queue *q, const char *page,
-                         return ret;
-         }
-
-+       if (wbt_disabled(q))
-+               return -EINVAL;
-+
-         if (val == -1)
-                 val = wbt_default_latency_nsec(q);
-         else if (val >= 0)
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 26ee6ca66a93..55d1015ef117 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -423,6 +423,13 @@ static void wbt_update_limits(struct rq_wb *rwb)
-         rwb_wake_all(rwb);
-  }
-
-+bool wbt_disabled(struct request_queue *q)
-+{
-+       struct rq_qos *rqos = wbt_rq_qos(q);
-+
-+       return !rqos || RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT;
-+}
-+
-  u64 wbt_get_min_lat(struct request_queue *q)
-  {
-         struct rq_qos *rqos = wbt_rq_qos(q);
-diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-index 1a49b6ac397c..4252b8077257 100644
---- a/block/blk-wbt.h
-+++ b/block/blk-wbt.h
-@@ -94,6 +94,7 @@ void wbt_enable_default(struct request_queue *, bool);
-
-  u64 wbt_get_min_lat(struct request_queue *q);
-  void wbt_set_min_lat(struct request_queue *q, u64 val);
-+bool wbt_disabled(struct request_queue *);
-
-  void wbt_set_write_cache(struct request_queue *, bool);
-
-> 
-> Sorry :)
-> 
-> Holger
-> 
-> .
-> 
+Thanks,
+Kuai
 
