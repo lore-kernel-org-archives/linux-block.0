@@ -2,70 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D51DFECAAD3
-	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 12:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC42ECAAD3
+	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 14:52:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229969AbiINMry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Sep 2022 08:47:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43962 "EHLO
+        id S229542AbiINOwi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Sep 2022 10:52:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230131AbiINMr1 (ORCPT
+        with ESMTP id S229520AbiINOwh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2022 08:47:27 -0400
-Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1136279EEA;
-        Wed, 14 Sep 2022 05:47:22 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VPogkmb_1663159636;
-Received: from B-P7TQMD6M-0146.lan(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VPogkmb_1663159636)
-          by smtp.aliyun-inc.com;
-          Wed, 14 Sep 2022 20:47:18 +0800
-Date:   Wed, 14 Sep 2022 20:47:16 +0800
-From:   Gao Xiang <hsiangkao@linux.alibaba.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        Josef Bacik <josef@toxicpanda.com>,
-        linux-block@vger.kernel.org, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH 4/5] erofs: add manual PSI accounting for the compressed
- address space
-Message-ID: <YyHNVG5tHFt7E5ZY@B-P7TQMD6M-0146.lan>
-Mail-Followup-To: Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
-        Chris Mason <clm@fb.com>, David Sterba <dsterba@suse.com>,
-        linux-fsdevel@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        linux-btrfs@vger.kernel.org
-References: <20220910065058.3303831-1-hch@lst.de>
- <20220910065058.3303831-5-hch@lst.de>
+        Wed, 14 Sep 2022 10:52:37 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739C51A83D;
+        Wed, 14 Sep 2022 07:52:35 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BAC0A339CE;
+        Wed, 14 Sep 2022 14:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1663167153; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wCNnJsTvzDL0Ox0oJoto7Z0gWCmReDnFFpxhGEpv45M=;
+        b=lK0OJflOFaTVBDNJGHIUSBQa3bUT+rqVNAOzb42o4ScXiVv1vJMQE0dPHLHRbiDHdkVX+G
+        ilzuajvlwOM16QdSohRsh+XSCBQylRQrUx0g9xl98uhPJsdjw2Ldg1BHMs/m3TIcc1fk2J
+        LV7soPZ1H7wl7Yj+sCJSmuokSlTfFg8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1663167153;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wCNnJsTvzDL0Ox0oJoto7Z0gWCmReDnFFpxhGEpv45M=;
+        b=HDEaQIgQZQFxnGUVEGHKXrWl+9KmSpSPW44OQxNkxlot3B2fvH+wLLh/l5Cqrf2pJkcL8Y
+        zx1SOSVooD/X0tAQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A8895134B3;
+        Wed, 14 Sep 2022 14:52:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id n84lKbHqIWMbQAAAMHmgww
+        (envelope-from <jack@suse.cz>); Wed, 14 Sep 2022 14:52:33 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 38F74A0680; Wed, 14 Sep 2022 16:52:33 +0200 (CEST)
+Date:   Wed, 14 Sep 2022 16:52:33 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
+Message-ID: <20220914145233.cyeljaku4egeu4x2@quack3>
+References: <20220831041843.973026-1-jhubbard@nvidia.com>
+ <20220831041843.973026-5-jhubbard@nvidia.com>
+ <YxbtF1O8+kXhTNaj@infradead.org>
+ <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
+ <Yxb7YQWgjHkZet4u@infradead.org>
+ <20220906102106.q23ovgyjyrsnbhkp@quack3>
+ <YxhaJktqtHw3QTSG@infradead.org>
+ <YyFPtTtxYozCuXvu@ZenIV>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220910065058.3303831-5-hch@lst.de>
+In-Reply-To: <YyFPtTtxYozCuXvu@ZenIV>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 10, 2022 at 08:50:57AM +0200, Christoph Hellwig wrote:
-> erofs uses an additional address space for compressed data read from disk
-> in addition to the one directly associated with the inode.  Reading into
-> the lower address space is open coded using add_to_page_cache_lru instead
-> of using the filemap.c helper for page allocation micro-optimizations,
-> which means it is not covered by the MM PSI annotations for ->read_folio
-> and ->readahead, so add manual ones instead.
+On Wed 14-09-22 04:51:17, Al Viro wrote:
+> On Wed, Sep 07, 2022 at 01:45:26AM -0700, Christoph Hellwig wrote:
+> > On Tue, Sep 06, 2022 at 12:21:06PM +0200, Jan Kara wrote:
+> > > > For FOLL_PIN callers, never pin bvec and kvec pages:  For file systems
+> > > > not acquiring a reference is obviously safe, and the other callers will
+> > > > need an audit, but I can't think of why it woul  ever be unsafe.
+> > > 
+> > > Are you sure about "For file systems not acquiring a reference is obviously
+> > > safe"? I can see places e.g. in orangefs, afs, etc. which create bvec iters
+> > > from pagecache pages. And then we have iter_file_splice_write() which
+> > > creates bvec from pipe pages (which can also be pagecache pages if
+> > > vmsplice() is used). So perhaps there are no lifetime issues even without
+> > > acquiring a reference (but looking at the code I would not say it is
+> > > obvious) but I definitely don't see how it would be safe to not get a pin
+> > > to signal to filesystem backing the pagecache page that there is DMA
+> > > happening to/from the page.
+> > 
+> > I mean in the context of iov_iter_get_pages callers, that is direct
+> > I/O.  Direct callers of iov_iter_bvec which then pass that iov to
+> > ->read_iter / ->write_iter will need to hold references (those are
+> > the references that the callers of iov_iter_get_pages rely on!).
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Unless I'm misreading Jan, the question is whether they should get or
+> pin.  AFAICS, anyone who passes the sucker to ->read_iter() (or ->recvmsg(),
+> or does direct copy_to_iter()/zero_iter(), etc.) is falling under
+> =================================================================================
+> CASE 5: Pinning in order to write to the data within the page
+> -------------------------------------------------------------
+> Even though neither DMA nor Direct IO is involved, just a simple case of "pin,
+> write to a page's data, unpin" can cause a problem. Case 5 may be considered a
+> superset of Case 1, plus Case 2, plus anything that invokes that pattern. In
+> other words, if the code is neither Case 1 nor Case 2, it may still require
+> FOLL_PIN, for patterns like this:
+> 
+> Correct (uses FOLL_PIN calls):
+>     pin_user_pages()
+>     write to the data within the pages
+>     unpin_user_pages()
+> 
+> INCORRECT (uses FOLL_GET calls):
+>     get_user_pages()
+>     write to the data within the pages
+>     put_page()
+> =================================================================================
 
-Thanks, Looks good to me (Although I don't have chance to seek more time
-digging into PSI internal...)
+Yes, that was my point.
 
-Acked-by: Gao Xiang <hsiangkao@linux.alibaba.com>
+> Regarding iter_file_splice_write() case, do we need to pin pages
+> when we are not going to modify the data in those?
 
-Thanks,
-Gao Xiang,
+Strictly speaking not. So far we are pinning pages even if they serve as
+data source because it is simpler not to bother about data access direction
+but I'm not really aware of anything that would mandate that.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
