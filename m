@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2C5ECAAD3
-	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 11:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF87ECAAD3
+	for <linux-block@archiver.kernel.org>; Wed, 14 Sep 2022 11:47:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229938AbiINLq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Sep 2022 07:46:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34838 "EHLO
+        id S229907AbiINLrq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Sep 2022 07:47:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiINLq6 (ORCPT
+        with ESMTP id S229869AbiINLro (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Sep 2022 07:46:58 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532DA7A530
-        for <linux-block@vger.kernel.org>; Wed, 14 Sep 2022 04:46:56 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id h8so18288574wrf.3
-        for <linux-block@vger.kernel.org>; Wed, 14 Sep 2022 04:46:56 -0700 (PDT)
+        Wed, 14 Sep 2022 07:47:44 -0400
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE207AC24
+        for <linux-block@vger.kernel.org>; Wed, 14 Sep 2022 04:47:42 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id n35-20020a05600c502300b003b4924c6868so2138879wmr.1
+        for <linux-block@vger.kernel.org>; Wed, 14 Sep 2022 04:47:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=R0+X/Vt8U/YJmmqx4EaockLsNUJKMLE86zCLujidRXk=;
-        b=x896VLq/0T8z+7Ik2gVEyES3l8Hvh2btFLNkRDkyFPILpk8pTXgwHjASSECXNYjAWz
-         /4nzKNwpCXNTkvMp3wIXm+yfyMEvJgbc0MMk3D9eqte3BBV33uNDi2zp5DN9H7jUKXIY
-         QXvEQyfRrTQbfi9CRmk38OQyufCqNJxtBsi780ZltRwyVkT9bfkauohtiuVyIg+158uh
-         +dFEzwIdSyjmXHrCx/K924lHgmJPmWJYLsCwaV9AGTR61qVUxaiMSZ2OhTc/JpkYvAPH
-         4lWJuFbIHC8bixWnUFa+49kysfkp6O/h1VUzL+fvL4Iut0DY7EPkgG7OYYgpkJLQBkQf
-         Dppg==
+        bh=jkjInFA4v6207rYNR9PZy7GQsLdw9JOAYyp4dYZPwKo=;
+        b=gNw8KIHA1akV3WAIG3mTyAM9FwwfR45IWHpt7v8NJ/D3h8AuPnRAR4Fr9l6bY4Z+l+
+         yBth3uvMnFhQguK7OFTCFEvob15XvvYYkQE6d5COR/F3dEL9EtIxWGeLd3Ti+huvh2AS
+         UBiZdvfDAe2ffljdOWuaI7kc+tuNrsOiJfuhmKifgcExmxx2CxBo4QEmKguep2CjcgBi
+         Mp80NzZ2QTsl+f2ooHri9mIxl/A9EFiJh010AdjbJ9RG0BFdICtooF0X4b+3YpOiUcxo
+         PiaQDy5iGBG39jXagGb5CLj0tueVl6vvcptlPqe1xaYjbhuQ/GbIW0ZWRwxqmB33Cc8w
+         iz1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=R0+X/Vt8U/YJmmqx4EaockLsNUJKMLE86zCLujidRXk=;
-        b=Zg0ue9LGZF6fH/OLtYqG3LkWtjm2Tmr28eZtcCyyz0dG6NFSXBRpMfba/Pspriyslo
-         CI4QXS6yHTXg4JkcmDf/ct1Ki9BLK0bnC7geLAWSeZ+3tgJtbR86tTECQ2GU3iI4B+AB
-         Ju+VmABTov6Vw4LLL56kJMLhk4BUeqvAQE+kweD7ZmmlvfieYjoN/ADDELj5/u+TQ95Q
-         CAHlQ/gjgRKhHw6yyCujKt6+FcTGkGqOsch4CBk225bmAB6rWKm93tC+LxjuovnA2ZA6
-         b6AKHNpv8M2J+XA5t8RJVqikIYSiCWZMf1nFXbsmgHEQuLmkXVKrrO87bi4Ge9K6Rxk1
-         lA7w==
-X-Gm-Message-State: ACgBeo3vzrlO0QvgLQVMAuy+I37p2rM9lfXXLA5QDK1kGE/aP8iGsH/m
-        N1WusA9qSWAOGAqhgIbcnC50hg==
-X-Google-Smtp-Source: AA6agR5rGXGDLe/tOLWmuZc+R9A3yuqUfg5LeZ1FohTf0HB09NHH8ytKek+mH6dzb5U83k4gaIwQ1A==
-X-Received: by 2002:a5d:47aa:0:b0:226:dbf6:680c with SMTP id 10-20020a5d47aa000000b00226dbf6680cmr21226454wrb.581.1663156014968;
-        Wed, 14 Sep 2022 04:46:54 -0700 (PDT)
+        bh=jkjInFA4v6207rYNR9PZy7GQsLdw9JOAYyp4dYZPwKo=;
+        b=S9I2fEbdT9LFJFZ7fjuuGxlpckSvWmH3zWRsZ6CpBcJm3TGFsTy45KNq/6MzoNY47E
+         Yo5+uIsLYOAhuurznmhdF3nyKrYo6GEBbT5ptKEVDJ0zZsqvNLpLHer+X8oLLhzfEEwY
+         FcIL7myjZYWpRYIEm8zcL4U1ZO8EIZCXv6HTx1HYaF05X7WOR3W2klM56RnCbBJoq0pJ
+         9dNJ8f8zS0e/GH60DwqDhNvU5M022aOGJOpYT7DC7ViRh1P/k7XW3WX4WA2SdJEu5wjT
+         ZZC0pzHKzjVj1xmsDrfRu6epDcjpAbcOB5Nldze2p5OGca3+bISdh1b75vOitWW/Dmr7
+         fFbA==
+X-Gm-Message-State: ACgBeo3xM68kdysHLZCKnZ9nnKlTRJz7eUennbaikSxfSDtnE3lq6ojh
+        cNUcedu8SMXRr52LR1bosHLcJQ==
+X-Google-Smtp-Source: AA6agR6aSV3jXyKXuS6Lp8ysxs2qtNOBdPRNKt7wbfiui0ec8Ug1sA6v6mmiNfrSa5l3/MzmVoabgw==
+X-Received: by 2002:a7b:c84c:0:b0:3b3:3faa:10c3 with SMTP id c12-20020a7bc84c000000b003b33faa10c3mr2800743wml.94.1663156061281;
+        Wed, 14 Sep 2022 04:47:41 -0700 (PDT)
 Received: from localhost ([185.122.133.20])
-        by smtp.gmail.com with ESMTPSA id y25-20020a05600c365900b003b483000583sm11359663wmq.48.2022.09.14.04.46.54
+        by smtp.gmail.com with ESMTPSA id n9-20020a5d6609000000b0021e51c039c5sm13066031wru.80.2022.09.14.04.47.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Sep 2022 04:46:54 -0700 (PDT)
-Date:   Wed, 14 Sep 2022 12:46:54 +0100
+        Wed, 14 Sep 2022 04:47:40 -0700 (PDT)
+Date:   Wed, 14 Sep 2022 12:47:40 +0100
 From:   Johannes Weiner <hannes@cmpxchg.org>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
@@ -59,28 +59,26 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
         Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
         linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
-Subject: Re: [PATCH 3/5] btrfs: add manual PSI accounting for compressed reads
-Message-ID: <YyG/LlF7TbdHSCsm@cmpxchg.org>
+Subject: Re: [PATCH 4/5] erofs: add manual PSI accounting for the compressed
+ address space
+Message-ID: <YyG/XKXFNxk+HfXf@cmpxchg.org>
 References: <20220910065058.3303831-1-hch@lst.de>
- <20220910065058.3303831-4-hch@lst.de>
+ <20220910065058.3303831-5-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220910065058.3303831-4-hch@lst.de>
+In-Reply-To: <20220910065058.3303831-5-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 10, 2022 at 08:50:56AM +0200, Christoph Hellwig wrote:
-> btrfs compressed reads try to always read the entire compressed chunk,
-> even if only a subset is requested.  Currently this is covered by the
-> magic PSI accounting underneath submit_bio, but that is about to go
-> away. Instead add manual psi_memstall_{enter,leave} annotations.
-> 
-> Note that for readahead this really should be using readahead_expand,
-> but the additionals reads are also done for plain ->read_folio where
-> readahead_expand can't work, so this overall logic is left as-is for
-> now.
+On Sat, Sep 10, 2022 at 08:50:57AM +0200, Christoph Hellwig wrote:
+> erofs uses an additional address space for compressed data read from disk
+> in addition to the one directly associated with the inode.  Reading into
+> the lower address space is open coded using add_to_page_cache_lru instead
+> of using the filemap.c helper for page allocation micro-optimizations,
+> which means it is not covered by the MM PSI annotations for ->read_folio
+> and ->readahead, so add manual ones instead.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
