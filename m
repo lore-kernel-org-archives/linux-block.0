@@ -2,164 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78DCBC6FA89
-	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 16:49:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19203C32771
+	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 22:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230179AbiIOQt4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Sep 2022 12:49:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49922 "EHLO
+        id S229572AbiIOWtc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Sep 2022 18:49:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbiIOQt0 (ORCPT
+        with ESMTP id S229658AbiIOWta (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2022 12:49:26 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C29B9E6B8
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:58 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id w20so6843221ply.12
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=CC2AT69XGg5wm3bSeW54GIGYiTC1rZqaZVqT6NInl68=;
-        b=mu3+zu2fHkK18fyK8GquthMgCh0knmNuo1AuOv6/5p4XsIu5amJTOn6ebMi5f22/na
-         PdmtAwktXThz7euWyzkdNELKrfRtOJwgowVocLAbaPOqQuLnlvONAH9Ktcv8xh5VTMrL
-         zfixw/KKn7UoVL8Jol7k9Cf7o8+gbedJGP27U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=CC2AT69XGg5wm3bSeW54GIGYiTC1rZqaZVqT6NInl68=;
-        b=xPrrrlG4JVdlfs0OTYrWiQp0Bwy7oLyVeonpl9Pfj8gk7u9GIIdPno/dYll89BaQii
-         emN641RruAE3/h2fcZOCSACmkuuT+lupDaKuxooc+I1i+gMpkKxWwfi3eaJaUWLgO7gN
-         wvRqoh+rklxyM9LLNiQngH35N2TGB8Leiq8zMUGeg0PHNdPhUp/nMSN4+LNeljcsTemH
-         SVqioUnDVfMm2K16+rgfYwAVLwD5hgM3eOsGulU5P7iq9bXeuOpQOvs3tTsz0Tan3MQ7
-         CduhpaEhVwCce/cQQx8m4yt7A+5S2qq5skYoxT9wY5/rdmsfkUwdX9I5C7MRBeCeO1st
-         Ra1Q==
-X-Gm-Message-State: ACrzQf0RfZc/+xKRT39YS2u8jsvhWEglnURCKV1nv/GxNZ7J2ah2s7A8
-        qH7UVuMGiRQ4ms7PxoJGI3ukXw==
-X-Google-Smtp-Source: AMsMyM7xQDECJlshM1y7hrMSNYPc8bpR0IMtAX/vgFfB37FWYtZxA5MaaTnkclE6b1SXhntNfjnk0g==
-X-Received: by 2002:a17:902:b7c3:b0:176:b7e6:ae6c with SMTP id v3-20020a170902b7c300b00176b7e6ae6cmr292383plz.163.1663260537835;
-        Thu, 15 Sep 2022 09:48:57 -0700 (PDT)
-Received: from sarthakkukreti-glaptop.hsd1.ca.comcast.net ([2601:647:4200:b5b0:3af2:34b2:a98a:a652])
-        by smtp.gmail.com with ESMTPSA id o4-20020a170902bcc400b00177ee563b6dsm13174970pls.33.2022.09.15.09.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Sep 2022 09:48:56 -0700 (PDT)
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-X-Google-Original-From: Sarthak Kukreti <sarthakkukreti@google.com>
-To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>,
-        Sarthak Kukreti <sarthakkukreti@chromium.org>
-Subject: [PATCH RFC 8/8] ext4: Add a per-file provision override xattr
-Date:   Thu, 15 Sep 2022 09:48:26 -0700
-Message-Id: <20220915164826.1396245-9-sarthakkukreti@google.com>
-X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-In-Reply-To: <20220915164826.1396245-1-sarthakkukreti@google.com>
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+        Thu, 15 Sep 2022 18:49:30 -0400
+X-Greylist: delayed 554 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Sep 2022 15:49:28 PDT
+Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 849C0B61
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 15:49:27 -0700 (PDT)
+Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
+        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id F3CA6161C;
+        Fri, 16 Sep 2022 00:40:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
+        s=202205; t=1663281614;
+        bh=LJxbxN0p+J8K4MB6fZQ/FX68iUgDSxVET1nGFcHAxDw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HC9LxH81GBDUWS66rXqUxR+BRXg1iwoTKrioNmZDS2v0lCvd1wM+lSHHiiFytSw3B
+         6Vb2KIeDz1mejudKQsmwPwTxqEBxngcMVCKPhKRQwHPcy2cMP8ohX6RQU7DwQoF6aA
+         rk+qus0XbBml2Ts9sUwIBKihg6fFEe0AdImxESxD720xW4OId8+NcIlJlkiITDsVuZ
+         xEAPGZ+z2UpRvdCIrh7f7KC3Iw6Wj2fNL+dDkOlirxDIfFsksIWTNqEzTFVMH8TO+o
+         GlQrRd1u94EFPZvogOMRBzG+YGLI4E7CS3S0NZo10ImB6BDt/kEWzkAN9Uy789jlyN
+         niyGI+wu92fvGzg0NLb0q2z0Rb5S972+NLeCDBeWODYSW7ZKP9WMhlgrBK2MOwvQtf
+         cpF3txzKg5ZP0GPciHBGbgaGNWFvrwlIyz0q0t0CYvmklb5Nyt7mKW5okmN741PDX7
+         64bifIfc2vpjF1KI0F06QSmNt1XV1LMwfWGlpXNx93SgfzicaY4AsS12CwJwFrnqIu
+         nM0uRlzqvqFnPeDQ7vyvDWopT3+qVSDDlPhDxsOHizeaDlBP9TXO93pqgeGKQZXmZf
+         o0VRN5qfUvwFy0iTvxNwh9WXvoihaKIzz5/EZyN/w1RbgGB+FL9PJqGyGJFuK5CEFR
+         lAv5k4ye3tPfxl6krEp0q9wo=
+Date:   Fri, 16 Sep 2022 00:40:12 +0200
+From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Federico Vaga <federico.vaga@vaga.pv.it>,
+        Alex Shi <alexs@kernel.org>,
+        Yanteng Si <siyanteng@loongson.cn>,
+        Hu Haowen <src.res@email.cn>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-doc-tw-discuss@lists.sourceforge.net,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH v4 16/18] nbd: remove define-only NBD_MAGIC, previously magic
+ number
+Message-ID: <10a80681c5966fed1a1afc696e3db114f481514c.1663280877.git.nabijaczleweli@nabijaczleweli.xyz>
+References: <YyMlovoskUcHLEb7@kroah.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="xpjr53kvf7ol5gv5"
+Content-Disposition: inline
+In-Reply-To: <YyMlovoskUcHLEb7@kroah.com>
+User-Agent: NeoMutt/20220429
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Sarthak Kukreti <sarthakkukreti@chromium.org>
 
-Adds a per-file provision override that allows select files to
-override the per-mount setting for provisioning blocks on allocation.
+--xpjr53kvf7ol5gv5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This acts as a mechanism to allow mounts using provision to
-replicate the current behavior for fallocate() and only preserve
-space at the filesystem level.
+commit f4507164e779 ("nbd: rename the nbd_device variable from lo to
+nbd") renamed LO_MAGIC to NBD_MAGIC; commit 5ea8d10802ec ("nbd:
+separate out the config information") removed the last users of that
 
-Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
 ---
- fs/ext4/extents.c | 32 ++++++++++++++++++++++++++++++++
- fs/ext4/xattr.h   |  1 +
- 2 files changed, 33 insertions(+)
+ Documentation/process/magic-number.rst                    | 1 -
+ Documentation/translations/it_IT/process/magic-number.rst | 1 -
+ Documentation/translations/zh_CN/process/magic-number.rst | 1 -
+ Documentation/translations/zh_TW/process/magic-number.rst | 1 -
+ drivers/block/nbd.c                                       | 2 --
+ 5 files changed, 6 deletions(-)
 
-diff --git a/fs/ext4/extents.c b/fs/ext4/extents.c
-index 746213b5ec3d..a9ed908b2ebe 100644
---- a/fs/ext4/extents.c
-+++ b/fs/ext4/extents.c
-@@ -4424,6 +4424,26 @@ int ext4_ext_truncate(handle_t *handle, struct inode *inode)
- 	return err;
- }
- 
-+int ext4_provision_support(struct inode *inode)
-+{
-+	char provision;
-+	int ret =
-+		ext4_xattr_get(inode, EXT4_XATTR_INDEX_TRUSTED,
-+			       EXT4_XATTR_NAME_PROVISION_POLICY, &provision, 1);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	switch (provision) {
-+	case 'y':
-+		return 1;
-+	case 'n':
-+		return 0;
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
- static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
- 				  ext4_lblk_t len, loff_t new_size,
- 				  int flags)
-@@ -4436,12 +4456,24 @@ static int ext4_alloc_file_blocks(struct file *file, ext4_lblk_t offset,
- 	struct ext4_map_blocks map;
- 	unsigned int credits;
- 	loff_t epos;
-+	bool provision = false;
-+	int file_provision_override = -1;
- 
- 	/*
- 	 * Attempt to provision file blocks if the mount is mounted with
- 	 * provision.
- 	 */
- 	if (test_opt2(inode->i_sb, PROVISION))
-+		provision = true;
-+
-+	/*
-+	 * Use file-specific override, if available.
-+	 */
-+	file_provision_override = ext4_provision_support(inode);
-+	if (file_provision_override >= 0)
-+		provision &= file_provision_override;
-+
-+	if (provision)
- 		flags |= EXT4_GET_BLOCKS_PROVISION;
- 
- 	BUG_ON(!ext4_test_inode_flag(inode, EXT4_INODE_EXTENTS));
-diff --git a/fs/ext4/xattr.h b/fs/ext4/xattr.h
-index 824faf0b15a8..69e97f853b0c 100644
---- a/fs/ext4/xattr.h
-+++ b/fs/ext4/xattr.h
-@@ -140,6 +140,7 @@ extern const struct xattr_handler ext4_xattr_security_handler;
- extern const struct xattr_handler ext4_xattr_hurd_handler;
- 
- #define EXT4_XATTR_NAME_ENCRYPTION_CONTEXT "c"
-+#define EXT4_XATTR_NAME_PROVISION_POLICY "provision"
- 
- /*
-  * The EXT4_STATE_NO_EXPAND is overloaded and used for two purposes.
--- 
-2.31.0
+diff --git a/Documentation/process/magic-number.rst b/Documentation/process=
+/magic-number.rst
+index e242ef9e5dd3..3f72252d9fd3 100644
+--- a/Documentation/process/magic-number.rst
++++ b/Documentation/process/magic-number.rst
+@@ -81,7 +81,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
+       ``include/linux/
+ BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
+net/baycom_epp.c``
+ HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
+linux/hdlcdrv.h``
+ KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
+s/include/asm/sn/klkernvars.h``
+-LO_MAGIC              0x68797548       nbd_device               ``include/=
+linux/nbd.h``
+ NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
+linux/nbd.h``
+ ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
+eni.h``
+ CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
+coda_fs_i.h``
+diff --git a/Documentation/translations/it_IT/process/magic-number.rst b/Do=
+cumentation/translations/it_IT/process/magic-number.rst
+index 0730b561ff47..db57ea55d3be 100644
+--- a/Documentation/translations/it_IT/process/magic-number.rst
++++ b/Documentation/translations/it_IT/process/magic-number.rst
+@@ -87,7 +87,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
+       ``include/linux/
+ BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
+net/baycom_epp.c``
+ HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
+linux/hdlcdrv.h``
+ KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
+s/include/asm/sn/klkernvars.h``
+-LO_MAGIC              0x68797548       nbd_device               ``include/=
+linux/nbd.h``
+ NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
+linux/nbd.h``
+ ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
+eni.h``
+ CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
+coda_fs_i.h``
+diff --git a/Documentation/translations/zh_CN/process/magic-number.rst b/Do=
+cumentation/translations/zh_CN/process/magic-number.rst
+index 70e46ecf8089..c555e857a210 100644
+--- a/Documentation/translations/zh_CN/process/magic-number.rst
++++ b/Documentation/translations/zh_CN/process/magic-number.rst
+@@ -70,7 +70,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
+       ``include/linux/
+ BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
+net/baycom_epp.c``
+ HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
+linux/hdlcdrv.h``
+ KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
+s/include/asm/sn/klkernvars.h``
+-LO_MAGIC              0x68797548       nbd_device               ``include/=
+linux/nbd.h``
+ NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
+linux/nbd.h``
+ ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
+eni.h``
+ CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
+coda_fs_i.h``
+diff --git a/Documentation/translations/zh_TW/process/magic-number.rst b/Do=
+cumentation/translations/zh_TW/process/magic-number.rst
+index e2c650213d51..ebe99277b7b3 100644
+--- a/Documentation/translations/zh_TW/process/magic-number.rst
++++ b/Documentation/translations/zh_TW/process/magic-number.rst
+@@ -73,7 +73,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
+       ``include/linux/
+ BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
+net/baycom_epp.c``
+ HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
+linux/hdlcdrv.h``
+ KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
+s/include/asm/sn/klkernvars.h``
+-LO_MAGIC              0x68797548       nbd_device               ``include/=
+linux/nbd.h``
+ NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
+linux/nbd.h``
+ ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
+eni.h``
+ CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
+coda_fs_i.h``
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 2a709daefbc4..e185d7b5f1e8 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -157,8 +157,6 @@ static struct dentry *nbd_dbg_dir;
+=20
+ #define nbd_name(nbd) ((nbd)->disk->disk_name)
+=20
+-#define NBD_MAGIC 0x68797548
+-
+ #define NBD_DEF_BLKSIZE_BITS 10
+=20
+ static unsigned int nbds_max =3D 16;
+--=20
+2.30.2
 
+--xpjr53kvf7ol5gv5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmMjqcwACgkQvP0LAY0m
+WPFaRw/+KLY9JQVt3S6Uq8YY1O5AK2Xvnk8+Faf/e5+ajK0ZY+tODhLaUj532JPw
+KryqUqOduysnHgM/9eQ3E3+UwMqu/Q4YibiPrHPTkJkbSZIZAyZqahtSXM7+Jgi1
+W7iYjWtxk8ayGEAazuX0+f+7K9htN7grQNEhnKnFvRw0KVN74sAi01SqT5vxHTja
+zrsI0nPVVWgjiDYTt7PTNu3QSkoY1/mBtORzrMnCLOqRSiVS3IFFDhQMqt/L1Wcw
+SG3bqKEU4noZPrIj8uP8C9MRMkJKzJGNZsqhzKZltuhcUXYVAgkjkaSpsGWgbz7w
+UIJAGUVm2VXqdbGynmSfyxXJUX/q8PVWEiJ3zDHdkc534JLjlIKBbSinFkF3cMyC
+iSzkp5VA2RLWBYru/+E13vpH16gPstxKxPv7lZxCx6ZUms8ZBuT3R/oIchEHKJxm
+ZziSa/Iq9bVKl2lqsh4egkugcAtp8LkVoyOj6HT6Zx0QDlrAL/wDAJBg9XRYl/Q/
+M4rfoKffAJgsFFviwKhoripKIB2rSXbeiiX8lIEUAugSDxzM/0FB06dMQB8lYSMT
+RSW4VCpN6aRYHTB917vyRAdvQKUV3H8zH+abYBe3zVJb8+QZxFgzop7NJfHFJW9v
+UXGtgUDMDEPPIr+EJRxQ2a9rONdS67XMs4IOPuuylNwKy/j1L20=
+=bjLr
+-----END PGP SIGNATURE-----
+
+--xpjr53kvf7ol5gv5--
