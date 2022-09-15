@@ -2,203 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19203C32771
-	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 22:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17818C32771
+	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 23:23:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiIOWtc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Sep 2022 18:49:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60068 "EHLO
+        id S229501AbiIOXW7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Sep 2022 19:22:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiIOWta (ORCPT
+        with ESMTP id S229473AbiIOXW6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2022 18:49:30 -0400
-X-Greylist: delayed 554 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 15 Sep 2022 15:49:28 PDT
-Received: from tarta.nabijaczleweli.xyz (unknown [139.28.40.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 849C0B61
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 15:49:27 -0700 (PDT)
-Received: from tarta.nabijaczleweli.xyz (unknown [192.168.1.250])
-        by tarta.nabijaczleweli.xyz (Postfix) with ESMTPSA id F3CA6161C;
-        Fri, 16 Sep 2022 00:40:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nabijaczleweli.xyz;
-        s=202205; t=1663281614;
-        bh=LJxbxN0p+J8K4MB6fZQ/FX68iUgDSxVET1nGFcHAxDw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HC9LxH81GBDUWS66rXqUxR+BRXg1iwoTKrioNmZDS2v0lCvd1wM+lSHHiiFytSw3B
-         6Vb2KIeDz1mejudKQsmwPwTxqEBxngcMVCKPhKRQwHPcy2cMP8ohX6RQU7DwQoF6aA
-         rk+qus0XbBml2Ts9sUwIBKihg6fFEe0AdImxESxD720xW4OId8+NcIlJlkiITDsVuZ
-         xEAPGZ+z2UpRvdCIrh7f7KC3Iw6Wj2fNL+dDkOlirxDIfFsksIWTNqEzTFVMH8TO+o
-         GlQrRd1u94EFPZvogOMRBzG+YGLI4E7CS3S0NZo10ImB6BDt/kEWzkAN9Uy789jlyN
-         niyGI+wu92fvGzg0NLb0q2z0Rb5S972+NLeCDBeWODYSW7ZKP9WMhlgrBK2MOwvQtf
-         cpF3txzKg5ZP0GPciHBGbgaGNWFvrwlIyz0q0t0CYvmklb5Nyt7mKW5okmN741PDX7
-         64bifIfc2vpjF1KI0F06QSmNt1XV1LMwfWGlpXNx93SgfzicaY4AsS12CwJwFrnqIu
-         nM0uRlzqvqFnPeDQ7vyvDWopT3+qVSDDlPhDxsOHizeaDlBP9TXO93pqgeGKQZXmZf
-         o0VRN5qfUvwFy0iTvxNwh9WXvoihaKIzz5/EZyN/w1RbgGB+FL9PJqGyGJFuK5CEFR
-         lAv5k4ye3tPfxl6krEp0q9wo=
-Date:   Fri, 16 Sep 2022 00:40:12 +0200
-From:   =?utf-8?B?0L3QsNCx?= <nabijaczleweli@nabijaczleweli.xyz>
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Federico Vaga <federico.vaga@vaga.pv.it>,
-        Alex Shi <alexs@kernel.org>,
-        Yanteng Si <siyanteng@loongson.cn>,
-        Hu Haowen <src.res@email.cn>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-doc-tw-discuss@lists.sourceforge.net,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH v4 16/18] nbd: remove define-only NBD_MAGIC, previously magic
- number
-Message-ID: <10a80681c5966fed1a1afc696e3db114f481514c.1663280877.git.nabijaczleweli@nabijaczleweli.xyz>
-References: <YyMlovoskUcHLEb7@kroah.com>
+        Thu, 15 Sep 2022 19:22:58 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C527C75A;
+        Thu, 15 Sep 2022 16:22:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663284177; x=1694820177;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4Aotw1s2HbqfBcOfpO1TwzDGwI8uCbHCjQTddLKguTw=;
+  b=cy3QCpyUKItDG03fuTj/4B2Ri9zu2kUc8NBFkE0H/OyJPJuWLaDuzNjk
+   +xtRyZVyYJckON60X27k4grQywsHYfEgJoAoU7oZI7zqWyUD/EJTPvNYy
+   alYgIYQXL8UY0JACDQPwf7d/p/J594mYgluY97AsbfLSM2KwZ8RcqzQna
+   O1mlgpXQyIA34+vmKpZ16/rlx9+orLRyK1pXi5szPWj/yIiZlzbvO/ci8
+   7K3HyFzzO7jhfIteAZcBSwM/EoF9wc5NNYGkgnRp8j9IaCBTbKxbguSyV
+   omJjAtMCMplqo6gHjysmCTGpBNfqI7BfqX9T23aicNImwon/ShNGzevEx
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10471"; a="281893229"
+X-IronPort-AV: E=Sophos;i="5.93,319,1654585200"; 
+   d="scan'208";a="281893229"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 16:22:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,319,1654585200"; 
+   d="scan'208";a="568623143"
+Received: from lkp-server02.sh.intel.com (HELO 41300c7200ea) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 15 Sep 2022 16:22:54 -0700
+Received: from kbuild by 41300c7200ea with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oYyC5-0001Aa-2R;
+        Thu, 15 Sep 2022 23:22:53 +0000
+Date:   Fri, 16 Sep 2022 07:22:06 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     "Alexander V. Buev" <a.buev@yadro.com>, linux-block@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, io-uring@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com,
+        "Alexander V. Buev" <a.buev@yadro.com>
+Subject: Re: [PATCH v4 2/3] block: io-uring: add READV_PI/WRITEV_PI operations
+Message-ID: <202209160737.29uHLqYq-lkp@intel.com>
+References: <20220909122040.1098696-3-a.buev@yadro.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="xpjr53kvf7ol5gv5"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YyMlovoskUcHLEb7@kroah.com>
-User-Agent: NeoMutt/20220429
+In-Reply-To: <20220909122040.1098696-3-a.buev@yadro.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Alexander,
 
---xpjr53kvf7ol5gv5
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thank you for the patch! Perhaps something to improve:
 
-commit f4507164e779 ("nbd: rename the nbd_device variable from lo to
-nbd") renamed LO_MAGIC to NBD_MAGIC; commit 5ea8d10802ec ("nbd:
-separate out the config information") removed the last users of that
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v6.0-rc5 next-20220915]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Ahelenia Ziemia=C5=84ska <nabijaczleweli@nabijaczleweli.xyz>
----
- Documentation/process/magic-number.rst                    | 1 -
- Documentation/translations/it_IT/process/magic-number.rst | 1 -
- Documentation/translations/zh_CN/process/magic-number.rst | 1 -
- Documentation/translations/zh_TW/process/magic-number.rst | 1 -
- drivers/block/nbd.c                                       | 2 --
- 5 files changed, 6 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Alexander-V-Buev/implement-direct-IO-with-integrity/20220909-202433
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: parisc-randconfig-s053-20220914 (https://download.01.org/0day-ci/archive/20220916/202209160737.29uHLqYq-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 12.1.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/81de858455c5cf1e5870106f544fe1fd179fa324
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Alexander-V-Buev/implement-direct-IO-with-integrity/20220909-202433
+        git checkout 81de858455c5cf1e5870106f544fe1fd179fa324
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=parisc SHELL=/bin/bash
 
-diff --git a/Documentation/process/magic-number.rst b/Documentation/process=
-/magic-number.rst
-index e242ef9e5dd3..3f72252d9fd3 100644
---- a/Documentation/process/magic-number.rst
-+++ b/Documentation/process/magic-number.rst
-@@ -81,7 +81,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
-       ``include/linux/
- BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
-net/baycom_epp.c``
- HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
-linux/hdlcdrv.h``
- KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
-s/include/asm/sn/klkernvars.h``
--LO_MAGIC              0x68797548       nbd_device               ``include/=
-linux/nbd.h``
- NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
-linux/nbd.h``
- ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
-eni.h``
- CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
-coda_fs_i.h``
-diff --git a/Documentation/translations/it_IT/process/magic-number.rst b/Do=
-cumentation/translations/it_IT/process/magic-number.rst
-index 0730b561ff47..db57ea55d3be 100644
---- a/Documentation/translations/it_IT/process/magic-number.rst
-+++ b/Documentation/translations/it_IT/process/magic-number.rst
-@@ -87,7 +87,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
-       ``include/linux/
- BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
-net/baycom_epp.c``
- HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
-linux/hdlcdrv.h``
- KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
-s/include/asm/sn/klkernvars.h``
--LO_MAGIC              0x68797548       nbd_device               ``include/=
-linux/nbd.h``
- NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
-linux/nbd.h``
- ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
-eni.h``
- CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
-coda_fs_i.h``
-diff --git a/Documentation/translations/zh_CN/process/magic-number.rst b/Do=
-cumentation/translations/zh_CN/process/magic-number.rst
-index 70e46ecf8089..c555e857a210 100644
---- a/Documentation/translations/zh_CN/process/magic-number.rst
-+++ b/Documentation/translations/zh_CN/process/magic-number.rst
-@@ -70,7 +70,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
-       ``include/linux/
- BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
-net/baycom_epp.c``
- HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
-linux/hdlcdrv.h``
- KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
-s/include/asm/sn/klkernvars.h``
--LO_MAGIC              0x68797548       nbd_device               ``include/=
-linux/nbd.h``
- NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
-linux/nbd.h``
- ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
-eni.h``
- CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
-coda_fs_i.h``
-diff --git a/Documentation/translations/zh_TW/process/magic-number.rst b/Do=
-cumentation/translations/zh_TW/process/magic-number.rst
-index e2c650213d51..ebe99277b7b3 100644
---- a/Documentation/translations/zh_TW/process/magic-number.rst
-+++ b/Documentation/translations/zh_TW/process/magic-number.rst
-@@ -73,7 +73,6 @@ NBD_REQUEST_MAGIC     0x12560953       nbd_request       =
-       ``include/linux/
- BAYCOM_MAGIC          0x19730510       baycom_state             ``drivers/=
-net/baycom_epp.c``
- HDLCDRV_MAGIC         0x5ac6e778       hdlcdrv_state            ``include/=
-linux/hdlcdrv.h``
- KV_MAGIC              0x5f4b565f       kernel_vars_s            ``arch/mip=
-s/include/asm/sn/klkernvars.h``
--LO_MAGIC              0x68797548       nbd_device               ``include/=
-linux/nbd.h``
- NBD_REPLY_MAGIC       0x96744668       nbd_reply                ``include/=
-linux/nbd.h``
- ENI155_MAGIC          0xa54b872d       midway_eprom	        ``drivers/atm/=
-eni.h``
- CODA_MAGIC            0xC0DAC0DA       coda_file_info           ``fs/coda/=
-coda_fs_i.h``
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 2a709daefbc4..e185d7b5f1e8 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -157,8 +157,6 @@ static struct dentry *nbd_dbg_dir;
-=20
- #define nbd_name(nbd) ((nbd)->disk->disk_name)
-=20
--#define NBD_MAGIC 0x68797548
--
- #define NBD_DEF_BLKSIZE_BITS 10
-=20
- static unsigned int nbds_max =3D 16;
---=20
-2.30.2
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
---xpjr53kvf7ol5gv5
-Content-Type: application/pgp-signature; name="signature.asc"
+sparse warnings: (new ones prefixed by >>)
+   io_uring/rw_pi.c: note: in included file (through io_uring/io_uring.h):
+   io_uring/slist.h:138:29: sparse: sparse: no newline at end of file
+   io_uring/rw_pi.c:248:27: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected void *private @@     got void [noderef] __user * @@
+   io_uring/rw_pi.c:248:27: sparse:     expected void *private
+   io_uring/rw_pi.c:248:27: sparse:     got void [noderef] __user *
+   io_uring/rw_pi.c:458:43: sparse: sparse: Using plain integer as NULL pointer
+   io_uring/rw_pi.c:543:43: sparse: sparse: Using plain integer as NULL pointer
+>> io_uring/rw_pi.c:266:17: sparse: sparse: cast removes address space '__user' of expression
+   io_uring/rw_pi.c:266:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:266:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:266:14: sparse:     got struct iovec *
+   io_uring/rw_pi.c:275:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:275:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:275:14: sparse:     got struct iovec *
+>> io_uring/rw_pi.c:266:17: sparse: sparse: cast removes address space '__user' of expression
+   io_uring/rw_pi.c:266:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:266:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:266:14: sparse:     got struct iovec *
+   io_uring/rw_pi.c:275:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:275:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:275:14: sparse:     got struct iovec *
+>> io_uring/rw_pi.c:266:17: sparse: sparse: cast removes address space '__user' of expression
+   io_uring/rw_pi.c:266:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:266:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:266:14: sparse:     got struct iovec *
+   io_uring/rw_pi.c:275:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:275:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:275:14: sparse:     got struct iovec *
+>> io_uring/rw_pi.c:266:17: sparse: sparse: cast removes address space '__user' of expression
+   io_uring/rw_pi.c:266:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:266:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:266:14: sparse:     got struct iovec *
+   io_uring/rw_pi.c:275:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct iovec [noderef] __user *uvec @@     got struct iovec * @@
+   io_uring/rw_pi.c:275:14: sparse:     expected struct iovec [noderef] __user *uvec
+   io_uring/rw_pi.c:275:14: sparse:     got struct iovec *
 
------BEGIN PGP SIGNATURE-----
+vim +/__user +266 io_uring/rw_pi.c
 
-iQIzBAABCgAdFiEEfWlHToQCjFzAxEFjvP0LAY0mWPEFAmMjqcwACgkQvP0LAY0m
-WPFaRw/+KLY9JQVt3S6Uq8YY1O5AK2Xvnk8+Faf/e5+ajK0ZY+tODhLaUj532JPw
-KryqUqOduysnHgM/9eQ3E3+UwMqu/Q4YibiPrHPTkJkbSZIZAyZqahtSXM7+Jgi1
-W7iYjWtxk8ayGEAazuX0+f+7K9htN7grQNEhnKnFvRw0KVN74sAi01SqT5vxHTja
-zrsI0nPVVWgjiDYTt7PTNu3QSkoY1/mBtORzrMnCLOqRSiVS3IFFDhQMqt/L1Wcw
-SG3bqKEU4noZPrIj8uP8C9MRMkJKzJGNZsqhzKZltuhcUXYVAgkjkaSpsGWgbz7w
-UIJAGUVm2VXqdbGynmSfyxXJUX/q8PVWEiJ3zDHdkc534JLjlIKBbSinFkF3cMyC
-iSzkp5VA2RLWBYru/+E13vpH16gPstxKxPv7lZxCx6ZUms8ZBuT3R/oIchEHKJxm
-ZziSa/Iq9bVKl2lqsh4egkugcAtp8LkVoyOj6HT6Zx0QDlrAL/wDAJBg9XRYl/Q/
-M4rfoKffAJgsFFviwKhoripKIB2rSXbeiiX8lIEUAugSDxzM/0FB06dMQB8lYSMT
-RSW4VCpN6aRYHTB917vyRAdvQKUV3H8zH+abYBe3zVJb8+QZxFgzop7NJfHFJW9v
-UXGtgUDMDEPPIr+EJRxQ2a9rONdS67XMs4IOPuuylNwKy/j1L20=
-=bjLr
------END PGP SIGNATURE-----
+   255	
+   256	
+   257	static inline int
+   258	io_import_iovecs_pi(int io_dir, struct io_kiocb *req, struct iovec **iovec,
+   259				struct io_rw_state *s_data, struct __io_rw_pi_state *s_pi)
+   260	{
+   261		struct io_rw_pi *rw = io_kiocb_to_cmd(req, struct io_rw_pi);
+   262		struct iovec __user *uvec;
+   263		ssize_t ret;
+   264	
+   265		/* data */
+ > 266		uvec = (struct iovec *)u64_to_user_ptr(rw->addr);
+   267		iovec[DATA] = s_data->fast_iov;
+   268		ret = __import_iovec(io_dir, uvec, rw->nr_segs,
+   269					UIO_FASTIOV, iovec + DATA,
+   270					&s_data->iter, req->ctx->compat);
+   271	
+   272		if (unlikely(ret <= 0))
+   273			return (ret) ? ret : -EINVAL;
+   274		/* pi */
+   275		uvec = (struct iovec *)rw->kiocb.private;
+   276		iovec[PI] = s_pi->fast_iov;
+   277		ret = __import_iovec(io_dir, uvec, rw->nr_pi_segs,
+   278					UIO_FASTIOV_PI, iovec + PI,
+   279					&s_pi->iter, req->ctx->compat);
+   280		if (unlikely(ret <= 0)) {
+   281			if (iovec[DATA])
+   282				kfree(iovec[DATA]);
+   283			return (ret) ? ret : -EINVAL;
+   284		}
+   285	
+   286		/* save states */
+   287		io_rw_pi_state_iter_save(s_data, s_pi);
+   288	
+   289		return 0;
+   290	}
+   291	
 
---xpjr53kvf7ol5gv5--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
