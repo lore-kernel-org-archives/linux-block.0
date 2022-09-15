@@ -2,133 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3765FC6FA89
-	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 15:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DF1C6FA89
+	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 16:48:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbiIOPmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Sep 2022 11:42:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52062 "EHLO
+        id S229542AbiIOQsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Sep 2022 12:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiIOPlt (ORCPT
+        with ESMTP id S229462AbiIOQsm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2022 11:41:49 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E6A754BF
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 08:41:48 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 8591F21B7D;
-        Thu, 15 Sep 2022 15:41:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663256507; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E+f78KcwCsN6dDgoNHa82d5GxDQmIauK2QBNQykhlZ8=;
-        b=EpfXO4hhLoabs6VgUMGB6/xYhAU8MvPFKBJ5ty17xk2kIdgfR6YOuRcJiSDLqSTJ2IHoBA
-        mNQ7N5mSNMYrpJ6LSrDqCqzZYTADJPXuF0ovpl98h26V2jVeF7j93kq5XocupI1367V5T8
-        x12HEpqLT/SSpqIyRtv9CxQTjJLgfgc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663256507;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=E+f78KcwCsN6dDgoNHa82d5GxDQmIauK2QBNQykhlZ8=;
-        b=4CyjsOTgwGwLTc97oQHabX4jjsWM9aqsjw2xQXTXqjY6pECCmBICJ/F8RtmTEsyDqAo15D
-        6NzoTSXBE1jUinBA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5F12213A49;
-        Thu, 15 Sep 2022 15:41:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id QNvmFLtHI2PZGgAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 15 Sep 2022 15:41:47 +0000
-Message-ID: <381b003e-3510-8cbf-031d-b5314b17560d@suse.de>
-Date:   Thu, 15 Sep 2022 17:41:46 +0200
+        Thu, 15 Sep 2022 12:48:42 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7703061D9C
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:38 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id a80so10058147pfa.4
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=zlA6ptTTn1LB8f3ds6R6bK3ndLgpFyQYa5/cgjmBz0k=;
+        b=EkH8vzH6AY/x2FDEot3lJqk0qgC1I0+W6noGE8h+Y7T5NdA67sJRGO99osypN4wxjP
+         si3T4JRl24o/N1JFcREcZ+zhM49Wim0sKm0xkSF0UULLVn87ChuPX89dvF+y0pdogAfr
+         dKUfrjDX9+mkcQ0KQAMMNZU7EcTIPVzAUmPLA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=zlA6ptTTn1LB8f3ds6R6bK3ndLgpFyQYa5/cgjmBz0k=;
+        b=sPkvQGY6EgD+9CPFaoLfBwLhU4HfRFLaC2KdWBDqYL6xHlxvm/9DykN7K/pW+lvir7
+         e6OvO3HDkLFyteEGxzJaRuQ98yLXMxJ1Bw/bwMWc032xSocxzmmyks0iIRGV2HicssBc
+         0u9UAUppElAzcURgYLrI5+FMlIj58i1do890E0SAklA0mQv34d0Bl9VErK9RL8PcAQ0H
+         ExU4OVo5VKJllS08Zj7bj656MxhFRPofGVNRmPJw5Ldfrr9wyhCaC72dRsSaYG5IQF9D
+         wnFJo/NECa7gT5vwzpq4hesqO2fNDdS2l+tHOMWNScdNV9pgqlS4f9RZ2uh/L4QhMtSn
+         Z0gw==
+X-Gm-Message-State: ACrzQf2dT4blRdOg2UHT6gLHrkcrCuy2UYT4idF8JLVxOyCl+YlVDIle
+        /q7uD+5W4o6JgDhAej9jLvBLV1dNXe7AzavG
+X-Google-Smtp-Source: AMsMyM4FdBRmEUaoFqZ1ZX6Vh6XtevMCEGOiKjv87UB8WmxxEo9+INCb9SpLcAAa5zOhruJLuTG+QQ==
+X-Received: by 2002:aa7:8892:0:b0:540:edcb:4773 with SMTP id z18-20020aa78892000000b00540edcb4773mr674454pfe.19.1663260517947;
+        Thu, 15 Sep 2022 09:48:37 -0700 (PDT)
+Received: from sarthakkukreti-glaptop.hsd1.ca.comcast.net ([2601:647:4200:b5b0:3af2:34b2:a98a:a652])
+        by smtp.gmail.com with ESMTPSA id o4-20020a170902bcc400b00177ee563b6dsm13174970pls.33.2022.09.15.09.48.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Sep 2022 09:48:37 -0700 (PDT)
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+X-Google-Original-From: Sarthak Kukreti <sarthakkukreti@google.com>
+To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        Evan Green <evgreen@google.com>,
+        Gwendal Grignou <gwendal@google.com>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>
+Subject: [PATCH RFC 0/8] Introduce provisioning primitives for thinly provisioned storage
+Date:   Thu, 15 Sep 2022 09:48:18 -0700
+Message-Id: <20220915164826.1396245-1-sarthakkukreti@google.com>
+X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH blktests v3] nvme/046: test queue count changes on
- reconnect
-Content-Language: en-US
-To:     Daniel Wagner <dwagner@suse.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        James Smart <jsmart2021@gmail.com>
-References: <20220913065758.134668-1-dwagner@suse.de>
- <20220913105743.gw2gczryymhy6x5o@shindev>
- <20220913114210.gceoxlpffhaekpk7@carbon.lan>
- <20220913171049.kgim57lu5rqb7j3g@carbon.lan>
- <20220914090003.jbc5xmtfxjjssuz3@carbon.lan>
- <3b58b91d-e217-86a2-b2e4-3b0656bbe0e9@grimberg.me>
- <20220914110717.pvzm2666mklkg73a@carbon.lan>
- <20220915125037.fqhcokdn4scnklyq@carbon.lan>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220915125037.fqhcokdn4scnklyq@carbon.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/15/22 14:50, Daniel Wagner wrote:
->> So do we agree the fc host should not stop reconnecting? James?
-> 
-> With the change below the test succeeds once:
-> 
-> diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-> index 42767fb75455..b167cf9fee6d 100644
-> --- a/drivers/nvme/host/fc.c
-> +++ b/drivers/nvme/host/fc.c
-> @@ -3325,8 +3325,6 @@ nvme_fc_reconnect_or_delete(struct nvme_fc_ctrl *ctrl, int status)
->                  dev_info(ctrl->ctrl.device,
->                          "NVME-FC{%d}: reset: Reconnect attempt failed (%d)\n",
->                          ctrl->cnum, status);
-> -               if (status > 0 && (status & NVME_SC_DNR))
-> -                       recon = false;
->          } else if (time_after_eq(jiffies, rport->dev_loss_end))
->                  recon = false;
-> 
-> This part was introduced with f25f8ef70ce2 ("nvme-fc: short-circuit
-> reconnect retries"):
-> 
->      nvme-fc: short-circuit reconnect retries
-> 
->      Returning an nvme status from nvme_fc_create_association() indicates
->      that the association is established, and we should honour the DNR bit.
->      If it's set a reconnect attempt will just return the same error, so
->      we can short-circuit the reconnect attempts and fail the connection
->      directly.
-> 
-> It looks like the reasoning here didn't take into consideration the
-> scenario we have here. I'd say we should not do it and handle it similar
-> as with have with tcp/rdma.
-> 
-But that is wrong.
-When we are evaluating the NVMe status we _need_ to check the DNR bit; 
-that's precisely what it's for.
+From: Sarthak Kukreti <sarthakkukreti@chromium.org>
 
-The real reason here is a queue inversion with fcloop; we've had them 
-for ages, and I'm not surprised that it pops off now.
-In fact, I was quite surprised that I didn't hit it when updating 
-blktests; in previous versions I had to insert an explicit 'sleep 2' 
-before disconnect to make it work.
+Hi,
 
-I'd rather fix that than reverting FC to the (wrong) behaviour.
+This patch series is an RFC of a mechanism to pass through provision requests on stacked thinly provisioned storage devices/filesystems.
 
-Cheers,
+The linux kernel provides several mechanisms to set up thinly provisioned block storage abstractions (eg. dm-thin, loop devices over sparse files), either directly as block devices or backing storage for filesystems. Currently, short of writing data to either the device or filesystem, there is no way for users to pre-allocate space for use in such storage setups. Consider the following use-cases:
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
+1) Suspend-to-disk and resume from a dm-thin device: In order to ensure that the underlying thinpool metadata is not modified during the suspend mechanism, the dm-thin device needs to be fully provisioned.
+2) If a filesystem uses a loop device over a sparse file, fallocate() on the filesystem will allocate blocks for files but the underlying sparse file will remain intact.
+3) Another example is virtual machine using a sparse file/dm-thin as a storage device; by default, allocations within the VM boundaries will not affect the host.
+4) Several storage standards support mechanisms for thin provisioning on real hardware devices. For example:
+  a. The NVMe spec 1.0b section 2.1.1 loosely talks about thin provisioning: "When the THINP bit in the NSFEAT field of the Identify Namespace data structure is set to ‘1’, the controller ... shall track the number of allocated blocks in the Namespace Utilization field"
+  b. The SCSi Block Commands reference - 4 section references "Thin provisioned logical units",
+  c. UFS 3.0 spec section 13.3.3 references "Thin provisioning".
+
+In all of the above situations, currently the only way for pre-allocating space is to issue writes (or use WRITE_ZEROES/WRITE_SAME). However, that does not scale well with larger pre-allocation sizes. 
+
+This patchset introduces primitives to support block-level provisioning (note: the term 'provisioning' is used to prevent overloading the term 'allocations/pre-allocations') requests across filesystems and block devices. This allows fallocate() and file creation requests to reserve space across stacked layers of block devices and filesystems. Currently, the patchset covers a prototype on the device-mapper targets, loop device and ext4, but the same mechanism can be extended to other filesystems/block devices as well as extended for use with devices in 4 a-c.
+
+Patch 1 introduces REQ_OP_PROVISION as a new request type. The provision request acts like the inverse of a discard request; instead of notifying lower layers that the block range will no longer be used, provision acts as a request to lower layers to provision disk space for the given block range. Real hardware storage devices will currently disable the provisioing capability but for the standards listed in 4a.-c., REQ_OP_PROVISION can be overloaded for use as the provisioing primitive for future devices.
+
+Patch 2 implements REQ_OP_PROVISION handling for some of the device-mapper targets. This additionally adds support for pre-allocating space for thinly provisioned logical volumes via fallocate()
+
+Patch 3 implements the handling for virtio-blk.
+
+Patch 4 introduces an fallocate() mode (FALLOC_FL_PROVISION) that sends a provision request to the underlying block device (and beyond). This acts as the primary mechanism for file-level provisioing.
+
+Patch 5 wires up the loop device handling of REQ_OP_PROVISION.
+
+Patches 6-8 cover a prototype implementation for ext4, which includes wiring up the fallocate() implementation, introducing a filesystem level option (called 'provision') to control the default allocation behaviour and finally a file level override to retain current handling, even on filesystems mounted with 'provision'
+
+Testing:
+--------
+- A backport of this patch series was tested on ChromiumOS using a 5.10 kernel.
+- File on ext4 on a thin logical volume: fallocate(FALLOC_FL_PROVISION) : 4.6s, dd if=/dev/zero of=...: 6 mins.
+
+TODOs:
+------
+1) The stacked block devices (dm-*, loop etc.) currently unconditionally pass through provision requests. Add support for provision, similar to how discard handling is set up (with options to disable, passdown or passthrough requests).
+2) Blktests and Xfstests for validating provisioning.
+
