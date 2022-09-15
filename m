@@ -2,49 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DF1C6FA89
-	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 16:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36583C6FA89
+	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 16:48:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiIOQsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Sep 2022 12:48:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49508 "EHLO
+        id S229779AbiIOQsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Sep 2022 12:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiIOQsm (ORCPT
+        with ESMTP id S229644AbiIOQso (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2022 12:48:42 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7703061D9C
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:38 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id a80so10058147pfa.4
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:38 -0700 (PDT)
+        Thu, 15 Sep 2022 12:48:44 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627015FAF2
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:43 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id t3so18916866ply.2
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 09:48:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=zlA6ptTTn1LB8f3ds6R6bK3ndLgpFyQYa5/cgjmBz0k=;
-        b=EkH8vzH6AY/x2FDEot3lJqk0qgC1I0+W6noGE8h+Y7T5NdA67sJRGO99osypN4wxjP
-         si3T4JRl24o/N1JFcREcZ+zhM49Wim0sKm0xkSF0UULLVn87ChuPX89dvF+y0pdogAfr
-         dKUfrjDX9+mkcQ0KQAMMNZU7EcTIPVzAUmPLA=
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=5ygvmrZPI1WDIMPoH4fryGIYobUzr2vUUota+pvSXgQ=;
+        b=OwhGbST3lN2j4BrNnqLh+crZoPJ17algWOozP9/QDV6cINmVxBuZv1MnjIOEEBVuFZ
+         w03zVHy7wVCYe2BrUXeeMOC/7qE2nTIBh3IWd//tWn1griPA5IqsGx1fBFnIny8polm4
+         OTKZRylYH/i3WSS8517Mp1igJHBaaHCpQZJLs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=zlA6ptTTn1LB8f3ds6R6bK3ndLgpFyQYa5/cgjmBz0k=;
-        b=sPkvQGY6EgD+9CPFaoLfBwLhU4HfRFLaC2KdWBDqYL6xHlxvm/9DykN7K/pW+lvir7
-         e6OvO3HDkLFyteEGxzJaRuQ98yLXMxJ1Bw/bwMWc032xSocxzmmyks0iIRGV2HicssBc
-         0u9UAUppElAzcURgYLrI5+FMlIj58i1do890E0SAklA0mQv34d0Bl9VErK9RL8PcAQ0H
-         ExU4OVo5VKJllS08Zj7bj656MxhFRPofGVNRmPJw5Ldfrr9wyhCaC72dRsSaYG5IQF9D
-         wnFJo/NECa7gT5vwzpq4hesqO2fNDdS2l+tHOMWNScdNV9pgqlS4f9RZ2uh/L4QhMtSn
-         Z0gw==
-X-Gm-Message-State: ACrzQf2dT4blRdOg2UHT6gLHrkcrCuy2UYT4idF8JLVxOyCl+YlVDIle
-        /q7uD+5W4o6JgDhAej9jLvBLV1dNXe7AzavG
-X-Google-Smtp-Source: AMsMyM4FdBRmEUaoFqZ1ZX6Vh6XtevMCEGOiKjv87UB8WmxxEo9+INCb9SpLcAAa5zOhruJLuTG+QQ==
-X-Received: by 2002:aa7:8892:0:b0:540:edcb:4773 with SMTP id z18-20020aa78892000000b00540edcb4773mr674454pfe.19.1663260517947;
-        Thu, 15 Sep 2022 09:48:37 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=5ygvmrZPI1WDIMPoH4fryGIYobUzr2vUUota+pvSXgQ=;
+        b=THM7/IccWcHgceQPRtysV0bPBGw7zzCaeN/vjNLMds9bnbNFeI20Q9gOt8QwjPDW1e
+         qdCD2V9qCt507440cOqEj/ZxCsQcrvlKOqHOGEuvcr7HMiIPo0t9QWx9OUBwgjCvozdc
+         bDk0wAdX6JF2bw4lGMKTdAsupSMIr15iqtvCUy3cMKRvF0bZWRvAolsRSS5Kc/skDEU0
+         xvuekgbKqPesBsqpIM6KpV/mHYfwqJZz0+yf3TS0VlQqlNoDa5Gi3kTHM22j/wCIhn6F
+         KK5efORa5YRyppz4u8myi2MQ12BaDQmMsh9EE49U5OVmcN3NUKEmQCMHAs94fNlAEuAP
+         r7Pg==
+X-Gm-Message-State: ACrzQf0/FaL2YppZ2rXcV8/EPyGOmb9nWzzl0n0EdFJ+doyaxHTna8Dd
+        Lhjpa9BTCpNs4VrOYScm/AaahA==
+X-Google-Smtp-Source: AMsMyM7uREf6rExESlC9UOz0czMJ3vqna+akFJyuGIrevbbq1rAo01SAxEamvT9aPhybE8cjhGavpQ==
+X-Received: by 2002:a17:90b:4f8d:b0:202:dd39:c03a with SMTP id qe13-20020a17090b4f8d00b00202dd39c03amr11917187pjb.71.1663260522760;
+        Thu, 15 Sep 2022 09:48:42 -0700 (PDT)
 Received: from sarthakkukreti-glaptop.hsd1.ca.comcast.net ([2601:647:4200:b5b0:3af2:34b2:a98a:a652])
-        by smtp.gmail.com with ESMTPSA id o4-20020a170902bcc400b00177ee563b6dsm13174970pls.33.2022.09.15.09.48.35
+        by smtp.gmail.com with ESMTPSA id o4-20020a170902bcc400b00177ee563b6dsm13174970pls.33.2022.09.15.09.48.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Sep 2022 09:48:37 -0700 (PDT)
+        Thu, 15 Sep 2022 09:48:41 -0700 (PDT)
 From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
 X-Google-Original-From: Sarthak Kukreti <sarthakkukreti@google.com>
 To:     dm-devel@redhat.com, linux-block@vger.kernel.org,
@@ -64,12 +65,13 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         Evan Green <evgreen@google.com>,
         Gwendal Grignou <gwendal@google.com>,
         Sarthak Kukreti <sarthakkukreti@chromium.org>
-Subject: [PATCH RFC 0/8] Introduce provisioning primitives for thinly provisioned storage
-Date:   Thu, 15 Sep 2022 09:48:18 -0700
-Message-Id: <20220915164826.1396245-1-sarthakkukreti@google.com>
+Subject: [PATCH RFC 2/8] dm: Add support for block provisioning
+Date:   Thu, 15 Sep 2022 09:48:20 -0700
+Message-Id: <20220915164826.1396245-3-sarthakkukreti@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
+In-Reply-To: <20220915164826.1396245-1-sarthakkukreti@google.com>
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -77,43 +79,302 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Sarthak Kukreti <sarthakkukreti@chromium.org>
 
-Hi,
+Add support to dm devices for REQ_OP_PROVISION. The default mode
+is to pass through the request and dm-thin will utilize it to provision
+blocks.
 
-This patch series is an RFC of a mechanism to pass through provision requests on stacked thinly provisioned storage devices/filesystems.
+Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+---
+ drivers/md/dm-crypt.c         |  4 +-
+ drivers/md/dm-linear.c        |  1 +
+ drivers/md/dm-table.c         | 17 +++++++
+ drivers/md/dm-thin.c          | 86 +++++++++++++++++++++++++++++++++--
+ drivers/md/dm.c               |  4 ++
+ include/linux/device-mapper.h |  6 +++
+ 6 files changed, 113 insertions(+), 5 deletions(-)
 
-The linux kernel provides several mechanisms to set up thinly provisioned block storage abstractions (eg. dm-thin, loop devices over sparse files), either directly as block devices or backing storage for filesystems. Currently, short of writing data to either the device or filesystem, there is no way for users to pre-allocate space for use in such storage setups. Consider the following use-cases:
-
-1) Suspend-to-disk and resume from a dm-thin device: In order to ensure that the underlying thinpool metadata is not modified during the suspend mechanism, the dm-thin device needs to be fully provisioned.
-2) If a filesystem uses a loop device over a sparse file, fallocate() on the filesystem will allocate blocks for files but the underlying sparse file will remain intact.
-3) Another example is virtual machine using a sparse file/dm-thin as a storage device; by default, allocations within the VM boundaries will not affect the host.
-4) Several storage standards support mechanisms for thin provisioning on real hardware devices. For example:
-  a. The NVMe spec 1.0b section 2.1.1 loosely talks about thin provisioning: "When the THINP bit in the NSFEAT field of the Identify Namespace data structure is set to ‘1’, the controller ... shall track the number of allocated blocks in the Namespace Utilization field"
-  b. The SCSi Block Commands reference - 4 section references "Thin provisioned logical units",
-  c. UFS 3.0 spec section 13.3.3 references "Thin provisioning".
-
-In all of the above situations, currently the only way for pre-allocating space is to issue writes (or use WRITE_ZEROES/WRITE_SAME). However, that does not scale well with larger pre-allocation sizes. 
-
-This patchset introduces primitives to support block-level provisioning (note: the term 'provisioning' is used to prevent overloading the term 'allocations/pre-allocations') requests across filesystems and block devices. This allows fallocate() and file creation requests to reserve space across stacked layers of block devices and filesystems. Currently, the patchset covers a prototype on the device-mapper targets, loop device and ext4, but the same mechanism can be extended to other filesystems/block devices as well as extended for use with devices in 4 a-c.
-
-Patch 1 introduces REQ_OP_PROVISION as a new request type. The provision request acts like the inverse of a discard request; instead of notifying lower layers that the block range will no longer be used, provision acts as a request to lower layers to provision disk space for the given block range. Real hardware storage devices will currently disable the provisioing capability but for the standards listed in 4a.-c., REQ_OP_PROVISION can be overloaded for use as the provisioing primitive for future devices.
-
-Patch 2 implements REQ_OP_PROVISION handling for some of the device-mapper targets. This additionally adds support for pre-allocating space for thinly provisioned logical volumes via fallocate()
-
-Patch 3 implements the handling for virtio-blk.
-
-Patch 4 introduces an fallocate() mode (FALLOC_FL_PROVISION) that sends a provision request to the underlying block device (and beyond). This acts as the primary mechanism for file-level provisioing.
-
-Patch 5 wires up the loop device handling of REQ_OP_PROVISION.
-
-Patches 6-8 cover a prototype implementation for ext4, which includes wiring up the fallocate() implementation, introducing a filesystem level option (called 'provision') to control the default allocation behaviour and finally a file level override to retain current handling, even on filesystems mounted with 'provision'
-
-Testing:
---------
-- A backport of this patch series was tested on ChromiumOS using a 5.10 kernel.
-- File on ext4 on a thin logical volume: fallocate(FALLOC_FL_PROVISION) : 4.6s, dd if=/dev/zero of=...: 6 mins.
-
-TODOs:
-------
-1) The stacked block devices (dm-*, loop etc.) currently unconditionally pass through provision requests. Add support for provision, similar to how discard handling is set up (with options to disable, passdown or passthrough requests).
-2) Blktests and Xfstests for validating provisioning.
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 159c6806c19b..357f0899cfb6 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -3081,6 +3081,8 @@ static int crypt_ctr_optional(struct dm_target *ti, unsigned int argc, char **ar
+ 	if (ret)
+ 		return ret;
+ 
++	ti->num_provision_bios = 1;
++
+ 	while (opt_params--) {
+ 		opt_string = dm_shift_arg(&as);
+ 		if (!opt_string) {
+@@ -3384,7 +3386,7 @@ static int crypt_map(struct dm_target *ti, struct bio *bio)
+ 	 * - for REQ_OP_DISCARD caller must use flush if IO ordering matters
+ 	 */
+ 	if (unlikely(bio->bi_opf & REQ_PREFLUSH ||
+-	    bio_op(bio) == REQ_OP_DISCARD)) {
++	    bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_PROVISION)) {
+ 		bio_set_dev(bio, cc->dev->bdev);
+ 		if (bio_sectors(bio))
+ 			bio->bi_iter.bi_sector = cc->start +
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 3212ef6aa81b..1aa782149428 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -61,6 +61,7 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	ti->num_discard_bios = 1;
+ 	ti->num_secure_erase_bios = 1;
+ 	ti->num_write_zeroes_bios = 1;
++	ti->num_provision_bios = 1;
+ 	ti->private = lc;
+ 	return 0;
+ 
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 332f96b58252..b7f9cb66b7ba 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1853,6 +1853,18 @@ static bool dm_table_supports_write_zeroes(struct dm_table *t)
+ 	return true;
+ }
+ 
++static bool dm_table_supports_provision(struct dm_table *t)
++{
++	for (unsigned int i = 0; i < t->num_targets; i++) {
++		struct dm_target *ti = dm_table_get_target(t, i);
++
++		if (ti->num_provision_bios)
++			return true;
++	}
++
++	return false;
++}
++
+ static int device_not_nowait_capable(struct dm_target *ti, struct dm_dev *dev,
+ 				     sector_t start, sector_t len, void *data)
+ {
+@@ -1989,6 +2001,11 @@ int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	if (!dm_table_supports_write_zeroes(t))
+ 		q->limits.max_write_zeroes_sectors = 0;
+ 
++	if (dm_table_supports_provision(t))
++		blk_queue_max_provision_sectors(q, UINT_MAX >> 9);
++	else
++		q->limits.max_provision_sectors = 0;
++
+ 	dm_table_verify_integrity(t);
+ 
+ 	/*
+diff --git a/drivers/md/dm-thin.c b/drivers/md/dm-thin.c
+index e76c96c760a9..fd3eb306c823 100644
+--- a/drivers/md/dm-thin.c
++++ b/drivers/md/dm-thin.c
+@@ -908,7 +908,8 @@ static void __inc_remap_and_issue_cell(void *context,
+ 	struct bio *bio;
+ 
+ 	while ((bio = bio_list_pop(&cell->bios))) {
+-		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD)
++		if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
++		    bio_op(bio) == REQ_OP_PROVISION)
+ 			bio_list_add(&info->defer_bios, bio);
+ 		else {
+ 			inc_all_io_entry(info->tc->pool, bio);
+@@ -1012,6 +1013,9 @@ static void process_prepared_mapping(struct dm_thin_new_mapping *m)
+ 		goto out;
+ 	}
+ 
++	if (bio && bio_op(bio) == REQ_OP_PROVISION)
++		return;
++
+ 	/*
+ 	 * Release any bios held while the block was being provisioned.
+ 	 * If we are processing a write bio that completely covers the block,
+@@ -1388,6 +1392,9 @@ static void schedule_zero(struct thin_c *tc, dm_block_t virt_block,
+ 	m->data_block = data_block;
+ 	m->cell = cell;
+ 
++	if (bio && bio_op(bio) == REQ_OP_PROVISION)
++		m->bio = bio;
++
+ 	/*
+ 	 * If the whole block of data is being overwritten or we are not
+ 	 * zeroing pre-existing data, we can issue the bio immediately.
+@@ -1897,7 +1904,7 @@ static void provision_block(struct thin_c *tc, struct bio *bio, dm_block_t block
+ 	/*
+ 	 * Fill read bios with zeroes and complete them immediately.
+ 	 */
+-	if (bio_data_dir(bio) == READ) {
++	if (bio_data_dir(bio) == READ && bio_op(bio) != REQ_OP_PROVISION) {
+ 		zero_fill_bio(bio);
+ 		cell_defer_no_holder(tc, cell);
+ 		bio_endio(bio);
+@@ -1980,6 +1987,69 @@ static void process_cell(struct thin_c *tc, struct dm_bio_prison_cell *cell)
+ 	}
+ }
+ 
++static void process_provision_cell(struct thin_c *tc, struct dm_bio_prison_cell *cell)
++{
++	int r;
++	struct pool *pool = tc->pool;
++	struct bio *bio = cell->holder;
++	dm_block_t begin, end;
++	struct dm_thin_lookup_result lookup_result;
++
++	if (tc->requeue_mode) {
++		cell_requeue(pool, cell);
++		return;
++	}
++
++	get_bio_block_range(tc, bio, &begin, &end);
++
++	while (begin != end) {
++		r = ensure_next_mapping(pool);
++		if (r)
++			/* we did our best */
++			return;
++
++		r = dm_thin_find_block(tc->td, begin, 1, &lookup_result);
++		switch (r) {
++		case 0:
++			begin++;
++			break;
++		case -ENODATA:
++			provision_block(tc, bio, begin, cell);
++			begin++;
++			break;
++		default:
++			DMERR_LIMIT(
++				"%s: dm_thin_find_block() failed: error = %d",
++				__func__, r);
++			cell_defer_no_holder(tc, cell);
++			bio_io_error(bio);
++			begin++;
++			break;
++		}
++	}
++	bio_endio(bio);
++	cell_defer_no_holder(tc, cell);
++}
++
++static void process_provision_bio(struct thin_c *tc, struct bio *bio)
++{
++	dm_block_t begin, end;
++	struct dm_cell_key virt_key;
++	struct dm_bio_prison_cell *virt_cell;
++
++	get_bio_block_range(tc, bio, &begin, &end);
++	if (begin == end) {
++		bio_endio(bio);
++		return;
++	}
++
++	build_key(tc->td, VIRTUAL, begin, end, &virt_key);
++	if (bio_detain(tc->pool, &virt_key, bio, &virt_cell))
++		return;
++
++	process_provision_cell(tc, virt_cell);
++}
++
+ static void process_bio(struct thin_c *tc, struct bio *bio)
+ {
+ 	struct pool *pool = tc->pool;
+@@ -2024,7 +2094,7 @@ static void __process_bio_read_only(struct thin_c *tc, struct bio *bio,
+ 	case -ENODATA:
+ 		if (cell)
+ 			cell_defer_no_holder(tc, cell);
+-		if (rw != READ) {
++		if (rw != READ || bio_op(bio) == REQ_OP_PROVISION) {
+ 			handle_unserviceable_bio(tc->pool, bio);
+ 			break;
+ 		}
+@@ -2200,6 +2270,8 @@ static void process_thin_deferred_bios(struct thin_c *tc)
+ 
+ 		if (bio_op(bio) == REQ_OP_DISCARD)
+ 			pool->process_discard(tc, bio);
++		else if (bio_op(bio) == REQ_OP_PROVISION)
++			process_provision_bio(tc, bio);
+ 		else
+ 			pool->process_bio(tc, bio);
+ 
+@@ -2716,7 +2788,8 @@ static int thin_bio_map(struct dm_target *ti, struct bio *bio)
+ 		return DM_MAPIO_SUBMITTED;
+ 	}
+ 
+-	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD) {
++	if (op_is_flush(bio->bi_opf) || bio_op(bio) == REQ_OP_DISCARD ||
++	    bio_op(bio) == REQ_OP_PROVISION) {
+ 		thin_defer_bio_with_throttle(tc, bio);
+ 		return DM_MAPIO_SUBMITTED;
+ 	}
+@@ -3353,6 +3426,7 @@ static int pool_ctr(struct dm_target *ti, unsigned argc, char **argv)
+ 	pt->low_water_blocks = low_water_blocks;
+ 	pt->adjusted_pf = pt->requested_pf = pf;
+ 	ti->num_flush_bios = 1;
++	ti->num_provision_bios = 1;
+ 
+ 	/*
+ 	 * Only need to enable discards if the pool should pass
+@@ -4043,6 +4117,7 @@ static void pool_io_hints(struct dm_target *ti, struct queue_limits *limits)
+ 		blk_limits_io_opt(limits, pool->sectors_per_block << SECTOR_SHIFT);
+ 	}
+ 
++
+ 	/*
+ 	 * pt->adjusted_pf is a staging area for the actual features to use.
+ 	 * They get transferred to the live pool in bind_control_target()
+@@ -4233,6 +4308,8 @@ static int thin_ctr(struct dm_target *ti, unsigned argc, char **argv)
+ 		ti->num_discard_bios = 1;
+ 	}
+ 
++	ti->num_provision_bios = 1;
++
+ 	mutex_unlock(&dm_thin_pool_table.mutex);
+ 
+ 	spin_lock_irq(&tc->pool->lock);
+@@ -4447,6 +4524,7 @@ static void thin_io_hints(struct dm_target *ti, struct queue_limits *limits)
+ 
+ 	limits->discard_granularity = pool->sectors_per_block << SECTOR_SHIFT;
+ 	limits->max_discard_sectors = 2048 * 1024 * 16; /* 16G */
++	limits->max_provision_sectors = 2048 * 1024 * 16; /* 16G */
+ }
+ 
+ static struct target_type thin_target = {
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 60549b65c799..3fe524800f5a 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1600,6 +1600,7 @@ static bool is_abnormal_io(struct bio *bio)
+ 		case REQ_OP_DISCARD:
+ 		case REQ_OP_SECURE_ERASE:
+ 		case REQ_OP_WRITE_ZEROES:
++		case REQ_OP_PROVISION:
+ 			return true;
+ 		default:
+ 			break;
+@@ -1624,6 +1625,9 @@ static blk_status_t __process_abnormal_io(struct clone_info *ci,
+ 	case REQ_OP_WRITE_ZEROES:
+ 		num_bios = ti->num_write_zeroes_bios;
+ 		break;
++	case REQ_OP_PROVISION:
++		num_bios = ti->num_provision_bios;
++		break;
+ 	default:
+ 		break;
+ 	}
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 04c6acf7faaa..edeb47195b6f 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -333,6 +333,12 @@ struct dm_target {
+ 	 */
+ 	unsigned num_write_zeroes_bios;
+ 
++	/*
++	 * The number of PROVISION bios that will be submitted to the target.
++	 * The bio number can be accessed with dm_bio_get_target_bio_nr.
++	 */
++	unsigned num_provision_bios;
++
+ 	/*
+ 	 * The minimum number of extra bytes allocated in each io for the
+ 	 * target to use.
+-- 
+2.31.0
 
