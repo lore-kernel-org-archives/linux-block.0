@@ -2,143 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1595EC6FA8B
-	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 08:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A018ECAAD3
+	for <linux-block@archiver.kernel.org>; Thu, 15 Sep 2022 09:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbiIOIQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Sep 2022 04:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51808 "EHLO
+        id S229673AbiIOJmO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Sep 2022 05:42:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbiIOIQc (ORCPT
+        with ESMTP id S229570AbiIOJmM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2022 04:16:32 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671A097B26;
-        Thu, 15 Sep 2022 01:16:27 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id DFC6833889;
-        Thu, 15 Sep 2022 08:16:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1663229785; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NTSN1xqCruJC4ZaRq7lW0AZpNYYRS+bGOmEnOKZF9Ng=;
-        b=TL4DUwJH0HUGXwxd/0idnCPEo+CBe3TRIIAOzAv3or6KpnMBKH8UrgVOEscEUXI89QSLzn
-        CLAOW8OOV+ygGlmhBOpIDZSDslOawYQInGjO8KtALpwdS4X7Vy/YxjGDRoOS3f7wEqeHJW
-        9FsixXYInXb+FrMfcZMlwBxWBiV3GhY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1663229785;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NTSN1xqCruJC4ZaRq7lW0AZpNYYRS+bGOmEnOKZF9Ng=;
-        b=HRlirllTGDI6NxtxuhafI4mnGPWJH/XlnVOAZ7P1+Mbk2Sx/n62L5kDAJwc2bT/o7UV9Kj
-        5arHv2C81Yvn6CCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C8A9C139C8;
-        Thu, 15 Sep 2022 08:16:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id V478MFnfImOjdgAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 15 Sep 2022 08:16:25 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 10690A0682; Thu, 15 Sep 2022 10:16:25 +0200 (CEST)
-Date:   Thu, 15 Sep 2022 10:16:25 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <20220915081625.6a72nza6yq4l5etp@quack3>
-References: <20220831041843.973026-1-jhubbard@nvidia.com>
- <20220831041843.973026-5-jhubbard@nvidia.com>
- <YxbtF1O8+kXhTNaj@infradead.org>
- <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
- <Yxb7YQWgjHkZet4u@infradead.org>
- <20220906102106.q23ovgyjyrsnbhkp@quack3>
- <YxhaJktqtHw3QTSG@infradead.org>
- <YyFPtTtxYozCuXvu@ZenIV>
- <20220914145233.cyeljaku4egeu4x2@quack3>
- <YyIEgD8ksSZTsUdJ@ZenIV>
+        Thu, 15 Sep 2022 05:42:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63846CF4E;
+        Thu, 15 Sep 2022 02:42:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=kmV+bjuBIbb/1Zd/POYrIraBtwwr2RAc0pWgW32GYaw=; b=pxDLm4xC98kMchQ2l7sCCX9ypx
+        yEG1CA9vqMQoSnRfymGegTpnD7aWpNAjR0io9BXKkCJUlaeaImBb5HPHQvpaIEcn7gQlp9MdmyA2u
+        ud5HTkIA99OGEQgFFW00Oi3IvT4qXbgu2Bly55ijYDeIKcHa+uDrleY8qQACq9sLyqYqbhy+sCJH4
+        axR2Ss+V5nYbvPWnt8c5pCYa2CwDlUHh5DRfgqzyo3K3adLgRqRVBQ+5PhnjU33dzwau//LcLchDQ
+        LXMHkjhT2m0c8ylR37ue/UV76hsx/rcvJDhVPj7laWTuXEbPHAhw2KB8FvSSN9CFC6h/aXAQCyCVD
+        pkhNmU4Q==;
+Received: from [185.122.133.20] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oYlNi-005auV-92; Thu, 15 Sep 2022 09:42:02 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
+        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
+Subject: improve pagecache PSI annotations v2
+Date:   Thu, 15 Sep 2022 10:41:55 +0100
+Message-Id: <20220915094200.139713-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YyIEgD8ksSZTsUdJ@ZenIV>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 14-09-22 17:42:40, Al Viro wrote:
-> On Wed, Sep 14, 2022 at 04:52:33PM +0200, Jan Kara wrote:
-> > > =================================================================================
-> > > CASE 5: Pinning in order to write to the data within the page
-> > > -------------------------------------------------------------
-> > > Even though neither DMA nor Direct IO is involved, just a simple case of "pin,
-> > > write to a page's data, unpin" can cause a problem. Case 5 may be considered a
-> > > superset of Case 1, plus Case 2, plus anything that invokes that pattern. In
-> > > other words, if the code is neither Case 1 nor Case 2, it may still require
-> > > FOLL_PIN, for patterns like this:
-> > > 
-> > > Correct (uses FOLL_PIN calls):
-> > >     pin_user_pages()
-> > >     write to the data within the pages
-> > >     unpin_user_pages()
-> > > 
-> > > INCORRECT (uses FOLL_GET calls):
-> > >     get_user_pages()
-> > >     write to the data within the pages
-> > >     put_page()
-> > > =================================================================================
-> > 
-> > Yes, that was my point.
-> 
-> The thing is, at which point do we pin those pages?  pin_user_pages() works by
-> userland address; by the time we get to any of those we have struct page
-> references and no idea whether they are still mapped anywhere.
+Hi all,
 
-Yes, pin_user_pages() currently works by page address but there's nothing
-fundamental about that. Technically, pin is currently just another type of
-page reference so we can as well just pin the page when given struct page.
-In fact John Hubbart has added such helper in this series.
+currently the VM tries to abuse the block layer submission path for
+the page cache PSI annotations.  This series instead annotates the
+->read_folio and ->readahead calls in the core VM code, and then
+only deals with the odd direct add_to_page_cache_lru calls manually.
 
-> How would that work?  What protects the area where you want to avoid running
-> into pinned pages from previously acceptable page getting pinned?  If "they
-> must have been successfully unmapped" is a part of what you are planning, we
-> really do have a problem...
+Changes since v1:
+ - fix a logic error in ra_alloc_folio
+ - drop a unlikely()
+ - spell a comment in the weird way preferred by btrfs maintainers
 
-But this is a very good question. So far the idea was that we lock the
-page, unmap (or writeprotect) the page, and then check pincount == 0 and
-that is a reliable method for making sure page data is stable (until we
-unlock the page & release other locks blocking page faults and writes). But
-once suddently ordinary page references can be used to create pins this
-does not work anymore. Hrm.
-
-Just brainstorming ideas now: So we'd either need to obtain the pins early
-when we still have the virtual address (but I guess that is often not
-practical but should work e.g. for normal direct IO path) or we need some
-way to "simulate" the page fault when pinning the page, just don't map it
-into page tables in the end. This simulated page fault could be perhaps
-avoided if rmap walk shows that the page is already mapped somewhere with
-suitable permissions.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Diffstat:
+ block/bio.c               |    8 --------
+ block/blk-core.c          |   17 -----------------
+ fs/btrfs/compression.c    |   14 ++++++++++++--
+ fs/direct-io.c            |    2 --
+ fs/erofs/zdata.c          |   13 ++++++++++++-
+ include/linux/blk_types.h |    1 -
+ include/linux/pagemap.h   |    2 ++
+ kernel/sched/psi.c        |    2 ++
+ mm/filemap.c              |    7 +++++++
+ mm/readahead.c            |   22 ++++++++++++++++++----
+ 10 files changed, 53 insertions(+), 35 deletions(-)
