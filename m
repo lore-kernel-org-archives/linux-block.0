@@ -2,69 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39428C54EE9
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 14:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4BAC6FA8B
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 14:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbiIPOM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 10:12:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51790 "EHLO
+        id S231549AbiIPOWG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 10:22:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232059AbiIPOMm (ORCPT
+        with ESMTP id S231993AbiIPOVw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 10:12:42 -0400
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593ABB0B38;
-        Fri, 16 Sep 2022 07:12:27 -0700 (PDT)
-Received: by mail-pl1-f175.google.com with SMTP id t3so21563022ply.2;
-        Fri, 16 Sep 2022 07:12:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=y+pvksgyHzFkmjtCkJnj77yHoOwln/ZIIk7XhvsTNYQ=;
-        b=7QYfgRhmh+qS93X3m8UZGru5K1JSXIklIFNp9zPrUSVvZWFlRvWYsWStuZYavwLNJj
-         QB7dfIkJ3LMQykf865xpbp9hDnaIbd3iIpNmiRhXxU/W7cIXVODgS4L0SbT8o/hwN6xB
-         CaUidztz1YESe4V+Bz6MxgHgAAG5pZYk7mqkIdZPCvmCvuhNpu+7Lm9GC7PiP+AeesgD
-         CsKFrohs2Ak8WWMUrQWWRZa36E+Kv9ArKWh7/c++HZqWQ29U030HcCIfh2pfKoSbA4qf
-         e2SGI4hkAVCXSpjorR2Da+jAdJl6VpVmuegDf+Kj18Wjv7qVInG+VneWVB5qUZqxDzYR
-         Q0pw==
-X-Gm-Message-State: ACrzQf1bfuCF19cZ6fDg/Wkwl2IntWYi7eFZdUC7uufyKMBGLGchLr87
-        O8LuRbOZJPaWUBdj5bNQIew=
-X-Google-Smtp-Source: AMsMyM7rJRm32BJuX2m12aOtMx+L72QYRIExIhzQO12myfiidHtpmXxaFYiOr4o2A8PWxDse1v94Yg==
-X-Received: by 2002:a17:902:7082:b0:177:f7fc:5290 with SMTP id z2-20020a170902708200b00177f7fc5290mr21789plk.143.1663337545948;
-        Fri, 16 Sep 2022 07:12:25 -0700 (PDT)
-Received: from [192.168.50.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id m17-20020a170902db1100b001782751833bsm11480486plx.223.2022.09.16.07.12.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Sep 2022 07:12:25 -0700 (PDT)
-Message-ID: <f2b8a99d-f6bd-4581-c651-d5b62d6cff21@acm.org>
-Date:   Fri, 16 Sep 2022 07:12:23 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH] block/blk-rq-qos: delete useless enmu RQ_QOS_IOPRIO
-Content-Language: en-US
-To:     Li Jinlin <lijinlin3@huawei.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linfeilong@huawei.com, Jan Kara <jack@suse.cz>
-References: <20220916023241.32926-1-lijinlin3@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220916023241.32926-1-lijinlin3@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Fri, 16 Sep 2022 10:21:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4545B1BAB
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 07:21:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 70C5962C2C
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 14:21:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D4E37C433D6;
+        Fri, 16 Sep 2022 14:21:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663338106;
+        bh=fJOaZCaBWzxOiGnqvQqGXZwpCxqbwMypRw0KJpJD4lk=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=smMQZF0ZR+gri9ui1p4oHtxvFvuRtDqzFEivZewYl45spDZNWnPxqkpBigjRlsw2e
+         LeUJ6LOC0yywRMzrifTptN+/ioql+bNdtUvYbERFc33MqEgSA0rnJ7w7HNXMyVYxbq
+         UUZKfNW4WVxGlTfuidsAotwh5PvmEKOgrKASJtNtB42/bMBLfwns0rC8Ue0nyuhgXs
+         Je4tWlygDWQTENU4g/lMJMOJLRU8WtO0FP5OuIva3Lbuz2uYqvbPl80G23oOnFDCeY
+         X/33vVeDcptHjoB9ea/jz2ks1mPAvpCayh2UzfMZ6kNIAhB8pc1+f3+xd5+BFdM141
+         G4nOF92geY8cg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C275CC59A58;
+        Fri, 16 Sep 2022 14:21:46 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.0-rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
+References: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-16
+X-PR-Tracked-Commit-Id: c4fa368466cc1b60bb92f867741488930ddd6034
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 68e777e44c275e8dbc36f5a187c366e982d6a129
+Message-Id: <166333810679.10979.6523292822343819351.pr-tracker-bot@kernel.org>
+Date:   Fri, 16 Sep 2022 14:21:46 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/15/22 19:32, Li Jinlin wrote:
-> Since blk-ioprio handing was converted from a rqos policy to a direct call,
-> RQ_QOS_IOPRIO is not used anymore, just delete it.
+The pull request you sent on Fri, 16 Sep 2022 03:08:16 -0600:
 
-(+Jan Kara)
+> git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-16
 
-Jan, please Cc me on future blk-ioprio patches - I just noticed that I 
-was not Cc-ed on commit 82b74cac2849 ("blk-ioprio: Convert from rqos 
-policy to direct call").
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/68e777e44c275e8dbc36f5a187c366e982d6a129
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
