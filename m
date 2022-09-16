@@ -2,92 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9F5ECAAA1
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 21:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D547C6FA8B
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 21:59:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbiIPV63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 17:58:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55556 "EHLO
+        id S229803AbiIPV7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 17:59:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbiIPV62 (ORCPT
+        with ESMTP id S229972AbiIPV7i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 17:58:28 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CD76A4B9;
-        Fri, 16 Sep 2022 14:58:26 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 71D2120E99;
-        Fri, 16 Sep 2022 21:58:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1663365505; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Wum9Ujr+n+NSRWSc3YvmOrBab3fvi3nUmbflY+j/WKM=;
-        b=0QyIPgPNBCpaAsebZfrbNMluy1rerJWNpNoze7OFhtjXU++h3Tdx88cOwQgnPlczRghFOL
-        ngxviVPAR1zxZLo81ffu5e05bx+ka8VjTKk6n1uPFDeSts+buLl2NVcTriWS4GEQ95wVwL
-        /xBC/oyOaH1hJGGZ6qO0h+casAj3bS8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1663365505;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Wum9Ujr+n+NSRWSc3YvmOrBab3fvi3nUmbflY+j/WKM=;
-        b=CeevbAqMyyQS4F3pDfTVwEDD53S2oQRQKv/yvkx9qPj+2uzKS4n5gdb4ZBTdxIRSC2rxvU
-        VaUungjxR+WWusBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 63F8E1346B;
-        Fri, 16 Sep 2022 21:58:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id TFWBGIHxJGMPbQAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 16 Sep 2022 21:58:25 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id DCC40A0682; Fri, 16 Sep 2022 23:58:24 +0200 (CEST)
-Date:   Fri, 16 Sep 2022 23:58:24 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Li Jinlin <lijinlin3@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linfeilong@huawei.com, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH] block/blk-rq-qos: delete useless enmu RQ_QOS_IOPRIO
-Message-ID: <20220916215824.kfxvesl3l6tjqciw@quack3>
-References: <20220916023241.32926-1-lijinlin3@huawei.com>
- <f2b8a99d-f6bd-4581-c651-d5b62d6cff21@acm.org>
+        Fri, 16 Sep 2022 17:59:38 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A20B4B0
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 14:59:36 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id z21so33429558edi.1
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 14:59:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=tXp8Qm0HOu9b4+ry3VO9lluub8ul1uWHsnihCuufP3w=;
+        b=Q39zWQsJZD445lUFViZ2aCm54TZUMrPkeF3F88WLVvuuYcpxoDzhCFhjgK7Miw1X4J
+         vTUBHYPMxnpweHtFOgVUpZ0AFNYZLEHNNMquduvRqskfJOtkTcmwvzwsat05Z1HBH8pL
+         Pa8fsG6pO3KNhCw44XALJuGbnSttZcWxEWr/A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=tXp8Qm0HOu9b4+ry3VO9lluub8ul1uWHsnihCuufP3w=;
+        b=XY7Z4y/OGLnRivBPh5KsGpE1SwHKsMAZpTyzwcGt3rT3nMfHX/F8HKHOEWztntw86l
+         5fBGuD90xLeT4tKuMuOD0oPigU1ErxT5dtvcRfMXW9NzOuyidfZFtghqlnJxJZLFJEAk
+         ZMvMrcA7i9N5DiZU/pGYvIV2fY7RLR3LBlmosHQeYc/UCxMwb8vNx41JG24Vh3J0keen
+         L8nA6S4qBxMsP5SHYS0bD31R8vMXPfir2tDA5xdRxBHuKOPoonTmbq3v4aoRUOBRMmeh
+         QBZMpCSQ40wLtLQP5FUFhIhJFwcm9NQ/c9WbsTc0phlGH0sA+EIKWXHdw0pe7HVibGwZ
+         T9sQ==
+X-Gm-Message-State: ACrzQf0XMWv+Mp9uY+JbN+U3noLwWmJ245zVhiAd2yFNBq9wb5sfykSw
+        nEogJtK9GcH9WtYCwXxfx9BbAdNl2XZOj0dg8l8osA==
+X-Google-Smtp-Source: AMsMyM57U86vqx070tvFh9n6rb5P+QpCeQvsVAXwmkT/JivZJxEBgvPEObSHPiDtHBStbOgCq0EOZ0nQ8Xzj88PWlsQ=
+X-Received: by 2002:a05:6402:161a:b0:451:ea13:572e with SMTP id
+ f26-20020a056402161a00b00451ea13572emr5613477edv.41.1663365574516; Fri, 16
+ Sep 2022 14:59:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f2b8a99d-f6bd-4581-c651-d5b62d6cff21@acm.org>
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <YyQTM5PRT2o/GDwy@fedora> <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
+ <0be0e378-1601-678c-247a-ba24d111b934@acm.org>
+In-Reply-To: <0be0e378-1601-678c-247a-ba24d111b934@acm.org>
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date:   Fri, 16 Sep 2022 14:59:22 -0700
+Message-ID: <CAG9=OMMS8gPFvGGH87bU2oBNk4WEBM5tG-z2Z5oaW4hUoKV8Jw@mail.gmail.com>
+Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
+ provisioned storage
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        Evan Green <evgreen@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 16-09-22 07:12:23, Bart Van Assche wrote:
-> On 9/15/22 19:32, Li Jinlin wrote:
-> > Since blk-ioprio handing was converted from a rqos policy to a direct call,
-> > RQ_QOS_IOPRIO is not used anymore, just delete it.
-> 
-> (+Jan Kara)
+On Fri, Sep 16, 2022 at 1:01 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> On 9/16/22 11:48, Sarthak Kukreti wrote:
+> > Yes. On ChromiumOS, we regularly deal with storage devices that don't
+> > support WRITE_ZEROES or that need to have it disabled, via a quirk,
+> > due to a bug in the vendor's implementation. Using WRITE_ZEROES for
+> > allocation makes the allocation path quite slow for such devices (not
+> > to mention the effect on storage lifetime), so having a separate
+> > provisioning construct is very appealing. Even for devices that do
+> > support an efficient WRITE_ZEROES implementation but don't support
+> > logical provisioning per-se, I suppose that the allocation path might
+> > be a bit faster (the device driver's request queue would report
+> > 'max_provision_sectors'=0 and the request would be short circuited
+> > there) although I haven't benchmarked the difference.
+>
+> Some background information about why ChromiumOS uses thin provisioning
+> instead of a single filesystem across the entire storage device would be
+> welcome. Although UFS devices support thin provisioning I am not aware
+> of any use cases in Android that would benefit from UFS thin
+> provisioning support.
+>
+Sure (and I'd be happy to put this in the cover letter, if you prefer;
+I didn't include it initially, since it seemed orthogonal to the
+discussion of the patchset)!
 
-Thanks! The patch looks good so feel free to add:
+On ChromiumOS, the primary driving force for using thin provisioning
+is to have flexible, segmented block storage, both per-user and for
+applications/virtual machines with several useful properties, for
+example: block-level encrypted user storage, snapshot based A-B
+updates for verified content, on-demand partitioning for short-lived
+use cases. Several of the other planned use-cases (like verified
+content retention over powerwash) require flexible on-demand block
+storage that is decoupled from the primary filesystem(s) so that we
+can have cryptographic erase for the user partitions and keep the
+on-demand, dm-verity backed executables intact.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Best
+Sarthak
 
-> Jan, please Cc me on future blk-ioprio patches - I just noticed that I was
-> not Cc-ed on commit 82b74cac2849 ("blk-ioprio: Convert from rqos policy to
-> direct call").
-
-Well, you were on CC of the whole patchset which this patch was part of - see
-[1]. So maybe you've missed it among other patches.
-
-[1] https://lore.kernel.org/all/20220623074450.30550-1-jack@suse.cz/
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> Thanks,
+>
+> Bart.
