@@ -2,143 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA4EC54EE9
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 09:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3547DECAAD8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 09:08:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231139AbiIPJBy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 05:01:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45966 "EHLO
+        id S230059AbiIPJIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 05:08:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231143AbiIPJB3 (ORCPT
+        with ESMTP id S229455AbiIPJIU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 05:01:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF514A8974
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 02:00:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663318848;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SGeUALzkpHlGTdD+bIbM2o/mONwjyQDl4XUhUw6myAg=;
-        b=VqqEjAa0EVI0J7ulZqGxzkGGOh+YCfkrcIJUQoCg7jshPtYbcqa+1IUI+coUPLn4ShEAXF
-        76ghNu//J+F2UaTyvdV3lKYsEn5P1eFEyDaXKOm6QFFIRBR22vxT7rHNn57LrZDV04056l
-        VobYTEFKqxPFTKwmK1K4M2ZqNzYKYOU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-307-bp_feYEXMpqGv9F01voWDg-1; Fri, 16 Sep 2022 05:00:46 -0400
-X-MC-Unique: bp_feYEXMpqGv9F01voWDg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 95EF1381079E;
-        Fri, 16 Sep 2022 09:00:46 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E1E9140EBF3;
-        Fri, 16 Sep 2022 09:00:46 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 28G90kwr000940;
-        Fri, 16 Sep 2022 05:00:46 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 28G90kgJ000937;
-        Fri, 16 Sep 2022 05:00:46 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Fri, 16 Sep 2022 05:00:46 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Jens Axboe <axboe@kernel.dk>, Zdenek Kabelac <zkabelac@redhat.com>
-cc:     linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH 4/4] brd: implement secure erase and write zeroes
-In-Reply-To: <alpine.LRH.2.02.2209151604410.13231@file01.intranet.prod.int.rdu2.redhat.com>
-Message-ID: <alpine.LRH.2.02.2209160500190.543@file01.intranet.prod.int.rdu2.redhat.com>
-References: <alpine.LRH.2.02.2209151604410.13231@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        Fri, 16 Sep 2022 05:08:20 -0400
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E2729C96
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 02:08:19 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id n40-20020a05600c3ba800b003b49aefc35fso6165138wms.5
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 02:08:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date;
+        bh=FIbPmibzQTRMTUkpa3IcFZ4WSAzHDHjA8c4r+3ZVTVo=;
+        b=G0E7az8JhZmPZ+bc6a/ChreAWtXKM18EGZ8V4dPi+9oUkjeFJtRmhzmAKFeUCYddCb
+         l8/YlIpP2OzdZyhxQlRcCVLqtL9vMcSyBMfcU5KVa0m/7KPC8uRHxvrONXGhPaLg3jQK
+         aaepR9Gwr+ZLQn1oeeo8h79ksuBi3L5R4ow/n+cLNNoWwRMzzJn/Cj7pPSwo13qD4d9K
+         Rh7VSDe7b+6ajPuDEj2MzBZGM7RwXHwh8W9kkogPkajFpBcOU0EQsw2rbXR6OshMRAIk
+         gvTVls2dbKRlMFTzoY/BA2ARmqLFBGiDR6/97iPR1jzUKm3slj5Rqkz+zeVuHiQUuFNl
+         9fMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date;
+        bh=FIbPmibzQTRMTUkpa3IcFZ4WSAzHDHjA8c4r+3ZVTVo=;
+        b=39EAo+UH+rR4l1UhnEKlyP2wcdy/jAmFUhgg0Ak2mozauEOIpIumAnEs6Woa+owzn7
+         gn2S7rzFdpY+DviS4wJN+dAPXMjEUFLBuzo/z9pHPzxRbJt3/woYi3AGkqQErOUdMT8t
+         f5fCTgAtkDqSHqS0gvc6d8uYvH1hzpGNIirgXishIDKX+dS3eIi33HgiB43ztk1rqvbi
+         Q3zr0N6SjAXedeih8XVBJtpovsMlG4bP2LN6+xrbGIEmEwXDm7Gvz24MUVT5K3WGzFx8
+         Twly/y0QibAgrHeRq/yWhI0Ks9fhFE4UUuy6DbtPu4ORmRydg0CTO5MYgdsrIX2A4IIG
+         9zxQ==
+X-Gm-Message-State: ACgBeo24XI/iDE8vRsOW1G8Icn/mdCeijpif9UUAOHGUru1iuXzspA29
+        0X53PqYzCLh75XrHsxtsuxC8p0TD/5hORNU3
+X-Google-Smtp-Source: AA6agR56k+omhfMUNHDVvKGb1kyOh7Bo+z+Gj80Zh6swteOrnq75MOKY/NKTpGIfRVoFNgwOTomDVg==
+X-Received: by 2002:a1c:6a0b:0:b0:3b3:3ed4:9bef with SMTP id f11-20020a1c6a0b000000b003b33ed49befmr9969345wmc.84.1663319297632;
+        Fri, 16 Sep 2022 02:08:17 -0700 (PDT)
+Received: from [10.200.94.69] ([82.141.251.28])
+        by smtp.gmail.com with ESMTPSA id v128-20020a1cac86000000b003b476bb2624sm1677897wme.6.2022.09.16.02.08.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Sep 2022 02:08:17 -0700 (PDT)
+Message-ID: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
+Date:   Fri, 16 Sep 2022 03:08:16 -0600
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 6.0-rc6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch implements REQ_OP_SECURE_ERASE and REQ_OP_WRITE_ZEROES on brd.
-Write zeroes will free the pages just like discard, but the difference is
-that it writes zeroes to the preceding and following page if the range is
-not aligned on page boundary. Secure erase is just like write zeroes,
-except that it clears the page content before freeing the page.
+Hi Linus,
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Two fixes for -rc6:
 
----
- drivers/block/brd.c |   28 +++++++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
+- Fix a mixup of sectors and bytes in the secure erase ioctl (Mikulas)
 
-Index: linux-2.6/drivers/block/brd.c
-===================================================================
---- linux-2.6.orig/drivers/block/brd.c
-+++ linux-2.6/drivers/block/brd.c
-@@ -118,7 +118,7 @@ static void brd_free_page_rcu(struct rcu
- 	__free_page(page);
- }
- 
--static void brd_free_page(struct brd_device *brd, sector_t sector)
-+static void brd_free_page(struct brd_device *brd, sector_t sector, bool secure)
- {
- 	struct page *page;
- 	pgoff_t idx;
-@@ -127,8 +127,11 @@ static void brd_free_page(struct brd_dev
- 	idx = sector >> PAGE_SECTORS_SHIFT;
- 	page = radix_tree_delete(&brd->brd_pages, idx);
- 	spin_unlock(&brd->brd_lock);
--	if (page)
-+	if (page) {
-+		if (secure)
-+			clear_highpage(page);
- 		call_rcu(&page->rcu_head, brd_free_page_rcu);
-+	}
- }
- 
- /*
-@@ -308,16 +311,29 @@ static void brd_submit_bio(struct bio *b
- 	struct bio_vec bvec;
- 	struct bvec_iter iter;
- 
--	if (bio_op(bio) == REQ_OP_DISCARD) {
-+	if (bio_op(bio) == REQ_OP_DISCARD ||
-+	    bio_op(bio) == REQ_OP_SECURE_ERASE ||
-+	    bio_op(bio) == REQ_OP_WRITE_ZEROES) {
-+		bool zero_padding = bio_op(bio) == REQ_OP_SECURE_ERASE || bio_op(bio) == REQ_OP_WRITE_ZEROES;
- 		sector_t len = bio_sectors(bio);
- 		sector_t front_pad = -sector & (PAGE_SECTORS - 1);
-+		sector_t end_pad;
-+
-+		if (zero_padding && unlikely(front_pad != 0))
-+			copy_to_brd(brd, page_address(ZERO_PAGE(0)), sector, min(len, front_pad) << SECTOR_SHIFT);
-+
- 		sector += front_pad;
- 		if (unlikely(len <= front_pad))
- 			goto endio;
- 		len -= front_pad;
--		len = round_down(len, PAGE_SECTORS);
-+
-+		end_pad = len & (PAGE_SECTORS - 1);
-+		if (zero_padding && unlikely(end_pad != 0))
-+			copy_to_brd(brd, page_address(ZERO_PAGE(0)), sector + len - end_pad, end_pad << SECTOR_SHIFT);
-+		len -= end_pad;
-+
- 		while (len) {
--			brd_free_page(brd, sector);
-+			brd_free_page(brd, sector, bio_op(bio) == REQ_OP_SECURE_ERASE);
- 			sector += PAGE_SECTORS;
- 			len -= PAGE_SECTORS;
- 			cond_resched();
-@@ -448,6 +464,8 @@ static int brd_alloc(int i)
- 
- 	disk->queue->limits.discard_granularity = PAGE_SIZE;
- 	blk_queue_max_discard_sectors(disk->queue, UINT_MAX);
-+	blk_queue_max_write_zeroes_sectors(disk->queue, UINT_MAX);
-+	blk_queue_max_secure_erase_sectors(disk->queue, UINT_MAX);
- 
- 	/* Tell the block layer that this is not a rotational device */
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
+- Fix for a bad return value for a non-blocking bio/blk queue enter call
+  (me)
 
+Please pull!
+
+
+The following changes since commit 745ed37277c5a7202180aa276c87db1362c90fe5:
+
+  block: add missing request flags to debugfs code (2022-09-09 05:57:52 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-16
+
+for you to fetch changes up to c4fa368466cc1b60bb92f867741488930ddd6034:
+
+  blk-lib: fix blkdev_issue_secure_erase (2022-09-15 00:25:17 -0600)
+
+----------------------------------------------------------------
+block-6.0-2022-09-16
+
+----------------------------------------------------------------
+Mikulas Patocka (1):
+      blk-lib: fix blkdev_issue_secure_erase
+
+Stefan Roesch (1):
+      block: blk_queue_enter() / __bio_queue_enter() must return -EAGAIN for nowait
+
+ block/blk-core.c |  4 ++--
+ block/blk-lib.c  | 11 ++++++++---
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+-- 
+Jens Axboe
