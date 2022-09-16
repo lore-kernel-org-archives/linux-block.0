@@ -2,144 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3C83C54EE9
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 06:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B16ECAAD8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 06:30:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229896AbiIPGKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 02:10:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45774 "EHLO
+        id S229745AbiIPGaK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 02:30:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiIPGKQ (ORCPT
+        with ESMTP id S229703AbiIPGaI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 02:10:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A056CA0605
-        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 23:10:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663308613;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WexFcKZFirN/jM+xTeznAj7e5nDORoI0aBqRUMifb8Y=;
-        b=YsHarc1UTDu2mXRfkJ0RdbL+z7Xq61Zhki+sWD/60Fjd9zEMPXcXl0wz05ryztfExyHs6N
-        DOtIjHCAXAV5xUs8DQTBEBNNT9IGktSavUVkbjLJKA3+oo/vU2uVCL+shcCewiw1Su27ht
-        q4QDd9mGrVHmLqeRyvCbGel/q5yz5vU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-292-jZYnFVjgP6GqmjFBWdto1w-1; Fri, 16 Sep 2022 02:09:58 -0400
-X-MC-Unique: jZYnFVjgP6GqmjFBWdto1w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Fri, 16 Sep 2022 02:30:08 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6D3133A31
+        for <linux-block@vger.kernel.org>; Thu, 15 Sep 2022 23:30:05 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7BE48882822;
-        Fri, 16 Sep 2022 06:09:57 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 46FC3C15BA4;
-        Fri, 16 Sep 2022 06:09:56 +0000 (UTC)
-Date:   Fri, 16 Sep 2022 07:09:55 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>
-Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
- provisioned storage
-Message-ID: <YyQTM5PRT2o/GDwy@fedora>
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 652E1338C3;
+        Fri, 16 Sep 2022 06:30:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1663309804; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=s2fX3PuJ3mKrpXZ1Ba+gT20JOe7i9oPxZrSejyfo0MI=;
+        b=kWhaTzmDjV5JdP+jqzspfFE6YX72/LoNC6m08iHubqF0HkZO7Gr9gp15qh/ebgYk/Jj0sR
+        cXegi0ucgbSpYPyS+DfkHNUTwOEtTWmEqXc5K5vun//z8yw9f2Ejo9p+xt+SiCwUJe643j
+        2aXGbchI+GOC9AhjI5p7H5LrQAGGvnk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1663309804;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=s2fX3PuJ3mKrpXZ1Ba+gT20JOe7i9oPxZrSejyfo0MI=;
+        b=OkDm4lgfEEl9V23C/BI1Iu7fOcOX1xS8TCBF8brIv/7bh+iGT9hxbE+wFGNq7HLxLK8BFv
+        yGHVUohSlHzu8rAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5719D1346B;
+        Fri, 16 Sep 2022 06:30:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id KIY6FewXJGMhFQAAMHmgww
+        (envelope-from <dwagner@suse.de>); Fri, 16 Sep 2022 06:30:04 +0000
+Date:   Fri, 16 Sep 2022 08:30:03 +0200
+From:   Daniel Wagner <dwagner@suse.de>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        James Smart <jsmart2021@gmail.com>
+Subject: Re: [PATCH blktests v3] nvme/046: test queue count changes on
+ reconnect
+Message-ID: <20220916062027.umsj6rqp6flgic3k@carbon.lan>
+References: <20220913065758.134668-1-dwagner@suse.de>
+ <20220913105743.gw2gczryymhy6x5o@shindev>
+ <20220913114210.gceoxlpffhaekpk7@carbon.lan>
+ <20220913171049.kgim57lu5rqb7j3g@carbon.lan>
+ <20220914090003.jbc5xmtfxjjssuz3@carbon.lan>
+ <3b58b91d-e217-86a2-b2e4-3b0656bbe0e9@grimberg.me>
+ <20220914110717.pvzm2666mklkg73a@carbon.lan>
+ <20220915125037.fqhcokdn4scnklyq@carbon.lan>
+ <381b003e-3510-8cbf-031d-b5314b17560d@suse.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="w/wnRFkY16cMLsvF"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220915164826.1396245-1-sarthakkukreti@google.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+In-Reply-To: <381b003e-3510-8cbf-031d-b5314b17560d@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Sep 15, 2022 at 05:41:46PM +0200, Hannes Reinecke wrote:
+> > It looks like the reasoning here didn't take into consideration the
+> > scenario we have here. I'd say we should not do it and handle it similar
+> > as with have with tcp/rdma.
+> > 
+> But that is wrong.
+> When we are evaluating the NVMe status we _need_ to check the DNR bit;
+> that's precisely what it's for.
 
---w/wnRFkY16cMLsvF
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I asked what the desired behavior is and Sagi pointed out:
 
-On Thu, Sep 15, 2022 at 09:48:18AM -0700, Sarthak Kukreti wrote:
-> From: Sarthak Kukreti <sarthakkukreti@chromium.org>
->=20
-> Hi,
->=20
-> This patch series is an RFC of a mechanism to pass through provision requ=
-ests on stacked thinly provisioned storage devices/filesystems.
->=20
-> The linux kernel provides several mechanisms to set up thinly provisioned=
- block storage abstractions (eg. dm-thin, loop devices over sparse files), =
-either directly as block devices or backing storage for filesystems. Curren=
-tly, short of writing data to either the device or filesystem, there is no =
-way for users to pre-allocate space for use in such storage setups. Conside=
-r the following use-cases:
->=20
-> 1) Suspend-to-disk and resume from a dm-thin device: In order to ensure t=
-hat the underlying thinpool metadata is not modified during the suspend mec=
-hanism, the dm-thin device needs to be fully provisioned.
-> 2) If a filesystem uses a loop device over a sparse file, fallocate() on =
-the filesystem will allocate blocks for files but the underlying sparse fil=
-e will remain intact.
-> 3) Another example is virtual machine using a sparse file/dm-thin as a st=
-orage device; by default, allocations within the VM boundaries will not aff=
-ect the host.
-> 4) Several storage standards support mechanisms for thin provisioning on =
-real hardware devices. For example:
->   a. The NVMe spec 1.0b section 2.1.1 loosely talks about thin provisioni=
-ng: "When the THINP bit in the NSFEAT field of the Identify Namespace data =
-structure is set to =E2=80=981=E2=80=99, the controller ... shall track the=
- number of allocated blocks in the Namespace Utilization field"
->   b. The SCSi Block Commands reference - 4 section references "Thin provi=
-sioned logical units",
->   c. UFS 3.0 spec section 13.3.3 references "Thin provisioning".
+> DNR means do not retry the command, it says nothing about do not attempt
+> a future reconnect...
 
-When REQ_OP_PROVISION is sent on an already-allocated range of blocks,
-are those blocks zeroed? NVMe Write Zeroes with Deallocate=3D0 works this
-way, for example. That behavior is counterintuitive since the operation
-name suggests it just affects the logical block's provisioning state,
-not the contents of the blocks.
+I really don't care too much, it just that fc and tcp/rdma do not behave
+the same in this regard which makes this test trip over. As long you two
+can agree on a the 'correct' behavior, I can do the work.
 
-> In all of the above situations, currently the only way for pre-allocating=
- space is to issue writes (or use WRITE_ZEROES/WRITE_SAME). However, that d=
-oes not scale well with larger pre-allocation sizes.=20
+> The real reason here is a queue inversion with fcloop; we've had them for
+> ages, and I'm not surprised that it pops off now.
 
-What exactly is the issue with WRITE_ZEROES scalability? Are you
-referring to cases where the device doesn't support an efficient
-WRITE_ZEROES command and actually writes blocks filled with zeroes
-instead of updating internal allocation metadata cheaply?
+Could you elaborate?
 
-Stefan
+> In fact, I was quite surprised that I didn't hit it when updating blktests;
+> in previous versions I had to insert an explicit 'sleep 2' before disconnect
+> to make it work.
+> 
+> I'd rather fix that than reverting FC to the (wrong) behaviour.
 
---w/wnRFkY16cMLsvF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmMkEzMACgkQnKSrs4Gr
-c8hn3wgAjJDAhaMbZwpCmdUdohpKtyMia1I6OsTlcURdfUV2iu1afmfcG5c7Q2pV
-ZPZC+DZhgUOEkpD1Aj5gCjpi8/1EXpmCwDGB36AgVnwzCMV9QLdW7B3xoCvJipNa
-b+KGhLFliE0pBX9ZGYqCZ7a8Tuz2OGtNhpAsd/tUOMYCLzc6WTqTIeB6Wv6rYrw4
-kIF+kP7pEK4INQYAav+pYDzZxqd4yrKINa6PEOZUMxzuLnH4eW8l+xrsTDIMbA+e
-ummgls1ZrhgPhUJNqscmevqfJMLqMsZTxN6+B9zH+G6GrxAc1rqeRTdlMAwwYxYg
-DIMeBAXmfutiQDOVF8Tj6W1p7wrNLw==
-=s/zf
------END PGP SIGNATURE-----
-
---w/wnRFkY16cMLsvF--
-
+Sure, no problem with this approach.
