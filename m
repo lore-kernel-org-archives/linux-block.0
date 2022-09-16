@@ -2,126 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6D4C6FA91
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 01:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2454AECAAD3
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 02:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbiIPB4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Sep 2022 21:56:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45760 "EHLO
+        id S229608AbiIPCeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Sep 2022 22:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229947AbiIPB4T (ORCPT
+        with ESMTP id S229539AbiIPCem (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Sep 2022 21:56:19 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491D34D839;
-        Thu, 15 Sep 2022 18:56:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=J30JNwom7vQid4zWEaAjuOGQKZP7syeMiY8+9KV+FKY=; b=BvcU3km0KfSNim65iuY74essLc
-        dF427a6nHkyNASvBjaXX4algXt7MW275rBnaScvxth/J8ok2SeGkGhDT8AmmgwgQMt1/IZ/78N/r6
-        fEMS9BysLwz1VYsv6S+TPrR0j0Hdy76hwkH0Vbp9y7jzOr9mCH2Czjrqc7wne1zexm4/o1MwsR7NQ
-        gqkH1VWNs/BVMn+r747M6z0ddhJQ6Qm1OleNiUHkCF+F4e5fnpAa06olO11cYPFjpL6evqQAIUuIU
-        D2+yebeP7+T8GBaRugEqqM6tuz/6RE4Iua5uSzzdSI9CvuXC/djbWCTGlylWgX80SDMhKjzmm2Y7T
-        3XXSZ8hg==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1oZ0a9-00GsoS-0s;
-        Fri, 16 Sep 2022 01:55:53 +0000
-Date:   Fri, 16 Sep 2022 02:55:53 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <YyPXqfyf37CUbOf0@ZenIV>
-References: <20220831041843.973026-5-jhubbard@nvidia.com>
- <YxbtF1O8+kXhTNaj@infradead.org>
- <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
- <Yxb7YQWgjHkZet4u@infradead.org>
- <20220906102106.q23ovgyjyrsnbhkp@quack3>
- <YxhaJktqtHw3QTSG@infradead.org>
- <YyFPtTtxYozCuXvu@ZenIV>
- <20220914145233.cyeljaku4egeu4x2@quack3>
- <YyIEgD8ksSZTsUdJ@ZenIV>
- <20220915081625.6a72nza6yq4l5etp@quack3>
+        Thu, 15 Sep 2022 22:34:42 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AD202B268;
+        Thu, 15 Sep 2022 19:34:40 -0700 (PDT)
+Received: from canpemm500008.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MTJ211fg4zNm71;
+        Fri, 16 Sep 2022 10:30:01 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by canpemm500008.china.huawei.com
+ (7.192.105.151) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Fri, 16 Sep
+ 2022 10:34:38 +0800
+From:   Li Jinlin <lijinlin3@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linfeilong@huawei.com>
+Subject: [PATCH] block/blk-rq-qos: delete useless enmu RQ_QOS_IOPRIO
+Date:   Fri, 16 Sep 2022 10:32:41 +0800
+Message-ID: <20220916023241.32926-1-lijinlin3@huawei.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220915081625.6a72nza6yq4l5etp@quack3>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500008.china.huawei.com (7.192.105.151)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2022 at 10:16:25AM +0200, Jan Kara wrote:
+Since blk-ioprio handing was converted from a rqos policy to a direct call,
+RQ_QOS_IOPRIO is not used anymore, just delete it.
 
-> > How would that work?  What protects the area where you want to avoid running
-> > into pinned pages from previously acceptable page getting pinned?  If "they
-> > must have been successfully unmapped" is a part of what you are planning, we
-> > really do have a problem...
-> 
-> But this is a very good question. So far the idea was that we lock the
-> page, unmap (or writeprotect) the page, and then check pincount == 0 and
-> that is a reliable method for making sure page data is stable (until we
-> unlock the page & release other locks blocking page faults and writes). But
-> once suddently ordinary page references can be used to create pins this
-> does not work anymore. Hrm.
-> 
-> Just brainstorming ideas now: So we'd either need to obtain the pins early
-> when we still have the virtual address (but I guess that is often not
-> practical but should work e.g. for normal direct IO path) or we need some
-> way to "simulate" the page fault when pinning the page, just don't map it
-> into page tables in the end. This simulated page fault could be perhaps
-> avoided if rmap walk shows that the page is already mapped somewhere with
-> suitable permissions.
+Signed-off-by: Li Jinlin <lijinlin3@huawei.com>
+---
+ block/blk-mq-debugfs.c | 2 --
+ block/blk-rq-qos.h     | 1 -
+ 2 files changed, 3 deletions(-)
 
-OK...  I'd done some digging; results so far
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index dee789f2f98f..bd942341b638 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -807,8 +807,6 @@ static const char *rq_qos_id_to_name(enum rq_qos_id id)
+ 		return "latency";
+ 	case RQ_QOS_COST:
+ 		return "cost";
+-	case RQ_QOS_IOPRIO:
+-		return "ioprio";
+ 	}
+ 	return "unknown";
+ }
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 08b856570ad1..1ef1f7d4bc3c 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -17,7 +17,6 @@ enum rq_qos_id {
+ 	RQ_QOS_WBT,
+ 	RQ_QOS_LATENCY,
+ 	RQ_QOS_COST,
+-	RQ_QOS_IOPRIO,
+ };
+ 
+ struct rq_wait {
+-- 
+2.23.0
 
-	* READ vs. WRITE turned out to be an awful way to specify iov_iter
-data direction.  Local iov_iter branch so far:
-	get rid of unlikely() on page_copy_sane() calls
-	csum_and_copy_to_iter(): handle ITER_DISCARD
-	[s390] copy_oldmem_kernel() - WRITE is "data source", not destination
-	[fsi] WRITE is "data source", not destination...
-	[infiniband] READ is "data destination", not source...
-	[s390] zcore: WRITE is "data source", not destination...
-	[target] fix iov_iter_bvec() "direction" argument
-	[vhost] fix 'direction' argument of iov_iter_{init,bvec}()
-	[xen] fix "direction" argument of iov_iter_kvec()
-	[trace] READ means "data destination", not source...
-	iov_iter: saner checks for attempt to copy to/from iterator
-	use less confusing names for iov_iter direction initializers
-those 8 commits in the middle consist of fixes, some of them with more than
-one call site affected.  Folks keep going "oh, we are going to copy data
-into that iterator, must be WRITE".  Wrong - WRITE means "as for write(2)",
-i.e. the data _source_, not data destination.  And the same kind of bugs
-goes in the opposite direction, of course.
-	I think something like ITER_DEST vs. ITER_SOURCE would be less
-confusing.
-
-	* anything that goes with ITER_SOURCE doesn't need pin.
-	* ITER_IOVEC/ITER_UBUF need pin for get_pages and for nothing else.
-Need to grab reference on get_pages, obviously.
-	* even more obviously, ITER_DISCARD is irrelevant here.
-	* ITER_PIPE only modifies anonymous pages that had been allocated
-by iov_iter primitives and hadn't been observed by anything outside until
-we are done with said ITER_PIPE.
-	* quite a few instances are similar to e.g. REQ_OP_READ handling in
-/dev/loop - we work with ITER_BVEC there and we do modify the page contents,
-but the damn thing would better be given to us locked and stay locked until
-all involved modifications (be it real IO/decoding/whatever) is complete.
-That ought to be safe, unless I'm missing something.
-
-That doesn't cover everything; still going through the list...
