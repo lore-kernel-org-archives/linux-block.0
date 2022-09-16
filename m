@@ -2,56 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E9CECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 18:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B9A7C6FA86
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 20:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230209AbiIPSsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 14:48:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48852 "EHLO
+        id S229614AbiIPUBW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 16:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229765AbiIPSst (ORCPT
+        with ESMTP id S230171AbiIPUBO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 14:48:49 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF3FB8F09
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 11:48:47 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id go34so51464699ejc.2
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 11:48:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date;
-        bh=SdKZkQSOOeZ73NFTfXwaDLPs0+FX9IJxa8fOyAWvQWo=;
-        b=jPbxqkcJ18+RZwG4Xt8jUmsZkdqH2rsOtYcfpH9++ASA+lpXozL6u8Xpcawj7xrriu
-         zylCptexZ4/vToAy5m1VgKpvp8wdlA7c0oByY7fIAp8hStBk9mBFWHnIUnZJAXhrT+dW
-         1uLVgpXxBuAXs/wLz9oAgKyYBMlq8Eze6MK2Q=
+        Fri, 16 Sep 2022 16:01:14 -0400
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338CE85AA3;
+        Fri, 16 Sep 2022 13:01:13 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d82so22214916pfd.10;
+        Fri, 16 Sep 2022 13:01:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=SdKZkQSOOeZ73NFTfXwaDLPs0+FX9IJxa8fOyAWvQWo=;
-        b=RtzfwGZhbjQ+cD0EMKiuu8IdDLDnjByThDL200OtlHdiytWCMd9hTTS1MotFK39Ck2
-         aKrXI+y9o/RMlqAlIHcpgGUK36LGc14cfp80wO42PU8FjDR5fUlURzrw2TyoNxy0uRT6
-         zVzLcP71rF2PGXcAHy6Tq0LOqaRwGFSw0Jf48h6+3Gp03Sbv+JmF2hNoF2E+P5BcY9Sg
-         0rLhYT/CaT3K8ysXjyCkW9fgjnuSOtOqO5HQAX7VGAh7/GqtkaXmxeQd/uDgrbACRlA+
-         Gl4dyoYz39aiLcM5XcbixY/BBWJkyJGsXSABa9k9NTGvVN/+K/j4bRp/87JTQcfqlvbn
-         sIkg==
-X-Gm-Message-State: ACrzQf04YMl31KNSsaJW6J1ir+HnxxE4bRidKh9qh+L4L1CluakYI/dh
-        alThgsa0W9W6OlRW/j8U6H6KoPFsECh8okRQwcmh3w==
-X-Google-Smtp-Source: AMsMyM4H50Nh3fB15dbYJDOgQVr7DWdwSoN47hKf8GNOPyV4RnAetL9SU78eAuiLXsBmxUNOb3xdb298jwC8+0N02/8=
-X-Received: by 2002:a17:907:628a:b0:72f:678d:6047 with SMTP id
- nd10-20020a170907628a00b0072f678d6047mr4442324ejc.456.1663354126400; Fri, 16
- Sep 2022 11:48:46 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=aI55elBM47AbpRIfEoRwcS12RWAxkruf3PuVmLaNsIw=;
+        b=F93+3ZCuhoW4ubfMQpiKJx3jYO2YUlD99AS4TKVJFHr2cITbQE1c4KZZRs/b07IsrF
+         71vE+0oKcC+g33vygMudbCM9cwLfEffrCHL8/A/+L/clX/M+Y9qZPw4M/qjDFlIgXdu4
+         QiO4Re/9Ms2VZfqmDL+rR2Vc0KfXNS97qFssyM8LltJkjy0UzXrAgw7IfaoaWtutTmPU
+         i42jQJyTI0fiwaWDcW6yNDeBQ7uzf4Q7b4FmBsIt3OmzSMNf0HxsoeQSuyI6hq4igsq5
+         qPNbUBmnVVZqo5KKMlr1eusMZHJQQlmIRO2tUv5DYbp0P95iFjeEvAADhNcuahj3X1zI
+         PSFg==
+X-Gm-Message-State: ACrzQf38Z+mWYa2pf9O4zTOOmr4B3B0I5QexSTkZ0OfBjQqItPY8DDxb
+        tshmutsszHKV1RTldP+BpHQ=
+X-Google-Smtp-Source: AMsMyM7BtRpoBGm+25ZIcjQ1eDg7usENuczHgm9wgE8Sus1sUlVcptKPjg/7yVuSQ/Mc/WEtnHJpcQ==
+X-Received: by 2002:a63:e452:0:b0:42c:60ce:8b78 with SMTP id i18-20020a63e452000000b0042c60ce8b78mr5917990pgk.453.1663358472565;
+        Fri, 16 Sep 2022 13:01:12 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:e470:c0f8:8896:5368? ([2620:15c:211:201:e470:c0f8:8896:5368])
+        by smtp.gmail.com with ESMTPSA id n10-20020a170902d2ca00b00174c235e1fdsm15550309plc.199.2022.09.16.13.01.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Sep 2022 13:01:11 -0700 (PDT)
+Message-ID: <0be0e378-1601-678c-247a-ba24d111b934@acm.org>
+Date:   Fri, 16 Sep 2022 13:01:08 -0700
 MIME-Version: 1.0
-References: <20220915164826.1396245-1-sarthakkukreti@google.com> <YyQTM5PRT2o/GDwy@fedora>
-In-Reply-To: <YyQTM5PRT2o/GDwy@fedora>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Fri, 16 Sep 2022 11:48:34 -0700
-Message-ID: <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
 Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
  provisioned storage
-To:     Stefan Hajnoczi <stefanha@redhat.com>
+Content-Language: en-US
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
@@ -61,90 +57,42 @@ Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
+        Theodore Ts'o <tytso@mit.edu>,
         Andreas Dilger <adilger.kernel@dilger.ca>,
         Bart Van Assche <bvanassche@google.com>,
         Daniil Lunev <dlunev@google.com>,
         Evan Green <evgreen@google.com>,
         Gwendal Grignou <gwendal@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <YyQTM5PRT2o/GDwy@fedora>
+ <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2022 at 11:10 PM Stefan Hajnoczi <stefanha@redhat.com> wrot=
-e:
->
-> On Thu, Sep 15, 2022 at 09:48:18AM -0700, Sarthak Kukreti wrote:
-> > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> >
-> > Hi,
-> >
-> > This patch series is an RFC of a mechanism to pass through provision re=
-quests on stacked thinly provisioned storage devices/filesystems.
-> >
-> > The linux kernel provides several mechanisms to set up thinly provision=
-ed block storage abstractions (eg. dm-thin, loop devices over sparse files)=
-, either directly as block devices or backing storage for filesystems. Curr=
-ently, short of writing data to either the device or filesystem, there is n=
-o way for users to pre-allocate space for use in such storage setups. Consi=
-der the following use-cases:
-> >
-> > 1) Suspend-to-disk and resume from a dm-thin device: In order to ensure=
- that the underlying thinpool metadata is not modified during the suspend m=
-echanism, the dm-thin device needs to be fully provisioned.
-> > 2) If a filesystem uses a loop device over a sparse file, fallocate() o=
-n the filesystem will allocate blocks for files but the underlying sparse f=
-ile will remain intact.
-> > 3) Another example is virtual machine using a sparse file/dm-thin as a =
-storage device; by default, allocations within the VM boundaries will not a=
-ffect the host.
-> > 4) Several storage standards support mechanisms for thin provisioning o=
-n real hardware devices. For example:
-> >   a. The NVMe spec 1.0b section 2.1.1 loosely talks about thin provisio=
-ning: "When the THINP bit in the NSFEAT field of the Identify Namespace dat=
-a structure is set to =E2=80=981=E2=80=99, the controller ... shall track t=
-he number of allocated blocks in the Namespace Utilization field"
-> >   b. The SCSi Block Commands reference - 4 section references "Thin pro=
-visioned logical units",
-> >   c. UFS 3.0 spec section 13.3.3 references "Thin provisioning".
->
-> When REQ_OP_PROVISION is sent on an already-allocated range of blocks,
-> are those blocks zeroed? NVMe Write Zeroes with Deallocate=3D0 works this
-> way, for example. That behavior is counterintuitive since the operation
-> name suggests it just affects the logical block's provisioning state,
-> not the contents of the blocks.
->
-No, the blocks are not zeroed. The current implementation (in the dm
-patch) is to indeed look at the provisioned state of the logical block
-and provision if it is unmapped. if the block is already allocated,
-REQ_OP_PROVISION should have no effect on the contents of the block.
-Similarly, in the file semantics, sending an FALLOC_FL_PROVISION
-requests for extents already mapped should not affect the contents in
-the extents.
+On 9/16/22 11:48, Sarthak Kukreti wrote:
+> Yes. On ChromiumOS, we regularly deal with storage devices that don't
+> support WRITE_ZEROES or that need to have it disabled, via a quirk,
+> due to a bug in the vendor's implementation. Using WRITE_ZEROES for
+> allocation makes the allocation path quite slow for such devices (not
+> to mention the effect on storage lifetime), so having a separate
+> provisioning construct is very appealing. Even for devices that do
+> support an efficient WRITE_ZEROES implementation but don't support
+> logical provisioning per-se, I suppose that the allocation path might
+> be a bit faster (the device driver's request queue would report
+> 'max_provision_sectors'=0 and the request would be short circuited
+> there) although I haven't benchmarked the difference.
 
-> > In all of the above situations, currently the only way for pre-allocati=
-ng space is to issue writes (or use WRITE_ZEROES/WRITE_SAME). However, that=
- does not scale well with larger pre-allocation sizes.
->
-> What exactly is the issue with WRITE_ZEROES scalability? Are you
-> referring to cases where the device doesn't support an efficient
-> WRITE_ZEROES command and actually writes blocks filled with zeroes
-> instead of updating internal allocation metadata cheaply?
->
-Yes. On ChromiumOS, we regularly deal with storage devices that don't
-support WRITE_ZEROES or that need to have it disabled, via a quirk,
-due to a bug in the vendor's implementation. Using WRITE_ZEROES for
-allocation makes the allocation path quite slow for such devices (not
-to mention the effect on storage lifetime), so having a separate
-provisioning construct is very appealing. Even for devices that do
-support an efficient WRITE_ZEROES implementation but don't support
-logical provisioning per-se, I suppose that the allocation path might
-be a bit faster (the device driver's request queue would report
-'max_provision_sectors'=3D0 and the request would be short circuited
-there) although I haven't benchmarked the difference.
+Some background information about why ChromiumOS uses thin provisioning 
+instead of a single filesystem across the entire storage device would be 
+welcome. Although UFS devices support thin provisioning I am not aware 
+of any use cases in Android that would benefit from UFS thin 
+provisioning support.
 
-Sarthak
+Thanks,
 
-> Stefan
+Bart.
