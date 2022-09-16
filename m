@@ -2,68 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4BAC6FA8B
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 14:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D350ECAAD8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 17:57:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231549AbiIPOWG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 10:22:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38164 "EHLO
+        id S229450AbiIPR5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 13:57:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231993AbiIPOVw (ORCPT
+        with ESMTP id S229533AbiIPR5p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 10:21:52 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4545B1BAB
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 07:21:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 70C5962C2C
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 14:21:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D4E37C433D6;
-        Fri, 16 Sep 2022 14:21:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663338106;
-        bh=fJOaZCaBWzxOiGnqvQqGXZwpCxqbwMypRw0KJpJD4lk=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=smMQZF0ZR+gri9ui1p4oHtxvFvuRtDqzFEivZewYl45spDZNWnPxqkpBigjRlsw2e
-         LeUJ6LOC0yywRMzrifTptN+/ioql+bNdtUvYbERFc33MqEgSA0rnJ7w7HNXMyVYxbq
-         UUZKfNW4WVxGlTfuidsAotwh5PvmEKOgrKASJtNtB42/bMBLfwns0rC8Ue0nyuhgXs
-         Je4tWlygDWQTENU4g/lMJMOJLRU8WtO0FP5OuIva3Lbuz2uYqvbPl80G23oOnFDCeY
-         X/33vVeDcptHjoB9ea/jz2ks1mPAvpCayh2UzfMZ6kNIAhB8pc1+f3+xd5+BFdM141
-         G4nOF92geY8cg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C275CC59A58;
-        Fri, 16 Sep 2022 14:21:46 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 6.0-rc6
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
-References: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <654cd36f-a42b-3ae3-a92a-3bfc366277fc@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-16
-X-PR-Tracked-Commit-Id: c4fa368466cc1b60bb92f867741488930ddd6034
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 68e777e44c275e8dbc36f5a187c366e982d6a129
-Message-Id: <166333810679.10979.6523292822343819351.pr-tracker-bot@kernel.org>
-Date:   Fri, 16 Sep 2022 14:21:46 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Fri, 16 Sep 2022 13:57:45 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5F59A6ADE
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 10:57:31 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220916175727euoutp011b2a94c15fab4eb46d024ae7cfe72346~VaPcTtZ6O1214012140euoutp01f
+        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 17:57:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220916175727euoutp011b2a94c15fab4eb46d024ae7cfe72346~VaPcTtZ6O1214012140euoutp01f
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1663351047;
+        bh=k7hjlb6AiF7jh1iuh9LKDhE7ZOyrX7xUup0+nfGc/5s=;
+        h=Date:Subject:From:To:CC:In-Reply-To:References:From;
+        b=D+pdMVtQ8bxrwLYytL7X0K38R6vQ6LW1kOJce7HKao8/VYbNAFSktF9XgHWQj+T64
+         N+2a6A7LZc0Yfwkx5PsFLdFOLbjJwo4Pdwot/C9gbWMEw3XRZb4FK/r4R/2mLiIOTf
+         yvjurKXfcWX+oR5Zl5xkbAKy/PfXwLDouzruhZx8=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220916175727eucas1p29f8779dd295b1870898730a928a1732e~VaPbzdcPJ0630006300eucas1p2i;
+        Fri, 16 Sep 2022 17:57:27 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id B3.EC.29727.709B4236; Fri, 16
+        Sep 2022 18:57:27 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220916175726eucas1p2b96d3dda893b1e3b47e0ae4f22da13d5~VaPa0z9ck0629506295eucas1p2x;
+        Fri, 16 Sep 2022 17:57:26 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220916175726eusmtrp20aec6fd837cb9c97323960623fd98cb1~VaPaz9JkG2811228112eusmtrp2i;
+        Fri, 16 Sep 2022 17:57:26 +0000 (GMT)
+X-AuditID: cbfec7f2-205ff7000001741f-45-6324b9075764
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 85.B7.07473.609B4236; Fri, 16
+        Sep 2022 18:57:26 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220916175725eusmtip282c3befede6e547a184672cacca605db~VaPanlpJO0439104391eusmtip2m;
+        Fri, 16 Sep 2022 17:57:25 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.192) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 16 Sep 2022 18:57:21 +0100
+Message-ID: <622ae86d-39ad-c45e-ec48-42abf4b257d2@samsung.com>
+Date:   Fri, 16 Sep 2022 19:57:19 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.11.0
+Subject: Re: [PATCH v13 13/13] dm: add power-of-2 target for zoned devices
+ with non power-of-2 zone sizes
+Content-Language: en-US
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+CC:     <hch@lst.de>, <agk@redhat.com>, <damien.lemoal@opensource.wdc.com>,
+        <axboe@kernel.dk>, <snitzer@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <Johannes.Thumshirn@wdc.com>,
+        <linux-nvme@lists.infradead.org>, <pankydev8@gmail.com>,
+        <matias.bjorling@wdc.com>, <linux-block@vger.kernel.org>,
+        <bvanassche@acm.org>, <gost.dev@samsung.com>,
+        <dm-devel@redhat.com>, <hare@suse.de>, <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+In-Reply-To: <e42a0579-61b2-7b77-08cb-6723278490cc@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.192]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKKsWRmVeSWpSXmKPExsWy7djPc7rsO1WSDQ6f4rBYf+oYs8Xqu/1s
+        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
+        PWW3mND2ldlizc2nLBYnbklbtG38yugg6HH5irfHzll32T0uny312LSqk81j85J6j903G9g8
+        drbeZ/V4v+8qUOh0tcfnTXIe7Qe6mQK4o7hsUlJzMstSi/TtErgyGrfFF2xgqbg+LaGBcTVz
+        FyMnh4SAicSF31tZuhi5OIQEVjBKXFnyCcr5wiixu20LG4TzmVGi51ATI0xLz4w5jBCJ5YwS
+        +6/8Zoer2tWznBXC2c0o8enwC3aQFl4BO4mbZ98zgdgsAqoSM7/dZoKIC0qcnPmEBcQWFYiU
+        WLP7LFi9sEC2xMFrm8AuZBYQl7j1ZD5QPQcHm4CWRGMnO4gpAjTm1jQXiIr9zBL98yxAbE4B
+        e4l9Gy4wQcQ1JVq3/2aHsOUltr+dA/WzssTMm1Oh7FqJtcfOsEPYjzglNrVZgIyXEHCR2Nkc
+        BxEWlnh1fAtUiYzE/53zmSDsaomnN34zg3wrIdDCKNG/cz0bRK+1RN+ZHIgaR4mGaT+ZIcJ8
+        EjfeCkJcwycxadt05gmMqrOQgmEWkndnIXlgFpIHFjCyrGIUTy0tzk1PLTbMSy3XK07MLS7N
+        S9dLzs/dxAhMiaf/Hf+0g3Huq496hxiZOBgPMUpwMCuJ8Kp6qiQL8aYkVlalFuXHF5XmpBYf
+        YpTmYFES503O3JAoJJCeWJKanZpakFoEk2Xi4JRqYJK1vHtb8uOdE7m/Ledwej2dFbBxUQHT
+        nNOB2/9Pz4pSkSitr5vjIfjox66JDtHSp1WKTL5Vxfoz7eeO6fvxaGJabP/7ILc7Ch+S3D8v
+        /v2Mw1Iy+qOT4GKGq2snfn958eS6MqHm+XnGFWkhU/yYZkU3zVVwXlQu+JnVs/TG3jW6lq/1
+        7TmmOWTbn5h17EtE/uwKxyz5x1rxOpPWH2tViJaovvVD+di6loC4++v+LPl/ZOFJE4uZvtE7
+        LgX0GNpvdLG62r/j9fzEq028vas1u1dwRrwKElfx3MBTxJIk3LOQ75I0c27P/M+W/iuao5Oi
+        2zTvcTM9PjX7VFjj/rdf77ZYn9r/2j6kPem58rJWUSWW4oxEQy3mouJEAEG+Xgj4AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsVy+t/xe7psO1WSDd69ZLVYf+oYs8Xqu/1s
+        FtM+/GS2+H32PLNFa/s3Jou972azWuxZNInJYuXqo0wWT9bPYrb423UPKHFL2+LyrjlsFvOX
+        PWW3mND2ldlizc2nLBYnbklbtG38yugg6HH5irfHzll32T0uny312LSqk81j85J6j903G9g8
+        drbeZ/V4v+8qUOh0tcfnTXIe7Qe6mQK4o/RsivJLS1IVMvKLS2yVog0tjPQMLS30jEws9QyN
+        zWOtjEyV9O1sUlJzMstSi/TtEvQyGrfFF2xgqbg+LaGBcTVzFyMnh4SAiUTPjDmMXYxcHEIC
+        Sxkl1i1dywqRkJH4dOUjO4QtLPHnWhcbRNFHRomFuxayQzi7GSVOLL3EBlLFK2AncfPseyYQ
+        m0VAVWLmt9tMEHFBiZMzn7CA2KICkRIPlzWBxYUFsiUOXtsEdgazgLjErSfzgeIcHGwCWhKN
+        newgpgjQmFvTXCAq9jNL9M+zgFg7kUni34E7YGs5Bewl9m24wARRpCnRuv03O4QtL7H97Ryo
+        L5UlZt6cCmXXSry6v5txAqPoLCTXzUJyxSwko2YhGbWAkWUVo0hqaXFuem6xoV5xYm5xaV66
+        XnJ+7iZGYDLZduzn5h2M81591DvEyMTBeIhRgoNZSYRX1VMlWYg3JbGyKrUoP76oNCe1+BCj
+        KTCIJjJLiSbnA9NZXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQQHpiSWp2ampBahFMHxMHp1QD
+        0542hevvdr8ydz6+61fYTyfWvYalBXcjfgXLprX/WZmizajYcbPOID2kdeeyp5u9/IJCJZo3
+        iWQWPzpvN8vFX+V8VOKqmFPdLDv5DRJ2pi+e/cQh/sDK96r9v8W0FxwwdZ6ffdwsJln056vV
+        C8JibDeu5pDamlGTlZImHu0gtr3rh9vjumXrozwqj8vE7/C0aGdvOu9YpdkmuefI/Yynju/m
+        mZxI2PVy0d1cnjl1yf3VUv2OK969DokssnuQdizg2N1DE2IPe1meaVR/+DQqfrXz7dPtDkY5
+        uab/f35pbftTfEd3ZpHLmVtuQREnn4jf/b1apaZI+aRw8F3FalcjzetPU64ZTEnzPZytWfxU
+        iaU4I9FQi7moOBEAgMk2La8DAAA=
+X-CMS-MailID: 20220916175726eucas1p2b96d3dda893b1e3b47e0ae4f22da13d5
+X-Msg-Generator: CA
+X-RootMTR: 20220912082220eucas1p24605fdcf22aedc4c40d5303da8f17ad5
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220912082220eucas1p24605fdcf22aedc4c40d5303da8f17ad5
+References: <20220912082204.51189-1-p.raghav@samsung.com>
+        <CGME20220912082220eucas1p24605fdcf22aedc4c40d5303da8f17ad5@eucas1p2.samsung.com>
+        <20220912082204.51189-14-p.raghav@samsung.com> <YyIG3i++QriS9Gyy@redhat.com>
+        <e42a0579-61b2-7b77-08cb-6723278490cc@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 16 Sep 2022 03:08:16 -0600:
+>>
+>> Are you certain you shouldn't at least be exposing a different
+>> logical_block_size to upper layers?
+>>
+> To be honest, I tested my patches in QEMU with 4k Logical block size and on
+> a device with 4k LBA size.
+> 
+> I did a quick test with 512B LBA size in QEMU, and I didn't see any
+> failures when I ran my normal test suite.
+> 
+> Do you see any problem with exposing the same LBA as the underlying device?
+> 
 
-> git://git.kernel.dk/linux-block.git tags/block-6.0-2022-09-16
+Do you see any issues here? If not, I can send the next version with the
+other two changes you suggested.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/68e777e44c275e8dbc36f5a187c366e982d6a129
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+Pankaj
