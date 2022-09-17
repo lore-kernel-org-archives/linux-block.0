@@ -2,189 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0384BECAAD8
-	for <linux-block@archiver.kernel.org>; Sat, 17 Sep 2022 03:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB25C54EE9
+	for <linux-block@archiver.kernel.org>; Sat, 17 Sep 2022 10:20:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbiIQDDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 23:03:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44962 "EHLO
+        id S229556AbiIQKUl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Sep 2022 06:20:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiIQDDm (ORCPT
+        with ESMTP id S229539AbiIQKUj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 23:03:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 551AB90818;
-        Fri, 16 Sep 2022 20:03:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CE3E362E38;
-        Sat, 17 Sep 2022 03:03:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 272CEC433C1;
-        Sat, 17 Sep 2022 03:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663383820;
-        bh=viHf2rvi9XQW9HP3Qdp1Nv8dDs2EYIeR3eo/c+/gCEM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PHDw6X/qaJmOcuC5ZBNbnqLdFugk0NLTwILyibHl3N8RQ3N6y3a8YcsQQNK4sj20J
-         o7EMzPMBMg6SwfilgIBJpLKMaVKiloSJzWZGUAw5k+tk3m70BSbhdVU4SvWXG4DNee
-         bQWx7nJ9x3Vf0EF+H1XDs1SMmNlSEcHhzz2U9frPJLcip0xXOEibHp8gxIVz/HpZPY
-         Zikgw9vY5zOwlKuIS2/MNn3Y2u0LUkE8mZYycsaNb9WpWrQDxBXCFGe9AmwxLU7Evh
-         n1ddfZRaD8R9RmwxDA/L7XHXDUGFYALHTVPjs3dEXnXe675euO2XsexTAKnc2uWYS1
-         gh4ecxPLt170w==
-Date:   Fri, 16 Sep 2022 20:03:39 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Gwendal Grignou <gwendal@google.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Evan Green <evgreen@google.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Daniil Lunev <dlunev@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [dm-devel] [PATCH RFC 0/8] Introduce provisioning primitives for
- thinly provisioned storage
-Message-ID: <YyU5CyQfS+64xmnm@magnolia>
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+        Sat, 17 Sep 2022 06:20:39 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3928136865;
+        Sat, 17 Sep 2022 03:20:34 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MV6ND4LzTzKLFV;
+        Sat, 17 Sep 2022 18:18:36 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgA3inNunyVjbrzoAw--.34097S3;
+        Sat, 17 Sep 2022 18:20:32 +0800 (CST)
+Subject: Re: [PATCH] sbitmap: fix permanent io blocking caused by insufficient
+ wakeup times
+To:     Liu Song <liusong@linux.alibaba.com>, axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <1663381981-6413-1-git-send-email-liusong@linux.alibaba.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ab451e4c-e1ca-d7a3-6e02-c7d12a473124@huaweicloud.com>
+Date:   Sat, 17 Sep 2022 18:20:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <1663381981-6413-1-git-send-email-liusong@linux.alibaba.com>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220915164826.1396245-1-sarthakkukreti@google.com>
+X-CM-TRANSID: Syh0CgA3inNunyVjbrzoAw--.34097S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFyDtw13GFy8try5tr4fXwb_yoWrXr15pF
+        WDGFn3uw1rtrW2qr43JrWUA3Zagw4v9r93GrWfG34rCr4jqrnaqr10kanxZw4rJF4DGanr
+        Jrs8CFs5G3yUXFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUzsqWUUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2022 at 09:48:18AM -0700, Sarthak Kukreti wrote:
-> From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+Hi,
+
+ÔÚ 2022/09/17 10:33, Liu Song Ð´µÀ:
+> From: Liu Song <liusong@linux.alibaba.com>
 > 
-> Hi,
+> In "sbitmap_queue_clear_batch", a batch of completed requests may be
+> processed at once, but "wait_cnt" is only reduced once by
+> "sbitmap_queue_wake_up".
+> In our environment, if "/sys/block/nvme0n1/nr_requests" is adjusted to
+> 32, it is easily because no tag and then enter the waiting situation,
+> if continue change "nr_requests" to 1023 at this time, it will basically
+> fall into the situation of permanent blocking. Because there will be
+> "blk_freeze_queue" in "blk_mq_update_nr_requests", which will prevent
+> any new requests, but due to insufficient wake-up, there are tasks
+> waiting for wake-up, but no new wake-up opportunities will be generated
+> at this time, so this situation needs to be repaired.
 > 
-> This patch series is an RFC of a mechanism to pass through provision
-> requests on stacked thinly provisioned storage devices/filesystems.
 
-[Reflowed text]
+It seems Keith already fixed this recently. Can you have a check at his
+patch?
 
-> The linux kernel provides several mechanisms to set up thinly
-> provisioned block storage abstractions (eg. dm-thin, loop devices over
-> sparse files), either directly as block devices or backing storage for
-> filesystems. Currently, short of writing data to either the device or
-> filesystem, there is no way for users to pre-allocate space for use in
-> such storage setups. Consider the following use-cases:
+Thanks,
+Kuai
+> Signed-off-by: Liu Song <liusong@linux.alibaba.com>
+> ---
+>   include/linux/sbitmap.h |  8 ++++++++
+>   lib/sbitmap.c           | 22 ++++++++++++++++++----
+>   2 files changed, 26 insertions(+), 4 deletions(-)
 > 
-> 1) Suspend-to-disk and resume from a dm-thin device: In order to
-> ensure that the underlying thinpool metadata is not modified during
-> the suspend mechanism, the dm-thin device needs to be fully
-> provisioned.
-> 2) If a filesystem uses a loop device over a sparse file, fallocate()
-> on the filesystem will allocate blocks for files but the underlying
-> sparse file will remain intact.
-> 3) Another example is virtual machine using a sparse file/dm-thin as a
-> storage device; by default, allocations within the VM boundaries will
-> not affect the host.
-> 4) Several storage standards support mechanisms for thin provisioning
-> on real hardware devices. For example:
->   a. The NVMe spec 1.0b section 2.1.1 loosely talks about thin
->   provisioning: "When the THINP bit in the NSFEAT field of the
->   Identify Namespace data structure is set to â€˜1â€™, the controller ...
->   shall track the number of allocated blocks in the Namespace
->   Utilization field"
->   b. The SCSi Block Commands reference - 4 section references "Thin
->   provisioned logical units",
->   c. UFS 3.0 spec section 13.3.3 references "Thin provisioning".
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index 8f5a86e..153382e 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -579,6 +579,14 @@ static inline struct sbq_wait_state *sbq_wait_ptr(struct sbitmap_queue *sbq,
+>   void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
+>   
+>   /**
+> + * sbitmap_queue_wake_up_batch() - Attempt to wake up waiters in batches
+> + * on a &struct sbitmap_queue.
+> + * @sbq: Bitmap queue to wake up.
+> + * @nr: The number of attempts to wake the waiter.
+> + */
+> +void sbitmap_queue_wake_up_batch(struct sbitmap_queue *sbq, int nr);
+> +
+> +/**
+>    * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct
+>    * seq_file.
+>    * @sbq: Bitmap queue to show.
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 29eb048..f2aa1da 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -600,7 +600,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+>   	return NULL;
+>   }
+>   
+> -static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+> +static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
+>   {
+>   	struct sbq_wait_state *ws;
+>   	unsigned int wake_batch;
+> @@ -610,6 +610,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   	if (!ws)
+>   		return false;
+>   
+> +again:
+>   	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+>   	if (wait_cnt <= 0) {
+>   		int ret;
+> @@ -632,10 +633,14 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   		if (ret == wait_cnt) {
+>   			sbq_index_atomic_inc(&sbq->wake_index);
+>   			wake_up_nr(&ws->wait, wake_batch);
+> -			return false;
+> +			if (!nr || *nr <= 0)
+> +				return false;
+>   		}
+>   
+>   		return true;
+> +	} else if (nr && *nr) {
+> +		(*nr)--;
+> +		goto again;
+>   	}
+>   
+>   	return false;
+> @@ -643,11 +648,20 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   
+>   void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+>   {
+> -	while (__sbq_wake_up(sbq))
+> +	while (__sbq_wake_up(sbq, NULL))
+>   		;
+>   }
+>   EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+>   
+> +void sbitmap_queue_wake_up_batch(struct sbitmap_queue *sbq, int nr)
+> +{
+> +	int i = SBQ_WAIT_QUEUES;
+> +
+> +	while (__sbq_wake_up(sbq, &nr) && --i)
+> +		;
+> +}
+> +EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up_batch);
+> +
+>   static inline void sbitmap_update_cpu_hint(struct sbitmap *sb, int cpu, int tag)
+>   {
+>   	if (likely(!sb->round_robin && tag < sb->depth))
+> @@ -683,7 +697,7 @@ void sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, int offset,
+>   		atomic_long_andnot(mask, (atomic_long_t *) addr);
+>   
+>   	smp_mb__after_atomic();
+> -	sbitmap_queue_wake_up(sbq);
+> +	sbitmap_queue_wake_up_batch(sbq, nr_tags);
+>   	sbitmap_update_cpu_hint(&sbq->sb, raw_smp_processor_id(),
+>   					tags[nr_tags - 1] - offset);
+>   }
 > 
-> In all of the above situations, currently the only way for
-> pre-allocating space is to issue writes (or use
-> WRITE_ZEROES/WRITE_SAME). However, that does not scale well with
-> larger pre-allocation sizes. 
-> 
-> This patchset introduces primitives to support block-level
-> provisioning (note: the term 'provisioning' is used to prevent
-> overloading the term 'allocations/pre-allocations') requests across
-> filesystems and block devices. This allows fallocate() and file
-> creation requests to reserve space across stacked layers of block
-> devices and filesystems. Currently, the patchset covers a prototype on
-> the device-mapper targets, loop device and ext4, but the same
-> mechanism can be extended to other filesystems/block devices as well
-> as extended for use with devices in 4 a-c.
 
-If you call REQ_OP_PROVISION on an unmapped LBA range of a block device
-and then try to read the provisioned blocks, what do you get?  Zeroes?
-Random stale disk contents?
-
-I think I saw elsewhere in the thread that any mapped LBAs within the
-provisioning range are left alone (i.e. not zeroed) so I'll proceed on
-that basis.
-
-> Patch 1 introduces REQ_OP_PROVISION as a new request type. The
-> provision request acts like the inverse of a discard request; instead
-> of notifying lower layers that the block range will no longer be used,
-> provision acts as a request to lower layers to provision disk space
-> for the given block range. Real hardware storage devices will
-> currently disable the provisioing capability but for the standards
-> listed in 4a.-c., REQ_OP_PROVISION can be overloaded for use as the
-> provisioing primitive for future devices.
-> 
-> Patch 2 implements REQ_OP_PROVISION handling for some of the
-> device-mapper targets. This additionally adds support for
-> pre-allocating space for thinly provisioned logical volumes via
-> fallocate()
-> 
-> Patch 3 implements the handling for virtio-blk.
-> 
-> Patch 4 introduces an fallocate() mode (FALLOC_FL_PROVISION) that
-> sends a provision request to the underlying block device (and beyond).
-> This acts as the primary mechanism for file-level provisioing.
-
-Personally, I think it's well within the definition of fallocate mode==0
-(aka preallocate) for XFS to call REQ_OP_PROVISION on the blocks that it
-preallocates?  XFS always sets the unwritten flag on the file mapping,
-so it doesn't matter if the device provisions space without zeroing the
-contents.
-
-That said, if devices are really allowed to expose stale disk blocks
-then for blkdev fallocate I think you could get away with reusin
-FALLOC_FL_NO_HIDE_STALE instead of introducing a new fallocate flag.
-
-> Patch 5 wires up the loop device handling of REQ_OP_PROVISION.
-> 
-> Patches 6-8 cover a prototype implementation for ext4, which includes
-> wiring up the fallocate() implementation, introducing a filesystem
-> level option (called 'provision') to control the default allocation
-> behaviour and finally a file level override to retain current
-> handling, even on filesystems mounted with 'provision'
-
-Hmm, I'll have a look.
-
-> Testing:
-> --------
-> - A backport of this patch series was tested on ChromiumOS using a
-> 5.10 kernel.
-> - File on ext4 on a thin logical volume:
-> fallocate(FALLOC_FL_PROVISION) : 4.6s, dd if=/dev/zero of=...: 6 mins.
-> 
-> TODOs:
-> ------
-> 1) The stacked block devices (dm-*, loop etc.) currently
-> unconditionally pass through provision requests. Add support for
-> provision, similar to how discard handling is set up (with options to
-> disable, passdown or passthrough requests).
-> 2) Blktests and Xfstests for validating provisioning.
-
-Yes....
-
---D
-
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://listman.redhat.com/mailman/listinfo/dm-devel
