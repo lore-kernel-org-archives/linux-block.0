@@ -2,117 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D547C6FA8B
-	for <linux-block@archiver.kernel.org>; Fri, 16 Sep 2022 21:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D85FECAAA1
+	for <linux-block@archiver.kernel.org>; Sat, 17 Sep 2022 02:33:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229803AbiIPV7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Sep 2022 17:59:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57102 "EHLO
+        id S229601AbiIQCdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Sep 2022 22:33:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbiIPV7i (ORCPT
+        with ESMTP id S229515AbiIQCdb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Sep 2022 17:59:38 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A20B4B0
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 14:59:36 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id z21so33429558edi.1
-        for <linux-block@vger.kernel.org>; Fri, 16 Sep 2022 14:59:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=tXp8Qm0HOu9b4+ry3VO9lluub8ul1uWHsnihCuufP3w=;
-        b=Q39zWQsJZD445lUFViZ2aCm54TZUMrPkeF3F88WLVvuuYcpxoDzhCFhjgK7Miw1X4J
-         vTUBHYPMxnpweHtFOgVUpZ0AFNYZLEHNNMquduvRqskfJOtkTcmwvzwsat05Z1HBH8pL
-         Pa8fsG6pO3KNhCw44XALJuGbnSttZcWxEWr/A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=tXp8Qm0HOu9b4+ry3VO9lluub8ul1uWHsnihCuufP3w=;
-        b=XY7Z4y/OGLnRivBPh5KsGpE1SwHKsMAZpTyzwcGt3rT3nMfHX/F8HKHOEWztntw86l
-         5fBGuD90xLeT4tKuMuOD0oPigU1ErxT5dtvcRfMXW9NzOuyidfZFtghqlnJxJZLFJEAk
-         ZMvMrcA7i9N5DiZU/pGYvIV2fY7RLR3LBlmosHQeYc/UCxMwb8vNx41JG24Vh3J0keen
-         L8nA6S4qBxMsP5SHYS0bD31R8vMXPfir2tDA5xdRxBHuKOPoonTmbq3v4aoRUOBRMmeh
-         QBZMpCSQ40wLtLQP5FUFhIhJFwcm9NQ/c9WbsTc0phlGH0sA+EIKWXHdw0pe7HVibGwZ
-         T9sQ==
-X-Gm-Message-State: ACrzQf0XMWv+Mp9uY+JbN+U3noLwWmJ245zVhiAd2yFNBq9wb5sfykSw
-        nEogJtK9GcH9WtYCwXxfx9BbAdNl2XZOj0dg8l8osA==
-X-Google-Smtp-Source: AMsMyM57U86vqx070tvFh9n6rb5P+QpCeQvsVAXwmkT/JivZJxEBgvPEObSHPiDtHBStbOgCq0EOZ0nQ8Xzj88PWlsQ=
-X-Received: by 2002:a05:6402:161a:b0:451:ea13:572e with SMTP id
- f26-20020a056402161a00b00451ea13572emr5613477edv.41.1663365574516; Fri, 16
- Sep 2022 14:59:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
- <YyQTM5PRT2o/GDwy@fedora> <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
- <0be0e378-1601-678c-247a-ba24d111b934@acm.org>
-In-Reply-To: <0be0e378-1601-678c-247a-ba24d111b934@acm.org>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Fri, 16 Sep 2022 14:59:22 -0700
-Message-ID: <CAG9=OMMS8gPFvGGH87bU2oBNk4WEBM5tG-z2Z5oaW4hUoKV8Jw@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
- provisioned storage
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 16 Sep 2022 22:33:31 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E68399B77;
+        Fri, 16 Sep 2022 19:33:29 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=liusong@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VPzHIFq_1663381981;
+Received: from localhost(mailfrom:liusong@linux.alibaba.com fp:SMTPD_---0VPzHIFq_1663381981)
+          by smtp.aliyun-inc.com;
+          Sat, 17 Sep 2022 10:33:27 +0800
+From:   Liu Song <liusong@linux.alibaba.com>
+To:     axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH] sbitmap: fix permanent io blocking caused by insufficient wakeup times
+Date:   Sat, 17 Sep 2022 10:33:01 +0800
+Message-Id: <1663381981-6413-1-git-send-email-liusong@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 16, 2022 at 1:01 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 9/16/22 11:48, Sarthak Kukreti wrote:
-> > Yes. On ChromiumOS, we regularly deal with storage devices that don't
-> > support WRITE_ZEROES or that need to have it disabled, via a quirk,
-> > due to a bug in the vendor's implementation. Using WRITE_ZEROES for
-> > allocation makes the allocation path quite slow for such devices (not
-> > to mention the effect on storage lifetime), so having a separate
-> > provisioning construct is very appealing. Even for devices that do
-> > support an efficient WRITE_ZEROES implementation but don't support
-> > logical provisioning per-se, I suppose that the allocation path might
-> > be a bit faster (the device driver's request queue would report
-> > 'max_provision_sectors'=0 and the request would be short circuited
-> > there) although I haven't benchmarked the difference.
->
-> Some background information about why ChromiumOS uses thin provisioning
-> instead of a single filesystem across the entire storage device would be
-> welcome. Although UFS devices support thin provisioning I am not aware
-> of any use cases in Android that would benefit from UFS thin
-> provisioning support.
->
-Sure (and I'd be happy to put this in the cover letter, if you prefer;
-I didn't include it initially, since it seemed orthogonal to the
-discussion of the patchset)!
+From: Liu Song <liusong@linux.alibaba.com>
 
-On ChromiumOS, the primary driving force for using thin provisioning
-is to have flexible, segmented block storage, both per-user and for
-applications/virtual machines with several useful properties, for
-example: block-level encrypted user storage, snapshot based A-B
-updates for verified content, on-demand partitioning for short-lived
-use cases. Several of the other planned use-cases (like verified
-content retention over powerwash) require flexible on-demand block
-storage that is decoupled from the primary filesystem(s) so that we
-can have cryptographic erase for the user partitions and keep the
-on-demand, dm-verity backed executables intact.
+In "sbitmap_queue_clear_batch", a batch of completed requests may be
+processed at once, but "wait_cnt" is only reduced once by
+"sbitmap_queue_wake_up".
+In our environment, if "/sys/block/nvme0n1/nr_requests" is adjusted to
+32, it is easily because no tag and then enter the waiting situation,
+if continue change "nr_requests" to 1023 at this time, it will basically
+fall into the situation of permanent blocking. Because there will be
+"blk_freeze_queue" in "blk_mq_update_nr_requests", which will prevent
+any new requests, but due to insufficient wake-up, there are tasks
+waiting for wake-up, but no new wake-up opportunities will be generated
+at this time, so this situation needs to be repaired.
 
-Best
-Sarthak
+Signed-off-by: Liu Song <liusong@linux.alibaba.com>
+---
+ include/linux/sbitmap.h |  8 ++++++++
+ lib/sbitmap.c           | 22 ++++++++++++++++++----
+ 2 files changed, 26 insertions(+), 4 deletions(-)
 
-> Thanks,
->
-> Bart.
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index 8f5a86e..153382e 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -579,6 +579,14 @@ static inline struct sbq_wait_state *sbq_wait_ptr(struct sbitmap_queue *sbq,
+ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
+ 
+ /**
++ * sbitmap_queue_wake_up_batch() - Attempt to wake up waiters in batches
++ * on a &struct sbitmap_queue.
++ * @sbq: Bitmap queue to wake up.
++ * @nr: The number of attempts to wake the waiter.
++ */
++void sbitmap_queue_wake_up_batch(struct sbitmap_queue *sbq, int nr);
++
++/**
+  * sbitmap_queue_show() - Dump &struct sbitmap_queue information to a &struct
+  * seq_file.
+  * @sbq: Bitmap queue to show.
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 29eb048..f2aa1da 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -600,7 +600,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+ 	return NULL;
+ }
+ 
+-static bool __sbq_wake_up(struct sbitmap_queue *sbq)
++static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
+ {
+ 	struct sbq_wait_state *ws;
+ 	unsigned int wake_batch;
+@@ -610,6 +610,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 	if (!ws)
+ 		return false;
+ 
++again:
+ 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+ 	if (wait_cnt <= 0) {
+ 		int ret;
+@@ -632,10 +633,14 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 		if (ret == wait_cnt) {
+ 			sbq_index_atomic_inc(&sbq->wake_index);
+ 			wake_up_nr(&ws->wait, wake_batch);
+-			return false;
++			if (!nr || *nr <= 0)
++				return false;
+ 		}
+ 
+ 		return true;
++	} else if (nr && *nr) {
++		(*nr)--;
++		goto again;
+ 	}
+ 
+ 	return false;
+@@ -643,11 +648,20 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 
+ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
+ {
+-	while (__sbq_wake_up(sbq))
++	while (__sbq_wake_up(sbq, NULL))
+ 		;
+ }
+ EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+ 
++void sbitmap_queue_wake_up_batch(struct sbitmap_queue *sbq, int nr)
++{
++	int i = SBQ_WAIT_QUEUES;
++
++	while (__sbq_wake_up(sbq, &nr) && --i)
++		;
++}
++EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up_batch);
++
+ static inline void sbitmap_update_cpu_hint(struct sbitmap *sb, int cpu, int tag)
+ {
+ 	if (likely(!sb->round_robin && tag < sb->depth))
+@@ -683,7 +697,7 @@ void sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, int offset,
+ 		atomic_long_andnot(mask, (atomic_long_t *) addr);
+ 
+ 	smp_mb__after_atomic();
+-	sbitmap_queue_wake_up(sbq);
++	sbitmap_queue_wake_up_batch(sbq, nr_tags);
+ 	sbitmap_update_cpu_hint(&sbq->sb, raw_smp_processor_id(),
+ 					tags[nr_tags - 1] - offset);
+ }
+-- 
+1.8.3.1
+
