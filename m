@@ -2,133 +2,239 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E044ECAAA1
-	for <linux-block@archiver.kernel.org>; Sat, 17 Sep 2022 16:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DCFC6FA82
+	for <linux-block@archiver.kernel.org>; Sat, 17 Sep 2022 19:46:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229488AbiIQQar (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 17 Sep 2022 12:30:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56976 "EHLO
+        id S229524AbiIQTqu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 17 Sep 2022 15:46:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbiIQQaq (ORCPT
+        with ESMTP id S229455AbiIQTqs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 17 Sep 2022 12:30:46 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on20618.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eb2::618])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A552DAA9;
-        Sat, 17 Sep 2022 09:30:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RO1T597+zR3gXHCjOgyQNW8zv/zrQ71UgunBFz+ICNEVgFNtY6lpHf89H/TLTF66e/0f6GlgOQEcpaSbgfV0qCxd2cQs78LPPhz394SoFJZ1QxkRXzczjc+7nrQIFJAt4M2e3F/SZBnO5F16UInHIwmnPhrz2GY5s1ghc/vvfxCZ6dtNGPqy9gPleqGJFl+NWzrlxbxHV9i6xb+kskwUtRyBS5nQQayv/YFXAOJxdBqOpsiOKQwkKv/JM6jDG+1IYhoc2GQmK/7yPYEiFAp0y3geV4FLOgfjrpPDDGNIzblEmFnk0McbzT22hysKGfJbvZbtzEBis3MElVMSOIIvIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aRO6XSCRYqaMhLE556KeG6SvBg6lpdytqT3Lhy6nY/U=;
- b=eYNeEhiIZ1eorWt4gRgTMmX5cf81Z3db1SfUutFWYciXaL0zOOB8SBt4QONqTRjOHa0q5sGc9Tmea4USbXtgRafeu/eUBgV3Y7IFpTMORBMNjcWkW3rfE0Vddn4l6/eJq33TmvAmp3S1zE+1e1plStRyVT4BR/XQmgDpm5R3lyGQUZckYGfx2v+SYgd0cmojtEuyOXdxcIPq21l79Q473NOewDqQZT3eZigZ6Ocwab7f+yer1I+Rq525DkwY7WO9flWIyGl1rODIk0IYsEM9hJcHFpSKSUWOW3z/Y8XeQrnYnOyPvUZWmLaR+BOUlJaR8rBmwLcnwS4kFAZWkE+u0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aRO6XSCRYqaMhLE556KeG6SvBg6lpdytqT3Lhy6nY/U=;
- b=uLHjcS8wXXYE2fPPBkUHPmGGOVo3hM7VljiWGjJmcjLCBxPYYqoILuwira/y/ZUhKFFa5v6ypa0wx3/FWpG4UFLO8cr0IyVRMAMjaEGIp8LAP9tbcUmKmgPBkYndijBY07Xxu41LjtwTdGFeSVV1dlkDHIaqmgUOIyxWSrvhgkFHLbtAvY0p2D5omTqFBUMdyGTWKtD482pmlnpmDuvhxHD5oO6NTvEYD5i32hT4OQkX6G6kbzXi5H6r7cdzNW8k+XlRrnP0Vs02CRIBZCOa51GixzwNzM/HjI3bUqVxRH6GVQIQ4JCq26S5XmHMt9OdARu9bTj9/vyp/gD4fBPJ+w==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by DM6PR12MB4337.namprd12.prod.outlook.com (2603:10b6:5:2a9::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.18; Sat, 17 Sep
- 2022 16:30:42 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::3d10:f869:d83:c266]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::3d10:f869:d83:c266%4]) with mapi id 15.20.5632.018; Sat, 17 Sep 2022
- 16:30:42 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Li Jinlin <lijinlin3@huawei.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linfeilong@huawei.com" <linfeilong@huawei.com>
-Subject: Re: [PATCH] block/blk-rq-qos: delete useless enmu RQ_QOS_IOPRIO
-Thread-Topic: [PATCH] block/blk-rq-qos: delete useless enmu RQ_QOS_IOPRIO
-Thread-Index: AQHYyXTjYF2IKWNfP0m619oo0fSira3j0r+A
-Date:   Sat, 17 Sep 2022 16:30:42 +0000
-Message-ID: <fe9863c8-af50-32f2-9b3a-ee631a50a874@nvidia.com>
-References: <20220916023241.32926-1-lijinlin3@huawei.com>
-In-Reply-To: <20220916023241.32926-1-lijinlin3@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|DM6PR12MB4337:EE_
-x-ms-office365-filtering-correlation-id: 3328fce9-b93c-471b-baa4-08da98c9f71d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ud6ncRr1cPKtkmk+CDO00hnQu2GcRG6Ubv3CIMRmQe4B1H+IxbxwCt31My4d26p+H4jUQAMUCUgy5E88tFpO33p4WQ2kHBLIP6n6+OJNMn/VVdRlMxvd0XwLtbkgpcGTyEic8EskoIr//ZJNWXHzcLKFkNERPB6mctFiEl/u2kkX7Bt8Gn/+YfJcj/gksuuHJqaUS4ohnSQW2vUJ1aLQVD6GoPLU/WQYsLPLjZRuNeM/dyXHMp86+iCh9pLgkNE60cFDBO3ssdT0+QbttZpXP4yLc8Z1f/kk/W3IR+/rwkIEryl0Mceni8pafhoe1FJIqBo33efq5BEnBM1aqnZsm06y/RWbR/qKaKlSKbYbswOZ38wTcn7DcKdLWZ/txOkRRhoP1fGJyv6R5bJjzxvDEZ8zmkkGYwh9u3nl2l84IZYj99rTyZZ6ASrQxaX3ka3TF6Vwn8bq8lERITIPs4Nug+8ALIFmooLyBuAi6096Q03t/0ZQyi/3CGnn2AmOlZCzsWeFZWQlIiSlh/ZTsJI4JDRP+2CVK4zNx7zHg/MpPiBGr8y55kOpS1V5h/JhRIdNeHoPRh0tAykR2e6QRlnQEEHKLM89X0EVLiz/bKc2Kl1Sf2FW+WbzHpE2qtRaL74/YAE/VV1x1CyJiq/LTY9jaoD5IqtnUPm5wUTLsLMycIKD6qgzoU6+6MM74fi4A+zGTGYtW5qYzG6MZXFPfgode8amFTcesH09BChZMFb404SidAT+bcri0jHMnLJdSlKo2V0thon9R7fpiwA+Z02LuzfeX02SCj+LnuSYwNO7G7YrsEOpwgAgzEGg9IGoedGGSJ5ocC35+/dbVzSrho1DWA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(376002)(396003)(136003)(39860400002)(451199015)(558084003)(186003)(5660300002)(66476007)(66946007)(76116006)(64756008)(4326008)(8676002)(2616005)(8936002)(2906002)(66446008)(6486002)(478600001)(122000001)(316002)(38100700002)(66556008)(54906003)(6916009)(71200400001)(83380400001)(36756003)(38070700005)(31686004)(53546011)(6506007)(86362001)(91956017)(41300700001)(6512007)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TlZKd2NVS3lPeWdMODg4M2JiNTJhQkJBV2NSeUxxTG8vdytjM2J0OU1wTjlp?=
- =?utf-8?B?SzZJYkZzblNWOXlWMmlBN3RvUGw5bDhFOHhzK2NhSkY5eGo3WFhrZTFKVTJW?=
- =?utf-8?B?dnFTTFcweUdBa3dRL0hDZWwvTGFpUUtPTGplV2g5VEtKQnZZWGh5dnYzU2pY?=
- =?utf-8?B?VXNLMXdsTGljUVFTWS9HTXNIcVZGQnU0OXBVNjA2bmVCdFdWRXV6Y3BidUt5?=
- =?utf-8?B?WmZBN1RXaDAzUWpTMnBpUmg3RjNPNnA3MmlzUnpJcG16SEVZc1QzUGJiYnVI?=
- =?utf-8?B?RVlaaW1MNTAyNVV2WmdsTnFGRndIMmVXQS96Q2FFNmZKSXBlWGJna2JqM1R6?=
- =?utf-8?B?VDR6ZFhmaFdiN0I0RXFadXE1a3lEZ3R6aTV4SDVGTGdmaUVpc3kzZFBGNjFJ?=
- =?utf-8?B?VW5xb2lWaVZtVExEMGdoSUMva0MzRVgyUVNobWMyUE8xOUZ4L2pIeFR2K1R6?=
- =?utf-8?B?QzRVS0pKVjRLMk1xcUR0UmpZUVlEM1EreS9IS21TY01MYThMOXVGS3g1Q0Rz?=
- =?utf-8?B?M1g4cm1FVlNnWlVpMDBkUXJZVHV1ZW5QV1FneGN6SjNqb1NWZWVwTElhbjRt?=
- =?utf-8?B?dER4clY3Yjl0Nm9jZFgxVEtEQjdjcmNTYlBmQ2poNUtNZGE4SVA4YVg3S1k0?=
- =?utf-8?B?eUxmMERUVnlSTXlHZ0tESm9ndkQzTmZDR3ZQUEJ6UXdaU0FtSG1JNC9uUEFh?=
- =?utf-8?B?dG5iSEVDNzZUT1ZTVlFkT3d6YTVnNFFnMHlldDh3eVJrcGE0MG5GRmtOU3FM?=
- =?utf-8?B?YXlJckRIaml1ck1XTzh0bDl6Uitlazd0UkxkSldvalQwMmFvR0FhcXhMdnk4?=
- =?utf-8?B?bXhUMGxKMUYwaXlLYlVIUldhcUlwTFVuMDU3ZENYOWE4Z2pYVXZlcHF4VmpZ?=
- =?utf-8?B?T0xlbXlTTFFUdktwak5JT3U1M0ZncUNwNk1zdUJ1a2JuU0JKUDJRRnErbXdW?=
- =?utf-8?B?eGNqcmUrVEV0Q2w4eXVESmdpSHFJc0lqeUtTUzkzZC9JUHBvUDdPWk9uSHNq?=
- =?utf-8?B?OEJlOXlwWFp5K3B0SDNlTkpDcnh4S3JUZ3ZaMjBRMnJTajh3MVVpOFEwcWR2?=
- =?utf-8?B?dWx3bWI3cklkbHdZQlZuUndrSmNwWVJRZi80R2dkelhsdHM5blMwMktrNzlp?=
- =?utf-8?B?R3NLbCtKc1VYd3BrNklGR094RTNlQU9ValZleEZwVnBWS2NsSXkzN0dVM1Bk?=
- =?utf-8?B?bGw4T0pLTHBaV2h5cUpvK2dYMTZIb0xUdGdVcTl5Rnh4cFlOUWpucUp4UE9R?=
- =?utf-8?B?enFWU1NzKytsQUNjek03SWcwdU9GQlZmaDE1SWV4dENqZGdjNlkwRTdWVjEw?=
- =?utf-8?B?cUFPdGlMd3NyejRPSGxSSzRYRndSSHlVOGxZSjFQNVp2VUxlTWx4QWVwVENo?=
- =?utf-8?B?UGZiT29SMk1MUzRpNXFuTlVPbE02U1VCZG1hR2V5WlFqQ1A3ZjExK2o3OWdx?=
- =?utf-8?B?SWRZcWxHR1g0VUlRaHVuQisxMktHRzZqb2dDVWdYVUUvZ2RrWWRJcU9NdHJm?=
- =?utf-8?B?Z3FEQXhsM3NBeVRNeEpkNHJxKzNlbXlpdnRzODU2MUFVVFBSTXZLOXp2UDly?=
- =?utf-8?B?Y3VFS3cvZ1RROVowTkJ6VUwrYXI3dUZmMW41M0Y4MmU1K2dGbERnNmxkOGxN?=
- =?utf-8?B?R0s1TFFYYUFiNWVJNE0rU2I2Z2c5VVB3N1Q0bk1vODhoQVVQSllMaWNSV2Jj?=
- =?utf-8?B?bExKbjk5U1VqRVppYkhxTFZPeXdxV2thYnlWZDhNWEVyRXhHZDk1YlFQWXZ1?=
- =?utf-8?B?SkxDT0FZMXRWTWFRQlBmaFBVdW9FYVUwdUFhMzh3cUV0Nm5sVFI4Z0NuMGtI?=
- =?utf-8?B?V1ViQWh1WG9HWU1pV1JYaHhyb2RHZGRqLzNnNHdKNy9LN0FhSHdRS1dOWVAw?=
- =?utf-8?B?VkkxVDl6elQzNWFWNmhQSVI2M1NqMmx6NUlZUDJrMkdhaUxNSStyeVNvUVp6?=
- =?utf-8?B?UER3bVVzMzN0RzdVazZ1RStZcW9qL0JkRVFkaDU2bnozOVExYUV6Mkh1QUpD?=
- =?utf-8?B?TjZrN1VYOWJwaFZwNHhacGFqMHhISlFLWmFNSXNwa3ZxVnppVzdBNngvSkhw?=
- =?utf-8?B?bzdrOGVUclN1L2c0TDdpelA2dzZrVXQyakZTVHR3cGp1NURXck5LMWRIbHB1?=
- =?utf-8?B?R2xLZE9TYkludkxvb01nR2kvRmJnS1JwZmp3b2RTeXlnSzVNU01sTnZFMWRk?=
- =?utf-8?Q?hp0wY3iPc69ozKd6sM0jB5lqC6mMHi7fiiijjhylE79g?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6E37C28C4B51AA46B225A58847A7BB35@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Sat, 17 Sep 2022 15:46:48 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF8F12C100
+        for <linux-block@vger.kernel.org>; Sat, 17 Sep 2022 12:46:46 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id b35so36020956edf.0
+        for <linux-block@vger.kernel.org>; Sat, 17 Sep 2022 12:46:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=YyeNIHUzNbtSHe6o09PMb3YQ7MMyCYWkOVqFjUHdZoU=;
+        b=iffWO/0yAzSK5e6E1WnNnRN8CWp03XEgokCUrm8VcMYG56l+/wiV3OVIX/MzEsVhZz
+         Y3EZ6Hhdpb0rcQXB970URz0oZuHLHSHcPAwjzs9lGhNjN6vrSmxINM5D1mh++walEPBg
+         hKBSM50RAdbX+Dlan4RT0ACVQ7geepnsAmoGE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=YyeNIHUzNbtSHe6o09PMb3YQ7MMyCYWkOVqFjUHdZoU=;
+        b=53PLhF+lIsKxT5qsSzKTYd8olNw3ext7rRerQnWAAbDVZBvcOMi3n0m1qgzecHLumm
+         gKg0+FvFvzARSK49n0DXdxN5nv1CYV/t3zFaoHvbGJp2QAmJLvifymHRbNL66GHG6myd
+         gDLK06TsBtw7oqP24po/lMDox7GZJp+znT1kK5sNTOE3sGzObZGSeGO4mPjbo1hepIBe
+         e4dgEbrgxsgeyUTHGGD/FkMiWUM846OIjqC45yTt099MjxAQw8FMPa2evahXaTm363tl
+         UyXkqQFAT+bLxfHQHF3PYf1dW3Y7uHDls34CFM87nqmiek/ABL9AnoW3nxkWJq+neMh8
+         I5lQ==
+X-Gm-Message-State: ACrzQf0DJD3z3ahcG+ARDq3htL2LvAMit8RqBnLNcy8cTIdogY41kRFi
+        HbLuUEsNE7ah5WC1wqs3OqHOAIa9O7wUjVtFGfKWMw==
+X-Google-Smtp-Source: AMsMyM4QrS6tI4fQMcBRrUQlm6Q+5pMuSSoJX62Z5PpIwpQM2juv8YcKUn5ARK9Xc2oVnRKOJlkUreM93NBIQ6zDl0w=
+X-Received: by 2002:a05:6402:90a:b0:443:8b10:bcad with SMTP id
+ g10-20020a056402090a00b004438b10bcadmr8770066edz.416.1663444005137; Sat, 17
+ Sep 2022 12:46:45 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3328fce9-b93c-471b-baa4-08da98c9f71d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2022 16:30:42.7490
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nKD/3EydKGgvcFhfJBgvMMqYc3Xs0cvrVwdRdHAn3NIkFAPnQPgQKf3PPqRY0ugiLZiRTWSYvbhdnAtwBgDTzg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4337
+References: <20220915164826.1396245-1-sarthakkukreti@google.com> <YyU5CyQfS+64xmnm@magnolia>
+In-Reply-To: <YyU5CyQfS+64xmnm@magnolia>
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date:   Sat, 17 Sep 2022 12:46:33 -0700
+Message-ID: <CAG9=OMNPnsjaUw2EUG0XFjV94-V1eD63V+1anoGM=EWKyzXEfg@mail.gmail.com>
+Subject: Re: [dm-devel] [PATCH RFC 0/8] Introduce provisioning primitives for
+ thinly provisioned storage
+To:     "Darrick J. Wong" <djwong@kernel.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Gwendal Grignou <gwendal@google.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Evan Green <evgreen@google.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Daniil Lunev <dlunev@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gOS8xNS8yMDIyIDc6MzIgUE0sIExpIEppbmxpbiB3cm90ZToNCj4gU2luY2UgYmxrLWlvcHJp
-byBoYW5kaW5nIHdhcyBjb252ZXJ0ZWQgZnJvbSBhIHJxb3MgcG9saWN5IHRvIGEgZGlyZWN0IGNh
-bGwsDQo+IFJRX1FPU19JT1BSSU8gaXMgbm90IHVzZWQgYW55bW9yZSwganVzdCBkZWxldGUgaXQu
-DQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBMaSBKaW5saW4gPGxpamlubGluM0BodWF3ZWkuY29tPg0K
-Pg0KDQpQZXJoYXBzIG1lbnRpb24gYWJvdXQgd2hlbiBpdCB3YXMgcmVtb3ZlZC4NCg0KRWl0aGVy
-IHdheSwNCg0KUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBLdWxrYXJuaSA8a2NoQG52aWRpYS5jb20+
-DQoNCi1jaw0KDQoNCg==
+On Fri, Sep 16, 2022 at 8:03 PM Darrick J. Wong <djwong@kernel.org> wrote:
+>
+> On Thu, Sep 15, 2022 at 09:48:18AM -0700, Sarthak Kukreti wrote:
+> > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> >
+> > Hi,
+> >
+> > This patch series is an RFC of a mechanism to pass through provision
+> > requests on stacked thinly provisioned storage devices/filesystems.
+>
+> [Reflowed text]
+>
+> > The linux kernel provides several mechanisms to set up thinly
+> > provisioned block storage abstractions (eg. dm-thin, loop devices over
+> > sparse files), either directly as block devices or backing storage for
+> > filesystems. Currently, short of writing data to either the device or
+> > filesystem, there is no way for users to pre-allocate space for use in
+> > such storage setups. Consider the following use-cases:
+> >
+> > 1) Suspend-to-disk and resume from a dm-thin device: In order to
+> > ensure that the underlying thinpool metadata is not modified during
+> > the suspend mechanism, the dm-thin device needs to be fully
+> > provisioned.
+> > 2) If a filesystem uses a loop device over a sparse file, fallocate()
+> > on the filesystem will allocate blocks for files but the underlying
+> > sparse file will remain intact.
+> > 3) Another example is virtual machine using a sparse file/dm-thin as a
+> > storage device; by default, allocations within the VM boundaries will
+> > not affect the host.
+> > 4) Several storage standards support mechanisms for thin provisioning
+> > on real hardware devices. For example:
+> >   a. The NVMe spec 1.0b section 2.1.1 loosely talks about thin
+> >   provisioning: "When the THINP bit in the NSFEAT field of the
+> >   Identify Namespace data structure is set to =E2=80=981=E2=80=99, the =
+controller ...
+> >   shall track the number of allocated blocks in the Namespace
+> >   Utilization field"
+> >   b. The SCSi Block Commands reference - 4 section references "Thin
+> >   provisioned logical units",
+> >   c. UFS 3.0 spec section 13.3.3 references "Thin provisioning".
+> >
+> > In all of the above situations, currently the only way for
+> > pre-allocating space is to issue writes (or use
+> > WRITE_ZEROES/WRITE_SAME). However, that does not scale well with
+> > larger pre-allocation sizes.
+> >
+> > This patchset introduces primitives to support block-level
+> > provisioning (note: the term 'provisioning' is used to prevent
+> > overloading the term 'allocations/pre-allocations') requests across
+> > filesystems and block devices. This allows fallocate() and file
+> > creation requests to reserve space across stacked layers of block
+> > devices and filesystems. Currently, the patchset covers a prototype on
+> > the device-mapper targets, loop device and ext4, but the same
+> > mechanism can be extended to other filesystems/block devices as well
+> > as extended for use with devices in 4 a-c.
+>
+> If you call REQ_OP_PROVISION on an unmapped LBA range of a block device
+> and then try to read the provisioned blocks, what do you get?  Zeroes?
+> Random stale disk contents?
+>
+> I think I saw elsewhere in the thread that any mapped LBAs within the
+> provisioning range are left alone (i.e. not zeroed) so I'll proceed on
+> that basis.
+>
+For block devices, I'd say it's definitely possible to get stale data, depe=
+nding
+on the implementation of the allocation layer; for example, with dm-thinpoo=
+l,
+the default setting via using LVM2 tools is to zero out blocks on allocatio=
+n.
+But that's configurable and can be turned off to improve performance.
+
+Similarly, for actual devices that end up supporting thin provisioning, unl=
+ess
+the specification absolutely mandates that an LBA contains zeroes post
+allocation, some implementations will definitely miss out on that (probably
+similar to the semantics of discard_zeroes_data today). I'm operating under
+the assumption that it's possible to get stale data from LBAs allocated usi=
+ng
+provision requests at the block layer and trying to see if we can create a
+safe default operating model from that.
+
+> > Patch 1 introduces REQ_OP_PROVISION as a new request type. The
+> > provision request acts like the inverse of a discard request; instead
+> > of notifying lower layers that the block range will no longer be used,
+> > provision acts as a request to lower layers to provision disk space
+> > for the given block range. Real hardware storage devices will
+> > currently disable the provisioing capability but for the standards
+> > listed in 4a.-c., REQ_OP_PROVISION can be overloaded for use as the
+> > provisioing primitive for future devices.
+> >
+> > Patch 2 implements REQ_OP_PROVISION handling for some of the
+> > device-mapper targets. This additionally adds support for
+> > pre-allocating space for thinly provisioned logical volumes via
+> > fallocate()
+> >
+> > Patch 3 implements the handling for virtio-blk.
+> >
+> > Patch 4 introduces an fallocate() mode (FALLOC_FL_PROVISION) that
+> > sends a provision request to the underlying block device (and beyond).
+> > This acts as the primary mechanism for file-level provisioing.
+>
+> Personally, I think it's well within the definition of fallocate mode=3D=
+=3D0
+> (aka preallocate) for XFS to call REQ_OP_PROVISION on the blocks that it
+> preallocates?  XFS always sets the unwritten flag on the file mapping,
+> so it doesn't matter if the device provisions space without zeroing the
+> contents.
+>
+> That said, if devices are really allowed to expose stale disk blocks
+> then for blkdev fallocate I think you could get away with reusin
+> FALLOC_FL_NO_HIDE_STALE instead of introducing a new fallocate flag.
+>
+For filesystems, I think it's reasonable to support the mode if and only if
+the filesystem can guarantee that unwritten extents return zero. For instan=
+ce,
+in the current ext4 implementation, the provisioned extents are still marke=
+d as
+unwritten, which means a read from the file would still show all zeroes (wh=
+ich
+I think differs from the original FALLOC_FL_NO_HIDE implementation).
+
+That might be one more reason to keep the mode separate from the regular
+modes though; to drive home the point that it is only acceptable under
+the above conditions and that there's more to it than just adding
+blkdev_issue_provision(..) at the end of fs_fallocate().
+
+Best
+Sarthak
+
+> > Patch 5 wires up the loop device handling of REQ_OP_PROVISION.
+> >
+> > Patches 6-8 cover a prototype implementation for ext4, which includes
+> > wiring up the fallocate() implementation, introducing a filesystem
+> > level option (called 'provision') to control the default allocation
+> > behaviour and finally a file level override to retain current
+> > handling, even on filesystems mounted with 'provision'
+>
+> Hmm, I'll have a look.
+>
+> > Testing:
+> > --------
+> > - A backport of this patch series was tested on ChromiumOS using a
+> > 5.10 kernel.
+> > - File on ext4 on a thin logical volume:
+> > fallocate(FALLOC_FL_PROVISION) : 4.6s, dd if=3D/dev/zero of=3D...: 6 mi=
+ns.
+> >
+> > TODOs:
+> > ------
+> > 1) The stacked block devices (dm-*, loop etc.) currently
+> > unconditionally pass through provision requests. Add support for
+> > provision, similar to how discard handling is set up (with options to
+> > disable, passdown or passthrough requests).
+> > 2) Blktests and Xfstests for validating provisioning.
+>
+> Yes....
+>
+> --D
+>
+> > --
+> > dm-devel mailing list
+> > dm-devel@redhat.com
+> > https://listman.redhat.com/mailman/listinfo/dm-devel
