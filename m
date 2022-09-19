@@ -2,111 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B04E4ECAAD8
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 02:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAAEC54EE9
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 03:57:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229601AbiISCuZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Sep 2022 22:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41112 "EHLO
+        id S229552AbiISD4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Sep 2022 23:56:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbiISCuU (ORCPT
+        with ESMTP id S229496AbiISD4G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Sep 2022 22:50:20 -0400
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8129A272;
-        Sun, 18 Sep 2022 19:50:19 -0700 (PDT)
-Received: by mail-pl1-x641.google.com with SMTP id w20so14607225ply.12;
-        Sun, 18 Sep 2022 19:50:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=SYi7IojHEftdTdWXx08akJ87fP9b+6eRrKThed0efXo=;
-        b=jZLuRZsOmzoK8mtzQK0fqW4XTKnXD2wxSeexLtUpGJVEzpVhct+KQIaE07uGfLUpC/
-         ECxnFr4jGJJOb6poC7tIQBVcdaCWEXIeBnXLz/of67zQ9hVfCPTUiChWuROUfbDtApaE
-         Vn/YftSGoOOErtz3BUkLlOf0lPXDvCVzijVGrJuUR5SfMHHJZHyqm5XVgso/Ef5xgEdi
-         BrX13BVxYb1hCwgm+10636BoqL/Crb2iYcEeEGIPLJhOosdx04v8oIFmDYS1YP06sL7D
-         Ql73rHUuv1PWjuv7iHQrvrSp1iLZ/NGGUNqozLa1AR41t4MPCBnQlZW1KPMNplfsQ1h3
-         jcUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=SYi7IojHEftdTdWXx08akJ87fP9b+6eRrKThed0efXo=;
-        b=8CxGQNDP+ZJEhiY7pOWP2olQLBbRiU1UrsYMP85yVuDdN5+rNVrYm0ZCNAHjrziQtK
-         1VYYGO8r5XUONRTcSvAsxqaY2J3BoAB2X7WRPIxUq15e7q3uyGOJH0T9evg1Ien8/vco
-         x5NBFrRtpYi34EEOQj+qAtCtP9QaWF8+qdF/pq8c707QnWG8rdRZ/yTthYKq1ge0cqyz
-         CP9zvcPeVxkKKGGFNYB8O8Q7th5Bg5Uqq7ekoDDmDu04oSQdRSGKas+AlTXPcnFEC0z+
-         aRdFOzsvRl44/zJm4+8+naYD3zL6/JJwST/iw6UFQl94AZG4xZuAd9GfDQkFARN8xDoL
-         GT3Q==
-X-Gm-Message-State: ACrzQf2vKbzvAWrv1tLeFaPBhz+Xb6msxJe6ypGa58f8AubE1EUZVyqx
-        qMOiczaIc7gT+NN2VA5Yr/CuC0m9AD0=
-X-Google-Smtp-Source: AMsMyM5gN2JcbwAOjMNxBDlRJPzcBMNc5GTC9EA/J/5Tb2PQsKvXZi2zgBHFsCQ8vMWyStdiB+WZ4Q==
-X-Received: by 2002:a17:902:f708:b0:178:9b70:310b with SMTP id h8-20020a170902f70800b001789b70310bmr4737952plo.65.1663555819026;
-        Sun, 18 Sep 2022 19:50:19 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id h9-20020a17090a3d0900b002002fb120d7sm5549820pjc.8.2022.09.18.19.50.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Sep 2022 19:50:18 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: chi.minghao@zte.com.cn
-To:     minchan@kernel.org
-Cc:     ngupta@vflare.org, senozhatsky@chromium.org, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH] zram: use strscpy() is more robust and safer
-Date:   Mon, 19 Sep 2022 02:50:14 +0000
-Message-Id: <20220919025014.211268-1-chi.minghao@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Sun, 18 Sep 2022 23:56:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9577183A9
+        for <linux-block@vger.kernel.org>; Sun, 18 Sep 2022 20:56:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663559760;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HG8HMEb/cIOfLhOlbf6Pwfu6E0VxjMhXeVXcIWhs/kI=;
+        b=dc4B4NU+P/nvfbNMSpCxm5l8ut2sZ4RCkGuV4gFObhLO9bcihQmcmgvBCXkZLRATnv4a6n
+        dyRcbtMnxTPHUte1GryS4JDXitaObIjvqe4LpZ3YumcmQLJKa5mn2hYoY8dnsOUAX3OHZL
+        e0GFKNIMwpJjmvEvNmcv2E+OGVvW0Dg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-331-LuEc13XHNUK5sbGAqxxa6w-1; Sun, 18 Sep 2022 23:55:57 -0400
+X-MC-Unique: LuEc13XHNUK5sbGAqxxa6w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 04A0D82A68B;
+        Mon, 19 Sep 2022 03:55:57 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 757772166B26;
+        Mon, 19 Sep 2022 03:55:51 +0000 (UTC)
+Date:   Mon, 19 Sep 2022 11:55:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, ming.lei@redhat.com
+Subject: Re: [PATCH V3 4/7] ublk_drv: requeue rqs with recovery feature
+ enabled
+Message-ID: <YyfoQuw18kOynxcC@T590>
+References: <20220913041707.197334-1-ZiyangZhang@linux.alibaba.com>
+ <20220913041707.197334-5-ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220913041707.197334-5-ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Minghao Chi <chi.minghao@zte.com.cn>
+On Tue, Sep 13, 2022 at 12:17:04PM +0800, ZiyangZhang wrote:
+> With recovery feature enabled, in ublk_queue_rq or task work
+> (in exit_task_work or fallback wq), we requeue rqs instead of
+> ending(aborting) them. Besides, No matter recovery feature is enabled
+> or disabled, we schedule monitor_work immediately.
+> 
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> ---
+>  drivers/block/ublk_drv.c | 34 ++++++++++++++++++++++++++++++++--
+>  1 file changed, 32 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 23337bd7c105..b067f33a1913 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -682,6 +682,21 @@ static void ubq_complete_io_cmd(struct ublk_io *io, int res)
+>  
+>  #define UBLK_REQUEUE_DELAY_MS	3
+>  
+> +static inline void __ublk_abort_rq_in_task_work(struct ublk_queue *ubq,
+> +		struct request *rq)
+> +{
+> +	pr_devel("%s: %s q_id %d tag %d io_flags %x.\n", __func__,
+> +			(ublk_queue_can_use_recovery(ubq)) ? "requeue" : "abort",
+> +			ubq->q_id, rq->tag, ubq->ios[rq->tag].flags);
+> +	/* We cannot process this rq so just requeue it. */
+> +	if (ublk_queue_can_use_recovery(ubq)) {
+> +		blk_mq_requeue_request(rq, false);
+> +		blk_mq_delay_kick_requeue_list(rq->q, UBLK_REQUEUE_DELAY_MS);
 
-The implementation of strscpy() is more robust and safer.
+Here you needn't to kick requeue list since we know it can't make
+progress. And you can do that once before deleting gendisk
+or the queue is recovered.
 
-That's now the recommended way to copy NUL terminated strings.
+> +	} else {
+> +		blk_mq_end_request(rq, BLK_STS_IOERR);
+> +	}
+> +}
+> +
+>  static inline void __ublk_rq_task_work(struct request *req)
+>  {
+>  	struct ublk_queue *ubq = req->mq_hctx->driver_data;
+> @@ -704,7 +719,7 @@ static inline void __ublk_rq_task_work(struct request *req)
+>  	 * (2) current->flags & PF_EXITING.
+>  	 */
+>  	if (unlikely(current != ubq->ubq_daemon || current->flags & PF_EXITING)) {
+> -		blk_mq_end_request(req, BLK_STS_IOERR);
+> +		__ublk_abort_rq_in_task_work(ubq, req);
+>  		mod_delayed_work(system_wq, &ub->monitor_work, 0);
+>  		return;
+>  	}
+> @@ -779,6 +794,21 @@ static void ublk_rq_task_work_fn(struct callback_head *work)
+>  	__ublk_rq_task_work(req);
+>  }
+>  
+> +static inline blk_status_t __ublk_abort_rq(struct ublk_queue *ubq,
+> +		struct request *rq)
+> +{
+> +	pr_devel("%s: %s q_id %d tag %d io_flags %x.\n", __func__,
+> +			(ublk_queue_can_use_recovery(ubq)) ? "requeue" : "abort",
+> +			ubq->q_id, rq->tag, ubq->ios[rq->tag].flags);
+> +	/* We cannot process this rq so just requeue it. */
+> +	if (ublk_queue_can_use_recovery(ubq)) {
+> +		blk_mq_requeue_request(rq, false);
+> +		blk_mq_delay_kick_requeue_list(rq->q, UBLK_REQUEUE_DELAY_MS);
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
----
- drivers/block/zram/zram_drv.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Same with above.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index eb021db21ddf..28b17c82c27a 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -499,7 +499,7 @@ static ssize_t backing_dev_store(struct device *dev,
- 		goto out;
- 	}
- 
--	strlcpy(file_name, buf, PATH_MAX);
-+	strscpy(file_name, buf, PATH_MAX);
- 	/* ignore trailing newline */
- 	sz = strlen(file_name);
- 	if (sz > 0 && file_name[sz - 1] == '\n')
-@@ -1031,7 +1031,7 @@ static ssize_t comp_algorithm_store(struct device *dev,
- 	char compressor[ARRAY_SIZE(zram->compressor)];
- 	size_t sz;
- 
--	strlcpy(compressor, buf, sizeof(compressor));
-+	strscpy(compressor, buf, sizeof(compressor));
- 	/* ignore trailing newline */
- 	sz = strlen(compressor);
- 	if (sz > 0 && compressor[sz - 1] == '\n')
-@@ -1979,7 +1979,7 @@ static int zram_add(void)
- 	if (ret)
- 		goto out_cleanup_disk;
- 
--	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
-+	strscpy(zram->compressor, default_compressor, sizeof(zram->compressor));
- 
- 	zram_debugfs_register(zram);
- 	pr_info("Added device: %s\n", zram->disk->disk_name);
--- 
-2.25.1
+
+Thanks,
+Ming
+
