@@ -2,62 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2634CECAAD8
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 01:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA82C6FA82
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 01:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229676AbiISB2g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Sep 2022 21:28:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59540 "EHLO
+        id S229684AbiISBix (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Sep 2022 21:38:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbiISB2f (ORCPT
+        with ESMTP id S229587AbiISBiw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Sep 2022 21:28:35 -0400
-Received: from mail.nfschina.com (mail.nfschina.com [124.16.136.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6927B186EE;
-        Sun, 18 Sep 2022 18:28:32 -0700 (PDT)
-Received: from localhost (unknown [127.0.0.1])
-        by mail.nfschina.com (Postfix) with ESMTP id 07F9A1E80D75;
-        Mon, 19 Sep 2022 09:25:34 +0800 (CST)
-X-Virus-Scanned: amavisd-new at test.com
-Received: from mail.nfschina.com ([127.0.0.1])
-        by localhost (mail.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id sGjsW4Xt2sJy; Mon, 19 Sep 2022 09:25:31 +0800 (CST)
-Received: from localhost.localdomain (unknown [219.141.250.2])
-        (Authenticated sender: zeming@nfschina.com)
-        by mail.nfschina.com (Postfix) with ESMTPA id 1DAAC1E80CAB;
-        Mon, 19 Sep 2022 09:25:31 +0800 (CST)
-From:   Li zeming <zeming@nfschina.com>
+        Sun, 18 Sep 2022 21:38:52 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F1A186CC;
+        Sun, 18 Sep 2022 18:38:50 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MW6jH4NqJz6S2p8;
+        Mon, 19 Sep 2022 09:36:51 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgA3inMmyCdjeiM6BA--.44102S4;
+        Mon, 19 Sep 2022 09:38:47 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Li zeming <zeming@nfschina.com>
-Subject: [PATCH] block: Remove unnecessary (void*) conversions
-Date:   Mon, 19 Sep 2022 09:28:25 +0800
-Message-Id: <20220919012825.2936-1-zeming@nfschina.com>
-X-Mailer: git-send-email 2.18.2
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH -next 0/3] blk-wbt: simple improvment to enable wbt correctly
+Date:   Mon, 19 Sep 2022 09:49:36 +0800
+Message-Id: <20220919014939.175497-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgA3inMmyCdjeiM6BA--.44102S4
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUU5i7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
+        MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
+        0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0E
+        wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
+        W8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+        IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
+        U==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The key pointer does not need to cast the type.
+From: Yu Kuai <yukuai3@huawei.com>
 
-Signed-off-by: Li zeming <zeming@nfschina.com>
----
- block/blk-iocost.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yu Kuai (3):
+  wbt: don't show valid wbt lat in sysfs while wbt is disabled
+  block: add a helper to check elevator name
+  blk-wbt: don't enable throttling if default elevator is bfq
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 7936e5f5821c..b473efd89b86 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1430,7 +1430,7 @@ static int iocg_wake_fn(struct wait_queue_entry *wq_entry, unsigned mode,
- 			int flags, void *key)
- {
- 	struct iocg_wait *wait = container_of(wq_entry, struct iocg_wait, wait);
--	struct iocg_wake_ctx *ctx = (struct iocg_wake_ctx *)key;
-+	struct iocg_wake_ctx *ctx = key;
- 	u64 cost = abs_cost_to_cost(wait->abs_cost, ctx->hw_inuse);
- 
- 	ctx->vbudget -= cost;
+ block/bfq-iosched.c |  2 +-
+ block/blk-sysfs.c   | 11 +++++++++--
+ block/blk-wbt.c     | 14 +++++++++++++-
+ block/blk-wbt.h     |  6 ++++--
+ block/elevator.h    |  5 +++++
+ 5 files changed, 32 insertions(+), 6 deletions(-)
+
 -- 
-2.18.2
+2.31.1
 
