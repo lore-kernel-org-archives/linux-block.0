@@ -2,96 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8697ECAAA1
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 17:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 561F5ECAAA1
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 21:22:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231463AbiISROG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 13:14:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42358 "EHLO
+        id S229821AbiISVWW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 17:22:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230312AbiISRNR (ORCPT
+        with ESMTP id S229449AbiISVWV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 13:13:17 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F122DB6
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 10:12:52 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id x13so5739259ilp.3
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 10:12:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
-        bh=isFqxYJS0Ih2m1cQEE/2UjOIr1qkpqnToPzi0naES18=;
-        b=cRgoJ9/zZiUayTqe5THraccN+zuECYLtzSk2ttJDhyPy4lH49fbFQu/z5Lqby4K4GZ
-         RSZ8gMuUcx0iSNtbi3bjMoguFrgdEV+bh3rqLdADfaXyHJ9zIXVrdOM/iMmJ66GB+qyH
-         7wxp86wjzPTK9UrCsdW0Cfirwcw7SdQl6RCtTwY7ZMOJsYJnt0aSb1ue76BPfd/7vx4K
-         KwYF0P/jpLEUFBbzygxeClTgAsYdtB2mxByA3nfuK+QufrneoqSV9aX8x7c6XTd+stH2
-         dLYsFbB6te9SBTJ3L8qDRZRNC+pN3v4HIYB9YEwB64Km6ZjFJblmrrSllnPI50CGhK+H
-         kEQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=isFqxYJS0Ih2m1cQEE/2UjOIr1qkpqnToPzi0naES18=;
-        b=4PWQetk7AVVs1U3aIpsfkos5iH6G3czb33fsZ43bjMUlAwPkq3ls8Xd5KnKyDhtFJw
-         RclMMdvGnG5p3Zqevb1ybVvKcWZYSO8k/sLRVYF106Ue97AEVASaNAEMiLhcr+SECNJ/
-         5Mhq7DiFVwSqDwgteHehXTMfKc0IHv3cgYXl/W1MZmEEKblu8LDGgxo/ijteJ7brBQH/
-         utIG1R6Z3/m/Jt89nUJxZwiRWCjQjoAAvnG2icX36WgiEGsm9KhLjk4786ArInj/k1Do
-         l3rchuWHtfRwDE8JHQdQIuvdgzE7qYwG5rXCCEjrw62JdD2aFxJE8LrVSxTfpf6iSgmb
-         J+Ow==
-X-Gm-Message-State: ACrzQf0G5DJzH/aX4EDSLsEJZMwQb169bh05UMFz8qsV9Dw0riZVbGsZ
-        xtDNnDTpeIhaZbFghQaU1xIKtgsI6tWkqA==
-X-Google-Smtp-Source: AMsMyM4VKFA6gmD9GzgAsEzHhgIdT3ZLUDquZvpLKy03aFVmB1pIVeBLkFenBtK2NZ0b5tjh7f2TlA==
-X-Received: by 2002:a05:6e02:ec7:b0:2f5:4c1:5208 with SMTP id i7-20020a056e020ec700b002f504c15208mr6060138ilk.178.1663607571422;
-        Mon, 19 Sep 2022 10:12:51 -0700 (PDT)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id n2-20020a056638110200b003580ab611a2sm5662875jal.93.2022.09.19.10.12.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 10:12:50 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-In-Reply-To: <20220919161647.81238-1-colyli@suse.de>
-References: <20220919161647.81238-1-colyli@suse.de>
-Subject: Re: [PATCH 0/5] bcache patches for Linux v6.1
-Message-Id: <166360757047.16805.18160063101665809906.b4-ty@kernel.dk>
-Date:   Mon, 19 Sep 2022 11:12:50 -0600
+        Mon, 19 Sep 2022 17:22:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A7447B95;
+        Mon, 19 Sep 2022 14:22:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5FFFA611DB;
+        Mon, 19 Sep 2022 21:22:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39CBAC433C1;
+        Mon, 19 Sep 2022 21:22:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663622539;
+        bh=fbxWbYcpv+Xlpl8GPsmdhWofyWA7VUTSh+HjIQ+CX1c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Gnu9OWbfuDKxIm0HYMi2CpJTSuEA1gnX80dzv6AReiFMamFnchNTCwRHsh62BvkCT
+         MgClcADZHWmggQoTEmKSnZWXtn3bb6St88FtjRHdVlhmwmur9uwylRLLnPuu0C8rb8
+         ZUlL7MkZdKRVWHiMQZr1piFBIQbAATMwb9VR65QnpoPHGx1AW0VxzP2wXYIIvso+qA
+         0Vk6kphseY76zKW97nlEjQ9335Fm57LcAeA7PNhSaMJ2GO8TaZpBmU5+CvKs9nK7p3
+         wbtY3or7u4L5tJzpL7g16psODevZCqdiV09HeuspaVB/+Hg6QEgC+4AHsngBA57qpd
+         Tf0mXxjdgM5eg==
+Date:   Mon, 19 Sep 2022 15:22:16 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
+        Jan Kara <jack@suse.cz>, Liu Song <liusong@linux.alibaba.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
+Message-ID: <YyjdiKC0YYUkI+AI@kbusch-mbp>
+References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.10.0-dev-355bd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 20 Sep 2022 00:16:42 +0800, Coly Li wrote:
-> This is the 1st wave bcache patches for Linux v6.1.
+On Sun, Sep 18, 2022 at 02:10:51PM -0700, Hugh Dickins wrote:
+> I have almost no grasp of all the possible sbitmap races, and their
+> consequences: but using the same !waitqueue_active() check as used
+> elsewhere, fixes the lockup and shows no adverse consequence for me.
+
+ 
+> Fixes: 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
+> Signed-off-by: Hugh Dickins <hughd@google.com>
+> ---
 > 
-> The patch from me fixes a calculation mistake reported by Mingzhe Zou,
-> now the idle time to wait before setting maximum writeback rate can be
-> increased when more backing devices attached.
+>  lib/sbitmap.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> And we also have other code cleanup patches from Jilin Yuan,
-> Jules Maselbas, Lei Li and Lin Feng.
-> 
-> [...]
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -620,7 +620,7 @@ static bool __sbq_wake_up(struct sbitmap
+>  		 * function again to wakeup a new batch on a different 'ws'.
+>  		 */
+>  		if (cur == 0)
+> -			return true;
+> +			return !waitqueue_active(&ws->wait);
 
-Applied, thanks!
+If it's 0, that is supposed to mean another thread is about to make it not zero
+as well as increment the wakestate index. That should be happening after patch
+48c033314f37 was included, at least.
 
-[1/5] bcache: remove unnecessary flush_workqueue
-      commit: 97d26ae764a43bfaf870312761a0a0f9b49b6351
-[2/5] bcache: remove unused bch_mark_cache_readahead function def in stats.h
-      commit: d86b4e6dc88826f2b5cfa90c4ebbccb19a88bc39
-[3/5] bcache: bset: Fix comment typos
-      commit: 11e529ccea33f24af6b54fe10bb3be9c1c48eddb
-[4/5] bcache:: fix repeated words in comments
-      commit: 6dd3be6923eec2c49860e7292e4e2783c74a9dff
-[5/5] bcache: fix set_at_max_writeback_rate() for multiple attached devices
-      commit: d2d05b88035d2d51a5bb6c5afec88a0880c73df4
+Prior to 4acb83417cad, the code would also return 'true' if the count was
+already zero, and this batched code wasn't supposed to behave any different in
+that condition.
 
-Best regards,
--- 
-Jens Axboe
-
-
+Anyway, I don't think the waitqueue_active criteria of the current waitstate is
+correct either. The next waitstate may have waiters too, so we still may need
+to account for this batch's count in order to wake them.
