@@ -2,181 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A9EC6FA86
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 16:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50285C6FA86
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 16:19:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbiISQRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 12:17:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45746 "EHLO
+        id S229449AbiISQTy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 12:19:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbiISQRr (ORCPT
+        with ESMTP id S229727AbiISQTv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 12:17:47 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAAE83AB0B;
-        Mon, 19 Sep 2022 09:17:42 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id DA69621AC2;
-        Mon, 19 Sep 2022 16:17:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663604260; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yavwVdcOwkRxq1Ojd2Q5m3eBvPT2tJIyu1OTolveTFg=;
-        b=Id/6pHorgKV/uVLtSDuL6dNJbNYvLeDHqBhywBS5tKkRIvASI71aDhom3pbjo9ZlbUso33
-        YFxLZ9bowWDIbenZWMf6NvZ8oJOSbzaOmYYp7PaSJw8fUEWospbUaeBafMfc0j4fPYUXHG
-        IX7MfvOfFDAxf4NH5/nBPN3kanZ1neI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663604260;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=yavwVdcOwkRxq1Ojd2Q5m3eBvPT2tJIyu1OTolveTFg=;
-        b=QpPl8hDmepPD/m4FEGIjeV7ha0adbbyB5ysqmZUh+DyuE8cTfFWNUdpcihQ/CshDOK2Sl0
-        cSppWng/hMtfpuCA==
-Received: from localhost.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id 83DEE2C141;
-        Mon, 19 Sep 2022 16:17:36 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Mingzhe Zou <mingzhe.zou@easystack.cn>
-Subject: [PATCH 5/5] bcache: fix set_at_max_writeback_rate() for multiple attached devices
-Date:   Tue, 20 Sep 2022 00:16:47 +0800
-Message-Id: <20220919161647.81238-6-colyli@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220919161647.81238-1-colyli@suse.de>
-References: <20220919161647.81238-1-colyli@suse.de>
+        Mon, 19 Sep 2022 12:19:51 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30AF7BF7C
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 09:19:50 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id c4so23324594iof.3
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 09:19:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=MfR8SYEM/ayWj0nE/c9RrX4FncRoY/5nh8/YlYsAApI=;
+        b=5pryB/Qw3pQXpBdl9gbLE40yWfJS8yoigFNBZ9dRXmpVWQftv1bfDS+MB4x+KHHJ//
+         qS0s3oI7i8KLh1SRA+vVKdh21N0FjogSAZnfjSHxwyK6wlpagLkpROsMtrGLJO3tEixo
+         lHfyc/meiS5YTINNLKFFf+zDNeIJAPj5s2YgJl0zneMwNaFhJpkxf4d0phKQxon5+2BW
+         0+pdfbA/8OjBpV5/WxLiQrZaA0uEWxFXK4h1eRMzZATD30+4eXplptvc1M20/u2Xxhsp
+         rOWZGbKM5i6VUCJG6rynT5qUvetbCWv17PMvm4sy3gxC7G4pc71E0RVExkVEbRGXmYOF
+         P7Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=MfR8SYEM/ayWj0nE/c9RrX4FncRoY/5nh8/YlYsAApI=;
+        b=Woda7Im8Nt7gyLmxSxERK7FiRnF0whZanqm/zZ0mEzwT/qq1qRP7Gm1kN6fOa+GtWS
+         ysKsGrEnVPElxaUpbO2WX7dnxQwL/eBhpyf/ZpvlvrnF6x651zA1W/bHHXReAFIIZHAG
+         DbfkCcybhryrG6LTGmY0PMS/6eG4KRgF1mh/Igu790Mghsu4AVGLBXBC6evjtBl6TEtm
+         4cMs63I6xi4x06Sdr+MZayLBu73vJ0zEV4dXNbX2qLRXMLBVqvo8ib6rdqpTmjxG4a1S
+         ERzrQv1AlQwoV6cw4VOcOuHpGXGI3m1rHSfAMcc0sg/jU+sskfuKZaVsTPHpjKAhAhBS
+         T5wg==
+X-Gm-Message-State: ACrzQf3VNzCA2YpsXzLHLy7wS40lNbmnUNCxSIUjxCen0exXGcm5htLt
+        qF3bjobS/nzpmU7fkpovKh4QZA==
+X-Google-Smtp-Source: AMsMyM7bw9/pl8Sr1mZdB/6Rdq43+7EevxerAFVzSWA4w5MGue9LlS9E1cQUSZj4rKrT5gM0THJcxQ==
+X-Received: by 2002:a05:6638:2488:b0:35a:17ac:8cd2 with SMTP id x8-20020a056638248800b0035a17ac8cd2mr8582586jat.175.1663604389522;
+        Mon, 19 Sep 2022 09:19:49 -0700 (PDT)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id c7-20020a056638028700b003435c50f000sm5753622jaq.14.2022.09.19.09.19.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Sep 2022 09:19:49 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, linux-block@vger.kernel.org
+In-Reply-To: <20220919154931.4123002-1-sth@linux.ibm.com>
+References: <20220919154931.4123002-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/1] s390/dasd fix oops
+Message-Id: <166360438889.14661.10099967634123102461.b4-ty@kernel.dk>
+Date:   Mon, 19 Sep 2022 10:19:48 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.10.0-dev-355bd
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Inside set_at_max_writeback_rate() the calculation in following if()
-check is wrong,
-	if (atomic_inc_return(&c->idle_counter) <
-	    atomic_read(&c->attached_dev_nr) * 6)
+On Mon, 19 Sep 2022 17:49:30 +0200, Stefan Haberland wrote:
+> please apply the following patch that fixes an Oops in the DASD driver
+> related to a race in a device structure update function.
+> 
+> Stefan Haberland (1):
+>   s390/dasd: fix Oops in dasd_alias_get_start_dev due to missing
+>     pavgroup
+> 
+> [...]
 
-Because each attached backing device has its own writeback thread
-running and increasing c->idle_counter, the counter increates much
-faster than expected. The correct calculation should be,
-	(counter / dev_nr) < dev_nr * 6
-which equals to,
-	counter < dev_nr * dev_nr * 6
+Applied, thanks!
 
-This patch fixes the above mistake with correct calculation, and helper
-routine idle_counter_exceeded() is added to make code be more clear.
+[1/1] s390/dasd: fix Oops in dasd_alias_get_start_dev due to missing pavgroup
+      commit: db7ba07108a48c0f95b74fabbfd5d63e924f992d
 
-Reported-by: Mingzhe Zou <mingzhe.zou@easystack.cn>
-Signed-off-by: Coly Li <colyli@suse.de>
-Acked-by: Mingzhe Zou <mingzhe.zou@easystack.cn>
----
- drivers/md/bcache/writeback.c | 73 +++++++++++++++++++++++++----------
- 1 file changed, 52 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index 647661005176..c186bf55fe61 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -157,6 +157,53 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	dc->writeback_rate_target = target;
- }
- 
-+static bool idle_counter_exceeded(struct cache_set *c)
-+{
-+	int counter, dev_nr;
-+
-+	/*
-+	 * If c->idle_counter is overflow (idel for really long time),
-+	 * reset as 0 and not set maximum rate this time for code
-+	 * simplicity.
-+	 */
-+	counter = atomic_inc_return(&c->idle_counter);
-+	if (counter <= 0) {
-+		atomic_set(&c->idle_counter, 0);
-+		return false;
-+	}
-+
-+	dev_nr = atomic_read(&c->attached_dev_nr);
-+	if (dev_nr == 0)
-+		return false;
-+
-+	/*
-+	 * c->idle_counter is increased by writeback thread of all
-+	 * attached backing devices, in order to represent a rough
-+	 * time period, counter should be divided by dev_nr.
-+	 * Otherwise the idle time cannot be larger with more backing
-+	 * device attached.
-+	 * The following calculation equals to checking
-+	 *	(counter / dev_nr) < (dev_nr * 6)
-+	 */
-+	if (counter < (dev_nr * dev_nr * 6))
-+		return false;
-+
-+	return true;
-+}
-+
-+/*
-+ * Idle_counter is increased every time when update_writeback_rate() is
-+ * called. If all backing devices attached to the same cache set have
-+ * identical dc->writeback_rate_update_seconds values, it is about 6
-+ * rounds of update_writeback_rate() on each backing device before
-+ * c->at_max_writeback_rate is set to 1, and then max wrteback rate set
-+ * to each dc->writeback_rate.rate.
-+ * In order to avoid extra locking cost for counting exact dirty cached
-+ * devices number, c->attached_dev_nr is used to calculate the idle
-+ * throushold. It might be bigger if not all cached device are in write-
-+ * back mode, but it still works well with limited extra rounds of
-+ * update_writeback_rate().
-+ */
- static bool set_at_max_writeback_rate(struct cache_set *c,
- 				       struct cached_dev *dc)
- {
-@@ -167,21 +214,8 @@ static bool set_at_max_writeback_rate(struct cache_set *c,
- 	/* Don't set max writeback rate if gc is running */
- 	if (!c->gc_mark_valid)
- 		return false;
--	/*
--	 * Idle_counter is increased everytime when update_writeback_rate() is
--	 * called. If all backing devices attached to the same cache set have
--	 * identical dc->writeback_rate_update_seconds values, it is about 6
--	 * rounds of update_writeback_rate() on each backing device before
--	 * c->at_max_writeback_rate is set to 1, and then max wrteback rate set
--	 * to each dc->writeback_rate.rate.
--	 * In order to avoid extra locking cost for counting exact dirty cached
--	 * devices number, c->attached_dev_nr is used to calculate the idle
--	 * throushold. It might be bigger if not all cached device are in write-
--	 * back mode, but it still works well with limited extra rounds of
--	 * update_writeback_rate().
--	 */
--	if (atomic_inc_return(&c->idle_counter) <
--	    atomic_read(&c->attached_dev_nr) * 6)
-+
-+	if (!idle_counter_exceeded(c))
- 		return false;
- 
- 	if (atomic_read(&c->at_max_writeback_rate) != 1)
-@@ -195,13 +229,10 @@ static bool set_at_max_writeback_rate(struct cache_set *c,
- 	dc->writeback_rate_change = 0;
- 
- 	/*
--	 * Check c->idle_counter and c->at_max_writeback_rate agagain in case
--	 * new I/O arrives during before set_at_max_writeback_rate() returns.
--	 * Then the writeback rate is set to 1, and its new value should be
--	 * decided via __update_writeback_rate().
-+	 * In case new I/O arrives during before
-+	 * set_at_max_writeback_rate() returns.
- 	 */
--	if ((atomic_read(&c->idle_counter) <
--	     atomic_read(&c->attached_dev_nr) * 6) ||
-+	if (!idle_counter_exceeded(c) ||
- 	    !atomic_read(&c->at_max_writeback_rate))
- 		return false;
- 
+Best regards,
 -- 
-2.35.3
+Jens Axboe
+
 
