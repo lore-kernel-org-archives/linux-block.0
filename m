@@ -2,82 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F42C54EE9
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 14:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C82AC54EE9
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 15:45:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbiISOlR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 10:41:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46804 "EHLO
+        id S230114AbiISPpl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 11:45:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbiISOlB (ORCPT
+        with ESMTP id S229570AbiISPpk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 10:41:01 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C376F1
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 07:40:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=vUCIx1yCpMppbaXbcvweqkW9qIO2w9E+swsy/lTt4JQ=; b=49JvCQqyMPHkZFcGia4V42vymw
-        4Xl5umhzMLK44mZ+0lVnHbQ9H2l9dK2YNTKiCSzg1e1A3TLEl9c0gEO1Lx068fWQdFLxfEN2Dzuf6
-        gTa+IT10BmrpJpCKqUB7E0XtkL4aBl0mBe6pHkzI2W3XndsIU72al0l1A86IjAZsibTNE9mL1/M3a
-        m+iKpwI24Chq6RM13cI9Vz+paNh9fInO3swRv7tblColkX653krcl2DlY/ibqdSWytUPTGc9+m8yW
-        S9VlDsPhvNkeefgZl3HLW3+cVMyMIOXTaXZCULnKWX1hekwBqMpYqUkRyWU1QyePT9LOBcEe14XeJ
-        aDQv5JlQ==;
-Received: from [2001:4bb8:189:f4ee:184d:7c69:5714:93ca] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oaHx5-00C946-Ge; Mon, 19 Sep 2022 14:40:51 +0000
+        Mon, 19 Sep 2022 11:45:40 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D9431A06B;
+        Mon, 19 Sep 2022 08:45:39 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id DDEA568BEB; Mon, 19 Sep 2022 17:45:33 +0200 (CEST)
+Date:   Mon, 19 Sep 2022 17:45:33 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, dusty@dustymabe.com,
-        ming.lei@redhat.com
-Subject: [PATCH] Revert "block: freeze the queue earlier in del_gendisk"
-Date:   Mon, 19 Sep 2022 16:40:49 +0200
-Message-Id: <20220919144049.978907-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+To:     David Sterba <dsterba@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Matthew Wilcox <willy@infradead.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, Gao Xiang <xiang@kernel.org>,
+        Chao Yu <chao@kernel.org>, linux-block@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-mm@kvack.org
+Subject: Re: improve pagecache PSI annotations v2
+Message-ID: <20220919154533.GA710@lst.de>
+References: <20220915094200.139713-1-hch@lst.de> <20220915130138.GO32411@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220915130138.GO32411@suse.cz>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit a09b314005f3a0956ebf56e01b3b80339df577cc.
+On Thu, Sep 15, 2022 at 03:01:38PM +0200, David Sterba wrote:
+> On Thu, Sep 15, 2022 at 10:41:55AM +0100, Christoph Hellwig wrote:
+> > 
+> >  - spell a comment in the weird way preferred by btrfs maintainers
+> 
+> What? A comment is a standalone sentence or a full paragraph, so it's
+> formatted as such. I hope it's not weird to expect literacy either in
+> the language of comments or the programming language. The same style can
+> be found in many other kernel parts so please stop the nags at btrfs.
 
-Dusty Mabe reported consistent hang during CoreOS shutdown with a MD 
-RAID1 setup.  Although apparently similar hangs happened before,
-and this patch most likely is not the root cause it made it much
-more severe.  Revert it until we can figure out what is going on
-with the md driver.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-
----
- block/genhd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index d36fabf0abc1f..988ba52fd3316 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -602,7 +602,6 @@ void del_gendisk(struct gendisk *disk)
- 	 * Prevent new I/O from crossing bio_queue_enter().
- 	 */
- 	blk_queue_start_drain(q);
--	blk_mq_freeze_queue_wait(q);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
-@@ -626,6 +625,8 @@ void del_gendisk(struct gendisk *disk)
- 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
- 	device_del(disk_to_dev(disk));
- 
-+	blk_mq_freeze_queue_wait(q);
-+
- 	blk_throtl_cancel_bios(disk->queue);
- 
- 	blk_sync_queue(q);
--- 
-2.30.2
-
+That is not what most of the kernel seems to think.  The usual style is
+to have multi-line comments start with a capitalized word and end with a
+dot and thus form one or more complete sentences, but single line
+comments most of the time do not form complete sentences and thus
+do not start with a capitalized word and do not end with a dot.
