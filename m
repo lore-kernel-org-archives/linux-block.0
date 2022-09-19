@@ -2,140 +2,342 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9BA0C6FA8B
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 23:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AAE2C6FA82
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 23:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbiISXCC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 19:02:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53048 "EHLO
+        id S230043AbiISX7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 19:59:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbiISXCB (ORCPT
+        with ESMTP id S229659AbiISX7X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 19:02:01 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989C843E4E
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 16:01:59 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id j10so626914qtv.4
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 16:01:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date;
-        bh=xixo44lTcERHPiUV64xTDRqasHw9DlQyVVg8mpJU9es=;
-        b=AgcVBHh0Hw9LMN3EKAyNefT6Y8I8kX0c8Hih+eW5gYpAM+bvvfQMe4A3kV5CH89Fzq
-         0gQQDRzPET7tFaAMhsDE9ZzQA5NhHbKpj7bed/yRGTBX0hETdK9Gf9pHdAZknnFA9yRj
-         SHnp0B0Us1AUQUod4cBI4+D316FWpO/dKexSTqaQPCZiiEpYhLekHLbITzKvDzNJl4Bx
-         lo1nvff+zjopDK3RHPeWBq/xC+Q/nZIt05shBR2esadkg7leu8eUMq695diDosIWpat5
-         jHEP4W3/hXbE0dfpXOGP/EYHzY8r18TZS+El7G3hVR3IxIxIjOC8B0XkVV9Qvt/Gwyy0
-         52DQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=xixo44lTcERHPiUV64xTDRqasHw9DlQyVVg8mpJU9es=;
-        b=ZTA8u0rElUGi8D273bMgTdh73H034Hu6eCvbNtpGFvZwbZGdUs/98iPQERFHYK+RY/
-         x2aXgpHumQQYa+CT+GrYlcDqc8mjYrs2WsKgjD+rQMU4Hj5EbAtnZMxHtqBgVTwRxvn7
-         7I0dbGe3IBs6FBE6GVsS0EASJi20SRW2BL82kAFrrd+lvqSK3eiPNbfBwhwyiqqLNGeV
-         9kEoUiQO7L7IBNr2yXrPrnCet5RAESwDvHkgO+ktqWUukKC7s9mfSGGI4zcKENEiDpWL
-         UzLXEatnPPBlFMYIgPJIwlbZPbIrwBNNAO6fBxjvMHlHdQFiYauvxsbImfaAPZDRPOuW
-         qjaA==
-X-Gm-Message-State: ACrzQf0sihd3S9wS+9J3WFY6LJPtEMZW2Bg8MStKy9htzhl+DgWXL9ZF
-        GjnxXtadJqeJqC9Q89rmDW7qxM9fz8/6aQ==
-X-Google-Smtp-Source: AMsMyM4ouUmlUEH1L7eYlmBEN7b4vAmMYcNn5lPDnA9AHYvbCCciVxwIStA540FoBADTcmr54usBmg==
-X-Received: by 2002:a05:622a:1015:b0:35c:e915:3b61 with SMTP id d21-20020a05622a101500b0035ce9153b61mr6086559qte.572.1663628518654;
-        Mon, 19 Sep 2022 16:01:58 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id cc19-20020a05622a411300b0031e9ab4e4cesm8099175qtb.26.2022.09.19.16.01.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 16:01:57 -0700 (PDT)
-Date:   Mon, 19 Sep 2022 16:01:39 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Keith Busch <kbusch@kernel.org>
-cc:     Hugh Dickins <hughd@google.com>, Jens Axboe <axboe@kernel.dk>,
-        Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>,
-        Liu Song <liusong@linux.alibaba.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
-In-Reply-To: <YyjdiKC0YYUkI+AI@kbusch-mbp>
-Message-ID: <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com>
-References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com> <YyjdiKC0YYUkI+AI@kbusch-mbp>
+        Mon, 19 Sep 2022 19:59:23 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E40520A3
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 16:59:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1663631957; x=1695167957;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cEVZ92IUthHU1udbHEvnHa/hWAI5exdOeev5CQ+ALEQ=;
+  b=FP1dlfanUffBtEgz4uWdkekEZLXk6Updcry4bMH3WnvHHWo47jdAyLY0
+   v/+ifD0e9EEWrcQVyWf7/81XsQL+h7Y3vr+T81MV6wjGXSfVmwwD4cJOd
+   xrZeEcfOj0V3S4zJlH7ylrLzQsd/scWfkzyjMi3nKXVn1fhqUX3zF9YHX
+   cdUqR3QB8XOeXRReEcyhpeT0XA+MBWRHhS+LFSUpZxg8p7vNmTEeUQ+qZ
+   2Giup05L5WZtxA0WDNZQ7V1TYE02pn45ibkGePmi/gdbzMJ/cW9+3Aij9
+   Tjq8Of78EdkuXWNmRukeqbBrFhbtsxG0RHw/mRCGqqBIuQuuIWU5M4Mqt
+   w==;
+X-IronPort-AV: E=Sophos;i="5.93,329,1654531200"; 
+   d="scan'208";a="316037985"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Sep 2022 07:59:16 +0800
+IronPort-SDR: DacpeMaHrrN/GThsY+Av/s6u8eXtM0iN5EswZcdji37ubuKPCUEIQGLUJz0qR8ZUUZGXr1QXPx
+ Kbmfp9kKoQ/zE1gjLUieloBrn3TXyKAK8hgtbaQA5gXncl8Vjag/xUBhByNswR5zgSyAtRlGVz
+ lvnZgSJswWZXkOZgHjSk6nnjFwUQJxMNzW3xWexdqSjWdoVTKD5VzrNOFE77xc5YP7tbibqhIh
+ Mrl6DyDMgQlyN5mbtw7DnMQ4rM600T1cRAKi49nm7DUHKn63SkxpPisTJK27Ir1jUQyDcAXnkw
+ OaKWPbtOS7wfxBxwyVIx31Vz
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Sep 2022 16:19:23 -0700
+IronPort-SDR: Pob1X/2KkQaLdBU1FDDhT33b2ex7XkcK4nzdR0BcXZvCUNjtwPhF7BDAvGjUI1atDNnNfVTfvx
+ jHgddOIhlSmjqYEEHxENq4EVVtJvNtraDZlnKNvVTGeBb0PM6Y0Y5OLYaPzm5YsaM7oClE9Kap
+ 9PSAZnRe5Rlx26A6GZFRbre+BWf5xUz4BDp5Sz0YEivt2DIVA67qoVAUfAmR48+VthDjdK0LbN
+ HDXvE7CQh50Dwtx1AmExDT83e0hYp/hMiJhNA7sOqh+wy+4Z5vevlElYtIFOR0ahS+0d4qNcJe
+ P/M=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Sep 2022 16:59:17 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MWhVD3zt1z1Rwtl
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 16:59:16 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1663631955; x=1666223956; bh=cEVZ92IUthHU1udbHEvnHa/hWAI5exdOeev
+        5CQ+ALEQ=; b=LIwnSk2O812DQo1Xx1WJrdwCpbgoTRr6PsEoFA+L1CjbSaDhlwl
+        tjrq0QWYB/xZjDrZCnrFTFO2IbxEk7KQpXQ8jQcBMqpwL/ZHacovF2L9tD2tB6KI
+        moCSQYDeCHQBaBRqZTKfb+n3Y5MdIvUbOeQNGzPW+2SVNsPIn3UBBeb0XBYA+00a
+        gLeDWXFQQHZgvrhthow0tDNzcsGfeRiy44Jtlop0iJzNGHzAd+S/r/N94OBRO8s4
+        gIKQb5U4A0AhwOgBMeDsjSHuWC9FlaDSpd0AcuWMdFJpm3OjbWnu6bCqoTrkSHuX
+        qYkpiLvlD87YjrwsTplzEo9EDRAmiB7gy0Q==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 9NWJTJ9rxMMH for <linux-block@vger.kernel.org>;
+        Mon, 19 Sep 2022 16:59:15 -0700 (PDT)
+Received: from [10.225.163.81] (unknown [10.225.163.81])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MWhV744XZz1RvLy;
+        Mon, 19 Sep 2022 16:59:11 -0700 (PDT)
+Message-ID: <44dfb47f-a59f-b236-03bf-5d25d7f206b5@opensource.wdc.com>
+Date:   Tue, 20 Sep 2022 08:59:09 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH 3/3] virtio-blk: add support for zoned block devices
+Content-Language: en-US
+To:     Pankaj Raghav <pankydev8@gmail.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Stefan Hajnoczi <stefanha@gmail.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Sam Li <faithilikerun@gmail.com>, linux-block@vger.kernel.org,
+        virtio-dev@lists.oasis-open.org,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        k.jensen@samsung.com
+References: <20220919022921.946344-1-dmitry.fomichev@wdc.com>
+ <20220919022921.946344-4-dmitry.fomichev@wdc.com>
+ <20220919133853.2xsamyvr66qeogko@quentin>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220919133853.2xsamyvr66qeogko@quentin>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 19 Sep 2022, Keith Busch wrote:
-> On Sun, Sep 18, 2022 at 02:10:51PM -0700, Hugh Dickins wrote:
-> > I have almost no grasp of all the possible sbitmap races, and their
-> > consequences: but using the same !waitqueue_active() check as used
-> > elsewhere, fixes the lockup and shows no adverse consequence for me.
+On 9/19/22 22:41, Pankaj Raghav wrote:
+> Hi Dmitry,
 > 
->  
-> > Fixes: 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
-> > Signed-off-by: Hugh Dickins <hughd@google.com>
-> > ---
-> > 
-> >  lib/sbitmap.c |    2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > --- a/lib/sbitmap.c
-> > +++ b/lib/sbitmap.c
-> > @@ -620,7 +620,7 @@ static bool __sbq_wake_up(struct sbitmap
-> >  		 * function again to wakeup a new batch on a different 'ws'.
-> >  		 */
-> >  		if (cur == 0)
-> > -			return true;
-> > +			return !waitqueue_active(&ws->wait);
-> 
-> If it's 0, that is supposed to mean another thread is about to make it not zero
-> as well as increment the wakestate index. That should be happening after patch
-> 48c033314f37 was included, at least.
+> On Sun, Sep 18, 2022 at 10:29:21PM -0400, Dmitry Fomichev wrote:
+>> The zone-specific code in the patch is heavily influenced by NVMe ZNS
+>> code in drivers/nvme/host/zns.c, but it is simpler because the proposed
+>> virtio ZBD draft only covers the zoned device features that are
+>> relevant to the zoned functionality provided by Linux block layer.
+>>
+> There is a parallel work going on to support non-po2 zone sizes in Linux
+> block layer and drivers[1]. I don't see any reason why we shouldn't make
+> the calculations generic here instead of putting the constraint on zone
+> sectors to be po2 as the virtio spec also supports it.
 
-I believe that the thread about to make wait_cnt not zero (and increment the
-wakestate index) is precisely this interrupted thread: the backtrace shows
-that it had just done its wakeups, so has not yet reached making wait_cnt
-not zero; and I suppose that either its wakeups did not empty the waitqueue
-completely, or another waiter got added as soon as it dropped the spinlock.
+That series is not upstream, so implementing against would not be the
+correct approach, especially given that this would also impact qemu code.
 
 > 
-> Prior to 4acb83417cad, the code would also return 'true' if the count was
-> already zero, and this batched code wasn't supposed to behave any different in
-> that condition.
-
-In principle yes, but in practice no.  Prior to 4acb83417cad, the swapping
-load would run okayish for a few minutes, before freezing up mysteriously
-(presumably due to missed wakeups).  The "ish" in "okayish" because the
-system time was abnormally high, and occasionally there was an odd message
-from systemd about killing its journal or something - 4acb83417cad saved
-me from having to investigate that further.
-
-Prior to 4acb83417cad, it never locked up looping on wait_cnt < 0;
-after 4acb83417cad, it would lock up on wait_cnt 0 in a few seconds.
-
-But in writing that, and remembering the abnormal systime, I begin to
-suspect that it might have often been in a tight loop on wait_cnt < 0,
-but the batch accounting sufficiently wrong that it always got rescued
-by an unrelated wakeup (shifting wakestate index), before any lockup
-ever got observed and reported.  Or something like that.
-
-(And I'm trying to avoid making a fool of myself with the arithmetic:
-how quickly would wait_cnt 0 have got decremented to positive before?)
-
-I won't mind Jens deleting that "Fixes: 4acb83417cad" if it's unfair.
-
+> I took a quick look, and changing the calculations from po2 specific to
+> generic will not be in the hot path and can be trivially changed. I have
+> suggested the changes inline to make the virtio blk driver zone size 
+> agnostic. I haven't tested the changes but it is very
+> similar to the changes I did in the drivers/nvme/host/zns.c in my patch
+> series[2].
 > 
-> Anyway, I don't think the waitqueue_active criteria of the current waitstate is
-> correct either. The next waitstate may have waiters too, so we still may need
-> to account for this batch's count in order to wake them.
+> [1] https://lore.kernel.org/linux-block/20220912082204.51189-1-p.raghav@samsung.com/
+> [2] https://lore.kernel.org/linux-block/20220912082204.51189-6-p.raghav@samsung.com/
+> 
+>> Co-developed-by: Stefan Hajnoczi <stefanha@gmail.com>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
+>> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+>> ---
+>>  drivers/block/virtio_blk.c      | 381 ++++++++++++++++++++++++++++++--
+>>  include/uapi/linux/virtio_blk.h | 106 +++++++++
+>>  2 files changed, 469 insertions(+), 18 deletions(-)
+>>
+> <snip>
+>> +#ifdef CONFIG_BLK_DEV_ZONED
+>> +static void *virtblk_alloc_report_buffer(struct virtio_blk *vblk,
+>> +					  unsigned int nr_zones,
+>> +					  unsigned int zone_sectors,
+>> +					  size_t *buflen)
+>> +{
+>> +	struct request_queue *q = vblk->disk->queue;
+>> +	size_t bufsize;
+>> +	void *buf;
+>> +
+> -	nr_zones = min_t(unsigned int, nr_zones,
+> -			 get_capacity(vblk->disk) >> ilog2(zone_sectors));
+> 
+> +	nr_zones = min_t(unsigned int, nr_zones,
+> +			 div64_u64(get_capacity(vblk->disk), zone_sectors));
+> 
+>> +
+>> +	bufsize = sizeof(struct virtio_blk_zone_report) +
+>> +		nr_zones * sizeof(struct virtio_blk_zone_descriptor);
+>> +	bufsize = min_t(size_t, bufsize,
+>> +			queue_max_hw_sectors(q) << SECTOR_SHIFT);
+>> +	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
+>> +
+>> +	while (bufsize >= sizeof(struct virtio_blk_zone_report)) {
+>> +		buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
+>> +		if (buf) {
+>> +			*buflen = bufsize;
+>> +			return buf;
+>> +		}
+>> +		bufsize >>= 1;
+>> +	}
+>> +
+>> +	return NULL;
+>> +}
+>> +
+>> +static int virtblk_submit_zone_report(struct virtio_blk *vblk,
+>> +				       char *report_buf, size_t report_len,
+>> +				       sector_t sector)
+>> +{
+>> +	struct request_queue *q = vblk->disk->queue;
+>> +	struct request *req;
+>> +	struct virtblk_req *vbr;
+>> +	int err;
+>> +
+>> +	req = blk_mq_alloc_request(q, REQ_OP_DRV_IN, 0);
+>> +	if (IS_ERR(req))
+>> +		return PTR_ERR(req);
+>> +
+>> +	vbr = blk_mq_rq_to_pdu(req);
+>> +	vbr->in_hdr_len = sizeof(vbr->status);
+>> +	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_ZONE_REPORT);
+>> +	vbr->out_hdr.sector = cpu_to_virtio64(vblk->vdev, sector);
+>> +
+>> +	err = blk_rq_map_kern(q, req, report_buf, report_len, GFP_KERNEL);
+>> +	if (err)
+>> +		goto out;
+>> +
+>> +	blk_execute_rq(req, false);
+>> +	err = blk_status_to_errno(virtblk_result(vbr->status));
+>> +out:
+>> +	blk_mq_free_request(req);
+>> +	return err;
+>> +}
+>> +
+>> +static int virtblk_parse_zone(struct virtio_blk *vblk,
+>> +			       struct virtio_blk_zone_descriptor *entry,
+>> +			       unsigned int idx, unsigned int zone_sectors,
+>> +			       report_zones_cb cb, void *data)
+>> +{
+>> +	struct blk_zone zone = { };
+>> +
+>> +	if (entry->z_type != VIRTIO_BLK_ZT_SWR &&
+>> +	    entry->z_type != VIRTIO_BLK_ZT_SWP &&
+>> +	    entry->z_type != VIRTIO_BLK_ZT_CONV) {
+>> +		dev_err(&vblk->vdev->dev, "invalid zone type %#x\n",
+>> +			entry->z_type);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	zone.type = entry->z_type;
+>> +	zone.cond = entry->z_state;
+>> +	zone.len = zone_sectors;
+>> +	zone.capacity = le64_to_cpu(entry->z_cap);
+>> +	zone.start = le64_to_cpu(entry->z_start);
+>> +	if (zone.cond == BLK_ZONE_COND_FULL)
+>> +		zone.wp = zone.start + zone.len;
+>> +	else
+>> +		zone.wp = le64_to_cpu(entry->z_wp);
+>> +
+>> +	return cb(&zone, idx, data);
+>> +}
+>> +
+>> +static int virtblk_report_zones(struct gendisk *disk, sector_t sector,
+>> +				 unsigned int nr_zones, report_zones_cb cb,
+>> +				 void *data)
+>> +{
+>> +	struct virtio_blk *vblk = disk->private_data;
+>> +	struct virtio_blk_zone_report *report;
+>> +	unsigned int zone_sectors = vblk->zone_sectors;
+>> +	unsigned int nz, i;
+>> +	int ret, zone_idx = 0;
+>> +	size_t buflen;
+> +	u64 remainder;
+>> +
+>> +	if (WARN_ON_ONCE(!vblk->zone_sectors))
+>> +		return -EOPNOTSUPP;
+>> +
+>> +	report = virtblk_alloc_report_buffer(vblk, nr_zones,
+>> +					     zone_sectors, &buflen);
+>> +	if (!report)
+>> +		return -ENOMEM;
+>> +
+> -	sector &= ~(zone_sectors - 1);
+> 
+> +	div64_u64_rem(sector, zone_sectors, &remainder);
+> +	sector -= remainder;
+>> +	while (zone_idx < nr_zones && sector < get_capacity(vblk->disk)) {
+>> +		memset(report, 0, buflen);
+>> +
+>> +		ret = virtblk_submit_zone_report(vblk, (char *)report,
+>> +						 buflen, sector);
+>> +		if (ret) {
+>> +			if (ret > 0)
+>> +				ret = -EIO;
+>> +			goto out_free;
+>> +		}
+>> +
+>> +		nz = min((unsigned int)le64_to_cpu(report->nr_zones), nr_zones);
+>> +		if (!nz)
+>> +			break;
+>> +
+>> +		for (i = 0; i < nz && zone_idx < nr_zones; i++) {
+>> +			ret = virtblk_parse_zone(vblk, &report->zones[i],
+>> +						 zone_idx, zone_sectors, cb, data);
+>> +			if (ret)
+>> +				goto out_free;
+>> +			zone_idx++;
+>> +		}
+>> +
+>> +		sector += zone_sectors * nz;
+>> +	}
+>> +
+>> +	if (zone_idx > 0)
+>> +		ret = zone_idx;
+>> +	else
+>> +		ret = -EINVAL;
+>> +out_free:
+>> +	kvfree(report);
+>> +	return ret;
+>> +}
+>> +
+> <snip>
+>> +static int virtblk_probe_zoned_device(struct virtio_device *vdev,
+>> +				       struct virtio_blk *vblk,
+>> +				       struct request_queue *q)
+>> +{
+> <snip>
+>> +	blk_queue_physical_block_size(q, le32_to_cpu(v));
+>> +	blk_queue_io_min(q, le32_to_cpu(v));
+>> +
+>> +	dev_dbg(&vdev->dev, "write granularity = %u\n", le32_to_cpu(v));
+>> +
+> -	/*
+> -	 * virtio ZBD specification doesn't require zones to be a power of
+> -	 * two sectors in size, but the code in this driver expects that.
+> -	 */
+> -	virtio_cread(vdev, struct virtio_blk_config, zoned.zone_sectors, &v);
+> -	if (v == 0 || !is_power_of_2(v)) {
+> -		dev_err(&vdev->dev,
+> -			"zoned device with non power of two zone size %u\n", v);
+> -		return -ENODEV;
+> -	}
+>> +
+>> +	dev_dbg(&vdev->dev, "zone sectors = %u\n", le32_to_cpu(v));
+>> +	vblk->zone_sectors = le32_to_cpu(v);
+>> +
+>> +	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
+>> +		dev_warn(&vblk->vdev->dev,
+>> +			 "ignoring negotiated F_DISCARD for zoned device\n");
+>> +		blk_queue_max_discard_sectors(q, 0);
+>> +	}
+>> +
+>> +	ret = blk_revalidate_disk_zones(vblk->disk, NULL);
+>> +	if (!ret) {
+>> +		virtio_cread(vdev, struct virtio_blk_config,
+>> +			     zoned.max_append_sectors, &v);
+>> +		if (!v) {
+>> +			dev_warn(&vdev->dev, "zero max_append_sectors reported\n");
+>> +			return -ENODEV;
+>> +		}
+>> +		blk_queue_max_zone_append_sectors(q, le32_to_cpu(v));
+>> +		dev_dbg(&vdev->dev, "max append sectors = %u\n", le32_to_cpu(v));
+>> +
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+> 
 
-I cannot usefully comment on that, it's all rather too subtle for me.
+-- 
+Damien Le Moal
+Western Digital Research
 
-But I did wonder if each of those !waitqueue_active()s would be better
-replaced just by "false"s: we only get that far into __sbq_wake_up() if
-waitqueue_active(), so the !waitqueue_active() case reflects a race:
-a possible race, yes, but a race that wants precise accounting at a
-few imprecise locations?
-
-Hugh
