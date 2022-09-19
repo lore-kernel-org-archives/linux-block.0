@@ -2,51 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A03FECAAD3
-	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 06:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC6BFECAAD3
+	for <linux-block@archiver.kernel.org>; Mon, 19 Sep 2022 06:58:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229869AbiISG6c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 02:58:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35584 "EHLO
+        id S229884AbiISG6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 02:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbiISG6a (ORCPT
+        with ESMTP id S229706AbiISG6a (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 19 Sep 2022 02:58:30 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC6DA1D0DF;
-        Sun, 18 Sep 2022 23:58:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511591D0EC;
+        Sun, 18 Sep 2022 23:58:28 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MWFp445MWzKNxn;
-        Mon, 19 Sep 2022 14:56:28 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MWFp5279tzKPvv;
+        Mon, 19 Sep 2022 14:56:29 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgAnenMPEyhjBBpFBA--.10045S4;
-        Mon, 19 Sep 2022 14:58:25 +0800 (CST)
+        by APP2 (Coremail) with SMTP id Syh0CgAnenMPEyhjBBpFBA--.10045S6;
+        Mon, 19 Sep 2022 14:58:26 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v2 0/3] blk-wbt: simple improvment to enable wbt correctly
-Date:   Mon, 19 Sep 2022 15:09:13 +0800
-Message-Id: <20220919070916.2738443-1-yukuai1@huaweicloud.com>
+Subject: [PATCH v2 2/3] block: add a helper to check elevator name
+Date:   Mon, 19 Sep 2022 15:09:15 +0800
+Message-Id: <20220919070916.2738443-3-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220919070916.2738443-1-yukuai1@huaweicloud.com>
+References: <20220919070916.2738443-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgAnenMPEyhjBBpFBA--.10045S4
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUU5i7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7
-        MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
-        0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0E
-        wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJV
-        W8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-        IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
-        U==
+X-CM-TRANSID: Syh0CgAnenMPEyhjBBpFBA--.10045S6
+X-Coremail-Antispam: 1UD129KBjvdXoWrKr4rur18CF45WFyxtr1UKFg_yoWxKrb_G3
+        y8K34kX398JrnayF1UtFyYqryUWws5JryfWw1xtF1kAF4rWF1Fy3yxAr1UCrZrXFWjka45
+        Cr48ur1UZr1jgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb-kFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
+        0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
+        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
+        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
+        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
+        vE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
+        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
+        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
+        JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
+        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
+        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
+        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjYiiDUUUUU==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -55,21 +58,30 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-changes in v2:
- - define new api if wbt config is not enabled in patch 1.
+The helper will be used in later patch to make sure wbt is not enabled
+if default io scheduler is bfq.
 
-Yu Kuai (3):
-  wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
-  block: add a helper to check elevator name
-  blk-wbt: don't enable throttling if default elevator is bfq
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/elevator.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
- block/bfq-iosched.c |  2 +-
- block/blk-sysfs.c   | 11 +++++++++--
- block/blk-wbt.c     | 13 ++++++++++++-
- block/blk-wbt.h     | 10 ++++++++--
- block/elevator.h    |  5 +++++
- 5 files changed, 35 insertions(+), 6 deletions(-)
-
+diff --git a/block/elevator.h b/block/elevator.h
+index 3f0593b3bf9d..2ddc738cae97 100644
+--- a/block/elevator.h
++++ b/block/elevator.h
+@@ -104,6 +104,11 @@ struct elevator_queue
+ 	DECLARE_HASHTABLE(hash, ELV_HASH_BITS);
+ };
+ 
++static inline bool check_elevator_name(struct elevator_queue *elevator,
++				       const char *name)
++{
++	return elevator && !strcmp(elevator->type->elevator_name, name);
++}
+ /*
+  * block elevator interface
+  */
 -- 
 2.31.1
 
