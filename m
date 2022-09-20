@@ -2,104 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BAAFC6FA90
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 02:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D311C6FA8B
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 02:33:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbiITCRx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 22:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45294 "EHLO
+        id S230204AbiITCdx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 22:33:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230197AbiITCRo (ORCPT
+        with ESMTP id S229582AbiITCdw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 22:17:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186F94DB16
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 19:17:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663640254;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=h9ZmCI0LCaoZR7HfXTt/Db+qT+knp1RrpFNmpWwfzuI=;
-        b=Ycl2lvyulGN9OivHUXMuK5l8Bo9JD8Vd8xUhNVm8K59lHYX8aJEUDSZayHvN62ufoJY2sk
-        pgrJRN2lwR6YewtYFpb5sCrOUUvh/bmCaHK6io9P4JrTil8LdielClnveSXSI/nMFHZcDB
-        U3ssrgKE5hNYoQG6bpTwiROrNM8s2nE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-275-_jpJ3zoUOja4-7BEnVWeKA-1; Mon, 19 Sep 2022 22:17:32 -0400
-X-MC-Unique: _jpJ3zoUOja4-7BEnVWeKA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4D6B01C05152;
-        Tue, 20 Sep 2022 02:17:32 +0000 (UTC)
-Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E61DAC159CD;
-        Tue, 20 Sep 2022 02:17:30 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        Yi Zhang <yi.zhang@redhat.com>
-Subject: [PATCH] blk-mq: avoid to hang in the cpuhp offline handler
-Date:   Tue, 20 Sep 2022 10:17:24 +0800
-Message-Id: <20220920021724.1841850-1-ming.lei@redhat.com>
+        Mon, 19 Sep 2022 22:33:52 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE724578A5
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 19:33:50 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id kr11so2878693ejc.8
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 19:33:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=4WdgOQEnTGB5AD0/3SYqzq4oO226bgoIvmn6I1vr/DE=;
+        b=B66Mfs4AndtZMHw0cxrGW2QT2/SRG5s1osj6N3OngZcnx85hUZVIBES+B1K+Ef5VEO
+         I4B/iSWs1ss6it+OJ7yy5H7AFUGDRdkrQeaoUPdd5rLx+456n9LX0uLS4Q/V5aDMEDfQ
+         jgl8mGOUixXp4MezbRgD7YZXWSGjAQ8Op8BPY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=4WdgOQEnTGB5AD0/3SYqzq4oO226bgoIvmn6I1vr/DE=;
+        b=X/AJEJYbXEiY+2L5WDilOTnTfAw5BSnKI6kp6RjfX3g56TSibP9iowknoMIq50lSmS
+         EFszJi3x4QzN4v18L58iJzCqyTsyKkB764nM39kqdjL7eoWJzGcT2X1+Y2S3An1cZsEF
+         /i2YEYi37uQHr0fG7i8aMHxEQe89XmmIJgxCTWgWaF+5s2X76KMKPdRoferMoFOuyxmL
+         RbAr3McPUBbgGaXkwsh8v0QXSaH4CcSur6XIUGoxDc7w69lct77baO9wEYaVTxLEbpK4
+         gAEKcaSuh38Pm+/hhyHJ3lxuGjZAfGbWhB5A9SBJKu+VfjmBJYv26QILwcl7Pvgfn0bC
+         n+eA==
+X-Gm-Message-State: ACrzQf23njVvmwbW0dUrGPTK1FD8ng7TiU83Fv/pIx8dar9e4xZAr1dh
+        eokNJCfDQY+/mGkKA+TPZ+U7fmW51QPJiFwtAYsUmw==
+X-Google-Smtp-Source: AMsMyM6oA07pBoPv0NiRcgoDeKipAqKueA2dka5/YzaH22PcO7CPkT4imFruPehqxaOY1hLqLkVMvRcG/EQO9P7eK/0=
+X-Received: by 2002:a17:906:9746:b0:781:913d:6cc7 with SMTP id
+ o6-20020a170906974600b00781913d6cc7mr3007772ejy.386.1663641229240; Mon, 19
+ Sep 2022 19:33:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <20220915164826.1396245-4-sarthakkukreti@google.com> <YyQOFTI4CWn041UM@fedora>
+In-Reply-To: <YyQOFTI4CWn041UM@fedora>
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date:   Mon, 19 Sep 2022 19:33:37 -0700
+Message-ID: <CAG9=OMM4uQiJuu+ChUq-hoiyKMrBOECgz=+xw+=LmcPt2FVwOQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 3/8] virtio_blk: Add support for provision requests
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        Evan Green <evgreen@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For avoiding to trigger io timeout when one hctx becomes inactive, we
-drain IOs when all CPUs of one hctx are offline. However, driver's
-timeout handler may require cpus_read_lock, such as nvme-pci,
-pci_alloc_irq_vectors_affinity() is called in nvme-pci reset context,
-and irq_build_affinity_masks() needs cpus_read_lock().
+On Thu, Sep 15, 2022 at 10:48 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> On Thu, Sep 15, 2022 at 09:48:21AM -0700, Sarthak Kukreti wrote:
+> > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> >
+> > Adds support for provision requests. Provision requests act like
+> > the inverse of discards.
+> >
+> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> > ---
+> >  drivers/block/virtio_blk.c      | 48 +++++++++++++++++++++++++++++++++
+> >  include/uapi/linux/virtio_blk.h |  9 +++++++
+> >  2 files changed, 57 insertions(+)
+>
+> Please send a VIRTIO spec patch too:
+> https://github.com/oasis-tcs/virtio-spec#providing-feedback
+>
+Thanks for the suggestion! Ref:
+https://lists.oasis-open.org/archives/virtio-comment/202209/msg00025.html
 
-Meantime when blk-mq's cpuhp offline handler is called, cpus_write_lock
-is held, so deadlock is caused.
+The patch needs to be amended a bit to account for the diff. in the
+spec and the original patch. Will update in the next patch iteration.
 
-Fixes the issue by breaking the wait loop if enough long time elapses,
-and these in-flight not drained IO still can be handled by timeout
-handler.
+Best
+Sarthak
 
-Cc: linux-nvme@lists.infradead.org
-Reported-by: Yi Zhang <yi.zhang@redhat.com>
-Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c96c8c4f751b..4585985b8537 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3301,6 +3301,7 @@ static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
- 	return true;
- }
- 
-+#define BLK_MQ_MAX_OFFLINE_WAIT_MSECS 3000
- static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- {
- 	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
-@@ -3326,8 +3327,13 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
- 	 * frozen and there are no requests.
- 	 */
- 	if (percpu_ref_tryget(&hctx->queue->q_usage_counter)) {
--		while (blk_mq_hctx_has_requests(hctx))
-+		unsigned int wait_ms = 0;
-+
-+		while (blk_mq_hctx_has_requests(hctx) && wait_ms <
-+				BLK_MQ_MAX_OFFLINE_WAIT_MSECS) {
- 			msleep(5);
-+			wait_ms += 5;
-+		}
- 		percpu_ref_put(&hctx->queue->q_usage_counter);
- 	}
- 
--- 
-2.31.1
-
+> Stefan
+>
+> >
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 30255fcaf181..eacc2bffe1d1 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -178,6 +178,39 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
+> >       return 0;
+> >  }
+> >
+> > +static int virtblk_setup_provision(struct request *req)
+> > +{
+> > +     unsigned short segments = blk_rq_nr_discard_segments(req);
+> > +     unsigned short n = 0;
+> > +
+> > +     struct virtio_blk_discard_write_zeroes *range;
+> > +     struct bio *bio;
+> > +     u32 flags = 0;
+> > +
+> > +     range = kmalloc_array(segments, sizeof(*range), GFP_ATOMIC);
+> > +     if (!range)
+> > +             return -ENOMEM;
+> > +
+> > +     __rq_for_each_bio(bio, req) {
+> > +             u64 sector = bio->bi_iter.bi_sector;
+> > +             u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
+> > +
+> > +             range[n].flags = cpu_to_le32(flags);
+> > +             range[n].num_sectors = cpu_to_le32(num_sectors);
+> > +             range[n].sector = cpu_to_le64(sector);
+> > +             n++;
+> > +     }
+> > +
+> > +     WARN_ON_ONCE(n != segments);
+> > +
+> > +     req->special_vec.bv_page = virt_to_page(range);
+> > +     req->special_vec.bv_offset = offset_in_page(range);
+> > +     req->special_vec.bv_len = sizeof(*range) * segments;
+> > +     req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >  static void virtblk_unmap_data(struct request *req, struct virtblk_req *vbr)
+> >  {
+> >       if (blk_rq_nr_phys_segments(req))
+> > @@ -243,6 +276,9 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
+> >       case REQ_OP_DRV_IN:
+> >               type = VIRTIO_BLK_T_GET_ID;
+> >               break;
+> > +     case REQ_OP_PROVISION:
+> > +             type = VIRTIO_BLK_T_PROVISION;
+> > +             break;
+> >       default:
+> >               WARN_ON_ONCE(1);
+> >               return BLK_STS_IOERR;
+> > @@ -256,6 +292,11 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
+> >                       return BLK_STS_RESOURCE;
+> >       }
+> >
+> > +     if (type == VIRTIO_BLK_T_PROVISION) {
+> > +             if (virtblk_setup_provision(req))
+> > +                     return BLK_STS_RESOURCE;
+> > +     }
+> > +
+> >       return 0;
+> >  }
+> >
+> > @@ -1075,6 +1116,12 @@ static int virtblk_probe(struct virtio_device *vdev)
+> >               blk_queue_max_write_zeroes_sectors(q, v ? v : UINT_MAX);
+> >       }
+> >
+> > +     if (virtio_has_feature(vdev, VIRTIO_BLK_F_PROVISION)) {
+> > +             virtio_cread(vdev, struct virtio_blk_config,
+> > +                          max_provision_sectors, &v);
+> > +             q->limits.max_provision_sectors = v ? v : UINT_MAX;
+> > +     }
+> > +
+> >       virtblk_update_capacity(vblk, false);
+> >       virtio_device_ready(vdev);
+> >
+> > @@ -1177,6 +1224,7 @@ static unsigned int features[] = {
+> >       VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
+> >       VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
+> >       VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
+> > +     VIRTIO_BLK_F_PROVISION,
+> >  };
+> >
+> >  static struct virtio_driver virtio_blk = {
+> > diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
+> > index d888f013d9ff..184f8cf6d185 100644
+> > --- a/include/uapi/linux/virtio_blk.h
+> > +++ b/include/uapi/linux/virtio_blk.h
+> > @@ -40,6 +40,7 @@
+> >  #define VIRTIO_BLK_F_MQ              12      /* support more than one vq */
+> >  #define VIRTIO_BLK_F_DISCARD 13      /* DISCARD is supported */
+> >  #define VIRTIO_BLK_F_WRITE_ZEROES    14      /* WRITE ZEROES is supported */
+> > +#define VIRTIO_BLK_F_PROVISION       15      /* provision is supported */
+> >
+> >  /* Legacy feature bits */
+> >  #ifndef VIRTIO_BLK_NO_LEGACY
+> > @@ -120,6 +121,11 @@ struct virtio_blk_config {
+> >        */
+> >       __u8 write_zeroes_may_unmap;
+> >
+> > +     /*
+> > +      * The maximum number of sectors in a provision request.
+> > +      */
+> > +     __virtio32 max_provision_sectors;
+> > +
+> >       __u8 unused1[3];
+> >  } __attribute__((packed));
+> >
+> > @@ -155,6 +161,9 @@ struct virtio_blk_config {
+> >  /* Write zeroes command */
+> >  #define VIRTIO_BLK_T_WRITE_ZEROES    13
+> >
+> > +/* Provision command */
+> > +#define VIRTIO_BLK_T_PROVISION       14
+> > +
+> >  #ifndef VIRTIO_BLK_NO_LEGACY
+> >  /* Barrier before this op. */
+> >  #define VIRTIO_BLK_T_BARRIER 0x80000000
+> > --
+> > 2.31.0
+> >
