@@ -2,49 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 431C4C6FA90
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 17:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DE33C54EE9
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 17:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229605AbiITRVO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Sep 2022 13:21:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40598 "EHLO
+        id S229599AbiITRVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Sep 2022 13:21:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbiITRVN (ORCPT
+        with ESMTP id S229473AbiITRVt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Sep 2022 13:21:13 -0400
+        Tue, 20 Sep 2022 13:21:49 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A276E5F7FD;
-        Tue, 20 Sep 2022 10:21:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2FD5F222
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 10:21:49 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id B875568AFE; Tue, 20 Sep 2022 19:21:06 +0200 (CEST)
-Date:   Tue, 20 Sep 2022 19:21:06 +0200
+        id 7383568AFE; Tue, 20 Sep 2022 19:21:46 +0200 (CEST)
+Date:   Tue, 20 Sep 2022 19:21:46 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Suren Baghdasaryan <surenb@google.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, David Sterba <dsterba@suse.com>,
-        Gao Xiang <xiang@kernel.org>, Chris Mason <clm@fb.com>,
-        linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-        Chao Yu <chao@kernel.org>, linux-mm@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org
-Subject: Re: improve pagecache PSI annotations v2
-Message-ID: <20220920172106.GA24750@lst.de>
-References: <20220915094200.139713-1-hch@lst.de> <166368389821.10447.12312122039024559092.b4-ty@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: rnbd cleanups v2
+Message-ID: <20220920172146.GA24795@lst.de>
+References: <20220909131509.3263924-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <166368389821.10447.12312122039024559092.b4-ty@kernel.dk>
+In-Reply-To: <20220909131509.3263924-1-hch@lst.de>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 08:24:58AM -0600, Jens Axboe wrote:
-> Applied, thanks!
-
-I think Andrew applied these as well already.  I'll let you two fight
-that out as I'm happy as long as it goes in :)
-
+Can you pick these up?
