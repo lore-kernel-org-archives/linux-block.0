@@ -2,89 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CDFBECAAD8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 13:51:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF721C54EE9
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 14:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbiITNvL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Sep 2022 09:51:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42890 "EHLO
+        id S231446AbiITOFa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Sep 2022 10:05:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230422AbiITNvI (ORCPT
+        with ESMTP id S230322AbiITOFN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Sep 2022 09:51:08 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2659A40E06
-        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 06:51:01 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id g8so2330663iob.0
-        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 06:51:01 -0700 (PDT)
+        Tue, 20 Sep 2022 10:05:13 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641D59592
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 07:05:11 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id v128so2284091ioe.12
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 07:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date;
-        bh=CK9TebHno8mIksOGMP5iM3H7Bl6eF54lPzCEEcDUT8A=;
-        b=1pix+LOtxXtsEWvUmhnBjK3Gi+Nnb5nIznsQKF7piSBaXYJeoA+t+BzRXQud265iJj
-         IoaThAE80xzywXLO4AXggmrZzoENkNb+RhP2jf7qx7b4hpSNhSWrj6Avdb0urPmwJTBr
-         Hm8FSrU8cQRUgiZzngJhBpezxDAxEUqDdYpE5T1ZPuppXTiXk5uEBsgedRxlN2Z85lG7
-         rlYwEgPLBJrJLrua5ZL2USGLNcOTnY8FRV8fEpPFS7ABnKRktyzzIxraJ2styn+HWl3X
-         ijUCyEC1A/x8QOvGtZYd0wo/Ar7rx/A7UZaxiOarJBC0GHjtnBLMf+Nzn8HN1ej7vhnN
-         3OGw==
+        bh=tSt+TIRAC+j8jmijeG7Slz9mQYvn4dIMqWXdxkZMwII=;
+        b=pDZq9O89zt5c9P9djLhNuRMJjotd1+aXB7XJH/VMdJC20UE3ZZEKnXAyGkCDIMuTKB
+         pVq/bjEuIwaRbDNl79xe2dlR5CUTvP1pB0uCV/YeONAnWgl3NkdaolR7MtLZnYr6acqi
+         sF+7P2OQWc794yd0Xg+vItcDjpARQig/FvYvRfkZ/gFUpl6rBH/4PoWVnZbfza2iTtbd
+         vPe04lTNR2oJamlEVQAn2RlSRO4Mho27ZdYCpH1CyUC4k6U2sGJIHYswO/PU3+CYiWGC
+         93ofJYWlivrPMce3nN19QiRVl1Pyo+dMpA9AE5ogYUheoxsyPr6YnbSoTLITZscuutWP
+         /PMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=CK9TebHno8mIksOGMP5iM3H7Bl6eF54lPzCEEcDUT8A=;
-        b=o6DgUxk76XJNK8wmTIwkldvA10Tw2mV3i0KNJZovz/gCQGPMYalCfDqga8M/lJcP7o
-         v1inVRYnePpgZRfUKJYxqGRf0kZ/VGcThLccl6APlj6glV48K8yVm7Etpeq9PhAJNb61
-         QV5tY3VfhhF8tlHRw7Uco3n5A3aF9q7Oi+/NXnmk1q5EI+MKl3w16kjc5L1Gx2v/tPRQ
-         h6cJdIITW0ZCyQfCtisAKswrItEYa+SDxLtvWcvmrYlm5MO+7CUpuwoJmb8Ul/TnAHAs
-         glpXXuiba/lS6PhoPFewK5w/3sy97OE0vcKfM8iOKauQvZb0JeBVhiyOQ7QSt4I6GNxU
-         fVUw==
-X-Gm-Message-State: ACrzQf0dpcAtY+hdwHTcocAYgjvQn3gfH0kyJsz0abZ0DLqTiZjqYM09
-        8gDndgEYeHioIIT8ZEfLxpSZi8qUrnLJVQ==
-X-Google-Smtp-Source: AMsMyM5/3U4XqLk26/Dwj3BYAtCy7LF4qawYFbJqiCdHYjNuc+YqIYw+7kE3g0JkUej/1M3hc9dQIQ==
-X-Received: by 2002:a02:c4d4:0:b0:35a:a076:bb5e with SMTP id h20-20020a02c4d4000000b0035aa076bb5emr7927171jaj.300.1663681860310;
-        Tue, 20 Sep 2022 06:51:00 -0700 (PDT)
+        bh=tSt+TIRAC+j8jmijeG7Slz9mQYvn4dIMqWXdxkZMwII=;
+        b=Sw2zDX2eh+nk7GYfeaMCDM05S+sj5eTyD7kgecu6KkmAbC6cORXQctCc8e+JSuGjQ8
+         eJsmYcc4hcfGSa7OxderRwDD1sCt+FtX4zjQN1U290WGQU4AkezNwkcGX1pUfhHyfr1f
+         UvQuGj7kOM+zmwzP57Tjxcphk8GKRVE9RdaoWOiNId+4hWWwRXJMGoxP7OhIelyDg/nk
+         fj1xHUMMblcOLtBBStUtc+GahoG8a1CDYxmKb9HpMAsufNCQLaRgRAbHVcNbilOMEhp1
+         GEVmBYHQ6YicyWDN/X9Ic1vYWqtGL8i59fyAML4bXE8xhGFLqjkBYUw9696CizcxP3ga
+         e62A==
+X-Gm-Message-State: ACrzQf0m/uJQIP4i24PgKOhm6tHewnRk4FkdxBcHaEmDfT7HseOyYfWx
+        QHkQmgyEbPlGtaFUEKisbNbjZw==
+X-Google-Smtp-Source: AMsMyM59GVInxWbQJpAoFsryT8RMGZ/gj3CIiidUTPZsyRhsYv7uE5TGbwRxR4macqcUYIT41f8uuA==
+X-Received: by 2002:a05:6638:140e:b0:35a:7a8e:86e5 with SMTP id k14-20020a056638140e00b0035a7a8e86e5mr10502979jad.276.1663682710679;
+        Tue, 20 Sep 2022 07:05:10 -0700 (PDT)
 Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id v8-20020a056e0213c800b002f1a7929d67sm65818ilj.72.2022.09.20.06.50.59
+        by smtp.gmail.com with ESMTPSA id x10-20020a0566380caa00b00356726330a4sm640575jad.154.2022.09.20.07.05.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 06:50:59 -0700 (PDT)
-Message-ID: <c296189b-0a43-e682-d5c1-85cec7ce1f98@kernel.dk>
-Date:   Tue, 20 Sep 2022 07:50:56 -0600
+        Tue, 20 Sep 2022 07:05:10 -0700 (PDT)
+Message-ID: <d39e9149-fcb6-1f7c-4c19-234e74f286f8@kernel.dk>
+Date:   Tue, 20 Sep 2022 08:05:06 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
-Subject: Re: [GIT PULL] first round of nvme updates for Linux 6.1
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <Yylz9ST3BJeXmQCU@infradead.org>
+Subject: Re: regression caused by block: freeze the queue earlier in
+ del_gendisk
+To:     Thorsten Leemhuis <regressions@leemhuis.info>,
+        Dusty Mabe <dusty@dustymabe.com>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
+ <YxBZ4BBjxvAkvI2A@T590> <20220907073324.GB23826@lst.de>
+ <Yxr4SD4d0rZ9TZik@T590> <20220912071618.GA4971@lst.de>
+ <Yx/jLTknQm9VeHi4@T590> <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
+ <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
 Content-Language: en-US
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Yylz9ST3BJeXmQCU@infradead.org>
+In-Reply-To: <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/22 2:04 AM, Christoph Hellwig wrote:
-> Hi Jens,
+On 9/20/22 3:11 AM, Thorsten Leemhuis wrote:
+> Hi, this is your Linux kernel regression tracker.
 > 
-> here is currently queue up nvme patches for 6.1, which are not a lot.
-> There are a few more patches under discussion that will follow later.
+> On 13.09.22 04:36, Dusty Mabe wrote:
+>> On 9/12/22 21:55, Ming Lei wrote:
+>>> On Mon, Sep 12, 2022 at 09:16:18AM +0200, Christoph Hellwig wrote:
+>>>> On Fri, Sep 09, 2022 at 04:24:40PM +0800, Ming Lei wrote:
+>>>>> On Wed, Sep 07, 2022 at 09:33:24AM +0200, Christoph Hellwig wrote:
+>>>>>> On Thu, Sep 01, 2022 at 03:06:08PM +0800, Ming Lei wrote:
+>>>>>>> It is a bit hard to associate the above commit with reported issue.
+>>>>>>
+>>>>>> So the messages clearly are about something trying to open a device
+>>>>>> that went away at the block layer, but somehow does not get removed
+>>>>>> in time by udev (which seems to be a userspace bug in CoreOS).  But
+>>>>>> even with that we really should not hang.
+>>>>>
+>>>>> Xiao Ni provides one script[1] which can reproduce the issue more or less.
+>>>>
+>>>> I've run the reproduced 10000 times on current mainline, and while
+>>>> it prints one of the autoloading messages per run, I've not actually
+>>>> seen any kind of hang.
+>>>
+>>> I can't reproduce the hang too.
+>>
+>> I obviously can reproduce the issue with the test in our Fedora CoreOS
+>> test suite. It's part of a framework (i.e. it's not simple some script
+>> you can run) but it is very reproducible so one can add some instrumentation
+>> to the kernel and feed it through a build/test cycle to see different
+>> results or logs.
+>>
+>> I'm willing to share this with other people (maybe a screen share or
+>> some written down instructions) if anyone would be interested.
 > 
-> The following changes since commit 91418cc4fd8f8e2e21b409eb8983d074359c8be6:
-> 
->   block/drbd: remove unused w_start_resync declaration (2022-09-12 01:47:57 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.1-2022-09-20
+> This thread looked stalled, or was there any progress in the past week?
+> If not: Fedora apparently removed the patch in their kernels a while
+> ago, as quite a few users where hitting it. What is preventing us from
+> doing the same in mainline and 5.19.y until the issue can be resolved?
+> The description of a09b314005f3 ("block: freeze the queue earlier in
+> del_gendisk") doesn't sound like the change does something crucial that
+> can't wait a bit. I might be totally wrong with that, but I think it's
+> my duty to ask that question at this point.
 
-Pulled, thanks.
+Christoph and I discussed this one last week, and he has a plan to try
+a flag approach. Christoph, did you get a chance to bang that out? Would
+be nice to get this one wrapped up.
 
 -- 
 Jens Axboe
