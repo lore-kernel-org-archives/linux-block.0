@@ -2,95 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A83BECAAD8
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 14:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C856C6FA94
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 14:19:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231714AbiITOR0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Sep 2022 10:17:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58782 "EHLO
+        id S231666AbiITOT0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Sep 2022 10:19:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231733AbiITORF (ORCPT
+        with ESMTP id S231815AbiITOSn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Sep 2022 10:17:05 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17FF219C1F
-        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 07:14:40 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id h194so2351523iof.4
-        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 07:14:40 -0700 (PDT)
+        Tue, 20 Sep 2022 10:18:43 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7266465831
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 07:16:03 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id e205so2372129iof.1
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 07:16:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=/yot0ov3usmKB3Zy+wkJUKPk22BQTuylnVUMZmxsCR4=;
-        b=lIXZTwlaHIbQQ9hNPvRV7HuGvm5RDJYX8qcUeX22OX83N0tkw9Xt13KdlC/anWINwm
-         GSdQCjuqFlnjXmK6d3quFgRZ7vkpgfhPiFdng2KG0u9ylgvfBvqMepItjYQ2ivjERQGp
-         8lbIhTvYiKoy9hpyPK3TjnPUEnO2JyjF2hhVOdKkuSRa0+4ZtVIZ0cplD7cmpKuDl69T
-         uqT78PPAKOllkkBpBIUzKAmALjQnSnksHUYVyAn5ydOljMtwsZEGwWrugEhmfOR/ZRxs
-         gaLDLph39qi7lQQj9HHR0xjlCHEUwJZ+rHe2pgOisLfuPgHb7r7OhEJ2DUDpVDTh2sgy
-         kqTw==
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=l4ln2ykBhlZWW5Rwt4pQjcBchsXfZQalKEmYUz/KFhE=;
+        b=KvMempRM9b+JsUs17jcSdZe4CcjpJzMUZQ2/EqNuu1uSxbx8M69qlpDbopCQKoShZ7
+         8XIBuC0QVg/JHbBQywYHHq5uwzWivc5GL+ckcX24PfkwcesLnT1xaI9yJS+UqbzFdig/
+         /QjreHUiNjzPHlHrvEgM3lVWeV2l4z4Cna29zQwEIPbGGHBuiL977WBTwSlSOf3M/H4p
+         xhTNKGJff5HbWUDSjKS0JpmMIsYZj8jJydMDvxjbodwZCsckcV4vN1hjbl0rd/2nNiXP
+         ywJ5vi0aiXd/D3dGtG5LhN+IsRXQhohdv+t/Et4oqFM7TNBHiR346sjYemRgkfitFCw1
+         wUoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=/yot0ov3usmKB3Zy+wkJUKPk22BQTuylnVUMZmxsCR4=;
-        b=0h2jc647z5xyOII2RKzn07ySmYrppWwdQZ4fmUuk+P4JJGrmgP3G6pDPJbUSUTZFf/
-         TzHqdyOGtSpg516bMlH3z2acRRF9pi5yEeNll1kkreE+EpQjT0rBxlPtI7OSQe1IrBM/
-         E/je42wJy7y7FD30+2kM2znF3uGhbK2opjUVpPCWBWBuj4YIeCftUQxX++uHWhc6GP4J
-         /o7iz+oe+RV+CYBikl5qxXTWuqRgs4RicwS+Z8d0dEBuIgoQ4oYzBDiwMrefPqjCdpdA
-         vYno9rAzjY0gej5sVDBDnN5zQU7zpSBKSu1mAs31HFULT0EDfcgHEQ1VA0rwyRNlWHO4
-         XieA==
-X-Gm-Message-State: ACrzQf2n4cq55Zv8ee/BjaCb6UEo6Iurdm9kVDeGqk6O1t4anqMgTyBk
-        oieHKTCh8t4XXyItqho2DcWaVQ==
-X-Google-Smtp-Source: AMsMyM4Fm0kTiShfxuAAb97HY9gCdOOBLEjpM6ZrfDeefAteWrULruA4zXYQ/fIChp4JLiLJB3BlqQ==
-X-Received: by 2002:a5d:9902:0:b0:6a2:f72d:4b21 with SMTP id x2-20020a5d9902000000b006a2f72d4b21mr5956574iol.113.1663683273188;
-        Tue, 20 Sep 2022 07:14:33 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id w16-20020a056e0213f000b002f5cd533b31sm125125ilj.0.2022.09.20.07.14.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 07:14:32 -0700 (PDT)
-Message-ID: <9594af4b-eb16-0a51-9a4a-e21bbce3317d@kernel.dk>
-Date:   Tue, 20 Sep 2022 08:14:30 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Thorsten Leemhuis <regressions@leemhuis.info>,
-        Dusty Mabe <dusty@dustymabe.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
- <YxBZ4BBjxvAkvI2A@T590> <20220907073324.GB23826@lst.de>
- <Yxr4SD4d0rZ9TZik@T590> <20220912071618.GA4971@lst.de>
- <Yx/jLTknQm9VeHi4@T590> <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
- <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
- <d39e9149-fcb6-1f7c-4c19-234e74f286f8@kernel.dk>
- <20220920141217.GA12560@lst.de>
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=l4ln2ykBhlZWW5Rwt4pQjcBchsXfZQalKEmYUz/KFhE=;
+        b=surNw3Lhmf4Gl7xn6cXJLftWQLsge9COyXkygywuz9a00i+HX1Vzju4Tvi+Mb8anGe
+         TEnCv25cir1ipMM9ximClPo5XrgfLqH0OjoG74a6UGkeub3NZpU4N+nZkOS/gxmYeEqt
+         fmW9Oq0fVBdaPmCLFUcmVGOAYa9a7JzQ+eP8emWOzmyPol/nA+z1y6lIta/BEKUa+lV1
+         L0sJua+nj4urN6PVJ+gYWNWgPAIjyOt9NUB77pJsmyqmZbS3Z114cxJEcv1T6rO4so58
+         v9dDqNhwfCEOS6fnNjni+UzqgHHzImsyY5whk0XXaFutnfDRXC3gEgxo2rrRNqP473bA
+         FnPA==
+X-Gm-Message-State: ACrzQf0y2Pfw8KVOnw97ofX7tnzmUwYGirqqigAbED9wn1hMNB2EZZGv
+        eY3Q3zMUOZtFY8Oumk0Z/xIxpJUBmLwhSA==
+X-Google-Smtp-Source: AMsMyM4Vxw7zSqXIqTdQr0q20rxhnWPfY6ZufIBK/gLZyuZe1YT4ssQnK92+eioctfjeJX95U/nojQ==
+X-Received: by 2002:a05:6638:5a7:b0:35a:5354:9d6b with SMTP id b7-20020a05663805a700b0035a53549d6bmr10595056jar.53.1663683362653;
+        Tue, 20 Sep 2022 07:16:02 -0700 (PDT)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m13-20020a056e020ded00b002f19d9838c6sm106544ilj.25.2022.09.20.07.16.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Sep 2022 07:16:02 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220920141217.GA12560@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, dusty@dustymabe.com,
+        ming.lei@redhat.com
+In-Reply-To: <20220919144049.978907-1-hch@lst.de>
+References: <20220919144049.978907-1-hch@lst.de>
+Subject: Re: [PATCH] Revert "block: freeze the queue earlier in del_gendisk"
+Message-Id: <166368336208.9534.7513008797616860619.b4-ty@kernel.dk>
+Date:   Tue, 20 Sep 2022 08:16:02 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.10.0-dev-355bd
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/20/22 8:12 AM, Christoph Hellwig wrote:
-> On Tue, Sep 20, 2022 at 08:05:06AM -0600, Jens Axboe wrote:
->> Christoph and I discussed this one last week, and he has a plan to try
->> a flag approach. Christoph, did you get a chance to bang that out? Would
->> be nice to get this one wrapped up.
+On Mon, 19 Sep 2022 16:40:49 +0200, Christoph Hellwig wrote:
+> This reverts commit a09b314005f3a0956ebf56e01b3b80339df577cc.
 > 
-> I gave up on that as it will be far too much change so late in
-> the cycle and sent you the revert yesterday.
+> Dusty Mabe reported consistent hang during CoreOS shutdown with a MD
+> RAID1 setup.  Although apparently similar hangs happened before,
+> and this patch most likely is not the root cause it made it much
+> more severe.  Revert it until we can figure out what is going on
+> with the md driver.
+> 
+> [...]
 
-Gotcha, haven't made it all the way through the emails of the morning yet.
-I'll queue it up.
+Applied, thanks!
 
+[1/1] Revert "block: freeze the queue earlier in del_gendisk"
+      commit: 4c66a326b5ab784cddd72de07ac5b6210e9e1b06
+
+Best regards,
 -- 
 Jens Axboe
 
