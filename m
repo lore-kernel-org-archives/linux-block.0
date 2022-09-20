@@ -2,150 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE153C54EE9
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 03:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58840ECAAD8
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 04:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbiITDem (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 23:34:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44136 "EHLO
+        id S229505AbiITECJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Sep 2022 00:02:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229659AbiITDel (ORCPT
+        with ESMTP id S229575AbiITECH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 23:34:41 -0400
-Received: from out30-56.freemail.mail.aliyun.com (out30-56.freemail.mail.aliyun.com [115.124.30.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A261CCE8;
-        Mon, 19 Sep 2022 20:34:37 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VQHDCtu_1663644874;
-Received: from 30.97.56.91(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQHDCtu_1663644874)
-          by smtp.aliyun-inc.com;
-          Tue, 20 Sep 2022 11:34:35 +0800
-Message-ID: <0642eab9-6124-ba42-1585-82eab1ff9e87@linux.alibaba.com>
-Date:   Tue, 20 Sep 2022 11:34:32 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH V3 4/7] ublk_drv: requeue rqs with recovery feature
- enabled
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
+        Tue, 20 Sep 2022 00:02:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD20328
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 21:02:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663646524;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a2Q6u2DGYBJzVi4q2AHZgi4BSpB8IO5nFEbbegWhcS0=;
+        b=aETcI83EN3r4DmysGOn1+sfiNbwygBYyQPWiFvM7eWH0wN1jjYiVnNFlp0bzdd+839ajMM
+        Scj8wiH81fNgldHzZK8Kpl38k/gUWzWmEAa8+gAtEqpOVZNDflKh4FK4Q768EqDT+HKq33
+        MZoRM6bhXXIJPgZHh1cYA4EwP5VLKgE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-274-9WVQwIFcPDqyrDTBES0yKg-1; Tue, 20 Sep 2022 00:02:00 -0400
+X-MC-Unique: 9WVQwIFcPDqyrDTBES0yKg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 63E6429ABA30;
+        Tue, 20 Sep 2022 04:02:00 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A66621121314;
+        Tue, 20 Sep 2022 04:01:55 +0000 (UTC)
+Date:   Tue, 20 Sep 2022 12:01:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
 Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V3 5/7] ublk_drv: consider recovery feature in aborting
+ mechanism
+Message-ID: <Yyk7LnH9lj303DTj@T590>
 References: <20220913041707.197334-1-ZiyangZhang@linux.alibaba.com>
- <20220913041707.197334-5-ZiyangZhang@linux.alibaba.com>
- <YyfoQuw18kOynxcC@T590>
- <ff61718d-da2d-f754-5e56-b58a3e57820f@linux.alibaba.com>
- <Yyhi/kavaq1aLAQY@T590>
- <84b99294-6859-f49f-d529-c6e3899f2aa2@linux.alibaba.com>
- <Yykn7q/T9CUzZpxH@T590>
- <5383bd34-4f61-f3b0-0a75-a8a2eb75d7ef@linux.alibaba.com>
- <Yykw+NdXr/SX4yq4@T590>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <Yykw+NdXr/SX4yq4@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20220913041707.197334-6-ZiyangZhang@linux.alibaba.com>
+ <Yyg3KLfQaxbS1miq@T590>
+ <9a682fac-f022-1f4d-5c2c-e1f0a84746d8@linux.alibaba.com>
+ <YyhhnbrHTJpW4Xcm@T590>
+ <dbc78e92-ede7-fc63-1bee-83794bf1e33b@linux.alibaba.com>
+ <Yyktx/xz0qTNxnT4@T590>
+ <64492fad-e14a-c647-b490-cd1f53a475a8@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64492fad-e14a-c647-b490-cd1f53a475a8@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/9/20 11:18, Ming Lei wrote:
-> On Tue, Sep 20, 2022 at 11:04:30AM +0800, Ziyang Zhang wrote:
->> On 2022/9/20 10:39, Ming Lei wrote:
->>> On Tue, Sep 20, 2022 at 09:31:54AM +0800, Ziyang Zhang wrote:
->>>> On 2022/9/19 20:39, Ming Lei wrote:
->>>>> On Mon, Sep 19, 2022 at 05:12:21PM +0800, Ziyang Zhang wrote:
->>>>>> On 2022/9/19 11:55, Ming Lei wrote:
->>>>>>> On Tue, Sep 13, 2022 at 12:17:04PM +0800, ZiyangZhang wrote:
->>>>>>>> With recovery feature enabled, in ublk_queue_rq or task work
->>>>>>>> (in exit_task_work or fallback wq), we requeue rqs instead of
->>>>>>>> ending(aborting) them. Besides, No matter recovery feature is enabled
->>>>>>>> or disabled, we schedule monitor_work immediately.
->>>>>>>>
->>>>>>>> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
->>>>>>>> ---
->>>>>>>>  drivers/block/ublk_drv.c | 34 ++++++++++++++++++++++++++++++++--
->>>>>>>>  1 file changed, 32 insertions(+), 2 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
->>>>>>>> index 23337bd7c105..b067f33a1913 100644
->>>>>>>> --- a/drivers/block/ublk_drv.c
->>>>>>>> +++ b/drivers/block/ublk_drv.c
->>>>>>>> @@ -682,6 +682,21 @@ static void ubq_complete_io_cmd(struct ublk_io *io, int res)
->>>>>>>>  
->>>>>>>>  #define UBLK_REQUEUE_DELAY_MS	3
->>>>>>>>  
->>>>>>>> +static inline void __ublk_abort_rq_in_task_work(struct ublk_queue *ubq,
->>>>>>>> +		struct request *rq)
->>>>>>>> +{
->>>>>>>> +	pr_devel("%s: %s q_id %d tag %d io_flags %x.\n", __func__,
->>>>>>>> +			(ublk_queue_can_use_recovery(ubq)) ? "requeue" : "abort",
->>>>>>>> +			ubq->q_id, rq->tag, ubq->ios[rq->tag].flags);
->>>>>>>> +	/* We cannot process this rq so just requeue it. */
->>>>>>>> +	if (ublk_queue_can_use_recovery(ubq)) {
->>>>>>>> +		blk_mq_requeue_request(rq, false);
->>>>>>>> +		blk_mq_delay_kick_requeue_list(rq->q, UBLK_REQUEUE_DELAY_MS);
->>>>>>>
->>>>>>> Here you needn't to kick requeue list since we know it can't make
->>>>>>> progress. And you can do that once before deleting gendisk
->>>>>>> or the queue is recovered.
->>>>>>
->>>>>> No, kicking rq here is necessary.
->>>>>>
->>>>>> Consider USER_RECOVERY is enabled and everything goes well.
->>>>>> User sends STOP_DEV, and we have kicked requeue list in
->>>>>> ublk_stop_dev() and are going to call del_gendisk().
->>>>>> However, a crash happens now. Then rqs may be still requeued
->>>>>> by ublk_queue_rq() because ublk_queue_rq() sees a dying
->>>>>> ubq_daemon. So del_gendisk() will hang because there are
->>>>>> rqs leaving in requeue list and no one kicks them.
->>>>>
->>>>> Why can't you kick requeue list before calling del_gendisk().
->>>>
->>>> Yes, we can kick requeue list once before calling del_gendisk().
->>>> But a crash may happen just after kicking but before del_gendisk().
->>>> So some rqs may be requeued at this moment. But we have already
->>>> kicked the requeue list! Then del_gendisk() will hang, right?
->>>
->>> ->force_abort is set before kicking in ublk_unquiesce_dev(), so
->>> all new requests are failed immediately instead of being requeued,
->>> right?
->>>
->>
->> ->force_abort is not heplful here because there may be fallback wq running
->> which can requeue rqs after kicking requeue list.
+On Tue, Sep 20, 2022 at 11:24:12AM +0800, Ziyang Zhang wrote:
+> On 2022/9/20 11:04, Ming Lei wrote:
+> > On Tue, Sep 20, 2022 at 09:49:33AM +0800, Ziyang Zhang wrote:
+> > 
+> > Follows the delta patch against patch 5 for showing the idea:
+> > 
+> > 
+> > diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> > index 4409a130d0b6..60c5786c4711 100644
+> > --- a/drivers/block/ublk_drv.c
+> > +++ b/drivers/block/ublk_drv.c
+> > @@ -656,7 +656,8 @@ static void ublk_complete_rq(struct request *req)
+> >   * Also aborting may not be started yet, keep in mind that one failed
+> >   * request may be issued by block layer again.
+> >   */
+> > -static void __ublk_fail_req(struct ublk_io *io, struct request *req)
+> > +static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+> > +		struct request *req)
+> >  {
+> >  	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
+> >  
+> > @@ -667,7 +668,10 @@ static void __ublk_fail_req(struct ublk_io *io, struct request *req)
+> >  				req->tag,
+> >  				io->flags);
+> >  		io->flags |= UBLK_IO_FLAG_ABORTED;
+> > -		blk_mq_end_request(req, BLK_STS_IOERR);
+> > +		if (ublk_queue_can_use_recovery_reissue(ubq))
+> > +			blk_mq_requeue_request(req, false);
 > 
-> After ublk_wait_tagset_rqs_idle() returns, there can't be any
-> pending requests in fallback wq or task work, can there
-Please consider this case: a crash happens while ublk_stop_dev() is
-calling. In such case I cannot schedule quiesce_work or call
-ublk_wait_tagset_rqs_idle(). This is because quiesce_work has to
-accquire ub_mutex to quiesce request queue.
+> Here is one problem:
+> We reset io->flags to 0 in ublk_queue_reinit() and it is called before new
+
+As we agreed, ublk_queue_reinit() will be moved to ublk_ch_release(), when there isn't
+any inflight request, which is completed by either ublk server or __ublk_fail_req().
+
+So clearing io->flags isn't related with quisceing device.
+
+> ubq_daemon with FETCH_REQ is accepted. ublk_abort_queue() is not protected with
+> ub_mutex and it is called many times in monitor_work. So same rq may be requeued
+> multiple times.
+
+UBLK_IO_FLAG_ABORTED is set for the slot, so one req is only ended or
+requeued just once.
 
 > 
-> Please look at the 2nd point of the comment log, and I did ask you
-> to add the words for fallback wq and task work.
-> 
->>
->> In ublk_unquiesce_dev(), I simply disable recovery feature
->> if ub's state is UBLK_S_DEV_LIVE while stopping ublk_dev.
-> 
-> monitor work will provide forward progress in case of not applying
-> user recovery.
+> With recovery disabled, there is no such problem since io->flags does not change
+> until ublk_dev is released.
 
-Yes, that's why I disable recovery feature in ublk_stop_dev if quiesce_work
-has not run. In this case nonitor_work can abort rqs.
+But we have agreed that ublk_queue_reinit() can be moved to release
+handler of /dev/ublkcN.
 
 > 
->>
->> Note: We can make sure fallback wq does not run if we wait until all rqs with
->> ACTIVE flag set are requeued. This is done in quiesce_work(). But it cannot
->> run while ublk_stop_dev() is running...
->  
-> Please take a look at the delta patch I just sent, which is supposed to be
-> simpler for addressing this corner case.
+> In my patch 5 I only requeue the same rq once. So re-using ublk_abort_queue() is
+> hard for recovery feature.
 
-I saw your patch, it is for rqs with ACTIVE unset, but I am concerning on rqs
-with ACTIVE set.
+No, the same rq is just requeued once. Here the point is:
 
-Regards,
-Zhang.
+1) reuse previous pattern in ublk_stop_dev(), which is proved as
+workable reliably
+
+2) avoid to stay in half-working state forever
+
+3) the behind idea is more simpler.
+
+
+Thanks.
+Ming
+
