@@ -2,79 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A94E3C6FA8B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 11:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14FDAC6FA8B
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 12:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbiITLae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Sep 2022 07:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49070 "EHLO
+        id S229843AbiITMCd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Sep 2022 08:02:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230190AbiITLa1 (ORCPT
+        with ESMTP id S229518AbiITMCc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Sep 2022 07:30:27 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2946D1EEEB;
-        Tue, 20 Sep 2022 04:30:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Ufnh2nMLFWVGqIEbVXFQ5bFlJnUCbH6WOUk2G18r1y8=; b=WOaF0pb2mROTLVZj6oPFh/FEVU
-        Dl8UExUWm8T66UeCdjXNE09c88ke2G80M4GgWN3ICQ41JHgfvY7DeVuOKLU3QrAyedUw6Gkd9c/JZ
-        xzASYsIw47hVIvPfhdZlxwcIpeIfsMs1aoI4pFyhCieMxjdDFlHcIqyn9Bjk119xt+LQQgeVeHgW9
-        JiG6T7qdN37W/Rc1zdKr3aD/JgQCwyS3Ezmw7EaAupUS/Q+ffG3TkQzgpV6R3eO/Z9WiFAeb8lAeR
-        B67xStuif2T9Mk2ap53GV7HCBlxGa2Dt8whgMwfgbOtYL7aU4wj1hqfjdyVe/wTc8PXEQEnDHPej4
-        MqMWmAcw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oabSC-003JT4-DQ; Tue, 20 Sep 2022 11:30:16 +0000
-Date:   Tue, 20 Sep 2022 04:30:16 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniil Lunev <dlunev@google.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Sarthak Kukreti <sarthakkukreti@chromium.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>
-Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
- provisioned storage
-Message-ID: <YymkSDsFVVg1nbDP@infradead.org>
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
- <YyQTM5PRT2o/GDwy@fedora>
- <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
- <Yylvvm3zVgqpqDrm@infradead.org>
- <CAAKderPF5Z5QLxyEb80Y+90+eR0sfRmL-WfgXLp=eL=HxWSZ9g@mail.gmail.com>
+        Tue, 20 Sep 2022 08:02:32 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D624A614E;
+        Tue, 20 Sep 2022 05:02:30 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 213FE68AA6; Tue, 20 Sep 2022 14:02:27 +0200 (CEST)
+Date:   Tue, 20 Sep 2022 14:02:26 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+        asml.silence@gmail.com, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        gost.dev@samsung.com
+Subject: Re: [PATCH for-next v7 3/5] nvme: refactor nvme_alloc_user_request
+Message-ID: <20220920120226.GB2809@lst.de>
+References: <20220909102136.3020-1-joshi.k@samsung.com> <CGME20220909103143epcas5p2eda60190cd23b79fb8f48596af3e1524@epcas5p2.samsung.com> <20220909102136.3020-4-joshi.k@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAKderPF5Z5QLxyEb80Y+90+eR0sfRmL-WfgXLp=eL=HxWSZ9g@mail.gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20220909102136.3020-4-joshi.k@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 08:17:10PM +1000, Daniil Lunev wrote:
-> to WRITE ZERO command in NVMe, but to WRITE UNAVAILABLE in
+On Fri, Sep 09, 2022 at 03:51:34PM +0530, Kanchan Joshi wrote:
+> Separate this out to two functions with reduced number of arguments.
+> _
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> ---
+>  drivers/nvme/host/ioctl.c | 116 ++++++++++++++++++++++----------------
+>  1 file changed, 66 insertions(+), 50 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+> index 548aca8b5b9f..cb2fa4db50dd 100644
+> --- a/drivers/nvme/host/ioctl.c
+> +++ b/drivers/nvme/host/ioctl.c
+> @@ -65,18 +65,10 @@ static int nvme_finish_user_metadata(struct request *req, void __user *ubuf,
+>  }
+>  
+>  static struct request *nvme_alloc_user_request(struct request_queue *q,
+> +		struct nvme_command *cmd, unsigned timeout,
+>  		blk_opf_t rq_flags, blk_mq_req_flags_t blk_flags)
 
-There is no such thing as WRITE UNAVAILABLE in NVMe.
+I think we can also drop the timeout flag here, which seems like it
+can be handled cleaner in the callers.
+to set it can just do that.
 
-> NVME 2.0 spec, and to UNMAP ANCHORED in SCSI spec.
+> +static int nvme_map_user_request(struct request *req, void __user *ubuffer,
+> +		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+> +		u32 meta_seed, void **metap, bool vec)
+> +{
+> +	struct request_queue *q = req->q;
+> +	struct nvme_ns *ns = q->queuedata;
+> +	struct block_device *bdev = ns ? ns->disk->part0 : NULL;
+> +	struct bio *bio = NULL;
+> +	void *meta = NULL;
+> +	int ret;
+> +
+> +	if (!ubuffer || !bufflen)
+> +		return 0;
 
-The SCSI anchored LBA state is quite complicated, and in addition
-to UNMAP you can also create it using WRITE SAME, which is at least
-partially useful, as it allows for sensible initialization pattern.
-For the purpose of Linux that woud be 0.
+I'd leave these in the callers and not call the helper if there is
+no data to transfer.
 
-That being siad you still haven't actually explained what problem
-you're even trying to solve.
+> +
+> +	if (!vec)
+> +		ret = blk_rq_map_user(q, req, NULL, ubuffer, bufflen,
+> +			GFP_KERNEL);
+> +	else {
+> +		struct iovec fast_iov[UIO_FASTIOV];
+> +		struct iovec *iov = fast_iov;
+> +		struct iov_iter iter;
+> +
+> +		ret = import_iovec(rq_data_dir(req), ubuffer, bufflen,
+> +				UIO_FASTIOV, &iov, &iter);
+> +		if (ret < 0)
+>  			goto out;
+> +		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
+> +		kfree(iov);
+
+To me some of this almost screams like lifting the vectored vs
+not to the block layer into a separate helper.
+
+> +	}
+> +	bio = req->bio;
+> +	if (ret)
+> +		goto out_unmap;
+
+This seems incorrect, we don't need to unmap if blk_rq_map_user*
+failed.
+
+> +	if (bdev)
+> +		bio_set_dev(bio, bdev);
+
+I think we can actually drop this now - bi_bdev should only be used
+by the non-passthrough path these days.
+
+> +	if (bdev && meta_buffer && meta_len) {
+> +		meta = nvme_add_user_metadata(bio, meta_buffer, meta_len,
+> +				meta_seed, req_op(req) == REQ_OP_DRV_OUT);
+> +		if (IS_ERR(meta)) {
+> +			ret = PTR_ERR(meta);
+> +			goto out_unmap;
+>  		}
+> +		req->cmd_flags |= REQ_INTEGRITY;
+> +		*metap = meta;
+
+And if we pass the request to nvme_add_user_metadata, that can set
+REQ_INTEGRITY.  And we don't need this second helper at all.
