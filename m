@@ -2,65 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79143C54EE9
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 06:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473B7C54EE9
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 07:26:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230317AbiITGq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Sep 2022 02:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38604 "EHLO
+        id S230092AbiITH0H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Sep 2022 03:26:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230262AbiITGqX (ORCPT
+        with ESMTP id S230230AbiITH0G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Sep 2022 02:46:23 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3573564E5;
-        Mon, 19 Sep 2022 23:46:22 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8272368BEB; Tue, 20 Sep 2022 08:46:14 +0200 (CEST)
-Date:   Tue, 20 Sep 2022 08:46:13 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-Subject: Re: [PATCH v9 7/8] PCI/P2PDMA: Allow userspace VMA allocations
- through sysfs
-Message-ID: <20220920064613.GB17325@lst.de>
-References: <20220825152425.6296-1-logang@deltatee.com> <20220825152425.6296-8-logang@deltatee.com> <YxDb2MyRx6o/wDAz@kroah.com> <4a4bca1e-bebf-768f-92d4-92eb8ae714e1@deltatee.com> <YxDhEO9ycZDTnbZm@kroah.com> <cc9a24a8-dd3a-9d21-d9a7-5ee4b0ad7a57@deltatee.com> <YxD7uZYaV75gJS9d@kroah.com> <fb9d7948-43fe-87c5-5275-70f280181ad1@deltatee.com> <YxGad5h2Nn/Ejslc@kroah.com> <db8cd049-c78b-1aa0-dcd0-0feb8c6cb25c@deltatee.com>
+        Tue, 20 Sep 2022 03:26:06 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231E951A35;
+        Tue, 20 Sep 2022 00:26:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qteLBBo7gVyIzY+cqTBV2I+NHOr6YHBw0FIcyQI9tp8=; b=U3km51K/9URRR722eOD617czlB
+        kqYZuclNDxR6GAVHQG3rJZMaxuqea8tUvU/koafALedar/8WuJg+KJyLEcsxoXQJByN3xPoakhMPJ
+        McLagTM5reMYyM+mDumkJtDVs5/+tUkMbn5vLgLPvsygRLLzh8gJuUluxOZOtOZyrR1raZN8lIQor
+        0Msm8hPNHjhhNr4I5brlzrtuOyyRV2Xh/TkvUNtjgyfONhZ7B7LC3xcst135iXYeUB9hKvkX5Ej78
+        EomQxwVHT7hkQvUVfVUSIxO126iYx9NuGH/aSRN7sRx8oyBpXjRNwF6SuleSfBnyNEktiOCW7eQdy
+        yKds+8xA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oaXdh-001LTm-Vw; Tue, 20 Sep 2022 07:25:53 +0000
+Date:   Tue, 20 Sep 2022 00:25:53 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+Subject: Re: [PATCH v2 3/3] blk-wbt: don't enable throttling if default
+ elevator is bfq
+Message-ID: <YylrAbQ75wCAj5va@infradead.org>
+References: <20220919070916.2738443-1-yukuai1@huaweicloud.com>
+ <20220919070916.2738443-4-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <db8cd049-c78b-1aa0-dcd0-0feb8c6cb25c@deltatee.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220919070916.2738443-4-yukuai1@huaweicloud.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 02, 2022 at 12:46:54PM -0600, Logan Gunthorpe wrote:
-> See the diff at the bottom of this email. I can apply it on top of this
-> patch, but IMO it is neither easier to follow nor maintain. Unless you 
-> have a different suggestion...
+Matching names is always is a bad idea.
 
-Greg, can you chime in on this?  Besides this item we just have a few
-cosmetic bits left I think, and I'd really like to get the series into
-this merge window.
+Just ad a flags field to elevator_mq_ops, add a DISABLE_WBT flag
+to it, and check for that and everything should become much, much
+simpler.
 
