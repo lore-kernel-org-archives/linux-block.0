@@ -2,225 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D311C6FA8B
-	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 02:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 100A5C6FA82
+	for <linux-block@archiver.kernel.org>; Tue, 20 Sep 2022 02:40:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230204AbiITCdx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Sep 2022 22:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34880 "EHLO
+        id S229599AbiITCj6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Sep 2022 22:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiITCdw (ORCPT
+        with ESMTP id S229496AbiITCj6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Sep 2022 22:33:52 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE724578A5
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 19:33:50 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id kr11so2878693ejc.8
-        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 19:33:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=4WdgOQEnTGB5AD0/3SYqzq4oO226bgoIvmn6I1vr/DE=;
-        b=B66Mfs4AndtZMHw0cxrGW2QT2/SRG5s1osj6N3OngZcnx85hUZVIBES+B1K+Ef5VEO
-         I4B/iSWs1ss6it+OJ7yy5H7AFUGDRdkrQeaoUPdd5rLx+456n9LX0uLS4Q/V5aDMEDfQ
-         jgl8mGOUixXp4MezbRgD7YZXWSGjAQ8Op8BPY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=4WdgOQEnTGB5AD0/3SYqzq4oO226bgoIvmn6I1vr/DE=;
-        b=X/AJEJYbXEiY+2L5WDilOTnTfAw5BSnKI6kp6RjfX3g56TSibP9iowknoMIq50lSmS
-         EFszJi3x4QzN4v18L58iJzCqyTsyKkB764nM39kqdjL7eoWJzGcT2X1+Y2S3An1cZsEF
-         /i2YEYi37uQHr0fG7i8aMHxEQe89XmmIJgxCTWgWaF+5s2X76KMKPdRoferMoFOuyxmL
-         RbAr3McPUBbgGaXkwsh8v0QXSaH4CcSur6XIUGoxDc7w69lct77baO9wEYaVTxLEbpK4
-         gAEKcaSuh38Pm+/hhyHJ3lxuGjZAfGbWhB5A9SBJKu+VfjmBJYv26QILwcl7Pvgfn0bC
-         n+eA==
-X-Gm-Message-State: ACrzQf23njVvmwbW0dUrGPTK1FD8ng7TiU83Fv/pIx8dar9e4xZAr1dh
-        eokNJCfDQY+/mGkKA+TPZ+U7fmW51QPJiFwtAYsUmw==
-X-Google-Smtp-Source: AMsMyM6oA07pBoPv0NiRcgoDeKipAqKueA2dka5/YzaH22PcO7CPkT4imFruPehqxaOY1hLqLkVMvRcG/EQO9P7eK/0=
-X-Received: by 2002:a17:906:9746:b0:781:913d:6cc7 with SMTP id
- o6-20020a170906974600b00781913d6cc7mr3007772ejy.386.1663641229240; Mon, 19
- Sep 2022 19:33:49 -0700 (PDT)
+        Mon, 19 Sep 2022 22:39:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8E34286E2
+        for <linux-block@vger.kernel.org>; Mon, 19 Sep 2022 19:39:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663641595;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=j2anbc9EZCx2mxhFesSjUByCEffPhUgCP5vJVuSR+/U=;
+        b=MpEx1vyuBMz/t2U5ZM3BnOgyVA5RqA+KOFYNKke1dpBnz+Zz8hDlCo8rD0y4KWXUbo1WkF
+        OLACHV0joMK1YBSPR1tvLXNlZeXcdOzMeorJ7iL899gNe/DRaM40j0paVlBc6TKRkc3EtO
+        ZPj/PbLw/3LhBBFMv4IX443eKrMBkpU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-6-gQ9oF2AONqmQqXOtZ1UvfQ-1; Mon, 19 Sep 2022 22:39:52 -0400
+X-MC-Unique: gQ9oF2AONqmQqXOtZ1UvfQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 330D51C0BC60;
+        Tue, 20 Sep 2022 02:39:52 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3075817583;
+        Tue, 20 Sep 2022 02:39:47 +0000 (UTC)
+Date:   Tue, 20 Sep 2022 10:39:42 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V3 4/7] ublk_drv: requeue rqs with recovery feature
+ enabled
+Message-ID: <Yykn7q/T9CUzZpxH@T590>
+References: <20220913041707.197334-1-ZiyangZhang@linux.alibaba.com>
+ <20220913041707.197334-5-ZiyangZhang@linux.alibaba.com>
+ <YyfoQuw18kOynxcC@T590>
+ <ff61718d-da2d-f754-5e56-b58a3e57820f@linux.alibaba.com>
+ <Yyhi/kavaq1aLAQY@T590>
+ <84b99294-6859-f49f-d529-c6e3899f2aa2@linux.alibaba.com>
 MIME-Version: 1.0
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
- <20220915164826.1396245-4-sarthakkukreti@google.com> <YyQOFTI4CWn041UM@fedora>
-In-Reply-To: <YyQOFTI4CWn041UM@fedora>
-From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
-Date:   Mon, 19 Sep 2022 19:33:37 -0700
-Message-ID: <CAG9=OMM4uQiJuu+ChUq-hoiyKMrBOECgz=+xw+=LmcPt2FVwOQ@mail.gmail.com>
-Subject: Re: [PATCH RFC 3/8] virtio_blk: Add support for provision requests
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <84b99294-6859-f49f-d529-c6e3899f2aa2@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2022 at 10:48 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Thu, Sep 15, 2022 at 09:48:21AM -0700, Sarthak Kukreti wrote:
-> > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> >
-> > Adds support for provision requests. Provision requests act like
-> > the inverse of discards.
-> >
-> > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> > ---
-> >  drivers/block/virtio_blk.c      | 48 +++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/virtio_blk.h |  9 +++++++
-> >  2 files changed, 57 insertions(+)
->
-> Please send a VIRTIO spec patch too:
-> https://github.com/oasis-tcs/virtio-spec#providing-feedback
->
-Thanks for the suggestion! Ref:
-https://lists.oasis-open.org/archives/virtio-comment/202209/msg00025.html
+On Tue, Sep 20, 2022 at 09:31:54AM +0800, Ziyang Zhang wrote:
+> On 2022/9/19 20:39, Ming Lei wrote:
+> > On Mon, Sep 19, 2022 at 05:12:21PM +0800, Ziyang Zhang wrote:
+> >> On 2022/9/19 11:55, Ming Lei wrote:
+> >>> On Tue, Sep 13, 2022 at 12:17:04PM +0800, ZiyangZhang wrote:
+> >>>> With recovery feature enabled, in ublk_queue_rq or task work
+> >>>> (in exit_task_work or fallback wq), we requeue rqs instead of
+> >>>> ending(aborting) them. Besides, No matter recovery feature is enabled
+> >>>> or disabled, we schedule monitor_work immediately.
+> >>>>
+> >>>> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> >>>> ---
+> >>>>  drivers/block/ublk_drv.c | 34 ++++++++++++++++++++++++++++++++--
+> >>>>  1 file changed, 32 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> >>>> index 23337bd7c105..b067f33a1913 100644
+> >>>> --- a/drivers/block/ublk_drv.c
+> >>>> +++ b/drivers/block/ublk_drv.c
+> >>>> @@ -682,6 +682,21 @@ static void ubq_complete_io_cmd(struct ublk_io *io, int res)
+> >>>>  
+> >>>>  #define UBLK_REQUEUE_DELAY_MS	3
+> >>>>  
+> >>>> +static inline void __ublk_abort_rq_in_task_work(struct ublk_queue *ubq,
+> >>>> +		struct request *rq)
+> >>>> +{
+> >>>> +	pr_devel("%s: %s q_id %d tag %d io_flags %x.\n", __func__,
+> >>>> +			(ublk_queue_can_use_recovery(ubq)) ? "requeue" : "abort",
+> >>>> +			ubq->q_id, rq->tag, ubq->ios[rq->tag].flags);
+> >>>> +	/* We cannot process this rq so just requeue it. */
+> >>>> +	if (ublk_queue_can_use_recovery(ubq)) {
+> >>>> +		blk_mq_requeue_request(rq, false);
+> >>>> +		blk_mq_delay_kick_requeue_list(rq->q, UBLK_REQUEUE_DELAY_MS);
+> >>>
+> >>> Here you needn't to kick requeue list since we know it can't make
+> >>> progress. And you can do that once before deleting gendisk
+> >>> or the queue is recovered.
+> >>
+> >> No, kicking rq here is necessary.
+> >>
+> >> Consider USER_RECOVERY is enabled and everything goes well.
+> >> User sends STOP_DEV, and we have kicked requeue list in
+> >> ublk_stop_dev() and are going to call del_gendisk().
+> >> However, a crash happens now. Then rqs may be still requeued
+> >> by ublk_queue_rq() because ublk_queue_rq() sees a dying
+> >> ubq_daemon. So del_gendisk() will hang because there are
+> >> rqs leaving in requeue list and no one kicks them.
+> > 
+> > Why can't you kick requeue list before calling del_gendisk().
+> 
+> Yes, we can kick requeue list once before calling del_gendisk().
+> But a crash may happen just after kicking but before del_gendisk().
+> So some rqs may be requeued at this moment. But we have already
+> kicked the requeue list! Then del_gendisk() will hang, right?
 
-The patch needs to be amended a bit to account for the diff. in the
-spec and the original patch. Will update in the next patch iteration.
+->force_abort is set before kicking in ublk_unquiesce_dev(), so
+all new requests are failed immediately instead of being requeued,
+right?
 
-Best
-Sarthak
 
-> Stefan
->
-> >
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 30255fcaf181..eacc2bffe1d1 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -178,6 +178,39 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
-> >       return 0;
-> >  }
-> >
-> > +static int virtblk_setup_provision(struct request *req)
-> > +{
-> > +     unsigned short segments = blk_rq_nr_discard_segments(req);
-> > +     unsigned short n = 0;
-> > +
-> > +     struct virtio_blk_discard_write_zeroes *range;
-> > +     struct bio *bio;
-> > +     u32 flags = 0;
-> > +
-> > +     range = kmalloc_array(segments, sizeof(*range), GFP_ATOMIC);
-> > +     if (!range)
-> > +             return -ENOMEM;
-> > +
-> > +     __rq_for_each_bio(bio, req) {
-> > +             u64 sector = bio->bi_iter.bi_sector;
-> > +             u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
-> > +
-> > +             range[n].flags = cpu_to_le32(flags);
-> > +             range[n].num_sectors = cpu_to_le32(num_sectors);
-> > +             range[n].sector = cpu_to_le64(sector);
-> > +             n++;
-> > +     }
-> > +
-> > +     WARN_ON_ONCE(n != segments);
-> > +
-> > +     req->special_vec.bv_page = virt_to_page(range);
-> > +     req->special_vec.bv_offset = offset_in_page(range);
-> > +     req->special_vec.bv_len = sizeof(*range) * segments;
-> > +     req->rq_flags |= RQF_SPECIAL_PAYLOAD;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static void virtblk_unmap_data(struct request *req, struct virtblk_req *vbr)
-> >  {
-> >       if (blk_rq_nr_phys_segments(req))
-> > @@ -243,6 +276,9 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
-> >       case REQ_OP_DRV_IN:
-> >               type = VIRTIO_BLK_T_GET_ID;
-> >               break;
-> > +     case REQ_OP_PROVISION:
-> > +             type = VIRTIO_BLK_T_PROVISION;
-> > +             break;
-> >       default:
-> >               WARN_ON_ONCE(1);
-> >               return BLK_STS_IOERR;
-> > @@ -256,6 +292,11 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
-> >                       return BLK_STS_RESOURCE;
-> >       }
-> >
-> > +     if (type == VIRTIO_BLK_T_PROVISION) {
-> > +             if (virtblk_setup_provision(req))
-> > +                     return BLK_STS_RESOURCE;
-> > +     }
-> > +
-> >       return 0;
-> >  }
-> >
-> > @@ -1075,6 +1116,12 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >               blk_queue_max_write_zeroes_sectors(q, v ? v : UINT_MAX);
-> >       }
-> >
-> > +     if (virtio_has_feature(vdev, VIRTIO_BLK_F_PROVISION)) {
-> > +             virtio_cread(vdev, struct virtio_blk_config,
-> > +                          max_provision_sectors, &v);
-> > +             q->limits.max_provision_sectors = v ? v : UINT_MAX;
-> > +     }
-> > +
-> >       virtblk_update_capacity(vblk, false);
-> >       virtio_device_ready(vdev);
-> >
-> > @@ -1177,6 +1224,7 @@ static unsigned int features[] = {
-> >       VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
-> >       VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
-> >       VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
-> > +     VIRTIO_BLK_F_PROVISION,
-> >  };
-> >
-> >  static struct virtio_driver virtio_blk = {
-> > diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> > index d888f013d9ff..184f8cf6d185 100644
-> > --- a/include/uapi/linux/virtio_blk.h
-> > +++ b/include/uapi/linux/virtio_blk.h
-> > @@ -40,6 +40,7 @@
-> >  #define VIRTIO_BLK_F_MQ              12      /* support more than one vq */
-> >  #define VIRTIO_BLK_F_DISCARD 13      /* DISCARD is supported */
-> >  #define VIRTIO_BLK_F_WRITE_ZEROES    14      /* WRITE ZEROES is supported */
-> > +#define VIRTIO_BLK_F_PROVISION       15      /* provision is supported */
-> >
-> >  /* Legacy feature bits */
-> >  #ifndef VIRTIO_BLK_NO_LEGACY
-> > @@ -120,6 +121,11 @@ struct virtio_blk_config {
-> >        */
-> >       __u8 write_zeroes_may_unmap;
-> >
-> > +     /*
-> > +      * The maximum number of sectors in a provision request.
-> > +      */
-> > +     __virtio32 max_provision_sectors;
-> > +
-> >       __u8 unused1[3];
-> >  } __attribute__((packed));
-> >
-> > @@ -155,6 +161,9 @@ struct virtio_blk_config {
-> >  /* Write zeroes command */
-> >  #define VIRTIO_BLK_T_WRITE_ZEROES    13
-> >
-> > +/* Provision command */
-> > +#define VIRTIO_BLK_T_PROVISION       14
-> > +
-> >  #ifndef VIRTIO_BLK_NO_LEGACY
-> >  /* Barrier before this op. */
-> >  #define VIRTIO_BLK_T_BARRIER 0x80000000
-> > --
-> > 2.31.0
-> >
+Thanks, 
+Ming
+
