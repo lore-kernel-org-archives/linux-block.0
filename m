@@ -2,200 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE58C6FA82
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 17:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32743C6FA8B
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 17:59:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbiIURdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 13:33:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58126 "EHLO
+        id S229842AbiIUR7x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 13:59:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbiIURdB (ORCPT
+        with ESMTP id S229938AbiIUR7t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 13:33:01 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C424A1D68
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 10:32:55 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220921173250euoutp0246c28b171e35533dbd258bb256ca1fae~W8IXgnPwE1361213612euoutp02g
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 17:32:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220921173250euoutp0246c28b171e35533dbd258bb256ca1fae~W8IXgnPwE1361213612euoutp02g
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1663781570;
-        bh=3Ci10O2BVi/HktN0SRzO4buCtgT/msmMdQxBp8IfR8Y=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=jFi1QKww3b6OGjZPqJJFuVmrch3IxUK9rBO4jjLJafGHkWikJOOUb7TDJvenuAiM5
-         lB1cu5h5/F/WW4RQQK/3drIjzlIfwFi9VibTd+eu1vEpgAaKr6hJnxBynJJg9x3Cdo
-         WnEewb/A/jYp6lE29W6DyYDM5aNQDwYRPafSeiZw=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220921173249eucas1p205c67c6120e3314a1324332e3c725528~W8IWuikMW0485404854eucas1p2f;
-        Wed, 21 Sep 2022 17:32:49 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 52.87.19378.1CA4B236; Wed, 21
-        Sep 2022 18:32:49 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220921173248eucas1p23403baa578aa335747fb8a62145a577f~W8IWL9LNd0562805628eucas1p2p;
-        Wed, 21 Sep 2022 17:32:48 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220921173248eusmtrp1119dd3978522ddbd060337edcc92edd2~W8IWLHoqA1591515915eusmtrp1V;
-        Wed, 21 Sep 2022 17:32:48 +0000 (GMT)
-X-AuditID: cbfec7f5-a4dff70000014bb2-1a-632b4ac1bb46
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 0A.7B.10862.0CA4B236; Wed, 21
-        Sep 2022 18:32:48 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220921173248eusmtip2825416e5fdc058383a65eb9819720136~W8IWAmJkC2186421864eusmtip20;
-        Wed, 21 Sep 2022 17:32:48 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.192) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 21 Sep 2022 18:32:46 +0100
-Message-ID: <fc7d88a5-f65b-3962-22e5-cc393535d66d@samsung.com>
-Date:   Wed, 21 Sep 2022 19:32:45 +0200
+        Wed, 21 Sep 2022 13:59:49 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DA8B275DA
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 10:59:46 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id v128so5664492ioe.12
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 10:59:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=hf/HnpywcTa/krqK+PEEFk3kz6BZ3SHmt4R3jnHLtp4=;
+        b=hOU6LNdM4ZzAoRL9h5lNddvCMlTeELuhrKtih70gQoaQJ9/TFIrE65hi57qlJj5DEK
+         Jo5mQqDhJ4X5IscIFB0nMlvN6mh/0sLk03hXnfeSLXH+YilaH6jDHpmU1AGpv0QlEL0q
+         SrwD5nYBiGP1Yl0xHN998aCNAtOGPCh692A5MLmN+jlVMF44uPnvy4QvSxeCaRQnMcV2
+         qGtauL2/hBDdkTeYwNRkMUGQgUr+A+2bTxJEOOuOyGExO6Px0JyuT12G1JjMDj1Hh8qL
+         1PtU7mgqYLua9GFmeq7jcB9zy01hkEDDQKdkrQjNrWKPmn7pNdtJp6OFAtIqLkC9W9NX
+         1/RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=hf/HnpywcTa/krqK+PEEFk3kz6BZ3SHmt4R3jnHLtp4=;
+        b=tRDpSgS6gcWA2jhWPwzHNS0yU+6aPrqzAkiqfTUa/F8aOLJC1M8z+Omh/E10PrtH7X
+         K6/d7FMrr/s6HAc6DrZ/T3v/1SBvAUEYo1LLbqID0Z/PGeb7bvSnR9Dwp8EYFGN+oCoy
+         XyJCTc4TGd037l7mojeW5b07U55Z71L1D6395JpvPGlet3i9R0mepI4RJn30GtjkZMVW
+         p33U+nRT+IXicu24deN7M+Q30PLLjOu0jqbtsP/4Ig+fENE0GOIZlEjo94Fv99FvcCTg
+         A7NrJV98jprW/mAKSP+I7bIysGVKVvwcLtJYSzybvpa5jyewc3JSoQwmF5J62JEa3LcZ
+         uGkw==
+X-Gm-Message-State: ACrzQf1GjPCL89c2gGx/H9jxm2c60eFJh+wcjNSGdbXxIpCoUO8rxIxl
+        JnsCHYfXrXptlpIhkjmwKp0neg==
+X-Google-Smtp-Source: AMsMyM4S0Ok07pZar40reKgjPXQHdRE42YcSlpmOdGA5zvN/rPnTHTYQNCS1CzZ3qN8uJp+r6w9JPg==
+X-Received: by 2002:a05:6638:134f:b0:35a:5b6a:9591 with SMTP id u15-20020a056638134f00b0035a5b6a9591mr14632494jad.184.1663783186010;
+        Wed, 21 Sep 2022 10:59:46 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id l40-20020a026668000000b00349dc447fbasm1258582jaf.52.2022.09.21.10.59.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Sep 2022 10:59:45 -0700 (PDT)
+Message-ID: <54666720-609b-c639-430d-1dc61e96a6c6@kernel.dk>
+Date:   Wed, 21 Sep 2022 11:59:44 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.11.0
-Subject: Re: [PATCH v14 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v5 2/3] block: io-uring: add READV_PI/WRITEV_PI operations
 Content-Language: en-US
-To:     Mike Snitzer <snitzer@redhat.com>
-CC:     <agk@redhat.com>, <snitzer@kernel.org>, <axboe@kernel.dk>,
-        <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@wdc.com>, <bvanassche@acm.org>,
-        <pankydev8@gmail.com>, <gost.dev@samsung.com>,
-        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        <jaegeuk@kernel.org>, <matias.bjorling@wdc.com>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <Yys9sTqCIzxVFwyX@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     "Alexander V. Buev" <a.buev@yadro.com>, linux-block@vger.kernel.org
+Cc:     io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+References: <20220920144618.1111138-1-a.buev@yadro.com>
+ <20220920144618.1111138-3-a.buev@yadro.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220920144618.1111138-3-a.buev@yadro.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.192]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrPKsWRmVeSWpSXmKPExsWy7djP87oHvbSTDT4c4rNYf+oYs8Xqu/1s
-        FtM+/GS2+H32PLNFa/s3Jou972azWqxcfZTJ4sn6WcwWf7vuAcVuaVtc3jWHzWL+sqfsFhPa
-        vjJbrLn5lMXixC1pi7aNXxkdBDwuX/H22DnrLrvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we
-        7/ddZfP4vEnOo/1AN1MAVxSXTUpqTmZZapG+XQJXRsuJSSwFLcIVt+9MYGxgbOHvYuTkkBAw
-        kTh3bgtbFyMXh5DACkaJXSv3s0I4XxglGpdeYoJwPjNK9De/ZINpWTHnMSOILSSwnFHiw2E/
-        uKKPPxrYIZzdjBJ91zYAdXBw8ArYSbSvkAVpYBFQlXi29BgTiM0rIChxcuYTFhBbVCBSYs3u
-        s+wgtrBAtsSrC9PAFjALiEvcejKfCWSMCFDvrWkuIOOZBQ4xS6xrew0WZxPQkmjsBGvlBDIP
-        vvzKAtGqKdG6/Tc7hC0vsf3tHGaI+5UlZt6cCmXXSqw9dgbsZAmBR5wSv873QD3pInG28yQj
-        hC0s8er4FnYIW0bi9OQeFgi7WuLpjd/MEM0twBDauR7sXwkBa4m+MzkQNY4S565uYocI80nc
-        eCsIcQ+fxKRt05knMKrOQgqJWUg+noXkhVlIXljAyLKKUTy1tDg3PbXYOC+1XK84Mbe4NC9d
-        Lzk/dxMjMA2e/nf86w7GFa8+6h1iZOJgPMQowcGsJMI7+45mshBvSmJlVWpRfnxRaU5q8SFG
-        aQ4WJXFethlayUIC6YklqdmpqQWpRTBZJg5OqQamlun7tzMdF9oxaYZZlnzYkncdod/m51V4
-        btu54+2p8HLrC/f1+m8cyV7kUf/64ErVmdM4PlbOWHdi7buJX/JCe5s/zrTh+c+qsE/0PMec
-        FbLrivoPG/rPlYpk/PvX9ON79eveJ+ICjqpMcWt71qJ8qO+Wg4OT5ocSle2rWt4VXA1bV6nE
-        7To/6L7O7KDo+6bikmaGVzeZTIrN5j8vs+Bj+7PuWWKiJR/C/H7PeHr/QHDXVLEwhnWMXR9F
-        hPr0Io9c+3Rm3Y5Hro4zb2e/0WZyPz+L52T43CDr3t5rr5X4BBYtFb9kMvGfnfyzb0oBx53F
-        T002eWetZXX6i/La3zLe1xand6/zYL2v13Odq+THCSWW4oxEQy3mouJEAGmuP8jyAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKKsWRmVeSWpSXmKPExsVy+t/xe7oHvLSTDX62aFisP3WM2WL13X42
-        i2kffjJb/D57ntmitf0bk8Xed7NZLVauPspk8WT9LGaLv133gGK3tC0u75rDZjF/2VN2iwlt
-        X5kt1tx8ymJx4pa0RdvGr4wOAh6Xr3h77Jx1l93j8tlSj02rOtk8Ni+p99h9s4HNY2frfVaP
-        9/uusnl83iTn0X6gmymAK0rPpii/tCRVISO/uMRWKdrQwkjP0NJCz8jEUs/Q2DzWyshUSd/O
-        JiU1J7MstUjfLkEvo+XEJJaCFuGK23cmMDYwtvB3MXJySAiYSKyY85ixi5GLQ0hgKaPE3et/
-        WSESMhKfrnxkh7CFJf5c62KDKPrIKPH+6FVmCGc3o8S2B/OAqjg4eAXsJNpXyII0sAioSjxb
-        eowJxOYVEJQ4OfMJC4gtKhAp8XBZE1hcWCBb4tWFaYwgNrOAuMStJ/OZQMaIAPXemuYCMp5Z
-        4BCzxLq210wQu+4xSmzufc0GUsQmoCXR2Al2HCeQefDlVxaIOZoSrdt/s0PY8hLb385hhnhA
-        WWLmzalQdq3Eq/u7GScwis5Cct4sJGfMQjJqFpJRCxhZVjGKpJYW56bnFhvpFSfmFpfmpesl
-        5+duYgSmj23Hfm7Zwbjy1Ue9Q4xMHIyHGCU4mJVEeGff0UwW4k1JrKxKLcqPLyrNSS0+xGgK
-        DKOJzFKiyfnABJZXEm9oZmBqaGJmaWBqaWasJM7rWdCRKCSQnliSmp2aWpBaBNPHxMEp1cDk
-        K6PW+rD/4XSJvANHuOwzNaXkbr7S3JDJtf/hrVPCPDPYJ+bsMw1WvSDQeC5+CY8MG+NbVXmH
-        61PmGh2YlWG83Id5c5/T/IgPBeHzrVifWz9ZbClnPPdAmInT4XD7yLTfoQoszSsjNlUcWp3t
-        dC5Yys8yo1bwBsOPJZ/LuA6GZbcVuf9+9+yJX6ZlTrEDm9TWD5rNLT2fTzqdZF66bkPY8o65
-        qaFs5mm55REn4s7UND6c2pY+a+fKtUxGoTKpEV1K/35nvRA+89IzWdv5tGP1P5fpXq4z9FO4
-        nt1/rjybeUKB+PHXLkd9tPkj395alNSYwGN6O2PJ9OWvNl7fPuVxR1eq1R33f3tu8xlmPVBi
-        Kc5INNRiLipOBAATeEQ9qAMAAA==
-X-CMS-MailID: 20220921173248eucas1p23403baa578aa335747fb8a62145a577f
-X-Msg-Generator: CA
-X-RootMTR: 20220920091134eucas1p275585b70fab48ba1f19eb5d2cc515b6d
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220920091134eucas1p275585b70fab48ba1f19eb5d2cc515b6d
-References: <20220920091119.115879-1-p.raghav@samsung.com>
-        <CGME20220920091134eucas1p275585b70fab48ba1f19eb5d2cc515b6d@eucas1p2.samsung.com>
-        <20220920091119.115879-14-p.raghav@samsung.com>
-        <Yys9sTqCIzxVFwyX@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> +/*
->> + * This target works on the complete zoned device. Partial mapping is not
->> + * supported.
->> + * Construct a zoned po2 logical device: <dev-path>
->> + */
->> +static int dm_po2z_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->> +{
->> +	struct dm_po2z_target *dmh = NULL;
->> +	int ret;
->> +	sector_t zone_size;
->> +	sector_t dev_capacity;
->> +
->> +	if (argc != 1)
->> +		return -EINVAL;
->> +
->> +	dmh = kmalloc(sizeof(*dmh), GFP_KERNEL);
->> +	if (!dmh)
->> +		return -ENOMEM;
->> +
->> +	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table),
->> +			    &dmh->dev);
->> +	if (ret) {
->> +		ti->error = "Device lookup failed";
->> +		goto bad;
->> +	}
->> +
->> +	if (!bdev_is_zoned(dmh->dev->bdev)) {
->> +		DMERR("%pg is not a zoned device", dmh->dev->bdev);
->> +		ret = -EINVAL;
->> +		goto bad;
->> +	}
->> +
->> +	zone_size = bdev_zone_sectors(dmh->dev->bdev);
->> +	dev_capacity = get_capacity(dmh->dev->bdev->bd_disk);
->> +	if (ti->len != dev_capacity) {
->> +		DMERR("%pg Partial mapping of the target is not supported",
->> +		      dmh->dev->bdev);
->> +		ret = -EINVAL;
->> +		goto bad;
->> +	}
->> +
->> +	if (is_power_of_2(zone_size))
->> +		DMWARN("%pg: underlying device has a power-of-2 number of sectors per zone",
->> +		       dmh->dev->bdev);
->> +
->> +	dmh->zone_size = zone_size;
->> +	dmh->zone_size_po2 = 1 << get_count_order_long(zone_size);
->> +	dmh->zone_size_po2_shift = ilog2(dmh->zone_size_po2);
->> +	dmh->zone_size_diff = dmh->zone_size_po2 - dmh->zone_size;
->> +	ti->private = dmh;
->> +	ti->max_io_len = dmh->zone_size_po2;
->> +	dmh->nr_zones = npo2_zone_no(dmh, ti->len);
->> +	ti->len = dmh->zone_size_po2 * dmh->nr_zones;
->> +	return 0;
->> +
->> +bad:
->> +	kfree(dmh);
->> +	return ret;
->> +}
-> 
-> This error handling still isn't correct.  You're using
-> dm_get_device().  If you return early due to error, _after_
-> dm_get_device(), you need to dm_put_device().
-> 
-> Basically you need a new label above "bad:" that calls dm_put_device()
-> then falls through to "bad:".  Or you need to explcitly call
-> dm_put_device() before "goto bad;" in the if (ti->len != dev_capacity)
-> error branch.
-> 
+On 9/20/22 8:46 AM, Alexander V. Buev wrote:
+> Added new READV_PI/WRITEV_PI operations to io_uring.
+> Added new pi_addr & pi_len fields to SQE struct.
+> Added new IOCB_USE_PI flag to kiocb struct.
+> Use kiocb->private pointer to pass PI data
+> iterator to low layer.
 
-Ah. I naively assumed dtr will be called to cleanup but not in this case as
-the ctr itself fails.
+Minor nit - please format commit message lines to 72-74 chars.
 
-I will add an extra label on top of `bad` and use it for errors that
-happens after `dm_get_device`. Thanks for pointing it out Mike.
+In general, I think this feature is useful. I do echo Keith's response
+that it should probably be named a bit differently, as PI is just one
+use case of this.
+
+But for this patch in particular, not a huge fan of the rote copying of
+rw.c into a new file. Now we have to patch two different spots whenever
+a bug is found in there, that's not very maintainable. I do appreciate
+the fact that this keeps the PI work out of the fast path for
+read/write, but I do think this warrants a bit of refactoring work first
+to ensure that there are helpers that can be shared between rw and
+rw_pi. That definitely needs to be solved before this can be considered
+for inclusion.
+
+-- 
+Jens Axboe
