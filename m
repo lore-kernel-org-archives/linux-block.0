@@ -2,164 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFCAECAAD8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 12:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4300CC6FA8E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 14:34:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiIUMQ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 08:16:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39736 "EHLO
+        id S229663AbiIUOed (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 10:34:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiIUMQ0 (ORCPT
+        with ESMTP id S229551AbiIUOeb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 08:16:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB52A7D1C5
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 05:16:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663762584;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lRz/z/AXpEruTQsHU4EAQEPc0Y+Waw+jrJW7+kWECyI=;
-        b=HC1WaawmTydvuc2LUpWkM8stA646rPW9rVnWDrInzSOEHFSiILBF18jfAL1GdizbpJQK/u
-        ATYiFKN3pCjg/fZXJm+VhXq52z3jAgSGoFIvFDX3jQGZPePiTamidNb9XxlYWvBvFDOQrg
-        c6o/b/+e4R6BXmQK9oHEDomgVU9bwx0=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-133-MiyWjtkHPuGg2HYcJPaO3w-1; Wed, 21 Sep 2022 08:16:23 -0400
-X-MC-Unique: MiyWjtkHPuGg2HYcJPaO3w-1
-Received: by mail-pg1-f200.google.com with SMTP id 14-20020a63000e000000b00438c0563dc2so3354855pga.9
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 05:16:23 -0700 (PDT)
+        Wed, 21 Sep 2022 10:34:31 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86504FD12
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 07:34:28 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id d8so5147742iof.11
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 07:34:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=y9qJH4p5mVpa4a017Npx8Guug2HXx37SOnXReOlQQDI=;
+        b=6neaLw7Rl2m8fqveO8b9p7b7NV80spZJC8zDn3ZoSFYLYAIH13wXecVlYPcFiOptaD
+         vmaLnx9f7h95Ri0MaRTL/xBPTEWBF2r8FvErC5F9I1GpMaFmaYr9PgO7KOd1VR1WTc8/
+         Fn3ju5Y42QSBnLEG4S24GK/vx8ymmiAaGu88Kq86/vq4x55nQNBly7VMEr+9ZSbDZfEn
+         fWDiDZko4Qklq1qWsJXJoVZx7ukgrV7uG0gliFQlXxploBdaGFinQMVN39rFBz5PT6Ap
+         +RNj8F7zrmIwDH5uTWLG6cNpEY/uP0J5rKC2AiVCd/ZsfrE3dgwojQ+3o/JC32rPOpSi
+         MfXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=lRz/z/AXpEruTQsHU4EAQEPc0Y+Waw+jrJW7+kWECyI=;
-        b=KhhrTf2jvesQQJeoFHq+Hi7r/BMAZvg5AAikN9Q5qXYTjGu8WWKNncbBPwnlWKNkBf
-         lOhqF8v7y0x7Hjz1xTUlPZjF+o8uKVdfDNROCjIF3fA1120nWXkPOMPuA97jPu09S/zx
-         7Ue49M0Ehh7N1r80Hmgtr2qnZftqVd9737KFju8j6qdZOggvyYEhODN3Gc+MXnkA9a6E
-         vPjNLsbptKec1c9LublcmlHk2rKlssOHh4KCkOTZ/Bs1/uSfrvuudwyjkc8PGkeKrXdg
-         4ejf2HLY7iIUEH6cF83XKj1HvPEL6cauCLw/4fALppnXdA8Fu0T9qcbx8VOQ4PO8jWbd
-         bEhQ==
-X-Gm-Message-State: ACrzQf3HjqQrJanMD0mIJ9EZvyq6hVWrVn8yJIxI+jnjhVwjmw6SWIu9
-        N2f6IQi09x0zhgpEEUjM4j+OF5qgsa7el6pLp2AOmlQWH6fJzkMUWLqDMQLTBEtSyMAmNJZJ0oM
-        TZzb22Bn0jwvbXMujNTvnpULuNMUDoZYBwwZR8ds=
-X-Received: by 2002:a05:6a00:114c:b0:528:2c7a:6302 with SMTP id b12-20020a056a00114c00b005282c7a6302mr28503661pfm.37.1663762582639;
-        Wed, 21 Sep 2022 05:16:22 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5r/ijjU2c5rOZiLzk/NojDFwRsD3xgDKZQeggVJqltBvK5luALhPFt8HfhxhdtEdOtWZNDc8CkV8CGgvipPTc=
-X-Received: by 2002:a05:6a00:114c:b0:528:2c7a:6302 with SMTP id
- b12-20020a056a00114c00b005282c7a6302mr28503640pfm.37.1663762582408; Wed, 21
- Sep 2022 05:16:22 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=y9qJH4p5mVpa4a017Npx8Guug2HXx37SOnXReOlQQDI=;
+        b=MX5Qli99q6Y49M+dV1lGH5wBPVlhMdQ7DpcQreC/VAtNpdJRtH7lGxhVLziJaeEp8p
+         bkVpy0J4NEn4Q3K1tFGr87svK8XfSu7kN8759WZeBoGoPODwaRr8+JrJNtb2MZKL9TyH
+         nY0GB/SGRrRDYZnuyDtiG2hHve4U1qKgqTt34/1gYtfcP7ZIrYBbv8HKRQiLHqrj0N9y
+         rsTzW+UIsnlvegg01Ntgmlqf/5uYp/zKJdm7TzBv5C/j72aUpMR4fvdiIfbPKpaziWJi
+         USKthKdYZCbIe+YlZuZ6m0cHLl+7Mlnv6IAsCku39QkN3/t6UK9SWL9wo+rc4uTCHnXX
+         3XSw==
+X-Gm-Message-State: ACrzQf1pKynpa5//YNAqs92zQNHjiHH7sbUAgsoDiG61w6JOm3ZgQxv9
+        zXHDW/gQYloNwodb0WWtmDh4kg==
+X-Google-Smtp-Source: AMsMyM5Y0ov9derzD5xgJgr5MKwNddz0GhXBBijeLFlGJnuvIzG2ySlyP7j3WrnvuVf3gorGGI/Sxg==
+X-Received: by 2002:a6b:7d05:0:b0:68b:7243:63ff with SMTP id c5-20020a6b7d05000000b0068b724363ffmr11874700ioq.191.1663770867802;
+        Wed, 21 Sep 2022 07:34:27 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id y97-20020a02956a000000b0035b0ea27606sm999417jah.79.2022.09.21.07.34.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Sep 2022 07:34:27 -0700 (PDT)
+Message-ID: <c7c909aa-71d9-b43c-293e-d4801a00861e@kernel.dk>
+Date:   Wed, 21 Sep 2022 08:34:26 -0600
 MIME-Version: 1.0
-References: <20220721121152.4180-1-colyli@suse.de> <20220721121152.4180-2-colyli@suse.de>
-In-Reply-To: <20220721121152.4180-2-colyli@suse.de>
-From:   Xiao Ni <xni@redhat.com>
-Date:   Wed, 21 Sep 2022 20:16:11 +0800
-Message-ID: <CALTww2_raNwb3j9evCWi4LD3FqBpW9+hugKw9-OEU+0LG25DBA@mail.gmail.com>
-Subject: Re: [PATCH v6 1/7] badblocks: add more helper structure and routines
- in badblocks.h
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-block@vger.kernel.org, nvdimm@lists.linux.dev,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Geliang Tang <geliang.tang@suse.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        NeilBrown <neilb@suse.de>,
-        Vishal L Verma <vishal.l.verma@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: regression caused by block: freeze the queue earlier in
+ del_gendisk
+Content-Language: en-US
+To:     Thorsten Leemhuis <regressions@leemhuis.info>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Dusty Mabe <dusty@dustymabe.com>, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
+ <YxBZ4BBjxvAkvI2A@T590> <20220907073324.GB23826@lst.de>
+ <Yxr4SD4d0rZ9TZik@T590> <20220912071618.GA4971@lst.de>
+ <Yx/jLTknQm9VeHi4@T590> <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
+ <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
+ <d39e9149-fcb6-1f7c-4c19-234e74f286f8@kernel.dk>
+ <20220920141217.GA12560@lst.de>
+ <9594af4b-eb16-0a51-9a4a-e21bbce3317d@kernel.dk>
+ <6a3660b2-fa7d-14a2-6977-f50926ad369c@leemhuis.info>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <6a3660b2-fa7d-14a2-6977-f50926ad369c@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 21, 2022 at 8:12 PM Coly Li <colyli@suse.de> wrote:
->
-> This patch adds the following helper structure and routines into
-> badblocks.h,
-> - struct badblocks_context
->   This structure is used in improved badblocks code for bad table
->   iteration.
-> - BB_END()
->   The macro to calculate end LBA of a bad range record from bad
->   table.
-> - badblocks_full() and badblocks_empty()
->   The inline routines to check whether bad table is full or empty.
-> - set_changed() and clear_changed()
->   The inline routines to set and clear 'changed' tag from struct
->   badblocks.
->
-> These new helper structure and routines can help to make the code more
-> clear, they will be used in the improved badblocks code in following
-> patches.
->
-> Signed-off-by: Coly Li <colyli@suse.de>
-> Cc: Dan Williams <dan.j.williams@intel.com>
-> Cc: Geliang Tang <geliang.tang@suse.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: NeilBrown <neilb@suse.de>
-> Cc: Vishal L Verma <vishal.l.verma@intel.com>
-> Cc: Xiao Ni <xni@redhat.com>
-> ---
->  include/linux/badblocks.h | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
->
-> diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
-> index 2426276b9bd3..670f2dae692f 100644
-> --- a/include/linux/badblocks.h
-> +++ b/include/linux/badblocks.h
-> @@ -15,6 +15,7 @@
->  #define BB_OFFSET(x)   (((x) & BB_OFFSET_MASK) >> 9)
->  #define BB_LEN(x)      (((x) & BB_LEN_MASK) + 1)
->  #define BB_ACK(x)      (!!((x) & BB_ACK_MASK))
-> +#define BB_END(x)      (BB_OFFSET(x) + BB_LEN(x))
->  #define BB_MAKE(a, l, ack) (((a)<<9) | ((l)-1) | ((u64)(!!(ack)) << 63))
->
->  /* Bad block numbers are stored sorted in a single page.
-> @@ -41,6 +42,12 @@ struct badblocks {
->         sector_t size;          /* in sectors */
->  };
->
-> +struct badblocks_context {
-> +       sector_t        start;
-> +       sector_t        len;
-> +       int             ack;
-> +};
-> +
->  int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
->                    sector_t *first_bad, int *bad_sectors);
->  int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
-> @@ -63,4 +70,27 @@ static inline void devm_exit_badblocks(struct device *dev, struct badblocks *bb)
->         }
->         badblocks_exit(bb);
->  }
-> +
-> +static inline int badblocks_full(struct badblocks *bb)
-> +{
-> +       return (bb->count >= MAX_BADBLOCKS);
-> +}
-> +
-> +static inline int badblocks_empty(struct badblocks *bb)
-> +{
-> +       return (bb->count == 0);
-> +}
-> +
-> +static inline void set_changed(struct badblocks *bb)
-> +{
-> +       if (bb->changed != 1)
-> +               bb->changed = 1;
-> +}
-> +
-> +static inline void clear_changed(struct badblocks *bb)
-> +{
-> +       if (bb->changed != 0)
-> +               bb->changed = 0;
-> +}
-> +
->  #endif
-> --
-> 2.35.3
->
+On 9/21/22 3:25 AM, Thorsten Leemhuis wrote:
+> On 20.09.22 16:14, Jens Axboe wrote:
+>> On 9/20/22 8:12 AM, Christoph Hellwig wrote:
+>>> On Tue, Sep 20, 2022 at 08:05:06AM -0600, Jens Axboe wrote:
+>>>> Christoph and I discussed this one last week, and he has a plan to try
+>>>> a flag approach. Christoph, did you get a chance to bang that out? Would
+>>>> be nice to get this one wrapped up.
+>>>
+>>> I gave up on that as it will be far too much change so late in
+>>> the cycle and sent you the revert yesterday.
+>>
+>> Gotcha, haven't made it all the way through the emails of the morning yet.
+>> I'll queue it up.
+> 
+> Thx to both of you for taking care of this.
+> 
+> Nitpicking: that patch is missing a "CC: stable@..." tag to ensure
+> automatic and quick backporting to 5.19.y. Or is the block layer among
+> the subsystems that prefer to handle such things manually?
+> 
+> Ohh, and a fixes tag might have been good as well; a "Link:" tag
+> pointing to the report, too. If either would have been there, regzbot
+> would have noticed Christoph's patch posting and I wouldn't have
+> bothered you yesterday. :-) But whatever, not that important.
 
-Reviewed-by: Xiao Ni <xni@redhat.com>
+We'll just have to ensure we ping stable on it when it goes in.
+
+-- 
+Jens Axboe
+
 
