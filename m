@@ -2,76 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B25C32771
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 05:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBEA0C32771
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 05:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbiIUFUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 01:20:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54402 "EHLO
+        id S229873AbiIUFyu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 01:54:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbiIUFUh (ORCPT
+        with ESMTP id S229822AbiIUFyr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 01:20:37 -0400
-Received: from out199-1.us.a.mail.aliyun.com (out199-1.us.a.mail.aliyun.com [47.90.199.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4F0386B4
-        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 22:20:35 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VQMUhZC_1663737630;
-Received: from B-P7TQMD6M-0146.local(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VQMUhZC_1663737630)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Sep 2022 13:20:32 +0800
-Date:   Wed, 21 Sep 2022 13:20:29 +0800
-From:   Gao Xiang <hsiangkao@linux.alibaba.com>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Zdenek Kabelac <zkabelac@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [dm-devel] [PATCH v2 0/4] brd: implement discard
-Message-ID: <YyqfHfadJvxbB/JC@B-P7TQMD6M-0146.local>
-Mail-Followup-To: Mikulas Patocka <mpatocka@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Zdenek Kabelac <zkabelac@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-References: <alpine.LRH.2.02.2209201350470.26058@file01.intranet.prod.int.rdu2.redhat.com>
+        Wed, 21 Sep 2022 01:54:47 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0015DDFD6
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 22:54:44 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id bj12so11073795ejb.13
+        for <linux-block@vger.kernel.org>; Tue, 20 Sep 2022 22:54:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=O+/FFDzqjGUa/uvDMSfAuiQjEkg5o9+lgPvGbc+n8wE=;
+        b=M2HNg17GHPWM6YaoxXWHCj0Bj4Qcb3SFiebct60i4Kq2DeqFUCVSkSFeGDa1eQr76o
+         QAj9qXjArpAvj6pZoapjSa8fvl8Ybj74urvoPRvvb8029qo35RLoAiKXpoM02YxOoaPP
+         SEPdHtwtTdLozFOWHQQfD0FaI1vBycLifzNug=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=O+/FFDzqjGUa/uvDMSfAuiQjEkg5o9+lgPvGbc+n8wE=;
+        b=h55+LbLtj6ax2LOdj19O80QtSxLR8hSfRHIrmIhAVTq+DEblmx6Y1hALjvGGT2ltMl
+         HFHeBUYTL+zb5HRtstT7yoim/x6Hy2qdb0wL5v/j35gM60a3qm8v0mgcFOOKL+Zc6xHH
+         dPxiXJNDkQX/rMsvQLfSftGA2h37Fe6pG6GAD0u/vWb+Yx0Bz0Cmtx+kZnF7A6kQrZC1
+         U0hlAReDTA3LohAmmWC1MbLdPmk7Y5tXGWmXbvJOSrIUoMHz4FXiBze1I7/eR4WB4QG3
+         Kb7KMPCXJ7mEXyONu/mE7rKv58eigGDkkdNWdpwtpVtw14PURTNVDs7hqzNdM6857vlc
+         /g5w==
+X-Gm-Message-State: ACrzQf2KzYI//+LD0LEwFVG58cGfSbTiEw4VKh+6kJjTj0IFElfYtIWf
+        2vuj7n3K+ayVRGSXAb6g6+uzArhlicpOpXgOXvl9Lq0ZMtQ=
+X-Google-Smtp-Source: AMsMyM7DwZfJgUBj+Jcm+ahguQtT7+RYi7n81t2AfUSbJlFqnH/D7ZLc78O5AtvKtve14UtIE21JWlJbn+K5xTQxSGs=
+X-Received: by 2002:a17:907:7289:b0:780:2017:3898 with SMTP id
+ dt9-20020a170907728900b0078020173898mr19775359ejc.276.1663739683574; Tue, 20
+ Sep 2022 22:54:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.2209201350470.26058@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <20220915164826.1396245-5-sarthakkukreti@google.com> <YylweQAZkIdb5ixo@infradead.org>
+In-Reply-To: <YylweQAZkIdb5ixo@infradead.org>
+From:   Sarthak Kukreti <sarthakkukreti@chromium.org>
+Date:   Tue, 20 Sep 2022 22:54:32 -0700
+Message-ID: <CAG9=OMNoG01UUStNs_Zhsv6mXZw0M0q2v54ZriJvHZ4aspvjEQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 4/8] fs: Introduce FALLOC_FL_PROVISION
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        Evan Green <evgreen@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 01:52:38PM -0400, Mikulas Patocka wrote:
-> Hi
-> 
-> Here I'm sending second version of the brd discard patches.
+On Tue, Sep 20, 2022 at 12:49 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Thu, Sep 15, 2022 at 09:48:22AM -0700, Sarthak Kukreti wrote:
+> > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> >
+> > FALLOC_FL_PROVISION is a new fallocate() allocation mode that
+> > sends a hint to (supported) thinly provisioned block devices to
+> > allocate space for the given range of sectors via REQ_OP_PROVISION.
+>
+> So, how does that "provisioning" actually work in todays world where
+> storage is usually doing out of place writes in one or more layers,
+> including the flash storage everyone is using.  Does it give you one
+> write?  And unlimited number?  Some undecided number inbetween?
 
-That is quite interesting.
+Apologies, the patchset was a bit short on describing the semantics so
+I'll expand more in the next revision; I'd say that it's the minimum
+of regular mode fallocate() guarantees at each allocation layer. For
+example, the guarantees from a contrived storage stack like (left to
+right is bottom to top):
 
-btw, something out of topic, I once had some preliminary attempt
-to add DAX support to brd since brd works as ramdisk and brd-dax
-could have the following benefits:
+[ mmc0blkp1 | ext4(1) | sparse file | loop | dm-thinp | dm-thin | ext4(2) ]
 
- - DAX can be tested without PMEM devices;
- - ramdisk fses can be accessed without double page cache;
- - initrd use cases then can work well without extra page cache
-   and maybe it can perform better than initramfs (without unpack
-   process).
+would be predicated on the guarantees of fallocate() per allocation
+layer; if ext4(1) was replaced by a filesystem that did not support
+fallocate(), then there would be no guarantee that a write to a file
+on ext4(2) succeeds.
 
-I wrote some hack stuff but don't have more time working on it...
-https://git.kernel.org/pub/scm/linux/kernel/git/xiang/linux.git/log/?h=erofs/initrd-fsdax
+For dm-thinp, in the current implementation, the provision request
+allocates blocks for the range specified and adds the mapping to the
+thinpool metadata. All subsequent writes are to the same block, so
+you'll be able to write to the same block inifinitely. Brian mentioned
+this above, one case it doesn't cover is if provision is called on a
+shared block, but the natural extension would be to allocate and
+assign a new block and copy the contents of the shared block (kind of
+like copy-on-provision).
 
-I'm not sure if others are interested in topic though.
+[reflowed]
+> How is it affected by write zeroes to that range or a discard?
 
-It would be helpful to get rid of all brd page->index use cases
-first.
+The current semantics of discards for dm-thinp/ext4/sparse files will
+apply as they do today; discards will unmap the dm-thin block/free the
+file extent. Write zeroes is more interesting; dm-thinp will treat the
+command as usual. ext4_zero_range will mark the extents as unwritten,
+so essentially if a user did provision + write to a block, write zeros
+to the block would essentially leave it in the original provisioned
+state, but ext4 would now show the contents of the block as zero on
+the next read. I think, similar to above, the semantics of a request
+will depend on each layer that it passes through.
 
-Thanks,
-Gao Xiang
-
-> 
-> Mikulas
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://listman.redhat.com/mailman/listinfo/dm-devel
-> 
+Best
+Sarthak
