@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2ECCECAAD8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 10:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1913AC32771
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 10:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230449AbiIUKBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 06:01:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
+        id S231340AbiIUKBZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 06:01:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230372AbiIUKAl (ORCPT
+        with ESMTP id S231400AbiIUKA6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 06:00:41 -0400
-Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 410008A7D3;
-        Wed, 21 Sep 2022 03:00:37 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQNuDNV_1663754399;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQNuDNV_1663754399)
+        Wed, 21 Sep 2022 06:00:58 -0400
+Received: from out199-15.us.a.mail.aliyun.com (out199-15.us.a.mail.aliyun.com [47.90.199.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83EC90C7E;
+        Wed, 21 Sep 2022 03:00:53 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQNuDjo_1663754445;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQNuDjo_1663754445)
           by smtp.aliyun-inc.com;
-          Wed, 21 Sep 2022 18:00:35 +0800
+          Wed, 21 Sep 2022 18:00:50 +0800
 From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 To:     ming.lei@redhat.com
 Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         joseph.qi@linux.alibaba.com,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V4 4/8] ublk_drv: requeue rqs with recovery feature enabled
-Date:   Wed, 21 Sep 2022 17:58:45 +0800
-Message-Id: <20220921095849.84988-5-ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V4 6/8] ublk_drv: support UBLK_F_USER_RECOVERY_REISSUE
+Date:   Wed, 21 Sep 2022 17:58:47 +0800
+Message-Id: <20220921095849.84988-7-ZiyangZhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
 References: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
@@ -37,79 +37,77 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With recovery feature enabled, in ublk_queue_rq or task work
-(in exit_task_work or fallback wq), we requeue rqs instead of
-ending(aborting) them. Besides, No matter recovery feature is enabled
-or disabled, we schedule monitor_work immediately.
+UBLK_F_USER_RECOVERY_REISSUE implies that:
+With a dying ubq_daemon, ublk_drv let monitor_work requeues rq issued to
+userspace(ublksrv) before the ubq_daemon is dying.
+
+UBLK_F_USER_RECOVERY_REISSUE is designed for backends which:
+(1) tolerate double-write since ublk_drv may issue the same rq
+    twice.
+(2) does not let frontend users get I/O error, such as read-only FS
+    and VM backend.
 
 Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 ---
- drivers/block/ublk_drv.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ drivers/block/ublk_drv.c      | 17 +++++++++++++++--
+ include/uapi/linux/ublk_cmd.h |  2 ++
+ 2 files changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3bdac4bdf46f..b940e490ebab 100644
+index 9610afe11463..dc33ebc20c01 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -655,6 +655,19 @@ static void ubq_complete_io_cmd(struct ublk_io *io, int res)
+@@ -50,7 +50,8 @@
+ #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
+ 		| UBLK_F_URING_CMD_COMP_IN_TASK \
+ 		| UBLK_F_NEED_GET_DATA \
+-		| UBLK_F_USER_RECOVERY)
++		| UBLK_F_USER_RECOVERY \
++		| UBLK_F_USER_RECOVERY_REISSUE)
  
- #define UBLK_REQUEUE_DELAY_MS	3
- 
-+static inline void __ublk_abort_rq_in_task_work(struct ublk_queue *ubq,
-+		struct request *rq)
-+{
-+	pr_devel("%s: %s q_id %d tag %d io_flags %x.\n", __func__,
-+			(ublk_queue_can_use_recovery(ubq)) ? "requeue" : "abort",
-+			ubq->q_id, rq->tag, ubq->ios[rq->tag].flags);
-+	/* We cannot process this rq so just requeue it. */
-+	if (ublk_queue_can_use_recovery(ubq))
-+		blk_mq_requeue_request(rq, false);
-+	else
-+		blk_mq_end_request(rq, BLK_STS_IOERR);
-+}
-+
- static inline void __ublk_rq_task_work(struct request *req)
- {
- 	struct ublk_queue *ubq = req->mq_hctx->driver_data;
-@@ -677,7 +690,7 @@ static inline void __ublk_rq_task_work(struct request *req)
- 	 * (2) current->flags & PF_EXITING.
- 	 */
- 	if (unlikely(current != ubq->ubq_daemon || current->flags & PF_EXITING)) {
--		blk_mq_end_request(req, BLK_STS_IOERR);
-+		__ublk_abort_rq_in_task_work(ubq, req);
- 		mod_delayed_work(system_wq, &ub->monitor_work, 0);
- 		return;
- 	}
-@@ -752,6 +765,20 @@ static void ublk_rq_task_work_fn(struct callback_head *work)
- 	__ublk_rq_task_work(req);
+ /* All UBLK_PARAM_TYPE_* should be included here */
+ #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD)
+@@ -325,6 +326,15 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
+ 			PAGE_SIZE);
  }
  
-+static inline blk_status_t __ublk_abort_rq(struct ublk_queue *ubq,
-+		struct request *rq)
++static inline bool ublk_queue_can_use_recovery_reissue(
++		struct ublk_queue *ubq)
 +{
-+	pr_devel("%s: %s q_id %d tag %d io_flags %x.\n", __func__,
-+			(ublk_queue_can_use_recovery(ubq)) ? "requeue" : "abort",
-+			ubq->q_id, rq->tag, ubq->ios[rq->tag].flags);
-+	/* We cannot process this rq so just requeue it. */
-+	if (ublk_queue_can_use_recovery(ubq)) {
-+		blk_mq_requeue_request(rq, false);
-+		return BLK_STS_OK;
-+	}
-+	return BLK_STS_IOERR;
++	if ((ubq->flags & UBLK_F_USER_RECOVERY) &&
++			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE))
++		return true;
++	return false;
 +}
 +
- static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		const struct blk_mq_queue_data *bd)
+ static inline bool ublk_queue_can_use_recovery(
+ 		struct ublk_queue *ubq)
  {
-@@ -769,7 +796,7 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (unlikely(ubq_daemon_is_dying(ubq))) {
-  fail:
- 		mod_delayed_work(system_wq, &ubq->dev->monitor_work, 0);
--		return BLK_STS_IOERR;
-+		return __ublk_abort_rq(ubq, rq);
+@@ -641,7 +651,10 @@ static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+ 				req->tag,
+ 				io->flags);
+ 		io->flags |= UBLK_IO_FLAG_ABORTED;
+-		blk_mq_end_request(req, BLK_STS_IOERR);
++		if (ublk_queue_can_use_recovery_reissue(ubq))
++			blk_mq_requeue_request(req, false);
++		else
++			blk_mq_end_request(req, BLK_STS_IOERR);
  	}
+ }
  
- 	if (ublk_can_use_task_work(ubq)) {
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 340ff14bde49..332370628757 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -76,6 +76,8 @@
+ 
+ #define UBLK_F_USER_RECOVERY	(1UL << 3)
+ 
++#define UBLK_F_USER_RECOVERY_REISSUE	(1UL << 4)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
 -- 
 2.27.0
 
