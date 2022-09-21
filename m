@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 194DDECAAD8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D67CFC6FA82
 	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 18:05:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbiIUSFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 14:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37104 "EHLO
+        id S229940AbiIUSF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 14:05:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230274AbiIUSFs (ORCPT
+        with ESMTP id S230052AbiIUSFu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 14:05:48 -0400
+        Wed, 21 Sep 2022 14:05:50 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50AA97DF46
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 11:05:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85EB77AC25
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 11:05:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=C2BdQeRlKN5lPEDZxeBfSuzwee/rdxNAuOmbLu1nHXE=; b=dNlQDFRIRoK2yPKGf8Ue1UwLxG
-        6dEo70deFwbrR53IZknqjgcRRkwF14CEQwE9f63FqQlZQja1rQAfkLFEDLU03qxC4vcCDS6Wt87At
-        hnM3HlWWcJNqGHH0MBNa1pcjuNEWObrLoM7CXHgxolUV5atL/kp9/kSI1Ioi8euwsC8uK0wI+qRaE
-        +2eGnGBFu5fRR+D9Ni/kz9sVWVzMxDfrDAq+HeKqYATDguC/UroIzvPLA/gxqRAsSBxTm2XzbXC68
-        PhdtsSqJKeOuoGk0RHu5NjYREAtEvHK8MkmmYWB5GvUR6bsKPsGf+wC2Y8U7tMHOzZr0/CAkJxt9B
-        R7F05bWA==;
+        bh=FDCEniY+aK/9Ygq94nEzECnMQNx6HymvVYxR0DM2jGA=; b=q+r/Mt7BetmsVTuha26GRqicF1
+        /hJkdo52ohpC33xpn79qcwbNO/zBITANWKqQT6YGtK8cUlG8aSCpXNRFhIC6krwkc0SB1fDfyEc8v
+        6f1PhRnlTbOb9WrtG/xxlludI/8CwTqIQQXzAjPeYDovFKvcD5TBbcwYKWoqdxTIbw1kjoJnl6WAE
+        VKvkuBLpSk3MhJ7XFLW7HDxTAyFrxqrKj+EG/bu+JEMCFIUUUSAarrPaQSLpX1if3SLcp7DF4io7b
+        l1LAF78fgB7GOqwm51N4O0QL9BTRZDN7zJ4nrwQrLRA/ChXCtEqk3mWL5Czi4WLGDAYnL4Sle6pGT
+        pTNEnS0w==;
 Received: from ip4d15bec4.dynamic.kabel-deutschland.de ([77.21.190.196] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ob46T-00CGdo-Sa; Wed, 21 Sep 2022 18:05:46 +0000
+        id 1ob46W-00CGdx-2Y; Wed, 21 Sep 2022 18:05:48 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 16/17] blk-cgroup: pass a gendisk to blkcg_schedule_throttle
-Date:   Wed, 21 Sep 2022 20:05:00 +0200
-Message-Id: <20220921180501.1539876-17-hch@lst.de>
+Subject: [PATCH 17/17] blk-cgroup: pass a gendisk to the blkg allocation helpers
+Date:   Wed, 21 Sep 2022 20:05:01 +0200
+Message-Id: <20220921180501.1539876-18-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220921180501.1539876-1-hch@lst.de>
 References: <20220921180501.1539876-1-hch@lst.de>
@@ -44,128 +44,219 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pass the gendisk to blkcg_schedule_throttle as part of moving the
-blk-cgroup infrastructure to be gendisk based.  Remove the unused
-!BLK_CGROUP stub while we're at it.
+Prepare for storing the blkcg information in the gendisk instead of
+the request_queue.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-cgroup.c         | 8 +++++---
- block/blk-iocost.c         | 4 ++--
- block/blk-iolatency.c      | 2 +-
- include/linux/blk-cgroup.h | 5 ++---
- mm/swapfile.c              | 2 +-
- 5 files changed, 11 insertions(+), 10 deletions(-)
+ block/blk-cgroup.c | 56 +++++++++++++++++++++++-----------------------
+ 1 file changed, 28 insertions(+), 28 deletions(-)
 
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c2d5ca2eb92e5..fc82057db9629 100644
+index fc82057db9629..94af5f3f3620b 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -1792,13 +1792,13 @@ void blkcg_maybe_throttle_current(void)
- 
+@@ -202,19 +202,19 @@ static inline struct blkcg *blkcg_parent(struct blkcg *blkcg)
  /**
-  * blkcg_schedule_throttle - this task needs to check for throttling
-- * @q: the request queue IO was submitted on
-+ * @gendisk: disk to throttle
-  * @use_memdelay: do we charge this to memory delay for PSI
+  * blkg_alloc - allocate a blkg
+  * @blkcg: block cgroup the new blkg is associated with
+- * @q: request_queue the new blkg is associated with
++ * @disk: gendisk the new blkg is associated with
+  * @gfp_mask: allocation mask to use
   *
-  * This is called by the IO controller when we know there's delay accumulated
-  * for the blkg for this task.  We do not pass the blkg because there are places
-  * we call this that may not have that information, the swapping code for
-- * instance will only have a request_queue at that point.  This set's the
-+ * instance will only have a block_device at that point.  This set's the
-  * notify_resume for the task to check and see if it requires throttling before
-  * returning to user space.
-  *
-@@ -1807,8 +1807,10 @@ void blkcg_maybe_throttle_current(void)
-  * throttle once.  If the task needs to be throttled again it'll need to be
-  * re-set at the next time we see the task.
+  * Allocate a new blkg assocating @blkcg and @q.
   */
--void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay)
-+void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay)
+-static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
++static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct gendisk *disk,
+ 				   gfp_t gfp_mask)
+ {
+ 	struct blkcg_gq *blkg;
+ 	int i, cpu;
+ 
+ 	/* alloc and init base part */
+-	blkg = kzalloc_node(sizeof(*blkg), gfp_mask, q->node);
++	blkg = kzalloc_node(sizeof(*blkg), gfp_mask, disk->queue->node);
+ 	if (!blkg)
+ 		return NULL;
+ 
+@@ -225,10 +225,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 	if (!blkg->iostat_cpu)
+ 		goto err_free;
+ 
+-	if (!blk_get_queue(q))
++	if (!blk_get_queue(disk->queue))
+ 		goto err_free;
+ 
+-	blkg->q = q;
++	blkg->q = disk->queue;
+ 	INIT_LIST_HEAD(&blkg->q_node);
+ 	spin_lock_init(&blkg->async_bio_lock);
+ 	bio_list_init(&blkg->async_bios);
+@@ -243,11 +243,11 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 		struct blkcg_policy *pol = blkcg_policy[i];
+ 		struct blkg_policy_data *pd;
+ 
+-		if (!blkcg_policy_enabled(q, pol))
++		if (!blkcg_policy_enabled(disk->queue, pol))
+ 			continue;
+ 
+ 		/* alloc per-policy data and attach it to blkg */
+-		pd = pol->pd_alloc_fn(gfp_mask, q, blkcg);
++		pd = pol->pd_alloc_fn(gfp_mask, disk->queue, blkcg);
+ 		if (!pd)
+ 			goto err_free;
+ 
+@@ -275,17 +275,16 @@ static void blkg_update_hint(struct blkcg *blkcg, struct blkcg_gq *blkg)
+  * If @new_blkg is %NULL, this function tries to allocate a new one as
+  * necessary using %GFP_NOWAIT.  @new_blkg is always consumed on return.
+  */
+-static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+-				    struct request_queue *q,
++static struct blkcg_gq *blkg_create(struct blkcg *blkcg, struct gendisk *disk,
+ 				    struct blkcg_gq *new_blkg)
+ {
+ 	struct blkcg_gq *blkg;
+ 	int i, ret;
+ 
+-	lockdep_assert_held(&q->queue_lock);
++	lockdep_assert_held(&disk->queue->queue_lock);
+ 
+ 	/* request_queue is dying, do not create/recreate a blkg */
+-	if (blk_queue_dying(q)) {
++	if (blk_queue_dying(disk->queue)) {
+ 		ret = -ENODEV;
+ 		goto err_free_blkg;
+ 	}
+@@ -298,7 +297,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 
+ 	/* allocate */
+ 	if (!new_blkg) {
+-		new_blkg = blkg_alloc(blkcg, q, GFP_NOWAIT | __GFP_NOWARN);
++		new_blkg = blkg_alloc(blkcg, disk, GFP_NOWAIT | __GFP_NOWARN);
+ 		if (unlikely(!new_blkg)) {
+ 			ret = -ENOMEM;
+ 			goto err_put_css;
+@@ -308,7 +307,7 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 
+ 	/* link parent */
+ 	if (blkcg_parent(blkcg)) {
+-		blkg->parent = blkg_lookup(blkcg_parent(blkcg), q);
++		blkg->parent = blkg_lookup(blkcg_parent(blkcg), disk->queue);
+ 		if (WARN_ON_ONCE(!blkg->parent)) {
+ 			ret = -ENODEV;
+ 			goto err_put_css;
+@@ -326,10 +325,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 
+ 	/* insert */
+ 	spin_lock(&blkcg->lock);
+-	ret = radix_tree_insert(&blkcg->blkg_tree, q->id, blkg);
++	ret = radix_tree_insert(&blkcg->blkg_tree, disk->queue->id, blkg);
+ 	if (likely(!ret)) {
+ 		hlist_add_head_rcu(&blkg->blkcg_node, &blkcg->blkg_list);
+-		list_add(&blkg->q_node, &q->blkg_list);
++		list_add(&blkg->q_node, &disk->queue->blkg_list);
+ 
+ 		for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 			struct blkcg_policy *pol = blkcg_policy[i];
+@@ -358,19 +357,20 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ /**
+  * blkg_lookup_create - lookup blkg, try to create one if not there
+  * @blkcg: blkcg of interest
+- * @q: request_queue of interest
++ * @disk: gendisk of interest
+  *
+- * Lookup blkg for the @blkcg - @q pair.  If it doesn't exist, try to
++ * Lookup blkg for the @blkcg - @disk pair.  If it doesn't exist, try to
+  * create one.  blkg creation is performed recursively from blkcg_root such
+  * that all non-root blkg's have access to the parent blkg.  This function
+- * should be called under RCU read lock and takes @q->queue_lock.
++ * should be called under RCU read lock and takes @disk->queue->queue_lock.
+  *
+  * Returns the blkg or the closest blkg if blkg_create() fails as it walks
+  * down from root.
+  */
+ static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+-		struct request_queue *q)
++		struct gendisk *disk)
  {
 +	struct request_queue *q = disk->queue;
-+
- 	if (unlikely(current->flags & PF_KTHREAD))
- 		return;
+ 	struct blkcg_gq *blkg;
+ 	unsigned long flags;
  
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index b8e5f550aa5be..b0899ab214c41 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2636,7 +2636,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 	if (use_debt) {
- 		iocg_incur_debt(iocg, abs_cost, &now);
- 		if (iocg_kick_delay(iocg, &now))
--			blkcg_schedule_throttle(rqos->q,
-+			blkcg_schedule_throttle(rqos->q->disk,
- 					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
- 		iocg_unlock(iocg, ioc_locked, &flags);
- 		return;
-@@ -2737,7 +2737,7 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
- 	if (likely(!list_empty(&iocg->active_list))) {
- 		iocg_incur_debt(iocg, abs_cost, &now);
- 		if (iocg_kick_delay(iocg, &now))
--			blkcg_schedule_throttle(rqos->q,
-+			blkcg_schedule_throttle(rqos->q->disk,
- 					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
- 	} else {
- 		iocg_commit_bio(iocg, bio, abs_cost, cost);
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index c6f61fe88b875..571fa95aafe96 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -292,7 +292,7 @@ static void __blkcg_iolatency_throttle(struct rq_qos *rqos,
- 	unsigned use_delay = atomic_read(&lat_to_blkg(iolat)->use_delay);
+@@ -408,7 +408,7 @@ static struct blkcg_gq *blkg_lookup_create(struct blkcg *blkcg,
+ 			parent = blkcg_parent(parent);
+ 		}
  
- 	if (use_delay)
--		blkcg_schedule_throttle(rqos->q, use_memdelay);
-+		blkcg_schedule_throttle(rqos->q->disk, use_memdelay);
+-		blkg = blkg_create(pos, q, NULL);
++		blkg = blkg_create(pos, disk, NULL);
+ 		if (IS_ERR(blkg)) {
+ 			blkg = ret_blkg;
+ 			break;
+@@ -652,6 +652,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 	__acquires(rcu) __acquires(&bdev->bd_queue->queue_lock)
+ {
+ 	struct block_device *bdev;
++	struct gendisk *disk;
+ 	struct request_queue *q;
+ 	struct blkcg_gq *blkg;
+ 	int ret;
+@@ -659,8 +660,8 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 	bdev = blkcg_conf_open_bdev(&input);
+ 	if (IS_ERR(bdev))
+ 		return PTR_ERR(bdev);
+-
+-	q = bdev_get_queue(bdev);
++	disk = bdev->bd_disk;
++	q = disk->queue;
  
  	/*
- 	 * To avoid priority inversions we want to just take a slot if we are
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 9f40dbc65f82c..dd5841a42c331 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -18,14 +18,14 @@
+ 	 * blkcg_deactivate_policy() requires queue to be frozen, we can grab
+@@ -703,7 +704,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		spin_unlock_irq(&q->queue_lock);
+ 		rcu_read_unlock();
  
- struct bio;
- struct cgroup_subsys_state;
--struct request_queue;
-+struct gendisk;
+-		new_blkg = blkg_alloc(pos, q, GFP_KERNEL);
++		new_blkg = blkg_alloc(pos, disk, GFP_KERNEL);
+ 		if (unlikely(!new_blkg)) {
+ 			ret = -ENOMEM;
+ 			goto fail_exit_queue;
+@@ -729,7 +730,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			blkg_update_hint(pos, blkg);
+ 			blkg_free(new_blkg);
+ 		} else {
+-			blkg = blkg_create(pos, q, new_blkg);
++			blkg = blkg_create(pos, disk, new_blkg);
+ 			if (IS_ERR(blkg)) {
+ 				ret = PTR_ERR(blkg);
+ 				goto fail_preloaded;
+@@ -1234,7 +1235,7 @@ int blkcg_init_disk(struct gendisk *disk)
  
- #define FC_APPID_LEN              129
+ 	INIT_LIST_HEAD(&q->blkg_list);
  
- #ifdef CONFIG_BLK_CGROUP
- extern struct cgroup_subsys_state * const blkcg_root_css;
+-	new_blkg = blkg_alloc(&blkcg_root, q, GFP_KERNEL);
++	new_blkg = blkg_alloc(&blkcg_root, disk, GFP_KERNEL);
+ 	if (!new_blkg)
+ 		return -ENOMEM;
  
--void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay);
-+void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay);
- void blkcg_maybe_throttle_current(void);
- bool blk_cgroup_congested(void);
- void blkcg_pin_online(struct cgroup_subsys_state *blkcg_css);
-@@ -39,7 +39,6 @@ struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio);
+@@ -1243,7 +1244,7 @@ int blkcg_init_disk(struct gendisk *disk)
+ 	/* Make sure the root blkg exists. */
+ 	/* spin_lock_irq can serve as RCU read-side critical section. */
+ 	spin_lock_irq(&q->queue_lock);
+-	blkg = blkg_create(&blkcg_root, q, new_blkg);
++	blkg = blkg_create(&blkcg_root, disk, new_blkg);
+ 	if (IS_ERR(blkg))
+ 		goto err_unlock;
+ 	q->root_blkg = blkg;
+@@ -1860,8 +1861,7 @@ static inline struct blkcg_gq *blkg_tryget_closest(struct bio *bio,
+ 	struct blkcg_gq *blkg, *ret_blkg = NULL;
  
- static inline void blkcg_maybe_throttle_current(void) { }
- static inline bool blk_cgroup_congested(void) { return false; }
--static inline void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay) { }
- static inline struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
- {
- 	return NULL;
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index 1fdccd2f1422e..82e62007881db 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -3655,7 +3655,7 @@ void __cgroup_throttle_swaprate(struct page *page, gfp_t gfp_mask)
- 	plist_for_each_entry_safe(si, next, &swap_avail_heads[nid],
- 				  avail_lists[nid]) {
- 		if (si->bdev) {
--			blkcg_schedule_throttle(bdev_get_queue(si->bdev), true);
-+			blkcg_schedule_throttle(si->bdev->bd_disk, true);
- 			break;
- 		}
- 	}
+ 	rcu_read_lock();
+-	blkg = blkg_lookup_create(css_to_blkcg(css),
+-				  bdev_get_queue(bio->bi_bdev));
++	blkg = blkg_lookup_create(css_to_blkcg(css), bio->bi_bdev->bd_disk);
+ 	while (blkg) {
+ 		if (blkg_tryget(blkg)) {
+ 			ret_blkg = blkg;
 -- 
 2.30.2
 
