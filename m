@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9018EECAAD8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 10:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 502F7C32771
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 10:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231285AbiIUKAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 06:00:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49818 "EHLO
+        id S229715AbiIUKAS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 06:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbiIUJ75 (ORCPT
+        with ESMTP id S231274AbiIUKAG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 05:59:57 -0400
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ED21659B;
-        Wed, 21 Sep 2022 02:59:47 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQNuDE2_1663754378;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQNuDE2_1663754378)
+        Wed, 21 Sep 2022 06:00:06 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344C07CA80;
+        Wed, 21 Sep 2022 03:00:01 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R241e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQNuDHH_1663754385;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQNuDHH_1663754385)
           by smtp.aliyun-inc.com;
-          Wed, 21 Sep 2022 17:59:45 +0800
+          Wed, 21 Sep 2022 17:59:59 +0800
 From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 To:     ming.lei@redhat.com
 Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         joseph.qi@linux.alibaba.com,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V4 2/8] ublk_drv: refactor ublk_cancel_queue()
-Date:   Wed, 21 Sep 2022 17:58:43 +0800
-Message-Id: <20220921095849.84988-3-ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V4 3/8] ublk_drv: define macros for recovery feature and check them
+Date:   Wed, 21 Sep 2022 17:58:44 +0800
+Message-Id: <20220921095849.84988-4-ZiyangZhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
 References: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
@@ -37,68 +37,78 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Assume only a few FETCH_REQ ioucmds are sent to ublk_drv, then the
-ubq_daemon exits, We have to call io_uring_cmd_done() for all ioucmds
-received so that io_uring ctx will not leak.
+Define some macros for recovery feature.
 
-ublk_cancel_queue() may be called before START_DEV or after STOP_DEV,
-we decrease ubq->nr_io_ready and clear UBLK_IO_FLAG_ACTIVE so that we
-won't call io_uring_cmd_done() twice for one ioucmd to avoid UAF. Also
-clearing UBLK_IO_FLAG_ACTIVE makes the code more reasonable.
+UBLK_S_DEV_QUIESCED implies that ublk_device is quiesced
+and is ready for recovery. This state can be observed by userspace.
+
+UBLK_F_USER_RECOVERY implies that:
+(1) ublk_drv enables recovery feature. It won't let monitor_work to
+    automatically abort rqs and release the device.
+(2) With a dying ubq_daemon, ublk_drv ends(aborts) rqs issued to
+    userspace(ublksrv) before crash.
+(3) With a dying ubq_daemon, in task work and ublk_queue_rq(),
+    ublk_drv requeues rqs.
 
 Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
+ drivers/block/ublk_drv.c      | 18 +++++++++++++++++-
+ include/uapi/linux/ublk_cmd.h |  3 +++
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index c39b67d7133d..0c6db0978ed0 100644
+index 0c6db0978ed0..3bdac4bdf46f 100644
 --- a/drivers/block/ublk_drv.c
 +++ b/drivers/block/ublk_drv.c
-@@ -963,22 +963,39 @@ static inline bool ublk_queue_ready(struct ublk_queue *ubq)
- 	return ubq->nr_io_ready == ubq->q_depth;
+@@ -49,7 +49,8 @@
+ /* All UBLK_F_* have to be included into UBLK_F_ALL */
+ #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
+ 		| UBLK_F_URING_CMD_COMP_IN_TASK \
+-		| UBLK_F_NEED_GET_DATA)
++		| UBLK_F_NEED_GET_DATA \
++		| UBLK_F_USER_RECOVERY)
+ 
+ /* All UBLK_PARAM_TYPE_* should be included here */
+ #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD)
+@@ -323,6 +324,21 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
+ 			PAGE_SIZE);
  }
  
-+/* If ublk_cancel_queue() is called before sending START_DEV(), ->mutex
-+ * provides protection on above update.
-+ *
-+ * If ublk_cancel_queue() is called after sending START_DEV(), disk is
-+ * deleted first, UBLK_IO_RES_ABORT is returned so that any new io
-+ * command can't be issued to driver, so updating on io flags and
-+ * nr_io_ready is safe here.
-+ *
-+ * Also ->nr_io_ready is guaranteed to become zero after ublk_cance_queue()
-+ * returns since request queue is either frozen or not present in both two
-+ * cases.
-+ */
- static void ublk_cancel_queue(struct ublk_queue *ubq)
++static inline bool ublk_queue_can_use_recovery(
++		struct ublk_queue *ubq)
++{
++	if (ubq->flags & UBLK_F_USER_RECOVERY)
++		return true;
++	return false;
++}
++
++static inline bool ublk_can_use_recovery(struct ublk_device *ub)
++{
++	if (ub->dev_info.flags & UBLK_F_USER_RECOVERY)
++		return true;
++	return false;
++}
++
+ static void ublk_free_disk(struct gendisk *disk)
  {
- 	int i;
+ 	struct ublk_device *ub = disk->private_data;
+diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+index 677edaab2b66..340ff14bde49 100644
+--- a/include/uapi/linux/ublk_cmd.h
++++ b/include/uapi/linux/ublk_cmd.h
+@@ -74,9 +74,12 @@
+  */
+ #define UBLK_F_NEED_GET_DATA (1UL << 2)
  
--	if (!ublk_queue_ready(ubq))
-+	if (!ubq->nr_io_ready)
- 		return;
++#define UBLK_F_USER_RECOVERY	(1UL << 3)
++
+ /* device state */
+ #define UBLK_S_DEV_DEAD	0
+ #define UBLK_S_DEV_LIVE	1
++#define UBLK_S_DEV_QUIESCED	2
  
- 	for (i = 0; i < ubq->q_depth; i++) {
- 		struct ublk_io *io = &ubq->ios[i];
- 
--		if (io->flags & UBLK_IO_FLAG_ACTIVE)
-+		if (io->flags & UBLK_IO_FLAG_ACTIVE) {
-+			pr_devel("%s: done old cmd: qid %d tag %d\n",
-+					__func__, ubq->q_id, i);
- 			io_uring_cmd_done(io->cmd, UBLK_IO_RES_ABORT, 0);
-+			io->flags &= ~UBLK_IO_FLAG_ACTIVE;
-+			ubq->nr_io_ready--;
-+		}
- 	}
- 
- 	/* all io commands are canceled */
--	ubq->nr_io_ready = 0;
-+	WARN_ON_ONCE(ubq->nr_io_ready);
- }
- 
- /* Cancel all pending commands, must be called after del_gendisk() returns */
+ /* shipped via sqe->cmd of io_uring command */
+ struct ublksrv_ctrl_cmd {
 -- 
 2.27.0
 
