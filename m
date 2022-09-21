@@ -2,117 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09907ECAAD8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 09:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF973ECAAD8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 09:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231599AbiIUJ1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 05:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46632 "EHLO
+        id S231437AbiIUJmZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 05:42:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231416AbiIUJ1S (ORCPT
+        with ESMTP id S230144AbiIUJmY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 05:27:18 -0400
-Received: from mta-01.yadro.com (mta-02.yadro.com [89.207.88.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EC1F8E0F1;
-        Wed, 21 Sep 2022 02:27:17 -0700 (PDT)
-Received: from localhost (unknown [127.0.0.1])
-        by mta-01.yadro.com (Postfix) with ESMTP id 9AE1941252;
-        Wed, 21 Sep 2022 09:27:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
-        in-reply-to:content-transfer-encoding:content-disposition
-        :content-type:content-type:mime-version:references:message-id
-        :subject:subject:from:from:date:date:received:received:received
-        :received; s=mta-01; t=1663752434; x=1665566835; bh=Zo8hxc7svqb4
-        BFaKV7Mv5NTNkTTzcrDesurD+cIxjTE=; b=XbnMHwzikvvrwMVzaW637TKfaflG
-        tNgDyhAR7ITQjJWiyszQatfFDWEnfr1ljpTMNZmapG8DWIB/s1yPDtHCKcxvRqsm
-        WFCXn9qIVfObg0KWQKRlZt+nC5QGeHU5uXEhPMVqtrIwHBEHANnUqTbWcIbka6Yf
-        +Gj3uI81xQsJLVw=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
-        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id n8-Aiz6fb9MR; Wed, 21 Sep 2022 12:27:14 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (T-EXCH-02.corp.yadro.com [172.17.10.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mta-01.yadro.com (Postfix) with ESMTPS id 2B11F41263;
-        Wed, 21 Sep 2022 12:26:12 +0300 (MSK)
-Received: from T-EXCH-09.corp.yadro.com (172.17.11.59) by
- T-EXCH-02.corp.yadro.com (172.17.10.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
- 15.1.669.32; Wed, 21 Sep 2022 12:26:12 +0300
-Received: from yadro.com (10.199.18.119) by T-EXCH-09.corp.yadro.com
- (172.17.11.59) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.9; Wed, 21 Sep
- 2022 12:26:11 +0300
-Date:   Wed, 21 Sep 2022 12:26:09 +0300
-From:   "Alexander V. Buev" <a.buev@yadro.com>
-To:     Keith Busch <kbusch@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>
-Subject: Re: [PATCH v5 0/3] implement direct IO with integrity
-Message-ID: <20220921092609.m4duniwc6jmfrort@yadro.com>
-Mail-Followup-To: "Alexander V. Buev" <a.buev@yadro.com>,
-        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
-References: <20220920144618.1111138-1-a.buev@yadro.com>
- <Yyoer7aEPBWGQCfR@kbusch-mbp.dhcp.thefacebook.com>
+        Wed, 21 Sep 2022 05:42:24 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FDB78275E;
+        Wed, 21 Sep 2022 02:42:23 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MXYLG6L70z6T2Zg;
+        Wed, 21 Sep 2022 17:40:22 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgA3inN73CpjFoetBA--.3521S4;
+        Wed, 21 Sep 2022 17:42:21 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH 0/2] blk-throttle: improve bypassing bios checkings
+Date:   Wed, 21 Sep 2022 17:53:07 +0800
+Message-Id: <20220921095309.1481289-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yyoer7aEPBWGQCfR@kbusch-mbp.dhcp.thefacebook.com>
-X-Originating-IP: [10.199.18.119]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-09.corp.yadro.com (172.17.11.59)
+X-CM-TRANSID: Syh0CgA3inN73CpjFoetBA--.3521S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZryfuFWfXFWrZr17ur1ftFb_yoWDJwbE9F
+        WxJFW5JwnxX3W8JFW0yF1rXrZIgw4UWrW8Z3Z0vrW7Xrn7Zr1DKFZrJr4aqFy7ZF4kKrn8
+        Kr40va18CF1YvjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbz8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> «Внимание! Данное письмо от внешнего адресата!»
-> 
-> On Tue, Sep 20, 2022 at 05:46:15PM +0300, Alexander V. Buev wrote:
-> > This series of patches makes possible to do direct block IO
-> > with integrity payload using io uring kernel interface.
-> > Userspace app can utilize new READV_PI/WRITEV_PI operation with a new
-> > fields in sqe struct (pi_addr/pi_len) to provide iovec's with
-> > integrity data.
-> 
-> Is this really intended to be used exclusively for PI? Once you give use space
-> access to extended metadata regions, they can use it for whatever the user
-> wants, which may not be related to protection information formats. Perhaps a
-> more generic suffix than "_PI" may be appropriate like _EXT or _META?
+From: Yu Kuai <yukuai3@huawei.com>
 
-Currently we use this code for transfer block IO with meta information 
-from user space to special block device driver. This meta information includes PI and some other
-information that helps driver to process IO with some optimization, 
-special option and etc. In the near feature we can extend this info die to increased
-requirements for our product.
+Currently, "tg->has_rules" and "tg->flags & THROTL_TG_HAS_IOPS_LIMIT"
+both try to bypass bios that don't need to be throttled, however, they are
+a little redundant and both not perfect:
 
-Also we can use this code for transfer IO with PI information from user space
-to supported block devices such as nvme & scsi.
+1) "tg->has_rules" only distinguish read and write, but not iops and bps
+   limit.
+2) "tg->flags & THROTL_TG_HAS_IOPS_LIMIT" only check if iops limit
+   exist, read and write is not distinguished, and bps limit is not
+   checked.
 
-And you are right. Just for me "_meta" is more appropriate and abstract suffix for this,
-but:
+With this patchset, biowon't be bypassedd if:
 
- 1. "PI" is shortly
- 2. "PI" and "integrity" is widely used in block layer code and I decided that
-    if it's called PI - everyone understands what exactly it is about.
- 3. User can read/write general info only in case of using special block layer driver. 
+1) Bio is read/write, and corresponding read/write iops limit exist.
+2) If corresponding iops limit doesn't exist, corresponding bps limit
+exist and bio is not throttled before.
 
-Anyway I'm ready to rename this things.
+Yu Kuai (2):
+  blk-throttle: remove THROTL_TG_HAS_IOPS_LIMIT
+  blk-throttle: improve bypassing bios checkings
 
-May be it's enough to rename only userspace visible part?
-(sqe struct members & op codes)
-
+ block/blk-throttle.c | 21 +++++++--------------
+ block/blk-throttle.h | 28 +++++++++++++++++++---------
+ 2 files changed, 26 insertions(+), 23 deletions(-)
 
 -- 
-Alexander V. Buev
+2.31.1
+
