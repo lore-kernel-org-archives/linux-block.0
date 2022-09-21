@@ -2,77 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09316C32771
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 09:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09907ECAAD8
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 09:27:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231479AbiIUJ0Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 05:26:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44256 "EHLO
+        id S231599AbiIUJ1X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 05:27:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231621AbiIUJ0F (ORCPT
+        with ESMTP id S231416AbiIUJ1S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 05:26:05 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 766E6895D0;
-        Wed, 21 Sep 2022 02:26:02 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1oavzT-0004S6-RL; Wed, 21 Sep 2022 11:25:59 +0200
-Message-ID: <6a3660b2-fa7d-14a2-6977-f50926ad369c@leemhuis.info>
-Date:   Wed, 21 Sep 2022 11:25:59 +0200
+        Wed, 21 Sep 2022 05:27:18 -0400
+Received: from mta-01.yadro.com (mta-02.yadro.com [89.207.88.252])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EC1F8E0F1;
+        Wed, 21 Sep 2022 02:27:17 -0700 (PDT)
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id 9AE1941252;
+        Wed, 21 Sep 2022 09:27:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        in-reply-to:content-transfer-encoding:content-disposition
+        :content-type:content-type:mime-version:references:message-id
+        :subject:subject:from:from:date:date:received:received:received
+        :received; s=mta-01; t=1663752434; x=1665566835; bh=Zo8hxc7svqb4
+        BFaKV7Mv5NTNkTTzcrDesurD+cIxjTE=; b=XbnMHwzikvvrwMVzaW637TKfaflG
+        tNgDyhAR7ITQjJWiyszQatfFDWEnfr1ljpTMNZmapG8DWIB/s1yPDtHCKcxvRqsm
+        WFCXn9qIVfObg0KWQKRlZt+nC5QGeHU5uXEhPMVqtrIwHBEHANnUqTbWcIbka6Yf
+        +Gj3uI81xQsJLVw=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id n8-Aiz6fb9MR; Wed, 21 Sep 2022 12:27:14 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (T-EXCH-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mta-01.yadro.com (Postfix) with ESMTPS id 2B11F41263;
+        Wed, 21 Sep 2022 12:26:12 +0300 (MSK)
+Received: from T-EXCH-09.corp.yadro.com (172.17.11.59) by
+ T-EXCH-02.corp.yadro.com (172.17.10.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
+ 15.1.669.32; Wed, 21 Sep 2022 12:26:12 +0300
+Received: from yadro.com (10.199.18.119) by T-EXCH-09.corp.yadro.com
+ (172.17.11.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.9; Wed, 21 Sep
+ 2022 12:26:11 +0300
+Date:   Wed, 21 Sep 2022 12:26:09 +0300
+From:   "Alexander V. Buev" <a.buev@yadro.com>
+To:     Keith Busch <kbusch@kernel.org>
+CC:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>
+Subject: Re: [PATCH v5 0/3] implement direct IO with integrity
+Message-ID: <20220921092609.m4duniwc6jmfrort@yadro.com>
+Mail-Followup-To: "Alexander V. Buev" <a.buev@yadro.com>,
+        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+References: <20220920144618.1111138-1-a.buev@yadro.com>
+ <Yyoer7aEPBWGQCfR@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Content-Language: en-US, de-DE
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
-Cc:     Dusty Mabe <dusty@dustymabe.com>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
- <YxBZ4BBjxvAkvI2A@T590> <20220907073324.GB23826@lst.de>
- <Yxr4SD4d0rZ9TZik@T590> <20220912071618.GA4971@lst.de>
- <Yx/jLTknQm9VeHi4@T590> <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
- <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
- <d39e9149-fcb6-1f7c-4c19-234e74f286f8@kernel.dk>
- <20220920141217.GA12560@lst.de>
- <9594af4b-eb16-0a51-9a4a-e21bbce3317d@kernel.dk>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <9594af4b-eb16-0a51-9a4a-e21bbce3317d@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1663752362;c546a042;
-X-HE-SMSGID: 1oavzT-0004S6-RL
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Yyoer7aEPBWGQCfR@kbusch-mbp.dhcp.thefacebook.com>
+X-Originating-IP: [10.199.18.119]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-09.corp.yadro.com (172.17.11.59)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20.09.22 16:14, Jens Axboe wrote:
-> On 9/20/22 8:12 AM, Christoph Hellwig wrote:
->> On Tue, Sep 20, 2022 at 08:05:06AM -0600, Jens Axboe wrote:
->>> Christoph and I discussed this one last week, and he has a plan to try
->>> a flag approach. Christoph, did you get a chance to bang that out? Would
->>> be nice to get this one wrapped up.
->>
->> I gave up on that as it will be far too much change so late in
->> the cycle and sent you the revert yesterday.
+> «Внимание! Данное письмо от внешнего адресата!»
 > 
-> Gotcha, haven't made it all the way through the emails of the morning yet.
-> I'll queue it up.
+> On Tue, Sep 20, 2022 at 05:46:15PM +0300, Alexander V. Buev wrote:
+> > This series of patches makes possible to do direct block IO
+> > with integrity payload using io uring kernel interface.
+> > Userspace app can utilize new READV_PI/WRITEV_PI operation with a new
+> > fields in sqe struct (pi_addr/pi_len) to provide iovec's with
+> > integrity data.
+> 
+> Is this really intended to be used exclusively for PI? Once you give use space
+> access to extended metadata regions, they can use it for whatever the user
+> wants, which may not be related to protection information formats. Perhaps a
+> more generic suffix than "_PI" may be appropriate like _EXT or _META?
 
-Thx to both of you for taking care of this.
+Currently we use this code for transfer block IO with meta information 
+from user space to special block device driver. This meta information includes PI and some other
+information that helps driver to process IO with some optimization, 
+special option and etc. In the near feature we can extend this info die to increased
+requirements for our product.
 
-Nitpicking: that patch is missing a "CC: stable@..." tag to ensure
-automatic and quick backporting to 5.19.y. Or is the block layer among
-the subsystems that prefer to handle such things manually?
+Also we can use this code for transfer IO with PI information from user space
+to supported block devices such as nvme & scsi.
 
-Ohh, and a fixes tag might have been good as well; a "Link:" tag
-pointing to the report, too. If either would have been there, regzbot
-would have noticed Christoph's patch posting and I wouldn't have
-bothered you yesterday. :-) But whatever, not that important.
+And you are right. Just for me "_meta" is more appropriate and abstract suffix for this,
+but:
 
-#regzbot fixed-by: 4c66a326b5ab784cddd72d
+ 1. "PI" is shortly
+ 2. "PI" and "integrity" is widely used in block layer code and I decided that
+    if it's called PI - everyone understands what exactly it is about.
+ 3. User can read/write general info only in case of using special block layer driver. 
 
-Ciao, Thorsten
+Anyway I'm ready to rename this things.
+
+May be it's enough to rename only userspace visible part?
+(sqe struct members & op codes)
+
+
+-- 
+Alexander V. Buev
