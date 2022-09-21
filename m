@@ -2,112 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4300CC6FA8E
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 14:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E4FC6FA82
+	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 14:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229663AbiIUOed (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 10:34:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44622 "EHLO
+        id S229512AbiIUOhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 10:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiIUOeb (ORCPT
+        with ESMTP id S229490AbiIUOhB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 10:34:31 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86504FD12
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 07:34:28 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id d8so5147742iof.11
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 07:34:28 -0700 (PDT)
+        Wed, 21 Sep 2022 10:37:01 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28461895E2
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 07:37:01 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id y9so3215980ily.11
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 07:37:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=y9qJH4p5mVpa4a017Npx8Guug2HXx37SOnXReOlQQDI=;
-        b=6neaLw7Rl2m8fqveO8b9p7b7NV80spZJC8zDn3ZoSFYLYAIH13wXecVlYPcFiOptaD
-         vmaLnx9f7h95Ri0MaRTL/xBPTEWBF2r8FvErC5F9I1GpMaFmaYr9PgO7KOd1VR1WTc8/
-         Fn3ju5Y42QSBnLEG4S24GK/vx8ymmiAaGu88Kq86/vq4x55nQNBly7VMEr+9ZSbDZfEn
-         fWDiDZko4Qklq1qWsJXJoVZx7ukgrV7uG0gliFQlXxploBdaGFinQMVN39rFBz5PT6Ap
-         +RNj8F7zrmIwDH5uTWLG6cNpEY/uP0J5rKC2AiVCd/ZsfrE3dgwojQ+3o/JC32rPOpSi
-         MfXQ==
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=2PJ7mUrSV3d/EEO99tJFQt9AbdRDwWYt70eWZRfTg+w=;
+        b=K0W+V6XMQMc4HbHBUosgF9SpxnuEvs176WSWL9RmRcRKBU8K1ypiDPiAEih/bwipBM
+         H6tGvn+2GlYE5QG5+KTNeIXVAtM4tczzS9DsEyGQcKpb3GTDro3J2NQTCGOVgEaZgA8E
+         4XQ1lfQOKaTuAyYV4FwSyRN5ULtaX8WYSmCPVFp8wKcy9B6nTLDOIzk3afsBGVfKejNK
+         PVNH1tG+Y29dMP416W2lWT9ktEls3TE3yk4uua0P8gzuE+ZX1L9TZ0I1HHA8hPSWyltG
+         Mpz5++aNkX6dQlUqY5vIQqxU22OhyGEV7VJohL7pfjuRrFa/nAQWeVOZ0STZqCjBFH61
+         C7PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=y9qJH4p5mVpa4a017Npx8Guug2HXx37SOnXReOlQQDI=;
-        b=MX5Qli99q6Y49M+dV1lGH5wBPVlhMdQ7DpcQreC/VAtNpdJRtH7lGxhVLziJaeEp8p
-         bkVpy0J4NEn4Q3K1tFGr87svK8XfSu7kN8759WZeBoGoPODwaRr8+JrJNtb2MZKL9TyH
-         nY0GB/SGRrRDYZnuyDtiG2hHve4U1qKgqTt34/1gYtfcP7ZIrYBbv8HKRQiLHqrj0N9y
-         rsTzW+UIsnlvegg01Ntgmlqf/5uYp/zKJdm7TzBv5C/j72aUpMR4fvdiIfbPKpaziWJi
-         USKthKdYZCbIe+YlZuZ6m0cHLl+7Mlnv6IAsCku39QkN3/t6UK9SWL9wo+rc4uTCHnXX
-         3XSw==
-X-Gm-Message-State: ACrzQf1pKynpa5//YNAqs92zQNHjiHH7sbUAgsoDiG61w6JOm3ZgQxv9
-        zXHDW/gQYloNwodb0WWtmDh4kg==
-X-Google-Smtp-Source: AMsMyM5Y0ov9derzD5xgJgr5MKwNddz0GhXBBijeLFlGJnuvIzG2ySlyP7j3WrnvuVf3gorGGI/Sxg==
-X-Received: by 2002:a6b:7d05:0:b0:68b:7243:63ff with SMTP id c5-20020a6b7d05000000b0068b724363ffmr11874700ioq.191.1663770867802;
-        Wed, 21 Sep 2022 07:34:27 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id y97-20020a02956a000000b0035b0ea27606sm999417jah.79.2022.09.21.07.34.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Sep 2022 07:34:27 -0700 (PDT)
-Message-ID: <c7c909aa-71d9-b43c-293e-d4801a00861e@kernel.dk>
-Date:   Wed, 21 Sep 2022 08:34:26 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Content-Language: en-US
-To:     Thorsten Leemhuis <regressions@leemhuis.info>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Dusty Mabe <dusty@dustymabe.com>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <017845ae-fbae-70f6-5f9e-29aff2742b8c@dustymabe.com>
- <YxBZ4BBjxvAkvI2A@T590> <20220907073324.GB23826@lst.de>
- <Yxr4SD4d0rZ9TZik@T590> <20220912071618.GA4971@lst.de>
- <Yx/jLTknQm9VeHi4@T590> <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
- <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
- <d39e9149-fcb6-1f7c-4c19-234e74f286f8@kernel.dk>
- <20220920141217.GA12560@lst.de>
- <9594af4b-eb16-0a51-9a4a-e21bbce3317d@kernel.dk>
- <6a3660b2-fa7d-14a2-6977-f50926ad369c@leemhuis.info>
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=2PJ7mUrSV3d/EEO99tJFQt9AbdRDwWYt70eWZRfTg+w=;
+        b=UMd7FpQ9ZSFONh2UnRwVA1avrvmefeQnqzLPfgppo7q137jfh24/JtzJMV99EQ9hmI
+         vSxMqyQRP7Sx52967nq0vm4j2yKndKncixSCPn4XMy3QtOTOIsr9vqXINH3Mk02zZREV
+         /vKwyrl8sWCH0J8AEkQHgVp8dqtJ/GROOMLNjicj6xZchbP96nIw98adT1/wJRk8wSkO
+         u49LL5dRtrJfkE9T6JpLC8bgBCPy1+7GtYftwgu5CAFqcKL/OtekuxNWQb4ErQOOmoqG
+         m4M9ZKnufDBt96GCFrINTJ8a7kXvM4dxVSNFcY1gJNy6xr3Jauzu5184eANgw3QEF5tM
+         gy4g==
+X-Gm-Message-State: ACrzQf2o0Kwe9O+vJ/RJSU6vUS3Eqzc5fDbB1O51olGbwTL/B+eWNfr9
+        aMTwoOUUhsZiX8mhP/B9+pUo5iHjg9npRA==
+X-Google-Smtp-Source: AMsMyM5kX6grzFPuCSlMHELCEDjwzyXoTaYOHTf+6cU8Vkhjvll6mH2g+6HeyV+4ViIAIEzjH5KHCg==
+X-Received: by 2002:a05:6e02:1b83:b0:2f5:3d65:6bca with SMTP id h3-20020a056e021b8300b002f53d656bcamr9108102ili.279.1663771020471;
+        Wed, 21 Sep 2022 07:37:00 -0700 (PDT)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id a14-20020a056602148e00b006a0d1a30684sm1215802iow.33.2022.09.21.07.36.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Sep 2022 07:36:59 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <6a3660b2-fa7d-14a2-6977-f50926ad369c@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     Stefan Haberland <sth@linux.ibm.com>
+Cc:     linux-block@vger.kernel.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-s390@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>
+In-Reply-To: <20220920192616.808070-1-sth@linux.ibm.com>
+References: <20220920192616.808070-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/7] s390/dasd: add hardware copy relation
+Message-Id: <166377101952.42670.6992780318045697672.b4-ty@kernel.dk>
+Date:   Wed, 21 Sep 2022 08:36:59 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.10.0-dev-355bd
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/21/22 3:25 AM, Thorsten Leemhuis wrote:
-> On 20.09.22 16:14, Jens Axboe wrote:
->> On 9/20/22 8:12 AM, Christoph Hellwig wrote:
->>> On Tue, Sep 20, 2022 at 08:05:06AM -0600, Jens Axboe wrote:
->>>> Christoph and I discussed this one last week, and he has a plan to try
->>>> a flag approach. Christoph, did you get a chance to bang that out? Would
->>>> be nice to get this one wrapped up.
->>>
->>> I gave up on that as it will be far too much change so late in
->>> the cycle and sent you the revert yesterday.
->>
->> Gotcha, haven't made it all the way through the emails of the morning yet.
->> I'll queue it up.
+On Tue, 20 Sep 2022 21:26:09 +0200, Stefan Haberland wrote:
+> please apply the following patchset to for-next.
+> It adds basic support for a harwdare based copy relation to the DASD
+> device driver.
 > 
-> Thx to both of you for taking care of this.
+> regards,
+> Stefan
 > 
-> Nitpicking: that patch is missing a "CC: stable@..." tag to ensure
-> automatic and quick backporting to 5.19.y. Or is the block layer among
-> the subsystems that prefer to handle such things manually?
-> 
-> Ohh, and a fixes tag might have been good as well; a "Link:" tag
-> pointing to the report, too. If either would have been there, regzbot
-> would have noticed Christoph's patch posting and I wouldn't have
-> bothered you yesterday. :-) But whatever, not that important.
+> [...]
 
-We'll just have to ensure we ping stable on it when it goes in.
+Applied, thanks!
 
+[1/7] s390/dasd: put block allocation in separate function
+      commit: 2b43bf061b2e1b67561cbb1f6f305421f5fc86af
+[2/7] s390/dasd: add query PPRC function
+      commit: 3f217cceb6846e7533511fc69bc774cdba37ff7d
+[3/7] s390/dasd: add copy pair setup
+      commit: a91ff09d39f9b6545254839ac91f1ff7bd21d39e
+[4/7] s390/dasd: add copy pair swap capability
+      commit: 413862caad6fe7fddec639219bccfdab60333551
+[5/7] s390/dasd: add ioctl to perform a swap of the drivers copy pair
+      commit: 112ff512fc654d7066936dcc06f77cc60471fdb4
+[6/7] s390/dasd: suppress generic error messages for PPRC secondary devices
+      commit: 1fca631a1185d1de9eab65ee963fec20efcc528a
+[7/7] s390/dasd: add device ping attribute
+      commit: 32ff8ce08b47a5fe64ef9827443ba6cc49a659c8
+
+Best regards,
 -- 
 Jens Axboe
 
