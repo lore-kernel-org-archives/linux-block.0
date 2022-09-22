@@ -2,172 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 259BBC6FA8B
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 06:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EEBC6FA82
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 06:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbiIVGSt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 02:18:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43608 "EHLO
+        id S230218AbiIVG0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 02:26:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbiIVGSR (ORCPT
+        with ESMTP id S230225AbiIVGZq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 02:18:17 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06FC2B56CC;
-        Wed, 21 Sep 2022 23:18:13 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQRHxVq_1663827489;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQRHxVq_1663827489)
-          by smtp.aliyun-inc.com;
-          Thu, 22 Sep 2022 14:18:11 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     ming.lei@redhat.com
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        joseph.qi@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V5 6/7] ublk_drv: allow new process to open ublk chardev with recovery feature enabled
-Date:   Thu, 22 Sep 2022 14:17:33 +0800
-Message-Id: <20220922061734.21625-7-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220922061734.21625-1-ZiyangZhang@linux.alibaba.com>
-References: <20220922061734.21625-1-ZiyangZhang@linux.alibaba.com>
+        Thu, 22 Sep 2022 02:25:46 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8ED4AFAF2
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 23:25:30 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 9EC5F68BEB; Thu, 22 Sep 2022 08:25:17 +0200 (CEST)
+Date:   Thu, 22 Sep 2022 08:25:17 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        Yi Zhang <yi.zhang@redhat.com>,
+        homas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] blk-mq: avoid to hang in the cpuhp offline handler
+Message-ID: <20220922062517.GB27946@lst.de>
+References: <20220920021724.1841850-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220920021724.1841850-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With recovery feature enabled, if ublk chardev is ready to be released
-and quiesce_work has been scheduled, we:
-(1) reinit all ubqs, including:
-    (a) put the task_struct and reset ->ubq_daemon to NULL.
-    (b) reset all ublk_io.
-(2) reset ub->mm to NULL.
-Then ublk chardev is released and new process can open it.
+On Tue, Sep 20, 2022 at 10:17:24AM +0800, Ming Lei wrote:
+> For avoiding to trigger io timeout when one hctx becomes inactive, we
+> drain IOs when all CPUs of one hctx are offline. However, driver's
+> timeout handler may require cpus_read_lock, such as nvme-pci,
+> pci_alloc_irq_vectors_affinity() is called in nvme-pci reset context,
+> and irq_build_affinity_masks() needs cpus_read_lock().
+> 
+> Meantime when blk-mq's cpuhp offline handler is called, cpus_write_lock
+> is held, so deadlock is caused.
+> 
+> Fixes the issue by breaking the wait loop if enough long time elapses,
+> and these in-flight not drained IO still can be handled by timeout
+> handler.
 
-RECOVER_DEV is introduced as a new ctrl-cmd for recovery feature.
-After the chardev is opened and all ubqs are ready, user should send
-RECOVER_DEV to:
-(1) wait until all new ubq_daemons getting ready.
-(2) update ublksrv_pid
-(3) unquiesce the request queue and expect incoming ublk_queue_rq()
-(4) convert ub's state to UBLK_S_DEV_LIVE
-(5) reschedule monitor_work
+I'm not sure that this actually is a good idea on its own, and it kinda
+defeats the cpu hotplug processing.
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- drivers/block/ublk_drv.c      | 67 +++++++++++++++++++++++++++++++++++
- include/uapi/linux/ublk_cmd.h |  1 +
- 2 files changed, 68 insertions(+)
+So if I understand your log above correctly the problem is that
+we have commands that would time out, and we exacalate to a
+controller reset that is racing with the CPU unplug, or if not can
+you explain the scenario a little more?
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 3977869d2bc4..ac8bf497567f 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -898,10 +898,40 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
- 	return 0;
- }
- 
-+static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
-+{
-+	int i;
-+
-+	/* old daemon is PF_EXITING, put it now */
-+	if (ubq->ubq_daemon) {
-+		put_task_struct(ubq->ubq_daemon);
-+		/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
-+		ubq->ubq_daemon = NULL;
-+	}
-+
-+	for (i = 0; i < ubq->q_depth; i++) {
-+		struct ublk_io *io = &ubq->ios[i];
-+
-+		/* forget everything now and be ready for new FETCH_REQ */
-+		io->flags = 0;
-+		io->cmd = NULL;
-+		io->addr = 0;
-+	}
-+	ubq->nr_io_ready = 0;
-+}
-+
- static int ublk_ch_release(struct inode *inode, struct file *filp)
- {
- 	struct ublk_device *ub = filp->private_data;
-+	int i;
- 
-+	pr_devel("%s: reinit queues for dev id %d.\n", __func__, ub->dev_info.dev_id);
-+	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-+		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
-+	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
-+	ub->mm = NULL;
-+	ub->nr_queues_ready = 0;
-+	init_completion(&ub->completion);
- 	clear_bit(UB_STATE_OPEN, &ub->state);
- 	return 0;
- }
-@@ -1873,6 +1903,40 @@ static int ublk_ctrl_set_params(struct io_uring_cmd *cmd)
- 	return ret;
- }
- 
-+static int ublk_ctrl_recover_dev(struct io_uring_cmd *cmd)
-+{
-+	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
-+	int ublksrv_pid = (int)header->data[0];
-+	struct ublk_device *ub;
-+	int ret = -EINVAL;
-+
-+	ub = ublk_get_device_from_id(header->dev_id);
-+	if (!ub)
-+		return ret;
-+
-+	/* wait until new ubq_daemon sending all FETCH_REQ */
-+	wait_for_completion_interruptible(&ub->completion);
-+
-+	mutex_lock(&ub->mutex);
-+	if (!ublk_can_use_recovery(ub))
-+		goto out_unlock;
-+
-+	if (ub->dev_info.state != UBLK_S_DEV_QUIESCED) {
-+		ret = -EBUSY;
-+		goto out_unlock;
-+	}
-+	ub->dev_info.ublksrv_pid = ublksrv_pid;
-+	blk_mq_unquiesce_queue(ub->ub_disk->queue);
-+	blk_mq_kick_requeue_list(ub->ub_disk->queue);
-+	ub->dev_info.state = UBLK_S_DEV_LIVE;
-+	schedule_delayed_work(&ub->monitor_work, UBLK_DAEMON_MONITOR_PERIOD);
-+	ret = 0;
-+ out_unlock:
-+	mutex_unlock(&ub->mutex);
-+	ublk_put_device(ub);
-+	return ret;
-+}
-+
- static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 		unsigned int issue_flags)
- {
-@@ -1914,6 +1978,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
- 	case UBLK_CMD_SET_PARAMS:
- 		ret = ublk_ctrl_set_params(cmd);
- 		break;
-+	case UBLK_CMD_RECOVER_DEV:
-+		ret = ublk_ctrl_recover_dev(cmd);
-+		break;
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 332370628757..deb674f1fbc9 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -17,6 +17,7 @@
- #define	UBLK_CMD_STOP_DEV	0x07
- #define	UBLK_CMD_SET_PARAMS	0x08
- #define	UBLK_CMD_GET_PARAMS	0x09
-+#define UBLK_CMD_RECOVER_DEV	0x10
- 
- /*
-  * IO commands, issued by ublk server, and handled by ublk driver.
--- 
-2.27.0
-
+> Cc: linux-nvme@lists.infradead.org
+> Reported-by: Yi Zhang <yi.zhang@redhat.com>
+> Fixes: bf0beec0607d ("blk-mq: drain I/O when all CPUs in a hctx are offline")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c96c8c4f751b..4585985b8537 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3301,6 +3301,7 @@ static inline bool blk_mq_last_cpu_in_hctx(unsigned int cpu,
+>  	return true;
+>  }
+>  
+> +#define BLK_MQ_MAX_OFFLINE_WAIT_MSECS 3000
+>  static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+>  {
+>  	struct blk_mq_hw_ctx *hctx = hlist_entry_safe(node,
+> @@ -3326,8 +3327,13 @@ static int blk_mq_hctx_notify_offline(unsigned int cpu, struct hlist_node *node)
+>  	 * frozen and there are no requests.
+>  	 */
+>  	if (percpu_ref_tryget(&hctx->queue->q_usage_counter)) {
+> -		while (blk_mq_hctx_has_requests(hctx))
+> +		unsigned int wait_ms = 0;
+> +
+> +		while (blk_mq_hctx_has_requests(hctx) && wait_ms <
+> +				BLK_MQ_MAX_OFFLINE_WAIT_MSECS) {
+>  			msleep(5);
+> +			wait_ms += 5;
+> +		}
+>  		percpu_ref_put(&hctx->queue->q_usage_counter);
+>  	}
+>  
+> -- 
+> 2.31.1
+---end quoted text---
