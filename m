@@ -2,227 +2,288 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D531BECAAD8
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 18:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 256D9ECAAD8
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 18:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbiIVSbz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 14:31:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51140 "EHLO
+        id S232705AbiIVSca (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 14:32:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232463AbiIVSa7 (ORCPT
+        with ESMTP id S229847AbiIVScB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 14:30:59 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A8B10CA48
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 11:28:12 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id p202so2165284iod.6
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 11:28:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=8xAQy7aZ7BYH1DPQ+8tvyApZhb4BnQnHW544FcJ7XiE=;
-        b=aR9k5LYhnfTw7XXQzoO5WAz8DP39KvgUKyrz1rGsakd/XddUjw6vg3NHGqsum9PG+V
-         QoYoKbT2kP5nhO/G7Sy/qccemyc0E3pmzD1crhRZt6HqXTJEmz/xelocvDqKLNuVcNQL
-         Sl0HAFLPpFWkeQlEmS28RX7jV9+hMHFzbx3TOKoTuYtLcwK9Es9RpjUt11hx8enBYeBL
-         f8ky37PViY/csWh7e3o3oS3HydD07wSBCxDqzwz1zuVf+k0iAXXg38nE5IjnxNq1FTab
-         lrWaeH8Gb5fnrrASwQQHIZ/F9tg1KlBE+kuCAi0dR8ZXyjP4xFMf/mRUd8VVQV7PK8FO
-         ew0w==
+        Thu, 22 Sep 2022 14:32:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7DC15A0F
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 11:29:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663871382;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=S6tJUCgYaZdA91WGecG3Omdxk6C0Sput3VYlk3b1RhA=;
+        b=Gt2JtkcpHh1qeMaekK+43dkXaj9hFWeU7xf2Bw28Yy3A65Jas3m4NO/sRr2xOzxV6xfLV9
+        zvhrKYL2x76+d1EVCHUMFFjZ9KzszrimWN2dDM5UVTohK7FCl4kJ7QzALgMdcCaIHouZvk
+        fF86+Y6g4rTDVq7Fo8Z5Un4i6mBXSeA=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-205-m2-IseD7PfuaXCkxI1tUgg-1; Thu, 22 Sep 2022 14:29:41 -0400
+X-MC-Unique: m2-IseD7PfuaXCkxI1tUgg-1
+Received: by mail-qv1-f71.google.com with SMTP id ok32-20020a0562143ca000b004a10b5f97e6so6960730qvb.12
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 11:29:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=8xAQy7aZ7BYH1DPQ+8tvyApZhb4BnQnHW544FcJ7XiE=;
-        b=CJEPjInJR5+wp2UuI8lSepFBduVV1ipwOOVX5qIlMWGSemtLI5tWUikG4GRkLzVcPD
-         AoSrUDSSftD+DQmSLYFcfJcRGnVQGbvJW2LXpWngvo1O1UNgh1DX1C+h40owqZne9v/N
-         MXzXplyircEtp8JneAf15ZJwNEFFLKMdAvBuWNtbxnirw2o7g9OKb/tk5ootsvgh390x
-         SoHXzJrRRhB8yZGZhEipnHBMb8gdPeE7GJ2dfiy6zynezuaBQdRmEUP0Susay2pZ9br3
-         Jxt4UKvAxem+JbNTqGQPbBVK6EZJx/W9GrbgaPxlwCEfKSi4kieuVA1u4kr8Smb8kRmh
-         2UmA==
-X-Gm-Message-State: ACrzQf2UHP919keUzLQ+S21fwKPYXo+/nlrKBsTnsf7yBHW2GMIoYvXM
-        uRl0HwtXfVRP/EhmB2Rh5/uowj8zZhnl9Q==
-X-Google-Smtp-Source: AMsMyM4SGqW5jyi20l7Smo7p+cJHNnri3FkeeL9qvvrk+1n6md6nK0KgGtTcdgUAs/H34Ch0+VvUPg==
-X-Received: by 2002:a6b:ba05:0:b0:68a:8a2f:8fdc with SMTP id k5-20020a6bba05000000b0068a8a2f8fdcmr2255996iof.148.1663871291224;
-        Thu, 22 Sep 2022 11:28:11 -0700 (PDT)
-Received: from m1max.localdomain ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q20-20020a05663810d400b0035a468b7fbesm2440646jad.71.2022.09.22.11.28.10
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=S6tJUCgYaZdA91WGecG3Omdxk6C0Sput3VYlk3b1RhA=;
+        b=60qWD7BdH0NUrVFaJEHylo6miFP3Q+UpMGhElMmkbRRJDT1FhEBoWDDXXbtrTi6f8z
+         rMY6EqRJWhHluvWIDYitaYjCUBSdDDmJ5uPeqVUmNSJggy1JY7GavJuvRUOWVLrwvmH0
+         ClAK8aiIWuQSYtlxk/7rJf+/brIVH99nUBQOG+fJO8biAqacR0JwkCm2JNK5DAjgDEOf
+         SuISi9YiVk1Zm99vOmZCR6b+/USdbJEhBjI8bJba7yTfghGyiob+jeFHVUlLbxZxq6Sq
+         iJKG/5+CR6voDhoEKzHbXgcCg3JfKuOvcb72GKCC3QEMk5OJ756+T8gveFEaiHDsDBv6
+         wMyw==
+X-Gm-Message-State: ACrzQf2ZyDLao/S5L/NiNXLzzK7vrZEZ3TegzHu/cryEoYuv3477TLV2
+        1BcKCVY+09KxIqVVx8AOKuc+DpcmLDxNpL8p2CCP/F6MGUhf3RfIWDKfy+mYoOgQJAUtZcGJrTi
+        qiUQMcGEuu0jcmWuREDuKP40=
+X-Received: by 2002:a05:6214:29e4:b0:4ad:8c96:178b with SMTP id jv4-20020a05621429e400b004ad8c96178bmr1931441qvb.29.1663871380573;
+        Thu, 22 Sep 2022 11:29:40 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5RkWlQl2NY4VBbaFM/3H818tEmhHbxLx0HPIsYfjbny4kxcAOERW2vdVGtdqk3/xGNqUrABA==
+X-Received: by 2002:a05:6214:29e4:b0:4ad:8c96:178b with SMTP id jv4-20020a05621429e400b004ad8c96178bmr1931418qvb.29.1663871380242;
+        Thu, 22 Sep 2022 11:29:40 -0700 (PDT)
+Received: from bfoster (c-24-61-119-116.hsd1.ma.comcast.net. [24.61.119.116])
+        by smtp.gmail.com with ESMTPSA id n12-20020a05620a294c00b006ce63901d27sm4470061qkp.4.2022.09.22.11.29.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 11:28:10 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@fb.com>
-Subject: [PATCH 4/5] nvme: split out metadata vs non metadata end_io uring_cmd completions
-Date:   Thu, 22 Sep 2022 12:28:04 -0600
-Message-Id: <20220922182805.96173-5-axboe@kernel.dk>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220922182805.96173-1-axboe@kernel.dk>
-References: <20220922182805.96173-1-axboe@kernel.dk>
+        Thu, 22 Sep 2022 11:29:39 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 14:29:36 -0400
+From:   Brian Foster <bfoster@redhat.com>
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        Evan Green <evgreen@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Subject: Re: [PATCH RFC 4/8] fs: Introduce FALLOC_FL_PROVISION
+Message-ID: <YyypkOr3l2lx4Odi@bfoster>
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <20220915164826.1396245-5-sarthakkukreti@google.com>
+ <YyRkd8YAH1lal8/N@bfoster>
+ <CAG9=OMNL1Z3DiO-usdH0k90NDsDkDQ7A7CHc4Nu6MCXKNKjWdw@mail.gmail.com>
+ <YyswI57JH7gcs9+S@bfoster>
+ <CAG9=OMPEoShYMx6A+p97-tw4MuLpgOEpy7aFs5CH6wTedptALQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAG9=OMPEoShYMx6A+p97-tw4MuLpgOEpy7aFs5CH6wTedptALQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-By splitting up the metadata and non-metadata end_io handling, we can
-remove any request dependencies on the normal non-metadata IO path. This
-is in preparation for enabling the normal IO passthrough path to pass
-the ownership of the request back to the block layer.
+On Thu, Sep 22, 2022 at 01:04:33AM -0700, Sarthak Kukreti wrote:
+> On Wed, Sep 21, 2022 at 8:39 AM Brian Foster <bfoster@redhat.com> wrote:
+> >
+> > On Fri, Sep 16, 2022 at 02:02:31PM -0700, Sarthak Kukreti wrote:
+> > > On Fri, Sep 16, 2022 at 4:56 AM Brian Foster <bfoster@redhat.com> wrote:
+> > > >
+> > > > On Thu, Sep 15, 2022 at 09:48:22AM -0700, Sarthak Kukreti wrote:
+> > > > > From: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> > > > >
+> > > > > FALLOC_FL_PROVISION is a new fallocate() allocation mode that
+> > > > > sends a hint to (supported) thinly provisioned block devices to
+> > > > > allocate space for the given range of sectors via REQ_OP_PROVISION.
+> > > > >
+> > > > > Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
+> > > > > ---
+> > > > >  block/fops.c                | 7 ++++++-
+> > > > >  include/linux/falloc.h      | 3 ++-
+> > > > >  include/uapi/linux/falloc.h | 8 ++++++++
+> > > > >  3 files changed, 16 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/block/fops.c b/block/fops.c
+> > > > > index b90742595317..a436a7596508 100644
+> > > > > --- a/block/fops.c
+> > > > > +++ b/block/fops.c
+> > > > ...
+> > > > > @@ -661,6 +662,10 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+> > > > >               error = blkdev_issue_discard(bdev, start >> SECTOR_SHIFT,
+> > > > >                                            len >> SECTOR_SHIFT, GFP_KERNEL);
+> > > > >               break;
+> > > > > +     case FALLOC_FL_PROVISION:
+> > > > > +             error = blkdev_issue_provision(bdev, start >> SECTOR_SHIFT,
+> > > > > +                                            len >> SECTOR_SHIFT, GFP_KERNEL);
+> > > > > +             break;
+> > > > >       default:
+> > > > >               error = -EOPNOTSUPP;
+> > > > >       }
+> > > >
+> > > > Hi Sarthak,
+> > > >
+> > > > Neat mechanism.. I played with something very similar in the past (that
+> > > > was much more crudely hacked up to target dm-thin) to allow filesystems
+> > > > to request a thinly provisioned device to allocate blocks and try to do
+> > > > a better job of avoiding inactivation when overprovisioned.
+> > > >
+> > > > One thing I'm a little curious about here.. what's the need for a new
+> > > > fallocate mode? On a cursory glance, the provision mode looks fairly
+> > > > analogous to normal (mode == 0) allocation mode with the exception of
+> > > > sending the request down to the bdev. blkdev_fallocate() already maps
+> > > > some of the logical falloc modes (i.e. punch hole, zero range) to
+> > > > sending write sames or discards, etc., and it doesn't currently look
+> > > > like it supports allocation mode, so could it not map such requests to
+> > > > the underlying REQ_OP_PROVISION op?
+> > > >
+> > > > I guess the difference would be at the filesystem level where we'd
+> > > > probably need to rely on a mount option or some such to control whether
+> > > > traditional fallocate issues provision ops (like you've implemented for
+> > > > ext4) vs. the specific falloc command, but that seems fairly consistent
+> > > > with historical punch hole/discard behavior too. Hm? You might want to
+> > > > cc linux-fsdevel in future posts in any event to get some more feedback
+> > > > on how other filesystems might want to interact with such a thing.
+> > > >
+> > > Thanks for the feedback!
+> > > Argh, I completely forgot that I should add linux-fsdevel. Let me
+> > > re-send this with linux-fsdevel cc'd
+> > >
+> > > There's a slight distinction is that the current filesystem-level
+> > > controls are usually for default handling, but userspace can still
+> > > call the relevant functions manually if they need to. For example, for
+> > > ext4, the 'discard' mount option dictates whether free blocks are
+> > > discarded, but it doesn't set the policy to allow/disallow userspace
+> > > from manually punching holes into files even if the mount opt is
+> > > 'nodiscard'. FALLOC_FL_PROVISION is similar in that regard; it adds a
+> > > manual mechanism for users to provision the files' extents, that is
+> > > separate from the filesystems' default handling of provisioning files.
+> > >
+> >
+> > What I'm trying to understand is why not let blkdev_fallocate() issue a
+> > provision based on the default mode (i.e. mode == 0) of fallocate(),
+> > which is already defined to mean "perform allocation?" It currently
+> > issues discards or write zeroes based on variants of
+> > FALLOC_FL_PUNCH_HOLE without the need for a separate FALLOC_FL_DISCARD
+> > mode, for example.
+> >
+> It's mostly to keep the block device fallocate() semantics in-line and
+> consistent with the file-specific modes: I added the separate
+> filesystem fallocate() mode under the assumption that we'd want to
+> keep the traditional handling for filesystems intact with (mode == 0).
+> And for block devices, I didn't map the requests to mode == 0 so that
+> it's less confusing to describe (eg. mode == 0 on block devices will
+> issue provision; mode == 0 on files will not). It would complicate
+> loopback devices, for instance; if the loop device is backed by a
+> file, it would need to use (mode == FALLOC_FL_PROVISION) but if the
+> loop device is backed by another block device, then the fallocate()
+> call would need to switch to (mode == 0).
+> 
 
-Co-developed-by: Stefan Roesch <shr@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- drivers/nvme/host/ioctl.c | 82 +++++++++++++++++++++++++++++++--------
- 1 file changed, 66 insertions(+), 16 deletions(-)
+I would expect the loopback scenario for provision to behave similar to
+how discards are handled. I.e., loopback receives a provision request
+and translates that to fallocate(mode = 0). If the backing device is
+block, blkdev_fallocate(mode = 0) translates that to another provision
+request.  If the backing device is a file, the associated fallocate
+handler allocs/maps, if necessary, and then issues a provision on
+allocation, if enabled by the fs.
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index c80b3ecca5c8..1ccc9dd6d434 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -349,9 +349,18 @@ struct nvme_uring_cmd_pdu {
- 		struct bio *bio;
- 		struct request *req;
- 	};
--	void *meta; /* kernel-resident buffer */
--	void __user *meta_buffer;
- 	u32 meta_len;
-+	union {
-+		struct {
-+			void *meta; /* kernel-resident buffer */
-+			void __user *meta_buffer;
-+		};
-+		struct {
-+			u32 nvme_flags;
-+			u32 nvme_status;
-+			u64 result;
-+		};
-+	};
- };
- 
- static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
-@@ -360,11 +369,10 @@ static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
- 	return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
- }
- 
--static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
-+static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
- {
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
- 	struct request *req = pdu->req;
--	struct bio *bio = req->bio;
- 	int status;
- 	u64 result;
- 
-@@ -375,27 +383,43 @@ static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
- 
- 	result = le64_to_cpu(nvme_req(req)->result.u64);
- 
--	if (pdu->meta)
-+	if (pdu->meta_len)
- 		status = nvme_finish_user_metadata(req, pdu->meta_buffer,
- 					pdu->meta, pdu->meta_len, status);
--	if (bio)
--		blk_rq_unmap_user(bio);
-+	if (req->bio)
-+		blk_rq_unmap_user(req->bio);
- 	blk_mq_free_request(req);
- 
- 	io_uring_cmd_done(ioucmd, status, result);
- }
- 
-+static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
-+{
-+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
-+	int status;
-+
-+	if (pdu->nvme_flags & NVME_REQ_CANCELLED)
-+		status = -EINTR;
-+	else
-+		status = pdu->nvme_status;
-+
-+	if (pdu->bio)
-+		blk_rq_unmap_user(pdu->bio);
-+
-+	io_uring_cmd_done(ioucmd, status, pdu->result);
-+}
-+
- static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 						blk_status_t err)
- {
- 	struct io_uring_cmd *ioucmd = req->end_io_data;
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
--	/* extract bio before reusing the same field for request */
--	struct bio *bio = pdu->bio;
- 	void *cookie = READ_ONCE(ioucmd->cookie);
- 
--	pdu->req = req;
--	req->bio = bio;
-+	req->bio = pdu->bio;
-+	pdu->nvme_flags = nvme_req(req)->flags;
-+	pdu->nvme_status = nvme_req(req)->status;
-+	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
- 
- 	/*
- 	 * For iopoll, complete it directly.
-@@ -406,6 +430,29 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 	else
- 		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
- 
-+	blk_mq_free_request(req);
-+	return RQ_END_IO_NONE;
-+}
-+
-+static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
-+						     blk_status_t err)
-+{
-+	struct io_uring_cmd *ioucmd = req->end_io_data;
-+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
-+	void *cookie = READ_ONCE(ioucmd->cookie);
-+
-+	req->bio = pdu->bio;
-+	pdu->req = req;
-+
-+	/*
-+	 * For iopoll, complete it directly.
-+	 * Otherwise, move the completion to task work.
-+	 */
-+	if (cookie != NULL && blk_rq_is_poll(req))
-+		nvme_uring_task_meta_cb(ioucmd);
-+	else
-+		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
-+
- 	return RQ_END_IO_NONE;
- }
- 
-@@ -467,8 +514,6 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 			blk_flags);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
--	req->end_io = nvme_uring_cmd_end_io;
--	req->end_io_data = ioucmd;
- 
- 	if (issue_flags & IO_URING_F_IOPOLL && rq_flags & REQ_POLLED) {
- 		if (unlikely(!req->bio)) {
-@@ -483,10 +528,15 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	}
- 	/* to free bio on completion, as req->bio will be null at that time */
- 	pdu->bio = req->bio;
--	pdu->meta = meta;
--	pdu->meta_buffer = nvme_to_user_ptr(d.metadata);
- 	pdu->meta_len = d.metadata_len;
--
-+	req->end_io_data = ioucmd;
-+	if (pdu->meta_len) {
-+		pdu->meta = meta;
-+		pdu->meta_buffer = nvme_to_user_ptr(d.metadata);
-+		req->end_io = nvme_uring_cmd_end_io_meta;
-+	} else {
-+		req->end_io = nvme_uring_cmd_end_io;
-+	}
- 	blk_execute_rq_nowait(req, false);
- 	return -EIOCBQUEUED;
- }
--- 
-2.35.1
+AFAICT there's no need for FL_PROVISION at all in that scenario. Is
+there a functional purpose to FL_PROVISION? Is the intent to try and
+guarantee that a provision request propagates down the I/O stack? If so,
+what happens if blocks were already preallocated in the backing file (in
+the loopback file example)?
+
+BTW, an unrelated thing I noticed is that blkdev_fallocate()
+unconditionally calls truncate_bdev_range(), which probably doesn't make
+sense for any sort of alloc mode.
+
+> With the separate mode, we can describe the semantics of falllcate()
+> modes a bit more cleanly, and it is common for both files and block
+> devices:
+> 
+> 1. mode == 0: allocation at the same layer, will not provision on the
+> underlying device/filesystem (unsupported for block devices).
+> 2. mode == FALLOC_FL_PROVISION, allocation at the layer, will
+> provision on the underlying device/filesystem.
+> 
+
+I think I see why you make the distinction, since the block layer
+doesn't have a "this layer only" mode, but IMO it's also quite confusing
+to say that mode == FL_PROVISION can allocate at the current and
+underlying layer(s) but mode == 0 to that underlying layer cannot.
+
+Either way, if you want to propose a new falloc mode/modifier, it
+probably warrants a more detailed commit log with more explanation of
+the purpose, examples of behavior, perhaps some details on how the mode
+might be documented in man pages, etc.
+
+Brian
+
+> Block devices don't technically need to use a separate mode, but it
+> makes it much less confusing if filesystems are already using a
+> separate mode for provision.
+> 
+> Best
+> Sarthak
+> 
+> > Brian
+> >
+> > > > BTW another thing that might be useful wrt to dm-thin is to support
+> > > > FALLOC_FL_UNSHARE. I.e., it looks like the previous dm-thin patch only
+> > > > checks that blocks are allocated, but not whether those blocks are
+> > > > shared (re: lookup_result.shared). It might be useful to do the COW in
+> > > > such cases if the caller passes down a REQ_UNSHARE or some such flag.
+> > > >
+> > > That's an interesting idea! There's a few more things on the TODO list
+> > > for this patch series but I think we can follow up with a patch to
+> > > handle that as well.
+> > >
+> > > Sarthak
+> > >
+> > > > Brian
+> > > >
+> > > > > diff --git a/include/linux/falloc.h b/include/linux/falloc.h
+> > > > > index f3f0b97b1675..a0e506255b20 100644
+> > > > > --- a/include/linux/falloc.h
+> > > > > +++ b/include/linux/falloc.h
+> > > > > @@ -30,7 +30,8 @@ struct space_resv {
+> > > > >                                        FALLOC_FL_COLLAPSE_RANGE |     \
+> > > > >                                        FALLOC_FL_ZERO_RANGE |         \
+> > > > >                                        FALLOC_FL_INSERT_RANGE |       \
+> > > > > -                                      FALLOC_FL_UNSHARE_RANGE)
+> > > > > +                                      FALLOC_FL_UNSHARE_RANGE |                          \
+> > > > > +                                      FALLOC_FL_PROVISION)
+> > > > >
+> > > > >  /* on ia32 l_start is on a 32-bit boundary */
+> > > > >  #if defined(CONFIG_X86_64)
+> > > > > diff --git a/include/uapi/linux/falloc.h b/include/uapi/linux/falloc.h
+> > > > > index 51398fa57f6c..2d323d113eed 100644
+> > > > > --- a/include/uapi/linux/falloc.h
+> > > > > +++ b/include/uapi/linux/falloc.h
+> > > > > @@ -77,4 +77,12 @@
+> > > > >   */
+> > > > >  #define FALLOC_FL_UNSHARE_RANGE              0x40
+> > > > >
+> > > > > +/*
+> > > > > + * FALLOC_FL_PROVISION acts as a hint for thinly provisioned devices to allocate
+> > > > > + * blocks for the range/EOF.
+> > > > > + *
+> > > > > + * FALLOC_FL_PROVISION can only be used with allocate-mode fallocate.
+> > > > > + */
+> > > > > +#define FALLOC_FL_PROVISION          0x80
+> > > > > +
+> > > > >  #endif /* _UAPI_FALLOC_H_ */
+> > > > > --
+> > > > > 2.31.0
+> > > > >
+> > > >
+> > >
+> >
+> 
 
