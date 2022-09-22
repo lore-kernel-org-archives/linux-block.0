@@ -2,307 +2,300 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B937ECAAD8
-	for <linux-block@archiver.kernel.org>; Wed, 21 Sep 2022 23:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC316C32771
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 00:19:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229649AbiIUX4C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 19:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39122 "EHLO
+        id S230024AbiIVATG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 20:19:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiIUX4B (ORCPT
+        with ESMTP id S229811AbiIVATF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 19:56:01 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16F829FAA4
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 16:55:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1663804560; x=1695340560;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=R6QuspugV33sv/Nyw/jFGeLxlZk7c4W6yvVLK3L2FAo=;
-  b=gTsyjOe5PGhmEN9jy8QEhCnhoHr/msku3fFqu5Pf/MVYubVTOACQZnVm
-   MkM7nQsipsbSuCQWBkOyItDDMovgooVxnZKiV18ZySxBHHbYgSkOhLMcV
-   PkC5JnZdJfzu74Xjhi/7bPxDeb6zGZmKVogPC/fdl69bLabso/EiCy2mW
-   Nh5OYTONfdcDXWpLx6k+a3EwY+Lt5UpbscKiIEXwQVchOkC5QQcncvW4B
-   Y9b51xPpG/Ajt3ZuDqFKW8dlFT63qsk+9TzYhOOzXoWFKQI5og0e8q40K
-   lPvM7LkfovUuvPkqZ0l0gL6EV/xYgNoaFXxhc2uFEucQCUIen4HTl9yh4
-   A==;
-X-IronPort-AV: E=Sophos;i="5.93,334,1654531200"; 
-   d="scan'208";a="212393164"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Sep 2022 07:55:58 +0800
-IronPort-SDR: /5FcMAQegP/CMDV90RhlLf7q2EN4jy0YlDHWBhq4mDEJNY/qEOU2f6s0vWbS/e+sGp/RhjKt91
- 66kiFHFAfzxjYnQSDIJpJoFxJ6bYV1IdCalFJeNsxm1KE/+3HqrbmBk9gGn9VxGkSRSF8rEhEz
- YzMCjtaVd/Mzo1fVyJDbHo/Sflxz2qqQNc7OZ48Nd7G0z/9zQPRyGz4GRcEdK1btX4PoLUI9fy
- G5KN2ol8097VRIKq066YVph6Lx6zAox9GAjUFoILzmI8SIyVzqqm7QH2liDUc/nIkosC49TMnh
- NYrV1orGNAp2CKFbSjDNtGaR
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Sep 2022 16:10:32 -0700
-IronPort-SDR: 0dRf6lH1e4SMRI++RiMT/6eYqZACHBsBzs/2HG/2fr5L6xqwT1Ms6b4rWrszCVrqb2731Y8JL0
- 9IF47vPUnoC1NcoAf13IMkubwQeGZqD6samjsfEWqbCKx29c/UrbfEnqkUZO4IIIMbR2kDEoA2
- sgeFnwtbVvhudxgVpv1l3heu23+RC1+rhzLwNcVpozY6HgiEiSf0B3tjjZYtqvN9gFzwRkipuP
- OjvTOhxGUTBZ+8rQTJTP7AzPQwaYuTwRtnSIURJGAqmr4VOT+SYRNYb2tHHwcxO6fgACVojmw6
- iJI=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Sep 2022 16:55:58 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MXwKT5HdFz1Rwtm
-        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 16:55:57 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1663804554; x=1666396555; bh=R6QuspugV33sv/Nyw/jFGeLxlZk7c4W6yvV
-        LK3L2FAo=; b=eNHxOBlVsoK+cUKCyD9rk9mD9UapAH8S50Gd/aF6G73xvEjiVFt
-        IPahmf+oO/PfuDBsbPev/J9gy4p41ePyNN7c+o2/mYyRfizL5IHCu/hofli6rSP/
-        X7m3nvMbNqPklHHZONhKe2aPHooH/Ri3nAtu8SYFpP0/lzyapsY9A0z0R2f5z79f
-        N4wg1kGcM0kGtkYxKveO6fwtrE8KfBaNOwg9cEI429jNWkhytreX3pgs/WfiwAJ9
-        askQpSeu44kr/gQRw7bPMi3D6YQOMll8FLIYvljLueSh/4KSAk3fWlmIS+CTmklT
-        XyUJHKxgM4gbQ0Lq196ni2r5gA/K/iAQ9KQ==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id jTdDfxb-MeL9 for <linux-block@vger.kernel.org>;
-        Wed, 21 Sep 2022 16:55:54 -0700 (PDT)
-Received: from [10.225.163.81] (unknown [10.225.163.81])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MXwKJ1tkpz1RvLy;
-        Wed, 21 Sep 2022 16:55:47 -0700 (PDT)
-Message-ID: <7dd9dbc0-b08b-fa47-5452-d448d86ca56b@opensource.wdc.com>
-Date:   Thu, 22 Sep 2022 08:55:45 +0900
+        Wed, 21 Sep 2022 20:19:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB9BA9257
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 17:19:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663805943;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nRu96DXad/ClErJ/XbFkMXkJihUx9Hma4kYP+hzX0Dk=;
+        b=QFOqakjJcnEF7CFJnwjeTSrQ6kKFm6oG+PNYRv/fR6uMB6LQ6a6GRsv+oaGzVZ/1wPMY0c
+        m9i2uj6RGtSPB2BwcVzr5p6BaFZ6YhjIRseFJdiT8NEWkWiLIUzVzHNXyvKqtnewWlbVi4
+        mMrMaTPv7IoCERmkVx1ErA/gFSyTE5A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-439-v-Q3tZWRMSqDeJi9eyvB6Q-1; Wed, 21 Sep 2022 20:18:58 -0400
+X-MC-Unique: v-Q3tZWRMSqDeJi9eyvB6Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1D611811E81;
+        Thu, 22 Sep 2022 00:18:58 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 060D317582;
+        Thu, 22 Sep 2022 00:18:52 +0000 (UTC)
+Date:   Thu, 22 Sep 2022 08:18:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V4 5/8] ublk_drv: consider recovery feature in aborting
+ mechanism
+Message-ID: <Yyup5vt32fULKIJu@T590>
+References: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
+ <20220921095849.84988-6-ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: Please further explain Linux's "zoned storage" roadmap [was: Re:
- [PATCH v14 00/13] support zoned block devices with non-power-of-2 zone sizes]
-Content-Language: en-US
-To:     Mike Snitzer <snitzer@redhat.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Cc:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de,
-        bvanassche@acm.org, pankydev8@gmail.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Johannes.Thumshirn@wdc.com, jaegeuk@kernel.org,
-        matias.bjorling@wdc.com
-References: <CGME20220920091120eucas1p2c82c18f552d6298d24547cba2f70b7fc@eucas1p2.samsung.com>
- <20220920091119.115879-1-p.raghav@samsung.com> <YytJhEywBhqcr7MX@redhat.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <YytJhEywBhqcr7MX@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220921095849.84988-6-ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/22/22 02:27, Mike Snitzer wrote:
-> On Tue, Sep 20 2022 at  5:11P -0400,
-> Pankaj Raghav <p.raghav@samsung.com> wrote:
+On Wed, Sep 21, 2022 at 05:58:46PM +0800, ZiyangZhang wrote:
+> With USER_RECOVERY feature enabled, the monitor_work schedules
+> quiesce_work after finding a dying ubq_daemon. The monitor_work
+> should also abort all rqs issued to userspace before the ubq_daemon is
+> dying. The quiesce_work's job is to:
+> (1) quiesce request queue.
+> (2) check if there is any INFLIGHT rq. If so, we retry until all these
+>     rqs are requeued and become IDLE. These rqs should be requeued by
+> 	ublk_queue_rq(), task work, io_uring fallback wq or monitor_work.
+> (3) complete all ioucmds by calling io_uring_cmd_done(). We are safe to
+>     do so because no ioucmd can be referenced now.
+> (5) set ub's state to UBLK_S_DEV_QUIESCED, which means we are ready for
+>     recovery. This state is exposed to userspace by GET_DEV_INFO.
 > 
->> - Background and Motivation:
->>
->> The zone storage implementation in Linux, introduced since v4.10, first
->> targetted SMR drives which have a power of 2 (po2) zone size alignment
->> requirement. The po2 zone size was further imposed implicitly by the
->> block layer's blk_queue_chunk_sectors(), used to prevent IO merging
->> across chunks beyond the specified size, since v3.16 through commit
->> 762380ad9322 ("block: add notion of a chunk size for request merging").
->> But this same general block layer po2 requirement for blk_queue_chunk_sectors()
->> was removed on v5.10 through commit 07d098e6bbad ("block: allow 'chunk_sectors'
->> to be non-power-of-2").
->>
->> NAND, which is the media used in newer zoned storage devices, does not
->> naturally align to po2. In these devices, zone capacity(cap) is not the
->> same as the po2 zone size. When the zone cap != zone size, then unmapped
->> LBAs are introduced to cover the space between the zone cap and zone size.
->> po2 requirement does not make sense for these type of zone storage devices.
->> This patch series aims to remove these unmapped LBAs for zoned devices when
->> zone cap is npo2. This is done by relaxing the po2 zone size constraint
->> in the kernel and allowing zoned device with npo2 zone sizes if zone cap
->> == zone size.
->>
->> Removing the po2 requirement from zone storage should be possible
->> now provided that no userspace regression and no performance regressions are
->> introduced. Stop-gap patches have been already merged into f2fs-tools to
->> proactively not allow npo2 zone sizes until proper support is added [1].
->>
->> There were two efforts previously to add support to npo2 devices: 1) via
->> device level emulation [2] but that was rejected with a final conclusion
->> to add support for non po2 zoned device in the complete stack[3] 2)
->> adding support to the complete stack by removing the constraint in the
->> block layer and NVMe layer with support to btrfs, zonefs, etc which was
->> rejected with a conclusion to add a dm target for FS support [0]
->> to reduce the regression impact.
->>
->> This series adds support to npo2 zoned devices in the block and nvme
->> layer and a new **dm target** is added: dm-po2zoned-target. This new
->> target will be initially used for filesystems such as btrfs and
->> f2fs until native npo2 zone support is added.
+> The driver can always handle STOP_DEV and cleanup everything no matter
+> ub's state is LIVE or QUIESCED. After ub's state is UBLK_S_DEV_QUIESCED,
+> user can recover with new process.
 > 
-> As this patchset nears the point of being "ready for merge" and DM's
-> "zoned" oriented targets are multiplying, I need to understand: where
-> are we collectively going?  How long are we expecting to support the
-> "stop-gap zoned storage" layers we've constructed?
+> Note: we do not change the default behavior with reocvery feature
+> disabled. monitor_work still schedules stop_work and abort inflight
+> rqs. And finally ublk_device is released.
 > 
-> I know https://zonedstorage.io/docs/introduction exists... but it
-> _seems_ stale given the emergence of ZNS and new permutations of zoned
-> hardware. Maybe that isn't quite fair (it does cover A LOT!) but I'm
-> still left wanting (e.g. "bring it all home for me!")...
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+
+This version is close to be ready, just some debug logging needs
+be removed, see inline comment. Also I'd suggest you to learn to
+use bpftrace a bit, then basically you needn't to rely on kernel
+logging.
+
+If these logging is removed, you will see how simple the patch becomes
+compared with previous version.
+
+> ---
+>  drivers/block/ublk_drv.c | 137 +++++++++++++++++++++++++++++++++++----
+>  1 file changed, 125 insertions(+), 12 deletions(-)
 > 
-> Damien, as the most "zoned storage" oriented engineer I know, can you
-> please kick things off by shedding light on where Linux is now, and
-> where it's going, for "zoned storage"?
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index b940e490ebab..9610afe11463 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -120,7 +120,7 @@ struct ublk_queue {
+>  
+>  	unsigned long io_addr;	/* mapped vm address */
+>  	unsigned int max_io_sz;
+> -	bool abort_work_pending;
+> +	bool force_abort;
+>  	unsigned short nr_io_ready;	/* how many ios setup */
+>  	struct ublk_device *dev;
+>  	struct ublk_io ios[0];
+> @@ -162,6 +162,7 @@ struct ublk_device {
+>  	 * monitor each queue's daemon periodically
+>  	 */
+>  	struct delayed_work	monitor_work;
+> +	struct work_struct	quiesce_work;
+>  	struct work_struct	stop_work;
+>  };
+>  
+> @@ -628,11 +629,17 @@ static void ublk_complete_rq(struct request *req)
+>   * Also aborting may not be started yet, keep in mind that one failed
+>   * request may be issued by block layer again.
+>   */
+> -static void __ublk_fail_req(struct ublk_io *io, struct request *req)
+> +static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
+> +		struct request *req)
+>  {
+>  	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
+>  
+>  	if (!(io->flags & UBLK_IO_FLAG_ABORTED)) {
+> +		pr_devel("%s: abort rq: qid %d tag %d io_flags %x\n",
+> +				__func__,
+> +				req->mq_hctx->queue_num,
+> +				req->tag,
+> +				io->flags);
 
-Let me first start with what we have seen so far with deployments in the
-field.
+No necessary to add the above log.
 
-The largest user base for zoned storage is for now hyperscalers (cloud
-services) deploying SMR disks. E.g. Dropbox has many times publicized its
-use of SMR HDDs. ZNS is fairly new, and while it is being actively
-evaluated by many, there are not yet any large scale deployments that I am
-aware of.
+>  		io->flags |= UBLK_IO_FLAG_ABORTED;
+>  		blk_mq_end_request(req, BLK_STS_IOERR);
+>  	}
+> @@ -676,10 +683,6 @@ static inline void __ublk_rq_task_work(struct request *req)
+>  	struct ublk_io *io = &ubq->ios[tag];
+>  	unsigned int mapped_bytes;
+>  
+> -	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
+> -			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
+> -			ublk_get_iod(ubq, req->tag)->addr);
+> -
+>  	/*
+>  	 * Task is exiting if either:
+>  	 *
+> @@ -746,6 +749,9 @@ static inline void __ublk_rq_task_work(struct request *req)
+>  			mapped_bytes >> 9;
+>  	}
+>  
+> +	pr_devel("%s: complete: op %d, qid %d tag %d io_flags %x addr %llx\n",
+> +			__func__, io->cmd->cmd_op, ubq->q_id, req->tag, io->flags,
+> +			ublk_get_iod(ubq, req->tag)->addr);
+>  	ubq_complete_io_cmd(io, UBLK_IO_RES_OK);
+>  }
+>  
+> @@ -790,6 +796,21 @@ static blk_status_t ublk_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	res = ublk_setup_iod(ubq, rq);
+>  	if (unlikely(res != BLK_STS_OK))
+>  		return BLK_STS_IOERR;
+> +	/* With recovery feature enabled, force_abort is set in
+> +	 * ublk_stop_dev() before calling del_gendisk(). We have to
+> +	 * abort all requeued and new rqs here to let del_gendisk()
+> +	 * move on. Besides, we cannot not call io_uring_cmd_complete_in_task()
+> +	 * to avoid UAF on io_uring ctx.
+> +	 *
+> +	 * Note: force_abort is guaranteed to be seen because it is set
+> +	 * before request queue is unqiuesced.
+> +	 */
+> +	if (unlikely(ubq->force_abort)) {
+> +		pr_devel("%s: abort rq: qid %d tag %d io_flags %x\n",
+> +				__func__, ubq->q_id, rq->tag,
+> +				ubq->ios[rq->tag].flags);
 
-Most of the large scale SMR users today mainly use the zoned storage
-drives directly, without a file system, similarly to their use of regular
-block devices. Some erasure coded object store sits on top of the zoned
-drives and manage them. The interface used for that has now switched to
-using the kernel API, from libzbc pass-through in the early days of SMR
-support. With the inclusion of zonefs in kernel 5.6, many are now
-switching to using that instead of directly accessing the block device
-file. zonefs makes the application development somewhat easier (there is
-no need for issuing zone management ioctls) and can also result in
-applications that can actually run almost as-is on top of regular block
-devices with a file system. That is a very interesting property,
-especially in development phase for the user.
+same with above.
 
-Beside these large scale SMR deployments, there are also many smaller
-users. For these cases, dm-zoned seemed to be used a lot. In particular,
-the Chia cryptocurrency boom (now fading ?) did generate a fair amount of
-new SMR users relying on dm-zoned. With btrfs zoned storage support
-maturing, dm-zoned is not as needed as it used to though. SMR drives can
-be used directly under btrfs and I certainly am always recommending this
-approach over dm-zoned+ext4 or dm-zoned+xfs as performance is much better
-for write intensive workloads.
+> +		return BLK_STS_IOERR;
+> +	}
+>  
+>  	blk_mq_start_request(bd->rq);
+>  
+> @@ -967,7 +988,7 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
+>  			 */
+>  			rq = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], i);
+>  			if (rq)
+> -				__ublk_fail_req(io, rq);
+> +				__ublk_fail_req(ubq, io, rq);
+>  		}
+>  	}
+>  	ublk_put_device(ub);
+> @@ -983,7 +1004,10 @@ static void ublk_daemon_monitor_work(struct work_struct *work)
+>  		struct ublk_queue *ubq = ublk_get_queue(ub, i);
+>  
+>  		if (ubq_daemon_is_dying(ubq)) {
+> -			schedule_work(&ub->stop_work);
+> +			if (ublk_queue_can_use_recovery(ubq))
+> +				schedule_work(&ub->quiesce_work);
+> +			else
+> +				schedule_work(&ub->stop_work);
+>  
+>  			/* abort queue is for making forward progress */
+>  			ublk_abort_queue(ub, ubq);
+> @@ -991,12 +1015,13 @@ static void ublk_daemon_monitor_work(struct work_struct *work)
+>  	}
+>  
+>  	/*
+> -	 * We can't schedule monitor work after ublk_remove() is started.
+> +	 * We can't schedule monitor work after ub's state is not UBLK_S_DEV_LIVE.
+> +	 * after ublk_remove() or __ublk_quiesce_dev() is started.
+>  	 *
+>  	 * No need ub->mutex, monitor work are canceled after state is marked
+> -	 * as DEAD, so DEAD state is observed reliably.
+> +	 * as not LIVE, so new state is observed reliably.
+>  	 */
+> -	if (ub->dev_info.state != UBLK_S_DEV_DEAD)
+> +	if (ub->dev_info.state == UBLK_S_DEV_LIVE)
+>  		schedule_delayed_work(&ub->monitor_work,
+>  				UBLK_DAEMON_MONITOR_PERIOD);
+>  }
+> @@ -1050,12 +1075,97 @@ static void ublk_cancel_dev(struct ublk_device *ub)
+>  		ublk_cancel_queue(ublk_get_queue(ub, i));
+>  }
+>  
+> -static void ublk_stop_dev(struct ublk_device *ub)
+> +static bool ublk_check_inflight_rq(struct request *rq, void *data)
+> +{
+> +	bool *idle = data;
+> +
+> +	if (blk_mq_request_started(rq)) {
+> +		pr_devel("%s: rq qid %d tag %d is not IDLE.\n",
+> +				__func__, rq->mq_hctx->queue_num,
+> +				rq->tag);
 
-For Linux kernel overall, zoned storage is in a very good shape for raw
-block device use and zonefs use. Production deployments we are seeing are
-a proof of that. Currently, my team effort is mostly focused on btrfs and
-zonefs and increasing zoned storage use cases.
+Please remove above log, otherwise it may overflow printk buffer.
+Also you can observe pending requests info from blk-mq debugfs.
 
-1) For btrfs, Johannes and Naohiro are working on stabilizing support for
-ZNS (we still have some issues with the management of active zones) and
-implementing de-clustered parity RAID support so that zoned drives can be
-used in RAID 0, 1, 10, 5, 6 and erasure coded volumes. This will address
-use cases such as home NAS boxes, backup servers, small file servers,
-video applications (e.g. video surveillance) etc. Essentially, any
-application with large storage capacity needs that is not a distributed
-setup. There are many.
+> +		*idle = false;
+> +		return false;
+> +	}
+> +	return true;
+> +}
+> +
+> +static void ublk_wait_tagset_rqs_idle(struct ublk_device *ub)
+> +{
+> +	bool idle;
+> +
+> +	WARN_ON_ONCE(!blk_queue_quiesced(ub->ub_disk->queue));
+> +	while (true) {
+> +		idle = true;
+> +		blk_mq_tagset_busy_iter(&ub->tag_set,
+> +				ublk_check_inflight_rq, &idle);
+> +		if (idle)
+> +			break;
+> +		pr_devel("%s: not all tags are idle, ub: dev_id %d\n",
+> +				__func__, ub->dev_info.dev_id);
 
-2) For zonefs, I have some to-do items lined up to improve performance
-(better read IO tail latency) and further improve ease of use (e.g. remove
-the O_DIRECT write constraint).
+The above logging isn't useful, we can conclude easily that
+the wait isn't done by checking stack trace or debugfs log.
 
-3) At the block device level, we are also working on adding zoned block
-device specifications to virtio and implementing that support in qemu and
-the kernel. Patches are floating around now but not yet merged. This
-addresses the use of zoned storage in VM environments through virtio
-interface instead of directly attaching devices to guests.
+> +		msleep(UBLK_REQUEUE_DELAY_MS);
+> +	}
+> +}
+> +
+> +static void __ublk_quiesce_dev(struct ublk_device *ub)
+>  {
+> +	pr_devel("%s: quiesce ub: dev_id %d state %s\n",
+> +			__func__, ub->dev_info.dev_id,
+> +			ub->dev_info.state == UBLK_S_DEV_LIVE ?
+> +			"LIVE" : "QUIESCED");
+> +	blk_mq_quiesce_queue(ub->ub_disk->queue);
+> +	ublk_wait_tagset_rqs_idle(ub);
+> +	pr_devel("%s: all tags are idle, ub: dev_id %d\n",
+> +			__func__, ub->dev_info.dev_id);
 
-> To give some additional context to help me when you answer: I'm left
-> wondering what, if any, role dm-zoned has to play moving forward given
-> ZNS is "the future" (and yeah "the future" is now but...)?  E.g.: Does
-> it make sense to stack dm-zoned ontop of dm-po2zoned!?
+The above logging can be removed too.
 
-That is a lot to unfold in a small paragraph :)
+> +	ublk_cancel_dev(ub);
+> +	ub->dev_info.state = UBLK_S_DEV_QUIESCED;
+> +}
+> +
+> +static void ublk_quiesce_work_fn(struct work_struct *work)
+> +{
+> +	struct ublk_device *ub =
+> +		container_of(work, struct ublk_device, quiesce_work);
+> +
+>  	mutex_lock(&ub->mutex);
+>  	if (ub->dev_info.state != UBLK_S_DEV_LIVE)
+>  		goto unlock;
+> +	pr_devel("%s: start __ublk_quiesce_dev: dev_id %d\n",
+> +			__func__, ub->dev_info.dev_id);
 
-First of all, I would rephrase "ZNS is the future" into "ZNS is a very
-interesting alternative to generic NVMe SSDs". The reason being that HDD
-are not dead, far from it. They still are way cheaper than SSDs in $/TB :)
-So ZNS is not really in competition with SMR HDDs jere. The 2 are
-complementary, exactly like regular SSDs are complementary to regular HDDs.
+The above logging isn't needed, since you do add one
+at the beginning of __ublk_quiesce_dev().
 
-dm-zoned serves some use cases for SMR HDDs (see above) but does not
-address ZNS (more on this below). And given that all SMR HDD on the market
-today have a zone size that is a power of 2 number of LBAs (256MB zone
-size is by far the most common), dm-po2zoned is not required at all for SMR.
 
-Pankaj patch series is all about supporting ZNS devices that have a zone
-size that is not a power of 2 number of LBAs as some vendors want to
-produce such drives. There is no such move happening in the SMR world as
-all users are happy with the current zone sizes which match the kernel
-support (which currently requires power-of-2 number of LBAs for the zone
-size).
-
-I do not think we have yet reached a consensus on if we really want to
-accept any zone size for zoned storage. I personally am not a big fan of
-removing the existing constraint as that makes the code somewhat heavier
-(multiplication & divisions instead of bit shifts) without introducing any
-benefit to the user that I can see (or agree with). And there is also a
-risk of forcing onto the users to redesign/change their code to support
-different devices in the same system. That is never nice to fragment
-support like this for the same device class. This is why several people,
-including me, requested something like dm-po2zoned, to avoid breaking user
-applications if non-power-of-2 zone size drives support is merged. Better
-than nothing for sure, but not ideal either. That is only my opinion.
-There are different opinions out there.
-
-> Yet more context: When I'm asked to add full-blown support for
-> dm-zoned to RHEL my gut is "please no, why!?".  And if we really
-> should add dm-zoned is dm-po2zoned now also a requirement (to support
-> non-power-of-2 ZNS devices in our never-ending engineering of "zoned
-> storage" compatibility stop-gaps)?
-
-Support for dm-zoned in RHEL really depends on if your customers need it.
-Having SMR and ZNS block device (CONFIG_BLK_DEV_ZONED) and zonefs support
-enabled would already cover a lot of use cases on their own, at least the
-ones we see in the field today.
-
-Going forward, we expect more use cases to rely on btrfs rather than
-dm-zoned or any equivalent DM target for ZNS. And that can also include
-non power of 2 zone size drives as btrfs should normally be able to handle
-such devices, if the support for them is merged. But we are not there yet
-with btrfs support, hence dm-po2zoned.
-
-But again, that all depends on if Pankaj patch series is accepted, that
-is, on everybody accepting that we lift the power-of-2 zone size constraint.
-> In addition, it was my understanding that WDC had yet another zoned DM
-> target called "dm-zap" that is for ZNS based devices... It's all a bit
-> messy in my head (that's on me for not keeping up, but I think we need
-> a recap!)
-
-Since the ZNS specification does not define conventional zones, dm-zoned
-cannot be used as a standalone DM target (read: single block device) with
-NVMe zoned block devices. Furthermore, due to its block mapping scheme,
-dm-zoned does not support devices with zones that have a capacity lower
-than the zone size. So ZNS is really a big *no* for dm-zoned. dm-zap is a
-prototype and in a nutshell is the equivalent of dm-zoned for ZNS. dm-zap
-can deal with the smaller zone capacity and does not require conventional
-zones. We are not trying to push for dm-zap to be merged for now as we are
-still evaluating its potential use cases. We also have a different but
-functionally equivalent approach implemented as a block device driver that
-we are evaluating internally.
-
-Given the above mentioned usage pattern we have seen so far for zoned
-storage, it is not yet clear if something like dm-zap for ZNS is needed
-beside some niche use cases.
-
-> So please help me, and others, become more informed as quickly as
-> possible! ;)
-
-I hope the above helps. If you want me to develop further any of the
-points above, feel free to let me know.
-
-> ps. I'm asking all this in the open on various Linux mailing lists
-> because it doesn't seem right to request a concall to inform only
-> me... I think others may need similar "zoned storage" help.
-
-All good with me :)
-
--- 
-Damien Le Moal
-Western Digital Research
+Thanks,
+Ming
 
