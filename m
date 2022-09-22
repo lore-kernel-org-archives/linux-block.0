@@ -2,154 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D533C54EE9
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 13:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BFDC6FA92
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 13:40:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231185AbiIVNjD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 09:39:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35832 "EHLO
+        id S229911AbiIVNkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 09:40:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231294AbiIVNiV (ORCPT
+        with ESMTP id S229656AbiIVNkd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 09:38:21 -0400
+        Thu, 22 Sep 2022 09:40:33 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00EF7B790
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 06:38:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61393F6F
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 06:40:32 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id AD7E31F38D;
-        Thu, 22 Sep 2022 13:38:01 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 23B8D1F8EA;
+        Thu, 22 Sep 2022 13:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663853881; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1663854031; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WzpJDWrBG2TomAe5pib/r13k0hKgah319F+1M9Ja1ps=;
-        b=vI7vzzYqyBaFJi60fS/IQBJwF1vG/fhNsySjw38eF6DnmXQE1/5uz6JJv2/MRa0nqVEbog
-        VrmFgKqNrr5efUupJtybuziBYoptwSroRaGoQuXjA1mqMrN/FUmkwfNO8Guvdq0of+wHp4
-        Gjf8B9FIW+wwHUfB6n4qov12uW93JAc=
+        bh=KTnTe9ao9zHjAzLNt3DZiwBsoTSDa8ih8vr4D6K0yrg=;
+        b=eSMLoiMnYDxj2bLJNgmU96gWgQoycevZ20SZ+1OOeKf2oF9tKJEkTEZw0H/JnMCQqsVy3+
+        QfLNHwedYUGSZ3B4yTEsCMXx4z+ueAEhujv48LjR9Et+zZQ+E6QuOR3S+21c42q7i+qloT
+        pgoIWRbrSsOa0xclVUQjDXN5KR90nUo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663853881;
+        s=susede2_ed25519; t=1663854031;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WzpJDWrBG2TomAe5pib/r13k0hKgah319F+1M9Ja1ps=;
-        b=2CY//JrdODFfLZZvzcJhBJSOhC3jK5nAWMQjNlcC09Hi083REe7kLZZMdVj5WX927FKuQK
-        M1ENsfgZhNpUX5Aw==
+        bh=KTnTe9ao9zHjAzLNt3DZiwBsoTSDa8ih8vr4D6K0yrg=;
+        b=5fPYaHtjv1wp6b9JttmL/76wUq9HeY7oJUHr8tn3T3dPillWa+aYB7J8HdyKNVmKdRGV+/
+        lDYF5zgGj99g7cAg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8631013AA5;
-        Thu, 22 Sep 2022 13:38:01 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E90E413AA5;
+        Thu, 22 Sep 2022 13:40:30 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id qqFpHzllLGObewAAMHmgww
-        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 13:38:01 +0000
-Date:   Thu, 22 Sep 2022 15:38:00 +0200
+        id raq0N85lLGPJfAAAMHmgww
+        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 13:40:30 +0000
+Date:   Thu, 22 Sep 2022 15:40:29 +0200
 From:   Andreas Herrmann <aherrmann@suse.de>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH 07/17] blk-ioprio: pass a gendisk to blk_ioprio_init and
- blk_ioprio_exit
-Message-ID: <YyxlOOWNmPmDq4D5@suselix>
+Subject: Re: [PATCH 08/17] blk-iolatency: pass a gendisk to blk_iolatency_init
+Message-ID: <YyxlzXnatdkuPwaC@suselix>
 References: <20220921180501.1539876-1-hch@lst.de>
- <20220921180501.1539876-8-hch@lst.de>
+ <20220921180501.1539876-9-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220921180501.1539876-8-hch@lst.de>
+In-Reply-To: <20220921180501.1539876-9-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 08:04:51PM +0200, Christoph Hellwig wrote:
-> Pass the gendisk to blk_ioprio_init and blk_ioprio_exit as part of moving
-> the blk-cgroup infrastructure to be gendisk based.
+On Wed, Sep 21, 2022 at 08:04:52PM +0200, Christoph Hellwig wrote:
+> Pass the gendisk to blk_iolatency_init as part of moving the blk-cgroup
+> infrastructure to be gendisk based.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-cgroup.c | 4 ++--
->  block/blk-ioprio.c | 8 ++++----
->  block/blk-ioprio.h | 8 ++++----
->  3 files changed, 10 insertions(+), 10 deletions(-)
+>  block/blk-cgroup.c    | 2 +-
+>  block/blk-iolatency.c | 3 ++-
+>  block/blk.h           | 4 ++--
+>  3 files changed, 5 insertions(+), 4 deletions(-)
 
 Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
 
 > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 4ca6933a7c3f5..89974fd0db3da 100644
+> index 89974fd0db3da..82a117ff54de5 100644
 > --- a/block/blk-cgroup.c
 > +++ b/block/blk-cgroup.c
-> @@ -1257,7 +1257,7 @@ int blkcg_init_disk(struct gendisk *disk)
->  	if (preloaded)
->  		radix_tree_preload_end();
->  
-> -	ret = blk_ioprio_init(q);
-> +	ret = blk_ioprio_init(disk);
+> @@ -1265,7 +1265,7 @@ int blkcg_init_disk(struct gendisk *disk)
 >  	if (ret)
->  		goto err_destroy_all;
+>  		goto err_ioprio_exit;
 >  
-> @@ -1274,7 +1274,7 @@ int blkcg_init_disk(struct gendisk *disk)
->  err_throtl_exit:
->  	blk_throtl_exit(q);
->  err_ioprio_exit:
-> -	blk_ioprio_exit(q);
-> +	blk_ioprio_exit(disk);
->  err_destroy_all:
->  	blkg_destroy_all(q);
->  	return ret;
-> diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
-> index c00060a02c6ef..8bb6b8eba4cee 100644
-> --- a/block/blk-ioprio.c
-> +++ b/block/blk-ioprio.c
-> @@ -202,14 +202,14 @@ void blkcg_set_ioprio(struct bio *bio)
->  		bio->bi_ioprio = prio;
+> -	ret = blk_iolatency_init(q);
+> +	ret = blk_iolatency_init(disk);
+>  	if (ret)
+>  		goto err_throtl_exit;
+>  
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index e285152345a20..c6f61fe88b875 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -756,8 +756,9 @@ static void blkiolatency_enable_work_fn(struct work_struct *work)
+>  	}
 >  }
 >  
-> -void blk_ioprio_exit(struct request_queue *q)
-> +void blk_ioprio_exit(struct gendisk *disk)
+> -int blk_iolatency_init(struct request_queue *q)
+> +int blk_iolatency_init(struct gendisk *disk)
 >  {
-> -	blkcg_deactivate_policy(q, &ioprio_policy);
-> +	blkcg_deactivate_policy(disk->queue, &ioprio_policy);
+> +	struct request_queue *q = disk->queue;
+>  	struct blk_iolatency *blkiolat;
+>  	struct rq_qos *rqos;
+>  	int ret;
+> diff --git a/block/blk.h b/block/blk.h
+> index d7142c4d2fefb..361db83147c6f 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -389,9 +389,9 @@ static inline struct bio *blk_queue_bounce(struct bio *bio,
 >  }
 >  
-> -int blk_ioprio_init(struct request_queue *q)
-> +int blk_ioprio_init(struct gendisk *disk)
->  {
-> -	return blkcg_activate_policy(q, &ioprio_policy);
-> +	return blkcg_activate_policy(disk->queue, &ioprio_policy);
->  }
->  
->  static int __init ioprio_init(void)
-> diff --git a/block/blk-ioprio.h b/block/blk-ioprio.h
-> index 5a1eb550e178c..b6afb8e80de05 100644
-> --- a/block/blk-ioprio.h
-> +++ b/block/blk-ioprio.h
-> @@ -9,15 +9,15 @@ struct request_queue;
->  struct bio;
->  
->  #ifdef CONFIG_BLK_CGROUP_IOPRIO
-> -int blk_ioprio_init(struct request_queue *q);
-> -void blk_ioprio_exit(struct request_queue *q);
-> +int blk_ioprio_init(struct gendisk *disk);
-> +void blk_ioprio_exit(struct gendisk *disk);
->  void blkcg_set_ioprio(struct bio *bio);
+>  #ifdef CONFIG_BLK_CGROUP_IOLATENCY
+> -extern int blk_iolatency_init(struct request_queue *q);
+> +int blk_iolatency_init(struct gendisk *disk);
 >  #else
-> -static inline int blk_ioprio_init(struct request_queue *q)
-> +static inline int blk_ioprio_init(struct gendisk *disk)
->  {
->  	return 0;
->  }
-> -static inline void blk_ioprio_exit(struct request_queue *q)
-> +static inline void blk_ioprio_exit(struct gendisk *disk)
->  {
->  }
->  static inline void blkcg_set_ioprio(struct bio *bio)
+> -static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+> +static int blk_iolatency_init(struct gendisk *disk) { return 0 };
+>  #endif
+>  
+>  #ifdef CONFIG_BLK_DEV_ZONED
 > -- 
 > 2.30.2
 > 
