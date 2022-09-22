@@ -2,135 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17AB9C6FA82
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 12:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 727C0C6FA86
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 12:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiIVMLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 08:11:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56528 "EHLO
+        id S231545AbiIVMs4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 08:48:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbiIVMLm (ORCPT
+        with ESMTP id S231530AbiIVMsz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 08:11:42 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ACA152E75
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 05:11:41 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Thu, 22 Sep 2022 08:48:55 -0400
+Received: from mta-01.yadro.com (mta-02.yadro.com [89.207.88.252])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E682B24B3;
+        Thu, 22 Sep 2022 05:48:53 -0700 (PDT)
+Received: from localhost (unknown [127.0.0.1])
+        by mta-01.yadro.com (Postfix) with ESMTP id 0976E40418;
+        Thu, 22 Sep 2022 12:48:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+        in-reply-to:content-disposition:content-type:content-type
+        :mime-version:references:message-id:subject:subject:from:from
+        :date:date:received:received:received:received; s=mta-01; t=
+        1663850930; x=1665665331; bh=1oTTLOVpNbb59fNrT4bLbmXqUOOFkWyDmNS
+        tFQJjWsY=; b=OxyZVAHSNb4N4uBmgadpoko/FuYsetRvK5Sdo/9xLGsP1e7GCtl
+        xiUKwBf8NjOfkDf3SPSkMS8CgeDJ2fN+arhjsMabL6Q8Tr49B9U7NJOtPWwJzhMZ
+        /bPMHdkUjiSrhDZ5MPHuSJ9eSvvmAa4oGAl5rOy1r8OCGgWtsQODZ0og=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+        by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id nAxnMvok_hvf; Thu, 22 Sep 2022 15:48:50 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (T-EXCH-02.corp.yadro.com [172.17.10.102])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 4DDC721A32;
-        Thu, 22 Sep 2022 12:11:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663848700; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KylczORo8Jgo73p7jeEyt/himenFvR9a74rSUrvw7lU=;
-        b=lr8gbh6mBrvsYptuda4zn1gOsfYf6/ulrIBZiBd32PivtdWo7u/a0f3PFBG9Yf0vPFaYXf
-        VfesBy4C4mWp7GUM3skPslpJR7vgTq3GAw9vnzIqXUkuP8K7FXdbM1ddkF2Q0TiOqlIbCa
-        h5qIE/x/SJ2fUAMBKQzd/BuIc5meaw4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663848700;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KylczORo8Jgo73p7jeEyt/himenFvR9a74rSUrvw7lU=;
-        b=dEfDwC29H46eJVFYFatW78G5Bw/DytD6O48g51vFPLU78JpDiZQXGLpySfQqbIDLZeMLrg
-        gdgX4FengkL/+jCQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 273691346B;
-        Thu, 22 Sep 2022 12:11:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id dPA6CPxQLGO8UAAAMHmgww
-        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 12:11:40 +0000
-Date:   Thu, 22 Sep 2022 14:11:38 +0200
-From:   Andreas Herrmann <aherrmann@suse.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 11/17] blk-iocost: cleanup ioc_qos_write
-Message-ID: <YyxQ+lfIsP8mSAGq@suselix>
-References: <20220921180501.1539876-1-hch@lst.de>
- <20220921180501.1539876-12-hch@lst.de>
+        by mta-01.yadro.com (Postfix) with ESMTPS id D1EE140354;
+        Thu, 22 Sep 2022 15:48:49 +0300 (MSK)
+Received: from T-EXCH-09.corp.yadro.com (172.17.11.59) by
+ T-EXCH-02.corp.yadro.com (172.17.10.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id
+ 15.1.669.32; Thu, 22 Sep 2022 15:48:49 +0300
+Received: from yadro.com (10.199.18.119) by T-EXCH-09.corp.yadro.com
+ (172.17.11.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.9; Thu, 22 Sep
+ 2022 15:48:48 +0300
+Date:   Thu, 22 Sep 2022 15:48:46 +0300
+From:   "Alexander V. Buev" <a.buev@yadro.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>,
+        "Christoph Hellwig" <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, <linux@yadro.com>
+Subject: Re: [PATCH v5 2/3] block: io-uring: add READV_PI/WRITEV_PI operations
+Message-ID: <20220922124846.d4mhaugyd4is7gd5@yadro.com>
+Mail-Followup-To: "Alexander V. Buev" <a.buev@yadro.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+References: <20220920144618.1111138-1-a.buev@yadro.com>
+ <20220920144618.1111138-3-a.buev@yadro.com>
+ <54666720-609b-c639-430d-1dc61e96a6c6@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220921180501.1539876-12-hch@lst.de>
+In-Reply-To: <54666720-609b-c639-430d-1dc61e96a6c6@kernel.dk>
+X-Originating-IP: [10.199.18.119]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-09.corp.yadro.com (172.17.11.59)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 08:04:55PM +0200, Christoph Hellwig wrote:
-> Use a local disk variable instead of retrieving the disk and
-> request_queue over and over by various means.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-iocost.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
+> In general, I think this feature is useful. I do echo Keith's response
+> that it should probably be named a bit differently, as PI is just one
+> use case of this.
+Accepted. 
+In the next version, this suffix "pi" will be renamed to "meta"
+(meta_addr, meta_len, READV_META, WRITEV_META and etc...)
 
-Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 1e7bf0d353227..b8e5f550aa5be 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -3167,6 +3167,7 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
->  			     size_t nbytes, loff_t off)
->  {
->  	struct block_device *bdev;
-> +	struct gendisk *disk;
->  	struct ioc *ioc;
->  	u32 qos[NR_QOS_PARAMS];
->  	bool enable, user;
-> @@ -3177,12 +3178,13 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
->  	if (IS_ERR(bdev))
->  		return PTR_ERR(bdev);
->  
-> -	ioc = q_to_ioc(bdev_get_queue(bdev));
-> +	disk = bdev->bd_disk;
-> +	ioc = q_to_ioc(disk->queue);
->  	if (!ioc) {
-> -		ret = blk_iocost_init(bdev->bd_disk);
-> +		ret = blk_iocost_init(disk);
->  		if (ret)
->  			goto err;
-> -		ioc = q_to_ioc(bdev_get_queue(bdev));
-> +		ioc = q_to_ioc(disk->queue);
->  	}
->  
->  	spin_lock_irq(&ioc->lock);
-> @@ -3259,11 +3261,11 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
->  	spin_lock_irq(&ioc->lock);
->  
->  	if (enable) {
-> -		blk_stat_enable_accounting(ioc->rqos.q);
-> -		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, ioc->rqos.q);
-> +		blk_stat_enable_accounting(disk->queue);
-> +		blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
->  		ioc->enabled = true;
->  	} else {
-> -		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, ioc->rqos.q);
-> +		blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
->  		ioc->enabled = false;
->  	}
->  
-> -- 
-> 2.30.2
-> 
+> But for this patch in particular, not a huge fan of the rote copying of
+> rw.c into a new file. Now we have to patch two different spots whenever
+> a bug is found in there, that's not very maintainable. I do appreciate
+> the fact that this keeps the PI work out of the fast path for
+> read/write, but I do think this warrants a bit of refactoring work first
+> to ensure that there are helpers that can be shared between rw and
+> rw_pi. That definitely needs to be solved before this can be considered
+> for inclusion.
+I think it would be better to move some of the shared code to another file. 
+For example "rw_common.[ch]". What do you think about?
+As an alternative I can leave such code in "rw.[ch]" file as is.
 
 -- 
-Regards,
-Andreas
-
-SUSE Software Solutions Germany GmbH
-Frankenstrasse 146, 90461 Nürnberg, Germany
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
-(HRB 36809, AG Nürnberg)
+Alexander V. Buev
