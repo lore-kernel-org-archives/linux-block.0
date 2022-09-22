@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEB9C6FA82
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 06:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D244DC6FA82
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 06:18:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbiIVGSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 02:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43770 "EHLO
+        id S229935AbiIVGSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 02:18:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiIVGSN (ORCPT
+        with ESMTP id S230020AbiIVGST (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 02:18:13 -0400
-Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770BBB5176;
-        Wed, 21 Sep 2022 23:18:11 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQRHxUi_1663827487;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQRHxUi_1663827487)
+        Thu, 22 Sep 2022 02:18:19 -0400
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AEEB56F2;
+        Wed, 21 Sep 2022 23:18:15 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQRHxX4_1663827491;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQRHxX4_1663827491)
           by smtp.aliyun-inc.com;
-          Thu, 22 Sep 2022 14:18:09 +0800
+          Thu, 22 Sep 2022 14:18:12 +0800
 From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 To:     ming.lei@redhat.com
 Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         joseph.qi@linux.alibaba.com,
         ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V5 5/7] ublk_drv: support UBLK_F_USER_RECOVERY_REISSUE
-Date:   Thu, 22 Sep 2022 14:17:32 +0800
-Message-Id: <20220922061734.21625-6-ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V5 7/7] Documentation: document ublk user recovery feature
+Date:   Thu, 22 Sep 2022 14:17:34 +0800
+Message-Id: <20220922061734.21625-8-ZiyangZhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220922061734.21625-1-ZiyangZhang@linux.alibaba.com>
 References: <20220922061734.21625-1-ZiyangZhang@linux.alibaba.com>
@@ -37,95 +37,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-UBLK_F_USER_RECOVERY_REISSUE implies that:
-With a dying ubq_daemon, ublk_drv let monitor_work requeues rq issued to
-userspace(ublksrv) before the ubq_daemon is dying.
-
-UBLK_F_USER_RECOVERY_REISSUE is designed for backends which:
-(1) tolerate double-write since ublk_drv may issue the same rq
-    twice.
-(2) does not let frontend users get I/O error, such as read-only FS
-    and VM backend.
+Add documentation for user recovery feature of ublk subsystem.
 
 Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/ublk_drv.c      | 22 ++++++++++++++++++----
- include/uapi/linux/ublk_cmd.h |  2 ++
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ Documentation/block/ublk.rst | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-index 888ad16c5dd8..3977869d2bc4 100644
---- a/drivers/block/ublk_drv.c
-+++ b/drivers/block/ublk_drv.c
-@@ -50,7 +50,8 @@
- #define UBLK_F_ALL (UBLK_F_SUPPORT_ZERO_COPY \
- 		| UBLK_F_URING_CMD_COMP_IN_TASK \
- 		| UBLK_F_NEED_GET_DATA \
--		| UBLK_F_USER_RECOVERY)
-+		| UBLK_F_USER_RECOVERY \
-+		| UBLK_F_USER_RECOVERY_REISSUE)
+diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
+index 2122d1a4a541..3f1bfd51898b 100644
+--- a/Documentation/block/ublk.rst
++++ b/Documentation/block/ublk.rst
+@@ -144,6 +144,31 @@ managing and controlling ublk devices with help of several control commands:
+   For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
+   responsibility to save IO target specific info in userspace.
  
- /* All UBLK_PARAM_TYPE_* should be included here */
- #define UBLK_PARAM_TYPE_ALL (UBLK_PARAM_TYPE_BASIC | UBLK_PARAM_TYPE_DISCARD)
-@@ -325,6 +326,15 @@ static inline int ublk_queue_cmd_buf_size(struct ublk_device *ub, int q_id)
- 			PAGE_SIZE);
- }
- 
-+static inline bool ublk_queue_can_use_recovery_reissue(
-+		struct ublk_queue *ubq)
-+{
-+	if ((ubq->flags & UBLK_F_USER_RECOVERY) &&
-+			(ubq->flags & UBLK_F_USER_RECOVERY_REISSUE))
-+		return true;
-+	return false;
-+}
++- ``UBLK_CMD_RESTART_DEV``
 +
- static inline bool ublk_queue_can_use_recovery(
- 		struct ublk_queue *ubq)
- {
-@@ -629,13 +639,17 @@ static void ublk_complete_rq(struct request *req)
-  * Also aborting may not be started yet, keep in mind that one failed
-  * request may be issued by block layer again.
-  */
--static void __ublk_fail_req(struct ublk_io *io, struct request *req)
-+static void __ublk_fail_req(struct ublk_queue *ubq, struct ublk_io *io,
-+		struct request *req)
- {
- 	WARN_ON_ONCE(io->flags & UBLK_IO_FLAG_ACTIVE);
- 
- 	if (!(io->flags & UBLK_IO_FLAG_ABORTED)) {
- 		io->flags |= UBLK_IO_FLAG_ABORTED;
--		blk_mq_end_request(req, BLK_STS_IOERR);
-+		if (ublk_queue_can_use_recovery_reissue(ubq))
-+			blk_mq_requeue_request(req, false);
-+		else
-+			blk_mq_end_request(req, BLK_STS_IOERR);
- 	}
- }
- 
-@@ -973,7 +987,7 @@ static void ublk_abort_queue(struct ublk_device *ub, struct ublk_queue *ubq)
- 			 */
- 			rq = blk_mq_tag_to_rq(ub->tag_set.tags[ubq->q_id], i);
- 			if (rq)
--				__ublk_fail_req(io, rq);
-+				__ublk_fail_req(ubq, io, rq);
- 		}
- 	}
- 	ublk_put_device(ub);
-diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
-index 340ff14bde49..332370628757 100644
---- a/include/uapi/linux/ublk_cmd.h
-+++ b/include/uapi/linux/ublk_cmd.h
-@@ -76,6 +76,8 @@
- 
- #define UBLK_F_USER_RECOVERY	(1UL << 3)
- 
-+#define UBLK_F_USER_RECOVERY_REISSUE	(1UL << 4)
++  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. The old
++  process has exited and ublk device is quiesced. Then, user should start a new
++  process which opens ``/dev/ublkc*`` and gets all ublk queues be ready. Finally
++  user should send this command. When this command returns, ublk device is
++  unquiesced and new I/O requests are passed to the new process.
 +
- /* device state */
- #define UBLK_S_DEV_DEAD	0
- #define UBLK_S_DEV_LIVE	1
++- user recovery feature description
++
++  Two new features are added for user recovery: ``UBLK_F_USER_RECOVERY`` and
++  ``UBLK_F_USER_RECOVERY_REISSUE``.
++
++  With ``UBLK_F_USER_RECOVERY`` set, after one ubq_daemon(ublksrv io handler) is
++  dying, ublk does not release ``/dev/ublkc*`` or ``/dev/ublkb*`` but requeues all
++  inflight requests which have not been issued to userspace. Requests which have
++  been issued to userspace are aborted.
++
++  With ``UBLK_F_USER_RECOVERY_REISSUE`` set, after one ubq_daemon(ublksrv io
++  handler) is dying, contrary to ``UBLK_F_USER_RECOVERY``, requests which have been
++  issued to userspace are requeued and will be re-issued to the new process after
++  handling ``UBLK_CMD_RESTART_DEV``. ``UBLK_F_USER_RECOVERY_REISSUE`` is designed
++  for backends who tolerate double-write since the driver may issue the same
++  I/O request twice. It might be useful to a read-only FS or a VM backend.
++
+ Data plane
+ ----------
+ 
 -- 
 2.27.0
 
