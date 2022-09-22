@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA207C6FA9C
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 16:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E96C6FA91
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 16:39:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232127AbiIVQjt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 12:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48092 "EHLO
+        id S232139AbiIVQju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 12:39:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231651AbiIVQjo (ORCPT
+        with ESMTP id S229803AbiIVQjp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 12:39:44 -0400
+        Thu, 22 Sep 2022 12:39:45 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26BA4B0C5;
-        Thu, 22 Sep 2022 09:39:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C32CA4DF14;
+        Thu, 22 Sep 2022 09:39:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=jfO5g1O0d+6c4IZIgwOCr9oja0GcOETYVFtbYmY1tYg=; b=Vm4YoDs4HghS+T9W6hhNWgT0OF
-        p2Y4iq/UsOxC6ewXU6tm2NSPWnyQkj5jt792kDNUiIHExdtzmqeIRTw3DeajH+YheW6Kp8vzd5VwK
-        Z9Aaa7oJjqf4n2gVFv8j3HmBBz1YpolNn+gpu9e+PgGoPZ/M1jxx8u4JgcHYBNCjw49i6BgFvUVQT
-        Nn/a1fXFIJ5b+vUv6wr60W+J13NEV1/9W+2YtcE8XEfIq05gOJ8VCGUYMCcy+X34/PTfEngOlSM4v
-        1NV+0AgG9IHkPnesunDxhInU6YSztEf06sYbx/R2yofrc/eaQw5FNof+MZq4xzFsPgsuUuV2SgpaX
-        9o+0S8ew==;
+        bh=ItJ8m+lleZiH/D7kr9kZGMa9/tjBgpeVzB8HkP75IQA=; b=i85S0w54THJ/szqoMR3ZacShUv
+        a3GTE6oGOI/VG2h9xDPtebfYgBwmX1XmrkRIQhemgp0Phm8eYDKuLxvuJFO9eBcPY7yuSw+kRZ0ED
+        vYZw4u66yNlD8hsoNco9ZGPhRt1Ypz5B0/PmIyvsmcVYhzRboMrhqL0oB1mC4USezlKo2AE7obNR0
+        b19WDFcJQiAJbV1NW7TMHoMeNDHb2IwNni4rmJIc9jAmlmSq6TIAa8MWHKK8H02ozzkB3M8ExcUob
+        +YZnm6uzE1jQovPZr8i5AU9V0YsG1X/yvDy0alQ6/CL2cQm/73TQ1KmSPz12Z2zt+bt4kKDbUPGgM
+        CI8cs/cA==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1obPEh-00862c-75; Thu, 22 Sep 2022 10:39:40 -0600
+        id 1obPEf-00862c-HN; Thu, 22 Sep 2022 10:39:38 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1obPEb-0001ry-Ih; Thu, 22 Sep 2022 10:39:33 -0600
+        id 1obPEa-0001rm-Va; Thu, 22 Sep 2022 10:39:33 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -57,8 +57,8 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 22 Sep 2022 10:39:24 -0600
-Message-Id: <20220922163926.7077-7-logang@deltatee.com>
+Date:   Thu, 22 Sep 2022 10:39:20 -0600
+Message-Id: <20220922163926.7077-3-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220922163926.7077-1-logang@deltatee.com>
 References: <20220922163926.7077-1-logang@deltatee.com>
@@ -67,56 +67,121 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v10 6/8] block: set FOLL_PCI_P2PDMA in bio_map_user_iov()
+Subject: [PATCH v10 2/8] iov_iter: introduce iov_iter_get_pages_[alloc_]flags()
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
-iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be
-passed from userspace and enables the NVMe passthru requests to
-use P2PDMA pages.
+Add iov_iter_get_pages_flags() and iov_iter_get_pages_alloc_flags()
+which take a flags argument that is passed to get_user_pages_fast().
+
+This is so that FOLL_PCI_P2PDMA can be passed when appropriate.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: John Hubbard <jhubbard@nvidia.com>
 ---
- block/blk-map.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/linux/uio.h |  6 ++++++
+ lib/iov_iter.c      | 32 ++++++++++++++++++++++++--------
+ 2 files changed, 30 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 7196a6b64c80..7882504b99ac 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -236,6 +236,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 5896af36199c..5d976d01ccb9 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -247,8 +247,14 @@ void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode
+ void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
+ void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
+ 		     loff_t start, size_t count);
++ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
++		size_t maxsize, unsigned maxpages, size_t *start,
++		unsigned gup_flags);
+ ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
+ 			size_t maxsize, unsigned maxpages, size_t *start);
++ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
++		struct page ***pages, size_t maxsize, size_t *start,
++		unsigned gup_flags);
+ ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
+ 			size_t maxsize, size_t *start);
+ int iov_iter_npages(const struct iov_iter *i, int maxpages);
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 4b7fce72e3e5..8f089d661a41 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1427,7 +1427,8 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
+ 
+ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		   struct page ***pages, size_t maxsize,
+-		   unsigned int maxpages, size_t *start)
++		   unsigned int maxpages, size_t *start,
++		   unsigned int gup_flags)
  {
- 	unsigned int max_sectors = queue_max_hw_sectors(rq->q);
- 	unsigned int nr_vecs = iov_iter_npages(iter, BIO_MAX_VECS);
-+	unsigned int gup_flags = 0;
- 	struct bio *bio;
- 	int ret;
- 	int j;
-@@ -248,13 +249,17 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 		return -ENOMEM;
- 	bio_init(bio, NULL, bio->bi_inline_vecs, nr_vecs, req_op(rq));
+ 	unsigned int n;
  
-+	if (blk_queue_pci_p2pdma(rq->q))
-+		gup_flags |= FOLL_PCI_P2PDMA;
+@@ -1439,7 +1440,6 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		maxsize = MAX_RW_COUNT;
+ 
+ 	if (likely(user_backed_iter(i))) {
+-		unsigned int gup_flags = 0;
+ 		unsigned long addr;
+ 		int res;
+ 
+@@ -1489,33 +1489,49 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+ 	return -EFAULT;
+ }
+ 
+-ssize_t iov_iter_get_pages2(struct iov_iter *i,
++ssize_t iov_iter_get_pages(struct iov_iter *i,
+ 		   struct page **pages, size_t maxsize, unsigned maxpages,
+-		   size_t *start)
++		   size_t *start, unsigned gup_flags)
+ {
+ 	if (!maxpages)
+ 		return 0;
+ 	BUG_ON(!pages);
+ 
+-	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages, start);
++	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages,
++					  start, gup_flags);
++}
++EXPORT_SYMBOL_GPL(iov_iter_get_pages);
 +
- 	while (iov_iter_count(iter)) {
- 		struct page **pages;
- 		ssize_t bytes;
- 		size_t offs, added = 0;
- 		int npages;
++ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
++		size_t maxsize, unsigned maxpages, size_t *start)
++{
++	return iov_iter_get_pages(i, pages, maxsize, maxpages, start, 0);
+ }
+ EXPORT_SYMBOL(iov_iter_get_pages2);
  
--		bytes = iov_iter_get_pages_alloc2(iter, &pages, LONG_MAX, &offs);
-+		bytes = iov_iter_get_pages_alloc(iter, &pages, LONG_MAX,
-+						 &offs, gup_flags);
- 		if (unlikely(bytes <= 0)) {
- 			ret = bytes ? bytes : -EFAULT;
- 			goto out_unmap;
+-ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
++ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+ 		   struct page ***pages, size_t maxsize,
+-		   size_t *start)
++		   size_t *start, unsigned gup_flags)
+ {
+ 	ssize_t len;
+ 
+ 	*pages = NULL;
+ 
+-	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start);
++	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start,
++					 gup_flags);
+ 	if (len <= 0) {
+ 		kvfree(*pages);
+ 		*pages = NULL;
+ 	}
+ 	return len;
+ }
++EXPORT_SYMBOL_GPL(iov_iter_get_pages_alloc);
++
++ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
++		struct page ***pages, size_t maxsize, size_t *start)
++{
++	return iov_iter_get_pages_alloc(i, pages, maxsize, start, 0);
++}
+ EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
+ 
+ size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
 -- 
 2.30.2
 
