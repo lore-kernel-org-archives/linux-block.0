@@ -2,107 +2,228 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63FB2C6FA86
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 14:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB116C6FA91
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 15:33:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbiIVO6f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 10:58:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40726 "EHLO
+        id S231317AbiIVPdh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 11:33:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231820AbiIVO6b (ORCPT
+        with ESMTP id S231804AbiIVPde (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 10:58:31 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E646D74D7;
-        Thu, 22 Sep 2022 07:58:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=lIqeYmIYKdZ39Sv7iKx98PZ/aFncvZ/B1l8HysQoIhk=; b=I75dP8r9MX4OiRESuJQ15NM69H
-        E7EPt6dmj1RLUSLfLdHSdQgN1mX1Mps+QUyXlvHfee+UqpkHTb6XVDmWWJmc+SsSXElXncswhSea/
-        n7ClPcuX8C+GwiXwMt/bA9+YVdTDgHYaqcPfaUTSE2PgJgFZGhE5WKHVUC+x9lJkdalVuklY4Xq8n
-        nEI+f/4MSCesrWAsHDl7LEYeD/yhSatwrHa4riE/CQsWfphlfqxmoZ49pmeUh05ZlrdcurIihp0za
-        NSFZ6gpSHMV26d1luCPA7bAblBb7vBlDXKICtG6AtRLly1VcBQJPVRZYaHZ6jleuswBvQRteHobdp
-        Z4DBeTVg==;
-Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1obNef-00848L-ST; Thu, 22 Sep 2022 08:58:22 -0600
-Message-ID: <0074a009-9ece-6617-b66d-d003593d153e@deltatee.com>
-Date:   Thu, 22 Sep 2022 08:58:16 -0600
+        Thu, 22 Sep 2022 11:33:34 -0400
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 509F3FB33C
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 08:33:29 -0700 (PDT)
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20220922153323epoutp047862519a50c5ec36a9b88e26821a6706~XOJXrPfGR0377103771epoutp04M
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 15:33:23 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20220922153323epoutp047862519a50c5ec36a9b88e26821a6706~XOJXrPfGR0377103771epoutp04M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1663860803;
+        bh=C81qtWO5E2zgqe+FAcHdBTKT4T0bT/5nCLsYZNOSs0I=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=K0s54Ba7TN+MawLq2p/1j0r1y2hNuclSuXKy7k3Jerqd6p7kHyAkwKmPSLqvo86vL
+         WqFIfIgZRsOEXAo1X5LV9MY9fMvHhThmH09h9kTxW+O5ptSHbZI50B5cbfkb5rYP4X
+         xxDRs7UpoAHWAEyoWPST1LwrUrc0C3ofWrP8SPYQ=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20220922153323epcas5p493e554822c3858b4612676a7039a3951~XOJXLsMDE2442124421epcas5p4z;
+        Thu, 22 Sep 2022 15:33:23 +0000 (GMT)
+Received: from epsmges5p2new.samsung.com (unknown [182.195.38.175]) by
+        epsnrtp4.localdomain (Postfix) with ESMTP id 4MYK744wR0z4x9Pv; Thu, 22 Sep
+        2022 15:33:20 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        9A.48.39477.0408C236; Fri, 23 Sep 2022 00:33:20 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220922153319epcas5p1edab5d5bc06594d0ffa1c89944c2bc83~XOJT7-7sp1909019090epcas5p1H;
+        Thu, 22 Sep 2022 15:33:19 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220922153319epsmtrp2569d97d2764b73dd09e3208c254ba3f4~XOJT7Nfg21775817758epsmtrp2y;
+        Thu, 22 Sep 2022 15:33:19 +0000 (GMT)
+X-AuditID: b6c32a4a-007ff70000019a35-77-632c80409203
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        BC.5F.14392.F308C236; Fri, 23 Sep 2022 00:33:19 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220922153317epsmtip143a075c61865f5cf72b75201a9d95020~XOJSET6Fr1695316953epsmtip1g;
+        Thu, 22 Sep 2022 15:33:17 +0000 (GMT)
+Date:   Thu, 22 Sep 2022 20:53:31 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH for-next v7 4/5] block: add helper to map bvec iterator
+ for passthrough
+Message-ID: <20220922152331.GA24701@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-CA
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20220825152425.6296-8-logang@deltatee.com>
- <YxDb2MyRx6o/wDAz@kroah.com>
- <4a4bca1e-bebf-768f-92d4-92eb8ae714e1@deltatee.com>
- <YxDhEO9ycZDTnbZm@kroah.com>
- <cc9a24a8-dd3a-9d21-d9a7-5ee4b0ad7a57@deltatee.com>
- <YxD7uZYaV75gJS9d@kroah.com>
- <fb9d7948-43fe-87c5-5275-70f280181ad1@deltatee.com>
- <YxGad5h2Nn/Ejslc@kroah.com>
- <db8cd049-c78b-1aa0-dcd0-0feb8c6cb25c@deltatee.com>
- <20220920064613.GB17325@lst.de> <Yywe9rBMB6hlUwqw@kroah.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <Yywe9rBMB6hlUwqw@kroah.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: gregkh@linuxfoundation.org, hch@lst.de, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v9 7/8] PCI/P2PDMA: Allow userspace VMA allocations
- through sysfs
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+In-Reply-To: <20220920120802.GC2809@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfVCTdRzA/T3Pw8MD1+px6PFzxsCHeR4vA4YDHhYQXeTNNIOzw85O4bnx
+        tHF7vb1kdl2tGYWcBEEXMKzsRIktZgyYEoxsTmdceBVqo2sSx+CMK44TsxPC2niw87/P9/2V
+        QPm9uICo1ZlZo47RUHg85rmUli4utWYqckZ/FNG25lWUPunwANoZasLpyYtDCN3jvIzQC3XX
+        MLrFdxPQ3l8y6M/OzsaWxsmH7KFY+cS4Re52HMfl/V1vy4cnrbj8gwEHkC+5heWxB9VFKpap
+        YY0prE6hr6nVKYupPfurnq3Ky8+RiCWFdAGVomO0bDFVtrdcvKtWE+mLSnmN0VgiqnLGZKKy
+        S4qMeouZTVHpTeZiijXUaAxSQ5aJ0ZosOmWWjjXLJDk5uXkRx2q1qjP8TYyhbdvrN09cwqzg
+        7y0NII6ApBR6+39GG0A8wSeHAVy9ugg44Q6AjdN+jBPuRSz+LvAwZPn8CZwzeAF0nJ9ZF+YA
+        vPVJBx71wsjtcNEViiQmCJxMgz+0WqLqTSQFZ+fH10qg5HUAww0uJGpIIA/BPv8KGmUeKYZn
+        7PdjON4Iv+sIY1GOIzNgoLl/jTeTqfCiJ4BEE0Gyh4DBtnAs114ZdF6+gnGcAOcDA+t6AVxa
+        8OIcK+BPHdcQjs1wZuTbdX4a1o01rTWBkq9C319+jOPHYeNKGIkOA0kerH+Pz7lvg7daZmM4
+        ToTT7V3rLIdfnry+vscggMFBB9YMhPZH5rE/UoJjGTy+aIvhOBkeG+xE7ZFyKLkVdj8gOEyD
+        577OPgVwB9jCGkxaJWvKM+Tq2CP/X1yh17rB2t+mP38BTP+2mOUDCAF8ABIotYnX+Wuags+r
+        YY6+wRr1VUaLhjX5QF7kVh+igs0KfeTxdeYqibQwR5qfny8t3JkvoRJ5p9vTFXxSyZhZNcsa
+        WOPDOISIE1gRoeP9bpFnVeZd3LH748x3W38v6D4w1lgyFHYVTUwd6ut5pmKaPHu790Vj02rv
+        OxsHLhxxtyaa/xh5arUaFxfcpx6MocnKGVGI3IB9lJrbNrpUOues/ly5oeKf+MpByWNHDfgB
+        6H4l+/t9AdnOeutp0cJkS83++sMu/tgxm0corVdLbYbBWdz11d7OTM+TvDtv2fZ4k7Q7Ru5O
+        vfzvCys3BOpxVZtIZJ769NTt0bp4YSj1cDBwT6woWxrxFM3J4Bfbw0nWyq3DsnPl7Rn253a1
+        vrmcpC2+emZfhdmpQ5bvgnBB+hN92TO4vzkzq5Ka0JZ4kPmDyTfwP68EW3cPziW8RGEmFSNJ
+        R40m5j81oTy8QAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpnkeLIzCtJLcpLzFFi42LZdlhJTte+QSfZ4PBhA4umCX+ZLeas2sZo
+        sfpuP5vFzQM7mSxWrj7KZPGu9RyLxaRD1xgt9t7Stpi/7Cm7A6fHzll32T0uny312LSqk81j
+        85J6j903G9g8+rasYvT4vEkugD2KyyYlNSezLLVI3y6BK6P/83S2gnVyFZ///mNuYFwt3sXI
+        ySEhYCLxa3sPWxcjF4eQwG5GiQWdB1khEuISzdd+sEPYwhIr/z1nhyh6wijxZ/UHsCIWAVWJ
+        D+vuMncxcnCwCWhKXJhcChIWEVCSePrqLCNIPbPAFaD6/UvA6oUFYiU2HvnNDGLzCuhKLJ31
+        kxVi6C1GiY2rlrJDJAQlTs58wgJiMwuYSczb/BBsAbOAtMTyfxwQYXmJ5q2zweZwCmhLHJ+w
+        GaxcVEBZ4sC240wTGIVmIZk0C8mkWQiTZiGZtICRZRWjZGpBcW56brFhgWFearlecWJucWle
+        ul5yfu4mRnBcaWnuYNy+6oPeIUYmDsZDjBIczEoivLPvaCYL8aYkVlalFuXHF5XmpBYfYpTm
+        YFES573QdTJeSCA9sSQ1OzW1ILUIJsvEwSnVwFQoMV30tejC2qSLBVI52ybNXha0VDruxfx1
+        ps8i66VOvXzAa3BYaH5hlrXGIQspCcXYbTksH7YEGM4XsV0memxp7pnLXQUTg3vYT5xLmrOH
+        ccqxC62bNQ8u9lL7oGJ9cK+V/ef9HTlX/BZsCfx8wu971g1DvS0SBTeMkt5mXmGfKs8m3L/j
+        raupqofJ3FOd5l3/FmUUMfkHfpBLzlpbI8lz//3dF7dCOw15ZCxe6a69+SyCRyshO7/AXODY
+        7N+id49EHv3z0XH+y+n+L/NPumx0rLtkHSvczzvrO2sd59q8b0Ivrn3jdNzx8+0ViQyd+54/
+        GWMXpJ9fc26P32StM5Nfbr3bosAw97PZpZXKaxSUWIozEg21mIuKEwFGDvG0GgMAAA==
+X-CMS-MailID: 20220922153319epcas5p1edab5d5bc06594d0ffa1c89944c2bc83
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----Iofw26EFbNSGL_UgXoU1XVs5LxhMn2U4r7Cvdd9q_.3L.-0Y=_cd5_"
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220909103147epcas5p2a83ec151333bcb1d2abb8c7536789bfd
+References: <20220909102136.3020-1-joshi.k@samsung.com>
+        <CGME20220909103147epcas5p2a83ec151333bcb1d2abb8c7536789bfd@epcas5p2.samsung.com>
+        <20220909102136.3020-5-joshi.k@samsung.com> <20220920120802.GC2809@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+------Iofw26EFbNSGL_UgXoU1XVs5LxhMn2U4r7Cvdd9q_.3L.-0Y=_cd5_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+
+On Tue, Sep 20, 2022 at 02:08:02PM +0200, Christoph Hellwig wrote:
+>> -static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+>> +static struct bio *bio_map_get(struct request *rq, unsigned int nr_vecs,
+>>  		gfp_t gfp_mask)
+>
+>bio_map_get is a very confusing name.
+
+So I chose that name because functionality is opposite of what we do
+inside existing bio_map_put helper. In that way it is symmetric.
+
+>And I also still think this is
+>the wrong way to go.  If plain slab allocations don't use proper
+>per-cpu caches we have a MM problem and need to talk to the slab
+>maintainers and not use the overkill bio_set here.
+
+This series is not about using (or not using) bio-set. Attempt here has
+been to use pre-mapped buffers (and bvec) that we got from io_uring.
+
+>> +/* Prepare bio for passthrough IO given an existing bvec iter */
+>> +int blk_rq_map_user_bvec(struct request *rq, struct iov_iter *iter)
+>
+>I'm a little confused about the interface we're trying to present from
+>the block layer to the driver here.
+>
+>blk_rq_map_user_iov really should be able to detect that it is called
+>on a bvec iter and just do the right thing rather than needing different
+>helpers.
+
+I too explored that possibility, but found that it does not. It maps the
+user-pages into bio either directly or by doing that copy (in certain odd
+conditions) but does not know how to deal with existing bvec.
+Reason, I guess, is no one felt the need to try passthrough for bvecs
+before. It makes sense only in context of io_uring passthrough.
+And it really felt cleaner to me write a new function rather than 
+overloading the blk_rq_map_user_iov with multiple if/else canals.
+I tried that again after your comment, but it does not seem to produce
+any good-looking code.
+The other factor is - it seemed safe to go this way as I am more sure
+that I will not break something else (using blk_rq_map_user_iov).
+
+>> +		/*
+>> +		 * If the queue doesn't support SG gaps and adding this
+>> +		 * offset would create a gap, disallow it.
+>> +		 */
+>> +		if (bvprvp && bvec_gap_to_prev(lim, bvprvp, bv->bv_offset))
+>> +			goto out_err;
+>
+>So now you limit the input that is accepted?  That's not really how
+>iov_iters are used.   We can either try to reshuffle the bvecs, or
+>just fall back to the copy data version as blk_rq_map_user_iov does
+>for 'weird' iters˙
+
+Since I was writing a 'new' helper for passthrough only, I thought it
+will not too bad to just bail out (rather than try to handle it using
+copy) if we hit this queue_virt_boundary related situation. 
+
+To handle it the 'copy data' way we would need this -
+
+585         else if (queue_virt_boundary(q))
+586                 copy = queue_virt_boundary(q) & iov_iter_gap_alignment(iter);
+587
+
+But iov_iter_gap_alignment does not work on bvec iters. Line #1274 below
+
+1264 unsigned long iov_iter_gap_alignment(const struct iov_iter *i)
+1265 {
+1266         unsigned long res = 0;
+1267         unsigned long v = 0;
+1268         size_t size = i->count;
+1269         unsigned k;
+1270
+1271         if (iter_is_ubuf(i))
+1272                 return 0;
+1273
+1274         if (WARN_ON(!iter_is_iovec(i)))
+1275                 return ~0U;
+
+Do you see a way to overcome this. Or maybe this can be revisted as we
+are not missing a lot?
+
+>> +
+>> +		/* check full condition */
+>> +		if (nsegs >= nr_segs || bytes > UINT_MAX - bv->bv_len)
+>> +			goto out_err;
+>> +
+>> +		if (bytes + bv->bv_len <= nr_iter &&
+>> +				bv->bv_offset + bv->bv_len <= PAGE_SIZE) {
+>> +			nsegs++;
+>> +			bytes += bv->bv_len;
+>> +		} else
+>> +			goto out_err;
+>
+>Nit: This would read much better as:
+>
+>		if (bytes + bv->bv_len > nr_iter)
+>			goto out_err;
+>		if (bv->bv_offset + bv->bv_len > PAGE_SIZE)
+>			goto out_err;
+>
+>		bytes += bv->bv_len;
+>		nsegs++;
+
+Indeed, cleaner. Thanks.
+
+------Iofw26EFbNSGL_UgXoU1XVs5LxhMn2U4r7Cvdd9q_.3L.-0Y=_cd5_
+Content-Type: text/plain; charset="utf-8"
 
 
-On 2022-09-22 02:38, Greg Kroah-Hartman wrote:
-> On Tue, Sep 20, 2022 at 08:46:13AM +0200, Christoph Hellwig wrote:
->> On Fri, Sep 02, 2022 at 12:46:54PM -0600, Logan Gunthorpe wrote:
->>> See the diff at the bottom of this email. I can apply it on top of this
->>> patch, but IMO it is neither easier to follow nor maintain. Unless you 
->>> have a different suggestion...
->>
->> Greg, can you chime in on this?  Besides this item we just have a few
->> cosmetic bits left I think, and I'd really like to get the series into
->> this merge window.
->>
-> 
-> I don't seem to have this in my inbox at all anymore, sorry.
-> 
-> The original should be fine, Logan, thanks for trying to split it out a
-> bit more.  So this can be taken as-is for 6.1-rc1.
-
-Thanks Greg,
-
-I'll send a v10 with changes from the other feedback later today.
-
-Logan
+------Iofw26EFbNSGL_UgXoU1XVs5LxhMn2U4r7Cvdd9q_.3L.-0Y=_cd5_--
