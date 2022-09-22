@@ -2,128 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BFDC6FA92
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 13:40:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5CE4C6FA82
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 13:42:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229911AbiIVNkf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 09:40:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46708 "EHLO
+        id S230172AbiIVNmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 09:42:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbiIVNkd (ORCPT
+        with ESMTP id S230058AbiIVNmQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 09:40:33 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61393F6F
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 06:40:32 -0700 (PDT)
+        Thu, 22 Sep 2022 09:42:16 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD457D62E0
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 06:42:15 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 23B8D1F8EA;
-        Thu, 22 Sep 2022 13:40:31 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7D71C21A49;
+        Thu, 22 Sep 2022 13:42:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663854031; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1663854134; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KTnTe9ao9zHjAzLNt3DZiwBsoTSDa8ih8vr4D6K0yrg=;
-        b=eSMLoiMnYDxj2bLJNgmU96gWgQoycevZ20SZ+1OOeKf2oF9tKJEkTEZw0H/JnMCQqsVy3+
-        QfLNHwedYUGSZ3B4yTEsCMXx4z+ueAEhujv48LjR9Et+zZQ+E6QuOR3S+21c42q7i+qloT
-        pgoIWRbrSsOa0xclVUQjDXN5KR90nUo=
+        bh=AJelLEfuuR+svkQ2l/gSK+7xE6vwYFX6QKtuIeNHAks=;
+        b=oP258jGbnk3PcAxLAi0eQLnNY8HM/1W3IpId64TWUVVtk7/k+F6HC96TvnutXXfF44dt8I
+        mFQH1aPKvxGtrbCOGA41yCGbh8a5pEOBM2cWMrjGiKUXOMJRtdP+GO9DwuE5PcW0275j30
+        swJ8qQgOeBQ36w+sv+TL2Dy1Un9of68=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663854031;
+        s=susede2_ed25519; t=1663854134;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KTnTe9ao9zHjAzLNt3DZiwBsoTSDa8ih8vr4D6K0yrg=;
-        b=5fPYaHtjv1wp6b9JttmL/76wUq9HeY7oJUHr8tn3T3dPillWa+aYB7J8HdyKNVmKdRGV+/
-        lDYF5zgGj99g7cAg==
+        bh=AJelLEfuuR+svkQ2l/gSK+7xE6vwYFX6QKtuIeNHAks=;
+        b=zh9Ob6oACO6t/daQ8dBs3O7nkdDQX3/hZHcZtQbTtOHwxEzqpvvNFBhhqHluFReBvV0jI0
+        lODBKsG+l2/c1CCg==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E90E413AA5;
-        Thu, 22 Sep 2022 13:40:30 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5489A13AA5;
+        Thu, 22 Sep 2022 13:42:14 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id raq0N85lLGPJfAAAMHmgww
-        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 13:40:30 +0000
-Date:   Thu, 22 Sep 2022 15:40:29 +0200
+        id 4gAUEzZmLGOIfQAAMHmgww
+        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 13:42:14 +0000
+Date:   Thu, 22 Sep 2022 15:42:12 +0200
 From:   Andreas Herrmann <aherrmann@suse.de>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH 08/17] blk-iolatency: pass a gendisk to blk_iolatency_init
-Message-ID: <YyxlzXnatdkuPwaC@suselix>
+Subject: Re: [PATCH 15/17] blk-cgroup: pass a gendisk to blkg_destroy_all
+Message-ID: <YyxmNE+Ae9D2mSuB@suselix>
 References: <20220921180501.1539876-1-hch@lst.de>
- <20220921180501.1539876-9-hch@lst.de>
+ <20220921180501.1539876-16-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220921180501.1539876-9-hch@lst.de>
+In-Reply-To: <20220921180501.1539876-16-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 08:04:52PM +0200, Christoph Hellwig wrote:
-> Pass the gendisk to blk_iolatency_init as part of moving the blk-cgroup
+On Wed, Sep 21, 2022 at 08:04:59PM +0200, Christoph Hellwig wrote:
+> Pass the gendisk to blkg_destroy_all as part of moving the blk-cgroup
 > infrastructure to be gendisk based.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-cgroup.c    | 2 +-
->  block/blk-iolatency.c | 3 ++-
->  block/blk.h           | 4 ++--
->  3 files changed, 5 insertions(+), 4 deletions(-)
+>  block/blk-cgroup.c | 13 ++++---------
+>  1 file changed, 4 insertions(+), 9 deletions(-)
 
 Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
 
 > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 89974fd0db3da..82a117ff54de5 100644
+> index 3dfd78f1312db..c2d5ca2eb92e5 100644
 > --- a/block/blk-cgroup.c
 > +++ b/block/blk-cgroup.c
-> @@ -1265,7 +1265,7 @@ int blkcg_init_disk(struct gendisk *disk)
->  	if (ret)
->  		goto err_ioprio_exit;
->  
-> -	ret = blk_iolatency_init(q);
-> +	ret = blk_iolatency_init(disk);
->  	if (ret)
->  		goto err_throtl_exit;
->  
-> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> index e285152345a20..c6f61fe88b875 100644
-> --- a/block/blk-iolatency.c
-> +++ b/block/blk-iolatency.c
-> @@ -756,8 +756,9 @@ static void blkiolatency_enable_work_fn(struct work_struct *work)
->  	}
+> @@ -462,14 +462,9 @@ static void blkg_destroy(struct blkcg_gq *blkg)
+>  	percpu_ref_kill(&blkg->refcnt);
 >  }
 >  
-> -int blk_iolatency_init(struct request_queue *q)
-> +int blk_iolatency_init(struct gendisk *disk)
+> -/**
+> - * blkg_destroy_all - destroy all blkgs associated with a request_queue
+> - * @q: request_queue of interest
+> - *
+> - * Destroy all blkgs associated with @q.
+> - */
+> -static void blkg_destroy_all(struct request_queue *q)
+> +static void blkg_destroy_all(struct gendisk *disk)
 >  {
 > +	struct request_queue *q = disk->queue;
->  	struct blk_iolatency *blkiolat;
->  	struct rq_qos *rqos;
->  	int ret;
-> diff --git a/block/blk.h b/block/blk.h
-> index d7142c4d2fefb..361db83147c6f 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -389,9 +389,9 @@ static inline struct bio *blk_queue_bounce(struct bio *bio,
+>  	struct blkcg_gq *blkg, *n;
+>  	int count = BLKG_DESTROY_BATCH_SIZE;
+>  
+> @@ -1276,7 +1271,7 @@ int blkcg_init_disk(struct gendisk *disk)
+>  err_ioprio_exit:
+>  	blk_ioprio_exit(disk);
+>  err_destroy_all:
+> -	blkg_destroy_all(q);
+> +	blkg_destroy_all(disk);
+>  	return ret;
+>  err_unlock:
+>  	spin_unlock_irq(&q->queue_lock);
+> @@ -1287,7 +1282,7 @@ int blkcg_init_disk(struct gendisk *disk)
+>  
+>  void blkcg_exit_disk(struct gendisk *disk)
+>  {
+> -	blkg_destroy_all(disk->queue);
+> +	blkg_destroy_all(disk);
+>  	blk_throtl_exit(disk);
 >  }
 >  
->  #ifdef CONFIG_BLK_CGROUP_IOLATENCY
-> -extern int blk_iolatency_init(struct request_queue *q);
-> +int blk_iolatency_init(struct gendisk *disk);
->  #else
-> -static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
-> +static int blk_iolatency_init(struct gendisk *disk) { return 0 };
->  #endif
->  
->  #ifdef CONFIG_BLK_DEV_ZONED
 > -- 
 > 2.30.2
 > 
