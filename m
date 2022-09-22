@@ -2,81 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E49C32771
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 02:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53650ECAAD8
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 02:13:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbiIVCGj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 22:06:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35994 "EHLO
+        id S231209AbiIVCNw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 22:13:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbiIVCGi (ORCPT
+        with ESMTP id S231158AbiIVCNs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 22:06:38 -0400
-Received: from out199-14.us.a.mail.aliyun.com (out199-14.us.a.mail.aliyun.com [47.90.199.14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478AC98D1F;
-        Wed, 21 Sep 2022 19:06:37 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VQQI7Fc_1663812392;
-Received: from 30.97.56.134(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQQI7Fc_1663812392)
-          by smtp.aliyun-inc.com;
-          Thu, 22 Sep 2022 10:06:33 +0800
-Message-ID: <8b595d99-9d77-dcbe-4d1a-14bbb12b912b@linux.alibaba.com>
-Date:   Thu, 22 Sep 2022 10:06:30 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH V4 5/8] ublk_drv: consider recovery feature in aborting
- mechanism
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
+        Wed, 21 Sep 2022 22:13:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E53D9AF86
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 19:13:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663812826;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=la998Fhh07Iapm6q9oJ6N9PKQNKvsYQdU7CIA3wD4kk=;
+        b=BmIXEbtXzKaqTtLF2m7wm8aHfTBTkxsGIMUpmBKW3uebv+cuGJlXGoeYLBTFN2xp/rebGD
+        Y9mbCDaPbd03oqN56jo2YdzDQF9XZZQ1wgNn5PUwnQUCPQdsNj6kjdgg6Aa0IInNmFvZp7
+        3PGD3eypIBXRwH8Q3vNmDXUcH0UK6Gk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-MdOlDXeCNyqMlsFfMDMc9g-1; Wed, 21 Sep 2022 22:13:43 -0400
+X-MC-Unique: MdOlDXeCNyqMlsFfMDMc9g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C3E8F85A5A6;
+        Thu, 22 Sep 2022 02:13:42 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F25382166B2C;
+        Thu, 22 Sep 2022 02:13:30 +0000 (UTC)
+Date:   Thu, 22 Sep 2022 10:13:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
 Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V4 6/8] ublk_drv: support UBLK_F_USER_RECOVERY_REISSUE
+Message-ID: <YyvExQcnSFAqQHMY@T590>
 References: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
- <20220921095849.84988-6-ZiyangZhang@linux.alibaba.com>
- <Yyup5vt32fULKIJu@T590>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <Yyup5vt32fULKIJu@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20220921095849.84988-7-ZiyangZhang@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220921095849.84988-7-ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/9/22 08:18, Ming Lei wrote:
-> On Wed, Sep 21, 2022 at 05:58:46PM +0800, ZiyangZhang wrote:
->> With USER_RECOVERY feature enabled, the monitor_work schedules
->> quiesce_work after finding a dying ubq_daemon. The monitor_work
->> should also abort all rqs issued to userspace before the ubq_daemon is
->> dying. The quiesce_work's job is to:
->> (1) quiesce request queue.
->> (2) check if there is any INFLIGHT rq. If so, we retry until all these
->>     rqs are requeued and become IDLE. These rqs should be requeued by
->> 	ublk_queue_rq(), task work, io_uring fallback wq or monitor_work.
->> (3) complete all ioucmds by calling io_uring_cmd_done(). We are safe to
->>     do so because no ioucmd can be referenced now.
->> (5) set ub's state to UBLK_S_DEV_QUIESCED, which means we are ready for
->>     recovery. This state is exposed to userspace by GET_DEV_INFO.
->>
->> The driver can always handle STOP_DEV and cleanup everything no matter
->> ub's state is LIVE or QUIESCED. After ub's state is UBLK_S_DEV_QUIESCED,
->> user can recover with new process.
->>
->> Note: we do not change the default behavior with reocvery feature
->> disabled. monitor_work still schedules stop_work and abort inflight
->> rqs. And finally ublk_device is released.
->>
->> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+On Wed, Sep 21, 2022 at 05:58:47PM +0800, ZiyangZhang wrote:
+> UBLK_F_USER_RECOVERY_REISSUE implies that:
+> With a dying ubq_daemon, ublk_drv let monitor_work requeues rq issued to
+> userspace(ublksrv) before the ubq_daemon is dying.
 > 
-> This version is close to be ready, just some debug logging needs
-> be removed, see inline comment. Also I'd suggest you to learn to
-> use bpftrace a bit, then basically you needn't to rely on kernel
-> logging.
+> UBLK_F_USER_RECOVERY_REISSUE is designed for backends which:
+> (1) tolerate double-write since ublk_drv may issue the same rq
+>     twice.
+> (2) does not let frontend users get I/O error, such as read-only FS
+>     and VM backend.
 > 
-> If these logging is removed, you will see how simple the patch becomes
-> compared with previous version.
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> ---
 
-Current version is simpler, thanks for reviewing, Ming.
-Debug logging will be removed in V5 and I will send it out soon.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Regards,
-Zhang
+Thanks,
+Ming
+
