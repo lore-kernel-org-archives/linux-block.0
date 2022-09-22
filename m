@@ -2,153 +2,197 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD82BC54EE9
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 14:16:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE2FC6FA86
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 14:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231407AbiIVOQe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 10:16:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58992 "EHLO
+        id S230513AbiIVOWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 10:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbiIVOQc (ORCPT
+        with ESMTP id S231908AbiIVOVn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 10:16:32 -0400
+        Thu, 22 Sep 2022 10:21:43 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8C2F08BC
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 07:16:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4B3F3701
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 07:21:39 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id A63852197E;
-        Thu, 22 Sep 2022 14:16:30 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 02E69218E2;
+        Thu, 22 Sep 2022 14:21:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663856190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1663856498; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vQfmjxow22E9ErucqnIRe3m8H7/+7GKXTXRnb9gkKro=;
-        b=WyQrdb6nDHNd5W7Pk8Jlc9MKE2mxxwS2GGd6fNGFH8XYyqMezyOGbW+9+F3JbVdJ7vavO+
-        PVs3T38y3rlvyPXCECk87jYVf7wJUSvtnp4+NiYPWWI1gsIfZSZxXZaFttqKwFl0Xs3rwc
-        LWIEc1X4YEFCty3jV0BSU70kVmWiZM0=
+        bh=FJ5MloPjge1aybrw3VPT2moRtXskWEybZMK58z8IXfE=;
+        b=Weq8TCjwwmOu7o6qxSQk7ptwxLxnTCKFl9qvAxMe4etjymWQ15iUFpXbmuCVKImJqhdWv8
+        N3i37J3YhsNeAFv+tJ8suzw3ZQrzJRRTbhIhk7zVbNNgf3mP6FynbzC2NprZ1UHXCvOFcp
+        Csa06CSxlEew8c+hVhAvNU1ZRg+tVtU=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663856190;
+        s=susede2_ed25519; t=1663856498;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vQfmjxow22E9ErucqnIRe3m8H7/+7GKXTXRnb9gkKro=;
-        b=6QtNHboQUaJmR5cGpIg/vmjN0c0wJBjanyB20Ju+Sgf7JZeC/q007xyXqH9YgYuh/Wn3mR
-        Tqe861K7u6H3U+AA==
+        bh=FJ5MloPjge1aybrw3VPT2moRtXskWEybZMK58z8IXfE=;
+        b=ffLv+zfbib1ZlqQ/Dc6T2QPNyLRd9GnEF3qTOfAaIVdT4o3XdnHDu/n684NwXcRO+rHVRj
+        wociiF3xfLXw90CA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7EDC413AA5;
-        Thu, 22 Sep 2022 14:16:30 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CF35113AA5;
+        Thu, 22 Sep 2022 14:21:37 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id GZqiHT5uLGOgDwAAMHmgww
-        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 14:16:30 +0000
-Date:   Thu, 22 Sep 2022 16:16:29 +0200
+        id zLs+MXFvLGNcEwAAMHmgww
+        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 14:21:37 +0000
+Date:   Thu, 22 Sep 2022 16:21:36 +0200
 From:   Andreas Herrmann <aherrmann@suse.de>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH 05/17] blk-cgroup: remove blkg_lookup_check
-Message-ID: <YyxuPeXuThDhyLjG@suselix>
+Subject: Re: [PATCH 16/17] blk-cgroup: pass a gendisk to
+ blkcg_schedule_throttle
+Message-ID: <YyxvcAwPm7jSSLNd@suselix>
 References: <20220921180501.1539876-1-hch@lst.de>
- <20220921180501.1539876-6-hch@lst.de>
+ <20220921180501.1539876-17-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220921180501.1539876-6-hch@lst.de>
+In-Reply-To: <20220921180501.1539876-17-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 08:04:49PM +0200, Christoph Hellwig wrote:
-> The combinations of an error check with an ERR_PTR return and a lookup
-> with a NULL return leads to ugly handling of the return values in the
-> callers.  Just open coding the check and the lookup is much simpler.
+On Wed, Sep 21, 2022 at 08:05:00PM +0200, Christoph Hellwig wrote:
+> Pass the gendisk to blkcg_schedule_throttle as part of moving the
+> blk-cgroup infrastructure to be gendisk based.  Remove the unused
+> !BLK_CGROUP stub while we're at it.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-cgroup.c | 36 ++++++++++--------------------------
->  1 file changed, 10 insertions(+), 26 deletions(-)
+>  block/blk-cgroup.c         | 8 +++++---
+>  block/blk-iocost.c         | 4 ++--
+>  block/blk-iolatency.c      | 2 +-
+>  include/linux/blk-cgroup.h | 5 ++---
+>  mm/swapfile.c              | 2 +-
+>  5 files changed, 11 insertions(+), 10 deletions(-)
 
 Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
 
 > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index d1216760d0255..1306112d76486 100644
+> index c2d5ca2eb92e5..fc82057db9629 100644
 > --- a/block/blk-cgroup.c
 > +++ b/block/blk-cgroup.c
-> @@ -602,25 +602,6 @@ u64 __blkg_prfill_u64(struct seq_file *sf, struct blkg_policy_data *pd, u64 v)
->  }
->  EXPORT_SYMBOL_GPL(__blkg_prfill_u64);
+> @@ -1792,13 +1792,13 @@ void blkcg_maybe_throttle_current(void)
 >  
-> -/* Performs queue bypass and policy enabled checks then looks up blkg. */
-> -static struct blkcg_gq *blkg_lookup_check(struct blkcg *blkcg,
-> -					  const struct blkcg_policy *pol,
-> -					  struct request_queue *q)
-> -{
-> -	struct blkcg_gq *blkg;
-> -
-> -	WARN_ON_ONCE(!rcu_read_lock_held());
-> -	lockdep_assert_held(&q->queue_lock);
-> -
-> -	if (!blkcg_policy_enabled(q, pol))
-> -		return ERR_PTR(-EOPNOTSUPP);
-> -
-> -	blkg = blkg_lookup(blkcg, q);
-> -	if (blkg)
-> -		blkg_update_hint(blkcg, blkg);
-> -	return blkg;
-> -}
-> -
 >  /**
->   * blkcg_conf_open_bdev - parse and open bdev for per-blkg config update
->   * @inputp: input string pointer
-> @@ -697,14 +678,16 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
->  	rcu_read_lock();
->  	spin_lock_irq(&q->queue_lock);
+>   * blkcg_schedule_throttle - this task needs to check for throttling
+> - * @q: the request queue IO was submitted on
+> + * @gendisk: disk to throttle
+>   * @use_memdelay: do we charge this to memory delay for PSI
+>   *
+>   * This is called by the IO controller when we know there's delay accumulated
+>   * for the blkg for this task.  We do not pass the blkg because there are places
+>   * we call this that may not have that information, the swapping code for
+> - * instance will only have a request_queue at that point.  This set's the
+> + * instance will only have a block_device at that point.  This set's the
+>   * notify_resume for the task to check and see if it requires throttling before
+>   * returning to user space.
+>   *
+> @@ -1807,8 +1807,10 @@ void blkcg_maybe_throttle_current(void)
+>   * throttle once.  If the task needs to be throttled again it'll need to be
+>   * re-set at the next time we see the task.
+>   */
+> -void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay)
+> +void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay)
+>  {
+> +	struct request_queue *q = disk->queue;
+> +
+>  	if (unlikely(current->flags & PF_KTHREAD))
+>  		return;
 >  
-> -	blkg = blkg_lookup_check(blkcg, pol, q);
-> -	if (IS_ERR(blkg)) {
-> -		ret = PTR_ERR(blkg);
-> +	if (!blkcg_policy_enabled(q, pol)) {
-> +		ret = -EOPNOTSUPP;
->  		goto fail_unlock;
->  	}
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index b8e5f550aa5be..b0899ab214c41 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2636,7 +2636,7 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+>  	if (use_debt) {
+>  		iocg_incur_debt(iocg, abs_cost, &now);
+>  		if (iocg_kick_delay(iocg, &now))
+> -			blkcg_schedule_throttle(rqos->q,
+> +			blkcg_schedule_throttle(rqos->q->disk,
+>  					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
+>  		iocg_unlock(iocg, ioc_locked, &flags);
+>  		return;
+> @@ -2737,7 +2737,7 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
+>  	if (likely(!list_empty(&iocg->active_list))) {
+>  		iocg_incur_debt(iocg, abs_cost, &now);
+>  		if (iocg_kick_delay(iocg, &now))
+> -			blkcg_schedule_throttle(rqos->q,
+> +			blkcg_schedule_throttle(rqos->q->disk,
+>  					(bio->bi_opf & REQ_SWAP) == REQ_SWAP);
+>  	} else {
+>  		iocg_commit_bio(iocg, bio, abs_cost, cost);
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index c6f61fe88b875..571fa95aafe96 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -292,7 +292,7 @@ static void __blkcg_iolatency_throttle(struct rq_qos *rqos,
+>  	unsigned use_delay = atomic_read(&lat_to_blkg(iolat)->use_delay);
 >  
-> -	if (blkg)
-> +	blkg = blkg_lookup(blkcg, q);
-> +	if (blkg) {
-> +		blkg_update_hint(blkcg, blkg);
->  		goto success;
-> +	}
+>  	if (use_delay)
+> -		blkcg_schedule_throttle(rqos->q, use_memdelay);
+> +		blkcg_schedule_throttle(rqos->q->disk, use_memdelay);
 >  
 >  	/*
->  	 * Create blkgs walking down from blkcg_root to @blkcg, so that all
-> @@ -740,14 +723,15 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
->  		rcu_read_lock();
->  		spin_lock_irq(&q->queue_lock);
+>  	 * To avoid priority inversions we want to just take a slot if we are
+> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+> index 9f40dbc65f82c..dd5841a42c331 100644
+> --- a/include/linux/blk-cgroup.h
+> +++ b/include/linux/blk-cgroup.h
+> @@ -18,14 +18,14 @@
 >  
-> -		blkg = blkg_lookup_check(pos, pol, q);
-> -		if (IS_ERR(blkg)) {
-> -			ret = PTR_ERR(blkg);
-> +		if (!blkcg_policy_enabled(q, pol)) {
->  			blkg_free(new_blkg);
-> +			ret = -EOPNOTSUPP;
->  			goto fail_preloaded;
+>  struct bio;
+>  struct cgroup_subsys_state;
+> -struct request_queue;
+> +struct gendisk;
+>  
+>  #define FC_APPID_LEN              129
+>  
+>  #ifdef CONFIG_BLK_CGROUP
+>  extern struct cgroup_subsys_state * const blkcg_root_css;
+>  
+> -void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay);
+> +void blkcg_schedule_throttle(struct gendisk *disk, bool use_memdelay);
+>  void blkcg_maybe_throttle_current(void);
+>  bool blk_cgroup_congested(void);
+>  void blkcg_pin_online(struct cgroup_subsys_state *blkcg_css);
+> @@ -39,7 +39,6 @@ struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio);
+>  
+>  static inline void blkcg_maybe_throttle_current(void) { }
+>  static inline bool blk_cgroup_congested(void) { return false; }
+> -static inline void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay) { }
+>  static inline struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
+>  {
+>  	return NULL;
+> diff --git a/mm/swapfile.c b/mm/swapfile.c
+> index 1fdccd2f1422e..82e62007881db 100644
+> --- a/mm/swapfile.c
+> +++ b/mm/swapfile.c
+> @@ -3655,7 +3655,7 @@ void __cgroup_throttle_swaprate(struct page *page, gfp_t gfp_mask)
+>  	plist_for_each_entry_safe(si, next, &swap_avail_heads[nid],
+>  				  avail_lists[nid]) {
+>  		if (si->bdev) {
+> -			blkcg_schedule_throttle(bdev_get_queue(si->bdev), true);
+> +			blkcg_schedule_throttle(si->bdev->bd_disk, true);
+>  			break;
 >  		}
->  
-> +		blkg = blkg_lookup(pos, q);
->  		if (blkg) {
-> +			blkg_update_hint(pos, blkg);
->  			blkg_free(new_blkg);
->  		} else {
->  			blkg = blkg_create(pos, q, new_blkg);
+>  	}
 > -- 
 > 2.30.2
 > 
