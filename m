@@ -2,130 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5CE4C6FA82
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 13:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3550C6FA91
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 14:08:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbiIVNmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 09:42:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49478 "EHLO
+        id S230282AbiIVOIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 10:08:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbiIVNmQ (ORCPT
+        with ESMTP id S230436AbiIVOIV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 09:42:16 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD457D62E0
-        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 06:42:15 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 7D71C21A49;
-        Thu, 22 Sep 2022 13:42:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1663854134; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AJelLEfuuR+svkQ2l/gSK+7xE6vwYFX6QKtuIeNHAks=;
-        b=oP258jGbnk3PcAxLAi0eQLnNY8HM/1W3IpId64TWUVVtk7/k+F6HC96TvnutXXfF44dt8I
-        mFQH1aPKvxGtrbCOGA41yCGbh8a5pEOBM2cWMrjGiKUXOMJRtdP+GO9DwuE5PcW0275j30
-        swJ8qQgOeBQ36w+sv+TL2Dy1Un9of68=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1663854134;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AJelLEfuuR+svkQ2l/gSK+7xE6vwYFX6QKtuIeNHAks=;
-        b=zh9Ob6oACO6t/daQ8dBs3O7nkdDQX3/hZHcZtQbTtOHwxEzqpvvNFBhhqHluFReBvV0jI0
-        lODBKsG+l2/c1CCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5489A13AA5;
-        Thu, 22 Sep 2022 13:42:14 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 4gAUEzZmLGOIfQAAMHmgww
-        (envelope-from <aherrmann@suse.de>); Thu, 22 Sep 2022 13:42:14 +0000
-Date:   Thu, 22 Sep 2022 15:42:12 +0200
-From:   Andreas Herrmann <aherrmann@suse.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 15/17] blk-cgroup: pass a gendisk to blkg_destroy_all
-Message-ID: <YyxmNE+Ae9D2mSuB@suselix>
-References: <20220921180501.1539876-1-hch@lst.de>
- <20220921180501.1539876-16-hch@lst.de>
+        Thu, 22 Sep 2022 10:08:21 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D7F54C97
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 07:08:19 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id p3so7752385iof.13
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 07:08:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date;
+        bh=rkVImxlyK2QBDKhgSnYfdEQRSVWW9sMB9j7AsMC1/LE=;
+        b=oQJcamULfvQh9FWwuKAKPN5l8tlP8mUoTHHGHGEsNdJfVUZZxr3Jvw2XG6D08iNbGl
+         JGkH21lYkHj8GA8FcTZD1PxEB8l2pASE0zRcJTe9/Rkfql8rX4HdkYSuYCIJa9ZOXkA8
+         kwuaackEPe0iZ+Bw6pf5xB+x4lzkZsSNwzD35bL30jmg3DAyDaAs6b1Wsqk121DoD/Kw
+         mKT+y+FyZXhC257aji5lbhwzkErWCdFiMYzt6M4qPgVp39Waleq0XrDFcYBFr67GVqGg
+         Zivn0odNaLDzjv8/fUi1GYghuhQJ6yG9/grWDLBedFQmoy75IUlYLKVl7h5PGrUTXCj3
+         gaGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=rkVImxlyK2QBDKhgSnYfdEQRSVWW9sMB9j7AsMC1/LE=;
+        b=vJ2JCDDxvAgT9GtI6aAu1WlbHj/+nIbL6ccn29DV8rJTciuKcbMmjP2K0XwkjaNlgj
+         9LVyxzpsMSw2qN3hc9kLKIgGrFvtxgIZqKzQ/tSS7mxF9ZKrJ8JZw2RId6Dy7TH/JE2l
+         3RTOGjBR5U/m3m2ZImpcuUYZwEAaz8/trnlnE45ks8R9prKW9pf0InllJx65F4gpfhVS
+         IcJmjpJW/rJbu7DFnPBVegtTTX2f/kE2GrmJA/PYZO5HTr1Sxjfit6khhlKUv0emIzK4
+         eoouuUCkczo8rPrrkV2/Hx2oWqqz+7QLfG8QRchlSuy3yQWezWzhJHGRpjA1FxKHmYqp
+         T3AQ==
+X-Gm-Message-State: ACrzQf3FL2PnZ+uVxbcixxZjs9Sm9B1z6QFgST/D0CUW124yce9wVuZw
+        YTFFoXr5oCkto7rbi+gMrbrKQQ==
+X-Google-Smtp-Source: AMsMyM5FMy8Wj3nL4JYRPeijQ5rrYO7IJ2lH8wCZfN/sOCbqfKAaTbxnPNdUkSLlgqcaDDIXGy1Ltg==
+X-Received: by 2002:a05:6638:3791:b0:35a:22c3:4cc9 with SMTP id w17-20020a056638379100b0035a22c34cc9mr2125797jal.114.1663855699117;
+        Thu, 22 Sep 2022 07:08:19 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id x22-20020a0566380cb600b00349d33a92a2sm2270623jad.140.2022.09.22.07.08.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Sep 2022 07:08:18 -0700 (PDT)
+Message-ID: <a208d8c5-f0d8-0334-3eaa-74ed5f181996@kernel.dk>
+Date:   Thu, 22 Sep 2022 08:08:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220921180501.1539876-16-hch@lst.de>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v5 2/3] block: io-uring: add READV_PI/WRITEV_PI operations
+To:     "Alexander V. Buev" <a.buev@yadro.com>,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
+References: <20220920144618.1111138-1-a.buev@yadro.com>
+ <20220920144618.1111138-3-a.buev@yadro.com>
+ <54666720-609b-c639-430d-1dc61e96a6c6@kernel.dk>
+ <20220922124846.d4mhaugyd4is7gd5@yadro.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220922124846.d4mhaugyd4is7gd5@yadro.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 08:04:59PM +0200, Christoph Hellwig wrote:
-> Pass the gendisk to blkg_destroy_all as part of moving the blk-cgroup
-> infrastructure to be gendisk based.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-cgroup.c | 13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
+>> But for this patch in particular, not a huge fan of the rote copying of
+>> rw.c into a new file. Now we have to patch two different spots whenever
+>> a bug is found in there, that's not very maintainable. I do appreciate
+>> the fact that this keeps the PI work out of the fast path for
+>> read/write, but I do think this warrants a bit of refactoring work first
+>> to ensure that there are helpers that can be shared between rw and
+>> rw_pi. That definitely needs to be solved before this can be considered
+>> for inclusion.
+> I think it would be better to move some of the shared code to another file. 
+> For example "rw_common.[ch]". What do you think about?
+> As an alternative I can leave such code in "rw.[ch]" file as is.
 
-Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
-
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 3dfd78f1312db..c2d5ca2eb92e5 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -462,14 +462,9 @@ static void blkg_destroy(struct blkcg_gq *blkg)
->  	percpu_ref_kill(&blkg->refcnt);
->  }
->  
-> -/**
-> - * blkg_destroy_all - destroy all blkgs associated with a request_queue
-> - * @q: request_queue of interest
-> - *
-> - * Destroy all blkgs associated with @q.
-> - */
-> -static void blkg_destroy_all(struct request_queue *q)
-> +static void blkg_destroy_all(struct gendisk *disk)
->  {
-> +	struct request_queue *q = disk->queue;
->  	struct blkcg_gq *blkg, *n;
->  	int count = BLKG_DESTROY_BATCH_SIZE;
->  
-> @@ -1276,7 +1271,7 @@ int blkcg_init_disk(struct gendisk *disk)
->  err_ioprio_exit:
->  	blk_ioprio_exit(disk);
->  err_destroy_all:
-> -	blkg_destroy_all(q);
-> +	blkg_destroy_all(disk);
->  	return ret;
->  err_unlock:
->  	spin_unlock_irq(&q->queue_lock);
-> @@ -1287,7 +1282,7 @@ int blkcg_init_disk(struct gendisk *disk)
->  
->  void blkcg_exit_disk(struct gendisk *disk)
->  {
-> -	blkg_destroy_all(disk->queue);
-> +	blkg_destroy_all(disk);
->  	blk_throtl_exit(disk);
->  }
->  
-> -- 
-> 2.30.2
-> 
+That's basically what I'm suggesting, at least that would be one way to
+do it. And the best one imho. So yes, let's go ahead and do that.
 
 -- 
-Regards,
-Andreas
+Jens Axboe
 
-SUSE Software Solutions Germany GmbH
-Frankenstrasse 146, 90461 Nürnberg, Germany
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
-(HRB 36809, AG Nürnberg)
