@@ -2,225 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9709FC6FA82
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 11:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 745FEC6FA86
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 11:53:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230415AbiIVL3q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 07:29:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55268 "EHLO
+        id S230335AbiIVLxO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 07:53:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbiIVL3o (ORCPT
+        with ESMTP id S229453AbiIVLxM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 07:29:44 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E06513FAF;
-        Thu, 22 Sep 2022 04:29:37 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 0781521A54;
-        Thu, 22 Sep 2022 11:29:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1663846176; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9k9bX/5slzDdRSkUKBx98w00GOC+8EEXB+oK3HF6E5Q=;
-        b=T2VVCow1zNYZIiy/aEnPrWbsvg0XzllrQTYu6Y9KFZTd6Qbn2qh99JzI0IZqGDnbFWcuhj
-        J4nvfKtyBOvKH3Lcy00HfiMF9eidbuN6wx2razfOyNI02HnacqQLI0yoSEnATKR95hDVWT
-        /ya0yj4pvWs9AhgmIVxLNo5gi5ehsnw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1663846176;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9k9bX/5slzDdRSkUKBx98w00GOC+8EEXB+oK3HF6E5Q=;
-        b=ZNhkQWahbJ8c3/2sKwYjFTJbr4peFr+RuXw/nULl9kpZhK6zN+w8VFJipp673C6Vg0J0Q/
-        xq8pg4titNRGMRDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E5F2013AA5;
-        Thu, 22 Sep 2022 11:29:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id HNohOB9HLGMTOwAAMHmgww
-        (envelope-from <jack@suse.cz>); Thu, 22 Sep 2022 11:29:35 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 5B522A0684; Thu, 22 Sep 2022 13:29:35 +0200 (CEST)
-Date:   Thu, 22 Sep 2022 13:29:35 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     John Hubbard <jhubbard@nvidia.com>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-        Christoph Hellwig <hch@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <20220922112935.pep45vfqfw5766gq@quack3>
-References: <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
- <Yxb7YQWgjHkZet4u@infradead.org>
- <20220906102106.q23ovgyjyrsnbhkp@quack3>
- <YxhaJktqtHw3QTSG@infradead.org>
- <YyFPtTtxYozCuXvu@ZenIV>
- <20220914145233.cyeljaku4egeu4x2@quack3>
- <YyIEgD8ksSZTsUdJ@ZenIV>
- <20220915081625.6a72nza6yq4l5etp@quack3>
- <YyvG+Oih2A37Grcf@ZenIV>
- <a6f95605-c2d5-6ec5-b85c-d1f3f8664646@nvidia.com>
+        Thu, 22 Sep 2022 07:53:12 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458A09752A
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 04:53:10 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220922115306euoutp0195b649df32cd36dc1adee398b2658270~XLJCPS0-Z1217612176euoutp01p
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 11:53:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220922115306euoutp0195b649df32cd36dc1adee398b2658270~XLJCPS0-Z1217612176euoutp01p
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1663847586;
+        bh=u8B68iZhHsDKI4cIzdR1Y2hA5mMXV8Cld2Sk7jmlWk0=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=GGfQ+LOknSn0FJRueSi/uArudKYhwLBS5aQ05zQUNJ+UXQUFRlfR9DbebpYkmuZ6X
+         dAmDbAloaAetKC3XqVODZ/AuND/Va5ocpgSv6LiNNvm/YIxGhM5EqfCPmxWpxYkQ3C
+         NdR0lG9bAug493tvSzo+m4Wsk1viji2ZrfRbxETY=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220922115306eucas1p12b7db3f20df086bdff2ff3400cd52ca1~XLJB7_SLs2018120181eucas1p1Y;
+        Thu, 22 Sep 2022 11:53:06 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id DF.89.07817.2AC4C236; Thu, 22
+        Sep 2022 12:53:06 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220922115305eucas1p1b862ce6603248112d2b0836f37f922f2~XLJBZmEFt3156431564eucas1p1O;
+        Thu, 22 Sep 2022 11:53:05 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220922115305eusmtrp15dccd4d9687bb0f6a554d7a41d80da06~XLJBYjnIZ2733027330eusmtrp1l;
+        Thu, 22 Sep 2022 11:53:05 +0000 (GMT)
+X-AuditID: cbfec7f4-8abff70000011e89-3b-632c4ca25f3a
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 6F.97.07473.1AC4C236; Thu, 22
+        Sep 2022 12:53:05 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220922115305eusmtip2f92eefce3c8f8d5f30b16cc3aebb9e87~XLJBOExt23183331833eusmtip2e;
+        Thu, 22 Sep 2022 11:53:05 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.168) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Thu, 22 Sep 2022 12:53:03 +0100
+Message-ID: <b393c127-b773-8296-a559-83606077aa1c@samsung.com>
+Date:   Thu, 22 Sep 2022 13:53:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a6f95605-c2d5-6ec5-b85c-d1f3f8664646@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.11.0
+Subject: Re: Please further explain Linux's "zoned storage" roadmap [was:
+ Re: [PATCH v14 00/13] support zoned block devices with non-power-of-2 zone
+ sizes]
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Mike Snitzer <snitzer@redhat.com>, <axboe@kernel.dk>,
+        <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+CC:     <agk@redhat.com>, <snitzer@kernel.org>, <bvanassche@acm.org>,
+        <pankydev8@gmail.com>, <gost.dev@samsung.com>,
+        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
+        <Johannes.Thumshirn@wdc.com>, <jaegeuk@kernel.org>,
+        <matias.bjorling@wdc.com>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <7dd9dbc0-b08b-fa47-5452-d448d86ca56b@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.168]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djP87qLfHSSDfY2CVusP3WM2WL13X42
+        i2kffjJb/D57ntli77vZrBYrVx9lsniyfhazxd+ue0wWkw5dY7TYe0vb4vKuOWwW85c9ZbeY
+        0PaV2WLNzacsFiduSVu0bfzK6CDgcfmKt8fOWXfZPS6fLfXYtKqTzWPzknqP3Tcb2Dx2tt5n
+        9Xi/7yqbx+dNch7tB7qZAriiuGxSUnMyy1KL9O0SuDJuf/nHUtDCV/Fk2wuWBsap3F2MnBwS
+        AiYSf1Z/Z+li5OIQEljBKNHZcYoRwvnCKHHz1Cc2COczo8SSJZ1sMC0XmrcyQySWM0pM/NTB
+        Dle1c8ZvJghnN6PEgwO/WUBaeAXsJP7vmc0KYrMIqEo8mnGTGSIuKHFy5hOwGlGBSIk1u8+C
+        TRIWmM8oca39IFiCWUBc4taT+WBTRQTmMUrMuneQFSJxgEli3iu/LkYODjYBLYnGTnaQMKeA
+        m8S8Z/vYIEo0JVq3/2aHsOUltr+dwwzxg7LE8tMzoexaibXHzoAtlhB4xilx6+caqISLxLmT
+        75kgbGGJV8e3sEPYMhKnJ/ewQNjVEk9v/GaGaG5hlOjfuZ4N5CAJAWuJvjM5EDWOEg/fLmGG
+        CPNJ3HgrCHEPn8SkbdOZJzCqzkIKi1lIXp6F5IVZSF5YwMiyilE8tbQ4Nz212CgvtVyvODG3
+        uDQvXS85P3cTIzAdnv53/MsOxuWvPuodYmTiYDzEKMHBrCTCO/uOZrIQb0piZVVqUX58UWlO
+        avEhRmkOFiVxXrYZWslCAumJJanZqakFqUUwWSYOTqkGpt2TX++Q91p1WeVcXLx4krnXYlOx
+        5SJe0zbWN2krM4ebNekwmq8RzFtzWOTOom/uPUc/yirLfE2/avolekKf9roW7cc2EQtbJ/NG
+        MKtOEtr0Y3vI/+TlYXUT/3r/smQTaXvMtYerf83xadWPlEo2J2Z1ZSpanLbZ8kumdIcCC2Nj
+        jYWD6vvol2lSk67OuHXsfeyN8K/GEx9fmeliw2Iau2jiHaO7N56Gzt+1+eeDc/+iVQ97rHYI
+        qXKtSp3wbIW1/dZN9+sW/RKzrrJdOemgTOD5Cu9VfYFT3My9fol8WNQrIHpD02HXIrkwxbup
+        i0M+cO7N5So19Tnu2HhgwUKve01/JMN0Djo1up1k+ak+VYmlOCPRUIu5qDgRAPO4N0/2AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJKsWRmVeSWpSXmKPExsVy+t/xe7oLfXSSDXbv0rVYf+oYs8Xqu/1s
+        FtM+/GS2+H32PLPF3nezWS1Wrj7KZPFk/Sxmi79d95gsJh26xmix95a2xeVdc9gs5i97ym4x
+        oe0rs8Wam09ZLE7ckrZo2/iV0UHA4/IVb4+ds+6ye1w+W+qxaVUnm8fmJfUeu282sHnsbL3P
+        6vF+31U2j8+b5DzaD3QzBXBF6dkU5ZeWpCpk5BeX2CpFG1oY6RlaWugZmVjqGRqbx1oZmSrp
+        29mkpOZklqUW6dsl6GXc/vKPpaCFr+LJthcsDYxTubsYOTkkBEwkLjRvZe5i5OIQEljKKLGw
+        6yELREJG4tOVj+wQtrDEn2tdbBBFHxklHny+zwLh7GaUWHPxHytIFa+AncT/PbPBbBYBVYlH
+        M24yQ8QFJU7OfAI2VVQgUuLhsiYmkGZhgbmMEoe+LAJLMAuIS9x6Mh8sISIwj1Fi1r2DrCAO
+        s8A+JokrX89CXfiCUeLJ20+MXYwcHGwCWhKNnWAHcgq4Scx7to8NYpKmROv23+wQtrzE9rdz
+        mCGeUJZYfnomlF0r8er+bsYJjKKzkFw4C8khs5CMmoVk1AJGllWMIqmlxbnpucWGesWJucWl
+        eel6yfm5mxiBaWTbsZ+bdzDOe/VR7xAjEwfjIUYJDmYlEd7ZdzSThXhTEiurUovy44tKc1KL
+        DzGaAoNpIrOUaHI+MJHllcQbmhmYGpqYWRqYWpoZK4nzehZ0JAoJpCeWpGanphakFsH0MXFw
+        SjUwGe5TfJyhXjxpTY3dJHXF2NJIw/Ds8uNrnXhF/PjmLDTNyK0rNXl5lS3k5sopU193fDAo
+        dJ7VJyCc66K6YjaD/Pktd56ESaq9nZmt+fDZEslH6V+iO2QnfzGf7jpB5cZ7U9GMW5Unfk7d
+        vZpxt8Eu1XUrD/331Mmr83Bl6JMouDt30aHymbfFs0r/Pos4r6xyxU0/ZVP+ojPMZ51PcmsU
+        Xt7ddzh1VsPFrIdReusPP1qkqPFE9uHMNQJmh+xlWwPc53Nczpm5urtfIzJr4WH3Y5GhBxfU
+        spd0rct/3jDHi1kgtZ1t9hY/Rb8b73MFpXb9aipNWeYh53thU5bqVDPDFYpqJgee7Z7iJqj6
+        5IasEktxRqKhFnNRcSIAtXBZ3qwDAAA=
+X-CMS-MailID: 20220922115305eucas1p1b862ce6603248112d2b0836f37f922f2
+X-Msg-Generator: CA
+X-RootMTR: 20220920091120eucas1p2c82c18f552d6298d24547cba2f70b7fc
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220920091120eucas1p2c82c18f552d6298d24547cba2f70b7fc
+References: <CGME20220920091120eucas1p2c82c18f552d6298d24547cba2f70b7fc@eucas1p2.samsung.com>
+        <20220920091119.115879-1-p.raghav@samsung.com> <YytJhEywBhqcr7MX@redhat.com>
+        <7dd9dbc0-b08b-fa47-5452-d448d86ca56b@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 21-09-22 23:09:06, John Hubbard wrote:
-> On 9/21/22 19:22, Al Viro wrote:
-> > On Thu, Sep 15, 2022 at 10:16:25AM +0200, Jan Kara wrote:
-> > 
-> >>> How would that work?  What protects the area where you want to avoid running
-> >>> into pinned pages from previously acceptable page getting pinned?  If "they
-> >>> must have been successfully unmapped" is a part of what you are planning, we
-> >>> really do have a problem...
-> >>
-> >> But this is a very good question. So far the idea was that we lock the
-> >> page, unmap (or writeprotect) the page, and then check pincount == 0 and
-> >> that is a reliable method for making sure page data is stable (until we
-> >> unlock the page & release other locks blocking page faults and writes). But
-> >> once suddently ordinary page references can be used to create pins this
-> >> does not work anymore. Hrm.
-> >>
-> >> Just brainstorming ideas now: So we'd either need to obtain the pins early
-> >> when we still have the virtual address (but I guess that is often not
-> >> practical but should work e.g. for normal direct IO path) or we need some
-> >> way to "simulate" the page fault when pinning the page, just don't map it
-> >> into page tables in the end. This simulated page fault could be perhaps
-> >> avoided if rmap walk shows that the page is already mapped somewhere with
-> >> suitable permissions.
-> > 
-> > OK.  As far as I can see, the rules are along the lines of
-> > 	* creator of ITER_BVEC/ITER_XARRAY is responsible for pages being safe.
-> > 	  That includes
-> > 		* page known to be locked by caller
-> > 		* page being privately allocated and not visible to anyone else
-> > 		* iterator being data source
-> > 		* page coming from pin_user_pages(), possibly as the result of
-> > 		  iov_iter_pin_pages() on ITER_IOVEC/ITER_UBUF.
-> > 	* ITER_PIPE pages are always safe
-> > 	* pages found in ITER_BVEC/ITER_XARRAY are safe, since the iterator
-> > 	  had been created with such.
-> > My preference would be to have iov_iter_get_pages() and friends pin if and
-> > only if we have data-destination iov_iter that is user-backed.  For
-> > data-source user-backed we only need FOLL_GET, and for all other flavours
-> > (ITER_BVEC, etc.) we only do get_page(), if we need to grab any references
-> > at all.
-> 
-> This rule would mostly work, as long as we can relax it in some cases, to
-> allow pinning of both source and dest pages, instead of just destination
-> pages, in some cases. In particular, bio_release_pages() has lost all
-> context about whether it was a read or a write request, as far as I can
-> tell. And bio_release_pages() is the primary place to unpin pages for
-> direct IO.
+Thanks a lot Damien for the summary. Your feedback has made this series
+much better.
 
-Well, we already do have BIO_NO_PAGE_REF bio flag that gets checked in
-bio_release_pages(). I think we can easily spare another bio flag to tell
-whether we need to unpin or not. So as long as all the pages in the created
-bio need the same treatment, the situation should be simple.
-
-> > What I'd like to have is the understanding of the places where we drop
-> > the references acquired by iov_iter_get_pages().  How do we decide
-> > whether to unpin?  E.g. pipe_buffer carries a reference to page and no
-> > way to tell whether it's a pinned one; results of iov_iter_get_pages()
-> > on ITER_IOVEC *can* end up there, but thankfully only from data-source
-> > (== WRITE, aka.  ITER_SOURCE) iov_iter.  So for those we don't care.
-> > Then there's nfs_request; AFAICS, we do need to pin the references in
-> > those if they are coming from nfs_direct_read_schedule_iovec(), but
-> > not if they come from readpage_async_filler().  How do we deal with
-> > coalescence, etc.?  It's been a long time since I really looked at
-> > that code...  Christoph, could you give any comments on that one?
-> > 
-> > Note, BTW, that nfs_request coming from readpage_async_filler() have
-> > pages locked by caller; the ones from nfs_direct_read_schedule_iovec()
-> > do not, and that's where we want them pinned.  Resulting page references
-> > end up (after quite a trip through data structures) stuffed into struct
-> > rpc_rqst ->rc_recv_buf.pages[] and when a response arrives from server,
-> > they get picked by xs_read_bvec() and fed to iov_iter_bvec().  In one
-> > case it's safe since the pages are locked; in another - since they would
-> > come from pin_user_pages().  The call chain at the time they are used
-> > has nothing to do with the originator - sunrpc is looking at the arrived
-> > response to READ that matches an rpc_rqst that had been created by sender
-> > of that request and safety is the sender's responsibility.
+> Pankaj patch series is all about supporting ZNS devices that have a zone
+> size that is not a power of 2 number of LBAs as some vendors want to
+> produce such drives. There is no such move happening in the SMR world as
+> all users are happy with the current zone sizes which match the kernel
+> support (which currently requires power-of-2 number of LBAs for the zone
+> size).
 > 
-> For NFS Direct, is there any reason it can't be as simple as this
-> (conceptually, that is--the implementation of iov_iter_pin_pages_alloc()
-> is not shown here)? Here:
-> 
-> 
-> diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-> index 1707f46b1335..7dbc705bab83 100644
-> --- a/fs/nfs/direct.c
-> +++ b/fs/nfs/direct.c
-> @@ -142,13 +142,6 @@ int nfs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
->  	return 0;
->  }
->  
-> -static void nfs_direct_release_pages(struct page **pages, unsigned int npages)
-> -{
-> -	unsigned int i;
-> -	for (i = 0; i < npages; i++)
-> -		put_page(pages[i]);
-> -}
-> -
->  void nfs_init_cinfo_from_dreq(struct nfs_commit_info *cinfo,
->  			      struct nfs_direct_req *dreq)
->  {
-> @@ -332,7 +325,7 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
->  		size_t pgbase;
->  		unsigned npages, i;
->  
-> -		result = iov_iter_get_pages_alloc2(iter, &pagevec,
-> +		result = iov_iter_pin_pages_alloc(iter, &pagevec,
->  						  rsize, &pgbase);
->  		if (result < 0)
->  			break;
-> @@ -362,7 +355,16 @@ static ssize_t nfs_direct_read_schedule_iovec(struct nfs_direct_req *dreq,
->  			pos += req_len;
->  			dreq->bytes_left -= req_len;
->  		}
-> -		nfs_direct_release_pages(pagevec, npages);
-> +
-> +		/*
-> +		 * iov_iter_pin_pages_alloc() calls pin_user_pages_fast() for
-> +		 * the user_backed_iter() case (only).
-> +		 */
-> +		if (user_backed_iter(iter))
-> +			unpin_user_pages(pagevec, npages);
-> +		else
-> +			release_pages(pagevec, npages);
-> +
+> I do not think we have yet reached a consensus on if we really want to
+> accept any zone size for zoned storage. I personally am not a big fan of
+> removing the existing constraint as that makes the code somewhat heavier
+> (multiplication & divisions instead of bit shifts) without introducing any
+> benefit to the user that I can see (or agree with). And there is also a
+> risk of forcing onto the users to redesign/change their code to support
+> different devices in the same system. That is never nice to fragment
+> support like this for the same device class. This is why several people,
+> including me, requested something like dm-po2zoned, to avoid breaking user
+> applications if non-power-of-2 zone size drives support is merged. Better
+> than nothing for sure, but not ideal either. That is only my opinion.
+> There are different opinions out there.
 
-I don't think this will work. The pin nfs_direct_read_schedule_iovec()
-obtains needs to be released once the IO is completed. Not once the IO is
-submitted. Notice how nfs_create_request()->__nfs_create_request() gets
-another page reference which is released on completion
-(nfs_direct_read_completion->nfs_release_request->nfs_page_group_destroy->
-nfs_free_request->nfs_clear_request). And we need to stop releasing the
-obtained pin in nfs_direct_read_schedule_iovec() (and acquiring another
-reference in __nfs_create_request()) and instead propagate it to
-nfs_clear_request() where it can get released.
+I appreciate that you have explained the different perspectives. We have
+covered this written and orally, and it seems to me that we have a good
+coverage of the arguments in the list.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+At this point, I would like to ask the opinion of Jens, Christoph and
+Keith. Do you think we are missing anything in the series? Can this be
+queued up for 6.1 (after I send the next version with a minor fix suggested
+by Mike)?
+
+--
+Regards,
+Pankaj
