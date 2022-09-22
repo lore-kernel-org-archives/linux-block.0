@@ -2,128 +2,264 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A42C6FA8E
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 02:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AA7C32771
+	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 02:39:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbiIVCXM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Sep 2022 22:23:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53448 "EHLO
+        id S230227AbiIVCjH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Sep 2022 22:39:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229803AbiIVCXL (ORCPT
+        with ESMTP id S229646AbiIVCjG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Sep 2022 22:23:11 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 277F070E5B;
-        Wed, 21 Sep 2022 19:23:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZiPBxKPeBhyg1ydjp9NE+T7YJ8ZxnXylq6Qe68BttcM=; b=X5nKHSb5zMgYZl+FhXsP6DCn72
-        bEglB3uwj1u2ckoCMYriAyG5kPjUhImLESuKJd2vtNNiLCcrYBHeBdt3F6cQh6Wm3StOrkOcjQeJu
-        4qrCsHH5WIU26q176+DcvQKvcrbj0BY9yaqWeThAwanr0qzriUoC+LqfYejfH/Fnsff8pbPPZ71Qb
-        NjRsD6GZMQI/wiIBI5colWhci+DcZ9INZTqBN7Niz8E0f9Fh+HHg3qeHhqTiWGfHStzVjtBSLeI0K
-        W8V4q7B54U3lalSJFlSdAHcj1YZ49zmVV2ju998nI+9rCL2JEeqKV0rTw/xbrhrKpjGLwJQMEI0p/
-        suiYbjiA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1obBrU-002FEi-1w;
-        Thu, 22 Sep 2022 02:22:48 +0000
-Date:   Thu, 22 Sep 2022 03:22:48 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <YyvG+Oih2A37Grcf@ZenIV>
-References: <20220831041843.973026-5-jhubbard@nvidia.com>
- <YxbtF1O8+kXhTNaj@infradead.org>
- <103fe662-3dc8-35cb-1a68-dda8af95c518@nvidia.com>
- <Yxb7YQWgjHkZet4u@infradead.org>
- <20220906102106.q23ovgyjyrsnbhkp@quack3>
- <YxhaJktqtHw3QTSG@infradead.org>
- <YyFPtTtxYozCuXvu@ZenIV>
- <20220914145233.cyeljaku4egeu4x2@quack3>
- <YyIEgD8ksSZTsUdJ@ZenIV>
- <20220915081625.6a72nza6yq4l5etp@quack3>
+        Wed, 21 Sep 2022 22:39:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63EFBAC243
+        for <linux-block@vger.kernel.org>; Wed, 21 Sep 2022 19:39:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663814344;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3rtlol+nybrxZqk71Z0RF75amtsvv4itZfLra2B+a88=;
+        b=KfGH/8W8nHjczrRsszZBoDvRgezixsbDd3L0HWxuCxFoZHlJTQyotbaUXogwmxBPVyIDZ/
+        RPmFVhYPVnpTggL936nofPlZP+Y9rA5DC7XRUznxZVN6xgWB3ALTOgZb2c70jJKevWC5ri
+        7iq4coGUWYjCp6GlzJxSmtqOEgvjP+4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-104-QgMIiI6JNua-If_NV_wFcw-1; Wed, 21 Sep 2022 22:39:01 -0400
+X-MC-Unique: QgMIiI6JNua-If_NV_wFcw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB6881C05AAC;
+        Thu, 22 Sep 2022 02:39:00 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74793C159CD;
+        Thu, 22 Sep 2022 02:38:54 +0000 (UTC)
+Date:   Thu, 22 Sep 2022 10:38:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V4 7/8] ublk_drv: allow new process to open ublk chardev
+ with recovery feature enabled
+Message-ID: <YyvKuiRAmiMYMS7b@T590>
+References: <20220921095849.84988-1-ZiyangZhang@linux.alibaba.com>
+ <20220921095849.84988-8-ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220915081625.6a72nza6yq4l5etp@quack3>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <20220921095849.84988-8-ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 15, 2022 at 10:16:25AM +0200, Jan Kara wrote:
-
-> > How would that work?  What protects the area where you want to avoid running
-> > into pinned pages from previously acceptable page getting pinned?  If "they
-> > must have been successfully unmapped" is a part of what you are planning, we
-> > really do have a problem...
+On Wed, Sep 21, 2022 at 05:58:48PM +0800, ZiyangZhang wrote:
+> With recovery feature enabled, if ublk chardev is ready to be released
+> and quiesce_work has been scheduled, we:
+> (1) cancel monitor_work to avoid UAF on ubq && ublk_io.
+> (2) reinit all ubqs, including:
+>     (a) put the task_struct and reset ->ubq_daemon to NULL.
+>     (b) reset all ublk_io.
+> (3) reset ub->mm to NULL.
+> Then ublk chardev is released and new process can open it.
 > 
-> But this is a very good question. So far the idea was that we lock the
-> page, unmap (or writeprotect) the page, and then check pincount == 0 and
-> that is a reliable method for making sure page data is stable (until we
-> unlock the page & release other locks blocking page faults and writes). But
-> once suddently ordinary page references can be used to create pins this
-> does not work anymore. Hrm.
+> RESTART_DEV is introduced as a new ctrl-cmd for recovery feature.
+> After the chardev is opened and all ubqs are ready, user should send
+> RESTART_DEV to:
+> (1) wait until all new ubq_daemons getting ready.
+> (2) update ublksrv_pid
+> (3) unquiesce the request queue and expect incoming ublk_queue_rq()
+> (4) convert ub's state to UBLK_S_DEV_LIVE
+> (5) reschedule monitor_work
 > 
-> Just brainstorming ideas now: So we'd either need to obtain the pins early
-> when we still have the virtual address (but I guess that is often not
-> practical but should work e.g. for normal direct IO path) or we need some
-> way to "simulate" the page fault when pinning the page, just don't map it
-> into page tables in the end. This simulated page fault could be perhaps
-> avoided if rmap walk shows that the page is already mapped somewhere with
-> suitable permissions.
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> ---
+>  drivers/block/ublk_drv.c      | 109 +++++++++++++++++++++++++++++++++-
+>  include/uapi/linux/ublk_cmd.h |   1 +
+>  2 files changed, 109 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index dc33ebc20c01..871cd48503a2 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -912,10 +912,67 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+>  	return 0;
+>  }
+>  
+> +static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+> +{
+> +	int i;
+> +
+> +	WARN_ON_ONCE(!(ubq->ubq_daemon && ubq_daemon_is_dying(ubq)));
+> +	pr_devel("%s: prepare for recovering qid %d\n", __func__, ubq->q_id);
+> +	/* old daemon is PF_EXITING, put it now */
+> +	put_task_struct(ubq->ubq_daemon);
+> +	/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
+> +	ubq->ubq_daemon = NULL;
 
-OK.  As far as I can see, the rules are along the lines of
-	* creator of ITER_BVEC/ITER_XARRAY is responsible for pages being safe.
-	  That includes
-		* page known to be locked by caller
-		* page being privately allocated and not visible to anyone else
-		* iterator being data source
-		* page coming from pin_user_pages(), possibly as the result of
-		  iov_iter_pin_pages() on ITER_IOVEC/ITER_UBUF.
-	* ITER_PIPE pages are always safe
-	* pages found in ITER_BVEC/ITER_XARRAY are safe, since the iterator
-	  had been created with such.
-My preference would be to have iov_iter_get_pages() and friends pin if and
-only if we have data-destination iov_iter that is user-backed.  For
-data-source user-backed we only need FOLL_GET, and for all other flavours
-(ITER_BVEC, etc.) we only do get_page(), if we need to grab any references
-at all.
+Then we can kill the task put & reset in ublk_deinit_queue(), and call
+ublk_queue_reinit() unconditionally in ublk_ch_release(). 
 
-What I'd like to have is the understanding of the places where we drop
-the references acquired by iov_iter_get_pages().  How do we decide
-whether to unpin?  E.g. pipe_buffer carries a reference to page and no
-way to tell whether it's a pinned one; results of iov_iter_get_pages()
-on ITER_IOVEC *can* end up there, but thankfully only from data-source
-(== WRITE, aka.  ITER_SOURCE) iov_iter.  So for those we don't care.
-Then there's nfs_request; AFAICS, we do need to pin the references in
-those if they are coming from nfs_direct_read_schedule_iovec(), but
-not if they come from readpage_async_filler().  How do we deal with
-coalescence, etc.?  It's been a long time since I really looked at
-that code...  Christoph, could you give any comments on that one?
+> +
+> +	for (i = 0; i < ubq->q_depth; i++) {
+> +		struct ublk_io *io = &ubq->ios[i];
+> +
+> +		/* forget everything now and be ready for new FETCH_REQ */
+> +		io->flags = 0;
+> +		io->cmd = NULL;
+> +		io->addr = 0;
+> +	}
+> +	ubq->nr_io_ready = 0;
 
-Note, BTW, that nfs_request coming from readpage_async_filler() have
-pages locked by caller; the ones from nfs_direct_read_schedule_iovec()
-do not, and that's where we want them pinned.  Resulting page references
-end up (after quite a trip through data structures) stuffed into struct
-rpc_rqst ->rc_recv_buf.pages[] and when a response arrives from server,
-they get picked by xs_read_bvec() and fed to iov_iter_bvec().  In one
-case it's safe since the pages are locked; in another - since they would
-come from pin_user_pages().  The call chain at the time they are used
-has nothing to do with the originator - sunrpc is looking at the arrived
-response to READ that matches an rpc_rqst that had been created by sender
-of that request and safety is the sender's responsibility.
+I guess the above line should have been WARN_ON_ONCE(!ubq->nr_io_ready)?
+
+> +}
+> +
+>  static int ublk_ch_release(struct inode *inode, struct file *filp)
+>  {
+>  	struct ublk_device *ub = filp->private_data;
+> +	int i;
+> +
+> +	/* lockless fast path */
+> +	if (!unlikely(ublk_can_use_recovery(ub) && ub->dev_info.state == UBLK_S_DEV_QUIESCED))
+> +		goto out_clear;
+> +
+> +	mutex_lock(&ub->mutex);
+> +	/*
+> +	 * USER_RECOVERY is only allowd after UBLK_S_DEV_QUIESCED is set,
+> +	 * which means that:
+> +	 *     (a) request queue has been quiesced
+> +	 *     (b) no inflight rq exists
+> +	 *     (c) all ioucmds owned by ther dying process are completed
+> +	 */
+> +	if (!(ublk_can_use_recovery(ub) && ub->dev_info.state == UBLK_S_DEV_QUIESCED))
+> +		goto out_unlock;
+> +	pr_devel("%s: reinit queues for dev id %d.\n", __func__, ub->dev_info.dev_id);
+> +	/* we are going to release task_struct of ubq_daemon and resets
+> +	 * ->ubq_daemon to NULL. So in monitor_work, check on ubq_daemon causes UAF.
+> +	 * Besides, monitor_work is not necessary in QUIESCED state since we have
+> +	 * already scheduled quiesce_work and quiesced all ubqs.
+> +	 *
+> +	 * Do not let monitor_work schedule itself if state it QUIESCED. And we cancel
+> +	 * it here and re-schedule it in RESTART_DEV to avoid UAF.
+> +	 */
+> +	cancel_delayed_work_sync(&ub->monitor_work);
+
+monitor_work isn't supposed to be done here, which should be called after
+ublk_wait_tagset_rqs_idle(ub) returns.
+
+>  
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> +		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
+> +	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
+> +	ub->mm = NULL;
+> +	ub->nr_queues_ready = 0;
+> +	init_completion(&ub->completion);
+
+The above can be done as generic code for both non-recovery and recovery
+code.
+
+> + out_unlock:
+> +	mutex_unlock(&ub->mutex);
+> + out_clear:
+>  	clear_bit(UB_STATE_OPEN, &ub->state);
+>  	return 0;
+>  }
+> @@ -1199,9 +1256,14 @@ static void ublk_mark_io_ready(struct ublk_device *ub, struct ublk_queue *ubq)
+>  		ubq->ubq_daemon = current;
+>  		get_task_struct(ubq->ubq_daemon);
+>  		ub->nr_queues_ready++;
+> +		pr_devel("%s: ub %d qid %d is ready.\n",
+> +				__func__, ub->dev_info.dev_id, ubq->q_id);
+>  	}
+> -	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues)
+> +	if (ub->nr_queues_ready == ub->dev_info.nr_hw_queues) {
+> +		pr_devel("%s: ub %d all ubqs are ready.\n",
+> +				__func__, ub->dev_info.dev_id);
+>  		complete_all(&ub->completion);
+> +	}
+
+Too many logging.
+
+>  	mutex_unlock(&ub->mutex);
+>  }
+>  
+> @@ -1903,6 +1965,48 @@ static int ublk_ctrl_set_params(struct io_uring_cmd *cmd)
+>  	return ret;
+>  }
+>  
+> +static int ublk_ctrl_restart_dev(struct io_uring_cmd *cmd)
+> +{
+> +	struct ublksrv_ctrl_cmd *header = (struct ublksrv_ctrl_cmd *)cmd->cmd;
+> +	int ublksrv_pid = (int)header->data[0];
+> +	struct ublk_device *ub;
+> +	int ret = -EINVAL;
+> +
+> +	ub = ublk_get_device_from_id(header->dev_id);
+> +	if (!ub)
+> +		return ret;
+> +
+> +	pr_devel("%s: Waiting for new ubq_daemons(nr: %d) are ready, dev id %d...\n",
+> +			__func__, ub->dev_info.nr_hw_queues, header->dev_id);
+> +	/* wait until new ubq_daemon sending all FETCH_REQ */
+> +	wait_for_completion_interruptible(&ub->completion);
+> +	pr_devel("%s: All new ubq_daemons(nr: %d) are ready, dev id %d\n",
+> +			__func__, ub->dev_info.nr_hw_queues, header->dev_id);
+> +
+> +	mutex_lock(&ub->mutex);
+> +	if (!ublk_can_use_recovery(ub))
+> +		goto out_unlock;
+> +
+> +	if (ub->dev_info.state != UBLK_S_DEV_QUIESCED) {
+> +		ret = -EBUSY;
+> +		goto out_unlock;
+> +	}
+> +	ub->dev_info.ublksrv_pid = ublksrv_pid;
+> +	pr_devel("%s: new ublksrv_pid %d, dev id %d\n",
+> +			__func__, ublksrv_pid, header->dev_id);
+> +	blk_mq_unquiesce_queue(ub->ub_disk->queue);
+> +	pr_devel("%s: queue unquiesced, dev id %d.\n",
+> +			__func__, header->dev_id);
+> +	blk_mq_kick_requeue_list(ub->ub_disk->queue);
+> +	ub->dev_info.state = UBLK_S_DEV_LIVE;
+> +	schedule_delayed_work(&ub->monitor_work, UBLK_DAEMON_MONITOR_PERIOD);
+> +	ret = 0;
+> + out_unlock:
+> +	mutex_unlock(&ub->mutex);
+> +	ublk_put_device(ub);
+> +	return ret;
+> +}
+> +
+>  static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+>  		unsigned int issue_flags)
+>  {
+> @@ -1944,6 +2048,9 @@ static int ublk_ctrl_uring_cmd(struct io_uring_cmd *cmd,
+>  	case UBLK_CMD_SET_PARAMS:
+>  		ret = ublk_ctrl_set_params(cmd);
+>  		break;
+> +	case UBLK_CMD_RESTART_DEV:
+> +		ret = ublk_ctrl_restart_dev(cmd);
+> +		break;
+>  	default:
+>  		break;
+>  	}
+> diff --git a/include/uapi/linux/ublk_cmd.h b/include/uapi/linux/ublk_cmd.h
+> index 332370628757..a088f374c0f6 100644
+> --- a/include/uapi/linux/ublk_cmd.h
+> +++ b/include/uapi/linux/ublk_cmd.h
+> @@ -17,6 +17,7 @@
+>  #define	UBLK_CMD_STOP_DEV	0x07
+>  #define	UBLK_CMD_SET_PARAMS	0x08
+>  #define	UBLK_CMD_GET_PARAMS	0x09
+> +#define UBLK_CMD_RESTART_DEV	0x10
+
+Maybe RESET_DEV or RECOVERY_DEV is better given userspace does not
+send STOP_DEV command.
+
+Thanks,
+Ming
+
