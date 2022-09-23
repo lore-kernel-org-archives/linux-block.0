@@ -2,109 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DD5EECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 13:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE78ECAAD8
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 14:08:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231965AbiIWN60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 09:58:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52170 "EHLO
+        id S231574AbiIWOIU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 10:08:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231447AbiIWN6Y (ORCPT
+        with ESMTP id S231218AbiIWOIS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 09:58:24 -0400
+        Fri, 23 Sep 2022 10:08:18 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB8B148A12
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 06:58:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE3E8145CAD
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:08:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663941501;
+        s=mimecast20190719; t=1663942095;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=N2JNnlimZO+gNUdKvbZFxiMu/jcdDt8F+ogIcvNJ+8o=;
-        b=Lal7H+/w693KR35qQoyLNO+r0BL26WywSO26hn51dzAMwbRuntLazGdcCTQUKm0vj8VLVI
-        8rLsF3IPYYVheDBnJ5zdvZsjL/sGRjy/OICneqNlReRAg5Cz1gac0guGs7hxjLQp5DZKkb
-        3mFkFagJfJTXgWeq7O2044ir/x018vA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-90-KfOK3L36ME-PJ7cYHhnGDQ-1; Fri, 23 Sep 2022 09:58:18 -0400
-X-MC-Unique: KfOK3L36ME-PJ7cYHhnGDQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9D73C800186;
-        Fri, 23 Sep 2022 13:58:17 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 532B12166B4B;
-        Fri, 23 Sep 2022 13:58:12 +0000 (UTC)
-Date:   Fri, 23 Sep 2022 21:58:07 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        joseph.qi@linux.alibaba.com
-Subject: Re: [RESEND PATCH V5 7/7] Documentation: document ublk user recovery
- feature
-Message-ID: <Yy27b9CmdmNroIA5@T590>
-References: <20220923061505.52007-1-ZiyangZhang@linux.alibaba.com>
- <20220923061505.52007-8-ZiyangZhang@linux.alibaba.com>
+        bh=LBYIB5Hr/s79C5MbXbGY0mfsUxmhEdiC6zxTkuGSCwk=;
+        b=e/BXz5Xapq4s3pC2kT3QKRkV6RWRq6Hr2uZWd5oEduEc6OJLod7lun/dWD5FpzI5IsI/uV
+        LQKL+yzlxEEXH+/vOuQrQtC32AnMrCxvHiyUKvQ3Vrg8LxFdJJDbNCL/P4B8vvAYDH1jhb
+        v+R7n59y0s8E5sescrHadnuFsHCfL/0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-218-maDsCyqHNJ6Hw33N5hKy-Q-1; Fri, 23 Sep 2022 10:08:13 -0400
+X-MC-Unique: maDsCyqHNJ6Hw33N5hKy-Q-1
+Received: by mail-qv1-f70.google.com with SMTP id nl18-20020a056214369200b004ac52c4b0a4so8647525qvb.13
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:08:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=LBYIB5Hr/s79C5MbXbGY0mfsUxmhEdiC6zxTkuGSCwk=;
+        b=e4gA6wf7By9uh0CC4tPuwJTRxZP3T+oc14lwJX+QWhQq1NzOiNoKHcfYF4CmkpUQtx
+         xLmte6HHMMSaEH0GaeaT2qzZQnyNAaaMG3AsHKDtGtsdwGV9iJJwECcATTxXOPjMxhFi
+         hqCp7ufu8d+DnyYZZWRvBfvArcaPpJ01pSZdWDG33Z2u73V0ozjee4KlAA+5420ZMi7D
+         dCSAzL+fzDGMrPuKVkJB3iT63JCimxcRy+AOvCiJ+dPmri0I+ELjmfkkgFIUEHV77q8h
+         qkPSerGViq/mVQjt0cyPCmv77kOjTGsz8rta/cFTTUWYePqCK3Uc7BGWNpcqn8C+VvEc
+         DM5A==
+X-Gm-Message-State: ACrzQf1RQIDnrTBE9PoeeGxltVyFfImSrwE96u/eO7rrJBxb0DaUYy3T
+        s4DTFE2jdnhXySJxTS28QRQB6gIv/Ul1RggVoeE5lSsYMSQLbBYtugb2Oqn+paP6YFNCDQEW+Rv
+        uHR0zBHGICzfuEUr1IG383w==
+X-Received: by 2002:ac8:5dc9:0:b0:35c:dac8:a141 with SMTP id e9-20020ac85dc9000000b0035cdac8a141mr7271308qtx.229.1663942093306;
+        Fri, 23 Sep 2022 07:08:13 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4hP35ZcbFzjjav7W2Ml66N3dqlsgPCpf9kKzESU216uoZsCAsOatn0mJ4gZX5U/fSihe9dkw==
+X-Received: by 2002:ac8:5dc9:0:b0:35c:dac8:a141 with SMTP id e9-20020ac85dc9000000b0035cdac8a141mr7271263qtx.229.1663942092916;
+        Fri, 23 Sep 2022 07:08:12 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id cq3-20020a05622a424300b0035ced0a8382sm5566028qtb.54.2022.09.23.07.08.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Sep 2022 07:08:12 -0700 (PDT)
+Date:   Fri, 23 Sep 2022 10:08:11 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Daniil Lunev <dlunev@google.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
+        Sarthak Kukreti <sarthakkukreti@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Bart Van Assche <bvanassche@google.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        linux-kernel@vger.kernel.org, Gwendal Grignou <gwendal@google.com>,
+        virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-ext4@vger.kernel.org, Evan Green <evgreen@google.com>,
+        Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
+ provisioned storage
+Message-ID: <Yy29y/jUvWM6GRZ5@redhat.com>
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <YyQTM5PRT2o/GDwy@fedora>
+ <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
+ <Yylvvm3zVgqpqDrm@infradead.org>
+ <CAAKderPF5Z5QLxyEb80Y+90+eR0sfRmL-WfgXLp=eL=HxWSZ9g@mail.gmail.com>
+ <YymkSDsFVVg1nbDP@infradead.org>
+ <CAAKderNcHpbBqWqqd5-WuKLRCQQUt7a_4D4ti4gy15+fKGK0vQ@mail.gmail.com>
+ <Yy1zkMH0f9ski4Sg@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220923061505.52007-8-ZiyangZhang@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+In-Reply-To: <Yy1zkMH0f9ski4Sg@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 02:15:05PM +0800, ZiyangZhang wrote:
-> Add documentation for user recovery feature of ublk subsystem.
+On Fri, Sep 23 2022 at  4:51P -0400,
+Christoph Hellwig <hch@infradead.org> wrote:
+
+> On Wed, Sep 21, 2022 at 07:48:50AM +1000, Daniil Lunev wrote:
+> > > There is no such thing as WRITE UNAVAILABLE in NVMe.
+> > Apologize, that is WRITE UNCORRECTABLE. Chapter 3.2.7 of
+> > NVM Express NVM Command Set Specification 1.0b
 > 
-> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-> ---
->  Documentation/block/ublk.rst | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+> Write uncorrectable is a very different thing, and the equivalent of the
+> horribly misnamed SCSI WRITE LONG COMMAND.  It injects an unrecoverable
+> error, and does not provision anything.
 > 
-> diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-> index 2122d1a4a541..c3dde087e601 100644
-> --- a/Documentation/block/ublk.rst
-> +++ b/Documentation/block/ublk.rst
-> @@ -144,6 +144,38 @@ managing and controlling ublk devices with help of several control commands:
->    For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
->    responsibility to save IO target specific info in userspace.
->  
-> +- ``UBLK_CMD_START_USER_RECOVERY``
-> +
-> +  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
-> +  command is accepted after the old process has exited, ublk device is quiesced
-> +  and ``/dev/ublkc*`` is closed. User should send this command before he starts
-> +  a new process which opens ``/dev/ublkc*``. When this command returns, the
-> +  ublk device is ready for the new process.
-> +
-> +- ``UBLK_CMD_END_USER_RECOVERY``
-> +
-> +  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
-> +  command is accepted after a new process has opened ``/dev/ublkc*`` and get
-> +  all ublk queues be ready. When this command returns, ublk device is
-> +  unquiesced and new I/O requests are passed to the new process.
-> +
-> +- user recovery feature description
-> +
-> +  Two new features are added for user recovery: ``UBLK_F_USER_RECOVERY`` and
-> +  ``UBLK_F_USER_RECOVERY_REISSUE``.
-> +
-> +  With ``UBLK_F_USER_RECOVERY`` set, after one ubq_daemon(ublksrv io handler) is
-> +  dying, ublk does not release ``/dev/ublkc*`` or ``/dev/ublkb*`` but requeues all
+> > * Each application is potentially allowed to consume the entirety
+> >   of the disk space - there is no strict size limit for application
+> > * Applications need to pre-allocate space sometime, for which
+> >   they use fallocate. Once the operation succeeded, the application
+> >   assumed the space is guaranteed to be there for it.
+> > * Since filesystems on the volumes are independent, filesystem
+> >   level enforcement of size constraints is impossible and the only
+> >   common level is the thin pool, thus, each fallocate has to find its
+> >   representation in thin pool one way or another - otherwise you
+> >   may end up in the situation, where FS thinks it has allocated space
+> >   but when it tries to actually write it, the thin pool is already
+> >   exhausted.
+> > * Hole-Punching fallocate will not reach the thin pool, so the only
+> >   solution presently is zero-writing pre-allocate.
+> 
+> To me it sounds like you want a non-thin pool in dm-thin and/or
+> guaranted space reservations for it.
 
-The above looks not accurate, the old ubq daemon has to release
-/dev/ublkc*, and the new ubq daemon needs to re-open it, and
-here I think it is fine to just mention /dev/ublkb* won't be
-deleted during the whole recovery, or the device ID is kept,
-and it is ublk server's responsibility to recover the device
-context by its own knowledge.
+What is implemented in this patchset: enablement for dm-thinp to
+actually provide guarantees which fallocate requires.
 
+Seems you're getting hung up on the finishing details in HW (details
+which are _not_ the point of this patchset).
 
+The proposed changes are in service to _Linux_ code. The patchset
+implements the primitive from top (ext4) to bottom (dm-thinp, loop).
+It stops short of implementing handling everywhere that'd need it
+(e.g. in XFS, etc). But those changes can come as follow-on work once
+the primitive is established top to bottom.
 
-thanks,
-Ming
+But you know all this ;)
+
+> > * Thus, a provisioning block operation allows an interface specific
+> >   operation that guarantees the presence of the block in the
+> >   mapped space. LVM Thin-pool itself is the primary target for our
+> >   use case but the argument is that this operation maps well to
+> >   other interfaces which allow thinly provisioned units.
+> 
+> I think where you are trying to go here is badly mistaken.  With flash
+> (or hard drive SMR) there is no such thing as provisioning LBAs.  Every
+> write is out of place, and a one time space allocation does not help
+> you at all.  So fundamentally what you try to here just goes against
+> the actual physics of modern storage media.  While there are some
+> layers that keep up a pretence, trying to that an an exposed API
+> level is a really bad idea.
+
+This doesn't need to be so feudal.  Reserving an LBA in physical HW
+really isn't the point.
+
+Fact remains: an operation that ensures space is actually reserved via
+fallocate is long overdue (just because an FS did its job doesn't mean
+underlying layers reflect that). And certainly useful, even if "only"
+benefiting dm-thinp and the loop driver. Like other block primitives,
+REQ_OP_PROVISION is filtered out by block core if the device doesn't
+support it.
+
+That said, I agree with Brian Foster that we need really solid
+documentation and justification for why fallocate mode=0 cannot be
+used (but the case has been made in this thread).
+
+Also, I do see an issue with the implementation (relative to stacked
+devices): dm_table_supports_provision() is too myopic about DM. It
+needs to go a step further and verify that some layer in the stack
+actually services REQ_OP_PROVISION. Will respond to DM patch too.
 
