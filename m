@@ -2,112 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D26C54EE9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 02:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DAEECAAD8
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 03:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232239AbiIWCDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 22:03:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38198 "EHLO
+        id S232376AbiIWDDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 23:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232225AbiIWCDh (ORCPT
+        with ESMTP id S232427AbiIWDDL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 22:03:37 -0400
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F92D118B37;
-        Thu, 22 Sep 2022 19:03:36 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R951e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VQUivRf_1663898613;
-Received: from 30.97.56.82(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQUivRf_1663898613)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Sep 2022 10:03:34 +0800
-Message-ID: <caf0bfbf-18d2-e936-4bbd-3e728a567de5@linux.alibaba.com>
-Date:   Fri, 23 Sep 2022 10:03:32 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH V5 6/7] ublk_drv: allow new process to open ublk chardev
- with recovery feature enabled
-Content-Language: en-US
-To:     ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+        Thu, 22 Sep 2022 23:03:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D5FE11CB21
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 20:01:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663902118;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mOUbwOVwoS4tvADVKdclHC5ioKuaABY326oj+/kvkPI=;
+        b=CD1TNY2QPAnrvB/+5BtdBgROioSLOM7naN+pKOSu9tRcM3HzKCSdPZnc2JUGgWq4Ku2m4P
+        snBtIER2K/lYwRrkkW4Pca0l1sxNGpyWXQrW9+K+bS5i4Vq5LSA+fjOpXHyQwFeauVIcCF
+        P4iYawMFIYB/CszEslBiSOayaLLAi8Q=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-418-8jqRBZQ_P3G2OSyJ5Uu1EQ-1; Thu, 22 Sep 2022 23:01:47 -0400
+X-MC-Unique: 8jqRBZQ_P3G2OSyJ5Uu1EQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E637E101E14F;
+        Fri, 23 Sep 2022 03:01:46 +0000 (UTC)
+Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F23FB2024CBB;
+        Fri, 23 Sep 2022 03:01:42 +0000 (UTC)
+Date:   Fri, 23 Sep 2022 11:01:37 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V5 2/7] ublk_drv: define macros for recovery feature and
+ check them
+Message-ID: <Yy0hkf3lWWxfSzmN@T590>
 References: <20220922061734.21625-1-ZiyangZhang@linux.alibaba.com>
- <20220922061734.21625-7-ZiyangZhang@linux.alibaba.com>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20220922061734.21625-7-ZiyangZhang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20220922061734.21625-3-ZiyangZhang@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220922061734.21625-3-ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/9/22 14:17, ZiyangZhang wrote:
-> With recovery feature enabled, if ublk chardev is ready to be released
-> and quiesce_work has been scheduled, we:
-> (1) reinit all ubqs, including:
->     (a) put the task_struct and reset ->ubq_daemon to NULL.
->     (b) reset all ublk_io.
-> (2) reset ub->mm to NULL.
-> Then ublk chardev is released and new process can open it.
+On Thu, Sep 22, 2022 at 02:17:29PM +0800, ZiyangZhang wrote:
+> Define some macros for recovery feature.
 > 
-> RECOVER_DEV is introduced as a new ctrl-cmd for recovery feature.
-> After the chardev is opened and all ubqs are ready, user should send
-> RECOVER_DEV to:
-> (1) wait until all new ubq_daemons getting ready.
-> (2) update ublksrv_pid
-> (3) unquiesce the request queue and expect incoming ublk_queue_rq()
-> (4) convert ub's state to UBLK_S_DEV_LIVE
-> (5) reschedule monitor_work
+> UBLK_S_DEV_QUIESCED implies that ublk_device is quiesced
+> and is ready for recovery. This state can be observed by userspace.
+> 
+> UBLK_F_USER_RECOVERY implies that:
+> (1) ublk_drv enables recovery feature. It won't let monitor_work to
+>     automatically abort rqs and release the device.
+> (2) With a dying ubq_daemon, ublk_drv ends(aborts) rqs issued to
+>     userspace(ublksrv) before crash.
+> (3) With a dying ubq_daemon, in task work and ublk_queue_rq(),
+>     ublk_drv requeues rqs.
 > 
 > Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-> ---
->  drivers/block/ublk_drv.c      | 67 +++++++++++++++++++++++++++++++++++
->  include/uapi/linux/ublk_cmd.h |  1 +
->  2 files changed, 68 insertions(+)
-> 
-> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
-> index 3977869d2bc4..ac8bf497567f 100644
-> --- a/drivers/block/ublk_drv.c
-> +++ b/drivers/block/ublk_drv.c
-> @@ -898,10 +898,40 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
->  	return 0;
->  }
->  
-> +static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
-> +{
-> +	int i;
-> +
-> +	/* old daemon is PF_EXITING, put it now */
-> +	if (ubq->ubq_daemon) {
-> +		put_task_struct(ubq->ubq_daemon);
-> +		/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
-> +		ubq->ubq_daemon = NULL;
-> +	}
-> +
-> +	for (i = 0; i < ubq->q_depth; i++) {
-> +		struct ublk_io *io = &ubq->ios[i];
-> +
-> +		/* forget everything now and be ready for new FETCH_REQ */
-> +		io->flags = 0;
-> +		io->cmd = NULL;
-> +		io->addr = 0;
-> +	}
-> +	ubq->nr_io_ready = 0;
-> +}
-> +
->  static int ublk_ch_release(struct inode *inode, struct file *filp)
->  {
->  	struct ublk_device *ub = filp->private_data;
-> +	int i;
->  
-> +	pr_devel("%s: reinit queues for dev id %d.\n", __func__, ub->dev_info.dev_id);
-> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
-> +		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
-> +	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
-> +	ub->mm = NULL;
-> +	ub->nr_queues_ready = 0;
-> +	init_completion(&ub->completion);
->  	clear_bit(UB_STATE_OPEN, &ub->state);
->  	return 0;
->  }
 
-This one is not correct. I will figure out how to correctly
-put_task_struct(ubq->ubq_daemon) with recovery feature enabled.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+
+Thanks,
+Ming
+
