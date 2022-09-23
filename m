@@ -2,95 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83242C6FA82
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 15:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE75C6FA82
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 15:42:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232807AbiIWPl1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 11:41:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40590 "EHLO
+        id S232748AbiIWPmC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 11:42:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232774AbiIWPkr (ORCPT
+        with ESMTP id S232801AbiIWPlm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 11:40:47 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3855A9A9F4;
-        Fri, 23 Sep 2022 08:40:17 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R331e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQXQbuQ_1663947609;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQXQbuQ_1663947609)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Sep 2022 23:40:13 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     ming.lei@redhat.com
-Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        joseph.qi@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH V6 7/7] Documentation: document ublk user recovery feature
-Date:   Fri, 23 Sep 2022 23:39:19 +0800
-Message-Id: <20220923153919.44078-8-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220923153919.44078-1-ZiyangZhang@linux.alibaba.com>
-References: <20220923153919.44078-1-ZiyangZhang@linux.alibaba.com>
+        Fri, 23 Sep 2022 11:41:42 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8A8915E8;
+        Fri, 23 Sep 2022 08:40:46 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 4425467373; Fri, 23 Sep 2022 17:40:42 +0200 (CEST)
+Date:   Fri, 23 Sep 2022 17:40:41 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+Subject: Re: [PATCH for-next v8 5/5] nvme: wire up fixed buffer support for
+ nvme passthrough
+Message-ID: <20220923154041.GD21275@lst.de>
+References: <20220923092854.5116-1-joshi.k@samsung.com> <CGME20220923093924epcas5p1e1723a3937cb3331c77e55bd1a785e57@epcas5p1.samsung.com> <20220923092854.5116-6-joshi.k@samsung.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220923092854.5116-6-joshi.k@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add documentation for user recovery feature of ublk subsystem.
+On Fri, Sep 23, 2022 at 02:58:54PM +0530, Kanchan Joshi wrote:
+>  	if (!vec)
+> +		if (!fixedbufs)
+> +			ret = blk_rq_map_user(q, req, NULL,
+> +					nvme_to_user_ptr(ubuffer), bufflen,
+> +					GFP_KERNEL);
+> +		else {
+> +			struct iov_iter iter;
+> +
+> +			ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
+> +					rq_data_dir(req), &iter, ioucmd);
+> +			if (ret < 0)
+> +				goto out;
+> +			ret = blk_rq_map_user_bvec(req, &iter);
+> +		}
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
----
- Documentation/block/ublk.rst | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Given that the fixedufs case doesn't handle the vec case we can
+do with some untangling and a single level of indentation here.
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index 2122d1a4a541..ba45c46cc0da 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -144,6 +144,42 @@ managing and controlling ublk devices with help of several control commands:
-   For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
-   responsibility to save IO target specific info in userspace.
- 
-+- ``UBLK_CMD_START_USER_RECOVERY``
-+
-+  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
-+  command is accepted after the old process has exited, ublk device is quiesced
-+  and ``/dev/ublkc*`` is released. User should send this command before he starts
-+  a new process which re-opens ``/dev/ublkc*``. When this command returns, the
-+  ublk device is ready for the new process.
-+
-+- ``UBLK_CMD_END_USER_RECOVERY``
-+
-+  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
-+  command is accepted after ublk device is quiesced and a new process has
-+  opened ``/dev/ublkc*`` and get all ublk queues be ready. When this command
-+  returns, ublk device is unquiesced and new I/O requests are passed to the
-+  new process.
-+
-+- user recovery feature description
-+
-+  Two new features are added for user recovery: ``UBLK_F_USER_RECOVERY`` and
-+  ``UBLK_F_USER_RECOVERY_REISSUE``.
-+
-+  With ``UBLK_F_USER_RECOVERY`` set, after one ubq_daemon(ublk server's io
-+  handler) is dying, ublk does not delete ``/dev/ublkb*`` during the whole
-+  recovery stage and ublk device ID is kept. It is ublk server's
-+  responsibility to recover the device context by its own knowledge.
-+  Requests which have not been issued to userspace are requeued. Requests
-+  which have been issued to userspace are aborted.
-+
-+  With ``UBLK_F_USER_RECOVERY_REISSUE`` set, after one ubq_daemon(ublk
-+  server's io handler) is dying, contrary to ``UBLK_F_USER_RECOVERY``,
-+  requests which have been issued to userspace are requeued and will be
-+  re-issued to the new process after handling ``UBLK_CMD_END_USER_RECOVERY``.
-+  ``UBLK_F_USER_RECOVERY_REISSUE`` is designed for backends who tolerate
-+  double-write since the driver may issue the same I/O request twice. It
-+  might be useful to a read-only FS or a VM backend.
-+
- Data plane
- ----------
- 
--- 
-2.27.0
-
+Even with that a WARN_ON_ONCE() for that impossible case would be good
+to have, though.
