@@ -2,109 +2,242 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DF4ECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 15:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95B4C6FA82
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 15:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232636AbiIWPiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 11:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35006 "EHLO
+        id S232659AbiIWPjx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 11:39:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbiIWPiY (ORCPT
+        with ESMTP id S232578AbiIWPjx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 11:38:24 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF97145959;
-        Fri, 23 Sep 2022 08:38:23 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A093767373; Fri, 23 Sep 2022 17:38:19 +0200 (CEST)
-Date:   Fri, 23 Sep 2022 17:38:19 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [PATCH for-next v8 3/5] nvme: refactor nvme_alloc_user_request
-Message-ID: <20220923153819.GC21275@lst.de>
-References: <20220923092854.5116-1-joshi.k@samsung.com> <CGME20220923093916epcas5p387fdd905413f6d90babecf5d14da5b67@epcas5p3.samsung.com> <20220923092854.5116-4-joshi.k@samsung.com>
+        Fri, 23 Sep 2022 11:39:53 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C462A414;
+        Fri, 23 Sep 2022 08:39:47 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R541e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VQXQbjD_1663947577;
+Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQXQbjD_1663947577)
+          by smtp.aliyun-inc.com;
+          Fri, 23 Sep 2022 23:39:43 +0800
+From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+To:     ming.lei@redhat.com
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Subject: [PATCH V6 0/7] ublk_drv: add USER_RECOVERY support
+Date:   Fri, 23 Sep 2022 23:39:12 +0800
+Message-Id: <20220923153919.44078-1-ZiyangZhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220923092854.5116-4-joshi.k@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -static void *nvme_add_user_metadata(struct bio *bio, void __user *ubuf,
-> -		unsigned len, u32 seed, bool write)
-> +static void *nvme_add_user_metadata(struct request *req, void __user *ubuf,
-> +		unsigned len, u32 seed)
+ublk_drv is a driver simply passes all blk-mq rqs to userspace
+target(such as ublksrv[1]). For each ublk queue, there is one
+ubq_daemon(pthread). All ubq_daemons share the same process
+which opens /dev/ublkcX. The ubq_daemon code infinitely loops on
+io_uring_enter() to send/receive io_uring cmds which pass
+information of blk-mq rqs.
 
-Please split out a separate patch just for the changes to
-nvme_add_user_metadata.
+Since the real IO handler(the process/thread opening /dev/ublkcX) is
+in userspace, it could crash if:
+(1) the user kills -9 it because of IO hang on backend, system
+    reboot, etc...
+(2) the process/thread catches a exception(segfault, divisor error,
+oom...) Therefore, the kernel driver has to deal with a dying
+ubq_daemon or the process.
 
-> -	if (ret == len)
-> +	if (ret == len) {
-> +		req->cmd_flags |= REQ_INTEGRITY;
->  		return buf;
-> +	}
->  	ret = -ENOMEM;
+Now, if one ubq_daemon(pthread) or the process crashes, ublk_drv
+must abort the dying ubq, stop the device and delete everything.
+This is not a good choice in practice because users do not expect
+aborted requests, I/O errors and a deleted device. They may want
+a recovery machenism so that no requests are aborted and no I/O
+error occurs. Anyway, users just want everything works as usual.
 
-Nit: Please keep the successful path in line and branch out for the
-errors, i.e.
+This patchset implements USER_RECOVERY support. If the process
+or any ubq_daemon(pthread) crashes(exits accidentally), we allow
+user to provide new process and ubq_daemons.
 
+Note: The responsibility of recovery belongs to the user who opens
+/dev/ublkcX. After a crash, the kernel driver only switch the
+device's state to be ready for recovery(START_USER_RECOVERY) or
+termination(STOP_DEV). The state is defined as UBLK_S_DEV_QUIESCED.
+This patchset does not provide how to detect such a crash in userspace.
+The user has may ways to do so. For example, user may:
+(1) send GET_DEV_INFO on specific dev_id and check if its state is
+    UBLK_S_DEV_QUIESCED.
+(2) 'ps' on ublksrv_pid.
 
-	if (ret != len) {
-	 	ret = -ENOMEM;
-		goto out_free_meta;
-	}
+Recovery feature is quite useful for real products. In detail,
+we support this scenario:
+(1) The /dev/ublkc0 is opened by process 0.
+(2) Fio is running on /dev/ublkb0 exposed by ublk_drv and all
+    rqs are handled by process 0.
+(3) Process 0 suddenly crashes(e.g. segfault);
+(4) Fio is still running and submit IOs(but these IOs cannot
+    be dispatched now)
+(5) User starts process 1 and attach it to /dev/ublkc0
+(6) All rqs are handled by process 1 now and IOs can be
+    completed now.
 
-	req->cmd_flags |= REQ_INTEGRITY;
-	return buf;
+Note: The backend must tolerate double-write because we re-issue
+a rq sent to the old process 0 before.
 
-We should have done this already with the old code, but now that more
-is added to the success path it becomes even more important:.
+We provide a sample script here to simulate the above steps:
 
-> +	else {
-> +		struct iovec fast_iov[UIO_FASTIOV];
-> +		struct iovec *iov = fast_iov;
-> +		struct iov_iter iter;
-> +
-> +		ret = import_iovec(rq_data_dir(req), ubuffer, bufflen,
-> +				UIO_FASTIOV, &iov, &iter);
-> +		if (ret < 0)
->  			goto out;
-> +		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
-> +		kfree(iov);
-> +	}
+***************************script***************************
+LOOPS=10
 
-While you touch this:  I think thi block of code would also be a good
-separate helper.  Maybe even in the block layer given the the scsi
-ioctl code and sg duplicate it, and already missed the fast_iov
-treatment due to the duplication.  Having this in a separate function
-is also nice to keep the fast_iov stack footprint isolated.
+__ublk_get_pid() {
+	pid=`./ublk list -n 0 | grep "pid" | awk '{print $7}'`
+	echo $pid
+}
 
-> +	if (ret)
-> +		goto out;
-> +	bio = req->bio;
+ublk_recover_kill()
+{
+	for CNT in `seq $LOOPS`; do
+		dmesg -C
+                pid=`__ublk_get_pid`
+                echo -e "*** kill $pid now ***"
+		kill -9 $pid
+		sleep 6
+                echo -e "*** recover now ***"
+                ./ublk recover -n 0
+		sleep 6
+	done
+}
 
-I think we can also do away with this bio local variable now.
+ublk_test()
+{
+        echo -e "*** add ublk device ***"
+        ./ublk add -t null -d 4 -i 1
+        sleep 2
+        echo -e "*** start fio ***"
+        fio --bs=4k \
+            --filename=/dev/ublkb0 \
+            --runtime=140s \
+            --rw=read &
+        sleep 4
+        ublk_recover_kill
+        wait
+        echo -e "*** delete ublk device ***"
+        ./ublk del -n 0
+}
 
-> +	if (bdev)
-> +		bio_set_dev(bio, bdev);
+for CNT in `seq 4`; do
+        modprobe -rv ublk_drv
+        modprobe ublk_drv
+        echo -e "************ round $CNT ************"
+        ublk_test
+        sleep 5
+done
+***************************script***************************
 
-We don't need the bio_set_dev here as mentioned last time, so I think
-we should remove it in a prep patch.
+You may run it with our modified ublksrv[2] which supports
+recovery feature. No I/O error occurs and you can verify it
+by typing
+    $ perf-tools/bin/tpoint block:block_rq_error
 
-> +		ret = nvme_map_user_request(req, ubuffer, bufflen, meta_buffer,
-> +			meta_len, meta_seed, &meta, vec);
+The basic idea of USER_RECOVERY is quite straightfoward:
+(1) quiesce ublk queues and requeue/abort rqs.
+(2) release/free everything belongs to the dying process.
+    Note: Since ublk_drv does save information about user process,
+    this work is important because we don't expect any resource
+    lekage. Particularly, ioucmds from the dying ubq_daemons
+    need to be completed(freed).
+(3) allow new ubq_daemons issue FETCH_REQ.
+    Note: ublk_ch_uring_cmd() checks some states and flags. We
+    have to set them to a correct value.
 
-Nit: Add an extra tab for indentation here please.
+Here is steps to reocver:
+(0) requests dispatched after the corresponding ubq_daemon is dying 
+    are requeued.
+(1) monitor_work finds one dying ubq_daemon, and it should
+    schedule quiesce_work and requeue/abort requests issued to
+    userspace before the ubq_daemon is dying.
+(2) quiesce_work must (a)quiesce request queue to ban any incoming
+    ublk_queue_rq(), (b)wait unitl all rqs are IDLE, (c)complete old
+	  ioucmds. Then the ublk device is ready for recovery or stop.
+(3) The user sends START_USER_RECOVERY ctrl-cmd to /dev/ublk-control
+    with a dev_id X (such as 3 for /dev/ublkc3).
+(4) Then ublk_drv should perpare for a new process to attach /dev/ublkcX.
+    All ublk_io structures are cleared and ubq_daemons are reset.
+(5) Then, user should start a new process and ubq_daemons(pthreads) and
+    send FETCH_REQ by io_uring_enter() to make all ubqs be ready. The
+    user must correctly setup queues, flags and so on(how to persist
+    user's information is not related to this patchset).
+(6) The user sends END_USER_RECOVERY ctrl-cmd to /dev/ublk-control with a
+    dev_id X.
+(7) After receiving END_USER_RECOVERY, ublk_drv waits for all ubq_daemons
+    getting ready. Then it unquiesces request queue and new rqs are
+    allowed.
 
->  	if (IS_ERR(req))
->  		return PTR_ERR(req);
-> +	req->timeout = d.timeout_ms ? msecs_to_jiffies(d.timeout_ms) : 0;
+You should use ublksrv[2] and tests[3] provided by us. We add 3 additional
+tests to verify that recovery feature works. Our code will be PR-ed to
+Ming's repo soon.
 
-	if (d.timeout_ms)
-		req->timeout = msecs_to_jiffies(d.timeout_ms);
+[1] https://github.com/ming1/ubdsrv
+[2] https://github.com/old-memories/ubdsrv/tree/recovery-v1
+[3] https://github.com/old-memories/ubdsrv/tree/recovery-v1/tests/generic
+
+Since V5:
+(1) add mod_delayed_work() into __ublk_abort_rq() wrapper
+(2) update documentation on UBLK_F_USER_RECOVERY
+
+Since V4:
+(1) remove ublk_cancel_dev() refactor patch 
+(2) keep START_USER_RECOVERY and END_USER_RECOVERY
+(3) avoid UAF on ubq_daemon in monitor_work
+(4) add one helper for requeuing/ending rqs
+
+Since V3:
+(1) do not kick requeue list in ublk_queue_rq() or io_uring fallback wq
+    with a dying ubq_daemon but kicking the list once while unquiescing dev
+(2) add comment on requeing rqs in ublk_queue_rq(), or io_uring fallback wq
+    with a dying ubq_daemon
+(3) split support for UBLK_F_USER_RECOVERY_REISSUE into a single patch
+(4) let monitor_work abort/requeue rqs issued to userspace instead of
+    quiesce_work with recovery enabled
+(5) alway wait until no INFLIGHT rq exists in ublk_quiesce_dev()
+(6) move ublk re-init stuff into ublk_ch_release()
+(7) let ublk_quiesce_dev() go on as long as one ubq_daemon is dying
+(8) add only one ctrl-cmd and rename it as RESTART_DEV
+(9) check ub.dev_info->flags instead of iterating on all ubqs
+(10) do not disable recoevry feature, but always qiuesce dev in
+     ublk_stop_dev() and then unquiesce it
+(11) add doc on USER_RECOVERY feature
+ 
+Since V2:
+(1) run ublk_quiesce_dev() in a standalone work.
+(2) do not run monitor_work after START_USER_RECOVERY is handled.
+(3) refactor recovery feature code so that it does not affect current code.
+
+Since V1:
+(1) refactor cover letter. Add intruduction on "how to detect a crash" and
+    "why we need recovery feature".
+(2) do not refactor task_work and ublk_queue_rq().
+(3) allow users freely stop/recover the device.
+(4) add comment on ublk_cancel_queue().
+(5) refactor monitor_work and aborting machenism since we add recovery
+    machenism in monitor_work.
+
+ZiyangZhang (7):
+  ublk_drv: check 'current' instead of 'ubq_daemon'
+  ublk_drv: define macros for recovery feature and check them
+  ublk_drv: requeue rqs with recovery feature enabled
+  ublk_drv: consider recovery feature in aborting mechanism
+  ublk_drv: support UBLK_F_USER_RECOVERY_REISSUE
+  ublk_drv: add START_USER_RECOVERY and END_USER_RECOVERY support
+  Documentation: document ublk user recovery feature
+
+ Documentation/block/ublk.rst  |  36 ++++
+ drivers/block/ublk_drv.c      | 302 ++++++++++++++++++++++++++++++++--
+ include/uapi/linux/ublk_cmd.h |   8 +-
+ 3 files changed, 328 insertions(+), 18 deletions(-)
+
+-- 
+2.27.0
 
