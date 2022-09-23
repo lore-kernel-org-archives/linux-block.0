@@ -2,137 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A3FECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 11:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C96EC6FA90
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 12:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbiIWLcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 07:32:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38264 "EHLO
+        id S232245AbiIWM1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 08:27:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbiIWLcv (ORCPT
+        with ESMTP id S232124AbiIWM0o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 07:32:51 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A059812DEB7;
-        Fri, 23 Sep 2022 04:32:49 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MYqj50GSCzl15D;
-        Fri, 23 Sep 2022 19:31:05 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgDXKXNemS1javcXBQ--.14144S3;
-        Fri, 23 Sep 2022 19:32:47 +0800 (CST)
-Subject: Re: [PATCH v3 3/5] block, bfq: don't disable wbt if
- CONFIG_BFQ_GROUP_IOSCHED is disabled
-To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, paolo.valente@linaro.org,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220922113558.1085314-1-yukuai3@huawei.com>
- <20220922113558.1085314-4-yukuai3@huawei.com>
- <Yy10vjnxAvca8Ee1@infradead.org>
- <988a86f2-e960-ba59-4d41-f4c8a6345ee9@huaweicloud.com>
- <20220923100659.a3atdanlvygffuxt@quack3>
- <95998ae6-8bbf-b438-801b-7033ceaf9c36@huaweicloud.com>
- <20220923110354.czvzm6rjm7mtqyh3@quack3>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <9edbfe1a-b4ba-7967-4287-1610415f6449@huaweicloud.com>
-Date:   Fri, 23 Sep 2022 19:32:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 23 Sep 2022 08:26:44 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5A513505E;
+        Fri, 23 Sep 2022 05:22:46 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 141DA1F92C;
+        Fri, 23 Sep 2022 12:22:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1663935764; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uWHeuxh4DhTU4e8+sDFIgUuNnvFHgGUFoyEReSRgGTY=;
+        b=GaS3P1mTSVy7nSKrfrj/ufMsJsJTty09ODjZQD7Oil8VPuL9kb5L9beX55XjUmTXKt1Khg
+        C9qw8QX+RAXmqHhFkH98ZIxe2yS2l4qcpdJz70A6dQonZHj9MTnoX7Mc1FhsCrWsw0JYCy
+        8Oga72G9TOuH67EiyKlPNlYkr81TbLQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1663935764;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uWHeuxh4DhTU4e8+sDFIgUuNnvFHgGUFoyEReSRgGTY=;
+        b=B9eWBL1C7tXZz2ObeTj77PXquEvf2OzUBEKJwPMz5GnRUw5EvSKpLvEKLIx65rjNnBrrVL
+        b0EHoJAfEr5c3dCw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E508513A00;
+        Fri, 23 Sep 2022 12:22:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id cwLLNxOlLWO9cgAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 23 Sep 2022 12:22:43 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 78FD3A0685; Fri, 23 Sep 2022 14:22:43 +0200 (CEST)
+Date:   Fri, 23 Sep 2022 14:22:43 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
+Message-ID: <20220923122243.bbw6agvopkhz5yud@quack3>
+References: <YxhaJktqtHw3QTSG@infradead.org>
+ <YyFPtTtxYozCuXvu@ZenIV>
+ <20220914145233.cyeljaku4egeu4x2@quack3>
+ <YyIEgD8ksSZTsUdJ@ZenIV>
+ <20220915081625.6a72nza6yq4l5etp@quack3>
+ <YyvG+Oih2A37Grcf@ZenIV>
+ <a6f95605-c2d5-6ec5-b85c-d1f3f8664646@nvidia.com>
+ <20220922112935.pep45vfqfw5766gq@quack3>
+ <Yy0lztxfwfGXFme4@ZenIV>
+ <7e652ba4-8b03-59e0-a9ef-1118c4bbd492@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20220923110354.czvzm6rjm7mtqyh3@quack3>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDXKXNemS1javcXBQ--.14144S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr1fuFWkJFW7XFW8Zry3XFb_yoW5Wr15p3
-        4xKay0kF48AryxKwnFvw18Xa4Fyw4xJr47WF1rA3ykAas0vr1xJw4fKa1Y9a4q9r4xGw12
-        yFn8XrZrAr18ZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-        UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e652ba4-8b03-59e0-a9ef-1118c4bbd492@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jan!
-
-在 2022/09/23 19:03, Jan Kara 写道:
-> Hi Kuai!
+On Thu 22-09-22 21:05:16, John Hubbard wrote:
+> On 9/22/22 20:19, Al Viro wrote:
+> > On Thu, Sep 22, 2022 at 01:29:35PM +0200, Jan Kara wrote:
+> > 
+> >>> This rule would mostly work, as long as we can relax it in some cases, to
+> >>> allow pinning of both source and dest pages, instead of just destination
+> >>> pages, in some cases. In particular, bio_release_pages() has lost all
+> >>> context about whether it was a read or a write request, as far as I can
+> >>> tell. And bio_release_pages() is the primary place to unpin pages for
+> >>> direct IO.
+> >>
+> >> Well, we already do have BIO_NO_PAGE_REF bio flag that gets checked in
+> >> bio_release_pages(). I think we can easily spare another bio flag to tell
+> >> whether we need to unpin or not. So as long as all the pages in the created
+> >> bio need the same treatment, the situation should be simple.
+> > 
+> > Yes.  Incidentally, the same condition is already checked by the creators
+> > of those bio - see the assorted should_dirty logics.
 > 
-> On Fri 23-09-22 18:23:03, Yu Kuai wrote:
->> 在 2022/09/23 18:06, Jan Kara 写道:
->>> On Fri 23-09-22 17:50:49, Yu Kuai wrote:
->>>> Hi, Christoph
->>>>
->>>> 在 2022/09/23 16:56, Christoph Hellwig 写道:
->>>>> On Thu, Sep 22, 2022 at 07:35:56PM +0800, Yu Kuai wrote:
->>>>>> wbt and bfq should work just fine if CONFIG_BFQ_GROUP_IOSCHED is disabled.
->>>>>
->>>>> Umm, wouldn't this be something decided at runtime, that is not
->>>>> if CONFIG_BFQ_GROUP_IOSCHED is enable/disable in the kernel build
->>>>> if the hierarchical cgroup based scheduling is actually used for a
->>>>> given device?
->>>>> .
->>>>>
->>>>
->>>> That's a good point,
->>>>
->>>> Before this patch wbt is simply disabled if elevator is bfq.
->>>>
->>>> With this patch, if elevator is bfq while bfq doesn't throttle
->>>> any IO yet, wbt still is disabled unnecessarily.
->>>
->>> It is not really disabled unnecessarily. Have you actually tested the
->>> performance of the combination? I did once and the results were just
->>> horrible (which is I made BFQ just disable wbt by default). The problem is
->>> that blk-wbt assumes certain model of underlying storage stack and hardware
->>> behavior and BFQ just does not fit in that model. For example BFQ wants to
->>> see as many requests as possible so that it can heavily reorder them,
->>> estimate think times of applications, etc. On the other hand blk-wbt
->>> assumes that if request latency gets higher, it means there is too much IO
->>> going on and we need to allow less of "lower priority" IO types to be
->>> submitted. These two go directly against one another and I was easily
->>> observing blk-wbt spiraling down to allowing only very small number of
->>> requests submitted while BFQ was idling waiting for more IO from the
->>> process that was currently scheduled.
->>>
->>
->> Thanks for your explanation, I understand that bfq and wbt should not
->> work together.
->>
->> However, I wonder if CONFIG_BFQ_GROUP_IOSCHED is disabled, or service
->> guarantee is not needed, does the above phenomenon still exist? I find
->> it hard to understand... Perhaps I need to do some test.
+> Beautiful!
 > 
-> Well, BFQ implements for example idling on sync IO queues which is one of
-> the features that upsets blk-wbt. That does not depend on
-> CONFIG_BFQ_GROUP_IOSCHED in any way. Also generally the idea that BFQ
-> assigns storage *time slots* to different processes and IO from other
-> processes is just queued at those times increases IO completion
-> latency (for IOs of processes that are not currently scheduled) and this
-> tends to confuse blk-wbt.
+> > 
+> > While we are at it - how much of the rationale around bio_check_pages_dirty()
+> > doing dirtying is still applicable with pinning pages before we stick them
+> > into bio?  We do dirty them before submitting bio, then on completion
+> > bio_check_pages_dirty() checks if something has marked them clean while
+> > we'd been doing IO; if all of them are still dirty we just drop the pages
+> > (well, unpin and drop), otherwise we arrange for dirty + unpin + drop
+> > done in process context (via schedule_work()).  Can they be marked clean by
+> > anyone while they are pinned?  After all, pinning is done to prevent
+> > writeback getting done on them while we are modifying the suckers...
 > 
-I see it now, thanks a lot for your expiations, that really helps a lot.
+> I certainly hope not. And in fact, we should really just say that that's
+> a rule: the whole time the page is pinned, it simply must remain dirty
+> and writable, at least with the way things are right now.
 
-I misunderstand about the how the bfq works. I'll remove this patch in
-next version.
+I agree the page should be staying dirty the whole time it is pinned. I
+don't think it is feasible to keep it writeable in the page tables because
+that would mean you would need to block e.g. munmap() until the pages gets
+unpinned and that will almost certainly upset some current userspace.
 
-Thanks,
-Kuai
+But keeping page dirty should be enough so that we can get rid of all these
+nasty calls to set_page_dirty() from IO completion.
 
-> 								Honza
-> 
+> This reminds me that I'm not exactly sure what the rules for
+> FOLL_LONGTERM callers should be, with respect to dirtying. At the
+> moment, most, if not all of the code that does "set_page_dirty_lock();
+> unpin_user_page()" is wrong.
 
+Right.
+
+> To fix those cases, IIUC, the answer is: you must make the page dirty
+> properly, with page_mkwrite(), not just with set_page_dirty_lock(). And
+
+Correct, and GUP (or PUP) actually does that under the hood so I don't
+think we need to change anything there.
+
+> that has to be done probably a lot earlier, for reasons that I'm still
+> vague on. But perhaps right after pinning the page. (Assuming that we
+> hold off writeback while the page is pinned.)
+
+Holding off writeback is not always doable - as Christoph mentions, for
+data integrity writeback we'll have to get the data to disk before the page
+is unpinned (as for longterm users it can take days for the page to be
+unpinned). But we can just writeback the page without clearing the dirty
+bit in these cases. We may need to use bounce pages to be able to safely
+writeback pinned pages but that's another part of the story...
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
