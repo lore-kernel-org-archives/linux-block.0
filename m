@@ -2,175 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5980C6FA82
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 16:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA2AC6FA82
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 16:21:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbiIWQS3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 12:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41474 "EHLO
+        id S231186AbiIWQVP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 12:21:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232692AbiIWQSB (ORCPT
+        with ESMTP id S232512AbiIWQUr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 12:18:01 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF90614B844
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 09:17:09 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id q11so376994qkc.12
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 09:17:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date;
-        bh=4qxMWjOIpMkOGtLLFe8WhdHhUlkbe7D+rolKd+h+uVk=;
-        b=lQQdTR/g32E0O34bdirpXaGLyHEcnk6cCeQel6YdaiOTT/IR8dPFCqfsqKwybbWJZO
-         pYFiHhn28GsbJNgLCwSQ36twulPuXMUOVa1lqsN0Ny+L1y3Uover2McV4+6mWQILnaTm
-         vYZS/drXJcjnB18YKhwd2uYjnnXExsznxosR0jfQYtXo5tJH3k17CSSeCnnj5o3Sku2m
-         6I90c4SN575CRQPhA7zopWvyUZDl106kRLCf6T41hPKKnvK7durJ0vZw6pqWeQ5vURRi
-         +pwudMB1EkYloh/r7kGt7/TgzmSOHJo36agtH2yKi74TYibb7ZGMZ8Pj+/4M/2iSDoOJ
-         BPKw==
+        Fri, 23 Sep 2022 12:20:47 -0400
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C0A51A209;
+        Fri, 23 Sep 2022 09:19:52 -0700 (PDT)
+Received: by mail-pj1-f52.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so6323859pjq.3;
+        Fri, 23 Sep 2022 09:19:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4qxMWjOIpMkOGtLLFe8WhdHhUlkbe7D+rolKd+h+uVk=;
-        b=Eg6ZCitdk/LHW7bY6VcZ9CS6huIIYk30Fn+VpH22DwFWEq5/lFx2aahv4RrQRNBOC5
-         IOITU4V3nzqPnZx+1z0zswreWCbmMDFkUqS3rHb1/GSyXmzhnh+swWkviMto9IOUu26U
-         qY0uwOjrMwFdKr818jux0DGt4kATB8Q6550au2u+cwWQWaFFWTyrU5amtqSlm+9j2JKt
-         Q/yfpLDLdlBMVplVYH+9iv6fMFnUIgjccZWawzaIVaTVZRaSa+mO07xgkoUc27UMjK+0
-         K6/Ir6hm/a9Iq/sdGJ6qBx1AZdzYV6MF17pylz7kyH1Hq+sLnfzLpO0Ahptu46C1FD65
-         x1dg==
-X-Gm-Message-State: ACrzQf2WXfgatcXsp3SrnnupmyvcIz1IEzi/BQRU3o4RZZoISkM7V7Y5
-        vLRIDeLbPlqM1vtuDbWq92jKkA==
-X-Google-Smtp-Source: AMsMyM5ihNn7PNdTw/GoVp4V09U9sYJFPx5Pxro8xvFdOqUvnnUHwcsY7d/b4qmDimwdYHQp8FEq2Q==
-X-Received: by 2002:a05:620a:2204:b0:6ce:1589:7deb with SMTP id m4-20020a05620a220400b006ce15897debmr6165868qkh.327.1663949827972;
-        Fri, 23 Sep 2022 09:17:07 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id w15-20020a05620a424f00b006af0ce13499sm5986159qko.115.2022.09.23.09.17.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 09:17:07 -0700 (PDT)
-Date:   Fri, 23 Sep 2022 09:16:55 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Jan Kara <jack@suse.cz>
-cc:     Hugh Dickins <hughd@google.com>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Liu Song <liusong@linux.alibaba.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
-In-Reply-To: <20220923144303.fywkmgnkg6eken4x@quack3>
-Message-ID: <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com>
-References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com> <YyjdiKC0YYUkI+AI@kbusch-mbp> <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com> <20220921164012.s7lvklp2qk6occcg@quack3> <20220923144303.fywkmgnkg6eken4x@quack3>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=vnSOT79vZm2Z1X3vBb9NByt6VpxGbBF310FVdgigcRo=;
+        b=AnKstt4jHs13SEIbBQjTLVpMdnTxp4iC2lGMr97kEGL1/nOIMX0wGXSLJwEh1C5DlN
+         svQxtFNscoAO8ZSQZ63YeMluOLAqXUJDAInRhIfuoY0NzEIXDl5gqYnU09ECmEGFzk0a
+         UFiMH1aAcfdJqW9jA+1dAatW4jqSZ/2vM1nDfX1fdC+Uu3o5rbcWTEYFsZejw5iDtds/
+         sI+1ODLNtPx6DymzjNwVQK5M5DGz95m9VyrnYuEY8YgFBynAix3esmnBHdHNNIJZQhtZ
+         0ey4mWjMjpp8HV1LlaovCGgPh6i5/Y7kyxBcROp2sknAO3wcGAoU+yq2GNWy6/IyFNK0
+         6AEQ==
+X-Gm-Message-State: ACrzQf2SQr4ao71itcMWsdL3xicS+Ect41LPwxz/q+x7FhKbUXepj1/C
+        vg4ExZPJwad8K5Gt1DFuDdU=
+X-Google-Smtp-Source: AMsMyM5CMCm0D86HYnpQDo/X7/UqnWT+5BzKuiOzTeV53omgR+X965yxoHmyOZ/dbkOcdr27tB35Ow==
+X-Received: by 2002:a17:90a:c782:b0:202:c73e:5488 with SMTP id gn2-20020a17090ac78200b00202c73e5488mr21574508pjb.202.1663949991522;
+        Fri, 23 Sep 2022 09:19:51 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:aa13:bc38:2a63:318e? ([2620:15c:211:201:aa13:bc38:2a63:318e])
+        by smtp.gmail.com with ESMTPSA id x18-20020a634852000000b004388f33b80esm5811710pgk.2.2022.09.23.09.19.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Sep 2022 09:19:50 -0700 (PDT)
+Message-ID: <396ddf4d-5a81-f6dc-b98f-a6cdad553e91@acm.org>
+Date:   Fri, 23 Sep 2022 09:19:48 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: Please further explain Linux's "zoned storage" roadmap [was: Re:
+ [PATCH v14 00/13] support zoned block devices with non-power-of-2 zone sizes]
+Content-Language: en-US
+To:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Cc:     "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@kernel.org" <snitzer@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "jaegeuk@kernel.org" <jaegeuk@kernel.org>
+References: <CGME20220920091120eucas1p2c82c18f552d6298d24547cba2f70b7fc@eucas1p2.samsung.com>
+ <20220920091119.115879-1-p.raghav@samsung.com> <YytJhEywBhqcr7MX@redhat.com>
+ <7dd9dbc0-b08b-fa47-5452-d448d86ca56b@opensource.wdc.com>
+ <8fd1d8b1-9f43-eb03-4a7f-187723d1c483@acm.org>
+ <BYAPR04MB4968EB5E341049DFF973B9B1F1519@BYAPR04MB4968.namprd04.prod.outlook.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <BYAPR04MB4968EB5E341049DFF973B9B1F1519@BYAPR04MB4968.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 23 Sep 2022, Jan Kara wrote:
-> On Wed 21-09-22 18:40:12, Jan Kara wrote:
-> > On Mon 19-09-22 16:01:39, Hugh Dickins wrote:
-> > > On Mon, 19 Sep 2022, Keith Busch wrote:
-> > > > On Sun, Sep 18, 2022 at 02:10:51PM -0700, Hugh Dickins wrote:
-> > > > > I have almost no grasp of all the possible sbitmap races, and their
-> > > > > consequences: but using the same !waitqueue_active() check as used
-> > > > > elsewhere, fixes the lockup and shows no adverse consequence for me.
-> > > > 
-> > > >  
-> > > > > Fixes: 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
-> > > > > Signed-off-by: Hugh Dickins <hughd@google.com>
-> > > > > ---
-> > > > > 
-> > > > >  lib/sbitmap.c |    2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > 
-> > > > > --- a/lib/sbitmap.c
-> > > > > +++ b/lib/sbitmap.c
-> > > > > @@ -620,7 +620,7 @@ static bool __sbq_wake_up(struct sbitmap
-> > > > >  		 * function again to wakeup a new batch on a different 'ws'.
-> > > > >  		 */
-> > > > >  		if (cur == 0)
-> > > > > -			return true;
-> > > > > +			return !waitqueue_active(&ws->wait);
-> > > > 
-> > > > If it's 0, that is supposed to mean another thread is about to make it not zero
-> > > > as well as increment the wakestate index. That should be happening after patch
-> > > > 48c033314f37 was included, at least.
-> > > 
-> > > I believe that the thread about to make wait_cnt not zero (and increment the
-> > > wakestate index) is precisely this interrupted thread: the backtrace shows
-> > > that it had just done its wakeups, so has not yet reached making wait_cnt
-> > > not zero; and I suppose that either its wakeups did not empty the waitqueue
-> > > completely, or another waiter got added as soon as it dropped the spinlock.
+On 9/22/22 23:29, Matias Bjørling wrote:
+> With UFS, in the proposed copy I have (may been changed) - there's
+> the concept of gap zones, which is zones that cannot be accessed by
+> the host. The gap zones are essentially "LBA fillers", enabling the
+> next writeable zone to start at a X * pow2 size offset. My
+> understanding is that this specific approach was chosen to simplify
+> standardization in UFS and avoid updating T10's ZBC with zone
+> capacity support.
 > 
-> I was trying to wrap my head around this but I am failing to see how we
-> could have wait_cnt == 0 for long enough to cause any kind of stall let
-> alone a lockup in sbitmap_queue_wake_up() as you describe. I can understand
-> we have:
+> While UFS would technically expose non-power of 2 zone sizes, they're
+> also, due to the gap zones, could also be considered power of 2 zones
+> if one considers the seq. write zone + the gap zone as a single
+> unit.
 > 
-> CPU1						CPU2
-> sbitmap_queue_wake_up()
->   ws = sbq_wake_ptr(sbq);
->   cur = atomic_read(&ws->wait_cnt);
->   do {
-> 	...
-> 	wait_cnt = cur - sub;	/* this will be 0 */
->   } while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
->   ...
-> 						/* Gets the same waitqueue */
-> 						ws = sbq_wake_ptr(sbq);
-> 						cur = atomic_read(&ws->wait_cnt);
-> 						do {
-> 							if (cur == 0)
-> 								return true; /* loop */
->   wake_up_nr(&ws->wait, wake_batch);
->   smp_mb__before_atomic();
->   sbq_index_atomic_inc(&sbq->wake_index);
->   atomic_set(&ws->wait_cnt, wake_batch); /* This stops looping on CPU2 */
+> When I think about having UFS support in the kernel, the SWR and the
+> gap zone could be represented as a single unit. For example:
 > 
-> So until CPU1 reaches the atomic_set(), CPU2 can be looping. But how come
-> this takes so long that is causes a hang as you describe? Hum... So either
-> CPU1 takes really long to get to atomic_set():
-> - can CPU1 get preempted? Likely not at least in the context you show in
->   your message
-> - can CPU1 spend so long in wake_up_nr()? Maybe the waitqueue lock is
->   contended but still...
+> UFS - Zone Report
+>    Zone 0: SWR, LBA 0-11
+>    Zone 1: Gap, LBA 12-15
+>    Zone 2: SWR, LBA 16-27
+>    Zone 3: Gap, LBA 28-31
+>    ...
 > 
-> or CPU2 somehow sees cur==0 for longer than it should. The whole sequence
-> executed in a loop on CPU2 does not contain anything that would force CPU2
-> to refresh its cache and get new ws->wait_cnt value so we are at the mercy
-> of CPU cache coherency mechanisms to stage the write on CPU1 and propagate
-> it to other CPUs. But still I would not expect that to take significantly
-> long. Any other ideas?
+> Kernel representation - Zone Report (as supported today)
+>    Zone 0: SWR, LBA 0-15, Zone Capacity 12
+>    Zone 1: SWR, LBA 16-31, Zone Capacity 12
+>    ...
+> 
+> If doing it this way, it removes the need for filesystems,
+> device-mappers, user-space applications having to understand gap
+> zones, and allows UFS to work out of the box with no changes to the
+> rest of the zoned storage eco-system.
+> 
+> Has the above representation been considered?
 
-Rushed reply (hoping) to help your thinking,
-I'll read you more closely two hours later.
+Hi Matias,
 
-You're writing of CPU1 and CPU2, but in my case it was just the one CPU
-interrupted - see again sbitmap_queue_wake_up twice in the backtrace:
+What has been described above is the approach from the first version of 
+the zoned storage for UFS (ZUFS) draft standard. Support for this 
+approach is available in the upstream kernel. See also "[PATCH v2 0/9] 
+Support zoned devices with gap zones", 2022-04-21 
+(https://lore.kernel.org/linux-scsi/20220421183023.3462291-1-bvanassche@acm.org/).
 
-sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
-__blk_mq_free_request < blk_mq_free_request < __blk_mq_end_request <
-scsi_end_request < scsi_io_completion < scsi_finish_command <
-scsi_complete < blk_complete_reqs < blk_done_softirq < __do_softirq <
-__irq_exit_rcu < irq_exit_rcu < common_interrupt < asm_common_interrupt <
-_raw_spin_unlock_irqrestore < __wake_up_common_lock < __wake_up <
-sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
-__blk_mq_free_request < blk_mq_free_request < dd_bio_merge <
-blk_mq_sched_bio_merge < blk_mq_attempt_bio_merge < blk_mq_submit_bio <
-__submit_bio < submit_bio_noacct_nocheck < submit_bio_noacct <
-submit_bio < __swap_writepage < swap_writepage < pageout <
-shrink_folio_list < evict_folios < lru_gen_shrink_lruvec <
-shrink_lruvec < shrink_node < do_try_to_free_pages < try_to_free_pages <
-__alloc_pages_slowpath < __alloc_pages < folio_alloc < vma_alloc_folio <
-do_anonymous_page < __handle_mm_fault < handle_mm_fault <
-do_user_addr_fault < exc_page_fault < asm_exc_page_fault
+Since F2FS extents must be split at gap zones, gap zones negatively 
+affect sequential read and write performance. So we abandoned the gap 
+zone approach. The current approach is as follows:
+* The power-of-two restriction for the offset between zone starts has 
+been removed. Gap zones are no longer required. Hence, we will need the 
+patches that add support for zone sizes that are not a power of two.
+* The Sequential Write Required (SWR) and Sequential Write Preferred 
+(SWP) zone types are supported. The feedback we received from UFS 
+vendors is that which zone type works best depends on their firmware and 
+ASIC design.
+* We need a queue depth larger than one (QD > 1) for writes to achieve 
+the full sequential write bandwidth. We plan to support QD > 1 as follows:
+   - If writes have to be serialized, submit these to the same hardware
+     queue. According to the UFS host controller interface (UFSHCI)
+     standard, UFS host controllers are not allowed to reorder SCSI
+     commands that are submitted to the same hardware queue. A source of
+     command reordering that remains is the SCSI retry mechanism. Retries
+     happen e.g. after a command timeout.
+   - For SWP zones, require the UFS device firmware to use its garbage
+     collection mechanism to reorder data in the unlikely case that
+     out-of-order writes happened.
+   - For SWR zones, retry writes that failed because these were received
+     out-of-order by a UFS device. ZBC-1 requires compliant devices to
+     respond with ILLEGAL REQUEST / UNALIGNED WRITE COMMAND to out-of-
+     order writes.
 
-And in one case I did study stack contents carefully, confirming
-the same sbq pointer used in upper and lower sbitmap_queue_wake_up.
+We have considered the zone append approach but decided not to use it 
+because if zone append commands get reordered the data ends up 
+permanently out-of-order on the storage medium. This affects sequential 
+read performance negatively.
 
-And on Keith's points: yes, I do have preemption enabled; but no, this
-machine does not have nvme, and I never hit this on the nvme laptop.
-
-Thanks,
-Hugh
+Bart.
