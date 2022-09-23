@@ -2,77 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 811D3C54EE9
-	for <linux-block@archiver.kernel.org>; Thu, 22 Sep 2022 23:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D26C54EE9
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 02:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229744AbiIVX4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Sep 2022 19:56:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        id S232239AbiIWCDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Sep 2022 22:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229677AbiIVX4N (ORCPT
+        with ESMTP id S232225AbiIWCDh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Sep 2022 19:56:13 -0400
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D637AFAC0;
-        Thu, 22 Sep 2022 16:56:12 -0700 (PDT)
-Received: by mail-pl1-f175.google.com with SMTP id w13so10293329plp.1;
-        Thu, 22 Sep 2022 16:56:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=W2+hY5lHfF8Yuo41plQsF/0eXxPmqJupnSDFH4YELL4=;
-        b=mVRR4aZJ5g4MCHjpo4FP5u3OBVgKIEPrZtKX2L4xHqoi0Ur2e63hq9FvaowJAy7kWQ
-         jnLqufVdqloRtEM+eYE+y4MOmy1+dlo0RxtVgdSUtMYtItd7lvscp7aYAEb47cyJ/I/1
-         DQvHNO0UiANbq0iEnjs4IxBjshM9X6dIabZUBo5Dq/aLikTSROX1hPYeifO/3WDC6BJt
-         kCU6S0fvjPo971XxYN1fxa9zWRBfND/X2dnCvrDbYttpqbr1WwMlat196gZ2bSVl2oTy
-         QGTyKPJcpYyigGfVHnJreSBnJjusNmuayjmchvndoSWQlJ2wlXoy9G7+9WhBLlhtort3
-         j63Q==
-X-Gm-Message-State: ACrzQf2m0wEP9Ai1snI8wqYcWcASikRsfSNlPmbcwCqVXcibtKQn/2QC
-        IdBzIyd2FJOKkzol2FHy1gg=
-X-Google-Smtp-Source: AMsMyM7DnGl8Usys7cprZQSwOFa/NlnQp69DKqLnRIqNLOSTU/oMTFEKEH4OrfofFw1WRmQVRwtsKg==
-X-Received: by 2002:a17:902:d58f:b0:179:b756:6f5e with SMTP id k15-20020a170902d58f00b00179b7566f5emr4818263plh.1.1663890971926;
-        Thu, 22 Sep 2022 16:56:11 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id u10-20020a170903124a00b001782a0d3eeasm4698194plh.115.2022.09.22.16.56.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Sep 2022 16:56:10 -0700 (PDT)
-Message-ID: <8fd1d8b1-9f43-eb03-4a7f-187723d1c483@acm.org>
-Date:   Thu, 22 Sep 2022 16:56:08 -0700
+        Thu, 22 Sep 2022 22:03:37 -0400
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F92D118B37;
+        Thu, 22 Sep 2022 19:03:36 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R951e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VQUivRf_1663898613;
+Received: from 30.97.56.82(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQUivRf_1663898613)
+          by smtp.aliyun-inc.com;
+          Fri, 23 Sep 2022 10:03:34 +0800
+Message-ID: <caf0bfbf-18d2-e936-4bbd-3e728a567de5@linux.alibaba.com>
+Date:   Fri, 23 Sep 2022 10:03:32 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: Please further explain Linux's "zoned storage" roadmap [was: Re:
- [PATCH v14 00/13] support zoned block devices with non-power-of-2 zone sizes]
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [PATCH V5 6/7] ublk_drv: allow new process to open ublk chardev
+ with recovery feature enabled
 Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Cc:     agk@redhat.com, snitzer@kernel.org, axboe@kernel.dk, hch@lst.de,
-        pankydev8@gmail.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Johannes.Thumshirn@wdc.com, jaegeuk@kernel.org,
-        matias.bjorling@wdc.com
-References: <CGME20220920091120eucas1p2c82c18f552d6298d24547cba2f70b7fc@eucas1p2.samsung.com>
- <20220920091119.115879-1-p.raghav@samsung.com> <YytJhEywBhqcr7MX@redhat.com>
- <7dd9dbc0-b08b-fa47-5452-d448d86ca56b@opensource.wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7dd9dbc0-b08b-fa47-5452-d448d86ca56b@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220922061734.21625-1-ZiyangZhang@linux.alibaba.com>
+ <20220922061734.21625-7-ZiyangZhang@linux.alibaba.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20220922061734.21625-7-ZiyangZhang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/21/22 16:55, Damien Le Moal wrote:
-> But again, that all depends on if Pankaj patch series is accepted, that
-> is, on everybody accepting that we lift the power-of-2 zone size constraint.
+On 2022/9/22 14:17, ZiyangZhang wrote:
+> With recovery feature enabled, if ublk chardev is ready to be released
+> and quiesce_work has been scheduled, we:
+> (1) reinit all ubqs, including:
+>     (a) put the task_struct and reset ->ubq_daemon to NULL.
+>     (b) reset all ublk_io.
+> (2) reset ub->mm to NULL.
+> Then ublk chardev is released and new process can open it.
+> 
+> RECOVER_DEV is introduced as a new ctrl-cmd for recovery feature.
+> After the chardev is opened and all ubqs are ready, user should send
+> RECOVER_DEV to:
+> (1) wait until all new ubq_daemons getting ready.
+> (2) update ublksrv_pid
+> (3) unquiesce the request queue and expect incoming ublk_queue_rq()
+> (4) convert ub's state to UBLK_S_DEV_LIVE
+> (5) reschedule monitor_work
+> 
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> ---
+>  drivers/block/ublk_drv.c      | 67 +++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/ublk_cmd.h |  1 +
+>  2 files changed, 68 insertions(+)
+> 
+> diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+> index 3977869d2bc4..ac8bf497567f 100644
+> --- a/drivers/block/ublk_drv.c
+> +++ b/drivers/block/ublk_drv.c
+> @@ -898,10 +898,40 @@ static int ublk_ch_open(struct inode *inode, struct file *filp)
+>  	return 0;
+>  }
+>  
+> +static void ublk_queue_reinit(struct ublk_device *ub, struct ublk_queue *ubq)
+> +{
+> +	int i;
+> +
+> +	/* old daemon is PF_EXITING, put it now */
+> +	if (ubq->ubq_daemon) {
+> +		put_task_struct(ubq->ubq_daemon);
+> +		/* We have to reset it to NULL, otherwise ub won't accept new FETCH_REQ */
+> +		ubq->ubq_daemon = NULL;
+> +	}
+> +
+> +	for (i = 0; i < ubq->q_depth; i++) {
+> +		struct ublk_io *io = &ubq->ios[i];
+> +
+> +		/* forget everything now and be ready for new FETCH_REQ */
+> +		io->flags = 0;
+> +		io->cmd = NULL;
+> +		io->addr = 0;
+> +	}
+> +	ubq->nr_io_ready = 0;
+> +}
+> +
+>  static int ublk_ch_release(struct inode *inode, struct file *filp)
+>  {
+>  	struct ublk_device *ub = filp->private_data;
+> +	int i;
+>  
+> +	pr_devel("%s: reinit queues for dev id %d.\n", __func__, ub->dev_info.dev_id);
+> +	for (i = 0; i < ub->dev_info.nr_hw_queues; i++)
+> +		ublk_queue_reinit(ub, ublk_get_queue(ub, i));
+> +	/* set to NULL, otherwise new ubq_daemon cannot mmap the io_cmd_buf */
+> +	ub->mm = NULL;
+> +	ub->nr_queues_ready = 0;
+> +	init_completion(&ub->completion);
+>  	clear_bit(UB_STATE_OPEN, &ub->state);
+>  	return 0;
+>  }
 
-The companies that are busy with implementing zoned storage for UFS 
-devices are asking for kernel support for non-power-of-2 zone sizes.
-
-Thanks,
-
-Bart.
+This one is not correct. I will figure out how to correctly
+put_task_struct(ubq->ubq_daemon) with recovery feature enabled.
