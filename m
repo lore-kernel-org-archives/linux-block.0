@@ -2,168 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE78ECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 14:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5B2C6FA91
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 14:15:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231574AbiIWOIU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 10:08:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35300 "EHLO
+        id S230165AbiIWOPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 10:15:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231218AbiIWOIS (ORCPT
+        with ESMTP id S232350AbiIWOPd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:08:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE3E8145CAD
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:08:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663942095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LBYIB5Hr/s79C5MbXbGY0mfsUxmhEdiC6zxTkuGSCwk=;
-        b=e/BXz5Xapq4s3pC2kT3QKRkV6RWRq6Hr2uZWd5oEduEc6OJLod7lun/dWD5FpzI5IsI/uV
-        LQKL+yzlxEEXH+/vOuQrQtC32AnMrCxvHiyUKvQ3Vrg8LxFdJJDbNCL/P4B8vvAYDH1jhb
-        v+R7n59y0s8E5sescrHadnuFsHCfL/0=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-218-maDsCyqHNJ6Hw33N5hKy-Q-1; Fri, 23 Sep 2022 10:08:13 -0400
-X-MC-Unique: maDsCyqHNJ6Hw33N5hKy-Q-1
-Received: by mail-qv1-f70.google.com with SMTP id nl18-20020a056214369200b004ac52c4b0a4so8647525qvb.13
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:08:13 -0700 (PDT)
+        Fri, 23 Sep 2022 10:15:33 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152A9110ED2
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:15:32 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id v128so10371357ioe.12
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=UWmSkIcj2Zi0W95Qe0q25OStbn3befeirPvCr4MRQSQ=;
+        b=D2yf3TlFalE7EQgO4dw4+/YaX1DhboXIHpiQ3fxco/I0FzbFXMnkI9U2xiatkh9t2c
+         nLQASI0sqeJwJmqy0E/wtVtgC5vep4UieANkH0I9W+I9WGrki+D76hbN6Fp/9Pw5dp6x
+         mHDFqkjHesmdGr8jaIw2/O7AclhwSxCIZk2vlreVNrOngHhTBr2RigHvgR8mMR83xHVc
+         15f4/Op6S+4vymQP3tWaR4DgF8plZoCLH35Biwinj73bIpozGDLUX2UUle7+TxE7VGAc
+         vb1P0oFzD1imNOhDp9l3X75Uaqt5Kx5GNBoTfyBHWJ1gHgJEgKBk1mjJ/3iVZa/r7C3r
+         FY6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=LBYIB5Hr/s79C5MbXbGY0mfsUxmhEdiC6zxTkuGSCwk=;
-        b=e4gA6wf7By9uh0CC4tPuwJTRxZP3T+oc14lwJX+QWhQq1NzOiNoKHcfYF4CmkpUQtx
-         xLmte6HHMMSaEH0GaeaT2qzZQnyNAaaMG3AsHKDtGtsdwGV9iJJwECcATTxXOPjMxhFi
-         hqCp7ufu8d+DnyYZZWRvBfvArcaPpJ01pSZdWDG33Z2u73V0ozjee4KlAA+5420ZMi7D
-         dCSAzL+fzDGMrPuKVkJB3iT63JCimxcRy+AOvCiJ+dPmri0I+ELjmfkkgFIUEHV77q8h
-         qkPSerGViq/mVQjt0cyPCmv77kOjTGsz8rta/cFTTUWYePqCK3Uc7BGWNpcqn8C+VvEc
-         DM5A==
-X-Gm-Message-State: ACrzQf1RQIDnrTBE9PoeeGxltVyFfImSrwE96u/eO7rrJBxb0DaUYy3T
-        s4DTFE2jdnhXySJxTS28QRQB6gIv/Ul1RggVoeE5lSsYMSQLbBYtugb2Oqn+paP6YFNCDQEW+Rv
-        uHR0zBHGICzfuEUr1IG383w==
-X-Received: by 2002:ac8:5dc9:0:b0:35c:dac8:a141 with SMTP id e9-20020ac85dc9000000b0035cdac8a141mr7271308qtx.229.1663942093306;
-        Fri, 23 Sep 2022 07:08:13 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4hP35ZcbFzjjav7W2Ml66N3dqlsgPCpf9kKzESU216uoZsCAsOatn0mJ4gZX5U/fSihe9dkw==
-X-Received: by 2002:ac8:5dc9:0:b0:35c:dac8:a141 with SMTP id e9-20020ac85dc9000000b0035cdac8a141mr7271263qtx.229.1663942092916;
-        Fri, 23 Sep 2022 07:08:12 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id cq3-20020a05622a424300b0035ced0a8382sm5566028qtb.54.2022.09.23.07.08.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 07:08:12 -0700 (PDT)
-Date:   Fri, 23 Sep 2022 10:08:11 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Daniil Lunev <dlunev@google.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-        Sarthak Kukreti <sarthakkukreti@chromium.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Bart Van Assche <bvanassche@google.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        linux-kernel@vger.kernel.org, Gwendal Grignou <gwendal@google.com>,
-        virtualization@lists.linux-foundation.org, dm-devel@redhat.com,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-ext4@vger.kernel.org, Evan Green <evgreen@google.com>,
-        Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH RFC 0/8] Introduce provisioning primitives for thinly
- provisioned storage
-Message-ID: <Yy29y/jUvWM6GRZ5@redhat.com>
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
- <YyQTM5PRT2o/GDwy@fedora>
- <CAG9=OMPHZqdDhX=M+ovdg5fa3x4-Q_1r5SWPa8pMTQw0mr5fPg@mail.gmail.com>
- <Yylvvm3zVgqpqDrm@infradead.org>
- <CAAKderPF5Z5QLxyEb80Y+90+eR0sfRmL-WfgXLp=eL=HxWSZ9g@mail.gmail.com>
- <YymkSDsFVVg1nbDP@infradead.org>
- <CAAKderNcHpbBqWqqd5-WuKLRCQQUt7a_4D4ti4gy15+fKGK0vQ@mail.gmail.com>
- <Yy1zkMH0f9ski4Sg@infradead.org>
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=UWmSkIcj2Zi0W95Qe0q25OStbn3befeirPvCr4MRQSQ=;
+        b=Pf7YT43kAy/94qFC/6Khn3QNNRFdfTphBWTRX1DPTefEpxUNTI8K/UlBBHNak8Daii
+         PVGFlz7J6ejg44AOJEZz/GigpY3OEttpgYPZCqDeh4QZdP0nSAWYKg7b2szrselNkdmk
+         v5M8532SuOjcy+p4YwaeiieaFKvTnAZDzQ8alNu7iK8FeOJhcToaGEn3nVeebe+lIXRZ
+         9Fq5EM4k7OjSb8zzog7R/S+T/JGQYIw7l6h0u/eqrNxbsXlhlGFjNbhxutNj5s4vGCRr
+         FlqT+4LdmJjW1ace69EPH4lcPH60jK4TbkjygFT80ys8JBKSGTLBNcepRB+y4IKnCRMy
+         EwRQ==
+X-Gm-Message-State: ACrzQf3QZnpULhgdWbFpAY9cg7HxnaxfyQWrf+mh5BMsWuwnN2pnsmxs
+        Szan/7LjRrAR9+wwz7sjZWVj/w==
+X-Google-Smtp-Source: AMsMyM53Z12Kuv8H+dqvBgr3DBBg4AIRzLDXTvx9NPbXSHl0B74YnwyuZKRp6Ju5owk5lxsokGhe1Q==
+X-Received: by 2002:a02:cc83:0:b0:35a:1461:5be8 with SMTP id s3-20020a02cc83000000b0035a14615be8mr4925685jap.32.1663942531405;
+        Fri, 23 Sep 2022 07:15:31 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id k10-20020a6bba0a000000b006a19152b3f0sm3653752iof.5.2022.09.23.07.15.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Sep 2022 07:15:30 -0700 (PDT)
+Message-ID: <c9750503-b16b-a756-b3e3-c9dfa0c482c3@kernel.dk>
+Date:   Fri, 23 Sep 2022 08:15:28 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yy1zkMH0f9ski4Sg@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH for-next v8 0/5] fixed-buffer for uring-cmd/passthru
+To:     Kanchan Joshi <joshi.k@samsung.com>, hch@lst.de, kbusch@kernel.org
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+References: <CGME20220923093906epcas5p1308a262f3de722a923339c2e804fc5ee@epcas5p1.samsung.com>
+ <20220923092854.5116-1-joshi.k@samsung.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220923092854.5116-1-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 23 2022 at  4:51P -0400,
-Christoph Hellwig <hch@infradead.org> wrote:
-
-> On Wed, Sep 21, 2022 at 07:48:50AM +1000, Daniil Lunev wrote:
-> > > There is no such thing as WRITE UNAVAILABLE in NVMe.
-> > Apologize, that is WRITE UNCORRECTABLE. Chapter 3.2.7 of
-> > NVM Express NVM Command Set Specification 1.0b
+On 9/23/22 3:28 AM, Kanchan Joshi wrote:
+> Currently uring-cmd lacks the ability to leverage the pre-registered
+> buffers. This series adds that support in uring-cmd, and plumbs
+> nvme passthrough to work with it.
 > 
-> Write uncorrectable is a very different thing, and the equivalent of the
-> horribly misnamed SCSI WRITE LONG COMMAND.  It injects an unrecoverable
-> error, and does not provision anything.
-> 
-> > * Each application is potentially allowed to consume the entirety
-> >   of the disk space - there is no strict size limit for application
-> > * Applications need to pre-allocate space sometime, for which
-> >   they use fallocate. Once the operation succeeded, the application
-> >   assumed the space is guaranteed to be there for it.
-> > * Since filesystems on the volumes are independent, filesystem
-> >   level enforcement of size constraints is impossible and the only
-> >   common level is the thin pool, thus, each fallocate has to find its
-> >   representation in thin pool one way or another - otherwise you
-> >   may end up in the situation, where FS thinks it has allocated space
-> >   but when it tries to actually write it, the thin pool is already
-> >   exhausted.
-> > * Hole-Punching fallocate will not reach the thin pool, so the only
-> >   solution presently is zero-writing pre-allocate.
-> 
-> To me it sounds like you want a non-thin pool in dm-thin and/or
-> guaranted space reservations for it.
+> Using registered-buffers showed IOPS hike from 1.9M to 2.2M in my tests.
 
-What is implemented in this patchset: enablement for dm-thinp to
-actually provide guarantees which fallocate requires.
+Ran my peak test on this, specifically:
 
-Seems you're getting hung up on the finishing details in HW (details
-which are _not_ the point of this patchset).
+t/io_uring -pX -d128 -b512 -s32 -c32 -F1 -B0 -R1 -X1 -n24 -P1 -u1 -O0 /dev/ng0n1 /dev/ng1n1 /dev/ng2n1 /dev/ng3n1 /dev/ng4n1 /dev/ng5n1 /dev/ng6n1 /dev/ng7n1 /dev/ng8n1 /dev/ng9n1 /dev/ng10n1 /dev/ng11n1 /dev/ng12n1 /dev/ng13n1 /dev/ng14n1 /dev/ng15n1 /dev/ng16n1 /dev/ng17n1 /dev/ng18n1 /dev/ng19n1 /dev/ng20n1 /dev/ng21n1 /dev/ng22n1 /dev/ng23n1
 
-The proposed changes are in service to _Linux_ code. The patchset
-implements the primitive from top (ext4) to bottom (dm-thinp, loop).
-It stops short of implementing handling everywhere that'd need it
-(e.g. in XFS, etc). But those changes can come as follow-on work once
-the primitive is established top to bottom.
+Before:
 
-But you know all this ;)
+Polled (-p1): 96.8M IOPS
+IRQ driven (-p0): 56.2M IOPS
 
-> > * Thus, a provisioning block operation allows an interface specific
-> >   operation that guarantees the presence of the block in the
-> >   mapped space. LVM Thin-pool itself is the primary target for our
-> >   use case but the argument is that this operation maps well to
-> >   other interfaces which allow thinly provisioned units.
-> 
-> I think where you are trying to go here is badly mistaken.  With flash
-> (or hard drive SMR) there is no such thing as provisioning LBAs.  Every
-> write is out of place, and a one time space allocation does not help
-> you at all.  So fundamentally what you try to here just goes against
-> the actual physics of modern storage media.  While there are some
-> layers that keep up a pretence, trying to that an an exposed API
-> level is a really bad idea.
+With patches, set -B1 in the above:
 
-This doesn't need to be so feudal.  Reserving an LBA in physical HW
-really isn't the point.
+Polled (-p1): 121.8M IOPS
+IRQ driven (-p0): 68.7M IOPS
 
-Fact remains: an operation that ensures space is actually reserved via
-fallocate is long overdue (just because an FS did its job doesn't mean
-underlying layers reflect that). And certainly useful, even if "only"
-benefiting dm-thinp and the loop driver. Like other block primitives,
-REQ_OP_PROVISION is filtered out by block core if the device doesn't
-support it.
++22-26% improvement, which is not unexpected.
 
-That said, I agree with Brian Foster that we need really solid
-documentation and justification for why fallocate mode=0 cannot be
-used (but the case has been made in this thread).
+-- 
+Jens Axboe
 
-Also, I do see an issue with the implementation (relative to stacked
-devices): dm_table_supports_provision() is too myopic about DM. It
-needs to go a step further and verify that some layer in the stack
-actually services REQ_OP_PROVISION. Will respond to DM patch too.
 
