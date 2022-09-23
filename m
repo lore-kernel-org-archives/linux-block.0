@@ -2,59 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D029ECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 15:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F34EDC6FA90
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 16:14:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232339AbiIWPyW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 11:54:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35336 "EHLO
+        id S231741AbiIWQOF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 12:14:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232458AbiIWPyV (ORCPT
+        with ESMTP id S229495AbiIWQOE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 11:54:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D80146628
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 08:54:20 -0700 (PDT)
+        Fri, 23 Sep 2022 12:14:04 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439E91280F1;
+        Fri, 23 Sep 2022 09:14:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0V/3fc/31YRZhKH5mxAQEYkI6AxXxZiPPcalq7iJpuA=; b=1SbSm3I29iPtn7m9MDKg3p1cK9
-        wZRREwTKqYzQm3epfDjdkt2BUKNJNdCG1o+DRHUn2WKglBq/sI7sQ2JsDVKGugEqvHs4KLcpY+Usx
-        IVNXZxGrGeMRWFZ7r6HSIKktOAa2yh8IyevVrEGmD9GcoiemZzubCTJP8ws2YVie+4H4RHrmN6Twf
-        82CEyUjNqV07ne1KfJSTbVyTjsVdA8FLlDAkFducr7WVQp2GkQpgn6l1yTQwK8Zx7HltEkhOGwEoO
-        7xqFHXyZiWMn0svMrbUtp6Eg9SV9bATRGgGROZS3X4i3UaQpuPUOSzXD5n8QAou44Fw55Qa0OZsf9
-        D+UiO7Fg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1obl0N-004tsH-20; Fri, 23 Sep 2022 15:54:19 +0000
-Date:   Fri, 23 Sep 2022 08:54:19 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Zdenek Kabelac <zkabelac@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH v2 4/4] brd: implement secure erase and write zeroes
-Message-ID: <Yy3Wq2Hnb8KEbyb3@infradead.org>
-References: <alpine.LRH.2.02.2209201350470.26058@file01.intranet.prod.int.rdu2.redhat.com>
- <alpine.LRH.2.02.2209201358580.26535@file01.intranet.prod.int.rdu2.redhat.com>
+        bh=YgHH6pk3nJLXW2jbXtGoxm+4FKcaifQJYVKj+aRwkxg=; b=ELnSTSol/sfK6s31ClYuS8gszF
+        sgXyMtpRrY266URjhhF2+1SDFZPQ78gjuIuhX2IKz28nBNhRVMvO+lvdYB0u9QfxT77iP5VaWVadQ
+        XQ7c8C2XILfSmvEUEZNndcp74iadwyK5fGrJ2BFrCVFtzqPwlVzV8idNgG0D9vuRVL5c60jrYWDzq
+        7t0rwxdFdeOKfLhnBFBDnyEJQ9KRzGyGnf7Y6ovolAFvEL3wYKawkB7tGYFSqpHRkMjTbebYoWz82
+        P+56yyxTj49Ngg8b0QDC7L5mid0UQH+ffCszwa9c1DnG3p+HPNkrve7pWm/ViH77+sQ5wQ2HwLSDK
+        1uOznKEw==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1oblJ8-002uO3-0s;
+        Fri, 23 Sep 2022 16:13:42 +0000
+Date:   Fri, 23 Sep 2022 17:13:42 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
+Message-ID: <Yy3bNjaiUoGv/djG@ZenIV>
+References: <20220906102106.q23ovgyjyrsnbhkp@quack3>
+ <YxhaJktqtHw3QTSG@infradead.org>
+ <YyFPtTtxYozCuXvu@ZenIV>
+ <20220914145233.cyeljaku4egeu4x2@quack3>
+ <YyIEgD8ksSZTsUdJ@ZenIV>
+ <20220915081625.6a72nza6yq4l5etp@quack3>
+ <YyvG+Oih2A37Grcf@ZenIV>
+ <YyxzYTlyGhbb2MOu@infradead.org>
+ <Yy00eSjyxvUIp7D5@ZenIV>
+ <Yy1x8QE9YA4HHzbQ@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.2209201358580.26535@file01.intranet.prod.int.rdu2.redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Yy1x8QE9YA4HHzbQ@infradead.org>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 01:59:46PM -0400, Mikulas Patocka wrote:
-> This patch implements REQ_OP_SECURE_ERASE and REQ_OP_WRITE_ZEROES on brd.
-> Write zeroes will free the pages just like discard, but the difference is
-> that it writes zeroes to the preceding and following page if the range is
-> not aligned on page boundary. Secure erase is just like write zeroes,
-> except that it clears the page content before freeing the page.
+On Fri, Sep 23, 2022 at 01:44:33AM -0700, Christoph Hellwig wrote:
 
-So while I can see the use case for the simple discard you mentioned,
-and maybe even the WRITE_ZEROES, I'd rather have a really good
-justification for REQ_OP_SECURE_ERASE.  It is a bad interface,
-and there are alsmost no good reasons for ever using it.  So sprinkling
-it in random drivers just we can is not helpful.
+> Why would I?  We generall do have or should have the iov_iter around.
+
+Not for async IO.
+
+> And for the common case where we don't (bios) we can carry that
+> information in the bio as it needs a special unmap helper anyway.
+
+*Any* async read_iter is like that.
+
+> > Where are they getting
+> > dropped and what guarantees that IO is complete by that point?
+> 
+> The exact place depens on the exact taaraget frontend of which we have
+> a few.  But it happens from the end_io callback that is triggered
+> through a call to target_complete_cmd.
+
+OK...
+
+> > The reason I'm asking is that here you have an ITER_BVEC possibly fed to
+> > __blkdev_direct_IO_async(), with its
+> >         if (iov_iter_is_bvec(iter)) {
+> >                 /*
+> >                  * Users don't rely on the iterator being in any particular
+> >                  * state for async I/O returning -EIOCBQUEUED, hence we can
+> >                  * avoid expensive iov_iter_advance(). Bypass
+> >                  * bio_iov_iter_get_pages() and set the bvec directly.
+> >                  */
+> >                 bio_iov_bvec_set(bio, iter);
+> > which does *not* grab the page referneces.  Sure, bio_release_pages() knows
+> > to leave those alone and doesn't drop anything.  However, what is the
+> > mechanism preventing the pages getting freed before the IO completion
+> > in this case?
+> 
+> The contract that callers of bvec iters need to hold their own
+> references as without that doing I/O do them would be unsafe.  It they
+> did not hold references the pages could go away before even calling
+> bio_iov_iter_get_pages (or this open coded bio_iov_bvec_set).
+
+You are mixing two issues here - holding references to pages while using
+iov_iter instance is obvious; holding them until async IO is complete, even
+though struct iov_iter might be long gone by that point is a different
+story.
+
+And originating iov_iter instance really can be long-gone by the time
+of IO completion - requirement to keep it around would be very hard to
+satisfy.  I've no objections to requiring the pages in ITER_BVEC to be
+preserved at least until the IO completion by means independent of
+whatever ->read_iter/->write_iter does to them, but
+	* that needs to be spelled out very clearly and
+	* we need to verify that it is, indeed, the case for all existing
+iov_iter_bvec callers, preferably with comments next to non-obvious ones
+(something that is followed only by the sync IO is obvious)
+
+That goes not just for bio - if we make get_pages *NOT* grab references
+on ITER_BVEC (and I'm all for it), we need to make sure that those
+pages won't be retained after the original protection runs out.  Which
+includes the reference put into struct nfs_request, for example, as well
+as whatever ceph transport is doing, etc.  Another thing that needs to
+be sorted out is __zerocopy_sg_from_iter() and its callers - AFAICS,
+all of those are in ->sendmsg() with MSG_ZEROCOPY in flags.
+
+It's a non-trivial amount of code audit - we have about 40 iov_iter_bvec()
+callers in the tree, and while many are clearly sync-only... the ones
+that are not tend to balloon into interesting analysis of call chains, etc.
+
+Don't get me wrong - that analysis needs to be done, just don't expect
+it to be trivial.  And it will require quite a bit of cooperation from the
+folks familiar with e.g. drivers/target, or with ceph transport layer,
+etc.
+
+FWIW, my preference would be along the lines of
+
+	Backing memory for any non user-backed iov_iter should be protected
+	from reuse by creator of iov_iter and that protection should continue
+	through not just all synchronous operations with iov_iter in question
+	- it should last until all async operations involving that memory are
+	finished.  That continued protection must not depend upon taking
+	extra page references, etc. while we are working with iov_iter.
+
+But getting there will take quite a bit of code audit and probably some massage
+as well.
