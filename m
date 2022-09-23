@@ -2,91 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 820B4ECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 06:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8A0C6FA82
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 06:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230328AbiIWGeh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 02:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34230 "EHLO
+        id S230496AbiIWGio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 02:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230338AbiIWGeg (ORCPT
+        with ESMTP id S230371AbiIWGie (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 02:34:36 -0400
-Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D326392;
-        Thu, 22 Sep 2022 23:34:34 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VQViWnv_1663914871;
-Received: from 30.97.56.82(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VQViWnv_1663914871)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Sep 2022 14:34:32 +0800
-Message-ID: <882f5629-a6e2-5fcc-7d26-b3de77ca2985@linux.alibaba.com>
-Date:   Fri, 23 Sep 2022 14:34:29 +0800
+        Fri, 23 Sep 2022 02:38:34 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31B51280DB
+        for <linux-block@vger.kernel.org>; Thu, 22 Sep 2022 23:38:33 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C98D11F953;
+        Fri, 23 Sep 2022 06:38:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1663915111; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MS1dPeaXIzRME7ObCblZ8A+YKEsqI3GsSiIYZP9UjBE=;
+        b=TdqhKRco4hhDpxBbtTPVBu7QnJz5bonIKFMDQPQ6rwc52pHNmoVeFeSTuWIQ5T3ikig0Sx
+        rDlwrI8ZfEkxSzJOt5y07C9ciawnqwOw2HGwIsi1USab2TCQEar+yDyQDJPmRCbTX/p5xB
+        61CCrZkEgB0h5Gj7NcDSdtvka8sEhpQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1663915111;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=MS1dPeaXIzRME7ObCblZ8A+YKEsqI3GsSiIYZP9UjBE=;
+        b=NCC278Qe2JHGwLmNs7EVllKeIlnEETqNYE8PQfhlpKGIo7y4yNi6KxR95+WlBEcNpkQzzk
+        HzDXCY7ZxVPJ12Cg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7DC3013AA5;
+        Fri, 23 Sep 2022 06:38:31 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id uF5sG2dULWOXVwAAMHmgww
+        (envelope-from <aherrmann@suse.de>); Fri, 23 Sep 2022 06:38:31 +0000
+Date:   Fri, 23 Sep 2022 08:38:29 +0200
+From:   Andreas Herrmann <aherrmann@suse.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 12/17] blk-throttle: pass a gendisk to blk_throtl_init
+ and blk_throtl_exit
+Message-ID: <Yy1UZXgRcwXzaidt@suselix>
+References: <20220921180501.1539876-1-hch@lst.de>
+ <20220921180501.1539876-13-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [RESEND PATCH V5 6/7] ublk_drv: add START_USER_RECOVERY and
- END_USER_RECOVERY support
-Content-Language: en-US
-To:     ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220923061505.52007-1-ZiyangZhang@linux.alibaba.com>
- <20220923061505.52007-7-ZiyangZhang@linux.alibaba.com>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20220923061505.52007-7-ZiyangZhang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220921180501.1539876-13-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/9/23 14:15, ZiyangZhang wrote:
-> START_USER_RECOVERY and END_USER_RECOVERY are two new control commands
-> to support user recovery feature.
+On Wed, Sep 21, 2022 at 08:04:56PM +0200, Christoph Hellwig wrote:
+> Pass the gendisk to blk_throtl_init and blk_throtl_exit as part of moving
+> the blk-cgroup infrastructure to be gendisk based.
 > 
-> After a crash, user should send START_USER_RECOVERY, it will:
-> (1) check if (a)current ublk_device is UBLK_S_DEV_QUIESCED which was
->     set by quiesce_work and (b)chardev is released
-> (2) reinit all ubqs, including:
->     (a) put the task_struct and reset ->ubq_daemon to NULL.
->     (b) reset all ublk_io.
-> (3) reset ub->mm to NULL.
-> 
-> Then, user should start a new process and send FETCH_REQ on each
-> ubq_daemon.
-> 
-> Finally, user should send END_USER_RECOVERY, it will:
-> (1) wait for all new ubq_daemons getting ready.
-> (2) update ublksrv_pid
-> (3) unquiesce the request queue and expect incoming ublk_queue_rq()
-> (4) convert ub's state to UBLK_S_DEV_LIVE
-> 
-> Note: we can handle STOP_DEV between START_USER_RECOVERY and
-> END_USER_RECOVERY. This is helpful to users who cannot start new process
-> after sending START_USER_RECOVERY ctrl-cmd.
-> 
-> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-cgroup.c   | 6 +++---
+>  block/blk-throttle.c | 7 +++++--
+>  block/blk-throttle.h | 8 ++++----
+>  3 files changed, 12 insertions(+), 9 deletions(-)
 
-Let me explain why we still need two ctrl-cmds: START_USER_RECOVERY
-and END_USER_RECOVERY:
+Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
 
-(1) They are easy to use and understand. Just like calling
-    a)ADD_DEV, b)start daemon c)START_DEV, we can recover a device by
-    a)START_USER_RECOVERY b)start new daemon c)END_USER_RECOVERY.
-    IMO, START_USER_RECOVERY can guide user whether to start a new daemon.
-    Without it, user must directly start a new daemon. He may fail here
-    because /dev/ublkc* is not released. So a retry is necessary here.
-    But I think that let the user retry by sending START_USER_RECOVERY
-    instead of opening /dev/ublkc* is more reasonable.
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 82a117ff54de5..3dfd78f1312db 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1261,7 +1261,7 @@ int blkcg_init_disk(struct gendisk *disk)
+>  	if (ret)
+>  		goto err_destroy_all;
+>  
+> -	ret = blk_throtl_init(q);
+> +	ret = blk_throtl_init(disk);
+>  	if (ret)
+>  		goto err_ioprio_exit;
+>  
+> @@ -1272,7 +1272,7 @@ int blkcg_init_disk(struct gendisk *disk)
+>  	return 0;
+>  
+>  err_throtl_exit:
+> -	blk_throtl_exit(q);
+> +	blk_throtl_exit(disk);
+>  err_ioprio_exit:
+>  	blk_ioprio_exit(disk);
+>  err_destroy_all:
+> @@ -1288,7 +1288,7 @@ int blkcg_init_disk(struct gendisk *disk)
+>  void blkcg_exit_disk(struct gendisk *disk)
+>  {
+>  	blkg_destroy_all(disk->queue);
+> -	blk_throtl_exit(disk->queue);
+> +	blk_throtl_exit(disk);
+>  }
+>  
+>  static void blkcg_bind(struct cgroup_subsys_state *root_css)
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 55f2d985cfbbd..9ca8ae0ae6683 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -2358,8 +2358,9 @@ void blk_throtl_bio_endio(struct bio *bio)
+>  }
+>  #endif
+>  
+> -int blk_throtl_init(struct request_queue *q)
+> +int blk_throtl_init(struct gendisk *disk)
+>  {
+> +	struct request_queue *q = disk->queue;
+>  	struct throtl_data *td;
+>  	int ret;
+>  
+> @@ -2401,8 +2402,10 @@ int blk_throtl_init(struct request_queue *q)
+>  	return ret;
+>  }
+>  
+> -void blk_throtl_exit(struct request_queue *q)
+> +void blk_throtl_exit(struct gendisk *disk)
+>  {
+> +	struct request_queue *q = disk->queue;
+> +
+>  	BUG_ON(!q->td);
+>  	del_timer_sync(&q->td->service_queue.pending_timer);
+>  	throtl_shutdown_wq(q);
+> diff --git a/block/blk-throttle.h b/block/blk-throttle.h
+> index 66b4292b1b92a..f75852a4e5337 100644
+> --- a/block/blk-throttle.h
+> +++ b/block/blk-throttle.h
+> @@ -168,14 +168,14 @@ static inline struct throtl_grp *blkg_to_tg(struct blkcg_gq *blkg)
+>   * Internal throttling interface
+>   */
+>  #ifndef CONFIG_BLK_DEV_THROTTLING
+> -static inline int blk_throtl_init(struct request_queue *q) { return 0; }
+> -static inline void blk_throtl_exit(struct request_queue *q) { }
+> +static inline int blk_throtl_init(struct gendisk *disk) { return 0; }
+> +static inline void blk_throtl_exit(struct gendisk *disk) { }
+>  static inline void blk_throtl_register_queue(struct request_queue *q) { }
+>  static inline bool blk_throtl_bio(struct bio *bio) { return false; }
+>  static inline void blk_throtl_cancel_bios(struct request_queue *q) { }
+>  #else /* CONFIG_BLK_DEV_THROTTLING */
+> -int blk_throtl_init(struct request_queue *q);
+> -void blk_throtl_exit(struct request_queue *q);
+> +int blk_throtl_init(struct gendisk *disk);
+> +void blk_throtl_exit(struct gendisk *disk);
+>  void blk_throtl_register_queue(struct request_queue *q);
+>  bool __blk_throtl_bio(struct bio *bio);
+>  void blk_throtl_cancel_bios(struct request_queue *q);
+> -- 
+> 2.30.2
+> 
 
-(2) Handling put_task_struct(ubq_daemon) is hard in ublk_ch_release().
-    Assume all ioucmds have been issued back to userspace and a crash happens,
-    ublk_ch_release() can be called immediately here and ubq_daemon is
-    freed. But monoitor_work may be running now. Dealing with UAF on
-    ubq_daemon in monitor_work may be difficult. But handling
-    put_task_struct(ubq_daemon) in START_USER_RECOVERY solves the problem
-    because monitor_work is sure to be canceled. Besides, here is no race
-    with ublk_deinit_queue() since it cannot be called if ub's state is
-    QUIESCED.
-
+-- 
 Regards,
-Zhang
+Andreas
+
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nürnberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Martje Boudien Moerman
+(HRB 36809, AG Nürnberg)
