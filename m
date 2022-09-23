@@ -2,111 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDE6ECAAD8
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 14:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 997AEC6FA8B
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 15:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbiIWOw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 10:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49194 "EHLO
+        id S230094AbiIWPN4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 11:13:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbiIWOwt (ORCPT
+        with ESMTP id S232596AbiIWPNr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:52:49 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E02413A380;
-        Fri, 23 Sep 2022 07:52:42 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id a2so668612lfb.6;
-        Fri, 23 Sep 2022 07:52:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=9en01QcZoVRB/nyuHix8atR26FaNJkFbsXv8c0H0Ewc=;
-        b=PVuPZKBRqWaUP5aS/sM77IUimjHSDr9CQTadF85aA5q4O90CpCTMdaFBCYFy7EUFXz
-         h2GNkjwON4xJaInS2D1O6t9ZUYI3n0jPsgeRluS3TCyfw6hB+baKudhs603HocyP4RWZ
-         uA/S+BxHmq1DEjRf0na3JK9q171ECwNyKC/yRhSCmt2mpExCxJRLc0nqHtgVc7z5p33D
-         dYFbTwIxvEIWV3ALkDpzQV3KNMjl82CdJikqWLsqO2zBZgiH8GBJWzoM0uyU/5LHQsYZ
-         W0MtIBbrUaeQMxhsby/3QPjlPoUirew/kZRvI4Ts1vqlEWn4hAJlVxqKaPj3u2oHq6Pe
-         tZTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=9en01QcZoVRB/nyuHix8atR26FaNJkFbsXv8c0H0Ewc=;
-        b=LWitlc0nkg0QCvj0chdI2l3xMIhYNpRijraq/1kJBMbbK37Jvq1UoABtO5qxWbm6pT
-         y7vwBP9aNyHnogn4Tlama7Nq/7bXE/9jRbogLls8Or2yexKJLyQdZw/nUbR8XBCYYe8O
-         eHRUQko7oaQfOkpspkEc6IeeGpMW3WajBudJcvFG1BHF1x9alC1Sy8J0iQsXGpR50deC
-         j9dM61eiD0k5V4Z/tDbnkhZPgof7YFzG4F5+liouUR/g0EK9M9Ky1pLPxkKBtEjnZUOX
-         rvTAweAV/zgHM9Rjeh7CubnKdq8xN4I+kr2zPnaTw1SSYrgEZgcX3ajB7U9Fl06N8Saj
-         0XqQ==
-X-Gm-Message-State: ACrzQf0KQrV7GzO2++DVYtgBHioAEb59z0HXUNtVR8JREF3wCz3Rn8Jo
-        ujhrv+NIPBwxTIgy4wHeJLbiaCUJ2ZM=
-X-Google-Smtp-Source: AMsMyM6oT3NunHaRFH/pM9NAACYneBSq+ek5ly7lVSal3ZJ0a4JDlTxrbOSd4U+7r34vtj5BJRZzOA==
-X-Received: by 2002:a05:6512:10d6:b0:49a:1fc0:cc62 with SMTP id k22-20020a05651210d600b0049a1fc0cc62mr3653475lfg.138.1663944760226;
-        Fri, 23 Sep 2022 07:52:40 -0700 (PDT)
-Received: from localhost (80-62-116-219-mobile.dk.customer.tdc.net. [80.62.116.219])
-        by smtp.gmail.com with ESMTPSA id i16-20020a2ea230000000b0026aba858fbfsm1032999ljm.137.2022.09.23.07.52.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 07:52:39 -0700 (PDT)
-Date:   Fri, 23 Sep 2022 16:52:36 +0200
-From:   Pankaj Raghav <pankydev8@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org,
-        Pankaj Raghav <p.raghav@samsung.com>, joshi.k@samsung.com
-Subject: Re: [PATCH 1/5] block: enable batched allocation for
- blk_mq_alloc_request()
-Message-ID: <20220923145236.pr7ssckko4okklo2@quentin>
-References: <20220922182805.96173-1-axboe@kernel.dk>
- <20220922182805.96173-2-axboe@kernel.dk>
+        Fri, 23 Sep 2022 11:13:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79DDD139416;
+        Fri, 23 Sep 2022 08:13:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 33815B83878;
+        Fri, 23 Sep 2022 15:13:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A284C433D6;
+        Fri, 23 Sep 2022 15:13:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663946024;
+        bh=2RNZetd/4AvNkNba7S23VtdxTbdmnfkmLDgpHZQ1mlk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fEeiCm6+H4K9yHE6bpGVDvz73LlaBsUZx6yBOUnULi9LhTLTE+iW3Ixa+udXjKurU
+         hOJ8dQkNCGURJmollBx+6FUQcp7Waq52Ud+5eJxPIzWR1PwVZvlm92vRV7pnEZyxvn
+         mLV1kbb0cDnRLCMv6g5jow2qLeR7QdrE4ij5tIHlQ6+Hkx3Yw6w9f5JPExTMcCj3+w
+         AireuUgkBrN0IrhTE2BcfyolhlPtlkkf81dK0mN3AG18jJmN5tFMayayg9Iqhr2NCj
+         j2wmLI7+nDTMoON0MlRgf3fNNdEa96FfBswaY7CCzVmwiAhKnE75gzKOXWPGy9A6Qo
+         jb1FC2n4EegmQ==
+Date:   Fri, 23 Sep 2022 09:13:40 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Hugh Dickins <hughd@google.com>, Jens Axboe <axboe@kernel.dk>,
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Liu Song <liusong@linux.alibaba.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
+Message-ID: <Yy3NJFmdxclHTKs3@kbusch-mbp.dhcp.thefacebook.com>
+References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com>
+ <YyjdiKC0YYUkI+AI@kbusch-mbp>
+ <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com>
+ <20220921164012.s7lvklp2qk6occcg@quack3>
+ <20220923144303.fywkmgnkg6eken4x@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220922182805.96173-2-axboe@kernel.dk>
+In-Reply-To: <20220923144303.fywkmgnkg6eken4x@quack3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 12:28:01PM -0600, Jens Axboe wrote:
-> The filesystem IO path can take advantage of allocating batches of
-> requests, if the underlying submitter tells the block layer about it
-> through the blk_plug. For passthrough IO, the exported API is the
-> blk_mq_alloc_request() helper, and that one does not allow for
-> request caching.
+On Fri, Sep 23, 2022 at 04:43:03PM +0200, Jan Kara wrote:
+> On Wed 21-09-22 18:40:12, Jan Kara wrote:
+> > On Mon 19-09-22 16:01:39, Hugh Dickins wrote:
+> > > On Mon, 19 Sep 2022, Keith Busch wrote:
+> > > > On Sun, Sep 18, 2022 at 02:10:51PM -0700, Hugh Dickins wrote:
+> > > > > I have almost no grasp of all the possible sbitmap races, and their
+> > > > > consequences: but using the same !waitqueue_active() check as used
+> > > > > elsewhere, fixes the lockup and shows no adverse consequence for me.
+> > > > 
+> > > >  
+> > > > > Fixes: 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
+> > > > > Signed-off-by: Hugh Dickins <hughd@google.com>
+> > > > > ---
+> > > > > 
+> > > > >  lib/sbitmap.c |    2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > 
+> > > > > --- a/lib/sbitmap.c
+> > > > > +++ b/lib/sbitmap.c
+> > > > > @@ -620,7 +620,7 @@ static bool __sbq_wake_up(struct sbitmap
+> > > > >  		 * function again to wakeup a new batch on a different 'ws'.
+> > > > >  		 */
+> > > > >  		if (cur == 0)
+> > > > > -			return true;
+> > > > > +			return !waitqueue_active(&ws->wait);
+> > > > 
+> > > > If it's 0, that is supposed to mean another thread is about to make it not zero
+> > > > as well as increment the wakestate index. That should be happening after patch
+> > > > 48c033314f37 was included, at least.
+> > > 
+> > > I believe that the thread about to make wait_cnt not zero (and increment the
+> > > wakestate index) is precisely this interrupted thread: the backtrace shows
+> > > that it had just done its wakeups, so has not yet reached making wait_cnt
+> > > not zero; and I suppose that either its wakeups did not empty the waitqueue
+> > > completely, or another waiter got added as soon as it dropped the spinlock.
 > 
-> Wire up request caching for blk_mq_alloc_request(), which is generally
-> done without having a bio available upfront.
+> I was trying to wrap my head around this but I am failing to see how we
+> could have wait_cnt == 0 for long enough to cause any kind of stall let
+> alone a lockup in sbitmap_queue_wake_up() as you describe. I can understand
+> we have:
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/blk-mq.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
->  1 file changed, 71 insertions(+), 9 deletions(-)
+> CPU1						CPU2
+> sbitmap_queue_wake_up()
+>   ws = sbq_wake_ptr(sbq);
+>   cur = atomic_read(&ws->wait_cnt);
+>   do {
+> 	...
+> 	wait_cnt = cur - sub;	/* this will be 0 */
+>   } while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
+>   ...
+> 						/* Gets the same waitqueue */
+> 						ws = sbq_wake_ptr(sbq);
+> 						cur = atomic_read(&ws->wait_cnt);
+> 						do {
+> 							if (cur == 0)
+> 								return true; /* loop */
+>   wake_up_nr(&ws->wait, wake_batch);
+>   smp_mb__before_atomic();
+>   sbq_index_atomic_inc(&sbq->wake_index);
+>   atomic_set(&ws->wait_cnt, wake_batch); /* This stops looping on CPU2 */
 > 
-I think we need this patch to ensure correct behaviour for passthrough:
+> So until CPU1 reaches the atomic_set(), CPU2 can be looping. But how come
+> this takes so long that is causes a hang as you describe? Hum... So either
+> CPU1 takes really long to get to atomic_set():
+> - can CPU1 get preempted? Likely not at least in the context you show in
+>   your message
+> - can CPU1 spend so long in wake_up_nr()? Maybe the waitqueue lock is
+>   contended but still...
+> 
+> or CPU2 somehow sees cur==0 for longer than it should. The whole sequence
+> executed in a loop on CPU2 does not contain anything that would force CPU2
+> to refresh its cache and get new ws->wait_cnt value so we are at the mercy
+> of CPU cache coherency mechanisms to stage the write on CPU1 and propagate
+> it to other CPUs. But still I would not expect that to take significantly
+> long. Any other ideas?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c11949d66163..840541c1ab40 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1213,7 +1213,7 @@ void blk_execute_rq_nowait(struct request *rq, bool at_head)
-        WARN_ON(!blk_rq_is_passthrough(rq));
- 
-        blk_account_io_start(rq);
--       if (current->plug)
-+       if (blk_mq_plug(rq->bio))
-                blk_add_rq_to_plug(current->plug, rq);
-        else
-                blk_mq_sched_insert_request(rq, at_head, true, false);
+Thank you for the analysis. I arrived at the same conclusions.
 
-As the passthrough path can now support request caching via blk_mq_alloc_request(),
-and it uses blk_execute_rq_nowait(), bad things can happen at least for zoned
-devices:
-
-static inline struct blk_plug *blk_mq_plug( struct bio *bio)
-{
-	/* Zoned block device write operation case: do not plug the BIO */
-	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
-		return NULL;
-..
-
-Am I missing something?
+If this is a preempt enabled context, and there's just one CPU, I suppose the
+2nd task could spin in the while(), blocking the 1st task from resetting the
+wait_cnt. I doubt that's happening though, at least for nvme where we call this
+function in irq context.
