@@ -2,163 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BAE5C07E9D
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 20:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D139C04A95
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 20:54:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232721AbiIWUxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:53:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33898 "EHLO
+        id S232228AbiIWUys (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 16:54:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232677AbiIWUxA (ORCPT
+        with ESMTP id S233069AbiIWUyY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:53:00 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0074F08BB
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 13:52:56 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id d14so773657ilf.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 13:52:56 -0700 (PDT)
+        Fri, 23 Sep 2022 16:54:24 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F047F115A45
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 13:54:12 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id z191so869127iof.10
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 13:54:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date;
-        bh=0pguD5ERzMg1kriRPNLUHasBeFWgUGfxhoverUsEc0M=;
-        b=W4fL5OpwMiLHCLHE6MA2VCMfatp1lEDsHdXjApFf75g7A4o+b8aKbVcI2KDIo696Sf
-         ts4bZDR0j+B276oegyXKnN+/RxXID8cue/ScCc97/2L+SgbpwsyoD/qVuEJ3vgHecKgm
-         QhBq/Coo3EkCwb0NWw1nV3SYN8cZYAfdGPOV2KuoKrZ2uXLiKOMUW5Zq4h1e9brDFza7
-         KZYpR/a7iPwI7CH9yCogOVqua9QX48YTJgn6iLkamB8YCjrs38jCEChdL4oWULr37DVZ
-         vEbPIOVck+OooX2/aeTEvnEsSJgpQh79dHs4hOCXuzbmiIFdBvTolv7lLs+kfig45Bfj
-         YE2A==
+        bh=/K/GOu02xfTZ/9xI05vqPiDNx5hkxNdjNt0qyrC4Qyw=;
+        b=nvLIB0RJXe73WL+xXeF3BnfdKLnrKGY8ZDslI6lmL0cQeakLC6BCZhPiuK243GoOB4
+         4c8WWHLlshW3gZOfu4mYXdYgFCEVijcufrrV3yk7klbW+ebOtX34BSloqb33h3lWwgDj
+         BZ3lJ/bXZbnQnIMovtT87ZG0Y4Aii4Xf4atHWFoRryKMtvYl6VJHhJ9dkNRPfjF/UrDU
+         xCpD2eFIQIb6Qb+lUeMaAAl4IgolpacRuJSWRKROeEWNyrB8gwl/OZzwwc2/GFVRH3SY
+         YT/Xan5f47fBd5dlECLqU4y8pUy5sIlubvt0nLaLlHI80v8k25j3U+KF5sKm24pBmCGc
+         r9Hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=0pguD5ERzMg1kriRPNLUHasBeFWgUGfxhoverUsEc0M=;
-        b=yB9IugCJr5Ut19nN3g2EDv5yZb31V1LB90Z2qFirzO4nSJQfzAmPBgQGUUbZ6ZoTx7
-         W6APKSvnMM41PomvLyQsaku0RZ7Gg7rkB6XeGSh8XAcD1+hb/Z7ZMKwaoFlcxiS4JPLn
-         FdyClQHA6QvCchqaT1ilVy4nQdCWEQzPf/irI9RIpQz+gngfVW9W9ISfqItCjiQzULuM
-         0uY/QoLlEuJIl0VaNvjPCkBbMk3s0RLraRv9Gq1D6abNI1ms0bviawYCVG7o9rt2XXf4
-         2+jIg7lqCbj/Ukumrc7j77m3TicE0XO9MdvY2MVLlMqUeK5UkZUdHzfOPkgEiS3FCsGu
-         QTTg==
-X-Gm-Message-State: ACrzQf0cnImRrS8JXebEhw4+U5bJuHclAlNF6vXvCN4SYKNSTF9LMc1e
-        BNzRQq5h/FJ6wG8SNPoFm1SaZlYipBiZ3A==
-X-Google-Smtp-Source: AMsMyM51Ya2I8nFxvsCDC+9xPjmakd9dYpKCi1drkHVeMaH4beOmC4A8dpyYLut3dXaUzPsJEosJQQ==
-X-Received: by 2002:a05:6e02:15c5:b0:2d7:a1cf:6f87 with SMTP id q5-20020a056e0215c500b002d7a1cf6f87mr5040089ilu.30.1663966376003;
-        Fri, 23 Sep 2022 13:52:56 -0700 (PDT)
+        bh=/K/GOu02xfTZ/9xI05vqPiDNx5hkxNdjNt0qyrC4Qyw=;
+        b=edboyVqmxYcTu1alRzmmOpSZc1W4fBBBHv2Ph0Kmqc6gzjuKna8GcUjCAuJbp6xZbz
+         K4pvxQP9IY+O88TpXi6AwyAr/rGW7mOXbd2Q9owK2L20y/1vMdpAh0gvWDrGMGvtZ3iD
+         B/O8FPOey9hY+Uicy75TMgShL71ZH4Ia+LDxrKYhxRM8OXZRcrBYRnFWTkqwiZgDYtjn
+         9aoS3QLioPS7IUWjRtIJVb6C5s3rCdB5rkmQQP1izO4ljhZJOJL7Ji8WAsd+dcpzQIqj
+         lAyWyOJVfxY2fhFNFuzkeHtVCQ3/FFAMmvvK69elyBpIahVZFL9m7sCF4aLReYRwipvN
+         QG1g==
+X-Gm-Message-State: ACrzQf0HZRQshNR5kTF9iX6uRJCA22/SPKZj4GRQApA2DXQ/+3mkMot4
+        FiC3TgtXA111bXzDF+zjthQNvNeLKl+ksA==
+X-Google-Smtp-Source: AMsMyM7fQ9X8DI4XxBLuNaKvje1XDwW71d2cJffEU6cwqjPF4VEwKC+YAJvorV6dYRuBCbuSX+CV7Q==
+X-Received: by 2002:a6b:1c7:0:b0:6a3:2e71:2a91 with SMTP id 190-20020a6b01c7000000b006a32e712a91mr4959223iob.158.1663966452346;
+        Fri, 23 Sep 2022 13:54:12 -0700 (PDT)
 Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id e23-20020a0566380cd700b00352ce4f5e72sm1201219jak.179.2022.09.23.13.52.55
+        by smtp.gmail.com with ESMTPSA id d194-20020a0262cb000000b0035a42c43e3bsm3820406jac.81.2022.09.23.13.54.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 13:52:55 -0700 (PDT)
-Message-ID: <d09e1645-919f-9239-f86d-a8e85a133e5c@kernel.dk>
-Date:   Fri, 23 Sep 2022 14:52:54 -0600
+        Fri, 23 Sep 2022 13:54:11 -0700 (PDT)
+Message-ID: <2e484ccb-b65b-2991-e259-d3f7be6ad1a6@kernel.dk>
+Date:   Fri, 23 Sep 2022 14:54:11 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
-Subject: Re: [PATCH 4/5] nvme: split out metadata vs non metadata end_io
- uring_cmd completions
+Subject: Re: [PATCH 1/5] block: enable batched allocation for
+ blk_mq_alloc_request()
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
+To:     Pankaj Raghav <p.raghav@samsung.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Stefan Roesch <shr@fb.com>
+        linux-nvme@lists.infradead.org, joshi.k@samsung.com,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>
 References: <20220922182805.96173-1-axboe@kernel.dk>
- <20220922182805.96173-5-axboe@kernel.dk> <Yy3O7wH16t6AhC3j@infradead.org>
+ <20220922182805.96173-2-axboe@kernel.dk>
+ <CGME20220923145245eucas1p107655755f446bb1e1318539a3f82d301@eucas1p1.samsung.com>
+ <20220923145236.pr7ssckko4okklo2@quentin>
+ <c7b76fa1-f7e3-3ac6-c92d-35baa0d9a40a@samsung.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Yy3O7wH16t6AhC3j@infradead.org>
+In-Reply-To: <c7b76fa1-f7e3-3ac6-c92d-35baa0d9a40a@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/23/22 9:21 AM, Christoph Hellwig wrote:
->> +	union {
->> +		struct {
->> +			void *meta; /* kernel-resident buffer */
->> +			void __user *meta_buffer;
->> +		};
->> +		struct {
->> +			u32 nvme_flags;
->> +			u32 nvme_status;
->> +			u64 result;
->> +		};
->> +	};
+On 9/23/22 9:13 AM, Pankaj Raghav wrote:
+> On 2022-09-23 16:52, Pankaj Raghav wrote:
+>> On Thu, Sep 22, 2022 at 12:28:01PM -0600, Jens Axboe wrote:
+>>> The filesystem IO path can take advantage of allocating batches of
+>>> requests, if the underlying submitter tells the block layer about it
+>>> through the blk_plug. For passthrough IO, the exported API is the
+>>> blk_mq_alloc_request() helper, and that one does not allow for
+>>> request caching.
+>>>
+>>> Wire up request caching for blk_mq_alloc_request(), which is generally
+>>> done without having a bio available upfront.
+>>>
+>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>> ---
+>>>  block/blk-mq.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
+>>>  1 file changed, 71 insertions(+), 9 deletions(-)
+>>>
+>> I think we need this patch to ensure correct behaviour for passthrough:
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index c11949d66163..840541c1ab40 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -1213,7 +1213,7 @@ void blk_execute_rq_nowait(struct request *rq, bool at_head)
+>>         WARN_ON(!blk_rq_is_passthrough(rq));
+>>  
+>>         blk_account_io_start(rq);
+>> -       if (current->plug)
+>> +       if (blk_mq_plug(rq->bio))
+>>                 blk_add_rq_to_plug(current->plug, rq);
+>>         else
+>>                 blk_mq_sched_insert_request(rq, at_head, true, false);
+>>
+>> As the passthrough path can now support request caching via blk_mq_alloc_request(),
+>> and it uses blk_execute_rq_nowait(), bad things can happen at least for zoned
+>> devices:
+>>
+>> static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+>> {
+>> 	/* Zoned block device write operation case: do not plug the BIO */
+>> 	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
+>> 		return NULL;
+>> ..
 > 
-> Without naming the arms of the union this is becoming a bit too much
-> of a mess..
+> Thinking more about it, even this will not fix it because op is
+> REQ_OP_DRV_OUT if it is a NVMe write for passthrough requests.
 > 
->> +static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
->> +{
->> +	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
->> +	int status;
->> +
->> +	if (pdu->nvme_flags & NVME_REQ_CANCELLED)
->> +		status = -EINTR;
->> +	else
->> +		status = pdu->nvme_status;
+> @Damien Should the condition in blk_mq_plug() be changed to:
 > 
-> If you add a signed int field you only need one field instead of
-> two in the pdu for this (the nvme status is only 15 bits anyway).
+> static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+> {
+> 	/* Zoned block device write operation case: do not plug the BIO */
+> 	if (bdev_is_zoned(bio->bi_bdev) && !op_is_read(bio_op(bio)))
+> 		return NULL;
 
-For both of these, how about we just simplify like below? I think
-at that point it's useless to name them anyway.
-
-
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index 25f2f6df1602..6f955984ca14 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -350,16 +350,13 @@ struct nvme_uring_cmd_pdu {
- 		struct request *req;
- 	};
- 	u32 meta_len;
-+	u32 nvme_status;
- 	union {
- 		struct {
- 			void *meta; /* kernel-resident buffer */
- 			void __user *meta_buffer;
- 		};
--		struct {
--			u32 nvme_flags;
--			u32 nvme_status;
--			u64 result;
--		};
-+		u64 result;
- 	};
- };
- 
-@@ -396,17 +393,11 @@ static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
- static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
- {
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
--	int status;
--
--	if (pdu->nvme_flags & NVME_REQ_CANCELLED)
--		status = -EINTR;
--	else
--		status = pdu->nvme_status;
- 
- 	if (pdu->bio)
- 		blk_rq_unmap_user(pdu->bio);
- 
--	io_uring_cmd_done(ioucmd, status, pdu->result);
-+	io_uring_cmd_done(ioucmd, pdu->nvme_status, pdu->result);
- }
- 
- static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
-@@ -417,8 +408,10 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 	void *cookie = READ_ONCE(ioucmd->cookie);
- 
- 	req->bio = pdu->bio;
--	pdu->nvme_flags = nvme_req(req)->flags;
--	pdu->nvme_status = nvme_req(req)->status;
-+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+		pdu->nvme_status = -EINTR;
-+	else
-+		pdu->nvme_status = nvme_req(req)->status;
- 	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
- 
- 	/*
+That looks reasonable to me. It'll prevent plug optimizations even
+for passthrough on zoned devices, but that's probably fine.
 
 -- 
 Jens Axboe
+
+
