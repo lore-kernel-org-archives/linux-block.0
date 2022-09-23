@@ -2,116 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64948C04A95
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 21:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D71C07E9D
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 22:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232301AbiIWV35 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 17:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
+        id S232810AbiIWW64 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 18:58:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbiIWV3u (ORCPT
+        with ESMTP id S232630AbiIWW6y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 17:29:50 -0400
-Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D6482ED4B
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 14:29:48 -0700 (PDT)
-Received: by mail-oo1-xc33.google.com with SMTP id r136-20020a4a378e000000b004755953bc6cso242758oor.13
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 14:29:48 -0700 (PDT)
+        Fri, 23 Sep 2022 18:58:54 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F387D147A06
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 15:58:51 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id r20so955199qtn.12
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 15:58:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date;
-        bh=ZGsHfCz0vcFr7tUGQ1YmYn/WTXvbxQ/j0IzGjWxyxBw=;
-        b=I0aBEbvgjLil0ywPPi6Ss08ZtLCUNNMs3cN1rzPH1Z5uZIXD54xYdyBRbtSdAIIQsX
-         vaZouOQ9T1QumiTC3NDHrTvWjJMWeEWpH+OnpplHEVevfIWJdQnjFz6l8RrSgKjgA5mb
-         l0jTr0Vd1DfuBJzhajfHxNR1bKUs6Lq/hXbPH/tHyr5pZ+XiHJPFmB6BKXmd9uAPkSTt
-         VCo/iqiNzCTeNGPd/IQrfCbzegNKym5AqfjjqBUiYKgKnlZ9cgFP2Zn+QP/F7hnQGX1h
-         38TRWe0xZvw/58iiGuVR+gNj/Pa4pzua3bT0zChkr7ZtNJHk2zlOQz2lZnDEYUnNh0+Z
-         GthQ==
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=FNVLh7QhTGQ0fcTY+ctZvZZG3IwOkyYDgRdATbQqFOE=;
+        b=K6ThUhwaPxzE2uNJlUneDV+lEcb3sOSkMme+uJcOlA6PYnkzlx9eWnQI1++F4JHPTq
+         6r5PK01FmTenaqwabhqB54wtpEtSh4q/f93LAarupwwOtTOjD+IgB/VnY7DUeuIhnkQC
+         ueJpGrhUyrDSBys3KiQqSXiiBkciEmtt9rHzEbu8riWDZ48ZSyiWrSiPky8YDf3TxmTw
+         JUiu1YmBDldxsDnWcSHllSPx0BxlwyOXe/lppV6D0S4dxlwZK9P4DpsQeTWyB8t6HwzK
+         z3SSHJoW/95nBFxiW6hEVkAM1qDx4k+3uHGKOmgxxq5NvqNGbvm3e45Zg2lFjxXsyWRU
+         k//Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=ZGsHfCz0vcFr7tUGQ1YmYn/WTXvbxQ/j0IzGjWxyxBw=;
-        b=6Z4qit8RoehYSIqPx0xxwIXRGzK77PzrW3MJ0DzFadem7dZu9eX8wa7Ygn2q4VFqbP
-         XAqiadDW5C6UgwCgvlXi2cZMxZrUQuByjxoU+1Gp8g4SGdxGDrdJEuWir5+j6YpW2ZJs
-         +kOum9bSvDiA2p62VfZxNBjBQBxfHbqdZg5Esm7mkhG/zN+rCc4E3ZLUz8hvYfpXLfcS
-         1Iw3VmnGFce+C7UyP1ildu5cr3Qn6lYQ+7ByQQjpg+t+8j6OGjJMsNc6qMgwfjAHX1Am
-         ltYayRwWWX96gcmBC/e4Ll8tNd3XgHHCT6mgH/IExQl6vcghPPeCRpQcU0mJrJlvUR5S
-         3Naw==
-X-Gm-Message-State: ACrzQf1hGgKB/86rhxYVS/iiKT1cZ9Ru97jsppp6+438nRHtzVv4zSzY
-        n4ev4WyAhK8NyavMWN5TFbMcdA==
-X-Google-Smtp-Source: AMsMyM50XCi7LDTMNO4C0MWoUV/IYyF9t3ZMdSltCTg0JhEoxE8L1v+wfcY/UTC7XDhMwKaC5HYxNQ==
-X-Received: by 2002:a05:6820:1505:b0:476:994:186e with SMTP id ay5-20020a056820150500b004760994186emr4276566oob.28.1663968587374;
-        Fri, 23 Sep 2022 14:29:47 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id t23-20020a056870609700b0012c21a64a76sm5230776oae.24.2022.09.23.14.29.46
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=FNVLh7QhTGQ0fcTY+ctZvZZG3IwOkyYDgRdATbQqFOE=;
+        b=zI71+aoP9LBdCKLs2lIG3yt8lmF7w9zz+h650iY7MQ+t1amYuRhVX8WCF/WraBiazp
+         sqhRBUzs4W/ccJx1INXN6VtMpuhqXfYQ7eJRW7UlqwghLkw+FDHEmbEeaak4beQWk5Vw
+         LbgxVjiFQ9iDOfVWrKNjhwrpEy0BWPx++fyJJGs7rFcSeT2zP89/qKBtMUYkZaC7YjOD
+         QxsGkwKNRuOS3g3uh63UcwSodtiE4q/AbTXSTvhYY23USo8tXWfQvPsVEvMBxp1Q3q5r
+         esSNRuIF+niWmTStOD41e1vsCyezBPPcYLcW2JLh5D2luxcoLz4OXb4yaM+Uhuwn96Hm
+         J8wg==
+X-Gm-Message-State: ACrzQf3RW//KMMaXUwv0rMwn4CXVoCCmaRziTksZRVx9XjjAz/UeregF
+        eAbTEl73iUGmMaQN+B7tIme1mzbDvnb2xQ==
+X-Google-Smtp-Source: AMsMyM47dsm4TxegiRkZUeLCH+5O+Wr8H54uLORgq4Q+/7wXo2aoGW0gmLRhcDSR3jPPk1osSOqTXA==
+X-Received: by 2002:ac8:5a8b:0:b0:35b:f5c0:d5c9 with SMTP id c11-20020ac85a8b000000b0035bf5c0d5c9mr9233331qtc.14.1663973931136;
+        Fri, 23 Sep 2022 15:58:51 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id s5-20020a05620a254500b006b98315c6fbsm7255492qko.1.2022.09.23.15.58.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 14:29:46 -0700 (PDT)
-Date:   Fri, 23 Sep 2022 14:29:37 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Keith Busch <kbusch@kernel.org>
-cc:     Hugh Dickins <hughd@google.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Liu Song <liusong@linux.alibaba.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
-In-Reply-To: <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
-Message-ID: <391b1763-7146-857-e3b6-dc2a8e797162@google.com>
-References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com> <YyjdiKC0YYUkI+AI@kbusch-mbp> <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com> <20220921164012.s7lvklp2qk6occcg@quack3> <20220923144303.fywkmgnkg6eken4x@quack3> <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com>
- <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
+        Fri, 23 Sep 2022 15:58:50 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1obrdB-00316G-At;
+        Fri, 23 Sep 2022 19:58:49 -0300
+Date:   Fri, 23 Sep 2022 19:58:49 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>
+Subject: Re: [PATCH v10 1/8] mm: introduce FOLL_PCI_P2PDMA to gate getting
+ PCI P2PDMA pages
+Message-ID: <Yy46KbD/PvhaHA6X@ziepe.ca>
+References: <20220922163926.7077-1-logang@deltatee.com>
+ <20220922163926.7077-2-logang@deltatee.com>
+ <Yy33LUqvDLSOqoKa@ziepe.ca>
+ <64f8da81-7803-4db4-73da-a158295cbc9c@deltatee.com>
+ <Yy4Ot5MoOhsgYLTQ@ziepe.ca>
+ <2327d393-af5c-3f4c-b9b9-6852b9d72f90@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2327d393-af5c-3f4c-b9b9-6852b9d72f90@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 23 Sep 2022, Keith Busch wrote:
-
-> Does the following fix the observation? Rational being that there's no reason
-> to spin on the current wait state that is already under handling; let
-> subsequent clearings proceed to the next inevitable wait state immediately.
-
-It's running fine without lockup so far; but doesn't this change merely
-narrow the window?  If this is interrupted in between atomic_try_cmpxchg()
-setting wait_cnt to 0 and sbq_index_atomic_inc() advancing wake_index,
-don't we run the same risk as before, of sbitmap_queue_wake_up() from
-the interrupt handler getting stuck on that wait_cnt 0?
-
+On Fri, Sep 23, 2022 at 02:11:03PM -0600, Logan Gunthorpe wrote:
 > 
-> ---
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 624fa7f118d1..47bf7882210b 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -634,6 +634,13 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
->  
->  	*nr -= sub;
->  
-> +	/*
-> +	 * Increase wake_index before updating wait_cnt, otherwise concurrent
-> +	 * callers can see valid wait_cnt in old waitqueue, which can cause
-> +	 * invalid wakeup on the old waitqueue.
-> +	 */
-> +	sbq_index_atomic_inc(&sbq->wake_index);
-> +
->  	/*
->  	 * When wait_cnt == 0, we have to be particularly careful as we are
->  	 * responsible to reset wait_cnt regardless whether we've actually
-> @@ -660,13 +667,6 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq, int *nr)
->  	 * of atomic_set().
->  	 */
->  	smp_mb__before_atomic();
-> -
-> -	/*
-> -	 * Increase wake_index before updating wait_cnt, otherwise concurrent
-> -	 * callers can see valid wait_cnt in old waitqueue, which can cause
-> -	 * invalid wakeup on the old waitqueue.
-> -	 */
-> -	sbq_index_atomic_inc(&sbq->wake_index);
->  	atomic_set(&ws->wait_cnt, wake_batch);
->  
->  	return ret || *nr;
-> --
+> 
+> On 2022-09-23 13:53, Jason Gunthorpe wrote:
+> > On Fri, Sep 23, 2022 at 01:08:31PM -0600, Logan Gunthorpe wrote:
+> > I'm encouraging Dan to work on better infrastructure in pgmap core
+> > because every pgmap implementation has this issue currently.
+> > 
+> > For that reason it is probably not so relavent to this series.
+> > 
+> > Perhaps just clarify in the commit message that the FOLL_LONGTERM
+> > restriction is to copy DAX until the pgmap page refcounts are fixed.
+> 
+> Ok, I'll add that note.
+> 
+> Per the fix for the try_grab_page(), to me it doesn't fit well in 
+> try_grab_page() without doing a bunch of cleanup to change the
+> error handling, and the same would have to be added to try_grab_folio().
+> So I think it's better to leave it where it was, but move it below the 
+> respective grab calls. Does the incremental patch below look correct?
+
+Oh? I was thinking of just a very simple thing:
+
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -225,6 +225,11 @@ bool __must_check try_grab_page(struct page *page, unsigned int flags)
+                node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, 1);
+        }
+ 
++       if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page))) {
++               gup_put_folio(page_folio(page), 1, flags);
++              return false;
++       }
++
+        return true;
+ }
+
+
+> I am confused about what happens if neither FOLL_PIN or FOLL_GET 
+> are set (which the documentation for try_grab_x() says is possible, but
+> other documentation suggests that FOLL_GET is automatically set). 
+> In which case it'd be impossible to do the check if we can't 
+> access the page.
+
+try_grab_page is operating under the PTL so it can probably touch the
+page OK (though perhaps we don't need to even check anything)
+
+try_grab_folio cannot be called without PIN/GET, so like this perhaps:
+
+@@ -123,11 +123,14 @@ static inline struct folio *try_get_folio(struct page *page, int refs)
+  */
+ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
+ {
++       struct folio *folio;
++
++       if (WARN_ON((flags & (FOLL_GET | FOLL_PIN)) == 0))
++               return NULL;
++
+        if (flags & FOLL_GET)
+-               return try_get_folio(page, refs);
++               folio = try_get_folio(page, refs);
+        else if (flags & FOLL_PIN) {
+-               struct folio *folio;
+-
+                /*
+                 * Can't do FOLL_LONGTERM + FOLL_PIN gup fast path if not in a
+                 * right zone, so fail and let the caller fall back to the slow
+@@ -160,11 +163,14 @@ struct folio *try_grab_folio(struct page *page, int refs, unsigned int flags)
+                                        refs * (GUP_PIN_COUNTING_BIAS - 1));
+                node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, refs);
+ 
+-               return folio;
+        }
+ 
+-       WARN_ON_ONCE(1);
+-       return NULL;
++       if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page))) {
++               gup_put_folio(page, 1, flags);
++               return NULL;
++       }
++
++       return folio;
+ }
+
+Jason
+
