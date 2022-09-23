@@ -2,164 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAABFC6FA83
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 20:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BAE5C07E9D
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 20:53:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiIWULN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 16:11:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36624 "EHLO
+        id S232721AbiIWUxB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 16:53:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiIWULM (ORCPT
+        with ESMTP id S232677AbiIWUxA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 16:11:12 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7619011DFCA;
-        Fri, 23 Sep 2022 13:11:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=UKGkJSDEegt6Km6YnASFgTL/rZgzcY69GV8aEjSrBsw=; b=Uk3BJ2VHv+0S4jWHSA/rtq3PWC
-        Zj9PsoIM/Z7XnRTaL5ne1xXzusxv8rr55DkC1OmoHUwIWkaZ+Jpepoglgn0v3hyI2SvBzpQQPB7/I
-        pOzSUqMPA2jHYvbYN7r7oL1saGjNZNZxZZl/Qa9MxLkY2XbnIcupaFB9+/ymV/qcrL0ambaJlozZA
-        iz9rqIPUWbtwxVNqkUFYgqxw8Tw3cB3ChEfoRI9T2u9bJwQnnupTD5u0NfCsylJQb8zJCg5sMGt3b
-        O2XS16tx23f40e3Qwgn5Q7E+PItgegCw2qWKbMcuoZvBT0Rtwht0AGeyszOrU2alxd7kuxnWVCgDG
-        7MWeKj5w==;
-Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1obp0t-008yJz-3Q; Fri, 23 Sep 2022 14:11:09 -0600
-Message-ID: <2327d393-af5c-3f4c-b9b9-6852b9d72f90@deltatee.com>
-Date:   Fri, 23 Sep 2022 14:11:03 -0600
+        Fri, 23 Sep 2022 16:53:00 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0074F08BB
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 13:52:56 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id d14so773657ilf.2
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 13:52:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=0pguD5ERzMg1kriRPNLUHasBeFWgUGfxhoverUsEc0M=;
+        b=W4fL5OpwMiLHCLHE6MA2VCMfatp1lEDsHdXjApFf75g7A4o+b8aKbVcI2KDIo696Sf
+         ts4bZDR0j+B276oegyXKnN+/RxXID8cue/ScCc97/2L+SgbpwsyoD/qVuEJ3vgHecKgm
+         QhBq/Coo3EkCwb0NWw1nV3SYN8cZYAfdGPOV2KuoKrZ2uXLiKOMUW5Zq4h1e9brDFza7
+         KZYpR/a7iPwI7CH9yCogOVqua9QX48YTJgn6iLkamB8YCjrs38jCEChdL4oWULr37DVZ
+         vEbPIOVck+OooX2/aeTEvnEsSJgpQh79dHs4hOCXuzbmiIFdBvTolv7lLs+kfig45Bfj
+         YE2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=0pguD5ERzMg1kriRPNLUHasBeFWgUGfxhoverUsEc0M=;
+        b=yB9IugCJr5Ut19nN3g2EDv5yZb31V1LB90Z2qFirzO4nSJQfzAmPBgQGUUbZ6ZoTx7
+         W6APKSvnMM41PomvLyQsaku0RZ7Gg7rkB6XeGSh8XAcD1+hb/Z7ZMKwaoFlcxiS4JPLn
+         FdyClQHA6QvCchqaT1ilVy4nQdCWEQzPf/irI9RIpQz+gngfVW9W9ISfqItCjiQzULuM
+         0uY/QoLlEuJIl0VaNvjPCkBbMk3s0RLraRv9Gq1D6abNI1ms0bviawYCVG7o9rt2XXf4
+         2+jIg7lqCbj/Ukumrc7j77m3TicE0XO9MdvY2MVLlMqUeK5UkZUdHzfOPkgEiS3FCsGu
+         QTTg==
+X-Gm-Message-State: ACrzQf0cnImRrS8JXebEhw4+U5bJuHclAlNF6vXvCN4SYKNSTF9LMc1e
+        BNzRQq5h/FJ6wG8SNPoFm1SaZlYipBiZ3A==
+X-Google-Smtp-Source: AMsMyM51Ya2I8nFxvsCDC+9xPjmakd9dYpKCi1drkHVeMaH4beOmC4A8dpyYLut3dXaUzPsJEosJQQ==
+X-Received: by 2002:a05:6e02:15c5:b0:2d7:a1cf:6f87 with SMTP id q5-20020a056e0215c500b002d7a1cf6f87mr5040089ilu.30.1663966376003;
+        Fri, 23 Sep 2022 13:52:56 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id e23-20020a0566380cd700b00352ce4f5e72sm1201219jak.179.2022.09.23.13.52.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Sep 2022 13:52:55 -0700 (PDT)
+Message-ID: <d09e1645-919f-9239-f86d-a8e85a133e5c@kernel.dk>
+Date:   Fri, 23 Sep 2022 14:52:54 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-CA
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20220922163926.7077-1-logang@deltatee.com>
- <20220922163926.7077-2-logang@deltatee.com> <Yy33LUqvDLSOqoKa@ziepe.ca>
- <64f8da81-7803-4db4-73da-a158295cbc9c@deltatee.com>
- <Yy4Ot5MoOhsgYLTQ@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <Yy4Ot5MoOhsgYLTQ@ziepe.ca>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 4/5] nvme: split out metadata vs non metadata end_io
+ uring_cmd completions
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Stefan Roesch <shr@fb.com>
+References: <20220922182805.96173-1-axboe@kernel.dk>
+ <20220922182805.96173-5-axboe@kernel.dk> <Yy3O7wH16t6AhC3j@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Yy3O7wH16t6AhC3j@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v10 1/8] mm: introduce FOLL_PCI_P2PDMA to gate getting PCI
- P2PDMA pages
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022-09-23 13:53, Jason Gunthorpe wrote:
-> On Fri, Sep 23, 2022 at 01:08:31PM -0600, Logan Gunthorpe wrote:
-> I'm encouraging Dan to work on better infrastructure in pgmap core
-> because every pgmap implementation has this issue currently.
+On 9/23/22 9:21 AM, Christoph Hellwig wrote:
+>> +	union {
+>> +		struct {
+>> +			void *meta; /* kernel-resident buffer */
+>> +			void __user *meta_buffer;
+>> +		};
+>> +		struct {
+>> +			u32 nvme_flags;
+>> +			u32 nvme_status;
+>> +			u64 result;
+>> +		};
+>> +	};
 > 
-> For that reason it is probably not so relavent to this series.
+> Without naming the arms of the union this is becoming a bit too much
+> of a mess..
 > 
-> Perhaps just clarify in the commit message that the FOLL_LONGTERM
-> restriction is to copy DAX until the pgmap page refcounts are fixed.
+>> +static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
+>> +{
+>> +	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+>> +	int status;
+>> +
+>> +	if (pdu->nvme_flags & NVME_REQ_CANCELLED)
+>> +		status = -EINTR;
+>> +	else
+>> +		status = pdu->nvme_status;
+> 
+> If you add a signed int field you only need one field instead of
+> two in the pdu for this (the nvme status is only 15 bits anyway).
 
-Ok, I'll add that note.
+For both of these, how about we just simplify like below? I think
+at that point it's useless to name them anyway.
 
-Per the fix for the try_grab_page(), to me it doesn't fit well in 
-try_grab_page() without doing a bunch of cleanup to change the
-error handling, and the same would have to be added to try_grab_folio().
-So I think it's better to leave it where it was, but move it below the 
-respective grab calls. Does the incremental patch below look correct?
 
-I am confused about what happens if neither FOLL_PIN or FOLL_GET 
-are set (which the documentation for try_grab_x() says is possible, but
-other documentation suggests that FOLL_GET is automatically set). 
-In which case it'd be impossible to do the check if we can't 
-access the page.
-
-I'm assuming that seeing there are other accesses to the page in these
-two instances of try_grab_x() that these spots will always have FOLL_GET
-or  FOLL_PIN set and thus this isn't an issue. Another reason not
-to push the check into try_grab_x().
-
-Logan
-
---
-
-diff --git a/mm/gup.c b/mm/gup.c
-index 108848b67f6f..f05ba3e8e29a 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -601,12 +601,6 @@ static struct page *follow_page_pte(struct vm_area_struct >
-                goto out;
-        }
+diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+index 25f2f6df1602..6f955984ca14 100644
+--- a/drivers/nvme/host/ioctl.c
++++ b/drivers/nvme/host/ioctl.c
+@@ -350,16 +350,13 @@ struct nvme_uring_cmd_pdu {
+ 		struct request *req;
+ 	};
+ 	u32 meta_len;
++	u32 nvme_status;
+ 	union {
+ 		struct {
+ 			void *meta; /* kernel-resident buffer */
+ 			void __user *meta_buffer;
+ 		};
+-		struct {
+-			u32 nvme_flags;
+-			u32 nvme_status;
+-			u64 result;
+-		};
++		u64 result;
+ 	};
+ };
  
--       if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
--                    is_pci_p2pdma_page(page))) {
--               page = ERR_PTR(-EREMOTEIO);
--               goto out;
--       }
+@@ -396,17 +393,11 @@ static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
+ static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
+ {
+ 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
+-	int status;
 -
-        VM_BUG_ON_PAGE((flags & FOLL_PIN) && PageAnon(page) &&
-                       !PageAnonExclusive(page), page);
+-	if (pdu->nvme_flags & NVME_REQ_CANCELLED)
+-		status = -EINTR;
+-	else
+-		status = pdu->nvme_status;
  
-@@ -615,6 +609,13 @@ static struct page *follow_page_pte(struct vm_area_struct >
-                page = ERR_PTR(-ENOMEM);
-                goto out;
-        }
-+
-+       if (unlikely(!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page))) {
-+               gup_put_folio(page_folio(page), 1, flags);
-+               page = ERR_PTR(-EREMOTEIO);
-+               goto out;
-+       }
-+
-        /*
-         * We need to make the page accessible if and only if we are going
-         * to access its content (the FOLL_PIN case).  Please see
-@@ -2392,14 +2393,16 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr,>
-                VM_BUG_ON(!pfn_valid(pte_pfn(pte)));
-                page = pte_page(pte);
+ 	if (pdu->bio)
+ 		blk_rq_unmap_user(pdu->bio);
  
--               if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
--                            is_pci_p2pdma_page(page)))
--                       goto pte_unmap;
--
-                folio = try_grab_folio(page, 1, flags);
-                if (!folio)
-                        goto pte_unmap;
+-	io_uring_cmd_done(ioucmd, status, pdu->result);
++	io_uring_cmd_done(ioucmd, pdu->nvme_status, pdu->result);
+ }
  
-+               if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
-+                            is_pci_p2pdma_page(page))) {
-+                       gup_put_folio(folio, 1, flags);
-+                       goto pte_unmap;
-+               }
-+
-                if (unlikely(page_is_secretmem(page))) {
-                        gup_put_folio(folio, 1, flags);
-                        goto pte_unmap;
+ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+@@ -417,8 +408,10 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+ 	void *cookie = READ_ONCE(ioucmd->cookie);
+ 
+ 	req->bio = pdu->bio;
+-	pdu->nvme_flags = nvme_req(req)->flags;
+-	pdu->nvme_status = nvme_req(req)->status;
++	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
++		pdu->nvme_status = -EINTR;
++	else
++		pdu->nvme_status = nvme_req(req)->status;
+ 	pdu->result = le64_to_cpu(nvme_req(req)->result.u64);
+ 
+ 	/*
+
+-- 
+Jens Axboe
