@@ -2,179 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D267DC6FA90
-	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 14:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63163ECAAD8
+	for <linux-block@archiver.kernel.org>; Fri, 23 Sep 2022 14:43:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232589AbiIWOXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 10:23:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59040 "EHLO
+        id S231699AbiIWOnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 10:43:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232552AbiIWOXb (ORCPT
+        with ESMTP id S231856AbiIWOnH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:23:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C9BA13B023
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:23:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663943009;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        Fri, 23 Sep 2022 10:43:07 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53530143280;
+        Fri, 23 Sep 2022 07:43:05 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B8233219F6;
+        Fri, 23 Sep 2022 14:43:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1663944183; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MtMta5sZ7F8zj2gNZ2FUjMLqWdc2TCa8gGZwFvL5igI=;
-        b=aYX7wOfswgVM4YQfQbOoM2q04BjNYwzKtoQjas3BcJq4veSejrV1YIhwfuIEcPyc6hQjhc
-        GOeyOSu9cspMY8TlVUtAYZ+qqbTFgNh8atYwclRCifbf11glVV9kU+HRnvt5C80S/uMdlQ
-        Mx6KkuLFXh+Kg0W5RkHesQaeEnRugug=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-480-MO9u59p1NzKyAGeH8iw14w-1; Fri, 23 Sep 2022 10:23:28 -0400
-X-MC-Unique: MO9u59p1NzKyAGeH8iw14w-1
-Received: by mail-qv1-f71.google.com with SMTP id i10-20020ad45c6a000000b004a25d0fea96so8602380qvh.3
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 07:23:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=MtMta5sZ7F8zj2gNZ2FUjMLqWdc2TCa8gGZwFvL5igI=;
-        b=62Ut6tBtXshpi+HzYtXBvjWa1828CrNnP7xt+Y7LfAJwK/Jx2IR7JHyP/Z+yhFf/Ak
-         eq8smUmJmM3vHCmjsF5usCeE4YJNmkwRtuh96EfL57bNIYBSE3PRx4hJIipCVLjvEpkI
-         kDGGAv4iuimPZpJvz+85TIpamOqK7DL7/vDFYc9i270xuEsxxWEPiQYmg/M+Pk7etwLI
-         PilKf/z4h7Zvys2oVTCnHtEpBx0ir/9/tmOK20WfWSG6D8eoomev44Yk6IwSzDKqYQRR
-         KnWC33JT8OlqIwOYq235at/iROnNhTohvuzPL+xoxyOJqHqAj9s74ii9sYYszpiJE1Ak
-         DZIQ==
-X-Gm-Message-State: ACrzQf21d7rJzZdLci6oRDyrFfthnkavBBHqr30ubyjvHkxykoezJOLZ
-        PcPeL638CyQ8IBimOEb6nnpUyOFO5MjsGApwMAPlkeBOqaww1akh289Of8HCDV+j6lbHi+VMRer
-        Y3evaN5lTVzWOg7v5OYyCSA==
-X-Received: by 2002:a37:ef18:0:b0:6ce:175f:409a with SMTP id j24-20020a37ef18000000b006ce175f409amr5781674qkk.572.1663943006692;
-        Fri, 23 Sep 2022 07:23:26 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7XaeBSmIgCS5xVoX7O37KV2Q4BatIbL+4W7934TQWhD9AMaj+EBoxQ49sZN/jgeEabR6YtNA==
-X-Received: by 2002:a37:ef18:0:b0:6ce:175f:409a with SMTP id j24-20020a37ef18000000b006ce175f409amr5781650qkk.572.1663943006470;
-        Fri, 23 Sep 2022 07:23:26 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id y26-20020a37f61a000000b006ceb933a9fesm5847674qkj.81.2022.09.23.07.23.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 07:23:26 -0700 (PDT)
-Date:   Fri, 23 Sep 2022 10:23:25 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Bart Van Assche <bvanassche@google.com>,
-        Daniil Lunev <dlunev@google.com>,
-        Evan Green <evgreen@google.com>,
-        Gwendal Grignou <gwendal@google.com>
-Subject: Re: [PATCH RFC 2/8] dm: Add support for block provisioning
-Message-ID: <Yy3BXc9wf4PH6Rby@redhat.com>
-References: <20220915164826.1396245-1-sarthakkukreti@google.com>
- <20220915164826.1396245-3-sarthakkukreti@google.com>
+        bh=3eRIeqJ35bjBaxEIVHyjl5HzJmU8eUg6UuiOKVVDhfI=;
+        b=pjBYBvVquyKzp9m/dCfmi5ulC/6lWsIX/9ZYV8ku+G07BvI2orRR6wcvN3rJlD54BThb0V
+        TPnLhu0D9cr0KZZ7TjMunkwpvmTkrAd3cKB9kuPUg3qug7CbB5bm2HM7Q6qnBUH7CbzSbg
+        BFibh786yP7q2BPSvJOSXGz4Yr8GuwY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1663944183;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3eRIeqJ35bjBaxEIVHyjl5HzJmU8eUg6UuiOKVVDhfI=;
+        b=BqksOAX4xO6kfjd1zqXmCr3Qb02d8iX6p3pHkpUHPMJQR84+hdETfPOPNtr+82WUJV5deM
+        rHwtczfMmOIi3nBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A903E13A00;
+        Fri, 23 Sep 2022 14:43:03 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id TI87KffFLWPOKwAAMHmgww
+        (envelope-from <jack@suse.cz>); Fri, 23 Sep 2022 14:43:03 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 3415CA0685; Fri, 23 Sep 2022 16:43:03 +0200 (CEST)
+Date:   Fri, 23 Sep 2022 16:43:03 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Hugh Dickins <hughd@google.com>
+Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Yu Kuai <yukuai1@huaweicloud.com>, Jan Kara <jack@suse.cz>,
+        Liu Song <liusong@linux.alibaba.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
+Message-ID: <20220923144303.fywkmgnkg6eken4x@quack3>
+References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com>
+ <YyjdiKC0YYUkI+AI@kbusch-mbp>
+ <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com>
+ <20220921164012.s7lvklp2qk6occcg@quack3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220915164826.1396245-3-sarthakkukreti@google.com>
+In-Reply-To: <20220921164012.s7lvklp2qk6occcg@quack3>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 15 2022 at 12:48P -0400,
-Sarthak Kukreti <sarthakkukreti@chromium.org> wrote:
+On Wed 21-09-22 18:40:12, Jan Kara wrote:
+> On Mon 19-09-22 16:01:39, Hugh Dickins wrote:
+> > On Mon, 19 Sep 2022, Keith Busch wrote:
+> > > On Sun, Sep 18, 2022 at 02:10:51PM -0700, Hugh Dickins wrote:
+> > > > I have almost no grasp of all the possible sbitmap races, and their
+> > > > consequences: but using the same !waitqueue_active() check as used
+> > > > elsewhere, fixes the lockup and shows no adverse consequence for me.
+> > > 
+> > >  
+> > > > Fixes: 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
+> > > > Signed-off-by: Hugh Dickins <hughd@google.com>
+> > > > ---
+> > > > 
+> > > >  lib/sbitmap.c |    2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > --- a/lib/sbitmap.c
+> > > > +++ b/lib/sbitmap.c
+> > > > @@ -620,7 +620,7 @@ static bool __sbq_wake_up(struct sbitmap
+> > > >  		 * function again to wakeup a new batch on a different 'ws'.
+> > > >  		 */
+> > > >  		if (cur == 0)
+> > > > -			return true;
+> > > > +			return !waitqueue_active(&ws->wait);
+> > > 
+> > > If it's 0, that is supposed to mean another thread is about to make it not zero
+> > > as well as increment the wakestate index. That should be happening after patch
+> > > 48c033314f37 was included, at least.
+> > 
+> > I believe that the thread about to make wait_cnt not zero (and increment the
+> > wakestate index) is precisely this interrupted thread: the backtrace shows
+> > that it had just done its wakeups, so has not yet reached making wait_cnt
+> > not zero; and I suppose that either its wakeups did not empty the waitqueue
+> > completely, or another waiter got added as soon as it dropped the spinlock.
 
-> From: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> 
-> Add support to dm devices for REQ_OP_PROVISION. The default mode
-> is to pass through the request and dm-thin will utilize it to provision
-> blocks.
-> 
-> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
-> ---
->  drivers/md/dm-crypt.c         |  4 +-
->  drivers/md/dm-linear.c        |  1 +
->  drivers/md/dm-table.c         | 17 +++++++
->  drivers/md/dm-thin.c          | 86 +++++++++++++++++++++++++++++++++--
->  drivers/md/dm.c               |  4 ++
->  include/linux/device-mapper.h |  6 +++
->  6 files changed, 113 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 159c6806c19b..357f0899cfb6 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -3081,6 +3081,8 @@ static int crypt_ctr_optional(struct dm_target *ti, unsigned int argc, char **ar
->  	if (ret)
->  		return ret;
->  
-> +	ti->num_provision_bios = 1;
-> +
->  	while (opt_params--) {
->  		opt_string = dm_shift_arg(&as);
->  		if (!opt_string) {
-> @@ -3384,7 +3386,7 @@ static int crypt_map(struct dm_target *ti, struct bio *bio)
->  	 * - for REQ_OP_DISCARD caller must use flush if IO ordering matters
->  	 */
->  	if (unlikely(bio->bi_opf & REQ_PREFLUSH ||
-> -	    bio_op(bio) == REQ_OP_DISCARD)) {
-> +	    bio_op(bio) == REQ_OP_DISCARD || bio_op(bio) == REQ_OP_PROVISION)) {
->  		bio_set_dev(bio, cc->dev->bdev);
->  		if (bio_sectors(bio))
->  			bio->bi_iter.bi_sector = cc->start +
-> diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-> index 3212ef6aa81b..1aa782149428 100644
-> --- a/drivers/md/dm-linear.c
-> +++ b/drivers/md/dm-linear.c
-> @@ -61,6 +61,7 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
->  	ti->num_discard_bios = 1;
->  	ti->num_secure_erase_bios = 1;
->  	ti->num_write_zeroes_bios = 1;
-> +	ti->num_provision_bios = 1;
->  	ti->private = lc;
->  	return 0;
->  
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 332f96b58252..b7f9cb66b7ba 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -1853,6 +1853,18 @@ static bool dm_table_supports_write_zeroes(struct dm_table *t)
->  	return true;
->  }
->  
-> +static bool dm_table_supports_provision(struct dm_table *t)
-> +{
-> +	for (unsigned int i = 0; i < t->num_targets; i++) {
-> +		struct dm_target *ti = dm_table_get_target(t, i);
-> +
-> +		if (ti->num_provision_bios)
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
+I was trying to wrap my head around this but I am failing to see how we
+could have wait_cnt == 0 for long enough to cause any kind of stall let
+alone a lockup in sbitmap_queue_wake_up() as you describe. I can understand
+we have:
 
-This needs to go a step further and verify a device in the stack
-actually services REQ_OP_PROVISION.
+CPU1						CPU2
+sbitmap_queue_wake_up()
+  ws = sbq_wake_ptr(sbq);
+  cur = atomic_read(&ws->wait_cnt);
+  do {
+	...
+	wait_cnt = cur - sub;	/* this will be 0 */
+  } while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
+  ...
+						/* Gets the same waitqueue */
+						ws = sbq_wake_ptr(sbq);
+						cur = atomic_read(&ws->wait_cnt);
+						do {
+							if (cur == 0)
+								return true; /* loop */
+  wake_up_nr(&ws->wait, wake_batch);
+  smp_mb__before_atomic();
+  sbq_index_atomic_inc(&sbq->wake_index);
+  atomic_set(&ws->wait_cnt, wake_batch); /* This stops looping on CPU2 */
 
-Please see dm_table_supports_discards(): it iterates all devices in
-the table and checks that support is advertised.
+So until CPU1 reaches the atomic_set(), CPU2 can be looping. But how come
+this takes so long that is causes a hang as you describe? Hum... So either
+CPU1 takes really long to get to atomic_set():
+- can CPU1 get preempted? Likely not at least in the context you show in
+  your message
+- can CPU1 spend so long in wake_up_nr()? Maybe the waitqueue lock is
+  contended but still...
 
-For discard, DM requires that _all_ devices in a table advertise
-support (that is pretty strict and likely could be relaxed to _any_).
-
-You'll need ti->provision_supported (like ->discards_supported) to
-advertise actual support is provided by dm-thinp (even if underlying
-devices don't support it).
-
-And yeah, dm-thinp passdown support for REQ_OP_PROVISION can follow
-later as needed (if there actual HW that would benefit from
-REQ_OP_PROVISION).
-
-Mike
-
+or CPU2 somehow sees cur==0 for longer than it should. The whole sequence
+executed in a loop on CPU2 does not contain anything that would force CPU2
+to refresh its cache and get new ws->wait_cnt value so we are at the mercy
+of CPU cache coherency mechanisms to stage the write on CPU1 and propagate
+it to other CPUs. But still I would not expect that to take significantly
+long. Any other ideas?
+ 
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
