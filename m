@@ -2,155 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC4CC6FA82
-	for <linux-block@archiver.kernel.org>; Sat, 24 Sep 2022 01:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EF0C07E9D
+	for <linux-block@archiver.kernel.org>; Sat, 24 Sep 2022 01:02:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232759AbiIXBBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 21:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42356 "EHLO
+        id S232550AbiIXBCx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Sep 2022 21:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232731AbiIXBBV (ORCPT
+        with ESMTP id S232418AbiIXBCv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 21:01:21 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D5BF123854
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 18:01:19 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id t3so1596157ply.2
-        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 18:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=jM/NFW+dzaacI3soZGyv7jPWC6pA1pw7cDCJhuL2E/8=;
-        b=19NqT5W8oYJqWXv7sK7tkZgw39YSavL6E7bqfJ9W9KMEmQx3kAR99oSffuNcIST7zT
-         Zk+EjQ0KoBTA3bP/Wlle4apJAXhuM9VXeSUp8Pca9Q0iBaKpdx8VC7m/SbCksnS6KAxt
-         q1PtKeeStJt49FozhjDpPV/jqIgJgPmcFt0LwS7JdfoPws44U6DDHa5yYgWtLgdDc35G
-         /4odI4rVtHwgTVC1k/sdl6DImwC/QXLL9zQI87xkcJuEivVAeUO1IcyH/1+NbGk/sxFT
-         yxn4qlYjBsLKLqZG2IbYOubTheMoS15IJPe9enN+tmIU9Mpn+VMdRBmjzpeisMRi1lch
-         kGww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=jM/NFW+dzaacI3soZGyv7jPWC6pA1pw7cDCJhuL2E/8=;
-        b=2lu4Q+6NrkKDwBYp/rjlCfuXdbAjtkwEYfOr3QiBenZqI5EVYD2nToIMzXmOs4v2bI
-         4fTneRkm42zoOvm8lpY0VTacdRpLLkKaGFWMUoq+dqjcrzsB9aw9XYvYO4vuaxKB/eVg
-         33ArOl7y3UZlzq1ubfuqlxp0zQY42DZoxmt8aLPTscFKT/uKtywfGN3PDkou05Dx98Z/
-         oLda+ufUbraZodOASib5JgYe30lPHKwXHoZpy/TV3p1dRfGlqFmJihEeKleoq2R1Ae5a
-         p281pUyq3s8eSNzTRWvpOxjavTf2bNI3ZkVnPiPXbIvAbft0+crcoD10OwkcZMJKL7tq
-         oBFA==
-X-Gm-Message-State: ACrzQf28sCG2XBnrQlCglc6FOZQBg96qztLVCQ9A0aP3lcpLAn/yQtgI
-        KpKVEiqvKsY+9/POkNPHHHjVxQ==
-X-Google-Smtp-Source: AMsMyM6PjtMQW7Bi+dRsT6bCwYk/CGUTy4KNjBaElrFqSDHtnOFOVbl4Bxk2w4yKvUFJjESeMIldcA==
-X-Received: by 2002:a17:90a:cf92:b0:202:ae52:43a4 with SMTP id i18-20020a17090acf9200b00202ae5243a4mr12298778pju.141.1663981279032;
-        Fri, 23 Sep 2022 18:01:19 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f22-20020a635116000000b004308422060csm6157835pgb.69.2022.09.23.18.01.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 18:01:18 -0700 (PDT)
-Message-ID: <ba0b3ae4-7001-af42-3549-cc52049ccccb@kernel.dk>
-Date:   Fri, 23 Sep 2022 19:01:16 -0600
+        Fri, 23 Sep 2022 21:02:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22210124C09
+        for <linux-block@vger.kernel.org>; Fri, 23 Sep 2022 18:02:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663981370;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=6h7ahkgH3oZ8yUGMt1JuU5Bc7gd3yRGFoO+sQHOHhUs=;
+        b=dyyPk0O7gPW8+0DGLoiqDrCrdmtmm1rLh0wEnaRpt1/etXopTJaQQu0pBOtRPEfZ9pz6/S
+        CCIOVr4O3cCpbCAthYikTOjroAvhqUVkiZUfADUvNkc3+65TwXp4NSzVnDQJaba1WoRwD2
+        OZpaupjAVky57mwcRXKR72gID3cTMEQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-9-Q2ncmA88OL-grLEDwxQZFA-1; Fri, 23 Sep 2022 21:02:39 -0400
+X-MC-Unique: Q2ncmA88OL-grLEDwxQZFA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16953101A528;
+        Sat, 24 Sep 2022 01:02:39 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BD3D840C2064;
+        Sat, 24 Sep 2022 01:02:33 +0000 (UTC)
+Date:   Sat, 24 Sep 2022 09:02:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, xiaoguang.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH V6 7/7] Documentation: document ublk user recovery feature
+Message-ID: <Yy5XJOuvFH+2dXfP@T590>
+References: <20220923153919.44078-1-ZiyangZhang@linux.alibaba.com>
+ <20220923153919.44078-8-ZiyangZhang@linux.alibaba.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 1/5] block: enable batched allocation for
- blk_mq_alloc_request()
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, joshi.k@samsung.com,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20220922182805.96173-1-axboe@kernel.dk>
- <20220922182805.96173-2-axboe@kernel.dk>
- <CGME20220923145245eucas1p107655755f446bb1e1318539a3f82d301@eucas1p1.samsung.com>
- <20220923145236.pr7ssckko4okklo2@quentin>
- <c7b76fa1-f7e3-3ac6-c92d-35baa0d9a40a@samsung.com>
- <2e484ccb-b65b-2991-e259-d3f7be6ad1a6@kernel.dk>
- <a06df4ba-a968-0ee1-f8ff-062def0ec031@opensource.wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <a06df4ba-a968-0ee1-f8ff-062def0ec031@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220923153919.44078-8-ZiyangZhang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/23/22 6:59 PM, Damien Le Moal wrote:
-> On 9/24/22 05:54, Jens Axboe wrote:
->> On 9/23/22 9:13 AM, Pankaj Raghav wrote:
->>> On 2022-09-23 16:52, Pankaj Raghav wrote:
->>>> On Thu, Sep 22, 2022 at 12:28:01PM -0600, Jens Axboe wrote:
->>>>> The filesystem IO path can take advantage of allocating batches of
->>>>> requests, if the underlying submitter tells the block layer about it
->>>>> through the blk_plug. For passthrough IO, the exported API is the
->>>>> blk_mq_alloc_request() helper, and that one does not allow for
->>>>> request caching.
->>>>>
->>>>> Wire up request caching for blk_mq_alloc_request(), which is generally
->>>>> done without having a bio available upfront.
->>>>>
->>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>> ---
->>>>>  block/blk-mq.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
->>>>>  1 file changed, 71 insertions(+), 9 deletions(-)
->>>>>
->>>> I think we need this patch to ensure correct behaviour for passthrough:
->>>>
->>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>> index c11949d66163..840541c1ab40 100644
->>>> --- a/block/blk-mq.c
->>>> +++ b/block/blk-mq.c
->>>> @@ -1213,7 +1213,7 @@ void blk_execute_rq_nowait(struct request *rq, bool at_head)
->>>>         WARN_ON(!blk_rq_is_passthrough(rq));
->>>>  
->>>>         blk_account_io_start(rq);
->>>> -       if (current->plug)
->>>> +       if (blk_mq_plug(rq->bio))
->>>>                 blk_add_rq_to_plug(current->plug, rq);
->>>>         else
->>>>                 blk_mq_sched_insert_request(rq, at_head, true, false);
->>>>
->>>> As the passthrough path can now support request caching via blk_mq_alloc_request(),
->>>> and it uses blk_execute_rq_nowait(), bad things can happen at least for zoned
->>>> devices:
->>>>
->>>> static inline struct blk_plug *blk_mq_plug( struct bio *bio)
->>>> {
->>>> 	/* Zoned block device write operation case: do not plug the BIO */
->>>> 	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
->>>> 		return NULL;
->>>> ..
->>>
->>> Thinking more about it, even this will not fix it because op is
->>> REQ_OP_DRV_OUT if it is a NVMe write for passthrough requests.
->>>
->>> @Damien Should the condition in blk_mq_plug() be changed to:
->>>
->>> static inline struct blk_plug *blk_mq_plug( struct bio *bio)
->>> {
->>> 	/* Zoned block device write operation case: do not plug the BIO */
->>> 	if (bdev_is_zoned(bio->bi_bdev) && !op_is_read(bio_op(bio)))
->>> 		return NULL;
->>
->> That looks reasonable to me. It'll prevent plug optimizations even
->> for passthrough on zoned devices, but that's probably fine.
+On Fri, Sep 23, 2022 at 11:39:19PM +0800, ZiyangZhang wrote:
+> Add documentation for user recovery feature of ublk subsystem.
 > 
-> Could do:
-> 
-> 	if (blk_op_is_passthrough(bio_op(bio)) ||
-> 	    (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio))))
-> 		return NULL;
-> 
-> Which I think is way cleaner. No ?
-> Unless you want to preserve plugging with passthrough commands on regular
-> (not zoned) drives ?
+> Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
+> ---
 
-We most certainly do, without plugging this whole patchset is not
-functional. Nor is batched dispatch, for example.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
--- 
-Jens Axboe
+
+Thanks,
+Ming
+
