@@ -2,342 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7699C07E9D
-	for <linux-block@archiver.kernel.org>; Sat, 24 Sep 2022 03:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42BBFC07E9D
+	for <linux-block@archiver.kernel.org>; Sat, 24 Sep 2022 11:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233228AbiIXDtX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Sep 2022 23:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39340 "EHLO
+        id S229669AbiIXL4g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Sep 2022 07:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233048AbiIXDtW (ORCPT
+        with ESMTP id S230093AbiIXL4f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Sep 2022 23:49:22 -0400
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2069.outbound.protection.outlook.com [40.107.215.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E9521514CA;
-        Fri, 23 Sep 2022 20:49:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oTg5YK6bBDxWhJBla0tpeV/SD0l97mN+8A6xVn0ELJWjskR+rc6OVwZj1axHya230XVe/F3x+pq/Avb5tDo8kPp6pOmRDaLod5IhN7tspWSXrb7CsVr4rm3jM0dfW+0PKO91OYrgBnGgxv52VJGIeWsSiPdUef1FlmQBOpXxCFuXNyQhtbgcE1rL/E+iiaVveNFGslVeMRfPOa+ewSHRqtzIwS9XEVm1XofDZGJTANU+sUBehO6cQ/Q8BXP148qHDX2CpU+oQEYWfMR7mxiKVPITRqrxee8RcUYM0vCGmlbwM5D4U5BWOljQcdJTGXHRzVIAX41P66l8bdA36aNnnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vrmf8j6cyPBq5ZkgsB8Qlyrx7m4pbQkxc58NTKNybKQ=;
- b=nZ6PKgCzujXPvYW7DPmbZYg3ot1hNprXCc1PK6qQkMjz0eRIK1SfsEVOxsx9Pi16UHIjDRFytLII+1js0lzYIYqpECMroQTvaDMfpiHgjMZIaOx/MfHezPt79z9/63usbS6ACDNj1aAegceybvH5uU6M6A6xiJClnUPkKykJkifB4gMxBQCzRRZhz01Au9cV9X/n7dmNQtu3Yx0JLjAVPkcpTIvly9wNnJWyTLMxr/fSjJonSoGsdztw1srdU9D9k5AyCg0r/6men2FnJIgcGaBCZ73OcjkPIpM7/MykCel5pkczy8JI+SsgpIi/zJeglxv7ygwFTHNrN2raVDLICQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
- header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vrmf8j6cyPBq5ZkgsB8Qlyrx7m4pbQkxc58NTKNybKQ=;
- b=jRmvjWMId453Uj8h1wj7hcN9oLDcHoleit+c2wV30S7db2qfwwva9pgPQdV6yNI2G+cE7P5KOdUD9kOzp8yKqWGaCkvVg+38mcOnNoYs3EJg4JNWA3JDORwbOTmNKTO+kjECfSOVp7UMNSS9FuMzbBMCDCrX2mciGWGMgR/DQ7/Rd+3oqdRsFdWBFTAQZfVc0o76p1ZX4u5aA9oV8hwOCXZuQtqAAIISyYaukhk4A8ZaASxVVuLYQOwbjyrG6zAifn61JLeBKq6I45fzse0uRA1dk0+qUguhd2CfeWfbWs8J8gOwRO20498oZEKw3LmwcNNx7wRUV4gkPsl9dXNIGw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-Received: from TY2PR06MB3424.apcprd06.prod.outlook.com (2603:1096:404:104::19)
- by TYUPR06MB6150.apcprd06.prod.outlook.com (2603:1096:400:359::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.22; Sat, 24 Sep
- 2022 03:49:13 +0000
-Received: from TY2PR06MB3424.apcprd06.prod.outlook.com
- ([fe80::aa83:33dc:435c:cb5d]) by TY2PR06MB3424.apcprd06.prod.outlook.com
- ([fe80::aa83:33dc:435c:cb5d%6]) with mapi id 15.20.5632.019; Sat, 24 Sep 2022
- 03:49:12 +0000
-From:   Angus Chen <angus.chen@jaguarmicro.com>
-To:     jasowang@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        axboe@kernel.dk
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Angus Chen <angus.chen@jaguarmicro.com>,
-        Liming Wu <liming.wu@jaguarmicro.com>
-Subject: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in init_rq
-Date:   Sat, 24 Sep 2022 11:48:54 +0800
-Message-Id: <20220924034854.323-1-angus.chen@jaguarmicro.com>
-X-Mailer: git-send-email 2.33.0.windows.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR02CA0076.apcprd02.prod.outlook.com
- (2603:1096:4:90::16) To TY2PR06MB3424.apcprd06.prod.outlook.com
- (2603:1096:404:104::19)
+        Sat, 24 Sep 2022 07:56:35 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1359082759
+        for <linux-block@vger.kernel.org>; Sat, 24 Sep 2022 04:56:32 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220924115630euoutp01618d2397731d99f9741045948dd4b444~XyekZZcXt3181131811euoutp01y
+        for <linux-block@vger.kernel.org>; Sat, 24 Sep 2022 11:56:30 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220924115630euoutp01618d2397731d99f9741045948dd4b444~XyekZZcXt3181131811euoutp01y
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1664020590;
+        bh=EVg47p0JhcCTGJg0TZxH7odD+YswmajLBxZkmpLFUSs=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=gP+DdZ8YTaA8W9eSwaaBJ6wXnHfDBWkf+U5StLvG7YI40nvngRmDhPBYttMXwZw2g
+         SlKXp1nIUC8k3IaHPFnmxvMJZAvMOnWvDpYwUcnfDh+QlPJSwXlOxb3LCAKRzJowLx
+         v+P52o+ENCDH5ORBv6aQTEYLBDGPqKPLJL2nUkfM=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220924115629eucas1p1ab30f4d338ef6a179d1a763a57a7eb22~Xyej95o9C2356423564eucas1p1C;
+        Sat, 24 Sep 2022 11:56:29 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 7D.11.19378.D60FE236; Sat, 24
+        Sep 2022 12:56:29 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220924115629eucas1p16b9ad95f3f797b2f4a6d2178e6426ff4~XyejfnfBP1392613926eucas1p1a;
+        Sat, 24 Sep 2022 11:56:29 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220924115629eusmtrp12a86d614c2c27919bb3ed5cfe6b8335f~XyejfABOR1630216302eusmtrp1D;
+        Sat, 24 Sep 2022 11:56:29 +0000 (GMT)
+X-AuditID: cbfec7f5-a35ff70000014bb2-4e-632ef06da064
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id DC.F7.10862.D60FE236; Sat, 24
+        Sep 2022 12:56:29 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220924115629eusmtip2ca42f7a320dfee98355591818a181d48~XyejT19ho0292802928eusmtip2R;
+        Sat, 24 Sep 2022 11:56:29 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.168) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Sat, 24 Sep 2022 12:56:27 +0100
+Message-ID: <59e40929-bc1e-5d1e-3dcf-b9ba39b3d393@samsung.com>
+Date:   Sat, 24 Sep 2022 13:56:26 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TY2PR06MB3424:EE_|TYUPR06MB6150:EE_
-X-MS-Office365-Filtering-Correlation-Id: 719eca34-54a8-4e8c-7a9a-08da9ddfbe6a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oVecQu3FNu8WfR5c1aV9qYioAp0AtH339n0lXw+23Jm266XphCAvgVflzRRDpVOHMvFmVC3hVqSlImb2iFwCXfhUN4Po54htkuPFRbsE3Ud5HLo2dTtLu/8MvBy1AG7/KKb18htsUeyXqJwwsp1wM7eJ05fUmWpknhdDy9n3ukPR0jHS8GjWviA0M+86nndsd6u4zKVPD+EDAAsaeDEExFDFbr+/qycfC0iEYS7JlZAEjKaiuxDZcozKOpSFtAM/wPkPZfFqoUZodhm4XbymbgH0wXi1Q2Flz0+Qn1lZfJkE0YCTfcHqN4uLLcp1rWGR4pc1JwiMNtj5pSPK+Aer4B/luez6edV7F2l7NxwNwGUoW4rZNTgtNGg2Xmi9K/z4SwP5/e0BRhNv43nYNYH6e2uc4P6ouNUhdLhmY98S+aQGri9G8+WYLe4U1Rze0uV8Gt/MyJn4to9DubdY1s7jlbrVLMZtHzUQCLx3WkpdjqOt8pGmkmhdw2UB6BQFg/NGLGDnSlT+rvnBup1I4itjIeDoV6OSKm6jZRmQ9FU2AUsqLQe2MZLAV7UO6szd0mudbRFCpfI37DUPcQppc4CgRltQbzyE5fjzdJexOO59UdCyJ1i7gpitGBDO2HHZsaaE/PfM818I4WnrkubiJNc0iuv0M3E59yD2eOrx8tHEOO76L4qDzfQl+gf/Ubn4ppvfVs/0NC6LraUQe0N2dzBBZstBYuctCIw1m/q6XzfLFLSdmVzEAOwD3kQwF0RqD2t0kQ1P/5JmD3LgguArUnHnzQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2PR06MB3424.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(136003)(366004)(376002)(396003)(39840400004)(451199015)(316002)(8676002)(4326008)(66556008)(66476007)(66946007)(54906003)(5660300002)(186003)(2906002)(8936002)(1076003)(44832011)(41300700001)(2616005)(52116002)(83380400001)(6666004)(6512007)(478600001)(6506007)(6486002)(107886003)(26005)(86362001)(36756003)(38350700002)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?T/kdPtaGTxsr7EtCqvv9B7lKv1Av8W9xWnfIPvSo9dQ1TJyGvzPk2XWTGkjV?=
- =?us-ascii?Q?5m4hoN0+biugQIx/oydXOHoYhNzM4RxLTDTpHv93OVYKbu1VWEAsa4oK1Yhy?=
- =?us-ascii?Q?6qMpLcTpN+J3kiPXhxDTv9zUrJHeU2/AmBjhl8xqXmU8kaAbDZTTZKinu7Ui?=
- =?us-ascii?Q?K2WBqdT/VYh61zK6KR8ST9i+pBrWkotWjSQQRabS3TybQjp46Ss45Gc38IlT?=
- =?us-ascii?Q?PO6UTwwA7H3WVMVS7y1VADdNEEnxps4HmSaOG9bJCsAyV23eA0zbujYm/Ad2?=
- =?us-ascii?Q?vtYICSZ6W/MX9kLgbMf1oLqR07qlIAimCRV4S51QikhR7mtpFIyYXyWSv3Bc?=
- =?us-ascii?Q?AYHX07SdPjxYdYzv6e7XN4dxFUoaiIUGSXWS2uLA1ecB4parVfYmhRCS0ja8?=
- =?us-ascii?Q?zJwwYKNqyvkh5XGBPeP3f7yL5w0K0PwBQGwoh+L5d5unGffnTNJs/VVY9qLS?=
- =?us-ascii?Q?fpMLf0vjhwgfF7izODi8y5NxrAJ9uZrc69DEKGYVlGxsqYo3VKqJcEkeYjLD?=
- =?us-ascii?Q?aIusAeOeOgtSZajWhfiHhp1MuFf8QAJdBRYRzii2qjOlGaN+FmPgZhOQvanO?=
- =?us-ascii?Q?NK8Mv5ISj/sj2yNQC+IAfGWdKpR+qHDC639LxV8NfszvVEWnJYeZ3UNXrmbN?=
- =?us-ascii?Q?iR7k40M0GGTynQqC9BfJIhqHPaU0uRq4Jbz4JaqjLi8CEQnOFIn423+F0VTA?=
- =?us-ascii?Q?3rahVKJ8EG/l/18xA3NlxLxt/q7af4+2KePBTX31yltau+PskVKruMz2pTFB?=
- =?us-ascii?Q?Unk9DDOxVh5BgZLB9m6Db5pkULGEBW5JCyhUZgZhH5//eUYMoWkt97jL2x05?=
- =?us-ascii?Q?MJO3R9HWP55d1kpEwSr8nO1RbKGXmt38+sjL/WCWOlevkoaVYsocv8vol3ya?=
- =?us-ascii?Q?SR8uhtKlXP4PvIEyAL2lQPXSGO/PwMa4Ra2TYcXuO5nEc6xV2KDMJo4JcOff?=
- =?us-ascii?Q?ssg77QH5+B77/psxHab6u2/kZCdGT4FouqF9FmzYvxeIICfizkNDcfRnChq9?=
- =?us-ascii?Q?GcAOfv2zU2v5LPmUwfNpOVYtiqvLzIhonwoWG5IgOaxN0voqLKtvsvaIXuZd?=
- =?us-ascii?Q?u4Pjud9+SVKn5tdoSy1zXWH/LVbJs24UtFWzPyu3DLTQ7Mie31uAAGZL9Iwe?=
- =?us-ascii?Q?PWPG6OH+WAVjbBZ2M3SlpmnfZQ2Q4MtWJiygAmUd7zrmsBc/l7v5KglL5yhp?=
- =?us-ascii?Q?0OpgVOeSiNIUsvc4r70fqJxd8p+tBN6oPdzGeSV+Xljf9TVv3GW+B4oa+xCW?=
- =?us-ascii?Q?7OuAEgjPKTF8Tmfsst+ZvoueZJ9YRdePo3o682trQyXWXWnglBzOl4JBo9Zz?=
- =?us-ascii?Q?pWfVH5H7aOZFRUfHNMr4qmSHf2OiOBQtVxNWb77iXHyY+gJdlxDL/STIx9ks?=
- =?us-ascii?Q?9pbnbm2jeGexZophbii2cYHpMmAsexxY72rq+2Nii5EnHMxG8pLx1FP9WrXg?=
- =?us-ascii?Q?t8TVF5RJB4rsXPcggaT7d/d9EZO/rTY46Nhln0Ykx8pmfsRRX5+cA7ufjar6?=
- =?us-ascii?Q?z88oTV6TCc7kBprbCa2HLe8/fULN8yiiK3rN1P8z2HIQ71aYISM1Wn+D+lRS?=
- =?us-ascii?Q?u3yVV0YbK9o406wcWTjABcha4eChUrLWAUJfQwZqs5RTcNljJOYlzhwgpING?=
- =?us-ascii?Q?aw=3D=3D?=
-X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 719eca34-54a8-4e8c-7a9a-08da9ddfbe6a
-X-MS-Exchange-CrossTenant-AuthSource: TY2PR06MB3424.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2022 03:49:12.7700
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1N2+8rzwiwPaLsooRbz6yVOVMhs4AW4Ou9Qfrw9QIQfAwq+yx4Zi5IKBR91JQvfDcgDw/ezpGH2qtYhbXcWImH9Yce7tiHB/fO4BTPcBb6Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYUPR06MB6150
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.11.0
+Subject: Re: [PATCH 1/5] block: enable batched allocation for
+ blk_mq_alloc_request()
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+CC:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <joshi.k@samsung.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Bart Van Assche <bvanassche@acm.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <2e484ccb-b65b-2991-e259-d3f7be6ad1a6@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.168]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprLKsWRmVeSWpSXmKPExsWy7djPc7q5H/SSDZ7+MLRYfbefzWLah5/M
+        Fr/Pnme22HtL22L+sqfsFt3Xd7BZrLn5lMWB3ePyFW+PnbPuAhlnSz02L6n32Nl6n9Xj8ya5
+        ALYoLpuU1JzMstQifbsErowNB2oLXnBUTJpwirmBsYu9i5GTQ0LAROLgiVOsXYxcHEICKxgl
+        zkw+ygbhfGGUODptBzNIlZDAZ0aJT2uDYDqWPnwJ1bGcUWLO740IRavPM0IkdgMlGieC7eAV
+        sJNobexhBLFZBFQljj1/wwYRF5Q4OfMJC4gtKhApsWb3WbB6YYEwif3v1zKB2MwC4hK3nswH
+        s0UEQiXuND0HO49Z4DijxP1zV4HO4OBgE9CSaOxkBzE5BWwlHr1VhmjVlGjd/psdwpaX2P52
+        DjPEA8oSy0/PhLJrJdYeO8MOMlJC4AeHxJ9zO5lA5kgIuEic2ZsAUSMs8er4FmhwyUicntzD
+        AmFXSzy98ZsZoreFUaJ/53o2iF5rib4zORA1jhL992dChfkkbrwVhDiHT2LStunMExhVZyEF
+        xCwkD89C8sEsJB8sYGRZxSieWlqcm55abJyXWq5XnJhbXJqXrpecn7uJEZiCTv87/nUH44pX
+        H/UOMTJxMB5ilOBgVhLhTbmomyzEm5JYWZValB9fVJqTWnyIUZqDRUmcl22GVrKQQHpiSWp2
+        ampBahFMlomDU6qByfkGq6eAi5v1s2XZTwtPTRerbDny/tc02bDLz/qD/hpbbYg8Oa3+WssL
+        fo4ur8nm+34+2Byw0zHyAEvnSeUVj1j/5R+Uq7qt/GI6g7fNLZFrEmV9z0/fT7AXPar6hiNE
+        LHGBwDp2o+JCwc8n48XeT7I73P8tYIFL72kdxi8x5pJG/BVTn4n+21AqPI39su+CWNbcFdFz
+        mYqTFN8sdeqa9K9y5tQFufqP9oU+MhZMrWk02rtwg5hki7zJiSbj/90fo6JqtMrl9jTdC9cS
+        PbTkr1Wc1LVd10///hTYbWp2YP7Lk5O/lyydZlBZc/jsCxcTBSlBhbkFP94FqJ+uLzjtcSUu
+        L9jUlYGHv8nmtZiqEktxRqKhFnNRcSIAIr48PrADAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKIsWRmVeSWpSXmKPExsVy+t/xe7q5H/SSDf7OErBYfbefzWLah5/M
+        Fr/Pnme22HtL22L+sqfsFt3Xd7BZrLn5lMWB3ePyFW+PnbPuAhlnSz02L6n32Nl6n9Xj8ya5
+        ALYoPZui/NKSVIWM/OISW6VoQwsjPUNLCz0jE0s9Q2PzWCsjUyV9O5uU1JzMstQifbsEvYwN
+        B2oLXnBUTJpwirmBsYu9i5GTQ0LARGLpw5esXYxcHEICSxkltrVdgkrISHy68hHKFpb4c62L
+        DaLoI6PEn+8HoTp2M0qc+juZBaSKV8BOorWxhxHEZhFQlTj2/A0bRFxQ4uTMJ2A1ogKREg+X
+        NTGB2MICYRL7368Fs5kFxCVuPZkPZosIhErcaXoOto1Z4DijxP1zV6G2HWeSWHvgHlAVBweb
+        gJZEYyc7iMkpYCvx6K0yxBxNidbtv9khbHmJ7W/nMEN8oCyx/PRMKLtW4tX93YwTGEVnITlv
+        FpIzZiEZNQvJqAWMLKsYRVJLi3PTc4uN9IoTc4tL89L1kvNzNzEC43fbsZ9bdjCufPVR7xAj
+        EwfjIUYJDmYlEd6Ui7rJQrwpiZVVqUX58UWlOanFhxhNgWE0kVlKNDkfmEDySuINzQxMDU3M
+        LA1MLc2MlcR5PQs6EoUE0hNLUrNTUwtSi2D6mDg4pRqY9Kc0KrTtf3X+5yyO/YrBpWW9RcJ8
+        rbuMyqQSot53quYkBTJOfjRbgvPUT+87PUIyf/9f+Wg7f1JfrvSBH8yViTbLfphfmB52pLUy
+        NJTNn6P2c9W1sG+T53tXxUvMvBA9/070N91XX86fufVyE/s1B5NjbqwHjAxvN5ywulZp98ho
+        2X2/My38VTdYGJpK3fgbDtU+fcMVbXfuRcy3n7GOfd6ruJ8I90eFl2gtNw8++jn9XvHp15Lb
+        Emw8j+5UEW66wvmNa/mfQgObV6sdHZcrZhcffDJBJkeX+/DFsH99C+V/tRkEpEao3rnmrBJW
+        sCLz9vo/PPzbrky78YqxMZh7nf29jsglzd5TtOy2LJZRYinOSDTUYi4qTgQACiPo5GgDAAA=
+X-CMS-MailID: 20220924115629eucas1p16b9ad95f3f797b2f4a6d2178e6426ff4
+X-Msg-Generator: CA
+X-RootMTR: 20220923145245eucas1p107655755f446bb1e1318539a3f82d301
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220923145245eucas1p107655755f446bb1e1318539a3f82d301
+References: <20220922182805.96173-1-axboe@kernel.dk>
+        <20220922182805.96173-2-axboe@kernel.dk>
+        <CGME20220923145245eucas1p107655755f446bb1e1318539a3f82d301@eucas1p1.samsung.com>
+        <20220923145236.pr7ssckko4okklo2@quentin>
+        <c7b76fa1-f7e3-3ac6-c92d-35baa0d9a40a@samsung.com>
+        <2e484ccb-b65b-2991-e259-d3f7be6ad1a6@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The background is that we use dpu in cloud computing,the arch is x86,80
-cores.We will have a lots of virtio devices,like 512 or more.
-When we probe about 200 virtio_blk devices,it will fail and
-the stack is print as follows:
+>>> As the passthrough path can now support request caching via blk_mq_alloc_request(),
+>>> and it uses blk_execute_rq_nowait(), bad things can happen at least for zoned
+>>> devices:
+>>>
+>>> static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+>>> {
+>>> 	/* Zoned block device write operation case: do not plug the BIO */
+>>> 	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
+>>> 		return NULL;
+>>> ..
+>>
+>> Thinking more about it, even this will not fix it because op is
+>> REQ_OP_DRV_OUT if it is a NVMe write for passthrough requests.
+>>
+>> @Damien Should the condition in blk_mq_plug() be changed to:
+>>
+>> static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+>> {
+>> 	/* Zoned block device write operation case: do not plug the BIO */
+>> 	if (bdev_is_zoned(bio->bi_bdev) && !op_is_read(bio_op(bio)))
+>> 		return NULL;
+> 
+> That looks reasonable to me. It'll prevent plug optimizations even
+> for passthrough on zoned devices, but that's probably fine.
+> 
 
-[25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver
-[25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)
-[25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-305.30.1.el8.x86_64
-[25338.516403] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.21 08/25/2021
-[25338.523881] Workqueue: events work_for_cpu_fn
-[25338.528235] Call Trace:
-[25338.530687]  dump_stack+0x5c/0x80
-[25338.534000]  __setup_irq.cold.53+0x7c/0xd3
-[25338.538098]  request_threaded_irq+0xf5/0x160
-[25338.542371]  vp_find_vqs+0xc7/0x190
-[25338.545866]  init_vq+0x17c/0x2e0 [virtio_blk]
-[25338.550223]  ? ncpus_cmp_func+0x10/0x10
-[25338.554061]  virtblk_probe+0xe6/0x8a0 [virtio_blk]
-[25338.558846]  virtio_dev_probe+0x158/0x1f0
-[25338.562861]  really_probe+0x255/0x4a0
-[25338.566524]  ? __driver_attach_async_helper+0x90/0x90
-[25338.571567]  driver_probe_device+0x49/0xc0
-[25338.575660]  bus_for_each_drv+0x79/0xc0
-[25338.579499]  __device_attach+0xdc/0x160
-[25338.583337]  bus_probe_device+0x9d/0xb0
-[25338.587167]  device_add+0x418/0x780
-[25338.590654]  register_virtio_device+0x9e/0xe0
-[25338.595011]  virtio_pci_probe+0xb3/0x140
-[25338.598941]  local_pci_probe+0x41/0x90
-[25338.602689]  work_for_cpu_fn+0x16/0x20
-[25338.606443]  process_one_work+0x1a7/0x360
-[25338.610456]  ? create_worker+0x1a0/0x1a0
-[25338.614381]  worker_thread+0x1cf/0x390
-[25338.618132]  ? create_worker+0x1a0/0x1a0
-[25338.622051]  kthread+0x116/0x130
-[25338.625283]  ? kthread_flush_work_fn+0x10/0x10
-[25338.629731]  ret_from_fork+0x1f/0x40
-[25338.633395] virtio_blk: probe of virtio418 failed with error -16
+Do you want me send a separate patch for this change or you will fold it in
+the existing series?
 
-After I did some work of this stack,took stap and crash to get more
-information,I found that the auto irq_affinity affect this.
-When "vp_find_vqs" call "vp_find_vqs_msix" failed,it will be go back
-to call vp_find_vqs_msix again with ctx be false, and when it failed again,
-we will call vp_find_vqs_intx,if the vp_dev->pci_dev->irq is zero,
-we will get a backtrace like above.
-
-The log :
-"genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)"
-was print because of the irq 0 is used by timer exclusive,and when
-vp_find_vqs called vp_find_vqs_msix and return false twice,then it will
-call vp_find_vqs_intx for the last try.
-Because vp_dev->pci_dev->irq is zero,so it will be request irq 0 with
-flag IRQF_SHARED.
-
-without config CONFIG_GENERIC_IRQ_DEBUGFS,
-I found that we called vp_find_vqs_msix failed twice because of
-the irq resource was exhausted.
-
-crash> irq_domain.name,parent 0xffff9bff87d4dec0
-  name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"
-  parent = 0xffff9bff87400000
-crash> irq_domain.name,parent 0xffff9bff87400000
-  name = 0xffff9bff87c24300 "INTEL-IR-1"
-  parent = 0xffff9bff87c6c900
-crash> irq_domain.name,parent 0xffff9bff87c6c900
-  name = 0xffff9bff87c3ecd0 "VECTOR"
-  parent = 0x0----------------------the highest level
-
-and stap irq_matrix_alloc_managed get return value -ENOSPC.
-
-When no virtio_blk device probe,the vctor_matrix is:
-crash>  p *vector_matrix
-$1 = {
-  matrix_bits = 256,
-  alloc_start = 32,
-  alloc_end = 236,
-  alloc_size = 204,
-  global_available = 15593,
-  global_reserved = 149,
-  systembits_inalloc = 3,
-  total_allocated = 409,
-  online_maps = 80,
-  maps = 0x2ff20,
-  scratch_map = {1161063342014463, 0, 1, 18446726481523507200,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  system_map = {1125904739729407, 0, 1, 18446726481523507200,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-}
-
-When the dump stack occur,the vector_matrix of system is exhausted.
-crash> p *vector_matrix
-$82 = {
-  matrix_bits = 256,
-  alloc_start = 32,
-  alloc_end = 236,
-  alloc_size = 204,
-  global_available = 0,//caq:irq left
-  global_reserved = 151,
-  systembits_inalloc = 3,
-  total_allocated = 1922,//caq:irq that allocated
-  online_maps = 80,
-  maps = 0x2ff20,
-  scratch_map = {18446744069952503807, 18446744073709551615,
- 18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  system_map = {1125904739729407, 0, 1, 18446726481523507200,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-}
-
-And we tested the virtio_blk device which request irq success,
-we found that in a system with 80 cores and two numa ,one
-virtio_blk device with just two data queues consume 81 irqs capacity,
-Although it just only three irqs in /proc/interrupt,80 irqs capacity 
-is effected by function "irq_build_affinity_masks" with 2*40.
-
-before one virtio_blk device hotplug out:
-crash> p *vector_matrix
-$2 = {
-  matrix_bits = 256,
-  alloc_start = 32,
-  alloc_end = 236,
-  alloc_size = 204,
-  global_available = 15215,
-  global_reserved = 150,
-  systembits_inalloc = 3,
-  total_allocated = 553,
-  online_maps = 80,
-  maps = 0x2ff20,
-  scratch_map = {1179746449752063, 0, 1, 18446726481523507200, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
- 0, 0, 0, 0, 0},
-  system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0}
-}
-
-after one virtio_blk device hotplug out:
-crash> p *vector_matrix
-$3 = {
-  matrix_bits = 256,
-  alloc_start = 32,
-  alloc_end = 236,
-  alloc_size = 204,
-  global_available = 15296,---it increase 81,include 1 config irq.
-  global_reserved = 150,
-  systembits_inalloc = 3,
-  total_allocated = 550,------it just decrease 3.
-  online_maps = 80,
-  maps = 0x2ff20,
-  scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0},
-  system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
- 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
- 0, 0, 0, 0, 0}
-}
-
-We test the new kernel also,it occur the same result.
-[Fri Sep 23 04:51:42 2022] genirq: Flags mismatch irq 0. 00000080 (virtio608) vs. 00015a00 (timer)
-[Fri Sep 23 04:51:42 2022] CPU: 0 PID: 5749 Comm: kworker/0:0 Kdump: loaded Tainted: G        W  OE      6.0.0-rc6+ #5
-[Fri Sep 23 04:51:42 2022] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.19 06/16/2021
-[Fri Sep 23 04:51:42 2022] Workqueue: events work_for_cpu_fn
-[Fri Sep 23 04:51:42 2022] Call Trace:
-[Fri Sep 23 04:51:42 2022]  <TASK>
-[Fri Sep 23 04:51:42 2022]  dump_stack_lvl+0x33/0x46
-[Fri Sep 23 04:51:42 2022]  __setup_irq+0x705/0x770
-[Fri Sep 23 04:51:42 2022]  request_threaded_irq+0x109/0x170
-[Fri Sep 23 04:51:42 2022]  vp_find_vqs+0xc4/0x190
-[Fri Sep 23 04:51:42 2022]  init_vqs+0x348/0x580 [virtio_net]
-[Fri Sep 23 04:51:42 2022]  virtnet_probe+0x54d/0xa80 [virtio_net]
-[Fri Sep 23 04:51:42 2022]  virtio_dev_probe+0x19c/0x240
-[Fri Sep 23 04:51:42 2022]  really_probe+0x106/0x3e0
-[Fri Sep 23 04:51:42 2022]  ? pm_runtime_barrier+0x4f/0xa0
-[Fri Sep 23 04:51:42 2022]  __driver_probe_device+0x79/0x170
-[Fri Sep 23 04:51:42 2022]  driver_probe_device+0x1f/0xa0
-[Fri Sep 23 04:51:42 2022]  __device_attach_driver+0x85/0x110
-[Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-[Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-[Fri Sep 23 04:51:42 2022]  bus_for_each_drv+0x67/0xb0
-[Fri Sep 23 04:51:42 2022]  __device_attach+0xe9/0x1b0
-[Fri Sep 23 04:51:42 2022]  bus_probe_device+0x87/0xa0
-[Fri Sep 23 04:51:42 2022]  device_add+0x59f/0x950
-[Fri Sep 23 04:51:42 2022]  ? dev_set_name+0x4e/0x70
-[Fri Sep 23 04:51:42 2022]  register_virtio_device+0xac/0xf0
-[Fri Sep 23 04:51:42 2022]  virtio_pci_probe+0x101/0x170
-[Fri Sep 23 04:51:42 2022]  local_pci_probe+0x42/0xa0
-[Fri Sep 23 04:51:42 2022]  work_for_cpu_fn+0x13/0x20
-[Fri Sep 23 04:51:42 2022]  process_one_work+0x1c2/0x3d0
-[Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-[Fri Sep 23 04:51:42 2022]  worker_thread+0x1b9/0x360
-[Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-[Fri Sep 23 04:51:42 2022]  kthread+0xe6/0x110
-[Fri Sep 23 04:51:42 2022]  ? kthread_complete_and_exit+0x20/0x20
-[Fri Sep 23 04:51:42 2022]  ret_from_fork+0x1f/0x30
-[Fri Sep 23 04:51:42 2022]  </TASK>
-[Fri Sep 23 04:51:43 2022] virtio_net: probe of virtio608 failed with error -16
-
-Fixes: ad71473d9c43 ("virtio_blk: use virtio IRQ affinity")
-Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
-Tested-by: Liming Wu <liming.wu@jaguarmicro.com>
----
- drivers/block/virtio_blk.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index a8bcf3f664af..075de30a9bb4 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -513,7 +513,6 @@ static int init_vq(struct virtio_blk *vblk)
- 	struct virtqueue **vqs;
- 	unsigned short num_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
--	struct irq_affinity desc = { 0, };
- 
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
- 				   struct virtio_blk_config, num_queues,
-@@ -548,7 +547,7 @@ static int init_vq(struct virtio_blk *vblk)
- 	}
- 
- 	/* Discover virtqueues and write information to configuration.  */
--	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
-+	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, NULL);
- 	if (err)
- 		goto out;
- 
--- 
-2.17.1
-
+--
+Pankaj
