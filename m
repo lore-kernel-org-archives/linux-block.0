@@ -2,95 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45055C32771
-	for <linux-block@archiver.kernel.org>; Sat, 24 Sep 2022 15:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 905EBC07E9D
+	for <linux-block@archiver.kernel.org>; Sat, 24 Sep 2022 15:32:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbiIXPAP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Sep 2022 11:00:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45056 "EHLO
+        id S231462AbiIXPcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Sep 2022 11:32:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230111AbiIXPAO (ORCPT
+        with ESMTP id S229599AbiIXPcw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Sep 2022 11:00:14 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A0B922BC9
-        for <linux-block@vger.kernel.org>; Sat, 24 Sep 2022 08:00:12 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id c198so2691099pfc.13
-        for <linux-block@vger.kernel.org>; Sat, 24 Sep 2022 08:00:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
-        bh=/ZxmoZGavmWNlrZnawkbXveh01Wn367vmE/VNkXmIdw=;
-        b=s25ZCs1tSDwZADqqqf1Vm4xt2zv7eMrlkQYv4xQaqPF3mPJzzvhB2mzxAqxPkb32pK
-         NHAqqy/qx4pNcfeO5zqFmmWF2ufBVP1cOVbbxVTdLQvPTSHxLDM+xweoWGa34eoy6rDG
-         dyyruF1ntIIDA6CvCIvQDTZADmji0DJAHX5s0Vhfrhdfq4gt11Qo5ttrdt7FnYlOgmiM
-         g8G3lY1JxPY4sBzH8MwvY9x6UDIuc8ekZ8AqGfJh5wk+r/EmtPVkEnjYkiP/kHjK9ETv
-         OYDkJBXcuZFyiUKv4Aw+s8K/uMug7rbzVAcHajZOqT5eH86LKpfotHSrJsWWt7a+AOji
-         zcSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=/ZxmoZGavmWNlrZnawkbXveh01Wn367vmE/VNkXmIdw=;
-        b=TLySxMp2TqCrUTiKivYLYUxWxVOKiVy11wAdAlEYTN+FS2LE+lX7sInLYiNvBoX9dF
-         td16O5TQTRhXwKaZnhFU+pJCLJPhjgSkt0UEygBJAFIWGVhW7zQVbABVjOqlqkh68VtW
-         72900mgwPenAsr7jACEFzeWPHDWf0LQQzg5WjkIPOy6Q398iJS8rPToFsIp4/UQRoXb2
-         AjQ03W9Y0+4sI1ZcFt39KUz2TP/NWMN918j5afXhKHRSWjSgnZpTwBoSSicdEiHiGfI1
-         fNh5uCVsw6XZR7oTMPdOk+w3aRxqQ+nQ5mTRy8O0izQ4etMOakoBPYFLSrl0RHfWAiTy
-         xeJA==
-X-Gm-Message-State: ACrzQf1aQJec7ppURqC4qRXVfbtTXhESUwDO1SnAjz6ehxlxruRN1mTI
-        mtoeb5b4j9j+HULo7mb9KnRNY5uXRKnWDA==
-X-Google-Smtp-Source: AMsMyM5+ef+aw0XcysL1aexhvPjDjgsey9VsVY7POoHb/1mlXyhvyLCmIyCeSI3bLtHy1j0OgNAhEA==
-X-Received: by 2002:a63:5d48:0:b0:43a:390b:2183 with SMTP id o8-20020a635d48000000b0043a390b2183mr12204841pgm.29.1664031611841;
-        Sat, 24 Sep 2022 08:00:11 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id k1-20020a170902760100b0017870f471f6sm7848200pll.226.2022.09.24.08.00.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Sep 2022 08:00:11 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tj@kernel.org, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, yi.zhang@huawei.com,
-        yukuai3@huawei.com
-In-Reply-To: <20220921095309.1481289-1-yukuai1@huaweicloud.com>
-References: <20220921095309.1481289-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH 0/2] blk-throttle: improve bypassing bios checkings
-Message-Id: <166403161084.5171.274436515046613194.b4-ty@kernel.dk>
-Date:   Sat, 24 Sep 2022 09:00:10 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.10.0-dev-355bd
+        Sat, 24 Sep 2022 11:32:52 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84C427DE6
+        for <linux-block@vger.kernel.org>; Sat, 24 Sep 2022 08:32:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7EC5B60CF6
+        for <linux-block@vger.kernel.org>; Sat, 24 Sep 2022 15:32:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E3069C433D7;
+        Sat, 24 Sep 2022 15:32:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664033570;
+        bh=bG1TGkDRm1MkzJREnelP1Iywwkq5lkpP3S+IznE3kWc=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=j3l+S4aHXjpHFFrkYl0pKkTgfEYk+S/hl3Xd3y1rPouZAgaqWIkQ/6qC+R7LsMfJy
+         fVDCuZ+y9EIGAXA8axfSVL2PHmoEan/9wjf9V8tc8Z5fktj4L4T6UT1M5pijgN7NNz
+         92iBHKJDl+NMOovlsGGw0CdTE5OOIcRpiKWyPSTpdTfHjGnAuQvIznxqKktFBqkUra
+         32FxxeI60bXUma+MBbzx+L9fD6OqB3s1Ka3ST4sgpE9CKuIZXQwz1JgSW2E+Axl/6D
+         oRfM6w2P7g++UUtGByS/AoRR+UVZb679ghnWO4fLvHnuDtJ8t7SxKIUC8z4wAlp8Gs
+         IqS2XcgrvmnGA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D24BDC072E7;
+        Sat, 24 Sep 2022 15:32:50 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.0-rc7
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <0e2b98ab-dd42-074d-ebc3-b9bd3deb779a@kernel.dk>
+References: <0e2b98ab-dd42-074d-ebc3-b9bd3deb779a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <0e2b98ab-dd42-074d-ebc3-b9bd3deb779a@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.0-2022-09-22
+X-PR-Tracked-Commit-Id: 4c66a326b5ab784cddd72de07ac5b6210e9e1b06
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0be27f7be2e5def5577de097fb420af09acf0983
+Message-Id: <166403357085.24842.15096547480324127091.pr-tracker-bot@kernel.org>
+Date:   Sat, 24 Sep 2022 15:32:50 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 21 Sep 2022 17:53:07 +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Currently, "tg->has_rules" and "tg->flags & THROTL_TG_HAS_IOPS_LIMIT"
-> both try to bypass bios that don't need to be throttled, however, they are
-> a little redundant and both not perfect:
-> 
-> 1) "tg->has_rules" only distinguish read and write, but not iops and bps
->    limit.
-> 2) "tg->flags & THROTL_TG_HAS_IOPS_LIMIT" only check if iops limit
->    exist, read and write is not distinguished, and bps limit is not
->    checked.
-> 
-> [...]
+The pull request you sent on Fri, 23 Sep 2022 15:07:29 -0600:
 
-Applied, thanks!
+> git://git.kernel.dk/linux.git tags/block-6.0-2022-09-22
 
-[1/2] blk-throttle: remove THROTL_TG_HAS_IOPS_LIMIT
-      commit: 85496749904016f36b69332f73a1cf3ecfee828f
-[2/2] blk-throttle: improve bypassing bios checkings
-      commit: 81c7a63abc7c0be572b4f853e913ce93a34f6e1b
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0be27f7be2e5def5577de097fb420af09acf0983
 
-Best regards,
+Thank you!
+
 -- 
-Jens Axboe
-
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
