@@ -2,111 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A60DC04A95
-	for <linux-block@archiver.kernel.org>; Sun, 25 Sep 2022 22:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B25F1C6FA82
+	for <linux-block@archiver.kernel.org>; Sun, 25 Sep 2022 22:55:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbiIYWa6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 25 Sep 2022 18:30:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
+        id S229850AbiIYWzU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 25 Sep 2022 18:55:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiIYWa5 (ORCPT
+        with ESMTP id S229722AbiIYWzS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 25 Sep 2022 18:30:57 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975CE28E16;
-        Sun, 25 Sep 2022 15:30:55 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id g20so5601617ljg.7;
-        Sun, 25 Sep 2022 15:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=a0hPbzQaBpMZbWVLyY6Ndr2md1EPl8heRcl2lfx1uao=;
-        b=prIsjwSViz1wXo7G4+dw2QMAUYRqb+JaN8xLaFU0Mpm720vsQlKbiP86kSyjK6/J2f
-         UGL1JMA+tZbm+36axWkxsWe76LZ50jIgn88og12tFEhHuVazHWUXqmuxCGQQTATOLLmZ
-         spdrcaq4Lzuq2ssEmvib39fmILwUzpX8VRsbe7Lq+Qajv529JR0stTj6IQi6cEHLkmKh
-         OafABWRhWwcww6JDyoK0lU7XrAFw9x3u/15eQrfGPJIta/7hVKMeZBDesROTh0WhRfJi
-         Nfd032HRBElAfY2jFOTPhNqIK1eLWkfEokcM8b151gDnjM4vSzgW3h4PbTqXJUyDvznl
-         W5NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=a0hPbzQaBpMZbWVLyY6Ndr2md1EPl8heRcl2lfx1uao=;
-        b=gAlFmgyZTnyggUK+6w5HNuc2f3JCjR9nQm+JveIwHSL/ygAkn8xKRad6N0ThML26ll
-         ZHI4Tz+bxHR/7Qt5z1URJybe6U+f9mVHIeoNt88/WIpMJKIr45BcIfc4vHeYfOUxcKnf
-         L2rZb1W2W93lwiI5oL37oYSTItVo697/7O64nEsfRw7zovKFyYBHwmyZEddIGDzw5ioj
-         gG/rzbXubFyHGzEdqqiBak22IwOOdE5v7DtcphAoxdLDGF9Z4sZviUuczWxGCX8O/1MY
-         MpGnV9Z6pvlotfXPX/R76pCiK5dUqBz59z/9B3onmlT7cm/Y2KePbn9RIlXkVGWRSQa+
-         1wzg==
-X-Gm-Message-State: ACrzQf37CXm6GdfKPC9+iJ9JNN4/h0TYFku6nK3oC8lOP/SgQrBnM8xm
-        QJSnycm1tXvYcgilVGTV1xY=
-X-Google-Smtp-Source: AMsMyM6HNh9b7WyDnzcSuSoW1HsGYT8oADEab3CivQY//vuQJo3RvP7/TJc7qf3WbBEZsPmwfLKAhQ==
-X-Received: by 2002:a2e:7d13:0:b0:26c:4062:acfe with SMTP id y19-20020a2e7d13000000b0026c4062acfemr6763157ljc.201.1664145053791;
-        Sun, 25 Sep 2022 15:30:53 -0700 (PDT)
-Received: from mobilestation ([95.79.140.178])
-        by smtp.gmail.com with ESMTPSA id l10-20020a056512110a00b0049f9c732858sm2322995lfg.254.2022.09.25.15.30.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Sep 2022 15:30:53 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 01:30:51 +0300
-From:   Serge Semin <fancer.lancer@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>,
-        Scott Bauer <scott.bauer@intel.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: sed-opal: Cache-line-align the cmd/resp
- buffers
-Message-ID: <20220925223051.5vem3ab4267jlxeg@mobilestation>
-References: <20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru>
- <20220909191916.16013-3-Sergey.Semin@baikalelectronics.ru>
- <20220910053203.GB23052@lst.de>
- <20220911162854.ivoeyzilpboplldw@mobilestation>
+        Sun, 25 Sep 2022 18:55:18 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA2CE1EACC
+        for <linux-block@vger.kernel.org>; Sun, 25 Sep 2022 15:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1664146516; x=1695682516;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=x2YbQXgRBgGLdhgg+0qdqVm+nwP0pOEuZfWlKM5zf7Q=;
+  b=f9g5q+CyacetcDq73VshVxWX8d8sTzBOwGEaKufKkzsHKORtfyWH9im7
+   OpxmRLfzXIGwWdmDb8raNm2PwFELRRB3b+uuH/g55RhevhWdFQqowiqj0
+   Qg6QIv6SD3dvagXP/KHiWGjpN0biAf+nsLqqKACdxLYkiE0ZVjZK2ZDzU
+   lGIKlRX2Lyte3cXWa7IoXh6uYS5Ry0dzTkqOfzXn/4uRC8l47D2HAI4Im
+   KPMl1RTMIdNSgoYTl9VZX/bQUzXdZISpqOKmcslD5wqldwz14HFgFXd26
+   HGBOEwh/YxSnCt6kOLdGanZiSP+/sX9XjC0MZ2wF/Fg5R7ePi2XkU3rsp
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.93,345,1654531200"; 
+   d="scan'208";a="324337792"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Sep 2022 06:55:16 +0800
+IronPort-SDR: PjpVmQV2dJXHXwsBbULKobVHIycyTXKiUo0ik8CDe4eQ2AEsWWIIiQqJnfsH02gipiCboVv5P8
+ nXZXA5ixYLn42BPAqDfmkOWm3NZh+L/ksDt2fWAouVncXYcW9Eb2fHfoNghJsLNrBjMDH0gEel
+ SGFeySJvhnv/7db7Ipig07Q4oiUlEIu95VCED22fBwLSI7151JnoB1xPESldwKBtyS6+zRLDDv
+ y1+J11jCa0u3NnHDOmodDikAwRd7nrS1EXm5fC9573zLHi3DKtmsuGy7haq+CRPHRCyEQpZXdg
+ z/yJ8qi9FQDm3L74geRAkmQR
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Sep 2022 15:09:43 -0700
+IronPort-SDR: qJc8nW9DZutzD/0pGBg5hZ3oKcKUq6r5+tZVO6yAgCOAPF2N6p1dZrEFsAVteA8nKyC+BzLqrv
+ 4gBHk1JVkZ0cUKPfJixIik725x9ZcEOIQAHzYxPVQCiw1/rgSYbcEZUXYdGx6RlCG6nNYr9v+k
+ 6druri3zq/eCj1skSAAO6+EX+S3AI4Wc2QWaPpRhM7PZjb5xwzvcNMRLGPDiERmF5vCSMyT1FF
+ Y2M9cX+CUg/qCIBwfAMNkmnp3udCkVYMLN544dQ6Jgy9sBoM1apD2Quok9oER/zgWdrL5kMzzO
+ tPM=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Sep 2022 15:55:17 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MbLnb5jDSz1Rwrq
+        for <linux-block@vger.kernel.org>; Sun, 25 Sep 2022 15:55:15 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:content-language:references:to
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1664146515; x=1666738516; bh=x2YbQXgRBgGLdhgg+0qdqVm+nwP0pOEuZfW
+        lKM5zf7Q=; b=DGgOiG4NJcbLvclB6n45vIfG7JhSGBpAFYir+mth2fgJGV22x1T
+        KNQ3D8tSrQl0p0U5f+cs3E6ufAUFqhqLiqaVaO4935NU6P2t7sTs3x+e6hN8O2d0
+        URfIokS4omzZ8lISEzJW7IiVIpLgChIm/XLEkgUquZ1WgTG8BMxEDnYA4j9JrdXG
+        hDby9MEuD7FmX/2VQAV5nJB6w0/F+pekvO3uZW8CmWPxvF85QS6yhflUWx0f37bU
+        DiEXJcoxci/BFzG1QGuxAKD6HIfI9AbRS3MTVEFItFXfjj8DIuNW3qCsascIoJLD
+        N0ZoyyIG6yd4MQn+8wEkUOAHDRs/pEZXUmA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 9ZDVTAkI7Bug for <linux-block@vger.kernel.org>;
+        Sun, 25 Sep 2022 15:55:15 -0700 (PDT)
+Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MbLnZ4P6Dz1RvLy;
+        Sun, 25 Sep 2022 15:55:14 -0700 (PDT)
+Message-ID: <736c593b-a8cb-0e68-c895-cb89bc29b68e@opensource.wdc.com>
+Date:   Mon, 26 Sep 2022 07:55:13 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220911162854.ivoeyzilpboplldw@mobilestation>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH 1/2] block: modify blk_mq_plug() to allow only reads for
+ zoned block devices
+To:     Pankaj Raghav <p.raghav@samsung.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk
+Cc:     gost.dev@samsung.com
+References: <20220925185348.120964-1-p.raghav@samsung.com>
+ <CGME20220925185350eucas1p1fc354429027a88de7e548a3a4529b4ef@eucas1p1.samsung.com>
+ <20220925185348.120964-2-p.raghav@samsung.com>
+Content-Language: en-US
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220925185348.120964-2-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-@Jens, @Revanth, @Jonathan do you have anything to say regarding the
-patch and what @Christoph suggested?
+On 9/26/22 03:53, Pankaj Raghav wrote:
+> Modify blk_mq_plug() to allow plugging only for read operations in zoned
+> block devices as there are alternative IO paths in the linux block
+> layer which can end up doing a write via driver private requests in
+> sequential write zones.
+> 
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+>   block/blk-mq.h | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 8ca453ac243d..005343df64ca 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -305,14 +305,15 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>    * change can cause write BIO failures with zoned block devices as these
+>    * require sequential write patterns to zones. Prevent this from happening by
+>    * ignoring the plug state of a BIO issuing context if it is for a zoned block
+> - * device and the BIO to plug is a write operation.
+> + * device and the BIO to plug is not a read operation.
+> + *
+>    *
+>    * Return current->plug if the bio can be plugged and NULL otherwise
+>    */
+>   static inline struct blk_plug *blk_mq_plug( struct bio *bio)
+>   {
+> -	/* Zoned block device write operation case: do not plug the BIO */
+> -	if (bdev_is_zoned(bio->bi_bdev) && op_is_write(bio_op(bio)))
+> +	/* Allow plugging only for read operations in zoned block devices */
 
-On Sun, Sep 11, 2022 at 07:28:57PM +0300, Serge Semin wrote:
-> Hello Christoph
-> 
-> On Sat, Sep 10, 2022 at 07:32:03AM +0200, Christoph Hellwig wrote:
-> > On Fri, Sep 09, 2022 at 10:19:16PM +0300, Serge Semin wrote:
-> > > In accordance with [1] the DMA-able memory buffers must be
-> > > cacheline-aligned otherwise the cache writing-back and invalidation
-> > > performed during the mapping may cause the adjacent data being lost. It's
-> > > specifically required for the DMA-noncoherent platforms. Seeing the
-> > > opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
-> > > drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
-> > > respectively we must make sure the passed buffers are cacheline-aligned to
-> > > prevent the denoted problem.
-> >
->  
-> > Same comment as for the previous one, this should work, but I think
-> > separate allocations for the DMAable buffers would document the intent
-> > much better.  Given that the opal initialization isn't a fast path
-> > I don't think that the overhead should matter either.
-> 
-> Thanks for the comment. I see your point. Let's hear the subsystem
-> maintainers out for their opinion regarding the most suitable solution
-> in this case. If they get to agree with you I'll resend the series
-> with altered fixes.
-> 
-> -Sergey
+nit: s/in/with
+
+> +	if (bdev_is_zoned(bio->bi_bdev) && bio_op(bio) != REQ_OP_READ)
+>   		return NULL;
+>   
+>   	/*
+
+Otherwise, looks good to me.
+
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+
+-- 
+Damien Le Moal
+Western Digital Research
+
