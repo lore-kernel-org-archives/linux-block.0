@@ -2,131 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FE5C32771
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 13:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC94C32771
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 14:24:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234731AbiIZNTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 09:19:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38534 "EHLO
+        id S229898AbiIZOYS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 10:24:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235538AbiIZNSq (ORCPT
+        with ESMTP id S234765AbiIZOXx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 09:18:46 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FA212636;
-        Mon, 26 Sep 2022 04:45:35 -0700 (PDT)
+        Mon, 26 Sep 2022 10:23:53 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6E7E5F92;
+        Mon, 26 Sep 2022 05:34:29 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C2D811F8AA;
-        Mon, 26 Sep 2022 11:44:16 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A50F71F999;
+        Mon, 26 Sep 2022 11:47:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1664192656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1664192847; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CqSXH5j7wLypgTtW8quzgrqoNG+t/F+4SqgHayo/knc=;
-        b=HDJm4MLCdDct087pWEvc+k9wsLS//GBd2cmiHIxGkFgJqa3j4RikzYogZ+522Usg7wzCtt
-        SSlIhpnH2WdLDR7eLdQGQwZMmR7fCHgb5HmKB155FkTSpty6VoxVCb9qET3puhYUCgURha
-        zvjDNJnTiHp44/HBhFbJIt6y3E4UU08=
+        bh=c/Dwa7jmGj4R9AMOKFQFRa0wpNExY5Nn0h5gzI93m5Q=;
+        b=qpUt7z34ITetIRwyKjRs9ItYJlZ5CuZJUYoj+fPxex2RQGQPYBucgu7Q0uMqaqxM0MNnDA
+        qzV0zpnugAhsZbgBa7NTTMNMhIwohEF0hyu0awNhPqIVz1CIihm3chmPDI5hUzYK3x5jv9
+        HZYsTPW71JJc1hWqJg4g1/BF8lyjNoo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1664192656;
+        s=susede2_ed25519; t=1664192847;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=CqSXH5j7wLypgTtW8quzgrqoNG+t/F+4SqgHayo/knc=;
-        b=RiZKcFGfR1OxHKCTb6ZcGrfyko2XNw3TO6dUjyulTIwg3aKzNDbVqXsXSm74rIodZXc5zx
-        1bnZGw3iUf2Zv9BQ==
+        bh=c/Dwa7jmGj4R9AMOKFQFRa0wpNExY5Nn0h5gzI93m5Q=;
+        b=efS8a39K9ZrBkDeaHwnEtkzMBW3HQJWELC8Oj99kOjXxZwZjQV3l9IH+Gxsv9P5KFr19Mp
+        jnv/XNkn+UHlWfAA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B3CBD139BD;
-        Mon, 26 Sep 2022 11:44:16 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8B9B7139BD;
+        Mon, 26 Sep 2022 11:47:27 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id Y5rYK5CQMWO9OgAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 26 Sep 2022 11:44:16 +0000
+        id 1xYLIk+RMWONPAAAMHmgww
+        (envelope-from <jack@suse.cz>); Mon, 26 Sep 2022 11:47:27 +0000
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 49BA1A0685; Mon, 26 Sep 2022 13:44:16 +0200 (CEST)
-Date:   Mon, 26 Sep 2022 13:44:16 +0200
+        id B363CA0685; Mon, 26 Sep 2022 13:47:26 +0200 (CEST)
+Date:   Mon, 26 Sep 2022 13:47:26 +0200
 From:   Jan Kara <jack@suse.cz>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Liu Song <liusong@linux.alibaba.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
-Message-ID: <20220926114416.t7t65u66ze76aiz7@quack3>
-References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com>
- <YyjdiKC0YYUkI+AI@kbusch-mbp>
- <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com>
- <20220921164012.s7lvklp2qk6occcg@quack3>
- <20220923144303.fywkmgnkg6eken4x@quack3>
- <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com>
- <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
- <391b1763-7146-857-e3b6-dc2a8e797162@google.com>
- <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH v3 1/5] wbt: don't show valid wbt_lat_usec in sysfs while
+ wbt is disabled
+Message-ID: <20220926114726.ta2w3vcbxgkh3sov@quack3>
+References: <20220922113558.1085314-1-yukuai3@huawei.com>
+ <20220922113558.1085314-2-yukuai3@huawei.com>
+ <20220926094434.jrl6gnlbjqkex3wa@quack3>
+ <6736753f-b5ae-39f1-b0c4-508b7f45d701@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6736753f-b5ae-39f1-b0c4-508b7f45d701@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 23-09-22 16:15:29, Hugh Dickins wrote:
-> On Fri, 23 Sep 2022, Hugh Dickins wrote:
-> > On Fri, 23 Sep 2022, Keith Busch wrote:
+On Mon 26-09-22 18:25:18, Yu Kuai wrote:
+> Hi, Jan
+> 
+> 在 2022/09/26 17:44, Jan Kara 写道:
+> > On Thu 22-09-22 19:35:54, Yu Kuai wrote:
+> > > Currently, if wbt is initialized and then disabled by
+> > > wbt_disable_default(), sysfs will still show valid wbt_lat_usec, which
+> > > will confuse users that wbt is still enabled.
+> > > 
+> > > This patch shows wbt_lat_usec as zero and forbid to set it while wbt
+> > > is disabled.
 > > 
-> > > Does the following fix the observation? Rational being that there's no reason
-> > > to spin on the current wait state that is already under handling; let
-> > > subsequent clearings proceed to the next inevitable wait state immediately.
-> > 
-> > It's running fine without lockup so far; but doesn't this change merely
-> > narrow the window?  If this is interrupted in between atomic_try_cmpxchg()
-> > setting wait_cnt to 0 and sbq_index_atomic_inc() advancing wake_index,
-> > don't we run the same risk as before, of sbitmap_queue_wake_up() from
-> > the interrupt handler getting stuck on that wait_cnt 0?
+> > So I agree we should show 0 in wbt_lat_usec if wbt is disabled by
+> > wbt_disable_default(). But why do you forbid setting of wbt_lat_usec?
+> > IMHO if wbt_lat_usec is set, admin wants to turn on wbt so we should just
+> > update rwb->enable_state to WBT_STATE_ON_MANUAL.
 > 
-> Yes, it ran successfully for 50 minutes, then an interrupt came in
-> immediately after the cmpxchg, and it locked up just as before.
-> 
-> Easily dealt with by disabling interrupts, no doubt, but I assume it's a
-> badge of honour not to disable interrupts here (except perhaps in waking).
+> I was thinking that don't enable wbt if elevator is bfq. Since we know
+> that performance is bad, thus it doesn't make sense to me to do that,
+> and user might doesn't aware of the problem.
 
-I don't think any magic with sbq_index_atomic_inc() is going to reliably
-fix this. After all the current waitqueue may be the only one that has active
-waiters so sbq_wake_ptr() will always end up returning this waitqueue
-regardless of the current value of sbq->wake_index.
-
-Honestly, this whole code needs a serious redesign. I have some
-simplifications in mind but it will take some thinking and benchmarking so
-we need some fix for the interim. I was pondering for quite some time about
-some band aid to the problem you've found but didn't find anything
-satisfactory.
-
-In the end I see two options: 
-
-1) Take your patch (as wrong as it is ;). Yes, it can lead to lost wakeups
-but we were living with those for a relatively long time so probably we can
-live with them for some longer.
-
-2) Revert Yu Kuai's original fix 040b83fcecfb8 ("sbitmap: fix possible io
-hung due to lost wakeup") and my fixup 48c033314f37 ("sbitmap: Avoid leaving
-waitqueue in invalid state in __sbq_wake_up()"). But then Keith would have
-to redo his batched accounting patches on top.
-
-> Some clever way to make the wait_cnt and wake_index adjustments atomic?
-> 
-> Or is this sbitmap_queue_wake_up() interrupting sbitmap_queue_wake_up()
-> just supposed never to happen, the counts preventing it: but some
-> misaccounting letting it happen by mistake?
-
-No, I think that is in principle a situation that we have to accommodate.
+Yeah, I don't think it is a good idea (that is the reason why it is
+disabled by default) but in priciple I don't see a reason why we should
+block admin from enabling it.
 
 								Honza
+
+> > > 
+> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > > Reported-and-tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+> > > ---
+> > >   block/blk-sysfs.c | 9 ++++++++-
+> > >   block/blk-wbt.c   | 7 +++++++
+> > >   block/blk-wbt.h   | 5 +++++
+> > >   3 files changed, 20 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > > index e1f009aba6fd..1955bb6a284d 100644
+> > > --- a/block/blk-sysfs.c
+> > > +++ b/block/blk-sysfs.c
+> > > @@ -467,10 +467,14 @@ static ssize_t queue_io_timeout_store(struct request_queue *q, const char *page,
+> > >   static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
+> > >   {
+> > > +	u64 lat;
+> > > +
+> > >   	if (!wbt_rq_qos(q))
+> > >   		return -EINVAL;
+> > > -	return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
+> > > +	lat = wbt_disabled(q) ? 0 : div_u64(wbt_get_min_lat(q), 1000);
+> > > +
+> > > +	return sprintf(page, "%llu\n", lat);
+> > >   }
+> > >   static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
+> > > @@ -493,6 +497,9 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
+> > >   			return ret;
+> > >   	}
+> > > +	if (wbt_disabled(q))
+> > > +		return -EINVAL;
+> > > +
+> > >   	if (val == -1)
+> > >   		val = wbt_default_latency_nsec(q);
+> > >   	else if (val >= 0)
+> > > diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+> > > index a9982000b667..68851c2c02d2 100644
+> > > --- a/block/blk-wbt.c
+> > > +++ b/block/blk-wbt.c
+> > > @@ -422,6 +422,13 @@ static void wbt_update_limits(struct rq_wb *rwb)
+> > >   	rwb_wake_all(rwb);
+> > >   }
+> > > +bool wbt_disabled(struct request_queue *q)
+> > > +{
+> > > +	struct rq_qos *rqos = wbt_rq_qos(q);
+> > > +
+> > > +	return !rqos || RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT;
+> > > +}
+> > > +
+> > >   u64 wbt_get_min_lat(struct request_queue *q)
+> > >   {
+> > >   	struct rq_qos *rqos = wbt_rq_qos(q);
+> > > diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+> > > index 7e44eccc676d..e42465ddcbb6 100644
+> > > --- a/block/blk-wbt.h
+> > > +++ b/block/blk-wbt.h
+> > > @@ -94,6 +94,7 @@ void wbt_enable_default(struct request_queue *);
+> > >   u64 wbt_get_min_lat(struct request_queue *q);
+> > >   void wbt_set_min_lat(struct request_queue *q, u64 val);
+> > > +bool wbt_disabled(struct request_queue *);
+> > >   void wbt_set_write_cache(struct request_queue *, bool);
+> > > @@ -125,6 +126,10 @@ static inline u64 wbt_default_latency_nsec(struct request_queue *q)
+> > >   {
+> > >   	return 0;
+> > >   }
+> > > +static inline bool wbt_disabled(struct request_queue *q)
+> > > +{
+> > > +	return true;
+> > > +}
+> > >   #endif /* CONFIG_BLK_WBT */
+> > > -- 
+> > > 2.31.1
+> > > 
+> 
 -- 
 Jan Kara <jack@suse.com>
 SUSE Labs, CR
