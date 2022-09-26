@@ -2,94 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD22C07E9D
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 16:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0129C32771
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 17:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbiIZQ6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 12:58:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
+        id S230354AbiIZRS7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 13:18:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230091AbiIZQ5w (ORCPT
+        with ESMTP id S230462AbiIZRSj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:57:52 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB07293;
-        Mon, 26 Sep 2022 08:54:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=GLjOCldwMSYbtIvOp9MNc738nkI+qSWqG0cQCtDGyYs=; b=iKgsgckx1BpnYBt1Ml1luRzlNo
-        UEaD93VJ/NaxUNW6l6hN4BiK/C+lXg9TvmRBVZsr6VTRgniAUARhROkGwU1gb/+ga6hgyHbqIk4/Z
-        MZ2vk2dp+YZ4n0PysUqI70IA94ZPELr3jKfzqB+j9wqcDa40U1/yUR6ed5i6U/Ooq6akJwUIH9LCc
-        4FE9DI2L7LRdgnfG+csHbDb8jVG/m3HrQoeTsrshIrc6b/uSVjKzkoMcldkhksDV/gf35W549vzaw
-        QW3k1gYHecYAhnbGFnhN3AfKto9jFnIhYWcwx925qCXeqVUi440PLfDtd4qG2idoghktcU6o/gEhs
-        CpXOoeeQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ocqQR-005okf-Pg; Mon, 26 Sep 2022 15:53:43 +0000
-Date:   Mon, 26 Sep 2022 08:53:43 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        David Hildenbrand <david@redhat.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
-Message-ID: <YzHLB4lGa2vktN7W@infradead.org>
-References: <YxhaJktqtHw3QTSG@infradead.org>
- <YyFPtTtxYozCuXvu@ZenIV>
- <20220914145233.cyeljaku4egeu4x2@quack3>
- <YyIEgD8ksSZTsUdJ@ZenIV>
- <20220915081625.6a72nza6yq4l5etp@quack3>
- <YyvG+Oih2A37Grcf@ZenIV>
- <YyxzYTlyGhbb2MOu@infradead.org>
- <Yy00eSjyxvUIp7D5@ZenIV>
- <Yy1x8QE9YA4HHzbQ@infradead.org>
- <Yy3bNjaiUoGv/djG@ZenIV>
+        Mon, 26 Sep 2022 13:18:39 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486ABE1098
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 09:32:45 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id h194so5680656iof.4
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 09:32:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=BxnsyrNOfRRvN4ZxwiPkZaVoZKcCqMXtLHTaeCguwX4=;
+        b=KBC9QeNVMBnQErEdrDFPIQawHLknQnGE6SAYOpJC3hxSMiGNYPpGNkAJ/FhdC/ClCg
+         tc1kiMOrX5LKuH1dYd29r02uKM0gtzoAguu1QcX3qOhLEazXtNHoJ65yGmqENYoHuwtm
+         6056Mt/ITJf9IEt5SohjtVrsCS2hIRg07g1QQRUU0BJEk1fSqr4U/6xXz8zIFQ8efmDR
+         iHvywvdbZIM39V1jNyxhAw27EDk4eCe4mpFQio6WcwZCxMc3v3nWtsYgC5PMhxSwujy1
+         zp8qsFkMt0ux5iYPgioDdgtXbBQXz2vnEjDAt+xazrVZQ1drrCo4XcLyBfO+GvlC3BhH
+         xWPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=BxnsyrNOfRRvN4ZxwiPkZaVoZKcCqMXtLHTaeCguwX4=;
+        b=7Md+5hnGn2fDkqkKqVF/zI6517Ci4yTVdQBpc1E0uFsmrzU5k8wkVd9ovcKMQuNRs+
+         HvoKyBNBiCUV3qzvh2XSa925tr9FWMPHU3HGinPmRt+WJPzJ/QxDm+hicFKZeSxq0MfV
+         3yB2QLrcE1Silj1S+o2VrgR8x6bfqocd/y5uaBPDY9hu8ZdUSSGJJQjSjCGFaS2PkQAG
+         dglHo3RSYj3MV6LxVLkzBC8yq/okDCuixfXwNJV9xDffzLGPvHo3ZOvRWUIJjBdtmlFf
+         jsocWtPW7i8cbw/XlFxbnvcekASD6SIsnCzq90xWyRdtnrN1AbCklEI46YxPuVwLv9we
+         O7Lg==
+X-Gm-Message-State: ACrzQf3w45+vQjw/x8BNmks/c7HhfQ6axWb7FZoT0Ai2csjXX0JrZVls
+        KinDVK00FOCxsmasB+4zd5QGcw==
+X-Google-Smtp-Source: AMsMyM7hRmBGrNShU4EhDsmsaeaEdPVCEoPbLI2JqvhBfa9c1h1+675I8JpTEILBHkfM48YVXbJjmQ==
+X-Received: by 2002:a05:6638:19:b0:35a:52a2:dfbe with SMTP id z25-20020a056638001900b0035a52a2dfbemr11450888jao.213.1664209961137;
+        Mon, 26 Sep 2022 09:32:41 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id h44-20020a022b2c000000b00358422fcc7bsm7194378jaa.120.2022.09.26.09.32.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Sep 2022 09:32:40 -0700 (PDT)
+Message-ID: <2ee6a897-87e7-0592-2482-9928a9a63ff6@kernel.dk>
+Date:   Mon, 26 Sep 2022 10:32:39 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yy3bNjaiUoGv/djG@ZenIV>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 1/2] block: modify blk_mq_plug() to allow only reads for
+ zoned block devices
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Pankaj Raghav <p.raghav@samsung.com>, linux-block@vger.kernel.org,
+        damien.lemoal@opensource.wdc.com, gost.dev@samsung.com
+References: <20220925185348.120964-1-p.raghav@samsung.com>
+ <CGME20220925185350eucas1p1fc354429027a88de7e548a3a4529b4ef@eucas1p1.samsung.com>
+ <20220925185348.120964-2-p.raghav@samsung.com>
+ <YzG5RgmWSsH6rX08@infradead.org>
+ <d5975b62-f2e9-dcde-e332-a73cca1f7fbf@kernel.dk>
+ <YzG6fZdz6XBDbrVB@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YzG6fZdz6XBDbrVB@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 05:13:42PM +0100, Al Viro wrote:
-> You are mixing two issues here - holding references to pages while using
-> iov_iter instance is obvious; holding them until async IO is complete, even
-> though struct iov_iter might be long gone by that point is a different
-> story.
+On 9/26/22 8:43 AM, Christoph Hellwig wrote:
+> On Mon, Sep 26, 2022 at 08:40:54AM -0600, Jens Axboe wrote:
+>> On 9/26/22 8:37 AM, Christoph Hellwig wrote:
+>>> On Sun, Sep 25, 2022 at 08:53:46PM +0200, Pankaj Raghav wrote:
+>>>> Modify blk_mq_plug() to allow plugging only for read operations in zoned
+>>>> block devices as there are alternative IO paths in the linux block
+>>>> layer which can end up doing a write via driver private requests in
+>>>> sequential write zones.
+>>>
+>>> We should be able to plug for all operations that are not
+>>> REQ_OP_ZONE_APPEND just fine.
+>>
+>> Agree, I think we just want to make this about someone doing a series
+>> of appends. If you mix-and-match with passthrough you will have a bad
+>> time anyway.
+> 
+> Err, sorry - what I wrote about is compelte garbage.  I initially
+> wanted to say you can plug for REQ_OP_ZONE_APPEND just fine, and then
+> realized that we also want various other ones that have the write bit
+> set batched.  So I suspect we really want to explicitly check for
+> REQ_OP_WRITE here.
 
-But someone needs to hold a refernce until the I/O is completed, because
-the I/O obviously needs the pages.  Yes, we could say the callers holds
-them and can drop the references right after I/O submission, while
-the method needs to grab another reference.  But that is more
-complicated and is more costly than just holding the damn reference.
+My memory was a bit hazy, since we have separate ops for the driver
+in/out, I think just checking for REQ_OP_WRITE is indeed the right
+choice. That's the single case we need to care about.
 
-> And originating iov_iter instance really can be long-gone by the time
-> of IO completion - requirement to keep it around would be very hard to
-> satisfy.  I've no objections to requiring the pages in ITER_BVEC to be
-> preserved at least until the IO completion by means independent of
-> whatever ->read_iter/->write_iter does to them, but
-> 	* that needs to be spelled out very clearly and
-> 	* we need to verify that it is, indeed, the case for all existing
-> iov_iter_bvec callers, preferably with comments next to non-obvious ones
-> (something that is followed only by the sync IO is obvious)
+-- 
+Jens Axboe
 
-Agreed.
 
-> That goes not just for bio - if we make get_pages *NOT* grab references
-> on ITER_BVEC (and I'm all for it), we need to make sure that those
-> pages won't be retained after the original protection runs out.
-
-Yes.
