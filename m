@@ -2,107 +2,285 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDC6C07E9D
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 07:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D11C3C07E9D
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 08:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234094AbiIZHK1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 03:10:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58588 "EHLO
+        id S233787AbiIZIVE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 04:21:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234025AbiIZHKB (ORCPT
+        with ESMTP id S233999AbiIZIUs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 03:10:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C610F3136D;
-        Mon, 26 Sep 2022 00:09:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9DE2361785;
-        Mon, 26 Sep 2022 07:09:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF6EDC433C1;
-        Mon, 26 Sep 2022 07:09:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1664176154;
-        bh=+wwySMrMtE5CQ6gKHpsT7ms5I9rHyoBUL87VEi0oDP0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=J1+NL5oeoW+aj/l9B3+3Sh9nqoAlC6A3JngBgscVBPS0e/Vu4dNrTNcVropQczx/Q
-         1O0L1R7HvLYovDo+zujHFZyS0OZ94oVCnahT6vgs3N8shPACeqX+NDWud7TJQBlCwQ
-         6pyQ9zpd9zuV44nlicUdPuMIXSf38Km8N+l4sTJ0=
-Date:   Mon, 26 Sep 2022 09:09:11 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Thorsten Leemhuis <regressions@leemhuis.info>,
-        Christoph Hellwig <hch@lst.de>,
-        Dusty Mabe <dusty@dustymabe.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Subject: Re: regression caused by block: freeze the queue earlier in
- del_gendisk
-Message-ID: <YzFQF3cccwK1G2FS@kroah.com>
-References: <Yx/jLTknQm9VeHi4@T590>
- <95cbd47d-46ed-850e-7d4f-851b35d03069@dustymabe.com>
- <f2c28043-59e6-0aee-b8bf-df38525ee899@leemhuis.info>
- <d39e9149-fcb6-1f7c-4c19-234e74f286f8@kernel.dk>
- <20220920141217.GA12560@lst.de>
- <9594af4b-eb16-0a51-9a4a-e21bbce3317d@kernel.dk>
- <6a3660b2-fa7d-14a2-6977-f50926ad369c@leemhuis.info>
- <c7c909aa-71d9-b43c-293e-d4801a00861e@kernel.dk>
- <Yysj6AXQ44/el4pS@kroah.com>
- <cecf4c71-14be-4ff8-df83-cfd1da102bcf@kernel.dk>
+        Mon, 26 Sep 2022 04:20:48 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379C21409E;
+        Mon, 26 Sep 2022 01:20:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ZuKd6TW+mKhC3stR7yoPnBhnZC3OTfRWvk29wHdin0o=; b=RdJRg8dP9q9+ADI4g1zdBEGndy
+        co+VTXCchZKduu3NpDbx5eS+7qDuB8oJmxBxmIumXDwWpvhhg/KFC7fNrIZg5s/aGX9b0rQ9T68f+
+        8fpSqz1VidPudbf6UGR0puHe/gnW9J33+c2tQZ4YpebvnXWiZBRLjIv/RxPd1N3zV8UsmmHPZDIuK
+        dlQL1zohBsavG6nBbThLscdKQFY9gJT9KHsntZQ8KmTFTuakII/gp1/HiZhYmiN8z7Q0bUhAozR0Y
+        3p2j5kTRvbxc8uHohurTXUNC1SpwcFpUO/jNVauTNJI6HHHzzD6+td7SRR6K42b5E6K6shqRP1RKl
+        GJq9ZarQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ocjLw-0036Ok-Ek; Mon, 26 Sep 2022 08:20:36 +0000
+Date:   Mon, 26 Sep 2022 01:20:36 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Angus Chen <angus.chen@jaguarmicro.com>
+Cc:     jasowang@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Liming Wu <liming.wu@jaguarmicro.com>, tglx@linutronix.de
+Subject: Re: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
+ init_rq
+Message-ID: <YzFg1H9k+rL34FVj@infradead.org>
+References: <20220924034854.323-1-angus.chen@jaguarmicro.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cecf4c71-14be-4ff8-df83-cfd1da102bcf@kernel.dk>
+In-Reply-To: <20220924034854.323-1-angus.chen@jaguarmicro.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 08:56:53AM -0600, Jens Axboe wrote:
-> On Wed, Sep 21, 2022 at 8:47 AM Greg KH <gregkh@linuxfoundation.org> wrote:
-> >
-> > On Wed, Sep 21, 2022 at 08:34:26AM -0600, Jens Axboe wrote:
-> > > On 9/21/22 3:25 AM, Thorsten Leemhuis wrote:
-> > > > On 20.09.22 16:14, Jens Axboe wrote:
-> > > >> On 9/20/22 8:12 AM, Christoph Hellwig wrote:
-> > > >>> On Tue, Sep 20, 2022 at 08:05:06AM -0600, Jens Axboe wrote:
-> > > >>>> Christoph and I discussed this one last week, and he has a plan to try
-> > > >>>> a flag approach. Christoph, did you get a chance to bang that out? Would
-> > > >>>> be nice to get this one wrapped up.
-> > > >>>
-> > > >>> I gave up on that as it will be far too much change so late in
-> > > >>> the cycle and sent you the revert yesterday.
-> > > >>
-> > > >> Gotcha, haven't made it all the way through the emails of the morning yet.
-> > > >> I'll queue it up.
-> > > >
-> > > > Thx to both of you for taking care of this.
-> > > >
-> > > > Nitpicking: that patch is missing a "CC: stable@..." tag to ensure
-> > > > automatic and quick backporting to 5.19.y. Or is the block layer among
-> > > > the subsystems that prefer to handle such things manually?
-> > > >
-> > > > Ohh, and a fixes tag might have been good as well; a "Link:" tag
-> > > > pointing to the report, too. If either would have been there, regzbot
-> > > > would have noticed Christoph's patch posting and I wouldn't have
-> > > > bothered you yesterday. :-) But whatever, not that important.
-> > >
-> > > We'll just have to ensure we ping stable on it when it goes in.
-> >
-> > If you have a git id that is not going to change, I can watch out for it
-> > to land in Linus's tree...
-> 
-> This is the one:
-> 
-> commit 4c66a326b5ab784cddd72de07ac5b6210e9e1b06 (origin/block-6.0, block-6.0)
-> Author: Christoph Hellwig <hch@lst.de>
-> Date:   Mon Sep 19 16:40:49 2022 +0200
-> 
->     Revert "block: freeze the queue earlier in del_gendisk"
-> 
-> Thanks Greg!
+On Sat, Sep 24, 2022 at 11:48:54AM +0800, Angus Chen wrote:
+> The background is that we use dpu in cloud computing,the arch is x86,80
+> cores.We will have a lots of virtio devices,like 512 or more.
+> When we probe about 200 virtio_blk devices,it will fail and
+> the stack is print as follows:
 
-Now queued up, thanks.
+I don't think managed irqs are your problem here, but only a symptom.
+Why is the timer irq allowed to be shared with PCI irqs to start with?
 
-greg k-h
+> 
+> [25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver
+> [25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)
+> [25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-305.30.1.el8.x86_64
+> [25338.516403] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.21 08/25/2021
+> [25338.523881] Workqueue: events work_for_cpu_fn
+> [25338.528235] Call Trace:
+> [25338.530687]  dump_stack+0x5c/0x80
+> [25338.534000]  __setup_irq.cold.53+0x7c/0xd3
+> [25338.538098]  request_threaded_irq+0xf5/0x160
+> [25338.542371]  vp_find_vqs+0xc7/0x190
+> [25338.545866]  init_vq+0x17c/0x2e0 [virtio_blk]
+> [25338.550223]  ? ncpus_cmp_func+0x10/0x10
+> [25338.554061]  virtblk_probe+0xe6/0x8a0 [virtio_blk]
+> [25338.558846]  virtio_dev_probe+0x158/0x1f0
+> [25338.562861]  really_probe+0x255/0x4a0
+> [25338.566524]  ? __driver_attach_async_helper+0x90/0x90
+> [25338.571567]  driver_probe_device+0x49/0xc0
+> [25338.575660]  bus_for_each_drv+0x79/0xc0
+> [25338.579499]  __device_attach+0xdc/0x160
+> [25338.583337]  bus_probe_device+0x9d/0xb0
+> [25338.587167]  device_add+0x418/0x780
+> [25338.590654]  register_virtio_device+0x9e/0xe0
+> [25338.595011]  virtio_pci_probe+0xb3/0x140
+> [25338.598941]  local_pci_probe+0x41/0x90
+> [25338.602689]  work_for_cpu_fn+0x16/0x20
+> [25338.606443]  process_one_work+0x1a7/0x360
+> [25338.610456]  ? create_worker+0x1a0/0x1a0
+> [25338.614381]  worker_thread+0x1cf/0x390
+> [25338.618132]  ? create_worker+0x1a0/0x1a0
+> [25338.622051]  kthread+0x116/0x130
+> [25338.625283]  ? kthread_flush_work_fn+0x10/0x10
+> [25338.629731]  ret_from_fork+0x1f/0x40
+> [25338.633395] virtio_blk: probe of virtio418 failed with error -16
+> 
+> After I did some work of this stack,took stap and crash to get more
+> information,I found that the auto irq_affinity affect this.
+> When "vp_find_vqs" call "vp_find_vqs_msix" failed,it will be go back
+> to call vp_find_vqs_msix again with ctx be false, and when it failed again,
+> we will call vp_find_vqs_intx,if the vp_dev->pci_dev->irq is zero,
+> we will get a backtrace like above.
+> 
+> The log :
+> "genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)"
+> was print because of the irq 0 is used by timer exclusive,and when
+> vp_find_vqs called vp_find_vqs_msix and return false twice,then it will
+> call vp_find_vqs_intx for the last try.
+> Because vp_dev->pci_dev->irq is zero,so it will be request irq 0 with
+> flag IRQF_SHARED.
+> 
+> without config CONFIG_GENERIC_IRQ_DEBUGFS,
+> I found that we called vp_find_vqs_msix failed twice because of
+> the irq resource was exhausted.
+> 
+> crash> irq_domain.name,parent 0xffff9bff87d4dec0
+>   name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"
+>   parent = 0xffff9bff87400000
+> crash> irq_domain.name,parent 0xffff9bff87400000
+>   name = 0xffff9bff87c24300 "INTEL-IR-1"
+>   parent = 0xffff9bff87c6c900
+> crash> irq_domain.name,parent 0xffff9bff87c6c900
+>   name = 0xffff9bff87c3ecd0 "VECTOR"
+>   parent = 0x0----------------------the highest level
+> 
+> and stap irq_matrix_alloc_managed get return value -ENOSPC.
+> 
+> When no virtio_blk device probe,the vctor_matrix is:
+> crash>  p *vector_matrix
+> $1 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 15593,
+>   global_reserved = 149,
+>   systembits_inalloc = 3,
+>   total_allocated = 409,
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {1161063342014463, 0, 1, 18446726481523507200,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+> }
+> 
+> When the dump stack occur,the vector_matrix of system is exhausted.
+> crash> p *vector_matrix
+> $82 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 0,//caq:irq left
+>   global_reserved = 151,
+>   systembits_inalloc = 3,
+>   total_allocated = 1922,//caq:irq that allocated
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {18446744069952503807, 18446744073709551615,
+>  18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+> }
+> 
+> And we tested the virtio_blk device which request irq success,
+> we found that in a system with 80 cores and two numa ,one
+> virtio_blk device with just two data queues consume 81 irqs capacity,
+> Although it just only three irqs in /proc/interrupt,80 irqs capacity 
+> is effected by function "irq_build_affinity_masks" with 2*40.
+> 
+> before one virtio_blk device hotplug out:
+> crash> p *vector_matrix
+> $2 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 15215,
+>   global_reserved = 150,
+>   systembits_inalloc = 3,
+>   total_allocated = 553,
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {1179746449752063, 0, 1, 18446726481523507200, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+>  0, 0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0}
+> }
+> 
+> after one virtio_blk device hotplug out:
+> crash> p *vector_matrix
+> $3 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 15296,---it increase 81,include 1 config irq.
+>   global_reserved = 150,
+>   systembits_inalloc = 3,
+>   total_allocated = 550,------it just decrease 3.
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0}
+> }
+> 
+> We test the new kernel also,it occur the same result.
+> [Fri Sep 23 04:51:42 2022] genirq: Flags mismatch irq 0. 00000080 (virtio608) vs. 00015a00 (timer)
+> [Fri Sep 23 04:51:42 2022] CPU: 0 PID: 5749 Comm: kworker/0:0 Kdump: loaded Tainted: G        W  OE      6.0.0-rc6+ #5
+> [Fri Sep 23 04:51:42 2022] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.19 06/16/2021
+> [Fri Sep 23 04:51:42 2022] Workqueue: events work_for_cpu_fn
+> [Fri Sep 23 04:51:42 2022] Call Trace:
+> [Fri Sep 23 04:51:42 2022]  <TASK>
+> [Fri Sep 23 04:51:42 2022]  dump_stack_lvl+0x33/0x46
+> [Fri Sep 23 04:51:42 2022]  __setup_irq+0x705/0x770
+> [Fri Sep 23 04:51:42 2022]  request_threaded_irq+0x109/0x170
+> [Fri Sep 23 04:51:42 2022]  vp_find_vqs+0xc4/0x190
+> [Fri Sep 23 04:51:42 2022]  init_vqs+0x348/0x580 [virtio_net]
+> [Fri Sep 23 04:51:42 2022]  virtnet_probe+0x54d/0xa80 [virtio_net]
+> [Fri Sep 23 04:51:42 2022]  virtio_dev_probe+0x19c/0x240
+> [Fri Sep 23 04:51:42 2022]  really_probe+0x106/0x3e0
+> [Fri Sep 23 04:51:42 2022]  ? pm_runtime_barrier+0x4f/0xa0
+> [Fri Sep 23 04:51:42 2022]  __driver_probe_device+0x79/0x170
+> [Fri Sep 23 04:51:42 2022]  driver_probe_device+0x1f/0xa0
+> [Fri Sep 23 04:51:42 2022]  __device_attach_driver+0x85/0x110
+> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
+> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
+> [Fri Sep 23 04:51:42 2022]  bus_for_each_drv+0x67/0xb0
+> [Fri Sep 23 04:51:42 2022]  __device_attach+0xe9/0x1b0
+> [Fri Sep 23 04:51:42 2022]  bus_probe_device+0x87/0xa0
+> [Fri Sep 23 04:51:42 2022]  device_add+0x59f/0x950
+> [Fri Sep 23 04:51:42 2022]  ? dev_set_name+0x4e/0x70
+> [Fri Sep 23 04:51:42 2022]  register_virtio_device+0xac/0xf0
+> [Fri Sep 23 04:51:42 2022]  virtio_pci_probe+0x101/0x170
+> [Fri Sep 23 04:51:42 2022]  local_pci_probe+0x42/0xa0
+> [Fri Sep 23 04:51:42 2022]  work_for_cpu_fn+0x13/0x20
+> [Fri Sep 23 04:51:42 2022]  process_one_work+0x1c2/0x3d0
+> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
+> [Fri Sep 23 04:51:42 2022]  worker_thread+0x1b9/0x360
+> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
+> [Fri Sep 23 04:51:42 2022]  kthread+0xe6/0x110
+> [Fri Sep 23 04:51:42 2022]  ? kthread_complete_and_exit+0x20/0x20
+> [Fri Sep 23 04:51:42 2022]  ret_from_fork+0x1f/0x30
+> [Fri Sep 23 04:51:42 2022]  </TASK>
+> [Fri Sep 23 04:51:43 2022] virtio_net: probe of virtio608 failed with error -16
+> 
+> Fixes: ad71473d9c43 ("virtio_blk: use virtio IRQ affinity")
+> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
+> Tested-by: Liming Wu <liming.wu@jaguarmicro.com>
+> ---
+>  drivers/block/virtio_blk.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index a8bcf3f664af..075de30a9bb4 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -513,7 +513,6 @@ static int init_vq(struct virtio_blk *vblk)
+>  	struct virtqueue **vqs;
+>  	unsigned short num_vqs;
+>  	struct virtio_device *vdev = vblk->vdev;
+> -	struct irq_affinity desc = { 0, };
+>  
+>  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
+>  				   struct virtio_blk_config, num_queues,
+> @@ -548,7 +547,7 @@ static int init_vq(struct virtio_blk *vblk)
+>  	}
+>  
+>  	/* Discover virtqueues and write information to configuration.  */
+> -	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
+> +	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, NULL);
+>  	if (err)
+>  		goto out;
+>  
+> -- 
+> 2.17.1
+> 
+---end quoted text---
