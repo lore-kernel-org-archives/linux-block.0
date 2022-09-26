@@ -2,65 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BEDC6FA83
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 14:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0D9C6FA83
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 14:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235129AbiIZOjq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 10:39:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38914 "EHLO
+        id S235025AbiIZOlR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 10:41:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234327AbiIZOiv (ORCPT
+        with ESMTP id S235030AbiIZOkz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 10:38:51 -0400
+        Mon, 26 Sep 2022 10:40:55 -0400
 Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB82880BD0;
-        Mon, 26 Sep 2022 06:00:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA2CF3131;
+        Mon, 26 Sep 2022 06:01:44 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MbjWF1R2Rzl8LK;
-        Mon, 26 Sep 2022 20:59:05 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MbjWv0n6FzKHQS;
+        Mon, 26 Sep 2022 20:59:39 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgD3SXOAojFj4UO2BQ--.18700S3;
-        Mon, 26 Sep 2022 21:00:50 +0800 (CST)
-Subject: Re: [PATCH v3 3/5] block, bfq: don't disable wbt if
- CONFIG_BFQ_GROUP_IOSCHED is disabled
+        by APP2 (Coremail) with SMTP id Syh0CgBH53C1ojFjD0y2BQ--.50147S3;
+        Mon, 26 Sep 2022 21:01:42 +0800 (CST)
+Subject: Re: [PATCH v3 1/5] wbt: don't show valid wbt_lat_usec in sysfs while
+ wbt is disabled
 To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, paolo.valente@linaro.org,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
 References: <20220922113558.1085314-1-yukuai3@huawei.com>
- <20220922113558.1085314-4-yukuai3@huawei.com>
- <Yy10vjnxAvca8Ee1@infradead.org>
- <988a86f2-e960-ba59-4d41-f4c8a6345ee9@huaweicloud.com>
- <20220923100659.a3atdanlvygffuxt@quack3>
- <95998ae6-8bbf-b438-801b-7033ceaf9c36@huaweicloud.com>
- <20220923110354.czvzm6rjm7mtqyh3@quack3>
+ <20220922113558.1085314-2-yukuai3@huawei.com>
+ <20220926094434.jrl6gnlbjqkex3wa@quack3>
+ <6736753f-b5ae-39f1-b0c4-508b7f45d701@huaweicloud.com>
+ <20220926114726.ta2w3vcbxgkh3sov@quack3>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <5a2dba26-529d-295f-2e88-601475ff67bf@huaweicloud.com>
-Date:   Mon, 26 Sep 2022 21:00:48 +0800
+Message-ID: <84ae1c2c-9b57-6cb7-173b-68b5c7634d64@huaweicloud.com>
+Date:   Mon, 26 Sep 2022 21:01:41 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20220923110354.czvzm6rjm7mtqyh3@quack3>
+In-Reply-To: <20220926114726.ta2w3vcbxgkh3sov@quack3>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgD3SXOAojFj4UO2BQ--.18700S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr1fuFWkJFW7XFW8Zry3XFb_yoW5WrWxp3
-        4fKay2kF48AFWxKwnFv348X34Fyw4xJr47WF1rA34kG3Z0vr1xJr1fKF4Y9a4q9r1xGw12
-        yF98XrZxAr1kZ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-        UUUUU==
+X-CM-TRANSID: Syh0CgBH53C1ojFjD0y2BQ--.50147S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrKFWrCr4UWr1UAFy5Wr1UGFg_yoWkCwcEvF
+        1j9F4DCFn8WFsaya1DKr1xArWvyF4agFyrXw10gF12vrZ7XF47CrWkGrZ3Z3s093WxtF9r
+        Ga1q9r15ZrZxWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Gr0_Zr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+        IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1a9aPUUUU
+        U==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -69,72 +66,34 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi, Jan
 
-在 2022/09/23 19:03, Jan Kara 写道:
-> Hi Kuai!
-> 
-> On Fri 23-09-22 18:23:03, Yu Kuai wrote:
->> 在 2022/09/23 18:06, Jan Kara 写道:
->>> On Fri 23-09-22 17:50:49, Yu Kuai wrote:
->>>> Hi, Christoph
->>>>
->>>> 在 2022/09/23 16:56, Christoph Hellwig 写道:
->>>>> On Thu, Sep 22, 2022 at 07:35:56PM +0800, Yu Kuai wrote:
->>>>>> wbt and bfq should work just fine if CONFIG_BFQ_GROUP_IOSCHED is disabled.
->>>>>
->>>>> Umm, wouldn't this be something decided at runtime, that is not
->>>>> if CONFIG_BFQ_GROUP_IOSCHED is enable/disable in the kernel build
->>>>> if the hierarchical cgroup based scheduling is actually used for a
->>>>> given device?
->>>>> .
->>>>>
->>>>
->>>> That's a good point,
->>>>
->>>> Before this patch wbt is simply disabled if elevator is bfq.
->>>>
->>>> With this patch, if elevator is bfq while bfq doesn't throttle
->>>> any IO yet, wbt still is disabled unnecessarily.
->>>
->>> It is not really disabled unnecessarily. Have you actually tested the
->>> performance of the combination? I did once and the results were just
->>> horrible (which is I made BFQ just disable wbt by default). The problem is
->>> that blk-wbt assumes certain model of underlying storage stack and hardware
->>> behavior and BFQ just does not fit in that model. For example BFQ wants to
->>> see as many requests as possible so that it can heavily reorder them,
->>> estimate think times of applications, etc. On the other hand blk-wbt
->>> assumes that if request latency gets higher, it means there is too much IO
->>> going on and we need to allow less of "lower priority" IO types to be
->>> submitted. These two go directly against one another and I was easily
->>> observing blk-wbt spiraling down to allowing only very small number of
->>> requests submitted while BFQ was idling waiting for more IO from the
->>> process that was currently scheduled.
->>>
+在 2022/09/26 19:47, Jan Kara 写道:
+> On Mon 26-09-22 18:25:18, Yu Kuai wrote:
+>> Hi, Jan
 >>
->> Thanks for your explanation, I understand that bfq and wbt should not
->> work together.
+>> 在 2022/09/26 17:44, Jan Kara 写道:
+>>> On Thu 22-09-22 19:35:54, Yu Kuai wrote:
+>>>> Currently, if wbt is initialized and then disabled by
+>>>> wbt_disable_default(), sysfs will still show valid wbt_lat_usec, which
+>>>> will confuse users that wbt is still enabled.
+>>>>
+>>>> This patch shows wbt_lat_usec as zero and forbid to set it while wbt
+>>>> is disabled.
+>>>
+>>> So I agree we should show 0 in wbt_lat_usec if wbt is disabled by
+>>> wbt_disable_default(). But why do you forbid setting of wbt_lat_usec?
+>>> IMHO if wbt_lat_usec is set, admin wants to turn on wbt so we should just
+>>> update rwb->enable_state to WBT_STATE_ON_MANUAL.
 >>
->> However, I wonder if CONFIG_BFQ_GROUP_IOSCHED is disabled, or service
->> guarantee is not needed, does the above phenomenon still exist? I find
->> it hard to understand... Perhaps I need to do some test.
+>> I was thinking that don't enable wbt if elevator is bfq. Since we know
+>> that performance is bad, thus it doesn't make sense to me to do that,
+>> and user might doesn't aware of the problem.
 > 
-> Well, BFQ implements for example idling on sync IO queues which is one of
-> the features that upsets blk-wbt. That does not depend on
-> CONFIG_BFQ_GROUP_IOSCHED in any way. Also generally the idea that BFQ
-> assigns storage *time slots* to different processes and IO from other
-> processes is just queued at those times increases IO completion
-> latency (for IOs of processes that are not currently scheduled) and this
-> tends to confuse blk-wbt.
-> 
-Hi, Jan
+> Yeah, I don't think it is a good idea (that is the reason why it is
+> disabled by default) but in priciple I don't see a reason why we should
+> block admin from enabling it.
 
-Just to be curious, have you ever think about or tested wbt with
-io-cost? And even more, how bfq work with io-cost?
-
-I haven't tested yet, but it seems to me some of them can work well
-together.
+I'll enable it in next version.
 
 Thanks,
 Kuai
-> 								Honza
-> 
 
