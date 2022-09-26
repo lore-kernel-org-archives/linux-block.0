@@ -2,178 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC94C32771
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 14:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BEDC6FA83
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 14:39:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbiIZOYS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 10:24:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44558 "EHLO
+        id S235129AbiIZOjq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 10:39:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234765AbiIZOXx (ORCPT
+        with ESMTP id S234327AbiIZOiv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 10:23:53 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6E7E5F92;
-        Mon, 26 Sep 2022 05:34:29 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A50F71F999;
-        Mon, 26 Sep 2022 11:47:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1664192847; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c/Dwa7jmGj4R9AMOKFQFRa0wpNExY5Nn0h5gzI93m5Q=;
-        b=qpUt7z34ITetIRwyKjRs9ItYJlZ5CuZJUYoj+fPxex2RQGQPYBucgu7Q0uMqaqxM0MNnDA
-        qzV0zpnugAhsZbgBa7NTTMNMhIwohEF0hyu0awNhPqIVz1CIihm3chmPDI5hUzYK3x5jv9
-        HZYsTPW71JJc1hWqJg4g1/BF8lyjNoo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1664192847;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c/Dwa7jmGj4R9AMOKFQFRa0wpNExY5Nn0h5gzI93m5Q=;
-        b=efS8a39K9ZrBkDeaHwnEtkzMBW3HQJWELC8Oj99kOjXxZwZjQV3l9IH+Gxsv9P5KFr19Mp
-        jnv/XNkn+UHlWfAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8B9B7139BD;
-        Mon, 26 Sep 2022 11:47:27 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 1xYLIk+RMWONPAAAMHmgww
-        (envelope-from <jack@suse.cz>); Mon, 26 Sep 2022 11:47:27 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id B363CA0685; Mon, 26 Sep 2022 13:47:26 +0200 (CEST)
-Date:   Mon, 26 Sep 2022 13:47:26 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH v3 1/5] wbt: don't show valid wbt_lat_usec in sysfs while
- wbt is disabled
-Message-ID: <20220926114726.ta2w3vcbxgkh3sov@quack3>
+        Mon, 26 Sep 2022 10:38:51 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB82880BD0;
+        Mon, 26 Sep 2022 06:00:51 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MbjWF1R2Rzl8LK;
+        Mon, 26 Sep 2022 20:59:05 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP2 (Coremail) with SMTP id Syh0CgD3SXOAojFj4UO2BQ--.18700S3;
+        Mon, 26 Sep 2022 21:00:50 +0800 (CST)
+Subject: Re: [PATCH v3 3/5] block, bfq: don't disable wbt if
+ CONFIG_BFQ_GROUP_IOSCHED is disabled
+To:     Jan Kara <jack@suse.cz>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, paolo.valente@linaro.org,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
 References: <20220922113558.1085314-1-yukuai3@huawei.com>
- <20220922113558.1085314-2-yukuai3@huawei.com>
- <20220926094434.jrl6gnlbjqkex3wa@quack3>
- <6736753f-b5ae-39f1-b0c4-508b7f45d701@huaweicloud.com>
+ <20220922113558.1085314-4-yukuai3@huawei.com>
+ <Yy10vjnxAvca8Ee1@infradead.org>
+ <988a86f2-e960-ba59-4d41-f4c8a6345ee9@huaweicloud.com>
+ <20220923100659.a3atdanlvygffuxt@quack3>
+ <95998ae6-8bbf-b438-801b-7033ceaf9c36@huaweicloud.com>
+ <20220923110354.czvzm6rjm7mtqyh3@quack3>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <5a2dba26-529d-295f-2e88-601475ff67bf@huaweicloud.com>
+Date:   Mon, 26 Sep 2022 21:00:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <20220923110354.czvzm6rjm7mtqyh3@quack3>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6736753f-b5ae-39f1-b0c4-508b7f45d701@huaweicloud.com>
+X-CM-TRANSID: Syh0CgD3SXOAojFj4UO2BQ--.18700S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxXr1fuFWkJFW7XFW8Zry3XFb_yoW5WrWxp3
+        4fKay2kF48AFWxKwnFv348X34Fyw4xJr47WF1rA34kG3Z0vr1xJr1fKF4Y9a4q9r1xGw12
+        yF98XrZxAr1kZ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
+        UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 26-09-22 18:25:18, Yu Kuai wrote:
-> Hi, Jan
-> 
-> 在 2022/09/26 17:44, Jan Kara 写道:
-> > On Thu 22-09-22 19:35:54, Yu Kuai wrote:
-> > > Currently, if wbt is initialized and then disabled by
-> > > wbt_disable_default(), sysfs will still show valid wbt_lat_usec, which
-> > > will confuse users that wbt is still enabled.
-> > > 
-> > > This patch shows wbt_lat_usec as zero and forbid to set it while wbt
-> > > is disabled.
-> > 
-> > So I agree we should show 0 in wbt_lat_usec if wbt is disabled by
-> > wbt_disable_default(). But why do you forbid setting of wbt_lat_usec?
-> > IMHO if wbt_lat_usec is set, admin wants to turn on wbt so we should just
-> > update rwb->enable_state to WBT_STATE_ON_MANUAL.
-> 
-> I was thinking that don't enable wbt if elevator is bfq. Since we know
-> that performance is bad, thus it doesn't make sense to me to do that,
-> and user might doesn't aware of the problem.
+Hi, Jan
 
-Yeah, I don't think it is a good idea (that is the reason why it is
-disabled by default) but in priciple I don't see a reason why we should
-block admin from enabling it.
-
-								Honza
-
-> > > 
-> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > > Reported-and-tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-> > > ---
-> > >   block/blk-sysfs.c | 9 ++++++++-
-> > >   block/blk-wbt.c   | 7 +++++++
-> > >   block/blk-wbt.h   | 5 +++++
-> > >   3 files changed, 20 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > > index e1f009aba6fd..1955bb6a284d 100644
-> > > --- a/block/blk-sysfs.c
-> > > +++ b/block/blk-sysfs.c
-> > > @@ -467,10 +467,14 @@ static ssize_t queue_io_timeout_store(struct request_queue *q, const char *page,
-> > >   static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
-> > >   {
-> > > +	u64 lat;
-> > > +
-> > >   	if (!wbt_rq_qos(q))
-> > >   		return -EINVAL;
-> > > -	return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
-> > > +	lat = wbt_disabled(q) ? 0 : div_u64(wbt_get_min_lat(q), 1000);
-> > > +
-> > > +	return sprintf(page, "%llu\n", lat);
-> > >   }
-> > >   static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
-> > > @@ -493,6 +497,9 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
-> > >   			return ret;
-> > >   	}
-> > > +	if (wbt_disabled(q))
-> > > +		return -EINVAL;
-> > > +
-> > >   	if (val == -1)
-> > >   		val = wbt_default_latency_nsec(q);
-> > >   	else if (val >= 0)
-> > > diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-> > > index a9982000b667..68851c2c02d2 100644
-> > > --- a/block/blk-wbt.c
-> > > +++ b/block/blk-wbt.c
-> > > @@ -422,6 +422,13 @@ static void wbt_update_limits(struct rq_wb *rwb)
-> > >   	rwb_wake_all(rwb);
-> > >   }
-> > > +bool wbt_disabled(struct request_queue *q)
-> > > +{
-> > > +	struct rq_qos *rqos = wbt_rq_qos(q);
-> > > +
-> > > +	return !rqos || RQWB(rqos)->enable_state == WBT_STATE_OFF_DEFAULT;
-> > > +}
-> > > +
-> > >   u64 wbt_get_min_lat(struct request_queue *q)
-> > >   {
-> > >   	struct rq_qos *rqos = wbt_rq_qos(q);
-> > > diff --git a/block/blk-wbt.h b/block/blk-wbt.h
-> > > index 7e44eccc676d..e42465ddcbb6 100644
-> > > --- a/block/blk-wbt.h
-> > > +++ b/block/blk-wbt.h
-> > > @@ -94,6 +94,7 @@ void wbt_enable_default(struct request_queue *);
-> > >   u64 wbt_get_min_lat(struct request_queue *q);
-> > >   void wbt_set_min_lat(struct request_queue *q, u64 val);
-> > > +bool wbt_disabled(struct request_queue *);
-> > >   void wbt_set_write_cache(struct request_queue *, bool);
-> > > @@ -125,6 +126,10 @@ static inline u64 wbt_default_latency_nsec(struct request_queue *q)
-> > >   {
-> > >   	return 0;
-> > >   }
-> > > +static inline bool wbt_disabled(struct request_queue *q)
-> > > +{
-> > > +	return true;
-> > > +}
-> > >   #endif /* CONFIG_BLK_WBT */
-> > > -- 
-> > > 2.31.1
-> > > 
+在 2022/09/23 19:03, Jan Kara 写道:
+> Hi Kuai!
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> On Fri 23-09-22 18:23:03, Yu Kuai wrote:
+>> 在 2022/09/23 18:06, Jan Kara 写道:
+>>> On Fri 23-09-22 17:50:49, Yu Kuai wrote:
+>>>> Hi, Christoph
+>>>>
+>>>> 在 2022/09/23 16:56, Christoph Hellwig 写道:
+>>>>> On Thu, Sep 22, 2022 at 07:35:56PM +0800, Yu Kuai wrote:
+>>>>>> wbt and bfq should work just fine if CONFIG_BFQ_GROUP_IOSCHED is disabled.
+>>>>>
+>>>>> Umm, wouldn't this be something decided at runtime, that is not
+>>>>> if CONFIG_BFQ_GROUP_IOSCHED is enable/disable in the kernel build
+>>>>> if the hierarchical cgroup based scheduling is actually used for a
+>>>>> given device?
+>>>>> .
+>>>>>
+>>>>
+>>>> That's a good point,
+>>>>
+>>>> Before this patch wbt is simply disabled if elevator is bfq.
+>>>>
+>>>> With this patch, if elevator is bfq while bfq doesn't throttle
+>>>> any IO yet, wbt still is disabled unnecessarily.
+>>>
+>>> It is not really disabled unnecessarily. Have you actually tested the
+>>> performance of the combination? I did once and the results were just
+>>> horrible (which is I made BFQ just disable wbt by default). The problem is
+>>> that blk-wbt assumes certain model of underlying storage stack and hardware
+>>> behavior and BFQ just does not fit in that model. For example BFQ wants to
+>>> see as many requests as possible so that it can heavily reorder them,
+>>> estimate think times of applications, etc. On the other hand blk-wbt
+>>> assumes that if request latency gets higher, it means there is too much IO
+>>> going on and we need to allow less of "lower priority" IO types to be
+>>> submitted. These two go directly against one another and I was easily
+>>> observing blk-wbt spiraling down to allowing only very small number of
+>>> requests submitted while BFQ was idling waiting for more IO from the
+>>> process that was currently scheduled.
+>>>
+>>
+>> Thanks for your explanation, I understand that bfq and wbt should not
+>> work together.
+>>
+>> However, I wonder if CONFIG_BFQ_GROUP_IOSCHED is disabled, or service
+>> guarantee is not needed, does the above phenomenon still exist? I find
+>> it hard to understand... Perhaps I need to do some test.
+> 
+> Well, BFQ implements for example idling on sync IO queues which is one of
+> the features that upsets blk-wbt. That does not depend on
+> CONFIG_BFQ_GROUP_IOSCHED in any way. Also generally the idea that BFQ
+> assigns storage *time slots* to different processes and IO from other
+> processes is just queued at those times increases IO completion
+> latency (for IOs of processes that are not currently scheduled) and this
+> tends to confuse blk-wbt.
+> 
+Hi, Jan
+
+Just to be curious, have you ever think about or tested wbt with
+io-cost? And even more, how bfq work with io-cost?
+
+I haven't tested yet, but it seems to me some of them can work well
+together.
+
+Thanks,
+Kuai
+> 								Honza
+> 
+
