@@ -2,94 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C05DC6FA82
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 16:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD22C07E9D
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 16:58:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234302AbiIZQGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 12:06:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52462 "EHLO
+        id S230103AbiIZQ6I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 12:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234250AbiIZQGF (ORCPT
+        with ESMTP id S230091AbiIZQ5w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:06:05 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB1E2645
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 07:54:08 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id 138so5401022iou.9
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 07:54:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=GFgIjACJN9ef5+O5Og9/DlD2wJW0SUIxL2QcgPrbsYc=;
-        b=O6BuwalmwwYXOzo+C/YM69mwnYKMYr8o+VXsmRvl4i7rwPH1XHeNiAWtZYlhHu3x1k
-         ABZI2Iw0Glk+PwbhLkcVqjJy13+aSHZm9s3Za2oqc6nV1K1AmDgOUSWmX+KVKGph4Bsa
-         Vtj+9n4D2sLGmdmjZz12dBLj6rklBdCVvkckfXkH3xFBKgBm0ee3A3hFOrrsiu3uqHWL
-         QeYHgJscKTg88T8/KrFdITuLCVfqvWVszV2ZOaRIBC4FpVne0XcJSgLpIGqCWMsv2qPj
-         EMSpHNc0Vb+ilgIJ+rleGG9DdET7ZoUGxEQYCqREFz0goJgMZzIWRJ5BoAvEDg1n17i7
-         1Wbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=GFgIjACJN9ef5+O5Og9/DlD2wJW0SUIxL2QcgPrbsYc=;
-        b=i4xlxCoMVdzbeRojoaxdWv7s93ad56L2sbeH6OL6/rZ1tA9oKDtz9IfjplYdlaShya
-         PmQYp8GuIAQ1/YVhlx9ycFZ0MH8lyhxurpiQeBg9+JDNThDCKuhe7UsjtnR+rg41jPe2
-         uINtoC8OXo69siuKUUaoYkIfkRyZRraF1mqfXXn8wJUEUfO+Q4Kj7PmFyhUu8TT7w4fq
-         ljdIkgSdHC+uaopAPGFfVxgpqljIlsV3I5DcaW55wgk+t2KK9IDdV2wI9EkhP953luw5
-         Lfl5BAGEj3pMJEOyyjpRlEugZVn20IC6gaJYGAsZodGF/+1i4WiFQ2dLUQ5Qyqz1T2dS
-         m8OA==
-X-Gm-Message-State: ACrzQf3QK/gdn6JXMqEGW95yuj79JBJjjtaO7ka7NxeYoZShmYQvJxgc
-        OJfruwr6F8THChz/lVnotg6+og==
-X-Google-Smtp-Source: AMsMyM4hzRj1NCt5qjQmyZkoVCT9OWmRSxwmpvJsL6WjnZ+oLf++I8kF1xpoVmAbCJWyaZoIbUOzKQ==
-X-Received: by 2002:a05:6602:2b06:b0:67f:fdf6:ffc2 with SMTP id p6-20020a0566022b0600b0067ffdf6ffc2mr9866886iov.111.1664204048218;
-        Mon, 26 Sep 2022 07:54:08 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id t23-20020a02b197000000b00346e7ca2463sm6868577jah.135.2022.09.26.07.54.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Sep 2022 07:54:07 -0700 (PDT)
-Message-ID: <f7b92f52-8a33-4cf0-b8b6-328c573ad1bd@kernel.dk>
-Date:   Mon, 26 Sep 2022 08:54:06 -0600
+        Mon, 26 Sep 2022 12:57:52 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB07293;
+        Mon, 26 Sep 2022 08:54:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=GLjOCldwMSYbtIvOp9MNc738nkI+qSWqG0cQCtDGyYs=; b=iKgsgckx1BpnYBt1Ml1luRzlNo
+        UEaD93VJ/NaxUNW6l6hN4BiK/C+lXg9TvmRBVZsr6VTRgniAUARhROkGwU1gb/+ga6hgyHbqIk4/Z
+        MZ2vk2dp+YZ4n0PysUqI70IA94ZPELr3jKfzqB+j9wqcDa40U1/yUR6ed5i6U/Ooq6akJwUIH9LCc
+        4FE9DI2L7LRdgnfG+csHbDb8jVG/m3HrQoeTsrshIrc6b/uSVjKzkoMcldkhksDV/gf35W549vzaw
+        QW3k1gYHecYAhnbGFnhN3AfKto9jFnIhYWcwx925qCXeqVUi440PLfDtd4qG2idoghktcU6o/gEhs
+        CpXOoeeQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ocqQR-005okf-Pg; Mon, 26 Sep 2022 15:53:43 +0000
+Date:   Mon, 26 Sep 2022 08:53:43 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        David Hildenbrand <david@redhat.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-mm@kvack.org, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 4/7] iov_iter: new iov_iter_pin_pages*() routines
+Message-ID: <YzHLB4lGa2vktN7W@infradead.org>
+References: <YxhaJktqtHw3QTSG@infradead.org>
+ <YyFPtTtxYozCuXvu@ZenIV>
+ <20220914145233.cyeljaku4egeu4x2@quack3>
+ <YyIEgD8ksSZTsUdJ@ZenIV>
+ <20220915081625.6a72nza6yq4l5etp@quack3>
+ <YyvG+Oih2A37Grcf@ZenIV>
+ <YyxzYTlyGhbb2MOu@infradead.org>
+ <Yy00eSjyxvUIp7D5@ZenIV>
+ <Yy1x8QE9YA4HHzbQ@infradead.org>
+ <Yy3bNjaiUoGv/djG@ZenIV>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 4/5] nvme: split out metadata vs non metadata end_io
- uring_cmd completions
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Stefan Roesch <shr@fb.com>
-References: <20220922182805.96173-1-axboe@kernel.dk>
- <20220922182805.96173-5-axboe@kernel.dk> <Yy3O7wH16t6AhC3j@infradead.org>
- <d09e1645-919f-9239-f86d-a8e85a133e5c@kernel.dk>
- <YzG5/1zSdiMlMLnB@infradead.org>
- <69598e37-fb91-5b92-bb80-b68457a7b6f8@kernel.dk>
- <YzG6mZhtd/QysvdH@infradead.org>
- <25b9899f-0c60-39f2-179b-789b914e0f0a@kernel.dk>
- <YzG8vsR8j0VIt6Nx@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YzG8vsR8j0VIt6Nx@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yy3bNjaiUoGv/djG@ZenIV>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/26/22 8:52 AM, Christoph Hellwig wrote:
-> On Mon, Sep 26, 2022 at 08:50:41AM -0600, Jens Axboe wrote:
->> Or just the union named so it's clear it's a union? That'd make it
->>
->> pdu->u.meta
->>
->> and so forth. I think that might be cleaner.
-> 
-> Ok, that's at least a bit of a warning sign.
+On Fri, Sep 23, 2022 at 05:13:42PM +0100, Al Viro wrote:
+> You are mixing two issues here - holding references to pages while using
+> iov_iter instance is obvious; holding them until async IO is complete, even
+> though struct iov_iter might be long gone by that point is a different
+> story.
 
-I'll go with that.
+But someone needs to hold a refernce until the I/O is completed, because
+the I/O obviously needs the pages.  Yes, we could say the callers holds
+them and can drop the references right after I/O submission, while
+the method needs to grab another reference.  But that is more
+complicated and is more costly than just holding the damn reference.
 
--- 
-Jens Axboe
+> And originating iov_iter instance really can be long-gone by the time
+> of IO completion - requirement to keep it around would be very hard to
+> satisfy.  I've no objections to requiring the pages in ITER_BVEC to be
+> preserved at least until the IO completion by means independent of
+> whatever ->read_iter/->write_iter does to them, but
+> 	* that needs to be spelled out very clearly and
+> 	* we need to verify that it is, indeed, the case for all existing
+> iov_iter_bvec callers, preferably with comments next to non-obvious ones
+> (something that is followed only by the sync IO is obvious)
 
+Agreed.
 
+> That goes not just for bio - if we make get_pages *NOT* grab references
+> on ITER_BVEC (and I'm all for it), we need to make sure that those
+> pages won't be retained after the original protection runs out.
+
+Yes.
