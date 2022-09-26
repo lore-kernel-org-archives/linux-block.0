@@ -2,285 +2,331 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11C3C07E9D
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 08:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C80C32771
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 08:48:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233787AbiIZIVE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 04:21:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49386 "EHLO
+        id S234530AbiIZIsU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 04:48:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233999AbiIZIUs (ORCPT
+        with ESMTP id S234587AbiIZIsH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 04:20:48 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379C21409E;
-        Mon, 26 Sep 2022 01:20:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZuKd6TW+mKhC3stR7yoPnBhnZC3OTfRWvk29wHdin0o=; b=RdJRg8dP9q9+ADI4g1zdBEGndy
-        co+VTXCchZKduu3NpDbx5eS+7qDuB8oJmxBxmIumXDwWpvhhg/KFC7fNrIZg5s/aGX9b0rQ9T68f+
-        8fpSqz1VidPudbf6UGR0puHe/gnW9J33+c2tQZ4YpebvnXWiZBRLjIv/RxPd1N3zV8UsmmHPZDIuK
-        dlQL1zohBsavG6nBbThLscdKQFY9gJT9KHsntZQ8KmTFTuakII/gp1/HiZhYmiN8z7Q0bUhAozR0Y
-        3p2j5kTRvbxc8uHohurTXUNC1SpwcFpUO/jNVauTNJI6HHHzzD6+td7SRR6K42b5E6K6shqRP1RKl
-        GJq9ZarQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ocjLw-0036Ok-Ek; Mon, 26 Sep 2022 08:20:36 +0000
-Date:   Mon, 26 Sep 2022 01:20:36 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Angus Chen <angus.chen@jaguarmicro.com>
-Cc:     jasowang@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Liming Wu <liming.wu@jaguarmicro.com>, tglx@linutronix.de
-Subject: Re: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
+        Mon, 26 Sep 2022 04:48:07 -0400
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2085.outbound.protection.outlook.com [40.107.117.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07EF628734;
+        Mon, 26 Sep 2022 01:48:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=icBatwmMj4TcYV3rj9rNVw1N8pVJiI2Jd+XwtnEl20q9NtckuL/DIQc/qXRcT1JUMu4CGP1bk0Q6gyu9ktw6MYDOOXrIMG7VUvIuT/eIJ1T4WQfrIYSHnP+q7pCh+1ENcnTL+iOUwBkIw/acMcXoFSeS0DuFBxAmntiqUZbMJ3jemsy9tPpImPXhwyYkAUOzDjQQmHPskzOFbMlFbkDnplE1McLWkIDcBInwLFZKTLwCk6w8wZJ+cWZscFwDTjqIVM3Z7qO+9fbAizdgk9c6es677pI/3UpF4BYw8Q0FVDYs/5qf10EVFc11qmupB1pDDy5rwS/k9V5TClQaoyKIIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x3jsHkN4r99TwmVzVS62w8pqNt30JTQE+az6XcMZJvs=;
+ b=d2srPnzXxoQLC8jNCDboJ29TwR/FPp7xrpXOuBGWv5gpGY22iRI8khG5anzMQShaGOBiFUrkWHX5LjSf6mdRoQD5AgsRQlXeCVscpeKReqRnE2jv1p+3lHC/gnoNWSemzAAxSU8FRUe8YJw462TnukGd+sT/c1a7+Cyc+X1vKfldipvh3UnJI6a03kXGuMQOlzY4W5UyDj+EQurTdVAadeJmpsKDfEXDnovBvC5fFMT8kqUzChz7ZI0SAXLIernr5xPrJzkMaTJsDMkcB5vI1bk9DAwgntOBHfZ53uVsZGZ8ek5tAA+9BZeaBv4gsb3Tm8GsJlVRDHdEB0Q7+vCjYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
+ header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x3jsHkN4r99TwmVzVS62w8pqNt30JTQE+az6XcMZJvs=;
+ b=TkWo0rzF/CmTW5UdehJ/l+6rOAu0/JYcqlKnP+C4OHTFNj/Wt+zKX84yXaUJliI+4iBPeEWhk8Cnb6VLyWMPgPFHeGlWg7KXwFpP5en3gp/MH1SVUmwxNLiBa7PA+erHlxCmZBZg5Bq0UQ/CrTXDe1NyYVbckx6Wzd1bMy4kEpmaK6LybIpRGBuKvlP/xTw7brclobsw/4RHgL1dTEJI44Cu4ivp8tNATW3XltQDuQLIChGv1XSsgRQuNhQD7+/0oNtNifWhfcJo8uxJtB+tI2F6cbkWzmqu7KDCEv5HGkjM2NZB5GcTP6Aw4A0gjLiq9rLBjXBjMblnpV0IwV4P1g==
+Received: from TY2PR06MB3424.apcprd06.prod.outlook.com (2603:1096:404:104::19)
+ by SI2PR06MB3947.apcprd06.prod.outlook.com (2603:1096:4:f6::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5654.25; Mon, 26 Sep 2022 08:47:56 +0000
+Received: from TY2PR06MB3424.apcprd06.prod.outlook.com
+ ([fe80::aa83:33dc:435c:cb5d]) by TY2PR06MB3424.apcprd06.prod.outlook.com
+ ([fe80::aa83:33dc:435c:cb5d%6]) with mapi id 15.20.5632.019; Mon, 26 Sep 2022
+ 08:47:56 +0000
+From:   Angus Chen <angus.chen@jaguarmicro.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Liming Wu <liming.wu@jaguarmicro.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>
+Subject: =?big5?B?tarOYDogW1BBVENIIHYxXSB2aXJ0aW9fYmxrOiBzaG91bGQgbm90IHVzZSBJUlFE?=
+ =?big5?B?X0FGRklOSVRZX01BTkFHRUQgaW4gaW5pdF9ycQ==?=
+Thread-Topic: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
  init_rq
-Message-ID: <YzFg1H9k+rL34FVj@infradead.org>
+Thread-Index: AQHYz8icdCaFSgSJiUmKEzpcev4wOq3xYiMAgAACTsA=
+Date:   Mon, 26 Sep 2022 08:47:56 +0000
+Message-ID: <TY2PR06MB3424E0C024090C0A1CB247E985529@TY2PR06MB3424.apcprd06.prod.outlook.com>
 References: <20220924034854.323-1-angus.chen@jaguarmicro.com>
+ <YzFg1H9k+rL34FVj@infradead.org>
+In-Reply-To: <YzFg1H9k+rL34FVj@infradead.org>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY2PR06MB3424:EE_|SI2PR06MB3947:EE_
+x-ms-office365-filtering-correlation-id: f8fbe655-6030-4fd9-3cc7-08da9f9bcea8
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ik/OUUIFrVNbeyxt6Js7biPRg7E321VJjYxOCoN2GJp/73XtGYhA7+a70/0T9YEoej4520+ZUm6cFn9z0pXLX5vTswnLEWgQsOde3j+hPNT3YCd3+ZEa1XkRkaxYm6b3XAQMWqHOa6mopylmQ0PkdhUgd1W46e1z12mXqigFascQAr+tdilkETfp3gcqD1PKv5beKkzQw1+hdqQDiXYjnZhAspnp7+HpbwR/PrbeKwCGTo4EOBt5IQsFKH4bxEXtXGTZm7N/wpdeRa7gp7RB4UzdERDzpMqNCj6ImGwfpOy4++c5FPxEnbcmseQ4i+OHQ3fy5DvqKTbPJa6e2rpihJ9UHmFOd8nDlio6Xcr6CDm98VBqvnRmNPkl7ERAeWEvKt6J4DDWjy52RTRfHTeazPVeRbEdoSmU5a6er++EQ9qHvy7FcpoIKjYy/KY2x04NCmNUW1tYclUC3miGHF4TSwMw+Zykf5dftTMpHnONhRuGY2jmal44aAsiW4B6RtVp42UVLHMrposI9KE4XiDL4N8I7BHHc6jzM4WiIpOQ5aak/RzxzWXbeVGvlIJKBZ4dIUezjMagLB8KmCHzCrbBrVGIUprZ9XwxhzqtEsOvSzuHde0XfjzvD6KnKEeyvDSbrQbiVOpNGGPdXDFY64R1FS4Hi6kSlw54hBaWb4U4IIpkdE/5joFYYIeVrRiYnIXMFRyTaJrhazJuOcUjkz2lTyYm9lovX3cFFhHJ3PwmQhRxwJHJ4IXznEbcQBnbovUfRrrifjk7asDJ0ABSxqhG7w==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY2PR06MB3424.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(136003)(39840400004)(366004)(396003)(346002)(451199015)(478600001)(7696005)(71200400001)(41300700001)(6506007)(83380400001)(9686003)(186003)(26005)(2906002)(30864003)(44832011)(5660300002)(55016003)(54906003)(6916009)(8936002)(66446008)(76116006)(52536014)(66556008)(66476007)(66946007)(4326008)(64756008)(316002)(38100700002)(86362001)(122000001)(38070700005)(33656002)(224303003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?big5?B?aldNVFhKNS9WMHNIWWRxQW8vQjdLODA3SWZhRmhxdkRTSVQ5VjN5K2VzZDhBZEhz?=
+ =?big5?B?WEZUSjFPRHBNaHJ1QXhYUDFiTnVleXBuNEpUQnE3ZVk1aitVVmJ6RWdteTBFdHBJ?=
+ =?big5?B?WEVua01LU25WQUZxOHBmUEFNR21zOGF3L1hET3MxNlJYdVVFTzMxYTNKcjdCWWtP?=
+ =?big5?B?OG1GYTQxUGlabTdnanNaRVpNMjFwTjVjSWdRSU1wM041Z1cwUzRsdE53YTUyOTlv?=
+ =?big5?B?dG0vbXZYSWVncVpwVVQ0S3pJOWs0MHBXNGh3alFobEpLM1VqMVVkK0RpN0dvYXhi?=
+ =?big5?B?QzhTQ2hJeEZzbkZXcTBXOXdPVnJleXRTQVlKNU1MazFEem5xZXdnNlplTkpIeVN5?=
+ =?big5?B?S3VIMlV4clpNdGFIdEdoL09WeFJlS0F4K3FsWmdwTWhPUGxmTHNvRTg1d1BQN09D?=
+ =?big5?B?M1hiVldJZGhGRVlEelBwMmNkeE1pZGc0enZ1QkJENWtlYlZ2NTVmNkxSUFdLdnd5?=
+ =?big5?B?UHFUR25aZlk3WHAzeG81Zk9ldjluQW4yQ0NIZmNITjdvaXlJU3plTUpJSk1LWG82?=
+ =?big5?B?Lzl2YVMwRUlGbk1yVW55RUlFczViWVJhTnIwVmw2RzVWVGltQitrMVJoMkdVa3hy?=
+ =?big5?B?TW1Wc1VCRTBDS0g4cHhnbmRta0c0N3hFa2FsQnhBZ1dsNDl5TjdLa2p5Nk9NTG5r?=
+ =?big5?B?UjQxaTFGUy9MUWVlOGViQmVpWGpYMHIxSWgrUkt1dUxzMEVyMjJOZ3JXbi81YzVm?=
+ =?big5?B?Z1Zta3JYbUU1dDJrQ3VtOURqZXpMaFk3VWc1WlJnTmludWhuVTJuQ25QTFg5d09P?=
+ =?big5?B?c2JOcnJFNzN0Y1ZjUHN1bjRrOStIVEtGanlsdFY5T2tSdjNzWElkUTd5NDFXMXN1?=
+ =?big5?B?WDNtdkdPL3FKb2tTK2Zxb1o1MU5xalphcVR0bTVlcUQrRzZFMkh6ZEc1YXdWYWhM?=
+ =?big5?B?SkhwUlkvaXhaUHBlbFM3NVR2M0FEZ1BXVTRHTkx2UGVxbmMxZU4zZHkraXN5emo3?=
+ =?big5?B?NGI4NXJmcEE0YnU1LzQ3dEJRRm1tVThhUTFYRlJSQytxRms5N0RqYUJHbU9ESGJp?=
+ =?big5?B?RHhFYVNJWEhBWjc3WVc3VmhUNG5acE1tM205QVFtc3d6Zm8ycVR1WGNJWEhNYmxw?=
+ =?big5?B?b0V1YzF3QUplS2xMVkRkc2ppWTB4S3JGRERDVnhwY2Myb3NFTzhmcGgrWloreVpP?=
+ =?big5?B?UlZxRnRhcFo2MmEveVJDWlE3K0MySGRRR1lqNVBBcEZPT3p3R1Y1Z2g1NzdDV0NC?=
+ =?big5?B?d3FJaS9qUlJsdjdkOG0vUzFaWkFiQmVKZnM5dkplZEVkMGg0VFk1SW04RW93U0JN?=
+ =?big5?B?bGw4L1RaYnZPckUvNW5xU3krOEZtWDRtNmt2NlpZaUMwSWdtdzJqQ2ZTbFFyNmtt?=
+ =?big5?B?Z1hsemc0LzlPeFh5YVZpWVJnc2VQTCt0TVQvelJSVG1lV256cVpjRGhzVkZXSEVt?=
+ =?big5?B?QWt1ZG10NTJHa2d4d1kxSVMvQmxXY1EzWjN4Vk1XemQ4Z1Jnb0Y0U2ZhQ1VkUmhX?=
+ =?big5?B?NUVsQWNYQ0FPQVlyTmtsb2RaMjRGNjZvK0dtVlJCT0VYMWJmZEkrNzdwTkNTSVhP?=
+ =?big5?B?NERVdmpZVjNKaFhKUFpCbEQyalhITFNPTzN3Uk5qL2c4NkhEUklTUDZ5NGRYc3dT?=
+ =?big5?B?UGU2ZWJvQ2s3cFNhcVA5YXlYUUdnTGNOWCtnS1JIVExHN3JsSWcrN3ZtM1o3MWFt?=
+ =?big5?B?SEU2ZnJ4TDhCcVJINTBFSXA3SGdHNms3TzkwV2NIdjBySWJsNVNmeDhuYXhsQ0NS?=
+ =?big5?B?Q3pqY2Vzd3Z1akV1QVRwNTNuZlVxekFGWEVYQ0JOL1NKMTkwQUtJVU9iK1RrTUNj?=
+ =?big5?B?blgxVTk2a2RFZU5xYUNHYkovZTZ1VFUyNjdtaU9DN2dWZ29UT2VrTWhCWG9Wbnc1?=
+ =?big5?B?NThleGMwVGVHZUxDcTkydzNnU1FucEV1R1dQNFdZU0VYamdPVnZLeldhZXVwNVVi?=
+ =?big5?B?QkdnNTRncDFXSDJZSWQ5WUhEa2RoWi95aVJwZGpoT3o2RHV4Wmg4TjZOQnBrRTFx?=
+ =?big5?B?OWI2RjNqNUd6ZE5yc2Rvb1p5b05qcUNQK2J6VWNuZnk1aWZFakVlSmpaelRZTzMz?=
+ =?big5?B?UmtUYXBNeUx3aEN6TjVhVVpWcFVURitJQjZJdWg0Y2xzYWZGTmc9PQ==?=
+Content-Type: text/plain; charset="big5"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220924034854.323-1-angus.chen@jaguarmicro.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-OriginatorOrg: jaguarmicro.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY2PR06MB3424.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8fbe655-6030-4fd9-3cc7-08da9f9bcea8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2022 08:47:56.1757
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9rseN6V5UT5JVEqeDo9iE75gHoC1rdFhof1Miq3geBMBnNWAmORFyxI8LLWbWPqpJIJtDIG35TGhLdFlviFG7JLN5TA19czCUvH5HdbIFo8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI2PR06MB3947
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 24, 2022 at 11:48:54AM +0800, Angus Chen wrote:
-> The background is that we use dpu in cloud computing,the arch is x86,80
-> cores.We will have a lots of virtio devices,like 512 or more.
-> When we probe about 200 virtio_blk devices,it will fail and
-> the stack is print as follows:
-
-I don't think managed irqs are your problem here, but only a symptom.
-Why is the timer irq allowed to be shared with PCI irqs to start with?
-
-> 
-> [25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver
-> [25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)
-> [25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-305.30.1.el8.x86_64
-> [25338.516403] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.21 08/25/2021
-> [25338.523881] Workqueue: events work_for_cpu_fn
-> [25338.528235] Call Trace:
-> [25338.530687]  dump_stack+0x5c/0x80
-> [25338.534000]  __setup_irq.cold.53+0x7c/0xd3
-> [25338.538098]  request_threaded_irq+0xf5/0x160
-> [25338.542371]  vp_find_vqs+0xc7/0x190
-> [25338.545866]  init_vq+0x17c/0x2e0 [virtio_blk]
-> [25338.550223]  ? ncpus_cmp_func+0x10/0x10
-> [25338.554061]  virtblk_probe+0xe6/0x8a0 [virtio_blk]
-> [25338.558846]  virtio_dev_probe+0x158/0x1f0
-> [25338.562861]  really_probe+0x255/0x4a0
-> [25338.566524]  ? __driver_attach_async_helper+0x90/0x90
-> [25338.571567]  driver_probe_device+0x49/0xc0
-> [25338.575660]  bus_for_each_drv+0x79/0xc0
-> [25338.579499]  __device_attach+0xdc/0x160
-> [25338.583337]  bus_probe_device+0x9d/0xb0
-> [25338.587167]  device_add+0x418/0x780
-> [25338.590654]  register_virtio_device+0x9e/0xe0
-> [25338.595011]  virtio_pci_probe+0xb3/0x140
-> [25338.598941]  local_pci_probe+0x41/0x90
-> [25338.602689]  work_for_cpu_fn+0x16/0x20
-> [25338.606443]  process_one_work+0x1a7/0x360
-> [25338.610456]  ? create_worker+0x1a0/0x1a0
-> [25338.614381]  worker_thread+0x1cf/0x390
-> [25338.618132]  ? create_worker+0x1a0/0x1a0
-> [25338.622051]  kthread+0x116/0x130
-> [25338.625283]  ? kthread_flush_work_fn+0x10/0x10
-> [25338.629731]  ret_from_fork+0x1f/0x40
-> [25338.633395] virtio_blk: probe of virtio418 failed with error -16
-> 
-> After I did some work of this stack,took stap and crash to get more
-> information,I found that the auto irq_affinity affect this.
-> When "vp_find_vqs" call "vp_find_vqs_msix" failed,it will be go back
-> to call vp_find_vqs_msix again with ctx be false, and when it failed again,
-> we will call vp_find_vqs_intx,if the vp_dev->pci_dev->irq is zero,
-> we will get a backtrace like above.
-> 
-> The log :
-> "genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)"
-> was print because of the irq 0 is used by timer exclusive,and when
-> vp_find_vqs called vp_find_vqs_msix and return false twice,then it will
-> call vp_find_vqs_intx for the last try.
-> Because vp_dev->pci_dev->irq is zero,so it will be request irq 0 with
-> flag IRQF_SHARED.
-> 
-> without config CONFIG_GENERIC_IRQ_DEBUGFS,
-> I found that we called vp_find_vqs_msix failed twice because of
-> the irq resource was exhausted.
-> 
-> crash> irq_domain.name,parent 0xffff9bff87d4dec0
->   name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"
->   parent = 0xffff9bff87400000
-> crash> irq_domain.name,parent 0xffff9bff87400000
->   name = 0xffff9bff87c24300 "INTEL-IR-1"
->   parent = 0xffff9bff87c6c900
-> crash> irq_domain.name,parent 0xffff9bff87c6c900
->   name = 0xffff9bff87c3ecd0 "VECTOR"
->   parent = 0x0----------------------the highest level
-> 
-> and stap irq_matrix_alloc_managed get return value -ENOSPC.
-> 
-> When no virtio_blk device probe,the vctor_matrix is:
-> crash>  p *vector_matrix
-> $1 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 15593,
->   global_reserved = 149,
->   systembits_inalloc = 3,
->   total_allocated = 409,
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {1161063342014463, 0, 1, 18446726481523507200,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-> }
-> 
-> When the dump stack occur,the vector_matrix of system is exhausted.
-> crash> p *vector_matrix
-> $82 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 0,//caq:irq left
->   global_reserved = 151,
->   systembits_inalloc = 3,
->   total_allocated = 1922,//caq:irq that allocated
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {18446744069952503807, 18446744073709551615,
->  18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-> }
-> 
-> And we tested the virtio_blk device which request irq success,
-> we found that in a system with 80 cores and two numa ,one
-> virtio_blk device with just two data queues consume 81 irqs capacity,
-> Although it just only three irqs in /proc/interrupt,80 irqs capacity 
-> is effected by function "irq_build_affinity_masks" with 2*40.
-> 
-> before one virtio_blk device hotplug out:
-> crash> p *vector_matrix
-> $2 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 15215,
->   global_reserved = 150,
->   systembits_inalloc = 3,
->   total_allocated = 553,
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {1179746449752063, 0, 1, 18446726481523507200, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
->  0, 0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0}
-> }
-> 
-> after one virtio_blk device hotplug out:
-> crash> p *vector_matrix
-> $3 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 15296,---it increase 81,include 1 config irq.
->   global_reserved = 150,
->   systembits_inalloc = 3,
->   total_allocated = 550,------it just decrease 3.
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0}
-> }
-> 
-> We test the new kernel also,it occur the same result.
-> [Fri Sep 23 04:51:42 2022] genirq: Flags mismatch irq 0. 00000080 (virtio608) vs. 00015a00 (timer)
-> [Fri Sep 23 04:51:42 2022] CPU: 0 PID: 5749 Comm: kworker/0:0 Kdump: loaded Tainted: G        W  OE      6.0.0-rc6+ #5
-> [Fri Sep 23 04:51:42 2022] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.19 06/16/2021
-> [Fri Sep 23 04:51:42 2022] Workqueue: events work_for_cpu_fn
-> [Fri Sep 23 04:51:42 2022] Call Trace:
-> [Fri Sep 23 04:51:42 2022]  <TASK>
-> [Fri Sep 23 04:51:42 2022]  dump_stack_lvl+0x33/0x46
-> [Fri Sep 23 04:51:42 2022]  __setup_irq+0x705/0x770
-> [Fri Sep 23 04:51:42 2022]  request_threaded_irq+0x109/0x170
-> [Fri Sep 23 04:51:42 2022]  vp_find_vqs+0xc4/0x190
-> [Fri Sep 23 04:51:42 2022]  init_vqs+0x348/0x580 [virtio_net]
-> [Fri Sep 23 04:51:42 2022]  virtnet_probe+0x54d/0xa80 [virtio_net]
-> [Fri Sep 23 04:51:42 2022]  virtio_dev_probe+0x19c/0x240
-> [Fri Sep 23 04:51:42 2022]  really_probe+0x106/0x3e0
-> [Fri Sep 23 04:51:42 2022]  ? pm_runtime_barrier+0x4f/0xa0
-> [Fri Sep 23 04:51:42 2022]  __driver_probe_device+0x79/0x170
-> [Fri Sep 23 04:51:42 2022]  driver_probe_device+0x1f/0xa0
-> [Fri Sep 23 04:51:42 2022]  __device_attach_driver+0x85/0x110
-> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-> [Fri Sep 23 04:51:42 2022]  bus_for_each_drv+0x67/0xb0
-> [Fri Sep 23 04:51:42 2022]  __device_attach+0xe9/0x1b0
-> [Fri Sep 23 04:51:42 2022]  bus_probe_device+0x87/0xa0
-> [Fri Sep 23 04:51:42 2022]  device_add+0x59f/0x950
-> [Fri Sep 23 04:51:42 2022]  ? dev_set_name+0x4e/0x70
-> [Fri Sep 23 04:51:42 2022]  register_virtio_device+0xac/0xf0
-> [Fri Sep 23 04:51:42 2022]  virtio_pci_probe+0x101/0x170
-> [Fri Sep 23 04:51:42 2022]  local_pci_probe+0x42/0xa0
-> [Fri Sep 23 04:51:42 2022]  work_for_cpu_fn+0x13/0x20
-> [Fri Sep 23 04:51:42 2022]  process_one_work+0x1c2/0x3d0
-> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-> [Fri Sep 23 04:51:42 2022]  worker_thread+0x1b9/0x360
-> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-> [Fri Sep 23 04:51:42 2022]  kthread+0xe6/0x110
-> [Fri Sep 23 04:51:42 2022]  ? kthread_complete_and_exit+0x20/0x20
-> [Fri Sep 23 04:51:42 2022]  ret_from_fork+0x1f/0x30
-> [Fri Sep 23 04:51:42 2022]  </TASK>
-> [Fri Sep 23 04:51:43 2022] virtio_net: probe of virtio608 failed with error -16
-> 
-> Fixes: ad71473d9c43 ("virtio_blk: use virtio IRQ affinity")
-> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
-> Tested-by: Liming Wu <liming.wu@jaguarmicro.com>
-> ---
->  drivers/block/virtio_blk.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index a8bcf3f664af..075de30a9bb4 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -513,7 +513,6 @@ static int init_vq(struct virtio_blk *vblk)
->  	struct virtqueue **vqs;
->  	unsigned short num_vqs;
->  	struct virtio_device *vdev = vblk->vdev;
-> -	struct irq_affinity desc = { 0, };
->  
->  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
->  				   struct virtio_blk_config, num_queues,
-> @@ -548,7 +547,7 @@ static int init_vq(struct virtio_blk *vblk)
->  	}
->  
->  	/* Discover virtqueues and write information to configuration.  */
-> -	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
-> +	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, NULL);
->  	if (err)
->  		goto out;
->  
-> -- 
-> 2.17.1
-> 
----end quoted text---
+DQpPbiBTYXQsIFNlcCAyNCwgMjAyMiBhdCAxMTo0ODo1NEFNICswODAwLCBBbmd1cyBDaGVuIHdy
+b3RlOg0KPiBUaGUgYmFja2dyb3VuZCBpcyB0aGF0IHdlIHVzZSBkcHUgaW4gY2xvdWQgY29tcHV0
+aW5nLHRoZSBhcmNoIGlzIHg4Niw4MA0KPiBjb3Jlcy5XZSB3aWxsIGhhdmUgYSBsb3RzIG9mIHZp
+cnRpbyBkZXZpY2VzLGxpa2UgNTEyIG9yIG1vcmUuDQo+IFdoZW4gd2UgcHJvYmUgYWJvdXQgMjAw
+IHZpcnRpb19ibGsgZGV2aWNlcyxpdCB3aWxsIGZhaWwgYW5kDQo+IHRoZSBzdGFjayBpcyBwcmlu
+dCBhcyBmb2xsb3dzOg0KDQpJIGRvbid0IHRoaW5rIG1hbmFnZWQgaXJxcyBhcmUgeW91ciBwcm9i
+bGVtIGhlcmUsIGJ1dCBvbmx5IGEgc3ltcHRvbS4NCldoeSBpcyB0aGUgdGltZXIgaXJxIGFsbG93
+ZWQgdG8gYmUgc2hhcmVkIHdpdGggUENJIGlycXMgdG8gc3RhcnQgd2l0aD8NCg0KVGhhbmtzoUFi
+ZWNhdXNlIHRoZSB2aXJ0aW9fbmV0IGRldmljZXMgd2UgcmVhbGl6ZWQgaXMganVzdCBzdXBwcHJ0
+IG1zaXgsbm90IHN1cHBvcnQgaW50eCBpcnEuDQpTbyB0aGUgaW50eCBpcnEgaXMgemVybyBieSBk
+ZWZhdWx0Lg0KRXZlbiBpZiB3ZSBoYXZlIGluaXRpYWxpemVkIHRoZSBpbnR4LHdlIHdpbGwgZmFp
+bCBhbHNvIGlmIHRoZSBpcnEgY2FwYWNpdHkgaXMgZXhoYXVzdGVkLg0KDQpUaGUgZnVuY3Rpb24g
+dnBfZmluZF92cXMgdXNlIG1zaXggdG8gaW5pdCBmaXJzdC4gDQoNCi8qIHRoZSBjb25maWctPmZp
+bmRfdnFzKCkgaW1wbGVtZW50YXRpb24gKi8NCmludCB2cF9maW5kX3ZxcyhzdHJ1Y3QgdmlydGlv
+X2RldmljZSAqdmRldiwgdW5zaWduZWQgbnZxcywNCiAgICAgICAgc3RydWN0IHZpcnRxdWV1ZSAq
+dnFzW10sIHZxX2NhbGxiYWNrX3QgKmNhbGxiYWNrc1tdLA0KICAgICAgICBjb25zdCBjaGFyICog
+Y29uc3QgbmFtZXNbXSwgY29uc3QgYm9vbCAqY3R4LA0KICAgICAgICBzdHJ1Y3QgaXJxX2FmZmlu
+aXR5ICpkZXNjKQ0Kew0KICAgIGludCBlcnI7DQoNCiAgICAvKiBUcnkgTVNJLVggd2l0aCBvbmUg
+dmVjdG9yIHBlciBxdWV1ZS4gKi8NCiAgICBlcnIgPSB2cF9maW5kX3Zxc19tc2l4KHZkZXYsIG52
+cXMsIHZxcywgY2FsbGJhY2tzLCBuYW1lcywgdHJ1ZSwgY3R4LCBkZXNjKTsNCiAgICBpZiAoIWVy
+cikNCiAgICAgICAgcmV0dXJuIDA7DQogICAgLyogRmFsbGJhY2s6IE1TSS1YIHdpdGggb25lIHZl
+Y3RvciBmb3IgY29uZmlnLCBvbmUgc2hhcmVkIGZvciBxdWV1ZXMuICovDQogICAgZXJyID0gdnBf
+ZmluZF92cXNfbXNpeCh2ZGV2LCBudnFzLCB2cXMsIGNhbGxiYWNrcywgbmFtZXMsIGZhbHNlLCBj
+dHgsIGRlc2MpOw0KICAgIGlmICghZXJyKQ0KICAgICAgICByZXR1cm4gMDsNCiAgICAvKiBGaW5h
+bGx5IGZhbGwgYmFjayB0byByZWd1bGFyIGludGVycnVwdHMuICovDQogICAgcmV0dXJuIHZwX2Zp
+bmRfdnFzX2ludHgodmRldiwgbnZxcywgdnFzLCBjYWxsYmFja3MsIG5hbWVzLCBjdHgpOw0KfQ0K
+DQpTbyBJIHRoaW5rIHRoZSBrZXkgcmVzc29uIGlzIG9uZSB2aXJ0aW9fYmxrIGRldmljZSB1c2Ug
+ODAgaXJxcyBjYXBhY2l0eSBpZiBpdCB1c2UgYXV0b21hdGljIElSUSBhZmZpbml0eS4NCg0KDQo+
+IA0KPiBbMjUzMzguNDg1MTI4XSB2aXJ0aW8tcGNpIDAwMDA6YjM6MDAuMDogdmlydGlvX3BjaTog
+bGVhdmluZyBmb3IgbGVnYWN5IGRyaXZlcg0KPiBbMjUzMzguNDk2MTc0XSBnZW5pcnE6IEZsYWdz
+IG1pc21hdGNoIGlycSAwLiAwMDAwMDA4MCAodmlydGlvNDE4KSB2cy4gMDAwMTVhMDAgKHRpbWVy
+KQ0KPiBbMjUzMzguNTAzODIyXSBDUFU6IDIwIFBJRDogNTQzMSBDb21tOiBrd29ya2VyLzIwOjAg
+S2R1bXA6IGxvYWRlZCBUYWludGVkOiBHICAgICAgICAgICBPRSAgICAtLS0tLS0tLS0gLSAgLSA0
+LjE4LjAtMzA1LjMwLjEuZWw4Lng4Nl82NA0KPiBbMjUzMzguNTE2NDAzXSBIYXJkd2FyZSBuYW1l
+OiBJbnNwdXIgTkY1MjgwTTUvWVpNQi0wMDg4Mi0xMEUsIEJJT1MgNC4xLjIxIDA4LzI1LzIwMjEN
+Cj4gWzI1MzM4LjUyMzg4MV0gV29ya3F1ZXVlOiBldmVudHMgd29ya19mb3JfY3B1X2ZuDQo+IFsy
+NTMzOC41MjgyMzVdIENhbGwgVHJhY2U6DQo+IFsyNTMzOC41MzA2ODddICBkdW1wX3N0YWNrKzB4
+NWMvMHg4MA0KPiBbMjUzMzguNTM0MDAwXSAgX19zZXR1cF9pcnEuY29sZC41MysweDdjLzB4ZDMN
+Cj4gWzI1MzM4LjUzODA5OF0gIHJlcXVlc3RfdGhyZWFkZWRfaXJxKzB4ZjUvMHgxNjANCj4gWzI1
+MzM4LjU0MjM3MV0gIHZwX2ZpbmRfdnFzKzB4YzcvMHgxOTANCj4gWzI1MzM4LjU0NTg2Nl0gIGlu
+aXRfdnErMHgxN2MvMHgyZTAgW3ZpcnRpb19ibGtdDQo+IFsyNTMzOC41NTAyMjNdICA/IG5jcHVz
+X2NtcF9mdW5jKzB4MTAvMHgxMA0KPiBbMjUzMzguNTU0MDYxXSAgdmlydGJsa19wcm9iZSsweGU2
+LzB4OGEwIFt2aXJ0aW9fYmxrXQ0KPiBbMjUzMzguNTU4ODQ2XSAgdmlydGlvX2Rldl9wcm9iZSsw
+eDE1OC8weDFmMA0KPiBbMjUzMzguNTYyODYxXSAgcmVhbGx5X3Byb2JlKzB4MjU1LzB4NGEwDQo+
+IFsyNTMzOC41NjY1MjRdICA/IF9fZHJpdmVyX2F0dGFjaF9hc3luY19oZWxwZXIrMHg5MC8weDkw
+DQo+IFsyNTMzOC41NzE1NjddICBkcml2ZXJfcHJvYmVfZGV2aWNlKzB4NDkvMHhjMA0KPiBbMjUz
+MzguNTc1NjYwXSAgYnVzX2Zvcl9lYWNoX2RydisweDc5LzB4YzANCj4gWzI1MzM4LjU3OTQ5OV0g
+IF9fZGV2aWNlX2F0dGFjaCsweGRjLzB4MTYwDQo+IFsyNTMzOC41ODMzMzddICBidXNfcHJvYmVf
+ZGV2aWNlKzB4OWQvMHhiMA0KPiBbMjUzMzguNTg3MTY3XSAgZGV2aWNlX2FkZCsweDQxOC8weDc4
+MA0KPiBbMjUzMzguNTkwNjU0XSAgcmVnaXN0ZXJfdmlydGlvX2RldmljZSsweDllLzB4ZTANCj4g
+WzI1MzM4LjU5NTAxMV0gIHZpcnRpb19wY2lfcHJvYmUrMHhiMy8weDE0MA0KPiBbMjUzMzguNTk4
+OTQxXSAgbG9jYWxfcGNpX3Byb2JlKzB4NDEvMHg5MA0KPiBbMjUzMzguNjAyNjg5XSAgd29ya19m
+b3JfY3B1X2ZuKzB4MTYvMHgyMA0KPiBbMjUzMzguNjA2NDQzXSAgcHJvY2Vzc19vbmVfd29yaysw
+eDFhNy8weDM2MA0KPiBbMjUzMzguNjEwNDU2XSAgPyBjcmVhdGVfd29ya2VyKzB4MWEwLzB4MWEw
+DQo+IFsyNTMzOC42MTQzODFdICB3b3JrZXJfdGhyZWFkKzB4MWNmLzB4MzkwDQo+IFsyNTMzOC42
+MTgxMzJdICA/IGNyZWF0ZV93b3JrZXIrMHgxYTAvMHgxYTANCj4gWzI1MzM4LjYyMjA1MV0gIGt0
+aHJlYWQrMHgxMTYvMHgxMzANCj4gWzI1MzM4LjYyNTI4M10gID8ga3RocmVhZF9mbHVzaF93b3Jr
+X2ZuKzB4MTAvMHgxMA0KPiBbMjUzMzguNjI5NzMxXSAgcmV0X2Zyb21fZm9yaysweDFmLzB4NDAN
+Cj4gWzI1MzM4LjYzMzM5NV0gdmlydGlvX2JsazogcHJvYmUgb2YgdmlydGlvNDE4IGZhaWxlZCB3
+aXRoIGVycm9yIC0xNg0KPiANCj4gQWZ0ZXIgSSBkaWQgc29tZSB3b3JrIG9mIHRoaXMgc3RhY2ss
+dG9vayBzdGFwIGFuZCBjcmFzaCB0byBnZXQgbW9yZQ0KPiBpbmZvcm1hdGlvbixJIGZvdW5kIHRo
+YXQgdGhlIGF1dG8gaXJxX2FmZmluaXR5IGFmZmVjdCB0aGlzLg0KPiBXaGVuICJ2cF9maW5kX3Zx
+cyIgY2FsbCAidnBfZmluZF92cXNfbXNpeCIgZmFpbGVkLGl0IHdpbGwgYmUgZ28gYmFjaw0KPiB0
+byBjYWxsIHZwX2ZpbmRfdnFzX21zaXggYWdhaW4gd2l0aCBjdHggYmUgZmFsc2UsIGFuZCB3aGVu
+IGl0IGZhaWxlZCBhZ2FpbiwNCj4gd2Ugd2lsbCBjYWxsIHZwX2ZpbmRfdnFzX2ludHgsaWYgdGhl
+IHZwX2Rldi0+cGNpX2Rldi0+aXJxIGlzIHplcm8sDQo+IHdlIHdpbGwgZ2V0IGEgYmFja3RyYWNl
+IGxpa2UgYWJvdmUuDQo+IA0KPiBUaGUgbG9nIDoNCj4gImdlbmlycTogRmxhZ3MgbWlzbWF0Y2gg
+aXJxIDAuIDAwMDAwMDgwICh2aXJ0aW80MTgpIHZzLiAwMDAxNWEwMCAodGltZXIpIg0KPiB3YXMg
+cHJpbnQgYmVjYXVzZSBvZiB0aGUgaXJxIDAgaXMgdXNlZCBieSB0aW1lciBleGNsdXNpdmUsYW5k
+IHdoZW4NCj4gdnBfZmluZF92cXMgY2FsbGVkIHZwX2ZpbmRfdnFzX21zaXggYW5kIHJldHVybiBm
+YWxzZSB0d2ljZSx0aGVuIGl0IHdpbGwNCj4gY2FsbCB2cF9maW5kX3Zxc19pbnR4IGZvciB0aGUg
+bGFzdCB0cnkuDQo+IEJlY2F1c2UgdnBfZGV2LT5wY2lfZGV2LT5pcnEgaXMgemVybyxzbyBpdCB3
+aWxsIGJlIHJlcXVlc3QgaXJxIDAgd2l0aA0KPiBmbGFnIElSUUZfU0hBUkVELg0KPiANCj4gd2l0
+aG91dCBjb25maWcgQ09ORklHX0dFTkVSSUNfSVJRX0RFQlVHRlMsDQo+IEkgZm91bmQgdGhhdCB3
+ZSBjYWxsZWQgdnBfZmluZF92cXNfbXNpeCBmYWlsZWQgdHdpY2UgYmVjYXVzZSBvZg0KPiB0aGUg
+aXJxIHJlc291cmNlIHdhcyBleGhhdXN0ZWQuDQo+IA0KPiBjcmFzaD4gaXJxX2RvbWFpbi5uYW1l
+LHBhcmVudCAweGZmZmY5YmZmODdkNGRlYzANCj4gICBuYW1lID0gMHhmZmZmOWJmZjg3YzFmZDYw
+ICJJTlRFTC1JUi1NU0ktMS0yIg0KPiAgIHBhcmVudCA9IDB4ZmZmZjliZmY4NzQwMDAwMA0KPiBj
+cmFzaD4gaXJxX2RvbWFpbi5uYW1lLHBhcmVudCAweGZmZmY5YmZmODc0MDAwMDANCj4gICBuYW1l
+ID0gMHhmZmZmOWJmZjg3YzI0MzAwICJJTlRFTC1JUi0xIg0KPiAgIHBhcmVudCA9IDB4ZmZmZjli
+ZmY4N2M2YzkwMA0KPiBjcmFzaD4gaXJxX2RvbWFpbi5uYW1lLHBhcmVudCAweGZmZmY5YmZmODdj
+NmM5MDANCj4gICBuYW1lID0gMHhmZmZmOWJmZjg3YzNlY2QwICJWRUNUT1IiDQo+ICAgcGFyZW50
+ID0gMHgwLS0tLS0tLS0tLS0tLS0tLS0tLS0tLXRoZSBoaWdoZXN0IGxldmVsDQo+IA0KPiBhbmQg
+c3RhcCBpcnFfbWF0cml4X2FsbG9jX21hbmFnZWQgZ2V0IHJldHVybiB2YWx1ZSAtRU5PU1BDLg0K
+PiANCj4gV2hlbiBubyB2aXJ0aW9fYmxrIGRldmljZSBwcm9iZSx0aGUgdmN0b3JfbWF0cml4IGlz
+Og0KPiBjcmFzaD4gIHAgKnZlY3Rvcl9tYXRyaXgNCj4gJDEgPSB7DQo+ICAgbWF0cml4X2JpdHMg
+PSAyNTYsDQo+ICAgYWxsb2Nfc3RhcnQgPSAzMiwNCj4gICBhbGxvY19lbmQgPSAyMzYsDQo+ICAg
+YWxsb2Nfc2l6ZSA9IDIwNCwNCj4gICBnbG9iYWxfYXZhaWxhYmxlID0gMTU1OTMsDQo+ICAgZ2xv
+YmFsX3Jlc2VydmVkID0gMTQ5LA0KPiAgIHN5c3RlbWJpdHNfaW5hbGxvYyA9IDMsDQo+ICAgdG90
+YWxfYWxsb2NhdGVkID0gNDA5LA0KPiAgIG9ubGluZV9tYXBzID0gODAsDQo+ICAgbWFwcyA9IDB4
+MmZmMjAsDQo+ICAgc2NyYXRjaF9tYXAgPSB7MTE2MTA2MzM0MjAxNDQ2MywgMCwgMSwgMTg0NDY3
+MjY0ODE1MjM1MDcyMDAsDQo+ICAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAw
+LCAwLCAwLA0KPiAgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sDQo+ICAg
+c3lzdGVtX21hcCA9IHsxMTI1OTA0NzM5NzI5NDA3LCAwLCAxLCAxODQ0NjcyNjQ4MTUyMzUwNzIw
+MCwNCj4gIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsDQo+ICAw
+LCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwfQ0KPiB9DQo+IA0KPiBXaGVuIHRo
+ZSBkdW1wIHN0YWNrIG9jY3VyLHRoZSB2ZWN0b3JfbWF0cml4IG9mIHN5c3RlbSBpcyBleGhhdXN0
+ZWQuDQo+IGNyYXNoPiBwICp2ZWN0b3JfbWF0cml4DQo+ICQ4MiA9IHsNCj4gICBtYXRyaXhfYml0
+cyA9IDI1NiwNCj4gICBhbGxvY19zdGFydCA9IDMyLA0KPiAgIGFsbG9jX2VuZCA9IDIzNiwNCj4g
+ICBhbGxvY19zaXplID0gMjA0LA0KPiAgIGdsb2JhbF9hdmFpbGFibGUgPSAwLC8vY2FxOmlycSBs
+ZWZ0DQo+ICAgZ2xvYmFsX3Jlc2VydmVkID0gMTUxLA0KPiAgIHN5c3RlbWJpdHNfaW5hbGxvYyA9
+IDMsDQo+ICAgdG90YWxfYWxsb2NhdGVkID0gMTkyMiwvL2NhcTppcnEgdGhhdCBhbGxvY2F0ZWQN
+Cj4gICBvbmxpbmVfbWFwcyA9IDgwLA0KPiAgIG1hcHMgPSAweDJmZjIwLA0KPiAgIHNjcmF0Y2hf
+bWFwID0gezE4NDQ2NzQ0MDY5OTUyNTAzODA3LCAxODQ0Njc0NDA3MzcwOTU1MTYxNSwNCj4gIDE4
+NDQ2NzQ0MDczNzA5NTUxNjE1LCAxODQ0NjczNTI3NzYxNjUyOTQwNywgMCwgMCwgMCwgMCwgMCwN
+Cj4gIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDAs
+IDAsIDAsIDAsIDAsIDB9LA0KPiAgIHN5c3RlbV9tYXAgPSB7MTEyNTkwNDczOTcyOTQwNywgMCwg
+MSwgMTg0NDY3MjY0ODE1MjM1MDcyMDAsDQo+ICAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAw
+LCAwLCAwLCAwLA0KPiAgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwg
+MH0NCj4gfQ0KPiANCj4gQW5kIHdlIHRlc3RlZCB0aGUgdmlydGlvX2JsayBkZXZpY2Ugd2hpY2gg
+cmVxdWVzdCBpcnEgc3VjY2VzcywNCj4gd2UgZm91bmQgdGhhdCBpbiBhIHN5c3RlbSB3aXRoIDgw
+IGNvcmVzIGFuZCB0d28gbnVtYSAsb25lDQo+IHZpcnRpb19ibGsgZGV2aWNlIHdpdGgganVzdCB0
+d28gZGF0YSBxdWV1ZXMgY29uc3VtZSA4MSBpcnFzIGNhcGFjaXR5LA0KPiBBbHRob3VnaCBpdCBq
+dXN0IG9ubHkgdGhyZWUgaXJxcyBpbiAvcHJvYy9pbnRlcnJ1cHQsODAgaXJxcyBjYXBhY2l0eSAN
+Cj4gaXMgZWZmZWN0ZWQgYnkgZnVuY3Rpb24gImlycV9idWlsZF9hZmZpbml0eV9tYXNrcyIgd2l0
+aCAyKjQwLg0KPiANCj4gYmVmb3JlIG9uZSB2aXJ0aW9fYmxrIGRldmljZSBob3RwbHVnIG91dDoN
+Cj4gY3Jhc2g+IHAgKnZlY3Rvcl9tYXRyaXgNCj4gJDIgPSB7DQo+ICAgbWF0cml4X2JpdHMgPSAy
+NTYsDQo+ICAgYWxsb2Nfc3RhcnQgPSAzMiwNCj4gICBhbGxvY19lbmQgPSAyMzYsDQo+ICAgYWxs
+b2Nfc2l6ZSA9IDIwNCwNCj4gICBnbG9iYWxfYXZhaWxhYmxlID0gMTUyMTUsDQo+ICAgZ2xvYmFs
+X3Jlc2VydmVkID0gMTUwLA0KPiAgIHN5c3RlbWJpdHNfaW5hbGxvYyA9IDMsDQo+ICAgdG90YWxf
+YWxsb2NhdGVkID0gNTUzLA0KPiAgIG9ubGluZV9tYXBzID0gODAsDQo+ICAgbWFwcyA9IDB4MmZm
+MjAsDQo+ICAgc2NyYXRjaF9tYXAgPSB7MTE3OTc0NjQ0OTc1MjA2MywgMCwgMSwgMTg0NDY3MjY0
+ODE1MjM1MDcyMDAsIDAsIDAsIDAsDQo+ICAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAw
+LCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCANCj4gIDAsIDAsIDAsIDAsIDB9LA0KPiAgIHN5
+c3RlbV9tYXAgPSB7MTEyNTkwNDczOTcyOTQwNywgMCwgMSwgMTg0NDY3MjY0ODE1MjM1MDcyMDAs
+IDAsIDAsIDAsDQo+ICAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAw
+LCAwLCAwLCAwLCAwLCAwLA0KPiAgMCwgMCwgMCwgMCwgMH0NCj4gfQ0KPiANCj4gYWZ0ZXIgb25l
+IHZpcnRpb19ibGsgZGV2aWNlIGhvdHBsdWcgb3V0Og0KPiBjcmFzaD4gcCAqdmVjdG9yX21hdHJp
+eA0KPiAkMyA9IHsNCj4gICBtYXRyaXhfYml0cyA9IDI1NiwNCj4gICBhbGxvY19zdGFydCA9IDMy
+LA0KPiAgIGFsbG9jX2VuZCA9IDIzNiwNCj4gICBhbGxvY19zaXplID0gMjA0LA0KPiAgIGdsb2Jh
+bF9hdmFpbGFibGUgPSAxNTI5NiwtLS1pdCBpbmNyZWFzZSA4MSxpbmNsdWRlIDEgY29uZmlnIGly
+cS4NCj4gICBnbG9iYWxfcmVzZXJ2ZWQgPSAxNTAsDQo+ICAgc3lzdGVtYml0c19pbmFsbG9jID0g
+MywNCj4gICB0b3RhbF9hbGxvY2F0ZWQgPSA1NTAsLS0tLS0taXQganVzdCBkZWNyZWFzZSAzLg0K
+PiAgIG9ubGluZV9tYXBzID0gODAsDQo+ICAgbWFwcyA9IDB4MmZmMjAsDQo+ICAgc2NyYXRjaF9t
+YXAgPSB7NDgxMDM2MzM3MTUyLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAw
+LA0KPiAgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwNCj4gIDAsIDAs
+IDAsIDB9LA0KPiAgIHN5c3RlbV9tYXAgPSB7MTEyNTkwNDczOTcyOTQwNywgMCwgMSwgMTg0NDY3
+MjY0ODE1MjM1MDcyMDAsIDAsIDAsIDAsDQo+ICAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAw
+LCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLCAwLA0KPiAgMCwgMCwgMCwgMCwgMH0NCj4gfQ0K
+PiANCj4gV2UgdGVzdCB0aGUgbmV3IGtlcm5lbCBhbHNvLGl0IG9jY3VyIHRoZSBzYW1lIHJlc3Vs
+dC4NCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gZ2VuaXJxOiBGbGFncyBtaXNtYXRjaCBp
+cnEgMC4gMDAwMDAwODAgKHZpcnRpbzYwOCkgdnMuIDAwMDE1YTAwICh0aW1lcikNCj4gW0ZyaSBT
+ZXAgMjMgMDQ6NTE6NDIgMjAyMl0gQ1BVOiAwIFBJRDogNTc0OSBDb21tOiBrd29ya2VyLzA6MCBL
+ZHVtcDogbG9hZGVkIFRhaW50ZWQ6IEcgICAgICAgIFcgIE9FICAgICAgNi4wLjAtcmM2KyAjNQ0K
+PiBbRnJpIFNlcCAyMyAwNDo1MTo0MiAyMDIyXSBIYXJkd2FyZSBuYW1lOiBJbnNwdXIgTkY1Mjgw
+TTUvWVpNQi0wMDg4Mi0xMEUsIEJJT1MgNC4xLjE5IDA2LzE2LzIwMjENCj4gW0ZyaSBTZXAgMjMg
+MDQ6NTE6NDIgMjAyMl0gV29ya3F1ZXVlOiBldmVudHMgd29ya19mb3JfY3B1X2ZuDQo+IFtGcmkg
+U2VwIDIzIDA0OjUxOjQyIDIwMjJdIENhbGwgVHJhY2U6DQo+IFtGcmkgU2VwIDIzIDA0OjUxOjQy
+IDIwMjJdICA8VEFTSz4NCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gIGR1bXBfc3RhY2tf
+bHZsKzB4MzMvMHg0Ng0KPiBbRnJpIFNlcCAyMyAwNDo1MTo0MiAyMDIyXSAgX19zZXR1cF9pcnEr
+MHg3MDUvMHg3NzANCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gIHJlcXVlc3RfdGhyZWFk
+ZWRfaXJxKzB4MTA5LzB4MTcwDQo+IFtGcmkgU2VwIDIzIDA0OjUxOjQyIDIwMjJdICB2cF9maW5k
+X3ZxcysweGM0LzB4MTkwDQo+IFtGcmkgU2VwIDIzIDA0OjUxOjQyIDIwMjJdICBpbml0X3Zxcysw
+eDM0OC8weDU4MCBbdmlydGlvX25ldF0NCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gIHZp
+cnRuZXRfcHJvYmUrMHg1NGQvMHhhODAgW3ZpcnRpb19uZXRdDQo+IFtGcmkgU2VwIDIzIDA0OjUx
+OjQyIDIwMjJdICB2aXJ0aW9fZGV2X3Byb2JlKzB4MTljLzB4MjQwDQo+IFtGcmkgU2VwIDIzIDA0
+OjUxOjQyIDIwMjJdICByZWFsbHlfcHJvYmUrMHgxMDYvMHgzZTANCj4gW0ZyaSBTZXAgMjMgMDQ6
+NTE6NDIgMjAyMl0gID8gcG1fcnVudGltZV9iYXJyaWVyKzB4NGYvMHhhMA0KPiBbRnJpIFNlcCAy
+MyAwNDo1MTo0MiAyMDIyXSAgX19kcml2ZXJfcHJvYmVfZGV2aWNlKzB4NzkvMHgxNzANCj4gW0Zy
+aSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gIGRyaXZlcl9wcm9iZV9kZXZpY2UrMHgxZi8weGEwDQo+
+IFtGcmkgU2VwIDIzIDA0OjUxOjQyIDIwMjJdICBfX2RldmljZV9hdHRhY2hfZHJpdmVyKzB4ODUv
+MHgxMTANCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gID8gZHJpdmVyX2FsbG93c19hc3lu
+Y19wcm9iaW5nKzB4NjAvMHg2MA0KPiBbRnJpIFNlcCAyMyAwNDo1MTo0MiAyMDIyXSAgPyBkcml2
+ZXJfYWxsb3dzX2FzeW5jX3Byb2JpbmcrMHg2MC8weDYwDQo+IFtGcmkgU2VwIDIzIDA0OjUxOjQy
+IDIwMjJdICBidXNfZm9yX2VhY2hfZHJ2KzB4NjcvMHhiMA0KPiBbRnJpIFNlcCAyMyAwNDo1MTo0
+MiAyMDIyXSAgX19kZXZpY2VfYXR0YWNoKzB4ZTkvMHgxYjANCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6
+NDIgMjAyMl0gIGJ1c19wcm9iZV9kZXZpY2UrMHg4Ny8weGEwDQo+IFtGcmkgU2VwIDIzIDA0OjUx
+OjQyIDIwMjJdICBkZXZpY2VfYWRkKzB4NTlmLzB4OTUwDQo+IFtGcmkgU2VwIDIzIDA0OjUxOjQy
+IDIwMjJdICA/IGRldl9zZXRfbmFtZSsweDRlLzB4NzANCj4gW0ZyaSBTZXAgMjMgMDQ6NTE6NDIg
+MjAyMl0gIHJlZ2lzdGVyX3ZpcnRpb19kZXZpY2UrMHhhYy8weGYwDQo+IFtGcmkgU2VwIDIzIDA0
+OjUxOjQyIDIwMjJdICB2aXJ0aW9fcGNpX3Byb2JlKzB4MTAxLzB4MTcwDQo+IFtGcmkgU2VwIDIz
+IDA0OjUxOjQyIDIwMjJdICBsb2NhbF9wY2lfcHJvYmUrMHg0Mi8weGEwDQo+IFtGcmkgU2VwIDIz
+IDA0OjUxOjQyIDIwMjJdICB3b3JrX2Zvcl9jcHVfZm4rMHgxMy8weDIwDQo+IFtGcmkgU2VwIDIz
+IDA0OjUxOjQyIDIwMjJdICBwcm9jZXNzX29uZV93b3JrKzB4MWMyLzB4M2QwDQo+IFtGcmkgU2Vw
+IDIzIDA0OjUxOjQyIDIwMjJdICA/IHByb2Nlc3Nfb25lX3dvcmsrMHgzZDAvMHgzZDANCj4gW0Zy
+aSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gIHdvcmtlcl90aHJlYWQrMHgxYjkvMHgzNjANCj4gW0Zy
+aSBTZXAgMjMgMDQ6NTE6NDIgMjAyMl0gID8gcHJvY2Vzc19vbmVfd29yaysweDNkMC8weDNkMA0K
+PiBbRnJpIFNlcCAyMyAwNDo1MTo0MiAyMDIyXSAga3RocmVhZCsweGU2LzB4MTEwDQo+IFtGcmkg
+U2VwIDIzIDA0OjUxOjQyIDIwMjJdICA/IGt0aHJlYWRfY29tcGxldGVfYW5kX2V4aXQrMHgyMC8w
+eDIwDQo+IFtGcmkgU2VwIDIzIDA0OjUxOjQyIDIwMjJdICByZXRfZnJvbV9mb3JrKzB4MWYvMHgz
+MA0KPiBbRnJpIFNlcCAyMyAwNDo1MTo0MiAyMDIyXSAgPC9UQVNLPg0KPiBbRnJpIFNlcCAyMyAw
+NDo1MTo0MyAyMDIyXSB2aXJ0aW9fbmV0OiBwcm9iZSBvZiB2aXJ0aW82MDggZmFpbGVkIHdpdGgg
+ZXJyb3IgLTE2DQo+IA0KPiBGaXhlczogYWQ3MTQ3M2Q5YzQzICgidmlydGlvX2JsazogdXNlIHZp
+cnRpbyBJUlEgYWZmaW5pdHkiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBBbmd1cyBDaGVuIDxhbmd1cy5j
+aGVuQGphZ3Vhcm1pY3JvLmNvbT4NCj4gVGVzdGVkLWJ5OiBMaW1pbmcgV3UgPGxpbWluZy53dUBq
+YWd1YXJtaWNyby5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9ibG9jay92aXJ0aW9fYmxrLmMgfCAz
+ICstLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAyIGRlbGV0aW9ucygtKQ0K
+PiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmxvY2svdmlydGlvX2Jsay5jIGIvZHJpdmVycy9i
+bG9jay92aXJ0aW9fYmxrLmMNCj4gaW5kZXggYThiY2YzZjY2NGFmLi4wNzVkZTMwYTliYjQgMTAw
+NjQ0DQo+IC0tLSBhL2RyaXZlcnMvYmxvY2svdmlydGlvX2Jsay5jDQo+ICsrKyBiL2RyaXZlcnMv
+YmxvY2svdmlydGlvX2Jsay5jDQo+IEBAIC01MTMsNyArNTEzLDYgQEAgc3RhdGljIGludCBpbml0
+X3ZxKHN0cnVjdCB2aXJ0aW9fYmxrICp2YmxrKQ0KPiAgCXN0cnVjdCB2aXJ0cXVldWUgKip2cXM7
+DQo+ICAJdW5zaWduZWQgc2hvcnQgbnVtX3ZxczsNCj4gIAlzdHJ1Y3QgdmlydGlvX2RldmljZSAq
+dmRldiA9IHZibGstPnZkZXY7DQo+IC0Jc3RydWN0IGlycV9hZmZpbml0eSBkZXNjID0geyAwLCB9
+Ow0KPiAgDQo+ICAJZXJyID0gdmlydGlvX2NyZWFkX2ZlYXR1cmUodmRldiwgVklSVElPX0JMS19G
+X01RLA0KPiAgCQkJCSAgIHN0cnVjdCB2aXJ0aW9fYmxrX2NvbmZpZywgbnVtX3F1ZXVlcywNCj4g
+QEAgLTU0OCw3ICs1NDcsNyBAQCBzdGF0aWMgaW50IGluaXRfdnEoc3RydWN0IHZpcnRpb19ibGsg
+KnZibGspDQo+ICAJfQ0KPiAgDQo+ICAJLyogRGlzY292ZXIgdmlydHF1ZXVlcyBhbmQgd3JpdGUg
+aW5mb3JtYXRpb24gdG8gY29uZmlndXJhdGlvbi4gICovDQo+IC0JZXJyID0gdmlydGlvX2ZpbmRf
+dnFzKHZkZXYsIG51bV92cXMsIHZxcywgY2FsbGJhY2tzLCBuYW1lcywgJmRlc2MpOw0KPiArCWVy
+ciA9IHZpcnRpb19maW5kX3Zxcyh2ZGV2LCBudW1fdnFzLCB2cXMsIGNhbGxiYWNrcywgbmFtZXMs
+IE5VTEwpOw0KPiAgCWlmIChlcnIpDQo+ICAJCWdvdG8gb3V0Ow0KPiAgDQo+IC0tIA0KPiAyLjE3
+LjENCj4gDQotLS1lbmQgcXVvdGVkIHRleHQtLS0NCg==
