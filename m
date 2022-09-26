@@ -2,63 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 306E8C6FA8E
-	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 15:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B95EAC32771
+	for <linux-block@archiver.kernel.org>; Mon, 26 Sep 2022 16:03:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234827AbiIZP4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 11:56:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36316 "EHLO
+        id S235238AbiIZQDJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 12:03:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234303AbiIZP42 (ORCPT
+        with ESMTP id S234395AbiIZQCf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 11:56:28 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAFB027CD6;
-        Mon, 26 Sep 2022 07:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BF7TrxuHg8VWiYmnBgXSU6xi1GIgMGkhEuKcEkcRrWE=; b=q61X2kGQOlVfPdGfzQdHZqrsCF
-        ULKFTNsWkXfI2CSbw+m8C6cPDhxKHtFx7Ou4f4IomDUl6Q8PAYMHLUYrBwkindPLwfYZGXjtGwxiL
-        6Dwn7dV07rPVdhWVuGcsAh6uJmn1suURXynjiKRFbAhiJ9li8AITYB3pSsPmr2plAZEpxAlIeZjDD
-        91j2EAR0fCWShBW6NYf/qm4/JIdnodSl4SiCo8jIVho9yOJQIw5PIjoIpcI63wOiyKvm8O+Bj/4g7
-        60n5qzcxb62SNOl9YKCsB550EGuEJbGhbgbUoY6+ya2vIjWNmSUblwqC1Dg+FFT+VBoQC1MLc1LN4
-        5YbU764w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ocpKb-005R8Y-Gx; Mon, 26 Sep 2022 14:43:37 +0000
-Date:   Mon, 26 Sep 2022 07:43:37 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Stefan Roesch <shr@fb.com>
-Subject: Re: [PATCH 4/5] nvme: split out metadata vs non metadata end_io
- uring_cmd completions
-Message-ID: <YzG6mZhtd/QysvdH@infradead.org>
-References: <20220922182805.96173-1-axboe@kernel.dk>
- <20220922182805.96173-5-axboe@kernel.dk>
- <Yy3O7wH16t6AhC3j@infradead.org>
- <d09e1645-919f-9239-f86d-a8e85a133e5c@kernel.dk>
- <YzG5/1zSdiMlMLnB@infradead.org>
- <69598e37-fb91-5b92-bb80-b68457a7b6f8@kernel.dk>
+        Mon, 26 Sep 2022 12:02:35 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94DD97E83C;
+        Mon, 26 Sep 2022 07:50:44 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id AA18068AFE; Mon, 26 Sep 2022 16:50:40 +0200 (CEST)
+Date:   Mon, 26 Sep 2022 16:50:40 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, kbusch@kernel.org,
+        asml.silence@gmail.com, io-uring@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        gost.dev@samsung.com, Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH for-next v7 4/5] block: add helper to map bvec iterator
+ for passthrough
+Message-ID: <20220926145040.GA20424@lst.de>
+References: <20220909102136.3020-1-joshi.k@samsung.com> <CGME20220909103147epcas5p2a83ec151333bcb1d2abb8c7536789bfd@epcas5p2.samsung.com> <20220909102136.3020-5-joshi.k@samsung.com> <20220920120802.GC2809@lst.de> <20220922152331.GA24701@test-zns> <20220923152941.GA21275@lst.de> <20220923184349.GA3394@test-zns>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <69598e37-fb91-5b92-bb80-b68457a7b6f8@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20220923184349.GA3394@test-zns>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 08:41:38AM -0600, Jens Axboe wrote:
-> Sure, I don't really care. What name do you want for it?
+On Sat, Sep 24, 2022 at 12:13:49AM +0530, Kanchan Joshi wrote:
+> And efficency is the concern as we are moving to more heavyweight
+> helper that 'handles' weird conditions rather than just 'bails out'.
+> These alignment checks end up adding a loop that traverses
+> the entire ITER_BVEC.
+> Also blk_rq_map_user_iov uses bio_iter_advance which also seems
+> cycle-consuming given below code-comment in io_import_fixed():
 
-Maybe slow and fast?  Or simple and meta?
+No one says you should use the existing loop in blk_rq_map_user_iov.
+Just make it call your new helper early on when a ITER_BVEC iter is
+passed in.
 
-> 
-> -- 
-> Jens Axboe
-> 
-> 
----end quoted text---
+> Do you see good way to trigger this virt-alignment condition? I have
+> not seen this hitting (the SG gap checks) when running with fixebufs.
+
+You'd need to make sure the iovec passed to the fixed buffer
+registration is chunked up smaller than the nvme page size.
+
+E.g. if you pass lots of non-contiguous 512 byte sized iovecs to the
+buffer registration.
+
+>> We just need to implement the equivalent functionality for bvecs.  It
+>> isn't really hard, it just wasn't required so far.
+>
+> Can the virt-boundary alignment gap exist for ITER_BVEC iter in first
+> place?
+
+Yes.  bvecs are just a way to represent data.  If the individual
+segments don't fit the virt boundary you still need to deal with it.
