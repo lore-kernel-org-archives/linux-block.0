@@ -2,79 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7DF0C54EE9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 16:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40957C07E9D
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 16:19:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232989AbiI0QOu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Sep 2022 12:14:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51084 "EHLO
+        id S231317AbiI0QTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Sep 2022 12:19:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232763AbiI0QOo (ORCPT
+        with ESMTP id S231587AbiI0QTX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2022 12:14:44 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315B152DF6
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 09:14:43 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id lc7so21873082ejb.0
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 09:14:42 -0700 (PDT)
+        Tue, 27 Sep 2022 12:19:23 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E72561C88A4
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 09:19:21 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id r18so21742537eja.11
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 09:19:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date;
-        bh=AO3Ket6nM9CVbA4boalWeXCKbOK/+MGlVFc5tGoM03M=;
-        b=BlQlv/c2nDbmy0hEKfl2JbrHFwC3otnmINeaZ1HuJ4D1nVyd+9cAIBqvc2RdJPqR71
-         s1BLB8p3B/a8JenGnFi3GoR4Xrrgieh4rR+wyW6uFzU9xYhl1hR1pebFznxjiar/rCyM
-         ad/QIzXGVdVMaOsQPNgu8DnCgXMr4BOk7kGJBaO6OEXwTSgmqI88FVq6WbuvVpTtORm6
-         gT/ymrLYdnPxU9hVfSUlmbNC8hy/GBy/CGJDywNpXVb2wgeb3bPnQeeQJHie1mbQxN71
-         NviB9CcLR/+4DVzcwHnj5SQKf4arBoivTeK3IE5Ll8aLpZed3UvXM0i2oT+lHXtf9K95
-         bDLw==
+        bh=wtuYP/U8JcCds+Y8vgYt3RNPN+IvgKtQC+pNVMQXjHw=;
+        b=VPLGTAFsQ9vqWDNFPxTFeBhouiEHc5CpVWDjOnwMbJMnR2o39RyG6YtrR3o28npFwP
+         RvPNVrmMcTHfxXqqprE1I5VtYa7YQ60pF98aTQ8Tb1SpBkupjZZ3QaLsxKYxN/WKSVCj
+         07MJxNSBzx+dfnRsdbHVHytZBHXt3PW0m9HY68qnzjB3XE88/WUY7A5Cm2UaC45QUkq0
+         bxmwyOugjFh4VMs0Pm9Fd3npFFxpLLX9ipH7sCscaAPU/MUnbSrbBpX4xo0ZwCo89NNN
+         HYrWeJGzdTh3nQOQUfJhcISoeetoY9O8jd7mn23F7GWhydPmwRhsEH7Sv81uCEYHJA4V
+         UG4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=AO3Ket6nM9CVbA4boalWeXCKbOK/+MGlVFc5tGoM03M=;
-        b=CrjvrUXBjSJUQY/P+mPCWRVzKSpx8eo2yB5dmLbi2234SwRIYUXElL2/EHLaA9ZqeG
-         eiDtmdF7HDQRUQT+tfWc63Dq10a0+qlEU9KyYgwCe3pvOZ+8MGah4SF9MdP29R5S2p0P
-         NpniTUdvxH5+QztrZ9Uw5r4gbogJxd+MmsEolHhpzVnACoD/I4q7lk3opytWP2qd+vAA
-         VoOYOhzPaqpscxEhjCz4BWl374bG6bmL276eRVT9G5l00eiiCrFS51Ylaje1l/mfuLKl
-         dsjMiStLNmOw647xdNiFSzreZfvIYptKxyOf7nODD66Th7jIIrCi6mX3Zwvi6Boh1ckY
-         Q+4A==
-X-Gm-Message-State: ACrzQf2pnGJ0eXJD3yGZuoEG0UYW4/uO5kX9g6u+JiA2Vk/iWYBYZxzE
-        RXW+DHERHnKQAHerXgPV/ym4Cw==
-X-Google-Smtp-Source: AMsMyM64hNFD2cfbZd590RMmASdUD/jM6g6ZY9jroHQEBliD5vXeQLKdtJj0wVYw7OhzlDT8IBBK3w==
-X-Received: by 2002:a17:907:1b1c:b0:72f:9aac:ee41 with SMTP id mp28-20020a1709071b1c00b0072f9aacee41mr23448258ejc.56.1664295281511;
-        Tue, 27 Sep 2022 09:14:41 -0700 (PDT)
+        bh=wtuYP/U8JcCds+Y8vgYt3RNPN+IvgKtQC+pNVMQXjHw=;
+        b=dNHxTeq+23YziSzg2ns9CtsHoyyd4iV4H39w/yLEPdNCTIFQMAh8vDnYcJ3CUP16By
+         G4sys+45hLJTdb26gMtfzius/VExorwN4SBDRp/PCQdi0NI0A/2iq0tDyfrZQVZ54j0/
+         5zZ+YZ6O0aVeeIUeoRnX5ALMHNiIWPhum47s1YYL9hxgxyh8aWgAc0KbBsKV8RM5lSq0
+         HQuU6roFvIkjnYA97SEJN9gZNAj2RgdpYWmScR2j1al9rBlWxF3S4FmxBqRIvuHLl8gl
+         f8WFboUXiJML9m/uzyUr1MHIKDzeltJzhoxBXaZ1yCshBAivTn5gRbIEpnBydcW+QCU0
+         yQ0w==
+X-Gm-Message-State: ACrzQf1HAtwf648wZC/ff6Oi8aQHYxXaaf1ZDstub6dIK5sxdmLZZJgU
+        F/2DlTgNhZsdnjIiAw9Dx06GCg==
+X-Google-Smtp-Source: AMsMyM72s9GjR424MSP071Z2GqS/d2ATvAkbBHFTQyGzmNysECeWNT9rATKse5Hkg/ENGXsjfefBeg==
+X-Received: by 2002:a17:907:62a1:b0:781:b320:90c0 with SMTP id nd33-20020a17090762a100b00781b32090c0mr22413279ejc.255.1664295560374;
+        Tue, 27 Sep 2022 09:19:20 -0700 (PDT)
 Received: from mbp-di-paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
-        by smtp.gmail.com with ESMTPSA id g25-20020a1709067c5900b0073cd7cc2c81sm971265ejp.181.2022.09.27.09.14.40
+        by smtp.gmail.com with ESMTPSA id b18-20020a17090630d200b00780982d77d1sm974784ejb.154.2022.09.27.09.19.18
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Sep 2022 09:14:41 -0700 (PDT)
+        Tue, 27 Sep 2022 09:19:19 -0700 (PDT)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v3 3/5] block, bfq: don't disable wbt if
- CONFIG_BFQ_GROUP_IOSCHED is disabled
+Subject: Re: [patch v11 5/6] block, bfq: cleanup bfq_weights_tree add/remove
+ apis
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <84f52be5-0fc4-ad22-d1ce-27e3dbc28fe7@huaweicloud.com>
-Date:   Tue, 27 Sep 2022 18:14:39 +0200
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
+In-Reply-To: <20220919084633.nmzastqkjool5jnc@quack3>
+Date:   Tue, 27 Sep 2022 18:19:18 +0200
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <E29E2557-9D79-40A3-B0EA-5EBAD6DD5A1F@linaro.org>
-References: <20220922113558.1085314-1-yukuai3@huawei.com>
- <20220922113558.1085314-4-yukuai3@huawei.com>
- <Yy10vjnxAvca8Ee1@infradead.org>
- <988a86f2-e960-ba59-4d41-f4c8a6345ee9@huaweicloud.com>
- <20220923100659.a3atdanlvygffuxt@quack3>
- <95998ae6-8bbf-b438-801b-7033ceaf9c36@huaweicloud.com>
- <20220923110354.czvzm6rjm7mtqyh3@quack3>
- <5a2dba26-529d-295f-2e88-601475ff67bf@huaweicloud.com>
- <20220926142242.mxrkbs63ynmhulib@quack3>
- <84f52be5-0fc4-ad22-d1ce-27e3dbc28fe7@huaweicloud.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
+Message-Id: <6E987AC9-9EBD-4172-A440-2FC13BA9AFD1@linaro.org>
+References: <20220916071942.214222-1-yukuai1@huaweicloud.com>
+ <20220916071942.214222-6-yukuai1@huaweicloud.com>
+ <20220919084633.nmzastqkjool5jnc@quack3>
+To:     Jan Kara <jack@suse.cz>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -82,117 +74,189 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 27 set 2022, alle ore 03:02, Yu Kuai =
-<yukuai1@huaweicloud.com> ha scritto:
+> Il giorno 19 set 2022, alle ore 10:46, Jan Kara <jack@suse.cz> ha =
+scritto:
 >=20
-> Hi, Jan
+> On Fri 16-09-22 15:19:41, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>=20
+>> The 'bfq_data' and 'rb_root_cached' can both be accessed through
+>> 'bfq_queue', thus only pass 'bfq_queue' as parameter.
+>>=20
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 >=20
-> =E5=9C=A8 2022/09/26 22:22, Jan Kara =E5=86=99=E9=81=93:
->> Hi Kuai!
->> On Mon 26-09-22 21:00:48, Yu Kuai wrote:
->>> =E5=9C=A8 2022/09/23 19:03, Jan Kara =E5=86=99=E9=81=93:
->>>> Hi Kuai!
->>>>=20
->>>> On Fri 23-09-22 18:23:03, Yu Kuai wrote:
->>>>> =E5=9C=A8 2022/09/23 18:06, Jan Kara =E5=86=99=E9=81=93:
->>>>>> On Fri 23-09-22 17:50:49, Yu Kuai wrote:
->>>>>>> Hi, Christoph
->>>>>>>=20
->>>>>>> =E5=9C=A8 2022/09/23 16:56, Christoph Hellwig =E5=86=99=E9=81=93:
->>>>>>>> On Thu, Sep 22, 2022 at 07:35:56PM +0800, Yu Kuai wrote:
->>>>>>>>> wbt and bfq should work just fine if CONFIG_BFQ_GROUP_IOSCHED =
-is disabled.
->>>>>>>>=20
->>>>>>>> Umm, wouldn't this be something decided at runtime, that is not
->>>>>>>> if CONFIG_BFQ_GROUP_IOSCHED is enable/disable in the kernel =
-build
->>>>>>>> if the hierarchical cgroup based scheduling is actually used =
-for a
->>>>>>>> given device?
->>>>>>>> .
->>>>>>>>=20
->>>>>>>=20
->>>>>>> That's a good point,
->>>>>>>=20
->>>>>>> Before this patch wbt is simply disabled if elevator is bfq.
->>>>>>>=20
->>>>>>> With this patch, if elevator is bfq while bfq doesn't throttle
->>>>>>> any IO yet, wbt still is disabled unnecessarily.
->>>>>>=20
->>>>>> It is not really disabled unnecessarily. Have you actually tested =
-the
->>>>>> performance of the combination? I did once and the results were =
-just
->>>>>> horrible (which is I made BFQ just disable wbt by default). The =
-problem is
->>>>>> that blk-wbt assumes certain model of underlying storage stack =
-and hardware
->>>>>> behavior and BFQ just does not fit in that model. For example BFQ =
-wants to
->>>>>> see as many requests as possible so that it can heavily reorder =
-them,
->>>>>> estimate think times of applications, etc. On the other hand =
-blk-wbt
->>>>>> assumes that if request latency gets higher, it means there is =
-too much IO
->>>>>> going on and we need to allow less of "lower priority" IO types =
+
+Thanks for keeping improving BFQ's code.
+
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
+
+> Looks good. Feel free to add:
+>=20
+> Reviewed-by: Jan Kara <jack@suse.cz>
+>=20
+> 								Honza
+>> ---
+>> block/bfq-iosched.c | 19 +++++++++----------
+>> block/bfq-iosched.h | 10 +++-------
+>> block/bfq-wf2q.c    | 18 ++++++------------
+>> 3 files changed, 18 insertions(+), 29 deletions(-)
+>>=20
+>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>> index 6d95b0e488a8..4ad4fa0dad4a 100644
+>> --- a/block/bfq-iosched.c
+>> +++ b/block/bfq-iosched.c
+>> @@ -870,9 +870,9 @@ static bool bfq_asymmetric_scenario(struct =
+bfq_data *bfqd,
+>>  * In most scenarios, the rate at which nodes are created/destroyed
+>>  * should be low too.
+>>  */
+>> -void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue =
+*bfqq,
+>> -			  struct rb_root_cached *root)
+>> +void bfq_weights_tree_add(struct bfq_queue *bfqq)
+>> {
+>> +	struct rb_root_cached *root =3D &bfqq->bfqd->queue_weights_tree;
+>> 	struct bfq_entity *entity =3D &bfqq->entity;
+>> 	struct rb_node **new =3D &(root->rb_root.rb_node), *parent =3D =
+NULL;
+>> 	bool leftmost =3D true;
+>> @@ -944,13 +944,14 @@ void bfq_weights_tree_add(struct bfq_data =
+*bfqd, struct bfq_queue *bfqq,
+>>  * See the comments to the function bfq_weights_tree_add() for =
+considerations
+>>  * about overhead.
+>>  */
+>> -void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+>> -			       struct bfq_queue *bfqq,
+>> -			       struct rb_root_cached *root)
+>> +void __bfq_weights_tree_remove(struct bfq_queue *bfqq)
+>> {
+>> +	struct rb_root_cached *root;
+>> +
+>> 	if (!bfqq->weight_counter)
+>> 		return;
+>>=20
+>> +	root =3D &bfqq->bfqd->queue_weights_tree;
+>> 	bfqq->weight_counter->num_active--;
+>> 	if (bfqq->weight_counter->num_active > 0)
+>> 		goto reset_entity_pointer;
+>> @@ -967,11 +968,9 @@ void __bfq_weights_tree_remove(struct bfq_data =
+*bfqd,
+>>  * Invoke __bfq_weights_tree_remove on bfqq and decrement the number
+>>  * of active groups for each queue's inactive parent entity.
+>>  */
+>> -void bfq_weights_tree_remove(struct bfq_data *bfqd,
+>> -			     struct bfq_queue *bfqq)
+>> +void bfq_weights_tree_remove(struct bfq_queue *bfqq)
+>> {
+>> -	__bfq_weights_tree_remove(bfqd, bfqq,
+>> -				  &bfqd->queue_weights_tree);
+>> +	__bfq_weights_tree_remove(bfqq);
+>> }
+>>=20
+>> /*
+>> @@ -6220,7 +6219,7 @@ static void bfq_completed_request(struct =
+bfq_queue *bfqq, struct bfq_data *bfqd)
+>> 		bfqq->budget_timeout =3D jiffies;
+>>=20
+>> 		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>> -		bfq_weights_tree_remove(bfqd, bfqq);
+>> +		bfq_weights_tree_remove(bfqq);
+>> 	}
+>>=20
+>> 	now_ns =3D ktime_get_ns();
+>> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+>> index 257acb54c6dc..4bb58ab0c90a 100644
+>> --- a/block/bfq-iosched.h
+>> +++ b/block/bfq-iosched.h
+>> @@ -973,13 +973,9 @@ struct bfq_queue *bic_to_bfqq(struct bfq_io_cq =
+*bic, bool is_sync);
+>> void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool =
+is_sync);
+>> struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
+>> void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue =
+*bfqq);
+>> -void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue =
+*bfqq,
+>> -			  struct rb_root_cached *root);
+>> -void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+>> -			       struct bfq_queue *bfqq,
+>> -			       struct rb_root_cached *root);
+>> -void bfq_weights_tree_remove(struct bfq_data *bfqd,
+>> -			     struct bfq_queue *bfqq);
+>> +void bfq_weights_tree_add(struct bfq_queue *bfqq);
+>> +void __bfq_weights_tree_remove(struct bfq_queue *bfqq);
+>> +void bfq_weights_tree_remove(struct bfq_queue *bfqq);
+>> void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>> 		     bool compensate, enum bfqq_expiration reason);
+>> void bfq_put_queue(struct bfq_queue *bfqq);
+>> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+>> index 5e8224c96921..124aaea6196e 100644
+>> --- a/block/bfq-wf2q.c
+>> +++ b/block/bfq-wf2q.c
+>> @@ -707,7 +707,6 @@ __bfq_entity_update_weight_prio(struct =
+bfq_service_tree *old_st,
+>> 		struct bfq_queue *bfqq =3D bfq_entity_to_bfqq(entity);
+>> 		unsigned int prev_weight, new_weight;
+>> 		struct bfq_data *bfqd =3D NULL;
+>> -		struct rb_root_cached *root;
+>> #ifdef CONFIG_BFQ_GROUP_IOSCHED
+>> 		struct bfq_sched_data *sd;
+>> 		struct bfq_group *bfqg;
+>> @@ -770,19 +769,15 @@ __bfq_entity_update_weight_prio(struct =
+bfq_service_tree *old_st,
+>> 		 * queue, remove the entity from its old weight counter =
+(if
+>> 		 * there is a counter associated with the entity).
+>> 		 */
+>> -		if (prev_weight !=3D new_weight && bfqq) {
+>> -			root =3D &bfqd->queue_weights_tree;
+>> -			__bfq_weights_tree_remove(bfqd, bfqq, root);
+>> -		}
+>> +		if (prev_weight !=3D new_weight && bfqq)
+>> +			__bfq_weights_tree_remove(bfqq);
+>> 		entity->weight =3D new_weight;
+>> 		/*
+>> 		 * Add the entity, if it is not a weight-raised queue,
+>> 		 * to the counter associated with its new weight.
+>> 		 */
+>> -		if (prev_weight !=3D new_weight && bfqq && =
+bfqq->wr_coeff =3D=3D 1) {
+>> -			/* If we get here, root has been initialized. */
+>> -			bfq_weights_tree_add(bfqd, bfqq, root);
+>> -		}
+>> +		if (prev_weight !=3D new_weight && bfqq && =
+bfqq->wr_coeff =3D=3D 1)
+>> +			bfq_weights_tree_add(bfqq);
+>>=20
+>> 		new_st->wsum +=3D entity->weight;
+>>=20
+>> @@ -1687,7 +1682,7 @@ void bfq_del_bfqq_busy(struct bfq_queue *bfqq, =
+bool expiration)
+>> 		 * Next function is invoked last, because it causes bfqq =
 to be
->>>>>> submitted. These two go directly against one another and I was =
-easily
->>>>>> observing blk-wbt spiraling down to allowing only very small =
-number of
->>>>>> requests submitted while BFQ was idling waiting for more IO from =
-the
->>>>>> process that was currently scheduled.
->>>>>>=20
->>>>>=20
->>>>> Thanks for your explanation, I understand that bfq and wbt should =
-not
->>>>> work together.
->>>>>=20
->>>>> However, I wonder if CONFIG_BFQ_GROUP_IOSCHED is disabled, or =
-service
->>>>> guarantee is not needed, does the above phenomenon still exist? I =
-find
->>>>> it hard to understand... Perhaps I need to do some test.
->>>>=20
->>>> Well, BFQ implements for example idling on sync IO queues which is =
-one of
->>>> the features that upsets blk-wbt. That does not depend on
->>>> CONFIG_BFQ_GROUP_IOSCHED in any way. Also generally the idea that =
-BFQ
->>>> assigns storage *time slots* to different processes and IO from =
-other
->>>> processes is just queued at those times increases IO completion
->>>> latency (for IOs of processes that are not currently scheduled) and =
-this
->>>> tends to confuse blk-wbt.
->>>>=20
->>> Hi, Jan
->>>=20
->>> Just to be curious, have you ever think about or tested wbt with
->>> io-cost? And even more, how bfq work with io-cost?
->>>=20
->>> I haven't tested yet, but it seems to me some of them can work well
->>> together.
->> No, I didn't test these combinations. I actually expect there would =
-be
->> troubles in both cases under high IO load but you can try :)
->=20
-> Just realize I made a clerical error, I actually want to saied that
-> *can't* work well together.
->=20
-
-You are right, they can't work together, conceptually. Their logics =
-would simply keep conflicting, and none of the two would make ti to =
-control IO as desired.
-
-Thanks,
-Paolo
-
-> I'll try to have a test the combinations.
->=20
-> Thanks,
-> Kuai
->> 								Honza
+>> 		 * freed. DO NOT use bfqq after the next function =
+invocation.
+>> 		 */
+>> -		bfq_weights_tree_remove(bfqd, bfqq);
+>> +		bfq_weights_tree_remove(bfqq);
+>> 	}
+>> }
+>>=20
+>> @@ -1708,8 +1703,7 @@ void bfq_add_bfqq_busy(struct bfq_queue *bfqq)
+>> 	if (!bfqq->dispatched) {
+>> 		bfq_add_bfqq_in_groups_with_pending_reqs(bfqq);
+>> 		if (bfqq->wr_coeff =3D=3D 1)
+>> -			bfq_weights_tree_add(bfqd, bfqq,
+>> -					     &bfqd->queue_weights_tree);
+>> +			bfq_weights_tree_add(bfqq);
+>> 	}
+>>=20
+>> 	if (bfqq->wr_coeff > 1)
+>> --=20
+>> 2.31.1
+>>=20
+> --=20
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
 
