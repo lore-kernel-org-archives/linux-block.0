@@ -2,156 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 156E2C07E9D
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 03:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E33C54EE9
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 04:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229472AbiI0DjU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 23:39:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52472 "EHLO
+        id S229598AbiI0EDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Sep 2022 00:03:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiI0DjT (ORCPT
+        with ESMTP id S229449AbiI0EDW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 23:39:19 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B652AB071
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 20:39:18 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id x18so5357117qkn.6
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 20:39:18 -0700 (PDT)
+        Tue, 27 Sep 2022 00:03:22 -0400
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6ECCAB181
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 21:03:21 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id i3so5381193qkl.3
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 21:03:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:from:to:cc:subject:date;
-        bh=ZH4Ham6QOYlPJxFlz6NHTTKOMx8HcWnSTKQZP+8VER0=;
-        b=RFbZI3xEL5vv8HSqcE2cVEQbAFDe2oFUs/anu59++xOuOitH5qKR4o+UDeN5Gn/UNE
-         3roofFKh6ChKQIQgSoSFMV94SdHSd0rrooSJgfYWPLFCtX4kWJRDgLkB23BSRkv8AXlm
-         q8K2CiuZM/JRQ3+qCurzhCanF4Mr1l6pe39tZfISBVlXrRZ99AlDba/nYvMVHBI/2gbb
-         r1dpn4gIgjrkle/NCPLDfAdNe/JQ/472tYUHJA6ip2ka/7gAauhJ5vdvu/TZynvu1IRV
-         z6fUABXayr+gXGc3sAiojufbH3NvwfDhZelkhFYeqoQhKxN8KV8LJvP0yBvZdIoGm/sc
-         2BMA==
+        bh=RVeDgL58MZ/WnottLUU1JEd91S6UWqT1/tRkRRE+vRU=;
+        b=epR5HFBd6WZTiwOoOcTrwHK0nEhccfHOmjrktKl+qtCLHJhx/SLK1MmYZ3OvETzJij
+         pev/5Nb1gqOU4HW6sdBTnH9atIHmoj2azPRB7YdwF/suqrYlmAo9OCU2dvaXgrS6Kd9d
+         lSPyYvcEcQV8rm51m3ZBG3ncAC9YyO/MK3Jb1OhehgT4WbZx6pjlEinKMhwBEQ4xBFGr
+         UEwmeFcdVP90XwJLRbdqJLU7OKJVWzRdbtXkT1ZOcpNVcOVX45+3UKwP8oZYbebqKJt5
+         25pWnsS9KSLMNSDrB49ymLwM4KHNAtgBV/4hDKJSyKXwISMg94qvubWiCcuOxbdMpx60
+         8nhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=ZH4Ham6QOYlPJxFlz6NHTTKOMx8HcWnSTKQZP+8VER0=;
-        b=p9QmrCyk1Mi+eILVU3rD4zLzZ5UmSYHwO/XFtIuQzbJfBCtorbFnzzMht92gFKfFpo
-         TgLZmNzRNsEwoKJsfbh6fpWI+52kn0ycI/RpCSnqVNLH/dB/QW77r0KsjIVLzYmpzjpB
-         hWqgwWvlIEVCjPFD1uBI8rxVvsGmWwBehYcm0CXD6uPTxmj4d8nBKS8ligkoZeOAepcU
-         WzI2U9qfCpXHZ2iSvfRIk1rw8c1zbIAAkpRl3DWBTU9EFfdzHG+04Vwd5vrhfj6YYEf8
-         9ytObCpPsRcArqUhd10hStl9NFhq41taW7b1B0DKkeyp/ViAukQ4uXPic3d/6wzzBhSn
-         1QPQ==
-X-Gm-Message-State: ACrzQf0FsevSMppDnpvxnmPdBrqmltaxb3SMknv5/Qtu5GpWr9Kp4A49
-        knunGKYD+ZlzPf9lrrNt4bf4ms9GToty8w==
-X-Google-Smtp-Source: AMsMyM5YZB/KpqvuCJvz1223w+yYHQxY7+ypCr/nHs3CQv7HgvYdIw8Y6LdNJ6LzFNajYC7+zI/e2A==
-X-Received: by 2002:a05:620a:244b:b0:6ce:8443:bda1 with SMTP id h11-20020a05620a244b00b006ce8443bda1mr15920184qkn.685.1664249957360;
-        Mon, 26 Sep 2022 20:39:17 -0700 (PDT)
+        bh=RVeDgL58MZ/WnottLUU1JEd91S6UWqT1/tRkRRE+vRU=;
+        b=U1fbK+FtvyYAz/WSM7u4WOvkcIjlPXRGIXx+irZ5Py+I3XFxAGJ6vSeCDeaz370Uf+
+         hmMc+DJVlA6zscrwiQJxJnAncP8L+hTld79wotfhBGmEuUK3J+o6NknDi8wbgXDTggbP
+         AuJzct9Mwp5+xNUBcn57WneAzxrzp11XKX0a0tXMYfAgpfhz1DBRt7yYn0UMsSNfingE
+         hJm7PZPuFVvUdIkXhMlFKdp5YF2NtvTjOYShWflnEVo8/v3dduz0XZojuHv93tK31xQx
+         gP3DfIvu5sa7zJm11OXsOaDtLjMQjh0N1XuFTVtjA4c6VDsJdy599XDUzSViWOMFwbXA
+         M7Vw==
+X-Gm-Message-State: ACrzQf1WGE0AI5CwY1LPsCqYTM0ZEbCTCgG2MoHlDOPELD5g3XFo4q8A
+        LBEG1+KiT4k4WNhOvbSTFdWSZw==
+X-Google-Smtp-Source: AMsMyM77iwhdwsmNPTD5cFhK59QYfl4INtPZKdjlZkZ+A9zp4HxaD9/Ek/bpbUMBsPNaS5INX4l2Ag==
+X-Received: by 2002:a37:e107:0:b0:6ce:1a08:fbd8 with SMTP id c7-20020a37e107000000b006ce1a08fbd8mr16879136qkm.493.1664251400586;
+        Mon, 26 Sep 2022 21:03:20 -0700 (PDT)
 Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id p14-20020a05620a22ae00b006ce60296f97sm256654qkh.68.2022.09.26.20.39.16
+        by smtp.gmail.com with ESMTPSA id bq35-20020a05620a46a300b006bb78d095c5sm290319qkb.79.2022.09.26.21.02.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 20:39:17 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 20:39:03 -0700 (PDT)
+        Mon, 26 Sep 2022 21:02:31 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 21:02:22 -0700 (PDT)
 From:   Hugh Dickins <hughd@google.com>
 X-X-Sender: hugh@ripple.attlocal.net
-To:     Jan Kara <jack@suse.cz>
+To:     Hillf Danton <hdanton@sina.com>
 cc:     Hugh Dickins <hughd@google.com>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
         Yu Kuai <yukuai1@huaweicloud.com>,
         Liu Song <liusong@linux.alibaba.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
-In-Reply-To: <20220926114416.t7t65u66ze76aiz7@quack3>
-Message-ID: <4539e48-417-edae-d42-9ef84602af0@google.com>
+In-Reply-To: <20220924023047.1410-1-hdanton@sina.com>
+Message-ID: <5880722-767c-16db-fc3-df50a12754b9@google.com>
 References: <aef9de29-e9f5-259a-f8be-12d1b734e72@google.com> <YyjdiKC0YYUkI+AI@kbusch-mbp> <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com> <20220921164012.s7lvklp2qk6occcg@quack3> <20220923144303.fywkmgnkg6eken4x@quack3> <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com>
- <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com> <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com> <20220926114416.t7t65u66ze76aiz7@quack3>
+ <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com> <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <20220924023047.1410-1-hdanton@sina.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 26 Sep 2022, Jan Kara wrote:
-> On Fri 23-09-22 16:15:29, Hugh Dickins wrote:
+On Sat, 24 Sep 2022, Hillf Danton wrote:
 > 
-> I don't think any magic with sbq_index_atomic_inc() is going to reliably
-> fix this. After all the current waitqueue may be the only one that has active
-> waiters so sbq_wake_ptr() will always end up returning this waitqueue
-> regardless of the current value of sbq->wake_index.
+> I think the lockup can be avoided by
+> a) either advancing wake_index as early as I can [1],
+> b) or doing wakeup in case of zero wait_cnt to kill all cases of waitqueue_active().
 > 
-> Honestly, this whole code needs a serious redesign.
+> Only for thoughts now.
 
-I was pleased to see you say so, Jan: I do agree.
+Thanks Hillf: I gave your __sbq_wake_up() patch below several tries,
+and as far as I could tell, it works just as well as my one-liner.
 
-> I have some
-> simplifications in mind but it will take some thinking and benchmarking
+But I don't think it's what we would want to do: doesn't it increment
+wake_index on every call to __sbq_wake_up()? whereas I thought it was
+intended to be incremented only after wake_batch calls (thinking in
+terms of nr 1).
 
-I'm definitely not the right person to take it on, and glad if you can.
-But I did have some thoughts and experiments over the weekend, and would
-like to throw a couple of suggestions into the pot.
-
-One, not a big issue, but I think sbq_index_atomic_inc() is misconceived.
-It's unhelpful for multiple racers to be adjusting sbq->wake_index, and
-	wake_index = ws - sbq->ws;
-	atomic_cmpxchg(&sbq->wake_index, wake_index, sbq_index_inc(wake_index));
-seems to me a better way for __sbq_wake_up() to increment it.
-
-Two, and here the depths of my naivete and incomprehension may be on
-display, but: I get the impression that __sbq_wake_up() is intended
-to accumulate wake_batch-1 wakeups while doing nothing, then on the
-wake_batch'th it hopes to do all those wake_batch wakeups.  I assume
-someone in the past has established that that's a safe way to procede
-here, though it's not obviously safe to me.
-
-Now, those !waitqueue_active(&ws->wait) checks are good for catching
-when the hoped-for procedure has gone so "wrong" that there's actually
-nothing to be woken on this ws (so proceed to the next); but they give
-no clue as to when there are some but not enough wakeups done.
-
-It is very easy to add a wake_up_nr_return() to kernel/sched/wait.c,
-which returns the nr_exclusive still not woken (__wake_up_common_lock()
-merely has to return nr_exclusive itself); and then __sbq_wake_up() can
-be recalled until wake_batch have been woken (or all queues empty).
-
-I do have an experiment running that way: but my testing is much too
-limited to draw serious conclusions from, and I've already admitted
-that I may just be misunderstanding the whole thing.  But, just maybe,
-a wake_up_nr_return() might be useful.  End of those suggestions.
-
-> so
-> we need some fix for the interim. I was pondering for quite some time about
-> some band aid to the problem you've found but didn't find anything
-> satisfactory.
-> 
-> In the end I see two options: 
-> 
-> 1) Take your patch (as wrong as it is ;). Yes, it can lead to lost wakeups
-> but we were living with those for a relatively long time so probably we can
-> live with them for some longer.
-
-In getting that experiment above going, I did have to make this change
-below: and it looks to me now as better than my original patch - since
-this one does try all SBQ_WAIT_QUEUES before giving up, whereas my first
-patch immediately gave up on the waitqueue_active !wait_cnt case.
-
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -587,7 +587,7 @@ static struct sbq_wait_state *sbq_wake_p
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
- 
--		if (waitqueue_active(&ws->wait)) {
-+		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
- 			if (wake_index != atomic_read(&sbq->wake_index))
- 				atomic_set(&sbq->wake_index, wake_index);
- 			return ws;
-
-TBH I have not tested this one outside of that experiment: would you
-prefer this patch to my first one, I test and sign this off and send?
-
-> 
-> 2) Revert Yu Kuai's original fix 040b83fcecfb8 ("sbitmap: fix possible io
-> hung due to lost wakeup") and my fixup 48c033314f37 ("sbitmap: Avoid leaving
-> waitqueue in invalid state in __sbq_wake_up()"). But then Keith would have
-> to redo his batched accounting patches on top.
-
-I know much too little to help make that choice.
+I'll not be surprised if your advance-wake_index-earlier idea ends
+up as a part of the solution: but mainly I agree with Jan that the
+whole code needs a serious redesign (or perhaps the whole design
+needs a serious recode).  So I didn't give your version more thought.
 
 Hugh
+
+> 
+> Hillf
+> 
+> [1] https://lore.kernel.org/lkml/afe5b403-4e37-80fd-643d-79e0876a7047@linux.alibaba.com/
+> 
+> +++ b/lib/sbitmap.c
+> @@ -613,6 +613,16 @@ static bool __sbq_wake_up(struct sbitmap
+>  	if (!ws)
+>  		return false;
+>  
+> +	do {
+> +		/* open code sbq_index_atomic_inc(&sbq->wake_index) to avoid race */
+> +		int old = atomic_read(&sbq->wake_index);
+> +		int new = sbq_index_inc(old);
+> +
+> +		/* try another ws if someone else takes care of this one */
+> +		if (old != atomic_cmpxchg(&sbq->wake_index, old, new))
+> +			return true;
+> +	} while (0);
+> +
+>  	cur = atomic_read(&ws->wait_cnt);
+>  	do {
+>  		/*
+> @@ -620,7 +630,7 @@ static bool __sbq_wake_up(struct sbitmap
+>  		 * function again to wakeup a new batch on a different 'ws'.
+>  		 */
+>  		if (cur == 0)
+> -			return true;
+> +			goto out;
+>  		sub = min(*nr, cur);
+>  		wait_cnt = cur - sub;
+>  	} while (!atomic_try_cmpxchg(&ws->wait_cnt, &cur, wait_cnt));
+> @@ -634,6 +644,7 @@ static bool __sbq_wake_up(struct sbitmap
+>  
+>  	*nr -= sub;
+>  
+> +out:
+>  	/*
+>  	 * When wait_cnt == 0, we have to be particularly careful as we are
+>  	 * responsible to reset wait_cnt regardless whether we've actually
+> @@ -661,12 +672,6 @@ static bool __sbq_wake_up(struct sbitmap
+>  	 */
+>  	smp_mb__before_atomic();
+>  
+> -	/*
+> -	 * Increase wake_index before updating wait_cnt, otherwise concurrent
+> -	 * callers can see valid wait_cnt in old waitqueue, which can cause
+> -	 * invalid wakeup on the old waitqueue.
+> -	 */
+> -	sbq_index_atomic_inc(&sbq->wake_index);
+>  	atomic_set(&ws->wait_cnt, wake_batch);
+>  
+>  	return ret || *nr;
