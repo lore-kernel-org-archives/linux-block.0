@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D9FC6FA92
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 01:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34251C6FA93
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 01:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbiI0Boe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229503AbiI0Boe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 26 Sep 2022 21:44:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56800 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbiI0Boa (ORCPT
+        with ESMTP id S229975AbiI0Bob (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 21:44:30 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A93A74D6
+        Mon, 26 Sep 2022 21:44:31 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2119DA7A83
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:29 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id 9so8351158pfz.12
         for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:28 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id u69so8124612pgd.2
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=OWQyl94A5qNKtPnF/8PyOhg9aeGApg21Zf8bAO/j86s=;
-        b=mP3PeN6PCELyvJQ+DXmQS2FoJwddmxuB7MQ2/UGEabb+Nm+/V452tOJaIqhRCFbWIv
-         IDC2qnSZZmCGdo5dh/q1ZBrd1oigApYXtLJPSyGuJcrx8rVIz3Xa9fMTdc/32SjSGYm7
-         R1IZP4E6Ph619vy2hU2ZZMhbef7T8doLfRUOMdOWG67R4osTEnmvvI4sEeF4Dotkbtmv
-         CrJeo7+GHMCQX9bmnTYIvdrUCh1UfScfimPbsJ1bRgeXH5KLwHYydc/+NxR7gHcVuM7W
-         vDmc3SweNBhuBsmVtob4aqGhkqVJzVipuHgB1xuPXoC3Yk7y4SIW9wNbXnUChX9C0mQN
-         sIpw==
+        bh=Gw9lyqQe5R+yw+IDPoV4+8Za+H046k5YKHvd8lw2rPY=;
+        b=N0ygZaFhLSOXkV8fuZqHVSFTMa/CFtuXkka+qByZM4y/jLM4N7XGTKIRmXsUIUHrON
+         3xw/74DNSgBGpgoVZi5QLh/wZc1wsmK9f+44t89KaCF9k8cJDA1unvlZlkR+JNBM4Y32
+         JVSVDHu/2ByQpfKZJPkcQK3WPaFQjwh4QKyWOnegEVT/KegEFa6ydXk+zn0Hh71SCb3E
+         AkSNsCF45qlH3oMFjCWFG3IK+mMS2HkWwZgHtEbMES8GCHhmXPAayxJsUrxMP5o3pxN3
+         Wd03JthVfnQhbLCxYibxseOrQ9fhcin8EAGRuttygUZlR4eg0jcZRycz+DOG5IA4VI/p
+         oQCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=OWQyl94A5qNKtPnF/8PyOhg9aeGApg21Zf8bAO/j86s=;
-        b=bMG/S6P7pF04XeYw94gxNp8Kjl2z2tdq1dVGugjkzEgkS7tmFu5la0RqGrTYhHcNuu
-         YR2BMUrHjzU+nd9vBFeC6PmY7OPLSDyC8udbYgfB55cE3ebHRnHdIxVj5bBBp+N6dG/A
-         X9WXqSk8xzfuAVHXIkul4bA1FGwA0PE0SRv0FVN9bm1fIKKxo9OaESPGUc5RJfP4nvPP
-         +TQ9by9I7XLtZ7FfxGUc65KFGgSheCV5OhnTNj52o57TquyyD5j2A+Ua9S9QlIBblzQo
-         m6b2KAeG0u3n/jS3Tt+Smb68Br1cENEXjYsiB4TTasz+ieBVjIg6PTz2MAvPDxZ8F6Hv
-         mJtw==
-X-Gm-Message-State: ACrzQf0p7XuCG/29AgAvAtlZRUfYiReMP0Piqq+CBNXB0GajN672tEbn
-        SpfjMKHjLj69z7hF5tBFa8WtK1YBirMkgg==
-X-Google-Smtp-Source: AMsMyM4b4xjI5VuwTPQxKRtlKpdTkx4cE0vHyJY+Uc0NtDg0sPzbmbmbPkA9/NgxXSIQ4gKYg+MuEw==
-X-Received: by 2002:a62:1bc8:0:b0:546:c62e:e84 with SMTP id b191-20020a621bc8000000b00546c62e0e84mr26532012pfb.45.1664243066985;
-        Mon, 26 Sep 2022 18:44:26 -0700 (PDT)
+        bh=Gw9lyqQe5R+yw+IDPoV4+8Za+H046k5YKHvd8lw2rPY=;
+        b=b0vXOwM4LZVw1g/REsddh4YuRdLrFQI1I1DsoC0/4mGP2pdsfWrts1iFaIQJ5Y1fQ1
+         RDaV/kUxKL498DcFz8NZHJ2MF8afsmgSqMsepzvB8yHdG0xpt92BOH1m+ZvJpTCOp1+i
+         MH3vCS8r7igf7IJNHni8yjJSJuM98d0TRGnYuEUj3VvcQFHtYtScO9NYn0ExMZZGtlSa
+         lONq79oOa+RbOuatGjtdFTaULH205l+DtFCMb6MrgSGhzTJFRPtQW913Nyi0hKW4P/Q4
+         nrUs8sCYne0R/8mpaCW11FnCVOXywIp7koS7stVwWQ4HEA74YeX3BXx1EjYRZcu5a18f
+         3y6A==
+X-Gm-Message-State: ACrzQf393h1xIqw016vizXj/Lp66/8u5AdDtFxiNZMzEBEQ0otpukHV3
+        3lcAVcX8moyGhUZzPaRDBQl7ojpbMLMEfA==
+X-Google-Smtp-Source: AMsMyM76dVAl8IUXKH4912uerp2IA/RXyHJpj8bhTIn05ne6zZSO1S91VEgYu/TmSWlfMDVcAlB4Pw==
+X-Received: by 2002:a63:2ac4:0:b0:41d:95d8:45b6 with SMTP id q187-20020a632ac4000000b0041d95d845b6mr23016941pgq.132.1664243067888;
+        Mon, 26 Sep 2022 18:44:27 -0700 (PDT)
 Received: from localhost.localdomain ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id o2-20020aa79782000000b00537d60286c9sm183062pfp.113.2022.09.26.18.44.26
+        by smtp.gmail.com with ESMTPSA id o2-20020aa79782000000b00537d60286c9sm183062pfp.113.2022.09.26.18.44.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 18:44:26 -0700 (PDT)
+        Mon, 26 Sep 2022 18:44:27 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
         Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@fb.com>
-Subject: [PATCH 4/5] nvme: split out metadata vs non metadata end_io uring_cmd completions
-Date:   Mon, 26 Sep 2022 19:44:19 -0600
-Message-Id: <20220927014420.71141-5-axboe@kernel.dk>
+Subject: [PATCH 5/5] nvme: enable batched completions of passthrough IO
+Date:   Mon, 26 Sep 2022 19:44:20 -0600
+Message-Id: <20220927014420.71141-6-axboe@kernel.dk>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220927014420.71141-1-axboe@kernel.dk>
 References: <20220927014420.71141-1-axboe@kernel.dk>
@@ -65,159 +65,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-By splitting up the metadata and non-metadata end_io handling, we can
-remove any request dependencies on the normal non-metadata IO path. This
-is in preparation for enabling the normal IO passthrough path to pass
-the ownership of the request back to the block layer.
+Now that the normal passthrough end_io path doesn't need the request
+anymore, we can kill the explicit blk_mq_free_request() and just pass
+back RQ_END_IO_FREE instead. This enables the batched completion from
+freeing batches of requests at the time.
+
+This brings passthrough IO performance at least on par with bdev based
+O_DIRECT with io_uring. With this and batche allocations, peak performance
+goes from 110M IOPS to 122M IOPS. For IRQ based, passthrough is now also
+about 10% faster than previously, going from ~61M to ~67M IOPS.
 
 Co-developed-by: Stefan Roesch <shr@fb.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/host/ioctl.c | 79 ++++++++++++++++++++++++++++++---------
- 1 file changed, 61 insertions(+), 18 deletions(-)
+ drivers/nvme/host/ioctl.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index c80b3ecca5c8..9e356a6c96c2 100644
+index 9e356a6c96c2..d9633f426690 100644
 --- a/drivers/nvme/host/ioctl.c
 +++ b/drivers/nvme/host/ioctl.c
-@@ -349,9 +349,15 @@ struct nvme_uring_cmd_pdu {
- 		struct bio *bio;
- 		struct request *req;
- 	};
--	void *meta; /* kernel-resident buffer */
--	void __user *meta_buffer;
- 	u32 meta_len;
-+	u32 nvme_status;
-+	union {
-+		struct {
-+			void *meta; /* kernel-resident buffer */
-+			void __user *meta_buffer;
-+		};
-+		u64 result;
-+	} u;
- };
- 
- static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
-@@ -360,11 +366,10 @@ static inline struct nvme_uring_cmd_pdu *nvme_uring_cmd_pdu(
- 	return (struct nvme_uring_cmd_pdu *)&ioucmd->pdu;
- }
- 
--static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
-+static void nvme_uring_task_meta_cb(struct io_uring_cmd *ioucmd)
- {
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
- 	struct request *req = pdu->req;
--	struct bio *bio = req->bio;
- 	int status;
- 	u64 result;
- 
-@@ -375,27 +380,39 @@ static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
- 
- 	result = le64_to_cpu(nvme_req(req)->result.u64);
- 
--	if (pdu->meta)
--		status = nvme_finish_user_metadata(req, pdu->meta_buffer,
--					pdu->meta, pdu->meta_len, status);
--	if (bio)
--		blk_rq_unmap_user(bio);
-+	if (pdu->meta_len)
-+		status = nvme_finish_user_metadata(req, pdu->u.meta_buffer,
-+					pdu->u.meta, pdu->meta_len, status);
-+	if (req->bio)
-+		blk_rq_unmap_user(req->bio);
- 	blk_mq_free_request(req);
- 
- 	io_uring_cmd_done(ioucmd, status, result);
- }
- 
-+static void nvme_uring_task_cb(struct io_uring_cmd *ioucmd)
-+{
-+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
-+
-+	if (pdu->bio)
-+		blk_rq_unmap_user(pdu->bio);
-+
-+	io_uring_cmd_done(ioucmd, pdu->nvme_status, pdu->u.result);
-+}
-+
- static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
- 						blk_status_t err)
- {
- 	struct io_uring_cmd *ioucmd = req->end_io_data;
- 	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
--	/* extract bio before reusing the same field for request */
--	struct bio *bio = pdu->bio;
- 	void *cookie = READ_ONCE(ioucmd->cookie);
- 
--	pdu->req = req;
--	req->bio = bio;
-+	req->bio = pdu->bio;
-+	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
-+		pdu->nvme_status = -EINTR;
-+	else
-+		pdu->nvme_status = nvme_req(req)->status;
-+	pdu->u.result = le64_to_cpu(nvme_req(req)->result.u64);
- 
- 	/*
- 	 * For iopoll, complete it directly.
-@@ -406,6 +423,29 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
+@@ -423,8 +423,7 @@ static enum rq_end_io_ret nvme_uring_cmd_end_io(struct request *req,
  	else
  		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_cb);
  
-+	blk_mq_free_request(req);
-+	return RQ_END_IO_NONE;
-+}
-+
-+static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
-+						     blk_status_t err)
-+{
-+	struct io_uring_cmd *ioucmd = req->end_io_data;
-+	struct nvme_uring_cmd_pdu *pdu = nvme_uring_cmd_pdu(ioucmd);
-+	void *cookie = READ_ONCE(ioucmd->cookie);
-+
-+	req->bio = pdu->bio;
-+	pdu->req = req;
-+
-+	/*
-+	 * For iopoll, complete it directly.
-+	 * Otherwise, move the completion to task work.
-+	 */
-+	if (cookie != NULL && blk_rq_is_poll(req))
-+		nvme_uring_task_meta_cb(ioucmd);
-+	else
-+		io_uring_cmd_complete_in_task(ioucmd, nvme_uring_task_meta_cb);
-+
- 	return RQ_END_IO_NONE;
+-	blk_mq_free_request(req);
+-	return RQ_END_IO_NONE;
++	return RQ_END_IO_FREE;
  }
  
-@@ -467,8 +507,6 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 			blk_flags);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
--	req->end_io = nvme_uring_cmd_end_io;
--	req->end_io_data = ioucmd;
- 
- 	if (issue_flags & IO_URING_F_IOPOLL && rq_flags & REQ_POLLED) {
- 		if (unlikely(!req->bio)) {
-@@ -483,10 +521,15 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	}
- 	/* to free bio on completion, as req->bio will be null at that time */
- 	pdu->bio = req->bio;
--	pdu->meta = meta;
--	pdu->meta_buffer = nvme_to_user_ptr(d.metadata);
- 	pdu->meta_len = d.metadata_len;
--
-+	req->end_io_data = ioucmd;
-+	if (pdu->meta_len) {
-+		pdu->u.meta = meta;
-+		pdu->u.meta_buffer = nvme_to_user_ptr(d.metadata);
-+		req->end_io = nvme_uring_cmd_end_io_meta;
-+	} else {
-+		req->end_io = nvme_uring_cmd_end_io;
-+	}
- 	blk_execute_rq_nowait(req, false);
- 	return -EIOCBQUEUED;
- }
+ static enum rq_end_io_ret nvme_uring_cmd_end_io_meta(struct request *req,
 -- 
 2.35.1
 
