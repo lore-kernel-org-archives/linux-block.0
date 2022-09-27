@@ -2,50 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B3AC6FA83
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 07:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3143C6FA86
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 07:50:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230487AbiI0Hrk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Sep 2022 03:47:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47052 "EHLO
+        id S231203AbiI0Hut (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Sep 2022 03:50:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230495AbiI0Hrf (ORCPT
+        with ESMTP id S230337AbiI0HuZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2022 03:47:35 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C067AC0B;
-        Tue, 27 Sep 2022 00:47:32 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id A0DFA68AA6; Tue, 27 Sep 2022 09:47:28 +0200 (CEST)
-Date:   Tue, 27 Sep 2022 09:47:28 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Alexander V. Buev" <a.buev@yadro.com>
-Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Mikhail Malygin <m.malygin@yadro.com>, linux@yadro.com
-Subject: Re: [PATCH v5 1/3] block: bio-integrity: add PI iovec to bio
-Message-ID: <20220927074728.GB17819@lst.de>
-References: <20220920144618.1111138-1-a.buev@yadro.com> <20220920144618.1111138-2-a.buev@yadro.com>
+        Tue, 27 Sep 2022 03:50:25 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0D91C435;
+        Tue, 27 Sep 2022 00:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0sifwQyqnhpHngKxzCHkDyc0Tyn50ZsV3oCXOspJ4q8=; b=2bIKZsxlAx9aXhDgXX+HxBPjVT
+        sfBioXFBqoJn9DYtuzDJWpzkJcpFP+wCx8gHLYOknL2LqM4EIJXT9GyOK0zq1IzarIeMSLOZAsBkT
+        fScgQWaVO2G/MU3Tj1ClskLHpdwlIVG6JLItD7DFXEViZuvh68FrKSjdNGzOBdGjCJs1ehBPtAeHc
+        LLy3gSYG7EYxXk/ryL7vsFNFwo06pHcZ3IFT1ScjUCnT22icjMMcgnWLA4M0H5S6o8hCdWUUDv5YX
+        S52w+dRaGYmUXTs2XusPzIZ8Tn1mu7a0A+uO5CVRbaKXey8unRBx1fs5AWzE/F9xPXysNUYiumjd7
+        OaLGI7qg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1od5ME-008sTT-6b; Tue, 27 Sep 2022 07:50:22 +0000
+Date:   Tue, 27 Sep 2022 00:50:22 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Stefan Roesch <shr@fb.com>
+Subject: Re: [PATCH 4/5] nvme: split out metadata vs non metadata end_io
+ uring_cmd completions
+Message-ID: <YzKrPrUvr3wJWCCd@infradead.org>
+References: <20220927014420.71141-1-axboe@kernel.dk>
+ <20220927014420.71141-5-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220920144618.1111138-2-a.buev@yadro.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220927014420.71141-5-axboe@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 05:46:16PM +0300, Alexander V. Buev wrote:
-> Added functions to attach user PI iovec pages to bio and release this
-> pages via bio_integrity_free.
+On Mon, Sep 26, 2022 at 07:44:19PM -0600, Jens Axboe wrote:
+> By splitting up the metadata and non-metadata end_io handling, we can
+> remove any request dependencies on the normal non-metadata IO path. This
+> is in preparation for enabling the normal IO passthrough path to pass
+> the ownership of the request back to the block layer.
+> 
+> Co-developed-by: Stefan Roesch <shr@fb.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-I'd much prefer if for the first version we could just go down the
-copy_from/to_user route as mentioned below and avoid the extra
-complexity of the get_user_pages path.  Once we get the interface
-right we can consider adding the get_user_pages version back if
-we have benchmarks for relevant workloads that justify it.  In that
-case we'll also need into refactoring thing so that more code is
-shared with the bio data path.
+Looks good:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
