@@ -2,243 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0344C6FA90
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 17:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE1A6C6FA83
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 17:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233456AbiI0Rte (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Sep 2022 13:49:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
+        id S230081AbiI0RyW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Sep 2022 13:54:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233645AbiI0RtE (ORCPT
+        with ESMTP id S233056AbiI0RyV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2022 13:49:04 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8331BA4058
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 10:46:48 -0700 (PDT)
-Received: from epcas5p3.samsung.com (unknown [182.195.41.41])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220927174647epoutp0378f41a9bc9b47ebf7b160e7f0c0a98d2~YyMQkV4gH2901229012epoutp03r
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 17:46:47 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220927174647epoutp0378f41a9bc9b47ebf7b160e7f0c0a98d2~YyMQkV4gH2901229012epoutp03r
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1664300807;
-        bh=Z0IC8FwLh8tvDC+rBID68Mm7U2jdtPbcK+YXwZu6xLY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=B6TCtJHhVjJwsTiAXqrk5o/EhYgkKaQzjMVNp8YrbgLtWpmSWoqf0p4xK6nbBfH0P
-         MBoKT4K4HuuQdhiVJY8J0QQvp9x2jAeYxw481ymJ3GInWDr9wyH0cymGZGaTYVwfM5
-         PHbwhzInPIYkmK2rF0IPcUz2s8Gj0K4h5iWDyzJM=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20220927174645epcas5p1368eef0b8fa5cb698e607ecdd6e8ccb8~YyMPN8soi3009630096epcas5p17;
-        Tue, 27 Sep 2022 17:46:45 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.174]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4McRrg1Bgsz4x9Pw; Tue, 27 Sep
-        2022 17:46:43 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C6.1F.39477.30733336; Wed, 28 Sep 2022 02:46:43 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c~YyMMUtgTU2244622446epcas5p1X;
-        Tue, 27 Sep 2022 17:46:42 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220927174642epsmtrp1e3f38800bdd1cbac135396634c8e3c75~YyMMUBdlS2108921089epsmtrp1Q;
-        Tue, 27 Sep 2022 17:46:42 +0000 (GMT)
-X-AuditID: b6c32a4a-259fb70000019a35-a7-633337037fea
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        76.86.18644.20733336; Wed, 28 Sep 2022 02:46:42 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.110.206.5]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220927174641epsmtip1156eddfe38c69c571429239d9c4c8946~YyMLA_T640699206992epsmtip1W;
-        Tue, 27 Sep 2022 17:46:40 +0000 (GMT)
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH for-next v10 7/7] nvme: wire up fixed buffer support for
- nvme passthrough
-Date:   Tue, 27 Sep 2022 23:06:10 +0530
-Message-Id: <20220927173610.7794-8-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220927173610.7794-1-joshi.k@samsung.com>
+        Tue, 27 Sep 2022 13:54:21 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 057426B8EC
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 10:54:21 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id w2so10398391pfb.0
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 10:54:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=QOxXX6PZWjuFQYw1PKwJzistcbBPVeQ6lf3m7m3pTKE=;
+        b=UY4EpIG/HoUih0UhL/Bb8u/2u45Ex9YCb5owwPUjENHnMUeBhAZyuz8mS8rpPrFdG+
+         K76t7sh/ilI74s0ZRD+5OJXfqR8v/M/96gXDWJO3l9GPLz1+FM29gi008YTBnf0kogUG
+         108fmN1NKh4mcj0qgYiyRolLh5it/3TCVFvhwWM6SdYpwxCjt/V+7SZdTWqwgoavR0SF
+         Wp3vds4IL9ltYA/PxJipuswR64ApcFEVeZMMfhUGiupVWa8lN3pO6mgK7OhA4oZ9ac7d
+         SYLHcau86UwrLAbbwU7/exsaJ0lSVgM59HyGhw4Cro7aKk5zf9micj/FA9T/vPgGHhTr
+         3BCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=QOxXX6PZWjuFQYw1PKwJzistcbBPVeQ6lf3m7m3pTKE=;
+        b=3U5dzHazxha1lJK6F6K5stJpIGgs6eVX5YaO0eNYzZi1hYdxb/+H5jDX/5/zRTktSK
+         T5RI/nOQRBv/5MOdVXzANqr7y3g78/cp5kuF7EKbuSWQt7B4mhcLxdmtK6zMGOELWikW
+         BmY6Rh9dvKrFWM/uhprxaIvo0vsY19JqARdRa6J+S8NbrTYacypimVyKth1byNkQhATM
+         JFqM5u8exaqO2CUK9YmpZC3Jeh8fNMT8MTdNPtzeOdM/fV+9MRonfMZTVvxcI5F2YytU
+         vlBJG2brorZb33ei4KrygI7lmCHnNyVvqNt6Vdnx9dIWUJVX8hL0f9ROPlb/55RjRegj
+         s2mg==
+X-Gm-Message-State: ACrzQf2X9+D3S7Zy2YtFsS8jcIKWpcJY0g12qE/Rbu8cuevAwVIRWtuv
+        vfPxBpwCOjXDWzdyvOXx4TYiSo3LOA35OQ==
+X-Google-Smtp-Source: AMsMyM6YrV9Y2HvBfB0U4vkt5dr/7KCXjyhJuoV5Ge3xhya8J+VLbq5AGH1ujko0JvmRYBr77U2FgQ==
+X-Received: by 2002:a63:d54b:0:b0:42c:299e:255 with SMTP id v11-20020a63d54b000000b0042c299e0255mr25258890pgi.282.1664301260263;
+        Tue, 27 Sep 2022 10:54:20 -0700 (PDT)
+Received: from [127.0.0.1] ([2620:10d:c090:400::5:de02])
+        by smtp.gmail.com with ESMTPSA id y16-20020a17090264d000b0016d5b7fb02esm739675pli.60.2022.09.27.10.54.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 10:54:19 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     tj@kernel.org, linux-block@vger.kernel.org
+In-Reply-To: <20220927065425.257876-1-hch@lst.de>
+References: <20220927065425.257876-1-hch@lst.de>
+Subject: Re: [PATCH] blk-cgroup: don't update the blkg lookup hint in blkg_conf_prep
+Message-Id: <166430125928.156260.5625074206407475452.b4-ty@kernel.dk>
+Date:   Tue, 27 Sep 2022 11:54:19 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjk+LIzCtJLcpLzFFi42LZdlhTS5fZ3DjZYHU7u8Xqu/1sFjcP7GSy
-        WLn6KJPFu9ZzLBZH/79ls5h06Bqjxd5b2hbzlz1ld+DwuHy21GPTqk42j81L6j1232xg8+jb
-        sorR4/MmuQC2qGybjNTElNQihdS85PyUzLx0WyXv4HjneFMzA0NdQ0sLcyWFvMTcVFslF58A
-        XbfMHKBrlBTKEnNKgUIBicXFSvp2NkX5pSWpChn5xSW2SqkFKTkFJgV6xYm5xaV56Xp5qSVW
-        hgYGRqZAhQnZGdN+Rxe0qlV0PP/D2MD4Q66LkZNDQsBEYsWnp2xdjFwcQgK7GSV+rfrOBOF8
-        YpS4fn4VK4TzmVHiRdsedpiW7xuWMYPYQgK7GCXuTwiHK1rf9Jyxi5GDg01AU+LC5FKQGhEB
-        I4n9n06CDWIWmMEosbrjNTtIjbBAtMT5k5EgNSwCqhIL1lxkAgnzCphLnJ3BDbFKXmLmpe9g
-        1ZwCFhKHP2aChHkFBCVOznzCAmIzA5U0b53NDDJdQuAru8Skee8YIXpdJE7+u8gMYQtLvDq+
-        Bep8KYmX/W1QdrLEpZnnmCDsEonHew5C2fYSraf6mUH2MgN9sn6XPsQuPone30/ArpQQ4JXo
-        aBOCqFaUuDfpKSuELS7xcMYSKNtDovX7U3ZI4HQzSvRdXso2gVF+FpIXZiF5YRbCtgWMzKsY
-        JVMLinPTU4tNC4zyUsvhkZqcn7uJEZwgtbx2MD588EHvECMTB+MhRgkOZiUR3t9HDZOFeFMS
-        K6tSi/Lji0pzUosPMZoCQ3gis5Rocj4wReeVxBuaWBqYmJmZmVgamxkqifMunqGVLCSQnliS
-        mp2aWpBaBNPHxMEp1cC0uGGqreTlL5Kf/5Y+Ypsn72bxSuLXpMX/DJacl9kf0G7G8Zgp8oKw
-        SexnuZkFNjpLMwwOF2xtF2OojJv5P/cZ46uMaWwCOkeU+YuWnvATPPZrydrS2OPLEm6IbymK
-        t7+hsFbWv0x02urLHokan7WaZvBNyrmhe8mlz21ub/S97CyeGRXsyRlPXDk+ygTt+XPtJ6P7
-        sVm2uyawsdRwGteL/T/0+2Du3TvqUacX6KdZ3xGedmFjfIShqrsRU3+ma64mc1r0f/3MzIDK
-        a//vZ+xkMm5X5z4avLcvm+31/+cB7jY69x4d5Lwjy8g/tTBiW8GF3YtSlWXKVXVWsM67d4Dj
-        m8S6/iaZLVPd+ja07FRiKc5INNRiLipOBAAKRBQiGQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrJLMWRmVeSWpSXmKPExsWy7bCSnC6TuXGywdMFkhar7/azWdw8sJPJ
-        YuXqo0wW71rPsVgc/f+WzWLSoWuMFntvaVvMX/aU3YHD4/LZUo9NqzrZPDYvqffYfbOBzaNv
-        yypGj8+b5ALYorhsUlJzMstSi/TtErgypv2OLmhVq+h4/oexgfGHXBcjJ4eEgInE9w3LmLsY
-        uTiEBHYwSpyZvpkRIiEu0XztBzuELSyx8t9zMFtI4COjxIytwl2MHBxsApoSFyaXgoRFBMwk
-        lh5ewwIyh1lgDqPE5ct72EFqhAUiJb4vqAWpYRFQlViw5iITSJhXwFzi7AxuiOnyEjMvfQer
-        5hSwkDj8MRNikbnE1k0fWEBsXgFBiZMzn4DZzEDlzVtnM09gFJiFJDULSWoBI9MqRsnUguLc
-        9NxiwwKjvNRyveLE3OLSvHS95PzcTYzg0NbS2sG4Z9UHvUOMTByMhxglOJiVRHh/HzVMFuJN
-        SaysSi3Kjy8qzUktPsQozcGiJM57oetkvJBAemJJanZqakFqEUyWiYNTqoEpuvXAsk+yKR8+
-        JXh/KDGqNd32w2TO0Y+lhWcc1rmZt7le2HqP7XCe2W4Bdp5GRcc0+UbW2D+mHoW/H27ubsvM
-        VOiQXrlQ6KSD/JTL3rEWn/+whi44IxmZxDo3bWW/guHeU0dErPOqGJes4zr1vEBa1NCUN3//
-        h9jcg9XqWy4VfErr0cl9JGjM+zjHxNe9fWK5f9Ou6HdbNL/IxPMaq/0ye8q3JeAM/0PBY1/X
-        3PXOfnNnzWe2zYeLPzVtfmtt6ff4u6dZZUyTQkXdItNZ1b9t9vS6rFqqmMRne1lpU9YGxyRr
-        p8x3m7Q0zbaVc1/P51m9rqT52q3DhZlGr6OMZU5u3H/u3K01FyvmBV0rVVFiKc5INNRiLipO
-        BAD+Fksh3AIAAA==
-X-CMS-MailID: 20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c
-X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c
-References: <20220927173610.7794-1-joshi.k@samsung.com>
-        <CGME20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c@epcas5p1.samsung.com>
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-if io_uring sends passthrough command with IORING_URING_CMD_FIXED flag,
-use the pre-registered buffer for IO (non-vectored variant). Pass the
-buffer/length to io_uring and get the bvec iterator for the range. Next,
-pass this bvec to block-layer and obtain a bio/request for subsequent
-processing.
-While at it, modify nvme_submit_user_cmd to take ubuffer as plain integer
-argument, and do away with nvme_to_user_ptr conversion in callers.
+On Tue, 27 Sep 2022 08:54:25 +0200, Christoph Hellwig wrote:
+> blkg_conf_prep just creates a new blkg structure, there is no real
+> need to update the lookup hint which should only be done on a
+> successful lookup in the I/O path.
+> 
+> 
 
-Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
----
- drivers/nvme/host/ioctl.c | 44 +++++++++++++++++++++++++--------------
- 1 file changed, 28 insertions(+), 16 deletions(-)
+Applied, thanks!
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index b9f17dc87de9..1a45246f0d7a 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -83,9 +83,10 @@ static struct request *nvme_alloc_user_request(struct request_queue *q,
- 	return req;
- }
- 
--static int nvme_map_user_request(struct request *req, void __user *ubuffer,
-+static int nvme_map_user_request(struct request *req, u64 ubuffer,
- 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
--		u32 meta_seed, void **metap, bool vec)
-+		u32 meta_seed, void **metap, struct io_uring_cmd *ioucmd,
-+		bool vec)
- {
- 	struct request_queue *q = req->q;
- 	struct nvme_ns *ns = q->queuedata;
-@@ -93,23 +94,34 @@ static int nvme_map_user_request(struct request *req, void __user *ubuffer,
- 	struct bio *bio = NULL;
- 	void *meta = NULL;
- 	int ret;
-+	bool fixedbufs = ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED);
- 
--	if (!vec)
--		ret = blk_rq_map_user(q, req, NULL, ubuffer, bufflen,
--			GFP_KERNEL);
--	else {
-+	if (vec) {
- 		struct iovec fast_iov[UIO_FASTIOV];
- 		struct iovec *iov = fast_iov;
- 		struct iov_iter iter;
- 
--		ret = import_iovec(rq_data_dir(req), ubuffer, bufflen,
--				UIO_FASTIOV, &iov, &iter);
-+		/* fixedbufs is only for non-vectored io */
-+		WARN_ON_ONCE(fixedbufs);
-+		ret = import_iovec(rq_data_dir(req), nvme_to_user_ptr(ubuffer),
-+				bufflen, UIO_FASTIOV, &iov, &iter);
- 		if (ret < 0)
- 			goto out;
- 
- 		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
- 		kfree(iov);
--	}
-+	} else if (fixedbufs) {
-+		struct iov_iter iter;
-+
-+		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
-+				rq_data_dir(req), &iter, ioucmd);
-+		if (ret < 0)
-+			goto out;
-+		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
-+	} else
-+		ret = blk_rq_map_user(q, req, NULL,
-+					nvme_to_user_ptr(ubuffer), bufflen,
-+					GFP_KERNEL);
- 	if (ret)
- 		goto out;
- 	bio = req->bio;
-@@ -136,7 +148,7 @@ static int nvme_map_user_request(struct request *req, void __user *ubuffer,
- }
- 
- static int nvme_submit_user_cmd(struct request_queue *q,
--		struct nvme_command *cmd, void __user *ubuffer,
-+		struct nvme_command *cmd, u64 ubuffer,
- 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
- 		u32 meta_seed, u64 *result, unsigned timeout, bool vec)
- {
-@@ -152,7 +164,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
- 	req->timeout = timeout;
- 	if (ubuffer && bufflen) {
- 		ret = nvme_map_user_request(req, ubuffer, bufflen, meta_buffer,
--				meta_len, meta_seed, &meta, vec);
-+				meta_len, meta_seed, &meta, NULL, vec);
- 		if (ret)
- 			goto out;
- 	}
-@@ -231,7 +243,7 @@ static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
- 	c.rw.appmask = cpu_to_le16(io.appmask);
- 
- 	return nvme_submit_user_cmd(ns->queue, &c,
--			nvme_to_user_ptr(io.addr), length,
-+			io.addr, length,
- 			metadata, meta_len, lower_32_bits(io.slba), NULL, 0,
- 			false);
- }
-@@ -285,7 +297,7 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 		timeout = msecs_to_jiffies(cmd.timeout_ms);
- 
- 	status = nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
--			nvme_to_user_ptr(cmd.addr), cmd.data_len,
-+			cmd.addr, cmd.data_len,
- 			nvme_to_user_ptr(cmd.metadata), cmd.metadata_len,
- 			0, &result, timeout, false);
- 
-@@ -331,7 +343,7 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 		timeout = msecs_to_jiffies(cmd.timeout_ms);
- 
- 	status = nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
--			nvme_to_user_ptr(cmd.addr), cmd.data_len,
-+			cmd.addr, cmd.data_len,
- 			nvme_to_user_ptr(cmd.metadata), cmd.metadata_len,
- 			0, &cmd.result, timeout, vec);
- 
-@@ -475,9 +487,9 @@ static int nvme_uring_cmd_io(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	req->timeout = d.timeout_ms ? msecs_to_jiffies(d.timeout_ms) : 0;
- 
- 	if (d.addr && d.data_len) {
--		ret = nvme_map_user_request(req, nvme_to_user_ptr(d.addr),
-+		ret = nvme_map_user_request(req, d.addr,
- 			d.data_len, nvme_to_user_ptr(d.metadata),
--			d.metadata_len, 0, &meta, vec);
-+			d.metadata_len, 0, &meta, ioucmd, vec);
- 		if (ret)
- 			goto out_err;
- 	}
+[1/1] blk-cgroup: don't update the blkg lookup hint in blkg_conf_prep
+      commit: 5765033cf77c54897848df683420bb62b6cc3d05
+
+Best regards,
 -- 
-2.25.1
+Jens Axboe
+
 
