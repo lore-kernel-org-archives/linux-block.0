@@ -2,60 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3576CC6FA82
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 01:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9757C6FA82
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 01:44:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229582AbiI0Bo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Sep 2022 21:44:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56456 "EHLO
+        id S229967AbiI0Bob (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Sep 2022 21:44:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbiI0BoZ (ORCPT
+        with ESMTP id S229948AbiI0Bo1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Sep 2022 21:44:25 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4331FA6C2D
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:24 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id w20so7777112ply.12
-        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:24 -0700 (PDT)
+        Mon, 26 Sep 2022 21:44:27 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4D5A7230
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:26 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id i15-20020a17090a4b8f00b0020073b4ac27so8664747pjh.3
+        for <linux-block@vger.kernel.org>; Mon, 26 Sep 2022 18:44:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=KOdha0xZ2/QYkK5YkfhyDv4n+7NP1qIjesr4vuNTao8=;
-        b=IZ47anjuWzzeW6tFN95y9yhaayVusdQv6KbEijleZbt5Iw+sz8JmacG50WtnEERZ+T
-         ukyS5F4ahFzGOZK+L3qTcdJexGtnST2bu8ZaKa9WT/utuzrcw2o4cFJtsy8euWpKfEnx
-         rvXyTqA4TZKRalJzpTIHilAYUmbH08J08UcL9DEgRm38E9mVgaInmLOetIV5qET5M320
-         GfRVwa+ng63clk9+PkTDvTFIobCDuQXpIlTz2yxPbQHKwvG5PpO89F9AjtZ24/VgOIho
-         tiyCKV7/xq7YI0KwHz3GIYPrUcj0KkG5fgwsHcUPzP5uFBbmQmk0DNOd+Hp8+2Av5AKp
-         fvhw==
+        bh=Nz/B6jdwrrOsf5JLn/R8YVwnmVtMrvsX8isrBntB0gc=;
+        b=YT5XveMQNm31+MTJZ+0kPwthf1yXMJQ1wFLUuRB4zypjMZ05Qqnq+P+1friBnnl77p
+         KK60FLMIHFVWxiWnFKEELBnnjeeaaHf2qbOuV4Qdfa94HJQGydL7bQ/t4I7UNG8HESrS
+         iAkRfMZxl9iupPkubKeTmJd1BkFZajiZTLcUWR8mfMrNJQaLSs7sHmpmHNyj3ZM5FDfO
+         +M7oADYj71hjFcKq22AZjw+9JA7DV3xtA2/NNc6EY0fj+yG6OixAA0LQw+9E/MMmTcCI
+         22ybrhzADauGcmi87SYE8KgOzPoTihQPwmT9QcpNB4uP/SN6h/yUDZtBk9GUkauHG5LD
+         0ylw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=KOdha0xZ2/QYkK5YkfhyDv4n+7NP1qIjesr4vuNTao8=;
-        b=XrZf/14Pv38et/ObtiPbQmfQZvYUJ8c6pgXdaDPTjXRnlgcJHq8eevjoWnTvo4EU75
-         uMOdoqsqDEA52JiQKmC/4lazZHgEKugx78x1pOqL146iX9BMvDiNpQFnm5aZBHG5u/dD
-         neSW2DyE9gaT16K2bO5vgKUoR/0Bt1T1crnC8xGV5sy5jSnd7HJDWWiA9mbaFYos5Izb
-         c8PMHAmud43vk66iEP2u+iAPwP2NZjXZFjBfL2NPx+fXFusLQI4X0Bxxn4OoslB2NSYu
-         X8rKu+sacVD0RaXy1rf3Wki2gCATTB+QGed6xkqlD00AVqOETNQFnnM6XZevYBdcATzJ
-         /E4g==
-X-Gm-Message-State: ACrzQf0tNR+VNURHSyRiBcLRL/o5PEztrTRPbO812E94wjrFXbJTRy5e
-        1sEcvSqy3IUP6rvyA+hGJ9pTaq/RpVkO6w==
-X-Google-Smtp-Source: AMsMyM4q9iQ/NKVm6hjlVj+kedzuR0z7pDReUN/KpszmAjSVIxz1HZxq3fyW05GGm8DEzlY8kHoU6w==
-X-Received: by 2002:a17:90b:180a:b0:202:ae1f:328a with SMTP id lw10-20020a17090b180a00b00202ae1f328amr1816502pjb.78.1664243063538;
-        Mon, 26 Sep 2022 18:44:23 -0700 (PDT)
+        bh=Nz/B6jdwrrOsf5JLn/R8YVwnmVtMrvsX8isrBntB0gc=;
+        b=5eCxWkIcgsAmHa2jZBCn7FLjhCxCQOX+sONjTIHaFlb8mJuUbP2u5y65ighU3f8vkf
+         djbKkSEFruJ1POLTq73dEuAsgOemAng+rcrUQTzV7mHSYaiX8mTDUiUZbHqo1ucq2BSs
+         0Qo5fdwPfqtj20B3Ak4gY2O4+N4jeXrAZtOkrTza6BK/auR+DEpd7km8lkgIqEgGqQJz
+         teZvcYgVG4Ln8dgoa2Wc5sx01bUYizl4VfomxWvYh/cbQ7vRahSSUpwIsOextIjxt2IE
+         RT+vg+5u3UOtUyVzf2lkrQLmFZKOLvl/9qx7ceaUyKIw1jaJlZ3yssakh28xbaWjnxsH
+         BhXA==
+X-Gm-Message-State: ACrzQf0Dut7KuPIxiVqtbnFF8van2573wInLj3u1nUECawqVy8DxqUzx
+        uVk/LqZH2GxsFD/lpX4hKEf+0ryH6iuB8w==
+X-Google-Smtp-Source: AMsMyM4ePwz2HRsSpw7tWuMO8WEprrgKRsdcXCPFgXwQUx9CiC45lyoJblyFaY69/biPTWfpxqiSog==
+X-Received: by 2002:a17:902:ce81:b0:178:8e0a:5615 with SMTP id f1-20020a170902ce8100b001788e0a5615mr25192700plg.109.1664243065770;
+        Mon, 26 Sep 2022 18:44:25 -0700 (PDT)
 Received: from localhost.localdomain ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id o2-20020aa79782000000b00537d60286c9sm183062pfp.113.2022.09.26.18.44.22
+        by smtp.gmail.com with ESMTPSA id o2-20020aa79782000000b00537d60286c9sm183062pfp.113.2022.09.26.18.44.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 18:44:23 -0700 (PDT)
+        Mon, 26 Sep 2022 18:44:25 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/5] block: enable batched allocation for blk_mq_alloc_request()
-Date:   Mon, 26 Sep 2022 19:44:16 -0600
-Message-Id: <20220927014420.71141-2-axboe@kernel.dk>
+        Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@fb.com>
+Subject: [PATCH 3/5] block: allow end_io based requests in the completion batch handling
+Date:   Mon, 26 Sep 2022 19:44:18 -0600
+Message-Id: <20220927014420.71141-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220927014420.71141-1-axboe@kernel.dk>
 References: <20220927014420.71141-1-axboe@kernel.dk>
@@ -65,121 +65,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The filesystem IO path can take advantage of allocating batches of
-requests, if the underlying submitter tells the block layer about it
-through the blk_plug. For passthrough IO, the exported API is the
-blk_mq_alloc_request() helper, and that one does not allow for
-request caching.
+With end_io handlers now being able to potentially pass ownership of
+the request upon completion, we can allow requests with end_io handlers
+in the batch completion handling.
 
-Wire up request caching for blk_mq_alloc_request(), which is generally
-done without having a bio available upfront.
-
+Co-developed-by: Stefan Roesch <shr@fb.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c | 80 ++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 71 insertions(+), 9 deletions(-)
+ block/blk-mq.c         | 13 +++++++++++--
+ include/linux/blk-mq.h |  3 ++-
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c11949d66163..d3a9f8b9c7ee 100644
+index a4e018c82b7c..a7dfe7a898a4 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -510,25 +510,87 @@ static struct request *__blk_mq_alloc_requests(struct blk_mq_alloc_data *data)
- 					alloc_time_ns);
+@@ -823,8 +823,10 @@ static void blk_complete_request(struct request *req)
+ 	 * can find how many bytes remain in the request
+ 	 * later.
+ 	 */
+-	req->bio = NULL;
+-	req->__data_len = 0;
++	if (!req->end_io) {
++		req->bio = NULL;
++		req->__data_len = 0;
++	}
  }
  
--struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
--		blk_mq_req_flags_t flags)
-+static struct request *blk_mq_rq_cache_fill(struct request_queue *q,
-+					    struct blk_plug *plug,
-+					    blk_opf_t opf,
-+					    blk_mq_req_flags_t flags)
+ /**
+@@ -1055,6 +1057,13 @@ void blk_mq_end_request_batch(struct io_comp_batch *iob)
+ 
+ 		rq_qos_done(rq->q, rq);
+ 
++		/*
++		 * If end_io handler returns NONE, then it still has
++		 * ownership of the request.
++		 */
++		if (rq->end_io && rq->end_io(rq, 0) == RQ_END_IO_NONE)
++			continue;
++
+ 		WRITE_ONCE(rq->state, MQ_RQ_IDLE);
+ 		if (!req_ref_put_and_test(rq))
+ 			continue;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e6fa49dd6196..50811d0fb143 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -853,8 +853,9 @@ static inline bool blk_mq_add_to_batch(struct request *req,
+ 				       struct io_comp_batch *iob, int ioerror,
+ 				       void (*complete)(struct io_comp_batch *))
  {
- 	struct blk_mq_alloc_data data = {
- 		.q		= q,
- 		.flags		= flags,
- 		.cmd_flags	= opf,
--		.nr_tags	= 1,
-+		.nr_tags	= plug->nr_ios,
-+		.cached_rq	= &plug->cached_rq,
- 	};
- 	struct request *rq;
--	int ret;
- 
--	ret = blk_queue_enter(q, flags);
--	if (ret)
--		return ERR_PTR(ret);
-+	if (blk_queue_enter(q, flags))
-+		return NULL;
+-	if (!iob || (req->rq_flags & RQF_ELV) || req->end_io || ioerror)
++	if (!iob || (req->rq_flags & RQF_ELV) || ioerror)
+ 		return false;
 +
-+	plug->nr_ios = 1;
- 
- 	rq = __blk_mq_alloc_requests(&data);
--	if (!rq)
--		goto out_queue_exit;
-+	if (unlikely(!rq))
-+		blk_queue_exit(q);
-+	return rq;
-+}
-+
-+static struct request *blk_mq_alloc_cached_request(struct request_queue *q,
-+						   blk_opf_t opf,
-+						   blk_mq_req_flags_t flags)
-+{
-+	struct blk_plug *plug = current->plug;
-+	struct request *rq;
-+
-+	if (!plug)
-+		return NULL;
-+	if (rq_list_empty(plug->cached_rq)) {
-+		if (plug->nr_ios == 1)
-+			return NULL;
-+		rq = blk_mq_rq_cache_fill(q, plug, opf, flags);
-+		if (rq)
-+			goto got_it;
-+		return NULL;
-+	}
-+	rq = rq_list_peek(&plug->cached_rq);
-+	if (!rq || rq->q != q)
-+		return NULL;
-+
-+	if (blk_mq_get_hctx_type(opf) != rq->mq_hctx->type)
-+		return NULL;
-+	if (op_is_flush(rq->cmd_flags) != op_is_flush(opf))
-+		return NULL;
-+
-+	plug->cached_rq = rq_list_next(rq);
-+got_it:
-+	rq->cmd_flags = opf;
-+	INIT_LIST_HEAD(&rq->queuelist);
-+	return rq;
-+}
-+
-+struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
-+		blk_mq_req_flags_t flags)
-+{
-+	struct request *rq;
-+
-+	rq = blk_mq_alloc_cached_request(q, opf, flags);
-+	if (!rq) {
-+		struct blk_mq_alloc_data data = {
-+			.q		= q,
-+			.flags		= flags,
-+			.cmd_flags	= opf,
-+			.nr_tags	= 1,
-+		};
-+		int ret;
-+
-+		ret = blk_queue_enter(q, flags);
-+		if (ret)
-+			return ERR_PTR(ret);
-+
-+		rq = __blk_mq_alloc_requests(&data);
-+		if (!rq)
-+			goto out_queue_exit;
-+	}
- 	rq->__data_len = 0;
- 	rq->__sector = (sector_t) -1;
- 	rq->bio = rq->biotail = NULL;
+ 	if (!iob->complete)
+ 		iob->complete = complete;
+ 	else if (iob->complete != complete)
 -- 
 2.35.1
 
