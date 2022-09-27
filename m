@@ -2,331 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9824BC07E9D
-	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 20:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65AC3C6FA82
+	for <linux-block@archiver.kernel.org>; Tue, 27 Sep 2022 21:38:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231689AbiI0Uru (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Sep 2022 16:47:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40224 "EHLO
+        id S231312AbiI0ViD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Sep 2022 17:38:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232966AbiI0Urb (ORCPT
+        with ESMTP id S230283AbiI0ViC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2022 16:47:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72BF01B14E7
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 13:47:30 -0700 (PDT)
+        Tue, 27 Sep 2022 17:38:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85E8107DC8
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 14:38:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664311649;
+        s=mimecast20190719; t=1664314679;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+doqp2PWkPaWef/nK0555GwMqR1Pj4yFwRvcRH93o04=;
-        b=hNwTQX25efRdzqyYLZhJKX9uQ+k9HpdjqKgqRefakiR2YzwprCgZkiYQs4E+L7itXh7+sb
-        xB0DwJebxVR3mpUJQ5ugTxDwpu51wSZdz58qhOybHYKkDCkJmvd4PWoexCfkoduEPkoJxQ
-        bpY/6cGs+PvtGFqhbTqjwPNNJOHCzkk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=D5ZIksmGurvYC/iOAqtPVWbeUblsOdJ5xwGtu/IzOWI=;
+        b=YBIfZafXPewAOPCwMwlF2w2DlDD21qltDYr2cFEMVrVtmC51dGFTeKdAXiJtPaqx9yq9Cp
+        1HrshBShVhgvqNhy5iLFSavwN+Xt14nTLUwA6xhnRIjgMImWL1QeLhi/5X4kCLAk1uzMhj
+        MZTuB/yV+8ihcPCiACSikzeV3XfNNVk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-54-tTrUgEguNyyjW6sIntNDdA-1; Tue, 27 Sep 2022 16:47:27 -0400
-X-MC-Unique: tTrUgEguNyyjW6sIntNDdA-1
-Received: by mail-wm1-f71.google.com with SMTP id i129-20020a1c3b87000000b003b33e6160bdso9119148wma.7
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 13:47:27 -0700 (PDT)
+ us-mta-53-egD9NGNUOECQNh_K_Obmvg-1; Tue, 27 Sep 2022 17:37:58 -0400
+X-MC-Unique: egD9NGNUOECQNh_K_Obmvg-1
+Received: by mail-wr1-f69.google.com with SMTP id j16-20020adfa550000000b0022cbdfcea2dso938276wrb.19
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 14:37:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=+doqp2PWkPaWef/nK0555GwMqR1Pj4yFwRvcRH93o04=;
-        b=07bePQL9/E2ruVXiECeTLFKHhPVk4PV+91PISTzG+UZMDcgUOXTpOrZgdTSTbZcRzU
-         hZ7AWaUN9YI3LBHeh3+Ez1aKZt75B3HlTK/CInVuEVEv61la8SJvNc0fcHJuXGdABILW
-         vPnUIP8yWkkeGGYyhT+A+Q0VHQ5oLhqKWnz1vZ5mVhFr+c0y41D1y2Xo4vmUUzXNc+kP
-         mpUAU6MGJB5tehLkW73hTJHzJP37Yiq5sYh7dTTFyW2JXxn0J58i0UQrOQm0/PfPSDtk
-         KlCh2+wLNG9LbppueGBbm59B86AeNDvwSskKsfHDyWuR09uqVjwh2hy3nZOD4PqRPxTw
-         zmRA==
-X-Gm-Message-State: ACrzQf137eLDgmRkqoD1QLSDbnlpLVR3QVwPjwiPFmK/nXb6PIcFn6l5
-        ONMzuyBk12+Ovd/TR8wkEiwQiQeTyU/+h1WZVFKVjZn3jBksoOgDYwk73AmObXP+QjZc0so1iFh
-        dTzzMjtqVc9216+TfBRzTqQI=
-X-Received: by 2002:a5d:4741:0:b0:22c:c1a2:812d with SMTP id o1-20020a5d4741000000b0022cc1a2812dmr2792105wrs.220.1664311645775;
-        Tue, 27 Sep 2022 13:47:25 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5bYMVR2w3eieGGL9lQFZMOQ2OqTGSRs+aC998aQOq6zhwWnATJ4jozbFIhU5o1210eApxqrQ==
-X-Received: by 2002:a5d:4741:0:b0:22c:c1a2:812d with SMTP id o1-20020a5d4741000000b0022cc1a2812dmr2792088wrs.220.1664311645460;
-        Tue, 27 Sep 2022 13:47:25 -0700 (PDT)
+        bh=D5ZIksmGurvYC/iOAqtPVWbeUblsOdJ5xwGtu/IzOWI=;
+        b=IFEItgIe9LvLX7h37MKb4wIBXQbiGFWZZNwTauyIayImAu8DpA1nYAPFH7a0Vv9oDc
+         pmiz13zrE9S5CKVrq6krbYDravB2I1QGfBtJcF9bjJ4QHKYWsOeNHF21jXQXUVMamwLD
+         Yfbrqbpj1YhAk00Wj2aGZ2Y0JnhKT7Pz8hyzBlRsT5Fep5nigPn4BZVONp6DMWQyN7w+
+         IC9m+CojD7+lsEdphl+TMle9WBgmYIoVVKJ7KIS415YdhBjDHNsxC3RyNsgQ/5Kr6Gfa
+         r3ozh21i/N84a8ARBOyswTvT8FbEdAM8WRAUxAaGiRYBeqE/UDdpa25r7tOP+iBhVXje
+         KwVw==
+X-Gm-Message-State: ACrzQf3o/X1ycyOd0/C3qTG/RgzD01iBMgaCIAnH0t6pF/DbUyQAy7eR
+        FNNXpXcHmJl/c6U9PBJ0iSiwghrHtI/9YsY2+/wf2+ZSur/y0hY1ouiL/4C9WmcdcMA+LkSwAJS
+        V2R/biwLa6TBJXkPJh7mAYMc=
+X-Received: by 2002:a05:6000:2ce:b0:22a:f2dc:1531 with SMTP id o14-20020a05600002ce00b0022af2dc1531mr18614999wry.370.1664314677240;
+        Tue, 27 Sep 2022 14:37:57 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM75GZrpOIjx3Y8daQH5gD30RRG235Fd/YqvwBOi/XGXrLC5i+WLs9D44hdtjOnyVVgkm68Sog==
+X-Received: by 2002:a05:6000:2ce:b0:22a:f2dc:1531 with SMTP id o14-20020a05600002ce00b0022af2dc1531mr18614976wry.370.1664314677008;
+        Tue, 27 Sep 2022 14:37:57 -0700 (PDT)
 Received: from redhat.com ([2.55.47.213])
-        by smtp.gmail.com with ESMTPSA id h9-20020a05600c414900b003b4e009deb2sm3189435wmm.41.2022.09.27.13.47.23
+        by smtp.gmail.com with ESMTPSA id n3-20020a5d4203000000b0022acb7195aesm2708029wrq.33.2022.09.27.14.37.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 13:47:24 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 16:47:20 -0400
+        Tue, 27 Sep 2022 14:37:56 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 17:37:50 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Angus Chen <angus.chen@jaguarmicro.com>
-Cc:     jasowang@redhat.com, pbonzini@redhat.com, axboe@kernel.dk,
+To:     Sarthak Kukreti <sarthakkukreti@chromium.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Liming Wu <liming.wu@jaguarmicro.com>, stefanha@redhat.com,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
- init_rq
-Message-ID: <20220927163723-mutt-send-email-mst@kernel.org>
-References: <20220924034854.323-1-angus.chen@jaguarmicro.com>
+        Jens Axboe <axboe@kernel.dk>, Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Bart Van Assche <bvanassche@google.com>,
+        Daniil Lunev <dlunev@google.com>,
+        Evan Green <evgreen@google.com>,
+        Gwendal Grignou <gwendal@google.com>
+Subject: Re: [PATCH RFC 3/8] virtio_blk: Add support for provision requests
+Message-ID: <20220927173658-mutt-send-email-mst@kernel.org>
+References: <20220915164826.1396245-1-sarthakkukreti@google.com>
+ <20220915164826.1396245-4-sarthakkukreti@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220924034854.323-1-angus.chen@jaguarmicro.com>
+In-Reply-To: <20220915164826.1396245-4-sarthakkukreti@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Sep 24, 2022 at 11:48:54AM +0800, Angus Chen wrote:
-> The background is that we use dpu in cloud computing,the arch is x86,80
-> cores.We will have a lots of virtio devices,like 512 or more.
-> When we probe about 200 virtio_blk devices,it will fail and
-> the stack is print as follows:
+On Thu, Sep 15, 2022 at 09:48:21AM -0700, Sarthak Kukreti wrote:
+> From: Sarthak Kukreti <sarthakkukreti@chromium.org>
 > 
-> [25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver
-> [25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)
-> [25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-305.30.1.el8.x86_64
-> [25338.516403] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.21 08/25/2021
-> [25338.523881] Workqueue: events work_for_cpu_fn
-> [25338.528235] Call Trace:
-> [25338.530687]  dump_stack+0x5c/0x80
-> [25338.534000]  __setup_irq.cold.53+0x7c/0xd3
-> [25338.538098]  request_threaded_irq+0xf5/0x160
-> [25338.542371]  vp_find_vqs+0xc7/0x190
-> [25338.545866]  init_vq+0x17c/0x2e0 [virtio_blk]
-> [25338.550223]  ? ncpus_cmp_func+0x10/0x10
-> [25338.554061]  virtblk_probe+0xe6/0x8a0 [virtio_blk]
-> [25338.558846]  virtio_dev_probe+0x158/0x1f0
-> [25338.562861]  really_probe+0x255/0x4a0
-> [25338.566524]  ? __driver_attach_async_helper+0x90/0x90
-> [25338.571567]  driver_probe_device+0x49/0xc0
-> [25338.575660]  bus_for_each_drv+0x79/0xc0
-> [25338.579499]  __device_attach+0xdc/0x160
-> [25338.583337]  bus_probe_device+0x9d/0xb0
-> [25338.587167]  device_add+0x418/0x780
-> [25338.590654]  register_virtio_device+0x9e/0xe0
-> [25338.595011]  virtio_pci_probe+0xb3/0x140
-> [25338.598941]  local_pci_probe+0x41/0x90
-> [25338.602689]  work_for_cpu_fn+0x16/0x20
-> [25338.606443]  process_one_work+0x1a7/0x360
-> [25338.610456]  ? create_worker+0x1a0/0x1a0
-> [25338.614381]  worker_thread+0x1cf/0x390
-> [25338.618132]  ? create_worker+0x1a0/0x1a0
-> [25338.622051]  kthread+0x116/0x130
-> [25338.625283]  ? kthread_flush_work_fn+0x10/0x10
-> [25338.629731]  ret_from_fork+0x1f/0x40
-> [25338.633395] virtio_blk: probe of virtio418 failed with error -16
+> Adds support for provision requests. Provision requests act like
+> the inverse of discards.
 > 
-> After I did some work of this stack,took stap and crash to get more
-> information,I found that the auto irq_affinity affect this.
-> When "vp_find_vqs" call "vp_find_vqs_msix" failed,it will be go back
-> to call vp_find_vqs_msix again with ctx be false, and when it failed again,
-> we will call vp_find_vqs_intx,if the vp_dev->pci_dev->irq is zero,
-> we will get a backtrace like above.
-> 
-> The log :
-> "genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)"
-> was print because of the irq 0 is used by timer exclusive,and when
-> vp_find_vqs called vp_find_vqs_msix and return false twice,then it will
-> call vp_find_vqs_intx for the last try.
-> Because vp_dev->pci_dev->irq is zero,so it will be request irq 0 with
-> flag IRQF_SHARED.
-
-First this is a bug. We can fix that so it will fail more cleanly.
-
-We should check pci_dev->pin and if 0 do not try to use INT#x
-at all.
-It will still fail, just with a nicer backtrace.
-
-
-
-
-> without config CONFIG_GENERIC_IRQ_DEBUGFS,
-> I found that we called vp_find_vqs_msix failed twice because of
-> the irq resource was exhausted.
-
-I see. I don't know enough about how this work, but roughly
-I think the issue is at a high level
-
-- because of auto affinity, we try to reserve an interrupt on all CPUs
-- as there are 512 devices with a single vector per VQ we would
-  have no issue as they would be spread between CPUs,
-  but allocating on all CPUs fails.
-
-
-I don't think the issue should be fixed at blk level - it is not
-blk specifix - but yes this looks like a problem.
-Christoph, any idea?
-
-
-
-> crash> irq_domain.name,parent 0xffff9bff87d4dec0
->   name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"
->   parent = 0xffff9bff87400000
-> crash> irq_domain.name,parent 0xffff9bff87400000
->   name = 0xffff9bff87c24300 "INTEL-IR-1"
->   parent = 0xffff9bff87c6c900
-> crash> irq_domain.name,parent 0xffff9bff87c6c900
->   name = 0xffff9bff87c3ecd0 "VECTOR"
->   parent = 0x0----------------------the highest level
-> 
-> and stap irq_matrix_alloc_managed get return value -ENOSPC.
-> 
-> When no virtio_blk device probe,the vctor_matrix is:
-> crash>  p *vector_matrix
-> $1 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 15593,
->   global_reserved = 149,
->   systembits_inalloc = 3,
->   total_allocated = 409,
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {1161063342014463, 0, 1, 18446726481523507200,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-> }
-> 
-> When the dump stack occur,the vector_matrix of system is exhausted.
-> crash> p *vector_matrix
-> $82 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 0,//caq:irq left
->   global_reserved = 151,
->   systembits_inalloc = 3,
->   total_allocated = 1922,//caq:irq that allocated
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {18446744069952503807, 18446744073709551615,
->  18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-> }
-> 
-> And we tested the virtio_blk device which request irq success,
-> we found that in a system with 80 cores and two numa ,one
-> virtio_blk device with just two data queues consume 81 irqs capacity,
-> Although it just only three irqs in /proc/interrupt,80 irqs capacity 
-> is effected by function "irq_build_affinity_masks" with 2*40.
-> 
-> before one virtio_blk device hotplug out:
-> crash> p *vector_matrix
-> $2 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 15215,
->   global_reserved = 150,
->   systembits_inalloc = 3,
->   total_allocated = 553,
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {1179746449752063, 0, 1, 18446726481523507200, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
->  0, 0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0}
-> }
-> 
-> after one virtio_blk device hotplug out:
-> crash> p *vector_matrix
-> $3 = {
->   matrix_bits = 256,
->   alloc_start = 32,
->   alloc_end = 236,
->   alloc_size = 204,
->   global_available = 15296,---it increase 81,include 1 config irq.
->   global_reserved = 150,
->   systembits_inalloc = 3,
->   total_allocated = 550,------it just decrease 3.
->   online_maps = 80,
->   maps = 0x2ff20,
->   scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0},
->   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
->  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
->  0, 0, 0, 0, 0}
-> }
-> 
-> We test the new kernel also,it occur the same result.
-> [Fri Sep 23 04:51:42 2022] genirq: Flags mismatch irq 0. 00000080 (virtio608) vs. 00015a00 (timer)
-> [Fri Sep 23 04:51:42 2022] CPU: 0 PID: 5749 Comm: kworker/0:0 Kdump: loaded Tainted: G        W  OE      6.0.0-rc6+ #5
-> [Fri Sep 23 04:51:42 2022] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.19 06/16/2021
-> [Fri Sep 23 04:51:42 2022] Workqueue: events work_for_cpu_fn
-> [Fri Sep 23 04:51:42 2022] Call Trace:
-> [Fri Sep 23 04:51:42 2022]  <TASK>
-> [Fri Sep 23 04:51:42 2022]  dump_stack_lvl+0x33/0x46
-> [Fri Sep 23 04:51:42 2022]  __setup_irq+0x705/0x770
-> [Fri Sep 23 04:51:42 2022]  request_threaded_irq+0x109/0x170
-> [Fri Sep 23 04:51:42 2022]  vp_find_vqs+0xc4/0x190
-> [Fri Sep 23 04:51:42 2022]  init_vqs+0x348/0x580 [virtio_net]
-> [Fri Sep 23 04:51:42 2022]  virtnet_probe+0x54d/0xa80 [virtio_net]
-> [Fri Sep 23 04:51:42 2022]  virtio_dev_probe+0x19c/0x240
-> [Fri Sep 23 04:51:42 2022]  really_probe+0x106/0x3e0
-> [Fri Sep 23 04:51:42 2022]  ? pm_runtime_barrier+0x4f/0xa0
-> [Fri Sep 23 04:51:42 2022]  __driver_probe_device+0x79/0x170
-> [Fri Sep 23 04:51:42 2022]  driver_probe_device+0x1f/0xa0
-> [Fri Sep 23 04:51:42 2022]  __device_attach_driver+0x85/0x110
-> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
-> [Fri Sep 23 04:51:42 2022]  bus_for_each_drv+0x67/0xb0
-> [Fri Sep 23 04:51:42 2022]  __device_attach+0xe9/0x1b0
-> [Fri Sep 23 04:51:42 2022]  bus_probe_device+0x87/0xa0
-> [Fri Sep 23 04:51:42 2022]  device_add+0x59f/0x950
-> [Fri Sep 23 04:51:42 2022]  ? dev_set_name+0x4e/0x70
-> [Fri Sep 23 04:51:42 2022]  register_virtio_device+0xac/0xf0
-> [Fri Sep 23 04:51:42 2022]  virtio_pci_probe+0x101/0x170
-> [Fri Sep 23 04:51:42 2022]  local_pci_probe+0x42/0xa0
-> [Fri Sep 23 04:51:42 2022]  work_for_cpu_fn+0x13/0x20
-> [Fri Sep 23 04:51:42 2022]  process_one_work+0x1c2/0x3d0
-> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-> [Fri Sep 23 04:51:42 2022]  worker_thread+0x1b9/0x360
-> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
-> [Fri Sep 23 04:51:42 2022]  kthread+0xe6/0x110
-> [Fri Sep 23 04:51:42 2022]  ? kthread_complete_and_exit+0x20/0x20
-> [Fri Sep 23 04:51:42 2022]  ret_from_fork+0x1f/0x30
-> [Fri Sep 23 04:51:42 2022]  </TASK>
-> [Fri Sep 23 04:51:43 2022] virtio_net: probe of virtio608 failed with error -16
-> 
-> Fixes: ad71473d9c43 ("virtio_blk: use virtio IRQ affinity")
-> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
-> Tested-by: Liming Wu <liming.wu@jaguarmicro.com>
+> Signed-off-by: Sarthak Kukreti <sarthakkukreti@chromium.org>
 > ---
->  drivers/block/virtio_blk.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  drivers/block/virtio_blk.c      | 48 +++++++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_blk.h |  9 +++++++
+>  2 files changed, 57 insertions(+)
 > 
 > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index a8bcf3f664af..075de30a9bb4 100644
+> index 30255fcaf181..eacc2bffe1d1 100644
 > --- a/drivers/block/virtio_blk.c
 > +++ b/drivers/block/virtio_blk.c
-> @@ -513,7 +513,6 @@ static int init_vq(struct virtio_blk *vblk)
->  	struct virtqueue **vqs;
->  	unsigned short num_vqs;
->  	struct virtio_device *vdev = vblk->vdev;
-> -	struct irq_affinity desc = { 0, };
+> @@ -178,6 +178,39 @@ static int virtblk_setup_discard_write_zeroes(struct request *req, bool unmap)
+>  	return 0;
+>  }
 >  
->  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
->  				   struct virtio_blk_config, num_queues,
-> @@ -548,7 +547,7 @@ static int init_vq(struct virtio_blk *vblk)
+> +static int virtblk_setup_provision(struct request *req)
+> +{
+> +	unsigned short segments = blk_rq_nr_discard_segments(req);
+> +	unsigned short n = 0;
+> +
+> +	struct virtio_blk_discard_write_zeroes *range;
+> +	struct bio *bio;
+> +	u32 flags = 0;
+> +
+> +	range = kmalloc_array(segments, sizeof(*range), GFP_ATOMIC);
+> +	if (!range)
+> +		return -ENOMEM;
+> +
+> +	__rq_for_each_bio(bio, req) {
+> +		u64 sector = bio->bi_iter.bi_sector;
+> +		u32 num_sectors = bio->bi_iter.bi_size >> SECTOR_SHIFT;
+> +
+> +		range[n].flags = cpu_to_le32(flags);
+> +		range[n].num_sectors = cpu_to_le32(num_sectors);
+> +		range[n].sector = cpu_to_le64(sector);
+> +		n++;
+> +	}
+> +
+> +	WARN_ON_ONCE(n != segments);
+> +
+> +	req->special_vec.bv_page = virt_to_page(range);
+> +	req->special_vec.bv_offset = offset_in_page(range);
+> +	req->special_vec.bv_len = sizeof(*range) * segments;
+> +	req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+> +
+> +	return 0;
+> +}
+> +
+>  static void virtblk_unmap_data(struct request *req, struct virtblk_req *vbr)
+>  {
+>  	if (blk_rq_nr_phys_segments(req))
+> @@ -243,6 +276,9 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
+>  	case REQ_OP_DRV_IN:
+>  		type = VIRTIO_BLK_T_GET_ID;
+>  		break;
+> +	case REQ_OP_PROVISION:
+> +		type = VIRTIO_BLK_T_PROVISION;
+> +		break;
+>  	default:
+>  		WARN_ON_ONCE(1);
+>  		return BLK_STS_IOERR;
+> @@ -256,6 +292,11 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
+>  			return BLK_STS_RESOURCE;
 >  	}
 >  
->  	/* Discover virtqueues and write information to configuration.  */
-> -	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
-> +	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, NULL);
->  	if (err)
->  		goto out;
+> +	if (type == VIRTIO_BLK_T_PROVISION) {
+> +		if (virtblk_setup_provision(req))
+> +			return BLK_STS_RESOURCE;
+> +	}
+> +
+>  	return 0;
+>  }
 >  
+> @@ -1075,6 +1116,12 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  		blk_queue_max_write_zeroes_sectors(q, v ? v : UINT_MAX);
+>  	}
+>  
+> +	if (virtio_has_feature(vdev, VIRTIO_BLK_F_PROVISION)) {
+> +		virtio_cread(vdev, struct virtio_blk_config,
+> +			     max_provision_sectors, &v);
+> +		q->limits.max_provision_sectors = v ? v : UINT_MAX;
+> +	}
+> +
+>  	virtblk_update_capacity(vblk, false);
+>  	virtio_device_ready(vdev);
+>  
+> @@ -1177,6 +1224,7 @@ static unsigned int features[] = {
+>  	VIRTIO_BLK_F_RO, VIRTIO_BLK_F_BLK_SIZE,
+>  	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
+>  	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
+> +	VIRTIO_BLK_F_PROVISION,
+>  };
+>  
+>  static struct virtio_driver virtio_blk = {
+> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
+> index d888f013d9ff..184f8cf6d185 100644
+> --- a/include/uapi/linux/virtio_blk.h
+> +++ b/include/uapi/linux/virtio_blk.h
+> @@ -40,6 +40,7 @@
+>  #define VIRTIO_BLK_F_MQ		12	/* support more than one vq */
+>  #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
+>  #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
+> +#define VIRTIO_BLK_F_PROVISION	15	/* provision is supported */
+>  
+>  /* Legacy feature bits */
+>  #ifndef VIRTIO_BLK_NO_LEGACY
+> @@ -120,6 +121,11 @@ struct virtio_blk_config {
+>  	 */
+>  	__u8 write_zeroes_may_unmap;
+>  
+> +	/*
+> +	 * The maximum number of sectors in a provision request.
+> +	 */
+> +	__virtio32 max_provision_sectors;
+> +
+>  	__u8 unused1[3];
+>  } __attribute__((packed));
+>  
+> @@ -155,6 +161,9 @@ struct virtio_blk_config {
+>  /* Write zeroes command */
+>  #define VIRTIO_BLK_T_WRITE_ZEROES	13
+>  
+> +/* Provision command */
+> +#define VIRTIO_BLK_T_PROVISION	14
+> +
+>  #ifndef VIRTIO_BLK_NO_LEGACY
+>  /* Barrier before this op. */
+>  #define VIRTIO_BLK_T_BARRIER	0x80000000
+
+
+Feature bit has to be reserved in the virtio spec.
+Pls do this through the virtio TC mailing list.
+
 > -- 
-> 2.17.1
+> 2.31.0
 
