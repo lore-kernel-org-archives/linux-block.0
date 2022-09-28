@@ -2,132 +2,304 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88885C04A95
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 04:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA86AC32771
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 06:17:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbiI1EIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 00:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50714 "EHLO
+        id S231496AbiI1GRZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 02:17:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230040AbiI1EIA (ORCPT
+        with ESMTP id S229630AbiI1GRY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2022 00:08:00 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919021EE763
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 21:07:59 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id a20so7281310qtw.10
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 21:07:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date;
-        bh=KFhIIG6fJJ5RGEpipB0mjh9TDPsM/a9pejZ+fKWNIZo=;
-        b=Z+nlbg+X9WIz1FSazuhzTGocc2sPX7jq94+AS2ZO8vTzTIc2yduBJwUi6mwaxel2Pw
-         MOt9ryt3ecU+5CSIsNdGtzFOMSuoCByPBgOYJAqWHDzbnOYHX6s1Vc55k3AF409Br6sN
-         Un3KJUUin+AKlxoKonhYbl6gal9QxjMrkci0F8v1SinVdJg9uH2vtdXHjg5C+GLzpbbR
-         Lm14/TZYnt1kNLWWWEVjj5F6iP1GCg6wixc5bRjNWElGCdMI2S8K689tWl1/MRu+q70p
-         j9jJl1GsRc1O0EVYU1ACgjwRNZyjreWuQmKdDwnDAxXLAw+5MA9borOCZQFO+YbaHAub
-         L30Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=KFhIIG6fJJ5RGEpipB0mjh9TDPsM/a9pejZ+fKWNIZo=;
-        b=ny9bNjVg9x3OphmGqKZRbQIrQ5NLeyBRjP3MtKCXj6oanJWZ90jtZatdFOZeRXlTFo
-         cv6NKUhrpVoavV6t3jIXkl5rH5cYI8weSQrJQ7sOLEJt6Q2ibQLilondHsjsPSm0oOM7
-         wHi5001lgbreWl97EB9ag3cxkieViU1iOmf87xEf2HKFS39jGOMq+s8eMsMMsrny1nqX
-         HvcmYan8eEi+lGUhsjjr1GvjKc9VRrYFourVcvB2haunbM+vcP4cC0TBP56hnDJqxa+k
-         58raByZSn6p1Fh3tExbU5wmcrbahfl4cXdVVYcrGwjo87XdcBcimyMl9xpTaZGvLtYsW
-         yPEw==
-X-Gm-Message-State: ACrzQf20Shd3zswsTYnnPtl0OnjryuX6rQw1j74PcTrfmA9tZ5R8jBhl
-        PtR1zXafFkSt7x+HO54K7idJQQ==
-X-Google-Smtp-Source: AMsMyM4808P3ZIq1U/9vwWonPoq/gEyol9QgJRzv7Q5uzWYzlDfcbcke8/J2EJo1x/3Huj4eDaBLQw==
-X-Received: by 2002:ac8:5786:0:b0:35c:aa82:303 with SMTP id v6-20020ac85786000000b0035caa820303mr25655385qta.343.1664338078579;
-        Tue, 27 Sep 2022 21:07:58 -0700 (PDT)
-Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id w12-20020ac843cc000000b0035bb6c3811asm2034432qtn.53.2022.09.27.21.07.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 21:07:58 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 21:07:46 -0700 (PDT)
-From:   Hugh Dickins <hughd@google.com>
-X-X-Sender: hugh@ripple.attlocal.net
-To:     Jens Axboe <axboe@kernel.dk>
-cc:     Hugh Dickins <hughd@google.com>, Jan Kara <jack@suse.cz>,
-        Keith Busch <kbusch@kernel.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>,
-        Liu Song <liusong@linux.alibaba.com>,
-        Hillf Danton <hdanton@sina.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH next v2] sbitmap: fix lockup while swapping
-In-Reply-To: <f975dddf-6ec-b3cb-3746-e91f61b22ea@google.com>
-Message-ID: <9f68731-e699-5679-6a71-77634767b8dd@google.com>
-References: <YyjdiKC0YYUkI+AI@kbusch-mbp> <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com> <20220921164012.s7lvklp2qk6occcg@quack3> <20220923144303.fywkmgnkg6eken4x@quack3> <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com> <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
- <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com> <20220926114416.t7t65u66ze76aiz7@quack3> <4539e48-417-edae-d42-9ef84602af0@google.com> <20220927103123.cvjbdx6lqv7jxa2w@quack3> <2b931ee7-1bc9-e389-9d9f-71eb778dcf1@google.com>
- <f975dddf-6ec-b3cb-3746-e91f61b22ea@google.com>
+        Wed, 28 Sep 2022 02:17:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2214B118DE6
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 23:17:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664345842;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xmlSZkZxROIcPznagSrxrKVXTo8KbG8k1WiRu1ChMH8=;
+        b=M8sdbc44B/5ZIGyXLWE0BLkUaeBr1vtMwZgwALSwoBNYrYoc+Q4lqkjfEGIWnAAciyJK/h
+        2pqVo/AtUSnSbktExrqVdXfATVXDoXamuVGtxEYoBkQZKm4s1X/DdpKU17XXaRN31iFGGQ
+        LrvBpvAa2QUmZKzfQBs9UC3UAroCDdc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-457-GvslDGmOOuO8jLmiubdULQ-1; Wed, 28 Sep 2022 02:17:20 -0400
+X-MC-Unique: GvslDGmOOuO8jLmiubdULQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C87F03C01D9E;
+        Wed, 28 Sep 2022 06:17:19 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 81DCD2027061;
+        Wed, 28 Sep 2022 06:17:11 +0000 (UTC)
+Date:   Wed, 28 Sep 2022 14:17:06 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Angus Chen <angus.chen@jaguarmicro.com>
+Cc:     jasowang@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        axboe@kernel.dk, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Liming Wu <liming.wu@jaguarmicro.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v1] virtio_blk: should not use IRQD_AFFINITY_MANAGED in
+ init_rq
+Message-ID: <YzPm4hCx4xBuR3o9@T590>
+References: <20220924034854.323-1-angus.chen@jaguarmicro.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220924034854.323-1-angus.chen@jaguarmicro.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
-is a big improvement: without it, I had to revert to before commit
-040b83fcecfb ("sbitmap: fix possible io hung due to lost wakeup")
-to avoid the high system time and freezes which that had introduced.
+On Sat, Sep 24, 2022 at 11:48:54AM +0800, Angus Chen wrote:
+> The background is that we use dpu in cloud computing,the arch is x86,80
+> cores.We will have a lots of virtio devices,like 512 or more.
+> When we probe about 200 virtio_blk devices,it will fail and
+> the stack is print as follows:
+> 
+> [25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver
+> [25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)
+> [25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-305.30.1.el8.x86_64
+> [25338.516403] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.21 08/25/2021
+> [25338.523881] Workqueue: events work_for_cpu_fn
+> [25338.528235] Call Trace:
+> [25338.530687]  dump_stack+0x5c/0x80
+> [25338.534000]  __setup_irq.cold.53+0x7c/0xd3
+> [25338.538098]  request_threaded_irq+0xf5/0x160
+> [25338.542371]  vp_find_vqs+0xc7/0x190
+> [25338.545866]  init_vq+0x17c/0x2e0 [virtio_blk]
+> [25338.550223]  ? ncpus_cmp_func+0x10/0x10
+> [25338.554061]  virtblk_probe+0xe6/0x8a0 [virtio_blk]
+> [25338.558846]  virtio_dev_probe+0x158/0x1f0
+> [25338.562861]  really_probe+0x255/0x4a0
+> [25338.566524]  ? __driver_attach_async_helper+0x90/0x90
+> [25338.571567]  driver_probe_device+0x49/0xc0
+> [25338.575660]  bus_for_each_drv+0x79/0xc0
+> [25338.579499]  __device_attach+0xdc/0x160
+> [25338.583337]  bus_probe_device+0x9d/0xb0
+> [25338.587167]  device_add+0x418/0x780
+> [25338.590654]  register_virtio_device+0x9e/0xe0
+> [25338.595011]  virtio_pci_probe+0xb3/0x140
+> [25338.598941]  local_pci_probe+0x41/0x90
+> [25338.602689]  work_for_cpu_fn+0x16/0x20
+> [25338.606443]  process_one_work+0x1a7/0x360
+> [25338.610456]  ? create_worker+0x1a0/0x1a0
+> [25338.614381]  worker_thread+0x1cf/0x390
+> [25338.618132]  ? create_worker+0x1a0/0x1a0
+> [25338.622051]  kthread+0x116/0x130
+> [25338.625283]  ? kthread_flush_work_fn+0x10/0x10
+> [25338.629731]  ret_from_fork+0x1f/0x40
+> [25338.633395] virtio_blk: probe of virtio418 failed with error -16
+> 
+> After I did some work of this stack,took stap and crash to get more
+> information,I found that the auto irq_affinity affect this.
+> When "vp_find_vqs" call "vp_find_vqs_msix" failed,it will be go back
+> to call vp_find_vqs_msix again with ctx be false, and when it failed again,
+> we will call vp_find_vqs_intx,if the vp_dev->pci_dev->irq is zero,
+> we will get a backtrace like above.
+> 
+> The log :
+> "genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)"
+> was print because of the irq 0 is used by timer exclusive,and when
+> vp_find_vqs called vp_find_vqs_msix and return false twice,then it will
+> call vp_find_vqs_intx for the last try.
+> Because vp_dev->pci_dev->irq is zero,so it will be request irq 0 with
+> flag IRQF_SHARED.
+> 
+> without config CONFIG_GENERIC_IRQ_DEBUGFS,
+> I found that we called vp_find_vqs_msix failed twice because of
+> the irq resource was exhausted.
+> 
+> crash> irq_domain.name,parent 0xffff9bff87d4dec0
+>   name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"
+>   parent = 0xffff9bff87400000
+> crash> irq_domain.name,parent 0xffff9bff87400000
+>   name = 0xffff9bff87c24300 "INTEL-IR-1"
+>   parent = 0xffff9bff87c6c900
+> crash> irq_domain.name,parent 0xffff9bff87c6c900
+>   name = 0xffff9bff87c3ecd0 "VECTOR"
+>   parent = 0x0----------------------the highest level
+> 
+> and stap irq_matrix_alloc_managed get return value -ENOSPC.
+> 
+> When no virtio_blk device probe,the vctor_matrix is:
+> crash>  p *vector_matrix
+> $1 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 15593,
+>   global_reserved = 149,
+>   systembits_inalloc = 3,
+>   total_allocated = 409,
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {1161063342014463, 0, 1, 18446726481523507200,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+> }
+> 
+> When the dump stack occur,the vector_matrix of system is exhausted.
+> crash> p *vector_matrix
+> $82 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 0,//caq:irq left
+>   global_reserved = 151,
+>   systembits_inalloc = 3,
+>   total_allocated = 1922,//caq:irq that allocated
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {18446744069952503807, 18446744073709551615,
+>  18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+> }
+> 
+> And we tested the virtio_blk device which request irq success,
+> we found that in a system with 80 cores and two numa ,one
+> virtio_blk device with just two data queues consume 81 irqs capacity,
+> Although it just only three irqs in /proc/interrupt,80 irqs capacity 
+> is effected by function "irq_build_affinity_masks" with 2*40.
 
-Now okay on the NVME laptop, but 4acb83417cad is a disaster for heavy
-swapping (kernel builds in low memory) on another: soon locking up in
-sbitmap_queue_wake_up() (into which __sbq_wake_up() is inlined), cycling
-around with waitqueue_active() but wait_cnt 0 .  Here is a backtrace,
-showing the common pattern of outer sbitmap_queue_wake_up() interrupted
-before setting wait_cnt 0 back to wake_batch (in some cases other CPUs
-are idle, in other cases they're spinning for a lock in dd_bio_merge()):
+irq_build_affinity_masks() is just for spreading CPUs among the two
+vectors, nothing to do with your issue.
 
-sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
-__blk_mq_free_request < blk_mq_free_request < __blk_mq_end_request <
-scsi_end_request < scsi_io_completion < scsi_finish_command <
-scsi_complete < blk_complete_reqs < blk_done_softirq < __do_softirq <
-__irq_exit_rcu < irq_exit_rcu < common_interrupt < asm_common_interrupt <
-_raw_spin_unlock_irqrestore < __wake_up_common_lock < __wake_up <
-sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
-__blk_mq_free_request < blk_mq_free_request < dd_bio_merge <
-blk_mq_sched_bio_merge < blk_mq_attempt_bio_merge < blk_mq_submit_bio <
-__submit_bio < submit_bio_noacct_nocheck < submit_bio_noacct <
-submit_bio < __swap_writepage < swap_writepage < pageout <
-shrink_folio_list < evict_folios < lru_gen_shrink_lruvec <
-shrink_lruvec < shrink_node < do_try_to_free_pages < try_to_free_pages <
-__alloc_pages_slowpath < __alloc_pages < folio_alloc < vma_alloc_folio <
-do_anonymous_page < __handle_mm_fault < handle_mm_fault <
-do_user_addr_fault < exc_page_fault < asm_exc_page_fault
+Your issue should be related with irq matrix code, which manages effective
+cpu allocation for irq vector, nothing to do with irq_build_affinity_masks().
 
-See how the process-context sbitmap_queue_wake_up() has been interrupted,
-after bringing wait_cnt down to 0 (and in this example, after doing its
-wakeups), before advancing wake_index and refilling wake_cnt: an
-interrupt-context sbitmap_queue_wake_up() of the same sbq gets stuck.
+Cc Thomas.
 
-I have almost no grasp of all the possible sbitmap races, and their
-consequences: but __sbq_wake_up() can do nothing useful while wait_cnt 0,
-so it is better if sbq_wake_ptr() skips on to the next ws in that case:
-which fixes the lockup and shows no adverse consequence for me.
+> 
+> before one virtio_blk device hotplug out:
+> crash> p *vector_matrix
+> $2 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 15215,
+>   global_reserved = 150,
+>   systembits_inalloc = 3,
+>   total_allocated = 553,
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {1179746449752063, 0, 1, 18446726481523507200, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+>  0, 0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0}
+> }
+> 
+> after one virtio_blk device hotplug out:
+> crash> p *vector_matrix
+> $3 = {
+>   matrix_bits = 256,
+>   alloc_start = 32,
+>   alloc_end = 236,
+>   alloc_size = 204,
+>   global_available = 15296,---it increase 81,include 1 config irq.
+>   global_reserved = 150,
+>   systembits_inalloc = 3,
+>   total_allocated = 550,------it just decrease 3.
+>   online_maps = 80,
+>   maps = 0x2ff20,
+>   scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0},
+>   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0,
+>  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+>  0, 0, 0, 0, 0}
+> }
+> 
+> We test the new kernel also,it occur the same result.
+> [Fri Sep 23 04:51:42 2022] genirq: Flags mismatch irq 0. 00000080 (virtio608) vs. 00015a00 (timer)
+> [Fri Sep 23 04:51:42 2022] CPU: 0 PID: 5749 Comm: kworker/0:0 Kdump: loaded Tainted: G        W  OE      6.0.0-rc6+ #5
+> [Fri Sep 23 04:51:42 2022] Hardware name: Inspur NF5280M5/YZMB-00882-10E, BIOS 4.1.19 06/16/2021
+> [Fri Sep 23 04:51:42 2022] Workqueue: events work_for_cpu_fn
+> [Fri Sep 23 04:51:42 2022] Call Trace:
+> [Fri Sep 23 04:51:42 2022]  <TASK>
+> [Fri Sep 23 04:51:42 2022]  dump_stack_lvl+0x33/0x46
+> [Fri Sep 23 04:51:42 2022]  __setup_irq+0x705/0x770
+> [Fri Sep 23 04:51:42 2022]  request_threaded_irq+0x109/0x170
+> [Fri Sep 23 04:51:42 2022]  vp_find_vqs+0xc4/0x190
+> [Fri Sep 23 04:51:42 2022]  init_vqs+0x348/0x580 [virtio_net]
+> [Fri Sep 23 04:51:42 2022]  virtnet_probe+0x54d/0xa80 [virtio_net]
+> [Fri Sep 23 04:51:42 2022]  virtio_dev_probe+0x19c/0x240
+> [Fri Sep 23 04:51:42 2022]  really_probe+0x106/0x3e0
+> [Fri Sep 23 04:51:42 2022]  ? pm_runtime_barrier+0x4f/0xa0
+> [Fri Sep 23 04:51:42 2022]  __driver_probe_device+0x79/0x170
+> [Fri Sep 23 04:51:42 2022]  driver_probe_device+0x1f/0xa0
+> [Fri Sep 23 04:51:42 2022]  __device_attach_driver+0x85/0x110
+> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
+> [Fri Sep 23 04:51:42 2022]  ? driver_allows_async_probing+0x60/0x60
+> [Fri Sep 23 04:51:42 2022]  bus_for_each_drv+0x67/0xb0
+> [Fri Sep 23 04:51:42 2022]  __device_attach+0xe9/0x1b0
+> [Fri Sep 23 04:51:42 2022]  bus_probe_device+0x87/0xa0
+> [Fri Sep 23 04:51:42 2022]  device_add+0x59f/0x950
+> [Fri Sep 23 04:51:42 2022]  ? dev_set_name+0x4e/0x70
+> [Fri Sep 23 04:51:42 2022]  register_virtio_device+0xac/0xf0
+> [Fri Sep 23 04:51:42 2022]  virtio_pci_probe+0x101/0x170
+> [Fri Sep 23 04:51:42 2022]  local_pci_probe+0x42/0xa0
+> [Fri Sep 23 04:51:42 2022]  work_for_cpu_fn+0x13/0x20
+> [Fri Sep 23 04:51:42 2022]  process_one_work+0x1c2/0x3d0
+> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
+> [Fri Sep 23 04:51:42 2022]  worker_thread+0x1b9/0x360
+> [Fri Sep 23 04:51:42 2022]  ? process_one_work+0x3d0/0x3d0
+> [Fri Sep 23 04:51:42 2022]  kthread+0xe6/0x110
+> [Fri Sep 23 04:51:42 2022]  ? kthread_complete_and_exit+0x20/0x20
+> [Fri Sep 23 04:51:42 2022]  ret_from_fork+0x1f/0x30
+> [Fri Sep 23 04:51:42 2022]  </TASK>
+> [Fri Sep 23 04:51:43 2022] virtio_net: probe of virtio608 failed with error -16
+> 
+> Fixes: ad71473d9c43 ("virtio_blk: use virtio IRQ affinity")
+> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
+> Tested-by: Liming Wu <liming.wu@jaguarmicro.com>
+> ---
+>  drivers/block/virtio_blk.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index a8bcf3f664af..075de30a9bb4 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -513,7 +513,6 @@ static int init_vq(struct virtio_blk *vblk)
+>  	struct virtqueue **vqs;
+>  	unsigned short num_vqs;
+>  	struct virtio_device *vdev = vblk->vdev;
+> -	struct irq_affinity desc = { 0, };
+>  
+>  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_MQ,
+>  				   struct virtio_blk_config, num_queues,
+> @@ -548,7 +547,7 @@ static int init_vq(struct virtio_blk *vblk)
+>  	}
+>  
+>  	/* Discover virtqueues and write information to configuration.  */
+> -	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
+> +	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, NULL);
+>  	if (err)
+>  		goto out;
 
-Signed-off-by: Hugh Dickins <hughd@google.com>
----
-v2: - v1 to __sbq_wake_up() broke out when this happens, but
-      v2 to sbq_wake_ptr() does better by skipping on to the next.
-    - added more comment and deleted dubious Fixes attribution.
-    - and apologies to Mr Axboe and all for my axbod typo
+This patch isn't good since blk-mq's queue mapping depends on managed
+irq affinity, and this way breaks queue mapping.
 
- lib/sbitmap.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -587,7 +587,7 @@ static struct sbq_wait_state *sbq_wake_p
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
- 
--		if (waitqueue_active(&ws->wait)) {
-+		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
- 			if (wake_index != atomic_read(&sbq->wake_index))
- 				atomic_set(&sbq->wake_index, wake_index);
- 			return ws;
+Thanks,
+Ming
+
