@@ -2,146 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3CDC04A95
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 14:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58286C04A95
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 14:28:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234355AbiI1OWs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 10:22:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40156 "EHLO
+        id S234109AbiI1O2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 10:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234358AbiI1OWo (ORCPT
+        with ESMTP id S234362AbiI1O2I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2022 10:22:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CA1A99FA
-        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 07:22:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664374962;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8eB83t+uAXU0eeIFIBcJy7R/AwuzdJ0SXvnM1E+9aQE=;
-        b=UMlbsaRjw0QOlzFlW4msEY+0xq8NEHd/DA4fOxqqRs5wdEOyfHqtjyD9YQI9A0gksAYMGQ
-        mtHEi83IIYPlvJCleuybERVuc30qTjJauQS1mzOVD7pET3CsB4GTIQ1dVlV4qVCXDnM33G
-        JPbEBZWsfFano545EtUdIIvE0qM2axc=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-445-y3iV-9nKNHebz3rx0sKdFg-1; Wed, 28 Sep 2022 10:22:39 -0400
-X-MC-Unique: y3iV-9nKNHebz3rx0sKdFg-1
-Received: by mail-qv1-f71.google.com with SMTP id lx3-20020a0562145f0300b004af5fb266ebso6645268qvb.12
-        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 07:22:39 -0700 (PDT)
+        Wed, 28 Sep 2022 10:28:08 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612FBAB427
+        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 07:28:04 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id h8-20020a17090a054800b00205ccbae31eso2489656pjf.5
+        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 07:28:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=RlRvct3277EYFToPkW4od6VyhmMFB2bnHNyqnEFyrBM=;
+        b=CTdt4QqtPWlmjOer5e4jfzrIOLyZndPvQViX2DxuaaYRi8jdHNRDhr15r7TTLmXcif
+         ebtsA7cI6Yht1jcDtTlaI7tNQWSyu3lyLXeJvrYgKh2N6YcU+2pmRUbVjWWDCE00cbeg
+         CHLGEXblutHx4aNfjvq7TzZheZqNR2IMKSDnFFZItikZb4W9FkWqXYG/Yyghk5Y/aEwT
+         Ety7xrr38GrtQZE8vq52oiX0kfyEPpqLuMs8SlObeRtqUOlmpbe7RPUep0w/NeKfsql0
+         6R5KsKOtX3ryXHOHNa0Qop+K8XGpOtUsbEPzMExvi7giv7WI3IsfIe2zhzJYnGWRov6U
+         cyYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=8eB83t+uAXU0eeIFIBcJy7R/AwuzdJ0SXvnM1E+9aQE=;
-        b=yn+/zbQM9AT7siyBq7prtKbqaA70sETOg+cC1qUAL4/jJ9oYYuKOmgaAie0OmREANP
-         xd6/qZpHv4eGhWJ8nEi+dLoxkKAq3AHjG+YGqic0uxFaDs9vif3IsbIMHOnWOuQ+lfN5
-         LcGYUkkW5cGPiqhordRzZxRmuhL6XLvA0D52ZlwVViWLeU49H4o1hrbZoW+oGYGbShYF
-         I0aXHjq5ME1Q3g0/+X6iacLfyUIOxQjvdZYLsSg9hC/N8IQm7OSIKOPHLodxH/VUpn/R
-         1ZeK3ZMQHOBcEytWyQlA3PSC8sVR4coQzy+0VqYqzwZrcvoLCKHabcC3m+En4mGR296g
-         qc5g==
-X-Gm-Message-State: ACrzQf2apKza+ywNxNxB0wOnxIgSwUjEFpfl1Dz+2lF2w0KHTHDvcZAZ
-        Rx6qMlPz6rI9Q516V2FFXdsTwRMAlGl4W6pI4IiW66oAg0jTIwRQRuJw9wXGjnvKIazFHIdMWBv
-        /R5YJ3ITEInZJC360bA96NQ==
-X-Received: by 2002:a05:620a:12b5:b0:6cd:f08a:5d4f with SMTP id x21-20020a05620a12b500b006cdf08a5d4fmr21775545qki.8.1664374959194;
-        Wed, 28 Sep 2022 07:22:39 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6fmKzRNXSuxW01rhdqH0LlsG4b/0woL5Epyq9ljOUekYyldjofq1FKZh/mDRdfgWqVKl7cTA==
-X-Received: by 2002:a05:620a:12b5:b0:6cd:f08a:5d4f with SMTP id x21-20020a05620a12b500b006cdf08a5d4fmr21775532qki.8.1664374958971;
-        Wed, 28 Sep 2022 07:22:38 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id cp4-20020a05622a420400b00359961365f1sm2859790qtb.68.2022.09.28.07.22.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 07:22:38 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 10:22:36 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     snitzer@kernel.org, axboe@kernel.dk, agk@redhat.com, hch@lst.de,
-        damien.lemoal@opensource.wdc.com,
-        Damien Le Moal <damien.lemoal@wdc.com>, bvanassche@acm.org,
-        pankydev8@gmail.com, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        jaegeuk@kernel.org, matias.bjorling@wdc.com
-Subject: Re: [PATCH v15 13/13] dm: add power-of-2 target for zoned devices
- with non power-of-2 zone sizes
-Message-ID: <YzRYrNBB35fLjAO4@redhat.com>
-References: <20220923173618.6899-1-p.raghav@samsung.com>
- <CGME20220923173634eucas1p18fccee11155c670354da389b4d2f4c60@eucas1p1.samsung.com>
- <20220923173618.6899-14-p.raghav@samsung.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=RlRvct3277EYFToPkW4od6VyhmMFB2bnHNyqnEFyrBM=;
+        b=53dQn2Si/1PH0wZiUu0LOzrxmEvyWgi7eiSbwKZ1xBUU4paC9MqD1Gh6IE2FaL9V7c
+         Eq+7Ffx+8Ju69oG8NnkxUyFZQZGh/PYbeHv+1CqoC9dwQrNjy3zu92QEkJ2ZWrz30jL0
+         mfQ+21++XWrOyo+qMgzVPhPiMkfgBdEcrLbIHDdn6BiLN1XcCLFjCv70fG4zzjyXxVYJ
+         0zrnP68Wqirb06NIUJIUfUDb9QhXTQWlB2phByD5Je++aBx/KEKPOU2P8fUkttWSk8ft
+         +FUmfUtpQ5mt5hW68A0DvqgsIIEEX6UDvMtG9g55g0HpB1qE08YI105AznvJQm4h+Oj2
+         vpcA==
+X-Gm-Message-State: ACrzQf2GaKLsJ1/AudgsEGSloTEfELWpKp6ngUFZXwWjIfGYVm0jk+2c
+        QCTwPwdMIoa0xm9sPHmf58BP1g==
+X-Google-Smtp-Source: AMsMyM4REYpTDSAfEZcJo3ADi76E0K/8bIe2v79W+pe1cKZ3OjTnXEc2ij22YaVeD7Sl7qwFecHbkg==
+X-Received: by 2002:a17:902:dac7:b0:178:b5e0:3627 with SMTP id q7-20020a170902dac700b00178b5e03627mr72355plx.147.1664375283710;
+        Wed, 28 Sep 2022 07:28:03 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u8-20020a170903124800b00178b717a143sm3907725plh.126.2022.09.28.07.28.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 07:28:03 -0700 (PDT)
+Message-ID: <96154f6c-c02a-4364-c2a8-c714d79806d3@kernel.dk>
+Date:   Wed, 28 Sep 2022 08:28:02 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220923173618.6899-14-p.raghav@samsung.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH for-next v10 0/7] Fixed-buffer for uring-cmd/passthru
+Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>, hch@lst.de, kbusch@kernel.org
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com
+References: <CGME20220927174622epcas5p1685c0f97a7ee2ee13ba25f5fb58dff00@epcas5p1.samsung.com>
+ <20220927173610.7794-1-joshi.k@samsung.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220927173610.7794-1-joshi.k@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 23 2022 at  1:36P -0400,
-Pankaj Raghav <p.raghav@samsung.com> wrote:
+On 9/27/22 11:36 AM, Kanchan Joshi wrote:
+> Hi
+> 
+> uring-cmd lacks the ability to leverage the pre-registered buffers.
+> This series adds that support in uring-cmd, and plumbs nvme passthrough
+> to work with it.
+> Patch 3 and 4 contains a bunch of general nvme cleanups, which got added
+> along the iterations.
+> 
+> Using registered-buffers showed IOPS hike from 1.65M to 2.04M.
+> Without fixedbufs
+> *****************
+> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B0 -O0 -n1 -u1 /dev/ng0n1
+> submitter=0, tid=2178, file=/dev/ng0n1, node=-1
+> polled=1, fixedbufs=0/0, register_files=1, buffered=1, QD=128
+> Engine=io_uring, sq_ring=128, cq_ring=128
+> IOPS=1.63M, BW=796MiB/s, IOS/call=32/31
+> IOPS=1.64M, BW=800MiB/s, IOS/call=32/32
+> IOPS=1.64M, BW=801MiB/s, IOS/call=32/32
+> IOPS=1.65M, BW=803MiB/s, IOS/call=32/31
+> ^CExiting on signal
+> Maximum IOPS=1.65M
+> 
+> With fixedbufs
+> **************
+> # taskset -c 0 t/io_uring -b512 -d128 -c32 -s32 -p1 -F1 -B1 -O0 -n1 -u1 /dev/ng0n1
+> submitter=0, tid=2180, file=/dev/ng0n1, node=-1
+> polled=1, fixedbufs=1/0, register_files=1, buffered=1, QD=128
+> Engine=io_uring, sq_ring=128, cq_ring=128
+> IOPS=2.03M, BW=991MiB/s, IOS/call=32/31
+> IOPS=2.04M, BW=998MiB/s, IOS/call=32/32
+> IOPS=2.04M, BW=997MiB/s, IOS/call=32/31
+> ^CExiting on signal
+> Maximum IOPS=2.04M
 
-> Only zoned devices with power-of-2(po2) number of sectors per zone(zone
-> size) were supported in linux but now non power-of-2(npo2) zone sizes
-> support has been added to the block layer.
-> 
-> Filesystems such as F2FS and btrfs have support for zoned devices with
-> po2 zone size assumption. Before adding native support for npo2 zone
-> sizes, it was suggested to create a dm target for npo2 zone size device to
-> appear as a po2 zone size target so that file systems can initially
-> work without any explicit changes.
-> 
-> The design of this target is very simple: remap the device zone size to
-> the zone capacity and change the zone size to be the nearest power of 2
-> value.
-> 
-> For e.g., a device with a zone size/capacity of 3M will have an equivalent
-> target layout as follows:
-> 
-> Device layout :-
-> zone capacity = 3M
-> zone size = 3M
-> 
-> |--------------|-------------|
-> 0             3M            6M
-> 
-> Target layout :-
-> zone capacity=3M
-> zone size = 4M
-> 
-> |--------------|---|--------------|---|
-> 0             3M  4M             7M  8M
-> 
-> The area between target's zone capacity and zone size will be emulated
-> in the target.
-> The read IOs that fall in the emulated gap area will return 0 filled
-> bio and all the other IOs in that area will result in an error.
-> If a read IO span across the emulated area boundary, then the IOs are
-> split across them. All other IO operations that span across the emulated
-> area boundary will result in an error.
-> 
-> The target can be easily created as follows:
-> dmsetup create <label> --table '0 <size_sects> po2zoned /dev/nvme<id>'
-> 
-> The target does not support partial mapping of the underlying
-> device as there is no use-case for it.
-> 
-> Note:
-> This target is not related to dm-zoned target, which exposes a zoned block
-> device as a regular block device without any write constraint.
-> 
-> This target only exposes a different zone size than the underlying device.
-> The underlying device's other constraints will be directly exposed to the
-> target.
-> 
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Suggested-by: Hannes Reinecke <hare@suse.de>
+Christoph, are you happy with the changes at this point?
 
-If/when this series is accepted by Jens and others the DM changes can
-just be included along with the rest of the series.
+-- 
+Jens Axboe
 
-Reviewed-by: Mike Snitzer <snitzer@kernel.org>
 
