@@ -2,68 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDADC04A95
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 04:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88885C04A95
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 04:08:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232486AbiI1EAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 00:00:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35696 "EHLO
+        id S230307AbiI1EIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 00:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231848AbiI1D77 (ORCPT
+        with ESMTP id S230040AbiI1EIA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2022 23:59:59 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 228CC1559C3
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 20:59:49 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id v130so14106511oie.2
-        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 20:59:49 -0700 (PDT)
+        Wed, 28 Sep 2022 00:08:00 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919021EE763
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 21:07:59 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id a20so7281310qtw.10
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 21:07:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:from:to:cc:subject:date;
-        bh=cKg3c7GVCjfn7CupnMnZ/SCSyFG5IPfos7eN/2zVwG8=;
-        b=sHFs1Cooi2y5xXA0BL/6+6Waz0HuHk9jIF06Fx4P4A7WWhuUj2ptbrYtbHwJVVY1cR
-         /tORdisbPuPUtriRGPRjua2G3N4xnV37aFT/NiJJxIfdXGfqG5akb9S/dv8ujedArwvI
-         JM0sp6LLNhtI/knTj97Y3ecT4q63XITO/Gx0CdTV27UtsxCLYMm/WmgEDj31LfMTRSpk
-         R3wg0M6pZmvZxz+LDkifiG6on/W1b2wH6VC0Colf/cENGwsYXP6msXL4azPjLA3p8Z1G
-         r1lXbcFgk8HrPDyrreXOE2zKNgENl+2v2ddp56Lyey5RaqIUlq2cC8ihHusuJg8lwYus
-         ABjQ==
+        bh=KFhIIG6fJJ5RGEpipB0mjh9TDPsM/a9pejZ+fKWNIZo=;
+        b=Z+nlbg+X9WIz1FSazuhzTGocc2sPX7jq94+AS2ZO8vTzTIc2yduBJwUi6mwaxel2Pw
+         MOt9ryt3ecU+5CSIsNdGtzFOMSuoCByPBgOYJAqWHDzbnOYHX6s1Vc55k3AF409Br6sN
+         Un3KJUUin+AKlxoKonhYbl6gal9QxjMrkci0F8v1SinVdJg9uH2vtdXHjg5C+GLzpbbR
+         Lm14/TZYnt1kNLWWWEVjj5F6iP1GCg6wixc5bRjNWElGCdMI2S8K689tWl1/MRu+q70p
+         j9jJl1GsRc1O0EVYU1ACgjwRNZyjreWuQmKdDwnDAxXLAw+5MA9borOCZQFO+YbaHAub
+         L30Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=cKg3c7GVCjfn7CupnMnZ/SCSyFG5IPfos7eN/2zVwG8=;
-        b=Zae3ZwTHQZmUzKpuoklDhsXN6epBY6D0vmI+VZ5TdOX3hmgO0fi1f/xmRIl+9Tfx+w
-         y1GQcOG8sEnstX6ju0GVNP0LpP73U1zdjLXTG1hFa1vxOAlbwZ9/KOslidT/Ji/ysOlV
-         xgfmCXPPoPQ0u7BPT7f4myVyR6XdWWc7xW1h4dr87w+7hIuwe3ZzHQkI05NLyFVmjK5l
-         18FP/JSnrPSSOcbOt/AvmfX2waRXzxb1u9CwifdVjOUB4ggZpcQuFv1IkxY+xkdUs22p
-         2K8BzyJmjjH7KPqN0smsmB3IVESS9jTcYfZDtAuhrvjbI/v78hSSIjKQWABGXsNMrDvK
-         oU8A==
-X-Gm-Message-State: ACrzQf1w+oKRX0LFcTniuigL1yS3Uq3/lsG28phNPdWCQeVsKxJ4gGeH
-        +kkideMQwOKmetuhMk4ZFocZrA==
-X-Google-Smtp-Source: AMsMyM6Oiw0ZdSUZmTEBtMh2zFrN+RYkMMdT/KyVolkNoP2lwZXhk7I8dpQCmCwu5He3YGRE67Z7dg==
-X-Received: by 2002:a05:6808:3007:b0:351:3de7:82f4 with SMTP id ay7-20020a056808300700b003513de782f4mr3211800oib.103.1664337589114;
-        Tue, 27 Sep 2022 20:59:49 -0700 (PDT)
+        bh=KFhIIG6fJJ5RGEpipB0mjh9TDPsM/a9pejZ+fKWNIZo=;
+        b=ny9bNjVg9x3OphmGqKZRbQIrQ5NLeyBRjP3MtKCXj6oanJWZ90jtZatdFOZeRXlTFo
+         cv6NKUhrpVoavV6t3jIXkl5rH5cYI8weSQrJQ7sOLEJt6Q2ibQLilondHsjsPSm0oOM7
+         wHi5001lgbreWl97EB9ag3cxkieViU1iOmf87xEf2HKFS39jGOMq+s8eMsMMsrny1nqX
+         HvcmYan8eEi+lGUhsjjr1GvjKc9VRrYFourVcvB2haunbM+vcP4cC0TBP56hnDJqxa+k
+         58raByZSn6p1Fh3tExbU5wmcrbahfl4cXdVVYcrGwjo87XdcBcimyMl9xpTaZGvLtYsW
+         yPEw==
+X-Gm-Message-State: ACrzQf20Shd3zswsTYnnPtl0OnjryuX6rQw1j74PcTrfmA9tZ5R8jBhl
+        PtR1zXafFkSt7x+HO54K7idJQQ==
+X-Google-Smtp-Source: AMsMyM4808P3ZIq1U/9vwWonPoq/gEyol9QgJRzv7Q5uzWYzlDfcbcke8/J2EJo1x/3Huj4eDaBLQw==
+X-Received: by 2002:ac8:5786:0:b0:35c:aa82:303 with SMTP id v6-20020ac85786000000b0035caa820303mr25655385qta.343.1664338078579;
+        Tue, 27 Sep 2022 21:07:58 -0700 (PDT)
 Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
-        by smtp.gmail.com with ESMTPSA id q16-20020a9d6550000000b00636fd78dd57sm1628961otl.41.2022.09.27.20.59.48
+        by smtp.gmail.com with ESMTPSA id w12-20020ac843cc000000b0035bb6c3811asm2034432qtn.53.2022.09.27.21.07.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 20:59:48 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 20:59:47 -0700 (PDT)
+        Tue, 27 Sep 2022 21:07:58 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 21:07:46 -0700 (PDT)
 From:   Hugh Dickins <hughd@google.com>
 X-X-Sender: hugh@ripple.attlocal.net
-To:     Jens Axboe <axbod@kernel.dk>
-cc:     Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
+To:     Jens Axboe <axboe@kernel.dk>
+cc:     Hugh Dickins <hughd@google.com>, Jan Kara <jack@suse.cz>,
+        Keith Busch <kbusch@kernel.org>,
         Yu Kuai <yukuai1@huaweicloud.com>,
         Liu Song <liusong@linux.alibaba.com>,
         Hillf Danton <hdanton@sina.com>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Subject: [PATCH next v2] sbitmap: fix lockup while swapping
-In-Reply-To: <2b931ee7-1bc9-e389-9d9f-71eb778dcf1@google.com>
-Message-ID: <f975dddf-6ec-b3cb-3746-e91f61b22ea@google.com>
+In-Reply-To: <f975dddf-6ec-b3cb-3746-e91f61b22ea@google.com>
+Message-ID: <9f68731-e699-5679-6a71-77634767b8dd@google.com>
 References: <YyjdiKC0YYUkI+AI@kbusch-mbp> <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com> <20220921164012.s7lvklp2qk6occcg@quack3> <20220923144303.fywkmgnkg6eken4x@quack3> <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com> <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
- <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com> <20220926114416.t7t65u66ze76aiz7@quack3> <4539e48-417-edae-d42-9ef84602af0@google.com> <20220927103123.cvjbdx6lqv7jxa2w@quack3>
- <2b931ee7-1bc9-e389-9d9f-71eb778dcf1@google.com>
+ <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com> <20220926114416.t7t65u66ze76aiz7@quack3> <4539e48-417-edae-d42-9ef84602af0@google.com> <20220927103123.cvjbdx6lqv7jxa2w@quack3> <2b931ee7-1bc9-e389-9d9f-71eb778dcf1@google.com>
+ <f975dddf-6ec-b3cb-3746-e91f61b22ea@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
@@ -115,6 +115,7 @@ Signed-off-by: Hugh Dickins <hughd@google.com>
 v2: - v1 to __sbq_wake_up() broke out when this happens, but
       v2 to sbq_wake_ptr() does better by skipping on to the next.
     - added more comment and deleted dubious Fixes attribution.
+    - and apologies to Mr Axboe and all for my axbod typo
 
  lib/sbitmap.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
