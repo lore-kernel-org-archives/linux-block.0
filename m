@@ -2,108 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCE0C04A95
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 17:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 171BFC6FA86
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 18:11:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234070AbiI1R72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 13:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
+        id S234401AbiI1SK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 14:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234719AbiI1R7N (ORCPT
+        with ESMTP id S234032AbiI1SK5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2022 13:59:13 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D599FFA44;
-        Wed, 28 Sep 2022 10:59:08 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6A3E768BEB; Wed, 28 Sep 2022 19:59:04 +0200 (CEST)
-Date:   Wed, 28 Sep 2022 19:59:04 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com
-Subject: Re: [PATCH for-next v10 7/7] nvme: wire up fixed buffer support
- for nvme passthrough
-Message-ID: <20220928175904.GA17899@lst.de>
-References: <20220927173610.7794-1-joshi.k@samsung.com> <CGME20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c@epcas5p1.samsung.com> <20220927173610.7794-8-joshi.k@samsung.com>
+        Wed, 28 Sep 2022 14:10:57 -0400
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1CF8A1D65;
+        Wed, 28 Sep 2022 11:10:56 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id l9-20020a17090a4d4900b00205e295400eso2371687pjh.4;
+        Wed, 28 Sep 2022 11:10:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=GKDnwlvt98AzYvx8t1Z5mBjBPM9OSikHPq+0SvL9Y6w=;
+        b=BqTMUUhvd8QcTzNSgoQK8zbz/nbzLRBX6JUblecqyrLJ9REVfXjV0piTiBAgkivKkV
+         YqHMlCDHnbe6VlOxOxy5YmAnIawkP9Yxe62A2oIzHn8nfyGlgdRm255mQ62hTzbs0OSJ
+         VcOkyEnfD2jkeVX9DYaaRCBMvCeIxziqS34nzPndrPTOrHIkldTF7XYcp2ei7Wv2taST
+         pcg0Aabsy7WLLorXh5egq/aZvfuF6MGv2e7IB75N1DM/6beSodOIJpo5UzDQgD7EgkCR
+         ADZLU17n5Evisrpprkf1FIOaZ7YMMVwferJyhSTk8s6UygGmhDP81GJDPRc21B9KsP9j
+         Eicw==
+X-Gm-Message-State: ACrzQf1orNs+KuorM9RIFth8PsjhUxepfVoxLHq+eidqOxwI3wTNLoZZ
+        uKMuKhpdHUFItoODviL8V5M=
+X-Google-Smtp-Source: AMsMyM6IxpfaBJs42tePmX0Cj6OVnmn2lb9A/fUs5CG7m7PAuLn3yEE2tGgbRAOQDk0DKNCAQZzakQ==
+X-Received: by 2002:a17:902:ea12:b0:178:8e76:c781 with SMTP id s18-20020a170902ea1200b001788e76c781mr1044864plg.136.1664388656275;
+        Wed, 28 Sep 2022 11:10:56 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:4cba:f1a9:6ef8:3759? ([2620:15c:211:201:4cba:f1a9:6ef8:3759])
+        by smtp.gmail.com with ESMTPSA id i132-20020a62878a000000b0053651308a1csm4352316pfe.195.2022.09.28.11.10.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 11:10:55 -0700 (PDT)
+Message-ID: <26566e80-bf67-8c9f-9aac-b636cfaf473c@acm.org>
+Date:   Wed, 28 Sep 2022 11:10:52 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220927173610.7794-8-joshi.k@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v15 07/13] zonefs: allow non power of 2 zoned devices
+Content-Language: en-US
+To:     Pankaj Raghav <p.raghav@samsung.com>, snitzer@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, hch@lst.de,
+        damien.lemoal@opensource.wdc.com
+Cc:     jaegeuk@kernel.org, gost.dev@samsung.com,
+        linux-kernel@vger.kernel.org, hare@suse.de,
+        matias.bjorling@wdc.com, Johannes.Thumshirn@wdc.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        pankydev8@gmail.com, dm-devel@redhat.com,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+References: <20220923173618.6899-1-p.raghav@samsung.com>
+ <CGME20220923173627eucas1p2f134d9cb331e4a8f0fca8431eeb0f0b0@eucas1p2.samsung.com>
+ <20220923173618.6899-8-p.raghav@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220923173618.6899-8-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -static int nvme_map_user_request(struct request *req, void __user *ubuffer,
-> +static int nvme_map_user_request(struct request *req, u64 ubuffer,
+On 9/23/22 10:36, Pankaj Raghav wrote:
+> The zone size shift variable is useful only if the zone sizes are known
+> to be power of 2. Remove that variable and use generic helpers from
+> block layer to calculate zone index in zonefs.
 
-The changes to pass ubuffer as an integer trip me up every time.
-They are obviously fine as we do the pointer conversion less often,
-but maybe they'd be easier to follow if split into a prep patch.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 
-> +	bool fixedbufs = ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED);
->  
-> -	if (!vec)
-> -		ret = blk_rq_map_user(q, req, NULL, ubuffer, bufflen,
-> -			GFP_KERNEL);
-> -	else {
-> +	if (vec) {
 
-If we check IORING_URING_CMD_FIXED first this becomes a bit simpler,
-and also works better with the block helper suggested earlier:
-
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index 1a45246f0d7a8..f46142dcb8f1e 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -94,34 +94,33 @@ static int nvme_map_user_request(struct request *req, u64 ubuffer,
- 	struct bio *bio = NULL;
- 	void *meta = NULL;
- 	int ret;
--	bool fixedbufs = ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED);
- 
--	if (vec) {
--		struct iovec fast_iov[UIO_FASTIOV];
--		struct iovec *iov = fast_iov;
-+	if (ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED)) {
- 		struct iov_iter iter;
- 
- 		/* fixedbufs is only for non-vectored io */
--		WARN_ON_ONCE(fixedbufs);
--		ret = import_iovec(rq_data_dir(req), nvme_to_user_ptr(ubuffer),
--				bufflen, UIO_FASTIOV, &iov, &iter);
-+		if (WARN_ON_ONCE(vec))
-+			return -EINVAL;
-+		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
-+				rq_data_dir(req), &iter, ioucmd);
- 		if (ret < 0)
- 			goto out;
--
- 		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
--		kfree(iov);
--	} else if (fixedbufs) {
-+	} else if (vec) {
-+		struct iovec fast_iov[UIO_FASTIOV];
-+		struct iovec *iov = fast_iov;
- 		struct iov_iter iter;
- 
--		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
--				rq_data_dir(req), &iter, ioucmd);
-+		ret = import_iovec(rq_data_dir(req), nvme_to_user_ptr(ubuffer),
-+				bufflen, UIO_FASTIOV, &iov, &iter);
- 		if (ret < 0)
- 			goto out;
- 		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
--	} else
-+		kfree(iov);
-+	} else {
- 		ret = blk_rq_map_user(q, req, NULL,
--					nvme_to_user_ptr(ubuffer), bufflen,
--					GFP_KERNEL);
-+				nvme_to_user_ptr(ubuffer), bufflen, GFP_KERNEL);
-+	}
- 	if (ret)
- 		goto out;
- 	bio = req->bio;
