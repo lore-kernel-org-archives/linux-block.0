@@ -2,269 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FBBC6FA82
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 19:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F76C32771
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 21:38:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233775AbiI1TzW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 15:55:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40348 "EHLO
+        id S233375AbiI1Viv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 17:38:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233996AbiI1TzT (ORCPT
+        with ESMTP id S229901AbiI1Vit (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2022 15:55:19 -0400
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B8C33AB2B
-        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 12:55:16 -0700 (PDT)
-Received: by mail-ed1-f47.google.com with SMTP id x92so5507113ede.9
-        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 12:55:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=9qxjLuGoYfBY9VR8HKNz32kEKmBsh/5GPU2w8/C7NLg=;
-        b=ePO24Azbvo5hl7wthEZ0EfuE2ctca8U+glkOWcZgj8n+8T60idY/xpMUqgLFUfTgZu
-         YVjs2f55uS7YBi+WO215meWzRR4wY9/ml/ZpGy8dpm1nTaIsx/7YdBriN7mQ+oEGHRYE
-         xs7ApReO1o52paqijLgxHFDXXj+0KAzW0QI85PXdb1p5IHU/+nR0CQcPTBE14/9GgIFv
-         SqP4+WYswjw0qKTbFW3hzpO9gL0fz4nboY1Ffzfj4mnsdvB+tfWaF3dbEyE5gT4ebWyi
-         tqjGSyrTv+/L5tyV45VBI1oC2OHFCMaJZYxTgAnVX9VjaXbm/sldwoblUKmxM8V9mnqF
-         Ipcg==
-X-Gm-Message-State: ACrzQf33I5WzSHblutUcwOEk0e3HNRaT2U5limdzvAVAdtETUTDZ0QoF
-        uu4WPWk5GaV7xWXzSBmxCqrhJEIuzS8=
-X-Google-Smtp-Source: AMsMyM6JT1m0ccMQzjE7GKmUitewkXolxJZjt89cuJSfMUyrqq5EfBC4cqZuX2vK5YvRsfPJqbJeIA==
-X-Received: by 2002:a05:6402:2549:b0:452:8292:b610 with SMTP id l9-20020a056402254900b004528292b610mr34895294edb.199.1664394914460;
-        Wed, 28 Sep 2022 12:55:14 -0700 (PDT)
-Received: from localhost.localdomain (46-116-236-159.bb.netvision.net.il. [46.116.236.159])
-        by smtp.gmail.com with ESMTPSA id 16-20020a170906329000b007389c5a45f0sm2845747ejw.148.2022.09.28.12.55.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 12:55:13 -0700 (PDT)
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     linux-nvme@lists.infradead.org
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH rfc] nvme: support io stats on the mpath device
-Date:   Wed, 28 Sep 2022 22:55:10 +0300
-Message-Id: <20220928195510.165062-2-sagi@grimberg.me>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220928195510.165062-1-sagi@grimberg.me>
-References: <20220928195510.165062-1-sagi@grimberg.me>
+        Wed, 28 Sep 2022 17:38:49 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC62395E59;
+        Wed, 28 Sep 2022 14:38:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=VOh9QcFEDE1YfzcxWIGp+1k7f+qP9ixR08UnNbWnKpc=; b=mOBFIK5m8mLy4ywi3FVTK4mL6V
+        oj75zw9aDB26C9Y6E3q3Zh+2OVl0EQqV4erRsyOn6/kj0Tt8zleEZbtbluaojd3dKCXarw1p0vw2N
+        Mjm+cJscVTFtRI6ZPBK1NMDtmJ37SkFDwrsyizQWmLDPIffvRJnH6j1msXmitMEuUo/Vnmp2R1D4p
+        3eeslAUPK9oaVUW/PBgxclT7nvMxXVf6RSS/t7hKvCFdGuk4mom65QCMpDVM/oB2p4534U7GPMsT2
+        IrYHvtiO2s/gVPnZi67xksWEgfLmwrPbCcD3YWEry/HYu/+x3cwqtiiEiJwyJj2kiqcaFXQ9u2+sd
+        n5FHDhcw==;
+Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1odelP-00D1s7-Da; Wed, 28 Sep 2022 15:38:44 -0600
+Message-ID: <a375f380-b153-bdfe-1822-c6d8b1668c64@deltatee.com>
+Date:   Wed, 28 Sep 2022 15:38:36 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <Yy33LUqvDLSOqoKa@ziepe.ca>
+ <64f8da81-7803-4db4-73da-a158295cbc9c@deltatee.com>
+ <Yy4Ot5MoOhsgYLTQ@ziepe.ca>
+ <2327d393-af5c-3f4c-b9b9-6852b9d72f90@deltatee.com>
+ <Yy46KbD/PvhaHA6X@ziepe.ca>
+ <3840c1c6-3a5c-2286-e577-949f0d4ea7a6@deltatee.com>
+ <Yy48GPMdQS/pzNSa@ziepe.ca>
+ <aa5d51dd-0b40-29c0-69af-e83043541d3e@deltatee.com>
+ <Yy4/f+s1jOCm7dFo@ziepe.ca>
+ <980899e1-532a-772b-2f6d-6fb017def50b@deltatee.com>
+ <YzIuSsFpOC+VN1/P@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <YzIuSsFpOC+VN1/P@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 70.73.163.230
+X-SA-Exim-Rcpt-To: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v10 1/8] mm: introduce FOLL_PCI_P2PDMA to gate getting PCI
+ P2PDMA pages
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Our mpath stack device is just a shim that selects a bottom namespace
-and submits the bio to it without any fancy splitting. This also means
-that we don't clone the bio or have any context to the bio beyond
-submission. However it really sucks that we don't see the mpath device
-io stats.
 
-Given that the mpath device can't do that without adding some context
-to it, we let the bottom device do it on its behalf (somewhat similar
-to the approach taken in nvme_trace_bio_complete);
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/apple.c     |  2 +-
- drivers/nvme/host/core.c      | 10 ++++++++++
- drivers/nvme/host/fc.c        |  2 +-
- drivers/nvme/host/multipath.c | 18 ++++++++++++++++++
- drivers/nvme/host/nvme.h      | 12 ++++++++++++
- drivers/nvme/host/pci.c       |  2 +-
- drivers/nvme/host/rdma.c      |  2 +-
- drivers/nvme/host/tcp.c       |  2 +-
- drivers/nvme/target/loop.c    |  2 +-
- 9 files changed, 46 insertions(+), 6 deletions(-)
+On 2022-09-26 16:57, Jason Gunthorpe wrote:
+> On Fri, Sep 23, 2022 at 05:51:49PM -0600, Logan Gunthorpe wrote:
+>> Userspace code that's written for purpose can look at the EREMOTEIO error
+>> and tell the user something useful, if we return the correct error.
+>> If we return ENOMEM in this case, that is not possible because
+>> lots of things might have caused that error.
+> 
+> That is reasonable, but I'd still prefer to see it done more
+> centrally.
+> 
+> I mean the way the code is structured is at the top of the call chain
+> the PIN/GET/0 is decided and then the callchain is run. All the
+> callsites of try_grab_page() must be safe to call under FOLL_PIN
+> because their caller is making the decision what flag to use.
 
-diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
-index 5fc5ea196b40..6df4b8a5d8ab 100644
---- a/drivers/nvme/host/apple.c
-+++ b/drivers/nvme/host/apple.c
-@@ -763,7 +763,7 @@ static blk_status_t apple_nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			goto out_free_cmd;
- 	}
- 
--	blk_mq_start_request(req);
-+	nvme_start_request(req);
- 	apple_nvme_submit_cmd(q, cmnd);
- 	return BLK_STS_OK;
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 9bacfd014e3d..f42e6e40d84b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -385,6 +385,8 @@ static inline void nvme_end_req(struct request *req)
- 	nvme_end_req_zoned(req);
- 	nvme_trace_bio_complete(req);
- 	blk_mq_end_request(req, status);
-+	if (req->cmd_flags & REQ_NVME_MPATH)
-+		nvme_mpath_end_request(req);
- }
- 
- void nvme_complete_rq(struct request *req)
-@@ -419,6 +421,14 @@ void nvme_complete_rq(struct request *req)
- }
- EXPORT_SYMBOL_GPL(nvme_complete_rq);
- 
-+void nvme_start_request(struct request *rq)
-+{
-+	if (rq->cmd_flags & REQ_NVME_MPATH)
-+		nvme_mpath_start_request(rq);
-+	blk_mq_start_request(rq);
-+}
-+EXPORT_SYMBOL_GPL(nvme_start_request);
-+
- void nvme_complete_batch_req(struct request *req)
- {
- 	trace_nvme_complete_rq(req);
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 127abaf9ba5d..2cdcc7f5d0a9 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2744,7 +2744,7 @@ nvme_fc_start_fcp_op(struct nvme_fc_ctrl *ctrl, struct nvme_fc_queue *queue,
- 	atomic_set(&op->state, FCPOP_STATE_ACTIVE);
- 
- 	if (!(op->flags & FCOP_FLAGS_AEN))
--		blk_mq_start_request(op->rq);
-+		nvme_start_request(op->rq);
- 
- 	cmdiu->csn = cpu_to_be32(atomic_inc_return(&queue->csn));
- 	ret = ctrl->lport->ops->fcp_io(&ctrl->lport->localport,
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 6ef497c75a16..9d2ff9ed8c6c 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -114,6 +114,23 @@ void nvme_failover_req(struct request *req)
- 	kblockd_schedule_work(&ns->head->requeue_work);
- }
- 
-+void nvme_mpath_start_request(struct request *rq)
-+{
-+	struct nvme_ns *ns = rq->q->queuedata;
-+
-+	nvme_req(rq)->start_time = bdev_start_io_acct(ns->head->disk->part0,
-+					blk_rq_bytes(rq) >> SECTOR_SHIFT,
-+					req_op(rq), jiffies);
-+}
-+
-+void nvme_mpath_end_request(struct request *rq)
-+{
-+	struct nvme_ns *ns = rq->q->queuedata;
-+
-+	bdev_end_io_acct(ns->head->disk->part0,
-+		req_op(rq), nvme_req(rq)->start_time);
-+}
-+
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_ns *ns;
-@@ -501,6 +518,7 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, head->disk->queue);
- 	blk_queue_flag_set(QUEUE_FLAG_NOWAIT, head->disk->queue);
-+	blk_queue_flag_set(QUEUE_FLAG_IO_STAT, head->disk->queue);
- 	/*
- 	 * This assumes all controllers that refer to a namespace either
- 	 * support poll queues or not.  That is not a strict guarantee,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 2d5d44a73f26..08f94c404cd8 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -162,6 +162,9 @@ struct nvme_request {
- 	u8			retries;
- 	u8			flags;
- 	u16			status;
-+#ifdef CONFIG_NVME_MULTIPATH
-+	unsigned long		start_time;
-+#endif
- 	struct nvme_ctrl	*ctrl;
- };
- 
-@@ -753,6 +756,7 @@ static inline enum req_op nvme_req_op(struct nvme_command *cmd)
- }
- 
- #define NVME_QID_ANY -1
-+void nvme_start_request(struct request *rq);
- void nvme_init_request(struct request *req, struct nvme_command *cmd);
- void nvme_cleanup_cmd(struct request *req);
- blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req);
-@@ -861,6 +865,8 @@ bool nvme_mpath_clear_current_path(struct nvme_ns *ns);
- void nvme_mpath_revalidate_paths(struct nvme_ns *ns);
- void nvme_mpath_clear_ctrl_paths(struct nvme_ctrl *ctrl);
- void nvme_mpath_shutdown_disk(struct nvme_ns_head *head);
-+void nvme_mpath_start_request(struct request *rq);
-+void nvme_mpath_end_request(struct request *rq);
- 
- static inline void nvme_trace_bio_complete(struct request *req)
- {
-@@ -946,6 +952,12 @@ static inline void nvme_mpath_start_freeze(struct nvme_subsystem *subsys)
- static inline void nvme_mpath_default_iopolicy(struct nvme_subsystem *subsys)
- {
- }
-+static inline void nvme_mpath_start_request(struct request *rq)
-+{
-+}
-+static inline void nvme_mpath_end_request(struct request *rq)
-+{
-+}
- #endif /* CONFIG_NVME_MULTIPATH */
- 
- int nvme_revalidate_zones(struct nvme_ns *ns);
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 3bdb97205699..e898b9e4e6e0 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -929,7 +929,7 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
- 			goto out_unmap_data;
- 	}
- 
--	blk_mq_start_request(req);
-+	nvme_start_request(req);
- 	return BLK_STS_OK;
- out_unmap_data:
- 	nvme_unmap_data(dev, req);
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 8e52d2362fa1..ab9d5a17704b 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -2089,7 +2089,7 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (ret)
- 		goto unmap_qe;
- 
--	blk_mq_start_request(rq);
-+	nvme_start_request(rq);
- 
- 	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
- 	    queue->pi_support &&
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 2524b5304bfb..a1df405de7f1 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -2461,7 +2461,7 @@ static blk_status_t nvme_tcp_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (unlikely(ret))
- 		return ret;
- 
--	blk_mq_start_request(rq);
-+	nvme_start_request(rq);
- 
- 	nvme_tcp_queue_request(req, true, bd->last);
- 
-diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-index 9750a7fca268..c327615decc2 100644
---- a/drivers/nvme/target/loop.c
-+++ b/drivers/nvme/target/loop.c
-@@ -145,7 +145,7 @@ static blk_status_t nvme_loop_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (ret)
- 		return ret;
- 
--	blk_mq_start_request(req);
-+	nvme_start_request(req);
- 	iod->cmd.common.flags |= NVME_CMD_SGL_METABUF;
- 	iod->req.port = queue->ctrl->port;
- 	if (!nvmet_req_init(&iod->req, &queue->nvme_cq,
--- 
-2.34.1
+Ok, so I've done some auditing here.
+
+I've convinced myself it's safe to access the page before incrementing
+the reference:
+
+ * In the try_grab_page() case it must be safe as all call sites do seem
+to be called under the appropriate ptl or mmap_lock (though this is hard
+to audit). It's also true that it touches the page struct in the sense
+of the reference.
+ * In the try_grab_folio() case there already is already a similar
+FOLL_LONGTERM check in that function *before* getting the reference and
+the page should be stable due to the existing gup fast guarantees.
+
+So we don't need to do the check after we have the reference and release
+it when it fails. This simplifies things.
+
+Moving the check into try_grab_x() should be possible with some cleanup.
+
+For try_grab_page(), there are a few call sites that WARN_ON if it
+fails, assuming it cannot fail seeing the page is stable.
+try_grab_page() already has a WARN_ON on failure so it appears fine to
+remove the second WARN_ON and add a new failure path that doesn't WARN.
+
+For try_grab_folio() there's one call site in follow_hugetlb_page() that
+assumes success and warns on failure; but this call site only applies to
+hugetlb pages which should never be P2PDMA pages (nor non-longterm pages
+which is another existing failure path). So I've added a note in the
+comment with a couple other conditions that should not be possible.
+
+I expect this work is way too late for the merge window now so I'll send
+v11 after the window. In the meantime, if you want to do a quick review
+on the first two patches, it would speed things up if there are obvious
+changes. You can see these patches on this git branch:
+
+  https://github.com/sbates130272/linux-p2pmem/  p2pdma_user_cmb_v11pre
+
+Thanks,
+
+Logan
+
+
 
