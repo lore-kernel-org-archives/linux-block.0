@@ -2,177 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B40E9C32771
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 03:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FE1C04A95
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 03:56:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbiI1DaP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Sep 2022 23:30:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38408 "EHLO
+        id S232047AbiI1D4m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Sep 2022 23:56:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiI1DaN (ORCPT
+        with ESMTP id S229885AbiI1D4l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Sep 2022 23:30:13 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 965282870C;
-        Tue, 27 Sep 2022 20:30:08 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mchlm6bRlzl4KT;
-        Wed, 28 Sep 2022 11:28:20 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP2 (Coremail) with SMTP id Syh0CgDHY229vzNjmIoJBg--.45108S3;
-        Wed, 28 Sep 2022 11:30:07 +0800 (CST)
-Subject: Re: [PATCH v3 3/5] block, bfq: don't disable wbt if
- CONFIG_BFQ_GROUP_IOSCHED is disabled
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@infradead.org>,
+        Tue, 27 Sep 2022 23:56:41 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5261129F7
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 20:56:40 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id cj27so7275170qtb.7
+        for <linux-block@vger.kernel.org>; Tue, 27 Sep 2022 20:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date;
+        bh=VdDdT0KA+qYfMvfk0utv752G9/f13S09k+XIMqQkf2Y=;
+        b=WNsHLip4DFniGLTPsxPL7KTTmwHvOn2zwTOlMu+NitwYCgUYEb/QxiK3wfybBIkqlj
+         KrzJC7WnxYlyD6Y+33ZvOXJKCtHwPGputwN7IyYjGtdMQ3pVVM9rJjxmh81CPJjXv23F
+         GAiKkdae6RM3y2i0Ax47pf0iaA+KwkCJ/v0JLiyIhlnYK3AhrEvnbRcKsfCRiSBY/l99
+         e+iL+lQRIDMd15zJK+N+EUuY8S+6sW+empuJOfQOW/yK0QJbxckUzh9mYbiv20cqegCG
+         sYcPc1y5T82pm9z/Mawmkeqt8O6pI+9ZADEmyxWxAlLX8Gsgcf0Tu450iRlatWgR/4c7
+         GmcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date;
+        bh=VdDdT0KA+qYfMvfk0utv752G9/f13S09k+XIMqQkf2Y=;
+        b=Id2Vp/8jPk/26BCarUzlqEP6GDqsn5pHvIZceGlA7652wPZEK2iPkyQnmN3CrBnvzp
+         yUTx/xyscCheBqYLNsTLWMK72/Sz8jvMcl2reFNqMTFCVT7+QLkKFVCuTQB1bZq0C154
+         j2eWVwIekBIenNdWRiTCTVe7yaVUbHDzpkgMO7bp9+V1x4wvym2JLCCUwG/aidwgI2wu
+         AKRPdYz+s8sPJcq4nUTMDybN1y+7tXgyzuJROD04Omi24v949EoswIHoN87Pxeb33B9z
+         FHYPXksV+0eQ5iDnSYoqsfbrCPLhz0f6QhbYt2a57Gn1A4kfVui3sjyHe3N0q8XA/CsX
+         Ejhg==
+X-Gm-Message-State: ACrzQf0zNndwKzzwMLcuDai7qvuSjHlHzL/ndn/ccllfoWzkXKN4lVYY
+        BDkpn05t7bM0MZtjfMCQShsxhw==
+X-Google-Smtp-Source: AMsMyM5k5oRHIaGJ7yBwqCbbvF8BNAalVg8m9DiF5TK3zvaMWlSYkhP/VtQ64rUJ+2ViKvdU3Kg2cg==
+X-Received: by 2002:a05:622a:207:b0:35d:539e:99f0 with SMTP id b7-20020a05622a020700b0035d539e99f0mr2230422qtx.512.1664337399901;
+        Tue, 27 Sep 2022 20:56:39 -0700 (PDT)
+Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id 139-20020a370691000000b006cf14cc6740sm2163079qkg.70.2022.09.27.20.56.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 20:56:39 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 20:56:14 -0700 (PDT)
+From:   Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@ripple.attlocal.net
+To:     Jan Kara <jack@suse.cz>
+cc:     Hugh Dickins <hughd@google.com>, Keith Busch <kbusch@kernel.org>,
         Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220922113558.1085314-1-yukuai3@huawei.com>
- <20220922113558.1085314-4-yukuai3@huawei.com>
- <Yy10vjnxAvca8Ee1@infradead.org>
- <988a86f2-e960-ba59-4d41-f4c8a6345ee9@huaweicloud.com>
- <20220923100659.a3atdanlvygffuxt@quack3>
- <95998ae6-8bbf-b438-801b-7033ceaf9c36@huaweicloud.com>
- <20220923110354.czvzm6rjm7mtqyh3@quack3>
- <5a2dba26-529d-295f-2e88-601475ff67bf@huaweicloud.com>
- <20220926142242.mxrkbs63ynmhulib@quack3>
- <84f52be5-0fc4-ad22-d1ce-27e3dbc28fe7@huaweicloud.com>
- <E29E2557-9D79-40A3-B0EA-5EBAD6DD5A1F@linaro.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <93f383d2-380f-2acd-7aaf-345357a1a91c@huaweicloud.com>
-Date:   Wed, 28 Sep 2022 11:30:05 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Yu Kuai <yukuai1@huaweicloud.com>,
+        Liu Song <liusong@linux.alibaba.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH next] sbitmap: fix lockup while swapping
+In-Reply-To: <20220927103123.cvjbdx6lqv7jxa2w@quack3>
+Message-ID: <2b931ee7-1bc9-e389-9d9f-71eb778dcf1@google.com>
+References: <YyjdiKC0YYUkI+AI@kbusch-mbp> <f2d130d2-f3af-d09d-6fd7-10da28d26ba9@google.com> <20220921164012.s7lvklp2qk6occcg@quack3> <20220923144303.fywkmgnkg6eken4x@quack3> <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com> <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
+ <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com> <20220926114416.t7t65u66ze76aiz7@quack3> <4539e48-417-edae-d42-9ef84602af0@google.com> <20220927103123.cvjbdx6lqv7jxa2w@quack3>
 MIME-Version: 1.0
-In-Reply-To: <E29E2557-9D79-40A3-B0EA-5EBAD6DD5A1F@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgDHY229vzNjmIoJBg--.45108S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxXrWxKryftFyUCFyfJFyUAwb_yoWrXw43p3
-        47Jay7KF48Ary8tw1qyw18WryFyr4xJr4UXF1rJ348Xryqyr17Jr1xJr45uFyqqr18Gw12
-        yFyUXr9rJr1UZ3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-        UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Tue, 27 Sep 2022, Jan Kara wrote:
+> On Mon 26-09-22 20:39:03, Hugh Dickins wrote:
+> 
+> So my thinking was that instead of having multiple counters, we'd have just
+> two - one counting completions and the other one counting wakeups and if
+> completions - wakeups > batch, we search for waiters in the wait queues,
+> wake them up so that 'wakeups' counter catches up. That also kind of
+> alleviates the 'wake_index' issue because racing updates to it will lead to
+> reordering of wakeups but not to lost wakeups, retries, or anything.
+> 
+> I also agree with your wake_up_nr_return() idea below, that is part of this
+> solution (reliably waking given number of waiters) and in fact I have
+> already coded that yesterday while thinking about the problem ;)
 
-在 2022/09/28 0:14, Paolo Valente 写道:
-> 
-> 
->> Il giorno 27 set 2022, alle ore 03:02, Yu Kuai <yukuai1@huaweicloud.com> ha scritto:
->>
->> Hi, Jan
->>
->> 在 2022/09/26 22:22, Jan Kara 写道:
->>> Hi Kuai!
->>> On Mon 26-09-22 21:00:48, Yu Kuai wrote:
->>>> 在 2022/09/23 19:03, Jan Kara 写道:
->>>>> Hi Kuai!
->>>>>
->>>>> On Fri 23-09-22 18:23:03, Yu Kuai wrote:
->>>>>> 在 2022/09/23 18:06, Jan Kara 写道:
->>>>>>> On Fri 23-09-22 17:50:49, Yu Kuai wrote:
->>>>>>>> Hi, Christoph
->>>>>>>>
->>>>>>>> 在 2022/09/23 16:56, Christoph Hellwig 写道:
->>>>>>>>> On Thu, Sep 22, 2022 at 07:35:56PM +0800, Yu Kuai wrote:
->>>>>>>>>> wbt and bfq should work just fine if CONFIG_BFQ_GROUP_IOSCHED is disabled.
->>>>>>>>>
->>>>>>>>> Umm, wouldn't this be something decided at runtime, that is not
->>>>>>>>> if CONFIG_BFQ_GROUP_IOSCHED is enable/disable in the kernel build
->>>>>>>>> if the hierarchical cgroup based scheduling is actually used for a
->>>>>>>>> given device?
->>>>>>>>> .
->>>>>>>>>
->>>>>>>>
->>>>>>>> That's a good point,
->>>>>>>>
->>>>>>>> Before this patch wbt is simply disabled if elevator is bfq.
->>>>>>>>
->>>>>>>> With this patch, if elevator is bfq while bfq doesn't throttle
->>>>>>>> any IO yet, wbt still is disabled unnecessarily.
->>>>>>>
->>>>>>> It is not really disabled unnecessarily. Have you actually tested the
->>>>>>> performance of the combination? I did once and the results were just
->>>>>>> horrible (which is I made BFQ just disable wbt by default). The problem is
->>>>>>> that blk-wbt assumes certain model of underlying storage stack and hardware
->>>>>>> behavior and BFQ just does not fit in that model. For example BFQ wants to
->>>>>>> see as many requests as possible so that it can heavily reorder them,
->>>>>>> estimate think times of applications, etc. On the other hand blk-wbt
->>>>>>> assumes that if request latency gets higher, it means there is too much IO
->>>>>>> going on and we need to allow less of "lower priority" IO types to be
->>>>>>> submitted. These two go directly against one another and I was easily
->>>>>>> observing blk-wbt spiraling down to allowing only very small number of
->>>>>>> requests submitted while BFQ was idling waiting for more IO from the
->>>>>>> process that was currently scheduled.
->>>>>>>
->>>>>>
->>>>>> Thanks for your explanation, I understand that bfq and wbt should not
->>>>>> work together.
->>>>>>
->>>>>> However, I wonder if CONFIG_BFQ_GROUP_IOSCHED is disabled, or service
->>>>>> guarantee is not needed, does the above phenomenon still exist? I find
->>>>>> it hard to understand... Perhaps I need to do some test.
->>>>>
->>>>> Well, BFQ implements for example idling on sync IO queues which is one of
->>>>> the features that upsets blk-wbt. That does not depend on
->>>>> CONFIG_BFQ_GROUP_IOSCHED in any way. Also generally the idea that BFQ
->>>>> assigns storage *time slots* to different processes and IO from other
->>>>> processes is just queued at those times increases IO completion
->>>>> latency (for IOs of processes that are not currently scheduled) and this
->>>>> tends to confuse blk-wbt.
->>>>>
->>>> Hi, Jan
->>>>
->>>> Just to be curious, have you ever think about or tested wbt with
->>>> io-cost? And even more, how bfq work with io-cost?
->>>>
->>>> I haven't tested yet, but it seems to me some of them can work well
->>>> together.
->>> No, I didn't test these combinations. I actually expect there would be
->>> troubles in both cases under high IO load but you can try :)
->>
->> Just realize I made a clerical error, I actually want to saied that
->> *can't* work well together.
->>
-> 
-> You are right, they can't work together, conceptually. Their logics would simply keep conflicting, and none of the two would make ti to control IO as desired.
+Great - I'm pleasantly surprised to have been not so far off,
+and we seem to be much in accord.
 
-Yes, I just run some simple tests, test result is very bad...
+(What I called wake_up_nr_return() can perfectly well be wake_up_nr()
+itself: I had just been temporarily avoiding a void to int change in
+a header file, recompiling the world.)
 
-Perhaps we can do something like bfq does to disable wbt.
+Many thanks for your detailed elucidation of the batch safety,
+in particular: I won't pretend to have absorbed it completely yet,
+but it's there in your mail for me and all of us to refer back to.
 
-Thanks,
-Kuai
+> > TBH I have not tested this one outside of that experiment: would you
+> > prefer this patch to my first one, I test and sign this off and send?
 > 
-> Thanks,
-> Paolo
-> 
->> I'll try to have a test the combinations.
->>
->> Thanks,
->> Kuai
->>> 								Honza
-> 
-> .
-> 
+> Yes, actually this is an elegant solution. It has the same inherent
+> raciness as your waitqueue_active() patch so wakeups could be lost even
+> though some waiters need them but that seems pretty unlikely. So yes, if
+> you can submit this, I guess this is a good band aid for the coming merge
+> window.
 
+No problem in the testing, the v2 patch follows now.
+
+> 
+> > > 2) Revert Yu Kuai's original fix 040b83fcecfb8 ("sbitmap: fix possible io
+> > > hung due to lost wakeup") and my fixup 48c033314f37 ("sbitmap: Avoid leaving
+> > > waitqueue in invalid state in __sbq_wake_up()"). But then Keith would have
+> > > to redo his batched accounting patches on top.
+> > 
+> > I know much too little to help make that choice.
+> 
+> Yeah, I guess it is Jens' call in the end. I'm fine with both options.
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
