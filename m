@@ -2,48 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171BFC6FA86
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 18:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C5CC32771
+	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 18:13:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234401AbiI1SK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 14:10:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36074 "EHLO
+        id S234509AbiI1SNe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 14:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234032AbiI1SK5 (ORCPT
+        with ESMTP id S234436AbiI1SNc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2022 14:10:57 -0400
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1CF8A1D65;
-        Wed, 28 Sep 2022 11:10:56 -0700 (PDT)
-Received: by mail-pj1-f54.google.com with SMTP id l9-20020a17090a4d4900b00205e295400eso2371687pjh.4;
-        Wed, 28 Sep 2022 11:10:56 -0700 (PDT)
+        Wed, 28 Sep 2022 14:13:32 -0400
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A777ABF17;
+        Wed, 28 Sep 2022 11:13:32 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d24so12420988pls.4;
+        Wed, 28 Sep 2022 11:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=GKDnwlvt98AzYvx8t1Z5mBjBPM9OSikHPq+0SvL9Y6w=;
-        b=BqTMUUhvd8QcTzNSgoQK8zbz/nbzLRBX6JUblecqyrLJ9REVfXjV0piTiBAgkivKkV
-         YqHMlCDHnbe6VlOxOxy5YmAnIawkP9Yxe62A2oIzHn8nfyGlgdRm255mQ62hTzbs0OSJ
-         VcOkyEnfD2jkeVX9DYaaRCBMvCeIxziqS34nzPndrPTOrHIkldTF7XYcp2ei7Wv2taST
-         pcg0Aabsy7WLLorXh5egq/aZvfuF6MGv2e7IB75N1DM/6beSodOIJpo5UzDQgD7EgkCR
-         ADZLU17n5Evisrpprkf1FIOaZ7YMMVwferJyhSTk8s6UygGmhDP81GJDPRc21B9KsP9j
-         Eicw==
-X-Gm-Message-State: ACrzQf1orNs+KuorM9RIFth8PsjhUxepfVoxLHq+eidqOxwI3wTNLoZZ
-        uKMuKhpdHUFItoODviL8V5M=
-X-Google-Smtp-Source: AMsMyM6IxpfaBJs42tePmX0Cj6OVnmn2lb9A/fUs5CG7m7PAuLn3yEE2tGgbRAOQDk0DKNCAQZzakQ==
-X-Received: by 2002:a17:902:ea12:b0:178:8e76:c781 with SMTP id s18-20020a170902ea1200b001788e76c781mr1044864plg.136.1664388656275;
-        Wed, 28 Sep 2022 11:10:56 -0700 (PDT)
+        bh=SrqLT0kXpAlJD8TZzx8ujBa5nxZPe+zl7PnVUm+RbhE=;
+        b=TDLXY43fvsaoQNCtrwuijWEqsIG31bpFMUPXK8AfWOQtIg+Wkhva+/mjAdIi91bXKN
+         zldZjVnxPjCiuZx9giK81NVf0ivXssKU/wHZyJbFQpvLbRUZscWS7BU0MQCc/xIJqe+W
+         cPtFLYjHqLu/BlN2XDQARvkHtmJFVXzNM7GSedeuaxBaW/NepyEL2U6oQqTM8LKUutQW
+         4VCgja+rbWqp3nE/5IL9aS1bzdO5WhGw4YN1boE1bsHX0xvGC+GhjE6qiANXHE70oS6g
+         nw2+Sz6zb6ldua/wJmo37gQJ6X88UmBYOyhtLf7mXpOWW4SFRyB8vOE1o4F+kzvINnf3
+         q73A==
+X-Gm-Message-State: ACrzQf1P+VcKv9EYc4h7VWk/g98uogW38fmg8FQuLXyniiuHYKqhq5Ww
+        9/uzvZ/9XKv9NNveojQcv5ZM6AUWepASJQ==
+X-Google-Smtp-Source: AMsMyM5phyXRHDoV48KwWkEssjx6POVAM7KislIcpIimObHNjJBChVYQkrXS8krHgOsN/67JiWvhEA==
+X-Received: by 2002:a17:90a:4607:b0:202:e22d:4892 with SMTP id w7-20020a17090a460700b00202e22d4892mr11629503pjg.220.1664388811703;
+        Wed, 28 Sep 2022 11:13:31 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:4cba:f1a9:6ef8:3759? ([2620:15c:211:201:4cba:f1a9:6ef8:3759])
-        by smtp.gmail.com with ESMTPSA id i132-20020a62878a000000b0053651308a1csm4352316pfe.195.2022.09.28.11.10.54
+        by smtp.gmail.com with ESMTPSA id p15-20020a1709027ecf00b0016f8e8032c4sm4014341plb.129.2022.09.28.11.13.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Sep 2022 11:10:55 -0700 (PDT)
-Message-ID: <26566e80-bf67-8c9f-9aac-b636cfaf473c@acm.org>
-Date:   Wed, 28 Sep 2022 11:10:52 -0700
+        Wed, 28 Sep 2022 11:13:31 -0700 (PDT)
+Message-ID: <d7004ae9-ad68-cb61-9ca8-0bf61efa0c21@acm.org>
+Date:   Wed, 28 Sep 2022 11:13:28 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
-Subject: Re: [PATCH v15 07/13] zonefs: allow non power of 2 zoned devices
+Subject: Re: [PATCH v15 11/13] dm: call dm_zone_endio after the target endio
+ callback for zoned devices
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, snitzer@kernel.org,
         axboe@kernel.dk, agk@redhat.com, hch@lst.de,
@@ -52,14 +53,12 @@ Cc:     jaegeuk@kernel.org, gost.dev@samsung.com,
         linux-kernel@vger.kernel.org, hare@suse.de,
         matias.bjorling@wdc.com, Johannes.Thumshirn@wdc.com,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        pankydev8@gmail.com, dm-devel@redhat.com,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Chaitanya Kulkarni <kch@nvidia.com>
+        pankydev8@gmail.com, dm-devel@redhat.com
 References: <20220923173618.6899-1-p.raghav@samsung.com>
- <CGME20220923173627eucas1p2f134d9cb331e4a8f0fca8431eeb0f0b0@eucas1p2.samsung.com>
- <20220923173618.6899-8-p.raghav@samsung.com>
+ <CGME20220923173631eucas1p23cceb8438d6b8b9c3460192c0ad2472d@eucas1p2.samsung.com>
+ <20220923173618.6899-12-p.raghav@samsung.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220923173618.6899-8-p.raghav@samsung.com>
+In-Reply-To: <20220923173618.6899-12-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -67,10 +66,23 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 9/23/22 10:36, Pankaj Raghav wrote:
-> The zone size shift variable is useful only if the zone sizes are known
-> to be power of 2. Remove that variable and use generic helpers from
-> block layer to calculate zone index in zonefs.
+> dm_zone_endio() updates the bi_sector of orig bio for zoned devices that
+> uses either native append or append emulation, and it is called before the
+> endio of the target. But target endio can still update the clone bio
+> after dm_zone_endio is called, thereby, the orig bio does not contain
+> the updated information anymore.
+> 
+> Currently, this is not a problem as the targets that support zoned devices
+> such as dm-zoned, dm-linear, and dm-crypt do not have an endio function,
+> and even if they do (such as dm-flakey), they don't modify the
+> bio->bi_iter.bi_sector of the cloned bio that is used to update the
+> orig_bio's bi_sector in dm_zone_endio function.
+> 
+> This is a prep patch for the new dm-po2zoned target as it modifies
+> bi_sector in the endio callback.
+> 
+> Call dm_zone_endio for zoned devices after calling the target's endio
+> function.
 
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-
 
