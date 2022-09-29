@@ -2,61 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C547C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 16:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1AC8C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 16:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236021AbiI2Q1J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Sep 2022 12:27:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55194 "EHLO
+        id S234340AbiI2Qco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Sep 2022 12:32:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236297AbiI2Q0n (ORCPT
+        with ESMTP id S233904AbiI2Qcn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2022 12:26:43 -0400
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 074FC11F125
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 09:25:53 -0700 (PDT)
-Received: by mail-wr1-f54.google.com with SMTP id s14so3049703wro.0
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 09:25:52 -0700 (PDT)
+        Thu, 29 Sep 2022 12:32:43 -0400
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D1914FE0F
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 09:32:43 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id c11so3011659wrp.11
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 09:32:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=474tjA3Gjf60Pz38dDMyAaRwLrDVcBWJSEsK7Yc5yII=;
-        b=alPjwN1lE9s7e2mo6vbJDKNF1QOk8q/mHm/zYeZISTwGNLgcm//a+Gmnjk4rPqCuuH
-         WOCC3dgDOsircAmVOUkmdSwraZ5DJR59oi0glZByUmCWVAAxp0TeANoD7zMyxrxKDeWA
-         hqpAZ2K0/Aqf7e93GQn/mW9NImL1Ep33pQpWy+G9RdNiGGATaJ542h/eFOR5qMrH4jZu
-         4Txgi19FF5q7uozjJim3m80IHxGn3LPtSmILIMpQfhJF3MmNHF1sf1Zw3jw7jZCubCTL
-         wRP3z97fERplAgHqLkPOpyV4ketnUzYKgFcAg5R7WpJlPCrZ6XRIk+kOECMUjntE1He3
-         Soaw==
-X-Gm-Message-State: ACrzQf2W0RcBbk7ebPvXWBiLWDbbmw6CXwzhX3FQ6MdtTn8vyweBi0wU
-        oExZj4lZp7A+h21Gf3S8RXk=
-X-Google-Smtp-Source: AMsMyM5ArMrAJHgtGVPKjq2yZzCVLOipwE7b7GNao9dudVYRpPyv4+HVhfSpxojNMkZYvmrzoH7nsA==
-X-Received: by 2002:a05:6000:1c18:b0:22b:13e3:19d3 with SMTP id ba24-20020a0560001c1800b0022b13e319d3mr3106868wrb.699.1664468751518;
-        Thu, 29 Sep 2022 09:25:51 -0700 (PDT)
+        bh=IYZh+nK5YCCQ4oiVyHqObkTmxD0DKA6yJReA9paQ+eI=;
+        b=1owLOZbcQZP5hUfilIPSIEjHfyFDGi2bP0/LCZvPHM0HJdACuTrtrv/8PhD7L9wFjm
+         AMICvqdNBQ5Jfo0PJ7kf8nAo+offzmGdvlB2FN+MB/OfNzigPVz0aTSU58Kol8bkHu/0
+         2qTK36HFp9fZWvUOkFLbEQvY3FrBuUJKxB/q/0pd5GdOnWZn1Lkcr/N2+yZPwsrJtySs
+         O0eC5WtIzq6GTW4MfMxQdcgfJcfTgYZYe7fHVnl02zRv+dtVNspJSrpsJZdCePYL4f0X
+         10PCEVTsqo0QqAn2b4/+KNacWYJFUTk7EfHrgnT7c2MyqSUv+hBh5O28ROhfFlAOX2Ob
+         RAbQ==
+X-Gm-Message-State: ACrzQf1YqqHr8a1xp3tSGx8SVHrCEDi7VPxMOueGeoIDT3SJiYKWeRL3
+        vL0u2Lr/P+sddkuiLuvLYFbm5RxmUU4=
+X-Google-Smtp-Source: AMsMyM7Vi8Zv246zWA3Kl9vxysqsy5NxHTXSGu7gRTfgvoZ4sXaYFHNRRsDOlBr92PMvARCHZtpRfw==
+X-Received: by 2002:adf:a4ce:0:b0:22a:f5e8:6dcc with SMTP id h14-20020adfa4ce000000b0022af5e86dccmr2899437wrb.445.1664469161531;
+        Thu, 29 Sep 2022 09:32:41 -0700 (PDT)
 Received: from [192.168.64.53] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id o3-20020a5d4743000000b00225307f43fbsm7155649wrs.44.2022.09.29.09.25.49
+        by smtp.gmail.com with ESMTPSA id e9-20020adfe389000000b00228daaa84aesm6942020wrm.25.2022.09.29.09.32.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Sep 2022 09:25:50 -0700 (PDT)
-Message-ID: <91ebc84d-c0e3-b792-4f92-79612271eb91@grimberg.me>
-Date:   Thu, 29 Sep 2022 19:25:48 +0300
+        Thu, 29 Sep 2022 09:32:41 -0700 (PDT)
+Message-ID: <e5299b5e-5e9a-5a2a-b7dc-30de2bf43adc@grimberg.me>
+Date:   Thu, 29 Sep 2022 19:32:39 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.11.0
-From:   Sagi Grimberg <sagi@grimberg.me>
 Subject: Re: [PATCH rfc] nvme: support io stats on the mpath device
-To:     Jens Axboe <axboe@kernel.dk>, Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-nvme@lists.infradead.org
-Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.de>
 References: <20220928195510.165062-1-sagi@grimberg.me>
  <20220928195510.165062-2-sagi@grimberg.me>
  <760a7129-945c-35fa-6bd6-aa315d717bc5@nvidia.com>
  <a3d619a3-ccae-69ea-3e2c-9acff7b97d92@grimberg.me>
- <04b39974-6b55-7aca-70de-4a567f2eac8f@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <04b39974-6b55-7aca-70de-4a567f2eac8f@kernel.dk>
+ <YzWzvOKgoAqltAA0@kbusch-mbp.dhcp.thefacebook.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <YzWzvOKgoAqltAA0@kbusch-mbp.dhcp.thefacebook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -64,25 +65,15 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->>> 3. Do you have some performance numbers (we're touching the fast path here) ?
+>>> 3. Do you have some performance numbers (we're touching the fast path
+>>> here) ?
 >>
 >> This is pretty light-weight, accounting is per-cpu and only wrapped by
 >> preemption disable. This is a very small price to pay for what we gain.
 > 
-> Is it? Enabling IO stats for normal devices has a very noticeable impact
-> on performance at the higher end of the scale.
+> It does add up, though, and some environments disable stats to skip the
+> overhead. At a minimum, you need to add a check for blk_queue_io_stat() before
+> assuming you need to account for stats.
 
-Interesting, I didn't think this would be that noticeable. How much
-would you quantify the impact in terms of %?
-
-I don't have any insight on this for blk-mq, probably because I've never
-seen any user turn IO stats off (or at least don't remember).
-
-My (very limited) testing did not show any noticeable differences for
-nvme-loop. All I'm saying that we need to have IO stats for the mpath
-device node. If there is a clever way to collect this from the hidden
-devices just for nvme, great, but we need to expose these stats.
-
-> So much so that I've contemplated how we can make this less expensive than it currently is.
-
-Then nvme-mpath would benefit from that as well.
+But QUEUE_FLAG_IO_STAT is set by nvme-mpath itself?
+You mean disable IO stats in runtime?
