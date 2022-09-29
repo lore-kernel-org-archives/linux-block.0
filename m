@@ -2,139 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA51AC6FA82
-	for <linux-block@archiver.kernel.org>; Wed, 28 Sep 2022 23:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B17C04A95
+	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 03:34:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234104AbiI1Xki (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Sep 2022 19:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38864 "EHLO
+        id S233488AbiI2Dep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Sep 2022 23:34:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233938AbiI1Xka (ORCPT
+        with ESMTP id S231340AbiI2Den (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Sep 2022 19:40:30 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on20620.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8d::620])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E206950063
-        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 16:40:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PL4nhoBmLeN9Zk11yPxAGfY8YQgVJkikoDv57WTAIC499mSHcxOxfxzH9cocYzzNTLI1WZov161t5CPWrSTvwfMNoTciMIWQFd1WW6DJEiQKWbWjiJa6setCf6W0wLNtjeyDJtrWkd+EHw+nobM0wi7mZ7ZnO04AaaKOVkEh5H7FBoRXW6Tgnb7TfAullzDhykEvPmlEFVjjb+kHOkykkQNBQ4IobrchpUXR6w0LBw/L9ZNswAJdNd5dPESSwIlIlW1noxZ3VlhwkaNg8Qh96rygLL1mIrvxv2tD0BwPyOcIyW8MLEY2H0gv56BzmdyezKNyNu4Eh7sPePEPazGy7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I6/Pp4M/p7kThhVmY/N3V6NrSe32mAiEyO1qRze4AQ8=;
- b=RzkIR9dk/CxGMaiy/m9xABOgAymCC3h/l/RipmADnS3h6uHv3kNY5T/G27fSSygGOllJpRWe1DPvF4fGd/XSRVB6RWBzYHeGc5l2AO7j3xdjYRgDHHcGw8eHkzUzqDkhOd5VNXeoPweJ/48kT5PdTgDDnkX8SexkdOOrnM0KeaQNkjG4XB0CrC7ItcKyzmiRuGr2XWfmpfztplpr0ziqDWrWJ7yABK7dQPyrmc5SKDXQs0gQNWV2omKS1c3foIYH+jCFSOwwfa5il6JyAHNx5Abg6FnUfsrIbFPqcZdzmBycE8fIYWS6xAiX5+pJu0Mbsq0jYnn8IXeL9FmciU3fGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I6/Pp4M/p7kThhVmY/N3V6NrSe32mAiEyO1qRze4AQ8=;
- b=YSKd5+JB8hdtw8BDeo4ifQomM1IQ37rETdRxcUZr5SAdIh8i+KO850eMQKW6fd6m+nIbTwkKc1teP4hvdF7gR3163pAsRmJOAH8jQMD3HvDcnfSijuIwPgwWKclCaVWsYUYvlW7Gbmohyo/Qh3GQTtZEFUvwosw50hhxz0ySpFnMmlJAjKhOOjJg/MYc9cAgOhabVx9DSAv9/5IvfQ+0ZP9uSkxMzxhBeqxwAvP5yVwML0B0VCxlfcixY1sNeusQin5VrAVHIPDEIk3x6V/vkITSQpsJerpdrlkEThImJiolziMptC86Jso5O6n1f+VB2U30hxa/1X2YplKZ6WfX/Q==
-Received: from BN8PR04CA0028.namprd04.prod.outlook.com (2603:10b6:408:70::41)
- by CH2PR12MB5001.namprd12.prod.outlook.com (2603:10b6:610:61::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.16; Wed, 28 Sep
- 2022 23:40:26 +0000
-Received: from BN8NAM11FT015.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:70:cafe::4d) by BN8PR04CA0028.outlook.office365.com
- (2603:10b6:408:70::41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17 via Frontend
- Transport; Wed, 28 Sep 2022 23:40:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN8NAM11FT015.mail.protection.outlook.com (10.13.176.90) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5676.17 via Frontend Transport; Wed, 28 Sep 2022 23:40:26 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Wed, 28 Sep
- 2022 16:40:11 -0700
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Wed, 28 Sep 2022 16:40:11 -0700
-Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.986.29 via Frontend
- Transport; Wed, 28 Sep 2022 16:40:09 -0700
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <mst@redhat.com>, <stefanha@redhat.com>, <jasowang@redhat.com>,
-        <virtualization@lists.linux-foundation.org>
-CC:     <linux-block@vger.kernel.org>, Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH 1/1] virtio_pci: use common helper to configure SR-IOV
-Date:   Thu, 29 Sep 2022 02:40:08 +0300
-Message-ID: <20220928234008.30302-1-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
+        Wed, 28 Sep 2022 23:34:43 -0400
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1927E6554
+        for <linux-block@vger.kernel.org>; Wed, 28 Sep 2022 20:34:37 -0700 (PDT)
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220929033433epoutp02b78927894b305d6aa1817f40cecf994e~ZN2u5ml0b1433014330epoutp02x
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 03:34:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220929033433epoutp02b78927894b305d6aa1817f40cecf994e~ZN2u5ml0b1433014330epoutp02x
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1664422473;
+        bh=XWhu9fPf/z4i+HXa/bFF3pUCQt6+ZI4Iir5N84tzID4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=KJoRyWwPzQmUfGrm8hU5WgO9wBDUOu+7o6k1rszc1c7s+//5Et4yA0obHPen1bOh0
+         t3me5zSNwcHSXBBpFsrb/5Q5ykTH/YnoPnylZqEOqOhiSdkhg9OGh3Ct0Z0AJ8Z9zG
+         l8ydGrr0BCuycZkAmVq/hPAxmSFN2CZv1Sm4T4Aw=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220929033432epcas1p2eb9705e5c3cf2d69fe225285a17087ff~ZN2uJ_wCo2613426134epcas1p2I;
+        Thu, 29 Sep 2022 03:34:32 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.38.242]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4MdJrR6WXVz4x9Q1; Thu, 29 Sep
+        2022 03:34:31 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        43.3E.64988.74215336; Thu, 29 Sep 2022 12:34:31 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20220929033431epcas1p416e37f037fda478e524a365f0f754524~ZN2tFd_aS0586905869epcas1p4Q;
+        Thu, 29 Sep 2022 03:34:31 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220929033431epsmtrp1a53f7c0dba688b92692dd57d13ecc25e~ZN2tEeGho3046130461epsmtrp1d;
+        Thu, 29 Sep 2022 03:34:31 +0000 (GMT)
+X-AuditID: b6c32a39-8d3fa7000001fddc-7f-63351247ee48
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F9.93.18644.64215336; Thu, 29 Sep 2022 12:34:31 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.98.109]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220929033430epsmtip17cd295128a7447e58ea5fe09409dc1dc~ZN2s144Qq1251112511epsmtip1M;
+        Thu, 29 Sep 2022 03:34:30 +0000 (GMT)
+From:   Manjong Lee <mj0123.lee@samsung.com>
+To:     mj0123.lee@samsung.com, bvanassche@acm.org, ming.lei@redhat.com,
+        hch@lst.de
+Cc:     axboe@kernel.dk, jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        nanich.lee@samsung.com, sbeom16.kim@samsung.com,
+        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
+        yt0928.kim@samsung.com
+Subject: RE:[PATCH 1/1] blk-mq: added case for cpu offline during send_ipi
+ in rq_complete
+Date:   Thu, 29 Sep 2022 12:34:28 +0900
+Message-Id: <20220929033428.25948-1-mj0123.lee@samsung.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20220826013136.16763-1-mj0123.lee@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT015:EE_|CH2PR12MB5001:EE_
-X-MS-Office365-Filtering-Correlation-Id: 306f2c9c-d10f-4eac-ba47-08daa1aad1ce
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Q1Dimv9MJBxeqjJZa/fNuVVzpcy6lEUvx2T6+0zMHlNYHhGAkSl/HRNPb3QEb8qy2nPwE+tg+YP2dVtYkOzDl8ITt/ywS7iX9CaF7pSnvVE47a+zwiW47c2IGqGhacevXEZRSnxfcR/1b3iPeJ91V+5UDH/YYad7/jaxqF1dmqplguuxIVT/NSJVrZwRzSJk2hWk3eKFL9gfMx/Li6AphRffVKkf6dt2EnlYSzW4S8OwCvlVX6hnLAX1n0OnL+L7oOLASEL1iNbtT334TyJVS0sksCAhoRYvfHZLqh1iTX4HtYxh/UHCsq5jj2xmY67/Al3K95i+R7BderMtl/QYMFD5SxnyUTkC3417l1dPmL1i4gLoEA/xDJHfT0Wd86I+D/uTrF6CzRSg3MmYo+xdLaZoDQXmZbnwyu8J1pRagvua6HuOhDS2tshYSmEEMJKIPBQG8PzjJsv+gZLEJoIsiab4iVXH7SbWdFC8Ni5nUgOChGyIddhSt/exS2dD9twAKP24QSnaH7x2x//YAlDAsthQ4qkrftE2/ZGrQVLhW8uTH6K9yjFeycQAVjixcBBisMHMPZ7nZ7TB2QcEttCIPtWHjp/eJfSOLWTURBK48VQ5H8IwFR0oL9eodOCMjZAbwqTt9Kgu+u6lKxIYg/39CZmHsliLdBBVKvUsr69svefUPxD4DzwGwPHQbdPtOf5KA+1l2FQ4VU+eHMrtuPTATwEMID9XygLtE+Rv1CSWyY9/orQNFTnFP6+gtPFDeI0jjSvhQSwrl1kNjKBLKPhYlQ==
-X-Forefront-Antispam-Report: CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(136003)(376002)(346002)(451199015)(40470700004)(46966006)(36840700001)(83380400001)(47076005)(40480700001)(1076003)(36860700001)(426003)(336012)(186003)(70586007)(70206006)(86362001)(5660300002)(356005)(54906003)(107886003)(2616005)(110136005)(8936002)(36756003)(316002)(26005)(4326008)(82740400003)(82310400005)(8676002)(478600001)(7636003)(40460700003)(41300700001)(2906002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 23:40:26.0813
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 306f2c9c-d10f-4eac-ba47-08daa1aad1ce
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT015.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5001
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNJsWRmVeSWpSXmKPExsWy7bCmga67kGmywcLbRhar7/azWUz78JPZ
+        YuXqo0wWPU+aWC2+Piy22HtL2+LyrjlsFocmNzNZTN88h9ni2v0z7BZz/t9jtTh38hOrxbzH
+        Dhbr9/5kc+DzuHzF2+Py2VKP3Tcb2Dze77vK5tG3ZRWjx+dNcgFsUdk2GamJKalFCql5yfkp
+        mXnptkrewfHO8aZmBoa6hpYW5koKeYm5qbZKLj4Bum6ZOUCXKimUJeaUAoUCEouLlfTtbIry
+        S0tSFTLyi0tslVILUnIKzAr0ihNzi0vz0vXyUkusDA0MjEyBChOyM9Zt6WQs6BCsWHr5FFsD
+        Yy9fFyMnh4SAicSR5d9Zuxi5OIQEdjBKPF8yA8r5xChxr30OG0iVkMBnRomrvx1gOuYdPsAK
+        Ed/FKHHrnihEA1DN7PYfTCAJNgEtieXPLrCD2CICgRJ7N3xhBLGZBdqYJBbNSQWxhQWiJWb9
+        +gm2gEVAVaLt5SJmEJtXwFriVt9zFohl8hKnlh0Em8kpYCPx/+Q1VogaQYmTM5+wQMyUl2je
+        OpsZ5AgJgZkcEgtvfgByOIAcF4kjrWkQc4QlXh3fwg5hS0m87G+DsoslttyazAJRXiHR2xUL
+        ETaW+PT5MyNImFlAU2L9Ln2IsKLEzt9zoT7hk3j3tYcVopNXoqNNCKJERWJ38ze4RW9eHWCE
+        sD0kzp89zwIJtX5GiYkPxSYwKsxC8sssJL/MQli8gJF5FaNYakFxbnpqsWGBKTx2k/NzNzGC
+        U62W5Q7G6W8/6B1iZOJgPMQowcGsJML7+6hhshBvSmJlVWpRfnxRaU5q8SFGU2BIT2SWEk3O
+        Byb7vJJ4QxNLAxMzIxMLY0tjMyVx3oYZWslCAumJJanZqakFqUUwfUwcnFINTK1Ce5b1B8ur
+        RoutPMnimWcYrr423aN1Q16E1O+K+jNC1yryFla9OWTq+ac41tPy4JaE0DDzLw/KQhg5j5z8
+        0rlz+tFJziJbXl5/oJWyJ77m8s47K9c93B6pIh1TntHEu+Hzvk3KN1raF4ge3GbUcnrn7TYT
+        TZtVrLfnpHXOn7dgQtvyiLm5Eq9Oi8rZLH263Vv6Ed9d23bt3kkMEiu/Z16YyjRHxSX+CNe5
+        I7pXXQQyHnJL9zs/al9fvbjylbhOnELbvSvbF3up1J6ct8euwm86w7vuiZlr7//j6pt5UWnL
+        hVM/mz/Exz0wtw9cNvPBbNO4BPG551Vdf2w81RWQH90246nbJrmegozUpyuP7VViKc5INNRi
+        LipOBACMWVj0PgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrJLMWRmVeSWpSXmKPExsWy7bCSnK67kGmywfzjjBar7/azWUz78JPZ
+        YuXqo0wWPU+aWC2+Piy22HtL2+LyrjlsFocmNzNZTN88h9ni2v0z7BZz/t9jtTh38hOrxbzH
+        Dhbr9/5kc+DzuHzF2+Py2VKP3Tcb2Dze77vK5tG3ZRWjx+dNcgFsUVw2Kak5mWWpRfp2CVwZ
+        67Z0MhZ0CFYsvXyKrYGxl6+LkZNDQsBEYt7hA6wgtpDADkaJ9jZ2iLiUxLy1DWxdjBxAtrDE
+        4cPFXYxcQCUfGSXa3m4Gq2cT0JJY/uwCWL2IQKjErTPXGUGKmAUmMUk0LHoKViQsEClxd9o/
+        RhCbRUBVou3lImYQm1fAWuJW33MWiGXyEqeWHWQCsTkFbCT+n7wGdZC1xM2b86HqBSVOznwC
+        Vs8MVN+8dTbzBEaBWUhSs5CkFjAyrWKUTC0ozk3PLTYsMMpLLdcrTswtLs1L10vOz93ECI4N
+        La0djHtWfdA7xMjEwXiIUYKDWUmE9/dRw2Qh3pTEyqrUovz4otKc1OJDjNIcLErivBe6TsYL
+        CaQnlqRmp6YWpBbBZJk4OKUamHoqGbe+U2Sflx+Znfi1fqOqr4l0h0jdBs/u6le9a1eISE2Z
+        l/bCa9cfQ+n/X7Y1PN3xcrpp+yOvwtL2Hv7rPWy7Z0RyqZ9xKDm8OlFdWXwBg73J50zmiFcf
+        i/Zrd9RHRzRlsq5bdags3jFw58K79m5fzOYWtt19euBBQGSc0G+5G9qXreIvTNTN2f3nis6+
+        Bfs+LXi3pWVCCFfjqfKF7wLcb+z6qPTdUZBjGmvE2T/tlw7W8/tbXIqNUpM8Ps/Ea7Mv05GZ
+        QYxr1Du51M5MO3hd8unUyRV8MRdD6+61lv7a7PXkw8QzxaFlGm6WiuK5n/3vF91f3Xr+1Nnq
+        oGffmxgms+ws1Tv1b4Na9MHwc0osxRmJhlrMRcWJAOgmddv8AgAA
+X-CMS-MailID: 20220929033431epcas1p416e37f037fda478e524a365f0f754524
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220929033431epcas1p416e37f037fda478e524a365f0f754524
+References: <20220826013136.16763-1-mj0123.lee@samsung.com>
+        <CGME20220929033431epcas1p416e37f037fda478e524a365f0f754524@epcas1p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is instead of re-writing the same logic in virtio driver.
-
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- drivers/virtio/virtio_pci_common.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
-
-diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-index ad258a9d3b9f..67d3970e57f2 100644
---- a/drivers/virtio/virtio_pci_common.c
-+++ b/drivers/virtio/virtio_pci_common.c
-@@ -607,7 +607,6 @@ static int virtio_pci_sriov_configure(struct pci_dev *pci_dev, int num_vfs)
- {
- 	struct virtio_pci_device *vp_dev = pci_get_drvdata(pci_dev);
- 	struct virtio_device *vdev = &vp_dev->vdev;
--	int ret;
- 
- 	if (!(vdev->config->get_status(vdev) & VIRTIO_CONFIG_S_DRIVER_OK))
- 		return -EBUSY;
-@@ -615,19 +614,7 @@ static int virtio_pci_sriov_configure(struct pci_dev *pci_dev, int num_vfs)
- 	if (!__virtio_test_bit(vdev, VIRTIO_F_SR_IOV))
- 		return -EINVAL;
- 
--	if (pci_vfs_assigned(pci_dev))
--		return -EPERM;
--
--	if (num_vfs == 0) {
--		pci_disable_sriov(pci_dev);
--		return 0;
--	}
--
--	ret = pci_enable_sriov(pci_dev, num_vfs);
--	if (ret < 0)
--		return ret;
--
--	return num_vfs;
-+	return pci_sriov_configure_simple(pci_dev, num_vfs);
- }
- 
- static struct pci_driver virtio_pci_driver = {
--- 
-2.18.1
-
+Hello. I think there seems to be a problem that the request
+complete processing will be omitted due to the follow routine.
+Please give me a advice or opinion if I get a mistake or missing something.
+Thank you.
+>
+>When a request complete then send ipi to original cpu which issued request.
+>If cpu offline during this process, send_ipi might fail.
+>However, there is currently no code to handle this error case.
+>This may cause in missing request complete.
+>Therefore, if send_ipi fails due to cpu offline, the request complete
+>has to be processed directly from the cpu where it is running.
+>
+>
+>
+>Signed-off-by: Manjong Lee <mj0123.lee@samsung.com>
+>Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+>Signed-off-by: Junho Kim <junho89.kim@samsung.com>
+>---
+> block/blk-mq.c | 16 ++++++++++------
+> 1 file changed, 10 insertions(+), 6 deletions(-)
+>
+>diff --git a/block/blk-mq.c b/block/blk-mq.c
+>index 3c1e6b6d991d..f2ce79708c5e 100644
+>--- a/block/blk-mq.c
+>+++ b/block/blk-mq.c
+>@@ -1064,17 +1064,22 @@ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+> 	return cpu_online(rq->mq_ctx->cpu);
+> }
+> 
+>-static void blk_mq_complete_send_ipi(struct request *rq)
+>+static int blk_mq_complete_send_ipi(struct request *rq)
+> {
+> 	struct llist_head *list;
+> 	unsigned int cpu;
+>+	int ret = 0;
+> 
+> 	cpu = rq->mq_ctx->cpu;
+> 	list = &per_cpu(blk_cpu_done, cpu);
+> 	if (llist_add(&rq->ipi_list, list)) {
+> 		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
+>-		smp_call_function_single_async(cpu, &rq->csd);
+>+		ret = smp_call_function_single_async(cpu, &rq->csd);
+>+		if (ret)
+>+			llist_del_all(list);
+> 	}
+>+
+>+	return ret;
+> }
+> 
+> static void blk_mq_raise_softirq(struct request *rq)
+>@@ -1099,10 +1104,9 @@ bool blk_mq_complete_request_remote(struct request *rq)
+> 	if (rq->cmd_flags & REQ_POLLED)
+> 		return false;
+> 
+>-	if (blk_mq_complete_need_ipi(rq)) {
+>-		blk_mq_complete_send_ipi(rq);
+>-		return true;
+>-	}
+>+	if (blk_mq_complete_need_ipi(rq))
+>+		if (!blk_mq_complete_send_ipi(rq))
+>+			return true;
+> 
+> 	if (rq->q->nr_hw_queues == 1) {
+> 		blk_mq_raise_softirq(rq);
+>-- 
+>2.32.0
+>
