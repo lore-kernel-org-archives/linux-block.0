@@ -2,43 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8332C4321E
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 23:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B483C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 23:24:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232296AbiI3XYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 19:24:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47222 "EHLO
+        id S232005AbiI3XYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 19:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232113AbiI3XYS (ORCPT
+        with ESMTP id S232164AbiI3XYS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 30 Sep 2022 19:24:18 -0400
 Received: from post.baikalelectronics.com (post.baikalelectronics.com [213.79.110.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7411715A700;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7406C14594C;
         Fri, 30 Sep 2022 16:24:12 -0700 (PDT)
 Received: from post.baikalelectronics.com (localhost.localdomain [127.0.0.1])
-        by post.baikalelectronics.com (Proxmox) with ESMTP id 63B39E0EB5;
-        Fri, 30 Sep 2022 01:46:56 +0300 (MSK)
+        by post.baikalelectronics.com (Proxmox) with ESMTP id 8504BE0EB2;
+        Fri, 30 Sep 2022 01:46:54 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         baikalelectronics.ru; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:from:from:in-reply-to:message-id
-        :mime-version:references:reply-to:subject:subject:to:to; s=post;
-         bh=wuhxWCVeXVlJVS/RfP/AZNvPaB2WtIt+hlprDEaQew8=; b=tp0ozYnJRVZb
-        3eOjGM6LN8TCwm25Q+QFgtbgIAcq6fonGNSvoBN/ax9zXSP9KuFKSHRRJhS6lHBY
-        Hp9D7/pv0NAdDxGCXECCbCHCzU+5HbRntTZwP29CWCnCUKnIXExi1hNXj9wDXbL1
-        rI4PnhJFrDkO3LC4RvuG+ywABgJbY1w=
+        :content-type:content-type:date:from:from:message-id
+        :mime-version:reply-to:subject:subject:to:to; s=post; bh=0F0pMI2
+        9a3JYWPRwZUHOw05fHrRq2BuL98mhBC2wW+8=; b=hhryUWcjZ17wdbk7YFSJ8Jg
+        jsSzixbGL/YYeGw4TlYj2IqJxyPCW8eHrd+m0za4eFNCjzlpwlc301DwxCiWb4XU
+        uWynJqgYQU+MToyfXTtkSAkU17ZyRwuemdku2j2PppEHjko1u/imOUnTg53sloxd
+        nV5apMT/1XzM6RYuNHS0=
 Received: from mail.baikal.int (mail.baikal.int [192.168.51.25])
-        by post.baikalelectronics.com (Proxmox) with ESMTP id 56706E0E6B;
-        Fri, 30 Sep 2022 01:46:56 +0300 (MSK)
+        by post.baikalelectronics.com (Proxmox) with ESMTP id 6A7A4E0E6B;
+        Fri, 30 Sep 2022 01:46:54 +0300 (MSK)
 Received: from localhost (192.168.168.10) by mail (192.168.51.25) with
- Microsoft SMTP Server (TLS) id 15.0.1395.4; Fri, 30 Sep 2022 01:46:57 +0300
+ Microsoft SMTP Server (TLS) id 15.0.1395.4; Fri, 30 Sep 2022 01:46:55 +0300
 From:   Serge Semin <Sergey.Semin@baikalelectronics.ru>
 To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
         Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>,
-        Scott Bauer <scott.bauer@intel.com>
+        Sagi Grimberg <sagi@grimberg.me>
 CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
         Serge Semin <fancer.lancer@gmail.com>,
         Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
@@ -46,12 +42,10 @@ CC:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
         <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 3/3] block: sed-opal: Cache-line-align the cmd/resp buffers
-Date:   Fri, 30 Sep 2022 01:46:48 +0300
-Message-ID: <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
+Subject: [PATCH v2 0/3] block/nvme: Fix DMA-noncoherent platforms support
+Date:   Fri, 30 Sep 2022 01:46:45 +0300
+Message-ID: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
 X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
-References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
@@ -61,46 +55,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In accordance with [1] the DMA-able memory buffers must be
-cacheline-aligned otherwise the cache writing-back and invalidation
-performed during the mapping may cause the adjacent data being lost. It's
-specifically required for the DMA-noncoherent platforms. Seeing the
-opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
-drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
-respectively we must make sure the passed buffers are cacheline-aligned to
-prevent the denoted problem.
+Our SoC doesn't have the CPU caches coherent on DMA's. After getting the
+kernel updated to the 6.0-rcX version we've discovered a problem with the
+NVME hwmon probe. It turned out that the root cause of it was connected
+with the cache-line-unaligned buffer passed to the DMA-engine. Due to the
+cache-invalidation performed on the buffer mapping stage a part of the
+structure the buffer was embedded to was lost. Here we suggest to fix the
+problem just by aligning the buffer accordingly as the
+Documentation/core-api/dma-api.rst document requires. (See the
+corresponding patch log for more details.)
 
-[1] Documentation/core-api/dma-api.rst
+A potential root of a similar problem has been detected in the sed-opal
+driver too. Even though we have not got any difficulties connected with
+that part we still suggest to fix that in the same way as it is done for
+the NVME hwmon driver.
 
-Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
+Link: https://lore.kernel.org/linux-nvme/20220909191916.16013-1-Sergey.Semin@baikalelectronics.ru
+Changelog v2:
+- Drop Jonathan Derrick and Revanth Rajashekar from Cc-list due to
+  the email messages being bounced back.
+- Add a new preparation patch:
+[PATCH v2 1/3] nvme-hwmon: Return error on kzalloc failure
+- Convert to allocating the nvme_smart_log structure instance instead of
+  cache-aligning it. (@Christoph)
+
 Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
----
- block/sed-opal.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Cc: Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>
+Cc: Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: linux-nvme@lists.infradead.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 9700197000f2..222acbd1f03a 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -73,6 +73,7 @@ struct parsed_resp {
- 	struct opal_resp_tok toks[MAX_TOKS];
- };
- 
-+/* Presumably DMA-able buffers must be cache-aligned */
- struct opal_dev {
- 	bool supported;
- 	bool mbr_enabled;
-@@ -88,8 +89,8 @@ struct opal_dev {
- 	u64 lowest_lba;
- 
- 	size_t pos;
--	u8 cmd[IO_BUFFER_LENGTH];
--	u8 resp[IO_BUFFER_LENGTH];
-+	u8 cmd[IO_BUFFER_LENGTH] ____cacheline_aligned;
-+	u8 resp[IO_BUFFER_LENGTH] ____cacheline_aligned;
- 
- 	struct parsed_resp parsed;
- 	size_t prev_d_len;
+Serge Semin (3):
+  nvme-hwmon: Return error on kzalloc failure
+  nvme-hwmon: Kmalloc the NVME SMART log buffer
+  block: sed-opal: Cache-line-align the cmd/resp buffers
+
+ block/sed-opal.c          |  5 +++--
+ drivers/nvme/host/hwmon.c | 34 ++++++++++++++++++++++++----------
+ 2 files changed, 27 insertions(+), 12 deletions(-)
+
 -- 
 2.37.3
 
