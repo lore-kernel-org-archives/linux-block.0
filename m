@@ -2,204 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB93DC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 11:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8777CC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 11:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235336AbiI2LvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Sep 2022 07:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34132 "EHLO
+        id S232166AbiI2L7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Sep 2022 07:59:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235410AbiI2LvK (ORCPT
+        with ESMTP id S235103AbiI2L7d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2022 07:51:10 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8B810FC65
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 04:51:08 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220929115103epoutp0333d6388d077907e891545b41a17d6955~ZUoPHOH2p2784327843epoutp036
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 11:51:03 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220929115103epoutp0333d6388d077907e891545b41a17d6955~ZUoPHOH2p2784327843epoutp036
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1664452263;
-        bh=UusulqRpysVUIzAkvHawID4SCo7MWa2AUVyepONB3Wo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=U/1PLVkC9KOD0xdtCg9gNxnb3p8U1w4spj1wx6y6QT+IH0KnAIa4+a8dK5iBPiTdt
-         aQqBtwvoenyjS7CSzQUr1t8TtDfotSJG8jsaEEXU44bMXE7CMMYGfwuaZ0h9U8/Itn
-         LsVCj3vEDdSga0bXY3PxNolNtLtUZmZ6HBNO74AU=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20220929115102epcas5p1e0c4c4d15df514e5bd0a603ee635c168~ZUoOYFvpB2371223712epcas5p1V;
-        Thu, 29 Sep 2022 11:51:02 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.179]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4MdWsH6YZnz4x9Pp; Thu, 29 Sep
-        2022 11:50:59 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        27.F1.39477.3A685336; Thu, 29 Sep 2022 20:50:59 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220929114553epcas5p111cafe19d8d682c30ebcb8621ed7ffb3~ZUjuMvSsl1005010050epcas5p1X;
-        Thu, 29 Sep 2022 11:45:53 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220929114552epsmtrp15e4da8243d6d99c7d3daf39c14aa010f~ZUjuL-gEi3217132171epsmtrp1V;
-        Thu, 29 Sep 2022 11:45:52 +0000 (GMT)
-X-AuditID: b6c32a4a-259fb70000019a35-3f-633586a38b54
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        C8.9A.18644.07585336; Thu, 29 Sep 2022 20:45:52 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220929114551epsmtip21ee60e9491898e1eba29d65718088cba~ZUjs9eW2s1348113481epsmtip2N;
-        Thu, 29 Sep 2022 11:45:51 +0000 (GMT)
-Date:   Thu, 29 Sep 2022 17:06:03 +0530
-From:   Anuj Gupta <anuj20.g@samsung.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk,
-        kbusch@kernel.org, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        gost.dev@samsung.com
-Subject: Re: [PATCH for-next v10 7/7] nvme: wire up fixed buffer support for
- nvme passthrough
-Message-ID: <20220929113603.GE27633@test-zns>
+        Thu, 29 Sep 2022 07:59:33 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD8B1B53
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 04:59:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NIT/7rrhOYthbEV50LTNxLCMV3UQFyudKIQWeC1+4bY89C2clB8pyHxG0tGUqFZFHa+lksxVaxG65pw5tFXbdPSkeD+1Y+0NUwdzJlrJWabgxdYNF4LQMRZkwY5JzUYiIDnmkt+ZHAEl3AU3Fy6kDUssflEtq8/W8sWYHAuNvRGVBF6us63Xk3v3Br1BUmDF7lyqjnE//JWCwJskojJKnoMmNS8WzLzNIDJQfWfcQmQXs8xFJUjOziRVYZu4S5nZA2K68WvCIm/c3Kg/ui4fcxQ3FAkxE9O2ymDIj8pnXpYbhPhVfCpnFwVnkMcHLSi/PLQIjc5tj12N9EGXMnwgeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O/Py4ZI8tSuhCX1r1EQEkYBE4HB8smss4N/kKua66+Q=;
+ b=REx/h9I/QvbURfYlVw1yActw8I4f96ZXm07PfcOr7mePxujmi+TFXC/kTesyh9R2rCUM77BrzcyPEsjTxbil5/n34+oQLNEMaLM4h2pEQxxpyqcf5YAhKa7MyphVnG2793NAG1kfbK5swz+FoS4uaR5vmfyL6bNX7SaXPnXrB0Lqd8Lc0LUXIWdNVfRBVBMLO/BNNXc6Ljq5kkEEJyyL9P848oDms3ahnilkQ7D/D0lJ/zPIn2Nun5vAuY2zRMd7Ifku2rgZVWAs9aqpMCipEmek0zGgnxRIa5+SmgxIsqDgYfE2ivc7S/Htk2YG7e/XLg9HLELvMBQcpKmYJdJdAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lists.infradead.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O/Py4ZI8tSuhCX1r1EQEkYBE4HB8smss4N/kKua66+Q=;
+ b=Shz3A/YwyI3qYDuRayyakMtS4/v9ZhDo2Bta8tmpmVGHKXTspMopbiSJRsHSgcoBl8MLV64U7etCrnuJ3jPHnuAoT61aOS9dQQi+BGvTunfk50mi7k82vgpCo7OZOopmBqd9ZxZfGku+l4qtjCps5Rf2XN5UBEPS8Kp/A7Jjgw5NeY5PvjVVmNjBiSCPW9AtVPzYbvq/S9rnfrBvvMJ6+4gfr/hXt9tax97ol/CI7roNaSzUZuHcs3k9Ao13uSZkLquI6Xw0wolI7PzchrzDBtmcOQK1bNfc1iNHLMJlltX24Jlmkaawt9H+NVQ5TdOgNxzByCkPkAZxca9dRpaRXQ==
+Received: from DS7PR03CA0008.namprd03.prod.outlook.com (2603:10b6:5:3b8::13)
+ by PH7PR12MB6954.namprd12.prod.outlook.com (2603:10b6:510:1b7::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.20; Thu, 29 Sep
+ 2022 11:59:28 +0000
+Received: from DM6NAM11FT109.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:3b8:cafe::a3) by DS7PR03CA0008.outlook.office365.com
+ (2603:10b6:5:3b8::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.20 via Frontend
+ Transport; Thu, 29 Sep 2022 11:59:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DM6NAM11FT109.mail.protection.outlook.com (10.13.173.178) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.17 via Frontend Transport; Thu, 29 Sep 2022 11:59:27 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Thu, 29 Sep
+ 2022 04:59:22 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Thu, 29 Sep
+ 2022 04:59:22 -0700
+Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server id 15.2.986.29 via Frontend
+ Transport; Thu, 29 Sep 2022 04:59:19 -0700
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+To:     <linux-nvme@lists.infradead.org>, <sagi@grimberg.me>, <hch@lst.de>,
+        <kbusch@kernel.org>
+CC:     <oren@nvidia.com>, <chaitanyak@nvidia.com>,
+        <linux-block@vger.kernel.org>, Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/1] nvme: use macro definitions for setting reservation values
+Date:   Thu, 29 Sep 2022 14:59:19 +0300
+Message-ID: <20220929115919.9906-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
-In-Reply-To: <20220928175904.GA17899@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrCJsWRmVeSWpSXmKPExsWy7bCmlu7iNtNkg5WXDCxW3+1ns7h5YCeT
-        xcrVR5ks3rWeY7E4+v8tm8WkQ9cYLfbe0raYv+wpuwOHx+WzpR6bVnWyeWxeUu+x+2YDm0ff
-        llWMHp83yQWwRWXbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE
-        6Lpl5gBdo6RQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkpMCnQK07MLS7NS9fLSy2x
-        MjQwMDIFKkzIzth3TbFgtUTFxY9LmRsYNwh3MXJySAiYSLzZMpW1i5GLQ0hgN6PE6kP7GCGc
-        T4wSjY/WskE4nxkltt49zArT8qijCSqxi1HiVvMWJgjnGaPE/2mv2UGqWARUJfrn/wDrYBNQ
-        lzjyvJURxBYRUJJ4+uos2A5mgT2MEuuvbwYrEhaIl2j/vxbM5hXQldhzYTOULShxcuYTFhCb
-        U0BHYv2x82CDRAWUJQ5sOw62WUKglUNiwe7HLBD3uUhs/vScEcIWlnh1fAs7hC0l8bK/DcpO
-        l/hx+SkThF0g0XxsH1S9vUTrqX5mEJtZIEPi98xpzBBxWYmpp9YxQcT5JHp/P4Hq5ZXYMQ/G
-        VpJoXzkHypaQ2HuuAcr2kGj9/pQdEkQ3GSVe3Gtmn8AoPwvJc7OQ7IOwdYD++cQ2i5EDyJaW
-        WP6PA8LUlFi/S38BI+sqRsnUguLc9NRi0wKjvNRyeJQn5+duYgQnVy2vHYwPH3zQO8TIxMF4
-        iFGCg1lJhFe8wDRZiDclsbIqtSg/vqg0J7X4EKMpMLYmMkuJJucD03teSbyhiaWBiZmZmYml
-        sZmhkjjv4hlayUIC6YklqdmpqQWpRTB9TBycUg1M2e475jXOVP4rGD/X22iSso9WyM6/t0WY
-        lu5//f/EwspXyY9EfgZMm7ll7mX2lAmX+y7ZsE1SZjL1MzR8+YSNwTds292M4EV6Zq1R4s+r
-        fDge/7s8/cqbW0di4/LvRTbXNIVwaXmUGnDeelO/rcKrat1lqadzD/t/+54lxOGZ+7Pm/Dud
-        qWbKd1RyrjqmHE7imu56ueFJ6BT5iUGiHuq63OYrRBcc/a0u73A2bPqbt52P5d1XHXdVPSHJ
-        wKHxQvwYo2iu4AqFKpWmmYv3svrvqXrgGLh0Yo/OGvl9gc2h536/uX1kO8+LJbbZ3HU8Xdd8
-        NlzX234uNG5qUs7J5/Ou26xavVZn+RH+nbGcBa82KLEUZyQaajEXFScCAFY8Z8g3BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrGLMWRmVeSWpSXmKPExsWy7bCSvG5Bq2mywYZ/Zhar7/azWdw8sJPJ
-        YuXqo0wW71rPsVgc/f+WzWLSoWuMFntvaVvMX/aU3YHD4/LZUo9NqzrZPDYvqffYfbOBzaNv
-        yypGj8+b5ALYorhsUlJzMstSi/TtErgyFje8Yy94LVpx6toEpgbGTsEuRk4OCQETiUcdTWxd
-        jFwcQgI7GCUe/5/HApGQkDj1chkjhC0ssfLfc3aIoieMEktvXWUCSbAIqEr0z//BCmKzCahL
-        HHneCtYgIqAk8fTVWUaQBmaBPYwS669vBisSFoiXaP+/FszmFdCV2HMBJA4y9TajxI/5M5gg
-        EoISJ2c+ATuDWUBL4sa/l0BxDiBbWmL5Pw6QMKeAjsT6Y+fBlokKKEsc2HacaQKj4Cwk3bOQ
-        dM9C6F7AyLyKUTK1oDg3PbfYsMAoL7Vcrzgxt7g0L10vOT93EyM4KrS0djDuWfVB7xAjEwfj
-        IUYJDmYlEV7xAtNkId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rwXuk7GCwmkJ5akZqemFqQWwWSZ
-        ODilGpjCZha0nlLJSWwpKXq95OPNKROvmyR8ihT+Wensf+C/DOfSM7OW3Js/I5/XnDGY6Un6
-        scywe11Z1679MPwipB/oYfhVfr4M3/2iMtGrTpXsga93JfPXNr9yXKUhJvBIn9sgb5bsrUyx
-        iZe85O7eUmQqnGd+vXOOsefbSa35MY0yxxfKyEqVuIUuV1zWciTfI2yiz5ONGedixbxaszfG
-        JDuHPPfVzglrUVxbla7cq3h6h9vErSvYKl6qmX6XYV7jaF3Rv9P8dV7YTdcfM5SKHBxlv3yT
-        cXUQOFPQu4Pr+vGGMs0os8fcx/XF7u19s5tr9Wu5rXqsbO7vtu0KUXfYU39gw4stj5+Iv+j5
-        eGjzKiWW4oxEQy3mouJEAEjgjkP5AgAA
-X-CMS-MailID: 20220929114553epcas5p111cafe19d8d682c30ebcb8621ed7ffb3
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----MqMoGWHj7w70ixSxIQQUJpQDpxeWNW7xlUV_NBkU4rXoYOVD=_23360_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c
-References: <20220927173610.7794-1-joshi.k@samsung.com>
-        <CGME20220927174642epcas5p1dafa31776d4eb8180e18f149ed25640c@epcas5p1.samsung.com>
-        <20220927173610.7794-8-joshi.k@samsung.com> <20220928175904.GA17899@lst.de>
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT109:EE_|PH7PR12MB6954:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0632d2c8-3019-4e84-0736-08daa2120f71
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dLJhJ3WAwiYpnPFtzjj2h3cMg/WxQPTt2zm64xPDHTb5A0nmF4P6iUiOOiP3Rt+QOsHyllatRhbmv5/FA2BH+8gQZZ5Hy5Co+YfVOrLEKTmr3ktmQj5/M666EOkWcfzdPvgLsQaplvsCn7PVQ1HsiDITb8LKFfxdsGtaNz7YhO9GAhgfvkZ2njl1SEhH3pCVoEUQ1AHhcjxkUewXCFfm+g6BS2riLeeAQF8Jf+5uUC8U8WFSeNqr/3e0foxY36qh79FwM85hu/JcHiBahw357b6ck7whwMcxbDwgPyOzU3iFkYWCTM455bFKlEh6NKQ2VR/ffb/N+YeNkLBBkyu/cSySv/4iKv8LuMszV7FoOKTKpixU+8U0FiRaLlLnHueUexXlpxyx+chx+JWujYkx3uKIjQmssVOMP26Yd7t7xnmFBNlv7N4bY7x5/5uPPIko/RM9gXrxx50+k+vz/zSbmQskCXNscpRazBYsaTI2uc1oS7AFGc1m4Du5spkcoylpLnmCGCwqvyIbqwO0n8YwUCHr1kcsa8rA4OXckWQbTWZD8wO/zawzVyMTpd6SEmQRh2ffVikODe1zOgCkG6AeWELOAEyjxUZpE1bRf8tyz1e/FrA68bFYYoMYyaf6/uOA8x2BM9pG8RMmCRvifGbWXmitfnW8U6R6ALnr4Mgy5i3hlvib3+7bZwx3UGr7ErQaR8oKZFpTomr2czFmGgFeTQWSvikr3wFqGQKgzGvRtifNsTDwn3LNhJyt1fnY8Z+uPJu3Y9j+5E+1rYLZfG2l6g==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(136003)(39860400002)(346002)(451199015)(40470700004)(36840700001)(46966006)(86362001)(36860700001)(36756003)(7636003)(40480700001)(40460700003)(82740400003)(356005)(316002)(110136005)(4326008)(8676002)(54906003)(70586007)(5660300002)(2906002)(8936002)(70206006)(41300700001)(426003)(186003)(1076003)(83380400001)(82310400005)(336012)(47076005)(107886003)(478600001)(2616005)(26005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2022 11:59:27.6804
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0632d2c8-3019-4e84-0736-08daa2120f71
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT109.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6954
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------MqMoGWHj7w70ixSxIQQUJpQDpxeWNW7xlUV_NBkU4rXoYOVD=_23360_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+This makes the code more readable.
 
-On Wed, Sep 28, 2022 at 07:59:04PM +0200, Christoph Hellwig wrote:
-> > -static int nvme_map_user_request(struct request *req, void __user *ubuffer,
-> > +static int nvme_map_user_request(struct request *req, u64 ubuffer,
-> 
-> The changes to pass ubuffer as an integer trip me up every time.
-> They are obviously fine as we do the pointer conversion less often,
-> but maybe they'd be easier to follow if split into a prep patch.
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+ drivers/nvme/host/core.c | 12 ++++++------
+ include/linux/nvme.h     | 12 ++++++++++++
+ 2 files changed, 18 insertions(+), 6 deletions(-)
 
-ok, will separate these changes in a separate prep patch
-> 
-> > +	bool fixedbufs = ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED);
-> >  
-> > -	if (!vec)
-> > -		ret = blk_rq_map_user(q, req, NULL, ubuffer, bufflen,
-> > -			GFP_KERNEL);
-> > -	else {
-> > +	if (vec) {
-> 
-> If we check IORING_URING_CMD_FIXED first this becomes a bit simpler,
-> and also works better with the block helper suggested earlier:
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3f1a7dc2a2a3..50668e1bd9f1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2068,17 +2068,17 @@ static char nvme_pr_type(enum pr_type type)
+ {
+ 	switch (type) {
+ 	case PR_WRITE_EXCLUSIVE:
+-		return 1;
++		return NVME_PR_WRITE_EXCLUSIVE;
+ 	case PR_EXCLUSIVE_ACCESS:
+-		return 2;
++		return NVME_PR_EXCLUSIVE_ACCESS;
+ 	case PR_WRITE_EXCLUSIVE_REG_ONLY:
+-		return 3;
++		return NVME_PR_WRITE_EXCLUSIVE_REG_ONLY;
+ 	case PR_EXCLUSIVE_ACCESS_REG_ONLY:
+-		return 4;
++		return NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY;
+ 	case PR_WRITE_EXCLUSIVE_ALL_REGS:
+-		return 5;
++		return NVME_PR_WRITE_EXCLUSIVE_ALL_REGS;
+ 	case PR_EXCLUSIVE_ACCESS_ALL_REGS:
+-		return 6;
++		return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
+ 	default:
+ 		return 0;
+ 	}
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index ae53d74f3696..a925be0056f2 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -238,6 +238,18 @@ enum {
+ 	NVME_CAP_CRMS_CRIMS	= 1ULL << 60,
+ };
+ 
++/*
++ * Reservation Type Encoding
++ */
++enum {
++	NVME_PR_WRITE_EXCLUSIVE = 1, /* Write Exclusive Reservation */
++	NVME_PR_EXCLUSIVE_ACCESS = 2, /* Exclusive Access Reservation */
++	NVME_PR_WRITE_EXCLUSIVE_REG_ONLY = 3, /* Write Exclusive - Registrants Only Reservation */
++	NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY = 4, /* Exclusive Access - Registrants Only Reservation */
++	NVME_PR_WRITE_EXCLUSIVE_ALL_REGS = 5, /* Write Exclusive - All Registrants Reservation */
++	NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS = 6, /* Exclusive Access - All Registrants Reservation */
++};
++
+ struct nvme_id_power_state {
+ 	__le16			max_power;	/* centiwatts */
+ 	__u8			rsvd2;
+-- 
+2.18.1
 
-will create a block helper for this and the scsi counterparts in the next iteration
-> 
-> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-> index 1a45246f0d7a8..f46142dcb8f1e 100644
-> --- a/drivers/nvme/host/ioctl.c
-> +++ b/drivers/nvme/host/ioctl.c
-> @@ -94,34 +94,33 @@ static int nvme_map_user_request(struct request *req, u64 ubuffer,
->  	struct bio *bio = NULL;
->  	void *meta = NULL;
->  	int ret;
-> -	bool fixedbufs = ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED);
->  
-> -	if (vec) {
-> -		struct iovec fast_iov[UIO_FASTIOV];
-> -		struct iovec *iov = fast_iov;
-> +	if (ioucmd && (ioucmd->flags & IORING_URING_CMD_FIXED)) {
->  		struct iov_iter iter;
->  
->  		/* fixedbufs is only for non-vectored io */
-> -		WARN_ON_ONCE(fixedbufs);
-> -		ret = import_iovec(rq_data_dir(req), nvme_to_user_ptr(ubuffer),
-> -				bufflen, UIO_FASTIOV, &iov, &iter);
-> +		if (WARN_ON_ONCE(vec))
-> +			return -EINVAL;
-> +		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
-> +				rq_data_dir(req), &iter, ioucmd);
->  		if (ret < 0)
->  			goto out;
-> -
->  		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
-> -		kfree(iov);
-> -	} else if (fixedbufs) {
-> +	} else if (vec) {
-> +		struct iovec fast_iov[UIO_FASTIOV];
-> +		struct iovec *iov = fast_iov;
->  		struct iov_iter iter;
->  
-> -		ret = io_uring_cmd_import_fixed(ubuffer, bufflen,
-> -				rq_data_dir(req), &iter, ioucmd);
-> +		ret = import_iovec(rq_data_dir(req), nvme_to_user_ptr(ubuffer),
-> +				bufflen, UIO_FASTIOV, &iov, &iter);
->  		if (ret < 0)
->  			goto out;
->  		ret = blk_rq_map_user_iov(q, req, NULL, &iter, GFP_KERNEL);
-> -	} else
-> +		kfree(iov);
-> +	} else {
->  		ret = blk_rq_map_user(q, req, NULL,
-> -					nvme_to_user_ptr(ubuffer), bufflen,
-> -					GFP_KERNEL);
-> +				nvme_to_user_ptr(ubuffer), bufflen, GFP_KERNEL);
-> +	}
->  	if (ret)
->  		goto out;
->  	bio = req->bio;
-> 
-
---
-Anuj Gupta
-
-------MqMoGWHj7w70ixSxIQQUJpQDpxeWNW7xlUV_NBkU4rXoYOVD=_23360_
-Content-Type: text/plain; charset="utf-8"
-
-
-------MqMoGWHj7w70ixSxIQQUJpQDpxeWNW7xlUV_NBkU4rXoYOVD=_23360_--
