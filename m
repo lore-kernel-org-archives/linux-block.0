@@ -2,74 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A216C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 15:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC88C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 15:03:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234740AbiI2PCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Sep 2022 11:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33538 "EHLO
+        id S234956AbiI2PDG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Sep 2022 11:03:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234666AbiI2PCo (ORCPT
+        with ESMTP id S234946AbiI2PDF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2022 11:02:44 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69DAC128895
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 08:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=1TanhPj1pvcWXIurjMX1HYDdYlrIVvvf4bEhTgkHyPM=; b=RZzS61qBiS5FQDdv2VyMluo1tf
-        Uiy6z8C1s7FpDcgB99m2iHyF6eOmUK/3mEOlQLnsXbrY6SzJknZBt5/qkTDUIj87O9ZcDVrDlqMkf
-        uXvVNRox0GnsiiHhPuVK3vpnnAJcGmjRtf8F7JYWLHwXcCQVJK6pjcT2bEpI/QB1+E867H2I92Ld8
-        DYUkTWnOL9AjvhnUm8g/HSJy9d0Knv0uwrjag+Ut1izfhPPFlwLe+UhE+kI2MXk/VNuockXxhE0wU
-        sXPpwf57SLhqgQzPJElSDi+FlQ27dKE12aQg0Ri/cXJKbngvs7/3epWtosLjUzSFKgy7BRTRxsHrQ
-        if7jPQCQ==;
-Received: from [2001:4bb8:180:b903:9be8:d11a:21a0:96eb] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1odv3W-003jvq-GD; Thu, 29 Sep 2022 15:02:30 +0000
-Date:   Thu, 29 Sep 2022 17:02:28 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [GIT PULL] nvme fixes for Linux 6.0
-Message-ID: <YzWzhIAX+vtSmo39@infradead.org>
+        Thu, 29 Sep 2022 11:03:05 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD0A13FB52
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 08:03:03 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id c6-20020a17090a4d0600b0020958fcd9acso312248pjg.4
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 08:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=4Q0kGVidgZNn5EqKq2GsASyHbngmRwJEXLTs/tkeDIc=;
+        b=4DDUpgenrUgPc2PhLG5hb+GDdgqrGI3mZDqixC0ki+TNdQb/HuE8YLQSw6EQl5VcPu
+         kRNzSk9ckQAeJ7ijq3UwZsfm1D+3U+Jzw582PFpg9EX4IzB64tdaSRb0gFn1YeHC1VqD
+         FTkMhXYfk+Bjn94feiC/AtfRdoaQE3rEpthRaDX107KRf7WCG+xER0qEroaoPjoTWSDE
+         EZpIPm7WbfAW2hWz15TmqMbYxLaeBQJUE3wSaEgvT39yNcK7PLyDqO1xlQMdFHatA43t
+         HaCWz9gTPkH40HdJmypNSau+CyIlRjt0Pezw6TXFM2+6QPXnoNdDKiy4HNtRraT7HH+5
+         VRPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=4Q0kGVidgZNn5EqKq2GsASyHbngmRwJEXLTs/tkeDIc=;
+        b=fPRH9WSpownoxNol6tF4I4SW4+K8q70doWePJnl2yEN0ABJkf4JbY5ofe+BRysINTE
+         oXEnTp3EfNaoAyfedLAox+R2RexldzKved31v63lhi4dshPpV2SJqNHHXvJLM+QuVDH1
+         QDlybqVYpzgiDPMe0cwPcHJLhPGBErr/A0QorFXmkjFqa7vGULghg7IFTZul/IOsxa2g
+         fKNOECDHqBvIb8kOGCGaUJB7gUqjDf0++skDe95H8+y9EHjlDyJQpeP8CCUhxYiO8Zxg
+         QqPkm1s+OulNK3cp5+xFABX4fivxsr2mEyEHG8EjwD6TEHvhOeHh5E7toDqQG49DK3Os
+         VV3A==
+X-Gm-Message-State: ACrzQf3GespQGgrm4uMGkFEdHgYlTTipTwJqQU12Exr7wkXWDcxXwe2a
+        EM+tnAePqXFPZ4OQWmP6NWsHjQ==
+X-Google-Smtp-Source: AMsMyM691xfeHbJc15gMbYjUX2BSNul/FEylRXq2504/rMiKYev1kqFvA+IqZ1GQYKTlDJEkykgH8A==
+X-Received: by 2002:a17:902:b285:b0:17b:c8bf:8beb with SMTP id u5-20020a170902b28500b0017bc8bf8bebmr930294plr.141.1664463783314;
+        Thu, 29 Sep 2022 08:03:03 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id a188-20020a621ac5000000b0052c849d0886sm6341281pfa.86.2022.09.29.08.03.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Sep 2022 08:03:02 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de
+Cc:     damien.lemoal@opensource.wdc.com, gost.dev@samsung.com,
+        linux-block@vger.kernel.org
+In-Reply-To: <20220929144141.140077-1-p.raghav@samsung.com>
+References: <CGME20220929144143eucas1p2a68d7cb3f5e347954e3a5a5e335cf620@eucas1p2.samsung.com>
+ <20220929144141.140077-1-p.raghav@samsung.com>
+Subject: Re: [PATCH] block: add rationale for not using blk_mq_plug() when applicable
+Message-Id: <166446378255.69599.14942031119369908314.b4-ty@kernel.dk>
+Date:   Thu, 29 Sep 2022 09:03:02 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 4c66a326b5ab784cddd72de07ac5b6210e9e1b06:
+On Thu, 29 Sep 2022 16:41:41 +0200, Pankaj Raghav wrote:
+> There are two places in the block layer at the moment where
+> blk_mq_plug() helper could be used instead of directly accessing the
+> plug from struct current. In both these cases, directly accessing the plug
+> should not have any consequences for zoned devices.
+> 
+> Make the intent explicit by adding comments instead of introducing unwanted
+> checks with blk_mq_plug() helper.[1]
+> 
+> [...]
 
-  Revert "block: freeze the queue earlier in del_gendisk" (2022-09-20 08:15:44 -0600)
+Applied, thanks!
 
-are available in the Git repository at:
+[1/1] block: add rationale for not using blk_mq_plug() when applicable
+      commit: 110fdb4486d3a5e67d55bc6866d6426e6d49ccfc
 
-  git://git.infradead.org/nvme.git tags/nvme-6.0-2022-09-29
+Best regards,
+-- 
+Jens Axboe
 
-for you to fetch changes up to d14c273132aec81a1a8107c9ab4865b89e7910a7:
 
-  nvme-pci: disable Write Zeroes on Phison E3C/E4C (2022-09-27 09:20:30 +0200)
-
-----------------------------------------------------------------
-nvme fixes for Linux 6.1
-
- - fix IOC_PR_CLEAR and IOC_PR_RELEASE ioctls for nvme devices
-   (Michael Kelley)
- - disable Write Zeroes on Phison E3C/E4C (Tina Hsu)
-
-----------------------------------------------------------------
-Michael Kelley (1):
-      nvme: Fix IOC_PR_CLEAR and IOC_PR_RELEASE ioctls for nvme devices
-
-Tina Hsu (1):
-      nvme-pci: disable Write Zeroes on Phison E3C/E4C
-
- drivers/nvme/host/core.c | 6 +++---
- drivers/nvme/host/pci.c  | 4 ++++
- 2 files changed, 7 insertions(+), 3 deletions(-)
