@@ -2,172 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B87C07E9D
-	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 07:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA89C07E9D
+	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 07:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235364AbiI2Hln (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Sep 2022 03:41:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47930 "EHLO
+        id S234687AbiI2Hrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Sep 2022 03:47:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235357AbiI2HlU (ORCPT
+        with ESMTP id S234421AbiI2Hrw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2022 03:41:20 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3535E58DF8;
-        Thu, 29 Sep 2022 00:41:01 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MdQD44MHrzWh3G;
-        Thu, 29 Sep 2022 15:36:52 +0800 (CST)
-Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
- (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 29 Sep
- 2022 15:40:59 +0800
-From:   Kemeng Shi <shikemeng@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH 3/3] block: Replace struct rq_depth with unsigned int in struct iolatency_grp
-Date:   Thu, 29 Sep 2022 15:40:55 +0800
-Message-ID: <20220929074055.30080-4-shikemeng@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20220929074055.30080-1-shikemeng@huawei.com>
-References: <20220929074055.30080-1-shikemeng@huawei.com>
+        Thu, 29 Sep 2022 03:47:52 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE711397D8
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 00:47:50 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220929074748euoutp0196f052e255dbcc7965bae45077632073~ZRT2gcYKN1771317713euoutp01w
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 07:47:48 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220929074748euoutp0196f052e255dbcc7965bae45077632073~ZRT2gcYKN1771317713euoutp01w
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1664437668;
+        bh=uYe0cjHVLKIEoq46d0KyYfaBElIogMYYkPbhaRKvDlQ=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=m/bVaTYyar0FOp1z6OQWxJophGOTWwEiVjXkOL1CizEZsi+x/YHTvcy94wu/pzZmy
+         2+NoqRSFnOay5TNi4Ezv8fABIkra/3MmeaZacIssBd4lcp3hqQoys/K6UB0DjzKXdM
+         asDagebW/+F+vSAo05BaVLwqZyE2JdP6qhCzmuyA=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220929074747eucas1p14f5ca6432a9802dc958d223d375d420c~ZRT1s-t_R3109531095eucas1p1k;
+        Thu, 29 Sep 2022 07:47:47 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 65.CC.19378.3AD45336; Thu, 29
+        Sep 2022 08:47:47 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220929074747eucas1p1821a5b79ad24cb559b7b6ec324239e9e~ZRT1aiogG0530805308eucas1p1F;
+        Thu, 29 Sep 2022 07:47:47 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220929074747eusmtrp2ccb6f17d7fa9288f08272d4b0e0334a9~ZRT1ZPZGE0658106581eusmtrp2Q;
+        Thu, 29 Sep 2022 07:47:47 +0000 (GMT)
+X-AuditID: cbfec7f5-a4dff70000014bb2-80-63354da3e312
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 2E.60.07473.2AD45336; Thu, 29
+        Sep 2022 08:47:47 +0100 (BST)
+Received: from localhost (unknown [106.210.248.168]) by eusmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220929074746eusmtip29f5a47ba8bd6fdc9adcc2c4fd94cb6b0~ZRT1Hxdr81041910419eusmtip2E;
+        Thu, 29 Sep 2022 07:47:46 +0000 (GMT)
+From:   Pankaj Raghav <p.raghav@samsung.com>
+To:     axboe@kernel.dk, hch@lst.de
+Cc:     gost.dev@samsung.com, linux-block@vger.kernel.org,
+        damien.lemoal@opensource.wdc.com,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: [PATCH v3 0/2] plugging cleanup v3
+Date:   Thu, 29 Sep 2022 09:47:43 +0200
+Message-Id: <20220929074745.103073-1-p.raghav@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.178.129]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpnleLIzCtJLcpLzFFi42LZduzned3FvqbJBvuWiFqsvtvPZvH77Hlm
+        i5sHdjJZrFx9lMli7y1ti89LW9gd2Dwuny312H2zgc1jZ+t9Vo++LasYPT5vkgtgjeKySUnN
+        ySxLLdK3S+DKeLlgNmvBO/aKVyd6mBoYW9m6GDk5JARMJK483MXUxcjFISSwglHizuqT7BDO
+        F0aJKa+Os0E4nxkllqxdygzT8vdpC1TVckaJ9gkTWSGcl4wSP159AMpwcLAJaEk0drKDNIgI
+        yEt8ub2WBcRmFqiXaL7wEywuLKAtcWTvXrChLAKqEtfbnjKC2LwCVhIrN++Euk9eYual7+wQ
+        cUGJkzOfQM2Rl2jeOpsZZK+EwEIOic1/D7BANLhIvN13HupSYYlXx7ewQ9gyEv93zmeCsKsl
+        nt74DdXcwijRv3M9G8jREgLWEn1nckBMZgFNifW79CGijhK7e1IgTD6JG28FIS7gk5i0bToz
+        RJhXoqNNCGK2ksTOn0+gdkpIXG6aA3WXh8SGXQ/B1ggJxEqsuJI9gVFhFpK3ZiF5axbCBQsY
+        mVcxiqeWFuempxYb56WW6xUn5haX5qXrJefnbmIEppXT/45/3cG44tVHvUOMTByMhxglOJiV
+        RHh/HzVMFuJNSaysSi3Kjy8qzUktPsQozcGiJM7LNkMrWUggPbEkNTs1tSC1CCbLxMEp1cDU
+        +zHzWoZGyZ6NuxekP9/7UfPwMtdN/3k6HnGkzrouc2btxd6o37nf17o/2RG3oS8p1irT/3FU
+        wyzJhb5eCW92vTnQsPG8sKBwNss6Gd+fGgGdQtxsq7trtTN2TIi/Ufr93ubfKaqP/l1/t2Bu
+        qbBMpaDkRyPTfydMll9+H5AVeVr+CGeM5Z3we1/0JpsZ6k0P4LrZ73u/PHDrulmPRSdIRJrO
+        DuOK4Ja4c0JO/EZC6Kon+68t6lk1Jbp/mjV/ya7z8+rero5b133RYN/yzGdiOZbCEjL/T9fO
+        cVXaaGGt0ysw5Wb2/rwvEWIvhGVCYt5dufB06srXiw4kLndd66Yx/fNBb7c8wc+PLl1Y0GOf
+        psRSnJFoqMVcVJwIAL5XHFWaAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGLMWRmVeSWpSXmKPExsVy+t/xe7qLfU2TDdq3MlmsvtvPZvH77Hlm
+        i5sHdjJZrFx9lMli7y1ti89LW9gd2Dwuny312H2zgc1jZ+t9Vo++LasYPT5vkgtgjdKzKcov
+        LUlVyMgvLrFVija0MNIztLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DLeLlgNmvBO/aK
+        Vyd6mBoYW9m6GDk5JARMJP4+bWHvYuTiEBJYyijxr+k5C0RCQuL2wiZGCFtY4s+1LjaIoueM
+        Egc3TQbq4OBgE9CSaOxkB6kREVCU2PgRop5ZoJlR4vm8ChBbWEBb4sjevcwgNouAqsT1tqdg
+        NbwCVhIrN++EOkJeYual72AjmQU0Jdbv0ocoEZQ4OfMJC8RIeYnmrbOZJzDyz0KomoWkahaS
+        qgWMzKsYRVJLi3PTc4sN9YoTc4tL89L1kvNzNzECI2DbsZ+bdzDOe/VR7xAjEwfjIUYJDmYl
+        Ed7fRw2ThXhTEiurUovy44tKc1KLDzGaAl09kVlKNDkfGIN5JfGGZgamhiZmlgamlmbGSuK8
+        ngUdiUIC6YklqdmpqQWpRTB9TBycUg1Mzhc3zXvbnL5joXwLt6JL7w2+lav0Uxb/s2ZM5eGI
+        LhWtX7FxolBlDXeFtGjDsVc18SLNopYTpLJUwu5ob9v5WHtBjfZf7cC7hdFhWUFOYfcub5QL
+        nxdj4mv9VOedmNuD2Qn7U6bY7DMQVlKV7LzgL3LqRLCL4SYDkTnBfFl+0dmL1W2zOqQO3//8
+        O/rVnm6L0rOl3ffuHBGTqRN642+znVfih1fDA37jU5O5pqd/Mmg8/+iAUy53V5vdO57PKz4v
+        0P44J+2BPSu3t9CFlK2Jajq/Hh72DT3YtDEh88Md3zVXbCO+dz62PvN3h85X/107y92uZqpe
+        u2CrfdBsfp6aRf6yC1EZDl2zvQ04dimxFGckGmoxFxUnAgAT2dApCQMAAA==
+X-CMS-MailID: 20220929074747eucas1p1821a5b79ad24cb559b7b6ec324239e9e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20220929074747eucas1p1821a5b79ad24cb559b7b6ec324239e9e
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220929074747eucas1p1821a5b79ad24cb559b7b6ec324239e9e
+References: <CGME20220929074747eucas1p1821a5b79ad24cb559b7b6ec324239e9e@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We only need a max queue depth for every iolatency to limit the inflight io
-number. Replace struct rq_depth with unsigned int to simplfy "struct
-iolatency_grp" and save memory.
+Hi Jens,
 
-Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
----
- block/blk-iolatency.c | 28 +++++++++++++---------------
- 1 file changed, 13 insertions(+), 15 deletions(-)
+1st patch modifies blk_mq_plug() function to disable plugging for
+ write and write zeroes in zoned block devices.
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 2666afd7abdb..55bc742d3b66 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -141,7 +141,7 @@ struct iolatency_grp {
- 	struct latency_stat __percpu *stats;
- 	struct latency_stat cur_stat;
- 	struct blk_iolatency *blkiolat;
--	struct rq_depth rq_depth;
-+	unsigned int max_depth;
- 	struct rq_wait rq_wait;
- 	atomic64_t window_start;
- 	atomic_t scale_cookie;
-@@ -280,7 +280,7 @@ static void iolat_cleanup_cb(struct rq_wait *rqw, void *private_data)
- static bool iolat_acquire_inflight(struct rq_wait *rqw, void *private_data)
- {
- 	struct iolatency_grp *iolat = private_data;
--	return rq_wait_inc_below(rqw, iolat->rq_depth.max_depth);
-+	return rq_wait_inc_below(rqw, iolat->max_depth);
- }
- 
- static void __blkcg_iolatency_throttle(struct rq_qos *rqos,
-@@ -372,7 +372,7 @@ static void scale_change(struct iolatency_grp *iolat, bool up)
- {
- 	unsigned long qd = iolat->blkiolat->rqos.q->nr_requests;
- 	unsigned long scale = scale_amount(qd, up);
--	unsigned long old = iolat->rq_depth.max_depth;
-+	unsigned long old = iolat->max_depth;
- 
- 	if (old > qd)
- 		old = qd;
-@@ -384,12 +384,12 @@ static void scale_change(struct iolatency_grp *iolat, bool up)
- 		if (old < qd) {
- 			old += scale;
- 			old = min(old, qd);
--			iolat->rq_depth.max_depth = old;
-+			iolat->max_depth = old;
- 			wake_up_all(&iolat->rq_wait.wait);
- 		}
- 	} else {
- 		old >>= 1;
--		iolat->rq_depth.max_depth = max(old, 1UL);
-+		iolat->max_depth = max(old, 1UL);
- 	}
- }
- 
-@@ -442,7 +442,7 @@ static void check_scale_change(struct iolatency_grp *iolat)
- 	}
- 
- 	/* We're as low as we can go. */
--	if (iolat->rq_depth.max_depth == 1 && direction < 0) {
-+	if (iolat->max_depth == 1 && direction < 0) {
- 		blkcg_use_delay(lat_to_blkg(iolat));
- 		return;
- 	}
-@@ -450,7 +450,7 @@ static void check_scale_change(struct iolatency_grp *iolat)
- 	/* We're back to the default cookie, unthrottle all the things. */
- 	if (cur_cookie == DEFAULT_SCALE_COOKIE) {
- 		blkcg_clear_delay(lat_to_blkg(iolat));
--		iolat->rq_depth.max_depth = UINT_MAX;
-+		iolat->max_depth = UINT_MAX;
- 		wake_up_all(&iolat->rq_wait.wait);
- 		return;
- 	}
-@@ -505,7 +505,7 @@ static void iolatency_record_time(struct iolatency_grp *iolat,
- 	 * We don't want to count issue_as_root bio's in the cgroups latency
- 	 * statistics as it could skew the numbers downwards.
- 	 */
--	if (unlikely(issue_as_root && iolat->rq_depth.max_depth != UINT_MAX)) {
-+	if (unlikely(issue_as_root && iolat->max_depth != UINT_MAX)) {
- 		u64 sub = iolat->min_lat_nsec;
- 		if (req_time < sub)
- 			blkcg_add_delay(lat_to_blkg(iolat), now, sub - req_time);
-@@ -916,7 +916,7 @@ static void iolatency_ssd_stat(struct iolatency_grp *iolat, struct seq_file *s)
- 	}
- 	preempt_enable();
- 
--	if (iolat->rq_depth.max_depth == UINT_MAX)
-+	if (iolat->max_depth == UINT_MAX)
- 		seq_printf(s, " missed=%llu total=%llu depth=max",
- 			(unsigned long long)stat.ps.missed,
- 			(unsigned long long)stat.ps.total);
-@@ -924,7 +924,7 @@ static void iolatency_ssd_stat(struct iolatency_grp *iolat, struct seq_file *s)
- 		seq_printf(s, " missed=%llu total=%llu depth=%u",
- 			(unsigned long long)stat.ps.missed,
- 			(unsigned long long)stat.ps.total,
--			iolat->rq_depth.max_depth);
-+			iolat->max_depth);
- }
- 
- static void iolatency_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
-@@ -941,12 +941,12 @@ static void iolatency_pd_stat(struct blkg_policy_data *pd, struct seq_file *s)
- 
- 	avg_lat = div64_u64(iolat->lat_avg, NSEC_PER_USEC);
- 	cur_win = div64_u64(iolat->cur_win_nsec, NSEC_PER_MSEC);
--	if (iolat->rq_depth.max_depth == UINT_MAX)
-+	if (iolat->max_depth == UINT_MAX)
- 		seq_printf(s, " depth=max avg_lat=%llu win=%llu",
- 			avg_lat, cur_win);
- 	else
- 		seq_printf(s, " depth=%u avg_lat=%llu win=%llu",
--			iolat->rq_depth.max_depth, avg_lat, cur_win);
-+			iolat->max_depth, avg_lat, cur_win);
- }
- 
- static struct blkg_policy_data *iolatency_pd_alloc(gfp_t gfp,
-@@ -990,9 +990,7 @@ static void iolatency_pd_init(struct blkg_policy_data *pd)
- 	latency_stat_init(iolat, &iolat->cur_stat);
- 	rq_wait_init(&iolat->rq_wait);
- 	spin_lock_init(&iolat->child_lat.lock);
--	iolat->rq_depth.queue_depth = blkg->q->nr_requests;
--	iolat->rq_depth.max_depth = UINT_MAX;
--	iolat->rq_depth.default_depth = iolat->rq_depth.queue_depth;
-+	iolat->max_depth = UINT_MAX;
- 	iolat->blkiolat = blkiolat;
- 	iolat->cur_win_nsec = 100 * NSEC_PER_MSEC;
- 	atomic64_set(&iolat->window_start, now);
+2nd patch uses the blk_mq_plug function in the block layer consistently.
+
+The patches are based on next-20220923.
+
+Changes since v2:
+- Enhance the commit log for the 2nd patch (Christoph)
+
+Changes since v1:
+- Explicltly check only for write and write zeroes as they require zone
+  locking in blk_mq_plug
+- create a new helper to check for ops that require zone locking for
+  zoned devices and also reuse it in blk_req_needs_zone_write_lock
+
+Pankaj Raghav (2):
+  block: adapt blk_mq_plug() to not plug for writes that require a zone
+    lock
+  block: use blk_mq_plug() wrapper consistently in the block layer
+
+ block/blk-core.c       | 2 +-
+ block/blk-mq.c         | 6 ++++--
+ block/blk-mq.h         | 3 ++-
+ block/blk-zoned.c      | 9 +++------
+ include/linux/blkdev.h | 9 +++++++++
+ 5 files changed, 19 insertions(+), 10 deletions(-)
+
 -- 
-2.30.0
+2.25.1
 
