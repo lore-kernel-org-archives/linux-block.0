@@ -2,109 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCEFC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 13:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217BCC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 14:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231547AbiI3NnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 09:43:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54610 "EHLO
+        id S229735AbiI3OFF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 10:05:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231528AbiI3NnL (ORCPT
+        with ESMTP id S229557AbiI3OFD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 09:43:11 -0400
+        Fri, 30 Sep 2022 10:05:03 -0400
 Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D5ED17CCE4
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 06:43:10 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id b23so3287452iof.2
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 06:43:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD026716D
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 07:05:00 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id p202so3328760iod.6
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 07:05:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date;
-        bh=86ypbaE9HMEEUp4HcEZ8Vhii4e+cJbq4gPmtz2KSjJg=;
-        b=7ZNmRuphFT+zKjsVjx44nU8k3rFtF2IN9No+4XeUMpkp40hjrgAAr3+2oOLlulm59t
-         gzrldH3sKkozvi4V1j8qSYoulJ9o9tFtZH77Z2+mcdNkEznd1Xqer/GLl7PwG1WrWf+D
-         BM/jSKskrgudcBUKu//cBBNI3nTfP+tRr2HJ0Favcl6VmrhV5m0hifmWbvyylehtnwNB
-         Tdz07+dM3neptvhQBzpPzBBeXoJabR4X/sLrCDbm/jEz9tHqk2ykDhlW0vgLO+NwRvMU
-         q5cSyl5z7ZqhCtTRavTMpW94ShQ6eOmAQF4eHPOLVb0kozgpiMfCUxhCsT2ydR0ueo+c
-         /r+Q==
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=KE/La02ogRQIY/HzxSEopjUhIfT01GVed+k6zu427FM=;
+        b=eTSscY00rOLUJHWuFQyJIl59dQGpUSoWvHHwSfNnFKA4Lw44WSKU49+jZTWN47Jnf5
+         55R/FwWHdwkFedGF7J3APM2KsySrM9JgactJUB3aSET9yPsj9KVjVwyT4ZLrz+OD+KKV
+         AhfLWzDGtUjoMr5OXEttfZYzZDT4hj0bjxzcqlI1syLfAFm+CjXjGbkI72jZhUIib47a
+         TiVeQlPuyIFn+ebZpyH/8DYCExfqdWWWzDillNjOUNcotehAMdGUndCvUHfH4w0GpLJq
+         ughRo26e9JqrBgCkOHoGxXOjnjLv3PQ8AiiKFqEgltASsaQc8z5EH/ExdZCSOWlOJt00
+         kMXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-language:cc:to:subject:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date;
-        bh=86ypbaE9HMEEUp4HcEZ8Vhii4e+cJbq4gPmtz2KSjJg=;
-        b=cM9WNsn5Cq/RacD0zpIO5BsVEykp3f/3mCGM8HuWvBKK9bqOnMKmJHWb6tN47e8e6y
-         t4E3GSxALdj6thmGZUadIr2H9W5O5OQ4xvsNaXkgJEVXQNJ9S9DDXhCUdScnaic4FWD4
-         4TtPOpzT0i+7jyNHvZDtN4Yrq4ai63F/SptxzzZd6HT3bXvVyfW6gHtOe6pKib4nDJ7H
-         jZz5CM0c2JlMiPm/mo6J6L++6/mQIBGFz6X9LvEgd6/xZOiN0UbcUXzFe0dLWMJ3ksuP
-         QnWbYA1zUxoC/RBD3ykaeuDEABuVnULFaPyNecKyW4LzlMw1OJSDyjGOvwTlrqpAXunS
-         CRGA==
-X-Gm-Message-State: ACrzQf0KevE6IMQ7XvUILyGk9uMnlJYoFgVieOr0ifHnralb6DR0MQ7P
-        CPq464uQIvcWG6ENE0Bis08SKqsunXuF6w==
-X-Google-Smtp-Source: AMsMyM635u+tRpJpoEIFcYjFpyjTiA6iEWYct/b1Mgurh1pEOi2zHoDXH31z+HJpVfcJyQAQjJx8ug==
-X-Received: by 2002:a05:6638:d54:b0:35a:995f:502b with SMTP id d20-20020a0566380d5400b0035a995f502bmr4859772jak.278.1664545389601;
-        Fri, 30 Sep 2022 06:43:09 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id p185-20020a0229c2000000b003572ae30370sm941438jap.145.2022.09.30.06.43.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Sep 2022 06:43:09 -0700 (PDT)
-Message-ID: <e5c2a0e5-1a04-50b1-78f0-08d998a8d4e7@kernel.dk>
-Date:   Fri, 30 Sep 2022 07:43:08 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=KE/La02ogRQIY/HzxSEopjUhIfT01GVed+k6zu427FM=;
+        b=y5g0DRuOBPmFezIyfpH+H+S+98maxBjpNM3O9Vst+yWjs0HsnMfQ8fKlEcHWFtliNc
+         zeRT3kZxEb4OJlNsihBndSAlZNubB65MZ1jGL0S9krL/uVWQVhzqBkuqsl9cvVMMevyj
+         E0cuELoCiDBQV9zHkEwrDyt7x2QM/ZDpeA5hz9yTBGA4/wMYPq0HXm60+ekW+YYN+LTq
+         pYI/VtzUJVNDSoye3LTqLzM7pMuL+MoqEbfucg4KtuKYOVOVuPkNhzszdqKmdbyEk+9k
+         OQDDR3CMOWqGZdj3wbjDmTgM9506VdN53ftUVYsEGhBhby3/DkRN9F228ibXPGOklqny
+         iWoQ==
+X-Gm-Message-State: ACrzQf1wy33cWMtiXYap7vLmiqGjJRcKDb27CmeaQX1am2wTMwcyNSXf
+        NUh2QDc1S7wNov89MKnH6E9QhQ==
+X-Google-Smtp-Source: AMsMyM4JtLxVJcRSJ6Gida3IQoin845TBOh5Ewp8EzEnzwL947qn7d3mtbmSE+hpAqBx4RR26Cvc1w==
+X-Received: by 2002:a05:6638:1449:b0:35a:70ce:8a3f with SMTP id l9-20020a056638144900b0035a70ce8a3fmr4631148jad.42.1664546700214;
+        Fri, 30 Sep 2022 07:05:00 -0700 (PDT)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id y4-20020a027304000000b00349d2d52f6asm963095jab.37.2022.09.30.07.04.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Sep 2022 07:04:59 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 6.0-final
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     kbusch@kernel.org, Anuj Gupta <anuj20.g@samsung.com>, hch@lst.de
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        gost.dev@samsung.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+In-Reply-To: <20220930062749.152261-1-anuj20.g@samsung.com>
+References: <CGME20220930063754epcas5p2aff33c952032713a39604388eacda910@epcas5p2.samsung.com>
+ <20220930062749.152261-1-anuj20.g@samsung.com>
+Subject: Re: [PATCH for-next v12 00/12] Fixed-buffer for uring-cmd/passthru
+Message-Id: <166454669913.10664.15099234392865928285.b4-ty@kernel.dk>
+Date:   Fri, 30 Sep 2022 08:04:59 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, 30 Sep 2022 11:57:37 +0530, Anuj Gupta wrote:
+> uring-cmd lacks the ability to leverage the pre-registered buffers.
+> This series adds that support in uring-cmd, and plumbs nvme passthrough
+> to work with it.
+> Patches 3 - 5 carve out a block helper and scsi, nvme then use it to
+> avoid duplication of code.
+> Patch 6 and 7 contains a bunch of general nvme cleanups, which got added
+> along the iterations.
+> 
+> [...]
 
-Single NVMe pull request via Christoph with a few fixes that should go
-into the 6.0 release:
+Applied, thanks!
 
-- Fix IOC_PR_CLEAR and IOC_PR_RELEASE ioctls for nvme devices
-  (Michael Kelley)
-- Disable Write Zeroes on Phison E3C/E4C (Tina Hsu)
+[01/12] io_uring: add io_uring_cmd_import_fixed
+        commit: a9216fac3ed8819cbbda5d39dd5fcaa43dfd35d8
+[02/12] io_uring: introduce fixed buffer support for io_uring_cmd
+        commit: 9cda70f622cdcf049521a9c2886e5fd8a90a0591
+[03/12] block: add blk_rq_map_user_io
+        commit: 557654025df5706785d395558244890dc4b2c875
+[04/12] scsi: Use blk_rq_map_user_io helper
+        commit: 6732932c836a4313f471b92b4d90761f31d3fa81
+[05/12] nvme: Use blk_rq_map_user_io helper
+        commit: 7f05635764390d5f811971af9f4c89b794032c80
+[06/12] nvme: refactor nvme_add_user_metadata
+        commit: 38c0ddab7b93daa90c046d0b9064a34fb0e586e5
+[07/12] nvme: refactor nvme_alloc_request
+        commit: 470e900c8036ff1aafeb5f06f3cb7a375a081399
+[08/12] block: rename bio_map_put to blk_mq_map_bio_put
+        commit: 32f1c71b15fc9cb8e964c3d0c15ca99a70cfe8a7
+[09/12] block: factor out blk_rq_map_bio_alloc helper
+        commit: ab89e8e7ca526ca04baaad2aa28172d336425d67
+[10/12] block: extend functionality to map bvec iterator
+        commit: 37987547932c89f15f9b76950040131ddb591a8b
+[11/12] nvme: pass ubuffer as an integer
+        commit: 4d174486820e625fa85bac5d4235d4b4cb659866
+[12/12] nvme: wire up fixed buffer support for nvme passthrough
+        commit: 23fd22e55b767be9c31fda57205afb2023cd6aad
 
-Please pull!
-
-
-The following changes since commit 4c66a326b5ab784cddd72de07ac5b6210e9e1b06:
-
-  Revert "block: freeze the queue earlier in del_gendisk" (2022-09-20 08:15:44 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux.git tags/block-6.0-2022-09-29
-
-for you to fetch changes up to 6c84501a3c38adaf1c3486fb80b972f728ad8fd1:
-
-  Merge tag 'nvme-6.0-2022-09-29' of git://git.infradead.org/nvme into block-6.0 (2022-09-29 09:04:02 -0600)
-
-----------------------------------------------------------------
-block-6.0-2022-09-29
-
-----------------------------------------------------------------
-Jens Axboe (1):
-      Merge tag 'nvme-6.0-2022-09-29' of git://git.infradead.org/nvme into block-6.0
-
-Michael Kelley (1):
-      nvme: Fix IOC_PR_CLEAR and IOC_PR_RELEASE ioctls for nvme devices
-
-Tina Hsu (1):
-      nvme-pci: disable Write Zeroes on Phison E3C/E4C
-
- drivers/nvme/host/core.c | 6 +++---
- drivers/nvme/host/pci.c  | 4 ++++
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
+Best regards,
 -- 
 Jens Axboe
+
+
