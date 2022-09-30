@@ -2,124 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CC6C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 09:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 495F8C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 11:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230152AbiI3Jwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 05:52:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57784 "EHLO
+        id S231993AbiI3LQz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 07:16:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230382AbiI3Jwx (ORCPT
+        with ESMTP id S231737AbiI3LQW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 05:52:53 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434A312888B;
-        Fri, 30 Sep 2022 02:52:52 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id q17so4228336lji.11;
-        Fri, 30 Sep 2022 02:52:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=5e++Bq8byiSeO9h99CYt5V1LItyqEPo3VTEHQk8BylQ=;
-        b=HwxvMPTlOzXP1QfP3zDzS7IbqRifPUtcnIIb0LaVXEe1n8584HeeBV8pTDgaEoqFFP
-         LawrtsDaBnla4Y9Nh0y6H6BypJloBhWDZ6FLzwUYBdbmj1l50NGkzyULniykfbiaw8Sj
-         E+NDJQ1izK3UOlHhKpxSvb6uRs0xUL7i/rX0a2V6a99AJw79LQYkFEKFIoXIf6pHtxTf
-         wRqtb+F4+9MAoZp56CAnTtFpaAaWP4AWMM7LaZyQzVBq94EsnvH7hhHOqJR4O3GiBGS7
-         qtb04qii52P1uk1QTF6QvtZbJRzlGOhCHqAOWTw9M6zzzx7k8ZmKcUvP86vHMW7WPnqz
-         aA9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=5e++Bq8byiSeO9h99CYt5V1LItyqEPo3VTEHQk8BylQ=;
-        b=i+pjiBvtElZU25pXdcbutEI9LTpvIpT0M+cmT2wIKd1qF+IK0O8JBEsc1Dc+fHeLcO
-         JZXFfAHw4tYG2shrduozfAXh0WDrtgP9UK6L7j5QmCTKANuJAyrPh4OL41F5GELpyo7t
-         HLzvFQYpb7aGMllUnBu7wvQt4AlSW8o/91cMWKbx0BqWOQ7FWpkuR03qDiNP2rmO5xt8
-         blklvFo4+VDLghoQS5I7n454YFWOmenEJt4sIZatzW7Jml0o0aDnVstf/jbDy4YJ92lL
-         4+AQ2X+zYpSOnExkKK357D59YYHG0DcOgyx0hGoVP6o75yDV0XVGM6jwjF4APX32qf9S
-         e+tg==
-X-Gm-Message-State: ACrzQf2hZveKdq2J1rOdU7L7YWbyz6Yee5AyBwQrDz8q5ume0l61xCEE
-        fcp3Ug3RsFJxm6WAB+NVtLO8w6euOuySkA==
-X-Google-Smtp-Source: AMsMyM5W3qggiqHyrqng78Ar+doOtQG5XPfZcA7kWDg4EtlNDKjdeRjPyWaF128cmsRAZ/ILfiIL2Q==
-X-Received: by 2002:a05:651c:2205:b0:26c:622e:afef with SMTP id y5-20020a05651c220500b0026c622eafefmr2879674ljq.242.1664531570503;
-        Fri, 30 Sep 2022 02:52:50 -0700 (PDT)
-Received: from mobilestation ([95.79.133.202])
-        by smtp.gmail.com with ESMTPSA id c17-20020a056512105100b004a1e592837esm242979lfb.140.2022.09.30.02.52.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 02:52:49 -0700 (PDT)
-Date:   Fri, 30 Sep 2022 12:52:47 +0300
-From:   Serge Semin <fancer.lancer@gmail.com>
-To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
-Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] nvme-hwmon: Return error on kzalloc failure
-Message-ID: <20220930095247.vqtdc53rr66uaiwv@mobilestation>
-References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
- <20220929224648.8997-2-Sergey.Semin@baikalelectronics.ru>
- <YzYwB7lRGW80r4HA@kbusch-mbp.dhcp.thefacebook.com>
+        Fri, 30 Sep 2022 07:16:22 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C24C1BE3C;
+        Fri, 30 Sep 2022 03:59:40 -0700 (PDT)
+Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Mf65z2txyzlXNg;
+        Fri, 30 Sep 2022 18:33:59 +0800 (CST)
+Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 30 Sep 2022 18:38:18 +0800
+Received: from ubuntu1804.huawei.com (10.67.175.36) by
+ dggpemm500013.china.huawei.com (7.185.36.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 30 Sep 2022 18:38:18 +0800
+From:   Chen Zhongjin <chenzhongjin@huawei.com>
+To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <chenzhongjin@huawei.com>
+Subject: [PATCH -next] block: Remove unused variable 'added'
+Date:   Fri, 30 Sep 2022 18:34:28 +0800
+Message-ID: <20220930103428.21823-1-chenzhongjin@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YzYwB7lRGW80r4HA@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain
+X-Originating-IP: [10.67.175.36]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500013.china.huawei.com (7.185.36.172)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Sep 29, 2022 at 05:53:43PM -0600, Keith Busch wrote:
-> On Fri, Sep 30, 2022 at 01:46:46AM +0300, Serge Semin wrote:
-> > Inability to allocate a buffer is a critical error which shouldn't be
-> > tolerated since most likely the rest of the driver won't work correctly.
-> > Thus instead of returning the zero status let's return the -ENOMEM error
-> > if the nvme_hwmon_data structure instance couldn't be created.
-> 
+Reported by Clang [-Wunused-but-set-variable]
 
-> Nak for this one. The hwmon is not necessary for the rest of the driver to
-> function, so having the driver detach from the device seems a bit harsh.
+'commit 480cb846c27b ("block: convert to advancing variants of iov_iter_get_pages{,_alloc}()")'
+This commit converted iov_iter_advance() to iov_iter_revert(), and
+not uses variable 'added' anymore but forgot to delete it.
 
-Even if it is as you say, neither the method semantic nor the way it's
-called imply that. Any failures except the allocation one are
-perceived as erroneous.
+Since 'added' is useless now, remove it for code cleaning.
 
-> The
-> driver can participate in memory reclaim, so failing on a low memory condition
-> can make matters worse.
+Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
+---
+ block/blk-map.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Yes it can, so can many other places in the driver utilizing kmalloc
-with just GFP_KERNEL flag passed including on the same path as the
-nvme_hwmon_init() execution. Kmalloc will make sure the reclaim is
-either finished or executed in background anyway in all cases. Don't
-really see why memory allocation failure is less worse in this case
-than in many others in the same driver especially seeing as I said
-above the method semantic doesn't imply the optional feature
-detection. Moreover the allocated structure isn't huge at all. So
-failing to allocate that would indeed mean problems with the memory
-resource.
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 7196a6b64c80..1d5e609589c0 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -251,7 +251,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 	while (iov_iter_count(iter)) {
+ 		struct page **pages;
+ 		ssize_t bytes;
+-		size_t offs, added = 0;
++		size_t offs;
+ 		int npages;
+ 
+ 		bytes = iov_iter_get_pages_alloc2(iter, &pages, LONG_MAX, &offs);
+@@ -280,7 +280,6 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 					break;
+ 				}
+ 
+-				added += n;
+ 				bytes -= n;
+ 				offs = 0;
+ 			}
+-- 
+2.17.1
 
-> 
-> The rest looks good, though.
-
-but you ok with kmalloc in the next line. Seems like contradicting.
-
-@Christoph, what do you think about this?
-
--Sergey
-
-> 
-> > @@ -230,7 +230,7 @@ int nvme_hwmon_init(struct nvme_ctrl *ctrl)
-> >  
-> >  	data = kzalloc(sizeof(*data), GFP_KERNEL);
-> >  	if (!data)
-> > -		return 0;
-> > +		return -ENOMEM;
-> >  
-> >  	data->ctrl = ctrl;
-> >  	mutex_init(&data->read_lock);
-> > -- 
