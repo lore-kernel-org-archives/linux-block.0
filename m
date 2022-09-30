@@ -2,100 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E142C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 16:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0D0C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 16:38:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231888AbiI3Qfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 12:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55272 "EHLO
+        id S231934AbiI3QiY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 12:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231284AbiI3Qfp (ORCPT
+        with ESMTP id S231768AbiI3QiW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 12:35:45 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16969F50B7
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 09:35:41 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id 64so3668766iov.13
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 09:35:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=Kezpom8rJsVG2Syyn3/zEYfm5bdVOEFSAlE2suSQHSw=;
-        b=Ua3NLrKFNNJu6C4h1UF2NO39rwaNSmYfnEN7gjCb18BRAS6dacl6NzRduKI+jgI2oG
-         6UemSvw3H8jUS9rZlDzuIY60pEwUbh/+U944llY6mSCOb22iWIAUy6ouvWSMD5iQ8P9v
-         xK+UeWkyfqW3yhiVBHd0Mu5t+ei4IcGnQVt2yzEkbQ7eWFjPQMVbqRFGleMgMgVnu8c6
-         6Ra+8kdkNgM7auHiixqajLA+e8Rto+/xwTD+r3r7GwF2/b+nGls6wTTOGvGPBdevM/Dm
-         ZxmMT22DFu/WD/bdD7ed0ViI0hg8TkaQTH4Z3nMCrvpL9+RYjlDPbsPfKON3KK9cl+92
-         Ovaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Kezpom8rJsVG2Syyn3/zEYfm5bdVOEFSAlE2suSQHSw=;
-        b=n72Cxk5BVenaDwpsNVttcTqiLwljqI4By+M5QorpYjAhhQppOjNn4j+fzu7o9XQFJZ
-         ogqQYgUmiJTwlZ7PoBzwkAQr6OYhf/E61nxwb6subj0wnT2L51vWh0SRKPZ9SY5d06TL
-         v/QHeUK+qjVuw4c+GBTPj+4oDdcwbm+owFALMa7kfpByGbx6cum4pslCp7GvBfM7kfwn
-         56hy2ar/Mbu0RexAjo9BWdpoVGfAXAz6VV/ZS/Jh3NdwVZqtsX0XxR8cgFEOoZjSVl++
-         QnEJ5stztf2U+vg92hi7OxgrebFTPLHFQJz1byVM6GMR2YPBc0nqK/EIUixIoN1NDGaE
-         vRRA==
-X-Gm-Message-State: ACrzQf3v8/Z/BttXIoR7odFOgnrbrCyYR/uyJFA0lorVWJxWgFgudPWd
-        H5ZXD3T5RCNIQhLDY6MS3d1qiQ==
-X-Google-Smtp-Source: AMsMyM6Bo9kMyMyymRpkgRpKKTUXxbHzMlJDn6OcG2Z3krboh5VsAHz+9gA1c/PjmQHw9bBBWA8O6w==
-X-Received: by 2002:a05:6602:3944:b0:6a4:cae3:12fd with SMTP id bt4-20020a056602394400b006a4cae312fdmr4452725iob.189.1664555741237;
-        Fri, 30 Sep 2022 09:35:41 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x37-20020a0294a8000000b003583063a6cdsm1089478jah.104.2022.09.30.09.35.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Sep 2022 09:35:40 -0700 (PDT)
-Message-ID: <12aa1043-14c3-0f95-6cb4-f7a021268ae4@kernel.dk>
-Date:   Fri, 30 Sep 2022 10:35:38 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: block: wrong return value by bio_end_sector?
-Content-Language: en-US
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
-        Tyler Erickson <tyler.erickson@seagate.com>,
-        Muhammad Ahmad <muhammad.ahmad@seagate.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jan Kara <jack@suse.cz>,
-        "andrea.righi@canonical.com" <andrea.righi@canonical.com>,
-        "glen.valante@linaro.org" <glen.valante@linaro.org>,
-        Michael English <michael.english@seagate.com>,
-        Andrew Ring <andrew.ring@seagate.com>,
-        Varun Boddu <varunreddy.boddu@seagate.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <D4FC5552-B3C8-4118-B3C8-C6BF20C793B4@linaro.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <D4FC5552-B3C8-4118-B3C8-C6BF20C793B4@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Fri, 30 Sep 2022 12:38:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FD8F1739FA
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 09:38:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A1199623D5
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 16:38:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1281DC433D6;
+        Fri, 30 Sep 2022 16:38:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664555901;
+        bh=p5mKqGXiFEecvU7/DWkKj/05cwBNwPQYeHBeKff32O0=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=ROdL2ddVz/phmKCVxFWmhNBHvy6Ml5UmXKRtwfDsCaGVxcW7FyCNEIP2sPPUXN2GL
+         l34ygpP89bZeH0BNyy0HR8fxADV8bAn+cF/vDemzJiMlnQd5FI8Qot1LLsaQgDGypd
+         S1cMQZfCzplgUwcH4N7/04dCNvNFZpwgruXGw+vPduI3CDweMa7E/kokS7tajO5oiY
+         qGkwiiiqu8MA76N/KR+0dv0XHiodNNy8gSpYjYyisscpwKb2nJGFP59pUckbva+G2y
+         RQFJlVul+wOVQ+RHBCyV2sbAJ9CRb4KmLpPHBKOV1AK3NCjzgz9fxR1+pJTydJOuBO
+         jeetX9l0wwKMA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 006CBC04E59;
+        Fri, 30 Sep 2022 16:38:21 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 6.0-final
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <e5c2a0e5-1a04-50b1-78f0-08d998a8d4e7@kernel.dk>
+References: <e5c2a0e5-1a04-50b1-78f0-08d998a8d4e7@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <e5c2a0e5-1a04-50b1-78f0-08d998a8d4e7@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux.git tags/block-6.0-2022-09-29
+X-PR-Tracked-Commit-Id: 6c84501a3c38adaf1c3486fb80b972f728ad8fd1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 7bc6e90d7aa4170039abe80b9f4e8c8e4eb35091
+Message-Id: <166455590099.13600.978141470278001046.pr-tracker-bot@kernel.org>
+Date:   Fri, 30 Sep 2022 16:38:20 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/22 9:59 AM, Paolo Valente wrote:
-> Hi Jens, Damien, all other possibly interested people,
-> this is to raise attention on a mistake that has emerged in a
-> thread on a bfq extension for multi-actuary drives [1].
-> 
-> The mistake is apparently in the macro bio_end_sector (defined in
-> include/linux/bio.h), which seems to be translated (incorrectly) as
-> sector+size, and not as sector+size-1.
-> 
-> For your convenience, I'm pasting a detailed description of the
-> problem, by Tyler (description taken from the above thread [1]).
+The pull request you sent on Fri, 30 Sep 2022 07:43:08 -0600:
 
-I'm a little confused - currently it returns non-inclusive end, the
-proposed change just make it inclusive. In general in the kernel the
-former is used, and this one follows that.
+> git://git.kernel.dk/linux.git tags/block-6.0-2022-09-29
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/7bc6e90d7aa4170039abe80b9f4e8c8e4eb35091
+
+Thank you!
 
 -- 
-Jens Axboe
-
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
