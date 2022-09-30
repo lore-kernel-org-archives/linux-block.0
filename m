@@ -2,143 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5446BC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 11:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D43C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 13:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbiI3LTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 07:19:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34198 "EHLO
+        id S231526AbiI3NmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 09:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232139AbiI3LTD (ORCPT
+        with ESMTP id S231532AbiI3NmK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 07:19:03 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9342C5A8B2
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 04:06:31 -0700 (PDT)
-Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 28UB6BjC040455;
-        Fri, 30 Sep 2022 20:06:12 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
- Fri, 30 Sep 2022 20:06:11 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 28UB6BUs040449
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 30 Sep 2022 20:06:11 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <313d914e-6258-50db-4317-0ffb6f936553@I-love.SAKURA.ne.jp>
-Date:   Fri, 30 Sep 2022 20:06:10 +0900
+        Fri, 30 Sep 2022 09:42:10 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2FD198683
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 06:42:08 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id 138so3257296iou.9
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 06:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=xqlNMZQ3D1AS+gGJtbQ5nwPfHLNZekdJiLeGB/2P0Oo=;
+        b=g/SZlfEnW/xtL+38NFDeER7npa/YEubRwkLHoo7w9fm/7CxnBOtSpUYdY2mj8BA0Zs
+         0oGpWEt4q45AGsJo6T8vpUTuRGV7Arl8LoU48M6d65vi+Kb8kfT8Lwi4ZxCaLuKCBxyZ
+         xTqB13NvJVsAycKAY8x4J2NFMBqpPnf6YDMYXj6068D10m7OxZOK0zsVynWpRHUH+der
+         Y8lxqnZlpfL/AvT/Se1lXMGoEEk409Lqu6W2OHwmAnoKHM0E2+T8U8drsN+CSTfUAm1A
+         xGiejsbM8mDML6UBOFft3rtgMR3brw30FEz9h1IBIv51w7absU4zHRrgH4SudrGfWNEH
+         sj7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=xqlNMZQ3D1AS+gGJtbQ5nwPfHLNZekdJiLeGB/2P0Oo=;
+        b=5wIxJjtLw9cK3B/9QmyPiHTHl06OOHgFaFPipkwtSWTKGaJbYbJ1TSDVBVsxv3R3y7
+         hjYpYdrn3hFLAjEkU7/S9u46jevt9DNdX9Lu4f5QykiMShw90BFn9Aa7ah8MkXkQZjNd
+         lGmwpPWeGsKDvNEYwaaLT6RStSU/ncvxykiM0+35vx5aSRFE/VS2DgOxjaA/QHnd0MTM
+         VW5JTHoXaShjyIuTH1WJZUH/X1V6dui7AIbHKaaq7PezwlA6GuFK9IdR0dsBmULPnVWg
+         X4evaphSpfZBnc2IvJs80FkijYZlNyzwhoSme9usiJ9WCYLvYEUKIML6J9vFMr61Xhv1
+         BL2Q==
+X-Gm-Message-State: ACrzQf3uVps2nqdlBWQUQfx+YmvYC2uiL2gXZbUh9DeR6/AlHwkZLjY8
+        1WxB6mHFa8nniUwz5HR0GN4T0j1kWsUq3A==
+X-Google-Smtp-Source: AMsMyM68NxJth0vMZTHBU5g6/kMmGIAZO++J6bTpObKSqOmiBAa83Dd5SOy69a0F9kxxELXGdjUJww==
+X-Received: by 2002:a05:6638:22c5:b0:35a:88fa:3d3a with SMTP id j5-20020a05663822c500b0035a88fa3d3amr4803594jat.115.1664545327131;
+        Fri, 30 Sep 2022 06:42:07 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id d17-20020a0566022bf100b006a10d068d39sm1111030ioy.41.2022.09.30.06.42.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Sep 2022 06:42:06 -0700 (PDT)
+Message-ID: <a08df763-b84f-0360-f1bf-4dd1da3a97bc@kernel.dk>
+Date:   Fri, 30 Sep 2022 07:42:04 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: lockdep WARNING at blktests block/011
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH for-next v12 02/12] io_uring: introduce fixed buffer
+ support for io_uring_cmd
+To:     Anuj Gupta <anuj20.g@samsung.com>, hch@lst.de, kbusch@kernel.org
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, gost.dev@samsung.com,
+        linux-scsi@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
+References: <20220930062749.152261-1-anuj20.g@samsung.com>
+ <CGME20220930063809epcas5p328b9e14ead49e9612b905e6f5b6682f7@epcas5p3.samsung.com>
+ <20220930062749.152261-3-anuj20.g@samsung.com>
 Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Cc:     Tejun Heo <tj@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20220930001943.zdbvolc3gkekfmcv@shindev>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220930001943.zdbvolc3gkekfmcv@shindev>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220930062749.152261-3-anuj20.g@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/09/30 9:19, Shinichiro Kawasaki wrote:
-> Kernel v6.0-rc7 triggered the WARN "possible circular locking dependency
-> detected" at blktests test case block/011 for NVME devices [1]. The trigger
-> commit was c0feea594e05 ("workqueue: don't skip lockdep work dependency in
-> cancel_work_sync()"). The commit was backported to v5.15.71 stable kernel and
-> the WARN is observed with the stable kernel also. It looks that the possible
-> deadlock scenario has been hidden for long time and the commit revealed it now.
+On 9/30/22 12:27 AM, Anuj Gupta wrote:
+> Add IORING_URING_CMD_FIXED flag that is to be used for sending io_uring
+> command with previously registered buffers. User-space passes the buffer
+> index in sqe->buf_index, same as done in read/write variants that uses
+> fixed buffers.
+> 
+> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> ---
+>  include/linux/io_uring.h      |  2 +-
+>  include/uapi/linux/io_uring.h |  9 +++++++++
+>  io_uring/uring_cmd.c          | 18 +++++++++++++++++-
+>  3 files changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
+> index 1dbf51115c30..e10c5cc81082 100644
+> --- a/include/linux/io_uring.h
+> +++ b/include/linux/io_uring.h
+> @@ -28,7 +28,7 @@ struct io_uring_cmd {
+>  		void *cookie;
+>  	};
+>  	u32		cmd_op;
+> -	u32		pad;
+> +	u32		flags;
+>  	u8		pdu[32]; /* available inline for free use */
+>  };
+>  
+> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+> index 92f29d9505a6..ab7458033ee3 100644
+> --- a/include/uapi/linux/io_uring.h
+> +++ b/include/uapi/linux/io_uring.h
+> @@ -56,6 +56,7 @@ struct io_uring_sqe {
+>  		__u32		hardlink_flags;
+>  		__u32		xattr_flags;
+>  		__u32		msg_ring_flags;
+> +		__u32		uring_cmd_flags;
+>  	};
+>  	__u64	user_data;	/* data to be passed back at completion time */
+>  	/* pack this to avoid bogus arm OABI complaints */
+> @@ -219,6 +220,14 @@ enum io_uring_op {
+>  	IORING_OP_LAST,
+>  };
+>  
+> +/*
+> + * sqe->uring_cmd_flags
+> + * IORING_URING_CMD_FIXED	use registered buffer; pass thig flag
+> + *				along with setting sqe->buf_index.
+> + */
+> +#define IORING_URING_CMD_FIXED	(1U << 0)
+> +
+> +
+>  /*
+>   * sqe->fsync_flags
+>   */
+> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+> index 6a6d69523d75..05e8ad8cef87 100644
+> --- a/io_uring/uring_cmd.c
+> +++ b/io_uring/uring_cmd.c
+> @@ -4,6 +4,7 @@
+>  #include <linux/file.h>
+>  #include <linux/io_uring.h>
+>  #include <linux/security.h>
+> +#include <linux/nospec.h>
+>  
+>  #include <uapi/linux/io_uring.h>
+>  
+> @@ -77,7 +78,22 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>  {
+>  	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
+>  
+> -	if (sqe->rw_flags || sqe->__pad1)
+> +	if (sqe->__pad1)
+> +		return -EINVAL;
+> +
+> +	ioucmd->flags = READ_ONCE(sqe->uring_cmd_flags);
+> +	if (ioucmd->flags & IORING_URING_CMD_FIXED) {
+> +		struct io_ring_ctx *ctx = req->ctx;
+> +		u16 index;
+> +
+> +		req->buf_index = READ_ONCE(sqe->buf_index);
+> +		if (unlikely(req->buf_index >= ctx->nr_user_bufs))
+> +			return -EFAULT;
+> +		index = array_index_nospec(req->buf_index, ctx->nr_user_bufs);
+> +		req->imu = ctx->user_bufs[index];
+> +		io_req_set_rsrc_node(req, ctx, 0);
+> +	}
+> +	if (ioucmd->flags & ~IORING_URING_CMD_FIXED)
+>  		return -EINVAL;
 
-Right.
+Not that it _really_ matters, but why isn't this check the first thing
+that is done after reading the flags? No need to respin, I can just move
+it myself.
 
-> I tried to understand the deadlock scenario, but can not tell if it is for real,
-> or false-positive. Help to understand the scenario will be appreciated. The
-> lockdep splat mentions three locks (ctrl->namespaces_rwsem, dev->shutdown_lock
-> and q->timeout_work).
-
-Right.
-
-This is a circular locking problem which involves three locks.
-
-  (A) (work_completion)(&q->timeout_work) --> &dev->shutdown_lock
-
-  (B) &dev->shutdown_lock --> &ctrl->namespaces_rwsem
-
-  (C) &ctrl->namespaces_rwsem --> (work_completion)(&q->timeout_work)
-
-(A) and (B) happens due to
-
-  INIT_WORK(&q->timeout_work, blk_mq_timeout_work);
-
-  blk_mq_timeout_work(work) { // Is blocking __flush_work() from cancel_work_sync().
-    blk_mq_queue_tag_busy_iter(blk_mq_check_expired) {
-      bt_for_each(blk_mq_check_expired) == blk_mq_check_expired() {
-        blk_mq_rq_timed_out() {
-          req->q->mq_ops->timeout(req) == nvme_timeout(req) {
-            nvme_dev_disable() {
-              mutex_lock(&dev->shutdown_lock); // Holds dev->shutdown_lock
-              nvme_start_freeze(&dev->ctrl) {
-                down_read(&ctrl->namespaces_rwsem); // Holds ctrl->namespaces_rwsem which might block
-                up_read(&ctrl->namespaces_rwsem);
-              }
-              mutex_unlock(&dev->shutdown_lock);
-            }
-          }
-        }
-      }
-    }
-  }
-
-(C) happens due to
-
-  nvme_sync_queues(ctrl) {
-    nvme_sync_io_queues(ctrl) {
-      down_read(&ctrl->namespaces_rwsem); // Holds ctrl->namespaces_rwsem which might block
-      /*** Question comes here. Please check the last block in this mail. ***/
-      blk_sync_queue(ns->queue) {
-	cancel_work_sync(&q->timeout_work) {
-          __flush_work((&q->timeout_work, true) {
-            // Might wait for completion of blk_mq_timeout_work() with ctrl->namespaces_rwsem held.
-          }
-        }
-      }
-      up_read(&ctrl->namespaces_rwsem);
-    }
-  }
-
->                       In the related function call paths, it looks that
-> ctrl->namespaces_rwsem is locked only for read, so the deadlock scenario does
-> not look possible for me.
-
-Right.
-
->                           (Maybe I'm misunderstanding something...)
-
-Although ctrl->namespaces_rwsem is a rw-sem and is held for read in these paths,
-there are paths which hold ctrl->namespaces_rwsem for write. If someone is trying
-to hold that rw-sem for write, these down_read(&ctrl->namespaces_rwsem) will be blocked.
-
-That is, it also depends on whether
-  down_read(&ctrl->namespaces_rwsem);
-and
-  down_write(&ctrl->namespaces_rwsem);
-might run in parallel.
-
-Question:
-  Does someone else call down_write(&ctrl->namespaces_rwsem) immediately after
-  someone's down_read(&ctrl->namespaces_rwsem) succeeded?
-
-nvme_alloc_ns()/nvme_ns_remove()/nvme_remove_invalid_namespaces()/nvme_remove_namespaces() calls
-down_write(&ctrl->namespaces_rwsem), and some of these are called from work callback functions
-which might run in parallel with other work callback functions?
-
+-- 
+Jens Axboe
