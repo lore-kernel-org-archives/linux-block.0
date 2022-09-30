@@ -2,127 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD11EC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 18:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19321C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 19:38:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230378AbiI3Stp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 14:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56100 "EHLO
+        id S229594AbiI3Tiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 15:38:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230521AbiI3Sto (ORCPT
+        with ESMTP id S232376AbiI3Tiy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 14:49:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF8FE1EB
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 11:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664563781;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YWfYo+GDUoZ0OpeHuuLzSQerAIG+GqmtkQYeKrxmQZ8=;
-        b=eZQF5LXus9SnWZdhIpgrOPO/A04zgLu31aIfa7TqEbaWEjFN4WE7axD/bN+k+OKPwZPtqo
-        a7Xe1RymJHGV/l+QgX8zvuwRs5JspXZzfdHp4VtmxmGSwtVkqOyBut3UuUq/TWi9NZWIg0
-        SAytqXmoqSAyxi7smFNgrpcHCX34k6k=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-516-PNU3mZ_eMy2cYrsr1z9F3A-1; Fri, 30 Sep 2022 14:49:39 -0400
-X-MC-Unique: PNU3mZ_eMy2cYrsr1z9F3A-1
-Received: by mail-ed1-f72.google.com with SMTP id e15-20020a056402190f00b0044f41e776a0so4142927edz.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 11:49:39 -0700 (PDT)
+        Fri, 30 Sep 2022 15:38:54 -0400
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D112C149780;
+        Fri, 30 Sep 2022 12:38:52 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id l12so4952850pjh.2;
+        Fri, 30 Sep 2022 12:38:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=YWfYo+GDUoZ0OpeHuuLzSQerAIG+GqmtkQYeKrxmQZ8=;
-        b=k4sEZ63UY98oH4tJiqcw1ea1PLlx8xYPtzLYsTm5qDTEcf0nFkh0qCcnWPlieCnsyW
-         HnBfO6XsOjwAFt+Ta8ySQi5uEOXPjf3Unz0gnJbJG5bvEgj35PjERAWWFw6miLmlzy7y
-         5X9rfh0DrIMBKliuLYTge01KR5YoCJZVlR4ytUzb/4jaRX8QEGhYh31BIZizYTs8gmEC
-         paZ5XErhyvUtZ1WNapiOrBBAamBL6kw5j9AKGiU/YlEjTEwmePG9a16tJtTjkDDlL/zw
-         RKhOBkUKmFz0DfpU8khNdQ6/okG/ISRxxZm/InCWnD1l9PdFELEx+8snnkxb+U0eb8bD
-         P9Rg==
-X-Gm-Message-State: ACrzQf3fd6+qbQGHgzBFh3kkuru2v6+gD5+uvVyO5R5PcAlayAmot8go
-        IOgLO0tZ4BIvoMpbokjI+nh1ndcaWyrN4RTO396XryRmFxYjc7NZBWiUcHzmBVd60sA2nJ+67pl
-        VQrElNGgYH2GvVzcW8/cVIiu1ocseNCR9jOZQzUI=
-X-Received: by 2002:a17:907:728f:b0:787:71b4:d84c with SMTP id dt15-20020a170907728f00b0078771b4d84cmr7330261ejc.506.1664563778488;
-        Fri, 30 Sep 2022 11:49:38 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4OgpVLQpBnb1EG5QAel1ZwsPNE20c1qFyH7MP8dEAsKE2hckQEEyzdRygzRftCMeGHB1OB5BL9cN2bO2EiIdM=
-X-Received: by 2002:a17:907:728f:b0:787:71b4:d84c with SMTP id
- dt15-20020a170907728f00b0078771b4d84cmr7330246ejc.506.1664563778305; Fri, 30
- Sep 2022 11:49:38 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=gjDYcfQrPymPgf4zZHF6ExZnXFdO/ag78V3ukKEreZ8=;
+        b=kb10rTWlUKTqJRtFUDbI2061gIYzUD719SiT2UKCGXQdo7XP3i1nx7UE5sII7iW6CQ
+         fEr/CLkfds3t/VHl+4+rGM+6A01b87uRLNMgv7kxF3R5uFhUT/YFxil67oMyjjvxMdcr
+         qvGu97KngDV4Mv5SGmhqKL9OUKDTJLXZWwvOEPsEm2PR++etO1w/1MLcuA2kTin98sub
+         hQ8isdmZPD6NujUgigIuUNEYNbrwhOz7JBIcLosjeaXSgYu68/PyVIyHXaLcbe4nsyfx
+         Kb1sUWNFc/E/nEyjUdaDtLYvHiTha96qUwa8RZef4qRnSr/+bg9y+iWLqW9aHOORtssj
+         rPZg==
+X-Gm-Message-State: ACrzQf2FFeInIXQiZTKPK3pOsN/3Top2QCWFt1df7J6KxxAf5LKxLorc
+        Y1IlR/gDxyiUeg4AlqpHxoM=
+X-Google-Smtp-Source: AMsMyM6wPTQbb/wpm4NYDTyzteu9Ju/f5nYNm4NlJda34lAJsiPgMThwpAp8l1Io6xLGw26w5R/LwQ==
+X-Received: by 2002:a17:90b:3149:b0:202:e9e9:632f with SMTP id ip9-20020a17090b314900b00202e9e9632fmr24463065pjb.96.1664566732077;
+        Fri, 30 Sep 2022 12:38:52 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:56f2:482f:20c2:1d35? ([2620:15c:211:201:56f2:482f:20c2:1d35])
+        by smtp.gmail.com with ESMTPSA id z5-20020aa79f85000000b0052e6c058bccsm2187903pfr.61.2022.09.30.12.38.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Sep 2022 12:38:51 -0700 (PDT)
+Message-ID: <0e5088a5-5408-c5bd-bf97-00803cb5faed@acm.org>
+Date:   Fri, 30 Sep 2022 12:38:48 -0700
 MIME-Version: 1.0
-References: <20220930150345.854021-1-bfoster@redhat.com>
-In-Reply-To: <20220930150345.854021-1-bfoster@redhat.com>
-From:   Nico Pache <npache@redhat.com>
-Date:   Fri, 30 Sep 2022 12:49:12 -0600
-Message-ID: <CAA1CXcA9_EOcOsc+7QqrtjtNe8fhyqUVDLFwFPwwipBghgMFDg@mail.gmail.com>
-Subject: Re: [PATCH] block: avoid sign extend problem with default queue flags mask
-To:     Brian Foster <bfoster@redhat.com>
-Cc:     linux-block@vger.kernel.org, Joel Savitz <jsavitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v15 00/13] support zoned block devices with non-power-of-2
+ zone sizes
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, Pankaj Raghav <p.raghav@samsung.com>,
+        hch@lst.de, Keith Busch <kbusch@kernel.org>
+Cc:     jaegeuk@kernel.org, agk@redhat.com, gost.dev@samsung.com,
+        snitzer@kernel.org, damien.lemoal@opensource.wdc.com,
+        linux-kernel@vger.kernel.org, hare@suse.de,
+        matias.bjorling@wdc.com, Johannes.Thumshirn@wdc.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        pankydev8@gmail.com, dm-devel@redhat.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <CGME20220923173619eucas1p13e645adbe1c8eb62fb48b52c0248ed65@eucas1p1.samsung.com>
+ <20220923173618.6899-1-p.raghav@samsung.com>
+ <5e9d678f-ffea-e015-53d8-7e80f3deda1e@samsung.com>
+ <bd9479f4-ff87-6e5d-296e-e31e669fb148@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <bd9479f4-ff87-6e5d-296e-e31e669fb148@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 30, 2022 at 9:03 AM Brian Foster <bfoster@redhat.com> wrote:
->
-> request_queue->queue_flags is an 8-byte field. Most queue flag
-> modifications occur through bit field helpers, but default flags can
-> be logically OR'd via the QUEUE_FLAG_MQ_DEFAULT mask. If this mask
-> happens to include bit 31, the assignment can sign extend the field
-> and set all upper 32 bits.
->
-> This exact problem has been observed on a downstream kernel that
-> happens to use bit 31 for QUEUE_FLAG_NOWAIT. This is not an
-> immediate problem for current upstream because bit 31 is not
-> included in the default flag assignment (and is not used at all,
-> actually). Regardless, fix up the QUEUE_FLAG_MQ_DEFAULT mask
-> definition to avoid the landmine in the future.
->
-> Signed-off-by: Brian Foster <bfoster@redhat.com>
-> ---
->
-> Just to elaborate, I ran a quick test to change QUEUE_FLAG_NOWAIT to use
-> bit 31. With that change but without this patch, I see the following
-> queue state:
->
-> # cat /sys/kernel/debug/block/vda/state
-> SAME_COMP|IO_STAT|INIT_DONE|WC|STATS|REGISTERED|30|NOWAIT|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63
->
-> And then with the patch applied:
->
-> # cat /sys/kernel/debug/block/vda/state
-> SAME_COMP|IO_STAT|INIT_DONE|WC|STATS|REGISTERED|30|NOWAIT
->
-> Thanks.
->
-> Brian
->
->  include/linux/blkdev.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 84b13fdd34a7..28c3037cb25c 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -580,9 +580,9 @@ struct request_queue {
->  #define QUEUE_FLAG_NOWAIT       29     /* device supports NOWAIT */
->  #define QUEUE_FLAG_SQ_SCHED     30     /* single queue style io dispatch */
->
-> -#define QUEUE_FLAG_MQ_DEFAULT  ((1 << QUEUE_FLAG_IO_STAT) |            \
-> -                                (1 << QUEUE_FLAG_SAME_COMP) |          \
-> -                                (1 << QUEUE_FLAG_NOWAIT))
-> +#define QUEUE_FLAG_MQ_DEFAULT  ((1ULL << QUEUE_FLAG_IO_STAT) |         \
-> +                                (1ULL << QUEUE_FLAG_SAME_COMP) |       \
-> +                                (1ULL << QUEUE_FLAG_NOWAIT))
->
->  void blk_queue_flag_set(unsigned int flag, struct request_queue *q);
->  void blk_queue_flag_clear(unsigned int flag, struct request_queue *q);
-> --
-> 2.37.2
->
-Looks good, thanks Brian!
+On 9/30/22 08:13, Jens Axboe wrote:
+> On 9/29/22 12:31 AM, Pankaj Raghav wrote:
+>>> Hi Jens,
+>>>    Please consider this patch series for the 6.1 release.
+>>>
+>>
+>> Hi Jens, Christoph, and Keith,
+>>   All the patches have a Reviewed-by tag at this point. Can we queue this up
+>> for 6.1?
+> 
+> It's getting pretty late for 6.1 and I'd really like to have both Christoph
+> and Martin sign off on these changes.
 
-Acked-by: Nico Pache <npache@redhat.com>
+Hi Jens,
+
+Agreed that it's getting late for 6.1.
+
+Since this has not been mentioned in the cover letter, I want to add 
+that in the near future we will need these patches for Android devices. 
+JEDEC is working on supporting zoned storage for UFS devices, the 
+storage devices used in all modern Android phones. Although it would be 
+possible to make the offset between zone starts a power of two by 
+inserting gap zones between data zones, UFS vendors asked not to do this 
+and hence need support for zone sizes that are not a power of two. An 
+advantage of not having to deal with gap zones is better filesystem 
+performance since filesystem extents cannot span gap zones. Having to 
+split filesystem extents because of gap zones reduces filesystem 
+performance.
+
+Thanks,
+
+Bart.
+
 
