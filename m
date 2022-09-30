@@ -2,108 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17ABDC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 01:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A27B4C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 02:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbiI3B0b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Sep 2022 21:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55990 "EHLO
+        id S229843AbiI3C5L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Sep 2022 22:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiI3B0a (ORCPT
+        with ESMTP id S229536AbiI3C5J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2022 21:26:30 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FF2139F76
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 18:26:28 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id u59-20020a17090a51c100b00205d3c44162so7591411pjh.2
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 18:26:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=Cg6k590d1gYe1qvzLK8US59eUH7WJXJdcnukMaAq5JQ=;
-        b=h1bgzldX+/L9fXhKSk/XewnvXXMCnpgpXGG+N2Vrmw1HCHa2Ue3P1gJ7lte3NhLNQQ
-         opK+geSBRBxre64a+lTdmBjopIL/SaVrmYu2tOsXNhLUrZzsi+1uC/7omK6b5UzWoMrU
-         0s+n2Jt5Y7fRUSttfrhG9F9OFaCS+v/BB4zpkWDUFBPy7qgp0BYAj0/rj4sUlDwL5mqi
-         lf6Dj936AuSMLz8c2Ts/9Gp1dt93hERti9oZ7/X4OSGNgSrMxOaiDlqtnUbMvvbdaS98
-         8LuBaifjg5iqEfMuaYIueKFg4evNfIFH/KNja02Zt80LaLRRT/RSyj0XAI3hKP5OV+gV
-         vUdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Cg6k590d1gYe1qvzLK8US59eUH7WJXJdcnukMaAq5JQ=;
-        b=hlyV3qjtroJeOgtZpNfj1nDjwbJlv9wO+yA1nxg4om2hSgfRcSE0wCGX6l5TVBs5cU
-         f33vpAgDKck5tcyU9rNJS5/fij/v+o6Rl1n2cKSwEZgkZrm3SOEfQOmzHJCFhlV4tbkL
-         Bg99inaiptu9r019vExdBvWQL69/KhBBLttD6V6iu2Rgi+C6nHhYzeLtAGcWj3DuR1OG
-         lZUu3htj2DYW7WObHcFuzoTrWoL0JBTAImPngXw2I87pM5sNwUe8dF9ENPqfGZuhvwsa
-         +tTAzoix+GF4n5kRIapgBOYlDRxB6ZATE5BhzgoDcQOcSVhZSQfAlJHakOOi5nxZBKWV
-         HNvg==
-X-Gm-Message-State: ACrzQf1BelLRrLERMnTaQausMlssFWGN482yiuBu+37PEfX4naYCO7jg
-        n761S69NTINAd7GThyMFF0/xFA==
-X-Google-Smtp-Source: AMsMyM54XYNL60ZKYJnXrSIFgmbWTCJkL3I8OdtaVHNuzxN6EhKViW84Cz8nyS9OLFnrbEHSDcY+kw==
-X-Received: by 2002:a17:90b:3b47:b0:202:a81f:4059 with SMTP id ot7-20020a17090b3b4700b00202a81f4059mr19768268pjb.150.1664501188259;
-        Thu, 29 Sep 2022 18:26:28 -0700 (PDT)
-Received: from [192.168.1.136] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s10-20020a63e80a000000b0042fe1914e26sm558361pgh.37.2022.09.29.18.26.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Sep 2022 18:26:27 -0700 (PDT)
-Message-ID: <eaa47591-10e0-426a-6345-2881963be080@kernel.dk>
-Date:   Thu, 29 Sep 2022 19:26:26 -0600
+        Thu, 29 Sep 2022 22:57:09 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3261B104623;
+        Thu, 29 Sep 2022 19:57:07 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MdvwL4Kb3zKJB2;
+        Fri, 30 Sep 2022 10:54:58 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgAnenP_WjZjTFJvBg--.12213S4;
+        Fri, 30 Sep 2022 10:57:04 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     jack@suse.cz, hch@infradead.org, ebiggers@kernel.org,
+        paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH v4 0/6] blk-wbt: simple improvment to enable wbt correctly
+Date:   Fri, 30 Sep 2022 11:19:00 +0800
+Message-Id: <20220930031906.4164306-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH for-next v11 02/13] io_uring: introduce fixed buffer
- support for io_uring_cmd
-Content-Language: en-US
-To:     Anuj Gupta <anuj20.g@samsung.com>, hch@lst.de, kbusch@kernel.org
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        linux-scsi@vger.kernel.org, Kanchan Joshi <joshi.k@samsung.com>
-References: <20220929120632.64749-1-anuj20.g@samsung.com>
- <CGME20220929121637epcas5p2ff344c7951037f79d117d000e405dd45@epcas5p2.samsung.com>
- <20220929120632.64749-3-anuj20.g@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220929120632.64749-3-anuj20.g@samsung.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgAnenP_WjZjTFJvBg--.12213S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrurWftryrury3GF4UAFy7Jrb_yoWfKrgEqa
+        y8Kas5WFn8X3W5CF9rJF10qFyj9rs5Zry5Xasrtr90yryfXF4jyw4ktr47uF98Za1Ik3Z8
+        t3yUurWrZr1IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbxxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
+        0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFyl
+        IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
+        AFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
+        Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoO
+        J5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/29/22 6:06 AM, Anuj Gupta wrote:
-> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> index 6a6d69523d75..faefa9f6f259 100644
-> --- a/io_uring/uring_cmd.c
-> +++ b/io_uring/uring_cmd.c
-> @@ -4,6 +4,7 @@
->  #include <linux/file.h>
->  #include <linux/io_uring.h>
->  #include <linux/security.h>
-> +#include <linux/nospec.h>
->  
->  #include <uapi/linux/io_uring.h>
->  
-> @@ -77,8 +78,21 @@ int io_uring_cmd_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->  {
->  	struct io_uring_cmd *ioucmd = io_kiocb_to_cmd(req, struct io_uring_cmd);
->  
-> -	if (sqe->rw_flags || sqe->__pad1)
-> +	if (sqe->__pad1)
->  		return -EINVAL;
-> +
-> +	ioucmd->flags = READ_ONCE(sqe->uring_cmd_flags);
+From: Yu Kuai <yukuai3@huawei.com>
 
-After reading this and checking for IORING_URING_CMD_FIXED, this should
-have a:
+changes in v4:
+ - remove patch 3 from v3
+ - add patch 2,3 in v4
 
-	if (iocmd->flags & ~IORING_URING_CMD_FIXED)
-		return -EINVAL;
+changes in v3:
+ - instead of check elevator name, add a flag in elevator_queue, as
+ suggested by Christoph.
+ - add patch 3 and patch 5 to this patchset.
 
-to ensure we can safely add more flags in the future. Apart from that,
-this looks good.
+changes in v2:
+ - define new api if wbt config is not enabled in patch 1.
+
+Yu Kuai (6):
+  elevator: remove redundant code in elv_unregister_queue()
+  blk-wbt: remove unnecessary check in wbt_enable_default()
+  blk-wbt: make enable_state more accurate
+  blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
+  elevator: add new field flags in struct elevator_queue
+  blk-wbt: don't enable throttling if default elevator is bfq
+
+ block/bfq-iosched.c |  2 ++
+ block/blk-sysfs.c   |  6 +++++-
+ block/blk-wbt.c     | 26 ++++++++++++++++++++++----
+ block/blk-wbt.h     | 17 ++++++++++++-----
+ block/elevator.c    |  8 ++------
+ block/elevator.h    |  5 ++++-
+ 6 files changed, 47 insertions(+), 17 deletions(-)
 
 -- 
-Jens Axboe
+2.31.1
+
