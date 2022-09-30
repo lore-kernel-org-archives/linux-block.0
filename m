@@ -2,52 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19321C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 19:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECDAC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 21:24:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229594AbiI3Tiz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 15:38:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43898 "EHLO
+        id S231429AbiI3VYu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 17:24:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232376AbiI3Tiy (ORCPT
+        with ESMTP id S231258AbiI3VYt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 15:38:54 -0400
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D112C149780;
-        Fri, 30 Sep 2022 12:38:52 -0700 (PDT)
-Received: by mail-pj1-f46.google.com with SMTP id l12so4952850pjh.2;
-        Fri, 30 Sep 2022 12:38:52 -0700 (PDT)
+        Fri, 30 Sep 2022 17:24:49 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF3220BD7
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 14:24:47 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id q9so5158587pgq.8
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 14:24:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=gQa4eGbEVBeAKBGzZEdWdAqwKEPR/qyaUUpn0AQUmcY=;
+        b=3EURTjXeklkLflGUj4iVrCFJLZ7OcWMFSStfiFCwgJII/1WImuD2se4G66ta21P6Da
+         vFoTglIBbGNORBQWbWTCDuqtqxaO+HPnkTQTzYC1dhwW92sS/v7QWSB1rIA5TUm6h0E5
+         jsb7sBRYK8arp+hv/lW94rlgekF6bYM1d7eL9MJrDFF4Jk6jfeNFYeFJdnUSlPMr0Aro
+         8ecBCzitkMgDwf6dYdV/gZREORLjH+l1NiJuWBUuGWTpxnLT8s2Lknz+mn3Ff8tLqPUd
+         rAi/qyTW2/CzAM7vCQAK1RkNXW4p2AVdxEwZ3EcAgVJEn+e9yv2o+6CMYbSmoBlDdJ7+
+         631g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=gjDYcfQrPymPgf4zZHF6ExZnXFdO/ag78V3ukKEreZ8=;
-        b=kb10rTWlUKTqJRtFUDbI2061gIYzUD719SiT2UKCGXQdo7XP3i1nx7UE5sII7iW6CQ
-         fEr/CLkfds3t/VHl+4+rGM+6A01b87uRLNMgv7kxF3R5uFhUT/YFxil67oMyjjvxMdcr
-         qvGu97KngDV4Mv5SGmhqKL9OUKDTJLXZWwvOEPsEm2PR++etO1w/1MLcuA2kTin98sub
-         hQ8isdmZPD6NujUgigIuUNEYNbrwhOz7JBIcLosjeaXSgYu68/PyVIyHXaLcbe4nsyfx
-         Kb1sUWNFc/E/nEyjUdaDtLYvHiTha96qUwa8RZef4qRnSr/+bg9y+iWLqW9aHOORtssj
-         rPZg==
-X-Gm-Message-State: ACrzQf2FFeInIXQiZTKPK3pOsN/3Top2QCWFt1df7J6KxxAf5LKxLorc
-        Y1IlR/gDxyiUeg4AlqpHxoM=
-X-Google-Smtp-Source: AMsMyM6wPTQbb/wpm4NYDTyzteu9Ju/f5nYNm4NlJda34lAJsiPgMThwpAp8l1Io6xLGw26w5R/LwQ==
-X-Received: by 2002:a17:90b:3149:b0:202:e9e9:632f with SMTP id ip9-20020a17090b314900b00202e9e9632fmr24463065pjb.96.1664566732077;
-        Fri, 30 Sep 2022 12:38:52 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:56f2:482f:20c2:1d35? ([2620:15c:211:201:56f2:482f:20c2:1d35])
-        by smtp.gmail.com with ESMTPSA id z5-20020aa79f85000000b0052e6c058bccsm2187903pfr.61.2022.09.30.12.38.49
+        bh=gQa4eGbEVBeAKBGzZEdWdAqwKEPR/qyaUUpn0AQUmcY=;
+        b=w680MbD93eHE/86UrTKSvoj8+l4/5TpLysafIy5hYGtYF2eNqUh9k1aAuDUIsu0jgx
+         GJE33vcgyE05pp3f6IPJ/rt8fhZggos1WpekBZE++ZVj4cGuxoy/aXI8ksAksLCneXDD
+         gHlYzTtOPifcotSc1jSzqRogV98mBceBRr4yx8OHe85ajfhJDKUaPQrBB6K6ZFQWiVmy
+         vypWVWa/ZdaPz9TNygTKuDSxzatmdrya7fQcH22W23ZtALDYQMCJWn3gd+ginzjz6BYs
+         tFC717PbVboA9XkVLKtQU6eA63ccRMrHy7HopMGlige5lqIiOUq5Hoq5yu3QhVHWa2rG
+         Vf+A==
+X-Gm-Message-State: ACrzQf1nooKC3p45HcNMVA7qcZLqnQqpaQlgzD6rZMYSiskTP+u9Z/bf
+        gqkPYTUDCXxca0LwDFMn3DehfQ==
+X-Google-Smtp-Source: AMsMyM6bH8LWTyKM8E6TZPLLzzJcAnhCSq843METl4dQR8aOBKDpfMXeY2d7Z+NB8UVtrtjnFjkUSQ==
+X-Received: by 2002:a63:d603:0:b0:43c:6762:20d9 with SMTP id q3-20020a63d603000000b0043c676220d9mr9108628pgg.68.1664573086605;
+        Fri, 30 Sep 2022 14:24:46 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id q15-20020a17090ad38f00b00209a12b3879sm2028502pju.37.2022.09.30.14.24.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Sep 2022 12:38:51 -0700 (PDT)
-Message-ID: <0e5088a5-5408-c5bd-bf97-00803cb5faed@acm.org>
-Date:   Fri, 30 Sep 2022 12:38:48 -0700
+        Fri, 30 Sep 2022 14:24:46 -0700 (PDT)
+Message-ID: <90b6d45e-61a5-3eb3-7525-8467f1a67587@kernel.dk>
+Date:   Fri, 30 Sep 2022 15:24:44 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
 Subject: Re: [PATCH v15 00/13] support zoned block devices with non-power-of-2
  zone sizes
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Pankaj Raghav <p.raghav@samsung.com>,
-        hch@lst.de, Keith Busch <kbusch@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
+        Keith Busch <kbusch@kernel.org>
 Cc:     jaegeuk@kernel.org, agk@redhat.com, gost.dev@samsung.com,
         snitzer@kernel.org, damien.lemoal@opensource.wdc.com,
         linux-kernel@vger.kernel.org, hare@suse.de,
@@ -59,45 +72,47 @@ References: <CGME20220923173619eucas1p13e645adbe1c8eb62fb48b52c0248ed65@eucas1p1
  <20220923173618.6899-1-p.raghav@samsung.com>
  <5e9d678f-ffea-e015-53d8-7e80f3deda1e@samsung.com>
  <bd9479f4-ff87-6e5d-296e-e31e669fb148@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <bd9479f4-ff87-6e5d-296e-e31e669fb148@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <0e5088a5-5408-c5bd-bf97-00803cb5faed@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <0e5088a5-5408-c5bd-bf97-00803cb5faed@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/22 08:13, Jens Axboe wrote:
-> On 9/29/22 12:31 AM, Pankaj Raghav wrote:
->>> Hi Jens,
->>>    Please consider this patch series for the 6.1 release.
+On 9/30/22 1:38 PM, Bart Van Assche wrote:
+> On 9/30/22 08:13, Jens Axboe wrote:
+>> On 9/29/22 12:31 AM, Pankaj Raghav wrote:
+>>>> Hi Jens,
+>>>> ?? Please consider this patch series for the 6.1 release.
+>>>>
 >>>
+>>> Hi Jens, Christoph, and Keith,
+>>> ? All the patches have a Reviewed-by tag at this point. Can we queue this up
+>>> for 6.1?
 >>
->> Hi Jens, Christoph, and Keith,
->>   All the patches have a Reviewed-by tag at this point. Can we queue this up
->> for 6.1?
+>> It's getting pretty late for 6.1 and I'd really like to have both Christoph
+>> and Martin sign off on these changes.
 > 
-> It's getting pretty late for 6.1 and I'd really like to have both Christoph
-> and Martin sign off on these changes.
+> Hi Jens,
+> 
+> Agreed that it's getting late for 6.1.
+> 
+> Since this has not been mentioned in the cover letter, I want to add
+> that in the near future we will need these patches for Android
+> devices. JEDEC is working on supporting zoned storage for UFS devices,
+> the storage devices used in all modern Android phones. Although it
+> would be possible to make the offset between zone starts a power of
+> two by inserting gap zones between data zones, UFS vendors asked not
+> to do this and hence need support for zone sizes that are not a power
+> of two. An advantage of not having to deal with gap zones is better
+> filesystem performance since filesystem extents cannot span gap zones.
+> Having to split filesystem extents because of gap zones reduces
+> filesystem performance.
 
-Hi Jens,
+Noted. I'll find some time to review this as well separately, once we're
+on the other side of the merge window.
 
-Agreed that it's getting late for 6.1.
-
-Since this has not been mentioned in the cover letter, I want to add 
-that in the near future we will need these patches for Android devices. 
-JEDEC is working on supporting zoned storage for UFS devices, the 
-storage devices used in all modern Android phones. Although it would be 
-possible to make the offset between zone starts a power of two by 
-inserting gap zones between data zones, UFS vendors asked not to do this 
-and hence need support for zone sizes that are not a power of two. An 
-advantage of not having to deal with gap zones is better filesystem 
-performance since filesystem extents cannot span gap zones. Having to 
-split filesystem extents because of gap zones reduces filesystem 
-performance.
-
-Thanks,
-
-Bart.
-
-
+-- 
+Jens Axboe
