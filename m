@@ -2,129 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 685DEC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 09:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CC6C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 09:52:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbiI3JYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 05:24:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59938 "EHLO
+        id S230152AbiI3Jwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 05:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230308AbiI3JYV (ORCPT
+        with ESMTP id S230382AbiI3Jwx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 05:24:21 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D880156C14;
-        Fri, 30 Sep 2022 02:24:19 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id lx7so3769351pjb.0;
-        Fri, 30 Sep 2022 02:24:19 -0700 (PDT)
+        Fri, 30 Sep 2022 05:52:53 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434A312888B;
+        Fri, 30 Sep 2022 02:52:52 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id q17so4228336lji.11;
+        Fri, 30 Sep 2022 02:52:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date;
-        bh=6iCG4gazXB3pWG0Bfe/MnWxlMViLhtA9EAJcveW3FPM=;
-        b=W8OHm3zvUFFggryKe7RZxVt5JEGExVo3SyxpqYHCRTDO48QYpRWDUDvTaQ6MtxbOl/
-         ryUTCUoPBtbcqWZw0R7IRMb0+C9HqtXCLNXViblCLZTjDRkzYmfNfE/4i4a58lLi7vsa
-         4n6GdPfagn4cQj1WX5/emS676OYXTYRv57IT/K2NhQkELAFeEZvGWt0ofqlLZi5ciuWs
-         9pcv1VjqQOrq+UaxiCYkVmPLlY9kLYn4xkHz2480/0r2O3invpGRPxHMr7EHB1yzVBZy
-         Us5bWBxoEjPuFC4io5ABSU0ceUr7xoQzozmxLabsHlNnBWo9GfEEQHihVQsuLaiI0PaE
-         lMHg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=5e++Bq8byiSeO9h99CYt5V1LItyqEPo3VTEHQk8BylQ=;
+        b=HwxvMPTlOzXP1QfP3zDzS7IbqRifPUtcnIIb0LaVXEe1n8584HeeBV8pTDgaEoqFFP
+         LawrtsDaBnla4Y9Nh0y6H6BypJloBhWDZ6FLzwUYBdbmj1l50NGkzyULniykfbiaw8Sj
+         E+NDJQ1izK3UOlHhKpxSvb6uRs0xUL7i/rX0a2V6a99AJw79LQYkFEKFIoXIf6pHtxTf
+         wRqtb+F4+9MAoZp56CAnTtFpaAaWP4AWMM7LaZyQzVBq94EsnvH7hhHOqJR4O3GiBGS7
+         qtb04qii52P1uk1QTF6QvtZbJRzlGOhCHqAOWTw9M6zzzx7k8ZmKcUvP86vHMW7WPnqz
+         aA9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=6iCG4gazXB3pWG0Bfe/MnWxlMViLhtA9EAJcveW3FPM=;
-        b=lkyUhx7A5227DSeSCtYCWpU3NXuh8G6LcCB9iNY4DfIb/RK+ZECF3vOG2KWfWeZjT1
-         Xb8i1elvNEJOd0FmvImds3OhryqbUPGSHVwXMHqBxR6WPdaUC7Ts7Sucq5/4x75cesJT
-         izn8hZpvJ6JEKqAqRxQrN1FSn6sjQCqRK7nVK0V0QNPR+LGAL3+DQIlM73TyCig+Er38
-         uXotz8Egsyk3Wz4wuzDGB3h36BczlsNwyVPvG4b0UARJdwg6XUL3b5SWx3fVY4sCZmYw
-         tSiL4S5QWHgEjRcCPDQIVhyYSOn4anInFNJvB5dSd8fCNW1+34zWpzrbzh8cK60MNRnW
-         J4UQ==
-X-Gm-Message-State: ACrzQf1CK8cuHtyAS4zrIsmD5z+1deD/DxWEE9PRBgms9y8QxvWZFuIn
-        2y8lQhtRQFuv6phm1Wbx6J1yPrU8Nu8tVw==
-X-Google-Smtp-Source: AMsMyM7eeeVzQYgbUMSdujcKlMzcGJ72cz07MoTFpwokTQWD0n1LgIel+K8xU1qvisQNl/8S8qZd5w==
-X-Received: by 2002:a17:902:e552:b0:179:e796:b432 with SMTP id n18-20020a170902e55200b00179e796b432mr7823816plf.21.1664529858681;
-        Fri, 30 Sep 2022 02:24:18 -0700 (PDT)
-Received: from T590 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id k11-20020a17090a404b00b001f559e00473sm4879248pjg.43.2022.09.30.02.24.14
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=5e++Bq8byiSeO9h99CYt5V1LItyqEPo3VTEHQk8BylQ=;
+        b=i+pjiBvtElZU25pXdcbutEI9LTpvIpT0M+cmT2wIKd1qF+IK0O8JBEsc1Dc+fHeLcO
+         JZXFfAHw4tYG2shrduozfAXh0WDrtgP9UK6L7j5QmCTKANuJAyrPh4OL41F5GELpyo7t
+         HLzvFQYpb7aGMllUnBu7wvQt4AlSW8o/91cMWKbx0BqWOQ7FWpkuR03qDiNP2rmO5xt8
+         blklvFo4+VDLghoQS5I7n454YFWOmenEJt4sIZatzW7Jml0o0aDnVstf/jbDy4YJ92lL
+         4+AQ2X+zYpSOnExkKK357D59YYHG0DcOgyx0hGoVP6o75yDV0XVGM6jwjF4APX32qf9S
+         e+tg==
+X-Gm-Message-State: ACrzQf2hZveKdq2J1rOdU7L7YWbyz6Yee5AyBwQrDz8q5ume0l61xCEE
+        fcp3Ug3RsFJxm6WAB+NVtLO8w6euOuySkA==
+X-Google-Smtp-Source: AMsMyM5W3qggiqHyrqng78Ar+doOtQG5XPfZcA7kWDg4EtlNDKjdeRjPyWaF128cmsRAZ/ILfiIL2Q==
+X-Received: by 2002:a05:651c:2205:b0:26c:622e:afef with SMTP id y5-20020a05651c220500b0026c622eafefmr2879674ljq.242.1664531570503;
+        Fri, 30 Sep 2022 02:52:50 -0700 (PDT)
+Received: from mobilestation ([95.79.133.202])
+        by smtp.gmail.com with ESMTPSA id c17-20020a056512105100b004a1e592837esm242979lfb.140.2022.09.30.02.52.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 02:24:18 -0700 (PDT)
-Date:   Fri, 30 Sep 2022 17:24:11 +0800
-From:   Ming Lei <tom.leiming@gmail.com>
-To:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Fri, 30 Sep 2022 02:52:49 -0700 (PDT)
+Date:   Fri, 30 Sep 2022 12:52:47 +0300
+From:   Serge Semin <fancer.lancer@gmail.com>
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Subject: ublk-qcow2: ublk-qcow2 is available
-Message-ID: <Yza1u1KfKa7ycQm0@T590>
+Subject: Re: [PATCH v2 1/3] nvme-hwmon: Return error on kzalloc failure
+Message-ID: <20220930095247.vqtdc53rr66uaiwv@mobilestation>
+References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
+ <20220929224648.8997-2-Sergey.Semin@baikalelectronics.ru>
+ <YzYwB7lRGW80r4HA@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <YzYwB7lRGW80r4HA@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Thu, Sep 29, 2022 at 05:53:43PM -0600, Keith Busch wrote:
+> On Fri, Sep 30, 2022 at 01:46:46AM +0300, Serge Semin wrote:
+> > Inability to allocate a buffer is a critical error which shouldn't be
+> > tolerated since most likely the rest of the driver won't work correctly.
+> > Thus instead of returning the zero status let's return the -ENOMEM error
+> > if the nvme_hwmon_data structure instance couldn't be created.
+> 
 
-ublk-qcow2 is available now.
+> Nak for this one. The hwmon is not necessary for the rest of the driver to
+> function, so having the driver detach from the device seems a bit harsh.
 
-So far it provides basic read/write function, and compression and snapshot
-aren't supported yet. The target/backend implementation is completely
-based on io_uring, and share the same io_uring with ublk IO command
-handler, just like what ublk-loop does.
+Even if it is as you say, neither the method semantic nor the way it's
+called imply that. Any failures except the allocation one are
+perceived as erroneous.
 
-Follows the main motivations of ublk-qcow2:
+> The
+> driver can participate in memory reclaim, so failing on a low memory condition
+> can make matters worse.
 
-- building one complicated target from scratch helps libublksrv APIs/functions
-  become mature/stable more quickly, since qcow2 is complicated and needs more
-  requirement from libublksrv compared with other simple ones(loop, null)
+Yes it can, so can many other places in the driver utilizing kmalloc
+with just GFP_KERNEL flag passed including on the same path as the
+nvme_hwmon_init() execution. Kmalloc will make sure the reclaim is
+either finished or executed in background anyway in all cases. Don't
+really see why memory allocation failure is less worse in this case
+than in many others in the same driver especially seeing as I said
+above the method semantic doesn't imply the optional feature
+detection. Moreover the allocated structure isn't huge at all. So
+failing to allocate that would indeed mean problems with the memory
+resource.
 
-- there are several attempts of implementing qcow2 driver in kernel, such as
-  ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
-  might useful be for covering requirement in this field
+> 
+> The rest looks good, though.
 
-- performance comparison with qemu-nbd, and it was my 1st thought to evaluate
-  performance of ublk/io_uring backend by writing one ublk-qcow2 since ublksrv
-  is started
+but you ok with kmalloc in the next line. Seems like contradicting.
 
-- help to abstract common building block or design pattern for writing new ublk
-  target/backend
+@Christoph, what do you think about this?
 
-So far it basically passes xfstest(XFS) test by using ublk-qcow2 block
-device as TEST_DEV, and kernel building workload is verified too. Also
-soft update approach is applied in meta flushing, and meta data
-integrity is guaranteed, 'make test T=qcow2/040' covers this kind of
-test, and only cluster leak is reported during this test.
+-Sergey
 
-The performance data looks much better compared with qemu-nbd, see
-details in commit log[1], README[5] and STATUS[6]. And the test covers both
-empty image and pre-allocated image, for example of pre-allocated qcow2
-image(8GB):
-
-- qemu-nbd (make test T=qcow2/002)
-	randwrite(4k): jobs 1, iops 24605
-	randread(4k): jobs 1, iops 30938
-	randrw(4k): jobs 1, iops read 13981 write 14001
-	rw(512k): jobs 1, iops read 724 write 728
-
-- ublk-qcow2 (make test T=qcow2/022)
-	randwrite(4k): jobs 1, iops 104481
-	randread(4k): jobs 1, iops 114937
-	randrw(4k): jobs 1, iops read 53630 write 53577
-	rw(512k): jobs 1, iops read 1412 write 1423
-
-Also ublk-qcow2 aligns queue's chunk_sectors limit with qcow2's cluster size,
-which is 64KB at default, this way simplifies backend io handling, but
-it could be increased to 512K or more proper size for improving sequential
-IO perf, just need one coroutine to handle more than one IOs.
-
-
-[1] https://github.com/ming1/ubdsrv/commit/9faabbec3a92ca83ddae92335c66eabbeff654e7
-[2] https://upcommons.upc.edu/bitstream/handle/2099.1/9619/65757.pdf?sequence=1&isAllowed=y
-[3] https://lwn.net/Articles/889429/
-[4] https://lab.ks.uni-freiburg.de/projects/kernel-qcow2/repository
-[5] https://github.com/ming1/ubdsrv/blob/master/qcow2/README.rst
-[6] https://github.com/ming1/ubdsrv/blob/master/qcow2/STATUS.rst
-
-Thanks,
-Ming
+> 
+> > @@ -230,7 +230,7 @@ int nvme_hwmon_init(struct nvme_ctrl *ctrl)
+> >  
+> >  	data = kzalloc(sizeof(*data), GFP_KERNEL);
+> >  	if (!data)
+> > -		return 0;
+> > +		return -ENOMEM;
+> >  
+> >  	data->ctrl = ctrl;
+> >  	mutex_init(&data->read_lock);
+> > -- 
