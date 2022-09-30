@@ -2,61 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995DAC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 15:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E142C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 16:35:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231752AbiI3P7f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 11:59:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58908 "EHLO
+        id S231888AbiI3Qfq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Sep 2022 12:35:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231284AbiI3P7b (ORCPT
+        with ESMTP id S231284AbiI3Qfp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 11:59:31 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 320CF1B052D
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 08:59:30 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id hy2so9932669ejc.8
-        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 08:59:30 -0700 (PDT)
+        Fri, 30 Sep 2022 12:35:45 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16969F50B7
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 09:35:41 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id 64so3668766iov.13
+        for <linux-block@vger.kernel.org>; Fri, 30 Sep 2022 09:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date;
-        bh=tv98VyOmh2tNklw+nKuuqFH6TMgkeQl1m1GokPReHXk=;
-        b=FkP/qXTIM5Fv/AgMpu52jxfmLGyRy3Q2bQp7d8I4VfYchqAP5GiZVcUNwlsPYzPthb
-         HmHchmBFFernPOjwkqJQ1B64ISlwW0D1b5U0LL0XpMSKuZihqZqR74oRz5zyi+7c5Cxb
-         5tS8WxRDU1WR62bMilTZkQgY5Fimq34YfFYjTznkC6tI0aWk2z28XU4xWjgCZmQ5EpR9
-         L/JaGee9tsgw+M5PpOOh/6cfZMYlkmM1bcEA8Vq0YIv43fftk1wW4YEmJAAam5XzjNqx
-         32r6CYFyXBDj1ePpLGTVD5zQE6kwx2t49SkUz+Bw9Y/ZpzYaohgrH1KR0oK94v50BxWJ
-         qwkg==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=Kezpom8rJsVG2Syyn3/zEYfm5bdVOEFSAlE2suSQHSw=;
+        b=Ua3NLrKFNNJu6C4h1UF2NO39rwaNSmYfnEN7gjCb18BRAS6dacl6NzRduKI+jgI2oG
+         6UemSvw3H8jUS9rZlDzuIY60pEwUbh/+U944llY6mSCOb22iWIAUy6ouvWSMD5iQ8P9v
+         xK+UeWkyfqW3yhiVBHd0Mu5t+ei4IcGnQVt2yzEkbQ7eWFjPQMVbqRFGleMgMgVnu8c6
+         6Ra+8kdkNgM7auHiixqajLA+e8Rto+/xwTD+r3r7GwF2/b+nGls6wTTOGvGPBdevM/Dm
+         ZxmMT22DFu/WD/bdD7ed0ViI0hg8TkaQTH4Z3nMCrvpL9+RYjlDPbsPfKON3KK9cl+92
+         Ovaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=tv98VyOmh2tNklw+nKuuqFH6TMgkeQl1m1GokPReHXk=;
-        b=x4UHGzqz9rE93usK0OJls987dCYa71IApKPjBPm/tReotmfnGu2IacZrVMxhSxYUjo
-         atd0mb4C8v0y2Rq/ml+RnwmczOnXRgbqLtCmXOUWqOrf0fqk6NzuzqICgWQnlZebzQpA
-         0duNdgEXI4BEeNrFRD3BjXD3u5D/JFZmH/03ksENscKDihwee6GwfR5Ra30/1i2vILMD
-         Xgm+uAWhqhjl9PX0kph1gtiZXbMpMhVPr7MiQ7qJRU5RngT0s1Gnftp6+eqoVDp274zc
-         PxPVn815GTj+OcYj67yyowL52GGeg0/7fWP3+RaWoUiHnuzn60xA6LmDZasPIxLCxRQ3
-         517w==
-X-Gm-Message-State: ACrzQf3NgxRyuCz2YC1pT9iYPh+7zaM1TiWPBnvezEvps5bTnjihSw9u
-        NM2WeBQJG6Fxe4FO3xoqzui+Wg==
-X-Google-Smtp-Source: AMsMyM61A7Yq8mVoKx1yGfuAHMuqZhe0Jzif9odhOvVOt8h8/4dz6TV1vQQx04lsTJxcKrIZeIBwig==
-X-Received: by 2002:a17:906:6a02:b0:787:8b8b:8c7e with SMTP id qw2-20020a1709066a0200b007878b8b8c7emr7025043ejc.160.1664553568692;
-        Fri, 30 Sep 2022 08:59:28 -0700 (PDT)
-Received: from mbp-di-paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
-        by smtp.gmail.com with ESMTPSA id q26-20020a17090676da00b0077ce503bd77sm1348873ejn.129.2022.09.30.08.59.27
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Sep 2022 08:59:28 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: block: wrong return value by bio_end_sector?
-Message-Id: <D4FC5552-B3C8-4118-B3C8-C6BF20C793B4@linaro.org>
-Date:   Fri, 30 Sep 2022 17:59:26 +0200
-To:     Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Kezpom8rJsVG2Syyn3/zEYfm5bdVOEFSAlE2suSQHSw=;
+        b=n72Cxk5BVenaDwpsNVttcTqiLwljqI4By+M5QorpYjAhhQppOjNn4j+fzu7o9XQFJZ
+         ogqQYgUmiJTwlZ7PoBzwkAQr6OYhf/E61nxwb6subj0wnT2L51vWh0SRKPZ9SY5d06TL
+         v/QHeUK+qjVuw4c+GBTPj+4oDdcwbm+owFALMa7kfpByGbx6cum4pslCp7GvBfM7kfwn
+         56hy2ar/Mbu0RexAjo9BWdpoVGfAXAz6VV/ZS/Jh3NdwVZqtsX0XxR8cgFEOoZjSVl++
+         QnEJ5stztf2U+vg92hi7OxgrebFTPLHFQJz1byVM6GMR2YPBc0nqK/EIUixIoN1NDGaE
+         vRRA==
+X-Gm-Message-State: ACrzQf3v8/Z/BttXIoR7odFOgnrbrCyYR/uyJFA0lorVWJxWgFgudPWd
+        H5ZXD3T5RCNIQhLDY6MS3d1qiQ==
+X-Google-Smtp-Source: AMsMyM6Bo9kMyMyymRpkgRpKKTUXxbHzMlJDn6OcG2Z3krboh5VsAHz+9gA1c/PjmQHw9bBBWA8O6w==
+X-Received: by 2002:a05:6602:3944:b0:6a4:cae3:12fd with SMTP id bt4-20020a056602394400b006a4cae312fdmr4452725iob.189.1664555741237;
+        Fri, 30 Sep 2022 09:35:41 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id x37-20020a0294a8000000b003583063a6cdsm1089478jah.104.2022.09.30.09.35.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Sep 2022 09:35:40 -0700 (PDT)
+Message-ID: <12aa1043-14c3-0f95-6cb4-f7a021268ae4@kernel.dk>
+Date:   Fri, 30 Sep 2022 10:35:38 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: block: wrong return value by bio_end_sector?
+Content-Language: en-US
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
         Tyler Erickson <tyler.erickson@seagate.com>,
         Muhammad Ahmad <muhammad.ahmad@seagate.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -64,68 +66,36 @@ To:     Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
         Jan Kara <jack@suse.cz>,
         "andrea.righi@canonical.com" <andrea.righi@canonical.com>,
         "glen.valante@linaro.org" <glen.valante@linaro.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
         Michael English <michael.english@seagate.com>,
         Andrew Ring <andrew.ring@seagate.com>,
         Varun Boddu <varunreddy.boddu@seagate.com>,
         Damien Le Moal <damien.lemoal@wdc.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+References: <D4FC5552-B3C8-4118-B3C8-C6BF20C793B4@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <D4FC5552-B3C8-4118-B3C8-C6BF20C793B4@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens, Damien, all other possibly interested people,
-this is to raise attention on a mistake that has emerged in a
-thread on a bfq extension for multi-actuary drives [1].
+On 9/30/22 9:59 AM, Paolo Valente wrote:
+> Hi Jens, Damien, all other possibly interested people,
+> this is to raise attention on a mistake that has emerged in a
+> thread on a bfq extension for multi-actuary drives [1].
+> 
+> The mistake is apparently in the macro bio_end_sector (defined in
+> include/linux/bio.h), which seems to be translated (incorrectly) as
+> sector+size, and not as sector+size-1.
+> 
+> For your convenience, I'm pasting a detailed description of the
+> problem, by Tyler (description taken from the above thread [1]).
 
-The mistake is apparently in the macro bio_end_sector (defined in
-include/linux/bio.h), which seems to be translated (incorrectly) as
-sector+size, and not as sector+size-1.
+I'm a little confused - currently it returns non-inclusive end, the
+proposed change just make it inclusive. In general in the kernel the
+former is used, and this one follows that.
 
-For your convenience, I'm pasting a detailed description of the
-problem, by Tyler (description taken from the above thread [1]).
+-- 
+Jens Axboe
 
-The drive reports the actuator ranges as a starting LBA and a count of =
-LBAs for the range.
-If the code reading the reported values simply does startingLBA + range, =
-this is an incorrect ending LBA for that actuator. This is because LBAs =
-are zero indexed and this simple addition is not taking that into =
-account.
-The proper way to get the endingLBA is startingLBA + range - 1 to get =
-the last LBA value for where to issue a final IO read/write to account =
-for LBA values starting at zero rather than one.
 
-Here is an example from the output in SeaChest/openSeaChest:
-=3D=3D=3D=3DConcurrent Positioning Ranges=3D=3D=3D=3D
-
-Range#     #Elements            Lowest LBA          # of LBAs     =20
-  0            1                                               0         =
-  17578328064
-  1            1                         17578328064           =
-17578328064
-
-If using the incorrect formula to get the final LBA for actuator 0, you =
-would get 17578328064, but this is the starting LBA reported by the =
-drive for actuator 1.
-So to be consistent for all ranges, the final LBA for a given actuator =
-should be calculated as starting LBA + range - 1.
-
-I had reached out to Seagate's T10 and T13 representatives for =
-clarification and verification and this is most likely what is causing =
-the error is a missing - 1 somewhere after getting the information =
-reported by the device. They agreed that the reporting from the drive =
-and the SCSI to ATA translation is correct.
-
-I'm not sure where this is being read and calculated, but it is not an =
-error in the low-level libata or sd level of the kernel. It may be in =
-bfq, or it may be in some other place after the sd layer. I know there =
-were some additions to read this and report it up the stack, but I did =
-not think those were wrong as they seemed to pass the drive reported =
-information up the stack.
-
-Jens, Damien, can you shed a light on this?
-
-Thanks,
-Paolo
-
-[1] https://www.spinics.net/lists/kernel/msg4507408.html=
