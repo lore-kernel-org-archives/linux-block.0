@@ -2,100 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D18EC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 29 Sep 2022 23:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4097BC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 30 Sep 2022 00:08:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229495AbiI2X6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Sep 2022 19:58:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37152 "EHLO
+        id S229498AbiI3AIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Sep 2022 20:08:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbiI2X6n (ORCPT
+        with ESMTP id S229524AbiI3AIU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Sep 2022 19:58:43 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAB55DD34D
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 16:58:42 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id v10-20020a17090a634a00b00205e48cf845so7417759pjs.4
-        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 16:58:42 -0700 (PDT)
+        Thu, 29 Sep 2022 20:08:20 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34FE4200B1C
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 17:08:19 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id a80so2831151pfa.4
+        for <linux-block@vger.kernel.org>; Thu, 29 Sep 2022 17:08:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
-        bh=BxDGR1WvgjKrBhJw6cyiVAQVtKbUU/nQwv2StZb0cVo=;
-        b=QufG7IdzNKypsywKUg1oxcHaqMXJmy7xEkdUuxH6St6W6HKzRSZJv4b7arBCg+L/8/
-         4EVeCVP1XGK0EAX7fNV5ejcNtzxrZtsVTISl3ZANaD6uEdGDDOjh7vv3El6jb24ydXO3
-         ruEoAbMVZYYsOyWxpaZ1GcQE5Bj1/XmHpzMVGqHRJ89zs9q2qJUDZgGaNVMgpWbsSpRG
-         poQ9cTrKXrqS0Y1VAo9I81KPbTbhcfnGfO022FNu5hfFrlYIOus+OwnzERlwOPMwSiFt
-         38SQRRtpv+SgHKVdK4lAPPS7uH/9cGrqtzorbx4L1iLKq5cIQL3l5QAzTrJNsDTwJud9
-         1dnA==
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=eFv2DXNGP7+TwfqtcxKjZ1YQUTflSUL1IVygY4MFlKI=;
+        b=EzbUiSPk7hYCUrgM2gkMLGOVcVpSMYimXtZhvk5gP7RH1nRcXLWrndO/vOVGdWsINu
+         /KNLbNUN9TYIfk7mZZRKrsK3gg9rV3Rgpk54omqRIZjFLSxbh2OZFj+il/y6ds79dGHL
+         yuWzJ7sJlafrDrkkzWFNU3n4fjK8IjVBrZIYTa9kLpgx94X7Y+PltKbOPn4a0Z/FTAO1
+         xw26yuuzi+c5rTHnteHZKZlwVJBmdqHnePuMQRt2OWihGJlMPiu+8aJ8KDsgqqtE4C8L
+         FpE0dcUmvy8hMb0Hwqz2hkQMXGLfQqU62DuUB/JDCMLit85uI9qeDXbps6xKkaAywwJU
+         Qlkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=BxDGR1WvgjKrBhJw6cyiVAQVtKbUU/nQwv2StZb0cVo=;
-        b=cqZnx35QklPCz0VLsa2IzOuyLcYwjrB8BJQOkqj8kEu+QIV4w3o8Y6jfR1pGwH+nv4
-         T7YD9tCy76W6GUVhmKyAM0z1NhcCdlexdYAxWISHeWRGvyQQdzWpUa6v/pLZNQVbbgcv
-         dk48VBkq5+DF6O5nNk8zza+CEaTq4paFE8YbTfsLSiPUS0mGixxhSFx7mqM6zYMQZ4x7
-         MNz03wnX2UztRjEcSZHueY1Fxg9526uYm4T03WMe5ly6WEttj22Y9ljNwYwCp7mv0RIJ
-         oJ3gJsO46aHikHBwqooTAtRFZQLz+4BUF/6/9DChhyHIAsUki1XiaZgRuWJ5z04B2vnK
-         nBeQ==
-X-Gm-Message-State: ACrzQf0YqOABwzmrWDqxOPXL/NS/nEz1oncKxu/IzNPBypgbutq7K1nT
-        kdfwaOLNCO3GixGntZxArV53fNIn2u9Q5w==
-X-Google-Smtp-Source: AMsMyM46NzOkXRtY9l0v4AoEqmQm8aFSFaVxv8RWvFPd7j56uIqpPIPfYlng4lihPhFxcdax937zgQ==
-X-Received: by 2002:a17:90b:2785:b0:203:6279:f03a with SMTP id pw5-20020a17090b278500b002036279f03amr19139930pjb.36.1664495922428;
-        Thu, 29 Sep 2022 16:58:42 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b00172f4835f53sm457627plg.192.2022.09.29.16.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 16:58:41 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Hugh Dickins <hughd@google.com>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Liu Song <liusong@linux.alibaba.com>,
-        Hillf Danton <hdanton@sina.com>, Jan Kara <jack@suse.cz>,
-        linux-kernel@vger.kernel.org, Yu Kuai <yukuai1@huaweicloud.com>
-In-Reply-To: <9c2038a7-cdc5-5ee-854c-fbc6168bf16@google.com>
-References: <d83885c9-2635-ef45-2ccc-a7e06421e1cc@google.com> <Yy4D54kPpenBkjHz@kbusch-mbp.dhcp.thefacebook.com>
- <391b1763-7146-857-e3b6-dc2a8e797162@google.com> <929a3aba-72b0-5e-5b80-824a2b7f5dc7@google.com>
- <20220926114416.t7t65u66ze76aiz7@quack3> <4539e48-417-edae-d42-9ef84602af0@google.com>
- <20220927103123.cvjbdx6lqv7jxa2w@quack3> <2b931ee7-1bc9-e389-9d9f-71eb778dcf1@google.com>
- <f975dddf-6ec-b3cb-3746-e91f61b22ea@google.com> <9f68731-e699-5679-6a71-77634767b8dd@google.com>
- <20220929083939.ioytch563qikyflz@quack3> <9c2038a7-cdc5-5ee-854c-fbc6168bf16@google.com>
-Subject: Re: [PATCH next v3] sbitmap: fix lockup while swapping
-Message-Id: <166449592135.4485.5114483552637281957.b4-ty@kernel.dk>
-Date:   Thu, 29 Sep 2022 17:58:41 -0600
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=eFv2DXNGP7+TwfqtcxKjZ1YQUTflSUL1IVygY4MFlKI=;
+        b=mFF2vCSfvk9GKOELDCdUo7T3btEno+ArU4JbNLRAb/V5t2raZ/P0Nk6GA42u3pyclq
+         bY3GTxQ5NbKTf9PsnOS/tLNHA+201uY4tKuqukGfyPQbuwAp78j/U6RcMKEHmyiIRapx
+         RZaefx+kzHiVvugMYeLFjekpBtkILKpYbFen2rocJo6fd/CDRQCEQM0O6G9RijuJX/2P
+         0x/m184ziDdphdnXtOebicjAXVuDJROI1UnkzMlHW+U1mU9DajXOc/7Q1VDFsZjhnWax
+         24YMU9XWfL9ORkKD2n4Oav9JAm//enYb9Pd6jzRp4KliiyXktLQR247gAat4QmEMfbB2
+         qodA==
+X-Gm-Message-State: ACrzQf16pdRsQJkjuGIJhy9QwRcPnmZG/K5KPmsU1uuyO3lgCt5pPVzR
+        eTfuIozwE9iY+dc9nK7rPupyXA==
+X-Google-Smtp-Source: AMsMyM6cMdM75zBZ/1Nn5XH7fjOX1viqcgRH3OX6Sra4iYSVWg5ZonhXFUyjJLvtx1lM53UFTaIKBg==
+X-Received: by 2002:a05:6a00:b41:b0:52f:59dc:75 with SMTP id p1-20020a056a000b4100b0052f59dc0075mr6111006pfo.33.1664496498640;
+        Thu, 29 Sep 2022 17:08:18 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b001755e4278a6sm445046plb.261.2022.09.29.17.08.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Sep 2022 17:08:17 -0700 (PDT)
+Message-ID: <c2cab5be-658d-3c50-b1a0-1d7d86e12e0b@kernel.dk>
+Date:   Thu, 29 Sep 2022 18:08:16 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH rfc] nvme: support io stats on the mpath device
+To:     Sagi Grimberg <sagi@grimberg.me>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        linux-nvme@lists.infradead.org
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+References: <20220928195510.165062-1-sagi@grimberg.me>
+ <20220928195510.165062-2-sagi@grimberg.me>
+ <760a7129-945c-35fa-6bd6-aa315d717bc5@nvidia.com>
+ <a3d619a3-ccae-69ea-3e2c-9acff7b97d92@grimberg.me>
+ <04b39974-6b55-7aca-70de-4a567f2eac8f@kernel.dk>
+ <91ebc84d-c0e3-b792-4f92-79612271eb91@grimberg.me>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <91ebc84d-c0e3-b792-4f92-79612271eb91@grimberg.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 29 Sep 2022 12:50:12 -0700 (PDT), Hugh Dickins wrote:
-> Commit 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
-> is a big improvement: without it, I had to revert to before commit
-> 040b83fcecfb ("sbitmap: fix possible io hung due to lost wakeup")
-> to avoid the high system time and freezes which that had introduced.
+On 9/29/22 10:25 AM, Sagi Grimberg wrote:
 > 
-> Now okay on the NVME laptop, but 4acb83417cad is a disaster for heavy
-> swapping (kernel builds in low memory) on another: soon locking up in
-> sbitmap_queue_wake_up() (into which __sbq_wake_up() is inlined), cycling
-> around with waitqueue_active() but wait_cnt 0 .  Here is a backtrace,
-> showing the common pattern of outer sbitmap_queue_wake_up() interrupted
-> before setting wait_cnt 0 back to wake_batch (in some cases other CPUs
-> are idle, in other cases they're spinning for a lock in dd_bio_merge()):
+>>>> 3. Do you have some performance numbers (we're touching the fast path here) ?
+>>>
+>>> This is pretty light-weight, accounting is per-cpu and only wrapped by
+>>> preemption disable. This is a very small price to pay for what we gain.
+>>
+>> Is it? Enabling IO stats for normal devices has a very noticeable impact
+>> on performance at the higher end of the scale.
 > 
-> [...]
+> Interesting, I didn't think this would be that noticeable. How much
+> would you quantify the impact in terms of %?
 
-Applied, thanks!
+If we take it to the extreme - my usual peak benchmark, which is drive
+limited at 122M IOPS, run at 113M IOPS if I have iostats enabled. If I
+lower the queue depth (128 -> 16), then peak goes from 46M to 44M. Not
+as dramatic, but still quite noticeable. This is just using a single
+thread on a single CPU core per drive, so not throwing tons of CPU at
+it.
 
-[1/1] sbitmap: fix lockup while swapping
-      commit: 30514bd2dd4e86a3ecfd6a93a3eadf7b9ea164a0
+Now, I have no idea how well nvme multipath currently scales or works.
+Would be interesting to test that separately. But if you were to double
+(or more, I guess 3x if you're doing the exposed device and then adding
+stats to at least two below?) the overhead, that'd certainly not be
+free.
 
-Best regards,
+> I don't have any insight on this for blk-mq, probably because I've never
+> seen any user turn IO stats off (or at least don't remember).
+
+Most people don't care, but some certainly do. As per the above, it's
+noticeable enough that it makes a difference if you're chasing latencies
+or peak performance.
+
+> My (very limited) testing did not show any noticeable differences for
+> nvme-loop. All I'm saying that we need to have IO stats for the mpath
+> device node. If there is a clever way to collect this from the hidden
+> devices just for nvme, great, but we need to expose these stats.
+
+ From a previous message, sounds like that's just some qemu setup? Hard
+to measure anything there with precision in my experience, and it's not
+really peak performance territory either.
+
+>> So much so that I've contemplated how we can make this less expensive
+>> than it currently is.
+> 
+> Then nvme-mpath would benefit from that as well.
+
+Yeah, it'd be a win all around for sure...
+
 -- 
 Jens Axboe
-
-
