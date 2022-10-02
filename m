@@ -2,367 +2,231 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 524F1C433FE
-	for <linux-block@archiver.kernel.org>; Sun,  2 Oct 2022 15:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 029DEC433FE
+	for <linux-block@archiver.kernel.org>; Sun,  2 Oct 2022 16:20:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbiJBPvE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Oct 2022 11:51:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44754 "EHLO
+        id S229740AbiJBQUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Oct 2022 12:20:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229963AbiJBPvE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 11:51:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CE21CFFF
-        for <linux-block@vger.kernel.org>; Sun,  2 Oct 2022 08:51:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664725861;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xc5wXjX6YMHDc48LC9ROPqe1Trpb5RnwdSq8IG2ryzA=;
-        b=i9jHqvapLNdX5wqwDtmgMMlU0p2AvIFHTlta8E+PcM7Zg8gwA3RqzcC68OWU0N9IhpR3kY
-        SpKkJLSFTKdISYUYP6cmGDJFQ6CqBtFwODvQ6fyebA3Vc7Sv2c4dUANcMGqPymok5mRvsV
-        VJzrDoM2kOS5I1VXzY9g8gXCYhzP2EA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-613-TIQKteWvNgylcrHls2joIw-1; Sun, 02 Oct 2022 11:51:00 -0400
-X-MC-Unique: TIQKteWvNgylcrHls2joIw-1
-Received: by mail-wm1-f71.google.com with SMTP id i132-20020a1c3b8a000000b003b339a8556eso5070025wma.4
-        for <linux-block@vger.kernel.org>; Sun, 02 Oct 2022 08:51:00 -0700 (PDT)
+        with ESMTP id S229901AbiJBQUq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 12:20:46 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0FB32CCA1
+        for <linux-block@vger.kernel.org>; Sun,  2 Oct 2022 09:20:44 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id m3so11687696eda.12
+        for <linux-block@vger.kernel.org>; Sun, 02 Oct 2022 09:20:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date;
+        bh=ohdqoRKNRc0sRbUk4OlFbQLSZmmj3tVcHvCkL7T1BZ0=;
+        b=a1M9TQtFaOXE+T3ieYn/nhpnRA8GvZX+y8X5fKrjlrR/qPiqrRXWZgw6SAJYr2FA4X
+         1GQ9LS16nAm1vvsxlijRsQg402w9nKR5e4bj3OW6tPWLQUEJd94ACeEH1CbWWLpOw6+D
+         YYaWFliOFK3YoUvXEkYFCEq2QoJIxcMIpJvEci8nkbKEchqTJVgbpZo33Le0AQX8OxIA
+         OMCa7Cz07dc5AKrbbDzOlx8Y165CZvJ7171MG+aL/3PhuroNqehnyPgQpulCRGXw36f6
+         wGUJnz5jnALJQx8IfTMD2RShZEnAZK/URu8ZBDS4jzdIWuNWzU5mas7zu1u9FWuSjSmC
+         SwDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Xc5wXjX6YMHDc48LC9ROPqe1Trpb5RnwdSq8IG2ryzA=;
-        b=QAAH7+peo6qjplXM59D8hv7QHQizA9Diw+ajXN+NYDZ2MpNH+0n3Xto2WiNUq4746B
-         FADPtdF1OyVVIvjKk52CZurytICZf07ARFpfzF1X79uI1VB88Ko1yDynI6l7amWQPNEz
-         aH5+ByY5LZG6AEb31aJ8hRb32A5a2MHs/GqGVJZM/+zImE7fhVwuUyvR3Y/epOx9HjQ/
-         hwHFge5k+TUvOOhVcqg34qvZbYw3xApb/yJ3XNCGA+0C6gzGXRB/NBSOms9DBbmm+rQg
-         STvTNV2NHzXNDaqX139zjUf5xa3wI2OOTI5LUaKCoysYVudFVwT+OGpxbuKqlnt3WXAw
-         09fA==
-X-Gm-Message-State: ACrzQf246n9J36iZaPmMX9lN6lre3hyjwdPynLeK31k+RXJCWMxAUaQp
-        fWMBqN+MCWhWckWR+yrHFB0srhs5JQKN3uT+xab8MeTx7udFt4wMHxc13qD9X/7s5ZK4Wvwox5L
-        tKDr5XP98dbhRVUPsr7BtGY0=
-X-Received: by 2002:a05:600c:687:b0:3b4:7280:9b7 with SMTP id a7-20020a05600c068700b003b4728009b7mr4564506wmn.189.1664725859397;
-        Sun, 02 Oct 2022 08:50:59 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5owdchnkA0uNmm8BwwM3bwcyoaJD5N/yRbSjAp9gh2lCqpGxctsSJvp4lYlpUzkCGRGJ7ebA==
-X-Received: by 2002:a05:600c:687:b0:3b4:7280:9b7 with SMTP id a7-20020a05600c068700b003b4728009b7mr4564494wmn.189.1664725859172;
-        Sun, 02 Oct 2022 08:50:59 -0700 (PDT)
-Received: from redhat.com ([2.55.17.78])
-        by smtp.gmail.com with ESMTPSA id e13-20020a5d530d000000b0022aeba020casm7588579wrv.83.2022.10.02.08.50.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Oct 2022 08:50:58 -0700 (PDT)
-Date:   Sun, 2 Oct 2022 11:50:55 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     stefanha@redhat.com, jasowang@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Johannes.Thumshirn@wdc.com
-Subject: Re: [PATCH 1/1] virtio-blk: simplify probe function
-Message-ID: <20221002115024-mutt-send-email-mst@kernel.org>
-References: <20221002154417.34583-1-mgurtovoy@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221002154417.34583-1-mgurtovoy@nvidia.com>
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=ohdqoRKNRc0sRbUk4OlFbQLSZmmj3tVcHvCkL7T1BZ0=;
+        b=UdyIl7lrcBzFHVPnUx8jPVYKCzv7eh6evPvDSXXmwct6La+mx7r0NvBL0IaoXXWCS4
+         xOeQTNSCZfHVl7yAtUDSMjxKKarJn7Zbl0HFvkTQx4mY9qrHbhlImA6/XVtjBcYyGQm/
+         ATEueb3HpaJZSZuX4wXksvt8Nj1IiwVShgUqgmZJcR9/gqZArozS03X+I0v/CxQsKdyN
+         iP0OJoe04405u+GgH8F5Q+Fm8NhSpx+U/72PlOx72u4W6wp7NKb6DPEqL0cEwqGXIfch
+         queSHQAC1yuUZl9OLwnnsXubsOBkPZCohoRIMAsEQW1GXu+IM6qS8z2WSnpSOghqwRcf
+         Tfvg==
+X-Gm-Message-State: ACrzQf1dCKl/5OV1osGz7tI2P58ZIiW33iBcye1DsIaXslJ1vGsMcI7X
+        sSzAk6agbvu2/NVYkyVbe9oRBQ==
+X-Google-Smtp-Source: AMsMyM4IzXOAo788h7Mjx6klXNVbaUtTci/LAdV5IYRF8ulqc8nnJsrt9psuxEGiYi8LAZry0yF6MA==
+X-Received: by 2002:a05:6402:550c:b0:443:7d15:d57f with SMTP id fi12-20020a056402550c00b004437d15d57fmr15495137edb.147.1664727643401;
+        Sun, 02 Oct 2022 09:20:43 -0700 (PDT)
+Received: from mbp-di-paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
+        by smtp.gmail.com with ESMTPSA id 17-20020a170906301100b00731582babcasm4184198ejz.71.2022.10.02.09.20.42
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 02 Oct 2022 09:20:42 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: block: wrong return value by bio_end_sector?
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <8d5ffebe-39dc-b811-ce7c-9df4b5d061c1@opensource.wdc.com>
+Date:   Sun, 2 Oct 2022 18:20:41 +0200
+Cc:     Arie van der Hoeven <arie.vanderhoeven@seagate.com>,
+        Tyler Erickson <tyler.erickson@seagate.com>,
+        Muhammad Ahmad <muhammad.ahmad@seagate.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Jan Kara <jack@suse.cz>,
+        "andrea.righi@canonical.com" <andrea.righi@canonical.com>,
+        "glen.valante@linaro.org" <glen.valante@linaro.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Michael English <michael.english@seagate.com>,
+        Andrew Ring <andrew.ring@seagate.com>,
+        Varun Boddu <varunreddy.boddu@seagate.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <51C3A1EA-A746-4DA2-AFC1-D9C4C1D7B213@linaro.org>
+References: <D4FC5552-B3C8-4118-B3C8-C6BF20C793B4@linaro.org>
+ <8d5ffebe-39dc-b811-ce7c-9df4b5d061c1@opensource.wdc.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Oct 02, 2022 at 06:44:17PM +0300, Max Gurtovoy wrote:
-> Divide the extremely long probe function to small meaningful functions.
-> This makes the code more readably and easy to maintain.
-> 
-> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 
-This is subjective ... pls CC some reviewers. If Stefan or Paolo
-ack this I will merge.
 
-> ---
->  drivers/block/virtio_blk.c | 227 +++++++++++++++++++++----------------
->  1 file changed, 131 insertions(+), 96 deletions(-)
-> 
-> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> index 30255fcaf181..bdd44069bf6f 100644
-> --- a/drivers/block/virtio_blk.c
-> +++ b/drivers/block/virtio_blk.c
-> @@ -882,28 +882,13 @@ static const struct blk_mq_ops virtio_mq_ops = {
->  static unsigned int virtblk_queue_depth;
->  module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
->  
-> -static int virtblk_probe(struct virtio_device *vdev)
-> +static int virtblk_q_limits_set(struct virtio_device *vdev,
-> +		struct request_queue *q)
->  {
-> -	struct virtio_blk *vblk;
-> -	struct request_queue *q;
-> -	int err, index;
-> -
-> -	u32 v, blk_size, max_size, sg_elems, opt_io_size;
-> -	u16 min_io_size;
->  	u8 physical_block_exp, alignment_offset;
-> -	unsigned int queue_depth;
-> -
-> -	if (!vdev->config->get) {
-> -		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> -			__func__);
-> -		return -EINVAL;
-> -	}
-> -
-> -	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
-> -			     GFP_KERNEL);
-> -	if (err < 0)
-> -		goto out;
-> -	index = err;
-> +	u16 min_io_size;
-> +	u32 v, blk_size, max_size, sg_elems, opt_io_size;
-> +	int err;
->  
->  	/* We need to know how many segments before we allocate. */
->  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_SEG_MAX,
-> @@ -917,73 +902,6 @@ static int virtblk_probe(struct virtio_device *vdev)
->  	/* Prevent integer overflows and honor max vq size */
->  	sg_elems = min_t(u32, sg_elems, VIRTIO_BLK_MAX_SG_ELEMS - 2);
->  
-> -	vdev->priv = vblk = kmalloc(sizeof(*vblk), GFP_KERNEL);
-> -	if (!vblk) {
-> -		err = -ENOMEM;
-> -		goto out_free_index;
-> -	}
-> -
-> -	mutex_init(&vblk->vdev_mutex);
-> -
-> -	vblk->vdev = vdev;
-> -
-> -	INIT_WORK(&vblk->config_work, virtblk_config_changed_work);
-> -
-> -	err = init_vq(vblk);
-> -	if (err)
-> -		goto out_free_vblk;
-> -
-> -	/* Default queue sizing is to fill the ring. */
-> -	if (!virtblk_queue_depth) {
-> -		queue_depth = vblk->vqs[0].vq->num_free;
-> -		/* ... but without indirect descs, we use 2 descs per req */
-> -		if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
-> -			queue_depth /= 2;
-> -	} else {
-> -		queue_depth = virtblk_queue_depth;
-> -	}
-> -
-> -	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
-> -	vblk->tag_set.ops = &virtio_mq_ops;
-> -	vblk->tag_set.queue_depth = queue_depth;
-> -	vblk->tag_set.numa_node = NUMA_NO_NODE;
-> -	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-> -	vblk->tag_set.cmd_size =
-> -		sizeof(struct virtblk_req) +
-> -		sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
-> -	vblk->tag_set.driver_data = vblk;
-> -	vblk->tag_set.nr_hw_queues = vblk->num_vqs;
-> -	vblk->tag_set.nr_maps = 1;
-> -	if (vblk->io_queues[HCTX_TYPE_POLL])
-> -		vblk->tag_set.nr_maps = 3;
-> -
-> -	err = blk_mq_alloc_tag_set(&vblk->tag_set);
-> -	if (err)
-> -		goto out_free_vq;
-> -
-> -	vblk->disk = blk_mq_alloc_disk(&vblk->tag_set, vblk);
-> -	if (IS_ERR(vblk->disk)) {
-> -		err = PTR_ERR(vblk->disk);
-> -		goto out_free_tags;
-> -	}
-> -	q = vblk->disk->queue;
-> -
-> -	virtblk_name_format("vd", index, vblk->disk->disk_name, DISK_NAME_LEN);
-> -
-> -	vblk->disk->major = major;
-> -	vblk->disk->first_minor = index_to_minor(index);
-> -	vblk->disk->minors = 1 << PART_BITS;
-> -	vblk->disk->private_data = vblk;
-> -	vblk->disk->fops = &virtblk_fops;
-> -	vblk->index = index;
-> -
-> -	/* configure queue flush support */
-> -	virtblk_update_cache_mode(vdev);
-> -
-> -	/* If disk is read-only in the host, the guest should obey */
-> -	if (virtio_has_feature(vdev, VIRTIO_BLK_F_RO))
-> -		set_disk_ro(vblk->disk, 1);
-> -
->  	/* We can handle whatever the host told us to handle. */
->  	blk_queue_max_segments(q, sg_elems);
->  
-> @@ -1011,12 +929,13 @@ static int virtblk_probe(struct virtio_device *vdev)
->  			dev_err(&vdev->dev,
->  				"virtio_blk: invalid block size: 0x%x\n",
->  				blk_size);
-> -			goto out_cleanup_disk;
-> +			return err;
->  		}
->  
->  		blk_queue_logical_block_size(q, blk_size);
-> -	} else
-> +	} else {
->  		blk_size = queue_logical_block_size(q);
-> +	}
->  
->  	/* Use topology information if available */
->  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
-> @@ -1075,19 +994,136 @@ static int virtblk_probe(struct virtio_device *vdev)
->  		blk_queue_max_write_zeroes_sectors(q, v ? v : UINT_MAX);
->  	}
->  
-> +	return 0;
-> +}
-> +
-> +static void virtblk_tagset_put(struct virtio_blk *vblk)
-> +{
-> +	put_disk(vblk->disk);
-> +	blk_mq_free_tag_set(&vblk->tag_set);
-> +}
-> +
-> +static void virtblk_tagset_free(struct virtio_blk *vblk)
-> +{
-> +	del_gendisk(vblk->disk);
-> +	blk_mq_free_tag_set(&vblk->tag_set);
-> +}
-> +
-> +static int virtblk_tagset_alloc(struct virtio_blk *vblk,
-> +		unsigned int queue_depth)
-> +{
-> +	int err;
-> +
-> +	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
-> +	vblk->tag_set.ops = &virtio_mq_ops;
-> +	vblk->tag_set.queue_depth = queue_depth;
-> +	vblk->tag_set.numa_node = NUMA_NO_NODE;
-> +	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
-> +	vblk->tag_set.cmd_size =
-> +		sizeof(struct virtblk_req) +
-> +		sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
-> +	vblk->tag_set.driver_data = vblk;
-> +	vblk->tag_set.nr_hw_queues = vblk->num_vqs;
-> +	vblk->tag_set.nr_maps = 1;
-> +	if (vblk->io_queues[HCTX_TYPE_POLL])
-> +		vblk->tag_set.nr_maps = 3;
-> +
-> +	err = blk_mq_alloc_tag_set(&vblk->tag_set);
-> +	if (err)
-> +		return err;
-> +
-> +	vblk->disk = blk_mq_alloc_disk(&vblk->tag_set, vblk);
-> +	if (IS_ERR(vblk->disk)) {
-> +		err = PTR_ERR(vblk->disk);
-> +		goto out_free_tags;
-> +	}
-> +
-> +	return 0;
-> +
-> +out_free_tags:
-> +	blk_mq_free_tag_set(&vblk->tag_set);
-> +	return err;
-> +}
-> +
-> +static int virtblk_probe(struct virtio_device *vdev)
-> +{
-> +	struct virtio_blk *vblk;
-> +	int err, index;
-> +	unsigned int queue_depth;
-> +
-> +	if (!vdev->config->get) {
-> +		dev_err(&vdev->dev, "%s failure: config access disabled\n",
-> +			__func__);
-> +		return -EINVAL;
-> +	}
-> +
-> +	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
-> +			     GFP_KERNEL);
-> +	if (err < 0)
-> +		goto out;
-> +	index = err;
-> +
-> +	vdev->priv = vblk = kmalloc(sizeof(*vblk), GFP_KERNEL);
-> +	if (!vblk) {
-> +		err = -ENOMEM;
-> +		goto out_free_index;
-> +	}
-> +
-> +	mutex_init(&vblk->vdev_mutex);
-> +
-> +	vblk->vdev = vdev;
-> +
-> +	INIT_WORK(&vblk->config_work, virtblk_config_changed_work);
-> +
-> +	err = init_vq(vblk);
-> +	if (err)
-> +		goto out_free_vblk;
-> +
-> +	/* Default queue sizing is to fill the ring. */
-> +	if (!virtblk_queue_depth) {
-> +		queue_depth = vblk->vqs[0].vq->num_free;
-> +		/* ... but without indirect descs, we use 2 descs per req */
-> +		if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
-> +			queue_depth /= 2;
-> +	} else {
-> +		queue_depth = virtblk_queue_depth;
-> +	}
-> +
-> +	err = virtblk_tagset_alloc(vblk, queue_depth);
-> +	if (err)
-> +		goto out_free_vq;
-> +
-> +	virtblk_name_format("vd", index, vblk->disk->disk_name, DISK_NAME_LEN);
-> +
-> +	vblk->disk->major = major;
-> +	vblk->disk->first_minor = index_to_minor(index);
-> +	vblk->disk->minors = 1 << PART_BITS;
-> +	vblk->disk->private_data = vblk;
-> +	vblk->disk->fops = &virtblk_fops;
-> +	vblk->index = index;
-> +
-> +	/* configure queue flush support */
-> +	virtblk_update_cache_mode(vdev);
-> +
-> +	/* If disk is read-only in the host, the guest should obey */
-> +	if (virtio_has_feature(vdev, VIRTIO_BLK_F_RO))
-> +		set_disk_ro(vblk->disk, 1);
-> +
-> +	err = virtblk_q_limits_set(vdev, vblk->disk->queue);
-> +	if (err)
-> +		goto out_tagset_put;
-> +
->  	virtblk_update_capacity(vblk, false);
->  	virtio_device_ready(vdev);
->  
->  	err = device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
->  	if (err)
-> -		goto out_cleanup_disk;
-> +		goto out_tagset_put;
->  
->  	return 0;
->  
-> -out_cleanup_disk:
-> -	put_disk(vblk->disk);
-> -out_free_tags:
-> -	blk_mq_free_tag_set(&vblk->tag_set);
-> +out_tagset_put:
-> +	virtblk_tagset_put(vblk);
->  out_free_vq:
->  	vdev->config->del_vqs(vdev);
->  	kfree(vblk->vqs);
-> @@ -1106,8 +1142,7 @@ static void virtblk_remove(struct virtio_device *vdev)
->  	/* Make sure no work handler is accessing the device. */
->  	flush_work(&vblk->config_work);
->  
-> -	del_gendisk(vblk->disk);
-> -	blk_mq_free_tag_set(&vblk->tag_set);
-> +	virtblk_tagset_free(vblk);
->  
->  	mutex_lock(&vblk->vdev_mutex);
->  
-> -- 
-> 2.18.1
+> Il giorno 1 ott 2022, alle ore 02:50, Damien Le Moal =
+<damien.lemoal@opensource.wdc.com> ha scritto:
+>=20
+> On 10/1/22 00:59, Paolo Valente wrote:
+>> Hi Jens, Damien, all other possibly interested people, this is to =
+raise
+>> attention on a mistake that has emerged in a thread on a bfq =
+extension
+>> for multi-actuary drives [1].
+>>=20
+>> The mistake is apparently in the macro bio_end_sector (defined in=20
+>> include/linux/bio.h), which seems to be translated (incorrectly) as=20=
+
+>> sector+size, and not as sector+size-1.
+>=20
+> This has been like this for a long time, I think.
+>=20
+>>=20
+>> For your convenience, I'm pasting a detailed description of the=20
+>> problem, by Tyler (description taken from the above thread [1]).
+>>=20
+>> The drive reports the actuator ranges as a starting LBA and a count =
+of
+>> LBAs for the range. If the code reading the reported values simply =
+does
+>> startingLBA + range, this is an incorrect ending LBA for that =
+actuator.
+>=20
+> Well, yes. LBA 0 + drive capacity is also an incorrect LBA. If the =
+code
+> assumes that it is, you have a classic off-by-one bug.
+>=20
+>> This is because LBAs are zero indexed and this simple addition is not
+>> taking that into account. The proper way to get the endingLBA is
+>> startingLBA + range - 1 to get the last LBA value for where to issue =
+a
+>> final IO read/write to account for LBA values starting at zero rather
+>> than one.
+>=20
+> Yes. And ? Where is the issue ?
+>=20
+>>=20
+>> Here is an example from the output in SeaChest/openSeaChest:=20
+>> =3D=3D=3D=3DConcurrent Positioning Ranges=3D=3D=3D=3D
+>>=20
+>> Range#     #Elements            Lowest LBA          # of LBAs 0
+>> 1                                               0
+>> 17578328064 1            1                         17578328064
+>> 17578328064
+>>=20
+>> If using the incorrect formula to get the final LBA for actuator 0, =
+you
+>> would get 17578328064, but this is the starting LBA reported by the
+>> drive for actuator 1. So to be consistent for all ranges, the final =
+LBA
+>> for a given actuator should be calculated as starting LBA + range - =
+1.
+>>=20
+>> I had reached out to Seagate's T10 and T13 representatives for
+>> clarification and verification and this is most likely what is =
+causing
+>> the error is a missing - 1 somewhere after getting the information
+>> reported by the device. They agreed that the reporting from the drive
+>> and the SCSI to ATA translation is correct.
+>>=20
+>> I'm not sure where this is being read and calculated, but it is not =
+an
+>> error in the low-level libata or sd level of the kernel. It may be in
+>> bfq, or it may be in some other place after the sd layer. I know =
+there
+>> were some additions to read this and report it up the stack, but I =
+did
+>> not think those were wrong as they seemed to pass the drive reported
+>> information up the stack.
+>>=20
+>> Jens, Damien, can you shed a light on this?
+>=20
+> I am not clear on what the problem is exactly. This all sound like a
+> simple off-by-one issue if bfq support code. No ?
+
+Yes, it's (also) in bfq code now; no, it's not only in bfq code.=20
+
+The involved bfq code is a replica of the following original function
+(living in block/blk-iaranges.c):
+
+static struct blk_independent_access_range *
+disk_find_ia_range(struct blk_independent_access_ranges *iars,
+		  sector_t sector)
+{
+	struct blk_independent_access_range *iar;
+	int i;
+
+	for (i =3D 0; i < iars->nr_ia_ranges; i++) {
+		iar =3D &iars->ia_range[i];
+		if (sector >=3D iar->sector &&
+		    sector < iar->sector + iar->nr_sectors)
+			return iar;
+	}
+
+	return NULL;
+}
+
+bfq's replica simply contains also this warning, right before the return =
+NULL:
+
+	WARN_ONCE(true,
+		  "bfq_actuator_index: bio sector out of ranges: =
+end=3D%llu\n",
+		  end);
+
+So, if this warning is triggered, then the sector does not belong to
+any range.
+
+That warning gets actually triggered [1], for a sector number that is
+larger than the largest extreme (iar->sector + iar->nr_sectors) in the
+iar data structure.  The offending value resulted to be simply equal
+to the largest possible value accepted by the iar data structure, plus
+one.
+
+So, yes, this is an off-by-one error.  More precisely, there is a
+mismatch between the above code (or the values stored the iar data
+structure) and the value of bio_end_sector (the latter is passed as
+input to the above function).  bio_end_sector does not seem to give
+the end sector of a request (equal to begin+size-1), as apparently
+expected by the above code, but the sector after the last one (namely,
+begin+size).
+
+Should I express an opinion on where the error is, I would say that
+the mistake is in bio_end_sector.  But I could be totally wrong, as
+I'm not a expert of either of the involved parts.  In addition,
+bio_end_sector is already in use, with its current formula, by other
+parts of the block layer.  If you guys (Damien, Jens, Tyler?, ...)
+give us some guidance on what to fix exactly, we will be happy to make
+a fix.
+
+Thanks,
+Paolo
+
+
+
+>=20
+>>=20
+>> Thanks, Paolo
+>>=20
+>> [1] https://www.spinics.net/lists/kernel/msg4507408.html
+>=20
+> --=20
+> Damien Le Moal
+> Western Digital Research
 
