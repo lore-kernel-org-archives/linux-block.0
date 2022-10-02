@@ -2,100 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9C4C433FE
-	for <linux-block@archiver.kernel.org>; Sat,  1 Oct 2022 02:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E46D3C433F5
+	for <linux-block@archiver.kernel.org>; Sun,  2 Oct 2022 08:29:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231985AbiJACO1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Sep 2022 22:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45514 "EHLO
+        id S229661AbiJBI3L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Oct 2022 04:29:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231516AbiJACO0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Sep 2022 22:14:26 -0400
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD521AF919;
-        Fri, 30 Sep 2022 19:14:25 -0700 (PDT)
-Received: by mail-pf1-f174.google.com with SMTP id w2so5726613pfb.0;
-        Fri, 30 Sep 2022 19:14:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=39nUKBxMEtQ4k/548GHzcQvvgKYGFvJDlLo/dLbAsKs=;
-        b=KiIOaV2jNyWSXEnAp14gftW4nVj10JyEXuPtUbQaD3OFG3eFoPFiFsqD1wLXYlwzDE
-         obmzxzwHHPlcGcCSs29WCcm0FOjy3z5PVgmFRWxY8B6c0WCBaMssBHeQgf8b/ntAbJXR
-         Oabw6iewh1FQR3GEiwuWPmAAmD6x7GrZ214r74XzLo0Ii93rPjLquziL66Gz2bO2SrSG
-         BVgyyYMCwBCWmfASUQXX80zabn9Ccy1uaHI+lLdlst8Lb2bDxEBO7XkO9rwQFZKCvgFG
-         /9oRoPFODRqlhtgx++j6edPBuHeI1JUYELCj9zZlHW9hLbr/y1oTMY0/aIP4uf/AG1W5
-         gl/A==
-X-Gm-Message-State: ACrzQf02q0VgbraXm5U69/2bmcE3Lm6Fh0GPuOk3j3Mpo9dkeGhGt5s4
-        VrT7i/KNaAPulRm3AmAdTqs=
-X-Google-Smtp-Source: AMsMyM5IZ9SWdvy+3MR23M5okJI2LPj5kq09p3lxCfop3u62wqmizBiTv5Ld8kTbr49f1xoKgTuRYA==
-X-Received: by 2002:a65:42c8:0:b0:41a:8138:f47f with SMTP id l8-20020a6542c8000000b0041a8138f47fmr10062728pgp.476.1664590464635;
-        Fri, 30 Sep 2022 19:14:24 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id o3-20020a17090ac08300b0020a73eec389sm69517pjs.3.2022.09.30.19.14.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Sep 2022 19:14:23 -0700 (PDT)
-Message-ID: <c54b3271-1e3f-75cc-2a90-0d5b9b5e93b2@acm.org>
-Date:   Fri, 30 Sep 2022 19:14:21 -0700
+        with ESMTP id S229488AbiJBI3K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 04:29:10 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2072.outbound.protection.outlook.com [40.107.95.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35215491F1
+        for <linux-block@vger.kernel.org>; Sun,  2 Oct 2022 01:29:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=msahqXEEEywzZZMMI9BF0Zx5TWchi1Q0VB4LHSK9as/U4FWM3RDBaTfGc1MpUNxBv+36vomIaMhHtBfN4Z+gJJckZ8LoWcI8N7Z7eRVYfpeVxvsWr7CMUaC6RhfJOThp8m3gMSuQLQGAAWUxYWXPUupIZB43TJnJ4ZTvqNU3V1jUTLJBQT3SaErTzTUzrt5AYeUt62ScOXZSV6hTx04zE3OV/6wTuQxJL6QAjxE4y1vi7BdLYFufumZkBxT+uJqIekAFMwgvgU9n99bkGGhCAgAj9WD2QWSieZScRHZ/AGZ2D4Cvo4DTq7+rR9DXZj58L8q4oZLS/VMMj1qzrmj5mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d5PzXpBtctzyjgCE0DLke8BH3vzlVe/nLmdUwaHML4E=;
+ b=R8EkhWYySo/pVrsR4bQqe9P9XR8isVA3rgdP9OEYYGvB5rTN05NX7AoH10n7Z43DR4+OOi/S41f86cwc8bi9wIOrxuFlqLwiqyKxSPodssE04vQi2dkW1R7A/uOig+hRcQdvV3sw/rH5ySAPVS6HONjw3qLTIFElHtnJbuc+IUEKiowlQzIFDw5urEeA2Cdo9TaZOL7X6xWxc5ZnPfh5UhbF13Cbj56CPDTcKTAomIz84FzBVte+I0TPPKhm40g2JXqdYn2n2Y0q27Ny5W49GnfTy3SHkonHViURiROeevVsnPa5Q8+AXMFxMUJOFvdmmQemZnsi5NW5CWtBOAuvuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lists.infradead.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d5PzXpBtctzyjgCE0DLke8BH3vzlVe/nLmdUwaHML4E=;
+ b=gw/D0fEupyM91zPRCWfDoK5hwnaaKhDYhdRTXeTOXN5kVVmVrwObDd+IkTnLtR3fosfnnruPU0mntuoGP5bFnVMUctzVncVpB6zhD/RaXT8goGufuP4KEyd7XDbWNRy7ycoaabXKXOZSzaV2XS+0tO0U4/lv6YtIHV1OFAGViY4OqkUGuWQQl3ufM9QhQkoWE2k+Hggf+hG4xRPeAXpU1bfI2RQ9nx43O1vLtqETORJ2yMgWhBXJoM1qrJOocCeg8dLH558HwIu2uUIoO5zgxFd89MThvnv6lr1FXQCYzP9+3/F8gDq/asahuYunBolMp9JwmuL9F9vm/ZStekqh9A==
+Received: from BN9PR03CA0221.namprd03.prod.outlook.com (2603:10b6:408:f8::16)
+ by MW3PR12MB4377.namprd12.prod.outlook.com (2603:10b6:303:55::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.23; Sun, 2 Oct
+ 2022 08:29:08 +0000
+Received: from BN8NAM11FT101.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:f8:cafe::8) by BN9PR03CA0221.outlook.office365.com
+ (2603:10b6:408:f8::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.23 via Frontend
+ Transport; Sun, 2 Oct 2022 08:29:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT101.mail.protection.outlook.com (10.13.177.126) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5676.17 via Frontend Transport; Sun, 2 Oct 2022 08:29:08 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Sun, 2 Oct 2022
+ 01:28:55 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Sun, 2 Oct 2022
+ 01:28:54 -0700
+Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server id 15.2.986.29 via Frontend
+ Transport; Sun, 2 Oct 2022 01:28:52 -0700
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+To:     <linux-nvme@lists.infradead.org>, <sagi@grimberg.me>, <hch@lst.de>,
+        <kbusch@kernel.org>
+CC:     <oren@nvidia.com>, <chaitanyak@nvidia.com>,
+        <linux-block@vger.kernel.org>, Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH v2 1/1] nvme: use macro definitions for setting reservation values
+Date:   Sun, 2 Oct 2022 11:28:51 +0300
+Message-ID: <20221002082851.13222-1-mgurtovoy@nvidia.com>
+X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v15 00/13] support zoned block devices with non-power-of-2
- zone sizes
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
-        Keith Busch <kbusch@kernel.org>
-Cc:     jaegeuk@kernel.org, agk@redhat.com, gost.dev@samsung.com,
-        snitzer@kernel.org, linux-kernel@vger.kernel.org, hare@suse.de,
-        matias.bjorling@wdc.com, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        pankydev8@gmail.com, dm-devel@redhat.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <CGME20220923173619eucas1p13e645adbe1c8eb62fb48b52c0248ed65@eucas1p1.samsung.com>
- <20220923173618.6899-1-p.raghav@samsung.com>
- <5e9d678f-ffea-e015-53d8-7e80f3deda1e@samsung.com>
- <bd9479f4-ff87-6e5d-296e-e31e669fb148@kernel.dk>
- <0e5088a5-5408-c5bd-bf97-00803cb5faed@acm.org>
- <bb2b3784-422f-fc82-e5be-e4d24412e21f@opensource.wdc.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <bb2b3784-422f-fc82-e5be-e4d24412e21f@opensource.wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT101:EE_|MW3PR12MB4377:EE_
+X-MS-Office365-Filtering-Correlation-Id: e10240b9-05ee-4405-fab5-08daa4502ccc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: C0ckwXKc+B3ZzCWnAWZRR6BY8lNjbEx9wv65ULeswzfaXh69lGembUhY7nt4efZmD0C8x45YowcTVXpCw0lpN08EcwlUxVDwU5Q9a3P464GfLhUIRFd8Y6Q9tbFF1FKStaMxv6xdn8/2x8QipfAI/FvTK7MX9t4tRGiK8y26iEXGon7Q0TdhtRo4pwZyIhJe0G7xfm+JNF3uV7I3A4+y49KHwk3bdWP9Ka5qvw8q0wJ3uLcZkhOpBiEk9LKa+5N1h4BOQsH+tGb3dxARMD7GGWrNKkZC0v5T3eWx6vzW086YLhH0xvLdgSzvGiKCNEaqQNTO/TJcNA9t4qDo4hD+j+ESf2W8UuEUhv7s0+SRMwW0VVtxbMqUspVjK9wL8aBuy4AFVHzSi6YqYYoqmBnHRMSNJoYVjJCOpXEpZdvwXfnX6hByuoY+iW5XUfw+332i3ih0BzwdTq+NMWS7krlQ/3KfR5Oiq+uoZ6DQkpFq4/tXDrJMyE5k6czIifEVIm9EkLMF6iroKFLCBtf5+rm+rMdkm6fhTOVs/3Qa3Oi93oVRf78BlTQ8hW+wnNRL7X3U1TBjmPuYWPwRP11du8TOjIAmvSBo6/PbzlYkvzCpIBAqlUOqRaUaEUZKbwGymuRImvB6mkLnJj76vEamIQ39ieYipKmmwYJr/5ybwmSspvG8Rd00JWDclgEVpa28VCTV+iD07u7X3C7/mSdxSZ8w5jBMawyqGvWu1yRm+flAS/v2B+W7564xTelDZEDcCS52va/l8cBIwgGsPKqGSP0SLg==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(346002)(376002)(396003)(451199015)(40470700004)(36840700001)(46966006)(70206006)(4326008)(86362001)(8676002)(8936002)(41300700001)(1076003)(426003)(70586007)(2616005)(336012)(186003)(47076005)(107886003)(478600001)(82740400003)(5660300002)(83380400001)(110136005)(7636003)(26005)(40480700001)(40460700003)(316002)(356005)(36756003)(54906003)(82310400005)(36860700001)(2906002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2022 08:29:08.0129
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e10240b9-05ee-4405-fab5-08daa4502ccc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT101.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4377
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/22 17:45, Damien Le Moal wrote:
-> On 10/1/22 04:38, Bart Van Assche wrote:
->> Since this has not been mentioned in the cover letter, I want to add
->> that in the near future we will need these patches for Android devices.
->> JEDEC is working on supporting zoned storage for UFS devices, the
->> storage devices used in all modern Android phones. Although it would be
->> possible to make the offset between zone starts a power of two by
->> inserting gap zones between data zones, UFS vendors asked not to do this
->> and hence need support for zone sizes that are not a power of two. An
->> advantage of not having to deal with gap zones is better filesystem
->> performance since filesystem extents cannot span gap zones. Having to
->> split filesystem extents because of gap zones reduces filesystem
->> performance.
-> 
-> As mentioned many times, my opinion is that a good implementation should
-> *not* have any extent span zone boundaries. So personally, I do not
-> consider such argument as a valid justification for the non-power-of-2
-> zone size support.
+This makes the code more readable.
 
-Hi Damien,
+Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+---
+Changes from v1:
+ - remove comments (Sagi/Keith)
+ - use tabs for constants alignment, similar to 'enum pr_type' (Keith)
+---
+ drivers/nvme/host/core.c | 12 ++++++------
+ include/linux/nvme.h     |  9 +++++++++
+ 2 files changed, 15 insertions(+), 6 deletions(-)
 
-Although the filesystem extent issue probably can be solved in software, 
-the argument that UFS vendors strongly prefer not to have gap zones and 
-hence need support for zone sizes that are not a power of two remains.
-
-Thanks,
-
-Bart.
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 3f1a7dc2a2a3..50668e1bd9f1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2068,17 +2068,17 @@ static char nvme_pr_type(enum pr_type type)
+ {
+ 	switch (type) {
+ 	case PR_WRITE_EXCLUSIVE:
+-		return 1;
++		return NVME_PR_WRITE_EXCLUSIVE;
+ 	case PR_EXCLUSIVE_ACCESS:
+-		return 2;
++		return NVME_PR_EXCLUSIVE_ACCESS;
+ 	case PR_WRITE_EXCLUSIVE_REG_ONLY:
+-		return 3;
++		return NVME_PR_WRITE_EXCLUSIVE_REG_ONLY;
+ 	case PR_EXCLUSIVE_ACCESS_REG_ONLY:
+-		return 4;
++		return NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY;
+ 	case PR_WRITE_EXCLUSIVE_ALL_REGS:
+-		return 5;
++		return NVME_PR_WRITE_EXCLUSIVE_ALL_REGS;
+ 	case PR_EXCLUSIVE_ACCESS_ALL_REGS:
+-		return 6;
++		return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
+ 	default:
+ 		return 0;
+ 	}
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index ae53d74f3696..4f777d8621a7 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -238,6 +238,15 @@ enum {
+ 	NVME_CAP_CRMS_CRIMS	= 1ULL << 60,
+ };
+ 
++enum {
++	NVME_PR_WRITE_EXCLUSIVE			= 1,
++	NVME_PR_EXCLUSIVE_ACCESS		= 2,
++	NVME_PR_WRITE_EXCLUSIVE_REG_ONLY	= 3,
++	NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY	= 4,
++	NVME_PR_WRITE_EXCLUSIVE_ALL_REGS	= 5,
++	NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS	= 6,
++};
++
+ struct nvme_id_power_state {
+ 	__le16			max_power;	/* centiwatts */
+ 	__u8			rsvd2;
+-- 
+2.18.1
 
