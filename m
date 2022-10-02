@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E46D3C433F5
-	for <linux-block@archiver.kernel.org>; Sun,  2 Oct 2022 08:29:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CAC7C433FE
+	for <linux-block@archiver.kernel.org>; Sun,  2 Oct 2022 15:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbiJBI3L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Oct 2022 04:29:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42276 "EHLO
+        id S229805AbiJBPo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Oct 2022 11:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbiJBI3K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 04:29:10 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2072.outbound.protection.outlook.com [40.107.95.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35215491F1
-        for <linux-block@vger.kernel.org>; Sun,  2 Oct 2022 01:29:10 -0700 (PDT)
+        with ESMTP id S229923AbiJBPoZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 11:44:25 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2070.outbound.protection.outlook.com [40.107.96.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A023FEDE
+        for <linux-block@vger.kernel.org>; Sun,  2 Oct 2022 08:44:24 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=msahqXEEEywzZZMMI9BF0Zx5TWchi1Q0VB4LHSK9as/U4FWM3RDBaTfGc1MpUNxBv+36vomIaMhHtBfN4Z+gJJckZ8LoWcI8N7Z7eRVYfpeVxvsWr7CMUaC6RhfJOThp8m3gMSuQLQGAAWUxYWXPUupIZB43TJnJ4ZTvqNU3V1jUTLJBQT3SaErTzTUzrt5AYeUt62ScOXZSV6hTx04zE3OV/6wTuQxJL6QAjxE4y1vi7BdLYFufumZkBxT+uJqIekAFMwgvgU9n99bkGGhCAgAj9WD2QWSieZScRHZ/AGZ2D4Cvo4DTq7+rR9DXZj58L8q4oZLS/VMMj1qzrmj5mQ==
+ b=agAdc7R0136ys8AHWrC6RoDorM8EkU8W7utOFBTJWlNEFpC1/5UaxzOrW4WcgQnqx8IXyS1MYQO15TZMiM3lFR1msjT/UQr5QB+MkMnxWTzG/hH/aEdQ7cNOB89QuQ0vUpVexXKvrJK2H7+a/kiM4+LjkUcyWwVrY3c1P6WPXbAHIWT70Esr0QF8CACs6r24jKVrHzH1aza+07XQDWmWXpmtJmzKsf/9ZqgcgjBQbbbRWGls6+Az6is6cSLtHeD9tMmXQYq/7LRUnoG8U4no7MUmRL/OzvAvTS+nPMZDrrMqyz+34mhiCmew4b3nCeiGyx+adUPvYTcDqxX9B8hI0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d5PzXpBtctzyjgCE0DLke8BH3vzlVe/nLmdUwaHML4E=;
- b=R8EkhWYySo/pVrsR4bQqe9P9XR8isVA3rgdP9OEYYGvB5rTN05NX7AoH10n7Z43DR4+OOi/S41f86cwc8bi9wIOrxuFlqLwiqyKxSPodssE04vQi2dkW1R7A/uOig+hRcQdvV3sw/rH5ySAPVS6HONjw3qLTIFElHtnJbuc+IUEKiowlQzIFDw5urEeA2Cdo9TaZOL7X6xWxc5ZnPfh5UhbF13Cbj56CPDTcKTAomIz84FzBVte+I0TPPKhm40g2JXqdYn2n2Y0q27Ny5W49GnfTy3SHkonHViURiROeevVsnPa5Q8+AXMFxMUJOFvdmmQemZnsi5NW5CWtBOAuvuQ==
+ bh=2LDbdCwrGA8Pxfi3f4NZZxM6U8Hm4GyxY/qEc+oBkX8=;
+ b=jK4Pd38T4EYyticrzr0g1T5r/X2egCc8Wx9WRsmNcRzn1g09/eyBWVG7tH815mm3pXBn20Bf8x+XsdP6KKE3VuePiG1zrK459dz8P0yl/h/YXLFoyggdPILGaZIouJYBaYgCFH8eTPjpdjvdehdip4dSNMy/uy9Mhc7OkGnqrlfDAwid5rc0xSPY8QAoJtRLP1Kwcgaat6WobZCA4D4Hb5XIIh09BDPwwywTDnD4DNxyDU+XMiO2OqQ9JQ4SUaRE9WhdQSWxCrpyOYEZrnhdT+dZG5qTRJscRAYeLDXk3v0fLEe58cYPOwDwDcRtOvRHSnRNPYxctZpWxMcXYII/FA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.infradead.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d5PzXpBtctzyjgCE0DLke8BH3vzlVe/nLmdUwaHML4E=;
- b=gw/D0fEupyM91zPRCWfDoK5hwnaaKhDYhdRTXeTOXN5kVVmVrwObDd+IkTnLtR3fosfnnruPU0mntuoGP5bFnVMUctzVncVpB6zhD/RaXT8goGufuP4KEyd7XDbWNRy7ycoaabXKXOZSzaV2XS+0tO0U4/lv6YtIHV1OFAGViY4OqkUGuWQQl3ufM9QhQkoWE2k+Hggf+hG4xRPeAXpU1bfI2RQ9nx43O1vLtqETORJ2yMgWhBXJoM1qrJOocCeg8dLH558HwIu2uUIoO5zgxFd89MThvnv6lr1FXQCYzP9+3/F8gDq/asahuYunBolMp9JwmuL9F9vm/ZStekqh9A==
-Received: from BN9PR03CA0221.namprd03.prod.outlook.com (2603:10b6:408:f8::16)
- by MW3PR12MB4377.namprd12.prod.outlook.com (2603:10b6:303:55::11) with
+ bh=2LDbdCwrGA8Pxfi3f4NZZxM6U8Hm4GyxY/qEc+oBkX8=;
+ b=BY+mNi2RNJHJm/bJgmm5z0C7EZvepnvo+2L2mN+oeIazA9dRKSGL9oQkfHsBBRKJjoTh7o4mrmnx5pzdX4pzt8RDTk4jr6+jUoE1ADx2rnItOif7/2PKbl0+tpGhxCze87+COBxd3d5yXxOUKyu4Duj4wLe/zalsl2paZjLeq99Q1YCVFbh6RzvJbfvzreY1hseWZcCC1lRs+NttQiixEM0bjWc0fPCYrRtGPYNVKcB7/iWCtKIrDii/XVKD2dzwZQfcRxjc0KuGH1Vk2JWSWmmWEmBGeCSw0OaLV76QsPeuaE2ZS15jFjfCqVkJF7Tb9xc8X/eMZfMqVW38vLI21g==
+Received: from BN9PR03CA0931.namprd03.prod.outlook.com (2603:10b6:408:108::6)
+ by DM4PR12MB5914.namprd12.prod.outlook.com (2603:10b6:8:67::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.23; Sun, 2 Oct
- 2022 08:29:08 +0000
-Received: from BN8NAM11FT101.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:f8:cafe::8) by BN9PR03CA0221.outlook.office365.com
- (2603:10b6:408:f8::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.23 via Frontend
- Transport; Sun, 2 Oct 2022 08:29:08 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.28; Sun, 2 Oct
+ 2022 15:44:22 +0000
+Received: from BN8NAM11FT041.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:108:cafe::d3) by BN9PR03CA0931.outlook.office365.com
+ (2603:10b6:408:108::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.24 via Frontend
+ Transport; Sun, 2 Oct 2022 15:44:22 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -47,114 +47,342 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT101.mail.protection.outlook.com (10.13.177.126) with Microsoft SMTP
+ BN8NAM11FT041.mail.protection.outlook.com (10.13.177.18) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5676.17 via Frontend Transport; Sun, 2 Oct 2022 08:29:08 +0000
+ 15.20.5676.17 via Frontend Transport; Sun, 2 Oct 2022 15:44:21 +0000
 Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Sun, 2 Oct 2022
- 01:28:55 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
+ 08:44:20 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
  (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Sun, 2 Oct 2022
- 01:28:54 -0700
+ 08:44:20 -0700
 Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server id 15.2.986.29 via Frontend
- Transport; Sun, 2 Oct 2022 01:28:52 -0700
+ (10.129.68.10) with Microsoft SMTP Server id 15.2.986.29 via Frontend
+ Transport; Sun, 2 Oct 2022 08:44:18 -0700
 From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-To:     <linux-nvme@lists.infradead.org>, <sagi@grimberg.me>, <hch@lst.de>,
-        <kbusch@kernel.org>
-CC:     <oren@nvidia.com>, <chaitanyak@nvidia.com>,
-        <linux-block@vger.kernel.org>, Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH v2 1/1] nvme: use macro definitions for setting reservation values
-Date:   Sun, 2 Oct 2022 11:28:51 +0300
-Message-ID: <20221002082851.13222-1-mgurtovoy@nvidia.com>
+To:     <mst@redhat.com>, <stefanha@redhat.com>, <jasowang@redhat.com>,
+        <virtualization@lists.linux-foundation.org>
+CC:     <linux-block@vger.kernel.org>, <Johannes.Thumshirn@wdc.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: [PATCH 1/1] virtio-blk: simplify probe function
+Date:   Sun, 2 Oct 2022 18:44:17 +0300
+Message-ID: <20221002154417.34583-1-mgurtovoy@nvidia.com>
 X-Mailer: git-send-email 2.18.1
 MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT101:EE_|MW3PR12MB4377:EE_
-X-MS-Office365-Filtering-Correlation-Id: e10240b9-05ee-4405-fab5-08daa4502ccc
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT041:EE_|DM4PR12MB5914:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a57cb3f-5510-40b2-9e1c-08daa48cf9ef
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: C0ckwXKc+B3ZzCWnAWZRR6BY8lNjbEx9wv65ULeswzfaXh69lGembUhY7nt4efZmD0C8x45YowcTVXpCw0lpN08EcwlUxVDwU5Q9a3P464GfLhUIRFd8Y6Q9tbFF1FKStaMxv6xdn8/2x8QipfAI/FvTK7MX9t4tRGiK8y26iEXGon7Q0TdhtRo4pwZyIhJe0G7xfm+JNF3uV7I3A4+y49KHwk3bdWP9Ka5qvw8q0wJ3uLcZkhOpBiEk9LKa+5N1h4BOQsH+tGb3dxARMD7GGWrNKkZC0v5T3eWx6vzW086YLhH0xvLdgSzvGiKCNEaqQNTO/TJcNA9t4qDo4hD+j+ESf2W8UuEUhv7s0+SRMwW0VVtxbMqUspVjK9wL8aBuy4AFVHzSi6YqYYoqmBnHRMSNJoYVjJCOpXEpZdvwXfnX6hByuoY+iW5XUfw+332i3ih0BzwdTq+NMWS7krlQ/3KfR5Oiq+uoZ6DQkpFq4/tXDrJMyE5k6czIifEVIm9EkLMF6iroKFLCBtf5+rm+rMdkm6fhTOVs/3Qa3Oi93oVRf78BlTQ8hW+wnNRL7X3U1TBjmPuYWPwRP11du8TOjIAmvSBo6/PbzlYkvzCpIBAqlUOqRaUaEUZKbwGymuRImvB6mkLnJj76vEamIQ39ieYipKmmwYJr/5ybwmSspvG8Rd00JWDclgEVpa28VCTV+iD07u7X3C7/mSdxSZ8w5jBMawyqGvWu1yRm+flAS/v2B+W7564xTelDZEDcCS52va/l8cBIwgGsPKqGSP0SLg==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(346002)(376002)(396003)(451199015)(40470700004)(36840700001)(46966006)(70206006)(4326008)(86362001)(8676002)(8936002)(41300700001)(1076003)(426003)(70586007)(2616005)(336012)(186003)(47076005)(107886003)(478600001)(82740400003)(5660300002)(83380400001)(110136005)(7636003)(26005)(40480700001)(40460700003)(316002)(356005)(36756003)(54906003)(82310400005)(36860700001)(2906002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: qtkVOUuQDGl4yTsIa8fyur4W5DLuaN1BseTp5FkfrAPSixq7Mwj72YTMC/vQZpfIxw9MIJQkFeQBapUEwg4kxceWR7BCgTGdr9Tqa6kKaE/usC21DnIu1pEnUnCuVw6Xfpezmf/8m4c2hOCfwHdZ4ZexbiOoVNsGtNGnwFjzfeuSSxpijESgFiazvLvBipRxK7+VbMCqGWjW3oy6IAWlDnBWbuubGE0K3zlJQX65QWkRC98prvJZy6Ri8D+xb8T7YbqW5+/8Qebfk8FT+7Xsaneq4MRlU/azMiFKORxx72mzMNez1mwX0Gub8k1y8iCwVSr2FkV+LnFBddLbQV0qq86qOH5MkewLflFQ/Rd7sbbVg3dv4qwaOfCfVApJZEEE+is0HR7xYoZTyApVCt6HU5F99gQ+MKOkg6Xv8OoVlgZ4s3OITNCIy+iP6n9luTnzq8w0Br5VWhffTLdbEQBXnjllbLI1qhmnDhKuqgLm6qqphHxvLOurSVfllVMETr4aupP42qktIWNlrDNH/A84CAmpDd1B85EVwklYhOaPe5tGnLpafqPP7a7sBvHyH9jhh4VAP4WMIKViivuxgBRfakpdanhIzlLAWhiPbpH3538xdULbyq6/BzOi2Jxc2zuW0pU8VhfaHvECW6/C2/oh2v+4Uy4vGrDKOa0nYf6a7J3pSChNn1RH/oAYPvBChfj6YACHHlEvRi7DP6dZunTOt9X0uHIDKDziRJIf7A7bVxeGf1dJuV2XJj4HRew0GzDNCG+qBBJrk+AWNK+rVcX9gA==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(376002)(39860400002)(346002)(451199015)(40470700004)(36840700001)(46966006)(82310400005)(7636003)(110136005)(356005)(82740400003)(478600001)(316002)(54906003)(70586007)(70206006)(8676002)(4326008)(186003)(1076003)(41300700001)(107886003)(36756003)(26005)(86362001)(5660300002)(40480700001)(8936002)(426003)(47076005)(40460700003)(2616005)(336012)(2906002)(36860700001)(83380400001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2022 08:29:08.0129
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2022 15:44:21.9922
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e10240b9-05ee-4405-fab5-08daa4502ccc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a57cb3f-5510-40b2-9e1c-08daa48cf9ef
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT101.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT041.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4377
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5914
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This makes the code more readable.
+Divide the extremely long probe function to small meaningful functions.
+This makes the code more readably and easy to maintain.
 
 Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 ---
-Changes from v1:
- - remove comments (Sagi/Keith)
- - use tabs for constants alignment, similar to 'enum pr_type' (Keith)
----
- drivers/nvme/host/core.c | 12 ++++++------
- include/linux/nvme.h     |  9 +++++++++
- 2 files changed, 15 insertions(+), 6 deletions(-)
+ drivers/block/virtio_blk.c | 227 +++++++++++++++++++++----------------
+ 1 file changed, 131 insertions(+), 96 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 3f1a7dc2a2a3..50668e1bd9f1 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2068,17 +2068,17 @@ static char nvme_pr_type(enum pr_type type)
- {
- 	switch (type) {
- 	case PR_WRITE_EXCLUSIVE:
--		return 1;
-+		return NVME_PR_WRITE_EXCLUSIVE;
- 	case PR_EXCLUSIVE_ACCESS:
--		return 2;
-+		return NVME_PR_EXCLUSIVE_ACCESS;
- 	case PR_WRITE_EXCLUSIVE_REG_ONLY:
--		return 3;
-+		return NVME_PR_WRITE_EXCLUSIVE_REG_ONLY;
- 	case PR_EXCLUSIVE_ACCESS_REG_ONLY:
--		return 4;
-+		return NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY;
- 	case PR_WRITE_EXCLUSIVE_ALL_REGS:
--		return 5;
-+		return NVME_PR_WRITE_EXCLUSIVE_ALL_REGS;
- 	case PR_EXCLUSIVE_ACCESS_ALL_REGS:
--		return 6;
-+		return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
- 	default:
- 		return 0;
- 	}
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index ae53d74f3696..4f777d8621a7 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -238,6 +238,15 @@ enum {
- 	NVME_CAP_CRMS_CRIMS	= 1ULL << 60,
- };
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 30255fcaf181..bdd44069bf6f 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -882,28 +882,13 @@ static const struct blk_mq_ops virtio_mq_ops = {
+ static unsigned int virtblk_queue_depth;
+ module_param_named(queue_depth, virtblk_queue_depth, uint, 0444);
  
-+enum {
-+	NVME_PR_WRITE_EXCLUSIVE			= 1,
-+	NVME_PR_EXCLUSIVE_ACCESS		= 2,
-+	NVME_PR_WRITE_EXCLUSIVE_REG_ONLY	= 3,
-+	NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY	= 4,
-+	NVME_PR_WRITE_EXCLUSIVE_ALL_REGS	= 5,
-+	NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS	= 6,
-+};
+-static int virtblk_probe(struct virtio_device *vdev)
++static int virtblk_q_limits_set(struct virtio_device *vdev,
++		struct request_queue *q)
+ {
+-	struct virtio_blk *vblk;
+-	struct request_queue *q;
+-	int err, index;
+-
+-	u32 v, blk_size, max_size, sg_elems, opt_io_size;
+-	u16 min_io_size;
+ 	u8 physical_block_exp, alignment_offset;
+-	unsigned int queue_depth;
+-
+-	if (!vdev->config->get) {
+-		dev_err(&vdev->dev, "%s failure: config access disabled\n",
+-			__func__);
+-		return -EINVAL;
+-	}
+-
+-	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
+-			     GFP_KERNEL);
+-	if (err < 0)
+-		goto out;
+-	index = err;
++	u16 min_io_size;
++	u32 v, blk_size, max_size, sg_elems, opt_io_size;
++	int err;
+ 
+ 	/* We need to know how many segments before we allocate. */
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_SEG_MAX,
+@@ -917,73 +902,6 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	/* Prevent integer overflows and honor max vq size */
+ 	sg_elems = min_t(u32, sg_elems, VIRTIO_BLK_MAX_SG_ELEMS - 2);
+ 
+-	vdev->priv = vblk = kmalloc(sizeof(*vblk), GFP_KERNEL);
+-	if (!vblk) {
+-		err = -ENOMEM;
+-		goto out_free_index;
+-	}
+-
+-	mutex_init(&vblk->vdev_mutex);
+-
+-	vblk->vdev = vdev;
+-
+-	INIT_WORK(&vblk->config_work, virtblk_config_changed_work);
+-
+-	err = init_vq(vblk);
+-	if (err)
+-		goto out_free_vblk;
+-
+-	/* Default queue sizing is to fill the ring. */
+-	if (!virtblk_queue_depth) {
+-		queue_depth = vblk->vqs[0].vq->num_free;
+-		/* ... but without indirect descs, we use 2 descs per req */
+-		if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
+-			queue_depth /= 2;
+-	} else {
+-		queue_depth = virtblk_queue_depth;
+-	}
+-
+-	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
+-	vblk->tag_set.ops = &virtio_mq_ops;
+-	vblk->tag_set.queue_depth = queue_depth;
+-	vblk->tag_set.numa_node = NUMA_NO_NODE;
+-	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+-	vblk->tag_set.cmd_size =
+-		sizeof(struct virtblk_req) +
+-		sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
+-	vblk->tag_set.driver_data = vblk;
+-	vblk->tag_set.nr_hw_queues = vblk->num_vqs;
+-	vblk->tag_set.nr_maps = 1;
+-	if (vblk->io_queues[HCTX_TYPE_POLL])
+-		vblk->tag_set.nr_maps = 3;
+-
+-	err = blk_mq_alloc_tag_set(&vblk->tag_set);
+-	if (err)
+-		goto out_free_vq;
+-
+-	vblk->disk = blk_mq_alloc_disk(&vblk->tag_set, vblk);
+-	if (IS_ERR(vblk->disk)) {
+-		err = PTR_ERR(vblk->disk);
+-		goto out_free_tags;
+-	}
+-	q = vblk->disk->queue;
+-
+-	virtblk_name_format("vd", index, vblk->disk->disk_name, DISK_NAME_LEN);
+-
+-	vblk->disk->major = major;
+-	vblk->disk->first_minor = index_to_minor(index);
+-	vblk->disk->minors = 1 << PART_BITS;
+-	vblk->disk->private_data = vblk;
+-	vblk->disk->fops = &virtblk_fops;
+-	vblk->index = index;
+-
+-	/* configure queue flush support */
+-	virtblk_update_cache_mode(vdev);
+-
+-	/* If disk is read-only in the host, the guest should obey */
+-	if (virtio_has_feature(vdev, VIRTIO_BLK_F_RO))
+-		set_disk_ro(vblk->disk, 1);
+-
+ 	/* We can handle whatever the host told us to handle. */
+ 	blk_queue_max_segments(q, sg_elems);
+ 
+@@ -1011,12 +929,13 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 			dev_err(&vdev->dev,
+ 				"virtio_blk: invalid block size: 0x%x\n",
+ 				blk_size);
+-			goto out_cleanup_disk;
++			return err;
+ 		}
+ 
+ 		blk_queue_logical_block_size(q, blk_size);
+-	} else
++	} else {
+ 		blk_size = queue_logical_block_size(q);
++	}
+ 
+ 	/* Use topology information if available */
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_TOPOLOGY,
+@@ -1075,19 +994,136 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 		blk_queue_max_write_zeroes_sectors(q, v ? v : UINT_MAX);
+ 	}
+ 
++	return 0;
++}
 +
- struct nvme_id_power_state {
- 	__le16			max_power;	/* centiwatts */
- 	__u8			rsvd2;
++static void virtblk_tagset_put(struct virtio_blk *vblk)
++{
++	put_disk(vblk->disk);
++	blk_mq_free_tag_set(&vblk->tag_set);
++}
++
++static void virtblk_tagset_free(struct virtio_blk *vblk)
++{
++	del_gendisk(vblk->disk);
++	blk_mq_free_tag_set(&vblk->tag_set);
++}
++
++static int virtblk_tagset_alloc(struct virtio_blk *vblk,
++		unsigned int queue_depth)
++{
++	int err;
++
++	memset(&vblk->tag_set, 0, sizeof(vblk->tag_set));
++	vblk->tag_set.ops = &virtio_mq_ops;
++	vblk->tag_set.queue_depth = queue_depth;
++	vblk->tag_set.numa_node = NUMA_NO_NODE;
++	vblk->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
++	vblk->tag_set.cmd_size =
++		sizeof(struct virtblk_req) +
++		sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
++	vblk->tag_set.driver_data = vblk;
++	vblk->tag_set.nr_hw_queues = vblk->num_vqs;
++	vblk->tag_set.nr_maps = 1;
++	if (vblk->io_queues[HCTX_TYPE_POLL])
++		vblk->tag_set.nr_maps = 3;
++
++	err = blk_mq_alloc_tag_set(&vblk->tag_set);
++	if (err)
++		return err;
++
++	vblk->disk = blk_mq_alloc_disk(&vblk->tag_set, vblk);
++	if (IS_ERR(vblk->disk)) {
++		err = PTR_ERR(vblk->disk);
++		goto out_free_tags;
++	}
++
++	return 0;
++
++out_free_tags:
++	blk_mq_free_tag_set(&vblk->tag_set);
++	return err;
++}
++
++static int virtblk_probe(struct virtio_device *vdev)
++{
++	struct virtio_blk *vblk;
++	int err, index;
++	unsigned int queue_depth;
++
++	if (!vdev->config->get) {
++		dev_err(&vdev->dev, "%s failure: config access disabled\n",
++			__func__);
++		return -EINVAL;
++	}
++
++	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
++			     GFP_KERNEL);
++	if (err < 0)
++		goto out;
++	index = err;
++
++	vdev->priv = vblk = kmalloc(sizeof(*vblk), GFP_KERNEL);
++	if (!vblk) {
++		err = -ENOMEM;
++		goto out_free_index;
++	}
++
++	mutex_init(&vblk->vdev_mutex);
++
++	vblk->vdev = vdev;
++
++	INIT_WORK(&vblk->config_work, virtblk_config_changed_work);
++
++	err = init_vq(vblk);
++	if (err)
++		goto out_free_vblk;
++
++	/* Default queue sizing is to fill the ring. */
++	if (!virtblk_queue_depth) {
++		queue_depth = vblk->vqs[0].vq->num_free;
++		/* ... but without indirect descs, we use 2 descs per req */
++		if (!virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC))
++			queue_depth /= 2;
++	} else {
++		queue_depth = virtblk_queue_depth;
++	}
++
++	err = virtblk_tagset_alloc(vblk, queue_depth);
++	if (err)
++		goto out_free_vq;
++
++	virtblk_name_format("vd", index, vblk->disk->disk_name, DISK_NAME_LEN);
++
++	vblk->disk->major = major;
++	vblk->disk->first_minor = index_to_minor(index);
++	vblk->disk->minors = 1 << PART_BITS;
++	vblk->disk->private_data = vblk;
++	vblk->disk->fops = &virtblk_fops;
++	vblk->index = index;
++
++	/* configure queue flush support */
++	virtblk_update_cache_mode(vdev);
++
++	/* If disk is read-only in the host, the guest should obey */
++	if (virtio_has_feature(vdev, VIRTIO_BLK_F_RO))
++		set_disk_ro(vblk->disk, 1);
++
++	err = virtblk_q_limits_set(vdev, vblk->disk->queue);
++	if (err)
++		goto out_tagset_put;
++
+ 	virtblk_update_capacity(vblk, false);
+ 	virtio_device_ready(vdev);
+ 
+ 	err = device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
+ 	if (err)
+-		goto out_cleanup_disk;
++		goto out_tagset_put;
+ 
+ 	return 0;
+ 
+-out_cleanup_disk:
+-	put_disk(vblk->disk);
+-out_free_tags:
+-	blk_mq_free_tag_set(&vblk->tag_set);
++out_tagset_put:
++	virtblk_tagset_put(vblk);
+ out_free_vq:
+ 	vdev->config->del_vqs(vdev);
+ 	kfree(vblk->vqs);
+@@ -1106,8 +1142,7 @@ static void virtblk_remove(struct virtio_device *vdev)
+ 	/* Make sure no work handler is accessing the device. */
+ 	flush_work(&vblk->config_work);
+ 
+-	del_gendisk(vblk->disk);
+-	blk_mq_free_tag_set(&vblk->tag_set);
++	virtblk_tagset_free(vblk);
+ 
+ 	mutex_lock(&vblk->vdev_mutex);
+ 
 -- 
 2.18.1
 
