@@ -2,111 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C07C4332F
-	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 03:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E13C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 08:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229478AbiJCDb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Oct 2022 23:31:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52244 "EHLO
+        id S230198AbiJCIgA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Oct 2022 04:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiJCDbz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 23:31:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5031356F5;
-        Sun,  2 Oct 2022 20:31:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 82392B8058E;
-        Mon,  3 Oct 2022 03:31:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3C19C433C1;
-        Mon,  3 Oct 2022 03:31:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664767911;
-        bh=y35fnV1suzCrdYnC9ogHY7hnwYVGR7VG5Y9k9Bvj6Y4=;
-        h=Date:From:To:Cc:Subject:From;
-        b=aXP5wX8T+Tj8ZKfuf/V+xa7gVbK0pLGri+mgOnMuP/IlzoyXMTV3k4ILCuklR6mZM
-         FlaX90HO752CwrDRAnB4OdepWaGdvPTCVgt95WYpqKZHk979DdoVvdD1ZFziKehmd9
-         zheGJo2+IVxfZnix2V7pcEv8F/blcN0QtP0GI8MVxwJ0BbVEod0APOgnGLSwJuAqfa
-         grfOZgNRUjbIJ0CbrqHwg688qD4Ra9NLOmyhI7gmYwD0mwlGlvrfDDyPwqGrvJ9plG
-         qfMG4uxF+RUX0f63BuXtgjxCvoja9F4BNDjWRV5uCa8QPEwG2L/oQe7iX5WGEgXaqT
-         ciwkakE9U+5Aw==
-Date:   Sun, 2 Oct 2022 20:31:49 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     linux-fsdevel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [GIT PULL] STATX_DIOALIGN for 6.1
-Message-ID: <YzpXpalOcvwp+keu@quark>
+        with ESMTP id S230195AbiJCIfe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 04:35:34 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B176D563
+        for <linux-block@vger.kernel.org>; Mon,  3 Oct 2022 01:07:47 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id j7so10099994wrr.3
+        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2022 01:07:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=hVBNQ5c/KIbk2+4B3+qMf2aC9Bjz6M4lskTK/SNnjPA=;
+        b=10gM2r4vlcVw00LduSidR3Hvj/12RJeuIFSZ7HE6Sr1PIrv8JkWLmAuKZRfSzNYtMs
+         j94ebCCpYGsrvbzpt53hvqzk9e5FoezAd/QEJCieNRXLhoxdzK44EX1WM+XGdgZfXQDp
+         LrRgBjiDxFqQL8LjXkRLP9vpX/yI1T9YjiXfh8VvDiEeuhOU32FIDXv8iCdwG/w4I9R6
+         4DM39Dn2RaRyddGAfn3uJABF7Z4RNE5jFiS4qMG3Ycv2ANk14lQqfJsl1EDm2w37gS90
+         +JtdeiSsI24IopW6XFEomyWB3xLTLJky6uQlNKbpkdrkcJaGtdBtA+k/tMVtd0O31fmX
+         EtiA==
+X-Gm-Message-State: ACrzQf0FBJEyvaaywSU2FgPCfRmDDzmEAKW6TDyMqyPVXPSNRnJ89mDE
+        J/BCOMqxpk7l4sp8PeepyarFtasXluI=
+X-Google-Smtp-Source: AMsMyM6Xntuf0ZnDgCbmn571IIKvBlrQXrbOZepgknpJ4oagT39vJ+3j7uTee23pecwDYwg+s8CNVQ==
+X-Received: by 2002:a5d:6b09:0:b0:225:37cf:fb8b with SMTP id v9-20020a5d6b09000000b0022537cffb8bmr12178760wrw.179.1664784152958;
+        Mon, 03 Oct 2022 01:02:32 -0700 (PDT)
+Received: from [192.168.64.53] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id d10-20020a5d6dca000000b0022917d58603sm9056820wrz.32.2022.10.03.01.02.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Oct 2022 01:02:32 -0700 (PDT)
+Message-ID: <cef09c04-17d6-c588-be9f-b33e36dfce1a@grimberg.me>
+Date:   Mon, 3 Oct 2022 11:02:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH rfc] nvme: support io stats on the mpath device
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Hannes Reinecke <hare@suse.de>
+References: <20220928195510.165062-1-sagi@grimberg.me>
+ <20220928195510.165062-2-sagi@grimberg.me>
+ <760a7129-945c-35fa-6bd6-aa315d717bc5@nvidia.com>
+ <a3d619a3-ccae-69ea-3e2c-9acff7b97d92@grimberg.me>
+ <YzWzvOKgoAqltAA0@kbusch-mbp.dhcp.thefacebook.com>
+ <e5299b5e-5e9a-5a2a-b7dc-30de2bf43adc@grimberg.me>
+ <YzcINzNpZ+4zkupd@kbusch-mbp.dhcp.thefacebook.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <YzcINzNpZ+4zkupd@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 1c23f9e627a7b412978b4e852793c5e3c3efc555:
 
-  Linux 6.0-rc2 (2022-08-21 17:32:54 -0700)
+>>>>> 3. Do you have some performance numbers (we're touching the fast path
+>>>>> here) ?
+>>>>
+>>>> This is pretty light-weight, accounting is per-cpu and only wrapped by
+>>>> preemption disable. This is a very small price to pay for what we gain.
+>>>
+>>> It does add up, though, and some environments disable stats to skip the
+>>> overhead. At a minimum, you need to add a check for blk_queue_io_stat() before
+>>> assuming you need to account for stats.
+>>
+>> But QUEUE_FLAG_IO_STAT is set by nvme-mpath itself?
+>> You mean disable IO stats in runtime?
+> 
+> Yes, the user can disable it at any time. That actually makes things a bit
+> tricky since it can be enabled at the start of an IO and disabled by the time
+> it completes.
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/statx-dioalign-for-linus
-
-for you to fetch changes up to 61a223df421f698c253143014cfd384255b3cf1e:
-
-  xfs: support STATX_DIOALIGN (2022-09-11 19:47:12 -0500)
-
-----------------------------------------------------------------
-
-Make statx() support reporting direct I/O (DIO) alignment information.
-This provides a generic interface for userspace programs to determine
-whether a file supports DIO, and if so with what alignment restrictions.
-Specifically, STATX_DIOALIGN works on block devices, and on regular
-files when their containing filesystem has implemented support.
-
-An interface like this has been requested for years, since the
-conditions for when DIO is supported in Linux have gotten increasingly
-complex over time.  Today, DIO support and alignment requirements can be
-affected by various filesystem features such as multi-device support,
-data journalling, inline data, encryption, verity, compression,
-checkpoint disabling, log-structured mode, etc.  Further complicating
-things, Linux v6.0 relaxed the traditional rule of DIO needing to be
-aligned to the block device's logical block size; now user buffers (but
-not file offsets) only need to be aligned to the DMA alignment.
-
-The approach of uplifting the XFS specific ioctl XFS_IOC_DIOINFO was
-discarded in favor of creating a clean new interface with statx().
-
-For more information, see the individual commits and the man page update
-https://lore.kernel.org/r/20220722074229.148925-1-ebiggers@kernel.org.
-
-----------------------------------------------------------------
-Eric Biggers (8):
-      statx: add direct I/O alignment information
-      vfs: support STATX_DIOALIGN on block devices
-      fscrypt: change fscrypt_dio_supported() to prepare for STATX_DIOALIGN
-      ext4: support STATX_DIOALIGN
-      f2fs: move f2fs_force_buffered_io() into file.c
-      f2fs: simplify f2fs_force_buffered_io()
-      f2fs: support STATX_DIOALIGN
-      xfs: support STATX_DIOALIGN
-
- block/bdev.c              | 23 ++++++++++++++++++++++
- fs/crypto/inline_crypt.c  | 49 +++++++++++++++++++++++------------------------
- fs/ext4/ext4.h            |  1 +
- fs/ext4/file.c            | 37 ++++++++++++++++++++++++-----------
- fs/ext4/inode.c           | 37 +++++++++++++++++++++++++++++++++++
- fs/f2fs/f2fs.h            | 40 --------------------------------------
- fs/f2fs/file.c            | 43 ++++++++++++++++++++++++++++++++++++++++-
- fs/stat.c                 | 14 ++++++++++++++
- fs/xfs/xfs_iops.c         | 10 ++++++++++
- include/linux/blkdev.h    |  4 ++++
- include/linux/fscrypt.h   |  7 ++-----
- include/linux/stat.h      |  2 ++
- include/uapi/linux/stat.h |  4 +++-
- 13 files changed, 188 insertions(+), 83 deletions(-)
+That is what blk_do_io_stat is for, we can definitely export that.
