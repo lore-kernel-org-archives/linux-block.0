@@ -2,186 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A189AC433FE
-	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 10:16:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A08EDC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 12:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229480AbiJCKQs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Oct 2022 06:16:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
+        id S229836AbiJCMwg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Oct 2022 08:52:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiJCKQr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 06:16:47 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9FA2EF03
-        for <linux-block@vger.kernel.org>; Mon,  3 Oct 2022 03:16:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nPBmrzpfir585gdcPoq+dgcvgIS4t2ZikR0EwMhAKcCBcIln+Sdj7Q0o19XrwFLTAms5EzS/ZxHKDITpEFsJuBTet/is2ky1Z2v8kPJ1fO2/7ewaIa1IMHmqtZUdrV+0MA6Tdy/XYY9jEWbFEBQPvQ8VvuKWY4paHoT9lRV31agQnV5M8Z7eFucDxdWSfpFEvla/A56fIk1Cx0BB4K168xM+bYFIr1g1pluBrHKniy2Dfqt44clDChFsM/A9rACzUwOQUulXzgSfqUrfAE6SWvGvyB2hddKMjUL5zWTZUM2Ocr1rFLf0ssX1J/XWzxoC+upOSObCF4i8UwokQFylEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=va+Xr5qhjfPwUwwsN1zSPhnOWq2c/lmTdvUTeyyFTag=;
- b=W4VGcXytI/+ItwHaEzhO5zw4vJI0xKx7FtEC4G16d0EI8bkY0A8ijpBJucHhAN4dsjLUoU2vCWwUJwZlefHBbb7guMDg9HbfhwvERptZ1qBqnxn0XjnYwoTDd/k9911rKDtJpY1sPXpPJHYhwqQ33m/gUZ+77CUvZHbVStyXt5DGJuJG8WsffxnScsOst9Vjty/e6Jm0MV4gVvJm42e+wLKHGnoCSBaB3CVfU8kBLVOZbFJTVWfSbeNAMYaw2Y//Ke4hgGJG7FHxh8TWKU0tfxXbpDsNdl0hr76sd1oKSxjHrl6jOtrwXd6nNY7ptm8cQ5M2KwIpBNLjeXSuMgK5kw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=va+Xr5qhjfPwUwwsN1zSPhnOWq2c/lmTdvUTeyyFTag=;
- b=gr5QdLykOFCPn84ALmbUCeLym8XqWwtL1H44TZ+mPey+XCRaeQWr2eZXycrgwkNLoIBi838Y+BdFQpCo0hfjQuWSQLoaSYyO9a3GKpMQ2iSXNWk8b6rQR/yrkaqaD3VDrj0qlfLnjSnjoRH4wgTLaGiUctlNmmJvkqnFX0pJHygYTWrzQfkTZHTrZxCGhbJMkcDyCAIU1YZTCIPOylGUOTbQNfsMQnmnGGIF6zLxir/idRiHycGzs0RCdeCxP+jLkhiLdV8UPIxxEOixT/FNFzln2xQrtGCDli1EjRv4t13gJPDztC2VoF1PVoBl2II/FKzJxKhRoFfYfxNAw5j8nQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by CO6PR12MB5410.namprd12.prod.outlook.com (2603:10b6:5:35b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.20; Mon, 3 Oct
- 2022 10:16:43 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::6579:a8ca:b90b:c3fb]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::6579:a8ca:b90b:c3fb%4]) with mapi id 15.20.5676.030; Mon, 3 Oct 2022
- 10:16:43 +0000
-Message-ID: <3354c32d-34b3-0997-3a59-8fc199e6640a@nvidia.com>
-Date:   Mon, 3 Oct 2022 13:16:36 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v2 1/1] nvme: use macro definitions for setting
- reservation values
-Content-Language: en-US
-To:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
-        hch@lst.de, kbusch@kernel.org
-Cc:     oren@nvidia.com, chaitanyak@nvidia.com, linux-block@vger.kernel.org
-References: <20221002082851.13222-1-mgurtovoy@nvidia.com>
- <cfd01d2e-1f87-2295-13bb-c8705b3335f9@grimberg.me>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <cfd01d2e-1f87-2295-13bb-c8705b3335f9@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM5P194CA0003.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:203:8f::13) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+        with ESMTP id S229742AbiJCMwe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 08:52:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72BBA3B946
+        for <linux-block@vger.kernel.org>; Mon,  3 Oct 2022 05:52:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664801538;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LWI5T1sagJQQtT9F8e+DNVpGWonAVpt6zwpHx5ib+Ck=;
+        b=dsi5oN8UX0a5Up/2VW9+GAJtwKP/tkF+y6MoUKHm6rq3yJEW8RyArWjet91E1sVACTH/aX
+        M1NnhQBhNHAL744O0rdCFi69o2aRBefkK3emtOmLIAnJGn1PDzB3DSPh5cPU6f7lNJZ1bn
+        84RZ4XDu4tVOHPwKVFeRMnEeQ2wlteA=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-259-dUYEr_wdMXOKWDQqzTaM_Q-1; Mon, 03 Oct 2022 08:52:17 -0400
+X-MC-Unique: dUYEr_wdMXOKWDQqzTaM_Q-1
+Received: by mail-qv1-f71.google.com with SMTP id em2-20020ad44f82000000b004af5338777cso6812080qvb.4
+        for <linux-block@vger.kernel.org>; Mon, 03 Oct 2022 05:52:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=LWI5T1sagJQQtT9F8e+DNVpGWonAVpt6zwpHx5ib+Ck=;
+        b=ukKm7FS6G7Lx5zmxlFM5xZS5edIr/D8WmoQyX1iw7X7vYhQ+Zy8UNPZuK6+Iuv7R15
+         iMnj7zj6d+BwNG2Vx6H56ZxKaHuYStjZESwULTLW2js/MwcXkZMEl4SOr95LgbQFG583
+         C1HpkvU02NkrprEXLppHLn+2P2ANkMKHGTWiEgpN8+Fx2g74julLHhX57DpUOMt+9yyA
+         8l77k/XvfpVsojwuBwBAhPDdtMClTbF5gsVISP5AsdfDPHRaUtFDx/phwtY/xIT3rVxf
+         2vohtP75fc1HYcihFIIztmA5sk+OOYQAzxsz2QCxd6kPOYGRD078RVyxv9AEBk7FVEHi
+         ECrQ==
+X-Gm-Message-State: ACrzQf3/47Mp0ysMsSbmilYOMfJB1ij1nUsCF0FFjBXThwV63w0xvJn8
+        wX83har1LS6fChe2H9N9tfgEJfW2IXrUeuIFt3tQz3p9hwYisEIMvD1NSsbPr1na1T4s6BlQcuR
+        fUh1qsRexZD2wpfbvxIHFrNk=
+X-Received: by 2002:ac8:5f48:0:b0:35d:1b11:6ae5 with SMTP id y8-20020ac85f48000000b0035d1b116ae5mr15866580qta.247.1664801536604;
+        Mon, 03 Oct 2022 05:52:16 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6W9kp8Pz+Wo9CRSIYVIQDHWRVzW5lvdk95YrX7f9CkHRpn284zpUCFot5EYE7MfO7vNzxpQg==
+X-Received: by 2002:ac8:5f48:0:b0:35d:1b11:6ae5 with SMTP id y8-20020ac85f48000000b0035d1b116ae5mr15866570qta.247.1664801536340;
+        Mon, 03 Oct 2022 05:52:16 -0700 (PDT)
+Received: from bfoster (c-24-61-119-116.hsd1.ma.comcast.net. [24.61.119.116])
+        by smtp.gmail.com with ESMTPSA id u27-20020a05622a199b00b0034305a91aaesm10089689qtc.83.2022.10.03.05.52.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Oct 2022 05:52:15 -0700 (PDT)
+Date:   Mon, 3 Oct 2022 08:52:13 -0400
+From:   Brian Foster <bfoster@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Nico Pache <npache@redhat.com>,
+        Joel Savitz <jsavitz@redhat.com>
+Subject: Re: [PATCH] block: avoid sign extend problem with default queue
+ flags mask
+Message-ID: <Yzra/TsOxX5JCIlf@bfoster>
+References: <20220930150345.854021-1-bfoster@redhat.com>
+ <5b7798a8-c9e1-530d-3926-856294f779d1@kernel.dk>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5040:EE_|CO6PR12MB5410:EE_
-X-MS-Office365-Filtering-Correlation-Id: bbc624ee-eef3-43ef-b3a1-08daa5285efc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4+LNJV39BWWvUI6Oq+ZHSXWvL6/hzsw/UGp5WP6Job33w2kUicDLP+bTS2SxiuY1yXIUJq0jQCsuv7eLEmkmYkIi5EUMfQL2+zk7uhopwGZ+JeapphT9qctUD+mokTd48t61q6RoVWbjiSVaeQV/HIRvqkmLL7T0wVtz5DqLTve271EJ3HlK0WvsuGxabf+38hpi2csNombk4HLWnPW3GbxcIVUN+d27SRolTjj5CyMtavoma/wmGgWHOzF2lc460urHtaHfGZNSLQBmU/NOus8pgp3T37h2yLWtgttWmCKxKgXQ3mAiMw7RqAxJqy0nncqN4swrmWW78gskJyfWd38WxEnZiDD+JDLWm3OD0MFtgSwzP/ErX7qiGXKALuBeQDghpGcI3a7AGdnE7GZ84D/7oElp98i2VxV3+3qv4KrEnHdv3mkKYW8JhLjbRRwe4yWDRcyFtlT6vjMUWJ/UVp/E4MdZ45CJ2qECscBdV+VXIR61ejGkDmliuaeTyGeAso/Fj5Af/AEBlC2GmJqsk6esh4t3XcdIyGR5s4eiF4NtqdbRO2RSHqOnLfl0vVU4dR9Bpr3ntW+EU3//CxEnwB7xfJ5ZbJx6ppDE0EVR7X3Em2nOMIx6P/duWXL6Fi1mmyWdSt+ykStVlvjSHupsiDi069+M/6Hu8CaqOk2zIUIJ62HIAmv1qEItJRhznxL9SPivzzlcuKBOIM/Bqub9usf2y1SsqFfSJkxqw3M128OnZ6YQB2XRa/25LTWrJ0vBiHMLm8wwnjHyvsqhyXNkFiHaS5J1A8EACYpmlsf0AEU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(39860400002)(366004)(136003)(396003)(451199015)(4326008)(8676002)(38100700002)(41300700001)(6666004)(66476007)(66556008)(66946007)(186003)(2616005)(2906002)(83380400001)(53546011)(6506007)(31696002)(6512007)(86362001)(8936002)(36756003)(26005)(5660300002)(31686004)(316002)(478600001)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T3BVVVJkaS8vSzFwOWZRcE1kUXh2UWlMYzJnKy9UeGJSOGlvUjJ1VDl5NFFn?=
- =?utf-8?B?bTI4a01QbzVMZENHSlUvN2RrQjdvUTdnWWZ3ZDNtelJSa1lGYkpGaUErR05D?=
- =?utf-8?B?WExoZTN2RnhDMGlwYUdJN1V1Nk9XcVNPRCtSUFIwUHlELy9wd1YrUGFMUmZ2?=
- =?utf-8?B?bmJPUWlBVm8yeUpwNWVOaVBkNUhtTWlCbkpCQ3lUUlhnb3ZPSFphMCsyT0hm?=
- =?utf-8?B?S1JpWExWaXEwa0MzK1pjL3VWL2xwWWVwTklXdEwvSC9oc09kSE1ZSEVrOSti?=
- =?utf-8?B?NDRUNU9xbzBwblUvOUR0UEkxaGs2MWxVOC81dWdhcG5iYVllUHVZM3Q2emM4?=
- =?utf-8?B?d0VDWGtSaDhTNHdqaEhCMkMxY3JKUTI5eGpsK0R2SWtLYlhEVzJ0cUZ3Rk4x?=
- =?utf-8?B?Mlh3cGFyRUZvckwwWFk1UEF6dVNIK0RRUitjdzZ1NjRPTTZha0NEU05tcXR4?=
- =?utf-8?B?U1FiaGhKUHZocms3V2RpWHJNTHhQQzhEMlZDN3ZOajQ2VGpOS2VqOWY3QWxr?=
- =?utf-8?B?dGtkTWZmcmlYZDBTeHNnejJyK3JTMEo0SGlGRHZJeG1KenUyMWdmMkUzQ0ls?=
- =?utf-8?B?ZXVYbGpHdjNITFJ2V3ZsejRjRVFNamRIK1dNQnYrd3oyYSttYUp6Sjg1ZWti?=
- =?utf-8?B?ZjRmb3ROWDRNZ0VnaDB2a0RFV1FLd0I1NjEzemZFNnF3STdaanZ1R0x4dmFJ?=
- =?utf-8?B?TXJEbC9aa2xUZVpyb1BIa0JkcGtnOWZJUFlBSGwyc0RKd0wrS3VnQ3h1VlZx?=
- =?utf-8?B?WS90N1RWbGJlZjRlK3VpbXRMOUo2QndvTHkxZ0lINktMOXVIMGxKVTI3TXp0?=
- =?utf-8?B?YXkwZ0tUT1dBMEtnRHdhQjJWY2h6MUJEZlpvSDFPYW1WU3ZUUG4wMFlPZVVo?=
- =?utf-8?B?R1FzTlAydXdFU0s5RHpiTWg2aFJraDhDZFBCT3VFTkRHUnJROWx5VWxWbFg0?=
- =?utf-8?B?MERxRlU3aEZlUDVpZHdwVFlUcG5qMmNHZFc5dU9OZWRGczBScnp0bG1qdlcz?=
- =?utf-8?B?RDFlRnMwdFg1dVowNStmYURBcmpFYWpONy8zNmoySjR0TGJFbDk0dkRpTlJz?=
- =?utf-8?B?ZkRZa0ovSFZ0bWJpQ2JMbVRUdTROQlB2S0dpVzFxQXZmZjI4QW1hR29CcTEr?=
- =?utf-8?B?S3k5TVlZcEJLYXRLb2w2cGppRTJ5TU5LMmZ0ZVJmQ0NxREtNVWVHdWREdzFQ?=
- =?utf-8?B?SGwzZ2MvOFRuMU5nSXd2SE5QZW1oWDUvaG0zOURGeUJJcmQzYnZWUzA3YTNs?=
- =?utf-8?B?VERCZXptNlc0N1NsVnhQNXhFdnhjUVJmM1FGNlBsQmdlbU00S0t1Zzh1MXM1?=
- =?utf-8?B?aTRvelIyWWFybjI2Zy9NYnEwUGdhZVFJMm5WajluY2VVb05LTXl3OXFHQ3pt?=
- =?utf-8?B?QlIwbmpWRGdRb21hbUtQa2VQdGRMeHhJdi9yS282dXdXNlcwWHYrd3ZFYnhU?=
- =?utf-8?B?ZGsvdmp1U1R3RDcwYjBJWTBQTXBxK0dkUjN3OUhxcTlXRVpyNys4TEI0VVpa?=
- =?utf-8?B?eklBNnZUOGsyZHgxVlZpYXBNb2tIdnAyTStsREswY2M1OFFjd25RMGRxS0JF?=
- =?utf-8?B?SkJMYm9WUmVZSnlPRlUzVVBhOE95QWo0RG84V2VEUEZ4V3JtOHZOYlZXRTVm?=
- =?utf-8?B?alFnZWVZdE1Ud0krcjBrajU0NThrcER2c2JZblBlTlM2aWVLbHN2aXpjUEZn?=
- =?utf-8?B?RjZxZW1TS0diQS9VcFh3Ujd0NEIvSU9qSi9jMXJmQlBuU29LeUZxamNpTENV?=
- =?utf-8?B?NDE5STB1S0UzWFVxT3B6dTZML1BZc2I2MEg1cVVWMlhjeU8rMGdvRTBXc1lv?=
- =?utf-8?B?WUtCYzA1WU5MZlhWVW1lWitDcmtUdGVZZzU4MTMzZUpDQW5lRllzaFJlYzdv?=
- =?utf-8?B?bDhrMmF6V1piYk9SQU80VXMwMkk4amRmeGJEbnpjTERxU0lHWCt4ZDVWRVlP?=
- =?utf-8?B?dmdua3FyZFJyZHF2TjdLcHFmbXIyQWxKclBTajBxNVlBWmJNZ1kxSldyZldy?=
- =?utf-8?B?UmxvYXdxR1RwVWY0MHV5dFZkamNxZC9NeXVjZndIZnI0Rm54NzFIWWlCV3hO?=
- =?utf-8?B?dFFBWmZwUmlOYk9OWlJEekxmUTN5VmhWbHg1NkRnTmJxOXl1dms2L293cGRQ?=
- =?utf-8?B?OHRPdGQ0MDdkZ0ZRWmtBMUlLV1Y0MVZYZkNJUWZoWFJRL3pZWXB1eXNKUUMw?=
- =?utf-8?B?VkE9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbc624ee-eef3-43ef-b3a1-08daa5285efc
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2022 10:16:43.8959
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Th+jhKgflLp2/TmssMrYjnAKq7r3tPOiSpKtkjAuTAx6XJ1MK2tVng9OcnQtq6gMAL2oxwY6trbJHNS5rZGcCA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR12MB5410
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b7798a8-c9e1-530d-3926-856294f779d1@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Sep 30, 2022 at 03:33:29PM -0600, Jens Axboe wrote:
+> On 9/30/22 9:03 AM, Brian Foster wrote:
+> > request_queue->queue_flags is an 8-byte field. Most queue flag
+> > modifications occur through bit field helpers, but default flags can
+> > be logically OR'd via the QUEUE_FLAG_MQ_DEFAULT mask. If this mask
+> > happens to include bit 31, the assignment can sign extend the field
+> > and set all upper 32 bits.
+> > 
+> > This exact problem has been observed on a downstream kernel that
+> > happens to use bit 31 for QUEUE_FLAG_NOWAIT. This is not an
+> > immediate problem for current upstream because bit 31 is not
+> > included in the default flag assignment (and is not used at all,
+> > actually). Regardless, fix up the QUEUE_FLAG_MQ_DEFAULT mask
+> > definition to avoid the landmine in the future.
+> > 
+> > Signed-off-by: Brian Foster <bfoster@redhat.com>
+> > ---
+> > 
+> > Just to elaborate, I ran a quick test to change QUEUE_FLAG_NOWAIT to use
+> > bit 31. With that change but without this patch, I see the following
+> > queue state:
+> > 
+> > # cat /sys/kernel/debug/block/vda/state
+> > SAME_COMP|IO_STAT|INIT_DONE|WC|STATS|REGISTERED|30|NOWAIT|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63
+> > 
+> > And then with the patch applied:
+> > 
+> > # cat /sys/kernel/debug/block/vda/state
+> > SAME_COMP|IO_STAT|INIT_DONE|WC|STATS|REGISTERED|30|NOWAIT
+> > 
+> > Thanks.
+> > 
+> > Brian
+> > 
+> >  include/linux/blkdev.h | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 84b13fdd34a7..28c3037cb25c 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -580,9 +580,9 @@ struct request_queue {
+> >  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
+> >  #define QUEUE_FLAG_SQ_SCHED     30	/* single queue style io dispatch */
+> >  
+> > -#define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+> > -				 (1 << QUEUE_FLAG_SAME_COMP) |		\
+> > -				 (1 << QUEUE_FLAG_NOWAIT))
+> > +#define QUEUE_FLAG_MQ_DEFAULT	((1ULL << QUEUE_FLAG_IO_STAT) |		\
+> > +				 (1ULL << QUEUE_FLAG_SAME_COMP) |	\
+> > +				 (1ULL << QUEUE_FLAG_NOWAIT))
+> 
+> Shouldn't this just be 1UL << foo? The queue_flags are not 8-bytes,
+> they are unsigned long. That happens to be 8-bytes on 64-bit archs,
+> but it's 4-bytes on 32-bit archs.
+> 
 
-On 10/3/2022 1:03 PM, Sagi Grimberg wrote:
->
->> This makes the code more readable.
->>
->> Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
->> ---
->> Changes from v1:
->>   - remove comments (Sagi/Keith)
->>   - use tabs for constants alignment, similar to 'enum pr_type' (Keith)
->> ---
->>   drivers/nvme/host/core.c | 12 ++++++------
->>   include/linux/nvme.h     |  9 +++++++++
->>   2 files changed, 15 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->> index 3f1a7dc2a2a3..50668e1bd9f1 100644
->> --- a/drivers/nvme/host/core.c
->> +++ b/drivers/nvme/host/core.c
->> @@ -2068,17 +2068,17 @@ static char nvme_pr_type(enum pr_type type)
->>   {
->>       switch (type) {
->>       case PR_WRITE_EXCLUSIVE:
->> -        return 1;
->> +        return NVME_PR_WRITE_EXCLUSIVE;
->>       case PR_EXCLUSIVE_ACCESS:
->> -        return 2;
->> +        return NVME_PR_EXCLUSIVE_ACCESS;
->>       case PR_WRITE_EXCLUSIVE_REG_ONLY:
->> -        return 3;
->> +        return NVME_PR_WRITE_EXCLUSIVE_REG_ONLY;
->>       case PR_EXCLUSIVE_ACCESS_REG_ONLY:
->> -        return 4;
->> +        return NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY;
->>       case PR_WRITE_EXCLUSIVE_ALL_REGS:
->> -        return 5;
->> +        return NVME_PR_WRITE_EXCLUSIVE_ALL_REGS;
->>       case PR_EXCLUSIVE_ACCESS_ALL_REGS:
->> -        return 6;
->> +        return NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS;
->>       default:
->>           return 0;
->>       }
->> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
->> index ae53d74f3696..4f777d8621a7 100644
->> --- a/include/linux/nvme.h
->> +++ b/include/linux/nvme.h
->> @@ -238,6 +238,15 @@ enum {
->>       NVME_CAP_CRMS_CRIMS    = 1ULL << 60,
->>   };
->>   +enum {
->
-> I'd make this named nvme_pr_type
+Oops.. yes, that makes sense. I guess that means we shouldn't really
+expect to see anything use the upper 32 bits. The extension still makes
+the state output look wonky in the (1 << 31) case, so I'll send a v2
+with that fixed..
 
-Most of the enums of this header are not named.
+Brian
 
-I don't understand what is the convention here.
-
-Usually, if it's not a new header file I'm trying to keep the file 
-convention and this is what I did.
-
-If all agree on named, I'll send another version.
-
+> -- 
+> Jens Axboe
+> 
+> 
 
