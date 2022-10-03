@@ -2,90 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B80C2C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 17:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A99B4C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 17:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229468AbiJCRkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Oct 2022 13:40:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58066 "EHLO
+        id S229918AbiJCR6a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Oct 2022 13:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229743AbiJCRkR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 13:40:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355791E729
-        for <linux-block@vger.kernel.org>; Mon,  3 Oct 2022 10:40:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664818813;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/OvRUrGfw8TOZah0PxNYChSkH0fCR+iXG8NZ//kOXLc=;
-        b=GLvw4/8Md/ka9eC21uvQhKfX1eSQGuBdPVW0qGYFm6JV2A05J2Fbo5W5s5rNn6w5vN6vpq
-        mb4eRanNfv5av0MfhqBIcLUqOi5KaZ5PO2zbTTiAvEaZyZRYg3miU3NUH18JXI1gJu8/od
-        OKdxELzuP9ss///g2MtEh9GfyJU+puk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-487-CREGx1c3NwWpx7R3TydlWQ-1; Mon, 03 Oct 2022 13:40:06 -0400
-X-MC-Unique: CREGx1c3NwWpx7R3TydlWQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1584C80C8C1;
-        Mon,  3 Oct 2022 17:40:06 +0000 (UTC)
-Received: from [10.18.17.215] (dhcp-17-215.bos.redhat.com [10.18.17.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B89AA492CA2;
-        Mon,  3 Oct 2022 17:40:05 +0000 (UTC)
-Message-ID: <87e7cd70-4ab6-f33b-ce26-afe2c7c04faa@redhat.com>
-Date:   Mon, 3 Oct 2022 13:40:05 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH v7 1/3] llist: Add a lock-less list variant terminated by
- a sentinel node
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>,
+        with ESMTP id S229963AbiJCR5T (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 13:57:19 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A82706242;
+        Mon,  3 Oct 2022 10:56:35 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id r15-20020a4abf0f000000b004761c7e6be1so7242933oop.9;
+        Mon, 03 Oct 2022 10:56:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=gqeG2bk/2Oil9VANRyGxn3QzmZoAZRDSrhJ8M9gUamM=;
+        b=aqTFzRRrRwAPGWpJkPmp5dgY5kaqOXORBz5lRuAKAXu3kSD3gznaU1TWDG+6jMnvvo
+         wVm9tpjrdzeJy7NTi16105FqlVYN4i5sst0rirsdDa15EUhKzg8DDwKupD0MzXCKKX7R
+         xudFcwY4zShcN9RCcZu0lgk6WGdbs6yr8QG1AawI1te2JW4fHjip0vhZ96BENxHaw9Hs
+         VrwP7ioiMGvxyFPQfRZ4N5YCtGY09HWs2LM6qSw0prViZoU2HKJ5B03pglDN8CkNjaRu
+         FctO3GLKWq8/ptHnN4l6U1T4G6MnY8ojSs+v8QwUHr9vlrx6d2ol+f5R+K79Bii72kKX
+         gBcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=gqeG2bk/2Oil9VANRyGxn3QzmZoAZRDSrhJ8M9gUamM=;
+        b=PhJNzkK4iPNztyPkFBXzyoomNJ+u4E/FPocub/unFXeGW/eSD2ODs+e628Zml9sY9Q
+         RBQ9m/9E9wTMDBzaKcx89wnvZKqwKpM6ZWXoQfl8gq3QmEiMJBD6wY+ffNHSoJ2abHHU
+         oS/VawGGYC5/RfuqsyQtKZqKjcq4m7jMgVkSgU4GWCNQEQIc37FeiIFsdrz3AuTU/0ZA
+         762BrKS+P4iOT5t0IiN2gn9PP+xAfsX8A170xB2NbZuXRiHZJcRIYSJP7Ji1uEmktuWL
+         7I23AHByBbRloQtVoxtYzdYvv8KPaW/PbuL6IHItzFGJrrRQBb4oeZ4M3MrFNJe1MYUU
+         ZGmQ==
+X-Gm-Message-State: ACrzQf0nY1gnQYKU2LF/QV5tmpZg94VuIsbNaA1JTAWWTKkRpoS5rLIu
+        BZTZCWMQgL7TbaVoWxpT5Xg=
+X-Google-Smtp-Source: AMsMyM7hO1K+jJ3gpx+FucxtVuPmD5Hp0gqszRg+EdZE3vHcIUiIUAlj2oefskAejxW+YHYsHqhC/A==
+X-Received: by 2002:a9d:72d1:0:b0:65c:6650:a3c5 with SMTP id d17-20020a9d72d1000000b0065c6650a3c5mr8124998otk.286.1664819794817;
+        Mon, 03 Oct 2022 10:56:34 -0700 (PDT)
+Received: from localhost ([12.97.180.36])
+        by smtp.gmail.com with ESMTPSA id e17-20020a9d7311000000b0063715f7eef8sm2489013otk.38.2022.10.03.10.56.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Oct 2022 10:56:34 -0700 (PDT)
+Date:   Mon, 3 Oct 2022 10:54:23 -0700
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-References: <20221003154459.207538-1-longman@redhat.com>
- <20221003154459.207538-2-longman@redhat.com>
- <YzsQZPONIJRgtf3o@slm.duckdns.org>
- <006ebc52-ab37-442a-9ba3-e7b8dff53fab@redhat.com>
- <YzsUgY4CC0SH8Sl2@slm.duckdns.org>
- <8008933b-4a28-19e5-02db-ef1d07eaf952@redhat.com>
- <YzsdsjlMMDFwLOzR@slm.duckdns.org>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <YzsdsjlMMDFwLOzR@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>
+Subject: Re: [PATCH bitmap-for-next 1/5] blk_mq: Fix cpumask_check() warning
+ in blk_mq_hctx_next_cpu()
+Message-ID: <Yzshzw6hKhbtdxSd@yury-laptop>
+References: <20221003153420.285896-1-vschneid@redhat.com>
+ <20221003153420.285896-2-vschneid@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221003153420.285896-2-vschneid@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Oct 03, 2022 at 04:34:16PM +0100, Valentin Schneider wrote:
+> A recent commit made cpumask_next*() trigger a warning when passed
+> n = nr_cpu_ids - 1. This means extra care must be taken when feeding CPU
+> numbers back into cpumask_next*().
+> 
+> The warning occurs nearly every boot on QEMU:
 
-On 10/3/22 13:36, Tejun Heo wrote:
-> Hello,
->
-> On Mon, Oct 03, 2022 at 01:32:49PM -0400, Waiman Long wrote:
->> What my current thinking is to make llist works with both NULL and sentinel
->> terminated lockless list. Users who wish to use the sentinel terminated
->> version will have to use special sentinel version of LLIST_HEAD() macro and
->> llist_del_all() and __llist_del_all() functions. In this way, I don't need
->> to touch an existing users of llist while minimizing code redundancy. What
->> do you think?
-> Wouldn't that be more error-prone in the long term? I'd just bite the bullet
-> and convert the empty tests. It is a hassle to find them but given that it's
-> just the head node testing, it hopefully wouldn't be too bad.
+[...]
+ 
+> Fixes: 78e5a3399421 ("cpumask: fix checking valid cpu range")
 
-OK, I will take a further look at what changes will be needed by the 
-existing llist users.
+No! It fixes blk-mq bug, which has been revealed after 78e5a3399421.
+
+> Suggested-by: Yury Norov <yury.norov@gmail.com>
+
+OK, maybe I suggested something like this. But after looking into the code
+of blk_mq_hctx_next_cpu() code for more, I have a feeling that this should
+be overridden deeper. 
+
+Can you check - did this warning raise because hctx->next_cpu, or
+because cpumask_next_and() was called twice after jumping on
+select_cpu label?
+
+> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+> ---
+>  block/blk-mq.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c96c8c4f751b..30ae51eda95e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2046,8 +2046,13 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+>  
+>  	if (--hctx->next_cpu_batch <= 0) {
+>  select_cpu:
+
+Because we have backward looking goto, I have a strong feeling that the
+code should be reorganized.
+
+> -		next_cpu = cpumask_next_and(next_cpu, hctx->cpumask,
+> -				cpu_online_mask);
+> +		if (next_cpu == nr_cpu_ids - 1)
+> +			next_cpu = nr_cpu_ids;
+> +		else
+> +			next_cpu = cpumask_next_and(next_cpu,
+> +						    hctx->cpumask,
+> +						    cpu_online_mask);
+> +
+>  		if (next_cpu >= nr_cpu_ids)
+>  			next_cpu = blk_mq_first_mapped_cpu(hctx);
+
+This simply means 'let's start from the beginning', and should be
+replaced with cpumask_next_and_wrap().
+
+>  		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+
+
+Maybe something like this would work?
+
+        if (--hctx->next_cpu_batch > 0 && cpu_online(next_cpu)) {
+                hctx->next_cpu = next_cpu;
+                return next_cpu;
+        }
+
+        next_cpu = cpumask_next_and_wrap(next_cpu, hctx->cpumask, cpu_online_mask)
+        if (next_cpu < nr_cpu_ids) {
+                hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
+                hctx->next_cpu = next_cpu;
+                return next_cpu;
+        }
+
+        /*
+         * Make sure to re-select CPU next time once after CPUs
+         * in hctx->cpumask become online again.
+         */
+        hctx->next_cpu = next_cpu;
+        hctx->next_cpu_batch = 1;
+        return WORK_CPU_UNBOUND;
+
+I didn't test it and likely screwed some corner case. I'm just
+trying to say that picking next cpu should be an easier thing.
 
 Thanks,
-Longman
-
+Yury
