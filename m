@@ -2,108 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BF8C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 18:24:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E42C433FE
+	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 18:54:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbiJCSYY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Oct 2022 14:24:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49622 "EHLO
+        id S229551AbiJCSyW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Oct 2022 14:54:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbiJCSYS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 14:24:18 -0400
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE88DDF83;
-        Mon,  3 Oct 2022 11:24:15 -0700 (PDT)
-Message-ID: <cce74aec-61b1-d5eb-1b62-746e45ebfe69@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1664821453;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vWgkp1Uhseyx7z8GnHpVT62F43ADCuiKPEXkLOgZNbI=;
-        b=YRgrt7JRLHcpvwYwlIH4rVoSJiv1DhfNg2g89dUUxTKGbycBChtZGpUNjYqErnK8NfQNvR
-        veoeXGNsCx0ez+BLZkSuaj2fSlxnriYeiuQL+mKbjg4FnI2/7tdvqWSUZR3N2hVhkJ+qhf
-        cgnsekMDz2NBGYZ0DvH00GlzEtO9E8c=
-Date:   Mon, 3 Oct 2022 12:24:08 -0600
+        with ESMTP id S229830AbiJCSyV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Oct 2022 14:54:21 -0400
+Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C4B43637;
+        Mon,  3 Oct 2022 11:54:20 -0700 (PDT)
+Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1329abb0ec6so1373640fac.8;
+        Mon, 03 Oct 2022 11:54:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=FIzWmWN1I6YXU/aAJy96gawoVGv35HbU2tFhtZjd8kg=;
+        b=GMSBDUtWSW8r5MPFGXqTCJUSL7Y6NVBVy+Q4G6Rnq4onoHonlVlorlBczD93BR5zLW
+         6gajfadSoIPaP21LvQ6HLCaF2JcJL6y96MPe6oTGq8MithQ7s5ulNTDPAhW/wtfuRE7r
+         JMpEzHqpBnkZmDRBtmW3BvZOjQ41hiZbiVdelOiYGWaeY7Eze3hCDA8uRxCoKOIxqnCM
+         g0ec25MlZNvQGCw/Qi2CeBy1kqdu7u8dog2lFbj/hhiajAIGko2fZNtp9DinajIjLO5E
+         2a5lRA6+eODvivlNAo1SXneZw3KqVZcvhIwPo0VqNUoybswIJMUYcF6cJ6kuI+shq4V6
+         bVgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=FIzWmWN1I6YXU/aAJy96gawoVGv35HbU2tFhtZjd8kg=;
+        b=qOeCoPRapDwShNUzp2SA/lMaFNxzxSSjFl+2mTrci6deiYJ7KHdG6OphjYFQoWQ6T5
+         vgPWp9EtpZXtBCFZWd1zCwOLSh/TamhI1wME6CYJGZcTGuEz1Bdanzhl0Jsd1Z9Ncj9v
+         DK6Abm4x7dpsnzGGHksinnOHwBq2TujpdJiwplCY84rufU8YvGsbQVrXA1xuuLSDNRVH
+         cZbQuzhDdZTHWQf+pT3NIKc28ihGStXghjNdE4zEce3EzfnPtHxqVGCvOIS2jQLtsI+k
+         TdIxjC+Pvoz0F+ty6ec7AaW/Kj9mHr3U2U+wbU35C/6N+SRRHcpWYh1ImFcPbqSHVCK+
+         gATw==
+X-Gm-Message-State: ACrzQf1pjtnYOKF0EGzGqKn+l7uCakyRQ5K7OAR0nKmURpQZ4CgiGl40
+        ldR+RMTszSayapzI6eRazRU=
+X-Google-Smtp-Source: AMsMyM6CxufjFwB0bI+jFpaWRPRMUmGRf/87B7a5iI+TDYgOAqVWfqFBwTOeTV8MkxBqkNARdQJ5rw==
+X-Received: by 2002:a05:6870:c18f:b0:132:8af2:2831 with SMTP id h15-20020a056870c18f00b001328af22831mr1805005oad.9.1664823259907;
+        Mon, 03 Oct 2022 11:54:19 -0700 (PDT)
+Received: from localhost ([12.97.180.36])
+        by smtp.gmail.com with ESMTPSA id by6-20020a056830608600b0065c477a9db9sm2539495otb.1.2022.10.03.11.54.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Oct 2022 11:54:19 -0700 (PDT)
+Date:   Mon, 3 Oct 2022 11:52:07 -0700
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>
+Subject: Re: [PATCH bitmap-for-next 0/5] bitmap,cpumask: Add
+ for_each_cpu_andnot()
+Message-ID: <YzsvVx+i1JM8V72D@yury-laptop>
+References: <20221003153420.285896-1-vschneid@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 3/3] block: sed-opal: Cache-line-align the cmd/resp
- buffers
-To:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>,
-        Scott Bauer <scott.bauer@intel.com>
-Cc:     Serge Semin <fancer.lancer@gmail.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
- <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Jonathan Derrick <jonathan.derrick@linux.dev>
-In-Reply-To: <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221003153420.285896-1-vschneid@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+On Mon, Oct 03, 2022 at 04:34:15PM +0100, Valentin Schneider wrote:
+> As suggested by Yury, this is the bitmap/cpumask specific bits of [1]. This now
+> also contains an extra fix for blk_mq.
 
-On 9/29/2022 4:46 PM, Serge Semin wrote:
-> In accordance with [1] the DMA-able memory buffers must be
-> cacheline-aligned otherwise the cache writing-back and invalidation
-> performed during the mapping may cause the adjacent data being lost. It's
-> specifically required for the DMA-noncoherent platforms. Seeing the
-> opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
-> drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
-> respectively we must make sure the passed buffers are cacheline-aligned to
-> prevent the denoted problem.
-> 
-> [1] Documentation/core-api/dma-api.rst
-> 
-> Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
-> Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
-> ---
->   block/sed-opal.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index 9700197000f2..222acbd1f03a 100644
-> --- a/block/sed-opal.c
-> +++ b/block/sed-opal.c
-> @@ -73,6 +73,7 @@ struct parsed_resp {
->   	struct opal_resp_tok toks[MAX_TOKS];
->   };
->   
-> +/* Presumably DMA-able buffers must be cache-aligned */
->   struct opal_dev {
->   	bool supported;
->   	bool mbr_enabled;
-> @@ -88,8 +89,8 @@ struct opal_dev {
->   	u64 lowest_lba;
->   
->   	size_t pos;
-> -	u8 cmd[IO_BUFFER_LENGTH];
-> -	u8 resp[IO_BUFFER_LENGTH];
-> +	u8 cmd[IO_BUFFER_LENGTH] ____cacheline_aligned;
-> +	u8 resp[IO_BUFFER_LENGTH] ____cacheline_aligned;
-I'm with Christoph on this one.
-When I see ____cacheline_aligned, I assume its for performance reasons, 
-not to work around a DMA limitation. Can we instead kmalloc (which 
-provides alignment) these buffers to make it more clear? May want to add 
-that same comment pointing out some architectures require these dma 
-targets to be cache aligned.
+Patches ##2-5 look good to me, but I'd like to give them some testing.
+Let's also wait for other comments, and if nothing wrong will be spotted,
+I'll take it.
 
-
->   
->   	struct parsed_resp parsed;
->   	size_t prev_d_len;
+Thanks,
+Yury
+ 
+> This is based on top of Yury's bitmap-for-next [2].
+> 
+> A note on treewide use of for_each_cpu_andnot()
+> ===============================================
+> 
+> I've used the below coccinelle script to find places that could be patched (I
+> couldn't figure out the valid syntax to patch from coccinelle itself):
+> 
+> ,-----
+> @tmpandnot@
+> expression tmpmask;
+> iterator for_each_cpu;
+> position p;
+> statement S;
+> @@
+> cpumask_andnot(tmpmask, ...);
+> 
+> ...
+> 
+> (
+> for_each_cpu@p(..., tmpmask, ...)
+> 	S
+> |
+> for_each_cpu@p(..., tmpmask, ...)
+> {
+> 	...
+> }
+> )
+> 
+> @script:python depends on tmpandnot@
+> p << tmpandnot.p;
+> @@
+> coccilib.report.print_report(p[0], "andnot loop here")
+> '-----
+> 
+> Which yields (against c40e8341e3b3):
+> 
+> .//arch/powerpc/kernel/smp.c:1587:1-13: andnot loop here
+> .//arch/powerpc/kernel/smp.c:1530:1-13: andnot loop here
+> .//arch/powerpc/kernel/smp.c:1440:1-13: andnot loop here
+> .//arch/powerpc/platforms/powernv/subcore.c:306:2-14: andnot loop here
+> .//arch/x86/kernel/apic/x2apic_cluster.c:62:1-13: andnot loop here
+> .//drivers/acpi/acpi_pad.c:110:1-13: andnot loop here
+> .//drivers/cpufreq/armada-8k-cpufreq.c:148:1-13: andnot loop here
+> .//drivers/cpufreq/powernv-cpufreq.c:931:1-13: andnot loop here
+> .//drivers/net/ethernet/sfc/efx_channels.c:73:1-13: andnot loop here
+> .//drivers/net/ethernet/sfc/siena/efx_channels.c:73:1-13: andnot loop here
+> .//kernel/sched/core.c:345:1-13: andnot loop here
+> .//kernel/sched/core.c:366:1-13: andnot loop here
+> .//net/core/dev.c:3058:1-13: andnot loop here
+> 
+> A lot of those are actually of the shape
+> 
+>   for_each_cpu(cpu, mask) {
+>       ...
+>       cpumask_andnot(mask, ...);
+>   }
+> 
+> I think *some* of the powerpc ones would be a match for for_each_cpu_andnot(),
+> but I decided to just stick to the one obvious one in __sched_core_flip().
+> 
+> [1]: https://lore.kernel.org/all/20220923132527.1001870-1-vschneid@redhat.com/
+> [2]: https://github.com/norov/linux.git/ -b bitmap-for-next
+> 
+> Cheers,
+> Valentin
+> 
+> Valentin Schneider (5):
+>   blk_mq: Fix cpumask_check() warning in blk_mq_hctx_next_cpu()
+>   lib/find_bit: Introduce find_next_andnot_bit()
+>   cpumask: Introduce for_each_cpu_andnot()
+>   lib/test_cpumask: Add for_each_cpu_and(not) tests
+>   sched/core: Merge cpumask_andnot()+for_each_cpu() into
+>     for_each_cpu_andnot()
+> 
+>  block/blk-mq.c          |  9 +++++++--
+>  include/linux/cpumask.h | 18 ++++++++++++++++++
+>  include/linux/find.h    | 38 ++++++++++++++++++++++++++++++++++++++
+>  kernel/sched/core.c     |  5 +----
+>  lib/cpumask_kunit.c     | 19 +++++++++++++++++++
+>  lib/find_bit.c          |  9 +++++++++
+>  6 files changed, 92 insertions(+), 6 deletions(-)
+> 
+> --
+> 2.31.1
