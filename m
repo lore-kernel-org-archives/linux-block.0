@@ -2,94 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 688DEC4332F
-	for <linux-block@archiver.kernel.org>; Sun,  2 Oct 2022 22:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C07C4332F
+	for <linux-block@archiver.kernel.org>; Mon,  3 Oct 2022 03:31:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbiJBWw1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Oct 2022 18:52:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
+        id S229478AbiJCDb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Oct 2022 23:31:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229889AbiJBWvR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 18:51:17 -0400
+        with ESMTP id S229462AbiJCDbz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Oct 2022 23:31:55 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0E21BE9D;
-        Sun,  2 Oct 2022 15:50:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5031356F5;
+        Sun,  2 Oct 2022 20:31:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9ACF8B80924;
-        Sun,  2 Oct 2022 22:50:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2375C43146;
-        Sun,  2 Oct 2022 22:50:12 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 82392B8058E;
+        Mon,  3 Oct 2022 03:31:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3C19C433C1;
+        Mon,  3 Oct 2022 03:31:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664751013;
-        bh=XGe0DHnO7vYyv1CsRvz6jbA63RSiOfcg9ioBXlsRxQM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cjIT1DCjpTOweqEtTCLZu/6+CC85SmC/JWV5cJa7tRT8rs5Xs2Zpxiidszo78R5gK
-         xeivqht/0JEpHyH/ZhzsLp5fp/0qZsUKD40a0GegeAKQzYqjYbNIWnn9YytTv7LBoJ
-         3gZJW3rdrhfS46MsH5f3GS08CuWYVXn8/Vqr9h1rJUL/iVO08Np9148qQz6BeM9TQE
-         5zjIXOerE2157Y+Jqo9tfs0VTgX574ks9gQ+FLWzgPQsy5MH4GSl7NTP4jBDaHrFpi
-         iwtLcC8FrVySCHcYJv2jewEA3/luC2+TqH2RIfGEIqQHTh/RI6eHZjYqZsItB3wY2a
-         UGQx40CFeI0cg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 19/29] Revert "block: freeze the queue earlier in del_gendisk"
-Date:   Sun,  2 Oct 2022 18:49:12 -0400
-Message-Id: <20221002224922.238837-19-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221002224922.238837-1-sashal@kernel.org>
-References: <20221002224922.238837-1-sashal@kernel.org>
+        s=k20201202; t=1664767911;
+        bh=y35fnV1suzCrdYnC9ogHY7hnwYVGR7VG5Y9k9Bvj6Y4=;
+        h=Date:From:To:Cc:Subject:From;
+        b=aXP5wX8T+Tj8ZKfuf/V+xa7gVbK0pLGri+mgOnMuP/IlzoyXMTV3k4ILCuklR6mZM
+         FlaX90HO752CwrDRAnB4OdepWaGdvPTCVgt95WYpqKZHk979DdoVvdD1ZFziKehmd9
+         zheGJo2+IVxfZnix2V7pcEv8F/blcN0QtP0GI8MVxwJ0BbVEod0APOgnGLSwJuAqfa
+         grfOZgNRUjbIJ0CbrqHwg688qD4Ra9NLOmyhI7gmYwD0mwlGlvrfDDyPwqGrvJ9plG
+         qfMG4uxF+RUX0f63BuXtgjxCvoja9F4BNDjWRV5uCa8QPEwG2L/oQe7iX5WGEgXaqT
+         ciwkakE9U+5Aw==
+Date:   Sun, 2 Oct 2022 20:31:49 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [GIT PULL] STATX_DIOALIGN for 6.1
+Message-ID: <YzpXpalOcvwp+keu@quark>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+The following changes since commit 1c23f9e627a7b412978b4e852793c5e3c3efc555:
 
-[ Upstream commit 4c66a326b5ab784cddd72de07ac5b6210e9e1b06 ]
+  Linux 6.0-rc2 (2022-08-21 17:32:54 -0700)
 
-This reverts commit a09b314005f3a0956ebf56e01b3b80339df577cc.
+are available in the Git repository at:
 
-Dusty Mabe reported consistent hang during CoreOS shutdown with a MD
-RAID1 setup.  Although apparently similar hangs happened before,
-and this patch most likely is not the root cause it made it much
-more severe.  Revert it until we can figure out what is going on
-with the md driver.
+  https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/statx-dioalign-for-linus
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20220919144049.978907-1-hch@lst.de
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/genhd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+for you to fetch changes up to 61a223df421f698c253143014cfd384255b3cf1e:
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 278227ba1d53..e0675772178b 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -623,7 +623,6 @@ void del_gendisk(struct gendisk *disk)
- 	 * Prevent new I/O from crossing bio_queue_enter().
- 	 */
- 	blk_queue_start_drain(q);
--	blk_mq_freeze_queue_wait(q);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
-@@ -647,6 +646,8 @@ void del_gendisk(struct gendisk *disk)
- 	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
- 	device_del(disk_to_dev(disk));
- 
-+	blk_mq_freeze_queue_wait(q);
-+
- 	blk_throtl_cancel_bios(disk->queue);
- 
- 	blk_sync_queue(q);
--- 
-2.35.1
+  xfs: support STATX_DIOALIGN (2022-09-11 19:47:12 -0500)
 
+----------------------------------------------------------------
+
+Make statx() support reporting direct I/O (DIO) alignment information.
+This provides a generic interface for userspace programs to determine
+whether a file supports DIO, and if so with what alignment restrictions.
+Specifically, STATX_DIOALIGN works on block devices, and on regular
+files when their containing filesystem has implemented support.
+
+An interface like this has been requested for years, since the
+conditions for when DIO is supported in Linux have gotten increasingly
+complex over time.  Today, DIO support and alignment requirements can be
+affected by various filesystem features such as multi-device support,
+data journalling, inline data, encryption, verity, compression,
+checkpoint disabling, log-structured mode, etc.  Further complicating
+things, Linux v6.0 relaxed the traditional rule of DIO needing to be
+aligned to the block device's logical block size; now user buffers (but
+not file offsets) only need to be aligned to the DMA alignment.
+
+The approach of uplifting the XFS specific ioctl XFS_IOC_DIOINFO was
+discarded in favor of creating a clean new interface with statx().
+
+For more information, see the individual commits and the man page update
+https://lore.kernel.org/r/20220722074229.148925-1-ebiggers@kernel.org.
+
+----------------------------------------------------------------
+Eric Biggers (8):
+      statx: add direct I/O alignment information
+      vfs: support STATX_DIOALIGN on block devices
+      fscrypt: change fscrypt_dio_supported() to prepare for STATX_DIOALIGN
+      ext4: support STATX_DIOALIGN
+      f2fs: move f2fs_force_buffered_io() into file.c
+      f2fs: simplify f2fs_force_buffered_io()
+      f2fs: support STATX_DIOALIGN
+      xfs: support STATX_DIOALIGN
+
+ block/bdev.c              | 23 ++++++++++++++++++++++
+ fs/crypto/inline_crypt.c  | 49 +++++++++++++++++++++++------------------------
+ fs/ext4/ext4.h            |  1 +
+ fs/ext4/file.c            | 37 ++++++++++++++++++++++++-----------
+ fs/ext4/inode.c           | 37 +++++++++++++++++++++++++++++++++++
+ fs/f2fs/f2fs.h            | 40 --------------------------------------
+ fs/f2fs/file.c            | 43 ++++++++++++++++++++++++++++++++++++++++-
+ fs/stat.c                 | 14 ++++++++++++++
+ fs/xfs/xfs_iops.c         | 10 ++++++++++
+ include/linux/blkdev.h    |  4 ++++
+ include/linux/fscrypt.h   |  7 ++-----
+ include/linux/stat.h      |  2 ++
+ include/uapi/linux/stat.h |  4 +++-
+ 13 files changed, 188 insertions(+), 83 deletions(-)
