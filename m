@@ -2,62 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B874C43219
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 09:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EACFC433FE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 09:43:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231139AbiJDJnk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 05:43:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60098 "EHLO
+        id S229701AbiJDJnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 05:43:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231229AbiJDJnB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 05:43:01 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B425467C
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 02:40:26 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id hy2so27607422ejc.8
-        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 02:40:26 -0700 (PDT)
+        with ESMTP id S231209AbiJDJnA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 05:43:00 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B396E5755B
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 02:40:24 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id e18so18046202edj.3
+        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 02:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=PhHLVXcjENr+c62plFUE4L75G8J7r4FgJx5wcPd+U/o=;
-        b=QXmbjRvlwkGLt1DK4yC8OEelYZDkreUKsi9WsXOMq4dxsynMHA6FdRt+kNxFv84ovI
-         qzenSgbATr4dNf2TiDaETivsqS6+KXeZ6MTqxL4DAoOkbMm/E28ef+BErbb1xR+GQc7o
-         YAB9UcQ3iy0XHn3OTOXoCNw3NhPEKfTwBZdrcIxyNdOD/3pu+pU8tNOTRSC1EvhIAmkT
-         O3Q0ZqGE8d2y31m0bi+ZNu/WLIq5toBgZr9SLo/2ApklCYCMJGkJ/bPrnyfv8kX1ZDWP
-         6exIGn+DaQ4GCGwjb54/A5ziI5EYByUwMe0sO5ZFt3B7frFYLvMxpW/1prAUdv8liLFl
-         AG2g==
+        bh=6sNqmW2rHKHvW8JdSXnKXW00mNkyorStoHQsMNWaNpQ=;
+        b=DhNktmFUjsvqrwxrE5QnzuOKEZNdOswJGOsN2+SVpJ/RHbhFYnR7UQi9ydBL05Ih3a
+         RX0K9/ILlRlfuhyxC6EtlmsylTUY5gIB+ZVesA2/BURnXRZAVoAyb3USGORLZKL4B58B
+         eGPa33vvYSjRGODrc0F/+r22rRjZIBmnhLRvrxcHUQfY1NwbMcHcOvZ9h6HpSPygHomD
+         yIsRXcSMui+IV6rFG4bqNYeuVxxUpyerZ7eG+dUVUip/HTMw23KXvkUlAUxJcoHv2D8y
+         e0eC8wq2okDq69GAgtGcp2h4HseCoxEg2kyc7VXBcV17S0QmsHw02QwByV3UFZu3KMz3
+         Zq6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=PhHLVXcjENr+c62plFUE4L75G8J7r4FgJx5wcPd+U/o=;
-        b=S6emXmX/L1kuHTmDm6OPJmCYnu5457FPW4qZ+7PLO6DljWNya2dcUGJ48IVpCL3yMg
-         HmHOdHq9TvK9ntEz5CqR3wlz95qSJbkQBtMfHlQ/M3MgGalzd5tPZWFUY37akcdAo+9Q
-         f0Eiux6tYI95asSpn6gd5RGbxQ7nme9GSseZKj8ku7x2pY5VN1amf92lLXCP+N2hkc1s
-         99v1TPHUOp5Lz9GkY/Dk3QNaMSmP0E5C9XO86gKZBIWoOTmgFcIyf60apP4ZhBrTC0We
-         liwc8zI/Y/KyEm0mC8zJC+EYEnyPi9+VUjKkgduIik0jVdzY/pYSh6O1E7iRUcHP6K7i
-         TIzA==
-X-Gm-Message-State: ACrzQf3FmLYdxq6vXOlUpzLmaEZGtH1ni7bRueOFqfmuS8S2KwNrsYOS
-        xGWtiGVeAW2u/VL8rhMqDGrNPA==
-X-Google-Smtp-Source: AMsMyM4n1QowgTDG0H6KBcDrOVerHiJpI0YeLiyh087cE+KHfccB6y4PC7ePTIDDWap2fXMnZgLGaQ==
-X-Received: by 2002:a17:907:743:b0:740:ef93:2ffc with SMTP id xc3-20020a170907074300b00740ef932ffcmr18850227ejb.514.1664876424494;
-        Tue, 04 Oct 2022 02:40:24 -0700 (PDT)
+        bh=6sNqmW2rHKHvW8JdSXnKXW00mNkyorStoHQsMNWaNpQ=;
+        b=OXb15fxX+c/nXnLuhHsdLrKarBVLXsAzQuKSKqDs+N+WS72EVGQtfhOdBajm6FSPLY
+         QvmaxlN98q0IntBIdjqZxhoLRUWrBVjvnhXsX3mTLPLUZTXxulew+cZz2f8Bzh3wvr0L
+         o+73HvVld9blGWbm5cgZoHWuVWlCM69t6jMRLGrKSXMW8XOTTEcL3mTA6siz2dfnRoiw
+         w1qtudg6NOzKXse9KM+wYpcyhrUJ0EB0phtQ/JUY/vta/+oyjSJY0atW40P+RpOSGXH2
+         1FXpD2fMSeJ5tiZRPE/XiS6Tz/jvx0/IikuzMOXDP5N74I9iPcKuMJiq8DR2XXW90m/s
+         z/2g==
+X-Gm-Message-State: ACrzQf0LzmPg0e3QUcajDiO54RpGvRsXzsp0xFVZ3hqt66uppI3ZLUep
+        tySJK1WYBL4DW3A74mYBdWvp5g==
+X-Google-Smtp-Source: AMsMyM5ap5ERjB6QMOGBkKJFtgkgpBLfrFyfZIhvBpg90lADSYJRKzy5wFJp9KV66/QwhRPLXw4Plw==
+X-Received: by 2002:a05:6402:2693:b0:450:a807:6c91 with SMTP id w19-20020a056402269300b00450a8076c91mr22826169edd.33.1664876422421;
+        Tue, 04 Oct 2022 02:40:22 -0700 (PDT)
 Received: from MBP-di-Paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
-        by smtp.gmail.com with ESMTPSA id 9-20020a170906200900b00780f6071b5dsm6774853ejo.188.2022.10.04.02.40.23
+        by smtp.gmail.com with ESMTPSA id 9-20020a170906200900b00780f6071b5dsm6774853ejo.188.2022.10.04.02.40.21
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Oct 2022 02:40:24 -0700 (PDT)
+        Tue, 04 Oct 2022 02:40:22 -0700 (PDT)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         jack@suse.cz, andrea.righi@canonical.com, glen.valante@linaro.org,
         arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        Davide Zini <davidezini2@gmail.com>,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V3 7/8] block, bfq: inject I/O to underutilized actuators
-Date:   Tue,  4 Oct 2022 11:40:09 +0200
-Message-Id: <20221004094010.80090-8-paolo.valente@linaro.org>
+Subject: [PATCH V3 5/8] block, bfq: turn BFQ_NUM_ACTUATORS into BFQ_MAX_ACTUATORS
+Date:   Tue,  4 Oct 2022 11:40:07 +0200
+Message-Id: <20221004094010.80090-6-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221004094010.80090-1-paolo.valente@linaro.org>
 References: <20221004094010.80090-1-paolo.valente@linaro.org>
@@ -67,507 +66,195 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Davide Zini <davidezini2@gmail.com>
+This is a preparatory commit, for the commit that will use independent
+access ranges. The latter retrieves the number of ranges, that is the
+number of actuators. That number is assumed to be equal at most to
+a constant BFQ_MAX_ACTUATORS. Such a constant is defined in this
+preparatory icommit. In particular, this commit uses BFQ_MAX_ACTUATORS
+in place of the placeholder BFQ_NUM_ACTUATORS, which was introduced in
+a previous commit.
 
-The main service scheme of BFQ for sync I/O is serving one sync
-bfq_queue at a time, for a while. In particular, BFQ enforces this
-scheme when it deems the latter necessary to boost throughput or
-to preserve service guarantees. Unfortunately, when BFQ enforces
-this policy, only one actuator at a time gets served for a while,
-because each bfq_queue contains I/O only for one actuator. The
-other actuators may remain underutilized.
-
-Actually, BFQ may serve (inject) extra I/O, taken from other
-bfq_queues, in parallel with that of the in-service queue. This
-injection mechanism may provide the ground for dealing also with
-the above actuator-underutilization problem. Yet BFQ does not take
-the actuator load into account when choosing which queue to pick
-extra I/O from. In addition, BFQ may happen to inject extra I/O
-only when the in-service queue is temporarily empty.
-
-In view of these facts, this commit extends the
-injection mechanism in such a way that the latter:
-(1) takes into account also the actuator load;
-(2) checks such a load on each dispatch, and injects I/O for an
-    underutilized actuator, if there is one and there is I/O for it.
-
-To perform the check in (2), this commit introduces a load
-threshold, currently set to 4.  A linear scan of each actuator is
-performed, until an actuator is found for which the following two
-conditions hold: the load of the actuator is below the threshold,
-and there is at least one non-in-service queue that contains I/O
-for that actuator. If such a pair (actuator, queue) is found, then
-the head request of that queue is returned for dispatch, instead
-of the head request of the in-service queue.
-
-We have set the threshold, empirically, to the minimum possible
-value for which an actuator is fully utilized, or close to be
-fully utilized. By doing so, injected I/O 'steals' as few
-drive-queue slots as possibile to the in-service queue. This
-reduces as much as possible the probability that the service of
-I/O from the in-service bfq_queue gets delayed because of slot
-exhaustion, i.e., because all the slots of the drive queue are
-filled with I/O injected from other queues (NCQ provides for 32
-slots).
-
-This new mechanism also counters actuator underutilization in the
-case of asymmetric configurations of bfq_queues. Namely if there
-are few bfq_queues containing I/O for some actuators and many
-bfq_queues containing I/O for other actuators. Or if the
-bfq_queues containing I/O for some actuators have lower weights
-than the other bfq_queues.
+The actual commit that uses independet access ranges will then
+replace BFQ_MAX_ACTUATORS with the actual number of actuators, where
+appropriate.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
 ---
- block/bfq-cgroup.c  |   2 +-
- block/bfq-iosched.c | 137 +++++++++++++++++++++++++++++++++-----------
- block/bfq-iosched.h |  39 ++++++++++++-
- block/bfq-wf2q.c    |   2 +-
- 4 files changed, 141 insertions(+), 39 deletions(-)
+ block/bfq-cgroup.c  |  2 +-
+ block/bfq-iosched.c |  8 ++++----
+ block/bfq-iosched.h | 48 ++++++++++++++++++++++-----------------------
+ 3 files changed, 29 insertions(+), 29 deletions(-)
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 080d9160217b..abaf9cc4b7b2 100644
+index a745dd9d658e..3b4a0363d617 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -699,7 +699,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		bfq_activate_bfqq(bfqd, bfqq);
- 	}
+@@ -764,7 +764,7 @@ static void *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
+ 	struct bfq_entity *entity;
+ 	unsigned int act_idx;
  
--	if (!bfqd->in_service_queue && !bfqd->rq_in_driver)
-+	if (!bfqd->in_service_queue && !bfqd->tot_rq_in_driver)
- 		bfq_schedule_dispatch(bfqd);
- 	/* release extra ref taken above, bfqq may happen to be freed now */
- 	bfq_put_queue(bfqq);
+-	for (act_idx = 0; act_idx < BFQ_NUM_ACTUATORS; act_idx++) {
++	for (act_idx = 0; act_idx < BFQ_MAX_ACTUATORS; act_idx++) {
+ 		struct bfq_queue *async_bfqq = bic_to_bfqq(bic, 0, act_idx);
+ 		struct bfq_queue *sync_bfqq = bic_to_bfqq(bic, 1, act_idx);
+ 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 9203b4604da8..4deb0f6c751e 100644
+index a1a5eea731c7..d8a15427a96d 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2249,6 +2249,7 @@ static void bfq_add_request(struct request *rq)
- 
- 	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
- 	bfqq->queued[rq_is_sync(rq)]++;
-+
- 	/*
- 	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', however, it
- 	 * may be read without holding the lock in bfq_has_work().
-@@ -2294,9 +2295,9 @@ static void bfq_add_request(struct request *rq)
- 		 *   elapsed.
- 		 */
- 		if (bfqq == bfqd->in_service_queue &&
--		    (bfqd->rq_in_driver == 0 ||
-+		    (bfqd->tot_rq_in_driver == 0 ||
- 		     (bfqq->last_serv_time_ns > 0 &&
--		      bfqd->rqs_injected && bfqd->rq_in_driver > 0)) &&
-+		      bfqd->rqs_injected && bfqd->tot_rq_in_driver > 0)) &&
- 		    time_is_before_eq_jiffies(bfqq->decrease_time_jif +
- 					      msecs_to_jiffies(10))) {
- 			bfqd->last_empty_occupied_ns = ktime_get_ns();
-@@ -2320,7 +2321,7 @@ static void bfq_add_request(struct request *rq)
- 			 * will be set in case injection is performed
- 			 * on bfqq before rq is completed).
- 			 */
--			if (bfqd->rq_in_driver == 0)
-+			if (bfqd->tot_rq_in_driver == 0)
- 				bfqd->rqs_injected = false;
- 		}
- 	}
-@@ -2418,15 +2419,18 @@ static sector_t get_sdist(sector_t last_pos, struct request *rq)
- static void bfq_activate_request(struct request_queue *q, struct request *rq)
- {
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
-+	unsigned int act_idx = bfq_actuator_index(bfqd, rq->bio);
- 
--	bfqd->rq_in_driver++;
-+	bfqd->tot_rq_in_driver++;
-+	bfqd->rq_in_driver[act_idx]++;
- }
- 
- static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
- {
- 	struct bfq_data *bfqd = q->elevator->elevator_data;
- 
--	bfqd->rq_in_driver--;
-+	bfqd->tot_rq_in_driver--;
-+	bfqd->rq_in_driver[bfq_actuator_index(bfqd, rq->bio)]--;
- }
- #endif
- 
-@@ -2700,11 +2704,14 @@ void bfq_end_wr_async_queues(struct bfq_data *bfqd,
- static void bfq_end_wr(struct bfq_data *bfqd)
- {
- 	struct bfq_queue *bfqq;
-+	int i;
- 
- 	spin_lock_irq(&bfqd->lock);
- 
--	list_for_each_entry(bfqq, &bfqd->active_list, bfqq_list)
--		bfq_bfqq_end_wr(bfqq);
-+	for (i = 0; i < bfqd->num_ia_ranges; i++) {
-+		list_for_each_entry(bfqq, &bfqd->active_list[i], bfqq_list)
-+			bfq_bfqq_end_wr(bfqq);
-+	}
- 	list_for_each_entry(bfqq, &bfqd->idle_list, bfqq_list)
- 		bfq_bfqq_end_wr(bfqq);
- 	bfq_end_wr_async(bfqd);
-@@ -3639,13 +3646,13 @@ static void bfq_update_peak_rate(struct bfq_data *bfqd, struct request *rq)
- 	 * - start a new observation interval with this dispatch
- 	 */
- 	if (now_ns - bfqd->last_dispatch > 100*NSEC_PER_MSEC &&
--	    bfqd->rq_in_driver == 0)
-+	    bfqd->tot_rq_in_driver == 0)
- 		goto update_rate_and_reset;
- 
- 	/* Update sampling information */
- 	bfqd->peak_rate_samples++;
- 
--	if ((bfqd->rq_in_driver > 0 ||
-+	if ((bfqd->tot_rq_in_driver > 0 ||
- 		now_ns - bfqd->last_completion < BFQ_MIN_TT)
- 	    && !BFQ_RQ_SEEKY(bfqd, bfqd->last_position, rq))
- 		bfqd->sequential_samples++;
-@@ -3912,7 +3919,7 @@ static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
- 	return (bfqq->wr_coeff > 1 &&
- 		(bfqd->wr_busy_queues <
- 		 tot_busy_queues ||
--		 bfqd->rq_in_driver >=
-+		 bfqd->tot_rq_in_driver >=
- 		 bfqq->dispatched + 4)) ||
- 		bfq_asymmetric_scenario(bfqd, bfqq) ||
- 		tot_busy_queues == 1;
-@@ -4684,6 +4691,7 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- {
- 	struct bfq_queue *bfqq, *in_serv_bfqq = bfqd->in_service_queue;
- 	unsigned int limit = in_serv_bfqq->inject_limit;
-+	int i;
- 	/*
- 	 * If
- 	 * - bfqq is not weight-raised and therefore does not carry
-@@ -4715,7 +4723,7 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- 		)
- 		limit = 1;
- 
--	if (bfqd->rq_in_driver >= limit)
-+	if (bfqd->tot_rq_in_driver >= limit)
- 		return NULL;
- 
- 	/*
-@@ -4730,11 +4738,12 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- 	 *   (and re-added only if it gets new requests, but then it
- 	 *   is assigned again enough budget for its new backlog).
- 	 */
--	list_for_each_entry(bfqq, &bfqd->active_list, bfqq_list)
--		if (!RB_EMPTY_ROOT(&bfqq->sort_list) &&
--		    (in_serv_always_inject || bfqq->wr_coeff > 1) &&
--		    bfq_serv_to_charge(bfqq->next_rq, bfqq) <=
--		    bfq_bfqq_budget_left(bfqq)) {
-+	for (i = 0; i < bfqd->num_ia_ranges; i++) {
-+		list_for_each_entry(bfqq, &bfqd->active_list[i], bfqq_list)
-+			if (!RB_EMPTY_ROOT(&bfqq->sort_list) &&
-+				(in_serv_always_inject || bfqq->wr_coeff > 1) &&
-+				bfq_serv_to_charge(bfqq->next_rq, bfqq) <=
-+				bfq_bfqq_budget_left(bfqq)) {
- 			/*
- 			 * Allow for only one large in-flight request
- 			 * on non-rotational devices, for the
-@@ -4759,22 +4768,67 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- 			else
- 				limit = in_serv_bfqq->inject_limit;
- 
--			if (bfqd->rq_in_driver < limit) {
-+			if (bfqd->tot_rq_in_driver < limit) {
- 				bfqd->rqs_injected = true;
- 				return bfqq;
- 			}
- 		}
-+	}
-+
-+	return NULL;
-+}
-+
-+struct bfq_queue *bfq_find_active_bfqq_for_actuator(struct bfq_data *bfqd,
-+						    int idx)
-+{
-+	struct bfq_queue *bfqq = NULL;
-+
-+	if (bfqd->in_service_queue &&
-+	    bfqd->in_service_queue->actuator_idx == idx)
-+		return bfqd->in_service_queue;
-+
-+	list_for_each_entry(bfqq, &bfqd->active_list[idx], bfqq_list) {
-+		if (!RB_EMPTY_ROOT(&bfqq->sort_list) &&
-+			bfq_serv_to_charge(bfqq->next_rq, bfqq) <=
-+				bfq_bfqq_budget_left(bfqq)) {
-+			return bfqq;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+/*
-+ * Perform a linear scan of each actuator, until an actuator is found
-+ * for which the following two conditions hold: the load of the
-+ * actuator is below the threshold (see comments on actuator_load_threshold
-+ * for details), and there is a queue that contains I/O for that
-+ * actuator. On success, return that queue.
-+ */
-+struct bfq_queue *bfq_find_bfqq_for_underused_actuator(struct bfq_data *bfqd)
-+{
-+	int i;
-+
-+	for (i = 0 ; i < bfqd->num_ia_ranges; i++)
-+		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold) {
-+			struct bfq_queue *bfqq =
-+				bfq_find_active_bfqq_for_actuator(bfqd, i);
-+
-+			if (bfqq)
-+				return bfqq;
-+		}
- 
- 	return NULL;
- }
- 
-+
- /*
-  * Select a queue for service.  If we have a current queue in service,
-  * check whether to continue servicing it, or retrieve and set a new one.
-  */
- static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- {
--	struct bfq_queue *bfqq;
-+	struct bfq_queue *bfqq, *inject_bfqq;
- 	struct request *next_rq;
- 	enum bfqq_expiration reason = BFQQE_BUDGET_TIMEOUT;
- 
-@@ -4796,6 +4850,15 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- 		goto expire;
- 
- check_queue:
-+	/*
-+	 *  If some actuator is underutilized, but the in-service
-+	 *  queue does not contain I/O for that actuator, then try to
-+	 *  inject I/O for that actuator.
-+	 */
-+	inject_bfqq = bfq_find_bfqq_for_underused_actuator(bfqd);
-+	if (inject_bfqq && inject_bfqq != bfqq)
-+		return inject_bfqq;
-+
- 	/*
- 	 * This loop is rarely executed more than once. Even when it
- 	 * happens, it is much more convenient to re-execute this loop
-@@ -5151,11 +5214,11 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 
- 		/*
- 		 * We exploit the bfq_finish_requeue_request hook to
--		 * decrement rq_in_driver, but
-+		 * decrement tot_rq_in_driver, but
- 		 * bfq_finish_requeue_request will not be invoked on
- 		 * this request. So, to avoid unbalance, just start
--		 * this request, without incrementing rq_in_driver. As
--		 * a negative consequence, rq_in_driver is deceptively
-+		 * this request, without incrementing tot_rq_in_driver. As
-+		 * a negative consequence, tot_rq_in_driver is deceptively
- 		 * lower than it should be while this request is in
- 		 * service. This may cause bfq_schedule_dispatch to be
- 		 * invoked uselessly.
-@@ -5164,7 +5227,7 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 		 * bfq_finish_requeue_request hook, if defined, is
- 		 * probably invoked also on this request. So, by
- 		 * exploiting this hook, we could 1) increment
--		 * rq_in_driver here, and 2) decrement it in
-+		 * tot_rq_in_driver here, and 2) decrement it in
- 		 * bfq_finish_requeue_request. Such a solution would
- 		 * let the value of the counter be always accurate,
- 		 * but it would entail using an extra interface
-@@ -5193,7 +5256,7 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	 * Of course, serving one request at a time may cause loss of
- 	 * throughput.
- 	 */
--	if (bfqd->strict_guarantees && bfqd->rq_in_driver > 0)
-+	if (bfqd->strict_guarantees && bfqd->tot_rq_in_driver > 0)
- 		goto exit;
- 
- 	bfqq = bfq_select_queue(bfqd);
-@@ -5204,7 +5267,8 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 
- 	if (rq) {
- inc_in_driver_start_rq:
--		bfqd->rq_in_driver++;
-+		bfqd->rq_in_driver[bfqq->actuator_idx]++;
-+		bfqd->tot_rq_in_driver++;
- start_rq:
- 		rq->rq_flags |= RQF_STARTED;
- 	}
-@@ -6266,7 +6330,7 @@ static void bfq_update_hw_tag(struct bfq_data *bfqd)
- 	struct bfq_queue *bfqq = bfqd->in_service_queue;
- 
- 	bfqd->max_rq_in_driver = max_t(int, bfqd->max_rq_in_driver,
--				       bfqd->rq_in_driver);
-+				       bfqd->tot_rq_in_driver);
- 
- 	if (bfqd->hw_tag == 1)
- 		return;
-@@ -6277,7 +6341,7 @@ static void bfq_update_hw_tag(struct bfq_data *bfqd)
- 	 * sum is not exact, as it's not taking into account deactivated
- 	 * requests.
- 	 */
--	if (bfqd->rq_in_driver + bfqd->queued <= BFQ_HW_QUEUE_THRESHOLD)
-+	if (bfqd->tot_rq_in_driver + bfqd->queued <= BFQ_HW_QUEUE_THRESHOLD)
- 		return;
- 
- 	/*
-@@ -6288,7 +6352,7 @@ static void bfq_update_hw_tag(struct bfq_data *bfqd)
- 	if (bfqq && bfq_bfqq_has_short_ttime(bfqq) &&
- 	    bfqq->dispatched + bfqq->queued[0] + bfqq->queued[1] <
- 	    BFQ_HW_QUEUE_THRESHOLD &&
--	    bfqd->rq_in_driver < BFQ_HW_QUEUE_THRESHOLD)
-+	    bfqd->tot_rq_in_driver < BFQ_HW_QUEUE_THRESHOLD)
- 		return;
- 
- 	if (bfqd->hw_tag_samples++ < BFQ_HW_QUEUE_SAMPLES)
-@@ -6309,7 +6373,8 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 
- 	bfq_update_hw_tag(bfqd);
- 
--	bfqd->rq_in_driver--;
-+	bfqd->rq_in_driver[bfqq->actuator_idx]--;
-+	bfqd->tot_rq_in_driver--;
- 	bfqq->dispatched--;
- 
- 	if (!bfqq->dispatched && !bfq_bfqq_busy(bfqq)) {
-@@ -6428,7 +6493,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 					BFQQE_NO_MORE_REQUESTS);
+@@ -689,7 +689,7 @@ static void bfq_limit_depth(blk_opf_t opf, struct blk_mq_alloc_data *data)
+ 		limit = (limit * depth) >> bfqd->full_depth_shift;
  	}
  
--	if (!bfqd->rq_in_driver)
-+	if (!bfqd->tot_rq_in_driver)
- 		bfq_schedule_dispatch(bfqd);
- }
+-	for (act_idx = 0; act_idx < BFQ_NUM_ACTUATORS; act_idx++) {
++	for (act_idx = 0; act_idx < BFQ_MAX_ACTUATORS; act_idx++) {
+ 		struct bfq_queue *bfqq =
+ 			bic ? bic_to_bfqq(bic, op_is_sync(opf), act_idx) : NULL;
  
-@@ -6559,13 +6624,13 @@ static void bfq_update_inject_limit(struct bfq_data *bfqd,
- 	 * conditions to do it, or we can lower the last base value
- 	 * computed.
- 	 *
--	 * NOTE: (bfqd->rq_in_driver == 1) means that there is no I/O
-+	 * NOTE: (bfqd->tot_rq_in_driver == 1) means that there is no I/O
- 	 * request in flight, because this function is in the code
- 	 * path that handles the completion of a request of bfqq, and,
- 	 * in particular, this function is executed before
--	 * bfqd->rq_in_driver is decremented in such a code path.
-+	 * bfqd->tot_rq_in_driver is decremented in such a code path.
- 	 */
--	if ((bfqq->last_serv_time_ns == 0 && bfqd->rq_in_driver == 1) ||
-+	if ((bfqq->last_serv_time_ns == 0 && bfqd->tot_rq_in_driver == 1) ||
- 	    tot_time_ns < bfqq->last_serv_time_ns) {
- 		if (bfqq->last_serv_time_ns == 0) {
- 			/*
-@@ -6575,7 +6640,7 @@ static void bfq_update_inject_limit(struct bfq_data *bfqd,
- 			bfqq->inject_limit = max_t(unsigned int, 1, old_limit);
- 		}
- 		bfqq->last_serv_time_ns = tot_time_ns;
--	} else if (!bfqd->rqs_injected && bfqd->rq_in_driver == 1)
-+	} else if (!bfqd->rqs_injected && bfqd->tot_rq_in_driver == 1)
- 		/*
- 		 * No I/O injected and no request still in service in
- 		 * the drive: these are the exact conditions for
-@@ -7212,7 +7277,8 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 	bfqd->queue_weights_tree = RB_ROOT_CACHED;
- 	bfqd->num_groups_with_pending_reqs = 0;
+@@ -2673,7 +2673,7 @@ void bfq_end_wr_async_queues(struct bfq_data *bfqd,
+ {
+ 	int i, j, k;
  
--	INIT_LIST_HEAD(&bfqd->active_list);
-+	INIT_LIST_HEAD(&bfqd->active_list[0]);
-+	INIT_LIST_HEAD(&bfqd->active_list[1]);
- 	INIT_LIST_HEAD(&bfqd->idle_list);
- 	INIT_HLIST_HEAD(&bfqd->burst_list);
+-	for (k = 0; k < BFQ_NUM_ACTUATORS; k++) {
++	for (k = 0; k < BFQ_MAX_ACTUATORS; k++) {
+ 		for (i = 0; i < 2; i++)
+ 			for (j = 0; j < IOPRIO_NR_LEVELS; j++)
+ 				if (bfqg->async_bfqq[i][j][k])
+@@ -5432,7 +5432,7 @@ static void bfq_exit_icq(struct io_cq *icq)
+ 	if (bfqd)
+ 		spin_lock_irqsave(&bfqd->lock, flags);
  
-@@ -7257,6 +7323,9 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
- 		ref_wr_duration[blk_queue_nonrot(bfqd->queue)];
- 	bfqd->peak_rate = ref_rate[blk_queue_nonrot(bfqd->queue)] * 2 / 3;
+-	for (act_idx = 0; act_idx < BFQ_NUM_ACTUATORS; act_idx++) {
++	for (act_idx = 0; act_idx < BFQ_MAX_ACTUATORS; act_idx++) {
+ 		if (bic->stable_merge_bfqq[act_idx])
+ 			bfq_put_stable_ref(bic->stable_merge_bfqq[act_idx]);
  
-+	/* see comments on the definition of next field inside bfq_data */
-+	bfqd->actuator_load_threshold = 4;
-+
- 	spin_lock_init(&bfqd->lock);
+@@ -7003,7 +7003,7 @@ void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ {
+ 	int i, j, k;
  
- 	/*
+-	for (k = 0; k < BFQ_NUM_ACTUATORS; k++) {
++	for (k = 0; k < BFQ_MAX_ACTUATORS; k++) {
+ 		for (i = 0; i < 2; i++)
+ 			for (j = 0; j < IOPRIO_NR_LEVELS; j++)
+ 				__bfq_put_async_bfqq(bfqd, &bfqg->async_bfqq[i][j][k]);
 diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 34f7603bb62f..1585f2b827a6 100644
+index a7808c6a2cbe..f9ccf468edc2 100644
 --- a/block/bfq-iosched.h
 +++ b/block/bfq-iosched.h
-@@ -578,7 +578,12 @@ struct bfq_data {
- 	/* number of queued requests */
- 	int queued;
- 	/* number of requests dispatched and waiting for completion */
--	int rq_in_driver;
-+	int tot_rq_in_driver;
-+	/*
-+	 * number of requests dispatched and waiting for completion
-+	 * for each actuator
-+	 */
-+	int rq_in_driver[BFQ_MAX_ACTUATORS];
+@@ -33,7 +33,7 @@
+  */
+ #define BFQ_SOFTRT_WEIGHT_FACTOR	100
  
- 	/* true if the device is non rotational and performs queueing */
- 	bool nonrot_with_queueing;
-@@ -672,8 +677,13 @@ struct bfq_data {
- 	/* maximum budget allotted to a bfq_queue before rescheduling */
- 	int bfq_max_budget;
+-#define BFQ_NUM_ACTUATORS 2
++#define BFQ_MAX_ACTUATORS 32
  
--	/* list of all the bfq_queues active on the device */
--	struct list_head active_list;
-+	/*
-+	 * List of all the bfq_queues active for a specific actuator
-+	 * on the device. Keeping active queues separate on a
-+	 * per-actuator basis helps implementing per-actuator
-+	 * injection more efficiently.
-+	 */
-+	struct list_head active_list[BFQ_MAX_ACTUATORS];
- 	/* list of all the bfq_queues idle on the device */
- 	struct list_head idle_list;
+ struct bfq_entity;
  
-@@ -808,6 +818,29 @@ struct bfq_data {
- 	 * in this device.
+@@ -424,7 +424,7 @@ struct bfq_io_cq {
+ 	 * is async or sync. So there is a distinct queue for each
+ 	 * actuator.
  	 */
- 	struct blk_independent_access_range ia_ranges[BFQ_MAX_ACTUATORS];
-+
-+	/*
-+	 * If the number of I/O requests queued in the device for a
-+	 * given actuator is below next threshold, then the actuator
-+	 * is deemed as underutilized. If this condition is found to
-+	 * hold for some actuator upon a dispatch, but (i) the
-+	 * in-service queue does not contain I/O for that actuator,
-+	 * while (ii) some other queue does contain I/O for that
-+	 * actuator, then the head I/O request of the latter queue is
-+	 * returned (injected), instead of the head request of the
-+	 * currently in-service queue.
-+	 *
-+	 * We set the threshold, empirically, to the minimum possible
-+	 * value for which an actuator is fully utilized, or close to
-+	 * be fully utilized. By doing so, injected I/O 'steals' as
-+	 * few drive-queue slots as possibile to the in-service
-+	 * queue. This reduces as much as possible the probability
-+	 * that the service of I/O from the in-service bfq_queue gets
-+	 * delayed because of slot exhaustion, i.e., because all the
-+	 * slots of the drive queue are filled with I/O injected from
-+	 * other queues (NCQ provides for 32 slots).
-+	 */
-+	unsigned int actuator_load_threshold;
- };
- 
- enum bfqq_state_flags {
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 983413cdefad..fc19f9ba6b9a 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -477,7 +477,7 @@ static void bfq_active_insert(struct bfq_service_tree *st,
- 	bfqd = (struct bfq_data *)bfqg->bfqd;
- #endif
- 	if (bfqq)
--		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
-+		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list[bfqq->actuator_idx]);
+-	struct bfq_queue *bfqq[2][BFQ_NUM_ACTUATORS];
++	struct bfq_queue *bfqq[2][BFQ_MAX_ACTUATORS];
+ 	/* per (request_queue, blkcg) ioprio */
+ 	int ioprio;
  #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	if (bfqg != bfqd->root_group)
- 		bfqg->active_entities++;
+@@ -442,26 +442,26 @@ struct bfq_io_cq {
+ 	 * to remember their values while a queue is merged, so as to
+ 	 * be able to restore them in case of split.
+ 	 */
+-	bool saved_has_short_ttime[BFQ_NUM_ACTUATORS];
++	bool saved_has_short_ttime[BFQ_MAX_ACTUATORS];
+ 	/*
+ 	 * Same purpose as the previous two fields for the I/O bound
+ 	 * classification of a queue.
+ 	 */
+-	bool saved_IO_bound[BFQ_NUM_ACTUATORS];
++	bool saved_IO_bound[BFQ_MAX_ACTUATORS];
+ 
+-	u64 saved_io_start_time[BFQ_NUM_ACTUATORS];
+-	u64 saved_tot_idle_time[BFQ_NUM_ACTUATORS];
++	u64 saved_io_start_time[BFQ_MAX_ACTUATORS];
++	u64 saved_tot_idle_time[BFQ_MAX_ACTUATORS];
+ 
+ 	/*
+ 	 * Same purpose as the previous fields for the values of the
+ 	 * field keeping the queue's belonging to a large burst
+ 	 */
+-	bool saved_in_large_burst[BFQ_NUM_ACTUATORS];
++	bool saved_in_large_burst[BFQ_MAX_ACTUATORS];
+ 	/*
+ 	 * True if the queue belonged to a burst list before its merge
+ 	 * with another cooperating queue.
+ 	 */
+-	bool was_in_burst_list[BFQ_NUM_ACTUATORS];
++	bool was_in_burst_list[BFQ_MAX_ACTUATORS];
+ 
+ 	/*
+ 	 * Save the weight when a merge occurs, to be able
+@@ -470,27 +470,27 @@ struct bfq_io_cq {
+ 	 * then the weight of the recycled queue could differ
+ 	 * from the weight of the original queue.
+ 	 */
+-	unsigned int saved_weight[BFQ_NUM_ACTUATORS];
++	unsigned int saved_weight[BFQ_MAX_ACTUATORS];
+ 
+ 	/*
+ 	 * Similar to previous fields: save wr information.
+ 	 */
+-	unsigned long saved_wr_coeff[BFQ_NUM_ACTUATORS];
+-	unsigned long saved_last_wr_start_finish[BFQ_NUM_ACTUATORS];
+-	unsigned long saved_service_from_wr[BFQ_NUM_ACTUATORS];
+-	unsigned long saved_wr_start_at_switch_to_srt[BFQ_NUM_ACTUATORS];
+-	unsigned int saved_wr_cur_max_time[BFQ_NUM_ACTUATORS];
+-	struct bfq_ttime saved_ttime[BFQ_NUM_ACTUATORS];
++	unsigned long saved_wr_coeff[BFQ_MAX_ACTUATORS];
++	unsigned long saved_last_wr_start_finish[BFQ_MAX_ACTUATORS];
++	unsigned long saved_service_from_wr[BFQ_MAX_ACTUATORS];
++	unsigned long saved_wr_start_at_switch_to_srt[BFQ_MAX_ACTUATORS];
++	unsigned int saved_wr_cur_max_time[BFQ_MAX_ACTUATORS];
++	struct bfq_ttime saved_ttime[BFQ_MAX_ACTUATORS];
+ 
+ 	/* Save also injection state */
+-	u64 saved_last_serv_time_ns[BFQ_NUM_ACTUATORS];
+-	unsigned int saved_inject_limit[BFQ_NUM_ACTUATORS];
+-	unsigned long saved_decrease_time_jif[BFQ_NUM_ACTUATORS];
++	u64 saved_last_serv_time_ns[BFQ_MAX_ACTUATORS];
++	unsigned int saved_inject_limit[BFQ_MAX_ACTUATORS];
++	unsigned long saved_decrease_time_jif[BFQ_MAX_ACTUATORS];
+ 
+ 	/* candidate queue for a stable merge (due to close creation time) */
+-	struct bfq_queue *stable_merge_bfqq[BFQ_NUM_ACTUATORS];
++	struct bfq_queue *stable_merge_bfqq[BFQ_MAX_ACTUATORS];
+ 
+-	bool stably_merged[BFQ_NUM_ACTUATORS];	/* non splittable if true */
++	bool stably_merged[BFQ_MAX_ACTUATORS];	/* non splittable if true */
+ 
+ 	unsigned int requests;	/* Number of requests this process has in flight */
+ };
+@@ -961,8 +961,8 @@ struct bfq_group {
+ 
+ 	void *bfqd;
+ 
+-	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS][BFQ_NUM_ACTUATORS];
+-	struct bfq_queue *async_idle_bfqq[BFQ_NUM_ACTUATORS];
++	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS][BFQ_MAX_ACTUATORS];
++	struct bfq_queue *async_idle_bfqq[BFQ_MAX_ACTUATORS];
+ 
+ 	struct bfq_entity *my_entity;
+ 
+@@ -978,8 +978,8 @@ struct bfq_group {
+ 	struct bfq_entity entity;
+ 	struct bfq_sched_data sched_data;
+ 
+-	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS][BFQ_NUM_ACTUATORS];
+-	struct bfq_queue *async_idle_bfqq[BFQ_NUM_ACTUATORS];
++	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS][BFQ_MAX_ACTUATORS];
++	struct bfq_queue *async_idle_bfqq[BFQ_MAX_ACTUATORS];
+ 
+ 	struct rb_root rq_pos_tree;
+ };
 -- 
 2.20.1
 
