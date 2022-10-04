@@ -2,136 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0923FC43217
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 09:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5210C4332F
+	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 09:46:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbiJDJnn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 05:43:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59886 "EHLO
+        id S229959AbiJDJqb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 05:46:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231254AbiJDJnB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 05:43:01 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00334DB78
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 02:40:27 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id z23so10880529ejw.12
-        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 02:40:27 -0700 (PDT)
+        with ESMTP id S229962AbiJDJqI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 05:46:08 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF31E0D5;
+        Tue,  4 Oct 2022 02:43:48 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id 3so12286403pga.1;
+        Tue, 04 Oct 2022 02:43:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=Lkj24CwnqblrU2r7BP9tYzNtlqxQyj6cU7dT5FOgpSw=;
-        b=GMFbjSxm9o1TQamkt1NbybYxlFvue+3r266VqXcJfN6PdccRZvTT25BUA0sx0RIvrN
-         D3xSAlTqHaPSGUS4BavTR6i5tvrtHLmwm2Q3BJG45EJgATv7eKfh+GecaFT/3YbCbfGd
-         q4bwAUsX9YeRwxM8jPbBWaJzwhbyQojNDhuZfB/lnlcI3Iyr85Wr3FzhqM59hpioueOx
-         xEUiNDmyGsEKoGzO/skMGT1k7rxanGOiAi8rDHwLZxXZbmTeBsgavCPkD9I7fpN54WVw
-         wXpfDECndz0rfteQw5GHbTbxnv4Iy99uPtFp2Si76qmUVzX3ZYjc1aGKDEftu+SvWFPm
-         C0KA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=U16ld6fgiAl2VzPXw2vpzgUsTq1GDPKXULp31YXb5XY=;
+        b=c16ldyQb3HZHxQIdRzIFCQODA29wPOsD/CGP73fnrIcbKwRHOoS5+UxoiBX2HHFzFm
+         IuAlErOoQBrZUoAJJvzqfH2ejWEMofLjOXPo9gtqEF2aXnXl6iGyPQILIBXJS81MO6Cx
+         mrQ8nmY7T5ZNA+CVayLHq0OMsQ/d+E6YIvuNBG3/nC++q0LAkPmlpTuBgMHpamF1dBgw
+         nIiKR+0BnikgeBNbew1bIYZ/dKUO0Vd1ePYbB0ra5RUAVl/r7YLCnD/Jw1KWg88rlT0Y
+         PZ/EfS+bJTvb3ghU2SYbtFMNiTKgM1DKLbyQqcF6+JwdwSt0IK3XOdqHjKg0+L8KdeGE
+         L0jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=Lkj24CwnqblrU2r7BP9tYzNtlqxQyj6cU7dT5FOgpSw=;
-        b=hL7FCXP4kcGRfUOhO/30uY9IQgg+Vevg9gOftz7AIsJWJcciy27xlQ9WRi8jOC2fuv
-         TdOhOBgBq1SLQQxx2/rVqnjUnF/J6odTQtzpdnpiocffS8hpHqHTF1ruZ7OUFpOjRJnq
-         +WRJvl9RQdqV3IZwOOKopbIClf8QNVGNGDxvvphnXJZUkbvoMGAko0UEbfzytvbtI/pB
-         p9v3jMzB4m8bjqmHXJkfWZhQ4s2iHFzBLI7a+9SeEy40hrvif5Xvj6+qpFRJwOwe7mYx
-         pmhPa+hfExyFylgpMzdi+jdlYgesL+tUztbE+kjs1AVwH1uVupsEi7h1qu2hLCs7UFFt
-         p+uQ==
-X-Gm-Message-State: ACrzQf0iXXoMM6hPy4kyPgRJSij6ruA901pNIqLIroxBdDaYIB1sN6vw
-        By2fnIBmFDrFfxiYHPQIkXe85A==
-X-Google-Smtp-Source: AMsMyM780m0v4fpvF9zALrlRv0AoXqheCq3eP6aMp5XLnmEJF6Yh+7mR2S5FvmcYSYlyorkVSXV+MA==
-X-Received: by 2002:a17:906:8a5a:b0:781:6a01:5ccc with SMTP id gx26-20020a1709068a5a00b007816a015cccmr18201757ejc.118.1664876425650;
-        Tue, 04 Oct 2022 02:40:25 -0700 (PDT)
-Received: from MBP-di-Paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
-        by smtp.gmail.com with ESMTPSA id 9-20020a170906200900b00780f6071b5dsm6774853ejo.188.2022.10.04.02.40.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Oct 2022 02:40:25 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jack@suse.cz, andrea.righi@canonical.com, glen.valante@linaro.org,
-        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        Davide Zini <davidezini2@gmail.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V3 8/8] block, bfq: balance I/O injection among underutilized actuators
-Date:   Tue,  4 Oct 2022 11:40:10 +0200
-Message-Id: <20221004094010.80090-9-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221004094010.80090-1-paolo.valente@linaro.org>
-References: <20221004094010.80090-1-paolo.valente@linaro.org>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=U16ld6fgiAl2VzPXw2vpzgUsTq1GDPKXULp31YXb5XY=;
+        b=ZvIWjuHfd/t4pTp4ccWdW9FYpvZFgxNl0FnxUUt6MOBVgg56wrJauy5xdVTpiGKsg7
+         jqNWIO1UR5m+nyxFaOODKoWIPrdRdux159Hssb6CZrX/hsKGSMRzUbZKTrZvU9TELBU8
+         W98tLKXi01UfWfU9tn4ZoDSPjJKgGQWnjjLmy5N/pVreSLmt1sZwhSQYDKB2hfjUQtTH
+         KPBqj3ZP6U0Nbk8NAQIITXpeUHsi9mqUos8yD39A8C+JlF3hEK33joKOIwEyY6KTY0O2
+         k96hA4FW/fhWlP6u1ua31mb3WMHEOplcIsCFo1r7MlffM4OWZ7FCeWHFuSv4rcuzLSy6
+         +BEw==
+X-Gm-Message-State: ACrzQf12NGqRwytPY4DTpcIxlR8sWo6Biway7d+M+HhlEftTuWDaPQ4m
+        wnCQVJaQIxv/N7GmESufVsA=
+X-Google-Smtp-Source: AMsMyM6z9dQo1p6DFxFXBRn+gRwfwkvOktPU/dHCgljsraXWWh6QNuPeRSLnbDtzTB+ZNEicBlD72Q==
+X-Received: by 2002:a05:6a00:1705:b0:55a:b9c4:6e14 with SMTP id h5-20020a056a00170500b0055ab9c46e14mr26631686pfc.40.1664876626787;
+        Tue, 04 Oct 2022 02:43:46 -0700 (PDT)
+Received: from T590 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h19-20020a656393000000b0042c0ffa0e62sm8190518pgv.47.2022.10.04.02.43.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Oct 2022 02:43:45 -0700 (PDT)
+Date:   Tue, 4 Oct 2022 17:43:34 +0800
+From:   Ming Lei <tom.leiming@gmail.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Kirill Tkhai <kirill.tkhai@openvz.org>,
+        Manuel Bentele <development@manuel-bentele.de>,
+        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+Message-ID: <YzwARuAZdaoGTUfP@T590>
+References: <Yza1u1KfKa7ycQm0@T590>
+ <Yzs9xQlVuW41TuNC@fedora>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yzs9xQlVuW41TuNC@fedora>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Davide Zini <davidezini2@gmail.com>
+On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Hajnoczi wrote:
+> On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
+> > ublk-qcow2 is available now.
+> 
+> Cool, thanks for sharing!
+> 
+> > 
+> > So far it provides basic read/write function, and compression and snapshot
+> > aren't supported yet. The target/backend implementation is completely
+> > based on io_uring, and share the same io_uring with ublk IO command
+> > handler, just like what ublk-loop does.
+> > 
+> > Follows the main motivations of ublk-qcow2:
+> > 
+> > - building one complicated target from scratch helps libublksrv APIs/functions
+> >   become mature/stable more quickly, since qcow2 is complicated and needs more
+> >   requirement from libublksrv compared with other simple ones(loop, null)
+> > 
+> > - there are several attempts of implementing qcow2 driver in kernel, such as
+> >   ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
+> >   might useful be for covering requirement in this field
+> > 
+> > - performance comparison with qemu-nbd, and it was my 1st thought to evaluate
+> >   performance of ublk/io_uring backend by writing one ublk-qcow2 since ublksrv
+> >   is started
+> > 
+> > - help to abstract common building block or design pattern for writing new ublk
+> >   target/backend
+> > 
+> > So far it basically passes xfstest(XFS) test by using ublk-qcow2 block
+> > device as TEST_DEV, and kernel building workload is verified too. Also
+> > soft update approach is applied in meta flushing, and meta data
+> > integrity is guaranteed, 'make test T=qcow2/040' covers this kind of
+> > test, and only cluster leak is reported during this test.
+> > 
+> > The performance data looks much better compared with qemu-nbd, see
+> > details in commit log[1], README[5] and STATUS[6]. And the test covers both
+> > empty image and pre-allocated image, for example of pre-allocated qcow2
+> > image(8GB):
+> > 
+> > - qemu-nbd (make test T=qcow2/002)
+> 
+> Single queue?
 
-Upon the invocation of its dispatch function, BFQ returns the next I/O
-request of the in-service bfq_queue, unless some exception holds. One
-such exception is that there is some underutilized actuator, different
-from the actuator for which the in-service queue contains I/O, and
-that some other bfq_queue happens to contain I/O for such an
-actuator. In this case, the next I/O request of the latter bfq_queue,
-and not of the in-service bfq_queue, is returned (I/O is injected from
-that bfq_queue). To find such an actuator, a linear scan, in
-increasing index order, is performed among actuators.
+Yeah.
 
-Performing a linear scan entails a prioritization among actuators: an
-underutilized actuator may be considered for injection only if all
-actuators with a lower index are currently fully utilized, or if there
-is no pending I/O for any lower-index actuator that happens to be
-underutilized.
+> 
+> > 	randwrite(4k): jobs 1, iops 24605
+> > 	randread(4k): jobs 1, iops 30938
+> > 	randrw(4k): jobs 1, iops read 13981 write 14001
+> > 	rw(512k): jobs 1, iops read 724 write 728
+> 
+> Please try qemu-storage-daemon's VDUSE export type as well. The
+> command-line should be similar to this:
+> 
+>   # modprobe virtio_vdpa # attaches vDPA devices to host kernel
 
-This commits breaks this prioritization and tends to distribute
-injection uniformly across actuators. This is obtained by adding the
-following condition to the linear scan: even if an actuator A is
-underutilized, A is however skipped if its load is higher than that of
-the next actuator.
+Not found virtio_vdpa module even though I enabled all the following
+options:
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
----
- block/bfq-iosched.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+        --- vDPA drivers                                 
+          <M>   vDPA device simulator core               
+          <M>     vDPA simulator for networking device   
+          <M>     vDPA simulator for block device        
+          <M>   VDUSE (vDPA Device in Userspace) support 
+          <M>   Intel IFC VF vDPA driver                 
+          <M>   Virtio PCI bridge vDPA driver            
+          <M>   vDPA driver for Alibaba ENI
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4deb0f6c751e..074b6ae77242 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4800,17 +4800,25 @@ struct bfq_queue *bfq_find_active_bfqq_for_actuator(struct bfq_data *bfqd,
- 
- /*
-  * Perform a linear scan of each actuator, until an actuator is found
-- * for which the following two conditions hold: the load of the
-- * actuator is below the threshold (see comments on actuator_load_threshold
-- * for details), and there is a queue that contains I/O for that
-- * actuator. On success, return that queue.
-+ * for which the following three conditions hold: the load of the
-+ * actuator is below the threshold (see comments on
-+ * actuator_load_threshold for details) and lower than that of the
-+ * next actuator (comments on this extra condition below), and there
-+ * is a queue that contains I/O for that actuator. On success, return
-+ * that queue.
-+ *
-+ * Performing a plain linear scan entails a prioritization among
-+ * actuators. The extra condition above breaks this prioritization and
-+ * tends to distribute injection uniformly across actuators.
-  */
- struct bfq_queue *bfq_find_bfqq_for_underused_actuator(struct bfq_data *bfqd)
- {
- 	int i;
- 
- 	for (i = 0 ; i < bfqd->num_ia_ranges; i++)
--		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold) {
-+		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold &&
-+		    (i == bfqd->num_ia_ranges - 1 ||
-+		     bfqd->rq_in_driver[i] < bfqd->rq_in_driver[i+1])) {
- 			struct bfq_queue *bfqq =
- 				bfq_find_active_bfqq_for_actuator(bfqd, i);
- 
--- 
-2.20.1
+BTW, my test environment is VM and the shared data is done in VM too, and
+can virtio_vdpa be used inside VM?
 
+>   # modprobe vduse
+>   # qemu-storage-daemon \
+>       --blockdev file,filename=test.qcow2,cache.direct=of|off,aio=native,node-name=file \
+>       --blockdev qcow2,file=file,node-name=qcow2 \
+>       --object iothread,id=iothread0 \
+>       --export vduse-blk,id=vduse0,name=vduse0,num-queues=$(nproc),node-name=qcow2,writable=on,iothread=iothread0
+>   # vdpa dev add name vduse0 mgmtdev vduse
+> 
+> A virtio-blk device should appear and xfstests can be run on it
+> (typically /dev/vda unless you already have other virtio-blk devices).
+> 
+> Afterwards you can destroy the device using:
+> 
+>   # vdpa dev del vduse0
+> 
+> > 
+> > - ublk-qcow2 (make test T=qcow2/022)
+> 
+> There are a lot of other factors not directly related to NBD vs ublk. In
+> order to get an apples-to-apples comparison with qemu-* a ublk export
+> type is needed in qemu-storage-daemon. That way only the difference is
+> the ublk interface and the rest of the code path is identical, making it
+> possible to compare NBD, VDUSE, ublk, etc more precisely.
+
+Maybe not true.
+
+ublk-qcow2 uses io_uring to handle all backend IO(include meta IO) completely,
+and so far single io_uring/pthread is for handling all qcow2 IOs and IO
+command.
+
+
+thanks, 
+Ming
