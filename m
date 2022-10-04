@@ -2,61 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B55C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 16:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E97DFC4332F
+	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 16:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbiJDQmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 12:42:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37528 "EHLO
+        id S230174AbiJDQmF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 12:42:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbiJDQmB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 12:42:01 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C515F222
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 09:42:01 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id z191so10936090iof.10
-        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 09:42:01 -0700 (PDT)
+        with ESMTP id S230163AbiJDQmD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 12:42:03 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67AC05FAF9
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 09:42:02 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id b20so921492iof.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 09:42:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
-        bh=Fv/RATIKH7DVnVoK46aeiXnGHzrASEQkGihJLuSD98Q=;
-        b=OxB4M4DCGeQWSb2yecuTG5Cooq6Vsqk9UdlZpr80kpwsgwgoAkHd9pyp8lU2VUeOSR
-         GJK6bnOUYbWolSJCgZEt9BVXvKOD5jGatt/lqHTDkZ0HHve0EcUrxEE+f67pwlZ8M2Pt
-         hFUz9hk6E3MEUNVwvjRdg/QNCMnVCFgJrLxYvfKFUVqeVttBU49HnrLk0veT3V5rA6qn
-         4zvLnjbyjj9L/E35VQAld0GOlaF3mPXb8orcpULsEkM7Y87EV9FOpY3222UXpfwHmYCO
-         qBCJaK7yutyJzmbAeJFbNmY71FTlq+PbPtvyGmCddLWMgeeKxaYrnQoTAnqmmygijPLI
-         O0mg==
+        bh=0i98s1EMzTMBPsiKMIhUHBahDQAZLN3S8+2vEgOt2oE=;
+        b=a0qj2Q463SqfIC+Ubs74QDDq2ZbB3HQaPsO5gIq2lbw4HV6gCGWroyQhl7cM7Tqooh
+         H98g3g64Nfc9IQAZtf2zBjeUdCOuP/SpwLtixbH3S/VH0FC/8mjLvorGNNyf2jh9P5Yk
+         JRQldBkXqa59oDXlPSNgoqeh7L4/hdTjAMLxHa2e2I30mKGVONGQ01QrulJk/VT57NoH
+         EdhNSo2Dn68qLIyMXCEU91fmpweAbwHlyIyz6e7wHehVSmTE8B6U/WupgN+wsN7nwYGO
+         SyqXSEK4WsM7eX0Tx7AAFa/Xr2R2cMvgD9kdU6k9cUXyr+Cnu4lIBdtdUNlbUomZNDSE
+         GlFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=Fv/RATIKH7DVnVoK46aeiXnGHzrASEQkGihJLuSD98Q=;
-        b=PBllNHZRgafFN95Yz1VDarFEP0fVE5ERKjtCvA6Y16g6qdlo35glmSYEAb9gB2seJh
-         sufG3tr264EJwlkAtN79O0eawWv2C1Qw1xmHwuxd7SfUi6Dt7a2ejE7bN0RIwH9hy0nv
-         B87u+qMK+PAD7XUhhVq79Pp5LHt49kr60+P8JDy6kGOjCU9fLIdFhejXAv9xj0Il4r8P
-         KqIqCRwOqDudvtjBRpxm2hoO4MYFPucFXMrmV9verSInuxYK/96MWsjeDt++i51nl1m4
-         wfQfQ3Atlra8fjlBd+REac6XnY38Nmtc6u4ssvGpcdqkXyV1fbD3aFjCYD7v75BrWkfo
-         rWvg==
-X-Gm-Message-State: ACrzQf0N+C+j9B4ylV1vnnrwXVlGIcHoR0CzMSIUEKmDXxNdYwUkE3Av
-        bGoZBscTiI+XemQS8099bQYHN2/yOt8aOw==
-X-Google-Smtp-Source: AMsMyM4NeENQ9RrdgmRLfa9eppQvWRZBwzbHLgFLi2NlheGpPAbafceQz30mT1kiJmMMyHXxNKYNgw==
-X-Received: by 2002:a05:6602:3ca:b0:6a4:16a0:9862 with SMTP id g10-20020a05660203ca00b006a416a09862mr11681253iov.217.1664901720258;
-        Tue, 04 Oct 2022 09:42:00 -0700 (PDT)
+        bh=0i98s1EMzTMBPsiKMIhUHBahDQAZLN3S8+2vEgOt2oE=;
+        b=hRY5dDCfqDB1r50XHRwnpV2cntTTNpTPEjEURD4HEgy6recESGUOchTZGYzqoqtK8F
+         FLwgPBCDd1lam4XiR980/GPtvUQLL5YAW8PV/kr/iP/UdvDsBI6ttrkrvkqcN4jkqghz
+         0HC1xrCuhNdHujRVY5Sro0/MC3fDAfGPxEainT+GSx/ye+sP3QBDCL5pIsokrjRrxeOQ
+         Zf3dFQiZMPFf+zg6qwY+w5jAtm5y0sQ+RbDqWjITljywl+6+PBeY5nDJ7sHJJ3n9nkWD
+         u93FsadqJBxTLUguz9ZjtPcO8NB1wmd2OCm1nS877rHEjc0klXEQq0wolclHaiG0KHvQ
+         YWpQ==
+X-Gm-Message-State: ACrzQf2Y6R0a0x1/ZGQHLb/NB/vgx2jNV16hCRYPtWHT98vUbgBDQbr/
+        +YOpo5IZ2UHYfA3hY/YTXnNXSOp2FM0RiA==
+X-Google-Smtp-Source: AMsMyM62ZvTH0hn0AHpbQRffdx3Xg4I5EYsBhw3h7vAhYluNamICqCTzx6u/YvAUQwS2jPE/qZmsLQ==
+X-Received: by 2002:a05:6638:3390:b0:35a:a74e:44e3 with SMTP id h16-20020a056638339000b0035aa74e44e3mr13205908jav.77.1664901721530;
+        Tue, 04 Oct 2022 09:42:01 -0700 (PDT)
 Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c72-20020a02964e000000b003633ef39bd3sm1638823jai.92.2022.10.04.09.41.59
+        by smtp.gmail.com with ESMTPSA id c72-20020a02964e000000b003633ef39bd3sm1638823jai.92.2022.10.04.09.42.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Oct 2022 09:41:59 -0700 (PDT)
+        Tue, 04 Oct 2022 09:42:00 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org,
-        Jonathan Derrick <jonathan.derrick@linux.dev>
-Cc:     linux-kernel@vger.kernel.org
-In-Reply-To: <20221003202511.5124-1-jonathan.derrick@linux.dev>
-References: <20221003202511.5124-1-jonathan.derrick@linux.dev>
-Subject: Re: [PATCH] MAINTAINERS: Update SED-Opal Maintainers
-Message-Id: <166490171926.91699.11306873216901064768.b4-ty@kernel.dk>
-Date:   Tue, 04 Oct 2022 10:41:59 -0600
+To:     Khazhismel Kumykov <khazhy@chromium.org>
+Cc:     linux-block@vger.kernel.org,
+        Khazhismel Kumykov <khazhy@google.com>,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20220926220134.2633692-1-khazhy@google.com>
+References: <20220926220134.2633692-1-khazhy@google.com>
+Subject: Re: [PATCH] block: allow specifying default iosched in config
+Message-Id: <166490172029.91699.2910906888136711371.b4-ty@kernel.dk>
+Date:   Tue, 04 Oct 2022 10:42:00 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -65,15 +66,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 3 Oct 2022 14:25:11 -0600, Jonathan Derrick wrote:
-> Add my new email address and remove Revanth
+On Mon, 26 Sep 2022 15:01:34 -0700, Khazhismel Kumykov wrote:
+> Setting IO scheduler at device init time in kernel is useful, and moving
+> this option into kernel config makes it possible to build different
+> kernels with different default schedulers from the same tree.
 > 
+> Order deadline->none->rest to retain current behavior of using "none" by
+> default if mq-deadline is not enabled.
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] MAINTAINERS: Update SED-Opal Maintainers
-      commit: 1d800f32b2574c1d055984ad17223198caddbb54
+[1/1] block: allow specifying default iosched in config
+      commit: ad9d3da2d07e0b2966e3ced843a0e2229410e26a
 
 Best regards,
 -- 
