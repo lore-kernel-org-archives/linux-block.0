@@ -2,189 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B41C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 13:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C525EC433F5
+	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 14:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbiJDNxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 09:53:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54138 "EHLO
+        id S229924AbiJDOu5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 10:50:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbiJDNxs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 09:53:48 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9222256B9B;
-        Tue,  4 Oct 2022 06:53:45 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id e20so2354571ybh.2;
-        Tue, 04 Oct 2022 06:53:45 -0700 (PDT)
+        with ESMTP id S229904AbiJDOu4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 10:50:56 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 613AA62ABD;
+        Tue,  4 Oct 2022 07:50:53 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id d18so8430616lfb.0;
+        Tue, 04 Oct 2022 07:50:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=Hs3jvXYRoW9cue3NWCTKTBo720DcB8K81r/kuPpiKLg=;
-        b=NKVA9fTuWcg09Dku5bT/SxrAfaWTl4KWWCzK5e1YEmWxMcBMAtGeke6u6Uzeys0MpG
-         orqbTldkVSP4mEZ8pETdfFsIDjm3bdLtsGBnnVcs/0AXfagv8f4hTMz5TA+pYUNezVR9
-         x8B+dJxYJ2XAwOxtZDxCBt8/hC128iqbGxU0GCOPcd4Ga5TqAjZftpXyK2ofqDnwrWS9
-         nAYxOQDRUb7XuRKggMq9a7V4oh3Qjmytldrn5bEOpmMJGrPcTr8wx8zlH/xspYCjhwD4
-         2xOYNNERdQPKQ6fEQFdKFUl7h2mgA8nxiAO7+O8VgotTWu8yHzRHPuuhawFfZ6UEVlio
-         pX0w==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=0Hn40CSUd9u1FNS+WIRJQMhD0PfBlmdUq9IyNX5yQ8A=;
+        b=EyZjjX/3GJ3YRLyk8hhn5QEWqzCFf4PlbGe41bHvbGx7TdRABf8tAe/qRNZGRRJArC
+         wO7x/JJLgqjW8NGOJsj6+6eALVIjVP0e6Z3aY7tcRZfR00DaFLkPMO22U+WFh79aeQd/
+         VQ3sBsEWwSVrz5tCizef4R5netdI9nlLvFUi9UGzSnZd647yPqgH+zCYE+GE/yQaMLmf
+         XFGRMiFUniLOKls9aO3+RKatXSBxPMzxdJWLdaBv6xc4IM6WQfkuCS1A/YZ4T0P/IcjA
+         kwZKfnr0ghw3XivtacA4oTuejHvWTBp+555zVAhLcqxPghBijq9pKOj6PZuA0ZDoieDu
+         U9mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Hs3jvXYRoW9cue3NWCTKTBo720DcB8K81r/kuPpiKLg=;
-        b=rv9FfcjDuglG5gKKC6Ev1iOQO1YSiKdlERJqduMT0wBfm2Fa6sRth7cQRk9o/EOH4H
-         mGbfrjVyWq+yNEN5hQTAd+B3n8RGfum5U+CuexvYk8aDECSDKr8/lCP4hrHifp6/JO3O
-         QYe1/e7acEPuLONtHuY4K6/AEzn+SSJa038m4yMllquQL4zUCwfppwP3pJ/+Y8tx7ruR
-         O8MuT6hCqc3eMhVdWtp0U276Zp42GXH6vt98Mo7K2ozJGQJekX37dzMenCThWZ+7gtdn
-         RHcXcg+XlIJnZZrm5DPUAUEiWADuiKFzPCNoK8Jh37YV9eId+d+Ojxu+NSXKTzuD4bHl
-         ejow==
-X-Gm-Message-State: ACrzQf26XPZDAHeH/bLTf8dLS69dbMp/zgVW3EYjNkDuDxAsBvb7W48A
-        i07NqqSnXXo8u/cLH+qnak3M6AEow+mn1dTHFn0=
-X-Google-Smtp-Source: AMsMyM6+zGsuKsj2AwyUhlrPTvcMauXh5gjI+oX3NcpIaTUUvACKUgqczJK/iCDAJc9ZZht8ZphALvXUKQeyqyY04SE=
-X-Received: by 2002:a05:6902:44:b0:6af:f412:cfb7 with SMTP id
- m4-20020a056902004400b006aff412cfb7mr23782496ybh.366.1664891624610; Tue, 04
- Oct 2022 06:53:44 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=0Hn40CSUd9u1FNS+WIRJQMhD0PfBlmdUq9IyNX5yQ8A=;
+        b=i4ULWCYdMgIjOdBGR1m37CwzIl8vah+mAv6L7+1pAZ5BHzdFuCpkJ6wLM4o3OdZMB0
+         r1Hb0PotR2gFJuznfCQlIb/N33uvcqxlggqzoiVIAIqWciiBAI7havXXz3+fC2JiklnA
+         hCkFH5OMlUiMpzPoIYXBaREE/Esru6Sony9Px2mszTXLVRT/u0o00f5dp57vPTcuzS+8
+         V7OkIdGkgJFw8I69pDRtOLsEap7h1XcooxO0pNoKTsZyP5IP33b43olMdTr3jBnYnT8c
+         afZxoA3XrgP6Y58aP2/zaVGOajCxApB77jl3GuB3SBVW/tQ57O5JyS9EGjdR7u6Yxh45
+         Mpbg==
+X-Gm-Message-State: ACrzQf3ozWPeEe/PgNQJ+UVrmyXwQYt0Nsi2cI7dLx+hWZA5i/gx5bHN
+        pU34fDv801gyjNAvUL3lRpI=
+X-Google-Smtp-Source: AMsMyM5xHx121xWdjc6Jdp/Vv6LqbJIYkiwnlPad3CEaFwaOgZMjZ6vZdghrd8V0TtOKHjNcb3ytrA==
+X-Received: by 2002:a05:6512:12c8:b0:49b:817a:c2fc with SMTP id p8-20020a05651212c800b0049b817ac2fcmr9798920lfg.165.1664895051892;
+        Tue, 04 Oct 2022 07:50:51 -0700 (PDT)
+Received: from mobilestation ([95.79.133.202])
+        by smtp.gmail.com with ESMTPSA id g14-20020a056512118e00b0048b0099f40fsm1935601lfr.216.2022.10.04.07.50.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Oct 2022 07:50:51 -0700 (PDT)
+Date:   Tue, 4 Oct 2022 17:50:49 +0300
+From:   Serge Semin <fancer.lancer@gmail.com>
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] nvme-hwmon: Return error on kzalloc failure
+Message-ID: <20221004145049.74ffhcp7wpxw4ufz@mobilestation>
+References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
+ <20220929224648.8997-2-Sergey.Semin@baikalelectronics.ru>
+ <YzYwB7lRGW80r4HA@kbusch-mbp.dhcp.thefacebook.com>
+ <20220930095247.vqtdc53rr66uaiwv@mobilestation>
+ <YzcDvmlslPki8gBj@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-References: <Yza1u1KfKa7ycQm0@T590> <Yzs9xQlVuW41TuNC@fedora> <YzwARuAZdaoGTUfP@T590>
-In-Reply-To: <YzwARuAZdaoGTUfP@T590>
-From:   Stefan Hajnoczi <stefanha@gmail.com>
-Date:   Tue, 4 Oct 2022 09:53:32 -0400
-Message-ID: <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
-Subject: Re: ublk-qcow2: ublk-qcow2 is available
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YzcDvmlslPki8gBj@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 4 Oct 2022 at 05:44, Ming Lei <tom.leiming@gmail.com> wrote:
->
-> On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Hajnoczi wrote:
-> > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
-> > > ublk-qcow2 is available now.
-> >
-> > Cool, thanks for sharing!
-> >
-> > >
-> > > So far it provides basic read/write function, and compression and snapshot
-> > > aren't supported yet. The target/backend implementation is completely
-> > > based on io_uring, and share the same io_uring with ublk IO command
-> > > handler, just like what ublk-loop does.
-> > >
-> > > Follows the main motivations of ublk-qcow2:
-> > >
-> > > - building one complicated target from scratch helps libublksrv APIs/functions
-> > >   become mature/stable more quickly, since qcow2 is complicated and needs more
-> > >   requirement from libublksrv compared with other simple ones(loop, null)
-> > >
-> > > - there are several attempts of implementing qcow2 driver in kernel, such as
-> > >   ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
-> > >   might useful be for covering requirement in this field
-> > >
-> > > - performance comparison with qemu-nbd, and it was my 1st thought to evaluate
-> > >   performance of ublk/io_uring backend by writing one ublk-qcow2 since ublksrv
-> > >   is started
-> > >
-> > > - help to abstract common building block or design pattern for writing new ublk
-> > >   target/backend
-> > >
-> > > So far it basically passes xfstest(XFS) test by using ublk-qcow2 block
-> > > device as TEST_DEV, and kernel building workload is verified too. Also
-> > > soft update approach is applied in meta flushing, and meta data
-> > > integrity is guaranteed, 'make test T=qcow2/040' covers this kind of
-> > > test, and only cluster leak is reported during this test.
-> > >
-> > > The performance data looks much better compared with qemu-nbd, see
-> > > details in commit log[1], README[5] and STATUS[6]. And the test covers both
-> > > empty image and pre-allocated image, for example of pre-allocated qcow2
-> > > image(8GB):
-> > >
-> > > - qemu-nbd (make test T=qcow2/002)
-> >
-> > Single queue?
->
-> Yeah.
->
-> >
-> > >     randwrite(4k): jobs 1, iops 24605
-> > >     randread(4k): jobs 1, iops 30938
-> > >     randrw(4k): jobs 1, iops read 13981 write 14001
-> > >     rw(512k): jobs 1, iops read 724 write 728
-> >
-> > Please try qemu-storage-daemon's VDUSE export type as well. The
-> > command-line should be similar to this:
-> >
-> >   # modprobe virtio_vdpa # attaches vDPA devices to host kernel
->
-> Not found virtio_vdpa module even though I enabled all the following
-> options:
->
->         --- vDPA drivers
->           <M>   vDPA device simulator core
->           <M>     vDPA simulator for networking device
->           <M>     vDPA simulator for block device
->           <M>   VDUSE (vDPA Device in Userspace) support
->           <M>   Intel IFC VF vDPA driver
->           <M>   Virtio PCI bridge vDPA driver
->           <M>   vDPA driver for Alibaba ENI
->
-> BTW, my test environment is VM and the shared data is done in VM too, and
-> can virtio_vdpa be used inside VM?
+On Fri, Sep 30, 2022 at 08:57:02AM -0600, Keith Busch wrote:
+> On Fri, Sep 30, 2022 at 12:52:47PM +0300, Serge Semin wrote:
+> > On Thu, Sep 29, 2022 at 05:53:43PM -0600, Keith Busch wrote:
+> > > On Fri, Sep 30, 2022 at 01:46:46AM +0300, Serge Semin wrote:
+> > > > Inability to allocate a buffer is a critical error which shouldn't be
+> > > > tolerated since most likely the rest of the driver won't work correctly.
+> > > > Thus instead of returning the zero status let's return the -ENOMEM error
+> > > > if the nvme_hwmon_data structure instance couldn't be created.
+> > > 
+> > 
+> > > Nak for this one. The hwmon is not necessary for the rest of the driver to
+> > > function, so having the driver detach from the device seems a bit harsh.
+> > 
+> > Even if it is as you say, neither the method semantic nor the way it's
+> > called imply that. Any failures except the allocation one are
+> > perceived as erroneous.
+> 
 
-I hope Xie Yongji can help explain how to benchmark VDUSE.
+> This is called by nvme_init_ctrl_finish(), and returns the error to
+> nvme_reset_work() only if it's < 0, which indicates we can't go on and the
+> driver unbinds.
 
-virtio_vdpa is available inside guests too. Please check that
-VIRTIO_VDPA ("vDPA driver for virtio devices") is enabled in "Virtio
-drivers" menu.
+That's obvious. One of the my question was that what makes the no
+memory error different from the rest of the errors causing the
+nvme_hwmon_init() method to fail? 
 
->
-> >   # modprobe vduse
-> >   # qemu-storage-daemon \
-> >       --blockdev file,filename=test.qcow2,cache.direct=of|off,aio=native,node-name=file \
-> >       --blockdev qcow2,file=file,node-name=qcow2 \
-> >       --object iothread,id=iothread0 \
-> >       --export vduse-blk,id=vduse0,name=vduse0,num-queues=$(nproc),node-name=qcow2,writable=on,iothread=iothread0
-> >   # vdpa dev add name vduse0 mgmtdev vduse
-> >
-> > A virtio-blk device should appear and xfstests can be run on it
-> > (typically /dev/vda unless you already have other virtio-blk devices).
-> >
-> > Afterwards you can destroy the device using:
-> >
-> >   # vdpa dev del vduse0
-> >
-> > >
-> > > - ublk-qcow2 (make test T=qcow2/022)
-> >
-> > There are a lot of other factors not directly related to NBD vs ublk. In
-> > order to get an apples-to-apples comparison with qemu-* a ublk export
-> > type is needed in qemu-storage-daemon. That way only the difference is
-> > the ublk interface and the rest of the code path is identical, making it
-> > possible to compare NBD, VDUSE, ublk, etc more precisely.
->
-> Maybe not true.
->
-> ublk-qcow2 uses io_uring to handle all backend IO(include meta IO) completely,
-> and so far single io_uring/pthread is for handling all qcow2 IOs and IO
-> command.
+> 
+> This particular condition for hwmon is not something that prevents us from
+> making forward progress.
 
-qemu-nbd doesn't use io_uring to handle the backend IO, so we don't
-know whether the benchmark demonstrates that ublk is faster than NBD,
-that the ublk-qcow2 implementation is faster than qemu-nbd's qcow2,
-whether there are miscellaneous implementation differences between
-ublk-qcow2 and qemu-nbd (like using the same io_uring context for both
-ublk and backend IO), or something else.
+If you consider the hwmon functionality as optional (AFAIU you are),
+then just ignore the return value no matter the reason. If the problem
+caused the hwmon initialization process to fail turns to be critical
+it will be raised in some other place which is required for the NVME
+driver to work properly. Otherwise the hwmon module initialization may
+still cause the probe procedure to halt, which makes it not optional.
+That's what I meant when was saying about "the function and its
+caller semantics not implying that".
 
-I'm suggesting measuring changes to just 1 variable at a time.
-Otherwise it's hard to reach a conclusion about the root cause of the
-performance difference. Let's learn why ublk-qcow2 performs well.
+>  
+> > > The
+> > > driver can participate in memory reclaim, so failing on a low memory condition
+> > > can make matters worse.
+> > 
+> > Yes it can, so can many other places in the driver utilizing kmalloc
+> > with just GFP_KERNEL flag passed including on the same path as the
+> > nvme_hwmon_init() execution. Kmalloc will make sure the reclaim is
+> > either finished or executed in background anyway in all cases. 
+> 
+> This path is in the first initialization before we've set up a namespace that
+> can be used as a reclaim destination.
+> 
+> > Don't
+> > really see why memory allocation failure is less worse in this case
+> > than in many others in the same driver especially seeing as I said
+> 
+> The other initialization kmalloc's are required to make forward progress toward
+> setting up a namespace. This one is not required.
 
-Stefan
+Anyway what you say seems still contradicting. First you said that the
+hwmon functionality was optional, but the only error being ignored was
+the no-memory one which was very rare and turned to be not ignored in
+the most of the other places. Second you got to accept the second
+patch of the series, which introduced a one more kmalloc followed
+right after the first one in the same function nvme_hwmon_init(). That
+kmalloc failure wasn't ignored but caused the nvme_hwmon_init()
+function to return an error. If you suggest to forget about the first
+part (which IMO still counts, but AFAICS is a common pattern in the
+NVME core driver, i.e. nvme_configure_apst() and
+nvme_configure_host_options()), the second part still applies.
+
+-Sergey
