@@ -2,116 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB93C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 18:50:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9A0C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 20:22:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbiJDSuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 14:50:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54524 "EHLO
+        id S229505AbiJDUWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 16:22:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbiJDSt7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 14:49:59 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0345418B1E;
-        Tue,  4 Oct 2022 11:49:54 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id DECF41F94D;
-        Tue,  4 Oct 2022 18:49:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1664909392; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8UNyI7lLYkq9NR142HxaTAJjkImjeZgGlN6hwkAxwMk=;
-        b=YC+buOEk9Zc2GcPD5jOtQJWPyzrKsJH/cz+0BQYO7BGtB1JGjVdxR6XHWP8ftATaQo6OHd
-        JhKwLPZDIsyhSrLJtXujRVkh75AJvF0yYrrOIUe5aqbh0nmobhYxqufLH/vGO+WlHkP25y
-        +2oHfraB4VDBb7/iDgFznOCT3jB2vMU=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9E721139EF;
-        Tue,  4 Oct 2022 18:49:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id kn6PJVCAPGM4XwAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Tue, 04 Oct 2022 18:49:52 +0000
-Date:   Tue, 4 Oct 2022 20:49:51 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v8 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
-Message-ID: <YzyAT/lfyKhOnOpy@blackbook>
-References: <20221004151748.293388-1-longman@redhat.com>
- <20221004151748.293388-4-longman@redhat.com>
+        with ESMTP id S229468AbiJDUW3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 16:22:29 -0400
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E137E5A3C9
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 13:22:23 -0700 (PDT)
+Received: by mail-il1-x12a.google.com with SMTP id o13so2719927ilc.7
+        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 13:22:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=TelNLcm9wRWpRvZM6ui9GLROotn2S175JYIk0nIBYMU=;
+        b=STF3cKzsEkNyiAc2Pp9U+acmfSoO9o9FviqJOu5GTx9ayQmChbBcWmh+30RVpI7ku1
+         3TL9xHH/yeYsbts5GKYStMrmZKBWoSqUJcVo11VwATX5RUVZC8A84OMxJDVx14e+TRyI
+         Nc+HPgOgpPIBtZ4N/ayYZN5MY7PKYBMkYHaKG8si2vVDgHorKdMRnlRkTc5LJuSWNLfA
+         ReTIaqinJjqbLriC4pJucVuZlJspXBnej4Kw62tHQBPCt8yHRBKVJ2fJ+gnTO01TNopW
+         IcSDYEs8muyxhocv8GCeFfIU+TsX6iI9/F+ON1DBd60ziUqQ2AcEFN1X6qCb6CqkKSym
+         QqQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=TelNLcm9wRWpRvZM6ui9GLROotn2S175JYIk0nIBYMU=;
+        b=qdzjAm7K3pLBTqKazYSaN0klCEodaDti6bVbijvmx55WkGNyE4BWxBUAJau6x/DXE4
+         VWkOdEAMrFP6aMbJFaJ7XqD6l3k6WUzSVOS5KYhGbhrj5hDpBRNepfWLAbwbpVsKeNxq
+         w0+qqS7KuT06xgQbhcT68HCoNLYmCQkeKmVALBGofECP5jJV4TzdkMOzqVFKOno4fFm2
+         zU+uYLsGywagNHcohIKI59/+zkW0eDzkxzsihjxBZ0gRm18l4s+kbjZY/93XPs1D/L2O
+         sc27JfBNnq7DIYGMj6As8qk1qzMblyapPxDQdD+JUVakoUwEPYTHdh7052lto2Mpgkeg
+         wYYQ==
+X-Gm-Message-State: ACrzQf1i6UVCcDQuMQ0KyiknDA8619cyN5JB2Viy3tNJ+9x5hj6ca2oZ
+        r5p+m3c8fgJst3HdEIvtlhlMNgkfnsrExw==
+X-Google-Smtp-Source: AMsMyM7nWfSuZ2bMHjHDOTAjPo4J9MaV6oNis+zZcdekiEkjOufbVl2foV4BfKsvvXRRUaad2rpNmg==
+X-Received: by 2002:a05:6e02:194e:b0:2f8:fa94:9da1 with SMTP id x14-20020a056e02194e00b002f8fa949da1mr12747955ilu.102.1664914943271;
+        Tue, 04 Oct 2022 13:22:23 -0700 (PDT)
+Received: from [192.168.1.94] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id x2-20020a026f02000000b003583ae37f40sm5508319jab.153.2022.10.04.13.22.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Oct 2022 13:22:22 -0700 (PDT)
+Message-ID: <736d9e73-8f19-cc21-375e-140e4ab61383@kernel.dk>
+Date:   Tue, 4 Oct 2022 14:22:21 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="2x28QV160etDw6kh"
-Content-Disposition: inline
-In-Reply-To: <20221004151748.293388-4-longman@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH] block: allow specifying default iosched in config
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Khazhismel Kumykov <khazhy@chromium.org>
+Cc:     linux-block@vger.kernel.org,
+        Khazhismel Kumykov <khazhy@google.com>,
+        linux-kernel@vger.kernel.org
+References: <20220926220134.2633692-1-khazhy@google.com>
+ <166490172029.91699.2910906888136711371.b4-ty@kernel.dk>
+In-Reply-To: <166490172029.91699.2910906888136711371.b4-ty@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 10/4/22 10:42 AM, Jens Axboe wrote:
+> On Mon, 26 Sep 2022 15:01:34 -0700, Khazhismel Kumykov wrote:
+>> Setting IO scheduler at device init time in kernel is useful, and moving
+>> this option into kernel config makes it possible to build different
+>> kernels with different default schedulers from the same tree.
+>>
+>> Order deadline->none->rest to retain current behavior of using "none" by
+>> default if mq-deadline is not enabled.
+>>
+>> [...]
+> 
+> Applied, thanks!
+> 
+> [1/1] block: allow specifying default iosched in config
+>       commit: ad9d3da2d07e0b2966e3ced843a0e2229410e26a
 
---2x28QV160etDw6kh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm going to drop this one for now since we still have
+active discussion on it and it's very late (actually too late)
+to be debating 6.1.
 
-Hello.
+-- 
+Jens Axboe
 
-On Tue, Oct 04, 2022 at 11:17:48AM -0400, Waiman Long <longman@redhat.com> =
-wrote:
-> To protect against destruction of blkg, a percpu reference is gotten
-> when putting into the lockless list and put back when removed.
 
-Just to conclude my previous remark about the loop, let me try
-explaining it more precisely:
-
-blkcg->lhead via blkg_iostat_set holds reference to blkcg_gq=20
-   (taken in in blk_cgroup_bio_start)
-
-blkcg_gq holds reference to its blkcg_gq->blkcg=20
-   (taken in blkg_create)
-
-The cycle has two edges, the latter is broken in __blkg_release but
-that's a release callback of the involved blkcg_gq->refcnt, so it won't
-be called.
-
-The first edges is broken in blkcg_rstat_flush and that's more promising.
-The current code does the final flushes -- in css_release_work_fn.
-The problem is that it's the release callback of blkcg->css, i.e. it's
-also referenced on the cycle, therefore this final flush won't happen
-before cycle is broken.
-
-Fortunately, any other caller of cgroup_rstat_flush comes to the rescue
--- the blkcg_rstat_flush on the stuck blkcg would decompose lhead list
-and the reference cycle is broken.
-
-In summary, I think this adds the reference cycle but its survival time
-is limited to the soonest cgroup_rstat_flush call, which should not
-cause practical troubles.
-
-HTH,
-Michal
-
---2x28QV160etDw6kh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iHUEARYKAB0WIQTrXXag4J0QvXXBmkMkDQmsBEOquQUCYzyATQAKCRAkDQmsBEOq
-uR6ZAQDgLur6eHNw+8NVHuBo39WYPgLu3bNOK4TNdtKfpKl3mQEAxvyDr/yKx2iZ
-Duqml+a289o/PZPQLt5fTmUskNjKYAI=
-=xQFZ
------END PGP SIGNATURE-----
-
---2x28QV160etDw6kh--
