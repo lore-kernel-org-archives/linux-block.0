@@ -2,139 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08E3C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 15:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B55C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 16:42:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbiJDPcj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 11:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45016 "EHLO
+        id S229525AbiJDQmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 12:42:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbiJDPcj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 11:32:39 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982B033358;
-        Tue,  4 Oct 2022 08:32:37 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id bn8so2289793ljb.6;
-        Tue, 04 Oct 2022 08:32:37 -0700 (PDT)
+        with ESMTP id S229603AbiJDQmB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 12:42:01 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C515F222
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 09:42:01 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id z191so10936090iof.10
+        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 09:42:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=LJpQSt6f76xKyg5mFA+8DKvdT5AduyXHQ9BWqHR6Jys=;
-        b=NBLGR9LigeFmBloKTsH3jAyJdA2BxTIkpCCdzRtXt35tT8t77dwX8+1lCCsIzW6m1K
-         10X2ruTGY9VTmD5WOseHk2qtASOcK9oNV2yeTVycxcIH1B27teASNTL8jkogyKcnG9ja
-         lDYB/eUzTQtiog3LEROv008MKQyvrrmmHAUZqX9UiXsw5EsLKAQxgKS89IMkOyTy/SXW
-         BoeX0Gt881L/c8+qW6ay+296XSBAnQVjvtl0f7QjPoQmqj+j2HqKBQ2galI9YkGZJgxw
-         YPqPPDw1JEOrV60b/AHJzSy8+O+m/znCSzB9O4TyFBvZn2gzRfxRm/e3cyPKAHrrBq/A
-         sPSw==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date;
+        bh=Fv/RATIKH7DVnVoK46aeiXnGHzrASEQkGihJLuSD98Q=;
+        b=OxB4M4DCGeQWSb2yecuTG5Cooq6Vsqk9UdlZpr80kpwsgwgoAkHd9pyp8lU2VUeOSR
+         GJK6bnOUYbWolSJCgZEt9BVXvKOD5jGatt/lqHTDkZ0HHve0EcUrxEE+f67pwlZ8M2Pt
+         hFUz9hk6E3MEUNVwvjRdg/QNCMnVCFgJrLxYvfKFUVqeVttBU49HnrLk0veT3V5rA6qn
+         4zvLnjbyjj9L/E35VQAld0GOlaF3mPXb8orcpULsEkM7Y87EV9FOpY3222UXpfwHmYCO
+         qBCJaK7yutyJzmbAeJFbNmY71FTlq+PbPtvyGmCddLWMgeeKxaYrnQoTAnqmmygijPLI
+         O0mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=LJpQSt6f76xKyg5mFA+8DKvdT5AduyXHQ9BWqHR6Jys=;
-        b=KCSbvSnbdD6jRIvNVH3xgBpCyFW12zScaSkhAnD/zxjBhLuUeFYmoXGDgCZl/SE6Ru
-         BZEqDNqA8bUKsxFk80fXOVs1ai0l7QaewoVLawEc6pZsqSIEUxKB/kt5ILXgUA+0NBty
-         VXedSZR6maa8KCx6X8JubqhjGvETQzh5uBqZ9GtrcCp5KE8ocgkcS8BM8TDVBxYmTgdq
-         7lsCYwQRnAyjlbi9Q2v5fYd4Q3rtwcTSiw3paUIh1HIMwAuZ7uWJdNHGyiFwguD4NSiX
-         JO1e1NvDKD5ba1oe/S5IyU9fDLsOubhVa5Zy6tDsEwMvcU9Ukf3D7LJCK/HgIYQjUytY
-         HOlQ==
-X-Gm-Message-State: ACrzQf1bqZFjV9WTgQ6fJqUL3S51aZs3W4l0vTJgwtNIhbPctJNR8qFd
-        dgI+2VT5KKdqCUAtqZ+SuY4=
-X-Google-Smtp-Source: AMsMyM70KCRNNDKjPyPxNz/cIaHtp4wK32laKXHtSsO/3EwAzNBVS3tfMgR6hVFHSIO9qLn8bDdbpA==
-X-Received: by 2002:a05:651c:4ca:b0:26c:50e6:a9d3 with SMTP id e10-20020a05651c04ca00b0026c50e6a9d3mr8918382lji.318.1664897555773;
-        Tue, 04 Oct 2022 08:32:35 -0700 (PDT)
-Received: from mobilestation ([95.79.133.202])
-        by smtp.gmail.com with ESMTPSA id bx30-20020a05651c199e00b0026acfbbcb7esm763543ljb.12.2022.10.04.08.32.34
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=Fv/RATIKH7DVnVoK46aeiXnGHzrASEQkGihJLuSD98Q=;
+        b=PBllNHZRgafFN95Yz1VDarFEP0fVE5ERKjtCvA6Y16g6qdlo35glmSYEAb9gB2seJh
+         sufG3tr264EJwlkAtN79O0eawWv2C1Qw1xmHwuxd7SfUi6Dt7a2ejE7bN0RIwH9hy0nv
+         B87u+qMK+PAD7XUhhVq79Pp5LHt49kr60+P8JDy6kGOjCU9fLIdFhejXAv9xj0Il4r8P
+         KqIqCRwOqDudvtjBRpxm2hoO4MYFPucFXMrmV9verSInuxYK/96MWsjeDt++i51nl1m4
+         wfQfQ3Atlra8fjlBd+REac6XnY38Nmtc6u4ssvGpcdqkXyV1fbD3aFjCYD7v75BrWkfo
+         rWvg==
+X-Gm-Message-State: ACrzQf0N+C+j9B4ylV1vnnrwXVlGIcHoR0CzMSIUEKmDXxNdYwUkE3Av
+        bGoZBscTiI+XemQS8099bQYHN2/yOt8aOw==
+X-Google-Smtp-Source: AMsMyM4NeENQ9RrdgmRLfa9eppQvWRZBwzbHLgFLi2NlheGpPAbafceQz30mT1kiJmMMyHXxNKYNgw==
+X-Received: by 2002:a05:6602:3ca:b0:6a4:16a0:9862 with SMTP id g10-20020a05660203ca00b006a416a09862mr11681253iov.217.1664901720258;
+        Tue, 04 Oct 2022 09:42:00 -0700 (PDT)
+Received: from [127.0.0.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id c72-20020a02964e000000b003633ef39bd3sm1638823jai.92.2022.10.04.09.41.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Oct 2022 08:32:34 -0700 (PDT)
-Date:   Tue, 4 Oct 2022 18:32:33 +0300
-From:   Serge Semin <fancer.lancer@gmail.com>
-To:     Jonathan Derrick <jonathan.derrick@linux.dev>
-Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Revanth Rajashekar <revanth.rajashekar@intel.com>,
-        Rafael Antognolli <Rafael.Antognolli@intel.com>,
-        Scott Bauer <scott.bauer@intel.com>,
-        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
-        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] block: sed-opal: Cache-line-align the cmd/resp
- buffers
-Message-ID: <20221004153233.bxevkwwi6kqdpyep@mobilestation>
-References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
- <20220929224648.8997-4-Sergey.Semin@baikalelectronics.ru>
- <cce74aec-61b1-d5eb-1b62-746e45ebfe69@linux.dev>
+        Tue, 04 Oct 2022 09:41:59 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org,
+        Jonathan Derrick <jonathan.derrick@linux.dev>
+Cc:     linux-kernel@vger.kernel.org
+In-Reply-To: <20221003202511.5124-1-jonathan.derrick@linux.dev>
+References: <20221003202511.5124-1-jonathan.derrick@linux.dev>
+Subject: Re: [PATCH] MAINTAINERS: Update SED-Opal Maintainers
+Message-Id: <166490171926.91699.11306873216901064768.b4-ty@kernel.dk>
+Date:   Tue, 04 Oct 2022 10:41:59 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cce74aec-61b1-d5eb-1b62-746e45ebfe69@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 03, 2022 at 12:24:08PM -0600, Jonathan Derrick wrote:
-> Hi
-> 
-> On 9/29/2022 4:46 PM, Serge Semin wrote:
-> > In accordance with [1] the DMA-able memory buffers must be
-> > cacheline-aligned otherwise the cache writing-back and invalidation
-> > performed during the mapping may cause the adjacent data being lost. It's
-> > specifically required for the DMA-noncoherent platforms. Seeing the
-> > opal_dev.{cmd,resp} buffers are used for DMAs in the NVME and SCSI/SD
-> > drivers in framework of the nvme_sec_submit() and sd_sec_submit() methods
-> > respectively we must make sure the passed buffers are cacheline-aligned to
-> > prevent the denoted problem.
-> > 
-> > [1] Documentation/core-api/dma-api.rst
-> > 
-> > Fixes: 455a7b238cd6 ("block: Add Sed-opal library")
-> > Signed-off-by: Serge Semin <Sergey.Semin@baikalelectronics.ru>
-> > ---
-> >   block/sed-opal.c | 5 +++--
-> >   1 file changed, 3 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> > index 9700197000f2..222acbd1f03a 100644
-> > --- a/block/sed-opal.c
-> > +++ b/block/sed-opal.c
-> > @@ -73,6 +73,7 @@ struct parsed_resp {
-> >   	struct opal_resp_tok toks[MAX_TOKS];
-> >   };
-> > +/* Presumably DMA-able buffers must be cache-aligned */
-> >   struct opal_dev {
-> >   	bool supported;
-> >   	bool mbr_enabled;
-> > @@ -88,8 +89,8 @@ struct opal_dev {
-> >   	u64 lowest_lba;
-> >   	size_t pos;
-> > -	u8 cmd[IO_BUFFER_LENGTH];
-> > -	u8 resp[IO_BUFFER_LENGTH];
-> > +	u8 cmd[IO_BUFFER_LENGTH] ____cacheline_aligned;
-> > +	u8 resp[IO_BUFFER_LENGTH] ____cacheline_aligned;
-
-> I'm with Christoph on this one.
-> When I see ____cacheline_aligned, I assume its for performance reasons, not
-> to work around a DMA limitation. Can we instead kmalloc (which provides
-> alignment) these buffers to make it more clear? May want to add that same
-> comment pointing out some architectures require these dma targets to be
-> cache aligned.
-
-Ok. I'll resend v3 with these buffers being kmalloc'ed.
-
-Please note the SED OPAL entry of the MAINTAINTER list contains your
-intel-email address, which bounces back the messages (so does the
-Revanth' one). I'll add your new address to my patchset' "To"-list,
-but if you want to get new OPAL-related patches sent directly to your
-linux.dev email address the entry should be updated.
-
--Sergey
-
+On Mon, 3 Oct 2022 14:25:11 -0600, Jonathan Derrick wrote:
+> Add my new email address and remove Revanth
 > 
 > 
-> >   	struct parsed_resp parsed;
-> >   	size_t prev_d_len;
+
+Applied, thanks!
+
+[1/1] MAINTAINERS: Update SED-Opal Maintainers
+      commit: 1d800f32b2574c1d055984ad17223198caddbb54
+
+Best regards,
+-- 
+Jens Axboe
+
+
