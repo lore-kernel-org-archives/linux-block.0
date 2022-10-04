@@ -2,62 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4115C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6529CC433FE
 	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 09:43:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbiJDJnU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 05:43:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34904 "EHLO
+        id S231388AbiJDJnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 05:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231349AbiJDJm5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 05:42:57 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFBA237CF
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 02:40:23 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id kg6so12285730ejc.9
-        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 02:40:23 -0700 (PDT)
+        with ESMTP id S230348AbiJDJm4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 05:42:56 -0400
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D91E57561
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 02:40:20 -0700 (PDT)
+Received: by mail-ej1-x635.google.com with SMTP id lt21so2345271ejb.0
+        for <linux-block@vger.kernel.org>; Tue, 04 Oct 2022 02:40:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=zG87mohz6k0XA1QdodAbH2Cpuu/lMxi9cdgejBiMJhc=;
-        b=whHSXOJv5IvqbNa0REEKKOp25OIK8cw23JVFfaHWCdxjYVxQ0IgOFLbvXEy6zUhNx9
-         l1gsdUxIXdMtzwung4rt6t7VUFUQ9G3g+loFxfZZQktzmsR57L9T5NitLuYvMUeZK7r5
-         xUnXTLAcN8eMZaebC/2DWtt/v7oGQw3r2EJQSyXR8o6kq4JUZbt4Vba20Q+vi2l6dY08
-         jR8jW76mKoqWGLHsYVP9GujPLpZFRI6skTZ21AaTcNBQizhZTuayu9y4jaSQ3y5AyiGE
-         O3TxQpVn7N/DTGQLLl3ksCFwbnk4zZZ6jabIADqztv7i/P/t5DjXK+wWIOiovk1p8aXV
-         FP8A==
+        bh=zL7MggT/wjl1I9Pu+YgUlKOT6FxpafG/7SpHyPz1qkE=;
+        b=IOmIjj+sSjod0YaUczD0fikDsCfwO+ZpQUDGKMgh+KrZlAvUkVRqFFMgq+pzCe9ob+
+         ynW801Ljib/cZ5orDbnQobGHmySqJ7ukxApJ+b43GNXTqH0IINEzPquGMI8uE4wHQgWz
+         wcj2drhAKBVNNfuAwnRhWNRNGQJwCQOk9z9VUqsME9YlSO5bUzc0myzBsJboDSOZuf9c
+         0Kwe5pN9XiJYU//npzZpWLOSjfDebDMFPSCShKXVUW8u/X+QUE+Iyzx7r8V4iEjTsK9r
+         QI8PJhZvCutrDenlxCvm+lA5O7MshoOm1g13/NJt1D67iVXix4kKhTcfQStWcYCul3ru
+         cGYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=zG87mohz6k0XA1QdodAbH2Cpuu/lMxi9cdgejBiMJhc=;
-        b=Z7V4E8Xru61hjK78xSMI6BzuYN1awN7i2fSXUxeln9CZwZRpWcLQgAqeWe2INtVrMO
-         +y9V3Q9xxLVcaSlGQI6oQj733aVJNICHEGPWWeNvBjFAruHeowE3OkEA9Rgv1Jnw+eGF
-         mM2z/atSFv+289kEzK8PuQ8OfsYAPdmG8quwLVEPCc57GnoeT4KU6Y0dL/OY+VfNy5V9
-         SlurHyf3SRdc2gDJONqqb5ER320s+LwhMX8RkpvF9Wrv9Zq6FJcEtooOhlNHXYIIVnlB
-         /YK+e1g8m1Fb7qVGeZYJtcf7HCLkUb4drNEytIof6dB5RqHl7Fe4GZRgUoqNxdkVfety
-         JAUQ==
-X-Gm-Message-State: ACrzQf2IkE47CUNkHRUhATNwWGPA6mmGmRkHwOtu2do4d5iPZFaQAU8G
-        bRztwD3p5JR91X3kh6Fw974wFQ==
-X-Google-Smtp-Source: AMsMyM4J+CS5sm9pShCLGc0AxUh/rglmeYSkVG99GpLn/CpcIVaMhURGTU+u+NUdhio1cOCTa76Qqg==
-X-Received: by 2002:a17:907:b1b:b0:781:320f:b76c with SMTP id h27-20020a1709070b1b00b00781320fb76cmr18340780ejl.671.1664876421398;
-        Tue, 04 Oct 2022 02:40:21 -0700 (PDT)
+        bh=zL7MggT/wjl1I9Pu+YgUlKOT6FxpafG/7SpHyPz1qkE=;
+        b=YlqODgGKPtFE2Liu+nfNBvu6U3pzqo7dD86F4OPv0UIY0pdofGk0yOA0s3vmNppxBn
+         NZ9M9Ptd6ymcA7gNHg+4avT2HN4Z4cqcovF7G+6gC2lBvvkRpnEWyK/nh+fRuAaeLIRu
+         j76do0RlGDHMOThSRaQgthWyxbOZoHNFbhUSKol6eLbfhDYqM2oTVJ6EKHLdX1jLgG3f
+         sGyKkJUiHFBDapDBq5G8jiI3wf4LoMvXTRwmkaGMtifg3YVHdnX0YZjDFynVDHufzqgm
+         Xv3ZXmqho1gG0yNZjmzIxJ7EjcvrpM0HckDYDZxA/hBhiDjJ/m5DF5lgre7sKEBsyhhS
+         voAA==
+X-Gm-Message-State: ACrzQf2/6qGWRa/nt30Sg41JzRi1/IRYnC9Woky6HglK0L50I7j4F/30
+        bneivsd+41uY+phmotxOY3oXkA==
+X-Google-Smtp-Source: AMsMyM6qqy62fdBI86idXIKK8xWM7kAggmSgkH0teEDdtql7lqn+dSC74SlhkIwsiKHzsqy3N+EAzg==
+X-Received: by 2002:a17:907:9812:b0:781:bbff:1d20 with SMTP id ji18-20020a170907981200b00781bbff1d20mr18555380ejc.33.1664876419191;
+        Tue, 04 Oct 2022 02:40:19 -0700 (PDT)
 Received: from MBP-di-Paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
-        by smtp.gmail.com with ESMTPSA id 9-20020a170906200900b00780f6071b5dsm6774853ejo.188.2022.10.04.02.40.20
+        by smtp.gmail.com with ESMTPSA id 9-20020a170906200900b00780f6071b5dsm6774853ejo.188.2022.10.04.02.40.18
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Oct 2022 02:40:21 -0700 (PDT)
+        Tue, 04 Oct 2022 02:40:18 -0700 (PDT)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         jack@suse.cz, andrea.righi@canonical.com, glen.valante@linaro.org,
         arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        Davide Zini <davidezini2@gmail.com>,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V3 4/8] block, bfq: split also async bfq_queues on a per-actuator basis
-Date:   Tue,  4 Oct 2022 11:40:06 +0200
-Message-Id: <20221004094010.80090-5-paolo.valente@linaro.org>
+Subject: [PATCH V3 2/8] block, bfq: forbid stable merging of queues associated with different actuators
+Date:   Tue,  4 Oct 2022 11:40:04 +0200
+Message-Id: <20221004094010.80090-3-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221004094010.80090-1-paolo.valente@linaro.org>
 References: <20221004094010.80090-1-paolo.valente@linaro.org>
@@ -67,127 +66,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Davide Zini <davidezini2@gmail.com>
-
-Similarly to sync bfq_queues, also async bfq_queues need to be split
-on a per-actuator basis.
+If queues associated with different actuators are merged, then control
+is lost on each actuator. Therefore some actuator may be
+underutilized, and throughput may decrease. This problem cannot occur
+with basic queue merging, because the latter is triggered by spatial
+locality, and sectors for different actuators are not close to each
+other. Yet it may happen with stable merging. To address this issue,
+this commit prevents stable merging from occurring among queues
+associated with different actuators.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
 ---
- block/bfq-iosched.c | 41 +++++++++++++++++++++++------------------
- block/bfq-iosched.h |  8 ++++----
- 2 files changed, 27 insertions(+), 22 deletions(-)
+ block/bfq-iosched.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index dede0e948836..a1a5eea731c7 100644
+index c2485b599d87..2a75009c1c06 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2671,14 +2671,16 @@ static void bfq_bfqq_end_wr(struct bfq_queue *bfqq)
- void bfq_end_wr_async_queues(struct bfq_data *bfqd,
- 			     struct bfq_group *bfqg)
- {
--	int i, j;
--
--	for (i = 0; i < 2; i++)
--		for (j = 0; j < IOPRIO_NR_LEVELS; j++)
--			if (bfqg->async_bfqq[i][j])
--				bfq_bfqq_end_wr(bfqg->async_bfqq[i][j]);
--	if (bfqg->async_idle_bfqq)
--		bfq_bfqq_end_wr(bfqg->async_idle_bfqq);
-+	int i, j, k;
-+
-+	for (k = 0; k < BFQ_NUM_ACTUATORS; k++) {
-+		for (i = 0; i < 2; i++)
-+			for (j = 0; j < IOPRIO_NR_LEVELS; j++)
-+				if (bfqg->async_bfqq[i][j][k])
-+					bfq_bfqq_end_wr(bfqg->async_bfqq[i][j][k]);
-+		if (bfqg->async_idle_bfqq[k])
-+			bfq_bfqq_end_wr(bfqg->async_idle_bfqq[k]);
-+	}
- }
- 
- static void bfq_end_wr(struct bfq_data *bfqd)
-@@ -5598,18 +5600,18 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
- 					       struct bfq_group *bfqg,
--					       int ioprio_class, int ioprio)
-+					       int ioprio_class, int ioprio, int act_idx)
- {
- 	switch (ioprio_class) {
- 	case IOPRIO_CLASS_RT:
--		return &bfqg->async_bfqq[0][ioprio];
-+		return &bfqg->async_bfqq[0][ioprio][act_idx];
- 	case IOPRIO_CLASS_NONE:
- 		ioprio = IOPRIO_BE_NORM;
- 		fallthrough;
- 	case IOPRIO_CLASS_BE:
--		return &bfqg->async_bfqq[1][ioprio];
-+		return &bfqg->async_bfqq[1][ioprio][act_idx];
- 	case IOPRIO_CLASS_IDLE:
--		return &bfqg->async_idle_bfqq;
-+		return &bfqg->async_idle_bfqq[act_idx];
- 	default:
- 		return NULL;
- 	}
-@@ -5783,7 +5785,8 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 
- 	if (!is_sync) {
- 		async_bfqq = bfq_async_queue_prio(bfqd, bfqg, ioprio_class,
--						  ioprio);
-+						  ioprio,
-+						  bfq_actuator_index(bfqd, bio));
- 		bfqq = *async_bfqq;
- 		if (bfqq)
- 			goto out;
-@@ -6998,13 +7001,15 @@ static void __bfq_put_async_bfqq(struct bfq_data *bfqd,
-  */
- void bfq_put_async_queues(struct bfq_data *bfqd, struct bfq_group *bfqg)
- {
--	int i, j;
-+	int i, j, k;
- 
--	for (i = 0; i < 2; i++)
--		for (j = 0; j < IOPRIO_NR_LEVELS; j++)
--			__bfq_put_async_bfqq(bfqd, &bfqg->async_bfqq[i][j]);
-+	for (k = 0; k < BFQ_NUM_ACTUATORS; k++) {
-+		for (i = 0; i < 2; i++)
-+			for (j = 0; j < IOPRIO_NR_LEVELS; j++)
-+				__bfq_put_async_bfqq(bfqd, &bfqg->async_bfqq[i][j][k]);
- 
--	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq);
-+	__bfq_put_async_bfqq(bfqd, &bfqg->async_idle_bfqq[k]);
-+	}
- }
- 
- /*
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 0ff6be18f72a..a7808c6a2cbe 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -961,8 +961,8 @@ struct bfq_group {
- 
- 	void *bfqd;
- 
--	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
--	struct bfq_queue *async_idle_bfqq;
-+	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS][BFQ_NUM_ACTUATORS];
-+	struct bfq_queue *async_idle_bfqq[BFQ_NUM_ACTUATORS];
- 
- 	struct bfq_entity *my_entity;
- 
-@@ -978,8 +978,8 @@ struct bfq_group {
- 	struct bfq_entity entity;
- 	struct bfq_sched_data sched_data;
- 
--	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
--	struct bfq_queue *async_idle_bfqq;
-+	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS][BFQ_NUM_ACTUATORS];
-+	struct bfq_queue *async_idle_bfqq[BFQ_NUM_ACTUATORS];
- 
- 	struct rb_root rq_pos_tree;
- };
+@@ -5695,9 +5695,13 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
+ 	 * it has been set already, but too long ago, then move it
+ 	 * forward to bfqq. Finally, move also if bfqq belongs to a
+ 	 * different group than last_bfqq_created, or if bfqq has a
+-	 * different ioprio or ioprio_class. If none of these
+-	 * conditions holds true, then try an early stable merge or
+-	 * schedule a delayed stable merge.
++	 * different ioprio, ioprio_class or actuator_idx. If none of
++	 * these conditions holds true, then try an early stable merge
++	 * or schedule a delayed stable merge. As for the condition on
++	 * actuator_idx, the reason is that, if queues associated with
++	 * different actuators are merged, then control is lost on
++	 * each actuator. Therefore some actuator may be
++	 * underutilized, and throughput may decrease.
+ 	 *
+ 	 * A delayed merge is scheduled (instead of performing an
+ 	 * early merge), in case bfqq might soon prove to be more
+@@ -5715,7 +5719,8 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
+ 			bfqq->creation_time) ||
+ 		bfqq->entity.parent != last_bfqq_created->entity.parent ||
+ 		bfqq->ioprio != last_bfqq_created->ioprio ||
+-		bfqq->ioprio_class != last_bfqq_created->ioprio_class)
++		bfqq->ioprio_class != last_bfqq_created->ioprio_class ||
++		bfqq->actuator_idx != last_bfqq_created->actuator_idx)
+ 		*source_bfqq = bfqq;
+ 	else if (time_after_eq(last_bfqq_created->creation_time +
+ 				 bfqd->bfq_burst_interval,
 -- 
 2.20.1
 
