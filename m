@@ -2,545 +2,698 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB2AC433FE
-	for <linux-block@archiver.kernel.org>; Tue,  4 Oct 2022 23:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE06C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 03:17:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbiJDXSI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 19:18:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49774 "EHLO
+        id S229566AbiJEDRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Oct 2022 23:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbiJDXSH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 19:18:07 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15DC2A73F
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 16:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1664925485; x=1696461485;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=xVlEUpMlEbTYKBpqXysTIcl/6AymFTBVubGoimsZa/s=;
-  b=OlpSd1Nj9hI4KsaKORfndPDcV/IK6u8NIhuJeA5gAhDTmEAgBSIeBqIA
-   5VDWBQcHcmMXPf8Xg8JCJs4R6X0GhDsAtxw+QXu7LkBEgdnt/81iFoXLS
-   n57GLmcGZ6TwqR4qK205xigMpqmhjJjnxVWQH0vX5sKmAhgerDJ4KFa3M
-   RViTJsvzr10OjeFtdsLG/8iwhb0ZWgKbczWb5XzMQkaGNMy8X+Zb/zJ/y
-   3YMUKVywhdxGFoQAbtLn0YXOLwyLeFS/iwA/eBVJ0AJjfO1K0Yu3Mw1J/
-   zIq4nSi+OwwuDnQwyRKcVqMoPsmxsK/tDyG8FbMRw4d+tg6ywOjjTxjNe
-   A==;
-X-IronPort-AV: E=Sophos;i="5.95,159,1661788800"; 
-   d="scan'208";a="212996338"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Oct 2022 07:18:05 +0800
-IronPort-SDR: SrsIFwEYitwg/9bjMBmr5mwj1iQs/xgN0HCt8gNu6994E4L8YJvGQfeAfgDVCMQwhkV6mhWA9I
- 1+3aJtVGntHjY7mq/k7Yzv1H5EBKhB5rUmgD5V2+cotQ3CQWj6z7OAXLIj2RUb6x4I2A/iwbs0
- 5GJZNMgFdJd2Z1jGM43EAasJ6Zqy3m1wwNSfZtiIqdEtXBPnahWrCo/PVW5ATHPFrc4xnZC/Fs
- giaLj5CO/+0ePvXfj/U/XaqtJUVFjWPMNJ4ZK/SGCB8Y2H/Iz6KQPZmaYDMmFm05nVMS0OtQBE
- SsOb4dFbjQ71iL1MZ2NGIfD0
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2022 15:37:53 -0700
-IronPort-SDR: mBeE7cvDpzP/mF15chPwKBDSij0L5Y7ctYgFLE5u7+kpZMuWJ4CXwQIT/OmRLatzk8hNyqmJx6
- V5W7jYYpINIRxOcehSfnwmmcnqQB+qHnSCGHrvE8ya652m/7RdnMLNsdfJKltQkC1wltzAfqNC
- 8zMGhlquLmInU/LgmSVrKNdAsn8w6sNtQHoUwU+YCPBoER4mPFpUe7CqHt5Z1i4+r6CuU+4W8h
- Z+NNOfKTNVKOhQcwa4NRP1Qv84h3fG4ce90X90CEokFpbEJFotx1KKew6hZhPUzmF5ZBZ7H0IL
- vOU=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2022 16:18:05 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MhtcH5S1Rz1RwqL
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 16:06:23 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1664924781; x=1667516782; bh=xVlEUpMlEbTYKBpqXysTIcl/6AymFTBVubG
-        oimsZa/s=; b=jujZFQQiYO4S4C8n6aQo/IHv1hpuPLQj6V6VvWBq+z5TidA6spd
-        G/6gq8OkUofGch3+23ecrfkwA7rxsYEz1qHx/mo6zXLJ13uAqIYMdbAy8pqrAbPK
-        w9bcMg39IadOX1DNGDebabIFUiM+/h988WyQ+fj+XJ9ZxQGQf1OozXAG/iOkxcrX
-        ICnKxXxucaySjYbc1OVAa+iIdy8bBkoZNp2r1unbZcmn7xdPgi4BJe5XS0mN5N10
-        iQCEuF9QTkL//mvElcH3/N0s3I7E7Kw+6EYbuFb+EHfWRqRlP4rJxAGn+TRFoQXc
-        29US/Toz/zPB1uuZo/YpJatxJ0HAizLmG8w==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id n1xUJ1ZbEAUZ for <linux-block@vger.kernel.org>;
-        Tue,  4 Oct 2022 16:06:21 -0700 (PDT)
-Received: from [10.225.163.106] (unknown [10.225.163.106])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MhtcC1Z31z1RvLy;
-        Tue,  4 Oct 2022 16:06:19 -0700 (PDT)
-Message-ID: <2030ac1d-4ce2-dd99-8b68-6f9e708f2aa1@opensource.wdc.com>
-Date:   Wed, 5 Oct 2022 08:06:18 +0900
+        with ESMTP id S229518AbiJEDRS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 23:17:18 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2048.outbound.protection.outlook.com [40.107.223.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E036FA1B;
+        Tue,  4 Oct 2022 20:17:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FQqRfd9MlSydamn9k6QXKwQ2H26XRa80QasIZhqqS8wXcWSzsYiRrNRHouOOQQ9TaJeuIUawehujxOF8TIP0wD3xfzMhg2HFswoeFS/JLJEJDV/oOV7V6Hzf7lJyercScNazGOEyAUq7xETFEs21oqNTy14f7ZQ9IRFUNgIJEpoVb7n8fIbrHRf354UqvQbTHa6ZutKAS78W+235Ay7jYeViiKEjX9pe/wx+raa/DnxpakoGskJW6TK9//B0AIwf6IdStgwtQoNXJgSiTlralIg9J0xJ8y3FAvLLHjutVvHxDz+xAW9bzyuZj0Af0Obk/uKz1OYNeGbEJiqkF7fmnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sp5xGb04xZ7qLPo6VKdPz6ePbVATtlA7+P0mzrdIpJU=;
+ b=nMH8uO+a2EVeWXDhCU+xaUFZCxdodkr8HUoaVD9hctroPfeVBh51o1ZloKrJ2UCG+HAB8pGO9gNsPDxpivIgpZuw3ZlI5A0QXNeC5n05YKE6HV5rm+RiY/PqLcpLsXRasIDL99Q2sNY0v1n3ukFjKBOj5XaHcgEL1zrFvUKo0qx6dzIHmCPp+pqqrohYMzPp+LL/uhICX0NBP/sDgjQAWJR8cvnPAhf3xK597KKuEw2YlgMwOxyAQMWcmEPnJUQYjAQ0HbQ0GdVR44I+Dk1dS8J9Zjll+VaFu0st48Mq2rtae0ZT7i4NFj8K5uOdUQqJtjl2fvhhB0qk3WgcUzOGmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Sp5xGb04xZ7qLPo6VKdPz6ePbVATtlA7+P0mzrdIpJU=;
+ b=DFo4JPfqRsn8pf01Eim2Mj9kUCD2bxpufB7mxZshIPCLXKep6+5/6A2KpKkd7RcZ69qLQh1sMudMJR2uj5+5/CKNXzH1LNvfIG7E+iPkHPViGAWyw8S3rc4iCADqxNlfl3IRnNkYSaMCRe1Bk+0gVe+F05I2V9v/+VPdlqGZSJ43weCVq5kmzh7Y3v1Gd7TmatCY+OStAuj34by7zw5Eo0XK5S8YvtF/McA8ZA9l0sTX0ni8WIETjs0A5oZgAJFUbHopRmiEzkGRoD7LnbnB92pyUuFLCMzNyNAMCOJ2VVlBffRQl8U6VrVro+WBvcL9Cmr0AUTYRPvl8BdDHT3TYA==
+Received: from MW3PR05CA0011.namprd05.prod.outlook.com (2603:10b6:303:2b::16)
+ by MN2PR12MB4583.namprd12.prod.outlook.com (2603:10b6:208:26e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.28; Wed, 5 Oct
+ 2022 03:17:14 +0000
+Received: from CO1NAM11FT081.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:2b:cafe::72) by MW3PR05CA0011.outlook.office365.com
+ (2603:10b6:303:2b::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.7 via Frontend
+ Transport; Wed, 5 Oct 2022 03:17:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT081.mail.protection.outlook.com (10.13.174.80) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5709.10 via Frontend Transport; Wed, 5 Oct 2022 03:17:14 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 4 Oct 2022
+ 20:17:09 -0700
+Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Tue, 4 Oct 2022
+ 20:17:08 -0700
+From:   Chaitanya Kulkarni <kch@nvidia.com>
+To:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <axboe@kernel.dk>, <kch@nvidia.com>,
+        <damien.lemoal@opensource.wdc.com>, <johannes.thumshirn@wdc.com>,
+        <bvanassche@acm.org>, <ming.lei@redhat.com>,
+        <shinichiro.kawasaki@wdc.com>, <vincent.fu@samsung.com>,
+        <yukuai3@huawei.com>
+Subject: [PATCH 0/6] null_blk: allow REQ_OP_WRITE_ZEROES and cleanup
+Date:   Tue, 4 Oct 2022 20:16:55 -0700
+Message-ID: <20221005031701.79077-1-kch@nvidia.com>
+X-Mailer: git-send-email 2.29.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH V3 3/8] block, bfq: turn scalar fields into arrays in
- bfq_io_cq
-Content-Language: en-US
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jack@suse.cz, andrea.righi@canonical.com, glen.valante@linaro.org,
-        arie.vanderhoeven@seagate.com, rory.c.chen@seagate.com,
-        Gabriele Felici <felicigb@gmail.com>
-References: <20221004094010.80090-1-paolo.valente@linaro.org>
- <20221004094010.80090-4-paolo.valente@linaro.org>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20221004094010.80090-4-paolo.valente@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="y"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT081:EE_|MN2PR12MB4583:EE_
+X-MS-Office365-Filtering-Correlation-Id: 04e1e723-0812-4321-d537-08daa6801999
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uHcWwaiFE827ge6AAbmNd/vZG1f0VXH1kGh5THUk8eTmpv0wXNL5wnFvPivggz8IRYLEdahxrhrXHw3QGcpHFQ55l0/yNpjNAAoWa7zpSHBNTaUR6XVA4h0C/IHNNGlCHl819ed9RKzbI3uEXeoep/eY3OaywkSpqdoaMhWw8Ry9vww/i8VaPGMBhT3wXy3WFuJKKKoD/eN+4weSXDcUIReFNCLHATNDdCtF++ryoamGjt7xlLSJmouDEeIBgVD5jD8n2L37zHLLb0gFkGwvPESlzbV9AXkfzP3dKF9xedSum+NV/pW9VKpzfiIQDCf9fUXEy9s3Vj7Yz2uzpbgDvSR5Mhxo7hVEhvi5KCySDYVj7luNo4vvQI/ntceEeCMhM0hF5OdVnG1XkaJjlcw5dteoRmVwO4wwRpnIFpPpTIJ4xhw5k64F6FNjCZTNAnD9zeCvSUeUdADpGem9QtZTdVtE5yeN/sZ2VWXznNw2CmwPyXYJrKumyTa+B9mQUWcmdKJEwy1BkQDNnGNNPrf0kTVTVrRBQO67NczYEBhMSAIl51AWOplDPbACjuIHbN4LUud9rx3htJHYNrxjvvq1ixg8vdvB/hFHZHIyFzFXIElJhqzzee10ZHDiMcRgIWR0rM4HWqXnMu4TUpf5iFuvYHmAuQGUdG5IQ80XtFoYLoJvsDjibpkNl3AE6bLOllidJpmqSKrCv6aLZVkqZu9m9FNMZRX2qH2rj652hw6qSDSB3ejq1cWMuqfNvNieVKIvsNxOEar77Czor62jll1cTg==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(346002)(136003)(39860400002)(451199015)(46966006)(36840700001)(40470700004)(26005)(7696005)(6666004)(478600001)(2616005)(1076003)(70586007)(186003)(54906003)(40480700001)(82310400005)(41300700001)(2906002)(40460700003)(5660300002)(7416002)(7636003)(356005)(316002)(30864003)(4326008)(8936002)(110136005)(36756003)(8676002)(36860700001)(70206006)(16526019)(82740400003)(47076005)(336012)(83380400001)(426003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2022 03:17:14.0945
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04e1e723-0812-4321-d537-08daa6801999
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT081.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4583
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/4/22 18:40, Paolo Valente wrote:
-> When a bfq_queue Q is merged with another queue, several pieces of
-> information are saved about Q. These pieces are stored in the
-> bfq_io_cq data structure of the process associated with Q. In
-> particular, each such piece is represented by a scalar field in
-> bfq_io_cq.
-> 
-> Yet, with a multi-actuator drive, a process gets associated with
-> multiple bfq_queues: one queue for each of the N actuators. Each of
-> these queues may undergo a merge. So, the bfq_io_cq data structure
-> must be able to accommodate the above information for N queues.
-> 
-> This commit solves this problem by turning each scalar field into an
-> array of N elements (and by changing code so as to handle these
-> arrays).
-> 
-> This solution is written under the assumption that bfq_queues
-> associated with different actuators cannot be cross-merged. This
-> assumption holds naturally with basic queue merging: the latter is
-> triggered by spatial locality, and sectors for different actuators are
-> not close to each other. As for stable cross-merging, the assumption
-> here is that it is disabled.
-> 
-> Signed-off-by: Gabriele Felici <felicigb@gmail.com>
-> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-> ---
->  block/bfq-iosched.c | 139 ++++++++++++++++++++++++--------------------
->  block/bfq-iosched.h |  52 ++++++++++-------
->  2 files changed, 105 insertions(+), 86 deletions(-)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 2a75009c1c06..dede0e948836 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -406,7 +406,7 @@ void bic_set_bfqq(struct bfq_io_cq *bic,
->  	 */
->  	bic->bfqq[is_sync][actuator_idx] = bfqq;
->  
-> -	if (bfqq && bic->stable_merge_bfqq == bfqq) {
-> +	if (bfqq && bic->stable_merge_bfqq[actuator_idx] == bfqq) {
->  		/*
->  		 * Actually, these same instructions are executed also
->  		 * in bfq_setup_cooperator, in case of abort or actual
-> @@ -415,9 +415,9 @@ void bic_set_bfqq(struct bfq_io_cq *bic,
->  		 * did so, we would nest even more complexity in this
->  		 * function.
->  		 */
-> -		bfq_put_stable_ref(bic->stable_merge_bfqq);
-> +		bfq_put_stable_ref(bic->stable_merge_bfqq[actuator_idx]);
->  
-> -		bic->stable_merge_bfqq = NULL;
-> +		bic->stable_merge_bfqq[actuator_idx] = NULL;
->  	}
->  }
->  
-> @@ -1176,36 +1176,38 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
->  {
->  	unsigned int old_wr_coeff = 1;
->  	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
-> +	unsigned int a_idx = bfqq->actuator_idx;
->  
-> -	if (bic->saved_has_short_ttime)
-> +	if (bic->saved_has_short_ttime[a_idx])
->  		bfq_mark_bfqq_has_short_ttime(bfqq);
->  	else
->  		bfq_clear_bfqq_has_short_ttime(bfqq);
->  
-> -	if (bic->saved_IO_bound)
-> +	if (bic->saved_IO_bound[a_idx])
->  		bfq_mark_bfqq_IO_bound(bfqq);
->  	else
->  		bfq_clear_bfqq_IO_bound(bfqq);
->  
-> -	bfqq->last_serv_time_ns = bic->saved_last_serv_time_ns;
-> -	bfqq->inject_limit = bic->saved_inject_limit;
-> -	bfqq->decrease_time_jif = bic->saved_decrease_time_jif;
-> +	bfqq->last_serv_time_ns = bic->saved_last_serv_time_ns[a_idx];
-> +	bfqq->inject_limit = bic->saved_inject_limit[a_idx];
-> +	bfqq->decrease_time_jif = bic->saved_decrease_time_jif[a_idx];
->  
-> -	bfqq->entity.new_weight = bic->saved_weight;
-> -	bfqq->ttime = bic->saved_ttime;
-> -	bfqq->io_start_time = bic->saved_io_start_time;
-> -	bfqq->tot_idle_time = bic->saved_tot_idle_time;
-> +	bfqq->entity.new_weight = bic->saved_weight[a_idx];
-> +	bfqq->ttime = bic->saved_ttime[a_idx];
-> +	bfqq->io_start_time = bic->saved_io_start_time[a_idx];
-> +	bfqq->tot_idle_time = bic->saved_tot_idle_time[a_idx];
->  	/*
->  	 * Restore weight coefficient only if low_latency is on
->  	 */
->  	if (bfqd->low_latency) {
->  		old_wr_coeff = bfqq->wr_coeff;
-> -		bfqq->wr_coeff = bic->saved_wr_coeff;
-> +		bfqq->wr_coeff = bic->saved_wr_coeff[a_idx];
->  	}
-> -	bfqq->service_from_wr = bic->saved_service_from_wr;
-> -	bfqq->wr_start_at_switch_to_srt = bic->saved_wr_start_at_switch_to_srt;
-> -	bfqq->last_wr_start_finish = bic->saved_last_wr_start_finish;
-> -	bfqq->wr_cur_max_time = bic->saved_wr_cur_max_time;
-> +	bfqq->service_from_wr = bic->saved_service_from_wr[a_idx];
-> +	bfqq->wr_start_at_switch_to_srt =
-> +				bic->saved_wr_start_at_switch_to_srt[a_idx];
-> +	bfqq->last_wr_start_finish = bic->saved_last_wr_start_finish[a_idx];
-> +	bfqq->wr_cur_max_time = bic->saved_wr_cur_max_time[a_idx];
->  
->  	if (bfqq->wr_coeff > 1 && (bfq_bfqq_in_large_burst(bfqq) ||
->  	    time_is_before_jiffies(bfqq->last_wr_start_finish +
-> @@ -1824,6 +1826,16 @@ static bool bfq_bfqq_higher_class_or_weight(struct bfq_queue *bfqq,
->  	return bfqq_weight > in_serv_weight;
->  }
->  
-> +/* get the index of the actuator that will serve bio */
-> +static unsigned int bfq_actuator_index(struct bfq_data *bfqd, struct bio *bio)
-> +{
-> +	/*
-> +	 * Multi-actuator support not complete yet, so always return 0
-> +	 * for the moment.
-> +	 */
-> +	return 0;
-> +}
-> +
->  static bool bfq_better_to_idle(struct bfq_queue *bfqq);
->  
->  static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
-> @@ -1878,7 +1890,9 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
->  	wr_or_deserves_wr = bfqd->low_latency &&
->  		(bfqq->wr_coeff > 1 ||
->  		 (bfq_bfqq_sync(bfqq) &&
-> -		  (bfqq->bic || RQ_BIC(rq)->stably_merged) &&
-> +		  (bfqq->bic ||
-> +		   RQ_BIC(rq)->stably_merged
-> +		   [bfq_actuator_index(bfqd, rq->bio)]) &&
->  		   (*interactive || soft_rt)));
->  
->  	/*
-> @@ -2466,16 +2480,6 @@ static void bfq_remove_request(struct request_queue *q,
->  
->  }
->  
-> -/* get the index of the actuator that will serve bio */
-> -static unsigned int bfq_actuator_index(struct bfq_data *bfqd, struct bio *bio)
-> -{
-> -	/*
-> -	 * Multi-actuator support not complete yet, so always return 0
-> -	 * for the moment.
-> -	 */
-> -	return 0;
-> -}
-> -
->  static bool bfq_bio_merge(struct request_queue *q, struct bio *bio,
->  		unsigned int nr_segs)
->  {
-> @@ -2902,6 +2906,7 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  		     void *io_struct, bool request, struct bfq_io_cq *bic)
->  {
->  	struct bfq_queue *in_service_bfqq, *new_bfqq;
-> +	unsigned int a_idx = bfqq->actuator_idx;
->  
->  	/* if a merge has already been setup, then proceed with that first */
->  	if (bfqq->new_bfqq)
-> @@ -2923,21 +2928,21 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  		 * stable merging) also if bic is associated with a
->  		 * sync queue, but this bfqq is async
->  		 */
-> -		if (bfq_bfqq_sync(bfqq) && bic->stable_merge_bfqq &&
-> +		if (bfq_bfqq_sync(bfqq) && bic->stable_merge_bfqq[a_idx] &&
->  		    !bfq_bfqq_just_created(bfqq) &&
->  		    time_is_before_jiffies(bfqq->split_time +
->  					  msecs_to_jiffies(bfq_late_stable_merging)) &&
->  		    time_is_before_jiffies(bfqq->creation_time +
->  					   msecs_to_jiffies(bfq_late_stable_merging))) {
->  			struct bfq_queue *stable_merge_bfqq =
-> -				bic->stable_merge_bfqq;
-> +				bic->stable_merge_bfqq[a_idx];
->  			int proc_ref = min(bfqq_process_refs(bfqq),
->  					   bfqq_process_refs(stable_merge_bfqq));
->  
->  			/* deschedule stable merge, because done or aborted here */
->  			bfq_put_stable_ref(stable_merge_bfqq);
->  
-> -			bic->stable_merge_bfqq = NULL;
-> +			bic->stable_merge_bfqq[a_idx] = NULL;
->  
->  			if (!idling_boosts_thr_without_issues(bfqd, bfqq) &&
->  			    proc_ref > 0) {
-> @@ -2946,9 +2951,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  					bfq_setup_merge(bfqq, stable_merge_bfqq);
->  
->  				if (new_bfqq) {
-> -					bic->stably_merged = true;
-> +					bic->stably_merged[a_idx] = true;
->  					if (new_bfqq->bic)
-> -						new_bfqq->bic->stably_merged =
-> +						new_bfqq->bic->stably_merged
-> +						    [new_bfqq->actuator_idx] =
->  									true;
->  				}
->  				return new_bfqq;
-> @@ -3048,6 +3054,8 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
->  {
->  	struct bfq_io_cq *bic = bfqq->bic;
-> +	/* State must be saved for the right queue index. */
-> +	unsigned int a_idx = bfqq->actuator_idx;
->  
->  	/*
->  	 * If !bfqq->bic, the queue is already shared or its requests
-> @@ -3057,18 +3065,18 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
->  	if (!bic)
->  		return;
->  
-> -	bic->saved_last_serv_time_ns = bfqq->last_serv_time_ns;
-> -	bic->saved_inject_limit = bfqq->inject_limit;
-> -	bic->saved_decrease_time_jif = bfqq->decrease_time_jif;
-> -
-> -	bic->saved_weight = bfqq->entity.orig_weight;
-> -	bic->saved_ttime = bfqq->ttime;
-> -	bic->saved_has_short_ttime = bfq_bfqq_has_short_ttime(bfqq);
-> -	bic->saved_IO_bound = bfq_bfqq_IO_bound(bfqq);
-> -	bic->saved_io_start_time = bfqq->io_start_time;
-> -	bic->saved_tot_idle_time = bfqq->tot_idle_time;
-> -	bic->saved_in_large_burst = bfq_bfqq_in_large_burst(bfqq);
-> -	bic->was_in_burst_list = !hlist_unhashed(&bfqq->burst_list_node);
-> +	bic->saved_last_serv_time_ns[a_idx] = bfqq->last_serv_time_ns;
-> +	bic->saved_inject_limit[a_idx] = bfqq->inject_limit;
-> +	bic->saved_decrease_time_jif[a_idx] = bfqq->decrease_time_jif;
-> +
-> +	bic->saved_weight[a_idx] = bfqq->entity.orig_weight;
-> +	bic->saved_ttime[a_idx] = bfqq->ttime;
-> +	bic->saved_has_short_ttime[a_idx] = bfq_bfqq_has_short_ttime(bfqq);
-> +	bic->saved_IO_bound[a_idx] = bfq_bfqq_IO_bound(bfqq);
-> +	bic->saved_io_start_time[a_idx] = bfqq->io_start_time;
-> +	bic->saved_tot_idle_time[a_idx] = bfqq->tot_idle_time;
-> +	bic->saved_in_large_burst[a_idx] = bfq_bfqq_in_large_burst(bfqq);
-> +	bic->was_in_burst_list[a_idx] = !hlist_unhashed(&bfqq->burst_list_node);
->  	if (unlikely(bfq_bfqq_just_created(bfqq) &&
->  		     !bfq_bfqq_in_large_burst(bfqq) &&
->  		     bfqq->bfqd->low_latency)) {
-> @@ -3081,17 +3089,17 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
->  		 * to bfqq, so that to avoid that bfqq unjustly fails
->  		 * to enjoy weight raising if split soon.
->  		 */
-> -		bic->saved_wr_coeff = bfqq->bfqd->bfq_wr_coeff;
-> -		bic->saved_wr_start_at_switch_to_srt = bfq_smallest_from_now();
-> -		bic->saved_wr_cur_max_time = bfq_wr_duration(bfqq->bfqd);
-> -		bic->saved_last_wr_start_finish = jiffies;
-> +		bic->saved_wr_coeff[a_idx] = bfqq->bfqd->bfq_wr_coeff;
-> +		bic->saved_wr_start_at_switch_to_srt[a_idx] = bfq_smallest_from_now();
-> +		bic->saved_wr_cur_max_time[a_idx] = bfq_wr_duration(bfqq->bfqd);
-> +		bic->saved_last_wr_start_finish[a_idx] = jiffies;
->  	} else {
-> -		bic->saved_wr_coeff = bfqq->wr_coeff;
-> -		bic->saved_wr_start_at_switch_to_srt =
-> +		bic->saved_wr_coeff[a_idx] = bfqq->wr_coeff;
-> +		bic->saved_wr_start_at_switch_to_srt[a_idx] =
->  			bfqq->wr_start_at_switch_to_srt;
-> -		bic->saved_service_from_wr = bfqq->service_from_wr;
-> -		bic->saved_last_wr_start_finish = bfqq->last_wr_start_finish;
-> -		bic->saved_wr_cur_max_time = bfqq->wr_cur_max_time;
-> +		bic->saved_service_from_wr[a_idx] = bfqq->service_from_wr;
-> +		bic->saved_last_wr_start_finish[a_idx] = bfqq->last_wr_start_finish;
-> +		bic->saved_wr_cur_max_time[a_idx] = bfqq->wr_cur_max_time;
->  	}
->  }
->  
-> @@ -5423,8 +5431,8 @@ static void bfq_exit_icq(struct io_cq *icq)
->  		spin_lock_irqsave(&bfqd->lock, flags);
->  
->  	for (act_idx = 0; act_idx < BFQ_NUM_ACTUATORS; act_idx++) {
-> -		if (bic->stable_merge_bfqq)
-> -			bfq_put_stable_ref(bic->stable_merge_bfqq);
-> +		if (bic->stable_merge_bfqq[act_idx])
-> +			bfq_put_stable_ref(bic->stable_merge_bfqq[act_idx]);
->  
->  		bfq_exit_icq_bfqq(bic, true, act_idx);
->  		bfq_exit_icq_bfqq(bic, false, act_idx);
-> @@ -5612,6 +5620,7 @@ bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  			  struct bfq_io_cq *bic,
->  			  struct bfq_queue *last_bfqq_created)
->  {
-> +	unsigned int a_idx = last_bfqq_created->actuator_idx;
->  	struct bfq_queue *new_bfqq =
->  		bfq_setup_merge(bfqq, last_bfqq_created);
->  
-> @@ -5619,8 +5628,8 @@ bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  		return bfqq;
->  
->  	if (new_bfqq->bic)
-> -		new_bfqq->bic->stably_merged = true;
-> -	bic->stably_merged = true;
-> +		new_bfqq->bic->stably_merged[a_idx] = true;
-> +	bic->stably_merged[a_idx] = true;
->  
->  	/*
->  	 * Reusing merge functions. This implies that
-> @@ -5750,7 +5759,8 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
->  			/*
->  			 * Record the bfqq to merge to.
->  			 */
-> -			bic->stable_merge_bfqq = last_bfqq_created;
-> +			bic->stable_merge_bfqq[last_bfqq_created->actuator_idx]
-> +							   = last_bfqq_created;
->  		}
->  	}
->  
-> @@ -6684,12 +6694,12 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
->  
->  	bic_set_bfqq(bic, bfqq, is_sync, act_idx);
->  	if (split && is_sync) {
-> -		if ((bic->was_in_burst_list && bfqd->large_burst) ||
-> -		    bic->saved_in_large_burst)
-> +		if ((bic->was_in_burst_list[act_idx] && bfqd->large_burst) ||
-> +		    bic->saved_in_large_burst[act_idx])
->  			bfq_mark_bfqq_in_large_burst(bfqq);
->  		else {
->  			bfq_clear_bfqq_in_large_burst(bfqq);
-> -			if (bic->was_in_burst_list)
-> +			if (bic->was_in_burst_list[act_idx])
->  				/*
->  				 * If bfqq was in the current
->  				 * burst list before being
-> @@ -6778,6 +6788,7 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
->  	struct bfq_queue *bfqq;
->  	bool new_queue = false;
->  	bool bfqq_already_existing = false, split = false;
-> +	unsigned int a_idx = bfq_actuator_index(bfqd, bio);
->  
->  	if (unlikely(!rq->elv.icq))
->  		return NULL;
-> @@ -6804,12 +6815,12 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
->  	if (likely(!new_queue)) {
->  		/* If the queue was seeky for too long, break it apart. */
->  		if (bfq_bfqq_coop(bfqq) && bfq_bfqq_split_coop(bfqq) &&
-> -			!bic->stably_merged) {
-> +			!bic->stably_merged[a_idx]) {
->  			struct bfq_queue *old_bfqq = bfqq;
->  
->  			/* Update bic before losing reference to bfqq */
->  			if (bfq_bfqq_in_large_burst(bfqq))
-> -				bic->saved_in_large_burst = true;
-> +				bic->saved_in_large_burst[a_idx] = true;
->  
->  			bfqq = bfq_split_bfqq(bic, bfqq);
->  			split = true;
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 8b5225a9e080..0ff6be18f72a 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -431,30 +431,37 @@ struct bfq_io_cq {
->  	uint64_t blkcg_serial_nr; /* the current blkcg serial */
->  #endif
->  	/*
-> -	 * Snapshot of the has_short_time flag before merging; taken
-> -	 * to remember its value while the queue is merged, so as to
-> -	 * be able to restore it in case of split.
-> +	 * Several fields follow, which are used to support
-> +	 * queue-merging operations. Each field is an array, because a
-> +	 * process may be associated with multiple bfq_queues (see the
-> +	 * field bfqq above). And each of these queues may undergo a
-> +	 * merge.
->  	 */
-> -	bool saved_has_short_ttime;
-> +	/*
-> +	 * Snapshot of the has_short_time flags before merging; taken
-> +	 * to remember their values while a queue is merged, so as to
-> +	 * be able to restore them in case of split.
-> +	 */
-> +	bool saved_has_short_ttime[BFQ_NUM_ACTUATORS];
->  	/*
->  	 * Same purpose as the previous two fields for the I/O bound
->  	 * classification of a queue.
->  	 */
-> -	bool saved_IO_bound;
-> +	bool saved_IO_bound[BFQ_NUM_ACTUATORS];
->  
-> -	u64 saved_io_start_time;
-> -	u64 saved_tot_idle_time;
-> +	u64 saved_io_start_time[BFQ_NUM_ACTUATORS];
-> +	u64 saved_tot_idle_time[BFQ_NUM_ACTUATORS];
->  
->  	/*
-> -	 * Same purpose as the previous fields for the value of the
-> +	 * Same purpose as the previous fields for the values of the
->  	 * field keeping the queue's belonging to a large burst
->  	 */
-> -	bool saved_in_large_burst;
-> +	bool saved_in_large_burst[BFQ_NUM_ACTUATORS];
->  	/*
->  	 * True if the queue belonged to a burst list before its merge
->  	 * with another cooperating queue.
->  	 */
-> -	bool was_in_burst_list;
-> +	bool was_in_burst_list[BFQ_NUM_ACTUATORS];
->  
->  	/*
->  	 * Save the weight when a merge occurs, to be able
-> @@ -463,27 +470,28 @@ struct bfq_io_cq {
->  	 * then the weight of the recycled queue could differ
->  	 * from the weight of the original queue.
->  	 */
-> -	unsigned int saved_weight;
-> +	unsigned int saved_weight[BFQ_NUM_ACTUATORS];
->  
->  	/*
->  	 * Similar to previous fields: save wr information.
->  	 */
-> -	unsigned long saved_wr_coeff;
-> -	unsigned long saved_last_wr_start_finish;
-> -	unsigned long saved_service_from_wr;
-> -	unsigned long saved_wr_start_at_switch_to_srt;
-> -	unsigned int saved_wr_cur_max_time;
-> -	struct bfq_ttime saved_ttime;
-> +	unsigned long saved_wr_coeff[BFQ_NUM_ACTUATORS];
-> +	unsigned long saved_last_wr_start_finish[BFQ_NUM_ACTUATORS];
-> +	unsigned long saved_service_from_wr[BFQ_NUM_ACTUATORS];
-> +	unsigned long saved_wr_start_at_switch_to_srt[BFQ_NUM_ACTUATORS];
-> +	unsigned int saved_wr_cur_max_time[BFQ_NUM_ACTUATORS];
-> +	struct bfq_ttime saved_ttime[BFQ_NUM_ACTUATORS];
->  
->  	/* Save also injection state */
-> -	u64 saved_last_serv_time_ns;
-> -	unsigned int saved_inject_limit;
-> -	unsigned long saved_decrease_time_jif;
-> +	u64 saved_last_serv_time_ns[BFQ_NUM_ACTUATORS];
-> +	unsigned int saved_inject_limit[BFQ_NUM_ACTUATORS];
-> +	unsigned long saved_decrease_time_jif[BFQ_NUM_ACTUATORS];
+Hi,
 
-Instead of changing all these fields to an array, why not pack them into a
-structure and have a single array of structures here ? That would be a lot
-cleaner I think.
+In order to test the non-trivial I/O path in the block layer for
+REQ_OP_WRITE_ZEROES allow write-zeroes on null_blk so we can write
+testcases with and without non-memory backed mode followed by
+few cleanup patches.
 
->  
->  	/* candidate queue for a stable merge (due to close creation time) */
-> -	struct bfq_queue *stable_merge_bfqq;
-> +	struct bfq_queue *stable_merge_bfqq[BFQ_NUM_ACTUATORS];
-> +
-> +	bool stably_merged[BFQ_NUM_ACTUATORS];	/* non splittable if true */
->  
-> -	bool stably_merged;	/* non splittable if true */
->  	unsigned int requests;	/* Number of requests this process has in flight */
->  };
->  
+Below is the test report with ext2/ext4 mkfs and a blktest
+waiting to get upstream for this patch-series.
 
--- 
-Damien Le Moal
-Western Digital Research
+-ck
+
+Chaitanya Kulkarni (6):
+  null_blk: allow write zeores on non-membacked
+  null_blk: allow write zeores on membacked
+  null_blk: code cleaup
+  null_blk: initialize cmd->bio in __alloc_cmd()
+  null_blk: don't use magic numbers in the code
+  null_blk: remove extra space in switch condition
+
+ drivers/block/null_blk/main.c     | 131 ++++++++++++++++++++++--------
+ drivers/block/null_blk/null_blk.h |   1 +
+ 2 files changed, 97 insertions(+), 35 deletions(-)
+
+1. Write Zeroes test with ext2/ext3 for memory backed :-
+linux-block (for-next) # mkfs.ext2 /dev/nullb0 
+mke2fs 1.45.6 (20-Mar-2020)
+Creating filesystem with 262144 4k blocks and 65536 inodes
+Filesystem UUID: 76037c2c-9c32-4ac6-b1d6-d1f62e6071ad
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Writing superblocks and filesystem accounting information: done
+
+linux-block (for-next) # mount /dev/nullb0 /mnt/
+backend/ data/    nullb0/  nvme1n1/ test/    
+linux-block (for-next) # mount /dev/nullb0 /mnt/nullb0/
+linux-block (for-next) # dmesg  -c 
+[18833.072830] null_blk: null_handle_write_zeroes 1225 2097024 128
+[18833.072963] null_blk: null_handle_write_zeroes 1225 536 4096
+[18833.073439] null_blk: null_handle_write_zeroes 1225 262680 4096
+[18833.073845] null_blk: null_handle_write_zeroes 1225 524304 4096
+[18833.074202] null_blk: null_handle_write_zeroes 1225 786968 4096
+[18833.074581] null_blk: null_handle_write_zeroes 1225 1048592 4096
+[18833.074951] null_blk: null_handle_write_zeroes 1225 1311256 4096
+[18833.075381] null_blk: null_handle_write_zeroes 1225 1572880 4096
+[18833.075748] null_blk: null_handle_write_zeroes 1225 1835544 4096
+[18833.076164] null_blk: null_handle_write_zeroes 1225 4672 8
+[18844.752019] EXT4-fs (nullb0): mounting ext2 file system using the ext4 subsystem
+[18844.752487] EXT4-fs (nullb0): mounted filesystem without journal. Quota mode: none.
+linux-block (for-next) # 
+
+
+linux-block (for-next) # mkfs.ext4 /dev/nullb0 
+mke2fs 1.45.6 (20-Mar-2020)
+/dev/nullb0 contains a ext2 file system
+	last mounted on Mon Oct  3 18:28:05 2022
+Proceed anyway? (y,N) y
+Creating filesystem with 262144 4k blocks and 65536 inodes
+Filesystem UUID: a4c66d5f-bda9-4f58-aa03-911b87bb5c7d
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (8192 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+linux-block (for-next) # mount /dev/nullb0 /mnt/nullb0/
+linux-block (for-next) # dmesg  -c 
+[18882.721160] EXT4-fs (nullb0): unmounting filesystem.
+[18888.687070] null_blk: null_handle_write_zeroes 1225 2097024 128
+[18888.687159] null_blk: null_handle_write_zeroes 1225 1160 8
+[18888.687309] null_blk: null_handle_write_zeroes 1225 33968 8
+[18888.687839] null_blk: null_handle_write_zeroes 1225 1048576 65536
+[18892.105964] EXT4-fs (nullb0): mounted filesystem with ordered data mode. Quota mode: none.
+linux-block (for-next) # 
+
+2. Test blkdiscard with -z for different block sizes :-
+
+linux-block (for-next) # ./zeroout.sh 
+#################### BLKISZ 512 #####################
+config/nullb/nullb0
+├── badblocks
+├── blocking
+├── blocksize
+├── cache_size
+├── completion_nsec
+├── discard
+├── home_node
+├── hw_queue_depth
+├── index
+├── irqmode
+├── max_sectors
+├── mbps
+├── memory_backed
+├── no_sched
+├── poll_queues
+├── power
+├── queue_mode
+├── shared_tag_bitmap
+├── size
+├── submit_queues
+├── use_per_node_hctx
+├── virt_boundary
+├── write_zeroes
+├── zone_capacity
+├── zoned
+├── zone_max_active
+├── zone_max_open
+├── zone_nr_conv
+└── zone_size
+
+0 directories, 29 files
+ODD:- 
+19+1 records in
+19+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.000521991 s, 19.2 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0000512   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000528
+0001024   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001040
+0001536   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001552
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0002560   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002576
+0003072   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003088
+0003584   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003600
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0004608   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004624
+------------------------------------------------------
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0000512  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000528
+0001024   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001040
+0001536  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0001552
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0002560  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0002576
+0003072   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003088
+0003584  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0003600
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0004608  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0004624
+------------------------------------------------------
+EVEN:- 
+19+1 records in
+19+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.000376636 s, 26.6 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0000512   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000528
+0001024   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001040
+0001536   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001552
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0002560   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002576
+0003072   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003088
+0003584   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003600
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0004608   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004624
+------------------------------------------------------
+0000000  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000016
+0000512   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000528
+0001024  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0001040
+0001536   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001552
+0002048  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0002064
+0002560   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002576
+0003072  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0003088
+0003584   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003600
+0004096  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0004112
+0004608   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004624
+------------------------------------------------------
+
+
+
+
+#################### BLKISZ 1024 #####################
+config/nullb/nullb0
+├── badblocks
+├── blocking
+├── blocksize
+├── cache_size
+├── completion_nsec
+├── discard
+├── home_node
+├── hw_queue_depth
+├── index
+├── irqmode
+├── max_sectors
+├── mbps
+├── memory_backed
+├── no_sched
+├── poll_queues
+├── power
+├── queue_mode
+├── shared_tag_bitmap
+├── size
+├── submit_queues
+├── use_per_node_hctx
+├── virt_boundary
+├── write_zeroes
+├── zone_capacity
+├── zoned
+├── zone_max_active
+├── zone_max_open
+├── zone_nr_conv
+└── zone_size
+
+0 directories, 29 files
+ODD:- 
+9+1 records in
+9+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.00040033 s, 25.0 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0001024   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001040
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0003072   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003088
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0005120   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0005136
+0006144   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0006160
+0007168   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0007184
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0009216   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0009232
+------------------------------------------------------
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0001024  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0001040
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0003072  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0003088
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0005120  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0005136
+0006144   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0006160
+0007168  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0007184
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0009216  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0009232
+------------------------------------------------------
+EVEN:- 
+9+1 records in
+9+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.000325488 s, 30.7 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0001024   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001040
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0003072   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003088
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0005120   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0005136
+0006144   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0006160
+0007168   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0007184
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0009216   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0009232
+------------------------------------------------------
+0000000  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000016
+0001024   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0001040
+0002048  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0002064
+0003072   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0003088
+0004096  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0004112
+0005120   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0005136
+0006144  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0006160
+0007168   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0007184
+0008192  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0008208
+0009216   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0009232
+------------------------------------------------------
+
+
+
+
+#################### BLKISZ 2048 #####################
+config/nullb/nullb0
+├── badblocks
+├── blocking
+├── blocksize
+├── cache_size
+├── completion_nsec
+├── discard
+├── home_node
+├── hw_queue_depth
+├── index
+├── irqmode
+├── max_sectors
+├── mbps
+├── memory_backed
+├── no_sched
+├── poll_queues
+├── power
+├── queue_mode
+├── shared_tag_bitmap
+├── size
+├── submit_queues
+├── use_per_node_hctx
+├── virt_boundary
+├── write_zeroes
+├── zone_capacity
+├── zoned
+├── zone_max_active
+├── zone_max_open
+├── zone_nr_conv
+└── zone_size
+
+0 directories, 29 files
+ODD:- 
+4+1 records in
+4+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.000367949 s, 27.2 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0006144   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0006160
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0010240  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0010256
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0014336  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0014352
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0018432  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0018448
+------------------------------------------------------
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0002048  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0002064
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0006144  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0006160
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0010240  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0010256
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0014336  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0014352
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0018432  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0018448
+------------------------------------------------------
+EVEN:- 
+4+1 records in
+4+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.000310981 s, 32.2 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0006144   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0006160
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0010240  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0010256
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0014336  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0014352
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0018432  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0018448
+------------------------------------------------------
+0000000  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000016
+0002048   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0002064
+0004096  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0004112
+0006144   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0006160
+0008192  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0008208
+0010240  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0010256
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0014336  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0014352
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0018432  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0018448
+------------------------------------------------------
+
+
+
+
+#################### BLKISZ 4096 #####################
+config/nullb/nullb0
+├── badblocks
+├── blocking
+├── blocksize
+├── cache_size
+├── completion_nsec
+├── discard
+├── home_node
+├── hw_queue_depth
+├── index
+├── irqmode
+├── max_sectors
+├── mbps
+├── memory_backed
+├── no_sched
+├── poll_queues
+├── power
+├── queue_mode
+├── shared_tag_bitmap
+├── size
+├── submit_queues
+├── use_per_node_hctx
+├── virt_boundary
+├── write_zeroes
+├── zone_capacity
+├── zoned
+├── zone_max_active
+├── zone_max_open
+├── zone_nr_conv
+└── zone_size
+
+0 directories, 29 files
+ODD:- 
+2+1 records in
+2+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.00028502 s, 35.1 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0020480  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0020496
+0024576  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0024592
+0028672  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0028688
+0032768  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0032784
+0036864  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0036880
+------------------------------------------------------
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0004096  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0004112
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0020480  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0020496
+0024576  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0024592
+0028672  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0028688
+0032768  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0032784
+0036864  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0036880
+------------------------------------------------------
+EVEN:- 
+2+1 records in
+2+1 records out
+10002 bytes (10 kB, 9.8 KiB) copied, 0.00024765 s, 40.4 MB/s
+0000000   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0000016
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0008192   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0008208
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0020480  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0020496
+0024576  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0024592
+0028672  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0028688
+0032768  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0032784
+0036864  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0036880
+------------------------------------------------------
+0000000  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0000016
+0004096   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a   a
+0004112
+0008192  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0008208
+0012288  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0012304
+0016384  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0016400
+0020480  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0020496
+0024576  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0024592
+0028672  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0028688
+0032768  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0032784
+0036864  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0  \0
+0036880
+------------------------------------------------------
+
+
+
 
