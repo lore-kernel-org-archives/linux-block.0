@@ -2,120 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFFAC43219
-	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 16:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0938CC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 17:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbiJEQyV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Oct 2022 12:54:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51770 "EHLO
+        id S229947AbiJERAS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Oct 2022 13:00:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbiJEQyU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 12:54:20 -0400
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168E24B9A8;
-        Wed,  5 Oct 2022 09:54:19 -0700 (PDT)
-Received: by mail-pf1-f172.google.com with SMTP id a26so7312736pfg.7;
-        Wed, 05 Oct 2022 09:54:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=GFGmeXwzImdz1h+PmMN1s24FBEmejNYEC+q1xWfXEck=;
-        b=JWf5VAz03AB4CkFEpVkfUEWgtmAjJ4wGjWY6babOa0PJChJcZ0ezYXykprUlrHwiZI
-         v4HeZ+6jF5Zc9NjJfsUXsfGdHdhUlxn+xq8+UZhFtyFx10UOs5HuapVHHEEV1dBSSZKO
-         KJB5TzZHCYSU9kh0p88M7P0C8IefFbGGgDi1G1GSt1/qTXGXsuU46m0CugrWM7VM16Ij
-         RGFlghN5WfCPvJH5qA8zH13aK7nx54zJbv9rOfw076haEwshRGTTLkH5rvY0F/2rF6cE
-         SDmINa9yM5lYV92oWR8yDyMsUAg7unn74YelZwFnJPrRzziKhlqSe/C0uegYbM6TGUdR
-         Z4yA==
-X-Gm-Message-State: ACrzQf1lcWB49zedkrBYX6YwlzM9c5IM6GtxENQxzEP5otYjmzY10mkW
-        QrgsR6WdcKI8yP5lU4tDIQ4=
-X-Google-Smtp-Source: AMsMyM5oX6qSPQ4HG3bu8E8hjU3lPQSUd8WrMcNcjR4MljBf6naYCl5wsAAwQMON9m5RMKfn4/SRMQ==
-X-Received: by 2002:a62:2985:0:b0:544:77d4:f43b with SMTP id p127-20020a622985000000b0054477d4f43bmr726456pfp.9.1664988858370;
-        Wed, 05 Oct 2022 09:54:18 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id j16-20020a170902da9000b00176c6738d13sm10795484plx.169.2022.10.05.09.54.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Oct 2022 09:54:17 -0700 (PDT)
-Message-ID: <e0ea0b0a-5077-de37-046f-62902aca93b6@acm.org>
-Date:   Wed, 5 Oct 2022 09:54:11 -0700
+        with ESMTP id S229915AbiJERAQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 13:00:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF65A248F7
+        for <linux-block@vger.kernel.org>; Wed,  5 Oct 2022 10:00:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 676CB613B3
+        for <linux-block@vger.kernel.org>; Wed,  5 Oct 2022 17:00:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4287CC433D6;
+        Wed,  5 Oct 2022 17:00:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664989213;
+        bh=ZU+Vi7GwQHkAhx4h3CNHVKarZ535ozOv0/0B5tys4NU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ErEAbLZrTERT4YwJb0cinJKjMzcL0EfpBpCjFiNdGwp/956Y3/x3ISViYWo5BdaSq
+         sO8dVDT8dmQjV//JQUaa3CfawaRySV8wc5peUNnfg20+LNmgFynUUQ888xu+Whkn5X
+         bSjBl0955Yom0d8+fWLqxGkllPiZ0xNFgSbZ43e3DKvN7qb7VZZlyOVvg174TSxAxC
+         m1PwfJ1VG8lqFRf41q9QPAUjNvHCzjftmErbUcyvJRHg00+hnj2+sknOW3Uy4mKqZO
+         TpkeAG0YThzi2IucZQyE2+fdpt7hMECM9msBR9ErUWi0PLdgsOFdeeBVdnpSyXbkWT
+         9jith3XD3nFEA==
+Date:   Wed, 5 Oct 2022 11:00:10 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: Supporting segment sizes smaller than the page size
+Message-ID: <Yz24Ghonv2xmplz/@kbusch-mbp.dhcp.thefacebook.com>
+References: <3a32f6fd-af4a-3a81-67ad-7dc542bb6a3c@acm.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [RFC PATCH 01/21] block: add and use init tagset helper
-Content-Language: en-US
-To:     Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, axboe@kernel.dk, efremov@linux.com,
-        josef@toxicpanda.com, idryomov@gmail.com,
-        dongsheng.yang@easystack.cn, haris.iqbal@ionos.com,
-        jinpu.wang@ionos.com, mst@redhat.com, jasowang@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com, ohad@wizery.com,
-        andersson@kernel.org, baolin.wang@linux.alibaba.com,
-        richard@nod.at, miquel.raynal@bootlin.com, vigneshr@ti.com,
-        marcan@marcan.st, sven@svenpeter.dev, alyssa@rosenzweig.io,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, sth@linux.ibm.com,
-        hoeppner@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, hare@suse.de, bhelgaas@google.com,
-        john.garry@huawei.com, mcgrof@kernel.org,
-        christophe.jaillet@wanadoo.fr, vaibhavgupta40@gmail.com,
-        wsa+renesas@sang-engineering.com, johannes.thumshirn@wdc.com,
-        ming.lei@redhat.com, shinichiro.kawasaki@wdc.com,
-        vincent.fu@samsung.com, christoph.boehmwalder@linbit.com,
-        joel@jms.id.au, vincent.whitchurch@axis.com, nbd@other.debian.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, asahi@lists.linux.dev
-References: <20221005032257.80681-1-kch@nvidia.com>
- <20221005032257.80681-2-kch@nvidia.com>
- <6fee2d7a-7fd1-73ee-2911-87a4ed3e8769@opensource.wdc.com>
- <CAPDyKFpBpiydQn+=24CqtaH_qa3tQfN2gQSiUrHCjnLSuy4=Kg@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAPDyKFpBpiydQn+=24CqtaH_qa3tQfN2gQSiUrHCjnLSuy4=Kg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3a32f6fd-af4a-3a81-67ad-7dc542bb6a3c@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/5/22 02:47, Ulf Hansson wrote:
-> On Wed, 5 Oct 2022 at 07:11, Damien Le Moal <damien.lemoal@opensource.wdc.com> wrote:
->> On 10/5/22 12:22, Chaitanya Kulkarni wrote:
->>> +void blk_mq_init_tag_set(struct blk_mq_tag_set *set,
->>> +             const struct blk_mq_ops *ops, unsigned int nr_hw_queues,
->>> +             unsigned int queue_depth, unsigned int cmd_size, int numa_node,
->>> +             unsigned int timeout, unsigned int flags, void *driver_data)
->>
->> That is an awful lot of arguments... I would be tempted to say pack all
->> these into a struct but then that would kind of negate this patchset goal.
->> Using a function with that many arguments will be error prone, and hard to
->> review... Not a fan.
+On Wed, Sep 21, 2022 at 04:28:32PM -0700, Bart Van Assche wrote:
+> Hi Jens, Christoph and Ming,
 > 
-> I completely agree.
+> As we know the Linux kernel block layer does not support DMA segment sizes
+> that are smaller than the page size. From block/blk-settings.c:
 > 
-> But there is also another problem going down this route. If/when we
-> realize that there is another parameter needed in the blk_mq_tag_set.
-> Today that's quite easy to add (assuming the parameter can be
-> optional), without changing the blk_mq_init_tag_set() interface.
+> void blk_queue_max_segment_size(struct request_queue *q,
+>                                 unsigned int max_size)
+> {
+> 	if (max_size < PAGE_SIZE) {
+> 		max_size = PAGE_SIZE;
+> 		printk(KERN_INFO "%s: set to minimum %d\n",
+> 		       __func__, max_size);
+> 	}
+> 
+> 	/* see blk_queue_virt_boundary() for the explanation */
+> 	WARN_ON_ONCE(q->limits.virt_boundary_mask);
+> 
+> 	q->limits.max_segment_size = max_size;
+> }
+> 
+> I have been asked to add support for DMA segment sizes that are smaller than
+> the page size to support a UFS controller with a maximum DMA segment size of
+> 4 KiB and a page size > 4 KiB (my understanding of the JEDEC UFS host
+> controller specification is that UFS host controllers should support a
+> maximum DMA segment size of 256 KiB). Does anyone want to comment on this
+> before I start working on a patch series?
 
-Hi Chaitanya,
-
-Please consider to drop the entire patch series. In addition to the 
-disadvantages mentioned above I'd like to mention the following 
-disadvantages:
-* Replacing named member assignments with positional arguments in a
-   function call makes code harder to read and harder to verify.
-* This patch series makes tree-wide changes without improving the code
-   in a substantial way.
-
-Thanks,
-
-Bart.
-
+If the hardware's DMA segment is smaller than a page, why doesn't the driver
+just split a kernel's larger segment into whatever representation the hardware
+wants? We do that in nvme, at least.
