@@ -2,149 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BADC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 05:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB253C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 05:06:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229771AbiJEFGg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Oct 2022 01:06:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60370 "EHLO
+        id S229848AbiJEFGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Oct 2022 01:06:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbiJEFGA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 01:06:00 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E80A3753A5
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 22:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1664946263; x=1696482263;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=uFJBTYsaMBZYY3AXnBMf5pwuXPfgYExf5gPkj72Rc1U=;
-  b=kvLA/aBXgTpsSNCWLg5m4NqEiju13pm7ouBzu/ckoZ8Dce9W2ocBIsSv
-   8omTm+9g+q5O6tJfZTmRCiUodpE4dF+CqHnwKJorHunbXUGCIbOXNm/KC
-   3p7UhNK8JDizleTTP0eDRs/ba0DZPeA80aQBowdAhbA7tsuWmSOE38Rgf
-   vkIvaB+s3mYeoDkYPuE/2ztHTLPqtb6hY44aaVFeo62nqdz+xLxWHeG0k
-   jfm0JxCMd1aCKU75EWLKlxBW+ZTudeWQJcw7/GOTpqImqi/HdpRpb0+Fa
-   GtLJ1ep0xrENhhXs3fI0NRgmhi1kbexVKWFyhwGBSm4oeI9Ze2UITTmCs
-   w==;
-X-IronPort-AV: E=Sophos;i="5.95,159,1661788800"; 
-   d="scan'208";a="317307260"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Oct 2022 13:04:22 +0800
-IronPort-SDR: /4xAI+Mt8hJt1/MHpJh4V0IT43qP6JemEWa86xcRMAxzB6ZCeDrKJ8CntjGLaF+E3Vjaca3ebj
- z/zv/coDeOX+HEdsBg1Fqp8Qaxi+6dgRQ1SED+LneNOLlq7zPLjOuzPnpZn9zbGHgva5PmF+kD
- Z1lTbGZeNMfayOopOu/yqdfHbQFvPgW6gXfc2NavBGEpe6SiO0NXLgnro6QDYNuE8vkccxwvOk
- W5ZJvZ7yKYz5r1NyKICWgbR1LXXbdYyKBEKEzKauroeRML41dnFYxZmmXZKVEvMGEFOIvtHv1V
- rSoeGR3oWDGaW6ORwn8A2h9J
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2022 21:24:10 -0700
-IronPort-SDR: T5SbC4St22G/tjKlKBB4ppCvJ6N2Ejh2LzRJUzWOT9wWe5mdMyM1tuChJgtpKkCWrzne9yXRXz
- 9/SAYosVtxEw/8Ht/7Uq3ycWN8hvfXNUgwmM9nWrdlsBIEcJ5z72b/K9cr6tjzjSauoUmitSkE
- xxHp30vt3agpqnGguvmqLzzDd/E/tn8FIdAsqeoh0FBkWQE0qK04C0lkBR+v7ORkJkBBPQkVq8
- 1xnPILBNbAMxH4tO3fdTJsDUWyQ+ekZhDjphBiHk7+ZXvpph4mTJjTmtXvPh5BEgff78ZKFJxq
- +2A=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2022 22:04:23 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Mj2YK6GhDz1RvTr
-        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 22:04:21 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1664946261; x=1667538262; bh=uFJBTYsaMBZYY3AXnBMf5pwuXPfgYExf5gP
-        kj72Rc1U=; b=gVsj93DwWdgMnF7DCLWcZQEKVFELmQMR+/yvEKgZ9dZeXAjAuXo
-        h5/1IUAnUHxCM2yky/MyEI/znUM/OwdGwe0XtJ33336PTFR5uvlhP8Vj3NNdXI3i
-        YLh+Y/KOM+4SqAXst0/+z20ZkhYM2qkmcVU7AixPqeaHGD30sIHY+frL9BjFiYwo
-        j4ORy6Vy614d/6AXKE6337DkTwyL89YSbsaZZEVWMoOD55pYoMEDEt5Xdbwecmc6
-        NB9hdV7cgwpGgQIlEe0DOuxZmVOTkvHWNt5bcyhhRpf4ZnFI39eYltil8QZRGNGV
-        zaZQDjoCzO0JwFpiGsgB1giPEoqsrdHmyDg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id OMxqn0hZrFEc for <linux-block@vger.kernel.org>;
-        Tue,  4 Oct 2022 22:04:21 -0700 (PDT)
-Received: from [10.225.163.106] (unknown [10.225.163.106])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Mj2YH5h3mz1RvLy;
-        Tue,  4 Oct 2022 22:04:19 -0700 (PDT)
-Message-ID: <64c8beb8-ddb1-c86c-c6c6-aea93776f619@opensource.wdc.com>
-Date:   Wed, 5 Oct 2022 14:04:18 +0900
+        with ESMTP id S230092AbiJEFGC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 01:06:02 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B7D8753B2;
+        Tue,  4 Oct 2022 22:04:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LCpmbioWARSij48hDHxWLETjLMMmHLguu9p6vy+uK6V5AAtbjUdqGISS4dRk75mtngi3QoVyQrnDHJc47kldN6nDu6DKx2U4uTs0Vinyrc0U4wEbc8xpnjkC8Q+qRcLeE7nYL7jg0pUr9nBs2GSn+HJDxwOEtitSqYUobEMqIDI8zz+ONDXpwr+5PwoNboHoxsQ/4vlwHOjaiyfwHpoMg39aFdxL1uY7zrSjT7H/JIk/fPCfDYOkYAsBx1SAeOzVzDiJ1Gd/Xik4wcPC3NlAJlDYzdZErrCg/o5W0BCwM/ohW0/prXaqrQGJ1cBiTYUDIH7VooRQyWBK/Gl3Teocig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VqJq9X9tqAo2dMwUgS5ahUWpG0s0I2opXSaHSMh2AbQ=;
+ b=M3sP6J/KVHmwTImmF3w5VPNkHq0y+eP62VtSieGymIrypyclSKoFGUSdnCUYtqgCf5VxlXwpf6aSL1Wg/dumvJDfxk76ZyNy2N2IwpgvBU73kFGtv29kVMRgsClaXpP/4UVr0afi6OTvfIi052UFPmuTfc082BnwGxHCktVl0Rnxqp5bnoKhINSHYiKPcJbRFqz3g98vmo0nu2o5EqgBzIZVjKrPiQfziZqu/JHNoQDYE1epuG9b0Qo7b8KiBoKg7YSWq58xjrHg4Iav/JAJHI/L7EICeXQTVxtu8utXkifKq6nE1KM6bYUvbL8doolUStCq7b542aQ445UmRDo2qA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=linux-m68k.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VqJq9X9tqAo2dMwUgS5ahUWpG0s0I2opXSaHSMh2AbQ=;
+ b=HU8/1NL9eoXLN+SSVeZsYiH99l8CYhxOVwMgzmPBqtrlUgjshbaVU62ykvsJns3WBpB2CCGd597dmhRtr83E5ykgKhPM2n9EE22fAffwFreIi342IFo9tKshfBKT7dmLP0FOjLtM3TIBuv94kj8d0UEzmZdzKF7odj++eo+bckqTqn4mwEOoJUYqTch4ovnkj+qZzmifCXXt4ydGe5ArQNyStNeh11VOh5ZcSWjxWPsdGz27dSRUSulxHu/qHzhVnGizrh75lYCylqTp3tSprdXz3SSTCojbhI/qyva2M4ytBXj6GsoAJ2+nGIZLKiSF/oqyKACJyhENbFYuXfxlcQ==
+Received: from BN9PR03CA0317.namprd03.prod.outlook.com (2603:10b6:408:112::22)
+ by CH2PR12MB4053.namprd12.prod.outlook.com (2603:10b6:610:7c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.24; Wed, 5 Oct
+ 2022 05:04:25 +0000
+Received: from BN8NAM11FT033.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:112:cafe::bd) by BN9PR03CA0317.outlook.office365.com
+ (2603:10b6:408:112::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.24 via Frontend
+ Transport; Wed, 5 Oct 2022 05:04:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT033.mail.protection.outlook.com (10.13.177.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5709.10 via Frontend Transport; Wed, 5 Oct 2022 05:04:24 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 4 Oct 2022
+ 22:04:13 -0700
+Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Tue, 4 Oct 2022
+ 22:04:11 -0700
+From:   Chaitanya Kulkarni <kch@nvidia.com>
+To:     <ogeert@linux-m68k.org>, <linux-block@vger.kernel.org>,
+        <linux-m68k@lists.linux-m68k.org>, <linux-kernel@vger.kernel.org>,
+        <drbd-dev@lists.linbit.com>, <nbd@other.debian.org>,
+        <linux-mtd@lists.infradead.org>
+CC:     <axboe@kernel.dk>, <philipp.reisner@linbit.com>,
+        <lars.ellenberg@linbit.com>, <christoph.boehmwalder@linbit.com>,
+        <efremov@linux.com>, <josef@toxicpanda.com>, <tim@cyberelk.net>,
+        <haris.iqbal@ionos.com>, <jinpu.wang@ionos.com>, <richard@nod.at>,
+        <miquel.raynal@bootlin.com>, <vigneshr@ti.com>, <kch@nvidia.com>,
+        <mcgrof@kernel.org>, <hare@suse.de>,
+        <damien.lemoal@opensource.wdc.com>, <johannes.thumshirn@wdc.com>,
+        <bvanassche@acm.org>, <ming.lei@redhat.com>,
+        <vincent.fu@samsung.com>, <shinichiro.kawasaki@wdc.com>
+Subject: [RFC PATCH 18/18] ubi: use init disk helper
+Date:   Tue, 4 Oct 2022 22:00:27 -0700
+Message-ID: <20221005050027.39591-19-kch@nvidia.com>
+X-Mailer: git-send-email 2.29.0
+In-Reply-To: <20221005050027.39591-1-kch@nvidia.com>
+References: <20221005050027.39591-1-kch@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH 4/6] null_blk: initialize cmd->bio in __alloc_cmd()
-Content-Language: en-US
-To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com, bvanassche@acm.org,
-        ming.lei@redhat.com, shinichiro.kawasaki@wdc.com,
-        vincent.fu@samsung.com, yukuai3@huawei.com
-References: <20221005031701.79077-1-kch@nvidia.com>
- <20221005031701.79077-5-kch@nvidia.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20221005031701.79077-5-kch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT033:EE_|CH2PR12MB4053:EE_
+X-MS-Office365-Filtering-Correlation-Id: 27d8d60b-e5d1-4050-db8d-08daa68f1276
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bVdH+XWqMGPPWB1/2H3kNLQPismwJd2x3rKmctdDUEn6FYMemnCk8gfzdGSHtQoaKtz4WLpIRHd5Dmuucfu4o5W81SckmwVzL0NFlJD3tvBwVGuwqZKE5NEjg8cWN0fL3/CzgKJfWca4VrI7wqFqKhC67gL2mM55hnahN5c4rvHJCGBWaXh5aFplVqX+fFZ+Py++W1SFyFnMfsYC/wAFGoWeOKVvMX9k3WuHs3nHM66bGBE9HfiZC9Nj/Dvp4IcNpD2qcHrxYwVZtSrRUpvDo2gUBsIzwarOV0nmLl0VYVzB8S7dUgH2qljfOaCKaTrnn5FLlc5QuKzuo57NRDZwpPSvpehxGn3vMS7tzFQXzbmW8UD9drXJ6qxiRuGJU68nWeUTWn8Sv3HwkYMD9g+G9DavHpOUN0cnXTwDy7LTOKuLkVDEUrwriptbflnBGhkf2urbimyFSSna46KTYjtI0qt9yY7L9Eh7YpEZkx2MHhLOnMG/DE9+LiTS4eXsD0i8C99rfpDfCTTFlkno9ewR2C3+fGnzcvi7r/MigpjVL/NamD5Z45+M3f28HsQaMSOxKoCwuPEOdMRIc090HqDdMNmEGBdEL9gB+IDuV7D3fUQiQ0/EBtcvSYcDHuCnKXJhfI9xDd8/DW4m8Ttuye14W5clNvNe5PWjYbG/8UA2iwAWS/p35NnnxPOrJcI3B+68GuKXnULEvX8B/W2eVNxnc5puAJxMSnFya1wuU59h+Xo9lIOdsHPCfOC6oYxG84Wx4jMoXaYts8R+CAbnOkOshGbaxR5nSIStDPkHs7Yj+U4=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(39860400002)(136003)(396003)(451199015)(46966006)(40470700004)(36840700001)(82310400005)(36756003)(6666004)(7696005)(478600001)(40460700003)(36860700001)(83380400001)(26005)(2906002)(316002)(54906003)(110136005)(336012)(16526019)(5660300002)(2616005)(40480700001)(8936002)(7416002)(7636003)(4326008)(70586007)(70206006)(8676002)(82740400003)(41300700001)(1076003)(186003)(426003)(356005)(47076005)(2101003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2022 05:04:24.4316
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27d8d60b-e5d1-4050-db8d-08daa68f1276
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT033.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4053
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/5/22 12:16, Chaitanya Kulkarni wrote:
-> The function __alloc_cmd() is responsible to allocate tag and
-> initializae the different members of the null_cmd structure e.g.
-> cmd->tag, cmd->error, and cmd->nq, Move only member bio that is initialized
-> from alloc_cmd() into __alloc_cmd().
-> 
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+Add and use the helper to initialize the common fields of struct gendisk
+such as major, first_minor, minors, disk_name, private_data, and ops.
+This initialization is spread all over the block drivers. This avoids
+code repetation of inialization code of gendisk in current block drivers
+and any future ones.
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+---
+ drivers/mtd/ubi/block.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-> ---
->  drivers/block/null_blk/main.c | 9 ++++-----
->  1 file changed, 4 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index b82c2ffeb086..765c1ca0edf5 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -743,7 +743,7 @@ static void free_cmd(struct nullb_cmd *cmd)
->  
->  static enum hrtimer_restart null_cmd_timer_expired(struct hrtimer *timer);
->  
-> -static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
-> +static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq, struct bio *bio)
->  {
->  	struct nullb_cmd *cmd;
->  	unsigned int tag;
-> @@ -754,6 +754,7 @@ static struct nullb_cmd *__alloc_cmd(struct nullb_queue *nq)
->  		cmd->tag = tag;
->  		cmd->error = BLK_STS_OK;
->  		cmd->nq = nq;
-> +		cmd->bio = bio;
->  		if (nq->dev->irqmode == NULL_IRQ_TIMER) {
->  			hrtimer_init(&cmd->timer, CLOCK_MONOTONIC,
->  				     HRTIMER_MODE_REL);
-> @@ -775,11 +776,9 @@ static struct nullb_cmd *alloc_cmd(struct nullb_queue *nq, struct bio *bio)
->  		 * This avoids multiple return statements, multiple calls to
->  		 * __alloc_cmd() and a fast path call to prepare_to_wait().
->  		 */
-> -		cmd = __alloc_cmd(nq);
-> -		if (cmd) {
-> -			cmd->bio = bio;
-> +		cmd = __alloc_cmd(nq, bio);
-> +		if (cmd)
->  			return cmd;
-> -		}
->  		prepare_to_wait(&nq->wait, &wait, TASK_UNINTERRUPTIBLE);
->  		io_schedule();
->  		finish_wait(&nq->wait, &wait);
-
+diff --git a/drivers/mtd/ubi/block.c b/drivers/mtd/ubi/block.c
+index 4cf67a2a0d04..07c085a5fd52 100644
+--- a/drivers/mtd/ubi/block.c
++++ b/drivers/mtd/ubi/block.c
+@@ -420,9 +420,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
+ 		goto out_free_tags;
+ 	}
+ 
+-	gd->fops = &ubiblock_ops;
+-	gd->major = ubiblock_major;
+-	gd->minors = 1;
++	init_disk(gd, ubiblock_major, 1, 0, disk_capacity, dev, &ubiblock_ops);
+ 	gd->first_minor = idr_alloc(&ubiblock_minor_idr, dev, 0, 0, GFP_KERNEL);
+ 	if (gd->first_minor < 0) {
+ 		dev_err(disk_to_dev(gd),
+@@ -431,9 +429,7 @@ int ubiblock_create(struct ubi_volume_info *vi)
+ 		goto out_cleanup_disk;
+ 	}
+ 	gd->flags |= GENHD_FL_NO_PART;
+-	gd->private_data = dev;
+ 	sprintf(gd->disk_name, "ubiblock%d_%d", dev->ubi_num, dev->vol_id);
+-	set_capacity(gd, disk_capacity);
+ 	dev->gd = gd;
+ 
+ 	dev->rq = gd->queue;
 -- 
-Damien Le Moal
-Western Digital Research
+2.29.0
 
