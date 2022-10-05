@@ -2,294 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CA9C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 04:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 003E0C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 04:54:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229831AbiJEETN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Oct 2022 00:19:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45900 "EHLO
+        id S229573AbiJEEy4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Oct 2022 00:54:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbiJEETL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 00:19:11 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5E3965279;
-        Tue,  4 Oct 2022 21:19:10 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id v10-20020a17090a634a00b00205e48cf845so626053pjs.4;
-        Tue, 04 Oct 2022 21:19:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=JqYaSs8nnjKHk4wZ+yCo6aZO+FDfi0LL5kl9tHDj7j8=;
-        b=CTFOmMqHKnJPrPJnfFZkFWSrGvYDUeHw5orJcik7dTxKZ4FWH/0cX0PKKWFDr8SaGG
-         DpEBF1wLzffxmmTs9mvQBKnXsp2CxOAsVMlPjXmWAjACN4bZwZ6PX5PO53Iz4ofR3XZq
-         3qenV/LYxFaLuDxqSDH/7/gwgnlhXFsV+dJ08tDy8y42q5pBvFYj1hUL4AT6eZYFtaax
-         zYKAgem7iYTC4gk5OANoklvycbtf2J94WAXdU608Z5jqm3P0E2cI0VGrbYF7WXWibW7s
-         lf0IirVcS03jZbYI5JnryvFTq+hUUBJ4fzvtXJDwPMRUONqiQb+LfA0iza+BOEeg0ttH
-         QPew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=JqYaSs8nnjKHk4wZ+yCo6aZO+FDfi0LL5kl9tHDj7j8=;
-        b=D/b+iDE8m8tukTF6UAWo5TzLPXpZAHl1MqNd/DxPFAEFIH7hoXncEVxuKDTprcebco
-         MzG6clzyjO7cVtWmeKKU+CrzwTxqMq+7d7LY1ztfBbcuKthmcOQYVWGZ5S36QeMBtNPD
-         XZe1Gyzbc+wpdpanjSS3KUGmUHDOu6piMaD+oxNWDlsfWBCSW+3tcTAjCRRO6G8LN2yu
-         Z3kN0k6q5LMP7qM3XpqCFLp4UpquYwH1C1uTULr1S44K82HonxjDaZU23SXrlTYSh9Rw
-         U9QW1wSwZ2VIgiOk/ba/HGJiaOaImqpRLyViPD6WoufIY5G+/43pIZ45V+yEd3ru1nbM
-         9W1g==
-X-Gm-Message-State: ACrzQf3sDmNMvP3R3zqLCHCBAoBbF380rkaiEC0X8/sPZt9SkIHTUxae
-        7d64r06Nikp2I2E1VrU5h1E=
-X-Google-Smtp-Source: AMsMyM6pF3OTw2eCu6EvKnL05epDKzZm0fc+COF4b5oBhaPgBWskpjcYprU3v0FQYxWiHZuSJUV8hg==
-X-Received: by 2002:a17:90b:1a92:b0:20a:f34a:2b9 with SMTP id ng18-20020a17090b1a9200b0020af34a02b9mr40921pjb.74.1664943550031;
-        Tue, 04 Oct 2022 21:19:10 -0700 (PDT)
-Received: from T590 ([117.136.79.112])
-        by smtp.gmail.com with ESMTPSA id j23-20020a63cf17000000b0041cd5ddde6fsm9241347pgg.76.2022.10.04.21.19.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Oct 2022 21:19:09 -0700 (PDT)
-Date:   Wed, 5 Oct 2022 12:18:55 +0800
-From:   Ming Lei <tom.leiming@gmail.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: ublk-qcow2: ublk-qcow2 is available
-Message-ID: <Yz0FrzJVZTqlQtJ5@T590>
-References: <Yza1u1KfKa7ycQm0@T590>
- <Yzs9xQlVuW41TuNC@fedora>
- <YzwARuAZdaoGTUfP@T590>
- <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
+        with ESMTP id S229379AbiJEEyz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 00:54:55 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4831C101C9
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 21:54:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1664945694; x=1696481694;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=X/wnYvLEfjWPiHP0g6qUoEkTmreuHxScsfCtdjtKDoI=;
+  b=AQ8TFeR1e958X1IhAEDJy7W8LTq/Yp8LheS3DH1Nwozi8xt2fKOI/Ybf
+   YC6d4o8U22MhfzSMEyEuWUl6ZeugK4J+edKBf8Rsvg3DFdY8iNF55I9Qt
+   3NrMCEmSvmPQgCo9XDh2t2LoeAG/pf82TBQVKMPqvB7G4QpcOPeNVKQKN
+   AM5uPAMSEfvM3NcZ2Fe+xU1cqN+NiNw3eRSIwWQTKiSvQtIE1+lVrh4e3
+   zY3oaMLnPmREGTcSnrk77EjgwFCVZInJwBL5a8Os268ZLPuYJZ3g2K0Zr
+   eHgUK6rrmU4Y+EmUxgR/tDv+Zy6lntxx5lLLlxitPq44rO+c432/V1H1D
+   A==;
+X-IronPort-AV: E=Sophos;i="5.95,159,1661788800"; 
+   d="scan'208";a="325117124"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Oct 2022 12:54:49 +0800
+IronPort-SDR: RlKQEODTXJVpKZDpsUZqxMBFDNm+dvoSx1DuR3Av/iWJFkkmYr1Nk9S7EA4frcAKxb/knoN1++
+ URXVziQ7gbCBA5yyvrqbaFA9wBMA0QKPQeFv6wgvqIuYA9ITXhIC8bhlwBbSmBl67mwJIlhcin
+ eZfY2aDBvK9OWOig8jXHlTY04rUgTNowClh7UZXkEzNuLYkhMqpi7BsvBT4PsbFHBs5TkLK3LK
+ lJXc7/QTXTs2rBj6tMICXcx0fglbBokJcibPQ0U3B3TETkES28swxgxwLbaQML3GB96sdn0BQ1
+ dBnltvi7JxDdzOONWDkgQKgj
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2022 21:09:02 -0700
+IronPort-SDR: 5gBB5pwuq25SgdVttWIvuwheokrrsXPH1EvXGaE0b2wNcv9e/RYSbyeTR9UAayFlv3gHAUCIX3
+ wIRQZ1IMP/LqACkxCjloHTmjVPqjbfSHrb0tfPlaaY1s2xLrwgFZX+KADn2Kqhcy/PpKQptjmH
+ qJ4xO8aCCOs4k9KEhYEb4oF6XBDmdSSFiOYjJ+6g5BYajnr0xsRBMd4lJa5TuZBYkztFJF52zT
+ zkaQ56HqmXuHXTmAufxlhw9JjcbBW1GeCnUgODne5QLLxMlGzbqdG54LNlnDK2Gp6lqPVVOA1v
+ zrk=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2022 21:54:49 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Mj2LJ6wywz1Rwtm
+        for <linux-block@vger.kernel.org>; Tue,  4 Oct 2022 21:54:48 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1664945687; x=1667537688; bh=X/wnYvLEfjWPiHP0g6qUoEkTmreuHxScsfC
+        tdjtKDoI=; b=I45lrdqZJ44GFSl/+oBfP47bm9o4FQE7J+aQgmTDuydXl+k6Udw
+        QJBeahxO3k77MCHH39X6yLg7HVLPCbWrstD7RqRPxXQUiFjh+auU/ShrMYSDSP9f
+        VABP7UGxkocDuxGO9mJRMNLTgrLigBbDtWDYVA7T95nR5WimB1n1W5vi+d19Ki66
+        ILmeuwmFJlHl9BLMfP/aRY52FD3Utl6yiZOqJXOwMUfVjMom1ELCp4ZoZnbETmVQ
+        IQVBF9DRCkGR77WEH72NlSQ6Un85/5TTBnM5qaNOI6727z8FufdA3uK01ivfG6dk
+        4WEtJjkcx4NK+i2kZu/kjD3QWegUdUjmRHg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 6wCqmTd16E34 for <linux-block@vger.kernel.org>;
+        Tue,  4 Oct 2022 21:54:47 -0700 (PDT)
+Received: from [10.225.163.106] (unknown [10.225.163.106])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Mj2LG1chxz1RvLy;
+        Tue,  4 Oct 2022 21:54:45 -0700 (PDT)
+Message-ID: <66698df8-74ca-e802-2250-04aecafa1106@opensource.wdc.com>
+Date:   Wed, 5 Oct 2022 13:54:44 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH 1/6] null_blk: allow write zeores on non-membacked
+Content-Language: en-US
+To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com, bvanassche@acm.org,
+        ming.lei@redhat.com, shinichiro.kawasaki@wdc.com,
+        vincent.fu@samsung.com, yukuai3@huawei.com
+References: <20221005031701.79077-1-kch@nvidia.com>
+ <20221005031701.79077-2-kch@nvidia.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20221005031701.79077-2-kch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajnoczi wrote:
-> On Tue, 4 Oct 2022 at 05:44, Ming Lei <tom.leiming@gmail.com> wrote:
-> >
-> > On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Hajnoczi wrote:
-> > > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
-> > > > ublk-qcow2 is available now.
-> > >
-> > > Cool, thanks for sharing!
-> > >
-> > > >
-> > > > So far it provides basic read/write function, and compression and snapshot
-> > > > aren't supported yet. The target/backend implementation is completely
-> > > > based on io_uring, and share the same io_uring with ublk IO command
-> > > > handler, just like what ublk-loop does.
-> > > >
-> > > > Follows the main motivations of ublk-qcow2:
-> > > >
-> > > > - building one complicated target from scratch helps libublksrv APIs/functions
-> > > >   become mature/stable more quickly, since qcow2 is complicated and needs more
-> > > >   requirement from libublksrv compared with other simple ones(loop, null)
-> > > >
-> > > > - there are several attempts of implementing qcow2 driver in kernel, such as
-> > > >   ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
-> > > >   might useful be for covering requirement in this field
-> > > >
-> > > > - performance comparison with qemu-nbd, and it was my 1st thought to evaluate
-> > > >   performance of ublk/io_uring backend by writing one ublk-qcow2 since ublksrv
-> > > >   is started
-> > > >
-> > > > - help to abstract common building block or design pattern for writing new ublk
-> > > >   target/backend
-> > > >
-> > > > So far it basically passes xfstest(XFS) test by using ublk-qcow2 block
-> > > > device as TEST_DEV, and kernel building workload is verified too. Also
-> > > > soft update approach is applied in meta flushing, and meta data
-> > > > integrity is guaranteed, 'make test T=qcow2/040' covers this kind of
-> > > > test, and only cluster leak is reported during this test.
-> > > >
-> > > > The performance data looks much better compared with qemu-nbd, see
-> > > > details in commit log[1], README[5] and STATUS[6]. And the test covers both
-> > > > empty image and pre-allocated image, for example of pre-allocated qcow2
-> > > > image(8GB):
-> > > >
-> > > > - qemu-nbd (make test T=qcow2/002)
-> > >
-> > > Single queue?
-> >
-> > Yeah.
-> >
-> > >
-> > > >     randwrite(4k): jobs 1, iops 24605
-> > > >     randread(4k): jobs 1, iops 30938
-> > > >     randrw(4k): jobs 1, iops read 13981 write 14001
-> > > >     rw(512k): jobs 1, iops read 724 write 728
-> > >
-> > > Please try qemu-storage-daemon's VDUSE export type as well. The
-> > > command-line should be similar to this:
-> > >
-> > >   # modprobe virtio_vdpa # attaches vDPA devices to host kernel
-> >
-> > Not found virtio_vdpa module even though I enabled all the following
-> > options:
-> >
-> >         --- vDPA drivers
-> >           <M>   vDPA device simulator core
-> >           <M>     vDPA simulator for networking device
-> >           <M>     vDPA simulator for block device
-> >           <M>   VDUSE (vDPA Device in Userspace) support
-> >           <M>   Intel IFC VF vDPA driver
-> >           <M>   Virtio PCI bridge vDPA driver
-> >           <M>   vDPA driver for Alibaba ENI
-> >
-> > BTW, my test environment is VM and the shared data is done in VM too, and
-> > can virtio_vdpa be used inside VM?
+On 10/5/22 12:16, Chaitanya Kulkarni wrote:
+> Add a helper function to enable the REQ_OP_WRITE_ZEROES operations
+> when null_blk is configured with the non-membacked operations.
 > 
-> I hope Xie Yongji can help explain how to benchmark VDUSE.
+> Since write-zeroes is a non-trivial I/O operation we need this to
+> add a blktest so we can test the non-trivial I/O path from the
+> application to the block layer.
 > 
-> virtio_vdpa is available inside guests too. Please check that
-> VIRTIO_VDPA ("vDPA driver for virtio devices") is enabled in "Virtio
-> drivers" menu.
+> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> ---
+>  drivers/block/null_blk/main.c     | 13 +++++++++++++
+>  drivers/block/null_blk/null_blk.h |  1 +
+>  2 files changed, 14 insertions(+)
 > 
-> >
-> > >   # modprobe vduse
-> > >   # qemu-storage-daemon \
-> > >       --blockdev file,filename=test.qcow2,cache.direct=of|off,aio=native,node-name=file \
-> > >       --blockdev qcow2,file=file,node-name=qcow2 \
-> > >       --object iothread,id=iothread0 \
-> > >       --export vduse-blk,id=vduse0,name=vduse0,num-queues=$(nproc),node-name=qcow2,writable=on,iothread=iothread0
-> > >   # vdpa dev add name vduse0 mgmtdev vduse
-> > >
-> > > A virtio-blk device should appear and xfstests can be run on it
-> > > (typically /dev/vda unless you already have other virtio-blk devices).
-> > >
-> > > Afterwards you can destroy the device using:
-> > >
-> > >   # vdpa dev del vduse0
-> > >
-> > > >
-> > > > - ublk-qcow2 (make test T=qcow2/022)
-> > >
-> > > There are a lot of other factors not directly related to NBD vs ublk. In
-> > > order to get an apples-to-apples comparison with qemu-* a ublk export
-> > > type is needed in qemu-storage-daemon. That way only the difference is
-> > > the ublk interface and the rest of the code path is identical, making it
-> > > possible to compare NBD, VDUSE, ublk, etc more precisely.
-> >
-> > Maybe not true.
-> >
-> > ublk-qcow2 uses io_uring to handle all backend IO(include meta IO) completely,
-> > and so far single io_uring/pthread is for handling all qcow2 IOs and IO
-> > command.
-> 
-> qemu-nbd doesn't use io_uring to handle the backend IO, so we don't
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> index 1f154f92f4c2..fc3e883f7b84 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -209,6 +209,10 @@ static bool g_discard;
+>  module_param_named(discard, g_discard, bool, 0444);
+>  MODULE_PARM_DESC(discard, "Support discard operations (requires memory-backed null_blk device). Default: false");
+>  
+> +static bool g_write_zeroes;
+> +module_param_named(write_zeroes, g_write_zeroes, bool, 0444);
+> +MODULE_PARM_DESC(write_zeroes, "Support write-zeores operations. Default: false");
 
-I tried to use it via --aio=io_uring for setting up qemu-nbd, but not succeed.
+Why not make this a number of sectors representing the maximum size of a
+write zero command (blk_queue_max_write_zeroes_sectors()) ? That would
+allow exercising split write zeros BIOs.
 
-> know whether the benchmark demonstrates that ublk is faster than NBD,
-> that the ublk-qcow2 implementation is faster than qemu-nbd's qcow2,
-> whether there are miscellaneous implementation differences between
-> ublk-qcow2 and qemu-nbd (like using the same io_uring context for both
-> ublk and backend IO), or something else.
+> +
+>  static unsigned long g_cache_size;
+>  module_param_named(cache_size, g_cache_size, ulong, 0444);
+>  MODULE_PARM_DESC(mbps, "Cache size in MiB for memory-backed device. Default: 0 (none)");
+> @@ -678,6 +682,7 @@ static struct nullb_device *null_alloc_dev(void)
+>  	dev->blocking = g_blocking;
+>  	dev->memory_backed = g_memory_backed;
+>  	dev->discard = g_discard;
+> +	dev->write_zeroes = g_write_zeroes;
+>  	dev->cache_size = g_cache_size;
+>  	dev->mbps = g_mbps;
+>  	dev->use_per_node_hctx = g_use_per_node_hctx;
+> @@ -1800,6 +1805,13 @@ static void null_config_discard(struct nullb *nullb)
+>  	blk_queue_max_discard_sectors(nullb->q, UINT_MAX >> 9);
+>  }
+>  
+> +static void null_config_write_zeroes(struct nullb *nullb)
+> +{
+> +	if (!nullb->dev->write_zeroes)
+> +		return;
+> +	blk_queue_max_write_zeroes_sectors(nullb->q, UINT_MAX >> 9);
+> +}
+> +
+>  static const struct block_device_operations null_bio_ops = {
+>  	.owner		= THIS_MODULE,
+>  	.submit_bio	= null_submit_bio,
+> @@ -2111,6 +2123,7 @@ static int null_add_dev(struct nullb_device *dev)
+>  		blk_queue_virt_boundary(nullb->q, PAGE_SIZE - 1);
+>  
+>  	null_config_discard(nullb);
+> +	null_config_write_zeroes(nullb);
+>  
+>  	if (config_item_name(&dev->item)) {
+>  		/* Use configfs dir name as the device name */
+> diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
+> index 94ff68052b1e..2c0c9c29158f 100644
+> --- a/drivers/block/null_blk/null_blk.h
+> +++ b/drivers/block/null_blk/null_blk.h
+> @@ -111,6 +111,7 @@ struct nullb_device {
+>  	bool power; /* power on/off the device */
+>  	bool memory_backed; /* if data is stored in memory */
+>  	bool discard; /* if support discard */
+> +	bool write_zeroes; /* if support write_zeroes */
+>  	bool zoned; /* if device is zoned */
+>  	bool virt_boundary; /* virtual boundary on/off for the device */
+>  	bool no_sched; /* no IO scheduler for the device */
 
-The theory shouldn't be too complicated:
+-- 
+Damien Le Moal
+Western Digital Research
 
-1) io uring passthough(pt) communication is fast than socket, and io command
-is carried over io_uring pt commands, and should be fast than virio
-communication too.
-
-2) io uring io handling is fast than libaio which is taken in the
-test on qemu-nbd, and all qcow2 backend io(include meta io) is handled
-by io_uring.
-
-https://github.com/ming1/ubdsrv/blob/master/tests/common/qcow2_common
-
-3) ublk uses one single io_uring to handle all io commands and qcow2
-backend IOs, so batching handling is common, and it is easy to see
-dozens of IOs/io commands handled in single syscall, or even more.
-
-> 
-> I'm suggesting measuring changes to just 1 variable at a time.
-> Otherwise it's hard to reach a conclusion about the root cause of the
-> performance difference. Let's learn why ublk-qcow2 performs well.
-
-Turns out the latest Fedora 37-beta doesn't support vdpa yet, so I built
-qemu from the latest github tree, and finally it starts to work. And test kernel
-is v6.0 release.
-
-Follows the test result, and all three devices are setup as single
-queue, and all tests are run in single job, still done in one VM, and
-the test images are stored on XFS/virito-scsi backed SSD.
-
-The 1st group tests all three block device which is backed by empty
-qcow2 image.
-
-The 2nd group tests all the three block devices backed by pre-allocated
-qcow2 image.
-
-Except for big sequential IO(512K), there is still not small gap between
-vdpa-virtio-blk and ublk.
-
-1. run fio on block device over empty qcow2 image
-1) qemu-nbd
-running qcow2/001
-run perf test on empty qcow2 image via nbd
-	fio (nbd(/mnt/data/ublk_null_8G_nYbgF.qcow2), libaio, bs 4k, dio, hw queues:1)...
-	randwrite: jobs 1, iops 8549
-	randread: jobs 1, iops 34829
-	randrw: jobs 1, iops read 11363 write 11333
-	rw(512k): jobs 1, iops read 590 write 597
-
-
-2) ublk-qcow2
-running qcow2/021
-run perf test on empty qcow2 image via ublk
-	fio (ublk/qcow2( -f /mnt/data/ublk_null_8G_s761j.qcow2), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0).
-	randwrite: jobs 1, iops 16086
-	randread: jobs 1, iops 172720
-	randrw: jobs 1, iops read 35760 write 35702
-	rw(512k): jobs 1, iops read 1140 write 1149
-
-3) vdpa-virtio-blk
-running debug/test_dev
-run io test on specified device
-	fio (vdpa(/dev/vdc), libaio, bs 4k, dio, hw queues:1)...
-	randwrite: jobs 1, iops 8626
-	randread: jobs 1, iops 126118
-	randrw: jobs 1, iops read 17698 write 17665
-	rw(512k): jobs 1, iops read 1023 write 1031
-
-
-2. run fio on block device over pre-allocated qcow2 image
-1) qemu-nbd
-running qcow2/002
-run perf test on pre-allocated qcow2 image via nbd
-	fio (nbd(/mnt/data/ublk_data_8G_sc0SB.qcow2), libaio, bs 4k, dio, hw queues:1)...
-	randwrite: jobs 1, iops 21439
-	randread: jobs 1, iops 30336
-	randrw: jobs 1, iops read 11476 write 11449
-	rw(512k): jobs 1, iops read 718 write 722
-
-2) ublk-qcow2
-running qcow2/022
-run perf test on pre-allocated qcow2 image via ublk
-	fio (ublk/qcow2( -f /mnt/data/ublk_data_8G_yZiaJ.qcow2), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0).
-	randwrite: jobs 1, iops 98757
-	randread: jobs 1, iops 110246
-	randrw: jobs 1, iops read 47229 write 47161
-	rw(512k): jobs 1, iops read 1416 write 1427
-
-3) vdpa-virtio-blk
-running debug/test_dev
-run io test on specified device
-	fio (vdpa(/dev/vdc), libaio, bs 4k, dio, hw queues:1)...
-	randwrite: jobs 1, iops 47317
-	randread: jobs 1, iops 74092
-	randrw: jobs 1, iops read 27196 write 27234
-	rw(512k): jobs 1, iops read 1447 write 1458
-
-
-thanks,
-Ming
