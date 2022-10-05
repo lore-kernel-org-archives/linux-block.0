@@ -2,188 +2,294 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6229CC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 03:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CA9C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 04:19:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230082AbiJEDc2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Oct 2022 23:32:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
+        id S229831AbiJEETN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Oct 2022 00:19:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229953AbiJEDcC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Oct 2022 23:32:02 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2072.outbound.protection.outlook.com [40.107.95.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E6575CC8;
-        Tue,  4 Oct 2022 20:28:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mtEEV/2g+OZEmvyf7CGY/gv3L3o5L+uhcb/9tQAtsqpqQyfB7l7YzognVjN0VyIpKebhXgQCCatYggAqE08wgPYbNKzOhoXpAYE4AmOJTiNxW43P3GJ/CTa73a4mZxbbu9jKoRWP6BC86ZcSUow3Iwm/9CbHxisdj3m5HFjxqEi+GOMOagop3poZTiVVJ42cXaM3QVhwB6knJrNKfh2v6ANr4gK00ScGKLW+JTXiUmxtjqOn0T9RER5BiWDh60FerF7aeg7jYp0XUUcwv79TgMgskseD+xnGHQXVO1au01w1QyvApxfX+fuamHs16lFdFFr5Df9V2HqcdCi+AdqLrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gHz7Dp/+F4b/Hkk0H5bmoMnwFHpir4BLHeQHPx4VfbM=;
- b=gAHtV/IZjz+T2VM3sgbRe/EJT3puh1pbVa6KmLT7IDcWaMThYonjPJxbE3Ya74TzKXgi6Ro2RkANe/7FYk/sUep5ZK03hkO8dXCLDZIBrE53sU9Dbxj+vzZKB7PKqY/xXr8aN5Mqxp2wWGPaxRHjJVa1+RspW7o/0tys9JjeWu0ETLChGyrkmTde6AcdGnYfZkFaZSMP4KdD9lWD2zXSoNs358q49P9y41yxlwJCKg/RHsV+0hSVjB7Y4X4rZMNzF3Pj2939Ng00iN0n8x805ayjzH+HvzjMvMoy7En2GtKKHU2E68/Upfjo30sDCr4P6wWedKrLxLRhyHvGI9N6HQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gHz7Dp/+F4b/Hkk0H5bmoMnwFHpir4BLHeQHPx4VfbM=;
- b=T4W+aTNTibT//scjWp8lEYnBLxbLb2CZGiOoSTy3i0NRNz4Gtt23L+lPmf2oFcOp/8Z4NUZatkQA7YRgfPqIlAkU6eV2HW6A/uAzYeXHoKTsU9wZEPec3Zk4C11M1BVXhm3u5qwHiZlGZxMfVeTqSkKjEaLuwtmF6TFbUX5C3TwmMLnYoFzEBphFd7chdUGWrp/UFIOBw+gwMYd5A/kHuWEqYNXgqVHON71kjItGtJ2ZaqwZ4ywGYwBiYrWpcaLxkT3HWbJmNIq3sq0OiEpNJEj8IOoBrt6pABfTL1IEp0mOqa9IVgF6Jar2zeyouqXO9QPES7T6WQoMMMUA2z4p8w==
-Received: from DM6PR02CA0122.namprd02.prod.outlook.com (2603:10b6:5:1b4::24)
- by MN0PR12MB5932.namprd12.prod.outlook.com (2603:10b6:208:37f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.31; Wed, 5 Oct
- 2022 03:27:56 +0000
-Received: from DM6NAM11FT037.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:1b4:cafe::74) by DM6PR02CA0122.outlook.office365.com
- (2603:10b6:5:1b4::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.23 via Frontend
- Transport; Wed, 5 Oct 2022 03:27:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DM6NAM11FT037.mail.protection.outlook.com (10.13.172.122) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5709.10 via Frontend Transport; Wed, 5 Oct 2022 03:27:56 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 4 Oct 2022
- 20:27:54 -0700
-Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Tue, 4 Oct 2022
- 20:27:51 -0700
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-omap@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
-        <linux-mmc@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-nvme@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <efremov@linux.com>, <josef@toxicpanda.com>,
-        <idryomov@gmail.com>, <dongsheng.yang@easystack.cn>,
-        <haris.iqbal@ionos.com>, <jinpu.wang@ionos.com>, <mst@redhat.com>,
-        <jasowang@redhat.com>, <pbonzini@redhat.com>,
-        <stefanha@redhat.com>, <ohad@wizery.com>, <andersson@kernel.org>,
-        <baolin.wang@linux.alibaba.com>, <ulf.hansson@linaro.org>,
-        <richard@nod.at>, <miquel.raynal@bootlin.com>, <vigneshr@ti.com>,
-        <marcan@marcan.st>, <sven@svenpeter.dev>, <alyssa@rosenzweig.io>,
-        <kbusch@kernel.org>, <hch@lst.de>, <sagi@grimberg.me>,
-        <sth@linux.ibm.com>, <hoeppner@linux.ibm.com>, <hca@linux.ibm.com>,
-        <gor@linux.ibm.com>, <agordeev@linux.ibm.com>,
-        <borntraeger@linux.ibm.com>, <svens@linux.ibm.com>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>, <hare@suse.de>,
-        <kch@nvidia.com>, <bhelgaas@google.com>, <john.garry@huawei.com>,
-        <mcgrof@kernel.org>, <christophe.jaillet@wanadoo.fr>,
-        <vaibhavgupta40@gmail.com>, <wsa+renesas@sang-engineering.com>,
-        <damien.lemoal@opensource.wdc.com>, <johannes.thumshirn@wdc.com>,
-        <bvanassche@acm.org>, <ming.lei@redhat.com>,
-        <shinichiro.kawasaki@wdc.com>, <vincent.fu@samsung.com>,
-        <christoph.boehmwalder@linbit.com>, <joel@jms.id.au>,
-        <vincent.whitchurch@axis.com>, <nbd@other.debian.org>,
-        <ceph-devel@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>,
-        <asahi@lists.linux.dev>
-Subject: [RFC PATCH 21/21] nvme-pci: use lib tagset init helper
-Date:   Tue, 4 Oct 2022 20:22:57 -0700
-Message-ID: <20221005032257.80681-22-kch@nvidia.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20221005032257.80681-1-kch@nvidia.com>
-References: <20221005032257.80681-1-kch@nvidia.com>
+        with ESMTP id S229539AbiJEETL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 00:19:11 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5E3965279;
+        Tue,  4 Oct 2022 21:19:10 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id v10-20020a17090a634a00b00205e48cf845so626053pjs.4;
+        Tue, 04 Oct 2022 21:19:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=JqYaSs8nnjKHk4wZ+yCo6aZO+FDfi0LL5kl9tHDj7j8=;
+        b=CTFOmMqHKnJPrPJnfFZkFWSrGvYDUeHw5orJcik7dTxKZ4FWH/0cX0PKKWFDr8SaGG
+         DpEBF1wLzffxmmTs9mvQBKnXsp2CxOAsVMlPjXmWAjACN4bZwZ6PX5PO53Iz4ofR3XZq
+         3qenV/LYxFaLuDxqSDH/7/gwgnlhXFsV+dJ08tDy8y42q5pBvFYj1hUL4AT6eZYFtaax
+         zYKAgem7iYTC4gk5OANoklvycbtf2J94WAXdU608Z5jqm3P0E2cI0VGrbYF7WXWibW7s
+         lf0IirVcS03jZbYI5JnryvFTq+hUUBJ4fzvtXJDwPMRUONqiQb+LfA0iza+BOEeg0ttH
+         QPew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=JqYaSs8nnjKHk4wZ+yCo6aZO+FDfi0LL5kl9tHDj7j8=;
+        b=D/b+iDE8m8tukTF6UAWo5TzLPXpZAHl1MqNd/DxPFAEFIH7hoXncEVxuKDTprcebco
+         MzG6clzyjO7cVtWmeKKU+CrzwTxqMq+7d7LY1ztfBbcuKthmcOQYVWGZ5S36QeMBtNPD
+         XZe1Gyzbc+wpdpanjSS3KUGmUHDOu6piMaD+oxNWDlsfWBCSW+3tcTAjCRRO6G8LN2yu
+         Z3kN0k6q5LMP7qM3XpqCFLp4UpquYwH1C1uTULr1S44K82HonxjDaZU23SXrlTYSh9Rw
+         U9QW1wSwZ2VIgiOk/ba/HGJiaOaImqpRLyViPD6WoufIY5G+/43pIZ45V+yEd3ru1nbM
+         9W1g==
+X-Gm-Message-State: ACrzQf3sDmNMvP3R3zqLCHCBAoBbF380rkaiEC0X8/sPZt9SkIHTUxae
+        7d64r06Nikp2I2E1VrU5h1E=
+X-Google-Smtp-Source: AMsMyM6pF3OTw2eCu6EvKnL05epDKzZm0fc+COF4b5oBhaPgBWskpjcYprU3v0FQYxWiHZuSJUV8hg==
+X-Received: by 2002:a17:90b:1a92:b0:20a:f34a:2b9 with SMTP id ng18-20020a17090b1a9200b0020af34a02b9mr40921pjb.74.1664943550031;
+        Tue, 04 Oct 2022 21:19:10 -0700 (PDT)
+Received: from T590 ([117.136.79.112])
+        by smtp.gmail.com with ESMTPSA id j23-20020a63cf17000000b0041cd5ddde6fsm9241347pgg.76.2022.10.04.21.19.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Oct 2022 21:19:09 -0700 (PDT)
+Date:   Wed, 5 Oct 2022 12:18:55 +0800
+From:   Ming Lei <tom.leiming@gmail.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kirill Tkhai <kirill.tkhai@openvz.org>,
+        Manuel Bentele <development@manuel-bentele.de>,
+        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+Message-ID: <Yz0FrzJVZTqlQtJ5@T590>
+References: <Yza1u1KfKa7ycQm0@T590>
+ <Yzs9xQlVuW41TuNC@fedora>
+ <YzwARuAZdaoGTUfP@T590>
+ <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT037:EE_|MN0PR12MB5932:EE_
-X-MS-Office365-Filtering-Correlation-Id: 20d8c758-a3e9-403e-afa8-08daa6819884
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1IwHhpF45Lv+E1FLJ2N0fDaKfgLEQRdw8iFZ8hB8o7fuwj86Gy6LTWnzK2rgIfRETVDsjcyrIP7qIRwNkqVSmI95hhQXxtY/2rvy6h7L1bzE70WQHO8MM+u8ExXS1MhRsOJkByqQW3UMMgCNQQTdoOTHcXFm/5+5P32/gc2x31LrXp8ynt/8FTWvNY85kW6Y5hlO7KbQNFU2ENIgHwJCoZHNmB+1n5GPp2+EwzA8/gEuxe2iVYOb38DYtOfD5mSDHSIzLvyT2bXfPTkFzQ2b3NyOjXGTMcNWn9OJr0ULmi9ju3EC1C9CGy/VxMNTE36rb7lB6YcUGKy4Ojy6zG+VMXJmB0e180tFd1m6dz4A5cp1SF3zLL0vrYNXqvjnavov7z3jQkZaRduizhX/rQs1dfKC0NinLLqjfF5cjDJ5bkg5CiBhng+63nUI/fv+mY79PC8JuoX33qHFWe9sAD8q4RSiJjRZRbFcymRkP7EAxqut4o3IxhYLaSwFrvjaNujO5dXOGAmdFRFrZ7mvlKLsyLlgo/9PRuqw72oPQ/ZEiLWu/uR27IMoz6R2VDgDsBdVJdkK53Snix1APCJ6RSMi3tcy9dj5kfal4r2yy8OFQWtcfaKePJpX4BVxaEAFX3F9XuOPLwQzqVG7Ncz6MMJfKSEFD60I626R1LD7Si3/e4vBovQMKX0L+rmNa4Vrn6VdVO+tzwaEA3dGnnweAcT3C9jU1m9Kf0SeJuh3mUJiaCFoeY5w3K63B3gcx2eoKmWrUzVjkujhdsNLDTT2z5zblJ1wN/pBaErrjT6i45CGl12dMSuQGA0OfTPB0ug/0yIrBjInFteR3zV9PJlQDvhIJ4x5hyOYKojXzivb82o6FK4=
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199015)(46966006)(40470700004)(36840700001)(2616005)(82740400003)(7636003)(70206006)(7696005)(40460700003)(4326008)(8676002)(26005)(40480700001)(70586007)(356005)(921005)(36756003)(83380400001)(478600001)(1076003)(316002)(110136005)(16526019)(336012)(47076005)(426003)(36860700001)(186003)(54906003)(82310400005)(8936002)(7416002)(7406005)(5660300002)(7366002)(2906002)(41300700001)(21314003)(2101003)(83996005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2022 03:27:56.4764
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20d8c758-a3e9-403e-afa8-08daa6819884
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT037.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5932
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the block layer helper to initialize the common fields of tag_set
-such as blk_mq_ops, number of h/w queues, queue depth, command size,
-numa_node, timeout, BLK_MQ_F_XXX flags, driver data. This initialization
-is spread all over the block drivers. This avoids the code repetation of
-the inialization code of the tag set in current block drivers and any
-future ones.
+On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajnoczi wrote:
+> On Tue, 4 Oct 2022 at 05:44, Ming Lei <tom.leiming@gmail.com> wrote:
+> >
+> > On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Hajnoczi wrote:
+> > > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
+> > > > ublk-qcow2 is available now.
+> > >
+> > > Cool, thanks for sharing!
+> > >
+> > > >
+> > > > So far it provides basic read/write function, and compression and snapshot
+> > > > aren't supported yet. The target/backend implementation is completely
+> > > > based on io_uring, and share the same io_uring with ublk IO command
+> > > > handler, just like what ublk-loop does.
+> > > >
+> > > > Follows the main motivations of ublk-qcow2:
+> > > >
+> > > > - building one complicated target from scratch helps libublksrv APIs/functions
+> > > >   become mature/stable more quickly, since qcow2 is complicated and needs more
+> > > >   requirement from libublksrv compared with other simple ones(loop, null)
+> > > >
+> > > > - there are several attempts of implementing qcow2 driver in kernel, such as
+> > > >   ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
+> > > >   might useful be for covering requirement in this field
+> > > >
+> > > > - performance comparison with qemu-nbd, and it was my 1st thought to evaluate
+> > > >   performance of ublk/io_uring backend by writing one ublk-qcow2 since ublksrv
+> > > >   is started
+> > > >
+> > > > - help to abstract common building block or design pattern for writing new ublk
+> > > >   target/backend
+> > > >
+> > > > So far it basically passes xfstest(XFS) test by using ublk-qcow2 block
+> > > > device as TEST_DEV, and kernel building workload is verified too. Also
+> > > > soft update approach is applied in meta flushing, and meta data
+> > > > integrity is guaranteed, 'make test T=qcow2/040' covers this kind of
+> > > > test, and only cluster leak is reported during this test.
+> > > >
+> > > > The performance data looks much better compared with qemu-nbd, see
+> > > > details in commit log[1], README[5] and STATUS[6]. And the test covers both
+> > > > empty image and pre-allocated image, for example of pre-allocated qcow2
+> > > > image(8GB):
+> > > >
+> > > > - qemu-nbd (make test T=qcow2/002)
+> > >
+> > > Single queue?
+> >
+> > Yeah.
+> >
+> > >
+> > > >     randwrite(4k): jobs 1, iops 24605
+> > > >     randread(4k): jobs 1, iops 30938
+> > > >     randrw(4k): jobs 1, iops read 13981 write 14001
+> > > >     rw(512k): jobs 1, iops read 724 write 728
+> > >
+> > > Please try qemu-storage-daemon's VDUSE export type as well. The
+> > > command-line should be similar to this:
+> > >
+> > >   # modprobe virtio_vdpa # attaches vDPA devices to host kernel
+> >
+> > Not found virtio_vdpa module even though I enabled all the following
+> > options:
+> >
+> >         --- vDPA drivers
+> >           <M>   vDPA device simulator core
+> >           <M>     vDPA simulator for networking device
+> >           <M>     vDPA simulator for block device
+> >           <M>   VDUSE (vDPA Device in Userspace) support
+> >           <M>   Intel IFC VF vDPA driver
+> >           <M>   Virtio PCI bridge vDPA driver
+> >           <M>   vDPA driver for Alibaba ENI
+> >
+> > BTW, my test environment is VM and the shared data is done in VM too, and
+> > can virtio_vdpa be used inside VM?
+> 
+> I hope Xie Yongji can help explain how to benchmark VDUSE.
+> 
+> virtio_vdpa is available inside guests too. Please check that
+> VIRTIO_VDPA ("vDPA driver for virtio devices") is enabled in "Virtio
+> drivers" menu.
+> 
+> >
+> > >   # modprobe vduse
+> > >   # qemu-storage-daemon \
+> > >       --blockdev file,filename=test.qcow2,cache.direct=of|off,aio=native,node-name=file \
+> > >       --blockdev qcow2,file=file,node-name=qcow2 \
+> > >       --object iothread,id=iothread0 \
+> > >       --export vduse-blk,id=vduse0,name=vduse0,num-queues=$(nproc),node-name=qcow2,writable=on,iothread=iothread0
+> > >   # vdpa dev add name vduse0 mgmtdev vduse
+> > >
+> > > A virtio-blk device should appear and xfstests can be run on it
+> > > (typically /dev/vda unless you already have other virtio-blk devices).
+> > >
+> > > Afterwards you can destroy the device using:
+> > >
+> > >   # vdpa dev del vduse0
+> > >
+> > > >
+> > > > - ublk-qcow2 (make test T=qcow2/022)
+> > >
+> > > There are a lot of other factors not directly related to NBD vs ublk. In
+> > > order to get an apples-to-apples comparison with qemu-* a ublk export
+> > > type is needed in qemu-storage-daemon. That way only the difference is
+> > > the ublk interface and the rest of the code path is identical, making it
+> > > possible to compare NBD, VDUSE, ublk, etc more precisely.
+> >
+> > Maybe not true.
+> >
+> > ublk-qcow2 uses io_uring to handle all backend IO(include meta IO) completely,
+> > and so far single io_uring/pthread is for handling all qcow2 IOs and IO
+> > command.
+> 
+> qemu-nbd doesn't use io_uring to handle the backend IO, so we don't
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- drivers/nvme/host/pci.c | 25 +++++++------------------
- 1 file changed, 7 insertions(+), 18 deletions(-)
+I tried to use it via --aio=io_uring for setting up qemu-nbd, but not succeed.
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 7bbffd2a9beb..52af4b2bb668 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1757,15 +1757,9 @@ static int nvme_pci_alloc_admin_tag_set(struct nvme_dev *dev)
- {
- 	struct blk_mq_tag_set *set = &dev->admin_tagset;
- 
--	set->ops = &nvme_mq_admin_ops;
--	set->nr_hw_queues = 1;
--
--	set->queue_depth = NVME_AQ_MQ_TAG_DEPTH;
--	set->timeout = NVME_ADMIN_TIMEOUT;
--	set->numa_node = dev->ctrl.numa_node;
--	set->cmd_size = sizeof(struct nvme_iod);
--	set->flags = BLK_MQ_F_NO_SCHED;
--	set->driver_data = dev;
-+	blk_mq_init_tag_set(set, &nvme_mq_admin_ops, 1, NVME_AQ_MQ_TAG_DEPTH,
-+			sizeof(struct nvme_iod), dev->ctrl.numa_node,
-+			NVME_ADMIN_TIMEOUT, BLK_MQ_F_NO_SCHED, dev);
- 
- 	if (blk_mq_alloc_tag_set(set))
- 		return -ENOMEM;
-@@ -2528,20 +2522,15 @@ static void nvme_pci_alloc_tag_set(struct nvme_dev *dev)
- 	struct blk_mq_tag_set * set = &dev->tagset;
- 	int ret;
- 
--	set->ops = &nvme_mq_ops;
--	set->nr_hw_queues = dev->online_queues - 1;
- 	set->nr_maps = 1;
- 	if (dev->io_queues[HCTX_TYPE_READ])
- 		set->nr_maps = 2;
- 	if (dev->io_queues[HCTX_TYPE_POLL])
- 		set->nr_maps = 3;
--	set->timeout = NVME_IO_TIMEOUT;
--	set->numa_node = dev->ctrl.numa_node;
--	set->queue_depth = min_t(unsigned, dev->q_depth, BLK_MQ_MAX_DEPTH) - 1;
--	set->cmd_size = sizeof(struct nvme_iod);
--	set->flags = BLK_MQ_F_SHOULD_MERGE;
--	set->driver_data = dev;
--
-+	blk_mq_init_tag_set(set, &nvme_mq_ops, dev->online_queues - 1,
-+			min_t(unsigned, dev->q_depth, BLK_MQ_MAX_DEPTH) - 1,
-+			sizeof(struct nvme_iod), dev->ctrl.numa_node,
-+			NVME_IO_TIMEOUT, BLK_MQ_F_SHOULD_MERGE, dev);
- 	/*
- 	 * Some Apple controllers requires tags to be unique
- 	 * across admin and IO queue, so reserve the first 32
--- 
-2.29.0
+> know whether the benchmark demonstrates that ublk is faster than NBD,
+> that the ublk-qcow2 implementation is faster than qemu-nbd's qcow2,
+> whether there are miscellaneous implementation differences between
+> ublk-qcow2 and qemu-nbd (like using the same io_uring context for both
+> ublk and backend IO), or something else.
 
+The theory shouldn't be too complicated:
+
+1) io uring passthough(pt) communication is fast than socket, and io command
+is carried over io_uring pt commands, and should be fast than virio
+communication too.
+
+2) io uring io handling is fast than libaio which is taken in the
+test on qemu-nbd, and all qcow2 backend io(include meta io) is handled
+by io_uring.
+
+https://github.com/ming1/ubdsrv/blob/master/tests/common/qcow2_common
+
+3) ublk uses one single io_uring to handle all io commands and qcow2
+backend IOs, so batching handling is common, and it is easy to see
+dozens of IOs/io commands handled in single syscall, or even more.
+
+> 
+> I'm suggesting measuring changes to just 1 variable at a time.
+> Otherwise it's hard to reach a conclusion about the root cause of the
+> performance difference. Let's learn why ublk-qcow2 performs well.
+
+Turns out the latest Fedora 37-beta doesn't support vdpa yet, so I built
+qemu from the latest github tree, and finally it starts to work. And test kernel
+is v6.0 release.
+
+Follows the test result, and all three devices are setup as single
+queue, and all tests are run in single job, still done in one VM, and
+the test images are stored on XFS/virito-scsi backed SSD.
+
+The 1st group tests all three block device which is backed by empty
+qcow2 image.
+
+The 2nd group tests all the three block devices backed by pre-allocated
+qcow2 image.
+
+Except for big sequential IO(512K), there is still not small gap between
+vdpa-virtio-blk and ublk.
+
+1. run fio on block device over empty qcow2 image
+1) qemu-nbd
+running qcow2/001
+run perf test on empty qcow2 image via nbd
+	fio (nbd(/mnt/data/ublk_null_8G_nYbgF.qcow2), libaio, bs 4k, dio, hw queues:1)...
+	randwrite: jobs 1, iops 8549
+	randread: jobs 1, iops 34829
+	randrw: jobs 1, iops read 11363 write 11333
+	rw(512k): jobs 1, iops read 590 write 597
+
+
+2) ublk-qcow2
+running qcow2/021
+run perf test on empty qcow2 image via ublk
+	fio (ublk/qcow2( -f /mnt/data/ublk_null_8G_s761j.qcow2), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0).
+	randwrite: jobs 1, iops 16086
+	randread: jobs 1, iops 172720
+	randrw: jobs 1, iops read 35760 write 35702
+	rw(512k): jobs 1, iops read 1140 write 1149
+
+3) vdpa-virtio-blk
+running debug/test_dev
+run io test on specified device
+	fio (vdpa(/dev/vdc), libaio, bs 4k, dio, hw queues:1)...
+	randwrite: jobs 1, iops 8626
+	randread: jobs 1, iops 126118
+	randrw: jobs 1, iops read 17698 write 17665
+	rw(512k): jobs 1, iops read 1023 write 1031
+
+
+2. run fio on block device over pre-allocated qcow2 image
+1) qemu-nbd
+running qcow2/002
+run perf test on pre-allocated qcow2 image via nbd
+	fio (nbd(/mnt/data/ublk_data_8G_sc0SB.qcow2), libaio, bs 4k, dio, hw queues:1)...
+	randwrite: jobs 1, iops 21439
+	randread: jobs 1, iops 30336
+	randrw: jobs 1, iops read 11476 write 11449
+	rw(512k): jobs 1, iops read 718 write 722
+
+2) ublk-qcow2
+running qcow2/022
+run perf test on pre-allocated qcow2 image via ublk
+	fio (ublk/qcow2( -f /mnt/data/ublk_data_8G_yZiaJ.qcow2), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0).
+	randwrite: jobs 1, iops 98757
+	randread: jobs 1, iops 110246
+	randrw: jobs 1, iops read 47229 write 47161
+	rw(512k): jobs 1, iops read 1416 write 1427
+
+3) vdpa-virtio-blk
+running debug/test_dev
+run io test on specified device
+	fio (vdpa(/dev/vdc), libaio, bs 4k, dio, hw queues:1)...
+	randwrite: jobs 1, iops 47317
+	randread: jobs 1, iops 74092
+	randrw: jobs 1, iops read 27196 write 27234
+	rw(512k): jobs 1, iops read 1447 write 1458
+
+
+thanks,
+Ming
