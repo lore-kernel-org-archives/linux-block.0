@@ -2,134 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE59C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 15:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFFAC43219
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 16:54:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230118AbiJEPMH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Oct 2022 11:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
+        id S230126AbiJEQyV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Oct 2022 12:54:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230354AbiJEPMF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 11:12:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 376EF6DFB1
-        for <linux-block@vger.kernel.org>; Wed,  5 Oct 2022 08:12:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664982724;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/WGubC4HbVqcwNsvts+AiFEUTLkMeqajhao/HLtOsbc=;
-        b=YO0e5jqX6ZnXLEVoX+4+3QIOwrxsDlQFFHs6n33ScDjiW/aLoDhCQkTiuHWs/lktPWIsER
-        L083E6dRPfBEKdBXFTjwmXqA1FsqtF5MI4wzC44UWgVmMe7O2yllLAddzeWWMq6Pw1o7DK
-        Cb2N6GE6SNIudeZxV1xTSENfiV7vaio=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-636-Pud9b8BxNhaiVC77lbmreg-1; Wed, 05 Oct 2022 11:12:01 -0400
-X-MC-Unique: Pud9b8BxNhaiVC77lbmreg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E66C3C0D1A4;
-        Wed,  5 Oct 2022 15:11:58 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 59626C15BA4;
-        Wed,  5 Oct 2022 15:11:51 +0000 (UTC)
-Date:   Wed, 5 Oct 2022 11:11:32 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     "Denis V. Lunev" <den@virtuozzo.com>
-Cc:     Ming Lei <tom.leiming@gmail.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: ublk-qcow2: ublk-qcow2 is available
-Message-ID: <Yz2epPwoufj0mug/@fedora>
-References: <Yza1u1KfKa7ycQm0@T590>
- <Yzs9xQlVuW41TuNC@fedora>
- <6659a0d5-60ab-9ac7-d25d-b4ff1940c6ab@virtuozzo.com>
+        with ESMTP id S230096AbiJEQyU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 12:54:20 -0400
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168E24B9A8;
+        Wed,  5 Oct 2022 09:54:19 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id a26so7312736pfg.7;
+        Wed, 05 Oct 2022 09:54:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=GFGmeXwzImdz1h+PmMN1s24FBEmejNYEC+q1xWfXEck=;
+        b=JWf5VAz03AB4CkFEpVkfUEWgtmAjJ4wGjWY6babOa0PJChJcZ0ezYXykprUlrHwiZI
+         v4HeZ+6jF5Zc9NjJfsUXsfGdHdhUlxn+xq8+UZhFtyFx10UOs5HuapVHHEEV1dBSSZKO
+         KJB5TzZHCYSU9kh0p88M7P0C8IefFbGGgDi1G1GSt1/qTXGXsuU46m0CugrWM7VM16Ij
+         RGFlghN5WfCPvJH5qA8zH13aK7nx54zJbv9rOfw076haEwshRGTTLkH5rvY0F/2rF6cE
+         SDmINa9yM5lYV92oWR8yDyMsUAg7unn74YelZwFnJPrRzziKhlqSe/C0uegYbM6TGUdR
+         Z4yA==
+X-Gm-Message-State: ACrzQf1lcWB49zedkrBYX6YwlzM9c5IM6GtxENQxzEP5otYjmzY10mkW
+        QrgsR6WdcKI8yP5lU4tDIQ4=
+X-Google-Smtp-Source: AMsMyM5oX6qSPQ4HG3bu8E8hjU3lPQSUd8WrMcNcjR4MljBf6naYCl5wsAAwQMON9m5RMKfn4/SRMQ==
+X-Received: by 2002:a62:2985:0:b0:544:77d4:f43b with SMTP id p127-20020a622985000000b0054477d4f43bmr726456pfp.9.1664988858370;
+        Wed, 05 Oct 2022 09:54:18 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id j16-20020a170902da9000b00176c6738d13sm10795484plx.169.2022.10.05.09.54.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Oct 2022 09:54:17 -0700 (PDT)
+Message-ID: <e0ea0b0a-5077-de37-046f-62902aca93b6@acm.org>
+Date:   Wed, 5 Oct 2022 09:54:11 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="0HJHRezJw1wbMhDd"
-Content-Disposition: inline
-In-Reply-To: <6659a0d5-60ab-9ac7-d25d-b4ff1940c6ab@virtuozzo.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [RFC PATCH 01/21] block: add and use init tagset helper
+Content-Language: en-US
+To:     Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, axboe@kernel.dk, efremov@linux.com,
+        josef@toxicpanda.com, idryomov@gmail.com,
+        dongsheng.yang@easystack.cn, haris.iqbal@ionos.com,
+        jinpu.wang@ionos.com, mst@redhat.com, jasowang@redhat.com,
+        pbonzini@redhat.com, stefanha@redhat.com, ohad@wizery.com,
+        andersson@kernel.org, baolin.wang@linux.alibaba.com,
+        richard@nod.at, miquel.raynal@bootlin.com, vigneshr@ti.com,
+        marcan@marcan.st, sven@svenpeter.dev, alyssa@rosenzweig.io,
+        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, sth@linux.ibm.com,
+        hoeppner@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+        svens@linux.ibm.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, hare@suse.de, bhelgaas@google.com,
+        john.garry@huawei.com, mcgrof@kernel.org,
+        christophe.jaillet@wanadoo.fr, vaibhavgupta40@gmail.com,
+        wsa+renesas@sang-engineering.com, johannes.thumshirn@wdc.com,
+        ming.lei@redhat.com, shinichiro.kawasaki@wdc.com,
+        vincent.fu@samsung.com, christoph.boehmwalder@linbit.com,
+        joel@jms.id.au, vincent.whitchurch@axis.com, nbd@other.debian.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, asahi@lists.linux.dev
+References: <20221005032257.80681-1-kch@nvidia.com>
+ <20221005032257.80681-2-kch@nvidia.com>
+ <6fee2d7a-7fd1-73ee-2911-87a4ed3e8769@opensource.wdc.com>
+ <CAPDyKFpBpiydQn+=24CqtaH_qa3tQfN2gQSiUrHCjnLSuy4=Kg@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAPDyKFpBpiydQn+=24CqtaH_qa3tQfN2gQSiUrHCjnLSuy4=Kg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 10/5/22 02:47, Ulf Hansson wrote:
+> On Wed, 5 Oct 2022 at 07:11, Damien Le Moal <damien.lemoal@opensource.wdc.com> wrote:
+>> On 10/5/22 12:22, Chaitanya Kulkarni wrote:
+>>> +void blk_mq_init_tag_set(struct blk_mq_tag_set *set,
+>>> +             const struct blk_mq_ops *ops, unsigned int nr_hw_queues,
+>>> +             unsigned int queue_depth, unsigned int cmd_size, int numa_node,
+>>> +             unsigned int timeout, unsigned int flags, void *driver_data)
+>>
+>> That is an awful lot of arguments... I would be tempted to say pack all
+>> these into a struct but then that would kind of negate this patchset goal.
+>> Using a function with that many arguments will be error prone, and hard to
+>> review... Not a fan.
+> 
+> I completely agree.
+> 
+> But there is also another problem going down this route. If/when we
+> realize that there is another parameter needed in the blk_mq_tag_set.
+> Today that's quite easy to add (assuming the parameter can be
+> optional), without changing the blk_mq_init_tag_set() interface.
 
---0HJHRezJw1wbMhDd
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Chaitanya,
 
-On Tue, Oct 04, 2022 at 01:57:50AM +0200, Denis V. Lunev wrote:
-> On 10/3/22 21:53, Stefan Hajnoczi wrote:
-> > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
-> > > ublk-qcow2 is available now.
-> > Cool, thanks for sharing!
-> yep
->=20
-> > > So far it provides basic read/write function, and compression and sna=
-pshot
-> > > aren't supported yet. The target/backend implementation is completely
-> > > based on io_uring, and share the same io_uring with ublk IO command
-> > > handler, just like what ublk-loop does.
-> > >=20
-> > > Follows the main motivations of ublk-qcow2:
-> > >=20
-> > > - building one complicated target from scratch helps libublksrv APIs/=
-functions
-> > >    become mature/stable more quickly, since qcow2 is complicated and =
-needs more
-> > >    requirement from libublksrv compared with other simple ones(loop, =
-null)
-> > >=20
-> > > - there are several attempts of implementing qcow2 driver in kernel, =
-such as
-> > >    ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], s=
-o ublk-qcow2
-> > >    might useful be for covering requirement in this field
-> There is one important thing to keep in mind about all partly-userspace
-> implementations though:
-> * any single allocation happened in the context of the
-> =A0=A0 userspace daemon through try_to_free_pages() in
-> =A0=A0 kernel has a possibility to trigger the operation,
-> =A0=A0 which will require userspace daemon action, which
-> =A0=A0 is inside the kernel now.
-> * the probability of this is higher in the overcommitted
-> =A0=A0 environment
->=20
-> This was the main motivation of us in favor for the in-kernel
-> implementation.
+Please consider to drop the entire patch series. In addition to the 
+disadvantages mentioned above I'd like to mention the following 
+disadvantages:
+* Replacing named member assignments with positional arguments in a
+   function call makes code harder to read and harder to verify.
+* This patch series makes tree-wide changes without improving the code
+   in a substantial way.
 
-CCed Josef Bacik because the Linux NBD driver has dealt with memory
-reclaim hangs in the past.
+Thanks,
 
-Josef: Any thoughts on userspace block drivers (whether NBD or ublk) and
-how to avoid hangs in memory reclaim?
-
-Stefan
-
---0HJHRezJw1wbMhDd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmM9nqQACgkQnKSrs4Gr
-c8iEoAf/eIubb5NIhncZ0gl2w50kSq02L7TslR04+6oMZQN+WN/pe3IPaCA2AFEC
-5FronSoFT2uNPoARvGAzXKOMgM6L3qLtrstcvVRDm46hBbmJewj6Z3/7oT/KRr5t
-vJtZLmOW4vItXWRmC2v41SmKgkOKMqESjCcBrVXUSXRvYCIsD516MjSE3r+0Lawa
-hPrbD4/1SAz5P0Qtoh1rqFiDSqIpqA7X86InkW/+GHNv0t3pw6E0Bp/CbPC0UVrf
-XU/34RMn/0+ETiTLsrUXgirmHdimpxNdnRgmFGYSsrbwI/Yy0k/2aqQF/JWAo1zi
-6el/KNsveFmDYtRkVC1tYgcwFFNFpw==
-=xRRN
------END PGP SIGNATURE-----
-
---0HJHRezJw1wbMhDd--
+Bart.
 
