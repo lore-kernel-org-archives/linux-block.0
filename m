@@ -2,155 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6587BC4321E
-	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 09:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E78AC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  5 Oct 2022 10:01:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbiJEJsP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Oct 2022 05:48:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35164 "EHLO
+        id S229620AbiJEKBO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Oct 2022 06:01:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiJEJsN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 05:48:13 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E3FD6E889
-        for <linux-block@vger.kernel.org>; Wed,  5 Oct 2022 02:48:11 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id p3-20020a17090a284300b0020a85fa3ffcso1145523pjf.2
-        for <linux-block@vger.kernel.org>; Wed, 05 Oct 2022 02:48:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=uAiOjs73GnPtRWDKlCBYpOmHeG3ElDSPTXYVbLmJn3Y=;
-        b=dh/s9gbrJ1NP2il6j7m7392rb5m/0olUhLw6ywfYrwbm+b05mgthbXGVeHCne6faSe
-         nEB8FWIww9/Mh3TPJYBTwQxHk9YQhBfOYEWSgISGS3x2V+1PSzpPW0fGwHCNvRUrDmsC
-         V4LPjNBP1ZNWd2lWycmQ+cVlk2hOYpk0wbD3BQW90ktRdTfHVQoOGdzFfsVLA+UV8P0L
-         yaYjHeb70WMgWdHpn0iX5L8LgNN78O1ThcYXr+GHqSaFRNBAWLFYqLr8IpSUK6wbVOaM
-         BO7XUtm7Hdl6sqI52mxM7YweUuOKwjFV07IZc9k6gah2y9PsEzpdZlxqQ3TbFVT9xR+n
-         gOow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=uAiOjs73GnPtRWDKlCBYpOmHeG3ElDSPTXYVbLmJn3Y=;
-        b=4YvJzqaYqH0t/QrdVjzGxYdoSVC4as5Jpazfr4esfSdEvIl/a4Sf4nsTsvl7kV3IM3
-         XdOoNAiLLKzPvjbaPcGL6p6mrJJLgPHdkLjHngKrvqC5H1zJ9Qm3V3whrhJ5OzMYv+W+
-         m8OVhp3HT2VCfxw95K+XYAaNkPQJZEnivGebBXKCKY4G4o+HeCkK+/D+IXkDtxg3JPZe
-         M/rTNwipxaMefR/FrRj/6Qqet4YQtKZFW6JUzYDg4oVPSnsvxV3mNtblWLdd/dcSr2rg
-         2dXLfHRRONVaFKAEox++rJuFs9VOM0NnIZuwnB2QMh7GhZNljI5SYMyH2C4eu/1z2B3c
-         uT0w==
-X-Gm-Message-State: ACrzQf2zk2sncshXHBotJrn2rpE6LG7StNl7HEP+TkERgbNmiC3sBGn2
-        kYNCUdvjrb5tmtkUKYvhzAdx8RDOYm6ytK6qs2lWOA==
-X-Google-Smtp-Source: AMsMyM6eqXlNc1atZOkkKgiG1yV3Y78Coz+AbzCXphLyt0GPdUFcokJxxEDnXeFGnrVe0bHv3fHf9rWqZFSPgK8TTJI=
-X-Received: by 2002:a17:90b:4d07:b0:1ef:521c:f051 with SMTP id
- mw7-20020a17090b4d0700b001ef521cf051mr4350723pjb.164.1664963290949; Wed, 05
- Oct 2022 02:48:10 -0700 (PDT)
+        with ESMTP id S229495AbiJEKBL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Oct 2022 06:01:11 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019855724C
+        for <linux-block@vger.kernel.org>; Wed,  5 Oct 2022 03:01:08 -0700 (PDT)
+Received: from fsav111.sakura.ne.jp (fsav111.sakura.ne.jp [27.133.134.238])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 295A0VQ3008740;
+        Wed, 5 Oct 2022 19:00:31 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav111.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp);
+ Wed, 05 Oct 2022 19:00:31 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 295A0U79008735
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 5 Oct 2022 19:00:31 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <15c6e51f-a2a4-38ff-15a4-9efee32824d3@I-love.SAKURA.ne.jp>
+Date:   Wed, 5 Oct 2022 19:00:30 +0900
 MIME-Version: 1.0
-References: <20221005032257.80681-1-kch@nvidia.com> <20221005032257.80681-2-kch@nvidia.com>
- <6fee2d7a-7fd1-73ee-2911-87a4ed3e8769@opensource.wdc.com>
-In-Reply-To: <6fee2d7a-7fd1-73ee-2911-87a4ed3e8769@opensource.wdc.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed, 5 Oct 2022 11:47:34 +0200
-Message-ID: <CAPDyKFpBpiydQn+=24CqtaH_qa3tQfN2gQSiUrHCjnLSuy4=Kg@mail.gmail.com>
-Subject: Re: [RFC PATCH 01/21] block: add and use init tagset helper
-To:     Chaitanya Kulkarni <kch@nvidia.com>,
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: lockdep WARNING at blktests block/011
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Keith Busch <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Tejun Heo <tj@kernel.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, axboe@kernel.dk, efremov@linux.com,
-        josef@toxicpanda.com, idryomov@gmail.com,
-        dongsheng.yang@easystack.cn, haris.iqbal@ionos.com,
-        jinpu.wang@ionos.com, mst@redhat.com, jasowang@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com, ohad@wizery.com,
-        andersson@kernel.org, baolin.wang@linux.alibaba.com,
-        richard@nod.at, miquel.raynal@bootlin.com, vigneshr@ti.com,
-        marcan@marcan.st, sven@svenpeter.dev, alyssa@rosenzweig.io,
-        kbusch@kernel.org, hch@lst.de, sagi@grimberg.me, sth@linux.ibm.com,
-        hoeppner@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-        svens@linux.ibm.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, hare@suse.de, bhelgaas@google.com,
-        john.garry@huawei.com, mcgrof@kernel.org,
-        christophe.jaillet@wanadoo.fr, vaibhavgupta40@gmail.com,
-        wsa+renesas@sang-engineering.com, johannes.thumshirn@wdc.com,
-        bvanassche@acm.org, ming.lei@redhat.com,
-        shinichiro.kawasaki@wdc.com, vincent.fu@samsung.com,
-        christoph.boehmwalder@linbit.com, joel@jms.id.au,
-        vincent.whitchurch@axis.com, nbd@other.debian.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, asahi@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+References: <20220930001943.zdbvolc3gkekfmcv@shindev>
+ <313d914e-6258-50db-4317-0ffb6f936553@I-love.SAKURA.ne.jp>
+ <20221003133240.bq2vynauksivj55x@shindev>
+ <Yzr/pBvvq0NCzGwV@kbusch-mbp.dhcp.thefacebook.com>
+ <20221004104456.ik42oxynyujsu5vb@shindev>
+ <63e14e00-e877-cb5a-a69a-ff44bed8b5a5@I-love.SAKURA.ne.jp>
+ <20221004122354.xxqpughpvnisz5qs@shindev>
+ <20221005083104.2k7nqohqcqcrdpn4@shindev>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20221005083104.2k7nqohqcqcrdpn4@shindev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 5 Oct 2022 at 07:11, Damien Le Moal
-<damien.lemoal@opensource.wdc.com> wrote:
->
-> On 10/5/22 12:22, Chaitanya Kulkarni wrote:
-> > Add and use the helper to initialize the common fields of the tag_set
-> > such as blk_mq_ops, number of h/w queues, queue depth, command size,
-> > numa_node, timeout, BLK_MQ_F_XXX flags, driver data. This initialization
-> > is spread all over the block drivers. This avoids the code repetation of
-> > the inialization code of the tag set in current block drivers and any
->
-> s/inialization/initialization
-> s/repetation/repetition
->
-> > future ones.
-> >
-> > Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> > ---
-> >  block/blk-mq.c                | 20 ++++++++++++++++++++
-> >  drivers/block/null_blk/main.c | 10 +++-------
-> >  include/linux/blk-mq.h        |  5 +++++
-> >  3 files changed, 28 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 8070b6c10e8d..e3a8dd81bbe2 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -4341,6 +4341,26 @@ static int blk_mq_alloc_tag_set_tags(struct blk_mq_tag_set *set,
-> >       return blk_mq_realloc_tag_set_tags(set, 0, new_nr_hw_queues);
-> >  }
-> >
-> > +void blk_mq_init_tag_set(struct blk_mq_tag_set *set,
-> > +             const struct blk_mq_ops *ops, unsigned int nr_hw_queues,
-> > +             unsigned int queue_depth, unsigned int cmd_size, int numa_node,
-> > +             unsigned int timeout, unsigned int flags, void *driver_data)
->
-> That is an awful lot of arguments... I would be tempted to say pack all
-> these into a struct but then that would kind of negate this patchset goal.
-> Using a function with that many arguments will be error prone, and hard to
-> review... Not a fan.
+On 2022/10/05 17:31, Shinichiro Kawasaki wrote:
+> @@ -5120,11 +5120,27 @@ EXPORT_SYMBOL_GPL(nvme_start_admin_queue);
+>  void nvme_sync_io_queues(struct nvme_ctrl *ctrl)
+>  {
+>  	struct nvme_ns *ns;
+> +	LIST_HEAD(splice);
+>  
+> -	down_read(&ctrl->namespaces_rwsem);
+> -	list_for_each_entry(ns, &ctrl->namespaces, list)
+> +	/*
+> +	 * blk_sync_queues() call in ctrl->snamespaces_rwsem critical section
+> +	 * triggers deadlock warning by lockdep since cancel_work_sync() in
+> +	 * blk_sync_queue() waits for nvme_timeout() work completion which may
+> +	 * lock the ctrl->snamespaces_rwsem. To avoid the deadlock possibility,
+> +	 * call blk_sync_queues() out of the critical section by moving the
+> +         * ctrl->namespaces list elements to the stack list head temporally.
+> +	 */
+> +
+> +	down_write(&ctrl->namespaces_rwsem);
+> +	list_splice_init(&ctrl->namespaces, &splice);
+> +	up_write(&ctrl->namespaces_rwsem);
 
-I completely agree.
+Does this work?
 
-But there is also another problem going down this route. If/when we
-realize that there is another parameter needed in the blk_mq_tag_set.
-Today that's quite easy to add (assuming the parameter can be
-optional), without changing the blk_mq_init_tag_set() interface.
+ctrl->namespaces being empty when calling blk_sync_queue() means that
+e.g. nvme_start_freeze() cannot find namespaces to freeze, doesn't it?
 
->
-> > +{
-> > +     if (!set)
-> > +             return;
-> > +
-> > +     set->ops = ops;
-> > +     set->nr_hw_queues = nr_hw_queues;
-> > +     set->queue_depth = queue_depth;
-> > +     set->cmd_size = cmd_size;
-> > +     set->numa_node = numa_node;
-> > +     set->timeout = timeout;
-> > +     set->flags = flags;
-> > +     set->driver_data = driver_data;
-> > +}
-> > +
->
+  blk_mq_timeout_work(work) { // Is blocking __flush_work() from cancel_work_sync().
+    blk_mq_queue_tag_busy_iter(blk_mq_check_expired) {
+      bt_for_each(blk_mq_check_expired) == blk_mq_check_expired() {
+        blk_mq_rq_timed_out() {
+          req->q->mq_ops->timeout(req) == nvme_timeout(req) {
+            nvme_dev_disable() {
+              mutex_lock(&dev->shutdown_lock); // Holds dev->shutdown_lock
+              nvme_start_freeze(&dev->ctrl) {
+                down_read(&ctrl->namespaces_rwsem); // Holds ctrl->namespaces_rwsem which might block
+                //blk_freeze_queue_start(ns->queue); // <= Never be called because ctrl->namespaces is empty.
+                up_read(&ctrl->namespaces_rwsem);
+              }
+              mutex_unlock(&dev->shutdown_lock);
+            }
+          }
+        }
+      }
+    }
+  }
 
-[...]
+Are you sure that down_read(&ctrl->namespaces_rwsem) users won't run
+when ctrl->namespaces is temporarily made empty? (And if you are sure
+that down_read(&ctrl->namespaces_rwsem) users won't run when
+ctrl->namespaces is temporarily made empty, why ctrl->namespaces_rwsem
+needs to be a rw-sem rather than a plain mutex or spinlock ?)
 
-Kind regards
-Uffe
+> +
+> +	list_for_each_entry(ns, &splice, list)
+>  		blk_sync_queue(ns->queue);
+> -	up_read(&ctrl->namespaces_rwsem);
+> +
+> +	down_write(&ctrl->namespaces_rwsem);
+> +	list_splice(&splice, &ctrl->namespaces);
+> +	up_write(&ctrl->namespaces_rwsem);
+>  }
+>  EXPORT_SYMBOL_GPL(nvme_sync_io_queues);
+
+I don't know about dependency chain, but you might be able to add
+"struct nvme_ctrl"->sync_io_queue_mutex which is held for serializing
+nvme_sync_io_queues() and down_write(&ctrl->namespaces_rwsem) users?
+
+If we can guarantee that ctrl->namespaces_rwsem => ctrl->sync_io_queue_mutex
+is impossible, nvme_sync_io_queues() can use ctrl->sync_io_queue_mutex
+rather than ctrl->namespaces_rwsem, and down_write(&ctrl->namespaces_rwsem)/
+up_write(&ctrl->namespaces_rwsem) users are replaced with
+  mutex_lock(&ctrl->sync_io_queue_mutex);
+  down_write(&ctrl->namespaces_rwsem);
+and
+  up_write(&ctrl->namespaces_rwsem);
+  mutex_unlock(&ctrl->sync_io_queue_mutex);
+sequences respectively.
+
