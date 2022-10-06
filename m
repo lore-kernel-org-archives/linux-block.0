@@ -2,149 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3052BC433FE
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 15:17:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18DF6C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 15:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230129AbiJFPRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 11:17:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51462 "EHLO
+        id S231911AbiJFPko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 11:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbiJFPR2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 11:17:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6507A59A6
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 08:17:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665069446;
+        with ESMTP id S231869AbiJFPkj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 11:40:39 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089ED696EA;
+        Thu,  6 Oct 2022 08:40:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B25DBB82067;
+        Thu,  6 Oct 2022 15:40:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CD3CC433C1;
+        Thu,  6 Oct 2022 15:40:31 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kBRHEGDV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665070829;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=LaNanz1TbIo0L9kCY4HbAhnT0dLLrBmpJdnr9yzBj4w=;
-        b=U2WQLXHsN2wyJi95xYNmT3DnvTADRqi5epC7ZObTJP3CPW4R0VwVGwXoBLfrtMmW7holD1
-        jez42EsWYokUBGZK6hsvFGwYGuoaxRueJdtScp+Ltd6gIvhu7UFNi7Wd6GSgCyMoJYQ+tN
-        xYGhQftQCdbcnVTkWsScgkUSKmy9KJw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-503-ArCh5ojcNs-3TxEjMiq5pQ-1; Thu, 06 Oct 2022 11:17:25 -0400
-X-MC-Unique: ArCh5ojcNs-3TxEjMiq5pQ-1
-Received: by mail-wr1-f71.google.com with SMTP id k30-20020adfb35e000000b0022e04708c18so646704wrd.22
-        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 08:17:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LaNanz1TbIo0L9kCY4HbAhnT0dLLrBmpJdnr9yzBj4w=;
-        b=gXtpEMzcoQF3ka5VRc2dvkLOiZVmFXXTcqAY2gEM+h7H4NrhDvtCCmh3/wUBKpy+dk
-         pOID9vda18Tsk2CC5qXGkk9stbX2yvtTGItO8wwwNGo10BE+TVg1DmJg/3BWg89/Gztm
-         QKBMnsjeA/10ovuModpyxQWEzMuhD5xHlQed3bAtqlIKLNxcGICRptxb3mb+GZzQKfVn
-         R8bliRczgdE37PUSI4sbOWI4T7mHEPT5lXmEaN5I9r3TeZl3XsiZiQU/JtWHRaB3TzHA
-         m2We8wMJLRCNJLbH1MMTpkd82frHuNCfDvQzjHfVPs97Kskauefb6qbfS+bVR9O5i3P/
-         /v3g==
-X-Gm-Message-State: ACrzQf0d1NnvWq2ug/QJtJDUt5tQNOk4Mtwat6FFkHJu7Qfyqxa58OXp
-        nyRZVdaeZyjx4fJYdOF1cuVPDAqWJUjIub2eIcOuQclt0/oFDlpnqHNwvvrf52ngZsDOxLUbkUV
-        06KxKKcD4zebiPelYZrvcpm8=
-X-Received: by 2002:a05:600c:4254:b0:3bd:c9c9:92cc with SMTP id r20-20020a05600c425400b003bdc9c992ccmr7609142wmm.151.1665069443636;
-        Thu, 06 Oct 2022 08:17:23 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5xBGuQWsrC6rFfTPmTdLaQ20XGGEkPMobtqTJ6wfL4EKokOUZjDvFcpkEkxoCTA0HgUj6O1Q==
-X-Received: by 2002:a05:600c:4254:b0:3bd:c9c9:92cc with SMTP id r20-20020a05600c425400b003bdc9c992ccmr7609126wmm.151.1665069443377;
-        Thu, 06 Oct 2022 08:17:23 -0700 (PDT)
-Received: from vschneid.remote.csb ([149.71.65.94])
-        by smtp.gmail.com with ESMTPSA id p3-20020a5d4e03000000b002238ea5750csm21354407wrt.72.2022.10.06.08.17.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 08:17:22 -0700 (PDT)
-From:   Valentin Schneider <vschneid@redhat.com>
-To:     Yury Norov <yury.norov@gmail.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
+        bh=UErKVaJQCmz0JpPdH7ldbL7h3QJYSFC93QhEFTHl6oU=;
+        b=kBRHEGDVb4SxSdQZmxiLlvgZp8K/L39m7Aawd9FrMpHZqd8fExzCnpgD1kYeWI3YH2l4Lx
+        fCCrpTpQNaqSgsjJjoErAHYrbvZgFFKPcVuNFtEyerd6me5+szI5L8n0vd2h9+2EAno4dR
+        GAH24PotmggWbf+yGCTE7zF3UfYlSOI=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 477cd97a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Thu, 6 Oct 2022 15:40:29 +0000 (UTC)
+Date:   Thu, 6 Oct 2022 09:40:24 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org, patches@lists.linux.dev
+Cc:     Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [RFC PATCH bitmap-for-next 4/4] blk_mq: Fix cpumask_check()
- warning in blk_mq_hctx_next_cpu()
-In-Reply-To: <Yz7dC4zxby1CZphE@yury-laptop>
-References: <20221006122112.663119-1-vschneid@redhat.com>
- <20221006122112.663119-5-vschneid@redhat.com>
- <Yz7dC4zxby1CZphE@yury-laptop>
-Date:   Thu, 06 Oct 2022 16:17:21 +0100
-Message-ID: <xhsmhy1ttf0ce.mognet@vschneid.remote.csb>
+        Borislav Petkov <bp@alien8.de>,
+        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hugh Dickins <hughd@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>, Theodore Ts'o <tytso@mit.edu>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mm@kvack.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] treewide cleanup of random integer usage
+Message-ID: <Yz726M8q7RTNFKXb@zx2c4.com>
+References: <20221006132510.23374-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221006132510.23374-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/10/22 06:50, Yury Norov wrote:
-> On Thu, Oct 06, 2022 at 01:21:12PM +0100, Valentin Schneider wrote:
->> blk_mq_hctx_next_cpu() implements a form of cpumask_next_and_wrap() using
->> cpumask_next_and_cpu() and blk_mq_first_mapped_cpu():
->>
->> [    5.398453] WARNING: CPU: 3 PID: 162 at include/linux/cpumask.h:110 __blk_mq_delay_run_hw_queue+0x16b/0x180
->> [    5.399317] Modules linked in:
->> [    5.399646] CPU: 3 PID: 162 Comm: ssh-keygen Tainted: G                 N 6.0.0-rc4-00004-g93003cb24006 #55
->> [    5.400135] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->> [    5.405430] Call Trace:
->> [    5.406152]  <TASK>
->> [    5.406452]  blk_mq_sched_insert_requests+0x67/0x150
->> [    5.406759]  blk_mq_flush_plug_list+0xd0/0x280
->> [    5.406987]  ? bit_wait+0x60/0x60
->> [    5.407317]  __blk_flush_plug+0xdb/0x120
->> [    5.407561]  ? bit_wait+0x60/0x60
->> [    5.407765]  io_schedule_prepare+0x38/0x40
->> [...]
->>
->> This triggers a warning when next_cpu == nr_cpu_ids - 1, so rewrite it
->> using cpumask_next_and_wrap() directly. The backwards-going goto can be
->> removed, as the cpumask_next*() operation already ANDs hctx->cpumask and
->> cpu_online_mask, which implies checking for an online CPU.
->>
->> No change in behaviour intended.
->>
->> Suggested-by: Yury Norov <yury.norov@gmail.com>
->> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
->> ---
->>  block/blk-mq.c | 39 +++++++++++++--------------------------
->>  1 file changed, 13 insertions(+), 26 deletions(-)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index c96c8c4f751b..1520794dd9ea 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2038,42 +2038,29 @@ static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
->>   */
->>  static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
->>  {
->> -	bool tried = false;
->>      int next_cpu = hctx->next_cpu;
->>
->>      if (hctx->queue->nr_hw_queues == 1)
->>              return WORK_CPU_UNBOUND;
->>
->> -	if (--hctx->next_cpu_batch <= 0) {
->> -select_cpu:
->> -		next_cpu = cpumask_next_and(next_cpu, hctx->cpumask,
->> -				cpu_online_mask);
->> -		if (next_cpu >= nr_cpu_ids)
->> -			next_cpu = blk_mq_first_mapped_cpu(hctx);
->> +	if (--hctx->next_cpu_batch > 0 && cpu_online(next_cpu))
->> +		return next_cpu;
->> +
->> +	next_cpu = cpumask_next_and_wrap(next_cpu, hctx->cpumask, cpu_online_mask, next_cpu, false);
->
-> Last two parameters are simply useless. In fact, in many cases they
-> are useless for cpumask_next_wrap(). I'm working on simplifying the
-> cpumask_next_wrap() so that it would take just 2 parameters - pivot
-> point and cpumask.
->
-> Regarding 'next' version - we already have find_next_and_bit_wrap(),
-> and I think cpumask_next_and_wrap() should use it.
->
-
-Oh, I had missed those, that makes more sense indeed.
-
-> For the context: those last parameters are needed to exclude part of
-> cpumask from traversing, and to implement for-loop. Now that we have
-> for_each_cpu_wrap() based on for_each_set_bit_wrap(), it's possible
-> to remove them. I'm working on it.
-
-Sounds good.
-
+FYI, v3, which I'll wait a bit before posting, will also take care of
+get_random_int().
