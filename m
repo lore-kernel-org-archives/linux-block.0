@@ -2,151 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CC1C4332F
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 15:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3052BC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 15:17:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229575AbiJFPKD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 11:10:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38674 "EHLO
+        id S230129AbiJFPRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 11:17:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbiJFPKC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 11:10:02 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F236420F78;
-        Thu,  6 Oct 2022 08:09:58 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id b15so2011951pje.1;
-        Thu, 06 Oct 2022 08:09:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date;
-        bh=TDjphh1QdcaQ9ECGpDAMca94QNs69RGi+PB3mg6hmDA=;
-        b=Md88KWJT/EWX1VvDMAXJccXtQoPCFfF8/m40LJ9uU0boab9RANFM6c2e0Bff6pg0Rb
-         DUv+aZCuqc1czFRezxz7HARKch62TdoWedlMIY6kY6lI8+w3e3MjapciWzT9FhinAkiN
-         5umP0vstYS17YClKveHiDtGcLMW0VY8YoWG6qfMMM9K0+OByKmO12Z69S+mLDBIrJ2JD
-         Qwd5+PQthIuSVWSfnYd1+Sta8DWPX1/XYXzPPul1VOicH3JXWEFz7T9SUIK+kmp4TLBN
-         /fl5PenIslLO68/VWOXJanL23/dgNCNUwn4rlisUcAVq1Syz470i4Cwkp4iUV94ktjsu
-         b64g==
+        with ESMTP id S229714AbiJFPR2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 11:17:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6507A59A6
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 08:17:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665069446;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LaNanz1TbIo0L9kCY4HbAhnT0dLLrBmpJdnr9yzBj4w=;
+        b=U2WQLXHsN2wyJi95xYNmT3DnvTADRqi5epC7ZObTJP3CPW4R0VwVGwXoBLfrtMmW7holD1
+        jez42EsWYokUBGZK6hsvFGwYGuoaxRueJdtScp+Ltd6gIvhu7UFNi7Wd6GSgCyMoJYQ+tN
+        xYGhQftQCdbcnVTkWsScgkUSKmy9KJw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-503-ArCh5ojcNs-3TxEjMiq5pQ-1; Thu, 06 Oct 2022 11:17:25 -0400
+X-MC-Unique: ArCh5ojcNs-3TxEjMiq5pQ-1
+Received: by mail-wr1-f71.google.com with SMTP id k30-20020adfb35e000000b0022e04708c18so646704wrd.22
+        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 08:17:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=TDjphh1QdcaQ9ECGpDAMca94QNs69RGi+PB3mg6hmDA=;
-        b=E05H8wmvcVAdov9vzRiC/6OxmunaM4qVAImhBRJsZEDUN790XUte3voeZvCJz6BHpV
-         Uf6tyV2StuPqp+MoOF0ukjeNmXUkfJ3mVDL6rwR7TGPslbMcphfGyqSpc27gjU90BNeF
-         eCIWmTV+jAjS9gLEocfV4rgWW4IrGLSLLBF/QjpPzilMt6sJpgrTnnUvkGzU03IgUhB0
-         57S/JBD0eavu+knV+VJYV9u4YdZxH65AERiKsyJkdaD4iTH4LaYZU9CivADj/9hfbbcG
-         rRh2XTEoJvHdr5sfP/R4hEUVkcVjwzdC/y6t8O0rnQzLD4juZnsPomx7oiB2AH9VFOKf
-         h74w==
-X-Gm-Message-State: ACrzQf1P6lW++My5CFWDjl/TX+dNDD0gZiSGpUUcRlMG+bH1K4WdFUZa
-        CV3TAzy4yXk6O1j/ux8ktJG8nWmIOmHpypgh
-X-Google-Smtp-Source: AMsMyM5e+oKrl4FKRNapq/rzhRs5YOwwV2H/HtcCSmY4AVIRvz7EQI+AGHZ3ItSqQBgv/4yvd2z6IQ==
-X-Received: by 2002:a17:902:bcc3:b0:178:639a:1a10 with SMTP id o3-20020a170902bcc300b00178639a1a10mr326763pls.159.1665068998112;
-        Thu, 06 Oct 2022 08:09:58 -0700 (PDT)
-Received: from T590 ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170903404a00b00172a670607asm12335746pla.300.2022.10.06.08.09.51
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LaNanz1TbIo0L9kCY4HbAhnT0dLLrBmpJdnr9yzBj4w=;
+        b=gXtpEMzcoQF3ka5VRc2dvkLOiZVmFXXTcqAY2gEM+h7H4NrhDvtCCmh3/wUBKpy+dk
+         pOID9vda18Tsk2CC5qXGkk9stbX2yvtTGItO8wwwNGo10BE+TVg1DmJg/3BWg89/Gztm
+         QKBMnsjeA/10ovuModpyxQWEzMuhD5xHlQed3bAtqlIKLNxcGICRptxb3mb+GZzQKfVn
+         R8bliRczgdE37PUSI4sbOWI4T7mHEPT5lXmEaN5I9r3TeZl3XsiZiQU/JtWHRaB3TzHA
+         m2We8wMJLRCNJLbH1MMTpkd82frHuNCfDvQzjHfVPs97Kskauefb6qbfS+bVR9O5i3P/
+         /v3g==
+X-Gm-Message-State: ACrzQf0d1NnvWq2ug/QJtJDUt5tQNOk4Mtwat6FFkHJu7Qfyqxa58OXp
+        nyRZVdaeZyjx4fJYdOF1cuVPDAqWJUjIub2eIcOuQclt0/oFDlpnqHNwvvrf52ngZsDOxLUbkUV
+        06KxKKcD4zebiPelYZrvcpm8=
+X-Received: by 2002:a05:600c:4254:b0:3bd:c9c9:92cc with SMTP id r20-20020a05600c425400b003bdc9c992ccmr7609142wmm.151.1665069443636;
+        Thu, 06 Oct 2022 08:17:23 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5xBGuQWsrC6rFfTPmTdLaQ20XGGEkPMobtqTJ6wfL4EKokOUZjDvFcpkEkxoCTA0HgUj6O1Q==
+X-Received: by 2002:a05:600c:4254:b0:3bd:c9c9:92cc with SMTP id r20-20020a05600c425400b003bdc9c992ccmr7609126wmm.151.1665069443377;
+        Thu, 06 Oct 2022 08:17:23 -0700 (PDT)
+Received: from vschneid.remote.csb ([149.71.65.94])
+        by smtp.gmail.com with ESMTPSA id p3-20020a5d4e03000000b002238ea5750csm21354407wrt.72.2022.10.06.08.17.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 08:09:57 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 23:09:48 +0800
-From:   Ming Lei <tom.leiming@gmail.com>
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     "Denis V. Lunev" <den@virtuozzo.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: ublk-qcow2: ublk-qcow2 is available
-Message-ID: <Yz7vvNKSNRyBVObo@T590>
-References: <Yza1u1KfKa7ycQm0@T590>
- <Yzs9xQlVuW41TuNC@fedora>
- <6659a0d5-60ab-9ac7-d25d-b4ff1940c6ab@virtuozzo.com>
- <Yz2epPwoufj0mug/@fedora>
- <Yz6tR24T8HPHJ70D@T590>
- <Yz7fTANAxAQ8KT4v@fedora>
+        Thu, 06 Oct 2022 08:17:22 -0700 (PDT)
+From:   Valentin Schneider <vschneid@redhat.com>
+To:     Yury Norov <yury.norov@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [RFC PATCH bitmap-for-next 4/4] blk_mq: Fix cpumask_check()
+ warning in blk_mq_hctx_next_cpu()
+In-Reply-To: <Yz7dC4zxby1CZphE@yury-laptop>
+References: <20221006122112.663119-1-vschneid@redhat.com>
+ <20221006122112.663119-5-vschneid@redhat.com>
+ <Yz7dC4zxby1CZphE@yury-laptop>
+Date:   Thu, 06 Oct 2022 16:17:21 +0100
+Message-ID: <xhsmhy1ttf0ce.mognet@vschneid.remote.csb>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yz7fTANAxAQ8KT4v@fedora>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 09:59:40AM -0400, Stefan Hajnoczi wrote:
-> On Thu, Oct 06, 2022 at 06:26:15PM +0800, Ming Lei wrote:
-> > On Wed, Oct 05, 2022 at 11:11:32AM -0400, Stefan Hajnoczi wrote:
-> > > On Tue, Oct 04, 2022 at 01:57:50AM +0200, Denis V. Lunev wrote:
-> > > > On 10/3/22 21:53, Stefan Hajnoczi wrote:
-> > > > > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
-> > > > > > ublk-qcow2 is available now.
-> > > > > Cool, thanks for sharing!
-> > > > yep
-> > > > 
-> > > > > > So far it provides basic read/write function, and compression and snapshot
-> > > > > > aren't supported yet. The target/backend implementation is completely
-> > > > > > based on io_uring, and share the same io_uring with ublk IO command
-> > > > > > handler, just like what ublk-loop does.
-> > > > > > 
-> > > > > > Follows the main motivations of ublk-qcow2:
-> > > > > > 
-> > > > > > - building one complicated target from scratch helps libublksrv APIs/functions
-> > > > > >    become mature/stable more quickly, since qcow2 is complicated and needs more
-> > > > > >    requirement from libublksrv compared with other simple ones(loop, null)
-> > > > > > 
-> > > > > > - there are several attempts of implementing qcow2 driver in kernel, such as
-> > > > > >    ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
-> > > > > >    might useful be for covering requirement in this field
-> > > > There is one important thing to keep in mind about all partly-userspace
-> > > > implementations though:
-> > > > * any single allocation happened in the context of the
-> > > >    userspace daemon through try_to_free_pages() in
-> > > >    kernel has a possibility to trigger the operation,
-> > > >    which will require userspace daemon action, which
-> > > >    is inside the kernel now.
-> > > > * the probability of this is higher in the overcommitted
-> > > >    environment
-> > > > 
-> > > > This was the main motivation of us in favor for the in-kernel
-> > > > implementation.
-> > > 
-> > > CCed Josef Bacik because the Linux NBD driver has dealt with memory
-> > > reclaim hangs in the past.
-> > > 
-> > > Josef: Any thoughts on userspace block drivers (whether NBD or ublk) and
-> > > how to avoid hangs in memory reclaim?
-> > 
-> > If I remember correctly, there isn't new report after the last NBD(TCMU) deadlock
-> > in memory reclaim was addressed by 8d19f1c8e193 ("prctl: PR_{G,S}ET_IO_FLUSHER
-> > to support controlling memory reclaim").
-> 
-> Denis: I'm trying to understand the problem you described. Is this
-> correct:
-> 
-> Due to memory pressure, the kernel reclaims pages and submits a write to
-> a ublk block device. The userspace process attempts to allocate memory
-> in order to service the write request, but it gets stuck because there
-> is no memory available. As a result reclaim gets stuck, the system is
-> unable to free more memory and therefore it hangs?
+On 06/10/22 06:50, Yury Norov wrote:
+> On Thu, Oct 06, 2022 at 01:21:12PM +0100, Valentin Schneider wrote:
+>> blk_mq_hctx_next_cpu() implements a form of cpumask_next_and_wrap() using
+>> cpumask_next_and_cpu() and blk_mq_first_mapped_cpu():
+>>
+>> [    5.398453] WARNING: CPU: 3 PID: 162 at include/linux/cpumask.h:110 __blk_mq_delay_run_hw_queue+0x16b/0x180
+>> [    5.399317] Modules linked in:
+>> [    5.399646] CPU: 3 PID: 162 Comm: ssh-keygen Tainted: G                 N 6.0.0-rc4-00004-g93003cb24006 #55
+>> [    5.400135] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+>> [    5.405430] Call Trace:
+>> [    5.406152]  <TASK>
+>> [    5.406452]  blk_mq_sched_insert_requests+0x67/0x150
+>> [    5.406759]  blk_mq_flush_plug_list+0xd0/0x280
+>> [    5.406987]  ? bit_wait+0x60/0x60
+>> [    5.407317]  __blk_flush_plug+0xdb/0x120
+>> [    5.407561]  ? bit_wait+0x60/0x60
+>> [    5.407765]  io_schedule_prepare+0x38/0x40
+>> [...]
+>>
+>> This triggers a warning when next_cpu == nr_cpu_ids - 1, so rewrite it
+>> using cpumask_next_and_wrap() directly. The backwards-going goto can be
+>> removed, as the cpumask_next*() operation already ANDs hctx->cpumask and
+>> cpu_online_mask, which implies checking for an online CPU.
+>>
+>> No change in behaviour intended.
+>>
+>> Suggested-by: Yury Norov <yury.norov@gmail.com>
+>> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+>> ---
+>>  block/blk-mq.c | 39 +++++++++++++--------------------------
+>>  1 file changed, 13 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index c96c8c4f751b..1520794dd9ea 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2038,42 +2038,29 @@ static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
+>>   */
+>>  static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+>>  {
+>> -	bool tried = false;
+>>      int next_cpu = hctx->next_cpu;
+>>
+>>      if (hctx->queue->nr_hw_queues == 1)
+>>              return WORK_CPU_UNBOUND;
+>>
+>> -	if (--hctx->next_cpu_batch <= 0) {
+>> -select_cpu:
+>> -		next_cpu = cpumask_next_and(next_cpu, hctx->cpumask,
+>> -				cpu_online_mask);
+>> -		if (next_cpu >= nr_cpu_ids)
+>> -			next_cpu = blk_mq_first_mapped_cpu(hctx);
+>> +	if (--hctx->next_cpu_batch > 0 && cpu_online(next_cpu))
+>> +		return next_cpu;
+>> +
+>> +	next_cpu = cpumask_next_and_wrap(next_cpu, hctx->cpumask, cpu_online_mask, next_cpu, false);
+>
+> Last two parameters are simply useless. In fact, in many cases they
+> are useless for cpumask_next_wrap(). I'm working on simplifying the
+> cpumask_next_wrap() so that it would take just 2 parameters - pivot
+> point and cpumask.
+>
+> Regarding 'next' version - we already have find_next_and_bit_wrap(),
+> and I think cpumask_next_and_wrap() should use it.
+>
 
-The process should be killed in this situation if PR_SET_IO_FLUSHER
-is applied since the page allocation is done in VM fault handler.
+Oh, I had missed those, that makes more sense indeed.
 
-Firstly in theory the userspace part should provide forward progress
-guarantee in code path for handling IO, such as reserving/mlock pages
-for such situation. However, this issue isn't unique for nbd or ublk,
-all userspace block device should have such potential risk, and vduse
-is no exception, IMO.
+> For the context: those last parameters are needed to exclude part of
+> cpumask from traversing, and to implement for-loop. Now that we have
+> for_each_cpu_wrap() based on for_each_set_bit_wrap(), it's possible
+> to remove them. I'm working on it.
 
-Secondly with proper/enough swap space, I think it is hard to trigger
-such kind of issue.
+Sounds good.
 
-Finally ublk driver has added user recovery commands for recovering from
-crash, and ublksrv will support it soon.
-
-Thanks,
-Ming
