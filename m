@@ -2,181 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1412C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 09:08:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B1AC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 10:14:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231259AbiJFJIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 05:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49296 "EHLO
+        id S229637AbiJFKON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 06:14:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbiJFJIA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 05:08:00 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2138B2E2
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 02:07:57 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id b7so1664995wrq.9
-        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 02:07:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=1aJ5REXRMTq1sh1mUk4G4sr0eg6/nM0EyPCJJ1eSDvw=;
-        b=oj64Vi+eOZpuQI+htjvWY8sZHF5q7NbF+S/U6svj8thZ8X+Vg61vlsVc/qwgGMjZPa
-         VXvzaKeVOCf0sB0AzJGjZIAqfcpn0ScowzTj6E2p3tNJjjJFXlcuAxAxwbmYjy2X4PxD
-         p5817amn3pGou9aDw3/3LN7zIHRtbNzeztLeODaCwncXV9oP4atBx6VB6dzF8F3BKapK
-         8eq4LlFlCBqQ4Cc07YqQahf8C0LJxg4oWEy3v3wrV+QakfsJ2mtsguJXew72RomAcHro
-         r2hI6ZgNVmzk3lDJEllh7IW2xAz8etTQX5Bo6N2ds44bV2iJpDX7XuEyc+8VFIfw5J7M
-         vpMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=1aJ5REXRMTq1sh1mUk4G4sr0eg6/nM0EyPCJJ1eSDvw=;
-        b=K4j1QmsYlQZYRw1FD/yHtY2mFJHi6JZ3AepSWya+I2TtvYY3JGOhvQUUI6vLd7boYy
-         lIZfJ6PtYDGsLN79B6M16fpMkxyjxctkxSfZ6KMxzFNc6ljdQJYpEwvr1geEPcEF23wi
-         HxBUZQqpTRd/G264sarKgftLY1T4U4G0vdbXN6WJSF0heIfPE1+0UBEUkh9v6aOQ83Z9
-         2N0G9OVAqtjUGektL/uM1oVMDY2He8EZlNXqkyWOr5hVlMKHjHjju2I3HDViTRqLNkuy
-         Z/iqnOchegk+uZwpmWxnUjCg/Wv4uDGswh+kySFf+Zl+cPjD7yo1cjztr9kBzv+ff61E
-         7xJA==
-X-Gm-Message-State: ACrzQf3bFzSr/2XkFFDFcc/Dwg073riEzNOa7OMsHOOrqnOXk5kgZgg4
-        W1VOv0AKGUjqSmhPyPFj3ihweg==
-X-Google-Smtp-Source: AMsMyM4T3aR66ySnGUYOn1F8FVH43uhaw24LlS828ZglEOXX6NaXvHYdoyqonBfmR2ibWCuDf+ldjg==
-X-Received: by 2002:a5d:4889:0:b0:22b:214:38dd with SMTP id g9-20020a5d4889000000b0022b021438ddmr2603126wrq.32.1665047276144;
-        Thu, 06 Oct 2022 02:07:56 -0700 (PDT)
-Received: from [10.43.66.1] (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
-        by smtp.gmail.com with ESMTPSA id l20-20020a1c7914000000b003b47ff307e1sm873687wme.31.2022.10.06.02.07.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Oct 2022 02:07:55 -0700 (PDT)
-Message-ID: <892bcf4d-70d9-8833-9449-c55fa719158e@linbit.com>
-Date:   Thu, 6 Oct 2022 11:07:54 +0200
+        with ESMTP id S230283AbiJFKOJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 06:14:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 352EF56BAF
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 03:14:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665051247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dAdYI9+QG+yvH01DAjeN7mJ9hlotsPkqRPFvWXOIksI=;
+        b=fpA5wdgmLaiCfH4SI5/EeifNS+aUX87ySPvpkmkbyHxuzwexsMWOhzXTiml7tL4MXmJ5cA
+        gM8DN+eT1ejMt5AEzzPoj+xF9RFv4az4TEvOIFUxKbwQktxOBjDlQa0WjXteShcHUszcJv
+        ZWZ0A1kWD461S0SAwgGck1LiTHqVhcc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-518-SWus2_ThNQC2TQKOd7pj9g-1; Thu, 06 Oct 2022 06:14:02 -0400
+X-MC-Unique: SWus2_ThNQC2TQKOd7pj9g-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B209C29AA2F4;
+        Thu,  6 Oct 2022 10:14:01 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.193])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 24E49477F55;
+        Thu,  6 Oct 2022 10:14:01 +0000 (UTC)
+Date:   Thu, 6 Oct 2022 11:14:00 +0100
+From:   "Richard W.M. Jones" <rjones@redhat.com>
+To:     Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Ming Lei <tom.leiming@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Kirill Tkhai <kirill.tkhai@openvz.org>,
+        Manuel Bentele <development@manuel-bentele.de>,
+        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+        Xie Yongji <xieyongji@bytedance.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+Message-ID: <20221006101400.GC7636@redhat.com>
+References: <Yza1u1KfKa7ycQm0@T590>
+ <Yzs9xQlVuW41TuNC@fedora>
+ <YzwARuAZdaoGTUfP@T590>
+ <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v1 1/5] treewide: use prandom_u32_max() when possible
-Content-Language: en-US
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-References: <20221005214844.2699-1-Jason@zx2c4.com>
- <20221005214844.2699-2-Jason@zx2c4.com>
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20221005214844.2699-2-Jason@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05.10.22 23:48, Jason A. Donenfeld wrote:
-> Rather than incurring a division or requesting too many random bytes for
-> the given range, use the prandom_u32_max() function, which only takes
-> the minimum required bytes from the RNG and avoids divisions.
-> 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  arch/x86/mm/pat/cpa-test.c                    |  4 +-
->  crypto/testmgr.c                              | 86 +++++++++----------
->  drivers/block/drbd/drbd_receiver.c            |  4 +-
+On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajnoczi wrote:
+> qemu-nbd doesn't use io_uring to handle the backend IO,
 
-For the drbd part:
+Would this be fixed by your (not yet upstream) libblkio driver for
+qemu?
 
-Reviewed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Rich.
 
->  drivers/infiniband/core/cma.c                 |  2 +-
->  drivers/infiniband/hw/cxgb4/id_table.c        |  4 +-
->  drivers/infiniband/hw/hns/hns_roce_ah.c       |  5 +-
->  drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  3 +-
->  drivers/mmc/core/core.c                       |  4 +-
->  drivers/mmc/host/dw_mmc.c                     |  2 +-
->  drivers/mtd/nand/raw/nandsim.c                |  4 +-
->  drivers/mtd/tests/mtd_nandecctest.c           | 10 +--
->  drivers/mtd/tests/stresstest.c                | 17 +---
->  drivers/mtd/ubi/debug.c                       |  2 +-
->  drivers/mtd/ubi/debug.h                       |  6 +-
->  drivers/net/ethernet/broadcom/cnic.c          |  3 +-
->  .../chelsio/inline_crypto/chtls/chtls_io.c    |  4 +-
->  drivers/net/hamradio/baycom_epp.c             |  2 +-
->  drivers/net/hamradio/hdlcdrv.c                |  2 +-
->  drivers/net/hamradio/yam.c                    |  2 +-
->  drivers/net/phy/at803x.c                      |  2 +-
->  .../broadcom/brcm80211/brcmfmac/p2p.c         |  2 +-
->  .../net/wireless/intel/iwlwifi/mvm/mac-ctxt.c |  2 +-
->  drivers/scsi/fcoe/fcoe_ctlr.c                 |  4 +-
->  drivers/scsi/qedi/qedi_main.c                 |  2 +-
->  fs/ceph/inode.c                               |  2 +-
->  fs/ceph/mdsmap.c                              |  2 +-
->  fs/ext4/super.c                               |  7 +-
->  fs/f2fs/gc.c                                  |  2 +-
->  fs/f2fs/segment.c                             |  8 +-
->  fs/ubifs/debug.c                              |  8 +-
->  fs/ubifs/lpt_commit.c                         | 14 +--
->  fs/ubifs/tnc_commit.c                         |  2 +-
->  fs/xfs/libxfs/xfs_alloc.c                     |  2 +-
->  fs/xfs/libxfs/xfs_ialloc.c                    |  2 +-
->  fs/xfs/xfs_error.c                            |  2 +-
->  kernel/time/clocksource.c                     |  2 +-
->  lib/fault-inject.c                            |  2 +-
->  lib/find_bit_benchmark.c                      |  4 +-
->  lib/reed_solomon/test_rslib.c                 |  6 +-
->  lib/sbitmap.c                                 |  4 +-
->  lib/test_list_sort.c                          |  2 +-
->  lib/test_vmalloc.c                            | 17 +---
->  net/ceph/mon_client.c                         |  2 +-
->  net/ceph/osd_client.c                         |  2 +-
->  net/core/neighbour.c                          |  2 +-
->  net/core/pktgen.c                             | 43 +++++-----
->  net/core/stream.c                             |  2 +-
->  net/ipv4/igmp.c                               |  6 +-
->  net/ipv4/inet_connection_sock.c               |  2 +-
->  net/ipv4/inet_hashtables.c                    |  2 +-
->  net/ipv6/addrconf.c                           |  8 +-
->  net/ipv6/mcast.c                              | 10 +--
->  net/netfilter/ipvs/ip_vs_twos.c               |  4 +-
->  net/packet/af_packet.c                        |  2 +-
->  net/sched/act_gact.c                          |  2 +-
->  net/sched/act_sample.c                        |  2 +-
->  net/sched/sch_netem.c                         |  4 +-
->  net/sctp/socket.c                             |  2 +-
->  net/sunrpc/cache.c                            |  2 +-
->  net/sunrpc/xprtsock.c                         |  2 +-
->  net/tipc/socket.c                             |  2 +-
->  net/xfrm/xfrm_state.c                         |  2 +-
->  62 files changed, 173 insertions(+), 196 deletions(-)
-> 
-[...]
-> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> index af4c7d65490b..d8b1417dc503 100644
-> --- a/drivers/block/drbd/drbd_receiver.c
-> +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -781,7 +781,7 @@ static struct socket *drbd_wait_for_connect(struct drbd_connection *connection,
->  
->  	timeo = connect_int * HZ;
->  	/* 28.5% random jitter */
-> -	timeo += (prandom_u32() & 1) ? timeo / 7 : -timeo / 7;
-> +	timeo += prandom_u32_max(2) ? timeo / 7 : -timeo / 7;
->  
->  	err = wait_for_completion_interruptible_timeout(&ad->door_bell, timeo);
->  	if (err <= 0)
-> @@ -1004,7 +1004,7 @@ static int conn_connect(struct drbd_connection *connection)
->  				drbd_warn(connection, "Error receiving initial packet\n");
->  				sock_release(s);
->  randomize:
-> -				if (prandom_u32() & 1)
-> +				if (prandom_u32_max(2))
->  					goto retry;
->  			}
->  		}[...]
+-- 
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
 
-(Had to cut out most of the CC list because Google complains about "too many
-recipients").
-
---
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
