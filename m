@@ -2,65 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3735C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 08:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1412C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 09:08:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231196AbiJFIpE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 04:45:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41598 "EHLO
+        id S231259AbiJFJIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 05:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231147AbiJFIpD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 04:45:03 -0400
-Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5468E4AD58;
-        Thu,  6 Oct 2022 01:44:58 -0700 (PDT)
-Received: from ([60.208.111.195])
-        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id BKZ00051;
-        Thu, 06 Oct 2022 16:44:51 +0800
-Received: from localhost.localdomain (10.200.104.82) by
- jtjnmail201603.home.langchao.com (10.100.2.3) with Microsoft SMTP Server id
- 15.1.2507.12; Thu, 6 Oct 2022 16:44:52 +0800
-From:   Deming Wang <wangdeming@inspur.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Deming Wang <wangdeming@inspur.com>
-Subject: [PATCH] block: Remove the repeat word 'can'
-Date:   Thu, 6 Oct 2022 04:44:50 -0400
-Message-ID: <20221006084450.1513-1-wangdeming@inspur.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S229637AbiJFJIA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 05:08:00 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2138B2E2
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 02:07:57 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id b7so1664995wrq.9
+        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 02:07:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=1aJ5REXRMTq1sh1mUk4G4sr0eg6/nM0EyPCJJ1eSDvw=;
+        b=oj64Vi+eOZpuQI+htjvWY8sZHF5q7NbF+S/U6svj8thZ8X+Vg61vlsVc/qwgGMjZPa
+         VXvzaKeVOCf0sB0AzJGjZIAqfcpn0ScowzTj6E2p3tNJjjJFXlcuAxAxwbmYjy2X4PxD
+         p5817amn3pGou9aDw3/3LN7zIHRtbNzeztLeODaCwncXV9oP4atBx6VB6dzF8F3BKapK
+         8eq4LlFlCBqQ4Cc07YqQahf8C0LJxg4oWEy3v3wrV+QakfsJ2mtsguJXew72RomAcHro
+         r2hI6ZgNVmzk3lDJEllh7IW2xAz8etTQX5Bo6N2ds44bV2iJpDX7XuEyc+8VFIfw5J7M
+         vpMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=1aJ5REXRMTq1sh1mUk4G4sr0eg6/nM0EyPCJJ1eSDvw=;
+        b=K4j1QmsYlQZYRw1FD/yHtY2mFJHi6JZ3AepSWya+I2TtvYY3JGOhvQUUI6vLd7boYy
+         lIZfJ6PtYDGsLN79B6M16fpMkxyjxctkxSfZ6KMxzFNc6ljdQJYpEwvr1geEPcEF23wi
+         HxBUZQqpTRd/G264sarKgftLY1T4U4G0vdbXN6WJSF0heIfPE1+0UBEUkh9v6aOQ83Z9
+         2N0G9OVAqtjUGektL/uM1oVMDY2He8EZlNXqkyWOr5hVlMKHjHjju2I3HDViTRqLNkuy
+         Z/iqnOchegk+uZwpmWxnUjCg/Wv4uDGswh+kySFf+Zl+cPjD7yo1cjztr9kBzv+ff61E
+         7xJA==
+X-Gm-Message-State: ACrzQf3bFzSr/2XkFFDFcc/Dwg073riEzNOa7OMsHOOrqnOXk5kgZgg4
+        W1VOv0AKGUjqSmhPyPFj3ihweg==
+X-Google-Smtp-Source: AMsMyM4T3aR66ySnGUYOn1F8FVH43uhaw24LlS828ZglEOXX6NaXvHYdoyqonBfmR2ibWCuDf+ldjg==
+X-Received: by 2002:a5d:4889:0:b0:22b:214:38dd with SMTP id g9-20020a5d4889000000b0022b021438ddmr2603126wrq.32.1665047276144;
+        Thu, 06 Oct 2022 02:07:56 -0700 (PDT)
+Received: from [10.43.66.1] (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
+        by smtp.gmail.com with ESMTPSA id l20-20020a1c7914000000b003b47ff307e1sm873687wme.31.2022.10.06.02.07.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Oct 2022 02:07:55 -0700 (PDT)
+Message-ID: <892bcf4d-70d9-8833-9449-c55fa719158e@linbit.com>
+Date:   Thu, 6 Oct 2022 11:07:54 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.200.104.82]
-tUid:   202210061644511c3f968f2379d69f85dbb1d08d96c882
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1 1/5] treewide: use prandom_u32_max() when possible
+Content-Language: en-US
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+References: <20221005214844.2699-1-Jason@zx2c4.com>
+ <20221005214844.2699-2-Jason@zx2c4.com>
+From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+In-Reply-To: <20221005214844.2699-2-Jason@zx2c4.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the repeat word 'can' from the comments of bio_kmalloc.
+On 05.10.22 23:48, Jason A. Donenfeld wrote:
+> Rather than incurring a division or requesting too many random bytes for
+> the given range, use the prandom_u32_max() function, which only takes
+> the minimum required bytes from the RNG and avoids divisions.
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  arch/x86/mm/pat/cpa-test.c                    |  4 +-
+>  crypto/testmgr.c                              | 86 +++++++++----------
+>  drivers/block/drbd/drbd_receiver.c            |  4 +-
 
-Signed-off-by: Deming Wang <wangdeming@inspur.com>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+For the drbd part:
 
-diff --git a/block/bio.c b/block/bio.c
-index ec350e040b64..633a902468ec 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -567,7 +567,7 @@ EXPORT_SYMBOL(bio_alloc_bioset);
-  * be reused by calling bio_uninit() before calling bio_init() again.
-  *
-  * Note that unlike bio_alloc() or bio_alloc_bioset() allocations from this
-- * function are not backed by a mempool can can fail.  Do not use this function
-+ * function are not backed by a mempool can fail.  Do not use this function
-  * for allocations in the file system I/O path.
-  *
-  * Returns: Pointer to new bio on success, NULL on failure.
--- 
-2.27.0
+Reviewed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 
+>  drivers/infiniband/core/cma.c                 |  2 +-
+>  drivers/infiniband/hw/cxgb4/id_table.c        |  4 +-
+>  drivers/infiniband/hw/hns/hns_roce_ah.c       |  5 +-
+>  drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  3 +-
+>  drivers/mmc/core/core.c                       |  4 +-
+>  drivers/mmc/host/dw_mmc.c                     |  2 +-
+>  drivers/mtd/nand/raw/nandsim.c                |  4 +-
+>  drivers/mtd/tests/mtd_nandecctest.c           | 10 +--
+>  drivers/mtd/tests/stresstest.c                | 17 +---
+>  drivers/mtd/ubi/debug.c                       |  2 +-
+>  drivers/mtd/ubi/debug.h                       |  6 +-
+>  drivers/net/ethernet/broadcom/cnic.c          |  3 +-
+>  .../chelsio/inline_crypto/chtls/chtls_io.c    |  4 +-
+>  drivers/net/hamradio/baycom_epp.c             |  2 +-
+>  drivers/net/hamradio/hdlcdrv.c                |  2 +-
+>  drivers/net/hamradio/yam.c                    |  2 +-
+>  drivers/net/phy/at803x.c                      |  2 +-
+>  .../broadcom/brcm80211/brcmfmac/p2p.c         |  2 +-
+>  .../net/wireless/intel/iwlwifi/mvm/mac-ctxt.c |  2 +-
+>  drivers/scsi/fcoe/fcoe_ctlr.c                 |  4 +-
+>  drivers/scsi/qedi/qedi_main.c                 |  2 +-
+>  fs/ceph/inode.c                               |  2 +-
+>  fs/ceph/mdsmap.c                              |  2 +-
+>  fs/ext4/super.c                               |  7 +-
+>  fs/f2fs/gc.c                                  |  2 +-
+>  fs/f2fs/segment.c                             |  8 +-
+>  fs/ubifs/debug.c                              |  8 +-
+>  fs/ubifs/lpt_commit.c                         | 14 +--
+>  fs/ubifs/tnc_commit.c                         |  2 +-
+>  fs/xfs/libxfs/xfs_alloc.c                     |  2 +-
+>  fs/xfs/libxfs/xfs_ialloc.c                    |  2 +-
+>  fs/xfs/xfs_error.c                            |  2 +-
+>  kernel/time/clocksource.c                     |  2 +-
+>  lib/fault-inject.c                            |  2 +-
+>  lib/find_bit_benchmark.c                      |  4 +-
+>  lib/reed_solomon/test_rslib.c                 |  6 +-
+>  lib/sbitmap.c                                 |  4 +-
+>  lib/test_list_sort.c                          |  2 +-
+>  lib/test_vmalloc.c                            | 17 +---
+>  net/ceph/mon_client.c                         |  2 +-
+>  net/ceph/osd_client.c                         |  2 +-
+>  net/core/neighbour.c                          |  2 +-
+>  net/core/pktgen.c                             | 43 +++++-----
+>  net/core/stream.c                             |  2 +-
+>  net/ipv4/igmp.c                               |  6 +-
+>  net/ipv4/inet_connection_sock.c               |  2 +-
+>  net/ipv4/inet_hashtables.c                    |  2 +-
+>  net/ipv6/addrconf.c                           |  8 +-
+>  net/ipv6/mcast.c                              | 10 +--
+>  net/netfilter/ipvs/ip_vs_twos.c               |  4 +-
+>  net/packet/af_packet.c                        |  2 +-
+>  net/sched/act_gact.c                          |  2 +-
+>  net/sched/act_sample.c                        |  2 +-
+>  net/sched/sch_netem.c                         |  4 +-
+>  net/sctp/socket.c                             |  2 +-
+>  net/sunrpc/cache.c                            |  2 +-
+>  net/sunrpc/xprtsock.c                         |  2 +-
+>  net/tipc/socket.c                             |  2 +-
+>  net/xfrm/xfrm_state.c                         |  2 +-
+>  62 files changed, 173 insertions(+), 196 deletions(-)
+> 
+[...]
+> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+> index af4c7d65490b..d8b1417dc503 100644
+> --- a/drivers/block/drbd/drbd_receiver.c
+> +++ b/drivers/block/drbd/drbd_receiver.c
+> @@ -781,7 +781,7 @@ static struct socket *drbd_wait_for_connect(struct drbd_connection *connection,
+>  
+>  	timeo = connect_int * HZ;
+>  	/* 28.5% random jitter */
+> -	timeo += (prandom_u32() & 1) ? timeo / 7 : -timeo / 7;
+> +	timeo += prandom_u32_max(2) ? timeo / 7 : -timeo / 7;
+>  
+>  	err = wait_for_completion_interruptible_timeout(&ad->door_bell, timeo);
+>  	if (err <= 0)
+> @@ -1004,7 +1004,7 @@ static int conn_connect(struct drbd_connection *connection)
+>  				drbd_warn(connection, "Error receiving initial packet\n");
+>  				sock_release(s);
+>  randomize:
+> -				if (prandom_u32() & 1)
+> +				if (prandom_u32_max(2))
+>  					goto retry;
+>  			}
+>  		}[...]
+
+(Had to cut out most of the CC list because Google complains about "too many
+recipients").
+
+--
+Christoph Böhmwalder
+LINBIT | Keeping the Digital World Running
+DRBD HA —  Disaster Recovery — Software defined Storage
