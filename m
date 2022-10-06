@@ -2,156 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5F4C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 13:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C4FC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 14:45:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231211AbiJFN7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 09:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39572 "EHLO
+        id S231829AbiJFOpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 10:45:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbiJFN7u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 09:59:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3BEFB1F2
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 06:59:48 -0700 (PDT)
+        with ESMTP id S231882AbiJFOpO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 10:45:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E839692F4C
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 07:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665064787;
+        s=mimecast20190719; t=1665067503;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=wvAFTm8FdW2/6pnC/amNx72dguHCE6Nha3ZiXPtT6Ek=;
-        b=SGlr3MYGXNCC9JLvoOM4ehGngvBlee55Kvufj3HmNTCxFIcClHqovd25zWhEh4vQuH+D0n
-        P2mDX/FqGzs7UPgJsU4htUcFlgD58gt2gXQsmq43mw163AfqhTshrfy3UYZdHmdGsvDnhq
-        n/5gnL7Fu2O7kRLZpU9e0iEkVWbQ55E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-74-pkRHXZp8OU-oqy8cOmgpJQ-1; Thu, 06 Oct 2022 09:59:44 -0400
-X-MC-Unique: pkRHXZp8OU-oqy8cOmgpJQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D0075855307;
-        Thu,  6 Oct 2022 13:59:43 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.119])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C1523111E412;
-        Thu,  6 Oct 2022 13:59:42 +0000 (UTC)
-Date:   Thu, 6 Oct 2022 09:59:40 -0400
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     "Denis V. Lunev" <den@virtuozzo.com>
-Cc:     Ming Lei <tom.leiming@gmail.com>, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: ublk-qcow2: ublk-qcow2 is available
-Message-ID: <Yz7fTANAxAQ8KT4v@fedora>
-References: <Yza1u1KfKa7ycQm0@T590>
- <Yzs9xQlVuW41TuNC@fedora>
- <6659a0d5-60ab-9ac7-d25d-b4ff1940c6ab@virtuozzo.com>
- <Yz2epPwoufj0mug/@fedora>
- <Yz6tR24T8HPHJ70D@T590>
+        bh=szsrOLyuanSQuhduXkmhJcDFcnP0SxPlfZGY4+fPa+0=;
+        b=a1uQTtVXyaIQA5Br+Cf9mGG94DalyO711UskCiMy/8LSfDgqS/Q6bIi27y7x6XpWDuoQFc
+        lthhuNUmVZTTf0D4MbnW2QoxbB48xT6tvr1M5HMy95tMGrGCPzyeznsyN/+zdRTw87mvAC
+        /ERKfBvzKNLhbNn22KlM5nIVSCvg2Ko=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-437-FWJljyk8O8GaAqXDBCsSow-1; Thu, 06 Oct 2022 10:45:02 -0400
+X-MC-Unique: FWJljyk8O8GaAqXDBCsSow-1
+Received: by mail-vs1-f70.google.com with SMTP id 65-20020a670344000000b0039b3020da1bso508775vsd.3
+        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 07:45:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=szsrOLyuanSQuhduXkmhJcDFcnP0SxPlfZGY4+fPa+0=;
+        b=5CgPG7bVpN0DI4XQJqPLkCHDPRmi4DZ2tihzJi8BC6HZdDLZnFONqRxdN+xX1rkV2L
+         0Djb6/kGbaP1FidgBAq0Gvlf4Lt0ZylIJaE0IQEqZJkzArVKef5zVEsnxG/97HK5B9He
+         UKUytq1fHGKIW1tRxqCY/S71V23sYWgGBuvH1r+BXEtkDDiXumxnKUhwKKXS9R7QSsxl
+         YnrpZyrJ7AbrUGsiGw2MlqHh2ZXoqRIzjZcQiI+h/1jc3FmAu1UB0KIai2Oxaio6HN9m
+         kaCHhZNT/lWw9oJ555mY1zZkUc73lPhEAqzCHOM8PYGz4pZrEjY1b8YgHxwY793aMn5z
+         +DKg==
+X-Gm-Message-State: ACrzQf00Nltu1LwAfMtr0ZVzsaN/tgQ1920JaPBQ7fBm2gtOcyX2pAEj
+        ahUwMP3U/px2B+efBjZtQUh2IHSME501oiNikvDZ2trxiXFGD5c0BSHuy54orX8a7cC57zrR5E3
+        awbbtqUzw0a1Hmik0An+EMs4dkhiSlAZzs8eVH/M=
+X-Received: by 2002:a67:d201:0:b0:3a6:804d:55ba with SMTP id y1-20020a67d201000000b003a6804d55bamr2613119vsi.35.1665067502094;
+        Thu, 06 Oct 2022 07:45:02 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6Eq3/pF3bVaTO4jRXaS5/AAbLhoATZ2EBtZnuGGJVs2kF8jeRYioWORbZ8Aw1aMiHg1xkDWYXijZXm/UKaxDg=
+X-Received: by 2002:a67:d201:0:b0:3a6:804d:55ba with SMTP id
+ y1-20020a67d201000000b003a6804d55bamr2613113vsi.35.1665067501928; Thu, 06 Oct
+ 2022 07:45:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="15fzNgcvZDw6D8kW"
-Content-Disposition: inline
-In-Reply-To: <Yz6tR24T8HPHJ70D@T590>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+References: <CAK8fFZ5w8CC7ez50dEd9nGJpc_c-ubJLk3+77d7Y5qN1pMkfRQ@mail.gmail.com>
+ <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org> <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
+In-Reply-To: <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
+From:   Ming Lei <ming.lei@redhat.com>
+Date:   Thu, 6 Oct 2022 22:44:51 +0800
+Message-ID: <CAFj5m9LSw+1g1j8ofEQhj6GFJX_pWRNGqbTzNNNfE3RnWcbdHA@mail.gmail.com>
+Subject: Re: again? - Write I/O queue hangup at random on recent Linus' kernels
+To:     Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Oct 6, 2022 at 8:37 PM Jaroslav Pulchart
+<jaroslav.pulchart@gooddata.com> wrote:
+>
+> Hello,
+>
+> I apply the
+> echo 0 > /sys/block/vdc/queue/wbt_lat_usec
+> at the production servers. I expect it will disable wbt. Could you
+> please confirm that my expectation is correct?
+>
+> The issue is happening once per ~14-30d after some random higher IOps
+> (~25-100k) peak so we need to wait....
 
---15fzNgcvZDw6D8kW
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Next time when it is triggered, please collect blk-mq debugfs log via
+the following
+command after the hang is triggered
 
-On Thu, Oct 06, 2022 at 06:26:15PM +0800, Ming Lei wrote:
-> On Wed, Oct 05, 2022 at 11:11:32AM -0400, Stefan Hajnoczi wrote:
-> > On Tue, Oct 04, 2022 at 01:57:50AM +0200, Denis V. Lunev wrote:
-> > > On 10/3/22 21:53, Stefan Hajnoczi wrote:
-> > > > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
-> > > > > ublk-qcow2 is available now.
-> > > > Cool, thanks for sharing!
-> > > yep
-> > >=20
-> > > > > So far it provides basic read/write function, and compression and=
- snapshot
-> > > > > aren't supported yet. The target/backend implementation is comple=
-tely
-> > > > > based on io_uring, and share the same io_uring with ublk IO comma=
-nd
-> > > > > handler, just like what ublk-loop does.
-> > > > >=20
-> > > > > Follows the main motivations of ublk-qcow2:
-> > > > >=20
-> > > > > - building one complicated target from scratch helps libublksrv A=
-PIs/functions
-> > > > >    become mature/stable more quickly, since qcow2 is complicated =
-and needs more
-> > > > >    requirement from libublksrv compared with other simple ones(lo=
-op, null)
-> > > > >=20
-> > > > > - there are several attempts of implementing qcow2 driver in kern=
-el, such as
-> > > > >    ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4=
-], so ublk-qcow2
-> > > > >    might useful be for covering requirement in this field
-> > > There is one important thing to keep in mind about all partly-userspa=
-ce
-> > > implementations though:
-> > > * any single allocation happened in the context of the
-> > > =A0=A0 userspace daemon through try_to_free_pages() in
-> > > =A0=A0 kernel has a possibility to trigger the operation,
-> > > =A0=A0 which will require userspace daemon action, which
-> > > =A0=A0 is inside the kernel now.
-> > > * the probability of this is higher in the overcommitted
-> > > =A0=A0 environment
-> > >=20
-> > > This was the main motivation of us in favor for the in-kernel
-> > > implementation.
-> >=20
-> > CCed Josef Bacik because the Linux NBD driver has dealt with memory
-> > reclaim hangs in the past.
-> >=20
-> > Josef: Any thoughts on userspace block drivers (whether NBD or ublk) and
-> > how to avoid hangs in memory reclaim?
->=20
-> If I remember correctly, there isn't new report after the last NBD(TCMU) =
-deadlock
-> in memory reclaim was addressed by 8d19f1c8e193 ("prctl: PR_{G,S}ET_IO_FL=
-USHER
-> to support controlling memory reclaim").
+(cd /sys/kernel/debug/block/vdc && find . -type f -exec grep -aH . {} \;)
 
-Denis: I'm trying to understand the problem you described. Is this
-correct:
+Also you can try all kinds of settings, such as reducing the
+nr_tags/queue_depth to 4 or
+smaller(1), for quick reproduction.
 
-Due to memory pressure, the kernel reclaims pages and submits a write to
-a ublk block device. The userspace process attempts to allocate memory
-in order to service the write request, but it gets stuck because there
-is no memory available. As a result reclaim gets stuck, the system is
-unable to free more memory and therefore it hangs?
+~14-30d is  too long to verify any change.
 
-Stefan
-
---15fzNgcvZDw6D8kW
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmM+30wACgkQnKSrs4Gr
-c8iHRQf8CLjA5KPwDOjXvWn297/VU+slSiJzehP2Idpif/5l1xCQuasQWziB8flE
-skkANbVPQn8Y+Z/cwWykCx3XjZSoVDM+SO4VG1TMS1ZcPU+ODHzPdA1/yZwArg1J
-/6A8HxGpVAQYajnOmAMEBueuSUX30cN32YGh/uNykOU4q0Td8YzXS2ybbRGQfnit
-lkU4QvFm6foeKArFelx+8AP3xiQXIHulVtG4Yn72gnAIzZDgJlrsau3x05idY/+L
-acGUSyXP2PUnsZqFncWviWOfpa1LnyXDp1/bk4t/XRdrzSCReyOtcEwk/0ahFceh
-3AWMJdbDcA+5dP62qT3XyL6dCgaugQ==
-=bI8b
------END PGP SIGNATURE-----
-
---15fzNgcvZDw6D8kW--
+Thanks,
 
