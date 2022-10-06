@@ -2,176 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE332C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 13:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5F4C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 13:59:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbiJFNwT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 09:52:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55760 "EHLO
+        id S231211AbiJFN7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 09:59:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230453AbiJFNwQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 09:52:16 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CE049FFC;
-        Thu,  6 Oct 2022 06:52:14 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id d22-20020a4a5216000000b0047f740d5847so1416399oob.13;
-        Thu, 06 Oct 2022 06:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3w1N6cAYXcTYVDEoqLPleQfVTM3iy8dzcjzK6Lzia68=;
-        b=PzkZ37yLE12Q6hbAvKYJ5ajfKdV8BPY9I0+haNFdbo/8aUbSry4iynrmovbQeLJsKb
-         /+vOdlsI5pFcJgnC3fcL3XTS0SH38Uke8wmsDS89+MDByaPmykN3Fb/TMslv16vcZT+y
-         lKbpaEGMuyBPsdLcT1gGKltpDPZHHnj2E03285P95eY8QkLAcEShvW9XwODnWsIjKOGu
-         qhRsY2wHWIcCSVuGgzFspXAYMEFPdETb4g9sR1Sy3Zt5p2wtsBV04Yl2uA1iy0JN/9ir
-         ZARWzyZ8o+EIamH0C/VEoou+yLPT7QWYg1ZsTwo9b/hMpASfq7gm74mqo/fj6TWWy26d
-         SrEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3w1N6cAYXcTYVDEoqLPleQfVTM3iy8dzcjzK6Lzia68=;
-        b=YaurmCcX3T4Y32U23aPVJt0RLIfiEFwNyF7zRQyLXV3LyBV3Nq7x7eNSNHRLIQlRAj
-         fjMLKikaIdlelNjDCL9nVMRSxIwBQxD739UddmKdF86FfuxCJXE8JXKRJM2s3HyBA+Iq
-         mNBc4MQuTYUgoUdnkYxfZDJbwbtUQpRGXKIdR86xz9W0McHFeUAlY4YiWVKqsOTIuExy
-         PiG1nkD4/uPOfODr9kSD+L/fayPwXORAuDauj8P45LW8cTJMwY4yZXm2lr4IZtdmJi+o
-         h6UEa6oVFs7tUAPza8y2gJATFmNEpjeFeXsqjrAfAwceqXdxxO61WckScjUHUDXzr3wl
-         VraQ==
-X-Gm-Message-State: ACrzQf2fTwGhut++rKz6C0W5ykKKlIrOTzyLR+P8DqBUopA4rtnpg4VU
-        /HaDTnz4wctgJafi+gRkJ/Ri0kATD3Y=
-X-Google-Smtp-Source: AMsMyM6zWqHd198tfHrixIxFqyGVKtlilHGal/7xFotzYoXGFZzqMUbEeMvNuavt+TknZbbChhTm1g==
-X-Received: by 2002:a9d:4b11:0:b0:655:f017:962c with SMTP id q17-20020a9d4b11000000b00655f017962cmr1960106otf.322.1665064333727;
-        Thu, 06 Oct 2022 06:52:13 -0700 (PDT)
-Received: from localhost ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id bq13-20020a05680823cd00b00353f41440dasm2433469oib.56.2022.10.06.06.52.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 06:52:13 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 06:50:03 -0700
-From:   Yury Norov <yury.norov@gmail.com>
-To:     Valentin Schneider <vschneid@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [RFC PATCH bitmap-for-next 4/4] blk_mq: Fix cpumask_check()
- warning in blk_mq_hctx_next_cpu()
-Message-ID: <Yz7dC4zxby1CZphE@yury-laptop>
-References: <20221006122112.663119-1-vschneid@redhat.com>
- <20221006122112.663119-5-vschneid@redhat.com>
+        with ESMTP id S230467AbiJFN7u (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 09:59:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3BEFB1F2
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 06:59:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665064787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=wvAFTm8FdW2/6pnC/amNx72dguHCE6Nha3ZiXPtT6Ek=;
+        b=SGlr3MYGXNCC9JLvoOM4ehGngvBlee55Kvufj3HmNTCxFIcClHqovd25zWhEh4vQuH+D0n
+        P2mDX/FqGzs7UPgJsU4htUcFlgD58gt2gXQsmq43mw163AfqhTshrfy3UYZdHmdGsvDnhq
+        n/5gnL7Fu2O7kRLZpU9e0iEkVWbQ55E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-74-pkRHXZp8OU-oqy8cOmgpJQ-1; Thu, 06 Oct 2022 09:59:44 -0400
+X-MC-Unique: pkRHXZp8OU-oqy8cOmgpJQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D0075855307;
+        Thu,  6 Oct 2022 13:59:43 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.119])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C1523111E412;
+        Thu,  6 Oct 2022 13:59:42 +0000 (UTC)
+Date:   Thu, 6 Oct 2022 09:59:40 -0400
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "Denis V. Lunev" <den@virtuozzo.com>
+Cc:     Ming Lei <tom.leiming@gmail.com>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kirill Tkhai <kirill.tkhai@openvz.org>,
+        Manuel Bentele <development@manuel-bentele.de>,
+        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+        rjones@redhat.com, Xie Yongji <xieyongji@bytedance.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+Message-ID: <Yz7fTANAxAQ8KT4v@fedora>
+References: <Yza1u1KfKa7ycQm0@T590>
+ <Yzs9xQlVuW41TuNC@fedora>
+ <6659a0d5-60ab-9ac7-d25d-b4ff1940c6ab@virtuozzo.com>
+ <Yz2epPwoufj0mug/@fedora>
+ <Yz6tR24T8HPHJ70D@T590>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="15fzNgcvZDw6D8kW"
 Content-Disposition: inline
-In-Reply-To: <20221006122112.663119-5-vschneid@redhat.com>
+In-Reply-To: <Yz6tR24T8HPHJ70D@T590>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 01:21:12PM +0100, Valentin Schneider wrote:
-> blk_mq_hctx_next_cpu() implements a form of cpumask_next_and_wrap() using
-> cpumask_next_and_cpu() and blk_mq_first_mapped_cpu():
-> 
-> [    5.398453] WARNING: CPU: 3 PID: 162 at include/linux/cpumask.h:110 __blk_mq_delay_run_hw_queue+0x16b/0x180
-> [    5.399317] Modules linked in:
-> [    5.399646] CPU: 3 PID: 162 Comm: ssh-keygen Tainted: G                 N 6.0.0-rc4-00004-g93003cb24006 #55
-> [    5.400135] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> [    5.405430] Call Trace:
-> [    5.406152]  <TASK>
-> [    5.406452]  blk_mq_sched_insert_requests+0x67/0x150
-> [    5.406759]  blk_mq_flush_plug_list+0xd0/0x280
-> [    5.406987]  ? bit_wait+0x60/0x60
-> [    5.407317]  __blk_flush_plug+0xdb/0x120
-> [    5.407561]  ? bit_wait+0x60/0x60
-> [    5.407765]  io_schedule_prepare+0x38/0x40
-> [...]
-> 
-> This triggers a warning when next_cpu == nr_cpu_ids - 1, so rewrite it
-> using cpumask_next_and_wrap() directly. The backwards-going goto can be
-> removed, as the cpumask_next*() operation already ANDs hctx->cpumask and
-> cpu_online_mask, which implies checking for an online CPU.
-> 
-> No change in behaviour intended.
-> 
-> Suggested-by: Yury Norov <yury.norov@gmail.com>
-> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
-> ---
->  block/blk-mq.c | 39 +++++++++++++--------------------------
->  1 file changed, 13 insertions(+), 26 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index c96c8c4f751b..1520794dd9ea 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2038,42 +2038,29 @@ static inline int blk_mq_first_mapped_cpu(struct blk_mq_hw_ctx *hctx)
->   */
->  static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
->  {
-> -	bool tried = false;
->  	int next_cpu = hctx->next_cpu;
->  
->  	if (hctx->queue->nr_hw_queues == 1)
->  		return WORK_CPU_UNBOUND;
->  
-> -	if (--hctx->next_cpu_batch <= 0) {
-> -select_cpu:
-> -		next_cpu = cpumask_next_and(next_cpu, hctx->cpumask,
-> -				cpu_online_mask);
-> -		if (next_cpu >= nr_cpu_ids)
-> -			next_cpu = blk_mq_first_mapped_cpu(hctx);
-> +	if (--hctx->next_cpu_batch > 0 && cpu_online(next_cpu))
-> +		return next_cpu;
-> +
-> +	next_cpu = cpumask_next_and_wrap(next_cpu, hctx->cpumask, cpu_online_mask, next_cpu, false);
 
-Last two parameters are simply useless. In fact, in many cases they
-are useless for cpumask_next_wrap(). I'm working on simplifying the
-cpumask_next_wrap() so that it would take just 2 parameters - pivot
-point and cpumask.
+--15fzNgcvZDw6D8kW
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regarding 'next' version - we already have find_next_and_bit_wrap(),
-and I think cpumask_next_and_wrap() should use it.
+On Thu, Oct 06, 2022 at 06:26:15PM +0800, Ming Lei wrote:
+> On Wed, Oct 05, 2022 at 11:11:32AM -0400, Stefan Hajnoczi wrote:
+> > On Tue, Oct 04, 2022 at 01:57:50AM +0200, Denis V. Lunev wrote:
+> > > On 10/3/22 21:53, Stefan Hajnoczi wrote:
+> > > > On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
+> > > > > ublk-qcow2 is available now.
+> > > > Cool, thanks for sharing!
+> > > yep
+> > >=20
+> > > > > So far it provides basic read/write function, and compression and=
+ snapshot
+> > > > > aren't supported yet. The target/backend implementation is comple=
+tely
+> > > > > based on io_uring, and share the same io_uring with ublk IO comma=
+nd
+> > > > > handler, just like what ublk-loop does.
+> > > > >=20
+> > > > > Follows the main motivations of ublk-qcow2:
+> > > > >=20
+> > > > > - building one complicated target from scratch helps libublksrv A=
+PIs/functions
+> > > > >    become mature/stable more quickly, since qcow2 is complicated =
+and needs more
+> > > > >    requirement from libublksrv compared with other simple ones(lo=
+op, null)
+> > > > >=20
+> > > > > - there are several attempts of implementing qcow2 driver in kern=
+el, such as
+> > > > >    ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4=
+], so ublk-qcow2
+> > > > >    might useful be for covering requirement in this field
+> > > There is one important thing to keep in mind about all partly-userspa=
+ce
+> > > implementations though:
+> > > * any single allocation happened in the context of the
+> > > =A0=A0 userspace daemon through try_to_free_pages() in
+> > > =A0=A0 kernel has a possibility to trigger the operation,
+> > > =A0=A0 which will require userspace daemon action, which
+> > > =A0=A0 is inside the kernel now.
+> > > * the probability of this is higher in the overcommitted
+> > > =A0=A0 environment
+> > >=20
+> > > This was the main motivation of us in favor for the in-kernel
+> > > implementation.
+> >=20
+> > CCed Josef Bacik because the Linux NBD driver has dealt with memory
+> > reclaim hangs in the past.
+> >=20
+> > Josef: Any thoughts on userspace block drivers (whether NBD or ublk) and
+> > how to avoid hangs in memory reclaim?
+>=20
+> If I remember correctly, there isn't new report after the last NBD(TCMU) =
+deadlock
+> in memory reclaim was addressed by 8d19f1c8e193 ("prctl: PR_{G,S}ET_IO_FL=
+USHER
+> to support controlling memory reclaim").
 
-For the context: those last parameters are needed to exclude part of
-cpumask from traversing, and to implement for-loop. Now that we have
-for_each_cpu_wrap() based on for_each_set_bit_wrap(), it's possible
-to remove them. I'm working on it.
+Denis: I'm trying to understand the problem you described. Is this
+correct:
 
-> +	if (next_cpu < nr_cpu_ids) {
->  		hctx->next_cpu_batch = BLK_MQ_CPU_WORK_BATCH;
-> +		hctx->next_cpu = next_cpu;
-> +		return next_cpu;
->  	}
->  
->  	/*
-> -	 * Do unbound schedule if we can't find a online CPU for this hctx,
-> -	 * and it should only happen in the path of handling CPU DEAD.
-> +	 * No other online CPU in hctx->cpumask.
-> +	 *
-> +	 * Make sure to re-select CPU next time once after CPUs
-> +	 * in hctx->cpumask become online again.
->  	 */
-> -	if (!cpu_online(next_cpu)) {
-> -		if (!tried) {
-> -			tried = true;
-> -			goto select_cpu;
-> -		}
-> -
-> -		/*
-> -		 * Make sure to re-select CPU next time once after CPUs
-> -		 * in hctx->cpumask become online again.
-> -		 */
-> -		hctx->next_cpu = next_cpu;
-> -		hctx->next_cpu_batch = 1;
-> -		return WORK_CPU_UNBOUND;
-> -	}
-> -
-> -	hctx->next_cpu = next_cpu;
-> -	return next_cpu;
-> +	hctx->next_cpu_batch = 1;
-> +	return WORK_CPU_UNBOUND;
->  }
->  
->  /**
-> -- 
-> 2.31.1
+Due to memory pressure, the kernel reclaims pages and submits a write to
+a ublk block device. The userspace process attempts to allocate memory
+in order to service the write request, but it gets stuck because there
+is no memory available. As a result reclaim gets stuck, the system is
+unable to free more memory and therefore it hangs?
+
+Stefan
+
+--15fzNgcvZDw6D8kW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmM+30wACgkQnKSrs4Gr
+c8iHRQf8CLjA5KPwDOjXvWn297/VU+slSiJzehP2Idpif/5l1xCQuasQWziB8flE
+skkANbVPQn8Y+Z/cwWykCx3XjZSoVDM+SO4VG1TMS1ZcPU+ODHzPdA1/yZwArg1J
+/6A8HxGpVAQYajnOmAMEBueuSUX30cN32YGh/uNykOU4q0Td8YzXS2ybbRGQfnit
+lkU4QvFm6foeKArFelx+8AP3xiQXIHulVtG4Yn72gnAIzZDgJlrsau3x05idY/+L
+acGUSyXP2PUnsZqFncWviWOfpa1LnyXDp1/bk4t/XRdrzSCReyOtcEwk/0ahFceh
+3AWMJdbDcA+5dP62qT3XyL6dCgaugQ==
+=bI8b
+-----END PGP SIGNATURE-----
+
+--15fzNgcvZDw6D8kW--
+
