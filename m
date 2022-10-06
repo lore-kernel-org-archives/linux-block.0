@@ -2,97 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B21C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 12:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4A5C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 13:01:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbiJFMhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 08:37:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42642 "EHLO
+        id S229514AbiJFNBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 09:01:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229942AbiJFMhV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 08:37:21 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 737C785A8E
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 05:37:20 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id u28so893316qku.2
-        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 05:37:20 -0700 (PDT)
+        with ESMTP id S229437AbiJFNBE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 09:01:04 -0400
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F29789AE2;
+        Thu,  6 Oct 2022 06:01:03 -0700 (PDT)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-13207a86076so2085416fac.3;
+        Thu, 06 Oct 2022 06:01:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date;
-        bh=vo1QAtKipx9eeiPoGvhZwuSOjBoSpY/YuVoAnsjypP4=;
-        b=EY2O/cMHA42iCRWSbnjQ8cWURmH6PgapUPnHhUdnDrFiOkHPNJ1tU844qYunD33VqJ
-         KBAOTA+eAAWEcRR5ubGkgmfMUa0wvsfIhEmeI4DbW0TzxWHTm+R1w5v4NLCj5AGlmpIA
-         vKUMJGW4PiayCQl04g6X4N9XAtEVaSc0rCAL8=
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hOxzxB6Ta+ahPUPvLHNT/LSeggT991ufeQf/qCTG8Fo=;
+        b=J0ntHF1dSQQ0tlazjlpP2Q3oLKRNeFydIFk705ZhfWD0PjX4AHrPuhKgSLVw3QBCNc
+         /jjV3C9dTfZUjA86pji0cJDcv3L65F9/P0/mbvkPQcWrsjy59iG198llUg2b1rC47bKm
+         RI52/V+TTW/ECY1Qd33ZoEv9SXBiqd/U91j7qwrZrBdvNrm8mG2kEcf+vdHbwPdfIsEj
+         Kh5roIS2XhcYo23wHgLemMsvBAVWPKm5R8K3gJ0eFHUcrptyXWGD8EnumW35odH0mnGG
+         Mm5H8BJPy+AJESqaJs+qX8QrOCKkAapbti86UhhciCwdFryygyEftMA4Zodp3Iu7i/NH
+         jc9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=vo1QAtKipx9eeiPoGvhZwuSOjBoSpY/YuVoAnsjypP4=;
-        b=NQafxFF1iSESHYSej0ruTRCeB6Q0s9824pZOSEkSkf+vM727vT6RWAcve8BwCtewf6
-         ZpwlFLLKpM4nbxu3ZFXMNiXhrsIw0FyFCoO1eTm8RwuZkRvMZeEnvhP15S7HR6gddyTY
-         juExjzg8KVr8a/+4V8kxN/NivTniARiW9jrzvneBysjE1I2bOabHa9BqwtTveiKY+WSl
-         3cAJGrOonCrHJo7wJW9JeXuobzFWmi83BIqMVmYyQTB5P6jPHn5UfOi/oSRvSVn+GLjl
-         haVsD2ZSL/lsMWyFanVqFn025P61d7PLam2BweKCu8NkAfEOIio6csTTr7MsRxJZsZ2g
-         Hnmw==
-X-Gm-Message-State: ACrzQf2NaKwjtJByxPrr+oOnO/KUm7muytX59w6CbJx8doyctxeBg5Ic
-        1nuofPBPNc6bfm2oqrGiszdASIsxY0zdt/cxmDB4zOPofOQ=
-X-Google-Smtp-Source: AMsMyM5Jul0nHsUjVkEIN5JoE+lw8z295f5LXZKXLQvfONDh424ZXDNMnK0Tx5NhIdvIWXduWkzn20Lh4KlvqyiAEzQ=
-X-Received: by 2002:a05:620a:1aa2:b0:6e1:15a7:72eb with SMTP id
- bl34-20020a05620a1aa200b006e115a772ebmr3064763qkb.632.1665059839607; Thu, 06
- Oct 2022 05:37:19 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hOxzxB6Ta+ahPUPvLHNT/LSeggT991ufeQf/qCTG8Fo=;
+        b=WOIYjYfY+o2VBNppnffETxvHgmKyxeqAoQz3DabejSEv7+rVPLrK0A7Pqvk5H8WSsa
+         epTrA3tEjzTNXejMZM4pV3Nddtem7pOp1T7Wm4Sl0+eRAgIhl7ohT0JX+nXvg/bAcde0
+         YgFG9L8NBr8HGF4xcx8i2KN7BGi4QZFfktcYhHZatwfo+LBq0y8pgqspdjZG964a0xsZ
+         ShdIGGdyJbyMEARO05hbVX9TAY3+NqDg58/kT8thj8dQU5YSU/uyDluy2jIK/WHJMzfe
+         1bApVn0LCQSU41igJZRNyg/EStlnEcIN2pYs1Bllbe3AnN5FPmUxTaVVsFCywUn1FN9R
+         QROQ==
+X-Gm-Message-State: ACrzQf3cAU2ROmjh1n81oxR3Dm782iYR6QDOW7Sz/LngkVm86t+e3Bxt
+        yoeF2V3Go9XQYe1Q+ePqOAjIJIH27kE=
+X-Google-Smtp-Source: AMsMyM5X0YKCU+QQiYrM8MOLk5TvEmefyBe31tSMObUbU+zn/ns8r3CsDen7PU5j1DvARavs8JrerQ==
+X-Received: by 2002:a05:6870:160c:b0:12b:9663:67ca with SMTP id b12-20020a056870160c00b0012b966367camr5359068oae.36.1665061261549;
+        Thu, 06 Oct 2022 06:01:01 -0700 (PDT)
+Received: from localhost ([12.97.180.36])
+        by smtp.gmail.com with ESMTPSA id z4-20020a544584000000b0035418324b78sm516940oib.11.2022.10.06.06.01.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Oct 2022 06:01:01 -0700 (PDT)
+Date:   Thu, 6 Oct 2022 05:58:49 -0700
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Valentin Schneider <vschneid@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Dietmar Eggemann <dietmar.eggemann@arm.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
+        Daniel Bristot de Oliveira <bristot@redhat.com>
+Subject: Re: [PATCH bitmap-for-next 0/5] bitmap,cpumask: Add
+ for_each_cpu_andnot()
+Message-ID: <Yz7RCVTUeZAa4zM7@yury-laptop>
+References: <20221003153420.285896-1-vschneid@redhat.com>
+ <YzsvVx+i1JM8V72D@yury-laptop>
 MIME-Version: 1.0
-References: <CAK8fFZ5w8CC7ez50dEd9nGJpc_c-ubJLk3+77d7Y5qN1pMkfRQ@mail.gmail.com>
- <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org>
-In-Reply-To: <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org>
-From:   Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date:   Thu, 6 Oct 2022 14:36:53 +0200
-Message-ID: <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
-Subject: Re: again? - Write I/O queue hangup at random on recent Linus' kernels
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YzsvVx+i1JM8V72D@yury-laptop>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Mon, Oct 03, 2022 at 11:54:20AM -0700, Yury Norov wrote:
+> On Mon, Oct 03, 2022 at 04:34:15PM +0100, Valentin Schneider wrote:
+> > As suggested by Yury, this is the bitmap/cpumask specific bits of [1]. This now
+> > also contains an extra fix for blk_mq.
+> 
+> Patches ##2-5 look good to me, but I'd like to give them some testing.
+> Let's also wait for other comments, and if nothing wrong will be spotted,
+> I'll take it.
 
-I apply the
-echo 0 > /sys/block/vdc/queue/wbt_lat_usec
-at the production servers. I expect it will disable wbt. Could you
-please confirm that my expectation is correct?
-
-The issue is happening once per ~14-30d after some random higher IOps
-(~25-100k) peak so we need to wait....
-
-Best,
-
-
-
-st 5. 10. 2022 v 23:03 odes=C3=ADlatel Bart Van Assche <bvanassche@acm.org>=
- napsal:
-
->
-> On 10/5/22 12:43, Jaroslav Pulchart wrote:
-> > I'm investigating a queue hangup issue of our databases running on the
-> > 5.19.y kernel.
-> >
-> > I found "Write I/O queue hangup at random on recent Linus' kernels"
-> > thread (https://www.spinics.net/lists/linux-bcache/msg10781.html)
-> > already fixed some time.
-> That message mentions WBT (write back throttling). Is WBT enabled in
-> your kernel? If so, does disabling it help?
->
-> Thanks,
->
-> Bart.
-
-
-
---
-Jaroslav Pulchart
-Sr. Principal SW Engineer
-GoodData
+OK, taking those in bitmap-for-next.
