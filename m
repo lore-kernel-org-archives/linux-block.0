@@ -2,112 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCE3C4167B
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 13:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E20DDC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 13:38:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231406AbiJFNcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 09:32:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
+        id S231672AbiJFNi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 09:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231481AbiJFNcu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 09:32:50 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A505FC1;
-        Thu,  6 Oct 2022 06:32:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 47EBD619B3;
-        Thu,  6 Oct 2022 13:31:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D819C433C1;
-        Thu,  6 Oct 2022 13:31:13 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dCt1XlLR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665063067;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=19y9yEzpIVCdXeybhvKA7dJEvUCmehig1gThjjfIZlg=;
-        b=dCt1XlLRhK46o65EhJYBSpRmYOT4n7MeVXGzqEAmpcGdWyuxeH5sPJp8L+8s50v59qatMG
-        Pop9Q+fWN3pqL5OpRxJVaBL/44G7A5DyWYXHpzYYf1aO4M481jtYlUZ2z2P2gTZK51QEX3
-        xI04TaxnmVtdtVX+upl/OVmNZ34Lghg=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 07574342 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 6 Oct 2022 13:31:07 +0000 (UTC)
-Received: by mail-ua1-f49.google.com with SMTP id p89so623802uap.12;
-        Thu, 06 Oct 2022 06:31:05 -0700 (PDT)
-X-Gm-Message-State: ACrzQf39I0aG5QvIzUh/9qcHBEF1elKF+vF9hNH7v2anSGfBoAICV2EV
-        ngllvXKIEIB5FbGUv+zfb/ab2TbIsHShqQy6ySY=
-X-Google-Smtp-Source: AMsMyM5LOcwlCqLDJ8Sdf5AH9P6p8LW9hstCcin8XnWJVl2TEMHnjzVUue7OZJku+oxVakLrWA9vu3wGp+73FInbltY=
-X-Received: by 2002:ab0:70b9:0:b0:3d7:84d8:35ae with SMTP id
- q25-20020ab070b9000000b003d784d835aemr2699257ual.24.1665063063460; Thu, 06
- Oct 2022 06:31:03 -0700 (PDT)
+        with ESMTP id S231650AbiJFNix (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 09:38:53 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D51EAC392
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 06:38:51 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id n18-20020a17090ade9200b0020b0012097cso1863104pjv.0
+        for <linux-block@vger.kernel.org>; Thu, 06 Oct 2022 06:38:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jTCYSZmMysxtSVfEJTY+s0G/UzQUqK+OIX1DRudo8Kg=;
+        b=TzWXmCFRuEwSQxIvtrbLg3T/gSXyynJruPXM2VsC2kWTdmxgp2c6gfxpoMvWW3Hghk
+         r18GM8xCrKv7P+cPLVf88WS43gkSrm4EvQQeUupsML+Z6vTl6tQfEY3EzjM/V7eL6KAD
+         ySdJB2j4CTJAHh3/lCiCWusUXeEvb4PYmS8uBwd5rJOvBkwmxxbT6wFvf0GPhvUuIWLE
+         ABDicttkDsY8z2JdCYV2ntUjJm4vRgIIo3vR15PMSmtLqxH0ksziR/0IbTeKoYDO1Rz4
+         igkCFxrP29PaR3yEvO09BAcQ7R9FrpqzBWAFAcQZPUBUe8kwpPjNIt8DQ7qKk2m6ghtc
+         IR3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jTCYSZmMysxtSVfEJTY+s0G/UzQUqK+OIX1DRudo8Kg=;
+        b=gK/gmbHX9WZKcoohCnaH/5xUlkXVc6Kz6k5atuRf8HyyDxAuvNPu/SlEYD8rIwKJT1
+         NLpOV6J5XZOtDo5ww6h7njMq9DpBFGglAScOjuJSyklVtlc0aQJvfoMB1WJdbQ6pBi/9
+         /+uq7b1WuqmOm5hIcbfGwVFiC7Vh+mJs+zARUXOs6sOjnapcomybJh4s1Je01zdqq3wL
+         leoR+LVE02dunE3F1ccjSctSagjHDgglwvpuc7lq5ejkdD+Z+av2bvBvm/sVW9S3FIS8
+         KCLp42kYPWEKVFIfHZBSWd9+oWG1WyJwKdFsPcgFrwNzJVLruWZNnXZgXdgtxvCMUKhw
+         rVAw==
+X-Gm-Message-State: ACrzQf0k/ru1QPv0b1aGzjj2VaJHiNk24q8KCyRRgsM03yF6MlPPG1aO
+        8WaWHgWHV3uN79RIHTXHM1TQBGbqolTd4Q==
+X-Google-Smtp-Source: AMsMyM6p5emMqF60uEZPjXHkvs1E1VToggNwIb6bqQONyLj6xjXv3FjpqqhDN3PJwImhRiE8UzhFTg==
+X-Received: by 2002:a17:902:db12:b0:176:d6a4:53ab with SMTP id m18-20020a170902db1200b00176d6a453abmr5024135plx.113.1665063529879;
+        Thu, 06 Oct 2022 06:38:49 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id w129-20020a623087000000b00541c68a0689sm12890163pfw.7.2022.10.06.06.38.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Oct 2022 06:38:49 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Deming Wang <wangdeming@inspur.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20221006084450.1513-1-wangdeming@inspur.com>
+References: <20221006084450.1513-1-wangdeming@inspur.com>
+Subject: Re: [PATCH] block: Remove the repeat word 'can'
+Message-Id: <166506352904.7298.7396235219714937696.b4-ty@kernel.dk>
+Date:   Thu, 06 Oct 2022 07:38:49 -0600
 MIME-Version: 1.0
-References: <20221006132510.23374-1-Jason@zx2c4.com>
-In-Reply-To: <20221006132510.23374-1-Jason@zx2c4.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 6 Oct 2022 07:30:52 -0600
-X-Gmail-Original-Message-ID: <CAHmME9pXuGKNsm3cCOMLSOMJoX2XJnHffpiF_rr32mW2ozShhw@mail.gmail.com>
-Message-ID: <CAHmME9pXuGKNsm3cCOMLSOMJoX2XJnHffpiF_rr32mW2ozShhw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/5] treewide cleanup of random integer usage
-To:     linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Cc:     Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mm@kvack.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
-        linux-rdma@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 6, 2022 at 7:25 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> This is a five part treewide cleanup of random integer handling.
-> [...]
-> Please take a look!
+On Thu, 6 Oct 2022 04:44:50 -0400, Deming Wang wrote:
+> Remove the repeat word 'can' from the comments of bio_kmalloc.
+> 
+> 
 
-I should add that this patchset probably appears bigger than it
-already is, due in part to that wall of motivational text. Keep in
-mind, though, that the whole thing is only "305 insertions(+), 342
-deletions(-)", so it should be conventionally reviewable.
+Applied, thanks!
 
-Jason
+[1/1] block: Remove the repeat word 'can'
+      commit: 340e134727c9adaefadc7e79b765c038e18e55c3
+
+Best regards,
+-- 
+Jens Axboe
+
+
