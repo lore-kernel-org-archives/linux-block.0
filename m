@@ -2,219 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B2EC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  6 Oct 2022 23:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B60C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 01:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232296AbiJFXhL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 19:37:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43490 "EHLO
+        id S232442AbiJGBFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 21:05:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232217AbiJFXhF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 19:37:05 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F03EEB7E1;
-        Thu,  6 Oct 2022 16:37:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B07B7B821EA;
-        Thu,  6 Oct 2022 23:37:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08300C433C1;
-        Thu,  6 Oct 2022 23:36:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IOQ1bXhF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1665099413;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eDWvYu+uSvuLU1D2yrcps4Uxg3s4afpQR1DZP1HAENk=;
-        b=IOQ1bXhFd3q9+RqlaN9MoWoMb9hyeq0A9ZZHsjT7H7aJth5PyzgIFsO5RZ+IGkqpoVM4vs
-        G1fhQ2wIq1VD89DBIQN9w7YwWxcZC7kUxAooqITvAEdpg/3zs8L5I8+aGBoP4EPhTcYjjM
-        7a1SFu0rQgOf0f04kGQaSuHs/qYIRR4=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e1098d12 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Thu, 6 Oct 2022 23:36:53 +0000 (UTC)
-Received: by mail-vs1-f44.google.com with SMTP id h4so3494548vsr.11;
-        Thu, 06 Oct 2022 16:36:52 -0700 (PDT)
-X-Gm-Message-State: ACrzQf1TOlBL9WnO/NrZIZyjGBn5ukDeQw/0ECGPpkR+WaKxQK8erd/2
-        /cQN6L+VjtaxFvYQwZI/iE1XpRFjd/wCVAQO/xs=
-X-Google-Smtp-Source: AMsMyM5tvZWHSrcOLtkY/lX0Q7Qvr/oXlGj5vIRT4adjylKOfvaHnErU8AKkQNdqtGo/HZJDgntpViQRNpApZtsIptY=
-X-Received: by 2002:a05:6102:2908:b0:398:ac40:d352 with SMTP id
- cz8-20020a056102290800b00398ac40d352mr1292105vsb.55.1665099409449; Thu, 06
- Oct 2022 16:36:49 -0700 (PDT)
+        with ESMTP id S231453AbiJGBFs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 21:05:48 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04BFC8953
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 18:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1665104746; x=1696640746;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=pueaaqQCcatUTiGFsMlRm1mvaZDzz7r2NEvIMnNCLcY=;
+  b=faKeASlG9R9cQWeNCwpqiFM0CNwPd22m3KjyZ6YbT0bPvEzyyxWiHti0
+   BI7C8dyOQt0MX8P8Pd7j5ksKMCjhpkwdDLt6cFs6VtBnivHPw2jD2tmqE
+   V4y31A7GWEgQBeHahWfyNKxlGsLdAGMs6Wu6d+oY94DFXIPc7oazBKg2W
+   2/3IjbRq9byrFpXBAfibhgHaVl7iujqBGzPH9Y/SAOE7Seas0L1iLM3jk
+   VT63jCvdnIDbDkh40PiQZLNMeHD+BL3WaAAF8mgAngqoza6n4/wotHadt
+   YkSmGFLk3VfO4SJPfx2TaIl8eSLf/4wlJhSUKJGQImXB6xcO6xWp08DSh
+   g==;
+X-IronPort-AV: E=Sophos;i="5.95,164,1661788800"; 
+   d="scan'208";a="317484928"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Oct 2022 09:05:45 +0800
+IronPort-SDR: 5ExqaB+u+fRuFDUpWgX2qJaL/R1iOEDRifQ3BAGCoZYTEkkLXCqyPhTww/bXy+QQX0mQ+g419v
+ dEYLu1mrWiTEd+x/xtO5hdYlWJ6N7tH/WtFee1L1jYpRK6GJCy2jVM7lR/FXBFUlGUNPj8p+4j
+ ZT2Axj0yZpdjFYmROGbSfsxvn5XzSkLIW73XLb2iYYUc+CG6w2wDBREnG6QTBwJRFBU4thXK5h
+ orAF/gzrHFWOvYvTOlVlDeyGhSRABVn8s4lDQZPR7mwoQ/y6wY2wWrPYA7/jAvEbSmQXUVR4YF
+ GIk0KAPL+8XLTkTQZvQjTjmo
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Oct 2022 17:25:31 -0700
+IronPort-SDR: MYGI17Gbpee21HyQiU2TM0woIxnj/hwaImQKPl3yxveB6CLn8JyvDS3AWTVCfjYxn7lyfp2hiC
+ OqnDugJ4qwywX+DTDOJODWPzVlmupNMGIADrhGk7qZYNppEsN0d/+39yepa2oTTuiEhIVMrQ4Y
+ Aej7quUjp49S423dsisU+4vX4iXiKzprV0Q7G0jd6lkFhkOrcvKlXijRJ1MTLNCPEfVWsNh9rl
+ 0KBpR92ab6LfYewmPKLwgDUOARK/VU+3gPqXLaY/ale0j9DVMGIQ3trZ01waUwE1sJPzPMH8ql
+ bCM=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Oct 2022 18:05:45 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Mk9953L7Qz1RvTr
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 18:05:45 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1665104744; x=1667696745; bh=pueaaqQCcatUTiGFsMlRm1mvaZDzz7r2NEv
+        IMnNCLcY=; b=d4DrCSZY0TLHs4y2tKPHIhllYvs5MnQASNhd5oWS7DNSrnuN3Mp
+        SMVrBXukTgvf6m25x1bP8FgKnaZjeioeN2M8DEAf2zAsppoRXaaY7TKpQiZ1yG34
+        TyVQu+yPiyyOYLURoZxNDri+LwP0Du0zZspEQCMFZS3ztTJOc+gvHqX8jhzyttvz
+        Vilj5SDbZM5amh3I9kFK1E7cay9nE0FCUoumkTjNwFwBqQYvGceivscf21T6Mixq
+        o8J4lnlE1mv4PEHHkz0bRa3AWPul4IrxTskVnBc+dmBiiJkqH1t5JoBhVgP75FGy
+        qKEdSL8NY1zlmkzxaEtVKln3qAawGWL2NVA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id dY10EIi-eV5p for <linux-block@vger.kernel.org>;
+        Thu,  6 Oct 2022 18:05:44 -0700 (PDT)
+Received: from [10.225.163.106] (unknown [10.225.163.106])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Mk9936VzTz1RvLy;
+        Thu,  6 Oct 2022 18:05:43 -0700 (PDT)
+Message-ID: <45f1ee63-793d-2a13-90cc-2312b17dffaa@opensource.wdc.com>
+Date:   Fri, 7 Oct 2022 10:05:42 +0900
 MIME-Version: 1.0
-Received: by 2002:ab0:6ed0:0:b0:3d9:6dfd:499 with HTTP; Thu, 6 Oct 2022
- 16:36:48 -0700 (PDT)
-In-Reply-To: <6396875c-146a-acf5-dd9e-7f93ba1b4bc3@csgroup.eu>
-References: <20221006165346.73159-1-Jason@zx2c4.com> <20221006165346.73159-4-Jason@zx2c4.com>
- <848ed24c-13ef-6c38-fd13-639b33809194@csgroup.eu> <CAHmME9raQ4E00r9r8NyWJ17iSXE_KniTG0onCNAfMmfcGar1eg@mail.gmail.com>
- <f10fcfbf-2da6-cf2d-6027-fbf8b52803e9@csgroup.eu> <6396875c-146a-acf5-dd9e-7f93ba1b4bc3@csgroup.eu>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 6 Oct 2022 17:36:48 -0600
-X-Gmail-Original-Message-ID: <CAHmME9pE4saqnwxhsAwt-xegYGjsavPOGnHCbZhUXD7kaJ+GAA@mail.gmail.com>
-Message-ID: <CAHmME9pE4saqnwxhsAwt-xegYGjsavPOGnHCbZhUXD7kaJ+GAA@mail.gmail.com>
-Subject: Re: [PATCH v3 3/5] treewide: use get_random_u32() when possible
-To:     Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "patches@lists.linux.dev" <patches@lists.linux.dev>,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        "Theodore Ts'o" <tytso@mit.edu>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>,
-        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: soft lockup with pre-rc1
+Content-Language: en-US
+To:     Jeff Layton <jlayton@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-ide <linux-ide@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-        "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>,
-        Chuck Lever <chuck.lever@oracle.com>, Jan Kara <jack@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+References: <da0dd711f9820372e3afdf6fef7744cb31ada0ea.camel@redhat.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <da0dd711f9820372e3afdf6fef7744cb31ada0ea.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/6/22, Christophe Leroy <christophe.leroy@csgroup.eu> wrote:
->
->
-> Le 06/10/2022 =C3=A0 19:31, Christophe Leroy a =C3=A9crit :
->>
->>
->> Le 06/10/2022 =C3=A0 19:24, Jason A. Donenfeld a =C3=A9crit :
->>> Hi Christophe,
->>>
->>> On Thu, Oct 6, 2022 at 11:21 AM Christophe Leroy
->>> <christophe.leroy@csgroup.eu> wrote:
->>>> Le 06/10/2022 =C3=A0 18:53, Jason A. Donenfeld a =C3=A9crit :
->>>>> The prandom_u32() function has been a deprecated inline wrapper aroun=
-d
->>>>> get_random_u32() for several releases now, and compiles down to the
->>>>> exact same code. Replace the deprecated wrapper with a direct call to
->>>>> the real function. The same also applies to get_random_int(), which i=
-s
->>>>> just a wrapper around get_random_u32().
->>>>>
->>>>> Reviewed-by: Kees Cook <keescook@chromium.org>
->>>>> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk> # for sch_c=
-ake
->>>>> Acked-by: Chuck Lever <chuck.lever@oracle.com> # for nfsd
->>>>> Reviewed-by: Jan Kara <jack@suse.cz> # for ext4
->>>>> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->>>>> ---
->>>>
->>>>> diff --git a/arch/powerpc/kernel/process.c
->>>>> b/arch/powerpc/kernel/process.c
->>>>> index 0fbda89cd1bb..9c4c15afbbe8 100644
->>>>> --- a/arch/powerpc/kernel/process.c
->>>>> +++ b/arch/powerpc/kernel/process.c
->>>>> @@ -2308,6 +2308,6 @@ void notrace __ppc64_runlatch_off(void)
->>>>>    unsigned long arch_align_stack(unsigned long sp)
->>>>>    {
->>>>>        if (!(current->personality & ADDR_NO_RANDOMIZE) &&
->>>>> randomize_va_space)
->>>>> -             sp -=3D get_random_int() & ~PAGE_MASK;
->>>>> +             sp -=3D get_random_u32() & ~PAGE_MASK;
->>>>>        return sp & ~0xf;
->>>>
->>>> Isn't that a candidate for prandom_u32_max() ?
->>>>
->>>> Note that sp is deemed to be 16 bytes aligned at all time.
->>>
->>> Yes, probably. It seemed non-trivial to think about, so I didn't. But
->>> let's see here... maybe it's not too bad:
->>>
->>> If PAGE_MASK is always ~(PAGE_SIZE-1), then ~PAGE_MASK is
->>> (PAGE_SIZE-1), so prandom_u32_max(PAGE_SIZE) should yield the same
->>> thing? Is that accurate? And holds across platforms (this comes up a
->>> few places)? If so, I'll do that for a v4.
->>>
->>
->> On powerpc it is always (from arch/powerpc/include/asm/page.h) :
->>
->> /*
->>   * Subtle: (1 << PAGE_SHIFT) is an int, not an unsigned long. So if we
->>   * assign PAGE_MASK to a larger type it gets extended the way we want
->>   * (i.e. with 1s in the high bits)
->>   */
->> #define PAGE_MASK      (~((1 << PAGE_SHIFT) - 1))
->>
->> #define PAGE_SIZE        (1UL << PAGE_SHIFT)
->>
->>
->> So it would work I guess.
->
-> But taking into account that sp must remain 16 bytes aligned, would it
-> be better to do something like ?
->
-> 	sp -=3D prandom_u32_max(PAGE_SIZE >> 4) << 4;
->
-> 	return sp;
+On 10/7/22 02:33, Jeff Layton wrote:
+> I pulled down Linus tree today and did some testing with some filesystem
+> related patches. Running xfstests against ext4 in a VM, and I hit this:
+> 
+> [ 8947.343179] run fstests generic/224 at 2022-10-06 13:24:20
+> [ 8948.435322] EXT4-fs (dm-1): mounted filesystem with ordered data mode. Quota mode: none.
+> [ 8949.235839] EXT4-fs (dm-2): mounted filesystem with ordered data mode. Quota mode: none.
+> [ 9017.622065] watchdog: BUG: soft lockup - CPU#2 stuck for 23s! [kworker/2:0:1145882]
+> [ 9023.009230] Modules linked in: ext4(E) mbcache(E) jbd2(E) nft_fib_inet(E) nft_fib_ipv4(E) nft_fib_ipv6(E) nft_fib(E) nft_reject_inet(E) nf_reject_ipv4(E) nf_reject_ipv6(E) nft_reject(E) nft_ct(E) nft_chain_nat(E) nf_nat(E) nf_conntrack(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) rfkill(E) ip_set(E) nf_tables(E) nfnetlink(E) iTCO_wdt(E) intel_pmc_bxt(E) iTCO_vendor_support(E) joydev(E) intel_rapl_msr(E) i2c_i801(E) virtio_balloon(E) i2c_smbus(E) lpc_ich(E) intel_rapl_common(E) nfsd(E) auth_rpcgss(E) nfs_acl(E) lockd(E) grace(E) fuse(E) sunrpc(E) zram(E) xfs(E) crct10dif_pclmul(E) crc32_pclmul(E) crc32c_intel(E) ghash_clmulni_intel(E) virtio_gpu(E) virtio_dma_buf(E) drm_shmem_helper(E) serio_raw(E) virtio_net(E) drm_kms_helper(E) virtio_blk(E) net_failover(E) virtio_console(E) failover(E) drm(E) qemu_fw_cfg(E)
+> [ 9023.081530] CPU: 2 PID: 1145882 Comm: kworker/2:0 Tainted: G            E      6.0.0+ #43
+> [ 9023.085919] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-1.fc36 04/01/2014
+> [ 9023.090747] Workqueue: events_freezable_power_ disk_events_workfn
+> [ 9023.095155] RIP: 0010:__do_softirq+0xb5/0x401
+> [ 9023.147050] Code: ff e8 6f db bc fe c7 44 24 1c 0a 00 00 00 48 c7 c7 c0 d2 87 ad e8 1b 9c be ff 65 66 c7 05 d1 0e a4 52 00 00 fb 0f 1f 44 00 00 <bb> ff ff ff ff 41 0f bc de 83 c3 01 0f 84 9a 00 00 00 48 c7 c5 c0
+> [ 9023.158173] RSP: 0018:ffff888221909f80 EFLAGS: 00000296
+> [ 9023.163217] RAX: 0000000000000002 RBX: ffff888107fb002c RCX: ffffffffac1cdc2d
+> [ 9023.168569] RDX: dffffc0000000000 RSI: ffffffffad87d2c0 RDI: ffffffffada7f7e0
+> [ 9023.173885] RBP: 0000000000000000 R08: 0000000000000000 R09: ffffffffafc01083
+> [ 9023.179097] R10: fffffbfff5f80210 R11: 0000000000000000 R12: 0000000000000000
+> [ 9023.184780] R13: 0000000000000000 R14: 0000000000000282 R15: ffff888107fb0000
+> [ 9023.189955] FS:  0000000000000000(0000) GS:ffff888221900000(0000) knlGS:0000000000000000
+> [ 9023.195329] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 9023.200380] CR2: 00007fba16a314e0 CR3: 0000000107882000 CR4: 00000000003506e0
+> [ 9023.205569] Call Trace:
+> [ 9023.209571]  <IRQ>
+> [ 9023.213587]  __irq_exit_rcu+0x12a/0x190
+> [ 9023.217664]  sysvec_apic_timer_interrupt+0x8a/0xb0
+> [ 9023.221863]  </IRQ>
+> [ 9023.225684]  <TASK>
+> [ 9023.229384]  asm_sysvec_apic_timer_interrupt+0x16/0x20
+> [ 9023.233485] RIP: 0010:_raw_spin_unlock_irqrestore+0x19/0x40
+> [ 9023.237740] Code: c6 48 89 df e8 d8 54 fe fe 90 eb cc 0f 1f 44 00 00 0f 1f 44 00 00 e8 5a 4e fe fe 90 f7 c6 00 02 00 00 74 06 fb 0f 1f 44 00 00 <bf> 01 00 00 00 e8 ad 9a f8 fe 65 8b 05 16 a8 e2 52 85 c0 74 05 e9
+> [ 9023.246961] RSP: 0018:ffff88810f9e7828 EFLAGS: 00000206
+> [ 9023.251106] RAX: 0000000000000001 RBX: 0000000000000000 RCX: ffffffffacbdecee
+> [ 9023.255535] RDX: dffffc0000000000 RSI: 0000000000000286 RDI: ffff888109e4d500
+> [ 9023.259915] RBP: ffff88810a9d8000 R08: 0000000000000001 R09: ffff88810aa8894b
+> [ 9023.264310] R10: ffffed1021551129 R11: fefefefefefefeff R12: 0000000000000286
+> [ 9023.268834] R13: ffff88810a9d8010 R14: ffff8881013e0000 R15: ffff88810ab5a000
+> [ 9023.273239]  ? ata_scsi_queuecmd+0x6e/0xb0
+> [ 9023.277360]  ? _raw_spin_unlock_irqrestore+0xa/0x40
+> [ 9023.281479]  ata_scsi_queuecmd+0x7a/0xb0
+> [ 9023.285386]  scsi_queue_rq+0xb5c/0x13c0
+> [ 9023.289449]  blk_mq_dispatch_rq_list+0x3e2/0xfc0
+> [ 9023.293549]  ? blk_insert_cloned_request+0x330/0x330
+> [ 9023.297646]  ? _raw_spin_lock+0x77/0xc0
+> [ 9023.301593]  ? _raw_spin_lock_bh+0xc0/0xc0
+> [ 9023.305485]  __blk_mq_sched_dispatch_requests+0x13b/0x1f0
+> [ 9023.309609]  ? blk_mq_do_dispatch_ctx+0x340/0x340
+> [ 9023.313581]  ? _raw_spin_lock_bh+0xc0/0xc0
+> [ 9023.317304]  blk_mq_sched_dispatch_requests+0x82/0xb0
+> [ 9023.320780]  __blk_mq_run_hw_queue+0x66/0xe0
+> [ 9023.324965]  blk_mq_sched_insert_request+0x16f/0x1d0
+> [ 9023.328294]  ? __alloc_pages_slowpath.constprop.0+0x1360/0x1360
+> [ 9023.331757]  ? blk_mq_sched_bio_merge+0x180/0x180
+> [ 9023.335040]  ? bio_add_pc_page+0x8a/0xb0
+> [ 9023.339093]  blk_execute_rq+0x111/0x2c0
+> [ 9023.343823]  ? blk_mq_get_sq_hctx+0x80/0x80
+> [ 9023.348523]  __scsi_execute+0x13a/0x2b0
+> [ 9023.353163]  sr_check_events+0x13e/0x420
+> [ 9023.357071]  ? sr_packet+0x90/0x90
+> [ 9023.359914]  ? __mod_timer+0x42a/0x5e0
+> [ 9023.362727]  ? hibernation_snapshot+0x3e8/0x640
+> [ 9023.365600]  ? console_emit_next_record.constprop.0+0x400/0x400
+> [ 9023.368659]  cdrom_check_events+0x34/0x70
+> [ 9023.371522]  disk_check_events+0x5d/0x180
+> [ 9023.374430]  process_one_work+0x3d3/0x6a0
+> [ 9023.377304]  worker_thread+0x8a/0x610
+> [ 9023.380329]  ? process_one_work+0x6a0/0x6a0
+> [ 9023.383202]  kthread+0x167/0x1a0
+> [ 9023.385889]  ? kthread_complete_and_exit+0x20/0x20
+> [ 9023.388668]  ret_from_fork+0x22/0x30
+> [ 9023.391338]  </TASK>
 
-Does this assume that sp is already aligned at the beginning of the
-function? I'd assume from the function's name that this isn't the
-case?
+Adding linux-block and linux-fsdevel, just in case.
 
-Jason
+Hmm... Weird. ATA changes for 6.1 are not merged yet, and none of them
+touch ata_scsi_queue_cmd() or port locking anyway.
+
+It looks like the ata lock is stuck, which may mean that some other
+context is stuck in completion path ? Do you see any other task stuck in
+ata code ?
+
+> 
+> Last commit in my tree is this:
+> 
+> 833477fce7a1 (origin/master) Merge tag 'sound-6.1-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound
+> 
+> I also have some filesystem related patches on top of this. inode-
+>> i_version patches mostly -- nothing that should effect things at this
+> level.
+> 
+> config is attached.
+
+-- 
+Damien Le Moal
+Western Digital Research
+
