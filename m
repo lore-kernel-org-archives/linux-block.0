@@ -2,122 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA959C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 09:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59224C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 10:01:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbiJGJ0O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Oct 2022 05:26:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59550 "EHLO
+        id S229699AbiJGKBl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Oct 2022 06:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiJGJ0M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Oct 2022 05:26:12 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B844F2513;
-        Fri,  7 Oct 2022 02:26:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665134771; x=1696670771;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YIsvu8HuZoKfT0WBNxjXL2VasbVdSxWppe8Gs3rIq6U=;
-  b=lgV+Escms5zyViBvmedV3BHNjjb3FjjYj3Vz3SzYv4k0JXq+4hjSlm7Z
-   r4wxpTH0Ri9xpOMDvtHwj7d93ePr3ndqye1fjavDVQQ+SETk4itjJWcSm
-   wa8rwMZIT/8eJXO8VmESYry5dyAie8TXc4x4yNV3pM5aWwoQPO3bkgpkS
-   5FwlBOd0Tn2PaEuo4c362qsQW98fTFbIC1/XD4vUU2g+dv369hvJQlOyO
-   kia5cm/CgIT7PszSeLeDt+YUCfvMLXWgB9lh/d1JZONjtIsUmsVYuIlsY
-   aADoUXeW7RL6U688rIGXycyhSIPVhJPCvgocB1YG8oOBtTC77bqJsmGC+
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="302414297"
-X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="302414297"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2022 02:26:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="658277156"
-X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="658277156"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga001.jf.intel.com with ESMTP; 07 Oct 2022 02:26:03 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1001)
-        id 6645E17E; Fri,  7 Oct 2022 12:26:23 +0300 (EEST)
-Date:   Fri, 7 Oct 2022 12:26:23 +0300
-From:   Mika Westerberg <mika.westerberg@linux.intel.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-        Andreas Noever <andreas.noever@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Christoph B??hmwalder <christoph.boehmwalder@linbit.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Dave Airlie <airlied@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Florian Westphal <fw@strlen.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Helge Deller <deller@gmx.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Hugh Dickins <hughd@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E . J . Bottomley" <jejb@linux.ibm.com>,
-        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Jens Axboe <axboe@kernel.dk>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        KP Singh <kpsingh@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Richard Weinberger <richard@nod.at>,
-        Russell King <linux@armlinux.org.uk>,
-        Theodore Ts'o <tytso@mit.edu>,
+        with ESMTP id S229563AbiJGKBk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Oct 2022 06:01:40 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19ACA8794;
+        Fri,  7 Oct 2022 03:01:38 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id a10so5179919ljq.0;
+        Fri, 07 Oct 2022 03:01:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0DfhB8jvaZ+NX5O/W6U8PGiRnsQleUaLd7heHBLzUhM=;
+        b=B2Hr7KIYLqdlgqBWIF1ylrBnKIo+/FHDGnjhpVzD/cDbwWuGodJu4KPh9dgmn8SQje
+         cSWbK8apPRkKJngwKUOj57nvX0niu7SaBe2+S2UkTZgv7aHiIUVLWRBWf1Xao4CZMUJ1
+         l90GwXLAT71HdT3sD+Q0ecH2xGGMH6O5/0GCHqLU4DiGh+FTAr95k6pbgFjgYdgVq1VU
+         aENrX2Qgojj+t4h1WTdqqempffi8neDZvZiYehbzTJBWiriSSLOavgwwdIIHwYwGqIqC
+         B5mwyxVzT6BT9WE+RcHxURFL3+dGO1Hlm+vhislFn8LaqdQumNJO+W9fjJfW0X/ZTu36
+         m05Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0DfhB8jvaZ+NX5O/W6U8PGiRnsQleUaLd7heHBLzUhM=;
+        b=CEQtpG6Kr9CSaLzFXPolRPsZD48S2QQPjmtWbE39q00nC2cvYRx15XX/Ws07sdLEFC
+         mLhZ5VJbLlULJW5i8sqbyHgI0vAqtTUttO5Sp4cIPNLIo1Pn5WhhphEPlZdDv5qE0Exi
+         0p9US0UK50D2lKsM/H88ZcQoMrFwaP/9hi9S/1DPppS+tSSxP7BYDBOC9oce6WdRD2u5
+         DgYpBtXn0nyxFi+4s7E0bIB521FJqPu+rfRGd145qDrGTmfDlUVFDZUced8LgGy4UUK0
+         RXQ1/az8JyT6ipfLLVsHLBQ54utjLeg0AXymj6q1qXVad/BrhS+PIRXbfOdzxYrd9f7E
+         gZgg==
+X-Gm-Message-State: ACrzQf06AtDrVBBlP2BryP7l3LTyRikLyN6/3vhkhBPiT8fJjTrvFn6G
+        uli+kQpddm6zldgHyba9Tjg=
+X-Google-Smtp-Source: AMsMyM5EtI1u2e5hy90i1u5NHtzhbsVaZ4Dvovfk7AKn3YGsZDBUpI9TUw2FGcfwqq/BxjYyUpI+FQ==
+X-Received: by 2002:a2e:7804:0:b0:26c:463c:493c with SMTP id t4-20020a2e7804000000b0026c463c493cmr1417457ljc.521.1665136896974;
+        Fri, 07 Oct 2022 03:01:36 -0700 (PDT)
+Received: from mobilestation ([95.79.133.202])
+        by smtp.gmail.com with ESMTPSA id p18-20020a19f012000000b00499bf7605afsm235115lfc.143.2022.10.07.03.01.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Oct 2022 03:01:36 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 13:01:34 +0300
+From:   Serge Semin <fancer.lancer@gmail.com>
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jens Axboe <axboe@kernel.dk>, Jens Axboe <axboe@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
         Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Thomas Graf <tgraf@suug.ch>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
-        Yury Norov <yury.norov@gmail.com>,
-        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
-        kernel-janitors@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-mm@kvack.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        loongarch@lists.linux.dev, netdev@vger.kernel.org,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        Toke H??iland-J??rgensen <toke@toke.dk>,
-        Chuck Lever <chuck.lever@oracle.com>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH v3 3/5] treewide: use get_random_u32() when possible
-Message-ID: <Yz/wv0sqBR+J+jy+@black.fi.intel.com>
-References: <20221006165346.73159-1-Jason@zx2c4.com>
- <20221006165346.73159-4-Jason@zx2c4.com>
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] nvme-hwmon: Return error on kzalloc failure
+Message-ID: <20221007100134.faaekmuqyd5vy34m@mobilestation>
+References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
+ <20220929224648.8997-2-Sergey.Semin@baikalelectronics.ru>
+ <YzYwB7lRGW80r4HA@kbusch-mbp.dhcp.thefacebook.com>
+ <20220930095247.vqtdc53rr66uaiwv@mobilestation>
+ <YzcDvmlslPki8gBj@kbusch-mbp.dhcp.thefacebook.com>
+ <20221004145049.74ffhcp7wpxw4ufz@mobilestation>
+ <YzxueNRODpry8L0/@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221006165346.73159-4-Jason@zx2c4.com>
+In-Reply-To: <YzxueNRODpry8L0/@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 10:53:44AM -0600, Jason A. Donenfeld wrote:
->  drivers/thunderbolt/xdomain.c                  |  2 +-
+On Tue, Oct 04, 2022 at 11:33:44AM -0600, Keith Busch wrote:
+> On Tue, Oct 04, 2022 at 05:50:49PM +0300, Serge Semin wrote:
+> > > 
+> > > This particular condition for hwmon is not something that prevents us from
+> > > making forward progress.
+> > 
+> > If you consider the hwmon functionality as optional (AFAIU you are),
+> > then just ignore the return value no matter the reason. 
+> 
+> That is not an option. This function does IO, and the controller may not be
+> usable on the other side of that, which means initialization must abort. We
+> can't just ignore errors; we just don't need to report errors that don't
+> prevent forward progress.
+> 
+> > If the problem
+> > caused the hwmon initialization process to fail turns to be critical
+> > it will be raised in some other place which is required for the NVME
+> > driver to work properly. Otherwise the hwmon module initialization may
+> > still cause the probe procedure to halt, which makes it not optional.
+> > That's what I meant when was saying about "the function and its
+> > caller semantics not implying that".
+> > 
+> > >  
+> > > > > The
+> > > > > driver can participate in memory reclaim, so failing on a low memory condition
+> > > > > can make matters worse.
+> > > > 
+> > > > Yes it can, so can many other places in the driver utilizing kmalloc
+> > > > with just GFP_KERNEL flag passed including on the same path as the
+> > > > nvme_hwmon_init() execution. Kmalloc will make sure the reclaim is
+> > > > either finished or executed in background anyway in all cases. 
+> > > 
+> > > This path is in the first initialization before we've set up a namespace that
+> > > can be used as a reclaim destination.
+> > > 
+> > > > Don't
+> > > > really see why memory allocation failure is less worse in this case
+> > > > than in many others in the same driver especially seeing as I said
+> > > 
+> > > The other initialization kmalloc's are required to make forward progress toward
+> > > setting up a namespace. This one is not required.
+> > 
+> > Anyway what you say seems still contradicting. First you said that the
+> > hwmon functionality was optional, but the only error being ignored was
+> > the no-memory one which was very rare and turned to be not ignored in
+> > the most of the other places.
+> 
+> > Second you got to accept the second
+> > patch of the series, which introduced a one more kmalloc followed
+> > right after the first one in the same function nvme_hwmon_init(). 
+> 
 
-Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+> My comments on this patch were intended to be applied to all similiarly added
+> uses.
+
+How could I've possibly got that from your "The rest looks good,
+though." and nacking only this patch with the message "The hwmon is
+not necessary for the rest of the driver..." ?
+
+Anyway due to all these uncertainties it's better to have a second
+opinion on the patches before re-spining the series.
+
+@Christoph, since you've already started reviewing the pathchset could
+you have a look at the patches #1 and #2 of the series? Please note
+the @Keith' comments regarding the memory allocation failure handling
+in there.
+
+-Sergey
