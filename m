@@ -2,213 +2,245 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF1DC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 05:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB692C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 06:08:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229469AbiJGFih (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Oct 2022 01:38:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37982 "EHLO
+        id S229459AbiJGGIL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Oct 2022 02:08:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiJGFif (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Oct 2022 01:38:35 -0400
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2059.outbound.protection.outlook.com [40.107.100.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D29EA115C2C
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 22:38:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yhh5r5CUJNWle48QM2iQmcie3uDt6iJDMOJHeZ3EEMi0m9qCl685ZIzWHJ8Ssz6Z8oaxtzHJZZYVBAXEU0RlUdKoLd4vSj7aUCDSOcoUx5Xmk53ccD0PN4gYajfasVEvJeYaqj7oUDRCT8nkXQZSIpT9QtDwQ8ie2Y9mhmOKuqmBafIdHwrD5Tdwnn8OychFD6OUF0XAtA7/eUgcbq1oXZ91OPknzimJ/qFLWjSaJK41fpcw33j0DFUKdrqiun3yyEakQR5JGGjTQXSpc+28FaauFLr5HLrmQuW1pLmWkSk2vTNtmG34PiA5RJaqhiGtHzDx0ehDsnwASVz04dnzNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ibYqZxeLoo3vm/OvSUU+hpKFvLy65MYScdCcJWYi4LM=;
- b=cKXr+tJexnSDFNKPOmGfAnsc4m0WiGM4lhq6OYEb+CZH+35bHgJeSsH99mZSdbSTLW5q1oYpUcQWiW5KENB8bJnNAThxbtckPxIRMEisDBhdK52DgQ/2175NFix0gb001FHPugsOkK8s6qn9IunZgTtuNtDDJNeUbZeeDhGrBbnOlS05kpwnT/UoMdWMLUQ/F0nYf3iVFJ+jl815vSeHQAI6y0qoZvxwYwIsI4n9ncrejfc0BgkKGCUKnKXkTSQYTT6HluVfn0fax1O6c8jKw6xB9VE8TzJm4MrjcIlSuW+eNTmCLjEqZLtGgeaTqcFfIIo6CM94GDLChFCjjWhVTg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ibYqZxeLoo3vm/OvSUU+hpKFvLy65MYScdCcJWYi4LM=;
- b=j9w0yFuJsTwxoAh7sSHiCTPydH3kFvhI2pDxQXX1HJpwKjdtcVFvDztDqHO3qy0Fd4A/3HOvcIaXC7eWAekfZF762HXZfDNQA+gLAAeDuWSwp3SdKUf3PDomLKFOr/bIthoFxT7ZSnPekLkkUOIUaizbF+qNGpZNWhGlXtFqRMr1v1lJIOKU6F40KhKLzQQ6rMo8+9YmQojQRLt1ZCSNqixJtZrp96Drz8dyuJyVdPk8SrhxmgzBrI27sdF+pAOnMmG4D2wwZ97Lb9lQB+HBOlYfUN2bXHry8lE3/kxLSrRwn/+r7YU12CvyvD+cQwSWnA/3u4OGDFIDsgT5loSWYg==
-Received: from BL0PR12MB4659.namprd12.prod.outlook.com (2603:10b6:207:1d::33)
- by DM4PR12MB7765.namprd12.prod.outlook.com (2603:10b6:8:102::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17; Fri, 7 Oct
- 2022 05:38:30 +0000
-Received: from BL0PR12MB4659.namprd12.prod.outlook.com
- ([fe80::a1bb:b25d:8309:27e6]) by BL0PR12MB4659.namprd12.prod.outlook.com
- ([fe80::a1bb:b25d:8309:27e6%7]) with mapi id 15.20.5676.028; Fri, 7 Oct 2022
- 05:38:30 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S229525AbiJGGIK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Oct 2022 02:08:10 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11AA9AE840
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 23:08:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1665122887; x=1696658887;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=4aS2jy2IpbxbQ+lHyDBQLDg9e44lRtAL+iT/DLjHSaE=;
+  b=M2aWoKzlxZ7y2agTtFb3UOLJFMS5Lo6dqSEQl2ZSF/pzHlvOZAP37JS5
+   Zf3IHiIxJXRbamc1q17VdOhQH9wqJ4vVuuvf6LYkVaUPqJHRZYdg8xq8P
+   JThNzYynjF5ocT3L5QXg4abT9aAM74fsx1JRaS/OMq1eEZIiT9VvIXcyg
+   8bsoCFAMeU7jYMJeNLyAsAeYbO0Isqtncc/eV3Krq831CIlMxy0vtS2NY
+   V+t2daEW0MygehNAVLiyZUS6x2vpJZB49MeqMI0N8QEy0DHPcijyDXMbU
+   9htmLEcBROJBxH/Rfdf8pjhCUpoF4b9T2LUGM5EGZpCKmow9T84in4/aM
+   g==;
+X-IronPort-AV: E=Sophos;i="5.95,166,1661788800"; 
+   d="scan'208";a="213212392"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Oct 2022 14:08:06 +0800
+IronPort-SDR: BpAUgRFbWq5kQeiPl3gA2OGjPuXYQbB5SNcTunfaDyunkP6zcdjGirJJ8OIjjvolJFAvABt4yD
+ LElAIV4WsjlA2wqDM+zJX5T+QXp5w4QToeqMA+LkZUs65hIi2ctFRM+JlQFCPvLbmZNrWhE/qM
+ lf+mVJVN2EyajuwyjIMq3WrOKtEfJv15DQKSoJiH9gajNc5EYA0QnpL31d66y8wGQYm+HuNHvL
+ 17GUSGWZftj0BFh6X3/IEc077jmF44RpcW7oEOEz3EIxWEAlBGRt886p3XWLYzjrrbrVPWFcd/
+ kyyBHxnDA9D1ZWjoMYwlhIzF
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Oct 2022 22:22:16 -0700
+IronPort-SDR: yWAewKka+3dWQ3k3u2/VLGgKtt4TJv5RrSpGb+SQABxqBCvk3NArzMaF4M+AWq2Zap+W4SQF1t
+ PReDKNbtb7aNejxTpjQYUQzmYtLXyi4DroRK5eTxLwjL+hSOrMQjHG+d112wb1XfAr+8c9Vpn1
+ kOVanywuB/3IQ2XD/bPVhV50TwYEZRo9WiyRFXVaEhPjleT7hhiuEoAZfmuzmXblqeswLAsBTe
+ GlSJ9Nb5lMt2TIQqpz4oGs/YxdYtQhHD+Ap8WrSPs61ZLkt5CIGO+qQCWFmENZAcPUC8Ay3rl+
+ eG8=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Oct 2022 23:08:06 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MkHsx62n7z1RvTp
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 23:08:05 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1665122885; x=1667714886; bh=4aS2jy2IpbxbQ+lHyDBQLDg9e44lRtAL+iT
+        /DLjHSaE=; b=r+wqOanXQQn1HxSdVm02zNsot5ylrv+895QB4yU/1b4sWnr8IH0
+        sFMMpyTz2hhikfu+aaecxNnozNUrgbYkZe7v5RQ6i4I1nwnuSMNxVRyqSYXv0H9S
+        igR2z7DdoV+KCRBAY/YiF5YK8HjHPoZ64r9eT5hqRREVwbgPpkoTPZNRho8euuQ0
+        MI1Fx4BwIMx7jKPvGpora8eJhUCP/QaaiiQcAiLi+jgOM4EOUorVW0nMAdpa9jpx
+        7gZheGj6eeefl6rMwxpvk/xkXkxXUN93dbTcb8Ad5gqrkT/X0Ds7KFvb79c/YXpN
+        PJlO3vxuHBeNX7iTMjjK1NdfuF914z39D4w==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id WPXJx2T0Qpj3 for <linux-block@vger.kernel.org>;
+        Thu,  6 Oct 2022 23:08:05 -0700 (PDT)
+Received: from [10.225.163.106] (unknown [10.225.163.106])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MkHsw6ksWz1RvLy;
+        Thu,  6 Oct 2022 23:08:04 -0700 (PDT)
+Message-ID: <a54a9c84-0dd6-4af6-6c6e-d67d9e5a8695@opensource.wdc.com>
+Date:   Fri, 7 Oct 2022 15:08:03 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
 Subject: Re: [PATCH] null_blk: allow REQ_OP_ZONE_RESET_ALL to configure
-Thread-Topic: [PATCH] null_blk: allow REQ_OP_ZONE_RESET_ALL to configure
-Thread-Index: AQHY2UFEkIAKE36ytU6H0HwdEAigoa4A0sEAgAGYy4A=
-Date:   Fri, 7 Oct 2022 05:38:30 +0000
-Message-ID: <50136c06-498c-4058-731e-01938ad011de@nvidia.com>
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20221006050514.5564-1-kch@nvidia.com>
  <0ac14f65-d8ac-8d50-ccf1-010ec7bcaad9@opensource.wdc.com>
-In-Reply-To: <0ac14f65-d8ac-8d50-ccf1-010ec7bcaad9@opensource.wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR12MB4659:EE_|DM4PR12MB7765:EE_
-x-ms-office365-filtering-correlation-id: 9d01199c-d725-4e06-436d-08daa8262a86
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8iK5WJzzHqPz51TzWbCbhxoELIt35Om/AQQ54WIO1ZKsdPhbuBNsALTLvWyy/OQFRBd48SpRSYrdo4Ccrl/D+bi/2pVmSAjQKd64GrBy2LdNI3X5pn4gAizbL21ahw2LA/+g6hUxrxaKJjzBYhfkqJDVxPNZUAVI31krijiLf67RU9pTAOfaPTzNgccv0XEGpI7TmSnRqi6rah9QUK9EgO2yUyyW6N8YfaV4RKZ2QG8+hN/V85SFazStHYr6vwHp6k5tkU970MJchIV8XxrRXSTioEjbQ8323IMHzUlIEMhzKh7WG5/VgmCao8sthR3wmJIocikAfEJMOmxIPmxOF9fFhNY8kxZJoU7eSdIwtPBp5fRWVzcsVHXE1y6wsXWL+DDP4AjaN4RvTMSQPsknxdMejCY1towlVFQezxANODReIsPbszNdkCf7eLiZSQM+zCP8WQOz4QZRcIo4SpNmm9U/KQ98bZLTbc3tBTP5Sp6uI83RE/T3NdoReoe0drfY2ESTyU79tOEtfvVrkkmJkQ+0x/mbshGa8I5a15iIWtciPJiX5gPE6gHKpyxC97Lf8CynR5q9jESXFLydvMS4rgOY1hw7j32USAshzDb9GYjqFqo3eiOGL/mGimYrW4xJ8lkzeOgemTdMaQ8kHpT7oIigjyHy65gR+Ti68ZnZbzN6gYtUYUsoWiAyWB3ETrc9DGV76VuQwdSlz1QwDb4jKHZ+I/XPjEyvmog8TWg4bm1TKHxy/gas+BBezLFaI6RME1AT4g8gs8BdyQs/wweS17HJ6Kc3AdEF1fN7M49PUbRiY+owB2Yyn8Wwrjg1ajPMxPLuZD3KxZfT90/NHRofNw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB4659.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(366004)(376002)(136003)(39860400002)(346002)(451199015)(86362001)(6512007)(6506007)(8936002)(38070700005)(316002)(83380400001)(2906002)(110136005)(53546011)(36756003)(66476007)(478600001)(122000001)(2616005)(31696002)(31686004)(71200400001)(64756008)(91956017)(8676002)(5660300002)(6486002)(66446008)(66946007)(66556008)(38100700002)(76116006)(186003)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Ulc3L1NuSTA4azFGZW1UbjFrQjN1SXUzODZWUGwwc3hsb3pSdGFaeEE1eUNG?=
- =?utf-8?B?K1ZlMEFqdElURW96L2Z6TmpYM3RielNEa1I1aG9TOEQxSGxOYUYrSFlnRnNj?=
- =?utf-8?B?YW53cUg5T0ZWbmhmS3QxRFgrcm5oSnM2QmFtVm1UaVNKNmJueW9Fck1GL1Fq?=
- =?utf-8?B?azhVbzZKajdMcmRLU2NmVCtFUUNLK0pVMkJVeTBYekx3cWZxc3QwS0FCM3ZC?=
- =?utf-8?B?WHY4T2l3NjZOMWhoSnpLQ0JuM3lIZkRXQXlSZ1BPbDZqWXYxck9kc1FEcmpD?=
- =?utf-8?B?WSsrOTc4M2NIb3RYbXgzVEZkOEkyWHVrYjgxOVdZMmkvTys4UUpqYkFibHAz?=
- =?utf-8?B?YkhGUlNhVGwwSnZXVHBTL25aL0lkNUJZUmRiemhmYlZJMEpUdFk5dlkvK21h?=
- =?utf-8?B?OFBSQWhJeENvQkZBaW5wUUdFaExnTUVNMHZhZUdweXBZYnloQ3BTV3c1MUlY?=
- =?utf-8?B?dnlGRXpKZlE4bExjazVpK0NYTkxTUnVVRXIxLzE1d0VXWnVqemllZElHZEVW?=
- =?utf-8?B?bnhGckh1N3ZaLzJMSlJNN2JKOHA3aXRCOTEvRCtGS1dwd0FuWFVMREwzVjNa?=
- =?utf-8?B?bzRCRTJjT3h6YWhjc2UzYlJBcEdLbGJpOTA3WTZ3L2xuS1hEaUZ4ZTZRMGhD?=
- =?utf-8?B?Y21tS1JzTUdwZHZvaG1qaENyb0lwVzlpK1czL2plQVFlcWsyVTJKTitZTjRF?=
- =?utf-8?B?czdFYmp6d3hpR3VHZEIxTnZlU1hieStkV2FOZTQ4dnN2UE90b1NwY3l3ZkNj?=
- =?utf-8?B?cW15dVdnVHhtRmpuUmd5cEkzR1JWVUliU29rdExLWWZCRG9KL2x2RWhlV2Jq?=
- =?utf-8?B?dVRiaUQ5VUtmWlpSZUxJY2ZLYXJiTkFIeTEzZFRCcFFsQWRkeFlaZGRBWG9i?=
- =?utf-8?B?dE9qd3RmdnRpdnhScHAzb0VESmJBeTlmcGw0eUQ3dFlHYWNCWmxNRGtVbWdY?=
- =?utf-8?B?dU5mZXFVSlN6Y2NsKzIxVkxkQVloOThKUWpPQWJ5Ulk1MHdIOWlCMVl1Z3By?=
- =?utf-8?B?Tis5UmpzQy9iRjRNYmZlNWlBVWFLemZLU3VOL20zcmROQXV1U2ZPQWF4NVNY?=
- =?utf-8?B?RWg2blZWNHRxWWlKQnFYYXRZWitSSUY3SzArRmJJTjR3a3dyeTc3ZlM1TWQy?=
- =?utf-8?B?QUM4L29ZQWY1aS9mem5ZNUFtSmg1K2R3VkptU3RiSDd4SllDT09VM2kwYXlM?=
- =?utf-8?B?b1V3eWxXNkFyRmNnenBVR3lUTHBWTFhXMzBhTkl0SHpCemlHWldFTlh2SU9a?=
- =?utf-8?B?YUxkaEY1ZFJpRmVJejJYbnZmVFZxRWFGT2tFU284UVk5Q1FCY0gwcnVlREZU?=
- =?utf-8?B?NldQSDhLalRJUDZTMGlYallNaVVpNDlIa1BHaU9jWW1yQ2dRTlFQaUZXZ29U?=
- =?utf-8?B?V3MxdFpDdU9zZzhRREFqMnB3NnFENGQwdDFnMzAzYTNXZFRhRHBNTGh4a1M4?=
- =?utf-8?B?NStWTUNlSng0VVNVWHozTjAzTEVvYU9WQjBDTjNVbGZOYzdJMkc2b2FwNWJY?=
- =?utf-8?B?aWF4Sll1cVlBR1BHVlZVY3oxOFA2QlFrTkJ6ZDh6KzJpVXVicDN1WnViKzNz?=
- =?utf-8?B?ZGdKZ01TamJmSlY0cGdGOFNsQnhCVWlLU1pFZ0hiVjdncGNUVE1lUXQ2WUlF?=
- =?utf-8?B?Z2hCWmhYMzduaEx5OHJPeTdnVndqV2cxN01zNmFHT3Z3WXFVT3JSOVJVdUtB?=
- =?utf-8?B?eDdzMHpiVnZWb0RFVW9NZWYxNndqVTRLU1pua0hnRzk1NlUxTUpJOVZNamVD?=
- =?utf-8?B?K0VjWXAvdVMyU0M4YlJScG1tUWMvTWE4dDBQeHplNFl1NWQydmgzU1ZCVzFH?=
- =?utf-8?B?UG1JaVUwUUZobmVnMkhBenJkSS9PMW5OcWUwczlSYjJkTFpDWjhqZ1pzVE4w?=
- =?utf-8?B?c3k4V0dqdjUxSXZGVUhuOEIwZmhGSGxNVWIxdEZPbTNNUVBrOVAyd2tRQW9C?=
- =?utf-8?B?NFViRFJ6UGh2MnphbTcvVjVSQldXTE5kZHI4eXdiRGpocmFac1lsM1N4cVI3?=
- =?utf-8?B?cWwxbE5xLzBuNFVEN1RyVkQ2ZGdWSE5xUFRLVWNYR0xqT3ZQR3NhRE1xOTdG?=
- =?utf-8?B?SDF2SFp4ZVhzdDZnZUppbHV1OUZDV1FWcm1tbDg5TFM0YURyTm1UU2ZnZTQv?=
- =?utf-8?B?dnd0U0JEbENMSS8wcThvaEtsa3I4dWJsc1pFOWlDV014dzJtb3ZpUUlJSEZO?=
- =?utf-8?Q?m7rVcwNSm0y+uDVsToKc3CdvUguvfyh21BND80aAp5cf?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <91A3F5C5D919AD40BBFFD3AA868A7AFE@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB4659.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d01199c-d725-4e06-436d-08daa8262a86
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2022 05:38:30.1387
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6s9cBD5pj4Fgz5cxKey4MHTO1NNOD2giMyjobDRW7B9TUJcNsviWjSUhWlDkVJazSLZt8PxbHuVx5GVig37O1A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7765
+ <50136c06-498c-4058-731e-01938ad011de@nvidia.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <50136c06-498c-4058-731e-01938ad011de@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMTAvNS8yMiAyMjoxNSwgRGFtaWVuIExlIE1vYWwgd3JvdGU6DQo+IE9uIDEwLzYvMjIgMTQ6
-MDUsIENoYWl0YW55YSBLdWxrYXJuaSB3cm90ZToNCj4+IEZvciBhIFpvbmVkIEJsb2NrIERldmlj
-ZSB6b25lIHJlc2V0IGFsbCBpcyBlbXVsYXRlZCBpZiB1bmRlcmxheWluZw0KPj4gZGV2aWNlIGRv
-ZXNuJ3Qgc3VwcG9ydCBSRVFfT1BfWk9ORV9SRVNFVF9BTEwgb3BlcmF0aW9uLiBJbiBudWxsX2Js
-aw0KPj4gWm9uZWQgbW9kZSB0aGVyZSBpcyBubyB3YXkgdG8gdGVzdCB6b25lIHJlc2V0IGFsbCBl
-bXVsYXRpb24gcHJlc2VudCBpbg0KPj4gdGhlIGJsb2NrIGxheWVyIHNpbmNlIHdlIGVuYWJsZSBp
-dCBieSBkZWZhdWx0IDotDQo+Pg0KPj4gYmxrZGV2X3pvbmVfbWdtdCgpDQo+PiAgIGJsa2Rldl96
-b25lX3Jlc2V0X2FsbF9lbXVsYXRpb24oKSA8LS0tDQo+PiAgIGJsa2Rldl96b25lX3Jlc2V0X2Fs
-bCgpDQo+Pg0KPj4gQWRkIGEgbW9kdWxlIHBhcmFtZXRlciB6b25lX3Jlc2V0X2FsbCB0byBlbmFi
-bGUgb3IgZGlzYWJsZQ0KPj4gUkVRX09QX1pPTkVfUkVTRVRfQUxMLCBlbmFibGUgaXQgYnkgZGVm
-YXVsdCB0byByZXRhaW4gdGhlIGV4aXN0aW5nDQo+PiBiZWhhdmlvdXIuDQo+Pg0KPj4gU2lnbmVk
-LW9mZi1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCj4+IC0tLQ0KPj4g
-IyBnaXQgbG9nIC0xDQo+PiBjb21taXQgOGNhMGJkNTNhOWM5ZTJmNThjNGZjOWUzOGUzZjVmODJk
-MjZkMzg1MSAoSEVBRCAtPiBmb3ItbmV4dCkNCj4+IEF1dGhvcjogQ2hhaXRhbnlhIEt1bGthcm5p
-IDxrY2hAbnZpZGlhLmNvbT4NCj4+IERhdGU6ICAgV2VkIE9jdCA1IDIxOjU3OjAwIDIwMjIgLTA3
-MDANCj4+DQo+PiAgICAgIG51bGxfYmxrOiBhbGxvdyBSRVFfT1BfWk9ORV9SRVNFVF9BTEwgdG8g
-Y29uZmlndXJlDQo+PiAgICAgIA0KPj4gICAgICBGb3IgYSBab25lZCBCbG9jayBEZXZpY2Ugem9u
-ZSByZXNldCBhbGwgaXMgZW11bGF0ZWQgaWYgdW5kZXJsYXlpbmcNCj4+ICAgICAgZGV2aWNlIGRv
-ZXNuJ3Qgc3VwcG9ydCBSRVFfT1BfWk9ORV9SRVNFVF9BTEwgb3BlcmF0aW9uLiBJbiBudWxsX2Js
-aw0KPj4gICAgICBab25lZCBtb2RlIHRoZXJlIGlzIG5vIHdheSB0byB0ZXN0IHpvbmUgcmVzZXQg
-YWxsIGVtdWxhdGlvbiBwcmVzZW50IGluDQo+PiAgICAgIHRoZSBibG9jayBsYXllciBzaW5jZSB3
-ZSBlbmFibGUgaXQgYnkgZGVmYXVsdCA6LQ0KPj4gICAgICANCj4+ICAgICAgYmxrZGV2X3pvbmVf
-bWdtdCgpDQo+PiAgICAgICBibGtkZXZfem9uZV9yZXNldF9hbGxfZW11bGF0aW9uKCkgPC0tLQ0K
-Pj4gICAgICAgYmxrZGV2X3pvbmVfcmVzZXRfYWxsKCkNCj4+ICAgICAgDQo+PiAgICAgIEFkZCBh
-IG1vZHVsZSBwYXJhbWV0ZXIgem9uZV9yZXNldF9hbGwgdG8gZW5hYmxlIG9yIGRpc2FibGUNCj4+
-ICAgICAgUkVRX09QX1pPTkVfUkVTRVRfQUxMLCBlbmFibGUgaXQgYnkgZGVmYXVsdCB0byByZXRh
-aW4gdGhlIGV4aXN0aW5nDQo+PiAgICAgIGJlaGF2aW91ci4NCj4+ICAgICAgDQo+PiAgICAgIFNp
-Z25lZC1vZmYtYnk6IENoYWl0YW55YSBLdWxrYXJuaSA8a2NoQG52aWRpYS5jb20+DQo+PiAjIC4v
-Y29tcGlsZV9udWxsYi5zaA0KPj4gKyB1bW91bnQgL21udC9udWxsYjANCj4+IHVtb3VudDogL21u
-dC9udWxsYjA6IG5vdCBtb3VudGVkLg0KPj4gKyBybWRpciAnY29uZmlnL251bGxiL251bGxiKicN
-Cj4+IHJtZGlyOiBmYWlsZWQgdG8gcmVtb3ZlICdjb25maWcvbnVsbGIvbnVsbGIqJzogTm8gc3Vj
-aCBmaWxlIG9yIGRpcmVjdG9yeQ0KPj4gKyBkbWVzZyAtYw0KPj4gKyBtb2Rwcm9iZSAtciBudWxs
-X2Jsaw0KPj4gKyBsc21vZA0KPj4gKyBncmVwIG51bGxfYmxrDQo+PiArKyBucHJvYw0KPj4gKyBt
-YWtlIC1qIDQ4IE09ZHJpdmVycy9ibG9jayBtb2R1bGVzDQo+PiArIEhPU1Q9ZHJpdmVycy9ibG9j
-ay9udWxsX2Jsay8NCj4+ICsrIHVuYW1lIC1yDQo+PiArIEhPU1RfREVTVD0vbGliL21vZHVsZXMv
-Ni4wLjAtcmM3YmxrKy9rZXJuZWwvZHJpdmVycy9ibG9jay9udWxsX2Jsay8NCj4+ICsgY3AgZHJp
-dmVycy9ibG9jay9udWxsX2Jsay8vbnVsbF9ibGsua28gL2xpYi9tb2R1bGVzLzYuMC4wLXJjN2Js
-aysva2VybmVsL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsvLw0KPj4gKyBscyAtbHJ0aCAvbGliL21v
-ZHVsZXMvNi4wLjAtcmM3YmxrKy9rZXJuZWwvZHJpdmVycy9ibG9jay9udWxsX2Jsay8vbnVsbF9i
-bGsua28NCj4+IC1ydy1yLS1yLS0uIDEgcm9vdCByb290IDEuMk0gT2N0ICA1IDIxOjU3IC9saWIv
-bW9kdWxlcy82LjAuMC1yYzdibGsrL2tlcm5lbC9kcml2ZXJzL2Jsb2NrL251bGxfYmxrLy9udWxs
-X2Jsay5rbw0KPj4gKyBzbGVlcCAxDQo+PiArIGRtZXNnIC1jDQo+PiAjIG1vZHByb2JlIG51bGxf
-YmxrIGdiPTEgem9uZWQ9MSB6b25lX3NpemU9MTI4IDwtLS0NCj4+ICMgbHNibGsNCj4+IE5BTUUg
-ICAgTUFKOk1JTiBSTSAgU0laRSBSTyBUWVBFIE1PVU5UUE9JTlQNCj4+IHNkYSAgICAgICA4OjAg
-ICAgMCAgIDUwRyAgMCBkaXNrDQo+PiDilJzilIBzZGExICAgIDg6MSAgICAwICAgIDFHICAwIHBh
-cnQgL2Jvb3QNCj4+IOKUlOKUgHNkYTIgICAgODoyICAgIDAgICA0OUcgIDAgcGFydCAvaG9tZQ0K
-Pj4gc2RiICAgICAgIDg6MTYgICAwICAxMDBHICAwIGRpc2sgL21udC9kYXRhDQo+PiBzcjAgICAg
-ICAxMTowICAgIDEgMTAyNE0gIDAgcm9tDQo+PiBudWxsYjAgIDI1MDowICAgIDAgICAgMUcgIDAg
-ZGlzaw0KPj4genJhbTAgICAyNTE6MCAgICAwICAgIDhHICAwIGRpc2sgW1NXQVBdDQo+PiB2ZGEg
-ICAgIDI1MjowICAgIDAgIDUxMk0gIDAgZGlzaw0KPj4gbnZtZTBuMSAyNTk6MCAgICAwICAgIDFH
-ICAwIGRpc2sNCj4+ICMgYmxrem9uZSByZXNldCAvZGV2L251bGxiMA0KPj4gIyBkbWVzZyAgLWMN
-Cj4+IFsgIDM5Ny4wNzkyMjFdIG51bGxfYmxrOiBkaXNrIG51bGxiMCBjcmVhdGVkDQo+PiBbICAz
-OTcuMDc5MjI2XSBudWxsX2JsazogbW9kdWxlIGxvYWRlZA0KPj4gWyAgNDA2LjYyNjUwMF0gYmxr
-ZGV2X3pvbmVfcmVzZXRfYWxsIDIzNyA8LS0tDQo+PiAjIG1vZHByb2JlIC1yIG51bGxfYmxrDQo+
-PiAjDQo+PiAjDQo+PiAjDQo+PiAjIG1vZHByb2JlIG51bGxfYmxrIGdiPTEgem9uZWQ9MSB6b25l
-X3NpemU9MTI4IHpvbmVfcmVzZXRfYWxsPTAgPC0tLQ0KPj4gIyBsc2Jsaw0KPj4gTkFNRSAgICBN
-QUo6TUlOIFJNICBTSVpFIFJPIFRZUEUgTU9VTlRQT0lOVA0KPj4gc2RhICAgICAgIDg6MCAgICAw
-ICAgNTBHICAwIGRpc2sNCj4+IOKUnOKUgHNkYTEgICAgODoxICAgIDAgICAgMUcgIDAgcGFydCAv
-Ym9vdA0KPj4g4pSU4pSAc2RhMiAgICA4OjIgICAgMCAgIDQ5RyAgMCBwYXJ0IC9ob21lDQo+PiBz
-ZGIgICAgICAgODoxNiAgIDAgIDEwMEcgIDAgZGlzayAvbW50L2RhdGENCj4+IHNyMCAgICAgIDEx
-OjAgICAgMSAxMDI0TSAgMCByb20NCj4+IG51bGxiMCAgMjUwOjAgICAgMCAgICAxRyAgMCBkaXNr
-DQo+PiB6cmFtMCAgIDI1MTowICAgIDAgICAgOEcgIDAgZGlzayBbU1dBUF0NCj4+IHZkYSAgICAg
-MjUyOjAgICAgMCAgNTEyTSAgMCBkaXNrDQo+PiBudm1lMG4xIDI1OTowICAgIDAgICAgMUcgIDAg
-ZGlzaw0KPj4gIyBibGt6b25lIHJlc2V0IC9kZXYvbnVsbGIwDQo+PiAjIGRtZXNnICAtYw0KPj4g
-WyAgNDI1LjQ1NjE4N10gbnVsbF9ibGs6IGRpc2sgbnVsbGIwIGNyZWF0ZWQNCj4+IFsgIDQyNS40
-NTYxOTJdIG51bGxfYmxrOiBtb2R1bGUgbG9hZGVkDQo+PiBbICA0MzguNDE5NTI5XSBibGtkZXZf
-em9uZV9yZXNldF9hbGxfZW11bGF0ZWQgMTk3IDwtLS0NCj4+ICMgbW9kcHJvYmUgLXIgbnVsbF9i
-bGsNCj4+ICMNCj4+IC0tLQ0KPj4gICBkcml2ZXJzL2Jsb2NrL251bGxfYmxrL21haW4uYyAgICAg
-fCA1ICsrKysrDQo+PiAgIGRyaXZlcnMvYmxvY2svbnVsbF9ibGsvbnVsbF9ibGsuaCB8IDEgKw0K
-Pj4gICBkcml2ZXJzL2Jsb2NrL251bGxfYmxrL3pvbmVkLmMgICAgfCAzICsrLQ0KPj4gICAzIGZp
-bGVzIGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPj4NCj4+IGRpZmYg
-LS1naXQgYS9kcml2ZXJzL2Jsb2NrL251bGxfYmxrL21haW4uYyBiL2RyaXZlcnMvYmxvY2svbnVs
-bF9ibGsvbWFpbi5jDQo+PiBpbmRleCA4YjdmNDIwMjRmMTQuLmEwNTcyZTZjMjhjZSAxMDA2NDQN
-Cj4+IC0tLSBhL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsvbWFpbi5jDQo+PiArKysgYi9kcml2ZXJz
-L2Jsb2NrL251bGxfYmxrL21haW4uYw0KPj4gQEAgLTI2MCw2ICsyNjAsMTAgQEAgc3RhdGljIHVu
-c2lnbmVkIGludCBnX3pvbmVfbWF4X2FjdGl2ZTsNCj4+ICAgbW9kdWxlX3BhcmFtX25hbWVkKHpv
-bmVfbWF4X2FjdGl2ZSwgZ196b25lX21heF9hY3RpdmUsIHVpbnQsIDA0NDQpOw0KPj4gICBNT0RV
-TEVfUEFSTV9ERVNDKHpvbmVfbWF4X2FjdGl2ZSwgIk1heGltdW0gbnVtYmVyIG9mIGFjdGl2ZSB6
-b25lcyB3aGVuIGJsb2NrIGRldmljZSBpcyB6b25lZC4gRGVmYXVsdDogMCAobm8gbGltaXQpIik7
-DQo+PiAgIA0KPj4gK3N0YXRpYyBib29sIGdfem9uZV9yZXNldF9hbGwgPSB0cnVlOw0KPj4gK21v
-ZHVsZV9wYXJhbV9uYW1lZCh6b25lX3Jlc2V0X2FsbCwgZ196b25lX3Jlc2V0X2FsbCwgYm9vbCwg
-MDQ0NCk7DQo+IA0KPiBOaXQ6IFdoeSByZWFkLW9ubHkgPyBZb3UgY2FuIG1ha2UgaXQgd3JpdGFi
-bGUgd2l0aG91dCBhbnkgaXNzdWUsIG5vID8NCj4gDQoNClNvcnJ5IEkgZGlkbid0IHVuZGVyc3Rh
-bmQgdGhpcyBjb21tZW50LiBJbiBjYXNlIHRoaXMgY29tbWVudCBpcyBhYm91dCANCm5ldyB6b25l
-X3Jlc2V0X2FsbCBtb2RwcmFtIGJlaW5nIHJlYWRvbmx5IGFuZCBub3QgYWxsb3dlZCB0byBzZXQg
-dmlhIA0KY29tbWFuZCBsaW5lPyBUaGUgdGVzdCBsb2cgc2hvd3MgSSB3YXMgYWJsZSB0byBzZXQg
-aXQgdG8gMCBhbmQgdHJpZ2dlciANCmNhbGwgdG8gYmxrZGV2X3pvbmVfcmVzZXRfYWxsX2VtdWxh
-dGVkKCkgYW5kIGRlZmF1bHQgYmVoYXZpb3IgZW5kcyB1cCANCmNhbGxpbmcgYmxrZGV2X3pvbmVf
-cmVzZXRfYWxsKCkuDQoNCi1jaw0KDQo=
+On 10/7/22 14:38, Chaitanya Kulkarni wrote:
+> On 10/5/22 22:15, Damien Le Moal wrote:
+>> On 10/6/22 14:05, Chaitanya Kulkarni wrote:
+>>> For a Zoned Block Device zone reset all is emulated if underlaying
+>>> device doesn't support REQ_OP_ZONE_RESET_ALL operation. In null_blk
+>>> Zoned mode there is no way to test zone reset all emulation present i=
+n
+>>> the block layer since we enable it by default :-
+>>>
+>>> blkdev_zone_mgmt()
+>>>   blkdev_zone_reset_all_emulation() <---
+>>>   blkdev_zone_reset_all()
+>>>
+>>> Add a module parameter zone_reset_all to enable or disable
+>>> REQ_OP_ZONE_RESET_ALL, enable it by default to retain the existing
+>>> behaviour.
+>>>
+>>> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+>>> ---
+>>> # git log -1
+>>> commit 8ca0bd53a9c9e2f58c4fc9e38e3f5f82d26d3851 (HEAD -> for-next)
+>>> Author: Chaitanya Kulkarni <kch@nvidia.com>
+>>> Date:   Wed Oct 5 21:57:00 2022 -0700
+>>>
+>>>      null_blk: allow REQ_OP_ZONE_RESET_ALL to configure
+>>>     =20
+>>>      For a Zoned Block Device zone reset all is emulated if underlayi=
+ng
+>>>      device doesn't support REQ_OP_ZONE_RESET_ALL operation. In null_=
+blk
+>>>      Zoned mode there is no way to test zone reset all emulation pres=
+ent in
+>>>      the block layer since we enable it by default :-
+>>>     =20
+>>>      blkdev_zone_mgmt()
+>>>       blkdev_zone_reset_all_emulation() <---
+>>>       blkdev_zone_reset_all()
+>>>     =20
+>>>      Add a module parameter zone_reset_all to enable or disable
+>>>      REQ_OP_ZONE_RESET_ALL, enable it by default to retain the existi=
+ng
+>>>      behaviour.
+>>>     =20
+>>>      Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+>>> # ./compile_nullb.sh
+>>> + umount /mnt/nullb0
+>>> umount: /mnt/nullb0: not mounted.
+>>> + rmdir 'config/nullb/nullb*'
+>>> rmdir: failed to remove 'config/nullb/nullb*': No such file or direct=
+ory
+>>> + dmesg -c
+>>> + modprobe -r null_blk
+>>> + lsmod
+>>> + grep null_blk
+>>> ++ nproc
+>>> + make -j 48 M=3Ddrivers/block modules
+>>> + HOST=3Ddrivers/block/null_blk/
+>>> ++ uname -r
+>>> + HOST_DEST=3D/lib/modules/6.0.0-rc7blk+/kernel/drivers/block/null_bl=
+k/
+>>> + cp drivers/block/null_blk//null_blk.ko /lib/modules/6.0.0-rc7blk+/k=
+ernel/drivers/block/null_blk//
+>>> + ls -lrth /lib/modules/6.0.0-rc7blk+/kernel/drivers/block/null_blk//=
+null_blk.ko
+>>> -rw-r--r--. 1 root root 1.2M Oct  5 21:57 /lib/modules/6.0.0-rc7blk+/=
+kernel/drivers/block/null_blk//null_blk.ko
+>>> + sleep 1
+>>> + dmesg -c
+>>> # modprobe null_blk gb=3D1 zoned=3D1 zone_size=3D128 <---
+>>> # lsblk
+>>> NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+>>> sda       8:0    0   50G  0 disk
+>>> =E2=94=9C=E2=94=80sda1    8:1    0    1G  0 part /boot
+>>> =E2=94=94=E2=94=80sda2    8:2    0   49G  0 part /home
+>>> sdb       8:16   0  100G  0 disk /mnt/data
+>>> sr0      11:0    1 1024M  0 rom
+>>> nullb0  250:0    0    1G  0 disk
+>>> zram0   251:0    0    8G  0 disk [SWAP]
+>>> vda     252:0    0  512M  0 disk
+>>> nvme0n1 259:0    0    1G  0 disk
+>>> # blkzone reset /dev/nullb0
+>>> # dmesg  -c
+>>> [  397.079221] null_blk: disk nullb0 created
+>>> [  397.079226] null_blk: module loaded
+>>> [  406.626500] blkdev_zone_reset_all 237 <---
+>>> # modprobe -r null_blk
+>>> #
+>>> #
+>>> #
+>>> # modprobe null_blk gb=3D1 zoned=3D1 zone_size=3D128 zone_reset_all=3D=
+0 <---
+>>> # lsblk
+>>> NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+>>> sda       8:0    0   50G  0 disk
+>>> =E2=94=9C=E2=94=80sda1    8:1    0    1G  0 part /boot
+>>> =E2=94=94=E2=94=80sda2    8:2    0   49G  0 part /home
+>>> sdb       8:16   0  100G  0 disk /mnt/data
+>>> sr0      11:0    1 1024M  0 rom
+>>> nullb0  250:0    0    1G  0 disk
+>>> zram0   251:0    0    8G  0 disk [SWAP]
+>>> vda     252:0    0  512M  0 disk
+>>> nvme0n1 259:0    0    1G  0 disk
+>>> # blkzone reset /dev/nullb0
+>>> # dmesg  -c
+>>> [  425.456187] null_blk: disk nullb0 created
+>>> [  425.456192] null_blk: module loaded
+>>> [  438.419529] blkdev_zone_reset_all_emulated 197 <---
+>>> # modprobe -r null_blk
+>>> #
+>>> ---
+>>>   drivers/block/null_blk/main.c     | 5 +++++
+>>>   drivers/block/null_blk/null_blk.h | 1 +
+>>>   drivers/block/null_blk/zoned.c    | 3 ++-
+>>>   3 files changed, 8 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/m=
+ain.c
+>>> index 8b7f42024f14..a0572e6c28ce 100644
+>>> --- a/drivers/block/null_blk/main.c
+>>> +++ b/drivers/block/null_blk/main.c
+>>> @@ -260,6 +260,10 @@ static unsigned int g_zone_max_active;
+>>>   module_param_named(zone_max_active, g_zone_max_active, uint, 0444);
+>>>   MODULE_PARM_DESC(zone_max_active, "Maximum number of active zones w=
+hen block device is zoned. Default: 0 (no limit)");
+>>>  =20
+>>> +static bool g_zone_reset_all =3D true;
+>>> +module_param_named(zone_reset_all, g_zone_reset_all, bool, 0444);
+>>
+>> Nit: Why read-only ? You can make it writable without any issue, no ?
+>>
+>=20
+> Sorry I didn't understand this comment. In case this comment is about=20
+> new zone_reset_all modpram being readonly and not allowed to set via=20
+> command line? The test log shows I was able to set it to 0 and trigger=20
+> call to blkdev_zone_reset_all_emulated() and default behavior ends up=20
+> calling blkdev_zone_reset_all().
+>=20
+> -ck
+>=20
+
+If you change the param mode to 644, one can do:
+
+echo 0 >/sys/module/null_blk/parameters/zone_reset_all
+or
+echo 1 >/sys/module/null_blk/parameters/zone_reset_all
+
+But given that all null_blk parameters are read-only, not a big deal.
+
+--=20
+Damien Le Moal
+Western Digital Research
+
