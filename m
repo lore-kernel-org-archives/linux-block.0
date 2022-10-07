@@ -2,191 +2,244 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B60C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 01:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA78CC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  7 Oct 2022 01:36:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232442AbiJGBFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Oct 2022 21:05:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37010 "EHLO
+        id S230323AbiJGBg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Oct 2022 21:36:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231453AbiJGBFs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 21:05:48 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04BFC8953
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 18:05:46 -0700 (PDT)
+        with ESMTP id S230140AbiJGBg4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Oct 2022 21:36:56 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E023692592
+        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 18:36:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1665104746; x=1696640746;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=pueaaqQCcatUTiGFsMlRm1mvaZDzz7r2NEvIMnNCLcY=;
-  b=faKeASlG9R9cQWeNCwpqiFM0CNwPd22m3KjyZ6YbT0bPvEzyyxWiHti0
-   BI7C8dyOQt0MX8P8Pd7j5ksKMCjhpkwdDLt6cFs6VtBnivHPw2jD2tmqE
-   V4y31A7GWEgQBeHahWfyNKxlGsLdAGMs6Wu6d+oY94DFXIPc7oazBKg2W
-   2/3IjbRq9byrFpXBAfibhgHaVl7iujqBGzPH9Y/SAOE7Seas0L1iLM3jk
-   VT63jCvdnIDbDkh40PiQZLNMeHD+BL3WaAAF8mgAngqoza6n4/wotHadt
-   YkSmGFLk3VfO4SJPfx2TaIl8eSLf/4wlJhSUKJGQImXB6xcO6xWp08DSh
-   g==;
+  t=1665106612; x=1696642612;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=6DGgGL0W8/mlRRrzW/RdXgR1QOTzLHtKPgtlYn1bTlA=;
+  b=B34+bwbkKsIpOcPDGsMmnpe4XCdghDnZL0cRvOsJFeV+3bjDfdxrKDYt
+   5xKwdHv5P/OCaKPOj9xI8mci4QTN4G6ybL/5NbptAmzj8YWJH20J1NE7M
+   5Y7Y8RQGI+DdEIfPA9ufwsnaav0CsKBgguCVTXoN10+cbguqsqs5kI2RJ
+   F74WSVbga963ycxRtZ1C0dQoZlKzrM1piS/sFKXwwnbV3BKE0AkXmAJOF
+   M3WppymGGRZIravlNYq2cIMNpfS1vuXfVFWotTVtpVQrifGQl4K4xO5cl
+   6i4/b9y2HQokn9GSOZDZA0hPTKGQys7Nz3MoegVyJsOpZYH+ideVN8zuw
+   w==;
 X-IronPort-AV: E=Sophos;i="5.95,164,1661788800"; 
-   d="scan'208";a="317484928"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Oct 2022 09:05:45 +0800
-IronPort-SDR: 5ExqaB+u+fRuFDUpWgX2qJaL/R1iOEDRifQ3BAGCoZYTEkkLXCqyPhTww/bXy+QQX0mQ+g419v
- dEYLu1mrWiTEd+x/xtO5hdYlWJ6N7tH/WtFee1L1jYpRK6GJCy2jVM7lR/FXBFUlGUNPj8p+4j
- ZT2Axj0yZpdjFYmROGbSfsxvn5XzSkLIW73XLb2iYYUc+CG6w2wDBREnG6QTBwJRFBU4thXK5h
- orAF/gzrHFWOvYvTOlVlDeyGhSRABVn8s4lDQZPR7mwoQ/y6wY2wWrPYA7/jAvEbSmQXUVR4YF
- GIk0KAPL+8XLTkTQZvQjTjmo
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Oct 2022 17:25:31 -0700
-IronPort-SDR: MYGI17Gbpee21HyQiU2TM0woIxnj/hwaImQKPl3yxveB6CLn8JyvDS3AWTVCfjYxn7lyfp2hiC
- OqnDugJ4qwywX+DTDOJODWPzVlmupNMGIADrhGk7qZYNppEsN0d/+39yepa2oTTuiEhIVMrQ4Y
- Aej7quUjp49S423dsisU+4vX4iXiKzprV0Q7G0jd6lkFhkOrcvKlXijRJ1MTLNCPEfVWsNh9rl
- 0KBpR92ab6LfYewmPKLwgDUOARK/VU+3gPqXLaY/ale0j9DVMGIQ3trZ01waUwE1sJPzPMH8ql
- bCM=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Oct 2022 18:05:45 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Mk9953L7Qz1RvTr
-        for <linux-block@vger.kernel.org>; Thu,  6 Oct 2022 18:05:45 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1665104744; x=1667696745; bh=pueaaqQCcatUTiGFsMlRm1mvaZDzz7r2NEv
-        IMnNCLcY=; b=d4DrCSZY0TLHs4y2tKPHIhllYvs5MnQASNhd5oWS7DNSrnuN3Mp
-        SMVrBXukTgvf6m25x1bP8FgKnaZjeioeN2M8DEAf2zAsppoRXaaY7TKpQiZ1yG34
-        TyVQu+yPiyyOYLURoZxNDri+LwP0Du0zZspEQCMFZS3ztTJOc+gvHqX8jhzyttvz
-        Vilj5SDbZM5amh3I9kFK1E7cay9nE0FCUoumkTjNwFwBqQYvGceivscf21T6Mixq
-        o8J4lnlE1mv4PEHHkz0bRa3AWPul4IrxTskVnBc+dmBiiJkqH1t5JoBhVgP75FGy
-        qKEdSL8NY1zlmkzxaEtVKln3qAawGWL2NVA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id dY10EIi-eV5p for <linux-block@vger.kernel.org>;
-        Thu,  6 Oct 2022 18:05:44 -0700 (PDT)
-Received: from [10.225.163.106] (unknown [10.225.163.106])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Mk9936VzTz1RvLy;
-        Thu,  6 Oct 2022 18:05:43 -0700 (PDT)
-Message-ID: <45f1ee63-793d-2a13-90cc-2312b17dffaa@opensource.wdc.com>
-Date:   Fri, 7 Oct 2022 10:05:42 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: soft lockup with pre-rc1
-Content-Language: en-US
-To:     Jeff Layton <jlayton@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-ide <linux-ide@vger.kernel.org>,
+   d="scan'208";a="218374739"
+Received: from mail-dm6nam04lp2044.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.44])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Oct 2022 09:36:51 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T5VZjGrH43J60Qt/iFciYeX65eJ/KDgKesAlbEOly/ux3KaA1XwpYFXxtEIyckYCQil3fvSBGPINshcM0xhvpXq9Ws3xqm2Ad1g9NiGVIXI16WdkgE629O0bH0iz7bhF5u/QLLeXuZgewSKRdLop2MTLABYX4RoHB2+Xs4KEiF4rpkSsh1kJTsGgrkKSbC0xsmYImRnxBPxr4dxOcV9LrsvcCSxyWN/1i0gpHXVblhq+irVVmrmNxTY5O8AeltAQIG2jc5YBo2tKAtiZehzC6YRCe3zTCnf9wa9YTJ7rR4za0pgHX7BvQKyhZyH6p3eIzt7vL0OvvXE4knjKX0n7Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EWmEKh1rmgeeaqe6+J8Nu2w6mnWHLC9BN87M53OvwBA=;
+ b=N/lsCitZf0bK9v+2y1CEJAbIA4fKseW52sOCM/2qR/hXdOA5kJAo875w9w7Js1SxBZWT6TSC4EkEu720qGN7LYQaWcn/8khld1xHPr/TXdw9C805H/G/ThXMPb2Mab6IAkEK22BJmEV+ldLHoyqZovSSjZaHNkIMfYdobia3w5v39tUKzMRH4Ju/AAKaS/N90k5qRaeOGev+kQ+DgJvq2za+2d25pAAsv+m3OJWPsXy7ZraGb3HNIm95DSuF7zyJfz6SR7aI5zAEzLdj+6tKg7vzsc23jyEc8tKkXGLISwzwQ25DvmGvJvgZRjPeNShILSjH5n0dam1qYhR2Mnzi5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EWmEKh1rmgeeaqe6+J8Nu2w6mnWHLC9BN87M53OvwBA=;
+ b=fEvVRvMUe1Xc8kLY6zpMsQt+hCLV4/1AQ3hivnwLpx7uKRJ4Cm7+Z/vl7Iucp/8sqhm0bIwahWPmWmkPryuVjK++Km9jQ4XRR7G012FRaWbUHWpgYetGSFBxYslpsW60uXB/AyaOTno+Z8Pe6t8S+CnoSZAM9+4DTxifYOPKG1o=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BL0PR04MB6577.namprd04.prod.outlook.com (2603:10b6:208:1c4::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.28; Fri, 7 Oct
+ 2022 01:36:49 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::950f:778d:1de1:53f]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::950f:778d:1de1:53f%5]) with mapi id 15.20.5676.036; Fri, 7 Oct 2022
+ 01:36:49 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Keith Busch <kbusch@kernel.org>
+CC:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>
-References: <da0dd711f9820372e3afdf6fef7744cb31ada0ea.camel@redhat.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <da0dd711f9820372e3afdf6fef7744cb31ada0ea.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Tejun Heo <tj@kernel.org>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: lockdep WARNING at blktests block/011
+Thread-Topic: lockdep WARNING at blktests block/011
+Thread-Index: AQHY1GJXrtuQitm3Pk+3ExLt/WFGaa330IUAgATf7QCAACBlAIABQxMAgAAHQICAABRnAIABUUcAgAAY/QCAAEiBAIAAzDKAgAGDOwA=
+Date:   Fri, 7 Oct 2022 01:36:49 +0000
+Message-ID: <20221007013648.bhktcylgeyekse3q@shindev>
+References: <313d914e-6258-50db-4317-0ffb6f936553@I-love.SAKURA.ne.jp>
+ <20221003133240.bq2vynauksivj55x@shindev>
+ <Yzr/pBvvq0NCzGwV@kbusch-mbp.dhcp.thefacebook.com>
+ <20221004104456.ik42oxynyujsu5vb@shindev>
+ <63e14e00-e877-cb5a-a69a-ff44bed8b5a5@I-love.SAKURA.ne.jp>
+ <20221004122354.xxqpughpvnisz5qs@shindev>
+ <20221005083104.2k7nqohqcqcrdpn4@shindev>
+ <15c6e51f-a2a4-38ff-15a4-9efee32824d3@I-love.SAKURA.ne.jp>
+ <Yz2SkNORASzmL+jq@kbusch-mbp.dhcp.thefacebook.com>
+ <20221006023051.mkuueh5epnfominu@shindev>
+In-Reply-To: <20221006023051.mkuueh5epnfominu@shindev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|BL0PR04MB6577:EE_
+x-ms-office365-filtering-correlation-id: e2c6d2a2-9bff-4aa3-1924-08daa804674c
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ibhOqRkVO4D8XOK18LqdqpjtCRtYdFxyqP1gX0i1S3YHBbdpLtJToO4lngw6nZThsLM+3i0Bv6BAqc1VauH1ijFlsaofYltLantTVd7ngsmbQG+rds+CTCWOcpwy4/3sm54V8FkZesoh+v5zh8nQXIHm9IIII0jWXsf3tcGO/F+Xxq9IxFDjKRqcz1X+gxzSqj71OkyomdNGeMUNvK6QCV1SZcAhHwiEmh7oIyexWOoomLBZis852uwSg3zx35EqwPuH8CNWFNF/NBCsww0FQmuyCHv8QbIgG/3h1siTCckr9A6LBePP+w+iOKEN4qmJxHxA8bUNa4ibLIQfoUPnPuPQ9xJGNzGHQuEd0Fy1TJMEaGHO2vrgXDlD54lIw2XNS7qo/lPhsYG0KlOKcEI1kq46Z6Dtygr685jrsTP1UTZrc8qPAW1qqzW9C4UUytTTR1cGiNM2QkUYO4LLe7dedynvyaC2E7KC5BO+vQvtjq+vMal4yIvS+T5NskrxjwdH6encpAOnv/mNFZCE7P/xe1C1tan0feaENWnin8jG59692Q4E3YRqdiuyjQxUlUWQ1p9Q1BX5Z9+DaexpCZWzwFSlhCLsYfOIB7bJbbr63Z5QP0n+wGBOFDbfL8kRyLdK+tPtNxg9YKFSgf/DT9YQVb45Z4NQ1QxgZAKydmbWPGWsw1PUXW85ie1i+eCijZKjLCJQyxrUhq4YWA1Onn+0nEXJijED1GBG5KTGkU06ZfblLVHniv2Qr1iah0r7ipwjI+AKZ0JVx8HJBRXs9CeLeA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(7916004)(39860400002)(136003)(346002)(376002)(366004)(396003)(451199015)(38070700005)(6486002)(71200400001)(33716001)(54906003)(478600001)(86362001)(122000001)(6916009)(82960400001)(316002)(38100700002)(186003)(6512007)(8936002)(44832011)(26005)(9686003)(1076003)(8676002)(6506007)(53546011)(83380400001)(66446008)(2906002)(5660300002)(91956017)(66476007)(4326008)(64756008)(76116006)(66556008)(66946007)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/sDHpwob00RkO0tAeg21zKrNWv5LPArmtRBzRJZEVrbkUgqUPaPbiNlx3/WB?=
+ =?us-ascii?Q?vt2vEV3IBoBzI9491VLKx1JjUM7Fbbbh13RnIB1EFmOHXgMvoH/d+7dmnw4g?=
+ =?us-ascii?Q?kojqZVOtFAvdvpPX0xlvI/7h2fjyoPhX2oCad4Mbne+451ig/jc9Vch8JlF+?=
+ =?us-ascii?Q?DsgEGpRGB6yt0Xv8HWxawtP1D6TPJFeBQOx68YsdWgwG8Cg9rXL8mwKRcHW0?=
+ =?us-ascii?Q?GPOU56heQo9jQQpDSNUC931UiGhk17D9a/x1iMXFWSzSCUCpZYpVLiSMPhgf?=
+ =?us-ascii?Q?3+hhDRAreyLvT2nCGB8y6o6Juu9KXOlMQDIYWEAm/saZmAUAKzW2lTevSYEc?=
+ =?us-ascii?Q?OPEny8GJfoFN7LmDZxbuWaIgOPVljwuexjICiByLUpijm4LKxRRaJyHJlKKH?=
+ =?us-ascii?Q?aM7TwayRuSXd1CgxKOF8nkqTqtErmUTB0IEnAWXy8FtRW6j7Xj9Ok4Mqo2a1?=
+ =?us-ascii?Q?P6zxkOV54oWE4pGEQgSelJPrWPho18gs3y56w9r+aom0Tdi0a7vezUuhk/ZX?=
+ =?us-ascii?Q?RZuWYm8adQeZAMJGDdexgnYExmB2rwbyWN8futPatb8QLQeE7IesUOqS8SzC?=
+ =?us-ascii?Q?DsUNXdxfy0+4wI6lPWR3c+H4nno96GJsdIDZhn567MMsnzrJ4vS/o+3N7CcU?=
+ =?us-ascii?Q?XUDwL+r430lTmqBLj0rL+2eNwR9HJ1SHmXuJSHL/VTUUXLEr5ynNnHQEVvGA?=
+ =?us-ascii?Q?b8vOdW4jBG9yHJMPKAyfQtJ8JN/ta9osvVKzFqYq4XiGgPp0SlujnE8hySEQ?=
+ =?us-ascii?Q?8o2Nf98VluTi8/Z5xgJdPhroNGkkx0C/X99/kF+GbUT4PEeoWW0vcAKrcy9z?=
+ =?us-ascii?Q?nXD8mq9EkB4CTJbOUEFXsupbqCGSws7VPqIEv/U18zIYly/lU7hBsr+BPsRR?=
+ =?us-ascii?Q?UJ45L+SCuHg2xBQBjpiuI/P767AfBRbRVy6C3f83gUfUFpydDRjgnl2kkQQX?=
+ =?us-ascii?Q?K4kzHOHCoDqScLmjkPeUIV14xFiotFmVe/augz5G3LNazwIJqUu6A9lh2y3N?=
+ =?us-ascii?Q?UpPsQIhQFqnfzY+d3MwApoqdL+z5ZsCCsL9OGZKxIuITEETPYRozEYYUI1Iv?=
+ =?us-ascii?Q?4dcUvaYQrZg9Zs0tF/WChpxxjx3CH4bSjJ1UYmHgaS+khAlDjm10zkjuf8ld?=
+ =?us-ascii?Q?tL6SJQQqEfJaqtdMenkVi/mymHM7QSFtv3IsrlnSfO4fe1DbT2XQwCBbhDV7?=
+ =?us-ascii?Q?fLL3rcu7+ch2sW9N2+8+swekEhgJRRAwASRRttad2gNmejh8GI7J6uJw4YK2?=
+ =?us-ascii?Q?UqQZYt7f3I25BZkh5LHV1pdw7YSOgahL9jZwBfJdYgBDYnBCjtXnR321JeLv?=
+ =?us-ascii?Q?9Pg5SCap0/nwGz+j4NG8IFMMFODdw6LwVLWFZnObQ386zYCNqD2R9reKvtL2?=
+ =?us-ascii?Q?7M0WrCoxPa2+cqqopGu1V3DCzMAY0fwyvNjvdq239I5I+G2/awYGOv04Ri9F?=
+ =?us-ascii?Q?p62EkdkCA/GuT2/U24RLShQ6YokzvNlvwhQZzyVd7a4sDAgw2AHlE1ZqIUj2?=
+ =?us-ascii?Q?AKJ4R/vPeUxlTUXsvX/cieMWjnmTsMtQDIRUCvYL9b4YpxdSHuMOGL72QY87?=
+ =?us-ascii?Q?4stWkbJ3q6xml30DcWBgG4ztQw3Sk3xokNqN9X5cmEYzsxolarR+lOiDLqJ8?=
+ =?us-ascii?Q?fpmanNLvHIowh51A7bKbcGU=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <92BD99CD9231764EA4421A774147F344@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?us-ascii?Q?vaqXp1vY/RIYP6FFvJmBheJhixm/Cm0rq34X+3bC5rhKon/Gd4Q9tWjzjyV5?=
+ =?us-ascii?Q?PU/UGkg8wBXlV/9NROcyXc2nhplHYqQbx6rwBvyIzlkN1IdRkgYEmT7oTGbP?=
+ =?us-ascii?Q?OTiMNKa9PSst0+5fQRN18YaISY4c04fRpmyuxcsHc53Hzxod5Rce16FmLBdj?=
+ =?us-ascii?Q?pQIsOnN8DrZ0TL0czaRR+jW5oIPvPRyimWOKdFO7i6JJu0eJlaC3XDUem1xi?=
+ =?us-ascii?Q?PzMcR31dNYAchQ0OuNoDPPHKR+C+7TJiwvQpX2GVxTclVoshjeze0r3kC0Rg?=
+ =?us-ascii?Q?VIoSiLeWjd1o20sHA/cr998FFEJglQ3nRJFyMRAljDqbsYmUCXsEVPI7vfDu?=
+ =?us-ascii?Q?YoITxf5TKiAUXFGOrnbK8XIoypXIKPT8fpRZhU4ig2CnWI0itLASFam0zjZP?=
+ =?us-ascii?Q?H/jhYeg1SIXqrZDgvOA3SZ2u3UXD/gVDGc5jmqdXagmMigE7dAy+sdr3LCp4?=
+ =?us-ascii?Q?yRCPQXa+WzGicfKU/b8rgjhF/iIYIGIwRPKqJBhvb/JY/VZt4XBWxDYeufZm?=
+ =?us-ascii?Q?UZh6Zr4/o1F5UUniQwjq6clVQlOA+eEl+MEq/mQsrAo2T4nBnldX/+Xfp/Wx?=
+ =?us-ascii?Q?pCLb12Pl43d/CxR3tg7mVOgbY/15Kc3w9TVG7BBZGqLhgTOd8YxOp1Inr6cP?=
+ =?us-ascii?Q?vN9hlUDMfJpeZRHkOP/jvu1gUMygOcEiEniNI0vfS8OMmaO+UbyAZZRj2zM/?=
+ =?us-ascii?Q?LNicmt78QT32vjnW1v/1k9mo2+fkWVBnsunsAVDbG4/ZxgRfW1Jf4gETM1Zk?=
+ =?us-ascii?Q?wb+jAbUpGFbM4QPFgz7ckgoy+EGjUiuYLc7sYRvaHuqjIY2nJwfW+tTEgSze?=
+ =?us-ascii?Q?lBi9lGYVs247Jyk2hBYg/0/Ir1v+DcQ6cMldkyJ6qNO1cXyWPSxILsHaapdz?=
+ =?us-ascii?Q?JwVFV74AlEKpi1xNWc+g16iQtImRYgajHm737S/nwueuCTrlBraukyPWF5sE?=
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e2c6d2a2-9bff-4aa3-1924-08daa804674c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Oct 2022 01:36:49.2410
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: l5SvV6S4U/X8gObI5dkvqoF2OqFW47xMKuTqsekNBFwmXjUwu9HzIpApjCe/gX/O2FNrrhUdXZd8RoecRmmhX0JodOWCduQ0bBmYwt/alPw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB6577
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/7/22 02:33, Jeff Layton wrote:
-> I pulled down Linus tree today and did some testing with some filesystem
-> related patches. Running xfstests against ext4 in a VM, and I hit this:
-> 
-> [ 8947.343179] run fstests generic/224 at 2022-10-06 13:24:20
-> [ 8948.435322] EXT4-fs (dm-1): mounted filesystem with ordered data mode. Quota mode: none.
-> [ 8949.235839] EXT4-fs (dm-2): mounted filesystem with ordered data mode. Quota mode: none.
-> [ 9017.622065] watchdog: BUG: soft lockup - CPU#2 stuck for 23s! [kworker/2:0:1145882]
-> [ 9023.009230] Modules linked in: ext4(E) mbcache(E) jbd2(E) nft_fib_inet(E) nft_fib_ipv4(E) nft_fib_ipv6(E) nft_fib(E) nft_reject_inet(E) nf_reject_ipv4(E) nf_reject_ipv6(E) nft_reject(E) nft_ct(E) nft_chain_nat(E) nf_nat(E) nf_conntrack(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) rfkill(E) ip_set(E) nf_tables(E) nfnetlink(E) iTCO_wdt(E) intel_pmc_bxt(E) iTCO_vendor_support(E) joydev(E) intel_rapl_msr(E) i2c_i801(E) virtio_balloon(E) i2c_smbus(E) lpc_ich(E) intel_rapl_common(E) nfsd(E) auth_rpcgss(E) nfs_acl(E) lockd(E) grace(E) fuse(E) sunrpc(E) zram(E) xfs(E) crct10dif_pclmul(E) crc32_pclmul(E) crc32c_intel(E) ghash_clmulni_intel(E) virtio_gpu(E) virtio_dma_buf(E) drm_shmem_helper(E) serio_raw(E) virtio_net(E) drm_kms_helper(E) virtio_blk(E) net_failover(E) virtio_console(E) failover(E) drm(E) qemu_fw_cfg(E)
-> [ 9023.081530] CPU: 2 PID: 1145882 Comm: kworker/2:0 Tainted: G            E      6.0.0+ #43
-> [ 9023.085919] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-1.fc36 04/01/2014
-> [ 9023.090747] Workqueue: events_freezable_power_ disk_events_workfn
-> [ 9023.095155] RIP: 0010:__do_softirq+0xb5/0x401
-> [ 9023.147050] Code: ff e8 6f db bc fe c7 44 24 1c 0a 00 00 00 48 c7 c7 c0 d2 87 ad e8 1b 9c be ff 65 66 c7 05 d1 0e a4 52 00 00 fb 0f 1f 44 00 00 <bb> ff ff ff ff 41 0f bc de 83 c3 01 0f 84 9a 00 00 00 48 c7 c5 c0
-> [ 9023.158173] RSP: 0018:ffff888221909f80 EFLAGS: 00000296
-> [ 9023.163217] RAX: 0000000000000002 RBX: ffff888107fb002c RCX: ffffffffac1cdc2d
-> [ 9023.168569] RDX: dffffc0000000000 RSI: ffffffffad87d2c0 RDI: ffffffffada7f7e0
-> [ 9023.173885] RBP: 0000000000000000 R08: 0000000000000000 R09: ffffffffafc01083
-> [ 9023.179097] R10: fffffbfff5f80210 R11: 0000000000000000 R12: 0000000000000000
-> [ 9023.184780] R13: 0000000000000000 R14: 0000000000000282 R15: ffff888107fb0000
-> [ 9023.189955] FS:  0000000000000000(0000) GS:ffff888221900000(0000) knlGS:0000000000000000
-> [ 9023.195329] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 9023.200380] CR2: 00007fba16a314e0 CR3: 0000000107882000 CR4: 00000000003506e0
-> [ 9023.205569] Call Trace:
-> [ 9023.209571]  <IRQ>
-> [ 9023.213587]  __irq_exit_rcu+0x12a/0x190
-> [ 9023.217664]  sysvec_apic_timer_interrupt+0x8a/0xb0
-> [ 9023.221863]  </IRQ>
-> [ 9023.225684]  <TASK>
-> [ 9023.229384]  asm_sysvec_apic_timer_interrupt+0x16/0x20
-> [ 9023.233485] RIP: 0010:_raw_spin_unlock_irqrestore+0x19/0x40
-> [ 9023.237740] Code: c6 48 89 df e8 d8 54 fe fe 90 eb cc 0f 1f 44 00 00 0f 1f 44 00 00 e8 5a 4e fe fe 90 f7 c6 00 02 00 00 74 06 fb 0f 1f 44 00 00 <bf> 01 00 00 00 e8 ad 9a f8 fe 65 8b 05 16 a8 e2 52 85 c0 74 05 e9
-> [ 9023.246961] RSP: 0018:ffff88810f9e7828 EFLAGS: 00000206
-> [ 9023.251106] RAX: 0000000000000001 RBX: 0000000000000000 RCX: ffffffffacbdecee
-> [ 9023.255535] RDX: dffffc0000000000 RSI: 0000000000000286 RDI: ffff888109e4d500
-> [ 9023.259915] RBP: ffff88810a9d8000 R08: 0000000000000001 R09: ffff88810aa8894b
-> [ 9023.264310] R10: ffffed1021551129 R11: fefefefefefefeff R12: 0000000000000286
-> [ 9023.268834] R13: ffff88810a9d8010 R14: ffff8881013e0000 R15: ffff88810ab5a000
-> [ 9023.273239]  ? ata_scsi_queuecmd+0x6e/0xb0
-> [ 9023.277360]  ? _raw_spin_unlock_irqrestore+0xa/0x40
-> [ 9023.281479]  ata_scsi_queuecmd+0x7a/0xb0
-> [ 9023.285386]  scsi_queue_rq+0xb5c/0x13c0
-> [ 9023.289449]  blk_mq_dispatch_rq_list+0x3e2/0xfc0
-> [ 9023.293549]  ? blk_insert_cloned_request+0x330/0x330
-> [ 9023.297646]  ? _raw_spin_lock+0x77/0xc0
-> [ 9023.301593]  ? _raw_spin_lock_bh+0xc0/0xc0
-> [ 9023.305485]  __blk_mq_sched_dispatch_requests+0x13b/0x1f0
-> [ 9023.309609]  ? blk_mq_do_dispatch_ctx+0x340/0x340
-> [ 9023.313581]  ? _raw_spin_lock_bh+0xc0/0xc0
-> [ 9023.317304]  blk_mq_sched_dispatch_requests+0x82/0xb0
-> [ 9023.320780]  __blk_mq_run_hw_queue+0x66/0xe0
-> [ 9023.324965]  blk_mq_sched_insert_request+0x16f/0x1d0
-> [ 9023.328294]  ? __alloc_pages_slowpath.constprop.0+0x1360/0x1360
-> [ 9023.331757]  ? blk_mq_sched_bio_merge+0x180/0x180
-> [ 9023.335040]  ? bio_add_pc_page+0x8a/0xb0
-> [ 9023.339093]  blk_execute_rq+0x111/0x2c0
-> [ 9023.343823]  ? blk_mq_get_sq_hctx+0x80/0x80
-> [ 9023.348523]  __scsi_execute+0x13a/0x2b0
-> [ 9023.353163]  sr_check_events+0x13e/0x420
-> [ 9023.357071]  ? sr_packet+0x90/0x90
-> [ 9023.359914]  ? __mod_timer+0x42a/0x5e0
-> [ 9023.362727]  ? hibernation_snapshot+0x3e8/0x640
-> [ 9023.365600]  ? console_emit_next_record.constprop.0+0x400/0x400
-> [ 9023.368659]  cdrom_check_events+0x34/0x70
-> [ 9023.371522]  disk_check_events+0x5d/0x180
-> [ 9023.374430]  process_one_work+0x3d3/0x6a0
-> [ 9023.377304]  worker_thread+0x8a/0x610
-> [ 9023.380329]  ? process_one_work+0x6a0/0x6a0
-> [ 9023.383202]  kthread+0x167/0x1a0
-> [ 9023.385889]  ? kthread_complete_and_exit+0x20/0x20
-> [ 9023.388668]  ret_from_fork+0x22/0x30
-> [ 9023.391338]  </TASK>
+On Oct 06, 2022 / 02:30, Shinichiro Kawasaki wrote:
+> On Oct 05, 2022 / 08:20, Keith Busch wrote:
+> > On Wed, Oct 05, 2022 at 07:00:30PM +0900, Tetsuo Handa wrote:
+> > > On 2022/10/05 17:31, Shinichiro Kawasaki wrote:
+> > > > @@ -5120,11 +5120,27 @@ EXPORT_SYMBOL_GPL(nvme_start_admin_queue);
+> > > >  void nvme_sync_io_queues(struct nvme_ctrl *ctrl)
+> > > >  {
+> > > >  	struct nvme_ns *ns;
+> > > > +	LIST_HEAD(splice);
+> > > > =20
+> > > > -	down_read(&ctrl->namespaces_rwsem);
+> > > > -	list_for_each_entry(ns, &ctrl->namespaces, list)
+> > > > +	/*
+> > > > +	 * blk_sync_queues() call in ctrl->snamespaces_rwsem critical sec=
+tion
+> > > > +	 * triggers deadlock warning by lockdep since cancel_work_sync() =
+in
+> > > > +	 * blk_sync_queue() waits for nvme_timeout() work completion whic=
+h may
+> > > > +	 * lock the ctrl->snamespaces_rwsem. To avoid the deadlock possib=
+ility,
+> > > > +	 * call blk_sync_queues() out of the critical section by moving t=
+he
+> > > > +         * ctrl->namespaces list elements to the stack list head t=
+emporally.
+> > > > +	 */
+> > > > +
+> > > > +	down_write(&ctrl->namespaces_rwsem);
+> > > > +	list_splice_init(&ctrl->namespaces, &splice);
+> > > > +	up_write(&ctrl->namespaces_rwsem);
+> > >=20
+> > > Does this work?
+> > >=20
+> > > ctrl->namespaces being empty when calling blk_sync_queue() means that
+> > > e.g. nvme_start_freeze() cannot find namespaces to freeze, doesn't it=
+?
+> >=20
+> > There can't be anything to timeout at this point. The controller is dis=
+abled
+> > prior to syncing the queues. Not only is there no IO for timeout work t=
+o
+> > operate on, the controller state is already disabled, so a subsequent f=
+reeze
+> > would be skipped.
+>=20
+> Thank you. So, this temporary list move approach should be ok.
 
-Adding linux-block and linux-fsdevel, just in case.
+Keith, while I was preparing the formal patch, I noticed a path which may c=
+all
+nvme_sync_io_queues() when NVME controller is not disabled. Quote from
+drivers/nvme/host/pci.c:
 
-Hmm... Weird. ATA changes for 6.1 are not merged yet, and none of them
-touch ata_scsi_queue_cmd() or port locking anyway.
+static int nvme_suspend(struct device *dev)
+{
+	struct pci_dev *pdev =3D to_pci_dev(dev);
+	struct nvme_dev *ndev =3D pci_get_drvdata(pdev);
+	struct nvme_ctrl *ctrl =3D &ndev->ctrl;
 
-It looks like the ata lock is stuck, which may mean that some other
-context is stuck in completion path ? Do you see any other task stuck in
-ata code ?
+        /* ... */
 
-> 
-> Last commit in my tree is this:
-> 
-> 833477fce7a1 (origin/master) Merge tag 'sound-6.1-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound
-> 
-> I also have some filesystem related patches on top of this. inode-
->> i_version patches mostly -- nothing that should effect things at this
-> level.
-> 
-> config is attached.
+	nvme_start_freeze(ctrl);
+	nvme_wait_freeze(ctrl);
+	nvme_sync_queues(ctrl);
 
--- 
-Damien Le Moal
-Western Digital Research
+	if (ctrl->state !=3D NVME_CTRL_LIVE)
+		goto unfreeze;
 
+When nvme_sync_queues(ctrl) is called, still ctrl->state can be NMVE_CTRL_L=
+IVE.
+So, I think namespace addition or removal can happen in parallel to this
+nvme_supsend() context (this is super rare though...). If this is true, the
+patch to move namespace list to stack list head may cause removed (or added=
+)
+namespace to appear (or disappear) after suspend & resume. (I think other p=
+aths
+of nvme_sync_io_queues() disables the controller and fine.)
+
+Comment on this guess will be appreciated. If this guess is correct, Tetsuo=
+'s
+suggestion would be the better, even though it adds a new mutex.
+
+--=20
+Shin'ichiro Kawasaki=
