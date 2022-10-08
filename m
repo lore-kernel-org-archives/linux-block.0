@@ -2,228 +2,457 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1C0C433F5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Oct 2022 01:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B80C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  8 Oct 2022 02:15:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229840AbiJHB42 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Oct 2022 21:56:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42254 "EHLO
+        id S229723AbiJHCPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Oct 2022 22:15:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiJHB41 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Oct 2022 21:56:27 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA69BBEAF0;
-        Fri,  7 Oct 2022 18:56:25 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id c3-20020a1c3503000000b003bd21e3dd7aso5491800wma.1;
-        Fri, 07 Oct 2022 18:56:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:from:references:cc:to:content-language:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gtt8Sd1iGvBuE6r8qw66viAhLvTlUSClwTSyeRVy/5s=;
-        b=MlnO6IzMqSsdHgJfSn9GuImG8SiiU8gEa577JRbAfC9M5MT+fV3LtYjofrrzC542qh
-         SM17l9Y/FWKLhbVPZoK/voLcK41mEwlW9pW+ts6Blqhl1H/+tvtSRwrv8YCkKWt83G1/
-         SZNal9HjHUgkCq+zkq2X4Sm3j+IZ4Bj3ZIXdbCcG3Lzbvk7sPLcFC2Y87r5WZlHGh4r3
-         3jvTt7HuOiBSp/DOY/B04RoFUBYvmqnapONbzpBqKkDRIyscw+M3Mr6fF6bAY/UM1kpF
-         ihSa7DtsnGDwJziaEP7e49+RVSUau/E4i+ETknql5kSXtbqY/ulmPOJ8yk7bXK12p1qD
-         XYVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:from:references:cc:to:content-language:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gtt8Sd1iGvBuE6r8qw66viAhLvTlUSClwTSyeRVy/5s=;
-        b=H4USI0e4yrdsB0J7LgM4xNur4CCxErm993ycu6jSwnCQP726IZtXO+VZSx7tI36wrX
-         e1VaR/SAL4KajBhMtFzrfwPbulMERoU2cYHcXRxZtgRN7Cj7ZI8Tx/Cv9nCza44rOty7
-         dhe058sEYgjYBOII8FA5fbUxGo+mCwpVslL8aIASMd0iKoBEj3vxMG3Mqr4quEHqGiHu
-         oqKlKoRwLyvEh5NjjV41S2kuACQTUbQL57QMn8IAAqY/7B+0uoByrhsXpW1AT+8Q/F+2
-         MfnUKmZON+KG7OMMhBsnVTBQ4m9SuOag11B6CkRrtDRhKGncc9FUPHEYx6mTC6OUHAed
-         k2uA==
-X-Gm-Message-State: ACrzQf3b0mBe1MbfDtuE5umqwru4S0BN7NmZFJ7sH5YAPywN2RdakyXn
-        jrcZx6P3ScOhA1p/FyinZcXkOH3mSUQ=
-X-Google-Smtp-Source: AMsMyM6HyGtxtWyy2bSr683HtwijJ2P4jcCtuTJjIlcmddwD3D8OauMqDtzRyaCGy96ZwITPylXXgw==
-X-Received: by 2002:a7b:c341:0:b0:3c4:552d:2ea7 with SMTP id l1-20020a7bc341000000b003c4552d2ea7mr820449wmj.82.1665194184239;
-        Fri, 07 Oct 2022 18:56:24 -0700 (PDT)
-Received: from [192.168.0.160] ([170.253.36.171])
-        by smtp.gmail.com with ESMTPSA id s4-20020adff804000000b00226dedf1ab7sm3299967wrp.76.2022.10.07.18.56.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Oct 2022 18:56:23 -0700 (PDT)
-Message-ID: <26cafc28-e63a-6f13-df70-8ccec85a4ef0@gmail.com>
-Date:   Sat, 8 Oct 2022 03:56:22 +0200
+        with ESMTP id S229634AbiJHCPn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Oct 2022 22:15:43 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53263814D4;
+        Fri,  7 Oct 2022 19:15:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1665195340; x=1696731340;
+  h=from:to:cc:subject:references:date:in-reply-to:
+   message-id:mime-version;
+  bh=47u7X+WlCbz79fmnKKUMFHo3LBUWs88GcHrlh/Lb850=;
+  b=fyaRyGwQe7Amz5BP2dlxb8PNHteUEuSdLLnc8NOocr9CqkgmfR2fO80H
+   7vXKp4C153fQWpeCi72HB7FXmSCrzZmBlOaZeoetcKUAA3fu8bLBK3hun
+   8BgKu+zv/OTOiJdPIqqNXhYzNh2WsAXDgddXurtJD1JguiYuAXXYFh4tR
+   t4SIDdKPBhJDOAoURQskFtp/ZhT5hMbr0KdT6dx+bPXcbzhKxKWSc3ddH
+   3iPnp4kAFNDM+65y9MDqopVMIy106FMU8vVqVOada4jxHY2/H2cQlcEFO
+   uwGgsppvorm1jhniMHUnnl/ZKATW1vU7+jm+W1J6IgtSbzqQWS0ElLJWw
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10493"; a="305467890"
+X-IronPort-AV: E=Sophos;i="5.95,168,1661842800"; 
+   d="scan'208";a="305467890"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2022 19:15:39 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10493"; a="714476429"
+X-IronPort-AV: E=Sophos;i="5.95,168,1661842800"; 
+   d="scan'208";a="714476429"
+Received: from yhuang6-desk2.sh.intel.com (HELO yhuang6-desk2.ccr.corp.intel.com) ([10.238.208.55])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2022 19:15:36 -0700
+From:   "Huang, Ying" <ying.huang@intel.com>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+Subject: Re: [PATCH v7 1/3] llist: Add a lock-less list variant terminated
+ by a sentinel node
+References: <20221003154459.207538-1-longman@redhat.com>
+        <20221003154459.207538-2-longman@redhat.com>
+Date:   Sat, 08 Oct 2022 10:15:04 +0800
+In-Reply-To: <20221003154459.207538-2-longman@redhat.com> (Waiman Long's
+        message of "Mon, 3 Oct 2022 11:44:57 -0400")
+Message-ID: <87sfjzuklz.fsf@yhuang6-desk2.ccr.corp.intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [man-pages PATCH v3] statx.2, open.2: document STATX_DIOALIGN
-Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>, linux-man@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        "Darrick J. Wong" <djwong@kernel.org>
-References: <20221004174307.6022-1-ebiggers@kernel.org>
-From:   Alejandro Colomar <alx.manpages@gmail.com>
-In-Reply-To: <20221004174307.6022-1-ebiggers@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------x4E24oHe3w0nvhvCysX22mSr"
+Content-Type: text/plain; charset=ascii
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------x4E24oHe3w0nvhvCysX22mSr
-Content-Type: multipart/mixed; boundary="------------NegtShqtP2zaLlI3tpK20uRp";
- protected-headers="v1"
-From: Alejandro Colomar <alx.manpages@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>, linux-man@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
- linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
- "Darrick J. Wong" <djwong@kernel.org>
-Message-ID: <26cafc28-e63a-6f13-df70-8ccec85a4ef0@gmail.com>
-Subject: Re: [man-pages PATCH v3] statx.2, open.2: document STATX_DIOALIGN
-References: <20221004174307.6022-1-ebiggers@kernel.org>
-In-Reply-To: <20221004174307.6022-1-ebiggers@kernel.org>
+Waiman Long <longman@redhat.com> writes:
 
---------------NegtShqtP2zaLlI3tpK20uRp
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+> The lock-less list API is useful for dealing with list in a lock-less
+> manner. However, one of the drawback of the current API is that there
+> is not an easy way to determine if an entry has already been put into a
+> lock-less list. This has to be tracked externally and the tracking will
+> not be atomic unless some external synchronization logic is in place.
+>
+> This patch introduces a new variant of the lock-less list terminated
+> by a sentinel node instead of by NULL. The function names start with
+> "sllist" instead of "llist". The advantage of this scheme is that we
+> can atomically determine if an entry has been put into a lock-less
+> list by looking at the next pointer of the llist_node.
 
-SGkgRXJpYywNCg0KT24gMTAvNC8yMiAxOTo0MywgRXJpYyBCaWdnZXJzIHdyb3RlOg0KPiBG
-cm9tOiBFcmljIEJpZ2dlcnMgPGViaWdnZXJzQGdvb2dsZS5jb20+DQo+IA0KPiBEb2N1bWVu
-dCB0aGUgU1RBVFhfRElPQUxJR04gc3VwcG9ydCBmb3Igc3RhdHgoKQ0KPiAoaHR0cHM6Ly9n
-aXQua2VybmVsLm9yZy9saW51cy83MjU3MzdlN2MyMWQyZDI1KS4NCj4gDQo+IFJldmlld2Vk
-LWJ5OiBEYXJyaWNrIEouIFdvbmcgPGRqd29uZ0BrZXJuZWwub3JnPg0KPiBTaWduZWQtb2Zm
-LWJ5OiBFcmljIEJpZ2dlcnMgPGViaWdnZXJzQGdvb2dsZS5jb20+DQoNClBsZWFzZSBzZWUg
-c29tZSBmb3JtYXR0aW5nIGNvbW1lbnRzIGJlbG93Lg0KDQo+IC0tLQ0KPiANCj4gSSdtIHJl
-c2VuZGluZyB0aGlzIG5vdyB0aGF0IHN1cHBvcnQgZm9yIFNUQVRYX0RJT0FMSUdOIGhhcyBi
-ZWVuIG1lcmdlZA0KPiB1cHN0cmVhbS4NCg0KVGhhbmtzLg0KDQpDaGVlcnMsDQpBbGV4DQoN
-Cj4gDQo+IHYzOiB1cGRhdGVkIG1lbnRpb25zIG9mIExpbnV4IHZlcnNpb24sIGZpeGVkIHNv
-bWUgcHVuY3R1YXRpb24sIGFuZCBhZGRlZA0KPiAgICAgIGEgUmV2aWV3ZWQtYnkNCj4gDQo+
-IHYyOiByZWJhc2VkIG9udG8gbWFuLXBhZ2VzIG1hc3RlciBicmFuY2gsIG1lbnRpb25lZCB4
-ZnMsIGFuZCB1cGRhdGVkDQo+ICAgICAgbGluayB0byBwYXRjaHNldA0KPiANCj4gICBtYW4y
-L29wZW4uMiAgfCA0MyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0t
-LS0tDQo+ICAgbWFuMi9zdGF0eC4yIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysNCj4gICAyIGZpbGVzIGNoYW5nZWQsIDYxIGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9u
-cygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL21hbjIvb3Blbi4yIGIvbWFuMi9vcGVuLjINCj4g
-aW5kZXggZGViYTdlNGVhLi5iODYxN2UwZDIgMTAwNjQ0DQo+IC0tLSBhL21hbjIvb3Blbi4y
-DQo+ICsrKyBiL21hbjIvb3Blbi4yDQo+IEBAIC0xNzMyLDIxICsxNzMyLDQyIEBAIG9mIHVz
-ZXItc3BhY2UgYnVmZmVycyBhbmQgdGhlIGZpbGUgb2Zmc2V0IG9mIEkvT3MuDQo+ICAgSW4g
-TGludXggYWxpZ25tZW50DQo+ICAgcmVzdHJpY3Rpb25zIHZhcnkgYnkgZmlsZXN5c3RlbSBh
-bmQga2VybmVsIHZlcnNpb24gYW5kIG1pZ2h0IGJlDQo+ICAgYWJzZW50IGVudGlyZWx5Lg0K
-PiAtSG93ZXZlciB0aGVyZSBpcyBjdXJyZW50bHkgbm8gZmlsZXN5c3RlbVwtaW5kZXBlbmRl
-bnQNCj4gLWludGVyZmFjZSBmb3IgYW4gYXBwbGljYXRpb24gdG8gZGlzY292ZXIgdGhlc2Ug
-cmVzdHJpY3Rpb25zIGZvciBhIGdpdmVuDQo+IC1maWxlIG9yIGZpbGVzeXN0ZW0uDQo+IC1T
-b21lIGZpbGVzeXN0ZW1zIHByb3ZpZGUgdGhlaXIgb3duIGludGVyZmFjZXMNCj4gLWZvciBk
-b2luZyBzbywgZm9yIGV4YW1wbGUgdGhlDQo+ICtUaGUgaGFuZGxpbmcgb2YgbWlzYWxpZ25l
-ZA0KPiArLkIgT19ESVJFQ1QNCj4gK0kvT3MgYWxzbyB2YXJpZXM7IHRoZXkgY2FuIGVpdGhl
-ciBmYWlsIHdpdGgNCj4gKy5CIEVJTlZBTA0KPiArb3IgZmFsbCBiYWNrIHRvIGJ1ZmZlcmVk
-IEkvTy4NCj4gKy5QUA0KPiArU2luY2UgTGludXggNi4xLA0KPiArLkIgT19ESVJFQ1QNCj4g
-K3N1cHBvcnQgYW5kIGFsaWdubWVudCByZXN0cmljdGlvbnMgZm9yIGEgZmlsZSBjYW4gYmUg
-cXVlcmllZCB1c2luZw0KPiArLkJSIHN0YXR4ICgyKSwNCj4gK3VzaW5nIHRoZQ0KPiArLkIg
-U1RBVFhfRElPQUxJR04NCj4gK2ZsYWcuDQo+ICtTdXBwb3J0IGZvcg0KPiArLkIgU1RBVFhf
-RElPQUxJR04NCj4gK3ZhcmllcyBieSBmaWxlc3lzdGVtOyBzZWUNCj4gKy5CUiBzdGF0eCAo
-MikuDQo+ICsuUFANCj4gK1NvbWUgZmlsZXN5c3RlbXMgcHJvdmlkZSB0aGVpciBvd24gaW50
-ZXJmYWNlcyBmb3IgcXVlcnlpbmcNCj4gKy5CIE9fRElSRUNUDQo+ICthbGlnbm1lbnQgcmVz
-dHJpY3Rpb25zLCBmb3IgZXhhbXBsZSB0aGUNCj4gICAuQiBYRlNfSU9DX0RJT0lORk8NCj4g
-ICBvcGVyYXRpb24gaW4NCj4gICAuQlIgeGZzY3RsICgzKS4NCj4gKy5CIFNUQVRYX0RJT0FM
-SUdODQo+ICtzaG91bGQgYmUgdXNlZCBpbnN0ZWFkIHdoZW4gaXQgaXMgYXZhaWxhYmxlLg0K
-PiAgIC5QUA0KPiAtVW5kZXIgTGludXggMi40LCB0cmFuc2ZlciBzaXplcywgdGhlIGFsaWdu
-bWVudCBvZiB0aGUgdXNlciBidWZmZXIsDQo+IC1hbmQgdGhlIGZpbGUgb2Zmc2V0IG11c3Qg
-YWxsIGJlIG11bHRpcGxlcyBvZiB0aGUgbG9naWNhbCBibG9jayBzaXplDQo+IC1vZiB0aGUg
-ZmlsZXN5c3RlbS4NCj4gLVNpbmNlIExpbnV4IDIuNi4wLCBhbGlnbm1lbnQgdG8gdGhlIGxv
-Z2ljYWwgYmxvY2sgc2l6ZSBvZiB0aGUNCj4gLXVuZGVybHlpbmcgc3RvcmFnZSAodHlwaWNh
-bGx5IDUxMiBieXRlcykgc3VmZmljZXMuDQo+IC1UaGUgbG9naWNhbCBibG9jayBzaXplIGNh
-biBiZSBkZXRlcm1pbmVkIHVzaW5nIHRoZQ0KPiArSWYgbm9uZSBvZiB0aGUgYWJvdmUgaXMg
-YXZhaWxhYmxlLCB0aGVuIGRpcmVjdCBJL08gc3VwcG9ydCBhbmQgYWxpZ25tZW50DQoNClBs
-ZWFzZSB1c2Ugc2VtYW50aWMgbmV3bGluZXMuDQoNClNlZSBtYW4tcGFnZXMoNyk6DQogICAg
-VXNlIHNlbWFudGljIG5ld2xpbmVzDQogICAgICAgIEluIHRoZSBzb3VyY2Ugb2YgYSBtYW51
-YWwgcGFnZSwgbmV3IHNlbnRlbmNlcyAgc2hvdWxkICBiZQ0KICAgICAgICBzdGFydGVkIG9u
-IG5ldyBsaW5lcywgbG9uZyBzZW50ZW5jZXMgc2hvdWxkIGJlIHNwbGl0IGludG8NCiAgICAg
-ICAgbGluZXMgIGF0ICBjbGF1c2UgYnJlYWtzIChjb21tYXMsIHNlbWljb2xvbnMsIGNvbG9u
-cywgYW5kDQogICAgICAgIHNvIG9uKSwgYW5kIGxvbmcgY2xhdXNlcyBzaG91bGQgYmUgc3Bs
-aXQgYXQgcGhyYXNlIGJvdW5k4oCQDQogICAgICAgIGFyaWVzLiAgVGhpcyBjb252ZW50aW9u
-LCAgc29tZXRpbWVzICBrbm93biAgYXMgICJzZW1hbnRpYw0KICAgICAgICBuZXdsaW5lcyIs
-ICBtYWtlcyBpdCBlYXNpZXIgdG8gc2VlIHRoZSBlZmZlY3Qgb2YgcGF0Y2hlcywNCiAgICAg
-ICAgd2hpY2ggb2Z0ZW4gb3BlcmF0ZSBhdCB0aGUgbGV2ZWwgb2YgaW5kaXZpZHVhbCBzZW50
-ZW5jZXMsDQogICAgICAgIGNsYXVzZXMsIG9yIHBocmFzZXMuDQoNCg0KPiArcmVzdHJpY3Rp
-b25zIGNhbiBvbmx5IGJlIGFzc3VtZWQgZnJvbSBrbm93biBjaGFyYWN0ZXJpc3RpY3Mgb2Yg
-dGhlIGZpbGVzeXN0ZW0sDQo+ICt0aGUgaW5kaXZpZHVhbCBmaWxlLCB0aGUgdW5kZXJseWlu
-ZyBzdG9yYWdlIGRldmljZShzKSwgYW5kIHRoZSBrZXJuZWwgdmVyc2lvbi4NCj4gK0luIExp
-bnV4IDIuNCwgbW9zdCBibG9jayBkZXZpY2UgYmFzZWQgZmlsZXN5c3RlbXMgcmVxdWlyZSB0
-aGF0IHRoZSBmaWxlIG9mZnNldA0KPiArYW5kIHRoZSBsZW5ndGggYW5kIG1lbW9yeSBhZGRy
-ZXNzIG9mIGFsbCBJL08gc2VnbWVudHMgYmUgbXVsdGlwbGVzIG9mIHRoZQ0KPiArZmlsZXN5
-c3RlbSBibG9jayBzaXplICh0eXBpY2FsbHkgNDA5NiBieXRlcykuDQo+ICtJbiBMaW51eCAy
-LjYuMCwgdGhpcyB3YXMgcmVsYXhlZCB0byB0aGUgbG9naWNhbCBibG9jayBzaXplIG9mIHRo
-ZSBibG9jayBkZXZpY2UNCj4gKyh0eXBpY2FsbHkgNTEyIGJ5dGVzKS4NCj4gK0EgYmxvY2sg
-ZGV2aWNlJ3MgbG9naWNhbCBibG9jayBzaXplIGNhbiBiZSBkZXRlcm1pbmVkIHVzaW5nIHRo
-ZQ0KPiAgIC5CUiBpb2N0bCAoMikNCj4gICAuQiBCTEtTU1pHRVQNCj4gICBvcGVyYXRpb24g
-b3IgZnJvbSB0aGUgc2hlbGwgdXNpbmcgdGhlIGNvbW1hbmQ6DQo+IGRpZmYgLS1naXQgYS9t
-YW4yL3N0YXR4LjIgYi9tYW4yL3N0YXR4LjINCj4gaW5kZXggMGQxYjQ1OTFmLi41MDM5NzA1
-N2QgMTAwNjQ0DQo+IC0tLSBhL21hbjIvc3RhdHguMg0KPiArKysgYi9tYW4yL3N0YXR4LjIN
-Cj4gQEAgLTYxLDcgKzYxLDEyIEBAIHN0cnVjdCBzdGF0eCB7DQo+ICAgICAgICAgIGNvbnRh
-aW5pbmcgdGhlIGZpbGVzeXN0ZW0gd2hlcmUgdGhlIGZpbGUgcmVzaWRlcyAqLw0KPiAgICAg
-ICBfX3UzMiBzdHhfZGV2X21ham9yOyAgIC8qIE1ham9yIElEICovDQo+ICAgICAgIF9fdTMy
-IHN0eF9kZXZfbWlub3I7ICAgLyogTWlub3IgSUQgKi8NCj4gKw0KPiAgICAgICBfX3U2NCBz
-dHhfbW50X2lkOyAgICAgIC8qIE1vdW50IElEICovDQo+ICsNCj4gKyAgICAvKiBEaXJlY3Qg
-SS9PIGFsaWdubWVudCByZXN0cmljdGlvbnMgKi8NCj4gKyAgICBfX3UzMiBzdHhfZGlvX21l
-bV9hbGlnbjsNCj4gKyAgICBfX3UzMiBzdHhfZGlvX29mZnNldF9hbGlnbjsNCj4gICB9Ow0K
-PiAgIC5FRQ0KPiAgIC5pbg0KPiBAQCAtMjQ3LDYgKzI1Miw4IEBAIFNUQVRYX0JUSU1FCVdh
-bnQgc3R4X2J0aW1lDQo+ICAgU1RBVFhfQUxMCVRoZSBzYW1lIGFzIFNUQVRYX0JBU0lDX1NU
-QVRTIHwgU1RBVFhfQlRJTUUuDQo+ICAgCUl0IGlzIGRlcHJlY2F0ZWQgYW5kIHNob3VsZCBu
-b3QgYmUgdXNlZC4NCj4gICBTVEFUWF9NTlRfSUQJV2FudCBzdHhfbW50X2lkIChzaW5jZSBM
-aW51eCA1LjgpDQo+ICtTVEFUWF9ESU9BTElHTglXYW50IHN0eF9kaW9fbWVtX2FsaWduIGFu
-ZCBzdHhfZGlvX29mZnNldF9hbGlnbg0KPiArCShzaW5jZSBMaW51eCA2LjE7IHN1cHBvcnQg
-dmFyaWVzIGJ5IGZpbGVzeXN0ZW0pDQo+ICAgLlRFDQo+ICAgLmluDQo+ICAgLlBQDQo+IEBA
-IC00MDcsNiArNDE0LDI4IEBAIFRoaXMgaXMgdGhlIHNhbWUgbnVtYmVyIHJlcG9ydGVkIGJ5
-DQo+ICAgLkJSIG5hbWVfdG9faGFuZGxlX2F0ICgyKQ0KPiAgIGFuZCBjb3JyZXNwb25kcyB0
-byB0aGUgbnVtYmVyIGluIHRoZSBmaXJzdCBmaWVsZCBpbiBvbmUgb2YgdGhlIHJlY29yZHMg
-aW4NCj4gICAuSVIgL3Byb2Mvc2VsZi9tb3VudGluZm8gLg0KPiArLlRQDQo+ICsuSSBzdHhf
-ZGlvX21lbV9hbGlnbg0KPiArVGhlIGFsaWdubWVudCAoaW4gYnl0ZXMpIHJlcXVpcmVkIGZv
-ciB1c2VyIG1lbW9yeSBidWZmZXJzIGZvciBkaXJlY3QgSS9PDQo+ICsuQlIgIiIgKCBPX0RJ
-UkVDVCApDQoNCi5SQiBhbmQgcmVtb3ZlIHRoZSAiIi4NCg0KPiArb24gdGhpcyBmaWxlLCBv
-ciAwIGlmIGRpcmVjdCBJL08gaXMgbm90IHN1cHBvcnRlZCBvbiB0aGlzIGZpbGUuDQo+ICsu
-SVANCj4gKy5CIFNUQVRYX0RJT0FMSUdODQo+ICsuSVIgIiIgKCBzdHhfZGlvX21lbV9hbGln
-bg0KDQouUkkNCg0KPiArYW5kDQo+ICsuSVIgc3R4X2Rpb19vZmZzZXRfYWxpZ24gKQ0KPiAr
-aXMgc3VwcG9ydGVkIG9uIGJsb2NrIGRldmljZXMgc2luY2UgTGludXggNi4xLg0KPiArVGhl
-IHN1cHBvcnQgb24gcmVndWxhciBmaWxlcyB2YXJpZXMgYnkgZmlsZXN5c3RlbTsgaXQgaXMg
-c3VwcG9ydGVkIGJ5IGV4dDQsDQo+ICtmMmZzLCBhbmQgeGZzIHNpbmNlIExpbnV4IDYuMS4N
-Cj4gKy5UUA0KPiArLkkgc3R4X2Rpb19vZmZzZXRfYWxpZ24NCj4gK1RoZSBhbGlnbm1lbnQg
-KGluIGJ5dGVzKSByZXF1aXJlZCBmb3IgZmlsZSBvZmZzZXRzIGFuZCBJL08gc2VnbWVudCBs
-ZW5ndGhzIGZvcg0KPiArZGlyZWN0IEkvTw0KPiArLkJSICIiICggT19ESVJFQ1QgKQ0KPiAr
-b24gdGhpcyBmaWxlLCBvciAwIGlmIGRpcmVjdCBJL08gaXMgbm90IHN1cHBvcnRlZCBvbiB0
-aGlzIGZpbGUuDQo+ICtUaGlzIHdpbGwgb25seSBiZSBub256ZXJvIGlmDQo+ICsuSSBzdHhf
-ZGlvX21lbV9hbGlnbg0KPiAraXMgbm9uemVybywgYW5kIHZpY2UgdmVyc2EuDQo+ICAgLlBQ
-DQo+ICAgRm9yIGZ1cnRoZXIgaW5mb3JtYXRpb24gb24gdGhlIGFib3ZlIGZpZWxkcywgc2Vl
-DQo+ICAgLkJSIGlub2RlICg3KS4NCj4gDQo+IGJhc2UtY29tbWl0OiBiYzI4ZDI4OWU1MDY2
-ZmM2MjZkZjI2MGJhZmMyNDk4NDZhMGY2YWU2DQoNCi0tIA0KPGh0dHA6Ly93d3cuYWxlamFu
-ZHJvLWNvbG9tYXIuZXMvPg0K
+I guess that in the previous solution we use
+test_and_set_bit()/clear_bit() on another member of the type containing
+llist_node to track whether the node is in the llist?  After your patch,
+we can use cmpxchg()/WRITE_ONCE(, NULL) on llist_node->next for that?
 
---------------NegtShqtP2zaLlI3tpK20uRp--
+> Of course, the
+> callers must clear the next pointer when an entry is removed from the
+> lockless list. This is done automatically when the sllist_for_each_safe
+> or sllist_for_each_entry_safe
 
---------------x4E24oHe3w0nvhvCysX22mSr
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
+Per my understanding, other xxx_for_each_safe() variants will not change
+the list by itself.  So how about rename the functions?
 
------BEGIN PGP SIGNATURE-----
+> iteraters are used. The non-safe versions
+> of sllist iterator are not provided.
+>
+> Signed-off-by: Waiman Long <longman@redhat.com>
+> ---
+>  include/linux/llist.h | 132 +++++++++++++++++++++++++++++++++++++++++-
+>  lib/llist.c           |  79 ++++++++++++++++++++++++-
+>  2 files changed, 209 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/linux/llist.h b/include/linux/llist.h
+> index 85bda2d02d65..d9a921656adb 100644
+> --- a/include/linux/llist.h
+> +++ b/include/linux/llist.h
+> @@ -2,7 +2,8 @@
+>  #ifndef LLIST_H
+>  #define LLIST_H
+>  /*
+> - * Lock-less NULL terminated single linked list
+> + * Lock-less NULL terminated singly linked list
+> + * --------------------------------------------
+>   *
+>   * Cases where locking is not needed:
+>   * If there are multiple producers and multiple consumers, llist_add can be
+> @@ -46,6 +47,16 @@
+>   *
+>   * Copyright 2010,2011 Intel Corp.
+>   *   Author: Huang Ying <ying.huang@intel.com>
+> + *
+> + * Lock-less sentinel node terminated singly linked list
+> + * -----------------------------------------------------
+> + *
+> + * This is a variant of the generic lock-less list where the end of the list
+> + * is terminated by a sentinel node instead of NULL. The advantage of this
+> + * scheme is that we can use the next pointer of the llist_node to determine
+> + * if it has been put into a lock-less list. However, the next pointer of
+> + * the llist_node should be cleared ASAP after it has been removed from a
+> + * lock-less list.
+>   */
+>  
+>  #include <linux/atomic.h>
+> @@ -64,6 +75,13 @@ struct llist_node {
+>  #define LLIST_HEAD_INIT(name)	{ NULL }
+>  #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+>  
+> +/*
+> + * Sentinel lock-less list
+> + */
+> +extern struct llist_node	__llist_end;
+> +#define SLLIST_HEAD_INIT(name)	{ &__llist_end }
+> +#define SLLIST_HEAD(name)	struct llist_head name = SLLIST_HEAD_INIT(name)
+> +
+>  /**
+>   * init_llist_head - initialize lock-less list head
+>   * @head:	the head for your lock-less list
+> @@ -73,6 +91,15 @@ static inline void init_llist_head(struct llist_head *list)
+>  	list->first = NULL;
+>  }
+>  
+> +/**
+> + * init_sllist_head - initialize sentinel lock-less list head
+> + * @head:	the head for your sentinel lock-less list
+> + */
+> +static inline void init_sllist_head(struct llist_head *list)
+> +{
+> +	list->first = &__llist_end;
+> +}
+> +
+>  /**
+>   * llist_entry - get the struct of this entry
+>   * @ptr:	the &struct llist_node pointer.
+> @@ -99,6 +126,15 @@ static inline void init_llist_head(struct llist_head *list)
+>  #define member_address_is_nonnull(ptr, member)	\
+>  	((uintptr_t)(ptr) + offsetof(typeof(*(ptr)), member) != 0)
+>  
+> +/**
+> + * member_address_is_notsentinel - check whether member address is not sentinel
+> + * @ptr:	the object pointer (struct type * that contains the llist_node)
+> + * @member:	the name of the llist_node within the struct.
+> + */
+> +#define member_address_is_notsentinel(ptr, member)	\
+> +	((uintptr_t)(ptr) + offsetof(typeof(*(ptr)), member)	\
+> +		!= (uintptr_t)&__llist_end)
+> +
+>  /**
+>   * llist_for_each - iterate over some deleted entries of a lock-less list
+>   * @pos:	the &struct llist_node to use as a loop cursor
+> @@ -135,6 +171,18 @@ static inline void init_llist_head(struct llist_head *list)
+>  #define llist_for_each_safe(pos, n, node)			\
+>  	for ((pos) = (node); (pos) && ((n) = (pos)->next, true); (pos) = (n))
+>  
+> +/**
+> + * sllist_for_each_safe - iterate over entries of a sentinel lock-less list
+> + *			  safe against removal of list entry
+> + * @pos:	the &struct llist_node to use as a loop cursor
+> + * @n:		another &struct llist_node to use as temporary storage
+> + * @node:	the first entry of deleted list entries
+> + */
+> +#define sllist_for_each_safe(pos, n, node)			\
+> +	for ((pos) = (node); ((pos) !=  &__llist_end) &&	\
+> +	     ((n) = (pos)->next,				\
+> +	     ({ WRITE_ONCE((pos)->next, NULL); }), true); (pos) = (n))
+> +
+>  /**
+>   * llist_for_each_entry - iterate over some deleted entries of lock-less list of given type
+>   * @pos:	the type * to use as a loop cursor.
+> @@ -178,6 +226,21 @@ static inline void init_llist_head(struct llist_head *list)
+>  	        (n = llist_entry(pos->member.next, typeof(*n), member), true); \
+>  	     pos = n)
+>  
+> +/**
+> + * sllist_for_each_entry_safe - iterate over sentinel entries of lock-less list
+> + *				of given type safe against removal of list entry
+> + * @pos:	the type * to use as a loop cursor.
+> + * @n:		another type * to use as temporary storage
+> + * @node:	the first entry of deleted list entries.
+> + * @member:	the name of the llist_node with the struct.
+> + */
+> +#define sllist_for_each_entry_safe(pos, n, node, member)		       \
+> +	for (pos = llist_entry((node), typeof(*(pos)), member);		       \
+> +	     member_address_is_notsentinel(pos, member) &&		       \
+> +		(n = llist_entry((pos)->member.next, typeof(*(n)), member),    \
+> +		({ WRITE_ONCE((pos)->member.next, NULL); }), true);	       \
+> +	     pos = n)
+> +
+>  /**
+>   * llist_empty - tests whether a lock-less list is empty
+>   * @head:	the list to test
+> @@ -191,15 +254,35 @@ static inline bool llist_empty(const struct llist_head *head)
+>  	return READ_ONCE(head->first) == NULL;
+>  }
+>  
+> +/**
+> + * sllist_empty - tests whether a lock-less list is empty
+> + * @head:	the list to test
+> + */
+> +static inline bool sllist_empty(const struct llist_head *head)
+> +{
+> +	return READ_ONCE(head->first) == &__llist_end;
+> +}
+> +
+>  static inline struct llist_node *llist_next(struct llist_node *node)
+>  {
+>  	return node->next;
+>  }
+>  
+> +static inline struct llist_node *sllist_next(struct llist_node *node)
+> +{
+> +	struct llist_node *next = node->next;
+> +
+> +	return (next == &__llist_end) ? NULL : next;
+> +}
+> +
+>  extern bool llist_add_batch(struct llist_node *new_first,
+>  			    struct llist_node *new_last,
+>  			    struct llist_head *head);
+>  
+> +extern bool sllist_add_batch(struct llist_node *new_first,
+> +			     struct llist_node *new_last,
+> +			     struct llist_head *head);
+> +
+>  static inline bool __llist_add_batch(struct llist_node *new_first,
+>  				     struct llist_node *new_last,
+>  				     struct llist_head *head)
+> @@ -209,6 +292,15 @@ static inline bool __llist_add_batch(struct llist_node *new_first,
+>  	return new_last->next == NULL;
+>  }
+>  
+> +static inline bool __sllist_add_batch(struct llist_node *new_first,
+> +				      struct llist_node *new_last,
+> +				      struct llist_head *head)
+> +{
+> +	new_last->next = head->first;
+> +	head->first = new_first;
+> +	return new_last->next == &__llist_end;
+> +}
+> +
+>  /**
+>   * llist_add - add a new entry
+>   * @new:	new entry to be added
+> @@ -221,11 +313,28 @@ static inline bool llist_add(struct llist_node *new, struct llist_head *head)
+>  	return llist_add_batch(new, new, head);
+>  }
+>  
+> +/**
+> + * sllist_add - add a new entry
+> + * @new:	new entry to be added
+> + * @head:	the head for your lock-less list
+> + *
+> + * Returns true if the list was empty prior to adding this entry.
+> + */
+> +static inline bool sllist_add(struct llist_node *new, struct llist_head *head)
+> +{
+> +	return sllist_add_batch(new, new, head);
+> +}
+> +
+>  static inline bool __llist_add(struct llist_node *new, struct llist_head *head)
+>  {
+>  	return __llist_add_batch(new, new, head);
+>  }
+>  
+> +static inline bool __sllist_add(struct llist_node *new, struct llist_head *head)
+> +{
+> +	return __sllist_add_batch(new, new, head);
+> +}
+> +
+>  /**
+>   * llist_del_all - delete all entries from lock-less list
+>   * @head:	the head of lock-less list to delete all entries
+> @@ -239,6 +348,17 @@ static inline struct llist_node *llist_del_all(struct llist_head *head)
+>  	return xchg(&head->first, NULL);
+>  }
+>  
+> +/**
+> + * sllist_del_all - delete all entries from sentinel lock-less list
+> + * @head:	the head of lock-less list to delete all entries
+> + */
+> +static inline struct llist_node *sllist_del_all(struct llist_head *head)
+> +{
+> +	struct llist_node *first = xchg(&head->first, &__llist_end);
+> +
+> +	return (first == &__llist_end) ? NULL : first;
+> +}
+> +
+>  static inline struct llist_node *__llist_del_all(struct llist_head *head)
+>  {
+>  	struct llist_node *first = head->first;
+> @@ -247,8 +367,18 @@ static inline struct llist_node *__llist_del_all(struct llist_head *head)
+>  	return first;
+>  }
+>  
+> +static inline struct llist_node *__sllist_del_all(struct llist_head *head)
+> +{
+> +	struct llist_node *first = head->first;
+> +
+> +	head->first = &__llist_end;
+> +	return (first == &__llist_end) ? NULL : first;
+> +}
+> +
+>  extern struct llist_node *llist_del_first(struct llist_head *head);
+> +extern struct llist_node *sllist_del_first(struct llist_head *head);
+>  
+>  struct llist_node *llist_reverse_order(struct llist_node *head);
+> +struct llist_node *sllist_reverse_order(struct llist_node *head);
+>  
+>  #endif /* LLIST_H */
+> diff --git a/lib/llist.c b/lib/llist.c
+> index 611ce4881a87..418327394735 100644
+> --- a/lib/llist.c
+> +++ b/lib/llist.c
+> @@ -1,6 +1,6 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  /*
+> - * Lock-less NULL terminated single linked list
+> + * Lock-less NULL and sentinel node terminated singly linked lists
+>   *
+>   * The basic atomic operation of this list is cmpxchg on long.  On
+>   * architectures that don't have NMI-safe cmpxchg implementation, the
+> @@ -12,8 +12,11 @@
+>   */
+>  #include <linux/kernel.h>
+>  #include <linux/export.h>
+> +#include <linux/cache.h>
+>  #include <linux/llist.h>
+>  
+> +struct llist_node __llist_end __ro_after_init;
+> +EXPORT_SYMBOL_GPL(__llist_end);
+>  
+>  /**
+>   * llist_add_batch - add several linked entries in batch
+> @@ -36,6 +39,27 @@ bool llist_add_batch(struct llist_node *new_first, struct llist_node *new_last,
+>  }
+>  EXPORT_SYMBOL_GPL(llist_add_batch);
+>  
+> +/**
+> + * sllist_add_batch - add several linked entries in batch
+> + * @new_first:	first entry in batch to be added
+> + * @new_last:	last entry in batch to be added
+> + * @head:	the head for your lock-less list
+> + *
+> + * Return whether list is empty before adding.
+> + */
+> +bool sllist_add_batch(struct llist_node *new_first, struct llist_node *new_last,
+> +		      struct llist_head *head)
+> +{
+> +	struct llist_node *first;
+> +
+> +	do {
+> +		new_last->next = first = READ_ONCE(head->first);
 
-iQIzBAEBCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmNA2MYACgkQnowa+77/
-2zK5kw//fXQx4S3OL/pT8fA6cPcGbkKppj3y8jm224xgNltGQMKb7Cak0stDmGKO
-d2DKLfWtEAdWovBJcryyjjyLrHtsYbvUff4ulx74wiUAmxOMmTvFIbmvhK6DJDUe
-PIswvZEb0/XkX9oOYvXf24ZTX3HcIpXGZYuCCgmTyCbEFYtBj/50YoScoffCW6DY
-kYdQK92kixPFv2Dy8TtO9Eo+J7c7TuNuZWpU9/3HMT+gQavNfwtSR+wHoeZEur+M
-wso6Ydm662Fm8hWzMddVPSV1wDYfbNShbQNYuTB0LBef+7X/rLDK2b3xcC8JPk1R
-87i3LCdju4Byqpb9IhaMaNDE1zSowYst+wSg4ArGsCi5TJ9X2CSy0peewSW/sUqq
-7YPXyTepTRSUoFGNpvAguhAqoYAkpxV0ZwrMZ2GhyeSUMQtZc2PB3px+87l8Zua9
-+lL0BRttlGau7BbURhvvYqvlKDLzemqh0YXXMhtbCBD2YCQEtuCDEoC1fsbU5Ayn
-XBXDDlxCX+fJ31MgW606xLgCgqPuzIHQPX04/fsRy4YdnC4u+A8r8R92mhoojVws
-rC2z4qx9JB+UvcNZvyycP1YyBCZthMBYOj3PyBLCSRSCAWugC9x7TsO0I2GPjSej
-vIEb4e9Q2WDQQCGVGMwtvqX/zPvrXMDEFQ0cZYL1FPPRFDGAMZc=
-=xGWP
------END PGP SIGNATURE-----
+Here new_last->next may be changed from NULL to non-NULL?  Do we need
+to do this atomically?  Even cmpxchg() to guarantee it is NULL before
+put into list?
 
---------------x4E24oHe3w0nvhvCysX22mSr--
+> +	} while (cmpxchg(&head->first, first, new_first) != first);
+> +
+> +	return first == &__llist_end;
+> +}
+> +EXPORT_SYMBOL_GPL(sllist_add_batch);
+> +
+>  /**
+>   * llist_del_first - delete the first entry of lock-less list
+>   * @head:	the head for your lock-less list
+> @@ -69,6 +93,33 @@ struct llist_node *llist_del_first(struct llist_head *head)
+>  }
+>  EXPORT_SYMBOL_GPL(llist_del_first);
+>  
+> +/**
+> + * sllist_del_first - delete the first entry of sentinel lock-less list
+> + * @head:	the head for your lock-less list
+> + *
+> + * If list is empty, return NULL, otherwise, return the first entry
+> + * deleted, this is the newest added one.
+> + */
+> +struct llist_node *sllist_del_first(struct llist_head *head)
+> +{
+> +	struct llist_node *entry, *old_entry, *next;
+> +
+> +	entry = smp_load_acquire(&head->first);
+> +	for (;;) {
+> +		if (entry == &__llist_end)
+> +			return NULL;
+> +		old_entry = entry;
+> +		next = READ_ONCE(entry->next);
+> +		entry = cmpxchg(&head->first, old_entry, next);
+> +		if (entry == old_entry)
+> +			break;
+> +	}
+> +	WRITE_ONCE(entry->next, NULL);
+> +
+> +	return entry;
+> +}
+> +EXPORT_SYMBOL_GPL(sllist_del_first);
+> +
+>  /**
+>   * llist_reverse_order - reverse order of a llist chain
+>   * @head:	first item of the list to be reversed
+> @@ -90,3 +141,29 @@ struct llist_node *llist_reverse_order(struct llist_node *head)
+>  	return new_head;
+>  }
+>  EXPORT_SYMBOL_GPL(llist_reverse_order);
+> +
+> +/**
+> + * sllist_reverse_order - reverse order of a llist chain
+> + * @head:	first item of the list to be reversed
+> + *
+> + * Reverse the order of a chain of llist entries and return the
+> + * new first entry.
+> + */
+> +struct llist_node *sllist_reverse_order(struct llist_node *head)
+> +{
+> +	struct llist_node *new_head = &__llist_end;
+> +
+> +	if (!head || (head == &__llist_end))
+> +		return NULL;
+> +
+> +	while (head != &__llist_end) {
+> +		struct llist_node *tmp = head;
+> +
+> +		head = head->next;
+> +		tmp->next = new_head;
+> +		new_head = tmp;
+> +	}
+> +
+> +	return new_head;
+> +}
+> +EXPORT_SYMBOL_GPL(sllist_reverse_order);
+
+Best Regards,
+Huang, Ying
