@@ -2,208 +2,315 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5269C433F5
-	for <linux-block@archiver.kernel.org>; Sat,  8 Oct 2022 08:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE90C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  8 Oct 2022 08:44:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbiJHIAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 8 Oct 2022 04:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33650 "EHLO
+        id S229783AbiJHIn6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 8 Oct 2022 04:43:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbiJHIAV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Oct 2022 04:00:21 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BE0A303FE;
-        Sat,  8 Oct 2022 01:00:17 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MkyGK6N7SzKHnb;
-        Sat,  8 Oct 2022 15:58:01 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgC3Lo4KLkFjsJnSBw--.62079S3;
-        Sat, 08 Oct 2022 16:00:11 +0800 (CST)
-Subject: Re: [blk] 8c5035dfbb: fio.read_iops -10.6% regression
-To:     kernel test robot <yujie.liu@intel.com>
-Cc:     lkp@lists.01.org, lkp@intel.com, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        ying.huang@intel.com, feng.tang@intel.com,
-        zhengjun.xing@linux.intel.com, fengwei.yin@intel.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <202210081045.77ddf59b-yujie.liu@intel.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <d5279fc2-38b3-6d20-4404-604d5c7277e2@huaweicloud.com>
-Date:   Sat, 8 Oct 2022 16:00:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S229539AbiJHIn5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 8 Oct 2022 04:43:57 -0400
+Received: from out30-44.freemail.mail.aliyun.com (out30-44.freemail.mail.aliyun.com [115.124.30.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9C1F56BBE;
+        Sat,  8 Oct 2022 01:43:53 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VRbkghb_1665218629;
+Received: from 30.97.56.201(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VRbkghb_1665218629)
+          by smtp.aliyun-inc.com;
+          Sat, 08 Oct 2022 16:43:50 +0800
+Message-ID: <50827796-af93-4af5-4121-dc13c31a67fc@linux.alibaba.com>
+Date:   Sat, 8 Oct 2022 16:43:47 +0800
 MIME-Version: 1.0
-In-Reply-To: <202210081045.77ddf59b-yujie.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: ublk-qcow2: ublk-qcow2 is available
+Content-Language: en-US
+To:     Ming Lei <tom.leiming@gmail.com>,
+        Stefan Hajnoczi <stefanha@gmail.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Denis V. Lunev" <den@openvz.org>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+References: <Yza1u1KfKa7ycQm0@T590> <Yzs9xQlVuW41TuNC@fedora>
+ <YzwARuAZdaoGTUfP@T590>
+ <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
+ <Yz0FrzJVZTqlQtJ5@T590>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <Yz0FrzJVZTqlQtJ5@T590>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgC3Lo4KLkFjsJnSBw--.62079S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKFy8Xw4rZrW5GFyrZF1DJrb_yoWxCr18pa
-        na9FyxJrZ8G34ruw10vr1UuFW7Gr95Jay7Xry8WF4Iga4F9rn0qFZxKF93KF98u34jkw1x
-        ZFWUJry5XF1jyFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-        9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 2022/10/5 12:18, Ming Lei wrote:
+> On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajnoczi wrote:
+>> On Tue, 4 Oct 2022 at 05:44, Ming Lei <tom.leiming@gmail.com> wrote:
+>>>
+>>> On Mon, Oct 03, 2022 at 03:53:41PM -0400, Stefan Hajnoczi wrote:
+>>>> On Fri, Sep 30, 2022 at 05:24:11PM +0800, Ming Lei wrote:
+>>>>> ublk-qcow2 is available now.
+>>>>
+>>>> Cool, thanks for sharing!
+>>>>
+>>>>>
+>>>>> So far it provides basic read/write function, and compression and snapshot
+>>>>> aren't supported yet. The target/backend implementation is completely
+>>>>> based on io_uring, and share the same io_uring with ublk IO command
+>>>>> handler, just like what ublk-loop does.
+>>>>>
+>>>>> Follows the main motivations of ublk-qcow2:
+>>>>>
+>>>>> - building one complicated target from scratch helps libublksrv APIs/functions
+>>>>>   become mature/stable more quickly, since qcow2 is complicated and needs more
+>>>>>   requirement from libublksrv compared with other simple ones(loop, null)
+>>>>>
+>>>>> - there are several attempts of implementing qcow2 driver in kernel, such as
+>>>>>   ``qloop`` [2], ``dm-qcow2`` [3] and ``in kernel qcow2(ro)`` [4], so ublk-qcow2
+>>>>>   might useful be for covering requirement in this field
+>>>>>
+>>>>> - performance comparison with qemu-nbd, and it was my 1st thought to evaluate
+>>>>>   performance of ublk/io_uring backend by writing one ublk-qcow2 since ublksrv
+>>>>>   is started
+>>>>>
+>>>>> - help to abstract common building block or design pattern for writing new ublk
+>>>>>   target/backend
+>>>>>
+>>>>> So far it basically passes xfstest(XFS) test by using ublk-qcow2 block
+>>>>> device as TEST_DEV, and kernel building workload is verified too. Also
+>>>>> soft update approach is applied in meta flushing, and meta data
+>>>>> integrity is guaranteed, 'make test T=qcow2/040' covers this kind of
+>>>>> test, and only cluster leak is reported during this test.
+>>>>>
+>>>>> The performance data looks much better compared with qemu-nbd, see
+>>>>> details in commit log[1], README[5] and STATUS[6]. And the test covers both
+>>>>> empty image and pre-allocated image, for example of pre-allocated qcow2
+>>>>> image(8GB):
+>>>>>
+>>>>> - qemu-nbd (make test T=qcow2/002)
+>>>>
+>>>> Single queue?
+>>>
+>>> Yeah.
+>>>
+>>>>
+>>>>>     randwrite(4k): jobs 1, iops 24605
+>>>>>     randread(4k): jobs 1, iops 30938
+>>>>>     randrw(4k): jobs 1, iops read 13981 write 14001
+>>>>>     rw(512k): jobs 1, iops read 724 write 728
+>>>>
+>>>> Please try qemu-storage-daemon's VDUSE export type as well. The
+>>>> command-line should be similar to this:
+>>>>
+>>>>   # modprobe virtio_vdpa # attaches vDPA devices to host kernel
+>>>
+>>> Not found virtio_vdpa module even though I enabled all the following
+>>> options:
+>>>
+>>>         --- vDPA drivers
+>>>           <M>   vDPA device simulator core
+>>>           <M>     vDPA simulator for networking device
+>>>           <M>     vDPA simulator for block device
+>>>           <M>   VDUSE (vDPA Device in Userspace) support
+>>>           <M>   Intel IFC VF vDPA driver
+>>>           <M>   Virtio PCI bridge vDPA driver
+>>>           <M>   vDPA driver for Alibaba ENI
+>>>
+>>> BTW, my test environment is VM and the shared data is done in VM too, and
+>>> can virtio_vdpa be used inside VM?
+>>
+>> I hope Xie Yongji can help explain how to benchmark VDUSE.
+>>
+>> virtio_vdpa is available inside guests too. Please check that
+>> VIRTIO_VDPA ("vDPA driver for virtio devices") is enabled in "Virtio
+>> drivers" menu.
+>>
+>>>
+>>>>   # modprobe vduse
+>>>>   # qemu-storage-daemon \
+>>>>       --blockdev file,filename=test.qcow2,cache.direct=of|off,aio=native,node-name=file \
+>>>>       --blockdev qcow2,file=file,node-name=qcow2 \
+>>>>       --object iothread,id=iothread0 \
+>>>>       --export vduse-blk,id=vduse0,name=vduse0,num-queues=$(nproc),node-name=qcow2,writable=on,iothread=iothread0
+>>>>   # vdpa dev add name vduse0 mgmtdev vduse
+>>>>
+>>>> A virtio-blk device should appear and xfstests can be run on it
+>>>> (typically /dev/vda unless you already have other virtio-blk devices).
+>>>>
+>>>> Afterwards you can destroy the device using:
+>>>>
+>>>>   # vdpa dev del vduse0
+>>>>
+>>>>>
+>>>>> - ublk-qcow2 (make test T=qcow2/022)
+>>>>
+>>>> There are a lot of other factors not directly related to NBD vs ublk. In
+>>>> order to get an apples-to-apples comparison with qemu-* a ublk export
+>>>> type is needed in qemu-storage-daemon. That way only the difference is
+>>>> the ublk interface and the rest of the code path is identical, making it
+>>>> possible to compare NBD, VDUSE, ublk, etc more precisely.
+>>>
+>>> Maybe not true.
+>>>
+>>> ublk-qcow2 uses io_uring to handle all backend IO(include meta IO) completely,
+>>> and so far single io_uring/pthread is for handling all qcow2 IOs and IO
+>>> command.
+>>
+>> qemu-nbd doesn't use io_uring to handle the backend IO, so we don't
+> 
+> I tried to use it via --aio=io_uring for setting up qemu-nbd, but not succeed.
+> 
+>> know whether the benchmark demonstrates that ublk is faster than NBD,
+>> that the ublk-qcow2 implementation is faster than qemu-nbd's qcow2,
+>> whether there are miscellaneous implementation differences between
+>> ublk-qcow2 and qemu-nbd (like using the same io_uring context for both
+>> ublk and backend IO), or something else.
+> 
+> The theory shouldn't be too complicated:
+> 
+> 1) io uring passthough(pt) communication is fast than socket, and io command
+> is carried over io_uring pt commands, and should be fast than virio
+> communication too.
+> 
+> 2) io uring io handling is fast than libaio which is taken in the
+> test on qemu-nbd, and all qcow2 backend io(include meta io) is handled
+> by io_uring.
+> 
+> https://github.com/ming1/ubdsrv/blob/master/tests/common/qcow2_common
+> 
+> 3) ublk uses one single io_uring to handle all io commands and qcow2
+> backend IOs, so batching handling is common, and it is easy to see
+> dozens of IOs/io commands handled in single syscall, or even more.
+> 
+>>
+>> I'm suggesting measuring changes to just 1 variable at a time.
+>> Otherwise it's hard to reach a conclusion about the root cause of the
+>> performance difference. Let's learn why ublk-qcow2 performs well.
+> 
+> Turns out the latest Fedora 37-beta doesn't support vdpa yet, so I built
+> qemu from the latest github tree, and finally it starts to work. And test kernel
+> is v6.0 release.
+> 
+> Follows the test result, and all three devices are setup as single
+> queue, and all tests are run in single job, still done in one VM, and
+> the test images are stored on XFS/virito-scsi backed SSD.
+> 
+> The 1st group tests all three block device which is backed by empty
+> qcow2 image.
+> 
+> The 2nd group tests all the three block devices backed by pre-allocated
+> qcow2 image.
+> 
+> Except for big sequential IO(512K), there is still not small gap between
+> vdpa-virtio-blk and ublk.
+> 
+> 1. run fio on block device over empty qcow2 image
+> 1) qemu-nbd
+> running qcow2/001
+> run perf test on empty qcow2 image via nbd
+> 	fio (nbd(/mnt/data/ublk_null_8G_nYbgF.qcow2), libaio, bs 4k, dio, hw queues:1)...
+> 	randwrite: jobs 1, iops 8549
+> 	randread: jobs 1, iops 34829
+> 	randrw: jobs 1, iops read 11363 write 11333
+> 	rw(512k): jobs 1, iops read 590 write 597
+> 
+> 
+> 2) ublk-qcow2
+> running qcow2/021
+> run perf test on empty qcow2 image via ublk
+> 	fio (ublk/qcow2( -f /mnt/data/ublk_null_8G_s761j.qcow2), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0).
+> 	randwrite: jobs 1, iops 16086
+> 	randread: jobs 1, iops 172720
+> 	randrw: jobs 1, iops read 35760 write 35702
+> 	rw(512k): jobs 1, iops read 1140 write 1149
+> 
+> 3) vdpa-virtio-blk
+> running debug/test_dev
+> run io test on specified device
+> 	fio (vdpa(/dev/vdc), libaio, bs 4k, dio, hw queues:1)...
+> 	randwrite: jobs 1, iops 8626
+> 	randread: jobs 1, iops 126118
+> 	randrw: jobs 1, iops read 17698 write 17665
+> 	rw(512k): jobs 1, iops read 1023 write 1031
+> 
+> 
+> 2. run fio on block device over pre-allocated qcow2 image
+> 1) qemu-nbd
+> running qcow2/002
+> run perf test on pre-allocated qcow2 image via nbd
+> 	fio (nbd(/mnt/data/ublk_data_8G_sc0SB.qcow2), libaio, bs 4k, dio, hw queues:1)...
+> 	randwrite: jobs 1, iops 21439
+> 	randread: jobs 1, iops 30336
+> 	randrw: jobs 1, iops read 11476 write 11449
+> 	rw(512k): jobs 1, iops read 718 write 722
+> 
+> 2) ublk-qcow2
+> running qcow2/022
+> run perf test on pre-allocated qcow2 image via ublk
+> 	fio (ublk/qcow2( -f /mnt/data/ublk_data_8G_yZiaJ.qcow2), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0).
+> 	randwrite: jobs 1, iops 98757
+> 	randread: jobs 1, iops 110246
+> 	randrw: jobs 1, iops read 47229 write 47161
+> 	rw(512k): jobs 1, iops read 1416 write 1427
+> 
+> 3) vdpa-virtio-blk
+> running debug/test_dev
+> run io test on specified device
+> 	fio (vdpa(/dev/vdc), libaio, bs 4k, dio, hw queues:1)...
+> 	randwrite: jobs 1, iops 47317
+> 	randread: jobs 1, iops 74092
+> 	randrw: jobs 1, iops read 27196 write 27234
+> 	rw(512k): jobs 1, iops read 1447 write 1458
+> 
+> 
 
-在 2022/10/08 10:50, kernel test robot 写道:
-> Greeting,
-> 
-> FYI, we noticed a -10.6% regression of fio.read_iops due to commit:
+Hi All,
 
-I don't know how this is working but I'm *sure* this commit won't affect
-performance. Please take a look at the commit, only wbt initialization
-is touched, which is done while creating the device:
+We are interested in VDUSE vs UBLK, too. And I have tested them with nullblk backend.
+Let me share some results here.
 
-device_add_disk
-  blk_register_queue
-   wbt_enable_default
-    wbt_init
+I setup UBLK with:
+  ublk add -t loop -f /dev/nullb0 -d QUEUE_DEPTH -q NR_QUEUE
 
-And io path is the same with or without this commit.
+I setup VDUSE with:
+  qemu-storage-daemon \
+       --chardev socket,id=charmonitor,path=/tmp/qmp.sock,server=on,wait=off \
+       --monitor chardev=charmonitor \
+       --blockdev driver=host_device,cache.direct=on,filename=/dev/nullb0,node-name=disk0 \
+       --export vduse-blk,id=test,node-name=disk0,name=vduse_test,writable=on,num-queues=NR_QUEUE,queue-size=QUEUE_DEPTH
 
-By the way, wbt should only work for write.
+Here QUEUE_DEPTH is 1, 32 or 128 and NR_QUEUE is 1 or 4.
 
-Thanks,
-Kuai
-> 
-> commit: 8c5035dfbb9475b67c82b3fdb7351236525bf52b ("blk-wbt: call rq_qos_add() after wb_normal is initialized")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> 
-> in testcase: fio-basic
-> on test machine: 192 threads 4 sockets Intel(R) Xeon(R) Platinum 9242 CPU @ 2.30GHz (Cascade Lake) with 192G memory
-> with following parameters:
-> 
-> 	runtime: 300s
-> 	nr_task: 8t
-> 	disk: 1SSD
-> 	fs: btrfs
-> 	rw: randread
-> 	bs: 2M
-> 	ioengine: sync
-> 	test_size: 256g
-> 	cpufreq_governor: performance
-> 
-> test-description: Fio is a tool that will spawn a number of threads or processes doing a particular type of I/O action as specified by the user.
-> test-url: https://github.com/axboe/fio
-> 
-> 
-> Details are as below:
-> 
-> =========================================================================================
-> bs/compiler/cpufreq_governor/disk/fs/ioengine/kconfig/nr_task/rootfs/runtime/rw/tbox_group/test_size/testcase:
->    2M/gcc-11/performance/1SSD/btrfs/sync/x86_64-rhel-8.3/8t/debian-11.1-x86_64-20220510.cgz/300s/randread/lkp-csl-2ap4/256g/fio-basic
-> 
-> commit:
->    f7de4886fe ("rnbd-srv: remove struct rnbd_dev")
->    8c5035dfbb ("blk-wbt: call rq_qos_add() after wb_normal is initialized")
-> 
-> f7de4886fe8f008a 8c5035dfbb9475b67c82b3fdb73
-> ---------------- ---------------------------
->           %stddev     %change         %stddev
->               \          |                \
->        0.03 ±106%      +0.2        0.22 ± 80%  fio.latency_20ms%
->        0.02 ± 33%      -0.0        0.01 ± 12%  fio.latency_4ms%
->        2508           -10.6%       2243        fio.read_bw_MBps
->     6717440           +17.6%    7897088        fio.read_clat_90%_us
->     6892202           +19.0%    8202922        fio.read_clat_95%_us
->     7602176 ±  4%     +18.4%    9000277 ±  3%  fio.read_clat_99%_us
->     6374238           +11.8%    7127450        fio.read_clat_mean_us
->      363825 ± 10%     +74.9%     636378 ±  5%  fio.read_clat_stddev
->        1254           -10.6%       1121        fio.read_iops
->      104.97           +11.8%     117.32        fio.time.elapsed_time
->      104.97           +11.8%     117.32        fio.time.elapsed_time.max
->       13731            +5.6%      14498 ±  4%  fio.time.maximum_resident_set_size
->      116.00            -8.2%     106.50        fio.time.percent_of_cpu_this_job_got
->   1.998e+10           +11.4%  2.226e+10        cpuidle..time
->        3.27 ±  3%      +4.6%       3.42        iostat.cpu.iowait
->        4.49 ± 68%      -2.1        2.38 ±152%  perf-profile.children.cycles-pp.number
->        4.49 ± 68%      -2.5        1.98 ±175%  perf-profile.self.cycles-pp.number
->      557763            +5.4%     587781        proc-vmstat.pgfault
->       25488            +3.1%      26274        proc-vmstat.pgreuse
->     2459048           -10.1%    2209482        vmstat.io.bi
->      184649 ±  5%     -10.4%     165526 ±  7%  vmstat.system.cs
->      111733 ± 30%     +61.8%     180770 ± 21%  numa-meminfo.node0.AnonPages
->      113221 ± 30%     +60.2%     181416 ± 21%  numa-meminfo.node0.Inactive(anon)
->       11301 ± 24%    +164.5%      29888 ±117%  numa-meminfo.node2.Active(file)
->      104911 ± 39%     -80.5%      20456 ±100%  numa-meminfo.node3.AnonHugePages
->      131666 ± 27%     -67.9%      42297 ± 82%  numa-meminfo.node3.AnonPages
->      132698 ± 26%     -67.5%      43158 ± 81%  numa-meminfo.node3.Inactive(anon)
->       27934 ± 30%     +61.8%      45196 ± 21%  numa-vmstat.node0.nr_anon_pages
->       28306 ± 30%     +60.2%      45358 ± 21%  numa-vmstat.node0.nr_inactive_anon
->       28305 ± 30%     +60.2%      45357 ± 21%  numa-vmstat.node0.nr_zone_inactive_anon
->        6291 ± 24%     +68.0%      10567 ± 26%  numa-vmstat.node2.workingset_nodes
->       32925 ± 27%     -67.9%      10571 ± 82%  numa-vmstat.node3.nr_anon_pages
->       33182 ± 26%     -67.5%      10786 ± 81%  numa-vmstat.node3.nr_inactive_anon
->       33182 ± 26%     -67.5%      10786 ± 81%  numa-vmstat.node3.nr_zone_inactive_anon
->      161.78 ±  4%     -28.2%     116.10 ± 30%  sched_debug.cfs_rq:/.runnable_avg.avg
->      161.46 ±  4%     -28.2%     115.85 ± 30%  sched_debug.cfs_rq:/.util_avg.avg
->      426382           +11.0%     473345 ±  6%  sched_debug.cpu.clock.avg
->      426394           +11.0%     473357 ±  6%  sched_debug.cpu.clock.max
->      426370           +11.0%     473331 ±  6%  sched_debug.cpu.clock.min
->      426139           +10.9%     472586 ±  6%  sched_debug.cpu.clock_task.avg
->      426368           +11.0%     473130 ±  6%  sched_debug.cpu.clock_task.max
->      416196           +11.1%     462228 ±  6%  sched_debug.cpu.clock_task.min
->        1156 ±  7%     -10.8%       1031 ±  6%  sched_debug.cpu.curr->pid.stddev
->      426372           +11.0%     473334 ±  6%  sched_debug.cpu_clk
->      425355           +11.0%     472318 ±  6%  sched_debug.ktime
->      426826           +11.0%     473787 ±  6%  sched_debug.sched_clk
->   1.263e+09            -7.9%  1.164e+09 ±  3%  perf-stat.i.branch-instructions
->      190886 ±  5%     -10.8%     170290 ±  7%  perf-stat.i.context-switches
->   1.979e+09            -8.8%  1.804e+09 ±  2%  perf-stat.i.dTLB-loads
->   8.998e+08            -8.2%  8.257e+08 ±  2%  perf-stat.i.dTLB-stores
->   6.455e+09            -8.0%  5.938e+09 ±  3%  perf-stat.i.instructions
->       21.78            -8.4%      19.95        perf-stat.i.metric.M/sec
->     7045315 ±  4%     -14.0%    6057863 ±  6%  perf-stat.i.node-load-misses
->     2658563 ±  7%     -21.9%    2077647 ± 12%  perf-stat.i.node-loads
->      414822 ±  4%     -12.9%     361455 ±  3%  perf-stat.i.node-store-misses
->   1.251e+09            -7.8%  1.154e+09 ±  3%  perf-stat.ps.branch-instructions
->      189082 ±  5%     -10.7%     168849 ±  7%  perf-stat.ps.context-switches
->    1.96e+09            -8.8%  1.789e+09 ±  2%  perf-stat.ps.dTLB-loads
->   8.912e+08            -8.1%  8.187e+08 ±  2%  perf-stat.ps.dTLB-stores
->   6.393e+09            -7.9%  5.888e+09 ±  3%  perf-stat.ps.instructions
->     6978485 ±  4%     -13.9%    6006510 ±  6%  perf-stat.ps.node-load-misses
->     2633627 ±  7%     -21.8%    2060033 ± 12%  perf-stat.ps.node-loads
->      410822 ±  4%     -12.8%     358289 ±  3%  perf-stat.ps.node-store-misses
-> 
-> 
-> If you fix the issue, kindly add following tag
-> | Reported-by: kernel test robot <yujie.liu@intel.com>
-> | Link: https://lore.kernel.org/r/202210081045.77ddf59b-yujie.liu@intel.com
-> 
-> 
-> To reproduce:
-> 
->          git clone https://github.com/intel/lkp-tests.git
->          cd lkp-tests
->          sudo bin/lkp install job.yaml           # job file is attached in this email
->          bin/lkp split-job --compatible job.yaml # generate the yaml file for lkp run
->          sudo bin/lkp run generated-yaml-file
-> 
->          # if come across any failure that blocks the test,
->          # please remove ~/.lkp and /lkp dir to run from a clean state.
-> 
-> 
-> Disclaimer:
-> Results have been estimated based on internal Intel analysis and are provided
-> for informational purposes only. Any difference in system hardware or software
-> design or configuration may affect actual performance.
-> 
-> 
+Note:
+(1) VDUSE requires QUEUE_DEPTH >= 2. I cannot setup QUEUE_DEPTH to 1.
+(2) I use qemu 7.1.0-rc3. It supports vduse-blk.
+(3) I do not use ublk null target so that the test is fair.
+(4) I setup fio with direct=1, bs=4k.
 
+------------------------------
+1 job 1 iodepth, lat（usec)
+		vduse	ublk
+seq-read	22.55	11.15
+rand-read	22.49	11.17
+seq-write	25.67	10.25
+rand-write	24.13	10.16
+
+------------------------------
+1 job 32 iodepth, iops（k)
+		vduse	ublk
+seq-read	166	207
+rand-read	150	204
+seq-write	131	359
+rand-write	129	363
+
+------------------------------
+4job 128 iodepth, iops (k)
+
+		vduse	ublk
+seq-read	318	984
+rand-read	307	929
+seq-write	221	924
+rand-write	217	917
+
+Regards,
+Zhang
