@@ -2,101 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA56C433FE
-	for <linux-block@archiver.kernel.org>; Sun,  9 Oct 2022 09:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E3D6C433F5
+	for <linux-block@archiver.kernel.org>; Sun,  9 Oct 2022 09:48:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiJIJcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Oct 2022 05:32:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39948 "EHLO
+        id S229552AbiJIJs3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Oct 2022 05:48:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbiJIJcl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Oct 2022 05:32:41 -0400
+        with ESMTP id S229459AbiJIJs2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Oct 2022 05:48:28 -0400
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A0432CCA8;
-        Sun,  9 Oct 2022 02:32:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 973141659A;
+        Sun,  9 Oct 2022 02:48:26 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MlcGQ57rhzKDny;
-        Sun,  9 Oct 2022 17:30:22 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHzYwzlUJjegAJCA--.61104S3;
-        Sun, 09 Oct 2022 17:32:36 +0800 (CST)
-Subject: Re: [blk] 8c5035dfbb: fio.read_iops -10.6% regression
-To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     kernel test robot <yujie.liu@intel.com>, lkp@lists.01.org,
-        lkp@intel.com, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        ying.huang@intel.com, feng.tang@intel.com,
-        zhengjun.xing@linux.intel.com, fengwei.yin@intel.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <202210081045.77ddf59b-yujie.liu@intel.com>
- <d5279fc2-38b3-6d20-4404-604d5c7277e2@huaweicloud.com>
- <Y0KJmODYOh83OtGa@T590>
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mlcd24vjrzkbSd;
+        Sun,  9 Oct 2022 17:46:30 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgCHSIjlmEJj5JAJCA--.26004S4;
+        Sun, 09 Oct 2022 17:48:22 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <e81ea0fe-dcd2-1e5d-9b78-3c79751b3097@huaweicloud.com>
-Date:   Sun, 9 Oct 2022 17:32:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     fengwei.yin@intel.com, ming.lei@redhat.com, axboe@kernel.dk,
+        yukuai3@huawei.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH] blk-wbt: fix that 'rwb->wc' is always set to 1 in wbt_init()
+Date:   Sun,  9 Oct 2022 18:10:38 +0800
+Message-Id: <20221009101038.1692875-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <Y0KJmODYOh83OtGa@T590>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHzYwzlUJjegAJCA--.61104S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7JFy7XF13Zw43tw4fuF1rWFg_yoW3uwb_Zw
-        1vvF1xCrn8Gan2vrsFkr4agr4kX34xGFy7JF4rJa17X3sIgrn8ZFyDWFy8W3s8Ww1rtF4a
-        krWFy343Xrs2kjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-        nIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-TRANSID: gCh0CgCHSIjlmEJj5JAJCA--.26004S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zw15ArW3JrWxury7uF4rKrg_yoW8Gw4Upa
+        yxKrW5JFWjgrWI93WxGan5Wayqkan5AFnxCFW3Gw15Z3y29r4UuF4vkF4Uury8ZrZxCF4a
+        9r48urWDZFyUG3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
+        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+        AvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF
+        7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Yu Kuai <yukuai3@huawei.com>
 
-在 2022/10/09 16:43, Ming Lei 写道:
-> On Sat, Oct 08, 2022 at 04:00:10PM +0800, Yu Kuai wrote:
->> Hi,
->>
->> 在 2022/10/08 10:50, kernel test robot 写道:
->>> Greeting,
->>>
->>> FYI, we noticed a -10.6% regression of fio.read_iops due to commit:
->>
->> I don't know how this is working but I'm *sure* this commit won't affect
-> 
-> Looks it is wrong to move
-> 
-> 	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
-> 
-> before rq_qos_add() in wbt_init().
-> 
-> Without adding wbt rq_qos, wbt_set_write_cache is just a nop.
+commit 8c5035dfbb94 ("blk-wbt: call rq_qos_add() after wb_normal is
+initialized") moves wbt_set_write_cache() before rq_qos_add(), which
+is wrong because wbt_rq_qos() is still NULL.
 
-Yes, I got it now, I'm being foolish here.
+Fix the problem by removing wbt_set_write_cache() and setting 'rwb->wc'
+directly. Noted that this patch also remove the redundant setting of
+'rab->wc'.
 
-I missed that "rwb->wc" is got by rq_qos in wbt_set_write_cache(), which
-is NULL before rq_qos_add(). By the way, it's interesting that how read
-performance is affected, I still don't know why yet...
+Fixes: 8c5035dfbb94 ("blk-wbt: call rq_qos_add() after wb_normal is initialized")
+Reported-by: kernel test robot <yujie.liu@intel.com>
+Link: https://lore.kernel.org/r/202210081045.77ddf59b-yujie.liu@intel.com
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-wbt.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Thanks,
-Kuai
-> 
-> 
-> thanks,
-> Ming
-> 
-> .
-> 
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 246467926253..c293e08b301f 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -841,12 +841,11 @@ int wbt_init(struct request_queue *q)
+ 	rwb->last_comp = rwb->last_issue = jiffies;
+ 	rwb->win_nsec = RWB_WINDOW_NSEC;
+ 	rwb->enable_state = WBT_STATE_ON_DEFAULT;
+-	rwb->wc = 1;
++	rwb->wc = test_bit(QUEUE_FLAG_WC, &q->queue_flags);
+ 	rwb->rq_depth.default_depth = RWB_DEF_DEPTH;
+ 	rwb->min_lat_nsec = wbt_default_latency_nsec(q);
+ 
+ 	wbt_queue_depth_changed(&rwb->rqos);
+-	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
+ 
+ 	/*
+ 	 * Assign rwb and add the stats callback.
+-- 
+2.31.1
 
