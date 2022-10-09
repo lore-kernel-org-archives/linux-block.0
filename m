@@ -2,91 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D0A8C433FE
-	for <linux-block@archiver.kernel.org>; Sun,  9 Oct 2022 13:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9214CC433F5
+	for <linux-block@archiver.kernel.org>; Sun,  9 Oct 2022 14:18:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230159AbiJINsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Oct 2022 09:48:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45348 "EHLO
+        id S229812AbiJIOSK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Oct 2022 10:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229980AbiJINsn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Oct 2022 09:48:43 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D7CC26AC3
-        for <linux-block@vger.kernel.org>; Sun,  9 Oct 2022 06:48:42 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 128so649962pga.1
-        for <linux-block@vger.kernel.org>; Sun, 09 Oct 2022 06:48:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IkNfwa52J7sMrLHZ8QvF0WkiVrf7CKgOKzcDQJ9/luI=;
-        b=k1m17xlTOhme5LjnFHKgn+i6FDJf1/xcwuohDL5UtMkB761MepQ/yAEfb8Vu2qwdt4
-         QqpKlms3H9ASE6pAkgt/UR6ZOvmQ9g2Gf/KQV8SXwCLfUEgt6Xs+vswmLnsjankLpP1I
-         2qnFNwZIk0NxQXqUfKcOlwpcLOXJLXED0Oi2Q6cpGOSJpb3ouXuEg53gy21L982u3kzm
-         IRqumO28nEn9zaXXFeyCJC1U4u27cPK1XXdU8Hx0+r4u+oWxICi2xB8Kpks+Z/R5NdHN
-         aMUtLxynywtPa5fMF0SB7rDrKzvc3WE+/KG1KKxNnYwAcB4VVuY4jYA8/Jv2gPMoodIA
-         hAWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IkNfwa52J7sMrLHZ8QvF0WkiVrf7CKgOKzcDQJ9/luI=;
-        b=YC+ndQldXS3bzMiwOFDMaR1+nuCmUYaq7xDOBZ09PO0BH3fk0+UT4UAinekQUzv6Jj
-         vpoo5R+U945lLxKJ+6kPnXSmpQM0gViPSSWybrIbU6gADjBT4CvMQ3h1/MMMV/J5bHmb
-         XVHbdCsf0CjpcGjAwlkNtDR8KfBf08KIHV27I7fdt1zXUltDfJrzst6OP8GInmRQzO7U
-         KsyWC0nwtKElQNoY9jXDWHEDCC3dY30MT4UvT0Rr5v83OBTeUPxB2Cfr9e4sqf2bHRNB
-         dK/Hgk86bQ8cUiVSkzccK7sQE4FSJD0b90XtJAmZkOzcDBtP489WJLQFR37yiA4/jREn
-         I1zg==
-X-Gm-Message-State: ACrzQf3tEoTxE7WEk7eq13DK1BTg2NhXOUakUoQbr77MFjKSTZJjAdRS
-        mKqV/k21T0z5zvwiht0RjpRwhQ==
-X-Google-Smtp-Source: AMsMyM4a6Z/RTEnbk7OiUCFaWLzKQzrmrN4JMt/asnxx6nbq0RCO/svzV1FCFxRUYVbmbDgniR502g==
-X-Received: by 2002:a05:6a00:430c:b0:562:6897:7668 with SMTP id cb12-20020a056a00430c00b0056268977668mr14652393pfb.23.1665323321833;
-        Sun, 09 Oct 2022 06:48:41 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id i72-20020a639d4b000000b0044ed37dbca8sm4601703pgd.2.2022.10.09.06.48.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Oct 2022 06:48:41 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Yu Kuai <yukuai1@huaweicloud.com>, fengwei.yin@intel.com,
-        yukuai3@huawei.com, ming.lei@redhat.com
-Cc:     yi.zhang@huawei.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20221009101038.1692875-1-yukuai1@huaweicloud.com>
-References: <20221009101038.1692875-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH] blk-wbt: fix that 'rwb->wc' is always set to 1 in wbt_init()
-Message-Id: <166532332067.4035.10826406194481023090.b4-ty@kernel.dk>
-Date:   Sun, 09 Oct 2022 07:48:40 -0600
+        with ESMTP id S229854AbiJIOSJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Oct 2022 10:18:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09CF626ADE;
+        Sun,  9 Oct 2022 07:18:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A6EE7B80D2B;
+        Sun,  9 Oct 2022 14:18:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 659D2C433D6;
+        Sun,  9 Oct 2022 14:17:59 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YgHbN0I0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1665325077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oirLAgHKzqbm2tDuRRRruxvBPFu6OuA1m1Bdo0JewVo=;
+        b=YgHbN0I0lUsk61F/tkacjTtELz9m0jTOee92icnhvNyHJrs9iBf1nxk5rIk4LCzkioh8sG
+        190YFxxX+8obr4IDytSpJV/y+LGJPtZT2kSp6+N5MRfHp0a/WJLUeHRU53NaAsEmu2d/gM
+        WcwjBCYWAwT/EnbHfbZZP/9zFIVJmUM=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 76b4077f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sun, 9 Oct 2022 14:17:57 +0000 (UTC)
+Date:   Sun, 9 Oct 2022 08:17:41 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph =?utf-8?Q?B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Helge Deller <deller@gmx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>, Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Russell King <linux@armlinux.org.uk>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        kernel-janitors@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        loongarch@lists.linux.dev, netdev@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v5 0/7] treewide cleanup of random integer usage
+Message-ID: <Y0LYBaooZKDbL93G@zx2c4.com>
+References: <20221008055359.286426-1-Jason@zx2c4.com>
+ <202210082028.692DFA21@keescook>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <202210082028.692DFA21@keescook>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 9 Oct 2022 18:10:38 +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Sat, Oct 08, 2022 at 08:41:14PM -0700, Kees Cook wrote:
+> On Fri, Oct 07, 2022 at 11:53:52PM -0600, Jason A. Donenfeld wrote:
+> > This is a five part treewide cleanup of random integer handling. The
+> > rules for random integers are:
 > 
-> commit 8c5035dfbb94 ("blk-wbt: call rq_qos_add() after wb_normal is
-> initialized") moves wbt_set_write_cache() before rq_qos_add(), which
-> is wrong because wbt_rq_qos() is still NULL.
-> 
-> Fix the problem by removing wbt_set_write_cache() and setting 'rwb->wc'
-> directly. Noted that this patch also remove the redundant setting of
-> 'rab->wc'.
-> 
+> Reviewing the delta between of my .cocci rules and your v5, everything
+> matches, except for get_random_int() conversions for files not in
+> your tree:
 > [...]
+> So, I guess I mean to say that "prandom: remove unused functions" is
+> going to cause some pain. :) Perhaps don't push that to -next, and do a
+> final pass next merge window to catch any new stuff, and then send those
+> updates and the removal before -rc1 closes?
 
-Applied, thanks!
+Ooof. Actually I think what I'll do is include a suggested diff for the
+merge commit that fixes up the remaining two thankfully trivial cases.
 
-[1/1] blk-wbt: fix that 'rwb->wc' is always set to 1 in wbt_init()
-      commit: 285febabac4a16655372d23ff43e89ff6f216691
-
-Best regards,
--- 
-Jens Axboe
-
-
+Jason
