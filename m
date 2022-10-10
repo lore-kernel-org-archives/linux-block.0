@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C446AC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 12:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50CDAC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 13:05:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230371AbiJJMyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 08:54:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36986 "EHLO
+        id S229530AbiJJNE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 09:04:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229978AbiJJMyA (ORCPT
+        with ESMTP id S229767AbiJJNE5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 08:54:00 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F1953A4D;
-        Mon, 10 Oct 2022 05:53:59 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id ot12so24729829ejb.1;
-        Mon, 10 Oct 2022 05:53:59 -0700 (PDT)
+        Mon, 10 Oct 2022 09:04:57 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B262918B31;
+        Mon, 10 Oct 2022 06:04:55 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id l22so15796940edj.5;
+        Mon, 10 Oct 2022 06:04:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=4wf5a6RwI0+jg+xHIHcR0fSixVvpo7nyMe5bP8RORDA=;
-        b=Cys3I2hoR68wwtPuWOpSaptgp6Z76LWlbs3QNm4zu15F9WXpgmmXoYuH1YKim+igzD
-         hEmOexAUjSE/ZBME6OxySgyymWM/AduQaCJoEfE2dKqFurI3evGbhcbuSY4NXAqwq+ME
-         X6x1lZQSHa4R/vi8bPVSR+xOIZ0pJLUuhkW3Odp2LtVzFT0qwGpmBTsOBkXH8jf+HshR
-         X8ympZcI1nwnbLpSzqyIn1uYt8Wk5NS0syGcE3Nh/SaJ2ebHw62Hx+PoRE98qDs+avGd
-         aGHZnc4Mn0KhdKD9Ppm4W8k58g0XzQNtfhR/AwstWP2JKdc7I5HIVM989XnX4KWyJ8F5
-         1IEQ==
+        bh=o50QyVu8VAyHCqxIQn18V0Uq7O5eBhLw3GUeXgpdKJc=;
+        b=f6wdkHeSX5/FAdwUcsbSOithHLIndjQ/1E5YB4+iZW/mobFMkcPtGlSUQL8tD51+wg
+         NolyFKZmr4qOb7E6rOBd3wEi0Ibbvt7CjkpPPkEmMtJv+zMkv6GBHTqfXeAM/0usICTG
+         NxHHgw0R3XDfHIwBrJPaIBDheSCCcqUbFJdhAZD05pVNFYnOMHCL+DSl8JNWM7Vqo2DO
+         6Lvp/7n/h1Cr/Ot9tJiWBph3SAnbh6W9zoU3eS9Dq86TfZ2bArTk5BPunBzLTEKqSWKV
+         rqxWUWk44Om7uME28dheyMwXaL2uhglSxJq3SaZZxPLDYxlUfm4Gi6ISk4gMdXlc6fnG
+         lk9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=4wf5a6RwI0+jg+xHIHcR0fSixVvpo7nyMe5bP8RORDA=;
-        b=D6I6382Hp2gZ3cNCIiVFeufAvqAziOaGZZBcD1dXS9zHjtsoXNoeifW/pV7zNKztFP
-         W1MtKVJ9+WiFPwaSFlr+YCVPfWbCgmPrb8oY3gAwRnhUfvdH2Z0+uWnBMySIuUk5xwE0
-         oG1AbX5dDf+V5+kLKtijbutKhJA9LOWIyZK4FxZzLHIwEiqOUXgyQCp2H5Cu6+9OLjC7
-         7vsvLVm61CZ/19PDY2sDKbARyNfZY2VpKDWeCV/WwtcWQR53sB4oe19ynDBt5/hAa6dT
-         nk6TKKcZ3a0l2HfIyfRK6vc1pK2fV50/mXknuwnp+6zUzikPFFY0a0rweQBeJrLjmx1m
-         68LQ==
-X-Gm-Message-State: ACrzQf28FUnKoyNHUGv9PLvMgZNA36NdD6qCy6O92L8hXurByv8+JA8w
-        IoV7SKJDxnAr1Ps4BSPo1GNnaQYsJWMKIZ8hddIgcOO6buE=
-X-Google-Smtp-Source: AMsMyM4WCGu5ESyqLr4NNnYTM8Y/cesPGamT9fxgN1mP/0G9ezbkIpOzzvtgViQD671jU/F1ve4zQxrqVF2F9PUUCxs=
-X-Received: by 2002:a17:907:2c74:b0:78d:b3ae:8408 with SMTP id
- ib20-20020a1709072c7400b0078db3ae8408mr5005454ejc.172.1665406437543; Mon, 10
- Oct 2022 05:53:57 -0700 (PDT)
+        bh=o50QyVu8VAyHCqxIQn18V0Uq7O5eBhLw3GUeXgpdKJc=;
+        b=G1x7NEgr2vq8h+lvuX81RqxCEVvhQ4v/kVqphbLBOv/lyIFYcYPw91Lz7kNuEu35K5
+         OR8GgBonzKi/jAB9jmCsvez385RwV1U/OX7lwGOtWTA+xtDFpkzmcoskuJdESYjEcWdV
+         s1wXxEjuwsCqldE/JtyNRWc/lebsU0/t8h4RkRLtdZ28rde7qYhaAqC6QQ4eD2uUWJ0D
+         xvx1npR6YfZ/Qrt3yJzGsX6K44+q32N3yECwu7pHz08AwyQPCy9HmhzuWhXphomRMGya
+         GWW1ObfmIgFf65K+RC3Ya1mGAAl0zoZfseLqM97G0V2GOE5IdemU3OUMnISU5XcXwAmg
+         OA9Q==
+X-Gm-Message-State: ACrzQf3dhO9ACEyaLlBZGePgpWHExzsOI5XmQPMh8CEMk9UfLvTURv94
+        YiIP+/pKWPq1WRy6uf0TnqN1MmS9f44nKW99ec9760tPaxY=
+X-Google-Smtp-Source: AMsMyM6NVXe2NhyS3YjPCg6wGuxDKO/94eHw9JxQKYjhfldBZFW1mQ+cAP9dKb/QY9W6/uIbn4FqByXcUcbdT+p3u0Q=
+X-Received: by 2002:a05:6402:5291:b0:45c:3f6a:d4bc with SMTP id
+ en17-20020a056402529100b0045c3f6ad4bcmr2069155edb.285.1665407093609; Mon, 10
+ Oct 2022 06:04:53 -0700 (PDT)
 MIME-Version: 1.0
 From:   Wei Chen <harperchen1110@gmail.com>
-Date:   Mon, 10 Oct 2022 20:53:23 +0800
-Message-ID: <CAO4mrfcuh5MrdXcAtAh_i=nGgXzDHUq-0hRrYVq8pwP7UP9FyQ@mail.gmail.com>
-Subject: INFO: task hung in floppy_revalidate
+Date:   Mon, 10 Oct 2022 21:04:19 +0800
+Message-ID: <CAO4mrffEL_fAJ3TPr7gM7yPtEZ-w4dNrro5a_E=G3XSGvHEm8w@mail.gmail.com>
+Subject: WARNING: refcount bug in del_gendisk
 To:     axboe@kernel.dk, linux-block@vger.kernel.org
-Cc:     efremov@linux.com, linux-kernel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -65,132 +65,52 @@ HEAD commit: 64570fbc14f8 Linux 5.15-rc5
 git tree: upstream
 compiler: clang 12.0.0
 console output:
-https://drive.google.com/file/d/1RCnUEZWaVSMoTGbCMwoT5opyJYzOyz1Q/view?usp=sharing
+https://drive.google.com/file/d/1rRIA8DQuvuMXcFn2VKCXJaijxHGIVRRm/view?usp=sharing
 kernel config: https://drive.google.com/file/d/1lNwvovjLNrcuyFGrg05IoSmgO5jaKBBJ/view?usp=sharing
 
 Unfortunately, I don't have any reproducer for this crash yet.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: Wei Chen <harperchen1110@gmail.com>
-
-INFO: task syz-executor:8550 blocked for more than 143 seconds.
-      Not tainted 5.15.0-rc5+ #14
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:23192 pid: 8550 ppid:  6613 flags:0x00004004
-Call Trace:
- context_switch kernel/sched/core.c:4940 [inline]
- __schedule+0xc1a/0x11e0 kernel/sched/core.c:6287
- schedule+0x14b/0x210 kernel/sched/core.c:6366
- schedule_timeout+0x98/0x310 kernel/time/timer.c:1857
- do_wait_for_common+0x2da/0x480 kernel/sched/completion.c:85
- __wait_for_common kernel/sched/completion.c:106 [inline]
- wait_for_common kernel/sched/completion.c:117 [inline]
- wait_for_completion+0x48/0x60 kernel/sched/completion.c:138
- __floppy_read_block_0 drivers/block/floppy.c:4144 [inline]
- floppy_revalidate+0xd2e/0x1280 drivers/block/floppy.c:4188
- floppy_open+0x70b/0x1220 drivers/block/floppy.c:4038
- blkdev_get_whole+0x9a/0x430 block/bdev.c:668
- blkdev_get_by_dev+0x296/0xcb0 block/bdev.c:823
- blkdev_open+0x133/0x2d0 block/fops.c:448
- do_dentry_open+0x839/0x1080 fs/open.c:822
- do_open fs/namei.c:3428 [inline]
- path_openat+0x28b0/0x3870 fs/namei.c:3561
- do_filp_open+0x258/0x4d0 fs/namei.c:3588
- do_sys_openat2+0x133/0x520 fs/open.c:1200
- do_sys_open fs/open.c:1216 [inline]
- __do_sys_openat fs/open.c:1232 [inline]
- __se_sys_openat fs/open.c:1227 [inline]
- __x64_sys_openat+0x249/0x290 fs/open.c:1227
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f37347325b4
-RSP: 002b:00007f3731cf3780 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 6666666666666667 RCX: 00007f37347325b4
-RDX: 0000000000006400 RSI: 00007f3731cf3820 RDI: 00000000ffffff9c
-RBP: 00007f3731cf3820 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000006400
-R13: 00007ffffcce873f R14: 00007ffffcce88e0 R15: 00007f3731cf3dc0
-INFO: task syz-executor:8551 blocked for more than 143 seconds.
-      Not tainted 5.15.0-rc5+ #14
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor    state:D stack:26576 pid: 8551 ppid:  6613 flags:0x00004004
-Call Trace:
- context_switch kernel/sched/core.c:4940 [inline]
- __schedule+0xc1a/0x11e0 kernel/sched/core.c:6287
- schedule+0x14b/0x210 kernel/sched/core.c:6366
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6425
- __mutex_lock_common+0xcff/0x2630 kernel/locking/mutex.c:669
- __mutex_lock kernel/locking/mutex.c:729 [inline]
- mutex_lock_nested+0x17/0x20 kernel/locking/mutex.c:743
- blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
- blkdev_open+0x133/0x2d0 block/fops.c:448
- do_dentry_open+0x839/0x1080 fs/open.c:822
- do_open fs/namei.c:3428 [inline]
- path_openat+0x28b0/0x3870 fs/namei.c:3561
- do_filp_open+0x258/0x4d0 fs/namei.c:3588
- do_sys_openat2+0x133/0x520 fs/open.c:1200
- do_sys_open fs/open.c:1216 [inline]
- __do_sys_openat fs/open.c:1232 [inline]
- __se_sys_openat fs/open.c:1227 [inline]
- __x64_sys_openat+0x249/0x290 fs/open.c:1227
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3d/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f37347325b4
-RSP: 002b:00007f3731cd2780 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 6666666666666667 RCX: 00007f37347325b4
-RDX: 0000000000006400 RSI: 00007f3731cd2820 RDI: 00000000ffffff9c
-RBP: 00007f3731cd2820 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000006400
-R13: 00007ffffcce873f R14: 00007ffffcce88e0 R15: 00007f3731cd2dc0
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/21:
- #0: ffffffff8cf1c040 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30
-1 lock held by in:imklog/6512:
- #0: ffff88801de005f0 (&f->f_pos_lock){+.+.}-{3:3}, at:
-__fdget_pos+0x26c/0x310 fs/file.c:990
-3 locks held by syz-executor/8550:
- #0: ffff888019e12918 (&disk->open_mutex){+.+.}-{3:3}, at:
-blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
- #1: ffffffff8d69b1a8 (floppy_mutex){+.+.}-{3:3}, at:
-floppy_open+0x7f/0x1220 drivers/block/floppy.c:3974
- #2: ffffffff8d69b268 (open_lock){+.+.}-{3:3}, at:
-floppy_open+0x8d/0x1220 drivers/block/floppy.c:3975
-1 lock held by syz-executor/8551:
- #0: ffff888019e12918 (&disk->open_mutex){+.+.}-{3:3}, at:
-blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
-1 lock held by syz-executor/8812:
- #0: ffff888019e12918 (&disk->open_mutex){+.+.}-{3:3}, at:
-blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
-1 lock held by syz-executor/8813:
- #0: ffff888019e12918 (&disk->open_mutex){+.+.}-{3:3}, at:
-blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
-2 locks held by kworker/u2:8/9312:
-1 lock held by syz-executor/9536:
- #0: ffff888019e12918 (&disk->open_mutex){+.+.}-{3:3}, at:
-blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
-1 lock held by syz-executor/9537:
- #0: ffff888019e12918 (&disk->open_mutex){+.+.}-{3:3}, at:
-blkdev_get_by_dev+0x107/0xcb0 block/bdev.c:816
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 PID: 21 Comm: khungtaskd Not tainted 5.15.0-rc5+ #14
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 0 PID: 26667 at lib/refcount.c:28
+refcount_warn_saturate+0x186/0x1d0
+Modules linked in:
+CPU: 0 PID: 26667 Comm: syz-executor Not tainted 5.15.0-rc5+ #14
 Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
 1.13.0-1ubuntu1.1 04/01/2014
+RIP: 0010:refcount_warn_saturate+0x186/0x1d0
+Code: c7 a0 0d 15 8b 31 c0 e8 48 33 21 fd 0f 0b eb 80 e8 4f f9 57 fd
+c6 05 23 e7 fb 09 01 48 c7 c7 00 0e 15 8b 31 c0 e8 2a 33 21 fd <0f> 0b
+e9 5f ff ff ff e8 2e f9 57 fd c6 05 03 e7 fb 09 01 48 c7 c7
+RSP: 0018:ffffc9000c47fd90 EFLAGS: 00010246
+RAX: 2c799da371900300 RBX: 0000000000000003 RCX: 0000000000040000
+RDX: ffffc90008d39000 RSI: 000000000003ffff RDI: 0000000000040000
+RBP: 0000000000000003 R08: ffffffff816a2ede R09: ffffed100c7857a8
+R10: ffffed100c7857a8 R11: 0000000000000000 R12: ffff88810504c150
+R13: 1ffff11020a09810 R14: ffff888103d93b38 R15: ffff888103d93b00
+FS:  00007f74c6c90700(0000) GS:ffff888063c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000556503c79d68 CR3: 00000000460bb000 CR4: 0000000000752ef0
+DR0: 0000000020000080 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000600
+PKRU: 55555554
 Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1d8/0x2c4 lib/dump_stack.c:106
- nmi_cpu_backtrace+0x452/0x480 lib/nmi_backtrace.c:105
- nmi_trigger_cpumask_backtrace+0x1a3/0x330 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:210 [inline]
- watchdog+0xdbe/0xe30 kernel/hung_task.c:295
- kthread+0x419/0x510 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30
+ kobject_put+0x10d/0x130
+ kobject_put+0xce/0x130
+ del_gendisk+0x3c9/0x710
+ loop_control_ioctl+0x5d7/0x770
+ __se_sys_ioctl+0x10a/0x190
+ do_syscall_64+0x3d/0xb0
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f74c9727c4d
+Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48
+89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
+01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f74c6c8fc58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f74c984e0a0 RCX: 00007f74c9727c4d
+RDX: 0000000000000000 RSI: 0000000000004c81 RDI: 0000000000000006
+RBP: 00007f74c97a0d80 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f74c984e0a0
+R13: 00007fffe21bf5cf R14: 00007fffe21bf770 R15: 00007f74c6c8fdc0
 
 Best,
 Wei
