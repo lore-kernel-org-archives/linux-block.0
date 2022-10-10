@@ -2,111 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B09C43219
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 07:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BABC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 07:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230332AbiJJHlp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 03:41:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40522 "EHLO
+        id S231727AbiJJHlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 03:41:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231803AbiJJHkh (ORCPT
+        with ESMTP id S232206AbiJJHkj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 03:40:37 -0400
+        Mon, 10 Oct 2022 03:40:39 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2B5EA8
-        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 00:36:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 052095FAFD;
+        Mon, 10 Oct 2022 00:36:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1tUMMaMbsNcj03Xl6K+6IxqxLn7xCzLOdkslRNp7V+U=; b=hksasiMZTSuPYrSvrYvRf7XxoX
-        UiR4U4945dTW2A2my4pbGbyf6h3cS64ICY5Jmua2sGETXQ+Qiwm2BIZuSd4jt2QWgGEf5KLQp6fL0
-        hXKnbZ8htgWmjCB+8RaHXV6LMShp1NMvMcDUVqwcud36R7w7oys6aa73WMQD40KH1I7E4b5Whk7ym
-        XllXhOUVynKhOP65Uo7F6AvnXqSbzTvnSAjlYfzve8lmTra15rLPL5fR3i5JqgmIWhjJdQdfar6pP
-        ApDxND5MuCqYOo16K3Q5mTQPrER3qmTAfFczRfru8XGZtQLPmlonvAeEgBfmDVvSaoeiwVMkRR/Ik
-        zZuNaD1w==;
+        bh=IubIfg5PM0k+nLBu0W9G4H26hA5QLhWrO28e455qTr4=; b=XVK4eqvavav2G7Np2xMONjhKpk
+        vfQ0l0kBlVGZrJzAbl8+PYHrSGiTJhX9CWDgSujbfAhyFrQOILN7CRUI7E4t1RPXdsWxlAIkj0Y47
+        65+pdp3HehwpfuBeXUnPUTXkVMTxhCs/tF1IFhvn+XMmbst0VNp0UW8sBvxFoj/tKmkL6P1PFm8rt
+        xoq9TY9Fp+5QFHDgLqmT0NRwBw1pr/P1gXeaWecWu1+UPNGJMRx/Q+z5gxvvwPsRGCiY7B0nN8utb
+        bGvzP52MbyO3DcZE3x3Cla08o/XwaT7vgvnEYRXp96NlWaIeaYkPl8+R6tBQgz1d7lxyTAsQ2WXcG
+        9b++DfdQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ohnFX-00HO28-KB; Mon, 10 Oct 2022 07:30:55 +0000
-Date:   Mon, 10 Oct 2022 00:30:55 -0700
+        id 1ohn5H-00HNDD-6p; Mon, 10 Oct 2022 07:20:19 +0000
+Date:   Mon, 10 Oct 2022 00:20:19 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH] blk-mq: aggregate ktime_get per request batch
-Message-ID: <Y0PKL2Lm5yAY/ODl@infradead.org>
-References: <20221004153004.2058994-1-kbusch@meta.com>
+To:     Khazhy Kumykov <khazhy@google.com>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: allow specifying default iosched in config
+Message-ID: <Y0PHsxmsWHFYiLPK@infradead.org>
+References: <20220926220134.2633692-1-khazhy@google.com>
+ <fff022da-72f2-0fdb-e792-8d75069441cc@opensource.wdc.com>
+ <CACGdZYKh4TXSaAAzJa13xsMH=tFzb4dYrPzOS3HHLLU8K-362g@mail.gmail.com>
+ <7e3a521e-acf7-c3a8-a29b-c51874862344@opensource.wdc.com>
+ <CACGdZYKvTLd0g2yBuFX+++XeSa6aapuAwOM7e63zhKgdKFEGEw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221004153004.2058994-1-kbusch@meta.com>
+In-Reply-To: <CACGdZYKvTLd0g2yBuFX+++XeSa6aapuAwOM7e63zhKgdKFEGEw@mail.gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->  	rq->timeout = 0;
->  
-> -	if (blk_mq_need_time_stamp(rq))
-> -		rq->start_time_ns = ktime_get_ns();
-> -	else
-> -		rq->start_time_ns = 0;
-> +	rq->start_time_ns = now;
->  	rq->part = NULL;
->  #ifdef CONFIG_BLK_RQ_ALLOC_TIME
-> -	rq->alloc_time_ns = alloc_time_ns;
-> +	rq->alloc_time_ns = now;
->  #endif
+On Tue, Oct 04, 2022 at 04:15:20PM -0700, Khazhy Kumykov wrote:
+> The kernel already picks and hardcodes a default scheduler, my
+> thinking is: why not let folks choose? This was allowed in the old
+> block layer since 2005.
 
-Given that rq->start_time_ns and rq->alloc_time_ns are not always
-the same (except for the odd flush case), do we even need both fields?
-
->  static inline struct request *
->  __blk_mq_alloc_requests_batch(struct blk_mq_alloc_data *data,
-> -		u64 alloc_time_ns)
-> +		u64 now)
-
-Nit: this fits into the previous line now.
-
->  	return blk_mq_rq_ctx_init(data, blk_mq_tags_from_data(data), tag,
-> -					alloc_time_ns);
-> +					now);
-
-Same here.
-
->  static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
-> -					    struct request *rq, bool last)
-> +					    struct request *rq, bool last, u64 now)
-
-Overly long line.  FYI, this becomes a lot more readable anyway with
-the two tab indent:
-
-static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
-		struct request *rq, bool last, u64 now)
-
-> @@ -2521,6 +2528,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
->  	 * Any other error (busy), just add it to our list as we
->  	 * previously would have done.
->  	 */
-> +	rq->io_start_time_ns = now;
-
-Looking though this more I hate all these extra assignments, and
-it will change the accounting a bit from what we had.  Why can't we
-pass the time to blk_mq_start_request and just keep it where it was?
-
-> +	u64 now = 0;
-> +
-> +	if (blk_queue_stat(rq->q))
-> +		now = ktime_get_ns();
-
-This code pattern is duplicated a lot.  Can't we have a nice
-helper and shortcut it to:
-
-	u64 now = blk_ktime_get_ns_for_stats(rq->q);
-
-and use the opportunity to document the logic in the helpe.
-
-> -static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
-> +static blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last, u64 now)
-
-Overly long line here.  But I really wonder why we even needthis helper.
-
+You can choose it using CONFIG_CMDLINE.  We can't add a config option
+for every bloody default as that simply does not scale.
