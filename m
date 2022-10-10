@@ -2,71 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA19EC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 17:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B95C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 17:02:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiJJRBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 13:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53142 "EHLO
+        id S229887AbiJJRCB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 13:02:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbiJJRBy (ORCPT
+        with ESMTP id S229606AbiJJRB5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 13:01:54 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2046.outbound.protection.outlook.com [40.107.92.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 601233FA21
-        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 10:01:51 -0700 (PDT)
+        Mon, 10 Oct 2022 13:01:57 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2080.outbound.protection.outlook.com [40.107.237.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299B53A15A
+        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 10:01:56 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ALgrC5M11Id59DHnVzZnWcTb0MrUofnkFXlZYqp8HpqQPDGkNY8YbaJvLEVxKlvNrrrs0/Z6hwt74G5fEU+QaYuols95s0aMxOgSCf5HKggsgXppVDvDp+Kx+mc733J//kEKfa633Rj2jOpL49e5bYZndEvmMHL0G1wlslz+RSWs1lcTumRQRJM6myFbxBvtUeYm9odYkA6SC2jIdGmhPoAq2rWTubLOgiEYdNVqtAM8rIgYnBDjDlxl4l/dV/VWsfdzjY3eYAfS/uhM/9YxTADZRMdZVyIHEu0g1gno1dgp3VSHcVwEtNL4U1ObW3HHqtMzqfNq4g8rlfwSLgGrAw==
+ b=bKEgUR/u8dvTF4Tg4uO/TbwQRtoYNVfnEleHNeKYReWuE2XYjrMPnvIiSgqPvXwXNmjj2raeWrEHoFdeCsu7boBRGh+xRWdh217gwnWsd3jEi0pZe5EaWVjQhyW8LuyfAEuajRx4LC9KS+I5SNkMiMoEyVP+U6JelwqKVJXFZ/MjBR/09DJ3qBrgo/bg+jgWNS+MvnEdyyxg9POaA3eDrdO1rUuMDI0gLBzhFMx94ro35vebIR2MDeiJVbS634GCCK/8hCOy6VOYQ0e2VyclMQcjm3NwnYjcC5S6dazej4L2MkNkFgEpL69ZM+8W1/1xcW5qLwwGxTxQil0cjxUODA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sc8XT2hDD65HCxC6GQQw20MIw9BjmG6MFOx3ppWkz+4=;
- b=M+RGSl/ZEOt4VfRixoEBro72VvWz0ShpnnbKOEv9Xs/jBa9kN0pLuJYVPmyeGeCpdZUpISsWosNUb7B1zUlY7F2ZJEAkPM8pBdNxj+cFMGZ7wasLtAYPXso3c7e4BWTAVtnEUubH18+t4bFBMM6R808tFKy6JXepDRc9MKSGNz2oRpj1n+H25QZAKk6TlymfsslrNRaVy7OqKxJu7w7uqIQd/iuyWru+eq9jegd54NYzWgb9k1bif3Dz9dZwdrpIU5OBj06qBGsMsiMMwRqSpi4SYU5Gt9qRU4NfFme1vqM2SaADubk67n986ydphdaFy4v9hLDFynQju+THWsDtkg==
+ bh=C2JTODkI+74irzK0zcIIIoWdG2MUh2aj+Wde6aFLSqc=;
+ b=Ij0R0lYBJpmzKzq62AO1YpvrRwttigYOjFl6OhLehWkhpuAmkzCbnAnv9ekyYfH3Fs1BaYBCfA0+KDfddG3sRvBO1Rvyk+1F8+1ddXTOx2FBioo7BGnt0mQMZvmkzQk9uwSraoYg53Huv0GCiXByCvmkHIE5T1YfU4fZyiRvnUja/tWRhxw0BIepjqG/ZWPf3R2ojXLNVrpVerKuOvUg9SWFEJpHhPLX9gEvuuYIF/Buhyf42D8mDo5Q2uZgJ06QVG6lh9870LIaZAQBL2YcGwM8Y5GWQVx1JKfnk99fpn5N8x9kVEgboMNeda+WDFhPpKITREt/L3RbSbB0QvlDQg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sc8XT2hDD65HCxC6GQQw20MIw9BjmG6MFOx3ppWkz+4=;
- b=Oa5Uuj1RlfwYD/N5tFPL2zgNySK6UhIK/zENnFa3Aln/ulUtTHF1FVxktGqaItnq45AosoE05sBBBHtoA4z3QYEKi8O0OdbJvb32uJSUyFG/+1p8esBOeEgU8aEjnfTRyY1xdIthkfjBD/pRlHwi1LfLI0266HmJMhs6ATYdMsErA6jae2sfE/hkUZ1oPpQbMIkSqPxDONzujssfVaVVZRWqHXxZpg0BrYPMcG/oNY2mwdIv5Z7T+kxJMVIc+wP+DIm0uFVKMYDKkUSQP5YCaH+kwA0ZLVDopTxE/iFAmCjZxy6MJvrFvC7XMDdT5T1cZ+U0xyb6bK3z7gGu9dbN8A==
-Received: from CY5P221CA0102.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:9::33) by
- MW3PR12MB4457.namprd12.prod.outlook.com (2603:10b6:303:2e::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5709.15; Mon, 10 Oct 2022 17:01:49 +0000
-Received: from CY4PEPF0000B8E8.namprd05.prod.outlook.com
- (2603:10b6:930:9:cafe::d3) by CY5P221CA0102.outlook.office365.com
- (2603:10b6:930:9::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15 via Frontend
- Transport; Mon, 10 Oct 2022 17:01:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ bh=C2JTODkI+74irzK0zcIIIoWdG2MUh2aj+Wde6aFLSqc=;
+ b=JmLPw0EvOmBL2eXXbQc3WO0xj+yqeElWdWbn6HJ3DYsUkKazYjzh2mPGR623sXGhNspG3QppClDFNKvNlM24OczHKg1ozEc3ksHP/B72KgIuHvqTi1mfTb//7N+fYxIb5gJgZjBT3jcOOUAqTprO6NWxkU+NkpSw8Y6xZYp5fvjsTyKDvvM0uQBlc3iCHINVZQwbC3hzdNGd9P8b5V8HP41GMDXaeMHZbhWyr0Y6aNhiehEZQGaTWZteg+TlqYDMvoPdz5zF85iMx0ddyNGDPfZ5VP7WNEfr5pcAk/pApo8W60OFWsHoEjPJSWzQKKLKrHdIIHLl+elFT0IDQdH7mw==
+Received: from MW2PR16CA0054.namprd16.prod.outlook.com (2603:10b6:907:1::31)
+ by MN2PR12MB4285.namprd12.prod.outlook.com (2603:10b6:208:1d7::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Mon, 10 Oct
+ 2022 17:01:54 +0000
+Received: from CO1NAM11FT069.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:907:1:cafe::4e) by MW2PR16CA0054.outlook.office365.com
+ (2603:10b6:907:1::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.26 via Frontend
+ Transport; Mon, 10 Oct 2022 17:01:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000B8E8.mail.protection.outlook.com (10.167.241.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5676.17 via Frontend Transport; Mon, 10 Oct 2022 17:01:49 +0000
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT069.mail.protection.outlook.com (10.13.174.129) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5709.10 via Frontend Transport; Mon, 10 Oct 2022 17:01:53 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 10 Oct
- 2022 10:01:29 -0700
+ 2022 10:01:40 -0700
 Received: from dev.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Mon, 10 Oct
- 2022 10:01:28 -0700
+ 2022 10:01:39 -0700
 From:   Chaitanya Kulkarni <kch@nvidia.com>
 To:     <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, <kch@nvidia.com>, <hch@lst.de>,
         <damien.lemoal@opensource.wdc.com>, <johannes.thumshirn@wdc.com>,
         <bvanassche@acm.org>, <ming.lei@redhat.com>,
         <shinichiro.kawasaki@wdc.com>, <vincent.fu@samsung.com>
-Subject: [RFC PATCH 4/6] nvme-apple: use init alloc tagset helper
-Date:   Mon, 10 Oct 2022 10:00:24 -0700
-Message-ID: <20221010170026.49808-5-kch@nvidia.com>
+Subject: [RFC PATCH 5/6] nvme-core: use init alloc tagset helper
+Date:   Mon, 10 Oct 2022 10:00:25 -0700
+Message-ID: <20221010170026.49808-6-kch@nvidia.com>
 X-Mailer: git-send-email 2.29.0
 In-Reply-To: <20221010170026.49808-1-kch@nvidia.com>
 References: <20221010170026.49808-1-kch@nvidia.com>
@@ -78,81 +79,76 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000B8E8:EE_|MW3PR12MB4457:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0adc84ea-0b15-4e5a-4fcf-08daaae11f44
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT069:EE_|MN2PR12MB4285:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6a44df2e-46ab-45ef-2483-08daaae121e2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5WKvCvbf9AykPeetcGKk+tiR/cZdw2bXjX2lzsPpZjYiJcFLVjb/Vi78qv1NV3EebGvx2tA0GpA8cAb+9pF/+htxSWxBqjHAr+CW4bGpApD4GqtKwanPFGw035NtVx1TSfZiGPYtOPzdwYVNDl7+Ixk/MsHjRnXvn/QJlCd8ixgAj5YyTb6LaWRSpPhkYiy4nqZ5q56A5vzgvJkHjEnCnt6M2yvGk4Xayb2K7v4QWnBhSuY0LV/r2DCOGHqAe2fe6Iz0xNhLaG8O7QWMGKf85xHlj6BOJdBapWPf/C/EZtdHRZNLqRMzFtc4p5JA7/MQDDoG4CqY9V3ewvPHXM0XEpuAV0C7GMeZ6Ihhka3xKV4kNZ3llKsqDzpvYhD219Phq9VuBamdndgDzdIqtOynDW5BCvhVM5gne/Ot2fQiGq8atrNbYhvo+d81b+R0UIR3/+XZ55fg85wfe9Teqe0acc2H7snwIXlHU3+GFgca6usVgLFjzo4s5WibnYHko+YDOJsWGd9IA5g2E2lG2+byLJH4VgJtAn+619Z8i2SDXVeReUoEdeYQWjkbBGRb3g4oY5NIQ8QOIinmkuSvYFtQ8q13aD8dg0nd7GDql2AbpxNu4qQRw0XB+ENYfL2lXQJm09Q0B5hNw3hgScnpTtitbYQWohHTmKzacuDBi8qO6kv+ZNFcgqRSERMqF1gDdkUXcZ9gb+pdkmRJG1ttgNq/KHoltm2R7XLL+ZkQ/pB2F3Cagz+4h8AY4FhpBHJfpFWoVKspJcJCRt/nHremUYN6lJ+0diKIM/m0uzqiyF4u0Fw0IP+7opTVfY0jEdGndQDs
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(396003)(39860400002)(346002)(136003)(47660400002)(451199015)(36840700001)(40470700004)(46966006)(2616005)(40480700001)(426003)(36860700001)(356005)(40460700003)(7636003)(8676002)(70586007)(70206006)(82310400005)(4326008)(54906003)(36756003)(6916009)(41300700001)(2906002)(6666004)(82740400003)(47076005)(316002)(83380400001)(336012)(478600001)(5660300002)(8936002)(1076003)(26005)(186003)(7696005)(16526019)(46800400005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: ULGkBzOxFpVRkcc811xOQd663uca9G02oOZpsMZrtqIsCKyVoM97cEuFVKfnQEElaDGI3eIbSLPVYnZjIB0qn45zDCKb/saEPZmbCoR1E6DnJoqdSGXkus1UGbARhBAFSaaEWDzbSPa0f1k69CuSaRzpvt4qobXqWE3WYIpqHlC7wxobEsGcZXjrd+nrUPG6gRXLUhhMdciUwLdOdcYnUbqu4LN4Duy3BCwWLm+eMv6PmBqywl/aNiOLDzn30icnSec0CbQxl+pZ3Eo8HTFdvFZser7VujTBSFJzIxqMSq6PCCUxjd/zoFNCItPiwQTmACFpZW0NSQbx+Vvnsu82AnsgnVHfM95OtVxfccYFQSqfr51uRYK5hHk6LzGWIE59+HrspOL/b8LT++gsNkPaRNjZH4CB0QXApyOq0SKpXTbqFDIV8WMzlS4gpDJeNt3gMWaPgr90qhOt7q1vrg8Kp76IFk6gnP6syNziIgyK8LSW6pujOXeJUzm07FNhZfOdYgURVzn3ahQmuSbxya26hSU1YsH82dX/I0TAwHGY8Fy1ZiiyR+PK9waHnbscd1FuRKBSS8sPNHA1VznJ08zr83PXe6jnRT1qjS0bnH6/6uhnUXMYjImcKYkV4JH+cb3Cx98HSi4QVfs3ak1AglZpGWkP3WZDApw3L/PvIY5oh6Tb0uCdlK3KY9Wv29vmx8llsRy9qSPLB4rMR3Hbw+SQC3E/dO7xRGui1bUw56aytIUgwjZ1PwAj8REnIp0mwbG5naRR3z+2NRgGevOqClfcHg==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(346002)(136003)(376002)(39860400002)(396003)(451199015)(36840700001)(40470700004)(46966006)(7696005)(26005)(82740400003)(40480700001)(316002)(8676002)(70206006)(4326008)(70586007)(36860700001)(356005)(7636003)(40460700003)(36756003)(83380400001)(186003)(16526019)(1076003)(6666004)(82310400005)(478600001)(2616005)(47076005)(2906002)(6916009)(54906003)(336012)(426003)(5660300002)(8936002)(41300700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2022 17:01:49.3561
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2022 17:01:53.8084
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0adc84ea-0b15-4e5a-4fcf-08daaae11f44
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a44df2e-46ab-45ef-2483-08daaae121e2
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CY4PEPF0000B8E8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT069.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4457
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4285
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- drivers/nvme/host/apple.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/nvme/host/core.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
-index 5fc5ea196b40..baafee23e32a 100644
---- a/drivers/nvme/host/apple.c
-+++ b/drivers/nvme/host/apple.c
-@@ -1228,16 +1228,13 @@ static int apple_nvme_alloc_tagsets(struct apple_nvme *anv)
- {
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 965a4c3e9d44..bb6868f895c3 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -4814,17 +4814,13 @@ int nvme_alloc_admin_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
  	int ret;
  
--	anv->admin_tagset.ops = &apple_nvme_mq_admin_ops;
--	anv->admin_tagset.nr_hw_queues = 1;
--	anv->admin_tagset.queue_depth = APPLE_NVME_AQ_MQ_TAG_DEPTH;
- 	anv->admin_tagset.timeout = NVME_ADMIN_TIMEOUT;
- 	anv->admin_tagset.numa_node = NUMA_NO_NODE;
- 	anv->admin_tagset.cmd_size = sizeof(struct apple_nvme_iod);
- 	anv->admin_tagset.flags = BLK_MQ_F_NO_SCHED;
--	anv->admin_tagset.driver_data = &anv->adminq;
- 
--	ret = blk_mq_alloc_tag_set(&anv->admin_tagset);
-+	ret = blk_mq_alloc_tag_set(&anv->admin_tagset, apple_nvme_mq_admin_ops,
-+				   1, APPLE_NVME_AQ_MQ_TAG_DEPTH, &anv->adminq);
- 	if (ret)
- 		return ret;
- 	ret = devm_add_action_or_reset(anv->dev, devm_apple_nvme_put_tag_set,
-@@ -1245,8 +1242,6 @@ static int apple_nvme_alloc_tagsets(struct apple_nvme *anv)
+ 	memset(set, 0, sizeof(*set));
+-	set->ops = ops;
+-	set->queue_depth = NVME_AQ_MQ_TAG_DEPTH;
+ 	if (ctrl->ops->flags & NVME_F_FABRICS)
+ 		set->reserved_tags = NVMF_RESERVED_TAGS;
+ 	set->numa_node = ctrl->numa_node;
+ 	set->flags = flags;
+ 	set->cmd_size = cmd_size;
+-	set->driver_data = ctrl;
+-	set->nr_hw_queues = 1;
+ 	set->timeout = NVME_ADMIN_TIMEOUT;
+-	ret = blk_mq_alloc_tag_set(set);
++	ret = blk_mq_init_alloc_tag_set(set, ops, 1, NVME_AQ_MQ_TAG_DEPTH, ctrl);
  	if (ret)
  		return ret;
  
--	anv->tagset.ops = &apple_nvme_mq_ops;
--	anv->tagset.nr_hw_queues = 1;
- 	anv->tagset.nr_maps = 1;
- 	/*
- 	 * Tags are used as an index to the NVMMU and must be unique across
-@@ -1254,14 +1249,13 @@ static int apple_nvme_alloc_tagsets(struct apple_nvme *anv)
- 	 * must be marked as reserved in the IO queue.
- 	 */
- 	anv->tagset.reserved_tags = APPLE_NVME_AQ_DEPTH;
--	anv->tagset.queue_depth = APPLE_ANS_MAX_QUEUE_DEPTH - 1;
- 	anv->tagset.timeout = NVME_IO_TIMEOUT;
- 	anv->tagset.numa_node = NUMA_NO_NODE;
- 	anv->tagset.cmd_size = sizeof(struct apple_nvme_iod);
- 	anv->tagset.flags = BLK_MQ_F_SHOULD_MERGE;
--	anv->tagset.driver_data = &anv->ioq;
+@@ -4869,18 +4865,15 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+ 	int ret;
  
--	ret = blk_mq_alloc_tag_set(&anv->tagset);
-+	ret = blk_mq_alloc_tag_set(&anv->tagset, *apple_nvme_mq_ops, 1,
-+			APPLE_ANS_MAX_QUEUE_DEPTH - 1, &anv->ioq);
+ 	memset(set, 0, sizeof(*set));
+-	set->ops = ops;
+-	set->queue_depth = ctrl->sqsize + 1;
+ 	set->reserved_tags = NVMF_RESERVED_TAGS;
+ 	set->numa_node = ctrl->numa_node;
+ 	set->flags = flags;
+ 	set->cmd_size = cmd_size,
+-	set->driver_data = ctrl;
+-	set->nr_hw_queues = ctrl->queue_count - 1;
+ 	set->timeout = NVME_IO_TIMEOUT;
+ 	if (ops->map_queues)
+ 		set->nr_maps = ctrl->opts->nr_poll_queues ? HCTX_MAX_TYPES : 2;
+-	ret = blk_mq_alloc_tag_set(set);
++	ret = blk_mq_init_alloc_tag_set(set, ops, ctrl->queue_count - 1,
++			ctrl->sqsize + 1, ctrl);
  	if (ret)
  		return ret;
- 	ret = devm_add_action_or_reset(anv->dev, devm_apple_nvme_put_tag_set,
+ 
 -- 
 2.29.0
 
