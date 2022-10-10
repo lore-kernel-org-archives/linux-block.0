@@ -2,105 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32536C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 08:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650C0C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 11:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231356AbiJJItb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 04:49:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
+        id S231618AbiJJLCI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 07:02:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230361AbiJJIta (ORCPT
+        with ESMTP id S231961AbiJJLCD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 04:49:30 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B096D6525A
-        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 01:49:29 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 6B041218A8;
-        Mon, 10 Oct 2022 08:49:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1665391768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VRHQljv6X517H4MqoQc1rATj5lPe2O/OCT3sVmf2+tU=;
-        b=rYoaL6INHAxmIREd+g3HRAYTChcFJtPdYDKkuCfG6264Xssme355f4AB51D4/jZtBXP0Rh
-        2ItrtCCrTOWz7AdpyQp8LOyf4Ve+joPP7Obsogkz87DnwfzGIClFd4Wj0v9F2kSoJfH71M
-        v42F/fPWlEI5QGftFGXs0yUfsHekQYo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1665391768;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VRHQljv6X517H4MqoQc1rATj5lPe2O/OCT3sVmf2+tU=;
-        b=s8ZAjv8jJwh2ReX9Er8cCwy/E2aYB8UnD4NON/qkliogoTOUDpkv0Go8YxleHv2UlOQXx2
-        Kxlu9gJ72PG/RuCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5841413479;
-        Mon, 10 Oct 2022 08:49:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id juWBFZjcQ2OXeAAAMHmgww
-        (envelope-from <dwagner@suse.de>); Mon, 10 Oct 2022 08:49:28 +0000
-Date:   Mon, 10 Oct 2022 10:49:27 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@meta.com>, linux-block@vger.kernel.org,
-        axboe@kernel.dk, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2] block: fix leaking minors of hidden disks
-Message-ID: <20221010084927.47nniioysahndy6n@carbon.lan>
-References: <20221007193825.4058951-1-kbusch@meta.com>
- <Y0PLerK6pBp9UC2G@infradead.org>
- <20221010080218.uqhkvryiipybxidd@carbon.lan>
- <20221010081902.GA23270@lst.de>
+        Mon, 10 Oct 2022 07:02:03 -0400
+Received: from SHSQR01.spreadtrum.com (mx1.unisoc.com [222.66.158.135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0581C6D9FC;
+        Mon, 10 Oct 2022 04:01:57 -0700 (PDT)
+Received: from SHSend.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
+        by SHSQR01.spreadtrum.com with ESMTPS id 29AB0i36074609
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NO);
+        Mon, 10 Oct 2022 19:00:45 +0800 (CST)
+        (envelope-from zhaoyang.huang@unisoc.com)
+Received: from bj03382pcu.spreadtrum.com (10.0.74.65) by
+ BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.23; Mon, 10 Oct 2022 19:00:44 +0800
+From:   "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Zhaoyang Huang <huangzhaoyang@gmail.com>, <linux-mm@kvack.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <ke.wang@unisoc.com>, <steve.kang@unisoc.com>
+Subject: [RFC PATCH] mm: skip GFP_IO if swap is zram only
+Date:   Mon, 10 Oct 2022 19:00:22 +0800
+Message-ID: <1665399622-20236-1-git-send-email-zhaoyang.huang@unisoc.com>
+X-Mailer: git-send-email 1.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221010081902.GA23270@lst.de>
+Content-Type: text/plain
+X-Originating-IP: [10.0.74.65]
+X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
+ BJMBX01.spreadtrum.com (10.0.64.7)
+X-MAIL: SHSQR01.spreadtrum.com 29AB0i36074609
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 10, 2022 at 10:19:02AM +0200, Christoph Hellwig wrote:
-> On Mon, Oct 10, 2022 at 10:02:18AM +0200, Daniel Wagner wrote:
-> > Doesn't give me the same consistent result as with Keith's version:
-> 
-> That's because it is broken..  Try this version:
+From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
 
-This version works.
+__GFP_IO is believed to prevent the allocation being suspended due to accessing
+physical block devices when reclaiming dirty pages. Zram is not considered as
+such kind of device from kernel perspective of view. Do swap things if the system
+is zram only.
 
-Tested-by: Daniel Wagner <dwagner@suse.de>
+Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+---
+ include/linux/swap.h     | 1 +
+ include/linux/swapfile.h | 1 -
+ mm/swapfile.c            | 7 +++++++
+ mm/vmscan.c              | 3 ++-
+ 4 files changed, 10 insertions(+), 2 deletions(-)
 
-# ls -l /dev/nvme*
-crw------- 1 root root  10, 124 Oct 10 10:47 /dev/nvme-fabrics
-crw------- 1 root root 243,   0 Oct 10 10:46 /dev/nvme0
-brw-rw---- 1 root disk 259,   0 Oct 10 10:46 /dev/nvme0n1
-crw------- 1 root root 243,   2 Oct 10 10:48 /dev/nvme2
-brw-rw---- 1 root disk 259,   2 Oct 10 10:48 /dev/nvme2n1
-brw-rw---- 1 root disk 259,   3 Oct 10 10:48 /dev/nvme2n1p1
-brw-rw---- 1 root disk 259,   5 Oct 10 10:48 /dev/nvme2n2
-brw-rw---- 1 root disk 259,   7 Oct 10 10:48 /dev/nvme2n3
-brw-rw---- 1 root disk 259,   9 Oct 10 10:48 /dev/nvme2n4
-crw------- 1 root root 243,   3 Oct 10 10:48 /dev/nvme3
-crw------- 1 root root 243,   4 Oct 10 10:48 /dev/nvme4
-crw------- 1 root root 243,   5 Oct 10 10:48 /dev/nvme5
-# nvme disconnect-all
-# nvme connect-all
-# ls -l /dev/nvme*
-crw------- 1 root root  10, 124 Oct 10 10:47 /dev/nvme-fabrics
-crw------- 1 root root 243,   0 Oct 10 10:46 /dev/nvme0
-brw-rw---- 1 root disk 259,   0 Oct 10 10:46 /dev/nvme0n1
-crw------- 1 root root 243,   2 Oct 10 10:48 /dev/nvme2
-brw-rw---- 1 root disk 259,   2 Oct 10 10:48 /dev/nvme2n1
-brw-rw---- 1 root disk 259,   3 Oct 10 10:48 /dev/nvme2n1p1
-brw-rw---- 1 root disk 259,   5 Oct 10 10:48 /dev/nvme2n2
-brw-rw---- 1 root disk 259,   7 Oct 10 10:48 /dev/nvme2n3
-brw-rw---- 1 root disk 259,   9 Oct 10 10:48 /dev/nvme2n4
-crw------- 1 root root 243,   3 Oct 10 10:48 /dev/nvme3
-crw------- 1 root root 243,   4 Oct 10 10:48 /dev/nvme4
-crw------- 1 root root 243,   5 Oct 10 10:48 /dev/nvme5
+diff --git a/include/linux/swap.h b/include/linux/swap.h
+index 43150b9..c160b2e 100644
+--- a/include/linux/swap.h
++++ b/include/linux/swap.h
+@@ -505,6 +505,7 @@ static inline long get_nr_swap_pages(void)
+ extern int init_swap_address_space(unsigned int type, unsigned long nr_pages);
+ extern void exit_swap_address_space(unsigned int type);
+ extern struct swap_info_struct *get_swap_device(swp_entry_t entry);
++extern bool if_swap_zram_only(void);
+ sector_t swap_page_sector(struct page *page);
+ 
+ static inline void put_swap_device(struct swap_info_struct *si)
+diff --git a/include/linux/swapfile.h b/include/linux/swapfile.h
+index 5407854..e229c36 100644
+--- a/include/linux/swapfile.h
++++ b/include/linux/swapfile.h
+@@ -9,5 +9,4 @@
+ extern struct swap_info_struct *swap_info[];
+ extern unsigned long generic_max_swapfile_size(void);
+ extern unsigned long max_swapfile_size(void);
+-
+ #endif /* _LINUX_SWAPFILE_H */
+diff --git a/mm/swapfile.c b/mm/swapfile.c
+index 1fdccd2..e1b2969 100644
+--- a/mm/swapfile.c
++++ b/mm/swapfile.c
+@@ -3663,6 +3663,13 @@ void __cgroup_throttle_swaprate(struct page *page, gfp_t gfp_mask)
+ }
+ #endif
+ 
++bool if_swap_zram_only(void)
++{
++	return ((nr_swapfiles == 1)
++		&& !strncmp(swap_info[0]->bdev->bd_disk->disk_name, "zram", 4));
++}
++EXPORT_SYMBOL_GPL(if_swap_zram_only);
++
+ static int __init swapfile_init(void)
+ {
+ 	int nid;
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index b2b1431..37500b5 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -1770,7 +1770,8 @@ static unsigned int shrink_page_list(struct list_head *page_list,
+ 		 */
+ 		if (folio_test_anon(folio) && folio_test_swapbacked(folio)) {
+ 			if (!folio_test_swapcache(folio)) {
+-				if (!(sc->gfp_mask & __GFP_IO))
++				if (!(sc->gfp_mask & __GFP_IO)
++					&& !if_swap_zram_only())
+ 					goto keep_locked;
+ 				if (folio_maybe_dma_pinned(folio))
+ 					goto keep_locked;
+-- 
+1.9.1
+
