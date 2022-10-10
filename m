@@ -2,149 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FC1C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 06:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A69C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 07:28:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231329AbiJJGvr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 02:51:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49480 "EHLO
+        id S232391AbiJJH2Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 03:28:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231378AbiJJGvp (ORCPT
+        with ESMTP id S231322AbiJJH2G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 02:51:45 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on20608.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8c::608])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5888EE76
-        for <linux-block@vger.kernel.org>; Sun,  9 Oct 2022 23:51:44 -0700 (PDT)
+        Mon, 10 Oct 2022 03:28:06 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2070e.outbound.protection.outlook.com [IPv6:2a01:111:f400:feae::70e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D3556BCC2;
+        Mon, 10 Oct 2022 00:22:26 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QG6ByBOoOgmTpYzyElIOCQheIJ1yKRr3ICLcz2Z+29zObsjKI4m4kJnWekmxyqzsIy8giN7eSl9gEKN9QqfdFMmtX+TNepHYCD6fAbMugEWXxUSz7FdzJ2ULu+LlK9oKYYyVptwOkXR09YJS3qGKiHygMZJhQCaWnkzehq52NcJsD/56kGUnrC6iTS6FWgAA/xtTlgl3Ob3NInSz8oTsxfBDtJ8U4594E2MOkXZEthE/sx0pYApGo4DAMCsecJqpGIg3shZnM9L6tpnHy0Xp10VoySdJKDOMCZ2OA/MRtN5b+sYlisCOZbqeOe6ITnD+fRdkRYFE5/D/QIDNIYLZsQ==
+ b=bmOjfjWqKr0fIRg3tID1noIHSpkDFdV/BMYR7zO5bM/8RoNSvARbvZX18ED/r34sSvuYrBJHP5KAOei5BwxgAovccszRfi0mqlPj8qs5cUOQidWZ/w1vbeb9Cd0+kF7KnTKJM4X/XVQ/FiGAKakF0JVXwyzakwkER57XR57MKUKEIBEcv/qvwu/s+ZJBu/WKBBApYQKcSzPTY42lhSqxrpGq4upVXL7PsR9HwXPW9ekUnR8+/KnZOmedUNxk4aQBbfBLMO0qI2x6psg+dMtuuXLNdNsP9zMvVOr6zluiQcOQm5Wj6OVgmywarlRz9u7L8Tc0bZ8YLPYeXz60OzFLGg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/B1E0vqArqvlDKYwgWSWgWe2vG/OALsdWn3fW99jEkw=;
- b=AFqclIAltYZI0qbW0Zlth+3zVWy34zOJRa8uuXHcaE/0SuZ3tn2Q9/vVHcbGVx2mHI9MAki4FNvy37oKfSMRQcmutc9qyGmLps8DD2O5znxsfIOFt4ZGUnioVNIGA2hB9D20zPdk8lFfWoO97aB9G1Ta1GvXF9U5UfAHH9xdGCfvefrHzCylg02xGk58EJb0wuEPCM1zrGMqGv0M0X2wwOsV58ukW9Y9iLBYVlu3XBg6xQZZ/ppw0qQgpnnzR3DcHXnGL7yhivPeK2DvxgtrNLeXNmxJ+Sl0TV+BHhUPSjoOJGRQ4vxYltrblKP+Bzdxlmqg5H8bjhKXK+zN/ullmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ bh=qgbqflBWxuge+vseUXggqNFukZMjEaZtxmcYPj1C6wI=;
+ b=NEDjQZJQSGl0oBNAKKKdQMnX6oxJvpzfEK3QgxuDV2vWwo1P2UxWg6ecEzD1LD7jpczxrD4dtJtzR4qqRiwg1P9RyJaQzSuzTz711drBwFjgLkY4sQoxZUnCOo+YjBp3hcigFZr8X8WcrJjpgrwvB1vge+47QCy3Bg9j1BAMTq+95nIBeaNlevQ9zgg/YZs3ChTq8A+EVY8iebGSlcR+CmgPIGPvjUR+bHQj1j7kvUMv0Q0FIiDlrgXgLDuYSftLVgibAMp1lh+RcoVZg5xDECIvTQT3GsppU5VBgn18JtnkdcMoNwZhfAjxVZDCTlN/wxYnBzVuVWFrrN3u1qq2Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 145.14.71.66) smtp.rcpttodomain=kernel.dk smtp.mailfrom=zeekrlife.com;
+ dmarc=bestguesspass action=none header.from=zeekrlife.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=geely.onmicrosoft.com;
+ s=selector2-geely-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/B1E0vqArqvlDKYwgWSWgWe2vG/OALsdWn3fW99jEkw=;
- b=h9c9vvk+zWs/U1EpMuY+J2hVTwuOyZOKebEPJHPpOt+YNJZpvnVmCEygKjbVVMYWcwHmZIRqnRUPnpYpnUaDz4ONh8SCV9xbrzhu4mi/UYpXzep0eTztpbjPm8INw+ABfRy7oMMaQEMBk9i47J9hGe+8tz/voJ6vFyMGgqZAbYB0VsuMSk054cUEqXL7ovdZodkft5zRdhSk2FXRWgmbRq0v26NsfUUP/87dtupuvkfrrrHq0sxx3XA9vLm5O6N7g+h0cDJJEqapkk8EWMWMzgzRcrw5c1iiPq7LegzwApJbrmZ05L0X+/LbViWq6j+2z74+NnbwGNCiWCdQ8cKRGA==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by SA1PR12MB5638.namprd12.prod.outlook.com (2603:10b6:806:229::14) with
+ bh=qgbqflBWxuge+vseUXggqNFukZMjEaZtxmcYPj1C6wI=;
+ b=Sh5mR1cmGojH9d5NEUNs1wxqZf0KKtRKRA5uDQTkgJRuYNsf89IEid74YMClpl2gIe7GYKPiqByAv1sf+h2heRm0SPPtFZH1cigR8w6ZQ+qZArG0C39j9btM9kJAx3YL2CDh85NRYxHB9hhPT5XLQ9RHdOPUi3eqGsvCjsQO8eE=
+Received: from PU1PR06CA0020.apcprd06.prod.outlook.com (2603:1096:803:2a::32)
+ by KL1PR02MB4834.apcprd02.prod.outlook.com (2603:1096:820:5c::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.31; Mon, 10 Oct
- 2022 06:51:41 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::4470:ef9a:5126:f947]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::4470:ef9a:5126:f947%4]) with mapi id 15.20.5709.015; Mon, 10 Oct 2022
- 06:51:41 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Keith Busch <kbusch@meta.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: Re: [PATCHv2] block: fix leaking minors of hidden disks
-Thread-Topic: [PATCHv2] block: fix leaking minors of hidden disks
-Thread-Index: AQHY2oR6n6Pj70e85ku91VvDhNs3Z64HNHYA
-Date:   Mon, 10 Oct 2022 06:51:41 +0000
-Message-ID: <44a694c4-1cb7-244a-a9a8-84e17c41502a@nvidia.com>
-References: <20221007193825.4058951-1-kbusch@meta.com>
-In-Reply-To: <20221007193825.4058951-1-kbusch@meta.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|SA1PR12MB5638:EE_
-x-ms-office365-filtering-correlation-id: 9776cf26-a24e-4c40-4138-08daaa8be30e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: a6TDYeLI7aX6G/hQDh2ZgIWcJR4Bl48bOK5Uip8cQdAXrJeWU9K66rXtq/sdslq0swr05anSibBQ3y0ZXkhYY4zo5L5OI5usIH1xD85SU1eRXLWvHY9W0eWdRJDBZw62IQO1IXOHOrrXsmDJFkeojNzAoE6UjslRWnDmNC6kB3xLG8opR8W2hz9nJP2dTKdlPfvUZLicrR7/a9NxnBL53bGBtscuk7YFuLy3qkitLV32vhRpJwstEgyfMPLth+5VSp3bWs/HaQqiigdx2mYwNdCVhWmAuxd+0RdtCIO6dRCGQIsKQy8E3MMDGzW5DrFAXClmM4n5xyzPkswArCYzkW/nofr1GB3bD8Dz5a3buNKbmm8nk/k6ZVfsBK4xbrY0cmmI/iqt/8igTbnZ7OiZ2Wwy4JbxoXDjJbEtqUjHOxNdtQliAxdJhL7a7lNYhCtrZVEdwGuSu5Veyf1skUhNrv2qu8p+jIeI7ns8Mm75v9yWr314FcaaYZBx6nWr/s+xQOfcKxI70HiptOpAYFZ9l1oiQOlIwNPNFhB2xnqMPOfK5PVWcVMpNcL63oLPVJ4GhUddCfPOnkz6LEU0mRcd4vhaO9xOksnXD5Gifo+Pne6Y3aUD5I55Dw2SD2o4fEhHta3/rN4I3WT2x/373cUJVoDNgXWqjEe717OkkPjHmcfMNTJtHKo6WK0QNrdIkq0vYvS6ZoUFD58KIjU+4YUEGmkv4fARZNg5yAqs+js9dWr427ZGMzPajp+OJogfrNUmp3AKC/RFgZpNS5bGPVZ1Z0AKZgbF6+9jh5SGjiaZFWuFqd/JjLXJY51Pq6k3dNO298yeM5QJeK+dAqKBuDH+2A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(39860400002)(136003)(396003)(346002)(376002)(451199015)(66476007)(66446008)(54906003)(66946007)(31686004)(316002)(91956017)(76116006)(4326008)(64756008)(8676002)(110136005)(6486002)(31696002)(478600001)(122000001)(38100700002)(2906002)(66556008)(6512007)(53546011)(36756003)(41300700001)(6506007)(71200400001)(83380400001)(38070700005)(5660300002)(186003)(86362001)(8936002)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NTQ5bkJPZitac3FONWprWFVlMjcwVWsvcERYLzJ5N1JGN2Q5SDBTbGZkeVJZ?=
- =?utf-8?B?Qk5VVk5rZEp4dlRibXAwYm00WGRidHRTM09iTVZFa3pOUG9SNGZJMlN6K2dL?=
- =?utf-8?B?Q3c4dkg1dkxJS1ZwQUtmT2EzQmF0encwUmlNK0dJSjM2VWRkamJqM1IyZmR3?=
- =?utf-8?B?a1FXRGNkS2pINHVvSDRNV2EzYXM4TkNyNStPWXJoa2hWOFQvWTdTUmwzZm9S?=
- =?utf-8?B?Q2NFY3UvbkIxcGxBMWxMNEcraG9BdEI2RnhJNjhTUVg2aWxvVGR4QkxXNHJm?=
- =?utf-8?B?Y0xzRkkwV0lPMjNsbnVvRWpQZGRHR2gwZ1UrZWo5cXFmeTg2aFJ5dEtYVEo1?=
- =?utf-8?B?bEZ5aFdOdnNkREFWVTBJRFZ1WU5FMGRYV2dvQTQxL0lnTk5qZTAvVW1IRy9Q?=
- =?utf-8?B?aWpCcEZHNENHSjkwMXpmeFN1VThqSXhNTGpVd2pMMXpBTlIxUFFDQ005YnVr?=
- =?utf-8?B?L24wQUNWckNnb2RWMGV4WU9FcW9HUEx2SjlqYjR1VWFQejZHYi9RR3hFUllq?=
- =?utf-8?B?U2tsY2ZObFkwMm5DVWpqRUVjQTNCWE1ocTdBMVJibEt1OTRpTTU0Ly9DQ1BZ?=
- =?utf-8?B?M1hBL1U4eTg2V2pnMWgzYWc4YXR3dUJoaUkyRFFSUzl3OWM3eks0dmZqSG96?=
- =?utf-8?B?aHhlOCsvWEU1Zmg5V0pJOHE3ZTZDM3VVcEpIUy9mZDBDdkU1RGhZMjJSNy9x?=
- =?utf-8?B?UmJiVGswRC9hc3dOQjNSUGNBYUlmRlkzLzAzMzhMenozcUVhU3JkT01hQmsv?=
- =?utf-8?B?bnpmRG5ucmJ3bzNUOTk5M2VLWndvV1JZTFBYY001cTNiU29SZDgvTjkyaE1M?=
- =?utf-8?B?d0UzNEhWd2FUMDVkR2d5RmJ6UktFak94Y2Q3d3VTbkpjTW5CRVJiUFAwZE9P?=
- =?utf-8?B?T2c4M2FjT0IwbDc0SHlBTlhIb0pmc2RNYzNzUXFGdnByemlyMXVQUUFYZzNS?=
- =?utf-8?B?aThNSXhzM0duQnpNS21yTXRsMEVwRWh3SkVjOEhpeGVhVEdzeHhjS0d4WjNx?=
- =?utf-8?B?S3pKbElGa2cxVWdnVFFFK1YxMy9CZUxPazBkeU5zOEtkZjJEdjZEUlRHOHNy?=
- =?utf-8?B?cHdBdXA5a1ZYZDdqU1libWVIb3RxaFgxUGRGaGkxeit1anl3WnRKVGh1QmR6?=
- =?utf-8?B?NTZLZWxWMm5ZN0xNcUdaV1dsYTY5aTVzdGtDU3lnYnNkQzJ5M0ljQm1EU09r?=
- =?utf-8?B?WFpGTFdCNTlFSFRtQWgvaFNJTUdLSUt1WW5ZR1gxL1RWOXArcFNQTVZUYWN2?=
- =?utf-8?B?czZ0TlVGbms1ZWpHcFR5MlFEeDFhb1pCTG00bHRtRkFZcEF1Vnc5TjFwS3FI?=
- =?utf-8?B?a0h5ajJKQmNSU2ZPaXRqYkx0eEZKcDJ2eDUwdzY2ZlpjckNFU2lOUmVXay9j?=
- =?utf-8?B?T2FKdk5BQXVLR25kM2wvZ2pySUdvNTRPUzY3QjFPSGY0NEFUSmNPQmtrUnE3?=
- =?utf-8?B?Rm40aVAzUnhWcjhxemExNFJ5R2tZNDE0Ky9VZmljTGJCMzlhRXRNTlJjSlI0?=
- =?utf-8?B?cWdvQThFUXZsSWptNTZra0lRcGlQcXNTTkRUM1pnbEpBODcrK1RVVUNnYkgw?=
- =?utf-8?B?QUJQOGlKTXc4NGpLYlRUWDZJdWJBMUFJc1dWWkg3MFhWblNoelRxWEsxUzRV?=
- =?utf-8?B?clR2bllYV3YvMmdHbkdSSjhPelVEaGNPWHh2TS9UNmp4R3RjcGIvR2M0T0tr?=
- =?utf-8?B?UEdFSCtQbWVQZlVwWFkyK3poVFRBR2Z4VTd6clAxci9TS3pPQUNRK09ZMDNr?=
- =?utf-8?B?VmdPZS90UFczSngxNS9xa25WL1VJN2E3MVkwOEVoN2xXRzhsWUV0ckF4QUZR?=
- =?utf-8?B?TjVNWmFjV3AyQWNldWFiVGc0U1NsREd0aVVYQVFDdWttN1J6N1FPdk13SjN6?=
- =?utf-8?B?NU5jeWZZUFQ1SXIwQ0YyQmE1SU4rb1RwZ0F4ODd5TnVTSXBKNmdsV2h5YnN5?=
- =?utf-8?B?ODI0YWtQd04rNnRNMk1wWHBaRDhhZGlCdG0zTTZGam5lWFdEYzg4L0pjbUM3?=
- =?utf-8?B?STRVZ3VLN1hWanA4Y0tPM2tGd24wTExUTDBVSTM5OEtCMlJZTVRtTkVpNDBr?=
- =?utf-8?B?QThrZk94V3grS0RzN3VDQWR4dUo2QzRKUFJnNGpTaXRuRmxmYitoNEp4NlJK?=
- =?utf-8?B?UmUyRFUvK1VtWWFWQ3FrYnJkdFBuREFPNy9zaG1naTFZZUczT3drNzJKVEcz?=
- =?utf-8?Q?FhHAgsD86+c/R0tapEX5eslzwzC/IQDUu4m0cTTaNJXa?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <87698AF29F427945A65F27D628A2814E@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.38; Mon, 10 Oct
+ 2022 07:20:02 +0000
+Received: from PSAAPC01FT052.eop-APC01.prod.protection.outlook.com
+ (2603:1096:803:2a:cafe::47) by PU1PR06CA0020.outlook.office365.com
+ (2603:1096:803:2a::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15 via Frontend
+ Transport; Mon, 10 Oct 2022 07:20:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 145.14.71.66)
+ smtp.mailfrom=zeekrlife.com; dkim=none (message not signed)
+ header.d=none;dmarc=bestguesspass action=none header.from=zeekrlife.com;
+Received-SPF: Pass (protection.outlook.com: domain of zeekrlife.com designates
+ 145.14.71.66 as permitted sender) receiver=protection.outlook.com;
+ client-ip=145.14.71.66; helo=CN-BJI-EXP64.Geely.Auto; pr=C
+Received: from CN-BJI-EXP64.Geely.Auto (145.14.71.66) by
+ PSAAPC01FT052.mail.protection.outlook.com (10.13.38.166) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5709.10 via Frontend Transport; Mon, 10 Oct 2022 07:20:01 +0000
+Received: from Zbook.localdomain (10.186.26.31) by CN-BJI-EXP64.Geely.Auto
+ (10.186.65.77) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.14; Mon, 10 Oct
+ 2022 15:19:57 +0800
+From:   Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <Yuwei.Guan@zeekrlife.com>
+Subject: [PATCH] blk-mq: initialize csd/fifo_time before use
+Date:   Mon, 10 Oct 2022 15:19:16 +0800
+Message-ID: <20221010071916.1075-1-Yuwei.Guan@zeekrlife.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9776cf26-a24e-4c40-4138-08daaa8be30e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2022 06:51:41.2416
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Originating-IP: [10.186.26.31]
+X-ClientProxiedBy: CN-BJI-EXP57.Geely.Auto (10.186.65.69) To
+ CN-BJI-EXP64.Geely.Auto (10.186.65.77)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PSAAPC01FT052:EE_|KL1PR02MB4834:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3ee6d2e-d9e5-42ec-c34b-08daaa8fd8ab
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: U/CFsPMaa2OBNIApjR0P+aWuBF64Bhuc2v3kKvwn5SCXJDym3aEEkJ5E688PTD6Oodwmsx6ivlcnUvwiJIBZfoKWJb1PrCh8UtxJftOttPOlvx1nHMEfeUk5v9IsrCBUkOxHSYfkKqkYwFbIeDhq5wjSwAmI+qF4lkfS3i6jEvIGuBFmZC+tdl4PzD1R/x98svAKSlsKYHy06ycqZOLhCwsxo+LwhlelFYg5xSzytY9NCav47WhscRYB5P81v9gb1Uqj23tzA4m9V09eo9aepBdynL0eb8BCgtOTT6tWPFpXc04pNG0mYnF48+vGP922jy+W+o3EK6z6epEkRn823E5GMXR4OlXjKYz8RpC+X60mgev4MHAf0PescX08JAHkX03dhpmbKsGVDCAN6pTrr8c1jBHZLIrQKhWfAUMaqyDt7wY89dIAbssXFXzhK57SeqZhuqQfeW9v4n4lFdMsJX6NvyJgwoLcryncT1bVidHgzatQ8gqNPEzLVaAyWRVgzddN6mFpI9OglhyUJpjs71ecoWzi4OqivqhCDLn0N0Pdv3y9KLABaWx+Ep35IRAQfvgrqekMJvtaamcPb1vWdX0CXys2ZykdscJ6yxIl18UTRDhElfI2yHTpHwRriZ+M6c0/j8MhS3vM5T5wiwJ905bYokElf3JwExgSl2ZZNU+wrrfJDYDBdQwjwV32PJCqfkc5LmM53AN8txBDCRe0O1RvvAiD0oQKhXnOIz+6JM+ZY56INqC2Xo8QrDMOHpta88cx4ObQTlnD1QQn65P3SoMUktXGolrIsg034Slbr9I=
+X-Forefront-Antispam-Report: CIP:145.14.71.66;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CN-BJI-EXP64.Geely.Auto;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(376002)(396003)(346002)(136003)(39860400002)(451199015)(40470700004)(36840700001)(46966006)(5660300002)(8936002)(2906002)(41300700001)(316002)(6916009)(54906003)(86362001)(70586007)(70206006)(336012)(8676002)(107886003)(478600001)(6666004)(4326008)(83380400001)(186003)(356005)(36756003)(82740400003)(40460700003)(82310400005)(36860700001)(16526019)(81166007)(40480700001)(2616005)(47076005)(26005)(1076003)(36900700001);DIR:OUT;SFP:1102;
+X-OriginatorOrg: Zeekrlife.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2022 07:20:01.0402
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KP7qyqQ+nCNtkfaJtKZlRtws2tAFg556t6pPqHsdwMwNGKM4pS/gXNRdfACzrSINfpIu4PaVZTaG5Y/8lQn+1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5638
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3ee6d2e-d9e5-42ec-c34b-08daaa8fd8ab
+X-MS-Exchange-CrossTenant-Id: 6af81d03-dafe-4d76-a257-3cc43cb0454f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=6af81d03-dafe-4d76-a257-3cc43cb0454f;Ip=[145.14.71.66];Helo=[CN-BJI-EXP64.Geely.Auto]
+X-MS-Exchange-CrossTenant-AuthSource: PSAAPC01FT052.eop-APC01.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR02MB4834
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMTAvNy8yMiAxMjozOCwgS2VpdGggQnVzY2ggd3JvdGU6DQo+IEZyb206IEtlaXRoIEJ1c2No
-IDxrYnVzY2hAa2VybmVsLm9yZz4NCj4gDQo+IFRoZSBtYWpvci9taW5vciBvZiBhIGhpZGRlbiBn
-ZW5kaXNrIGlzIG5vdCBwcm9wYWdhdGVkIHRvIHRoZSBibG9jaw0KPiBkZXZpY2UuIFRoaXMgaXMg
-cmVxdWlyZWQgdG8gc3VwcHJlc3MgaXQgZnJvbSBiZWluZyB2aXNpYmxlLiBGb3IgdGhlc2UNCj4g
-ZGlza3MsIHdlIG5lZWQgdG8gaGFuZGxlIGZyZWVpbmcgdGhlIGR5bmFtaWMgbWlub3IgZGlyZWN0
-bHkgd2hlbiBpdCdzDQo+IHJlbGVhc2VkIHNpbmNlIGJkZXZfZnJlZV9pbm9kZSgpIHdvbid0IGJl
-IGFibGUgdG8uDQo+IA0KPiBDYzogQ2hyaXN0b3BoIEhlbGx3aWcgPGhjaEBsc3QuZGU+DQo+IFJl
-cG9ydGVkLWJ5OiBEYW5pZWwgV2FnbmVyIDxkd2FnbmVyQHN1c2UuZGU+DQo+IFNpZ25lZC1vZmYt
-Ynk6IEtlaXRoIEJ1c2NoIDxrYnVzY2hAa2VybmVsLm9yZz4NCj4gLS0tDQo+IHYxLT52MjoNCj4g
-DQo+ICAgIEFjdHVhbGx5IGNoZWNrIHRoYXQgdGhlIGRpc2sgaXMgaGlkZGVuIGJlZm9yZSBhc3N1
-bWluZyB0aGUgbWlub3IgbmVlZHMNCj4gICAgdG8gYmUgZnJlZWQuDQo+IA0KPiAgIGJsb2NrL2dl
-bmhkLmMgfCAyICsrDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQ0KPiANCj4g
-ZGlmZiAtLWdpdCBhL2Jsb2NrL2dlbmhkLmMgYi9ibG9jay9nZW5oZC5jDQo+IGluZGV4IDUxNDM5
-NTM2MWQ3Yy4uMGFmY2RiYjc1NzVjIDEwMDY0NA0KPiAtLS0gYS9ibG9jay9nZW5oZC5jDQo+ICsr
-KyBiL2Jsb2NrL2dlbmhkLmMNCj4gQEAgLTExNjYsNiArMTE2Niw4IEBAIHN0YXRpYyB2b2lkIGRp
-c2tfcmVsZWFzZShzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+ICAgCWlmICh0ZXN0X2JpdChHRF9BRERF
-RCwgJmRpc2stPnN0YXRlKSAmJiBkaXNrLT5mb3BzLT5mcmVlX2Rpc2spDQo+ICAgCQlkaXNrLT5m
-b3BzLT5mcmVlX2Rpc2soZGlzayk7DQo+ICAgDQo+ICsJaWYgKChkaXNrLT5mbGFncyAmIEdFTkhE
-X0ZMX0hJRERFTikgJiYgZGlzay0+bWFqb3IgPT0gQkxPQ0tfRVhUX01BSk9SKQ0KPiArCQlibGtf
-ZnJlZV9leHRfbWlub3IoZGlzay0+Zmlyc3RfbWlub3IpOw0KPiAgIAlpcHV0KGRpc2stPnBhcnQw
-LT5iZF9pbm9kZSk7CS8qIGZyZWVzIHRoZSBkaXNrICovDQo+ICAgfQ0KPiAgIA0KDQoNCkxvb2tz
-IGdvb2QuDQoNClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGtjaEBudmlkaWEuY29t
-Pg0KDQotY2sNCg0K
+csd/fifo_time need to be initialized before use again,
+otherwise, it will keep the last tag value.
+
+Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+---
+ block/blk-mq.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8070b6c10e8d..f55d41f1d150 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -383,6 +383,9 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq=
+_alloc_data *data,
+        rq->end_io =3D NULL;
+        rq->end_io_data =3D NULL;
+
++       /* initialize csd/fifo_time before use */
++       memset(&rq->csd, 0x0, sizeof(rq->csd));
++
+        blk_crypto_rq_set_defaults(rq);
+        INIT_LIST_HEAD(&rq->queuelist);
+        /* tag was already set */
+--
+2.34.1
+
+=E5=85=8D=E8=B4=A3=E5=A3=B0=E6=98=8E=EF=BC=9A=E6=9C=AC=E9=82=AE=E4=BB=B6=E6=
+=89=80=E5=8C=85=E5=90=AB=E4=BF=A1=E6=81=AF=E5=8F=91=E7=BB=99=E6=8C=87=E5=AE=
+=9A=E4=B8=AA=E4=BA=BA=E6=88=96=E6=9C=BA=E6=9E=84=EF=BC=8C=E9=82=AE=E4=BB=B6=
+=E5=8F=AF=E8=83=BD=E5=8C=85=E5=90=AB=E4=BF=9D=E5=AF=86=E6=88=96=E4=B8=93=E5=
+=B1=9E=E4=BF=A1=E6=81=AF=E3=80=82=E6=9C=AA=E7=BB=8F=E6=8E=A5=E6=94=B6=E8=80=
+=85=E8=AE=B8=E5=8F=AF=EF=BC=8C=E4=B8=8D=E5=BE=97=E9=98=85=E8=AF=BB=E3=80=81=
+=E8=BD=AC=E5=8F=91=E6=88=96=E4=BC=A0=E6=92=AD=E9=82=AE=E4=BB=B6=E5=86=85=E5=
+=AE=B9=EF=BC=8C=E6=88=96=E6=A0=B9=E6=8D=AE=E9=82=AE=E4=BB=B6=E5=86=85=E5=AE=
+=B9=E9=87=87=E5=8F=96=E4=BB=BB=E4=BD=95=E7=9B=B8=E5=85=B3=E8=A1=8C=E5=8A=A8=
+=E3=80=82=E5=A6=82=E6=9E=9C=E9=94=99=E8=AF=AF=E5=9C=B0=E6=94=B6=E5=88=B0=E4=
+=BA=86=E6=AD=A4=E9=82=AE=E4=BB=B6=EF=BC=8C=E8=AF=B7=E4=B8=8E=E6=94=B6=E4=BB=
+=B6=E4=BA=BA=E8=81=94=E7=B3=BB=E5=B9=B6=E8=87=AA=E8=A1=8C=E5=88=A0=E9=99=A4=
+=E9=82=AE=E4=BB=B6=E5=86=85=E5=AE=B9=E3=80=82
+
+Disclaimer=EF=BC=9AThe information transmitted is intended only for the per=
+son or entity to which it is addressed and may contain confidential and/or =
+privileged material. Any review, retransmission, dissemination or other use=
+ of, or taking of any action in reliance upon, this information by persons =
+or entities other than the intended recipient is prohibited. If you receive=
+d this in error , please contact the sender and delete the material from an=
+y computer .
