@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5890DC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 14:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91246C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 14:49:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229451AbiJJO1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 10:27:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44836 "EHLO
+        id S229545AbiJJOtV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 10:49:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiJJO1Y (ORCPT
+        with ESMTP id S229481AbiJJOtT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 10:27:24 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9FA953D21
-        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 07:27:22 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id f23so10529853plr.6
-        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 07:27:22 -0700 (PDT)
+        Mon, 10 Oct 2022 10:49:19 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3ACA72852
+        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 07:49:16 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id h13so9530723pfr.7
+        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 07:49:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8lXZVugAjzZt/AOOtKb1zujcaKt0Ww0HY8XVrW1TZGQ=;
-        b=sH7ANBjDG9yr63HNRtGX8baxzSpeCvB8v7bw8cgeKXHX9AwUwmhX9UjBfU0PGJgA4f
-         ZFNpaVfqwmokrACzfiJi+pSlKsAb60JQWxfyFEo2baB/2mGnBc1gmxqTF+6T1zlVUTWd
-         LW/xjtJCt9tJMnYijL1nB2v9QPlJbnU+d3LW4VU8TkaR3UBRASfofLlMhjryb0/GvVEk
-         tVtw97iL3lvlVO33Uk3p11EyENCB7BmCTqjN8HmQI0ACdmxmps7KdkNUyRXMCB240LUL
-         Yql7jTOZSK3c3G054nQrTGNe1nHW95Z8Qa5TEQweQ/v1LBMD9necMbMW/RYtwo9pnkCk
-         dH5A==
+        bh=SMtLwE5hEScjZzSAhrd8HUgskrcWzQHeKKqzQbt11Jk=;
+        b=nWoMTjM94zP+hYYEVzbIUrdxJiBV4OTv1Q4dtToRtjT+ZJMtxynx3f9L7HiQ4sNL1G
+         z6r34Qp8aFUPQ9SK1GTwV4uW7AyTQRYAuH0Qf05UF04jhUB3HdoffDasH0ECVVfDxDGH
+         nNbaLr17b58+AN5VgMRDdE3G3/U6RntptWOZeIp+TgRn3ZDMjLS8Rwbretewl2zozwox
+         oD0U4xRQsX8NZNALqePHd7X3QU5X1w539JSsrhVNCynkMHAhVSQn3ibWM18t0oy9q7cT
+         hEMLtBRWzgy4YR05FCIR7aNYTj/jDL+Uu59TuafuhIyx1HpBvAzFu5cxrd5aBkmiamvZ
+         03cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8lXZVugAjzZt/AOOtKb1zujcaKt0Ww0HY8XVrW1TZGQ=;
-        b=z90i3fxemkT9bPsLhNuCtXNj4jyK8el7F/DQoHfOFmeCiUxSlbUzbC50jEgOPSJGpT
-         G6SSA9gw4o/7XsrmLkTwnmsJmDqwF4UZew11sMipAwpp7+OVfl6jJwZxb56yjb1NukD8
-         b+Tm4Jkrbp9bjRcv/b0x+x36EJlcJ3tc4jNH6+tyrccCoh30BnjFZm2k4VTl5A1q+WVH
-         UrKnZcpxXP7TbmJ7aFkfJ4Mlfl5FOV0eC9CvUm9GJGIaS2Cs4qHyzdawXVXgytk4TG/g
-         kvXhVhYHi3bhly1FaKKK6Enr3Pz2jY8+xSv5nhiFjn5yzCuKi/rN0jzo0IGeE3j3LpTg
-         HaVg==
-X-Gm-Message-State: ACrzQf15nQEXELQsnNuOYUNteNOpUgWwgFURQMUMl3SU0v4GW4+ASR/+
-        NTib8iTVnzfcQEICNuLA8e5YeqMwrZdOfaAV
-X-Google-Smtp-Source: AMsMyM7wE9SNzofNNs5fo82ZnGSZ7k9sozC1BvOX51ik7k6afiHn48Ve+jfQ4EeS58Sjq/QK6XEitQ==
-X-Received: by 2002:a17:90b:3901:b0:20b:210d:d5d9 with SMTP id ob1-20020a17090b390100b0020b210dd5d9mr20327884pjb.83.1665412042306;
-        Mon, 10 Oct 2022 07:27:22 -0700 (PDT)
+        bh=SMtLwE5hEScjZzSAhrd8HUgskrcWzQHeKKqzQbt11Jk=;
+        b=Y3lDV8g0W5xh0v8IeqZD6gpK3yj9OnxHGj1Vd3QJMEUOQLnbT0neMDG3c8e3+gNv99
+         46Kevuwp4v6/ZQEnid+ZOZb0cQMMczS3zfqYYYcb0YG7F9fgSvpLjUsELHMo9iemC8wy
+         TOdNidwfi60ITL4bSv6XEmiuTqa/IryzJjm9AHNe9g5PW+9425Fe3gvJ3rUUO3ADbVEz
+         c9U6govUqhV7BsZxK/hgtpihNwIvMSKdjGPDKmMpp/Ywe3x8gEezcMwQB6AO2e2JGXKF
+         +nWmb66g6XFcVkkmP4OYh38UFroCjghpfdLwXIwPiq9i8Alng3j72+5jpJi5t8qTQ3hN
+         jBGQ==
+X-Gm-Message-State: ACrzQf3DIz7KkVb8dXoUGBjupKsrjCNxOU5vHsk/dY6fq3X1Ec39EUzW
+        qpE3ZieJ3xIuCHZRvTv4nmfnhaji9GeEVi06
+X-Google-Smtp-Source: AMsMyM4gC5HzSGrccAZ121wn5xguU6BuyPshrkHr97SmW/Cb0yAOzO21BlWmd6CJmhkWqscf1gfaxg==
+X-Received: by 2002:a65:6bca:0:b0:420:712f:ab98 with SMTP id e10-20020a656bca000000b00420712fab98mr17031931pgw.350.1665413355304;
+        Mon, 10 Oct 2022 07:49:15 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s15-20020a170902ea0f00b0016d72804664sm6712315plg.205.2022.10.10.07.27.21
+        by smtp.gmail.com with ESMTPSA id d8-20020a17090a02c800b0020a71ca2cb8sm9212588pjd.56.2022.10.10.07.49.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 07:27:21 -0700 (PDT)
+        Mon, 10 Oct 2022 07:49:14 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Brian Foster <bfoster@redhat.com>, linux-block@vger.kernel.org
-Cc:     Nico Pache <npache@redhat.com>, Joel Savitz <jsavitz@redhat.com>
-In-Reply-To: <20221003133534.1075582-1-bfoster@redhat.com>
-References: <20221003133534.1075582-1-bfoster@redhat.com>
-Subject: Re: [PATCH v2] block: avoid sign extend problem with default queue flags mask
-Message-Id: <166541204131.3814.10062171487438834420.b4-ty@kernel.dk>
-Date:   Mon, 10 Oct 2022 08:27:21 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org
+In-Reply-To: <20221010131857.748129-1-hch@lst.de>
+References: <20221010131857.748129-1-hch@lst.de>
+Subject: Re: [PATCH] block: fix leaking minors of hidden disks
+Message-Id: <166541335450.5340.12319693019784412348.b4-ty@kernel.dk>
+Date:   Mon, 10 Oct 2022 08:49:14 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -66,26 +66,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 3 Oct 2022 09:35:34 -0400, Brian Foster wrote:
-> request_queue->queue_flags is unsigned long, which is 8-bytes on
-> 64-bit architectures. Most queue flag modifications occur through
-> bit field helpers, but default flags can be logically OR'd via the
-> QUEUE_FLAG_MQ_DEFAULT mask. If this mask happens to include bit 31,
-> the assignment can sign extend the field and set all upper 32 bits.
+On Mon, 10 Oct 2022 15:18:57 +0200, Christoph Hellwig wrote:
+> The major/minor of a hidden gendisk is not propagated to the block
+> device because it is never registered using bdev_add.  But the lack of
+> bd_dev also causes the dynamic major minor number not to be freed.
+> Assign bd_dev manually to ensure the dynamic major minor gets freed.
 > 
-> This exact problem has been observed on a downstream kernel that
-> happens to use bit 31 for QUEUE_FLAG_NOWAIT. This is not an
-> immediate problem for current upstream because bit 31 is not
-> included in the default flag assignment (and is not used at all,
-> actually). Regardless, fix up the QUEUE_FLAG_MQ_DEFAULT mask
-> definition to avoid the landmine in the future.
+> Based on a patch by Keith Busch.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] block: avoid sign extend problem with default queue flags mask
-      commit: ca5eebda3e1c1a58a1c5a337da393ed6734593e3
+[1/1] block: fix leaking minors of hidden disks
+      commit: a0a6314ae774f8a5e52a599946aa2ad0db867b83
 
 Best regards,
 -- 
