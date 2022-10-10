@@ -2,73 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F030C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 07:55:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DF3C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 10 Oct 2022 07:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbiJJHzQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 03:55:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55274 "EHLO
+        id S230486AbiJJH7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 03:59:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbiJJHzP (ORCPT
+        with ESMTP id S230470AbiJJH7I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 03:55:15 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD4031DA70;
-        Mon, 10 Oct 2022 00:55:12 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 21BA768AA6; Mon, 10 Oct 2022 09:55:05 +0200 (CEST)
-Date:   Mon, 10 Oct 2022 09:55:04 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-remoteproc@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-mtd@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, axboe@kernel.dk, efremov@linux.com,
-        josef@toxicpanda.com, idryomov@gmail.com,
-        dongsheng.yang@easystack.cn, haris.iqbal@ionos.com,
-        jinpu.wang@ionos.com, mst@redhat.com, jasowang@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com, ohad@wizery.com,
-        andersson@kernel.org, baolin.wang@linux.alibaba.com,
-        ulf.hansson@linaro.org, richard@nod.at, miquel.raynal@bootlin.com,
-        vigneshr@ti.com, marcan@marcan.st, sven@svenpeter.dev,
-        alyssa@rosenzweig.io, kbusch@kernel.org, hch@lst.de,
-        sagi@grimberg.me, sth@linux.ibm.com, hoeppner@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        borntraeger@linux.ibm.com, svens@linux.ibm.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, hare@suse.de, bhelgaas@google.com,
-        john.garry@huawei.com, christophe.jaillet@wanadoo.fr,
-        vaibhavgupta40@gmail.com, wsa+renesas@sang-engineering.com,
+        Mon, 10 Oct 2022 03:59:08 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB6E72D74A;
+        Mon, 10 Oct 2022 00:59:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=sWolSNkLX1ZPnLQhfmowne8piiQT5rQ6uM09AjXa5Dc=; b=aJIBlsb0nSpWjrle4oZywMion1
+        d0M1TLezw/OcG2P0MgPxI6aB4/HTO9AxzYy4TBBhT7iUcr9rtBjX/6QDGEY3NVp14bJ4/jDCFWOLR
+        AQbNGi/LTMEXH3wmTjrkT5Y5SGv/Ib9V7XughQZRpp+pgf73tDFKD5qBO9fZNJp7D5XdpZAn047TZ
+        EiJJmMepreW3fKePOipspGiOfrSt007DayqpG0JoDUJoeTic1aqPtkls/MHiWNJVicPA3qcsuILrN
+        M+txLRN4vmfGm/5lZL3wxlLajTmeHmNW15SUYd9J3te7dVhIl6aHu6Zoczw8l4kTSbppDR+vGd2rO
+        RUq4Vc7g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ohngj-00HSJR-TP; Mon, 10 Oct 2022 07:59:01 +0000
+Date:   Mon, 10 Oct 2022 00:59:01 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     ogeert@linux-m68k.org, linux-block@vger.kernel.org,
+        linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
+        drbd-dev@lists.linbit.com, nbd@other.debian.org,
+        linux-mtd@lists.infradead.org, axboe@kernel.dk,
+        philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
+        christoph.boehmwalder@linbit.com, efremov@linux.com,
+        josef@toxicpanda.com, tim@cyberelk.net, haris.iqbal@ionos.com,
+        jinpu.wang@ionos.com, richard@nod.at, miquel.raynal@bootlin.com,
+        vigneshr@ti.com, mcgrof@kernel.org, hare@suse.de,
         damien.lemoal@opensource.wdc.com, johannes.thumshirn@wdc.com,
-        bvanassche@acm.org, ming.lei@redhat.com,
-        shinichiro.kawasaki@wdc.com, vincent.fu@samsung.com,
-        christoph.boehmwalder@linbit.com, joel@jms.id.au,
-        vincent.whitchurch@axis.com, nbd@other.debian.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, asahi@lists.linux.dev
-Subject: Re: [RFC PATCH 00/21] block: add and use init tagset helper
-Message-ID: <20221010075504.GA21272@lst.de>
-References: <20221005032257.80681-1-kch@nvidia.com> <Y0BvRaVO0iUVmHgB@bombadil.infradead.org>
+        bvanassche@acm.org, ming.lei@redhat.com, vincent.fu@samsung.com,
+        shinichiro.kawasaki@wdc.com
+Subject: Re: [RFC PATCH 01/18] block: add and use init disk helper
+Message-ID: <Y0PQxdzmMzAAW0KF@infradead.org>
+References: <20221005050027.39591-1-kch@nvidia.com>
+ <20221005050027.39591-2-kch@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y0BvRaVO0iUVmHgB@bombadil.infradead.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20221005050027.39591-2-kch@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 07, 2022 at 11:26:13AM -0700, Luis Chamberlain wrote:
-> *If* there were commonalities at init and these could be broken up into
-> common groups, each having their own set of calls, then we simplify and
-> can abstract these. I say this without doing a complete review of the
-> removals, but if there really isn't much of commonalities I tend to
-> agree with Bart that open coding this is better.
+On Tue, Oct 04, 2022 at 10:00:10PM -0700, Chaitanya Kulkarni wrote:
+> +void init_disk(struct gendisk *disk, int major, int first_minor,
+> +		int minors, sector_t sectors, void *private_data,
+> +		const struct block_device_operations *fops)
+> +{
+> +	disk->major = major;
+> +	disk->first_minor = first_minor;
+> +	disk->minors = minors;
+> +	set_capacity(disk, sectors);
+> +	disk->private_data = private_data;
+> +	disk->fops = fops;
 
-The commonality is that there are various required or optional
-fields to fill out.  I actually have a WIP series to make the tag_set
-dynamically allocated and refcounted to fix some long standing life time
-issues.  That creates a new alloc helper that will take a few mandatory
-arguments and would heavily clash with this series.
+I don't like this at all.  For one major/first_minor/minors are
+optional and discouraged for new drivers.  Setting the capacity is
+a different thing and is done by helpers also used for revalidation
+in many drivers.
+
+It might make sense to pass the fops (and maybe private_data) to
+blk_mq_alloc_disk / blk_alloc_disk, but even then I'm not quite
+sure it is worth the churn.
