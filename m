@@ -2,83 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E291C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 16:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21998C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 16:56:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229833AbiJKQy7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 12:54:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
+        id S229489AbiJKQ4z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 12:56:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbiJKQy6 (ORCPT
+        with ESMTP id S229885AbiJKQ4y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 12:54:58 -0400
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 078AA17E27;
-        Tue, 11 Oct 2022 09:54:56 -0700 (PDT)
-Received: by mail-vk1-xa2a.google.com with SMTP id y129so6947570vkg.8;
-        Tue, 11 Oct 2022 09:54:55 -0700 (PDT)
+        Tue, 11 Oct 2022 12:56:54 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFC11EC64;
+        Tue, 11 Oct 2022 09:56:53 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id f193so13355651pgc.0;
+        Tue, 11 Oct 2022 09:56:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uhLTcdB4WsCh/vP1czukbNh0ebYnCkF5kHJbcSwgwSY=;
-        b=nE1SI2L61bOeyDQVfsAVXR9tLiJCDb/MT3KNmCLWWQkxjFida4aJ6DukRVwdaYroZT
-         0gbAE+YsnR6IwIbVtnSmY/lHzTzrSax9urxIKmXww3pkUy8dTR5hokDuvbd6l+tRs1jT
-         +g+yJF4uf4R6eY18ovAWUsBn1y9hfs/ZMATeGtKyx49KvWtWLZqzw5qOoj4ZlDvsHsaF
-         LjAySYor7garmiQZCqwTsgSwo4b+LDN3CRp+QtvgNQVS5hqUATWjQK6kxyfwqDO4CdB/
-         6N/wYOtz74zl8MXdXzWnaD2dO1u5xqHoBkKYg5D8tOeGt/U64xmwokYx7EYVErHG92wK
-         Vz/g==
+        bh=Z5RbqDPmU+T36Dzi3M78WhRya0SfBBrW03GAQn62eSk=;
+        b=n+fdqDOwWSVskXE762n/Ybb/cMZTP1sawPVMLS51GoXmFxXJimchm4b/VL6PniWksJ
+         d0pr1VneQQoJPpYsa/jg8lSB/bZ6yemyTTuqnxPDAqO2/nlSx3G6HE9uDSx64apkRfi7
+         1/MIXES/V8/H60dSlCV9JxLf+QmH6rvL+SV/xfv7knxZKPx92wQ1IyrUoCwziRxJ6rHu
+         QFRta3qlBzXxZl/bfgIlC4qCnqgasE0mE0X6ICTgTBsPhXEjfD+ahMTa5IQJfatymf2/
+         M4eVbEyFltiQLdlrLG9fU52sO0ByM7NK7XnT2rwsHuCP3D2ndcCFdI7ENUQnGgREAcwl
+         YCYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uhLTcdB4WsCh/vP1czukbNh0ebYnCkF5kHJbcSwgwSY=;
-        b=wozLb11zDu5FpcgSlV/skCf+Cz1f5E/eNCqz1IO1FEgLhvUeLjlKY0r5WSP2v+9XKj
-         R3QDIi8nfII4p6MM1JCQrfb1gdPQ0bSDYV4ExCz9f7D/STDA11ZZA9W6qz32VPEY1Hxf
-         RJKFDc9ZFf7ZRKGrdwfKVg2wEnq0nIwR4Ut6DkBaYio5WksPsWYILOLEanTfyaM+41u9
-         IvmNdvvU5ucrPTYklRhFqGWEmO9wr4ClGgmSku/OF7/JoVjF+hotcP1LOstGeR+ZzJdA
-         A3W8Iy9QeIZ7pbgrw5zmwudTPnOwDmtToHoIXx+PQW+WTs1UYZ74x401JPDaBOBoPs9Y
-         buAA==
-X-Gm-Message-State: ACrzQf0zFllrR2e0XTUjP0tcvyZH67sJmXlD6zpdgsi/TuEdyiOgY1GZ
-        sMv4Oj2b4/Z4F/+0u8KIlzrSScY1z0iQCA==
-X-Google-Smtp-Source: AMsMyM6WD85RJrsWfWyb+GrHuCVmpzmrwbTaogLDboReDgPG9AtJdj/NiwKS8A23mRVKfztmS82bOg==
-X-Received: by 2002:a17:902:e885:b0:183:dcb7:c4f8 with SMTP id w5-20020a170902e88500b00183dcb7c4f8mr3026070plg.160.1665507284779;
-        Tue, 11 Oct 2022 09:54:44 -0700 (PDT)
+        bh=Z5RbqDPmU+T36Dzi3M78WhRya0SfBBrW03GAQn62eSk=;
+        b=beASmbzG8x4fUjN2Alq4uIOEY3xP569lsnEqHEqC6rBYqa7czYXvVrsu9msUolByEm
+         DQy5BdMrDXWAQGPSOPLc995gYHVe7mlpTxkHtYjXHR7UI1mPEE7Nnj5goT8afFemB55f
+         AjSPzlsW9JjBkubhgVCUx4TpEXlyRvENR4/+ph+CVnLYRBsVUs6Hwx3pQM/gXwUBZHQi
+         4Nw5ix4R6RLgZG/p5GYazBsAC0G/LWu3S5PRjaZ85kXGpFO04MbbinJQWoMQjsmIyUjh
+         Ry9azlNYUW+G/h0WSn8IvwiYddpWNwNWKv/oYLac+DRHawFBP5nTBmZzOy5PSwCLHu1R
+         k9kA==
+X-Gm-Message-State: ACrzQf1GVBb1sqiJKRFn/R2BMM7PKYggDv+yw+YuJyMvpJ/V57hZk4zh
+        sBgxF/P0Pe38xaTfMmPvlTM=
+X-Google-Smtp-Source: AMsMyM6ovS/PvL0XzhCu1Dgk0tPCY8KuNlZdZ/CjV6JHsJhC/E3577NH8AnWv1BADA0UfpTQHAYevw==
+X-Received: by 2002:a05:6a00:124b:b0:563:ce4b:f519 with SMTP id u11-20020a056a00124b00b00563ce4bf519mr3539498pfi.5.1665507412570;
+        Tue, 11 Oct 2022 09:56:52 -0700 (PDT)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id q14-20020a170902dace00b0017f7b6e970esm8941708plx.146.2022.10.11.09.54.44
+        by smtp.gmail.com with ESMTPSA id 22-20020a17090a0d5600b001ef8ab65052sm8146959pju.11.2022.10.11.09.56.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 09:54:44 -0700 (PDT)
+        Tue, 11 Oct 2022 09:56:52 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 11 Oct 2022 06:54:43 -1000
+Date:   Tue, 11 Oct 2022 06:56:50 -1000
 From:   Tejun Heo <tj@kernel.org>
 To:     Yu Kuai <yukuai1@huaweicloud.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
         yi.zhang@huawei.com
-Subject: Re: [PATCH -next 1/5] blk-iocost: disable writeback throttling
-Message-ID: <Y0Wf01w6iNbvxgya@slm.duckdns.org>
+Subject: Re: [PATCH -next 2/5] blk-iocost: don't release 'ioc->lock' while
+ updating params
+Message-ID: <Y0WgUgfRcKhaXiLx@slm.duckdns.org>
 References: <20221011083547.1831389-1-yukuai1@huaweicloud.com>
- <20221011083547.1831389-2-yukuai1@huaweicloud.com>
+ <20221011083547.1831389-3-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221011083547.1831389-2-yukuai1@huaweicloud.com>
+In-Reply-To: <20221011083547.1831389-3-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 11, 2022 at 04:35:43PM +0800, Yu Kuai wrote:
+On Tue, Oct 11, 2022 at 04:35:44PM +0800, Yu Kuai wrote:
 > From: Yu Kuai <yukuai3@huawei.com>
 > 
-> Commit b5dc5d4d1f4f ("block,bfq: Disable writeback throttling") disable
-> wbt for bfq, because different write-throttling heuristics should not
-> work together.
+> ioc_qos_write() and ioc_cost_model_write() are the same:
 > 
-> For the same reason, wbt and iocost should not work together as well,
-> unless admin really want to do that, dispite that performance is
-> affected.
+> 1) hold lock to read 'ioc->params' to local variable;
+> 2) update params to local variable without lock;
+> 3) hold lock to write local variable to 'ioc->params';
+> 
+> In theroy, if user updates params concurrenty, the params might be lost:
+> 
+> t1: update params a		t2: update params b
+> spin_lock_irq(&ioc->lock);
+> memcpy(qos, ioc->params.qos, sizeof(qos))
+> spin_unlock_irq(&ioc->lock);
+> 
+> qos[a] = xxx;
+> 
+> 				spin_lock_irq(&ioc->lock);
+> 				memcpy(qos, ioc->params.qos, sizeof(qos))
+> 				spin_unlock_irq(&ioc->lock);
+> 
+> 				qos[b] = xxx;
+> 
+> spin_lock_irq(&ioc->lock);
+> memcpy(ioc->params.qos, qos, sizeof(qos));
+> ioc_refresh_params(ioc, true);
+> spin_unlock_irq(&ioc->lock);
+> 
+> 				spin_lock_irq(&ioc->lock);
+> 				// updates of a will be lost
+> 				memcpy(ioc->params.qos, qos, sizeof(qos));
+> 				ioc_refresh_params(ioc, true);
+> 				spin_unlock_irq(&ioc->lock);
+> 
+> Althrough this is not common case, the problem can by fixed easily by
+> holding the lock through the read, update, write process.
 > 
 > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
