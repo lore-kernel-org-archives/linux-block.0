@@ -2,117 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F85CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 16:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E291C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 16:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbiJKQyH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 12:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37892 "EHLO
+        id S229833AbiJKQy7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 12:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229819AbiJKQyE (ORCPT
+        with ESMTP id S229795AbiJKQy6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 12:54:04 -0400
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A745AA59AF
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 09:54:02 -0700 (PDT)
-Received: by mail-pj1-f50.google.com with SMTP id x31-20020a17090a38a200b0020d2afec803so6717818pjb.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 09:54:02 -0700 (PDT)
+        Tue, 11 Oct 2022 12:54:58 -0400
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 078AA17E27;
+        Tue, 11 Oct 2022 09:54:56 -0700 (PDT)
+Received: by mail-vk1-xa2a.google.com with SMTP id y129so6947570vkg.8;
+        Tue, 11 Oct 2022 09:54:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uhLTcdB4WsCh/vP1czukbNh0ebYnCkF5kHJbcSwgwSY=;
+        b=nE1SI2L61bOeyDQVfsAVXR9tLiJCDb/MT3KNmCLWWQkxjFida4aJ6DukRVwdaYroZT
+         0gbAE+YsnR6IwIbVtnSmY/lHzTzrSax9urxIKmXww3pkUy8dTR5hokDuvbd6l+tRs1jT
+         +g+yJF4uf4R6eY18ovAWUsBn1y9hfs/ZMATeGtKyx49KvWtWLZqzw5qOoj4ZlDvsHsaF
+         LjAySYor7garmiQZCqwTsgSwo4b+LDN3CRp+QtvgNQVS5hqUATWjQK6kxyfwqDO4CdB/
+         6N/wYOtz74zl8MXdXzWnaD2dO1u5xqHoBkKYg5D8tOeGt/U64xmwokYx7EYVErHG92wK
+         Vz/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AC9RnLQ6FtnT0b/u+5GXr5MIOjs95fXXop2vwcrIHok=;
-        b=ov28gxQ1N66SK7hbj/StKGT9eOBsod+qCYSPc3fqT4YR85igHsPsXcbsmcpoHjiNhI
-         sJQAjzfYhPIMXYwmUgCFsOafMX4FyzHtSDuUMUBKEk8vCjWKF1AVgIpsQYnJ9JelVpqu
-         O3lQsm9HgLu88PHEG7nFAgtEFJlBDauYPO7/xbXPJghQ3EU+iMdv+wecz6I1b66RpLuy
-         vrzSGKXJm5pITdmEI43cYgxiT+x9sRZILG7bvFDD7drTvLbRwnulFTgwN32GB6hHjhPS
-         z6opSH1zLzQXe/zFJ0YeEuDDLYIthxjBDL2yxBTRRuVY3jRxbGQECTdHUBZwthXmkllR
-         Pa6g==
-X-Gm-Message-State: ACrzQf2Hi4vZEqSHHOJ8pZhzL4eWTdM7vePA9VMfU38a/uPxLevFkfnD
-        0txCGbtHUJZVfhlfL0pB6rz1Dj9xW/8=
-X-Google-Smtp-Source: AMsMyM4U1nAKEjdsXo1nP9XQ8xhb+/0plqg6wR1gh5Vn0pVRjIg4z99psXJpUoT7DrEOO35R+SMtJg==
-X-Received: by 2002:a17:90b:1c8c:b0:203:89fb:ba79 with SMTP id oo12-20020a17090b1c8c00b0020389fbba79mr73931pjb.92.1665507241952;
-        Tue, 11 Oct 2022 09:54:01 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:9f77:abf2:346f:9b6e? ([2620:15c:211:201:9f77:abf2:346f:9b6e])
-        by smtp.gmail.com with ESMTPSA id h25-20020aa796d9000000b0056126b79072sm9250448pfq.21.2022.10.11.09.54.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Oct 2022 09:54:01 -0700 (PDT)
-Message-ID: <9114b8a3-5539-b705-ea47-f692f51dc4bf@acm.org>
-Date:   Tue, 11 Oct 2022 09:53:58 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uhLTcdB4WsCh/vP1czukbNh0ebYnCkF5kHJbcSwgwSY=;
+        b=wozLb11zDu5FpcgSlV/skCf+Cz1f5E/eNCqz1IO1FEgLhvUeLjlKY0r5WSP2v+9XKj
+         R3QDIi8nfII4p6MM1JCQrfb1gdPQ0bSDYV4ExCz9f7D/STDA11ZZA9W6qz32VPEY1Hxf
+         RJKFDc9ZFf7ZRKGrdwfKVg2wEnq0nIwR4Ut6DkBaYio5WksPsWYILOLEanTfyaM+41u9
+         IvmNdvvU5ucrPTYklRhFqGWEmO9wr4ClGgmSku/OF7/JoVjF+hotcP1LOstGeR+ZzJdA
+         A3W8Iy9QeIZ7pbgrw5zmwudTPnOwDmtToHoIXx+PQW+WTs1UYZ74x401JPDaBOBoPs9Y
+         buAA==
+X-Gm-Message-State: ACrzQf0zFllrR2e0XTUjP0tcvyZH67sJmXlD6zpdgsi/TuEdyiOgY1GZ
+        sMv4Oj2b4/Z4F/+0u8KIlzrSScY1z0iQCA==
+X-Google-Smtp-Source: AMsMyM6WD85RJrsWfWyb+GrHuCVmpzmrwbTaogLDboReDgPG9AtJdj/NiwKS8A23mRVKfztmS82bOg==
+X-Received: by 2002:a17:902:e885:b0:183:dcb7:c4f8 with SMTP id w5-20020a170902e88500b00183dcb7c4f8mr3026070plg.160.1665507284779;
+        Tue, 11 Oct 2022 09:54:44 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id q14-20020a170902dace00b0017f7b6e970esm8941708plx.146.2022.10.11.09.54.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Oct 2022 09:54:44 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 11 Oct 2022 06:54:43 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next 1/5] blk-iocost: disable writeback throttling
+Message-ID: <Y0Wf01w6iNbvxgya@slm.duckdns.org>
+References: <20221011083547.1831389-1-yukuai1@huaweicloud.com>
+ <20221011083547.1831389-2-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: again? - Write I/O queue hangup at random on recent Linus'
- kernels
-Content-Language: en-US
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     linux-block@vger.kernel.org,
-        Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
-        Igor Raits <igor.raits@gooddata.com>,
-        Daniel Secik <daniel.secik@gooddata.com>,
-        David Krupicka <david.krupicka@gooddata.com>
-References: <CAK8fFZ5w8CC7ez50dEd9nGJpc_c-ubJLk3+77d7Y5qN1pMkfRQ@mail.gmail.com>
- <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org>
- <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
- <acac67a6-3331-75dd-840a-40b509ada0c1@acm.org>
- <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221011083547.1831389-2-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/11/22 08:15, Jaroslav Pulchart wrote:
-> čt 6. 10. 2022 v 18:57 odesílatel Bart Van Assche <bvanassche@acm.org> napsal:
->>
->> On 10/6/22 05:36, Jaroslav Pulchart wrote:
->>> I apply the
->>> echo 0 > /sys/block/vdc/queue/wbt_lat_usec
->>> at the production servers. I expect it will disable wbt. Could you
->>> please confirm that my expectation is correct?
->>
->> Hi Jaroslav,
->>
->> I have no experience with WBT. But what I found in the documentation seems
->> to confirm that the above command is sufficient to disable WBT:
->>
->>    What:         /sys/block/<disk>/queue/wbt_lat_usec
->> Date:           November 2016
->> Contact:        linux-block@vger.kernel.org
->> Description:
->>                  [RW] If the device is registered for writeback throttling, then
->>                  this file shows the target minimum read latency. If this latency
->>                  is exceeded in a given window of time (see wb_window_usec), then
->>                  the writeback throttling will start scaling back writes. Writing
->>                  a value of '0' to this file disables the feature. Writing a
->>                  value of '-1' to this file resets the value to the default
->>                  setting.
- >
- > we disabled the wbt, issue is happening much sooner. The logs are attached
- > 1/ "dmesg-20221011.log" form kernel messages
- > 2/ "command.logs" from execution of
- >      (cd /sys/kernel/debug/block/vdc && find . -type f -exec grep -aH . {} \;)
- >
- > Best regards,
- > Jaroslav Pulchart
+On Tue, Oct 11, 2022 at 04:35:43PM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Commit b5dc5d4d1f4f ("block,bfq: Disable writeback throttling") disable
+> wbt for bfq, because different write-throttling heuristics should not
+> work together.
+> 
+> For the same reason, wbt and iocost should not work together as well,
+> unless admin really want to do that, dispite that performance is
+> affected.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-(+Ted)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-Hi Jaroslav,
+Thanks.
 
-Please reply at the bottom of an email when posting on a Linux kernel mailing
-list (see also https://en.wikipedia.org/wiki/Posting_style#Bottom-posting).
-
-Hi Ted,
-
-In the dmesg fragment provided by Jaroslav I only see references to ext4. Are
-you perhaps aware of any recently introduced issues in the layers between ext4
-and the block layer? For the attachment provided by Jaroslav, see also
-https://lore.kernel.org/linux-block/CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com/T/#m97ece301ca9a47ee8a4976f6c35ffcf55669b248
-
-Thank you,
-
-Bart.
+-- 
+tejun
