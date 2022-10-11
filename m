@@ -2,113 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB765C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 17:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFF5C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 17:25:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbiJKRMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 13:12:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55892 "EHLO
+        id S230007AbiJKRZz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 13:25:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbiJKRMA (ORCPT
+        with ESMTP id S230054AbiJKRZy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 13:12:00 -0400
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978AFAA353
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 10:11:58 -0700 (PDT)
-Received: by mail-pl1-f174.google.com with SMTP id c20so4228708plc.5
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 10:11:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DGBOU35K+KpU1OIUsCpGC0zFYG1/rNmqHGx7R/WIKhk=;
-        b=yPpWmuYL4vHiYNORVR2KKXH1Br1WAMz54BOKcKmmxoxGGHWB52mX5B0oyv+5Lanv4/
-         EUAS76eZVgOFBH6Tto09yrudlEOLqtLXLLcez3HeBrQYH62o0GuegcsdMdWYdwB3i0Js
-         U2Va9p/Rgu2NHdC2y6bNhHl6L/F2/YsjFIbaeJ5FWsvqhHcYwRtH67veysg2guTUOqJ7
-         aiNeIloJU7rSgRuhYDmr19f+KGemF0tyRF8hd3D4N7igy58jIcYDiqGtXWemFyvZgHZF
-         qmy+Otc/YBaAdDETAUyReE3qVBWHrJX9JYQ7St45Ctp8kAZnvIQff7BcQUZdf5HFnO3C
-         tkuA==
-X-Gm-Message-State: ACrzQf3flML2C0IxULqU+BcgL/DjlwaXErUJ9RgfU39glj5r4+6xaXrg
-        2UtajHQuv2gQ+sIcYRZqP28=
-X-Google-Smtp-Source: AMsMyM4/i4Tq2e5dnGcCHubgr/jwsL0SEP1TPXXvOOMmOx8E+n4Q8HGaUcGsXsVndIXVwiifbhgAew==
-X-Received: by 2002:a17:90b:4a50:b0:203:1204:5bc4 with SMTP id lb16-20020a17090b4a5000b0020312045bc4mr118096pjb.79.1665508317940;
-        Tue, 11 Oct 2022 10:11:57 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:9f77:abf2:346f:9b6e? ([2620:15c:211:201:9f77:abf2:346f:9b6e])
-        by smtp.gmail.com with ESMTPSA id e17-20020a17090301d100b00172e19c2fa9sm9031399plh.9.2022.10.11.10.11.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Oct 2022 10:11:57 -0700 (PDT)
-Message-ID: <a9c60d24-7479-e32d-29a3-9f0dbcec767a@acm.org>
-Date:   Tue, 11 Oct 2022 10:11:54 -0700
+        Tue, 11 Oct 2022 13:25:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CE53205B
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 10:25:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665509152;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=5vHkI1D0I1xI6a4Gv+3LouMlybo3cvhcPYtH+nmf3p8=;
+        b=ahr5ORC7qfpt/yT0IIDpp4Qpv+hZnxKFb23mwxEVG93+HUHuXOAzCe+yQ06OCeoMWAremR
+        bGnigdWuSeMk6uvVOljTQdXC47M+6gwYJuMCjrme/T8UqqE8jMMsmIODePC89t2imiu228
+        YqRW6Egq3eiRi8zYSoehaEwLWsfMibc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-642-IZs9eNupMruY913wgHscjQ-1; Tue, 11 Oct 2022 13:25:46 -0400
+X-MC-Unique: IZs9eNupMruY913wgHscjQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1EE79185A7A8;
+        Tue, 11 Oct 2022 17:25:46 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 700A4477F5F;
+        Tue, 11 Oct 2022 17:25:44 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     bvanassche@acm.org, shinichiro.kawasaki@wdc.com
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH blktests] common/multipath-over-rdma: fix has_soft_rdma checking when mlx card as netdev
+Date:   Wed, 12 Oct 2022 01:24:54 +0800
+Message-Id: <20221011172454.310389-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: lockdep WARNING at blktests block/011
-Content-Language: en-US
-To:     Keith Busch <keith.busch@gmail.com>
-Cc:     Keith Busch <kbusch@kernel.org>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Tejun Heo <tj@kernel.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-References: <20220930001943.zdbvolc3gkekfmcv@shindev>
- <313d914e-6258-50db-4317-0ffb6f936553@I-love.SAKURA.ne.jp>
- <20221003133240.bq2vynauksivj55x@shindev>
- <Yzr/pBvvq0NCzGwV@kbusch-mbp.dhcp.thefacebook.com>
- <b6e9a4de-3200-f4c5-0665-8e919757035d@acm.org>
- <CAOSXXT7RVg8rNWP4cDwV6Ywtu1_DSZ=XhAyMkKrqS1uCi5UFKA@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <CAOSXXT7RVg8rNWP4cDwV6Ywtu1_DSZ=XhAyMkKrqS1uCi5UFKA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/10/22 06:31, Keith Busch wrote:
-> On Fri, Oct 7, 2022 at 10:34 PM Bart Van Assche <bvanassche@acm.org> wrote:
->>
->> On 10/3/22 08:28, Keith Busch wrote:
->>> On Mon, Oct 03, 2022 at 01:32:41PM +0000, Shinichiro Kawasaki wrote:
->>>>
->>>> BTW, I came up to another question during code read. I found nvme_reset_work()
->>>> calls nvme_dev_disable() before nvme_sync_queues(). So, I think the NVME
->>>> controller is already disabled when the reset work calls nvme_sync_queues().
->>>
->>> Right, everything previously outstanding has been reclaimed, and the queues are
->>> quiesced at this point. There's nothing for timeout work to wait for, and the
->>> sync is just ensuring every timeout work has returned.
->>>
->>> It looks like a timeout is required in order to hit this reported deadlock, but
->>> the driver ensures there's nothing to timeout prior to syncing the queues. I
->>> don't think lockdep could reasonably know that, though.
->>
->> Hi Keith,
->>
->> Commit b2a0eb1a0ac7 ("nvme-pci: Remove watchdog timer") introduced the
->> nvme_dev_disable() and nvme_reset_ctrl() calls in the nvme_timeout()
->> function. Has it been considered to invoke these two calls asynchronously
->> instead of synchronously from the NVMe timeout handler (queue_work())?
->> Although it may require some work to make sure that this approach does not
->> trigger any race conditions, do you agree that this should be sufficient to
->> make lockdep happy?
-> 
-> We still have to sync whatever work does the reset, so that would just
-> shift which work the lockdep splat indicates.
+The mlx dev will be ignored in has_soft_rdma when it was used as netdev,
+add more filter keywords.
 
-Hi Keith,
+link mlx5_0/1 state ACTIVE physical_state LINK_UP netdev enp33s0f0np0
+link mlx5_1/1 state DOWN physical_state DISABLED netdev enp33s0f1np1
 
-It seems like my email was not clear enough? What I meant is to queue
-asynchronous work from inside the timeout handler and to wait for the
-completion of that work from *outside* the timeout handler. This is not a
-new approach. As an example, the SCSI core queues abort work from inside the
-timeout handler and only allows new SCSI commands to be queued after error
-handling has finished. I'm not claiming that this approach should be followed
-by the NVMe driver - I'm only mentioning this as an example.
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+---
+ common/multipath-over-rdma | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index fb820d6..6b9629a 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -387,7 +387,7 @@ all_primary_gids() {
+ # Check whether or not an rdma_rxe or siw instance has been associated with
+ # network interface $1.
+ has_soft_rdma() {
+-	rdma link | grep -q " netdev $1[[:blank:]]*\$"
++	rdma link | grep -q "link $1.*netdev $1[[:blank:]]*\$"
+ }
+ 
+ # Load the rdma_rxe or siw kernel module and associate it with all network
+-- 
+2.34.1
 
-Bart.
