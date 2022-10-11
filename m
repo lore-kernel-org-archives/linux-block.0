@@ -2,94 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43944C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 16:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F85CC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 16:54:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbiJKQ0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 12:26:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47244 "EHLO
+        id S229621AbiJKQyH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 12:54:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbiJKQ0J (ORCPT
+        with ESMTP id S229819AbiJKQyE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 12:26:09 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E159B864
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 09:26:07 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id 137so7025589iou.9
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 09:26:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BcuXX3q54AIQQlX1+hQrsBzqHD7HfWkF6TuzwcEC6yc=;
-        b=yKWNjStLhM+J8LWSuTFi0G+YgK5GH1jgvNcS5zMhandAOdcWvvP7UfBaO6WVPFtHzK
-         /ypSm6T44wYn0/uteX6Bwg8JVH3etMj2AzSO5l2CmV3Tu28ytMKNfHTwPbqh5iVlEyef
-         cI0S9DF8xyc8a/SPiQCF8TrynoEfzZZRx3eYvPoF1CPe9jhL0RYizx75w6IXPe8itZOM
-         TQiQB8naYiQS6CAPLnLoHLgrtIeRQ91pq8v5xB3XGeNYITARVXGr6UlQhYDibO7Qk9Yt
-         x3KuYQ7efRv5MR/wX5KTk+EUflkQfB8ZmqK1SaXPP7v7pPbatMyplkhLBDOIGaje1+AL
-         N2oA==
+        Tue, 11 Oct 2022 12:54:04 -0400
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A745AA59AF
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 09:54:02 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id x31-20020a17090a38a200b0020d2afec803so6717818pjb.2
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 09:54:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BcuXX3q54AIQQlX1+hQrsBzqHD7HfWkF6TuzwcEC6yc=;
-        b=LLpbY5ZQG9lIoZ3grMeq7n7BY5jBUiP5G1WHDw7Bel66/N2ggtvp9SqNVg9gvSEibX
-         xEC1Tv7fLWYAlZWsrTNcafkM+4+Aaxm8kHIvR0M6PEHzA07AP0q96UtTX23pzOX7cfmn
-         9cl1+Kn+JRztI4J1Z2mhZSO+oZ1AUk9kr4cge/qgMngdgmKTHqtFKK+niTfoJb0Z611n
-         tlBXuiZnQVOeAb0o3Wc0XQU9S8LcsWRHCdscgqvme/LNHCleqRo7SB/bcmvu4xYqoB2W
-         zLvI9Tiw+JHDdbMYRcNUWcJodsi6uiX01E4aduU1HTn2R3xCrnQ5oM3AkpI4ga86fCWO
-         Q+JQ==
-X-Gm-Message-State: ACrzQf2Nzl8ocLYAuFtpQBXlOYxtwAtZFATzUrVfiFyi6X4w2CKhMA0N
-        Jwy7BtIgyRcIImXINgRgx4wSwQ==
-X-Google-Smtp-Source: AMsMyM7sNHjwSDvWOU6zdxTPQoesPx6zJH1N9XQoI1cI1aUpuo7/2H2TzJx3FWWqSIx+kLUnqpAOSA==
-X-Received: by 2002:a05:6638:3044:b0:35b:ac10:53be with SMTP id u4-20020a056638304400b0035bac1053bemr12879227jak.17.1665505566388;
-        Tue, 11 Oct 2022 09:26:06 -0700 (PDT)
-Received: from [192.168.1.94] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id c3-20020a0290c3000000b00363b8ef4bc5sm2375329jag.71.2022.10.11.09.26.05
+        bh=AC9RnLQ6FtnT0b/u+5GXr5MIOjs95fXXop2vwcrIHok=;
+        b=ov28gxQ1N66SK7hbj/StKGT9eOBsod+qCYSPc3fqT4YR85igHsPsXcbsmcpoHjiNhI
+         sJQAjzfYhPIMXYwmUgCFsOafMX4FyzHtSDuUMUBKEk8vCjWKF1AVgIpsQYnJ9JelVpqu
+         O3lQsm9HgLu88PHEG7nFAgtEFJlBDauYPO7/xbXPJghQ3EU+iMdv+wecz6I1b66RpLuy
+         vrzSGKXJm5pITdmEI43cYgxiT+x9sRZILG7bvFDD7drTvLbRwnulFTgwN32GB6hHjhPS
+         z6opSH1zLzQXe/zFJ0YeEuDDLYIthxjBDL2yxBTRRuVY3jRxbGQECTdHUBZwthXmkllR
+         Pa6g==
+X-Gm-Message-State: ACrzQf2Hi4vZEqSHHOJ8pZhzL4eWTdM7vePA9VMfU38a/uPxLevFkfnD
+        0txCGbtHUJZVfhlfL0pB6rz1Dj9xW/8=
+X-Google-Smtp-Source: AMsMyM4U1nAKEjdsXo1nP9XQ8xhb+/0plqg6wR1gh5Vn0pVRjIg4z99psXJpUoT7DrEOO35R+SMtJg==
+X-Received: by 2002:a17:90b:1c8c:b0:203:89fb:ba79 with SMTP id oo12-20020a17090b1c8c00b0020389fbba79mr73931pjb.92.1665507241952;
+        Tue, 11 Oct 2022 09:54:01 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:9f77:abf2:346f:9b6e? ([2620:15c:211:201:9f77:abf2:346f:9b6e])
+        by smtp.gmail.com with ESMTPSA id h25-20020aa796d9000000b0056126b79072sm9250448pfq.21.2022.10.11.09.54.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Oct 2022 09:26:05 -0700 (PDT)
-Message-ID: <eb59cf48-03c8-7ce9-7e00-4b824cef150d@kernel.dk>
-Date:   Tue, 11 Oct 2022 10:26:04 -0600
+        Tue, 11 Oct 2022 09:54:01 -0700 (PDT)
+Message-ID: <9114b8a3-5539-b705-ea47-f692f51dc4bf@acm.org>
+Date:   Tue, 11 Oct 2022 09:53:58 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH] block, bfq: remove unused variable for bfq_queue
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: again? - Write I/O queue hangup at random on recent Linus'
+ kernels
 Content-Language: en-US
-To:     Yuwei Guan <Yuwei.Guan@zeekrlife.com>, paolo.valente@linaro.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221010132907.1252-1-Yuwei.Guan@zeekrlife.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20221010132907.1252-1-Yuwei.Guan@zeekrlife.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     linux-block@vger.kernel.org,
+        Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
+        Igor Raits <igor.raits@gooddata.com>,
+        Daniel Secik <daniel.secik@gooddata.com>,
+        David Krupicka <david.krupicka@gooddata.com>
+References: <CAK8fFZ5w8CC7ez50dEd9nGJpc_c-ubJLk3+77d7Y5qN1pMkfRQ@mail.gmail.com>
+ <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org>
+ <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
+ <acac67a6-3331-75dd-840a-40b509ada0c1@acm.org>
+ <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/10/22 7:29 AM, Yuwei Guan wrote:
-> it defined in d0edc24, but there's nowhere to use it,
-> so remove it.
+On 10/11/22 08:15, Jaroslav Pulchart wrote:
+> čt 6. 10. 2022 v 18:57 odesílatel Bart Van Assche <bvanassche@acm.org> napsal:
+>>
+>> On 10/6/22 05:36, Jaroslav Pulchart wrote:
+>>> I apply the
+>>> echo 0 > /sys/block/vdc/queue/wbt_lat_usec
+>>> at the production servers. I expect it will disable wbt. Could you
+>>> please confirm that my expectation is correct?
+>>
+>> Hi Jaroslav,
+>>
+>> I have no experience with WBT. But what I found in the documentation seems
+>> to confirm that the above command is sufficient to disable WBT:
+>>
+>>    What:         /sys/block/<disk>/queue/wbt_lat_usec
+>> Date:           November 2016
+>> Contact:        linux-block@vger.kernel.org
+>> Description:
+>>                  [RW] If the device is registered for writeback throttling, then
+>>                  this file shows the target minimum read latency. If this latency
+>>                  is exceeded in a given window of time (see wb_window_usec), then
+>>                  the writeback throttling will start scaling back writes. Writing
+>>                  a value of '0' to this file disables the feature. Writing a
+>>                  value of '-1' to this file resets the value to the default
+>>                  setting.
+ >
+ > we disabled the wbt, issue is happening much sooner. The logs are attached
+ > 1/ "dmesg-20221011.log" form kernel messages
+ > 2/ "command.logs" from execution of
+ >      (cd /sys/kernel/debug/block/vdc && find . -type f -exec grep -aH . {} \;)
+ >
+ > Best regards,
+ > Jaroslav Pulchart
 
-A few things wrong with this patch:
+(+Ted)
 
-1) It's whitespace damaged, and hence will not apply directly.
-2) It should have a fixes tag, and the sha used should be 12
-    chars. 8 is too short.
+Hi Jaroslav,
 
-Can you resend it?
+Please reply at the bottom of an email when posting on a Linux kernel mailing
+list (see also https://en.wikipedia.org/wiki/Posting_style#Bottom-posting).
 
-> Disclaimer?The information transmitted is intended only for the person
-> or entity to which it is addressed and may contain confidential and/or
-> privileged material. Any review, retransmission, dissemination or
-> other use of, or taking of any action in reliance upon, this
-> information by persons or entities other than the intended recipient
-> is prohibited. If you received this in error , please contact the
-> sender and delete the material from any computer .
+Hi Ted,
 
-And please get rid of this, it's just spam and doesn't apply on a public
-mailing list.
+In the dmesg fragment provided by Jaroslav I only see references to ext4. Are
+you perhaps aware of any recently introduced issues in the layers between ext4
+and the block layer? For the attachment provided by Jaroslav, see also
+https://lore.kernel.org/linux-block/CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com/T/#m97ece301ca9a47ee8a4976f6c35ffcf55669b248
 
--- 
-Jens Axboe
+Thank you,
+
+Bart.
