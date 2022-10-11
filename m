@@ -2,177 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D320DC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 01:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CABC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 01:19:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229663AbiJKBSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 21:18:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39412 "EHLO
+        id S229738AbiJKBTB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 21:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiJKBSa (ORCPT
+        with ESMTP id S229486AbiJKBS7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 21:18:30 -0400
-Received: from SHSQR01.spreadtrum.com (unknown [222.66.158.135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A10C17695E;
-        Mon, 10 Oct 2022 18:18:28 -0700 (PDT)
-Received: from SHSend.spreadtrum.com (bjmbx01.spreadtrum.com [10.0.64.7])
-        by SHSQR01.spreadtrum.com with ESMTPS id 29B1GTj5030348
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NO);
-        Tue, 11 Oct 2022 09:16:29 +0800 (CST)
-        (envelope-from zhaoyang.huang@unisoc.com)
-Received: from bj03382pcu.spreadtrum.com (10.0.74.65) by
- BJMBX01.spreadtrum.com (10.0.64.7) with Microsoft SMTP Server (TLS) id
- 15.0.1497.23; Tue, 11 Oct 2022 09:16:28 +0800
-From:   "zhaoyang.huang" <zhaoyang.huang@unisoc.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Zhaoyang Huang <huangzhaoyang@gmail.com>, <linux-mm@kvack.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ke.wang@unisoc.com>, <steve.kang@unisoc.com>
-Subject: [Resend PATCH] mm: use stack_depot for recording kmemleak's backtrace
-Date:   Tue, 11 Oct 2022 09:16:04 +0800
-Message-ID: <1665450964-27487-1-git-send-email-zhaoyang.huang@unisoc.com>
-X-Mailer: git-send-email 1.9.1
+        Mon, 10 Oct 2022 21:18:59 -0400
+Received: from 66-220-144-178.mail-mxout.facebook.com (66-220-144-178.mail-mxout.facebook.com [66.220.144.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D037695E
+        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 18:18:59 -0700 (PDT)
+Received: by dev1180.prn1.facebook.com (Postfix, from userid 425415)
+        id 0949134BDDD8; Mon, 10 Oct 2022 18:01:06 -0700 (PDT)
+From:   Stefan Roesch <shr@devkernel.io>
+To:     kernel-team@fb.com, linux-block@vger.kernel.org, linux-mm@kvack.org
+Cc:     shr@devkernel.io, axboe@kernel.dk, clm@meta.com
+Subject: [RFC PATCH v1 05/14] mm: add bdi_get_max_bytes() function
+Date:   Mon, 10 Oct 2022 18:00:35 -0700
+Message-Id: <20221011010044.851537-6-shr@devkernel.io>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20221011010044.851537-1-shr@devkernel.io>
+References: <20221011010044.851537-1-shr@devkernel.io>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.0.74.65]
-X-ClientProxiedBy: SHCAS03.spreadtrum.com (10.0.1.207) To
- BJMBX01.spreadtrum.com (10.0.64.7)
-X-MAIL: SHSQR01.spreadtrum.com 29B1GTj5030348
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+This adds a function to return the specified value for max_bytes. It
+converts the stored max_ratio of the bdi to the corresponding bytes
+value. It introduces the bdi_get_bytes helper function to do the
+conversion. This is an approximation as it is based on the value that is
+returned by global_dirty_limits(), which can change. The helper function
+will also be used by the min_bytes bdi knob.
 
-Using stack_depot to record kmemleak's backtrace which has been implemented
-on slub for reducing redundant information.
-
-Signed-off-by: Zhaoyang Huang <zhaoyang.huang@unisoc.com>
+Signed-off-by: Stefan Roesch <shr@devkernel.io>
 ---
- mm/kmemleak.c | 43 +++++++++++++++++++++++++++++++++----------
- 1 file changed, 33 insertions(+), 10 deletions(-)
+ include/linux/backing-dev.h |  1 +
+ mm/page-writeback.c         | 18 ++++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/mm/kmemleak.c b/mm/kmemleak.c
-index 1eddc01..c9cee3a 100644
---- a/mm/kmemleak.c
-+++ b/mm/kmemleak.c
-@@ -79,6 +79,7 @@
- #include <linux/mutex.h>
- #include <linux/rcupdate.h>
- #include <linux/stacktrace.h>
-+#include <linux/stackdepot.h>
- #include <linux/cache.h>
- #include <linux/percpu.h>
- #include <linux/memblock.h>
-@@ -159,8 +160,7 @@ struct kmemleak_object {
- 	u32 checksum;
- 	/* memory ranges to be scanned inside an object (empty for all) */
- 	struct hlist_head area_list;
--	unsigned long trace[MAX_TRACE];
--	unsigned int trace_len;
-+	depot_stack_handle_t trace_handle;
- 	unsigned long jiffies;		/* creation timestamp */
- 	pid_t pid;			/* pid of the current task */
- 	char comm[TASK_COMM_LEN];	/* executable name */
-@@ -346,8 +346,11 @@ static void print_unreferenced(struct seq_file *seq,
- 			       struct kmemleak_object *object)
- {
- 	int i;
-+	unsigned long *entries;
-+	unsigned int nr_entries;
- 	unsigned int msecs_age = jiffies_to_msecs(jiffies - object->jiffies);
- 
-+	nr_entries = stack_depot_fetch(object->trace_handle, &entries);
- 	warn_or_seq_printf(seq, "unreferenced object 0x%08lx (size %zu):\n",
- 		   object->pointer, object->size);
- 	warn_or_seq_printf(seq, "  comm \"%s\", pid %d, jiffies %lu (age %d.%03ds)\n",
-@@ -356,10 +359,10 @@ static void print_unreferenced(struct seq_file *seq,
- 	hex_dump_object(seq, object);
- 	warn_or_seq_printf(seq, "  backtrace:\n");
- 
--	for (i = 0; i < object->trace_len; i++) {
--		void *ptr = (void *)object->trace[i];
--		warn_or_seq_printf(seq, "    [<%p>] %pS\n", ptr, ptr);
--	}
-+       for (i = 0; i < nr_entries; i++) {
-+               void *ptr = (void *)entries[i];
-+               warn_or_seq_printf(seq, "    [<%p>] %pS\n", ptr, ptr);
-+       }
- }
- 
- /*
-@@ -378,7 +381,8 @@ static void dump_object_info(struct kmemleak_object *object)
- 	pr_notice("  flags = 0x%x\n", object->flags);
- 	pr_notice("  checksum = %u\n", object->checksum);
- 	pr_notice("  backtrace:\n");
--	stack_trace_print(object->trace, object->trace_len, 4);
-+	if(object->trace_handle)
-+		stack_depot_print(object->trace_handle);
- }
- 
- /*
-@@ -591,6 +595,25 @@ static struct kmemleak_object *find_and_remove_object(unsigned long ptr, int ali
- 	return object;
- }
- 
-+#ifdef CONFIG_STACKDEPOT
-+static noinline depot_stack_handle_t set_track_prepare(void)
-+{
-+	depot_stack_handle_t trace_handle;
-+	unsigned long entries[MAX_TRACE];
-+	unsigned int nr_entries;
-+
-+	nr_entries = stack_trace_save(entries, ARRAY_SIZE(entries), 3);
-+	trace_handle = stack_depot_save(entries, nr_entries, GFP_NOWAIT);
-+
-+	return trace_handle;
-+}
-+#else
-+static inline depot_stack_handle_t set_track_prepare(void)
-+{
-+	return 0;
-+}
-+#endif
-+
- /*
-  * Save stack trace to the given array of MAX_TRACE size.
+diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+index f698befa76a0..94fedf66c915 100644
+--- a/include/linux/backing-dev.h
++++ b/include/linux/backing-dev.h
+@@ -105,6 +105,7 @@ static inline unsigned long wb_stat_error(void)
+ /* BDI ratio is expressed as part per 10000 for finer granularity. */
+ #define BDI_RATIO_SCALE 100
+=20
++unsigned long long bdi_get_max_bytes(struct backing_dev_info *bdi);
+ int bdi_set_min_ratio(struct backing_dev_info *bdi, unsigned int min_rat=
+io);
+ int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_rat=
+io);
+ int bdi_set_strict_limit(struct backing_dev_info *bdi, unsigned int stri=
+ct_limit);
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 4d5383d4da45..0b9dcf5afda2 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -650,6 +650,18 @@ void wb_domain_exit(struct wb_domain *dom)
   */
-@@ -654,7 +677,7 @@ static struct kmemleak_object *__create_object(unsigned long ptr, size_t size,
- 	}
- 
- 	/* kernel backtrace */
--	object->trace_len = __save_stack_trace(object->trace);
-+	object->trace_handle = set_track_prepare();
- 
- 	raw_spin_lock_irqsave(&kmemleak_lock, flags);
- 
-@@ -694,7 +717,6 @@ static struct kmemleak_object *__create_object(unsigned long ptr, size_t size,
- 	rb_link_node(&object->rb_node, rb_parent, link);
- 	rb_insert_color(&object->rb_node, is_phys ? &object_phys_tree_root :
- 					  &object_tree_root);
--
- 	list_add_tail_rcu(&object->object_list, &object_list);
- out:
- 	raw_spin_unlock_irqrestore(&kmemleak_lock, flags);
-@@ -1094,7 +1116,7 @@ void __ref kmemleak_update_trace(const void *ptr)
- 	}
- 
- 	raw_spin_lock_irqsave(&object->lock, flags);
--	object->trace_len = __save_stack_trace(object->trace);
-+	object->trace_handle = set_track_prepare();
- 	raw_spin_unlock_irqrestore(&object->lock, flags);
- 
- 	put_object(object);
-@@ -2064,6 +2086,7 @@ void __init kmemleak_init(void)
- 	if (kmemleak_error)
- 		return;
- 
-+	stack_depot_init();
- 	jiffies_min_age = msecs_to_jiffies(MSECS_MIN_AGE);
- 	jiffies_scan_wait = msecs_to_jiffies(SECS_SCAN_WAIT * 1000);
- 
--- 
-1.9.1
+ static unsigned int bdi_min_ratio;
+=20
++static unsigned long long bdi_get_bytes(unsigned int ratio)
++{
++	unsigned long background_thresh;
++	unsigned long dirty_thresh;
++	unsigned long long bytes;
++
++	global_dirty_limits(&background_thresh, &dirty_thresh);
++	bytes =3D (dirty_thresh * PAGE_SIZE * ratio) / BDI_RATIO_SCALE / 100;
++
++	return bytes;
++}
++
+ int bdi_set_min_ratio(struct backing_dev_info *bdi, unsigned int min_rat=
+io)
+ {
+ 	unsigned int delta;
+@@ -701,6 +713,12 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, =
+unsigned max_ratio)
+ }
+ EXPORT_SYMBOL(bdi_set_max_ratio);
+=20
++unsigned long long bdi_get_max_bytes(struct backing_dev_info *bdi)
++{
++	return bdi_get_bytes(bdi->max_ratio);
++}
++EXPORT_SYMBOL_GPL(bdi_get_max_bytes);
++
+ int bdi_set_strict_limit(struct backing_dev_info *bdi, unsigned int stri=
+ct_limit)
+ {
+ 	if (strict_limit > 1)
+--=20
+2.30.2
 
