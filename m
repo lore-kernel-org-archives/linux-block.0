@@ -2,73 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E7CC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 08:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FA7C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 08:32:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229839AbiJKIWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 04:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58218 "EHLO
+        id S229514AbiJKIcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 04:32:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbiJKIWC (ORCPT
+        with ESMTP id S229723AbiJKIcR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 04:22:02 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DECAB81681
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 01:22:00 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id k2so29756073ejr.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 01:22:00 -0700 (PDT)
+        Tue, 11 Oct 2022 04:32:17 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73A3D857DD
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 01:32:14 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id v12so783309edc.6
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 01:32:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=unimore.it; s=google;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bj0xYgysArWLPqW0WEMYDYsbaIBaqVxoq6u3lZ4Lwck=;
-        b=X64aMQ30USDaS6YeCWAbTV5gDuf6RDdUddRq9OV4gOQ1EG/6NpE3h5wSmvlCUH5Mv4
-         ZV3jRdJDykwJWTTxetGmadEy2rwG1rUnHHlcN5fGVo1MCHd1LZdHtPp1z3wuVHRhvckP
-         K8XCYGzeo5JT6fuzzLvfnsSan797kDJKjFuCzKV65ugJrV/ETWIf4KgNHnLBJ9nK8gWx
-         h8blJjdaR086z5bup0+RcvzP+bEZzh7WCMvTiOrNr+7klIA3YMH5tJ9Sc4qxt2szn+/U
-         k9zGFg5X3XPjTYfWbq8ZNRNpaFeEzVa1TesXi32mOEffldg0+UBmuZQlWh/6FRIIxmSF
-         T05w==
+        bh=1yDrTjRtrwKB9Ai/CodWTnJbodB9awBLkx/zBQbUM9g=;
+        b=E5J+TuJMpIllmYFmN0HquX/0NhS4RHYTFtM1zhiY0fMKk3O8OStqqviUKm+nkRZEUD
+         2/TYsF9gTG/R0yk+3pVwD0pMt974rvTpE9A6IMSoFcBw6OET7YUn6seQNxpadA2Fqlpv
+         TXAgFXaFyDj35nhzWhFDFUPL8OUTRus35pBB4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Bj0xYgysArWLPqW0WEMYDYsbaIBaqVxoq6u3lZ4Lwck=;
-        b=Q7dqDdH/gC5W7C652xYS+0vP7jPvc8LY0fN4Cjv1l64jqGQveYZQoHeTk19rolXWpL
-         dbIk/ARpMGrVwa2d4M/870tjGAVpSnYHI77QyebLZXaNt0LTh4Ga4uV89L06BSezqNgt
-         Ig3+AAyKFCfxtYWLquGShjrieTIxAD+916bDF42dB2Rh3bq4ZjA4g3NmvGJVcuYy204M
-         +vGz505x6EnEK96gEWGnXXx+dmrAplAqzRCCL/WO/ZzmexEvkG3k9OXldYxRsnm9Tzhc
-         ujUOdwD3QkiIMjgJCzVnxh0gfrB6RMaIg+wKovfGb/DgTlVSzGu5gAfw7v/I636IBPya
-         SQSg==
-X-Gm-Message-State: ACrzQf0/4kRtDzwNQLdu9S6WwZu0B8EM7K2h21iqp5b5apWS/LFpqjD6
-        0H0UR1wyXVHDu+aCH8pNtohPIw==
-X-Google-Smtp-Source: AMsMyM45ZSCEWNN8ny2kkTH3yjjXL+KUR6wUMfoKk6Nk1wBNRbRCU6MDldGBGZ9ySyWV49nmXNQIIw==
-X-Received: by 2002:a17:907:1c98:b0:78d:3b06:dc8f with SMTP id nb24-20020a1709071c9800b0078d3b06dc8fmr17765116ejc.58.1665476519260;
-        Tue, 11 Oct 2022 01:21:59 -0700 (PDT)
+        bh=1yDrTjRtrwKB9Ai/CodWTnJbodB9awBLkx/zBQbUM9g=;
+        b=G9wYnBBx/l+WQcsi2e9HY6jZvyM/moPdChxtR3l3ilXynQ6exVM9png3HGXKv89d7t
+         nhjVog5QaAu5cHPkDPj4gDqg1BaRK/z2EMUqV46ldBjeky1MMOeQX8Tn1T3og+cbM7cV
+         7diSc/OQhVk2NGYdvSX70zqAZsGa24LBU3M0+ag2ZI2y+4Jf8f+9TEh2hub5dpHp+zjU
+         pTgxGoQ/c3tgMsDpgGvv8xWo0DSYof72Ox92QU+wmO+bUafd/TWa2QvOgq2gXNewLzZi
+         J8/rDUQSYF+jXpfq/YvKDn+Jh6wjbdN09gx+nQV0ZNhdm3HyVSyvCZJmMAOqRUMLu7wX
+         y1ig==
+X-Gm-Message-State: ACrzQf19hh+yxjJ/FjCaMjJVH6kFRtuIzhNFwKjOd1Wj4z4xmgudIUPA
+        m3YC6C3jRB3X7zM0iHhV/kWn
+X-Google-Smtp-Source: AMsMyM5wB5PQ7SFZPpdBM1KRlHXkZcFCjoyibrYqyURQdo3k0qB/tmjXuNNfyZmrrSBtCZPDWsthfQ==
+X-Received: by 2002:a05:6402:e01:b0:442:dd7e:f49d with SMTP id h1-20020a0564020e0100b00442dd7ef49dmr13183722edh.355.1665477132911;
+        Tue, 11 Oct 2022 01:32:12 -0700 (PDT)
 Received: from mbp-di-paolo.station (net-2-37-207-44.cust.vodafonedsl.it. [2.37.207.44])
-        by smtp.gmail.com with ESMTPSA id kt25-20020a1709079d1900b0078d886c871bsm5636990ejc.70.2022.10.11.01.21.58
+        by smtp.gmail.com with ESMTPSA id c1-20020a17090618a100b00782ee6b34f2sm6552777ejf.183.2022.10.11.01.32.11
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Oct 2022 01:21:58 -0700 (PDT)
+        Tue, 11 Oct 2022 01:32:12 -0700 (PDT)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [patch v11 0/6] support concurrent sync io for bfq on a specail
- occasion
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <011d479f-644f-0013-40bf-664b62f93bec@huaweicloud.com>
-Date:   Tue, 11 Oct 2022 10:21:56 +0200
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH] block, bfq: remove unused variable for bfq_queue
+From:   Paolo VALENTE <paolo.valente@unimore.it>
+In-Reply-To: <20221010132907.1252-1-Yuwei.Guan@zeekrlife.com>
+Date:   Tue, 11 Oct 2022 10:32:11 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <A9D22DB6-6481-46BA-9D4C-5A828D19CB61@linaro.org>
-References: <20220916071942.214222-1-yukuai1@huaweicloud.com>
- <29348B39-94AE-4D76-BD2E-B759056264B6@linaro.org>
- <011d479f-644f-0013-40bf-664b62f93bec@huaweicloud.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
+Message-Id: <7FA0FAA3-2F41-4337-B6B3-C70A5AE472DB@unimore.it>
+References: <20221010132907.1252-1-Yuwei.Guan@zeekrlife.com>
+To:     Yuwei Guan <Yuwei.Guan@zeekrlife.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -76,209 +67,59 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 11 ott 2022, alle ore 10:11, Yu Kuai =
-<yukuai1@huaweicloud.com> ha scritto:
+> Il giorno 10 ott 2022, alle ore 15:29, Yuwei Guan =
+<Yuwei.Guan@zeekrlife.com> ha scritto:
 >=20
-> Hi, paolo
+> it defined in d0edc24, but there's nowhere to use it,
+> so remove it.
 >=20
-> =E5=9C=A8 2022/09/28 0:38, Paolo Valente =E5=86=99=E9=81=93:
->>> Il giorno 16 set 2022, alle ore 09:19, Yu Kuai =
-<yukuai1@huaweicloud.com> ha scritto:
->>>=20
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>=20
->>> Changes in v11:
->>> - keep the comments in bfq_weights_tree_remove() and move it to the
->>> caller where bfqq can be freed.
->>> - add two followed up cleanup patches.
->>>=20
->>> Changes in v10:
->>> - Add reviewed-tag for patch 2
->>>=20
->>> Changes in v9:
->>> - also update how many bfqqs have pending_reqs bfq_bfqq_move().
->>> - fix one language in patch 4
->>> - Add reviewed-tag for patch 1,3,4
->>>=20
->>> Changes in v8:
->>> - Instead of using whether bfqq is busy, using whether bfqq has =
-pending
->>> requests. As Paolo pointed out the former way is problematic.
->>>=20
->>> Changes in v7:
->>> - fix mismatch bfq_inc/del_busy_queues() and =
-bfqq_add/del_bfqq_busy(),
->>> also retest this patchset on v5.18 to make sure functionality is
->>> correct.
->>> - move the updating of 'bfqd->busy_queues' into new apis
->>>=20
->>> Changes in v6:
->>> - add reviewed-by tag for patch 1
->>>=20
->>> Changes in v5:
->>> - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
->>> - fix wrong definition in patch 1
->>> - fix spelling mistake in patch 2: leaset -> least
->>> - update comments in patch 3
->>> - add reviewed-by tag in patch 2,3
->>>=20
->>> Changes in v4:
->>> - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
->>>   suggested by Jan Kara.
->>> - remove unused 'in_groups_with_pending_reqs',
->>>=20
->>> Changes in v3:
->>> - remove the cleanup patch that is irrelevant now(I'll post it
->>>   separately).
->>> - instead of hacking wr queues and using weights tree =
-insertion/removal,
->>>   using bfq_add/del_bfqq_busy() to count the number of groups
->>>   (suggested by Jan Kara).
->>>=20
->>> Changes in v2:
->>> - Use a different approch to count root group, which is much simple.
->>>=20
->>> Currently, bfq can't handle sync io concurrently as long as they
->>> are not issued from root group. This is because
->>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>> bfq_asymmetric_scenario().
->>>=20
->>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>=20
->>> Before this patchset:
->>> 1) root group will never be counted.
->>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>> 3) Don't count if bfqg and it's child bfqgs complete all the =
-requests.
->>>=20
->>> After this patchset:
->>> 1) root group is counted.
->>> 2) Count if bfqg has pending requests.
->>> 3) Don't count if bfqg complete all the requests.
->>>=20
->>> With the above changes, concurrent sync io can be supported if only
->>> one group is activated.
->>>=20
->>> fio test script(startdelay is used to avoid queue merging):
->>> [global]
->>> filename=3D/dev/sda
->>> allow_mounted_write=3D0
->>> ioengine=3Dpsync
->>> direct=3D1
->>> ioscheduler=3Dbfq
->>> offset_increment=3D10g
->>> group_reporting
->>> rw=3Drandwrite
->>> bs=3D4k
->>>=20
->>> [test1]
->>> numjobs=3D1
->>>=20
->>> [test2]
->>> startdelay=3D1
->>> numjobs=3D1
->>>=20
->>> [test3]
->>> startdelay=3D2
->>> numjobs=3D1
->>>=20
->>> [test4]
->>> startdelay=3D3
->>> numjobs=3D1
->>>=20
->>> [test5]
->>> startdelay=3D4
->>> numjobs=3D1
->>>=20
->>> [test6]
->>> startdelay=3D5
->>> numjobs=3D1
->>>=20
->>> [test7]
->>> startdelay=3D6
->>> numjobs=3D1
->>>=20
->>> [test8]
->>> startdelay=3D7
->>> numjobs=3D1
->>>=20
->>> test result:
->>> running fio on root cgroup
->>> v5.18:	   112 Mib/s
->>> v5.18-patched: 112 Mib/s
->>>=20
->>> running fio on non-root cgroup
->>> v5.18:	   51.2 Mib/s
->>> v5.18-patched: 112 Mib/s
->>>=20
->>> Note that I also test null_blk with "irqmode=3D2
->>> completion_nsec=3D100000000(100ms) hw_queue_depth=3D1", and tests =
-show
->>> that service guarantees are still preserved.
->>>=20
->> Your patches seem ok to me now (thanks for you contribution and, =
-above all, for your patience). I have only a high-level concern: what do =
-you mean when you say that service guarantees are still preserved? What =
-test did you run exactly? This point is very important to me. I'd like =
-to see some convincing test with differentiated weights. In case you =
-don't have other tools for executing such tests quickly, you may want to =
-use the bandwidth-latency test in my simple S benchmark suite (for which =
-I'm willing to help).
->=20
-> Is there any test that you wish me to try?
->=20
-> By the way, I think for the case that multiple groups are activaced, (
-> specifically num_groups_with_pendind_rqs > 1), io path in bfq is the
-> same with or without this patchset.
->=20
+> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
 
-The tests cases you mentioned are ok for me (whatever tool or personal
-code you use to run them).  Just show me your results with and without
-your patchset applied.
+Thank you very much for spotting this!
 
-Thanks,
-Paolo
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
 
-> Thanks,
-> Kuai
->> Thanks,
->> Paolo
->>> Previous versions:
->>> RFC: =
-https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
->>> v1: =
-https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
->>> v2: =
-https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
->>> v3: =
-https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
->>> v4: =
-https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
->>> v5: =
-https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
->>> v6: =
-https://lore.kernel.org/all/20220523131818.2798712-1-yukuai3@huawei.com/
->>> v7: =
-https://lore.kernel.org/all/20220528095020.186970-1-yukuai3@huawei.com/
->>>=20
->>>=20
->>> Yu Kuai (6):
->>>  block, bfq: support to track if bfqq has pending requests
->>>  block, bfq: record how many queues have pending requests
->>>  block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
->>>  block, bfq: do not idle if only one group is activated
->>>  block, bfq: cleanup bfq_weights_tree add/remove apis
->>>  block, bfq: cleanup __bfq_weights_tree_remove()
->>>=20
->>> block/bfq-cgroup.c  | 10 +++++++
->>> block/bfq-iosched.c | 71 =
-+++++++--------------------------------------
->>> block/bfq-iosched.h | 30 +++++++++----------
->>> block/bfq-wf2q.c    | 69 ++++++++++++++++++++++++++-----------------
->>> 4 files changed, 76 insertions(+), 104 deletions(-)
->>>=20
->>> --=20
->>> 2.31.1
->>>=20
->> .
+> ---
+> block/bfq-iosched.h | 3 ---
+> 1 file changed, 3 deletions(-)
+>=20
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 64ee618064ba..0a7b3506697c 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -372,9 +372,6 @@ struct bfq_queue {
+>=20
+>        unsigned long creation_time; /* when this queue is created */
+>=20
+> -       /* max service rate measured so far */
+> -       u32 max_service_rate;
+> -
+>        /*
+>         * Pointer to the waker queue for this queue, i.e., to the
+>         * queue Q such that this queue happens to get new I/O right
+> --
+> 2.34.1
+>=20
+> =
+=E5=85=8D=E8=B4=A3=E5=A3=B0=E6=98=8E=EF=BC=9A=E6=9C=AC=E9=82=AE=E4=BB=B6=E6=
+=89=80=E5=8C=85=E5=90=AB=E4=BF=A1=E6=81=AF=E5=8F=91=E7=BB=99=E6=8C=87=E5=AE=
+=9A=E4=B8=AA=E4=BA=BA=E6=88=96=E6=9C=BA=E6=9E=84=EF=BC=8C=E9=82=AE=E4=BB=B6=
+=E5=8F=AF=E8=83=BD=E5=8C=85=E5=90=AB=E4=BF=9D=E5=AF=86=E6=88=96=E4=B8=93=E5=
+=B1=9E=E4=BF=A1=E6=81=AF=E3=80=82=E6=9C=AA=E7=BB=8F=E6=8E=A5=E6=94=B6=E8=80=
+=85=E8=AE=B8=E5=8F=AF=EF=BC=8C=E4=B8=8D=E5=BE=97=E9=98=85=E8=AF=BB=E3=80=81=
+=E8=BD=AC=E5=8F=91=E6=88=96=E4=BC=A0=E6=92=AD=E9=82=AE=E4=BB=B6=E5=86=85=E5=
+=AE=B9=EF=BC=8C=E6=88=96=E6=A0=B9=E6=8D=AE=E9=82=AE=E4=BB=B6=E5=86=85=E5=AE=
+=B9=E9=87=87=E5=8F=96=E4=BB=BB=E4=BD=95=E7=9B=B8=E5=85=B3=E8=A1=8C=E5=8A=A8=
+=E3=80=82=E5=A6=82=E6=9E=9C=E9=94=99=E8=AF=AF=E5=9C=B0=E6=94=B6=E5=88=B0=E4=
+=BA=86=E6=AD=A4=E9=82=AE=E4=BB=B6=EF=BC=8C=E8=AF=B7=E4=B8=8E=E6=94=B6=E4=BB=
+=B6=E4=BA=BA=E8=81=94=E7=B3=BB=E5=B9=B6=E8=87=AA=E8=A1=8C=E5=88=A0=E9=99=A4=
+=E9=82=AE=E4=BB=B6=E5=86=85=E5=AE=B9=E3=80=82
+>=20
+> Disclaimer=EF=BC=9AThe information transmitted is intended only for =
+the person or entity to which it is addressed and may contain =
+confidential and/or privileged material. Any review, retransmission, =
+dissemination or other use of, or taking of any action in reliance upon, =
+this information by persons or entities other than the intended =
+recipient is prohibited. If you received this in error , please contact =
+the sender and delete the material from any computer .
 
