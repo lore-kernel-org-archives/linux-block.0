@@ -2,94 +2,244 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 790EFC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 08:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5CA1C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 08:11:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbiJKIGT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 04:06:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53958 "EHLO
+        id S229827AbiJKILR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 04:11:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiJKIGS (ORCPT
+        with ESMTP id S229475AbiJKILM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 04:06:18 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47ACC691B8;
-        Tue, 11 Oct 2022 01:06:16 -0700 (PDT)
+        Tue, 11 Oct 2022 04:11:12 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E7F84E5F;
+        Tue, 11 Oct 2022 01:11:07 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MmpGB6TZFzl1rR;
-        Tue, 11 Oct 2022 16:04:18 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MmpMQ68Kyz6R4sN;
+        Tue, 11 Oct 2022 16:08:50 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAHB8n0I0VjWTtiAA--.25173S3;
-        Tue, 11 Oct 2022 16:06:14 +0800 (CST)
-Subject: Re: [PATCH v4 0/6] blk-wbt: simple improvment to enable wbt correctly
-To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz, hch@infradead.org,
-        ebiggers@kernel.org, paolo.valente@linaro.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        by APP4 (Coremail) with SMTP id gCh0CgA3N8kXJUVj8WhiAA--.27391S3;
+        Tue, 11 Oct 2022 16:11:03 +0800 (CST)
+Subject: Re: [patch v11 0/6] support concurrent sync io for bfq on a specail
+ occasion
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     Tejun Heo <tj@kernel.org>, axboe@kernel.dk,
+        Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20220930031906.4164306-1-yukuai1@huaweicloud.com>
+References: <20220916071942.214222-1-yukuai1@huaweicloud.com>
+ <29348B39-94AE-4D76-BD2E-B759056264B6@linaro.org>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <8a5333ea-361b-a9eb-2149-01f218260c0c@huaweicloud.com>
-Date:   Tue, 11 Oct 2022 16:06:12 +0800
+Message-ID: <011d479f-644f-0013-40bf-664b62f93bec@huaweicloud.com>
+Date:   Tue, 11 Oct 2022 16:11:02 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20220930031906.4164306-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <29348B39-94AE-4D76-BD2E-B759056264B6@linaro.org>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAHB8n0I0VjWTtiAA--.25173S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw1UKFykWF1UuFyUCw43Awb_yoWDZrcEgF
-        W0ka95W3WDXa1FkF9rJF10qFWj9rs5Zr15XasrtrZ0yry3JFyUtw4ktrWUua98Zan3C3Z8
-        A3yUu3yfZr12qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUba8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
-        Jr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VU1a9aPUUUUU==
+X-CM-TRANSID: gCh0CgA3N8kXJUVj8WhiAA--.27391S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxKF15Jw4DGr4xKw18ArWfAFb_yoW7uF13pa
+        ySqa1a9r4jqr13JwsxK34UXasYq3WrJryUWrn3J34rCr47ZF1rA3WIkr1F9F9rZrZ3Gr1I
+        vr43tw4Fk34jva7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6Fyj6rWU
+        JwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
+        nIWIevJa73UjIFyTuYvjfUF9a9DUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping ...
+Hi, paolo
 
-åœ¨ 2022/09/30 11:19, Yu Kuai å†™é“:
-> From: Yu Kuai <yukuai3@huawei.com>
+ÔÚ 2022/09/28 0:38, Paolo Valente Ð´µÀ:
 > 
-> changes in v4:
->   - remove patch 3 from v3
->   - add patch 2,3 in v4
 > 
-> changes in v3:
->   - instead of check elevator name, add a flag in elevator_queue, as
->   suggested by Christoph.
->   - add patch 3 and patch 5 to this patchset.
+>> Il giorno 16 set 2022, alle ore 09:19, Yu Kuai <yukuai1@huaweicloud.com> ha scritto:
+>>
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Changes in v11:
+>> - keep the comments in bfq_weights_tree_remove() and move it to the
+>> caller where bfqq can be freed.
+>> - add two followed up cleanup patches.
+>>
+>> Changes in v10:
+>> - Add reviewed-tag for patch 2
+>>
+>> Changes in v9:
+>> - also update how many bfqqs have pending_reqs bfq_bfqq_move().
+>> - fix one language in patch 4
+>> - Add reviewed-tag for patch 1,3,4
+>>
+>> Changes in v8:
+>> - Instead of using whether bfqq is busy, using whether bfqq has pending
+>> requests. As Paolo pointed out the former way is problematic.
+>>
+>> Changes in v7:
+>> - fix mismatch bfq_inc/del_busy_queues() and bfqq_add/del_bfqq_busy(),
+>> also retest this patchset on v5.18 to make sure functionality is
+>> correct.
+>> - move the updating of 'bfqd->busy_queues' into new apis
+>>
+>> Changes in v6:
+>> - add reviewed-by tag for patch 1
+>>
+>> Changes in v5:
+>> - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
+>> - fix wrong definition in patch 1
+>> - fix spelling mistake in patch 2: leaset -> least
+>> - update comments in patch 3
+>> - add reviewed-by tag in patch 2,3
+>>
+>> Changes in v4:
+>> - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
+>>    suggested by Jan Kara.
+>> - remove unused 'in_groups_with_pending_reqs',
+>>
+>> Changes in v3:
+>> - remove the cleanup patch that is irrelevant now(I'll post it
+>>    separately).
+>> - instead of hacking wr queues and using weights tree insertion/removal,
+>>    using bfq_add/del_bfqq_busy() to count the number of groups
+>>    (suggested by Jan Kara).
+>>
+>> Changes in v2:
+>> - Use a different approch to count root group, which is much simple.
+>>
+>> Currently, bfq can't handle sync io concurrently as long as they
+>> are not issued from root group. This is because
+>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>> bfq_asymmetric_scenario().
+>>
+>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+>>
+>> Before this patchset:
+>> 1) root group will never be counted.
+>> 2) Count if bfqg or it's child bfqgs have pending requests.
+>> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
+>>
+>> After this patchset:
+>> 1) root group is counted.
+>> 2) Count if bfqg has pending requests.
+>> 3) Don't count if bfqg complete all the requests.
+>>
+>> With the above changes, concurrent sync io can be supported if only
+>> one group is activated.
+>>
+>> fio test script(startdelay is used to avoid queue merging):
+>> [global]
+>> filename=/dev/sda
+>> allow_mounted_write=0
+>> ioengine=psync
+>> direct=1
+>> ioscheduler=bfq
+>> offset_increment=10g
+>> group_reporting
+>> rw=randwrite
+>> bs=4k
+>>
+>> [test1]
+>> numjobs=1
+>>
+>> [test2]
+>> startdelay=1
+>> numjobs=1
+>>
+>> [test3]
+>> startdelay=2
+>> numjobs=1
+>>
+>> [test4]
+>> startdelay=3
+>> numjobs=1
+>>
+>> [test5]
+>> startdelay=4
+>> numjobs=1
+>>
+>> [test6]
+>> startdelay=5
+>> numjobs=1
+>>
+>> [test7]
+>> startdelay=6
+>> numjobs=1
+>>
+>> [test8]
+>> startdelay=7
+>> numjobs=1
+>>
+>> test result:
+>> running fio on root cgroup
+>> v5.18:	   112 Mib/s
+>> v5.18-patched: 112 Mib/s
+>>
+>> running fio on non-root cgroup
+>> v5.18:	   51.2 Mib/s
+>> v5.18-patched: 112 Mib/s
+>>
+>> Note that I also test null_blk with "irqmode=2
+>> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
+>> that service guarantees are still preserved.
+>>
 > 
-> changes in v2:
->   - define new api if wbt config is not enabled in patch 1.
+> Your patches seem ok to me now (thanks for you contribution and, above all, for your patience). I have only a high-level concern: what do you mean when you say that service guarantees are still preserved? What test did you run exactly? This point is very important to me. I'd like to see some convincing test with differentiated weights. In case you don't have other tools for executing such tests quickly, you may want to use the bandwidth-latency test in my simple S benchmark suite (for which I'm willing to help).
+
+Is there any test that you wish me to try?
+
+By the way, I think for the case that multiple groups are activaced, (
+specifically num_groups_with_pendind_rqs > 1), io path in bfq is the
+same with or without this patchset.
+
+Thanks,
+Kuai
 > 
-> Yu Kuai (6):
->    elevator: remove redundant code in elv_unregister_queue()
->    blk-wbt: remove unnecessary check in wbt_enable_default()
->    blk-wbt: make enable_state more accurate
->    blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
->    elevator: add new field flags in struct elevator_queue
->    blk-wbt: don't enable throttling if default elevator is bfq
+> Thanks,
+> Paolo
 > 
->   block/bfq-iosched.c |  2 ++
->   block/blk-sysfs.c   |  6 +++++-
->   block/blk-wbt.c     | 26 ++++++++++++++++++++++----
->   block/blk-wbt.h     | 17 ++++++++++++-----
->   block/elevator.c    |  8 ++------
->   block/elevator.h    |  5 ++++-
->   6 files changed, 47 insertions(+), 17 deletions(-)
+>> Previous versions:
+>> RFC: https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
+>> v1: https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
+>> v2: https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
+>> v3: https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
+>> v4: https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
+>> v5: https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
+>> v6: https://lore.kernel.org/all/20220523131818.2798712-1-yukuai3@huawei.com/
+>> v7: https://lore.kernel.org/all/20220528095020.186970-1-yukuai3@huawei.com/
+>>
+>>
+>> Yu Kuai (6):
+>>   block, bfq: support to track if bfqq has pending requests
+>>   block, bfq: record how many queues have pending requests
+>>   block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
+>>   block, bfq: do not idle if only one group is activated
+>>   block, bfq: cleanup bfq_weights_tree add/remove apis
+>>   block, bfq: cleanup __bfq_weights_tree_remove()
+>>
+>> block/bfq-cgroup.c  | 10 +++++++
+>> block/bfq-iosched.c | 71 +++++++--------------------------------------
+>> block/bfq-iosched.h | 30 +++++++++----------
+>> block/bfq-wf2q.c    | 69 ++++++++++++++++++++++++++-----------------
+>> 4 files changed, 76 insertions(+), 104 deletions(-)
+>>
+>> -- 
+>> 2.31.1
+>>
+> 
+> .
 > 
 
