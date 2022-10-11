@@ -2,93 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95228C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 15:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AC0C43217
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 15:24:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231707AbiJKPTC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 11:19:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42762 "EHLO
+        id S230334AbiJKPYh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 11:24:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231755AbiJKPSd (ORCPT
+        with ESMTP id S230274AbiJKPYT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 11:18:33 -0400
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01olkn2038.outbound.protection.outlook.com [40.92.98.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D59B0B11;
-        Tue, 11 Oct 2022 08:10:30 -0700 (PDT)
+        Tue, 11 Oct 2022 11:24:19 -0400
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01olkn2056.outbound.protection.outlook.com [40.92.99.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A02C171CE1;
+        Tue, 11 Oct 2022 08:15:43 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fywr/bBjOIURZM7Y8fUN20X8H+Iy5LCkeIHsqyi6nv2zjIK52aGrBq/oOAGSmPYP7Gq4S+tp/leMbgIRgNYdWtLVprYEpvlEKhxvYSHp2yUTTjM0i5NkedBT25ljjv6BbYNMVNAP4HNxdscy9DRD2hmPwVisD14QnNsiVVuVH98TkjoGevV2uLGu/5wXOA9PfbUTw6WKYqs1k7YhhTFU6M9pml9RHQN7mXLHGWo0JFirycYQIpIV0i0hpyQTrLUD64JGKy4Nnl4lcN2pNpT9APivI/8cBPq/ycPcSkHMWq5/EPotEOJDnLOSKcYK80EHVHeiNQ9AujxSZ7G7E+9FGg==
+ b=gDPPOBNCb2FVUXVatbNvkW0sfhePITiSY/RGnMtP9YtNaF6mMD5ocR5AMcLF31nBw8ttn9uF8h1Ji5zo9aXfPDkszUUU3Y9a4jr2hEO8TabOMgSMzxCs3HySM+IbaXEZRDfNPrbeZJ14AJ96rVU/OW/PzzJ84I4DRMZD2xXCf333Rsbqn1WwSzC7impE8n26qVHS1cF3JAxdjyNYFZeCDtp3N6+IFsvNZclwA2k8pLQREOy7uk6bPsD5T0b7RctWPELK90C/43mf6UjzBpM5cKqSFmKruVYijUetgI9lQyrjJ9AUVVvgFYtSlRSSmXdAbpVOlUrm2XXiClOSDr0UNQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2bBy9sw36qcFhorM+iNFTH7B/8r5UMCmWvqfteMHnNY=;
- b=cbNNBmRuWoYPKcpiimnXH2TzioaVnW2dMQI2xF3x3XuduilbzkUe8S+zHnrXyaDjsx/xVf/HLAxMf+TwGZ8+Ywnh5ii/xh87ulx3RJD6hDEg9mcJeUwncD0CKiRODhSll8dpfosnEwmlcYIAs/YUOGCcV3On6Pho6B9CeDsaW9FdNyiKUTxSkyQwKSTVVz/q7+SaazDwEr1Fb3RH36E5dfGWHlkBwbpbxLhXMbYqTEPLsmEvW7ADJjxA/Y2OwqnViI1N9TFOYosDx/BYN+FQpQO+Y/9Z1a3d1ASxuNYPCbDmd8VcwLbaEYaytmj0sQCjdpF+BycuI7v/JQ96mtr55g==
+ bh=zo1Uyd5Cr+vUeOBgInoErdw02W2KCHswu/ahNGDjgQE=;
+ b=hI1AE8kCCP5wPxIR/Jbz5usFuzpwUvBrh4vZJ68ctafvAuhhaRLAHzJGQ94KFWsdNTbO2FSSMziJd/2udg7L43ApJRlkwM11RvXQ3ZvDGJyyvCUuf/lJiQiQmRa7RGFDlt4OkpHNXyohOXCL4ad3CVkAG/FY8eiZjqqHM2OdyISS47lZPjbwNh6NqbtX7dRGr3y2vKZBqX1HPkzLfdfab6Q4NKGEkRqMenAAX4xbYjdO40zy8RtEOYLa/79stbsa1YL5881hPipvCTYAC2IP5sIEbSOiOCqJwmOFbjKC6RsK/wONNAbSc8A4L4dXAqdTYVypnKQQYF98/l20dLdlLg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2bBy9sw36qcFhorM+iNFTH7B/8r5UMCmWvqfteMHnNY=;
- b=VprE1niqM/yyyFASg7FZ5LpQ/EtljQ5ETMBGywkfftCclL4q/c1fTwqtJljtN7xTEpG2kDonDxP3cJ/ot6oP+tHfhlMPmuTHgbi/27TpZOgExCMGCcXBmlCJInGwJpx/A7/sfrPS6BA1h5rbgFxD+y/I41yA7Dy5imVjHOklK3uFGWRY6h1EczDnaXxwpg95Osbxiv6Ihl1WWq0s/FcfxWFkUTQLZ8Uv7m6qQaS9nur8kfA3HCkuy47D8JciDORcGtjFQsKni/BhFIKu5AzozOOefe+XLYgOabBOueHvNq57Q3qCvqF2cH7ii+XAIDKIS7tgRiLRu+ukDAO8LXhvIA==
+ bh=zo1Uyd5Cr+vUeOBgInoErdw02W2KCHswu/ahNGDjgQE=;
+ b=PLSTtEFBXU+g/sB/Hz08I+spMOtWRF+JKQV9X9vBw75vIwu8D8ptarpxb9ZZe6ezwTn9wJM+Fe/wxTCg5SxnDy/iUyyX32ke9tvamzGDMLm9eYk4K+gz4fq1vfuOyDm/c7CCRH8SPZ1fwwdFMkrmblb42yYvaPhUmWNMu6klps3AvUjjQ0FGexDJz9SxNrvV4TGtiSWMNiIoPpe7+q/c8iq8ev1Rw6GrYhDg1Gfkg09HIy+6Bs9/F673oqPBuGC70BhBjd2NAl5l5JRtii2qsE2TDsnykdb7tQLxyl88EHiANJF0pX3KN8K7zFDgofgo7XPzYL1PKmWCdXq+wVB7LQ==
 Received: from TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:152::9)
  by OS3P286MB1855.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:171::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Tue, 11 Oct
- 2022 14:53:16 +0000
+ 2022 14:53:28 +0000
 Received: from TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
  ([fe80::4722:62da:4861:9d73]) by TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
  ([fe80::4722:62da:4861:9d73%3]) with mapi id 15.20.5709.019; Tue, 11 Oct 2022
- 14:53:16 +0000
+ 14:53:28 +0000
 From:   Dawei Li <set_pte_at@outlook.com>
 To:     axboe@kernel.dk, tj@kernel.org, paolo.valente@linaro.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org, Dawei Li <set_pte_at@outlook.com>
-Subject: [PATCH 0/2] block: queue flag helpers and atomic refcnt impl 
-Date:   Tue, 11 Oct 2022 22:52:44 +0800
-Message-ID: <TYCP286MB2323C42B3A3E18F296A06D41CA239@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+Subject: [PATCH 2/2] block: Make refcnt of bfq_group/bfq_queue atomic
+Date:   Tue, 11 Oct 2022 22:52:46 +0800
+Message-ID: <TYCP286MB2323F5B27A24ABA2CD1A3F70CA239@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221011145246.8656-1-set_pte_at@outlook.com>
+References: <20221011145246.8656-1-set_pte_at@outlook.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN:  [h4jbJW2cCnzmS36dnXJgkEkN2UQzb7Et]
+X-TMN:  [2RaW93Jzq6UaufPgovx1BuX/iN/nUzVG]
 X-ClientProxiedBy: SI1PR02CA0015.apcprd02.prod.outlook.com
  (2603:1096:4:1f7::18) To TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
  (2603:1096:400:152::9)
-X-Microsoft-Original-Message-ID: <20221011145246.8656-1-set_pte_at@outlook.com>
+X-Microsoft-Original-Message-ID: <20221011145246.8656-3-set_pte_at@outlook.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: TYCP286MB2323:EE_|OS3P286MB1855:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0819f860-b6f2-4a0d-86a3-08daab985413
-X-MS-Exchange-SLBlob-MailProps: LVbdfIC7uFAGjbskEBW/SERmDHTaO4T0p+LoA095vOPEm70rkD5JVnwVPm3exiyyLQZamrCHV/tiLlIxNSS2jik+MrBEt0/CnPSq6EQMKBECVuC5GFpN3fpVb9bKYj1tcezcsa3pn0Fk2PJ4vwBYXE8Abt5218ophkxdesVnNn/gg1Wx4TLjjuyWj+U/Y1vsaCXaPm2NvBsvs7UypSnY5L04c8bUqh7MNE6az7cVkAMxF92SJj1Ya05B7Zn8OhBWNbaRHnToXlaFUEch3efBc412IQjJlOqnPL1HJJEAbSZhVDGcUoBW5RgOHwGtcx/7dIG4GAGQGINRTcMca4irKH89LUf2czWXigXaFyAMrlipfwtZlvVQ9HrrpQmORawaeksynG2aHyfaIbPtQi+47fycAdN0Xy4gq/yKdCGuPkcTM5bm1FuEX54J2K9vlc181L74TdNucsV/90bs5DuEf4BaXWwiNIGADLuhx2SyLw/rPGK4915MMrtl5yKLM68TifS8dn/UCDuVKwpwuxGuXH8E8qajYzkun5GDOV4B/L7sxYdUqYEG5MMtf1+61XvMvF10UxPNKSl6ileWO2ghUr1DURQSfo4/0/Hf2qNzYw9Se1seU1b8SAdw8Xfad10JeYGHkxpAhPwtlA6gvTZY1RIM1GgNwJlW+T5dzzjW3qyStWbD1b6kTht9tq2LiGIjLtt5zsnhDqf9ioDT+Mx/ZmowKn/+rkJm5uQYgfMBEFksGjfgsS/O4g==
+X-MS-Office365-Filtering-Correlation-Id: 7cd74518-22f7-4248-176c-08daab985b61
+X-MS-Exchange-SLBlob-MailProps: C/ir7cSdGluUOiRWeVrPQcQDBojfOWWe1TW2X6Jn/BWc2O0Rw+C7Lk6a/5DM0eHi2VdejA8/hifYP+XzBa51h2eVZni1GzwN5ZXV4rVPpSi64WEM8UqjrD+75YhscwMrvUKIkfZbfdtSIx8UBzU6lNhX5vFTQEv7YY0Ku8DKHyNDnZMVFzscSGlozy5pRW9FbSD/zrAPxhRYwJ2l3Ey0nxlyMN3mPqvDQuyzMT3WpevxT3btwc76f2Y3pL/oahzbZWDuuqCJBaARNA7SaBSOTc/4QCTTRxLLcpeSblSmLrrtvLlSKHXsSRntFCPzwlpHaAS4/FZqFMlJG33IhHHdUAw2O98FMqWiXzeGqKQIDQEqqvVCXpgaBXgd4GXggculJZy6siEjxiVgJrZIiHuZkj+MtWpLVnHyRBLQ0uBSGLDLbA78qjxkv5vpd7uxjdd9OLa4g0zm8OPdPfX5ZBXTUABAZGgMSZFTkqGU+Z1twqsr1h8wVuu+DYhqKS9gAgjUGX90pOxdCZvVokUUgW/uKCcIzllFGnOVeJ3CrD42bqsi/3SLMlUMUvfw1eSDtTQ6TJGikaUdBK/0TJIy50l9LQ6o7/Ga1CZiZovhnFOSL+0j9W6htxx4TZ53vO4CswJxy6p8Ro70zH8ZrI767YQlOGrg9OkZIQBwt8LYoa/htLqmoQvQ80nv7l+gvw1kVu5sLyRFCjiljxNC2imD1zThG8MEIapomBjvRzt0MDadbDU4TURlxWl83R3rjJ3ivyGv
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vjEhZ9XgujfF7LDmuph1ud1OCFVOjlo4EmPVkNikUX2rVngZvYiAtPlrIDPSHJ3caZ23Cq5IPCdpICPq1/nNaZ2KSN9W5oqVkI5PlmJR7kY34jQK067iSLBLgs0oQU8Bwp7ckAt7wWG2y82GAcklSat/EgF/kGs2igTrGhnvJw3EcXfHESSUvkIzkEyRbDxq5VJ2/5g3FEqcOua1qPDnWKvI8JjDEodyfSMDnUDscZSyb4juCkY6Ws5FknUe10OZkauGP3MrhHd7ABwU02Q8ZGE/iEdOMmpqhHlfWoetIlPEYvvGUk1sLkwp12UKbz0kvR1wqA2NSHylm5mPjlJYlK97ymb1kND18k3RlsnZF8KnMawwb7Zifu9QhmM7gqgcngMn4ryVTehmZcCmqa36GR9RWXRGvztkg8Q7gX4A4JOaQxTieNWIK9hlW5/bQVYXhci7hcowfWGV79LQy2/UR32lAeCUtw50kFuTBTBddg2FbU3Y+pSNG6XwxAg0iF/Suk4DwN4873cn9mQRBcFKlEwmbWU3Z537rr8kdO1RaVY7uEKQT9blqg5/wrmdyTrqmQ8+jwleFs9W64/xbIZg4Pv8Uhkc5c5vvJ2+J1aRf8I85X1Zbjyb9A4xQ1Cv9HdQoQxmvcbS1jgLJ25vCuuRW7FFMWRm1R9SQO4PXs+ftdAFrbfNT4ryUI73QbJFZP2D
+X-Microsoft-Antispam-Message-Info: TJZzbOqEI9WzqjliobZhh1iCjMe/0W89rHkRP6Av1vk3qIhRH1RfbHJZUzA3OnFvtvZRpos6E1DvjGGfk00AgOO/3SnNA8Kk+nYQiZYC6Lo12ifCqK5gO5h2yGDoiFKQqkc3XvvwUHZ/EuakhUKQMJs6cAkGrQeXNK8ymYBVl0D8nzf8EhxGdNgVt5fulWeT5Sf35iIN2e5rtUR1+430US833jRQjmmrE9IFbaQbBCQqJfXWmIGIHPoYOWzmU4IVUKTSqlK6CNPs7Z3WbSyrkNVp91RWlNNDcuet/wYfwKDTp/R80WOSSVqu6QAdc2Jdz61Llfazf6Ow7BAvC6Q79C6kffXEczkkK6gqPFZmbBoqkZArMBJq4s1s2LWekt0GrRZMkvYIoRgzAzUv1pUZoEDDlnvXaeRlazUlBEikxcw70Jc0Crxee1LOygeyLx04cY8OOP99W+ES2H6RaosFbVEsAJEWgfWuDwtawtwmOBUkuTn+uTblz6wZqITXjNQ111QLUUi+jUnySk31ArBkK6lry02RWXUhdjJA5wU6UGvwmnkEQ9ZlJwWcrtaDpXDr4cl8+1i5IuVFAg+Kv7gyyIYFAp6lskjnY96958ozstc0HLYsM+gwoClZ6eXyaeJLn95VWPZUGzSSKvZn183D1zLGE8qpxB/ZyzelhUaPMNgZ5bFoPADoK35spjRsMQAp
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fm7t3SF90ZWJMECrB3MNab1eG5Es1nuP7OWiH8wju86dZEiSBFI4O/j1P3cv?=
- =?us-ascii?Q?eMKal8BuR9DXydHjBs4z3HWBTGdiP5fTDxviA8BennFg2sjMCtH3a62k7IdO?=
- =?us-ascii?Q?890A5WKvM1OFpPKG2g/EmxXwDiU/WpXTTwqvRqDvokYg0iHHXrR+qyOrA0t0?=
- =?us-ascii?Q?Pw9BNwvgYs4QzDirvWoVJ1DMXnv32icFqfs5p1QcbXn/iDikl1aJRq+yPYyq?=
- =?us-ascii?Q?cFjpasLlVypN2n8WTnRL2jPP9jMdywZi9cmYaNYWrd9V+Zw7bRtnWe2zoSZ3?=
- =?us-ascii?Q?drj3qQo/UnAE4J3WZ7VIIzyq5Lr1G/8zmqGeMAaGL0x0EM0PFU4GY8bxIRf5?=
- =?us-ascii?Q?gEDIF7m2m5WurWH/SV6My9PEiz7wKphnxsjVCggTJYripjRoFL0XjFqOQncZ?=
- =?us-ascii?Q?kLkmn5c4Kh++i/yenYNUpxx7SBjpzX9EKyrb5L5sFxFi7PA4FS9EF5lhSwrM?=
- =?us-ascii?Q?7YIWD+aW4FAAp43IzcN2W0A08+2bI/++1W3idsCsU9RZQYmlKlcLPyKVWyQh?=
- =?us-ascii?Q?pKt4ChEJm7VN3f6eHRZzwIY5pJBlOzMJBao1HxH6dCnnyGqBy8/RFqTtNxAV?=
- =?us-ascii?Q?FTuDTrwv+SIGLCSqviGJByi6PQnGpJgpaeHRpWbk8Dpd7kQKnENZi+fsbDXC?=
- =?us-ascii?Q?maWPj8013EHFHleSiUqr9K6t942RkADyPcN9peqaV+lbEznLPwsBXWN2hW3a?=
- =?us-ascii?Q?A1IebNIlFsNYZwjhwg/qiOaSyb2EIk26Qwj6Yb5e+X7JFRADjH9g0/uSfgWR?=
- =?us-ascii?Q?prx3DRns6rlvz5xVEL7e7pLCZM++2e0VS8GxFK1DNXNDjRQsn3i8/wRZf8q1?=
- =?us-ascii?Q?4iJSYSZJscRPdGLQkMgF+cJXSnQEArABzPmduu0wPE+5i37gDl2nLHZG2Z8u?=
- =?us-ascii?Q?l57SnS4TSW9YfkDOovUK38neI4BLw3n2YaQFieyc7pP/J4zjoHdiNYWjEsId?=
- =?us-ascii?Q?WHtDjwCl8cshfNnMtrWdIw02UuIgbkRg9wXjNclOUAwNmQuiYfSFOdGy46Gr?=
- =?us-ascii?Q?OlGOBzj/ixFQYN42ncRYhbNmOeDAfhmr09l14rWl35YXEWf2O1yEScJKjgqD?=
- =?us-ascii?Q?NiLUxZ0Z3E/AQCFZOzc7QXqqS8VWXnDdHrRFVvG43sgUuTybHOWvBi1j83+9?=
- =?us-ascii?Q?iBZBJwPEgTRb8ngzXXqXFFAzc7WNFdFhgOTKDzPnsqYKu+gBr7M2wT3kUkRa?=
- =?us-ascii?Q?kFTIVHQYd+oSJTF6x8fYA1vKZ8e13KY1rW6TkmC2xrMOAHcSVor9l78l+vwT?=
- =?us-ascii?Q?yHyRd630QEvMCuo9xDvz2HIFvLpwZYExgGJnZJozlw=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ym4mqwZCjMAyu9RgeTX0+7qTk7sTlKnexCeop8MpeH8LVh/GkBvywWJTdNy1?=
+ =?us-ascii?Q?u9ALbHXglV6evBlcXGZNG8uDsMyYJzD4XrCxArpZYFePrVur51vABkaIT5BL?=
+ =?us-ascii?Q?9tGqSkxrq4kGbvkbbE6GMfg6TUhf3jdSLP3fD+ouCxYrHjNFHWvPP5oCfS8I?=
+ =?us-ascii?Q?QU25lHjKRYC+gB3InPebTX2KkUWry37cYTSLz/qNlzShDQi3JoUz26oINZnP?=
+ =?us-ascii?Q?vqRQ5JVziB5w3k09QcBfgCKJEuqiiQmSM1Yb/f4pLymMbQENAX3BhUtDUZso?=
+ =?us-ascii?Q?lxDWynWRbdP/361NEf5bYiUr9kldDIcbG5PCW79Z2DOixoia+4RXzgf5UDVE?=
+ =?us-ascii?Q?/RWVjarqm2mld22EU0LTAhozARstbov5FLfu5oseAT8GUyzuW0Lf0qfgnh/X?=
+ =?us-ascii?Q?ll6YzvcIeckQyCITL1eQrMoxofQhbKV0MFLdbCnOkJWcE2dtOySHzSbjPQrc?=
+ =?us-ascii?Q?ed+eAAXUELtwNDlVbaYUSAsbufELLuBKgXVjgsDvgWAgNGr/6VCuOggHkg6m?=
+ =?us-ascii?Q?mU/7Y5VmM2WhNbB0to1uMeYnG6A1rHlUGN/r4Jr+OP2+H5uXuZl1TpsWP6oS?=
+ =?us-ascii?Q?mTpmhGl170T8m7dEgOrzDKR/iWopWSoxoXwCVSJ9t5O+ckDyh1gfl1uJbJgc?=
+ =?us-ascii?Q?QwcAldRo09oWfeRV90GzR7Z21cHJmWJ3zcPBkZSxR3i556TbMAHbY/kV8Ljl?=
+ =?us-ascii?Q?cTjZYrIKF7SM23HMEuO9Td3HFxFtc/CZP+KkLM7KbFGeed0pelZlPF27zJvp?=
+ =?us-ascii?Q?zmp7mC45RqtVYkLJWQf9YN+3Nv4CEBrkj0qYqqUFKIjN/jnle1X2l0KjS6/I?=
+ =?us-ascii?Q?8SKFzAcgFbNEJkmjTALTwhXAVkl/RfVL10dbwsrfOM9+VSO5cwQpAMwyiefB?=
+ =?us-ascii?Q?sx9lt1PiVz3/D4VoF8CitMioDbhgNitZqlLtcjW2wjwu/grplfvzQA2EIbu5?=
+ =?us-ascii?Q?YewzcD5oA0rN7bZ8pd2S/s7dyOyjEfbxqYWmW1y8gyUv3+YhFZPgQ024kOL/?=
+ =?us-ascii?Q?G1Fl/+5LbQhXAlWpECzQUNUwSEGXsSYwnRBWpdvp7vza6y0hIeoW0Bx8UbVP?=
+ =?us-ascii?Q?W19Y7VL4sDOLsIuUehqFlXV+uKweAzx4aki61p86YLpim0iET+51L0M6lOu1?=
+ =?us-ascii?Q?lJuAbWn1stgmKmhwtGxd6IaFCR2t3czEzA1WI5bwv1Dw/CU1U0fcrmUMRsU0?=
+ =?us-ascii?Q?SIju5sz1AkN6MjTVd0/I1Ap3uuqbiupzsYRCZB16xkRZ6I3i6gzX/H4pVI9E?=
+ =?us-ascii?Q?h8l7yu5dMwHYEVp9XNAf/bG7erDAx2eS9041YTqoIw=3D=3D?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0819f860-b6f2-4a0d-86a3-08daab985413
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cd74518-22f7-4248-176c-08daab985b61
 X-MS-Exchange-CrossTenant-AuthSource: TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2022 14:53:16.4195
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2022 14:53:28.6278
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -98,31 +100,261 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patchset includes enhancement on block layer:
-1. Complete missing blk_queue_xxx() helpers which is responsible
-   for denoting whether an attribute of request queue is set.
+For most implementations of reference count, atomic_t is preferred
+for their natural-born atomic ops capability.
+Change the reference count of bfq_group/bfq_queue, both data structures
+and related ops, into atomic.
 
-2. Make the referene count of bfq_group/bfq_queue atomic.
+Signed-off-by: Dawei Li <set_pte_at@outlook.com>
+---
+ block/bfq-cgroup.c  |  8 +++----
+ block/bfq-iosched.c | 54 +++++++++++++++++++++++----------------------
+ block/bfq-iosched.h |  6 ++---
+ block/bfq-wf2q.c    |  6 ++---
+ 4 files changed, 37 insertions(+), 37 deletions(-)
 
-Dawei Li (2):
-  block: Add helper for queue_flags bit test
-  block: Make refcnt of bfq_group/bfq_queue atomic
-
- block/bfq-cgroup.c     |  8 +++----
- block/bfq-iosched.c    | 54 ++++++++++++++++++++++--------------------
- block/bfq-iosched.h    |  6 ++---
- block/bfq-wf2q.c       |  6 ++---
- block/blk-core.c       |  7 +++---
- block/blk-mq-tag.c     |  8 +++----
- block/blk-mq.c         |  8 +++----
- block/blk-mq.h         |  2 +-
- block/blk-settings.c   |  2 +-
- block/blk-sysfs.c      | 12 +++++-----
- block/blk-timeout.c    |  2 +-
- block/blk-wbt.c        |  2 +-
- include/linux/blkdev.h | 19 +++++++++++----
- 13 files changed, 71 insertions(+), 65 deletions(-)
-
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 144bca006463..714126ba21b6 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
+ 
+ static void bfqg_get(struct bfq_group *bfqg)
+ {
+-	bfqg->ref++;
++	atomic_inc(&bfqg->ref);
+ }
+ 
+ static void bfqg_put(struct bfq_group *bfqg)
+ {
+-	bfqg->ref--;
+-
+-	if (bfqg->ref == 0)
++	if (atomic_dec_and_test(&bfqg->ref))
+ 		kfree(bfqg);
+ }
+ 
+@@ -659,7 +657,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	 * Get extra reference to prevent bfqq from being freed in
+ 	 * next possible expire or deactivate.
+ 	 */
+-	bfqq->ref++;
++	atomic_inc(&bfqq->ref);
+ 
+ 	/* If bfqq is empty, then bfq_bfqq_expire also invokes
+ 	 * bfq_del_bfqq_busy, thereby removing bfqq and its entity
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 7ea427817f7f..fbe5624be71f 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -935,7 +935,7 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 
+ inc_counter:
+ 	bfqq->weight_counter->num_active++;
+-	bfqq->ref++;
++	atomic_inc(&bfqq->ref);
+ }
+ 
+ /*
+@@ -1224,9 +1224,10 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+ 
+ static int bfqq_process_refs(struct bfq_queue *bfqq)
+ {
+-	return bfqq->ref - bfqq->entity.allocated -
++	return atomic_read(&bfqq->ref) - bfqq->entity.allocated -
+ 		bfqq->entity.on_st_or_in_serv -
+-		(bfqq->weight_counter != NULL) - bfqq->stable_ref;
++		(bfqq->weight_counter != NULL) -
++		atomic_read(&bfqq->stable_ref);
+ }
+ 
+ /* Empty burst list and add just bfqq (see comments on bfq_handle_burst) */
+@@ -2818,7 +2819,7 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
+ 	 * expected to be associated with new_bfqq as they happen to
+ 	 * issue I/O.
+ 	 */
+-	new_bfqq->ref += process_refs;
++	atomic_add(process_refs, &new_bfqq->ref);
+ 	return new_bfqq;
+ }
+ 
+@@ -5255,10 +5256,10 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 	struct hlist_node *n;
+ 	struct bfq_group *bfqg = bfqq_group(bfqq);
+ 
+-	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq, bfqq->ref);
++	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq,
++		     atomic_read(&bfqq->ref));
+ 
+-	bfqq->ref--;
+-	if (bfqq->ref)
++	if (!atomic_dec_and_test(&bfqq->ref))
+ 		return;
+ 
+ 	if (!hlist_unhashed(&bfqq->burst_list_node)) {
+@@ -5328,7 +5329,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+ 
+ static void bfq_put_stable_ref(struct bfq_queue *bfqq)
+ {
+-	bfqq->stable_ref--;
++	atomic_dec(&bfqq->stable_ref);
+ 	bfq_put_queue(bfqq);
+ }
+ 
+@@ -5358,7 +5359,7 @@ static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		bfq_schedule_dispatch(bfqd);
+ 	}
+ 
+-	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, bfqq->ref);
++	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, atomic_read(&bfqq->ref));
+ 
+ 	bfq_put_cooperator(bfqq);
+ 
+@@ -5507,7 +5508,7 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	INIT_HLIST_NODE(&bfqq->woken_list_node);
+ 	INIT_HLIST_HEAD(&bfqq->woken_list);
+ 
+-	bfqq->ref = 0;
++	atomic_set(&bfqq->ref, 0);
+ 	bfqq->bfqd = bfqd;
+ 
+ 	if (bic)
+@@ -5710,12 +5711,12 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
+ 			 * to prevent it from being freed,
+ 			 * until we decide whether to merge
+ 			 */
+-			last_bfqq_created->ref++;
++			atomic_inc(&last_bfqq_created->ref);
+ 			/*
+ 			 * need to keep track of stable refs, to
+ 			 * compute process refs correctly
+ 			 */
+-			last_bfqq_created->stable_ref++;
++			atomic_inc(&last_bfqq_created->stable_ref);
+ 			/*
+ 			 * Record the bfqq to merge to.
+ 			 */
+@@ -5767,20 +5768,21 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
+ 	 * prune it.
+ 	 */
+ 	if (async_bfqq) {
+-		bfqq->ref++; /*
+-			      * Extra group reference, w.r.t. sync
+-			      * queue. This extra reference is removed
+-			      * only if bfqq->bfqg disappears, to
+-			      * guarantee that this queue is not freed
+-			      * until its group goes away.
+-			      */
++		atomic_inc(&bfqq->ref);
++		/*
++		 * Extra group reference, w.r.t. sync
++		 * queue. This extra reference is removed
++		 * only if bfqq->bfqg disappears, to
++		 * guarantee that this queue is not freed
++		 * until its group goes away.
++		 */
+ 		bfq_log_bfqq(bfqd, bfqq, "get_queue, bfqq not in async: %p, %d",
+-			     bfqq, bfqq->ref);
++			     bfqq, atomic_read(&bfqq->ref));
+ 		*async_bfqq = bfqq;
+ 	}
+ 
+ out:
+-	bfqq->ref++; /* get a process reference to this queue */
++	atomic_inc(&bfqq->ref); /* get a process reference to this queue */
+ 
+ 	if (bfqq != &bfqd->oom_bfqq && is_sync && !respawn)
+ 		bfqq = bfq_do_or_sched_stable_merge(bfqd, bfqq, bic);
+@@ -6059,7 +6061,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
+ 		 */
+ 		bfqq_request_allocated(new_bfqq);
+ 		bfqq_request_freed(bfqq);
+-		new_bfqq->ref++;
++		atomic_inc(&new_bfqq->ref);
+ 		/*
+ 		 * If the bic associated with the process
+ 		 * issuing this request still points to bfqq
+@@ -6803,10 +6805,10 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
+ 	}
+ 
+ 	bfqq_request_allocated(bfqq);
+-	bfqq->ref++;
++	atomic_inc(&bfqq->ref);
+ 	bic->requests++;
+ 	bfq_log_bfqq(bfqd, bfqq, "get_request %p: bfqq %p, %d",
+-		     rq, bfqq, bfqq->ref);
++		     rq, bfqq, atomic_read(&bfqq->ref));
+ 
+ 	rq->elv.priv[0] = bic;
+ 	rq->elv.priv[1] = bfqq;
+@@ -6939,7 +6941,7 @@ static void __bfq_put_async_bfqq(struct bfq_data *bfqd,
+ 		bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
+ 
+ 		bfq_log_bfqq(bfqd, bfqq, "put_async_bfqq: putting %p, %d",
+-			     bfqq, bfqq->ref);
++			     bfqq, atomic_read(&bfqq->ref));
+ 		bfq_put_queue(bfqq);
+ 		*bfqq_ptr = NULL;
+ 	}
+@@ -7092,7 +7094,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	 * will not attempt to free it.
+ 	 */
+ 	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, NULL, 1, 0);
+-	bfqd->oom_bfqq.ref++;
++	atomic_inc(&bfqd->oom_bfqq.ref);
+ 	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
+ 	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
+ 	bfqd->oom_bfqq.entity.new_weight =
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 64ee618064ba..71ac0de80bb0 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -234,9 +234,9 @@ struct bfq_ttime {
+  */
+ struct bfq_queue {
+ 	/* reference counter */
+-	int ref;
++	atomic_t ref;
+ 	/* counter of references from other queues for delayed stable merge */
+-	int stable_ref;
++	atomic_t stable_ref;
+ 	/* parent bfq_data */
+ 	struct bfq_data *bfqd;
+ 
+@@ -928,7 +928,7 @@ struct bfq_group {
+ 	char blkg_path[128];
+ 
+ 	/* reference counter (see comments in bfq_bic_update_cgroup) */
+-	int ref;
++	atomic_t ref;
+ 	/* Is bfq_group still online? */
+ 	bool online;
+ 
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 8fc3da4c23bb..60a9a2c1fc8d 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -512,9 +512,9 @@ static void bfq_get_entity(struct bfq_entity *entity)
+ 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 
+ 	if (bfqq) {
+-		bfqq->ref++;
++		atomic_inc(&bfqq->ref);
+ 		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
+-			     bfqq, bfqq->ref);
++			     bfqq, atomic_read(&bfqq->ref));
+ 	}
+ }
+ 
+@@ -1611,7 +1611,7 @@ bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
+ 		 * reference to the queue. If this is the case, then
+ 		 * bfqq gets freed here.
+ 		 */
+-		int ref = in_serv_bfqq->ref;
++		int ref = atomic_read(&in_serv_bfqq->ref);
+ 		bfq_put_queue(in_serv_bfqq);
+ 		if (ref == 1)
+ 			return true;
 -- 
 2.25.1
 
