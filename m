@@ -2,27 +2,27 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34953C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 01:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF713C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 01:26:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229809AbiJKBZe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 21:25:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49540 "EHLO
+        id S229999AbiJKB0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 21:26:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230526AbiJKBYv (ORCPT
+        with ESMTP id S229913AbiJKBZp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 21:24:51 -0400
+        Mon, 10 Oct 2022 21:25:45 -0400
 Received: from 66-220-144-178.mail-mxout.facebook.com (66-220-144-178.mail-mxout.facebook.com [66.220.144.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA65E019
-        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 18:24:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E8633BC63
+        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 18:25:09 -0700 (PDT)
 Received: by dev1180.prn1.facebook.com (Postfix, from userid 425415)
-        id 0ED0134BDDDA; Mon, 10 Oct 2022 18:01:06 -0700 (PDT)
+        id F21E234BDDD4; Mon, 10 Oct 2022 18:01:05 -0700 (PDT)
 From:   Stefan Roesch <shr@devkernel.io>
 To:     kernel-team@fb.com, linux-block@vger.kernel.org, linux-mm@kvack.org
 Cc:     shr@devkernel.io, axboe@kernel.dk, clm@meta.com
-Subject: [RFC PATCH v1 06/14] mm: split off __bdi_set_max_ratio() function
-Date:   Mon, 10 Oct 2022 18:00:36 -0700
-Message-Id: <20221011010044.851537-7-shr@devkernel.io>
+Subject: [RFC PATCH v1 03/14] mm: document new /sys/class/bdi/<bdi>/strict_limit knob
+Date:   Mon, 10 Oct 2022 18:00:33 -0700
+Message-Id: <20221011010044.851537-4-shr@devkernel.io>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221011010044.851537-1-shr@devkernel.io>
 References: <20221011010044.851537-1-shr@devkernel.io>
@@ -32,55 +32,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This splits off the __bdi_set_max_ratio() function from the
-bdi_set_max_ratio() function. The __bdi_set_max_ratio() function will
-also be called from the bdi_set_max_bytes() function, which will be
-introduced in the next patch.
+This documents the new /sys/class/bdi/<bdi>/strict_limit knob.
 
 Signed-off-by: Stefan Roesch <shr@devkernel.io>
 ---
- mm/page-writeback.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ Documentation/ABI/testing/sysfs-class-bdi | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 0b9dcf5afda2..8b8936603783 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -692,14 +692,10 @@ int bdi_set_min_ratio(struct backing_dev_info *bdi,=
- unsigned int min_ratio)
- 	return ret;
- }
+diff --git a/Documentation/ABI/testing/sysfs-class-bdi b/Documentation/AB=
+I/testing/sysfs-class-bdi
+index 6d2a2fc189dd..68b5d4018c2f 100644
+--- a/Documentation/ABI/testing/sysfs-class-bdi
++++ b/Documentation/ABI/testing/sysfs-class-bdi
+@@ -55,6 +55,17 @@ Description:
+ 	mount that is prone to get stuck, or a FUSE mount which cannot
+ 	be trusted to play fair.
 =20
--int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned max_ratio)
-+static int __bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned in=
-t max_ratio)
- {
- 	int ret =3D 0;
-=20
--	if (max_ratio > 100)
--		return -EINVAL;
--	max_ratio *=3D BDI_RATIO_SCALE;
--
- 	spin_lock_bh(&bdi_lock);
- 	if (bdi->min_ratio > max_ratio) {
- 		ret =3D -EINVAL;
-@@ -711,6 +707,14 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, =
-unsigned max_ratio)
-=20
- 	return ret;
- }
++	(read-write)
++What:		/sys/class/bdi/<bdi>/strict_limit
++Date:		October 2022
++Contact:	Stefan Roesch <shr@devkernel.io>
++Description:
++	Forces per-BDI checks for the share of given device in the write-back
++	cache even before the global background dirty limit is reached. This
++	is useful in situations where the global limit is much higher than
++	affordable for given relatively slow (or untrusted) device. Turning
++	strictlimit on has no visible effect if max_ratio is equal to 100%.
 +
-+int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_rat=
-io)
-+{
-+	if (max_ratio > 100)
-+		return -EINVAL;
-+
-+	return __bdi_set_max_ratio(bdi, max_ratio * BDI_RATIO_SCALE);
-+}
- EXPORT_SYMBOL(bdi_set_max_ratio);
-=20
- unsigned long long bdi_get_max_bytes(struct backing_dev_info *bdi)
+ 	(read-write)
+ What:		/sys/class/bdi/<bdi>/stable_pages_required
+ Date:		January 2008
 --=20
 2.30.2
 
