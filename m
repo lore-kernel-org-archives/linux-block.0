@@ -2,283 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFACC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 09:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E49BC43217
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 10:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbiJKJh2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 05:37:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55836 "EHLO
+        id S229776AbiJKKAV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 06:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbiJKJhC (ORCPT
+        with ESMTP id S229599AbiJKKAU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 05:37:02 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379938A7FE;
-        Tue, 11 Oct 2022 02:36:59 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MmrGT0d4qz6R4tG;
-        Tue, 11 Oct 2022 17:34:41 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgDn58k1OUVj0m9lAA--.50447S3;
-        Tue, 11 Oct 2022 17:36:54 +0800 (CST)
-Subject: Re: [patch v11 0/6] support concurrent sync io for bfq on a specail
- occasion
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220916071942.214222-1-yukuai1@huaweicloud.com>
- <29348B39-94AE-4D76-BD2E-B759056264B6@linaro.org>
- <011d479f-644f-0013-40bf-664b62f93bec@huaweicloud.com>
- <A9D22DB6-6481-46BA-9D4C-5A828D19CB61@linaro.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <bcd07062-5a3b-563e-fb2d-2fa8e4c8bba5@huaweicloud.com>
-Date:   Tue, 11 Oct 2022 17:36:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 11 Oct 2022 06:00:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC3C3343A;
+        Tue, 11 Oct 2022 03:00:17 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29B9tIKb006463;
+        Tue, 11 Oct 2022 09:59:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=pp1;
+ bh=rsi++8Kv70P/yyaG5N63ukoqzzaV32xXultfsAN+sgY=;
+ b=b9WrKX6EJhkwDas+5wQJeAb2oflElkQO3Ljn8q8IiYGku406jhrTUM1QFFSYZPFNdFKo
+ QHKpdpz+dy38RreLu0fUmM6qnpOScfAfMCKM/XDDc0eenMPRVJyB1RlO6H/T2c9TEfEu
+ hK0orCiQnVvs2Xeg2cLtK5eQXHPw0hzLK43X6e9sknHM/b0YWS55t+kKmywfWSvUyDye
+ YNyh/te56N5fSc0tbPKKLOp4apFrXLDvZpYTL9AYNeZvLOaJgu6ULqrutiVzLDgBe4AG
+ VodfO95fsMEXeDJoBpykCHBGmpu4cocaq5++1kXg6MVP2WJiWMl8qYN+9OSEl3yDnTVx SA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k569g03km-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Oct 2022 09:59:09 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29B9tmI8010269;
+        Tue, 11 Oct 2022 09:59:08 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k569g03hx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Oct 2022 09:59:08 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29B9oZnZ003829;
+        Tue, 11 Oct 2022 09:59:05 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3k30u9c3hv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 11 Oct 2022 09:59:05 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29B9sJie47120848
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Oct 2022 09:54:19 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10739A405B;
+        Tue, 11 Oct 2022 09:59:02 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 30E5BA4054;
+        Tue, 11 Oct 2022 09:59:00 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.239])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 11 Oct 2022 09:59:00 +0000 (GMT)
+Date:   Tue, 11 Oct 2022 11:58:59 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+        Andreas Noever <andreas.noever@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Christoph Hellwig <hch@lst.de>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Dave Airlie <airlied@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Helge Deller <deller@gmx.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Hugh Dickins <hughd@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        Jan Kara <jack@suse.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jens Axboe <axboe@kernel.dk>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        KP Singh <kpsingh@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Marco Elver <elver@google.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Richard Weinberger <richard@nod.at>,
+        Russell King <linux@armlinux.org.uk>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Thomas Graf <tgraf@suug.ch>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        WANG Xuerui <kernel@xen0n.name>, Will Deacon <will@kernel.org>,
+        Yury Norov <yury.norov@gmail.com>,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        kernel-janitors@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-mm@kvack.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-parisc@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        loongarch@lists.linux.dev, netdev@vger.kernel.org,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        Jan Kara <jack@suse.cz>, "Darrick J . Wong" <djwong@kernel.org>
+Subject: Re: [PATCH v6 1/7] treewide: use prandom_u32_max() when possible,
+ part 1
+Message-ID: <Y0U+Y+VBqefDAZRG@osiris>
+References: <20221010230613.1076905-1-Jason@zx2c4.com>
+ <20221010230613.1076905-2-Jason@zx2c4.com>
 MIME-Version: 1.0
-In-Reply-To: <A9D22DB6-6481-46BA-9D4C-5A828D19CB61@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDn58k1OUVj0m9lAA--.50447S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKF15XFWkZr1kuFWUKFWktFb_yoW3JF1fp3
-        ySqa1akr4UXr13twsxKw1UXas3tw48Jr1UWrn8X348ur4qvFn5Ga1Ikr1F9rykZFZ2gr1I
-        vr17tw1agw1jva7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
-        0xkIwI1lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-        kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-        67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-        CI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E
-        3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-        sGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+In-Reply-To: <20221010230613.1076905-2-Jason@zx2c4.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: e2CZuGMXbt8P1Ahw-KHczcjQF2nFCX-z
+X-Proofpoint-ORIG-GUID: wAGriSa-6j8SChamwbK6r6GTq7mVMlOg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-10-11_03,2022-10-10_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
+ malwarescore=0 clxscore=1011 mlxscore=0 spamscore=0 mlxlogscore=427
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210110053
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Paolo
+On Mon, Oct 10, 2022 at 05:06:07PM -0600, Jason A. Donenfeld wrote:
+> Rather than incurring a division or requesting too many random bytes for
+> the given range, use the prandom_u32_max() function, which only takes
+> the minimum required bytes from the RNG and avoids divisions. This was
+...
+> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Reviewed-by: Yury Norov <yury.norov@gmail.com>
+> Reviewed-by: KP Singh <kpsingh@kernel.org>
+> Reviewed-by: Jan Kara <jack@suse.cz> # for ext4 and sbitmap
+> Reviewed-by: Christoph B�hmwalder <christoph.boehmwalder@linbit.com> # for drbd
+> Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # for mmc
+> Acked-by: Darrick J. Wong <djwong@kernel.org> # for xfs
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  arch/s390/kernel/process.c                    |  2 +-
+>  arch/s390/kernel/vdso.c                       |  2 +-
 
-在 2022/10/11 16:21, Paolo Valente 写道:
-> 
-> 
->> Il giorno 11 ott 2022, alle ore 10:11, Yu Kuai <yukuai1@huaweicloud.com> ha scritto:
->>
->> Hi, paolo
->>
->> 在 2022/09/28 0:38, Paolo Valente 写道:
->>>> Il giorno 16 set 2022, alle ore 09:19, Yu Kuai <yukuai1@huaweicloud.com> ha scritto:
->>>>
->>>> From: Yu Kuai <yukuai3@huawei.com>
->>>>
->>>> Changes in v11:
->>>> - keep the comments in bfq_weights_tree_remove() and move it to the
->>>> caller where bfqq can be freed.
->>>> - add two followed up cleanup patches.
->>>>
->>>> Changes in v10:
->>>> - Add reviewed-tag for patch 2
->>>>
->>>> Changes in v9:
->>>> - also update how many bfqqs have pending_reqs bfq_bfqq_move().
->>>> - fix one language in patch 4
->>>> - Add reviewed-tag for patch 1,3,4
->>>>
->>>> Changes in v8:
->>>> - Instead of using whether bfqq is busy, using whether bfqq has pending
->>>> requests. As Paolo pointed out the former way is problematic.
->>>>
->>>> Changes in v7:
->>>> - fix mismatch bfq_inc/del_busy_queues() and bfqq_add/del_bfqq_busy(),
->>>> also retest this patchset on v5.18 to make sure functionality is
->>>> correct.
->>>> - move the updating of 'bfqd->busy_queues' into new apis
->>>>
->>>> Changes in v6:
->>>> - add reviewed-by tag for patch 1
->>>>
->>>> Changes in v5:
->>>> - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
->>>> - fix wrong definition in patch 1
->>>> - fix spelling mistake in patch 2: leaset -> least
->>>> - update comments in patch 3
->>>> - add reviewed-by tag in patch 2,3
->>>>
->>>> Changes in v4:
->>>> - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
->>>>    suggested by Jan Kara.
->>>> - remove unused 'in_groups_with_pending_reqs',
->>>>
->>>> Changes in v3:
->>>> - remove the cleanup patch that is irrelevant now(I'll post it
->>>>    separately).
->>>> - instead of hacking wr queues and using weights tree insertion/removal,
->>>>    using bfq_add/del_bfqq_busy() to count the number of groups
->>>>    (suggested by Jan Kara).
->>>>
->>>> Changes in v2:
->>>> - Use a different approch to count root group, which is much simple.
->>>>
->>>> Currently, bfq can't handle sync io concurrently as long as they
->>>> are not issued from root group. This is because
->>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>> bfq_asymmetric_scenario().
->>>>
->>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>>
->>>> Before this patchset:
->>>> 1) root group will never be counted.
->>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
->>>>
->>>> After this patchset:
->>>> 1) root group is counted.
->>>> 2) Count if bfqg has pending requests.
->>>> 3) Don't count if bfqg complete all the requests.
->>>>
->>>> With the above changes, concurrent sync io can be supported if only
->>>> one group is activated.
->>>>
->>>> fio test script(startdelay is used to avoid queue merging):
->>>> [global]
->>>> filename=/dev/sda
->>>> allow_mounted_write=0
->>>> ioengine=psync
->>>> direct=1
->>>> ioscheduler=bfq
->>>> offset_increment=10g
->>>> group_reporting
->>>> rw=randwrite
->>>> bs=4k
->>>>
->>>> [test1]
->>>> numjobs=1
->>>>
->>>> [test2]
->>>> startdelay=1
->>>> numjobs=1
->>>>
->>>> [test3]
->>>> startdelay=2
->>>> numjobs=1
->>>>
->>>> [test4]
->>>> startdelay=3
->>>> numjobs=1
->>>>
->>>> [test5]
->>>> startdelay=4
->>>> numjobs=1
->>>>
->>>> [test6]
->>>> startdelay=5
->>>> numjobs=1
->>>>
->>>> [test7]
->>>> startdelay=6
->>>> numjobs=1
->>>>
->>>> [test8]
->>>> startdelay=7
->>>> numjobs=1
->>>>
->>>> test result:
->>>> running fio on root cgroup
->>>> v5.18:	   112 Mib/s
->>>> v5.18-patched: 112 Mib/s
->>>>
->>>> running fio on non-root cgroup
->>>> v5.18:	   51.2 Mib/s
->>>> v5.18-patched: 112 Mib/s
->>>>
->>>> Note that I also test null_blk with "irqmode=2
->>>> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
->>>> that service guarantees are still preserved.
->>>>
->>> Your patches seem ok to me now (thanks for you contribution and, above all, for your patience). I have only a high-level concern: what do you mean when you say that service guarantees are still preserved? What test did you run exactly? This point is very important to me. I'd like to see some convincing test with differentiated weights. In case you don't have other tools for executing such tests quickly, you may want to use the bandwidth-latency test in my simple S benchmark suite (for which I'm willing to help).
->>
->> Is there any test that you wish me to try?
->>
->> By the way, I think for the case that multiple groups are activaced, (
->> specifically num_groups_with_pendind_rqs > 1), io path in bfq is the
->> same with or without this patchset.
-
-I just ran the test for one time, result is a liiter inconsistent, do
-you think it's in the normal fluctuation range?
-
-test script:
-fio -filename=/dev/nullb0 -ioengine=libaio -ioscheduler=bfq -jumjobs=1 
--iodepth=64 -direct=1 -bs=4k -rw=randread -runtime=60 -name=test
-
-without this patchset:
-|                 |      |      |      |      |      |
-| --------------- | ---- | ---- | ---- | ---- | ---- |
-| cg1 weight      | 10   | 20   | 30   | 40   | 50   |
-| cg2 weight      | 90   | 80   | 70   | 60   | 50   |
-| cg1 bw MiB/s    | 25.8 | 51.0 | 80.1 | 90.5 | 138  |
-| cg2 bw MiB/s    | 193  | 179  | 162  | 127  | 136  |
-| cg2 bw / cg1 bw | 7.48 | 3.51 | 2.02 | 1.40 | 0.98 |
-
-with this patchset
-|                 |      |      |      |      |      |
-| --------------- | ---- | ---- | ---- | ---- | ---- |
-| cg1 weight      | 10   | 20   | 30   | 40   | 50   |
-| cg2 weight      | 90   | 80   | 70   | 60   | 50   |
-| cg1 bw MiB/s    | 21.5 | 43.9 | 62.7 | 87.4 | 136  |
-| cg2 bw MiB/s    | 195  | 185  | 173  | 138  | 141  |
-| cg2 bw / cg1 bw | 9.07 | 4.21 | 2.75 | 1.57 | 0.96 |
->>
-> 
-> The tests cases you mentioned are ok for me (whatever tool or personal
-> code you use to run them).  Just show me your results with and without
-> your patchset applied.
-> 
-> Thanks,
-> Paolo
-> 
->> Thanks,
->> Kuai
->>> Thanks,
->>> Paolo
->>>> Previous versions:
->>>> RFC: https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
->>>> v1: https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
->>>> v2: https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
->>>> v3: https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
->>>> v4: https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
->>>> v5: https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
->>>> v6: https://lore.kernel.org/all/20220523131818.2798712-1-yukuai3@huawei.com/
->>>> v7: https://lore.kernel.org/all/20220528095020.186970-1-yukuai3@huawei.com/
->>>>
->>>>
->>>> Yu Kuai (6):
->>>>   block, bfq: support to track if bfqq has pending requests
->>>>   block, bfq: record how many queues have pending requests
->>>>   block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
->>>>   block, bfq: do not idle if only one group is activated
->>>>   block, bfq: cleanup bfq_weights_tree add/remove apis
->>>>   block, bfq: cleanup __bfq_weights_tree_remove()
->>>>
->>>> block/bfq-cgroup.c  | 10 +++++++
->>>> block/bfq-iosched.c | 71 +++++++--------------------------------------
->>>> block/bfq-iosched.h | 30 +++++++++----------
->>>> block/bfq-wf2q.c    | 69 ++++++++++++++++++++++++++-----------------
->>>> 4 files changed, 76 insertions(+), 104 deletions(-)
->>>>
->>>> -- 
->>>> 2.31.1
->>>>
->>> .
-> 
-> .
-> 
-
+For s390:
+Acked-by: Heiko Carstens <hca@linux.ibm.com>
