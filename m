@@ -2,78 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFF5C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 17:25:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E127C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 17:43:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbiJKRZz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 13:25:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55654 "EHLO
+        id S229456AbiJKRnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 13:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbiJKRZy (ORCPT
+        with ESMTP id S229452AbiJKRnp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 13:25:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CE53205B
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 10:25:53 -0700 (PDT)
+        Tue, 11 Oct 2022 13:43:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC2226108
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 10:43:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665509152;
+        s=mimecast20190719; t=1665510223;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=5vHkI1D0I1xI6a4Gv+3LouMlybo3cvhcPYtH+nmf3p8=;
-        b=ahr5ORC7qfpt/yT0IIDpp4Qpv+hZnxKFb23mwxEVG93+HUHuXOAzCe+yQ06OCeoMWAremR
-        bGnigdWuSeMk6uvVOljTQdXC47M+6gwYJuMCjrme/T8UqqE8jMMsmIODePC89t2imiu228
-        YqRW6Egq3eiRi8zYSoehaEwLWsfMibc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=50WiZs7UViSj5w2cOYj6iUBWIJIgEQpETSwSo79m1LU=;
+        b=RBQQb1yMMTksAaZ8Ij9C84rh9yrwZet0UGJ02nSdLtR0ma5uE/2sJQvOEzA2sH1aLwaR0J
+        UUE6Z9HGNs4pwW3Qh/MrJ7qCrKAeVuFFm89S6qWIG7SmLakBHbOhlxwWaRX3KWrxoo8nTr
+        behnlFPkG247ZvXC1dysSK1Nhzt2gMc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-642-IZs9eNupMruY913wgHscjQ-1; Tue, 11 Oct 2022 13:25:46 -0400
-X-MC-Unique: IZs9eNupMruY913wgHscjQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-461-JoZ7qEh2Mq2Qz02Jn-V8cw-1; Tue, 11 Oct 2022 13:43:41 -0400
+X-MC-Unique: JoZ7qEh2Mq2Qz02Jn-V8cw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1EE79185A7A8;
-        Tue, 11 Oct 2022 17:25:46 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 412C12A59548;
+        Tue, 11 Oct 2022 17:43:41 +0000 (UTC)
 Received: from fedora34.. (unknown [10.66.146.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 700A4477F5F;
-        Tue, 11 Oct 2022 17:25:44 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 93532207B36F;
+        Tue, 11 Oct 2022 17:43:39 +0000 (UTC)
 From:   Yi Zhang <yi.zhang@redhat.com>
-To:     bvanassche@acm.org, shinichiro.kawasaki@wdc.com
+To:     hare@suse.de, shinichiro.kawasaki@wdc.com
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests] common/multipath-over-rdma: fix has_soft_rdma checking when mlx card as netdev
-Date:   Wed, 12 Oct 2022 01:24:54 +0800
-Message-Id: <20221011172454.310389-1-yi.zhang@redhat.com>
+Subject: [PATCH blktests] tests/nvme: set hostnqn after hostid uuidgen
+Date:   Wed, 12 Oct 2022 01:43:25 +0800
+Message-Id: <20221011174325.311286-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The mlx dev will be ignored in has_soft_rdma when it was used as netdev,
-add more filter keywords.
-
-link mlx5_0/1 state ACTIVE physical_state LINK_UP netdev enp33s0f0np0
-link mlx5_1/1 state DOWN physical_state DISABLED netdev enp33s0f1np1
-
 Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 ---
- common/multipath-over-rdma | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/nvme/041 | 3 ++-
+ tests/nvme/042 | 3 ++-
+ tests/nvme/043 | 3 ++-
+ tests/nvme/044 | 3 ++-
+ tests/nvme/045 | 3 ++-
+ 5 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index fb820d6..6b9629a 100644
---- a/common/multipath-over-rdma
-+++ b/common/multipath-over-rdma
-@@ -387,7 +387,7 @@ all_primary_gids() {
- # Check whether or not an rdma_rxe or siw instance has been associated with
- # network interface $1.
- has_soft_rdma() {
--	rdma link | grep -q " netdev $1[[:blank:]]*\$"
-+	rdma link | grep -q "link $1.*netdev $1[[:blank:]]*\$"
- }
+diff --git a/tests/nvme/041 b/tests/nvme/041
+index 98c443e..b311229 100755
+--- a/tests/nvme/041
++++ b/tests/nvme/041
+@@ -23,7 +23,7 @@ test() {
+ 	local port
+ 	local subsys_name="blktests-subsystem-1"
+ 	local hostid
+-	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hostkey
+ 	local ctrldev
+@@ -35,6 +35,7 @@ test() {
+ 		echo "uuidgen failed"
+ 		return 1
+ 	fi
++	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
+ 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+ 		echo "nvme gen-dhchap-key failed"
+diff --git a/tests/nvme/042 b/tests/nvme/042
+index 06e5d3d..30a638d 100755
+--- a/tests/nvme/042
++++ b/tests/nvme/042
+@@ -23,7 +23,7 @@ test() {
+ 	local port
+ 	local subsys_name="blktests-subsystem-1"
+ 	local hostid
+-	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hmac
+ 	local key_len
+@@ -37,6 +37,7 @@ test() {
+ 		echo "uuidgen failed"
+ 		return 1
+ 	fi
++	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
  
- # Load the rdma_rxe or siw kernel module and associate it with all network
+ 	_setup_nvmet
+ 
+diff --git a/tests/nvme/043 b/tests/nvme/043
+index 87273e5..84e1666 100755
+--- a/tests/nvme/043
++++ b/tests/nvme/043
+@@ -24,7 +24,7 @@ test() {
+ 	local port
+ 	local subsys_name="blktests-subsystem-1"
+ 	local hostid
+-	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hash
+ 	local dhgroup
+@@ -38,6 +38,7 @@ test() {
+ 		echo "uuidgen failed"
+ 		return 1
+ 	fi
++	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
+ 
+ 	_setup_nvmet
+ 
+diff --git a/tests/nvme/044 b/tests/nvme/044
+index 1301965..0eb36cc 100755
+--- a/tests/nvme/044
++++ b/tests/nvme/044
+@@ -24,7 +24,7 @@ test() {
+ 	local port
+ 	local subsys_name="blktests-subsystem-1"
+ 	local hostid
+-	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hostkey
+ 	local ctrlkey
+@@ -37,6 +37,7 @@ test() {
+ 		echo "uuidgen failed"
+ 		return 1
+ 	fi
++	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
+ 
+ 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
+diff --git a/tests/nvme/045 b/tests/nvme/045
+index 264f210..389e434 100755
+--- a/tests/nvme/045
++++ b/tests/nvme/045
+@@ -24,7 +24,7 @@ test() {
+ 	local port
+ 	local subsys_name="blktests-subsystem-1"
+ 	local hostid
+-	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
++	local hostnqn
+ 	local file_path="${TMPDIR}/img"
+ 	local hostkey
+ 	local new_hostkey
+@@ -39,6 +39,7 @@ test() {
+ 		echo "uuidgen failed"
+ 		return 1
+ 	fi
++	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
+ 
+ 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
+ 	if [ -z "$hostkey" ] ; then
 -- 
 2.34.1
 
