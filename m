@@ -2,115 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24E3FC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 12:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBFAC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 13:24:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbiJKM7q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 08:59:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34246 "EHLO
+        id S229974AbiJKNYn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 09:24:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229887AbiJKM7o (ORCPT
+        with ESMTP id S229994AbiJKNYl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 08:59:44 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEFAE21;
-        Tue, 11 Oct 2022 05:59:39 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MmwmJ2DlBz6Pq81;
-        Tue, 11 Oct 2022 20:57:20 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgD39si2aEVjv75sAA--.42468S3;
-        Tue, 11 Oct 2022 20:59:35 +0800 (CST)
-Subject: Re: [PATCH] block: put the reference of the io scheduler module after
- switching back
-To:     Yu Kuai <yukuai1@huaweicloud.com>,
-        Jinlong Chen <chenjinlong2016@outlook.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <OS0P286MB0338069A20BA87C2C9B2F2E0BE239@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
- <a0d0c50e-061b-ce4e-0341-35156dde00c7@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <7f6cb343-bf97-c73a-c3da-c22d7543bd4a@huaweicloud.com>
-Date:   Tue, 11 Oct 2022 20:59:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 11 Oct 2022 09:24:41 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0285FB5;
+        Tue, 11 Oct 2022 06:24:40 -0700 (PDT)
+Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MmxJb2L6Hz67xKh;
+        Tue, 11 Oct 2022 21:21:51 +0800 (CST)
+Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
+ fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 11 Oct 2022 15:24:38 +0200
+Received: from [10.202.227.197] (10.202.227.197) by
+ lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 11 Oct 2022 14:24:37 +0100
+Message-ID: <cf3116cb-b238-56c0-c5bf-fd8fa5167f77@huawei.com>
+Date:   Tue, 11 Oct 2022 14:24:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <a0d0c50e-061b-ce4e-0341-35156dde00c7@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD39si2aEVjv75sAA--.42468S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr43WF1kAr1DJw1xGw17Jrb_yoW8XryDpr
-        WkGa4YkrZIqr1vgay8Ga13Wa48ArWvgrs8Crn5uF1fZw1fGryIqFy8Xr4q9r1rCws7Jr4D
-        Jr1UXrs7ZFy5JrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r4j
-        6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9
-        -UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH] blk-mq: fix null pointer dereference in
+ blk_mq_clear_rq_mapping()
+To:     Yu Kuai <yukuai1@huaweicloud.com>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>, <hare@suse.de>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+References: <20221011121051.3149442-1-yukuai1@huaweicloud.com>
+From:   John Garry <john.garry@huawei.com>
+In-Reply-To: <20221011121051.3149442-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.197]
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ lhrpeml500003.china.huawei.com (7.191.162.67)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+On 11/10/2022 13:10, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Our syzkaller report a null pointer dereference, root cause is
+> following:
+> 
+> __blk_mq_alloc_map_and_rqs
+>   set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs
+>    blk_mq_alloc_map_and_rqs
+>     blk_mq_alloc_rqso
 
-在 2022/10/11 20:54, Yu Kuai 写道:
-> Hi!
-> 
-> 在 2022/10/11 18:21, Jinlong Chen 写道:
->> We got a reference of the io scheduler module in
->> blk_mq_elv_switch_none to prevent the module from
->> being removed. We need to put that reference back
->> once we are done.
-> 
-> However, if blk_mq_elv_switch_none() failed due to OOM, and module
-> reference is not acquired, blk_mq_elv_switch_back() will still be
-> called. This seems not to be the right fix.
+blk_mq_alloc_rqs
 
-Please ignore this.
+>      // failed due to oom
+>      alloc_pages_node
+>      // set->stags[hctx_idx] is still NULL
 
-I got it now if switch none failed, old queue is not added to the list,
-and later blk_lookup_qe_pair() will fail to lookup the queue.
+set->tags
 
-Thanks,
-Kuai
+>      blk_mq_free_rqs
+>       drv_tags = set->tags[hctx_idx];
+>       // null pointer dereference is triggered
+>       blk_mq_clear_rq_mapping(drv_tags, ...)
 > 
-> Thanks,
-> Kuai
->>
->> Signed-off-by: Jinlong Chen <chenjinlong2016@outlook.com>
->> ---
->>   block/blk-mq.c | 7 +++++++
->>   1 file changed, 7 insertions(+)
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8070b6c10e8d..8dfe3bf3e599 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -4595,6 +4595,13 @@ static void blk_mq_elv_switch_back(struct 
->> list_head *head,
->>       mutex_lock(&q->sysfs_lock);
->>       elevator_switch(q, t);
->> +    /**
->> +     * We got a reference of the io scheduler module in
->> +     * blk_mq_elv_switch_none to prevent the module from
->> +     * being removed. We need to put that reference back
->> +     * once we are done.
->> +     */
->> +    module_put(t->elevator_owner);
->>       mutex_unlock(&q->sysfs_lock);
->>   }
->>
+> This is because commit 63064be150e4 ("blk-mq:
+> Add blk_mq_alloc_map_and_rqs()") merged the two steps:
 > 
-> .
+> 1) set->tags[hctx_idx] = blk_mq_alloc_rq_map()
+> 2) blk_mq_alloc_rqs(..., set->tags[hctx_idx])
 > 
+> into one step:
+> 
+> set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs()
+> 
+> Since tags is not initialized yet in this case, fix the problem by
+> checking if tags is NULL pointer in blk_mq_clear_rq_mapping().
+> 
+> Fixes: 63064be150e4 ("blk-mq: Add blk_mq_alloc_map_and_rqs()")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+
+We could have something like the following to ensure the drv tags are 
+assigned before we try to allocate the rqs (and fail), but prob not 
+worth the churn since it's not nice to pass &set->tags[hctx_idx]:
+
+--->8---
+
+-struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
++bool blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+                                              unsigned int hctx_idx,
+-                                            unsigned int depth)
++                                            unsigned int depth,
++                                            struct blk_mq_tags **tags)
+  {
+-       struct blk_mq_tags *tags;
+         int ret;
+
+-       tags = blk_mq_alloc_rq_map(set, hctx_idx, depth, 
+set->reserved_tags);
+-       if (!tags)
+-               return NULL;
++       *tags = blk_mq_alloc_rq_map(set, hctx_idx, depth, 
+set->reserved_tags);
++       if (!*tags)
++               return false;
+
+-       ret = blk_mq_alloc_rqs(set, tags, hctx_idx, depth);
++       ret = blk_mq_alloc_rqs(set, *tags, hctx_idx, depth);
+         if (ret) {
+                 blk_mq_free_rq_map(tags);
++		*tags = NULL;
+-               return NULL;
++               return false;
+         }
+
+-       return tags;
++       return true;
+  }
+
+  static bool __blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+@@ -3632,10 +3632,9 @@ static bool __blk_mq_alloc_map_and_rqs(struct 
+blk_mq_tag_set *set,
+                 return true;
+         }
+
+-       set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs(set, hctx_idx,
+-                                                      set->queue_depth);
+-
+-       return set->tags[hctx_idx];
++       return blk_mq_alloc_map_and_rqs(set, hctx_idx,
++                                      set->queue_depth,
++                                      &set->tags[hctx_idx]);
+  }
+
+---8<----
+
+
+So,
+
+Reviewed-by: John Garry <john.garry@huawei.com>
+
+> ---
+>   block/blk-mq.c | 7 +++++--
+>   1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8070b6c10e8d..33292c01875d 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3112,8 +3112,11 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
+>   	struct page *page;
+>   	unsigned long flags;
+>   
+> -	/* There is no need to clear a driver tags own mapping */
+> -	if (drv_tags == tags)
+> +	/*
+> +	 * There is no need to clear mapping if driver tags is not initialized
+> +	 * or the mapping belongs to the driver tags.
+> +	 */
+> +	if (!drv_tags || drv_tags == tags)
+>   		return;
+>   
+>   	list_for_each_entry(page, &tags->page_list, lru) {
 
