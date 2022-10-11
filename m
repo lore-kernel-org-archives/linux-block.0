@@ -2,94 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD11C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 01:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34953C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 01:25:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbiJKBY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Oct 2022 21:24:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48158 "EHLO
+        id S229809AbiJKBZe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Oct 2022 21:25:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbiJKBY2 (ORCPT
+        with ESMTP id S230526AbiJKBYv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Oct 2022 21:24:28 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593A2855B8;
-        Mon, 10 Oct 2022 18:23:49 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MmdGp3Zg9z1M8h6;
-        Tue, 11 Oct 2022 09:19:14 +0800 (CST)
-Received: from [10.174.178.129] (10.174.178.129) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 11 Oct 2022 09:23:46 +0800
-Subject: Re: [PATCH 3/4] blk-cgroup: Add NULL check of pd_alloc_fn in
- blkcg_activate_policy
-To:     Tejun Heo <tj@kernel.org>
-CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20221010023859.11896-1-shikemeng@huawei.com>
- <20221010023859.11896-4-shikemeng@huawei.com>
- <Y0SAneaJadYJwAkr@slm.duckdns.org>
-From:   Kemeng Shi <shikemeng@huawei.com>
-Message-ID: <c62a8944-093f-8534-106c-51b159696008@huawei.com>
-Date:   Tue, 11 Oct 2022 09:23:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        Mon, 10 Oct 2022 21:24:51 -0400
+Received: from 66-220-144-178.mail-mxout.facebook.com (66-220-144-178.mail-mxout.facebook.com [66.220.144.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA65E019
+        for <linux-block@vger.kernel.org>; Mon, 10 Oct 2022 18:24:49 -0700 (PDT)
+Received: by dev1180.prn1.facebook.com (Postfix, from userid 425415)
+        id 0ED0134BDDDA; Mon, 10 Oct 2022 18:01:06 -0700 (PDT)
+From:   Stefan Roesch <shr@devkernel.io>
+To:     kernel-team@fb.com, linux-block@vger.kernel.org, linux-mm@kvack.org
+Cc:     shr@devkernel.io, axboe@kernel.dk, clm@meta.com
+Subject: [RFC PATCH v1 06/14] mm: split off __bdi_set_max_ratio() function
+Date:   Mon, 10 Oct 2022 18:00:36 -0700
+Message-Id: <20221011010044.851537-7-shr@devkernel.io>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20221011010044.851537-1-shr@devkernel.io>
+References: <20221011010044.851537-1-shr@devkernel.io>
 MIME-Version: 1.0
-In-Reply-To: <Y0SAneaJadYJwAkr@slm.duckdns.org>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.129]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This splits off the __bdi_set_max_ratio() function from the
+bdi_set_max_ratio() function. The __bdi_set_max_ratio() function will
+also be called from the bdi_set_max_bytes() function, which will be
+introduced in the next patch.
 
+Signed-off-by: Stefan Roesch <shr@devkernel.io>
+---
+ mm/page-writeback.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-on 10/11/2022 4:29 AM, Tejun Heo wrote:
-> On Mon, Oct 10, 2022 at 10:38:58AM +0800, Kemeng Shi wrote:
->> Function blkcg_policy_register only make sure pd_alloc_fn and pd_free_fn in
->> pairs, so pd_alloc_fn could be NULL in registered blkcg_policy. Check NULL
->> before use for pd_alloc_fn in blkcg_activate_policy to avoid protential
->> NULL dereference.
->>
->> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
->> ---
->>  block/blk-cgroup.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 463c568d3e86..fc083c35dc42 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -1404,6 +1404,9 @@ int blkcg_activate_policy(struct request_queue *q,
->>  	if (blkcg_policy_enabled(q, pol))
->>  		return 0;
->>  
->> +	if (pol->pd_alloc_fn == NULL)
->> +		return -EINVAL;
-> 
-> This isn't the only place this function is called, so the above won't
-> achieve much. Given that this is rather trivially noticeable and all the
-> current users do implement pd_alloc_fn, I'm not sure we need to update this
-> now.
-Thanks for review. The rest call of this function will always protect by
-blkcg_policy_enabled while policy only can be enabled if new added NULL
-check is passed. So the new added NULL check enough.
+diff --git a/mm/page-writeback.c b/mm/page-writeback.c
+index 0b9dcf5afda2..8b8936603783 100644
+--- a/mm/page-writeback.c
++++ b/mm/page-writeback.c
+@@ -692,14 +692,10 @@ int bdi_set_min_ratio(struct backing_dev_info *bdi,=
+ unsigned int min_ratio)
+ 	return ret;
+ }
+=20
+-int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned max_ratio)
++static int __bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned in=
+t max_ratio)
+ {
+ 	int ret =3D 0;
+=20
+-	if (max_ratio > 100)
+-		return -EINVAL;
+-	max_ratio *=3D BDI_RATIO_SCALE;
+-
+ 	spin_lock_bh(&bdi_lock);
+ 	if (bdi->min_ratio > max_ratio) {
+ 		ret =3D -EINVAL;
+@@ -711,6 +707,14 @@ int bdi_set_max_ratio(struct backing_dev_info *bdi, =
+unsigned max_ratio)
+=20
+ 	return ret;
+ }
++
++int bdi_set_max_ratio(struct backing_dev_info *bdi, unsigned int max_rat=
+io)
++{
++	if (max_ratio > 100)
++		return -EINVAL;
++
++	return __bdi_set_max_ratio(bdi, max_ratio * BDI_RATIO_SCALE);
++}
+ EXPORT_SYMBOL(bdi_set_max_ratio);
+=20
+ unsigned long long bdi_get_max_bytes(struct backing_dev_info *bdi)
+--=20
+2.30.2
 
-By the way, the policy enable/disable work is direct call to
-__set_bit(pol->plid, q->blkcg_pols) in blkcg_policy_enabled
-and __clear_bit(pol->plid, q->blkcg_pols) in blkcg_deactivate_policy
-which is not intuitive. Is it a good idea to add function
-blkcg_policy_enable and blkcg_policy_disable to improve readability?
-
-> 
-> Thanks.
-> 
-
--- 
-Best wishes
-Kemeng Shi
