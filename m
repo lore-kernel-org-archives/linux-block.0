@@ -2,168 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E127C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 17:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53784C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 18:20:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbiJKRnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 13:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40536 "EHLO
+        id S229436AbiJKSUT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 14:20:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiJKRnp (ORCPT
+        with ESMTP id S229451AbiJKSUT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 13:43:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC2226108
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 10:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665510223;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=50WiZs7UViSj5w2cOYj6iUBWIJIgEQpETSwSo79m1LU=;
-        b=RBQQb1yMMTksAaZ8Ij9C84rh9yrwZet0UGJ02nSdLtR0ma5uE/2sJQvOEzA2sH1aLwaR0J
-        UUE6Z9HGNs4pwW3Qh/MrJ7qCrKAeVuFFm89S6qWIG7SmLakBHbOhlxwWaRX3KWrxoo8nTr
-        behnlFPkG247ZvXC1dysSK1Nhzt2gMc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-461-JoZ7qEh2Mq2Qz02Jn-V8cw-1; Tue, 11 Oct 2022 13:43:41 -0400
-X-MC-Unique: JoZ7qEh2Mq2Qz02Jn-V8cw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 412C12A59548;
-        Tue, 11 Oct 2022 17:43:41 +0000 (UTC)
-Received: from fedora34.. (unknown [10.66.146.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93532207B36F;
-        Tue, 11 Oct 2022 17:43:39 +0000 (UTC)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     hare@suse.de, shinichiro.kawasaki@wdc.com
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests] tests/nvme: set hostnqn after hostid uuidgen
-Date:   Wed, 12 Oct 2022 01:43:25 +0800
-Message-Id: <20221011174325.311286-1-yi.zhang@redhat.com>
+        Tue, 11 Oct 2022 14:20:19 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB10133E2B
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 11:20:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qzecNvEAd/3Dg0SsYsChABTL2C2tH/O8AsUWj1hnFcI=; b=NGCMNMiw48kZ4qCz/icSwGiMeZ
+        o3g+twL7gPxReL7q1QxXz+DDVdl8EiimeEEFPVqZxgkjRcc84P9OLdTY5gzSWI6h7E1/Dt7bz8dDD
+        jzUfcOvYkXlf8rO1kgz969f9NAFsP7ouwLyfh/vnHVtcq0M5SPMbC6SCcwI0wmYlNaoz71s960RTZ
+        ylJAXLo68YgiVG0uBMV+hSbrIZ29HkKdoA54QldSEI1mOTqrzGP536G2rycwu5vDrQshIkVjUdLSm
+        kQsvHZGWm2xCS34Sm4nVOSyrA9Uh0evjlhfCpYobLKY8oUveyHYVkJF6DHVfbXnP7mOYvMy/DFCV2
+        DcguWYHQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oiJrP-005CRx-JF; Tue, 11 Oct 2022 18:20:11 +0000
+Date:   Tue, 11 Oct 2022 19:20:11 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Stefan Roesch <shr@devkernel.io>
+Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
+        linux-mm@kvack.org, axboe@kernel.dk, clm@meta.com
+Subject: Re: [RFC PATCH v1 00/14] mm/block: add bdi sysfs knobs
+Message-ID: <Y0Wz28QzRtH+72Pu@casper.infradead.org>
+References: <20221011010044.851537-1-shr@devkernel.io>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221011010044.851537-1-shr@devkernel.io>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- tests/nvme/041 | 3 ++-
- tests/nvme/042 | 3 ++-
- tests/nvme/043 | 3 ++-
- tests/nvme/044 | 3 ++-
- tests/nvme/045 | 3 ++-
- 5 files changed, 10 insertions(+), 5 deletions(-)
+On Mon, Oct 10, 2022 at 06:00:30PM -0700, Stefan Roesch wrote:
+> 2) Part of 10000 internal calculation
+>   The max_ratio is based on percentage. With the current machine sizes percentage
+>   values can be very high (1% of a 256GB main memory is already 2.5GB). This change
+>   uses part of 10000 instead of percentages for the internal calculations.
 
-diff --git a/tests/nvme/041 b/tests/nvme/041
-index 98c443e..b311229 100755
---- a/tests/nvme/041
-+++ b/tests/nvme/041
-@@ -23,7 +23,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hostkey
- 	local ctrldev
-@@ -35,6 +35,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
- 	if [ -z "$hostkey" ] ; then
- 		echo "nvme gen-dhchap-key failed"
-diff --git a/tests/nvme/042 b/tests/nvme/042
-index 06e5d3d..30a638d 100755
---- a/tests/nvme/042
-+++ b/tests/nvme/042
-@@ -23,7 +23,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hmac
- 	local key_len
-@@ -37,6 +37,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	_setup_nvmet
- 
-diff --git a/tests/nvme/043 b/tests/nvme/043
-index 87273e5..84e1666 100755
---- a/tests/nvme/043
-+++ b/tests/nvme/043
-@@ -24,7 +24,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hash
- 	local dhgroup
-@@ -38,6 +38,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	_setup_nvmet
- 
-diff --git a/tests/nvme/044 b/tests/nvme/044
-index 1301965..0eb36cc 100755
---- a/tests/nvme/044
-+++ b/tests/nvme/044
-@@ -24,7 +24,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hostkey
- 	local ctrlkey
-@@ -37,6 +37,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
- 	if [ -z "$hostkey" ] ; then
-diff --git a/tests/nvme/045 b/tests/nvme/045
-index 264f210..389e434 100755
---- a/tests/nvme/045
-+++ b/tests/nvme/045
-@@ -24,7 +24,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hostkey
- 	local new_hostkey
-@@ -39,6 +39,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
- 	if [ -z "$hostkey" ] ; then
--- 
-2.34.1
-
+Why 10,000?  If you need better accuracy than 1/1000, the next step
+should normally be parts per million.
