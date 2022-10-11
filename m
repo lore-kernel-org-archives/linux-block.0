@@ -2,113 +2,197 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A70C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 13:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 696A9C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Oct 2022 13:27:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbiJKNZ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 09:25:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36812 "EHLO
+        id S229933AbiJKN1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 09:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbiJKNZX (ORCPT
+        with ESMTP id S229543AbiJKN1n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 09:25:23 -0400
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01olkn2065.outbound.protection.outlook.com [40.92.98.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D071937FA9;
-        Tue, 11 Oct 2022 06:25:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nE1PZDCg5zSREwY8A3Fn0lq5WsXmGF6UJq86lu5RxNzdMxGkTl3gtdt0nvECPajs69bNBroHT89TJQ7TMbZMniR3sAOEc8hSmZW9RcV9bQRgGm0urv08PYenzKDKPNqU1KkX9uJ/9WJMldWEUEdgENScQrlPRg8Nv0pY1LbcgsYjyglqxJtKDiIhnYCkqq1svqli6dP8rK7Y7asoAjCQOxOcAeFblAjepgrhsXhvkq4Yx/1SBPP+yWD+N1yscg2M55Swx3SKbtF9L1vflTsf12exfIi+5rbOQTDrb9TYBxsEajuOe7ZyQqDte8YDLvJ6CcOGw757tzsmmJI63Y+KNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TCVsFpbtJPKLpK5uLC2nIGPYE9hPGGYtLCRycaKs/lg=;
- b=LT9D1EsF+36nztdtFMTyqfghKQeRU69ZBtQ0jghSpMsMiZqmYzelYsVFwPpAjYFYxDbaXZ5Gj/quxTVrXAWcli6ucZXDIA4/b0RBp0Lb1w394NKOj4xljiDBKxDfD6389xmhdFZmngMYQhODdVetg2bsjqat6VaINK42P7MAuZRc5RaLUAb3aQ50BHwmhIANutmsCJyTEmhg72S9Ii+RHbIODyiBPuqgO9vur57JtKHUn2/Ncer0SHDs/sMdjx8VGTSbQ9dU4WwzvPGPH9vCiZbcnkgM4LJRSdZMLcxG7btmAq/2/MNIcWMwqUvg+NyC09vorpSWYnqbpykLmp/YDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TCVsFpbtJPKLpK5uLC2nIGPYE9hPGGYtLCRycaKs/lg=;
- b=P395oSIgrNd9elosU+I2UokV7DsQN/NCsn5tmFokmDUIVPq56pdTNq7cIVYYAHKVcI3HrlN3usZf9jEZkb3cYZ7lbYhyZXU4SQ8vmYSOyI6S3RU0let9dOVcG29b4a9V/k8AxnRHbaOPoxF/3RK0Q1f251oT+6NTauOKCwuule4OLEkD/DytzdD2Y4aymoor3H1kr/MU5vFjuXHnyce/Fbe8xCeyySiITU1SoSPdjtL1oDaqOK2gZR3qdgdml4q7z+EfWQTSSNQOOIosE1D6aEIAenkEp/Zy37Dq5oek/D7Pj8tgThfPYMhrmHbZJ+VuodUlRxnJckb8vSgb8IwxbQ==
-Received: from OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:a7::12)
- by TYCP286MB1946.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:103::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Tue, 11 Oct
- 2022 13:25:19 +0000
-Received: from OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
- ([fe80::e524:f983:290d:369d]) by OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
- ([fe80::e524:f983:290d:369d%4]) with mapi id 15.20.5709.019; Tue, 11 Oct 2022
- 13:25:19 +0000
-From:   Jinlong Chen <chenjinlong2016@outlook.com>
-To:     yukuai1@huaweicloud.com
-Cc:     axboe@kernel.dk, chenjinlong2016@outlook.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com
-Subject: [PATCH] block: put the reference of the io scheduler module after switching back
-Date:   Tue, 11 Oct 2022 21:23:48 +0800
-Message-ID: <OS0P286MB0338E37232D7385CE39A0B07BE239@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <7f6cb343-bf97-c73a-c3da-c22d7543bd4a@huaweicloud.com>
-References: <7f6cb343-bf97-c73a-c3da-c22d7543bd4a@huaweicloud.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN:  [BGjkmTajMRwX6MtC/3OonDKXzepYN3Y2]
-X-ClientProxiedBy: SG2PR02CA0044.apcprd02.prod.outlook.com
- (2603:1096:3:18::32) To OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:604:a7::12)
-X-Microsoft-Original-Message-ID: <20221011132348.3328-1-chenjinlong2016@outlook.com>
+        Tue, 11 Oct 2022 09:27:43 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF8045985;
+        Tue, 11 Oct 2022 06:27:39 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MmxP100D5zl4Vh;
+        Tue, 11 Oct 2022 21:25:40 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAHB8lHb0VjtM1tAA--.44334S3;
+        Tue, 11 Oct 2022 21:27:36 +0800 (CST)
+Subject: Re: [PATCH] blk-mq: fix null pointer dereference in
+ blk_mq_clear_rq_mapping()
+To:     John Garry <john.garry@huawei.com>,
+        Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
+        ming.lei@redhat.com, hare@suse.de
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221011121051.3149442-1-yukuai1@huaweicloud.com>
+ <cf3116cb-b238-56c0-c5bf-fd8fa5167f77@huawei.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <46662b49-708f-6013-0e91-f59c4105c5eb@huaweicloud.com>
+Date:   Tue, 11 Oct 2022 21:27:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: OS0P286MB0338:EE_|TYCP286MB1946:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1438bb27-b449-475b-ab1a-08daab8c0aa5
-X-MS-Exchange-SLBlob-MailProps: BoO1yrQemBhGan5+5ws4G8VZFMmLUJNcy8EURbuIcD2+dQxzKFxdEIZ/m0bV/+FiTxCJeMTwLE6vbQH4/C6VG8iqUDGaQ9YBB/sN4Bvfr7IXpC23kO+lWjX+XeyZh4Nv1mzukta/VuC9A6Q9Ua1PkBBH8IO+/Eu30YvTiqoZ4DzPg97xF2sItDut9flV74oOdqefh3UY0zryMY4TpXosRxZhEjn9P5Tu4Dv6nHfGyRLrbaC0V2eRbnRpzTdVs3kvRgBhyGNZHitFHvQDeZBbII/cc2V0imve/5LK0Mjc9Xfj4DEibl25rCTKzRVWz91O+kwML6OyZSK5g15LrVxK8JG7pLMmQJR4rWS16SdJvCVov+sKRQvu0MMl3BhgGiUbCaor7NCTCi366A+FcUh9MMDp9h+lC4M/UADY7dp4NzL0fR3C4SjMwe7XlcfwvjXn23KojWPffRQsKjBhsSh6cENMcL5Agkw+CHxPB7fs+K2In7mWcdp5eBc+fb8WqpDQWHNpPBOxwfObIhJ/U4u0cQGUoYRhIEDlHDEYdyiF78xn4BxFC4/WJCt/eG4p4dF+Q769XFpSN0NEvXSylzwEewBHea7Ap9xkynBoeufPC+Zy2SVjjyRYXzKUZR1gchGTCABYtwt0g0U/xI59j8nJfMY306yrEf3x
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jnxTwvshK/egH8AsMtsIIomXevRYgS8LMV5FDIwmt1FzruS64bkKiX7l3j3b+pMliYdhAyag5aJVIbCxjAUJhz4ujcIF7urcFeEFSw17ctBvGFBxh5W3YXpdfu0vE+yeaaPaUYRu+cYPw9wqKSxaI5MlFV5N7p9YdWxqhM9AmUWC6jjTKOvmz++P/ULOjfo3Pmdk4uNtQQard94XWwfKxrN3SPbURAgzHRSQHsLwsqFxBvF55E9yd6kz45K0+lpqa1fPodSwyPjf+FBOacI3lBKLpCzJIZtf+NxRbF0egfWv68ocJ4ttFqil1HFZw1ucqh+4qzqdeKmdcd9I01k63KCKsvzMRSDNDWGfhNYxfB81XvuVSZjuQVXKe+8Oq0it6anN/KCrjRTwmx/7Jm0LFthpwHBGRCOf9Jjw9MfRWULqjNM3cYzDglagQ/CKwPx4hIvQApXRVglWIYp/ZKSAl8CliemRLLcXGItITo+jYu7s6rFEIk+QqT6KQ6XdYa3hGuGXT7AwO1SgAQqyPJI6xfCO/AQvE5Ib4exV17G1EQIQ0NjYuuYy5KHQlf5YVMV7FuGwwksnobFPpAI6+Q6z2MXOfe/hYIpEStJ3JFEMh21w+6WmDD+oZZLnq6JDapxmAOchwk7jX9r+CfF/nQRTKQS3e8tAL2XwqTSTWr2kTMbUD6l71cwPvCs8pCye2jYU
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WzaWRv9zJUl1UwzYVMWgQRBZMjsyNXCzOlOnn07aigU/sWAivawZ7/LSVj+1?=
- =?us-ascii?Q?+0C90BAOX5rvJBETpj9RPAwJLbLZVmO+YhmhME2cf2Aq3YZJKJQFI9xK2o1b?=
- =?us-ascii?Q?XN8QLTm9UuUXHzAb5O0kDDdo3lPwe4PaOd76JbmGw2B8MuBXfIsvqk/gU8LO?=
- =?us-ascii?Q?ml5M9v7asAgsMKPX9w9lqUMXmu5fq084yZvSXtLTbwsj0iG4rMQSMu6e2oz+?=
- =?us-ascii?Q?A4siRmDbL2p7eNnGiV8588gDM/9w4EiC9xC8Qf1H5zASWRddQCurb/a5Kd5v?=
- =?us-ascii?Q?yUCYenhUA2PjHVIJW88qBvqb/YcWAqMd1Uu7l3aFDox210+Q2Rav1a0M/JLk?=
- =?us-ascii?Q?IgqUscAahwEWEPVLHVAp1d/Mwq77fc7E1axEpgSmA7oCH+HPmIEpDf2lLWDe?=
- =?us-ascii?Q?eRUNdRtHqi6cv5pCmdS03UZPw1NvQ/S1cbyYLegFGkNWQuADilu1T1blr+4F?=
- =?us-ascii?Q?uT51o+UqUSNdD69sOXNhGbR1rMDM03Uw3IlxEp3+4fbzfPI7B/5+PSmiKdb9?=
- =?us-ascii?Q?IHsWGo/ZH6Ho9aSeV6hAlDsTfjqRbH3VfzwLBZx4OFsya2RJ4xrj1XVohSjK?=
- =?us-ascii?Q?7Zk4RXNh7/FYmlWcZS4h1SBJDs+Lk64KlZ4JGiGm2c3Qs2Z/EAJJfkgqLrwK?=
- =?us-ascii?Q?VVAJJHwfhQLQ3O4IKcps5d79aUClf03LM6iZMRP8amYbpjtHNc+eUhRZy1Ds?=
- =?us-ascii?Q?gz1UksIzsG7sfNsLRcc0DgBRNU7UeOpoU641XlHNbSLIzSiSXRI+U6j2Zrj7?=
- =?us-ascii?Q?U3LCe+0ggOyZPunB6FphSqb3sItyiTNWHnEIsGQFh8XHscsEnVcNeysm3WvC?=
- =?us-ascii?Q?yQSTjfX/qZQYPO0R2J8H7JKeS1NQTS0dau616VNRW7mV+YEK8Qn0N44p43u6?=
- =?us-ascii?Q?p6i55cUlYNqFHG9q+5LfGibeL8dqp7+qTWddnR2hCrNGmaep0ipiWTRcd6yR?=
- =?us-ascii?Q?YsdJx/5qm2fksyuta0RA/YbgmWd+ipZnEcuXFXe8kGYRVchokvwiKBw9416I?=
- =?us-ascii?Q?qvMneYU4EcZccvVrcxA276VSuOrjW+5ChVqOIZu8ZE+oq9ZEbLO8e/ule/VJ?=
- =?us-ascii?Q?pXQ2NRYdN9zftmmeuKlvQRCSqurYhf+KgWDhMwJyGzP/kh59/ALkgM40C7Hm?=
- =?us-ascii?Q?jlF2KCc4NsveZDZi8yeLMvYtZ/THRasmqKUpbDBzK6bJtRAbT8vnN1RLD8sz?=
- =?us-ascii?Q?ciVIVawivmNJPXwO4uT95trax23gKciII4XQB/eJKFNYWEy6LMNkmMGIyIO9?=
- =?us-ascii?Q?E52htVNG2eHeo/dA+W9RdBVacqLEF13ymdXY3hdIAMwqXDPFHzjFKPtcxFAd?=
- =?us-ascii?Q?uqw=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1438bb27-b449-475b-ab1a-08daab8c0aa5
-X-MS-Exchange-CrossTenant-AuthSource: OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2022 13:25:19.3585
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCP286MB1946
+In-Reply-To: <cf3116cb-b238-56c0-c5bf-fd8fa5167f77@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAHB8lHb0VjtM1tAA--.44334S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxAry7KF4rXw45JryDJw4DCFg_yoW7JFyDpF
+        48Ja1UGrWUJr1kCF4Utw1UJryUtr1UXw1DJr1rXa45Xr1UCr1jgr1UXr1jgr1UJr48Ar4U
+        Jr15Jr18Zr17Jr7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r4j
+        6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+        J5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+Hi,
 
-Thank you for reviewing!
-
+在 2022/10/11 21:24, John Garry 写道:
+> On 11/10/2022 13:10, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> Our syzkaller report a null pointer dereference, root cause is
+>> following:
+>>
+>> __blk_mq_alloc_map_and_rqs
+>>   set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs
+>>    blk_mq_alloc_map_and_rqs
+>>     blk_mq_alloc_rqso
 > 
-> I got it now if switch none failed, old queue is not added to the list,
-> and later blk_lookup_qe_pair() will fail to lookup the queue.
+> blk_mq_alloc_rqs
+> 
+>>      // failed due to oom
+>>      alloc_pages_node
+>>      // set->stags[hctx_idx] is still NULL
+> 
+> set->tags
+> 
+>>      blk_mq_free_rqs
+>>       drv_tags = set->tags[hctx_idx];
+>>       // null pointer dereference is triggered
+>>       blk_mq_clear_rq_mapping(drv_tags, ...)
+>>
+>> This is because commit 63064be150e4 ("blk-mq:
+>> Add blk_mq_alloc_map_and_rqs()") merged the two steps:
+>>
+>> 1) set->tags[hctx_idx] = blk_mq_alloc_rq_map()
+>> 2) blk_mq_alloc_rqs(..., set->tags[hctx_idx])
+>>
+>> into one step:
+>>
+>> set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs()
+>>
+>> Since tags is not initialized yet in this case, fix the problem by
+>> checking if tags is NULL pointer in blk_mq_clear_rq_mapping().
+>>
+>> Fixes: 63064be150e4 ("blk-mq: Add blk_mq_alloc_map_and_rqs()")
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> 
+> We could have something like the following to ensure the drv tags are 
+> assigned before we try to allocate the rqs (and fail), but prob not 
+> worth the churn since it's not nice to pass &set->tags[hctx_idx]:
+> 
+> --->8---
+> 
+> -struct blk_mq_tags *blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+> +bool blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+>                                               unsigned int hctx_idx,
+> -                                            unsigned int depth)
+> +                                            unsigned int depth,
+> +                                            struct blk_mq_tags **tags)
+>   {
+> -       struct blk_mq_tags *tags;
+>          int ret;
+> 
+> -       tags = blk_mq_alloc_rq_map(set, hctx_idx, depth, 
+> set->reserved_tags);
+> -       if (!tags)
+> -               return NULL;
+> +       *tags = blk_mq_alloc_rq_map(set, hctx_idx, depth, 
+> set->reserved_tags);
+> +       if (!*tags)
+> +               return false;
+> 
+> -       ret = blk_mq_alloc_rqs(set, tags, hctx_idx, depth);
+> +       ret = blk_mq_alloc_rqs(set, *tags, hctx_idx, depth);
+>          if (ret) {
+>                  blk_mq_free_rq_map(tags);
+> +        *tags = NULL;
+> -               return NULL;
+> +               return false;
+>          }
+> 
+> -       return tags;
+> +       return true;
+>   }
+> 
+>   static bool __blk_mq_alloc_map_and_rqs(struct blk_mq_tag_set *set,
+> @@ -3632,10 +3632,9 @@ static bool __blk_mq_alloc_map_and_rqs(struct 
+> blk_mq_tag_set *set,
+>                  return true;
+>          }
+> 
+> -       set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs(set, hctx_idx,
+> -                                                      set->queue_depth);
+> -
+> -       return set->tags[hctx_idx];
+> +       return blk_mq_alloc_map_and_rqs(set, hctx_idx,
+> +                                      set->queue_depth,
+> +                                      &set->tags[hctx_idx]);
+>   }
+> 
+> ---8<----
+> 
+> 
+> So,
+> 
+> Reviewed-by: John Garry <john.garry@huawei.com>
+
+Thanks for the review, I'll send a new verion with the spelling mistakes
+fixed.
+
+Kuai
+> 
+>> ---
+>>   block/blk-mq.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 8070b6c10e8d..33292c01875d 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -3112,8 +3112,11 @@ static void blk_mq_clear_rq_mapping(struct 
+>> blk_mq_tags *drv_tags,
+>>       struct page *page;
+>>       unsigned long flags;
+>> -    /* There is no need to clear a driver tags own mapping */
+>> -    if (drv_tags == tags)
+>> +    /*
+>> +     * There is no need to clear mapping if driver tags is not 
+>> initialized
+>> +     * or the mapping belongs to the driver tags.
+>> +     */
+>> +    if (!drv_tags || drv_tags == tags)
+>>           return;
+>>       list_for_each_entry(page, &tags->page_list, lru) {
+> 
+> .
 > 
 
-That's what I'm going to say. :)
