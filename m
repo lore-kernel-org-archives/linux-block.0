@@ -2,240 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49182C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 12:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC44C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 13:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiJLMgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 08:36:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33780 "EHLO
+        id S229627AbiJLNHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 09:07:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiJLMgb (ORCPT
+        with ESMTP id S229600AbiJLNHq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 08:36:31 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D4401DF00;
-        Wed, 12 Oct 2022 05:36:29 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MnXCV6ZjLzl9XM;
-        Wed, 12 Oct 2022 20:34:30 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgCXl8nJtEZjnY6gAA--.12812S4;
-        Wed, 12 Oct 2022 20:36:27 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     axboe@kernel.dk, gregkh@linuxfoundation.org, willy@infradead.org,
-        kch@nvidia.com, martin.petersen@oracle.com,
-        johannes.thumshirn@wdc.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH RFC] block: fix use after free for bd_holder_dir/slave_dir
-Date:   Wed, 12 Oct 2022 20:58:38 +0800
-Message-Id: <20221012125838.1608619-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+        Wed, 12 Oct 2022 09:07:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDDCECAE47
+        for <linux-block@vger.kernel.org>; Wed, 12 Oct 2022 06:07:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665580064;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QdSuEPO6v5Yda13eZlEGM4ZoOTT31U8VyXGaksmdMD8=;
+        b=AJCRda0iXRMwmzkb0zsUPALrJ8JeDfQmm1hpNAqZlAbvOGltFNoOrIO0KGx6l8UsTtJwjT
+        ihM8P3Uq2y0sj2ZT8HmT0YUWGXTeQoYi1s9wvCayRmHDYirEbJK8Q5MRb+iTExiHFqgNdG
+        98ipjot+/gQblwAcRZVCq6DxQxHTQZs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-642-vOWCSjtKMgKO6CGvADhryw-1; Wed, 12 Oct 2022 09:07:43 -0400
+X-MC-Unique: vOWCSjtKMgKO6CGvADhryw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BD02438164C3;
+        Wed, 12 Oct 2022 13:07:42 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F288B40C206B;
+        Wed, 12 Oct 2022 13:07:38 +0000 (UTC)
+Date:   Wed, 12 Oct 2022 21:07:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
+        Igor Raits <igor.raits@gooddata.com>,
+        Daniel Secik <daniel.secik@gooddata.com>,
+        David Krupicka <david.krupicka@gooddata.com>
+Subject: Re: again? - Write I/O queue hangup at random on recent Linus'
+ kernels
+Message-ID: <Y0a8Fax+YbB0M831@T590>
+References: <CAK8fFZ5w8CC7ez50dEd9nGJpc_c-ubJLk3+77d7Y5qN1pMkfRQ@mail.gmail.com>
+ <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org>
+ <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
+ <acac67a6-3331-75dd-840a-40b509ada0c1@acm.org>
+ <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXl8nJtEZjnY6gAA--.12812S4
-X-Coremail-Antispam: 1UD129KBjvJXoW3ArW3Kr47WFyDGw1DCr4DArb_yoW7ZryfpF
-        s8Ga97ArW8WryDuw47Xa4xWr1UJa1DJwn7Gasa9r4I9r43A3yqyFyUtrW7ua47WryfCFW5
-        Z3WDt3W5Jr18G37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-        n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-        AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-        c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-        AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWU
-        JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
-        J5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On Tue, Oct 11, 2022 at 05:15:05PM +0200, Jaroslav Pulchart wrote:
+> Hello,
+> 
+> we disabled the wbt, issue is happening much sooner. The logs are attached
+> 1/ "dmesg-20221011.log" form kernel messages
+> 2/ "command.logs" from execution of
+>     (cd /sys/kernel/debug/block/vdc && find . -type f -exec grep -aH . {} \;)
+> 
 
-Our test report a following uaf:
+From command.logs, looks like it is one qemu or virtio-blk issue.
 
-==================================================================
-BUG: KASAN: use-after-free in sysfs_remove_link+0x23/0x60
-Read of size 8 at addr ffff888117398db0 by task dmsetup/1097
+Maybe you can try to revert 0e9911fa768f ("virtio-blk: support mq_ops->queue_rqs()")
+and see if it makes difference.
 
-CPU: 12 PID: 1097 Comm: dmsetup Not tainted 6.0.0-next-20221007-00011-gf46c8956
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-4
-Call Trace:
- <TASK>
- ? dump_stack_lvl+0x73/0x9f
- ? print_report+0x249/0x746
- ? __virt_addr_valid+0xd4/0x200
- ? sysfs_remove_link+0x23/0x60
- ? kasan_report+0xc0/0x120
- ? sysfs_remove_link+0x23/0x60
- ? __asan_load8+0x74/0x110
- ? sysfs_remove_link+0x23/0x60
- ? __unlink_disk_holder.isra.0+0x2f/0x80
- ? bd_unlink_disk_holder+0xd2/0x1c0
- ? dm_put_table_device+0xf1/0x250
- ? dm_put_device+0x14f/0x230
- ? linear_dtr+0x34/0x50
- ? dm_table_destroy+0x7b/0x280
- ? table_load+0x34a/0x710
- ? list_devices+0x4c0/0x4c0
- ? kvmalloc_node+0x7d/0x160
- ? __kmalloc_node+0x185/0x2b0
- ? ctl_ioctl+0x388/0x7b0
- ? list_devices+0x4c0/0x4c0
- ? free_params+0x50/0x50
- ? do_vfs_ioctl+0x931/0x10d0
- ? tick_program_event+0x65/0xd0
- ? __kasan_check_read+0x1d/0x30
- ? __fget_light+0xc2/0x370
- ? dm_ctl_ioctl+0x12/0x20
- ? __x64_sys_ioctl+0xd5/0x150
- ? do_syscall_64+0x35/0x80
- ? entry_SYSCALL_64_after_hwframe+0x63/0xcd
- </TASK>
 
-Allocated by task 1097:
- kasan_save_stack+0x26/0x60
- kasan_set_track+0x29/0x40
- kasan_save_alloc_info+0x1f/0x40
- __kasan_kmalloc+0xcb/0xe0
- kmalloc_trace+0x7e/0x150
- kobject_create_and_add+0x3d/0xc0
- device_add_disk+0x429/0x7e0
- dm_setup_md_queue+0x15b/0x240
- table_load+0x469/0x710
- ctl_ioctl+0x388/0x7b0
- dm_ctl_ioctl+0x12/0x20
- __x64_sys_ioctl+0xd5/0x150
- do_syscall_64+0x35/0x80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+[1] all busy tags points to in-flight IOs
 
-Freed by task 1097:
- kasan_save_stack+0x26/0x60
- kasan_set_track+0x29/0x40
- kasan_save_free_info+0x32/0x60
- __kasan_slab_free+0x172/0x2c0
- __kmem_cache_free+0x11c/0x560
- kfree+0xd3/0x240
- dynamic_kobj_release+0x1e/0x60
- kobject_put+0x192/0x410
- device_add_disk+0x535/0x7e0
- dm_setup_md_queue+0x15b/0x240
- table_load+0x469/0x710
- ctl_ioctl+0x388/0x7b0
- dm_ctl_ioctl+0x12/0x20
- __x64_sys_ioctl+0xd5/0x150
- do_syscall_64+0x35/0x80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+grep busy temp/command.logs | grep -v -E "dispatch_busy|busy=0"
 
-This problem is very easy to reporduce by injecting failure while creating
-dm, and root cause is that lifetime of bd_holder_dir/slave_dir is
-problematic:
+./hctx27/tags:busy=3
+./hctx27/busy:00000000e4e3af26 {.op=READ, .cmd_flags=FAILFAST_DEV|FAILFAST_TRANSPORT|FAILFAST_DRIVER|RAHEAD, .rq_flags=IO_STAT|STATS, .state=in_flight, .tag=167, .internal_tag=-1}
+./hctx27/busy:00000000a9d6975f {.op=READ, .cmd_flags=FAILFAST_DEV|FAILFAST_TRANSPORT|FAILFAST_DRIVER|RAHEAD, .rq_flags=IO_STAT|STATS, .state=in_flight, .tag=168, .internal_tag=-1}
+./hctx27/busy:00000000474663fc {.op=READ, .cmd_flags=FAILFAST_DEV|FAILFAST_TRANSPORT|FAILFAST_DRIVER|RAHEAD, .rq_flags=IO_STAT|STATS, .state=in_flight, .tag=169, .internal_tag=-1}
+./hctx26/tags:busy=2
+./hctx26/busy:00000000f32dd525 {.op=WRITE, .cmd_flags=SYNC, .rq_flags=IO_STAT|STATS, .state=in_flight, .tag=107, .internal_tag=-1}
+./hctx26/busy:0000000055297a93 {.op=READ, .cmd_flags=FAILFAST_DEV|FAILFAST_TRANSPORT|FAILFAST_DRIVER|RAHEAD, .rq_flags=IO_STAT|STATS, .state=in_flight, .tag=108, .internal_tag=-1}
+...
 
-1) device alloc
-alloc_disk_node
- kzalloc_node			-> gendisk
- disk->part0 = bdev_alloc	-> part0
- device_initialize
-  kobject_init()		-> part0->bd_device
 
-2) device create
-device_add_disk
- device_add
-  kobject_add			-> part0->bd_device
- kobject_create_and_add		-> part0->bd_holder_dir
- kobject_create_and_add		-> gendisk->slave_dir
-
-3) device remove
-del_gendisk
- kobject_put			-> part0->bd_holder_dir
- kobject_put			-> gendisk->slave_dir
- device_del
-  kobject_del			-> part0->bd_device
-
-4) device free
-disk_release
- iput
-  bdev_free_inode
-   kfree			-> gendisk
-   kmem_cache_free		-> part0
-
-bd_holder_dir and slave_dir is allocated in step 2), and freed in steup
-3), while they are still accessible before step 4).
-
-This patch delay the kobject destruction to disk_release/part_release to
-fix the problem.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/genhd.c           | 7 ++++---
- block/partitions/core.c | 3 ++-
- drivers/base/core.c     | 1 -
- 3 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 514395361d7c..7ebd085d3a3f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -615,9 +615,6 @@ void del_gendisk(struct gendisk *disk)
- 
- 	blk_unregister_queue(disk);
- 
--	kobject_put(disk->part0->bd_holder_dir);
--	kobject_put(disk->slave_dir);
--
- 	part_stat_set_all(disk->part0, 0);
- 	disk->part0->bd_stamp = 0;
- 	if (!sysfs_deprecated)
-@@ -1139,6 +1136,10 @@ static void disk_release(struct device *dev)
- 	might_sleep();
- 	WARN_ON_ONCE(disk_live(disk));
- 
-+	kobject_put(disk->part0->bd_holder_dir);
-+	kobject_put(disk->slave_dir);
-+	kobject_del(&dev->kobj);
-+
- 	/*
- 	 * To undo the all initialization from blk_mq_init_allocated_queue in
- 	 * case of a probe failure where add_disk is never called we have to
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index b8112f52d388..b86a66198cc8 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -250,6 +250,8 @@ static const struct attribute_group *part_attr_groups[] = {
- 
- static void part_release(struct device *dev)
- {
-+	kobject_put(dev_to_bdev(dev)->bd_holder_dir);
-+	kobject_del(&dev->kobj);
- 	put_disk(dev_to_bdev(dev)->bd_disk);
- 	iput(dev_to_bdev(dev)->bd_inode);
- }
-@@ -279,7 +281,6 @@ static void delete_partition(struct block_device *part)
- 	__invalidate_device(part, true);
- 
- 	xa_erase(&part->bd_disk->part_tbl, part->bd_partno);
--	kobject_put(part->bd_holder_dir);
- 	device_del(&part->bd_device);
- 
- 	/*
-diff --git a/drivers/base/core.c b/drivers/base/core.c
-index d02501933467..d2ff3d2a8710 100644
---- a/drivers/base/core.c
-+++ b/drivers/base/core.c
-@@ -3712,7 +3712,6 @@ void device_del(struct device *dev)
- 					     BUS_NOTIFY_REMOVED_DEVICE, dev);
- 	kobject_uevent(&dev->kobj, KOBJ_REMOVE);
- 	glue_dir = get_glue_dir(dev);
--	kobject_del(&dev->kobj);
- 	cleanup_glue_dir(dev, glue_dir);
- 	memalloc_noio_restore(noio_flag);
- 	put_device(parent);
--- 
-2.31.1
+Thanks,
+Ming
 
