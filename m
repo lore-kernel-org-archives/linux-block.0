@@ -2,112 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81FB7C43219
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 01:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C03AC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 02:06:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbiJLBdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 21:33:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48984 "EHLO
+        id S229541AbiJLCGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 22:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiJLBdv (ORCPT
+        with ESMTP id S229480AbiJLCGC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 21:33:51 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E64AE82D14;
-        Tue, 11 Oct 2022 18:33:49 -0700 (PDT)
+        Tue, 11 Oct 2022 22:06:02 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AE84F664
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 19:06:00 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MnFVW4z6fzKF7N;
-        Wed, 12 Oct 2022 09:31:31 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MnGCg31dmz6R5GT
+        for <linux-block@vger.kernel.org>; Wed, 12 Oct 2022 10:03:43 +0800 (CST)
 Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAnKMp6GUZjH6SIAA--.46401S3;
-        Wed, 12 Oct 2022 09:33:48 +0800 (CST)
-Subject: Re: [PATCH -next 4/5] blk-iocost: bypass if only one cgroup issues io
-To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        by APP4 (Coremail) with SMTP id gCh0CgCXl8kFIUZjSsqJAA--.41237S3;
+        Wed, 12 Oct 2022 10:05:58 +0800 (CST)
+Subject: Re: again? - Write I/O queue hangup at random on recent Linus'
+ kernels
+To:     Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org
+Cc:     Igor Raits <igor.raits@gooddata.com>,
+        Daniel Secik <daniel.secik@gooddata.com>,
+        David Krupicka <david.krupicka@gooddata.com>,
         "yukuai (C)" <yukuai3@huawei.com>
-References: <20221011083547.1831389-1-yukuai1@huaweicloud.com>
- <20221011083547.1831389-5-yukuai1@huaweicloud.com>
- <Y0WhpuqK/8CEZAGc@slm.duckdns.org>
+References: <CAK8fFZ5w8CC7ez50dEd9nGJpc_c-ubJLk3+77d7Y5qN1pMkfRQ@mail.gmail.com>
+ <206b68b7-e52c-969c-a08f-a309a86c1ba6@acm.org>
+ <CAK8fFZ48N_VPSZ6SiknBtasDtUZiRn_ZsvcR4D132rj36W0KsA@mail.gmail.com>
+ <acac67a6-3331-75dd-840a-40b509ada0c1@acm.org>
+ <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c19008c3-512e-92cc-6be1-3ecc24e74341@huaweicloud.com>
-Date:   Wed, 12 Oct 2022 09:33:46 +0800
+Message-ID: <72f58c85-904b-9e21-c2f5-0d585386ec4f@huaweicloud.com>
+Date:   Wed, 12 Oct 2022 10:05:56 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <Y0WhpuqK/8CEZAGc@slm.duckdns.org>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <CAK8fFZ6ruxHsXuGT4qarNxdLLQtAoLsSvV0buFQhdc+TKo3Tag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAnKMp6GUZjH6SIAA--.46401S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww47Xr1kXr1fZw17Kw45Jrb_yoW8WFWkpr
-        ZrGanYya98Wr92k3ZagaySq34Fq3yvg3W0yr1fCw15Ar9xCr9IyFs7Ar45CF18Zrs3XrWI
-        qFsxJryrCF1UC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-        UUU
+X-CM-TRANSID: gCh0CgCXl8kFIUZjSsqJAA--.41237S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr47Jr4ktryrWFy8CryrXrb_yoW8CF4fpa
+        yxtFWSkF4kW3W0v3W29a48Ca9YqanrGF98Zr1DGry09as8CF12yFyxtFs09F9xtr1UC342
+        qrWDAw109a1j9aDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+        6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Tejun!
+Hi,
 
-‘⁄ 2022/10/12 1:02, Tejun Heo –¥µ¿:
-> On Tue, Oct 11, 2022 at 04:35:46PM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
->>
->> In this special case, there is no need to throttle io.
->>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-iocost.c | 9 +++++++--
->>   1 file changed, 7 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
->> index 5acc5f13bbd6..32e7e416d67c 100644
->> --- a/block/blk-iocost.c
->> +++ b/block/blk-iocost.c
->> @@ -2564,8 +2564,13 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
->>   	bool use_debt, ioc_locked;
->>   	unsigned long flags;
->>   
->> -	/* bypass IOs if disabled, still initializing, or for root cgroup */
->> -	if (!ioc->enabled || !iocg || !iocg->level)
->> +	/*
->> +	 * bypass IOs if disabled, still initializing, for root cgroup,
->> +	 * or the cgroup is the only cgroup with io.
->> +	 */
->> +	if (!ioc->enabled || !iocg || !iocg->level ||
->> +	    (iocg->hweight_inuse == WEIGHT_ONE &&
->> +	     atomic_read(&ioc->hweight_gen) == iocg->hweight_gen))
+Âú® 2022/10/11 23:15, Jaroslav Pulchart ÂÜôÈÅì:
+> Hello,
 > 
-> I'm not sure about this one. Bypassing here means that we lose track of how
-> much IO it's issuing which can affect future throttling decisions, right?
+> we disabled the wbt, issue is happening much sooner. The logs are attached
+> 1/ "dmesg-20221011.log" form kernel messages
+> 2/ "command.logs" from execution of
+>      (cd /sys/kernel/debug/block/vdc && find . -type f -exec grep -aH . {} \;)
+> 
+In the log, I found that many requests are stuck in the driver, for
+example:
 
-Yes, you're right, this patch doesn't look good in this case.
+./hctx24/busy:00000000e790f153 {.op=WRITE, .cmd_flags=SYNC|NOMERGE, 
+.rq_flags=IO_STAT|STATS, .state=in_flight, .tag=234, .internal_tag=-1}
 
-The reason why I tried to do this is because during test, I found that
-io performance is affected when I only issue io from one cgroup£®only
-happened in some environment with default configuration£©, and I found
-out that each io is throttled for some time before dispatching.
+state=in_flight means the rq is issued to driver, and in_flight is set
+in blk_mq_start_request().
 
-Perhaps a suitable configuration can avoid this problem.
+Can you have a check when the problem triggered, the log in 'hctx*/busy'
+stays the same so that we can be sure io is stuck in driver?
 
 Thanks,
 Kuai
-
+> Best regards,
+> Jaroslav Pulchart
 > 
-> Thanks.
-> 
+> ƒçt 6. 10. 2022 v 18:57 odes√≠latel Bart Van Assche <bvanassche@acm.org> napsal:
+>>
+>> On 10/6/22 05:36, Jaroslav Pulchart wrote:
+>>> I apply the
+>>> echo 0 > /sys/block/vdc/queue/wbt_lat_usec
+>>> at the production servers. I expect it will disable wbt. Could you
+>>> please confirm that my expectation is correct?
+>>
+>> Hi Jaroslav,
+>>
+>> I have no experience with WBT. But what I found in the documentation seems
+>> to confirm that the above command is sufficient to disable WBT:
+>>
+>>    What:         /sys/block/<disk>/queue/wbt_lat_usec
+>> Date:           November 2016
+>> Contact:        linux-block@vger.kernel.org
+>> Description:
+>>                  [RW] If the device is registered for writeback throttling, then
+>>                  this file shows the target minimum read latency. If this latency
+>>                  is exceeded in a given window of time (see wb_window_usec), then
+>>                  the writeback throttling will start scaling back writes. Writing
+>>                  a value of '0' to this file disables the feature. Writing a
+>>                  value of '-1' to this file resets the value to the default
+>>                  setting.
+>>
+>>
+>> Best regards,
+>>
+>> Bart.
 
