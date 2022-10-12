@@ -2,92 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CCDC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 06:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1285AC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 06:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbiJLGfk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 02:35:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
+        id S229436AbiJLGhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 02:37:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbiJLGff (ORCPT
+        with ESMTP id S229511AbiJLGhu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 02:35:35 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966D5481FF;
-        Tue, 11 Oct 2022 23:35:32 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id f140so15664158pfa.1;
-        Tue, 11 Oct 2022 23:35:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UQnkMXwyxVQogDtNelDtTOOBNOEp5pQlgWybNCBtvM=;
-        b=SMGdNLxMn+aL3HJ35F+yBAVTjBucxlDC0FmNVcdxdT73OTtO1iMm59m8yv6YNbrFDw
-         ZCfyzfyjVrfz1zgWQxaWHTCqVAcMGyCU0Nq8QngmmHmtczoKCh4CaAM0AoCOQ2J3RVkn
-         CaBDSXH2pqsqYxWRjrdYKDavtEwfLXdkbd4rcaDqw48OiwjskXKPWakkf3jklcCii/sp
-         II5n6oEBRU1NCbsFYSngT921tSEy6hs/ezT9FhJ/e3sWQ8GPApwfRkxyxvVk2CCaxYCW
-         radMf/wZFprB0t2Ed28KB5YWA/egveLR8PXT4AEHjm1NKZ5abAvzPwuf0jp9wLdSGali
-         wnwg==
+        Wed, 12 Oct 2022 02:37:50 -0400
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2AAB03D3
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 23:37:43 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id n16-20020a05600c4f9000b003c17bf8ddecso1870039wmq.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 23:37:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+UQnkMXwyxVQogDtNelDtTOOBNOEp5pQlgWybNCBtvM=;
-        b=CqRC1yK+PHe1B83IVdQyLGgbyzHdLBwkXgvIbJTToU6siBDxBHOYNWYgF5mNH0lpLU
-         16W0OGW7Sc/GMi7PbTHrPYssnNhIQSviuX5NkpUAiICc3+G0ij9T8xwmxTgty1DwqR9x
-         aN84FTc7pUiMO7EHqW1J+speRw/f/T2tlbQZVxWLLo3OZn9uv6a5syrcPj1WYWvRsCmq
-         +Wq6OFLda+RmEHMBZVb4KLgLiwxcmOKmCqGcpE2j1MCPVuy3Y7pb/p9EuBn7VIljkzUZ
-         e5PtXWgWs9sms/9igwz+vvQQ/ZyleapHyrdNuJYruHte1l+tusSDN2Eu89VN+G+nCxRg
-         PBNA==
-X-Gm-Message-State: ACrzQf1UBC8ETWGbCiAZ/hErcQ14veuNJFDI+aWX2ZAh5vD6/ZXIUqHA
-        WxlaiJdA4iNlmCDH0zdXauo=
-X-Google-Smtp-Source: AMsMyM6EQf8gdkpEXrDIlF3gSKpnu+PCerw953ixic+puLItEt8AO0aKVpgxedc06FDOLHrm5Orw9g==
-X-Received: by 2002:aa7:8e8c:0:b0:562:a549:efc5 with SMTP id a12-20020aa78e8c000000b00562a549efc5mr28646199pfr.20.1665556532091;
-        Tue, 11 Oct 2022 23:35:32 -0700 (PDT)
-Received: from Zbook.localdomain ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id q18-20020a17090311d200b00174c0dd29f0sm9796491plh.144.2022.10.11.23.35.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 23:35:31 -0700 (PDT)
-From:   Yuwei Guan <ssawgyw@gmail.com>
-X-Google-Original-From: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com
-Subject: [RESEND PATCH] block, bfq: remove unused variable for bfq_queue
-Date:   Wed, 12 Oct 2022 14:34:48 +0800
-Message-Id: <20221012063448.248-1-Yuwei.Guan@zeekrlife.com>
-X-Mailer: git-send-email 2.34.1
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fzazz2LGm2icEmkVZBKyvXHDcPEponMOSCNSkIH0wgI=;
+        b=GPw10vr61IMcRfr39ssqlqkECCz/cNJ8UbU5Aa8RtytPi6BTBwyLCIgQmDpWvkvFfp
+         iLuXFRICvOMKWWI0tKRVF6CtWdZO36bHTiOYUCeqXAagqKlxZV35/lWPVU1G4QPF+7ho
+         Pb8h4Meot5x+z4Ut2LHTDMBKXVyU2kr3vm8utknP5Mao4Z584levObEhXkpqNZ4vrYVz
+         EhpllJhqOkEajHfnCWqBzXen8gMi7qLSd1pV7naDKlpKRwR1zGcn69zcPcBmLxSIAQGG
+         ZH1L/Msl9BPcnpkUPqOrdeZvlglTsf1LY81ONo6kAy4XvKlXL/+BYEQg0C4uWuUduoKz
+         ygCw==
+X-Gm-Message-State: ACrzQf11iFgKZtMJfAl7zgpO777D1hcSFXdwbem1PEMcXLOkARoEZo2z
+        jg04hgVylv3zFcjXavRpi8U=
+X-Google-Smtp-Source: AMsMyM4JijtLxbt2ktWylR00buTODn27IC2f7iR7kF5eewPHXO7bGTRr/sy3mSvEUvQ7Yvyf66bGTQ==
+X-Received: by 2002:a1c:7407:0:b0:3c6:cc25:c02f with SMTP id p7-20020a1c7407000000b003c6cc25c02fmr1603832wmc.124.1665556662410;
+        Tue, 11 Oct 2022 23:37:42 -0700 (PDT)
+Received: from [192.168.64.53] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id w9-20020a5d6809000000b0022aeba020casm12952192wru.83.2022.10.11.23.37.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Oct 2022 23:37:41 -0700 (PDT)
+Message-ID: <5fc61f6c-3d3e-ce0e-a090-aa5bcdb7721c@grimberg.me>
+Date:   Wed, 12 Oct 2022 09:37:40 +0300
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 0/3] improve nvme quiesce time for large amount of
+ namespaces
+Content-Language: en-US
+To:     Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@kernel.dk
+References: <20220729073948.32696-1-lengchao@huawei.com>
+ <20220729142605.GA395@lst.de>
+ <1b3d753a-6ff5-bdf1-8c91-4b4760ea1736@huawei.com>
+ <fc7a303f-0921-f784-a559-f03511f2e4be@grimberg.me>
+ <20220802133815.GA380@lst.de>
+ <537c24ba-e984-811e-9e51-ecbc2af9895d@huawei.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <537c24ba-e984-811e-9e51-ecbc2af9895d@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-it defined in d0edc2473be9d, but there's nowhere to use it,
-so remove it.
 
-Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
----
- block/bfq-iosched.h | 3 ---
- 1 file changed, 3 deletions(-)
+>> On Sun, Jul 31, 2022 at 01:23:36PM +0300, Sagi Grimberg wrote:
+>>> But maybe we can avoid that, and because we allocate
+>>> the connect_q ourselves, and fully know that it should
+>>> not be apart of the tagset quiesce, perhaps we can introduce
+>>> a new interface like:
+>>> -- 
+>>> static inline int nvme_ctrl_init_connect_q(struct nvme_ctrl *ctrl)
+>>> {
+>>>     ctrl->connect_q = blk_mq_init_queue_self_quiesce(ctrl->tagset);
+>>>     if (IS_ERR(ctrl->connect_q))
+>>>         return PTR_ERR(ctrl->connect_q);
+>>>     return 0;
+>>> }
+>>> -- 
+>>>
+>>> And then blk_mq_quiesce_tagset can simply look into a per request-queue
+>>> self_quiesce flag and skip as needed.
+>>
+>> I'd just make that a queue flag set after allocation to keep the
+>> interface simple, but otherwise this seems like the right thing
+>> to do.
+> Now the code used NVME_NS_STOPPED to avoid unpaired stop/start.
+> If we use blk_mq_quiesce_tagset, It will cause the above mechanism to fail.
+> I review the code, only pci can not ensure secure stop/start pairing.
+> So there is a choice, We only use blk_mq_quiesce_tagset on fabrics, not 
+> PCI.
+> Do you think that's acceptable?
+> If that's acceptable, I will try to send a patch set.
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 64ee618064ba..6bcef8e5871a 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -369,11 +369,8 @@ struct bfq_queue {
- 	unsigned long split_time; /* time of last split */
- 
- 	unsigned long first_IO_time; /* time of first I/O for this queue */
--
- 	unsigned long creation_time; /* when this queue is created */
- 
--	/* max service rate measured so far */
--	u32 max_service_rate;
- 
- 	/*
- 	 * Pointer to the waker queue for this queue, i.e., to the
--- 
-2.34.1
-
+I don't think that this is acceptable. But I don't understand how
+NVME_NS_STOPPED would change anything in the behavior of tagset-wide
+quiesce?
