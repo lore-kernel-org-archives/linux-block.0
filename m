@@ -2,93 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88659C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 06:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CCDC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 06:35:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiJLGbp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 02:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45004 "EHLO
+        id S229492AbiJLGfk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 02:35:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiJLGbm (ORCPT
+        with ESMTP id S229686AbiJLGff (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 02:31:42 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3259DAC397;
-        Tue, 11 Oct 2022 23:31:42 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id v10-20020a17090a634a00b00205e48cf845so1114404pjs.4;
-        Tue, 11 Oct 2022 23:31:42 -0700 (PDT)
+        Wed, 12 Oct 2022 02:35:35 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966D5481FF;
+        Tue, 11 Oct 2022 23:35:32 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id f140so15664158pfa.1;
+        Tue, 11 Oct 2022 23:35:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3GR5go0ck5Qs0e0/T7kbb1mBxqLfRSLAKUeyU2WjNcU=;
-        b=U2A+BYXl888GxHHPJeE8FG6KtfrDgplmxYum+0JhEevDa8bs0QZsBPIrtQMZRE/4sV
-         nBnG9lCuQdKc9HIWYN+ZKNOxnK5QlG8+ZwatrWncUxeUmpfOywnGE3r0eFkk0Il3J7DC
-         lLOqTU5auPaMuj0esMM0+NpiuYqf68KtNBlfMDbd8aBZ/ao13ksborDr0FmpxGHNXHmS
-         hcB/a2XfwQbBNPQdxpUF7CKnTzQcOYPHdNnjZV4ux5vPOPI6pf1ZikIa++iRovwWv676
-         RdmToGtvNMM9pFaG3MxL6BZq4EQZ1HM7OFzG3TRteHvrRfrsGAj8uX0nnZPbZBxaQ18V
-         2yFA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+UQnkMXwyxVQogDtNelDtTOOBNOEp5pQlgWybNCBtvM=;
+        b=SMGdNLxMn+aL3HJ35F+yBAVTjBucxlDC0FmNVcdxdT73OTtO1iMm59m8yv6YNbrFDw
+         ZCfyzfyjVrfz1zgWQxaWHTCqVAcMGyCU0Nq8QngmmHmtczoKCh4CaAM0AoCOQ2J3RVkn
+         CaBDSXH2pqsqYxWRjrdYKDavtEwfLXdkbd4rcaDqw48OiwjskXKPWakkf3jklcCii/sp
+         II5n6oEBRU1NCbsFYSngT921tSEy6hs/ezT9FhJ/e3sWQ8GPApwfRkxyxvVk2CCaxYCW
+         radMf/wZFprB0t2Ed28KB5YWA/egveLR8PXT4AEHjm1NKZ5abAvzPwuf0jp9wLdSGali
+         wnwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3GR5go0ck5Qs0e0/T7kbb1mBxqLfRSLAKUeyU2WjNcU=;
-        b=pm2YOl8P+2Hv8DlY3SezKVMM34YUrs401/Z80NIDPYdTr8sXrinF1XVe9y5SXYwmfr
-         k8ry4wF2YKCC+2MRqnAi5lgJLQDVAcA1Rd2aL5QifwUpEATggwlARd7F4w3dIIVM+KYi
-         1zGE5/tJuVD2N29wTTF3ojO7CdywoDr/XZ3L7It1HfpYY68tbafRXNVZBdsiEevuOTDu
-         k0CxAdYgr/ZW1+uhhBoLn4JsLZrAEz8RAcmOayP+9yAQ6h4eO/zUD/e7SQU02fTBLIVc
-         rQUqygnd+kBSbOqi+o/lgkCMfScGeosrqrzCgu7gaB8HF3yD5Txw49qkFuRLAA4Tt8Yj
-         UR7w==
-X-Gm-Message-State: ACrzQf33Jq7NakFGwdExwtAqIH9D4387NO2ZqDEaax3VeaV1AvRdQJpQ
-        ybCA3Poc/GwASLbhbSy5HGM=
-X-Google-Smtp-Source: AMsMyM49qIov3tPxIY8VPEfjb4JSsPOJoaTOtk1CrTHk0MCGUXiNkqI2cLYrVKJ8yEdIHRjni03LTg==
-X-Received: by 2002:a17:903:230b:b0:17e:f1e4:6a89 with SMTP id d11-20020a170903230b00b0017ef1e46a89mr28829830plh.118.1665556301707;
-        Tue, 11 Oct 2022 23:31:41 -0700 (PDT)
-Received: from [10.114.96.63] ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id n15-20020a170902e54f00b001785fa792f4sm9874191plf.243.2022.10.11.23.31.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Oct 2022 23:31:41 -0700 (PDT)
-Message-ID: <2590b78f-65ee-c4b1-7a18-870db7a5c733@gmail.com>
-Date:   Wed, 12 Oct 2022 14:31:37 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.2
-Subject: Re: [PATCH] block, bfq: remove unused variable for bfq_queue
-To:     Jens Axboe <axboe@kernel.dk>,
-        Yuwei Guan <Yuwei.Guan@zeekrlife.com>, paolo.valente@linaro.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221010132907.1252-1-Yuwei.Guan@zeekrlife.com>
- <eb59cf48-03c8-7ce9-7e00-4b824cef150d@kernel.dk>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+UQnkMXwyxVQogDtNelDtTOOBNOEp5pQlgWybNCBtvM=;
+        b=CqRC1yK+PHe1B83IVdQyLGgbyzHdLBwkXgvIbJTToU6siBDxBHOYNWYgF5mNH0lpLU
+         16W0OGW7Sc/GMi7PbTHrPYssnNhIQSviuX5NkpUAiICc3+G0ij9T8xwmxTgty1DwqR9x
+         aN84FTc7pUiMO7EHqW1J+speRw/f/T2tlbQZVxWLLo3OZn9uv6a5syrcPj1WYWvRsCmq
+         +Wq6OFLda+RmEHMBZVb4KLgLiwxcmOKmCqGcpE2j1MCPVuy3Y7pb/p9EuBn7VIljkzUZ
+         e5PtXWgWs9sms/9igwz+vvQQ/ZyleapHyrdNuJYruHte1l+tusSDN2Eu89VN+G+nCxRg
+         PBNA==
+X-Gm-Message-State: ACrzQf1UBC8ETWGbCiAZ/hErcQ14veuNJFDI+aWX2ZAh5vD6/ZXIUqHA
+        WxlaiJdA4iNlmCDH0zdXauo=
+X-Google-Smtp-Source: AMsMyM6EQf8gdkpEXrDIlF3gSKpnu+PCerw953ixic+puLItEt8AO0aKVpgxedc06FDOLHrm5Orw9g==
+X-Received: by 2002:aa7:8e8c:0:b0:562:a549:efc5 with SMTP id a12-20020aa78e8c000000b00562a549efc5mr28646199pfr.20.1665556532091;
+        Tue, 11 Oct 2022 23:35:32 -0700 (PDT)
+Received: from Zbook.localdomain ([129.227.152.6])
+        by smtp.gmail.com with ESMTPSA id q18-20020a17090311d200b00174c0dd29f0sm9796491plh.144.2022.10.11.23.35.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Oct 2022 23:35:31 -0700 (PDT)
 From:   Yuwei Guan <ssawgyw@gmail.com>
-In-Reply-To: <eb59cf48-03c8-7ce9-7e00-4b824cef150d@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Google-Original-From: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+To:     paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yuwei.Guan@zeekrlife.com
+Subject: [RESEND PATCH] block, bfq: remove unused variable for bfq_queue
+Date:   Wed, 12 Oct 2022 14:34:48 +0800
+Message-Id: <20221012063448.248-1-Yuwei.Guan@zeekrlife.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+it defined in d0edc2473be9d, but there's nowhere to use it,
+so remove it.
 
-On 2022/10/12 0:26, Jens Axboe wrote:
-> On 10/10/22 7:29 AM, Yuwei Guan wrote:
->> it defined in d0edc24, but there's nowhere to use it,
->> so remove it.
-> A few things wrong with this patch:
->
-> 1) It's whitespace damaged, and hence will not apply directly.
-> 2) It should have a fixes tag, and the sha used should be 12
->      chars. 8 is too short.
->
-> Can you resend it?
-Thanks for reviewing, sure, I will resend it.
->> Disclaimer?The information transmitted is intended only for the person
->> or entity to which it is addressed and may contain confidential and/or
->> privileged material. Any review, retransmission, dissemination or
->> other use of, or taking of any action in reliance upon, this
->> information by persons or entities other than the intended recipient
->> is prohibited. If you received this in error , please contact the
->> sender and delete the material from any computer .
-> And please get rid of this, it's just spam and doesn't apply on a public
-> mailing list.
-Ok, I will send with gmail.
+Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+---
+ block/bfq-iosched.h | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 64ee618064ba..6bcef8e5871a 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -369,11 +369,8 @@ struct bfq_queue {
+ 	unsigned long split_time; /* time of last split */
+ 
+ 	unsigned long first_IO_time; /* time of first I/O for this queue */
+-
+ 	unsigned long creation_time; /* when this queue is created */
+ 
+-	/* max service rate measured so far */
+-	u32 max_service_rate;
+ 
+ 	/*
+ 	 * Pointer to the waker queue for this queue, i.e., to the
+-- 
+2.34.1
+
