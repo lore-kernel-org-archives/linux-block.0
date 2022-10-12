@@ -2,115 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A6CC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 06:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88659C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 06:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbiJLGVF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 02:21:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57122 "EHLO
+        id S229572AbiJLGbp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 02:31:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbiJLGVF (ORCPT
+        with ESMTP id S229519AbiJLGbm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 02:21:05 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4BF89AC2
-        for <linux-block@vger.kernel.org>; Tue, 11 Oct 2022 23:20:58 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6D59D1F381;
-        Wed, 12 Oct 2022 06:20:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1665555656; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IRw286FCeo/z7YPKAjzl9PWu46h36NwIgHxI8T3tlXI=;
-        b=YvyfKT1v4CjxamnrK3HzxZDwnHwUgtnl418i6u0fgDDMO4pReRvWpVRJS8KU0IjaDAuUxG
-        eMqZvXn6E6q6o0nHUMdXDf0bEeYC1QsDCUBdQ+vtd5m8YLD88c1ZNUlKaCUGYx/WdrYVHS
-        xquanNiDi5Ftwq9VDxOL1xtG7DyzJRw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1665555656;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IRw286FCeo/z7YPKAjzl9PWu46h36NwIgHxI8T3tlXI=;
-        b=1ixFZ2oa40iqgStLDLruyxczBPimPSowXMjlJ6JoDCy7U+SXf7d6w76wTWyRZBQZ7nFerX
-        eaYlGhIt6ECt8XBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 12CEB13ACD;
-        Wed, 12 Oct 2022 06:20:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Q/qIAMhcRmPjIwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 12 Oct 2022 06:20:56 +0000
-Message-ID: <0d869239-73bb-b61a-6a33-2219f3d635ef@suse.de>
-Date:   Wed, 12 Oct 2022 08:20:54 +0200
+        Wed, 12 Oct 2022 02:31:42 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3259DAC397;
+        Tue, 11 Oct 2022 23:31:42 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id v10-20020a17090a634a00b00205e48cf845so1114404pjs.4;
+        Tue, 11 Oct 2022 23:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3GR5go0ck5Qs0e0/T7kbb1mBxqLfRSLAKUeyU2WjNcU=;
+        b=U2A+BYXl888GxHHPJeE8FG6KtfrDgplmxYum+0JhEevDa8bs0QZsBPIrtQMZRE/4sV
+         nBnG9lCuQdKc9HIWYN+ZKNOxnK5QlG8+ZwatrWncUxeUmpfOywnGE3r0eFkk0Il3J7DC
+         lLOqTU5auPaMuj0esMM0+NpiuYqf68KtNBlfMDbd8aBZ/ao13ksborDr0FmpxGHNXHmS
+         hcB/a2XfwQbBNPQdxpUF7CKnTzQcOYPHdNnjZV4ux5vPOPI6pf1ZikIa++iRovwWv676
+         RdmToGtvNMM9pFaG3MxL6BZq4EQZ1HM7OFzG3TRteHvrRfrsGAj8uX0nnZPbZBxaQ18V
+         2yFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3GR5go0ck5Qs0e0/T7kbb1mBxqLfRSLAKUeyU2WjNcU=;
+        b=pm2YOl8P+2Hv8DlY3SezKVMM34YUrs401/Z80NIDPYdTr8sXrinF1XVe9y5SXYwmfr
+         k8ry4wF2YKCC+2MRqnAi5lgJLQDVAcA1Rd2aL5QifwUpEATggwlARd7F4w3dIIVM+KYi
+         1zGE5/tJuVD2N29wTTF3ojO7CdywoDr/XZ3L7It1HfpYY68tbafRXNVZBdsiEevuOTDu
+         k0CxAdYgr/ZW1+uhhBoLn4JsLZrAEz8RAcmOayP+9yAQ6h4eO/zUD/e7SQU02fTBLIVc
+         rQUqygnd+kBSbOqi+o/lgkCMfScGeosrqrzCgu7gaB8HF3yD5Txw49qkFuRLAA4Tt8Yj
+         UR7w==
+X-Gm-Message-State: ACrzQf33Jq7NakFGwdExwtAqIH9D4387NO2ZqDEaax3VeaV1AvRdQJpQ
+        ybCA3Poc/GwASLbhbSy5HGM=
+X-Google-Smtp-Source: AMsMyM49qIov3tPxIY8VPEfjb4JSsPOJoaTOtk1CrTHk0MCGUXiNkqI2cLYrVKJ8yEdIHRjni03LTg==
+X-Received: by 2002:a17:903:230b:b0:17e:f1e4:6a89 with SMTP id d11-20020a170903230b00b0017ef1e46a89mr28829830plh.118.1665556301707;
+        Tue, 11 Oct 2022 23:31:41 -0700 (PDT)
+Received: from [10.114.96.63] ([129.227.152.6])
+        by smtp.gmail.com with ESMTPSA id n15-20020a170902e54f00b001785fa792f4sm9874191plf.243.2022.10.11.23.31.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Oct 2022 23:31:41 -0700 (PDT)
+Message-ID: <2590b78f-65ee-c4b1-7a18-870db7a5c733@gmail.com>
+Date:   Wed, 12 Oct 2022 14:31:37 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH] block: fix leaking minors of hidden disks
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Daniel Wagner <dwagner@suse.de>
-References: <20221010131857.748129-1-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20221010131857.748129-1-hch@lst.de>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.2
+Subject: Re: [PATCH] block, bfq: remove unused variable for bfq_queue
+To:     Jens Axboe <axboe@kernel.dk>,
+        Yuwei Guan <Yuwei.Guan@zeekrlife.com>, paolo.valente@linaro.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221010132907.1252-1-Yuwei.Guan@zeekrlife.com>
+ <eb59cf48-03c8-7ce9-7e00-4b824cef150d@kernel.dk>
+From:   Yuwei Guan <ssawgyw@gmail.com>
+In-Reply-To: <eb59cf48-03c8-7ce9-7e00-4b824cef150d@kernel.dk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/10/22 15:18, Christoph Hellwig wrote:
-> The major/minor of a hidden gendisk is not propagated to the block
-> device because it is never registered using bdev_add.  But the lack of
-> bd_dev also causes the dynamic major minor number not to be freed.
-> Assign bd_dev manually to ensure the dynamic major minor gets freed.
-> 
-> Based on a patch by Keith Busch.
-> 
-> Fixes:  8ddcd653257c ("block: introduce GENHD_FL_HIDDEN")
-> Reported-by: Daniel Wagner <dwagner@suse.de>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Tested-by: Daniel Wagner <dwagner@suse.de>
-> ---
->   block/genhd.c | 7 +++++++
->   1 file changed, 7 insertions(+)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 514395361d7c5..17b33c62423df 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -507,6 +507,13 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
->   		 */
->   		dev_set_uevent_suppress(ddev, 0);
->   		disk_uevent(disk, KOBJ_ADD);
-> +	} else {
-> +		/*
-> +		 * Even if the block_device for a hidden gendisk is not
-> +		 * registered, it needs to have a valid bd_dev so that the
-> +		 * freeing of the dynamic major works.
-> +		 */
-> +		disk->part0->bd_dev = MKDEV(disk->major, disk->first_minor);
->   	}
->   
->   	disk_update_readahead(disk);
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
-
+On 2022/10/12 0:26, Jens Axboe wrote:
+> On 10/10/22 7:29 AM, Yuwei Guan wrote:
+>> it defined in d0edc24, but there's nowhere to use it,
+>> so remove it.
+> A few things wrong with this patch:
+>
+> 1) It's whitespace damaged, and hence will not apply directly.
+> 2) It should have a fixes tag, and the sha used should be 12
+>      chars. 8 is too short.
+>
+> Can you resend it?
+Thanks for reviewing, sure, I will resend it.
+>> Disclaimer?The information transmitted is intended only for the person
+>> or entity to which it is addressed and may contain confidential and/or
+>> privileged material. Any review, retransmission, dissemination or
+>> other use of, or taking of any action in reliance upon, this
+>> information by persons or entities other than the intended recipient
+>> is prohibited. If you received this in error , please contact the
+>> sender and delete the material from any computer .
+> And please get rid of this, it's just spam and doesn't apply on a public
+> mailing list.
+Ok, I will send with gmail.
