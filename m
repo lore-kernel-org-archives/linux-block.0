@@ -2,54 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D14C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 17:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1072C43217
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 19:26:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229451AbiJLRuT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 13:50:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53082 "EHLO
+        id S229769AbiJLT0d convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 15:26:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbiJLRuT (ORCPT
+        with ESMTP id S229748AbiJLT0b (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 13:50:19 -0400
-X-Greylist: delayed 1804 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Oct 2022 10:50:16 PDT
-Received: from zuombrgn.myspeace.com (zuombrgn.myspeace.com [45.95.169.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773D36C95A
-        for <linux-block@vger.kernel.org>; Wed, 12 Oct 2022 10:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=dkim; d=myspeace.com;
- h=Reply-To:From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding; i=jan.cha@myspeace.com;
- bh=5veHaSCo0CbAZntugzt28BVHSVA=;
- b=GJJ8sh3Tf+62qkd9M93nXOeLmmDu/LlIDGHOZ+8v89TibzMQckmOCgD7H28D6IAC73axR5GFRtbw
-   dWmMJG7aoPZ3SJ0Wo76oJekh7ApB40ftObIIFC42cRSxGhYvWlFyE+0xSPrpNg8tzhFsonW4u9ol
-   Mu1azhGobBVmsxckwxvDoSaJNsT2NJZ49XLqvVJfNqoqP/iya9butGxmKxBNTppkYv5pBMZ0sBO6
-   uQKvdUcsL0T65RDFwevPP1kkXvfH0eAUlBQmeqtQfB6cJMeYmC1yhfYtJuSgMsJWInsosyMbkdb2
-   F9NTXYg+I9BmwZ6em3tv5Au2K549bD7QTxAUmw==
-DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns; s=dkim; d=myspeace.com;
- b=tXhtiO8u3aKtsd9deeQ7J0/R2j1n3+V7aLYg1rauXNJxemZU672k+0YTiGm5hX7to8hUUL1oYWRQ
-   c67bp5tK1/vtMoIvCYDFW5jK09/3yXxxG2waDdTbkqI8qlQUt1U+jI8kxMbmTDS/qpA1mSds9fgI
-   Sj2s3dKqPZOwChLnX7C/myQm55t2mmguER32tz/nJqnPZHFxeK10fnOLnCJo7mjWewkxiE7cmWPl
-   /3l9vC4DR0cEC8hY4hxXrlm3qRy9K0oO3RtqabxT/k0isqomSisD+YVno1LwDi2ECnlQfIxXF6Ew
-   EdR2F+RxJFXbz3Wgj1Vu0zEcRBCP+xO8WwZd2Q==;
-Reply-To: m.ayvaz@mayvazburosu.com
-From:   Mustafa Ayvaz <jan.cha@myspeace.com>
-To:     linux-block@vger.kernel.org
-Subject: linux-block
-Date:   12 Oct 2022 19:20:09 +0200
-Message-ID: <20221012192009.CCFBCE79B7553064@myspeace.com>
+        Wed, 12 Oct 2022 15:26:31 -0400
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45A9910251A;
+        Wed, 12 Oct 2022 12:26:30 -0700 (PDT)
+Received: from omf12.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay01.hostedemail.com (Postfix) with ESMTP id 2096E1C6C41;
+        Wed, 12 Oct 2022 19:17:09 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf12.hostedemail.com (Postfix) with ESMTPA id AB9FC17;
+        Wed, 12 Oct 2022 19:16:43 +0000 (UTC)
+Message-ID: <f8ad3ba44d28dec1a5f7626b82c5e9c2aeefa729.camel@perches.com>
+Subject: Re: [PATCH v1 3/5] treewide: use get_random_u32() when possible
+From:   Joe Perches <joe@perches.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        linux-kernel@vger.kernel.org
+Cc:     brcm80211-dev-list.pdl@broadcom.com, cake@lists.bufferbloat.net,
+        ceph-devel@vger.kernel.org, coreteam@netfilter.org,
+        dccp@vger.kernel.org, dev@openvswitch.org,
+        dmaengine@vger.kernel.org, drbd-dev@lists.linbit.com,
+        dri-devel@lists.freedesktop.org, kasan-dev@googlegroups.com,
+        linux-actions@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mm@kvack.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-raid@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sctp@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        lvs-devel@vger.kernel.org, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, rds-devel@oss.oracle.com,
+        SHA-cyfmac-dev-list@infineon.com, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net
+Date:   Wed, 12 Oct 2022 12:16:53 -0700
+In-Reply-To: <20221005214844.2699-4-Jason@zx2c4.com>
+References: <20221005214844.2699-1-Jason@zx2c4.com>
+         <20221005214844.2699-4-Jason@zx2c4.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+X-Stat-Signature: c3d78nppyrywoyngway5d943fw3wwtdu
+X-Rspamd-Server: rspamout03
+X-Rspamd-Queue-Id: AB9FC17
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1/Qw27OeRP8/mQW0Su38d7rwhSo1NO9QCw=
+X-HE-Tag: 1665602203-428634
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Good day,
+On Wed, 2022-10-05 at 23:48 +0200, Jason A. Donenfeld wrote:
+> The prandom_u32() function has been a deprecated inline wrapper around
+> get_random_u32() for several releases now, and compiles down to the
+> exact same code. Replace the deprecated wrapper with a direct call to
+> the real function.
+[]
+> diff --git a/drivers/infiniband/hw/cxgb4/cm.c b/drivers/infiniband/hw/cxgb4/cm.c
+[]
+> @@ -734,7 +734,7 @@ static int send_connect(struct c4iw_ep *ep)
+>  				   &ep->com.remote_addr;
+>  	int ret;
+>  	enum chip_type adapter_type = ep->com.dev->rdev.lldi.adapter_type;
+> -	u32 isn = (prandom_u32() & ~7UL) - 1;
+> +	u32 isn = (get_random_u32() & ~7UL) - 1;
 
-I was only wondering if you got my previous message? I have been=20
-trying to reach you on your email: linux-block@vger.kernel.org ,=20
-I want to share a business opportunity with you. kindly get back=20
-to me swiftly,  it is very important.
+trivia:
 
-Thanks
-Mustafa Ayvaz
+There are somewhat odd size mismatches here.
+
+I had to think a tiny bit if random() returned a value from 0 to 7
+and was promoted to a 64 bit value then truncated to 32 bit.
+
+Perhaps these would be clearer as ~7U and not ~7UL
+
+>  	struct net_device *netdev;
+>  	u64 params;
+>  
+> @@ -2469,7 +2469,7 @@ static int accept_cr(struct c4iw_ep *ep, struct sk_buff *skb,
+>  	}
+>  
+>  	if (!is_t4(adapter_type)) {
+> -		u32 isn = (prandom_u32() & ~7UL) - 1;
+> +		u32 isn = (get_random_u32() & ~7UL) - 1;
+
+etc...
+
+drivers/infiniband/hw/cxgb4/cm.c:	u32 isn = (prandom_u32() & ~7UL) - 1;
+drivers/infiniband/hw/cxgb4/cm.c:		u32 isn = (prandom_u32() & ~7UL) - 1;
+drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c:	rpl5->iss = cpu_to_be32((prandom_u32() & ~7UL) - 1);
+drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:		u32 isn = (prandom_u32() & ~7UL) - 1;
+drivers/scsi/cxgbi/cxgb4i/cxgb4i.c:		u32 isn = (prandom_u32() & ~7UL) - 1;
+drivers/target/iscsi/cxgbit/cxgbit_cm.c:	rpl5->iss = cpu_to_be32((prandom_u32() & ~7UL) - 1);
+
