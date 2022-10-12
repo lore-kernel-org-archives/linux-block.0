@@ -2,113 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C75DC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 00:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81FB7C43219
+	for <linux-block@archiver.kernel.org>; Wed, 12 Oct 2022 01:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbiJLAz3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Oct 2022 20:55:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52280 "EHLO
+        id S229560AbiJLBdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Oct 2022 21:33:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiJLAz0 (ORCPT
+        with ESMTP id S229475AbiJLBdv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Oct 2022 20:55:26 -0400
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01olkn2099.outbound.protection.outlook.com [40.92.98.99])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2036E2F4;
-        Tue, 11 Oct 2022 17:55:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cP4/vNbdx4YzYAaw+V4i+IBtYPYPhG9ZctZ0/iqRt+FGbZMCjux7+zMr1wCzNAp+MBkShTFU4YX4qIhtGqe/a0PlGfaTSyZAjKuXuRXJXvSiU+MSigFkW4uKC+r1RD06M7hGBhKNKrnWLIs0VqwP2m3JZQDLwrBFixiWtIYcSyaTwGUvG/Vx5iWUfUyzxzeHzOS8/3gSWnKCXKYSCsXqByFd1yoY7bQOjG74xbG6Xb0fdFX9zNgPpHC1ipJkaZClPRzp8qPcj5unoQ7PiufwBFYhYzwUbGlBTw+8Mtx5q+tU14egtU1EcoB2lIt76xbE+RzI7mFK4M+y0Xd6EuJ5yw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xym1e/h14hNGGsbqv3uvDZAVHpfrnYfTmM2mIFsW35o=;
- b=Guw172697D9E8lNwjF8bZXLH064VRlmOTWeKHyymLCvjmp+yskJnCuNvEBqqVBSEHqMeP4FG86Q1n40tOCFGe9e+T8c7v9dxCzgy6P2H4KZpCQG+Ku9ZyEepndMmN+amucIR+MAkUqJs/PKFlYYIkHd0KY4lBLZjAoT8kxgr7tQdSy7j+5PA+B8pvYMxNragUimAWmnIlHb0CnNo50n3sl4c0ftF1EEPb7LproOMo/rZHNueuIfmEGvoTL46FEgXDgRY+XnW//+TtQ/A0OnHCJcnnA0bqad/bvbw3Y72h3LhmeMMViDKS8Bbw6vvijgIIEK1gqdDIMPvsfmk3DPAAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xym1e/h14hNGGsbqv3uvDZAVHpfrnYfTmM2mIFsW35o=;
- b=XT2wMaGz4xYNMI+sLQAVlejarjdw+EWmVcg/MqAoP+4kLE2Dn4dBqQs/enVxTF8rUj+1W2rVZb9/L6r1f9iUX5C+amsXJ15DEZodb1PzFAyKM4xZUifo1sTHr5ahSb61N3fWo6wvL9On4J4xHsuCHzD5sj0EhpLtJMm1NxJjNmcUzmxs2hLy0nC0Bag/ooMOXgtVNF1aL3S94vkbdmYed1grYgw9fVJu11JFLh3Y0vzM6oyClfcAeWi2pp/IBV/GOxpcBHVWzTKNdocb3hXiuV4/iyCfsZN6J8kGwD1NUl1PeD+1M/GH46ovOknDMByxSYZUiZUURk+b9GJw2pu3Ig==
-Received: from OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:a7::12)
- by TYWP286MB2086.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:161::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Wed, 12 Oct
- 2022 00:55:23 +0000
-Received: from OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
- ([fe80::e524:f983:290d:369d]) by OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
- ([fe80::e524:f983:290d:369d%5]) with mapi id 15.20.5709.021; Wed, 12 Oct 2022
- 00:55:23 +0000
-From:   Jinlong Chen <chenjinlong2016@outlook.com>
-To:     axboe@kernel.dk
-Cc:     chenjinlong2016@outlook.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: put the reference of the io scheduler module after switching back
-Date:   Wed, 12 Oct 2022 08:54:32 +0800
-Message-ID: <OS0P286MB0338CC0CB08A6CDDACC4FD41BE229@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <OS0P286MB0338069A20BA87C2C9B2F2E0BE239@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
-References: <OS0P286MB0338069A20BA87C2C9B2F2E0BE239@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN:  [L4eja23W4AHB8S9KKGo3gqs+iOFpIP80]
-X-ClientProxiedBy: SI1PR02CA0014.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::9) To OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:604:a7::12)
-X-Microsoft-Original-Message-ID: <20221012005432.6679-1-chenjinlong2016@outlook.com>
+        Tue, 11 Oct 2022 21:33:51 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E64AE82D14;
+        Tue, 11 Oct 2022 18:33:49 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MnFVW4z6fzKF7N;
+        Wed, 12 Oct 2022 09:31:31 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAnKMp6GUZjH6SIAA--.46401S3;
+        Wed, 12 Oct 2022 09:33:48 +0800 (CST)
+Subject: Re: [PATCH -next 4/5] blk-iocost: bypass if only one cgroup issues io
+To:     Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221011083547.1831389-1-yukuai1@huaweicloud.com>
+ <20221011083547.1831389-5-yukuai1@huaweicloud.com>
+ <Y0WhpuqK/8CEZAGc@slm.duckdns.org>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <c19008c3-512e-92cc-6be1-3ecc24e74341@huaweicloud.com>
+Date:   Wed, 12 Oct 2022 09:33:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: OS0P286MB0338:EE_|TYWP286MB2086:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d864ee8-0eee-4377-d44b-08daabec7124
-X-MS-Exchange-SLBlob-MailProps: QG/aTLqFmehwIP9laLO5mVFDKnJFjEuDgzVLvjA/5lXTsMa9+TkOelXQUGW+jDK11rAMLAXu3n8ARpqJb4i/FMV2IX64IoZXcyAIW7o3kQrN7u3QA3cFfLaOi5B6/ruybQJceMJnDGSzjYwll8hmAygMVWNwg5OZHYGry7abzEzlFzqPd2bQFloBD6dwfQb3b3mc7C48FO6W6cYfUPG8OQo9Q7CzWFP3gOXgVynONkcR5AlH5Xf65VLPg9GDMwak6pI75sO0i1wcehthYUdXnJRihZamcQ+gdCTbPnDIFA/DK0wMOPcatKAsAVY89eAYrpydWMy/xumt+rPGg8aJ9ScyUG1BbWROTbdC3hh+eOgH61RBdzRH8GhLgnA9HAbbbS3Jf2B1QH7HDkQlL8nQImd8v7PQ1vS2V462JozeEcj4lMcfzbKeNrAUQG36/67WO9w9wP6LaISDiuMvQQaUlTaKyDbxla/rbvgqeuls87mymzk63is5HpGNNaRb25JPuJ8HHn/S2Zq17iaTiLf4/02HlzGeyThTtR91qQwQZ5axnXu02+it05kogcGpSZJdBP0UtR8OD8D1d6i0/HZipQm0SCi8x5bs5zayJYptb/jpG563b3/wbAboCXY/lTU+CLGTGiJzwkqnnHDE2sNC/bx1l6+hXNBk
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qXr76CWngSLnM/wb3M7t2SjVmRW0mP9hpVMeJcVhEihv3gYGdFWEBn+2+Uu2L0F98AymUUs3VFzC7erRP7Q7BcBpUa5BgYlnmyPwXssqxhHuNsrKiFGlMN41Oc4e1dp3rx5MYcYTUWet00GsMNLPHnV1phvPd45e66jWXDC3yQHueIet49MBEudDgpPqyvZP3+ndt6+odmMes3ETxPShPS+ePooI9Vis2GXs7viz8DsyKZKf/+CuFRiT5dGOwyg0vtD4C+PQ5QpQyE+9MldPRg0/J4wIWOcjE7yCpTbyib0h3v4L+oeEHDCm7lAejk+QlNCmfixjtbwbhC75hT2qfOkAmd79fQSB+wV8kWDlw92KeLlviKrhKLYmxiXq1AFSvcNIrY5Q8YUYdLD8rpZb9wBg7dRbXflHwf343zPftapg5znk9BmuYze31kzw7onr8LnQvPZl/LUxrTeYQBCiuLup9hPalbhehq7o9BvQppkPsnoGXSVzGWikVtyhFM2Yx5dbbfkXF7ZEbNH90myMAz+lVfK49rCKO4gSN5i+bvbJr2M84Y7cKeqoIevxEfSSYsJ/tGecqoCxMVXuSza/uIlZbz9L2SmLwFE/cpsRnutAqE7C3T80ddVQNIVoU97CA13KQ5q4b0+BrQDn65LIKBu7z0AFMUSSlsfjcUcCMXcFv8yge6keU3gOQQmo3KXvCaI7a5XDV4JGvwKSYvvNU9Tt1T/zDxwfBv2lSXkbXks=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?axVEWwnTPvgOZDpKX9cakIaQFuFrhCZgHdR7UITi+2+PkqHbi4sleC0xxMS9?=
- =?us-ascii?Q?tKRv4AeMV61Yjp875TVFi9GdernHHPiJXT5A3Qo+YiXW70Pr2JoIVefGB8Mv?=
- =?us-ascii?Q?AfXA349u3Hrawui8jLaPbuhwwiqU6FYhAY6yMg4AbPsrYd0s9np+UsmPYtm1?=
- =?us-ascii?Q?JWGLWAjcx35JwfRVsySNYioQVhM17ZCZ4sAwBmxa+HLfr2QOA3Pu5D8bFauP?=
- =?us-ascii?Q?gyBpCWnCSZq+B1cJ3BsJLvlw0DWKY4xXe9htX7Tm/XYkitjlqRY1H+dmxK2b?=
- =?us-ascii?Q?CW2J6hQjIC/vCtjVfra8nTt7OVMnauBxxMMgBCqu4cCuFnYiqpmG1LvVnyTK?=
- =?us-ascii?Q?5I7kCPqL4CZzwrvS+otvh+W2HoRBNf/UZ8c9czpCKtrWHEixKbOd8Re0wp0P?=
- =?us-ascii?Q?3bba6fhxPbLuvVHJx63H0EghwnQTkYo+ZLO0keeub5E7nF+675tSwN28zDj/?=
- =?us-ascii?Q?mXTFQ8SH2nHENFNRCEGseUvgaooOyA5SPDPSJnUr+cxD/IAvyMLV8kuex8JH?=
- =?us-ascii?Q?QvxcTFjwSq/iO7UvWuCPZ5ojrIjKFcDY7Kn/G4ADdQ3dQLd7chtvwkUJp7yB?=
- =?us-ascii?Q?D+736YUjj9en+3QJDBbIxgzhhOVFdM96qIv0JGuCebf3xs8NQ4e2ESZW2jPr?=
- =?us-ascii?Q?gUoDo8TApdQ/z4/8VvBDIx389IVcyfGoW0+t/E8rz+Tk0TF/BFPDKUFCN2fY?=
- =?us-ascii?Q?Dcp9e2q6kePzkWtHyX6G6Km4hEVbBKgFKhDW+iwYUo+lQ7Tk+yRQ7hFci7B+?=
- =?us-ascii?Q?kbgSr2EtYEGhA2qma9QlqpX+TK/sOxc5C/D/NiTAhwu26mGaSEYRcz9iT2L5?=
- =?us-ascii?Q?9nuRDq5CQxXVfKq99r8jafgLuofPEgrU3swJqxHvrfyjtuxnAfmqBPegoub8?=
- =?us-ascii?Q?En1Jj4YQCr4YOL+GhLLRzE6HQZkqagH4a9LdetGmIjDvlmc44Ywx1fwfHq1R?=
- =?us-ascii?Q?vbV2iBU1jQy6gwMg8hFnTSh4zjEVooSrcbH8y1PjoqYRaoDQL/j0HxR8LxPn?=
- =?us-ascii?Q?vQzq1r5SxaTPWQ+6GBmUI+EvaSnX9228V1NOESlGn/a9yP/3F2xcxEasWPsi?=
- =?us-ascii?Q?krKAXydzycqvVrjZiRNROkg/2qIp8sahZBH5cPitjXqip02RC7r8FlPBMLc8?=
- =?us-ascii?Q?a1Giyguzful+atY2qtdi8c/ncpKHWKml2phpupqBCXYG8nMgZA7lndpof3WZ?=
- =?us-ascii?Q?GoZ3qnNruGUnd+ZCYQsH0/vOfALfm3QQjbF1HZPBnEE9gNVzf9LlbRWNn8dw?=
- =?us-ascii?Q?vqKE8mT2y+sf+lEK2XTrhaA8xMywnFilT6KWARQjwk32WqilZzqYQIP6CwYu?=
- =?us-ascii?Q?c+E=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d864ee8-0eee-4377-d44b-08daabec7124
-X-MS-Exchange-CrossTenant-AuthSource: OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2022 00:55:23.1310
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWP286MB2086
+In-Reply-To: <Y0WhpuqK/8CEZAGc@slm.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAnKMp6GUZjH6SIAA--.46401S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww47Xr1kXr1fZw17Kw45Jrb_yoW8WFWkpr
+        ZrGanYya98Wr92k3ZagaySq34Fq3yvg3W0yr1fCw15Ar9xCr9IyFs7Ar45CF18Zrs3XrWI
+        qFsxJryrCF1UC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
+        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
+        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
+        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+Hi, Tejun!
 
-I submitted a new patch with the commit message corrected:
+ÔÚ 2022/10/12 1:02, Tejun Heo Ð´µÀ:
+> On Tue, Oct 11, 2022 at 04:35:46PM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> In this special case, there is no need to throttle io.
+>>
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   block/blk-iocost.c | 9 +++++++--
+>>   1 file changed, 7 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+>> index 5acc5f13bbd6..32e7e416d67c 100644
+>> --- a/block/blk-iocost.c
+>> +++ b/block/blk-iocost.c
+>> @@ -2564,8 +2564,13 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+>>   	bool use_debt, ioc_locked;
+>>   	unsigned long flags;
+>>   
+>> -	/* bypass IOs if disabled, still initializing, or for root cgroup */
+>> -	if (!ioc->enabled || !iocg || !iocg->level)
+>> +	/*
+>> +	 * bypass IOs if disabled, still initializing, for root cgroup,
+>> +	 * or the cgroup is the only cgroup with io.
+>> +	 */
+>> +	if (!ioc->enabled || !iocg || !iocg->level ||
+>> +	    (iocg->hweight_inuse == WEIGHT_ONE &&
+>> +	     atomic_read(&ioc->hweight_gen) == iocg->hweight_gen))
+> 
+> I'm not sure about this one. Bypassing here means that we lose track of how
+> much IO it's issuing which can affect future throttling decisions, right?
 
-[PATCH v2] blk-mq: put the reference of the io scheduler module after
- switching back
+Yes, you're right, this patch doesn't look good in this case.
 
-Please ignore this patch.
+The reason why I tried to do this is because during test, I found that
+io performance is affected when I only issue io from one cgroup£¨only
+happened in some environment with default configuration£©, and I found
+out that each io is throttled for some time before dispatching.
 
-Thanks!
-Jinlong Chen
+Perhaps a suitable configuration can avoid this problem.
+
+Thanks,
+Kuai
+
+> 
+> Thanks.
+> 
+
