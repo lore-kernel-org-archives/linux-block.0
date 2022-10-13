@@ -2,238 +2,222 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C93B7C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 07:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A198DC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 08:38:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbiJMHmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 03:42:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35892 "EHLO
+        id S229646AbiJMIig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 04:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbiJMHml (ORCPT
+        with ESMTP id S229790AbiJMIig (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 03:42:41 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1431A12587D;
-        Thu, 13 Oct 2022 00:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665646961; x=1697182961;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=5ngiLCBusBT3theecGu7GGer3u5eG0nBJ6ePgW6ByF8=;
-  b=dAEWI4zDK0uW8/mqT3heX6/Q/Au3nSAX4ovmWSRjuJ4hfSCaISlRLR/L
-   PlOmoyPMTDbCTViiZ8PNfT6KUhBK7dGVXDC/ftY8OnanQlCGddxahXG+R
-   l49YR5qxvOT/5IJ1EYsIWEfpRC+sZHNzzcJzrWAagckxGSdRCHUKvuHV3
-   M/J1ahoUG1lJxNKJpHRP57s7EQrgO7XpFYgIvBGKr5HCY8oqDfcwo3VMV
-   sOWmsPLgDisavagzguckVf4RmGybiqQrjAc7fV9WKdjBjaQIReohOEI8I
-   jzHLslL8ovANXFoLxssjYiOSxGIQTR7jmW9v0IzJ88m2yVaMIaUu8n5uP
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10498"; a="304999838"
-X-IronPort-AV: E=Sophos;i="5.95,180,1661842800"; 
-   d="scan'208";a="304999838"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2022 00:42:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10498"; a="956064753"
-X-IronPort-AV: E=Sophos;i="5.95,180,1661842800"; 
-   d="scan'208";a="956064753"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga005.fm.intel.com with ESMTP; 13 Oct 2022 00:42:40 -0700
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 13 Oct 2022 00:42:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 13 Oct 2022 00:42:39 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Thu, 13 Oct 2022 00:42:39 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Thu, 13 Oct 2022 00:42:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RqLO749dLqq2ddqvRGoK3/HATUYHhTTMPCbwtWN8KX09b2b+TtNIgZReSIhG7bKZ73sh7ZWFPFWaN1UY1GtYNhvwV0Gzx2ofH115Xdz/FnEyUuDJXOAp5f+iY1QBopxnJZgW4o85wePtnchJlI2nihc4GwPu+VvrMJJpTOAGRfV672dtmNjWtfLMISZYGcrQ6c7eGeKzW/SHiSj6MKWu68iw6MCm2fiyLpV4A3d8R1QqLse6fF9o7fFTq64jwVVbKtU9uWmEPxB0++v2/DZ5vI8nozOA6xdjm4Cs161J+4x4/rWopDYLX5cuBvZ4wjt6maV4J5hyVH3pbXY4EG9LfQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X49wQdXQSEMP2v2lCGIhjK/awws2cv5/19lzwFdraxY=;
- b=g6FzQwp97gmyn9mp1X/V9VnH82fh6IFGh6AUNpYbCfyoN0w6dmDSwb01QJ/eb9JtjdJKhP44rT7L3LcuZOYdkeqRN0OGMTX0vPzhL19GysMUS8FRYTi5ck6xr9XgX6Ac0HCx7ivSoqm9YLMNIMneOv+S3vCXaayCxJgvIdcZMESgK/uKhAuTqgjRh8+nvh6lTfdVepmbh+SMVY4kJ32KMDRQYFf7EFJpUid7+VtgGVN/wPloJ4rPOeTvFE6tTO6DtCxfvWxCNCHGYr6DRgoiYtSpc3Yf9JvqB/uyq71cpflLkaBhLYL9J5cD59wNRUGBUgjCsZXnnSK7jvguDRzBIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6304.namprd11.prod.outlook.com (2603:10b6:208:3c0::7)
- by IA1PR11MB6442.namprd11.prod.outlook.com (2603:10b6:208:3a9::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.28; Thu, 13 Oct
- 2022 07:42:18 +0000
-Received: from MN0PR11MB6304.namprd11.prod.outlook.com
- ([fe80::3f8d:1406:50e2:7bcc]) by MN0PR11MB6304.namprd11.prod.outlook.com
- ([fe80::3f8d:1406:50e2:7bcc%3]) with mapi id 15.20.5723.022; Thu, 13 Oct 2022
- 07:42:18 +0000
-Date:   Thu, 13 Oct 2022 15:42:00 +0800
-From:   Feng Tang <feng.tang@intel.com>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-CC:     Ming Lei <ming.lei@redhat.com>, "Liu, Yujie" <yujie.liu@intel.com>,
-        "lkp@lists.01.org" <lkp@lists.01.org>, lkp <lkp@intel.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "zhengjun.xing@linux.intel.com" <zhengjun.xing@linux.intel.com>,
-        "Yin, Fengwei" <fengwei.yin@intel.com>,
-        "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [blk] 8c5035dfbb: fio.read_iops -10.6% regression
-Message-ID: <Y0fBSDv96boXmfB4@feng-clx>
-References: <202210081045.77ddf59b-yujie.liu@intel.com>
- <d5279fc2-38b3-6d20-4404-604d5c7277e2@huaweicloud.com>
- <Y0KJmODYOh83OtGa@T590>
- <e81ea0fe-dcd2-1e5d-9b78-3c79751b3097@huaweicloud.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e81ea0fe-dcd2-1e5d-9b78-3c79751b3097@huaweicloud.com>
-X-ClientProxiedBy: PS2PR04CA0022.apcprd04.prod.outlook.com
- (2603:1096:300:55::34) To MN0PR11MB6304.namprd11.prod.outlook.com
- (2603:10b6:208:3c0::7)
+        Thu, 13 Oct 2022 04:38:36 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84175106932;
+        Thu, 13 Oct 2022 01:38:34 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id r22so1426322ljn.10;
+        Thu, 13 Oct 2022 01:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=e147+WuM1h4PncI3UHBBTZQElA0u16g93C7czRieUSE=;
+        b=T9Tg53XT14CPf/lgILScuowxFhNiUsNFLB3dGTz/kM+cglALb9RS7w78Cw9Ql+xlzI
+         n//HP5jamd/D4oJ+LZ+HRNYvX5Bs2vkQIh5hjKWVz+UzJiKBbzAwwjzecZtd6xwlmWYF
+         pwv1CD58E1qq2OHjowd/linkWl9t2etOXvLqZwLGS20qPckIGCQrhQTCII2ojwyYt3Fs
+         z7DvhaqFdzPYmiGXeK3MurZ4j4Zh93xXX5RE/PGdOIJW0+CQJL8zCQjCCtDl/xXx3BvO
+         /HzsGU/Z+1Hcuv/4KjmsUG793UPlTLwtayEG4FyunnqIgZWQydmuXSDyhr85oxjdoQEY
+         QmgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e147+WuM1h4PncI3UHBBTZQElA0u16g93C7czRieUSE=;
+        b=NY3PigYBwEMYjM5k1XYG3CQ6zFfi4d22AUEwIb6crmMbnlTtUgmknw69fkt39lR3wg
+         UumJ+eW5cyF7q+dTt9Wi+RDTBIx5cgEXabN0ekvHLcsSrX2mFVa41qMAIVTYrS5XgZFN
+         cAU3ZkUF9vqSnAeAEDM6tTO0mhhs3j8/QfHVZRnXvC8l0xjsmx+ZDmrMb11UOX6MIBih
+         q2l8XC2bSrR0/V0FVwMMv3JDx30vhPhavN6pdAUKf7NDKPeN9lOfndhGRZbSPQ95CMnN
+         YZ1QqC79KtxmeqlH9oKS4rYnfRTNuXolXznrDrXWr6xD9K8lfFn2q/gfiXeof26tPXCM
+         /fJA==
+X-Gm-Message-State: ACrzQf1QvZ9j4XmfToi8IQo20zy6A58i7SVHd4wLR1mR2FQoD5NRcTbH
+        xjavEHYEkkJTZDMnB8jRAyrRe+Oc0TrbBlbIick=
+X-Google-Smtp-Source: AMsMyM62C2H0BpDnmp8aEFS+BnLh5Qu/qSBsh7FvuLsWIVw3ZjwmEf4Onb0CkLSfi7ilbe72GqQ8S2KsZeAbaEPdGQw=
+X-Received: by 2002:a2e:a7cc:0:b0:26f:cb7a:f375 with SMTP id
+ x12-20020a2ea7cc000000b0026fcb7af375mr649074ljp.392.1665650312697; Thu, 13
+ Oct 2022 01:38:32 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6304:EE_|IA1PR11MB6442:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6916c643-4bf1-41c7-7b8e-08daacee73eb
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BKdtfDTpnTbfJRJFZT/j1xxYJO+LpkCNlXe8czOEURrzavJvwD9uSzYeDMtbYEJXtTK0MLM9WyvjZFDsAkCrxNSyxXUvjdB8EFH2RDSoDs99bpRDty7xrfU173ZlyLGLsMeqGo6yTd6+YDMeZ3hu1sg/MhmEp9FBKFlMbFPBKSTx4L36WIa1P0Q1IOe+RkuJGwKJZrjYN3ei77IWoFoBvbYZB2QPN+jUQoolRZaR6qIySXSCC7huXRa5bkLTVCPT1SgqRlhYl36eYXIT+R2LEkYBeXherTEUPofXvUHs0twNWY6bP7lNqfH/RW0JZX5myihAhCMTZEb4BAHiJEaQs7+rX9v8gPcX8MGFVBUbbdkoOriDPDbXJEOfqVJ+hrylQKYSstc/tG5JYebfphPJ5WigO0ltAQq/vcvWKGYL/FHOQfG6UrjCDCxTwqLqx4cqXq0KNKkYgboa1+/8UNhIuX8Fj+pT0sSQ1prOwaV4Y8fkyRkEx8oUrzCrAQtqW+wgWYo2uDnmPT9HLO5yznY6JtP2BQtqxA1aFWIQDSGV95EqyJbyLvzdV3kcT2axT6OanPmVNdrrhoi2kNwWmXW91a8TeEODwYgx9sKTVCHtGtlgIgXXUhgv7hpmpwnaVDO0rZNpYWeUMb9HjAFoZ/VmGvkHE9wwt+OzrAiAz1M0hjhnfoyHL/lsVFNtF/33Ma28VP1pbZvhP8u/s29zF814nA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6304.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(7916004)(39860400002)(396003)(346002)(136003)(376002)(366004)(451199015)(54906003)(38100700002)(33716001)(5660300002)(6512007)(6486002)(6916009)(82960400001)(2906002)(186003)(478600001)(83380400001)(6506007)(6666004)(8936002)(41300700001)(66476007)(26005)(9686003)(4326008)(66556008)(44832011)(8676002)(66946007)(86362001)(316002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFRVbDBORzFXdnViQlhhb1Z4cTFENTAwRUMxZy9RWUVScTVBVkp6bmlRQVhS?=
- =?utf-8?B?ZWt2YTBoZTRReVFvdTJVZWRDNHMwSlFkRnBqSE1rQk11YXhKOUN5Z0I0M3lC?=
- =?utf-8?B?b2x5c2pCTHVCWXFZSnM2V1BEUGtWNGg4NHRKeWx0dmJickdHZmRKUEVhZVlz?=
- =?utf-8?B?bE1BU2U1RGNJUVNIRHU1Y2M2eEx6azJTU25iWmEwTEtmZzI2RWhqayttQkZV?=
- =?utf-8?B?VzdxbE5RT2FSRFdacElqTTZGMHkrVWJJQWMvK1ZHSXRXQTczZ0djbS93STJQ?=
- =?utf-8?B?MXIraFYwM2R3cDdOcStqOGJ5NC82c0NGbUhYeTdTYmRYUjBoTW9uaWpXeXBE?=
- =?utf-8?B?dmlGNWswK2J4eGNNemVZZklKM0w1dVRBU3c0SGhTeE9Hd1RlUXdXUGIxQzdL?=
- =?utf-8?B?UTBSdUJtWlM1QUN4NHlmZHlhWmtYS1Nyc3Iwc3NqWDJpVjh5VG1ZUnlpSG9m?=
- =?utf-8?B?Y3RCRmo5RG5PWU1GOUZYWnZBWE8xV3lxZkQyQlVEb0VuUXJ6bnllVDk1bDMv?=
- =?utf-8?B?QWhCUDduWTA5czRXdDBnR0NrcWtGdUFPQ3ZFbzJjZ0lJMjZmUEJOQkZxWitw?=
- =?utf-8?B?TnF2NG90cTJLaFB2Z0J1OEZFY2dTb2g3TjY4RHlKUGJJVk5nK2VsV1hnckZD?=
- =?utf-8?B?VXdMRGQzZTV6WTdhKzF1Vm9ERFpKZ29odDh0Njgxai9ibzVQYzN2eTlqMkRT?=
- =?utf-8?B?YW41WVRNWlVVenNvdDJmcS9kT1ZpMEFJUmdRTmRaNDl6dmZBNlB5ckhjMEVk?=
- =?utf-8?B?SmJOY1dla3hXMHVmbUYvUXVWVUNJQk5XOEhtOXE1S1ZYRE9aaEtOZzQ5cXRx?=
- =?utf-8?B?MnkrWUNTWVVKUEp6UUhWMjhjdVdXNVV2R3kraFdWZDd6VUg0bGpvMUUrRlhq?=
- =?utf-8?B?OWh4VmJwNDIzT3RrYm85WG9qVG9oNk5Wd2RmRXVOMnlMbUJCeFJVNnR6bHN0?=
- =?utf-8?B?UnFjaG1YQjIyZldFNkl5Y0RtNGFTSVlWK2NoVUJRL2xqWmlPUUsyQmFDTEt1?=
- =?utf-8?B?aHBTRnRZOTFsdHdrQ0R1dDJaQ0FCMlRTWUtPVG9qZzAvOW02Q2JPeVd2QVZh?=
- =?utf-8?B?RlVrRENPaVVFckRIMVArS29lK3UrUWNSWGl5OGg4QnR2VHZoU1ZXYUM1VnRF?=
- =?utf-8?B?WWxHT2p6bGtON1VjSEpUamQ2VzdKSDlCeHdTNjhjNDE5N1BDNG9JdC9HRzZy?=
- =?utf-8?B?WnEwTStqZG9ITm5SUUdSUnNMbzVwZy9udDVOZFJFMi9wcWZtOEZ5enIvdjBn?=
- =?utf-8?B?cHVseWV4WmgrMmoyN2MvYmxIYkJ6eVFrTlRJZXVkRmhRY2ovYnk1MStYc1Q5?=
- =?utf-8?B?dzRiUjdPclFrNjJQaUFrUFkwQUg4MUVyK3hLcExsdUVLalhPM1BWVWVBSXJD?=
- =?utf-8?B?eUJJMnh3S3d4OU5TbFpwZWVleXcvNStNV0UyWWtHRndkQ29DNEExNkdETk1n?=
- =?utf-8?B?V0dYUHdHOTFTUnU2T1lncndkRFNYT0Q2djRleUVZNElhTzFwNWFMVDhhbUsy?=
- =?utf-8?B?SS9VV001RGloUVoxdnFqK3RBcVBBS0JaaUtZbFU0UE9iakMvNWpxL1g1eU0w?=
- =?utf-8?B?d0dMNkFNeEhJTnppb0w4N1ZZNGQ3V3A2QzNLSGRvUzR3MGJncGt3dFFnZ0ww?=
- =?utf-8?B?TytNNW8wN0xVb0VLWjZkbnEwTnhqTGZaSmxyaVVEczdkdzljWG1qVktwWWxO?=
- =?utf-8?B?RTRQMzRyRHViUlBkSGJzOFBEL0lGRmVTNUMrYmNhMXJIWG5Oa1ZxbXc2NWcr?=
- =?utf-8?B?anFkcHFyWTFPa0ZjZnppcEZ3NXNpZ2ltckpVVzhIL0Y5cEVyWnBhTndTa09w?=
- =?utf-8?B?bGFIMklvbklweUZmNnN5YUJKd2xYcnYySGg5ZEw2YlRHOHhwemJxMnY5cXVY?=
- =?utf-8?B?YXJBK3pkamd2M2JRSFBEbGZ4YVE2YTVlY3NYRUlENzhsRnpmSVJDNWFsa1RE?=
- =?utf-8?B?anlYR1VYenZGLy9NR3BvcjBML0xIL2ErVS9ZNWFFTUh1NnR2azZkRFNhcjlV?=
- =?utf-8?B?YVk5elg0M3NxZHc3MmpSZEFpNFJUVTRhRElUK21jWTROU09zWEtwMjNDa3pR?=
- =?utf-8?B?ZmRLM3ZrUlNxTXVUSGRTUk1DVmhRc21md256K2ZPV1M2RWo0RmFsa1ZQMklQ?=
- =?utf-8?Q?uEq1gCRjPXQjoMkk0Q8sr60zI?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6916c643-4bf1-41c7-7b8e-08daacee73eb
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6304.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2022 07:42:17.6789
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LVsZzvmQi4Cv/Nk8L1urhldj8Dl0ixkIBfS+frrbRxt/LdIoEkvyhxr/RNWFFtlV2pdaGpfEl2hP6CpBvLejPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6442
-X-OriginatorOrg: intel.com
+References: <1665561689-29498-1-git-send-email-zhaoyang.huang@unisoc.com> <202210131309.fe5427b-oliver.sang@intel.com>
+In-Reply-To: <202210131309.fe5427b-oliver.sang@intel.com>
+From:   Zhaoyang Huang <huangzhaoyang@gmail.com>
+Date:   Thu, 13 Oct 2022 16:38:03 +0800
+Message-ID: <CAGWkznE_BJ+_e7tt7CxVMHLbO5NMpq5U50WEZyubgPYJ5aR2DQ@mail.gmail.com>
+Subject: Re: [mm] db8d280d38: PANIC:early_exception
+To:     kernel test robot <oliver.sang@intel.com>
+Cc:     "zhaoyang.huang" <zhaoyang.huang@unisoc.com>, lkp@lists.01.org,
+        lkp@intel.com, linux-mm@kvack.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ke.wang@unisoc.com,
+        steve.kang@unisoc.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Oct 09, 2022 at 05:32:34PM +0800, Yu Kuai wrote:
-> Hi,
-> 
-> 在 2022/10/09 16:43, Ming Lei 写道:
-> > On Sat, Oct 08, 2022 at 04:00:10PM +0800, Yu Kuai wrote:
-> >> Hi,
-> >>
-> >> 在 2022/10/08 10:50, kernel test robot 写道:
-> >>> Greeting,
-> >>>
-> >>> FYI, we noticed a -10.6% regression of fio.read_iops due to commit:
-> >>
-> >> I don't know how this is working but I'm *sure* this commit won't affect
-> > 
-> > Looks it is wrong to move
-> > 
-> > 	wbt_set_write_cache(q, test_bit(QUEUE_FLAG_WC, &q->queue_flags));
-> > 
-> > before rq_qos_add() in wbt_init().
-> > 
-> > Without adding wbt rq_qos, wbt_set_write_cache is just a nop.
-> 
-> Yes, I got it now, I'm being foolish here.
-> 
-> I missed that "rwb->wc" is got by rq_qos in wbt_set_write_cache(), which
-> is NULL before rq_qos_add(). By the way, it's interesting that how read
-> performance is affected, I still don't know why yet...
+@Vlastimil Could you please have an eye on this series of robot
+reports which are caused by stack_depot_init related issues. The
+problem arises from a very early access of stack_depot_save/init by
+kmemleak within setup_arch which happens even before
+stack_depot_early_init and zone related data ready. I would like to
+suggest adding a criteria at the entrance check of stack_depot_save
+which help the stackdepot API more aggregation and the caller free to
+call
 
-Indeed, we are confused too. So we did some further check, and found
-it could be related with the less calls of wake_up_all(), due to the
-'rwb->wc' value changed. 
+[    0.062350][    T0]  ? stack_depot_init.cold+0x5/0xbd
+[    0.063072][    T0]  ? set_track_prepare+0x6e/0x80
+[    0.063957][    T0]  ?
+__raw_callee_save___native_queued_spin_unlock+0x11/0x22
+[    0.064952][    T0]  ? write_comp_data+0x2a/0x80
+[    0.065623][    T0]  ? strncpy+0x2f/0x60
+[    0.066205][    T0]  ? __create_object+0x10c/0x3c0
+[    0.066904][    T0]  ? kmemleak_alloc_phys+0x6f/0x80
+[    0.067561][    T0]  ? memblock_alloc_range_nid+0x274/0x28f
+[    0.068396][    T0]  ? memblock_phys_alloc_range+0xa4/0xb3
+[    0.069200][    T0]  ? reserve_real_mode+0x87/0xd7
+[    0.069895][    T0]  ? setup_arch+0x6a9/0x995
+[    0.070526][    T0]  ? start_kernel+0x7c/0x854
+[    0.071195][    T0]  ? load_ucode_bsp+0x1bb/0x1c6
+[    0.071875][    T0]  ? secondary_startup_64_no_verify+0xe0/0xeb
+[    0.072682][    T0]  </TASK>
 
-I'm not familiar with the block layer and VFS, and just checked the
-'blk-wbt.c'. Before commit 8c5035dfbb, the 'rwb->wc' is 0 in 0Day's
-test env, while it's 1 after the commit.
-
-Inside wbt_rqw_done(), 'rwb->wc' be used to judge whether to wakeup
-other waiters in system, so we add some debug code to check the
-wakeup and skip-wakeup counter:
-
-  ----------------------------------------------------------------
-  @@ -130,6 +130,8 @@ static void wbt_rqw_done(struct rq_wb *rwb, struct rq_wait *rqw,
-   	/*
-   	 * Don't wake anyone up if we are above the normal limit.
-   	 */
-  -	if (inflight && inflight >= limit)
-  +	if (inflight && inflight >= limit) {
-  +		skip_wakeup++;
-   		return;
-  +	}
-   
-   	if (wq_has_sleeper(&rqw->wait)) {
-   		int diff = limit - inflight;
-   
-  -		if (!inflight || diff >= rwb->wb_background / 2)
-  +		if (!inflight || diff >= rwb->wb_background / 2) {
-  +			wakeup++;
-   			wake_up_all(&rqw->wait);
-  +		}
-  ----------------------------------------------------------------
-
-And after the fio task, the 'skip_wakeup' number is much bigger
-after the patch:
-  
-  before patch:
-      422.274394: wbt_rqw_done: wakeup_skip=19408 wakup_all=1944759
-  
-  after patch:
-      433.753345: wbt_rqw_done: wakeup_skip=2090585 wakup_all=13630
-
-Hope this can help the root causing.
-
-Thanks,
-Feng
+On Thu, Oct 13, 2022 at 1:58 PM kernel test robot <oliver.sang@intel.com> wrote:
+>
+>
+> Hi zhaoyang.huang,
+>
+> seems this is the fix based on our report
+>     "[mm]  0e949320db: BUG:kernel_NULL_pointer_dereference,address"
+> at
+>     https://lore.kernel.org/all/202210121406.d4ebc9bc-oliver.sang@intel.com/
+> but now it seems have new issue. report FYI
+>
+>
+> Greeting,
+>
+> FYI, we noticed the following commit (built with gcc-11):
+>
+> commit: db8d280d38efb061ad1a57ce060cbb917a4cf503 ("[RFC PATCHv2] mm: use stack_depot for recording kmemleak's backtrace")
+> url: https://github.com/intel-lab-lkp/linux/commits/zhaoyang-huang/mm-use-stack_depot-for-recording-kmemleak-s-backtrace/20221012-160458
+> base: https://git.kernel.org/cgit/linux/kernel/git/akpm/mm.git mm-everything
+> patch link: https://lore.kernel.org/linux-mm/1665561689-29498-1-git-send-email-zhaoyang.huang@unisoc.com
+> patch subject: [RFC PATCHv2] mm: use stack_depot for recording kmemleak's backtrace
+>
+> in testcase: boot
+>
+> on test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
+>
+> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+>
+>
+> +-------------------------------+------------+------------+
+> |                               | 95f1b43741 | db8d280d38 |
+> +-------------------------------+------------+------------+
+> | boot_successes                | 20         | 0          |
+> | boot_failures                 | 0          | 18         |
+> | PANIC:early_exception         | 0          | 18         |
+> | RIP:nr_free_zone_pages        | 0          | 18         |
+> | BUG:kernel_hang_in_boot_stage | 0          | 18         |
+> +-------------------------------+------------+------------+
+>
+>
+> If you fix the issue, kindly add following tag
+> | Reported-by: kernel test robot <oliver.sang@intel.com>
+> | Link: https://lore.kernel.org/r/202210131309.fe5427b-oliver.sang@intel.com
+>
+>
+> [    0.029254][    T0] Scan for SMP in [mem 0x00000000-0x000003ff]
+> [    0.030178][    T0] Scan for SMP in [mem 0x0009fc00-0x0009ffff]
+> [    0.031080][    T0] Scan for SMP in [mem 0x000f0000-0x000fffff]
+> [    0.043370][    T0] found SMP MP-table at [mem 0x000f5ba0-0x000f5baf]
+> [    0.044301][    T0]   mpc: f5bb0-f5c80
+> PANIC: early exception 0x0e IP 10:ffffffff8149c282 error 0 cr2 0x1e08
+> [    0.045770][    T0] CPU: 0 PID: 0 Comm: swapper Not tainted 6.0.0-rc3-00711-gdb8d280d38ef #5
+> [    0.046970][    T0] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.0-debian-1.16.0-4 04/01/2014
+> [ 0.048356][ T0] RIP: 0010:nr_free_zone_pages (kbuild/src/x86_64-2/include/linux/mmzone.h:1478 kbuild/src/x86_64-2/include/linux/mmzone.h:1504 kbuild/src/x86_64-2/mm/page_alloc.c:5886)
+> [ 0.049158][ T0] Code: e9 a3 5c 0b 00 0f 1f 00 e8 9b cd be ff 65 8b 05 14 b8 b8 7e 48 98 41 54 48 8b 04 c5 e0 e4 bc 83 53 89 fb 4c 8d 80 00 1e 00 00 <3b> b8 08 1e 00 00 72 5b 49 8b 10 45 31 e4 48 85 d2 75 05 eb 35 49
+> All code
+> ========
+>    0:   e9 a3 5c 0b 00          jmpq   0xb5ca8
+>    5:   0f 1f 00                nopl   (%rax)
+>    8:   e8 9b cd be ff          callq  0xffffffffffbecda8
+>    d:   65 8b 05 14 b8 b8 7e    mov    %gs:0x7eb8b814(%rip),%eax        # 0x7eb8b828
+>   14:   48 98                   cltq
+>   16:   41 54                   push   %r12
+>   18:   48 8b 04 c5 e0 e4 bc    mov    -0x7c431b20(,%rax,8),%rax
+>   1f:   83
+>   20:   53                      push   %rbx
+>   21:   89 fb                   mov    %edi,%ebx
+>   23:   4c 8d 80 00 1e 00 00    lea    0x1e00(%rax),%r8
+>   2a:*  3b b8 08 1e 00 00       cmp    0x1e08(%rax),%edi                <-- trapping instruction
+>   30:   72 5b                   jb     0x8d
+>   32:   49 8b 10                mov    (%r8),%rdx
+>   35:   45 31 e4                xor    %r12d,%r12d
+>   38:   48 85 d2                test   %rdx,%rdx
+>   3b:   75 05                   jne    0x42
+>   3d:   eb 35                   jmp    0x74
+>   3f:   49                      rex.WB
+>
+> Code starting with the faulting instruction
+> ===========================================
+>    0:   3b b8 08 1e 00 00       cmp    0x1e08(%rax),%edi
+>    6:   72 5b                   jb     0x63
+>    8:   49 8b 10                mov    (%r8),%rdx
+>    b:   45 31 e4                xor    %r12d,%r12d
+>    e:   48 85 d2                test   %rdx,%rdx
+>   11:   75 05                   jne    0x18
+>   13:   eb 35                   jmp    0x4a
+>   15:   49                      rex.WB
+> [    0.051803][    T0] RSP: 0000:ffffffff83603d18 EFLAGS: 00010046 ORIG_RAX: 0000000000000000
+> [    0.052881][    T0] RAX: 0000000000000000 RBX: 0000000000000002 RCX: 0001ffff84b317e0
+> [    0.053932][    T0] RDX: 0000000000000485 RSI: 0001ffffffffffff RDI: 0000000000000002
+> [    0.055007][    T0] RBP: ffffffff84b077d0 R08: 0000000000001e00 R09: 0000000000000000
+> [    0.056054][    T0] R10: ffffffff81b16d30 R11: 0001ffff84b317e8 R12: 0000000000000001
+> [    0.057088][    T0] R13: ffffffff84b077d8 R14: 0000000000098000 R15: 0000000000007000
+> [    0.058160][    T0] FS:  0000000000000000(0000) GS:ffffffff842c9000(0000) knlGS:0000000000000000
+> [    0.059440][    T0] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    0.060381][    T0] CR2: 0000000000001e08 CR3: 00000000043b6000 CR4: 00000000000406a0
+> [    0.061516][    T0] Call Trace:
+> [    0.061969][    T0]  <TASK>
+> [ 0.062350][ T0] ? stack_depot_init.cold (kbuild/src/x86_64-2/lib/stackdepot.c:258)
+> [ 0.063072][ T0] ? set_track_prepare (kbuild/src/x86_64-2/mm/slub.c:752)
+> [ 0.063957][ T0] ? __raw_callee_save___native_queued_spin_unlock (??:?)
+> [ 0.064952][ T0] ? write_comp_data (kbuild/src/x86_64-2/kernel/kcov.c:236)
+>
+>
+> To reproduce:
+>
+>         # build kernel
+>         cd linux
+>         cp config-6.0.0-rc3-00711-gdb8d280d38ef .config
+>         make HOSTCC=gcc-11 CC=gcc-11 ARCH=x86_64 olddefconfig prepare modules_prepare bzImage modules
+>         make HOSTCC=gcc-11 CC=gcc-11 ARCH=x86_64 INSTALL_MOD_PATH=<mod-install-dir> modules_install
+>         cd <mod-install-dir>
+>         find lib/ | cpio -o -H newc --quiet | gzip > modules.cgz
+>
+>
+>         git clone https://github.com/intel/lkp-tests.git
+>         cd lkp-tests
+>         bin/lkp qemu -k <bzImage> -m modules.cgz job-script # job-script is attached in this email
+>
+>         # if come across any failure that blocks the test,
+>         # please remove ~/.lkp and /lkp dir to run from a clean state.
+>
+>
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://01.org/lkp
+>
+>
