@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 821B9C43217
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF59C43217
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:32:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231779AbiJMAbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 20:31:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47242 "EHLO
+        id S231421AbiJMAc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 20:32:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232036AbiJMA3p (ORCPT
+        with ESMTP id S231653AbiJMAbH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 20:29:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFD3D4A2F;
-        Wed, 12 Oct 2022 17:27:28 -0700 (PDT)
+        Wed, 12 Oct 2022 20:31:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42ACD104D1F;
+        Wed, 12 Oct 2022 17:28:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AF4C361714;
-        Thu, 13 Oct 2022 00:27:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC0FC433D6;
-        Thu, 13 Oct 2022 00:27:21 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B593EB81CE6;
+        Thu, 13 Oct 2022 00:25:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CD8C433D6;
+        Thu, 13 Oct 2022 00:25:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665620842;
-        bh=iQieQ4Y/Cp6gHS2C7Lg2w/a+l9Ieo+k4kqJju/g1xY4=;
+        s=k20201202; t=1665620716;
+        bh=azAkJqJbnTmmew6QdoYoIdY01RIbkpxXD1N808qO7go=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=e31H6OVgs/JDJv9mhwGL69fyf6KrL85v0dtcxju/XYjS1faznxzTQJArlHD7cJu5i
-         +5C1JR+KQP6UL9xSB/O7q9zK383FURPf4JM22jM1oy3J6EnZ7md6wTXATQsPrBEhdx
-         zz5ro6EKFs8QWPv+XsACLzcVwhGQ06KUHjkr3XPfnIUiRJk9ugjtUmXeWgnRok1C4S
-         oa8o025LlJzukUaYLzkCI2oPX6JlCtQWn4ECdt9CMNPo5ufS/pjokQy/9BClXSuYYK
-         4wL0tlauF76jucP+4dMnd3uZdWAV/R0zEsJ80dyLNyl2SUwReUa28nIC6WPd4G0DQA
-         b8DiUas2mSCcQ==
+        b=sVWAen0Hb9ulvH901a4QvXObkws7teQo1oolaw7eAjKg0J+P9ZhUcQKdMiootIHSe
+         a6ky7HIruk4DdrVu8UBZKoPLWASvOuJQgGSIuhmz+0tQXkyPGeahzBS9DPMoCGq9dE
+         h+JHGpERPx/iQ1LDBwqGrwGIlVD+ls+Qm66YXrZkcv3HrW8Rd9lNM7nekOS3QN3IBO
+         gXPqZGDs4wi2jEM3bEsUXNKGj6+TlVqBQzgIMhxSC9kItd16qwiSf4lDmPoLPJaVR9
+         blSKX552hAoxO3ttloYStRmyX46QN2PxGv2TtF5SnAc+kCZBUa3C4Wgh1pWyFgexPm
+         BAQB2kJYU1TOg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Shigeru Yoshida <syoshida@redhat.com>,
@@ -39,12 +39,12 @@ Cc:     Shigeru Yoshida <syoshida@redhat.com>,
         Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 4.14 03/13] nbd: Fix hung when signal interrupts nbd_start_device_ioctl()
-Date:   Wed, 12 Oct 2022 20:27:02 -0400
-Message-Id: <20221013002716.1895839-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 05/27] nbd: Fix hung when signal interrupts nbd_start_device_ioctl()
+Date:   Wed, 12 Oct 2022 20:24:37 -0400
+Message-Id: <20221013002501.1895204-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221013002716.1895839-1-sashal@kernel.org>
-References: <20221013002716.1895839-1-sashal@kernel.org>
+In-Reply-To: <20221013002501.1895204-1-sashal@kernel.org>
+References: <20221013002501.1895204-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -96,10 +96,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 338d02a67afb..f01b8860ba14 100644
+index 09323b0510f0..610dc6a36a9d 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1258,10 +1258,12 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+@@ -1327,10 +1327,12 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
  	mutex_unlock(&nbd->config_lock);
  	ret = wait_event_interruptible(config->recv_wq,
  					 atomic_read(&config->recv_threads) == 0);
@@ -112,7 +112,7 @@ index 338d02a67afb..f01b8860ba14 100644
  
 +	flush_workqueue(nbd->recv_workq);
  	mutex_lock(&nbd->config_lock);
- 	bd_set_size(bdev, 0);
+ 	nbd_bdev_reset(bdev);
  	/* user requested, ignore socket errors */
 -- 
 2.35.1
