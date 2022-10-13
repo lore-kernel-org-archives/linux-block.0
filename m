@@ -2,115 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F37EC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 14:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA202C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 14:17:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbiJMOHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 10:07:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43224 "EHLO
+        id S229947AbiJMORJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 10:17:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbiJMOHB (ORCPT
+        with ESMTP id S229663AbiJMORG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 10:07:01 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82D65E308;
-        Thu, 13 Oct 2022 07:06:49 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MpB7s11znzKFPn;
-        Thu, 13 Oct 2022 22:03:37 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCHiMpBG0hjshrZAA--.47785S3;
-        Thu, 13 Oct 2022 22:05:54 +0800 (CST)
-Subject: Re: [PATCH] blk-mq: put the reference of the io scheduler module
- after switching back
-To:     Jinlong Chen <chenjinlong2016@outlook.com>, yukuai1@huaweicloud.com
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <b79a8187-5342-8ff3-73fc-0324bdfb67fb@huaweicloud.com>
- <OSYP286MB0344F8B1AC5F35BEA990B593BE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <f1c07b2a-ffdd-0912-139d-d51b34b77bcd@huaweicloud.com>
-Date:   Thu, 13 Oct 2022 22:05:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 13 Oct 2022 10:17:06 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1067838A17;
+        Thu, 13 Oct 2022 07:17:04 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MpBNP03xLzDsP8;
+        Thu, 13 Oct 2022 22:14:28 +0800 (CST)
+Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
+ (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 13 Oct
+ 2022 22:17:01 +0800
+From:   Kemeng Shi <shikemeng@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
+Subject: [PATCH v2] blk-cgroup: Fix typo in comment
+Date:   Thu, 13 Oct 2022 22:16:59 +0800
+Message-ID: <20221013141659.24032-1-shikemeng@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
 MIME-Version: 1.0
-In-Reply-To: <OSYP286MB0344F8B1AC5F35BEA990B593BE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCHiMpBG0hjshrZAA--.47785S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CF1UCw1rWrWkCrWrtr1rCrg_yoW8GFWkpF
-        W8GayYkw4ktr40g3y7Kw47Ja40vrZ5Kr1Ygr1fAa4xXrn5W393Zr1xJa1a9FW5A34vyw1U
-        W34xZFWkZ3s8JrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
-        UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
+X-Originating-IP: [10.174.178.129]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Replace assocating with associating.
+Replace intiailized with initialized.
 
+Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+Changes in v2:
+ -based on current mainline code
+ -add acked-by
 
-ÔÚ 2022/10/13 21:47, Jinlong Chen Ð´µÀ:
-> Hi, Yu Kuai!
-> 
->>
->> I'm confused here, cause I do think this patch make sense.
->>
->> blk_mq_update_nr_hw_queues
->>    // for each queue using the tagset
->>    blk_mq_freeze_queue
->>    // if current elevator is not none, swith to none
->>    blk_mq_elv_switch_none
->>     // elevator need to be switched back, got a reference to
->>     // prevent module to be removed.
->>     __module_get
->>     elevator_switch(q, NULL);
->>
->>    // switch back from none elevator
->>    blk_mq_elv_switch_back
->>     -> should release the module reference here
->>    blk_mq_unfreeze_queue
->>
-> 
-> We need to release the reference only if blk_mq_elv_switch_back got its own
->   reference. However, blk_mq_elv_switch_back (precisely elevator_switch_mq)
->   does not increase the reference of the module it is switching to.
->   Hence, the reference got in blk_mq_elv_switch_none does not need to be released,
->   or we'll have to re-increase the reference count manually.'
+ block/blk-cgroup.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-But I don't see elevator_switch() release the referenct of the module
-it is switching from. It's still not balance to me.
-
-Thanks,
-Kuai
-> 
->>
->> By the way, I do not test yet, but I think problem can be reporduced:
->>
->>
->> 1. modprobe bfq
->> 2. switch elevator to bfq
->> 3. trigger blk_mq_update_nr_hw_queues
->> 4. switch elevator to none
->> 5. rmmod bfq will fail
->>
-> 
-> I tried to reproduce the problem but failed, so I found my mistake.
-> 
-> Sincerely,
-> Jinlong Chen
-> .
-> 
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 6a5c849ee061..4c4bc874bd95 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -577,7 +577,7 @@ EXPORT_SYMBOL_GPL(blkcg_print_blkgs);
+  * @pd: policy private data of interest
+  * @v: value to print
+  *
+- * Print @v to @sf for the device assocaited with @pd.
++ * Print @v to @sf for the device associated with @pd.
+  */
+ u64 __blkg_prfill_u64(struct seq_file *sf, struct blkg_policy_data *pd, u64 v)
+ {
+@@ -765,7 +765,7 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
+ 
+ /**
+  * blkg_conf_finish - finish up per-blkg config update
+- * @ctx: blkg_conf_ctx intiailized by blkg_conf_prep()
++ * @ctx: blkg_conf_ctx initialized by blkg_conf_prep()
+  *
+  * Finish up after per-blkg config update.  This function must be paired
+  * with blkg_conf_prep().
+-- 
+2.30.0
 
