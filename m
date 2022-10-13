@@ -2,147 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80710C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 01:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57ADAC43217
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 01:43:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbiJMBhr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 21:37:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37542 "EHLO
+        id S229565AbiJMBnX convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 21:43:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230027AbiJMBhn (ORCPT
+        with ESMTP id S229459AbiJMBnV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 21:37:43 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1895215E0D8
-        for <linux-block@vger.kernel.org>; Wed, 12 Oct 2022 18:37:38 -0700 (PDT)
-Received: from canpemm500002.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MnsTx2NcrzQj77;
-        Thu, 13 Oct 2022 09:33:09 +0800 (CST)
-Received: from [10.169.59.127] (10.169.59.127) by
- canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 13 Oct 2022 09:37:36 +0800
-Subject: Re: [PATCH 0/3] improve nvme quiesce time for large amount of
- namespaces
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>
-CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <kbusch@kernel.org>, <axboe@kernel.dk>
-References: <20220729073948.32696-1-lengchao@huawei.com>
- <20220729142605.GA395@lst.de>
- <1b3d753a-6ff5-bdf1-8c91-4b4760ea1736@huawei.com>
- <fc7a303f-0921-f784-a559-f03511f2e4be@grimberg.me>
- <20220802133815.GA380@lst.de>
- <537c24ba-e984-811e-9e51-ecbc2af9895d@huawei.com>
- <5fc61f6c-3d3e-ce0e-a090-aa5bcdb7721c@grimberg.me>
- <f9fce880-4714-3cdb-dfd1-f1d77d033d7a@huawei.com>
- <a44292df-ce46-828a-91a6-aa7377aa23f7@grimberg.me>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <1c39ae7c-7b70-851c-813e-50a97ec44c50@huawei.com>
-Date:   Thu, 13 Oct 2022 09:37:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Wed, 12 Oct 2022 21:43:21 -0400
+Received: from relay.hostedemail.com (smtprelay0011.hostedemail.com [216.40.44.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7678936DEB;
+        Wed, 12 Oct 2022 18:43:19 -0700 (PDT)
+Received: from omf20.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay02.hostedemail.com (Postfix) with ESMTP id 640C9120237;
+        Thu, 13 Oct 2022 01:37:28 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf20.hostedemail.com (Postfix) with ESMTPA id 56EDD20026;
+        Thu, 13 Oct 2022 01:37:01 +0000 (UTC)
+Message-ID: <3f527ec95a12135eb40f5f2d156a2954feb7fbfe.camel@perches.com>
+Subject: Re: [PATCH v1 3/5] treewide: use get_random_u32() when possible
+From:   Joe Perches <joe@perches.com>
+To:     David Laight <David.Laight@ACULAB.COM>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-sctp@vger.kernel.org" <linux-sctp@vger.kernel.org>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "linux-stm32@st-md-mailman.stormreply.com" 
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "dev@openvswitch.org" <dev@openvswitch.org>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "kasan-dev@googlegroups.com" <kasan-dev@googlegroups.com>,
+        "lvs-devel@vger.kernel.org" <lvs-devel@vger.kernel.org>,
+        "SHA-cyfmac-dev-list@infineon.com" <SHA-cyfmac-dev-list@infineon.com>,
+        "coreteam@netfilter.org" <coreteam@netfilter.org>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-actions@lists.infradead.org" 
+        <linux-actions@lists.infradead.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "cake@lists.bufferbloat.net" <cake@lists.bufferbloat.net>,
+        "brcm80211-dev-list.pdl@broadcom.com" 
+        <brcm80211-dev-list.pdl@broadcom.com>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Date:   Wed, 12 Oct 2022 18:37:11 -0700
+In-Reply-To: <d45bd258e033453b85a137112e7694e1@AcuMS.aculab.com>
+References: <20221005214844.2699-1-Jason@zx2c4.com>
+         <20221005214844.2699-4-Jason@zx2c4.com>
+         <f8ad3ba44d28dec1a5f7626b82c5e9c2aeefa729.camel@perches.com>
+         <d45bd258e033453b85a137112e7694e1@AcuMS.aculab.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 MIME-Version: 1.0
-In-Reply-To: <a44292df-ce46-828a-91a6-aa7377aa23f7@grimberg.me>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.169.59.127]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500002.china.huawei.com (7.192.104.244)
-X-CFilter-Loop: Reflected
+X-Stat-Signature: jmxt1u5agdpi9w76hr4tp6uotie3p373
+X-Rspamd-Server: rspamout03
+X-Rspamd-Queue-Id: 56EDD20026
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX18KEIRmyyr9pSEavQqF5X0dTzAEITyiJq4=
+X-HE-Tag: 1665625021-540494
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, 2022-10-12 at 21:29 +0000, David Laight wrote:
+> From: Joe Perches
+> > Sent: 12 October 2022 20:17
+> > 
+> > On Wed, 2022-10-05 at 23:48 +0200, Jason A. Donenfeld wrote:
+> > > The prandom_u32() function has been a deprecated inline wrapper around
+> > > get_random_u32() for several releases now, and compiles down to the
+> > > exact same code. Replace the deprecated wrapper with a direct call to
+> > > the real function.
+> > []
+> > > diff --git a/drivers/infiniband/hw/cxgb4/cm.c b/drivers/infiniband/hw/cxgb4/cm.c
+> > []
+> > > @@ -734,7 +734,7 @@ static int send_connect(struct c4iw_ep *ep)
+> > >  				   &ep->com.remote_addr;
+> > >  	int ret;
+> > >  	enum chip_type adapter_type = ep->com.dev->rdev.lldi.adapter_type;
+> > > -	u32 isn = (prandom_u32() & ~7UL) - 1;
+> > > +	u32 isn = (get_random_u32() & ~7UL) - 1;
+> > 
+> > trivia:
+> > 
+> > There are somewhat odd size mismatches here.
+> > 
+> > I had to think a tiny bit if random() returned a value from 0 to 7
+> > and was promoted to a 64 bit value then truncated to 32 bit.
+> > 
+> > Perhaps these would be clearer as ~7U and not ~7UL
+> 
+> That makes no difference - the compiler will generate the same code.
 
+True, more or less.  It's more a question for the reader.
 
-On 2022/10/12 19:13, Sagi Grimberg wrote:
-> 
-> 
-> On 10/12/22 11:43, Chao Leng wrote:
->> Add Ming Lei.
->>
->> On 2022/10/12 14:37, Sagi Grimberg wrote:
->>>
->>>>> On Sun, Jul 31, 2022 at 01:23:36PM +0300, Sagi Grimberg wrote:
->>>>>> But maybe we can avoid that, and because we allocate
->>>>>> the connect_q ourselves, and fully know that it should
->>>>>> not be apart of the tagset quiesce, perhaps we can introduce
->>>>>> a new interface like:
->>>>>> -- 
->>>>>> static inline int nvme_ctrl_init_connect_q(struct nvme_ctrl *ctrl)
->>>>>> {
->>>>>>     ctrl->connect_q = blk_mq_init_queue_self_quiesce(ctrl->tagset);
->>>>>>     if (IS_ERR(ctrl->connect_q))
->>>>>>         return PTR_ERR(ctrl->connect_q);
->>>>>>     return 0;
->>>>>> }
->>>>>> -- 
->>>>>>
->>>>>> And then blk_mq_quiesce_tagset can simply look into a per request-queue
->>>>>> self_quiesce flag and skip as needed.
->>>>>
->>>>> I'd just make that a queue flag set after allocation to keep the
->>>>> interface simple, but otherwise this seems like the right thing
->>>>> to do.
->>>> Now the code used NVME_NS_STOPPED to avoid unpaired stop/start.
->>>> If we use blk_mq_quiesce_tagset, It will cause the above mechanism to fail.
->>>> I review the code, only pci can not ensure secure stop/start pairing.
->>>> So there is a choice, We only use blk_mq_quiesce_tagset on fabrics, not PCI.
->>>> Do you think that's acceptable?
->>>> If that's acceptable, I will try to send a patch set.
->>>
->>> I don't think that this is acceptable. But I don't understand how
->>> NVME_NS_STOPPED would change anything in the behavior of tagset-wide
->>> quiesce?
->> If use blk_mq_quiesce_tagset, it will quiesce all queues of all ns,
->> but can not set NVME_NS_STOPPED of all ns. The mechanism of NVME_NS_STOPPED
->> will be invalidated.
->> NVMe-pci has very complicated quiesce/unquiesce use pattern, quiesce/unquiesce
->> may be called unpaired.
->> It will cause some backward. There may be some bugs in this scenario:
->> A thread: quiesce the queue
->> B thread: quiesce the queue
->> A thread end, and does not unquiesce the queue.
->> B thread: unquiesce the queue, and do something which need the queue must be unquiesed.
->>
->> Of course, I don't think it is a good choice to guarantee paired access through NVME_NS_STOPPED,
->> there exist unexpected unquiesce and start queue too early.
->> But now that the code has done so, the backward should be unacceptable.
->> such as this scenario:
->> A thread: quiesce the queue
->> B thread: want to quiesce the queue but do nothing because NVME_NS_STOPPED is already set.
->> A thread: unquiesce the queue
->> Now the queue is unquiesced too early for B thread.
->> B thread: do something which need the queue must be quiesced.
->>
->> Introduce NVME_NS_STOPPED link:
->> https://lore.kernel.org/all/20211014081710.1871747-5-ming.lei@redhat.com/
-> 
-> I think we can just change a ns flag to a controller flag ala:
-> NVME_CTRL_STOPPED, and then do:
-> 
-> void nvme_stop_queues(struct nvme_ctrl *ctrl)
-> {
->      if (!test_and_set_bit(NVME_CTRL_STOPPED, &ns->flags))
->          blk_mq_quiesce_tagset(ctrl->tagset);
-> }
-> EXPORT_SYMBOL_GPL(nvme_stop_queues);
-> 
-> void nvme_start_queues(struct nvme_ctrl *ctrl)
-> {
->      if (test_and_clear_bit(NVME_CTRL_STOPPED, &ns->flags))
->          blk_mq_unquiesce_tagset(ctrl->tagset);
-> }
-> EXPORT_SYMBOL_GPL(nvme_start_queues);
-> 
-> Won't that achieve the same result?
-No, nvme_set_queue_dying call nvme_start_ns_queue for one ns.
-ctrl->flags can not cover this scenario.
-This still results in unpaired quiesce/unquiesce.
+> The real question is WTF is the code doing?
 
-Maybe it is necessary to clean up the confused quiesce/unquiesce of nvme-pci,
-Thus blk_mq_quiesce_tagset can be easy to use for nvme-pci.
-Before that, we could only optimize batched quiesce/unquiesce based on ns,
-Although I also think using blk_mq_quiesce_tagset is a better choice.
+True.
+
+> The '& ~7u' clears the bottom 3 bits.
+> The '- 1' then sets the bottom 3 bits and decrements the
+> (random) high bits.
+
+Right.
+
+> So is the same as get_random_u32() | 7.
+
+True, it's effectively the same as the upper 29 bits are random
+anyway and the bottom 3 bits are always set.
+
+> But I bet the coder had something else in mind.
+
+Likely.
+
+And it was also likely copy/pasted a few times.
