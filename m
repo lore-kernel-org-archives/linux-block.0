@@ -2,109 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A07A9C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 14:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F37EC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 14:07:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229762AbiJMOEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 10:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59968 "EHLO
+        id S229928AbiJMOHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 10:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbiJMOE3 (ORCPT
+        with ESMTP id S229982AbiJMOHB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 10:04:29 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204D64C032;
-        Thu, 13 Oct 2022 07:04:14 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1364357a691so2383861fac.7;
-        Thu, 13 Oct 2022 07:04:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=P3lzffeHmbexWVtKhrHG9c286PrH8ea4fn4/VFTKtUI=;
-        b=pyTFtbpqkize8kW1Owf9hUAM5zNNJzYmp5MHcfKlmD519xwRmXSE4n8iqx4pQ9Th+f
-         EcsrFVvUa4cZWU89Ca8lSQHMhQ7o+HX8RwhyKWpeyint//6sEXm3SUKO/6Hdp2VanFsd
-         jTkd+EdzA02ULjiIdWxm/w/VfU8FsvHQ/LrjEXJJGHBAURWxBKE4brKJrqOAu6fAcO0a
-         77THxw6s65Vxah9u6PS2SSm/RhAQMG+tUw+QrerMVy9linXduPhEqu4Mig147SMxMIy8
-         Q6RrjJN7+bkstFgaRmV1oCSfE4ws23vpFUikNLbok6MHVe4PpKHEGzwWlZgFJeIIgHMi
-         VcZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P3lzffeHmbexWVtKhrHG9c286PrH8ea4fn4/VFTKtUI=;
-        b=Ekft9pK3bnXqNEG1l7o07LCkv+tjyTs8zu5olIGSDrhp6cNOwl3BwJMMPUgeGRV3gJ
-         LLj6aaJ4JxNI+9FTS7u5KNz++yFPhSt1Zk1wSrWUf+g0zfbki/3/vN4nkWgAypdHKpVF
-         EdopC0VcedtGyce8Hrsu6wjwoe7CLdxrNAV81xCFEP8cBic7AM+wqNwBgS46pn05RXu8
-         Puam2ZjGVD1MBPqx/RdtZcvS+mRqh0sxkiYHz4kfLFhoXrniCz9eJSCvF7dG/Flldtye
-         uCcBvufrnr/L6eYW3mptJzZqPYd/ZC1sdz0kpgpqr0KzgA2WzYgRMrbmRcTKfYrEateP
-         Ssvw==
-X-Gm-Message-State: ACrzQf1f94kjgAboXzT37PBKkb3ZymxNRs2alhVGA0jh6TpfbhQpmFUD
-        ch3CYUV5Y0bzeDhNlY5zb2kxThpKaTSSKVzMlaM=
-X-Google-Smtp-Source: AMsMyM7WNtzh048Cixz7xAMEuZLEvsqFShLD207m5i7JKfrcDOHZ+w8jM7YOCo9WKrnANABbqtLaBQ==
-X-Received: by 2002:a17:90b:1c0e:b0:20d:8cc5:23e5 with SMTP id oc14-20020a17090b1c0e00b0020d8cc523e5mr9849752pjb.111.1665669252648;
-        Thu, 13 Oct 2022 06:54:12 -0700 (PDT)
-Received: from Zbook.localdomain ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id s15-20020a170902ea0f00b0016d72804664sm12650457plg.205.2022.10.13.06.54.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Oct 2022 06:54:12 -0700 (PDT)
-From:   Yuwei Guan <ssawgyw@gmail.com>
-X-Google-Original-From: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com
-Subject: [PATCH] bfq: do try insert merge before bfq_init_rq() call
-Date:   Thu, 13 Oct 2022 21:53:21 +0800
-Message-Id: <20221013135321.174-1-Yuwei.Guan@zeekrlife.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 13 Oct 2022 10:07:01 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82D65E308;
+        Thu, 13 Oct 2022 07:06:49 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MpB7s11znzKFPn;
+        Thu, 13 Oct 2022 22:03:37 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgCHiMpBG0hjshrZAA--.47785S3;
+        Thu, 13 Oct 2022 22:05:54 +0800 (CST)
+Subject: Re: [PATCH] blk-mq: put the reference of the io scheduler module
+ after switching back
+To:     Jinlong Chen <chenjinlong2016@outlook.com>, yukuai1@huaweicloud.com
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <b79a8187-5342-8ff3-73fc-0324bdfb67fb@huaweicloud.com>
+ <OSYP286MB0344F8B1AC5F35BEA990B593BE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <f1c07b2a-ffdd-0912-139d-d51b34b77bcd@huaweicloud.com>
+Date:   Thu, 13 Oct 2022 22:05:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <OSYP286MB0344F8B1AC5F35BEA990B593BE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHiMpBG0hjshrZAA--.47785S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF1UCw1rWrWkCrWrtr1rCrg_yoW8GFWkpF
+        W8GayYkw4ktr40g3y7Kw47Ja40vrZ5Kr1Ygr1fAa4xXrn5W393Zr1xJa1a9FW5A34vyw1U
+        W34xZFWkZ3s8JrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+        6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_
+        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
+        UUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's useless to do bfq_init_rq(rq), if the rq can do merge first.
 
-In the patch 5f550ede5edf8, it moved to bfq_init_rq() before
-blk_mq_sched_try_insert_merge(), but it's pointless,
-as the fifo_time of next is not set yet,
-and !list_empty(&next->queuelist) is 0, so it does not
-need to reposition rq's fifo_time.
 
-And for the "hash lookup, try again" situation, as follow,
-bfq_requests_merged() call can work normally.
+ÔÚ 2022/10/13 21:47, Jinlong Chen Ð´µÀ:
+> Hi, Yu Kuai!
+> 
+>>
+>> I'm confused here, cause I do think this patch make sense.
+>>
+>> blk_mq_update_nr_hw_queues
+>>    // for each queue using the tagset
+>>    blk_mq_freeze_queue
+>>    // if current elevator is not none, swith to none
+>>    blk_mq_elv_switch_none
+>>     // elevator need to be switched back, got a reference to
+>>     // prevent module to be removed.
+>>     __module_get
+>>     elevator_switch(q, NULL);
+>>
+>>    // switch back from none elevator
+>>    blk_mq_elv_switch_back
+>>     -> should release the module reference here
+>>    blk_mq_unfreeze_queue
+>>
+> 
+> We need to release the reference only if blk_mq_elv_switch_back got its own
+>   reference. However, blk_mq_elv_switch_back (precisely elevator_switch_mq)
+>   does not increase the reference of the module it is switching to.
+>   Hence, the reference got in blk_mq_elv_switch_none does not need to be released,
+>   or we'll have to re-increase the reference count manually.'
 
-blk_mq_sched_try_insert_merge
-  elv_attempt_insert_merge
-    elv_rqhash_find
+But I don't see elevator_switch() release the referenct of the module
+it is switching from. It's still not balance to me.
 
-Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
----
- block/bfq-iosched.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 7ea427817f7f..9845370a701c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6147,7 +6147,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 		bfqg_stats_update_legacy_io(q, rq);
- #endif
- 	spin_lock_irq(&bfqd->lock);
--	bfqq = bfq_init_rq(rq);
-+
- 	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
- 		spin_unlock_irq(&bfqd->lock);
- 		blk_mq_free_requests(&free);
-@@ -6156,6 +6156,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 
- 	trace_block_rq_insert(rq);
- 
-+	bfqq = bfq_init_rq(rq);
- 	if (!bfqq || at_head) {
- 		if (at_head)
- 			list_add(&rq->queuelist, &bfqd->dispatch);
--- 
-2.34.1
+Thanks,
+Kuai
+> 
+>>
+>> By the way, I do not test yet, but I think problem can be reporduced:
+>>
+>>
+>> 1. modprobe bfq
+>> 2. switch elevator to bfq
+>> 3. trigger blk_mq_update_nr_hw_queues
+>> 4. switch elevator to none
+>> 5. rmmod bfq will fail
+>>
+> 
+> I tried to reproduce the problem but failed, so I found my mistake.
+> 
+> Sincerely,
+> Jinlong Chen
+> .
+> 
 
