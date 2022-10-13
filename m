@@ -2,50 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB45C43217
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62961C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:24:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230273AbiJMAWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 20:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38528 "EHLO
+        id S230285AbiJMAYZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 20:24:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbiJMAVZ (ORCPT
+        with ESMTP id S230465AbiJMAXn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 20:21:25 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AE6212344B;
-        Wed, 12 Oct 2022 17:18:21 -0700 (PDT)
+        Wed, 12 Oct 2022 20:23:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF938128C80;
+        Wed, 12 Oct 2022 17:21:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1A8A6B81CCC;
-        Thu, 13 Oct 2022 00:18:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 769D0C433D7;
-        Thu, 13 Oct 2022 00:18:10 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BE3EBB81CD8;
+        Thu, 13 Oct 2022 00:21:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E9CC43141;
+        Thu, 13 Oct 2022 00:21:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665620291;
-        bh=GhQcifaJLHmSWV1FJcckCCWe5jRuznAVJImLAHQm4YM=;
+        s=k20201202; t=1665620469;
+        bh=uRmHCUX63YBGiTRGsBpssZqpTdFnfepauf0+F2d4CTU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=StF+L++WCzSkRTBHIiFgpICXinMNQSLJ+HnjyLHK4D4JiSkAv8OOEnoOzrHmNfDKk
-         qZL72uKS3IvFWx3l21dee8KS7a4G1P7egBzP9pZTk4WxFzJTobGBTQR427d2XWLDjX
-         w0mU9fcqRYoulPQPQ+UETWozS1ntC7Pm23qAkt8xS3UPCndNnSwY/87aMzLhtPmQTM
-         05xVOjaW1+1bmoWqB1bZl0XB0gTHjbf3tihq4i0CbmBtwFPXpzJx5EVHChrhVRi83u
-         4arIuDSdeSCSlINeDz5xTuSQi3nGK35C6vN2w721s8Yj1vUpEhLGEsaoO483u7a0rZ
-         NRFEUVmGfDW+Q==
+        b=ctqQIDVyavEmGmjgj/xeyMp5NC0cjjLIMTTzb2PQiNnJi1brMh3hGn/Oy3EA2zKqK
+         yd641X/uiIfNuUEet7TCpyVYGfRcy3QsmdQDXAEoX/wycTMVLkk9w6JfV+jGDP7lYQ
+         GEjwPUkPrkWv5eJKPj+YOSM6yViHfIkkqBtYDVhFS1bYYxPN6xBhJz1mA9B254DrY+
+         ldjUBFFZ+JsHwJwauq7JJVtu2B0EJ5dsmPCU7AMd3ToUsRkOxdQG4s2x641EUwNqaE
+         vMt/2cXyvISD+sQB8jy2ln+Qx18U+DrSnaPSDdenPe9eL74UfQMMJqgHCwkG5xgo9Y
+         qmOtBCLsX/IGw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
-        song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, io-uring@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 56/67] block: replace blk_queue_nowait with bdev_nowait
-Date:   Wed, 12 Oct 2022 20:15:37 -0400
-Message-Id: <20221013001554.1892206-56-sashal@kernel.org>
+Cc:     Hugh Dickins <hughd@google.com>, Jan Kara <jack@suse.cz>,
+        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.19 60/63] sbitmap: fix lockup while swapping
+Date:   Wed, 12 Oct 2022 20:18:34 -0400
+Message-Id: <20221013001842.1893243-60-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221013001554.1892206-1-sashal@kernel.org>
-References: <20221013001554.1892206-1-sashal@kernel.org>
+In-Reply-To: <20221013001842.1893243-1-sashal@kernel.org>
+References: <20221013001842.1893243-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,114 +51,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+From: Hugh Dickins <hughd@google.com>
 
-[ Upstream commit 568ec936bf1384fc15873908c96a9aeb62536edb ]
+[ Upstream commit 30514bd2dd4e86a3ecfd6a93a3eadf7b9ea164a0 ]
 
-Replace blk_queue_nowait with a bdev_nowait helpers that takes the
-block_device given that the I/O submission path should not have to
-look into the request_queue.
+Commit 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
+is a big improvement: without it, I had to revert to before commit
+040b83fcecfb ("sbitmap: fix possible io hung due to lost wakeup")
+to avoid the high system time and freezes which that had introduced.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
-Link: https://lore.kernel.org/r/20220927075815.269694-1-hch@lst.de
+Now okay on the NVME laptop, but 4acb83417cad is a disaster for heavy
+swapping (kernel builds in low memory) on another: soon locking up in
+sbitmap_queue_wake_up() (into which __sbq_wake_up() is inlined), cycling
+around with waitqueue_active() but wait_cnt 0 .  Here is a backtrace,
+showing the common pattern of outer sbitmap_queue_wake_up() interrupted
+before setting wait_cnt 0 back to wake_batch (in some cases other CPUs
+are idle, in other cases they're spinning for a lock in dd_bio_merge()):
+
+sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
+__blk_mq_free_request < blk_mq_free_request < __blk_mq_end_request <
+scsi_end_request < scsi_io_completion < scsi_finish_command <
+scsi_complete < blk_complete_reqs < blk_done_softirq < __do_softirq <
+__irq_exit_rcu < irq_exit_rcu < common_interrupt < asm_common_interrupt <
+_raw_spin_unlock_irqrestore < __wake_up_common_lock < __wake_up <
+sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
+__blk_mq_free_request < blk_mq_free_request < dd_bio_merge <
+blk_mq_sched_bio_merge < blk_mq_attempt_bio_merge < blk_mq_submit_bio <
+__submit_bio < submit_bio_noacct_nocheck < submit_bio_noacct <
+submit_bio < __swap_writepage < swap_writepage < pageout <
+shrink_folio_list < evict_folios < lru_gen_shrink_lruvec <
+shrink_lruvec < shrink_node < do_try_to_free_pages < try_to_free_pages <
+__alloc_pages_slowpath < __alloc_pages < folio_alloc < vma_alloc_folio <
+do_anonymous_page < __handle_mm_fault < handle_mm_fault <
+do_user_addr_fault < exc_page_fault < asm_exc_page_fault
+
+See how the process-context sbitmap_queue_wake_up() has been interrupted,
+after bringing wait_cnt down to 0 (and in this example, after doing its
+wakeups), before advancing wake_index and refilling wake_cnt: an
+interrupt-context sbitmap_queue_wake_up() of the same sbq gets stuck.
+
+I have almost no grasp of all the possible sbitmap races, and their
+consequences: but __sbq_wake_up() can do nothing useful while wait_cnt 0,
+so it is better if sbq_wake_ptr() skips on to the next ws in that case:
+which fixes the lockup and shows no adverse consequence for me.
+
+The check for wait_cnt being 0 is obviously racy, and ultimately can lead
+to lost wakeups: for example, when there is only a single waitqueue with
+waiters.  However, lost wakeups are unlikely to matter in these cases,
+and a proper fix requires redesign (and benchmarking) of the batched
+wakeup code: so let's plug the hole with this bandaid for now.
+
+Signed-off-by: Hugh Dickins <hughd@google.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Keith Busch <kbusch@kernel.org>
+Link: https://lore.kernel.org/r/9c2038a7-cdc5-5ee-854c-fbc6168bf16@google.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-core.c       | 2 +-
- drivers/md/dm-table.c  | 4 +---
- drivers/md/md.c        | 4 ++--
- include/linux/blkdev.h | 6 +++++-
- io_uring/io_uring.c    | 2 +-
- 5 files changed, 10 insertions(+), 8 deletions(-)
+ lib/sbitmap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 651057c4146b..4ec669b0eadc 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -717,7 +717,7 @@ void submit_bio_noacct(struct bio *bio)
- 	 * For a REQ_NOWAIT based request, return -EOPNOTSUPP
- 	 * if queue does not support NOWAIT.
- 	 */
--	if ((bio->bi_opf & REQ_NOWAIT) && !blk_queue_nowait(q))
-+	if ((bio->bi_opf & REQ_NOWAIT) && !bdev_nowait(bdev))
- 		goto not_supported;
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 29eb0484215a..e000aaf6dbde 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -588,7 +588,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+ 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+ 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
  
- 	if (should_fail_bio(bio))
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 332f96b58252..d8034ff0cb24 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1856,9 +1856,7 @@ static bool dm_table_supports_write_zeroes(struct dm_table *t)
- static int device_not_nowait_capable(struct dm_target *ti, struct dm_dev *dev,
- 				     sector_t start, sector_t len, void *data)
- {
--	struct request_queue *q = bdev_get_queue(dev->bdev);
--
--	return !blk_queue_nowait(q);
-+	return !bdev_nowait(dev->bdev);
- }
- 
- static bool dm_table_supports_nowait(struct dm_table *t)
-diff --git a/drivers/md/md.c b/drivers/md/md.c
-index 729be2c5296c..72ad352cb41a 100644
---- a/drivers/md/md.c
-+++ b/drivers/md/md.c
-@@ -5845,7 +5845,7 @@ int md_run(struct mddev *mddev)
- 			}
- 		}
- 		sysfs_notify_dirent_safe(rdev->sysfs_state);
--		nowait = nowait && blk_queue_nowait(bdev_get_queue(rdev->bdev));
-+		nowait = nowait && bdev_nowait(rdev->bdev);
- 	}
- 
- 	if (!bioset_initialized(&mddev->bio_set)) {
-@@ -6982,7 +6982,7 @@ static int hot_add_disk(struct mddev *mddev, dev_t dev)
- 	 * If the new disk does not support REQ_NOWAIT,
- 	 * disable on the whole MD.
- 	 */
--	if (!blk_queue_nowait(bdev_get_queue(rdev->bdev))) {
-+	if (!bdev_nowait(rdev->bdev)) {
- 		pr_info("%s: Disabling nowait because %pg does not support nowait\n",
- 			mdname(mddev), rdev->bdev);
- 		blk_queue_flag_clear(QUEUE_FLAG_NOWAIT, mddev->queue);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 84b13fdd34a7..4750772ef228 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -618,7 +618,6 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- #define blk_queue_quiesced(q)	test_bit(QUEUE_FLAG_QUIESCED, &(q)->queue_flags)
- #define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
- #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
--#define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
- #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
- 
- extern void blk_set_pm_only(struct request_queue *q);
-@@ -1280,6 +1279,11 @@ static inline bool bdev_fua(struct block_device *bdev)
- 	return test_bit(QUEUE_FLAG_FUA, &bdev_get_queue(bdev)->queue_flags);
- }
- 
-+static inline bool bdev_nowait(struct block_device *bdev)
-+{
-+	return test_bit(QUEUE_FLAG_NOWAIT, &bdev_get_queue(bdev)->queue_flags);
-+}
-+
- static inline enum blk_zoned_model bdev_zoned_model(struct block_device *bdev)
- {
- 	struct request_queue *q = bdev_get_queue(bdev);
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index 13af6b56ebd2..c13122a87c40 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -1384,7 +1384,7 @@ static void io_iopoll_req_issued(struct io_kiocb *req, unsigned int issue_flags)
- 
- static bool io_bdev_nowait(struct block_device *bdev)
- {
--	return !bdev || blk_queue_nowait(bdev_get_queue(bdev));
-+	return !bdev || bdev_nowait(bdev);
- }
- 
- /*
+-		if (waitqueue_active(&ws->wait)) {
++		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
+ 			if (wake_index != atomic_read(&sbq->wake_index))
+ 				atomic_set(&sbq->wake_index, wake_index);
+ 			return ws;
 -- 
 2.35.1
 
