@@ -2,147 +2,231 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F4DC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 20:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1755C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 22:08:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229595AbiJMUQq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 16:16:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45086 "EHLO
+        id S229605AbiJMWIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 18:08:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiJMUQq (ORCPT
+        with ESMTP id S229713AbiJMWID (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 16:16:46 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD0733358;
-        Thu, 13 Oct 2022 13:16:44 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id c24so2842030plo.3;
-        Thu, 13 Oct 2022 13:16:44 -0700 (PDT)
+        Thu, 13 Oct 2022 18:08:03 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 701A818BE0B
+        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 15:08:01 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id b2so3048298plc.7
+        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 15:08:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=linaro.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOTkI6DiG9zNlMVvwhJN0xPlCDiBJf3npR9m1obgkeo=;
-        b=Lsxl/tLwGNZv9z+oGntC+5LE/pkahStDM6pBWlZuCiAaTuym7A3vMYZz82HZHCOOdy
-         303PbGf9qgLhPz6gYeVjhsODFOQBDTKwPZ4o384PcBLrNJD6T/386rk3h5oOQ3l9kCkt
-         bn5vpwBS4VoLHflw8Dlu0hy0elVT6i/Db9dfVa3kVwAAyJh+4EXsDSvnBGsrLUoHNH0v
-         4hIFnZeD7QxnfQL/Cq5pkIBG8QmBlIBemKRie1OAuHDVvYcAGJVhaeiTdnDf+f+ze2IR
-         +dDha5Qt6qamaohKfhX1pCPK/JSTypuHSlgw7FuvY6eWjhccY0d6rzTFRje4k0y/rPMR
-         L80Q==
+        bh=HG91HlnBs0Gp075eX+DhqkeC1CpJ7jgAv09vLeJ+oIA=;
+        b=lSp8uCpBXzhgIRT9vhEtaY3ZBlU+VNfAikeY1bNW9zPjGrSLawXkzIMCZap+SDiAoy
+         cXBY1lw4isxgEjaAZWx8nrIreeP0M794HQmy8+THJf9IbAHNNluYawc16UhB+ZLbnN7A
+         NIxwxl2l4qwrOiOZBC1GHxfzBHx8yq/AIKvRp+Jiaho6hm2V10XrRgsf71zHlIOWF1K3
+         sFjYB3g0v1zTymEit9JpDTBcM6HTJYRX7/a4IPClo3cs9tOlL0ZHlpC2FnnMN9QzlaO6
+         Lh2UfI3iwXCKTkxvsH/JqhtDYqGCEMNI6v/yf06gLUCsFrCUynq2KApZndn3N+DZpjJD
+         ZJoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gOTkI6DiG9zNlMVvwhJN0xPlCDiBJf3npR9m1obgkeo=;
-        b=7EhN9s04s2CSA4uyiQARhChAEYKNGsrjzlCb7Z8JBcvtBTOiJDn74ufgWwW9SUz6P/
-         7kLy0eoqbT9aDFPciSvf3hGgnTGiq0tCPDF/0zruhrZaMpoxMiXSMLxYgbH7MK6pZb3d
-         ad+FMyE+htNVhNX12sjUwG5j+Nq1rA4W5Ribm6nFC027eqkNucRuU0avTdGfqacLBtuJ
-         ngtAx9xIdYS8xyFuCQKyBHFffQ1hKBlJjsSCP5FAbR3zucINgfbXY/j9xbSAJ3vf+Fx2
-         wmQCdSBgT5xN8NXZVDXAN56YxgTUSSoibM5YKj/x6f2dNIaJ2SqqxyIeH40cQbe/1DZq
-         Iczg==
-X-Gm-Message-State: ACrzQf1QHqh+nnKS5FHwttpmlrJJcOkeuwL5LjJQBgG2PEZmGxiiSoD9
-        r4SL6v7Y95jXvteJCOhde86x15BbtZxv5I3615w=
-X-Google-Smtp-Source: AMsMyM6oJD/yMaxb7cro3W7Zw+cQjBDGxa+i3q11ifg/KVLAfGAnzcBpn57njRrsLsdEm4UMGMYmjk8ypjuUqiKsQ4M=
-X-Received: by 2002:a17:903:41cf:b0:183:5a22:c63e with SMTP id
- u15-20020a17090341cf00b001835a22c63emr1364803ple.61.1665692203956; Thu, 13
- Oct 2022 13:16:43 -0700 (PDT)
+        bh=HG91HlnBs0Gp075eX+DhqkeC1CpJ7jgAv09vLeJ+oIA=;
+        b=qBgEPVjE5+045MUGNHQGHnP0e5hHOxmHH6YzZejT8CMYAaw50Eo9R5kAcKLWloQDG+
+         ckmhOSmz9zlqOmrxdeQbcyKrDdkiWNNfK0p6I0ET7Y+oqq+lP9Ojpv5GVVyg/SXjJarz
+         mZyT3auuM0bCmV04lYbHKRfdLBcRTeIIPAEXexv18DnyBLDBibcwyjCGyurSmgXDgzzW
+         s2JQ8v1h/yK1cnwWuI7ODuONxXbF4A0pLTrX0Q0YddllfmhG+vzu78BedAqSMQmOAEkk
+         +E8AvlNuy3JX+9ID2aUhM4Zs/p9G9gEnnkh2aaDnikUJY8/pbce8xRnO2MkLH/B6GyOM
+         AXIA==
+X-Gm-Message-State: ACrzQf2cVq/Rl1MPf6s5VPPseDMfIugR5MBteVOY2Ou0naTJpwAJH5xQ
+        l9D3Sr2hdHsr8SAfb77Q0coorOqjliMKjG/qqBF+hg==
+X-Google-Smtp-Source: AMsMyM6LV6OL0/s+uVlAMeW+oe+z+7ox+aQ0OBzUP5OTWYFjs3E5Domjv/7Z82BtRW4PVMLjkqZmOjjmY/2x9G04VA0=
+X-Received: by 2002:a17:90b:4f87:b0:20b:12e3:32ae with SMTP id
+ qe7-20020a17090b4f8700b0020b12e332aemr2126062pjb.236.1665698880863; Thu, 13
+ Oct 2022 15:08:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221005180341.1738796-1-shy828301@gmail.com> <20221005180341.1738796-3-shy828301@gmail.com>
- <20221013123830.opbulq4qad56kuev@techsingularity.net>
-In-Reply-To: <20221013123830.opbulq4qad56kuev@techsingularity.net>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Thu, 13 Oct 2022 13:16:31 -0700
-Message-ID: <CAHbLzkpc+CAfsYe6gXjh=-3MxMH_aWhPMYhic7ddFZgWttOhng@mail.gmail.com>
-Subject: Re: [PATCH 2/4] mm: mempool: introduce page bulk allocator
-To:     Mel Gorman <mgorman@techsingularity.net>
-Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
-        akpm@linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CA+G9fYvRXkjeO+yDEQxwJ8+GjSmwhZ7XHHAaVWAsxAaSngj5gg@mail.gmail.com>
+ <bf1b053d-ffa6-48ab-d2d2-d59ab21afc19@opensource.wdc.com> <CA+G9fYvUnn0cS+_DZm8hAfi=FnMB08+6Xnhud6yvi9Bxh=DU+Q@mail.gmail.com>
+In-Reply-To: <CA+G9fYvUnn0cS+_DZm8hAfi=FnMB08+6Xnhud6yvi9Bxh=DU+Q@mail.gmail.com>
+From:   Anders Roxell <anders.roxell@linaro.org>
+Date:   Fri, 14 Oct 2022 00:07:50 +0200
+Message-ID: <CADYN=9L8tt2T-8O+u5NSMSUOkZDvEggnvzxH6aMmd5Rn9yDeuw@mail.gmail.com>
+Subject: Re: TI: X15 the connected SSD is not detected on Linux next 20221006 tag
+To:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Sergey.Semin@baikalelectronics.ru, damien.lemoal@opensource.wdc.com
+Cc:     open list <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org, regressions@lists.linux.dev,
+        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
+        <linux-ide@vger.kernel.org>, lkft-triage@lists.linaro.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Arnd Bergmann <arnd@arndb.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 13, 2022 at 5:38 AM Mel Gorman <mgorman@techsingularity.net> wrote:
+On Thu, 13 Oct 2022 at 14:39, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
 >
-> On Wed, Oct 05, 2022 at 11:03:39AM -0700, Yang Shi wrote:
-> > Since v5.13 the page bulk allocator was introduced to allocate order-0
-> > pages in bulk.  There are a few mempool allocator callers which does
-> > order-0 page allocation in a loop, for example, dm-crypt, f2fs compress,
-> > etc.  A mempool page bulk allocator seems useful.  So introduce the
-> > mempool page bulk allocator.
+> On Thu, 13 Oct 2022 at 12:41, Damien Le Moal
+> <damien.lemoal@opensource.wdc.com> wrote:
 > >
-> > It introduces the below APIs:
-> >   - mempool_init_pages_bulk()
-> >   - mempool_create_pages_bulk()
-> > They initialize the mempool for page bulk allocator.  The pool is filled
-> > by alloc_page() in a loop.
-> >
-> >   - mempool_alloc_pages_bulk_list()
-> >   - mempool_alloc_pages_bulk_array()
-> > They do bulk allocation from mempool.
-> > They do the below conceptually:
-> >   1. Call bulk page allocator
-> >   2. If the allocation is fulfilled then return otherwise try to
-> >      allocate the remaining pages from the mempool
-> >   3. If it is fulfilled then return otherwise retry from #1 with sleepable
-> >      gfp
-> >   4. If it is still failed, sleep for a while to wait for the mempool is
-> >      refilled, then retry from #1
-> > The populated pages will stay on the list or array until the callers
-> > consume them or free them.
-> > Since mempool allocator is guaranteed to success in the sleepable context,
-> > so the two APIs return true for success or false for fail.  It is the
-> > caller's responsibility to handle failure case (partial allocation), just
-> > like the page bulk allocator.
-> >
-> > The mempool typically is an object agnostic allocator, but bulk allocation
-> > is only supported by pages, so the mempool bulk allocator is for page
-> > allocation only as well.
-> >
-> > Signed-off-by: Yang Shi <shy828301@gmail.com>
+> > On 2022/10/12 16:24, Naresh Kamboju wrote:
+> > > On TI beagle board x15 the connected SSD is not detected on linux next
+> > > 20221006 tag.
+> > >
+> > > + export STORAGE_DEV=/dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
+> > > + STORAGE_DEV=/dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
+> > > + test -n /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
+> > > + echo y
+> > > + mkfs.ext4 /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
+> > > mke2fs 1.46.5 (30-Dec-2021)
+> > > The file /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84 does
+> > > not exist and no size was specified.
+> > > + lava-test-raise 'mkfs.ext4
+> > > /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84 failed; job
+> > > exit'
 >
-> Overall, I think it's an ok approach and certainly a good use case for
-> the bulk allocator.
+> The reported issue is now noticed on the Linux mainline master branch.
 >
-> The main concern that I have is that the dm-crypt use case doesn't really
-> want to use lists as such and it's just a means for collecting pages to pass
-> to bio_add_page(). bio_add_page() is working with arrays but you cannot
-> use that array directly as any change to how that array is populated will
-> then explode. Unfortunately, what you have is adding pages to a list to
-> take them off the list and put them in an array and that is inefficient.
-
-Yeah, I didn't think of a better way to pass the pages to dm-crypt.
-
+> 1)
+> I see following config is missing on latest problematic builds
+>   - CONFIG_HAVE_PATA_PLATFORM=y
 >
-> How about this
+> 2)
+> Following ahci sata kernel message are missing on problematic boots,
+> [    1.408660] ahci 4a140000.sata: forcing port_map 0x0 -> 0x1
+> [    1.408691] ahci 4a140000.sata: AHCI 0001.0300 32 slots 1 ports 3
+> Gbps 0x1 impl platform mode
+> [    1.408721] ahci 4a140000.sata: flags: 64bit ncq sntf pm led clo
+> only pmp pio slum part ccc apst
+> [    1.409820] scsi host0: ahci
+> [    1.410064] ata1: SATA max UDMA/133 mmio [mem
+> 0x4a140000-0x4a1410ff] port 0x100 irq 98
 >
-> 1. Add a callback to __alloc_pages_bulk() that takes a page as a
->    parameter like bulk_add_page() or whatever.
+> 3)
+> GOOD: 9d84bb40bcb30a7fa16f33baa967aeb9953dda78
+> BAD:  e08466a7c00733a501d3c5328d29ec974478d717
 >
-> 2. For page_list == NULL && page_array == NULL, the callback is used
+> 4)
+> Here i am adding links working and not working test jobs and kernel configs,
+> problematic test job:
+>  - https://lkft.validation.linaro.org/scheduler/job/5641407#L2602
+> Good test job:
+>  - https://lkft.validation.linaro.org/scheduler/job/5640672#L2198
 >
-> 3. Add alloc_pages_bulk_cb() that passes in the name of a callback
->    function
+> 5)
+> metadata:
+>   git_ref: master
+>   git_repo: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline
+>   git_sha: e08466a7c00733a501d3c5328d29ec974478d717
+>   git_describe: v6.0-7220-ge08466a7c007
+>   kernel_version: 6.0.0
+>   kernel-config: https://builds.tuxbuild.com/2Fourpiqf1OrlPFFtKwhHV0wAiq/config
+>   build-url: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline/-/pipelines/661424896
+>   artifact-location: https://builds.tuxbuild.com/2Fourpiqf1OrlPFFtKwhHV0wAiq
+>   toolchain: gcc-10
 >
-> 4. In the dm-crypt case, use the callback to pass the page to bio_add_page
->    for the new page allocated.
-
-Thank you so much for the suggestion. But I have a hard time
-understanding how these work together. Do you mean call bio_add_page()
-in the callback? But bio_add_page() needs other parameters. Or I
-misunderstood you?
-
 >
-> It's not free because there will be an additional function call for every
-> page bulk allocated but I suspect that's cheaper than adding a pile of
-> pages to a list just to take them off again. It also avoids adding a user
-> for the bulk allocator list interface that does not even want a list.
->
-> It might mean that there is additional cleanup work for __alloc_pages_bulk
-> to abstract away whether a list, array or cb is used but nothing
-> impossible.
->
+> 6)
+> For your information,
 > --
-> Mel Gorman
-> SUSE Labs
+> I see diff on good to bad commits,
+> $ git log --oneline 9d84bb40bcb3..e08466a7c007  -- drivers/ata
+> 4078aa685097 Merge tag 'ata-6.1-rc1' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/libata
+> 71d7b6e51ad3 ata: libata-eh: avoid needless hard reset when revalidating link
+> e3b1fff6c051 ata: libata: drop superfluous ata_eh_analyze_tf() parameter
+> b46c760e11c8 ata: libata: drop superfluous ata_eh_request_sense() parameter
+> cb6e73aaadff ata: libata-eh: Remove the unneeded result variable
+> ecf8322f464d ata: ahci_st: Enable compile test
+> 2d29dd108c78 ata: ahci_st: Fix compilation warning
+> 9628711aa649 ata: ahci-dwc: Add Baikal-T1 AHCI SATA interface support
+> bc7af9100fa8 ata: ahci-dwc: Add platform-specific quirks support
+> 33629d35090f ata: ahci: Add DWC AHCI SATA controller support
+> 6ce73f3a6fc0 ata: libahci_platform: Add function returning a clock-handle by id
+> 18ee7c49f75b ata: ahci: Introduce firmware-specific caps initialization
+> 7cbbfbe01a72 ata: ahci: Convert __ahci_port_base to accepting hpriv as arguments
+> fad64dc06579 ata: libahci: Don't read AHCI version twice in the
+> save-config method
+> 88589772e80c ata: libahci: Discard redundant force_port_map parameter
+> eb7cae0b6afd ata: libahci: Extend port-cmd flags set with port capabilities
+> f67f12ff57bc ata: libahci_platform: Introduce reset
+> assertion/deassertion methods
+> 3f74cd046fbe ata: libahci_platform: Parse ports-implemented property
+> in resources getter
+> 3c132ea6508b ata: libahci_platform: Sanity check the DT child nodes number
+> e28b3abf8020 ata: libahci_platform: Convert to using devm bulk clocks API
+> 82d437e6dcb1 ata: libahci_platform: Convert to using platform
+> devm-ioremap methods
+> d3243965f24a ata: make PATA_PLATFORM selectable only for suitable architectures
+> 3ebe59a54111 ata: clean up how architectures enable PATA_PLATFORM and
+> PATA_OF_PLATFORM
+> 55d5ba550535 ata: libata-core: Check errors in sata_print_link_status()
+> 03070458d700 ata: libata-sff: Fix double word in comments
+> 0b2436d3d25f ata: pata_macio: Remove unneeded word in comments
+> 024811a2da45 ata: libata-core: Simplify ata_dev_set_xfermode()
+> 066de3b9d93b ata: libata-core: Simplify ata_build_rw_tf()
+> e00923c59e68 ata: libata: Rename ATA_DFLAG_NCQ_PRIO_ENABLE
+> 614065aba704 ata: libata-core: remove redundant err_mask variable
+> fee6073051c3 ata: ahci: Do not check ACPI_FADT_LOW_POWER_S0
+> 99ad3f9f829f ata: libata-core: improve parameter names for ata_dev_set_feature()
+> 16169fb78182 ata: libata-core: Print timeout value when internal command times
+>
+>
+>
+>
+> > >
+> > > Test log:
+> > >  - https://lkft.validation.linaro.org/scheduler/job/5634743#L2580
+> > >
+> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > >
+> > > metadata:
+> > >   git_ref: master
+> > >   git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+> > >   git_sha: 7da9fed0474b4cd46055dd92d55c42faf32c19ac
+> > >   git_describe: next-20221006
+> > >   kernel_version: 6.0.0
+> > >   kernel-config: https://builds.tuxbuild.com/2FkkkZ51ZYhBL1G8D69YX8Pkt5F/config
+> > >   build-url: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next/-/pipelines/659754170
+> > >   artifact-location: https://builds.tuxbuild.com/2FkkkZ51ZYhBL1G8D69YX8Pkt5F
+> > >   toolchain: gcc-10
+>
+> 7)
+> > The kernel messages that are shown in the links above do not show any "libata
+> > version 3.00 loaded." message nor any ata/ahci message that I can see. So I
+> > think the eSATA adapter is not even being detected and libata/ahci driver not used.
+> >
+> > Was this working before ? If yes, can you try with the following patches reverted ?
+> >
+> > d3243965f24a ("ata: make PATA_PLATFORM selectable only for suitable architectures")
+> > 3ebe59a54111 ("ata: clean up how architectures enable PATA_PLATFORM and
+> > PATA_OF_PLATFORM")
+>
+> I have reverted above two patches and but the problem has not been solved.
+>
+> 8)
+> > If reverting these patches restores the eSATA port on this board, then you need
+> > to fix the defconfig for that board.
+>
+> OTOH,
+> Anders, enabled the new config CONFIG_AHCI_DWC=y  and tried but the
+> device failed to boot.
+
+I thought it would work with enabling CONFIG_AHCI_DWC=y, but it didn't...
+However, reverting patch 33629d35090f ("ata: ahci: Add DWC AHCI SATA
+controller support")
+from next-20221013 was a success, kernel booted  and the 'mkfs.ext4' cmd was
+successful.
+
+Build artifacts [1].
+Any idea what happens?
+
+Cheers,
+Anders
+[1] https://builds.tuxbuild.com/2G53i1F7vUWWTuZJtka3Fr7iH1B/
