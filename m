@@ -2,102 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CA9C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 13:22:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73060C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 13:48:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbiJMNWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 09:22:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46774 "EHLO
+        id S229693AbiJMNsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 09:48:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbiJMNWx (ORCPT
+        with ESMTP id S229993AbiJMNsD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 09:22:53 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A59C10565D;
-        Thu, 13 Oct 2022 06:22:45 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mp9BP4PbNzl3nR;
-        Thu, 13 Oct 2022 21:20:45 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAnKMohEUhjqX_XAA--.48818S3;
-        Thu, 13 Oct 2022 21:22:42 +0800 (CST)
-Subject: Re: [PATCH] blk-mq: put the reference of the io scheduler module
- after switching back
-To:     Jinlong Chen <chenjinlong2016@outlook.com>, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <OS0P286MB0338E8D41770BFDE7B3A4EBBBE229@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
- <OS0P286MB033887ED7C81DD1F782000DBBE259@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b79a8187-5342-8ff3-73fc-0324bdfb67fb@huaweicloud.com>
-Date:   Thu, 13 Oct 2022 21:22:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <OS0P286MB033887ED7C81DD1F782000DBBE259@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=gbk; format=flowed
+        Thu, 13 Oct 2022 09:48:03 -0400
+Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01olkn2091.outbound.protection.outlook.com [40.92.98.91])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F5BA11B2C6;
+        Thu, 13 Oct 2022 06:47:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F+8v32CNFZHVfbWflig5NqmZqnmSGKlRxdBCQv3r3AnsEUNceTY4FzoLV+vKzkCAETLS9SWLckjxiwi3Axc/l9A0d07ZPs1Si2FddtVPoieNNYVwcaKDdGmmo6jhgnsLpyzF3QAjGafg9SbmP2dMo0QuZUxpliW7NMMIEKWCV8mudXJBMwmDo2CUYjyR1G/rdnA0vqf0iw4cwoMlKfg0z03RjQ2GjeaZq7RR+WR0gAsOq2TcbCj5faROFrtjySot0B3HkoHfVImTr5Z/oipNYmxsSJzdFIXQIfDXKZLxIT8w8ySIL4O1tqgGolrD4eqotO9Id3AyMjvOEFSxDizj9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p+3EvavTsoWN6VaBVcrcI4IN20boKXa/gkD+3f3mW9A=;
+ b=Gf6FTyvOjlJB5HgEUpF4XLpjQsNVyWT5fb+DGi4mxqAK/raytUzYQs0Y3qlKXRPaNDEWwh0ERJenZ8QkRnSz4oDSyyIPH/8daXM021znHYfKmV0ZfcDlFLGLeuiu55Z2IF0yHBENSSnt2QO8w0hZfv/xtzNpYh60eCAilVdoDjoo7A8q1nIRCXCiKXdzt2dCb6E/JX4/FfnF188z3RrOPTkpaZncyQG/fi2hM73KdooDtzapa9tqHlLBBNEarlrnJ/8BRReQtYDMxFQdGQSj4141ZKT49WoilSLpu11V0pGux49UfriZUUlgKqIC5eY6fqbaOrDNboG+F+aUrszEEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p+3EvavTsoWN6VaBVcrcI4IN20boKXa/gkD+3f3mW9A=;
+ b=r4CYRI5AE+kI30U+tSFDmBIFKSNjERPjMpMsvZn9dYitB5Ho/7LgxJkwwwNEyKjJVXdqPMUQSHwPfifPuWyCRJPQFS2YdYW5kN+Xs1Kp9H31pT6C/i2IdzuFUNNoDj5pLeWcoJHHTea+2kAZigD4uCCo0QjAu1anpzGF8At3YAYP1AjUiN4KXHe2T714kB5un8+FqpBabBxOIhww1rLhQpLHNLkrO0MViI0vR29HPZgDbfaO3FqVcM6ag+a+P6hOp3/4Pqg3WhEPWSoOo6O7X9AP94EW2/kZq4cQNflOdCtuViBDoBkfjGEEL2nRZrD1+hNESNBlGcgetTs9StfhYg==
+Received: from OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:82::12)
+ by OSZP286MB2412.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:1c4::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.21; Thu, 13 Oct
+ 2022 13:47:52 +0000
+Received: from OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::7fa1:f154:53ce:939a]) by OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::7fa1:f154:53ce:939a%8]) with mapi id 15.20.5709.024; Thu, 13 Oct 2022
+ 13:47:52 +0000
+From:   Jinlong Chen <chenjinlong2016@outlook.com>
+To:     yukuai1@huaweicloud.com
+Cc:     axboe@kernel.dk, chenjinlong2016@outlook.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com
+Subject: Re: [PATCH] blk-mq: put the reference of the io scheduler module after switching back
+Date:   Thu, 13 Oct 2022 21:47:33 +0800
+Message-ID: <OSYP286MB0344F8B1AC5F35BEA990B593BE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <b79a8187-5342-8ff3-73fc-0324bdfb67fb@huaweicloud.com>
+References: <b79a8187-5342-8ff3-73fc-0324bdfb67fb@huaweicloud.com>
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAnKMohEUhjqX_XAA--.48818S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKw1fZry7Xr4fur48Kr4DJwb_yoWDWrc_ur
-        40kFykKw1UGr4FgFyxKF1UZrZxW395Gr98JFW2yF4fAa90gay3tr4DK3WxWr1xJws7Cr1Y
-        qF43uF43uw15XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb78YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1CPfJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
+X-TMN:  [zefX+bJQrlArnJKRaAzuiB9p+6uFwRJk]
+X-ClientProxiedBy: SGAP274CA0003.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::15)
+ To OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:82::12)
+X-Microsoft-Original-Message-ID: <20221013134733.21207-1-chenjinlong2016@outlook.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: OSYP286MB0344:EE_|OSZP286MB2412:EE_
+X-MS-Office365-Filtering-Correlation-Id: 34d3608c-c138-4411-70e9-08daad218587
+X-MS-Exchange-SLBlob-MailProps: C/ir7cSdGltGXZ5hP6IVfgoZ9qi9retvdSL+iY+H6YskAd2sUnFzx0JGQNJEJqOn0dER4ZMCybef0xTsyhhdgv47IttuQ2wFnHQ1QDooflwrsiuHcLmxxOtHxDic/aPRZM1PrkeAvQzRp6IPnhWmfzwu4kIpBSOn4a3nAnJteHYfYfxGiB5VXl/NWTh6ARg5vUmZg+ExPkWobktJhkS0NTRgK4xNmYTrLeA5eE4mQTo/e3KXpHbS9CRqoK874Kku1ehUSDqPZgfVm/V2jWvPkB0dP4pxGkzUz8Kxm2yhMF/G1//prp6C1RmMu3Oc+jxArHQdhk7hbMDm8SKXD0y2pdgeIdsuZaf3LiLbvW5Eg1FOxhiaq4K/ygn0KdhGdhOmhhJvcaqrgwydCnnmGX6zlJmBlkIVKe9ARGPLQhp9nM6oe6L1wXc3wjGe0yMXi6EOYjxrurHb27FxiT0xvvk5OmHhds2/ELxsOYjiqdVrc3kZu8Le6USlrjbebLlax3hZCtCkvhIge5Hc6+drPTjeYvooKwsU3hs5n/TAsqW0s64BpmcK/N6ow1VO7BgvsxoBGuGZXWDTaneJY74EzfXOrxOSUFytLMcqnijkbi1Be8niESxxUaWuiECz44INDH6iNwo8f631GmnDXb1q161F7bfpIMhtuM8feD7/Tzfyl3w48wFalM4ENKMn0KsILI6WlhvP63KmRCH5WG1RhwhM6cmgPyHw1ehE/+NXmLAwTl/88NiARYk2OQyGF0gzK63j
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SZ+962e+jPGff3+MVLz90ZBHfwOwXZE2C/7SahWgHlQIldYAXeIiIdpSUmBaqmtfH591DT7EJhVQme0NBI81dKsoaV2EQCMkUjQQZTqCx0+chBiTXQUJSNpu9W82RcSzPubponMoyPVtwAjZn29MMCBA+LlpoMd+ykkF3rVuQvsZT8Xe3Ql5Ra6c1sTWgZFB6mxhtjXUDvYyHyuEhMT5DUDPe6kd17Su+hTnkXF4+QTonzWT9i2u9LrWS8CnsTJHkxbh5fdfi79/dR3+6xt18ymzRsp5Fc0MFsF1kXkIwCIlHdkowFyLYRoOoLX6nLTA/Wu8m1brghwiiz6T30qmxS2IS79eFsFEPrb70q41uSTwh+1+hM8KfCYL18VOtzKAQb91OVDxUMcB/y8QOCq/g6F3r6OfGQRF8HW9FOBp8xHsYOpHFZhUxOaLhWHQgVEPqbfJjeHST/Qn9Yng1iPCDzkInDByI5ktRJiCgKAcEc3VsfXlsPuVHqs7mzLyWyihPHrKKiu7OtJKvbSRV8oa9shaW6NOZbiJnowO9xbbKmMHtrlxyqpiS4NrNyJSXQcjKTGPzBwx38CSD310FjGt+z7hYb5q9kWKmwUoiXM6Idtk0CPWDz7fxpPupgeOeDCFeydjwNYWaQMEi6fUtJoxrb7iTSkuDeXoq4hsNPy4+3ljoyKOj9LqTaDC/111yzB5lOhz0ormBnnOr0jNrSBps/Veg2OsEQhLHZdtbUpTRrE=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PjjOVqnXPGuiFnyCPYeEtund//XbXFXDp0dZ7+92CB8H+798l5I9V52gvrpc?=
+ =?us-ascii?Q?GVRKmBI1RrgfxatgnGVd/QFiIq0yXpb7J96RBe8CBjrqL+1R/K+hc/11LD7R?=
+ =?us-ascii?Q?O010Fts55OmuViW7hjTqL+maGP7UnafJ+YJ7SMr1/4nreOk8Rs5klqnPTpta?=
+ =?us-ascii?Q?LIkz++0QVYn/JBw+Zq/DKgQDj9m8CEM4utiS3GkGuyTdB2D5nUFlPGp/GS/O?=
+ =?us-ascii?Q?/pbYtQqMgBBjS7qIPssR3ONn3VcDmSEQJLSYyALjPW9vJjZ/N80CAoc7JPgM?=
+ =?us-ascii?Q?Iqaq/etiBl13L1kB+xFgeQ7FfU7E/5V+wzXZ82ch8+mG3Dv4q02SuHrSMht2?=
+ =?us-ascii?Q?Uxn8uiO+YFocQA6kpsiNFBKUIRX4nIeb4/YQMr+Wkac2s77vgNE+RB278H1+?=
+ =?us-ascii?Q?UK4RLJOxpv1wqnYCAaBXOWieSUCUQJ0tpY9CIZFJcxglTik1tekRbJncyMOu?=
+ =?us-ascii?Q?Be6VRo2yWDMu8LIwx2I+IOqQt2sVKyJUHZJekSebQUVaOi+zdM/mEXkG8dlw?=
+ =?us-ascii?Q?QSLMzO6/k0maLITraxFjgeK8mogWgZ0o8eH4Z2vVlLFSfdv083x/kPEINTUt?=
+ =?us-ascii?Q?cf72VdpCmfBQxvf40tZ5uXJeYY0knKkM2wEDgYUryjmsBLjTEj0VwI9t3Zf6?=
+ =?us-ascii?Q?eyQjb4pAUncCBbOkzPOnImSFBvYcvyuR03CY8NB0TORA4dzl5QwTleoo3QLJ?=
+ =?us-ascii?Q?0HGbSdH/Vfdb160QovCBXiz3UVzVHzs5VRf8PLHxoG9R7eoJBei20nPOiCdd?=
+ =?us-ascii?Q?eExThUVkJRFPyZAO3QZ7NF5WdEfnILbLDyGreiR/IZiTv03s7cYncXe8aVrJ?=
+ =?us-ascii?Q?RGvO1NZYIohqB1A7tEUeHD1n2fNeEAHjQCw1mDF/TLfYRpvivXahkpBFuky/?=
+ =?us-ascii?Q?mTvSKEYQmQ2lr4ZXgPUaS55eSd4wWZjnVn5lGcONadHkt63ewps0W0sfRrCZ?=
+ =?us-ascii?Q?jFY+eBPply10ftwlrSBSchVEALkbXKQpQ+TzfC4/zUwKcqJJxtt1p2F1BHId?=
+ =?us-ascii?Q?YUafIJRll4sODXnYxs3QUq0PB0awt7IWAOJZyWlc0IdRBPQbowMSog5R/6gv?=
+ =?us-ascii?Q?nZoiEkMXs4XyhyCPYkWCbjTFdLnIDvRu1trapLAVI3ct6jgcE46TZNMxa49y?=
+ =?us-ascii?Q?YoyEuWk7YhEX59MrG/E7Kc9Qo/6WUyaMzy70DALkXS1ipOXeDLLRodu/j4D5?=
+ =?us-ascii?Q?zZruYnMFlo/9p/dLrVex3M1UYVbwPW0LC5DZ240bJ3kOeHDPyUv6ZN5QDURa?=
+ =?us-ascii?Q?++VF1dalJ1ZufCMX4D+Lt0rljTQr+oqlcbznsZ0JP3xo3+Rs2Qbbi/UviQX4?=
+ =?us-ascii?Q?SEM=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34d3608c-c138-4411-70e9-08daad218587
+X-MS-Exchange-CrossTenant-AuthSource: OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2022 13:47:52.6659
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSZP286MB2412
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi, Yu Kuai!
 
-ÔÚ 2022/10/13 21:03, Jinlong Chen Ð´µÀ:
-> Sorry for the disturbance.
 > 
-> This patch is just wrong. elevator_switch_mq does not increase the reference
->   count of the io scheduler module to which we are switching. Hence, we do not
->   need to put the reference back manually.
-
-I'm confused here, cause I do think this patch make sense.
-
-blk_mq_update_nr_hw_queues
-  // for each queue using the tagset
-  blk_mq_freeze_queue
-  // if current elevator is not none, swith to none
-  blk_mq_elv_switch_none
-   // elevator need to be switched back, got a reference to
-   // prevent module to be removed.
-   __module_get
-   elevator_switch(q, NULL);
-
-  // switch back from none elevator
-  blk_mq_elv_switch_back
-   -> should release the module reference here
-  blk_mq_unfreeze_queue
-
-By the way, I do not test yet, but I think problem can be reporduced:
-
-1. modprobe bfq
-2. switch elevator to bfq
-3. trigger blk_mq_update_nr_hw_queues
-4. switch elevator to none
-5. rmmod bfq will fail
-
-Thanks,
-Kuai
+> I'm confused here, cause I do think this patch make sense.
 > 
-> Sincerely
-> Jinlong Chen
-> .
+> blk_mq_update_nr_hw_queues
+>   // for each queue using the tagset
+>   blk_mq_freeze_queue
+>   // if current elevator is not none, swith to none
+>   blk_mq_elv_switch_none
+>    // elevator need to be switched back, got a reference to
+>    // prevent module to be removed.
+>    __module_get
+>    elevator_switch(q, NULL);
+> 
+>   // switch back from none elevator
+>   blk_mq_elv_switch_back
+>    -> should release the module reference here
+>   blk_mq_unfreeze_queue
 > 
 
+We need to release the reference only if blk_mq_elv_switch_back got its own
+ reference. However, blk_mq_elv_switch_back (precisely elevator_switch_mq)
+ does not increase the reference of the module it is switching to. 
+ Hence, the reference got in blk_mq_elv_switch_none does not need to be released,
+ or we'll have to re-increase the reference count manually.
+
+> 
+> By the way, I do not test yet, but I think problem can be reporduced:
+> 
+> 
+> 1. modprobe bfq
+> 2. switch elevator to bfq
+> 3. trigger blk_mq_update_nr_hw_queues
+> 4. switch elevator to none
+> 5. rmmod bfq will fail
+> 
+
+I tried to reproduce the problem but failed, so I found my mistake.
+
+Sincerely,
+Jinlong Chen
