@@ -2,106 +2,200 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B83DAC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 01:51:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A30C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 02:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiJMBvQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 21:51:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43006 "EHLO
+        id S229967AbiJMCHJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 22:07:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbiJMBvD (ORCPT
+        with ESMTP id S229990AbiJMCHG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 21:51:03 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 048EFEE0A7;
-        Wed, 12 Oct 2022 18:51:03 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id i3so632555pfk.9;
-        Wed, 12 Oct 2022 18:51:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k+fj3xaPXr55GP2FJv1sRZl6lOLiSQ/9qXaPvpYFz2w=;
-        b=Sm9uh2W7FEzUaBs04hT8hSWvVQG5de9bJ5uV8g35ZaNBfyeQEyzQyCv+/COgZdKuCY
-         xWQrkJLHa18E97WyAsMNpkzyzvHEF36kq4d0D+e58dDnP54SV0Ks68V8xNbyGhz+nbA5
-         ZgrjkUYgcIGUNkJTBiM4NrZPt0yHxPJ2SSqya2v3jIS1ivwnuQQzj6alQ2j9gw/3nJkx
-         bfdcAKCVWHNB0UF1m4qfnjW+buy87goAruDFsHQrqdQqYc53xqSfN6BZDepREMH7dFrt
-         SPBSrE3MIPPoIrxOyyKxQxCYIFzwWu8Hpu1c0GnG69tbmQKQlijJ6aMkrbr4gvzrPMSo
-         Yi8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k+fj3xaPXr55GP2FJv1sRZl6lOLiSQ/9qXaPvpYFz2w=;
-        b=bID/9CBFT8uTibYpCNEyMpmd6It/v8pUrK67a+nRGJWMncXq6KuZ3VFTadlMlgummx
-         8nvHQCN0xoRs0e/TnVSFEWmc8OkMUOiyTKGU7eJ4X4GsCO1YKQKBnbmDpGoK+/Tt2XiI
-         LK4ux4O1vmTH/VSYxFSgy+Z+G33qFqD5h4e2DEBb2GZKrf5uul5iIG1+2viChapEgbgr
-         dr9VnwM+ltkOcS0+f/Deq5DuSEDM/AjgYGWYGIK1YO25aNq13j8ZkIyvMiacl/lhwk8f
-         aHDMYxGKGu0Mws1hqZFYOjE7vV0JbKp6MtwNMZdTaeb9QsamLP906XO12n3oYy8DvEsQ
-         bhpg==
-X-Gm-Message-State: ACrzQf2eQ6jWgu8ALPR8+9OjiDWObEJA4x6H2ukM5KQ91E/+rYOVlpq1
-        i3RCF1j+gzJBID/q+iiGl/A=
-X-Google-Smtp-Source: AMsMyM75EDZVE7nkn1nTc50WrEt+rGU6bP4inf/wRAlexWY2XHy+pHtUGiG0l8M07fJ9CT1+s4wSCQ==
-X-Received: by 2002:a63:c145:0:b0:44e:9366:f982 with SMTP id p5-20020a63c145000000b0044e9366f982mr27587348pgi.584.1665625862576;
-        Wed, 12 Oct 2022 18:51:02 -0700 (PDT)
-Received: from T590 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id y4-20020a623204000000b00562ab71b863sm496161pfy.214.2022.10.12.18.50.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 18:51:02 -0700 (PDT)
-Date:   Thu, 13 Oct 2022 09:50:55 +0800
-From:   Ming Lei <tom.leiming@gmail.com>
-To:     Stefan Hajnoczi <stefanha@gmail.com>
-Cc:     "Richard W.M. Jones" <rjones@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Kirill Tkhai <kirill.tkhai@openvz.org>,
-        Manuel Bentele <development@manuel-bentele.de>,
-        qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
-        Xie Yongji <xieyongji@bytedance.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: ublk-qcow2: ublk-qcow2 is available
-Message-ID: <Y0du/9K3II70tZTD@T590>
-References: <Yza1u1KfKa7ycQm0@T590>
- <Yzs9xQlVuW41TuNC@fedora>
- <YzwARuAZdaoGTUfP@T590>
- <CAJSP0QXVK=wUy_JgJ9NmNMtKTRoRX0MwOZUuFWU-1mVWWKij8A@mail.gmail.com>
- <20221006101400.GC7636@redhat.com>
- <CAJSP0QXbnhkVgfgMfC=MAyvF63Oof_ZGDvNFhniDCvVY-f6Hmw@mail.gmail.com>
+        Wed, 12 Oct 2022 22:07:06 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 161E012B36C
+        for <linux-block@vger.kernel.org>; Wed, 12 Oct 2022 19:06:59 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MntDv6Y1BzHv1M;
+        Thu, 13 Oct 2022 10:06:55 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 13 Oct 2022 10:06:57 +0800
+Subject: Re: [PATCH 0/3] improve nvme quiesce time for large amount of
+ namespaces
+From:   Chao Leng <lengchao@huawei.com>
+To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>
+CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <kbusch@kernel.org>, <axboe@kernel.dk>
+References: <20220729073948.32696-1-lengchao@huawei.com>
+ <20220729142605.GA395@lst.de>
+ <1b3d753a-6ff5-bdf1-8c91-4b4760ea1736@huawei.com>
+ <fc7a303f-0921-f784-a559-f03511f2e4be@grimberg.me>
+ <20220802133815.GA380@lst.de>
+ <537c24ba-e984-811e-9e51-ecbc2af9895d@huawei.com>
+ <5fc61f6c-3d3e-ce0e-a090-aa5bcdb7721c@grimberg.me>
+ <f9fce880-4714-3cdb-dfd1-f1d77d033d7a@huawei.com>
+ <a44292df-ce46-828a-91a6-aa7377aa23f7@grimberg.me>
+ <1c39ae7c-7b70-851c-813e-50a97ec44c50@huawei.com>
+Message-ID: <6aa3240a-7e8a-daad-2e2e-13bd573155d2@huawei.com>
+Date:   Thu, 13 Oct 2022 10:06:56 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QXbnhkVgfgMfC=MAyvF63Oof_ZGDvNFhniDCvVY-f6Hmw@mail.gmail.com>
+In-Reply-To: <1c39ae7c-7b70-851c-813e-50a97ec44c50@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 12, 2022 at 10:15:28AM -0400, Stefan Hajnoczi wrote:
-> On Thu, 6 Oct 2022 at 06:14, Richard W.M. Jones <rjones@redhat.com> wrote:
-> >
-> > On Tue, Oct 04, 2022 at 09:53:32AM -0400, Stefan Hajnoczi wrote:
-> > > qemu-nbd doesn't use io_uring to handle the backend IO,
-> >
-> > Would this be fixed by your (not yet upstream) libblkio driver for
-> > qemu?
+
+
+On 2022/10/13 9:37, Chao Leng wrote:
 > 
-> I was wrong, qemu-nbd has syntax to use io_uring:
 > 
->   $ qemu-nbd ... --image-opts driver=file,filename=test.img,aio=io_uring
+> On 2022/10/12 19:13, Sagi Grimberg wrote:
+>>
+>>
+>> On 10/12/22 11:43, Chao Leng wrote:
+>>> Add Ming Lei.
+>>>
+>>> On 2022/10/12 14:37, Sagi Grimberg wrote:
+>>>>
+>>>>>> On Sun, Jul 31, 2022 at 01:23:36PM +0300, Sagi Grimberg wrote:
+>>>>>>> But maybe we can avoid that, and because we allocate
+>>>>>>> the connect_q ourselves, and fully know that it should
+>>>>>>> not be apart of the tagset quiesce, perhaps we can introduce
+>>>>>>> a new interface like:
+>>>>>>> -- 
+>>>>>>> static inline int nvme_ctrl_init_connect_q(struct nvme_ctrl *ctrl)
+>>>>>>> {
+>>>>>>>     ctrl->connect_q = blk_mq_init_queue_self_quiesce(ctrl->tagset);
+>>>>>>>     if (IS_ERR(ctrl->connect_q))
+>>>>>>>         return PTR_ERR(ctrl->connect_q);
+>>>>>>>     return 0;
+>>>>>>> }
+>>>>>>> -- 
+>>>>>>>
+>>>>>>> And then blk_mq_quiesce_tagset can simply look into a per request-queue
+>>>>>>> self_quiesce flag and skip as needed.
+>>>>>>
+>>>>>> I'd just make that a queue flag set after allocation to keep the
+>>>>>> interface simple, but otherwise this seems like the right thing
+>>>>>> to do.
+>>>>> Now the code used NVME_NS_STOPPED to avoid unpaired stop/start.
+>>>>> If we use blk_mq_quiesce_tagset, It will cause the above mechanism to fail.
+>>>>> I review the code, only pci can not ensure secure stop/start pairing.
+>>>>> So there is a choice, We only use blk_mq_quiesce_tagset on fabrics, not PCI.
+>>>>> Do you think that's acceptable?
+>>>>> If that's acceptable, I will try to send a patch set.
+>>>>
+>>>> I don't think that this is acceptable. But I don't understand how
+>>>> NVME_NS_STOPPED would change anything in the behavior of tagset-wide
+>>>> quiesce?
+>>> If use blk_mq_quiesce_tagset, it will quiesce all queues of all ns,
+>>> but can not set NVME_NS_STOPPED of all ns. The mechanism of NVME_NS_STOPPED
+>>> will be invalidated.
+>>> NVMe-pci has very complicated quiesce/unquiesce use pattern, quiesce/unquiesce
+>>> may be called unpaired.
+>>> It will cause some backward. There may be some bugs in this scenario:
+>>> A thread: quiesce the queue
+>>> B thread: quiesce the queue
+>>> A thread end, and does not unquiesce the queue.
+>>> B thread: unquiesce the queue, and do something which need the queue must be unquiesed.
+>>>
+>>> Of course, I don't think it is a good choice to guarantee paired access through NVME_NS_STOPPED,
+>>> there exist unexpected unquiesce and start queue too early.
+>>> But now that the code has done so, the backward should be unacceptable.
+>>> such as this scenario:
+>>> A thread: quiesce the queue
+>>> B thread: want to quiesce the queue but do nothing because NVME_NS_STOPPED is already set.
+>>> A thread: unquiesce the queue
+>>> Now the queue is unquiesced too early for B thread.
+>>> B thread: do something which need the queue must be quiesced.
+>>>
+>>> Introduce NVME_NS_STOPPED link:
+>>> https://lore.kernel.org/all/20211014081710.1871747-5-ming.lei@redhat.com/
+>>
+>> I think we can just change a ns flag to a controller flag ala:
+>> NVME_CTRL_STOPPED, and then do:
+>>
+>> void nvme_stop_queues(struct nvme_ctrl *ctrl)
+>> {
+>>      if (!test_and_set_bit(NVME_CTRL_STOPPED, &ns->flags))
+>>          blk_mq_quiesce_tagset(ctrl->tagset);
+>> }
+>> EXPORT_SYMBOL_GPL(nvme_stop_queues);
+>>
+>> void nvme_start_queues(struct nvme_ctrl *ctrl)
+>> {
+>>      if (test_and_clear_bit(NVME_CTRL_STOPPED, &ns->flags))
+>>          blk_mq_unquiesce_tagset(ctrl->tagset);
+>> }
+>> EXPORT_SYMBOL_GPL(nvme_start_queues);
+>>
+>> Won't that achieve the same result?
+> No, nvme_set_queue_dying call nvme_start_ns_queue for one ns.
+> ctrl->flags can not cover this scenario.
+> This still results in unpaired quiesce/unquiesce.
+> 
+> Maybe it is necessary to clean up the confused quiesce/unquiesce of nvme-pci,
+> Thus blk_mq_quiesce_tagset can be easy to use for nvme-pci.
+> Before that, we could only optimize batched quiesce/unquiesce based on ns,
+> Although I also think using blk_mq_quiesce_tagset is a better choice.
+We can do some something special for nvme_set_queue_dying.
+Thus can achieve the same effect with NVME_NS_STOPPED.
+This should look acceptable.
 
-Yeah, I saw the option, previously when I tried io_uring via:
+What do you think about this?
 
-qemu-nbd -c /dev/nbd11 -n --aio=io_uring $my_file
+Show the code:
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -5100,13 +5100,14 @@ static void nvme_stop_ns_queue(struct nvme_ns *ns)
+   * holding bd_butex.  This will end buffered writers dirtying pages that can't
+   * be synced.
+   */
+-static void nvme_set_queue_dying(struct nvme_ns *ns)
++static void nvme_set_queue_dying(struct nvme_ns *ns, bool start_queue)
+  {
+         if (test_and_set_bit(NVME_NS_DEAD, &ns->flags))
+                 return;
 
-It complains that 'qemu-nbd: Invalid aio mode 'io_uring'' even though
-that 'qemu-nbd --help' does say that io_uring is supported.
+         blk_mark_disk_dead(ns->disk);
+-       nvme_start_ns_queue(ns);
++       if (start_queue)
++               blk_mq_unquiesce_queue(ns->queue);
 
-Today just tried it on Fedora 37, looks it starts working with
---aio=io_uring, but the IOPS is basically same with --aio=native, and
-IO trace shows that io_uring is used by qemu-nbd.
+         set_capacity_and_notify(ns->disk, 0);
+  }
+@@ -5121,15 +5122,18 @@ static void nvme_set_queue_dying(struct nvme_ns *ns)
+  void nvme_kill_queues(struct nvme_ctrl *ctrl)
+  {
+         struct nvme_ns *ns;
++       bool start_queue = false;
 
+         down_read(&ctrl->namespaces_rwsem);
 
-Thanks,
-Ming
+         /* Forcibly unquiesce queues to avoid blocking dispatch */
+         if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
+                 nvme_start_admin_queue(ctrl);
++        if (test_and_clear_bit(NVME_CTRL_STOPPED, &ctrl->flags))
++               start_queue = true;
+
+         list_for_each_entry(ns, &ctrl->namespaces, list)
+-               nvme_set_queue_dying(ns);
++               nvme_set_queue_dying(ns, start_queue);
+
+         up_read(&ctrl->namespaces_rwsem);
+  }
+
+> 
+> .
