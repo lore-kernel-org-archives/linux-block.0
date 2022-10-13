@@ -2,47 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 847BDC4167D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:30:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 821B9C43217
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:31:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231376AbiJMAaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 20:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49528 "EHLO
+        id S231779AbiJMAbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 20:31:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231450AbiJMA2j (ORCPT
+        with ESMTP id S232036AbiJMA3p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 20:28:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D7EF18C945;
-        Wed, 12 Oct 2022 17:25:32 -0700 (PDT)
+        Wed, 12 Oct 2022 20:29:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BFD3D4A2F;
+        Wed, 12 Oct 2022 17:27:28 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B778461701;
-        Thu, 13 Oct 2022 00:24:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47C29C43470;
-        Thu, 13 Oct 2022 00:24:54 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF4C361714;
+        Thu, 13 Oct 2022 00:27:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FC0FC433D6;
+        Thu, 13 Oct 2022 00:27:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665620695;
-        bh=6SWVkc7PoL74v9cMAaBmF3OxN4jAeBczXhzNFF88fx0=;
+        s=k20201202; t=1665620842;
+        bh=iQieQ4Y/Cp6gHS2C7Lg2w/a+l9Ieo+k4kqJju/g1xY4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Rk4XAq91U93ni29RFvW31zZPbQx4oAq/dPTAYConPijfv7xJurykMAQhk/lrg9Ygt
-         xkLm5crbcn5yqkLU3jrBrIlnaeY6f5xEdaaepl5pEayLgdTY9O6+m4I+0aXG8H3mAS
-         S464d5pD2a6hGF+62V2kXhNpnlIH+OGNsc9G/BxAVEdpRUeocimUiBboKMTwDhlDoK
-         P6OodQNXyyZrXl18kxDUDmLUL+yt5YdQii6oWhwAShhFFzivBuVO+ZUPRNzaHOGjAC
-         +5xoSHLfyV5ZpE3nDC6Gt5f3lGuiT6kq62nUSUmWg7hL9CCOrd9tDZdtY1OBuFLnsO
-         QPzIuZz6LwRIA==
+        b=e31H6OVgs/JDJv9mhwGL69fyf6KrL85v0dtcxju/XYjS1faznxzTQJArlHD7cJu5i
+         +5C1JR+KQP6UL9xSB/O7q9zK383FURPf4JM22jM1oy3J6EnZ7md6wTXATQsPrBEhdx
+         zz5ro6EKFs8QWPv+XsACLzcVwhGQ06KUHjkr3XPfnIUiRJk9ugjtUmXeWgnRok1C4S
+         oa8o025LlJzukUaYLzkCI2oPX6JlCtQWn4ECdt9CMNPo5ufS/pjokQy/9BClXSuYYK
+         4wL0tlauF76jucP+4dMnd3uZdWAV/R0zEsJ80dyLNyl2SUwReUa28nIC6WPd4G0DQA
+         b8DiUas2mSCcQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hugh Dickins <hughd@google.com>, Jan Kara <jack@suse.cz>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 32/33] sbitmap: fix lockup while swapping
-Date:   Wed, 12 Oct 2022 20:23:31 -0400
-Message-Id: <20221013002334.1894749-32-sashal@kernel.org>
+Cc:     Shigeru Yoshida <syoshida@redhat.com>,
+        syzbot+38e6c55d4969a14c1534@syzkaller.appspotmail.com,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 4.14 03/13] nbd: Fix hung when signal interrupts nbd_start_device_ioctl()
+Date:   Wed, 12 Oct 2022 20:27:02 -0400
+Message-Id: <20221013002716.1895839-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221013002334.1894749-1-sashal@kernel.org>
-References: <20221013002334.1894749-1-sashal@kernel.org>
+In-Reply-To: <20221013002716.1895839-1-sashal@kernel.org>
+References: <20221013002716.1895839-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -51,79 +53,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hugh Dickins <hughd@google.com>
+From: Shigeru Yoshida <syoshida@redhat.com>
 
-[ Upstream commit 30514bd2dd4e86a3ecfd6a93a3eadf7b9ea164a0 ]
+[ Upstream commit 1de7c3cf48fc41cd95adb12bd1ea9033a917798a ]
 
-Commit 4acb83417cad ("sbitmap: fix batched wait_cnt accounting")
-is a big improvement: without it, I had to revert to before commit
-040b83fcecfb ("sbitmap: fix possible io hung due to lost wakeup")
-to avoid the high system time and freezes which that had introduced.
+syzbot reported hung task [1].  The following program is a simplified
+version of the reproducer:
 
-Now okay on the NVME laptop, but 4acb83417cad is a disaster for heavy
-swapping (kernel builds in low memory) on another: soon locking up in
-sbitmap_queue_wake_up() (into which __sbq_wake_up() is inlined), cycling
-around with waitqueue_active() but wait_cnt 0 .  Here is a backtrace,
-showing the common pattern of outer sbitmap_queue_wake_up() interrupted
-before setting wait_cnt 0 back to wake_batch (in some cases other CPUs
-are idle, in other cases they're spinning for a lock in dd_bio_merge()):
+int main(void)
+{
+	int sv[2], fd;
 
-sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
-__blk_mq_free_request < blk_mq_free_request < __blk_mq_end_request <
-scsi_end_request < scsi_io_completion < scsi_finish_command <
-scsi_complete < blk_complete_reqs < blk_done_softirq < __do_softirq <
-__irq_exit_rcu < irq_exit_rcu < common_interrupt < asm_common_interrupt <
-_raw_spin_unlock_irqrestore < __wake_up_common_lock < __wake_up <
-sbitmap_queue_wake_up < sbitmap_queue_clear < blk_mq_put_tag <
-__blk_mq_free_request < blk_mq_free_request < dd_bio_merge <
-blk_mq_sched_bio_merge < blk_mq_attempt_bio_merge < blk_mq_submit_bio <
-__submit_bio < submit_bio_noacct_nocheck < submit_bio_noacct <
-submit_bio < __swap_writepage < swap_writepage < pageout <
-shrink_folio_list < evict_folios < lru_gen_shrink_lruvec <
-shrink_lruvec < shrink_node < do_try_to_free_pages < try_to_free_pages <
-__alloc_pages_slowpath < __alloc_pages < folio_alloc < vma_alloc_folio <
-do_anonymous_page < __handle_mm_fault < handle_mm_fault <
-do_user_addr_fault < exc_page_fault < asm_exc_page_fault
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0)
+		return 1;
+	if ((fd = open("/dev/nbd0", 0)) < 0)
+		return 1;
+	if (ioctl(fd, NBD_SET_SIZE_BLOCKS, 0x81) < 0)
+		return 1;
+	if (ioctl(fd, NBD_SET_SOCK, sv[0]) < 0)
+		return 1;
+	if (ioctl(fd, NBD_DO_IT) < 0)
+		return 1;
+	return 0;
+}
 
-See how the process-context sbitmap_queue_wake_up() has been interrupted,
-after bringing wait_cnt down to 0 (and in this example, after doing its
-wakeups), before advancing wake_index and refilling wake_cnt: an
-interrupt-context sbitmap_queue_wake_up() of the same sbq gets stuck.
+When signal interrupt nbd_start_device_ioctl() waiting the condition
+atomic_read(&config->recv_threads) == 0, the task can hung because it
+waits the completion of the inflight IOs.
 
-I have almost no grasp of all the possible sbitmap races, and their
-consequences: but __sbq_wake_up() can do nothing useful while wait_cnt 0,
-so it is better if sbq_wake_ptr() skips on to the next ws in that case:
-which fixes the lockup and shows no adverse consequence for me.
+This patch fixes the issue by clearing queue, not just shutdown, when
+signal interrupt nbd_start_device_ioctl().
 
-The check for wait_cnt being 0 is obviously racy, and ultimately can lead
-to lost wakeups: for example, when there is only a single waitqueue with
-waiters.  However, lost wakeups are unlikely to matter in these cases,
-and a proper fix requires redesign (and benchmarking) of the batched
-wakeup code: so let's plug the hole with this bandaid for now.
-
-Signed-off-by: Hugh Dickins <hughd@google.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Link: https://lore.kernel.org/r/9c2038a7-cdc5-5ee-854c-fbc6168bf16@google.com
+Link: https://syzkaller.appspot.com/bug?id=7d89a3ffacd2b83fdd39549bc4d8e0a89ef21239 [1]
+Reported-by: syzbot+38e6c55d4969a14c1534@syzkaller.appspotmail.com
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Link: https://lore.kernel.org/r/20220907163502.577561-1-syoshida@redhat.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- lib/sbitmap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/nbd.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 267aa7709416..e5ed1ca170b8 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -499,7 +499,7 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 338d02a67afb..f01b8860ba14 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1258,10 +1258,12 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+ 	mutex_unlock(&nbd->config_lock);
+ 	ret = wait_event_interruptible(config->recv_wq,
+ 					 atomic_read(&config->recv_threads) == 0);
+-	if (ret)
++	if (ret) {
+ 		sock_shutdown(nbd);
+-	flush_workqueue(nbd->recv_workq);
++		nbd_clear_que(nbd);
++	}
  
--		if (waitqueue_active(&ws->wait)) {
-+		if (waitqueue_active(&ws->wait) && atomic_read(&ws->wait_cnt)) {
- 			if (wake_index != atomic_read(&sbq->wake_index))
- 				atomic_set(&sbq->wake_index, wake_index);
- 			return ws;
++	flush_workqueue(nbd->recv_workq);
+ 	mutex_lock(&nbd->config_lock);
+ 	bd_set_size(bdev, 0);
+ 	/* user requested, ignore socket errors */
 -- 
 2.35.1
 
