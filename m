@@ -2,46 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9DDFC4321E
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D28C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 00:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbiJMAQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Oct 2022 20:16:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38236 "EHLO
+        id S229892AbiJMASQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Oct 2022 20:18:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229847AbiJMAQp (ORCPT
+        with ESMTP id S229966AbiJMARn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Oct 2022 20:16:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD40015048D;
-        Wed, 12 Oct 2022 17:16:21 -0700 (PDT)
+        Wed, 12 Oct 2022 20:17:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D0D18C94D;
+        Wed, 12 Oct 2022 17:17:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BBCB6616B3;
-        Thu, 13 Oct 2022 00:16:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3528CC433C1;
-        Thu, 13 Oct 2022 00:16:20 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F017DB81CC1;
+        Thu, 13 Oct 2022 00:16:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3C50C43470;
+        Thu, 13 Oct 2022 00:16:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665620181;
-        bh=fvegeJIp2wdais0tigzcD56CJARkRkzBSW+xsY1dQP0=;
+        s=k20201202; t=1665620205;
+        bh=HiDHAOPSQv6P3nE8r2l5k+CLpdCGeWChgEX9BNsMegY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EB2pXyAy4npPNYzi7Dq746MZ9nMJDBjUX0b1QWV1sX0x8N16IableQde9vCiuaoTz
-         L2a1s6Fkq4KdR6JnkFynh4sOZLunDtJjvgGjba9/Eml11KGuu25qcU5y5sU+cqa2wc
-         bfcLCW5z4VrgCfcEtzqWXD17lxp+BvaNx6bEbsq+2MBKLuzX3lriyqI3YnJTG/gRQM
-         iPPkg34+3C0FJZUSvgWVprPJS65rzkrgLaGkYfo6u7LmUNhsZv/3VhgIpdOv0NxN6l
-         90g+NnB5FEN8BQ0WPcgG0bCZ3EONDHAYb1QUPpqBFVODWDJcnJv8qIl2EWSrVA3j0H
-         WddU74wIm6Sew==
+        b=a5CIkR2Mitb82E4vl9gQn9/fzdho6eDrA8slnHZK4A1fy7fpjYxQypRqMIvt3z4Ek
+         PcbptdG+PEXiiBOJ0BWjd+I4sjSXTdx5t6hD5gjQ/nNTtAU1zW6rjReIWeneiGeEMN
+         JIpDs1Zf0KYerQZyrv5H9LcNWlLdeoYrg+/R0XvnHqgRCD6YsEQC4vEFGzEeqfWHbK
+         JmeM9BbXWbJgvNm6Qwvtgg3qzlovjLnE3xhyBYjT0PaDcDfsbRXACMeeMlMK3OySdS
+         Pk89ASq0Ns9YeADXVve37ZNMpTTTeVrEUWS9YwZe+yGVLUm2o5e7TNXUWQTChZNmvZ
+         /Q8Syde+cmF9w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Shigeru Yoshida <syoshida@redhat.com>,
-        syzbot+38e6c55d4969a14c1534@syzkaller.appspotmail.com,
-        Josef Bacik <josef@toxicpanda.com>,
+Cc:     Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 6.0 12/67] nbd: Fix hung when signal interrupts nbd_start_device_ioctl()
-Date:   Wed, 12 Oct 2022 20:14:53 -0400
-Message-Id: <20221013001554.1892206-12-sashal@kernel.org>
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.0 19/67] blk-throttle: prevent overflow while calculating wait time
+Date:   Wed, 12 Oct 2022 20:15:00 -0400
+Message-Id: <20221013001554.1892206-19-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221013001554.1892206-1-sashal@kernel.org>
 References: <20221013001554.1892206-1-sashal@kernel.org>
@@ -53,67 +51,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Shigeru Yoshida <syoshida@redhat.com>
+From: Yu Kuai <yukuai3@huawei.com>
 
-[ Upstream commit 1de7c3cf48fc41cd95adb12bd1ea9033a917798a ]
+[ Upstream commit 8d6bbaada2e0a65f9012ac4c2506460160e7237a ]
 
-syzbot reported hung task [1].  The following program is a simplified
-version of the reproducer:
+There is a problem found by code review in tg_with_in_bps_limit() that
+'bps_limit * jiffy_elapsed_rnd' might overflow. Fix the problem by
+calling mul_u64_u64_div_u64() instead.
 
-int main(void)
-{
-	int sv[2], fd;
-
-	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv) < 0)
-		return 1;
-	if ((fd = open("/dev/nbd0", 0)) < 0)
-		return 1;
-	if (ioctl(fd, NBD_SET_SIZE_BLOCKS, 0x81) < 0)
-		return 1;
-	if (ioctl(fd, NBD_SET_SOCK, sv[0]) < 0)
-		return 1;
-	if (ioctl(fd, NBD_DO_IT) < 0)
-		return 1;
-	return 0;
-}
-
-When signal interrupt nbd_start_device_ioctl() waiting the condition
-atomic_read(&config->recv_threads) == 0, the task can hung because it
-waits the completion of the inflight IOs.
-
-This patch fixes the issue by clearing queue, not just shutdown, when
-signal interrupt nbd_start_device_ioctl().
-
-Link: https://syzkaller.appspot.com/bug?id=7d89a3ffacd2b83fdd39549bc4d8e0a89ef21239 [1]
-Reported-by: syzbot+38e6c55d4969a14c1534@syzkaller.appspotmail.com
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Link: https://lore.kernel.org/r/20220907163502.577561-1-syoshida@redhat.com
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Link: https://lore.kernel.org/r/20220829022240.3348319-3-yukuai1@huaweicloud.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/nbd.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ block/blk-throttle.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 2a709daefbc4..2a2a1d996a57 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1413,10 +1413,12 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd)
- 	mutex_unlock(&nbd->config_lock);
- 	ret = wait_event_interruptible(config->recv_wq,
- 					 atomic_read(&config->recv_threads) == 0);
--	if (ret)
-+	if (ret) {
- 		sock_shutdown(nbd);
--	flush_workqueue(nbd->recv_workq);
-+		nbd_clear_que(nbd);
-+	}
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 9f5fe62afff9..55a764e5ba61 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -806,7 +806,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 				 u64 bps_limit, unsigned long *wait)
+ {
+ 	bool rw = bio_data_dir(bio);
+-	u64 bytes_allowed, extra_bytes, tmp;
++	u64 bytes_allowed, extra_bytes;
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
  
-+	flush_workqueue(nbd->recv_workq);
- 	mutex_lock(&nbd->config_lock);
- 	nbd_bdev_reset(nbd);
- 	/* user requested, ignore socket errors */
+@@ -824,10 +824,8 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 		jiffy_elapsed_rnd = tg->td->throtl_slice;
+ 
+ 	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+-
+-	tmp = bps_limit * jiffy_elapsed_rnd;
+-	do_div(tmp, HZ);
+-	bytes_allowed = tmp;
++	bytes_allowed = mul_u64_u64_div_u64(bps_limit, (u64)jiffy_elapsed_rnd,
++					    (u64)HZ);
+ 
+ 	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
+ 		if (wait)
 -- 
 2.35.1
 
