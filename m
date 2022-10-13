@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE00C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 13:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A34C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 14:03:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbiJMN7D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 09:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45734 "EHLO
+        id S230146AbiJMODb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 10:03:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbiJMN6i (ORCPT
+        with ESMTP id S230054AbiJMODX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 09:58:38 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144BA8C452
-        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 06:57:59 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id v130-20020a1cac88000000b003bcde03bd44so3299387wme.5
-        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 06:57:58 -0700 (PDT)
+        Thu, 13 Oct 2022 10:03:23 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6047552444
+        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 07:02:56 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id bu25so2662549lfb.3
+        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 07:02:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linbit-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
         bh=7OuLUBYXAOcE8pcq9/e9z3dyHvBPYPaNaSxybWb4IeQ=;
-        b=iJPtJicN43I7vYtiBLEK061Z6o6nwoCYq95m9GtczXMd7MAZcAFqIwsQwmWIP2Om8h
-         /k/wPtyoqztOS4XTz5bylrSJhmBEaWDkv9GRW2h0x2iiOpcbWozDnFkhJ2B6K1UbPIRP
-         70yqwfG1Hl1LT6j76lVgmop9o+MO5IpUxW8CYGq07zLXfMhXxl5G2zCcqE3YKrZK/jJJ
-         Ln0DSURFTkBeV/v9jX19Ol2tJzl9T9VMk90FXtr6aJOCY8UbtylOQVDkjosFGsBMd6Or
-         WOVMfySpraUzGk3NDnmVVBA7Yvji7SGqmEpQUmyW+23u/9VwxuGMgLYvSUOvhHLwOpUe
-         qa+w==
+        b=z5vPZmNilmP1yjz6rliV0fXjnjfKafx+zYGelFWnyz7OXmhxjlK2moya1FjN+W1fdp
+         cAvV4v8NvLGkiUcLkPLUz+ANQ8PxeUGItIgtAeA+LpepSOoE2Joi1Q+CV6QoyiatLeKM
+         dEesH8tJPD0lDG6oA2D+II6e9O2zamTOWVimdfghrhw7I9xSFLdpcOwqqtYa5z2ogyAJ
+         FlSYzFktdHugGNdw+jIa1MS3JSaVjH65dx4VnPew8VLF48g+CA8MxtTEcrwHlqwEN1lj
+         PleWrPMTIqEIypdb0cEzWYqUKK6CBl/8XkiE8P0ENW7nU4qoyhrMn9Y+vuRATB+o2DC2
+         C3YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
         bh=7OuLUBYXAOcE8pcq9/e9z3dyHvBPYPaNaSxybWb4IeQ=;
-        b=vhD65eizkS/wMdHVka9RE5R7rTRyICYPXpY7zyDA2Xhd5kpa6OsrNGF0ZrzbMs6XYK
-         xawunS8VjNfw5W23xtKEnfAvkbK9bffrep8lHKemBZ5J6qhABBJrN8QBzPHw3gZ70223
-         LQ8MFjTzcfX1em7IWoEm+HKx+YVU7Zj39Gmjawaw7ZzHWAJMUfI97cDeuuu9wZghhUqK
-         HsHVAokUfZ1bF3vmFR9SeSSSmpU77ZlA0AODzNB+215FJx4j5YjOgH5xjIgWcK4I9hSY
-         dOnfQfJn1nUNm8/Az7yIs1CsQHRguQMZmnQahyx5rTEk7vRSgrmfX+//w7hn72iTDdvp
-         MV2A==
-X-Gm-Message-State: ACrzQf1Sy6vkFD4Ly4ObLRePwMOqNstjPDkQS9sq1RNYjZmvvqMaOWle
-        G+T2pdLaNePDHQRv6mOgpFwebw==
-X-Google-Smtp-Source: AMsMyM52nVzzf4JOMmR6/TA1aaThQ5YQ0URZybqKJb7Gldw54fnhQqj6kQv1Xev0LuxgOj2y5Zciww==
-X-Received: by 2002:a05:600c:314a:b0:3c6:d75e:1abe with SMTP id h10-20020a05600c314a00b003c6d75e1abemr5342045wmo.71.1665669199953;
-        Thu, 13 Oct 2022 06:53:19 -0700 (PDT)
+        b=x+wAyCAm6XdgDaaRjVWCKjXpYK+MX4/SGCthrCFwKG0RBAKFAcvWU/TPvaC5gRwh9c
+         qtrVwodVfDi2MkT18NGn4wRptb/haeqhTaJy+4vYWtiL7M2ghIMAfNWZnwXw9uMqYEHy
+         ulSOdyIjSgmPiZyBeQwcxI9oYzGhttgLhyg2YJIVC/vrbEdwqxj/W24rtKaJ2BvxugzM
+         NEEFMMnIm/FEKj5bpdSrSAD5KoHCcAe81/7YZrQi3ibsrlixRdcinWIg9Fo/BCPrST/S
+         HBqNlsq/iZIJWQNGE6NRvvf2SypBCfc8G6jVUyWnn7+qzBW0EIMpNTBUd+ra2eCaZP6l
+         HkpQ==
+X-Gm-Message-State: ACrzQf3kJxaoFDq5jZ4ymsjehG9Jb4Owc6jur4CZd1wO1/Ph34DgDm5f
+        dzoCdhgcPnRIWfp6dXbCOl71jJsDjpo7yKLW
+X-Google-Smtp-Source: AMsMyM5hfn1dZeeqQqGVcZG4ukNtnCmoJ5ApnsgQva1teAak+8QSCMhsooZni9Qx85RwueqDDL4gYg==
+X-Received: by 2002:adf:e19e:0:b0:22e:64de:39fa with SMTP id az30-20020adfe19e000000b0022e64de39famr39211wrb.369.1665669236071;
+        Thu, 13 Oct 2022 06:53:56 -0700 (PDT)
 Received: from localhost.localdomain (089144213149.atnat0022.highway.a1.net. [89.144.213.149])
-        by smtp.gmail.com with ESMTPSA id 20-20020a05600c021400b003b4c979e6bcsm4473769wmi.10.2022.10.13.06.53.18
+        by smtp.gmail.com with ESMTPSA id y8-20020a05600c364800b003c6bd91caa5sm4441295wmq.17.2022.10.13.06.53.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Oct 2022 06:53:19 -0700 (PDT)
+        Thu, 13 Oct 2022 06:53:55 -0700 (PDT)
 From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>
-To:     Jens Axboe <abxoe@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
         drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -59,8 +59,8 @@ Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
         <christoph.boehmwalder@linbit.com>,
         Joel Colledge <joel.colledge@linbit.com>
 Subject: [PATCH] drbd: only clone bio if we have a backing device
-Date:   Thu, 13 Oct 2022 15:53:02 +0200
-Message-Id: <20221013135302.933372-1-christoph.boehmwalder@linbit.com>
+Date:   Thu, 13 Oct 2022 15:53:52 +0200
+Message-Id: <20221013135352.933875-1-christoph.boehmwalder@linbit.com>
 X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
