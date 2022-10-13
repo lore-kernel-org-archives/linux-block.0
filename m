@@ -2,113 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90153C43217
-	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 12:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0969CC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 13 Oct 2022 13:04:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbiJMMsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 08:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53872 "EHLO
+        id S229815AbiJMNEy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 09:04:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiJMMsM (ORCPT
+        with ESMTP id S229640AbiJMNEx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 08:48:12 -0400
-X-Greylist: delayed 578 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 13 Oct 2022 05:48:11 PDT
-Received: from outbound-smtp14.blacknight.com (outbound-smtp14.blacknight.com [46.22.139.231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F64EFA00E
-        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 05:48:11 -0700 (PDT)
-Received: from mail.blacknight.com (pemlinmail05.blacknight.ie [81.17.254.26])
-        by outbound-smtp14.blacknight.com (Postfix) with ESMTPS id 08B141C4097
-        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 13:38:32 +0100 (IST)
-Received: (qmail 16548 invoked from network); 13 Oct 2022 12:38:31 -0000
-Received: from unknown (HELO techsingularity.net) (mgorman@techsingularity.net@[84.203.198.246])
-  by 81.17.254.9 with ESMTPSA (AES256-SHA encrypted, authenticated); 13 Oct 2022 12:38:31 -0000
-Date:   Thu, 13 Oct 2022 13:38:30 +0100
-From:   Mel Gorman <mgorman@techsingularity.net>
-To:     Yang Shi <shy828301@gmail.com>
-Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
-        akpm@linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] mm: mempool: introduce page bulk allocator
-Message-ID: <20221013123830.opbulq4qad56kuev@techsingularity.net>
-References: <20221005180341.1738796-1-shy828301@gmail.com>
- <20221005180341.1738796-3-shy828301@gmail.com>
+        Thu, 13 Oct 2022 09:04:53 -0400
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01acsn20809.outbound.protection.outlook.com [IPv6:2a01:111:f403:7010::809])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D33C114015;
+        Thu, 13 Oct 2022 06:04:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lLZvkaR4wSDjltE1FJWzXBdApjpCt7qobooKZmApJ4Yzu0Xggcj1fjPUtxxw5XM/Xezayd7coq3vlbzQey/C54oWviir2SM1A+/GsLQp2hqvkRKN96U28mvG6Ko3au/guhjchYJst6lsTLk4S/39/qQrxApaAr0X8YXVGVxWwdjRmkWY1UFhZMekJWrhD8JLx4KQN4OGU1qXV7TZtqJnSWwdafJ8UOJx7Zfg5W/dC3uRjSXpSa+U+cSId1I8jAohNvvx+CapB8kShk/sReujXoxHnvtioHgjmxFG8NdwQOEjNaD3QO2tmHuR5tF5PIleNuwfzwk8NMEhB8O0FxJUcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0pDXcnSMEAQOB8yEghKCBTDz3amlJTBYEyhbGZbXXGk=;
+ b=R3GGqt2dWnDZOn5sNxoKplENpm8b+jQZkbsyhGdJtM/Ba/F59RSpHpuTReY2yKer+xMCboGZ+IFI3mu23KEOOSjASzT5lHQXZ3rSVUHPCtUPyeinvxLzdTR0YNYRMuUNizYfeQOFKqN1abAAIUk14pELcf6KdMB6bRpoaWoviSXllSQDxeph1292QLV2y17uave9YTiFPPbJmSr1IW1GAZJwbQHp9SiHnSulk1Q6ZU5lMPM6jwSDDpc+fdGEQguNDbmUbdqcP0KRQCQwWyW/SjyU2CQ7+9TNz20PFS6N80w2M+ayEIexmuLRN0OAbUnmVDr6KkRWuP7eNtHAFtOaxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0pDXcnSMEAQOB8yEghKCBTDz3amlJTBYEyhbGZbXXGk=;
+ b=kcLcuSf6MF4Id6Y2w2UEUBoYsBvIbB8TEt0/nDbBVb+caPeMVNp5p/VtJStaCeBMJTrkJ5JcVA4IVNgmbK0Ijy3oHRQ4/BaitwWeDdpQkPjif3RHo4+8lGhrHgxiJf8HMJWbkD7d6k4bBQGa/KCtob0Bw5yo/+MBG3IetcOplclJbfgsZjxTFkhLQl5hiBZeKz4EjULkHa1++1H5cea5dx9o4vrVqorCvdSBOKFyFiM/NH+dz7yPmneJJ7RPwIwzYrwVpqKIFLp6ooKmIGQyy994swyHzgFukaNUzH6rVUv+hM97XgIx2pwjHkWIGtM7CEnI0DIygxMI6DqdO9V1OA==
+Received: from OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:a7::12)
+ by TYCP286MB1827.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:100::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Thu, 13 Oct
+ 2022 13:04:48 +0000
+Received: from OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::e524:f983:290d:369d]) by OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::e524:f983:290d:369d%5]) with mapi id 15.20.5723.025; Thu, 13 Oct 2022
+ 13:04:48 +0000
+From:   Jinlong Chen <chenjinlong2016@outlook.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq: put the reference of the io scheduler module after switching back
+Date:   Thu, 13 Oct 2022 21:03:44 +0800
+Message-ID: <OS0P286MB033887ED7C81DD1F782000DBBE259@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <OS0P286MB0338E8D41770BFDE7B3A4EBBBE229@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
+References: <OS0P286MB0338E8D41770BFDE7B3A4EBBBE229@OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [yYXQFuPacvfD1E0wjvtc0fyzU37Ldycm]
+X-ClientProxiedBy: SI1PR02CA0032.apcprd02.prod.outlook.com
+ (2603:1096:4:1f6::12) To OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:604:a7::12)
+X-Microsoft-Original-Message-ID: <20221013130344.12352-1-chenjinlong2016@outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-In-Reply-To: <20221005180341.1738796-3-shy828301@gmail.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: OS0P286MB0338:EE_|TYCP286MB1827:EE_
+X-MS-Office365-Filtering-Correlation-Id: ddda0adc-d662-48c1-13e2-08daad1b81d6
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: h7LlICBcybR+mSlm0+nSPNoKph6B9QZY7tiuCSYuqmDl0dSMEHWmiU6pVSYlEWZ9zlze9XwPfu7iTf1qs+kQzm1VM55a6NRmZqC8VJC51uZpqP8mK8NN8oCZENvgWmiIKd3WdmPuDR8fHo1WdHCWGOjYD3OvTskLCjw9aTuOXQzodbJP2y1Ip8DkMGALvzY9L4b84kuBSL3ygyluaeU69w70eh/jBauRdl3XtHIDL67Zf3Td6PFkvt2OzsB+evpek5DvfGCuC327rgyIZm7V91FhH7peS7YsvHaJJESFUP8tCKiKgoKxvQEn6IIVMKAdkVcbl1o4jevvJylGv4DkbCLG8zVf57qqd9Ew1Rlbu630jQXl8AEaDZF4c+wSuOh2200c7lkpU1hXGTxE0/IHxqwffty0xhVA0G/ztkTz0Z6nywjTWvv0f9z+A8uz+pEaMwWqZpaIwqkwnWRrCOZ1VdQzOmJpVXAP0UTZk0sOJxRqiq9imTGCnf2aGzeoCcE9AGrWhEIAsD+L3DJWJ1gUL3yx27l+VvkDSXt2W0ESsSv2hXe01ww/xFGYvio3XEorTGgVXOlIJfoBjxyopAPProWIL3xTOpBTLcNZwCSzGscfZ8zZ34daPmS1CEh+4QvircJ4+LadryLvWTv7NWEzCNxdVbDk0sVtavhsyvMIP+E09A2h62n7Qg9BovKAoEkw
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+nhLfWfODHJSlDUCFWLYW9H2iBy7GdKTYYtIk8T1LTtn/nTFWYDS5Tac8dgP?=
+ =?us-ascii?Q?8ADLS36/zZH7P+ihxKWjE/v+mz1ZgOQKhVmUzZ+NPdrsmhN6mBaKIwX6Mp0v?=
+ =?us-ascii?Q?wRNML0GpJ+jlbhITsGrl4MjZfyV78N6n35NiuSfMSjfAsvjSH2+X+OfKEC2E?=
+ =?us-ascii?Q?jZiYtOUqxsGy2UEh9CbktoqliGmDGyFNF+frnz1TXa+Pc372sU3fOQdN0Lz3?=
+ =?us-ascii?Q?ad2WRV3i7j3S241z1fVIdnamHa1ASrvadtMschcyOIaJhsrbpRgspSjf5n1t?=
+ =?us-ascii?Q?du0zDQeSNy52tF4FRxTXorT+35/JrGY/NaSlYvyaAOc3xYhDe1ooZO66miN8?=
+ =?us-ascii?Q?rT6ypmSfj+F8rt0RB/WysrwSmbcNK2IRi2wtWacYaAcXWaWaREnzoa5SrMnZ?=
+ =?us-ascii?Q?KCrOmZPjZp797l5+E2UpfC1H+yWaYUA4gViSKnqHu4pNMLOo8D1MqAI7wX3m?=
+ =?us-ascii?Q?EbEP6e/gnTFhE7P8xcAy67lo3ynOt6KMwEph2vKI39LjSnjOjE+ujzuS1eGa?=
+ =?us-ascii?Q?md1cXX6XeQlV5dUcfXVm3oPYUcp/l7FyQq/yDDxk6djLDwF6CAIQbAkL33bh?=
+ =?us-ascii?Q?Fq4P9LLWJFUata2Co6CXbxlSDpgU9E8sHaGweNiI/VIUbCOOA6zm2u1QVcfS?=
+ =?us-ascii?Q?vIKKht+FghVK3+/Z3su7D98wMMNY4R5UKd0v4ep1JjuiFW6zLNaKFXxtAozt?=
+ =?us-ascii?Q?cFIv93kCp/NlA2nrh/qLpxOYMC/FSw3pysbwpYZ/oRgaU5NxK8oIJ4728/rh?=
+ =?us-ascii?Q?MKhS5VoIfvayUJ3fzz2Vtmqes655j5KaDJU3m6gjVFUx6FiO3/Zqak9zQoff?=
+ =?us-ascii?Q?U/oHdQNLKQ0E8MmvMoPCgLy1PC/rUmBPmJpOQV2XDwCAsCNM9cF725Dy0pqB?=
+ =?us-ascii?Q?aO3Q1kTT1goGxq3FyWOBEf/AZ5IgMpFs0R710PN2EdJDaks7fvzySVYzcflC?=
+ =?us-ascii?Q?ljBt8lNBVyZQrPCo/llKRyS5A8yx7CotorvQJ9uv0Q30K6HsFyUuxLxzNU78?=
+ =?us-ascii?Q?uA3jXUkFC99FivAoONVRcm2tHc7PXfxem3uIvbn8KW19o7DYW+irIrhRAAIH?=
+ =?us-ascii?Q?nI+CDJo2q2T3Un0cXirMiPFgIUi7eQh+1/ZBUjZhQY7lxexdqM68p1JyKhkn?=
+ =?us-ascii?Q?nJC3U6MtB3FW8M7zckCzlAZ9UHXOtBOEYCpl1FCOHky9QCX+ehExpc0W7vH+?=
+ =?us-ascii?Q?aCAFc4kHyLrec0UHgtK6fOH9J2X9l3mpTm77ZsV+6qKRbJn/fPFBkffz+/r+?=
+ =?us-ascii?Q?Y+3BqAomTn7Hbr5EwiMKx3+1qpnskzd07iRH9F/X0LRG/dp1moAkMs/SnUD1?=
+ =?us-ascii?Q?KcY=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddda0adc-d662-48c1-13e2-08daad1b81d6
+X-MS-Exchange-CrossTenant-AuthSource: OS0P286MB0338.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Oct 2022 13:04:48.6933
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCP286MB1827
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 05, 2022 at 11:03:39AM -0700, Yang Shi wrote:
-> Since v5.13 the page bulk allocator was introduced to allocate order-0
-> pages in bulk.  There are a few mempool allocator callers which does
-> order-0 page allocation in a loop, for example, dm-crypt, f2fs compress,
-> etc.  A mempool page bulk allocator seems useful.  So introduce the
-> mempool page bulk allocator.
-> 
-> It introduces the below APIs:
->   - mempool_init_pages_bulk()
->   - mempool_create_pages_bulk()
-> They initialize the mempool for page bulk allocator.  The pool is filled
-> by alloc_page() in a loop.
-> 
->   - mempool_alloc_pages_bulk_list()
->   - mempool_alloc_pages_bulk_array()
-> They do bulk allocation from mempool.
-> They do the below conceptually:
->   1. Call bulk page allocator
->   2. If the allocation is fulfilled then return otherwise try to
->      allocate the remaining pages from the mempool
->   3. If it is fulfilled then return otherwise retry from #1 with sleepable
->      gfp
->   4. If it is still failed, sleep for a while to wait for the mempool is
->      refilled, then retry from #1
-> The populated pages will stay on the list or array until the callers
-> consume them or free them.
-> Since mempool allocator is guaranteed to success in the sleepable context,
-> so the two APIs return true for success or false for fail.  It is the
-> caller's responsibility to handle failure case (partial allocation), just
-> like the page bulk allocator.
-> 
-> The mempool typically is an object agnostic allocator, but bulk allocation
-> is only supported by pages, so the mempool bulk allocator is for page
-> allocation only as well.
-> 
-> Signed-off-by: Yang Shi <shy828301@gmail.com>
+Sorry for the disturbance.
 
-Overall, I think it's an ok approach and certainly a good use case for
-the bulk allocator.
+This patch is just wrong. elevator_switch_mq does not increase the reference
+ count of the io scheduler module to which we are switching. Hence, we do not
+ need to put the reference back manually.
 
-The main concern that I have is that the dm-crypt use case doesn't really
-want to use lists as such and it's just a means for collecting pages to pass
-to bio_add_page(). bio_add_page() is working with arrays but you cannot
-use that array directly as any change to how that array is populated will
-then explode. Unfortunately, what you have is adding pages to a list to
-take them off the list and put them in an array and that is inefficient.
-
-How about this
-
-1. Add a callback to __alloc_pages_bulk() that takes a page as a
-   parameter like bulk_add_page() or whatever.
-
-2. For page_list == NULL && page_array == NULL, the callback is used
-
-3. Add alloc_pages_bulk_cb() that passes in the name of a callback
-   function
-
-4. In the dm-crypt case, use the callback to pass the page to bio_add_page
-   for the new page allocated.
-
-It's not free because there will be an additional function call for every
-page bulk allocated but I suspect that's cheaper than adding a pile of
-pages to a list just to take them off again. It also avoids adding a user
-for the bulk allocator list interface that does not even want a list.
-
-It might mean that there is additional cleanup work for __alloc_pages_bulk
-to abstract away whether a list, array or cb is used but nothing
-impossible.
-
--- 
-Mel Gorman
-SUSE Labs
+Sincerely
+Jinlong Chen
