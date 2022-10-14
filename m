@@ -2,121 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA48C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 14:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F88C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 16:24:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229900AbiJNOuL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Oct 2022 10:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36428 "EHLO
+        id S229786AbiJNQY0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Oct 2022 12:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229843AbiJNOuK (ORCPT
+        with ESMTP id S229688AbiJNQYY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Oct 2022 10:50:10 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904A22EF45;
-        Fri, 14 Oct 2022 07:50:07 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B4FA221EB2;
-        Fri, 14 Oct 2022 14:50:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1665759005; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=D8T6Ig2kAX7i1ELDm18RCHxPf9499f4Scte73Zgsjgo=;
-        b=ElggAD/kgeVTBymIbafVSqYTdqTwbXm+nhPmndMhBX/e/lDy0kt9o7FXsVl+hDApSF4zaw
-        7eYQO4QahPf2Qp8TyN05xoqYjoc/I3hlAKSE3qOZ65xwtuRuG5BBcrVsKBjFXutFqj8HLR
-        rQWw6Mhm9n9IpF0bS8v86ZPqLdfsqDg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1665759005;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=D8T6Ig2kAX7i1ELDm18RCHxPf9499f4Scte73Zgsjgo=;
-        b=d012M3EAmA4Hg5ffW4BWjg8WNH1e1dpgrlz0HcqC9wDx2YUpEjC4CGXXruradBma/uMyBi
-        uGL/aSLXEpleQxBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A191213A4A;
-        Fri, 14 Oct 2022 14:50:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Z/JlJx13SWNKWgAAMHmgww
-        (envelope-from <jack@suse.cz>); Fri, 14 Oct 2022 14:50:05 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 07EB2A06F1; Fri, 14 Oct 2022 16:50:05 +0200 (CEST)
-Date:   Fri, 14 Oct 2022 16:50:04 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yuwei Guan <ssawgyw@gmail.com>
-Cc:     paolo.valente@linaro.org, axboe@kernel.dk, jack@suse.cz,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com
-Subject: Re: [PATCH] bfq: do try insert merge before bfq_init_rq() call
-Message-ID: <20221014145004.gqqpa5uvgg576tej@quack3>
-References: <20221013135321.174-1-Yuwei.Guan@zeekrlife.com>
+        Fri, 14 Oct 2022 12:24:24 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D5241D3A4F
+        for <linux-block@vger.kernel.org>; Fri, 14 Oct 2022 09:24:24 -0700 (PDT)
+Received: from pwmachine.localnet (85-170-37-190.rev.numericable.fr [85.170.37.190])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 170F320F32DC;
+        Fri, 14 Oct 2022 09:24:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 170F320F32DC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1665764664;
+        bh=0duHXehrvqnLR/0zgXOclz4VUHEzguBRni2O8VtDkaU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=FPoLZzotCbN7JawLH9RlfzEeFcCFVzqh7jG+Ya7FAtm6W8naW9P6q2K0b/ayDRin9
+         10xl4Fy6TN/mFXXOgyJ324PnpoyuxOPckPplVLJ1Y2WRSpCCLAGoP52RiUPP5MPPFU
+         gy/l/KfY4O8zFbWuCqxJhu+MOiBxr38rq9jZYGYY=
+From:   Francis Laniel <flaniel@linux.microsoft.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk, rostedt@goodmis.org,
+        Hengqi Chen <hengqi.chen@gmail.com>
+Cc:     hengqi.chen@gmail.com
+Subject: Re: [PATCH] block: introduce block_io_start/block_io_done tracepoints
+Date:   Fri, 14 Oct 2022 18:24:20 +0200
+Message-ID: <4433439.LvFx2qVVIh@pwmachine>
+In-Reply-To: <20221014100111.1706363-1-hengqi.chen@gmail.com>
+References: <20221014100111.1706363-1-hengqi.chen@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221013135321.174-1-Yuwei.Guan@zeekrlife.com>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 13-10-22 21:53:21, Yuwei Guan wrote:
-> It's useless to do bfq_init_rq(rq), if the rq can do merge first.
-> 
-> In the patch 5f550ede5edf8, it moved to bfq_init_rq() before
-> blk_mq_sched_try_insert_merge(), but it's pointless,
-> as the fifo_time of next is not set yet,
-> and !list_empty(&next->queuelist) is 0, so it does not
-> need to reposition rq's fifo_time.
-> 
-> And for the "hash lookup, try again" situation, as follow,
-> bfq_requests_merged() call can work normally.
-> 
-> blk_mq_sched_try_insert_merge
->   elv_attempt_insert_merge
->     elv_rqhash_find
-> 
-> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+Hi.
 
-OK, after some thinking I agree. How much testing has this patch got?
-Because I'd like to verify we didn't overlook something.
 
-							Honza
+Le vendredi 14 octobre 2022, 12:01:11 CEST Hengqi Chen a =E9crit :
+> Currently, several BCC ([0]) tools (biosnoop/biostacks/biotop) use
+> kprobes to blk_account_io_start/blk_account_io_done to implement
+> their functionalities. This is fragile because the target kernel
+> functions may be renamed ([1]) or inlined ([2]). So introduces two
+> new tracepoints for such use cases.
 
+Thank you for working on this, I was able to build a kernel with your patch=
+=20
+and successfully tested it:
+root@vm-amd64:~# uname -a
+Linux vm-amd64 6.0.0-rc4-00001-g89f38605b66b #95 SMP PREEMPT_DYNAMIC Fri Oc=
+t=20
+14 18:03:58 CEST 2022 x86_64 GNU/Linux
+root@vm-amd64:~# perf_5.10 record -e block:block_io_done -e=20
+block:block_io_start -a dd if=3D/dev/zero of=3Dfoo count=3D100
+=2E..
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.083 MB perf.data (1 samples) ]
+root@vm-amd64:~# perf_5.10 script                                          =
+   =20
+              dd   313 [000]   273.355898: block:block_io_start: 8,0 W 5324=
+8=20
+()>
+         swapper     0 [000]   273.357048:  block:block_io_done: 8,0 W 0 ()=
+=20
+484>
+
+So, I can offer you this:
+Tested-by: Francis Laniel <flaniel@linux.microsoft.com>
+
+>   [0]: https://github.com/iovisor/bcc
+>   [0]: https://github.com/iovisor/bcc/issues/3954
+>   [1]: https://github.com/iovisor/bcc/issues/4261
+
+One small nit:
+[0]: https://github.com/iovisor/bcc
+[1]: https://github.com/iovisor/bcc/issues/3954
+[2]: https://github.com/iovisor/bcc/issues/4261
+
+>=20
+> Signed-off-by: Hengqi Chen <hengqi.chen@gmail.com>
 > ---
->  block/bfq-iosched.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 7ea427817f7f..9845370a701c 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -6147,7 +6147,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  		bfqg_stats_update_legacy_io(q, rq);
->  #endif
->  	spin_lock_irq(&bfqd->lock);
-> -	bfqq = bfq_init_rq(rq);
+>  block/blk-mq.c               |  4 ++++
+>  include/trace/events/block.h | 27 ++++++++++++++++++++++++++-
+>  2 files changed, 30 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index c96c8c4f751b..3777f486a365 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -887,6 +887,8 @@ static void __blk_account_io_done(struct request *req,
+> u64 now)
+>=20
+>  static inline void blk_account_io_done(struct request *req, u64 now)
+>  {
+> +	trace_block_io_done(req);
 > +
->  	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
->  		spin_unlock_irq(&bfqd->lock);
->  		blk_mq_free_requests(&free);
-> @@ -6156,6 +6156,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  
->  	trace_block_rq_insert(rq);
->  
-> +	bfqq = bfq_init_rq(rq);
->  	if (!bfqq || at_head) {
->  		if (at_head)
->  			list_add(&rq->queuelist, &bfqd->dispatch);
-> -- 
-> 2.34.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>  	/*
+>  	 * Account IO completion.  flush_rq isn't accounted as a
+>  	 * normal IO on queueing nor completion.  Accounting the
+> @@ -917,6 +919,8 @@ static void __blk_account_io_start(struct request *rq)
+>=20
+>  static inline void blk_account_io_start(struct request *req)
+>  {
+> +	trace_block_io_start(req);
+> +
+>  	if (blk_do_io_stat(req))
+>  		__blk_account_io_start(req);
+>  }
+> diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+> index 7f4dfbdf12a6..65c4cb224736 100644
+> --- a/include/trace/events/block.h
+> +++ b/include/trace/events/block.h
+> @@ -245,6 +245,32 @@ DEFINE_EVENT(block_rq, block_rq_merge,
+>  	TP_ARGS(rq)
+>  );
+>=20
+> +/**
+> + * block_io_start - insert a request for execution
+> + * @rq: block IO operation request
+> + *
+> + * Called when block operation request @rq is queued for execution
+> + */
+> +DEFINE_EVENT(block_rq, block_io_start,
+> +
+> +	TP_PROTO(struct request *rq),
+> +
+> +	TP_ARGS(rq)
+> +);
+> +
+> +/**
+> + * block_io_done - block IO operation request completed
+> + * @rq: block IO operation request
+> + *
+> + * Called when block operation request @rq is completed
+> + */
+> +DEFINE_EVENT(block_rq, block_io_done,
+> +
+> +	TP_PROTO(struct request *rq),
+> +
+> +	TP_ARGS(rq)
+> +);
+> +
+>  /**
+>   * block_bio_complete - completed all work on the block operation
+>   * @q: queue holding the block operation
+> @@ -556,4 +582,3 @@ TRACE_EVENT(block_rq_remap,
+>=20
+>  /* This part must be outside protection */
+>  #include <trace/define_trace.h>
+> -
+
+
+Best regards.
+
+
