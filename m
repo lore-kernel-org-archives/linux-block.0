@@ -2,273 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12BEEC43217
-	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 00:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF07C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 02:09:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbiJNARo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Oct 2022 20:17:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52310 "EHLO
+        id S229511AbiJNCJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Oct 2022 22:09:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbiJNARl (ORCPT
+        with ESMTP id S229691AbiJNCJT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Oct 2022 20:17:41 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63270183E37
-        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 17:17:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1665706659; x=1697242659;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+vPjAjsehrdz7gwDjN7jzS+tOhZOxUsOQekKNk5Wns4=;
-  b=CwzeiNzkjfa4O/cPjm4RBsV0E7bbI7+x6v9QuZpNP2jgSU7v59m5P9oz
-   yyll2aMBGRKzzALr9QUJigjMan0ehbtpXHvHm5Fe+N9u/PGPgT6PNAQkL
-   CXz+qChLdAdhkRgn0z9VXWH9My60oJ84UOQFvJnOTfez/0mx+LRPdmHUq
-   A2Yxz57IrlMnooWpQqO27DeHvKnP6wsnzMWxSsT0UwiCKa8czuP9VGjx8
-   5ga6BaKvh5a4ad7CQzzusaDfcEoPRyfwF+0t3QImov5qNcaec4n/RcQSd
-   PaYCU2Y2Iresz0oyXtwsQ6hRuEhbTPe4UIvxupkXFrwd5wWd2yHlf2G79
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.95,182,1661788800"; 
-   d="scan'208";a="212086403"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 14 Oct 2022 08:17:38 +0800
-IronPort-SDR: y6JuSyCDNmOj0VRuXD2xi513JnNhnYcjNhkdp/bFoI6Exsg3T3BN388Eeur7PGtAemNrXhKa9a
- W5bj9edoLOVy3+CW7Fbhs3TC9iTXAksw4vjaIfAC4DTlgq9C1YsOS646yxMuxrB5E8MswD078R
- PrSvfBggSCm85/Up5SBk/U6HbQRvCsXvAMG/cms0b+U4KZEGlXdKOAvyluhxTz8+X3fMvLuWZD
- 1TrJbgvRK0jJnvh0IiPIy3NN/S2h67Rd0XMUaK0eNEGbD84s2Jh5x5mzfiEjEAcsaPBBQFbiMX
- ezvHNatJlVLqVWtHw4aDi13C
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Oct 2022 16:31:38 -0700
-IronPort-SDR: rcuSCIz0sVOcejmwfeX73K+0zDaSDa12Bt2cRx5eIo6OUNDV7OIF07WheEFBBQHHgirvjsHCXC
- 8DIMyaw5+5rfckyCDsZ9FMFidgeuySFk6joId6F2IRRIr+wCoHQ3QcOfyjV8S5cE7rKD1U5QBE
- 45fIYDGoOZ2ZpNEPXb4dlJ7IZDmhLckjFLCxPywg/rc4y+pKQfRbxBTgclgHYamEQaV+dWzqpp
- 3Qs/SwGyea1p3yTAhsGG9e/Vl3V1RKJAEE+bsA+bRUSe6bsgZIlq/iukGzrsjEvOB2tj0bKFE8
- Pk0=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Oct 2022 17:17:39 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MpRmL1Fwlz1RwqL
-        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 17:17:38 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:content-language:references:to
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1665706656; x=1668298657; bh=+vPjAjsehrdz7gwDjN7jzS+tOhZOxUsOQek
-        KNk5Wns4=; b=LodwpY61BgZC7keTvNXZ2/LYAGnVuGHVb9an48aEd8q8K69gqqy
-        VbKy6zJPbmjZA8e4GJtkhiWrVWxVzhRTRHdblvK7z9brHqO6THIBLrIOkylJbRKm
-        EmWI4/2bHhhUCa89/emEFum9tB8QqTc0RQbZJwOU30jUng/o2ZpypHqjk/DzgOwT
-        O1n8wOb6VycwsJ/vWlYPmiD7B60AsXRj/5NelL1BlKxPqwt8X17JfM7uYooyUXac
-        zeEy5ifTLS17wNR9/y5zm5suvvzTAS0cZu9wFSHPIW+wdmNt1daHnDPNVfeaiTew
-        lm59hAwDjMXYLr9eYZZ44i525sQgz6dDoKA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id k-n2D-J3NfEe for <linux-block@vger.kernel.org>;
-        Thu, 13 Oct 2022 17:17:36 -0700 (PDT)
-Received: from [10.225.163.119] (unknown [10.225.163.119])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MpRmG2T8Pz1RvLy;
-        Thu, 13 Oct 2022 17:17:34 -0700 (PDT)
-Message-ID: <3c8596b5-5ba5-df1d-a9d2-f39b9a7a0b21@opensource.wdc.com>
-Date:   Fri, 14 Oct 2022 09:17:32 +0900
+        Thu, 13 Oct 2022 22:09:19 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B8BE5ECC
+        for <linux-block@vger.kernel.org>; Thu, 13 Oct 2022 19:09:17 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MpV7z1WsczVj6t;
+        Fri, 14 Oct 2022 10:04:47 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 14 Oct 2022 10:09:15 +0800
+Subject: Re: [PATCH v2 2/2] nvme: use blk_mq_[un]quiesce_tagset
+To:     Sagi Grimberg <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
+CC:     <hch@lst.de>, <kbusch@kernel.org>, <ming.lei@redhat.com>,
+        <axboe@kernel.dk>
+References: <20221013094450.5947-1-lengchao@huawei.com>
+ <20221013094450.5947-3-lengchao@huawei.com>
+ <0b28653b-b133-ec4b-b09e-54090f374086@grimberg.me>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <0eb9f561-fcab-f2a0-a129-0953de50f6d2@huawei.com>
+Date:   Fri, 14 Oct 2022 10:09:15 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: TI: X15 the connected SSD is not detected on Linux next 20221006
- tag
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org, regressions@lists.linux.dev,
-        "open list:LIBATA SUBSYSTEM (Serial and Parallel ATA drivers)" 
-        <linux-ide@vger.kernel.org>, lkft-triage@lists.linaro.org,
-        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Anders Roxell <anders.roxell@linaro.org>
-References: <CA+G9fYvRXkjeO+yDEQxwJ8+GjSmwhZ7XHHAaVWAsxAaSngj5gg@mail.gmail.com>
- <bf1b053d-ffa6-48ab-d2d2-d59ab21afc19@opensource.wdc.com>
- <CA+G9fYvUnn0cS+_DZm8hAfi=FnMB08+6Xnhud6yvi9Bxh=DU+Q@mail.gmail.com>
+In-Reply-To: <0b28653b-b133-ec4b-b09e-54090f374086@grimberg.me>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <CA+G9fYvUnn0cS+_DZm8hAfi=FnMB08+6Xnhud6yvi9Bxh=DU+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/13/22 21:39, Naresh Kamboju wrote:
-> On Thu, 13 Oct 2022 at 12:41, Damien Le Moal
-> <damien.lemoal@opensource.wdc.com> wrote:
+
+
+On 2022/10/13 18:22, Sagi Grimberg wrote:
+> 
+> 
+> On 10/13/22 12:44, Chao Leng wrote:
+>> All controller namespaces share the same tagset, so we can use this
+>> interface which does the optimal operation for parallel quiesce based on
+>> the tagset type(e.g. blocking tagsets and non-blocking tagsets).
 >>
->> On 2022/10/12 16:24, Naresh Kamboju wrote:
->>> On TI beagle board x15 the connected SSD is not detected on linux next
->>> 20221006 tag.
->>>
->>> + export STORAGE_DEV=/dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
->>> + STORAGE_DEV=/dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
->>> + test -n /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
->>> + echo y
->>> + mkfs.ext4 /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84
->>> mke2fs 1.46.5 (30-Dec-2021)
->>> The file /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84 does
->>> not exist and no size was specified.
->>> + lava-test-raise 'mkfs.ext4
->>> /dev/disk/by-id/ata-SanDisk_SSD_PLUS_120GB_190702A00D84 failed; job
->>> exit'
-> 
-> The reported issue is now noticed on the Linux mainline master branch.
-> 
-> 1)
-> I see following config is missing on latest problematic builds
->   - CONFIG_HAVE_PATA_PLATFORM=y
-> 
-> 2)
-> Following ahci sata kernel message are missing on problematic boots,
-> [    1.408660] ahci 4a140000.sata: forcing port_map 0x0 -> 0x1
-> [    1.408691] ahci 4a140000.sata: AHCI 0001.0300 32 slots 1 ports 3
-> Gbps 0x1 impl platform mode
-> [    1.408721] ahci 4a140000.sata: flags: 64bit ncq sntf pm led clo
-> only pmp pio slum part ccc apst
-> [    1.409820] scsi host0: ahci
-> [    1.410064] ata1: SATA max UDMA/133 mmio [mem
-> 0x4a140000-0x4a1410ff] port 0x100 irq 98
-
-The proper driver for this board is not being loaded I think, or not
-builtin. What is the compat string in the device tree for this ahci
-adapter ? What driver does it need ? I quickly tried to google that info
-but did not find any details.
-
-> 3)
-> GOOD: 9d84bb40bcb30a7fa16f33baa967aeb9953dda78
-> BAD:  e08466a7c00733a501d3c5328d29ec974478d717
-
-What are these ? "git show" says they are drm and rdma pull request merge
-from Linus...
-
-> 4)
-> Here i am adding links working and not working test jobs and kernel configs,
-> problematic test job:
->  - https://lkft.validation.linaro.org/scheduler/job/5641407#L2602
-> Good test job:
->  - https://lkft.validation.linaro.org/scheduler/job/5640672#L2198
-
-Hard to read... Can you send a diff of the kernel configs ?
-
-> 5)
-> metadata:
->   git_ref: master
->   git_repo: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline
->   git_sha: e08466a7c00733a501d3c5328d29ec974478d717
->   git_describe: v6.0-7220-ge08466a7c007
->   kernel_version: 6.0.0
->   kernel-config: https://builds.tuxbuild.com/2Fourpiqf1OrlPFFtKwhHV0wAiq/config
->   build-url: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline/-/pipelines/661424896
->   artifact-location: https://builds.tuxbuild.com/2Fourpiqf1OrlPFFtKwhHV0wAiq
->   toolchain: gcc-10
-> 
-> 
-> 6)
-> For your information,
-> --
-> I see diff on good to bad commits,
-> $ git log --oneline 9d84bb40bcb3..e08466a7c007  -- drivers/ata
-> 4078aa685097 Merge tag 'ata-6.1-rc1' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/libata
-> 71d7b6e51ad3 ata: libata-eh: avoid needless hard reset when revalidating link
-> e3b1fff6c051 ata: libata: drop superfluous ata_eh_analyze_tf() parameter
-> b46c760e11c8 ata: libata: drop superfluous ata_eh_request_sense() parameter
-> cb6e73aaadff ata: libata-eh: Remove the unneeded result variable
-> ecf8322f464d ata: ahci_st: Enable compile test
-> 2d29dd108c78 ata: ahci_st: Fix compilation warning
-> 9628711aa649 ata: ahci-dwc: Add Baikal-T1 AHCI SATA interface support
-> bc7af9100fa8 ata: ahci-dwc: Add platform-specific quirks support
-> 33629d35090f ata: ahci: Add DWC AHCI SATA controller support
-> 6ce73f3a6fc0 ata: libahci_platform: Add function returning a clock-handle by id
-> 18ee7c49f75b ata: ahci: Introduce firmware-specific caps initialization
-> 7cbbfbe01a72 ata: ahci: Convert __ahci_port_base to accepting hpriv as arguments
-> fad64dc06579 ata: libahci: Don't read AHCI version twice in the
-> save-config method
-> 88589772e80c ata: libahci: Discard redundant force_port_map parameter
-> eb7cae0b6afd ata: libahci: Extend port-cmd flags set with port capabilities
-> f67f12ff57bc ata: libahci_platform: Introduce reset
-> assertion/deassertion methods
-> 3f74cd046fbe ata: libahci_platform: Parse ports-implemented property
-> in resources getter
-> 3c132ea6508b ata: libahci_platform: Sanity check the DT child nodes number
-> e28b3abf8020 ata: libahci_platform: Convert to using devm bulk clocks API
-> 82d437e6dcb1 ata: libahci_platform: Convert to using platform
-> devm-ioremap methods
-> d3243965f24a ata: make PATA_PLATFORM selectable only for suitable architectures
-> 3ebe59a54111 ata: clean up how architectures enable PATA_PLATFORM and
-> PATA_OF_PLATFORM
-> 55d5ba550535 ata: libata-core: Check errors in sata_print_link_status()
-> 03070458d700 ata: libata-sff: Fix double word in comments
-> 0b2436d3d25f ata: pata_macio: Remove unneeded word in comments
-> 024811a2da45 ata: libata-core: Simplify ata_dev_set_xfermode()
-> 066de3b9d93b ata: libata-core: Simplify ata_build_rw_tf()
-> e00923c59e68 ata: libata: Rename ATA_DFLAG_NCQ_PRIO_ENABLE
-> 614065aba704 ata: libata-core: remove redundant err_mask variable
-> fee6073051c3 ata: ahci: Do not check ACPI_FADT_LOW_POWER_S0
-> 99ad3f9f829f ata: libata-core: improve parameter names for ata_dev_set_feature()
-> 16169fb78182 ata: libata-core: Print timeout value when internal command times
-
-I do not understand what you are trying to say here. These are the latest
-ata patches for 6.1. They touch different drivers and ata core.
-I still do not know which driver needs to be used on that board...
-
->>> Test log:
->>>  - https://lkft.validation.linaro.org/scheduler/job/5634743#L2580
->>>
->>> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
->>>
->>> metadata:
->>>   git_ref: master
->>>   git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
->>>   git_sha: 7da9fed0474b4cd46055dd92d55c42faf32c19ac
->>>   git_describe: next-20221006
->>>   kernel_version: 6.0.0
->>>   kernel-config: https://builds.tuxbuild.com/2FkkkZ51ZYhBL1G8D69YX8Pkt5F/config
->>>   build-url: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next/-/pipelines/659754170
->>>   artifact-location: https://builds.tuxbuild.com/2FkkkZ51ZYhBL1G8D69YX8Pkt5F
->>>   toolchain: gcc-10
-> 
-> 7)
->> The kernel messages that are shown in the links above do not show any "libata
->> version 3.00 loaded." message nor any ata/ahci message that I can see. So I
->> think the eSATA adapter is not even being detected and libata/ahci driver not used.
+>> Now use NVME_NS_STOPPED to ensure pairing quiescing and unquiescing.
+>> If use blk_mq_[un]quiesce_tagset, NVME_NS_STOPPED will be invalided,
+>> so introduce NVME_CTRL_STOPPED to replace NVME_NS_STOPPED.
 >>
->> Was this working before ? If yes, can you try with the following patches reverted ?
+>> nvme connect_q should be never quiesced, so set QUEUE_FLAG_NOQUIESCED
+>> when init connect_q.
 >>
->> d3243965f24a ("ata: make PATA_PLATFORM selectable only for suitable architectures")
->> 3ebe59a54111 ("ata: clean up how architectures enable PATA_PLATFORM and
->> PATA_OF_PLATFORM")
+>> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+>> Signed-off-by: Chao Leng <lengchao@huawei.com>
+>> ---
+>>   drivers/nvme/host/core.c | 42 +++++++++++++-----------------------------
+>>   drivers/nvme/host/nvme.h |  2 +-
+>>   2 files changed, 14 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>> index 059737c1a2c1..0d07a07e02ff 100644
+>> --- a/drivers/nvme/host/core.c
+>> +++ b/drivers/nvme/host/core.c
+>> @@ -4890,6 +4890,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+>>               ret = PTR_ERR(ctrl->connect_q);
+>>               goto out_free_tag_set;
+>>           }
+>> +        blk_queue_flag_set(QUEUE_FLAG_NOQUIESCED, ctrl->connect_q);
+>>       }
+>>       ctrl->tagset = set;
+>> @@ -5089,20 +5090,6 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+>>   }
+>>   EXPORT_SYMBOL_GPL(nvme_init_ctrl);
+>> -static void nvme_start_ns_queue(struct nvme_ns *ns)
+>> -{
+>> -    if (test_and_clear_bit(NVME_NS_STOPPED, &ns->flags))
+>> -        blk_mq_unquiesce_queue(ns->queue);
+>> -}
+>> -
+>> -static void nvme_stop_ns_queue(struct nvme_ns *ns)
+>> -{
+>> -    if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
+>> -        blk_mq_quiesce_queue(ns->queue);
+>> -    else
+>> -        blk_mq_wait_quiesce_done(ns->queue);
+>> -}
+>> -
+>>   /*
+>>    * Prepare a queue for teardown.
+>>    *
+>> @@ -5111,13 +5098,14 @@ static void nvme_stop_ns_queue(struct nvme_ns *ns)
+>>    * holding bd_butex.  This will end buffered writers dirtying pages that can't
+>>    * be synced.
+>>    */
+>> -static void nvme_set_queue_dying(struct nvme_ns *ns)
+>> +static void nvme_set_queue_dying(struct nvme_ns *ns, bool start_queue)
+>>   {
+>>       if (test_and_set_bit(NVME_NS_DEAD, &ns->flags))
+>>           return;
+>>       blk_mark_disk_dead(ns->disk);
+>> -    nvme_start_ns_queue(ns);
+>> +    if (start_queue)
+>> +        blk_mq_unquiesce_queue(ns->queue);
+>>       set_capacity_and_notify(ns->disk, 0);
+>>   }
+>> @@ -5132,6 +5120,7 @@ static void nvme_set_queue_dying(struct nvme_ns *ns)
+>>   void nvme_kill_queues(struct nvme_ctrl *ctrl)
+>>   {
+>>       struct nvme_ns *ns;
+>> +    bool start_queue = false;
+>>       down_read(&ctrl->namespaces_rwsem);
+>> @@ -5139,8 +5128,11 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+>>       if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
+>>           nvme_start_admin_queue(ctrl);
+>> +    if (test_and_clear_bit(NVME_CTRL_STOPPED, &ctrl->flags))
+>> +        start_queue = true;
 > 
-> I have reverted above two patches and but the problem has not been solved.
-
-OK.
-
+> Why can't we just start the queues here? just call nvme_start_queues()?
+If we move the unquiesce of nvme_set_queue_dying out, this may destroys
+the functional atomicity of nvme_set_queue_dying.
+Of course, from the current code, It can work well.
+If others don't object, I'll modify it in patch v3.
+> Why does it need to happen only after we mark the disk dead?
+> The documentation only says that we need to set the capacity to 0
+> after we unquiesce, but it doesn't say that we can't unquiesce erliear.
 > 
-> 8)
->> If reverting these patches restores the eSATA port on this board, then you need
->> to fix the defconfig for that board.
+> Something like this:
+> -- 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 7e840549a940..27dc393eed97 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -5127,8 +5127,6 @@ static void nvme_set_queue_dying(struct nvme_ns *ns)
+>                  return;
 > 
-> OTOH,
-> Anders, enabled the new config CONFIG_AHCI_DWC=y  and tried but the
-> device failed to boot.
-
-Why would you need to enable this new driver ? You board was working
-before without this new driver, so it is not the one to use for this
-board, right ? Please send the ata related bits of the device tree to
-understand what this board needs.
-
--- 
-Damien Le Moal
-Western Digital Research
-
+>          blk_mark_disk_dead(ns->disk);
+> -       nvme_start_ns_queue(ns);
+> -
+>          set_capacity_and_notify(ns->disk, 0);
+>   }
+> 
+> @@ -5149,6 +5147,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
+>          if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
+>                  nvme_start_admin_queue(ctrl);
+> 
+> +       if (test_and_clear_bit(NVME_CTRL_STOPPED, &ctrl->flags))
+> +               nvme_start_queues(ctrl);
+> +
+>          list_for_each_entry(ns, &ctrl->namespaces, list)
+>                  nvme_set_queue_dying(ns);
+> -- 
+> 
+> .
