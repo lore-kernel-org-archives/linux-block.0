@@ -2,63 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F3DC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 08:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D2CC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 08:52:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbiJNIHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Oct 2022 04:07:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52888 "EHLO
+        id S229605AbiJNIwm convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Oct 2022 04:52:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiJNIHJ (ORCPT
+        with ESMTP id S230091AbiJNIwX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Oct 2022 04:07:09 -0400
-Received: from mail.fadrush.pl (mail.fadrush.pl [54.37.225.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40BA71C1143
-        for <linux-block@vger.kernel.org>; Fri, 14 Oct 2022 01:06:58 -0700 (PDT)
-Received: by mail.fadrush.pl (Postfix, from userid 1002)
-        id 1BB5A239DB; Fri, 14 Oct 2022 08:06:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fadrush.pl; s=mail;
-        t=1665734808; bh=bD6j9gIFU6CLTaCGl0Ow9oeIxtirvTfMeNZSfLEZQ+I=;
-        h=Date:From:To:Subject:From;
-        b=K4IwUEMIX8lYe5Fbgc6ZhpelYVGqhgaS7WuKn4tNPtX0KLXjbnf8vaxLIF6/GgiNn
-         jcUUQ/9DPfsGRic+d64/RSTNnsQQD5yu85WhvDRjITG+FrHlEDWxZn3jK4cLYipX/j
-         lxjHfdlnoWe62ocJpzVBKAj2WhjKE9TKJzjpRWE7oNzqjjPmoGmqK7gR8JqkUjThBv
-         Ezq/rMh+wv6ANjTDtZQP3muhlH3ATR9D/tBFRWOeFEobSkFIyCBDP2gruDpksXnHHq
-         Np+R3vFLJBxUrcimR3qdMMambAY9xeIwCnr55CwqzisJ9qbZw6lvAOUp7ChxaMKMJP
-         /3gJHatYBRhvA==
-Received: by mail.fadrush.pl for <linux-block@vger.kernel.org>; Fri, 14 Oct 2022 08:06:07 GMT
-Message-ID: <20221014064500-0.1.28.m8pw.0.uq49q1edll@fadrush.pl>
-Date:   Fri, 14 Oct 2022 08:06:07 GMT
-From:   "Jakub Olejniczak" <jakub.olejniczak@fadrush.pl>
-To:     <linux-block@vger.kernel.org>
-Subject: =?UTF-8?Q?Zwi=C4=99kszenie_p=C5=82ynno=C5=9Bci_finansowej?=
-X-Mailer: mail.fadrush.pl
+        Fri, 14 Oct 2022 04:52:23 -0400
+Received: from kbwpmyqt.hyperioncanada.com (unknown [85.217.145.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65C4D1C712E
+        for <linux-block@vger.kernel.org>; Fri, 14 Oct 2022 01:51:48 -0700 (PDT)
+Reply-To: inbox.mustafaa@gmail.com
+From:   Mustafa Ayvaz <jan.cha@myspeace.com>
+To:     linux-block@vger.kernel.org
+Subject: linux-block@vger.kernel.org 
+Date:   14 Oct 2022 10:51:35 +0200
+Message-ID: <20221014105135.0C5129B9BBA3AE5D@myspeace.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Good day,
 
-kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC chcia=C5=82bym za=
-proponowa=C4=87 wygodne rozwi=C4=85zanie, kt=C3=B3re umo=C5=BCliwi Pa=C5=84=
-stwa firmie stabilny rozw=C3=B3j.=20
+I was only wondering if you got my previous message? I have been 
+trying to reach you on your email: linux-block@vger.kernel.org , 
+I want to share a business opportunity with you. kindly get back 
+to me swiftly,  it is very important.
 
-Konkurencyjne otoczenie wymaga ci=C4=85g=C5=82ego ulepszania i poszerzeni=
-a oferty, co z kolei wi=C4=85=C5=BCe si=C4=99 z konieczno=C5=9Bci=C4=85 i=
-nwestowania. Brak odpowiedniego kapita=C5=82u powa=C5=BCnie ogranicza tem=
-po rozwoju firmy.
-
-Od wielu lat z powodzeniem pomagam firmom w uzyskaniu najlepszej formy fi=
-nansowania z banku oraz UE. Mam sta=C5=82ych Klient=C3=B3w, kt=C3=B3rzy n=
-adal ch=C4=99tnie korzystaj=C4=85 z moich us=C5=82ug, a tak=C5=BCe poleca=
-j=C4=85 je innym.
-
-Czy chcieliby Pa=C5=84stwo skorzysta=C4=87 z pomocy wykwalifikowanego i d=
-o=C5=9Bwiadczonego doradcy finansowego?
-
-
-Pozdrawiam
-Jakub Olejniczak
+Thanks
+Mustafa Ayvaz
