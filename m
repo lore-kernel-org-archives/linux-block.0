@@ -2,89 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 671D1C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 07:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F3DC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 14 Oct 2022 08:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiJNH1i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Oct 2022 03:27:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58204 "EHLO
+        id S229978AbiJNIHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Oct 2022 04:07:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbiJNH1h (ORCPT
+        with ESMTP id S230094AbiJNIHJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Oct 2022 03:27:37 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DCB1BF84A;
-        Fri, 14 Oct 2022 00:27:32 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MpdFh3X2PzKD1t;
-        Fri, 14 Oct 2022 15:25:12 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAXF8lhD0ljuwMAAQ--.30428S3;
-        Fri, 14 Oct 2022 15:27:30 +0800 (CST)
-Subject: Re: [PATCH] blk-mq: put the reference of the io scheduler module
- after switching back
-To:     Jinlong Chen <chenjinlong2016@outlook.com>, yukuai1@huaweicloud.com
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <f1c07b2a-ffdd-0912-139d-d51b34b77bcd@huaweicloud.com>
- <OSYP286MB0344A71BA994B77B9E2E46EDBE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <b4d2bb3e-ae2d-3028-ca73-f34eabf7bd01@huaweicloud.com>
-Date:   Fri, 14 Oct 2022 15:27:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 14 Oct 2022 04:07:09 -0400
+Received: from mail.fadrush.pl (mail.fadrush.pl [54.37.225.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40BA71C1143
+        for <linux-block@vger.kernel.org>; Fri, 14 Oct 2022 01:06:58 -0700 (PDT)
+Received: by mail.fadrush.pl (Postfix, from userid 1002)
+        id 1BB5A239DB; Fri, 14 Oct 2022 08:06:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fadrush.pl; s=mail;
+        t=1665734808; bh=bD6j9gIFU6CLTaCGl0Ow9oeIxtirvTfMeNZSfLEZQ+I=;
+        h=Date:From:To:Subject:From;
+        b=K4IwUEMIX8lYe5Fbgc6ZhpelYVGqhgaS7WuKn4tNPtX0KLXjbnf8vaxLIF6/GgiNn
+         jcUUQ/9DPfsGRic+d64/RSTNnsQQD5yu85WhvDRjITG+FrHlEDWxZn3jK4cLYipX/j
+         lxjHfdlnoWe62ocJpzVBKAj2WhjKE9TKJzjpRWE7oNzqjjPmoGmqK7gR8JqkUjThBv
+         Ezq/rMh+wv6ANjTDtZQP3muhlH3ATR9D/tBFRWOeFEobSkFIyCBDP2gruDpksXnHHq
+         Np+R3vFLJBxUrcimR3qdMMambAY9xeIwCnr55CwqzisJ9qbZw6lvAOUp7ChxaMKMJP
+         /3gJHatYBRhvA==
+Received: by mail.fadrush.pl for <linux-block@vger.kernel.org>; Fri, 14 Oct 2022 08:06:07 GMT
+Message-ID: <20221014064500-0.1.28.m8pw.0.uq49q1edll@fadrush.pl>
+Date:   Fri, 14 Oct 2022 08:06:07 GMT
+From:   "Jakub Olejniczak" <jakub.olejniczak@fadrush.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: =?UTF-8?Q?Zwi=C4=99kszenie_p=C5=82ynno=C5=9Bci_finansowej?=
+X-Mailer: mail.fadrush.pl
 MIME-Version: 1.0
-In-Reply-To: <OSYP286MB0344A71BA994B77B9E2E46EDBE259@OSYP286MB0344.JPNP286.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXF8lhD0ljuwMAAQ--.30428S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYF7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0
-        xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-        14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-        IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvE
-        x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
-        UI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi!
+Dzie=C5=84 dobry,
 
-ÔÚ 2022/10/13 22:18, Jinlong Chen Ð´µÀ:
->>
->> But I don't see elevator_switch() release the referenct of the module
->> it is switching from. It's still not balance to me.
->>
-> 
-> The reference count is released here:
-> 
-> elevator_switch_mq()
->    --> elevator_exit()
->      --> __elevator_exit()
->        --> kobject_put()
->          --> kobject_release()
->            --> elevator_release()
->              --> elevator_put()
-> 
-> What a deep call stack. :)
+kontaktuj=C4=99 si=C4=99 z Pa=C5=84stwem, poniewa=C5=BC chcia=C5=82bym za=
+proponowa=C4=87 wygodne rozwi=C4=85zanie, kt=C3=B3re umo=C5=BCliwi Pa=C5=84=
+stwa firmie stabilny rozw=C3=B3j.=20
 
-Yes, you're right.
+Konkurencyjne otoczenie wymaga ci=C4=85g=C5=82ego ulepszania i poszerzeni=
+a oferty, co z kolei wi=C4=85=C5=BCe si=C4=99 z konieczno=C5=9Bci=C4=85 i=
+nwestowania. Brak odpowiedniego kapita=C5=82u powa=C5=BCnie ogranicza tem=
+po rozwoju firmy.
 
-Thanks,
-Kuai
-> 
-> Sincerely,
-> Jinlong Chen
-> .
-> 
+Od wielu lat z powodzeniem pomagam firmom w uzyskaniu najlepszej formy fi=
+nansowania z banku oraz UE. Mam sta=C5=82ych Klient=C3=B3w, kt=C3=B3rzy n=
+adal ch=C4=99tnie korzystaj=C4=85 z moich us=C5=82ug, a tak=C5=BCe poleca=
+j=C4=85 je innym.
 
+Czy chcieliby Pa=C5=84stwo skorzysta=C4=87 z pomocy wykwalifikowanego i d=
+o=C5=9Bwiadczonego doradcy finansowego?
+
+
+Pozdrawiam
+Jakub Olejniczak
