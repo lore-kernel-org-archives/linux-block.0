@@ -2,140 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C828C4332F
-	for <linux-block@archiver.kernel.org>; Sat, 15 Oct 2022 03:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F19FC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 15 Oct 2022 03:57:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbiJODcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Oct 2022 23:32:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
+        id S229655AbiJOD5z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Oct 2022 23:57:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229573AbiJODcd (ORCPT
+        with ESMTP id S229542AbiJOD5y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Oct 2022 23:32:33 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 720A55A3C4;
-        Fri, 14 Oct 2022 20:32:32 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id cl1so6465927pjb.1;
-        Fri, 14 Oct 2022 20:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3X1YHPGMVMz9p937nmfPncWHRU0pK6n3WkNJ71zGW8c=;
-        b=qZOYjuMIHm2a7sUO10OWEHy1YaQmQiq8v+76AhwjwAPYvGvUOYD6zimKX9rtxWZf2H
-         jGg+pRk7a/52+VNiPImjLnxqyR6XUWMNIQtolTwbh/dwOFxoNSNYY49Sp/JHtaY5uFQE
-         uQX9Pzj0HG5c27NBXgDOefK9wDdn1/qcYKCe8RPpJqD1mMy+OtTYiRI/s4Nu9nXeJvhk
-         0qMo3WYwbxudi00dIvCa3mu+bkt/GuwgTT6hc8Zpas45Pa0OTuR7uv9kxkSzgT5oMdMs
-         FdQiK2cUEHx21V9XAi4PTcEsRgCLHyMhZbc7TcecRSCDdK8a48Rv0TLKkol8qb8wEJCl
-         WgzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3X1YHPGMVMz9p937nmfPncWHRU0pK6n3WkNJ71zGW8c=;
-        b=LNZu9N4nfqPz7FRKVnvj5WKi/S8zzW7Kfis4WZhn4yBlVfttYg5hwcITWbJx8PVw19
-         VKxVDU73HdUT9MoXFGtkzjJ0obDG8k0oZp7NsBaZWmEY7wTZxGGDOn7ZB3DRqnUFQn/I
-         b4HiGBlqqYwEswVwlgw9A0OZEzYmc/Sajk+hw2fPVh2hwuP1lX5R6adL1jFd3+vKvpCP
-         Mxlz7VQJOayW4k0hDZZ71/8VizvUNM9lTjX97CWYHribOnFrBSxT+sVuRjVT6mY3FHuy
-         xSQR6qB20Y/q6dd7eBQgUQsgEvrRtJ+0R4QZfYjhaKFcwW/tSP6n60bkVMiCZf75nsVu
-         uJQQ==
-X-Gm-Message-State: ACrzQf1TGMHovtE/zXmGRojarJfFS076DpedU90VuvcYBjqmgWRJdJCU
-        Q/s9Fr2xdarCv1tbMykvotQZGHODs8aPXIQw
-X-Google-Smtp-Source: AMsMyM7bRKKhBmM8H5v3Fdw2YBvrgvt4v8rtI1+aXZNNil39g1VJSTtclF8oOTblJqwLreyqbxJKIw==
-X-Received: by 2002:a17:90a:fa46:b0:20d:5efa:84fc with SMTP id dt6-20020a17090afa4600b0020d5efa84fcmr20334052pjb.20.1665804751836;
-        Fri, 14 Oct 2022 20:32:31 -0700 (PDT)
-Received: from [10.114.96.6] ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id w2-20020a62c702000000b00562f431f3d2sm2542125pfg.83.2022.10.14.20.32.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Oct 2022 20:32:31 -0700 (PDT)
-Message-ID: <57bd392b-45a6-929c-8be1-b0f6cff1da31@gmail.com>
-Date:   Sat, 15 Oct 2022 11:32:27 +0800
+        Fri, 14 Oct 2022 23:57:54 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E5167AC19;
+        Fri, 14 Oct 2022 20:57:52 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mq8Yh0J8Bzl6G3;
+        Sat, 15 Oct 2022 11:55:52 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAXF8m8L0pjxSQtAQ--.42351S3;
+        Sat, 15 Oct 2022 11:57:50 +0800 (CST)
+Subject: Re: [PATCH v2 0/4] blk-iocost: some random patches to improve iocost
+To:     Yu Kuai <yukuai1@huaweicloud.com>, tj@kernel.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, linan122@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221012094035.390056-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <ee8fa7e3-ce51-dc4a-c7f2-f3611d584936@huaweicloud.com>
+Date:   Sat, 15 Oct 2022 11:57:48 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Subject: Re: [PATCH] bfq: do try insert merge before bfq_init_rq() call
-To:     Jan Kara <jack@suse.cz>
-Cc:     paolo.valente@linaro.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com
-References: <20221013135321.174-1-Yuwei.Guan@zeekrlife.com>
- <20221014145004.gqqpa5uvgg576tej@quack3>
-From:   Yuwei Guan <ssawgyw@gmail.com>
-In-Reply-To: <20221014145004.gqqpa5uvgg576tej@quack3>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20221012094035.390056-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgAXF8m8L0pjxSQtAQ--.42351S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYF7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
+        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
+        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
+        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
+        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
+        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
+        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0
+        xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+        14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+        IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvE
+        x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnU
+        UI43ZEXa7VUbXdbUUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi, Jens
 
-On 2022/10/14 22:50, Jan Kara wrote:
-> On Thu 13-10-22 21:53:21, Yuwei Guan wrote:
->> It's useless to do bfq_init_rq(rq), if the rq can do merge first.
->>
->> In the patch 5f550ede5edf8, it moved to bfq_init_rq() before
->> blk_mq_sched_try_insert_merge(), but it's pointless,
->> as the fifo_time of next is not set yet,
->> and !list_empty(&next->queuelist) is 0, so it does not
->> need to reposition rq's fifo_time.
->>
->> And for the "hash lookup, try again" situation, as follow,
->> bfq_requests_merged() call can work normally.
->>
->> blk_mq_sched_try_insert_merge
->>    elv_attempt_insert_merge
->>      elv_rqhash_find
->>
->> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-> OK, after some thinking I agree. How much testing has this patch got?
-> Because I'd like to verify we didn't overlook something.
->
-> 							Honza
-Thanks for reviewing.
-I tested it with fio seq read case like bellow,
-then check blk trace and bfq log.
+Can you apply this patchset?
 
-[global]
-name=fio-seq-reads
-filename=fio-seq-reads
-rw=read
-bs=16K
-direct=1
-numjobs=4
+Thanks,
+Kuai
 
-[file1]
-size=32m
-ioengine=psync
+ÔÚ 2022/10/12 17:40, Yu Kuai Ð´µÀ:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> Changes in v2:
+>   - remove patch 4 from v1
+>   - add Acked-by tag from Tejun
+> 
+> Yu Kuai (4):
+>    blk-iocost: disable writeback throttling
+>    blk-iocost: don't release 'ioc->lock' while updating params
+>    blk-iocost: prevent configuration update concurrent with io throttling
+>    blk-iocost: read 'ioc->params' inside 'ioc->lock' in ioc_timer_fn()
+> 
+>   block/blk-iocost.c | 41 ++++++++++++++++++++++++++++++++---------
+>   1 file changed, 32 insertions(+), 9 deletions(-)
+> 
 
-What kinds of test cases you perfer to do, I will deal with them,
-or we verify this patch together, if you have free time. :)
->> ---
->>   block/bfq-iosched.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 7ea427817f7f..9845370a701c 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -6147,7 +6147,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->>   		bfqg_stats_update_legacy_io(q, rq);
->>   #endif
->>   	spin_lock_irq(&bfqd->lock);
->> -	bfqq = bfq_init_rq(rq);
->> +
->>   	if (blk_mq_sched_try_insert_merge(q, rq, &free)) {
->>   		spin_unlock_irq(&bfqd->lock);
->>   		blk_mq_free_requests(&free);
->> @@ -6156,6 +6156,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->>   
->>   	trace_block_rq_insert(rq);
->>   
->> +	bfqq = bfq_init_rq(rq);
->>   	if (!bfqq || at_head) {
->>   		if (at_head)
->>   			list_add(&rq->queuelist, &bfqd->dispatch);
->> -- 
->> 2.34.1
->>
