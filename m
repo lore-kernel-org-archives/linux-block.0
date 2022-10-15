@@ -2,130 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F35C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 15 Oct 2022 03:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACC7C4332F
+	for <linux-block@archiver.kernel.org>; Sat, 15 Oct 2022 09:46:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbiJOD6q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Oct 2022 23:58:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
+        id S229525AbiJOJqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Oct 2022 05:46:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiJOD6o (ORCPT
+        with ESMTP id S229518AbiJOJqG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Oct 2022 23:58:44 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D4E7A773;
-        Fri, 14 Oct 2022 20:58:43 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mq8ZH06P9zKFQl;
-        Sat, 15 Oct 2022 11:56:23 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCXmMrxL0pjAy0tAQ--.54884S3;
-        Sat, 15 Oct 2022 11:58:42 +0800 (CST)
-Subject: Re: [PATCH v2] blk-mq: fix null pointer dereference in
- blk_mq_clear_rq_mapping()
-To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk,
-        ming.lei@redhat.com, hare@suse.de, john.garry@huawei.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221011142253.4015966-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <c69e005d-7088-c4cd-f584-c4cf5385cdcc@huaweicloud.com>
-Date:   Sat, 15 Oct 2022 11:58:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sat, 15 Oct 2022 05:46:06 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFA0B4E622
+        for <linux-block@vger.kernel.org>; Sat, 15 Oct 2022 02:46:01 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d10so7012313pfh.6
+        for <linux-block@vger.kernel.org>; Sat, 15 Oct 2022 02:46:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yevS77zqlIo70RbwIB38gWjJeXMW2kI24HEwrpBEZG8=;
+        b=SFoKswY9s54XXWOEd/FWf2SlXif50vG5yxUi23GsWnNyV2q33yzYVrfJxyIBiWEji0
+         TARW8DrGamXjI7MQUU+JZiHjo6JbDji/qq9ndKVbfvQNU3cNTS6qx9Bd5tt1o3ukXr8n
+         EqR0zAgySpmFrV0a9euuOUEiErTvDzj2CG7CjuU5UjuY98BQ37O51shatzHHqzQuZxjK
+         JGm/ItirV4CZmjSMZoOmmOI0ICywWM3zwWaoZgcBEUMhJIVSiQyTCHIVGgPvTNR7ZQKf
+         dPPELCE7n5vqgSzlDlMuoV4YUkfcnbhYdBrleGTtFsHtycuYW7nUhXISwGWdHpDD7Qpl
+         ZBZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yevS77zqlIo70RbwIB38gWjJeXMW2kI24HEwrpBEZG8=;
+        b=gbxO1H9ghvCzvYG4OvewCUk91qGD/Z+V8g3VPAPWUdgbC6pGxeWPRkikVk200NsjnV
+         nHc/oaDC3VhAl/xanzYxutBfdhQfi9RWWXZQ/RcEo+ZVp2Bzeg+wIspk6YdHDkWUh2Bd
+         YTLUKy+iLiRHhPQi68bq3+cnKKk02tVdHFsv10y/X3HTjBLyFsI2jX9giRZZoNyeWdCu
+         0ST3TaTsqMQMkpVIo+6IJUK0PO3bKp/4vAtY5lqYwhil75rKodXSk43SDti62AGq/FGt
+         OKRkKN8a1YXLyEnP/oE6MfzRvqmQpMGtVOsl6gKNLhV50xAXEFweq2kHE2mlxpxRMqsz
+         XhTw==
+X-Gm-Message-State: ACrzQf2TLYAot5UPqpXTai05EFdmAAKlYDrl0zGYNw+cX4VHJ5PeMm20
+        0THd8ukzN/I4fxqZTB68IZQMrXXci7tKrw==
+X-Google-Smtp-Source: AMsMyM4K5x0SHvIUNgyqnoU7lpN4WVx5LBnga8z66aBx9rHdKtTgb7+qNhk4LsPL+rsPwmxVlSuYNA==
+X-Received: by 2002:a62:5a86:0:b0:563:553d:878e with SMTP id o128-20020a625a86000000b00563553d878emr2253302pfb.73.1665827160936;
+        Sat, 15 Oct 2022 02:46:00 -0700 (PDT)
+Received: from VM-32-4-ubuntu.. ([43.134.203.53])
+        by smtp.gmail.com with ESMTPSA id e23-20020a17090a119700b0020a8ed65df3sm2738465pja.45.2022.10.15.02.45.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Oct 2022 02:46:00 -0700 (PDT)
+From:   Hengqi Chen <hengqi.chen@gmail.com>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk, rostedt@goodmis.org
+Cc:     hengqi.chen@gmail.com, flaniel@linux.microsoft.com
+Subject: [PATCH v2] block: introduce block_io_start/block_io_done tracepoints
+Date:   Sat, 15 Oct 2022 09:45:37 +0000
+Message-Id: <20221015094537.383808-1-hengqi.chen@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <20221011142253.4015966-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCXmMrxL0pjAy0tAQ--.54884S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KF15WF1rtr4kJw18JrWkWFg_yoW8Cw48pF
-        4UGa1FkFZ0qr18ua1xXa9Fyryqga1kWr1rCa1Yv3s5Zry0kr17KF1vyrWUXr10yrs7CFZx
-        tr4YkFW8Jr1Dt3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r4j6FyUMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9-UUU
-        UU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens!
+Currently, several BCC ([0]) tools (biosnoop/biostacks/biotop) use
+kprobes to blk_account_io_start/blk_account_io_done to implement
+their functionalities. This is fragile because the target kernel
+functions may be renamed ([1]) or inlined ([2]). So introduces two
+new tracepoints for such use cases.
 
-ÔÚ 2022/10/11 22:22, Yu Kuai Ð´µÀ:
-> From: Yu Kuai <yukuai3@huawei.com>
-> 
-> Our syzkaller report a null pointer dereference, root cause is
-> following:
-> 
-> __blk_mq_alloc_map_and_rqs
->   set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs
->    blk_mq_alloc_map_and_rqs
->     blk_mq_alloc_rqs
->      // failed due to oom
->      alloc_pages_node
->      // set->tags[hctx_idx] is still NULL
->      blk_mq_free_rqs
->       drv_tags = set->tags[hctx_idx];
->       // null pointer dereference is triggered
->       blk_mq_clear_rq_mapping(drv_tags, ...)
-> 
-> This is because commit 63064be150e4 ("blk-mq:
-> Add blk_mq_alloc_map_and_rqs()") merged the two steps:
-> 
-> 1) set->tags[hctx_idx] = blk_mq_alloc_rq_map()
-> 2) blk_mq_alloc_rqs(..., set->tags[hctx_idx])
-> 
-> into one step:
-> 
-> set->tags[hctx_idx] = blk_mq_alloc_map_and_rqs()
-> 
-> Since tags is not initialized yet in this case, fix the problem by
-> checking if tags is NULL pointer in blk_mq_clear_rq_mapping().
-> 
-> Fixes: 63064be150e4 ("blk-mq: Add blk_mq_alloc_map_and_rqs()")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> Reviewed-by: John Garry <john.garry@huawei.com>
-> ---
-> Changes in v2:
->   - fix spelling mistakes
->   - add review tag
-> 
->   block/blk-mq.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-Can you apply this patch?
+  [0]: https://github.com/iovisor/bcc
+  [1]: https://github.com/iovisor/bcc/issues/3954
+  [2]: https://github.com/iovisor/bcc/issues/4261
 
-Thanks,
-Kuai
+Tested-by: Francis Laniel <flaniel@linux.microsoft.com>
+Signed-off-by: Hengqi Chen <hengqi.chen@gmail.com>
+---
+ block/blk-mq.c               |  4 ++++
+ include/trace/events/block.h | 27 ++++++++++++++++++++++++++-
+ 2 files changed, 30 insertions(+), 1 deletion(-)
 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 8070b6c10e8d..33292c01875d 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3112,8 +3112,11 @@ static void blk_mq_clear_rq_mapping(struct blk_mq_tags *drv_tags,
->   	struct page *page;
->   	unsigned long flags;
->   
-> -	/* There is no need to clear a driver tags own mapping */
-> -	if (drv_tags == tags)
-> +	/*
-> +	 * There is no need to clear mapping if driver tags is not initialized
-> +	 * or the mapping belongs to the driver tags.
-> +	 */
-> +	if (!drv_tags || drv_tags == tags)
->   		return;
->   
->   	list_for_each_entry(page, &tags->page_list, lru) {
-> 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c96c8c4f751b..3777f486a365 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -887,6 +887,8 @@ static void __blk_account_io_done(struct request *req, u64 now)
+ 
+ static inline void blk_account_io_done(struct request *req, u64 now)
+ {
++	trace_block_io_done(req);
++
+ 	/*
+ 	 * Account IO completion.  flush_rq isn't accounted as a
+ 	 * normal IO on queueing nor completion.  Accounting the
+@@ -917,6 +919,8 @@ static void __blk_account_io_start(struct request *rq)
+ 
+ static inline void blk_account_io_start(struct request *req)
+ {
++	trace_block_io_start(req);
++
+ 	if (blk_do_io_stat(req))
+ 		__blk_account_io_start(req);
+ }
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 7f4dfbdf12a6..65c4cb224736 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -245,6 +245,32 @@ DEFINE_EVENT(block_rq, block_rq_merge,
+ 	TP_ARGS(rq)
+ );
+ 
++/**
++ * block_io_start - insert a request for execution
++ * @rq: block IO operation request
++ *
++ * Called when block operation request @rq is queued for execution
++ */
++DEFINE_EVENT(block_rq, block_io_start,
++
++	TP_PROTO(struct request *rq),
++
++	TP_ARGS(rq)
++);
++
++/**
++ * block_io_done - block IO operation request completed
++ * @rq: block IO operation request
++ *
++ * Called when block operation request @rq is completed
++ */
++DEFINE_EVENT(block_rq, block_io_done,
++
++	TP_PROTO(struct request *rq),
++
++	TP_ARGS(rq)
++);
++
+ /**
+  * block_bio_complete - completed all work on the block operation
+  * @q: queue holding the block operation
+@@ -556,4 +582,3 @@ TRACE_EVENT(block_rq_remap,
+ 
+ /* This part must be outside protection */
+ #include <trace/define_trace.h>
+-
+-- 
+2.34.1
 
