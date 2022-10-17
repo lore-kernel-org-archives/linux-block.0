@@ -2,110 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B50C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 13:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EADF9C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 13:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbiJQNRJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 09:17:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38642 "EHLO
+        id S229802AbiJQNjM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 09:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbiJQNRJ (ORCPT
+        with ESMTP id S229663AbiJQNjL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 09:17:09 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315804D25B;
-        Mon, 17 Oct 2022 06:17:07 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Mrcsd3MTBz6R54R;
-        Mon, 17 Oct 2022 21:14:45 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgDnLS7PVU1j+NUFAA--.9367S3;
-        Mon, 17 Oct 2022 21:17:05 +0800 (CST)
-Subject: Re: [PATCH RFC] block: fix use after free for bd_holder_dir/slave_dir
-To:     Christoph Hellwig <hch@infradead.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, gregkh@linuxfoundation.org, willy@infradead.org,
-        kch@nvidia.com, martin.petersen@oracle.com,
-        johannes.thumshirn@wdc.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai3@huawei.com >> yukuai (C)" <yukuai3@huawei.com>
-References: <20221012125838.1608619-1-yukuai1@huaweicloud.com>
- <Y00LTH0yk3obS22m@infradead.org>
- <dadef634-9ec3-aa7b-f1c0-65a98a0fafb1@huaweicloud.com>
- <Y00+SsxI7IJ56im8@infradead.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <21375b39-234a-cffd-40db-f78fae3aee60@huaweicloud.com>
-Date:   Mon, 17 Oct 2022 21:17:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 17 Oct 2022 09:39:11 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC91850F83
+        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 06:39:10 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id EE9FF68BFE; Mon, 17 Oct 2022 15:39:06 +0200 (CEST)
+Date:   Mon, 17 Oct 2022 15:39:06 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chao Leng <lengchao@huawei.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        hch@lst.de, sagi@grimberg.me, kbusch@kernel.org,
+        ming.lei@redhat.com, axboe@kernel.dk,
+        "Paul E. McKenney" <paulmck@kernel.org>
+Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
+Message-ID: <20221017133906.GA24492@lst.de>
+References: <20221013094450.5947-1-lengchao@huawei.com> <20221013094450.5947-2-lengchao@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <Y00+SsxI7IJ56im8@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDnLS7PVU1j+NUFAA--.9367S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrKFy8Kr17tF4UuF4fGw48Zwb_yoWkCFgE9a
-        yxu39rCryvkw4ru3Zrtw1avasYkr15XrWUZFs7XFsFqFyqqasxAa1kCryxZr9xGa93CF15
-        Cry5Wr9xurZ7WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
-        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221013094450.5947-2-lengchao@huawei.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Thu, Oct 13, 2022 at 05:44:49PM +0800, Chao Leng wrote:
+> +	rcu = kvmalloc(count * sizeof(*rcu), GFP_KERNEL);
+> +	if (rcu) {
+> +		list_for_each_entry(q, &set->tag_list, tag_set_list) {
+> +			if (blk_queue_noquiesced(q))
+> +				continue;
+> +
+> +			init_rcu_head(&rcu[i].head);
+> +			init_completion(&rcu[i].completion);
+> +			call_srcu(q->srcu, &rcu[i].head, wakeme_after_rcu);
+> +			i++;
+> +		}
+> +
+> +		for (i = 0; i < count; i++) {
+> +			wait_for_completion(&rcu[i].completion);
+> +			destroy_rcu_head(&rcu[i].head);
+> +		}
+> +		kvfree(rcu);
+> +	} else {
+> +		list_for_each_entry(q, &set->tag_list, tag_set_list)
+> +			synchronize_srcu(q->srcu);
+> +	}
 
-ÔÚ 2022/10/17 19:36, Christoph Hellwig Ð´µÀ:
-> On Mon, Oct 17, 2022 at 05:24:20PM +0800, Yu Kuai wrote:
->> I agree that this patch do make sense, however, it seems to me this
->> patch should fix the problem that kobject is leaked, not uaf... And I
->> verified that the problem can still be reporduced with this patch.
-> 
-> Can you share your reproducer?
-> .
-> 
+Having to allocate a struct rcu_synchronize for each of the potentially
+many queues here is a bit sad.
 
-Of course, I add some delay in kernel to make sure the problem is
-reproduced 100%:
-
-diff --git a/block/holder.c b/block/holder.c
-index 5283bc804cc1..be8f4b4245f3 100644
---- a/block/holder.c
-+++ b/block/holder.c
-@@ -1,6 +1,7 @@
-  // SPDX-License-Identifier: GPL-2.0-only
-  #include <linux/blkdev.h>
-  #include <linux/slab.h>
-+#include <linux/delay.h>
-
-  struct bd_holder_disk {
-         struct list_head        list;
-@@ -33,6 +34,8 @@ static int __link_disk_holder(struct block_device 
-*bdev, struct gendisk *disk)
-  {
-         int ret;
-
-+       printk("%s: delay 5s\n", __func__);
-+       msleep(5000);
-         ret = add_symlink(disk->slave_dir, bdev_kobj(bdev));
-         if (ret)
-                 return ret;
-
-test cmd is very simple:
-
-dmsetup create test1 --table "0 100000 linear /dev/sda 0" &
-sleep 1
-echo 1 > /sys/block/sda/device/delete
-
+Pull just explained the start_poll_synchronize_rcu interfaces at ALPSS
+last week, so I wonder if something like that would also be feasible
+for SRCU, as that would come in really handy here.
