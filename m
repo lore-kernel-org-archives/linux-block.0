@@ -2,505 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA25C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 09:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F89FC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 09:30:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbiJQJ0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 05:26:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51622 "EHLO
+        id S230075AbiJQJax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 05:30:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231282AbiJQJ0G (ORCPT
+        with ESMTP id S230401AbiJQJav (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 05:26:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD5C10FF3
-        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 02:25:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665998755;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JreG45VBA5NDIhr/Z3QmWMJ+N3AJrpzLFE6Oac8qS7A=;
-        b=SH8Yb/G/6x8GZZamhq6C4oUMJwWPHidGsB2DjN5JGLebsy1ZyDbeJUlgVlkA4eNKzjBi0V
-        J9H2MAE6ySRUehkhhHYQWVQzXwNnojfB24gyTMqhm38mgca1mBmC8Ugzx7YxbHyNYLlw+N
-        Hx0z47iri+yLSzhgZztjH2/0XE7tL9A=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-361-5vsWU8AaMMOdeGpiXaVoIA-1; Mon, 17 Oct 2022 05:25:52 -0400
-X-MC-Unique: 5vsWU8AaMMOdeGpiXaVoIA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A76185A583;
-        Mon, 17 Oct 2022 09:25:51 +0000 (UTC)
-Received: from T590 (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DE571468208;
-        Mon, 17 Oct 2022 09:25:44 +0000 (UTC)
-Date:   Mon, 17 Oct 2022 17:25:37 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        johannes.thumshirn@wdc.com, bvanassche@acm.org,
-        shinichiro.kawasaki@wdc.com, vincent.fu@samsung.com,
-        yukuai3@huawei.com
+        Mon, 17 Oct 2022 05:30:51 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2075.outbound.protection.outlook.com [40.107.96.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A1FE3BC5B;
+        Mon, 17 Oct 2022 02:30:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rklqz2q2GFAUNDOcrWThAQcYKrPz7FFX83zmBwbL/Wl4BJhJZ37eejO555Ersqt5jXPTTqMmRZRc99E8DN1gYTPKjDTEicBmBPPJm/s5fi0H6you55Op2BkWO6LoFnMTsx8CMY5Qa+B2022I4JaOH1pvJ9OKnceG13bRorwZdfvsVC3gr8acvwnQvZo4/+mEdO9IYXD0hxnvU6kSNLxdNoPsL+nQUo3UTDguxg8zhEvF5A4hjpKZMNT4VpyE6qWFjT/DbeALwY1xmyFfEcUSH1P7p2G7bnUSasXZF/HPjP8XdvfZGOYmE+04DOQw4ppzp0C3DNfX449ERH4570sCVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CKbwp4vl449WKRkOdhdTELqRvMWy+X7TJvTqWVp6UN8=;
+ b=ltnXS7fAHhA3SOS26Ajbshgcw9FMZ7tJAT+I5oI4O20d4k8JSKi7a4fjTV8iXISODmmaquAzj4PHLksBOCYKyH0YVuu7YGzxHPipHRw8TcPAgL486hAt/9d9hG7szEHGat2L3TJu3Nyl7+FXUMtujYfGeigc3t8jEFNQp2UTYIsfowFnL1HIWuOp85aJfRCJpBQmAsmECkJ+NXN/v8IRGpUsre9eQZYLoM+dgNTmm3VQ/PylS2zn+WcldZckg5WFg0IFNBduhlhNGmKlGAGBK8g/R4Z65L6ErFC0tptThPlowWZV5tQUbRuqMx0HLw0gyA6cU4BG37MfPPv5z++srg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CKbwp4vl449WKRkOdhdTELqRvMWy+X7TJvTqWVp6UN8=;
+ b=Tx64zM+3MFjpSuzHWLzWRYSkmaB80Du/hZOwdqSxfDRql7pX2Qk5W3MnQjNNKz3MntyoEnOX+b2hiosvr2zqEyXx2j8nwaZMYeu2Zo/Q3fRRo6hF7fGacRszJCUVn+wSi6K29btcfZAWzPdh1mN02eXrRrcdG7XtbvBzjh6NjLrSnxVrzK/U+P+yBdXPtc8CiQQXli8NBIhN52IF6TULRhGSEUOrYBzbM2l7y051JpjqWQT3dWZbdBYJuIGpiNqkolVSCqsrwnUM9ygEe1sQXE58v0gihQKtmAfOKNNoRL2Y0U8JjwOqDiFm2w+ABswPdQQs122s67iG5OG3zLedBA==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by PH7PR12MB5903.namprd12.prod.outlook.com (2603:10b6:510:1d7::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.32; Mon, 17 Oct
+ 2022 09:30:47 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::1402:a17a:71c1:25a3]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::1402:a17a:71c1:25a3%7]) with mapi id 15.20.5723.033; Mon, 17 Oct 2022
+ 09:30:47 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "vincent.fu@samsung.com" <vincent.fu@samsung.com>,
+        "yukuai3@huawei.com" <yukuai3@huawei.com>
 Subject: Re: [PATCH] null_blk: allow teardown on request timeout
-Message-ID: <Y00fkc1N+Cif/Kxt@T590>
-References: <20221016052006.11126-1-kch@nvidia.com>
+Thread-Topic: [PATCH] null_blk: allow teardown on request timeout
+Thread-Index: AQHY4R8DFU2LJu/Wy0udZZqXPfzvLK4SUpaAgAABcQA=
+Date:   Mon, 17 Oct 2022 09:30:47 +0000
+Message-ID: <0af3d1a4-8166-ea1e-8710-c51479c587a1@nvidia.com>
+References: <20221016052006.11126-1-kch@nvidia.com> <Y00fkc1N+Cif/Kxt@T590>
+In-Reply-To: <Y00fkc1N+Cif/Kxt@T590>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|PH7PR12MB5903:EE_
+x-ms-office365-filtering-correlation-id: 97663bb3-3374-4e35-8d81-08dab02245d0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: OT7qC9ClJjnlqWPJH/JEi+FlYlN3sDrbBWPq7UiQSwpcOPUsf9fDANTc6BQbMc7n5rZhQe3DwN3+hN/+4jj+b0XqiX8w723UPX7BF6OjmrkcQr+oAbLfbgEf8PoxmoZYixvqntyH2SA7vwRpq3coWoVs9//I/xVZKbuwK/qu5tbXfg/cV6scSf0RO9At3B7ZGjp9ixOFpm5uQsYxcVlMbsuYr/XN5zvHGe2pZbhzJ6FIssaiyiFGMZrDiIMQaTkfdpuDv/sDzCLvR976YqLheMSMPuScE6E5/TJ8aaO6vXJYv6wS3TiYNIYebdyuFcRMw9h0ttp5xgoaV8S457g4ua2AuI/fe3XmfSBtiH/bIOYvQ7nLuldiFXnSh2rN4kdqTInawhFQGkDVV5rHuRdPFGXWgZoQyUMgilpKeWfvLr0SSJwe/z1Q95ER93sGlZDNMg1Ng2gnRuyN+6W8duGXE4/bXurX6Crh7LBwqzwqGgM3Hg8R7xpmEz+u07PutLO0GwJiv3feU2c7KOC6boMWf16wCAC7p1YTwfH0XAufUwyzLF1i+UZWshZsZDLTOUUxqaFf+GxmaNktglEwk9u6wiVbMybItG/FXdjFddq5N/BVpB4rYuTR0SkYefqcrjI21PspdBINNBn4DfP4prSsBDcDVlDTJCiC1EmsTqbIGdjEtcHYfDpfFzN1R6PJWHfNMM3knqN9YlER4S7/yV0g216nA1/kjH9qFBIoyeX82Qsfhighyq3+wBLJPx9lagXyCEEXVEArU7pJy0glwSlwJGO+2h8eTqPGxZqo3T0knFuHxpIbQnCM9GPcOoJ3FhigU7Q7GSMtdrwDCz96/gGI8g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(366004)(346002)(136003)(396003)(376002)(451199015)(6486002)(54906003)(2616005)(186003)(38070700005)(83380400001)(86362001)(31696002)(38100700002)(122000001)(4744005)(7416002)(5660300002)(2906002)(41300700001)(4326008)(64756008)(8676002)(8936002)(478600001)(6512007)(6506007)(316002)(110136005)(66446008)(76116006)(66476007)(66556008)(66946007)(91956017)(71200400001)(31686004)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?N3pEVk52dTNIck9GUUxseUdIL0hGYnppSTJtZmtNRmsvOHlSbGhXVnd3ci9E?=
+ =?utf-8?B?S21XQ0RHbVlMYlUyd0ROQWMrUkNDaCt2WkFvZDlGTFQ0REFxUkFRTDVnSHM1?=
+ =?utf-8?B?YWp3T0lrRThpUVBFekdPb1J5TXpwQnFhRHNSZU9OR0d6a05nWkRuUDVJa1c5?=
+ =?utf-8?B?WlJ4SjhlMU80TVZCcVRxREtYRTNzb09jRnNja0l3SnV1NGpCamw1bEZqc3hF?=
+ =?utf-8?B?NEs3VUxKVXZwd0wzSkVqNTY0RHgzcktPanRQaTVDTjNnNTRSSnFXcHdSOHhQ?=
+ =?utf-8?B?Z0NSZ3lMTXpPTW5GMWtnalVwSk1QUEVJUnFMWXJHZ01nMkdqQ1QrYThXcG4w?=
+ =?utf-8?B?TWR5WDNnRjMycmJJR1ZDT2gxWWIrVE5uMTc1SE1pakl3OWY4cDFLZ2ROZERM?=
+ =?utf-8?B?UFRsYk9lY3N2R2JiQkw5OHhkOU90aUxUQ3NBVndTTk93WjRaazR6bm83cTdL?=
+ =?utf-8?B?QXVFaFExcDg2N0pRaHVTM0oyWVR2NnJHeEFPS2FZRDdYdTFSY3JmVWRyRDVl?=
+ =?utf-8?B?c0VjYTBod01xUnlaVllsRlMxN1pEK2V3d1VpVDl0a25RcXFGQkxDZXNnSEVC?=
+ =?utf-8?B?c2lEVFpsbjNDL1QxMTlXNnMxNlZNNENXLzhqSGxnNkh4RFZYd1ZscU5iL0U1?=
+ =?utf-8?B?bnJNZkhyRzlhVWIyZ0RFbFRDeTgvRnJROUFDa0xBUjdvYUJGVWhIL0xjTWxC?=
+ =?utf-8?B?d3RKTVFNd3FqTFBqUlNFR0tPc3VNc3VMNldrUTNxNDZXNlEwMEQrWHdCSklo?=
+ =?utf-8?B?R3lBUkRVTDdmN2EyclhIZmUwY2VuTnVPUjhOMTBma1B1WE5RTzFLd1hLSXRw?=
+ =?utf-8?B?bkFhTmh6WVhBNW1JOU01a3k1dVlpR3FSQUg2S2E4SitibG5YU0RsRThOYWpo?=
+ =?utf-8?B?U3kyRFVCRnBqS3NaaUl3TUNKL1ROWmJBRkhka0lId3N3eFFwT2JHbkszUEts?=
+ =?utf-8?B?S0gxSklqQ1UzQkRXS0E1RWljUjViT0hTMTFqVjBlYVV3WkhJRHFOcUhZR0pV?=
+ =?utf-8?B?WGlsc0VaRHpMVGRjalhpVENTMWVoYTZJaWYwVk5Ob1U4Y210ZGdPTHhDN0JK?=
+ =?utf-8?B?SHZwUWx3TjNuRllBQ08zanJIRGZUVXZJT1hZNldpUENpY3Rvd2s3SWpPT1Bm?=
+ =?utf-8?B?Rk5PaVBTWGN4RkVsNjN3SDl3a3c1Z1lYeGFVQlY3Wk9GSkFPWStsWGQrbjNz?=
+ =?utf-8?B?RkRacmxLbnNqYXpTTXlkbTlsSUVFZkRkN25BMDlzZTZKZDJuNnY3THdIYWx1?=
+ =?utf-8?B?Z2dxKzBGakROYm9pL0ZUS0lDcng5UEZRUFNRV1pqcHpnM0l3YzNUdUxIajZk?=
+ =?utf-8?B?MXA2dThQYlVjZ0czQ0VpYm90UzMrKzBmN2NvSGVhOTBYdG93dGJOYzU1em1M?=
+ =?utf-8?B?RG8zU3AzVjRCQXV5Q1JNTGhGaENkaXdLcWJEcHVGbHo4V3ovR1hyV3pzek8y?=
+ =?utf-8?B?ZkZTelNVODFBUzNmMEpoTXhxUzlpV1JSalQyZkZmYWFsQ1h3WC9sUmlOZUh4?=
+ =?utf-8?B?ZktNZTBSdElWZC80bXVRbWpqZjlmMTJML1dOalFnOGFTRjhVSHVxeUJhVkJD?=
+ =?utf-8?B?V1poMGRMdWY5dWJtVnNnSzNUdGV1SVJXL2R0bHdWZXlGTlJ4RVIvVWt5YVJO?=
+ =?utf-8?B?OFNZWVgzZ2VnQzFHaW0ycjVFL1VLZXFCTG5hSWlFYkdXcEtDS1ExdnBVRGQ4?=
+ =?utf-8?B?ZEtKMlhGQ0dUYWtJZ0JPWmE4TFJaSnlVTW45cVhJQWZDUHY3dUMzN0lhbklR?=
+ =?utf-8?B?dUhtRkFvNis2ZmdtSGc3V1I5TUtRTmRZc0R6YkpkMU1qTHFZbU1IVlk0a1FJ?=
+ =?utf-8?B?K0pGd1puRnRuTWk2Z0FvM1UxelVrMHgwM2k5NEJ4ZFFLMm1nWnRyTGpkeUw1?=
+ =?utf-8?B?NE1QbUNiQnE2K2hUZ05rQUhQUmhNTW5CZGpTRE5GWjM0TUJhQTYzWGdEa1hh?=
+ =?utf-8?B?OVM4RFBwMXVTU2cxOEhNM0s2SnBneTh1Z3YxVDVXQ3ArMEVtK21KK3ppeWdw?=
+ =?utf-8?B?N0RWdHhhaitVZlVGNWV5MlU1S2szM085T005L1RqbUhFUndlRXY2RHF0djVT?=
+ =?utf-8?B?Nkg4TnRTOXdRNUFDVkFIZWxpbW0zenlhdUQ4TkpPUjJ4RTNHVWRxN0E0MWhH?=
+ =?utf-8?B?dEtkNXM3bzBBajRJenc5MEJKVFZCajcrWkMrZEwrTDNlNXJMbE1rMHh6WTc0?=
+ =?utf-8?Q?UdzfdqEg+m/FFf5QqzxIsNPq1h/4lxpPSwlvYKOL89hy?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <118A08C22EB362479A4C7952612CF2CC@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221016052006.11126-1-kch@nvidia.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97663bb3-3374-4e35-8d81-08dab02245d0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2022 09:30:47.2706
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: k75E+2+/Pn4fddGhYFfxDFBUeAZXCoYVDgdYzAjuf7GgRN7mdM1nmszauGA2HjSGu+QgIEk3OxMtOQ+LVOkSGA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5903
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Oct 15, 2022 at 10:20:06PM -0700, Chaitanya Kulkarni wrote:
-> In current timeout implementation null_blk just completes the request
-> with error=BLK_STS_TIMEOUT without doing any cleanup, hence device
-> cleanup code including handling inflight requests on timeout and
-> teardown is never exercised.
-> 
-> Add a module parameter rq_abort_limit to allow null_blk perform device
-> cleanup when time out occurs. The non zero value of this parameter
-> allows user to set the number of timeouts to occur before triggering
-> cleanup/teardown work.
-> 
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
-> * Test result enabling the rq_abort_limit from module parameter and
->   issueing dd until null_blk device disappears from the pathname
->   with connetion timeout error.
->  
-> linux-block (for-next) # !./test_
-> ./test_null_blk_abort_on_timeout.sh 
-> commit 4fbcf978ae8f385aa1830ce40f210c7eec8d58fa (HEAD -> for-next)
-> Author: Chaitanya Kulkarni <kch@nvidia.com>
-> Date:   Tue Oct 11 23:22:43 2022 -0700
-> 
->     null_blk: allow teardown on request timeout
->     
->     In current timeout implementation null_blk just completes the request
->     with error=BLK_STS_TIMEOUT without doing any cleanup, hence device
->     cleanup code including handling inflight requests on timeout and
->     teardown is never exercised.
->     
->     Add a module parameter rq_abort_limit to allow null_blk perform device
->     cleanup when time out occurs. The non zero value of this parameter
->     allows user to set the number of timeouts to occur before triggering
->     cleanup/teardown work.
->     
->     Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> + umount /mnt/nullb0
-> umount: /mnt/nullb0: not mounted.
-> + rmdir 'config/nullb/nullb*'
-> rmdir: failed to remove 'config/nullb/nullb*': No such file or directory
-> + dmesg -c
-> + modprobe -r null_blk
-> + lsmod
-> + grep null_blk
-> ++ nproc
-> + make -j 48 M=drivers/block modules
->   CC [M]  drivers/block/null_blk/main.o
->   CC [M]  drivers/block/null_blk/trace.o
->   CC [M]  drivers/block/null_blk/zoned.o
->   LD [M]  drivers/block/null_blk/null_blk.o
->   MODPOST drivers/block/Module.symvers
->   LD [M]  drivers/block/null_blk/null_blk.ko
-> + HOST=drivers/block/null_blk/
-> ++ uname -r
-> + HOST_DEST=/lib/modules/6.0.0blk+/kernel/drivers/block/null_blk/
-> + cp drivers/block/null_blk//null_blk.ko /lib/modules/6.0.0blk+/kernel/drivers/block/null_blk//
-> + ls -lrth /lib/modules/6.0.0blk+/kernel/drivers/block/null_blk//null_blk.ko
-> -rw-r--r--. 1 root root 1.2M Oct 15 21:51 /lib/modules/6.0.0blk+/kernel/drivers/block/null_blk//null_blk.ko
-> + sleep 1
-> + dmesg -c
-> ##################
-> ##################
-> nullb0  250:0    0  250G  0 disk 
-> dd: error writing '/dev/nullb0': Connection timed out
-> 3+0 records in
-> 2+0 records out
-> 8192 bytes (8.2 kB, 8.0 KiB) copied, 6.13436 s, 1.3 kB/s
-> ##################
-> ##################
-> nullb0  250:0    0  250G  0 disk 
-> [ 1598.393544] null_blk: rq 0000000015ff5165 timed out
-> [ 1598.393555] blk_print_req_error: 74 callbacks suppressed
-> [ 1598.393558] timeout error, dev nullb0, sector 8 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1598.395885] Buffer I/O error on dev nullb0, logical block 1, async page read
-> [ 1598.397731] Dev nullb0: unable to read RDB block 8
-> [ 1598.398990]  nullb0: unable to read partition table
-> [ 1598.399069] null_blk: disk nullb0 created
-> [ 1598.399071] null_blk: module loaded
-> [ 1604.537424] null_blk: rq 00000000b2a753f0 timed out
-> [ 1604.537437] timeout error, dev nullb0, sector 16 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
-> dd: error writing '/dev/nullb0': Connection timed out
-> 1+0 records in
-> 0+0 records out
-> 0 bytes copied, 6.13561 s, 0.0 kB/s
-> ##################
-> ##################
-> nullb0  250:0    0  250G  0 disk 
-> [ 1610.681242] null_blk: rq 00000000a392790b timed out
-> [ 1610.681253] timeout error, dev nullb0, sector 0 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
-> dd: error writing '/dev/nullb0': Connection timed out
-> 1+0 records in
-> 0+0 records out
-> 0 bytes copied, 6.13985 s, 0.0 kB/s
-> ##################
-> ##################
-> nullb0  250:0    0  250G  0 disk 
-> [ 1616.825155] null_blk: rq 0000000091a70f01 timed out
-> [ 1616.825168] timeout error, dev nullb0, sector 0 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
-> dd: error writing '/dev/nullb0': Connection timed out
-> 1+0 records in
-> 0+0 records out
-> 0 bytes copied, 6.1325 s, 0.0 kB/s
-> ##################
-> ##################
-> nullb0  250:0    0  250G  0 disk 
-> [ 1622.969017] null_blk: rq 00000000cdb610e7 timed out
-> [ 1622.969029] timeout error, dev nullb0, sector 0 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
-> dd: error writing '/dev/nullb0': Connection timed out
-> 2+0 records in
-> 1+0 records out
-> 4096 bytes (4.1 kB, 4.0 KiB) copied, 6.14283 s, 0.7 kB/s
-> ##################
-> ##################
-> [ 1629.112893] null_blk: rq 00000000555ecc5e timed out
-> [ 1629.118817] blk_sync_queue 230
-> [ 1629.118821] blk_sync_queue 232
-> [ 1629.118823] blk_sync_queue 234
-> [ 1629.118828] timeout error, dev nullb0, sector 8 op 0x1:(WRITE) flags 0x8800 phys_seg 1 prio class 2
-> [ 1629.125044] blk_sync_queue 230
-> [ 1629.125048] blk_sync_queue 232
-> [ 1629.125049] blk_sync_queue 234
-> ##################
-> ##################
-> 
-> * Test result enabling the rq_abort_limit from module parameter and
->   issueing fio until null_blk device disappears from the pathname
->   with connetion timeout error.
-> nullb0  250:0    0  250G  0 disk 
-> RANDREAD: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=128
-> fio-3.27
-> Starting 1 process
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=214274048, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=32268288, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=107802624, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=193708032, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=202928128, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=281436160, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=33292288, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=250576896, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=41902080, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=225521664, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=303058944, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=405196800, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=309719040, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=111214592, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=254062592, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=128663552, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=76795904, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=355647488, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=5873664, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=69328896, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=216276992, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=16027648, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=328343552, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=385630208, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=137695232, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=146546688, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=157765632, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=290615296, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=230440960, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=130961408, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=88547328, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=157401088, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=296202240, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=35819520, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=212545536, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=261697536, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=66195456, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=254603264, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=169242624, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=258154496, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=69320704, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=335650816, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=192950272, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=32813056, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=5804032, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=217219072, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=153227264, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=91131904, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=241209344, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=246509568, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=332935168, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=108859392, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=86061056, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=278966272, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=219004928, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=290512896, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=143306752, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=176312320, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=346566656, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=183422976, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=383885312, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=199393280, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=160944128, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=142491648, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=217841664, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=178466816, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=331423744, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=88883200, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=311562240, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=228642816, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=362893312, buflen=4096
-> fio: io_u error on file /dev/nullb0: Connection timed out: read offset=323035136, buflen=4096
-> fio: io_u error on file /dev/nullb0: Input/output error: read offset=385089536, buflen=4096
-> fio: pid=7811, err=110/file:io_u.c:1841, func=io_u error, error=Connection timed out
-> 
-> RANDREAD: (groupid=0, jobs=1): err=110 (file:io_u.c:1841, func=io_u error, error=Connection timed out): pid=7811: Sat Oct 15 21:52:09 2022
->   read: IOPS=33, BW=64.6KiB/s (66.1kB/s)(420KiB/6503msec)
->     slat (nsec): min=942, max=6485.4M, avg=29824299.02, stdev=439245367.62
->     clat (usec): min=525, max=6501.3k, avg=3899782.52, stdev=3194606.52
->      lat (usec): min=530, max=6501.3k, avg=3961597.01, stdev=3181404.42
->     clat percentiles (usec):
->      |  1.00th=[    545],  5.00th=[    553], 10.00th=[    562],
->      | 20.00th=[    611], 30.00th=[  15795], 40.00th=[  15795],
->      | 50.00th=[6476006], 60.00th=[6476006], 70.00th=[6476006],
->      | 80.00th=[6476006], 90.00th=[6476006], 95.00th=[6476006],
->      | 99.00th=[6476006], 99.50th=[6476006], 99.90th=[6476006],
->      | 99.95th=[6476006], 99.99th=[6476006]
->    bw (  KiB/s): min=  216, max=  216, per=100.00%, avg=216.00, stdev= 0.00, samples=1
->    iops        : min=   54, max=   54, avg=54.00, stdev= 0.00, samples=1
->   lat (usec)   : 750=12.39%
->   lat (msec)   : 20=6.88%, >=2000=28.90%
->   cpu          : usr=0.00%, sys=0.00%, ctx=4, majf=0, minf=150
->   IO depths    : 1=0.5%, 2=0.9%, 4=1.8%, 8=3.7%, 16=7.3%, 32=14.7%, >=64=71.1%
->      submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
->      complete  : 0=0.0%, 4=98.9%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=1.1%
->      issued rwts: total=218,0,0,0 short=40,0,0,0 dropped=0,0,0,0
->      latency   : target=0, window=0, percentile=100.00%, depth=128
-> 
-> Run status group 0 (all jobs):
->    READ: bw=64.6KiB/s (66.1kB/s), 64.6KiB/s-64.6KiB/s (66.1kB/s-66.1kB/s), io=420KiB (430kB), run=6503-6503msec
-> 
-> Disk stats (read/write):
->   nullb0: ios=90/0, merge=0/0, ticks=0/0, in_queue=0, util=98.55%
-> ##################
-> ##################
-> [ 1635.256737] null_blk: rq 00000000834b8ba3 timed out
-> [ 1635.256748] timeout error, dev nullb0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1635.258876] Buffer I/O error on dev nullb0, logical block 0, async page read
-> [ 1641.400625] null_blk: rq 00000000ee97fbff timed out
-> [ 1641.400636] timeout error, dev nullb0, sector 8 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1641.402919] Buffer I/O error on dev nullb0, logical block 1, async page read
-> [ 1641.404755] Dev nullb0: unable to read RDB block 8
-> [ 1641.406666]  nullb0: unable to read partition table
-> [ 1641.407559] null_blk: disk nullb0 created
-> [ 1641.407562] null_blk: module loaded
-> [ 1648.056420] null_blk: rq 00000000834b8ba3 timed out
-> [ 1648.056432] timeout error, dev nullb0, sector 418504 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.058914] null_blk: rq 0000000064c974a9 timed out
-> [ 1648.058918] timeout error, dev nullb0, sector 63024 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.061288] null_blk: rq 00000000ee97fbff timed out
-> [ 1648.061291] timeout error, dev nullb0, sector 210552 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.063663] null_blk: rq 000000006c6fa717 timed out
-> [ 1648.063667] timeout error, dev nullb0, sector 378336 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.066011] null_blk: rq 00000000fa856166 timed out
-> [ 1648.066015] null_blk: rq 00000000de9bec9a timed out
-> [ 1648.066016] timeout error, dev nullb0, sector 396344 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.068390] null_blk: rq 00000000f12b4b17 timed out
-> [ 1648.068393] timeout error, dev nullb0, sector 549680 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.071389] null_blk: rq 00000000667726b2 timed out
-> [ 1648.071393] timeout error, dev nullb0, sector 65024 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.073740] null_blk: rq 0000000088f0f903 timed out
-> [ 1648.073744] timeout error, dev nullb0, sector 489408 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.078759] null_blk: rq 00000000fd349776 timed out
-> [ 1648.078762] timeout error, dev nullb0, sector 81840 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.081093] null_blk: rq 000000002eb20dc4 timed out
-> [ 1648.081096] timeout error, dev nullb0, sector 440472 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2
-> [ 1648.083492] null_blk: rq 000000002db4026f timed out
-> [ 1648.083496] null_blk: rq 00000000db8f8be3 timed out
-> [ 1648.083499] null_blk: rq 00000000078a6daf timed out
-> [ 1648.083502] null_blk: rq 000000002c1b7c68 timed out
-> [ 1648.083505] null_blk: rq 00000000790d87a1 timed out
-> [ 1648.083508] null_blk: rq 000000004f48b7de timed out
-> [ 1648.083516] null_blk: rq 0000000074a5ff86 timed out
-> [ 1648.083518] null_blk: rq 000000000daf10f8 timed out
-> [ 1648.083521] null_blk: rq 00000000d54f527e timed out
-> [ 1648.083523] null_blk: rq 0000000009dc7bb8 timed out
-> [ 1648.083526] null_blk: rq 0000000017e81cd2 timed out
-> [ 1648.083529] null_blk: rq 0000000088e83fa2 timed out
-> [ 1648.083532] null_blk: rq 000000003c014afe timed out
-> [ 1648.083534] null_blk: rq 00000000b7a99358 timed out
-> [ 1648.083537] null_blk: rq 00000000d2d80485 timed out
-> [ 1648.083539] null_blk: rq 000000008805db58 timed out
-> [ 1648.083541] null_blk: rq 000000005c2e8f7a timed out
-> [ 1648.083544] null_blk: rq 00000000a33a2f2d timed out
-> [ 1648.083546] null_blk: rq 00000000d05bf454 timed out
-> [ 1648.083549] null_blk: rq 0000000080cb849f timed out
-> [ 1648.083552] null_blk: rq 000000009cbb48e0 timed out
-> [ 1648.083555] null_blk: rq 000000009e426689 timed out
-> [ 1648.083558] null_blk: rq 000000003705d117 timed out
-> [ 1648.083561] null_blk: rq 0000000010bc80b4 timed out
-> [ 1648.083563] null_blk: rq 000000004da816da timed out
-> [ 1648.083566] null_blk: rq 0000000081ceaf3f timed out
-> [ 1648.083568] null_blk: rq 00000000fb1e808e timed out
-> [ 1648.083570] null_blk: rq 000000006baf39c2 timed out
-> [ 1648.083573] null_blk: rq 00000000241e851f timed out
-> [ 1648.083575] null_blk: rq 00000000a7b7ff27 timed out
-> [ 1648.083577] null_blk: rq 0000000092e37377 timed out
-> [ 1648.083580] null_blk: rq 00000000a2b070cd timed out
-> [ 1648.083583] null_blk: rq 00000000a2c63d6f timed out
-> [ 1648.083585] null_blk: rq 00000000b775711d timed out
-> [ 1648.083588] null_blk: rq 000000000bfe50e6 timed out
-> [ 1648.083590] null_blk: rq 000000005c0b7039 timed out
-> [ 1648.083593] null_blk: rq 00000000af60d454 timed out
-> [ 1648.083595] null_blk: rq 00000000d2a38d75 timed out
-> [ 1648.083598] null_blk: rq 0000000000ae81a8 timed out
-> [ 1648.083601] null_blk: rq 000000001974c62a timed out
-> [ 1648.083603] null_blk: rq 000000002aaf80e6 timed out
-> [ 1648.083605] null_blk: rq 00000000bcdf1c85 timed out
-> [ 1648.083608] null_blk: rq 000000008b5d9eb6 timed out
-> [ 1648.083610] null_blk: rq 0000000066fcf345 timed out
-> [ 1648.083613] null_blk: rq 0000000067dc1221 timed out
-> [ 1648.083615] null_blk: rq 0000000088e78508 timed out
-> [ 1648.083618] null_blk: rq 000000009d1352eb timed out
-> [ 1648.083620] null_blk: rq 00000000a7019839 timed out
-> [ 1648.083622] null_blk: rq 00000000f5756a31 timed out
-> [ 1648.083625] null_blk: rq 00000000841b16a6 timed out
-> [ 1648.083627] null_blk: rq 0000000082fa3e11 timed out
-> [ 1648.083630] null_blk: rq 00000000794e9904 timed out
-> [ 1648.083632] null_blk: rq 00000000c3bcf5d1 timed out
-> [ 1648.094395] blk_sync_queue 230
-> [ 1648.094400] blk_sync_queue 232
-> [ 1648.094402] blk_sync_queue 234
-> [ 1648.096130] blk_sync_queue 230
-> [ 1648.096133] blk_sync_queue 232
-> [ 1648.096135] blk_sync_queue 234
-> NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-> sda       8:0    0   50G  0 disk 
-> ├─sda1    8:1    0    1G  0 part /boot
-> └─sda2    8:2    0   49G  0 part /home
-> sdb       8:16   0  100G  0 disk /mnt/data
-> sr0      11:0    1 1024M  0 rom  
-> zram0   251:0    0    8G  0 disk [SWAP]
-> ---
->  drivers/block/null_blk/main.c     | 90 +++++++++++++++++++++++++++++--
->  drivers/block/null_blk/null_blk.h | 10 ++++
->  2 files changed, 97 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 1f154f92f4c2..52db6b99b448 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -77,6 +77,10 @@ enum {
->  	NULL_IRQ_TIMER		= 2,
->  };
->  
-> +static unsigned int g_rq_abort_limit = 5;
-> +module_param_named(rq_abort_limit, g_rq_abort_limit, uint, 0644);
-> +MODULE_PARM_DESC(rq_abort_limit, "request timeout teardown limit. Default:5");
-> +
->  static bool g_virt_boundary = false;
->  module_param_named(virt_boundary, g_virt_boundary, bool, 0444);
->  MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the device. Default: False");
-> @@ -247,6 +251,7 @@ static void null_del_dev(struct nullb *nullb);
->  static int null_add_dev(struct nullb_device *dev);
->  static struct nullb *null_find_dev_by_name(const char *name);
->  static void null_free_device_storage(struct nullb_device *dev, bool is_cache);
-> +static void null_destroy_dev(struct nullb *nullb);
->  
->  static inline struct nullb_device *to_nullb_device(struct config_item *item)
->  {
-> @@ -578,6 +583,18 @@ config_item *nullb_group_make_item(struct config_group *group, const char *name)
->  {
->  	struct nullb_device *dev;
->  
-> +	if (g_rq_abort_limit) {
-> +		/*
-> +		 * abort_on_timeout removes the null_blk and resources. When
-> +		 * null_blk is created using configfs entry by user we will also
-> +		 * need to cleanup the those entries when abort_on_timeout is set
-> +		 * from null_abort_work() and that we shold not do it, since
-> +		 * manupulating user's entries from kernel can create confusion,
-> +		 * so just don't allow it.
-> +		 */
-> +		pr_err("don't use g_abort_on_timeout with configfs entries\n");
-> +		return ERR_PTR(-EINVAL);
-> +	}
->  	if (null_find_dev_by_name(name))
->  		return ERR_PTR(-EEXIST);
->  
-> @@ -614,7 +631,7 @@ static ssize_t memb_group_features_show(struct config_item *item, char *page)
->  			"poll_queues,power,queue_mode,shared_tag_bitmap,size,"
->  			"submit_queues,use_per_node_hctx,virt_boundary,zoned,"
->  			"zone_capacity,zone_max_active,zone_max_open,"
-> -			"zone_nr_conv,zone_size\n");
-> +			"zone_nr_conv,zone_size,abort_on_timeout,rq_abort_limit\n");
->  }
->  
->  CONFIGFS_ATTR_RO(memb_group_, features);
-> @@ -1609,10 +1626,60 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
->  	return nr;
->  }
->  
-> +static bool null_cancel_request(struct request *rq, void *data)
-> +{
-> +	struct nullb_cmd *cmd = blk_mq_rq_to_pdu(rq);
-> +
-> +	/*
-> +	 * Keep it simple and set the timeout error since we've been schedule
-> +	 * from timeout handler afterall.
-> +	 */
-> +	cmd->error = BLK_STS_TIMEOUT;
-> +	if (blk_mq_request_started(rq) && !blk_mq_request_completed(rq))
-> +		blk_mq_complete_request(rq);
-> +	return true;
-> +}
-> +
-> +static void null_abort_work(struct work_struct *w)
-> +{
-> +	struct nullb *nullb = container_of(w, struct nullb, abort_work);
-> +
-> +	mutex_lock(&lock);
-> +	if (!nullb || !nullb->dev)
-> +		goto unlock;
-> +
-> +	/*
-> +	 * To make sure that null_handle_cmd() callers are not in progress from
-> +	 * null_queue_rq()/null_submit_bio() when we are stopping nullb, we
-> +	 * quiece the block layer request queue and engage in teardown sequence.
-> +	 */
-> +	blk_freeze_queue_start(nullb->q);
-> +	blk_mq_quiesce_queue(nullb->q);
-> +	/*
-> +	 * We already ensured that submit_bio() will not add any plugging by
-> +	 * quiescing so it is safe to sync queue now.
-> +	 */
-> +	blk_sync_queue(nullb->q);
-> +	blk_mq_tagset_busy_iter(nullb->tag_set, null_cancel_request, nullb);
-> +	blk_mq_tagset_wait_completed_request(nullb->tag_set);
-> +	/*
-> +	 * Unblock any pending dispatch I/Os before we destroy the device.
-> +	 * From null_destroy_dev()->del_gendisk() will set GD_DEAD flag
-> +	 * causing any new I/O from __bio_queue_enter() to fail with -ENODEV.
-> +	 */
-> +	blk_mq_unquiesce_queue(nullb->q);
-> +
-> +	null_destroy_dev(nullb);
-
-destroying device is never good cleanup for handling timeout/abort, and it
-should have been the last straw any time.
-
-
-thanks, 
-Ming
-
+DQo+PiArCS8qDQo+PiArCSAqIFVuYmxvY2sgYW55IHBlbmRpbmcgZGlzcGF0Y2ggSS9PcyBiZWZv
+cmUgd2UgZGVzdHJveSB0aGUgZGV2aWNlLg0KPj4gKwkgKiBGcm9tIG51bGxfZGVzdHJveV9kZXYo
+KS0+ZGVsX2dlbmRpc2soKSB3aWxsIHNldCBHRF9ERUFEIGZsYWcNCj4+ICsJICogY2F1c2luZyBh
+bnkgbmV3IEkvTyBmcm9tIF9fYmlvX3F1ZXVlX2VudGVyKCkgdG8gZmFpbCB3aXRoIC1FTk9ERVYu
+DQo+PiArCSAqLw0KPj4gKwlibGtfbXFfdW5xdWllc2NlX3F1ZXVlKG51bGxiLT5xKTsNCj4+ICsN
+Cj4+ICsJbnVsbF9kZXN0cm95X2RldihudWxsYik7DQo+IA0KPiBkZXN0cm95aW5nIGRldmljZSBp
+cyBuZXZlciBnb29kIGNsZWFudXAgZm9yIGhhbmRsaW5nIHRpbWVvdXQvYWJvcnQsIGFuZCBpdA0K
+PiBzaG91bGQgaGF2ZSBiZWVuIHRoZSBsYXN0IHN0cmF3IGFueSB0aW1lLg0KPiANCg0KVGhhdCBp
+cyBleGFjdGx5IHdoeSBJJ3ZlIGFkZGVkIHRoZSBycV9hYm9ydF9saW1pdCwgc28gdW50aWwgdGhl
+IGxpbWl0DQppcyBub3QgcmVhY2hlZCBudWxsX2Fib3J0X3dvcmsoKSB3aWxsIG5vdCBnZXQgc2No
+ZWR1bGVkIGFuZCBkZXZpY2UgaXMNCm5vdCBkZXN0cm95ZWQuDQoNCi1jaw0KDQo=
