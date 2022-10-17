@@ -2,50 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BF3C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 06:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B516FC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 06:31:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230100AbiJQGJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 02:09:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36432 "EHLO
+        id S229646AbiJQGbW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 02:31:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiJQGJ5 (ORCPT
+        with ESMTP id S230048AbiJQGbV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 02:09:57 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233212A961;
-        Sun, 16 Oct 2022 23:09:54 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 665D168BFE; Mon, 17 Oct 2022 08:09:51 +0200 (CEST)
-Date:   Mon, 17 Oct 2022 08:09:51 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Joel Colledge <joel.colledge@linbit.com>
-Subject: Re: [PATCH] drbd: only clone bio if we have a backing device
-Message-ID: <20221017060951.GA28409@lst.de>
-References: <20221013135352.933875-1-christoph.boehmwalder@linbit.com>
+        Mon, 17 Oct 2022 02:31:21 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A3C5724F;
+        Sun, 16 Oct 2022 23:31:19 -0700 (PDT)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MrRph3HC9z1P7fB;
+        Mon, 17 Oct 2022 14:26:36 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by canpemm500010.china.huawei.com
+ (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 17 Oct
+ 2022 14:31:16 +0800
+From:   Ye Bin <yebin10@huawei.com>
+To:     <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
+        <linux-block@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, Ye Bin <yebin10@huawei.com>
+Subject: [PATCH -next 1/3] blktrace: introduce 'blk_trace_swicth_state' helper
+Date:   Mon, 17 Oct 2022 14:53:19 +0800
+Message-ID: <20221017065321.2846017-2-yebin10@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221017065321.2846017-1-yebin10@huawei.com>
+References: <20221017065321.2846017-1-yebin10@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221013135352.933875-1-christoph.boehmwalder@linbit.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 13, 2022 at 03:53:52PM +0200, Christoph Böhmwalder wrote:
-> +	if (get_ldev(device)) {
-> +		req->private_bio = bio_alloc_clone(device->ldev->backing_bdev,
-> +						   bio, GFP_NOIO, &drbd_io_bio_set);
+Introduce 'blk_trace_swicth_state' helper. No functional changed.
 
-This adds an overly long line.
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ kernel/trace/blktrace.c | 74 ++++++++++++++++++++---------------------
+ 1 file changed, 36 insertions(+), 38 deletions(-)
 
-Otherwise looks good:
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 7f5eb295fe19..edd83e213580 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -353,6 +353,39 @@ static void blk_trace_cleanup(struct request_queue *q, struct blk_trace *bt)
+ 	put_probe_ref();
+ }
+ 
++static int blk_trace_switch_state(struct blk_trace *bt, int start)
++{
++	/*
++	 * For starting a trace, we can transition from a setup or stopped
++	 * trace. For stopping a trace, the state must be running
++	 */
++	if (start) {
++		if (bt->trace_state == Blktrace_setup ||
++		    bt->trace_state == Blktrace_stopped) {
++			blktrace_seq++;
++			smp_mb();
++			bt->trace_state = Blktrace_running;
++			raw_spin_lock_irq(&running_trace_lock);
++			list_add(&bt->running_list, &running_trace_list);
++			raw_spin_unlock_irq(&running_trace_lock);
++
++			trace_note_time(bt);
++			return 0;
++		}
++	} else {
++		if (bt->trace_state == Blktrace_running) {
++			bt->trace_state = Blktrace_stopped;
++			raw_spin_lock_irq(&running_trace_lock);
++			list_del_init(&bt->running_list);
++			raw_spin_unlock_irq(&running_trace_lock);
++			relay_flush(bt->rchan);
++			return 0;
++		}
++	}
++
++	return -EINVAL;
++}
++
+ static int __blk_trace_remove(struct request_queue *q)
+ {
+ 	struct blk_trace *bt;
+@@ -658,7 +691,6 @@ static int compat_blk_trace_setup(struct request_queue *q, char *name,
+ 
+ static int __blk_trace_startstop(struct request_queue *q, int start)
+ {
+-	int ret;
+ 	struct blk_trace *bt;
+ 
+ 	bt = rcu_dereference_protected(q->blk_trace,
+@@ -666,36 +698,7 @@ static int __blk_trace_startstop(struct request_queue *q, int start)
+ 	if (bt == NULL)
+ 		return -EINVAL;
+ 
+-	/*
+-	 * For starting a trace, we can transition from a setup or stopped
+-	 * trace. For stopping a trace, the state must be running
+-	 */
+-	ret = -EINVAL;
+-	if (start) {
+-		if (bt->trace_state == Blktrace_setup ||
+-		    bt->trace_state == Blktrace_stopped) {
+-			blktrace_seq++;
+-			smp_mb();
+-			bt->trace_state = Blktrace_running;
+-			raw_spin_lock_irq(&running_trace_lock);
+-			list_add(&bt->running_list, &running_trace_list);
+-			raw_spin_unlock_irq(&running_trace_lock);
+-
+-			trace_note_time(bt);
+-			ret = 0;
+-		}
+-	} else {
+-		if (bt->trace_state == Blktrace_running) {
+-			bt->trace_state = Blktrace_stopped;
+-			raw_spin_lock_irq(&running_trace_lock);
+-			list_del_init(&bt->running_list);
+-			raw_spin_unlock_irq(&running_trace_lock);
+-			relay_flush(bt->rchan);
+-			ret = 0;
+-		}
+-	}
+-
+-	return ret;
++	return blk_trace_switch_state(bt, start);
+ }
+ 
+ int blk_trace_startstop(struct request_queue *q, int start)
+@@ -1614,13 +1617,8 @@ static int blk_trace_remove_queue(struct request_queue *q)
+ 	if (bt == NULL)
+ 		return -EINVAL;
+ 
+-	if (bt->trace_state == Blktrace_running) {
+-		bt->trace_state = Blktrace_stopped;
+-		raw_spin_lock_irq(&running_trace_lock);
+-		list_del_init(&bt->running_list);
+-		raw_spin_unlock_irq(&running_trace_lock);
+-		relay_flush(bt->rchan);
+-	}
++	if (bt->trace_state == Blktrace_running)
++		blk_trace_switch_state(bt, 0);
+ 
+ 	put_probe_ref();
+ 	synchronize_rcu();
+-- 
+2.31.1
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
