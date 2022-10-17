@@ -2,94 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2854EC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 03:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFA9C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 05:22:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbiJQDiV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Oct 2022 23:38:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35502 "EHLO
+        id S229849AbiJQFWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 01:22:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232469AbiJQDiS (ORCPT
+        with ESMTP id S229660AbiJQFWS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Oct 2022 23:38:18 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510964F67C;
-        Sun, 16 Oct 2022 20:38:16 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MrN1j4X5fzKFXS;
-        Mon, 17 Oct 2022 11:35:53 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgDn58kkzkxjf2KXAQ--.50937S3;
-        Mon, 17 Oct 2022 11:38:14 +0800 (CST)
+        Mon, 17 Oct 2022 01:22:18 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C5BF52FC6;
+        Sun, 16 Oct 2022 22:22:18 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id b2so9785320plc.7;
+        Sun, 16 Oct 2022 22:22:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n6gkSgz4A9z/u94pPmICvWvMxMQ4nQAtTsf/oOCb+8c=;
+        b=CyvNHlbs8X4uyOyXboay6cgqPtwFRTrsDruX49GQ2fTVAYDMeOl8aElHLD/0nz36Kt
+         cCMu4VbmvxRwBM/HoQbyNaw9YyZOrhojdE4IqkEE0M7zHFkqDYnX/+ZBpwDk+GdNkTaJ
+         Q2PARvllzsMMt7rfaW8raXCspOE7nxPo/R7QCOlSn2JD6Bt4EOGvANghyXmkDVzkxxZn
+         sJPn0PYY4Svg5HIyT3dEg4hhLuxSUp0bV+25do89W+W8hOcydoZGqyUCn0iIuHb8FKEf
+         im/nARWTu8QDB8MSQ2utciLERope4n0iUBiaqR25a92bkIY8REA1YSvzXqINLKry/thA
+         apuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=n6gkSgz4A9z/u94pPmICvWvMxMQ4nQAtTsf/oOCb+8c=;
+        b=LFW0u08aqgfpBfTP1DyfgPTpw5z8/NXrLDjCuLjYCwnpo+SyNVHxIm6Rw+c82RPeTm
+         IOQ8senjdrGKoTnlvBGrjeIAl3dZZ4k6gnytTVV5LtoRTXlyHUlFOOs01zdc4ZZSBjq0
+         au6umMYe2fUceXTrWEUqTUBbS09yF9KT7PSidw/RSguJc8dIYB6zjL3EeeMDP09fcplH
+         f3nS1CqhtjrwCpOgltjyWy0k56Z9jd9jmLOKtgO5TJHUPqQlcgLrGuadLPAX5sp404q4
+         HsmcDIUI+PpXS45Ao/Icfha/MxHCyNn3SgdzOSXuMMnUz+iz5tBCZ5mrL3QpYd3GSe/y
+         pTIw==
+X-Gm-Message-State: ACrzQf1f/akxI6RuvjiDlLb/D24nNbMGb2oBswQSg31sN+V/WZEd091V
+        BuAC7kAtksYGptCVZJGJxRI=
+X-Google-Smtp-Source: AMsMyM6w+afqOX66jIFzfpn1e5GkaAhZt6Z7/jnHXbeTqUo/fhMbUjz3ilcOP4oaUO6P5/JrVYAZaw==
+X-Received: by 2002:a17:902:d4c3:b0:185:4c1f:7457 with SMTP id o3-20020a170902d4c300b001854c1f7457mr8907285plg.117.1665984137442;
+        Sun, 16 Oct 2022 22:22:17 -0700 (PDT)
+Received: from [10.114.96.48] ([129.227.152.6])
+        by smtp.gmail.com with ESMTPSA id e19-20020a170902ed9300b00173411a4385sm5639849plj.43.2022.10.16.22.22.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 16 Oct 2022 22:22:16 -0700 (PDT)
+Message-ID: <b760f3ab-3833-3651-24a0-ab0aea5304b7@gmail.com>
+Date:   Mon, 17 Oct 2022 13:22:12 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
 Subject: Re: [RESEND PATCH] block, bfq: remove unused variable for bfq_queue
-To:     Yuwei Guan <ssawgyw@gmail.com>, paolo.valente@linaro.org,
+To:     Yu Kuai <yukuai1@huaweicloud.com>, paolo.valente@linaro.org,
         axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
 References: <20221017032019.101-1-Yuwei.Guan@zeekrlife.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <98809bee-a5d6-d7c0-7229-4a74c6eec67f@huaweicloud.com>
-Date:   Mon, 17 Oct 2022 11:38:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20221017032019.101-1-Yuwei.Guan@zeekrlife.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+ <98809bee-a5d6-d7c0-7229-4a74c6eec67f@huaweicloud.com>
+From:   Yuwei Guan <ssawgyw@gmail.com>
+In-Reply-To: <98809bee-a5d6-d7c0-7229-4a74c6eec67f@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgDn58kkzkxjf2KXAQ--.50937S3
-X-Coremail-Antispam: 1UD129KBjvdXoWrtF1UXry5Xw18Jry3GF1ftFb_yoWfCFb_J3
-        4vy34fCF4DGw4kXF4ft345ArWYy3y3AF97GFn8GF4UWa45A3Z3Awn7t34UWFsxZa9xGa1Y
-        vrWDZ3yftr1vkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbzAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-        Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-�� 2022/10/17 11:20, Yuwei Guan д��:
-> it defined in d0edc2473be9d, but there's nowhere to use it,
-> so remove it.
-> 
-> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-> Acked-by: Paolo Valente <paolo.valente@linaro.org>
-> ---
->   block/bfq-iosched.h | 3 ---
->   1 file changed, 3 deletions(-)
-> 
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 64ee618064ba..6bcef8e5871a 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -369,11 +369,8 @@ struct bfq_queue {
->   	unsigned long split_time; /* time of last split */
->   
->   	unsigned long first_IO_time; /* time of first I/O for this queue */
-> -
->   	unsigned long creation_time; /* when this queue is created */
->   
-> -	/* max service rate measured so far */
-> -	u32 max_service_rate;
->   
+On 2022/10/17 11:38, Yu Kuai wrote:
+> Hi,
+>
+> 在 2022/10/17 11:20, Yuwei Guan 写道:
+>> it defined in d0edc2473be9d, but there's nowhere to use it,
+>> so remove it.
+>>
+>> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
+>> Acked-by: Paolo Valente <paolo.valente@linaro.org>
+>> ---
+>>   block/bfq-iosched.h | 3 ---
+>>   1 file changed, 3 deletions(-)
+>>
+>> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+>> index 64ee618064ba..6bcef8e5871a 100644
+>> --- a/block/bfq-iosched.h
+>> +++ b/block/bfq-iosched.h
+>> @@ -369,11 +369,8 @@ struct bfq_queue {
+>>       unsigned long split_time; /* time of last split */
+>>         unsigned long first_IO_time; /* time of first I/O for this 
+>> queue */
+>> -
+>>       unsigned long creation_time; /* when this queue is created */
+>>   -    /* max service rate measured so far */
+>> -    u32 max_service_rate;
+>
+> You left two blank lines here. Have you tried checkpatch?
+>
+> Thanks,
+> Kuai
 
-You left two blank lines here. Have you tried checkpatch?
+Hi Kuai,
 
-Thanks,
-Kuai
->   	/*
->   	 * Pointer to the waker queue for this queue, i.e., to the
-> 
+I checked it with checkpatch.pl, but 0 errors, 0 warnings.
 
+I will delete one blank line, then resend it.
+
+>>       /*
+>>        * Pointer to the waker queue for this queue, i.e., to the
+>>
+>
