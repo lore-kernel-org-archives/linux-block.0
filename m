@@ -2,79 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 393DFC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 19:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A6CC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 19:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbiJQTKF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 15:10:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51724 "EHLO
+        id S230064AbiJQTPn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 15:15:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiJQTKE (ORCPT
+        with ESMTP id S230150AbiJQTPm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 15:10:04 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 780A74DB2A;
-        Mon, 17 Oct 2022 12:10:02 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id o9-20020a17090a0a0900b0020ad4e758b3so11835704pjo.4;
-        Mon, 17 Oct 2022 12:10:02 -0700 (PDT)
+        Mon, 17 Oct 2022 15:15:42 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3640C3DBC4;
+        Mon, 17 Oct 2022 12:15:42 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id n7so11685315plp.1;
+        Mon, 17 Oct 2022 12:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UXrfwd7gNNvp6Yt0u4EpnteM52pQoIrwendRXuTj8qA=;
-        b=Gqwr/qM5+4KYPFkY8CojJXd7D+89eVRg2YLwqL8DjIi3ZuNtRJzHGHJ7KNq/36CeVv
-         bPUInVg0M5GTiPmYCniBiN2XmXcv/380eB7YqB6rAF2JjDbt5/O+Hb5VDrgicRL13OyE
-         YHOS5C9K+vKjUq0f+qNY42yz2rm93XViAVhNuP49PLPu0p96/NCMllFLu5BkP33DoBdO
-         cYx7a4GcWYTRts3fzJm1WG6E3wkfLWw0q9yL1WnNMc8HgavnaqKswnNWgXeaMQke594j
-         QCJWMZKxNFhawpOmZy6ahjRoQPeCfSfjpXeJ3LL4ESqJf+DaUw7/tDm3uIlpQOPAIVRS
-         bASw==
+        bh=jYQqkn4Z7pKMP3VJb1HX2oe2GpNgJO0E7bDKNOoYtIE=;
+        b=TPN7z+1mH6FaSYcRjIy1CQQSIt5z8vj1Tle8p8G6umvRw+WQOFyYd8mYhw/EcxgIsF
+         vgisJtlzCmLBDI0+8V+/gRYV9fC0WzT7lsz6LYUvbvR+F72s4LGohEmCW4VAzviotxc8
+         6VYSHMhzMRJNMi7NHCg36Dj5UtfiTDkpt95xuV18Ak7aIjDzMHSsCe+xJWA6Q2wqLp4o
+         fxMHLwTBfcsY6fF9PE9SEmZrqoKFlxCL0GGQT/QIgM0Z8AZseEU/YrOO+jICs6b4qz9m
+         TwfKBv9JC6cQPTkYOSMTRwZKSVL280JKetKKJqv/gWOuBouMXDAlxOejxGe9qwtx3m7H
+         FDaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UXrfwd7gNNvp6Yt0u4EpnteM52pQoIrwendRXuTj8qA=;
-        b=C4X2xyRpUBAhFXGLNWQmfaO5wpN0DQXxXG4O3cNFM0GVOekWQcAJlh/pWCI6YjYflp
-         Z9ET/gv7XUDeD7olwiuH/1IgD+3NdbVrpTwKzJFS1etJoJlpf6vLrhLQIb/b6g6zi3L8
-         0pEcxQnllFUGPSt8y8NO5nmtEUt0NDHMIYPOQ23sRA3Cx2pRVM+3hy2/osH8pHvT+QQb
-         EyLNwByHJH/nWBKLwQJHS8nzOns1Km8hvdji4AqIKYYk7KW8XIfC4EqvwwmUygWIE1jo
-         Bpi/ykGRsnEpSdny/uNysOTPbuD3zfBEZeX+f19WnLInlxE6NXRFcRVyLt5O7M+OAweU
-         g4/A==
-X-Gm-Message-State: ACrzQf2rKSVbEdl8cZWAsbQADGODiEovcyaqK/Ze6gTlfsXwreblps/P
-        8g1SGT2+ZI4qhL+i3dZ7E3k=
-X-Google-Smtp-Source: AMsMyM4DTGBEwZH1kzFjjyuQypER81cfpdxfRrvj/nuz3d3N43HZoEzdyeAVB6hHSP5Q/tdg9MMS9g==
-X-Received: by 2002:a17:903:245:b0:178:e0ba:e507 with SMTP id j5-20020a170903024500b00178e0bae507mr13698271plh.115.1666033801850;
-        Mon, 17 Oct 2022 12:10:01 -0700 (PDT)
+        bh=jYQqkn4Z7pKMP3VJb1HX2oe2GpNgJO0E7bDKNOoYtIE=;
+        b=dZCJ4xob+KJ1YoSm/uxlI6DO7bBiAb5jap06CUey8N7h0ct3es8QFTUAYRV3zjACCj
+         Ypxit6of0ucSh355Lzf9bFY8LfZbrm6YAmzq/RjS68LjeSUWxWPBmyf+6fF9WrtYi7zU
+         AlkOu2mQhXnDoE/NwfJyG97qoWglitoCBcWw0qP3UW34jRDy2NCLh10uEWApOoN1yUjd
+         GNzSLhcQ13fzMBtK8QKZLogbOi6mow2tlB2tL18H6HoqVEwTHgNL+L4Wr2n4EchyftvH
+         mkXBundc50RZ4hVUc8qn5SLSQrltLoA8ZPcowWBCZYNOAt6piKOlnnhfqkWdHIe2zCzY
+         W+6w==
+X-Gm-Message-State: ACrzQf0VKyDN1WFOwGk1ZkF4pDrm71womdUKFwF/RMEkRO2FJb/YR8sv
+        YgsqkRMJ7XfQGpA4C469nNODH5OvNlfCoQ==
+X-Google-Smtp-Source: AMsMyM7zwjDrT1QdJLHBEh0N/xEdJto3b07NPFrCmaAcVvUQZNzbAmlidfRdShChWxs4WVtlbGhzkw==
+X-Received: by 2002:a17:90a:6e09:b0:20d:86b2:4c54 with SMTP id b9-20020a17090a6e0900b0020d86b24c54mr15267460pjk.73.1666034141597;
+        Mon, 17 Oct 2022 12:15:41 -0700 (PDT)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id 21-20020a631855000000b00462ae17a1c4sm6479293pgy.33.2022.10.17.12.10.01
+        by smtp.gmail.com with ESMTPSA id f15-20020a170902684f00b00176b0dec886sm6978459pln.58.2022.10.17.12.15.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Oct 2022 12:10:01 -0700 (PDT)
+        Mon, 17 Oct 2022 12:15:41 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 17 Oct 2022 09:10:00 -1000
+Date:   Mon, 17 Oct 2022 09:15:39 -1000
 From:   Tejun Heo <tj@kernel.org>
 To:     Kemeng Shi <shikemeng@huawei.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/8] blk-iocost: Correct comment in blk_iocost_init
-Message-ID: <Y02oiFyRJiFm13cL@slm.duckdns.org>
+Subject: Re: [PATCH 6/8] blk-iocost: Avoid to call current_hweight_max if
+ iocg->inuse == iocg->active
+Message-ID: <Y02p23KdUZfkYyzI@slm.duckdns.org>
 References: <20221017020011.25016-1-shikemeng@huawei.com>
- <20221017020011.25016-6-shikemeng@huawei.com>
+ <20221017020011.25016-7-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221017020011.25016-6-shikemeng@huawei.com>
+In-Reply-To: <20221017020011.25016-7-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 10:00:08AM +0800, Kemeng Shi wrote:
-> There is no iocg_pd_init function. The pd_alloc_fn function pointer of
-> iocost policy is set with ioc_pd_init. Just correct it.
+On Mon, Oct 17, 2022 at 10:00:09AM +0800, Kemeng Shi wrote:
+> The old_hwi is already max hweight_inuse if iocg->inuse == iocg->active.
+> Remove unnecessary calculation.
 > 
 > Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+> ---
+>  block/blk-iocost.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 96c1571a8a1d..fa90f471dfdc 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -2299,7 +2299,10 @@ static void ioc_timer_fn(struct timer_list *timer)
+>  			 * Determine the donation amount.
+>  			 */
+>  			current_hweight(iocg, &hwa, &old_hwi);
+> -			hwm = current_hweight_max(iocg);
+> +			if (iocg->inuse == iocg->active)
+> +				hwm = old_hwi;
+> +			else
+> +				hwm = current_hweight_max(iocg);
 
-Acked-by: Tejun Heo <tj@kernel.org>
+I don't think this is correct. The intermediate nodes might be donating.
+This also isn't a meaningful optimization given that it's in the cold
+periodic timer path. I'd much rather keep the code simpler unless the
+performance benfeit can be clearly demonstrated.
 
 Thanks.
 
