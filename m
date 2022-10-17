@@ -2,56 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF44C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 07:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0EBC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 07:47:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbiJQHr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 03:47:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47760 "EHLO
+        id S230029AbiJQHrn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 03:47:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230062AbiJQHrY (ORCPT
+        with ESMTP id S229916AbiJQHrn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 03:47:24 -0400
+        Mon, 17 Oct 2022 03:47:43 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BF55193ED;
-        Mon, 17 Oct 2022 00:47:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83EBF5300B
+        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 00:47:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=N3DhelgxeJD6609Ma0kcmpLW0VW7ci1zuKd0emkDasI=; b=4fQDVYDXyHEvBhehq1JK9VdDW0
-        R3tMd/QDPEtKsjFGyFUg5svkVWeas3otDLcoY5ADt9NTdCDdXhQyvOSW0DiE+Ha40wEVm/WfkzT/P
-        2ch6qZHi1dMjetjJmmIpImeTfa6H8ZZIkQJ5A7xdpLLo5NXFdAN8dqifLlAyZKASYGEEnlfL06jmG
-        yElmdEt09/1MHOslxcYuYYBVYM/zyj4Cb8W/6WUxoR+nYxhbg+dlVS3nz2/T4FBe6Pb/3hYyNRHvI
-        3YHeorVPSs9m3r3Mfq/GgQdazSE7bATFMgq6NUCBUwMIZHJOLAuHVUoWLH3zLEoaYTfJ2ti5bhaI7
-        9m8SZYMg==;
+        bh=97dQH1N2xHtpMxxG0nDV8SAuoMet2OPAMXZD917IpZM=; b=z039A3vITwRWuA1HXZgeBYakBD
+        7xC4neQ7EcXvQeb8NQ4CKQheW7COtTUTjtJjiid/MrmHsrRXn5fV8FwEa5m6URB8vB7R2djetc20h
+        YyH/FDaZMV2T9ObJrQ75QK2FkLzhpugsG443Rj7PiY5GRjQfuPNzPi3kvZjozTfX+hI9kpM6zpgqK
+        Cqn0Xv0UN1AsE9RqdcVQw8L1S4s7k4cOzw43GtwSLqLLM3RhZtEnBs46N3P9A3PFFP15BsGyDe4AO
+        Wgs8sV6z6uPXYHtRRbsUKhkIpRp7oFpozsR2zvEniq9RK6vGgjME5VupY1c7u2HdtJuQJYb5GAfte
+        30EJC4Xg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1okKqE-008bBK-57; Mon, 17 Oct 2022 07:47:18 +0000
-Date:   Mon, 17 Oct 2022 00:47:18 -0700
+        id 1okKqZ-008bH4-DG; Mon, 17 Oct 2022 07:47:39 +0000
+Date:   Mon, 17 Oct 2022 00:47:39 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Dawei Li <set_pte_at@outlook.com>
-Cc:     axboe@kernel.dk, tj@kernel.org, paolo.valente@linaro.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: Add helper for queue_flags bit test
-Message-ID: <Y00IhghhGgVQBknL@infradead.org>
-References: <20221011145246.8656-1-set_pte_at@outlook.com>
- <TYCP286MB232392B1D23662DE81B0D2D5CA239@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     hare@suse.de, shinichiro.kawasaki@wdc.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] tests/nvme: set hostnqn after hostid uuidgen
+Message-ID: <Y00Im55493i+BWBi@infradead.org>
+References: <20221011174325.311286-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <TYCP286MB232392B1D23662DE81B0D2D5CA239@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+In-Reply-To: <20221011174325.311286-1-yi.zhang@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->  	if (op_is_flush(bio->bi_opf) &&
-> -	    !test_bit(QUEUE_FLAG_WC, &q->queue_flags)) {
-> +		!blk_queue_wb_cached(q)) {
-
-The formatting is wrong here.  And I really think these helpers do
-nothing but obsfucating the code.  Now instead of a grep telling
-me exactly what is going on I now need to walk through the macro
-first.  (nevermind that this particular one is also horribly misnamed).
+Please explain why here.
 
