@@ -2,53 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 976C2C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 15:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D54B4C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 16:17:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbiJQPbM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 11:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33166 "EHLO
+        id S230121AbiJQQRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 12:17:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230228AbiJQPbL (ORCPT
+        with ESMTP id S229669AbiJQQRC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 11:31:11 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E76A13F1F
-        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 08:31:09 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 5514B68C4E; Mon, 17 Oct 2022 17:31:05 +0200 (CEST)
-Date:   Mon, 17 Oct 2022 17:31:05 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Paul E. McKenney" <paulmck@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>,
+        Mon, 17 Oct 2022 12:17:02 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BF96C112;
+        Mon, 17 Oct 2022 09:17:01 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id s20so18265655lfi.11;
+        Mon, 17 Oct 2022 09:17:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rak2jXyVCxsu9w36iXtNJY2CyxL6z5W907r16DRdiwI=;
+        b=qj3B3/oU2nQdqq2/EcGkEys8V2zPRYKApYztZr1sDPMYN5/CrNBtG7eB/6Ji3jIBBZ
+         gIwmtUxbvubxV6rNRe66HkTwWZHR/5tGnjaB4VssHYmLTanlCxnY+c2+D14TEexwHjfs
+         oqP1Z56YT0KnmfPy/0V2VoRxK4ljmlWedjGvrg/DQVrbKRMX8UPqSJzUfFqWls1Cwzuh
+         2ICcU7flL1ktzlxt+Pn3BgCrK93edMP4Z0xs/de9TkUZqQg5nrKxRrPyuIudn93F0ilU
+         xr7gvfQ/0CgO3WwdLQ0wXuaDMJCtOp9nATXbbwxWuoH0omfnDm2D7ko6sOp5bettvNO4
+         LhWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rak2jXyVCxsu9w36iXtNJY2CyxL6z5W907r16DRdiwI=;
+        b=MFvQyhnn9Ya3y4OOqxRhGS/r25e35YtV9cuZ6ReEAjhmLXd7R6/t6tS8RynQF7r8Js
+         5QF2cni+I8hoVtWRT1hMWStAHqwsDVj4cDzA/1rbTloM4e6m0WmVSQwaozmKHnH1G5aW
+         7pHL5AbA9KGOMZ9arZVtwZ7OqEIR0QBSvkeO19nrf+fltIsNsQxHBQWqt8nYgk8uexgg
+         o1L/NkKoQ8Ml+BfIH1tFQHBA1yLdhfCXj4ctMuOQLF+SwUd2nn4zVmiUQ+YYhOE7j3BD
+         TG0WyGcmAIYBzfuXuWNzVDPi0RvvrteB0tHaKu5DVRYv6ehaaFPBJatOax/OftOwLXoU
+         wgnQ==
+X-Gm-Message-State: ACrzQf1iVXHEYeeY95bjV0Oe8/jBBhB4znvZO2YeCCqOf1O/6XmdgmTl
+        qUoeBB0BgzVAozP2ovZvgmA=
+X-Google-Smtp-Source: AMsMyM7rH16sORrYUdovJN8ltutGjWM1TqM0J/X0Vt6B0RjtC0AlAtQyoO0LT81uFeRNEmMZRtvaYQ==
+X-Received: by 2002:a05:6512:3247:b0:4a2:8dc4:3889 with SMTP id c7-20020a056512324700b004a28dc43889mr3983880lfr.410.1666023419345;
+        Mon, 17 Oct 2022 09:16:59 -0700 (PDT)
+Received: from mobilestation ([95.79.133.202])
+        by smtp.gmail.com with ESMTPSA id w6-20020a05651204c600b0049ae3ed42e8sm1482468lfq.180.2022.10.17.09.16.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Oct 2022 09:16:58 -0700 (PDT)
+Date:   Mon, 17 Oct 2022 19:16:56 +0300
+From:   Serge Semin <fancer.lancer@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        sagi@grimberg.me, kbusch@kernel.org, ming.lei@redhat.com,
-        axboe@kernel.dk
-Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
-Message-ID: <20221017153105.GA32509@lst.de>
-References: <20221013094450.5947-1-lengchao@huawei.com> <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de> <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] nvme-hwmon: Kmalloc the NVME SMART log buffer
+Message-ID: <20221017161656.hzmsgqpuvqpmriqs@mobilestation>
+References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru>
+ <20220929224648.8997-3-Sergey.Semin@baikalelectronics.ru>
+ <20221017071832.GB30661@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20221017071832.GB30661@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 08:21:36AM -0700, Paul E. McKenney wrote:
-> The main reason for having multiple srcu_struct structures is to
-> prevent the readers from one from holding up the updaters from another.
-> Except that by waiting for the multiple grace periods, you are losing
-> that property anyway, correct?  Or is this code waiting on only a small
-> fraction of the srcu_struct structures associated with blk_queue?
+Hello Christoph
 
-There are a few places that do this.  SCSI and MMC could probably switch
-to this scheme or at least and open coded version of it (if we move
-to a per_tagsect srcu_struct open coding it might be a better idea
-anyway).
+On Mon, Oct 17, 2022 at 09:18:32AM +0200, Christoph Hellwig wrote:
+> Thanks,
+> 
+> applied to nvme-6.1.
 
-del_gendisk is one where we have to go one queue at a time, and
-that might actually matter for a device removal.  elevator_switch
-is another one, there is a variant for it that works on the whole
-tagset, but also those that don't.
+Please note the applied patch doesn't comply with the Keith' notes
+Link: https://lore.kernel.org/linux-nvme/YzxueNRODpry8L0%2F@kbusch-mbp.dhcp.thefacebook.com/
+Meanwhile without patch #1 (having only the accepted by you patch
+applied) the NVME hwmon init now seems contradicting: it ignores one
+kmalloc failure (returns zero) but fails on another one (returns
+-ENOMEM). I asked you to have a look at the patches #1 and #2 of the
+series
+Link: https://lore.kernel.org/linux-nvme/20221007100134.faaekmuqyd5vy34m@mobilestation/
+and give your opinion whether the re-spin was required: take the
+Keith' notes or keep the patches as is. Could you please clarify the
+situation?
+
+-Sergey
