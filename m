@@ -2,34 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E20AC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 06:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DA5C43219
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 06:31:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiJQGbX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 02:31:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43916 "EHLO
+        id S229983AbiJQGbY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 02:31:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbiJQGbV (ORCPT
+        with ESMTP id S230103AbiJQGbV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 17 Oct 2022 02:31:21 -0400
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6B15723F;
-        Sun, 16 Oct 2022 23:31:18 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MrRrJ4kwmzpVqZ;
-        Mon, 17 Oct 2022 14:28:00 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE3756BA0;
+        Sun, 16 Oct 2022 23:31:19 -0700 (PDT)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MrRrK6sLtzpWH0;
+        Mon, 17 Oct 2022 14:28:01 +0800 (CST)
 Received: from huawei.com (10.175.127.227) by canpemm500010.china.huawei.com
  (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 17 Oct
- 2022 14:31:16 +0800
+ 2022 14:31:17 +0800
 From:   Ye Bin <yebin10@huawei.com>
 To:     <axboe@kernel.dk>, <rostedt@goodmis.org>, <mhiramat@kernel.org>,
         <linux-block@vger.kernel.org>
 CC:     <linux-kernel@vger.kernel.org>, Ye Bin <yebin10@huawei.com>
-Subject: [PATCH -next 0/3] fix possible memleak in '__blk_trace_remove'
-Date:   Mon, 17 Oct 2022 14:53:18 +0800
-Message-ID: <20221017065321.2846017-1-yebin10@huawei.com>
+Subject: [PATCH -next 3/3] blktrace: remove unnessary stop block trace in 'blk_trace_shutdown'
+Date:   Mon, 17 Oct 2022 14:53:21 +0800
+Message-ID: <20221017065321.2846017-4-yebin10@huawei.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221017065321.2846017-1-yebin10@huawei.com>
+References: <20221017065321.2846017-1-yebin10@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Type:   text/plain; charset=US-ASCII
@@ -41,14 +43,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ye Bin (3):
-  blktrace: introduce 'blk_trace_swicth_state' helper
-  blktrace: fix possible memleak in '__blk_trace_remove'
-  blktrace: remove unnessary stop block trace in 'blk_trace_shutdown'
+As previous commit, '__blk_trace_remove' will stop block trace if
+block trace's state is 'Blktrace_running'.
+So remove unnessary stop block trace in 'blk_trace_shutdown'.
 
- kernel/trace/blktrace.c | 84 ++++++++++++++++++++---------------------
- 1 file changed, 41 insertions(+), 43 deletions(-)
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ kernel/trace/blktrace.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 0d93a0110ab5..f33ec0f5750a 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -777,10 +777,8 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
+ void blk_trace_shutdown(struct request_queue *q)
+ {
+ 	if (rcu_dereference_protected(q->blk_trace,
+-				      lockdep_is_held(&q->debugfs_mutex))) {
+-		__blk_trace_startstop(q, 0);
++				      lockdep_is_held(&q->debugfs_mutex)))
+ 		__blk_trace_remove(q);
+-	}
+ }
+ 
+ #ifdef CONFIG_BLK_CGROUP
 -- 
 2.31.1
 
