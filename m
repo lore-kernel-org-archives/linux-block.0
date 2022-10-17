@@ -2,113 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFA9C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 05:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BF3C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 06:09:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229849AbiJQFWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 01:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60522 "EHLO
+        id S230100AbiJQGJ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 02:09:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbiJQFWS (ORCPT
+        with ESMTP id S229616AbiJQGJ5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 01:22:18 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C5BF52FC6;
-        Sun, 16 Oct 2022 22:22:18 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id b2so9785320plc.7;
-        Sun, 16 Oct 2022 22:22:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n6gkSgz4A9z/u94pPmICvWvMxMQ4nQAtTsf/oOCb+8c=;
-        b=CyvNHlbs8X4uyOyXboay6cgqPtwFRTrsDruX49GQ2fTVAYDMeOl8aElHLD/0nz36Kt
-         cCMu4VbmvxRwBM/HoQbyNaw9YyZOrhojdE4IqkEE0M7zHFkqDYnX/+ZBpwDk+GdNkTaJ
-         Q2PARvllzsMMt7rfaW8raXCspOE7nxPo/R7QCOlSn2JD6Bt4EOGvANghyXmkDVzkxxZn
-         sJPn0PYY4Svg5HIyT3dEg4hhLuxSUp0bV+25do89W+W8hOcydoZGqyUCn0iIuHb8FKEf
-         im/nARWTu8QDB8MSQ2utciLERope4n0iUBiaqR25a92bkIY8REA1YSvzXqINLKry/thA
-         apuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=n6gkSgz4A9z/u94pPmICvWvMxMQ4nQAtTsf/oOCb+8c=;
-        b=LFW0u08aqgfpBfTP1DyfgPTpw5z8/NXrLDjCuLjYCwnpo+SyNVHxIm6Rw+c82RPeTm
-         IOQ8senjdrGKoTnlvBGrjeIAl3dZZ4k6gnytTVV5LtoRTXlyHUlFOOs01zdc4ZZSBjq0
-         au6umMYe2fUceXTrWEUqTUBbS09yF9KT7PSidw/RSguJc8dIYB6zjL3EeeMDP09fcplH
-         f3nS1CqhtjrwCpOgltjyWy0k56Z9jd9jmLOKtgO5TJHUPqQlcgLrGuadLPAX5sp404q4
-         HsmcDIUI+PpXS45Ao/Icfha/MxHCyNn3SgdzOSXuMMnUz+iz5tBCZ5mrL3QpYd3GSe/y
-         pTIw==
-X-Gm-Message-State: ACrzQf1f/akxI6RuvjiDlLb/D24nNbMGb2oBswQSg31sN+V/WZEd091V
-        BuAC7kAtksYGptCVZJGJxRI=
-X-Google-Smtp-Source: AMsMyM6w+afqOX66jIFzfpn1e5GkaAhZt6Z7/jnHXbeTqUo/fhMbUjz3ilcOP4oaUO6P5/JrVYAZaw==
-X-Received: by 2002:a17:902:d4c3:b0:185:4c1f:7457 with SMTP id o3-20020a170902d4c300b001854c1f7457mr8907285plg.117.1665984137442;
-        Sun, 16 Oct 2022 22:22:17 -0700 (PDT)
-Received: from [10.114.96.48] ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id e19-20020a170902ed9300b00173411a4385sm5639849plj.43.2022.10.16.22.22.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 16 Oct 2022 22:22:16 -0700 (PDT)
-Message-ID: <b760f3ab-3833-3651-24a0-ab0aea5304b7@gmail.com>
-Date:   Mon, 17 Oct 2022 13:22:12 +0800
+        Mon, 17 Oct 2022 02:09:57 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233212A961;
+        Sun, 16 Oct 2022 23:09:54 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 665D168BFE; Mon, 17 Oct 2022 08:09:51 +0200 (CEST)
+Date:   Mon, 17 Oct 2022 08:09:51 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Joel Colledge <joel.colledge@linbit.com>
+Subject: Re: [PATCH] drbd: only clone bio if we have a backing device
+Message-ID: <20221017060951.GA28409@lst.de>
+References: <20221013135352.933875-1-christoph.boehmwalder@linbit.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Subject: Re: [RESEND PATCH] block, bfq: remove unused variable for bfq_queue
-To:     Yu Kuai <yukuai1@huaweicloud.com>, paolo.valente@linaro.org,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221017032019.101-1-Yuwei.Guan@zeekrlife.com>
- <98809bee-a5d6-d7c0-7229-4a74c6eec67f@huaweicloud.com>
-From:   Yuwei Guan <ssawgyw@gmail.com>
-In-Reply-To: <98809bee-a5d6-d7c0-7229-4a74c6eec67f@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221013135352.933875-1-christoph.boehmwalder@linbit.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Oct 13, 2022 at 03:53:52PM +0200, Christoph B�hmwalder wrote:
+> +	if (get_ldev(device)) {
+> +		req->private_bio = bio_alloc_clone(device->ldev->backing_bdev,
+> +						   bio, GFP_NOIO, &drbd_io_bio_set);
 
-On 2022/10/17 11:38, Yu Kuai wrote:
-> Hi,
->
-> 在 2022/10/17 11:20, Yuwei Guan 写道:
->> it defined in d0edc2473be9d, but there's nowhere to use it,
->> so remove it.
->>
->> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
->> Acked-by: Paolo Valente <paolo.valente@linaro.org>
->> ---
->>   block/bfq-iosched.h | 3 ---
->>   1 file changed, 3 deletions(-)
->>
->> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
->> index 64ee618064ba..6bcef8e5871a 100644
->> --- a/block/bfq-iosched.h
->> +++ b/block/bfq-iosched.h
->> @@ -369,11 +369,8 @@ struct bfq_queue {
->>       unsigned long split_time; /* time of last split */
->>         unsigned long first_IO_time; /* time of first I/O for this 
->> queue */
->> -
->>       unsigned long creation_time; /* when this queue is created */
->>   -    /* max service rate measured so far */
->> -    u32 max_service_rate;
->
-> You left two blank lines here. Have you tried checkpatch?
->
-> Thanks,
-> Kuai
+This adds an overly long line.
 
-Hi Kuai,
+Otherwise looks good:
 
-I checked it with checkpatch.pl, but 0 errors, 0 warnings.
-
-I will delete one blank line, then resend it.
-
->>       /*
->>        * Pointer to the waker queue for this queue, i.e., to the
->>
->
+Reviewed-by: Christoph Hellwig <hch@lst.de>
