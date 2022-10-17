@@ -2,38 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E525CC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 02:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6634C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 02:06:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiJQCAZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Oct 2022 22:00:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58278 "EHLO
+        id S229702AbiJQCG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Oct 2022 22:06:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbiJQCAV (ORCPT
+        with ESMTP id S229866AbiJQCG5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Oct 2022 22:00:21 -0400
+        Sun, 16 Oct 2022 22:06:57 -0400
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1817F26101;
-        Sun, 16 Oct 2022 19:00:21 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MrKqg1lPtzpW9D;
-        Mon, 17 Oct 2022 09:57:03 +0800 (CST)
-Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
- (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 17 Oct
- 2022 10:00:18 +0800
-From:   Kemeng Shi <shikemeng@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8560141D16;
+        Sun, 16 Oct 2022 19:06:56 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MrKxd60MCzmVNq;
+        Mon, 17 Oct 2022 10:02:13 +0800 (CST)
+Received: from [10.174.178.129] (10.174.178.129) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Mon, 17 Oct 2022 10:06:54 +0800
+Subject: Re: [PATCH 0/3] A few cleanup patches for blk-iolatency.c
+To:     <tj@kernel.org>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
-CC:     <shikemeng@huawei.com>
-Subject: [PATCH 8/8] blk-iocost: Get ioc_now inside weight_updated
-Date:   Mon, 17 Oct 2022 10:00:11 +0800
-Message-ID: <20221017020011.25016-9-shikemeng@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20221017020011.25016-1-shikemeng@huawei.com>
-References: <20221017020011.25016-1-shikemeng@huawei.com>
+References: <20220929074055.30080-1-shikemeng@huawei.com>
+From:   Kemeng Shi <shikemeng@huawei.com>
+Message-ID: <b25560e2-78ae-b501-ff2b-ad69fd5c0f49@huawei.com>
+Date:   Mon, 17 Oct 2022 10:06:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20220929074055.30080-1-shikemeng@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.178.129]
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemi500016.china.huawei.com (7.221.188.220)
@@ -42,81 +44,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The ioc_now parameter of weight_updated is only needed if we need call
-propagate_weights. Move ioc_now inside weight_updated to remove
-unnecessary get of ioc_now from outside of weight_updated.
+Friendly ping ...
 
-Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
----
- block/blk-iocost.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+on 9/29/2022 3:40 PM, Kemeng Shi wrote:
+> This series contains three cleanup patches to remove redundant check,
+> correct comment and simplify struct iolatency_grp in blk-iolatency.c.
+> 
+> Kemeng Shi (3):
+>   block: Remove redundant parent blkcg_gp check in check_scale_change
+>   block: Correct comment for scale_cookie_change
+>   block: Replace struct rq_depth with unsigned int in struct
+>     iolatency_grp
+> 
+>  block/blk-iolatency.c | 33 ++++++++++++++-------------------
+>  1 file changed, 14 insertions(+), 19 deletions(-)
+> 
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 4815e676733d..e2aaf133deb8 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1220,18 +1220,21 @@ static u32 current_hweight_max(struct ioc_gq *iocg)
- 	return max_t(u32, hwm, 1);
- }
- 
--static void weight_updated(struct ioc_gq *iocg, struct ioc_now *now)
-+static void weight_updated(struct ioc_gq *iocg)
- {
- 	struct ioc *ioc = iocg->ioc;
- 	struct blkcg_gq *blkg = iocg_to_blkg(iocg);
- 	struct ioc_cgrp *iocc = blkcg_to_iocc(blkg->blkcg);
-+	struct ioc_now now;
- 	u32 weight;
- 
- 	lockdep_assert_held(&ioc->lock);
- 
- 	weight = iocg->cfg_weight ?: iocc->dfl_weight;
--	if (weight != iocg->weight && iocg->active)
--		propagate_weights(iocg, weight, iocg->inuse, true, now);
-+	if (weight != iocg->weight && iocg->active) {
-+		ioc_now(iocg->ioc, &now);
-+		propagate_weights(iocg, weight, iocg->inuse, true, &now);
-+	}
- 	iocg->weight = weight;
- }
- 
-@@ -2968,7 +2971,7 @@ static void ioc_pd_init(struct blkg_policy_data *pd)
- 	}
- 
- 	spin_lock_irqsave(&ioc->lock, flags);
--	weight_updated(iocg, NULL);
-+	weight_updated(iocg);
- 	spin_unlock_irqrestore(&ioc->lock, flags);
- }
- 
-@@ -3053,7 +3056,6 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
- 	struct blkcg *blkcg = css_to_blkcg(of_css(of));
- 	struct ioc_cgrp *iocc = blkcg_to_iocc(blkcg);
- 	struct blkg_conf_ctx ctx;
--	struct ioc_now now;
- 	struct ioc_gq *iocg;
- 	u32 v;
- 	int ret;
-@@ -3074,8 +3076,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
- 
- 			if (iocg) {
- 				spin_lock(&iocg->ioc->lock);
--				ioc_now(iocg->ioc, &now);
--				weight_updated(iocg, &now);
-+				weight_updated(iocg);
- 				spin_unlock(&iocg->ioc->lock);
- 			}
- 		}
-@@ -3101,8 +3102,7 @@ static ssize_t ioc_weight_write(struct kernfs_open_file *of, char *buf,
- 
- 	spin_lock(&iocg->ioc->lock);
- 	iocg->cfg_weight = v * WEIGHT_ONE;
--	ioc_now(iocg->ioc, &now);
--	weight_updated(iocg, &now);
-+	weight_updated(iocg);
- 	spin_unlock(&iocg->ioc->lock);
- 
- 	blkg_conf_finish(&ctx);
 -- 
-2.30.0
-
+Best wishes
+Kemeng Shi
