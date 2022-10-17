@@ -2,80 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A64ECC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 19:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF7FC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 19:30:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230391AbiJQTUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 15:20:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48634 "EHLO
+        id S230375AbiJQTaO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 15:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230339AbiJQTTu (ORCPT
+        with ESMTP id S230407AbiJQT3z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 15:19:50 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED8DB1EAF3;
-        Mon, 17 Oct 2022 12:19:47 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id pq16so11866170pjb.2;
-        Mon, 17 Oct 2022 12:19:47 -0700 (PDT)
+        Mon, 17 Oct 2022 15:29:55 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34DE4792D5;
+        Mon, 17 Oct 2022 12:28:15 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id y191so12028897pfb.2;
+        Mon, 17 Oct 2022 12:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GuVE9fVTM4eodOC6sJzSFmeJV1Sl1qeoc+ZDwqd1NBE=;
-        b=BCGp6HTFj0dBO16cFsAUMbAwB2kXgReySlKd4UqcPoEtEkQ+5o6yMLwSSFX5WtOhyi
-         Xtc+Av44Tqb1YzvKSoUzktfSJg9VIeW1eyqVkC7+UrvOiNsWN6dpYgh7py6iuerj0wqa
-         pbAih0x388OQVu3PthnVkvKnK+4+GxnecWIZTS2QdWvLe48MrIk/dTmZn29tZf6s8rig
-         zoy+hWeCUXeH4+MC8skFIDdrJ02hZf0DfnB4tHdXCC7wmVRIY9lIRycagcni+4s1mBlR
-         04dgT4vKkejZu/Bb0N/W8nWEIxFvu2RawXWqhN0dXVlKKWsYHYSQIxLRP+LI3tok0eYT
-         27AA==
+        bh=UhUgipz8KQA+Nb0UJBop4f3vYMVn4vujHt2cKAuNWjk=;
+        b=FXTIoUQRDTwcJPRSIT4V4YAORAn7g67+EaCCufpJ5HCiBsglXCHJIHvn8qpnh3eWLK
+         LN3W2cri+i84pYn0SyqyDYWWs4ym6nJO7DNn8Da4N1Xm7hyjuWuCwdthD+6AApb+RhGi
+         uzyx1XzKU3VdtwbNwVfZogIP+YMZY7sBGx39vaeVoMkuuiLgVGIi3ZhtYG1CJWA2fdY2
+         nQGMDU0l9OcvQ9fImtGsDjaMnLyCkcmnQr814f7Yu/73EePmXURcj2WAPyWmAu4Smd8M
+         KMjJ39lHt6zyadqwQbLoWIERQGRDnPIcPoAcXEHN80jJHMX3QEvkdwTvPjQU99X1CGbv
+         Nxew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GuVE9fVTM4eodOC6sJzSFmeJV1Sl1qeoc+ZDwqd1NBE=;
-        b=cFbVOaMKaVD5ye44aHLPqF0o4TchdneB8t1UoAgi7TLawxj1KORvWLSM6IwnQl5YI8
-         9uWcrDfBiyVOWbN7B4xGccJTZ7CiIg15cPzQJPQQiml9LR3CVZes4snsleKXlfdALpif
-         pZS1UvYzri3PE1relv6vcz322aoJ3+jGge1Kai2wh972D0NbX5PsoVQo9eKr2c9ODxFm
-         exqWayY8SqxJBbl95PaCN4rYciNAG93D6EwNJLt5VbJ9QNREVouFzQEMpYd8y+jZx+gr
-         QlVE8ccs0b/70mmQ58WF5Xlu2CCEL7/d7XfrfZ4iMbg4KkQPypnlJB4Oik778qayGUk4
-         WJhA==
-X-Gm-Message-State: ACrzQf37oCAGoHWu5dQ17gMDvuaOR40J+LArwGzwf3fJNDf2YjiH6pm5
-        Cvv8eFf1mFhxq5wV3DW1x9Jv3juJF4FVPw==
-X-Google-Smtp-Source: AMsMyM7073GR1pbP1Mtfl3zE7AM9vl9nzjP4ozn+3Jbt9DBHDexqdbpwPazCugEpdYW9o3rrMXDTXg==
-X-Received: by 2002:a17:902:9308:b0:182:b2ba:755 with SMTP id bc8-20020a170902930800b00182b2ba0755mr13479172plb.107.1666034387177;
-        Mon, 17 Oct 2022 12:19:47 -0700 (PDT)
+        bh=UhUgipz8KQA+Nb0UJBop4f3vYMVn4vujHt2cKAuNWjk=;
+        b=hjFrlUJFio4XRmIWMNo2ZX8332za9LHgHYuAkkef4Mmrwsu3AtINej0PmZOokWTeld
+         MtvCXGj/5whRqMtISQ4CZidrtFSqbNpcngGzUsoit2VzH32PBI+1wTzgrJEAUAANpZMy
+         3nWsW6NA6dL4an0yV+B+39gVLC8R82w276Rt2iX+UTUvhSfYmjRVAtEZ+ZTv8K4dLqLw
+         modN4K/OsyWJ0AsGIOH5avNg+UQWysuJ08F2+YvM7Hz2H+F3SkSUuqUq0NoI5m06iXlN
+         ESRbQFvN2ua9pCDw+NujJvI4dXiVE84vV9Zi7aybomzeCJbvPCdlZZIPtWKd8x8O9586
+         nv8Q==
+X-Gm-Message-State: ACrzQf35T+qfDyPACOmeOEPkttJgUyKDry2z5TI8nrpSHQS/pQAQQv6/
+        K2D+wY8dFJ4EnajdtAXhpGqi+Wmtfxx6WA==
+X-Google-Smtp-Source: AMsMyM5aiquUAAIoBCB5fNzPoIm2XhC1tJfx5tcAF0ZTinw5x7j04sw9qN+vcISH7dm/2VN2yvOjag==
+X-Received: by 2002:a62:84d1:0:b0:565:b27c:8140 with SMTP id k200-20020a6284d1000000b00565b27c8140mr14045379pfd.14.1666034891431;
+        Mon, 17 Oct 2022 12:28:11 -0700 (PDT)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id t2-20020a170902e1c200b001807922f43bsm6927713pla.158.2022.10.17.12.19.46
+        by smtp.gmail.com with ESMTPSA id a7-20020a170902ecc700b00180a7ff78ccsm7001746plh.126.2022.10.17.12.28.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Oct 2022 12:19:46 -0700 (PDT)
+        Mon, 17 Oct 2022 12:28:11 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 17 Oct 2022 09:19:45 -1000
+Date:   Mon, 17 Oct 2022 09:28:09 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Kemeng Shi <shikemeng@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 8/8] blk-iocost: Get ioc_now inside weight_updated
-Message-ID: <Y02q0Us+WZmQU3zO@slm.duckdns.org>
-References: <20221017020011.25016-1-shikemeng@huawei.com>
- <20221017020011.25016-9-shikemeng@huawei.com>
+To:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH cgroup/for-6.1-fixes] blkcg: Update MAINTAINERS entry
+Message-ID: <Y02sydfDCLXnfZ37@slm.duckdns.org>
+References: <Y02aBVTCSggxKWXT@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221017020011.25016-9-shikemeng@huawei.com>
+In-Reply-To: <Y02aBVTCSggxKWXT@slm.duckdns.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 10:00:11AM +0800, Kemeng Shi wrote:
-> The ioc_now parameter of weight_updated is only needed if we need call
-> propagate_weights. Move ioc_now inside weight_updated to remove
-> unnecessary get of ioc_now from outside of weight_updated.
+On Mon, Oct 17, 2022 at 08:08:05AM -1000, Tejun Heo wrote:
+> Josef wrote iolatency and iocost is missing from the files list. Let's add
+> Josef as a maintainer and add blk-iocost.c to the files list.
 > 
-> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+> Signed-off-by: Tejun Heo <tj@kernel.org>
 
-Ditto. I don't think this improves anything meaningful.
+Applied to cgroup/for-6.1-fixes.
 
 Thanks.
 
