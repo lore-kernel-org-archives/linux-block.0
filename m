@@ -2,326 +2,210 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E3A6C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 08:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C21C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 08:42:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230018AbiJQI2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 04:28:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55298 "EHLO
+        id S229697AbiJQImQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 04:42:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbiJQI2H (ORCPT
+        with ESMTP id S229778AbiJQImO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 04:28:07 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407D636DF0;
-        Mon, 17 Oct 2022 01:28:05 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MrVS54shfzKFKd;
-        Mon, 17 Oct 2022 16:25:41 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCHiMoREk1jMTWiAQ--.65146S3;
-        Mon, 17 Oct 2022 16:28:02 +0800 (CST)
-Subject: Re: [PATCH 2/2] block: Make refcnt of bfq_group/bfq_queue atomic
-To:     Dawei Li <set_pte_at@outlook.com>, axboe@kernel.dk, tj@kernel.org,
-        paolo.valente@linaro.org
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221011145246.8656-1-set_pte_at@outlook.com>
- <TYCP286MB2323F5B27A24ABA2CD1A3F70CA239@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <6e6aa502-01d0-d5d8-9193-a3fee2a17335@huaweicloud.com>
-Date:   Mon, 17 Oct 2022 16:28:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Mon, 17 Oct 2022 04:42:14 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7832B198
+        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 01:42:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bn1EB9krTyzd1b6mL2qcwrFeFpOT9lI2ojyDvhJoo0nn6T8A8a0FeU6yXQLq0SjpUjpBQySF0FkS/ySNu23s2/iYx7/JjGMujL3KdwQvyNOs6Ho+wB7pP39KCOL3QMDPN2vjsIJnQHTKmdTqDHh6xGT9kJKVR0vYBH6OGOBH6sd6abt/bTFIhkUUpU6c6J6AszQYyQSYrvWnXjxueYh2q5G08Z3KdLcyuBKAS+HYWGnKrDWmUiMFBHMoCdUjFsMqADPjr+fWu7V2KqQxu8f79fvPDBMxUtW8Uzytz347mnC71y4nwx3c6bq2YF+2Caap4/2WQe+YMdlSq4z+Iff/Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X+UypPpju+U6ix8XFm+7x7gO6tFQf0wnQSM1Lp1yGJs=;
+ b=Gi9pHPUjbe98HA0li6rTqPZQkNsJ5INtsiDmzcEYK67KMyLFjFwWVvm4dtWEadMVpz9Y/DgK4LTjWhddU4X7pC2PC7CsE8nJ1yJyJuR2Lvi9Z+izxyu8++rnp3gApxBiCmrThfw0DEQfLjhZh03/b922HbrLnlw7NCo1kP0O9/MlBcKrGlUlXRLLWokXJiQUkJuRjuWdimvElpbLuBWkHjWYPsrwRSCEDIMBPAOpMrliUEc95vNZDg032BPvDU5ivAZaJ1FMPg2D0CF0zIVA0q6p/KB4d/ESMi/e4/C/gFpQPFCkXaV1yPIqkAwj/wpZ/nd5RzO7nJ/Au/3BouEAPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X+UypPpju+U6ix8XFm+7x7gO6tFQf0wnQSM1Lp1yGJs=;
+ b=He9QnFppyDj1Q12jLCcd5Vpu8wwWwMnbStU/n1Q+BuzsFplS2kSQf5uWxq0c3HHTWTDCmlKCN5UcHbh/cmuGd36a3bQyPJL4EVWFBRZQW0PK3xV7mVAjJAJEBMRC3SVts4ujeTdr2v69CsizJvTweewmiygxpc7lFdIjm9gva61Lx5xpPmvQcH0XbsnvGwKFIo/muPkrSzQ5cQsjN9IQ9kmguvC1RYiCuBWwgfSHk5xWK4TavsSkfC5c77LNOTO3t+EeKowQW4hGQkbnGqunseAaFsV8OZ7N2bijZNCmHNbwUYGYOq6tRderxxgyKNsyV1wv2qDweHzEU8XHbxnXRw==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by CH2PR12MB5017.namprd12.prod.outlook.com (2603:10b6:610:36::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.30; Mon, 17 Oct
+ 2022 08:42:10 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::1402:a17a:71c1:25a3]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::1402:a17a:71c1:25a3%7]) with mapi id 15.20.5723.033; Mon, 17 Oct 2022
+ 08:42:10 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>,
+        "vincent.fu@samsung.com" <vincent.fu@samsung.com>,
+        "yukuai3@huawei.com" <yukuai3@huawei.com>
+Subject: Re: [PATCH] null_blk: allow teardown on request timeout
+Thread-Topic: [PATCH] null_blk: allow teardown on request timeout
+Thread-Index: AQHY4R8DFU2LJu/Wy0udZZqXPfzvLK4RzLiAgAB5ugA=
+Date:   Mon, 17 Oct 2022 08:42:10 +0000
+Message-ID: <c6867c78-d8aa-c02b-544e-f777e73d5064@nvidia.com>
+References: <20221016052006.11126-1-kch@nvidia.com>
+ <1636ebe1-68eb-b754-fc1f-00d8be7b728b@opensource.wdc.com>
+In-Reply-To: <1636ebe1-68eb-b754-fc1f-00d8be7b728b@opensource.wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|CH2PR12MB5017:EE_
+x-ms-office365-filtering-correlation-id: 21f6323c-8316-4340-39dd-08dab01b7b61
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kipDBPhqpfmRQ1c0k1y9vQMf0QiSClGMCz1y2gcSsJdsxZ22BBWyxA0cWA/aFECSK74o4yNx6X/NS/ODjM0M1J2xZ1cEJr7HM9EPHUBj5ALb1gPwE74DPd3Ir+2R5fUubFkK0SJi3xgW6jXeJ4vb5s/nasZ6/7KJmGv/pJlg8aXKHSRl9QgCG2+8fMIdAKnvLQKqNvsLMwgQNaNO6LkXpB1F2ZXcxmjo5f/B1TWOgjMK/0cE6Z5wjirUM/Z7IjI+6lsW781AsfMbaO2heK4TVxh6NjwLvckLJ03AsbSJbzoMM8ecnPjzC3gd1YsW81nW+QxS1s7hbup2rbwqyfkAPDCrNuSwNZn3iAqdEgJl3sBbSNA9f1Yb3UsOFcZ+r0Xk4XZDdLZGHCtKeGRTCMwxrxjkKWNORWQuOfmYVDp7xQI42E9865tLuIqu6YCJXb4kRoiOGEdhPSLGeeFbvjDyz+D29rl5Lnc4ty5FiVocM93PdbAlNP1M3uuphrq2FjFEDDdQ0ZIlP8AsfL8Gr5/N8r/U4+RQ4oIdBwQzYtCX+RcDyP7uTyrazbJsjscgxEP5fKepLZ7zy9ujgkrax/vbOb79HAbx1GxFHtGGlYYRLjFyXzgnuXBERyk7otsCJ4Qxkqsf2U8kmNx9wyKPni1dvwSViNvlz7ZA/cTKlC6pp1rOSeYsMnvDGUEHNU651w1NNQ2lXPzWZbjBBtfox90GvzumoFBA01pReFs7uAAqxRL98b43K3DCb0orHLIykNEl3TFyorylOPLEWR+T3K4+Nhu+k5xsIdSlhhoJqYIuWaVtaAB0/fmLJKiHSY8rSfVkgS5K0X4MjXyHUDMB9xt9Kw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(366004)(39860400002)(136003)(346002)(396003)(451199015)(38070700005)(36756003)(86362001)(31696002)(38100700002)(83380400001)(122000001)(91956017)(66946007)(76116006)(64756008)(66476007)(316002)(31686004)(110136005)(54906003)(66446008)(8676002)(5660300002)(8936002)(6486002)(186003)(71200400001)(2906002)(2616005)(6506007)(66556008)(4326008)(478600001)(6512007)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Wkl4Q1pxWlM1aEFCUEVOT0hqcVpxeHRtTkJDNUx5Z0kyVzYvRFFOSno4a3c3?=
+ =?utf-8?B?Y1RNVWRxVHQ0YVRwN3hjd3grUEZtYUNtL3liWHFuTzJEemlmS0txcUtleVdu?=
+ =?utf-8?B?blBpYkY1UCtFWnVIVDVvSGlrSmM4ZE9CNXpHTCtYL2w4RkJyM3FmZlBtSEJD?=
+ =?utf-8?B?NnFSMzBIU0kyRHdHeFVBUUx2ZGZMTVpxUGExUmRlTWczdmduWVpmS1RLeGEv?=
+ =?utf-8?B?QXhuVzA0aGZ4dWVKWldvd0RPdDFIVEJtbzhmWTloUVRlZnNoNGhZSys3Qkx2?=
+ =?utf-8?B?WkNwSSs4aW1SVDcwV3hVMWwzc3EzcEtmR0t1OWtzdmtLS1dQUFpWeTArRFkv?=
+ =?utf-8?B?bzlVK0hjd1pkUWQyM2xBNVA1eFAyTzVRbklybVozYUtqaWZqT05ZeUhNTUgr?=
+ =?utf-8?B?YytTY2grU0xKZGdZb3dPYXpUVEdWV2dFa0FBVHZrNEUxMHNNNVpyZHhQU1gr?=
+ =?utf-8?B?bkVQOEFSTFlZS3ZRY1ZYOW5oOEQ2djJGWEJLTVZpL2ZFejh1TFdnMUtvVXFa?=
+ =?utf-8?B?a3drWDhqQjN6VEptZTUvYnBMUGdFQkxjNm0wSkwwVXZwZHRRNGMxanhYbWpK?=
+ =?utf-8?B?RVJVUkdTVmw3VWRQNis5TWdHZWlaZHczQ3Z1emwyTFYrMm94UFJENFAzU3dq?=
+ =?utf-8?B?RTJMdkxud2hncWg2czBCUHhNOEZYSWI2TkhseHdibllBc1RzLytlWFhOUDho?=
+ =?utf-8?B?TkhBaG16aXc4dVhVQ0pyR0hiU0V0QTFLRzNFc0xQV1VjM2RGa0FJazBHVmpP?=
+ =?utf-8?B?Rjh6TDZVRU1CekN0T05Va3V6ZlJYOTdQL1Y4eGtHZWlaQklReHZLamR1cWxl?=
+ =?utf-8?B?VUFRU2I5ZWYxRDE3ZFp4cVJlVTJweXJsakdlWldaYjZQRDU2ay9DbnlySFVD?=
+ =?utf-8?B?SzVTMXpCcU8yWERRSWMzdzJ2QThHOURyRit5V2FOV2p6cExaTk4wZGNXV2tv?=
+ =?utf-8?B?dEl2N0duYzJiM0NoU3diK2g4cm5UYTMyS2FjdTdva1lHZlJYQkxQaTdWK2Uw?=
+ =?utf-8?B?Z012aU16ZGZ3cDFMV2Jmc1JzaExuazhrd3Jid3RwZFBVbWhsNzFvTlZQZCto?=
+ =?utf-8?B?QUVlT1piVFJLejBDMzFmUU1ZQkxGQS9nRVowcW5Uclk3QkRsVThUcW1HWkJz?=
+ =?utf-8?B?dldqaTNDT1J5WmsxcFkya3RqMGZjZWttQkloN2pCMVU3MUMyV2c3SzNXaDFt?=
+ =?utf-8?B?Qjl4TXE1ZnJWdjVOR1Q3YS9KS1lMQ050RHBEMzEvUmttMlBqWHVKRDdlMS9o?=
+ =?utf-8?B?YUxpT211VzgzTFJycG82TWlKT2VuSXd4clFSQlJZU2hLdit6NmwrT2pLdUFO?=
+ =?utf-8?B?TmxtT011ekZPMmxPb2phREpPSitlbW5iZnZsV0J2MCs1cytZUXVrcllTVWQv?=
+ =?utf-8?B?MDhkOUlCWXVDWGZnUkMyNzB2angvNXdrY2lkd29LOEdFa3MwK1pCdTBNZ2Rl?=
+ =?utf-8?B?VEUyb09rVWIvQXJYMDNKeXp1KzNjeGhzYmxFdjVsandwb2ZNakcxSElQeS9O?=
+ =?utf-8?B?Q0VGalFWemw3cG1OUEhCWXhIdGg5anZDU0prbEZzY0ZkMUJYdE1mNStsaktR?=
+ =?utf-8?B?eGc3bXIzNnAzUUdnTk1UTVlJZDlnYnQzbVJsbmJmdHdYRmdiQTMzUkJoeERZ?=
+ =?utf-8?B?dEg1aTZRUlVKOWZrT3BGVURYSVBGTElUaVlaOHJaYzQxblNvKys1cjk5akpO?=
+ =?utf-8?B?Q3dMc3hxc3Bzbi9YNnZPeWxtVm5GdFhEV3ZreWxORDdmUDZJQVFEUGRpM1Zi?=
+ =?utf-8?B?cXMrSTI4Y1M0dkxFOHpDK1pURjdGSUo0WmFNdXVxUWw0UmJxTm9CYlZWSy95?=
+ =?utf-8?B?dWVYdWRKNGVXN3FHelk2M2pLWkpRWTFGVDZRREJZZTQxSDlGWWU4Uk1hTUtk?=
+ =?utf-8?B?ZmN6TGg3S2JFRnZIY3ZlN2Q3MlpUaGRERE5zNzlzSklpVlcrbHM4WXpyNzJw?=
+ =?utf-8?B?MHBoUGliY2djYk9ZNGpsMi9FUTFCT25GSEdwdlFyRkoyWEZOSlMrYXJhYlZh?=
+ =?utf-8?B?VGlvczgvTVI2TWlJVFl4Y29oREgycjU1ZjhKM2RmbzZ4QlRpcHhEbmpka1Zt?=
+ =?utf-8?B?bUNCZ0c0ZzQxZUQwczVWS2tFT25vTE9lZVViSmZUdkJPYmpSdVBkSUJyQWdG?=
+ =?utf-8?B?a3JWM2pQbk5rSXc5VG1SSXgrQnNUY2NCbzI5M0VnNlRjcVRxUHFSc2NCWDUw?=
+ =?utf-8?Q?ZzcA8rLm1qFQDFJwEpITakhTWPAh8K0qe7ZxHo79qb+c?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <29197B76E9CABF45B56C160FD6FA7C82@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <TYCP286MB2323F5B27A24ABA2CD1A3F70CA239@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCHiMoREk1jMTWiAQ--.65146S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxKF15JrW7WryfJrW7uF17Wrg_yoW3KFWUpa
-        y5KayUWa1rJF45Xr4UJw4jvwn3Kr1S93srK34xX343trnxAr9Fq3ZIvw1FvF4SvF1kAr4f
-        Zr1jg3yvkr1xXFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
-        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
-        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
-        c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21f6323c-8316-4340-39dd-08dab01b7b61
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2022 08:42:10.6452
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9WP0GC0dXyABjZo06fp9jw9zcrYl3CfAddbvLPRqEiBE+40KyRIE5WCv30ctU2/bYPiGJFskFc07qALQKv4XcQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5017
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-ÔÚ 2022/10/11 22:52, Dawei Li Ð´µÀ:
-> For most implementations of reference count, atomic_t is preferred
-> for their natural-born atomic ops capability.
-> Change the reference count of bfq_group/bfq_queue, both data structures
-> and related ops, into atomic.
-
-I'm afraid that this is unnecessary, the modifications of reference
-count are inside spin_lock() in bfq.
-
-Thanks,
-Kuai
-> 
-> Signed-off-by: Dawei Li <set_pte_at@outlook.com>
-> ---
->   block/bfq-cgroup.c  |  8 +++----
->   block/bfq-iosched.c | 54 +++++++++++++++++++++++----------------------
->   block/bfq-iosched.h |  6 ++---
->   block/bfq-wf2q.c    |  6 ++---
->   4 files changed, 37 insertions(+), 37 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 144bca006463..714126ba21b6 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -316,14 +316,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
->   
->   static void bfqg_get(struct bfq_group *bfqg)
->   {
-> -	bfqg->ref++;
-> +	atomic_inc(&bfqg->ref);
->   }
->   
->   static void bfqg_put(struct bfq_group *bfqg)
->   {
-> -	bfqg->ref--;
-> -
-> -	if (bfqg->ref == 0)
-> +	if (atomic_dec_and_test(&bfqg->ref))
->   		kfree(bfqg);
->   }
->   
-> @@ -659,7 +657,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   	 * Get extra reference to prevent bfqq from being freed in
->   	 * next possible expire or deactivate.
->   	 */
-> -	bfqq->ref++;
-> +	atomic_inc(&bfqq->ref);
->   
->   	/* If bfqq is empty, then bfq_bfqq_expire also invokes
->   	 * bfq_del_bfqq_busy, thereby removing bfqq and its entity
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 7ea427817f7f..fbe5624be71f 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -935,7 +935,7 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   
->   inc_counter:
->   	bfqq->weight_counter->num_active++;
-> -	bfqq->ref++;
-> +	atomic_inc(&bfqq->ref);
->   }
->   
->   /*
-> @@ -1224,9 +1224,10 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
->   
->   static int bfqq_process_refs(struct bfq_queue *bfqq)
->   {
-> -	return bfqq->ref - bfqq->entity.allocated -
-> +	return atomic_read(&bfqq->ref) - bfqq->entity.allocated -
->   		bfqq->entity.on_st_or_in_serv -
-> -		(bfqq->weight_counter != NULL) - bfqq->stable_ref;
-> +		(bfqq->weight_counter != NULL) -
-> +		atomic_read(&bfqq->stable_ref);
->   }
->   
->   /* Empty burst list and add just bfqq (see comments on bfq_handle_burst) */
-> @@ -2818,7 +2819,7 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
->   	 * expected to be associated with new_bfqq as they happen to
->   	 * issue I/O.
->   	 */
-> -	new_bfqq->ref += process_refs;
-> +	atomic_add(process_refs, &new_bfqq->ref);
->   	return new_bfqq;
->   }
->   
-> @@ -5255,10 +5256,10 @@ void bfq_put_queue(struct bfq_queue *bfqq)
->   	struct hlist_node *n;
->   	struct bfq_group *bfqg = bfqq_group(bfqq);
->   
-> -	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq, bfqq->ref);
-> +	bfq_log_bfqq(bfqq->bfqd, bfqq, "put_queue: %p %d", bfqq,
-> +		     atomic_read(&bfqq->ref));
->   
-> -	bfqq->ref--;
-> -	if (bfqq->ref)
-> +	if (!atomic_dec_and_test(&bfqq->ref))
->   		return;
->   
->   	if (!hlist_unhashed(&bfqq->burst_list_node)) {
-> @@ -5328,7 +5329,7 @@ void bfq_put_queue(struct bfq_queue *bfqq)
->   
->   static void bfq_put_stable_ref(struct bfq_queue *bfqq)
->   {
-> -	bfqq->stable_ref--;
-> +	atomic_dec(&bfqq->stable_ref);
->   	bfq_put_queue(bfqq);
->   }
->   
-> @@ -5358,7 +5359,7 @@ static void bfq_exit_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
->   		bfq_schedule_dispatch(bfqd);
->   	}
->   
-> -	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, bfqq->ref);
-> +	bfq_log_bfqq(bfqd, bfqq, "exit_bfqq: %p, %d", bfqq, atomic_read(&bfqq->ref));
->   
->   	bfq_put_cooperator(bfqq);
->   
-> @@ -5507,7 +5508,7 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->   	INIT_HLIST_NODE(&bfqq->woken_list_node);
->   	INIT_HLIST_HEAD(&bfqq->woken_list);
->   
-> -	bfqq->ref = 0;
-> +	atomic_set(&bfqq->ref, 0);
->   	bfqq->bfqd = bfqd;
->   
->   	if (bic)
-> @@ -5710,12 +5711,12 @@ static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
->   			 * to prevent it from being freed,
->   			 * until we decide whether to merge
->   			 */
-> -			last_bfqq_created->ref++;
-> +			atomic_inc(&last_bfqq_created->ref);
->   			/*
->   			 * need to keep track of stable refs, to
->   			 * compute process refs correctly
->   			 */
-> -			last_bfqq_created->stable_ref++;
-> +			atomic_inc(&last_bfqq_created->stable_ref);
->   			/*
->   			 * Record the bfqq to merge to.
->   			 */
-> @@ -5767,20 +5768,21 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
->   	 * prune it.
->   	 */
->   	if (async_bfqq) {
-> -		bfqq->ref++; /*
-> -			      * Extra group reference, w.r.t. sync
-> -			      * queue. This extra reference is removed
-> -			      * only if bfqq->bfqg disappears, to
-> -			      * guarantee that this queue is not freed
-> -			      * until its group goes away.
-> -			      */
-> +		atomic_inc(&bfqq->ref);
-> +		/*
-> +		 * Extra group reference, w.r.t. sync
-> +		 * queue. This extra reference is removed
-> +		 * only if bfqq->bfqg disappears, to
-> +		 * guarantee that this queue is not freed
-> +		 * until its group goes away.
-> +		 */
->   		bfq_log_bfqq(bfqd, bfqq, "get_queue, bfqq not in async: %p, %d",
-> -			     bfqq, bfqq->ref);
-> +			     bfqq, atomic_read(&bfqq->ref));
->   		*async_bfqq = bfqq;
->   	}
->   
->   out:
-> -	bfqq->ref++; /* get a process reference to this queue */
-> +	atomic_inc(&bfqq->ref); /* get a process reference to this queue */
->   
->   	if (bfqq != &bfqd->oom_bfqq && is_sync && !respawn)
->   		bfqq = bfq_do_or_sched_stable_merge(bfqd, bfqq, bic);
-> @@ -6059,7 +6061,7 @@ static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
->   		 */
->   		bfqq_request_allocated(new_bfqq);
->   		bfqq_request_freed(bfqq);
-> -		new_bfqq->ref++;
-> +		atomic_inc(&new_bfqq->ref);
->   		/*
->   		 * If the bic associated with the process
->   		 * issuing this request still points to bfqq
-> @@ -6803,10 +6805,10 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
->   	}
->   
->   	bfqq_request_allocated(bfqq);
-> -	bfqq->ref++;
-> +	atomic_inc(&bfqq->ref);
->   	bic->requests++;
->   	bfq_log_bfqq(bfqd, bfqq, "get_request %p: bfqq %p, %d",
-> -		     rq, bfqq, bfqq->ref);
-> +		     rq, bfqq, atomic_read(&bfqq->ref));
->   
->   	rq->elv.priv[0] = bic;
->   	rq->elv.priv[1] = bfqq;
-> @@ -6939,7 +6941,7 @@ static void __bfq_put_async_bfqq(struct bfq_data *bfqd,
->   		bfq_bfqq_move(bfqd, bfqq, bfqd->root_group);
->   
->   		bfq_log_bfqq(bfqd, bfqq, "put_async_bfqq: putting %p, %d",
-> -			     bfqq, bfqq->ref);
-> +			     bfqq, atomic_read(&bfqq->ref));
->   		bfq_put_queue(bfqq);
->   		*bfqq_ptr = NULL;
->   	}
-> @@ -7092,7 +7094,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
->   	 * will not attempt to free it.
->   	 */
->   	bfq_init_bfqq(bfqd, &bfqd->oom_bfqq, NULL, 1, 0);
-> -	bfqd->oom_bfqq.ref++;
-> +	atomic_inc(&bfqd->oom_bfqq.ref);
->   	bfqd->oom_bfqq.new_ioprio = BFQ_DEFAULT_QUEUE_IOPRIO;
->   	bfqd->oom_bfqq.new_ioprio_class = IOPRIO_CLASS_BE;
->   	bfqd->oom_bfqq.entity.new_weight =
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 64ee618064ba..71ac0de80bb0 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -234,9 +234,9 @@ struct bfq_ttime {
->    */
->   struct bfq_queue {
->   	/* reference counter */
-> -	int ref;
-> +	atomic_t ref;
->   	/* counter of references from other queues for delayed stable merge */
-> -	int stable_ref;
-> +	atomic_t stable_ref;
->   	/* parent bfq_data */
->   	struct bfq_data *bfqd;
->   
-> @@ -928,7 +928,7 @@ struct bfq_group {
->   	char blkg_path[128];
->   
->   	/* reference counter (see comments in bfq_bic_update_cgroup) */
-> -	int ref;
-> +	atomic_t ref;
->   	/* Is bfq_group still online? */
->   	bool online;
->   
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index 8fc3da4c23bb..60a9a2c1fc8d 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -512,9 +512,9 @@ static void bfq_get_entity(struct bfq_entity *entity)
->   	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
->   
->   	if (bfqq) {
-> -		bfqq->ref++;
-> +		atomic_inc(&bfqq->ref);
->   		bfq_log_bfqq(bfqq->bfqd, bfqq, "get_entity: %p %d",
-> -			     bfqq, bfqq->ref);
-> +			     bfqq, atomic_read(&bfqq->ref));
->   	}
->   }
->   
-> @@ -1611,7 +1611,7 @@ bool __bfq_bfqd_reset_in_service(struct bfq_data *bfqd)
->   		 * reference to the queue. If this is the case, then
->   		 * bfqq gets freed here.
->   		 */
-> -		int ref = in_serv_bfqq->ref;
-> +		int ref = atomic_read(&in_serv_bfqq->ref);
->   		bfq_put_queue(in_serv_bfqq);
->   		if (ref == 1)
->   			return true;
-> 
-
+Pj4gICBkcml2ZXJzL2Jsb2NrL251bGxfYmxrL21haW4uYyAgICAgfCA5MCArKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKy0tDQo+PiAgIGRyaXZlcnMvYmxvY2svbnVsbF9ibGsvbnVsbF9ibGsu
+aCB8IDEwICsrKysNCj4+ICAgMiBmaWxlcyBjaGFuZ2VkLCA5NyBpbnNlcnRpb25zKCspLCAzIGRl
+bGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2Jsb2NrL251bGxfYmxrL21h
+aW4uYyBiL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsvbWFpbi5jDQo+PiBpbmRleCAxZjE1NGY5MmY0
+YzIuLjUyZGI2Yjk5YjQ0OCAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvYmxvY2svbnVsbF9ibGsv
+bWFpbi5jDQo+PiArKysgYi9kcml2ZXJzL2Jsb2NrL251bGxfYmxrL21haW4uYw0KPj4gQEAgLTc3
+LDYgKzc3LDEwIEBAIGVudW0gew0KPj4gICAJTlVMTF9JUlFfVElNRVIJCT0gMiwNCj4+ICAgfTsN
+Cj4+ICAgDQo+PiArc3RhdGljIHVuc2lnbmVkIGludCBnX3JxX2Fib3J0X2xpbWl0ID0gNTsNCj4+
+ICttb2R1bGVfcGFyYW1fbmFtZWQocnFfYWJvcnRfbGltaXQsIGdfcnFfYWJvcnRfbGltaXQsIHVp
+bnQsIDA2NDQpOw0KPj4gK01PRFVMRV9QQVJNX0RFU0MocnFfYWJvcnRfbGltaXQsICJyZXF1ZXN0
+IHRpbWVvdXQgdGVhcmRvd24gbGltaXQuIERlZmF1bHQ6NSIpOw0KPiANCj4gTnVtYmVyIG9mIHJl
+cXVlc3QgdGltZW91dCB0byB0cmlnZ2VyIGRldmljZSB0ZWFyZG93biA/DQo+IA0KPiBUaGF0IHdv
+dWxkIGEgbG90IGNsZWFyZXIgaW4gbXkgb3Bpbmlvbi4NCg0Kb2theSwgd2lsbCBhZGQgaXQgdG8g
+VjIuDQoNCj4gDQo+PiArDQo+PiAgIHN0YXRpYyBib29sIGdfdmlydF9ib3VuZGFyeSA9IGZhbHNl
+Ow0KPj4gICBtb2R1bGVfcGFyYW1fbmFtZWQodmlydF9ib3VuZGFyeSwgZ192aXJ0X2JvdW5kYXJ5
+LCBib29sLCAwNDQ0KTsNCj4+ICAgTU9EVUxFX1BBUk1fREVTQyh2aXJ0X2JvdW5kYXJ5LCAiUmVx
+dWlyZSBhIHZpcnR1YWwgYm91bmRhcnkgZm9yIHRoZSBkZXZpY2UuIERlZmF1bHQ6IEZhbHNlIik7
+DQo+PiBAQCAtMjQ3LDYgKzI1MSw3IEBAIHN0YXRpYyB2b2lkIG51bGxfZGVsX2RldihzdHJ1Y3Qg
+bnVsbGIgKm51bGxiKTsNCj4+ICAgc3RhdGljIGludCBudWxsX2FkZF9kZXYoc3RydWN0IG51bGxi
+X2RldmljZSAqZGV2KTsNCj4+ICAgc3RhdGljIHN0cnVjdCBudWxsYiAqbnVsbF9maW5kX2Rldl9i
+eV9uYW1lKGNvbnN0IGNoYXIgKm5hbWUpOw0KPj4gICBzdGF0aWMgdm9pZCBudWxsX2ZyZWVfZGV2
+aWNlX3N0b3JhZ2Uoc3RydWN0IG51bGxiX2RldmljZSAqZGV2LCBib29sIGlzX2NhY2hlKTsNCj4+
+ICtzdGF0aWMgdm9pZCBudWxsX2Rlc3Ryb3lfZGV2KHN0cnVjdCBudWxsYiAqbnVsbGIpOw0KPj4g
+ICANCj4+ICAgc3RhdGljIGlubGluZSBzdHJ1Y3QgbnVsbGJfZGV2aWNlICp0b19udWxsYl9kZXZp
+Y2Uoc3RydWN0IGNvbmZpZ19pdGVtICppdGVtKQ0KPj4gICB7DQo+PiBAQCAtNTc4LDYgKzU4Mywx
+OCBAQCBjb25maWdfaXRlbSAqbnVsbGJfZ3JvdXBfbWFrZV9pdGVtKHN0cnVjdCBjb25maWdfZ3Jv
+dXAgKmdyb3VwLCBjb25zdCBjaGFyICpuYW1lKQ0KPj4gICB7DQo+PiAgIAlzdHJ1Y3QgbnVsbGJf
+ZGV2aWNlICpkZXY7DQo+PiAgIA0KPj4gKwlpZiAoZ19ycV9hYm9ydF9saW1pdCkgew0KPj4gKwkJ
+LyoNCj4+ICsJCSAqIGFib3J0X29uX3RpbWVvdXQgcmVtb3ZlcyB0aGUgbnVsbF9ibGsgYW5kIHJl
+c291cmNlcy4gV2hlbg0KPiANCj4gLi4udGhlIG51bGxfYmxrIGRldmljZSBhbmQgaXRzIHJlc291
+cmNlcy4gV2hlbiB0aGUgbnVsbF9ibGsgZGV2aWNlIGlzDQo+IGNyZWF0ZWQgdXNpbmcgY29uZmln
+ZnMsIC4uLg0KPiANCj4gVGhlIHJlbWFpbmluZyBvZiB0aGUgc2VudGVuY2UgZG9lcyBub3QgcGFy
+c2UgYXQgYWxsLg0KDQpva2F5LCB3aWxsIHJlcGhyYXNlIGl0IGluIFYyLg0KDQo+IA0KPj4gKwkJ
+ICogbnVsbF9ibGsgaXMgY3JlYXRlZCB1c2luZyBjb25maWdmcyBlbnRyeSBieSB1c2VyIHdlIHdp
+bGwgYWxzbw0KPj4gKwkJICogbmVlZCB0byBjbGVhbnVwIHRoZSB0aG9zZSBlbnRyaWVzIHdoZW4g
+YWJvcnRfb25fdGltZW91dCBpcyBzZXQNCj4+ICsJCSAqIGZyb20gbnVsbF9hYm9ydF93b3JrKCkg
+YW5kIHRoYXQgd2Ugc2hvbGQgbm90IGRvIGl0LCBzaW5jZQ0KPj4gKwkJICogbWFudXB1bGF0aW5n
+IHVzZXIncyBlbnRyaWVzIGZyb20ga2VybmVsIGNhbiBjcmVhdGUgY29uZnVzaW9uLA0KPj4gKwkJ
+ICogc28ganVzdCBkb24ndCBhbGxvdyBpdC4NCj4+ICsJCSAqLw0KPj4gKwkJcHJfZXJyKCJkb24n
+dCB1c2UgZ19hYm9ydF9vbl90aW1lb3V0IHdpdGggY29uZmlnZnMgZW50cmllc1xuIik7DQo+PiAr
+CQlyZXR1cm4gRVJSX1BUUigtRUlOVkFMKTsNCj4+ICsJfQ0KPj4gICAJaWYgKG51bGxfZmluZF9k
+ZXZfYnlfbmFtZShuYW1lKSkNCj4+ICAgCQlyZXR1cm4gRVJSX1BUUigtRUVYSVNUKTsNCj4+ICAg
+DQo+PiBAQCAtNjE0LDcgKzYzMSw3IEBAIHN0YXRpYyBzc2l6ZV90IG1lbWJfZ3JvdXBfZmVhdHVy
+ZXNfc2hvdyhzdHJ1Y3QgY29uZmlnX2l0ZW0gKml0ZW0sIGNoYXIgKnBhZ2UpDQo+PiAgIAkJCSJw
+b2xsX3F1ZXVlcyxwb3dlcixxdWV1ZV9tb2RlLHNoYXJlZF90YWdfYml0bWFwLHNpemUsIg0KPj4g
+ICAJCQkic3VibWl0X3F1ZXVlcyx1c2VfcGVyX25vZGVfaGN0eCx2aXJ0X2JvdW5kYXJ5LHpvbmVk
+LCINCj4+ICAgCQkJInpvbmVfY2FwYWNpdHksem9uZV9tYXhfYWN0aXZlLHpvbmVfbWF4X29wZW4s
+Ig0KPj4gLQkJCSJ6b25lX25yX2NvbnYsem9uZV9zaXplXG4iKTsNCj4+ICsJCQkiem9uZV9ucl9j
+b252LHpvbmVfc2l6ZSxhYm9ydF9vbl90aW1lb3V0LHJxX2Fib3J0X2xpbWl0XG4iKTsNCj4gDQo+
+IFdoZXJlIGlzIGFib3J0X29uX3RpbWVvdXQgZGVmaW5lZCA/IE5vd2hlcmUgdG8gYmUgc2Vlbi4g
+RG9lcyB0aGlzIHBhdGNoDQo+IGV2ZW4gY29tcGlsZSA/IEFsc28sIGFzc3VtaW5nIHRoaXMgaXMg
+YSBib29sZWFuLCB3aHkgaW50cm9kdWNlIGl0ID8NCg0KUGxlYXNlIG5vdGUgdGhhdCB0aGlzIHBh
+dGNoIGlzIGNvbXBsaWVkIGFuZCB0ZXN0ZWQgd2l0aCB0aGUgdGVzdCByZXBvcnQNCm9mIGFwcGx5
+aW5nIHRoaXMgcGF0Y2ggc2VlIGFib3ZlIGZvciB0aGUgZ2l0IGFtLCBjb21waWxlIGFuZCBydW5u
+aW5nIGZpbyANCiAgbiBkZCBjb21tYW5kcyB0byB0cmlnZ2VyIG11bHRpcGxlIHRpbWVvdXRzIGFu
+ZCB0ZWFyZG93bi4NClRoZSBhYm9ydCBvbiB0aW1lb3V0IG5lZWRzIHRvIGJlIHJlbW92ZWQgc2lu
+Y2UgSSBnb3QgY29uZnVzZWQgYmV0d2Vlbg0Kd2hhdCBuYW1lIHNob3VsZCBiZSB1c2VkLi4uDQoN
+Cj4gV291bGRuJ3QgdXNpbmcgInJxX2Fib3J0X2xpbWl0ID4gMCIgYmUgZXF1aXZhbGVudCA/DQo+
+IA0KDQp0aGlzIGlzIGV4YWN0bHkgd2hhdCBpdCBpcyBkb2luZyByaWdodCBub3csIHVubGVzcyBJ
+IG1pc3NlZCB0aGF0Li4uDQoNClsuLi5dDQoNCj4+ICsJLyoNCj4+ICsJICogbnVsbF9ibGsgcmVx
+dWVzdCB0aW1lb3V0IHRlYXJkb3duIGxpbWl0IHdoZW4gZGV2aWNlIGlzIGluIHRoZQ0KPj4gKwkg
+KiBzdGFibGUgc3RhdGUsIGkuZS4gb25jZSB0aGlzIGxpbWl0IGlzIHJlYWNoZWQgaXNzdWUNCj4+
+ICsJICogbnVsbF9hYm9ydF93b3JrKCkgdG8gdGVhcmRvd24gdGhlIGRldmljZSBmcm9tIGJsb2Nr
+IGx5YWVyDQo+PiArCSAqIHJlcXVlc3QgdGltZW91dCBjYWxsYmFjayBhbmQgY2xlYW51cCByZXNv
+dXJjZXMgc3VjaCBhcw0KPj4gKwkgKiBtZW1vcnkgYW5kIHBhdGhuYW1lLg0KPiANCj4gcy9pc3N1
+ZS9leGVjdXRlDQo+IHMvbHlhZXIvbGF5ZXINCj4gDQo+IEJ1dCBJIHRoaW5rIHRoaXMgY2FuIGJl
+IHNpbXBsaWZpZWQgdG8gc29tZXRoaW5nIGxpa2U6DQo+IA0KPiAvKg0KPiAgICogTnVtYmVyIG9m
+IHJlcXVlc3RzIHRpbWVvdXQgZmFpbHVyZXMgYWxsb3dlZCBiZWZvcmUgdHJpZ2VycmluZw0KPiAg
+ICogYSBkZXZpY2UgdGVhcmRvd24gZnJvbSB0aGUgYmxvY2sgbGF5ZXIgcmVxdWVzdCB0aW1lb3V0
+IGNhbGxiYWNrLg0KPiAgICovDQo+DQoNCk9rYXksIGlmIHRoYXQgd29ya3MgZm9yIGV2ZXJ5b25l
+IHdpbGwgYWRkIHRvIFYyLg0KDQo+PiArCSAqLw0KPj4gKwlhdG9taWNfdCBycV9hYm9ydF9jb3Vu
+dDsNCj4+ICsJLyogdGVhciBkb3duIHdvcmsgdG8gYmUgc2NoZWR1bGVkIGZyb20gYmxvY2sgbGF5
+ZXIgcmVxdWVzdCBoYW5kbGVyICovDQo+IA0KPiBUaGlzIGNvbW1lbnQgaXMgbm90IHJlYWxseSB1
+c2VmdWwuDQo+IA0KPj4gKwlzdHJ1Y3Qgd29ya19zdHJ1Y3QgYWJvcnRfd29yazsNCj4+ICAgCWNo
+YXIgZGlza19uYW1lW0RJU0tfTkFNRV9MRU5dOw0KPj4gICB9Ow0KPj4gICANCj4gDQoNCnRoYW5r
+cyBmb3IgdGhlIGNvbW1lbnRzLCB3aWxsIHNlbmQgb3V0IFYyIHdpdGggY29tbWVudHMgZml4ZWQu
+DQoNCi1jaw0KDQo=
