@@ -2,85 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B366C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 19:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393DFC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 19:10:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbiJQTJD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 15:09:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46576 "EHLO
+        id S230164AbiJQTKF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 15:10:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbiJQTJC (ORCPT
+        with ESMTP id S229838AbiJQTKE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 15:09:02 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168DF72ECC;
-        Mon, 17 Oct 2022 12:09:02 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id n18-20020a17090ade9200b0020b0012097cso40215pjv.0;
-        Mon, 17 Oct 2022 12:09:02 -0700 (PDT)
+        Mon, 17 Oct 2022 15:10:04 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 780A74DB2A;
+        Mon, 17 Oct 2022 12:10:02 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id o9-20020a17090a0a0900b0020ad4e758b3so11835704pjo.4;
+        Mon, 17 Oct 2022 12:10:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bx7n35j6Slc9c7K9PZOEInk30eMtyZFgLAsHKA2uWBA=;
-        b=UGvR8YyioSnMVWr+ZXpvBpTUR6XZsUDSY+zgyWuOEX3PL5p+LtCNKvGEpi6HVzY6A6
-         f4M47zqvgOdYhgY09TlUk3qCId4LO0y1Lp7/1eBcGTsbxzfCFEa1qb40Yw4rcU9wdkgI
-         vFu94Ayp2JY/m6M7/l2WtjuwE8Fx2NDlU+hncczFoeJhTPwdB96Kb99CMMpQs/k28HZX
-         MQkd5bwb4naWhMXIxzb459HvV/Wf0eAq2yYVtVVYXw/NcAcOpKtOMhbE+7c16Yxv51DL
-         uiml69ztXu65gWYuCsGVXNBRo2s7+31wJtoz+eMCivdxwHS5IYI9HOuLBeQahmCZVqH0
-         9gKg==
+        bh=UXrfwd7gNNvp6Yt0u4EpnteM52pQoIrwendRXuTj8qA=;
+        b=Gqwr/qM5+4KYPFkY8CojJXd7D+89eVRg2YLwqL8DjIi3ZuNtRJzHGHJ7KNq/36CeVv
+         bPUInVg0M5GTiPmYCniBiN2XmXcv/380eB7YqB6rAF2JjDbt5/O+Hb5VDrgicRL13OyE
+         YHOS5C9K+vKjUq0f+qNY42yz2rm93XViAVhNuP49PLPu0p96/NCMllFLu5BkP33DoBdO
+         cYx7a4GcWYTRts3fzJm1WG6E3wkfLWw0q9yL1WnNMc8HgavnaqKswnNWgXeaMQke594j
+         QCJWMZKxNFhawpOmZy6ahjRoQPeCfSfjpXeJ3LL4ESqJf+DaUw7/tDm3uIlpQOPAIVRS
+         bASw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bx7n35j6Slc9c7K9PZOEInk30eMtyZFgLAsHKA2uWBA=;
-        b=8I/Sp7DQ64P3aAvpZDczgc1MloSvbSN9ldZ/3SGLZPXwYTviPPqCmcgZ4W76B6DKzS
-         a7XOuJye2+cfEGRjjBK8Kp4VTbGgXKRpfvP7MHc+GzIJM5GIJ0A7W/kTQFvtinKkQN02
-         NDTUKjnGSYmx2o0v7xOtneqGniAqR/SszTM0vrj15S4yZc3etnHu5WldDq2bqRQW/3bA
-         BYiFnqO0sPw4CaeYZnGHtxqbOyTstIy2Nmt/xM4d8OiTXnNQQnvphp0D1prUMrNQgCK/
-         srI2cdtjCmixHsgM3Fb7a3KkaNNIz3OYhghI5f/DTgMBWO8lICWebFqx9tPFEm0KIoNO
-         dgMg==
-X-Gm-Message-State: ACrzQf1FnwSpsjF+EdOY/NOXz3D/3cFz9L6wk4G1A4khiN1NMg3oas4c
-        fd7KlyyP1Hk2svwjkyhFmCs=
-X-Google-Smtp-Source: AMsMyM7aOAMF7/oKbs5BWocJ2BIvChHfsMUvfaWw+p/GNLb/RhN4RpTeSpV+UOsuC9R5h+3nIC0G4g==
-X-Received: by 2002:a17:903:1003:b0:181:6c26:1114 with SMTP id a3-20020a170903100300b001816c261114mr13469897plb.75.1666033741410;
-        Mon, 17 Oct 2022 12:09:01 -0700 (PDT)
+        bh=UXrfwd7gNNvp6Yt0u4EpnteM52pQoIrwendRXuTj8qA=;
+        b=C4X2xyRpUBAhFXGLNWQmfaO5wpN0DQXxXG4O3cNFM0GVOekWQcAJlh/pWCI6YjYflp
+         Z9ET/gv7XUDeD7olwiuH/1IgD+3NdbVrpTwKzJFS1etJoJlpf6vLrhLQIb/b6g6zi3L8
+         0pEcxQnllFUGPSt8y8NO5nmtEUt0NDHMIYPOQ23sRA3Cx2pRVM+3hy2/osH8pHvT+QQb
+         EyLNwByHJH/nWBKLwQJHS8nzOns1Km8hvdji4AqIKYYk7KW8XIfC4EqvwwmUygWIE1jo
+         Bpi/ykGRsnEpSdny/uNysOTPbuD3zfBEZeX+f19WnLInlxE6NXRFcRVyLt5O7M+OAweU
+         g4/A==
+X-Gm-Message-State: ACrzQf2rKSVbEdl8cZWAsbQADGODiEovcyaqK/Ze6gTlfsXwreblps/P
+        8g1SGT2+ZI4qhL+i3dZ7E3k=
+X-Google-Smtp-Source: AMsMyM4DTGBEwZH1kzFjjyuQypER81cfpdxfRrvj/nuz3d3N43HZoEzdyeAVB6hHSP5Q/tdg9MMS9g==
+X-Received: by 2002:a17:903:245:b0:178:e0ba:e507 with SMTP id j5-20020a170903024500b00178e0bae507mr13698271plh.115.1666033801850;
+        Mon, 17 Oct 2022 12:10:01 -0700 (PDT)
 Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id x185-20020a6263c2000000b00562a526cd2esm7374202pfb.55.2022.10.17.12.09.00
+        by smtp.gmail.com with ESMTPSA id 21-20020a631855000000b00462ae17a1c4sm6479293pgy.33.2022.10.17.12.10.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Oct 2022 12:09:01 -0700 (PDT)
+        Mon, 17 Oct 2022 12:10:01 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 17 Oct 2022 09:08:59 -1000
+Date:   Mon, 17 Oct 2022 09:10:00 -1000
 From:   Tejun Heo <tj@kernel.org>
 To:     Kemeng Shi <shikemeng@huawei.com>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/8] blk-iocost: Remove vrate member in struct ioc_now
-Message-ID: <Y02oS3f8yTw1r0VC@slm.duckdns.org>
+Subject: Re: [PATCH 5/8] blk-iocost: Correct comment in blk_iocost_init
+Message-ID: <Y02oiFyRJiFm13cL@slm.duckdns.org>
 References: <20221017020011.25016-1-shikemeng@huawei.com>
- <20221017020011.25016-5-shikemeng@huawei.com>
+ <20221017020011.25016-6-shikemeng@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221017020011.25016-5-shikemeng@huawei.com>
+In-Reply-To: <20221017020011.25016-6-shikemeng@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 10:00:07AM +0800, Kemeng Shi wrote:
-> If we trace vtime_base_rate instead of vtime_rate, there is nowhere to
-> access now->vrate except function ioc_now using now->vrate locally.
-  ^
-  which accesses ("to access" doesn't mean the same thing here)
-
-> Just clean it.
-       ^
-       remove
-
+On Mon, Oct 17, 2022 at 10:00:08AM +0800, Kemeng Shi wrote:
+> There is no iocg_pd_init function. The pd_alloc_fn function pointer of
+> iocost policy is set with ioc_pd_init. Just correct it.
+> 
 > Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
-
-With the above description updates,
 
 Acked-by: Tejun Heo <tj@kernel.org>
 
