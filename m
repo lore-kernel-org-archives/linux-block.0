@@ -2,72 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13505C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 09:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16923C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 10:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbiJRJw5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 05:52:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49456 "EHLO
+        id S230255AbiJRKCG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 06:02:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiJRJw5 (ORCPT
+        with ESMTP id S230045AbiJRKCE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 05:52:57 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBB42B14E4
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 02:52:53 -0700 (PDT)
-Received: from canpemm500002.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Ms8H9268YzJn2g;
-        Tue, 18 Oct 2022 17:50:13 +0800 (CST)
-Received: from [10.169.59.127] (10.169.59.127) by
- canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 18 Oct 2022 17:52:50 +0800
-Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
-To:     Christoph Hellwig <hch@lst.de>
-CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <sagi@grimberg.me>, <kbusch@kernel.org>, <ming.lei@redhat.com>,
-        <axboe@kernel.dk>, "Paul E. McKenney" <paulmck@kernel.org>
-References: <20221013094450.5947-1-lengchao@huawei.com>
- <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de>
- <20221017134244.GA24775@lst.de>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <00e6ce8b-5b27-d670-cd50-865fdb57e60b@huawei.com>
-Date:   Tue, 18 Oct 2022 17:52:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Tue, 18 Oct 2022 06:02:04 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD69AF1A1;
+        Tue, 18 Oct 2022 03:02:03 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id 10so13395886pli.0;
+        Tue, 18 Oct 2022 03:02:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HX99tVSM1rmC3ukGV0/miTpRAU7UnBmNE0xTCI/AilE=;
+        b=J+sVV1Q8SY94v/FKhxfx3Ht4gnkVutppPRp8MWhmOijVClpynT+gjac4FLQZb/Kjda
+         e8kvZvQjU+WAX0L5xgylWUdOmNui3vDLLL1+/prTadG/W1nu6T74dAfzBI9duA/hq/lu
+         1eJIge/GVrtkNnJmGwzGiAmMPzWXeQidVpvmp9U+t9thW/sMg4rgG2FASPvJ3PLYQIlA
+         KY+c9Zh3JChyF9NQRCKPNkFcRfg3k+Im0NIpVbpyOJdr3aY2QzZw/WznpfCNO3fQuZfM
+         5eyaGDhKIN+q6oGnM2dzrujcG9TfiTeEnMBNwWgDj1Flgf4LHyaNu2pFvZpNmEO/MwOf
+         jXKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HX99tVSM1rmC3ukGV0/miTpRAU7UnBmNE0xTCI/AilE=;
+        b=Ne7myBVGnV1MA+r/FYnWd2gdF/UwM1ZFNMgiCeK/BMPocGWgZ9C6zf0Tu0MC2qUCkq
+         Hd2OvbzMBw5fw5sIEtVyEGWq1NyMyIwbBjbeR8dl7AI+8R5/XwPKrpn8qClLqGohM/QE
+         gG5EqAntAie998uLRJrPZCWLaL3anmMxTfAxosG7kxvrlfyTEoqU6pVrORbVccsNoe4Y
+         WB8rJhs7v9e+ZlooBIs9olZgB5HXZ9S+3GTC/L5TbOe6GlBnA/2B8LT/vls8rdmSsCe6
+         ViX+1qePNMgdvozGNlb9dAZAL2eujVqCIA0IUEMra5d8aCkMLX22CWYOtZwP5yoccQqF
+         B2Gg==
+X-Gm-Message-State: ACrzQf3xmTHqJWoKSQh7vu9sAekn3tTCOA2loM1ecLEAnDHAgf7lISrZ
+        vGduwYgmWqkMB/QGigwKWPDsOpKaJ7binnsa
+X-Google-Smtp-Source: AMsMyM4sAHo43edi+BR6O/wF8FJzJoUf4uFT6a3Mw1gooyy1iaOm6MWBDNN6LcZLaLFZnRxzvJWV9A==
+X-Received: by 2002:a17:903:2144:b0:182:42ce:5778 with SMTP id s4-20020a170903214400b0018242ce5778mr2173798ple.46.1666087312246;
+        Tue, 18 Oct 2022 03:01:52 -0700 (PDT)
+Received: from localhost.localdomain ([43.132.141.9])
+        by smtp.gmail.com with ESMTPSA id j10-20020a637a4a000000b004405c6eb962sm7640355pgn.4.2022.10.18.03.01.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Oct 2022 03:01:51 -0700 (PDT)
+From:   zys.zljxml@gmail.com
+To:     ming.lei@redhat.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yushan Zhou <katrinzhou@tencent.com>
+Subject: [PATCH] ublk_drv: use flexible-array member instead of zero-length array
+Date:   Tue, 18 Oct 2022 18:01:32 +0800
+Message-Id: <20221018100132.355393-1-zys.zljxml@gmail.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-In-Reply-To: <20221017134244.GA24775@lst.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.169.59.127]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500002.china.huawei.com (7.192.104.244)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Yushan Zhou <katrinzhou@tencent.com>
 
+Eliminate the following coccicheck warning:
+./drivers/block/ublk_drv.c:127:16-19: WARNING use flexible-array member instead
 
-On 2022/10/17 21:42, Christoph Hellwig wrote:
-> On Mon, Oct 17, 2022 at 03:39:06PM +0200, Christoph Hellwig wrote:
->> Having to allocate a struct rcu_synchronize for each of the potentially
->> many queues here is a bit sad.
->>
->> Pull just explained the start_poll_synchronize_rcu interfaces at ALPSS
->> last week, so I wonder if something like that would also be feasible
->> for SRCU, as that would come in really handy here.
-> 
-> Alternatively I wonder if we could simply use a single srcu_struct
-> in the tag_set instead of one per-queue.  That would potentially
-> increase the number of read side critical sections
-> blk_mq_wait_quiesce_done would have to wait for in tagsets with
-> multiple queues, but I wonder how much overhead that would be in
-> practive.
-Now we submit request based on queues, maybe it is difficult to use
-a single srcu_struct in the tag instead of one per-queue.
-Using start_poll_synchronize_rcu  still need a unsigned long array.
-> 
-> .
-> 
+Signed-off-by: Yushan Zhou <katrinzhou@tencent.com>
+---
+ drivers/block/ublk_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/ublk_drv.c b/drivers/block/ublk_drv.c
+index 2651bf41dde3..5afce6ffaadf 100644
+--- a/drivers/block/ublk_drv.c
++++ b/drivers/block/ublk_drv.c
+@@ -124,7 +124,7 @@ struct ublk_queue {
+ 	bool force_abort;
+ 	unsigned short nr_io_ready;	/* how many ios setup */
+ 	struct ublk_device *dev;
+-	struct ublk_io ios[0];
++	struct ublk_io ios[];
+ };
+ 
+ #define UBLK_DAEMON_MONITOR_PERIOD	(5 * HZ)
+-- 
+2.27.0
+
