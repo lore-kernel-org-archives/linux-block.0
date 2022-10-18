@@ -2,100 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF8CC4167B
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 04:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66ABAC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 05:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbiJREzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 00:55:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58418 "EHLO
+        id S229862AbiJRFAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 01:00:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbiJREzh (ORCPT
+        with ESMTP id S230106AbiJRE7l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 00:55:37 -0400
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35986525F;
-        Mon, 17 Oct 2022 21:55:31 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ms1l168BWz4xFy;
-        Tue, 18 Oct 2022 15:55:25 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1666068926;
-        bh=CRrHBDsNdrBb28hzgQhlrZd26ZKphtFKLFjDwU/ABaM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=KoC6hrmzAs9HidJRRxkubIdSZ+CjOXbnqlKmiHN7K59O4vyWF8oo7vyiGEjyg7cjM
-         j9OfGRfnR4pdnCe9OvqaTMWdp3Nh9N4O6NDTIi7tQDrRHuJpfWswZRBizWuWkpLraD
-         T8/8zHB9obIaN+1OkMvUam8/bJvmm4Vp0YGFRSIS2chyfJObRcOgUXMm7IWZW+JV31
-         d6yXY9OxqMxwPepR6E2dTpRBFoM3s+6EXJS9ypIHF0f+/gUr1Qihyah9UO9arldiSe
-         bBQ8e3h6lXBihlsh6XhoNxGpldR6cG2UsZSpxg4Yv2h1xearu5CHhfU0i9qSeV47x7
-         sfeLbfH8NQ8eg==
-Date:   Tue, 18 Oct 2022 15:55:24 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-next@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v5 0/8] make statx() return DIO alignment information
-Message-ID: <20221018155524.5fc4e421@canb.auug.org.au>
-In-Reply-To: <20220913063025.4815466c@canb.auug.org.au>
-References: <20220827065851.135710-1-ebiggers@kernel.org>
-        <YxfE8zjqkT6Zn+Vn@quark>
-        <Yx6DNIorJ86IWk5q@quark>
-        <20220913063025.4815466c@canb.auug.org.au>
+        Tue, 18 Oct 2022 00:59:41 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CB164F68F;
+        Mon, 17 Oct 2022 21:59:13 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VSTCT4L_1666069150;
+Received: from 30.97.56.241(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VSTCT4L_1666069150)
+          by smtp.aliyun-inc.com;
+          Tue, 18 Oct 2022 12:59:11 +0800
+Message-ID: <bef81cd9-86a4-a671-2821-0d7021e4d49a@linux.alibaba.com>
+Date:   Tue, 18 Oct 2022 12:59:09 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Ta.nZamROACWUZnFj4i7MWy";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [PATCH 0/1] Documentation: document ublk user recovery
+Content-Language: en-US
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221018045346.99706-1-ZiyangZhang@linux.alibaba.com>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <20221018045346.99706-1-ZiyangZhang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---Sig_/Ta.nZamROACWUZnFj4i7MWy
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Jens,
 
-Hi Eric,
+This doc patch is resent since user recovery feature of ublk has been merged. 
+Please consider it.
 
-On Tue, 13 Sep 2022 06:30:25 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->=20
-> On Sun, 11 Sep 2022 19:54:12 -0500 Eric Biggers <ebiggers@kernel.org> wro=
-te:
-> >
-> > Stephen, can you add my git branch for this patchset to linux-next?
-> >=20
-> > URL: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-> > Branch: statx-dioalign
-> >=20
-> > This is targeting the 6.1 merge window with a pull request to Linus. =20
->=20
-> Added from today.
-
-I notice that this branch has been removed.  Are you finished with it
-(i.e. should I remove it from linux-next)?
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Ta.nZamROACWUZnFj4i7MWy
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNOMbwACgkQAVBC80lX
-0GxBPwf+NK66Affcx+uOwICiv+ovQ21QIlPm9IJ5LvIoFwf8a6p0CBBV0D87Lz3O
-gTyOmmIln6foey0EDLUonmx0R/g/NmDIqlmlTokCTOS3W06Rg+Q/ura6Xy2e16yX
-jkvcXxu3VueNdLN/MgKin6PjnB77DyhjPo1xuyXxHE39/XO0h8vTMY9OL44Zg8E9
-ZEnV4lTb/mUKb1DU0SiFrM2hcFfCG09gEnUGsA7P/dQnwrHHkD+vWPDsX5yWHX3P
-bKtAFYG/Z17S8nIzUbQG+A19u19ajcQasGjV8jDLEERPDX3bOg91nR33ahR4rfQb
-T/Xadfe0rtdAKEqBLhNafzUpmGIqxg==
-=DyWQ
------END PGP SIGNATURE-----
-
---Sig_/Ta.nZamROACWUZnFj4i7MWy--
+Regards,
+Zhang.
