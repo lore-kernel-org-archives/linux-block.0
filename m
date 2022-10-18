@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD5AC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 00:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9B9C352AA
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 00:20:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231359AbiJRAQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54610 "EHLO
+        id S231953AbiJRAUh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:20:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231303AbiJRAOf (ORCPT
+        with ESMTP id S232310AbiJRAUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:14:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6955789CDB;
-        Mon, 17 Oct 2022 17:12:06 -0700 (PDT)
+        Mon, 17 Oct 2022 20:20:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7649482617;
+        Mon, 17 Oct 2022 17:15:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AB634B81BEE;
-        Tue, 18 Oct 2022 00:09:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABD0EC433C1;
-        Tue, 18 Oct 2022 00:09:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0AC926131C;
+        Tue, 18 Oct 2022 00:10:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1ABDC43142;
+        Tue, 18 Oct 2022 00:10:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666051767;
-        bh=5KYy7SNoHHzSWSn9CQG5x/Ws1YdhP9QY9vua0YMLkrE=;
+        s=k20201202; t=1666051856;
+        bh=Jw1caU6sBAhifMwTh0ZZAAWGQ+PO+HsATzfdyWn8gG8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EGjSDiONCOkuW91oNsztLmFvWDFgTzDfgXwVxA4u+ZiL4GrDDsAGIiwOvtTbZmR3B
-         ip/FkGaPywQS8p/wXvnpSkJJ0r5B5l8+rVCDZIdcsnKbUaeU4XwxoVkxaA/7vLxiGL
-         ZL0Q3xCF/pHOwzby+60cJL+dzY53gFpkuHbnuGeEAx1XcAko2NNY1gVz8T76XR2wa1
-         boQXXILBEuNdIWKtHWXwu3MHo3Int5QMrBy4OXKVf6nvOsJVKhMdURPRS/QEIk7rAa
-         6Dnyiii4Xg6YVWBilrgp1v+QcbMPN79d5NntjJJ9fn883+bToP+iykjkEUVpjyGDpz
-         k1FyauTddUd1g==
+        b=h71WnWthRxJ+xfmVsQIAW3rrIouPaCiG0d1v+sUZTN34w10nU0tVbUeEMaj2Ogh7C
+         taT52OGATzDKjDZGASKLhf/6WdjKhO/IK4HgNV7ZI4Fy+gn5GKY2JlLcI0GvyT03fh
+         UdCy3Kx77vithudWshjU9mRAEwxy1urQprw3lJcW2lirTMihLJBWTD42jii93Wl5Ez
+         Om0l3Sl/3IYheG4frdkOf/Wcv1imZ2Knil4ze1zGmJfN9TZds2Tv/6OuQ4DjdOq9Kt
+         CI8eRXwhTf/WBxRfU5hm6vG+NNLQeyGNrBXm167O9vnKnjMTiedV06cmFY9Jwb8LxD
+         99Sbi89yfemlA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Alexander Potapenko <glider@google.com>,
@@ -69,12 +69,12 @@ Cc:     Alexander Potapenko <glider@google.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         Andrew Morton <akpm@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 21/29] kmsan: disable physical page merging in biovec
-Date:   Mon, 17 Oct 2022 20:08:30 -0400
-Message-Id: <20221018000839.2730954-21-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 13/16] kmsan: disable physical page merging in biovec
+Date:   Mon, 17 Oct 2022 20:10:26 -0400
+Message-Id: <20221018001029.2731620-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221018000839.2730954-1-sashal@kernel.org>
-References: <20221018000839.2730954-1-sashal@kernel.org>
+In-Reply-To: <20221018001029.2731620-1-sashal@kernel.org>
+References: <20221018001029.2731620-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -134,10 +134,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+)
 
 diff --git a/block/blk.h b/block/blk.h
-index 0d6668663ab5..37d24fab1e30 100644
+index 997941cd999f..107db0011d4c 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -93,6 +93,13 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+@@ -59,6 +59,13 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
  	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
  	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
  
