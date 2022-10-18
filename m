@@ -2,102 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2DEC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 08:40:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBDCC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 08:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbiJRIkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 04:40:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36980 "EHLO
+        id S229572AbiJRI4C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 04:56:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230097AbiJRIkq (ORCPT
+        with ESMTP id S230239AbiJRI4C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 04:40:46 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E095CA030E
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 01:40:22 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Ms6gn4N93zKG6n
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 16:37:57 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgD3PS5xZk5jVJwuAA--.47719S3;
-        Tue, 18 Oct 2022 16:40:19 +0800 (CST)
-Subject: Re: [PATCH 2/2] block: clear the holder releated fields on late
- disk_add failure
-To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221018073822.646207-1-hch@lst.de>
- <20221018073822.646207-2-hch@lst.de>
- <8c5359e3-39ee-d363-9425-0cb8b716dcb0@huaweicloud.com>
- <20221018082651.GA26079@lst.de>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <4c5acbb5-72e6-3f63-2e78-478d3230aa0c@huaweicloud.com>
-Date:   Tue, 18 Oct 2022 16:40:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 18 Oct 2022 04:56:02 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F070131ED2
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 01:56:00 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 4246D68C4E; Tue, 18 Oct 2022 10:55:57 +0200 (CEST)
+Date:   Tue, 18 Oct 2022 10:55:57 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, ming.lei@redhat.com, axboe@kernel.dk
+Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
+Message-ID: <20221018085557.GA28266@lst.de>
+References: <20221013094450.5947-1-lengchao@huawei.com> <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de> <20221017134244.GA24775@lst.de> <b0631151-4081-2fdb-fbb0-eab1db633200@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20221018082651.GA26079@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgD3PS5xZk5jVJwuAA--.47719S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7JF4xWrW3Wr4UXrWrKFW8Xrb_yoWkAFb_uF
-        yrA3yvgw42k3W3Ka1qqF15urW7tr1jvrWUZFZ7JanxGryUXFW3GFy7Zr15AF4xGrsIk3s8
-        Cr15Ka4Y9rsrZjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb4AFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Jr0_
-        Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbrMaU
-        UUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b0631151-4081-2fdb-fbb0-eab1db633200@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Tue, Oct 18, 2022 at 11:39:30AM +0300, Sagi Grimberg wrote:
+> The only question in my mind is regarding patch 2/2 with the subtle
+> ordering of nvme_set_queue_dying...
 
-ÔÚ 2022/10/18 16:26, Christoph Hellwig Ð´µÀ:
-> On Tue, Oct 18, 2022 at 04:00:36PM +0800, Yu Kuai wrote:
->> 1) in del_gendisk: (add a new api kobject_put_and_test)
->>
->> if (kobject_put_and_test(bd_holder_dir/slave_dir))
->> 	bd_holder_dir/slave_dir = NULL;
->>
->> 2) in bd_link_disk_holder, get bd_holder_dir first:
->>
->> if (!kobject_get_unless_zero(bd_holder_dir))
->> 	return -ENODEV;
->> ...
->> bd_find_holder_disk()
->>
->> Do you think this is ok?
-> 
-> I'm not quite sure what the point is.
-> 
+I think we need to sort that out as a pre-patch.  There is quite some
+history there was a fair amount of dead lock potential earlier, but
+I think I sorted quite a lot out there, including a new lock for setting
+the gendisk size, which is what the comment refers to.
 
-Because I'm afraid bd_link_disk_holder() just take bdev as paramater,
-(bdev is got by blkdev_get_by_dev), but there is no guarantee that disk
-can't be remove(del_gendisk is called for the disk that bdev belongs
-to).
+Something like this:
 
-Thus I think the interface bd_link_disk_holder() itself is problematic,
-current caller drbd/md/dm might all be affected.
-
-Thanks,
-Kuai
-> If you want to really clean this up a good thing would be to remove
-> the delayed holder registration entirely and just do them in dm
-> after add_disk and remove them before del_gendisk.  I've been wanting
-> to do that a few times but always gave up due to the mess in dm.
-> 
-> .
-> 
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 059737c1a2c19..cb7623b5d2c8b 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -5105,21 +5105,21 @@ static void nvme_stop_ns_queue(struct nvme_ns *ns)
+ 
+ /*
+  * Prepare a queue for teardown.
+- *
+- * This must forcibly unquiesce queues to avoid blocking dispatch, and only set
+- * the capacity to 0 after that to avoid blocking dispatchers that may be
+- * holding bd_butex.  This will end buffered writers dirtying pages that can't
+- * be synced.
+  */
+ static void nvme_set_queue_dying(struct nvme_ns *ns)
+ {
+ 	if (test_and_set_bit(NVME_NS_DEAD, &ns->flags))
+ 		return;
+ 
++	/*
++	 * Mark the disk dead to prevent new opens, and set the capacity to 0
++	 * to end buffered writers dirtying pages that can't be synced.
++	 */
+ 	blk_mark_disk_dead(ns->disk);
+-	nvme_start_ns_queue(ns);
+-
+ 	set_capacity_and_notify(ns->disk, 0);
++
++	/* forcibly unquiesce queues to avoid blocking dispatch */
++	nvme_start_ns_queue(ns);
+ }
+ 
+ /**
