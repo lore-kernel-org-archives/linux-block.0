@@ -2,117 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEACC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 19:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 858B0C43217
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 19:35:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229893AbiJRTUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 15:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59188 "EHLO
+        id S229602AbiJRTfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 15:35:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiJRTUH (ORCPT
+        with ESMTP id S229657AbiJRTfK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 15:20:07 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F10173DBE5
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 12:20:01 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id mx8so9941657qvb.8
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 12:20:00 -0700 (PDT)
+        Tue, 18 Oct 2022 15:35:10 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED35727912;
+        Tue, 18 Oct 2022 12:35:08 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id g27so22019667edf.11;
+        Tue, 18 Oct 2022 12:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mFa9H1YcgEQ0QJQ6P/vrEWGWEagwD/S4HsG+zs6wkwI=;
-        b=EePDupGOXDMX0Amsdt3KkO3ysbX9zyt5oakNbc4i76GaQMl6FVv5E56PrKs0D1zhwV
-         nZcG4sxIbVO20KnnXZN+AH5oabUbzeSKlgEdC67IL9ad0Wr6BGBHa5PkOXc3Ojrc6ZR6
-         tKbf5WjmJ20ykhY4PufKQqH642kc3Ux9uI17I=
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MEQQitYjZbXJANs1RoNeTAqxiMmroK05libS5bTqvrM=;
+        b=TJzasUE+7XDdqHpODudt3fj6P+0tKD8DDMWv0VxudtiYJJ2BkfW3a6bW3SaS1pMmm/
+         yTiJE1PsdoxcsYWHPdmWiHt6lBejV/ngHqWbk2rDW6msyzxEorIbdCG/jW4EuYc4cSZr
+         uQuobg8AR2IdelBxzmvz813y9TsH2OCmNmDdtpc61MCdY+CPp1w3e55qsXDbHhE5Ey3w
+         Hqy0Jy4wyMUjure6VzAxBREpMIn1q2g+dbPk2d936iAk+Nu+Gkr/S74Oc9n5KmzQFfFy
+         5025/ZO/MB2nbLdwFtKPt8TXNBAtZU4A5w61PItwUnTRY7DucFccuM2OU/VtMji9cp8D
+         WO4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mFa9H1YcgEQ0QJQ6P/vrEWGWEagwD/S4HsG+zs6wkwI=;
-        b=fj9D1ScGRwSD/rytb1WdMixak+pPNjigi+r0VCBvogiUSLshZ4gdpkhCfoz9mi01xo
-         Spn0iTkfRPGssySW/lN5hcnG+AKXyLDihWQmXWoqw1vlwSHHaFzIuXQ6F0WJBk5Y1vh0
-         4ghjUpTFdeO5XCq/PDD0mC9Y29VkB7oe50R80CcOletox3jLFNC5D4FLDzRKqE6MDHHu
-         x7j45ZvdaeNBf7j9lL55Uv2a8M9bc8MJP6nCbugVg2XFAOUxrQ86axa67vSlvAQ0Ns6N
-         LtN0sq6nLi7WcMP8oochVnuANG4trmtYNz/a03ymDjKwJcG100YSSxds/riwX1/4yr20
-         2Jag==
-X-Gm-Message-State: ACrzQf3jKuHbWp3GNRvpmzNM9jDVlLwfADHscTQixiWJxpEla0ljii8n
-        RcAibs9iBXOymLODgm44mrigGi1o76T1EA==
-X-Google-Smtp-Source: AMsMyM7qMMU0qlo/1UAcCXEK5k64tYeDSTm/Dh/iGTeaLv5ZwLiQLwHtaTkf2xFIYat85gyWsMgEHA==
-X-Received: by 2002:a05:6214:f27:b0:4b1:c73a:a990 with SMTP id iw7-20020a0562140f2700b004b1c73aa990mr3775132qvb.24.1666120797927;
-        Tue, 18 Oct 2022 12:19:57 -0700 (PDT)
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com. [209.85.128.175])
-        by smtp.gmail.com with ESMTPSA id r10-20020ac85e8a000000b00397101ac0f2sm2469960qtx.3.2022.10.18.12.19.56
-        for <linux-block@vger.kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MEQQitYjZbXJANs1RoNeTAqxiMmroK05libS5bTqvrM=;
+        b=Z6s/9ypnjIkNHCjDuJKE5u+XoCBtGrdqRKucXq13g6quGGVl2fxH6P7sePu8jWb6aC
+         qcq/axjE7+gSdr0ZjCoOoQ9Kr7olePmsRcgt3ikWjihpZ6Cnb7b+nayokDEm/4sh7edL
+         QHSWDIkmEWB+UmKMsTbhVuH3/LsfI7EhKPoB7P+HFrF8yAcBqu/iIzQyyplReD1wMIuM
+         4kmB/nb8qYu9K+o1AbjLyt7sy9yeVEx9Zos0jdoOBgBlNL0WVWjRi+bdmKYwt6LDPRZZ
+         Cb5x+PgHtTs8ViTNCn3NjaFBdwuLapD+HWQbWKNQD14aSi/aIJlGuOLwmsanw915HXl6
+         vltQ==
+X-Gm-Message-State: ACrzQf2Hv1/CvR0Cm5d4QqMnb1fgw9sGxP5VBBDpLWg9LVd/9qEYslGY
+        1f3EY5N36Gh3CH1BVy9fimAVM+eqkuI=
+X-Google-Smtp-Source: AMsMyM7h+SUBLedOYfsL7w7vWlAu8tjqt8DlKZke2cYAMbdZAWvCaOPqZVV9lSh+zp5K3iqPTBfEQQ==
+X-Received: by 2002:aa7:d7c5:0:b0:459:fad8:fd2 with SMTP id e5-20020aa7d7c5000000b00459fad80fd2mr4117207eds.336.1666121707476;
+        Tue, 18 Oct 2022 12:35:07 -0700 (PDT)
+Received: from [192.168.8.100] (94.197.72.2.threembb.co.uk. [94.197.72.2])
+        by smtp.gmail.com with ESMTPSA id fd13-20020a056402388d00b0045b3853c4b7sm9309479edb.51.2022.10.18.12.35.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Oct 2022 12:19:56 -0700 (PDT)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-354c7abf786so147341687b3.0
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 12:19:56 -0700 (PDT)
-X-Received: by 2002:a0d:fe07:0:b0:360:c3e9:fc8a with SMTP id
- o7-20020a0dfe07000000b00360c3e9fc8amr3888903ywf.441.1666120796403; Tue, 18
- Oct 2022 12:19:56 -0700 (PDT)
+        Tue, 18 Oct 2022 12:35:07 -0700 (PDT)
+Message-ID: <9c92c1fa-1a67-1fb1-0cc6-c65c708db01e@gmail.com>
+Date:   Tue, 18 Oct 2022 20:33:59 +0100
 MIME-Version: 1.0
-References: <Y07SYs98z5VNxdZq@redhat.com> <Y07twbDIVgEnPsFn@infradead.org> <CAHk-=wg3cpPyoO8u+8Fu1uk86bgTUYanfKhmxMsZzvY_mV=Cxw@mail.gmail.com>
-In-Reply-To: <CAHk-=wg3cpPyoO8u+8Fu1uk86bgTUYanfKhmxMsZzvY_mV=Cxw@mail.gmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 18 Oct 2022 12:19:39 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiE_p66JtpfsM2GMk0ctuLcP+HBuNOEnpZRY0Ees8oFXw@mail.gmail.com>
-Message-ID: <CAHk-=wiE_p66JtpfsM2GMk0ctuLcP+HBuNOEnpZRY0Ees8oFXw@mail.gmail.com>
-Subject: Re: [git pull] device mapper changes for 6.1
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, Alasdair G Kergon <agk@redhat.com>,
-        Genjian Zhang <zhanggenjian@kylinos.cn>,
-        Jiangshan Yi <yijiangshan@kylinos.cn>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Nathan Huckleberry <nhuck@google.com>,
-        Nikos Tsironis <ntsironis@arrikto.com>,
-        Shaomin Deng <dengshaomin@cdjrlc.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [RFC for-next 0/4] enable pcpu bio caching for IRQ I/O
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+References: <cover.1666114003.git.asml.silence@gmail.com>
+Content-Language: en-US
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <cover.1666114003.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 11:54 AM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> But no, we absolutely do *not* want to emulate that particular horror
-> anywhere else.
+On 10/18/22 19:47, Pavel Begunkov wrote:
+> This series implements bio pcpu caching for normal / IRQ-driven I/O
+> extending REQ_ALLOC_CACHE currently limited to iopoll. The allocation side
+> still only works from non-irq context, which is the reason it's not enabled
+> by default, but turning it on for other users (e.g. filesystems) is
+> as a matter of passing a flag.
 
-Side note: if DM people go "Hmm, a lot of our management really does
-have the exact same issues as 'mount()' and friends, and doing the
-same things as mount does with the whole string interface and logging
-sounds like a good idea", I want to nip that in the bud.
+Ooops, wrong version, will resend
 
-It's most definitely *not* a good idea. The mount thing is nasty, it's
-just that we've always had the odd string interface, and it's just
-grown from "const void *data" to be a whole complicated set of context
-handling.
 
-So don't even think about duplicating that thing.
+> t/io_uring with an Optane SSD setup showed +7% for batches of 32 requests
+> and +4.3% for batches of 8.
+> 
+> IRQ, 128/32/32, cache off
+> IOPS=59.08M, BW=28.84GiB/s, IOS/call=31/31
+> IOPS=59.30M, BW=28.96GiB/s, IOS/call=32/32
+> IOPS=59.97M, BW=29.28GiB/s, IOS/call=31/31
+> IOPS=59.92M, BW=29.26GiB/s, IOS/call=32/32
+> IOPS=59.81M, BW=29.20GiB/s, IOS/call=32/31
+> 
+> IRQ, 128/32/32, cache on
+> IOPS=64.05M, BW=31.27GiB/s, IOS/call=32/31
+> IOPS=64.22M, BW=31.36GiB/s, IOS/call=32/32
+> IOPS=64.04M, BW=31.27GiB/s, IOS/call=31/31
+> IOPS=63.16M, BW=30.84GiB/s, IOS/call=32/32
+> 
+> IRQ, 32/8/8, cache off
+> IOPS=50.60M, BW=24.71GiB/s, IOS/call=7/8
+> IOPS=50.22M, BW=24.52GiB/s, IOS/call=8/7
+> IOPS=49.54M, BW=24.19GiB/s, IOS/call=8/8
+> IOPS=50.07M, BW=24.45GiB/s, IOS/call=7/7
+> IOPS=50.46M, BW=24.64GiB/s, IOS/call=8/8
+> 
+> IRQ, 32/8/8, cache on
+> IOPS=51.39M, BW=25.09GiB/s, IOS/call=8/7
+> IOPS=52.52M, BW=25.64GiB/s, IOS/call=7/8
+> IOPS=52.57M, BW=25.67GiB/s, IOS/call=8/8
+> IOPS=52.58M, BW=25.67GiB/s, IOS/call=8/7
+> IOPS=52.61M, BW=25.69GiB/s, IOS/call=8/8
+> 
+> The main part is in patch 3. Would be great to take patch 1 separately
+> for 6.1 for extra safety.
+> 
+> Pavel Begunkov (4):
+>    bio: safeguard REQ_ALLOC_CACHE bio put
+>    bio: split pcpu cache part of bio_put into a helper
+>    block/bio: add pcpu caching for non-polling bio_put
+>    io_uring/rw: enable bio caches for IRQ rw
+> 
+>   block/bio.c   | 92 +++++++++++++++++++++++++++++++++++++++------------
+>   io_uring/rw.c |  3 +-
+>   2 files changed, 73 insertions(+), 22 deletions(-)
+> 
 
-Now, if some "inspired" person then thinks that instead of duplicating
-it, you really would want to do device mapper *as* a filesystem and
-actually using the fsconfig() model directly and natively, that is at
-least conceptually not necessarily wrong. At what point does a
-"translate disk blocks and munge contents" turn from "map devices into
-other devices" to a "map devices into a filesystem"? We've had loop
-devices forever, and they already show how filesystems and block
-devices can be a mixed concept.
-
-And no, I'm not seriously suggesting that as a "do this instead".
-
-I'm just saying that from an interface standpoint, we _do_ have an
-interface that is kind of doing this, and that is already an area
-where a lot of people think there is a lot of commonalities (ie a
-number of filesystems end up doing their own device mapping
-internally, and people used to say "layering violation - please use dm
-for that" before they got used/resigned to it because the filesystem
-people really wanted to control the mapping).
-
-In the absence of that kind of unification, just use 'errno'.
-
-               Linus
+-- 
+Pavel Begunkov
