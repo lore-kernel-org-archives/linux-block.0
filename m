@@ -2,59 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021A3C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 11:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAAEBC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 11:12:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbiJRLFx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 07:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
+        id S229719AbiJRLMu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 07:12:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbiJRLFu (ORCPT
+        with ESMTP id S229670AbiJRLMt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 07:05:50 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A333B193E0
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 04:05:48 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 3957768C4E; Tue, 18 Oct 2022 13:05:44 +0200 (CEST)
-Date:   Tue, 18 Oct 2022 13:05:44 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, ming.lei@redhat.com, axboe@kernel.dk
-Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
-Message-ID: <20221018110544.GA4785@lst.de>
-References: <20221013094450.5947-1-lengchao@huawei.com> <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de> <20221017134244.GA24775@lst.de> <b0631151-4081-2fdb-fbb0-eab1db633200@grimberg.me> <20221018085557.GA28266@lst.de> <3a466711-860a-667f-b78d-daa1eedb4edf@grimberg.me>
+        Tue, 18 Oct 2022 07:12:49 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB6CB9AFF0;
+        Tue, 18 Oct 2022 04:12:45 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MsB3K18K4zJn2S;
+        Tue, 18 Oct 2022 19:10:05 +0800 (CST)
+Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
+ (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 18 Oct
+ 2022 19:12:42 +0800
+From:   Kemeng Shi <shikemeng@huawei.com>
+To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
+Subject: [PATCH v2 0/3] A few cleanup patches for blk-iolatency.c
+Date:   Tue, 18 Oct 2022 19:12:37 +0800
+Message-ID: <20221018111240.22612-1-shikemeng@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3a466711-860a-667f-b78d-daa1eedb4edf@grimberg.me>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain
+X-Originating-IP: [10.174.178.129]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 12:06:41PM +0300, Sagi Grimberg wrote:
->>   +	/*
->> +	 * Mark the disk dead to prevent new opens, and set the capacity to 0
->> +	 * to end buffered writers dirtying pages that can't be synced.
->> +	 */
->>   	blk_mark_disk_dead(ns->disk);
->> -	nvme_start_ns_queue(ns);
->> -
->>   	set_capacity_and_notify(ns->disk, 0);
->> +
->> +	/* forcibly unquiesce queues to avoid blocking dispatch */
->> +	nvme_start_ns_queue(ns);
->>   }
->
-> If we no longer have this ordering requirement, then I don't see why
-> the unquiesce cannot move before or after nvme_set_queue_dying and apply
-> a tagset-wide quiesce/unquiesce...
+This series contains three cleanup patches to remove redundant check,
+correct comment and simplify struct iolatency_grp in blk-iolatency.c.
 
-Yes.  After this patch we can simply do the tagset-wide unquiesce
-after the loop calling blk_mark_disk_dead and set_capacity_and_notify.
+---
+v2:
+ Thanks Josef for review and comment!
+ Add Reviewed-by tag from Josef 
+ Improve the corrected comment in patch 2/3
+---
 
-We can then also move the NЅ_DEAD flag to the controller..
+Kemeng Shi (3):
+  block: Remove redundant parent blkcg_gp check in check_scale_change
+  block: Correct comment for scale_cookie_change
+  block: Replace struct rq_depth with unsigned int in struct
+    iolatency_grp
+
+ block/blk-iolatency.c | 37 +++++++++++++++++--------------------
+ 1 file changed, 17 insertions(+), 20 deletions(-)
+
+-- 
+2.30.0
+
