@@ -2,82 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FFDC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 07:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F7CC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 07:38:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbiJRHIB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 03:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54566 "EHLO
+        id S229959AbiJRHiH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 03:38:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbiJRHIA (ORCPT
+        with ESMTP id S229819AbiJRHiH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 03:08:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E3866BD5F;
-        Tue, 18 Oct 2022 00:08:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A10B46147B;
-        Tue, 18 Oct 2022 07:07:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA899C433C1;
-        Tue, 18 Oct 2022 07:07:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666076879;
-        bh=Fj9VdPapWV4U5Y1IbjLNZkEft7nk+xSTK0xPlMf5QSE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uqiiypT/X4Mi6+oIg09YWnzQ1pcaPbHl6AtT7QUP0efAmdx4C87r8NdT83fk3rk24
-         7bhbddb7xXglJZbhIRye0aeEQA1B3zTiEXb8shIkDsb9dgPF9QfJagb4uKzlbn2X/1
-         jmLH4Kl4MQp3+ThgwiSTe+NkLViqj5d0DlvKmnEEeSHxJjcDMAG5HyZRVoOFRXhTdG
-         GC54LvENZti2NWaPoQ+rQJB9o7ZIBVD6mtNZwm6Xe/7D644PscfKsxdBBwLhf+ovk7
-         dNDVuNxvRRFFEn51EOVnjJRh4uu+6SmuV+fUKqILHpF1eJKH6sfMfWpqIDijKPZncb
-         e6FkMYGLds4hw==
-Date:   Tue, 18 Oct 2022 00:07:57 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Stephen Rothwell <sfr@canb.auug.org.au>
-Cc:     linux-next@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH v5 0/8] make statx() return DIO alignment information
-Message-ID: <Y05QzQM2ed8sOJxC@sol.localdomain>
-References: <20220827065851.135710-1-ebiggers@kernel.org>
- <YxfE8zjqkT6Zn+Vn@quark>
- <Yx6DNIorJ86IWk5q@quark>
- <20220913063025.4815466c@canb.auug.org.au>
- <20221018155524.5fc4e421@canb.auug.org.au>
+        Tue, 18 Oct 2022 03:38:07 -0400
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173ACA1AE;
+        Tue, 18 Oct 2022 00:38:06 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Ms5Hx47wGzKDPh;
+        Tue, 18 Oct 2022 15:35:41 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgC3uzHZV05jtIQsAA--.51136S3;
+        Tue, 18 Oct 2022 15:38:03 +0800 (CST)
+Subject: Re: [PATCH -next 2/3] blktrace: fix possible memleak in
+ '__blk_trace_remove'
+To:     Ye Bin <yebin10@huawei.com>, axboe@kernel.dk, rostedt@goodmis.org,
+        mhiramat@kernel.org, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221017065321.2846017-1-yebin10@huawei.com>
+ <20221017065321.2846017-3-yebin10@huawei.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <9e9c8d3a-6f23-a465-e070-5f963a95afe2@huaweicloud.com>
+Date:   Tue, 18 Oct 2022 15:38:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221018155524.5fc4e421@canb.auug.org.au>
+In-Reply-To: <20221017065321.2846017-3-yebin10@huawei.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgC3uzHZV05jtIQsAA--.51136S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYU7kC6x804xWl14x267AKxVW8JVW5JwAF
+        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
+        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
+        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r
+        1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
+        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUrR6zUU
+        UUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 03:55:24PM +1100, Stephen Rothwell wrote:
-> Hi Eric,
-> 
-> On Tue, 13 Sep 2022 06:30:25 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> > 
-> > On Sun, 11 Sep 2022 19:54:12 -0500 Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > Stephen, can you add my git branch for this patchset to linux-next?
-> > > 
-> > > URL: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-> > > Branch: statx-dioalign
-> > > 
-> > > This is targeting the 6.1 merge window with a pull request to Linus.  
-> > 
-> > Added from today.
-> 
-> I notice that this branch has been removed.  Are you finished with it
-> (i.e. should I remove it from linux-next)?
-> 
+Hi,
 
-Yes, I think so.  This patchset has been merged upstream.  Any more patches
-related to STATX_DIOALIGN should go in through the VFS or filesystem-specific
-trees.
+ÔÚ 2022/10/17 14:53, Ye Bin Ð´µÀ:
+> To solve above issues, reference commit '5afedf670caf', first stop block trace
+> when block trace state is 'Blktrace_running' in '__blk_trace_remove'.
 
-- Eric
+Will it be much simpler if we just return -EBUSY in blk_trace_remove if
+state is still running?
+
+And similar checking in blk_trace_setup.
+
+Thanks,
+Kuai
+
