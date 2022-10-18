@@ -2,90 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD922C43217
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 12:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32B82C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 12:52:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229942AbiJRMTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 08:19:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
+        id S230196AbiJRMwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 08:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbiJRMTn (ORCPT
+        with ESMTP id S230199AbiJRMwd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 08:19:43 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DDC13E3B;
-        Tue, 18 Oct 2022 05:19:39 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MsCXW3M71zJn2y;
-        Tue, 18 Oct 2022 20:16:59 +0800 (CST)
-Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
- (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
+        Tue, 18 Oct 2022 08:52:33 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F31C4C3D;
+        Tue, 18 Oct 2022 05:52:32 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MsDKM5X4kzHtt3;
+        Tue, 18 Oct 2022 20:52:23 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 18 Oct 2022 20:52:29 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 18 Oct
- 2022 20:19:37 +0800
-From:   Kemeng Shi <shikemeng@huawei.com>
-To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH v2 4/5] blk-iocost: Remove vrate member in struct ioc_now
-Date:   Tue, 18 Oct 2022 20:19:31 +0800
-Message-ID: <20221018121932.10792-5-shikemeng@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20221018121932.10792-1-shikemeng@huawei.com>
-References: <20221018121932.10792-1-shikemeng@huawei.com>
+ 2022 20:52:28 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <hch@lst.de>, <axboe@kernel.dk>, <gregkh@linuxfoundation.org>,
+        <willy@infradead.org>, <martin.petersen@oracle.com>,
+        <kch@nvidia.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yukuai1@huaweicloud.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH RFC 1/2] kobject: add return value for kobject_put()
+Date:   Tue, 18 Oct 2022 21:14:31 +0800
+Message-ID: <20221018131432.434167-2-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221018131432.434167-1-yukuai3@huawei.com>
+References: <20221018131432.434167-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.178.129]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemi500016.china.huawei.com (7.221.188.220)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we trace vtime_base_rate instead of vtime_rate, there is nowhere
-which accesses now->vrate except function ioc_now using now->vrate locally.
-Just remove it.
+The return value will be used in later patch to fix uaf for slave_dir
+and bd_holder_dir in block layer.
 
-Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-iocost.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/linux/kobject.h | 2 +-
+ lib/kobject.c           | 7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index b0991b52e3dd..761295ed9c5a 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -556,7 +556,6 @@ struct ioc_now {
- 	u64				now_ns;
- 	u64				now;
- 	u64				vnow;
--	u64				vrate;
- };
+diff --git a/include/linux/kobject.h b/include/linux/kobject.h
+index 57fb972fea05..f12de6274c51 100644
+--- a/include/linux/kobject.h
++++ b/include/linux/kobject.h
+@@ -110,7 +110,7 @@ extern int __must_check kobject_move(struct kobject *, struct kobject *);
+ extern struct kobject *kobject_get(struct kobject *kobj);
+ extern struct kobject * __must_check kobject_get_unless_zero(
+ 						struct kobject *kobj);
+-extern void kobject_put(struct kobject *kobj);
++extern bool kobject_put(struct kobject *kobj);
  
- struct iocg_wait {
-@@ -1020,10 +1019,11 @@ static void ioc_adjust_base_vrate(struct ioc *ioc, u32 rq_wait_pct,
- static void ioc_now(struct ioc *ioc, struct ioc_now *now)
+ extern const void *kobject_namespace(struct kobject *kobj);
+ extern void kobject_get_ownership(struct kobject *kobj,
+diff --git a/lib/kobject.c b/lib/kobject.c
+index a0b2dbfcfa23..f86c55ae7376 100644
+--- a/lib/kobject.c
++++ b/lib/kobject.c
+@@ -711,15 +711,18 @@ static void kobject_release(struct kref *kref)
+  *
+  * Decrement the refcount, and if 0, call kobject_cleanup().
+  */
+-void kobject_put(struct kobject *kobj)
++bool kobject_put(struct kobject *kobj)
  {
- 	unsigned seq;
-+	u64 vrate;
- 
- 	now->now_ns = ktime_get();
- 	now->now = ktime_to_us(now->now_ns);
--	now->vrate = atomic64_read(&ioc->vtime_rate);
-+	vrate = atomic64_read(&ioc->vtime_rate);
- 
- 	/*
- 	 * The current vtime is
-@@ -1036,7 +1036,7 @@ static void ioc_now(struct ioc *ioc, struct ioc_now *now)
- 	do {
- 		seq = read_seqcount_begin(&ioc->period_seqcount);
- 		now->vnow = ioc->period_at_vtime +
--			(now->now - ioc->period_at) * now->vrate;
-+			(now->now - ioc->period_at) * vrate;
- 	} while (read_seqcount_retry(&ioc->period_seqcount, seq));
+ 	if (kobj) {
+ 		if (!kobj->state_initialized)
+ 			WARN(1, KERN_WARNING
+ 				"kobject: '%s' (%p): is not initialized, yet kobject_put() is being called.\n",
+ 			     kobject_name(kobj), kobj);
+-		kref_put(&kobj->kref, kobject_release);
++		if (kref_put(&kobj->kref, kobject_release))
++			return true;
+ 	}
++
++	return false;
  }
+ EXPORT_SYMBOL(kobject_put);
  
 -- 
-2.30.0
+2.31.1
 
