@@ -2,96 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF6DC43217
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 04:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF8CC4167B
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 04:55:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbiJREzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 00:55:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54952 "EHLO
+        id S229780AbiJREzr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 00:55:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229845AbiJREzB (ORCPT
+        with ESMTP id S229926AbiJREzh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 00:55:01 -0400
-Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461D01C91D;
-        Mon, 17 Oct 2022 21:54:50 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R971e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VSTAzRM_1666068875;
-Received: from localhost.localdomain(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VSTAzRM_1666068875)
-          by smtp.aliyun-inc.com;
-          Tue, 18 Oct 2022 12:54:47 +0800
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-To:     axboe@kernel.dk, ming.lei@redhat.com
-Cc:     xiaoguang.wang@linux.alibaba.com, linux-block@vger.kernel.org,
-        corbet@lwn.net, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Subject: [PATCH 1/1] Documentation: document ublk user recovery feature
-Date:   Tue, 18 Oct 2022 12:53:46 +0800
-Message-Id: <20221018045346.99706-2-ZiyangZhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20221018045346.99706-1-ZiyangZhang@linux.alibaba.com>
-References: <20221018045346.99706-1-ZiyangZhang@linux.alibaba.com>
+        Tue, 18 Oct 2022 00:55:37 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35986525F;
+        Mon, 17 Oct 2022 21:55:31 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Ms1l168BWz4xFy;
+        Tue, 18 Oct 2022 15:55:25 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1666068926;
+        bh=CRrHBDsNdrBb28hzgQhlrZd26ZKphtFKLFjDwU/ABaM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KoC6hrmzAs9HidJRRxkubIdSZ+CjOXbnqlKmiHN7K59O4vyWF8oo7vyiGEjyg7cjM
+         j9OfGRfnR4pdnCe9OvqaTMWdp3Nh9N4O6NDTIi7tQDrRHuJpfWswZRBizWuWkpLraD
+         T8/8zHB9obIaN+1OkMvUam8/bJvmm4Vp0YGFRSIS2chyfJObRcOgUXMm7IWZW+JV31
+         d6yXY9OxqMxwPepR6E2dTpRBFoM3s+6EXJS9ypIHF0f+/gUr1Qihyah9UO9arldiSe
+         bBQ8e3h6lXBihlsh6XhoNxGpldR6cG2UsZSpxg4Yv2h1xearu5CHhfU0i9qSeV47x7
+         sfeLbfH8NQ8eg==
+Date:   Tue, 18 Oct 2022 15:55:24 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-next@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>, linux-fscrypt@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH v5 0/8] make statx() return DIO alignment information
+Message-ID: <20221018155524.5fc4e421@canb.auug.org.au>
+In-Reply-To: <20220913063025.4815466c@canb.auug.org.au>
+References: <20220827065851.135710-1-ebiggers@kernel.org>
+        <YxfE8zjqkT6Zn+Vn@quark>
+        <Yx6DNIorJ86IWk5q@quark>
+        <20220913063025.4815466c@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/Ta.nZamROACWUZnFj4i7MWy";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add documentation for user recovery feature of ublk subsystem.
+--Sig_/Ta.nZamROACWUZnFj4i7MWy
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
----
- Documentation/block/ublk.rst | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Hi Eric,
 
-diff --git a/Documentation/block/ublk.rst b/Documentation/block/ublk.rst
-index 2122d1a4a541..ba45c46cc0da 100644
---- a/Documentation/block/ublk.rst
-+++ b/Documentation/block/ublk.rst
-@@ -144,6 +144,42 @@ managing and controlling ublk devices with help of several control commands:
-   For retrieving device info via ``ublksrv_ctrl_dev_info``. It is the server's
-   responsibility to save IO target specific info in userspace.
- 
-+- ``UBLK_CMD_START_USER_RECOVERY``
-+
-+  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
-+  command is accepted after the old process has exited, ublk device is quiesced
-+  and ``/dev/ublkc*`` is released. User should send this command before he starts
-+  a new process which re-opens ``/dev/ublkc*``. When this command returns, the
-+  ublk device is ready for the new process.
-+
-+- ``UBLK_CMD_END_USER_RECOVERY``
-+
-+  This command is valid if ``UBLK_F_USER_RECOVERY`` feature is enabled. This
-+  command is accepted after ublk device is quiesced and a new process has
-+  opened ``/dev/ublkc*`` and get all ublk queues be ready. When this command
-+  returns, ublk device is unquiesced and new I/O requests are passed to the
-+  new process.
-+
-+- user recovery feature description
-+
-+  Two new features are added for user recovery: ``UBLK_F_USER_RECOVERY`` and
-+  ``UBLK_F_USER_RECOVERY_REISSUE``.
-+
-+  With ``UBLK_F_USER_RECOVERY`` set, after one ubq_daemon(ublk server's io
-+  handler) is dying, ublk does not delete ``/dev/ublkb*`` during the whole
-+  recovery stage and ublk device ID is kept. It is ublk server's
-+  responsibility to recover the device context by its own knowledge.
-+  Requests which have not been issued to userspace are requeued. Requests
-+  which have been issued to userspace are aborted.
-+
-+  With ``UBLK_F_USER_RECOVERY_REISSUE`` set, after one ubq_daemon(ublk
-+  server's io handler) is dying, contrary to ``UBLK_F_USER_RECOVERY``,
-+  requests which have been issued to userspace are requeued and will be
-+  re-issued to the new process after handling ``UBLK_CMD_END_USER_RECOVERY``.
-+  ``UBLK_F_USER_RECOVERY_REISSUE`` is designed for backends who tolerate
-+  double-write since the driver may issue the same I/O request twice. It
-+  might be useful to a read-only FS or a VM backend.
-+
- Data plane
- ----------
- 
--- 
-2.27.0
+On Tue, 13 Sep 2022 06:30:25 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>=20
+> On Sun, 11 Sep 2022 19:54:12 -0500 Eric Biggers <ebiggers@kernel.org> wro=
+te:
+> >
+> > Stephen, can you add my git branch for this patchset to linux-next?
+> >=20
+> > URL: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+> > Branch: statx-dioalign
+> >=20
+> > This is targeting the 6.1 merge window with a pull request to Linus. =20
+>=20
+> Added from today.
 
+I notice that this branch has been removed.  Are you finished with it
+(i.e. should I remove it from linux-next)?
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/Ta.nZamROACWUZnFj4i7MWy
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmNOMbwACgkQAVBC80lX
+0GxBPwf+NK66Affcx+uOwICiv+ovQ21QIlPm9IJ5LvIoFwf8a6p0CBBV0D87Lz3O
+gTyOmmIln6foey0EDLUonmx0R/g/NmDIqlmlTokCTOS3W06Rg+Q/ura6Xy2e16yX
+jkvcXxu3VueNdLN/MgKin6PjnB77DyhjPo1xuyXxHE39/XO0h8vTMY9OL44Zg8E9
+ZEnV4lTb/mUKb1DU0SiFrM2hcFfCG09gEnUGsA7P/dQnwrHHkD+vWPDsX5yWHX3P
+bKtAFYG/Z17S8nIzUbQG+A19u19ajcQasGjV8jDLEERPDX3bOg91nR33ahR4rfQb
+T/Xadfe0rtdAKEqBLhNafzUpmGIqxg==
+=DyWQ
+-----END PGP SIGNATURE-----
+
+--Sig_/Ta.nZamROACWUZnFj4i7MWy--
