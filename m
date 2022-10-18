@@ -2,85 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC61C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55328C43219
 	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 14:29:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbiJRO3u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 10:29:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
+        id S229697AbiJRO3t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 10:29:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231514AbiJRO3m (ORCPT
+        with ESMTP id S231513AbiJRO3m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 18 Oct 2022 10:29:42 -0400
 Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30C85192A8;
-        Tue, 18 Oct 2022 07:29:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB2B16471;
+        Tue, 18 Oct 2022 07:29:40 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MsGQv1Bpmz6R48k;
-        Tue, 18 Oct 2022 22:27:19 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MsGQt68kVz6Q4XK;
+        Tue, 18 Oct 2022 22:27:18 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBHWTBRuE5jkSo6AA--.18765S7;
-        Tue, 18 Oct 2022 22:29:39 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgBHWTBRuE5jkSo6AA--.18765S6;
+        Tue, 18 Oct 2022 22:29:38 +0800 (CST)
 From:   Ye Bin <yebin@huaweicloud.com>
 To:     axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
         linux-block@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, yebin@huaweicloud.com
-Subject: [PATCH v2 3/3] blktrace: remove unnessary stop block trace in 'blk_trace_shutdown'
-Date:   Tue, 18 Oct 2022 22:51:35 +0800
-Message-Id: <20221018145135.932240-4-yebin@huaweicloud.com>
+Subject: [PATCH v2 2/3] blktrace: fix possible memleak in '__blk_trace_remove'
+Date:   Tue, 18 Oct 2022 22:51:34 +0800
+Message-Id: <20221018145135.932240-3-yebin@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221018145135.932240-1-yebin@huaweicloud.com>
 References: <20221018145135.932240-1-yebin@huaweicloud.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBHWTBRuE5jkSo6AA--.18765S7
-X-Coremail-Antispam: 1UD129KBjvdXoWrtrW5ury5ury8AryfXF1rCrg_yoWfAwb_A3
-        WUWwn2ga17Gr9Yvr4fJF4fXw1qq3sFqF109a45JrW5Aw1DJrZ8GanxAFs8Wr90va1qgasr
-        Zr13Jwn7J3ZYyjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb-kFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6r1j6r18M7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUWwA2048vs2IY02
-        0Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM2
-        8EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AI
-        xVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20x
-        vE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xv
-        r2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxC20s
-        026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_
-        JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14
-        v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xva
-        j40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JV
-        W8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjAR67UUUUU==
+X-CM-TRANSID: gCh0CgBHWTBRuE5jkSo6AA--.18765S6
+X-Coremail-Antispam: 1UD129KBjvJXoWxXw4ruFy7KF4rKrWxGry8Krg_yoW5Xw4DpF
+        48Xrs0kw48ZF4Fgw4v9r1fXry8t34Yy3y5Jr9xuw4ftr98tryYqFnF9ryqvFW5Zay8KFWf
+        AryrZr4jyr4UWa7anT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUml14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWUJVWUGwAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
+        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAa
+        w2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
+        C2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
+        7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxV
+        Aaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxY
+        O2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGV
+        WUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_
+        Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rV
+        WUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4U
+        JbIYCTnIWIevJa73UjIFyTuYvjfU1a0mUUUUU
 X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As previous commit, 'blk_trace_cleanup' will stop block trace if
-block trace's state is 'Blktrace_running'.
-So remove unnessary stop block trace in 'blk_trace_shutdown'.
+When test as follows:
+step1: ioctl(sda, BLKTRACESETUP, &arg)
+step2: ioctl(sda, BLKTRACESTART, NULL)
+step3: ioctl(sda, BLKTRACETEARDOWN, NULL)
+step4: ioctl(sda, BLKTRACESETUP, &arg)
+Got issue as follows:
+debugfs: File 'dropped' in directory 'sda' already present!
+debugfs: File 'msg' in directory 'sda' already present!
+debugfs: File 'trace0' in directory 'sda' already present!
+
+And also find syzkaller report issue like "KASAN: use-after-free Read in relay_switch_subbuf"
+"https://syzkaller.appspot.com/bug?id=13849f0d9b1b818b087341691be6cc3ac6a6bfb7"
+
+If remove block trace without stop(BLKTRACESTOP) block trace, '__blk_trace_remove'
+will just set 'q->blk_trace' with NULL. However, debugfs file isn't removed, so
+will report file already present when call BLKTRACESETUP.
+static int __blk_trace_remove(struct request_queue *q)
+{
+        struct blk_trace *bt;
+
+        bt = rcu_replace_pointer(q->blk_trace, NULL,
+                                 lockdep_is_held(&q->debugfs_mutex));
+        if (!bt)
+                return -EINVAL;
+
+	if (bt->trace_state != Blktrace_running)
+        	blk_trace_cleanup(q, bt);
+
+        return 0;
+}
+
+If do test as follows:
+step1: ioctl(sda, BLKTRACESETUP, &arg)
+step2: ioctl(sda, BLKTRACESTART, NULL)
+step3: ioctl(sda, BLKTRACETEARDOWN, NULL)
+step4: remove sda
+
+There will remove debugfs directory which will remove recursively all file
+under directory.
+>> blk_release_queue
+>>	debugfs_remove_recursive(q->debugfs_dir)
+So all files which created in 'do_blk_trace_setup' are removed, and
+'dentry->d_inode' is NULL. But 'q->blk_trace' is still in 'running_trace_lock',
+'trace_note_tsk' will traverse 'running_trace_lock' all nodes.
+>>trace_note_tsk
+>>  trace_note
+>>    relay_reserve
+>>       relay_switch_subbuf
+>>        d_inode(buf->dentry)->i_size
+
+To solve above issues, reference commit '5afedf670caf', call 'blk_trace_cleanup'
+unconditionally in '__blk_trace_remove' and first stop block trace in
+'blk_trace_cleanup'.
 
 Signed-off-by: Ye Bin <yebin@huaweicloud.com>
 ---
- kernel/trace/blktrace.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ kernel/trace/blktrace.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 030e5716661e..2be8c747f796 100644
+index f07a03c1e052..030e5716661e 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -784,10 +784,8 @@ int blk_trace_ioctl(struct block_device *bdev, unsigned cmd, char __user *arg)
- void blk_trace_shutdown(struct request_queue *q)
- {
- 	if (rcu_dereference_protected(q->blk_trace,
--				      lockdep_is_held(&q->debugfs_mutex))) {
--		__blk_trace_startstop(q, 0);
-+				      lockdep_is_held(&q->debugfs_mutex)))
- 		__blk_trace_remove(q);
--	}
- }
+@@ -387,6 +387,7 @@ static int blk_trace_stop(struct blk_trace *bt)
  
- #ifdef CONFIG_BLK_CGROUP
+ static void blk_trace_cleanup(struct request_queue *q, struct blk_trace *bt)
+ {
++	blk_trace_stop(bt);
+ 	synchronize_rcu();
+ 	blk_trace_free(q, bt);
+ 	put_probe_ref();
+@@ -401,8 +402,7 @@ static int __blk_trace_remove(struct request_queue *q)
+ 	if (!bt)
+ 		return -EINVAL;
+ 
+-	if (bt->trace_state != Blktrace_running)
+-		blk_trace_cleanup(q, bt);
++	blk_trace_cleanup(q, bt);
+ 
+ 	return 0;
+ }
 -- 
 2.31.1
 
