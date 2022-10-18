@@ -2,142 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55328C43219
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 14:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92649C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 14:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229697AbiJRO3t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 10:29:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43078 "EHLO
+        id S230234AbiJROtf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 10:49:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231513AbiJRO3m (ORCPT
+        with ESMTP id S229572AbiJROte (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 10:29:42 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB2B16471;
-        Tue, 18 Oct 2022 07:29:40 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MsGQt68kVz6Q4XK;
-        Tue, 18 Oct 2022 22:27:18 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBHWTBRuE5jkSo6AA--.18765S6;
-        Tue, 18 Oct 2022 22:29:38 +0800 (CST)
-From:   Ye Bin <yebin@huaweicloud.com>
-To:     axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, yebin@huaweicloud.com
-Subject: [PATCH v2 2/3] blktrace: fix possible memleak in '__blk_trace_remove'
-Date:   Tue, 18 Oct 2022 22:51:34 +0800
-Message-Id: <20221018145135.932240-3-yebin@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221018145135.932240-1-yebin@huaweicloud.com>
-References: <20221018145135.932240-1-yebin@huaweicloud.com>
+        Tue, 18 Oct 2022 10:49:34 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F413B10FEE;
+        Tue, 18 Oct 2022 07:49:30 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 660A068C4E; Tue, 18 Oct 2022 16:49:25 +0200 (CEST)
+Date:   Tue, 18 Oct 2022 16:49:24 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Serge Semin <fancer.lancer@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Jens Axboe <axboe@fb.com>, Sagi Grimberg <sagi@grimberg.me>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Alexey Malahov <Alexey.Malahov@baikalelectronics.ru>,
+        Pavel Parkhomenko <Pavel.Parkhomenko@baikalelectronics.ru>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] nvme-hwmon: Kmalloc the NVME SMART log buffer
+Message-ID: <20221018144924.GB20131@lst.de>
+References: <20220929224648.8997-1-Sergey.Semin@baikalelectronics.ru> <20220929224648.8997-3-Sergey.Semin@baikalelectronics.ru> <20221017071832.GB30661@lst.de> <20221017161656.hzmsgqpuvqpmriqs@mobilestation>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBHWTBRuE5jkSo6AA--.18765S6
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw4ruFy7KF4rKrWxGry8Krg_yoW5Xw4DpF
-        48Xrs0kw48ZF4Fgw4v9r1fXry8t34Yy3y5Jr9xuw4ftr98tryYqFnF9ryqvFW5Zay8KFWf
-        AryrZr4jyr4UWa7anT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUml14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWUJVWUGwAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jryl82xGYIkIc2
-        x26xkF7I0E14v26r4j6ryUM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
-        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
-        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAa
-        w2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrV
-        C2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE
-        7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxV
-        Aaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxY
-        O2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGV
-        WUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_
-        Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rV
-        WUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4U
-        JbIYCTnIWIevJa73UjIFyTuYvjfU1a0mUUUUU
-X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221017161656.hzmsgqpuvqpmriqs@mobilestation>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When test as follows:
-step1: ioctl(sda, BLKTRACESETUP, &arg)
-step2: ioctl(sda, BLKTRACESTART, NULL)
-step3: ioctl(sda, BLKTRACETEARDOWN, NULL)
-step4: ioctl(sda, BLKTRACESETUP, &arg)
-Got issue as follows:
-debugfs: File 'dropped' in directory 'sda' already present!
-debugfs: File 'msg' in directory 'sda' already present!
-debugfs: File 'trace0' in directory 'sda' already present!
+On Mon, Oct 17, 2022 at 07:16:56PM +0300, Serge Semin wrote:
+> Please note the applied patch doesn't comply with the Keith' notes
+> Link: https://lore.kernel.org/linux-nvme/YzxueNRODpry8L0%2F@kbusch-mbp.dhcp.thefacebook.com/
+> Meanwhile without patch #1 (having only the accepted by you patch
+> applied) the NVME hwmon init now seems contradicting: it ignores one
+> kmalloc failure (returns zero) but fails on another one (returns
+> -ENOMEM). I asked you to have a look at the patches #1 and #2 of the
+> series
+> Link: https://lore.kernel.org/linux-nvme/20221007100134.faaekmuqyd5vy34m@mobilestation/
+> and give your opinion whether the re-spin was required: take the
+> Keith' notes or keep the patches as is. Could you please clarify the
+> situation?
 
-And also find syzkaller report issue like "KASAN: use-after-free Read in relay_switch_subbuf"
-"https://syzkaller.appspot.com/bug?id=13849f0d9b1b818b087341691be6cc3ac6a6bfb7"
-
-If remove block trace without stop(BLKTRACESTOP) block trace, '__blk_trace_remove'
-will just set 'q->blk_trace' with NULL. However, debugfs file isn't removed, so
-will report file already present when call BLKTRACESETUP.
-static int __blk_trace_remove(struct request_queue *q)
-{
-        struct blk_trace *bt;
-
-        bt = rcu_replace_pointer(q->blk_trace, NULL,
-                                 lockdep_is_held(&q->debugfs_mutex));
-        if (!bt)
-                return -EINVAL;
-
-	if (bt->trace_state != Blktrace_running)
-        	blk_trace_cleanup(q, bt);
-
-        return 0;
-}
-
-If do test as follows:
-step1: ioctl(sda, BLKTRACESETUP, &arg)
-step2: ioctl(sda, BLKTRACESTART, NULL)
-step3: ioctl(sda, BLKTRACETEARDOWN, NULL)
-step4: remove sda
-
-There will remove debugfs directory which will remove recursively all file
-under directory.
->> blk_release_queue
->>	debugfs_remove_recursive(q->debugfs_dir)
-So all files which created in 'do_blk_trace_setup' are removed, and
-'dentry->d_inode' is NULL. But 'q->blk_trace' is still in 'running_trace_lock',
-'trace_note_tsk' will traverse 'running_trace_lock' all nodes.
->>trace_note_tsk
->>  trace_note
->>    relay_reserve
->>       relay_switch_subbuf
->>        d_inode(buf->dentry)->i_size
-
-To solve above issues, reference commit '5afedf670caf', call 'blk_trace_cleanup'
-unconditionally in '__blk_trace_remove' and first stop block trace in
-'blk_trace_cleanup'.
-
-Signed-off-by: Ye Bin <yebin@huaweicloud.com>
----
- kernel/trace/blktrace.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index f07a03c1e052..030e5716661e 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -387,6 +387,7 @@ static int blk_trace_stop(struct blk_trace *bt)
- 
- static void blk_trace_cleanup(struct request_queue *q, struct blk_trace *bt)
- {
-+	blk_trace_stop(bt);
- 	synchronize_rcu();
- 	blk_trace_free(q, bt);
- 	put_probe_ref();
-@@ -401,8 +402,7 @@ static int __blk_trace_remove(struct request_queue *q)
- 	if (!bt)
- 		return -EINVAL;
- 
--	if (bt->trace_state != Blktrace_running)
--		blk_trace_cleanup(q, bt);
-+	blk_trace_cleanup(q, bt);
- 
- 	return 0;
- }
--- 
-2.31.1
-
+I'll fix this patch up to follow the recommendation from Keith, I somehow
+thought this was already done.
