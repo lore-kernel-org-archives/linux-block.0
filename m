@@ -2,53 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23365C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 07:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C37C43217
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 07:41:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbiJRHkk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 03:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
+        id S229633AbiJRHlw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 03:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbiJRHki (ORCPT
+        with ESMTP id S229774AbiJRHlt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 03:40:38 -0400
+        Tue, 18 Oct 2022 03:41:49 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844F31135;
-        Tue, 18 Oct 2022 00:40:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502AB36DD9;
+        Tue, 18 Oct 2022 00:41:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=15NCkKgLMuQLzxL5npYUzX5h0+d6v+LAZHYlqwZhX/I=; b=2dIxVBCxo2PVGleuIxWGtdFE4F
-        QJilqrPtxuclT82GK8v+7gMZ/13PkPJ/kSX55DNAzqWjeWN4vgvPt9GSrFoLSsGDWpYVDYB4wXkjv
-        xH7aANVoXcAJqZTYvpp+jS/C7TgkSksI3LMnOs96my1zy6iopjyadaUmS18oR+jxmjz1hVp/6aZGQ
-        72l1cvLe9G7BD9BXi2BIGhpX//i7U2XXJ75syBnsGW3apLnV6G8Vlsx63uVT4BDsMA1yB4fn1395Z
-        nkgqit5UUlOeAH2RHd9A+25JkP/JUTe2Wox7xz00ORvqZxVDqRatF1fQUnTjP1wGte3b+7zwR2ydK
-        2sV7kdAQ==;
+        bh=jax8WsvgWCLEDfYEgIyhaUWsRzyH31RMbbNyco9nBvE=; b=oPJjOlxzMyn/wvmsgI/5rU3SuG
+        U46HISEzXZw2eTE+FEZzqs7/SJqreOVSSX40QjHzyyJHBmdNyZfSf7IwhBCcMFMeQuRGo3RDSaMZD
+        455DBHNTA/GNqXAGzZgUMH8Xxqwj+kmEb1KCBd+pT1XJh0ab+cK+S4fSJY8uglM9B8KafIRpuwyAK
+        59hGfjeTxQc5Adv12ugJyDu9KYcbxCcHDr2H2opH4m52LXglnv+YLY3Ze+ER9yU649BBicE84veCy
+        furhQTZ/iTxNFglswOCqHDUf2kFJe5jTV2L8af1o7413n+8BM9xqqC/bW4CwUoyHQILUibZQRSKDd
+        UC+W/thQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1okhD9-003vLl-QV; Tue, 18 Oct 2022 07:40:27 +0000
-Date:   Tue, 18 Oct 2022 00:40:27 -0700
+        id 1okhEO-003wZL-71; Tue, 18 Oct 2022 07:41:44 +0000
+Date:   Tue, 18 Oct 2022 00:41:44 -0700
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Ye Bin <yebin10@huawei.com>
 Cc:     axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next 1/3] blktrace: introduce 'blk_trace_swicth_state'
- helper
-Message-ID: <Y05Ya7+KdR4Kz6EG@infradead.org>
+Subject: Re: [PATCH -next 2/3] blktrace: fix possible memleak in
+ '__blk_trace_remove'
+Message-ID: <Y05YuJO2WDGasWdS@infradead.org>
 References: <20221017065321.2846017-1-yebin10@huawei.com>
- <20221017065321.2846017-2-yebin10@huawei.com>
+ <20221017065321.2846017-3-yebin10@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221017065321.2846017-2-yebin10@huawei.com>
+In-Reply-To: <20221017065321.2846017-3-yebin10@huawei.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 02:53:19PM +0800, Ye Bin wrote:
-> +static int blk_trace_switch_state(struct blk_trace *bt, int start)
+On Mon, Oct 17, 2022 at 02:53:20PM +0800, Ye Bin wrote:
+> +	if (bt->trace_state == Blktrace_running)
+> +		blk_trace_switch_state(bt, 0);
 
-This is a very confusing helper.  Please split it into two helpers
-(e.g. blk_trace_{start,stop}) instead of the awakward int used as
-boolean argument that makes it do two entirely unrelated things.
+AFAICS blk_trace_switch_state already has that state check, so there
+should be no need to duplicate it here.
+
+I think having this call in blk_trace_cleanup itself might be a little
+more obvious, too.
