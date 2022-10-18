@@ -2,108 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AADDC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 09:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4716C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 09:51:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbiJRJee (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 05:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
+        id S229964AbiJRJvj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 05:51:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229942AbiJRJed (ORCPT
+        with ESMTP id S229587AbiJRJvj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 05:34:33 -0400
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6523A219E;
-        Tue, 18 Oct 2022 02:34:22 -0700 (PDT)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id 29AAF1C0016; Tue, 18 Oct 2022 11:34:19 +0200 (CEST)
-Date:   Tue, 18 Oct 2022 11:34:18 +0200
-From:   Pavel Machek <pavel@denx.de>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Alexander Potapenko <glider@google.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andrey Konovalov <andreyknvl@gmail.com>,
-        Andrey Konovalov <andreyknvl@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Lameter <cl@linux.com>,
-        David Rientjes <rientjes@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ilya Leoshkevich <iii@linux.ibm.com>,
-        Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
-        Kees Cook <keescook@chromium.org>,
-        Marco Elver <elver@google.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Vegard Nossum <vegard.nossum@oracle.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.10 13/16] kmsan: disable physical page merging
- in biovec
-Message-ID: <20221018093418.GA1264@duo.ucw.cz>
-References: <20221018001029.2731620-1-sashal@kernel.org>
- <20221018001029.2731620-13-sashal@kernel.org>
+        Tue, 18 Oct 2022 05:51:39 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69C022B60D
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 02:51:38 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Ms8Fk5HHhzJn2S;
+        Tue, 18 Oct 2022 17:48:58 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 18 Oct 2022 17:51:04 +0800
+Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
+To:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>
+CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <kbusch@kernel.org>, <ming.lei@redhat.com>, <axboe@kernel.dk>
+References: <20221013094450.5947-1-lengchao@huawei.com>
+ <20221013094450.5947-2-lengchao@huawei.com>
+ <99dac305-206c-4e1b-a1ec-50e107258b6b@grimberg.me>
+ <20221017134335.GA24959@lst.de>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <50737260-4865-68f9-9bfe-a3de3d89f21d@huawei.com>
+Date:   Tue, 18 Oct 2022 17:51:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
-Content-Disposition: inline
-In-Reply-To: <20221018001029.2731620-13-sashal@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20221017134335.GA24959@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---RnlQjJ0d97Da+TV1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Hi!
-
-> From: Alexander Potapenko <glider@google.com>
->=20
-> [ Upstream commit f630a5d0ca59a6e73b61e3f82c371dc230da99ff ]
->=20
-> KMSAN metadata for adjacent physical pages may not be adjacent, therefore
-> accessing such pages together may lead to metadata corruption.  We disable
-> merging pages in biovec to prevent such corruptions.
-
-KMSAN is not there at least in 5.10, so we should not have this in
--stable.
-
-Best regards,
-								Pavel
---=20
-DENX Software Engineering GmbH,      Managing Director: Wolfgang Denk
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-
---RnlQjJ0d97Da+TV1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCY05zGgAKCRAw5/Bqldv6
-8sxcAKCJbdkPVjPSdx18zRkSxfIJRWit4gCdHcSIKp1L9Smhjt/uDryjX2Te9AQ=
-=pT0x
------END PGP SIGNATURE-----
-
---RnlQjJ0d97Da+TV1--
+On 2022/10/17 21:43, Christoph Hellwig wrote:
+> On Thu, Oct 13, 2022 at 01:28:37PM +0300, Sagi Grimberg wrote:
+>>> Because some queues never need to be quiesced(e.g. nvme connect_q).
+>>> So introduce QUEUE_FLAG_NOQUIESCED to tagset quiesce interface to
+>>> skip the queue.
+>>
+>> I wouldn't say it never nor will ever quiesce, we just don't happen to
+>> quiesce it today...
+> 
+> Yes.  It really is a QUEUE_FLAG_SKIP_TAGSET_QUIESCE.
+I will modify it in patch V3.
+> 
+> 
+> .
+> 
