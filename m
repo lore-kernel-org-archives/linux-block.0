@@ -2,119 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFCAC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 19:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CDFC43219
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 19:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbiJRTwk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229870AbiJRTwk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 18 Oct 2022 15:52:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51406 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbiJRTwj (ORCPT
+        with ESMTP id S229574AbiJRTwj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 18 Oct 2022 15:52:39 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016C58708D;
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38B18768D;
         Tue, 18 Oct 2022 12:52:29 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id w18so34892789ejq.11;
-        Tue, 18 Oct 2022 12:52:28 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a26so34605046ejc.4;
+        Tue, 18 Oct 2022 12:52:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hesUVV8oLfqzPuwApMzbxfjgf/NGsaqcxurto5C/xyU=;
-        b=oM8BEinm+7PCkXNou9ynjD3DYOjnpAZWd+QtEjiMIqOdlLzTTjSroUSFEkrnooNnXh
-         yqjfn7/KUT/pZtJMR8+L1ufMHm9DU1Sz+UqSkzUFc7rHOUniprjb1wnuyX2ETTaJk4WZ
-         JehnGyA30CL+/NV0eXv/5cgm/p3dMhi3Kysan5z+MSOcIC72W+a6Vo8g1o9nN58o+9gT
-         BWLofMj6t1nrd9SeN4cGw3FEcAkZggENHBsOC21hXear5uVQiSKuu5CMy6lMJvALS+NJ
-         keGsRkUy4/TLueAoqywZiV2CnUGgEtXMzOY91Zqnsgkq/YsS87uzkA+GqokWeQ0KJ/3a
-         EeSA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u5GqQPQo1EN7QTPOq98P7aatI+dm61orL9Tt4wQrx+M=;
+        b=DxrIRWF3IlLy7RscwISMjCOi24P2yJVMt2Xc0TV752F4rLMsC93h2W5TYQdYGCt1MR
+         jyRwSmKys8FRe2BXkY4D59joFsHthbLLe3FDyZQJZVDmwj+4W94mZQK1U5BNwQSTdfD1
+         T7QvSss0PnHop/E92i5X+3vitwOD+/dhuz3LihI7I7SrO0yU32x5JKCDAqLAOPDpsJxt
+         /DFqOVPve/MX8cq5RftjsGcfxNArnWahhuxRbxc16R4CMgF4jEOBAn81HVQKTW8rveeq
+         x/maZeaY21ZPPxj+fw2xBewgJBEtwCF5TT3xLCSPbu+xL0heQuU40uzlWt2TJUKUHLK6
+         NrNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hesUVV8oLfqzPuwApMzbxfjgf/NGsaqcxurto5C/xyU=;
-        b=PUk6dGZ2YDRCWmEvRNouCKcpBYS0GFeC510cyXdutBE/G9XH52TwC2CYdZMKr49kM/
-         hP49YuuXmpHOO0zYYO4HIzd2HRUrQK7E3R5d2125rSs/qBqvHHxrS5IhCg0pH5JXj7hq
-         JK5QPM/HbpOHzYcvX25Wph4WFc+s39suVOBW6288oqxoth0dgR6GpetB9x5VaKa0gKHI
-         DWyXcdRJHryJTJq3eZ3nZDaJOOIiJ9a6b4kitIdVqcu01sKmbeOWLPwZUxoGWbdhDYkf
-         PP7S+v/UtZ2OXLZGUQyJRk7t+p/xDkFN+jpcbjuOr/VbYDXHmZamcT7ekJ5SZaCiQeUk
-         4oNw==
-X-Gm-Message-State: ACrzQf0v8F73TE/1joIed7tjFVA1HJJaKOO3BxnU8Oo2UGUhxNWzzJmc
-        VkzF0VcTTXlgHWGts48kt086bRyCKuM=
-X-Google-Smtp-Source: AMsMyM5nab1s6kIkntr5BPRagGigN3Ty650kK/BaOevBAGj04Qt9pnYNWFwwo9AvQmql0n2WFbncxQ==
-X-Received: by 2002:a17:907:7287:b0:78d:8f26:5911 with SMTP id dt7-20020a170907728700b0078d8f265911mr3584838ejc.463.1666122723980;
-        Tue, 18 Oct 2022 12:52:03 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u5GqQPQo1EN7QTPOq98P7aatI+dm61orL9Tt4wQrx+M=;
+        b=1ez2zHwpPx4yyMSrHFENL7zkBDqYN3NG/TIA9Few8ZyEcprPYdBm1JRGMVkqxr0vyz
+         NXpf/LX4CHJj4BWnC984Tjx9pk8MDuQeKpxQR9Wc86eHOMTv/HPKgJRudW85wBf3NG0s
+         lHGh9gQ6owpBqBPklnuAldh1IKFVhyr8CneVOk15PTGgZ3g508ubaiJPLFF5bsVQDZ9Z
+         N3UHicVAA1WO7URpF0CdmnpGFZgD/tpa3H/Rh7QFaafBJryFrGBnOWRBS2FiEO00kO39
+         YEFWJ8Lb3V2Cuf6h12Wpy7mAY5BBOfsV5YUX7fabCMke0F2lV9h7Ua7Pu3YSdkbm6zjV
+         1g7A==
+X-Gm-Message-State: ACrzQf2gwCilgAEeSWDZim++TCYu2G1HaLWj2cUWbakk4MUc8JCjyknI
+        fP7YZFxX+g+0wigUi2/8LKc+Eoe4Gwk=
+X-Google-Smtp-Source: AMsMyM4zsLcwKui+DBi3RWrqYY07/MzotigsDhvrl8qX0g3qPewyVvoTQ9L5Cr+i/o0koesR1xQMRw==
+X-Received: by 2002:a17:907:6e9e:b0:78e:214b:e3c2 with SMTP id sh30-20020a1709076e9e00b0078e214be3c2mr3709856ejc.15.1666122726606;
+        Tue, 18 Oct 2022 12:52:06 -0700 (PDT)
 Received: from 127.0.0.1localhost (94.197.72.2.threembb.co.uk. [94.197.72.2])
-        by smtp.gmail.com with ESMTPSA id r1-20020a1709061ba100b0072a881b21d8sm7945858ejg.119.2022.10.18.12.52.02
+        by smtp.gmail.com with ESMTPSA id r1-20020a1709061ba100b0072a881b21d8sm7945858ejg.119.2022.10.18.12.52.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 12:52:03 -0700 (PDT)
+        Tue, 18 Oct 2022 12:52:05 -0700 (PDT)
 From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Cc:     io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-fsdevel@vger.kernel.org,
         Pavel Begunkov <asml.silence@gmail.com>
-Subject: [RFC for-next v2 0/4] enable pcpu bio caching for IRQ I/O
-Date:   Tue, 18 Oct 2022 20:50:54 +0100
-Message-Id: <cover.1666122465.git.asml.silence@gmail.com>
+Subject: [RFC for-next v2 2/4] bio: split pcpu cache part of bio_put into a helper
+Date:   Tue, 18 Oct 2022 20:50:56 +0100
+Message-Id: <cd6df8c5289a2df20c338d0842172950b0dedef2.1666122465.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.38.0
+In-Reply-To: <cover.1666122465.git.asml.silence@gmail.com>
+References: <cover.1666122465.git.asml.silence@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This series implements bio pcpu caching for normal / IRQ-driven I/O
-extending REQ_ALLOC_CACHE currently limited to iopoll. The allocation side
-still only works from non-irq context, which is the reason it's not enabled
-by default, but turning it on for other users (e.g. filesystems) is
-as a matter of passing a flag.
+Extract a helper out of bio_put for recycling into percpu caches.
+It's a preparation patch without functional changes.
 
-t/io_uring with an Optane SSD setup showed +7% for batches of 32 requests
-and +4.3% for batches of 8.
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ block/bio.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
-IRQ, 128/32/32, cache off
-IOPS=59.08M, BW=28.84GiB/s, IOS/call=31/31
-IOPS=59.30M, BW=28.96GiB/s, IOS/call=32/32
-IOPS=59.97M, BW=29.28GiB/s, IOS/call=31/31
-IOPS=59.92M, BW=29.26GiB/s, IOS/call=32/32
-IOPS=59.81M, BW=29.20GiB/s, IOS/call=32/31
-
-IRQ, 128/32/32, cache on
-IOPS=64.05M, BW=31.27GiB/s, IOS/call=32/31
-IOPS=64.22M, BW=31.36GiB/s, IOS/call=32/32
-IOPS=64.04M, BW=31.27GiB/s, IOS/call=31/31
-IOPS=63.16M, BW=30.84GiB/s, IOS/call=32/32
-
-IRQ, 32/8/8, cache off
-IOPS=50.60M, BW=24.71GiB/s, IOS/call=7/8
-IOPS=50.22M, BW=24.52GiB/s, IOS/call=8/7
-IOPS=49.54M, BW=24.19GiB/s, IOS/call=8/8
-IOPS=50.07M, BW=24.45GiB/s, IOS/call=7/7
-IOPS=50.46M, BW=24.64GiB/s, IOS/call=8/8
-
-IRQ, 32/8/8, cache on
-IOPS=51.39M, BW=25.09GiB/s, IOS/call=8/7
-IOPS=52.52M, BW=25.64GiB/s, IOS/call=7/8
-IOPS=52.57M, BW=25.67GiB/s, IOS/call=8/8
-IOPS=52.58M, BW=25.67GiB/s, IOS/call=8/7
-IOPS=52.61M, BW=25.69GiB/s, IOS/call=8/8
-
-The main part is in patch 3. Would be great to take patch 1 separately
-for 6.1 for extra safety.
-
-v2: fix botched splicing threshold checks
-
-Pavel Begunkov (4):
-  bio: safeguard REQ_ALLOC_CACHE bio put
-  bio: split pcpu cache part of bio_put into a helper
-  block/bio: add pcpu caching for non-polling bio_put
-  io_uring/rw: enable bio caches for IRQ rw
-
- block/bio.c   | 94 ++++++++++++++++++++++++++++++++++++++++-----------
- io_uring/rw.c |  3 +-
- 2 files changed, 76 insertions(+), 21 deletions(-)
-
+diff --git a/block/bio.c b/block/bio.c
+index 5b4594daa259..ac16cc154476 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -725,6 +725,28 @@ static void bio_alloc_cache_destroy(struct bio_set *bs)
+ 	bs->cache = NULL;
+ }
+ 
++static inline void bio_put_percpu_cache(struct bio *bio)
++{
++	struct bio_alloc_cache *cache;
++
++	cache = per_cpu_ptr(bio->bi_pool->cache, get_cpu());
++	bio_uninit(bio);
++
++	if ((bio->bi_opf & REQ_POLLED) && !WARN_ON_ONCE(in_interrupt())) {
++		bio->bi_next = cache->free_list;
++		cache->free_list = bio;
++		cache->nr++;
++	} else {
++		put_cpu();
++		bio_free(bio);
++		return;
++	}
++
++	if (cache->nr > ALLOC_CACHE_MAX + ALLOC_CACHE_SLACK)
++		bio_alloc_cache_prune(cache, ALLOC_CACHE_SLACK);
++	put_cpu();
++}
++
+ /**
+  * bio_put - release a reference to a bio
+  * @bio:   bio to release reference to
+@@ -740,20 +762,10 @@ void bio_put(struct bio *bio)
+ 		if (!atomic_dec_and_test(&bio->__bi_cnt))
+ 			return;
+ 	}
+-
+-	if ((bio->bi_opf & REQ_ALLOC_CACHE) && !WARN_ON_ONCE(in_interrupt())) {
+-		struct bio_alloc_cache *cache;
+-
+-		bio_uninit(bio);
+-		cache = per_cpu_ptr(bio->bi_pool->cache, get_cpu());
+-		bio->bi_next = cache->free_list;
+-		cache->free_list = bio;
+-		if (++cache->nr > ALLOC_CACHE_MAX + ALLOC_CACHE_SLACK)
+-			bio_alloc_cache_prune(cache, ALLOC_CACHE_SLACK);
+-		put_cpu();
+-	} else {
++	if (bio->bi_opf & REQ_ALLOC_CACHE)
++		bio_put_percpu_cache(bio);
++	else
+ 		bio_free(bio);
+-	}
+ }
+ EXPORT_SYMBOL(bio_put);
+ 
 -- 
 2.38.0
 
