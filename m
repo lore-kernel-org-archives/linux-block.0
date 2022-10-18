@@ -2,95 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 637BBC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Oct 2022 22:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA00C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 00:10:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbiJQWlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 18:41:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56914 "EHLO
+        id S231244AbiJRAKu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:10:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230120AbiJQWlR (ORCPT
+        with ESMTP id S229947AbiJRAJm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 18:41:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82D12F02B
-        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 15:41:16 -0700 (PDT)
+        Mon, 17 Oct 2022 20:09:42 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CAE876BB;
+        Mon, 17 Oct 2022 17:08:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2987A612AC
-        for <linux-block@vger.kernel.org>; Mon, 17 Oct 2022 22:41:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85F77C433B5;
-        Mon, 17 Oct 2022 22:41:15 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BF24FB81BEC;
+        Tue, 18 Oct 2022 00:08:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D339FC43148;
+        Tue, 18 Oct 2022 00:08:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666046475;
-        bh=9fDxJXZK1U5womZDJo/c6FscAHDcI1ZEsc4GYARxhcU=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=NlhwvhXnMEkst0U+X3torWYjiWRmQFE2imEJmLTmGUTEHw3MwqigrAGHwi0X7+WwC
-         o2mU7YTjFZ038Do7gF/b9hhV+sg1qLk0GshZFAN2x0fgMK1fJud1ifPwWvyaGPjZux
-         TaNkCQXaZReqDNUM8M1oYjmQ4PL/NpfAcBnyIgFJdgx8802xlgaIobz0auU0K2bQPn
-         cqlaVYLWLlvm8fLVeac0JNDJaou4DlbimxTeIb8h8Tj0V7gBOdft5NplZ5K1eXAh57
-         CDk8QjvGSyhiZ+kG6g8vnrPk3SKcAz7iPPbzbYuQkb6Owk8QYEAijxMekqj36S+57M
-         akMuagydW2GDQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 16EC05C0C34; Mon, 17 Oct 2022 15:41:15 -0700 (PDT)
-Date:   Mon, 17 Oct 2022 15:41:15 -0700
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Chao Leng <lengchao@huawei.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sagi@grimberg.me, kbusch@kernel.org,
-        ming.lei@redhat.com, axboe@kernel.dk
-Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
-Message-ID: <20221017224115.GJ5600@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <20221013094450.5947-1-lengchao@huawei.com>
- <20221013094450.5947-2-lengchao@huawei.com>
- <20221017133906.GA24492@lst.de>
- <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
- <20221017153105.GA32509@lst.de>
+        s=k20201202; t=1666051704;
+        bh=1gFAnxn0kO1IdTGw8hCH4ZiVUtwWczw4mKuNWmNcFSU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ItMsuxzX9ozsE+LaO47rNMMnY2Iu1bmiYmBzbmdwUV2GWIW4N994pLwwFcFdyr8bS
+         +A2AFKgGYeQ3hkd4rKBzsec0fkg98ER8hbRsS/u4Gr8vnixurqhKYMg+GEc6iZmBZt
+         9/KP6Jxkqqd846dCIuqXpAFOpdMerY4fe4MAcfpWjDLKLr1/lObmJwBIotEiLSADdK
+         RgRWldrIfh54zubE8/PCGu5zYqkDEoeqbAZpu6Tb4xOCZmxtRAiZcOoIxJr+yZ4M+B
+         Wdz1tdrlvJULq2F/BHiR+37InyPQAFV4/4+lwyciZhuLiZETQB70bfEQWVqYOmtvVg
+         tEpv/UGvD0lJQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Alexander Potapenko <glider@google.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrey Konovalov <andreyknvl@gmail.com>,
+        Andrey Konovalov <andreyknvl@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Lameter <cl@linux.com>,
+        David Rientjes <rientjes@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ilya Leoshkevich <iii@linux.ibm.com>,
+        Ingo Molnar <mingo@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>,
+        Kees Cook <keescook@chromium.org>,
+        Marco Elver <elver@google.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Vegard Nossum <vegard.nossum@oracle.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.0 23/32] kmsan: disable physical page merging in biovec
+Date:   Mon, 17 Oct 2022 20:07:20 -0400
+Message-Id: <20221018000729.2730519-23-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20221018000729.2730519-1-sashal@kernel.org>
+References: <20221018000729.2730519-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221017153105.GA32509@lst.de>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 05:31:05PM +0200, Christoph Hellwig wrote:
-> On Mon, Oct 17, 2022 at 08:21:36AM -0700, Paul E. McKenney wrote:
-> > The main reason for having multiple srcu_struct structures is to
-> > prevent the readers from one from holding up the updaters from another.
-> > Except that by waiting for the multiple grace periods, you are losing
-> > that property anyway, correct?  Or is this code waiting on only a small
-> > fraction of the srcu_struct structures associated with blk_queue?
-> 
-> There are a few places that do this.  SCSI and MMC could probably switch
-> to this scheme or at least and open coded version of it (if we move
-> to a per_tagsect srcu_struct open coding it might be a better idea
-> anyway).
-> 
-> del_gendisk is one where we have to go one queue at a time, and
-> that might actually matter for a device removal.  elevator_switch
-> is another one, there is a variant for it that works on the whole
-> tagset, but also those that don't.
+From: Alexander Potapenko <glider@google.com>
 
-OK, thank you for the info!
+[ Upstream commit f630a5d0ca59a6e73b61e3f82c371dc230da99ff ]
 
-Then the big question is "how long do the SRCU readers run?"
+KMSAN metadata for adjacent physical pages may not be adjacent, therefore
+accessing such pages together may lead to metadata corruption.  We disable
+merging pages in biovec to prevent such corruptions.
 
-If all of the readers ran for exactly the same duration, there would be
-little point in having more than one srcu_struct.
+Link: https://lkml.kernel.org/r/20220915150417.722975-28-glider@google.com
+Signed-off-by: Alexander Potapenko <glider@google.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Andrey Konovalov <andreyknvl@gmail.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Christoph Lameter <cl@linux.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ilya Leoshkevich <iii@linux.ibm.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Marco Elver <elver@google.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Pekka Enberg <penberg@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Petr Mladek <pmladek@suse.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Vegard Nossum <vegard.nossum@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-If the kernel knew up front how long the SRCU readers for a given entry
-would run, it could provide an srcu_struct structure for each duration.
-For a (fanciful) example, you could have one srcu_struct structure for
-SSDs, another for rotating rust, a third for LAN-attached storage, and
-a fourth for WAN-attached storage.  Maybe a fifth for lunar-based storage.
+diff --git a/block/blk.h b/block/blk.h
+index d7142c4d2fef..af02b93c1dba 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -88,6 +88,13 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
+ 	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
+ 
++	/*
++	 * Merging adjacent physical pages may not work correctly under KMSAN
++	 * if their metadata pages aren't adjacent. Just disable merging.
++	 */
++	if (IS_ENABLED(CONFIG_KMSAN))
++		return false;
++
+ 	if (addr1 + vec1->bv_len != addr2)
+ 		return false;
+ 	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
+-- 
+2.35.1
 
-If it is impossible to know up front which entry has what SRCU read-side
-latency characteristics, then the current approach of just giving each
-entry its own srcu_struct structure is not at all a bad plan.
-
-Does that help, or am I off in the weeds here?
-
-							Thanx, Paul
