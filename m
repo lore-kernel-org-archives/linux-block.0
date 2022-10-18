@@ -2,33 +2,33 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA4C43219
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 12:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CD2C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 12:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229983AbiJRMTt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 08:19:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57222 "EHLO
+        id S229974AbiJRMTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 08:19:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229955AbiJRMTn (ORCPT
+        with ESMTP id S229966AbiJRMTn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 18 Oct 2022 08:19:43 -0400
 Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55D412AC8;
-        Tue, 18 Oct 2022 05:19:38 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MsCXV5c7RzJn2j;
-        Tue, 18 Oct 2022 20:16:58 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A600613E8C;
+        Tue, 18 Oct 2022 05:19:40 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4MsCXX1Ps9zJn3H;
+        Tue, 18 Oct 2022 20:17:00 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 18 Oct
- 2022 20:19:36 +0800
+ 2022 20:19:37 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
-Subject: [PATCH v2 3/5] blk-iocost: Trace vtime_base_rate instead of vtime_rate
-Date:   Tue, 18 Oct 2022 20:19:30 +0800
-Message-ID: <20221018121932.10792-4-shikemeng@huawei.com>
+Subject: [PATCH v2 5/5] blk-iocost: Correct comment in blk_iocost_init
+Date:   Tue, 18 Oct 2022 20:19:32 +0800
+Message-ID: <20221018121932.10792-6-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221018121932.10792-1-shikemeng@huawei.com>
 References: <20221018121932.10792-1-shikemeng@huawei.com>
@@ -42,68 +42,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since commit ac33e91e2daca ("blk-iocost: implement vtime loss
-compensation") rename original vtime_rate to vtime_base_rate
-and current vtime_rate is original vtime_rate with compensation.
-The current rate showed in tracepoint is mixed with vtime_rate
-and vtime_base_rate:
-1) In function ioc_adjust_base_vrate, the first trace_iocost_ioc_vrate_adj
-shows vtime_rate, the second trace_iocost_ioc_vrate_adj shows
-vtime_base_rate.
-2) In function iocg_activate shows vtime_rate by calling
-TRACE_IOCG_PATH(iocg_activate...
-3) In function ioc_check_iocgs shows vtime_rate by calling
-TRACE_IOCG_PATH(iocg_idle...
-
-Trace vtime_base_rate instead of vtime_rate as:
-1) Before commit ac33e91e2daca ("blk-iocost: implement vtime loss
-compensation"), the traced rate is without compensation, so still
-show rate without compensation.
-2) The vtime_base_rate is more stable while vtime_rate heavily depends on
-excess budeget on current period which may change abruptly in next period.
+There is no iocg_pd_init function. The pd_alloc_fn function pointer of
+iocost policy is set with ioc_pd_init. Just correct it.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 Acked-by: Tejun Heo <tj@kernel.org>
 ---
- block/blk-iocost.c            | 2 +-
- include/trace/events/iocost.h | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ block/blk-iocost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 9214733bbc14..b0991b52e3dd 100644
+index 761295ed9c5a..96c1571a8a1d 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -977,7 +977,7 @@ static void ioc_adjust_base_vrate(struct ioc *ioc, u32 rq_wait_pct,
+@@ -2880,7 +2880,7 @@ static int blk_iocost_init(struct gendisk *disk)
+ 	spin_unlock_irq(&ioc->lock);
  
- 	if (!ioc->busy_level || (ioc->busy_level < 0 && nr_lagging)) {
- 		if (ioc->busy_level != prev_busy_level || nr_lagging)
--			trace_iocost_ioc_vrate_adj(ioc, atomic64_read(&ioc->vtime_rate),
-+			trace_iocost_ioc_vrate_adj(ioc, vrate,
- 						   missed_ppm, rq_wait_pct,
- 						   nr_lagging, nr_shortages);
- 
-diff --git a/include/trace/events/iocost.h b/include/trace/events/iocost.h
-index 6d1626e7a4ce..af8bfed528fc 100644
---- a/include/trace/events/iocost.h
-+++ b/include/trace/events/iocost.h
-@@ -38,7 +38,7 @@ DECLARE_EVENT_CLASS(iocost_iocg_state,
- 		__assign_str(cgroup, path);
- 		__entry->now = now->now;
- 		__entry->vnow = now->vnow;
--		__entry->vrate = now->vrate;
-+		__entry->vrate = iocg->ioc->vtime_base_rate;
- 		__entry->last_period = last_period;
- 		__entry->cur_period = cur_period;
- 		__entry->vtime = vtime;
-@@ -160,7 +160,7 @@ TRACE_EVENT(iocost_ioc_vrate_adj,
- 
- 	TP_fast_assign(
- 		__assign_str(devname, ioc_name(ioc));
--		__entry->old_vrate = atomic64_read(&ioc->vtime_rate);
-+		__entry->old_vrate = ioc->vtime_base_rate;
- 		__entry->new_vrate = new_vrate;
- 		__entry->busy_level = ioc->busy_level;
- 		__entry->read_missed_ppm = missed_ppm[READ];
+ 	/*
+-	 * rqos must be added before activation to allow iocg_pd_init() to
++	 * rqos must be added before activation to allow ioc_pd_init() to
+ 	 * lookup the ioc from q. This means that the rqos methods may get
+ 	 * called before policy activation completion, can't assume that the
+ 	 * target bio has an iocg associated and need to test for NULL iocg.
 -- 
 2.30.0
 
