@@ -2,173 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FADC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 13:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 476D4C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 13:24:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbiJRNSs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 09:18:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55234 "EHLO
+        id S230410AbiJRNY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 09:24:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbiJRNSr (ORCPT
+        with ESMTP id S230393AbiJRNYR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 09:18:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B98F5C8941
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 06:18:32 -0700 (PDT)
+        Tue, 18 Oct 2022 09:24:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374CDC90F0
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 06:24:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666099111;
+        s=mimecast20190719; t=1666099454;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OHBkuTSUngShbJj713zOySelAXFW6/K6OGq2+nTXW5A=;
-        b=gyaF/82Czss9cB4u74MZcHRzQrefPaXr2FBw6zxHf3DoJpbhx0jpilhRcvcViqi2gROCT+
-        AYJLAstzqjiJ1BPzy0J4pevffJSTsu3SAcow9yAq2PVLtlmcOz325+KuZSoqepAN7VV9TS
-        Ap+mIcftQVV/uTwLBQIw69Eyxy32Xw4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-320-MgC455w7MSSzwCPjCNoPzQ-1; Tue, 18 Oct 2022 09:18:30 -0400
-X-MC-Unique: MgC455w7MSSzwCPjCNoPzQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26232803D49;
-        Tue, 18 Oct 2022 13:18:30 +0000 (UTC)
-Received: from fedora34.. (unknown [10.66.146.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 25A191401C23;
-        Tue, 18 Oct 2022 13:18:27 +0000 (UTC)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     shinichiro.kawasaki@wdc.com
-Cc:     linux-block@vger.kernel.org, hch@infradead.org,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V2 blktests] tests/nvme: set hostnqn after hostid uuidgen
-Date:   Tue, 18 Oct 2022 21:17:58 +0800
-Message-Id: <20221018131758.763311-1-yi.zhang@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pcyZjCPgGIhvNeou0iELtPdI8MmA4xaqyx82U1JKIfw=;
+        b=EmCl6SXPlui1uKWCMLWo9lxX4wrfn4ReFNXpUapZ4W5dv9wUUt/JLU376O6gaQES26b15a
+        le/X1xuV27G5Zd2bbjgd1ETMkYA2dol6JNuc//FhyAyM4jlt9sEs0ECMVkHJKqnbQzyuCv
+        PJaF03w4U78KsUIwavBm59jbFJoRuZk=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-569-gcQKCe-0M-uPEKiee2GNlw-1; Tue, 18 Oct 2022 09:24:11 -0400
+X-MC-Unique: gcQKCe-0M-uPEKiee2GNlw-1
+Received: by mail-pf1-f199.google.com with SMTP id cw4-20020a056a00450400b00561ec04e77aso7809355pfb.12
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 06:24:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pcyZjCPgGIhvNeou0iELtPdI8MmA4xaqyx82U1JKIfw=;
+        b=Z+bSdlXxD7XokD/X2NCZH55RCCgDR37zHl0uMPCiaHEQ7XP8jwD+Hz4cMotqjG6+NP
+         rhf02bgwHYLt1iP0kb+bR72vO/kThflG+CnRmyTKblOs22Yqr/NP8IK3S3ev7oijZ6Dz
+         XtNSgGMi0hIB1awY24LdEpgbOHx5v+NtUfYXzVi7vwx7Q4vF77T7TUzaZBUNnVQCj70R
+         3HXKDy3idiw3GOJBHsomBa4LnYG0eIc+3TBEOI8WzGtrlPiefmle3avrdgJ94qKFZr6Q
+         1QHkENrwxKINSHN7QxgxgFsU2BodexOtQojguDUzsDEW1TMsNgWCSrkLz3qS01PCyX3p
+         8ing==
+X-Gm-Message-State: ACrzQf3Xy1LiI/pbwJPMEwVSqg3aG3Vxu0DxYHjg4/48RIxD3qYC7heF
+        TXHJwEXRPPlOjJt+C8jnKkX3Ar2yzKnilZJzXdL1CjsJIjTpfGkgHo/DmBHfFsxdYvmST0+NOnw
+        +SA7VQwUAbAqL5MQD+YLaVp0hf1GGo0wL7q4tk3s=
+X-Received: by 2002:a17:90b:1b42:b0:20d:6ddd:9ed2 with SMTP id nv2-20020a17090b1b4200b0020d6ddd9ed2mr40056160pjb.232.1666099445557;
+        Tue, 18 Oct 2022 06:24:05 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6HN4Jqn0EbsIpkVOssduahw+LRIDPFdjmyXjFNonPr+OHXDdOO8/xJ+SgOzrxRyTXPA4AJY/8xd0PyET5zbgc=
+X-Received: by 2002:a17:90b:1b42:b0:20d:6ddd:9ed2 with SMTP id
+ nv2-20020a17090b1b4200b0020d6ddd9ed2mr40056148pjb.232.1666099445325; Tue, 18
+ Oct 2022 06:24:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+References: <20221011174325.311286-1-yi.zhang@redhat.com> <Y00Im55493i+BWBi@infradead.org>
+In-Reply-To: <Y00Im55493i+BWBi@infradead.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Tue, 18 Oct 2022 21:23:53 +0800
+Message-ID: <CAHj4cs-J2FKR7JdjtStj9E=gyomPGk5UQEfnzeAcNvy=L=EJtw@mail.gmail.com>
+Subject: Re: [PATCH blktests] tests/nvme: set hostnqn after hostid uuidgen
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     hare@suse.de, shinichiro.kawasaki@wdc.com,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hostid will not be appended to hostnqn as it was generated after set
-hostnqn, so let's set hostnqn after hostid generated.
+On Mon, Oct 17, 2022 at 3:48 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> Please explain why here.
+>
+Hi Christoph
+Here is part of the original code, hostid will not be appended to
+hostnqn, I also added more info in V2, thanks for reviewing.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- tests/nvme/041 | 3 ++-
- tests/nvme/042 | 3 ++-
- tests/nvme/043 | 3 ++-
- tests/nvme/044 | 3 ++-
- tests/nvme/045 | 3 ++-
- 5 files changed, 10 insertions(+), 5 deletions(-)
-
-diff --git a/tests/nvme/041 b/tests/nvme/041
-index 98c443e..b311229 100755
---- a/tests/nvme/041
-+++ b/tests/nvme/041
-@@ -23,7 +23,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hostkey
- 	local ctrldev
-@@ -35,6 +35,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
- 	if [ -z "$hostkey" ] ; then
- 		echo "nvme gen-dhchap-key failed"
-diff --git a/tests/nvme/042 b/tests/nvme/042
-index 06e5d3d..30a638d 100755
---- a/tests/nvme/042
-+++ b/tests/nvme/042
-@@ -23,7 +23,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hmac
- 	local key_len
-@@ -37,6 +37,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	_setup_nvmet
- 
-diff --git a/tests/nvme/043 b/tests/nvme/043
-index 87273e5..84e1666 100755
---- a/tests/nvme/043
-+++ b/tests/nvme/043
-@@ -24,7 +24,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hash
- 	local dhgroup
-@@ -38,6 +38,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	_setup_nvmet
- 
-diff --git a/tests/nvme/044 b/tests/nvme/044
-index 1301965..0eb36cc 100755
---- a/tests/nvme/044
-+++ b/tests/nvme/044
-@@ -24,7 +24,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hostkey
- 	local ctrlkey
-@@ -37,6 +37,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
- 	if [ -z "$hostkey" ] ; then
-diff --git a/tests/nvme/045 b/tests/nvme/045
-index 264f210..389e434 100755
---- a/tests/nvme/045
-+++ b/tests/nvme/045
-@@ -24,7 +24,7 @@ test() {
- 	local port
- 	local subsys_name="blktests-subsystem-1"
- 	local hostid
--	local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
-+	local hostnqn
- 	local file_path="${TMPDIR}/img"
- 	local hostkey
- 	local new_hostkey
-@@ -39,6 +39,7 @@ test() {
- 		echo "uuidgen failed"
- 		return 1
- 	fi
-+	hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
- 
- 	hostkey="$(nvme gen-dhchap-key -n ${subsys_name} 2> /dev/null)"
- 	if [ -z "$hostkey" ] ; then
+        local hostnqn="nqn.2014-08.org.nvmexpress:uuid:${hostid}"
+        hostid="$(uuidgen)"
+        if [ -z "$hostid" ] ; then
+                echo "uuidgen failed"
+                return 1
+        fi
 -- 
-2.34.1
+Best Regards,
+  Yi Zhang
 
