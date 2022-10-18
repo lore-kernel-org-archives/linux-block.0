@@ -2,91 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD84C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 12:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CC5C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 12:19:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbiJRMMm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 08:12:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42518 "EHLO
+        id S229870AbiJRMTk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 08:19:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbiJRMMk (ORCPT
+        with ESMTP id S229660AbiJRMTi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 08:12:40 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C840481EA
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 05:12:39 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id x31-20020a17090a38a200b0020d2afec803so13825079pjb.2
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 05:12:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mjiYBWHAsq5BSDUVPoLM00mOuS8zKk9l4sbhEAwUt/s=;
-        b=KDo/UelbHK2Lq3B03+qlsYL3E/uP3B71Vws5tjN8etK7bErlH8XeDOs5zjwAGFpxsp
-         bYgtskekf3N1VvG1er141LbEZx2WMVTCzfPAqRmjltHe/uiRK3JbHsroBif0/VNf14Ze
-         aRxWj0hL35j9duPy69YkHXbYa/LTAb9Q83fpryYXrhnmMtgbypkeTADtV8ON9lS6JDOS
-         b5FU5C9ryOyahKqE4pwoIKAHIifV6qSynkBTXe6SfT7s6Ye1xxRvBU//AVm+4dGsc58U
-         7HBlimP6InVqXVD1yQVrLFk5XSjhUzZKPC7KVUkivRpQ+2xkRDTBQWzMQdIEthZ9t1zs
-         rfrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mjiYBWHAsq5BSDUVPoLM00mOuS8zKk9l4sbhEAwUt/s=;
-        b=15Cgo8KuHLz62FbkwcBXRfXMrzaXJqYJg1lEQRFpm9FRBBU9HVwL2u+ckDy24GdjJy
-         XblE8vjL/420ifzH/lBLJYmaqQPU7YRgbReoT5l52aVDAaZEsr8HTU2cLgTQyOWH/p5G
-         u+ltyMhGoqwV52/ImWogRpV1Gjujkx9ggL1mVgIZxq8PRUy8Qo74IkLVqefNBOEHpSxp
-         KC/snhua//OqFcGGBPtDY12s+KoYXx9kEeyevd8rItuw3AkrF97MBXFHbKudJbjkNKmu
-         tWlYC6P55O/QTGZatk7VlMbIjycpt02NSGDUcJtt05Mm118dyzeydpn1zgaxfUZigoh9
-         Ykfg==
-X-Gm-Message-State: ACrzQf0j4hDruOI6nkGL+j9+ZfaLH69lAebrh5QbCcGQXkkJ5/BAUlC6
-        HbPRLYLk29FkZRMwV0PxiAm3sg==
-X-Google-Smtp-Source: AMsMyM4xhlW1FInjHG7+slvf4Tq0ZfnKswtvVR3OyCmT0DQ4kBYHxlUxg53izEyT2IjoFZqGdCN9sA==
-X-Received: by 2002:a17:90b:1c87:b0:20a:e485:4e21 with SMTP id oo7-20020a17090b1c8700b0020ae4854e21mr3254817pjb.194.1666095158783;
-        Tue, 18 Oct 2022 05:12:38 -0700 (PDT)
-Received: from [127.0.0.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id i13-20020a170902c94d00b0017f48a9e2d6sm8580160pla.292.2022.10.18.05.12.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 05:12:38 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>, ming.lei@redhat.com
-Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        xiaoguang.wang@linux.alibaba.com, linux-block@vger.kernel.org,
-        corbet@lwn.net, joseph.qi@linux.alibaba.com
-In-Reply-To: <20221018045346.99706-1-ZiyangZhang@linux.alibaba.com>
-References: <20221018045346.99706-1-ZiyangZhang@linux.alibaba.com>
-Subject: Re: [PATCH 0/1] Documentation: document ublk user recovery
-Message-Id: <166609515777.5284.5366131175827495577.b4-ty@kernel.dk>
-Date:   Tue, 18 Oct 2022 05:12:37 -0700
+        Tue, 18 Oct 2022 08:19:38 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B6DA11478;
+        Tue, 18 Oct 2022 05:19:37 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MsCWk0YdYzpVjT;
+        Tue, 18 Oct 2022 20:16:18 +0800 (CST)
+Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
+ (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 18 Oct
+ 2022 20:19:34 +0800
+From:   Kemeng Shi <shikemeng@huawei.com>
+To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <shikemeng@huawei.com>
+Subject: [PATCH v2 1/5] blk-iocost: Fix typo in comment
+Date:   Tue, 18 Oct 2022 20:19:28 +0800
+Message-ID: <20221018121932.10792-2-shikemeng@huawei.com>
+X-Mailer: git-send-email 2.14.1.windows.1
+In-Reply-To: <20221018121932.10792-1-shikemeng@huawei.com>
+References: <20221018121932.10792-1-shikemeng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+Content-Type: text/plain
+X-Originating-IP: [10.174.178.129]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 18 Oct 2022 12:53:45 +0800, ZiyangZhang wrote:
-> User recovery feature of ublk has been merged. Add documentation for
-> it.
-> 
-> ZiyangZhang (1):
->   Documentation: document ublk user recovery feature
-> 
->  Documentation/block/ublk.rst | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
-> 
-> [...]
+soley -> solely
 
-Applied, thanks!
+Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-iocost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[1/1] Documentation: document ublk user recovery feature
-      commit: e0539ae012ba5d618eb19665ff990b87b960c643
-
-Best regards,
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 495396425bad..be4bc38821e2 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -111,7 +111,7 @@
+  * busy signal.
+  *
+  * As devices can have deep queues and be unfair in how the queued commands
+- * are executed, soley depending on rq wait may not result in satisfactory
++ * are executed, solely depending on rq wait may not result in satisfactory
+  * control quality.  For a better control quality, completion latency QoS
+  * parameters can be configured so that the device is considered saturated
+  * if N'th percentile completion latency rises above the set point.
 -- 
-Jens Axboe
-
+2.30.0
 
