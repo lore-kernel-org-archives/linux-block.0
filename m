@@ -2,91 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B6EC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 18:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74810C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 18:44:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229463AbiJRSSI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 14:18:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60676 "EHLO
+        id S229742AbiJRSol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 14:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbiJRSSH (ORCPT
+        with ESMTP id S229891AbiJRSoj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 14:18:07 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4DF7E02C;
-        Tue, 18 Oct 2022 11:18:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4E708B820EE;
-        Tue, 18 Oct 2022 18:18:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99F01C433D7;
-        Tue, 18 Oct 2022 18:18:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1666117084;
-        bh=mYGOGutZ4Vo9ucN0Lly1KgID1pVGbynxDNJ2SMsrc98=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AWRBtFwibDL7vA8S9et14vdl9j53tVVFgZ4kXgQbNRnI7sUffRFTXNaoMeslrqmed
-         qkner6nvIaNLRwWzTeIH4MPGXkESN45eZCBWc7ioNMNkyXK/R1YgNBozf+vedJRTT0
-         GkS3AKvn18CwSWywZEXs2JkTuZ0RcpipBI72oijQ=
-Date:   Tue, 18 Oct 2022 20:18:01 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     hch@lst.de, axboe@kernel.dk, willy@infradead.org,
-        martin.petersen@oracle.com, kch@nvidia.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH RFC 1/2] kobject: add return value for kobject_put()
-Message-ID: <Y07t2agdfUeujGE/@kroah.com>
-References: <20221018131432.434167-1-yukuai3@huawei.com>
- <20221018131432.434167-2-yukuai3@huawei.com>
- <Y06je6LiDicUfzto@kroah.com>
- <2f962069-8fd9-08df-aa00-062b94569c36@huaweicloud.com>
+        Tue, 18 Oct 2022 14:44:39 -0400
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387AE286ED
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 11:44:38 -0700 (PDT)
+Received: by mail-qt1-f169.google.com with SMTP id r19so10264759qtx.6
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 11:44:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=stlH/SoLoTxeHdDl6sjryAM2rO8hfi05PwPVPZbgTnE=;
+        b=2fU1ix/tNH6g6nz0FK6a+P0PV2oOcdXiONMOCPlZdVBPlM8RGRedepkpIiqfG5Er7d
+         QOCo+cfUb3N58ESAWVpsKg/mMelaIoGUKe/AIGQ9fD/uuBU4w2jz+Mr5rZ1QMFkYDM1e
+         LLvfGDr/qBncVBwkomt/QtBfQTftd17CnitQylwJc4kuK22mJJx7YCZyNa1M8ufxy7Fs
+         B3hwljmoqp1OVjj/hN6cWT05hqlW0DWXQEq/IROhGqu2oRYN5wjlIovs7bPdntLle04w
+         OuDvB/SfIcPWiPy8SgovOnp4YZw5RL8J4symNlKejbAznxXxX9aPOw3PAL1CPfsHbjFx
+         xjbA==
+X-Gm-Message-State: ACrzQf0WQvYJGSN3OuDEXrKyc216/YvII4fEPkZ2ePAi93onGwJGUZsB
+        1p/QN08tMldfMzkg6whPWajU
+X-Google-Smtp-Source: AMsMyM6CrAbtDjrjT2e043kwE0xeXRgbI9q5gHVmvpiuLusuhlpMS2D1xi9kn0v7CVVHfKrOwIm2VA==
+X-Received: by 2002:a05:622a:18a0:b0:39b:e6e5:3f6b with SMTP id v32-20020a05622a18a000b0039be6e53f6bmr3250715qtc.613.1666118677335;
+        Tue, 18 Oct 2022 11:44:37 -0700 (PDT)
+Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
+        by smtp.gmail.com with ESMTPSA id u6-20020a05620a430600b006e16dcf99c8sm3042688qko.71.2022.10.18.11.44.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Oct 2022 11:44:36 -0700 (PDT)
+Date:   Tue, 18 Oct 2022 14:44:35 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>
+Subject: [git pull] device mapper fix for 6.1-rc2
+Message-ID: <Y070ExTjLGLStSQ0@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2f962069-8fd9-08df-aa00-062b94569c36@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 09:12:08PM +0800, Yu Kuai wrote:
-> 
-> 
-> 在 2022/10/18 21:00, Greg KH 写道:
-> > On Tue, Oct 18, 2022 at 09:14:31PM +0800, Yu Kuai wrote:
-> > > The return value will be used in later patch to fix uaf for slave_dir
-> > > and bd_holder_dir in block layer.
-> > 
-> > Then the user will be incorrect, this is not ok, you should never care
-> > if you are the last "put" on an object at all.  Hint, what happens right
-> > after you call this and get the result?
-> > 
-> 
-> I tried to reset the pointer to NULL in patch 2 to prevent uaf.
+Hi Linus,
 
-That is not ok, sorry.
+The following changes since commit bb1a1146467ad812bb65440696df0782e2bc63c8:
 
-> And the
-> whole kobject_put() and pointer reset is protected by a mutex, the mutex
-> will be used on the reader side before kobject_get as well. So, in fact,
-> I'm protecting them by the mutex...
+  Merge tag 'cgroup-for-6.1-rc1-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/cgroup (2022-10-17 18:52:43 -0700)
 
-Still not ok.  You never know who else has a reference on a kobject,
-that's the point of reference counted objects.
+are available in the Git repository at:
 
-> I can bypass it by using another reference anyway. But let's see if
-> anyone has suggestions on the other patch.
-> 
-> > sorry, but NAK.
-> 
-> I know the best way is too refactor the lifecycle of the problematic
-> bd_holder_dir/slave_dir, however, I gave that up because this seems
-> quite complicated and influence is very huge...
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.1/dm-fix
 
-Please fix it up properly, core changes like this should not be needed.
+for you to fetch changes up to 141b3523e9be6f15577acf4bbc3bc1f82d81d6d1:
 
-thanks,
+  dm bufio: use the acquire memory barrier when testing for B_READING (2022-10-18 12:38:16 -0400)
 
-greg k-h
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+- Fix dm-bufio to use test_bit_acquire to properly test_bit on arches
+  with weaker memory ordering.
+
+----------------------------------------------------------------
+Mikulas Patocka (1):
+      dm bufio: use the acquire memory barrier when testing for B_READING
+
+ drivers/md/dm-bufio.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
