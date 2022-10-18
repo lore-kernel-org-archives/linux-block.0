@@ -2,41 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED93C43217
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 00:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF57C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 00:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231171AbiJRAem (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Oct 2022 20:34:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42276 "EHLO
+        id S230063AbiJRA4K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Oct 2022 20:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiJRAeg (ORCPT
+        with ESMTP id S229597AbiJRA4I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:34:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA70BA1B0;
-        Mon, 17 Oct 2022 17:34:22 -0700 (PDT)
+        Mon, 17 Oct 2022 20:56:08 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38C3656F;
+        Mon, 17 Oct 2022 17:56:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3CC3B611F5;
-        Tue, 18 Oct 2022 00:22:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F678C433C1;
-        Tue, 18 Oct 2022 00:22:35 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D405EB81BF7;
+        Tue, 18 Oct 2022 00:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6D8DC43470;
+        Tue, 18 Oct 2022 00:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666052556;
-        bh=w8dO5flJtUJ9RxNmvELTwbRTnOO/jaWU4CHl6yTVTtY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dgU0FONrfUG14UKEzGn6NWQEdmezbNgsBKBMCAE84b4HSKux7d1CBg6+awMblpCJr
-         b/dVyxnS6PRzGOX/bIZG2BEEQ6httxDRKW4lWTZLFVvcOIk+r9IF1JreiuEykWyTwL
-         LohTR9JwZ9xeiYFZ5nlSTgMyfCmkhgv7SL6awThizNbNtlGjdipWYyCOHb7XCJoBTr
-         AGYKljHxkFg6z5F3EqHUczqiZxed/czQkxuGWpeM8V39Ri9D8mXE6hSKCoubV+e2EN
-         hIeVyo8877ZKZJJ8e7mU2+oTUR7ufsxBGWsHvJZIrgM0DWRb196QYpnAQ2a6bKl3aj
-         QWQKsPeRTEl6Q==
-Date:   Mon, 17 Oct 2022 17:22:33 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Alexander Potapenko <glider@google.com>,
+        s=k20201202; t=1666051820;
+        bh=g+WXfrzA4ISuTyVMiDVrnPZI2xkMfmlnL2F1oUbznow=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=quQWKCZ7T1/JqJKLKzhWbuhsJ2uwlmEBBESRo++VOSMytb3bEV3o8nnGG+YErxeCl
+         NRhuhrt4RGA9OVQgzQjwACaQ63Qdfi0tn/KQhSb6nHDV+KCvyo4HBvOGG7f+7mw+S1
+         lhegizQHTyrE6b4rGflklPKCOGu3Nv71COkIjIPqmSQ9aerkVhV8VP9L1Rq2Cj9fdh
+         KNG//5ddr8KsGYuEkb4gHcMwuQ9qTvw9+SqZHal2UHkxcUhwy+8PNQ+Qs3T/IRiUZs
+         nsNasTynLfZVbCb3UR7UAvqufy6Lp4t9uDtvYVAxmisfCm4BjWdrvbiuVI2t2PfLik
+         61GONJzAGzonQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Alexander Potapenko <glider@google.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Alexei Starovoitov <ast@kernel.org>,
         Andrey Konovalov <andreyknvl@gmail.com>,
@@ -47,6 +45,8 @@ Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
         Christoph Lameter <cl@linux.com>,
         David Rientjes <rientjes@google.com>,
         Dmitry Vyukov <dvyukov@google.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Eric Biggers <ebiggers@kernel.org>,
         Eric Dumazet <edumazet@google.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -68,90 +68,89 @@ Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
         Vegard Nossum <vegard.nossum@oracle.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         Andrew Morton <akpm@linux-foundation.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.4 10/13] kmsan: disable physical page merging
- in biovec
-Message-ID: <Y03xyaUhL6gSLWYQ@sol.localdomain>
-References: <20221018001102.2731930-1-sashal@kernel.org>
- <20221018001102.2731930-10-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 16/21] kmsan: disable physical page merging in biovec
+Date:   Mon, 17 Oct 2022 20:09:35 -0400
+Message-Id: <20221018000940.2731329-16-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20221018000940.2731329-1-sashal@kernel.org>
+References: <20221018000940.2731329-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221018001102.2731930-10-sashal@kernel.org>
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 08:10:59PM -0400, Sasha Levin wrote:
-> From: Alexander Potapenko <glider@google.com>
-> 
-> [ Upstream commit f630a5d0ca59a6e73b61e3f82c371dc230da99ff ]
-> 
-> KMSAN metadata for adjacent physical pages may not be adjacent, therefore
-> accessing such pages together may lead to metadata corruption.  We disable
-> merging pages in biovec to prevent such corruptions.
-> 
-> Link: https://lkml.kernel.org/r/20220915150417.722975-28-glider@google.com
-> Signed-off-by: Alexander Potapenko <glider@google.com>
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: Alexei Starovoitov <ast@kernel.org>
-> Cc: Andrey Konovalov <andreyknvl@gmail.com>
-> Cc: Andrey Konovalov <andreyknvl@google.com>
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Christoph Lameter <cl@linux.com>
-> Cc: David Rientjes <rientjes@google.com>
-> Cc: Dmitry Vyukov <dvyukov@google.com>
-> Cc: Eric Biggers <ebiggers@google.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Ilya Leoshkevich <iii@linux.ibm.com>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Marco Elver <elver@google.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Pekka Enberg <penberg@kernel.org>
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: Petr Mladek <pmladek@suse.com>
-> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-> Cc: Steven Rostedt <rostedt@goodmis.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Vegard Nossum <vegard.nossum@oracle.com>
-> Cc: Vlastimil Babka <vbabka@suse.cz>
-> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  block/blk.h | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/block/blk.h b/block/blk.h
-> index ee3d5664d962..3358ef4244fe 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -79,6 +79,13 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
->  	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
->  	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
->  
-> +	/*
-> +	 * Merging adjacent physical pages may not work correctly under KMSAN
-> +	 * if their metadata pages aren't adjacent. Just disable merging.
-> +	 */
-> +	if (IS_ENABLED(CONFIG_KMSAN))
-> +		return false;
-> +
->  	if (addr1 + vec1->bv_len != addr2)
->  		return false;
->  	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
+From: Alexander Potapenko <glider@google.com>
 
-So KMSAN is being backported to 5.4?
+[ Upstream commit f630a5d0ca59a6e73b61e3f82c371dc230da99ff ]
 
-- Eric
+KMSAN metadata for adjacent physical pages may not be adjacent, therefore
+accessing such pages together may lead to metadata corruption.  We disable
+merging pages in biovec to prevent such corruptions.
+
+Link: https://lkml.kernel.org/r/20220915150417.722975-28-glider@google.com
+Signed-off-by: Alexander Potapenko <glider@google.com>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Andrey Konovalov <andreyknvl@gmail.com>
+Cc: Andrey Konovalov <andreyknvl@google.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Christoph Lameter <cl@linux.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dmitry Vyukov <dvyukov@google.com>
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ilya Leoshkevich <iii@linux.ibm.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Marco Elver <elver@google.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Pekka Enberg <penberg@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Petr Mladek <pmladek@suse.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Vegard Nossum <vegard.nossum@oracle.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/block/blk.h b/block/blk.h
+index aab72194d226..e833f606bf63 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -66,6 +66,13 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 	phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
+ 	phys_addr_t addr2 = page_to_phys(vec2->bv_page) + vec2->bv_offset;
+ 
++	/*
++	 * Merging adjacent physical pages may not work correctly under KMSAN
++	 * if their metadata pages aren't adjacent. Just disable merging.
++	 */
++	if (IS_ENABLED(CONFIG_KMSAN))
++		return false;
++
+ 	if (addr1 + vec1->bv_len != addr2)
+ 		return false;
+ 	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
+-- 
+2.35.1
+
