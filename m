@@ -2,102 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E313DC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 18:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8239DC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 18:48:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229843AbiJRSsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 14:48:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43998 "EHLO
+        id S230226AbiJRSsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 14:48:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbiJRSsH (ORCPT
+        with ESMTP id S230121AbiJRSsv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 14:48:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F3F9F75E
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 11:48:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666118885;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OMz7ZD6XCaUt0ZSMCX9PyjOg8xnpLboIrO4q8tkKQN4=;
-        b=bSh/MrjuVMHS5E75/k2W/3yZVnJwKgzvd2SlbFCoMAmNSb2imUdyzBRjrilnkQXQP+cj4N
-        FS8ZB8qmeD3MCP/h+zDfyshF54LjUk/akacRziK7T1ltLIlEvfUidllh18hZlBWtJpW7O+
-        SweMFg61gvD0x11xqN09y8n32pFI8kA=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-114-Jkd-DdXaM4CVqUpb8sUy7Q-1; Tue, 18 Oct 2022 14:48:04 -0400
-X-MC-Unique: Jkd-DdXaM4CVqUpb8sUy7Q-1
-Received: by mail-qt1-f197.google.com with SMTP id cb19-20020a05622a1f9300b0039cc64d84edso11274653qtb.15
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 11:48:04 -0700 (PDT)
+        Tue, 18 Oct 2022 14:48:51 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51B18A2871;
+        Tue, 18 Oct 2022 11:48:43 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id m15so21827015edb.13;
+        Tue, 18 Oct 2022 11:48:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2EgRk0P81xPzL9qww2eLXeNWcb1EWchmGlnBKdouweE=;
+        b=K/lo4kdx8fLgnv+KP45qob3AoybmziJgIjiw3Jn7PFCi1EUZg9G8YTRNSj6YTZ+lbQ
+         I9eHW7u5Xy+tn3KH/VQZv5iZNP+E3WEC0iW76wU5uie7xTyucvIM5qjHQvogLDNot8l2
+         QfskDVyp5niBpeczzIcTgg/QmVRNX34Wn233XRc2xRceaPohx+E66Wh2SiToJA3fYpGx
+         jjZG3tv69n/j4QZsq7md5U3eV9er2pDWO+Wodl9XcUkBm43//1GDiE1TS+S6ACrfFSCY
+         FneWgW284AH9RScE7ZA6/zcaFZXEsFRpC9FbP5Iew2EWXGsTHMVtd2VjOj/67g2qRmhf
+         55Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OMz7ZD6XCaUt0ZSMCX9PyjOg8xnpLboIrO4q8tkKQN4=;
-        b=Dpc3w1+8miu8z1FmUbMgzcaiduF4zfzJhI01BWH2caqQAZM6GeHypCL3rLL1RoAIuM
-         FepOOcihy2584K8y933m+BrbYDGfjvAam/s6YDjuv4iHugCGoYesI797ujgzro0ODVTU
-         nDHIurEaiG2cPZzTYyc/HvyV1kbabg7f+W2baqtGS5YF5zV739lwJWLGWH06F5iRmkjs
-         NaO1sf3nmAa8/mBDcCrJjLs6OJlVKVnyEPV7n/VCY46hXFIfHOvV0MX6tv299aEFIifC
-         aN7Y808n2nVQv1NP03FbUzsVyJA3bGGhCcV7gyMSRklzzc1n32/mwP2+xQ7SeciW66qz
-         Mssg==
-X-Gm-Message-State: ACrzQf2T9MDl8gwbk9tFhteMOyXl0PlbNY1CW5Mu6aLaAvQqiCujkVbm
-        RMp42agSwJ0hQUX081tbJzK8tkky9XbUExAo7YcoF4j2NsNO/+mQZzEcDgyHbgJX8sNrDiXeH67
-        Uioi63JEJjKkF2+a3XxKvbA==
-X-Received: by 2002:ac8:5a04:0:b0:39c:da61:d961 with SMTP id n4-20020ac85a04000000b0039cda61d961mr3283877qta.136.1666118883815;
-        Tue, 18 Oct 2022 11:48:03 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4kYiFrkCC2vcc5l1VMqo1SytTgaACjV5OzWvZuMYrZY7zizmGaHRbxL7hmGyNDT7s+jTC5sg==
-X-Received: by 2002:ac8:5a04:0:b0:39c:da61:d961 with SMTP id n4-20020ac85a04000000b0039cda61d961mr3283866qta.136.1666118883616;
-        Tue, 18 Oct 2022 11:48:03 -0700 (PDT)
-Received: from localhost (pool-68-160-173-162.bstnma.fios.verizon.net. [68.160.173.162])
-        by smtp.gmail.com with ESMTPSA id w29-20020a05620a0e9d00b006ee7e223bb8sm2920872qkm.39.2022.10.18.11.48.02
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2EgRk0P81xPzL9qww2eLXeNWcb1EWchmGlnBKdouweE=;
+        b=vf5Lg6P1rlwtN3ESBzgmXvh2FGoZROC5xrJ9Dx4l04WtwtflG36GPZfnjoyTJ02d6w
+         AX0bgJNI/9xzoPrM2vQg2HvmQZzpeC2VdJ71HRmYVsazU3IgySBNDlbUn5+v2gwiOXZJ
+         Er+4JO20CLzGbXE0Qp9kr3ijs057X1UM8zc2/5FMW2kHFIvfFyiiAFe9nevZnc6MiUO6
+         HJOK+upY8oF3O8eKNOC+0ml4dpSrRFq4arvP350KkFZG69n+h36n7Bo403Ee/67mJjqI
+         eiSpIHw6ydW4lX02OVuCN5qVem9f2a1G9jAlrcKcU1E5G6R6q0SZofCK66nOtQ4/Uroj
+         lXng==
+X-Gm-Message-State: ACrzQf3sH+MrT2sVoBozqC9cz28QKtNa+t6q8+fI+BnWQVJT5IyJynnT
+        6UmY6A3ksqeUOS4RX62yGpmKuSZQRjo=
+X-Google-Smtp-Source: AMsMyM42VftfztXwTkzBTqeAltrf8oNmfPM0JmYRnJKypdJcCiTBVibgtdK1Gc/ixK2zeEnLMKJfHg==
+X-Received: by 2002:aa7:cb49:0:b0:45c:7613:661b with SMTP id w9-20020aa7cb49000000b0045c7613661bmr3810197edt.273.1666118921952;
+        Tue, 18 Oct 2022 11:48:41 -0700 (PDT)
+Received: from 127.0.0.1localhost (94.197.72.2.threembb.co.uk. [94.197.72.2])
+        by smtp.gmail.com with ESMTPSA id j18-20020a17090623f200b0078db18d7972sm7855355ejg.117.2022.10.18.11.48.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 11:48:02 -0700 (PDT)
-Date:   Tue, 18 Oct 2022 14:48:01 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Mike Snitzer <snitzer@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Genjian Zhang <zhanggenjian@kylinos.cn>,
-        Jiangshan Yi <yijiangshan@kylinos.cn>,
-        Jilin Yuan <yuanjilin@cdjrlc.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Nathan Huckleberry <nhuck@google.com>,
-        Nikos Tsironis <ntsironis@arrikto.com>,
-        Shaomin Deng <dengshaomin@cdjrlc.com>
-Subject: Re: [git pull] device mapper changes for 6.1
-Message-ID: <Y0704chr07nUgx3X@redhat.com>
-References: <Y07SYs98z5VNxdZq@redhat.com>
- <Y07twbDIVgEnPsFn@infradead.org>
+        Tue, 18 Oct 2022 11:48:41 -0700 (PDT)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Pavel Begunkov <asml.silence@gmail.com>
+Subject: [RFC for-next 0/4] enable pcpu bio caching for IRQ I/O
+Date:   Tue, 18 Oct 2022 19:47:12 +0100
+Message-Id: <cover.1666114003.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.38.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y07twbDIVgEnPsFn@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18 2022 at  2:17P -0400,
-Christoph Hellwig <hch@infradead.org> wrote:
+This series implements bio pcpu caching for normal / IRQ-driven I/O
+extending REQ_ALLOC_CACHE currently limited to iopoll. The allocation side
+still only works from non-irq context, which is the reason it's not enabled
+by default, but turning it on for other users (e.g. filesystems) is
+as a matter of passing a flag.
 
-> On Tue, Oct 18, 2022 at 12:20:50PM -0400, Mike Snitzer wrote:
-> > 
-> > - Enhance DM ioctl interface to allow returning an error string to
-> >   userspace. Depends on exporting is_vmalloc_or_module_addr() to allow
-> >   DM core to conditionally free memory allocated with kasprintf().
-> 
-> That really does not sound like a good idea at all.  And it does not
-> seem to have any MM or core maintainer signoffs.
+t/io_uring with an Optane SSD setup showed +7% for batches of 32 requests
+and +4.3% for batches of 8.
 
-Sorry, I should've solicited proper review more loudly.
+IRQ, 128/32/32, cache off
+IOPS=59.08M, BW=28.84GiB/s, IOS/call=31/31
+IOPS=59.30M, BW=28.96GiB/s, IOS/call=32/32
+IOPS=59.97M, BW=29.28GiB/s, IOS/call=31/31
+IOPS=59.92M, BW=29.26GiB/s, IOS/call=32/32
+IOPS=59.81M, BW=29.20GiB/s, IOS/call=32/31
 
-But if you have a specific concern with how DM is looking to use
-is_vmalloc_or_module_addr() please say what that is.
+IRQ, 128/32/32, cache on
+IOPS=64.05M, BW=31.27GiB/s, IOS/call=32/31
+IOPS=64.22M, BW=31.36GiB/s, IOS/call=32/32
+IOPS=64.04M, BW=31.27GiB/s, IOS/call=31/31
+IOPS=63.16M, BW=30.84GiB/s, IOS/call=32/32
 
-Mike
+IRQ, 32/8/8, cache off
+IOPS=50.60M, BW=24.71GiB/s, IOS/call=7/8
+IOPS=50.22M, BW=24.52GiB/s, IOS/call=8/7
+IOPS=49.54M, BW=24.19GiB/s, IOS/call=8/8
+IOPS=50.07M, BW=24.45GiB/s, IOS/call=7/7
+IOPS=50.46M, BW=24.64GiB/s, IOS/call=8/8
+
+IRQ, 32/8/8, cache on
+IOPS=51.39M, BW=25.09GiB/s, IOS/call=8/7
+IOPS=52.52M, BW=25.64GiB/s, IOS/call=7/8
+IOPS=52.57M, BW=25.67GiB/s, IOS/call=8/8
+IOPS=52.58M, BW=25.67GiB/s, IOS/call=8/7
+IOPS=52.61M, BW=25.69GiB/s, IOS/call=8/8
+
+The main part is in patch 3. Would be great to take patch 1 separately
+for 6.1 for extra safety.
+
+Pavel Begunkov (4):
+  bio: safeguard REQ_ALLOC_CACHE bio put
+  bio: split pcpu cache part of bio_put into a helper
+  block/bio: add pcpu caching for non-polling bio_put
+  io_uring/rw: enable bio caches for IRQ rw
+
+ block/bio.c   | 92 +++++++++++++++++++++++++++++++++++++++------------
+ io_uring/rw.c |  3 +-
+ 2 files changed, 73 insertions(+), 22 deletions(-)
+
+-- 
+2.38.0
 
