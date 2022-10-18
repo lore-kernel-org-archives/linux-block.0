@@ -2,156 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB95C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 18:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D99B4C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Oct 2022 18:17:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbiJRSBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 14:01:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56728 "EHLO
+        id S229852AbiJRSRt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 14:17:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230149AbiJRSBs (ORCPT
+        with ESMTP id S229787AbiJRSRs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 14:01:48 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B2A61147;
-        Tue, 18 Oct 2022 11:01:44 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id o17-20020a17090aac1100b0020d98b0c0f4so16750712pjq.4;
-        Tue, 18 Oct 2022 11:01:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=kbVWeBLmoXaL5wT4FGVpRcLjWyd0m50VYE8PAOnnEko=;
-        b=a0iG9+gDGzV0/uFEh+xecDTUMLAjs0avyQ2SwEVTlqQ0OWuxIWVvI7+VGzewqEagT7
-         5N1mcJO41KbKS7i/17ZW9QV3RoHCd4fgRihwlp6D5/+M0mqFYNoJYrou3tjrqrlTJ8dz
-         XbKOlmlgCSm7t4iqfFRIJOMlef9tuCJ85wiUwPbLRtSwyRA1hArJi9oGz7TdQwhuEumS
-         xDaJQz404PU7P6NsWFLsZENDAml1aJHAJ3OBdTrq6GH4hjxTkfT6Qmn14UOcrFVPZstD
-         4oqbVikV/Ib0yqaGyN6ev3o2wWLK/uUDQCFdWKkr6BcCUVKSR7lOgRAYhE4EsX7u7G0i
-         93qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kbVWeBLmoXaL5wT4FGVpRcLjWyd0m50VYE8PAOnnEko=;
-        b=jKMmG5SrEkiTJQMxBJyt6TocG9csYlZaDf1pGLMVcGkN26fVYXgzg6YYPR5+/JtDBk
-         uAiLUABbZElx8UTI+51oUPMha66toqE4yP2RHZ1aATmObpMekhYDOf0E2mPG89a3OqH7
-         qJIYfVW7luFimjWIUgQfCHfFy3IJzD11oO1YZbEdurRN/+pZJIh1Q9IDmqaPtb5GNSkE
-         5y0LZ+JsqrirgpyqGl7LEUnQZ+3LPh1Jk8w+6EwPAmJYF1hWoi7AU4dYzdnLZ5DVKht+
-         pQO6TromTBLQalyuE2j+C+lTsX/iS2LiR09zB2V8WKl+/T25DNcoqS9GOFbuu4YA+JAf
-         qfsw==
-X-Gm-Message-State: ACrzQf08iiew1kLNqo5RotvAEJSCq5crV4WIp1nWXGSOt0UeLFH7Zozg
-        moWryXEgdIOkcKdRBtOQ5lyAz1hVquGHfXIvt9I=
-X-Google-Smtp-Source: AMsMyM4dRCMlLxwxpvWPKeEBQqgqTpkBvzI2y4UmcFNFY7lhRcumit+v8Ysop8DlhVkW1Pg4yIXBLJ/OEQVZxMId9tQ=
-X-Received: by 2002:a17:902:d512:b0:181:f1f4:fcb4 with SMTP id
- b18-20020a170902d51200b00181f1f4fcb4mr4248525plg.102.1666116103439; Tue, 18
- Oct 2022 11:01:43 -0700 (PDT)
+        Tue, 18 Oct 2022 14:17:48 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040587D1FF
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 11:17:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=AqJ0v0hhWU7bzKshJrvn579bKb31i80AclR/mDSMXJo=; b=SGDjpWATMVzh/pbCUrefeFdPR3
+        Jo2+g5toaGqCPCKiA/4iJzwggRpKDJnBLXuOtQPH10gThWpbWYVKQIo57mZQZEvQSoVbyFogJUC3w
+        8ifeTiMaNLzkY4M2z61hXIlTYfQtECUbzK/WTh68RFL53hDmiRBvDYta4t0fWD7DoTBXC/YCJveto
+        bfBhqYttUsoTM6tU2hMR2ox0Oh7xEDOqoHz7vDt9bIsfmUF9Cf1g2ANPFaBmNra+/xBBgumc8Ty6D
+        5tOHdPxsUSEsswU1hvlGM+9UQTK1/xbNay/LQ9y0j4uzB6uzs544LcfCWVFlaFnGTTU4WSbUmVXUS
+        qogy+R8A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1okr9l-009r0R-62; Tue, 18 Oct 2022 18:17:37 +0000
+Date:   Tue, 18 Oct 2022 11:17:37 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Genjian Zhang <zhanggenjian@kylinos.cn>,
+        Jiangshan Yi <yijiangshan@kylinos.cn>,
+        Jilin Yuan <yuanjilin@cdjrlc.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Nathan Huckleberry <nhuck@google.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>,
+        Shaomin Deng <dengshaomin@cdjrlc.com>
+Subject: Re: [git pull] device mapper changes for 6.1
+Message-ID: <Y07twbDIVgEnPsFn@infradead.org>
+References: <Y07SYs98z5VNxdZq@redhat.com>
 MIME-Version: 1.0
-References: <20221005180341.1738796-1-shy828301@gmail.com> <20221005180341.1738796-3-shy828301@gmail.com>
- <20221013123830.opbulq4qad56kuev@techsingularity.net> <CAHbLzkpc+CAfsYe6gXjh=-3MxMH_aWhPMYhic7ddFZgWttOhng@mail.gmail.com>
- <20221017094132.vnanndrwa2yn7qcw@techsingularity.net>
-In-Reply-To: <20221017094132.vnanndrwa2yn7qcw@techsingularity.net>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Tue, 18 Oct 2022 11:01:31 -0700
-Message-ID: <CAHbLzkpmbmtOdOsud-VG+wyk18wFAFnan8T55XxxwkHrnhLCmw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] mm: mempool: introduce page bulk allocator
-To:     Mel Gorman <mgorman@techsingularity.net>
-Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
-        akpm@linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y07SYs98z5VNxdZq@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 2:41 AM Mel Gorman <mgorman@techsingularity.net> wrote:
->
-> On Thu, Oct 13, 2022 at 01:16:31PM -0700, Yang Shi wrote:
-> > On Thu, Oct 13, 2022 at 5:38 AM Mel Gorman <mgorman@techsingularity.net> wrote:
-> > >
-> > > On Wed, Oct 05, 2022 at 11:03:39AM -0700, Yang Shi wrote:
-> > > > Since v5.13 the page bulk allocator was introduced to allocate order-0
-> > > > pages in bulk.  There are a few mempool allocator callers which does
-> > > > order-0 page allocation in a loop, for example, dm-crypt, f2fs compress,
-> > > > etc.  A mempool page bulk allocator seems useful.  So introduce the
-> > > > mempool page bulk allocator.
-> > > >
-> > > > It introduces the below APIs:
-> > > >   - mempool_init_pages_bulk()
-> > > >   - mempool_create_pages_bulk()
-> > > > They initialize the mempool for page bulk allocator.  The pool is filled
-> > > > by alloc_page() in a loop.
-> > > >
-> > > >   - mempool_alloc_pages_bulk_list()
-> > > >   - mempool_alloc_pages_bulk_array()
-> > > > They do bulk allocation from mempool.
-> > > > They do the below conceptually:
-> > > >   1. Call bulk page allocator
-> > > >   2. If the allocation is fulfilled then return otherwise try to
-> > > >      allocate the remaining pages from the mempool
-> > > >   3. If it is fulfilled then return otherwise retry from #1 with sleepable
-> > > >      gfp
-> > > >   4. If it is still failed, sleep for a while to wait for the mempool is
-> > > >      refilled, then retry from #1
-> > > > The populated pages will stay on the list or array until the callers
-> > > > consume them or free them.
-> > > > Since mempool allocator is guaranteed to success in the sleepable context,
-> > > > so the two APIs return true for success or false for fail.  It is the
-> > > > caller's responsibility to handle failure case (partial allocation), just
-> > > > like the page bulk allocator.
-> > > >
-> > > > The mempool typically is an object agnostic allocator, but bulk allocation
-> > > > is only supported by pages, so the mempool bulk allocator is for page
-> > > > allocation only as well.
-> > > >
-> > > > Signed-off-by: Yang Shi <shy828301@gmail.com>
-> > >
-> > > Overall, I think it's an ok approach and certainly a good use case for
-> > > the bulk allocator.
-> > >
-> > > The main concern that I have is that the dm-crypt use case doesn't really
-> > > want to use lists as such and it's just a means for collecting pages to pass
-> > > to bio_add_page(). bio_add_page() is working with arrays but you cannot
-> > > use that array directly as any change to how that array is populated will
-> > > then explode. Unfortunately, what you have is adding pages to a list to
-> > > take them off the list and put them in an array and that is inefficient.
-> >
-> > Yeah, I didn't think of a better way to pass the pages to dm-crypt.
-> >
-> > >
-> > > How about this
-> > >
-> > > 1. Add a callback to __alloc_pages_bulk() that takes a page as a
-> > >    parameter like bulk_add_page() or whatever.
-> > >
-> > > 2. For page_list == NULL && page_array == NULL, the callback is used
-> > >
-> > > 3. Add alloc_pages_bulk_cb() that passes in the name of a callback
-> > >    function
-> > >
-> > > 4. In the dm-crypt case, use the callback to pass the page to bio_add_page
-> > >    for the new page allocated.
-> >
-> > Thank you so much for the suggestion. But I have a hard time
-> > understanding how these work together. Do you mean call bio_add_page()
-> > in the callback? But bio_add_page() needs other parameters. Or I
-> > misunderstood you?
-> >
->
-> I expected dm-crypt to define the callback. Using bio_add_page
-> directly would not work as the bulk allocator has no idea what to pass
-> bio_add_page. dm-crypt would likely need to create both a callback and an
-> opaque data structure passed as (void *) to track "clone" and "len"
+On Tue, Oct 18, 2022 at 12:20:50PM -0400, Mike Snitzer wrote:
+> 
+> - Enhance DM ioctl interface to allow returning an error string to
+>   userspace. Depends on exporting is_vmalloc_or_module_addr() to allow
+>   DM core to conditionally free memory allocated with kasprintf().
 
-I see. Yeah, we have to pass the "clone" and "len" to the callback via
-pool_data. It should not be hard since dm-crypt already uses
-crypt_config to maintain a counter for allocated pages, we should just
-need to pass the struct to the callback as a parameter.
+That really does not sound like a good idea at all.  And it does not
+seem to have any MM or core maintainer signoffs.
 
-But I'm wondering whether this is worth it or not? Will it make the
-code harder to follow?
-
->
-> --
-> Mel Gorman
-> SUSE Labs
