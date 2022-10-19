@@ -2,62 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DA4C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 06:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EE9C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 07:15:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbiJSGzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Oct 2022 02:55:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33802 "EHLO
+        id S229906AbiJSHPf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Oct 2022 03:15:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbiJSGze (ORCPT
+        with ESMTP id S229848AbiJSHPb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Oct 2022 02:55:34 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0EC1481DB
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 23:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4aZ7DpfaBmS25liDU5Hs2TfHxsUU7VLC1MnUlXTOJ+Y=; b=scowe3qOfHCpNdeoZLBU9tg76v
-        kN0dcWir1Fspm+Hcn00qR7OngYG0Oii/j++1cVt9clylWpDXIY1G4JhI+LwLJ3FMS9q9XMml39BxS
-        3E5+TsxrhRsEogj0gkgLv32j0+IlJoeUXl7lKHqMlsibtwhVda8RZAmwlKaioU3nV8gX+Q68QKM1Y
-        CmHghhkcbKRp7RCVE+FKOTyYTfQF7PU+TLCl4+1vTws3rndWUkoEUUBprJnx+gCfz7oWZJ3eZRnX2
-        6Zji14F8814iDNbqMSDvjcTJKInOTtcyadt5xJ69PieJiGRZ65GF/LKTlw0WYuOzIWrkhb9jeF73O
-        0Sjvi6TQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ol2z5-00FsjG-1U; Wed, 19 Oct 2022 06:55:23 +0000
-Date:   Tue, 18 Oct 2022 23:55:23 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-Subject: Re: [PATCH 2/2] block: clear the holder releated fields on late
- disk_add failure
-Message-ID: <Y0+fW7niNe7L20VH@infradead.org>
-References: <20221018073822.646207-1-hch@lst.de>
- <20221018073822.646207-2-hch@lst.de>
- <8c5359e3-39ee-d363-9425-0cb8b716dcb0@huaweicloud.com>
- <20221018082651.GA26079@lst.de>
- <4c5acbb5-72e6-3f63-2e78-478d3230aa0c@huaweicloud.com>
- <7c021c4f-d31c-1a2b-70e4-4f21fea31488@huaweicloud.com>
+        Wed, 19 Oct 2022 03:15:31 -0400
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0DC56385E
+        for <linux-block@vger.kernel.org>; Wed, 19 Oct 2022 00:15:29 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id m29-20020a05600c3b1d00b003c6bf423c71so16445038wms.0
+        for <linux-block@vger.kernel.org>; Wed, 19 Oct 2022 00:15:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EvVWhk/BBaku1ZpMDQOh5RR4YdPhYTMo8mECNdmaEzA=;
+        b=lT7ichLwGTzBl4jfY1hdQh1iBGJ92XqKCO/G/GFKh6nwemcVTKgZ00U5kOAtWvodE4
+         aZjeHHUBO5gp+mvoL95HpJvbOo8lz1UQauHoeNwvOhQkxMVYCbSk4JRXR1r3XcIcqUye
+         EUXeGQin1JwBhCDIxqxUvYH0UUtPdNdQh6p6OgQNaVTsgd9hYzl7g8PUysdRx+oiaSUL
+         1mzhUGLAN4nPdamoaUvVpdIzLJzGW9HEK3EjuakwUNQAg1DG5gKbcVhy6F1RRYL+8GHR
+         F8FKCDrnmyqckqOJhdyMwAp3X3e3SLdgA4uBtrWvgmv2xTy9AoWjeAEjpPJqI+RERFm0
+         9SfA==
+X-Gm-Message-State: ACrzQf0Mz/exVp6f+d8cyVpU2ujt4cKBK9a7FOhV+SatZFuexNzTKaZb
+        modpGSgJ2zkHwER4OM1zjKtbfGH6PnQ=
+X-Google-Smtp-Source: AMsMyM5l42PXh4XxSQ3VMjZQsW+o5W0El0fbSviQq+qtnJ4ULUpcN7CX8KvH06cNK+tOcZUCEr6qug==
+X-Received: by 2002:a05:600c:4448:b0:3c6:fb65:2462 with SMTP id v8-20020a05600c444800b003c6fb652462mr4464065wmn.39.1666163728309;
+        Wed, 19 Oct 2022 00:15:28 -0700 (PDT)
+Received: from [192.168.64.53] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id e9-20020adffc49000000b002206203ed3dsm12973900wrs.29.2022.10.19.00.15.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Oct 2022 00:15:27 -0700 (PDT)
+Message-ID: <9da048fc-71ee-cc38-a861-59acc96671fe@grimberg.me>
+Date:   Wed, 19 Oct 2022 10:15:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7c021c4f-d31c-1a2b-70e4-4f21fea31488@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc:     "Paul E. McKenney" <paulmck@kernel.org>,
+        Chao Leng <lengchao@huawei.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@kernel.dk
+References: <20221013094450.5947-1-lengchao@huawei.com>
+ <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de>
+ <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
+ <20221017153105.GA32509@lst.de>
+ <20221017224115.GJ5600@paulmck-ThinkPad-P17-Gen-1>
+ <20221018051956.GA18802@lst.de> <Y09GROYqk3FMM21W@T590>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <Y09GROYqk3FMM21W@T590>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 05:05:09PM +0800, Yu Kuai wrote:
-> 2) run the cmd:
-> 
-> dmsetup create test1 --table "0 100000 linear /dev/sda 0" &
-> sleep 1
-> echo 1 > /sys/block/sda/device/delete
-> 
-> And the follwing uaf is triggered:
 
-Yes, for that we also need to clear the pointer and unregister all
-holder in del_gedisk (or even better move this mess to dm :()
+>>> Then the big question is "how long do the SRCU readers run?"
+>>>
+>>> If all of the readers ran for exactly the same duration, there would be
+>>> little point in having more than one srcu_struct.
+>>
+>> The SRCU readers are the I/O dispatch, which will have quite similar
+>> runtimes for the different queues.
+>>
+>>> If the kernel knew up front how long the SRCU readers for a given entry
+>>> would run, it could provide an srcu_struct structure for each duration.
+>>> For a (fanciful) example, you could have one srcu_struct structure for
+>>> SSDs, another for rotating rust, a third for LAN-attached storage, and
+>>> a fourth for WAN-attached storage.  Maybe a fifth for lunar-based storage.
+>>
+>> All the different request_queues in a tag_set are for the same device.
+>> There might be some corner cases like storare arrays where they have
+>> different latencies.  But we're not even waiting for the I/O completion
+>> here, this just protects the submission.
+>>
+>>> Does that help, or am I off in the weeds here?
+>>
+>> I think this was very helpful, and at least to be moving the srcu_struct
+>> to the tag_set sounds like a good idea to explore.
+>>
+>> Ming, anything I might have missed?
+> 
+> I think it is fine to move it to tag_set, this way could simplify a
+> lot.
+> 
+> The effect could be that blk_mq_quiesce_queue() becomes a little
+> slow, but it is always in slow path, and synchronize_srcu() won't
+> wait new read-side critical-section.
+> 
+> Just one corner case, in case of BLK_MQ_F_BLOCKING, is there any such driver
+> which may block too long in ->queue_rq() sometime? such as wait for dozens
+> of seconds.
+
+nvme-tcp will opportunistically try a network send directly from
+.queue_rq(), but always with MSG_DONTWAIT, so that is not a problem.
+
+nbd though can block in .queue_rq() with blocking network sends, however
+afaict nbd allocates a tagset per nbd_device, and also a request_queue
+per device, so its effectively the same if the srcu is in the tagset or
+in the request_queue.
