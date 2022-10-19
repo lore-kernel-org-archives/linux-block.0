@@ -2,69 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31444C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 08:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0104FC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 08:29:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbiJSIUq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Oct 2022 04:20:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53840 "EHLO
+        id S229766AbiJSI3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Oct 2022 04:29:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230087AbiJSIUn (ORCPT
+        with ESMTP id S229554AbiJSI3d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Oct 2022 04:20:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DB47B783
-        for <linux-block@vger.kernel.org>; Wed, 19 Oct 2022 01:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666167641;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HXZBvfNAfi6luas85qTQSWuS6SyKZHjVv+hOV8o6mUU=;
-        b=TcgHbawd5bzvzdVmJm45s1yxcPSVLdVIwosn9hZjpNoWknx0m3fKnnfHD6mrjdxb6RsM9h
-        vNYEKpRdoQMubJUkoTysDEpTeKhvqpJ5DbQty4f5gU1AHpqvTa+di9WJUFb78ZKQ1eieqd
-        iG9yS4NR4FYXITNbHYwOyHdm9CmqCy4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-614-sYYUZg2lMLCIv-hW0rz_jA-1; Wed, 19 Oct 2022 04:20:39 -0400
-X-MC-Unique: sYYUZg2lMLCIv-hW0rz_jA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 83E0F8027F5;
-        Wed, 19 Oct 2022 08:20:33 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 91F85414A81C;
-        Wed, 19 Oct 2022 08:20:27 +0000 (UTC)
-Date:   Wed, 19 Oct 2022 16:20:23 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: blk_mq_quiesce_queue in del_gendisk
-Message-ID: <Y0+zR+hhuVkV2rrc@T590>
-References: <20221019073035.GB11606@lst.de>
+        Wed, 19 Oct 2022 04:29:33 -0400
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE55F13DCA
+        for <linux-block@vger.kernel.org>; Wed, 19 Oct 2022 01:29:30 -0700 (PDT)
+Received: by mail-wr1-f46.google.com with SMTP id j7so27867686wrr.3
+        for <linux-block@vger.kernel.org>; Wed, 19 Oct 2022 01:29:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=C+YQK553ZwAb75g9DYbrpJvtlRziCaaKNmA4fzdn2Go=;
+        b=4pBxnGdrz78TADFWuo8nqib0vG3nJh4I2P59qHw7zqF4vDmbtiuNyxZ9Jc942HbJKs
+         mQg5SmcXrNe2Exz5M79cfMbhRfmXyJry26QKvL6qbufhpQnbYQqmjoWyveIPeFzahhho
+         Tau12RRE+kmn18ZENTa41VHOkvSrq+doI2vk3BHqvaac14/If5HkVe3HL1nD2b9Jn118
+         Xlyr01TeIELHCyRzguKDjdrEbUUlGgUxkwKkUQSAKY8YWjwEIfP6Pp0F4Yi0BpkuG7Iw
+         VITbxbGOiVR2nMYTgT7hXm0rDjFllsb19y0Hi09yeMHpZty405yWXwWbhh99wxTkFxmz
+         2RcA==
+X-Gm-Message-State: ACrzQf3POV/k08V9XTBdRAxgew+yiaRFgqWOe82Yg7bwOiP7ZTtCA2BL
+        SXSdaklfwJ0fdZ5YmPah974=
+X-Google-Smtp-Source: AMsMyM5YXYOq0swriFXs8+YYZMHVekIYDljoauTk0kcObiPq1L4R2KyizmHUw1twq22YPfLd/0Zcfw==
+X-Received: by 2002:a5d:4d07:0:b0:22e:3c45:9f00 with SMTP id z7-20020a5d4d07000000b0022e3c459f00mr4189315wrt.646.1666168169115;
+        Wed, 19 Oct 2022 01:29:29 -0700 (PDT)
+Received: from [192.168.64.53] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id q8-20020a1cf308000000b003c6b9749505sm20546201wmq.30.2022.10.19.01.29.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Oct 2022 01:29:28 -0700 (PDT)
+Message-ID: <78b32314-6e03-6069-3459-d21189eb42e4@grimberg.me>
+Date:   Wed, 19 Oct 2022 11:29:26 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221019073035.GB11606@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Chao Leng <lengchao@huawei.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, axboe@kernel.dk
+References: <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
+ <20221017153105.GA32509@lst.de>
+ <20221017224115.GJ5600@paulmck-ThinkPad-P17-Gen-1>
+ <20221018051956.GA18802@lst.de> <Y09GROYqk3FMM21W@T590>
+ <9da048fc-71ee-cc38-a861-59acc96671fe@grimberg.me>
+ <20221019072535.GA11402@lst.de>
+ <974a750a-4d18-f559-0247-3d3aa62e620e@grimberg.me>
+ <20221019073231.GA12035@lst.de>
+ <c791d0d8-80b5-d25c-f8d6-f93bf6c840a6@grimberg.me>
+ <20221019081734.GA15255@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20221019081734.GA15255@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 09:30:35AM +0200, Christoph Hellwig wrote:
-> Based on the per-tagset srcu for quiesce discusion I've been wondering
-> why we need the queue quiesce around elevator_exit and rq_qos_exit in
-> del_gendisk.  At the point where we call it, we've stopped new fs
-> I/O submissions, and the queue is frozen.  What does the quiesce still
-> protect against, and if anything can we come up with a cheaper way to
-> do that?
 
-There might be in-progress run queue not finished yet, only rcu can
-guarantee that.
+>>>> iscsi defers network sends to a workqueue anyways, and no scsi lld sets
+>>>> BLK_MQ_F_BLOCKING.
+>>>
+>>> Yes, but Mike had a series to implement a similar fast path as nvme-tcp
+>>> as while ago that included supporting BLK_MQ_F_BLOCKING in the scsi
+>>> midlayer.
+>>
+>> Hmmm, didn't see that, pointer?
+> 
+> https://www.spinics.net/lists/linux-scsi/msg170849.html
 
+Nice.
 
-Thanks, 
-Ming
+>>>   We'll also need it to convert the paride drivers to libata,
+>>> but those are single request_queue per tag_set as far as I know.
+>>
+>> didn't see paride even attempting to quiesce...
+> 
+> The block layer might.  But it really does not matter for our
+> considerations here..
 
+Right.
