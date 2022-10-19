@@ -2,144 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B63C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 02:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AF6C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 03:07:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbiJSCjs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 22:39:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 "EHLO
+        id S229868AbiJSDHU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 23:07:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiJSCjr (ORCPT
+        with ESMTP id S229879AbiJSDHJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 22:39:47 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4033920185
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 19:39:44 -0700 (PDT)
-Received: from canpemm500002.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MsZgr3btnzHv4q;
-        Wed, 19 Oct 2022 10:39:36 +0800 (CST)
-Received: from [10.169.59.127] (10.169.59.127) by
- canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 19 Oct 2022 10:39:42 +0800
-Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
-To:     <paulmck@kernel.org>
-CC:     Christoph Hellwig <hch@lst.de>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <sagi@grimberg.me>,
-        <kbusch@kernel.org>, <ming.lei@redhat.com>, <axboe@kernel.dk>
-References: <20221013094450.5947-1-lengchao@huawei.com>
- <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de>
- <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
- <3bb8a547-b2e2-7654-55dc-e943ac9aa06d@huawei.com>
- <20221018150406.GO5600@paulmck-ThinkPad-P17-Gen-1>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <dc24947f-9017-0399-606d-f9562a381485@huawei.com>
-Date:   Wed, 19 Oct 2022 10:39:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Tue, 18 Oct 2022 23:07:09 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF66B844C3;
+        Tue, 18 Oct 2022 20:07:04 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MsbDn3Mznz6PDfR;
+        Wed, 19 Oct 2022 11:04:41 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgA3nP_SaU9jZSxUAA--.3335S3;
+        Wed, 19 Oct 2022 11:07:00 +0800 (CST)
+To:     axboe@kernel.dk, linux-block <linux-block@vger.kernel.org>,
+        lkml <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>, jack@suse.cz, hch@infradead.org,
+        Ming Lei <ming.lei@redhat.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Subject: [QUESTION] kernel can be silence when io hang
+Message-ID: <034239b5-0d46-51b1-c189-a09f1700083d@huaweicloud.com>
+Date:   Wed, 19 Oct 2022 11:06:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20221018150406.GO5600@paulmck-ThinkPad-P17-Gen-1>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.169.59.127]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500002.china.huawei.com (7.192.104.244)
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgA3nP_SaU9jZSxUAA--.3335S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7CFy7Cr1xWryxXw1xtry8AFb_yoW8JFyDpF
+        43Kw12krs5Gr1xua18Xa13Wa47Aws8Ar4a934kJw13ZFs8ZFn7JrySvrWa9F17Xr1DWFZ2
+        vF10vrWv93WUZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
+        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
+        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi, block experts！
 
+In order to prevent false positive hung task warnings for slow io,
+following commits forbit hung task checking for io:
 
-On 2022/10/18 23:04, Paul E. McKenney wrote:
-> On Tue, Oct 18, 2022 at 05:52:06PM +0800, Chao Leng wrote:
->> On 2022/10/17 23:21, Paul E. McKenney wrote:
->>> On Mon, Oct 17, 2022 at 03:39:06PM +0200, Christoph Hellwig wrote:
->>>> On Thu, Oct 13, 2022 at 05:44:49PM +0800, Chao Leng wrote:
->>>>> +	rcu = kvmalloc(count * sizeof(*rcu), GFP_KERNEL);
->>>>> +	if (rcu) {
->>>>> +		list_for_each_entry(q, &set->tag_list, tag_set_list) {
->>>>> +			if (blk_queue_noquiesced(q))
->>>>> +				continue;
->>>>> +
->>>>> +			init_rcu_head(&rcu[i].head);
->>>>> +			init_completion(&rcu[i].completion);
->>>>> +			call_srcu(q->srcu, &rcu[i].head, wakeme_after_rcu);
->>>>> +			i++;
->>>>> +		}
->>>>> +
->>>>> +		for (i = 0; i < count; i++) {
->>>>> +			wait_for_completion(&rcu[i].completion);
->>>>> +			destroy_rcu_head(&rcu[i].head);
->>>>> +		}
->>>>> +		kvfree(rcu);
->>>>> +	} else {
->>>>> +		list_for_each_entry(q, &set->tag_list, tag_set_list)
->>>>> +			synchronize_srcu(q->srcu);
->>>>> +	}
->>>>
->>>> Having to allocate a struct rcu_synchronize for each of the potentially
->>>> many queues here is a bit sad.
->>>>
->>>> Pull just explained the start_poll_synchronize_rcu interfaces at ALPSS
->>>> last week, so I wonder if something like that would also be feasible
->>>> for SRCU, as that would come in really handy here.
->>>
->>> There is start_poll_synchronize_srcu() and poll_state_synchronize_srcu(),
->>> but there would need to be an unsigned long for each srcu_struct from
->>> which an SRCU grace period was required.  This would be half the size
->>> of the "rcu" array above, but still maybe larger than you would like.
->>>
->>> The resulting code might look something like this, with "rcu" now being
->>> a pointer to unsigned long:
->>>
->>> 	rcu = kvmalloc(count * sizeof(*rcu), GFP_KERNEL);
->>> 	if (rcu) {
->>> 		list_for_each_entry(q, &set->tag_list, tag_set_list) {
->>> 			if (blk_queue_noquiesced(q))
->>> 				continue;
->>> 			rcu[i] = start_poll_synchronize_srcu(q->srcu);
->>> 			i++;
->>> 		}
->>>
->>> 		for (i = 0; i < count; i++)
->>> 			if (!poll_state_synchronize_srcu(q->srcu))
->>> 				synchronize_srcu(q->srcu);
->> synchronize_srcu will restart a new period of grace.
-> 
-> True, but SRCU grace periods normally complete reasonably quickly, so
-> the synchronize_srcu() might well be faster than the loop, depending on
-> what the corresponding SRCU readers are doing.
-Yes, Different runtimes have different wait times, and it's hard to say
-which is better or worse.
-> 
->> Maybe it would be better like this:
->> 			while (!poll_state_synchronize_srcu(q->srcu, rcu[i]))
->> 				schedule_timeout_uninterruptible(1);
-> 
-> Why not try it both ways and see what happens?  Assuming that is, that
-> the differences matter in this code.
-> 
-> 							Thanx, Paul
-> 
->>> 		kvfree(rcu);
->>> 	} else {
->>> 		list_for_each_entry(q, &set->tag_list, tag_set_list)
->>> 			synchronize_srcu(q->srcu);
->>> 	}
->>>
->>> Or as Christoph suggested, just have a single srcu_struct for the
->>> whole group.
->>>
->>> The main reason for having multiple srcu_struct structures is to
->>> prevent the readers from one from holding up the updaters from another.
->>> Except that by waiting for the multiple grace periods, you are losing
->>> that property anyway, correct?  Or is this code waiting on only a small
->>> fraction of the srcu_struct structures associated with blk_queue?
->>>
->>> 							Thanx, Paul
->>> .
->>>
-> .
-> 
+1) 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4b1977698ceb
+2) 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=de6a78b601c5
+3) 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e6249cdd46e4
+
+However, if io really hangs, they also forbit the hung task warnings
+that will be helpful.
+
+I'm thinking about when hang task should be detected:
+
+1) If io is still in block layer，there are many places that io can be
+stalled: blk throttle, get tag, rq_qos_throttle, plug, elevator, hctx. I
+think hang task should be detected at least for the case that there is
+no io in driver.
+
+2) If io is issued to driver
+​   a. For the driver that timeout handling is implemented, there is no
+need to detect hung task.
+​   b. For the driver that timeout handling is not implemented
+(virtio,virtio_scsi)，there is a real timeout handling in physical
+device. So hung task should be detected before the io is issued to lower
+device.
+
+Does anyone thinks these thoughts meaningful? Comments and suggestions
+are welcomed.
+
+Thanks,
+
+Kuai
+
