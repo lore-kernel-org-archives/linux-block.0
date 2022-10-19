@@ -2,110 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06FACC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 01:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B63C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 02:39:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbiJSBX1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 21:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46678 "EHLO
+        id S229852AbiJSCjs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 22:39:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbiJSBX0 (ORCPT
+        with ESMTP id S229755AbiJSCjr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 21:23:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 709C2DFB68
-        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 18:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666142604;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dMOprsDQUY4INvBuBGxV3T7LRHx+WHc/e/o7v3nW7u4=;
-        b=IOJfI/xgpQvy0Lbs/CE8MPgi0LXj/Zoq4vY9qkqqfxSHKBrCnkkcITIYM7ew/dgM7seJXD
-        cP3suDhHrV7fZhQ+pr9r2U7HRqcZcErtKlMzKaWVBB8RPbYhzif3IDMJfxy8R6Ppiccx+I
-        cI5jxFlZWPe7mUiZ6jbl4aQCFDUg4xI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-457-kFCXiaauNs6sbrEKiLkEsA-1; Tue, 18 Oct 2022 21:23:13 -0400
-X-MC-Unique: kFCXiaauNs6sbrEKiLkEsA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C247D884342;
-        Wed, 19 Oct 2022 01:23:12 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 281C2200B408;
-        Wed, 19 Oct 2022 01:23:06 +0000 (UTC)
-Date:   Wed, 19 Oct 2022 09:23:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Hector Martin <marcan@marcan.st>,
-        Sven Peter <sven@svenpeter.dev>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 2/4] scsi: remove an extra queue reference
-Message-ID: <Y09Rdh0O23cvizeQ@T590>
-References: <20221018135720.670094-1-hch@lst.de>
- <20221018135720.670094-3-hch@lst.de>
- <Y09QCb5A+iL/Igoj@T590>
+        Tue, 18 Oct 2022 22:39:47 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4033920185
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 19:39:44 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MsZgr3btnzHv4q;
+        Wed, 19 Oct 2022 10:39:36 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 19 Oct 2022 10:39:42 +0800
+Subject: Re: [PATCH v2 1/2] blk-mq: add tagset quiesce interface
+To:     <paulmck@kernel.org>
+CC:     Christoph Hellwig <hch@lst.de>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <sagi@grimberg.me>,
+        <kbusch@kernel.org>, <ming.lei@redhat.com>, <axboe@kernel.dk>
+References: <20221013094450.5947-1-lengchao@huawei.com>
+ <20221013094450.5947-2-lengchao@huawei.com> <20221017133906.GA24492@lst.de>
+ <20221017152136.GI5600@paulmck-ThinkPad-P17-Gen-1>
+ <3bb8a547-b2e2-7654-55dc-e943ac9aa06d@huawei.com>
+ <20221018150406.GO5600@paulmck-ThinkPad-P17-Gen-1>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <dc24947f-9017-0399-606d-f9562a381485@huawei.com>
+Date:   Wed, 19 Oct 2022 10:39:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y09QCb5A+iL/Igoj@T590>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+In-Reply-To: <20221018150406.GO5600@paulmck-ThinkPad-P17-Gen-1>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 09:16:57AM +0800, Ming Lei wrote:
-> On Tue, Oct 18, 2022 at 03:57:18PM +0200, Christoph Hellwig wrote:
-> > Now that blk_mq_destroy_queue does not release the queue reference, there
-> > is no need for a second queue reference to be held by the scsi_device.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  drivers/scsi/scsi_scan.c  | 1 -
-> >  drivers/scsi/scsi_sysfs.c | 1 -
-> >  2 files changed, 2 deletions(-)
-> > 
-> > diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
-> > index 5d27f5196de6f..0a95fa787fdf4 100644
-> > --- a/drivers/scsi/scsi_scan.c
-> > +++ b/drivers/scsi/scsi_scan.c
-> > @@ -344,7 +344,6 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
-> >  	sdev->request_queue = q;
-> >  	q->queuedata = sdev;
-> >  	__scsi_init_queue(sdev->host, q);
-> > -	WARN_ON_ONCE(!blk_get_queue(q));
-> >  
-> >  	depth = sdev->host->cmd_per_lun ?: 1;
-> >  
-> > diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-> > index 1214c6f07bc64..c95177ca6ed26 100644
-> > --- a/drivers/scsi/scsi_sysfs.c
-> > +++ b/drivers/scsi/scsi_sysfs.c
-> > @@ -1478,7 +1478,6 @@ void __scsi_remove_device(struct scsi_device *sdev)
-> >  	mutex_unlock(&sdev->state_mutex);
-> >  
-> >  	blk_mq_destroy_queue(sdev->request_queue);
-> > -	blk_put_queue(sdev->request_queue);
+
+
+On 2022/10/18 23:04, Paul E. McKenney wrote:
+> On Tue, Oct 18, 2022 at 05:52:06PM +0800, Chao Leng wrote:
+>> On 2022/10/17 23:21, Paul E. McKenney wrote:
+>>> On Mon, Oct 17, 2022 at 03:39:06PM +0200, Christoph Hellwig wrote:
+>>>> On Thu, Oct 13, 2022 at 05:44:49PM +0800, Chao Leng wrote:
+>>>>> +	rcu = kvmalloc(count * sizeof(*rcu), GFP_KERNEL);
+>>>>> +	if (rcu) {
+>>>>> +		list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>>>>> +			if (blk_queue_noquiesced(q))
+>>>>> +				continue;
+>>>>> +
+>>>>> +			init_rcu_head(&rcu[i].head);
+>>>>> +			init_completion(&rcu[i].completion);
+>>>>> +			call_srcu(q->srcu, &rcu[i].head, wakeme_after_rcu);
+>>>>> +			i++;
+>>>>> +		}
+>>>>> +
+>>>>> +		for (i = 0; i < count; i++) {
+>>>>> +			wait_for_completion(&rcu[i].completion);
+>>>>> +			destroy_rcu_head(&rcu[i].head);
+>>>>> +		}
+>>>>> +		kvfree(rcu);
+>>>>> +	} else {
+>>>>> +		list_for_each_entry(q, &set->tag_list, tag_set_list)
+>>>>> +			synchronize_srcu(q->srcu);
+>>>>> +	}
+>>>>
+>>>> Having to allocate a struct rcu_synchronize for each of the potentially
+>>>> many queues here is a bit sad.
+>>>>
+>>>> Pull just explained the start_poll_synchronize_rcu interfaces at ALPSS
+>>>> last week, so I wonder if something like that would also be feasible
+>>>> for SRCU, as that would come in really handy here.
+>>>
+>>> There is start_poll_synchronize_srcu() and poll_state_synchronize_srcu(),
+>>> but there would need to be an unsigned long for each srcu_struct from
+>>> which an SRCU grace period was required.  This would be half the size
+>>> of the "rcu" array above, but still maybe larger than you would like.
+>>>
+>>> The resulting code might look something like this, with "rcu" now being
+>>> a pointer to unsigned long:
+>>>
+>>> 	rcu = kvmalloc(count * sizeof(*rcu), GFP_KERNEL);
+>>> 	if (rcu) {
+>>> 		list_for_each_entry(q, &set->tag_list, tag_set_list) {
+>>> 			if (blk_queue_noquiesced(q))
+>>> 				continue;
+>>> 			rcu[i] = start_poll_synchronize_srcu(q->srcu);
+>>> 			i++;
+>>> 		}
+>>>
+>>> 		for (i = 0; i < count; i++)
+>>> 			if (!poll_state_synchronize_srcu(q->srcu))
+>>> 				synchronize_srcu(q->srcu);
+>> synchronize_srcu will restart a new period of grace.
 > 
-> The above put is counter-pair of blk_get_queue() in scsi_alloc_sdev, and
-> the original blk_put_queue() in blk_mq_destroy_queue() is counter-pair of
-> the initial get in blk_alloc_queue().
+> True, but SRCU grace periods normally complete reasonably quickly, so
+> the synchronize_srcu() might well be faster than the loop, depending on
+> what the corresponding SRCU readers are doing.
+Yes, Different runtimes have different wait times, and it's hard to say
+which is better or worse.
 > 
-> Now blk_put_queue() is moved out of blk_mq_destroy_queue(), I am wondering
-> how the scsi queue lifetime can work correctly with this patch? Or is there
-> bug in current scsi code?
-
-oops, the above blk_put_queue() is actually added in the 1st patch, so
-this patch is fine, sorry for the noise.
-
-
-thanks,
-Ming
-
+>> Maybe it would be better like this:
+>> 			while (!poll_state_synchronize_srcu(q->srcu, rcu[i]))
+>> 				schedule_timeout_uninterruptible(1);
+> 
+> Why not try it both ways and see what happens?  Assuming that is, that
+> the differences matter in this code.
+> 
+> 							Thanx, Paul
+> 
+>>> 		kvfree(rcu);
+>>> 	} else {
+>>> 		list_for_each_entry(q, &set->tag_list, tag_set_list)
+>>> 			synchronize_srcu(q->srcu);
+>>> 	}
+>>>
+>>> Or as Christoph suggested, just have a single srcu_struct for the
+>>> whole group.
+>>>
+>>> The main reason for having multiple srcu_struct structures is to
+>>> prevent the readers from one from holding up the updaters from another.
+>>> Except that by waiting for the multiple grace periods, you are losing
+>>> that property anyway, correct?  Or is this code waiting on only a small
+>>> fraction of the srcu_struct structures associated with blk_queue?
+>>>
+>>> 							Thanx, Paul
+>>> .
+>>>
+> .
+> 
