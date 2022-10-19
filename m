@@ -2,52 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1CEC41535
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA24C4167E
 	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 12:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232323AbiJSMt0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Oct 2022 08:49:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32844 "EHLO
+        id S232877AbiJSMt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Oct 2022 08:49:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233391AbiJSMtA (ORCPT
+        with ESMTP id S233390AbiJSMtA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 19 Oct 2022 08:49:00 -0400
 Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E088140FC;
-        Wed, 19 Oct 2022 05:31:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBD06BC1E;
+        Wed, 19 Oct 2022 05:31:42 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mspvx4m1WzKHg0;
-        Wed, 19 Oct 2022 19:50:53 +0800 (CST)
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mspvy6r6pzKHgk;
+        Wed, 19 Oct 2022 19:50:54 +0800 (CST)
 Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgCX0DAq5U9jgItmAA--.58124S4;
-        Wed, 19 Oct 2022 19:53:16 +0800 (CST)
+        by APP4 (Coremail) with SMTP id gCh0CgCX0DAq5U9jgItmAA--.58124S7;
+        Wed, 19 Oct 2022 19:53:17 +0800 (CST)
 From:   Yu Kuai <yukuai1@huaweicloud.com>
 To:     hch@lst.de, ebiggers@google.com, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v5 0/6] blk-wbt: simple improvment to enable wbt correctly
-Date:   Wed, 19 Oct 2022 20:15:12 +0800
-Message-Id: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
+Subject: [PATCH v5 3/6] blk-wbt: make enable_state more accurate
+Date:   Wed, 19 Oct 2022 20:15:15 +0800
+Message-Id: <20221019121518.3865235-4-yukuai1@huaweicloud.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
+References: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCX0DAq5U9jgItmAA--.58124S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gw15Kw15tFyUuw4DJw4UXFb_yoWDurgEqa
-        yUK3s5WFn8XF1rCFZxJF1UJFWj9rs5Zr15Xa47tr9YyryfJF4jyw4ktr4Uu3s8ZF4Ik3Z0
-        y3yUurWrur1IqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbzxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
-        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
-        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-        67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-TRANSID: gCh0CgCX0DAq5U9jgItmAA--.58124S7
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZF47CF4Utw47WFyfZw4xWFg_yoW8AFW5pa
+        srGrW7KrnFgFn7Za1xA3W7JrWfCa1jyF45Gay5Zr1SgF15urW2v3WvkrWUXFnYvFW3Ca1I
+        g34DJr9rJa4jvrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9m14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JrWl82xGYIkIc2
+        x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+        Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+        A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+        0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+        IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0
+        Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxGrwCFx2
+        IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v2
+        6r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67
+        AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IY
+        s7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr
+        0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUd8n5UUUUU=
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -56,38 +58,61 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yu Kuai <yukuai3@huawei.com>
 
-changes in v5:
- - code adjustment in patch 4, as suggested by Christoph.
- - add review tag by Christop.
+Currently, if user disable wbt through sysfs, 'enable_state' will be
+'WBT_STATE_ON_MANUAL', which will be confusing. Add a new state
+'WBT_STATE_OFF_MANUAL' to cover that case.
 
-changes in v4:
- - remove patch 3 from v3
- - add patch 2,3 in v4
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-wbt.c |  7 ++++++-
+ block/blk-wbt.h | 12 +++++++-----
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-changes in v3:
- - instead of check elevator name, add a flag in elevator_queue, as
- suggested by Christoph.
- - add patch 3 and patch 5 to this patchset.
-
-changes in v2:
- - define new api if wbt config is not enabled in patch 1.
-
-Yu Kuai (6):
-  elevator: remove redundant code in elv_unregister_queue()
-  blk-wbt: remove unnecessary check in wbt_enable_default()
-  blk-wbt: make enable_state more accurate
-  blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
-  elevator: add new field flags in struct elevator_queue
-  blk-wbt: don't enable throttling if default elevator is bfq
-
- block/bfq-iosched.c |  2 ++
- block/blk-sysfs.c   |  3 +++
- block/blk-wbt.c     | 26 ++++++++++++++++++++++----
- block/blk-wbt.h     | 17 ++++++++++++-----
- block/elevator.c    |  8 ++------
- block/elevator.h    |  5 ++++-
- 6 files changed, 45 insertions(+), 16 deletions(-)
-
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index c5a8c10028a0..4680691a96bc 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -435,8 +435,13 @@ void wbt_set_min_lat(struct request_queue *q, u64 val)
+ 	struct rq_qos *rqos = wbt_rq_qos(q);
+ 	if (!rqos)
+ 		return;
++
+ 	RQWB(rqos)->min_lat_nsec = val;
+-	RQWB(rqos)->enable_state = WBT_STATE_ON_MANUAL;
++	if (val)
++		RQWB(rqos)->enable_state = WBT_STATE_ON_MANUAL;
++	else
++		RQWB(rqos)->enable_state = WBT_STATE_OFF_MANUAL;
++
+ 	wbt_update_limits(RQWB(rqos));
+ }
+ 
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 7e44eccc676d..7fe98638fff5 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -28,13 +28,15 @@ enum {
+ };
+ 
+ /*
+- * Enable states. Either off, or on by default (done at init time),
+- * or on through manual setup in sysfs.
++ * If current state is WBT_STATE_ON/OFF_DEFAULT, it can be covered to any other
++ * state, if current state is WBT_STATE_ON/OFF_MANUAL, it can only be covered
++ * to WBT_STATE_OFF/ON_MANUAL.
+  */
+ enum {
+-	WBT_STATE_ON_DEFAULT	= 1,
+-	WBT_STATE_ON_MANUAL	= 2,
+-	WBT_STATE_OFF_DEFAULT
++	WBT_STATE_ON_DEFAULT	= 1,	/* on by default */
++	WBT_STATE_ON_MANUAL	= 2,	/* on manually by sysfs */
++	WBT_STATE_OFF_DEFAULT	= 3,	/* off by default */
++	WBT_STATE_OFF_MANUAL	= 4,	/* off manually by sysfs */
+ };
+ 
+ struct rq_wb {
 -- 
 2.31.1
 
