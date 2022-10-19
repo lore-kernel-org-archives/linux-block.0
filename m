@@ -2,94 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5ADFC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 01:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD594C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 01:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiJSBGZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 21:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49808 "EHLO
+        id S229871AbiJSBRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 21:17:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbiJSBGV (ORCPT
+        with ESMTP id S229942AbiJSBR1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 21:06:21 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3925CDED38;
-        Tue, 18 Oct 2022 18:06:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MsXYm4Xsrzl66p;
-        Wed, 19 Oct 2022 09:04:12 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAXCzKETU9jlvBPAA--.9090S3;
-        Wed, 19 Oct 2022 09:06:13 +0800 (CST)
-Subject: Re: [PATCH v4 4/6] blk-wbt: don't show valid wbt_lat_usec in sysfs
- while wbt is disabled
-To:     Christoph Hellwig <hch@infradead.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     jack@suse.cz, ebiggers@kernel.org, paolo.valente@linaro.org,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220930031906.4164306-1-yukuai1@huaweicloud.com>
- <20220930031906.4164306-5-yukuai1@huaweicloud.com>
- <Y07LCnJN5q8ueV7X@infradead.org>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <63e04cac-974a-3235-275d-64499cbd5863@huaweicloud.com>
-Date:   Wed, 19 Oct 2022 09:06:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 18 Oct 2022 21:17:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C71CE0722
+        for <linux-block@vger.kernel.org>; Tue, 18 Oct 2022 18:17:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666142242;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vnNacsVxf3YZ/yiRosb8lJ/iQsw+P4AWbKc0V3i3E7k=;
+        b=EvM8V7Tc8KiqYL04r31p9cuojib3grDD34BYpYqPz0mJ2tgwm4t1qMlt1wuUnYNIE5a6sh
+        RbdyfDHroNO6XsbGuQXn0H7dBQTSc78zkrvEcb6TIJ97nncItQwE4v1C5hwtnyElqEl1SW
+        vSjlWB7OGT78V8j24SVUn9FoSk37rhc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-2wkAFIfOP82X2ckKDvfswQ-1; Tue, 18 Oct 2022 21:17:17 -0400
+X-MC-Unique: 2wkAFIfOP82X2ckKDvfswQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 05BF38060A0;
+        Wed, 19 Oct 2022 01:17:15 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 97A922166B41;
+        Wed, 19 Oct 2022 01:17:01 +0000 (UTC)
+Date:   Wed, 19 Oct 2022 09:16:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Hector Martin <marcan@marcan.st>,
+        Sven Peter <sven@svenpeter.dev>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 2/4] scsi: remove an extra queue reference
+Message-ID: <Y09QCb5A+iL/Igoj@T590>
+References: <20221018135720.670094-1-hch@lst.de>
+ <20221018135720.670094-3-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <Y07LCnJN5q8ueV7X@infradead.org>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAXCzKETU9jlvBPAA--.9090S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7GF13ArW7XFy7CFyrKF15Arb_yoWxCFXE9a
-        4jqF12kr45WF1vyF1DG3s7Wr93JF9rX3Wqgrs5J3WfCwn5WrWDAr18Wana93yIqr1DtFyx
-        G3sxAF9Fqw1jgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
-        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-        AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
-        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvf
-        C2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221018135720.670094-3-hch@lst.de>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Tue, Oct 18, 2022 at 03:57:18PM +0200, Christoph Hellwig wrote:
+> Now that blk_mq_destroy_queue does not release the queue reference, there
+> is no need for a second queue reference to be held by the scsi_device.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/scsi_scan.c  | 1 -
+>  drivers/scsi/scsi_sysfs.c | 1 -
+>  2 files changed, 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/scsi_scan.c b/drivers/scsi/scsi_scan.c
+> index 5d27f5196de6f..0a95fa787fdf4 100644
+> --- a/drivers/scsi/scsi_scan.c
+> +++ b/drivers/scsi/scsi_scan.c
+> @@ -344,7 +344,6 @@ static struct scsi_device *scsi_alloc_sdev(struct scsi_target *starget,
+>  	sdev->request_queue = q;
+>  	q->queuedata = sdev;
+>  	__scsi_init_queue(sdev->host, q);
+> -	WARN_ON_ONCE(!blk_get_queue(q));
+>  
+>  	depth = sdev->host->cmd_per_lun ?: 1;
+>  
+> diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
+> index 1214c6f07bc64..c95177ca6ed26 100644
+> --- a/drivers/scsi/scsi_sysfs.c
+> +++ b/drivers/scsi/scsi_sysfs.c
+> @@ -1478,7 +1478,6 @@ void __scsi_remove_device(struct scsi_device *sdev)
+>  	mutex_unlock(&sdev->state_mutex);
+>  
+>  	blk_mq_destroy_queue(sdev->request_queue);
+> -	blk_put_queue(sdev->request_queue);
 
-ÔÚ 2022/10/18 23:49, Christoph Hellwig Ð´µÀ:
->>   static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
->>   {
->> +	u64 lat;
->> +
->>   	if (!wbt_rq_qos(q))
->>   		return -EINVAL;
->>   
->> -	return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
->> +	lat = wbt_disabled(q) ? 0 : div_u64(wbt_get_min_lat(q), 1000);
->> +
->> +	return sprintf(page, "%llu\n", lat);
-> 
-> 	if (wbt_disabled(q))
-> 		return sprintf(page, "0\n");
-> 	return sprintf(page, "%llu\n", div_u64(wbt_get_min_lat(q), 1000));
-> 
-> but otherwise the patch looks fine:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> .
-> 
+The above put is counter-pair of blk_get_queue() in scsi_alloc_sdev, and
+the original blk_put_queue() in blk_mq_destroy_queue() is counter-pair of
+the initial get in blk_alloc_queue().
 
-Thanks for the review, I'll send a new version.
+Now blk_put_queue() is moved out of blk_mq_destroy_queue(), I am wondering
+how the scsi queue lifetime can work correctly with this patch? Or is there
+bug in current scsi code?
 
-Kuai
+
+Thanks,
+Ming
 
