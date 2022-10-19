@@ -2,94 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AF6C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 03:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17617C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 19 Oct 2022 03:14:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbiJSDHU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Oct 2022 23:07:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57092 "EHLO
+        id S229543AbiJSDOG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Oct 2022 23:14:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbiJSDHJ (ORCPT
+        with ESMTP id S229885AbiJSDOC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Oct 2022 23:07:09 -0400
+        Tue, 18 Oct 2022 23:14:02 -0400
 Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF66B844C3;
-        Tue, 18 Oct 2022 20:07:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56BB165A8;
+        Tue, 18 Oct 2022 20:14:01 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MsbDn3Mznz6PDfR;
-        Wed, 19 Oct 2022 11:04:41 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgA3nP_SaU9jZSxUAA--.3335S3;
-        Wed, 19 Oct 2022 11:07:00 +0800 (CST)
-To:     axboe@kernel.dk, linux-block <linux-block@vger.kernel.org>,
-        lkml <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>, jack@suse.cz, hch@infradead.org,
-        Ming Lei <ming.lei@redhat.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Subject: [QUESTION] kernel can be silence when io hang
-Message-ID: <034239b5-0d46-51b1-c189-a09f1700083d@huaweicloud.com>
-Date:   Wed, 19 Oct 2022 11:06:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MsbNp6y3Tz6R520;
+        Wed, 19 Oct 2022 11:11:38 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgDnLS53a09jvmtUAA--.10775S4;
+        Wed, 19 Oct 2022 11:13:59 +0800 (CST)
+From:   Ye Bin <yebin@huaweicloud.com>
+To:     axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, yebin@huaweicloud.com,
+        Ye Bin <yebin10@huawei.com>
+Subject: [PATCH v3 0/3] fix possible memleak in '__blk_trace_remove'
+Date:   Wed, 19 Oct 2022 11:35:59 +0800
+Message-Id: <20221019033602.752383-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3nP_SaU9jZSxUAA--.3335S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFy7Cr1xWryxXw1xtry8AFb_yoW8JFyDpF
-        43Kw12krs5Gr1xua18Xa13Wa47Aws8Ar4a934kJw13ZFs8ZFn7JrySvrWa9F17Xr1DWFZ2
-        vF10vrWv93WUZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-        xVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-        x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-        0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzVAYIcxG8wCF04k20xvY0x0E
-        wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-        80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
-        I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04
-        k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-        1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CM-TRANSID: gCh0CgDnLS53a09jvmtUAA--.10775S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrZFyfAw1rJFyUKw13Gr4kZwb_yoWxZrX_JF
+        WrXas7Gr13GFn8tFWfJF1DJ34qgrW7ur18X3WUtrW5AwnrXry5XFnFy398Wr1IvF4kXFW7
+        ZrsxG348C3WayjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbwAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6r1j6r18M7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr1j
+        6rxdM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48J
+        MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+        AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+        0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+        v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
+        14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUZa9-UUUUU=
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, block experts！
+From: Ye Bin <yebin10@huawei.com>
 
-In order to prevent false positive hung task warnings for slow io,
-following commits forbit hung task checking for io:
+Diff v3 VS v2
+1. Invert the check of 'blk_trace_{start,stop}' and return early from the
+function for the error case.
 
-1) 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4b1977698ceb
-2) 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=de6a78b601c5
-3) 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=e6249cdd46e4
+Diff v2 VS v1:
+1. Introduce 'blk_trace_{start,stop}' helper instead of 'blk_trace_switch_state'.
+2. Move stop block trace from '__blk_trace_remove' to 'blk_trace_cleanup'.
 
-However, if io really hangs, they also forbit the hung task warnings
-that will be helpful.
+Ye Bin (3):
+  blktrace: introduce 'blk_trace_{start,stop}' helper
+  blktrace: fix possible memleak in '__blk_trace_remove'
+  blktrace: remove unnessary stop block trace in 'blk_trace_shutdown'
 
-I'm thinking about when hang task should be detected:
+ kernel/trace/blktrace.c | 82 ++++++++++++++++++++---------------------
+ 1 file changed, 39 insertions(+), 43 deletions(-)
 
-1) If io is still in block layer，there are many places that io can be
-stalled: blk throttle, get tag, rq_qos_throttle, plug, elevator, hctx. I
-think hang task should be detected at least for the case that there is
-no io in driver.
-
-2) If io is issued to driver
-​   a. For the driver that timeout handling is implemented, there is no
-need to detect hung task.
-​   b. For the driver that timeout handling is not implemented
-(virtio,virtio_scsi)，there is a real timeout handling in physical
-device. So hung task should be detected before the io is issued to lower
-device.
-
-Does anyone thinks these thoughts meaningful? Comments and suggestions
-are welcomed.
-
-Thanks,
-
-Kuai
+-- 
+2.31.1
 
