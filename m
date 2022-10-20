@@ -2,106 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA061C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 10:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE5BC43217
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 10:56:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbiJTKs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 06:48:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
+        id S230505AbiJTK4t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 06:56:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbiJTKsZ (ORCPT
+        with ESMTP id S230329AbiJTK4s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 06:48:25 -0400
-Received: from hermod.demsh.org (hermod.demsh.org [45.140.147.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5A11DC821;
-        Thu, 20 Oct 2022 03:48:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=demsh.org; s=022020;
-        t=1666262900;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ETkbRpvmDPnr18kYQQ0G/Rg2H1mJOLWgSuqFKhzOm3E=;
-        b=OS63sYgbwTHI9M9z/xNpLVHTrX2fEs16wlGEYH39W36mpTaNOzyAN9XAOT1sxTYt8JjebZ
-        Lt0QvG5j2WDJpa0k8efxT+MuL5LlC/RFdz7KLu0zKeryjViP6+XE3nmXdxvLUCA6tmlOEE
-        NY9wGYvSTS71L9P9VZYYP7LphO8PsWHtG/Wx0Ye9+XPGnbYWo+BwFFpl6hv4i5aEPXpFSD
-        94B/PC8s3lVPZ94o3gQ95mWPDJc7rmNkPUyc65HOXkcxohpZjpSoHGgWg0xJr0zgCDUmMq
-        fkG2q2krPx/LTZuw6dwjCGILepf54jGRh1CuRMJQy6QNBrubk1TA1SxnZ7N6Ow==
-Received: from xps.demsh.org (algiz.demsh.org [94.103.82.47])
-        by hermod.demsh.org (OpenSMTPD) with ESMTPSA id 4bb7512b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=me;
-        Thu, 20 Oct 2022 10:48:20 +0000 (UTC)
-Date:   Thu, 20 Oct 2022 13:48:18 +0300
-From:   Dmitrii Tcvetkov <me@demsh.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [bisected] QEMU guest boot failure since 6.0 on x86_64 host
-Message-ID: <20221020134818.30961090@xps.demsh.org>
-In-Reply-To: <Y1CkMS+xbwbvn8My@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221020031725.7d01051a@xps.demsh.org>
-        <Y1CkMS+xbwbvn8My@kbusch-mbp.dhcp.thefacebook.com>
+        Thu, 20 Oct 2022 06:56:48 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532421E044A
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 03:56:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=WjC2ATU3FdKAY1CREXePv2H6AA+eybPyqgvUSFT4kMo=; b=EKS9/UJD3BtEzrzPZnZAyPlCZv
+        HIMuF7o4THrfTqoHFz+CXXYobRG7inxmPuS8IuMQzCnOlaU7KlvyeHdtw/iVaIuxQiyI7iM4Kyqeb
+        G/BANFdVS0ZD9tpXowUusHOLZwybERXsjZl5WVFETMrwThhS5D09IaNf5aEy04RfofITNxztB9t7h
+        c2y5qSMhSzZJN4bc+GVroAF+AisLZv40YBPJ8Sab4l94qLBaWerZzO1Uh7eCX9TjaxIcj3HrZ2w0d
+        OAYQpp0wgt6JNiaX1ikj6T80M4svmuUwYU4Wa3QA84OWBy8gSG7+ksypNxTGx8zID4XUIyyOAzmDj
+        Ci5ti9bw==;
+Received: from [88.128.92.117] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1olTDq-00DqcY-M6; Thu, 20 Oct 2022 10:56:23 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chao Leng <lengchao@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Subject: per-tagset SRCU struct and quiesce
+Date:   Thu, 20 Oct 2022 12:56:00 +0200
+Message-Id: <20221020105608.1581940-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 19 Oct 2022 19:28:17 -0600
-Keith Busch <kbusch@kernel.org> wrote:
+Hi all,
 
-> On Thu, Oct 20, 2022 at 03:17:25AM +0300, Dmitrii Tcvetkov wrote:
-> > 
-> > Bisect led me to commit b1a000d3b8ec5  ("block: relax direct io
-> > memory alignment"). I was unable to resolve revert conflicts when
-> > tried to revert b1a000d3b8ec5  ("block: relax direct io memory
-> > alignment") as I lack necessary understanding of block subsystem.
-> 
-> Background info: when your virtual block device's logical block size
-> is smaller than the host's block device backing it, qemu needs to
-> bounce unaligned buffers when using direct-io.
-> 
-> Historically for direct-io, the logical block size happened to also be
-> the memory page offset alignment. QEMU did this the other way around:
-> it used the memory offset as the block size, and that was not
-> intended:
-> 
->   https://lore.kernel.org/lkml/32db4f89-a83f-aac4-5d27-0801bdca60bf@redhat.com/
-> 
-> The kernel patch you bisected to detangled memory alignment from
-> logical block size, so now older qemu versions have the wrong idea of
-> the minimum vector size. That is fixed in the qemu repository here:
-> 
->   https://git.qemu.org/?p=qemu.git;a=commitdiff;h=25474d90aa50bd32e0de395a33d8de42dd6f2aef
-> > 
-> > This fails to boot on 6.0+ host:
-> > # losetup -b 4096 -f image.raw
-> > # qemu-system-x86_64 -enable-kvm -drive
-> > file=/dev/loop0,format=raw,cache=none
-> 
-> In the above, your backing storage is 4k, and the default virtual
-> device block size is 512b, so qemu needs to bounce that, but older
-> versions might not do that as intended.
-> 
-> It should work if you include logical_block_size=4096 to the -drive
-> parameters.
-> 
-> > These boot fine on 6.0+ host:
-> > # losetup -b 4096 -f image.raw
-> > # qemu-system-x86_64 -enable-kvm -drive
-> > file=/dev/loop0,format=raw
-> 
-> The above is using cache, which doesn't have any alignment and size
-> constraints, so works with anything sizes.
->  
-> > # losetup -f image.raw
-> > # qemu-system-x86_64 -enable-kvm -drive
-> > file=/dev/loop0,format=raw,cache=none
-> 
-> The above is using a 512b formated backing store to a 512b emulated
-> drive, so the matching means qemu never needs to bounce.
-
-Thanks! Specifying logical_block_size=4096 indeed helps, guest still
-doesn't boot but because it has partition table with an assumption of 512
-sectors. After reinstall with logical_block_size=4096 specified it
-boots.
+this series moves the SRCU struct used for quiescing to the tag_set
+as the SRCU critical sections for dispatch take about the same time
+on all queues anyway, and then adopts the series from Chao that provides
+tagset-wide quiesce to use that infrastructure.
