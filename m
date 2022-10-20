@@ -2,186 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C05C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:10:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB45EC43217
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:36:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbiJTJKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 05:10:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55138 "EHLO
+        id S229736AbiJTJg4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 05:36:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbiJTJKs (ORCPT
+        with ESMTP id S229501AbiJTJgz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:10:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4EC18196C
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:10:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666257045;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=6+CtSbpb8TXPeuZhxpRWK/BpD94ovFhE0lP0MjSv61M=;
-        b=OVGyb65/dFj6GzlYWYXzQOJxV7jbgXkNUTDLS6V1BvungAYWBw4cEGGXWC1uDYK1bPbRB7
-        9La0ovZqgmNv9HICs8Np2q/qhJOgfK/m+912xtPkWq47m3iahVv4mFY26bkSe7H+ojEAHP
-        xUv1MdHqCA4fsVz8W2CNyKT9JIn7czQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-292-X3_1_fH6N6uHI1xTV2JJjA-1; Thu, 20 Oct 2022 05:10:42 -0400
-X-MC-Unique: X3_1_fH6N6uHI1xTV2JJjA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 192C129324B0;
-        Thu, 20 Oct 2022 09:10:36 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AC1E40C6EC2;
-        Thu, 20 Oct 2022 09:10:19 +0000 (UTC)
-Date:   Thu, 20 Oct 2022 17:10:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, djeffery@redhat.com,
-        stefanha@redhat.com
-Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: [Bug] double ->queue_rq() because of timeout in ->queue_rq()
-Message-ID: <Y1EQdafQlKNAsutk@T590>
+        Thu, 20 Oct 2022 05:36:55 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B50516C239
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:36:54 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MtMnL59VpzmVFl;
+        Thu, 20 Oct 2022 17:32:06 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 20 Oct 2022 17:36:22 +0800
+Subject: Re: [PATCH v2 0/2] improve nvme quiesce time for large amount of
+ namespaces
+To:     Christoph Hellwig <hch@lst.de>
+CC:     <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <sagi@grimberg.me>, <kbusch@kernel.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>, <paulmck@kernel.org>
+References: <20221020035348.10163-1-lengchao@huawei.com>
+ <20221020063448.GA6246@lst.de>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <6491f977-95f2-e40e-aa8b-d0671b517903@huawei.com>
+Date:   Thu, 20 Oct 2022 17:36:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+In-Reply-To: <20221020063448.GA6246@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-David Jeffery found one double ->queue_rq() issue, so far it can
-be triggered in the following two cases:
-
-1) scsi driver in guest kernel
-
-- the story could be long vmexit latency or long preempt latency of
-vCPU pthread, then IO req is timed out before queuing the request
-to hardware but after calling blk_mq_start_request() during ->queue_rq(),
-then timeout handler handles it by requeue, then double ->queue_rq() is
-caused, and kernel panic
-
-2) burst of kernel messages from irq handler 
-
-For 1), I think it is one reasonable case, given latency from host side
-can come anytime in theory because vCPU is emulated by one normal host
-pthread which can be preempted anywhere. For 2), I guess kernel message is
-supposed to be rate limited.
-
-Firstly, is this kind of so long(30sec) random latency when running kernel
-code something normal? Or do we need to take care of it? IMO, it looks
-reasonable in case of VM, but our VM experts may have better idea about this
-situation. Also the default 30sec timeout could be reduced via sysfs or
-drivers.
-
-Suppose it is one reasonable report to fix, what is the preferred solution?
-
-So far, it is driver's responsibility to cover the race between timeout
-and completion, so it is supposed to be solved in driver in theory, given
-driver has enough knowledge.
-
-But it is really one common problem, lots of driver could have similar
-issue, and could be hard to fix all affected drivers, so David suggests
-the following patch by draining in-progress ->queue_rq() for this issue.
-And the patch looks reasonable too.
-
-Any comments for this issue and the solution?
 
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8070b6c10e8d..ca57c060bb65 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1523,7 +1523,12 @@ static void blk_mq_rq_timed_out(struct request *req)
- 	blk_add_timer(req);
- }
- 
--static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
-+struct blk_expired_data {
-+	unsigned long next;
-+	unsigned long now;
-+};
-+
-+static bool blk_mq_req_expired(struct request *rq, struct blk_expired_data *expired)
- {
- 	unsigned long deadline;
- 
-@@ -1533,13 +1538,13 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
- 		return false;
- 
- 	deadline = READ_ONCE(rq->deadline);
--	if (time_after_eq(jiffies, deadline))
-+	if (time_after_eq(expired->now, deadline))
- 		return true;
- 
--	if (*next == 0)
--		*next = deadline;
--	else if (time_after(*next, deadline))
--		*next = deadline;
-+	if (expired->next == 0)
-+		expired->next = deadline;
-+	else if (time_after(expired->next, deadline))
-+		expired->next = deadline;
- 	return false;
- }
- 
-@@ -1555,7 +1560,7 @@ void blk_mq_put_rq_ref(struct request *rq)
- 
- static bool blk_mq_check_expired(struct request *rq, void *priv)
- {
--	unsigned long *next = priv;
-+	struct blk_expired_data *expired = priv;
- 
- 	/*
- 	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
-@@ -1564,7 +1569,7 @@ static bool blk_mq_check_expired(struct request *rq, void *priv)
- 	 * it was completed and reallocated as a new request after returning
- 	 * from blk_mq_check_expired().
- 	 */
--	if (blk_mq_req_expired(rq, next))
-+	if (blk_mq_req_expired(rq, expired))
- 		blk_mq_rq_timed_out(rq);
- 	return true;
- }
-@@ -1573,7 +1578,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
- {
- 	struct request_queue *q =
- 		container_of(work, struct request_queue, timeout_work);
--	unsigned long next = 0;
-+	struct blk_expired_data expired = {.next = 0, .now = jiffies};
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
- 
-@@ -1593,10 +1598,17 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return;
- 
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
-+	/* Before walking tags, we must ensure any submit started before the
-+	 * current time has finished. Since the submit uses srcu or rcu, wait
-+	 * for a synchronization point to ensure all running submits have
-+	 * finished
-+	 */
-+	blk_mq_wait_quiesce_done(q);
-+
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
- 
--	if (next != 0) {
--		mod_timer(&q->timeout, next);
-+	if (expired.next != 0) {
-+		mod_timer(&q->timeout, expired.next);
- 	} else {
- 		/*
- 		 * Request timeouts are handled as a forward rolling timer. If
+On 2022/10/20 14:34, Christoph Hellwig wrote:
+> I though the conclusion from last round was to move the srcu_struct to
+> the tagset?
+If move the srcu_struct to the tagset, may loss the flexibility.
+I am not sure that it is good for other modules currently using blk_mq_quiesce_queue.
+Another, I am not sure if there will be a future scenario where blk_mq_quiesce_queue
+will have to be used, and if it is good for such scenario.
+It is a acceptable cost to allocate a temporary array for SRCU, the max memory size
+is actually a few hundred KB, and most of the time it's less than a few KB.
+So I did not move the srcu_struct to the tagset in patch V3.
 
-
-
-Thanks, 
-Ming
-
+It sounds like a good idea that explore moving the srcu_struct to the tag_set,
+But we may need more time to analysis it.
+I suggest that do the optimization in a separate patch set.
+> 
+> .
+> 
