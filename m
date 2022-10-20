@@ -2,111 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A49C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63249C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:47:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbiJTJmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 05:42:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58800 "EHLO
+        id S229865AbiJTJrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 05:47:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbiJTJmW (ORCPT
+        with ESMTP id S229934AbiJTJrv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:42:22 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41495159D6D;
-        Thu, 20 Oct 2022 02:42:22 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29K9CdgR022799;
-        Thu, 20 Oct 2022 09:42:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : from : subject : content-type :
- content-transfer-encoding; s=pp1;
- bh=8jz1r/nSXZHAVV1eh0np8c+bkjDvnPMv1zF7VbM3Ymk=;
- b=Kfa2w3WnryhWDxP10KF4C8oAQFC59MDbW7ISPrBRQC5DRdxHqWgKyy8A1EEekPhYOHu2
- ORjW6ChN83qbPzvsJ+US3C5UyS9vqDU42xrU0t2GqgXpLi1hMq6vKuh2qrX/kM9ecejL
- KRhl6T9y1EI75wkvH1/s1vlFtdHVjYEkKuv4Luf8kpkSy5+1k6OEyUCF4mY9MC/1wnCJ
- eb+GWZIAzKhKMtiDTsAW99K0pMM3ZLc0TiXfw1jbIlmECZ7Do3ktrRs5vLdOe/xFH6+6
- WA926Ca//vMMB8vDAb2mpxKy0oKkNtTwvvZ/+MO6qoa8wYJPS38DloqWMCA0JiLFWofz Mw== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb3g7s1jb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 09:42:21 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29K9bAVm025046;
-        Thu, 20 Oct 2022 09:42:20 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma01dal.us.ibm.com with ESMTP id 3k7mg9dj63-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 09:42:20 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com ([9.208.128.113])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29K9gJHp8454868
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Oct 2022 09:42:19 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1E6A58067;
-        Thu, 20 Oct 2022 09:42:18 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6DC6B58066;
-        Thu, 20 Oct 2022 09:42:13 +0000 (GMT)
-Received: from [9.43.91.85] (unknown [9.43.91.85])
-        by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 20 Oct 2022 09:42:12 +0000 (GMT)
-Message-ID: <7e3ace01-4960-0951-c708-dde0cdd6cf6d@linux.vnet.ibm.com>
-Date:   Thu, 20 Oct 2022 15:12:08 +0530
+        Thu, 20 Oct 2022 05:47:51 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B40631905C9
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:47:49 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MtN1y3G43zmVFx;
+        Thu, 20 Oct 2022 17:43:02 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 20 Oct 2022 17:47:47 +0800
+Subject: Re: [PATCH v3 2/2] nvme: use blk_mq_[un]quiesce_tagset
+To:     Sagi Grimberg <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
+CC:     <hch@lst.de>, <kbusch@kernel.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>, <paulmck@kernel.org>
+References: <20221020035348.10163-1-lengchao@huawei.com>
+ <20221020035348.10163-3-lengchao@huawei.com>
+ <13088882-2d1b-ca71-8420-84bb47760cff@grimberg.me>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <ffba2ecb-0c91-2960-9d83-08d7a3248cb1@huawei.com>
+Date:   Thu, 20 Oct 2022 17:47:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
+In-Reply-To: <13088882-2d1b-ca71-8420-84bb47760cff@grimberg.me>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
-        mputtash@linux.vnet.com
-From:   Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Subject: [6.0.0] [linux-master] Kernel Panic seen during boot
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VtZTl-92owPCN8CxYoyCK6UhEk9-ILIG
-X-Proofpoint-GUID: VtZTl-92owPCN8CxYoyCK6UhEk9-ILIG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-20_03,2022-10-19_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 mlxlogscore=773 lowpriorityscore=0 impostorscore=0
- suspectscore=0 bulkscore=0 mlxscore=0 malwarescore=0 spamscore=0
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210200056
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greetings,
 
-[6.0.0] [linux-master] Kernel Panic seen during boot
 
---- Traces ---
-[    0.057420] Kernel panic - not syncing: VFS: Unable to mount root fs 
-on unknown-block(0,0)
-[    0.057423] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 
-6.0.0-autotest-g66ae04368efb #1
-[    0.057427] Hardware name: IBM,9080-HEX POWER10 (raw) 0x800200 
-0xf000006 of:IBM,FW1010.32 (NH1010_135) hv:phyp pSeries
-[    0.057430] Call Trace:
-[    0.057431] [c000000003703ab0] [c000000000d1e71c] 
-dump_stack_lvl+0x70/0xa4 (unreliable)
-[    0.057439] [c000000003703af0] [c0000000001513fc] panic+0x174/0x428
-[    0.057443] [c000000003703b90] [c000000002005794] 
-mount_block_root+0x26c/0x2a0
-[    0.057448] [c000000003703c60] [c000000002005b84] 
-prepare_namespace+0x1b0/0x204
-[    0.057452] [c000000003703cd0] [c00000000200502c] 
-kernel_init_freeable+0x390/0x3e8
-[    0.057456] [c000000003703da0] [c000000000012734] kernel_init+0x34/0x1b0
-[    0.057460] [c000000003703e10] [c00000000000cf40] 
-ret_from_kernel_thread+0x5c/0x64
-[    0.077448] Rebooting in 10 seconds..
+On 2022/10/20 14:11, Sagi Grimberg wrote:
+> 
+> 
+> On 10/20/22 06:53, Chao Leng wrote:
+>> All controller namespaces share the same tagset, so we can use this
+>> interface which does the optimal operation for parallel quiesce based on
+>> the tagset type(e.g. blocking tagsets and non-blocking tagsets).
+>>
+>> nvme connect_q should not be quiesced when quiesce tagset, so set the
+>> QUEUE_FLAG_SKIP_TAGSET_QUIESCE to skip it when init connect_q.
+>>
+>> Currntely we use NVME_NS_STOPPED to ensure pairing quiescing and
+>> unquiescing. If use blk_mq_[un]quiesce_tagset, NVME_NS_STOPPED will be
+>> invalided, so introduce NVME_CTRL_STOPPED to replace NVME_NS_STOPPED.
+>> In addition, we never really quiesce a single namespace. It is a better
+>> choice to move the flag from ns to ctrl.
+>>
+>> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+>> Signed-off-by: Chao Leng <lengchao@huawei.com>
+>> ---
+>>   drivers/nvme/host/core.c | 57 +++++++++++++++++++-----------------------------
+>>   drivers/nvme/host/nvme.h |  3 ++-
+>>   2 files changed, 25 insertions(+), 35 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>> index 059737c1a2c1..c7727d1f228e 100644
+>> --- a/drivers/nvme/host/core.c
+>> +++ b/drivers/nvme/host/core.c
+>> @@ -4890,6 +4890,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+>>               ret = PTR_ERR(ctrl->connect_q);
+>>               goto out_free_tag_set;
+>>           }
+>> +        blk_queue_flag_set(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, ctrl->connect_q);
+>>       }
+>>       ctrl->tagset = set;
+>> @@ -5013,6 +5014,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
+>>       clear_bit(NVME_CTRL_FAILFAST_EXPIRED, &ctrl->flags);
+>>       spin_lock_init(&ctrl->lock);
+>>       mutex_init(&ctrl->scan_lock);
+>> +    mutex_init(&ctrl->queue_state_lock);
+> 
+> Why is this lock needed?
+It is used to secure the process which need that the queue must be quiesced.
+The scenario:(without the lock)
+Thread A: call nvme_stop_queues and set the NVME_CTRL_STOPPED and then quiesce the tagset
+           and wait the grace period.
+Thread B: call nvme_stop_queues, because the NVME_CTRL_STOPPED is already setted,
+           continue to do something which need that the queue must be quiesced,
+           because the grace period of the queue is not ended, may cause abnormal.
+Thread A: the grace period end, and continue.
+So add a lock to ensure that all queues are quiesced after set the NVME_CTRL_STOPPED.
 
--- 
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
-
+The old code was implemented by forcing a wait for the grace period. Show the code:
+	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
+		blk_mq_quiesce_queue(ns->queue);
+	else
+		blk_mq_wait_quiesce_done(ns->queue);
+The old code was not absolutely safe, such as this scenario:
+Thread A: test_and_set_bit, and interrupt by hardware irq, lost chance to run.
+Thread B: test_and_set_bit, and wait the grace period, and then continue
+           to do something which need that the queue must be quiesced,
+           because the queue is not quiesced, may cause abnormal.
+Thread A: get the chance to run, blk_mq_quiesce_queue, and then continue.
+> 
+> .
