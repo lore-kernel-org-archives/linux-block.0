@@ -2,116 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63249C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA061C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 10:48:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiJTJrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 05:47:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40802 "EHLO
+        id S230340AbiJTKs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 06:48:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbiJTJrv (ORCPT
+        with ESMTP id S229491AbiJTKsZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:47:51 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B40631905C9
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:47:49 -0700 (PDT)
-Received: from canpemm500002.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MtN1y3G43zmVFx;
-        Thu, 20 Oct 2022 17:43:02 +0800 (CST)
-Received: from [10.169.59.127] (10.169.59.127) by
- canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 20 Oct 2022 17:47:47 +0800
-Subject: Re: [PATCH v3 2/2] nvme: use blk_mq_[un]quiesce_tagset
-To:     Sagi Grimberg <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>
-CC:     <hch@lst.de>, <kbusch@kernel.org>, <axboe@kernel.dk>,
-        <ming.lei@redhat.com>, <paulmck@kernel.org>
-References: <20221020035348.10163-1-lengchao@huawei.com>
- <20221020035348.10163-3-lengchao@huawei.com>
- <13088882-2d1b-ca71-8420-84bb47760cff@grimberg.me>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <ffba2ecb-0c91-2960-9d83-08d7a3248cb1@huawei.com>
-Date:   Thu, 20 Oct 2022 17:47:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+        Thu, 20 Oct 2022 06:48:25 -0400
+Received: from hermod.demsh.org (hermod.demsh.org [45.140.147.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5A11DC821;
+        Thu, 20 Oct 2022 03:48:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=demsh.org; s=022020;
+        t=1666262900;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ETkbRpvmDPnr18kYQQ0G/Rg2H1mJOLWgSuqFKhzOm3E=;
+        b=OS63sYgbwTHI9M9z/xNpLVHTrX2fEs16wlGEYH39W36mpTaNOzyAN9XAOT1sxTYt8JjebZ
+        Lt0QvG5j2WDJpa0k8efxT+MuL5LlC/RFdz7KLu0zKeryjViP6+XE3nmXdxvLUCA6tmlOEE
+        NY9wGYvSTS71L9P9VZYYP7LphO8PsWHtG/Wx0Ye9+XPGnbYWo+BwFFpl6hv4i5aEPXpFSD
+        94B/PC8s3lVPZ94o3gQ95mWPDJc7rmNkPUyc65HOXkcxohpZjpSoHGgWg0xJr0zgCDUmMq
+        fkG2q2krPx/LTZuw6dwjCGILepf54jGRh1CuRMJQy6QNBrubk1TA1SxnZ7N6Ow==
+Received: from xps.demsh.org (algiz.demsh.org [94.103.82.47])
+        by hermod.demsh.org (OpenSMTPD) with ESMTPSA id 4bb7512b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=me;
+        Thu, 20 Oct 2022 10:48:20 +0000 (UTC)
+Date:   Thu, 20 Oct 2022 13:48:18 +0300
+From:   Dmitrii Tcvetkov <me@demsh.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [bisected] QEMU guest boot failure since 6.0 on x86_64 host
+Message-ID: <20221020134818.30961090@xps.demsh.org>
+In-Reply-To: <Y1CkMS+xbwbvn8My@kbusch-mbp.dhcp.thefacebook.com>
+References: <20221020031725.7d01051a@xps.demsh.org>
+        <Y1CkMS+xbwbvn8My@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-In-Reply-To: <13088882-2d1b-ca71-8420-84bb47760cff@grimberg.me>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.169.59.127]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500002.china.huawei.com (7.192.104.244)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, 19 Oct 2022 19:28:17 -0600
+Keith Busch <kbusch@kernel.org> wrote:
 
+> On Thu, Oct 20, 2022 at 03:17:25AM +0300, Dmitrii Tcvetkov wrote:
+> > 
+> > Bisect led me to commit b1a000d3b8ec5  ("block: relax direct io
+> > memory alignment"). I was unable to resolve revert conflicts when
+> > tried to revert b1a000d3b8ec5  ("block: relax direct io memory
+> > alignment") as I lack necessary understanding of block subsystem.
+> 
+> Background info: when your virtual block device's logical block size
+> is smaller than the host's block device backing it, qemu needs to
+> bounce unaligned buffers when using direct-io.
+> 
+> Historically for direct-io, the logical block size happened to also be
+> the memory page offset alignment. QEMU did this the other way around:
+> it used the memory offset as the block size, and that was not
+> intended:
+> 
+>   https://lore.kernel.org/lkml/32db4f89-a83f-aac4-5d27-0801bdca60bf@redhat.com/
+> 
+> The kernel patch you bisected to detangled memory alignment from
+> logical block size, so now older qemu versions have the wrong idea of
+> the minimum vector size. That is fixed in the qemu repository here:
+> 
+>   https://git.qemu.org/?p=qemu.git;a=commitdiff;h=25474d90aa50bd32e0de395a33d8de42dd6f2aef
+> > 
+> > This fails to boot on 6.0+ host:
+> > # losetup -b 4096 -f image.raw
+> > # qemu-system-x86_64 -enable-kvm -drive
+> > file=/dev/loop0,format=raw,cache=none
+> 
+> In the above, your backing storage is 4k, and the default virtual
+> device block size is 512b, so qemu needs to bounce that, but older
+> versions might not do that as intended.
+> 
+> It should work if you include logical_block_size=4096 to the -drive
+> parameters.
+> 
+> > These boot fine on 6.0+ host:
+> > # losetup -b 4096 -f image.raw
+> > # qemu-system-x86_64 -enable-kvm -drive
+> > file=/dev/loop0,format=raw
+> 
+> The above is using cache, which doesn't have any alignment and size
+> constraints, so works with anything sizes.
+>  
+> > # losetup -f image.raw
+> > # qemu-system-x86_64 -enable-kvm -drive
+> > file=/dev/loop0,format=raw,cache=none
+> 
+> The above is using a 512b formated backing store to a 512b emulated
+> drive, so the matching means qemu never needs to bounce.
 
-On 2022/10/20 14:11, Sagi Grimberg wrote:
-> 
-> 
-> On 10/20/22 06:53, Chao Leng wrote:
->> All controller namespaces share the same tagset, so we can use this
->> interface which does the optimal operation for parallel quiesce based on
->> the tagset type(e.g. blocking tagsets and non-blocking tagsets).
->>
->> nvme connect_q should not be quiesced when quiesce tagset, so set the
->> QUEUE_FLAG_SKIP_TAGSET_QUIESCE to skip it when init connect_q.
->>
->> Currntely we use NVME_NS_STOPPED to ensure pairing quiescing and
->> unquiescing. If use blk_mq_[un]quiesce_tagset, NVME_NS_STOPPED will be
->> invalided, so introduce NVME_CTRL_STOPPED to replace NVME_NS_STOPPED.
->> In addition, we never really quiesce a single namespace. It is a better
->> choice to move the flag from ns to ctrl.
->>
->> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
->> Signed-off-by: Chao Leng <lengchao@huawei.com>
->> ---
->>   drivers/nvme/host/core.c | 57 +++++++++++++++++++-----------------------------
->>   drivers/nvme/host/nvme.h |  3 ++-
->>   2 files changed, 25 insertions(+), 35 deletions(-)
->>
->> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->> index 059737c1a2c1..c7727d1f228e 100644
->> --- a/drivers/nvme/host/core.c
->> +++ b/drivers/nvme/host/core.c
->> @@ -4890,6 +4890,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
->>               ret = PTR_ERR(ctrl->connect_q);
->>               goto out_free_tag_set;
->>           }
->> +        blk_queue_flag_set(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, ctrl->connect_q);
->>       }
->>       ctrl->tagset = set;
->> @@ -5013,6 +5014,7 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
->>       clear_bit(NVME_CTRL_FAILFAST_EXPIRED, &ctrl->flags);
->>       spin_lock_init(&ctrl->lock);
->>       mutex_init(&ctrl->scan_lock);
->> +    mutex_init(&ctrl->queue_state_lock);
-> 
-> Why is this lock needed?
-It is used to secure the process which need that the queue must be quiesced.
-The scenario:(without the lock)
-Thread A: call nvme_stop_queues and set the NVME_CTRL_STOPPED and then quiesce the tagset
-           and wait the grace period.
-Thread B: call nvme_stop_queues, because the NVME_CTRL_STOPPED is already setted,
-           continue to do something which need that the queue must be quiesced,
-           because the grace period of the queue is not ended, may cause abnormal.
-Thread A: the grace period end, and continue.
-So add a lock to ensure that all queues are quiesced after set the NVME_CTRL_STOPPED.
-
-The old code was implemented by forcing a wait for the grace period. Show the code:
-	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
-		blk_mq_quiesce_queue(ns->queue);
-	else
-		blk_mq_wait_quiesce_done(ns->queue);
-The old code was not absolutely safe, such as this scenario:
-Thread A: test_and_set_bit, and interrupt by hardware irq, lost chance to run.
-Thread B: test_and_set_bit, and wait the grace period, and then continue
-           to do something which need that the queue must be quiesced,
-           because the queue is not quiesced, may cause abnormal.
-Thread A: get the chance to run, blk_mq_quiesce_queue, and then continue.
-> 
-> .
+Thanks! Specifying logical_block_size=4096 indeed helps, guest still
+doesn't boot but because it has partition table with an assumption of 512
+sectors. After reinstall with logical_block_size=4096 specified it
+boots.
