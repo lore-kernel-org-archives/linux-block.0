@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFFBC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 08:16:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A4DC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 08:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbiJTIQT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 04:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43460 "EHLO
+        id S231250AbiJTIRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 04:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231254AbiJTIQR (ORCPT
+        with ESMTP id S231244AbiJTIRt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 04:16:17 -0400
+        Thu, 20 Oct 2022 04:17:49 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6B6102DFD
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 01:16:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 737B1169107
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 01:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CZS8CR+I5rC/M2ogdtMccYBRhDkWgXtLf1tvCP6s+qs=; b=1X72yehe52eLAcvuiEvnWfE9rv
-        4WO2W7lNdyPF8BeFNqv+QB47CsUK3MviciBXHqEnE2v10w/bSrHT63vlN0oeEvLnHI4u2LWg6HifP
-        wVuIUZZ5Rrmc5Wk4kZCcV+t1j34aaszjLJhEWgxlVPZtIt9GdRBuoRN4MDGULw5NKSriiSxsWHVXM
-        c1mwGruy40QGpJg2i0t2pKQVvZCf/Ls4COVyKL72caQX/kKO/LBcCG1cOIfGjEXGM8ckj2z9GF+3Z
-        ouAr4a5SFNY1SWbZzxjfHhSZjOrScsA5lJGXuBJwXpQ4tHGFCEoz0roqy6+Us0/Dr8mMBpq386Ar5
-        P2tAPSqA==;
+        bh=XGpw+MPUsDD6yfCUxHt/UvpeYZn6UV8lfugIiNXndwA=; b=1PNIbmBVJDE2FYvsKoRwWPh6bH
+        kXfPR5QbjWprfogX0xzZtpI/Wowu8UtStpkEIsjgkWE6T4C9OvYedw7fIEd5seM38b2eDwuuXcvy3
+        HyDUvQjLdddAa32/voQG9sRqIafZ62m0NWoZCgdVYylvZOMmVMQafCoyVwB1B/CW4FOCluP9VzKrG
+        rkO/86PVDGeAynpJcl72jREFN5EmQZtQVnBt3OYcsJs5Ua/yipDGxEeMaybDrVRwHYtTd9zFHIjYY
+        b/1JaD875Oy5sy7YMegEka7euPPxawEDOLDckIxJFb4eLE6vJSEKRiuy8XjodQcoiJhdpLmXwA47M
+        HdVADzAQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1olQij-00C7O0-B7; Thu, 20 Oct 2022 08:16:05 +0000
-Date:   Thu, 20 Oct 2022 01:16:05 -0700
+        id 1olQkJ-00C85f-NC; Thu, 20 Oct 2022 08:17:43 +0000
+Date:   Thu, 20 Oct 2022 01:17:43 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Christoph Hellwig <hch@infradead.org>,
         Jilin Yuan <yuanjilin@cdjrlc.com>,
         Nikos Tsironis <ntsironis@arrikto.com>,
@@ -39,33 +39,31 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-block@vger.kernel.org, dm-devel@redhat.com,
         Mikulas Patocka <mpatocka@redhat.com>,
         Genjian Zhang <zhanggenjian@kylinos.cn>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
         Milan Broz <gmazyland@gmail.com>,
         Alasdair G Kergon <agk@redhat.com>,
         Jiangshan Yi <yijiangshan@kylinos.cn>
 Subject: Re: [dm-devel] [git pull] device mapper changes for 6.1
-Message-ID: <Y1EDxZvjEi47iWUN@infradead.org>
+Message-ID: <Y1EEJ6BEN2uOh8uj@infradead.org>
 References: <Y07SYs98z5VNxdZq@redhat.com>
  <Y07twbDIVgEnPsFn@infradead.org>
- <Y0704chr07nUgx3X@redhat.com>
+ <CAHk-=wg3cpPyoO8u+8Fu1uk86bgTUYanfKhmxMsZzvY_mV=Cxw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y0704chr07nUgx3X@redhat.com>
+In-Reply-To: <CAHk-=wg3cpPyoO8u+8Fu1uk86bgTUYanfKhmxMsZzvY_mV=Cxw@mail.gmail.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 02:48:01PM -0400, Mike Snitzer wrote:
-> > That really does not sound like a good idea at all.  And it does not
-> > seem to have any MM or core maintainer signoffs.
-> 
-> Sorry, I should've solicited proper review more loudly.
-> 
-> But if you have a specific concern with how DM is looking to use
-> is_vmalloc_or_module_addr() please say what that is.
+On Tue, Oct 18, 2022 at 11:54:49AM -0700, Linus Torvalds wrote:
+> I wouldn't worry about maintainer sign-offs just for exporting a
+> helper function, but I agree with the whole concept being a complete
+> disaster and not a good idea at all.
 
-If I understand the patch correct it tries to use it to detect if
-a string is a string global.  Besides being nasty API abuse I can't
-see how this would even work if DM is built in.
+It's not just a a "helper", it is internal magic for KASAN and low-level
+code patching.  No driver has any business checking if something is a
+module text/data address, and I'm fairly sure how they are using it is
+actually wrong if DM is built in.
+
+FYI, I also agree that the concept is a disaster as well.
