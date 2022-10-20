@@ -2,102 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D519C43217
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 11:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6562C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 11:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231134AbiJTLnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 07:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55178 "EHLO
+        id S231468AbiJTLo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 07:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbiJTLnk (ORCPT
+        with ESMTP id S231466AbiJTLoW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 07:43:40 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD4686A52A;
-        Thu, 20 Oct 2022 04:43:39 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q10-20020a17090a304a00b0020b1d5f6975so2827390pjl.0;
-        Thu, 20 Oct 2022 04:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sHyL+iSo35ah0e/V8okK2n5oGkX8sOLEw6ihIICz6Vk=;
-        b=CaxvdnB3D34/mdfSTiomzd6dmlCvR1jIRM2sEYc77uhFp3yfqOsUi/+znPLDKURq+D
-         N8TnBDQ53BfqpOCym+Ed/KoCzh/SJHYXIyM3d+D32y5N+kgMbJ0U11WIRe8147poGaNm
-         ASWFeNQeTXz/O9tZ3ruLsNTXa5tkD6us8+CguOJXzJamJozDp1yUB1NGAosP1D7Hvb5i
-         GcIJ/8ZLrErCJF+PaNDX6bmonXSFL1HQZlkq2AuVh7jki1WRyLhwPWTsx0zwpf8pMtjL
-         f/U0tMgiyCDDdVgDIy1nKmyD93BzzlHVlbgEnDuiNtnRu5YBOEqIzd1FlS8M47CrACvd
-         qEjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sHyL+iSo35ah0e/V8okK2n5oGkX8sOLEw6ihIICz6Vk=;
-        b=0fYrFYhu1vblpLO5ejLPf1yFtiOOAxT9Ho4O+p3FDn8HTWS+KM1ex88L+vwwEsTO5w
-         7Co9wOJhn1v/Sm03/s9zM4RovO/KST1wnRGkCM3mEN7mk3EHJyETLzjHT/eM/dOJP9KH
-         PyFhw1tFiBxTwR6YbJPa20NDYqyksL+jzi4HKlBMcH1eq/Cycte+Jn/GnsB7W9SoL2e3
-         purIe+WNzFTpQKB78Wh/K9tYOC1nkWx0AcFqZTVksF9zQZhnYnXnpzPJfaOIfjZK5v4N
-         MT88449v3yPDI3FWV3ROHW6epMIv4UQAKas/vJBGYcA/hG5ipBeZRr1NE9IOJ7+/cbjp
-         FU/g==
-X-Gm-Message-State: ACrzQf2G/ENpm7CKI3w6rV7/wKX+T5wCTEnqaxPUF8CJyhCXGZm60SZy
-        eAbEIo5vx/QKQ3CNUC6ZATg=
-X-Google-Smtp-Source: AMsMyM6U0+WqwhwwNRAzULYRnlQT5X0Wjjw8Jf46FlP/uwvT28jGG0i30ZT7HgxIxUtigv77DfWdzQ==
-X-Received: by 2002:a17:90a:1c02:b0:1e0:df7:31f2 with SMTP id s2-20020a17090a1c0200b001e00df731f2mr49904954pjs.222.1666266219347;
-        Thu, 20 Oct 2022 04:43:39 -0700 (PDT)
-Received: from [10.114.96.15] ([129.227.152.6])
-        by smtp.gmail.com with ESMTPSA id h6-20020a170902680600b0016dc6279ab7sm1394637plk.149.2022.10.20.04.43.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Oct 2022 04:43:38 -0700 (PDT)
-Message-ID: <9906b1bf-c938-e918-62bc-0c7118e954a9@gmail.com>
-Date:   Thu, 20 Oct 2022 19:43:35 +0800
+        Thu, 20 Oct 2022 07:44:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7936EE006
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 04:44:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666266259;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k3Mhr+6BKEIzi6QpGoY12EiebZwvogoM7Lmy0zCKqRM=;
+        b=T+5mey9y2mTWYypcnJhAUHwMGrr5KqouFLGcRkmc6NxnKZY4SUbhiCjgrBgAWdwXLFFr3Z
+        yRWwuMwbk2PVxS/RkSiQp1njI9mE+0JMLaecT9AGf5xGhVRF80paLd587dyNYZ2NsxfWVt
+        e9lAzR1Pr/TpW0xLztPImPNtc4xcCRI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-244-aWhIo7VfPjmGd8chKetwxw-1; Thu, 20 Oct 2022 07:44:15 -0400
+X-MC-Unique: aWhIo7VfPjmGd8chKetwxw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 55E82101E153;
+        Thu, 20 Oct 2022 11:44:15 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 24FDC40C6EC2;
+        Thu, 20 Oct 2022 11:44:15 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 29KBiFRG025651;
+        Thu, 20 Oct 2022 07:44:15 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 29KBiEdA025647;
+        Thu, 20 Oct 2022 07:44:14 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Thu, 20 Oct 2022 07:44:14 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Christoph Hellwig <hch@infradead.org>
+cc:     Mike Snitzer <snitzer@redhat.com>,
+        Jilin Yuan <yuanjilin@cdjrlc.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>,
+        Shaomin Deng <dengshaomin@cdjrlc.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Nathan Huckleberry <nhuck@google.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Genjian Zhang <zhanggenjian@kylinos.cn>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Milan Broz <gmazyland@gmail.com>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Jiangshan Yi <yijiangshan@kylinos.cn>
+Subject: Re: [dm-devel] [git pull] device mapper changes for 6.1
+In-Reply-To: <Y1EDxZvjEi47iWUN@infradead.org>
+Message-ID: <alpine.LRH.2.21.2210200731150.25125@file01.intranet.prod.int.rdu2.redhat.com>
+References: <Y07SYs98z5VNxdZq@redhat.com> <Y07twbDIVgEnPsFn@infradead.org> <Y0704chr07nUgx3X@redhat.com> <Y1EDxZvjEi47iWUN@infradead.org>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Subject: Re: [RESEND PATCH] block, bfq: remove unused variable for bfq_queue
-From:   Yuwei Guan <ssawgyw@gmail.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yuwei.Guan@zeekrlife.com
-References: <20221018030139.159-1-Yuwei.Guan@zeekrlife.com>
-In-Reply-To: <20221018030139.159-1-Yuwei.Guan@zeekrlife.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
 
-On 2022/10/18 11:01, Yuwei Guan wrote:
-> it defined in d0edc2473be9d, but there's nowhere to use it,
-> so remove it.
->
-> Signed-off-by: Yuwei Guan <Yuwei.Guan@zeekrlife.com>
-> Acked-by: Paolo Valente <paolo.valente@linaro.org>
-> ---
->   block/bfq-iosched.h | 4 ----
->   1 file changed, 4 deletions(-)
 
-Can you help to check this patch again?
+On Thu, 20 Oct 2022, Christoph Hellwig wrote:
 
-Thanks
+> On Tue, Oct 18, 2022 at 02:48:01PM -0400, Mike Snitzer wrote:
+> > > That really does not sound like a good idea at all.  And it does not
+> > > seem to have any MM or core maintainer signoffs.
+> > 
+> > Sorry, I should've solicited proper review more loudly.
+> > 
+> > But if you have a specific concern with how DM is looking to use
+> > is_vmalloc_or_module_addr() please say what that is.
+> 
+> If I understand the patch correct it tries to use it to detect if
+> a string is a string global.  Besides being nasty API abuse I can't
+> see how this would even work if DM is built in.
 
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 64ee618064ba..71f721670ab6 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -369,12 +369,8 @@ struct bfq_queue {
->   	unsigned long split_time; /* time of last split */
->   
->   	unsigned long first_IO_time; /* time of first I/O for this queue */
-> -
->   	unsigned long creation_time; /* when this queue is created */
->   
-> -	/* max service rate measured so far */
-> -	u32 max_service_rate;
-> -
->   	/*
->   	 * Pointer to the waker queue for this queue, i.e., to the
->   	 * queue Q such that this queue happens to get new I/O right
+It works for built-in DM.
+
+You have "kfree_const" that detects if the string points to to .rodata 
+with "is_kernel_rodata". Unfortunatelly, is_kernel_rodata doesn't detect 
+if the string points to some modules's rodata, so we need an extra check 
+for that.
+
+So, the logic is:
+if (!is_vmalloc_or_module_addr(ptr) && !is_kernel_rodata(ptr)) kfree(ptr);
+
+I thought about modifying is_kernel_rodata to detect module's rodata as 
+well, but it wouldn't work because kstrdup_const uses it and there would 
+be crash possibility:
+ptr = kstrdup_const(modules_rodata); unload_module(); use "ptr";
+
+Mikulas
+
