@@ -2,132 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D1FC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 08:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762EAC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 08:57:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbiJTIxT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 04:53:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57796 "EHLO
+        id S229767AbiJTI54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 04:57:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229779AbiJTIw7 (ORCPT
+        with ESMTP id S229484AbiJTI54 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 04:52:59 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47A3188118
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 01:52:52 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id j7so33251127wrr.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 01:52:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fxJKiEotGSWnJtU5023vvPUDcYNa2O9fl/RCysq+NZA=;
-        b=CmP3VgGnictPB7LKKm5de97ljCHY369aWKMvv2xLSdFmS2DeCVFc6Z9czgE1Dk/U7/
-         VyK1kIEbW0pmuuLffv8j6kySncqAJ8V9/FDA1rg8qQGVo3ke0WGrPRmcg2urSSs29hxk
-         LBg3V8XSAVOzs2K7dp1kc8pTw4iPmcmRHqJdR1vWCDbpsTEG9crmhrOB3HYQYGUODobE
-         jAVnxtjHyfPe2VgdaZn00vNh09lrjBVkifh2je1viTI9LGoZpAkogxDSA5IoWxLEoTj5
-         YemzS5ly8MaTIiJIdGpBIk8eFHW+wOLh6jfbyP6OB20QNb0LgRCgvIR80Rm21DN6wlOX
-         AF/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fxJKiEotGSWnJtU5023vvPUDcYNa2O9fl/RCysq+NZA=;
-        b=hJbkHIh5/HNIVJ2QPOmiNZ1pt0O8ehcwCiNZTos3Ppsu41efMbFkpefLPEc44ALpTP
-         5i7IAjtg7Z+lWkhkBqMcVcKyOa5g+jDm+aaFyQFhPcfEQTX+9Rx0LAUctxhxl7SWomXe
-         1kQTC/9iBYA4HSiO8VrH5CowiESUtNfOnY6Itv5V08Z7Gb8khK9/rSEbDBWICT79mLyI
-         GvmKoGXJg7c8UPnzLa6Nyc67TZWXX0CbEKwxhdOnTPrud7YYzlmNPxiMcF+qup0nEh54
-         xtE3EjhIDMybsbuBCpCN1cP58piWDzpgZc2s2ehUPFWiDtiLY4hKsjDVO07WDk7qitL2
-         7CNw==
-X-Gm-Message-State: ACrzQf05CDlKSL3xP7RNTxHXMN2sXGelR3vyHpslQwWk91ZSZxzIfuTt
-        /N0sOQniWl0pTIESjmF0Uec+gQ==
-X-Google-Smtp-Source: AMsMyM5aImbG8bVRLMpXktjc/gAOVl/L1zQG4Vzf0bERE8RpGUb1vgAIW6AnFp5nhL1A0UyViy7sBQ==
-X-Received: by 2002:a5d:4683:0:b0:22e:6be0:dfc6 with SMTP id u3-20020a5d4683000000b0022e6be0dfc6mr7915288wrq.573.1666255970764;
-        Thu, 20 Oct 2022 01:52:50 -0700 (PDT)
-Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id f10-20020a05600c4e8a00b003a84375d0d1sm2409409wmq.44.2022.10.20.01.52.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 01:52:50 -0700 (PDT)
-From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
+        Thu, 20 Oct 2022 04:57:56 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A436194208
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 01:57:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=yjUpLu0+0UVRSuM7qoEkvVCRCkHDyvMSS8FiZ0/18pM=; b=cUV7JpRAnF4pSABMS0uKkAn379
+        lvy7agYUVF3RjlhShgVWDS+nMZx8cAwr3ukW8E6pyc6gp+73F4CNdt+SWoAzrMdUzvtQCEaFEfJLu
+        AJgzoK6wCA5UZHH0PTUAvSNXGtkm1Ur70HaPzuHZB3iG2ig7kjnH7PF476jb+tQ1soKGWqtbn8LS3
+        g4EedG8bKD0c98ETSwezraOoV9I9nykFkkGxATKMmpJbVv6Nzu84k3OoAGkvd8QuAM8+cO5aoan5h
+        6VVcDLlTZwv2phTPI9QtCQofnmTjg1cM8lYcEbRZOEE0C7alCrBGHFGYR/yuJc3LVYY7DRu3lhksW
+        9U/g7vRg==;
+Received: from [88.128.92.117] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1olRNB-00CZwN-K5; Thu, 20 Oct 2022 08:57:53 +0000
+Date:   Thu, 20 Oct 2022 10:57:47 +0200
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Joel Colledge <joel.colledge@linbit.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2] drbd: only clone bio if we have a backing device
-Date:   Thu, 20 Oct 2022 10:52:05 +0200
-Message-Id: <20221020085205.129090-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.37.3
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 6.1
+Message-ID: <Y1ENi1X5gi7yU9VS@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit c347a787e34cb (drbd: set ->bi_bdev in drbd_req_new) moved a
-bio_set_dev call (which has since been removed) to "earlier", from
-drbd_request_prepare to drbd_req_new.
+The following changes since commit e0539ae012ba5d618eb19665ff990b87b960c643:
 
-The problem is that this accesses device->ldev->backing_bdev, which is
-not NULL-checked at this point. When we don't have an ldev (i.e. when
-the DRBD device is diskless), this leads to a null pointer deref.
+  Documentation: document ublk user recovery feature (2022-10-18 05:12:26 -0700)
 
-So, only allocate the private_bio if we actually have a disk. This is
-also a small optimization, since we don't clone the bio to only to
-immediately free it again in the diskless case.
+are available in the Git repository at:
 
-Fixes: c347a787e34cb ("drbd: set ->bi_bdev in drbd_req_new")
-Co-developed-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Co-developed-by: Joel Colledge <joel.colledge@linbit.com>
-Signed-off-by: Joel Colledge <joel.colledge@linbit.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
-Changes in v2:
-    - Fix an overly long line
----
- drivers/block/drbd/drbd_req.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+  git://git.infradead.org/nvme.git tags/nvme-6.1-2022-10-22
 
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 8f7f144e54f3..7f9bcc82fc9c 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -30,11 +30,6 @@ static struct drbd_request *drbd_req_new(struct drbd_device *device, struct bio
- 		return NULL;
- 	memset(req, 0, sizeof(*req));
- 
--	req->private_bio = bio_alloc_clone(device->ldev->backing_bdev, bio_src,
--					   GFP_NOIO, &drbd_io_bio_set);
--	req->private_bio->bi_private = req;
--	req->private_bio->bi_end_io = drbd_request_endio;
--
- 	req->rq_state = (bio_data_dir(bio_src) == WRITE ? RQ_WRITE : 0)
- 		      | (bio_op(bio_src) == REQ_OP_WRITE_ZEROES ? RQ_ZEROES : 0)
- 		      | (bio_op(bio_src) == REQ_OP_DISCARD ? RQ_UNMAP : 0);
-@@ -1219,9 +1214,12 @@ drbd_request_prepare(struct drbd_device *device, struct bio *bio)
- 	/* Update disk stats */
- 	req->start_jif = bio_start_io_acct(req->master_bio);
- 
--	if (!get_ldev(device)) {
--		bio_put(req->private_bio);
--		req->private_bio = NULL;
-+	if (get_ldev(device)) {
-+		req->private_bio = bio_alloc_clone(device->ldev->backing_bdev,
-+						   bio, GFP_NOIO,
-+						   &drbd_io_bio_set);
-+		req->private_bio->bi_private = req;
-+		req->private_bio->bi_end_io = drbd_request_endio;
- 	}
- 
- 	/* process discards always from our submitter thread */
--- 
-2.37.3
+for you to fetch changes up to 94f5a06884074dcd99606d7b329e133ee65ea6ad:
 
+  nvmet: fix invalid memory reference in nvmet_subsys_attr_qid_max_show (2022-10-19 12:43:13 +0200)
+
+----------------------------------------------------------------
+nvme fixes for Linux 6.1
+
+ - fix nvme-hwmon for DMA non-cohehrent architectures (Serge Semin)
+ - add a nvme-hwmong maintainer (Christoph Hellwig)
+ - fix error pointer dereference in error handling (Dan Carpenter)
+ - fix invalid memory reference in nvmet_subsys_attr_qid_max_show
+   (Daniel Wagner)
+ - don't limit the DMA segment size in nvme-apple (Russell King)
+ - fix workqueue MEM_RECLAIM flushing dependency (Sagi Grimberg)
+ - disable write zeroes on various Kingston SSDs (Xander Li)
+
+----------------------------------------------------------------
+Christoph Hellwig (2):
+      nvme: add Guenther as nvme-hwmon maintainer
+      nvme-hwmon: consistently ignore errors from nvme_hwmon_init
+
+Dan Carpenter (1):
+      nvme: fix error pointer dereference in error handling
+
+Daniel Wagner (1):
+      nvmet: fix invalid memory reference in nvmet_subsys_attr_qid_max_show
+
+Russell King (Oracle) (1):
+      nvme-apple: don't limit DMA segement size
+
+Sagi Grimberg (1):
+      nvmet: fix workqueue MEM_RECLAIM flushing dependency
+
+Serge Semin (1):
+      nvme-hwmon: kmalloc the NVME SMART log buffer
+
+Xander Li (1):
+      nvme-pci: disable write zeroes on various Kingston SSD
+
+ MAINTAINERS                    |  6 ++++++
+ drivers/nvme/host/apple.c      |  2 ++
+ drivers/nvme/host/core.c       |  8 ++++++--
+ drivers/nvme/host/hwmon.c      | 32 ++++++++++++++++++++++----------
+ drivers/nvme/host/pci.c        | 10 ++++++++++
+ drivers/nvme/target/configfs.c |  4 ----
+ drivers/nvme/target/core.c     |  2 +-
+ 7 files changed, 47 insertions(+), 17 deletions(-)
