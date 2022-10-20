@@ -2,395 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 981C7C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C05C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 09:10:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbiJTJAT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 05:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51256 "EHLO
+        id S230224AbiJTJKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 05:10:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230034AbiJTJAO (ORCPT
+        with ESMTP id S229932AbiJTJKs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:00:14 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB28459713
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:00:09 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id a10so33197062wrm.12
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:00:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uvsxN2WySJivbNHoEE51fvnJ5Q5oZj2weYzcINAu1z0=;
-        b=DhuqPt3cRwChFJ5Ve+rjMcLsahYDqJYw6W7Nbhsr7UtMPLT3oub/LXt39auQyMJMhg
-         FkIkJ50Io0bYV+H0wE7W9/mrX7MVv0f4KLZNasuFRBAvQeZg9CFU0U1to5Pm4+6LdoT5
-         GKc8430Q0ZVqVD22r3sCXRTFnCy+BNtE9Ej+3OpeA0CCNc9w+1TFlyOLDyeY7xkMBgpv
-         O7eqQU+uBzQaCT4qLwjYKrCRT9UU5BIXGhsnBiJ7ouBeDc1flYIuoEUaeBgt01FMjTEw
-         pNCYyZ1PhWMmJijnHTxfZhiVoiREUD3pSeMV8M86o5EtK9uj/QTtjv6L27xwmmOM1aOt
-         lKIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uvsxN2WySJivbNHoEE51fvnJ5Q5oZj2weYzcINAu1z0=;
-        b=ISKI4mq80y4fviiXjAavx3AS4+N9e23gVjHvNZESodl2RmshhEu3MbstKqebrNNohq
-         l5nxD71UnwqEUjxuVuR7vbjwVllQHjBBGwfVr5YU8uhpgmrGCfG2erOa8wRbnI8h7vQr
-         BKXkUCd7x1idQXzSLSzWmHHMwGt+pRrBkTWesssbLeuNIMupwNM2zbuSAiQa9m9Il8Rq
-         sLf1KAKd3JxPtPxSD2/Y6OdmKnytw/OzF+wXi9drAfIyCTH/sjxBkO52HFLyL6uvBFwq
-         74khh0Kk6QPzhUYJCVY0DEHO8i+UPLv5Z5Tpb1Q3v6yJHdOjdCH6I3RFZM4+uS9rjatU
-         HnMw==
-X-Gm-Message-State: ACrzQf2aiNylHDzpgeu2vqGFfZK7WFMLAMiLCt7mA0knR/yvMfXU1OLU
-        oXhXiE98PE2KmWExPJ8xzmeVAw==
-X-Google-Smtp-Source: AMsMyM50fSGMQZK7fcAe8rIkhXhs5hX+mE8Wk3BblMYNlRV98MQ9LIZkXlbBLAa57YfJowSuxJDsvw==
-X-Received: by 2002:a5d:5a18:0:b0:22f:4f72:213a with SMTP id bq24-20020a5d5a18000000b0022f4f72213amr7936934wrb.57.1666256407423;
-        Thu, 20 Oct 2022 02:00:07 -0700 (PDT)
-Received: from localhost.localdomain (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id h36-20020a05600c49a400b003a4efb794d7sm2037441wmp.36.2022.10.20.02.00.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 02:00:06 -0700 (PDT)
-From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        linux-block@vger.kernel.org,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Joel Colledge <joel.colledge@linbit.com>
-Subject: [PATCH v2] drbd: Store op in drbd_peer_request
-Date:   Thu, 20 Oct 2022 10:59:46 +0200
-Message-Id: <20221020085946.132253-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.37.3
+        Thu, 20 Oct 2022 05:10:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4EC18196C
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 02:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666257045;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=6+CtSbpb8TXPeuZhxpRWK/BpD94ovFhE0lP0MjSv61M=;
+        b=OVGyb65/dFj6GzlYWYXzQOJxV7jbgXkNUTDLS6V1BvungAYWBw4cEGGXWC1uDYK1bPbRB7
+        9La0ovZqgmNv9HICs8Np2q/qhJOgfK/m+912xtPkWq47m3iahVv4mFY26bkSe7H+ojEAHP
+        xUv1MdHqCA4fsVz8W2CNyKT9JIn7czQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-292-X3_1_fH6N6uHI1xTV2JJjA-1; Thu, 20 Oct 2022 05:10:42 -0400
+X-MC-Unique: X3_1_fH6N6uHI1xTV2JJjA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 192C129324B0;
+        Thu, 20 Oct 2022 09:10:36 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2AC1E40C6EC2;
+        Thu, 20 Oct 2022 09:10:19 +0000 (UTC)
+Date:   Thu, 20 Oct 2022 17:10:13 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>, djeffery@redhat.com,
+        stefanha@redhat.com
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: [Bug] double ->queue_rq() because of timeout in ->queue_rq()
+Message-ID: <Y1EQdafQlKNAsutk@T590>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-(Sort of) cherry-picked from the out-of-tree drbd9 branch. Original
-commit message by Joel Colledge:
+Hi,
 
-    This simplifies drbd_submit_peer_request by removing most of the
-    arguments. It also makes the treatment of the op better aligned with
-    that in struct bio.
+David Jeffery found one double ->queue_rq() issue, so far it can
+be triggered in the following two cases:
 
-    Determine fault_type dynamically using information which is already
-    available instead of passing it in as a parameter.
+1) scsi driver in guest kernel
 
-Note: The opf in receive_rs_deallocated was changed from
-REQ_OP_WRITE_ZEROES to REQ_OP_DISCARD. This was required in the
-out-of-tree module, and does not matter in-tree. The opf is ignored
-anyway in drbd_submit_peer_request, since the discard/zero-out is
-decided by the EE_TRIM flag.
+- the story could be long vmexit latency or long preempt latency of
+vCPU pthread, then IO req is timed out before queuing the request
+to hardware but after calling blk_mq_start_request() during ->queue_rq(),
+then timeout handler handles it by requeue, then double ->queue_rq() is
+caused, and kernel panic
 
-Signed-off-by: Joel Colledge <joel.colledge@linbit.com>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
----
-Changes in v2:
-    - Make opf the correct type
-    - Fix compiler warnings
----
- drivers/block/drbd/drbd_int.h      |  8 ++-
- drivers/block/drbd/drbd_receiver.c | 81 +++++++++++++++++-------------
- drivers/block/drbd/drbd_worker.c   |  4 +-
- 3 files changed, 53 insertions(+), 40 deletions(-)
+2) burst of kernel messages from irq handler 
 
-diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 4d661282ff41..6ab96fb2983f 100644
---- a/drivers/block/drbd/drbd_int.h
-+++ b/drivers/block/drbd/drbd_int.h
-@@ -395,6 +395,7 @@ struct drbd_peer_request {
- 	struct drbd_peer_device *peer_device;
- 	struct drbd_epoch *epoch; /* for writes */
- 	struct page *pages;
-+	blk_opf_t opf;
- 	atomic_t pending_bios;
- 	struct drbd_interval i;
- 	/* see comments on ee flag bits below */
-@@ -406,6 +407,10 @@ struct drbd_peer_request {
- 	};
- };
- 
-+/* Equivalent to bio_op and req_op. */
-+#define peer_req_op(peer_req) \
-+       ((peer_req)->opf & REQ_OP_MASK)
-+
- /* ee flag bits.
-  * While corresponding bios are in flight, the only modification will be
-  * set_bit WAS_ERROR, which has to be atomic.
-@@ -1545,8 +1550,7 @@ extern void drbd_send_acks_wf(struct work_struct *ws);
- extern bool drbd_rs_c_min_rate_throttle(struct drbd_device *device);
- extern bool drbd_rs_should_slow_down(struct drbd_device *device, sector_t sector,
- 		bool throttle_if_app_is_waiting);
--extern int drbd_submit_peer_request(struct drbd_device *,
--				    struct drbd_peer_request *, blk_opf_t, int);
-+extern int drbd_submit_peer_request(struct drbd_peer_request *);
- extern int drbd_free_peer_reqs(struct drbd_device *, struct list_head *);
- extern struct drbd_peer_request *drbd_alloc_peer_req(struct drbd_peer_device *, u64,
- 						     sector_t, unsigned int,
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index c897c4572036..af52a3ae37c1 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1603,9 +1603,19 @@ static void drbd_issue_peer_discard_or_zero_out(struct drbd_device *device, stru
- 	drbd_endio_write_sec_final(peer_req);
+For 1), I think it is one reasonable case, given latency from host side
+can come anytime in theory because vCPU is emulated by one normal host
+pthread which can be preempted anywhere. For 2), I guess kernel message is
+supposed to be rate limited.
+
+Firstly, is this kind of so long(30sec) random latency when running kernel
+code something normal? Or do we need to take care of it? IMO, it looks
+reasonable in case of VM, but our VM experts may have better idea about this
+situation. Also the default 30sec timeout could be reduced via sysfs or
+drivers.
+
+Suppose it is one reasonable report to fix, what is the preferred solution?
+
+So far, it is driver's responsibility to cover the race between timeout
+and completion, so it is supposed to be solved in driver in theory, given
+driver has enough knowledge.
+
+But it is really one common problem, lots of driver could have similar
+issue, and could be hard to fix all affected drivers, so David suggests
+the following patch by draining in-progress ->queue_rq() for this issue.
+And the patch looks reasonable too.
+
+Any comments for this issue and the solution?
+
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8070b6c10e8d..ca57c060bb65 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1523,7 +1523,12 @@ static void blk_mq_rq_timed_out(struct request *req)
+ 	blk_add_timer(req);
  }
  
-+static int peer_request_fault_type(struct drbd_peer_request *peer_req)
-+{
-+	if (peer_req_op(peer_req) == REQ_OP_READ) {
-+		return peer_req->flags & EE_APPLICATION ?
-+			DRBD_FAULT_DT_RD : DRBD_FAULT_RS_RD;
-+	} else {
-+		return peer_req->flags & EE_APPLICATION ?
-+			DRBD_FAULT_DT_WR : DRBD_FAULT_RS_WR;
-+	}
-+}
+-static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
++struct blk_expired_data {
++	unsigned long next;
++	unsigned long now;
++};
 +
- /**
-  * drbd_submit_peer_request()
-- * @device:	DRBD device.
-  * @peer_req:	peer request
-  *
-  * May spread the pages to multiple bios,
-@@ -1619,10 +1629,9 @@ static void drbd_issue_peer_discard_or_zero_out(struct drbd_device *device, stru
-  *  on certain Xen deployments.
-  */
- /* TODO allocate from our own bio_set. */
--int drbd_submit_peer_request(struct drbd_device *device,
--			     struct drbd_peer_request *peer_req,
--			     const blk_opf_t opf, const int fault_type)
-+int drbd_submit_peer_request(struct drbd_peer_request *peer_req)
++static bool blk_mq_req_expired(struct request *rq, struct blk_expired_data *expired)
  {
-+	struct drbd_device *device = peer_req->peer_device->device;
- 	struct bio *bios = NULL;
- 	struct bio *bio;
- 	struct page *page = peer_req->pages;
-@@ -1667,7 +1676,18 @@ int drbd_submit_peer_request(struct drbd_device *device,
- 	 * generated bio, but a bio allocated on behalf of the peer.
+ 	unsigned long deadline;
+ 
+@@ -1533,13 +1538,13 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+ 		return false;
+ 
+ 	deadline = READ_ONCE(rq->deadline);
+-	if (time_after_eq(jiffies, deadline))
++	if (time_after_eq(expired->now, deadline))
+ 		return true;
+ 
+-	if (*next == 0)
+-		*next = deadline;
+-	else if (time_after(*next, deadline))
+-		*next = deadline;
++	if (expired->next == 0)
++		expired->next = deadline;
++	else if (time_after(expired->next, deadline))
++		expired->next = deadline;
+ 	return false;
+ }
+ 
+@@ -1555,7 +1560,7 @@ void blk_mq_put_rq_ref(struct request *rq)
+ 
+ static bool blk_mq_check_expired(struct request *rq, void *priv)
+ {
+-	unsigned long *next = priv;
++	struct blk_expired_data *expired = priv;
+ 
+ 	/*
+ 	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
+@@ -1564,7 +1569,7 @@ static bool blk_mq_check_expired(struct request *rq, void *priv)
+ 	 * it was completed and reallocated as a new request after returning
+ 	 * from blk_mq_check_expired().
  	 */
- next_bio:
--	bio = bio_alloc(device->ldev->backing_bdev, nr_pages, opf, GFP_NOIO);
-+	/* _DISCARD, _WRITE_ZEROES handled above.
-+	 * REQ_OP_FLUSH (empty flush) not expected,
-+	 * should have been mapped to a "drbd protocol barrier".
-+	 * REQ_OP_SECURE_ERASE: I don't see how we could ever support that.
+-	if (blk_mq_req_expired(rq, next))
++	if (blk_mq_req_expired(rq, expired))
+ 		blk_mq_rq_timed_out(rq);
+ 	return true;
+ }
+@@ -1573,7 +1578,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ {
+ 	struct request_queue *q =
+ 		container_of(work, struct request_queue, timeout_work);
+-	unsigned long next = 0;
++	struct blk_expired_data expired = {.next = 0, .now = jiffies};
+ 	struct blk_mq_hw_ctx *hctx;
+ 	unsigned long i;
+ 
+@@ -1593,10 +1598,17 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	if (!percpu_ref_tryget(&q->q_usage_counter))
+ 		return;
+ 
+-	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
++	/* Before walking tags, we must ensure any submit started before the
++	 * current time has finished. Since the submit uses srcu or rcu, wait
++	 * for a synchronization point to ensure all running submits have
++	 * finished
 +	 */
-+	if (!(peer_req_op(peer_req) == REQ_OP_WRITE ||
-+				peer_req_op(peer_req) == REQ_OP_READ)) {
-+		drbd_err(device, "Invalid bio op received: 0x%x\n", peer_req->opf);
-+		return -EINVAL;
-+	}
++	blk_mq_wait_quiesce_done(q);
 +
-+	bio = bio_alloc(device->ldev->backing_bdev, nr_pages, peer_req->opf, GFP_NOIO);
- 	/* > peer_req->i.sector, unless this is the first bio */
- 	bio->bi_iter.bi_sector = sector;
- 	bio->bi_private = peer_req;
-@@ -1697,7 +1717,7 @@ int drbd_submit_peer_request(struct drbd_device *device,
- 		bios = bios->bi_next;
- 		bio->bi_next = NULL;
++	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
  
--		drbd_submit_bio_noacct(device, fault_type, bio);
-+		drbd_submit_bio_noacct(device, peer_request_fault_type(peer_req), bio);
- 	} while (bios);
- 	return 0;
- }
-@@ -2051,6 +2071,7 @@ static int recv_resync_read(struct drbd_peer_device *peer_device, sector_t secto
- 	 * respective _drbd_clear_done_ee */
- 
- 	peer_req->w.cb = e_end_resync_block;
-+	peer_req->opf = REQ_OP_WRITE;
- 	peer_req->submit_jif = jiffies;
- 
- 	spin_lock_irq(&device->resource->req_lock);
-@@ -2058,8 +2079,7 @@ static int recv_resync_read(struct drbd_peer_device *peer_device, sector_t secto
- 	spin_unlock_irq(&device->resource->req_lock);
- 
- 	atomic_add(pi->size >> 9, &device->rs_sect_ev);
--	if (drbd_submit_peer_request(device, peer_req, REQ_OP_WRITE,
--				     DRBD_FAULT_RS_WR) == 0)
-+	if (drbd_submit_peer_request(peer_req) == 0)
- 		return 0;
- 
- 	/* don't care for the reason here */
-@@ -2375,16 +2395,6 @@ static int wait_for_and_update_peer_seq(struct drbd_peer_device *peer_device, co
- 	return ret;
- }
- 
--/* see also bio_flags_to_wire()
-- * DRBD_REQ_*, because we need to semantically map the flags to data packet
-- * flags and back. We may replicate to other kernel versions. */
--static blk_opf_t wire_flags_to_bio_flags(u32 dpf)
--{
--	return  (dpf & DP_RW_SYNC ? REQ_SYNC : 0) |
--		(dpf & DP_FUA ? REQ_FUA : 0) |
--		(dpf & DP_FLUSH ? REQ_PREFLUSH : 0);
--}
--
- static enum req_op wire_flags_to_bio_op(u32 dpf)
- {
- 	if (dpf & DP_ZEROES)
-@@ -2395,6 +2405,15 @@ static enum req_op wire_flags_to_bio_op(u32 dpf)
- 		return REQ_OP_WRITE;
- }
- 
-+/* see also bio_flags_to_wire() */
-+static unsigned long wire_flags_to_bio(struct drbd_connection *connection, u32 dpf)
-+{
-+	return wire_flags_to_bio_op(dpf) |
-+		(dpf & DP_RW_SYNC ? REQ_SYNC : 0) |
-+		(dpf & DP_FUA ? REQ_FUA : 0) |
-+		(dpf & DP_FLUSH ? REQ_PREFLUSH : 0);
-+}
-+
- static void fail_postponed_requests(struct drbd_device *device, sector_t sector,
- 				    unsigned int size)
- {
-@@ -2538,8 +2557,6 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
- 	struct drbd_peer_request *peer_req;
- 	struct p_data *p = pi->data;
- 	u32 peer_seq = be32_to_cpu(p->seq_num);
--	enum req_op op;
--	blk_opf_t op_flags;
- 	u32 dp_flags;
- 	int err, tp;
- 
-@@ -2578,11 +2595,10 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
- 	peer_req->flags |= EE_APPLICATION;
- 
- 	dp_flags = be32_to_cpu(p->dp_flags);
--	op = wire_flags_to_bio_op(dp_flags);
--	op_flags = wire_flags_to_bio_flags(dp_flags);
-+	peer_req->opf = wire_flags_to_bio(connection, dp_flags);
- 	if (pi->cmd == P_TRIM) {
- 		D_ASSERT(peer_device, peer_req->i.size > 0);
--		D_ASSERT(peer_device, op == REQ_OP_DISCARD);
-+		D_ASSERT(peer_device, peer_req_op(peer_req) == REQ_OP_DISCARD);
- 		D_ASSERT(peer_device, peer_req->pages == NULL);
- 		/* need to play safe: an older DRBD sender
- 		 * may mean zero-out while sending P_TRIM. */
-@@ -2590,7 +2606,7 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
- 			peer_req->flags |= EE_ZEROOUT;
- 	} else if (pi->cmd == P_ZEROES) {
- 		D_ASSERT(peer_device, peer_req->i.size > 0);
--		D_ASSERT(peer_device, op == REQ_OP_WRITE_ZEROES);
-+		D_ASSERT(peer_device, peer_req_op(peer_req) == REQ_OP_WRITE_ZEROES);
- 		D_ASSERT(peer_device, peer_req->pages == NULL);
- 		/* Do (not) pass down BLKDEV_ZERO_NOUNMAP? */
- 		if (dp_flags & DP_DISCARD)
-@@ -2677,8 +2693,7 @@ static int receive_Data(struct drbd_connection *connection, struct packet_info *
- 		peer_req->flags |= EE_CALL_AL_COMPLETE_IO;
- 	}
- 
--	err = drbd_submit_peer_request(device, peer_req, op | op_flags,
--				       DRBD_FAULT_DT_WR);
-+	err = drbd_submit_peer_request(peer_req);
- 	if (!err)
- 		return 0;
- 
-@@ -2789,7 +2804,6 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 	struct drbd_peer_request *peer_req;
- 	struct digest_info *di = NULL;
- 	int size, verb;
--	unsigned int fault_type;
- 	struct p_block_req *p =	pi->data;
- 
- 	peer_device = conn_peer_device(connection, pi->vnr);
-@@ -2849,11 +2863,11 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 		put_ldev(device);
- 		return -ENOMEM;
- 	}
-+	peer_req->opf = REQ_OP_READ;
- 
- 	switch (pi->cmd) {
- 	case P_DATA_REQUEST:
- 		peer_req->w.cb = w_e_end_data_req;
--		fault_type = DRBD_FAULT_DT_RD;
- 		/* application IO, don't drbd_rs_begin_io */
- 		peer_req->flags |= EE_APPLICATION;
- 		goto submit;
-@@ -2867,14 +2881,12 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 		fallthrough;
- 	case P_RS_DATA_REQUEST:
- 		peer_req->w.cb = w_e_end_rsdata_req;
--		fault_type = DRBD_FAULT_RS_RD;
- 		/* used in the sector offset progress display */
- 		device->bm_resync_fo = BM_SECT_TO_BIT(sector);
- 		break;
- 
- 	case P_OV_REPLY:
- 	case P_CSUM_RS_REQUEST:
--		fault_type = DRBD_FAULT_RS_RD;
- 		di = kmalloc(sizeof(*di) + pi->size, GFP_NOIO);
- 		if (!di)
- 			goto out_free_e;
-@@ -2923,7 +2935,6 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- 					(unsigned long long)sector);
- 		}
- 		peer_req->w.cb = w_e_end_ov_req;
--		fault_type = DRBD_FAULT_RS_RD;
- 		break;
- 
- 	default:
-@@ -2975,8 +2986,7 @@ static int receive_DataRequest(struct drbd_connection *connection, struct packet
- submit:
- 	update_receiver_timing_details(connection, drbd_submit_peer_request);
- 	inc_unacked(device);
--	if (drbd_submit_peer_request(device, peer_req, REQ_OP_READ,
--				     fault_type) == 0)
-+	if (drbd_submit_peer_request(peer_req) == 0)
- 		return 0;
- 
- 	/* don't care for the reason here */
-@@ -4947,7 +4957,6 @@ static int receive_rs_deallocated(struct drbd_connection *connection, struct pac
- 
- 	if (get_ldev(device)) {
- 		struct drbd_peer_request *peer_req;
--		const enum req_op op = REQ_OP_WRITE_ZEROES;
- 
- 		peer_req = drbd_alloc_peer_req(peer_device, ID_SYNCER, sector,
- 					       size, 0, GFP_NOIO);
-@@ -4957,6 +4966,7 @@ static int receive_rs_deallocated(struct drbd_connection *connection, struct pac
- 		}
- 
- 		peer_req->w.cb = e_end_resync_block;
-+		peer_req->opf = REQ_OP_DISCARD;
- 		peer_req->submit_jif = jiffies;
- 		peer_req->flags |= EE_TRIM;
- 
-@@ -4965,8 +4975,7 @@ static int receive_rs_deallocated(struct drbd_connection *connection, struct pac
- 		spin_unlock_irq(&device->resource->req_lock);
- 
- 		atomic_add(pi->size >> 9, &device->rs_sect_ev);
--		err = drbd_submit_peer_request(device, peer_req, op,
--					       DRBD_FAULT_RS_WR);
-+		err = drbd_submit_peer_request(peer_req);
- 
- 		if (err) {
- 			spin_lock_irq(&device->resource->req_lock);
-diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 0bb1a900c2d5..c69beefc9d5c 100644
---- a/drivers/block/drbd/drbd_worker.c
-+++ b/drivers/block/drbd/drbd_worker.c
-@@ -400,13 +400,13 @@ static int read_for_csum(struct drbd_peer_device *peer_device, sector_t sector,
- 		goto defer;
- 
- 	peer_req->w.cb = w_e_send_csum;
-+	peer_req->opf = REQ_OP_READ;
- 	spin_lock_irq(&device->resource->req_lock);
- 	list_add_tail(&peer_req->w.list, &device->read_ee);
- 	spin_unlock_irq(&device->resource->req_lock);
- 
- 	atomic_add(size >> 9, &device->rs_sect_ev);
--	if (drbd_submit_peer_request(device, peer_req, REQ_OP_READ,
--				     DRBD_FAULT_RS_RD) == 0)
-+	if (drbd_submit_peer_request(peer_req) == 0)
- 		return 0;
- 
- 	/* If it failed because of ENOMEM, retry should help.  If it failed
--- 
-2.37.3
+-	if (next != 0) {
+-		mod_timer(&q->timeout, next);
++	if (expired.next != 0) {
++		mod_timer(&q->timeout, expired.next);
+ 	} else {
+ 		/*
+ 		 * Request timeouts are handled as a forward rolling timer. If
+
+
+
+Thanks, 
+Ming
 
