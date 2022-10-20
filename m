@@ -2,153 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC86C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 13:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7441CC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 15:27:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbiJTNfo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 09:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58494 "EHLO
+        id S229610AbiJTP1L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 11:27:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230146AbiJTNfo (ORCPT
+        with ESMTP id S229911AbiJTP1J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 09:35:44 -0400
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2AA165525
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 06:35:34 -0700 (PDT)
-Received: by mail-wr1-f49.google.com with SMTP id f11so34485658wrm.6
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 06:35:34 -0700 (PDT)
+        Thu, 20 Oct 2022 11:27:09 -0400
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F074149DC5
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 08:27:04 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id v130-20020a1cac88000000b003bcde03bd44so2624087wme.5
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 08:27:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ydtkBiacMxQllimLMzTI7t4qiYmQ9CS3AWKunS3eI8w=;
+        b=bnQEX0V9aOC+J0fe4SfrcFILUueKlcaZFaHr+cwCGyWITGwe/zAPJqG2q/RZhiobQh
+         5LEQRTiLWFKjwH0FnV3kgPC6S7xr82By0iwBhunYMtFcny+E+fYPNfJsNm/eCevGFAuf
+         JN1IgtFDFXgMdZ1VrQzDQPkSbfMUG3LvkgZtfyz3t3JMLLCbhManlTvz09KNQAODoUDZ
+         Wmj7i7m2VBU6dTaiLGi7ps8RFoNLH1OVH2mxYm4pb/G/gBV1VSAwngRGcECtAwbL/rM+
+         ihO0KsHcW/56lBU5+sObIgZwVh1swHmq+tVMMeVoIg9dBd5LG0DuDzdFzO/GsE9p+kZI
+         C2ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jJM/GBakjBfyCraEn+8twaTB9LWBeqaj9yYL5h/spdY=;
-        b=3lRgdQBHeZF/x/FFlHm+jjzYccgErrHAslcxFjmA4w0BsDMZiWMhaNTRWMF4Mm5zlx
-         61P5MLoQyIqSI2buHhqk8wQAyKz8eb50JVtJ9Cs9SIEVJnMveKiIREkyZ7jLz+TV1iQ8
-         17zRqu24HwpJ9UyF2J4O6ABws2wzTny/q927jPHhS4lmI6WS9Qi5qiNA0xWI6NkCr6lb
-         n02BhXT5dMa4+CJhgntcdnk0VprOe2Zst2KhDstus5yaW/EqhVMKwiBte6JibHeTwjJL
-         jw+jIGWuiY7AnKWl2Hq5C30PARlRsih/X1FDnDpK/22rwfWP3Cp9ST5cRac+Rcrua0o9
-         aeoA==
-X-Gm-Message-State: ACrzQf08cboTRpX69EGlT0rvXpPYI4SnUJF5nQLUGIOCpqouZ9QuuXqM
-        iSdGoAYRWSkhoX4n5iCUN64=
-X-Google-Smtp-Source: AMsMyM4qEcE7d8hVAOj1E6q5daxd0AaWGyc2Lt7wVQo03b0BJRrNli12Yp7Tz8grPoHRL+7JoYDYmg==
-X-Received: by 2002:a5d:5a96:0:b0:232:2e1:48f7 with SMTP id bp22-20020a5d5a96000000b0023202e148f7mr8961586wrb.694.1666272933007;
-        Thu, 20 Oct 2022 06:35:33 -0700 (PDT)
-Received: from [192.168.64.53] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id o13-20020adfe80d000000b0023580e7a2c4sm2174878wrm.86.2022.10.20.06.35.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Oct 2022 06:35:32 -0700 (PDT)
-Message-ID: <609615c0-225e-9607-e8cd-2f1a356211c0@grimberg.me>
-Date:   Thu, 20 Oct 2022 16:35:30 +0300
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ydtkBiacMxQllimLMzTI7t4qiYmQ9CS3AWKunS3eI8w=;
+        b=t1DsL8ok/dbGUwuxGkkP8NlmS9h1D0bq0dt1AMW4fegrgdCnKxMdO+9HncO0/Igled
+         VHY0fm5gmpTSCJZrePt91/pn98ZYDGYYW5xTGdCiMWS7vizxNbSVfxHQkNhi95K++waA
+         zLgo1KRRO60BOQmjFTh2CSGjwHs6lYL0uKuI8O3224w1S7A5eJxEz3FfvQuFpIBrHok6
+         Z0+craoJpB6ZUPCmUkjrj32mp9p5N71rVCeYND7zL8iHEZvlfv9f9AW1qS8EVS8Y887l
+         zuVi0bMVl6bW3UnlkLJs7ck83MLOqZ8uDiwc0CmtTFzT635fSLVZGSznZ29yP/dZVKF6
+         xI8Q==
+X-Gm-Message-State: ACrzQf0W39DNgGciFxZ5Gsf6kfaq6qOPjrzJkoIjTVExcupWHsMZ38V6
+        XLGrlJOBs/jwsPGDcrlLXn+uoA==
+X-Google-Smtp-Source: AMsMyM6Rtzh1xd/Xx6n+d8wC4tcV9WtwB8mPwz1cWsV02HbCOZAi62Vxgdqbc93r7KXqH5zbBr8+Hg==
+X-Received: by 2002:a1c:7c06:0:b0:3c6:cc24:82c8 with SMTP id x6-20020a1c7c06000000b003c6cc2482c8mr9445799wmc.180.1666279613205;
+        Thu, 20 Oct 2022 08:26:53 -0700 (PDT)
+Received: from MBP-di-Paolo.station (net-2-35-55-161.cust.vodafonedsl.it. [2.35.55.161])
+        by smtp.gmail.com with ESMTPSA id l10-20020a1ced0a000000b003c409244bb0sm134337wmh.6.2022.10.20.08.26.51
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Oct 2022 08:26:52 -0700 (PDT)
+From:   Paolo Valente <paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        glen.valante@linaro.org, arie.vanderhoeven@seagate.com,
+        rory.c.chen@seagate.com, Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH V4 0/8] block, bfq: extend bfq to support multi-actuator drives
+Date:   Thu, 20 Oct 2022 17:26:35 +0200
+Message-Id: <20221020152643.21199-1-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 8/8] nvme: use blk_mq_[un]quiesce_tagset
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Chao Leng <lengchao@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-References: <20221020105608.1581940-1-hch@lst.de>
- <20221020105608.1581940-9-hch@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20221020105608.1581940-9-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
+this V4 differs from V3 in that it implements all recommendations
+provided by Damien Le Moal in the thread for V3 [2]. It also addresses
+all the issues reported by the kernel test robot in the same thread.
 
-On 10/20/22 13:56, Christoph Hellwig wrote:
-> From: Chao Leng <lengchao@huawei.com>
-> 
-> All controller namespaces share the same tagset, so we can use this
-> interface which does the optimal operation for parallel quiesce based on
-> the tagset type(e.g. blocking tagsets and non-blocking tagsets).
-> 
-> nvme connect_q should not be quiesced when quiesce tagset, so set the
-> QUEUE_FLAG_SKIP_TAGSET_QUIESCE to skip it when init connect_q.
-> 
-> Currently we use NVME_NS_STOPPED to ensure pairing quiescing and
-> unquiescing. If use blk_mq_[un]quiesce_tagset, NVME_NS_STOPPED will be
-> invalided, so introduce NVME_CTRL_STOPPED to replace NVME_NS_STOPPED.
-> In addition, we never really quiesce a single namespace. It is a better
-> choice to move the flag from ns to ctrl.
-> 
-> Signed-off-by: Chao Leng <lengchao@huawei.com>
-> [hch: rebased on top of prep patches]
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   drivers/nvme/host/core.c | 38 +++++++++-----------------------------
->   drivers/nvme/host/nvme.h |  2 +-
->   2 files changed, 10 insertions(+), 30 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 0ab3a18fd9f85..cc71f1001144f 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -4891,6 +4891,7 @@ int nvme_alloc_io_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
->   			ret = PTR_ERR(ctrl->connect_q);
->   			goto out_free_tag_set;
->   		}
-> +		blk_queue_flag_set(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, ctrl->connect_q);
->   	}
->   
->   	ctrl->tagset = set;
-> @@ -5090,20 +5091,6 @@ int nvme_init_ctrl(struct nvme_ctrl *ctrl, struct device *dev,
->   }
->   EXPORT_SYMBOL_GPL(nvme_init_ctrl);
->   
-> -static void nvme_start_ns_queue(struct nvme_ns *ns)
-> -{
-> -	if (test_and_clear_bit(NVME_NS_STOPPED, &ns->flags))
-> -		blk_mq_unquiesce_queue(ns->queue);
-> -}
-> -
-> -static void nvme_stop_ns_queue(struct nvme_ns *ns)
-> -{
-> -	if (!test_and_set_bit(NVME_NS_STOPPED, &ns->flags))
-> -		blk_mq_quiesce_queue(ns->queue);
-> -	else
-> -		blk_mq_wait_quiesce_done(ns->queue->tag_set);
-> -}
-> -
->   /**
->    * nvme_kill_queues(): Ends all namespace queues
->    * @ctrl: the dead controller that needs to end
-> @@ -5120,10 +5107,9 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
->   	if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
->   		nvme_start_admin_queue(ctrl);
->   	if (!test_and_set_bit(NVME_CTRL_NS_DEAD, &ctrl->flags)) {
-> -		list_for_each_entry(ns, &ctrl->namespaces, list) {
-> +		list_for_each_entry(ns, &ctrl->namespaces, list)
->   			blk_mark_disk_dead(ns->disk);
-> -			nvme_start_ns_queue(ns);
-> -		}
-> +		nvme_start_queues(ctrl);
->   	}
->   	up_read(&ctrl->namespaces_rwsem);
->   }
-> @@ -5179,23 +5165,17 @@ EXPORT_SYMBOL_GPL(nvme_start_freeze);
->   
->   void nvme_stop_queues(struct nvme_ctrl *ctrl)
->   {
-> -	struct nvme_ns *ns;
-> -
-> -	down_read(&ctrl->namespaces_rwsem);
-> -	list_for_each_entry(ns, &ctrl->namespaces, list)
-> -		nvme_stop_ns_queue(ns);
-> -	up_read(&ctrl->namespaces_rwsem);
-> +	if (!test_and_set_bit(NVME_CTRL_STOPPED, &ctrl->flags))
-> +		blk_mq_quiesce_tagset(ctrl->tagset);
-> +	else
-> +		blk_mq_wait_quiesce_done(ctrl->tagset);
+Here is the whole description of this patch series again.  This
+extension addresses the following issue. Single-LUN multi-actuator
+SCSI drives, as well as all multi-actuator SATA drives appear as a
+single device to the I/O subsystem [1].  Yet they address commands to
+different actuators internally, as a function of Logical Block
+Addressing (LBAs). A given sector is reachable by only one of the
+actuators. For example, Seagate’s Serial Advanced Technology
+Attachment (SATA) version contains two actuators and maps the lower
+half of the SATA LBA space to the lower actuator and the upper half to
+the upper actuator.
 
-Isn't blk_mq_quiesce_tagset already waits for the (s)rcu
-grace? Is this to make a concurrent caller also wait?
+Evidently, to fully utilize actuators, no actuator must be left idle
+or underutilized while there is pending I/O for it. To reach this
+goal, the block layer must somehow control the load of each actuator
+individually. This series enriches BFQ with such a per-actuator
+control, as a first step. Then it also adds a simple mechanism for
+guaranteeing that actuators with pending I/O are never left idle.
 
-I wish we would sort out all the concurrency issues in
-the driver(s) instead of making core functions reentrant safe...
+See [1] for a more detailed overview of the problem and of the
+solutions implemented in this patch series. There you will also find
+some preliminary performance results.
+
+Thanks,
+Paolo
+
+[1] https://www.linaro.org/blog/budget-fair-queueing-bfq-linux-io-scheduler-optimizations-for-multi-actuator-sata-hard-drives/
+[2] https://lore.kernel.org/lkml/20221004094010.80090-1-paolo.valente@linaro.org/
+
+Davide Zini (3):
+  block, bfq: split also async bfq_queues on a per-actuator basis
+  block, bfq: inject I/O to underutilized actuators
+  block, bfq: balance I/O injection among underutilized actuators
+
+Federico Gavioli (1):
+  block, bfq: retrieve independent access ranges from request queue
+
+Paolo Valente (4):
+  block, bfq: split sync bfq_queues on a per-actuator basis
+  block, bfq: forbid stable merging of queues associated with different
+    actuators
+  block, bfq: move io_cq-persistent bfqq data into a dedicated struct
+  block, bfq: turn bfqq_data into an array in bfq_io_cq
+
+ block/bfq-cgroup.c  |  97 +++++----
+ block/bfq-iosched.c | 518 ++++++++++++++++++++++++++++++--------------
+ block/bfq-iosched.h | 141 +++++++++---
+ block/bfq-wf2q.c    |   2 +-
+ 4 files changed, 523 insertions(+), 235 deletions(-)
+
+--
+2.20.1
