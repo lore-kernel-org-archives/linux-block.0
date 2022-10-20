@@ -2,85 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA011C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 12:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C248AC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Oct 2022 12:47:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230198AbiJTMon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 08:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
+        id S230091AbiJTMrg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 08:47:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbiJTMol (ORCPT
+        with ESMTP id S230136AbiJTMre (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 08:44:41 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF64239100
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 05:44:39 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id c24so20217269plo.3
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 05:44:39 -0700 (PDT)
+        Thu, 20 Oct 2022 08:47:34 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351C618B091
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 05:47:33 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id bh13so19116892pgb.4
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 05:47:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SD1SmgBy8yy81OdjQiEz8k7nIalu/meQTVoilBM0ZmE=;
-        b=ZGCXAu3f1sz3wGahRpQhqGQc5mdl07tJeVUiHYHWXzJK2WDjCudxEYGUbg3wvU/q70
-         +mUFcE4t2zOxVvo351O4rlSq9gEqnOm3r5KBjyA6qoIvzo8Q6V+aL3pcPgT4IQ9EuN0d
-         FAx4N0XVSurc6XMZg6Yi3o+svKmHkgT/Y8VaMbitaH4dvSnVdnAKQD4WqU9/nKppm9e6
-         8l3nLXJfWzY4GzKq3Gce/p/JbMLqmxuEEtp0ime5KnbzBVAuDy353ipbxSbIcvouLq/5
-         gIZjk5UNfqzLgzouxGme+JonP68Y6uHFb67ZEHWBphFm6BWFp/HkDEIgODe/WKCQM2ty
-         yRuQ==
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=puPrUXZK0sU2nL/Dv5W0joxWJT4bAL8pPriVwGk3Wbg=;
+        b=JTLNeaBJ9BU2HAKbhIriPxN7ME+Ztp20XUO4VooC0vV+9vUoAoWvfpopmZZHJVoa9P
+         d0plpmcIv91CQF5bgQQel8l55bJjdtC4D5amwT6sWW+UlidZkTQ5Yw6kapRll9XntNax
+         DHlm+7qi46CM+9W2CB6UGqqWzarVxicTSxU9ZIuYyRFvWSB2Sk2UAMNoMLmu/fWYWNL4
+         ILMlGroW/iFE4YrL9l4PrjL0O77MrWROeJeQytgJwfCVwpRSPb1kNzt2E1kNGRgWXSWb
+         JpmfmCGy7Zs+P7TV7u13hhUyn4ptlXshAnY6iXfMVzrqE+np9MPOUF7S54Nyg6IuhPXe
+         4o1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SD1SmgBy8yy81OdjQiEz8k7nIalu/meQTVoilBM0ZmE=;
-        b=SCCsQgiGz+ShVxe08UdjpboiBgU5PxM54TYZz3c42qTSJQvyKYFATlnhNZeCjCH3Rk
-         6PvbagBH0jnmOZnmNkJYgH899tbzVIhVqeiGyCe+oOVzHuiFAOoTTJbYPu76JL/+ShSE
-         Hx7Pz0tYYcKvGoiGJXl6Xp40Zx2jeaf4SU2nomTu9LnHbUEyMFXV23iHDjX2UA61tcKt
-         Bv8u9nrfTJQyqLZyjH8VQsDhpEDicYUrmhacuA2OAmt1lJbg/XuEZgq23jIXuC7CUODM
-         DYnsn5HJEuPdw29Hmw1ZR12ZfIY5LHyrfUUyvByd5daGSLdFoujnjZY+XwmD03wS0H4z
-         6EYQ==
-X-Gm-Message-State: ACrzQf3ctpfYQw2UaspJp+TMp7JMr0KzBuVWLADbvlJsygl7PFSdLllQ
-        80ihRq2oBlVoheAmcjIw3wT1lA==
-X-Google-Smtp-Source: AMsMyM5Cr4DfPUctp2wz7vrf1Tij5yVA1d/FPQfZuTli2Oz5HcpDtR4Ep8Q/FKjYhaV9Wv+uOUSEpw==
-X-Received: by 2002:a17:90a:bd87:b0:20b:1cb4:2c92 with SMTP id z7-20020a17090abd8700b0020b1cb42c92mr16264857pjr.210.1666269879296;
-        Thu, 20 Oct 2022 05:44:39 -0700 (PDT)
-Received: from [192.168.4.201] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id f2-20020a170902ce8200b00179f370dbfasm12907953plg.26.2022.10.20.05.44.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Oct 2022 05:44:38 -0700 (PDT)
-Message-ID: <3c07d444-7863-a658-8b7b-755654d390d3@kernel.dk>
-Date:   Thu, 20 Oct 2022 05:44:37 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Subject: Re: [GIT PULL] nvme fixes for Linux 6.1
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <Y1ENi1X5gi7yU9VS@infradead.org>
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=puPrUXZK0sU2nL/Dv5W0joxWJT4bAL8pPriVwGk3Wbg=;
+        b=l6lMJZOpfvBwQRo2X5nx1/o9j5EfxC9ICU9Obd5nWAa07v7ngb/1sLMMewXnQUKQmz
+         kZFmVAHYGKzf+tV69btj2Q5w7S8Ds1HZMibj1PoDqdt1gKbYZ7NUwYhe/kW7w6ZA0wgR
+         /h/o9v9/nWYTxTRKOIAyA8jpqTuDiu5AAtjfQ6LDnKK1ZSMqgKTpy9pPHEO3z2qfFaz3
+         BZbPEbUpuH3YvzGl9D+yc4i5EylvCf5iM85++Z5dXWOgKdt8oK2zzyjODWiVdCaw+0HL
+         L1qvXvi+mRv2y8Vezi6RrGSmY1QA+mqvwJ5+8L2QLe1L3b9UpW+g8x6gANMqb3Sk00ea
+         7xnA==
+X-Gm-Message-State: ACrzQf1kIPnTggF8yO5FyFpYz3KKuqlGmxlZH+DbS/uNFpWt7gjd640v
+        +wtnd+jItrepl5VepxxY4IA54Q==
+X-Google-Smtp-Source: AMsMyM76/lj6+QAOB8gUCoxo0XMSw8YQQEYhAHX6BidP3Tl0NBlXJswP4vJMdhg+Sci4wE/osjNKVw==
+X-Received: by 2002:aa7:8011:0:b0:567:70cc:5b78 with SMTP id j17-20020aa78011000000b0056770cc5b78mr9768392pfi.29.1666270052667;
+        Thu, 20 Oct 2022 05:47:32 -0700 (PDT)
+Received: from [127.0.0.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id m12-20020a170902768c00b00176675adbe1sm2035164pll.208.2022.10.20.05.47.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Oct 2022 05:47:31 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Y1ENi1X5gi7yU9VS@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     Yuwei Guan <ssawgyw@gmail.com>, paolo.valente@linaro.org
+Cc:     Yuwei.Guan@zeekrlife.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20221018030139.159-1-Yuwei.Guan@zeekrlife.com>
+References: <20221018030139.159-1-Yuwei.Guan@zeekrlife.com>
+Subject: Re: [RESEND PATCH] block, bfq: remove unused variable for bfq_queue
+Message-Id: <166627005112.161439.5489216534046304449.b4-ty@kernel.dk>
+Date:   Thu, 20 Oct 2022 05:47:31 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/20/22 1:57 AM, Christoph Hellwig wrote:
-> The following changes since commit e0539ae012ba5d618eb19665ff990b87b960c643:
+On Tue, 18 Oct 2022 11:01:39 +0800, Yuwei Guan wrote:
+> it defined in d0edc2473be9d, but there's nowhere to use it,
+> so remove it.
 > 
->   Documentation: document ublk user recovery feature (2022-10-18 05:12:26 -0700)
 > 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-6.1-2022-10-22
 
-Pulled, thanks.
+Applied, thanks!
 
+[1/1] block, bfq: remove unused variable for bfq_queue
+      commit: 33566f92cd5f1c1d462920978f6dc102c744270d
+
+Best regards,
 -- 
 Jens Axboe
 
