@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A96CBFA3740
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 17:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F93BFA373D
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 17:41:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230274AbiJURlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 13:41:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59758 "EHLO
+        id S230261AbiJURld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 13:41:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229574AbiJURl3 (ORCPT
+        with ESMTP id S229615AbiJURl3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 21 Oct 2022 13:41:29 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C3943E47;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C1824AE32;
         Fri, 21 Oct 2022 10:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=89QTElwZFXRfggrOmp22BVYbNApHwJCc7/AtxsSaqyQ=; b=DUFJL4ob6bvKEwDSE4GWtIirYS
-        X97GxPsQU/8gpPukGv4stsVhpCVMpaZfqfjtZunkmVXWQISTg/R/BOcVA3pa7CZfACS0bNB43mpI+
-        c4OTnsrV1MciXZB4TbndO5a7ikBN/fz/wDgukCPrwSjCFtZ9ZyqxXcPgPcEnqgfdFeSTZyfCOy53l
-        RxY+GZLkNNPiCm5OAKU8w+xesdg2eMT/Wb02k7Pdlz/yKsq/T6ahDZumCPpUSmcZ/3oCl/3HEMwwC
-        cKWDtI+6VVeKGW1kms9Qbz0IR8J14E2KIWUlJDjVvyMCgYEjQLZ/KBKnSkVH95V20TixmWMKF5dVk
-        bcv8KLUw==;
+        bh=33I13543xxl5IpRI3N6CO97FrUmYnw9CKJFJpgwPP2E=; b=bgCCyiC80LwkdXBnalAtI8yTWC
+        4nCSWE1U2A1ySvyPV3WkvbtPKmCdf5mIA7Kn9LFX8StLBBLZtBnaer7mg65tIOxxPBIxYj1KvJfIL
+        rWHBMfhn6BFIT2AutDopBuI2boeRuUmArJD+P8KpIHv+884xkRV8HDqdscPhcci0Ffdi6HQR+LUMe
+        3fTYi/Cr1SNAX/on0Le/wYgZ+EGvo9nM+tQeNLdYZpAMIkAOBTEtQfuUKhSALmiiVnPPx/nRSZC2+
+        qHzqF6KPUU4VTfcmUsz/jBWXiTnpwR40Qs+fltLB8upyLUJLFBnOw+QnXJI+tf9tvSD1VBHwJy4SU
+        hSNPQy5Q==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1olw1K-00DoI1-5N; Fri, 21 Oct 2022 11:41:23 -0600
+        id 1olw1K-00DoHz-5A; Fri, 21 Oct 2022 11:41:23 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1olw1G-0001tO-8W; Fri, 21 Oct 2022 11:41:18 -0600
+        id 1olw1G-0001tV-Es; Fri, 21 Oct 2022 11:41:18 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -57,8 +57,8 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Fri, 21 Oct 2022 11:41:14 -0600
-Message-Id: <20221021174116.7200-8-logang@deltatee.com>
+Date:   Fri, 21 Oct 2022 11:41:16 -0600
+Message-Id: <20221021174116.7200-10-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221021174116.7200-1-logang@deltatee.com>
 References: <20221021174116.7200-1-logang@deltatee.com>
@@ -67,63 +67,45 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v11 7/9] block: set FOLL_PCI_P2PDMA in bio_map_user_iov()
+Subject: [PATCH v11 9/9] ABI: sysfs-bus-pci: add documentation for p2pmem allocate
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
-iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be
-passed from userspace and enables the NVMe passthru requests to
-use P2PDMA pages.
+Add documentation for the p2pmem/allocate binary file which allows
+for allocating p2pmem buffers in userspace for passing to drivers
+that support them. (Currently only O_DIRECT to NVMe devices.)
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- block/blk-map.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ Documentation/ABI/testing/sysfs-bus-pci | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/block/blk-map.c b/block/blk-map.c
-index 34735626b00f..8750f82d7da4 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -267,6 +267,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- {
- 	unsigned int max_sectors = queue_max_hw_sectors(rq->q);
- 	unsigned int nr_vecs = iov_iter_npages(iter, BIO_MAX_VECS);
-+	unsigned int gup_flags = 0;
- 	struct bio *bio;
- 	int ret;
- 	int j;
-@@ -278,6 +279,9 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 	if (bio == NULL)
- 		return -ENOMEM;
+diff --git a/Documentation/ABI/testing/sysfs-bus-pci b/Documentation/ABI/testing/sysfs-bus-pci
+index 840727fc75dc..ecf47559f495 100644
+--- a/Documentation/ABI/testing/sysfs-bus-pci
++++ b/Documentation/ABI/testing/sysfs-bus-pci
+@@ -407,6 +407,16 @@ Description:
+ 	        file contains a '1' if the memory has been published for
+ 		use outside the driver that owns the device.
  
-+	if (blk_queue_pci_p2pdma(rq->q))
-+		gup_flags |= FOLL_PCI_P2PDMA;
++What:		/sys/bus/pci/devices/.../p2pmem/allocate
++Date:		August 2022
++Contact:	Logan Gunthorpe <logang@deltatee.com>
++Description:
++		This file allows mapping p2pmem into userspace. For each
++		mmap() call on this file, the kernel will allocate a chunk
++		of Peer-to-Peer memory for use in Peer-to-Peer transactions.
++		This memory can be used in O_DIRECT calls to NVMe backed
++		files for Peer-to-Peer copies.
 +
- 	while (iov_iter_count(iter)) {
- 		struct page **pages, *stack_pages[UIO_FASTIOV];
- 		ssize_t bytes;
-@@ -286,11 +290,11 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
- 
- 		if (nr_vecs <= ARRAY_SIZE(stack_pages)) {
- 			pages = stack_pages;
--			bytes = iov_iter_get_pages2(iter, pages, LONG_MAX,
--							nr_vecs, &offs);
-+			bytes = iov_iter_get_pages(iter, pages, LONG_MAX,
-+						   nr_vecs, &offs, gup_flags);
- 		} else {
--			bytes = iov_iter_get_pages_alloc2(iter, &pages,
--							LONG_MAX, &offs);
-+			bytes = iov_iter_get_pages_alloc(iter, &pages,
-+						LONG_MAX, &offs, gup_flags);
- 		}
- 		if (unlikely(bytes <= 0)) {
- 			ret = bytes ? bytes : -EFAULT;
+ What:		/sys/bus/pci/devices/.../link/clkpm
+ 		/sys/bus/pci/devices/.../link/l0s_aspm
+ 		/sys/bus/pci/devices/.../link/l1_aspm
 -- 
 2.30.2
 
