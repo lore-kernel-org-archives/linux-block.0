@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65463FA373E
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 17:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0A2FA3749
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 17:41:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229958AbiJURlf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 13:41:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
+        id S230160AbiJURlg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 13:41:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229918AbiJURla (ORCPT
+        with ESMTP id S229967AbiJURla (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 21 Oct 2022 13:41:30 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F414324AE3C;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FD424AE36;
         Fri, 21 Oct 2022 10:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:MIME-Version:Message-Id:Date:Cc:To:From
-        :references:content-disposition:in-reply-to;
-        bh=nF0SVUXmUm6/1jQhAiGtVkXjqXLugkxBCw1H6lsq9qw=; b=kAAkNydFPlQ84zWbqcIf6HYHWw
-        swriGADMx3GagNeM2QyZOZagVVUqkxGVMUP+thgek92nyZqj/nN+tAEQK++PGuuoctMWY7q1X57ex
-        YZ2My7wYnjj8Zk0+4XR1miPNQHBm/khken5A0/4BCVp3HT02+NvGZbh5Q3SXn1r3GqjvJFNhXrphm
-        28Gro+M5SHbcfCJ4skRzMSah8NQ1cVbBRqLsjR/6Jp3gMKUCuIfTtFnZyWnLBrek+WNqKAZsghIX7
-        NX/kmablgeZJ2HhcxDrHbzJHJsfxJl5MKmQDtTB2kmrQWMJfF4EmYhAKFHZnzohfJy1BnP16QVC/c
-        WXH1a7vA==;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=meh9MET/cLorzCFSIwyZ+v6c79pnFv9f4AD/6AjXlyA=; b=Dnxvz9bu1650+6uPD6XmeHI8eu
+        FNbTzbtOAcPLiaUgO8REsgHo8opYH6vss+qGqThk6nRcTRIELX8h8YRVbg6Ca5T2yOEfwOlWq30tw
+        oQeQyefasTRB1O5m9JCPDxe5NoxoS7huiM1FYEB7omz+P3NEF5VgI1na+UVWb+Ziru45774Hvg/CL
+        dAc5a953b5uESq8n8B9SwRQr3ls/SNQDGedrN6mu0fSx/4NRAU71kWNzt/7LZ3DRJi9lBH6Q2fMKG
+        X1NmaE8uLSpHCWFCWUWvYHCR3zJDh8DN8psovNNZh4wOx/tlDlzp99Ot8tMbZyB38AYefT7BQEXij
+        jWwmIZcQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1olw1I-00DoHx-T9; Fri, 21 Oct 2022 11:41:22 -0600
+        id 1olw1L-00DoHx-6Z; Fri, 21 Oct 2022 11:41:23 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1olw1F-0001t4-HC; Fri, 21 Oct 2022 11:41:17 -0600
+        id 1olw1G-0001tL-5n; Fri, 21 Oct 2022 11:41:18 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -57,111 +57,69 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Stephen Bates <sbates@raithlin.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Fri, 21 Oct 2022 11:41:07 -0600
-Message-Id: <20221021174116.7200-1-logang@deltatee.com>
+Date:   Fri, 21 Oct 2022 11:41:13 -0600
+Message-Id: <20221021174116.7200-7-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20221021174116.7200-1-logang@deltatee.com>
+References: <20221021174116.7200-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v11 0/9] Userspace P2PDMA with O_DIRECT NVMe devices
+Subject: [PATCH v11 6/9] block: set FOLL_PCI_P2PDMA in __bio_iov_iter_get_pages()
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
+iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be passed
+from userspace and enables the O_DIRECT path in iomap based filesystems
+and direct to block devices.
 
-This is the latest P2PDMA userspace patch set. This version includes
-some cleanup from feedback from the last posting[1].
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: John Hubbard <jhubbard@nvidia.com>
+---
+ block/bio.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-This patch set enables userspace P2PDMA by allowing userspace to mmap()
-allocated chunks of the CMB. The resulting VMA can be passed only
-to O_DIRECT IO on NVMe backed files or block devices. A flag is added
-to GUP() in Patch 1, then Patches 2 through 6 wire this flag up based
-on whether the block queue indicates P2PDMA support. Patches 7
-creates the sysfs resource that can hand out the VMAs and Patch 8
-adds brief documentation for the new interface.
-
-Feedback welcome.
-
-This series is based on v6.1-rc1. A git branch is available here:
-
-  https://github.com/sbates130272/linux-p2pmem/  p2pdma_user_cmb_v11
-
-Thanks,
-
-Logan
-
-[1] https://lkml.kernel.org/r/20220922163926.7077-1-logang@deltatee.com
-
---
-
-Changes in v11:
-  - Rebased onto v6.1-rc1, fixed minor conflict in bio_map_user_iov
-  - The GUP test was moved to try_grab_page() and try_grab_folio().
-    This ought to be a bit more future proof. It required adding a new
-    cleanup patch to return a proper error code from try_grab_page().
-    (Per Jason)
-
-Changes in v10:
-  - Rebased onto v6.0-rc6
-  - Reworked iov iter changes to reuse the code better and
-    name them without the _flags() prefix (per Christoph)
-  - Renamed a number of flags variables to gup_flags (per John)
-  - Minor fixups to the last documentation patch (from Greg and John)
-
-Changes in v9:
-  - Rebased onto v6.0-rc2, included reworking the iov_iter patch
-    due to changes there
-  - Drop the char device mmap implementation in favour of a sysfs
-    based interface. (per Christoph)
-
- (v8 only included the first half of the series and was merged for v6.0)
-
-Changes in v8:
-  - Rebase onto v5.19-rc1
-  - Rework how the pages are stored in the VMA per Jason's suggestion
-
-Changes in v7:
-  - Rebased onto v5.18-rc1 which includes Christophs cleanup to
-    free_zone_device_page() (similar to Ralph's patch).
-  - Fix bug with concurrent first calls to pci_p2pdma_vma_fault()
-    that caused a double allocation and lost p2p memory. Noticed
-    by Andrew Maier.
-  - Collected a Reviewed-by tag from Chaitanya.
-  - Numerous minor fixes to commit messages
-
---
-
-Logan Gunthorpe (9):
-  mm: allow multiple error returns in try_grab_page()
-  mm: introduce FOLL_PCI_P2PDMA to gate getting PCI P2PDMA pages
-  iov_iter: introduce iov_iter_get_pages_[alloc_]flags()
-  block: add check when merging zone device pages
-  lib/scatterlist: add check when merging zone device pages
-  block: set FOLL_PCI_P2PDMA in __bio_iov_iter_get_pages()
-  block: set FOLL_PCI_P2PDMA in bio_map_user_iov()
-  PCI/P2PDMA: Allow userspace VMA allocations through sysfs
-  ABI: sysfs-bus-pci: add documentation for p2pmem allocate
-
- Documentation/ABI/testing/sysfs-bus-pci |  10 ++
- block/bio.c                             |  11 ++-
- block/blk-map.c                         |  12 ++-
- drivers/pci/p2pdma.c                    | 124 ++++++++++++++++++++++++
- include/linux/mm.h                      |   3 +-
- include/linux/mmzone.h                  |  24 +++++
- include/linux/uio.h                     |   6 ++
- lib/iov_iter.c                          |  32 ++++--
- lib/scatterlist.c                       |  25 +++--
- mm/gup.c                                |  45 ++++++---
- mm/huge_memory.c                        |  19 ++--
- mm/hugetlb.c                            |  23 +++--
- 12 files changed, 280 insertions(+), 54 deletions(-)
-
-
-base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
---
+diff --git a/block/bio.c b/block/bio.c
+index 439469370b7c..a7abf9b1b66a 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1197,6 +1197,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
++	unsigned int gup_flags = 0;
+ 	ssize_t size, left;
+ 	unsigned len, i = 0;
+ 	size_t offset, trim;
+@@ -1210,6 +1211,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+ 	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+ 
++	if (bio->bi_bdev && blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
++		gup_flags |= FOLL_PCI_P2PDMA;
++
+ 	/*
+ 	 * Each segment in the iov is required to be a block size multiple.
+ 	 * However, we may not be able to get the entire segment if it spans
+@@ -1217,8 +1221,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	 * result to ensure the bio's total size is correct. The remainder of
+ 	 * the iov data will be picked up in the next bio iteration.
+ 	 */
+-	size = iov_iter_get_pages2(iter, pages, UINT_MAX - bio->bi_iter.bi_size,
+-				  nr_pages, &offset);
++	size = iov_iter_get_pages(iter, pages,
++				  UINT_MAX - bio->bi_iter.bi_size,
++				  nr_pages, &offset, gup_flags);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
+ 
+-- 
 2.30.2
+
