@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B15BFA3743
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 463E4FA3745
 	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 17:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiJURli (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 13:41:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59856 "EHLO
+        id S230417AbiJURlj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 13:41:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbiJURla (ORCPT
+        with ESMTP id S230141AbiJURla (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 21 Oct 2022 13:41:30 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F411324AE39;
-        Fri, 21 Oct 2022 10:41:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0017924B305;
+        Fri, 21 Oct 2022 10:41:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=ZKzeHAseABZVh8sd+FhS8dmH5rKh2MAqOmNnK2azrFk=; b=SCPNrRDZ9UU4DpltRcbsssgmyI
-        AHJvEMgJpBj9GsQW3ewgt9CMYRzjTXS2pClQa/iJ5O4KclRX5lVa5tsEEz3BY9MiZ/70kt6YKTKon
-        adDQ6Rz1R9tvT9HgxUS6OnkIq96l33Z1f2ijTn5iFaT8UgRTVw/sR9htaLNNeMp7lvcHWXl4FZliC
-        OiKr0d1TOW4sUqigC0T9LjQxmVKBf09QghSF5km2kvs/fxlTr4tSNAK5c80z7xXFmKdDy9/Lr/GBZ
-        CUUng/vaRDjJEJ3Yc5bszWou2LyaJq0lEQsl9M7kL9ztyr33ASxSAgOOoQm7IvyeGp0SSewunrXTJ
-        1iyfFsKg==;
+        bh=8GUuV45G7YtMgQfBehNNQJaCCPQKMrASN4qZDBTJuk4=; b=SGMHgfPyjpZdNV1yPglw9xAFVD
+        5K8GJqwjITRCE9JS1twdXXYPyVhO/yYw0q6tIvK+WxfhCBbv1Zq9AaZ6kzJpLDe2rf3hqtZfxmjAq
+        djXxro96iIwr0wndhuehbkDgKLi6EpkhQbBjPgoVB3kpO3/S/7KK5XXgtCMmuWPlZ0N1JlTQmX8wH
+        7p+9zNyABDn2580JORxOMxesVvxgTcTKauvYzzP68ata4iXtP3mcQqZgptCbfsOaMUO/4fdAEvLLq
+        8cJDozGqvku50rURuQt3sDSA5B3GDaFmW9QpLv4A+lag3mBfk5Bnd9Bd26bJqTszun87KITK8FwPX
+        qCSHvbAg==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1olw1I-00DoHy-T8; Fri, 21 Oct 2022 11:41:22 -0600
+        id 1olw1L-00DoI0-AP; Fri, 21 Oct 2022 11:41:24 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1olw1F-0001t6-LU; Fri, 21 Oct 2022 11:41:17 -0600
+        id 1olw1G-0001tR-Bm; Fri, 21 Oct 2022 11:41:18 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -56,225 +56,214 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Stephen Bates <sbates@raithlin.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Fri, 21 Oct 2022 11:41:08 -0600
-Message-Id: <20221021174116.7200-2-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Date:   Fri, 21 Oct 2022 11:41:15 -0600
+Message-Id: <20221021174116.7200-9-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221021174116.7200-1-logang@deltatee.com>
 References: <20221021174116.7200-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, sbates@raithlin.com, logang@deltatee.com, bhelgaas@google.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v11 1/9] mm: allow multiple error returns in try_grab_page()
+Subject: [PATCH v11 8/9] PCI/P2PDMA: Allow userspace VMA allocations through sysfs
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to add checks for P2PDMA memory into try_grab_page(), expand
-the error return from a bool to an int/error code. Update all the
-callsites handle change in usage.
+Create a sysfs bin attribute called "allocate" under the existing
+"p2pmem" group. The only allowable operation on this file is the mmap()
+call.
 
-Also remove the WARN_ON_ONCE() call at the callsites seeing there
-already is a WARN_ON_ONCE() inside the function if it fails.
+When mmap() is called on this attribute, the kernel allocates a chunk of
+memory from the genalloc and inserts the pages into the VMA. The
+dev_pagemap .page_free callback will indicate when these pages are no
+longer used and they will be put back into the genalloc.
+
+On device unbind, remove the sysfs file before the memremap_pages are
+cleaned up. This ensures unmap_mapping_range() is called on the files
+inode and no new mappings can be created.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- include/linux/mm.h |  2 +-
- mm/gup.c           | 26 ++++++++++++++------------
- mm/huge_memory.c   | 19 +++++++++++++------
- mm/hugetlb.c       | 17 +++++++++--------
- 4 files changed, 37 insertions(+), 27 deletions(-)
+ drivers/pci/p2pdma.c | 124 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 124 insertions(+)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 8bbcccbc5565..62a91dc1272b 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1129,7 +1129,7 @@ static inline void get_page(struct page *page)
- 	folio_get(page_folio(page));
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 88dc66ee1c46..27539770a613 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -89,6 +89,90 @@ static ssize_t published_show(struct device *dev, struct device_attribute *attr,
  }
+ static DEVICE_ATTR_RO(published);
  
--bool __must_check try_grab_page(struct page *page, unsigned int flags);
-+int __must_check try_grab_page(struct page *page, unsigned int flags);
- 
- static inline __must_check bool try_get_page(struct page *page)
- {
-diff --git a/mm/gup.c b/mm/gup.c
-index fe195d47de74..e2f447446384 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -202,17 +202,19 @@ static void gup_put_folio(struct folio *folio, int refs, unsigned int flags)
-  * time. Cases: please see the try_grab_folio() documentation, with
-  * "refs=1".
-  *
-- * Return: true for success, or if no action was required (if neither FOLL_PIN
-- * nor FOLL_GET was set, nothing is done). False for failure: FOLL_GET or
-- * FOLL_PIN was set, but the page could not be grabbed.
-+ * Return: 0 for success, or if no action was required (if neither FOLL_PIN
-+ * nor FOLL_GET was set, nothing is done). A negative error code for failure:
-+ *
-+ *   -ENOMEM		FOLL_GET or FOLL_PIN was set, but the page could not
-+ *			be grabbed.
-  */
--bool __must_check try_grab_page(struct page *page, unsigned int flags)
-+int __must_check try_grab_page(struct page *page, unsigned int flags)
- {
- 	struct folio *folio = page_folio(page);
- 
- 	WARN_ON_ONCE((flags & (FOLL_GET | FOLL_PIN)) == (FOLL_GET | FOLL_PIN));
- 	if (WARN_ON_ONCE(folio_ref_count(folio) <= 0))
--		return false;
-+		return -ENOMEM;
- 
- 	if (flags & FOLL_GET)
- 		folio_ref_inc(folio);
-@@ -232,7 +234,7 @@ bool __must_check try_grab_page(struct page *page, unsigned int flags)
- 		node_stat_mod_folio(folio, NR_FOLL_PIN_ACQUIRED, 1);
- 	}
- 
--	return true;
-+	return 0;
- }
- 
- /**
-@@ -624,8 +626,9 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 		       !PageAnonExclusive(page), page);
- 
- 	/* try_grab_page() does nothing unless FOLL_GET or FOLL_PIN is set. */
--	if (unlikely(!try_grab_page(page, flags))) {
--		page = ERR_PTR(-ENOMEM);
-+	ret = try_grab_page(page, flags);
-+	if (unlikely(ret)) {
-+		page = ERR_PTR(ret);
- 		goto out;
- 	}
- 	/*
-@@ -960,10 +963,9 @@ static int get_gate_page(struct mm_struct *mm, unsigned long address,
- 			goto unmap;
- 		*page = pte_page(*pte);
- 	}
--	if (unlikely(!try_grab_page(*page, gup_flags))) {
--		ret = -ENOMEM;
-+	ret = try_grab_page(*page, gup_flags);
-+	if (unlikely(ret))
- 		goto unmap;
--	}
- out:
- 	ret = 0;
- unmap:
-@@ -2536,7 +2538,7 @@ static int __gup_device_huge(unsigned long pfn, unsigned long addr,
- 		}
- 		SetPageReferenced(page);
- 		pages[*nr] = page;
--		if (unlikely(!try_grab_page(page, flags))) {
-+		if (unlikely(try_grab_page(page, flags))) {
- 			undo_dev_pagemap(nr, nr_start, flags, pages);
- 			break;
- 		}
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index 1cc4a5f4791e..52f2b2a2ffae 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -1035,6 +1035,7 @@ struct page *follow_devmap_pmd(struct vm_area_struct *vma, unsigned long addr,
- 	unsigned long pfn = pmd_pfn(*pmd);
- 	struct mm_struct *mm = vma->vm_mm;
- 	struct page *page;
++static int p2pmem_alloc_mmap(struct file *filp, struct kobject *kobj,
++		struct bin_attribute *attr, struct vm_area_struct *vma)
++{
++	struct pci_dev *pdev = to_pci_dev(kobj_to_dev(kobj));
++	size_t len = vma->vm_end - vma->vm_start;
++	struct pci_p2pdma *p2pdma;
++	struct percpu_ref *ref;
++	unsigned long vaddr;
++	void *kaddr;
 +	int ret;
- 
- 	assert_spin_locked(pmd_lockptr(mm, pmd));
- 
-@@ -1066,8 +1067,9 @@ struct page *follow_devmap_pmd(struct vm_area_struct *vma, unsigned long addr,
- 	if (!*pgmap)
- 		return ERR_PTR(-EFAULT);
- 	page = pfn_to_page(pfn);
--	if (!try_grab_page(page, flags))
--		page = ERR_PTR(-ENOMEM);
-+	ret = try_grab_page(page, flags);
-+	if (ret)
-+		page = ERR_PTR(ret);
- 
- 	return page;
- }
-@@ -1193,6 +1195,7 @@ struct page *follow_devmap_pud(struct vm_area_struct *vma, unsigned long addr,
- 	unsigned long pfn = pud_pfn(*pud);
- 	struct mm_struct *mm = vma->vm_mm;
- 	struct page *page;
-+	int ret;
- 
- 	assert_spin_locked(pud_lockptr(mm, pud));
- 
-@@ -1226,8 +1229,10 @@ struct page *follow_devmap_pud(struct vm_area_struct *vma, unsigned long addr,
- 	if (!*pgmap)
- 		return ERR_PTR(-EFAULT);
- 	page = pfn_to_page(pfn);
--	if (!try_grab_page(page, flags))
--		page = ERR_PTR(-ENOMEM);
 +
-+	ret = try_grab_page(page, flags);
-+	if (ret)
-+		page = ERR_PTR(ret);
++	/* prevent private mappings from being established */
++	if ((vma->vm_flags & VM_MAYSHARE) != VM_MAYSHARE) {
++		pci_info_ratelimited(pdev,
++				     "%s: fail, attempted private mapping\n",
++				     current->comm);
++		return -EINVAL;
++	}
++
++	if (vma->vm_pgoff) {
++		pci_info_ratelimited(pdev,
++				     "%s: fail, attempted mapping with non-zero offset\n",
++				     current->comm);
++		return -EINVAL;
++	}
++
++	rcu_read_lock();
++	p2pdma = rcu_dereference(pdev->p2pdma);
++	if (!p2pdma) {
++		ret = -ENODEV;
++		goto out;
++	}
++
++	kaddr = (void *)gen_pool_alloc_owner(p2pdma->pool, len, (void **)&ref);
++	if (!kaddr) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	/*
++	 * vm_insert_page() can sleep, so a reference is taken to mapping
++	 * such that rcu_read_unlock() can be done before inserting the
++	 * pages
++	 */
++	if (unlikely(!percpu_ref_tryget_live_rcu(ref))) {
++		ret = -ENODEV;
++		goto out_free_mem;
++	}
++	rcu_read_unlock();
++
++	for (vaddr = vma->vm_start; vaddr < vma->vm_end; vaddr += PAGE_SIZE) {
++		ret = vm_insert_page(vma, vaddr, virt_to_page(kaddr));
++		if (ret) {
++			gen_pool_free(p2pdma->pool, (uintptr_t)kaddr, len);
++			return ret;
++		}
++		percpu_ref_get(ref);
++		put_page(virt_to_page(kaddr));
++		kaddr += PAGE_SIZE;
++		len -= PAGE_SIZE;
++	}
++
++	percpu_ref_put(ref);
++
++	return 0;
++out_free_mem:
++	gen_pool_free(p2pdma->pool, (uintptr_t)kaddr, len);
++out:
++	rcu_read_unlock();
++	return ret;
++}
++
++static struct bin_attribute p2pmem_alloc_attr = {
++	.attr = { .name = "allocate", .mode = 0660 },
++	.mmap = p2pmem_alloc_mmap,
++	/*
++	 * Some places where we want to call mmap (ie. python) will check
++	 * that the file size is greater than the mmap size before allowing
++	 * the mmap to continue. To work around this, just set the size
++	 * to be very large.
++	 */
++	.size = SZ_1T,
++};
++
+ static struct attribute *p2pmem_attrs[] = {
+ 	&dev_attr_size.attr,
+ 	&dev_attr_available.attr,
+@@ -96,11 +180,32 @@ static struct attribute *p2pmem_attrs[] = {
+ 	NULL,
+ };
  
- 	return page;
- }
-@@ -1435,6 +1440,7 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
++static struct bin_attribute *p2pmem_bin_attrs[] = {
++	&p2pmem_alloc_attr,
++	NULL,
++};
++
+ static const struct attribute_group p2pmem_group = {
+ 	.attrs = p2pmem_attrs,
++	.bin_attrs = p2pmem_bin_attrs,
+ 	.name = "p2pmem",
+ };
+ 
++static void p2pdma_page_free(struct page *page)
++{
++	struct pci_p2pdma_pagemap *pgmap = to_p2p_pgmap(page->pgmap);
++	struct percpu_ref *ref;
++
++	gen_pool_free_owner(pgmap->provider->p2pdma->pool,
++			    (uintptr_t)page_to_virt(page), PAGE_SIZE,
++			    (void **)&ref);
++	percpu_ref_put(ref);
++}
++
++static const struct dev_pagemap_ops p2pdma_pgmap_ops = {
++	.page_free = p2pdma_page_free,
++};
++
+ static void pci_p2pdma_release(void *data)
  {
- 	struct mm_struct *mm = vma->vm_mm;
- 	struct page *page;
-+	int ret;
+ 	struct pci_dev *pdev = data;
+@@ -152,6 +257,19 @@ static int pci_p2pdma_setup(struct pci_dev *pdev)
+ 	return error;
+ }
  
- 	assert_spin_locked(pmd_lockptr(mm, pmd));
++static void pci_p2pdma_unmap_mappings(void *data)
++{
++	struct pci_dev *pdev = data;
++
++	/*
++	 * Removing the alloc attribute from sysfs will call
++	 * unmap_mapping_range() on the inode, teardown any existing userspace
++	 * mappings and prevent new ones from being created.
++	 */
++	sysfs_remove_file_from_group(&pdev->dev.kobj, &p2pmem_alloc_attr.attr,
++				     p2pmem_group.name);
++}
++
+ /**
+  * pci_p2pdma_add_resource - add memory for use as p2p memory
+  * @pdev: the device to add the memory to
+@@ -198,6 +316,7 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 	pgmap->range.end = pgmap->range.start + size - 1;
+ 	pgmap->nr_range = 1;
+ 	pgmap->type = MEMORY_DEVICE_PCI_P2PDMA;
++	pgmap->ops = &p2pdma_pgmap_ops;
  
-@@ -1459,8 +1465,9 @@ struct page *follow_trans_huge_pmd(struct vm_area_struct *vma,
- 	VM_BUG_ON_PAGE((flags & FOLL_PIN) && PageAnon(page) &&
- 			!PageAnonExclusive(page), page);
+ 	p2p_pgmap->provider = pdev;
+ 	p2p_pgmap->bus_offset = pci_bus_address(pdev, bar) -
+@@ -209,6 +328,11 @@ int pci_p2pdma_add_resource(struct pci_dev *pdev, int bar, size_t size,
+ 		goto pgmap_free;
+ 	}
  
--	if (!try_grab_page(page, flags))
--		return ERR_PTR(-ENOMEM);
-+	ret = try_grab_page(page, flags);
-+	if (ret)
-+		return ERR_PTR(ret);
- 
- 	if (flags & FOLL_TOUCH)
- 		touch_pmd(vma, addr, pmd, flags & FOLL_WRITE);
-diff --git a/mm/hugetlb.c b/mm/hugetlb.c
-index b586cdd75930..e8d01a19ce46 100644
---- a/mm/hugetlb.c
-+++ b/mm/hugetlb.c
-@@ -7224,14 +7224,15 @@ follow_huge_pmd_pte(struct vm_area_struct *vma, unsigned long address, int flags
- 		page = pte_page(pte) +
- 			((address & ~huge_page_mask(h)) >> PAGE_SHIFT);
- 		/*
--		 * try_grab_page() should always succeed here, because: a) we
--		 * hold the pmd (ptl) lock, and b) we've just checked that the
--		 * huge pmd (head) page is present in the page tables. The ptl
--		 * prevents the head page and tail pages from being rearranged
--		 * in any way. So this page must be available at this point,
--		 * unless the page refcount overflowed:
-+		 * try_grab_page() should always be able to get the page here,
-+		 * because: a) we hold the pmd (ptl) lock, and b) we've just
-+		 * checked that the huge pmd (head) page is present in the
-+		 * page tables. The ptl prevents the head page and tail pages
-+		 * from being rearranged in any way. So this page must be
-+		 * available at this point, unless the page refcount
-+		 * overflowed:
- 		 */
--		if (WARN_ON_ONCE(!try_grab_page(page, flags))) {
-+		if (try_grab_page(page, flags)) {
- 			page = NULL;
- 			goto out;
- 		}
-@@ -7269,7 +7270,7 @@ follow_huge_pud(struct mm_struct *mm, unsigned long address,
- 	pte = huge_ptep_get((pte_t *)pud);
- 	if (pte_present(pte)) {
- 		page = pud_page(*pud) + ((address & ~PUD_MASK) >> PAGE_SHIFT);
--		if (WARN_ON_ONCE(!try_grab_page(page, flags))) {
-+		if (try_grab_page(page, flags)) {
- 			page = NULL;
- 			goto out;
- 		}
++	error = devm_add_action_or_reset(&pdev->dev, pci_p2pdma_unmap_mappings,
++					 pdev);
++	if (error)
++		goto pages_free;
++
+ 	p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
+ 	error = gen_pool_add_owner(p2pdma->pool, (unsigned long)addr,
+ 			pci_bus_address(pdev, bar) + offset,
 -- 
 2.30.2
 
