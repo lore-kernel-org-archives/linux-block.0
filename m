@@ -2,70 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 947FBC43217
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 00:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03BA3C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 00:58:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229929AbiJUAlk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 20:41:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41900 "EHLO
+        id S229916AbiJUA6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 20:58:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbiJUAld (ORCPT
+        with ESMTP id S229939AbiJUA6G (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 20:41:33 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A8B196EEF
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 17:41:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 20 Oct 2022 20:58:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68AD220F9D
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 17:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666313883;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qG8591Xly/v0qWxUjLRp/EASy0SBvAr2VHzhz10020A=;
+        b=gPUYnCJInxVv3Rb7vv+hGQPadmmzvPBTczmo5rcEFeB+IPW9uGsrF/Cmi8ojzbrW7E75Eb
+        4S5D5m7PSWll+VhfVDrhS7rD3Tozm5SSbU5+XqCBOLIugRmx6y9pKOw3C8JVDMlzL4mqYU
+        MQnpDDj3NtKlcV/CTjf4dzUyn9c9CVo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-168-0wpCcC_WPSy-6gDMJBGIww-1; Thu, 20 Oct 2022 20:57:57 -0400
+X-MC-Unique: 0wpCcC_WPSy-6gDMJBGIww-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CE905B82A11
-        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 00:41:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AA95C433D6;
-        Fri, 21 Oct 2022 00:41:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666312876;
-        bh=u6ho9VrMVeJWGaAvTDColdvtuYONIh5JvUWzC4OZePc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=M2ifSKhFXW3eFEI6O7eRd8roYJqR8BJSJlQgSWrTz2Pzg9S+u3lNM05lDLsREMu2S
-         wfRZQdBqujy75AdKaTh66EHtyEF/CdN7rEmBpOtsdJT0qnP/XHRpn5oPgplFN/KNXk
-         iVaFh0wmjspvh5dEeUrW7MnaSPb9JP8PR0ezmTsVgC4gOK6pOr8QzTc4kn0Ngyng/Z
-         dGzQlimkdc8cTXvVCVQGXhzIpEXnp3keNEK4/IWjnZ3E/QN7+QuxONle7cGg04xgji
-         0AmnhQnno+UB0JIawfP0mexItPQJrQxFJvhidGwKb11bokKkkBeNhvkfp0AygDOrLa
-         wUDmxZCDpGNJQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 642C0C4166D;
-        Fri, 21 Oct 2022 00:41:16 +0000 (UTC)
-Subject: Re: [git pull] device mapper fix for 6.1-rc2
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <Y070ExTjLGLStSQ0@redhat.com>
-References: <Y070ExTjLGLStSQ0@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Y070ExTjLGLStSQ0@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.1/dm-fix
-X-PR-Tracked-Commit-Id: 141b3523e9be6f15577acf4bbc3bc1f82d81d6d1
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 43e6c111824c75940a586cd7d3fe6a5ff1d5104f
-Message-Id: <166631287640.10394.17455212903841431163.pr-tracker-bot@kernel.org>
-Date:   Fri, 21 Oct 2022 00:41:16 +0000
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 62761811E7A;
+        Fri, 21 Oct 2022 00:57:57 +0000 (UTC)
+Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CDFB40611D;
+        Fri, 21 Oct 2022 00:57:50 +0000 (UTC)
+Date:   Fri, 21 Oct 2022 08:57:44 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        djeffery@redhat.com, stefanha@redhat.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [Bug] double ->queue_rq() because of timeout in ->queue_rq()
+Message-ID: <Y1HuiFXyQ1k+OH92@T590>
+References: <Y1EQdafQlKNAsutk@T590>
+ <7d5eae39-3a56-df7d-eb72-3cb910c2b802@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d5eae39-3a56-df7d-eb72-3cb910c2b802@acm.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Tue, 18 Oct 2022 14:44:35 -0400:
+On Thu, Oct 20, 2022 at 01:26:48PM -0700, Bart Van Assche wrote:
+> On 10/20/22 02:10, Ming Lei wrote:
+> > [ ... ]
+> 
+> Hi Ming,
+> 
+> Fixing this in the block layer seems fine to me. A few comments:
+> 
+> > +	/* Before walking tags, we must ensure any submit started before the
+> > +	 * current time has finished. Since the submit uses srcu or rcu, wait
+> > +	 * for a synchronization point to ensure all running submits have
+> > +	 * finished
+> > +	 */
+> 
+> Should the above comment follow the style of other comments in the block
+> layer?
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-6.1/dm-fix
+OK.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/43e6c111824c75940a586cd7d3fe6a5ff1d5104f
+> 
+> > +	blk_mq_wait_quiesce_done(q);
+> > +
+> > +	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
+> 
+> The above doesn't look sufficient to me since .queue_rq() may be called
+> while blk_mq_queue_tag_busy_iter() is in progress. How about moving the
+> blk_mq_wait_quiesce_done() call into blk_mq_check_expired() and preventing
+> new .queue_rq() calls before the timeout handler is called?
 
-Thank you!
+blk_mq_timeout_work() records the time before calling
+blk_mq_wait_quiesce_done(), and only handle requests which is timed out
+before the recorded jiffies, so new queued request won't be covered
+in this time.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+Ming
+
