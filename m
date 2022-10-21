@@ -2,78 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A089C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 03:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7322C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 03:16:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbiJUDP5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 23:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54490 "EHLO
+        id S229880AbiJUDQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 23:16:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229880AbiJUDPy (ORCPT
+        with ESMTP id S230016AbiJUDQ1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 23:15:54 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919E6134DD2;
-        Thu, 20 Oct 2022 20:15:37 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MtqKg3k9JzKFJ7;
-        Fri, 21 Oct 2022 11:13:11 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgAH+zHWDlJjvXi4AA--.37167S3;
-        Fri, 21 Oct 2022 11:15:35 +0800 (CST)
-Subject: Re: [PATCH -nect RFC v2 0/2] block: fix uaf in bd_link_disk_holder()
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, willy@infradead.org, kch@nvidia.com,
-        martin.petersen@oracle.com, johannes.thumshirn@wdc.com,
-        ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yukuai1@huaweicloud.com,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221020132049.3947415-1-yukuai3@huawei.com>
- <20221020164712.GA14773@lst.de>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <0ad09045-1012-e86b-41f2-a88d02e8f1ed@huaweicloud.com>
-Date:   Fri, 21 Oct 2022 11:15:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 20 Oct 2022 23:16:27 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43362158D6A
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 20:16:25 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4MtqHs1YvrzmVF4;
+        Fri, 21 Oct 2022 11:11:37 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 21 Oct 2022 11:16:05 +0800
+Subject: Re: [PATCH 2/8] blk-mq: skip non-mq queues in blk_mq_quiesce_queue
+From:   Chao Leng <lengchao@huawei.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>
+CC:     Ming Lei <ming.lei@redhat.com>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
+References: <20221020105608.1581940-1-hch@lst.de>
+ <20221020105608.1581940-3-hch@lst.de>
+ <25cf9a6a-9224-0b35-6dec-194440d4e58d@huawei.com>
+Message-ID: <99c31c6b-47ec-adb2-4f57-15ee8f7b3143@huawei.com>
+Date:   Fri, 21 Oct 2022 11:16:05 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-In-Reply-To: <20221020164712.GA14773@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
+In-Reply-To: <25cf9a6a-9224-0b35-6dec-194440d4e58d@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgAH+zHWDlJjvXi4AA--.37167S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYg7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4II
-        rI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr4
-        1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-        67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-        8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
-        wI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267
-        AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VU1a9aPUUUUU==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ canpemm500002.china.huawei.com (7.192.104.244)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-�� 2022/10/21 0:47, Christoph Hellwig д��:
-> As mentioned before I don't think we should make this even more
-> crufty in the block layer.  See the series I just sent to move it int
-> dm.
 
-It seems we had some misunderstanding, the problem I tried to fix here
-should not just related to dm, but all the caller of
-bd_link_disk_holder().
-
-Thanks,
-Kuai
+On 2022/10/21 10:47, Chao Leng wrote:
+> 
+> 
+> On 2022/10/20 18:56, Christoph Hellwig wrote:
+>> For submit_bio based queues there is no (S)RCU critical section during
+>> I/O submission and thus nothing to wait for in blk_mq_wait_quiesce_done,
+>> so skip doing any synchronization.
+>>
+>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>> ---
+>>   block/blk-mq.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 33292c01875d5..df967c8af9fee 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -280,7 +280,9 @@ EXPORT_SYMBOL_GPL(blk_mq_wait_quiesce_done);
+>>   void blk_mq_quiesce_queue(struct request_queue *q)
+>>   {
+>>       blk_mq_quiesce_queue_nowait(q);
+>> -    blk_mq_wait_quiesce_done(q);
+>> +    /* nothing to wait for non-mq queues */
+>> +    if (queue_is_mq(q))
+>> +        blk_mq_wait_quiesce_done(q);
+> For the non-mq queues, maybe we should add a synchronize_rcu.
+>      if (queue_is_mq(q))
+>          blk_mq_wait_quiesce_done(q);
+>      else
+>          synchronize_rcu();
+Please ignore this, synchronize_rcu is not needed.
+>>   }
+>>   EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue);
+>>
 > 
 > .
-> 
-
