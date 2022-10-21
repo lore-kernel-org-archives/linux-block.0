@@ -2,109 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC3CC3A59D
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 20:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C768C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 21:04:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbiJUUoP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 16:44:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52760 "EHLO
+        id S229588AbiJUVEv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 17:04:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbiJUUoO (ORCPT
+        with ESMTP id S229542AbiJUVEu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2022 16:44:14 -0400
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAED0106E16;
-        Fri, 21 Oct 2022 13:43:55 -0700 (PDT)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-1322fa1cf6fso5022525fac.6;
-        Fri, 21 Oct 2022 13:43:55 -0700 (PDT)
+        Fri, 21 Oct 2022 17:04:50 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27752D1ED;
+        Fri, 21 Oct 2022 14:04:47 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso1286149pjc.0;
+        Fri, 21 Oct 2022 14:04:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/G6LFbUeYMFO24FKBVvek1cF9UzLOlkGDVPRHkS0zAY=;
-        b=S7AEiAYCKYwxCC/ExzsIRek1gu+DwJbib9fX8RuXb2r8ukfVzwUlfbXmtJsKgiPgUA
-         2tRNij8vld4g7B0fqfFgo10fQdISvjSsWSZdRdrf1qPHBFFCtNKgqVtC7wNO97tCjZTs
-         uA49dV+qF61GwU7Hwk6WwzouxO58Az8waIeHNsG7auIhf4Qozf8TfoDrDqgqcvWw5w7r
-         7GspdrS5+hiAEgrRXQxSe4zlts9QdcvblScJIDMZ6JKZXljT0svL9+LyuP5UpWvkMOKC
-         iHtBm1pEA8kl8t+p9Qgh+m7QGgBaN06BV4ykIDdrL26jHIZUEWdmzGZhtT4UNbjzKjEG
-         JGSg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ufCCYZYJTmJF/KoW5M3amrstoH4BcMXNIbfmJhiw4Bg=;
+        b=WCWaYaayvJhFN0nzxYZ8rTHbSJb3QZ8teTfyxYm1ciVC4ozBAjqHfy5axAMQ+Lq1pz
+         wMmHX/otXDp+ixHCVLZitVt/EsirR80dPz75DR/89XspfmMN7qtcsOop1T0ETvSY1ESK
+         duNo6HAR+TD2Z4ee2LnD33fhQNuEeB16NFirodfgKS1WdurxWUvd5yENnrQVhk3YvCWk
+         4JO7UxIDGEXfH5uQLzODMbz9w8rXiJ8WE+ETjtpZCEaovHQE4jB+uXUKjsXpihDskgpa
+         3gZQ8lQ6EJrraUf3tqB7IcM/Qjs+N6bOlr2EMQE5qoAp1Z/DrRwkvXIQKc6yGK+p5CmM
+         /jEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/G6LFbUeYMFO24FKBVvek1cF9UzLOlkGDVPRHkS0zAY=;
-        b=nzyNiyPYxx6XSdJdrcwOKoibDOb/veMO98mUYjptH7oJgrVnGD8hIPZOiaefVdl2cT
-         7IIHqu3YscUZn/qPrxm1xVsh9QX5U+xUVU0dG37GqJiCxPCJLNpg0QxD7KZVAunfNo/9
-         lcNfPBSY3DZl8wH84de+x8z2pCkxGSVs35BB0fBYRrN+0OSQCPlGtPx1DsWgic9Vhdsf
-         CE/4c/i4Ydj/FdyMIdqNjP5Oj9TqtuzHWEp15SOxph4euB0acSHlXk1i0eAl5KHTWHno
-         /nzc9B5FDzH9MNeEa36W1gisAbQtOGP2DJLZMejkFt9IMS5AY4I9jq05NhfyeNOgbdWo
-         a11A==
-X-Gm-Message-State: ACrzQf0+RiJ3TmJY/ouGK2hWpYbWfO7LxwCX/TNV4PcfKAIgCRH+WQJe
-        2fKbvPRKqFftb/MR7pkbdLibbCb3ZRAUWA==
-X-Google-Smtp-Source: AMsMyM7EPWs+ShRsVXmYTg+a53hB9cUiENnafXWh0Llkzges/ZtwBWrbJJOPp/bOi0r0tBjyXkaOyg==
-X-Received: by 2002:a05:6870:5249:b0:137:2c18:6866 with SMTP id o9-20020a056870524900b001372c186866mr24429669oai.15.1666384957937;
-        Fri, 21 Oct 2022 13:42:37 -0700 (PDT)
-Received: from macondo.. ([2804:431:e7cc:1855:fc19:f361:478a:f673])
-        by smtp.gmail.com with ESMTPSA id z20-20020a056871015400b0011f22e74d5fsm10670933oab.20.2022.10.21.13.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 13:42:37 -0700 (PDT)
-From:   Rafael Mendonca <rafaelmendsr@gmail.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Suwan Kim <suwan.kim027@gmail.com>
-Cc:     Rafael Mendonca <rafaelmendsr@gmail.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] virtio_blk: Fix signedness bug in virtblk_prep_rq()
-Date:   Fri, 21 Oct 2022 17:41:26 -0300
-Message-Id: <20221021204126.927603-1-rafaelmendsr@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        bh=ufCCYZYJTmJF/KoW5M3amrstoH4BcMXNIbfmJhiw4Bg=;
+        b=pH8AK0NCJQkHNNJIWrvM+0VdKD0v1OzLxgX168qYyW5BxJQq1acAeDLbJa+Z25hS+A
+         AusLCWOFv4tkHMzU6ro21tx74d54XOReTeDHaimB80kAM8bbntxU9pDCu4P0/EJwYscP
+         PR/y2AW7xGqyLaPzj1MtPaaEgrg843l4+ixZ9zPQ5CPaFjUuqYu2NhsxqFSkc+tMX38o
+         CSyGOPCBDh0Wk94BzwmA19Is8cmHbpvqn58ahnKnvQJ49+CZSdQ+jJrlJ6rcIqq4q6K6
+         tl3Doq9Gpz1LKZ6IQQLW6oDlGuZB1tuXkDWMCpKgu95xHUGiqVTDBGa26uS0ZIZ9vk2I
+         XGBQ==
+X-Gm-Message-State: ACrzQf0ZmZzUimVC/nkf8iTbQNm7Eb0luXBpFjYHmpecINpSLNJfQkIh
+        frJN0yoxq1fn2cV0YzDBc4CVsrHUy51RVHMQ8xQ=
+X-Google-Smtp-Source: AMsMyM5tsrngLoCck9omAqu1bf1kz4Ah2EpMQMR6bhFE6MpEItn2IXmD213rWwn/DZs1vJCr8D+09/EppIvZSTFyUfI=
+X-Received: by 2002:a17:902:d512:b0:181:f1f4:fcb4 with SMTP id
+ b18-20020a170902d51200b00181f1f4fcb4mr21208456plg.102.1666386287303; Fri, 21
+ Oct 2022 14:04:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221005180341.1738796-1-shy828301@gmail.com> <20221005180341.1738796-3-shy828301@gmail.com>
+ <20221013123830.opbulq4qad56kuev@techsingularity.net> <CAHbLzkpc+CAfsYe6gXjh=-3MxMH_aWhPMYhic7ddFZgWttOhng@mail.gmail.com>
+ <20221017094132.vnanndrwa2yn7qcw@techsingularity.net> <CAHbLzkpmbmtOdOsud-VG+wyk18wFAFnan8T55XxxwkHrnhLCmw@mail.gmail.com>
+ <20221021091911.ak3a7a3wr3qcbe3b@techsingularity.net>
+In-Reply-To: <20221021091911.ak3a7a3wr3qcbe3b@techsingularity.net>
+From:   Yang Shi <shy828301@gmail.com>
+Date:   Fri, 21 Oct 2022 14:04:34 -0700
+Message-ID: <CAHbLzkpAX3CGRGsxj4CTsj=atXqPakJe7TSxVvp3KnKmygk=3g@mail.gmail.com>
+Subject: Re: [PATCH 2/4] mm: mempool: introduce page bulk allocator
+To:     Mel Gorman <mgorman@techsingularity.net>
+Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
+        akpm@linux-foundation.org, linux-mm@kvack.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The virtblk_map_data() function returns negative error codes, however, the
-'nents' field of vbr->sg_table is an unsigned int, which causes the error
-handling not to work correctly.
+On Fri, Oct 21, 2022 at 2:19 AM Mel Gorman <mgorman@techsingularity.net> wrote:
+>
+> On Tue, Oct 18, 2022 at 11:01:31AM -0700, Yang Shi wrote:
+> > > > Yeah, I didn't think of a better way to pass the pages to dm-crypt.
+> > > >
+> > > > >
+> > > > > How about this
+> > > > >
+> > > > > 1. Add a callback to __alloc_pages_bulk() that takes a page as a
+> > > > >    parameter like bulk_add_page() or whatever.
+> > > > >
+> > > > > 2. For page_list == NULL && page_array == NULL, the callback is used
+> > > > >
+> > > > > 3. Add alloc_pages_bulk_cb() that passes in the name of a callback
+> > > > >    function
+> > > > >
+> > > > > 4. In the dm-crypt case, use the callback to pass the page to bio_add_page
+> > > > >    for the new page allocated.
+> > > >
+> > > > Thank you so much for the suggestion. But I have a hard time
+> > > > understanding how these work together. Do you mean call bio_add_page()
+> > > > in the callback? But bio_add_page() needs other parameters. Or I
+> > > > misunderstood you?
+> > > >
+> > >
+> > > I expected dm-crypt to define the callback. Using bio_add_page
+> > > directly would not work as the bulk allocator has no idea what to pass
+> > > bio_add_page. dm-crypt would likely need to create both a callback and an
+> > > opaque data structure passed as (void *) to track "clone" and "len"
+> >
+> > I see. Yeah, we have to pass the "clone" and "len" to the callback via
+> > pool_data. It should not be hard since dm-crypt already uses
+> > crypt_config to maintain a counter for allocated pages, we should just
+> > need to pass the struct to the callback as a parameter.
+> >
+> > But I'm wondering whether this is worth it or not? Will it make the
+> > code harder to follow?
+> >
+>
+> A little because a callback is involved but it's not the only place in the
+> kernel where a callback is used like this and a comment should suffice. It
+> should be faster than list manipulation if nothing else. Mostly, I'm wary
+> of adding the first user of the list interface for the bulk allocator that
+> does not even want a list. If there isn't a user of the list interface
+> that *requires* it, the support will simply be deleted as dead code.
 
-Fixes: 0e9911fa768f ("virtio-blk: support mq_ops->queue_rqs()")
-Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
----
- drivers/block/virtio_blk.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Thanks, I see your point. Will work on the new version to implement
+the callback approach.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 19da5defd734..291f705e61a8 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -321,16 +321,18 @@ static blk_status_t virtblk_prep_rq(struct blk_mq_hw_ctx *hctx,
- 					struct virtblk_req *vbr)
- {
- 	blk_status_t status;
-+	int num;
- 
- 	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
- 	if (unlikely(status))
- 		return status;
- 
--	vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
--	if (unlikely(vbr->sg_table.nents < 0)) {
-+	num = virtblk_map_data(hctx, req, vbr);
-+	if (unlikely(num < 0)) {
- 		virtblk_cleanup_cmd(req);
- 		return BLK_STS_RESOURCE;
- 	}
-+	vbr->sg_table.nents = num;
- 
- 	blk_mq_start_request(req);
- 
--- 
-2.34.1
-
+>
+> --
+> Mel Gorman
+> SUSE Labs
