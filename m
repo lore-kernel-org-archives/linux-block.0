@@ -2,99 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1545EC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 01:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58094C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 01:53:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229489AbiJUBrG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Oct 2022 21:47:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59088 "EHLO
+        id S229597AbiJUBx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Oct 2022 21:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229921AbiJUBrF (ORCPT
+        with ESMTP id S229613AbiJUBxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Oct 2022 21:47:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B6922E8C0
-        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 18:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666316821;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rubxu5P5m0yu63YebC/bkr+rMDHRCz0exG7/VTY1p5I=;
-        b=c1UqjQ4I51zOfFDvgHKF8zlWe28luZe8SOoq94+qJti/cqC8aV0uVlcN7UevODHJa4kYpS
-        G0aiMiYLQgJHPJWap0GYymlAbMfZzAHIqNm+wzWvVMz1febgbC70pYivDfsvuK8IgWtTvW
-        R7HvURTdOff8hQS70lIEFseUSqc61Eg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-675-WYpq7VaSOFCIvvnJf5CBIA-1; Thu, 20 Oct 2022 21:46:58 -0400
-X-MC-Unique: WYpq7VaSOFCIvvnJf5CBIA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C65593810D51;
-        Fri, 21 Oct 2022 01:46:56 +0000 (UTC)
-Received: from T590 (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E989D40E8B14;
-        Fri, 21 Oct 2022 01:46:42 +0000 (UTC)
-Date:   Fri, 21 Oct 2022 09:46:33 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chao Leng <lengchao@huawei.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/8] blk-mq: pass a tagset to blk_mq_wait_quiesce_done
-Message-ID: <Y1H5+Z5HotPo7yWV@T590>
+        Thu, 20 Oct 2022 21:53:25 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D1D158180
+        for <linux-block@vger.kernel.org>; Thu, 20 Oct 2022 18:53:23 -0700 (PDT)
+Received: from canpemm500002.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MtnYP3g5zzHv7B;
+        Fri, 21 Oct 2022 09:53:13 +0800 (CST)
+Received: from [10.169.59.127] (10.169.59.127) by
+ canpemm500002.china.huawei.com (7.192.104.244) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 21 Oct 2022 09:53:21 +0800
+Subject: Re: [PATCH 1/8] block: set the disk capacity to 0 in
+ blk_mark_disk_dead
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>
+CC:     Ming Lei <ming.lei@redhat.com>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>
 References: <20221020105608.1581940-1-hch@lst.de>
- <20221020105608.1581940-5-hch@lst.de>
+ <20221020105608.1581940-2-hch@lst.de>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <e3ab9d31-7a9e-4bad-9a04-1f20845c6268@huawei.com>
+Date:   Fri, 21 Oct 2022 09:53:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221020105608.1581940-5-hch@lst.de>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+In-Reply-To: <20221020105608.1581940-2-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.59.127]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ canpemm500002.china.huawei.com (7.192.104.244)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Oct 20, 2022 at 12:56:04PM +0200, Christoph Hellwig wrote:
-> Noting in blk_mq_wait_quiesce_done needs the request_queue now, so just
-> pass the tagset, and move the non-mq check into the only caller that
-> needs it.
+Reviewed-by: Chao Leng <lengchao@huawei.com>
+
+On 2022/10/20 18:56, Christoph Hellwig wrote:
+> nvme and xen-blkfront are already doing this to stop buffered writes from
+> creating dirty pages that can't be written out later.  Move it to the
+> common code.  Note that this follows the xen-blkfront version that does
+> not send and uevent as the uevent is a bit confusing when the device is
+> about to go away a little later, and the the size change is just to stop
+> buffered writes faster.
+> 
+> This also removes the comment about the ordering from nvme, as bd_mutex
+> not only is gone entirely, but also hasn't been used for locking updates
+> to the disk size long before that, and thus the ordering requirement
+> documented there doesn't apply any more.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->  block/blk-mq.c           | 10 +++++-----
->  drivers/nvme/host/core.c |  4 ++--
->  drivers/scsi/scsi_lib.c  |  2 +-
->  include/linux/blk-mq.h   |  2 +-
->  4 files changed, 9 insertions(+), 9 deletions(-)
+>   block/genhd.c                | 3 +++
+>   drivers/block/xen-blkfront.c | 1 -
+>   drivers/nvme/host/core.c     | 7 +------
+>   3 files changed, 4 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 4a81a2da43328..cf8f9f9a96c35 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -254,15 +254,15 @@ EXPORT_SYMBOL_GPL(blk_mq_quiesce_queue_nowait);
->  
->  /**
->   * blk_mq_wait_quiesce_done() - wait until in-progress quiesce is done
-> - * @q: request queue.
-> + * @set: tag_set to wait on
->   *
->   * Note: it is driver's responsibility for making sure that quiesce has
->   * been started.
->   */
-> -void blk_mq_wait_quiesce_done(struct request_queue *q)
-> +void blk_mq_wait_quiesce_done(struct blk_mq_tag_set *set)
-
-The change is fine, but the interface could confuse people, it
-looks like it is waiting for whole tagset quiesced, but it needs
-to mark all request queues as quiesced first, otherwise it is just
-wait for one specific queue's quiesce.
-
-So suggest to document such thing.
-
-
-Thanks,
-Ming
-
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 17b33c62423df..2877b5f905579 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -555,6 +555,9 @@ void blk_mark_disk_dead(struct gendisk *disk)
+>   {
+>   	set_bit(GD_DEAD, &disk->state);
+>   	blk_queue_start_drain(disk->queue);
+> +
+> +	/* stop buffered writers from dirtying pages that can't written out */
+> +	set_capacity(disk, 0);
+>   }
+>   EXPORT_SYMBOL_GPL(blk_mark_disk_dead);
+>   
+> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> index 35b9bcad9db90..b28489290323f 100644
+> --- a/drivers/block/xen-blkfront.c
+> +++ b/drivers/block/xen-blkfront.c
+> @@ -2129,7 +2129,6 @@ static void blkfront_closing(struct blkfront_info *info)
+>   	if (info->rq && info->gd) {
+>   		blk_mq_stop_hw_queues(info->rq);
+>   		blk_mark_disk_dead(info->gd);
+> -		set_capacity(info->gd, 0);
+>   	}
+>   
+>   	for_each_rinfo(info, rinfo, i) {
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 059737c1a2c19..44a5321743128 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -5106,10 +5106,7 @@ static void nvme_stop_ns_queue(struct nvme_ns *ns)
+>   /*
+>    * Prepare a queue for teardown.
+>    *
+> - * This must forcibly unquiesce queues to avoid blocking dispatch, and only set
+> - * the capacity to 0 after that to avoid blocking dispatchers that may be
+> - * holding bd_butex.  This will end buffered writers dirtying pages that can't
+> - * be synced.
+> + * This must forcibly unquiesce queues to avoid blocking dispatch.
+>    */
+>   static void nvme_set_queue_dying(struct nvme_ns *ns)
+>   {
+> @@ -5118,8 +5115,6 @@ static void nvme_set_queue_dying(struct nvme_ns *ns)
+>   
+>   	blk_mark_disk_dead(ns->disk);
+>   	nvme_start_ns_queue(ns);
+> -
+> -	set_capacity_and_notify(ns->disk, 0);
+>   }
+>   
+>   /**
+> 
