@@ -2,96 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC67FC38A2D
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 18:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC3CC3A59D
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 20:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbiJUSdo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 14:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54224 "EHLO
+        id S229596AbiJUUoP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 16:44:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbiJUSdh (ORCPT
+        with ESMTP id S229592AbiJUUoO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2022 14:33:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0572828864C
-        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 11:33:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666377216;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dLmiSkOFaJ+6V3LqgPTa0cZ4h6uaklJ08nilTBsNxQM=;
-        b=d+fR4qShfMHx1d4ytX638AxC0una+QAO2dwSxnGvsQmO53A/OD0at5XnHLpiO4q8rwXZ2m
-        3Grn/L0ImXeVHpC2VNGd/M9ToX9wq1JE/1cEQTmVtRy5GpSNQgRDdzjJw1tyJT4njlHqgQ
-        /DvmOlfj7AhcyCgpXnxYDip6wPQDvZo=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-395-Pf_jJgoRPXKQ9y_FmZw8Cw-1; Fri, 21 Oct 2022 14:33:34 -0400
-X-MC-Unique: Pf_jJgoRPXKQ9y_FmZw8Cw-1
-Received: by mail-ed1-f72.google.com with SMTP id y14-20020a056402440e00b0044301c7ccd9so3412138eda.19
-        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 11:33:34 -0700 (PDT)
+        Fri, 21 Oct 2022 16:44:14 -0400
+Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAED0106E16;
+        Fri, 21 Oct 2022 13:43:55 -0700 (PDT)
+Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-1322fa1cf6fso5022525fac.6;
+        Fri, 21 Oct 2022 13:43:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/G6LFbUeYMFO24FKBVvek1cF9UzLOlkGDVPRHkS0zAY=;
+        b=S7AEiAYCKYwxCC/ExzsIRek1gu+DwJbib9fX8RuXb2r8ukfVzwUlfbXmtJsKgiPgUA
+         2tRNij8vld4g7B0fqfFgo10fQdISvjSsWSZdRdrf1qPHBFFCtNKgqVtC7wNO97tCjZTs
+         uA49dV+qF61GwU7Hwk6WwzouxO58Az8waIeHNsG7auIhf4Qozf8TfoDrDqgqcvWw5w7r
+         7GspdrS5+hiAEgrRXQxSe4zlts9QdcvblScJIDMZ6JKZXljT0svL9+LyuP5UpWvkMOKC
+         iHtBm1pEA8kl8t+p9Qgh+m7QGgBaN06BV4ykIDdrL26jHIZUEWdmzGZhtT4UNbjzKjEG
+         JGSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dLmiSkOFaJ+6V3LqgPTa0cZ4h6uaklJ08nilTBsNxQM=;
-        b=k9ULjFpqOGnRJ3thUHFV6QAiTkJ1I2YUnBqTq3Q0JNxEDPjMAdxnq4whS6w3l+E6uX
-         gr9yl7Ro3YJRU/Y3ti1+m9p0mOyaad1r9EN+lNQA4XSKXDihuT12w3LhdK1ZTcFAsx+P
-         bCFz4x8Sn5Shh/P/dYENpmMLI/JXVBXUe1BOWbQ+dc0FpPndLmQ0JI/nx4fo+P9zdYTg
-         dazVoSyW1cKvwxgzbjqxhIt+BvhcwDVbwn+oreZvU4pU9kIcOgDNZzV8sB17YkL/0JPo
-         vN9XXJ9y6lmbgVMdGMAgjN/L0bDHB0bNdk4JCnbpw6cf63GMFwWMCPoNwPtsbccOCHDv
-         otRA==
-X-Gm-Message-State: ACrzQf3IYj4RWo6mJ0gGKBog9OuXzjuNm1Nj4qQN0aFhARATWpJTM80n
-        dTar0dM4f/QTzFaqGkyFW+uhVyF4RuTiyqC8EnE3Ng1zptca5hyd6KE/DxgUaIgJtE+usoHiTzI
-        5xw5V2iQfKUSEeX3nW4fDoLMIR629YdaU+hXuG1s=
-X-Received: by 2002:a17:907:6e09:b0:78d:a326:49c6 with SMTP id sd9-20020a1709076e0900b0078da32649c6mr16637991ejc.507.1666377213474;
-        Fri, 21 Oct 2022 11:33:33 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7NZHJKc03YC7LnDuTW7o+luE+PAom09rHSVMHty9srBMk8ve+2AMEfrLe7S9AFxjPyeW5ZCPc2NuaXhM2MKJo=
-X-Received: by 2002:a17:907:6e09:b0:78d:a326:49c6 with SMTP id
- sd9-20020a1709076e0900b0078da32649c6mr16637970ejc.507.1666377213305; Fri, 21
- Oct 2022 11:33:33 -0700 (PDT)
+        bh=/G6LFbUeYMFO24FKBVvek1cF9UzLOlkGDVPRHkS0zAY=;
+        b=nzyNiyPYxx6XSdJdrcwOKoibDOb/veMO98mUYjptH7oJgrVnGD8hIPZOiaefVdl2cT
+         7IIHqu3YscUZn/qPrxm1xVsh9QX5U+xUVU0dG37GqJiCxPCJLNpg0QxD7KZVAunfNo/9
+         lcNfPBSY3DZl8wH84de+x8z2pCkxGSVs35BB0fBYRrN+0OSQCPlGtPx1DsWgic9Vhdsf
+         CE/4c/i4Ydj/FdyMIdqNjP5Oj9TqtuzHWEp15SOxph4euB0acSHlXk1i0eAl5KHTWHno
+         /nzc9B5FDzH9MNeEa36W1gisAbQtOGP2DJLZMejkFt9IMS5AY4I9jq05NhfyeNOgbdWo
+         a11A==
+X-Gm-Message-State: ACrzQf0+RiJ3TmJY/ouGK2hWpYbWfO7LxwCX/TNV4PcfKAIgCRH+WQJe
+        2fKbvPRKqFftb/MR7pkbdLibbCb3ZRAUWA==
+X-Google-Smtp-Source: AMsMyM7EPWs+ShRsVXmYTg+a53hB9cUiENnafXWh0Llkzges/ZtwBWrbJJOPp/bOi0r0tBjyXkaOyg==
+X-Received: by 2002:a05:6870:5249:b0:137:2c18:6866 with SMTP id o9-20020a056870524900b001372c186866mr24429669oai.15.1666384957937;
+        Fri, 21 Oct 2022 13:42:37 -0700 (PDT)
+Received: from macondo.. ([2804:431:e7cc:1855:fc19:f361:478a:f673])
+        by smtp.gmail.com with ESMTPSA id z20-20020a056871015400b0011f22e74d5fsm10670933oab.20.2022.10.21.13.42.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Oct 2022 13:42:37 -0700 (PDT)
+From:   Rafael Mendonca <rafaelmendsr@gmail.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Suwan Kim <suwan.kim027@gmail.com>
+Cc:     Rafael Mendonca <rafaelmendsr@gmail.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] virtio_blk: Fix signedness bug in virtblk_prep_rq()
+Date:   Fri, 21 Oct 2022 17:41:26 -0300
+Message-Id: <20221021204126.927603-1-rafaelmendsr@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <Y1EQdafQlKNAsutk@T590> <Y1Ktf2jRTlPMQwJR@kbusch-mbp.dhcp.thefacebook.com>
- <Y1K5Oo7bIRlVTDnb@T590>
-In-Reply-To: <Y1K5Oo7bIRlVTDnb@T590>
-From:   David Jeffery <djeffery@redhat.com>
-Date:   Fri, 21 Oct 2022 14:33:21 -0400
-Message-ID: <CA+-xHTFp+gFVy6aKW2nj47+WY2+1vOLAE-X067C-hm4_8ngA6g@mail.gmail.com>
-Subject: Re: [Bug] double ->queue_rq() because of timeout in ->queue_rq()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, stefanha@redhat.com,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 11:22 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Fri, Oct 21, 2022 at 08:32:31AM -0600, Keith Busch wrote:
-> >
-> > I agree with your idea that this is a lower level driver responsibility:
-> > it should reclaim all started requests before allowing new queuing.
-> > Perhaps the block layer should also raise a clear warning if it's
-> > queueing a request that's already started.
->
-> The thing is that it is one generic issue, lots of VM drivers could be
-> affected, and it may not be easy for drivers to handle the race too.
->
+The virtblk_map_data() function returns negative error codes, however, the
+'nents' field of vbr->sg_table is an unsigned int, which causes the error
+handling not to work correctly.
 
-While virtual systems are a common source of the problem, fully
-preempt kernels (with or without real-time patches) can also trigger
-this condition rather simply with a poorly behaved real-time task. The
-involuntary preemption means the queue_rq call can be stopped to let
-another task run. Poorly behaving tasks claiming the CPU for longer
-than the request timeout when preempting a task in a queue_rq function
-could cause the condition on real or virtual hardware. So it's not
-just VM related drivers that are affected by the race.
+Fixes: 0e9911fa768f ("virtio-blk: support mq_ops->queue_rqs()")
+Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
+---
+ drivers/block/virtio_blk.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-David Jeffery
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 19da5defd734..291f705e61a8 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -321,16 +321,18 @@ static blk_status_t virtblk_prep_rq(struct blk_mq_hw_ctx *hctx,
+ 					struct virtblk_req *vbr)
+ {
+ 	blk_status_t status;
++	int num;
+ 
+ 	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
+ 	if (unlikely(status))
+ 		return status;
+ 
+-	vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
+-	if (unlikely(vbr->sg_table.nents < 0)) {
++	num = virtblk_map_data(hctx, req, vbr);
++	if (unlikely(num < 0)) {
+ 		virtblk_cleanup_cmd(req);
+ 		return BLK_STS_RESOURCE;
+ 	}
++	vbr->sg_table.nents = num;
+ 
+ 	blk_mq_start_request(req);
+ 
+-- 
+2.34.1
 
