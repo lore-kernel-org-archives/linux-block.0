@@ -2,118 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F78CC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 15:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E98C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 15:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230189AbiJUPXA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 11:23:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
+        id S229828AbiJUP0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 11:26:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230229AbiJUPW6 (ORCPT
+        with ESMTP id S229531AbiJUP0n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2022 11:22:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B040227817A
-        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 08:22:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666365775;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rNUtD0qOkGMlGUgfA5NfPqgJZTck3/7w6b9qm8JJosE=;
-        b=IZ2AkvcyjO2KvUzgwZmSkavgnmaiC0DArmpmfAaKJcDBonQNOg1q3c8XioQdNXnN0a/sAN
-        TmWZUDYtu4hG9R4zLntxkMPIn2EYlJpYey1020AKLbA1nqhhgQxaPSVofqkknBqKcbbu4A
-        /NgzXyWpiB150Gn8F8HSpjDfR7+ho4Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-1BqXFHcOPbm4uh747QbAzg-1; Fri, 21 Oct 2022 11:22:47 -0400
-X-MC-Unique: 1BqXFHcOPbm4uh747QbAzg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E03D92823821;
-        Fri, 21 Oct 2022 15:22:45 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 27AEE401E5C;
-        Fri, 21 Oct 2022 15:22:39 +0000 (UTC)
-Date:   Fri, 21 Oct 2022 23:22:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, djeffery@redhat.com,
-        stefanha@redhat.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [Bug] double ->queue_rq() because of timeout in ->queue_rq()
-Message-ID: <Y1K5Oo7bIRlVTDnb@T590>
-References: <Y1EQdafQlKNAsutk@T590>
- <Y1Ktf2jRTlPMQwJR@kbusch-mbp.dhcp.thefacebook.com>
+        Fri, 21 Oct 2022 11:26:43 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859E024BAAC
+        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 08:26:41 -0700 (PDT)
+Received: from frapeml500007.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Mv7Yv6vwYz688NJ;
+        Fri, 21 Oct 2022 23:24:51 +0800 (CST)
+Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
+ frapeml500007.china.huawei.com (7.182.85.172) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 21 Oct 2022 17:26:39 +0200
+Received: from [10.126.168.107] (10.126.168.107) by
+ lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 21 Oct 2022 16:26:38 +0100
+Message-ID: <9346fa37-bbe6-062b-43be-729a0c362dd3@huawei.com>
+Date:   Fri, 21 Oct 2022 16:26:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y1Ktf2jRTlPMQwJR@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: Issue in blk_mq_alloc_request_hctx()
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>, <linux-block@vger.kernel.org>
+References: <b44c42f8-db20-eff8-fba4-07a64ca47918@huawei.com>
+ <65e2a1ec-34b4-cb5b-06f7-410160b8da96@acm.org>
+In-Reply-To: <65e2a1ec-34b4-cb5b-06f7-410160b8da96@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.168.107]
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ lhrpeml500003.china.huawei.com (7.191.162.67)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 08:32:31AM -0600, Keith Busch wrote:
-> On Thu, Oct 20, 2022 at 05:10:13PM +0800, Ming Lei wrote:
-> > @@ -1593,10 +1598,17 @@ static void blk_mq_timeout_work(struct work_struct *work)
-> >  	if (!percpu_ref_tryget(&q->q_usage_counter))
-> >  		return;
-> >  
-> > -	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
-> > +	/* Before walking tags, we must ensure any submit started before the
-> > +	 * current time has finished. Since the submit uses srcu or rcu, wait
-> > +	 * for a synchronization point to ensure all running submits have
-> > +	 * finished
-> > +	 */
-> > +	blk_mq_wait_quiesce_done(q);
-> > +
-> > +	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
+On 21/10/2022 15:54, Bart Van Assche wrote:
+> On 10/21/22 04:16, John Garry wrote:
+>> -    return blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag,
+>> +    rq = blk_mq_rq_ctx_init(&data, blk_mq_tags_from_data(&data), tag,
+>>                       alloc_time_ns);
+>> +    if (!rq)
+>> +        goto out_queue_exit;
+>> +
+>> +    rq->__data_len = 0;
+>> +    rq->__sector = (sector_t) -1;
+>> +    rq->bio = rq->biotail = NULL;
+>> +    return rq;
 > 
-> The blk_mq_wait_quiesce_done() will only wait for tasks that entered
-> just before calling that function. It will not wait for tasks that
-> entered immediately after.
-
-Yeah, but the patch records the jiffies before calling
-blk_mq_wait_quiesce_done, and only time out requests which are timed out
-before the recorded time, so it is fine to use blk_mq_wait_quiesce_done
-in this way.
-
+> Hi John,
 > 
-> If I correctly understand the problem you're describing, the hypervisor
-> may prevent any guest process from running. If so, the timeout work may
-> be stalled after the quiesce, and if a queue_rq() process also stalled
-> after starting quiesce_done(), then we're in the same situation you're
-> trying to prevent, right?
+> Shouldn't the new struct request member initializations be moved into 
+> blk_mq_rq_ctx_init() such that all blk_mq_rq_ctx_init() callers are fixed?
 
-No, the stall just happens on one vCPU, and other vCPUs may run smoothly.
+That would seem reasonable. I just wonder why it was not there in the 
+first place.
 
-1) vmexit, which only stalls one vCPU, some vmexit could come anytime,
-such as external interrupt
+Anyway, I'll look to make that change.
 
-2) vCPU is emulated by pthread usually, and the pthread is just one
-normal host userspace pthread, which can be preempted anytime, and
-the preempt latency could be long enough when the system load is
-heavy.
-
-And it is like random stall added when running any instruction of
-VM kernel code.
-
-> 
-> I agree with your idea that this is a lower level driver responsibility:
-> it should reclaim all started requests before allowing new queuing.
-> Perhaps the block layer should also raise a clear warning if it's
-> queueing a request that's already started.
-
-The thing is that it is one generic issue, lots of VM drivers could be
-affected, and it may not be easy for drivers to handle the race too.
-
-
-
-Thanks,
-Ming
-
+thanks,
+John
