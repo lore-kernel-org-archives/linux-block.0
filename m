@@ -2,119 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C768C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 21:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2831C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 21:12:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbiJUVEv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 17:04:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60634 "EHLO
+        id S229685AbiJUVMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 17:12:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiJUVEu (ORCPT
+        with ESMTP id S229574AbiJUVMP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2022 17:04:50 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27752D1ED;
-        Fri, 21 Oct 2022 14:04:47 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso1286149pjc.0;
-        Fri, 21 Oct 2022 14:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ufCCYZYJTmJF/KoW5M3amrstoH4BcMXNIbfmJhiw4Bg=;
-        b=WCWaYaayvJhFN0nzxYZ8rTHbSJb3QZ8teTfyxYm1ciVC4ozBAjqHfy5axAMQ+Lq1pz
-         wMmHX/otXDp+ixHCVLZitVt/EsirR80dPz75DR/89XspfmMN7qtcsOop1T0ETvSY1ESK
-         duNo6HAR+TD2Z4ee2LnD33fhQNuEeB16NFirodfgKS1WdurxWUvd5yENnrQVhk3YvCWk
-         4JO7UxIDGEXfH5uQLzODMbz9w8rXiJ8WE+ETjtpZCEaovHQE4jB+uXUKjsXpihDskgpa
-         3gZQ8lQ6EJrraUf3tqB7IcM/Qjs+N6bOlr2EMQE5qoAp1Z/DrRwkvXIQKc6yGK+p5CmM
-         /jEw==
+        Fri, 21 Oct 2022 17:12:15 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B87B129CBB1
+        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 14:12:14 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id pq16so3481838pjb.2
+        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 14:12:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ufCCYZYJTmJF/KoW5M3amrstoH4BcMXNIbfmJhiw4Bg=;
-        b=pH8AK0NCJQkHNNJIWrvM+0VdKD0v1OzLxgX168qYyW5BxJQq1acAeDLbJa+Z25hS+A
-         AusLCWOFv4tkHMzU6ro21tx74d54XOReTeDHaimB80kAM8bbntxU9pDCu4P0/EJwYscP
-         PR/y2AW7xGqyLaPzj1MtPaaEgrg843l4+ixZ9zPQ5CPaFjUuqYu2NhsxqFSkc+tMX38o
-         CSyGOPCBDh0Wk94BzwmA19Is8cmHbpvqn58ahnKnvQJ49+CZSdQ+jJrlJ6rcIqq4q6K6
-         tl3Doq9Gpz1LKZ6IQQLW6oDlGuZB1tuXkDWMCpKgu95xHUGiqVTDBGa26uS0ZIZ9vk2I
-         XGBQ==
-X-Gm-Message-State: ACrzQf0ZmZzUimVC/nkf8iTbQNm7Eb0luXBpFjYHmpecINpSLNJfQkIh
-        frJN0yoxq1fn2cV0YzDBc4CVsrHUy51RVHMQ8xQ=
-X-Google-Smtp-Source: AMsMyM5tsrngLoCck9omAqu1bf1kz4Ah2EpMQMR6bhFE6MpEItn2IXmD213rWwn/DZs1vJCr8D+09/EppIvZSTFyUfI=
-X-Received: by 2002:a17:902:d512:b0:181:f1f4:fcb4 with SMTP id
- b18-20020a170902d51200b00181f1f4fcb4mr21208456plg.102.1666386287303; Fri, 21
- Oct 2022 14:04:47 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pcjz87d34ZLL9ZZDYHNrEVpvA2PEjvPMwiSpgcT6SWQ=;
+        b=pubr/h3Ec4P1qa0h/KQK/ZLjxaeRUNKLfrganJ2nwTfWmzXXAOuV08aT8BK14zjgji
+         ZXCpwsUqpjr2mnISJzfJWvua/5lcF5d9LR5uzdVMjuhzduqNoBQObk6AfNqib4h5zLlB
+         FCAhBdoRHSVkUrEoef8hVH2/7URRwo2Zlme4louYHotUWqlTkqQBNd7RQ7+1PpF/vk/m
+         xwDMVNfPSTcOQ3BNnSQcrhDP6hqv1UpTIGGh05NJekZ313WGCYfTe4Q23N/CaAzyxGAR
+         AR07wq08h9UFGQyGosOsdyMb13Opv3xOTNOlsmQJL4sJXhNbkZ4XiY+4cRfy1kgGkDpE
+         wfdA==
+X-Gm-Message-State: ACrzQf2WCuU9j2HnJ+elYWNBNgGAQp6sHHQdaULj3u/3G0dxXDFKjyJA
+        pfmHZ/BXfu3DnumE4Q8lJ20=
+X-Google-Smtp-Source: AMsMyM6yHva/jmanLq8t+P2Y5eaV6hJ0WMqvjtEOki7lZBwAN/QENndu8aDK5QJqKK9mzOdmphwsJw==
+X-Received: by 2002:a17:902:778f:b0:17f:8347:ff83 with SMTP id o15-20020a170902778f00b0017f8347ff83mr20721524pll.146.1666386734082;
+        Fri, 21 Oct 2022 14:12:14 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:3bff:84a:36de:737? ([2620:15c:211:201:3bff:84a:36de:737])
+        by smtp.gmail.com with ESMTPSA id d11-20020a17090ab30b00b00202618f0df4sm278032pjr.0.2022.10.21.14.12.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Oct 2022 14:12:13 -0700 (PDT)
+Message-ID: <a954e484-af67-d41e-38f2-843a945d1de2@acm.org>
+Date:   Fri, 21 Oct 2022 14:12:10 -0700
 MIME-Version: 1.0
-References: <20221005180341.1738796-1-shy828301@gmail.com> <20221005180341.1738796-3-shy828301@gmail.com>
- <20221013123830.opbulq4qad56kuev@techsingularity.net> <CAHbLzkpc+CAfsYe6gXjh=-3MxMH_aWhPMYhic7ddFZgWttOhng@mail.gmail.com>
- <20221017094132.vnanndrwa2yn7qcw@techsingularity.net> <CAHbLzkpmbmtOdOsud-VG+wyk18wFAFnan8T55XxxwkHrnhLCmw@mail.gmail.com>
- <20221021091911.ak3a7a3wr3qcbe3b@techsingularity.net>
-In-Reply-To: <20221021091911.ak3a7a3wr3qcbe3b@techsingularity.net>
-From:   Yang Shi <shy828301@gmail.com>
-Date:   Fri, 21 Oct 2022 14:04:34 -0700
-Message-ID: <CAHbLzkpAX3CGRGsxj4CTsj=atXqPakJe7TSxVvp3KnKmygk=3g@mail.gmail.com>
-Subject: Re: [PATCH 2/4] mm: mempool: introduce page bulk allocator
-To:     Mel Gorman <mgorman@techsingularity.net>
-Cc:     agk@redhat.com, snitzer@kernel.org, dm-devel@redhat.com,
-        akpm@linux-foundation.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH 1/8] block: set the disk capacity to 0 in
+ blk_mark_disk_dead
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chao Leng <lengchao@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20221020105608.1581940-1-hch@lst.de>
+ <20221020105608.1581940-2-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20221020105608.1581940-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 2:19 AM Mel Gorman <mgorman@techsingularity.net> wrote:
->
-> On Tue, Oct 18, 2022 at 11:01:31AM -0700, Yang Shi wrote:
-> > > > Yeah, I didn't think of a better way to pass the pages to dm-crypt.
-> > > >
-> > > > >
-> > > > > How about this
-> > > > >
-> > > > > 1. Add a callback to __alloc_pages_bulk() that takes a page as a
-> > > > >    parameter like bulk_add_page() or whatever.
-> > > > >
-> > > > > 2. For page_list == NULL && page_array == NULL, the callback is used
-> > > > >
-> > > > > 3. Add alloc_pages_bulk_cb() that passes in the name of a callback
-> > > > >    function
-> > > > >
-> > > > > 4. In the dm-crypt case, use the callback to pass the page to bio_add_page
-> > > > >    for the new page allocated.
-> > > >
-> > > > Thank you so much for the suggestion. But I have a hard time
-> > > > understanding how these work together. Do you mean call bio_add_page()
-> > > > in the callback? But bio_add_page() needs other parameters. Or I
-> > > > misunderstood you?
-> > > >
-> > >
-> > > I expected dm-crypt to define the callback. Using bio_add_page
-> > > directly would not work as the bulk allocator has no idea what to pass
-> > > bio_add_page. dm-crypt would likely need to create both a callback and an
-> > > opaque data structure passed as (void *) to track "clone" and "len"
-> >
-> > I see. Yeah, we have to pass the "clone" and "len" to the callback via
-> > pool_data. It should not be hard since dm-crypt already uses
-> > crypt_config to maintain a counter for allocated pages, we should just
-> > need to pass the struct to the callback as a parameter.
-> >
-> > But I'm wondering whether this is worth it or not? Will it make the
-> > code harder to follow?
-> >
->
-> A little because a callback is involved but it's not the only place in the
-> kernel where a callback is used like this and a comment should suffice. It
-> should be faster than list manipulation if nothing else. Mostly, I'm wary
-> of adding the first user of the list interface for the bulk allocator that
-> does not even want a list. If there isn't a user of the list interface
-> that *requires* it, the support will simply be deleted as dead code.
+On 10/20/22 03:56, Christoph Hellwig wrote:
+> +	/* stop buffered writers from dirtying pages that can't written out */
 
-Thanks, I see your point. Will work on the new version to implement
-the callback approach.
+Hi Christoph,
 
->
-> --
-> Mel Gorman
-> SUSE Labs
+If this series is reposted, please insert the missing verb "be" in the 
+above comment.
+
+Thanks,
+
+Bart.
