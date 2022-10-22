@@ -2,92 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EF4C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 06:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32546C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 11:01:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229645AbiJVGD1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Oct 2022 02:03:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41058 "EHLO
+        id S229740AbiJVLBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Oct 2022 07:01:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiJVGD1 (ORCPT
+        with ESMTP id S230498AbiJVLBW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Oct 2022 02:03:27 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6238E2B3AEE;
-        Fri, 21 Oct 2022 23:03:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E98CB601C6;
-        Sat, 22 Oct 2022 06:03:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E12E6C433C1;
-        Sat, 22 Oct 2022 06:03:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666418605;
-        bh=tCXdIEe/bRuPmuD8DZJI7sITbkxpBfee1t0FtUrlE1s=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LGS4FPjZ0GenPE80Ht65ggEck6bgj5dMaBGUbmI1p5KIioZcU/U0B3w+tI1Dn25rx
-         llIng6acUhVuJ/HM4vaBISzwQ0bzbS9XtQmJ0Vcv4gBrkA4Yvn+Z2n4iaDXSOr93lP
-         6kE0ELPCFel8IWbq2XeR8VABeZZKCK5yTtr8p63JXPEROgpP0teOCA5RybzOekIHey
-         WO01JaNbJ4vidygloxS7RXdQaKTXIlWeMJqqphRYpzZR07P/w8/CEUZljrbdPYJwK0
-         sq4K9MbjRVh/iSW4OILqP9q7FbHb8Bp51AV9w0kHCsF0BcDX0ybnQzP/gy7AmQZBK5
-         pdal5+51PPfEA==
-Date:   Fri, 21 Oct 2022 23:03:22 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Russell King <linux@armlinux.org.uk>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Christoph =?UTF-8?B?QsO2aG13YWxkZXI=?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Richard Weinberger <richard@nod.at>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        SeongJae Park <sj@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
-Subject: Re: [PATCH v1 0/5] convert tree to
- get_random_u32_{below,above,between}()
-Message-ID: <20221021230322.00dd045c@kernel.org>
-In-Reply-To: <Y1OD2tdVwQsydSNV@zx2c4.com>
-References: <20221022014403.3881893-1-Jason@zx2c4.com>
-        <20221021205522.6b56fd24@kernel.org>
-        <Y1NwJJOIB4gI5G11@zx2c4.com>
-        <20221021223242.05df0a5b@kernel.org>
-        <Y1OD2tdVwQsydSNV@zx2c4.com>
+        Sat, 22 Oct 2022 07:01:22 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34BD57AC16;
+        Sat, 22 Oct 2022 03:19:45 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MvZlD6Xf5zl5kr;
+        Sat, 22 Oct 2022 16:49:28 +0800 (CST)
+Received: from [10.174.179.14] (unknown [10.174.179.14])
+        by APP4 (Coremail) with SMTP id gCh0CgC3xecSr1NjbLMLAA--.36624S3;
+        Sat, 22 Oct 2022 16:51:32 +0800 (CST)
+Subject: Re: [PATCH v2] block: fix memory leak for elevator on add_disk
+ failure
+To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@lst.de,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yukuai3@huawei.com, yi.zhang@huawei.com
+References: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
+From:   Jason Yan <yanaijie@huaweicloud.com>
+Message-ID: <8c22d055-6285-d5f6-1b83-8b08d39768b2@huaweicloud.com>
+Date:   Sat, 22 Oct 2022 16:51:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: gCh0CgC3xecSr1NjbLMLAA--.36624S3
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUU5i7kC6x804xWl14x267AKxVW8JVW5JwAF
+        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7
+        xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
+        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
+        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxv
+        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
+        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUU
+        U==
+X-CM-SenderInfo: 51dqtxhmlhqx5xdzvxpfor3voofrz/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 22 Oct 2022 07:47:06 +0200 Jason A. Donenfeld wrote:
-> On Fri, Oct 21, 2022 at 10:32:42PM -0700, Jakub Kicinski wrote:
-> > But whatever. I mean - hopefully there aren't any conflicts in the ~50
-> > networking files you touch. I just wish that people didn't pipe up with
-> > the tree wide changes right after the merge window. Feels like the
-> > worst possible timing.  
-> 
-> Oh, if the timing is what makes this especially worrisome, I have
-> no qualms about rebasing much later, and reposting this series then.
-> I'll do that.
 
-Cool, thanks! I promise to not be grumpy if you repost around rc6 :)
+On 2022/10/22 10:16, Yu Kuai wrote:
+> From: Yu Kuai<yukuai3@huawei.com>
+> 
+> The default elevator is allocated in the beginning of device_add_disk(),
+> however, it's not freed in the following error path.
+> 
+> Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
+> Signed-off-by: Yu Kuai<yukuai3@huawei.com>
+> Reviewed-by: Christoph Hellwig<hch@lst.de>
+> ---
+> Changes in v2:
+>   - fix wrong fix tag
+>   - add review tag
+> 
+>   block/genhd.c | 12 ++++++++----
+>   1 file changed, 8 insertions(+), 4 deletions(-)
+
+Reviewed-by: Jason Yan <yanaijie@huawei.com>
+
