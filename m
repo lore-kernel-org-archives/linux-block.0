@@ -2,80 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32546C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 11:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D74C8C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 11:04:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229740AbiJVLBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Oct 2022 07:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51956 "EHLO
+        id S229918AbiJVLEM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Oct 2022 07:04:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230498AbiJVLBW (ORCPT
+        with ESMTP id S231145AbiJVLDZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Oct 2022 07:01:22 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34BD57AC16;
-        Sat, 22 Oct 2022 03:19:45 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MvZlD6Xf5zl5kr;
-        Sat, 22 Oct 2022 16:49:28 +0800 (CST)
-Received: from [10.174.179.14] (unknown [10.174.179.14])
-        by APP4 (Coremail) with SMTP id gCh0CgC3xecSr1NjbLMLAA--.36624S3;
-        Sat, 22 Oct 2022 16:51:32 +0800 (CST)
-Subject: Re: [PATCH v2] block: fix memory leak for elevator on add_disk
- failure
-To:     Yu Kuai <yukuai1@huaweicloud.com>, axboe@kernel.dk, hch@lst.de,
-        ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-References: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
-From:   Jason Yan <yanaijie@huaweicloud.com>
-Message-ID: <8c22d055-6285-d5f6-1b83-8b08d39768b2@huaweicloud.com>
-Date:   Sat, 22 Oct 2022 16:51:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Sat, 22 Oct 2022 07:03:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0A6C140A6;
+        Sat, 22 Oct 2022 03:21:31 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CE36760BBF;
+        Sat, 22 Oct 2022 10:21:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B97FEC433D6;
+        Sat, 22 Oct 2022 10:21:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1666434090;
+        bh=4VayhwOVTKVAjPqqz97sF96LRLG+KRcajksLHZHtUxk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=wOx3mp5ksWJtvhNhAOmZUG8X3+HuRkTdY9Nc7h6cWFEIxsW4svt4t9REDVX0plI4T
+         0jvG2TdFgRx98jdox1K2bPVjxSRKOYymF+6X8vmbsIcB0hIMeoD9P7/9qN6LIAT+Ko
+         fQekZTeUTocY/mdL9wRqCZaeHaw+pLcmNqIWDT+k=
+Date:   Sat, 22 Oct 2022 12:21:27 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: Re: [PATCH v1 0/5] convert tree to
+ get_random_u32_{below,above,between}()
+Message-ID: <Y1PEJxnlY7dh4yK8@kroah.com>
+References: <20221022014403.3881893-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-In-Reply-To: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID: gCh0CgC3xecSr1NjbLMLAA--.36624S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUU5i7kC6x804xWl14x267AKxVW8JVW5JwAF
-        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWUuVWrJwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
-        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
-        wVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7
-        xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40E
-        FcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr
-        0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxv
-        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1zuWJUUUU
-        U==
-X-CM-SenderInfo: 51dqtxhmlhqx5xdzvxpfor3voofrz/
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221022014403.3881893-1-Jason@zx2c4.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 2022/10/22 10:16, Yu Kuai wrote:
-> From: Yu Kuai<yukuai3@huawei.com>
+On Fri, Oct 21, 2022 at 09:43:58PM -0400, Jason A. Donenfeld wrote:
+> Hey everyone,
 > 
-> The default elevator is allocated in the beginning of device_add_disk(),
-> however, it's not freed in the following error path.
+> Here's the second and final tranche of tree-wide conversions to get
+> random integer handling a bit tamer. It's predominantly another
+> Coccinelle-based patchset.
 > 
-> Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
-> Signed-off-by: Yu Kuai<yukuai3@huawei.com>
-> Reviewed-by: Christoph Hellwig<hch@lst.de>
-> ---
-> Changes in v2:
->   - fix wrong fix tag
->   - add review tag
+> First we s/prandom_u32_max/get_random_u32_below/, since the former is
+> just a deprecated alias for the latter. Then in the next commit we can
+> remove prandom_u32_max all together. I'm quite happy about finally being
+> able to do that. It means that prandom.h is now only for deterministic and 
+> repeatable randomness, not non-deterministic/cryptographic randomness.
+> That line is no longer blurred.
 > 
->   block/genhd.c | 12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
+> Then, in order to clean up a bunch of inefficient patterns, we introduce
+> two trivial static inline helper functions built on top of
+> get_random_u32_below: get_random_u32_above and get_random_u32_between.
+> These are pretty straight forward to use and understand. Then the final
+> two patches convert some gnarly open-coded number juggling to use these
+> helpers.
+> 
+> I've used Coccinelle for all the treewide patches, so hopefully review
+> is rather uneventful. I didn't accept all of the changes that Coccinelle
+> proposed, though, as these tend to be somewhat context-specific. I erred
+> on the side of just going with the most obvious cases, at least this
+> time through. And then we can address more complicated cases through
+> actual maintainer trees.
+> 
+> Since get_random_u32_below() sits in my random.git tree, these patches
+> too will flow through that same tree.
+> 
+> Regards,
+> Jason
 
-Reviewed-by: Jason Yan <yanaijie@huawei.com>
 
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
