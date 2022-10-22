@@ -2,156 +2,295 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDEEC38A2D
-	for <linux-block@archiver.kernel.org>; Fri, 21 Oct 2022 23:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C74C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 01:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbiJUX5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 19:57:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36280 "EHLO
+        id S229608AbiJVBof (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 21:44:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbiJUX5C (ORCPT
+        with ESMTP id S229460AbiJVBod (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2022 19:57:02 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6610F28F273
-        for <linux-block@vger.kernel.org>; Fri, 21 Oct 2022 16:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1666396621; x=1697932621;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=sP6CQwrqogta/W/PytrGJI9bLlX38lInKS3K8cskhzA=;
-  b=A3Vhm5jmaRqe3ZwYR6eh7RgF6wl9sNuwvR0NlLej0JDQ+I8+9JiTdeo1
-   qct08KMAofPlZCyB0PAa3wmweLP8HKbgaTbf8FQ+vfBd3dhkFfWM4YGyw
-   0v+eCOMyOEQQGJ87vjnm4UzfmDnlzf7RyURfcpeq8YzGTK1Ul3Vjic0SQ
-   vymU9T4wDS0fNzJ9W43jc8GTGMRiPL9xcaj/hkjVAh5b9l4yLzpHLjA8m
-   oIFMtSPhM6DYC2sA1YaDeclSqbaKnzCoAyQJ8kbZbSP9qSG8wt4JFtY57
-   SDD6bkfB+LKC3J8AmaF/+EfnHPyau4KfyVNJRRnFUTF5Lj/HcaxVOkqdL
-   A==;
-X-IronPort-AV: E=Sophos;i="5.95,203,1661788800"; 
-   d="scan'208";a="214845386"
-Received: from mail-dm6nam04lp2040.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.40])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Oct 2022 07:56:59 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cqxpl/nSyp0MR6bfVA2HhufRAvRBK/rP1siOGn9h1YpyUtN3XotZkI71i5LuJcXwNui2AVQxSO2RFmhEyVm4U11gauHNhskAd7TFHAYfvOcRwy6U98yCm1PuSedChBHRMsOkir/GW99YB753z1yrmMsFPDLzb98bGtsUBGUI7QMGink6NFZ8M7DKOsR7qjLy7PJl+bK5GRLlE8KEoE7i1uUDW1IKCWlLNfNrOb+JAAuG9dkXc/9bLZbPw+yjoYcoKT6tnpSEk4XLH3ZmUTAqsIFHB7G0GNH7NfWp5Pf8VmY59IJatcjqnZ42V+oxWQbC1ZaOC/r5kBM1VZi8tS3mQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sP6CQwrqogta/W/PytrGJI9bLlX38lInKS3K8cskhzA=;
- b=Lx3Y5MfpDA+rEXzrUSO8+XIesDMq0mIdt7CUTFEp9N2KybTCxelNop3Xq4q4/rhGKXUoecWZyg5Ov1ZCSWx5aljK8A+cXpPUYgn/aUAig1IapDJ/2khEgvzvP+EIHn7J9Hp2eKa2mO34r3Xa/YJsC3tBhIxKVXQWMcxo2an8VbkmOnjq5YcmRABVePQLnlg7Zlr6rPfvIx969NH4I7NNJ6uFBYO9a6umJhx+N1JLKMkg/cv34uderrIuLq5dg9/TLtR+Kun3+SFjhK5SXAsOZw+755BLm/gs2LSj6c2lsGecc7xTtuv85rx33hUbYbdGGJpLdpWTP1kF7euq638Qnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sP6CQwrqogta/W/PytrGJI9bLlX38lInKS3K8cskhzA=;
- b=x39XBWIHAfc/+NZ743g2QIPaLVn7vAqW/Imhbyp81cuZ87ch6ubABBfMcRJuFBTFLPyUyhTHWEocZFPrIYf9RbtLBDOhx7aGP8P9t1p6R5rJmAKd9XyIegKEihoYXSHuVh8kh1qBPMAP9ShGCSQd1LeuQsNUl7a9Z+cd8VymJzw=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SJ0PR04MB7663.namprd04.prod.outlook.com (2603:10b6:a03:324::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Fri, 21 Oct
- 2022 23:56:57 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::d4b9:86e9:4fc8:d6e0%5]) with mapi id 15.20.5746.021; Fri, 21 Oct 2022
- 23:56:57 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-CC:     Eric Sandeen <sandeen@sandeen.net>, Yi Zhang <yi.zhang@redhat.com>,
-        "logang@deltatee.com" <logang@deltatee.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] common/xfs: ignore the 32M log size during
- mkfs.xfs
-Thread-Topic: [PATCH blktests] common/xfs: ignore the 32M log size during
- mkfs.xfs
-Thread-Index: AQHY43l6J1B4S//4t0qObxFCSR9tRq4VPZSAgACG/YCAAFOEAIACd3OAgADVjYCAACWRAA==
-Date:   Fri, 21 Oct 2022 23:56:57 +0000
-Message-ID: <20221021235656.fxl7k4x3zjbbaiul@shindev>
-References: <20221019051244.810755-1-yi.zhang@redhat.com>
- <122cec5e-5374-e98f-a8e7-b063d9c413fc@nvidia.com>
- <306b38d1-3098-91e0-9ddc-f4a8660fa386@sandeen.net>
- <d3688d8d-bcf7-9cbf-7c99-74cb1a05a9dc@nvidia.com>
- <20221021085809.zkzw23ewnv6ul3b4@shindev>
- <0f2957e1-2b05-73ec-85b1-91cb643ccb54@nvidia.com>
-In-Reply-To: <0f2957e1-2b05-73ec-85b1-91cb643ccb54@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM8PR04MB8037:EE_|SJ0PR04MB7663:EE_
-x-ms-office365-filtering-correlation-id: 1bbedfa5-0f0b-4406-76a8-08dab3bff006
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +r1n6XmBSQ/hJfcpFiUXQwTgwb4XhtZdlkgy7qi5JoeEw1WgZW9P0zDt7pBSh1KLpwsiDmTqZzXyLQm8AfHhmv1ck15yZ8rW871dTe6A9+PlQa/kMOr1pWLDKf1d3gV6AEBT1WLDqbP5qdu8/QENdBSE+PKt8NFUIwsqJ+qmsltHWQ1wklMOQh06IzSL5SPt9C7Pe3dEO8dZUm/fBS71FmPcnV70XZkCZdwxrgv3XzqR0HXj7/bmHycurJA2bo5jIDqh71i1/dsDF4iRJAcrd+MWHPu55zD+uDF09PKQG/OBZ3sVIyf1xbiQChkGTJTdXVZ1ksTK/9NUMzcEzxEIDkqYDwT5gM7T+V5CxZ7kq4JWp9aglDJovASkwLo39ADi9eKHPAiT8Us9GIfWFTXQlLEDeCGdjOuAzRzKN8DAnSOuTQ7f8l0kC6rLgMqCeIJRgEmn7tfxDu5lb5+hSvDiH+X0S4e9UtI3j9XR2WD8E+nUzmyd7bYuoPlbfeFQcXyyGmwEvoW2QlyEjs4W3QdJkq/hxIHtZIcAoiiPV55nIEzak81mT3Lgp1YW0BRpNyJAWW4ypCepNf3DrCUqaYrWs4Pd36Je/bWAU5lpcr/sPFXX56rYNu5guqNsYlVRYAnLQSzz4/tngP0RQ66NnJ/l2s4WoPOyZ990H3z3pXiDbbkM5YurupxFd1M/Y3wVkU95FKFghUmicixsQ7gfmS8JcU9ec9ctFCfykFR6ikVH0x02MDhTmlta8mDFqDkDdqClob4ZKi6kKGcuSlc7kkMFkw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(7916004)(346002)(136003)(396003)(376002)(39860400002)(366004)(451199015)(6916009)(71200400001)(478600001)(122000001)(38070700005)(6486002)(33716001)(4326008)(76116006)(66946007)(82960400001)(91956017)(8676002)(4744005)(66476007)(64756008)(66556008)(44832011)(86362001)(66446008)(26005)(6506007)(38100700002)(316002)(8936002)(186003)(54906003)(9686003)(2906002)(41300700001)(5660300002)(1076003)(6512007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+zoZIrk3XCNaONX158XIanf3L2SXRPTaVfwUJjZbgrDkUlPxMmlWJAnOB08p?=
- =?us-ascii?Q?FLB82N1lqMKjyDsx9aHdmkNVjMQU0TD59RwDgyOAeGFTVIor6lfyI6yzh9N2?=
- =?us-ascii?Q?Z7t2BU5P2fzJwHfK47Lzhgw99XoFGIJYzJiVfeIdiLOFL+ZbYkRYPpik1DGD?=
- =?us-ascii?Q?VodlGkcOw0b2sk7UOAydOHmryW5FsGdVTAZnHeEUHEPFYdkeNGmwFMVtz8kQ?=
- =?us-ascii?Q?CO9Z8/AM0u5DF1whpbZV13gaC4lnfGMbNldPKVH+5xyhH9H3zp5+NVY+nLP8?=
- =?us-ascii?Q?BjZZNCnq7P9vNM6KdNXdSXvuUotdV0OYh2v1ZNTR7SkJNzqIHS7r+bWtL6cx?=
- =?us-ascii?Q?paxqA1IXq9NDrvZWcAGZBwlTYZEpshMrGxzdfcCsDdgXdgHzI3U18aDjJy4V?=
- =?us-ascii?Q?uwfCgFDjE1aiPFx+rg3JLAeWtAiQD7nfY0CUE778p8mtGcBWy0FHkPebtFyu?=
- =?us-ascii?Q?kOr9AwsflOO21nxyPAS7Oq0zDxjpB9eZGarJGqUsEMegIC6rGdM3XLUbKtJr?=
- =?us-ascii?Q?Xmm+o4orLLHtAXJM8pp+MMwICDCEFG/OnJuyvlqI2CCoL7sPJ1D8ujn/zwB3?=
- =?us-ascii?Q?g9L/3i/9AJbuPkDxTj9nYjoEGp+2aUSEeDoLErnQjxGDDwQ6sKW1Ks23HI3t?=
- =?us-ascii?Q?piSNyYi82J1YvhY3IgrYN3CPqPfxewxCvwoP38aiFFcTiBE1WfP/BYGWd79O?=
- =?us-ascii?Q?b3T7XDr8LKsP1hx/hErOgeBG6KxeMDhc1ieETI5nX8F1Vky6FP9ApS8iE6En?=
- =?us-ascii?Q?AlFSG7CQ99Ulan9GQFrGrXmEFHFBeeX35BaT9xJ56DO/eb4LJwOQrhOe0DpY?=
- =?us-ascii?Q?SQv1DTPUxpbtLZi+HYoe2YPClfO0Sg9ZLP2l5KuddXV26J6RZ3aO44PL4Fkr?=
- =?us-ascii?Q?Xe+hnzsYbMNWwVnRLccKGdUkXN9JaJ8nq0r//cyWUsy83rFi6ef3GXaHRTO7?=
- =?us-ascii?Q?rCdlz1A9eCp6JFwwwCZmggKyP7GhcWtQ+1+bI/yNGvzBKUJEDtYI1r8KBct7?=
- =?us-ascii?Q?Yv0cIaBkmN3VfeDcQZhoPr0fgKkm/sJo+1i7yPRd4b8CDLT7h/2SeJBNb5Bt?=
- =?us-ascii?Q?QLleWN2gS4BrwMml1od/S2rdOxSlelru/Yo6wnvaVYZj+kdbv09mkZANmFDM?=
- =?us-ascii?Q?6tnxpH0pt+e9g1TnjFcCzEuGvGriEVNtEQiLygRfP8NcDNYV4N1jXNLFwaY7?=
- =?us-ascii?Q?bQUBMh5dFysHFbOIhrEiJCmaIffBq2veU6fcI0wsGPu2pgzkExv0y6LK9Ijz?=
- =?us-ascii?Q?TlV9Bw81kogYAo2Q4D5qiqM9pgwsq2a1EscQwwyVnzpx+5mketzVxCmFoV/m?=
- =?us-ascii?Q?xAmO6tdn72cHd9x8YyKYRy7lzxZEcY7hstNAfos5BvPo4F2esamAyZrQ3mJs?=
- =?us-ascii?Q?N9bySaIfzm4+Jof28Z6lYbfa7OxFEgbrJh+DP6qrRs2brkYqlJK3LbZwH3uQ?=
- =?us-ascii?Q?HT+TqDTJBn1eBaijRX3cGy3pjnSr3nH5LmcFUYGGRVzoHKtycfwnGHeF0ocM?=
- =?us-ascii?Q?3eCrC8fcm69N4Pd+jKBRphuDF4iifKdSdcGBxvOyB1fM5dYN29Go1we9hPq8?=
- =?us-ascii?Q?CvmoWXAyVNd3vaSbw++05q2zcf/yZbIfPAjZj8Lcomxkra341g+aZ6Y04Tio?=
- =?us-ascii?Q?Gtczm9AA3lXLV8UsZkrt36w=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <45A5D3A09CFC574CA45E04346F07AE03@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 21 Oct 2022 21:44:33 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192895F4A;
+        Fri, 21 Oct 2022 18:44:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4F4F7B82DBA;
+        Sat, 22 Oct 2022 01:44:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0EE0C433D6;
+        Sat, 22 Oct 2022 01:44:21 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="RKXib5Vl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1666403058;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=MoqRTfm9IB8FgPaOUAJRCt6whwpoPY6P6DzU4oQAino=;
+        b=RKXib5Vl1apeqvXSkeHuSjzGVJcpdoYt/8OAwj7E4ekShqhA/prDPzbcZ3L8EURFJsnCT+
+        VCpgWDuEXVi4KUAlPXmdTapzdA6cjXUVNdUGqKO0UKQGAT4o94LRapJolzjCdwBIIXx41V
+        8R1b7nFrQ3AUcsbIp6ZnzrkcuAw5BG0=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 42623445 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sat, 22 Oct 2022 01:44:17 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Kees Cook <keescook@chromium.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Theodore Ts'o <tytso@mit.edu>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        SeongJae Park <sj@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Helge Deller <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: [PATCH v1 0/5] convert tree to get_random_u32_{below,above,between}()
+Date:   Fri, 21 Oct 2022 21:43:58 -0400
+Message-Id: <20221022014403.3881893-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1bbedfa5-0f0b-4406-76a8-08dab3bff006
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2022 23:56:57.3114
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZrdcSiAFyCbv4RSAnpoh/j1zrVkt+4/youkiWITriGHTT7Dq2xQ9g61VfguNymquqHOElz4cQeetQhfm3EoXrUrMa1L+bgruoTAJMgTJHOk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7663
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Oct 21, 2022 / 21:42, Chaitanya Kulkarni wrote:
+Hey everyone,
 
-...
+Here's the second and final tranche of tree-wide conversions to get
+random integer handling a bit tamer. It's predominantly another
+Coccinelle-based patchset.
 
-> I think creating a minimal setup is a part of the testcase and we should=
-=20
-> not change it, unless there is a explicit reason for doing so.
+First we s/prandom_u32_max/get_random_u32_below/, since the former is
+just a deprecated alias for the latter. Then in the next commit we can
+remove prandom_u32_max all together. I'm quite happy about finally being
+able to do that. It means that prandom.h is now only for deterministic and 
+repeatable randomness, not non-deterministic/cryptographic randomness.
+That line is no longer blurred.
 
-I see, I find no reason to change the "minimal log size policy". Let's go w=
-ith
-64MB log size to keep it.
+Then, in order to clean up a bunch of inefficient patterns, we introduce
+two trivial static inline helper functions built on top of
+get_random_u32_below: get_random_u32_above and get_random_u32_between.
+These are pretty straight forward to use and understand. Then the final
+two patches convert some gnarly open-coded number juggling to use these
+helpers.
 
-Yi, would you mind reposting v2 with size=3D64m?
+I've used Coccinelle for all the treewide patches, so hopefully review
+is rather uneventful. I didn't accept all of the changes that Coccinelle
+proposed, though, as these tend to be somewhat context-specific. I erred
+on the side of just going with the most obvious cases, at least this
+time through. And then we can address more complicated cases through
+actual maintainer trees.
 
---=20
-Shin'ichiro Kawasaki=
+Since get_random_u32_below() sits in my random.git tree, these patches
+too will flow through that same tree.
+
+Regards,
+Jason
+
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Andreas Dilger <adilger.kernel@dilger.ca>
+Cc: Jaegeuk Kim <jaegeuk@kernel.org>
+Cc: Richard Weinberger <richard@nod.at>
+Cc: Darrick J. Wong <djwong@kernel.org>
+Cc: SeongJae Park <sj@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Helge Deller <deller@gmx.de>
+Cc: netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: loongarch@lists.linux.dev
+Cc: linux-mips@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-mmc@vger.kernel.org
+Cc: linux-parisc@vger.kernel.org
+
+Jason A. Donenfeld (5):
+  treewide: use get_random_u32_below() instead of deprecated function
+  prandom: remove prandom_u32_max()
+  random: add helpers for random numbers with given floor or range
+  treewide: use get_random_u32_{above,below}() instead of manual loop
+  treewide: use get_random_u32_between() when possible
+
+ arch/arm/kernel/process.c                     |  2 +-
+ arch/arm64/kernel/process.c                   |  2 +-
+ arch/loongarch/kernel/process.c               |  2 +-
+ arch/loongarch/kernel/vdso.c                  |  2 +-
+ arch/mips/kernel/process.c                    |  2 +-
+ arch/mips/kernel/vdso.c                       |  2 +-
+ arch/parisc/kernel/vdso.c                     |  2 +-
+ arch/powerpc/crypto/crc-vpmsum_test.c         |  4 +-
+ arch/powerpc/kernel/process.c                 |  2 +-
+ arch/s390/kernel/process.c                    |  2 +-
+ arch/s390/kernel/vdso.c                       |  2 +-
+ arch/sparc/vdso/vma.c                         |  2 +-
+ arch/um/kernel/process.c                      |  2 +-
+ arch/x86/entry/vdso/vma.c                     |  2 +-
+ arch/x86/kernel/module.c                      |  2 +-
+ arch/x86/kernel/process.c                     |  2 +-
+ arch/x86/mm/pat/cpa-test.c                    |  4 +-
+ crypto/rsa-pkcs1pad.c                         |  2 +-
+ crypto/testmgr.c                              | 86 +++++++++----------
+ drivers/block/drbd/drbd_receiver.c            |  4 +-
+ drivers/bus/mhi/host/internal.h               |  2 +-
+ drivers/dma-buf/st-dma-fence-chain.c          |  6 +-
+ .../gpu/drm/i915/gem/i915_gem_execbuffer.c    |  2 +-
+ .../drm/i915/gt/intel_execlists_submission.c  |  2 +-
+ drivers/gpu/drm/i915/intel_memory_region.c    |  4 +-
+ drivers/infiniband/core/cma.c                 |  2 +-
+ drivers/infiniband/hw/cxgb4/id_table.c        |  4 +-
+ drivers/infiniband/hw/hns/hns_roce_ah.c       |  5 +-
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  2 +-
+ drivers/md/bcache/request.c                   |  2 +-
+ drivers/media/common/v4l2-tpg/v4l2-tpg-core.c |  8 +-
+ .../media/test-drivers/vidtv/vidtv_demod.c    |  8 +-
+ .../test-drivers/vivid/vivid-kthread-cap.c    |  2 +-
+ .../test-drivers/vivid/vivid-kthread-out.c    |  2 +-
+ .../media/test-drivers/vivid/vivid-radio-rx.c |  4 +-
+ .../media/test-drivers/vivid/vivid-sdr-cap.c  |  2 +-
+ .../test-drivers/vivid/vivid-touch-cap.c      |  2 +-
+ drivers/mmc/core/core.c                       |  4 +-
+ drivers/mmc/host/dw_mmc.c                     |  2 +-
+ drivers/mtd/nand/raw/nandsim.c                |  4 +-
+ drivers/mtd/tests/mtd_nandecctest.c           | 10 +--
+ drivers/mtd/tests/stresstest.c                |  8 +-
+ drivers/mtd/ubi/debug.c                       |  2 +-
+ drivers/mtd/ubi/debug.h                       |  6 +-
+ drivers/net/ethernet/broadcom/cnic.c          |  2 +-
+ .../chelsio/inline_crypto/chtls/chtls_io.c    |  4 +-
+ drivers/net/phy/at803x.c                      |  2 +-
+ drivers/net/team/team_mode_random.c           |  2 +-
+ drivers/net/wireguard/selftest/allowedips.c   | 20 ++---
+ drivers/net/wireguard/timers.c                |  4 +-
+ .../broadcom/brcm80211/brcmfmac/p2p.c         |  2 +-
+ .../net/wireless/intel/iwlwifi/mvm/mac-ctxt.c |  2 +-
+ drivers/pci/p2pdma.c                          |  2 +-
+ drivers/s390/scsi/zfcp_fc.c                   |  2 +-
+ drivers/scsi/fcoe/fcoe_ctlr.c                 |  4 +-
+ drivers/scsi/qedi/qedi_main.c                 |  2 +-
+ drivers/scsi/scsi_debug.c                     |  6 +-
+ fs/ceph/inode.c                               |  2 +-
+ fs/ceph/mdsmap.c                              |  2 +-
+ fs/ext2/ialloc.c                              |  2 +-
+ fs/ext4/ialloc.c                              |  2 +-
+ fs/ext4/mmp.c                                 |  8 +-
+ fs/ext4/super.c                               |  5 +-
+ fs/f2fs/gc.c                                  |  2 +-
+ fs/f2fs/segment.c                             |  8 +-
+ fs/ubifs/debug.c                              |  8 +-
+ fs/ubifs/lpt_commit.c                         | 14 +--
+ fs/ubifs/tnc_commit.c                         |  2 +-
+ fs/xfs/libxfs/xfs_alloc.c                     |  2 +-
+ fs/xfs/libxfs/xfs_ialloc.c                    |  2 +-
+ fs/xfs/xfs_error.c                            |  2 +-
+ include/linux/damon.h                         |  2 +-
+ include/linux/nodemask.h                      |  2 +-
+ include/linux/prandom.h                       |  6 --
+ include/linux/random.h                        | 24 ++++++
+ kernel/bpf/core.c                             |  4 +-
+ kernel/kcsan/selftest.c                       |  4 +-
+ kernel/locking/test-ww_mutex.c                |  4 +-
+ kernel/time/clocksource.c                     |  2 +-
+ lib/fault-inject.c                            |  2 +-
+ lib/find_bit_benchmark.c                      |  4 +-
+ lib/kobject.c                                 |  2 +-
+ lib/reed_solomon/test_rslib.c                 |  6 +-
+ lib/sbitmap.c                                 |  4 +-
+ lib/test-string_helpers.c                     |  2 +-
+ lib/test_fprobe.c                             |  5 +-
+ lib/test_hexdump.c                            | 10 +--
+ lib/test_kprobes.c                            |  5 +-
+ lib/test_list_sort.c                          |  2 +-
+ lib/test_printf.c                             |  2 +-
+ lib/test_rhashtable.c                         |  4 +-
+ lib/test_vmalloc.c                            |  8 +-
+ mm/kasan/kasan_test.c                         |  6 +-
+ mm/kfence/core.c                              |  4 +-
+ mm/kfence/kfence_test.c                       |  4 +-
+ mm/slub.c                                     |  2 +-
+ mm/swapfile.c                                 |  5 +-
+ net/802/garp.c                                |  2 +-
+ net/802/mrp.c                                 |  2 +-
+ net/batman-adv/bat_iv_ogm.c                   |  4 +-
+ net/batman-adv/bat_v_elp.c                    |  2 +-
+ net/batman-adv/bat_v_ogm.c                    |  4 +-
+ net/batman-adv/network-coding.c               |  2 +-
+ net/bluetooth/mgmt.c                          |  5 +-
+ net/can/j1939/socket.c                        |  2 +-
+ net/can/j1939/transport.c                     |  2 +-
+ net/ceph/mon_client.c                         |  2 +-
+ net/ceph/osd_client.c                         |  2 +-
+ net/core/neighbour.c                          |  4 +-
+ net/core/pktgen.c                             | 37 ++++----
+ net/core/stream.c                             |  2 +-
+ net/ipv4/icmp.c                               |  2 +-
+ net/ipv4/igmp.c                               |  6 +-
+ net/ipv4/inet_connection_sock.c               |  2 +-
+ net/ipv4/inet_hashtables.c                    |  2 +-
+ net/ipv4/route.c                              |  4 +-
+ net/ipv4/tcp_bbr.c                            |  2 +-
+ net/ipv4/tcp_input.c                          |  3 +-
+ net/ipv6/addrconf.c                           |  8 +-
+ net/ipv6/mcast.c                              | 10 +--
+ net/ipv6/output_core.c                        |  8 +-
+ net/ipv6/route.c                              |  2 +-
+ net/netfilter/ipvs/ip_vs_twos.c               |  4 +-
+ net/netfilter/nf_conntrack_core.c             |  4 +-
+ net/netfilter/nf_nat_helper.c                 |  2 +-
+ net/netlink/af_netlink.c                      |  2 +-
+ net/packet/af_packet.c                        |  4 +-
+ net/sched/act_gact.c                          |  2 +-
+ net/sched/act_sample.c                        |  2 +-
+ net/sched/sch_choke.c                         |  2 +-
+ net/sched/sch_netem.c                         |  4 +-
+ net/sctp/socket.c                             |  2 +-
+ net/sctp/transport.c                          |  2 +-
+ net/sunrpc/cache.c                            |  2 +-
+ net/sunrpc/xprtsock.c                         |  2 +-
+ net/tipc/socket.c                             |  2 +-
+ net/vmw_vsock/af_vsock.c                      |  3 +-
+ net/xfrm/xfrm_state.c                         |  2 +-
+ 138 files changed, 309 insertions(+), 318 deletions(-)
+
+-- 
+2.38.1
