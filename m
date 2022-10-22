@@ -2,117 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A4CC38A2D
-	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 01:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA26C38A2D
+	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 01:55:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229613AbiJVByW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Oct 2022 21:54:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56040 "EHLO
+        id S229491AbiJVBz0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Oct 2022 21:55:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbiJVByV (ORCPT
+        with ESMTP id S230033AbiJVBzO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Oct 2022 21:54:21 -0400
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911692CDEB;
-        Fri, 21 Oct 2022 18:54:18 -0700 (PDT)
+        Fri, 21 Oct 2022 21:55:14 -0400
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C2AA8364;
+        Fri, 21 Oct 2022 18:55:03 -0700 (PDT)
 Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4MvPTM4YpNzKFt3;
-        Sat, 22 Oct 2022 09:51:51 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP4 (Coremail) with SMTP id gCh0CgBHWTBGTVNjcFznAA--.52S4;
-        Sat, 22 Oct 2022 09:54:16 +0800 (CST)
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MvPVF6Y8gz6PpbZ;
+        Sat, 22 Oct 2022 09:52:37 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgAXCzJzTVNjK2PnAA--.224S3;
+        Sat, 22 Oct 2022 09:55:01 +0800 (CST)
+Subject: Re: [PATCH -next] block: fix memory leak for elevator on add_disk
+ failure
+To:     Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     hch@lst.de, axboe@kernel.dk, damien.lemoal@wdc.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221021033950.3913764-1-yukuai1@huaweicloud.com>
+ <Y1IWTOO1RUIOZJQN@T590>
 From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     axboe@kernel.dk, hch@lst.de, ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH v2] block: fix memory leak for elevator on add_disk failure
-Date:   Sat, 22 Oct 2022 10:16:15 +0800
-Message-Id: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
+Message-ID: <716cbd61-2567-5a02-59f1-936e0960077b@huaweicloud.com>
+Date:   Sat, 22 Oct 2022 09:54:59 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <Y1IWTOO1RUIOZJQN@T590>
+Content-Type: text/plain; charset=gbk; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgBHWTBGTVNjcFznAA--.52S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF4kXFyUuFWxWw1ftFyDGFg_yoW8CF4fpr
-        s8Z3s0grWDWr4UWF1jqa17JFy5Cw1kGr93WFW3Gr1a9wnakFsFva4UKa15Way5ArZ3Xan7
-        XFWxGFy0gF18Aw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUyG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij64vI
-        r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-        xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-        cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-        AvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
-        xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUUU==
+X-CM-TRANSID: gCh0CgAXCzJzTVNjK2PnAA--.224S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrArW8ZFyUCw4kZF4rXrW5ZFb_yoWxXrX_Za
+        yvv397Gwn0qr4ay347KFyUXFW2gF4rGrW7JryxXFyfXFW0ka1Y9w4vk34Dua1xJr4UCan0
+        yr15ZF47Zr15KjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
+        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+        W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Gr0_Zr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+        IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
+        U==
 X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+ÔÚ 2022/10/21 11:47, Ming Lei Ð´µÀ:
+> On Fri, Oct 21, 2022 at 11:39:50AM +0800, Yu Kuai wrote:
+>> From: Yu Kuai <yukuai3@huawei.com>
+>>
+>> The default elevator is allocated in the begining of device_add_disk(),
+>> however, it's not freed in the following error path.
+>>
+>> Fixes: 737eb78e82d5 ("block: Delay default elevator initialization")
+> 
+> Originally elevator can be teardown in disk release, or queue release
+> earlier time, so the fixes tag should be:
+> 
+> Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
 
-The default elevator is allocated in the beginning of device_add_disk(),
-however, it's not freed in the following error path.
+You're right! Thanks for the notice, I'll send a new version.
 
-Fixes: 50e34d78815e ("block: disable the elevator int del_gendisk")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
----
-Changes in v2:
- - fix wrong fix tag
- - add review tag
-
- block/genhd.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index b3d04e79e854..fea319c8f99e 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -437,9 +437,10 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 	 * Otherwise just allocate the device numbers for both the whole device
- 	 * and all partitions from the extended dev_t space.
- 	 */
-+	ret = -EINVAL;
- 	if (disk->major) {
- 		if (WARN_ON(!disk->minors))
--			return -EINVAL;
-+			goto out_exit_elevator;
- 
- 		if (disk->minors > DISK_MAX_PARTS) {
- 			pr_err("block: can't allocate more than %d partitions\n",
-@@ -447,14 +448,14 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 			disk->minors = DISK_MAX_PARTS;
- 		}
- 		if (disk->first_minor + disk->minors > MINORMASK + 1)
--			return -EINVAL;
-+			goto out_exit_elevator;
- 	} else {
- 		if (WARN_ON(disk->minors))
--			return -EINVAL;
-+			goto out_exit_elevator;
- 
- 		ret = blk_alloc_ext_minor();
- 		if (ret < 0)
--			return ret;
-+			goto out_exit_elevator;
- 		disk->major = BLOCK_EXT_MAJOR;
- 		disk->first_minor = ret;
- 	}
-@@ -571,6 +572,9 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- out_free_ext_minor:
- 	if (disk->major == BLOCK_EXT_MAJOR)
- 		blk_free_ext_minor(disk->first_minor);
-+out_exit_elevator:
-+	if (disk->queue->elevator)
-+		elevator_exit(disk->queue);
- 	return ret;
- }
- EXPORT_SYMBOL(device_add_disk);
--- 
-2.31.1
+Kuai
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
 
