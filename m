@@ -2,83 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39208C04A95
-	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 15:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E75AC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 18:44:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229631AbiJVPgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Oct 2022 11:36:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34282 "EHLO
+        id S229497AbiJVSos (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Oct 2022 14:44:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbiJVPgx (ORCPT
+        with ESMTP id S229491AbiJVSor (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Oct 2022 11:36:53 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D33927173;
-        Sat, 22 Oct 2022 08:36:52 -0700 (PDT)
-Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MvljN1C7qz67Q9H;
-        Sat, 22 Oct 2022 23:33:28 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 22 Oct 2022 17:36:49 +0200
-Received: from localhost.localdomain (10.69.192.58) by
- lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 22 Oct 2022 16:36:47 +0100
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <hch@lst.de>, John Garry <john.garry@huawei.com>
-Subject: [PATCH] blk-mq: Properly init bios from blk_mq_alloc_request_hctx()
-Date:   Sun, 23 Oct 2022 00:07:26 +0800
-Message-ID: <1666454846-11749-1-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
+        Sat, 22 Oct 2022 14:44:47 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7474248D1;
+        Sat, 22 Oct 2022 11:44:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3B6986068B;
+        Sat, 22 Oct 2022 18:44:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3F6AC433D7;
+        Sat, 22 Oct 2022 18:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666464281;
+        bh=rOUU30Ns40RaPB0p9BJDk4013bR8TLp0a0aP/lu3CGw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=QH1i6VZDzmLtoKIfZRdZlY5d0nnl5DOOq4/LqxYE5FlmXq1e/ayVWYrKNPQTQfyTm
+         lDWgFVezS94kXpPQqLVZatcxNDhidctINkWrhuWdQswTmu6mz+CfseCYZ+3W8aNf/D
+         BNkZScXW3d2V3kASY+/66HDGLtFJ5ipyIa5e8xIAsg2O2gipHt0u3nXAKd6fgttKgZ
+         NC4qpNwwmaHrG3GXHMyiFE9RiFlknggaV/ZCAfsoGqw84Y8dfHy2yZiRWd2Z5DPiV2
+         OT+zRHLzLLt4Xmw92V6rNOqAbn6uKoF3nU46vq2IUtHpqclZiRhC/zWn5A1+rqtQtz
+         yzpn0LslOhDww==
+From:   SeongJae Park <sj@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, "Kees Cook" <keescook@chromium.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Russell King" <linux@armlinux.org.uk>,
+        "Catalin Marinas" <catalin.marinas@arm.com>,
+        "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+        "Heiko Carstens" <hca@linux.ibm.com>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>,
+        "Jani Nikula" <jani.nikula@linux.intel.com>,
+        "Jason Gunthorpe" <jgg@nvidia.com>,
+        "Sakari Ailus" <sakari.ailus@linux.intel.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "Theodore Ts'o" <tytso@mit.edu>,
+        "Andreas Dilger" <adilger.kernel@dilger.ca>,
+        "Jaegeuk Kim" <jaegeuk@kernel.org>,
+        "Richard Weinberger" <richard@nod.at>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        "SeongJae Park" <sj@kernel.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        "Andrew Morton" <akpm@linux-foundation.org>,
+        "Michael Ellerman" <mpe@ellerman.id.au>,
+        "Helge Deller" <deller@gmx.de>, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-mmc@vger.kernel.org, linux-parisc@vger.kernel.org,
+        damon@lists.linux.dev, linux-mm@kvack.org
+Subject: Re: [PATCH v1 1/5] treewide: use get_random_u32_below() instead of deprecated function
+Date:   Sat, 22 Oct 2022 18:44:36 +0000
+Message-Id: <20221022184436.33750-1-sj@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221022014403.3881893-2-Jason@zx2c4.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Function blk_mq_alloc_request_hctx() is missing zeroing/init of rq->bio,
-biotail, __sector, and __data_len members, which blk_mq_alloc_request()
-has.
+Hi Jason,
 
-Move init'ing of those members to common blk_mq_rq_ctx_init().
+Cc-ing damon@lists.linux.dev and linux-mm@kvack.org.
 
-Fixes: 1f5bd336b9150 ("blk-mq: add blk_mq_alloc_request_hctx")
-Suggested-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: John Garry <john.garry@huawei.com>
+On Fri, 21 Oct 2022 21:43:59 -0400 "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8070b6c10e8d..260adeb2e455 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -402,6 +402,10 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
- 		}
- 	}
- 
-+	rq->__data_len = 0;
-+	rq->__sector = (sector_t) -1;
-+	rq->bio = rq->biotail = NULL;
-+
- 	return rq;
- }
- 
-@@ -591,9 +595,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
- 		if (!rq)
- 			goto out_queue_exit;
- 	}
--	rq->__data_len = 0;
--	rq->__sector = (sector_t) -1;
--	rq->bio = rq->biotail = NULL;
- 	return rq;
- out_queue_exit:
- 	blk_queue_exit(q);
--- 
-2.35.3
+> This is a simple mechanical transformation done by:
+> 
+> @@
+> expression E;
+> @@
+> - prandom_u32_max(E)
+> + get_random_u32_below(E)
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+[...]
+>  include/linux/damon.h                         |  2 +-
 
+For the damon.h part,
+
+Reviewed-by: SeongJae Park <sj@kernel.org>
+
+
+Thanks,
+SJ
