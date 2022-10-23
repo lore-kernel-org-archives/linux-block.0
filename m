@@ -2,86 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A54AC433FE
-	for <linux-block@archiver.kernel.org>; Sat, 22 Oct 2022 21:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED07C04A95
+	for <linux-block@archiver.kernel.org>; Sun, 23 Oct 2022 02:25:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229882AbiJVVPD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Oct 2022 17:15:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44306 "EHLO
+        id S229917AbiJWCZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Oct 2022 22:25:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbiJVVO6 (ORCPT
+        with ESMTP id S229849AbiJWCZ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Oct 2022 17:14:58 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B012B63B
-        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 14:14:48 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id u6so5286982plq.12
-        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 14:14:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3FvC1lDuEXWCYXb2hvcgpYlisVDpfK5faSIaWNOzeHs=;
-        b=jlu1d0/979sEdmVA9E65clPF3vKSUXLVMq4DubRcFyekFo2JoLF0YlZ1TDK+QJ0fky
-         IVppFZGJBgrTs6hrAK9xyg2vMB430B1x76T+UHDsvxy9JuF5vSFZNTpWugnc9fNWheQa
-         FdEupfGAEWcVxdaw9RdXO1X72DpKTdc5qaBv7wNtjYYcW6/34+bd8qXeyGEyDmW81LKu
-         QQM3w77dP2ouOSefV0yVCubstp5zrmR1ijLYa1ClUzCE5mvDNdzOkegUSRPDFwdQ8ioC
-         ldmep5tia0oIWmbZI6au0QkSBRhsFPmYRzP97JZ+gHfPLFMoMyxpiXtfPq0NT1YRNVrQ
-         N5dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3FvC1lDuEXWCYXb2hvcgpYlisVDpfK5faSIaWNOzeHs=;
-        b=ZuXavqhudmJkvuMpE5i+IVNdJMgkG5/Y+rvs+uS6jbV/fOU9odCrFEt/AKAXHjiDrm
-         C3GJUvfJPZllBE//i/04S4pgeb1RlDlZjH6X8cKPrPiHkXqfKavXe69PMcu17NEykuUX
-         da6Kx6+2OT5heBCujheVI4xwCeDMtIMB1TFysTmWAMpbemOpjRpZuLF/aYBYd8FA5F5D
-         BCCiHQr76W6wPizeMdOz3zT3g3MLjbFmN1edLrjDt+eNukpFasF6wZclJg+bvNla2Dpd
-         Gb7gBJwRQMeV1T6qgUMWn6mxSIy0LBzGbyxsTE4HO8gJ8ZCAT8A6xwkFntA09h39b53d
-         RfIQ==
-X-Gm-Message-State: ACrzQf0+8Xn3aIWTOwJ9oA1LMlf7XNzM1Tt1NsmFvHSxj1m7A68vKGKR
-        cYsBXtcmirTfXQdo02fRpdYGXA==
-X-Google-Smtp-Source: AMsMyM7Qu+Y+AtNozdZGfdN2QL/ZRk1f0kTozESOa9h9ASGH+K7+VptQo3OgTLUNf28FrWRcUbZLtg==
-X-Received: by 2002:a17:902:eb83:b0:185:46b7:7de3 with SMTP id q3-20020a170902eb8300b0018546b77de3mr25764664plg.19.1666473287610;
-        Sat, 22 Oct 2022 14:14:47 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id q15-20020a65684f000000b0044ba7b39c2asm15129489pgt.60.2022.10.22.14.14.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Oct 2022 14:14:47 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ming.lei@redhat.com, hch@lst.de, Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     linux-block@vger.kernel.org, yi.zhang@huawei.com,
-        linux-kernel@vger.kernel.org, yukuai3@huawei.com
-In-Reply-To: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
-References: <20221022021615.2756171-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v2] block: fix memory leak for elevator on add_disk failure
-Message-Id: <166647328666.27452.18046414061378704307.b4-ty@kernel.dk>
-Date:   Sat, 22 Oct 2022 15:14:46 -0600
+        Sat, 22 Oct 2022 22:25:28 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C6ED59E99;
+        Sat, 22 Oct 2022 19:25:24 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mw26n06mLzKG4l;
+        Sun, 23 Oct 2022 10:22:57 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgA3RecRplRjYA8yAA--.60936S3;
+        Sun, 23 Oct 2022 10:25:22 +0800 (CST)
+Subject: Re: [PATCH v5 0/6] blk-wbt: simple improvment to enable wbt correctly
+To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, ebiggers@google.com,
+        axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
+References: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <eb1c7962-c9bb-9148-6c62-cdd5e3105afe@huaweicloud.com>
+Date:   Sun, 23 Oct 2022 10:25:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+X-CM-TRANSID: gCh0CgA3RecRplRjYA8yAA--.60936S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7XryfJF48Jry8AFyUXFWUJwb_yoWkurgEga
+        y0kas5KF1DJ3WFkFZrJF1UXFWj9rs5Zr15X3ZrtrWayry3JF1Utw4vyrWUZ3s8Xa93C3Z8
+        A3yUu3yfZr12qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
+        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
+        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
+        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
+        U==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 22 Oct 2022 10:16:15 +0800, Yu Kuai wrote:
+Hi, Jens
+
+Can you apply this patchset?
+
+Thanks,
+Kuai
+
+在 2022/10/19 20:15, Yu Kuai 写道:
 > From: Yu Kuai <yukuai3@huawei.com>
 > 
-> The default elevator is allocated in the beginning of device_add_disk(),
-> however, it's not freed in the following error path.
+> changes in v5:
+>   - code adjustment in patch 4, as suggested by Christoph.
+>   - add review tag by Christop.
 > 
+> changes in v4:
+>   - remove patch 3 from v3
+>   - add patch 2,3 in v4
 > 
-
-Applied, thanks!
-
-[1/1] block: fix memory leak for elevator on add_disk failure
-      commit: 02341a08c9dec5a88527981b0bdf0fb6f7499cbf
-
-Best regards,
--- 
-Jens Axboe
-
+> changes in v3:
+>   - instead of check elevator name, add a flag in elevator_queue, as
+>   suggested by Christoph.
+>   - add patch 3 and patch 5 to this patchset.
+> 
+> changes in v2:
+>   - define new api if wbt config is not enabled in patch 1.
+> 
+> Yu Kuai (6):
+>    elevator: remove redundant code in elv_unregister_queue()
+>    blk-wbt: remove unnecessary check in wbt_enable_default()
+>    blk-wbt: make enable_state more accurate
+>    blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
+>    elevator: add new field flags in struct elevator_queue
+>    blk-wbt: don't enable throttling if default elevator is bfq
+> 
+>   block/bfq-iosched.c |  2 ++
+>   block/blk-sysfs.c   |  3 +++
+>   block/blk-wbt.c     | 26 ++++++++++++++++++++++----
+>   block/blk-wbt.h     | 17 ++++++++++++-----
+>   block/elevator.c    |  8 ++------
+>   block/elevator.h    |  5 ++++-
+>   6 files changed, 45 insertions(+), 16 deletions(-)
+> 
 
