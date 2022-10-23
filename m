@@ -2,103 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED07C04A95
-	for <linux-block@archiver.kernel.org>; Sun, 23 Oct 2022 02:25:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5986AFA373F
+	for <linux-block@archiver.kernel.org>; Sun, 23 Oct 2022 03:04:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbiJWCZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Oct 2022 22:25:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44784 "EHLO
+        id S229728AbiJWDCy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Oct 2022 23:02:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229849AbiJWCZ2 (ORCPT
+        with ESMTP id S229935AbiJWDCw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Oct 2022 22:25:28 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C6ED59E99;
-        Sat, 22 Oct 2022 19:25:24 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Mw26n06mLzKG4l;
-        Sun, 23 Oct 2022 10:22:57 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgA3RecRplRjYA8yAA--.60936S3;
-        Sun, 23 Oct 2022 10:25:22 +0800 (CST)
-Subject: Re: [PATCH v5 0/6] blk-wbt: simple improvment to enable wbt correctly
-To:     Yu Kuai <yukuai1@huaweicloud.com>, hch@lst.de, ebiggers@google.com,
-        axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <eb1c7962-c9bb-9148-6c62-cdd5e3105afe@huaweicloud.com>
-Date:   Sun, 23 Oct 2022 10:25:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
+        Sat, 22 Oct 2022 23:02:52 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58EC1E4
+        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 20:02:50 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id g129so4284621pgc.7
+        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 20:02:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZM5gJHOnivLnvLSSbR9bvNlNc5ldgiHnzUjRHLcgvbU=;
+        b=qd5Kz33mh+7AO0dVcQ+c7EyyLSmJkMhour9nYFlmFGTktHVOXpNha9k3JhuJSZF+zD
+         UE2RXd/ePi8/QZEOYyUV0LpLttN9k9SNBV0B5MExwgCyfC0F2w6Sjs+fKqlXNLFrr0os
+         qKDJvX4pUKvDnEoS5UMC3WcKEOSl8/YXQ8u7T+MaqDAyZy/ucbEF5bXn6iV0waJT3Q1A
+         zu7VwaenZ9BTr6djmsNX0MgrW9sJdNrE425K+e0LGOv+k1iFbTp9VL0610juVNRTtQvR
+         6PJmiU3ZZ7lwZrCo99zGDAM1azg3u9RbdQxuntvNk1ttFq4ICZCAHX3MwV80wuvfMxPO
+         /kNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZM5gJHOnivLnvLSSbR9bvNlNc5ldgiHnzUjRHLcgvbU=;
+        b=2osG1Y4WvYG87tcQSeQ0/RW+LJCVgzbcC4+pOML3ok3yljab2Dqg7DcaBsPueT5S5C
+         8tT27DxuJxU9y4u2tpegKk+zjLPYeyiRe+iKNeEFwfRRv634OMH3aljDhloowA6uxx52
+         uV0FXxdJ7xjWXCRxEPwLH31tN0fDdmVZCPBETKHKNvI8YGOrsOYY2YNUexj7Kwmu+FKh
+         +gXi8asZLvQmqFKD+YftSk7Eve7IddkKTV3z29ZiAuQB5EP9vW9MQu6+YAGwQFUJiMyD
+         mU6RD2232D8AD+0IkZ303YPkXFJmVLDsi+cvCgQii4pdzCdyCgPFtUjEGWcOxj7Jefxa
+         /akA==
+X-Gm-Message-State: ACrzQf1bTv73HXzIiepNYiJYrRGu4NYEKnTG4fYySKRvk9gFfdx5jkez
+        dEpDPo1isthrdrvR88Rzz1s2+Q==
+X-Google-Smtp-Source: AMsMyM790aDklrOEICsMHtcknQnjRuh3Z1xara5tff7NEOLvBKd5wjuUk8H/Vh9slA/TCXO2Y93SfQ==
+X-Received: by 2002:a63:9144:0:b0:45f:c9f5:1bb with SMTP id l65-20020a639144000000b0045fc9f501bbmr21925716pge.165.1666494170286;
+        Sat, 22 Oct 2022 20:02:50 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id w186-20020a6362c3000000b0044a4025cea1sm15023467pgb.90.2022.10.22.20.02.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Oct 2022 20:02:49 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Yu Kuai <yukuai1@huaweicloud.com>, ebiggers@google.com, hch@lst.de
+Cc:     yukuai3@huawei.com, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, linux-block@vger.kernel.org
 In-Reply-To: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
+Subject: Re: [PATCH v5 0/6] blk-wbt: simple improvment to enable wbt correctly
+Message-Id: <166649416867.43324.13666623072880876901.b4-ty@kernel.dk>
+Date:   Sat, 22 Oct 2022 21:02:48 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3RecRplRjYA8yAA--.60936S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7XryfJF48Jry8AFyUXFWUJwb_yoWkurgEga
-        y0kas5KF1DJ3WFkFZrJF1UXFWj9rs5Zr15X3ZrtrWayry3JF1Utw4vyrWUZ3s8Xa93C3Z8
-        A3yUu3yfZr12qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0xIA0c2IEe2xFo4CEbIxv
-        r21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-        WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-        7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-        1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4U
-        MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbUUUUU
-        U==
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
-
-Can you apply this patchset?
-
-Thanks,
-Kuai
-
-在 2022/10/19 20:15, Yu Kuai 写道:
+On Wed, 19 Oct 2022 20:15:12 +0800, Yu Kuai wrote:
 > From: Yu Kuai <yukuai3@huawei.com>
 > 
 > changes in v5:
->   - code adjustment in patch 4, as suggested by Christoph.
->   - add review tag by Christop.
+>  - code adjustment in patch 4, as suggested by Christoph.
+>  - add review tag by Christop.
 > 
 > changes in v4:
->   - remove patch 3 from v3
->   - add patch 2,3 in v4
+>  - remove patch 3 from v3
+>  - add patch 2,3 in v4
 > 
-> changes in v3:
->   - instead of check elevator name, add a flag in elevator_queue, as
->   suggested by Christoph.
->   - add patch 3 and patch 5 to this patchset.
-> 
-> changes in v2:
->   - define new api if wbt config is not enabled in patch 1.
-> 
-> Yu Kuai (6):
->    elevator: remove redundant code in elv_unregister_queue()
->    blk-wbt: remove unnecessary check in wbt_enable_default()
->    blk-wbt: make enable_state more accurate
->    blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
->    elevator: add new field flags in struct elevator_queue
->    blk-wbt: don't enable throttling if default elevator is bfq
-> 
->   block/bfq-iosched.c |  2 ++
->   block/blk-sysfs.c   |  3 +++
->   block/blk-wbt.c     | 26 ++++++++++++++++++++++----
->   block/blk-wbt.h     | 17 ++++++++++++-----
->   block/elevator.c    |  8 ++------
->   block/elevator.h    |  5 ++++-
->   6 files changed, 45 insertions(+), 16 deletions(-)
-> 
+> [...]
+
+Applied, thanks!
+
+[1/6] elevator: remove redundant code in elv_unregister_queue()
+      commit: 4321c1ad4abe05fb3683745ed52d0ca17918d537
+[2/6] blk-wbt: remove unnecessary check in wbt_enable_default()
+      commit: e2c2a27a4fef0af09bfb50c017d1d1962aa8784b
+[3/6] blk-wbt: make enable_state more accurate
+      commit: 563ee8c7ebfa01d43fa9a785c562318b3f6a587b
+[4/6] blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
+      commit: a66d2566505c819261591fb2462a99069c43db55
+[5/6] elevator: add new field flags in struct elevator_queue
+      commit: dd58a3a032d5b53571e9934b23a4ceae7b158db0
+[6/6] blk-wbt: don't enable throttling if default elevator is bfq
+      commit: b192851f14d980f8ce794e747adc4a2418527a75
+
+Best regards,
+-- 
+Jens Axboe
+
 
