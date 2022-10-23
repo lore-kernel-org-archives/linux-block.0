@@ -2,63 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5986AFA373F
-	for <linux-block@archiver.kernel.org>; Sun, 23 Oct 2022 03:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B32C9C04A95
+	for <linux-block@archiver.kernel.org>; Sun, 23 Oct 2022 03:05:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiJWDCy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 22 Oct 2022 23:02:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40996 "EHLO
+        id S229964AbiJWDFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Oct 2022 23:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbiJWDCw (ORCPT
+        with ESMTP id S230006AbiJWDFf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 22 Oct 2022 23:02:52 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58EC1E4
-        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 20:02:50 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id g129so4284621pgc.7
-        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 20:02:50 -0700 (PDT)
+        Sat, 22 Oct 2022 23:05:35 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B293337F
+        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 20:05:10 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d24so5729923pls.4
+        for <linux-block@vger.kernel.org>; Sat, 22 Oct 2022 20:05:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZM5gJHOnivLnvLSSbR9bvNlNc5ldgiHnzUjRHLcgvbU=;
-        b=qd5Kz33mh+7AO0dVcQ+c7EyyLSmJkMhour9nYFlmFGTktHVOXpNha9k3JhuJSZF+zD
-         UE2RXd/ePi8/QZEOYyUV0LpLttN9k9SNBV0B5MExwgCyfC0F2w6Sjs+fKqlXNLFrr0os
-         qKDJvX4pUKvDnEoS5UMC3WcKEOSl8/YXQ8u7T+MaqDAyZy/ucbEF5bXn6iV0waJT3Q1A
-         zu7VwaenZ9BTr6djmsNX0MgrW9sJdNrE425K+e0LGOv+k1iFbTp9VL0610juVNRTtQvR
-         6PJmiU3ZZ7lwZrCo99zGDAM1azg3u9RbdQxuntvNk1ttFq4ICZCAHX3MwV80wuvfMxPO
-         /kNQ==
+        bh=r6nyt/5u3IthVwqu/EgKeaaSGqRzZm+NuwSgy/ByAnQ=;
+        b=BQUulmnWAODhNl7IA8u3VpgVN/eggkKKzao910c4xLqJyB1jyq3BkcP9Ryiu67ivCZ
+         Jzct/LQ8D7M3jPRzoEobMLF8xfouzgb8q11+Zgv34VHFD/0hNtdq6sU6v2niN3KXK/Av
+         jXrkGqfUrVytCyFRrgNCVMcdcrtTWHfUBiit6JT6ipoYlTiUDYlySC2D5LmM5ioYc3+d
+         9YrpW/evtcVC2OSL1XgZrnMS40hX7acs2R+XZi57a8Hwa9asJAsg2gwUeC+ST5iyyicS
+         eBYGVa3zeuoMapdqHweTVrWhwvmRkRtOuftu4pob2hHKm/JqXQXBFLxXU36hvcaK3MWm
+         O6nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZM5gJHOnivLnvLSSbR9bvNlNc5ldgiHnzUjRHLcgvbU=;
-        b=2osG1Y4WvYG87tcQSeQ0/RW+LJCVgzbcC4+pOML3ok3yljab2Dqg7DcaBsPueT5S5C
-         8tT27DxuJxU9y4u2tpegKk+zjLPYeyiRe+iKNeEFwfRRv634OMH3aljDhloowA6uxx52
-         uV0FXxdJ7xjWXCRxEPwLH31tN0fDdmVZCPBETKHKNvI8YGOrsOYY2YNUexj7Kwmu+FKh
-         +gXi8asZLvQmqFKD+YftSk7Eve7IddkKTV3z29ZiAuQB5EP9vW9MQu6+YAGwQFUJiMyD
-         mU6RD2232D8AD+0IkZ303YPkXFJmVLDsi+cvCgQii4pdzCdyCgPFtUjEGWcOxj7Jefxa
-         /akA==
-X-Gm-Message-State: ACrzQf1bTv73HXzIiepNYiJYrRGu4NYEKnTG4fYySKRvk9gFfdx5jkez
-        dEpDPo1isthrdrvR88Rzz1s2+Q==
-X-Google-Smtp-Source: AMsMyM790aDklrOEICsMHtcknQnjRuh3Z1xara5tff7NEOLvBKd5wjuUk8H/Vh9slA/TCXO2Y93SfQ==
-X-Received: by 2002:a63:9144:0:b0:45f:c9f5:1bb with SMTP id l65-20020a639144000000b0045fc9f501bbmr21925716pge.165.1666494170286;
-        Sat, 22 Oct 2022 20:02:50 -0700 (PDT)
+        bh=r6nyt/5u3IthVwqu/EgKeaaSGqRzZm+NuwSgy/ByAnQ=;
+        b=BM6qoi51X9S4xLdGqmJgVYM3gHr7jjWWeRWf4FCZFRhcZ3OZQp5+ZFIqCTqvyL9HlB
+         qVBhfyWPbuxAPoB/N3M5W7KbSUDsbv9h3kpRN8PWLtQivD8uwFWz2HEVsEUuVaA5Yesc
+         WF30+nTYBuveMrW8nJq9l/+BqdwneM2DF03rXzR8oA8yBmH9P8CJJjimu2LZDiQNjn8R
+         0kpNGCftvaWlz6XBoYtBNoEnaROB/N20tjkytnGZfQZVC50c9Qz7YhylW79yDBD/bOcq
+         WjzgenzMgtN8VdJnpZAeyImXy09ssdlKF81Yqrv62n4VFrxFcuwJCz7B2+4AcHyi5mU7
+         mp5Q==
+X-Gm-Message-State: ACrzQf1NBf/ehb+z/GOqba4thqzwAtQnPP9f6FfBbjB/4jxYn8hRfIqg
+        zzjgzKdali1B7h9qB/1OhK60fw==
+X-Google-Smtp-Source: AMsMyM6DbCJC9squZcIC4uX4gg58vyChOuuUTQMv6f2ZPJCe2aV035QMTQ9J9WwAhOdH+VLBdHdE5A==
+X-Received: by 2002:a17:902:e9cc:b0:186:8816:88d4 with SMTP id 12-20020a170902e9cc00b00186881688d4mr7042387plk.59.1666494309309;
+        Sat, 22 Oct 2022 20:05:09 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w186-20020a6362c3000000b0044a4025cea1sm15023467pgb.90.2022.10.22.20.02.48
+        by smtp.gmail.com with ESMTPSA id m19-20020a17090a859300b001f8c532b93dsm3793321pjn.15.2022.10.22.20.05.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Oct 2022 20:02:49 -0700 (PDT)
+        Sat, 22 Oct 2022 20:05:08 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Yu Kuai <yukuai1@huaweicloud.com>, ebiggers@google.com, hch@lst.de
-Cc:     yukuai3@huawei.com, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, linux-block@vger.kernel.org
-In-Reply-To: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
-References: <20221019121518.3865235-1-yukuai1@huaweicloud.com>
-Subject: Re: [PATCH v5 0/6] blk-wbt: simple improvment to enable wbt correctly
-Message-Id: <166649416867.43324.13666623072880876901.b4-ty@kernel.dk>
-Date:   Sat, 22 Oct 2022 21:02:48 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Jinlong Chen <nickyc975@zju.edu.cn>
+In-Reply-To: <20221020064819.1469928-1-hch@lst.de>
+References: <20221020064819.1469928-1-hch@lst.de>
+Subject: Re: elevator refcount fixes
+Message-Id: <166649430855.43600.8976048007637469347.b4-ty@kernel.dk>
+Date:   Sat, 22 Oct 2022 21:05:08 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -67,33 +66,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 19 Oct 2022 20:15:12 +0800, Yu Kuai wrote:
-> From: Yu Kuai <yukuai3@huawei.com>
+On Thu, 20 Oct 2022 08:48:15 +0200, Christoph Hellwig wrote:
+> this series is a take on the elevator refcount fixes from Jinlong.
+> I've added a cleanup patch, and one that improves on one of the incidental
+> fixes he did, as well as splitting the main patch into two and improving
+> some comments.
 > 
-> changes in v5:
->  - code adjustment in patch 4, as suggested by Christoph.
->  - add review tag by Christop.
-> 
-> changes in v4:
->  - remove patch 3 from v3
->  - add patch 2,3 in v4
+> Diffstat:
+>  blk-mq-sched.c |    1 +
+>  blk-mq.c       |   13 ++++---------
+>  elevator.c     |   43 +++++++++++++++++++------------------------
+>  elevator.h     |   15 +++++++++++++++
+>  4 files changed, 39 insertions(+), 33 deletions(-)
 > 
 > [...]
 
 Applied, thanks!
 
-[1/6] elevator: remove redundant code in elv_unregister_queue()
-      commit: 4321c1ad4abe05fb3683745ed52d0ca17918d537
-[2/6] blk-wbt: remove unnecessary check in wbt_enable_default()
-      commit: e2c2a27a4fef0af09bfb50c017d1d1962aa8784b
-[3/6] blk-wbt: make enable_state more accurate
-      commit: 563ee8c7ebfa01d43fa9a785c562318b3f6a587b
-[4/6] blk-wbt: don't show valid wbt_lat_usec in sysfs while wbt is disabled
-      commit: a66d2566505c819261591fb2462a99069c43db55
-[5/6] elevator: add new field flags in struct elevator_queue
-      commit: dd58a3a032d5b53571e9934b23a4ceae7b158db0
-[6/6] blk-wbt: don't enable throttling if default elevator is bfq
-      commit: b192851f14d980f8ce794e747adc4a2418527a75
+[1/4] block: add proper helpers for elevator_type module refcount management
+      commit: 61e1f359c2bc78360cf9741959918934d9362aa5
+[2/4] block: sanitize the elevator name before passing it to __elevator_change
+      commit: d1368d8c074010b221be1e5474e0d318567bbec7
+[3/4] block: check for an unchanged elevator earlier in __elevator_change
+      commit: ffd37387225f6ccd47765dc33fc56db14a7a8487
+[4/4] block: fix up elevator_type refcounting
+      commit: bcd3010074ec9dc1bd65c210a2ec3815dc653340
 
 Best regards,
 -- 
