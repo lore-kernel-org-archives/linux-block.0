@@ -2,105 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519DDFA373E
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 10:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51808C38A2D
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 15:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbiJXK6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 06:58:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36414 "EHLO
+        id S231874AbiJXPCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 11:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbiJXK5b (ORCPT
+        with ESMTP id S231655AbiJXPBx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 06:57:31 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AA75FDD5;
-        Mon, 24 Oct 2022 03:57:21 -0700 (PDT)
-Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MwsRF5VVJz6HJR3;
-        Mon, 24 Oct 2022 18:55:05 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 24 Oct 2022 12:56:24 +0200
-Received: from [10.48.145.243] (10.48.145.243) by
- lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 24 Oct 2022 11:56:23 +0100
-Message-ID: <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
-Date:   Mon, 24 Oct 2022 11:56:21 +0100
+        Mon, 24 Oct 2022 11:01:53 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDF41366A4
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 06:38:48 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id g62so4956467pfb.10
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 06:38:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6vie4dh+louXoUQMxLwJz2RE5N7M8k6YAevG4uZHlAM=;
+        b=ZeklBEM++ZyiB9531bxr/Scj9q9MWVpJsuyTPhMoekTv+rbo5Vyvc70nqbVFwwN3M/
+         Uwk1qBUFWdyVDZu179Y2T66TNiOWC1+Q47wDFrHBYchJXHANXEftyXtqlE9bGWeUoNlm
+         SFGcQ/rUvH9Zbt/iWyA8ui399qtsDFU5bOKb6UlOJ4njJZZDmxG218rWnfQp5HdXDw+T
+         HpS9UbjbVIIncMtoJPw5hB6O2kgM+XwmYlMfzQG2jc+vBD/trbB1XR4Wjgo/QK9OQ+lK
+         iRmVpvkJM1cZBTXpS3NCv1LC3kClFnH1ME9R3pKS8udDJ1zo7csnVVDE2N+PVkpAi95b
+         +4Rg==
+X-Gm-Message-State: ACrzQf3gaZGyFD52UHh/QQgRv9jQs0RGHAW5ttbAJ745S0ak2+0nCEN0
+        YR/XuvpsK3uNAWn9/29fdOg=
+X-Google-Smtp-Source: AMsMyM6ckg/oHhCgaWHmli0CaXhP/8VL4mNEVYUHYL8F3rk1ClcrEraBR6UfQF3YnlCK0f+GKELy9w==
+X-Received: by 2002:a05:6a00:2303:b0:56b:cd7e:6cb with SMTP id h3-20020a056a00230300b0056bcd7e06cbmr5528386pfh.77.1666618524742;
+        Mon, 24 Oct 2022 06:35:24 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id cx10-20020a17090afd8a00b002132adb61ccsm432730pjb.48.2022.10.24.06.35.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Oct 2022 06:35:23 -0700 (PDT)
+Message-ID: <77784776-4e58-47d9-abde-a782f5ca7d3a@acm.org>
+Date:   Mon, 24 Oct 2022 06:35:21 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-From:   John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH] blk-mq: Properly init bios from
- blk_mq_alloc_request_hctx()
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <1666454846-11749-1-git-send-email-john.garry@huawei.com>
- <Y1U9zNZtZjRHQBww@T590>
-In-Reply-To: <Y1U9zNZtZjRHQBww@T590>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+Subject: Re: [PATCH 5/8] blk-mq: add tagset quiesce interface
+Content-Language: en-US
+To:     Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20221020105608.1581940-1-hch@lst.de>
+ <20221020105608.1581940-6-hch@lst.de>
+ <01e45c37-5db8-b1a5-33c6-251da2637fb5@acm.org>
+ <e092e8b6-66d5-b191-805d-f49ffdafc8a8@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <e092e8b6-66d5-b191-805d-f49ffdafc8a8@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.48.145.243]
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 23/10/2022 14:12, Ming Lei wrote:
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8070b6c10e8d..260adeb2e455 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -402,6 +402,10 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->>   		}
->>   	}
->>   
->> +	rq->__data_len = 0;
->> +	rq->__sector = (sector_t) -1;
->> +	rq->bio = rq->biotail = NULL;
->> +
->>   	return rq;
->>   }
->>   
->> @@ -591,9 +595,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
->>   		if (!rq)
->>   			goto out_queue_exit;
->>   	}
->> -	rq->__data_len = 0;
->> -	rq->__sector = (sector_t) -1;
->> -	rq->bio = rq->biotail = NULL;
-> This patch looks not good, why do you switch to initialize the three fields
-> twice in fast path?
+On 10/23/22 18:57, Chao Leng wrote:
+> blk_mq_quiesce_tagset() support concurrency. blk_mq_quiesce_tagset() just
+> check the flag(QUEUE_FLAG_SKIP_TAGSET_QUIESCE), it has no impact on 
+> concurrency.
 
-Can you please show me how these are initialized twice?
+Hi Chao,
 
-If there is a real concern with this then we go with my original idea, 
-which was to copy the init method of blk_mq_alloc_request() (in 
-blk_mq_alloc_request_hctx())
-
-> 
-> BTW, we know blk_mq_alloc_request_hctx() has big trouble, so please
-> avoid to extend it to other use cases.
-
-Yeah, I know this, but sometimes we just need to allocate for a specific 
-HW queue...
-
-For my usecase of interest, it should not impact if the cpumask of the 
-HW queue goes offline after selecting the cpu in 
-blk_mq_alloc_request_hctx(), so any race is ok ... I think.
-
-However it should be still possible to make blk_mq_alloc_request_hctx() 
-more robust. How about using something like work_on_cpu_safe() to 
-allocate and execute the request with blk_mq_alloc_request() on a cpu 
-associated with the HW queue, such that we know the cpu is online and 
-stays online until we execute it? Or also extent to 
-work_on_cpumask_safe() variant, so that we don't need to try all cpus in 
-the mask (to see if online)?
+I think it depends on how the QUEUE_FLAG_SKIP_TAGSET_QUIESCE flag is 
+set. I agree if that flag is set once and never modified that there is 
+no race. What I'm wondering about is whether there could be a need for 
+block drivers to set the QUEUE_FLAG_SKIP_TAGSET_QUIESCE flag just before 
+blk_mq_quiesce_tagset() is called and cleared immediately after 
+blk_mq_quiesce_tagset() returns? In that case I think there is a race 
+condition.
 
 Thanks,
-John
+
+Bart.
