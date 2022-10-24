@@ -2,123 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E0AC38A2D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 23:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94878FA373D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 00:03:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbiJXXqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 19:46:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36276 "EHLO
+        id S230037AbiJYAD0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 20:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbiJXXpq (ORCPT
+        with ESMTP id S230363AbiJYADH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 19:45:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874B22FACCB
-        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 15:03:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666648994;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2XUHdkSLn+zhCa5Ke4jI7G05nTKX0wDN8DWn8u2XkaU=;
-        b=ZqHWB0twBiuVfbEIulMS3qLrbHSuizEEXyo/AM6qdWdedEk9awdHPT5mYkCpaMOENRDKFg
-        DF2/0Rm9LOvJDOzXoHQsQw+PSwn0UmqxmT3v6QRrIv7YGsYJlS2lL1myVmRhU0SS/Md9Hv
-        f0GEQPRx5gwyDtWZ9dHO7AweXd9QLYQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-664-flVGeN7_MmKKO8sLFuo3nw-1; Mon, 24 Oct 2022 09:28:10 -0400
-X-MC-Unique: flVGeN7_MmKKO8sLFuo3nw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 607CA8027EB;
-        Mon, 24 Oct 2022 13:28:09 +0000 (UTC)
-Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A9C262166B35;
-        Mon, 24 Oct 2022 13:28:03 +0000 (UTC)
-Date:   Mon, 24 Oct 2022 21:27:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, hch@lst.de,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH] blk-mq: Properly init bios from
- blk_mq_alloc_request_hctx()
-Message-ID: <Y1aS3vIbuQTNGWJL@T590>
-References: <1666454846-11749-1-git-send-email-john.garry@huawei.com>
- <Y1U9zNZtZjRHQBww@T590>
- <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
+        Mon, 24 Oct 2022 20:03:07 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1634F3A2
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 15:18:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1666649892; x=1698185892;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AUarYESSBWuIiRFqSp6O0q+qq8tkbufoEKVSVje4Iy4=;
+  b=Qi7ZDz9eHOeDC/QSQtOtXB/h6U4QwOeQ72Fqr0TKOG67oZ3G0Sxg/Yvs
+   HI2M/bcMX4HAUYTP8N8z2XIy9bAJgS8IOQ0lq3VClcec4s3dMfSDO6lSZ
+   Bn4j6kelvLyjqlMMyz0mmLB8aCKUK9byhgp7Fkq/aDMm6z4okYDveqf10
+   X09ciDIn68vL9PpS7ZS7ra38vCL4vZSxXqk2UDZsLgVyQlGEOllJ6kI+B
+   kRuVYrZfzvQtp48YuQDn+ZqzWdd0zY06DlDxf9/PZSuRrAN8ItvkdnxiI
+   3scYrySdjpdEZeZ2A1gDKQR1VO2XGJbqYZba68+YTYUX23kFPPb/CN0LP
+   g==;
+X-IronPort-AV: E=Sophos;i="5.95,210,1661788800"; 
+   d="scan'208";a="219792294"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Oct 2022 06:18:11 +0800
+IronPort-SDR: gBQqVTlgZ4dImcZFwYR4MFgKLGaVNlQ5XJEDdVbhMjFj2FA+AKUHZOv8hCFcw1E7OLm70bVQ+Z
+ cndbpCI9LqYDfbmcwyl3hLIpVGC5BmgWwpYJ/ydguHRXs3E/2+t2cOvtFaNBwL8IGKQa8q4UwP
+ 0q9EN7jVxW33i1rULfr1cdGeCVfyJzI1D0nrAlLH0MEUxTDqa2VE9v80qsI2O61TNUD4DQjQPB
+ /ZE3+8QxtsindX6YTRsN/qFLBjcO9TdUvU2VGXb/fS9Z9+VVZJvqmpoGpms6JuWPyuMfb7Ws+a
+ IvvGaoL8K9/6qBCUr5EEHmkl
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Oct 2022 14:37:33 -0700
+IronPort-SDR: w+YimD/qN+abi8vRXxZXFkaEMDakQU6XRxCeUqAjT0KMMSshjRF+td+40WSR8tCGHf9L/Q8XBi
+ oNbZr8JocZuDch27qu5WNELnViDG2idVRUHuQzJIayh/Dde6fBYT6DsZ5PtKtE0ZsqCSQRChvR
+ 1p3/44NUsqAS39REYVV7Yb+GPijSNX6SZxyJ9Fktg+IplF4iXUpL8wcLu4vbGFmNPaB8tRNasT
+ UIjcQoPCt/efRqz+cEH02PXYsnmKBsfJqhUDVA5T8s438/GPmvvKV9ncqTUBk/5nhwCSga1pLF
+ z7Q=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Oct 2022 15:18:10 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Mx8bP57qrz1RWy0
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 15:18:09 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1666649887; x=1669241888; bh=AUarYESSBWuIiRFqSp6O0q+qq8tkbufoEKV
+        SVje4Iy4=; b=BTeM4sx7WaD0/FqfkAJRiv0MyL3ZRUYeQb/taFA/KB+vQgBAtIA
+        Da8KBEeBLXmq+uy1X63DEtBHcRkjUcJ3LZZ2YmoM5B4rj/QXA7otcJhf06y/n4/W
+        tlTwjJ9NgybBLNM5g0PKKdUtA7OO64fmuz7ce8X8tmJ4kRL/VB0Me4GExSwJZEJF
+        wxG1j/Fqz9UJzLXyHdOd0o/a0XXu4NuLLM3dvP0SJrDnSF+2VxnIY7tHFwVIjH7+
+        r+dHxcRpHIWa8MnpMSBXeu5QwsfP6cnri5or5CLaAAsTkoqOibM8nQvryUuU5TiL
+        WSCnh9OHblbFkntY85LMJgszkd6nmLxQrig==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id RMpcwLgbOWVG for <linux-block@vger.kernel.org>;
+        Mon, 24 Oct 2022 15:18:07 -0700 (PDT)
+Received: from [10.225.163.8] (unknown [10.225.163.8])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Mx8bK1bjpz1RvLy;
+        Mon, 24 Oct 2022 15:18:04 -0700 (PDT)
+Message-ID: <94ba6a25-b67f-4530-5236-63764711c4d5@opensource.wdc.com>
+Date:   Tue, 25 Oct 2022 07:18:03 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Content-Language: en-US
+To:     Chris Mason <clm@meta.com>, dsterba@suse.cz
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+References: <20220901074216.1849941-1-hch@lst.de>
+ <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+ <20221024144411.GA25172@lst.de>
+ <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
+ <20221024171042.GF5824@suse.cz>
+ <891da9bf-f703-0ddb-15e8-74647da297ea@meta.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <891da9bf-f703-0ddb-15e8-74647da297ea@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 24, 2022 at 11:56:21AM +0100, John Garry wrote:
-> On 23/10/2022 14:12, Ming Lei wrote:
-> > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > > index 8070b6c10e8d..260adeb2e455 100644
-> > > --- a/block/blk-mq.c
-> > > +++ b/block/blk-mq.c
-> > > @@ -402,6 +402,10 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
-> > >   		}
-> > >   	}
-> > > +	rq->__data_len = 0;
-> > > +	rq->__sector = (sector_t) -1;
-> > > +	rq->bio = rq->biotail = NULL;
-> > > +
-> > >   	return rq;
-> > >   }
-> > > @@ -591,9 +595,6 @@ struct request *blk_mq_alloc_request(struct request_queue *q, blk_opf_t opf,
-> > >   		if (!rq)
-> > >   			goto out_queue_exit;
-> > >   	}
-> > > -	rq->__data_len = 0;
-> > > -	rq->__sector = (sector_t) -1;
-> > > -	rq->bio = rq->biotail = NULL;
-> > This patch looks not good, why do you switch to initialize the three fields
-> > twice in fast path?
+On 10/25/22 02:34, Chris Mason wrote:
+> On 10/24/22 1:10 PM, David Sterba wrote:
+>> On Mon, Oct 24, 2022 at 11:25:04AM -0400, Chris Mason wrote:
+>>> On 10/24/22 10:44 AM, Christoph Hellwig wrote:
+>>>> On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:
+>>>>> David, what's your plan to progress with this series?
+>>>>
+>>>> FYI, I object to merging any of my code into btrfs without a proper
+>>>> copyright notice, and I also need to find some time to remove my
+>>>> previous significant changes given that the btrfs maintainer
+>>>> refuses to take the proper and legally required copyright notice.
+>>>>
+>>>> So don't waste any of your time on this.
+>>>
+>>> Christoph's request is well within the norms for the kernel, given that
+>>> he's making substantial changes to these files.  I talked this over with
+>>> GregKH, who pointed me at:
+>>>
+>>> https://www.linuxfoundation.org/blog/blog/copyright-notices-in-open-source-software-projects
+>>>
+>>> Even if we'd taken up some of the other policies suggested by this doc,
+>>> I'd still defer to preferences of developers who have made significant
+>>> changes.
+>>
+>> I've asked for recommendations or best practice similar to the SPDX
+>> process. Something that TAB can acknowledge and that is perhaps also
+>> consulted with lawyers. And understood within the linux project,
+>> not just that some dudes have an argument because it's all clear as mud
+>> and people are used to do things differently.
 > 
-> Can you please show me how these are initialized twice?
+> The LF in general doesn't give legal advice, but the link above does 
+> help describe common practices.
+> 
+> It's up to us to bring in our own lawyers and make decisions about the 
+> kinds of changes we're willing to accept.  We could ask the TAB (btw, 
+> I'm no longer on the TAB) to weigh in, but I think we'll find the normal 
+> variety of answers based on subsystem.
+> 
+> It's also up to contributors to decide on what kinds of requirements 
+> they want to place on continued participation.  Individuals and 
+> corporations have their own preferences based on advice from their 
+> lawyers, and as long as the change is significant, I think we can and 
+> should honor their wishes.
+> 
+> Does this mean going through and retroactively adding copyright lines? 
+> I'd really rather not.  If a major contributor comes in and shows a long 
+> list of commits and asks for a copyright line, I personally would say yes.
 
-blk_mq_bio_to_request() is one which setup these fields, then you add
-another one in blk_mq_rq_ctx_init().
+I am not aware of any long list of copyright holders in kernel source code
+files. I personally thought that the most common practice is to add a
+copyright notice for the creator (or his/her employer) of a new source
+file, or if for someone who almost completely rewrite a file. That is I
+think perfectly acceptable, as adding a new file generally means that a
+contribution is substantial.
 
 > 
-> If there is a real concern with this then we go with my original idea, which
-> was to copy the init method of blk_mq_alloc_request() (in
-> blk_mq_alloc_request_hctx())
+>>
+>> The link from linux foundation blog is nice but unless this is codified
+>> into the process it's just somebody's blog post. Also there's a paragraph
+>> about "Why not list every copyright holder?" that covers several points
+>> why I don't want to do that.
 > 
-> > 
-> > BTW, we know blk_mq_alloc_request_hctx() has big trouble, so please
-> > avoid to extend it to other use cases.
+> I'm also happy to gather advice about following the suggestions in the 
+> LF post.  I understand your concerns about listing every copyright 
+> holder, but I don't think this has been a major problem in the kernel in 
+> general.
 > 
-> Yeah, I know this,
-
-Did you know the exact issue on nvme-tcp, nvme-rdma or nvme-fc maybe
-with blk_mq_alloc_request_hctx()?
-
-> but sometimes we just need to allocate for a specific HW
-> queue...
+>>
+>> But, if TAB says so I will do, perhaps spending hours of unproductive
+>> time looking up the whole history of contributors and adding year, name,
+>> company whatever to files.
 > 
-> For my usecase of interest, it should not impact if the cpumask of the HW
-> queue goes offline after selecting the cpu in blk_mq_alloc_request_hctx(),
-> so any race is ok ... I think.
+> I can't imagine anyone asking you to spend time this way.
 > 
-> However it should be still possible to make blk_mq_alloc_request_hctx() more
-> robust. How about using something like work_on_cpu_safe() to allocate and
-> execute the request with blk_mq_alloc_request() on a cpu associated with the
-> HW queue, such that we know the cpu is online and stays online until we
-> execute it? Or also extent to work_on_cpumask_safe() variant, so that we
-> don't need to try all cpus in the mask (to see if online)?
+> -chris
+> 
 
-But all cpus on this hctx->cpumask could become offline.
-
-
-Thanks,
-Ming
+-- 
+Damien Le Moal
+Western Digital Research
 
