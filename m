@@ -2,105 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 342E4C38A2D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 23:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 491CFC38A2D
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 23:36:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbiJXXXj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 19:23:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54404 "EHLO
+        id S230031AbiJXXgR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 19:36:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230429AbiJXXXF (ORCPT
+        with ESMTP id S230026AbiJXXfw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 19:23:05 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED0C1A0C21;
-        Mon, 24 Oct 2022 14:44:04 -0700 (PDT)
-Received: from fraeml739-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Mx1N208yvz67btf;
-        Tue, 25 Oct 2022 00:52:50 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- fraeml739-chm.china.huawei.com (10.206.15.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 24 Oct 2022 18:56:18 +0200
-Received: from [10.48.145.243] (10.48.145.243) by
- lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Mon, 24 Oct 2022 17:56:17 +0100
-Message-ID: <360c78dc-65ce-362f-389d-075f2259ce5b@huawei.com>
-Date:   Mon, 24 Oct 2022 17:56:15 +0100
+        Mon, 24 Oct 2022 19:35:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9B6270D1E
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 14:56:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666648578;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jDZhxeP2TwwBagjsTWzkhVAY7jSjuBxTunb+OPsAibU=;
+        b=JyGUig9LrjFbmJD1CqWXrUqHe+3ZUdjCVuRev8a4qF6e5m/CQkMBi6BKPyV9wqTUqo4xf9
+        +VVZGPlCMKdicSSbpRE677g+9FH1RxsP9GD8cnOwGI6c8mx/40CcLmsw27YnKJiJ6Egylk
+        QDKVebwdzQRw8DnbAF87uS0i5nl03r8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-185-sgba_hcxP5a_xjp2TsMkqg-1; Mon, 24 Oct 2022 09:20:15 -0400
+X-MC-Unique: sgba_hcxP5a_xjp2TsMkqg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 409E885A5B6;
+        Mon, 24 Oct 2022 13:20:15 +0000 (UTC)
+Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 398341121315;
+        Mon, 24 Oct 2022 13:20:11 +0000 (UTC)
+Date:   Mon, 24 Oct 2022 21:20:05 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] ublk_drv: don't call task_work_add for queueing io
+ commands
+Message-ID: <Y1aRBaUWGH54TTs4@T590>
+References: <20221023093807.201946-1-ming.lei@redhat.com>
+ <8a225315-3932-62a6-2bc6-8e81e672fd9d@linux.alibaba.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH] blk-mq: Properly init bios from
- blk_mq_alloc_request_hctx()
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <1666454846-11749-1-git-send-email-john.garry@huawei.com>
- <Y1U9zNZtZjRHQBww@T590> <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
- <Y1aS3vIbuQTNGWJL@T590>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <Y1aS3vIbuQTNGWJL@T590>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.48.145.243]
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8a225315-3932-62a6-2bc6-8e81e672fd9d@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24/10/2022 14:27, Ming Lei wrote:
->>>> -	rq->bio = rq->biotail = NULL;
->>> This patch looks not good, why do you switch to initialize the three fields
->>> twice in fast path?
->> Can you please show me how these are initialized twice?
-> blk_mq_bio_to_request() is one which setup these fields, then you add
-> another one in blk_mq_rq_ctx_init().
+Hello Ziyang,
 
-ok, understood.
-
+On Mon, Oct 24, 2022 at 05:48:51PM +0800, Ziyang Zhang wrote:
+> On 2022/10/23 17:38, Ming Lei wrote:
+> > task_work_add() is used for waking ubq daemon task with one batch
+> > of io requests/commands queued. However, task_work_add() isn't
+> > exported for module code, and it is still debatable if the symbol
+> > should be exported.
+> > 
+> > Fortunately we still have io_uring_cmd_complete_in_task() which just
+> > can't handle batched wakeup for us.
+> > 
+> > Add one one llist into ublk_queue and call io_uring_cmd_complete_in_task()
+> > via current command for running them via task work.
+> > 
+> > This way cleans up current code a lot, meantime allow us to wakeup
+> > ubq daemon task after queueing batched requests/io commands.
+> > 
 > 
->> If there is a real concern with this then we go with my original idea, which
->> was to copy the init method of blk_mq_alloc_request() (in
->> blk_mq_alloc_request_hctx())
->>
->>> BTW, we know blk_mq_alloc_request_hctx() has big trouble, so please
->>> avoid to extend it to other use cases.
->> Yeah, I know this,
-> Did you know the exact issue on nvme-tcp, nvme-rdma or nvme-fc maybe
-> with blk_mq_alloc_request_hctx()?
-
-I thought that the original issue was an OoO bounds issue, fixed in 
-14dc7a18. Now there is still some issue in the following link, which is 
-still unresolved as I understand:
-https://lore.kernel.org/linux-block/5bd886f1-a7c6-b765-da29-777be0328bc2@grimberg.me/#t
-
-But I think that 14dc7a18 may still leave undesirable scenario:
-- all cpus in HW queue cpumask may go offline after cpu_online_mask read 
-in blk_mq_alloc_request_hctx() and before we get the driver tag and set 
-rq->hctx
-
 > 
->> but sometimes we just need to allocate for a specific HW
->> queue...
->>
->> For my usecase of interest, it should not impact if the cpumask of the HW
->> queue goes offline after selecting the cpu in blk_mq_alloc_request_hctx(),
->> so any race is ok ... I think.
->>
->> However it should be still possible to make blk_mq_alloc_request_hctx() more
->> robust. How about using something like work_on_cpu_safe() to allocate and
->> execute the request with blk_mq_alloc_request() on a cpu associated with the
->> HW queue, such that we know the cpu is online and stays online until we
->> execute it? Or also extent to work_on_cpumask_safe() variant, so that we
->> don't need to try all cpus in the mask (to see if online)?
-> But all cpus on this hctx->cpumask could become offline.
+> Hi, Ming
+> 
+> This patch works and I have run some tests to compare current version(ucmd)
+> with your patch(ucmd-batch).
+> 
+> iodepth=128 numjobs=1 direct=1 bs=4k
+> 
+> --------------------------------------------
+> ublk loop target, the backend is a file.
+> IOPS(k)
+> 
+> type		ucmd		ucmd-batch
+> seq-read	54.7		54.2	
+> rand-read	52.8		52.0
+> 
+> --------------------------------------------
+> ublk null target
+> IOPS(k)
+> 
+> type		ucmd		ucmd-batch
+> seq-read	257		257
+> rand-read	252		253
+> 
+> 
+> I find that io_req_task_work_add() puts task_work node into a llist
+> first, then it may call task_work_add() to run batched task_works. So do we really
+> need such llist in ublk_drv? I think io_uring has already considered task_work batch
+> optimization.
+> 
+> BTW, task_work_add() in ublk_drv achieves
+> higher IOPS(about 5-10% on my machine) than io_uring_cmd_complete_in_task()
+> in ublk_drv.
 
-If all hctx->cpumask are offline then we should not allocate a request 
-and this is acceptable. Maybe I am missing your point.
+Yeah, that is same with my observation, and motivation of this patch is
+to get same performance with task_work_add by building ublk_drv as
+module. One win of task_work_add() is that we get exact batching info
+meantime only send TWA_SIGNAL_NO_IPI for whole batch, that is basically
+what the patch is doing, but needs help of the following ublksrv patch:
 
-Thanks,
-John
+https://github.com/ming1/ubdsrv/commit/dce6d1d222023c1641292713b311ced01e6dc548
+
+which sets IORING_SETUP_COOP_TASKRUN for ublksrv's uring, then
+io_uring_cmd_complete_in_task will notify via TWA_SIGNAL_NO_IPI, and 5+%
+IOPS boost is observed on loop/001 by putting image on SSD in my test
+VM.
+
+Thanks, 
+Ming
+
