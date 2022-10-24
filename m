@@ -2,82 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2BCECDFA1
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 08:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF5EECDFA1
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 08:50:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbiJXIsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 04:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33122 "EHLO
+        id S230052AbiJXIun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 04:50:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiJXIsM (ORCPT
+        with ESMTP id S230394AbiJXIum (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 04:48:12 -0400
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F074C627
-        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 01:48:11 -0700 (PDT)
-Received: by mail-wm1-f49.google.com with SMTP id b20-20020a05600c4e1400b003cc28585e2fso2829434wmq.1
-        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 01:48:11 -0700 (PDT)
+        Mon, 24 Oct 2022 04:50:42 -0400
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC75846871
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 01:50:26 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id t4so6108323wmj.5
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 01:50:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHtF9ER2Or/nLigCVnn/Rwp4YAkOBbty21/0YYZd0eM=;
-        b=Sr7EIlES1+W8Uj92azaZtFKqu7MjdPwaO6LTUkAtHYKY48jGs8igWLNpdaL0X4SU9j
-         zRtKdts2BYR1ksomZDBpa9NdQNADBaAZ7HJdrFleA9syOnrxhP7F1F/ZAHqS1UXBtZRe
-         dsOI11FEmFg6OsHWaamAxV/Tw/mr9bgiSoS+zFwUoul05TXLPY47bU4Mjy/153dAocA2
-         Ez5PQAi/fDYptweAvdWqe6pkQPhvXkMf9EuyaoppxZStt1rux+qToq5JSE42g/vzC99S
-         6yTZEgbjLcnfS7n/VOzZoimceZO4hIwi0kjX0QeZnzdL5j0r0CyYGj3eRHbzePqmwS1k
-         I0SA==
-X-Gm-Message-State: ACrzQf1etob/WTq2fHImzQCKFOSe9JZ7P/S6D5kqGVj4kMHcNdvrwF0n
-        IIw2kgnaBrW/nMGFQr8ldcY=
-X-Google-Smtp-Source: AMsMyM6Rhf5JxAEKMXIy0ZoLMiuAbPkfy1l5rP155lk6IZ22YaJ7mbHRCic1wXvL2q02rWJ7Un6f1Q==
-X-Received: by 2002:a05:600c:54f2:b0:3c6:bd60:5390 with SMTP id jb18-20020a05600c54f200b003c6bd605390mr42004705wmb.206.1666601290328;
-        Mon, 24 Oct 2022 01:48:10 -0700 (PDT)
+        bh=18lRdCEX4yLQYFCKAwJMvIINT0nyFi41bx4NPe/PekE=;
+        b=ZxpvjEDFjdz96xMKmfHv1zTuU/nrAz5OrFxuJu/tPdXBA/4xvHUg1HOXHgGDY7Vmp9
+         ZpFMiM99jOLHI47GU7vzBO9dUdxdbIF9frs6nv45QcACMWGZaqXbThR9SHvdXVgpCJuq
+         Rv0CChRPOn8n3GvkPth6xiV+sC0h0KWS36zy0tZ60X36hnzvwin26Z+OiRXzwYsYrsA9
+         L2FDei7oMkYtMhNj6rvUGIp29oLcyy/42Z9A4Jm4+L6ScZL81U7wlIIHyQu0UnfyVzHB
+         p0nXrjfihrMKoDn03zJHs1cbO+C0pTYbNQO8htzdkY/iA7D/lpzt3lPL/im6zEy+Pdq5
+         HKdg==
+X-Gm-Message-State: ACrzQf0YXo497XQe5x5BHQk8dYgWA0ZEdSu17W/CgLCd/H/eIGLECG/Z
+        vL+r/ANabJ3Xu9X8NT945iQ=
+X-Google-Smtp-Source: AMsMyM55fommkUFOgu8vFZ05nbPW5Or2bLoCsnfUY0atwg+dAF5w8rexofq3CG6mqF5LCUlzBi5d/A==
+X-Received: by 2002:a05:600c:1913:b0:3c7:32c8:20f1 with SMTP id j19-20020a05600c191300b003c732c820f1mr11064467wmq.81.1666601424609;
+        Mon, 24 Oct 2022 01:50:24 -0700 (PDT)
 Received: from [192.168.64.94] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id b1-20020adfe641000000b002206203ed3dsm9774655wrn.29.2022.10.24.01.48.08
+        by smtp.gmail.com with ESMTPSA id a10-20020a056000188a00b0022e344a63c7sm26706921wri.92.2022.10.24.01.50.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 01:48:09 -0700 (PDT)
-Message-ID: <0d4dbbe6-f9da-1a49-1aa7-4610c6dea6e3@grimberg.me>
-Date:   Mon, 24 Oct 2022 11:48:07 +0300
+        Mon, 24 Oct 2022 01:50:24 -0700 (PDT)
+Message-ID: <45eea8bb-7322-6555-8181-40f57c42d337@grimberg.me>
+Date:   Mon, 24 Oct 2022 11:50:22 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
-Subject: Re: [PATCH 7/8] nvme: remove nvme_set_queue_dying
+Subject: Re: [PATCH 6/8] nvme: move the NS_DEAD flag to the controller
 Content-Language: en-US
+From:   Sagi Grimberg <sagi@grimberg.me>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
         Chao Leng <lengchao@huawei.com>,
         Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
 References: <20221020105608.1581940-1-hch@lst.de>
- <20221020105608.1581940-8-hch@lst.de>
- <55dfcd8e-c2f5-d064-bd4f-770383fc5305@grimberg.me>
- <20221021132950.GF22327@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20221021132950.GF22327@lst.de>
+ <20221020105608.1581940-7-hch@lst.de>
+ <ac33021a-b7a1-37cf-b156-df021ac4de43@grimberg.me>
+ <20221021132815.GE22327@lst.de>
+ <7d93b4fe-f88b-2d2c-e58d-396e03f3bc72@grimberg.me>
+In-Reply-To: <7d93b4fe-f88b-2d2c-e58d-396e03f3bc72@grimberg.me>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
->> I have to say that I always found nvme_kill_queues interface somewhat
->> odd.
-> 
-> It is..
-> 
->> its a core function that unquiesces the admin/io queues
->> assuming that they were stopped at some point by the driver.
+>>>> -
+>>>> +    if (!test_and_set_bit(NVME_CTRL_NS_DEAD, &ctrl->flags)) {
+>>>> +        list_for_each_entry(ns, &ctrl->namespaces, list)
+>>>> +            nvme_set_queue_dying(ns);
+>>>> +    }
+>>>
+>>> Looking at it now, I'm not sure I understand the need for this flag. It
+>>> seems to make nvme_kill_queues reentrant safe, but the admin queue
+>>> unquiesce can still end up unbalanced under reentrance?
+>>>
+>>> How is this not broken today (or ever since quiesce/unquiesce started
+>>> accounting)? Maybe I lost some context on the exact subtlety of how
+>>> nvme-pci uses this interface...
 >>
->> If now there is no dependency between unquiesce and blk_mark_disk_dead,
->> maybe it would be a good idea to move the unquiescing to the drivers
->> which can pair with the quiesce itself, and rename it to
->> nvme_mark_namespaces_dead() or something?
-> 
-> Yes, something like that is probably a good idea.  This entire area
-> is a bit of a mess to say it mildly, so maybe we need to sort that
-> out first.
+>> Yes, this also looks weird and I had a TODO list entry for myself
+>> to look into what is going on here.  The whole interaction
+>> with nvme_remove_namespaces is pretty weird to start with,
 
-I agree.
+git blame points to:
+0ff9d4e1a284 ("NVMe: Short-cut removal on surprise hot-unplug")
+
+But it is unclear as to why it sits in nvme_remove_namespaces instead
+of somewhere before that in nvme_remove()...
+
+Keith?
