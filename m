@@ -2,52 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99208C38A2D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 20:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C503EC67871
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 20:56:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233060AbiJXUAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 16:00:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
+        id S235251AbiJXU4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 16:56:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234348AbiJXT7n (ORCPT
+        with ESMTP id S235141AbiJXU4Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 15:59:43 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D08173594;
-        Mon, 24 Oct 2022 11:22:18 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8E5C06732D; Mon, 24 Oct 2022 16:44:11 +0200 (CEST)
-Date:   Mon, 24 Oct 2022 16:44:11 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting
-Message-ID: <20221024144411.GA25172@lst.de>
-References: <20220901074216.1849941-1-hch@lst.de> <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+        Mon, 24 Oct 2022 16:56:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F7FB3B0A;
+        Mon, 24 Oct 2022 12:03:01 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1217921E70;
+        Mon, 24 Oct 2022 19:01:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1666638117; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=oIWrFVCTFI0P8Gt8DB2CKcLBPuXOX6c8HwKwpujStPs=;
+        b=usXYqPefh4eEIKMYACSLS5A/8NdFsaITAJCgUzvwEPid3GH+TQTOI23v3ll5y+QNooeUZr
+        3ze7SirTSyiludyKt5GZz6rSOZ4tTwb4/lM5MDT4xrVqbSLeSQ4fcXWMk6rLmlp1uQzghA
+        S91SJQQGa1p2ZsLepX1DcrVHc9wRUhs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1666638117;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=oIWrFVCTFI0P8Gt8DB2CKcLBPuXOX6c8HwKwpujStPs=;
+        b=autQ68W9Wcb4TmHypUYFSXRRxqC0YVTZoahysFvUonU38+sDLf5TP/WJB83BWUqQQktFKV
+        qo006gi3pzYwxRCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E11FC13A79;
+        Mon, 24 Oct 2022 19:01:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id juQiNSThVmMpLwAAMHmgww
+        (envelope-from <mliska@suse.cz>); Mon, 24 Oct 2022 19:01:56 +0000
+Message-ID: <f70c7a11-e81e-f6b9-a403-315117f4aa3a@suse.cz>
+Date:   Mon, 24 Oct 2022 21:01:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+From:   =?UTF-8?Q?Martin_Li=c5=a1ka?= <mliska@suse.cz>
+Subject: [PATCH] block: fix Werror=format with GCC 13
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:
-> David, what's your plan to progress with this series?
+Starting with GCC 13, since
+[g3b3083a598ca3f4b] c: C2x enums wider than int [PR36113]
 
-FYI, I object to merging any of my code into btrfs without a proper
-copyright notice, and I also need to find some time to remove my
-previous significant changes given that the btrfs maintainer
-refuses to take the proper and legally required copyright notice.
+GCC promotes enum values with larger than integer types to a wider type.
+In case of the anonymous enum type in blk-iocost.c it is:
 
-So don't waste any of your time on this.
+enum {
+	MILLION			= 1000000,
+...
+
+	WEIGHT_ONE		= 1 << 16,
+...
+	VTIME_PER_SEC_SHIFT	= 37,
+	VTIME_PER_SEC		= 1LLU << VTIME_PER_SEC_SHIFT,
+...
+
+as seen VTIME_PER_SEC cannot fit into 32-bits (int type), thus one needs
+to use 'long unsigned int' in the format string.
+
+It fixes then the following 2 warnings:
+
+block/blk-iocost.c: In function ‘ioc_weight_prfill’:
+block/blk-iocost.c:3035:37: error: format ‘%u’ expects argument of type ‘unsigned int’, but argument 4 has type ‘long unsigned int’ [-Werror=format=]
+ 3035 |                 seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
+      |                                    ~^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                     |                             |
+      |                                     unsigned int                  long unsigned int
+      |                                    %lu
+block/blk-iocost.c: In function ‘ioc_weight_show’:
+block/blk-iocost.c:3045:34: error: format ‘%u’ expects argument of type ‘unsigned int’, but argument 3 has type ‘long unsigned int’ [-Werror=format=]
+ 3045 |         seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
+      |                                 ~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                  |                      |
+      |                                  unsigned int           long unsigned int
+      |                                 %lu
+
+Signed-off-by: Martin Liska <mliska@suse.cz>
+---
+ block/blk-iocost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 495396425bad..f165bac9bffb 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3032,7 +3032,7 @@ static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
+ 	struct ioc_gq *iocg = pd_to_iocg(pd);
+ 
+ 	if (dname && iocg->cfg_weight)
+-		seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
++		seq_printf(sf, "%s %lu\n", dname, iocg->cfg_weight / WEIGHT_ONE);
+ 	return 0;
+ }
+ 
+@@ -3042,7 +3042,7 @@ static int ioc_weight_show(struct seq_file *sf, void *v)
+ 	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+ 	struct ioc_cgrp *iocc = blkcg_to_iocc(blkcg);
+ 
+-	seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
++	seq_printf(sf, "default %lu\n", iocc->dfl_weight / WEIGHT_ONE);
+ 	blkcg_print_blkgs(sf, blkcg, ioc_weight_prfill,
+ 			  &blkcg_policy_iocost, seq_cft(sf)->private, false);
+ 	return 0;
+-- 
+2.38.0
+
