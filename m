@@ -2,95 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3846C3A59D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 08:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBEBC38A2D
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 08:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbiJXIXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 04:23:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37134 "EHLO
+        id S229822AbiJXInO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 04:43:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbiJXIWo (ORCPT
+        with ESMTP id S229692AbiJXInN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 04:22:44 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3987937F85;
-        Mon, 24 Oct 2022 01:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1666599614;
-        bh=mRETEBkQgxvlK+wVwijyfvEKXHrp0hCT43YSFto1wVM=;
-        h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=Szq5gNq7wFD6eigaToMGB1swCUiRaF9LgF7wlS58ft+Q3sqBjW2HlPLO9p0WtrQ4T
-         GXoHmADp9jMRENwMItatwtGAxyMd70AwjWO9TFxHlF3WbvAAo6oTEIsuGhl+loNaNn
-         yBkcW9OE47ESGIZeTgkkH5nZNgVDiFV9a8bQSVIQ=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1M7b2T-1ojs0m3IKL-0081DI; Mon, 24
- Oct 2022 10:20:14 +0200
-Message-ID: <de4337f4-3157-c4a3-0ec3-dba845d4f145@gmx.com>
-Date:   Mon, 24 Oct 2022 16:20:06 +0800
+        Mon, 24 Oct 2022 04:43:13 -0400
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 990FC36877
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 01:43:11 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id y10so6157909wma.0
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 01:43:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5nl8uXxvLSlpL8nTxFfcKz9Rk4wiN1AtReEBVE5r49Q=;
+        b=qFyVdbJ07YYr62yz65XXTtN4jt1scOO3cQQSVH77DpRZwLJygzyHppssIGvrIA0HGm
+         xcpwFXZstGrf46mCKfSxK91JtuAC9GVhDLqXZ4wEFZYudLC+IaVgN6TIsEXfYhpx7meL
+         Qki/pn1JoORMDX8vLvOOIx2ZRNeL58OqRglma+rBj5/zQ8WeW6jtCJTlZEjd+tQGL5NI
+         kR37aGEfHwkynPgy2Q2s2h/gb3SzU+aZ8i2WH+PggcAKc89Rox03evaQ2WCQjTf83H3z
+         aOjG6ZlANmNES49L3gZqbBqfoazm4ZLRijnVMmWV4fw36rgv5r33RRsaDjalMMddZtWc
+         5iJw==
+X-Gm-Message-State: ACrzQf0nBuUqQIilirDetmHV/AwK3mv3CTCMAp1KACR+i9ev0s5daOy7
+        nMHtetdGs2nw71WxWFH4M1SJZeY9r/Q=
+X-Google-Smtp-Source: AMsMyM7cU24cXF9jl5CRz0itr0ES9hhFWmak90hM098d5DB+fmhzdY0B2UpiCMj/2SW9gAHejo84vQ==
+X-Received: by 2002:a7b:cd93:0:b0:3c6:facf:1fa8 with SMTP id y19-20020a7bcd93000000b003c6facf1fa8mr22681746wmj.85.1666600990040;
+        Mon, 24 Oct 2022 01:43:10 -0700 (PDT)
+Received: from [192.168.64.94] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id v10-20020a5d4a4a000000b00236492b3315sm10520606wrs.104.2022.10.24.01.43.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Oct 2022 01:43:09 -0700 (PDT)
+Message-ID: <7d93b4fe-f88b-2d2c-e58d-396e03f3bc72@grimberg.me>
+Date:   Mon, 24 Oct 2022 11:43:08 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 6/8] nvme: move the NS_DEAD flag to the controller
 Content-Language: en-US
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-References: <20220901074216.1849941-1-hch@lst.de>
- <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-In-Reply-To: <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        Chao Leng <lengchao@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20221020105608.1581940-1-hch@lst.de>
+ <20221020105608.1581940-7-hch@lst.de>
+ <ac33021a-b7a1-37cf-b156-df021ac4de43@grimberg.me>
+ <20221021132815.GE22327@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20221021132815.GE22327@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:mTkzrOuttAy1jviNO4zU57OeQX2AnMzX8mLjNK2cHF5odq2WYVg
- 1FUkeR5oKeyNYCQeytJkxN3MdHk7VQ8NaFWiIZQXaG95Z9kP5ibpkgBSsjN96V473em/fh5
- 76REIzFYKgeuyeT7nqOyO1Gd5e3VIyaqjizZTr+NFMKPBS9EmuWo0j6ri0uuM8EGgMJXpM/
- Tc8oWbWpibiKWUGejcw9w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9drqmj/oLLI=:Nw34skgsYvifnjaN8ZhjLS
- L/dY2TjcxGbWcqO+HJo4upbLGmpog8MxAsgsWvLyK1mwNq7NjFvSpXLkOps+4JLZcRGFCA/k9
- vWt1/GaR0SQsqpJ/8w/TYJ1/H8KJwh31ZZGt691YBmwKn+Bwqo+r5uVT47RKZxz8xj79D1HgK
- OfLOgq7gF8FQZGmaW+QVkN0pGahSeLJ+zodSU0C5+ZfkbeYjkcqcWV0nuvKoXhXCcXiSQUumU
- tEh/qXjNZMk7LlXgOn8MHBunFS4YRPKfjVV/KG7hasbveUItL/JwXQlyOb5SWKlhfZsRYi8UR
- GY2BoksYs+rMhtrAgsJ+9nQJHcNgWvM1UyAcJ9jPnBJJuniMkg8sfiJp1SJVCLPfNQ589mjxW
- IXZBXwHCcBReD+LNYbS+HuNzxnfpZb1cWK99XGIw5WYyBBYgY9YUpCmnv7r9AJttA9P9XC4Bs
- ab/Wo0hyAS11ecqofoGwYpm+vruH41c1GtCOrxwsRV0ZGuh4LkwF0bTE9sxsrj09EVzxobARm
- BacOKpiTM98/Cc9yIsrzrIcgLVQNygSIC4RZl+5/r8zdQ3MKwinUHuE9orJjAhGCqVfOXM0U7
- Q+jM1XOFbrZGrw4IfiVQYhfStx6PxVTZPC9zpoj2vb5YpWF6745d3St8cBSvfV02GGIHsKLgB
- e89n/Zg2M9/kHF+XmA/udkglMV2WN9pZhQeV5Cq8wfGRadC/+dSXiSxP+y8SLPK8tKwvu7vTY
- wKlKR9Vb6hVTKS1UkSfip2MPtVBuRmz6VMeHSstdfBmkcvq2NKIbpMFxv6QcjjlHYfaUQ7maz
- ymoFV9y2j/6NgkGQs2EE3OiOz2F06XrOMzFRYBuqy0mKQ0axMhCyUG5lgIOGbIwAH/3XlR4Mo
- i1U5fja6in4HA4uqPHcZ6Fj0RY9qOiJN/2hkXivCpx/sO3NfWtue04e+f/79dq5Jl05vhZ3+h
- dZaeiEXXzv2sAXpKxwLUYSekkJ53ju54Bc6sRZqstc7ReJN3nhuFPqgUZUdATVnAaP1M0LdtC
- If6lgI0iPGWRsKcquwWezJqUDUbUgeqT99/agA7HXUHG173WzTa6B9kBNp5F7UPCHTZkkAyoQ
- BSY0/IXt0A1g2qPB/weCt+xPx3yr2JVjhY+TPt7TlBvjQeGVgqVLgQIOHV6gEPw5hJk4AZkQY
- ynx0JGBiaIQfw5Ea9XpwZTaYiFXiluBwqYYzLoC6/+TwzR9JCvZTx7Dshpmplql2S5qAZQQCQ
- vxhvbINsD9nIdmnn4do7MlQ/bZ62DBAlzdj3ebmI//IOK6EJ8W3lqqeSZvPYDa/w1dghYO0iF
- VU9K/PcZ9jyNdkhU4/QoAi54Y8I+LEA6xjOgxywsoLFDSDp4nKFSBE0xWKXSqPg7qkoWIJUTT
- v/JJWGFFIDYuqbR2uNRyEanabFlMMw8fwusRES3Fo+vO9rSgi1gVm3TEx/gDqRG1+qNLB7hub
- GB3TGf2ObKGbXKMj0pFEd0NjVA3Le1lY0zzFq5K9a1xX+V3ss8W4heNSkv2viEURwzWfUbzwR
- CFxBuclmIrJRZONk/ffMH+CfpK/qH0laYPPgqCVoQ17AQ
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+>>> -
+>>> +	if (!test_and_set_bit(NVME_CTRL_NS_DEAD, &ctrl->flags)) {
+>>> +		list_for_each_entry(ns, &ctrl->namespaces, list)
+>>> +			nvme_set_queue_dying(ns);
+>>> +	}
+>>
+>> Looking at it now, I'm not sure I understand the need for this flag. It
+>> seems to make nvme_kill_queues reentrant safe, but the admin queue
+>> unquiesce can still end up unbalanced under reentrance?
+>>
+>> How is this not broken today (or ever since quiesce/unquiesce started
+>> accounting)? Maybe I lost some context on the exact subtlety of how
+>> nvme-pci uses this interface...
+> 
+> Yes, this also looks weird and I had a TODO list entry for myself
+> to look into what is going on here.  The whole interaction
+> with nvme_remove_namespaces is pretty weird to start with, and then
+> the code in PCIe is even more weird.  But to feel confident to
+> touch this I'd need real hot removal testing, for which I don't
+> have a good rig right now.
 
-On 2022/10/24 16:12, Johannes Thumshirn wrote:
-> David, what's your plan to progress with this series?
->
-
-Initially David wants me to do some fixup in my spare time, but I know
-your RST feature is depending on this.
-
-If you're urgent on this series, I guess I can put it with more priority.
-
-Thanks,
-Qu
+Lets for start move the bit check up in the function and reverse
+the polarity to return if it is set. Unless someone can make sense
+of why this is OK.
