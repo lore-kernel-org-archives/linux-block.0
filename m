@@ -2,92 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 488B0C38A2D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 20:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F461C67871
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 21:02:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231967AbiJXU5x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 16:57:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52862 "EHLO
+        id S233095AbiJXVCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 17:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235201AbiJXU5H (ORCPT
+        with ESMTP id S232746AbiJXVBj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 16:57:07 -0400
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AE81C2EB6;
-        Mon, 24 Oct 2022 12:03:37 -0700 (PDT)
-Received: by mail-pj1-f45.google.com with SMTP id u8-20020a17090a5e4800b002106dcdd4a0so13888620pji.1;
-        Mon, 24 Oct 2022 12:03:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KpthEP7YXPpISJ6CGPHYOqUT6IOWvKcBQOAkgoQ0ELw=;
-        b=n+/PUfdkNtRN6FsSyZnOuG2MGe6OwkXQ0etPDDKP0hjvui5n1+crE6l/t4YAS/hLdB
-         hnYItTcEVr0LPjRQ/qxv2Gza3D4roOr0TkK+JhkQ5c5/bFGmK6QiLG9PXwtBTpW+Li3/
-         vgIxPICaaJafC/tv8W5dxSWvuqdEHEG1/uQlJxaJB6hnSCvo/H/77PU46NgI7Z+vzCag
-         N8ctFPw5ftvGptCDGk/DkAp975pL+W1VdBxMhwu9hxHBaZy9pJzvYN56g5Bae2XwWpwG
-         FAqU3V0V8eRg1gMS6uXv11lkMN7yUxPDjJ7QR4JhEK6XDISOWwr0+/GHk9XxomwS5WGd
-         qMmg==
-X-Gm-Message-State: ACrzQf1Q8y4k94tDXbz6g/Zx9SJ86lk+11McZ6cY2CrnnBSjXsq86UIr
-        pUBtuHKSETO00t/IGnA+UmE=
-X-Google-Smtp-Source: AMsMyM41hqd/uZatx/NIZkdddex4IQIsPyvThfppQJMTcjKSxixD9lMXD6LAtqRvj3T+q4RUKykUsQ==
-X-Received: by 2002:a17:903:18b:b0:185:43e6:20df with SMTP id z11-20020a170903018b00b0018543e620dfmr34041445plg.4.1666638167863;
-        Mon, 24 Oct 2022 12:02:47 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id i27-20020a056a00005b00b0056203db46ffsm135961pfk.172.2022.10.24.12.02.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 12:02:47 -0700 (PDT)
-Message-ID: <dc89c70e-4931-baaf-c450-6801c200c1d7@acm.org>
-Date:   Mon, 24 Oct 2022 12:02:44 -0700
+        Mon, 24 Oct 2022 17:01:39 -0400
+Received: from 66-220-144-178.mail-mxout.facebook.com (66-220-144-178.mail-mxout.facebook.com [66.220.144.178])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75953160200
+        for <linux-block@vger.kernel.org>; Mon, 24 Oct 2022 12:07:12 -0700 (PDT)
+Received: by dev1180.prn1.facebook.com (Postfix, from userid 425415)
+        id 447583ED5906; Mon, 24 Oct 2022 12:06:12 -0700 (PDT)
+From:   Stefan Roesch <shr@devkernel.io>
+To:     kernel-team@fb.com, linux-block@vger.kernel.org, linux-mm@kvack.org
+Cc:     shr@devkernel.io, axboe@kernel.dk, clm@meta.com,
+        willy@infradead.org, hch@infradead.org
+Subject: [RFC PATCH v3 00/14] mm/block: add bdi sysfs knobs
+Date:   Mon, 24 Oct 2022 12:05:49 -0700
+Message-Id: <20221024190603.3987969-1-shr@devkernel.io>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v15 00/13] support zoned block devices with non-power-of-2
- zone sizes
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Pankaj Raghav <p.raghav@samsung.com>,
-        hch@lst.de, Keith Busch <kbusch@kernel.org>
-Cc:     jaegeuk@kernel.org, agk@redhat.com, gost.dev@samsung.com,
-        snitzer@kernel.org, damien.lemoal@opensource.wdc.com,
-        linux-kernel@vger.kernel.org, hare@suse.de,
-        matias.bjorling@wdc.com, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        pankydev8@gmail.com, dm-devel@redhat.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <CGME20220923173619eucas1p13e645adbe1c8eb62fb48b52c0248ed65@eucas1p1.samsung.com>
- <20220923173618.6899-1-p.raghav@samsung.com>
- <5e9d678f-ffea-e015-53d8-7e80f3deda1e@samsung.com>
- <bd9479f4-ff87-6e5d-296e-e31e669fb148@kernel.dk>
- <0e5088a5-5408-c5bd-bf97-00803cb5faed@acm.org>
- <90b6d45e-61a5-3eb3-7525-8467f1a67587@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <90b6d45e-61a5-3eb3-7525-8467f1a67587@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 9/30/22 14:24, Jens Axboe wrote:
-> Noted. I'll find some time to review this as well separately, once we're
-> on the other side of the merge window.
+At meta network block devices (nbd) are used to implement remote block
+storage. In testing and during production it has been observed that
+these network block devices can consume a huge portion of the dirty
+writeback cache and writeback can take a considerable time.
 
-Hi Jens,
+To be able to give stricter limits, I'm proposing the following changes:
 
-Now that we are on the other side of the merge window: do you perhaps 
-want Pankaj to repost this patch series? From what I have heard in 
-several fora (JEDEC, SNIA) all flash storage vendors except one (WDC) 
-are in favor of a contiguous LBA space and hence are in favor of 
-supporting zone sizes that are not a power of two.
+1) introduce strictlimit knob
 
-As you may know in JEDEC we are working on standardizing zoned storage 
-for UFS devices. We (JEDEC JC-64.1 committee members) would like to know 
-whether or not we should require that the UFS zone size should be a 
-power of two.
+  Currently the max_ratio knob exists to limit the dirty_memory. However
+  this knob only applies once (dirty_ratio + dirty_background_ratio) / 2
+  has been reached.
+  With the BDI_CAP_STRICTLIMIT flag, the max_ratio can be applied without
+  reaching that limit. This change exposes that knob.
 
-Thank you,
+  This knob can also be useful for NFS, fuse filesystems and USB devices.
 
-Bart.
+2) Use part of 1000 internal calculation
 
+  The max_ratio is based on percentage. With the current machine sizes
+  percentage values can be very high (1% of a 256GB main memory is alread=
+y
+  2.5GB). This change uses part of 1000 instead of percentages for the
+  internal calculations.
+
+3) Introduce two new sysfs knobs: min_bytes and max_bytes.
+
+  Currently all calculations are based on ratio, but for a user it often
+  more convenient to specify a limit in bytes. The new knobs will not
+  store bytes values, instead they will translate the byte value to a
+  corresponding ratio. As the internal values are now part of 1000, the
+  ratio is closer to the specified value. However the value should be mor=
+e
+  seen as an approximation as it can fluctuate over time.
+
+
+
+Changes:
+  V3:
+  - change signature of function bdi_ratio_from_pages to take an unsigned=
+ long
+    parameter
+  - use div64_u64 function for division to support 32 bit platforms
+  - Refreshed to 6.1-rc2
+ =20
+  V2:
+  - Refreshed to 6.1-rc1
+  - Use part of 1000, instead of part of 10000
+  - Reformat cover letter
+
+*** BLURB HERE ***
+
+Stefan Roesch (14):
+  mm: add bdi_set_strict_limit() function
+  mm: add knob /sys/class/bdi/<bdi>/strict_limit
+  mm: document /sys/class/bdi/<bdi>/strict_limit knob
+  mm: use part per 1000 for bdi ratios.
+  mm: add bdi_get_max_bytes() function
+  mm: split off __bdi_set_max_ratio() function
+  mm: add bdi_set_max_bytes() function.
+  mm: add knob /sys/class/bdi/<bdi>/max_bytes
+  mm: document /sys/class/bdi/<bdi>/max_bytes knob
+  mm: add bdi_get_min_bytes() function.
+  mm: split off __bdi_set_min_ratio() function
+  mm: add bdi_set_min_bytes() function
+  mm: add /sys/class/bdi/<bdi>/min_bytes knob
+  mm: document /sys/class/bdi/<bdi>/min_bytes knob
+
+ Documentation/ABI/testing/sysfs-class-bdi |  40 +++++++
+ include/linux/backing-dev.h               |   8 ++
+ mm/backing-dev.c                          |  93 +++++++++++++++-
+ mm/page-writeback.c                       | 127 ++++++++++++++++++++--
+ 4 files changed, 254 insertions(+), 14 deletions(-)
+
+
+base-commit: 247f34f7b80357943234f93f247a1ae6b6c3a740
+--=20
+2.30.2
 
