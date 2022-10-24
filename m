@@ -2,62 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 435B4C38A2D
-	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 19:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99208C38A2D
+	for <linux-block@archiver.kernel.org>; Mon, 24 Oct 2022 20:00:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbiJXTD5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 24 Oct 2022 15:03:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42444 "EHLO
+        id S233060AbiJXUAO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Oct 2022 16:00:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232730AbiJXTDd (ORCPT
+        with ESMTP id S234348AbiJXT7n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 24 Oct 2022 15:03:33 -0400
+        Mon, 24 Oct 2022 15:59:43 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E81B138A11;
-        Mon, 24 Oct 2022 10:42:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D08173594;
+        Mon, 24 Oct 2022 11:22:18 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6EF1268BFE; Mon, 24 Oct 2022 17:03:20 +0200 (CEST)
-Date:   Mon, 24 Oct 2022 17:03:20 +0200
+        id 8E5C06732D; Mon, 24 Oct 2022 16:44:11 +0200 (CEST)
+Date:   Mon, 24 Oct 2022 16:44:11 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, Christoph Hellwig <hch@lst.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>, viro@zeniv.linux.org.uk
-Subject: Re: [PATCH v11 0/9] Userspace P2PDMA with O_DIRECT NVMe devices
-Message-ID: <20221024150320.GA26731@lst.de>
-References: <20221021174116.7200-1-logang@deltatee.com>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Message-ID: <20221024144411.GA25172@lst.de>
+References: <20220901074216.1849941-1-hch@lst.de> <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221021174116.7200-1-logang@deltatee.com>
+In-Reply-To: <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The series looks good to me know. How do we want to handle it?  I think
-we need a special branch somewhere (maybe in the block or mm trees?)
-so that we can base the other iov_iter work from John on it.  Also
-Al has a whole bunch of iov_iter changes that we probably want on
-the same branch as well, although some of those (READ vs WRITE fixups)
-look like 6.1 material to me.
+On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:
+> David, what's your plan to progress with this series?
 
+FYI, I object to merging any of my code into btrfs without a proper
+copyright notice, and I also need to find some time to remove my
+previous significant changes given that the btrfs maintainer
+refuses to take the proper and legally required copyright notice.
+
+So don't waste any of your time on this.
