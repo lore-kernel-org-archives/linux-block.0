@@ -2,161 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F161DC38A2D
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 10:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FF39C38A2D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 11:21:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232418AbiJYKR3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 06:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
+        id S231368AbiJYLVt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 07:21:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232242AbiJYKRF (ORCPT
+        with ESMTP id S230522AbiJYLVs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 06:17:05 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3569C112AAB;
-        Tue, 25 Oct 2022 03:11:20 -0700 (PDT)
-Received: from frapeml500002.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MxSNj16HWz6HJTP;
-        Tue, 25 Oct 2022 18:09:57 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- frapeml500002.china.huawei.com (7.182.85.205) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 25 Oct 2022 12:11:18 +0200
-Received: from [10.195.245.7] (10.195.245.7) by lhrpeml500003.china.huawei.com
- (7.191.162.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 25 Oct
- 2022 11:11:15 +0100
-Message-ID: <b02c42d9-3f3f-1d5a-29f0-13018867647b@huawei.com>
-Date:   Tue, 25 Oct 2022 11:11:14 +0100
+        Tue, 25 Oct 2022 07:21:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82E40123474
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 04:21:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666696905;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BaqceJ7rtioV7Hk4RXPbSv2vv4HBnmL/vQtFf809lKU=;
+        b=GDjIR4ei8BLDmU6YvcXvpnxUMxwydLlbPyJKH9QsoX8/TakwOFXpjwoB3PvRbVFPSPOk5w
+        dC5mEEQ7Tr8NOiGeK74rPCcSGo+x4xw4fAB3NDfbjFh4LwaSaO1nWlbOD1za+OlUYPv7jM
+        Yuprbt+SgDF9V/o0XmWw9HnIi70idaw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-610-MDje6bPONCib0KQ6WMl_Bw-1; Tue, 25 Oct 2022 07:21:31 -0400
+X-MC-Unique: MDje6bPONCib0KQ6WMl_Bw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 576E5811E75;
+        Tue, 25 Oct 2022 11:21:30 +0000 (UTC)
+Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 70E2C492B0A;
+        Tue, 25 Oct 2022 11:21:23 +0000 (UTC)
+Date:   Tue, 25 Oct 2022 19:21:17 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, hch@lst.de,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH] blk-mq: Properly init bios from
+ blk_mq_alloc_request_hctx()
+Message-ID: <Y1fGrfHqbha6l+hz@T590>
+References: <Y1U9zNZtZjRHQBww@T590>
+ <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
+ <Y1aS3vIbuQTNGWJL@T590>
+ <360c78dc-65ce-362f-389d-075f2259ce5b@huawei.com>
+ <Y1cvJ4/uwUScAQq4@T590>
+ <3513b14c-14e0-b865-628e-a83521090de9@huawei.com>
+ <CAFj5m9JnSBBVGrp5CqeH99-+VOGRuroUAi3c-3=6XKa891Sfmw@mail.gmail.com>
+ <cf7f8f88-7d3e-8818-8584-e2276e7a1f30@huawei.com>
+ <Y1epeuwonmjQhrXW@T590>
+ <399a2c2d-0b56-e4e7-c309-a6b9537d8939@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH RFC v3 00/22] blk-mq/libata/scsi: SCSI driver tagging
- improvements Part I
-To:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
-        <jinpu.wang@cloud.ionos.com>, <hare@suse.de>, <bvanassche@acm.org>,
-        <hch@lst.de>, <ming.lei@redhat.com>, <niklas.cassel@wdc.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-ide@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <linuxarm@huawei.com>
-References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.245.7]
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <399a2c2d-0b56-e4e7-c309-a6b9537d8939@huawei.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/10/2022 11:17, John Garry wrote:
+On Tue, Oct 25, 2022 at 10:32:28AM +0100, John Garry wrote:
+> On 25/10/2022 10:16, Ming Lei wrote:
+> > > > > I mentioned before that if no hctx->cpumask is online then we don't need
+> > > > > to allocate a request. That is because if no hctx->cpumask is online,
+> > > > > this means that original erroneous IO must be completed due to nature of
+> > > > > how blk-mq cpu hotplug handler works, i.e. drained, and then we don't
+> > > > > actually need to abort it any longer, so ok to not get a request.
+> > > > No, it is really not OK, if all cpus in hctx->cpumask are offline, you
+> > > > can't allocate
+> > > > request on the specified hw queue, then the erroneous IO can't be handled,
+> > > > then cpu hotplug handler may hang for ever.
+> > > If the erroneous IO is still in-flight from blk-mq perspective, then how can
+> > > hctx->cpumask still be offline? I thought that we guarantee that
+> > > hctx->cpumask cannot go offline until drained.
+> > Yeah, the draining is done before the cpu is offline. But the drain is
+> > simply waiting for the inflight IO to be completed. If the IO is failed
+> > during the waiting, you can't allocate such reserved request for error
+> > handling, then hang ever in blk_mq_hctx_notify_offline().
+> 
+> Actually if final cpu in hctx->cpumask is going offline, then hctx won't
+> queue any more requests, right? In this case I don't think we can queue on
+> that hctx anyway. I need to think about this more.
 
-Hi all,
+It can be queued actually, but interrupt may not be delivered if managed
+irq is used.
 
-I meant to say that this is just an update for where I got to here. I am 
-actually changing employer soon, but will continue in upstream linux 
-storage domain. So I don't want people to think that I am just throwing 
-some stuff over the wall for the community to deal with. I would still 
-like people to check this.
+> 
+> > 
+> > If you just make it one driver private command, there can't be such
+> > issue.
+> 
+> Well we're trying to use reserved requests for EH commands, which that goes
+> against.
+> 
+> > Block layer is supposed for handling common case(normal io and pt io),
+> > I'd suggest to not put such special cases into block layer.
+> 
+> It also supports reserved commands, which I would assume would be suitable
+> for EH scenarios.
+
+Then you have to be careful, as I mentioned, EH has to provide forward
+progress, if you let blk-mq allocate & submit EH request, the implied
+dependency from blk-mq has to be payed attention.
+
 
 Thanks,
-John
-
-> Currently SCSI low-level drivers are required to manage tags for commands
-> which do not come via the block layer - libata internal commands would be
-> an example of one of these. We want to make blk-mq manage these tags also.
-> 
-> There was some work to provide "reserved commands" support in such series
-> as https://lore.kernel.org/linux-scsi/20211125151048.103910-1-hare@suse.de/
-> 
-> This was based on allocating a request for the lifetime of the "internal"
-> command.
-> 
-> This series tries to solve that problem by not just allocating the request
-> but also sending it as a request through the block layer. Reasons to do
-> this:
-> - Normal flow of a request and also commonality for regular scsi command
->    lifetime
-> - We don't leave request and scsi_cmnd fields dangling as when we just
->    allocate and free the request for the lifetime of the "internal" command
-> - For poll mode support we can only poll in block layer, so could not send
->    internal commands on poll mode queues if we did not do this, which is a
->    problem
-> - Can get rid of duplicated code like libsas internal command timeout
->    handling
-> 
-> Series part I contains core SCSI midlayer, libata, and libsas changes to
-> queue libsas "slow" tasks as requests.
-> 
-> Series part II of this series focused on changing libata to queue internal
-> commands as requests.
-> 
-> Testing:
-> QEMU with AHCI with disk and cdrom attached, hisi_sas, pm8001.
-> 
-> Branch containing all patches is at:
-> https://github.com/hisilicon/kernel-dev/commits/private-topic-sas-6.1-block
-> 
-> v2 was here:
-> https://lore.kernel.org/linux-scsi/1654770559-101375-1-git-send-email-john.garry@huawei.com/
-> 
-> Hannes Reinecke (1):
->    scsi: core: Implement reserved command handling
-> 
-> John Garry (21):
->    blk-mq: Don't get budget for reserved requests
->    scsi: core: Add scsi_get_dev()
->    scsi: core: Add support to send reserved commands
->    scsi: core: Add support for reserved command timeout handling
->    scsi: libsas: Improve sas_ex_discover_expander() error handling
->    scsi: libsas: Notify LLDD expander found before calling sas_rphy_add()
->    scsi: scsi_transport_sas: Alloc sdev for expander
->    scsi: libsas: Add sas_alloc_slow_task_rq()
->    scsi: libsas: Add sas_queuecommand_internal()
->    scsi: libsas: Add sas_internal_timeout()
->    scsi: core: Use SCSI_SCAN_RESCAN in  __scsi_add_device()
->    scsi: scsi_transport_sas: Allocate end device target id in the rphy
->      alloc
->    ata: libata-scsi: Add ata_scsi_setup_sdev()
->    scsi: libsas: Add sas_ata_setup_device()
->    ata: libata-scsi: Allocate sdev early in port probe
->    scsi: libsas drivers: Reserve tags
->    scsi: libsas: Queue SMP commands as requests
->    scsi: libsas: Queue TMF commands as requests
->    scsi: core: Add scsi_alloc_request_hwq()
->    scsi: libsas: Queue internal abort commands as requests
->    scsi: libsas: Delete sas_task_slow.timer
-> 
->   block/blk-mq.c                         |   4 +-
->   drivers/ata/libata-eh.c                |   1 +
->   drivers/ata/libata-scsi.c              |  49 ++++++++----
->   drivers/ata/libata.h                   |   1 +
->   drivers/scsi/aic94xx/aic94xx_init.c    |   3 +
->   drivers/scsi/hisi_sas/hisi_sas_main.c  |  40 +++++-----
->   drivers/scsi/hisi_sas/hisi_sas_v1_hw.c |   3 +
->   drivers/scsi/hisi_sas/hisi_sas_v2_hw.c |   3 +
->   drivers/scsi/hisi_sas/hisi_sas_v3_hw.c |   7 ++
->   drivers/scsi/hosts.c                   |  16 ++++
->   drivers/scsi/isci/init.c               |   3 +
->   drivers/scsi/libsas/sas_ata.c          |  20 +++++
->   drivers/scsi/libsas/sas_expander.c     | 101 ++++++++++++++-----------
->   drivers/scsi/libsas/sas_init.c         |  61 ++++++++++++++-
->   drivers/scsi/libsas/sas_internal.h     |   5 ++
->   drivers/scsi/libsas/sas_scsi_host.c    |  93 ++++++++++++-----------
->   drivers/scsi/mvsas/mv_init.c           |   7 ++
->   drivers/scsi/pm8001/pm8001_init.c      |   8 +-
->   drivers/scsi/scsi_error.c              |   3 +
->   drivers/scsi/scsi_lib.c                |  42 +++++++++-
->   drivers/scsi/scsi_scan.c               |  29 ++++++-
->   drivers/scsi/scsi_transport_sas.c      |  34 ++++++---
->   include/linux/libata.h                 |   2 +
->   include/scsi/libsas.h                  |   8 +-
->   include/scsi/scsi_cmnd.h               |   3 +
->   include/scsi/scsi_host.h               |  21 ++++-
->   26 files changed, 424 insertions(+), 143 deletions(-)
-> 
+Ming
 
