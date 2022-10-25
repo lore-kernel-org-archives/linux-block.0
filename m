@@ -2,70 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B1AC04A95
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 14:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26924C04A95
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 14:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232301AbiJYOIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 10:08:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48418 "EHLO
+        id S229875AbiJYOYO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 10:24:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232825AbiJYOHp (ORCPT
+        with ESMTP id S232172AbiJYOX7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 10:07:45 -0400
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 802C91911EB
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 07:04:10 -0700 (PDT)
-Received: by mail-pg1-f180.google.com with SMTP id b5so11544743pgb.6
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 07:04:10 -0700 (PDT)
+        Tue, 25 Oct 2022 10:23:59 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9E0102511
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 07:23:58 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id j12so11092521plj.5
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 07:23:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sHFM7hSxk92IObPZe5vjZohRKRqPul0RJaS7riWUCk0=;
+        b=VIxooYOaxwZ61wqPop57waVSoQw62K9KchO4Wp0x3c75zgNLBtlXYzctK143sQY6B9
+         E0YCOoJUKy7pqGPDwJM86cc+VBMW+Of8qeUP7WqgStP83C08GuURb/GRfAIxAZcnWUL4
+         gnfHuEJ54AthJm+J/BnSaUpIFvukzEcSupHoI/t2p1ZJzZBISD+GnIrX6NZoB1a6feOq
+         WoXUJE9AdrVtQAx3ubTOL0DX1fwocYxcKOe2+UFBj01q4iXIPT0LiQFnBujKgAm8y0hY
+         4oPkaPV7vmscjbdlV2ge0Uwynwv5GwTYVKB+9nQ+rtLhJouETTVQCqzH5l2G6tnRPBJG
+         NqnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Te46Alpl4tynaaATY6iERpmfuiFBUQ+4oa5sHa3QaY=;
-        b=jJzZwxfBqk1IE0sk3yZyPOKB3FhpLalRxMOxSjyrgKtM3u8idlfVm/YiToM8X1g0ze
-         DYgHv7KeJYXvPdcY8u563crfVnzL9vjcyKNRsbUYh1TplXm9DYhfsW2iRvtcge/tTW3/
-         LK4fNMWbYvoGDo1FSSG59eDzfYJS6K7a050ThJhASYKgJQWtEWcpMjHWfKiHq+GqEBhg
-         CCp78uD6BOr/ymdruw/cgFyTk633NGhpId2/fDGJqYxIr02HCW/O/BDhLWfYHSmlIojB
-         3CmIKIYgJVMcscb0AjQNKs/XXD5NCMyGUCRY4zLBBnJ/MfKXLK/DFJXLGOiYcYwgjswd
-         4jjw==
-X-Gm-Message-State: ACrzQf0dMjhXjyuv8ikeBG+hCa8Si1keBadzB7Ke8VpXSlohN89SrFA6
-        qEBE9wcC/WIRrzsQ2wJ+VwI=
-X-Google-Smtp-Source: AMsMyM7ShonRU+/ZarCJpF/LAJmrHf0u81CHO0oOSPS+LEOrBtV6JCu5S9xRZrl8cFUeZYdWnfx4Lg==
-X-Received: by 2002:a63:2a81:0:b0:43c:5fa6:1546 with SMTP id q123-20020a632a81000000b0043c5fa61546mr32451709pgq.43.1666706649949;
-        Tue, 25 Oct 2022 07:04:09 -0700 (PDT)
-Received: from [192.168.51.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id d2-20020a170903230200b0017f61576dbesm1247772plh.304.2022.10.25.07.04.08
+        bh=sHFM7hSxk92IObPZe5vjZohRKRqPul0RJaS7riWUCk0=;
+        b=i/1031fS57HtWZ57Bs3HmvOFe2CS+K9nqC85x2ioCsW4Vk/8QHgMMGuCCGAjjm3CN4
+         uZvIqprm9M21/UEq/8fN6Mx4mDRHUpGjHMTqzT6icHyWQ7j3rX3GTSCztrnR8njWVWMn
+         NcUA/e81OQ/F6I6c1ndyUE2RX7T/HaYzX43maVIGl/T64jf/Ys5aDPNeymKbEB+JigBT
+         n4IQxymLxO77/WKuJmlcO4drSvPuhd90gypi8Sv/T4hGTM9oryWqTQhHQ+sKuWlTgrQm
+         N+rSbrvrxuZy8cRMLCXSKe4zWZYWlrSoDztf56ESiNJpzUy87A4ZoObAJVtJc6b/OlkB
+         rraw==
+X-Gm-Message-State: ACrzQf0OEe+8jUUaQVyukjsB+iJtad3Ri3c7euWzQvUSdteiYmcOd+4g
+        RsSlsBcbm2vDPwR21mq919A6Mg==
+X-Google-Smtp-Source: AMsMyM741H7P8iGhv9Qw7LG3fWhtLsvG2uiB/1mucg/H0TheENBKEWlKAS7sZ5WnLe0/9edqqKWe1A==
+X-Received: by 2002:a17:90a:590a:b0:20a:e93e:2022 with SMTP id k10-20020a17090a590a00b0020ae93e2022mr44004197pji.141.1666707837740;
+        Tue, 25 Oct 2022 07:23:57 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id h1-20020a170902f54100b00186cf82717fsm330817plf.165.2022.10.25.07.23.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Oct 2022 07:04:09 -0700 (PDT)
-Message-ID: <12132794-b7ba-5b87-4dae-fad592a74ee9@acm.org>
-Date:   Tue, 25 Oct 2022 07:04:07 -0700
+        Tue, 25 Oct 2022 07:23:57 -0700 (PDT)
+Message-ID: <2baca1bc-cee0-9a52-3fcd-bdb812e5f512@kernel.dk>
+Date:   Tue, 25 Oct 2022 08:23:56 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH] blk-mq: avoid double ->queue_rq() because of early
- timeout
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+Subject: Re: [PATCH 1/4] blk-mq: move the call to blk_put_queue out of
+ blk_mq_destroy_queue
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, David Jeffery <djeffery@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
         Keith Busch <kbusch@kernel.org>,
-        virtualization@lists.linux-foundation.org
-References: <20221025005501.281460-1-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20221025005501.281460-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org
+References: <20221018135720.670094-1-hch@lst.de>
+ <20221018135720.670094-2-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221018135720.670094-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/24/22 17:55, Ming Lei wrote:
-> +struct blk_expired_data {
-> +	unsigned long next;
-> +	unsigned long now;
-> +};
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 059737c1a2c19..07381673170b9 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -4847,6 +4847,7 @@ int nvme_alloc_admin_tag_set(struct nvme_ctrl *ctrl, struct blk_mq_tag_set *set,
+>  
+>  out_cleanup_admin_q:
+>  	blk_mq_destroy_queue(ctrl->fabrics_q);
+> +	blk_put_queue(ctrl->fabrics_q);
+>  out_free_tagset:
+>  	blk_mq_free_tag_set(ctrl->admin_tagset);
+>  	return ret;
+This is wrong and doesn't apply because it got fixed upstream:
 
-How about renaming 'now' into 'before_quiesce'? Anyway:
+commit 4739824e2d7878dcea88397a6758e31e3c5c124e
+Author: Dan Carpenter <error27@gmail.com>
+Date:   Sat Oct 15 11:25:56 2022 +0300
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+    nvme: fix error pointer dereference in error handling
+
+Can you respin this series so we can get it applied?
+
+-- 
+Jens Axboe
+
