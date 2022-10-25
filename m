@@ -2,85 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE34AC38A2D
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 18:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5E9FA373E
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 19:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231244AbiJYSxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 14:53:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48126 "EHLO
+        id S229781AbiJYTS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 15:18:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231381AbiJYSxa (ORCPT
+        with ESMTP id S232946AbiJYTSJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 14:53:30 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DFB6A487A
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 11:53:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 476C3B81E84
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 18:53:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 642C3C433D6;
-        Tue, 25 Oct 2022 18:53:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666724007;
-        bh=qXItz4lSkGiD7gbYePH9XLDF1DbJ3bgBrxUqFEb6QAA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fziRdPhqJQ06KZ0kiP0MS1nP+VvYfrrK3tA+Jq9uxyTDyN6KptCBDwXFa/vBhIx7N
-         bz63Yugw2OmcNyfwl+eyNtbg0uRxL/ExRdmdjSBh94+rijLiKUNJfllsshoAozYDGZ
-         QIiRuupR3aMV+He1t7suNLfcfBaVgLCtYAtaF1NizClR//7NprqUrWQbBwHDcRtHV2
-         QWk0cgAkYCpPtxHSLfXO2JMPR1U3Cfxm/L9QRBhnloszp61LKgvyd1Oa85aHf+6Cef
-         8W6oADV6X8dBz1gH06UFNrK5+VfJAnQ2LwpMdIm3TwgLZ42LZiS3vNru5k0fqCGw+c
-         ovkOZyQEf5GpQ==
-Date:   Tue, 25 Oct 2022 12:53:23 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Chao Leng <lengchao@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 10/17] nvme-pci: mark the namespaces dead earlier in
- nvme_remove
-Message-ID: <Y1gwo69pYet8hzt1@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221025144020.260458-1-hch@lst.de>
- <20221025144020.260458-11-hch@lst.de>
+        Tue, 25 Oct 2022 15:18:09 -0400
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA622B7F61
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 12:18:04 -0700 (PDT)
+Received: by mail-pj1-f46.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso12774929pjc.5
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 12:18:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EL1JYK0bUZJ89c8yrk5wkceIUOrhcWNtklo42o1wjCk=;
+        b=6FaL3GAhptBiQaa0VsqvgXI/80lbsatuYeN/mnCN+Ca2wLSnuSYmgsHara39kcuZBm
+         siLsH+dmEad1H6pbf+dZ7N85aQAenUYGPSiRv/rCR/eY2GY7RrlMP70/+uIp1ttj70VU
+         dKFjCBuLBJKzjBwaJYqLvadXURrwaFYdHPlc4JhhYmeZln6IAs0h+AK+bqco+4VRmUCF
+         X452RCi2/IdE20y57H7j08KfTrXSpRTagYU0elCm9XDt2bUzs6Z7dhD74BQ3+ntMfJi3
+         66iN9PUeZBjBsD4O11KCMKfecPMT3irPBt0oAghtird2m48DVAKKoM2n5mVoP041qiV3
+         ZvXw==
+X-Gm-Message-State: ACrzQf3+LkRDJ1JkxsIUXcL2Ru8GvbcHgX4AicYxWDvBBH0ZiIbktTs6
+        EA0AsuSNLKVcqDAwwidW+UiutehSiAU=
+X-Google-Smtp-Source: AMsMyM4AGnHD8y1dDeIG5gl6uXdFYsZ6bVU/97c0jtuSPDHHfGaaCHAFygdsOX77p4UFDdOS1qJExw==
+X-Received: by 2002:a17:902:ef95:b0:186:8376:2084 with SMTP id iz21-20020a170902ef9500b0018683762084mr21455132plb.48.1666725484039;
+        Tue, 25 Oct 2022 12:18:04 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:58c7:bc96:4597:61cd])
+        by smtp.gmail.com with ESMTPSA id b23-20020a170902d89700b00186a8beec78sm1540737plz.52.2022.10.25.12.18.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Oct 2022 12:18:03 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH 0/3] Block layer cleanup patches
+Date:   Tue, 25 Oct 2022 12:17:52 -0700
+Message-Id: <20221025191755.1711437-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221025144020.260458-11-hch@lst.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 25, 2022 at 07:40:13AM -0700, Christoph Hellwig wrote:
-> When we have a non-present controller there is no reason to wait in
-> marking the namespaces dead, so do it ASAP.  Also remove the superflous
-> call to nvme_start_queues as nvme_dev_disable already did that for us.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/nvme/host/pci.c | 18 ++++++------------
->  1 file changed, 6 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 8ab54857cfd50..bef98f6e1396c 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -3244,25 +3244,19 @@ static void nvme_remove(struct pci_dev *pdev)
->  	nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DELETING);
->  	pci_set_drvdata(pdev, NULL);
->  
-> +	/*
-> +	 * Mark the namespaces dead as we can't flush the data, and disable the
-> +	 * controller ASAP as we can't shut it down properly if it was surprise
-> +	 * removed.
-> +	 */
->  	if (!pci_device_is_present(pdev)) {
->  		nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_DEAD);
-> +		nvme_mark_namespaces_dead(&dev->ctrl);
->  		nvme_dev_disable(dev, true);
->  	}
+Hi Jens,
 
-Ah, this changes what I mentioned about 4. Flushing the scan_work prior
-to nvme_mark_namespaces_dead() still looks the right thing to do, but I
-think you have to do both after nvme_dev_disable().
+There are two cleanup patches in this series and one small performance
+improvement patch. Please consider these patches for the next merge window.
+
+Changes compared to v1:
+- Extracted these patches from a larger patch series.
+- Added Mings' Reviewed-by.
+
+Bart Van Assche (3):
+  block: Remove request.write_hint
+  block: Constify most queue limits pointers
+  block: Micro-optimize get_max_segment_size()
+
+ block/blk-map.c        |  2 +-
+ block/blk-merge.c      | 44 ++++++++++++++++++++++++++----------------
+ block/blk-settings.c   |  6 +++---
+ block/blk.h            | 11 ++++++-----
+ include/linux/blk-mq.h |  1 -
+ 5 files changed, 37 insertions(+), 27 deletions(-)
+
