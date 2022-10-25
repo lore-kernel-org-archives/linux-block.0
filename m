@@ -2,97 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE541FA3740
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 19:42:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A5EC38A2D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 20:17:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232179AbiJYTmR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 15:42:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55426 "EHLO
+        id S232758AbiJYURO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 16:17:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232185AbiJYTmP (ORCPT
+        with ESMTP id S232625AbiJYURN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 15:42:15 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2959AC49A
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 12:42:14 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id r142so11351254iod.11
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 12:42:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wo5gCdV4HOvdCiIDRmFlmf80DqTwgnkZIIgLG7LqzFw=;
-        b=POGwl/v2rAIo0Tt8sQBMm76r7/ZH/JK2/Bf6HuuKIWp+RTvj20FhYbzdX77Nur/6Bv
-         VaYgFwBsjPzEQN6j70X43WCcut6uSzrwySJTL9c2SJWkNu5QCLte63YBL05pklfjK4Pw
-         avjIVI1XK7tlszMx5qvLCLFKLVw/cZjy1/UVZkc8RX4BLMRcehnJVpPdGIwa7R/+67u9
-         U2tnUaFc7AI8AWJn17LTsd7imwunI6K4zK97jEB44Z8yuNM9wRZAyWUCc1NDNhUn1cK8
-         3+FT8wZNLu4QfCTqhlA6Rm+auoPbYvHBhxpc3aATbmhWwVOLltX8J/mTYEglJCDMucdc
-         Ff6A==
+        Tue, 25 Oct 2022 16:17:13 -0400
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86BAC8941
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 13:17:08 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id a14so20221242wru.5
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 13:17:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wo5gCdV4HOvdCiIDRmFlmf80DqTwgnkZIIgLG7LqzFw=;
-        b=73ZZPvWqV1/No3gDIPu5g6oOJASjxNkvTfJ0YB5RZ6xQQAd3JBkbBnvhdyEQVV0D8q
-         eMpu5ilIPTAzV4fJOaqB6Zuu/kvaeEnVAG1nJkN/yYKk9IGfhxmJ8n0vrfmaTaZ5n5Wm
-         Rd0KlNPzD5ju3yFFCp4tcDvcyKazZEVsokYUaA8HLCioix64q6y7Nw295fdfMRW3dzqH
-         R9p13SdgTvSR4AaOEmhFDtTenxCvjcQJS+32DL8OLrf1IuxWVx2kDGDF0cqWQbjpzuqh
-         Nk4P/1WN07sY5+1VogSF+zU2fernvP4y6K2oblReg/dJ0T3PZir5ds2wtL6EXagzu4t7
-         6k4A==
-X-Gm-Message-State: ACrzQf3oBlxJSMwRHZdR+UgpyQ/lv7PGMwaiE6UPsM7Ms8ElLSyr059z
-        Jk6HA2RvbZValNih6UcKSW4LVQ==
-X-Google-Smtp-Source: AMsMyM48aBtAi9RmmmRoZZeLkaEfwha1HYWhziCKd3iVYYUja5LyHNtr3FZa1xP/yiCE6+RA1WsXTg==
-X-Received: by 2002:a05:6638:25d1:b0:374:f8c2:bf7a with SMTP id u17-20020a05663825d100b00374f8c2bf7amr5089585jat.270.1666726933999;
-        Tue, 25 Oct 2022 12:42:13 -0700 (PDT)
-Received: from [127.0.0.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id n17-20020a92d9d1000000b002f9b55e7e92sm1318548ilq.0.2022.10.25.12.42.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Oct 2022 12:42:13 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        io-uring@vger.kernel.org
-In-Reply-To: <cover.1666347703.git.asml.silence@gmail.com>
-References: <cover.1666347703.git.asml.silence@gmail.com>
-Subject: Re: [PATCH for-next v3 0/3] implement pcpu bio caching for IRQ I/O
-Message-Id: <166672693299.6037.1642967404693492462.b4-ty@kernel.dk>
-Date:   Tue, 25 Oct 2022 13:42:12 -0600
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=97GpEQ2+6Ykh6KgprSH5be6D6WMxByu7zMpaNrCZEeY=;
+        b=PIeldrA9epW8VxLcqstrvnVYHfpflxSuaW1ijFHKaClFZjGKsW/gKCicAiZAjopbyj
+         ym8ASLbgka2bQNVxDtM1k+OOXUuNZENmOTUrtsb6Uux7/+Jlb/mChomjIBJkr3tf+TtD
+         CImMT+H83OpMl32u69hT6L+0cV0KzA3Nw4YSfNOCu8r3zf+pSQk3+q+02tGM9IK1dia4
+         cPqawCJ8ETZ3l2RqYGjoGMd93yNo2+9uKanFJMlHCljBKZM4rrA+Ty9H/ERgHkHrMNWm
+         NJUsvK5FJNszeqytGwvZ77IFeffDqV6JFMs5drxIiOgI9mv4+HWZYLwC3n97CYmftZKA
+         VwUQ==
+X-Gm-Message-State: ACrzQf3ox3rd5erMx6EDrmw50EPiy64Ex5nggh0o7HFwywIhnF1nlCf6
+        TfGCuKg81mYcJAOI2CjGYro=
+X-Google-Smtp-Source: AMsMyM5a1FeYsBbMRzCZtprCw+A2mLQrmVG/96WZ5BZLQiiu3e1XHmmXMkoH0J4o6OVBti4WBHAG2Q==
+X-Received: by 2002:a5d:51c2:0:b0:236:7000:8e82 with SMTP id n2-20020a5d51c2000000b0023670008e82mr8650982wrv.191.1666729027231;
+        Tue, 25 Oct 2022 13:17:07 -0700 (PDT)
+Received: from [10.100.102.14] (46-116-236-159.bb.netvision.net.il. [46.116.236.159])
+        by smtp.gmail.com with ESMTPSA id c11-20020a05600c0a4b00b003c6f27d275dsm12763840wmq.33.2022.10.25.13.17.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Oct 2022 13:17:06 -0700 (PDT)
+Message-ID: <63c062dd-babb-e815-131a-bc0e513bb33e@grimberg.me>
+Date:   Tue, 25 Oct 2022 23:17:04 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 04/17] nvme: don't call nvme_kill_queues from
+ nvme_remove_namespaces
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Chao Leng <lengchao@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20221025144020.260458-1-hch@lst.de>
+ <20221025144020.260458-5-hch@lst.de>
+ <Y1ggN68V/mbAw1q2@kbusch-mbp.dhcp.thefacebook.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <Y1ggN68V/mbAw1q2@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 21 Oct 2022 11:34:04 +0100, Pavel Begunkov wrote:
-> Add bio pcpu caching for normal / IRQ-driven I/O extending REQ_ALLOC_CACHE,
-> which was limited to iopoll. t/io_uring with an Optane SSD setup showed +7%
-> for batches of 32 requests and +4.3% for batches of 8.
+
+
+On 10/25/22 20:43, Keith Busch wrote:
+> On Tue, Oct 25, 2022 at 07:40:07AM -0700, Christoph Hellwig wrote:
+>> @@ -4560,15 +4560,6 @@ void nvme_remove_namespaces(struct nvme_ctrl *ctrl)
+>>   	/* prevent racing with ns scanning */
+>>   	flush_work(&ctrl->scan_work);
+>>   
+>> -	/*
+>> -	 * The dead states indicates the controller was not gracefully
+>> -	 * disconnected. In that case, we won't be able to flush any data while
+>> -	 * removing the namespaces' disks; fail all the queues now to avoid
+>> -	 * potentially having to clean up the failed sync later.
+>> -	 */
+>> -	if (ctrl->state == NVME_CTRL_DEAD)
+>> -		nvme_kill_queues(ctrl);
+>> -
+>>   	/* this is a no-op when called from the controller reset handler */
+>>   	nvme_change_ctrl_state(ctrl, NVME_CTRL_DELETING_NOIO);
+>>   
+>> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+>> index ec034d4dd9eff..f971e96ffd3f6 100644
+>> --- a/drivers/nvme/host/pci.c
+>> +++ b/drivers/nvme/host/pci.c
+>> @@ -3249,6 +3249,16 @@ static void nvme_remove(struct pci_dev *pdev)
+>>   
+>>   	flush_work(&dev->ctrl.reset_work);
+>>   	nvme_stop_ctrl(&dev->ctrl);
+>> +
+>> +	/*
+>> +	 * The dead states indicates the controller was not gracefully
+>> +	 * disconnected. In that case, we won't be able to flush any data while
+>> +	 * removing the namespaces' disks; fail all the queues now to avoid
+>> +	 * potentially having to clean up the failed sync later.
+>> +	 */
+>> +	if (dev->ctrl.state == NVME_CTRL_DEAD)
+>> +		nvme_kill_queues(&dev->ctrl);
+>> +
+>>   	nvme_remove_namespaces(&dev->ctrl);
+>>   	nvme_dev_disable(dev, true);
+>>   	nvme_remove_attrs(dev);
+>> -- 
+>> 2.30.2
+>>
 > 
-> IRQ, 128/32/32, cache off
-> IOPS=59.08M, BW=28.84GiB/s, IOS/call=31/31
-> IOPS=59.30M, BW=28.96GiB/s, IOS/call=32/32
-> IOPS=59.97M, BW=29.28GiB/s, IOS/call=31/31
-> IOPS=59.92M, BW=29.26GiB/s, IOS/call=32/32
-> IOPS=59.81M, BW=29.20GiB/s, IOS/call=32/31
-> 
-> [...]
+> We still need the flush_work(scan_work) prior to killing the queues. It
+> looks like it could safely be moved to nvme_stop_ctrl(), which might
+> make it easier on everyone if it were there.
 
-Applied, thanks!
+If we do end up moving it to nvme_stop_ctrl, can we make a sub-version
+of nvme_stop_ctrl that cannot block on I/O (i.e. without ana/scan/auth)?
+for multipathing where we want to teardown the controller quickly so we
+can failover I/O asap.
 
-[1/3] bio: split pcpu cache part of bio_put into a helper
-      commit: 0b0735a8c24f006d2d9d8b2b408b8c90f3163abd
-[2/3] block/bio: add pcpu caching for non-polling bio_put
-      commit: 13a184e269656994180e8c64ff56db03ed737902
-[3/3] io_uring/rw: enable bio caches for IRQ rw
-      commit: 93dad04746ea1340dec267f0e98ac42e8bc67160
-
-Best regards,
--- 
-Jens Axboe
-
-
+IIRC this is why scan_work is not in nvme_stop_ctrl to begin with, but
+it is also possible that there was some other deadlock caused by that.
