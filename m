@@ -2,65 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB1AC04A95
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 15:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 524F9C38A2D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 15:35:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231720AbiJYPa2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 11:30:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52896 "EHLO
+        id S231853AbiJYPfd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 11:35:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232031AbiJYPa1 (ORCPT
+        with ESMTP id S233263AbiJYPfc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 11:30:27 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7DE444BD
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 08:30:25 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1111968C7B; Tue, 25 Oct 2022 17:30:19 +0200 (CEST)
-Date:   Tue, 25 Oct 2022 17:30:17 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Keith Busch <kbusch@kernel.org>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH rfc] nvme: support io stats on the mpath device
-Message-ID: <20221025153017.GA24137@lst.de>
-References: <20220928195510.165062-1-sagi@grimberg.me> <20220928195510.165062-2-sagi@grimberg.me> <760a7129-945c-35fa-6bd6-aa315d717bc5@nvidia.com> <a3d619a3-ccae-69ea-3e2c-9acff7b97d92@grimberg.me> <YzWzvOKgoAqltAA0@kbusch-mbp.dhcp.thefacebook.com> <1b7feff8-48a4-6cd2-5a44-28a499630132@grimberg.me> <YzcJdeR82tHbFGAh@kbusch-mbp.dhcp.thefacebook.com> <414f04b6-aeac-5492-c175-9624b91d21c9@grimberg.me>
+        Tue, 25 Oct 2022 11:35:32 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186B8AE860;
+        Tue, 25 Oct 2022 08:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=x0Yzo3aybKV00mvxm0n+9+v1NGi8dTPJwFPa0omZxuE=; b=TECqBrsdO3eJvM/HwoglBPPjsi
+        dzMGqk2j2XncTUg3/bTvE9onc3miFg+MAkyNsga8bElyzRLnAvjYeSkIv+weqKScShndHJOo1rNGx
+        /MSeBNPOBQzoaEF+lwDkJV1MvB/MZY+2ONVduaX1mcgFn7/A3C1VwH/FXVkppjmzXuQQpe3Y2xW/O
+        KZenWN8CDqmV5JSRsm/v2dvyE5pkksWI9GfcoYs6ecrr/g1iXHiMwXwtDSS3CaUu8/T+5oC9vKi3w
+        +etNolO1BjumECdDkTpeWXLoKwzZizi4zMD4uP8rOT1DO6H+twuEbalWwlcabsXQ8ZvEWd7UI0SYP
+        CboL3j9w==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1onLxd-00H0QY-Ic; Tue, 25 Oct 2022 09:35:26 -0600
+Message-ID: <41e621bb-e836-4a86-e6db-0beed19f5ddc@deltatee.com>
+Date:   Tue, 25 Oct 2022 09:35:20 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <414f04b6-aeac-5492-c175-9624b91d21c9@grimberg.me>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-CA
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20221021174116.7200-1-logang@deltatee.com>
+ <20221021174116.7200-4-logang@deltatee.com>
+ <929ac68b-cf07-8df6-e589-49b0576a50c5@nvidia.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <929ac68b-cf07-8df6-e589-49b0576a50c5@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: chaitanyak@nvidia.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, hch@lst.de, gregkh@linuxfoundation.org, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, sbates@raithlin.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v11 3/9] iov_iter: introduce
+ iov_iter_get_pages_[alloc_]flags()
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 03, 2022 at 11:09:06AM +0300, Sagi Grimberg wrote:
->> make up the multipath device. Only the low-level driver can do that right now,
->> so perhaps either call into the driver to get all the block_device parts, or
->> the gendisk needs to maintain a list of those parts itself.
->
-> I definitely don't think we want to propagate the device relationship to
-> blk-mq. But a callback to the driver also seems very niche to nvme 
-> multipath and is also kinda messy to combine calculations like
-> iops/bw/latency accurately which depends on the submission distribution
-> to the bottom devices which we would need to track now.
->
-> I'm leaning towards just moving forward with this, take the relatively
-> small hit, and if people absolutely care about the extra latency, then
-> they can disable it altogether (upper and/or bottom devices).
 
-So looking at the patches I'm really not a big fan of the extra
-accounting calls, and especially the start_time field in the
-nvme_request and even more so the special start/end calls in all
-the transport drivers.
 
-the stats sysfs attributes already have the entirely separate
-blk-mq vs bio based code pathes.  So I think having a block_device
-operation that replaces part_stat_read_all which allows nvme to
-iterate over all pathes and collect the numbers would seem
-a lot nicer.  There might be some caveats like having to stash
-away the numbers for disappearing paths, though.
+On 2022-10-24 19:14, Chaitanya Kulkarni wrote:
+> On 10/21/22 10:41, Logan Gunthorpe wrote:
+>> Add iov_iter_get_pages_flags() and iov_iter_get_pages_alloc_flags()
+>> which take a flags argument that is passed to get_user_pages_fast().
+>>
+>> This is so that FOLL_PCI_P2PDMA can be passed when appropriate.
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>> ---
+>>   include/linux/uio.h |  6 ++++++
+>>   lib/iov_iter.c      | 32 ++++++++++++++++++++++++--------
+>>   2 files changed, 30 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/include/linux/uio.h b/include/linux/uio.h
+>> index 2e3134b14ffd..9ede533ce64c 100644
+>> --- a/include/linux/uio.h
+>> +++ b/include/linux/uio.h
+>> @@ -247,8 +247,14 @@ void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode
+>>   void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
+>>   void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
+>>   		     loff_t start, size_t count);
+>> +ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
+>> +		size_t maxsize, unsigned maxpages, size_t *start,
+>> +		unsigned gup_flags);
+>>   ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
+>>   			size_t maxsize, unsigned maxpages, size_t *start);
+>> +ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+>> +		struct page ***pages, size_t maxsize, size_t *start,
+>> +		unsigned gup_flags);
+>>   ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
+>>   			size_t maxsize, size_t *start);
+>>   int iov_iter_npages(const struct iov_iter *i, int maxpages);
+>> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+>> index c3ca28ca68a6..53efad017f3c 100644
+>> --- a/lib/iov_iter.c
+>> +++ b/lib/iov_iter.c
+>> @@ -1430,7 +1430,8 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
+>>   
+>>   static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>>   		   struct page ***pages, size_t maxsize,
+>> -		   unsigned int maxpages, size_t *start)
+>> +		   unsigned int maxpages, size_t *start,
+>> +		   unsigned int gup_flags)
+>>   {
+>>   	unsigned int n;
+>>   
+>> @@ -1442,7 +1443,6 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>>   		maxsize = MAX_RW_COUNT;
+>>   
+>>   	if (likely(user_backed_iter(i))) {
+>> -		unsigned int gup_flags = 0;
+>>   		unsigned long addr;
+>>   		int res;
+>>   
+>> @@ -1492,33 +1492,49 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>>   	return -EFAULT;
+>>   }
+>>   
+>> -ssize_t iov_iter_get_pages2(struct iov_iter *i,
+>> +ssize_t iov_iter_get_pages(struct iov_iter *i,
+>>   		   struct page **pages, size_t maxsize, unsigned maxpages,
+>> -		   size_t *start)
+>> +		   size_t *start, unsigned gup_flags)
+>>   {
+>>   	if (!maxpages)
+>>   		return 0;
+>>   	BUG_ON(!pages);
+>>   
+>> -	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages, start);
+>> +	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages,
+>> +					  start, gup_flags);
+>> +}
+>> +EXPORT_SYMBOL_GPL(iov_iter_get_pages);
+>> +
+>> +ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
+>> +		size_t maxsize, unsigned maxpages, size_t *start)
+>> +{
+>> +	return iov_iter_get_pages(i, pages, maxsize, maxpages, start, 0);
+>>   }
+>>   EXPORT_SYMBOL(iov_iter_get_pages2);
+>>   
+>> -ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
+>> +ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+>>   		   struct page ***pages, size_t maxsize,
+>> -		   size_t *start)
+>> +		   size_t *start, unsigned gup_flags)
+>>   {
+>>   	ssize_t len;
+>>   
+>>   	*pages = NULL;
+>>   
+>> -	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start);
+>> +	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start,
+>> +					 gup_flags);
+>>   	if (len <= 0) {
+>>   		kvfree(*pages);
+>>   		*pages = NULL;
+>>   	}
+>>   	return len;
+>>   }
+>> +EXPORT_SYMBOL_GPL(iov_iter_get_pages_alloc);
+>> +
+>> +ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
+>> +		struct page ***pages, size_t maxsize, size_t *start)
+>> +{
+>> +	return iov_iter_get_pages_alloc(i, pages, maxsize, start, 0);
+>> +}
+>>   EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
+> Just one minor question why not make following functions
+> EXPORT_SYMBOL_GPL() ?
+> 
+> 1. iov_iter_get_pages2()
+> 2. iov_iter_get_pages_alloc2()
+
+They previously were not GPL, so I didn't think that should be changed
+in this patch.
+
+Thanks for the review!
+
+Logan
