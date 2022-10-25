@@ -2,92 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE2AECDFA1
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 14:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0804ECDFA1
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 14:53:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232163AbiJYOku (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 10:40:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53378 "EHLO
+        id S231679AbiJYOxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 10:53:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232298AbiJYOkg (ORCPT
+        with ESMTP id S230158AbiJYOxm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 10:40:36 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEB5539B97
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 07:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=3Io0eBhCr/FHLmHpxgYZ1taiPGcCUyVAts23z2QYtk0=; b=rNKjumSaZ9VgWKIpZ3j8ghQRDL
-        Jcs/qKn4B+u+Cc7st4Qf+FnU400fpDQJtrDBfIZ+I948mEIMUlaHoSl6B0qkEmMguULGcGzg+kjmh
-        0JdA8IwGravTEVdOoVWDEDZgkExTW5W26ktu0cooGdrdZZaRcOP4lZw9Zh+QQPaLCXrmJXMrApJlv
-        qLVqHG8nQec3K5i+GK8WE/NMRbvDtS9Z36nzy69v5sau7InBRTGkrj8wBPU3SAHtMqlFMnmHUe9Oe
-        GK/LI1Rfu7NgmMB7krvS7TgGY+KDw0w0PRc1P9hXbuZl9fg8lhzT+lkbEcNCc8q/8kFYkFA3yOgQL
-        MkAsrM9w==;
-Received: from [12.47.128.130] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1onL6N-005pn9-07; Tue, 25 Oct 2022 14:40:23 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chao Leng <lengchao@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 08/17] nvme: don't unquiesce the admin queue in nvme_kill_queues
-Date:   Tue, 25 Oct 2022 07:40:11 -0700
-Message-Id: <20221025144020.260458-9-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221025144020.260458-1-hch@lst.de>
-References: <20221025144020.260458-1-hch@lst.de>
+        Tue, 25 Oct 2022 10:53:42 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA2E19E91E;
+        Tue, 25 Oct 2022 07:53:41 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5so506376wmo.1;
+        Tue, 25 Oct 2022 07:53:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A+O8rQxYMCKxiugB25CpOR5TRiPSVHAXloU6ZW0+2ew=;
+        b=pw2goslS3d3YvdLr34VC/tMBSPVNUxcfMFEACL/u5/FDOrUTKYELsEqTZ1Qhq0erDw
+         lVNIxCUOtDALppjPpKhIfGd4z1rbvTz6uLvxvA6a+rYhWUThM5FWQ9mwQrOlVkOMHGGo
+         jgzeAxkVSMPb+bNWd3lmlcWotCVStpokXeema2bhYB35NS9YAslYye/3PX3sZ2tvt0TO
+         79A8JHvawHz2EWIn0b3oAWnVHWCkIRnKw6tTLMyOzVF9bKQ9g+de8NlO3qaPEMJTsCBh
+         5Ibch6MjWdBOdr7mIZbusCjtZ2Oug6S46d3aXf/0HFxFoD5/geW4PaJ9a6vx7Yweggk/
+         bkrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A+O8rQxYMCKxiugB25CpOR5TRiPSVHAXloU6ZW0+2ew=;
+        b=aDgtnsdAkaxadI7lYU4Hl1mSzQl5DXzI7bJ2gEPTdQ7YhdT5b/GNi8HskSVNa9ZnjP
+         sNM65hiBLw+Q9hW8I+8RVacFE+kiiJxWkOXTvKJYgejwlc5nf4LzH5TyNvQAbCdnx3xd
+         rVHlriqwDmfS/nvmMCWAxzAvM7S+Aj/1LZ/zMWLCeyy11sorsE+SDtQXckQmwmy7eof8
+         umDpzmS9DGbvZpodJgxINhptkwpjhyZShqGpE7fZz4T5MrmuxS4yEIBsfJ+lX9MEW4G+
+         DdBrlNlEDzPwNoq1pUPxvIwlGnjk12XvRPbbdToqPYaqb7epNJv62B5S6Y2AK/rCOFvH
+         lSFQ==
+X-Gm-Message-State: ACrzQf0lIS1yrkuFGMtFKqLHfrhObVomXNCYTGufSlSA8ptBhtCfceG+
+        T2Z+fXMWZ0lVNZkVBcRpHh3Cj+ps6mdVWA==
+X-Google-Smtp-Source: AMsMyM5KkaSWVGkgxvT1Hnc2uk6gGbPrMvIJsthGvrjpaVipp3s1NodJ4PrH3fMGk4iOew3wAt+RfQ==
+X-Received: by 2002:a05:600c:4588:b0:3c6:f645:dad0 with SMTP id r8-20020a05600c458800b003c6f645dad0mr27572232wmo.114.1666709620462;
+        Tue, 25 Oct 2022 07:53:40 -0700 (PDT)
+Received: from [10.1.2.99] (wifi-guest-gw.tecnico.ulisboa.pt. [193.136.152.65])
+        by smtp.gmail.com with ESMTPSA id e17-20020a5d5011000000b002305cfb9f3dsm2724433wrt.89.2022.10.25.07.53.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Oct 2022 07:53:40 -0700 (PDT)
+Message-ID: <25567965-4eb5-7557-db49-e17776cec3d4@gmail.com>
+Date:   Tue, 25 Oct 2022 15:51:52 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH for-next v3 0/3] implement pcpu bio caching for IRQ I/O
+Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <CGME20221021103627epcas5p34eaaf3c8161bbee33160cce8b58efd5f@epcas5p3.samsung.com>
+ <cover.1666347703.git.asml.silence@gmail.com>
+ <20221025132502.GA31530@test-zns>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20221025132502.GA31530@test-zns>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are 4 callers of nvme_kill_queues:
+On 10/25/22 14:25, Kanchan Joshi wrote:
+> On Fri, Oct 21, 2022 at 11:34:04AM +0100, Pavel Begunkov wrote:
+>> Add bio pcpu caching for normal / IRQ-driven I/O extending REQ_ALLOC_CACHE,
+>> which was limited to iopoll. 
+> 
+> So below comment (stating process context as MUST) can also be removed as
+> part of this series now?
 
- 1) nvme_reset_work explicit call nvme_start_admin_queue toward the
-    beginning of the function.  The extra call to nvme_start_admin_queue
-    in nvme_reset_work this won't do anything as
-    NVME_CTRL_ADMIN_Q_STOPPED will already be cleared.
- 2) nvme_remove calls nvme_dev_disable with shutdown flag set to true at
-    the very beginning of the function if the PCIe device was not present,
-    which is the precondition for the call to nvme_kill_queues.
-    nvme_dev_disable already calls nvme_start_admin_queue toward the
-    end of the function when the shutdown flag is set to true, so the
-    admin queue is already enabled at this point.
- 3) nvme_remove_dead_ctrl schedules a workqueue to unbind the driver,
-    which will end up in nvme_remove, which calls nvme_dev_disable with
-    the shutdown flag.  This case will call nvme_start_admin_queue a bit
-    later than before.
- 4) apple_nvme_remove uses the same sequence as nvme_remove_dead_ctrl
-     above.
+Right, good point
 
-So it is safe to just remove the call to nvme_start_admin_queue in
-nvme_kill_queues without replacement.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/core.c | 3 ---
- 1 file changed, 3 deletions(-)
+> 495  * If REQ_ALLOC_CACHE is set, the final put of the bio MUST be done from process
+> 496  * context, not hard/soft IRQ.
+> 497  *
+> 498  * Returns: Pointer to new bio on success, NULL on failure.
+> 499  */
+> 500 struct bio *bio_alloc_bioset(struct block_device *bdev, unsigned short nr_vecs,
+> 501                              blk_opf_t opf, gfp_t gfp_mask,
+> 502                              struct bio_set *bs)
+> 503 {
+[...]
+>> The next step will be turning it on for other users, hopefully by default.
+>> The only restriction we currently have is that the allocations can't be
+>> done from non-irq context and so needs auditing.
+> 
+> Isn't allocation (of bio) happening in non-irq context already?
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 99eabbe7fac98..d4d25f1dd6dba 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -5121,9 +5121,6 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
- 	down_read(&ctrl->namespaces_rwsem);
- 
- 	/* Forcibly unquiesce queues to avoid blocking dispatch */
--	if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
--		nvme_start_admin_queue(ctrl);
--
- 	list_for_each_entry(ns, &ctrl->namespaces, list)
- 		nvme_set_queue_dying(ns);
- 
+That's my assumption, true for most of them, but I need to actually
+check that. Will be following up after this series is merged.
+
+
+> Reviewed-by: Kanchan Joshi <joshi.k@samsung.com>
+
+thanks
+
 -- 
-2.30.2
-
+Pavel Begunkov
