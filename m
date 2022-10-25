@@ -2,95 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66321C04A95
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 07:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 663A1C04A95
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 07:40:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbiJYHbO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 03:31:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49486 "EHLO
+        id S230149AbiJYHkp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 03:40:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231397AbiJYHbN (ORCPT
+        with ESMTP id S231769AbiJYHko (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 03:31:13 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F86127CEE;
-        Tue, 25 Oct 2022 00:31:11 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MxNpg1W4bz6S2lC;
-        Tue, 25 Oct 2022 15:28:43 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgA3Ree7kFdjS_OoAA--.14841S3;
-        Tue, 25 Oct 2022 15:31:09 +0800 (CST)
-Subject: Re: [patch v11 0/6] support concurrent sync io for bfq on a specail
- occasion
-To:     Paolo VALENTE <paolo.valente@unimore.it>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Jan Kara <jack@suse.cz>, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20220916071942.214222-1-yukuai1@huaweicloud.com>
- <29348B39-94AE-4D76-BD2E-B759056264B6@linaro.org>
- <011d479f-644f-0013-40bf-664b62f93bec@huaweicloud.com>
- <A9D22DB6-6481-46BA-9D4C-5A828D19CB61@linaro.org>
- <bcd07062-5a3b-563e-fb2d-2fa8e4c8bba5@huaweicloud.com>
- <82f1e969-742d-d3c3-63ca-961c755b5c35@huaweicloud.com>
- <A1E2F76F-2D27-4DCE-9B97-C8011CBE2A9E@unimore.it>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <69485939-d874-0201-e7ed-b3f49dbbb9c9@huaweicloud.com>
-Date:   Tue, 25 Oct 2022 15:31:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 25 Oct 2022 03:40:44 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFD2114DCF;
+        Tue, 25 Oct 2022 00:40:42 -0700 (PDT)
+Received: from frapeml500006.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MxP2G6sHsz6H7M1;
+        Tue, 25 Oct 2022 15:38:46 +0800 (CST)
+Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
+ frapeml500006.china.huawei.com (7.182.85.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 25 Oct 2022 09:40:39 +0200
+Received: from [10.48.157.17] (10.48.157.17) by lhrpeml500003.china.huawei.com
+ (7.191.162.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 25 Oct
+ 2022 08:40:38 +0100
+Message-ID: <3513b14c-14e0-b865-628e-a83521090de9@huawei.com>
+Date:   Tue, 25 Oct 2022 08:40:38 +0100
 MIME-Version: 1.0
-In-Reply-To: <A1E2F76F-2D27-4DCE-9B97-C8011CBE2A9E@unimore.it>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgA3Ree7kFdjS_OoAA--.14841S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw1UGrWkAw17Cr1DCF17Jrb_yoWfCFg_Ka
-        48ta47Ka1UtFnFyFnYqr18JrWrGF42qrW8Zry5Xw4fJry7Gr1jgF43WrsrXwnFgr45G3WU
-        Xr1UXw4UAryaqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kI
-        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq
-        3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIda
-        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH] blk-mq: Properly init bios from
+ blk_mq_alloc_request_hctx()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <1666454846-11749-1-git-send-email-john.garry@huawei.com>
+ <Y1U9zNZtZjRHQBww@T590> <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
+ <Y1aS3vIbuQTNGWJL@T590> <360c78dc-65ce-362f-389d-075f2259ce5b@huawei.com>
+ <Y1cvJ4/uwUScAQq4@T590>
+In-Reply-To: <Y1cvJ4/uwUScAQq4@T590>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.48.157.17]
+X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
+ lhrpeml500003.china.huawei.com (7.191.162.67)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/10/25 14:34, Paolo VALENTE 写道:
-
->>
->> I rerun the manually test for 5 times, here is the average result:
->>
->> without this patchset / with this patchset:
->>
->> | --------------- | ------------- | ------------ | -------------- | ------------- | -------------- |
->> | cg1 weight      | 10            | 20           | 30             | 40          | 50             |
->> | cg2 weight      | 90            | 80           | 70             | 60          | 50             |
->> | cg1 bw MiB/s    | 21.4 / 21.74  | 42.72 / 46.6 | 63.82 / 61.52  | 94.74 / 90.92 | 140 / 138.2    |
->> | cg2 bw MiB/s    | 197.2 / 197.4 | 182 / 181.2  | 171.2 / 173.44 | 162 / 156.8   | 138.6 / 137.04 |
->> | cg2 bw / cg1 bw | 9.22 / 9.08   | 4.26 / 3.89  | 2.68 / 2.82    | 1.71 / 1.72   | 0.99 / 0.99    |
+On 25/10/2022 01:34, Ming Lei wrote:
+>>>> but sometimes we just need to allocate for a specific HW
+>>>> queue...
+>>>>
+>>>> For my usecase of interest, it should not impact if the cpumask of the HW
+>>>> queue goes offline after selecting the cpu in blk_mq_alloc_request_hctx(),
+>>>> so any race is ok ... I think.
+>>>>
+>>>> However it should be still possible to make blk_mq_alloc_request_hctx() more
+>>>> robust. How about using something like work_on_cpu_safe() to allocate and
+>>>> execute the request with blk_mq_alloc_request() on a cpu associated with the
+>>>> HW queue, such that we know the cpu is online and stays online until we
+>>>> execute it? Or also extent to work_on_cpumask_safe() variant, so that we
+>>>> don't need to try all cpus in the mask (to see if online)?
+>>> But all cpus on this hctx->cpumask could become offline.
+>> If all hctx->cpumask are offline then we should not allocate a request and
+>> this is acceptable. Maybe I am missing your point.
+> As you saw, this API has the above problem too, but any one of CPUs
+> may become online later, maybe just during blk_mq_alloc_request_hctx(),
+> and it is easy to cause inconsistence.
 > 
-> Great!  Results are (statistically) the same, with and without your
-> patchset.  For me your patches are ok.  Thank you very much for this
-> contribution, and sorry again for my delay.
-> 
-> Acked-by: Paolo Valente <paolo.valente@linaro.org>
+> You didn't share your use case, but for nvme connection request, if it
+> is 1:1 mapping, if any one of CPU becomes offline, the controller
+> initialization could be failed, that isn't good from user viewpoint at
+> all.
 
-Thanks for the review, it's nice to get this done finally!
-> 
-> Thanks,
-> Paolo
+My use case is in SCSI EH domain. For my HBA controller of interest, to 
+abort an erroneous IO we must send a controller proprietary abort 
+command on same HW queue as original command. So we would need to 
+allocate this abort request for a specific HW queue.
 
+I mentioned before that if no hctx->cpumask is online then we don't need 
+to allocate a request. That is because if no hctx->cpumask is online, 
+this means that original erroneous IO must be completed due to nature of 
+how blk-mq cpu hotplug handler works, i.e. drained, and then we don't 
+actually need to abort it any longer, so ok to not get a request.
+
+I have an RFC series for this work in which I am using 
+blk_mq_alloc_request_hctx(). However, as I mentioned before, I can 
+experiment with using something like work_on_cpu_safe() to alloc and 
+execute the abort request to safeguard against cpu hotplug events.
+
+Thanks,
+John
