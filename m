@@ -2,98 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 663A1C04A95
-	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 07:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BCCC38A2D
+	for <linux-block@archiver.kernel.org>; Tue, 25 Oct 2022 07:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230149AbiJYHkp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 25 Oct 2022 03:40:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
+        id S231916AbiJYHq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 25 Oct 2022 03:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231769AbiJYHko (ORCPT
+        with ESMTP id S231953AbiJYHq1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 25 Oct 2022 03:40:44 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFD2114DCF;
-        Tue, 25 Oct 2022 00:40:42 -0700 (PDT)
-Received: from frapeml500006.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MxP2G6sHsz6H7M1;
-        Tue, 25 Oct 2022 15:38:46 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- frapeml500006.china.huawei.com (7.182.85.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 25 Oct 2022 09:40:39 +0200
-Received: from [10.48.157.17] (10.48.157.17) by lhrpeml500003.china.huawei.com
- (7.191.162.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 25 Oct
- 2022 08:40:38 +0100
-Message-ID: <3513b14c-14e0-b865-628e-a83521090de9@huawei.com>
-Date:   Tue, 25 Oct 2022 08:40:38 +0100
+        Tue, 25 Oct 2022 03:46:27 -0400
+Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC11B2BF0
+        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 00:46:25 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VT2BUEr_1666683982;
+Received: from 30.97.56.227(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VT2BUEr_1666683982)
+          by smtp.aliyun-inc.com;
+          Tue, 25 Oct 2022 15:46:23 +0800
+Message-ID: <1ab57612-685a-6272-5d09-bfae47b4a37e@linux.alibaba.com>
+Date:   Tue, 25 Oct 2022 15:46:21 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-From:   John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH] blk-mq: Properly init bios from
- blk_mq_alloc_request_hctx()
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [PATCH] ublk_drv: don't call task_work_add for queueing io
+ commands
+Content-Language: en-US
 To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <1666454846-11749-1-git-send-email-john.garry@huawei.com>
- <Y1U9zNZtZjRHQBww@T590> <99c6ca81-746d-85f4-04d3-49d7a3de611b@huawei.com>
- <Y1aS3vIbuQTNGWJL@T590> <360c78dc-65ce-362f-389d-075f2259ce5b@huawei.com>
- <Y1cvJ4/uwUScAQq4@T590>
-In-Reply-To: <Y1cvJ4/uwUScAQq4@T590>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <20221023093807.201946-1-ming.lei@redhat.com>
+ <8a225315-3932-62a6-2bc6-8e81e672fd9d@linux.alibaba.com>
+ <Y1aRBaUWGH54TTs4@T590>
+ <1816adbd-fa1c-71e0-652d-483d47697254@linux.alibaba.com>
+ <Y1eN7VqaJrCVJZjb@T590>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <Y1eN7VqaJrCVJZjb@T590>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.48.157.17]
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/10/2022 01:34, Ming Lei wrote:
->>>> but sometimes we just need to allocate for a specific HW
->>>> queue...
+On 2022/10/25 15:19, Ming Lei wrote:
+> On Tue, Oct 25, 2022 at 11:15:57AM +0800, Ziyang Zhang wrote:
+>> On 2022/10/24 21:20, Ming Lei wrote:
+>>> Hello Ziyang,
+>>>
+>>> On Mon, Oct 24, 2022 at 05:48:51PM +0800, Ziyang Zhang wrote:
+>>>> On 2022/10/23 17:38, Ming Lei wrote:
+>>>>> task_work_add() is used for waking ubq daemon task with one batch
+>>>>> of io requests/commands queued. However, task_work_add() isn't
+>>>>> exported for module code, and it is still debatable if the symbol
+>>>>> should be exported.
+>>>>>
+>>>>> Fortunately we still have io_uring_cmd_complete_in_task() which just
+>>>>> can't handle batched wakeup for us.
+>>>>>
+>>>>> Add one one llist into ublk_queue and call io_uring_cmd_complete_in_task()
+>>>>> via current command for running them via task work.
+>>>>>
+>>>>> This way cleans up current code a lot, meantime allow us to wakeup
+>>>>> ubq daemon task after queueing batched requests/io commands.
+>>>>>
 >>>>
->>>> For my usecase of interest, it should not impact if the cpumask of the HW
->>>> queue goes offline after selecting the cpu in blk_mq_alloc_request_hctx(),
->>>> so any race is ok ... I think.
 >>>>
->>>> However it should be still possible to make blk_mq_alloc_request_hctx() more
->>>> robust. How about using something like work_on_cpu_safe() to allocate and
->>>> execute the request with blk_mq_alloc_request() on a cpu associated with the
->>>> HW queue, such that we know the cpu is online and stays online until we
->>>> execute it? Or also extent to work_on_cpumask_safe() variant, so that we
->>>> don't need to try all cpus in the mask (to see if online)?
->>> But all cpus on this hctx->cpumask could become offline.
->> If all hctx->cpumask are offline then we should not allocate a request and
->> this is acceptable. Maybe I am missing your point.
-> As you saw, this API has the above problem too, but any one of CPUs
-> may become online later, maybe just during blk_mq_alloc_request_hctx(),
-> and it is easy to cause inconsistence.
+>>>> Hi, Ming
+>>>>
+>>>> This patch works and I have run some tests to compare current version(ucmd)
+>>>> with your patch(ucmd-batch).
+>>>>
+>>>> iodepth=128 numjobs=1 direct=1 bs=4k
+>>>>
+>>>> --------------------------------------------
+>>>> ublk loop target, the backend is a file.
+>>>> IOPS(k)
+>>>>
+>>>> type		ucmd		ucmd-batch
+>>>> seq-read	54.7		54.2	
+>>>> rand-read	52.8		52.0
+>>>>
+>>>> --------------------------------------------
+>>>> ublk null target
+>>>> IOPS(k)
+>>>>
+>>>> type		ucmd		ucmd-batch
+>>>> seq-read	257		257
+>>>> rand-read	252		253
+>>>>
+>>>>
+>>>> I find that io_req_task_work_add() puts task_work node into a llist
+>>>> first, then it may call task_work_add() to run batched task_works. So do we really
+>>>> need such llist in ublk_drv? I think io_uring has already considered task_work batch
+>>>> optimization.
+>>>>
+>>>> BTW, task_work_add() in ublk_drv achieves
+>>>> higher IOPS(about 5-10% on my machine) than io_uring_cmd_complete_in_task()
+>>>> in ublk_drv.
+>>>
+>>> Yeah, that is same with my observation, and motivation of this patch is
+>>> to get same performance with task_work_add by building ublk_drv as
+>>> module. One win of task_work_add() is that we get exact batching info
+>>> meantime only send TWA_SIGNAL_NO_IPI for whole batch, that is basically
+>>> what the patch is doing, but needs help of the following ublksrv patch:
+>>>
+>>> https://github.com/ming1/ubdsrv/commit/dce6d1d222023c1641292713b311ced01e6dc548
+>>>
+>>> which sets IORING_SETUP_COOP_TASKRUN for ublksrv's uring, then
+>>> io_uring_cmd_complete_in_task will notify via TWA_SIGNAL_NO_IPI, and 5+%
+>>> IOPS boost is observed on loop/001 by putting image on SSD in my test
+>>> VM.
+>>
+>> Hi Ming,
+>>
+>> I have added this ublksrv patch and run the above test again.
+>> I have also run ublksrv test: loop/001. Please check them.
+>>
+>> Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz 16 cores
+>> 64GB MEM, CentOS 8, kernel 6.0+
+>>
+>> --------
+>> fio test
+>>
+>> iodepth=128 numjobs=1 direct=1 bs=4k
+>>
+>> ucmd: without your kernel patch. Run io_uring_cmd_complete_in_task()
+>> for each blk-mq rq.
+>>
+>> ucmd-batch: with your kernel patch. Run io_uring_cmd_complete_in_task()
+>> for the last blk-mq rq.
+>>
+>> --------------------------------------------
+>> ublk loop target, the backend is a file.
+>>
+>> IOPS(k)
+>>
+>> type		ucmd		ucmd-batch
+>> seq-read	54.1		53.7
+>> rand-read	52.0		52.0
+>>
+>> --------------------------------------------
+>> ublk null target
+>> IOPS(k)
+>>
+>> type		ucmd		ucmd-batch
+>> seq-read	272		265
+>> rand-read	262		260
+>>
+>> ------------
+>> ublksrv test
+>>
+>> -------------
+>> ucmd
+>>
+>> running loop/001
+>>         fio (ublk/loop( -f /root/work/ubdsrv/tests/tmp/ublk_loop_1G_BZ85U), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
+>>         randwrite: jobs 1, iops 66737
+>>         randread: jobs 1, iops 64935
+>>         randrw: jobs 1, iops read 32694 write 32710
+>>         rw(512k): jobs 1, iops read 772 write 819
+>>
+>> -------------
+>> ucmd-batch
+>>
+>> running loop/001
+>>         fio (ublk/loop( -f /root/work/ubdsrv/tests/tmp/ublk_loop_1G_F56a3), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
+>>         randwrite: jobs 1, iops 66720
+>>         randread: jobs 1, iops 65015
+>>         randrw: jobs 1, iops read 32743 write 32759
+>>         rw(512k): jobs 1, iops read 771 write 817
+>>
+>>
+>> It seems that manually putting rqs into llist and calling
+>> io_uring_cmd_complete_in_task() while handling the last rq does
+>> not improve IOPS much.
+>>
+>> io_req_task_work_add() puts task_work node into a internal llist
+>> first, then it may call task_work_add() to run batched task_works.
+>> IMO, io_uring has already done such batch optimization and ublk_drv
+>> does not need to add such llist.
 > 
-> You didn't share your use case, but for nvme connection request, if it
-> is 1:1 mapping, if any one of CPU becomes offline, the controller
-> initialization could be failed, that isn't good from user viewpoint at
-> all.
+> The difference is just how batching is handled, looks blk-mq's batch info
+> doesn't matter any more. In my test, looks the perf improvement is mainly
+> made by enabling IORING_SETUP_COOP_TASKRUN in ublksrv.
 
-My use case is in SCSI EH domain. For my HBA controller of interest, to 
-abort an erroneous IO we must send a controller proprietary abort 
-command on same HW queue as original command. So we would need to 
-allocate this abort request for a specific HW queue.
+I guess only IORING_SETUP_COOP_TASKRUN helps improve IOPS. The llist in
+ublk_drv does not improve IOPS.
 
-I mentioned before that if no hctx->cpumask is online then we don't need 
-to allocate a request. That is because if no hctx->cpumask is online, 
-this means that original erroneous IO must be completed due to nature of 
-how blk-mq cpu hotplug handler works, i.e. drained, and then we don't 
-actually need to abort it any longer, so ok to not get a request.
+> 
+> Can you check if enabling IORING_SETUP_COOP_TASKRUN only can reach
+> same perf with task_work_add()(ublk_drv is builtin) when building
+> ublk_drv as module?
+> 
 
-I have an RFC series for this work in which I am using 
-blk_mq_alloc_request_hctx(). However, as I mentioned before, I can 
-experiment with using something like work_on_cpu_safe() to alloc and 
-execute the abort request to safeguard against cpu hotplug events.
+OK.
 
-Thanks,
-John
+Regards,
+Zhang
+
