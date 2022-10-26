@@ -2,198 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9137C38A2D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 05:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F846C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 07:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232874AbiJZFUP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 01:20:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52242 "EHLO
+        id S229995AbiJZHSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 03:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232698AbiJZFUL (ORCPT
+        with ESMTP id S231751AbiJZHSR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 01:20:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 494B41DDD8
-        for <linux-block@vger.kernel.org>; Tue, 25 Oct 2022 22:20:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666761608;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=NFGOV1YNN5cmc80A489E1jBX/nESpD+hEaSk0z53Rys=;
-        b=VeUCJfARwOdaC4/gf+cWrxBrk4tkIKygrG9gI7X5OGRvy8F/1Axf5SGpxhAgoQYyld9mza
-        fH7TpzbLED/aaeJ2GjbOEJPd+4szovnPkT3tmkIErM76gZFdBG6kUstD5lYCixkqOkm4pA
-        lA26WVDSeud8FRKlJPjK41ptT9tWnxU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-Rkjt1dwdOpWor_RuBN63BQ-1; Wed, 26 Oct 2022 01:20:04 -0400
-X-MC-Unique: Rkjt1dwdOpWor_RuBN63BQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F11091818212;
-        Wed, 26 Oct 2022 05:20:03 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 039982166B36;
-        Wed, 26 Oct 2022 05:20:02 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, David Jeffery <djeffery@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 1/1] blk-mq: avoid double ->queue_rq() because of early timeout
-Date:   Wed, 26 Oct 2022 13:19:57 +0800
-Message-Id: <20221026051957.358818-1-ming.lei@redhat.com>
+        Wed, 26 Oct 2022 03:18:17 -0400
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A8DBD059;
+        Wed, 26 Oct 2022 00:18:16 -0700 (PDT)
+Received: by mail-ej1-f48.google.com with SMTP id n12so13512420eja.11;
+        Wed, 26 Oct 2022 00:18:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jgrCSgoyKQAcf7Cn8RHYWJzwfMDTCeEL4acz0yVvwcc=;
+        b=kWEfo76nU65gaK4Vio7Gf89NJSOvl6f683/pOlM6otWjqfMyEa/3uhWau9vZDZE37U
+         C9Mjm7AeAE5UPt7kfSfNUswN2SS1xrCvWBHJJ6mInVmfsE+PaeG0kFTG3aSgDhoWlimX
+         VLOAs8pQkINxhGiCB7uibfbCjFlg9MV0zR+Uy+NkSc7DnBHhBeo9ijpr679n9YqsaRAi
+         CYrAaIzjsmJhzxvjjjFtWtDaJp9vjy2wignN3YqwsIW86TvTzeASAVaadjd8pMB1/MlD
+         SckYwLZ40A3A/m4EvYm3fjSdkhaUOiK1t21pfv4QQIikKWDPSDwuPnzr0Aiq167AyRvU
+         Z4aA==
+X-Gm-Message-State: ACrzQf0KEo9K/eaaWZw84iW3BO8xgi8FTz9uP6XUAUdQB2Rwl7mmzx7W
+        F+x8LVCHINPKf4K1nF/WQwpf0GPGIYTHIg==
+X-Google-Smtp-Source: AMsMyM47akiGq5DuCuDFHk2dVM5tb9IybhfihjyBOoI/UghMYjV/ct5kTcFCxew+mCnBf5iYuisMyg==
+X-Received: by 2002:a17:907:1dec:b0:7aa:6262:f23f with SMTP id og44-20020a1709071dec00b007aa6262f23fmr10680718ejc.38.1666768695290;
+        Wed, 26 Oct 2022 00:18:15 -0700 (PDT)
+Received: from ?IPV6:2a0b:e7c0:0:107::70f? ([2a0b:e7c0:0:107::70f])
+        by smtp.gmail.com with ESMTPSA id c1-20020a170906d18100b0072af4af2f46sm2528312ejz.74.2022.10.26.00.18.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Oct 2022 00:18:14 -0700 (PDT)
+Message-ID: <bc107c62-25ab-f959-c5bc-d5bacc511f20@kernel.org>
+Date:   Wed, 26 Oct 2022 09:18:13 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH] block: fix Werror=format with GCC 13
+Content-Language: en-US
+To:     =?UTF-8?Q?Martin_Li=c5=a1ka?= <mliska@suse.cz>,
+        linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
+References: <f70c7a11-e81e-f6b9-a403-315117f4aa3a@suse.cz>
+From:   Jiri Slaby <jirislaby@kernel.org>
+In-Reply-To: <f70c7a11-e81e-f6b9-a403-315117f4aa3a@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: David Jeffery <djeffery@redhat.com>
+On 24. 10. 22, 21:01, Martin Liška wrote:
+> Starting with GCC 13, since
+> [g3b3083a598ca3f4b] c: C2x enums wider than int [PR36113]
+> 
+> GCC promotes enum values with larger than integer types to a wider type.
+> In case of the anonymous enum type in blk-iocost.c it is:
+> 
+> enum {
+> 	MILLION			= 1000000,
+> ...
+> 
+> 	WEIGHT_ONE		= 1 << 16,
+> ...
+> 	VTIME_PER_SEC_SHIFT	= 37,
+> 	VTIME_PER_SEC		= 1LLU << VTIME_PER_SEC_SHIFT,
+> ...
+> 
+> as seen VTIME_PER_SEC cannot fit into 32-bits (int type), thus one needs
+> to use 'long unsigned int' in the format string.
+> 
+> It fixes then the following 2 warnings:
+> 
+> block/blk-iocost.c: In function ‘ioc_weight_prfill’:
+> block/blk-iocost.c:3035:37: error: format ‘%u’ expects argument of type ‘unsigned int’, but argument 4 has type ‘long unsigned int’ [-Werror=format=]
+>   3035 |                 seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
+>        |                                    ~^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>        |                                     |                             |
+>        |                                     unsigned int                  long unsigned int
+>        |                                    %lu
+> block/blk-iocost.c: In function ‘ioc_weight_show’:
+> block/blk-iocost.c:3045:34: error: format ‘%u’ expects argument of type ‘unsigned int’, but argument 3 has type ‘long unsigned int’ [-Werror=format=]
+>   3045 |         seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
+>        |                                 ~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>        |                                  |                      |
+>        |                                  unsigned int           long unsigned int
+>        |                                 %lu
 
-David Jeffery found one double ->queue_rq() issue, so far it can
-be triggered in VM use case because of long vmexit latency or preempt
-latency of vCPU pthread or long page fault in vCPU pthread, then block
-IO req could be timed out before queuing the request to hardware but after
-calling blk_mq_start_request() during ->queue_rq(), then timeout handler
-may handle it by requeue, then double ->queue_rq() is caused, and kernel
-panic.
+But introduces two with gcc-12 ;):
+ > block/blk-iocost.c: In function ‘ioc_weight_prfill’:
+ > block/blk-iocost.c:3037:38: error: format ‘%lu’ expects argument of 
+type ‘long unsigned int’, but argument 4 has type ‘u32’ {aka ‘unsigned 
+int’} [-Werror=format=]
+ >  3037 |                 seq_printf(sf, "%s %lu\n", dname, 
+iocg->cfg_weight / WEIGHT_ONE);
+ >       |                                    ~~^ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ >       |                                      | 
+      |
+ >       |                                      long unsigned int 
+      u32 {aka unsigned int}
+ >       |                                    %u
 
-So far, it is driver's responsibility to cover the race between timeout
-and completion, so it seems supposed to be solved in driver in theory,
-given driver has enough knowledge.
 
-But it is really one common problem, lots of driver could have similar
-issue, and could be hard to fix all affected drivers, even it isn't easy
-for driver to handle the race. So David suggests this patch by draining
-in-progress ->queue_rq() for solving this issue.
+Note that:
+1) the specs says enum behaves as int, or uint in some cases
+2) iocc->dfl_weight is u32, i.e. uint
+    WEIGHT_ONE is 1 << 16, i.e. int
+    so the promotion should be to s32/int. Or not?
 
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Keith Busch <kbusch@kernel.org>
-Cc: virtualization@lists.linux-foundation.org
-Cc: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: David Jeffery <djeffery@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V3:
-	- add callback for handle expired only, suggested by Keith Busch
-V2:
-	- follow Jens's suggestion to run sync rcu only if there is timeout
-	- rename 'now' as 'start_timeout'
- block/blk-mq.c | 56 +++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 44 insertions(+), 12 deletions(-)
+I think gcc-13 is wrong -- incosistent with gcc-12 at least.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 33292c01875d..030bbb8deca6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1523,7 +1523,13 @@ static void blk_mq_rq_timed_out(struct request *req)
- 	blk_add_timer(req);
- }
- 
--static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
-+struct blk_expired_data {
-+	bool has_timedout_rq;
-+	unsigned long next;
-+	unsigned long timeout_start;
-+};
-+
-+static bool blk_mq_req_expired(struct request *rq, struct blk_expired_data *expired)
- {
- 	unsigned long deadline;
- 
-@@ -1533,13 +1539,13 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
- 		return false;
- 
- 	deadline = READ_ONCE(rq->deadline);
--	if (time_after_eq(jiffies, deadline))
-+	if (time_after_eq(expired->timeout_start, deadline))
- 		return true;
- 
--	if (*next == 0)
--		*next = deadline;
--	else if (time_after(*next, deadline))
--		*next = deadline;
-+	if (expired->next == 0)
-+		expired->next = deadline;
-+	else if (time_after(expired->next, deadline))
-+		expired->next = deadline;
- 	return false;
- }
- 
-@@ -1555,7 +1561,7 @@ void blk_mq_put_rq_ref(struct request *rq)
- 
- static bool blk_mq_check_expired(struct request *rq, void *priv)
- {
--	unsigned long *next = priv;
-+	struct blk_expired_data *expired = priv;
- 
- 	/*
- 	 * blk_mq_queue_tag_busy_iter() has locked the request, so it cannot
-@@ -1564,7 +1570,18 @@ static bool blk_mq_check_expired(struct request *rq, void *priv)
- 	 * it was completed and reallocated as a new request after returning
- 	 * from blk_mq_check_expired().
- 	 */
--	if (blk_mq_req_expired(rq, next))
-+	if (blk_mq_req_expired(rq, expired)) {
-+		expired->has_timedout_rq = true;
-+		return false;
-+	}
-+	return true;
-+}
-+
-+static bool blk_mq_handle_expired(struct request *rq, void *priv)
-+{
-+	struct blk_expired_data *expired = priv;
-+
-+	if (blk_mq_req_expired(rq, expired))
- 		blk_mq_rq_timed_out(rq);
- 	return true;
- }
-@@ -1573,7 +1590,9 @@ static void blk_mq_timeout_work(struct work_struct *work)
- {
- 	struct request_queue *q =
- 		container_of(work, struct request_queue, timeout_work);
--	unsigned long next = 0;
-+	struct blk_expired_data expired = {
-+		.timeout_start = jiffies,
-+	};
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
- 
-@@ -1593,10 +1612,23 @@ static void blk_mq_timeout_work(struct work_struct *work)
- 	if (!percpu_ref_tryget(&q->q_usage_counter))
- 		return;
- 
--	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &next);
-+	/* check if there is any timed-out request */
-+	blk_mq_queue_tag_busy_iter(q, blk_mq_check_expired, &expired);
-+	if (expired.has_timedout_rq) {
-+		/*
-+		 * Before walking tags, we must ensure any submit started
-+		 * before the current time has finished. Since the submit
-+		 * uses srcu or rcu, wait for a synchronization point to
-+		 * ensure all running submits have finished
-+		 */
-+		blk_mq_wait_quiesce_done(q);
-+
-+		expired.next = 0;
-+		blk_mq_queue_tag_busy_iter(q, blk_mq_handle_expired, &expired);
-+	}
- 
--	if (next != 0) {
--		mod_timer(&q->timeout, next);
-+	if (expired.next != 0) {
-+		mod_timer(&q->timeout, expired.next);
- 	} else {
- 		/*
- 		 * Request timeouts are handled as a forward rolling timer. If
+> Signed-off-by: Martin Liska <mliska@suse.cz>
+> ---
+>   block/blk-iocost.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 495396425bad..f165bac9bffb 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -3032,7 +3032,7 @@ static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
+>   	struct ioc_gq *iocg = pd_to_iocg(pd);
+>   
+>   	if (dname && iocg->cfg_weight)
+> -		seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
+> +		seq_printf(sf, "%s %lu\n", dname, iocg->cfg_weight / WEIGHT_ONE);
+>   	return 0;
+>   }
+>   
+> @@ -3042,7 +3042,7 @@ static int ioc_weight_show(struct seq_file *sf, void *v)
+>   	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+>   	struct ioc_cgrp *iocc = blkcg_to_iocc(blkcg);
+>   
+> -	seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
+> +	seq_printf(sf, "default %lu\n", iocc->dfl_weight / WEIGHT_ONE);
+>   	blkcg_print_blkgs(sf, blkcg, ioc_weight_prfill,
+>   			  &blkcg_policy_iocost, seq_cft(sf)->private, false);
+>   	return 0;
+
+thanks,
 -- 
-2.31.1
+js
+suse labs
 
