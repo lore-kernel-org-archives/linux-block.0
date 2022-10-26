@@ -2,62 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C80C38A2D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 16:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C4AC38A2D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 16:48:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233408AbiJZQeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 12:34:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51648 "EHLO
+        id S233628AbiJZQsB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 12:48:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232946AbiJZQen (ORCPT
+        with ESMTP id S233812AbiJZQsB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 12:34:43 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAB32D1CF;
-        Wed, 26 Oct 2022 09:34:41 -0700 (PDT)
+        Wed, 26 Oct 2022 12:48:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5562CFF264;
+        Wed, 26 Oct 2022 09:48:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2CEF8B82381;
-        Wed, 26 Oct 2022 16:34:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A4D8C433B5;
-        Wed, 26 Oct 2022 16:34:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666802078;
-        bh=0OyATpcFpMtfgLWCG8arPflGf4wLgAo29PwRBcaXU7s=;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E815361FB7;
+        Wed, 26 Oct 2022 16:47:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3FBCC433D6;
+        Wed, 26 Oct 2022 16:47:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1666802879;
+        bh=N4pHwh+tY/v5x/wFmlPjVR8THFTPHGXNBhEs3/MGs9M=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rq4Mxi0kWqi0Mf0HO1Sk3X9j00MMjiOG5P1k57nofpBmBYYBaCEN33upwhoXThPIu
-         UGAM7fKsz41ESBlW61TjPC/44dX1Ur+8aBRoS7HcBTwyoZXFIp86AboZ/npjFjgJ9x
-         SO+abeadcBXvIxQe+RTsvyAi4WWpOGMwhYESo833sWWHgbV8JwN4OCysriP+C4hRl1
-         RDwX1C9+ro8LPN5InnwxBVFcMFMqk5X7YCjFAfofZTAG7JKCMf+mY2ekd4PlAIw1Sp
-         P1k9I4+QnEjhBt5N7CdBd+W0GEm3PuDn5GRjUR8Msy2KAxrR4hDn4vNrEF8W56TteL
-         PsvDdBFS4FCfg==
-Date:   Wed, 26 Oct 2022 10:34:35 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Dawei Li <set_pte_at@outlook.com>, axboe@kernel.dk, hch@lst.de,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: simplify blksize_bits() implementation
-Message-ID: <Y1lhmzQ9L2vxJzns@kbusch-mbp.dhcp.thefacebook.com>
-References: <TYCP286MB2323169D81A806A7C1F7FDF1CA309@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
- <30ea2fa3-0e4d-788b-b990-3bdb9e687377@acm.org>
+        b=pLZ/B8Wv0pu2V3uqRUFKBPEVKhEdE1jIpLu3LqmCGfVzJSUIpKeEJryJfgnxLQwP9
+         3XRmyI3D04S50xeJwNY8mcezi7j8NoesrmlnfEQAKXycv8wG6mCqPv1pQgahQAoYw1
+         +Jl2ESk7qjwlazzon29GNoHSKF0EyahlvZPejr9I=
+Date:   Wed, 26 Oct 2022 18:47:56 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, yukuai3@huawei.com, stable@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@hawei.com
+Subject: Re: [PATCH 5.10 2/3] blk-wbt: call rq_qos_add() after wb_normal is
+ initialized
+Message-ID: <Y1lkvFXjEMA80AFO@kroah.com>
+References: <20221018014326.467842-1-yukuai1@huaweicloud.com>
+ <20221018014326.467842-3-yukuai1@huaweicloud.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <30ea2fa3-0e4d-788b-b990-3bdb9e687377@acm.org>
+In-Reply-To: <20221018014326.467842-3-yukuai1@huaweicloud.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 09:29:21AM -0700, Bart Van Assche wrote:
-> On 10/26/22 08:14, Dawei Li wrote:
-> > Convert current looping-based implementation into bit operation,
-> > which can bring improvement for:
-> > 
-> > 1) bitops is more efficient for its arch-level optimization.
+On Tue, Oct 18, 2022 at 09:43:25AM +0800, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
 > 
-> As far as I know blksize_bits() is not used in the hot path so performance
-> of this function is not critical.
+> commit 8c5035dfbb9475b67c82b3fdb7351236525bf52b upstream.
 
-blksize_bits() is used on every IO going through iomap_dio_bio_iter(),
-though the usage there is completely unnecessary and can be removed.
+I need a 5.15 version of this, and the 3/3 patch in order to be able to
+apply the 5.10.y version.
+
+Can you please send that, and then resend the remaining patches here for
+5.10.y?
+
+thanks,
+
+greg k-h
