@@ -2,102 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA55EC38A2D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 16:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30C80C38A2D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 16:34:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233142AbiJZQ3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 12:29:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42236 "EHLO
+        id S233408AbiJZQeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 12:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231681AbiJZQ33 (ORCPT
+        with ESMTP id S232946AbiJZQen (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 12:29:29 -0400
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310C8B82;
-        Wed, 26 Oct 2022 09:29:25 -0700 (PDT)
-Received: by mail-pl1-f177.google.com with SMTP id j12so14633571plj.5;
-        Wed, 26 Oct 2022 09:29:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iuF9INKJr1wDQrykXWEEecn7e+vfn86O2X3BqBHpzhI=;
-        b=mRz2y7lC5sS/dprVmWHdXVjoq/Au/s1dVzawB4smEZhaDVd1IDi9rNH6vzhlSfqFvH
-         c2ADhqoVV0s/uLmsyzYwDxwgDVhVc70WotkYeNI1w3O15ocL1P2rrJ82hXttwX93PCnV
-         ZaG+nmk9HuxFTjwTRmoBzeR1V9tTwjf+ItKT3vHDUtjN3ymH2n+InDi3O12uLbII4DJb
-         w5iAjG9cMZ5fP1WyYzCe6Hb/WeBp3KL/ffCW6M4HcDfxQvqM5ahhQu79v563DJGq8NDj
-         nc6j5pO19/iXqtijLxbKQbExZpaG+Yz3uSg0xVcXz41clEjixLc1NocfNDGNZ+pFHIM/
-         gt0Q==
-X-Gm-Message-State: ACrzQf1hR54grn+/+6t+vX3YDuiLcNPFsb2Vxohano17IjNoLauTTDOO
-        zhLF1DDQHFI4OOojng/UBbo=
-X-Google-Smtp-Source: AMsMyM6rE6ykzxp3LR8lIe03IcZV2ilJqJ5CV8kOpdQjJWk1iqplm1AhrfC+D/JzEAWClq0swELpWg==
-X-Received: by 2002:a17:902:e944:b0:179:dee4:f115 with SMTP id b4-20020a170902e94400b00179dee4f115mr46199532pll.141.1666801764386;
-        Wed, 26 Oct 2022 09:29:24 -0700 (PDT)
-Received: from ?IPV6:2601:642:4c02:32f2:10:c576:6431:785e? ([2601:642:4c02:32f2:10:c576:6431:785e])
-        by smtp.gmail.com with ESMTPSA id ne16-20020a17090b375000b00210c84b8ae5sm1301067pjb.35.2022.10.26.09.29.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Oct 2022 09:29:23 -0700 (PDT)
-Message-ID: <30ea2fa3-0e4d-788b-b990-3bdb9e687377@acm.org>
-Date:   Wed, 26 Oct 2022 09:29:21 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
+        Wed, 26 Oct 2022 12:34:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DAB32D1CF;
+        Wed, 26 Oct 2022 09:34:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2CEF8B82381;
+        Wed, 26 Oct 2022 16:34:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A4D8C433B5;
+        Wed, 26 Oct 2022 16:34:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666802078;
+        bh=0OyATpcFpMtfgLWCG8arPflGf4wLgAo29PwRBcaXU7s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Rq4Mxi0kWqi0Mf0HO1Sk3X9j00MMjiOG5P1k57nofpBmBYYBaCEN33upwhoXThPIu
+         UGAM7fKsz41ESBlW61TjPC/44dX1Ur+8aBRoS7HcBTwyoZXFIp86AboZ/npjFjgJ9x
+         SO+abeadcBXvIxQe+RTsvyAi4WWpOGMwhYESo833sWWHgbV8JwN4OCysriP+C4hRl1
+         RDwX1C9+ro8LPN5InnwxBVFcMFMqk5X7YCjFAfofZTAG7JKCMf+mY2ekd4PlAIw1Sp
+         P1k9I4+QnEjhBt5N7CdBd+W0GEm3PuDn5GRjUR8Msy2KAxrR4hDn4vNrEF8W56TteL
+         PsvDdBFS4FCfg==
+Date:   Wed, 26 Oct 2022 10:34:35 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Dawei Li <set_pte_at@outlook.com>, axboe@kernel.dk, hch@lst.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] block: simplify blksize_bits() implementation
-Content-Language: en-US
-To:     Dawei Li <set_pte_at@outlook.com>, axboe@kernel.dk
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Message-ID: <Y1lhmzQ9L2vxJzns@kbusch-mbp.dhcp.thefacebook.com>
 References: <TYCP286MB2323169D81A806A7C1F7FDF1CA309@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <TYCP286MB2323169D81A806A7C1F7FDF1CA309@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <30ea2fa3-0e4d-788b-b990-3bdb9e687377@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <30ea2fa3-0e4d-788b-b990-3bdb9e687377@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/26/22 08:14, Dawei Li wrote:
-> Convert current looping-based implementation into bit operation,
-> which can bring improvement for:
+On Wed, Oct 26, 2022 at 09:29:21AM -0700, Bart Van Assche wrote:
+> On 10/26/22 08:14, Dawei Li wrote:
+> > Convert current looping-based implementation into bit operation,
+> > which can bring improvement for:
+> > 
+> > 1) bitops is more efficient for its arch-level optimization.
 > 
-> 1) bitops is more efficient for its arch-level optimization.
+> As far as I know blksize_bits() is not used in the hot path so performance
+> of this function is not critical.
 
-As far as I know blksize_bits() is not used in the hot path so 
-performance of this function is not critical.
-
-> 2) Given that blksize_bits() is inline, _if_ @size is compile-time
-> constant, it's possible that order_base_2() _may_ make output
-> compile-time evaluated, depending on code context and compiler behavior.
-> 
-> Signed-off-by: Dawei Li <set_pte_at@outlook.com>
-> ---
->   include/linux/blkdev.h | 7 +------
->   1 file changed, 1 insertion(+), 6 deletions(-)
-> 
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 50e358a19d98..117061c8b9a1 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1349,12 +1349,7 @@ static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
->   /* assumes size > 256 */
->   static inline unsigned int blksize_bits(unsigned int size)
->   {
-> -	unsigned int bits = 8;
-> -	do {
-> -		bits++;
-> -		size >>= 1;
-> -	} while (size > 256);
-> -	return bits;
-> +	return size > 512 ? order_base_2(size) : 9;
->   }
-
-How about optimizing this function even further by eliminating the 
-ternary operator, e.g. as follows (untested)?
-
-         return order_base_2(size >> SECTOR_SHIFT) + SECTOR_SHIFT;
-
-Thanks,
-
-Bart.
-
+blksize_bits() is used on every IO going through iomap_dio_bio_iter(),
+though the usage there is completely unnecessary and can be removed.
