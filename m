@@ -2,152 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F846C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 07:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C463AC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 07:34:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbiJZHSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 03:18:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33192 "EHLO
+        id S229551AbiJZHet (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 03:34:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231751AbiJZHSR (ORCPT
+        with ESMTP id S232489AbiJZHer (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 03:18:17 -0400
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A8DBD059;
-        Wed, 26 Oct 2022 00:18:16 -0700 (PDT)
-Received: by mail-ej1-f48.google.com with SMTP id n12so13512420eja.11;
-        Wed, 26 Oct 2022 00:18:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jgrCSgoyKQAcf7Cn8RHYWJzwfMDTCeEL4acz0yVvwcc=;
-        b=kWEfo76nU65gaK4Vio7Gf89NJSOvl6f683/pOlM6otWjqfMyEa/3uhWau9vZDZE37U
-         C9Mjm7AeAE5UPt7kfSfNUswN2SS1xrCvWBHJJ6mInVmfsE+PaeG0kFTG3aSgDhoWlimX
-         VLOAs8pQkINxhGiCB7uibfbCjFlg9MV0zR+Uy+NkSc7DnBHhBeo9ijpr679n9YqsaRAi
-         CYrAaIzjsmJhzxvjjjFtWtDaJp9vjy2wignN3YqwsIW86TvTzeASAVaadjd8pMB1/MlD
-         SckYwLZ40A3A/m4EvYm3fjSdkhaUOiK1t21pfv4QQIikKWDPSDwuPnzr0Aiq167AyRvU
-         Z4aA==
-X-Gm-Message-State: ACrzQf0KEo9K/eaaWZw84iW3BO8xgi8FTz9uP6XUAUdQB2Rwl7mmzx7W
-        F+x8LVCHINPKf4K1nF/WQwpf0GPGIYTHIg==
-X-Google-Smtp-Source: AMsMyM47akiGq5DuCuDFHk2dVM5tb9IybhfihjyBOoI/UghMYjV/ct5kTcFCxew+mCnBf5iYuisMyg==
-X-Received: by 2002:a17:907:1dec:b0:7aa:6262:f23f with SMTP id og44-20020a1709071dec00b007aa6262f23fmr10680718ejc.38.1666768695290;
-        Wed, 26 Oct 2022 00:18:15 -0700 (PDT)
-Received: from ?IPV6:2a0b:e7c0:0:107::70f? ([2a0b:e7c0:0:107::70f])
-        by smtp.gmail.com with ESMTPSA id c1-20020a170906d18100b0072af4af2f46sm2528312ejz.74.2022.10.26.00.18.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Oct 2022 00:18:14 -0700 (PDT)
-Message-ID: <bc107c62-25ab-f959-c5bc-d5bacc511f20@kernel.org>
-Date:   Wed, 26 Oct 2022 09:18:13 +0200
+        Wed, 26 Oct 2022 03:34:47 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B718DFF3;
+        Wed, 26 Oct 2022 00:34:42 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4My0rF53QRz6T6mt;
+        Wed, 26 Oct 2022 15:32:13 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP4 (Coremail) with SMTP id gCh0CgCntOYO41hjqLzeAA--.4330S4;
+        Wed, 26 Oct 2022 15:34:40 +0800 (CST)
+From:   Ye Bin <yebin@huaweicloud.com>
+To:     axboe@kernel.dk, rostedt@goodmis.org, mhiramat@kernel.org,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Ye Bin <yebin10@huawei.com>
+Subject: [PATCH] blktrace:use '__blk_trace_remove' helper in 'blk_trace_remove_queue'
+Date:   Wed, 26 Oct 2022 15:56:31 +0800
+Message-Id: <20221026075631.682100-1-yebin@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH] block: fix Werror=format with GCC 13
-Content-Language: en-US
-To:     =?UTF-8?Q?Martin_Li=c5=a1ka?= <mliska@suse.cz>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk
-References: <f70c7a11-e81e-f6b9-a403-315117f4aa3a@suse.cz>
-From:   Jiri Slaby <jirislaby@kernel.org>
-In-Reply-To: <f70c7a11-e81e-f6b9-a403-315117f4aa3a@suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCntOYO41hjqLzeAA--.4330S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKw1ktFykWry3XF45Xr4ruFg_yoWDJFc_ZF
+        yUW3Wxtr43Cr90qr4fAFsIq3Wqq34jvFyFya45tFW5A3ZrXrn8G3ZxZwsIgrZ09r4kWa4U
+        Jry3t34UGF1YyjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbr8YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+        Y4v20xvaj40_JFC_Wr1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+        A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
+        67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+        0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+        x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+        0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
+        z7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+        AF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4l
+        IxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WF
+        yUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIY
+        CTnIWIevJa73UjIFyTuYvjxUOyCJDUUUU
+X-CM-SenderInfo: p1hex046kxt4xhlfz01xgou0bp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24. 10. 22, 21:01, Martin Liška wrote:
-> Starting with GCC 13, since
-> [g3b3083a598ca3f4b] c: C2x enums wider than int [PR36113]
-> 
-> GCC promotes enum values with larger than integer types to a wider type.
-> In case of the anonymous enum type in blk-iocost.c it is:
-> 
-> enum {
-> 	MILLION			= 1000000,
-> ...
-> 
-> 	WEIGHT_ONE		= 1 << 16,
-> ...
-> 	VTIME_PER_SEC_SHIFT	= 37,
-> 	VTIME_PER_SEC		= 1LLU << VTIME_PER_SEC_SHIFT,
-> ...
-> 
-> as seen VTIME_PER_SEC cannot fit into 32-bits (int type), thus one needs
-> to use 'long unsigned int' in the format string.
-> 
-> It fixes then the following 2 warnings:
-> 
-> block/blk-iocost.c: In function ‘ioc_weight_prfill’:
-> block/blk-iocost.c:3035:37: error: format ‘%u’ expects argument of type ‘unsigned int’, but argument 4 has type ‘long unsigned int’ [-Werror=format=]
->   3035 |                 seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
->        |                                    ~^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->        |                                     |                             |
->        |                                     unsigned int                  long unsigned int
->        |                                    %lu
-> block/blk-iocost.c: In function ‘ioc_weight_show’:
-> block/blk-iocost.c:3045:34: error: format ‘%u’ expects argument of type ‘unsigned int’, but argument 3 has type ‘long unsigned int’ [-Werror=format=]
->   3045 |         seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
->        |                                 ~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->        |                                  |                      |
->        |                                  unsigned int           long unsigned int
->        |                                 %lu
+From: Ye Bin <yebin10@huawei.com>
 
-But introduces two with gcc-12 ;):
- > block/blk-iocost.c: In function ‘ioc_weight_prfill’:
- > block/blk-iocost.c:3037:38: error: format ‘%lu’ expects argument of 
-type ‘long unsigned int’, but argument 4 has type ‘u32’ {aka ‘unsigned 
-int’} [-Werror=format=]
- >  3037 |                 seq_printf(sf, "%s %lu\n", dname, 
-iocg->cfg_weight / WEIGHT_ONE);
- >       |                                    ~~^ 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- >       |                                      | 
-      |
- >       |                                      long unsigned int 
-      u32 {aka unsigned int}
- >       |                                    %u
+After '60a9bb9048f9' and 'dcd1a59c62dc' commit 'blk_trace_remove_queue' is do
+the same job with '__blk_trace_remove', so just call '__blk_trace_remove'.
 
+Signed-off-by: Ye Bin <yebin10@huawei.com>
+---
+ kernel/trace/blktrace.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
 
-Note that:
-1) the specs says enum behaves as int, or uint in some cases
-2) iocc->dfl_weight is u32, i.e. uint
-    WEIGHT_ONE is 1 << 16, i.e. int
-    so the promotion should be to s32/int. Or not?
-
-I think gcc-13 is wrong -- incosistent with gcc-12 at least.
-
-> Signed-off-by: Martin Liska <mliska@suse.cz>
-> ---
->   block/blk-iocost.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 495396425bad..f165bac9bffb 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -3032,7 +3032,7 @@ static u64 ioc_weight_prfill(struct seq_file *sf, struct blkg_policy_data *pd,
->   	struct ioc_gq *iocg = pd_to_iocg(pd);
->   
->   	if (dname && iocg->cfg_weight)
-> -		seq_printf(sf, "%s %u\n", dname, iocg->cfg_weight / WEIGHT_ONE);
-> +		seq_printf(sf, "%s %lu\n", dname, iocg->cfg_weight / WEIGHT_ONE);
->   	return 0;
->   }
->   
-> @@ -3042,7 +3042,7 @@ static int ioc_weight_show(struct seq_file *sf, void *v)
->   	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
->   	struct ioc_cgrp *iocc = blkcg_to_iocc(blkcg);
->   
-> -	seq_printf(sf, "default %u\n", iocc->dfl_weight / WEIGHT_ONE);
-> +	seq_printf(sf, "default %lu\n", iocc->dfl_weight / WEIGHT_ONE);
->   	blkcg_print_blkgs(sf, blkcg, ioc_weight_prfill,
->   			  &blkcg_policy_iocost, seq_cft(sf)->private, false);
->   	return 0;
-
-thanks,
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index a995ea1ef849..115ae18e479d 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -1609,19 +1609,7 @@ device_initcall(init_blk_tracer);
+ 
+ static int blk_trace_remove_queue(struct request_queue *q)
+ {
+-	struct blk_trace *bt;
+-
+-	bt = rcu_replace_pointer(q->blk_trace, NULL,
+-				 lockdep_is_held(&q->debugfs_mutex));
+-	if (bt == NULL)
+-		return -EINVAL;
+-
+-	blk_trace_stop(bt);
+-
+-	put_probe_ref();
+-	synchronize_rcu();
+-	blk_trace_free(q, bt);
+-	return 0;
++	return __blk_trace_remove(q);
+ }
+ 
+ /*
 -- 
-js
-suse labs
+2.31.1
 
