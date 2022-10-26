@@ -2,123 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78980C38A2D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 11:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C04C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 12:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232625AbiJZLoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 07:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57788 "EHLO
+        id S233891AbiJZMkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 08:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233121AbiJZLoQ (ORCPT
+        with ESMTP id S233889AbiJZMkV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 07:44:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D729DFC00;
-        Wed, 26 Oct 2022 04:41:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CA11BB821AB;
-        Wed, 26 Oct 2022 11:41:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D782FC433C1;
-        Wed, 26 Oct 2022 11:41:32 +0000 (UTC)
-Date:   Wed, 26 Oct 2022 07:41:45 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     "dsterba@suse.cz" <dsterba@suse.cz>, Chris Mason <clm@meta.com>,
-        Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting
-Message-ID: <20221026074145.2be5ca09@gandalf.local.home>
-In-Reply-To: <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
-References: <20220901074216.1849941-1-hch@lst.de>
-        <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
-        <20221024144411.GA25172@lst.de>
-        <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
-        <20221024171042.GF5824@suse.cz>
-        <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        Wed, 26 Oct 2022 08:40:21 -0400
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 881807CA9F
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 05:40:00 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5so2324529wmo.1
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 05:40:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=q5IvpM/yQeEl4yYS0K8b0mBf5PoYF64Ba+y55cfDoQRYoq1HIQN8Q5caI5L8FOt5SB
+         1GRRMp9CWs4Gj3HNGewkaYac4awDdzEFwPk8ysn/HuistbHelvNMD205CKOZD9KKTkkS
+         R4WrVGJ/Iw7Mc11Qr5q87ha5zpkNitN7MMrzr0Zds+5KKMPtnqsPyhXHmsqRKm4lRu3w
+         Omq0tcRJ9cr/DY/RPZDdc4da+roES0G7qxUXK1hPoYdikT8imgS8tUew/Uj1dEJetTjT
+         2/cADPSiG68PNyTBJ7/HlfhCtdftpl3c29tMYPmLZgMpG5SyBbYrOiT1y290Oxntaeag
+         GYEw==
+X-Gm-Message-State: ACrzQf1UDYzlG/LYsliverR1mmpAouHasLULIMkP4EkeeE0C+3+ZWJzY
+        jl+yeZOXbK0fxbrfNX+RIPI=
+X-Google-Smtp-Source: AMsMyM7rqOmWZX3SBMgIJK4VT+DcXle31VeUtHi0/7xyK+NzupYdd2xmp82KQS3XFa0kS1Bh/glsEA==
+X-Received: by 2002:a7b:c5d6:0:b0:3c6:f970:e755 with SMTP id n22-20020a7bc5d6000000b003c6f970e755mr2307678wmk.132.1666787999091;
+        Wed, 26 Oct 2022 05:39:59 -0700 (PDT)
+Received: from [192.168.64.94] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id a2-20020a056000050200b0023662245d3csm5250657wrf.95.2022.10.26.05.39.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Oct 2022 05:39:58 -0700 (PDT)
+Message-ID: <8945ffa7-607c-e791-5ec0-3648628bc595@grimberg.me>
+Date:   Wed, 26 Oct 2022 15:39:56 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 01/17] block: set the disk capacity to 0 in
+ blk_mark_disk_dead
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Chao Leng <lengchao@huawei.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20221025144020.260458-1-hch@lst.de>
+ <20221025144020.260458-2-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20221025144020.260458-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 26 Oct 2022 07:36:45 +0000
-Johannes Thumshirn <Johannes.Thumshirn@wdc.com> wrote:
-
-> [+Cc Steven ]
-> 
-> Steven, you're on the TAB, can you help with this issue?
-> Or bring it up with other TAB members?
-> 
-
-Well, Chris Mason was recently the TAB chair.
-
-> Thanks :)
-> 
-> Full quote below for reference:
-> 
-> On 24.10.22 19:11, David Sterba wrote:
-> > On Mon, Oct 24, 2022 at 11:25:04AM -0400, Chris Mason wrote:  
-> >> On 10/24/22 10:44 AM, Christoph Hellwig wrote:  
-> >>> On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:  
-> >>>> David, what's your plan to progress with this series?  
-> >>>
-> >>> FYI, I object to merging any of my code into btrfs without a proper
-> >>> copyright notice, and I also need to find some time to remove my
-> >>> previous significant changes given that the btrfs maintainer
-> >>> refuses to take the proper and legally required copyright notice.
-> >>>
-> >>> So don't waste any of your time on this.  
-> >>
-> >> Christoph's request is well within the norms for the kernel, given that 
-> >> he's making substantial changes to these files.  I talked this over with 
-> >> GregKH, who pointed me at:
-> >>
-> >> https://www.linuxfoundation.org/blog/blog/copyright-notices-in-open-source-software-projects
-> >>
-> >> Even if we'd taken up some of the other policies suggested by this doc, 
-> >> I'd still defer to preferences of developers who have made significant 
-> >> changes.  
-> > 
-> > I've asked for recommendations or best practice similar to the SPDX
-> > process. Something that TAB can acknowledge and that is perhaps also
-> > consulted with lawyers. And understood within the linux project,
-> > not just that some dudes have an argument because it's all clear as mud
-> > and people are used to do things differently.
-> > 
-> > The link from linux foundation blog is nice but unless this is codified
-> > into the process it's just somebody's blog post. Also there's a paragraph
-> > about "Why not list every copyright holder?" that covers several points
-> > why I don't want to do that.
-> > 
-> > But, if TAB says so I will do, perhaps spending hours of unproductive
-> > time looking up the whole history of contributors and adding year, name,
-> > company whatever to files.
-
-There's no requirement to list every copyright holder, as most developers do
-not require it for acceptance. The issue I see here is that there's someone
-that does require it for you to accept their code.
-
-The policy is simple. If someone requires a copyright notice for their
-code, you simply add it, or do not take their code. You can be specific
-about what that code is that is copyrighted. Perhaps just around the code in
-question or a description at the top.
-
-Looking over the thread, I'm still confused at what the issue is. Is it
-that if you add one copyright notice you must do it for everyone else? Is
-everyone else asking for it? If not, just add the one and be done with it.
-
--- Steve
-
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
