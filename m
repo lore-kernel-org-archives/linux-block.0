@@ -2,85 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DC6C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 12:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BBCC38A2D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 12:58:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233912AbiJZM61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 08:58:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42952 "EHLO
+        id S233954AbiJZM6z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 08:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233512AbiJZM60 (ORCPT
+        with ESMTP id S233959AbiJZM6y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 08:58:26 -0400
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93AF4F63C2
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 05:58:25 -0700 (PDT)
-Received: by mail-wr1-f49.google.com with SMTP id v1so26164588wrt.11
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 05:58:25 -0700 (PDT)
+        Wed, 26 Oct 2022 08:58:54 -0400
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6A6FF708D
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 05:58:47 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id r6-20020a1c4406000000b003cf4d389c41so463230wma.3
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 05:58:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CkziyNulvuCpKttkp9fhQ/YdQN74JvF7A8TDwagZTBg=;
-        b=w5ab7l1hr1utKT/xUZsQqd1AXMLggf9Nu0e8BLjgKU47P4nEUSor8uQaxpQFD4YAcL
-         G/7Q46IDzPz1UCzpwqLmX5EaXfR1apPQYztoTuE0hPQVdWK/owCrst+NBqhP2fmzApp2
-         NsXgfsb82Y1Jif9e/wyx1jgizACPedc2dCNtGQXoNWPv9EX4vhPoMlPtFw99lzgH2860
-         aPFwp1OlZsFSZuaKRDvQ7DW0XDYjbwuQaKT7n6k3iACe82qzwwyTBK94rw2URuSAZ6Kk
-         Ij1takffk53XHLyCCV+3xWpFC7PaSjp55iOrhNpRsmHDef6JR6OAA1Z5v0HLZZQs5RBk
-         uqAg==
-X-Gm-Message-State: ACrzQf2ULjauYVih/PLUOgkzJDCP8VMkHFqfNuvF9AOb49fqnPfMrGgx
-        q5zX4oUexgUZpH7WN/hi9hQ=
-X-Google-Smtp-Source: AMsMyM4RiM1dHUoUivbMPNSZHt0bj3Qv5wBN5O/ZJfLCeamLL9SzyRj2Dnzni9o7VWFNqOL00qqQkg==
-X-Received: by 2002:adf:dd0f:0:b0:236:2f7f:4cce with SMTP id a15-20020adfdd0f000000b002362f7f4ccemr21392799wrm.347.1666789104084;
-        Wed, 26 Oct 2022 05:58:24 -0700 (PDT)
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=b4Lhd5ZJEZFY/1mLafdq9ylqV2+BpamYlIuiUCTOsGOQ2Wc5fTBoteEHeqH3AZd6rk
+         YydQplbxRlmZkGIXUvXeJqbq3WmsvpGEpp8sWll+rDhfFz57H/56a4CML2Z0g75QoQ6e
+         YBlAtj5Yd5ZlwUXxyVricrEX5/MCK89INPbPcZyLWsK5q2eg/2hMhgzBd944enqN+YrI
+         vzUkfpILrc4/TaI1K1MTrIPinhoaDrzW43rZ8dVLKKU+pCZBKQjaKgFPm3FOuY4jmIzp
+         gfgbS23q68tVpycdVGcme2KeZwMim1iTZRy22ZnV2Ry+72AAKXh22ggL6SyW6mCH2sq4
+         7GwQ==
+X-Gm-Message-State: ACrzQf0WPaRb1owLjO+mPyxuA494enL1EPtu7DCsbOE8JGHYOfcRpcou
+        CVR3NzO9nmT6L1CcrfuQhEI=
+X-Google-Smtp-Source: AMsMyM5vTwNXD2B3fsKTpl+TMNn+mB3Xpe4zOea8a8MY9E3qVzdVXi9FabT62QrQg3zPFcNHrojVig==
+X-Received: by 2002:a05:600c:538b:b0:3c6:b66d:4027 with SMTP id hg11-20020a05600c538b00b003c6b66d4027mr2289881wmb.146.1666789126359;
+        Wed, 26 Oct 2022 05:58:46 -0700 (PDT)
 Received: from [192.168.64.94] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id v14-20020adfedce000000b00228dbf15072sm5346836wro.62.2022.10.26.05.58.22
+        by smtp.gmail.com with ESMTPSA id o16-20020a5d58d0000000b0023662d97130sm5150608wrf.20.2022.10.26.05.58.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Oct 2022 05:58:23 -0700 (PDT)
-Message-ID: <224ee1a1-e5ef-6644-36c4-8c1d84af10b0@grimberg.me>
-Date:   Wed, 26 Oct 2022 15:58:22 +0300
+        Wed, 26 Oct 2022 05:58:45 -0700 (PDT)
+Message-ID: <5d8a1201-554c-0273-351e-c9fb7e32509b@grimberg.me>
+Date:   Wed, 26 Oct 2022 15:58:43 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
-Subject: Re: [PATCH 11/17] nvme-pci: don't unquiesce the I/O queues in
- nvme_remove_dead_ctrl
+Subject: Re: [PATCH 12/17] nvme-pci: don't unquiesce the I/O queues in
+ apple_nvme_reset_work
 Content-Language: en-US
-To:     Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Chao Leng <lengchao@huawei.com>
 Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
 References: <20221025144020.260458-1-hch@lst.de>
- <20221025144020.260458-12-hch@lst.de>
- <cf78bcbb-b918-e9f5-186a-d1d804406011@huawei.com>
+ <20221025144020.260458-13-hch@lst.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <cf78bcbb-b918-e9f5-186a-d1d804406011@huawei.com>
+In-Reply-To: <20221025144020.260458-13-hch@lst.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> nvme_remove_dead_ctrl schedules nvme_remove to be called, which will
->> call nvme_dev_disable and unquiesce the I/O queues.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
->> ---
->>   drivers/nvme/host/pci.c | 1 -
->>   1 file changed, 1 deletion(-)
->>
->> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
->> index bef98f6e1396c..3a26c9b2bf454 100644
->> --- a/drivers/nvme/host/pci.c
->> +++ b/drivers/nvme/host/pci.c
->> @@ -2794,7 +2794,6 @@ static void nvme_remove_dead_ctrl(struct 
->> nvme_dev *dev)
->>       nvme_get_ctrl(&dev->ctrl);
->>       nvme_dev_disable(dev, false);
-> Currently set the parameter "shutdown" to false, nvme_dev_disable() do 
-> not unquiesce the queues.
-> Actually we should set the parameter "shutdown" to true.
->          nvme_dev_disable(dev, true);
-
-But the final put will trigger nvme_remove no?
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
