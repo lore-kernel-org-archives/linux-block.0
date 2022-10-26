@@ -2,79 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B89C38A2D
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 11:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78980C38A2D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 11:44:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233642AbiJZLn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 07:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47264 "EHLO
+        id S232625AbiJZLoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 07:44:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233674AbiJZLnE (ORCPT
+        with ESMTP id S233121AbiJZLoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 07:43:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC7159247
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 04:40:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666784411;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7irqz/NvTW4iXVUnlld6jTYNf6TWqWwg41go+5KxLrs=;
-        b=d2R7UXmYhaINnwRThl8PYaasEJvsDRZpDAZF+RDInN9Pqp6KbcvOgOsQt4htFWRlJkJ7Z4
-        T8aijQ2lIVLihbTr9U1gYYkDUQcXcM/qW1qP8pZZvuMkyjDnRb5K5OLlXR4NC5ITEIH3Kd
-        pQMAoFT68v6QqEByhGTMWnq2eVtPh6M=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-333-7Wn_k-bGMj-YkfM3mXI7yg-1; Wed, 26 Oct 2022 07:40:09 -0400
-X-MC-Unique: 7Wn_k-bGMj-YkfM3mXI7yg-1
-Received: by mail-vs1-f70.google.com with SMTP id 63-20020a671542000000b003a65bca366fso4198643vsv.8
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 04:40:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7irqz/NvTW4iXVUnlld6jTYNf6TWqWwg41go+5KxLrs=;
-        b=CYVujy0Px5uA9kDi7eYzVvO0JqkIzLGBWdlkQOeSgjwBDRCz6tEbT/Y90GfxIfgib9
-         PWVDSR75xkgz/x484/i9AFeuP+C/RjYpGI5lu4qlueQ5S2DPoKeVgHv5DLJgGbRgAuKi
-         8mHKdW+hMvPn79VfyXe5cErhOXmMGm9SogAojkguGOa5ZxRZXdVrsfZVFS3aqPtwivzy
-         5HuvVR/n89a0LrekY06aZlu8JKLhTcVPcYvzJUU5OMpejVDqoFmXUd55l3olvG8zeAG9
-         vUpXdm5rCMZze5ULdsUamK1qiPuGQJvNtSqFsG52oCh5Cj+3NCJXcWmz/g4UM/eKrGZt
-         z7iw==
-X-Gm-Message-State: ACrzQf2IjVAtE5q7AkC0cnV1etL7ulydcocV0UU9neiqvanlSJpPaLXr
-        EuB+WEJUOU3XtcHnyPWl0NVtfLiicFiZZtrP2b1Nbs8XPqcldFicBF8OBB7fwk9BuShRg3+Fhdf
-        mdrckhbdPbrX09u2s9Y5og9nAD9eIWvWPX4+Tze8=
-X-Received: by 2002:ab0:1c52:0:b0:401:762b:f888 with SMTP id o18-20020ab01c52000000b00401762bf888mr12114988uaj.57.1666784409111;
-        Wed, 26 Oct 2022 04:40:09 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4Xx/yW9MkoNGJhtGZNvU1HCnJVqOGUKZ9+Ilp9RoMt0HBvwtRIHlnIf5EfLuzSY/J85/XAX7roXuGnIGICkbE=
-X-Received: by 2002:ab0:1c52:0:b0:401:762b:f888 with SMTP id
- o18-20020ab01c52000000b00401762bf888mr12114979uaj.57.1666784408893; Wed, 26
- Oct 2022 04:40:08 -0700 (PDT)
+        Wed, 26 Oct 2022 07:44:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D729DFC00;
+        Wed, 26 Oct 2022 04:41:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CA11BB821AB;
+        Wed, 26 Oct 2022 11:41:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D782FC433C1;
+        Wed, 26 Oct 2022 11:41:32 +0000 (UTC)
+Date:   Wed, 26 Oct 2022 07:41:45 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     "dsterba@suse.cz" <dsterba@suse.cz>, Chris Mason <clm@meta.com>,
+        Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Message-ID: <20221026074145.2be5ca09@gandalf.local.home>
+In-Reply-To: <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
+References: <20220901074216.1849941-1-hch@lst.de>
+        <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+        <20221024144411.GA25172@lst.de>
+        <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
+        <20221024171042.GF5824@suse.cz>
+        <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <1666780513-121650-1-git-send-email-john.garry@huawei.com>
-In-Reply-To: <1666780513-121650-1-git-send-email-john.garry@huawei.com>
-From:   Ming Lei <ming.lei@redhat.com>
-Date:   Wed, 26 Oct 2022 19:39:58 +0800
-Message-ID: <CAFj5m9+o4Q9o-qYgwn-XLJxOn6h0JjGOscwCOHEZkxzOBCdDGA@mail.gmail.com>
-Subject: Re: [PATCH v2] blk-mq: Properly init requests from blk_mq_alloc_request_hctx()
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de, bvanassche@acm.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 6:04 PM John Garry <john.garry@huawei.com> wrote:
->
-> Function blk_mq_alloc_request_hctx() is missing zeroing/init of rq->bio,
-> biotail, __sector, and __data_len members, which blk_mq_alloc_request()
-> has, so duplicate what we do in blk_mq_alloc_request().
->
-> Fixes: 1f5bd336b9150 ("blk-mq: add blk_mq_alloc_request_hctx")
-> Signed-off-by: John Garry <john.garry@huawei.com>
+On Wed, 26 Oct 2022 07:36:45 +0000
+Johannes Thumshirn <Johannes.Thumshirn@wdc.com> wrote:
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> [+Cc Steven ]
+> 
+> Steven, you're on the TAB, can you help with this issue?
+> Or bring it up with other TAB members?
+> 
+
+Well, Chris Mason was recently the TAB chair.
+
+> Thanks :)
+> 
+> Full quote below for reference:
+> 
+> On 24.10.22 19:11, David Sterba wrote:
+> > On Mon, Oct 24, 2022 at 11:25:04AM -0400, Chris Mason wrote:  
+> >> On 10/24/22 10:44 AM, Christoph Hellwig wrote:  
+> >>> On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:  
+> >>>> David, what's your plan to progress with this series?  
+> >>>
+> >>> FYI, I object to merging any of my code into btrfs without a proper
+> >>> copyright notice, and I also need to find some time to remove my
+> >>> previous significant changes given that the btrfs maintainer
+> >>> refuses to take the proper and legally required copyright notice.
+> >>>
+> >>> So don't waste any of your time on this.  
+> >>
+> >> Christoph's request is well within the norms for the kernel, given that 
+> >> he's making substantial changes to these files.  I talked this over with 
+> >> GregKH, who pointed me at:
+> >>
+> >> https://www.linuxfoundation.org/blog/blog/copyright-notices-in-open-source-software-projects
+> >>
+> >> Even if we'd taken up some of the other policies suggested by this doc, 
+> >> I'd still defer to preferences of developers who have made significant 
+> >> changes.  
+> > 
+> > I've asked for recommendations or best practice similar to the SPDX
+> > process. Something that TAB can acknowledge and that is perhaps also
+> > consulted with lawyers. And understood within the linux project,
+> > not just that some dudes have an argument because it's all clear as mud
+> > and people are used to do things differently.
+> > 
+> > The link from linux foundation blog is nice but unless this is codified
+> > into the process it's just somebody's blog post. Also there's a paragraph
+> > about "Why not list every copyright holder?" that covers several points
+> > why I don't want to do that.
+> > 
+> > But, if TAB says so I will do, perhaps spending hours of unproductive
+> > time looking up the whole history of contributors and adding year, name,
+> > company whatever to files.
+
+There's no requirement to list every copyright holder, as most developers do
+not require it for acceptance. The issue I see here is that there's someone
+that does require it for you to accept their code.
+
+The policy is simple. If someone requires a copyright notice for their
+code, you simply add it, or do not take their code. You can be specific
+about what that code is that is copyrighted. Perhaps just around the code in
+question or a description at the top.
+
+Looking over the thread, I'm still confused at what the issue is. Is it
+that if you add one copyright notice you must do it for everyone else? Is
+everyone else asking for it? If not, just add the one and be done with it.
+
+-- Steve
+
 
