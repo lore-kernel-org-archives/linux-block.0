@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AF2C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 07:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E008AFA373D
+	for <linux-block@archiver.kernel.org>; Wed, 26 Oct 2022 07:35:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232489AbiJZHfI convert rfc822-to-8bit (ORCPT
+        id S233167AbiJZHfb convert rfc822-to-8bit (ORCPT
         <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 03:35:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48322 "EHLO
+        Wed, 26 Oct 2022 03:35:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233199AbiJZHfD (ORCPT
+        with ESMTP id S233131AbiJZHf3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 03:35:03 -0400
-X-Greylist: delayed 259 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 26 Oct 2022 00:35:00 PDT
-Received: from mail5.swissbit.com (mail5.swissbit.com [148.251.244.252])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5774AD41
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 00:34:59 -0700 (PDT)
-Received: from mail5.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id AA6F83A1CC8;
-        Wed, 26 Oct 2022 09:30:45 +0200 (CEST)
-Received: from mail5.swissbit.com (localhost [127.0.0.1])
-        by DDEI (Postfix) with ESMTP id 9BD3D3A19AE;
-        Wed, 26 Oct 2022 09:30:45 +0200 (CEST)
+        Wed, 26 Oct 2022 03:35:29 -0400
+X-Greylist: delayed 284 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 26 Oct 2022 00:35:28 PDT
+Received: from mail4.swissbit.com (mail4.swissbit.com [176.95.1.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A7E15A808
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 00:35:27 -0700 (PDT)
+Received: from mail4.swissbit.com (localhost [127.0.0.1])
+        by DDEI (Postfix) with ESMTP id A2AFD122BF0;
+        Wed, 26 Oct 2022 09:30:40 +0200 (CEST)
+Received: from mail4.swissbit.com (localhost [127.0.0.1])
+        by DDEI (Postfix) with ESMTP id 91580122BE9;
+        Wed, 26 Oct 2022 09:30:40 +0200 (CEST)
 X-TM-AS-ERS: 10.149.2.42-127.5.254.253
 X-TM-AS-SMTP: 1.0 ZXguc3dpc3NiaXQuY29t Y2xvZWhsZUBoeXBlcnN0b25lLmNvbQ==
 X-DDEI-TLS-USAGE: Used
-Received: from ex.swissbit.com (sbdeex04.sbitdom.lan [10.149.2.42])
-        by mail5.swissbit.com (Postfix) with ESMTPS;
-        Wed, 26 Oct 2022 09:30:45 +0200 (CEST)
+Received: from ex.swissbit.com (unknown [10.149.2.42])
+        by mail4.swissbit.com (Postfix) with ESMTPS;
+        Wed, 26 Oct 2022 09:30:40 +0200 (CEST)
 Received: from sbdeex04.sbitdom.lan (10.149.2.42) by sbdeex04.sbitdom.lan
  (10.149.2.42) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.9; Wed, 26 Oct
- 2022 09:30:45 +0200
+ 2022 09:30:40 +0200
 Received: from sbdeex04.sbitdom.lan ([fe80::2047:4968:b5a0:1818]) by
  sbdeex04.sbitdom.lan ([fe80::2047:4968:b5a0:1818%9]) with mapi id
- 15.02.1118.009; Wed, 26 Oct 2022 09:30:45 +0200
+ 15.02.1118.009; Wed, 26 Oct 2022 09:30:40 +0200
 From:   =?iso-8859-1?Q?Christian_L=F6hle?= <CLoehle@hyperstone.com>
 To:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
@@ -46,11 +46,11 @@ CC:     Avri Altman <Avri.Altman@wdc.com>,
         "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
         "vincent.whitchurch@axis.com" <vincent.whitchurch@axis.com>,
         =?iso-8859-1?Q?Christian_L=F6hle?= <CLoehle@hyperstone.com>
-Subject: [PATCH 3/3] mmc: block: Requeue on block size restrictions
-Thread-Topic: [PATCH 3/3] mmc: block: Requeue on block size restrictions
-Thread-Index: AdjpDHb57shE0br7QqOZ9olY8otAMg==
-Date:   Wed, 26 Oct 2022 07:30:44 +0000
-Message-ID: <f3b05a9103ba4c46ae78a96f8cdc700d@hyperstone.com>
+Subject: [PATCH 1/3] block: Requeue req as head if driver touched it
+Thread-Topic: [PATCH 1/3] block: Requeue req as head if driver touched it
+Thread-Index: AdjpDEQm2rub+3iRTPCN7zrgvOwESA==
+Date:   Wed, 26 Oct 2022 07:30:39 +0000
+Message-ID: <22aa78389c9b4613841716c5b7bd89aa@hyperstone.com>
 Accept-Language: en-US, de-DE
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -61,75 +61,43 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
 X-TMASE-Version: DDEI-5.1-9.0.1002-27224.006
-X-TMASE-Result: 10--5.321200-10.000000
-X-TMASE-MatchedRID: 9886Ub8IUanFkQpHLCk4oQXtykVcrvpNqf/efKFN1nDVjNsehGf0vVkI
-        Tz82Kc4AioDiaHUgJaTMdqKz1jxx8S/7QU2czuUNA9lly13c/gFHyz3bB5kG52fIvzHS0qU76bn
-        ve26xmNDsq6KOq5NL8H8mA3sDDq0AtVC7UY1n6yI7AFczfjr/7GCs+UIIAXsCzZ/ZSwfkDNqvOj
-        krw6MD5tw3n/ubs2J3W7oWrwszBSc=
+X-TMASE-Result: 10-1.026300-10.000000
+X-TMASE-MatchedRID: mIinBA9F1pwet1TxvngNg/ZNLVgVojn/9v33UW8WNYDIgofMgahPrb8F
+        Hrw7frluf146W0iUu2s1Wh0fHDSsUWm8qwfvyPv4Y6Gjtu6/t30yCs+pWvwBI5soi2XrUn/JExk
+        bqSDWgw8UGm4zriL0oQtuKBGekqUpI/NGWt0UYPDdxPQXTiv8E731jVRFyIDgbQoGqwZjwmkJeO
+        MxPAANXY4TDtwwKftL
 X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 X-TMASE-INERTIA: 0-0;;;;
-X-TMASE-XGENCLOUD: eac11117-5080-402d-a60f-b2191784507e-0-0-200-0
+X-TMASE-XGENCLOUD: e041678b-49f7-43a8-9ecd-1c6d54a9d864-0-0-200-0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The block layer does not conform to all our sector count restrictions, so
-requeue in case we had to modify the number of blocks sent instead of
-going through the normal completion.
-
-Note that the normal completion used before does not lead to a bug,
-this change is just the nicer thing to do.
-An example of such a restriction is max_blk_count = 1 and 512 blksz,
-but the block layer continues to use requests of size PAGE_SIZE.
+In case the driver set RQF_DONTPREP flag, requeue the request as head as
+it is likely that the backing storage already had a request to an
+adjacent region, so getting the requeued request out as soon as possible
+may give us some performance benefit.
 
 Signed-off-by: Christian Loehle <cloehle@hyperstone.com>
 ---
- drivers/mmc/core/block.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
-index 54cd009aee50..c434d3964880 100644
---- a/drivers/mmc/core/block.c
-+++ b/drivers/mmc/core/block.c
-@@ -1519,8 +1519,10 @@ static void mmc_blk_cqe_req_done(struct mmc_request *mrq)
- 	/*
- 	 * Block layer timeouts race with completions which means the normal
- 	 * completion path cannot be used during recovery.
-+	 * Also do not use it if we had to modify the block count to satisfy
-+	 * host controller needs.
- 	 */
--	if (mq->in_recovery)
-+	if (mq->in_recovery || mrq->data->blocks != blk_rq_sectors(req))
- 		mmc_blk_cqe_complete_rq(mq, req);
- 	else if (likely(!blk_should_fake_timeout(req->q)))
- 		blk_mq_complete_request(req);
-@@ -2051,8 +2053,10 @@ static void mmc_blk_hsq_req_done(struct mmc_request *mrq)
- 	/*
- 	 * Block layer timeouts race with completions which means the normal
- 	 * completion path cannot be used during recovery.
-+	 * Also do not use it if we had to modify the block count to satisfy
-+	 * host controller needs.
- 	 */
--	if (mq->in_recovery)
-+	if (mq->in_recovery || mrq->data->blocks != blk_rq_sectors(req))
- 		mmc_blk_cqe_complete_rq(mq, req);
- 	else if (likely(!blk_should_fake_timeout(req->q)))
- 		blk_mq_complete_request(req);
-@@ -2115,8 +2119,10 @@ static void mmc_blk_mq_post_req(struct mmc_queue *mq, struct request *req,
- 	/*
- 	 * Block layer timeouts race with completions which means the normal
- 	 * completion path cannot be used during recovery.
-+	 * Also do not use it if we had to modify the block count to satisfy
-+	 * host controller needs.
- 	 */
--	if (mq->in_recovery) {
-+	if (mq->in_recovery || mrq->data->blocks != blk_rq_sectors(req)) {
- 		mmc_blk_mq_complete_rq(mq, req);
- 	} else if (likely(!blk_should_fake_timeout(req->q))) {
- 		if (can_sleep)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 33292c01875d..d863c826fb23 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1429,7 +1429,7 @@ static void blk_mq_requeue_work(struct work_struct *work)
+ 		 * merge.
+ 		 */
+ 		if (rq->rq_flags & RQF_DONTPREP)
+-			blk_mq_request_bypass_insert(rq, false, false);
++			blk_mq_request_bypass_insert(rq, true, false);
+ 		else
+ 			blk_mq_sched_insert_request(rq, true, false, false);
+ 	}
 -- 
 2.37.3
-
 Hyperstone GmbH | Reichenaustr. 39a  | 78467 Konstanz
 Managing Director: Dr. Jan Peter Berns.
 Commercial register of local courts: Freiburg HRB381782
