@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D343C38A2D
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 01:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA7CC38A2D
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 01:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233044AbiJ0BQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 21:16:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
+        id S233575AbiJ0BS3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 21:18:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233747AbiJ0BQw (ORCPT
+        with ESMTP id S233699AbiJ0BS1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 21:16:52 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F94A54CBE
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:16:51 -0700 (PDT)
+        Wed, 26 Oct 2022 21:18:27 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8D1785B6
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:18:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1666833411; x=1698369411;
+  t=1666833507; x=1698369507;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=4ap/kLZ0OSB6Zuig+PaHn7p6EhgNVXfGROLAu+d2tkk=;
-  b=KYNgIhu4g/lFkqcueM//QR9z1sWnZ4+0DJFn8k6AiKLlekCw+GuDwx+L
-   qHtou0MrjOsdcX+FO0JJcIi9vSjj2PV54pM2TTNJOO69krBxSSmw5MdxR
-   SUanKE7LN6TJcMmmNqmLnGFLOantg2K2bGjY6C32kTA3UGABXAojoSyhp
-   2thyGWDqL3856ehz2SC05jsEHhuP/0IQUDE7r+B+Q0AnZPF7EGJuL25fp
-   IMqQye+fXRfYKw+HiG2JG1q3mn9gYyEJKyugtHAUZ2olMvllWwp8fNuoB
-   hMJgXfrd761brQ+5WBUA1da5o8omXBXeHjCWYjJh2cw79UZEeAVS+u76Z
-   A==;
+  bh=j4VTz3xAsPX1ykQZALKZMRU5knt+b8ZaK/+epWQA9oU=;
+  b=FHohDeUkUzPmDv3W0InYd7UIkTv5IVIAyt6FgB8TDECQm8An6559NG20
+   G0gh9DloaeER+6hmxrtjjs/cvoAHRGSRuU++I7/AbenXqOP5g6iiB7V+C
+   FDPzX0ToLTdxkV+g31J0KaIjMHsCQ/pGEeH5wGaQjRv0/zsbd/U1QGrck
+   ShZjkfPmlIYlrhNP9INb/lz40KCBPBu8AbGxAtI2uKQL3npD4M+TS0nev
+   eBfw/2mUR8EfLCmTWj5bC2x8DYvaas8n4NHO4ZgnQniwekKPG8u2bDfmh
+   1fAwJ6gPtv9rNL8SQlOCKagOvIOeFAUKEzaBRm7XpT8Fs+dJTYucgvKWV
+   g==;
 X-IronPort-AV: E=Sophos;i="5.95,215,1661788800"; 
-   d="scan'208";a="326936998"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2022 09:16:48 +0800
-IronPort-SDR: vJHVgiNJ3Tw38ISNxDu6dMLvafX4EbixcBN+bpQrLhOwc8dHA1Xa/tyCflxeozg40fGV4mny9A
- Ri+GkNzRPYst6qhsk/7ellZJfB2ydzZGs6TyQv1IbPy1g50Iq9KYsKqSjZauiLz/FDQDmwSjoE
- cSm0tIeAiPSWRJHXH1iJ6+HZNgOlEvW56aMsWjkqwSegrijO5r1mZDQDSPQaedrLtYDHa1/CK4
- 60gsUTSngoltLRAByiiPsdfmtHooD+t6zynySUIwG+7bAhi722rDZVuH7DBi6CE8BzwdrFs9+y
- XQpD8KVR+orzzlN/N2bzEUCi
+   d="scan'208";a="214828251"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2022 09:18:26 +0800
+IronPort-SDR: eIuGoOfOdMCJo/Vox5tWNdmimXDzo15Jazca4qzCHkFNO16X+woUPDLeusVyZOK97Fhcquxepw
+ mUcvw0z6M8OqOCfgIVRrJ0tx12VWtArN8yaObMsXsui9BnKQNYLsk6PIgEUC85ATKA1zl/SNG6
+ z/nfhaAGwPciorG9olR9GIJIsbLpcBwK9yDRmwXxKZeLSrL6YoJqC6C54dbfNETzumnBOEHkI5
+ hJB4vDUYpdU2BCHj8dnKboD5jCEjbydtaF68LUXsLewAB+0Q0f0JH6j2jXOgU2cZO13qo3/ucd
+ EWHxfLIZucoupioAf1Iix7kh
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Oct 2022 17:30:28 -0700
-IronPort-SDR: YUsSP0By5Fsh12N5651BXsDdrxNrA8EEi+ndcAYq51JzzhqBg90N0f5lMLAguBCgZIA7YI57+/
- XxXM/EHKDEJiO197NWuXDUsIyGZbmXanDPwC8msNFPpqcmthYqn9AlC0Iocy6TgVHiKBbJzDBi
- hGddxHpCoSzlsS5qZcAeLYiUwpnysPrX9zCGvP2Ch5vtK3+uOIo/9Gi2W4MTbKEyF2eWGdoKIS
- /DRxF40Jx8NdIwAF2gAPbvQ12t17Z0XU39Uzmmxsnkk5WNcyHCu3HWKLajWyXZSswV3xdJiwFb
- CXY=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Oct 2022 17:32:05 -0700
+IronPort-SDR: 3INUQfKSe3lzsA6rxDjFMl5+l1B9A6jnfW3cXj6QvMKJxY8C2JBaO/5/fk82wWGJstcx5zDBWR
+ /O+jpG5M6fidefv/V6LJwGxG3juoProSt3n1QvXBDShxT77utFSbkyuJKVhTZed3UsEVFDIYgq
+ Pn7ARIOIccRHgRgLyEgKh4oE5FcjY/2DhrdsGVU/YbvUhK+CINWZ91Eu+E8uIEOB+zJQtG+MHE
+ gYFlx0qLFifAvDhVuY7iWrk29SEoCfRuFno9J9UqszW5aMZCqtuLC/cvvF8M8RD+HOtMyYRVGU
+ jUM=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Oct 2022 18:16:50 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Oct 2022 18:18:25 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MySSb44CPz1RwtC
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:16:47 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MySVT09Mzz1Rwtm
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:18:25 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,28 +57,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1666833406; x=1669425407; bh=4ap/kLZ0OSB6Zuig+PaHn7p6EhgNVXfGROL
-        Au+d2tkk=; b=fc5pQpFSYHWJxqN13XqqQn2NYyh/xGBn+XIMtiysMOBlZmkncqh
-        RMejpVRBPwy5UVZFVRK4sxLxtDRx9zvJZm7vpjYoGIIFlC1FBZyWWUMed/5UX5GK
-        KVXV2fqb1kLWVQqXp0Hx42aC7OEEfYz/ouOOk8HdY8wM1ArnQwMCvivqW5gYXgmN
-        eMiZGPUU5N6Vn7AxqZarHXJV0pDx43l+DUD4bsGsnuwy9rXNQZ1gfH8fBrTFUfqO
-        u9p4uCE2SCrXol9iCQYSuxGmBS6itFIaAER5LfCoYOuE82El49HoDFHRGktVu5eQ
-        c9SK0ieU/U2JNXd4JKb8XuMAIbJOyvqgTBA==
+        1666833503; x=1669425504; bh=j4VTz3xAsPX1ykQZALKZMRU5knt+b8ZaK/+
+        epWQA9oU=; b=AlLTfLAZlMQuunUsaVrTOL6ArW6Bwtsjjj/dCIowQnsGO3Ny7IX
+        8fETeWSg45iCdJ8qBnD5z9SzZ/rORSWbNt/6k6fIGNFSbPAqFXciPJsr2KkDWTYs
+        4CAskUPPRb9upJ55xdDt6x1lGglffoeITJ/e0Hhgpz7w6fETMh1tf5n9pmIgVc8v
+        0F2yXafbOJQOQydVy9vvvCtlzJyv7BxaoC6XYzj+DV/1MRedMmNCBjwu4SNfv/es
+        lH9AOj8pyGJ0iSrnx/dhludNfuMK6I+54MpHK7PJNM8/QKrcsZxy+6vbMoml8zi+
+        +BodTY/qmKOETxc9ZWmNtOvXjEpqOvOLMfA==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id d1nGpuO0mKY6 for <linux-block@vger.kernel.org>;
-        Wed, 26 Oct 2022 18:16:46 -0700 (PDT)
+        with ESMTP id ADY70wMI3a1J for <linux-block@vger.kernel.org>;
+        Wed, 26 Oct 2022 18:18:23 -0700 (PDT)
 Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MySSX3v2yz1RvLy;
-        Wed, 26 Oct 2022 18:16:44 -0700 (PDT)
-Message-ID: <9cd8aa6a-98be-ddba-db4e-07ed59b53f08@opensource.wdc.com>
-Date:   Thu, 27 Oct 2022 10:16:43 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MySVP4qbZz1RvLy;
+        Wed, 26 Oct 2022 18:18:21 -0700 (PDT)
+Message-ID: <cd5df8e0-03d1-8f22-0367-eb7c76bc70e7@opensource.wdc.com>
+Date:   Thu, 27 Oct 2022 10:18:20 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.0
-Subject: Re: [PATCH RFC v3 01/22] blk-mq: Don't get budget for reserved
- requests
+Subject: Re: [PATCH RFC v3 03/22] scsi: core: Implement reserved command
+ handling
 Content-Language: en-US
 To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
         jejb@linux.ibm.com, martin.petersen@oracle.com,
@@ -88,10 +88,10 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
         linuxarm@huawei.com
 References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
- <1666693096-180008-2-git-send-email-john.garry@huawei.com>
+ <1666693096-180008-4-git-send-email-john.garry@huawei.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <1666693096-180008-2-git-send-email-john.garry@huawei.com>
+In-Reply-To: <1666693096-180008-4-git-send-email-john.garry@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -99,64 +99,98 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 10/25/22 19:17, John Garry wrote:
-> It should be possible to send reserved requests even when there is no
-> budget, so don't request a budget in that case.
+> From: Hannes Reinecke <hare@suse.de>
 > 
-> This comes into play when we need to allocate a reserved request from the
-> target device request queue for error handling for that same device.
+> Quite some drivers are using management commands internally, which
+> typically use the same hardware tag pool (ie they are being allocated
+> from the same hardware resources) as the 'normal' I/O commands.
+> These commands are set aside before allocating the block-mq tag bitmap,
+> so they'll never show up as busy in the tag map.
+> The block-layer, OTOH, already has 'reserved_tags' to handle precisely
+> this situation.
+> So this patch adds a new field 'nr_reserved_cmds' to the SCSI host
+> template to instruct the block layer to set aside a tag space for these
+> management commands by using reserved tags.
 > 
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> #jpg: Set tag_set->queue_depth = shost->can_queue, and not
+> = shost->can_queue + shost->nr_reserved_cmds;
 > Signed-off-by: John Garry <john.garry@huawei.com>
 > ---
->  block/blk-mq.c          | 4 +++-
->  drivers/scsi/scsi_lib.c | 3 ++-
->  2 files changed, 5 insertions(+), 2 deletions(-)
+>  drivers/scsi/hosts.c     |  3 +++
+>  drivers/scsi/scsi_lib.c  |  2 ++
+>  include/scsi/scsi_host.h | 15 ++++++++++++++-
+>  3 files changed, 19 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 260adeb2e455..d8baabb32ea4 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1955,11 +1955,13 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
->  	errors = queued = 0;
->  	do {
->  		struct blk_mq_queue_data bd;
-> +		bool need_budget;
+> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+> index 12346e2297fd..db89afc37bc9 100644
+> --- a/drivers/scsi/hosts.c
+> +++ b/drivers/scsi/hosts.c
+> @@ -489,6 +489,9 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+>  	if (sht->virt_boundary_mask)
+>  		shost->virt_boundary_mask = sht->virt_boundary_mask;
 >  
->  		rq = list_first_entry(list, struct request, queuelist);
->  
->  		WARN_ON_ONCE(hctx != rq->mq_hctx);
-> -		prep = blk_mq_prep_dispatch_rq(rq, !nr_budgets);
-> +		need_budget = !nr_budgets && !blk_mq_is_reserved_rq(rq);
-> +		prep = blk_mq_prep_dispatch_rq(rq, need_budget);
->  		if (prep != PREP_DISPATCH_OK)
->  			break;
+> +	if (sht->nr_reserved_cmds)
+> +		shost->nr_reserved_cmds = sht->nr_reserved_cmds;
+> +
 
-Below this code, there is:
+Nit: the if is not really necessary I think. But it does not hurt.
 
-		if (nr_budgets)
-			nr_budgets--;
-
-Don't you need to change that to:
-
-		if (need_budget && nr_budgets)
-			nr_budgets--;
-
-? Otherwise, the accounting will be off.
-
->  
+>  	device_initialize(&shost->shost_gendev);
+>  	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
+>  	shost->shost_gendev.bus = &scsi_bus_type;
 > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index fa96d3cfdfa3..39d4fd124375 100644
+> index 39d4fd124375..a8c4e7c037ae 100644
 > --- a/drivers/scsi/scsi_lib.c
 > +++ b/drivers/scsi/scsi_lib.c
-> @@ -298,7 +298,8 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
->  	if (starget->can_queue > 0)
->  		atomic_dec(&starget->target_busy);
+> @@ -1978,6 +1978,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+>  	tag_set->nr_hw_queues = shost->nr_hw_queues ? : 1;
+>  	tag_set->nr_maps = shost->nr_maps ? : 1;
+>  	tag_set->queue_depth = shost->can_queue;
+> +	tag_set->reserved_tags = shost->nr_reserved_cmds;
+> +
+
+Why the blank line ?
+
+>  	tag_set->cmd_size = cmd_size;
+>  	tag_set->numa_node = dev_to_node(shost->dma_dev);
+>  	tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 750ccf126377..91678c77398e 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -360,10 +360,17 @@ struct scsi_host_template {
+>  	/*
+>  	 * This determines if we will use a non-interrupt driven
+>  	 * or an interrupt driven scheme.  It is set to the maximum number
+> -	 * of simultaneous commands a single hw queue in HBA will accept.
+> +	 * of simultaneous commands a single hw queue in HBA will accept
+> +	 * including reserved commands.
+>  	 */
+>  	int can_queue;
 >  
-> -	sbitmap_put(&sdev->budget_map, cmd->budget_token);
-> +	if (!blk_mq_is_reserved_rq(scsi_cmd_to_rq(cmd)))
-> +		sbitmap_put(&sdev->budget_map, cmd->budget_token);
->  	cmd->budget_token = -1;
->  }
+> +	/*
+> +	 * This determines how many commands the HBA will set aside
+> +	 * for reserved commands.
+> +	 */
+> +	int nr_reserved_cmds;
+> +
+>  	/*
+>  	 * In many instances, especially where disconnect / reconnect are
+>  	 * supported, our host also has an ID on the SCSI bus.  If this is
+> @@ -611,6 +618,12 @@ struct Scsi_Host {
+>  	 */
+>  	unsigned nr_hw_queues;
+>  	unsigned nr_maps;
+> +
+> +	/*
+> +	 * Number of reserved commands to allocate, if any.
+> +	 */
+> +	unsigned int nr_reserved_cmds;
+> +
+>  	unsigned active_mode:2;
 >  
+>  	/*
 
 -- 
 Damien Le Moal
