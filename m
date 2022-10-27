@@ -2,187 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE64BFA373D
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 07:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA35FA373D
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 07:51:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234370AbiJ0HLV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 03:11:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53634 "EHLO
+        id S234552AbiJ0HvJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 03:51:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233506AbiJ0HLT (ORCPT
+        with ESMTP id S234241AbiJ0HvJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 03:11:19 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF0F1719B7;
-        Thu, 27 Oct 2022 00:11:16 -0700 (PDT)
-Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MycCv6s1gz15MC0;
-        Thu, 27 Oct 2022 15:06:19 +0800 (CST)
-Received: from [10.40.188.234] (10.40.188.234) by
- kwepemi500015.china.huawei.com (7.221.188.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 27 Oct 2022 15:11:13 +0800
-Subject: Re: [PATCH v11 3/9] iov_iter: introduce
- iov_iter_get_pages_[alloc_]flags()
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-mm@kvack.org>
-CC:     Christoph Hellwig <hch@lst.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Stephen Bates <sbates@raithlin.com>
-References: <20221021174116.7200-1-logang@deltatee.com>
- <20221021174116.7200-4-logang@deltatee.com>
-From:   Jay Fang <f.fangjian@huawei.com>
-Message-ID: <c73c426f-d9f5-2f17-bb88-b72792103703@huawei.com>
-Date:   Thu, 27 Oct 2022 15:11:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Thu, 27 Oct 2022 03:51:09 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20202A287D;
+        Thu, 27 Oct 2022 00:51:03 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9178A1FDFB;
+        Thu, 27 Oct 2022 07:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1666857062; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KW/ilq8EeIAm/XWevD2VqVdEVtwgp+eQrNdLBxj+VgI=;
+        b=OCmdeJxHcSlsxMdZdzBBEXBfyqcZ0GgftjK5FUv6GyZ/az5wshetS/ofhrLLDeTdMiSiIb
+        nNlTj/4aJdd+0bGEGAI21TZth7hgaVOn8+8L7OknRj7ovhmB5wns/FfIvxjpxRBSefd1HW
+        ugBcA3i40gOjaF2C4JdK2jZ6ClRyVI4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1666857062;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KW/ilq8EeIAm/XWevD2VqVdEVtwgp+eQrNdLBxj+VgI=;
+        b=px1TAfPvKNwPje1yeI4HyYEBfMYX9Qb31If2wK3ByrXC9j8Y5c9FlwY/GH/l1zePnVNtmn
+        I4iZ0MXJT3wohfBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 55FB6134CA;
+        Thu, 27 Oct 2022 07:51:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id gTgsE2U4WmPdLgAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 27 Oct 2022 07:51:01 +0000
+Message-ID: <5db88114-559b-970a-0437-9acdacb47f8b@suse.de>
+Date:   Thu, 27 Oct 2022 09:51:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20221021174116.7200-4-logang@deltatee.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.40.188.234]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500015.china.huawei.com (7.221.188.92)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH RFC v3 03/22] scsi: core: Implement reserved command
+ handling
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        jinpu.wang@cloud.ionos.com, bvanassche@acm.org, hch@lst.de,
+        ming.lei@redhat.com, niklas.cassel@wdc.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linuxarm@huawei.com
+References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
+ <1666693096-180008-4-git-send-email-john.garry@huawei.com>
+ <cd5df8e0-03d1-8f22-0367-eb7c76bc70e7@opensource.wdc.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <cd5df8e0-03d1-8f22-0367-eb7c76bc70e7@opensource.wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/10/22 1:41, Logan Gunthorpe wrote:
-> Add iov_iter_get_pages_flags() and iov_iter_get_pages_alloc_flags()
-> which take a flags argument that is passed to get_user_pages_fast().
+On 10/27/22 03:18, Damien Le Moal wrote:
+> On 10/25/22 19:17, John Garry wrote:
+>> From: Hannes Reinecke <hare@suse.de>
+>>
+>> Quite some drivers are using management commands internally, which
+>> typically use the same hardware tag pool (ie they are being allocated
+>> from the same hardware resources) as the 'normal' I/O commands.
+>> These commands are set aside before allocating the block-mq tag bitmap,
+>> so they'll never show up as busy in the tag map.
+>> The block-layer, OTOH, already has 'reserved_tags' to handle precisely
+>> this situation.
+>> So this patch adds a new field 'nr_reserved_cmds' to the SCSI host
+>> template to instruct the block layer to set aside a tag space for these
+>> management commands by using reserved tags.
+>>
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
+>> #jpg: Set tag_set->queue_depth = shost->can_queue, and not
+>> = shost->can_queue + shost->nr_reserved_cmds;
+>> Signed-off-by: John Garry <john.garry@huawei.com>
+>> ---
+>>   drivers/scsi/hosts.c     |  3 +++
+>>   drivers/scsi/scsi_lib.c  |  2 ++
+>>   include/scsi/scsi_host.h | 15 ++++++++++++++-
+>>   3 files changed, 19 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+>> index 12346e2297fd..db89afc37bc9 100644
+>> --- a/drivers/scsi/hosts.c
+>> +++ b/drivers/scsi/hosts.c
+>> @@ -489,6 +489,9 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+>>   	if (sht->virt_boundary_mask)
+>>   		shost->virt_boundary_mask = sht->virt_boundary_mask;
+>>   
+>> +	if (sht->nr_reserved_cmds)
+>> +		shost->nr_reserved_cmds = sht->nr_reserved_cmds;
+>> +
 > 
-> This is so that FOLL_PCI_P2PDMA can be passed when appropriate.
+> Nit: the if is not really necessary I think. But it does not hurt.
 > 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
->  include/linux/uio.h |  6 ++++++
->  lib/iov_iter.c      | 32 ++++++++++++++++++++++++--------
->  2 files changed, 30 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/linux/uio.h b/include/linux/uio.h
-> index 2e3134b14ffd..9ede533ce64c 100644
-> --- a/include/linux/uio.h
-> +++ b/include/linux/uio.h
-> @@ -247,8 +247,14 @@ void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode
->  void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
->  void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
->  		     loff_t start, size_t count);
-> +ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
-> +		size_t maxsize, unsigned maxpages, size_t *start,
-> +		unsigned gup_flags);
->  ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
->  			size_t maxsize, unsigned maxpages, size_t *start);
-> +ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
-> +		struct page ***pages, size_t maxsize, size_t *start,
-> +		unsigned gup_flags);
->  ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
->  			size_t maxsize, size_t *start);
->  int iov_iter_npages(const struct iov_iter *i, int maxpages);
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index c3ca28ca68a6..53efad017f3c 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -1430,7 +1430,8 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
->  
->  static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
->  		   struct page ***pages, size_t maxsize,
-> -		   unsigned int maxpages, size_t *start)
-> +		   unsigned int maxpages, size_t *start,
-> +		   unsigned int gup_flags)
+Yes, we do.
+Not all HBAs are able to figure out the number of reserved commands 
+upfront; some modify that based on the PCI device used etc.
+So I'd keep it for now.
 
-Hi,
-found some checkpatch warnings, like this:
-WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
-#50: FILE: lib/iov_iter.c:1497:
-+		   size_t *start, unsigned gup_flags)
+Cheers,
 
->  {
->  	unsigned int n;
->  
-> @@ -1442,7 +1443,6 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
->  		maxsize = MAX_RW_COUNT;
->  
->  	if (likely(user_backed_iter(i))) {
-> -		unsigned int gup_flags = 0;
->  		unsigned long addr;
->  		int res;
->  
-> @@ -1492,33 +1492,49 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
->  	return -EFAULT;
->  }
->  
-> -ssize_t iov_iter_get_pages2(struct iov_iter *i,
-> +ssize_t iov_iter_get_pages(struct iov_iter *i,
->  		   struct page **pages, size_t maxsize, unsigned maxpages,
-> -		   size_t *start)
-> +		   size_t *start, unsigned gup_flags)
->  {
->  	if (!maxpages)
->  		return 0;
->  	BUG_ON(!pages);
->  
-> -	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages, start);
-> +	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages,
-> +					  start, gup_flags);
-> +}
-> +EXPORT_SYMBOL_GPL(iov_iter_get_pages);
-> +
-> +ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
-> +		size_t maxsize, unsigned maxpages, size_t *start)
-> +{
-> +	return iov_iter_get_pages(i, pages, maxsize, maxpages, start, 0);
->  }
->  EXPORT_SYMBOL(iov_iter_get_pages2);
->  
-> -ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
-> +ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
->  		   struct page ***pages, size_t maxsize,
-> -		   size_t *start)
-> +		   size_t *start, unsigned gup_flags)
->  {
->  	ssize_t len;
->  
->  	*pages = NULL;
->  
-> -	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start);
-> +	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start,
-> +					 gup_flags);
->  	if (len <= 0) {
->  		kvfree(*pages);
->  		*pages = NULL;
->  	}
->  	return len;
->  }
-> +EXPORT_SYMBOL_GPL(iov_iter_get_pages_alloc);
-> +
-> +ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
-> +		struct page ***pages, size_t maxsize, size_t *start)
-> +{
-> +	return iov_iter_get_pages_alloc(i, pages, maxsize, start, 0);
-> +}
->  EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
->  
->  size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
-> 
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
