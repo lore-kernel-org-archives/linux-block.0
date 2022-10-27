@@ -2,98 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F20FA3742
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 11:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A60FA3742
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 11:47:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234920AbiJ0L2d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 07:28:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        id S233867AbiJ0Lr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 07:47:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234760AbiJ0L2c (ORCPT
+        with ESMTP id S234928AbiJ0LrZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 07:28:32 -0400
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2EAD994E;
-        Thu, 27 Oct 2022 04:28:31 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MyjzW6QWqz6R6CL;
-        Thu, 27 Oct 2022 19:25:59 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCX8+Vaa1pjWpkbAQ--.34104S3;
-        Thu, 27 Oct 2022 19:28:27 +0800 (CST)
-Subject: Re: [PATCH 5.10 2/3] blk-wbt: call rq_qos_add() after wb_normal is
- initialized
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     axboe@kernel.dk, stable@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@hawei.com, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221018014326.467842-1-yukuai1@huaweicloud.com>
- <20221018014326.467842-3-yukuai1@huaweicloud.com>
- <Y1lkvFXjEMA80AFO@kroah.com>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <fa4a2aed-4a9e-abfa-6fcf-d402ec9a1647@huaweicloud.com>
-Date:   Thu, 27 Oct 2022 19:28:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 27 Oct 2022 07:47:25 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CC3557BCF
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 04:47:24 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id c7-20020a05600c0ac700b003c6cad86f38so3974238wmr.2
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 04:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pp3WssIDiwffa/Iw72CELrWguDX00JoxvppfetTWe1c=;
+        b=SlMVCcJ74KWh3EOlvV6ErcsWhuQsLOPYemmXmipGLjIxg+M2ze2a/H+Zk4eRYQJJ+h
+         aIwKb9FgYyuWUJk5qAgJQ38BQ8o7rZpJP5PBSWg2sK5ArgUHeE20RRU62tUDazuggCv+
+         4wHDiNFKoM/6FV93U0ndlcVS2g2KOtC6axJegciJNPYbILFxqrRlM6fpsnnHXV7Klsdn
+         AtG7CE9B14gLmdqVPHr8g941Zaz4Z0xnyy9gSq//mlUUEiZ/+zJ5/eQdLo+EPbBkbCDN
+         3x6ZZAI1tNFipWwbn6+u31m4hQrwAXQd1wdQJUSkOVYAQCbKbwcD7yi2adqiPkp4q9qx
+         GcxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Pp3WssIDiwffa/Iw72CELrWguDX00JoxvppfetTWe1c=;
+        b=CAkct1/FJupIaTyGNbe34yzKZrWn6op/g50nFLETmiNshYWTgocXAP3ot/MxAvVHk8
+         PIziDFC7qTKO2Xa952wSiXx8N3ysfqoGoVxX403g6g3APorwK0ONekcrKXhZPL2mq17P
+         NYmfdAHfiEEdVXmjk3zfAkZyS5znV4zPVf6JX27H3f8JcTNMN1fyuczRHpq93o8ZsvVN
+         jlN+osXm6X1CxVFaAugqR9+NAsKZWbJBGhXBB2cGll4ivF4RuRrHHrI+psFlMUmAhTUT
+         fZmHJrm1f7asaL0E4ujNGrZbs7z+tTF16PgU1WdZsleAi4B6Lg4RDNU4utjoDMbVfGfl
+         6EUA==
+X-Gm-Message-State: ACrzQf2f3CIpxnifDMrLqKYv9HtmtPXgne9EGHjaHA3c07RYJKQK6td1
+        kz0BpwsdJqGE8TMDxFDUAG8ysoQRoMnQyQ==
+X-Google-Smtp-Source: AMsMyM55itU1AELEAim06UIy2JSVJyEtsspnwY1qIOEFxql1PaEJeC14ghkpWfSfewGIt6QmavcDxw==
+X-Received: by 2002:a05:600c:310a:b0:3c6:f9a6:5a7d with SMTP id g10-20020a05600c310a00b003c6f9a65a7dmr5597081wmo.29.1666871242518;
+        Thu, 27 Oct 2022 04:47:22 -0700 (PDT)
+Received: from [10.1.2.99] (wifi-guest-gw.tecnico.ulisboa.pt. [193.136.152.65])
+        by smtp.gmail.com with ESMTPSA id h2-20020adfe982000000b002322bff5b3bsm1176316wrm.54.2022.10.27.04.47.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Oct 2022 04:47:22 -0700 (PDT)
+Message-ID: <7f2a2ecd-7fe1-d30a-a29c-8025b33156ce@gmail.com>
+Date:   Thu, 27 Oct 2022 12:46:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <Y1lkvFXjEMA80AFO@kroah.com>
-Content-Type: text/plain; charset=gbk; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH] block: fix bio-allocation from per-cpu cache
+Content-Language: en-US
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+References: <CGME20221027101534epcas5p3b8335c05a1003531f1a4488dc27f27ee@epcas5p3.samsung.com>
+ <20221027100410.3891-1-joshi.k@samsung.com>
+ <b7c3d003-d808-a57f-c645-48cfc06d7a52@gmail.com>
+ <20221027104910.GA22546@test-zns>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20221027104910.GA22546@test-zns>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCX8+Vaa1pjWpkbAQ--.34104S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7JFW3tr4fJw1xJF1xJw18Zrb_yoWxKrcE9F
-        4qkrykGwn7Ga12vFsrAw1UXFWDKrWrJrZ8Ja4xJr13XF4rWayUXrs8tr93ZFW7tr9a9FZ0
-        qrsaq3sxt3s0gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUb4kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-        4UM4x0Y48IcVAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCYjI0SjxkI62AI1cAE67vI
-        Y487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-        0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-        0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-        WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8
-        JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UU
-        UUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-�� 2022/10/27 0:47, Greg KH д��:
-> On Tue, Oct 18, 2022 at 09:43:25AM +0800, Yu Kuai wrote:
->> From: Yu Kuai <yukuai3@huawei.com>
+On 10/27/22 11:49, Kanchan Joshi wrote:
+> On Thu, Oct 27, 2022 at 11:38:50AM +0100, Pavel Begunkov wrote:
+>> On 10/27/22 11:04, Kanchan Joshi wrote:
+>>> If cache does not have any entry, make sure to detect that and return
+>>> failure. Otherwise this leads to null pointer dereference.
 >>
->> commit 8c5035dfbb9475b67c82b3fdb7351236525bf52b upstream.
+>> Damn, it was done right in v2
+>>
+>> https://lore.kernel.org/all/9fd04486d972c1f3ef273fa26b4b6bf51a5e4270.1666122465.git.asml.silence@gmail.com/
+>>
+>> Perhaps I based v3 on a wrong version. Thanks
+>>
+>>
+>>> Fixes: 13a184e26965 ("block/bio: add pcpu caching for non-polling bio_put")
+>>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>>> ---
+>>> Can be reproduced by:
+>>> fio -direct=1 -iodepth=1 -rw=randread -ioengine=io_uring -bs=4k -numjobs=1 -size=4k -filename=/dev/nvme0n1 -hipri=1 -name=block
+>>>
+>>> BUG: KASAN: null-ptr-deref in bio_alloc_bioset.cold+0x2a/0x16a
+>>> Read of size 8 at addr 0000000000000000 by task fio/1835
+>>>
+>>> CPU: 5 PID: 1835 Comm: fio Not tainted 6.1.0-rc2+ #226
+>>> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.14.0-0-g
+>>> Call Trace:
+>>>  <TASK>
+>>>  dump_stack_lvl+0x34/0x48
+>>>  print_report+0x490/0x4a1
+>>>  ? __virt_addr_valid+0x28/0x140
+>>>  ? bio_alloc_bioset.cold+0x2a/0x16a
+>>>  kasan_report+0xb3/0x130
+>>>  ? bio_alloc_bioset.cold+0x2a/0x16a
+>>>  bio_alloc_bioset.cold+0x2a/0x16a
+>>>  ? bvec_alloc+0xf0/0xf0
+>>>  ? iov_iter_is_aligned+0x130/0x2c0
+>>>  blkdev_direct_IO.part.0+0x16a/0x8d0
+>>>
+>>>  block/bio.c | 11 ++++++-----
+>>>  1 file changed, 6 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/block/bio.c b/block/bio.c
+>>> index 8f624ffaf3d0..66f088bb3736 100644
+>>> --- a/block/bio.c
+>>> +++ b/block/bio.c
+>>> @@ -439,13 +439,14 @@ static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
+>>>      cache = per_cpu_ptr(bs->cache, get_cpu());
+>>>      if (!cache->free_list &&
+>>> -        READ_ONCE(cache->nr_irq) >= ALLOC_CACHE_THRESHOLD) {
+>>> +        READ_ONCE(cache->nr_irq) >= ALLOC_CACHE_THRESHOLD)
+>>>          bio_alloc_irq_cache_splice(cache);
+>>> -        if (!cache->free_list) {
+>>> -            put_cpu();
+>>> -            return NULL;
+>>> -        }
+>>> +
+>>> +    if (!cache->free_list) {
+>>
+>> Let's nest it under the other "if (!cache->free_list)"
 > 
-> I need a 5.15 version of this, and the 3/3 patch in order to be able to
-> apply the 5.10.y version.
-> 
-> Can you please send that, and then resend the remaining patches here for
-> 5.10.y?
+> Not sure if I got you. It was under that if condition earlier, and that
+> part causes trouble.
 
-Yes, I can do that. By the way, just to confirm:
+Under the free_list check specifically, the threshold would also
+go in a separate if,
 
-I already saw that patch 2,3 is queued:
+> What you wrote in v2 is another way, but there also we have two checks
+> on cache->free_list.
 
-[PATCH 5.15 122/530] blk-wbt: call rq_qos_add() after wb_normal is 
-initialized
-[PATCH 5.15 519/530] blk-wbt: fix that rwb->wc is always set to 1 in 
-wbt_init()
+Your version:
 
-Do I still need to send a 5.15 version?
+if (cache_empty())
+	if (check_threshold())
+		try_replenish_cache(); // splice
+if (cache_empty()) // still empty
+	return NULL;
 
-Thanks,
-Kuai
-> 
-> thanks,
-> 
-> greg k-h
-> .
-> 
 
+vs v2:
+
+if (cache_empty()) {
+	if (check_threshold())
+		try_replenish_cache(); // splice
+	if (cache_empty()) // still empty
+		return NULL;
+}
+
+But on the other hand compilers should be smart enough to
+optimise repeated checks when the cache already have requests,
+so there should be no real difference.
+
+-- 
+Pavel Begunkov
