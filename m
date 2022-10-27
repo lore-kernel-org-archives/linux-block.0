@@ -2,104 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D3F2FA373E
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 08:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3016C38A2D
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 08:57:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234705AbiJ0IQo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 04:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58788 "EHLO
+        id S234282AbiJ0I5f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 04:57:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233815AbiJ0IQm (ORCPT
+        with ESMTP id S234173AbiJ0I5e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 04:16:42 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF87EE09;
-        Thu, 27 Oct 2022 01:16:40 -0700 (PDT)
-Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4MydlM3sYhz67DWp;
-        Thu, 27 Oct 2022 16:15:11 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 27 Oct 2022 10:16:38 +0200
-Received: from [10.195.32.169] (10.195.32.169) by
- lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 27 Oct 2022 09:16:37 +0100
-Message-ID: <72234b96-b3b5-606c-cf82-95e6ee86550d@huawei.com>
-Date:   Thu, 27 Oct 2022 09:16:37 +0100
+        Thu, 27 Oct 2022 04:57:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEC4B03E3
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 01:57:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666861052;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=VsjYIRgooNe0W+o1o1Hlh6ktW6MVxVNGB3etGgKaZhU=;
+        b=FyiadgYg7s9ReT4iPUTWfKotxMzt+11mXZS+/BUxPLWixcZTw/Q53N67dtt6IacHKyyJvS
+        QJkKOrQzy2xB++Ovxb528axd032ab7Ht6khy2pDVlpqzPocS6UHylISx2EAlnT2ISu0K+o
+        Lm94CyvL5TzMR+6lLaQ+Ynl6jNUdzx0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-401-20UCIlNMMNqwIpXiyZS0Sw-1; Thu, 27 Oct 2022 04:57:24 -0400
+X-MC-Unique: 20UCIlNMMNqwIpXiyZS0Sw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0743D82DFC7;
+        Thu, 27 Oct 2022 08:57:24 +0000 (UTC)
+Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 98C6820290A6;
+        Thu, 27 Oct 2022 08:57:22 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        dm-devel@redhat.com, Mike Snitzer <snitzer@kernel.org>,
+        Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH] blk-mq: don't add non-pt request with ->end_io to batch
+Date:   Thu, 27 Oct 2022 16:57:09 +0800
+Message-Id: <20221027085709.513175-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH RFC v3 03/22] scsi: core: Implement reserved command
- handling
-To:     Hannes Reinecke <hare@suse.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        <axboe@kernel.dk>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <jinpu.wang@cloud.ionos.com>,
-        <bvanassche@acm.org>, <hch@lst.de>, <ming.lei@redhat.com>,
-        <niklas.cassel@wdc.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-ide@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <linuxarm@huawei.com>
-References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
- <1666693096-180008-4-git-send-email-john.garry@huawei.com>
- <cd5df8e0-03d1-8f22-0367-eb7c76bc70e7@opensource.wdc.com>
- <5db88114-559b-970a-0437-9acdacb47f8b@suse.de>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <5db88114-559b-970a-0437-9acdacb47f8b@suse.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.195.32.169]
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/10/2022 08:51, Hannes Reinecke wrote:
->>>
->>> Signed-off-by: Hannes Reinecke <hare@suse.de>
->>> #jpg: Set tag_set->queue_depth = shost->can_queue, and not
->>> = shost->can_queue + shost->nr_reserved_cmds;
->>> Signed-off-by: John Garry <john.garry@huawei.com>
->>> ---
->>>   drivers/scsi/hosts.c     |  3 +++
->>>   drivers/scsi/scsi_lib.c  |  2 ++
->>>   include/scsi/scsi_host.h | 15 ++++++++++++++-
->>>   3 files changed, 19 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
->>> index 12346e2297fd..db89afc37bc9 100644
->>> --- a/drivers/scsi/hosts.c
->>> +++ b/drivers/scsi/hosts.c
->>> @@ -489,6 +489,9 @@ struct Scsi_Host *scsi_host_alloc(struct 
->>> scsi_host_template *sht, int privsize)
->>>       if (sht->virt_boundary_mask)
->>>           shost->virt_boundary_mask = sht->virt_boundary_mask;
->>> +    if (sht->nr_reserved_cmds)
->>> +        shost->nr_reserved_cmds = sht->nr_reserved_cmds;
->>> +
->>
->> Nit: the if is not really necessary I think. But it does not hurt.
->>
-> Yes, we do.
-> Not all HBAs are able to figure out the number of reserved commands 
-> upfront; some modify that based on the PCI device used etc.
-> So I'd keep it for now.
+dm-rq implements ->end_io callback for request issued to underlying queue,
+and it isn't passthrough request.
 
-I think logically Damien is right as in the shost alloc 
-shost->nr_reserved_cmds is initially zero, so:
+Commit ab3e1d3bbab9 ("block: allow end_io based requests in the completion
+batch handling") doesn't clear rq->bio and rq->__data_len for request
+with ->end_io in blk_mq_end_request_batch(), and this way is actually
+dangerous, but so far it is only for nvme passthrough request.
 
-if (sht->nr_reserved_cmds)
-        shost->nr_reserved_cmds = sht->nr_reserved_cmds;
+dm-rq needs to clean up remained bios in case of partial completion,
+and req->bio is required, then use-after-free is triggered, so the
+underlying clone request can't be completed in blk_mq_end_request_batch.
 
-is same as simply:
+Fix panic by not adding such request into batch list, and the issue
+can be triggered simply by exposing nvme pci to dm-mpath simply.
 
-	shost->nr_reserved_cmds = sht->nr_reserved_cmds;
+Fixes: ab3e1d3bbab9 ("block: allow end_io based requests in the completion batch handling")
+Cc: dm-devel@redhat.com
+Cc: Mike Snitzer <snitzer@kernel.org>
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/blk-mq.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-However I am just copying the coding style.
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index ba18e9bdb799..d6119c5d1069 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -853,7 +853,8 @@ static inline bool blk_mq_add_to_batch(struct request *req,
+ 				       struct io_comp_batch *iob, int ioerror,
+ 				       void (*complete)(struct io_comp_batch *))
+ {
+-	if (!iob || (req->rq_flags & RQF_ELV) || ioerror)
++	if (!iob || (req->rq_flags & RQF_ELV) || ioerror ||
++			(req->end_io && !blk_rq_is_passthrough(req)))
+ 		return false;
+ 
+ 	if (!iob->complete)
+-- 
+2.31.1
 
-Thanks,
-John
