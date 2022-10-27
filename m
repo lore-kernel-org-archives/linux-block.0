@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 093A5C38A2D
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 09:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A71AFA373D
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 09:18:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234581AbiJ0JRN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 05:17:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59558 "EHLO
+        id S234689AbiJ0JS2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 05:18:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234480AbiJ0JRF (ORCPT
+        with ESMTP id S234704AbiJ0JSY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 05:17:05 -0400
+        Thu, 27 Oct 2022 05:18:24 -0400
 Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26F82F391
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 02:17:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C6C31371
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 02:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1666862224; x=1698398224;
+  t=1666862303; x=1698398303;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=q9/SkNOCAmP0U3/ZAegGPkz4MOkCYIOvnO9GX9L+WZ8=;
-  b=FiFxzkBe8B/W427d+VlSeWxsJY/X5J4MuTS9LHlnrJWkPIXo2NH5hY59
-   k2XkaGjtYJmxWDEGvGe1KLffz6X8Jk2zpymUKPQ5+NW4BPbFq1OJoloUN
-   688fSRIrMZ520+1sUWGPNWlEsd28vKdsIhrbKRN3cDYjNAX8QzZ9gFJqy
-   hJ2V/ElfJVajPHZPRH3HHrUXlp2qLp8G1TShWswGW4WUUoNK1KZA8f8js
-   zSBw/MkC71p2P17FX918JR5CY20t7UW+LwEV2RJ35ctSVe0iaQjy+1xy4
-   5WkEPRTq33voJ2va0J1eQp4NRzygWIUQtaTAUnoGdZkDgM6N9N5/Lj9ne
-   A==;
+  bh=kvLAXbtC50g6ZzyI4fPHRtBiFei4HcUvRqhE6dQ7SAY=;
+  b=K+xpmubmP1uyGMbkmYAWn7Si47fxuBbpY9fGM5YcZgnzYwnC3k/A6Gft
+   nZfx+GBm7+kuT7MQUrrUMuXJraVhL9AR9pmSyGTbkCPSH0j+LrhXTP0+4
+   tBaeS4FhAtKV7wYxitAYJdUkQcAQ/AIonxSG2ySbtnfs9oBcWL/R24JND
+   mlPR3vj2a60vJBN5zmv0WlLYM82oQoO9EdPVW+ym0r+ETAMu0p3HAmTyH
+   2Ih0w4hIck85Ud141LwGgHCTrrAa6GRU3JqzLb7W4mnLYtqHmo0Hn4pFn
+   NVImEW59atDSAjwK+5E5cix9yMMcUd6j868ONa2g/p7csLpbcV9Zo0GzI
+   w==;
 X-IronPort-AV: E=Sophos;i="5.95,217,1661788800"; 
-   d="scan'208";a="319187624"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2022 17:17:04 +0800
-IronPort-SDR: yDZ8pO10XV2RvmyCvKkwEZx37TZQr5Vk3Px+ftr12+4tBiQMp/WyQDBRQesqn26u8bu2zuZxy4
- UARvMOIE8OI1HT6qpXiCeci5KvfQMysSRDfTyD9JRAMKX6aPvvxKMKcz4g74UdEjsdV0AlKnul
- 1vfwL+bognMOnQauzFdmmSm8D9kinPITg3yG/FuiU9ycT011ho3/HsG0DBFOVaH77bnoS/SbYx
- teKGZ5SJN4YlvOOkFsUtua9OIrAEA7bhC97LShqe+iMX+NrNwJ0BRU1jDpscdtZmUp0JUSYjcx
- 3OV/g/RVVlbelXeeJNSjHQOD
+   d="scan'208";a="319187704"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2022 17:18:22 +0800
+IronPort-SDR: JZ5i8lFswxvSDqeKCb2UBdgxQoY/eFjBx6x9r0drg5nU9bbSWg2wCzpZgl9p39PNFVg0RDJmvO
+ R0qSVeeq1FfKO9+cB/T2yIveRpBXJRswyuqJDKHmc8JTtzWVXWiziVSjYnvfa4C547C/DXkV4Q
+ oSMsRLqg7gPQN9xoyGuEWswjGhvoy+RmmJ1CncIMrWBpg9x7aXeArNywovfiHvfjqmowKylaAv
+ pUDAS+tQEbhumUSbBkQC150vZtg+HJjbbrkGpYWnRP/NAyeEAPtXyD5xOBzzJbipxSwtt1d57H
+ EMsRCw6yBWO14SJTiOU7Qu/3
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Oct 2022 01:30:42 -0700
-IronPort-SDR: LQDVtcpFk39YxxcB58EcTklxUhINtyPbq4rgtc+XOA1mBahkJ28/L//TUes6v5Bz+yHHBzR26V
- 1pcGDDSgDbxMt2HyqdxRpYcefrxpps61ALZg0mtlWtfK/x9L80zT4D17vG84GdU3v8M8R51i1B
- zH3jH75Hjj79VRp4N2nuC1NebK2lq/7pUwzX2dx99Xrj6O2Mr+UqOfw0liYM1lZl/3P9dxszK8
- Rh5EnAt4cE1U92bIPyMeilTaKKSPwxCrlEMnn6U7SNXiYaB+rn8/Cvdkgdgdj6Iel3Uyxd1VzR
- 7mk=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Oct 2022 01:37:43 -0700
+IronPort-SDR: Ohd1dvKHMCp0VxwJi5z9BArDurzLrYigpi4dGIUVdVD6kdR3PKIIZZzp47paCrKo3SXFr+K1PG
+ y+3lOKgVeDHXse7Ks7rSroW9m5sDJTVDGWiqFtPTj67Ud1/SiZ3Tfh9oS0jK2sOQ4TajRKm0Nx
+ SsdTpQq1R/G3qPJXu/Jp4a8lPfSkCJHulsvaTlKaKDD7WjaDDH1Y7CNWRkBHVoBA37+ioMD79k
+ GC4OgSmTwYrXnoLIaHYRN2XRNuxGabC/LaAZy/7AD+BT/wthH7XMC+zzOfV+mGF2DopDi/JegB
+ NOM=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Oct 2022 02:17:04 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Oct 2022 02:18:22 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Myg6k3Tftz1RWy3
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 02:17:02 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Myg8G0tXjz1RwvT
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 02:18:22 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,192 +57,134 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1666862220; x=1669454221; bh=q9/SkNOCAmP0U3/ZAegGPkz4MOkCYIOvnO9
-        GX9L+WZ8=; b=mthPmqXvyern+Gs/hB6teVKMvC7h1852cNUqbGXGa7g2EqSHHIJ
-        zavv2SVjhifKBStdR7a7OhG+pvap+Lx0qwP4wXlUw5fdjiM4xHWQ7dv1ibQJAJ8b
-        aE/W0HPLvsfUrIXZkQvASgxDg36UTaMxxdx36kdFYXpJ9aaCQGunofpyyjMu+PQg
-        UvNPotnuzorebyK/eNOdY+IDiRJL6Q1HG+HFA74HY1vv0VoF1MKbqiVNJwLDzP7d
-        TWlDBBoCByt1u+RAvvrXDzwA/8N4uS9Qy8nnP6CYPqhvMnDGNRjXycZ5WlTmzUOd
-        uWtT0ddUqUFN9CW0dJBt/XRFso+5tOM2qOw==
+        1666862300; x=1669454301; bh=kvLAXbtC50g6ZzyI4fPHRtBiFei4HcUvRqh
+        E6dQ7SAY=; b=FF28ulx/sZ2DShKxKICmthkjOStRutL/PHIMQJpOMFQm1DxB0X0
+        Sn72UimYGywoe8Do+Vtxucn5eDw3gTl2keRDFUUAZWWRAg2JuNZs/GuCcT/JCWB5
+        mo00urhbRkb0n9feEdJvJRpoxdZta8OvBhyLWO3+cCfzML4RNrln1keXBYjBnMK9
+        NaTf17qHuLidD6x+8j+nI8AnThO6PvpHDYucrXhqT1efi/1G3gJETCJmH7qJTh5D
+        nuWRBZR3AUvRcTfUT1HRTk0ua68qSC5wT1GFPC0qGQgmWZEOIB98vsataqX+2Ses
+        +ilKVGVYXN/5R6NUPjXRa9WOQrqwkgRN5lg==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id CRvzATf_40Cf for <linux-block@vger.kernel.org>;
-        Thu, 27 Oct 2022 02:17:00 -0700 (PDT)
+        with ESMTP id olN5T9UgwtrJ for <linux-block@vger.kernel.org>;
+        Thu, 27 Oct 2022 02:18:20 -0700 (PDT)
 Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Myg6f00VXz1RvLy;
-        Thu, 27 Oct 2022 02:16:57 -0700 (PDT)
-Message-ID: <5417d401-6fb3-c1d7-58df-e24e0013cfb8@opensource.wdc.com>
-Date:   Thu, 27 Oct 2022 18:16:56 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Myg8C0F9dz1RvLy;
+        Thu, 27 Oct 2022 02:18:18 -0700 (PDT)
+Message-ID: <b9a287ad-6234-1bb6-3f20-3e019b6be879@opensource.wdc.com>
+Date:   Thu, 27 Oct 2022 18:18:17 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.0
-Subject: Re: [PATCH RFC v3 16/22] ata: libata-scsi: Allocate sdev early in
- port probe
+Subject: Re: [PATCH RFC v3 04/22] scsi: core: Add support to send reserved
+ commands
 Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>, John Garry <john.garry@huawei.com>,
-        axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        jinpu.wang@cloud.ionos.com, bvanassche@acm.org, hch@lst.de,
-        ming.lei@redhat.com, niklas.cassel@wdc.com
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        jinpu.wang@cloud.ionos.com, hare@suse.de, bvanassche@acm.org,
+        hch@lst.de, ming.lei@redhat.com, niklas.cassel@wdc.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
         linuxarm@huawei.com
 References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
- <1666693096-180008-17-git-send-email-john.garry@huawei.com>
- <6c0a4a75-786a-c946-57f2-c511bd765bcc@opensource.wdc.com>
- <d4535f4f-d9cf-30de-ce8c-9d8ee9c0decb@suse.de>
+ <1666693096-180008-5-git-send-email-john.garry@huawei.com>
+ <c30e421e-9652-ebb8-9733-b286cb0f9f19@opensource.wdc.com>
+ <76fe5007-5c53-9cdf-7c57-6af7ebaf8c97@huawei.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <d4535f4f-d9cf-30de-ce8c-9d8ee9c0decb@suse.de>
+In-Reply-To: <76fe5007-5c53-9cdf-7c57-6af7ebaf8c97@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/27/22 17:11, Hannes Reinecke wrote:
-> On 10/27/22 03:34, Damien Le Moal wrote:
->> On 10/25/22 19:18, John Garry wrote:
->>> Currently the per-ata device sdev is allocated as part of the scsi
->>> target
->>> scan, which is after the ata port probe.
->>>
->>> However it is useful to have the sdev available in the port probe. As=
- an
->>> example of an advantage, if the request queue is available in the pro=
-be
->>> (which it would be if the sdev is available), then it is possible to =
-use
->>> a SCSI cmnd for ATA internal commands. The benefit of this is then we
->>> can
->>> put the ATA qc structure in the SCSI cmnd private data. It will also =
-be
->>> useful if we want to send ATA internal commands as requests.
->>>
->>> Export scsi_target_reap() so that it can be used to put the extra
->>> reference we get when allocating the sdev.
->>>
->>> Signed-off-by: John Garry <john.garry@huawei.com>
->>> ---
->>> =C2=A0 drivers/ata/libata-eh.c=C2=A0=C2=A0 |=C2=A0 1 +
->>> =C2=A0 drivers/ata/libata-scsi.c | 23 +++++++++--------------
->>> =C2=A0 drivers/scsi/scsi_scan.c=C2=A0 |=C2=A0 1 +
->>> =C2=A0 3 files changed, 11 insertions(+), 14 deletions(-)
->>>
->>> diff --git a/drivers/ata/libata-eh.c b/drivers/ata/libata-eh.c
->>> index 08e11bc312c2..1ed5b1b64792 100644
->>> --- a/drivers/ata/libata-eh.c
->>> +++ b/drivers/ata/libata-eh.c
->>> @@ -3446,6 +3446,7 @@ static int ata_eh_schedule_probe(struct
->>> ata_device *dev)
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ata_eh_detach_dev(dev);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ata_dev_init(dev);
->>> +=C2=A0=C2=A0=C2=A0 ata_scsi_setup_sdev(dev);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ehc->did_probe_mask |=3D (1 << dev->de=
-vno);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ehc->i.action |=3D ATA_EH_RESET;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ehc->saved_xfer_mode[dev->devno] =3D 0=
-;
->>> diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
->>> index efdba852e363..476e0ef4bd29 100644
->>> --- a/drivers/ata/libata-scsi.c
->>> +++ b/drivers/ata/libata-scsi.c
->>> @@ -1109,7 +1109,12 @@ int ata_scsi_dev_config(struct scsi_device
->>> *sdev, struct ata_device *dev)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dev->flags & ATA_DFLAG_TRUSTED)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sdev->security=
-_supported =3D 1;
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0 dev->sdev =3D sdev;
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Put extra reference which we get when all=
-ocating the starget
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * initially
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 scsi_target_reap(scsi_target(sdev));
+On 10/27/22 18:13, John Garry wrote:
+> On 27/10/2022 02:21, Damien Le Moal wrote:
+>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (blk_mq_is_reserved_rq(rq)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct scsi_device *sdev =
+=3D cmd->device;
+>> This variable is not really needed. You can call:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 scsi_device_unbusy(cmd->dev=
+ice, cmd);
+>>
+>> No ?
+>=20
+> ok, your suggestion is good
+>=20
+>>
 >>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>> =C2=A0 }
->>> =C2=A0 @@ -4289,26 +4294,16 @@ void ata_scsi_scan_host(struct ata_por=
-t
->>> *ap, int sync)
->>> =C2=A0=C2=A0 repeat:
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ata_for_each_link(link, ap, EDGE) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ata_for_each_d=
-ev(dev, link, ENABLED) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-truct scsi_device *sdev;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s=
-truct Scsi_Host *shost =3D ap->scsi_host;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 int channel =3D 0, id =3D 0;
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 if (dev->sdev)
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 continue;
->>> -
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 if (ata_is_host_link(link))
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 id =3D dev->devno;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 else
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 channel =3D link->pmp;
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 sdev =3D __scsi_add_device(ap->scsi_host, channel, id, 0,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- NULL);
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (!IS_ERR(sdev)) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 dev->sdev =3D sdev;
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 ata_scsi_assign_ofnode(dev, ap);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 scsi_mq_uninit_cmd(cmd);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 scsi_device_unbusy(sdev, =
+cmd);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __blk_mq_end_request(rq, =
+0);
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 INIT_LIST_HEAD(&cmd->eh_entry);
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 atomic_inc(&cmd->device->iodone=
+_cnt);
+>>> @@ -1718,6 +1728,21 @@ static blk_status_t scsi_queue_rq(struct
+>>> blk_mq_hw_ctx *hctx,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_status_t ret;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int reason;
+>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (blk_mq_is_reserved_rq(req)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(req->rq_flags & RQF=
+_DONTPREP)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+et =3D scsi_prepare_cmd(req);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+f (ret !=3D BLK_STS_OK)
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 goto out_dec_host_busy;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
+eq->rq_flags |=3D RQF_DONTPREP;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c=
+lear_bit(SCMD_STATE_COMPLETE, &cmd->state);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 blk_mq_start_request(req)=
+;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return shost->hostt->rese=
+rved_queuecommand(shost, cmd);
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 WARN_ON_ONCE(cmd->budget_token < 0);
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+>>> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+>>> index 91678c77398e..a39f36aa0b0d 100644
+>>> --- a/include/scsi/scsi_host.h
+>>> +++ b/include/scsi/scsi_host.h
+>>> @@ -73,6 +73,7 @@ struct scsi_host_template {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * STATUS: REQUIRED
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int (* queuecommand)(struct Scsi_Host =
+*, struct scsi_cmnd *);
+>>> +=C2=A0=C2=A0=C2=A0 int (*reserved_queuecommand)(struct Scsi_Host *, =
+struct
+>>> scsi_cmnd *);
+>> Nit: This op name sound like something returning a bool... May be a
+>> straight "queue_reserved_command" name would be clearer ?
+>=20
+> or queuecommand_reserved ? I'm just trying to have the name a variant o=
+f
+> "queuecommand".
+
+I figured that :)
+queuereservedcommand ? (hard to read...)
+queuecommand_reserved is OK I guess.
+
+>=20
 >>
->> Is there something equivalent to what this function does inside
->> scsi_scan_target() ? I had a quick look but did not see anything...
->>
-> Typically, the SCSI layer has two ways of scanning.
-> One it the old-style serial scanning (originating in the old SCSI
-> parallel model):
-> The scanning code will blindly scan _all_ devices up to max_luns, and
-> attach every device for which the scanning code returns 'OK'.
-> The other one is to issue REPORT_LUNS and scan all LUNs returned there.
 >=20
-> Mapped to libata we would need to figure out a stable SCSI enumeration,
-> given that we have PMP and slave devices to content with.
-> To my knowledge we have ATA ports, each can have either a 'master' and
-> 'slave' device, _or_ it be a PMP port when it can support up to 16
-> devices, right?
-
-yes
-
-> Point being, master/slave and PMP are exclusive, right?
-
-Never heard of pmp with ide cable :)
-
-> So we can make the master as LUN 0, and the slave as LUN 1.
-
-Yes, but isn't that a little wrong ? That would assume that the ata port
-is the device and the ata devices the luns of that device. But beside
-the "link busy" stuff that needs to be dealt with, master and slave are
-independent devices, unlike LUNs. No ?
-
-> And for PMP we can use each PMP address as LUN <pmp> + 1, and keeping
-> the actual device as LUN 0.
->=20
-> I think we can figure out whether it's a master/slave device setup
-> upfront, so we should be able to set max_luns to '2' for these devices.
-> For PMP-capable (or devices which _might_ be PMP capable), we could
-> emulate the REPORT LUNS command, mapping on the PMP mechanism to figure
-> out which devices are connected.
->=20
-> Would that work?
->=20
-> Cheers,
->=20
-> Hannes
+> thanks,
+> John
 
 --=20
 Damien Le Moal
