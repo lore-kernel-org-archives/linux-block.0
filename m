@@ -2,65 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B09FA3740
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 13:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3EBECAAA1
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 13:16:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235578AbiJ0NP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 09:15:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57050 "EHLO
+        id S235611AbiJ0NQI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 09:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235611AbiJ0NPz (ORCPT
+        with ESMTP id S235654AbiJ0NQH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 09:15:55 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2609E85591
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 06:15:54 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id m2so1485075pjr.3
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 06:15:54 -0700 (PDT)
+        Thu, 27 Oct 2022 09:16:07 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC8686808
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 06:16:06 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id t16so1194508qvm.9
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 06:16:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TBfCM5SMkIGMEbZoL8e3ReYcZIOMaiwrs47mnFIdDdk=;
-        b=uK6WYYH1RMGUmm6jYgWDrdeLhvUL5CH1VnIPTfz1BR/vxfvHv/j0SD1F/CeSgx7ZhP
-         oyO64Cpp8AkqyePXjFn0jEG6G5I07KGHwdIAQpANtIuZqKRKZahIZ7Gj4bRYDXsnFNxS
-         cM4yJVrQVedCrg0oUPRYroCoi9UdBq+xIbe+kUH4UnPHd9mAvQ0yQ+aH+LezUSEGKHGp
-         H3Vz8Ra5tAZjw4djtX0N2kI/A2hFaWDaQ+n53hWO0kFkGWNcZqnuCz/4hngQpylTpN/T
-         izkk9LQsklOjleQ4JJk4gEC31AnWioZ8OkdG4fW8nFq1hSjNDtTps7198jm2RKoRkAl+
-         TvQg==
+        bh=lUXGTDslsfAFx1Eylt2BsWoz/ZloDL/xps+YJzdNYlY=;
+        b=p/b/XgFb8jWDu74h/b7N4m8vFa7PDMMumfrSzVb60lpropn3O0nsAGpwDvrCvolbwq
+         0kS5YJwKi7BpT8TcYyHnLJnS9Ko1QwEgwzSew9CfNF2Lv+PEv02EbWYIdvo2Sm+EEzNW
+         E/EIC0plO5tpYJjLoof51wHC8HraevOwce7PHgVTGEbjB4Djs2L8hQZg9IVV3gT0KoLR
+         yw5wtteEtHzKvEyxC67ENxtbWodNXBw8rkMMuPFhu01vGSJm+GsT4pX8VTMbWZUzxAD/
+         vStxZP6WBBG8T9Xw2bMF9sXRmJBUiekcbfEGd37AWrI0914CGRAIypfVus92+5Jv2OKI
+         +ZvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:date:message-id:subject
          :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TBfCM5SMkIGMEbZoL8e3ReYcZIOMaiwrs47mnFIdDdk=;
-        b=OKB/S9B1i61Y77k+f533B/bzzP7WWajlEQVcRVOK97VTCm6x8lRsgQUe9JfnusbaB0
-         oPvxQZV5bxFHhjp1MZOk++fllOawZpbbx/sLWe0Z6+V/C4YlTcCrcY4Y1l2nk7kHi++h
-         QL65AMyUu3LHr9XpdqeJVZ13301ujWhKsEe9FcDKc3LsbPrQPL5T6uJa9TIKXy0cIUgb
-         v6jJi7UY6AtISMm/Jo6L9kfpnJxW4szRiBpp1cVkSP8n+NG/93kI+a8PeaQDbwGgQzjO
-         HS2ZGxT9ADiCgLBtoJnPBUOWFGB1r9TzNZoQYGjrdzyPBXV4UKSlcx7itBAwfTdOzyXQ
-         Gdtw==
-X-Gm-Message-State: ACrzQf0Ih7YqRn77L8eVK8+p0t7jirllUBgvfGV3I1MfcjTkru11oEAl
-        HiAFcuraXFNxoT60sXaWp24rGVa9laoqE1+A
-X-Google-Smtp-Source: AMsMyM6fdsnMZ1IafarP5oLU+jn2wyrHokSsVLtd1NjIjMvXU3imwtSkb3N44hUr0gZG6KKEKjRXlg==
-X-Received: by 2002:a17:902:c189:b0:186:88bd:42c4 with SMTP id d9-20020a170902c18900b0018688bd42c4mr29140566pld.0.1666876553518;
-        Thu, 27 Oct 2022 06:15:53 -0700 (PDT)
+        bh=lUXGTDslsfAFx1Eylt2BsWoz/ZloDL/xps+YJzdNYlY=;
+        b=J4qfdbo5LjqXbzP/pAc/ZgKIbAGs05aRrMVVebX+Apyyq1lmYlq8v+2BX6pohm8RdH
+         H3w9y5My5zokr2cciwQLvukjNfizGiuj+DKJp+cO8QGxvxJ9gd/vNCv6b1fGmyjbwE+K
+         AGKiJ3K26R9aot9z/dq7gFddlbEvL+nfh7C6tefLyHcpP/3yghIZrXTRFR0u1XD9FEyK
+         mK/4bQ084OMbJ9Xntz/xXSUFwMrHP5y5Sk+7kXb/6JQ5nkpbKoLeUDSnSaVDfzPW5aZu
+         9roltvRt0gdwyd75yBGmOmdcjo1SVFbj6xywMCuXC5fhBAVQudNKp1bO6wOHJgRXU3Hu
+         Cx/A==
+X-Gm-Message-State: ACrzQf1XhB3FMMaiBn6SNU0OCWKUb6CFadnaeXtI4L/cgZefU9EgWXHI
+        zk75m+U0jeJbIyqhMABuWuLSwAVorGeZGaKq
+X-Google-Smtp-Source: AMsMyM5BPlA5HVPe6ZOlhjWSe4vnDS/vIpcXIHC2Ni6AyJB7oroOBPJBhdMyzoUGKJBqZ+CrpKLBeQ==
+X-Received: by 2002:a17:902:d70a:b0:178:5d52:9e41 with SMTP id w10-20020a170902d70a00b001785d529e41mr48242037ply.0.1666876555034;
+        Thu, 27 Oct 2022 06:15:55 -0700 (PDT)
 Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id m10-20020a63f60a000000b004608b721dfesm1027480pgh.38.2022.10.27.06.15.52
+        by smtp.gmail.com with ESMTPSA id m10-20020a63f60a000000b004608b721dfesm1027480pgh.38.2022.10.27.06.15.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 06:15:53 -0700 (PDT)
+        Thu, 27 Oct 2022 06:15:54 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     ceph-devel@vger.kernel.org,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        linux-block@vger.kernel.org
-Cc:     yehuda@hq.newdream.net, idryomov@gmail.com,
-        dongsheng.yang@easystack.cn
-In-Reply-To: <20221027091918.2294132-1-yangyingliang@huawei.com>
-References: <20221027091918.2294132-1-yangyingliang@huawei.com>
-Subject: Re: [PATCH] rbd: fix possible memory leak in rbd_sysfs_init()
-Message-Id: <166687655254.10763.17976246542549193136.b4-ty@kernel.dk>
-Date:   Thu, 27 Oct 2022 07:15:52 -0600
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Changhui Zhong <czhong@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>
+In-Reply-To: <20221027085709.513175-1-ming.lei@redhat.com>
+References: <20221027085709.513175-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] blk-mq: don't add non-pt request with ->end_io to batch
+Message-Id: <166687655373.10763.598511493848886543.b4-ty@kernel.dk>
+Date:   Thu, 27 Oct 2022 07:15:53 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -69,19 +68,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 27 Oct 2022 17:19:18 +0800, Yang Yingliang wrote:
-> If device_register() returns error in rbd_sysfs_init(), name of kobject
-> which is allocated in dev_set_name() called in device_add() is leaked.
+On Thu, 27 Oct 2022 16:57:09 +0800, Ming Lei wrote:
+> dm-rq implements ->end_io callback for request issued to underlying queue,
+> and it isn't passthrough request.
 > 
-> As comment of device_add() says, it should call put_device() to drop
-> the reference count that was set in device_initialize() when it fails,
-> so the name can be freed in kobject_cleanup().
+> Commit ab3e1d3bbab9 ("block: allow end_io based requests in the completion
+> batch handling") doesn't clear rq->bio and rq->__data_len for request
+> with ->end_io in blk_mq_end_request_batch(), and this way is actually
+> dangerous, but so far it is only for nvme passthrough request.
 > 
 > [...]
 
 Applied, thanks!
 
-[1/1] rbd: fix possible memory leak in rbd_sysfs_init()
+[1/1] blk-mq: don't add non-pt request with ->end_io to batch
       (no commit info)
 
 Best regards,
