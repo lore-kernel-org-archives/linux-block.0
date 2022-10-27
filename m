@@ -2,97 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DB0FA3741
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 15:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 299F5FA3740
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 15:21:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236228AbiJ0PU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 11:20:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35248 "EHLO
+        id S236442AbiJ0PVK convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 11:21:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236245AbiJ0PUW (ORCPT
+        with ESMTP id S236466AbiJ0PUb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 11:20:22 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F846B1E6;
-        Thu, 27 Oct 2022 08:19:03 -0700 (PDT)
+        Thu, 27 Oct 2022 11:20:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE9A763B6;
+        Thu, 27 Oct 2022 08:19:32 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DBB9DB826D5;
-        Thu, 27 Oct 2022 15:19:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 775E0C433D6;
-        Thu, 27 Oct 2022 15:18:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666883940;
-        bh=AaMB8NCIdgfiIoB4P8i4ZrWBp77/MCyzpJ/dSGKMeOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=jAN11w8vbxAnZj57IiVap+TOoIA8UTFnyS6l8eUYeJ0zfh7jFKqk6ghlIv0uQ74VP
-         6s+sJZw1FklPXoEaKYisv71ntr1NXakG1/ryanh2GOMtePJyEhRRCumLhESC77RuVp
-         VomokqAkfVHDHNHBSX0zXTkh9+xtmSucWj9QlDNMJ+vBxBuYfioS5k4S3qbfdXsYBp
-         XGukBNBFODPySgzjVvMq3YAlULS/RNvZM0jX30U9DuxmKqiGXKTuT/ayguaBDhmIOB
-         GkOpSl7CVoeT0NI812xMCb9/3TTPA9u16Zu0sjgAb7IJPKlh3QXTZL4qmz9p83e7RG
-         9q/Nk0QRDNidg==
-Date:   Thu, 27 Oct 2022 09:18:53 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Mike Christie <michael.christie@oracle.com>
-Cc:     bvanassche@acm.org, hch@lst.de, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, james.bottomley@hansenpartnership.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        snitzer@kernel.org, axboe@kernel.dk,
-        linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
-        target-devel@vger.kernel.org
-Subject: Re: [PATCH v3 10/19] nvme: Move NVMe and Block PR types to an array
-Message-ID: <Y1qhXQYOpEUk2uqF@kbusch-mbp.dhcp.thefacebook.com>
-References: <20221026231945.6609-1-michael.christie@oracle.com>
- <20221026231945.6609-11-michael.christie@oracle.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E242C623A8;
+        Thu, 27 Oct 2022 15:19:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCB8C433D6;
+        Thu, 27 Oct 2022 15:19:29 +0000 (UTC)
+Date:   Thu, 27 Oct 2022 11:19:44 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Christoph =?UTF-8?B?QsO2aG13YWxk?= =?UTF-8?B?ZXI=?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        drbd-dev@lists.linbit.com, Tejun Heo <tj@kernel.org>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [RFC][PATCH v2 04/31] timers: block: Use del_timer_shutdown()
+ before freeing timer
+Message-ID: <20221027111944.39b3a80c@gandalf.local.home>
+In-Reply-To: <20221027150925.819019339@goodmis.org>
+References: <20221027150525.753064657@goodmis.org>
+        <20221027150925.819019339@goodmis.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221026231945.6609-11-michael.christie@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 06:19:36PM -0500, Mike Christie wrote:
-> For Reservation Report support we need to also convert from the NVMe spec
-> PR type back to the block PR definition. This moves us to an array, so in
-> the next patch we can add another helper to do the conversion without
-> having to manage 2 switches.
-> 
-> Signed-off-by: Mike Christie <michael.christie@oracle.com>
-> ---
->  drivers/nvme/host/pr.c | 42 +++++++++++++++++++++++-------------------
->  include/linux/nvme.h   |  9 +++++++++
->  2 files changed, 32 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pr.c b/drivers/nvme/host/pr.c
-> index df7eb2440c67..5c4611d15d9c 100644
-> --- a/drivers/nvme/host/pr.c
-> +++ b/drivers/nvme/host/pr.c
-> @@ -6,24 +6,28 @@
->  
->  #include "nvme.h"
->  
-> -static char nvme_pr_type(enum pr_type type)
-> +static const struct {
-> +	enum nvme_pr_type	nvme_type;
-> +	enum pr_type		blk_type;
-> +} nvme_pr_types[] = {
-> +	{ NVME_PR_WRITE_EXCLUSIVE, PR_WRITE_EXCLUSIVE },
-> +	{ NVME_PR_EXCLUSIVE_ACCESS, PR_EXCLUSIVE_ACCESS },
-> +	{ NVME_PR_WRITE_EXCLUSIVE_REG_ONLY, PR_WRITE_EXCLUSIVE_REG_ONLY },
-> +	{ NVME_PR_EXCLUSIVE_ACCESS_REG_ONLY, PR_EXCLUSIVE_ACCESS_REG_ONLY },
-> +	{ NVME_PR_WRITE_EXCLUSIVE_ALL_REGS, PR_WRITE_EXCLUSIVE_ALL_REGS },
-> +	{ NVME_PR_EXCLUSIVE_ACCESS_ALL_REGS, PR_EXCLUSIVE_ACCESS_ALL_REGS },
-> +};
+[
+  quilt mail --send still can't handle unicode characters.
+    Here's the patch again
+]
 
-Wouldn't it be easier to use the block type as the array index to avoid
-the whole looped lookup?
+From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 
-  enum nvme_pr_type types[] = {
-	.PR_WRITE_EXCLUSIVE = NVME_PR_WRITE_EXCLUSIVE,
-	.PR_EXCLUSIVE_ACCESS  = NVME_PR_EXCLUSIVE_ACCESS,
-        ...
-  };
+Before a timer is freed, del_timer_shutdown() must be called.
 
-?
+Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home/
+
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
+Cc: "Christoph Böhmwalder" <christoph.boehmwalder@linbit.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: drbd-dev@lists.linbit.com
+Cc: Tejun Heo <tj@kernel.org>
+Cc: cgroups@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ block/blk-iocost.c             | 2 +-
+ block/blk-iolatency.c          | 2 +-
+ block/blk-stat.c               | 2 +-
+ block/blk-throttle.c           | 2 +-
+ block/kyber-iosched.c          | 2 +-
+ drivers/block/drbd/drbd_main.c | 2 +-
+ drivers/block/loop.c           | 2 +-
+ drivers/block/sunvdc.c         | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 495396425bad..e2d4bdd3d135 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2814,7 +2814,7 @@ static void ioc_rqos_exit(struct rq_qos *rqos)
+ 	ioc->running = IOC_STOP;
+ 	spin_unlock_irq(&ioc->lock);
+ 
+-	del_timer_sync(&ioc->timer);
++	del_timer_shutdown(&ioc->timer);
+ 	free_percpu(ioc->pcpu_stat);
+ 	kfree(ioc);
+ }
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 571fa95aafe9..7b61f09afedd 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -645,7 +645,7 @@ static void blkcg_iolatency_exit(struct rq_qos *rqos)
+ {
+ 	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+ 
+-	del_timer_sync(&blkiolat->timer);
++	del_timer_shutdown(&blkiolat->timer);
+ 	flush_work(&blkiolat->enable_work);
+ 	blkcg_deactivate_policy(rqos->q, &blkcg_policy_iolatency);
+ 	kfree(blkiolat);
+diff --git a/block/blk-stat.c b/block/blk-stat.c
+index 2ea01b5c1aca..de51db302c44 100644
+--- a/block/blk-stat.c
++++ b/block/blk-stat.c
+@@ -165,7 +165,7 @@ void blk_stat_remove_callback(struct request_queue *q,
+ 		blk_queue_flag_clear(QUEUE_FLAG_STATS, q);
+ 	spin_unlock_irqrestore(&q->stats->lock, flags);
+ 
+-	del_timer_sync(&cb->timer);
++	del_timer_shutdown(&cb->timer);
+ }
+ 
+ static void blk_stat_free_callback_rcu(struct rcu_head *head)
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 847721dc2b2b..95af99f24137 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -490,7 +490,7 @@ static void throtl_pd_free(struct blkg_policy_data *pd)
+ {
+ 	struct throtl_grp *tg = pd_to_tg(pd);
+ 
+-	del_timer_sync(&tg->service_queue.pending_timer);
++	del_timer_shutdown(&tg->service_queue.pending_timer);
+ 	blkg_rwstat_exit(&tg->stat_bytes);
+ 	blkg_rwstat_exit(&tg->stat_ios);
+ 	kfree(tg);
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index b05357bced99..59a444a47ba3 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -434,7 +434,7 @@ static void kyber_exit_sched(struct elevator_queue *e)
+ 	struct kyber_queue_data *kqd = e->elevator_data;
+ 	int i;
+ 
+-	del_timer_sync(&kqd->timer);
++	del_timer_shutdown(&kqd->timer);
+ 	blk_stat_disable_accounting(kqd->q);
+ 
+ 	for (i = 0; i < KYBER_NUM_DOMAINS; i++)
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index f3e4db16fd07..3f574f3769c3 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2184,7 +2184,7 @@ void drbd_destroy_device(struct kref *kref)
+ 	struct drbd_resource *resource = device->resource;
+ 	struct drbd_peer_device *peer_device, *tmp_peer_device;
+ 
+-	del_timer_sync(&device->request_timer);
++	del_timer_shutdown(&device->request_timer);
+ 
+ 	/* paranoia asserts */
+ 	D_ASSERT(device, device->open_cnt == 0);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index ad92192c7d61..d134a5fd4ae7 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1755,7 +1755,7 @@ static void lo_free_disk(struct gendisk *disk)
+ 	if (lo->workqueue)
+ 		destroy_workqueue(lo->workqueue);
+ 	loop_free_idle_workers(lo, true);
+-	del_timer_sync(&lo->timer);
++	del_timer_shutdown(&lo->timer);
+ 	mutex_destroy(&lo->lo_mutex);
+ 	kfree(lo);
+ }
+diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
+index fb855da971ee..9868937a9602 100644
+--- a/drivers/block/sunvdc.c
++++ b/drivers/block/sunvdc.c
+@@ -1067,7 +1067,7 @@ static void vdc_port_remove(struct vio_dev *vdev)
+ 
+ 		flush_work(&port->ldc_reset_work);
+ 		cancel_delayed_work_sync(&port->ldc_reset_timer_work);
+-		del_timer_sync(&port->vio.timer);
++		del_timer_shutdown(&port->vio.timer);
+ 
+ 		del_gendisk(port->disk);
+ 		put_disk(port->disk);
+-- 
+2.35.1
