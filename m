@@ -2,197 +2,222 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA7CC38A2D
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 01:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEDE8C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 01:21:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233575AbiJ0BS3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 21:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54854 "EHLO
+        id S233705AbiJ0BVK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Oct 2022 21:21:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233699AbiJ0BS1 (ORCPT
+        with ESMTP id S233745AbiJ0BVJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 21:18:27 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D8D1785B6
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1666833507; x=1698369507;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=j4VTz3xAsPX1ykQZALKZMRU5knt+b8ZaK/+epWQA9oU=;
-  b=FHohDeUkUzPmDv3W0InYd7UIkTv5IVIAyt6FgB8TDECQm8An6559NG20
-   G0gh9DloaeER+6hmxrtjjs/cvoAHRGSRuU++I7/AbenXqOP5g6iiB7V+C
-   FDPzX0ToLTdxkV+g31J0KaIjMHsCQ/pGEeH5wGaQjRv0/zsbd/U1QGrck
-   ShZjkfPmlIYlrhNP9INb/lz40KCBPBu8AbGxAtI2uKQL3npD4M+TS0nev
-   eBfw/2mUR8EfLCmTWj5bC2x8DYvaas8n4NHO4ZgnQniwekKPG8u2bDfmh
-   1fAwJ6gPtv9rNL8SQlOCKagOvIOeFAUKEzaBRm7XpT8Fs+dJTYucgvKWV
-   g==;
-X-IronPort-AV: E=Sophos;i="5.95,215,1661788800"; 
-   d="scan'208";a="214828251"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Oct 2022 09:18:26 +0800
-IronPort-SDR: eIuGoOfOdMCJo/Vox5tWNdmimXDzo15Jazca4qzCHkFNO16X+woUPDLeusVyZOK97Fhcquxepw
- mUcvw0z6M8OqOCfgIVRrJ0tx12VWtArN8yaObMsXsui9BnKQNYLsk6PIgEUC85ATKA1zl/SNG6
- z/nfhaAGwPciorG9olR9GIJIsbLpcBwK9yDRmwXxKZeLSrL6YoJqC6C54dbfNETzumnBOEHkI5
- hJB4vDUYpdU2BCHj8dnKboD5jCEjbydtaF68LUXsLewAB+0Q0f0JH6j2jXOgU2cZO13qo3/ucd
- EWHxfLIZucoupioAf1Iix7kh
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Oct 2022 17:32:05 -0700
-IronPort-SDR: 3INUQfKSe3lzsA6rxDjFMl5+l1B9A6jnfW3cXj6QvMKJxY8C2JBaO/5/fk82wWGJstcx5zDBWR
- /O+jpG5M6fidefv/V6LJwGxG3juoProSt3n1QvXBDShxT77utFSbkyuJKVhTZed3UsEVFDIYgq
- Pn7ARIOIccRHgRgLyEgKh4oE5FcjY/2DhrdsGVU/YbvUhK+CINWZ91Eu+E8uIEOB+zJQtG+MHE
- gYFlx0qLFifAvDhVuY7iWrk29SEoCfRuFno9J9UqszW5aMZCqtuLC/cvvF8M8RD+HOtMyYRVGU
- jUM=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Oct 2022 18:18:25 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4MySVT09Mzz1Rwtm
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:18:25 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1666833503; x=1669425504; bh=j4VTz3xAsPX1ykQZALKZMRU5knt+b8ZaK/+
-        epWQA9oU=; b=AlLTfLAZlMQuunUsaVrTOL6ArW6Bwtsjjj/dCIowQnsGO3Ny7IX
-        8fETeWSg45iCdJ8qBnD5z9SzZ/rORSWbNt/6k6fIGNFSbPAqFXciPJsr2KkDWTYs
-        4CAskUPPRb9upJ55xdDt6x1lGglffoeITJ/e0Hhgpz7w6fETMh1tf5n9pmIgVc8v
-        0F2yXafbOJQOQydVy9vvvCtlzJyv7BxaoC6XYzj+DV/1MRedMmNCBjwu4SNfv/es
-        lH9AOj8pyGJ0iSrnx/dhludNfuMK6I+54MpHK7PJNM8/QKrcsZxy+6vbMoml8zi+
-        +BodTY/qmKOETxc9ZWmNtOvXjEpqOvOLMfA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id ADY70wMI3a1J for <linux-block@vger.kernel.org>;
-        Wed, 26 Oct 2022 18:18:23 -0700 (PDT)
-Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4MySVP4qbZz1RvLy;
-        Wed, 26 Oct 2022 18:18:21 -0700 (PDT)
-Message-ID: <cd5df8e0-03d1-8f22-0367-eb7c76bc70e7@opensource.wdc.com>
-Date:   Thu, 27 Oct 2022 10:18:20 +0900
+        Wed, 26 Oct 2022 21:21:09 -0400
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184246C747
+        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 18:21:01 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4MySVc0dJgz6V50H
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 09:18:32 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgC3xuj63Flj+5AFAQ--.55747S3;
+        Thu, 27 Oct 2022 09:20:59 +0800 (CST)
+Subject: Re: [bug report] blk-iocost: don't release 'ioc->lock' while updating
+ params
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
+References: <Y1lAtdAkRp8JYJ+c@kili>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bb525f2f-4975-2219-7132-c4d7dffcb53d@huaweicloud.com>
+Date:   Thu, 27 Oct 2022 09:20:58 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH RFC v3 03/22] scsi: core: Implement reserved command
- handling
-Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        jinpu.wang@cloud.ionos.com, hare@suse.de, bvanassche@acm.org,
-        hch@lst.de, ming.lei@redhat.com, niklas.cassel@wdc.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linuxarm@huawei.com
-References: <1666693096-180008-1-git-send-email-john.garry@huawei.com>
- <1666693096-180008-4-git-send-email-john.garry@huawei.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <1666693096-180008-4-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <Y1lAtdAkRp8JYJ+c@kili>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgC3xuj63Flj+5AFAQ--.55747S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxur15Ar4UZrWxKw47AFyUGFg_yoWrAw1UpF
+        WfKF9xt348Xw40gr97AayUK3sYkr43JryxZFZrKrySvrZxKw1vq3W8GFWq9348XFs7GFW5
+        Jr4UJFWvyrWDGrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij
+        64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+        8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1Y6r17MIIYrxkI7VAKI48JMIIF0xvE
+        2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42
+        xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+        c7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1CPfJUUUUU==
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/25/22 19:17, John Garry wrote:
-> From: Hannes Reinecke <hare@suse.de>
+Hi, Dan!
+
+ÔÚ 2022/10/26 22:14, Dan Carpenter Ð´µÀ:
+> Hello Yu Kuai,
 > 
-> Quite some drivers are using management commands internally, which
-> typically use the same hardware tag pool (ie they are being allocated
-> from the same hardware resources) as the 'normal' I/O commands.
-> These commands are set aside before allocating the block-mq tag bitmap,
-> so they'll never show up as busy in the tag map.
-> The block-layer, OTOH, already has 'reserved_tags' to handle precisely
-> this situation.
-> So this patch adds a new field 'nr_reserved_cmds' to the SCSI host
-> template to instruct the block layer to set aside a tag space for these
-> management commands by using reserved tags.
+> The patch 2c0647988433: "blk-iocost: don't release 'ioc->lock' while
+> updating params" from Oct 12, 2022, leads to the following Smatch
+> static checker warnings:
 > 
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> #jpg: Set tag_set->queue_depth = shost->can_queue, and not
-> = shost->can_queue + shost->nr_reserved_cmds;
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> ---
->  drivers/scsi/hosts.c     |  3 +++
->  drivers/scsi/scsi_lib.c  |  2 ++
->  include/scsi/scsi_host.h | 15 ++++++++++++++-
->  3 files changed, 19 insertions(+), 1 deletion(-)
+> block/blk-iocost.c:3211 ioc_qos_write() warn: sleeping in atomic context
+> block/blk-iocost.c:3240 ioc_qos_write() warn: sleeping in atomic context
+> block/blk-iocost.c:3407 ioc_cost_model_write() warn: sleeping in atomic context
 > 
-> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-> index 12346e2297fd..db89afc37bc9 100644
-> --- a/drivers/scsi/hosts.c
-> +++ b/drivers/scsi/hosts.c
-> @@ -489,6 +489,9 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
->  	if (sht->virt_boundary_mask)
->  		shost->virt_boundary_mask = sht->virt_boundary_mask;
->  
-> +	if (sht->nr_reserved_cmds)
-> +		shost->nr_reserved_cmds = sht->nr_reserved_cmds;
-> +
+> block/blk-iocost.c
+>      3168 static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+>      3169                              size_t nbytes, loff_t off)
+>      3170 {
+>      3171         struct block_device *bdev;
+>      3172         struct gendisk *disk;
+>      3173         struct ioc *ioc;
+>      3174         u32 qos[NR_QOS_PARAMS];
+>      3175         bool enable, user;
+>      3176         char *p;
+>      3177         int ret;
+>      3178
+>      3179         bdev = blkcg_conf_open_bdev(&input);
+>      3180         if (IS_ERR(bdev))
+>      3181                 return PTR_ERR(bdev);
+>      3182
+>      3183         disk = bdev->bd_disk;
+>      3184         ioc = q_to_ioc(disk->queue);
+>      3185         if (!ioc) {
+>      3186                 ret = blk_iocost_init(disk);
+>      3187                 if (ret)
+>      3188                         goto err;
+>      3189                 ioc = q_to_ioc(disk->queue);
+>      3190         }
+>      3191
+>      3192         blk_mq_freeze_queue(disk->queue);
+>      3193         blk_mq_quiesce_queue(disk->queue);
+>      3194
+>      3195         spin_lock_irq(&ioc->lock);
+> 
+> Preempt disabled.
+> 
+>      3196         memcpy(qos, ioc->params.qos, sizeof(qos));
+>      3197         enable = ioc->enabled;
+>      3198         user = ioc->user_qos_params;
+>      3199
+>      3200         while ((p = strsep(&input, " \t\n"))) {
+>      3201                 substring_t args[MAX_OPT_ARGS];
+>      3202                 char buf[32];
+>      3203                 int tok;
+>      3204                 s64 v;
+>      3205
+>      3206                 if (!*p)
+>      3207                         continue;
+>      3208
+>      3209                 switch (match_token(p, qos_ctrl_tokens, args)) {
+>      3210                 case QOS_ENABLE:
+> --> 3211                         match_u64(&args[0], &v);
+>                                   ^^^^^^^^^^^^^^^^^^^^^^^^
+> match functions do sleeping allocations.
+Thanks for the report, I'll try to fix this soon.
 
-Nit: the if is not really necessary I think. But it does not hurt.
-
->  	device_initialize(&shost->shost_gendev);
->  	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
->  	shost->shost_gendev.bus = &scsi_bus_type;
-> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-> index 39d4fd124375..a8c4e7c037ae 100644
-> --- a/drivers/scsi/scsi_lib.c
-> +++ b/drivers/scsi/scsi_lib.c
-> @@ -1978,6 +1978,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
->  	tag_set->nr_hw_queues = shost->nr_hw_queues ? : 1;
->  	tag_set->nr_maps = shost->nr_maps ? : 1;
->  	tag_set->queue_depth = shost->can_queue;
-> +	tag_set->reserved_tags = shost->nr_reserved_cmds;
-> +
-
-Why the blank line ?
-
->  	tag_set->cmd_size = cmd_size;
->  	tag_set->numa_node = dev_to_node(shost->dma_dev);
->  	tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
-> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
-> index 750ccf126377..91678c77398e 100644
-> --- a/include/scsi/scsi_host.h
-> +++ b/include/scsi/scsi_host.h
-> @@ -360,10 +360,17 @@ struct scsi_host_template {
->  	/*
->  	 * This determines if we will use a non-interrupt driven
->  	 * or an interrupt driven scheme.  It is set to the maximum number
-> -	 * of simultaneous commands a single hw queue in HBA will accept.
-> +	 * of simultaneous commands a single hw queue in HBA will accept
-> +	 * including reserved commands.
->  	 */
->  	int can_queue;
->  
-> +	/*
-> +	 * This determines how many commands the HBA will set aside
-> +	 * for reserved commands.
-> +	 */
-> +	int nr_reserved_cmds;
-> +
->  	/*
->  	 * In many instances, especially where disconnect / reconnect are
->  	 * supported, our host also has an ID on the SCSI bus.  If this is
-> @@ -611,6 +618,12 @@ struct Scsi_Host {
->  	 */
->  	unsigned nr_hw_queues;
->  	unsigned nr_maps;
-> +
-> +	/*
-> +	 * Number of reserved commands to allocate, if any.
-> +	 */
-> +	unsigned int nr_reserved_cmds;
-> +
->  	unsigned active_mode:2;
->  
->  	/*
-
--- 
-Damien Le Moal
-Western Digital Research
+Kuai
+> 
+>      3212                         enable = v;
+>      3213                         continue;
+>      3214                 case QOS_CTRL:
+>      3215                         match_strlcpy(buf, &args[0], sizeof(buf));
+>      3216                         if (!strcmp(buf, "auto"))
+>      3217                                 user = false;
+>      3218                         else if (!strcmp(buf, "user"))
+>      3219                                 user = true;
+>      3220                         else
+>      3221                                 goto einval;
+>      3222                         continue;
+>      3223                 }
+>      3224
+>      3225                 tok = match_token(p, qos_tokens, args);
+>      3226                 switch (tok) {
+>      3227                 case QOS_RPPM:
+>      3228                 case QOS_WPPM:
+>      3229                         if (match_strlcpy(buf, &args[0], sizeof(buf)) >=
+>      3230                             sizeof(buf))
+>      3231                                 goto einval;
+>      3232                         if (cgroup_parse_float(buf, 2, &v))
+>      3233                                 goto einval;
+>      3234                         if (v < 0 || v > 10000)
+>      3235                                 goto einval;
+>      3236                         qos[tok] = v * 100;
+>      3237                         break;
+>      3238                 case QOS_RLAT:
+>      3239                 case QOS_WLAT:
+>      3240                         if (match_u64(&args[0], &v))
+>      3241                                 goto einval;
+>      3242                         qos[tok] = v;
+>      3243                         break;
+>      3244                 case QOS_MIN:
+>      3245                 case QOS_MAX:
+>      3246                         if (match_strlcpy(buf, &args[0], sizeof(buf)) >=
+>      3247                             sizeof(buf))
+>      3248                                 goto einval;
+>      3249                         if (cgroup_parse_float(buf, 2, &v))
+>      3250                                 goto einval;
+>      3251                         if (v < 0)
+>      3252                                 goto einval;
+>      3253                         qos[tok] = clamp_t(s64, v * 100,
+>      3254                                            VRATE_MIN_PPM, VRATE_MAX_PPM);
+>      3255                         break;
+>      3256                 default:
+>      3257                         goto einval;
+>      3258                 }
+>      3259                 user = true;
+>      3260         }
+>      3261
+>      3262         if (qos[QOS_MIN] > qos[QOS_MAX])
+>      3263                 goto einval;
+>      3264
+>      3265         if (enable) {
+>      3266                 blk_stat_enable_accounting(disk->queue);
+>      3267                 blk_queue_flag_set(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+>      3268                 ioc->enabled = true;
+>      3269                 wbt_disable_default(disk->queue);
+>      3270         } else {
+>      3271                 blk_queue_flag_clear(QUEUE_FLAG_RQ_ALLOC_TIME, disk->queue);
+>      3272                 ioc->enabled = false;
+>      3273                 wbt_enable_default(disk->queue);
+>      3274         }
+>      3275
+>      3276         if (user) {
+>      3277                 memcpy(ioc->params.qos, qos, sizeof(qos));
+>      3278                 ioc->user_qos_params = true;
+>      3279         } else {
+>      3280                 ioc->user_qos_params = false;
+>      3281         }
+>      3282
+>      3283         ioc_refresh_params(ioc, true);
+>      3284         spin_unlock_irq(&ioc->lock);
+>      3285
+>      3286         blk_mq_unquiesce_queue(disk->queue);
+>      3287         blk_mq_unfreeze_queue(disk->queue);
+>      3288
+>      3289         blkdev_put_no_open(bdev);
+>      3290         return nbytes;
+>      3291 einval:
+>      3292         spin_unlock_irq(&ioc->lock);
+>      3293
+>      3294         blk_mq_unquiesce_queue(disk->queue);
+>      3295         blk_mq_unfreeze_queue(disk->queue);
+>      3296
+>      3297         ret = -EINVAL;
+>      3298 err:
+>      3299         blkdev_put_no_open(bdev);
+>      3300         return ret;
+>      3301 }
+> 
+> regards,
+> dan carpenter
+> 
+> .
+> 
 
