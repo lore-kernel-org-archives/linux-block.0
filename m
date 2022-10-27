@@ -2,148 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DAE9C38A2D
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 09:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C79C4C67871
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 10:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235075AbiJ0J5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 05:57:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40834 "EHLO
+        id S234703AbiJ0KD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 06:03:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235157AbiJ0J4l (ORCPT
+        with ESMTP id S235222AbiJ0KDL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 05:56:41 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17324E22F9;
-        Thu, 27 Oct 2022 02:56:10 -0700 (PDT)
-Received: from frapeml500008.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Mygy925qrz67M1h;
-        Thu, 27 Oct 2022 17:54:41 +0800 (CST)
-Received: from lhrpeml500003.china.huawei.com (7.191.162.67) by
- frapeml500008.china.huawei.com (7.182.85.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 27 Oct 2022 11:56:08 +0200
-Received: from [10.195.32.169] (10.195.32.169) by
- lhrpeml500003.china.huawei.com (7.191.162.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 27 Oct 2022 10:56:07 +0100
-Message-ID: <83d9dc82-ea37-4a3c-7e67-1c097f777767@huawei.com>
-Date:   Thu, 27 Oct 2022 10:56:07 +0100
+        Thu, 27 Oct 2022 06:03:11 -0400
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B6BAD98F
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 03:02:48 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id fy4so3011461ejc.5
+        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 03:02:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HpWS2J3Es7uIIpMV8NfXpdIdeICyL7ab7tVCU0uhI/U=;
+        b=7LQWORwlBcytGd0JXHrg5PXT2k4JEFQQOzHUjCjjcLG0SNyqbXkAAEOhb+JEkxWxPr
+         LinCivw9zX8c4Pf/RKXCo/DxhXfpJKkiu+tIKvvJx1Y9RxrFiC0gvw1/U8Rb4fY+bKSy
+         GZESHSsmwUILvhROa8XPwVCE55EvbrK9GuW3bSgkAxxFO+yCPElgvXVfrKS1nyClVFjU
+         ynh9+3PIWZUcz269sQUHIxUt7wTpf9UqQ851Pct6gXy838rwufgeuSP41bZP76EZjQ3f
+         XtjIVovEtqayfjVSh9xREneBqzXE+DTYGicl5eOTkDhg/quRj/rsKQUWvWgtVg6yzSMb
+         vueg==
+X-Gm-Message-State: ACrzQf1IIxiNPDMnXfuqff1C4sF3mAzj0OnWLbq6vrIocB44TywPzsAH
+        +WFUikXWw4nViOyWL9/w7dpGjC1Bb2s=
+X-Google-Smtp-Source: AMsMyM5CY/5nG0MF2o1QHRha6hhsy0fgyBazhGunp8Q8cB1Uf/XbdOvnjOKX5Eq06ScaH9xc4Sfd9A==
+X-Received: by 2002:a17:907:7627:b0:78d:b6f5:9f15 with SMTP id jy7-20020a170907762700b0078db6f59f15mr42093169ejc.149.1666864966910;
+        Thu, 27 Oct 2022 03:02:46 -0700 (PDT)
+Received: from [10.100.102.14] (46-116-236-159.bb.netvision.net.il. [46.116.236.159])
+        by smtp.gmail.com with ESMTPSA id h8-20020aa7cdc8000000b00459012e5145sm691985edw.70.2022.10.27.03.02.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Oct 2022 03:02:46 -0700 (PDT)
+Message-ID: <bf1fa182-2bab-905d-f48e-eae70e64fd96@grimberg.me>
+Date:   Thu, 27 Oct 2022 13:02:44 +0300
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH RFC v3 2/7] ata: libata-scsi: Add
- ata_internal_queuecommand()
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>, <hare@suse.de>,
-        <bvanassche@acm.org>, <hch@lst.de>, <ming.lei@redhat.com>,
-        <niklas.cassel@wdc.com>
-CC:     <axboe@kernel.dk>, <jinpu.wang@cloud.ionos.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-ide@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <linuxarm@huawei.com>
-References: <1666693976-181094-1-git-send-email-john.garry@huawei.com>
- <1666693976-181094-3-git-send-email-john.garry@huawei.com>
- <08fdb698-0df3-7bc8-e6af-7d13cc96acfa@opensource.wdc.com>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <08fdb698-0df3-7bc8-e6af-7d13cc96acfa@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.32.169]
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- lhrpeml500003.china.huawei.com (7.191.162.67)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 14/17] blk-mq: move the srcu_struct used for quiescing to
+ the tagset
+Content-Language: en-US
+To:     Chao Leng <lengchao@huawei.com>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+References: <20221025144020.260458-1-hch@lst.de>
+ <20221025144020.260458-15-hch@lst.de>
+ <12eb7ad8-6b70-092a-978c-a2c1ba595ad4@huawei.com>
+ <73072365-adc5-1430-0b12-f552fd99b96e@grimberg.me>
+ <276f0800-2927-624d-0d90-8a5722f6d93b@huawei.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <276f0800-2927-624d-0d90-8a5722f6d93b@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/10/2022 02:45, Damien Le Moal wrote:
-> On 10/25/22 19:32, John Garry wrote:
->> Add callback to queue reserved commands - call it "internal" as this is
->> what libata uses.
+
+>>>> +
+>>>> +    if (set->flags & BLK_MQ_F_BLOCKING) {
+>>>> +        set->srcu = kmalloc(sizeof(*set->srcu), GFP_KERNEL);
+>>> Memory with contiguous physical addresses is not necessary, maybe it 
+>>> is a better choice to use kvmalloc,
+>>> because sizeof(*set->srcu) is a little large.
+>>> kvmalloc() is more friendly to scenarios where memory is insufficient 
+>>> and running for a long time.
 >>
->> Also add it to the base ATA SHT.
+>> Huh?
 >>
->> Signed-off-by: John Garry <john.garry@huawei.com>
->> ---
->>   drivers/ata/libata-scsi.c | 14 ++++++++++++++
->>   include/linux/libata.h    |  5 ++++-
->>   2 files changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
->> index 30d7c90b0c35..0d6f37d80137 100644
->> --- a/drivers/ata/libata-scsi.c
->> +++ b/drivers/ata/libata-scsi.c
->> @@ -1118,6 +1118,20 @@ int ata_scsi_dev_config(struct scsi_device *sdev, struct ata_device *dev)
->>   	return 0;
->>   }
->>   
->> +int ata_internal_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmd)
->> +{
->> +	struct ata_port *ap;
->> +	int res;
->> +
->> +	ap = ata_shost_to_port(shost);
+>> (gdb) p sizeof(struct srcu_struct)
+>> $1 = 392
+> I double recheck it. What I remember in my head is the old version of 
+> the size.
+> The size of the latest version is the size that you show.
+> Change the srcu_node array to a pointer in April 2022.
+> The link:
+> https://github.com/torvalds/linux/commit/2ec303113d978931ef368886c4c6bc854493e8bf
 > 
-> You can have this initialization together with the ap declaration.
-> 
->> +	spin_lock_irq(ap->lock);
->> +	res = ata_sas_queuecmd(scmd, ap);
->> +	spin_unlock_irq(ap->lock);
->> +
->> +	return res;
->> +}
->> +EXPORT_SYMBOL_GPL(ata_internal_queuecommand);
-> 
-> I am officially lost here. Do not see why this function is needed...
+> Therefore, kvmalloc() is a better choice for older versions.
+> For the latest version, static data member or kmalloc() are OK.
 
-The general idea in this series is to send ATA internal commands as 
-requests. And this function is used as the SCSI midlayer to queue 
-reserved commands. See how it is plugged into __ATA_BASE_SHT, below.
-
-So we have this overall flow:
-
-ata_exec_internal_sg():
-  -> alloc request
-  -> blk_execute_rq_nowait()
-      ... -> scsi_queue_rq()
-		-> sht->reserved_queuecommd()
-			-> ata_internal_queuecommand()
-
-And then we have ata_internal_queuecommand() -> ata_sas_queuecmd() -> 
-ata_scsi_queue_internal() -> ata_qc_issue().
-
-Hope it makes sense.
-
-Thanks,
-John
-
-> 
->> +
->>   /**
->>    *	ata_scsi_slave_config - Set SCSI device attributes
->>    *	@sdev: SCSI device to examine
->> diff --git a/include/linux/libata.h b/include/linux/libata.h
->> index 8938b584520f..f09c5dca16ce 100644
->> --- a/include/linux/libata.h
->> +++ b/include/linux/libata.h
->> @@ -1141,6 +1141,8 @@ extern int ata_std_bios_param(struct scsi_device *sdev,
->>   			      sector_t capacity, int geom[]);
->>   extern void ata_scsi_unlock_native_capacity(struct scsi_device *sdev);
->>   extern int ata_scsi_slave_config(struct scsi_device *sdev);
->> +extern int ata_internal_queuecommand(struct Scsi_Host *shost,
->> +				struct scsi_cmnd *scmd);
->>   extern void ata_scsi_slave_destroy(struct scsi_device *sdev);
->>   extern int ata_scsi_change_queue_depth(struct scsi_device *sdev,
->>   				       int queue_depth);
->> @@ -1391,7 +1393,8 @@ extern const struct attribute_group *ata_common_sdev_groups[];
->>   	.slave_destroy		= ata_scsi_slave_destroy,	\
->>   	.bios_param		= ata_std_bios_param,		\
->>   	.unlock_native_capacity	= ata_scsi_unlock_native_capacity,\
->> -	.max_sectors		= ATA_MAX_SECTORS_LBA48
->> +	.max_sectors		= ATA_MAX_SECTORS_LBA48,\
->> +	.reserved_queuecommand = ata_internal_queuecommand
->>   
->>   #define ATA_SUBBASE_SHT(drv_name)				\
->>   	__ATA_BASE_SHT(drv_name),				\
-> 
-
+We can keep it dynamic allocation IMO.
