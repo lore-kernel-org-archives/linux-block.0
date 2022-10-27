@@ -2,119 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3C8FA3743
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 12:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C791FA3742
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 13:03:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235475AbiJ0MMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Oct 2022 08:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40902 "EHLO
+        id S235811AbiJ0NDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 09:03:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235478AbiJ0MMn (ORCPT
+        with ESMTP id S235861AbiJ0NDD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Oct 2022 08:12:43 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173E9D18F6
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 05:12:42 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id e19so835653ili.4
-        for <linux-block@vger.kernel.org>; Thu, 27 Oct 2022 05:12:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YatRoCHU/prBuQvhSuWxys1gjK3BiZzhdawxQF0M6F4=;
-        b=B1N6OX1U1cX5YvB7aP1R+VTu7TtGkXtGL9wAXu12pynVNaoQnFk4SWKvkjYhQ8FuQn
-         1h9qSDpGHif3jet0wA8OuvjUGNyHEw3kbolGqJ/kMWl26OhTFlX29MCqkFwI0ZlR+Wjy
-         y5rOBZID8+nu/AnKslAryElPRIjSPje0CIem8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YatRoCHU/prBuQvhSuWxys1gjK3BiZzhdawxQF0M6F4=;
-        b=SgwGvAkd0mobKwlZkpbnRZHy3sISaytArNMl1mgMSmxbl7CP3Vn4Oejxd18nwT/iA8
-         oIlaL89n+dyza4FmKsEh5OHHle04N4JCM//Od16lCoSZRD4whjMbAkYERD3rzeX+fUoy
-         FG2ZMi2V9PwYOX6X5W8NUsPrQ243ViYsd8WrsobXMfBu/cgV6KQO6arT3MTfbUfwVlu2
-         fZveJ0IWOXfHaatk7OzxDua+kyKcOb6fEulsbEAzaD8qNnydld+gInEPWQkC+7ZuHcRU
-         5cegAEmZcNtUmuDzzasSph/DSTEU6XyiN+TLya3TPObHiHgsvxRXCBStZ7U9pwgNHQvc
-         fDhg==
-X-Gm-Message-State: ACrzQf2TFeAHHe3vivleoSRL5sS1yG2ftVacFvqd4peoKJiVOravgABC
-        4v4n0mZMCE0F54vPnU1+z97jEw==
-X-Google-Smtp-Source: AMsMyM50E3Zi2Pi2Qi15nwMvBIFqLj3tfj/bD2I2FXiF+frDTWgfyyRlmXYx8MSzxyAyNPLyHC0hiQ==
-X-Received: by 2002:a92:c548:0:b0:2f9:fe3f:f4c2 with SMTP id a8-20020a92c548000000b002f9fe3ff4c2mr29477770ilj.180.1666872761398;
-        Thu, 27 Oct 2022 05:12:41 -0700 (PDT)
-Received: from [172.22.22.4] ([98.61.227.136])
-        by smtp.googlemail.com with ESMTPSA id g26-20020a05663810fa00b003717c1df569sm506543jae.165.2022.10.27.05.12.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Oct 2022 05:12:40 -0700 (PDT)
-Message-ID: <e3d2e090-8349-927a-9d47-3c6c121c43a7@ieee.org>
-Date:   Thu, 27 Oct 2022 07:12:39 -0500
+        Thu, 27 Oct 2022 09:03:03 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA99175792;
+        Thu, 27 Oct 2022 06:03:02 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5246A21D35;
+        Thu, 27 Oct 2022 13:03:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1666875781; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6vU8vlBe1NmH+Y8hhVFNTdabTpguN3wNwqYkXSRqXNw=;
+        b=yMR4DON5E2/9m+BnomQU+UpYr4Q1Zdm7v0aJ0HpBCTsVlWjkFzansIMo66WOK3Rnta0WnL
+        B3LRaNWse0JPeb/Mij3Ways7jwHzkk24BGNcvVF75lKJij+NukIIsedd+m4OR2VuQ+UHcz
+        AD7JuTyl8SBGYrKPPUqFgZvwBbsopC4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1666875781;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6vU8vlBe1NmH+Y8hhVFNTdabTpguN3wNwqYkXSRqXNw=;
+        b=qEr+EWEG0kSSrZzav6o334GkEDPqeEs0fYGFuPv2ylmYwEZPFvJeijRE10Tpv0l0+FSb2i
+        9625IKD2r9j7iFBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 85140134CA;
+        Thu, 27 Oct 2022 13:03:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id FFRBHoSBWmOmXAAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 27 Oct 2022 13:03:00 +0000
+Message-ID: <3ef0347f-f3e2-cf08-2b27-f65a7afe82a2@suse.de>
+Date:   Thu, 27 Oct 2022 15:02:59 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
-Subject: Re: [PATCH] rbd: fix possible memory leak in rbd_sysfs_init()
+Subject: Re: [PATCH RFC v3 2/7] ata: libata-scsi: Add
+ ata_internal_queuecommand()
 Content-Language: en-US
-To:     Yang Yingliang <yangyingliang@huawei.com>,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     idryomov@gmail.com, dongsheng.yang@easystack.cn, axboe@kernel.dk,
-        yehuda@hq.newdream.net
-References: <20221027091918.2294132-1-yangyingliang@huawei.com>
-From:   Alex Elder <elder@ieee.org>
-In-Reply-To: <20221027091918.2294132-1-yangyingliang@huawei.com>
+To:     John Garry <john.garry@huawei.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, bvanassche@acm.org,
+        hch@lst.de, ming.lei@redhat.com, niklas.cassel@wdc.com
+Cc:     axboe@kernel.dk, jinpu.wang@cloud.ionos.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ide@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linuxarm@huawei.com
+References: <1666693976-181094-1-git-send-email-john.garry@huawei.com>
+ <1666693976-181094-3-git-send-email-john.garry@huawei.com>
+ <08fdb698-0df3-7bc8-e6af-7d13cc96acfa@opensource.wdc.com>
+ <83d9dc82-ea37-4a3c-7e67-1c097f777767@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <83d9dc82-ea37-4a3c-7e67-1c097f777767@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/27/22 4:19 AM, Yang Yingliang wrote:
-> If device_register() returns error in rbd_sysfs_init(), name of kobject
-> which is allocated in dev_set_name() called in device_add() is leaked.
+On 10/27/22 11:56, John Garry wrote:
+> On 27/10/2022 02:45, Damien Le Moal wrote:
+>> On 10/25/22 19:32, John Garry wrote:
+>>> Add callback to queue reserved commands - call it "internal" as this is
+>>> what libata uses.
+>>>
+>>> Also add it to the base ATA SHT.
+>>>
+>>> Signed-off-by: John Garry <john.garry@huawei.com>
+>>> ---
+>>>   drivers/ata/libata-scsi.c | 14 ++++++++++++++
+>>>   include/linux/libata.h    |  5 ++++-
+>>>   2 files changed, 18 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+>>> index 30d7c90b0c35..0d6f37d80137 100644
+>>> --- a/drivers/ata/libata-scsi.c
+>>> +++ b/drivers/ata/libata-scsi.c
+>>> @@ -1118,6 +1118,20 @@ int ata_scsi_dev_config(struct scsi_device 
+>>> *sdev, struct ata_device *dev)
+>>>       return 0;
+>>>   }
+>>> +int ata_internal_queuecommand(struct Scsi_Host *shost, struct 
+>>> scsi_cmnd *scmd)
+>>> +{
+>>> +    struct ata_port *ap;
+>>> +    int res;
+>>> +
+>>> +    ap = ata_shost_to_port(shost);
+>>
+>> You can have this initialization together with the ap declaration.
+>>
+>>> +    spin_lock_irq(ap->lock);
+>>> +    res = ata_sas_queuecmd(scmd, ap);
+>>> +    spin_unlock_irq(ap->lock);
+>>> +
+>>> +    return res;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(ata_internal_queuecommand);
+>>
+>> I am officially lost here. Do not see why this function is needed...
 > 
-> As comment of device_add() says, it should call put_device() to drop
-> the reference count that was set in device_initialize() when it fails,
-> so the name can be freed in kobject_cleanup().
+> The general idea in this series is to send ATA internal commands as 
+> requests. And this function is used as the SCSI midlayer to queue 
+> reserved commands. See how it is plugged into __ATA_BASE_SHT, below.
 > 
-> Fault injection test can trigger this problem:
+> So we have this overall flow:
 > 
-> unreferenced object 0xffff88810173aa78 (size 8):
->    comm "modprobe", pid 247, jiffies 4294714278 (age 31.789s)
->    hex dump (first 8 bytes):
->      72 62 64 00 81 88 ff ff                          rbd.....
->    backtrace:
->      [<00000000f58fae56>] __kmalloc_node_track_caller+0x44/0x1b0
->      [<00000000bdd44fe7>] kstrdup+0x3a/0x70
->      [<00000000f7844d0b>] kstrdup_const+0x63/0x80
->      [<000000001b0a0eeb>] kvasprintf_const+0x10b/0x190
->      [<00000000a47bd894>] kobject_set_name_vargs+0x56/0x150
->      [<00000000d5edbf18>] dev_set_name+0xab/0xe0
->      [<00000000f5153e80>] device_add+0x106/0x1f20
+> ata_exec_internal_sg():
+>   -> alloc request
+>   -> blk_execute_rq_nowait()
+>       ... -> scsi_queue_rq()
+>          -> sht->reserved_queuecommd()
+>              -> ata_internal_queuecommand()
 > 
-> Fixes: dfc5606dc513 ("rbd: replace the rbd sysfs interface")
-> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+> And then we have ata_internal_queuecommand() -> ata_sas_queuecmd() -> 
+> ata_scsi_queue_internal() -> ata_qc_issue().
+> 
+> Hope it makes sense.
+> 
+> Thanks,
+> John
+> 
+>>
+>>> +
+>>>   /**
+>>>    *    ata_scsi_slave_config - Set SCSI device attributes
+>>>    *    @sdev: SCSI device to examine
+>>> diff --git a/include/linux/libata.h b/include/linux/libata.h
+>>> index 8938b584520f..f09c5dca16ce 100644
+>>> --- a/include/linux/libata.h
+>>> +++ b/include/linux/libata.h
+>>> @@ -1141,6 +1141,8 @@ extern int ata_std_bios_param(struct 
+>>> scsi_device *sdev,
+>>>                     sector_t capacity, int geom[]);
+>>>   extern void ata_scsi_unlock_native_capacity(struct scsi_device *sdev);
+>>>   extern int ata_scsi_slave_config(struct scsi_device *sdev);
+>>> +extern int ata_internal_queuecommand(struct Scsi_Host *shost,
+>>> +                struct scsi_cmnd *scmd);
+>>>   extern void ata_scsi_slave_destroy(struct scsi_device *sdev);
+>>>   extern int ata_scsi_change_queue_depth(struct scsi_device *sdev,
+>>>                          int queue_depth);
+>>> @@ -1391,7 +1393,8 @@ extern const struct attribute_group 
+>>> *ata_common_sdev_groups[];
+>>>       .slave_destroy        = ata_scsi_slave_destroy,    \
+>>>       .bios_param        = ata_std_bios_param,        \
+>>>       .unlock_native_capacity    = ata_scsi_unlock_native_capacity,\
+>>> -    .max_sectors        = ATA_MAX_SECTORS_LBA48
+>>> +    .max_sectors        = ATA_MAX_SECTORS_LBA48,\
+>>> +    .reserved_queuecommand = ata_internal_queuecommand
+>>>   #define ATA_SUBBASE_SHT(drv_name)                \
+>>>       __ATA_BASE_SHT(drv_name),                \
+>>
+> 
 
-This looks right to me.
+But that means we can't use it before the SCSI host is initialized; some 
+HBAs require to send commands before the host can be initialized properly.
 
-Reviewed-by: Alex Elder <elder@linaro.org>
+Cheers,
 
-> ---
->   drivers/block/rbd.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-> index f9e39301c4af..04453f4a319c 100644
-> --- a/drivers/block/rbd.c
-> +++ b/drivers/block/rbd.c
-> @@ -7222,8 +7222,10 @@ static int __init rbd_sysfs_init(void)
->   	int ret;
->   
->   	ret = device_register(&rbd_root_dev);
-> -	if (ret < 0)
-> +	if (ret < 0) {
-> +		put_device(&rbd_root_dev);
->   		return ret;
-> +	}
->   
->   	ret = bus_register(&rbd_bus_type);
->   	if (ret < 0)
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
 
