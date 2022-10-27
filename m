@@ -2,172 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31A27C38A2D
-	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 03:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE64BFA373D
+	for <linux-block@archiver.kernel.org>; Thu, 27 Oct 2022 07:11:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234145AbiJ0DBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Oct 2022 23:01:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44146 "EHLO
+        id S234370AbiJ0HLV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Oct 2022 03:11:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234182AbiJ0DAy (ORCPT
+        with ESMTP id S233506AbiJ0HLT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Oct 2022 23:00:54 -0400
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AA565FAC7
-        for <linux-block@vger.kernel.org>; Wed, 26 Oct 2022 20:00:48 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R531e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0VT9I0CL_1666839644;
-Received: from 30.97.56.235(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VT9I0CL_1666839644)
-          by smtp.aliyun-inc.com;
-          Thu, 27 Oct 2022 11:00:45 +0800
-Message-ID: <228487d2-373c-57ae-c60d-53989324908e@linux.alibaba.com>
-Date:   Thu, 27 Oct 2022 11:00:44 +0800
+        Thu, 27 Oct 2022 03:11:19 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF0F1719B7;
+        Thu, 27 Oct 2022 00:11:16 -0700 (PDT)
+Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MycCv6s1gz15MC0;
+        Thu, 27 Oct 2022 15:06:19 +0800 (CST)
+Received: from [10.40.188.234] (10.40.188.234) by
+ kwepemi500015.china.huawei.com (7.221.188.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 27 Oct 2022 15:11:13 +0800
+Subject: Re: [PATCH v11 3/9] iov_iter: introduce
+ iov_iter_get_pages_[alloc_]flags()
+To:     Logan Gunthorpe <logang@deltatee.com>,
+        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-block@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        <linux-mm@kvack.org>
+CC:     Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Stephen Bates <sbates@raithlin.com>
+References: <20221021174116.7200-1-logang@deltatee.com>
+ <20221021174116.7200-4-logang@deltatee.com>
+From:   Jay Fang <f.fangjian@huawei.com>
+Message-ID: <c73c426f-d9f5-2f17-bb88-b72792103703@huawei.com>
+Date:   Thu, 27 Oct 2022 15:11:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH] ublk_drv: don't call task_work_add for queueing io
- commands
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <20221023093807.201946-1-ming.lei@redhat.com>
- <8a225315-3932-62a6-2bc6-8e81e672fd9d@linux.alibaba.com>
- <Y1aRBaUWGH54TTs4@T590>
- <1816adbd-fa1c-71e0-652d-483d47697254@linux.alibaba.com>
- <Y1eN7VqaJrCVJZjb@T590>
- <1ab57612-685a-6272-5d09-bfae47b4a37e@linux.alibaba.com>
- <925c299f-0d2f-2970-9c85-2f67834dd2bf@linux.alibaba.com>
- <Y1f+IeFQZhZRmZda@T590>
- <85bf5d34-7bbc-7da1-54fb-b0cec68a610b@linux.alibaba.com>
- <Y1kaFyan927Qnnnh@T590>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <Y1kaFyan927Qnnnh@T590>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20221021174116.7200-4-logang@deltatee.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.40.188.234]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemi500015.china.huawei.com (7.221.188.92)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/10/26 19:29, Ming Lei wrote:
-
-[...]
->>
->> Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz 16 cores
->> 64GB MEM, CentOS 8, kernel 6.0+
->> with IORING_SETUP_COOP_TASKRUN, without this kernel patch
->>
->> ucmd: io_uring_cmd_complete_in_task(), ublk_drv is a module
->>
->> ucmd-not-touch-pdu: use llist && do not touch 'cmd'/'pdu'/'io' in ublk_queue_rq()
->>
->> tw: task_work_add(), ublk is built-in.
->>
->>
->> --------
->> fio test
->>
->> iodepth=128 numjobs=1 direct=1 bs=4k
->>
->> --------------------------------------------
->> ublk loop target, the backend is a file.
->>
->> IOPS(k)
->>
->> type		ucmd		tw		ucmd-not-touch-pdu
->> seq-read	54.1		53.8		53.6
->> rand-read	52.0		52.0		52.0
->>
->> --------------------------------------------
->> ublk null target
->> IOPS(k)
->>
->> type		ucmd		tw		ucmd-not-touch-pdu
->> seq-read	272		286		275
->> rand-read	262		278		269
->>
->>
->> ------------
->> ublksrv test
->>
->> -------------
->> ucmd
->>
->> running loop/001
->>         fio (ublk/loop( -f /root/work/ubdsrv/tests/tmp/ublk_loop_1G_BZ85U), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
->>         randwrite: jobs 1, iops 66737
->>         randread: jobs 1, iops 64935
->>         randrw: jobs 1, iops read 32694 write 32710
->>         rw(512k): jobs 1, iops read 772 write 819
->>
->> running null/001
->>         fio (ublk/null(), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
->>         randwrite: jobs 1, iops 715863
->>         randread: jobs 1, iops 758449
->>         randrw: jobs 1, iops read 357407 write 357183
->>         rw(512k): jobs 1, iops read 5895 write 5875
->>
->> -------------
->> tw
->>
->> running loop/001
->>         fio (ublk/loop( -f /root/work/ubdsrv/tests/tmp/ublk_loop_1G_pvLTL), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
->>         randwrite: jobs 1, iops 66856
->>         randread: jobs 1, iops 65015
->>         randrw: jobs 1, iops read 32751 write 32767
->>         rw(512k): jobs 1, iops read 776 write 823
->>
->> running null/001
->>         fio (ublk/null(), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
->>         randwrite: jobs 1, iops 739450
->>         randread: jobs 1, iops 787500
->>         randrw: jobs 1, iops read 372956 write 372831
->>         rw(512k): jobs 1, iops read 5798 write 5777
->>
->> -------------
->> ucmd-not-touch-pdu
->>
->> running loop/001
->>         fio (ublk/loop( -f /root/work/ubdsrv/tests/tmp/ublk_loop_1G_oH0eG), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
->>         randwrite: jobs 1, iops 66754
->>         randread: jobs 1, iops 65032
->>         randrw: jobs 1, iops read 32776 write 32792
->>         rw(512k): jobs 1, iops read 772 write 818
->>
->> running null/001
->>         fio (ublk/null(), libaio, bs 4k, dio, hw queues:1, uring_comp: 0, get_data: 0)...
->>         randwrite: jobs 1, iops 725334
->>         randread: jobs 1, iops 741105
->>         randrw: jobs 1, iops read 360285 write 360047
->>         rw(512k): jobs 1, iops read 5770 write 5748
->>
->> Not touching cmd/pdu/io in ublk_queue_rq() improves IOPS.
->> But it is worse than using task_work_add().
+On 2022/10/22 1:41, Logan Gunthorpe wrote:
+> Add iov_iter_get_pages_flags() and iov_iter_get_pages_alloc_flags()
+> which take a flags argument that is passed to get_user_pages_fast().
 > 
-> Thanks for the test! It is better to not share ucmd between
-> ublk blk-mq io context and ubq daemon context, and we can
-> improve it for using io_uring_cmd_complete_in_task(), and I
-> have one patch by using the batch handing approach in
-> io_uring_cmd_complete_in_task().
+> This is so that FOLL_PCI_P2PDMA can be passed when appropriate.
 > 
-> Another reason could be the extra __set_notify_signal() in
-> __io_req_task_work_add() via task_work_add(). When task_work_add()
-> is available, we just need to call __set_notify_signal() once
-> for the whole batch, but it can't be done in case of using
-> io_uring_cmd_complete_in_task().
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  include/linux/uio.h |  6 ++++++
+>  lib/iov_iter.c      | 32 ++++++++++++++++++++++++--------
+>  2 files changed, 30 insertions(+), 8 deletions(-)
 > 
-> Also the patch of 'use llist' is actually wrong since we have to
-> call io_uring_cmd_complete_in_task() once in ->commit_rqs(), but
-> that couldn't be easy because ucmd isn't available at that time.
+> diff --git a/include/linux/uio.h b/include/linux/uio.h
+> index 2e3134b14ffd..9ede533ce64c 100644
+> --- a/include/linux/uio.h
+> +++ b/include/linux/uio.h
+> @@ -247,8 +247,14 @@ void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode
+>  void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
+>  void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
+>  		     loff_t start, size_t count);
+> +ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
+> +		size_t maxsize, unsigned maxpages, size_t *start,
+> +		unsigned gup_flags);
+>  ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
+>  			size_t maxsize, unsigned maxpages, size_t *start);
+> +ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+> +		struct page ***pages, size_t maxsize, size_t *start,
+> +		unsigned gup_flags);
+>  ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i, struct page ***pages,
+>  			size_t maxsize, size_t *start);
+>  int iov_iter_npages(const struct iov_iter *i, int maxpages);
+> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+> index c3ca28ca68a6..53efad017f3c 100644
+> --- a/lib/iov_iter.c
+> +++ b/lib/iov_iter.c
+> @@ -1430,7 +1430,8 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
+>  
+>  static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>  		   struct page ***pages, size_t maxsize,
+> -		   unsigned int maxpages, size_t *start)
+> +		   unsigned int maxpages, size_t *start,
+> +		   unsigned int gup_flags)
 
-Yes, you are correct.
+Hi,
+found some checkpatch warnings, like this:
+WARNING: Prefer 'unsigned int' to bare use of 'unsigned'
+#50: FILE: lib/iov_iter.c:1497:
++		   size_t *start, unsigned gup_flags)
 
+>  {
+>  	unsigned int n;
+>  
+> @@ -1442,7 +1443,6 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>  		maxsize = MAX_RW_COUNT;
+>  
+>  	if (likely(user_backed_iter(i))) {
+> -		unsigned int gup_flags = 0;
+>  		unsigned long addr;
+>  		int res;
+>  
+> @@ -1492,33 +1492,49 @@ static ssize_t __iov_iter_get_pages_alloc(struct iov_iter *i,
+>  	return -EFAULT;
+>  }
+>  
+> -ssize_t iov_iter_get_pages2(struct iov_iter *i,
+> +ssize_t iov_iter_get_pages(struct iov_iter *i,
+>  		   struct page **pages, size_t maxsize, unsigned maxpages,
+> -		   size_t *start)
+> +		   size_t *start, unsigned gup_flags)
+>  {
+>  	if (!maxpages)
+>  		return 0;
+>  	BUG_ON(!pages);
+>  
+> -	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages, start);
+> +	return __iov_iter_get_pages_alloc(i, &pages, maxsize, maxpages,
+> +					  start, gup_flags);
+> +}
+> +EXPORT_SYMBOL_GPL(iov_iter_get_pages);
+> +
+> +ssize_t iov_iter_get_pages2(struct iov_iter *i, struct page **pages,
+> +		size_t maxsize, unsigned maxpages, size_t *start)
+> +{
+> +	return iov_iter_get_pages(i, pages, maxsize, maxpages, start, 0);
+>  }
+>  EXPORT_SYMBOL(iov_iter_get_pages2);
+>  
+> -ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
+> +ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
+>  		   struct page ***pages, size_t maxsize,
+> -		   size_t *start)
+> +		   size_t *start, unsigned gup_flags)
+>  {
+>  	ssize_t len;
+>  
+>  	*pages = NULL;
+>  
+> -	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start);
+> +	len = __iov_iter_get_pages_alloc(i, pages, maxsize, ~0U, start,
+> +					 gup_flags);
+>  	if (len <= 0) {
+>  		kvfree(*pages);
+>  		*pages = NULL;
+>  	}
+>  	return len;
+>  }
+> +EXPORT_SYMBOL_GPL(iov_iter_get_pages_alloc);
+> +
+> +ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
+> +		struct page ***pages, size_t maxsize, size_t *start)
+> +{
+> +	return iov_iter_get_pages_alloc(i, pages, maxsize, start, 0);
+> +}
+>  EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
+>  
+>  size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
 > 
-> I think we may have to live with task_work_add() until the perf
-> number is improved to same basically with io_uring_cmd_complete_in_task().
-
-OK, we can keep task_work_add() && io_uring_cmd_complete_in_task().
-BTW, from test:loop/001, I think with real backends, the performance
-gap between them seems not too big.
-
-Regards,
-Zhang
 
