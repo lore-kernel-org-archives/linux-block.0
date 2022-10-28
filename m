@@ -2,54 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96DBAECAAA1
-	for <linux-block@archiver.kernel.org>; Fri, 28 Oct 2022 08:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D17ECAAA1
+	for <linux-block@archiver.kernel.org>; Fri, 28 Oct 2022 09:12:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiJ1Ij6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 28 Oct 2022 04:39:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44544 "EHLO
+        id S229455AbiJ1JMO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 28 Oct 2022 05:12:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbiJ1Ij5 (ORCPT
+        with ESMTP id S229456AbiJ1JMO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 28 Oct 2022 04:39:57 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DD03E765
-        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2022 01:39:57 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id m2so4117039pjr.3
-        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2022 01:39:57 -0700 (PDT)
+        Fri, 28 Oct 2022 05:12:14 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4D377541
+        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2022 02:12:13 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id f9so4337590pgj.2
+        for <linux-block@vger.kernel.org>; Fri, 28 Oct 2022 02:12:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ix/2sFES1XDrth8Mc5WsCC3xq14DhDgLbPRqVZ7CjnE=;
-        b=EB4SjPdP8jIAESzlr3p18eJASGseDuWp9CgGNv789JeTaSEon+ysczWfOdbUKXNJM5
-         /fQXkeR1vIGQCmP3SuMTLTk3aci9VjrDyPk9TPQHG+k7Aa2jPC2yqc9cRcHaSJ6/VTVL
-         D+cCCtUeUtItOs0LjsWx8jFO/3BeMtDeCX64IxrkHlTxs9ufiMhCsLZlzW4Q/1IqCYbf
-         jW0rUHxqX/WvuVnKd69mpgKKnwvtbgeJLtDEFuwt+mEEJMZy+nkFOWVSlvMXWk+q8WBB
-         V/mfZ/EjNBlv4lfCyN131ozJKt9HTZnWWmxpy7X+jGwnO2o086o5XMMTc4aqM+kqhMrw
-         YvQA==
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8aIUp+FdiwOxHNi2DOn6hMYUc4/9shjGitU8is1hvRw=;
+        b=BV5wRz4gCqTrm9hm83RNDap6PvHOmpK8sUR9Dctpk90Bo583D3T0Xz+GTsQ3oxhlBR
+         W+LVNHstqY5ORhVY3gh2Ktv4JgzKcuD24u8k1qcpwmTjqxNNTU3S/zNXfowzQtn+yts3
+         rnCVl8JD7wwD4bNTVUpygL+SzE1UQIXWRhmKEcd7rW6GwHFfZ4mrQj50R8DqLE4+lV5C
+         KJVWTIZQOmKf2J4FqB+WkHyToKFQwzAds/HFYrUqBslXhQ8jEUzFsf6tIZCa+o+DQ1LQ
+         g4QeY++5lj6HPmXiNDFNzT0X6yLp4AOo4ivwanMDJoPaETlWQWKMn5yOXbhO1Mga31eH
+         9gfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ix/2sFES1XDrth8Mc5WsCC3xq14DhDgLbPRqVZ7CjnE=;
-        b=cHv8kUP3+DshK8mCCNMiLBOXr+kqEjR4Faqz1hUfyOiAz4cS+aUTD3CkahqKiYwPK9
-         U3ginoldkYbH39Ih57BfAT3yAaVhFhZvv+jnIkmnAma8uOHmPqshiEKZCW2CdyCbqAqr
-         3EQgAQhDcV6MSN/ihwnOmU0zsmlTR1G416pPBwWP6ai22R1craLUQemm8earyzviIlWh
-         z+ewmHtpe2xr+W+OvP9nmgDIVx+0Mix0TCwkETEUSmFkZHShF7osSEjIMbvPfsi9LKsB
-         ybLOl6bInhvLL8BL/J4NFxbKt4SsCpekWWU4DKqkZ4nGxQsDJx/n6sQMjNgJGtjoX/zc
-         Obpw==
-X-Gm-Message-State: ACrzQf2Zqx3xKuttEsWkj6Zqo95ihRha/DQd/L+gQZCyeSsSR6iuIAGd
-        Hk82U5RTwqNhlQVTZ3o4vGKeP6Q4KncO2ROPLqynpU/neV5PD4A=
-X-Google-Smtp-Source: AMsMyM5pt7Kl2yis7OkvV+sDsj4LbySL4NuxYqbGBsjhHMh/A9LoszD5gHbSo6+qjPNMl/yVCmwyswTHvKhzRgP84DE=
-X-Received: by 2002:a17:902:e546:b0:186:cf80:978b with SMTP id
- n6-20020a170902e54600b00186cf80978bmr15600791plf.167.1666946396031; Fri, 28
- Oct 2022 01:39:56 -0700 (PDT)
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8aIUp+FdiwOxHNi2DOn6hMYUc4/9shjGitU8is1hvRw=;
+        b=edAK4cMMjZSrHENhKcVwYpgUStzWORWxmfTrNrwU1aDm0h0YzPS9HcS06CoM/9shG8
+         00YZM9jYKCFW2t7sxWX4tjezppl0wcd8Pc8LRy+c1mpPLy48u2z9IScsmEQkdFgnjMx7
+         gGRGn9upriiitbyjhFyecQa2osb8Ts3fwWBPXFb+541BqyWiSffx05fyGhFLqxrEr85b
+         p8Vi2Wwotb7l3DpLyLL9ww7clkGDCmmAOB5cNMsTMF+o9ifZ5/DDmAmQBlvL0anIwLi5
+         IzzNUFTDEj8KZ889zhLnaiXtzBQa113NTGpXVdkj+p6xx9c/Lrpu5DuEiblmxyn4w/og
+         0wgA==
+X-Gm-Message-State: ACrzQf2iUj9KZpDIafd06Fos4ioMMk+Ng2CsWeOvFVwudZPJVth3lqNY
+        ShbFnHOtJdaN5pesNQgxmu+Hge7X4B78RgeaxHdjkrhpoXx6
+X-Google-Smtp-Source: AMsMyM6CuwdQic8eywspk1czic6qMNm88JFhFjyw459oXW/A/sa7zf3GEwGNKpw50kvkgqE0unscPbPn1UwflhKy8tI=
+X-Received: by 2002:a63:f452:0:b0:46f:6d7b:3fc9 with SMTP id
+ p18-20020a63f452000000b0046f6d7b3fc9mr2201462pgk.472.1666948332175; Fri, 28
+ Oct 2022 02:12:12 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAJGKYO62pEsXgZtRvyHjdZD7FOm2m792DgTHSeKsa4T1XvKQEg@mail.gmail.com>
+In-Reply-To: <CAJGKYO62pEsXgZtRvyHjdZD7FOm2m792DgTHSeKsa4T1XvKQEg@mail.gmail.com>
 From:   "Roberto A. Foglietta" <roberto.foglietta@gmail.com>
-Date:   Fri, 28 Oct 2022 10:39:19 +0200
-Message-ID: <CAJGKYO62pEsXgZtRvyHjdZD7FOm2m792DgTHSeKsa4T1XvKQEg@mail.gmail.com>
-Subject: blk_mq_init_sq_queue (deprecated) on 5.13 does not have any effect, why?
+Date:   Fri, 28 Oct 2022 11:11:35 +0200
+Message-ID: <CAJGKYO6Lk7-Y1A-nR1tAVTK-ZP0iFAV=qpuGVrQXCRWDnK5EbQ@mail.gmail.com>
+Subject: Fwd: blk_mq_init_sq_queue (deprecated) on 5.13 does not have any
+ effect, why?
 To:     linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -100,4 +103,7 @@ static int md_blk_init_sq_queue(struct mddev *mddev)
 }
 
  The request handler make_request() is never called and I wonder why.
-Could you help me, plase? Thank, R-
+
+ Could you help me, please?
+
+ Thank, R-
