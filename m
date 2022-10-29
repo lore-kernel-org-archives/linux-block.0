@@ -2,85 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4AFFA3744
-	for <linux-block@archiver.kernel.org>; Sat, 29 Oct 2022 10:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1013FA3744
+	for <linux-block@archiver.kernel.org>; Sat, 29 Oct 2022 16:45:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbiJ2KCl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Oct 2022 06:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48456 "EHLO
+        id S229824AbiJ2Qp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Oct 2022 12:45:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiJ2KCl (ORCPT
+        with ESMTP id S229766AbiJ2Qpz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2022 06:02:41 -0400
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A2E9E69BCD;
-        Sat, 29 Oct 2022 03:02:39 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.14.30.251])
-        by mail-app3 (Coremail) with SMTP id cC_KCgCHjQwl+lxjdEpxCA--.43876S3;
-        Sat, 29 Oct 2022 18:02:29 +0800 (CST)
-From:   Jinlong Chen <nickyc975@zju.edu.cn>
-To:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, nickyc975@zju.edu.cn
-Subject: [PATCH 1/3] blk-mq: remove redundant call to blk_freeze_queue_start in blk_mq_destroy_queue
-Date:   Sat, 29 Oct 2022 18:02:09 +0800
-Message-Id: <ebd3a47a1ebf4ab518c985cdbaa1ac3afd6dfb9f.1667035519.git.nickyc975@zju.edu.cn>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1667035519.git.nickyc975@zju.edu.cn>
-References: <cover.1667035519.git.nickyc975@zju.edu.cn>
+        Sat, 29 Oct 2022 12:45:55 -0400
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839D15A2C2
+        for <linux-block@vger.kernel.org>; Sat, 29 Oct 2022 09:45:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ytlZHzXvVElyumf7th8tU5wsApgH5RDbnaflJhuYAhM=; b=ml7tFMagg8eNw3OcWI0uy1Ffmz
+        0PunpYfPKeEpnVpcT7J6gWj6ygQsW0vESBqVU2ysEpkoNtErx/erHjVdkaZdnt4fGVTvVe83Nnw2F
+        QU0UpJeMUgJQa+ATujN8XB8XXNC4yImf+3yaAm5JqgpLTdXFoZuif1+xKe2fwgOV2tvwvIhEmupLs
+        x5vSHH1QA56jPxw6Hx0N5cZ4k2tt+nvneGSVfcjycFXgMW/LmFfc+xuxzzueww2l4Ee5IeG1CC8p4
+        cr8jnvR7yn1eLmWmVdIRFPCxQ2n+VZgfwftaJw4V4ut5LsXzYoJNFNMwOSdEF6r+0Q3by51/I8Tmq
+        T2kHW6GQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+        id 1oooxt-00FIDZ-1G;
+        Sat, 29 Oct 2022 16:45:45 +0000
+Date:   Sat, 29 Oct 2022 17:45:45 +0100
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+Subject: Re: [bug?] blk_queue_may_bounce() has the comparison max_low_pfn and
+ max_pfn wrong way
+Message-ID: <Y11YuS3kiOWoOjuI@ZenIV>
+References: <Y1wZTtENDq3fvs6n@ZenIV>
+ <01ce222b-8ad6-b4b3-428a-bae9534795e7@kernel.dk>
+ <Y1wr0g39GzHcAk9v@ZenIV>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cC_KCgCHjQwl+lxjdEpxCA--.43876S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7Xw1xtw4xGw1xAF4Dtr43Jrb_yoWfWFc_Wa
-        4UCFy2yFZ8GF15ur1jkF15ZFn2kw1kJFy7GFWDW3srJwn5AanIyw47Cr1rCr4DW3y2kasr
-        Wr1DG397Jr40gjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbs8Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
-        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
-        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E
-        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6c
-        xK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
-        Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
-        WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij
-        64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI
-        8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
-        xVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
-        8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
-        aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43
-        ZEXa7VUbHa0DUUUUU==
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgwSB1ZdtcJ3NwABsm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1wr0g39GzHcAk9v@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Calling blk_freeze_queue results in a redundant call to
-blk_freeze_queue_start as it has been called in blk_queue_start_drain.
+On Fri, Oct 28, 2022 at 08:21:55PM +0100, Al Viro wrote:
+> On Fri, Oct 28, 2022 at 12:51:00PM -0600, Jens Axboe wrote:
+> > On 10/28/22 12:02 PM, Al Viro wrote:
+> > > 	We have this:
+> > > 
+> > > static inline bool blk_queue_may_bounce(struct request_queue *q)
+> > > {
+> > >         return IS_ENABLED(CONFIG_BOUNCE) &&
+> > >                 q->limits.bounce == BLK_BOUNCE_HIGH &&
+> > >                 max_low_pfn >= max_pfn;
+> > > }
+> > > 
+> > > static inline struct bio *blk_queue_bounce(struct bio *bio,
+> > >                 struct request_queue *q)
+> > > {
+> > >         if (unlikely(blk_queue_may_bounce(q) && bio_has_data(bio)))
+> > >                 return __blk_queue_bounce(bio, q);
+> > >         return bio;
+> > > }
+> > > 
+> > > Now, the last term in expression in blk_queue_may_bounce() is
+> > > true only on the boxen where max_pfn is no greater than max_low_pfn.
+> > > 
+> > > Unless I'm very confused, that's the boxen where we don't *have*
+> > > any highmem pages.
+> > > 
+> > > What's more, consider this:
+> > > 
+> > > static __init int init_emergency_pool(void)
+> > > {
+> > >         int ret;
+> > > 
+> > > #ifndef CONFIG_MEMORY_HOTPLUG
+> > >         if (max_pfn <= max_low_pfn)
+> > >                 return 0;
+> > > #endif
+> > > 
+> > >         ret = mempool_init_page_pool(&page_pool, POOL_SIZE, 0);
+> > >         BUG_ON(ret);
+> > >         pr_info("pool size: %d pages\n", POOL_SIZE);
+> > > 
+> > >         init_bounce_bioset();
+> > >         return 0;
+> > > }
+> > > 
+> > > On the same boxen (assuming we've not hotplug) page_pool won't be set up
+> > > at all, so we wouldn't be able to bounce any highmem page if we ever
+> > > ran into one.
+> > > 
+> > > AFAICS, this condition is backwards - it should be
+> > > 
+> > > static inline bool blk_queue_may_bounce(struct request_queue *q)
+> > > {
+> > >         return IS_ENABLED(CONFIG_BOUNCE) &&
+> > >                 q->limits.bounce == BLK_BOUNCE_HIGH &&
+> > >                 max_low_pfn < max_pfn;
+> > > }
+> > > 
+> > > What am I missing here?
+> > 
+> > I don't think you're missing anything, the case we need it for is when
+> > max_pfn > max_low_pfn. I wonder when this got botched? Because some
+> > of those statements date back probably about 20 years when we started
+> > allowing highmem pages to do IO.
+> 
+> 9bb33f24abbd "block: refactor the bounce buffering code" about a year ago.
+> 
+> But fixing the test alone is not going to be enough - just a quick look
+> through __blk_queue_bounce() catches an obvious bug on write (we copy
+> the part of highmem page we covered by bio into the beginning of the
+> bounce page - and leave ->bv_offset as-is) as well as a possible bug in
+> ->bi_status handling (if we really can run into bio_split() there).
+> 
+> I wonder if we ought to simply add "depends on BROKEN" for CONFIG_BOUNCE... ;-/
 
-Replace blk_freeze_queue with blk_mq_freeze_queue_wait to avoid the
-redundant call.
+BTW, ->bi_status propagation looks brittle in general.  Are there any
+places other than bio_init() where we would want to store 0 in ->bi_status
+of anything?
 
-Signed-off-by: Jinlong Chen <nickyc975@zju.edu.cn>
----
- block/blk-mq.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4cecf281123f..14c4165511b9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4005,7 +4005,12 @@ void blk_mq_destroy_queue(struct request_queue *q)
- 
- 	blk_queue_flag_set(QUEUE_FLAG_DYING, q);
- 	blk_queue_start_drain(q);
--	blk_freeze_queue(q);
-+
-+	/*
-+	 * blk_freeze_queue_start has been called in blk_queue_start_drain, we just
-+	 * need to wait.
-+	 */
-+	blk_mq_freeze_queue_wait(q);
- 
- 	blk_sync_queue(q);
- 	blk_mq_cancel_work_sync(q);
--- 
-2.31.1
-
+Look at e.g. null_blk; AFAICS, we store to ->bi_status on any request
+completion (in NULL_Q_BIO case, at least).  What happens if request
+gets split and split-off part finishes first with an error?  AFAICS,
+its ->bi_status will be copied to parent (original bio, the one that
+covers the tail).  Now the IO on the original bio is over as well
+and we hit drivers/block/null_blk/main.c:end_cmd().  Suppose this
+part succeeds; won't we end up overwriting ->bi_status with zero
+and assuming that the entire thing had succeeded, despite the
+(now lost) error on the split-off part?
