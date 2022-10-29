@@ -2,99 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40F1C38A02
-	for <linux-block@archiver.kernel.org>; Sat, 29 Oct 2022 07:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 280EBC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 29 Oct 2022 10:02:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229494AbiJ2HRS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Oct 2022 03:17:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59834 "EHLO
+        id S229544AbiJ2KCi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Oct 2022 06:02:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiJ2HRR (ORCPT
+        with ESMTP id S229456AbiJ2KCi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2022 03:17:17 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C9717FD53;
-        Sat, 29 Oct 2022 00:17:16 -0700 (PDT)
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4MzrFz06WJzVjK5;
-        Sat, 29 Oct 2022 15:12:23 +0800 (CST)
-Received: from dggpemm500013.china.huawei.com (7.185.36.172) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 29 Oct 2022 15:17:14 +0800
-Received: from ubuntu1804.huawei.com (10.67.175.36) by
- dggpemm500013.china.huawei.com (7.185.36.172) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Sat, 29 Oct 2022 15:17:14 +0800
-From:   Chen Zhongjin <chenzhongjin@huawei.com>
-To:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <mcgrof@kernel.org>, <hare@suse.de>,
-        <chenzhongjin@huawei.com>
-Subject: [PATCH] block: Fix possible memory leak for rq_wb on add_disk failure
-Date:   Sat, 29 Oct 2022 15:13:55 +0800
-Message-ID: <20221029071355.35462-1-chenzhongjin@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Sat, 29 Oct 2022 06:02:38 -0400
+Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 250036918A;
+        Sat, 29 Oct 2022 03:02:35 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.14.30.251])
+        by mail-app3 (Coremail) with SMTP id cC_KCgCHjQwl+lxjdEpxCA--.43876S2;
+        Sat, 29 Oct 2022 18:02:24 +0800 (CST)
+From:   Jinlong Chen <nickyc975@zju.edu.cn>
+To:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, nickyc975@zju.edu.cn
+Subject: [PATCH 0/3] cleanups for queue freezing functions
+Date:   Sat, 29 Oct 2022 18:02:08 +0800
+Message-Id: <cover.1667035519.git.nickyc975@zju.edu.cn>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.175.36]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500013.china.huawei.com (7.185.36.172)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cC_KCgCHjQwl+lxjdEpxCA--.43876S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrWw43Wr4fKF1DWF1kZFyxXwb_yoWxGwc_ua
+        4UAFyxtFykGFy3ZFyjkF1UAFyqkw4Utr1jqFWqqrWUAryxAFs8Aw4S9r4kWrs8WanrC3Z7
+        Gr1UGr1xJr47XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbIAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
+        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
+        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E
+        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6c
+        xK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
+        Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
+        WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij
+        64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI
+        8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
+        xVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
+        8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
+        aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyT
+        uYvjfUOlksUUUUU
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgwSB1ZdtcJ3NgAAsm
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kmemleak reported memory leaks in device_add_disk():
+This series of patches cleans up non-blk-mq functions in blk-mq.c to build
+a consistent blk_mq_* namespace.
 
-kmemleak: 3 new suspected memory leaks
+Jinlong Chen (3):
+  blk-mq: remove redundant call to blk_freeze_queue_start in
+    blk_mq_destroy_queue
+  blk-mq: remove blk_freeze_queue
+  block: hide back blk_freeze_queue_start and export its blk-mq alias
 
-unreferenced object 0xffff88800f420800 (size 512):
-  comm "modprobe", pid 4275, jiffies 4295639067 (age 223.512s)
-  hex dump (first 32 bytes):
-    04 00 00 00 08 00 00 00 01 00 00 00 00 00 00 00  ................
-    00 e1 f5 05 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<00000000d3662699>] kmalloc_trace+0x26/0x60
-    [<00000000edc7aadc>] wbt_init+0x50/0x6f0
-    [<0000000069601d16>] wbt_enable_default+0x157/0x1c0
-    [<0000000028fc393f>] blk_register_queue+0x2a4/0x420
-    [<000000007345a042>] device_add_disk+0x6fd/0xe40
-    [<0000000060e6aab0>] nbd_dev_add+0x828/0xbf0 [nbd]
-    ...
+ block/blk-core.c              | 13 +++++++++
+ block/blk-mq.c                | 52 ++++++++++++++---------------------
+ block/blk-pm.c                |  2 +-
+ block/blk.h                   |  2 +-
+ drivers/nvme/host/core.c      |  2 +-
+ drivers/nvme/host/multipath.c |  2 +-
+ include/linux/blk-mq.h        |  2 +-
+ 7 files changed, 39 insertions(+), 36 deletions(-)
 
-It is because the memory allocated in wbt_enable_default() is not
-released in device_add_disk() error path.
-Normally, these memory are freed in:
-
-del_gendisk()
-  rq_qos_exit()
-    rqos->ops->exit(rqos);
-      wbt_exit()
-
-So rq_qos_exit() is called to free the rq_wb memory for wbt_init().
-However in the error path of device_add_disk(), only
-blk_unregister_queue() is called and make rq_wb memory leaked.
-
-Add rq_qos_exit() to the error path to fix it.
-
-Fixes: 83cbce957446 ("block: add error handling for device_add_disk / add_disk")
-Signed-off-by: Chen Zhongjin <chenzhongjin@huawei.com>
----
- block/genhd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index fee90eb98b4a..0f9769db2de8 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -527,6 +527,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
- 		bdi_unregister(disk->bdi);
- out_unregister_queue:
- 	blk_unregister_queue(disk);
-+	rq_qos_exit(disk->queue);
- out_put_slave_dir:
- 	kobject_put(disk->slave_dir);
- out_put_holder_dir:
 -- 
-2.17.1
+2.31.1
 
