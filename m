@@ -2,84 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFDCECAAA1
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 18:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49064ECAAA1
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 20:19:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiJ3Srm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 14:47:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43908 "EHLO
+        id S229494AbiJ3UTP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 16:19:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiJ3Srl (ORCPT
+        with ESMTP id S229476AbiJ3UTO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 14:47:41 -0400
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8834562CE
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 11:47:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=WZHaOXZSQl1Gx2UwmlfgjO5egX5KL1UtlVsNFcqgE1A=; b=dB9MWYnuBeUbVHVshZvikbZq9a
-        8gMKTbq0xTSqWDWUtfOBS81k85c3uEad9FKEMquo22YttpDf479wksBMR07XwXGgCOTsVNa3MmZ8p
-        QSUq9VTfp8Vt/2LBvs8Qu5MWzvJ2yaEkAiBPnEuGrd/JhiWr45rl7XI1Vgx0bRVa+ABD0+x4cfbGI
-        m04ZvaHkQoGyaFa2QbGt8adsXYScv8E3/9vYjHQ3/g8Tc1mwR0fEdaHSe2kVXk2sWhOFmWK31mYoM
-        L3adyeneeEXP74yV7wXsd0Pyzbd8VkGudU/ew6Xt9EuOMRpANxfidEOop00cErLKCGcp+RG0/98Dj
-        xnK1Gp+A==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-        id 1opDLJ-00GHnC-11;
-        Sun, 30 Oct 2022 18:47:33 +0000
-Date:   Sun, 30 Oct 2022 18:47:33 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [bug?] blk_queue_may_bounce() has the comparison max_low_pfn and
- max_pfn wrong way
-Message-ID: <Y17GxQf8TV2/zNo1@ZenIV>
-References: <Y1wZTtENDq3fvs6n@ZenIV>
- <01ce222b-8ad6-b4b3-428a-bae9534795e7@kernel.dk>
- <Y1wr0g39GzHcAk9v@ZenIV>
- <Y11YuS3kiOWoOjuI@ZenIV>
- <20221030075032.GC4214@lst.de>
+        Sun, 30 Oct 2022 16:19:14 -0400
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F009A18F;
+        Sun, 30 Oct 2022 13:19:14 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id io19so9104715plb.8;
+        Sun, 30 Oct 2022 13:19:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CpcsaYxX2/iZPVTp5DAYjYaAQ7Q9mqzIBJhkkWXT9KI=;
+        b=vu0TPKGcdmlcF9FBWopcH8ixG6IMGpdlC7S5v8eebz5THEQq1TR9rHP0a0O/y/jLZg
+         kDjqwcGe7/Z/esXQdnJg7LuaUCk+UytSg+y+O15aNRKU8Hg1GzQstEGli4urFkffdg2S
+         uk5pb0JfFnuYGie4gkgVzQAIkJHgNtDLfFp4OiX99VKfmeO9Q7whHSPNNqH6IYzxFlvC
+         I8UneGzOtJ+Xs8ctPffo8Ft6sk9OMHuItFiBW8rbR2d6IyGAxFMnYWKChFLNlHq53mtQ
+         FSZeEEdgKXta+2TMxX+qJ0xv6Fv7j1dKM6y8SrM5vgoS3f10aLkWMK13LBwUyEf/fSfV
+         S3LQ==
+X-Gm-Message-State: ACrzQf3FseWQxoditB/avn05kTjupd0TjS1I0CX98xTdo7Oa4J4S7cLS
+        Es3O6rh97yjR9UqGxZl+jJ/+LC+XXAI=
+X-Google-Smtp-Source: AMsMyM6m6X1LDQAhui8BGKPfZ1MNzm6uykXWqEcVPHk/HTI+9TH+KyBI8USgMbD8mUXjQcrwLSY+ZQ==
+X-Received: by 2002:a17:902:f786:b0:180:6f9e:23b with SMTP id q6-20020a170902f78600b001806f9e023bmr10961455pln.37.1667161153435;
+        Sun, 30 Oct 2022 13:19:13 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id w2-20020a623002000000b00561beff1e09sm3010408pfw.164.2022.10.30.13.19.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Oct 2022 13:19:12 -0700 (PDT)
+Message-ID: <036eb44a-fd6a-4460-49d0-5f596452d1e1@acm.org>
+Date:   Sun, 30 Oct 2022 13:19:10 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221030075032.GC4214@lst.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 1/3] blk-mq: remove redundant call to
+ blk_freeze_queue_start in blk_mq_destroy_queue
+Content-Language: en-US
+To:     Jinlong Chen <nickyc975@zju.edu.cn>
+Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+References: <cover.1667035519.git.nickyc975@zju.edu.cn>
+ <ebd3a47a1ebf4ab518c985cdbaa1ac3afd6dfb9f.1667035519.git.nickyc975@zju.edu.cn>
+ <adaea16a-c7cd-5d68-50c8-d56de851061a@acm.org>
+ <42681e4e.15223d.18426b71124.Coremail.nickyc975@zju.edu.cn>
+ <9a758d91-42c5-d6b3-ddde-9c2b89d741a6@acm.org>
+ <fb1acbc.15062f.18429642056.Coremail.nickyc975@zju.edu.cn>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <fb1acbc.15062f.18429642056.Coremail.nickyc975@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Oct 30, 2022 at 08:50:32AM +0100, Christoph Hellwig wrote:
-> On Sat, Oct 29, 2022 at 05:45:45PM +0100, Al Viro wrote:
-> > completion (in NULL_Q_BIO case, at least).  What happens if request
-> > gets split and split-off part finishes first with an error?  AFAICS,
-> > its ->bi_status will be copied to parent (original bio, the one that
-> > covers the tail).  Now the IO on the original bio is over as well
-> > and we hit drivers/block/null_blk/main.c:end_cmd().  Suppose this
-> > part succeeds; won't we end up overwriting ->bi_status with zero
-> > and assuming that the entire thing had succeeded, despite the
-> > (now lost) error on the split-off part?
+On 10/30/22 07:55, Jinlong Chen wrote:
+>>> So I think there is a redundant call to blk_freeze_queue_start(), we
+>>> just need to call blk_mq_freeze_queue_wait() after calling
+>>> blk_queue_start_drain().
+>>
+>> I think it is on purpose that blk_queue_start_drain() freezes the
+>> request queue and never unfreezes it. So if you want to change this
+>> behavior it's up to you to motivate why you want to change this behavior
+>> and also why it is safe to make that change. See also commit
+>> d3cfb2a0ac0b ("block: block new I/O just after queue is set as dying").
 > 
-> As a rule of thumb drives should never set bi_status to 0, so null_blk
-> here has a bug.  What is missing everywhere is proper memory barriers,
-> though.
+> I think there might be some misunderstanding. I didn't touch
+> blk_queue_start_drain(), so its behavior is not changed. What I have done
+> is just replacing blk_freeze_queue() with blk_mq_freeze_queue_wait() in
+> blk_mq_destroy_queue().
 
-Something like
+Hi Jinlong,
 
-static inline void set_bio_status(struct bio *bio, blk_status_t status)
-{
-	if (unlikely(status))
-		cmpxchg(&bio->bi_status, 0, status);
-}
+Does this mean that you want me to provide more information about what I 
+wrote? Without this patch, blk_mq_destroy_queue() uses two mechanisms to 
+block future I/O requests:
+1. Set the flag QUEUE_FLAG_DYING.
+2. Freeze the request queue and leave it frozen.
 
-with e.g.
-        if (bio->bi_status && !dio->bio.bi_status)
-		dio->bio.bi_status = bio->bi_status;
-in blkdev_bio_end_io() replaced with
-	set_bio_status(&dio->bio, bio->bi_status);
+Your patch modifies blk_mq_destroy_queue() such that it unfreezes the 
+request queue after I/O has been quiesced instead of leaving it frozen. 
+I would appreciate it if Ming Lei (Cc-ed) could comment on this change 
+since I think that Ming introduced (2) in blk_mq_destroy_queue() 
+(formerly called blk_cleanup_queue()).
 
-perhaps?  That would probably do for almost all users, but...  what about
-e.g. drivers/md/raid1.c:fix_sync_read_error()?  Looks like it really
-intends non-zero -> zero change; I'm not familiar enough with the guts
-of that sucker to tell if it is guaranteed to get no propagation from
-another bio...
+Thanks,
+
+Bart.
