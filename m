@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60342C38A02
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 10:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E37CFA373D
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 10:07:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230113AbiJ3KHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 06:07:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54122 "EHLO
+        id S230112AbiJ3KHo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 06:07:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230112AbiJ3KHl (ORCPT
+        with ESMTP id S230102AbiJ3KHo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 06:07:41 -0400
+        Sun, 30 Oct 2022 06:07:44 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96A5C2AED
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 03:07:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6531F2
+        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 03:07:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=vRxbU4y5dur/pS0O7i0POtDhkVLpnO8QZLzO4ygGgew=; b=iBwF2okUuO3PQYS6VnpY4ejE16
-        MhKEmv8aXJFfy/iPMDrPPQkuH+97fMWzmJZZWuo5jYDRR+U8S9ZPnV0/mdSugMluVlu2JdIEX28Qa
-        JDrGqCG1qqPiuV75iWPhG+0bK/SA5+z9tUuQgVWW+qykoBu+T4+AGUZlFIb9tY7VQ4xWxz0VO3OqF
-        B26kyi4rFxh/c4iFIpwBsZaty6K2uD4aJXvPNvbD3vT02lImkvw3sCgsMJaCeYucABUjRtld0Ezde
-        cXxsdJ98d6KjRqBD9ZYa18/TML09ylWxqi3OWF8gLP1A9g0a0nKTR5p6PtZGi0PPAtMS4VrE/ZlNi
-        4/XeBk/g==;
+        bh=4c0WdD1P3xzEWKvGeAJDqWeuPkp65sLTQP2bAdYLIy4=; b=vthMF6oKO3m790sDU7+wMXb/fK
+        /+PzWDgFpNdAYP3QFiTAHUKKQXmVwrss0DwK+jLE8iEeQcOiMo0B1Xi4yq+qHsNG7m9KVDQgCVq6B
+        SbNArDL6dm5EE6UsAkLQo7aN7pmhA2HFT/pl2zKVI0lCklz9qd1nGFfibLA0mKY2tgEGasTzwjYNg
+        iv7iYZi2/PVr+7oFaWLkWFNOh4+/C6nLZTR5dkTCBdCzYTEelBAIwLPFLELdNgdqQkZEAVegY3n2t
+        KzJeTW/HBGmY6I2rwrZaqrXhUB6t3gF+Tzwm+5yu7OtNCpspp15LjAJ5GpzZTk1AEUzJhKf1HZUxS
+        rMOTC8/g==;
 Received: from [2001:4bb8:199:6818:1c2a:5f62:2eb:6092] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1op5EB-00F8RS-Sy; Sun, 30 Oct 2022 10:07:40 +0000
+        id 1op5EE-00F8SJ-DU; Sun, 30 Oct 2022 10:07:42 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 6/7] block: don't check for required features in elevator_match
-Date:   Sun, 30 Oct 2022 11:07:13 +0100
-Message-Id: <20221030100714.876891-7-hch@lst.de>
+Subject: [PATCH 7/7] block: split elevator_switch
+Date:   Sun, 30 Oct 2022 11:07:14 +0100
+Message-Id: <20221030100714.876891-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221030100714.876891-1-hch@lst.de>
 References: <20221030100714.876891-1-hch@lst.de>
@@ -44,117 +44,174 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Checking for the required features in the callers simplifies the code
-quite a bit, so do that.
+Split an elevator_disable helper from elevator_switch for the case where
+we want to switch to no scheduler at all.  This includes removing the
+pointless elevator_switch_mq helper and removing the switch to no
+schedule logic from blk_mq_init_sched.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/elevator.c | 49 +++++++++++++++---------------------------------
- 1 file changed, 15 insertions(+), 34 deletions(-)
+ block/blk-mq-sched.c |  7 ----
+ block/blk-mq.c       |  2 +-
+ block/blk.h          |  1 +
+ block/elevator.c     | 77 ++++++++++++++++++++++----------------------
+ 4 files changed, 40 insertions(+), 47 deletions(-)
 
-diff --git a/block/elevator.c b/block/elevator.c
-index 77c16c5ef04ff..4042e524333e0 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -83,10 +83,11 @@ bool elv_bio_merge_ok(struct request *rq, struct bio *bio)
- }
- EXPORT_SYMBOL(elv_bio_merge_ok);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 68227240fdea3..23d1a90fec427 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -564,13 +564,6 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ 	unsigned long i;
+ 	int ret;
  
--static inline bool elv_support_features(unsigned int elv_features,
--					unsigned int required_features)
-+static inline bool elv_support_features(struct request_queue *q,
-+		const struct elevator_type *e)
- {
--	return (required_features & elv_features) == required_features;
-+	return (q->required_elevator_features & e->elevator_features) ==
-+		q->required_elevator_features;
- }
- 
- /**
-@@ -98,37 +99,19 @@ static inline bool elv_support_features(unsigned int elv_features,
-  * Return true if the elevator @e name matches @name and if @e provides all
-  * the features specified by @required_features.
-  */
--static bool elevator_match(const struct elevator_type *e, const char *name,
--			   unsigned int required_features)
-+static bool elevator_match(const struct elevator_type *e, const char *name)
- {
--	if (!elv_support_features(e->elevator_features, required_features))
--		return false;
--	if (!strcmp(e->elevator_name, name))
--		return true;
--	if (e->elevator_alias && !strcmp(e->elevator_alias, name))
--		return true;
--
--	return false;
-+	return !strcmp(e->elevator_name, name) ||
-+		(e->elevator_alias && !strcmp(e->elevator_alias, name));
- }
- 
--/**
-- * elevator_find - Find an elevator
-- * @name: Name of the elevator to find
-- * @required_features: Features that the elevator must provide
-- *
-- * Return the first registered scheduler with name @name and supporting the
-- * features @required_features and NULL otherwise.
-- */
--static struct elevator_type *elevator_find(const char *name,
--					   unsigned int required_features)
-+static struct elevator_type *__elevator_find(const char *name)
- {
- 	struct elevator_type *e;
- 
--	list_for_each_entry(e, &elv_list, list) {
--		if (elevator_match(e, name, required_features))
-+	list_for_each_entry(e, &elv_list, list)
-+		if (elevator_match(e, name))
- 			return e;
+-	if (!e) {
+-		blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
+-		q->elevator = NULL;
+-		q->nr_requests = q->tag_set->queue_depth;
+-		return 0;
 -	}
 -
- 	return NULL;
+ 	/*
+ 	 * Default to double of smaller one between hw queue_depth and 128,
+ 	 * since we don't split into sync/async like the old code did.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 4cecf281123f6..1ebb2e68ac66f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4556,7 +4556,7 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
+ 	__elevator_get(qe->type);
+ 	qe->type = q->elevator->type;
+ 	list_add(&qe->node, head);
+-	elevator_switch(q, NULL);
++	elevator_disable(q);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+ 	return true;
+diff --git a/block/blk.h b/block/blk.h
+index 7f9e089ab1f75..f1398fb96cec9 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -278,6 +278,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ void blk_insert_flush(struct request *rq);
+ 
+ int elevator_switch(struct request_queue *q, struct elevator_type *new_e);
++void elevator_disable(struct request_queue *q);
+ void elevator_exit(struct request_queue *q);
+ int elv_register_queue(struct request_queue *q, bool uevent);
+ void elv_unregister_queue(struct request_queue *q);
+diff --git a/block/elevator.c b/block/elevator.c
+index 4042e524333e0..6fdbfca1bc61e 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -548,39 +548,6 @@ void elv_unregister(struct elevator_type *e)
+ }
+ EXPORT_SYMBOL_GPL(elv_unregister);
+ 
+-static int elevator_switch_mq(struct request_queue *q,
+-			      struct elevator_type *new_e)
+-{
+-	int ret;
+-
+-	lockdep_assert_held(&q->sysfs_lock);
+-
+-	if (q->elevator) {
+-		elv_unregister_queue(q);
+-		elevator_exit(q);
+-	}
+-
+-	ret = blk_mq_init_sched(q, new_e);
+-	if (ret)
+-		goto out;
+-
+-	if (new_e) {
+-		ret = elv_register_queue(q, true);
+-		if (ret) {
+-			elevator_exit(q);
+-			goto out;
+-		}
+-	}
+-
+-	if (new_e)
+-		blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
+-	else
+-		blk_add_trace_msg(q, "elv switch: none");
+-
+-out:
+-	return ret;
+-}
+-
+ static inline bool elv_support_iosched(struct request_queue *q)
+ {
+ 	if (!queue_is_mq(q) ||
+@@ -685,19 +652,51 @@ void elevator_init_mq(struct request_queue *q)
+  */
+ int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
+ {
+-	int err;
++	int ret;
+ 
+ 	lockdep_assert_held(&q->sysfs_lock);
+ 
+ 	blk_mq_freeze_queue(q);
+ 	blk_mq_quiesce_queue(q);
+ 
+-	err = elevator_switch_mq(q, new_e);
++	if (q->elevator) {
++		elv_unregister_queue(q);
++		elevator_exit(q);
++	}
+ 
++	ret = blk_mq_init_sched(q, new_e);
++	if (ret)
++		goto out_unfreeze;
++
++	ret = elv_register_queue(q, true);
++	if (ret) {
++		elevator_exit(q);
++		goto out_unfreeze;
++	}
++	blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
++
++out_unfreeze:
+ 	blk_mq_unquiesce_queue(q);
+ 	blk_mq_unfreeze_queue(q);
++	return ret;
++}
++
++void elevator_disable(struct request_queue *q)
++{
++	lockdep_assert_held(&q->sysfs_lock);
+ 
+-	return err;
++	blk_mq_freeze_queue(q);
++	blk_mq_quiesce_queue(q);
++
++	elv_unregister_queue(q);
++	elevator_exit(q);
++	blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
++	q->elevator = NULL;
++	q->nr_requests = q->tag_set->queue_depth;
++	blk_add_trace_msg(q, "elv switch: none");
++
++	blk_mq_unquiesce_queue(q);
++	blk_mq_unfreeze_queue(q);
  }
  
-@@ -138,8 +121,8 @@ static struct elevator_type *elevator_find_get(struct request_queue *q,
- 	struct elevator_type *e;
- 
- 	spin_lock(&elv_list_lock);
--	e = elevator_find(name, q->required_elevator_features);
--	if (e && !elevator_tryget(e))
-+	e = __elevator_find(name);
-+	if (e && (!elv_support_features(q, e) || !elevator_tryget(e)))
- 		e = NULL;
- 	spin_unlock(&elv_list_lock);
- 	return e;
-@@ -633,8 +616,7 @@ static struct elevator_type *elevator_get_by_features(struct request_queue *q)
- 	spin_lock(&elv_list_lock);
- 
- 	list_for_each_entry(e, &elv_list, list) {
--		if (elv_support_features(e->elevator_features,
--					 q->required_elevator_features)) {
-+		if (elv_support_features(q, e)) {
- 			found = e;
- 			break;
- 		}
-@@ -739,7 +721,7 @@ static int elevator_change(struct request_queue *q, const char *elevator_name)
- 		return elevator_switch(q, NULL);
+ /*
+@@ -716,9 +715,9 @@ static int elevator_change(struct request_queue *q, const char *elevator_name)
+ 	 * Special case for mq, turn off scheduling
+ 	 */
+ 	if (!strncmp(elevator_name, "none", 4)) {
+-		if (!q->elevator)
+-			return 0;
+-		return elevator_switch(q, NULL);
++		if (q->elevator)
++			elevator_disable(q);
++		return 0;
  	}
  
--	if (q->elevator && elevator_match(q->elevator->type, elevator_name, 0))
-+	if (q->elevator && elevator_match(q->elevator->type, elevator_name))
- 		return 0;
- 
- 	e = elevator_find_get(q, elevator_name);
-@@ -790,8 +772,7 @@ ssize_t elv_iosched_show(struct request_queue *q, char *name)
- 			len += sprintf(name+len, "[%s] ", cur->elevator_name);
- 			continue;
- 		}
--		if (elevator_match(e, e->elevator_name,
--				   q->required_elevator_features))
-+		if (elv_support_features(q, e))
- 			len += sprintf(name+len, "%s ", e->elevator_name);
- 	}
- 	spin_unlock(&elv_list_lock);
+ 	if (q->elevator && elevator_match(q->elevator->type, elevator_name))
 -- 
 2.30.2
 
