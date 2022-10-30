@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F133FC38A02
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 15:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5952BFA3742
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 15:31:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbiJ3Pbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229587AbiJ3Pbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sun, 30 Oct 2022 11:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42420 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiJ3Pbu (ORCPT
+        with ESMTP id S229441AbiJ3Pbu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 30 Oct 2022 11:31:50 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A8E9631C
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A89960D0
         for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 08:31:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=zTDppyVAqgjt6x8MHfxYB0HakgzAN80FZOa1iFX34qw=; b=WkZHc3aAk6o0aRz5NSfVrylj0J
-        3mVSnH+JbxOEdMseCAUOW5TgOQ7HNxWogsjy0RBneiWt78qc2dP7V9eCrhLD8sL/UEqJuHsXzkOqr
-        nx9phXnCq5UDR3oz7nhpBIgOAosY+dHeCCJKZZRltd4sH3xtdXmgo2X6pxkdbXK3mN3TbRzUXcGan
-        PRzyv8mYGwPerJIeKWtXfSoAk+D2hi28xthlhQaF3No9YskEg1H0IH6GdLZN4MWSzpkkviod8vZWS
-        3X0eumy7ZWLDcuawt2VRnhuY8YRyEwMtHAcYp7PeUU5QdYsvHA5N56Z8JlYdjB7D3Op6EPN93x6lp
-        Wddi5J3w==;
+        bh=EFXUQkOni9cxO7luloI3Uc+qTKEe2mxoeIaJyoyA+KI=; b=mYsnIb/vIvKUMPPpC+qPOk1xz8
+        3BF9sX4dOSriQetS9eLQ5CFQtZUap+bgT2rkB5E0BnxkfwO0pxykV08tmknLMQCKQiPTbmsesOK/r
+        E8sxnGsRfus8SXIwtXBPVfY3xyHjCQVnnilBYSprfesGEO5jQu0ejuYoWgAWwh+Eiw6TnwpfH78uI
+        Yi3mYzRQsKfxTLzqyAm77WV6Liydqct8AzzHYCYKrmKxIrUD8sExKQNkYbqpEX0k6YI0PJzvV7rVb
+        biQ3K+BeTXsx0/dHig3UodLeWaSTgALKExIolzrTHvsKfr4G0AZECRE+jq74sdWHSlHSSviZd5SM1
+        w5xbYjmA==;
 Received: from 213-225-37-80.nat.highway.a1.net ([213.225.37.80] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1opAHk-00HVnk-8O; Sun, 30 Oct 2022 15:31:40 +0000
+        id 1opAHg-00HVkO-Tg; Sun, 30 Oct 2022 15:31:37 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>
 Cc:     Yu Kuai <yukuai1@huaweicloud.com>, dm-devel@redhat.com,
         linux-block@vger.kernel.org
-Subject: [PATCH 2/7] dm: remove free_table_devices
-Date:   Sun, 30 Oct 2022 16:31:14 +0100
-Message-Id: <20221030153120.1045101-3-hch@lst.de>
+Subject: [PATCH 1/7] block: clear ->slave_dir when dropping the main slave_dir reference
+Date:   Sun, 30 Oct 2022 16:31:13 +0100
+Message-Id: <20221030153120.1045101-2-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221030153120.1045101-1-hch@lst.de>
 References: <20221030153120.1045101-1-hch@lst.de>
@@ -46,50 +46,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-free_table_devices just warns and frees all table_device structures when
-the target removal did not remove them.  This should never happen, but
-if it did, just freeing the structure without deleting them from the
-list or cleaning up the resources would not help at all.  So just WARN on
-a non-empty list instead.
+Zero out the pointer to ->slave_dir so that the holder code doesn't
+incorrectly treat the object as alive when add_disk failed or after
+del_gendisk was called.
 
+Fixes: 89f871af1b26 ("dm: delay registering the gendisk")
+Reported-by: Yu Kuai <yukuai1@huaweicloud.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/dm.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+ block/genhd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 95a1ee3d314eb..19d25bf997be4 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -833,19 +833,6 @@ void dm_put_table_device(struct mapped_device *md, struct dm_dev *d)
- 	mutex_unlock(&md->table_devices_lock);
- }
+diff --git a/block/genhd.c b/block/genhd.c
+index 17b33c62423df..aa0e2f5684543 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -528,6 +528,7 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+ 	blk_unregister_queue(disk);
+ out_put_slave_dir:
+ 	kobject_put(disk->slave_dir);
++	disk->slave_dir = NULL;
+ out_put_holder_dir:
+ 	kobject_put(disk->part0->bd_holder_dir);
+ out_del_integrity:
+@@ -624,6 +625,7 @@ void del_gendisk(struct gendisk *disk)
  
--static void free_table_devices(struct list_head *devices)
--{
--	struct list_head *tmp, *next;
--
--	list_for_each_safe(tmp, next, devices) {
--		struct table_device *td = list_entry(tmp, struct table_device, list);
--
--		DMWARN("dm_destroy: %s still exists with %d references",
--		       td->dm_dev.name, refcount_read(&td->count));
--		kfree(td);
--	}
--}
--
- /*
-  * Get the geometry associated with a dm device
-  */
-@@ -2122,7 +2109,7 @@ static void free_dev(struct mapped_device *md)
+ 	kobject_put(disk->part0->bd_holder_dir);
+ 	kobject_put(disk->slave_dir);
++	disk->slave_dir = NULL;
  
- 	cleanup_mapped_device(md);
- 
--	free_table_devices(&md->table_devices);
-+	WARN_ON_ONCE(!list_empty(&md->table_devices));
- 	dm_stats_cleanup(&md->stats);
- 	free_minor(minor);
- 
+ 	part_stat_set_all(disk->part0, 0);
+ 	disk->part0->bd_stamp = 0;
 -- 
 2.30.2
 
