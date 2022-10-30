@@ -2,73 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3481AC38A02
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 02:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0559C433FE
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 03:01:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229556AbiJ3C1i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Oct 2022 22:27:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50962 "EHLO
+        id S229696AbiJ3DBD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Oct 2022 23:01:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJ3C1i (ORCPT
+        with ESMTP id S229549AbiJ3DBC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2022 22:27:38 -0400
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 595D527FC5;
-        Sat, 29 Oct 2022 19:27:35 -0700 (PDT)
-Received: by ajax-webmail-mail-app4 (Coremail) ; Sun, 30 Oct 2022 10:27:22
- +0800 (GMT+08:00)
-X-Originating-IP: [10.192.32.139]
-Date:   Sun, 30 Oct 2022 10:27:22 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
-To:     "Bart Van Assche" <bvanassche@acm.org>
-Cc:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: Re: [PATCH 1/3] blk-mq: remove redundant call to
- blk_freeze_queue_start in blk_mq_destroy_queue
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
-In-Reply-To: <adaea16a-c7cd-5d68-50c8-d56de851061a@acm.org>
-References: <cover.1667035519.git.nickyc975@zju.edu.cn>
- <ebd3a47a1ebf4ab518c985cdbaa1ac3afd6dfb9f.1667035519.git.nickyc975@zju.edu.cn>
- <adaea16a-c7cd-5d68-50c8-d56de851061a@acm.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        Sat, 29 Oct 2022 23:01:02 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A5D3120C;
+        Sat, 29 Oct 2022 20:01:01 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id 3-20020a17090a0f8300b00212d5cd4e5eso13151483pjz.4;
+        Sat, 29 Oct 2022 20:01:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L57Nna1Rv8qEqcyUYnO8glciVH+3HJrUIebXRiDcDRk=;
+        b=4dMdEZdYUivL0mImkS43nFL7OTCPcw6PhGulvX+WZY7SHYI/VX0NODTrUO+RgZMbBr
+         54qv0omEmMWBDNaTsLBUm4s0nr27Q87tIV3Dw2UChVGKqdGXxc7urYs/0lYsuFpTZXPI
+         eTVG3CVGAnOafuMknuiTUBIjWZnJchNTk2BKcfEsxQoJUBUkgvg3o4H5nUxjeCSxXOKU
+         175S33kq8MvObzvTEZOqliTN6YKVYrWfymH0OpXWKaTHiMgbeyqWItPwhVh5KqFJvzH3
+         N2eGdemRXQ9ln14z05ca8TxefqysMBO/PJfR3+vdvnkGGEefSAclNhur0a3Cmh5EuIlk
+         K2MQ==
+X-Gm-Message-State: ACrzQf2BAK0oRZZGwKmjOpsYIayJKjObLO8u1cPq6YDyjs8v9gkZuykM
+        k44yzvKbT9Q/eCEwF/xx1so=
+X-Google-Smtp-Source: AMsMyM6KEs8BdLvR89JK6qwNIWFT/QJ5AO1dPiPjzuYo+c3mrxv3gKDAf46FxNDMulcSoL/BP6m0MA==
+X-Received: by 2002:a17:903:124e:b0:179:da2f:244e with SMTP id u14-20020a170903124e00b00179da2f244emr7357905plh.169.1667098860592;
+        Sat, 29 Oct 2022 20:01:00 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id w15-20020a17090a028f00b001f94d25bfabsm1662704pja.28.2022.10.29.20.00.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 29 Oct 2022 20:00:59 -0700 (PDT)
+Message-ID: <8ccaabc1-2834-dad6-7d46-19bfc2adcc9a@acm.org>
+Date:   Sat, 29 Oct 2022 20:00:58 -0700
 MIME-Version: 1.0
-Message-ID: <42681e4e.15223d.18426b71124.Coremail.nickyc975@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: cS_KCgBXXP0K4V1j+p2eBw--.49366W
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAggTB1ZdtcKM4AAAsO
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v2] block: simplify blksize_bits() implementation
+Content-Language: en-US
+To:     Dawei Li <set_pte_at@outlook.com>, axboe@kernel.dk
+Cc:     hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <TYCP286MB232371C798BE0500E979E24CCA349@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <TYCP286MB232371C798BE0500E979E24CCA349@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGksIEJhcnQuCgo+ID4gQ2FsbGluZyBibGtfZnJlZXplX3F1ZXVlIHJlc3VsdHMgaW4gYSByZWR1
-bmRhbnQgY2FsbCB0bwo+ID4gYmxrX2ZyZWV6ZV9xdWV1ZV9zdGFydCBhcyBpdCBoYXMgYmVlbiBj
-YWxsZWQgaW4gYmxrX3F1ZXVlX3N0YXJ0X2RyYWluLgo+ID4gCj4gPiBSZXBsYWNlIGJsa19mcmVl
-emVfcXVldWUgd2l0aCBibGtfbXFfZnJlZXplX3F1ZXVlX3dhaXQgdG8gYXZvaWQgdGhlCj4gPiBy
-ZWR1bmRhbnQgY2FsbC4KPiAKPiBibGtfbXFfZGVzdHJveV9xdWV1ZSgpIGhhcyBtb3JlIGNhbGxl
-cnMgdGhhbiBibGtfcXVldWVfc3RhcnRfZHJhaW4oKSBzbyAKPiB0aGUgYWJvdmUgZGVzY3JpcHRp
-b24gaXMgYXQgbGVhc3QgbWlzbGVhZGluZy4KPiAKPiBBZGRpdGlvbmFsbHksIHRoZSB3b3JkICJj
-bGVhbnVwIiBmcm9tIHRoZSBwYXRjaCBzZXJpZXMgdGl0bGUgaW5kaWNhdGVzIAo+IHRoYXQgbm8g
-cGF0Y2ggaW4gdGhpcyBzZXJpZXMgY2hhbmdlcyB0aGUgYmVoYXZpb3Igb2YgdGhlIGNvZGUuIFRo
-aXMgCj4gcGF0Y2ggaW52b2x2ZXMgYSBiZWhhdmlvciBjaGFuZ2UuCgpTb3JyeSBmb3IgbXkgcG9v
-ciBkZXNjcmlwdGlvbi4gSSdsbCBzZW5kIGEgbmV3IHNlcmllcyB3aXRoIHRoZXNlCmRlc2NyaXB0
-aW9uIHByb2JsZW1zIHJlc29sdmVkLgoKPiBJIHRoaW5rIHRoaXMgcGF0Y2ggaW50cm9kdWNlcyBh
-IGhhbmcgZm9yIGV2ZXJ5IGNhbGxlciBvZiAKPiBibGtfbXFfZGVzdHJveV9xdWV1ZSgpIG90aGVy
-IHRoYW4gYmxrX3F1ZXVlX3N0YXJ0X2RyYWluKCkuCj4gCj4gQmFydC4KCkkgZG9uJ3Qgc2VlIHdo
-eSB0aGUgcGF0Y2ggaW50cm9kdWNlcyBhIGhhbmcuIFRoZSBjYWxsaW5nIHJlbGF0aW9uc2hpcCBp
-bgpibGtfbXFfZGVzdHJveV9xdWV1ZSBpcyBhcyBmb2xsb3dzOgoKYmxrX21xX2Rlc3Ryb3lfcXVl
-dWUoKQogICAgLi4uCiAgICAtPiBibGtfcXVldWVfc3RhcnRfZHJhaW4oKQogICAgICAgIC0+IGJs
-a19mcmVlemVfcXVldWVfc3RhcnQoKSAgPC0gY2FsbGVkCiAgICAgICAgLi4uCiAgICAtPiBibGtf
-ZnJlZXplX3F1ZXVlKCkKICAgICAgICAtPiBibGtfZnJlZXplX3F1ZXVlX3N0YXJ0KCkgIDwtIGNh
-bGxlZCBhZ2FpbgogICAgICAgIC0+IGJsa19tcV9mcmVlemVfcXVldWVfd2FpdCgpCiAgICAuLi4K
-ClNvIEkgdGhpbmsgdGhlcmUgaXMgYSByZWR1bmRhbnQgY2FsbCB0byBibGtfZnJlZXplX3F1ZXVl
-X3N0YXJ0KCksIHdlCmp1c3QgbmVlZCB0byBjYWxsIGJsa19tcV9mcmVlemVfcXVldWVfd2FpdCgp
-IGFmdGVyIGNhbGxpbmcKYmxrX3F1ZXVlX3N0YXJ0X2RyYWluKCkuCgpUaGFua3MhCkppbmxvbmcg
-Q2hlbgoK
+On 10/29/22 19:17, Dawei Li wrote:
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 57ed49f20d2e..7b537afe8b38 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1349,12 +1349,7 @@ static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
+>   /* assumes size > 256 */
+>   static inline unsigned int blksize_bits(unsigned int size)
+>   {
+> -	unsigned int bits = 8;
+> -	do {
+> -		bits++;
+> -		size >>= 1;
+> -	} while (size > 256);
+> -	return bits;
+> +	return order_base_2((size + SECTOR_SIZE - 1) >> SECTOR_SHIFT) + SECTOR_SHIFT;
+>   }
+
+Why the rounding ("+ SECTOR_SIZE - 1")? The blksize_bits() argument 
+should be an argument of two.
+
+Thanks,
+
+Bart.
+
