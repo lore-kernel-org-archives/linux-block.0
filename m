@@ -2,216 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E37CFA373D
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 10:07:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B82C38A02
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 10:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230112AbiJ3KHo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 06:07:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54196 "EHLO
+        id S229574AbiJ3KfO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 06:35:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230102AbiJ3KHo (ORCPT
+        with ESMTP id S229520AbiJ3KfO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 06:07:44 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E6531F2
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 03:07:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=4c0WdD1P3xzEWKvGeAJDqWeuPkp65sLTQP2bAdYLIy4=; b=vthMF6oKO3m790sDU7+wMXb/fK
-        /+PzWDgFpNdAYP3QFiTAHUKKQXmVwrss0DwK+jLE8iEeQcOiMo0B1Xi4yq+qHsNG7m9KVDQgCVq6B
-        SbNArDL6dm5EE6UsAkLQo7aN7pmhA2HFT/pl2zKVI0lCklz9qd1nGFfibLA0mKY2tgEGasTzwjYNg
-        iv7iYZi2/PVr+7oFaWLkWFNOh4+/C6nLZTR5dkTCBdCzYTEelBAIwLPFLELdNgdqQkZEAVegY3n2t
-        KzJeTW/HBGmY6I2rwrZaqrXhUB6t3gF+Tzwm+5yu7OtNCpspp15LjAJ5GpzZTk1AEUzJhKf1HZUxS
-        rMOTC8/g==;
-Received: from [2001:4bb8:199:6818:1c2a:5f62:2eb:6092] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1op5EE-00F8SJ-DU; Sun, 30 Oct 2022 10:07:42 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 7/7] block: split elevator_switch
-Date:   Sun, 30 Oct 2022 11:07:14 +0100
-Message-Id: <20221030100714.876891-8-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221030100714.876891-1-hch@lst.de>
-References: <20221030100714.876891-1-hch@lst.de>
+        Sun, 30 Oct 2022 06:35:14 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0878C2D8;
+        Sun, 30 Oct 2022 03:35:13 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id t25so22927168ejb.8;
+        Sun, 30 Oct 2022 03:35:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HA/TsoWyYCiHqbEQKGIfjnR3yiWyLtF/oSx7LE7r7rE=;
+        b=DyfPL81gT9sRKhQCto4HVM/9Ec9iRKezFR98pTitKrkIL+YuNPm7cmM0is9FDbzvJY
+         80notpMeTjixUrtS3YZH7O31gCF+inhmcoGbZzc8Oe9T/NHVCcCmgY4JEClB9AvF157a
+         a4RwfPXZ9eVHMOdtDyjK0VTSGmz4eJ9aOWJGcXEPo7WbO2e9FIgadVhaSvZG9cT7XhEy
+         2B5om0Mox9vBzoqumPWd6htED1x142QxgdGqt2GSQ4uKgg1tGlSTiPspTix2BdNl+pdQ
+         Ym2VwByAQOruSYExxB/TkSJcWYc1lQk4w7dt2kfAqle8f/d63OmOHFTUPDDTerQHBKnS
+         /Ajw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HA/TsoWyYCiHqbEQKGIfjnR3yiWyLtF/oSx7LE7r7rE=;
+        b=LDuky4Dbu+ODFCVfi1wJMiMT9aTFkM8ppoJDXvnwTllUwgXTWoron00Dy4QPBDWgib
+         6/UIZPWjDfko9gomu6ZdQvLmXc6Ck9bUE389ysxi078BqbiWnZItWdiUexQwCu+1cEYx
+         uBSeYbrLuI2t/Yac95hKxYliwLOjqh+rxEXuGKaeRgePIqzA235BLzTzKnszFRuY71wq
+         4xvGEsLCUoKnKIIadAFLqiZ54yaNeTSt+17dlUVDSBXUt8rUXLj/FcAD6BwEvrsH2B0s
+         UhwmP/neEpWNUnva2WMHv2c4bvGn9noD/7QplD+qQ7Z9upLl2vbiJR13JwejxKGS7HhE
+         qUWw==
+X-Gm-Message-State: ACrzQf2rUVQxcZnOsGZfBPQ92c1GIpFSBfzDYz/rjmtRlrYGdco/FaTU
+        nigQA269F4W/XIM4pxD0u5HOsv4xxS4U5eKnksQbgj8Q6Zx+yw==
+X-Google-Smtp-Source: AMsMyM7aAsT7bTPpeukUaT9c6Q6CCksPZ2bYH2NEZX6yrJndIzBbWv8z2+x+2tTeur+MPxYYYq+B453QznyhMn40eHM=
+X-Received: by 2002:a17:907:c208:b0:7ad:a0df:d4c7 with SMTP id
+ ti8-20020a170907c20800b007ada0dfd4c7mr7499593ejc.312.1667126111351; Sun, 30
+ Oct 2022 03:35:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+From:   Wei Chen <harperchen1110@gmail.com>
+Date:   Sun, 30 Oct 2022 18:34:35 +0800
+Message-ID: <CAO4mrfffEyq9JzT=GJxzf7fUzXa0Pmx4J40qVDUepasnZ2QDgw@mail.gmail.com>
+Subject: INFO: rcu detected stall in blk_mq_requeue_work
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split an elevator_disable helper from elevator_switch for the case where
-we want to switch to no scheduler at all.  This includes removing the
-pointless elevator_switch_mq helper and removing the switch to no
-schedule logic from blk_mq_init_sched.
+Dear Linux Developer,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq-sched.c |  7 ----
- block/blk-mq.c       |  2 +-
- block/blk.h          |  1 +
- block/elevator.c     | 77 ++++++++++++++++++++++----------------------
- 4 files changed, 40 insertions(+), 47 deletions(-)
+Recently when using our tool to fuzz kernel, the following crash was triggered:
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 68227240fdea3..23d1a90fec427 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -564,13 +564,6 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
- 	unsigned long i;
- 	int ret;
- 
--	if (!e) {
--		blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
--		q->elevator = NULL;
--		q->nr_requests = q->tag_set->queue_depth;
--		return 0;
--	}
--
- 	/*
- 	 * Default to double of smaller one between hw queue_depth and 128,
- 	 * since we don't split into sync/async like the old code did.
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4cecf281123f6..1ebb2e68ac66f 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4556,7 +4556,7 @@ static bool blk_mq_elv_switch_none(struct list_head *head,
- 	__elevator_get(qe->type);
- 	qe->type = q->elevator->type;
- 	list_add(&qe->node, head);
--	elevator_switch(q, NULL);
-+	elevator_disable(q);
- 	mutex_unlock(&q->sysfs_lock);
- 
- 	return true;
-diff --git a/block/blk.h b/block/blk.h
-index 7f9e089ab1f75..f1398fb96cec9 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -278,6 +278,7 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
- void blk_insert_flush(struct request *rq);
- 
- int elevator_switch(struct request_queue *q, struct elevator_type *new_e);
-+void elevator_disable(struct request_queue *q);
- void elevator_exit(struct request_queue *q);
- int elv_register_queue(struct request_queue *q, bool uevent);
- void elv_unregister_queue(struct request_queue *q);
-diff --git a/block/elevator.c b/block/elevator.c
-index 4042e524333e0..6fdbfca1bc61e 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -548,39 +548,6 @@ void elv_unregister(struct elevator_type *e)
- }
- EXPORT_SYMBOL_GPL(elv_unregister);
- 
--static int elevator_switch_mq(struct request_queue *q,
--			      struct elevator_type *new_e)
--{
--	int ret;
--
--	lockdep_assert_held(&q->sysfs_lock);
--
--	if (q->elevator) {
--		elv_unregister_queue(q);
--		elevator_exit(q);
--	}
--
--	ret = blk_mq_init_sched(q, new_e);
--	if (ret)
--		goto out;
--
--	if (new_e) {
--		ret = elv_register_queue(q, true);
--		if (ret) {
--			elevator_exit(q);
--			goto out;
--		}
--	}
--
--	if (new_e)
--		blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
--	else
--		blk_add_trace_msg(q, "elv switch: none");
--
--out:
--	return ret;
--}
--
- static inline bool elv_support_iosched(struct request_queue *q)
- {
- 	if (!queue_is_mq(q) ||
-@@ -685,19 +652,51 @@ void elevator_init_mq(struct request_queue *q)
-  */
- int elevator_switch(struct request_queue *q, struct elevator_type *new_e)
- {
--	int err;
-+	int ret;
- 
- 	lockdep_assert_held(&q->sysfs_lock);
- 
- 	blk_mq_freeze_queue(q);
- 	blk_mq_quiesce_queue(q);
- 
--	err = elevator_switch_mq(q, new_e);
-+	if (q->elevator) {
-+		elv_unregister_queue(q);
-+		elevator_exit(q);
-+	}
- 
-+	ret = blk_mq_init_sched(q, new_e);
-+	if (ret)
-+		goto out_unfreeze;
-+
-+	ret = elv_register_queue(q, true);
-+	if (ret) {
-+		elevator_exit(q);
-+		goto out_unfreeze;
-+	}
-+	blk_add_trace_msg(q, "elv switch: %s", new_e->elevator_name);
-+
-+out_unfreeze:
- 	blk_mq_unquiesce_queue(q);
- 	blk_mq_unfreeze_queue(q);
-+	return ret;
-+}
-+
-+void elevator_disable(struct request_queue *q)
-+{
-+	lockdep_assert_held(&q->sysfs_lock);
- 
--	return err;
-+	blk_mq_freeze_queue(q);
-+	blk_mq_quiesce_queue(q);
-+
-+	elv_unregister_queue(q);
-+	elevator_exit(q);
-+	blk_queue_flag_clear(QUEUE_FLAG_SQ_SCHED, q);
-+	q->elevator = NULL;
-+	q->nr_requests = q->tag_set->queue_depth;
-+	blk_add_trace_msg(q, "elv switch: none");
-+
-+	blk_mq_unquiesce_queue(q);
-+	blk_mq_unfreeze_queue(q);
- }
- 
- /*
-@@ -716,9 +715,9 @@ static int elevator_change(struct request_queue *q, const char *elevator_name)
- 	 * Special case for mq, turn off scheduling
- 	 */
- 	if (!strncmp(elevator_name, "none", 4)) {
--		if (!q->elevator)
--			return 0;
--		return elevator_switch(q, NULL);
-+		if (q->elevator)
-+			elevator_disable(q);
-+		return 0;
- 	}
- 
- 	if (q->elevator && elevator_match(q->elevator->type, elevator_name))
--- 
-2.30.2
+HEAD commit: 64570fbc14f8 Linux 5.15-rc5
+git tree: upstream
+compiler: gcc 8.0.1
+console output:
+https://drive.google.com/file/d/1KgH89-sBhQbB2t-kx_ChpMM1F-7leKuo/view?usp=share_link
+kernel config: https://drive.google.com/file/d/1uDOeEYgJDcLiSOrx9W8v2bqZ6uOA_55t/view?usp=share_link
 
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: Wei Chen <harperchen1110@gmail.com>
+
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+(detected by 1, t=18410 jiffies, g=171261, q=4)
+rcu: All QSes seen, last rcu_preempt kthread activity 17890
+(4295068194-4295050304), jiffies_till_next_fqs=1, root ->qsmask 0x0
+rcu: rcu_preempt kthread starved for 17890 jiffies! g171261 f0x2
+RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
+rcu: Unless rcu_preempt kthread gets sufficient CPU time, OOM is now
+expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:R
+  running task     stack:13832 pid:   16 ppid:     2 flags:0x00004000
+Call Trace:
+ __schedule+0x4a1/0x1720
+ schedule+0x36/0xe0
+ schedule_timeout+0x2d7/0x4d0
+ rcu_gp_fqs_loop+0x299/0x410
+ rcu_gp_kthread+0xd0/0x160
+ kthread+0x1a6/0x1e0
+ ret_from_fork+0x1f/0x30
+rcu: Stack dump where RCU GP kthread last ran:
+NMI backtrace for cpu 1
+CPU: 1 PID: 160 Comm: kworker/1:1H Not tainted 5.15.0-rc5 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+rel-1.13.0-48-gd9c812dda519-prebuilt.qemu.org 04/01/2014
+Workqueue: kblockd blk_mq_requeue_work
+
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0xcd/0x134
+ nmi_cpu_backtrace.cold.8+0xf3/0x118
+ nmi_trigger_cpumask_backtrace+0x18f/0x1c0
+ rcu_check_gp_kthread_starvation.cold.103+0xb6/0x1a5
+ rcu_sched_clock_irq+0xb1d/0x1020
+ update_process_times+0xcf/0x130
+ tick_sched_handle.isra.20+0x47/0xa0
+ tick_sched_timer+0xa2/0xc0
+ __hrtimer_run_queues+0x2ea/0x810
+ hrtimer_interrupt+0x12b/0x2c0
+ __sysvec_apic_timer_interrupt+0x9c/0x2c0
+ sysvec_apic_timer_interrupt+0x99/0xc0
+ </IRQ>
+ asm_sysvec_apic_timer_interrupt+0x12/0x20
+RIP: 0010:_raw_spin_unlock_irqrestore+0x38/0x60
+Code: 74 24 10 e8 8a a3 70 fc 48 89 ef e8 e2 d4 70 fc 81 e3 00 02 00
+00 75 25 9c 58 f6 c4 02 75 2c 48 85 db 74 01 fb bf 01 00 00 00 <e8> e3
+69 6c fc 65 8b 05 4c 17 42 7b 85 c0 74 0a 5b 5d c3 e8 70 e3
+RSP: 0018:ffffc90000f47b60 EFLAGS: 00000206
+RAX: 0000000000000002 RBX: 0000000000000200 RCX: 0000000000000006
+RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000001
+RBP: ffff88800e23cc00 R08: 0000000000000001 R09: 0000000000000001
+R10: 0000000000000005 R11: 0000000000000000 R12: ffff8881043a2780
+R13: 0000000000000246 R14: ffff88800e1ab000 R15: ffff88800e146e00
+ ata_scsi_queuecmd+0x5e/0x90
+ scsi_queue_rq+0x678/0x13e0
+ blk_mq_dispatch_rq_list+0x209/0xd10
+ __blk_mq_sched_dispatch_requests+0xf1/0x1f0
+ blk_mq_sched_dispatch_requests+0x5e/0xb0
+ __blk_mq_run_hw_queue+0x70/0xd0
+ __blk_mq_delay_run_hw_queue+0x315/0x370
+ blk_mq_run_hw_queue+0xb5/0x140
+ blk_mq_run_hw_queues+0x7d/0x150
+ blk_mq_requeue_work+0x1fe/0x230
+ process_one_work+0x3fa/0x9f0
+ worker_thread+0x42/0x5c0
+ kthread+0x1a6/0x1e0
+ ret_from_fork+0x1f/0x30
+----------------
+Code disassembly (best guess):
+   0: 74 24                je     0x26
+   2: 10 e8                adc    %ch,%al
+   4: 8a a3 70 fc 48 89    mov    -0x76b70390(%rbx),%ah
+   a: ef                    out    %eax,(%dx)
+   b: e8 e2 d4 70 fc        callq  0xfc70d4f2
+  10: 81 e3 00 02 00 00    and    $0x200,%ebx
+  16: 75 25                jne    0x3d
+  18: 9c                    pushfq
+  19: 58                    pop    %rax
+  1a: f6 c4 02              test   $0x2,%ah
+  1d: 75 2c                jne    0x4b
+  1f: 48 85 db              test   %rbx,%rbx
+  22: 74 01                je     0x25
+  24: fb                    sti
+  25: bf 01 00 00 00        mov    $0x1,%edi
+* 2a: e8 e3 69 6c fc        callq  0xfc6c6a12 <-- trapping instruction
+  2f: 65 8b 05 4c 17 42 7b mov    %gs:0x7b42174c(%rip),%eax        # 0x7b421782
+  36: 85 c0                test   %eax,%eax
+  38: 74 0a                je     0x44
+  3a: 5b                    pop    %rbx
+  3b: 5d                    pop    %rbp
+  3c: c3                    retq
+  3d: e8                    .byte 0xe8
+  3e: 70 e3                jo     0x23
+
+Best,
+Wei
