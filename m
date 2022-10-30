@@ -2,60 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F152C38A02
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 14:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EAE1C38A02
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 14:25:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbiJ3OEL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 10:04:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43280 "EHLO
+        id S229494AbiJ3OZu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 10:25:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJ3OEK (ORCPT
+        with ESMTP id S229441AbiJ3OZt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 10:04:10 -0400
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AB70BEAD
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 07:04:08 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.14.30.251])
-        by mail-app3 (Coremail) with SMTP id cC_KCgD3dLlOhF5jfOJ4CA--.30951S2;
-        Sun, 30 Oct 2022 22:04:06 +0800 (CST)
-From:   Jinlong Chen <nickyc975@zju.edu.cn>
-To:     hch@lst.de
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Jinlong Chen <nickyc975@zju.edu.cn>
-Subject: Re: misc elevator code cleanups
-Date:   Sun, 30 Oct 2022 22:03:57 +0800
-Message-Id: <20221030140357.1327019-1-nickyc975@zju.edu.cn>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221030100714.876891-1-hch@lst.de>
-References: <20221030100714.876891-1-hch@lst.de>
+        Sun, 30 Oct 2022 10:25:49 -0400
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4FAB4BB;
+        Sun, 30 Oct 2022 07:25:48 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so3925116pjk.1;
+        Sun, 30 Oct 2022 07:25:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DlUsVXBEKnWSmUCDw//iMFATDePe/mdqp+ek5UTPNEE=;
+        b=hJdbgh6ctGN7mp4ogK32sS4uj4giZxKXtTs+ml1N754c2VXP8Z7MjapNLnkRwurkOl
+         o6J969hNgjTxKsYDDnQtKJNV/VsXXkriB+3H/bH0V7HGJBMtVaHLGFTswhp2qyZOAUJk
+         RDNtkWBJWVP0EgsnGCxem9ix+9kwgMgSjU/L/N5pYe8+ia06MqTWASuAe8Yrm3wwSUdO
+         AFUAacH2ThNWf7z+v8lI/xnhYOutwnrFmjvVNnWvbIbdiHbDgDZWq7WL/Bu8GWDR5Aqi
+         tjWSKR7uCviZlE6YaWSEFZagc3ckuiTSOL3jo06Lvd/nlqsv7JVtm9U5z8XNKUpj7Upi
+         5kxA==
+X-Gm-Message-State: ACrzQf1YxAj4fmHnioYhraNxmI87XgCrCrzkQDZAjcdLYJpv7pa1UTYl
+        gtd6kCEzu4Sxqn6B2ZnAM4XAhr1Bojo=
+X-Google-Smtp-Source: AMsMyM6kbsZX1AjQpVrp9L1PHMcJdfj4whBoZlmlCsbKzzpmVhCS34FDVE6CLk69TeseCfE6bfZMzw==
+X-Received: by 2002:a17:90a:6d22:b0:213:7e1e:9be0 with SMTP id z31-20020a17090a6d2200b002137e1e9be0mr9805926pjj.17.1667139948115;
+        Sun, 30 Oct 2022 07:25:48 -0700 (PDT)
+Received: from [192.168.3.219] ([98.51.102.78])
+        by smtp.gmail.com with ESMTPSA id s4-20020a170903214400b00177e5d83d3esm2789734ple.88.2022.10.30.07.25.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Oct 2022 07:25:47 -0700 (PDT)
+Message-ID: <9a758d91-42c5-d6b3-ddde-9c2b89d741a6@acm.org>
+Date:   Sun, 30 Oct 2022 07:25:45 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: cC_KCgD3dLlOhF5jfOJ4CA--.30951S2
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYa7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
-        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-        Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
-        rcIFxwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4I
-        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-        WwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-        JVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJr
-        UvcSsGvfC2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAg0TB1ZdtcKlzgABsN
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 1/3] blk-mq: remove redundant call to
+ blk_freeze_queue_start in blk_mq_destroy_queue
+Content-Language: en-US
+To:     Jinlong Chen <nickyc975@zju.edu.cn>
+Cc:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+References: <cover.1667035519.git.nickyc975@zju.edu.cn>
+ <ebd3a47a1ebf4ab518c985cdbaa1ac3afd6dfb9f.1667035519.git.nickyc975@zju.edu.cn>
+ <adaea16a-c7cd-5d68-50c8-d56de851061a@acm.org>
+ <42681e4e.15223d.18426b71124.Coremail.nickyc975@zju.edu.cn>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <42681e4e.15223d.18426b71124.Coremail.nickyc975@zju.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Christoph!
+On 10/29/22 19:27, Jinlong Chen wrote:
+>> I think this patch introduces a hang for every caller of
+>> blk_mq_destroy_queue() other than blk_queue_start_drain().
+ >> I don't see why the patch introduces a hang. The calling relationship in
+> blk_mq_destroy_queue is as follows: [ ... ]
 
-Only elevator_find_get is calling __elevator_find after applying the
-series. Maybe we can just remove __elevator_find and move the list
-iterating logic into elevator_find_get?
+Agreed - what I wrote is wrong.
 
-Thanks!
-Jinlong Chen
+> So I think there is a redundant call to blk_freeze_queue_start(), we
+> just need to call blk_mq_freeze_queue_wait() after calling
+> blk_queue_start_drain().
+
+I think it is on purpose that blk_queue_start_drain() freezes the 
+request queue and never unfreezes it. So if you want to change this 
+behavior it's up to you to motivate why you want to change this behavior 
+and also why it is safe to make that change. See also commit 
+d3cfb2a0ac0b ("block: block new I/O just after queue is set as dying").
+
+Bart.
 
