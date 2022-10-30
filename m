@@ -2,83 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0559C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 03:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA9CC38A02
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 03:07:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbiJ3DBD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 29 Oct 2022 23:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54972 "EHLO
+        id S229730AbiJ3DH1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 29 Oct 2022 23:07:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbiJ3DBC (ORCPT
+        with ESMTP id S229549AbiJ3DH0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 29 Oct 2022 23:01:02 -0400
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29A5D3120C;
-        Sat, 29 Oct 2022 20:01:01 -0700 (PDT)
-Received: by mail-pj1-f47.google.com with SMTP id 3-20020a17090a0f8300b00212d5cd4e5eso13151483pjz.4;
-        Sat, 29 Oct 2022 20:01:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L57Nna1Rv8qEqcyUYnO8glciVH+3HJrUIebXRiDcDRk=;
-        b=4dMdEZdYUivL0mImkS43nFL7OTCPcw6PhGulvX+WZY7SHYI/VX0NODTrUO+RgZMbBr
-         54qv0omEmMWBDNaTsLBUm4s0nr27Q87tIV3Dw2UChVGKqdGXxc7urYs/0lYsuFpTZXPI
-         eTVG3CVGAnOafuMknuiTUBIjWZnJchNTk2BKcfEsxQoJUBUkgvg3o4H5nUxjeCSxXOKU
-         175S33kq8MvObzvTEZOqliTN6YKVYrWfymH0OpXWKaTHiMgbeyqWItPwhVh5KqFJvzH3
-         N2eGdemRXQ9ln14z05ca8TxefqysMBO/PJfR3+vdvnkGGEefSAclNhur0a3Cmh5EuIlk
-         K2MQ==
-X-Gm-Message-State: ACrzQf2BAK0oRZZGwKmjOpsYIayJKjObLO8u1cPq6YDyjs8v9gkZuykM
-        k44yzvKbT9Q/eCEwF/xx1so=
-X-Google-Smtp-Source: AMsMyM6KEs8BdLvR89JK6qwNIWFT/QJ5AO1dPiPjzuYo+c3mrxv3gKDAf46FxNDMulcSoL/BP6m0MA==
-X-Received: by 2002:a17:903:124e:b0:179:da2f:244e with SMTP id u14-20020a170903124e00b00179da2f244emr7357905plh.169.1667098860592;
-        Sat, 29 Oct 2022 20:01:00 -0700 (PDT)
-Received: from [192.168.3.219] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id w15-20020a17090a028f00b001f94d25bfabsm1662704pja.28.2022.10.29.20.00.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Oct 2022 20:00:59 -0700 (PDT)
-Message-ID: <8ccaabc1-2834-dad6-7d46-19bfc2adcc9a@acm.org>
-Date:   Sat, 29 Oct 2022 20:00:58 -0700
+        Sat, 29 Oct 2022 23:07:26 -0400
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5085E3609E;
+        Sat, 29 Oct 2022 20:07:24 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.14.30.251])
+        by mail-app3 (Coremail) with SMTP id cC_KCgAXlrpJ6l1jv9B1CA--.27265S2;
+        Sun, 30 Oct 2022 11:07:14 +0800 (CST)
+From:   Jinlong Chen <nickyc975@zju.edu.cn>
+To:     axboe@kernel.dk, kbusch@kernel.org, hch@lst.de, sagi@grimberg.me
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, nickyc975@zju.edu.cn
+Subject: [PATCH v2 0/3] queue freezing improvement and cleanups
+Date:   Sun, 30 Oct 2022 11:06:45 +0800
+Message-Id: <cover.1667098953.git.nickyc975@zju.edu.cn>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v2] block: simplify blksize_bits() implementation
-Content-Language: en-US
-To:     Dawei Li <set_pte_at@outlook.com>, axboe@kernel.dk
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <TYCP286MB232371C798BE0500E979E24CCA349@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <TYCP286MB232371C798BE0500E979E24CCA349@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cC_KCgAXlrpJ6l1jv9B1CA--.27265S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZr4DCF48AF4kXr43AF15twb_yoWxtFc_ua
+        4UAFyxtrs7GF13ZFyjk3W5AFWvkw4UXr18tFWDtrW5Ar97AF45Ja1S9rWkWws8WanrC3Wk
+        Gr1UGr1xJr4xJjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbs8Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
+        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
+        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E
+        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6c
+        xK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
+        Yx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
+        WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42xK82IYc2Ij
+        64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI
+        8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
+        xVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
+        8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280
+        aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43
+        ZEXa7VUbHa0DUUUUU==
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAggTB1ZdtcKM4AABsP
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/29/22 19:17, Dawei Li wrote:
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 57ed49f20d2e..7b537afe8b38 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1349,12 +1349,7 @@ static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
->   /* assumes size > 256 */
->   static inline unsigned int blksize_bits(unsigned int size)
->   {
-> -	unsigned int bits = 8;
-> -	do {
-> -		bits++;
-> -		size >>= 1;
-> -	} while (size > 256);
-> -	return bits;
-> +	return order_base_2((size + SECTOR_SIZE - 1) >> SECTOR_SHIFT) + SECTOR_SHIFT;
->   }
+Hi!
 
-Why the rounding ("+ SECTOR_SIZE - 1")? The blksize_bits() argument 
-should be an argument of two.
+This series of patches improves and cleans up queue freezing in blk-mq.c
+to build a clearer blk_mq_* namespace.
 
-Thanks,
+Changes in v2:
+- improved descriptions in patch series title and patch 1.
 
-Bart.
+Jinlong Chen (3):
+  blk-mq: remove redundant call to blk_freeze_queue_start in
+    blk_mq_destroy_queue
+  blk-mq: remove blk_freeze_queue
+  block: hide back blk_freeze_queue_start and export its blk-mq alias
+
+ block/blk-core.c              | 13 +++++++++
+ block/blk-mq.c                | 52 ++++++++++++++---------------------
+ block/blk-pm.c                |  2 +-
+ block/blk.h                   |  2 +-
+ drivers/nvme/host/core.c      |  2 +-
+ drivers/nvme/host/multipath.c |  2 +-
+ include/linux/blk-mq.h        |  2 +-
+ 7 files changed, 39 insertions(+), 36 deletions(-)
+
+-- 
+2.31.1
 
