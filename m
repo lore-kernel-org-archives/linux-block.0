@@ -2,833 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F47C38A02
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 04:35:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47249C38A02
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 05:20:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiJ3Efy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 00:35:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59232 "EHLO
+        id S229489AbiJ3FUe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 01:20:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiJ3Efw (ORCPT
+        with ESMTP id S229494AbiJ3FUc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 00:35:52 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA75945997
-        for <linux-block@vger.kernel.org>; Sat, 29 Oct 2022 21:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1667104550; x=1698640550;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=q/U0WZpzblpVW+YVbDeoY5FA/y4XdDYPZrTwO9B/WBQ=;
-  b=mZM5xmsENiFUJ9CVgwj33yGBn/asReg/JkriYsNokzxtiaT2rtcqX3dx
-   UPuYOCDMZC7QMqcOW1Gcd+Bm0HvzaSauXD5TBebiQd/fH84Mz+53eO9dX
-   wgJR+FL88SACTNhCpOkxcDcBElL5bKPZzmaCd5SU47MG+jikcO7P6Vz16
-   uD9TexKRFQBeGzq1IFwAdrJafqRXesRJCWf4x6jeZYd8DvjUrbd1mWOgT
-   ZYPa563oNBwcx0nt3rUhtwGkA49zsFG1IKMq3xvaaFjbN7zuKDqUZ9NaL
-   zqanvmKeOtiaU9aYYGICEMgWSvndCUatelAJHS0s+aP2xMzn9xplS8qZf
-   A==;
-X-IronPort-AV: E=Sophos;i="5.95,225,1661788800"; 
-   d="scan'208";a="213350185"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Oct 2022 12:35:49 +0800
-IronPort-SDR: 59WkWI82AW8okKQHglBNy/ApbFMJPmAF8F8/E4Z1g9LNGjnPBfhz7NjkXPh4NT+Ml6Ya4SdObz
- 6q4af0BxqZBYWFh9Agc9Hv0TY/lrE6g9UxyXTHALL2vfdnlGPhoI1oHdHDAAkqfkDOex1Xbrhy
- Vdt8b/dCx+latDVdKzSKZtNYzR9vOz2FO9hp+ZYpv+hkQq3S34rv06CF93B6qzA8S68sJCZEBN
- CbbbyAk9g/IKcRN9z9xPTctlOYOPs34Gn7R8ob7HQZ9nRM6quqIB+AV5DIN7cbJ2nrf6rKKV8P
- U9WFRHn1hT7gA26BuvkPk0C0
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Oct 2022 20:49:23 -0700
-IronPort-SDR: wvX6b5Lbvog3/P1CzWkdVsN2qFvdSJOfLj8rUX2qFsNQDWXfGaJ9ysxnUqx/XYcpzNjMD/drYb
- fn6ZnuSKQBVq21FAugAd9NeIFZi+n/k1mphNDJD+2KoDZnFh8oAF0HqUj8zovpD7pN0k6jPn21
- 8/A/TLQFhpOZGZil0lUWz8jqfj/gbX+GwfL8EXmoxZcsvxF/vLQKyytoV8OXA91lfs6G33Jcxi
- Qi5WrG72eZH1tPifSPGfz+mgEE+7bOE9uzT6yKeMpqARsPe6uALGuhzd0xvv7wCTZVXmIl+Mpz
- tw4=
-WDCIronportException: Internal
-Received: from unknown (HELO oryx.wdc.com) ([10.225.167.43])
-  by uls-op-cesaip02.wdc.com with ESMTP; 29 Oct 2022 21:35:49 -0700
-From:   Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Stefan Hajnoczi <stefanha@gmail.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Sam Li <faithilikerun@gmail.com>
-Cc:     virtio-dev@lists.oasis-open.org,
-        Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: [PATCH v4 2/2] virtio-blk: add support for zoned block devices
-Date:   Sun, 30 Oct 2022 00:35:45 -0400
-Message-Id: <20221030043545.974223-3-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221030043545.974223-1-dmitry.fomichev@wdc.com>
-References: <20221030043545.974223-1-dmitry.fomichev@wdc.com>
-MIME-Version: 1.0
+        Sun, 30 Oct 2022 01:20:32 -0400
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01olkn2092.outbound.protection.outlook.com [40.92.99.92])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E09D62CC85;
+        Sat, 29 Oct 2022 22:20:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LCAYQHcWrzcsEnwlaqr6vbrFJy/PM6etFiNzQcHVwYeWmTAkC7F7sRw7FWMD1OAKfOcdmJMoPpHlic2blcYV2rc+jN6/fR4B/QEJh27ieveMDQHYUZ1M0f/gB/sEwq4E0n1K5ZZuq7Lv9mi7+1K7OJAnGJ+LFfdP2cMG73TdB8FbDYWQ75pKvek/dk7FKs0i49mhb9fbSS3iAmLP8cPweuE0j9e52uOs69Pp/GUgNEC2twsufG3+XvXTIM/wxDtMrbZM72/Y6fWN0vZg5jvhSoKCRbTDxloSqMwrkSbcdWQ3KLbesviTCBPU4ttfujmqrIsdg5Wr7gcgwRGi7RwMqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lTJ2HuWWX3ZrnZYVyUH8xwOTjP3lfQyYAiSBDMD8ry8=;
+ b=FEJCYETZeJQeC7QZlumHjL5DfKi6+KymykEHo17g4FadEUg3+C2rkrue+HgZHOO4gQeNCdj1Ko2jvpLFEryE3hPqZ7Ybe72ZucuLY3VBOG30z/0R+VEkZDpA3Af2A+hrN3O1drDpguY7VAmXnTIKs21Qop7DsRPSWB3hVLlDBf+0b7LNpYOM1m4cp2l/jxmVTPtgZgeZcAs31PnPrSushOODisOPcrikOIovh2DVYRIxACQYJvRTsgVdWyhrXD+pqJPd7bYCHqIMmCuqjo5ejejYPZLEl3U1Lqbwl6iyYMlBw5+9TKQ38PdERX8+EkJV2yT26qO/LdkBt5T0UUcQQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lTJ2HuWWX3ZrnZYVyUH8xwOTjP3lfQyYAiSBDMD8ry8=;
+ b=RyEPpxuknaXgj1PcAcpaX7WvRNJzDBvL14vppsDcCJtJAKzZGmT9m0FjRCn+SWNvRopEbAaVv0jjmTyd9MZTfdO0638a+rhV8BAZMqVOXl2SohsEeCjz543nyZ0IedaTAsEbeftyG78hfftUtzthU16g30SojdKrU2r6QimjofjPPF+8o9cxIHMldrykYop8aQqVFs1XhoXcERNaxAWPVZzI5i/38cP9RE0+LNkqqWEyCW7mmRpxNbICOpXYjOn44Hv1do0TTd/Ih+zZmYVwtpAZJtQB6gUQadXjYiZN7MoAeLG3vNLwSlHccbHvP3cNspkEhg0qt8lhLQz/Qpdcsw==
+Received: from TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:152::9)
+ by OSZP286MB1968.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:181::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.18; Sun, 30 Oct
+ 2022 05:20:26 +0000
+Received: from TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::c90e:cbf3:c23d:43a5]) by TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::c90e:cbf3:c23d:43a5%7]) with mapi id 15.20.5769.018; Sun, 30 Oct 2022
+ 05:20:26 +0000
+From:   Dawei Li <set_pte_at@outlook.com>
+To:     axboe@kernel.dk
+Cc:     bvanassche@acm.org, hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Dawei Li <set_pte_at@outlook.com>
+Subject: [PATCH v3] block: simplify blksize_bits() implementation
+Date:   Sun, 30 Oct 2022 13:20:08 +0800
+Message-ID: <TYCP286MB23238842958D7C083D6B67CECA349@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.25.1
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [gDpJn+dl8hZsB8/LKwM/zZG0/N7WoT6k6ASnKAZQwBA=]
+X-ClientProxiedBy: SG2PR01CA0165.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:28::21) To TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:152::9)
+X-Microsoft-Original-Message-ID: <20221030052008.22283-1-set_pte_at@outlook.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYCP286MB2323:EE_|OSZP286MB1968:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4e853545-0a37-4ad3-8d3a-08daba3673c4
+X-MS-Exchange-SLBlob-MailProps: ZLYX9kf+sFbSGQPCthfGnzMHvcLRKUdKeNqTJvdXx5zmkqUzjKz3rCo1at5+Zm1Mgj9Sx22hZoF1uwnZHrcLUEpccZHbcqAgEdPXzqxts63qYMSKgs9z9nxD+YFbm7R1ccnouNuCvhmxr4YpXayGRxeRAVM2I1wwEtZZ/izsMPaG4L6GMaY2AB/GQdo52vCc1PQLNkA2IPQfP6AqSk+pJDEDZfLAJ3vceJY+H09psnM2OjWO8+Ph8lsMemL9w9FH0aXmzR7DhsctJ1GTT9gm9cZE1TbwQ2ty+YnnAOD0KRhj1gc3jrvSxSeMcIkV6Nu+XD4G7zEw+uplInh7YsxCP/+bwb0WB1IHhSyH1Efj2Xg63Q813YFQNwcOzI/SCsyYE7B0p6w3bCRAAOYI0Sn2klPgH/0uBtEcEYSs7qHtpg6xks5X3dq/tdwO35ynHinUSaroQ7BTucRrJEiQ+Z7trHBgqoL9x7JtqQsN+7efflL1nAQUrg3NERGv3gZq1JvZh7o89gRXwUA/tY9WjpoIDS8IxWrxil2PDK31rKvhsgd1fscuyWpqELqT96VYcygI2Oj0qla5vKMBZwNmcD9cQ3NUYMj0hUaPhihBinx9oVGVP42DcG4LxT4CWQdRgdJL9Ox7OEy3HotmLvRQb5GarvGyJIkZif7ptj4KD4wZQ22cH5wc3+e9qppzYU2QOK6iX60dkgZN7dhKinNL79WLXmuF4p5MCoAlLOnQQvbeHbKx4QisGQqOU1mDVVBSa9YsdLMGEljELlsIWKevTTAvBJ8D2zfGFd2BU7pdprs9Dc0x4BKQ3jgH2Q==
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZQ4Tz6yPIMI/ZPbs/4mYkphu+2I3rbpTxm2vYYxfqz1/HD4S3mFxwk4iiIs8NktwD9hGtZK3QZ6bDKb3vnM33eoj3nOPVPXOjOASy2OUL0ANKg+Qnei+bASz25D/H53jzbNZEdir3AIn7BMkKH8IfWv2GppdxZsuzsZ0KMaKLgsj4DgshjF6V+UBjdEeSMAft4WuTivxBK0pFWaPwYJCdyjf9kdZ5FD8CFyqdDg2XxNSHDD7fQEu90Sb0MHHICEMggDF/EjLFUGi/B/aQpuoDGGxj4a7J7/Nj3w7xMrwfzfLm/PlYHSIhg51/tV3ZdT+G0l14YFPhJ8gz8EiPPkXFHAhkSugf06IQcmOML8ObXURUnpNCiERNIrDdpTrB5rfsADg43Yb0WEOONvkjwNtU7qT8hQhxPZ/Pk+FLjXFtqas94gUe1FJFrPX4dKxJ7fwnaoAkFm6XeOMpA3Hjn1TMsWfQZIxv6vaJg80if+eD8Jx46Tsyyna5Rdw+bIIjZZb/06renY/snzmVCSCp2iVdq4oKQFjDBs/nUIKPhiOhYEGHsm7bLgD5Zndv3XvE460ZtN9+1bvdMN/QPRhCsMC0IsbrtSmBa6Sp3WcTp1crbypuxQ8TgC2c+FAOThI8BMPkzAsmIegajpUZkaH3T0gQHqXwld8kceW1P7JR/1/YQswI4sD+e2wpAjWvWQd3t6o
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Y4Ki2FNuNfl7xDgbJzFGq6VvAmU9cPK7JFE/dNt+PBrwRJoy4oQ2YdBP+Wmn?=
+ =?us-ascii?Q?ajCSZkaXty1U/tSgPq0l5gbYlm9lZV+bPDSak4kPD+4mhG3q/bGG7eZrasZw?=
+ =?us-ascii?Q?XipU6j9e5eCwGG618mED9kr8jLzOCdTy69QtQjzVK/SeT+YKA+30qlNG6ITM?=
+ =?us-ascii?Q?5JHPfQ/2WnQE82OyuNr3ofoktIbb6ZiZBx8Xw8ZZvbCLGar5XSLquUgJhakQ?=
+ =?us-ascii?Q?XeyfN8nhggr4ycSwVLSdVxbDLviCEKpWJ3SHLzu6fGo8XBdNZXAEB/+hfbSr?=
+ =?us-ascii?Q?gXfrwx3FHs2x8q8e4bx+ygxIbMScDurWhjBXxjsxSGJeCmPdmXuQPT/L4U8Q?=
+ =?us-ascii?Q?y2YwE+oIFiYiQbpZJgmITzX5SXXndEWXAx7nFbRIEWRQsD5C8Oy34Fp/B4UG?=
+ =?us-ascii?Q?I1Ft+uiaOsQv03eQZiClaFE6JC61JeXKfW8M7Rc1YcgDtfQoIJZa+zNrt0Q3?=
+ =?us-ascii?Q?ld7lP1S1EliXV0rEr3uBkAlUG/i0YPYh4EgQD2n874OmVnlokTVDQkGEm5I0?=
+ =?us-ascii?Q?3BCWxh0CKdUL1sCSPw06uslYH6WppOK7WIC4Yuui3XUQdznGbtBau2/KmJn6?=
+ =?us-ascii?Q?qjjm0RL0gJCVmt4NPfJCj2qOd8b8vPpsQRWv28Blw7jfRvnZEhRus2twPm69?=
+ =?us-ascii?Q?mESKC6dHJ/SK20QdkIvHhODaYXcYq8Zq3UhRh4UXnwGjVQvwz/2t1tMmT5jn?=
+ =?us-ascii?Q?ScHVkYRmby/8DlyYwZl2+okQ2H1SaFxwI/nmZM9dwfOLBHm/cT8X8R+GbmWw?=
+ =?us-ascii?Q?gCMi+k8ftsvezVLPIisMvj3Ch3vaO3BcHPxw5gj1ww6RdwwVf28KVoQuL7CA?=
+ =?us-ascii?Q?9qRTPVuZeN2PtVEQDbZhNH6TCaNRCQmTkUzR8XFSdcqfCge4amoO/X2VcNhr?=
+ =?us-ascii?Q?vxaDC4BkAFSAlDNE0BCUt9cy9Iz9UR1Pj1JkvgHCAZ4aT0Fvr6xIBP2MnOSy?=
+ =?us-ascii?Q?zpuwmTa4bswPW4AtxlzJ6QAImGLdRQnwDI2nMMsozmJuoFguCK62SGDhWYT9?=
+ =?us-ascii?Q?zwh69qcVF8XtsM9SswnQuMvdnYS4MpEe+hFfxJ1ea/KPBL0Fzrh9tUPwT6TY?=
+ =?us-ascii?Q?j/IgnwMqtRDSJX4q1jH15hFGpDHx7FehremTZ/JC7+UPwJgDGrzX5zo1TAy9?=
+ =?us-ascii?Q?RQL8oUDDLTutlUel9d52sdvRe53fe2aJu+NfNjD9bILaTPAv56XkpCzBflJ2?=
+ =?us-ascii?Q?vARLEt3/9F04PQzrsskq9/lQ+0eiMltvn2cCuQmpYAwu0EFG8dXT81rsdvpg?=
+ =?us-ascii?Q?KIupxPBVkQfeJw+pGz1iNbqw5e6FNgR1eqjQd2s6ZxkEDHcgC7v4dvff3lIJ?=
+ =?us-ascii?Q?vH4=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e853545-0a37-4ad3-8d3a-08daba3673c4
+X-MS-Exchange-CrossTenant-AuthSource: TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2022 05:20:26.2419
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSZP286MB1968
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds support for Zoned Block Devices (ZBDs) to the kernel
-virtio-blk driver.
+Convert current looping-based implementation into bit operation,
+which can bring improvement for:
 
-The patch accompanies the virtio-blk ZBD support draft that is now
-being proposed for standardization. The latest version of the draft is
-linked at
+1) bitops is more efficient for its arch-level optimization.
 
-https://github.com/oasis-tcs/virtio-spec/issues/143 .
+2) Given that blksize_bits() is inline, _if_ @size is compile-time
+constant, it's possible that order_base_2() _may_ make output
+compile-time evaluated, depending on code context and compiler behavior.
 
-The QEMU zoned device code that implements these protocol extensions
-has been developed by Sam Li and it is currently in review at the QEMU
-mailing list.
+v1: https://lore.kernel.org/all/TYCP286MB2323169D81A806A7C1F7FDF1CA309@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM
 
-A number of virtblk request structure changes has been introduced to
-accommodate the functionality that is specific to zoned block devices
-and, most importantly, make room for carrying the Zoned Append sector
-value from the device back to the driver along with the request status.
+v2: Remove the ternary operator, based on Bart's suggestion
+    But this may lead to break for corner cases below:
+    BUILD_BUG_ON(blksize_bits(1025) != 11);
+    So make a minor modification by adding (SECTOR_SIZE - 1) before
+    shifting.
 
-The zone-specific code in the patch is heavily influenced by NVMe ZNS
-code in drivers/nvme/host/zns.c, but it is simpler because the proposed
-virtio ZBD draft only covers the zoned device features that are
-relevant to the zoned functionality provided by Linux block layer.
+v3: Remove the rounding stuff.
 
-Co-developed-by: Stefan Hajnoczi <stefanha@gmail.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@gmail.com>
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+base-commit: 30209debe98b6f66b13591e59e5272cb65b3945e
+
+Signed-off-by: Dawei Li <set_pte_at@outlook.com>
 ---
- drivers/block/virtio_blk.c      | 438 ++++++++++++++++++++++++++++++--
- include/uapi/linux/virtio_blk.h | 105 ++++++++
- 2 files changed, 524 insertions(+), 19 deletions(-)
+ include/linux/blkdev.h | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 3efe3da5f8c2..03b5302fac6e 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -15,6 +15,7 @@
- #include <linux/blk-mq.h>
- #include <linux/blk-mq-virtio.h>
- #include <linux/numa.h>
-+#include <linux/vmalloc.h>
- #include <uapi/linux/virtio_ring.h>
- 
- #define PART_BITS 4
-@@ -80,22 +81,51 @@ struct virtio_blk {
- 	int num_vqs;
- 	int io_queues[HCTX_MAX_TYPES];
- 	struct virtio_blk_vq *vqs;
-+
-+	/* For zoned device */
-+	unsigned int zone_sectors;
- };
- 
- struct virtblk_req {
-+	/* Out header */
- 	struct virtio_blk_outhdr out_hdr;
--	u8 status;
-+
-+	/* In header */
-+	union {
-+		struct {
-+			u8 status;
-+		} common;
-+
-+		/*
-+		 * The zone append command has an extended in header.
-+		 * The status field in zone_append_in_hdr must always
-+		 * be the last byte.
-+		 */
-+		struct {
-+			__virtio64 sector;
-+			u8 status;
-+		} zone_append;
-+	} in_hdr;
-+
-+	size_t in_hdr_len;
-+
- 	struct sg_table sg_table;
- 	struct scatterlist sg[];
- };
- 
--static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
-+static inline blk_status_t virtblk_result(u8 status)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 57ed49f20d2e..32137d85c9ad 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1349,12 +1349,7 @@ static inline int blk_rq_aligned(struct request_queue *q, unsigned long addr,
+ /* assumes size > 256 */
+ static inline unsigned int blksize_bits(unsigned int size)
  {
--	switch (vbr->status) {
-+	switch (status) {
- 	case VIRTIO_BLK_S_OK:
- 		return BLK_STS_OK;
- 	case VIRTIO_BLK_S_UNSUPP:
- 		return BLK_STS_NOTSUPP;
-+	case VIRTIO_BLK_S_ZONE_OPEN_RESOURCE:
-+		return BLK_STS_ZONE_OPEN_RESOURCE;
-+	case VIRTIO_BLK_S_ZONE_ACTIVE_RESOURCE:
-+		return BLK_STS_ZONE_ACTIVE_RESOURCE;
-+	case VIRTIO_BLK_S_IOERR:
-+	case VIRTIO_BLK_S_ZONE_UNALIGNED_WP:
- 	default:
- 		return BLK_STS_IOERR;
- 	}
-@@ -111,11 +141,11 @@ static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx
- 
- static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
- {
--	struct scatterlist hdr, status, *sgs[3];
-+	struct scatterlist out_hdr, in_hdr, *sgs[3];
- 	unsigned int num_out = 0, num_in = 0;
- 
--	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
--	sgs[num_out++] = &hdr;
-+	sg_init_one(&out_hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
-+	sgs[num_out++] = &out_hdr;
- 
- 	if (vbr->sg_table.nents) {
- 		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
-@@ -124,8 +154,8 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
- 			sgs[num_out + num_in++] = vbr->sg_table.sgl;
- 	}
- 
--	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
--	sgs[num_out + num_in++] = &status;
-+	sg_init_one(&in_hdr, &vbr->in_hdr.common.status, vbr->in_hdr_len);
-+	sgs[num_out + num_in++] = &in_hdr;
- 
- 	return virtqueue_add_sgs(vq, sgs, num_out, num_in, vbr, GFP_ATOMIC);
- }
-@@ -214,21 +244,22 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
- 				      struct request *req,
- 				      struct virtblk_req *vbr)
- {
-+	size_t in_hdr_len = sizeof(vbr->in_hdr.common.status);
- 	bool unmap = false;
- 	u32 type;
-+	u64 sector = 0;
- 
--	vbr->out_hdr.sector = 0;
-+	/* Set fields for all request types */
-+	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
- 
- 	switch (req_op(req)) {
- 	case REQ_OP_READ:
- 		type = VIRTIO_BLK_T_IN;
--		vbr->out_hdr.sector = cpu_to_virtio64(vdev,
--						      blk_rq_pos(req));
-+		sector = blk_rq_pos(req);
- 		break;
- 	case REQ_OP_WRITE:
- 		type = VIRTIO_BLK_T_OUT;
--		vbr->out_hdr.sector = cpu_to_virtio64(vdev,
--						      blk_rq_pos(req));
-+		sector = blk_rq_pos(req);
- 		break;
- 	case REQ_OP_FLUSH:
- 		type = VIRTIO_BLK_T_FLUSH;
-@@ -243,16 +274,42 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
- 	case REQ_OP_SECURE_ERASE:
- 		type = VIRTIO_BLK_T_SECURE_ERASE;
- 		break;
--	case REQ_OP_DRV_IN:
--		type = VIRTIO_BLK_T_GET_ID;
-+	case REQ_OP_ZONE_OPEN:
-+		type = VIRTIO_BLK_T_ZONE_OPEN;
-+		sector = blk_rq_pos(req);
- 		break;
-+	case REQ_OP_ZONE_CLOSE:
-+		type = VIRTIO_BLK_T_ZONE_CLOSE;
-+		sector = blk_rq_pos(req);
-+		break;
-+	case REQ_OP_ZONE_FINISH:
-+		type = VIRTIO_BLK_T_ZONE_FINISH;
-+		sector = blk_rq_pos(req);
-+		break;
-+	case REQ_OP_ZONE_APPEND:
-+		type = VIRTIO_BLK_T_ZONE_APPEND;
-+		sector = blk_rq_pos(req);
-+		in_hdr_len = sizeof(vbr->in_hdr.zone_append);
-+		break;
-+	case REQ_OP_ZONE_RESET:
-+		type = VIRTIO_BLK_T_ZONE_RESET;
-+		sector = blk_rq_pos(req);
-+		break;
-+	case REQ_OP_ZONE_RESET_ALL:
-+		type = VIRTIO_BLK_T_ZONE_RESET_ALL;
-+		break;
-+	case REQ_OP_DRV_IN:
-+		/* Out header already filled in, nothing to do */
-+		return 0;
- 	default:
- 		WARN_ON_ONCE(1);
- 		return BLK_STS_IOERR;
- 	}
- 
-+	/* Set fields for non-REQ_OP_DRV_IN request types */
-+	vbr->in_hdr_len = in_hdr_len;
- 	vbr->out_hdr.type = cpu_to_virtio32(vdev, type);
--	vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
-+	vbr->out_hdr.sector = cpu_to_virtio64(vdev, sector);
- 
- 	if (type == VIRTIO_BLK_T_DISCARD || type == VIRTIO_BLK_T_WRITE_ZEROES ||
- 	    type == VIRTIO_BLK_T_SECURE_ERASE) {
-@@ -263,13 +320,30 @@ static blk_status_t virtblk_setup_cmd(struct virtio_device *vdev,
- 	return 0;
+-	unsigned int bits = 8;
+-	do {
+-		bits++;
+-		size >>= 1;
+-	} while (size > 256);
+-	return bits;
++	return order_base_2(size >> SECTOR_SHIFT) + SECTOR_SHIFT;
  }
  
-+/*
-+ * The status byte is always the last byte of the virtblk request
-+ * in-header. This helper fetches its value for all in-header formats
-+ * that are currently defined.
-+ */
-+static inline u8 virtblk_vbr_status(struct virtblk_req *vbr)
-+{
-+	return *((u8 *)&vbr->in_hdr + vbr->in_hdr_len - 1);
-+}
-+
- static inline void virtblk_request_done(struct request *req)
- {
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-+	blk_status_t status = virtblk_result(virtblk_vbr_status(vbr));
-+	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
- 
- 	virtblk_unmap_data(req, vbr);
- 	virtblk_cleanup_cmd(req);
--	blk_mq_end_request(req, virtblk_result(vbr));
-+
-+	if (req_op(req) == REQ_OP_ZONE_APPEND)
-+		req->__sector = virtio64_to_cpu(vblk->vdev,
-+						vbr->in_hdr.zone_append.sector);
-+
-+	blk_mq_end_request(req, status);
- }
- 
- static void virtblk_done(struct virtqueue *vq)
-@@ -455,6 +529,315 @@ static void virtio_queue_rqs(struct request **rqlist)
- 	*rqlist = requeue_list;
- }
- 
-+#ifdef CONFIG_BLK_DEV_ZONED
-+static void *virtblk_alloc_report_buffer(struct virtio_blk *vblk,
-+					  unsigned int nr_zones,
-+					  unsigned int zone_sectors,
-+					  size_t *buflen)
-+{
-+	struct request_queue *q = vblk->disk->queue;
-+	size_t bufsize;
-+	void *buf;
-+
-+	nr_zones = min_t(unsigned int, nr_zones,
-+			 get_capacity(vblk->disk) >> ilog2(zone_sectors));
-+
-+	bufsize = sizeof(struct virtio_blk_zone_report) +
-+		nr_zones * sizeof(struct virtio_blk_zone_descriptor);
-+	bufsize = min_t(size_t, bufsize,
-+			queue_max_hw_sectors(q) << SECTOR_SHIFT);
-+	bufsize = min_t(size_t, bufsize, queue_max_segments(q) << PAGE_SHIFT);
-+
-+	while (bufsize >= sizeof(struct virtio_blk_zone_report)) {
-+		buf = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
-+		if (buf) {
-+			*buflen = bufsize;
-+			return buf;
-+		}
-+		bufsize >>= 1;
-+	}
-+
-+	return NULL;
-+}
-+
-+static int virtblk_submit_zone_report(struct virtio_blk *vblk,
-+				       char *report_buf, size_t report_len,
-+				       sector_t sector)
-+{
-+	struct request_queue *q = vblk->disk->queue;
-+	struct request *req;
-+	struct virtblk_req *vbr;
-+	int err;
-+
-+	req = blk_mq_alloc_request(q, REQ_OP_DRV_IN, 0);
-+	if (IS_ERR(req))
-+		return PTR_ERR(req);
-+
-+	vbr = blk_mq_rq_to_pdu(req);
-+	vbr->in_hdr_len = sizeof(vbr->in_hdr.common.status);
-+	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_ZONE_REPORT);
-+	vbr->out_hdr.sector = cpu_to_virtio64(vblk->vdev, sector);
-+
-+	err = blk_rq_map_kern(q, req, report_buf, report_len, GFP_KERNEL);
-+	if (err)
-+		goto out;
-+
-+	blk_execute_rq(req, false);
-+	err = blk_status_to_errno(virtblk_result(vbr->in_hdr.common.status));
-+out:
-+	blk_mq_free_request(req);
-+	return err;
-+}
-+
-+static int virtblk_parse_zone(struct virtio_blk *vblk,
-+			       struct virtio_blk_zone_descriptor *entry,
-+			       unsigned int idx, unsigned int zone_sectors,
-+			       report_zones_cb cb, void *data)
-+{
-+	struct blk_zone zone = { };
-+
-+	zone.start = virtio64_to_cpu(vblk->vdev, entry->z_start);
-+	zone.capacity = virtio64_to_cpu(vblk->vdev, entry->z_cap);
-+
-+	switch (entry->z_type) {
-+	case VIRTIO_BLK_ZT_SWR:
-+		zone.type = BLK_ZONE_TYPE_SEQWRITE_REQ;
-+		break;
-+	case VIRTIO_BLK_ZT_SWP:
-+		zone.type = BLK_ZONE_TYPE_SEQWRITE_PREF;
-+		break;
-+	case VIRTIO_BLK_ZT_CONV:
-+		zone.type = BLK_ZONE_TYPE_CONVENTIONAL;
-+		break;
-+	default:
-+		dev_err(&vblk->vdev->dev, "zone %llu: invalid type %#x\n",
-+			zone.start, entry->z_type);
-+		return -EINVAL;
-+	}
-+
-+	switch (entry->z_state) {
-+	case VIRTIO_BLK_ZS_EMPTY:
-+		zone.cond = BLK_ZONE_COND_EMPTY;
-+		break;
-+	case VIRTIO_BLK_ZS_CLOSED:
-+		zone.cond = BLK_ZONE_COND_CLOSED;
-+		break;
-+	case VIRTIO_BLK_ZS_FULL:
-+		zone.cond = BLK_ZONE_COND_FULL;
-+		break;
-+	case VIRTIO_BLK_ZS_EOPEN:
-+		zone.cond = BLK_ZONE_COND_EXP_OPEN;
-+		break;
-+	case VIRTIO_BLK_ZS_IOPEN:
-+		zone.cond = BLK_ZONE_COND_IMP_OPEN;
-+		break;
-+	case VIRTIO_BLK_ZS_NOT_WP:
-+		zone.cond = BLK_ZONE_COND_NOT_WP;
-+		break;
-+	case VIRTIO_BLK_ZS_RDONLY:
-+		zone.cond = BLK_ZONE_COND_READONLY;
-+		break;
-+	case VIRTIO_BLK_ZS_OFFLINE:
-+		zone.cond = BLK_ZONE_COND_OFFLINE;
-+		break;
-+	default:
-+		dev_err(&vblk->vdev->dev, "zone %llu: invalid condition %#x\n",
-+			zone.start, entry->z_state);
-+		return -EINVAL;
-+	}
-+
-+	zone.len = zone_sectors;
-+	if (zone.cond == BLK_ZONE_COND_FULL)
-+		zone.wp = zone.start + zone.len;
-+	else
-+		zone.wp = virtio64_to_cpu(vblk->vdev, entry->z_wp);
-+
-+	return cb(&zone, idx, data);
-+}
-+
-+static int virtblk_report_zones(struct gendisk *disk, sector_t sector,
-+				 unsigned int nr_zones, report_zones_cb cb,
-+				 void *data)
-+{
-+	struct virtio_blk *vblk = disk->private_data;
-+	struct virtio_blk_zone_report *report;
-+	unsigned long long nz, i;
-+	size_t buflen;
-+	unsigned int zone_sectors = vblk->zone_sectors;
-+	int ret, zone_idx = 0;
-+
-+	if (WARN_ON_ONCE(!vblk->zone_sectors))
-+		return -EOPNOTSUPP;
-+
-+	report = virtblk_alloc_report_buffer(vblk, nr_zones,
-+					     zone_sectors, &buflen);
-+	if (!report)
-+		return -ENOMEM;
-+
-+	while (zone_idx < nr_zones && sector < get_capacity(vblk->disk)) {
-+		memset(report, 0, buflen);
-+
-+		ret = virtblk_submit_zone_report(vblk, (char *)report,
-+						 buflen, sector);
-+		if (ret) {
-+			if (ret > 0)
-+				ret = -EIO;
-+			goto out_free;
-+		}
-+		nz = min(virtio64_to_cpu(vblk->vdev, report->nr_zones),
-+			 (u64)nr_zones);
-+		if (!nz)
-+			break;
-+
-+		for (i = 0; i < nz && zone_idx < nr_zones; i++) {
-+			ret = virtblk_parse_zone(vblk, &report->zones[i],
-+						 zone_idx, zone_sectors, cb, data);
-+			if (ret)
-+				goto out_free;
-+
-+			sector = virtio64_to_cpu(vblk->vdev,
-+						 report->zones[i].z_start) +
-+				 zone_sectors;
-+			zone_idx++;
-+		}
-+	}
-+
-+	if (zone_idx > 0)
-+		ret = zone_idx;
-+	else
-+		ret = -EINVAL;
-+out_free:
-+	kvfree(report);
-+	return ret;
-+}
-+
-+static void virtblk_revalidate_zones(struct virtio_blk *vblk)
-+{
-+	u8 model;
-+
-+	if (!vblk->zone_sectors)
-+		return;
-+
-+	virtio_cread(vblk->vdev, struct virtio_blk_config,
-+		     zoned.model, &model);
-+	if (!blk_revalidate_disk_zones(vblk->disk, NULL))
-+		set_capacity_and_notify(vblk->disk, 0);
-+}
-+
-+static int virtblk_probe_zoned_device(struct virtio_device *vdev,
-+				       struct virtio_blk *vblk,
-+				       struct request_queue *q)
-+{
-+	u32 v, wg;
-+	u8 model;
-+	int ret;
-+
-+	virtio_cread(vdev, struct virtio_blk_config,
-+		     zoned.model, &model);
-+
-+	switch (model) {
-+	case VIRTIO_BLK_Z_NONE:
-+		return 0;
-+	case VIRTIO_BLK_Z_HM:
-+		break;
-+	case VIRTIO_BLK_Z_HA:
-+		/*
-+		 * Present the host-aware device as a regular drive.
-+		 * TODO It is possible to add an option to make it appear
-+		 * in the system as a zoned drive.
-+		 */
-+		return 0;
-+	default:
-+		dev_err(&vdev->dev, "unsupported zone model %d\n", model);
-+		return -EINVAL;
-+	}
-+
-+	dev_dbg(&vdev->dev, "probing host-managed zoned device\n");
-+
-+	disk_set_zoned(vblk->disk, BLK_ZONED_HM);
-+	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
-+
-+	virtio_cread(vdev, struct virtio_blk_config,
-+		     zoned.max_open_zones, &v);
-+	disk_set_max_open_zones(vblk->disk, v);
-+
-+	dev_dbg(&vdev->dev, "max open zones = %u\n", v);
-+
-+	virtio_cread(vdev, struct virtio_blk_config,
-+		     zoned.max_active_zones, &v);
-+	disk_set_max_active_zones(vblk->disk, v);
-+	dev_dbg(&vdev->dev, "max active zones = %u\n", v);
-+
-+	virtio_cread(vdev, struct virtio_blk_config,
-+		     zoned.write_granularity, &wg);
-+	if (!wg) {
-+		dev_warn(&vdev->dev, "zero write granularity reported\n");
-+		return -ENODEV;
-+	}
-+	blk_queue_physical_block_size(q, wg);
-+	blk_queue_io_min(q, wg);
-+
-+	dev_dbg(&vdev->dev, "write granularity = %u\n", wg);
-+
-+	/*
-+	 * virtio ZBD specification doesn't require zones to be a power of
-+	 * two sectors in size, but the code in this driver expects that.
-+	 */
-+	virtio_cread(vdev, struct virtio_blk_config, zoned.zone_sectors,
-+		     &vblk->zone_sectors);
-+	if (vblk->zone_sectors == 0 || !is_power_of_2(vblk->zone_sectors)) {
-+		dev_err(&vdev->dev,
-+			"zoned device with non power of two zone size %u\n",
-+			vblk->zone_sectors);
-+		return -ENODEV;
-+	}
-+	dev_dbg(&vdev->dev, "zone sectors = %u\n", vblk->zone_sectors);
-+
-+	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
-+		dev_warn(&vblk->vdev->dev,
-+			 "ignoring negotiated F_DISCARD for zoned device\n");
-+		blk_queue_max_discard_sectors(q, 0);
-+	}
-+
-+	ret = blk_revalidate_disk_zones(vblk->disk, NULL);
-+	if (!ret) {
-+		virtio_cread(vdev, struct virtio_blk_config,
-+			     zoned.max_append_sectors, &v);
-+		if (!v) {
-+			dev_warn(&vdev->dev, "zero max_append_sectors reported\n");
-+			return -ENODEV;
-+		}
-+		if ((v << SECTOR_SHIFT) < wg) {
-+			dev_err(&vdev->dev,
-+				"write granularity %u exceeds max_append_sectors %u limit\n",
-+				wg, v);
-+			return -ENODEV;
-+		}
-+
-+		blk_queue_max_zone_append_sectors(q, v);
-+		dev_dbg(&vdev->dev, "max append sectors = %u\n", v);
-+	}
-+
-+	return ret;
-+}
-+
-+#else
-+
-+/*
-+ * Zoned block device support is not configured in this kernel.
-+ * We only need to define a few symbols to avoid compilation errors.
-+ */
-+#define virtblk_report_zones       NULL
-+static inline void virtblk_revalidate_zones(struct virtio_blk *vblk)
-+{
-+}
-+static inline int virtblk_probe_zoned_device(struct virtio_device *vdev,
-+			struct virtio_blk *vblk, struct request_queue *q)
-+{
-+	return -EOPNOTSUPP;
-+}
-+#endif /* CONFIG_BLK_DEV_ZONED */
-+
- /* return id (s/n) string for *disk to *id_str
-  */
- static int virtblk_get_id(struct gendisk *disk, char *id_str)
-@@ -462,18 +845,24 @@ static int virtblk_get_id(struct gendisk *disk, char *id_str)
- 	struct virtio_blk *vblk = disk->private_data;
- 	struct request_queue *q = vblk->disk->queue;
- 	struct request *req;
-+	struct virtblk_req *vbr;
- 	int err;
- 
- 	req = blk_mq_alloc_request(q, REQ_OP_DRV_IN, 0);
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
- 
-+	vbr = blk_mq_rq_to_pdu(req);
-+	vbr->in_hdr_len = sizeof(vbr->in_hdr.common.status);
-+	vbr->out_hdr.type = cpu_to_virtio32(vblk->vdev, VIRTIO_BLK_T_GET_ID);
-+	vbr->out_hdr.sector = 0;
-+
- 	err = blk_rq_map_kern(q, req, id_str, VIRTIO_BLK_ID_BYTES, GFP_KERNEL);
- 	if (err)
- 		goto out;
- 
- 	blk_execute_rq(req, false);
--	err = blk_status_to_errno(virtblk_result(blk_mq_rq_to_pdu(req)));
-+	err = blk_status_to_errno(virtblk_result(vbr->in_hdr.common.status));
- out:
- 	blk_mq_free_request(req);
- 	return err;
-@@ -524,6 +913,7 @@ static const struct block_device_operations virtblk_fops = {
- 	.owner  	= THIS_MODULE,
- 	.getgeo		= virtblk_getgeo,
- 	.free_disk	= virtblk_free_disk,
-+	.report_zones	= virtblk_report_zones,
- };
- 
- static int index_to_minor(int index)
-@@ -594,6 +984,7 @@ static void virtblk_config_changed_work(struct work_struct *work)
- 	struct virtio_blk *vblk =
- 		container_of(work, struct virtio_blk, config_work);
- 
-+	virtblk_revalidate_zones(vblk);
- 	virtblk_update_capacity(vblk, true);
- }
- 
-@@ -861,7 +1252,7 @@ static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- 		struct request *req = blk_mq_rq_from_pdu(vbr);
- 
- 		found++;
--		if (!blk_mq_add_to_batch(req, iob, vbr->status,
-+		if (!blk_mq_add_to_batch(req, iob, virtblk_vbr_status(vbr),
- 						virtblk_complete_batch))
- 			blk_mq_complete_request(req);
- 	}
-@@ -1150,6 +1541,12 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	virtblk_update_capacity(vblk, false);
- 	virtio_device_ready(vdev);
- 
-+	if (virtio_has_feature(vdev, VIRTIO_BLK_F_ZONED)) {
-+		err = virtblk_probe_zoned_device(vdev, vblk, q);
-+		if (err)
-+			goto out_cleanup_disk;
-+	}
-+
- 	err = device_add_disk(&vdev->dev, vblk->disk, virtblk_attr_groups);
- 	if (err)
- 		goto out_cleanup_disk;
-@@ -1251,6 +1648,9 @@ static unsigned int features[] = {
- 	VIRTIO_BLK_F_FLUSH, VIRTIO_BLK_F_TOPOLOGY, VIRTIO_BLK_F_CONFIG_WCE,
- 	VIRTIO_BLK_F_MQ, VIRTIO_BLK_F_DISCARD, VIRTIO_BLK_F_WRITE_ZEROES,
- 	VIRTIO_BLK_F_SECURE_ERASE,
-+#ifdef CONFIG_BLK_DEV_ZONED
-+	VIRTIO_BLK_F_ZONED,
-+#endif /* CONFIG_BLK_DEV_ZONED */
- };
- 
- static struct virtio_driver virtio_blk = {
-diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-index 58e70b24b504..3744e4da1b2a 100644
---- a/include/uapi/linux/virtio_blk.h
-+++ b/include/uapi/linux/virtio_blk.h
-@@ -41,6 +41,7 @@
- #define VIRTIO_BLK_F_DISCARD	13	/* DISCARD is supported */
- #define VIRTIO_BLK_F_WRITE_ZEROES	14	/* WRITE ZEROES is supported */
- #define VIRTIO_BLK_F_SECURE_ERASE	16 /* Secure Erase is supported */
-+#define VIRTIO_BLK_F_ZONED		17	/* Zoned block device */
- 
- /* Legacy feature bits */
- #ifndef VIRTIO_BLK_NO_LEGACY
-@@ -137,6 +138,16 @@ struct virtio_blk_config {
- 	/* Secure erase commands must be aligned to this number of sectors. */
- 	__virtio32 secure_erase_sector_alignment;
- 
-+	/* Zoned block device characteristics (if VIRTIO_BLK_F_ZONED) */
-+	struct virtio_blk_zoned_characteristics {
-+		__virtio32 zone_sectors;
-+		__virtio32 max_open_zones;
-+		__virtio32 max_active_zones;
-+		__virtio32 max_append_sectors;
-+		__virtio32 write_granularity;
-+		__u8 model;
-+		__u8 unused2[3];
-+	} zoned;
- } __attribute__((packed));
- 
- /*
-@@ -174,6 +185,27 @@ struct virtio_blk_config {
- /* Secure erase command */
- #define VIRTIO_BLK_T_SECURE_ERASE	14
- 
-+/* Zone append command */
-+#define VIRTIO_BLK_T_ZONE_APPEND    15
-+
-+/* Report zones command */
-+#define VIRTIO_BLK_T_ZONE_REPORT    16
-+
-+/* Open zone command */
-+#define VIRTIO_BLK_T_ZONE_OPEN      18
-+
-+/* Close zone command */
-+#define VIRTIO_BLK_T_ZONE_CLOSE     20
-+
-+/* Finish zone command */
-+#define VIRTIO_BLK_T_ZONE_FINISH    22
-+
-+/* Reset zone command */
-+#define VIRTIO_BLK_T_ZONE_RESET     24
-+
-+/* Reset All zones command */
-+#define VIRTIO_BLK_T_ZONE_RESET_ALL 26
-+
- #ifndef VIRTIO_BLK_NO_LEGACY
- /* Barrier before this op. */
- #define VIRTIO_BLK_T_BARRIER	0x80000000
-@@ -193,6 +225,72 @@ struct virtio_blk_outhdr {
- 	__virtio64 sector;
- };
- 
-+/*
-+ * Supported zoned device models.
-+ */
-+
-+/* Regular block device */
-+#define VIRTIO_BLK_Z_NONE      0
-+/* Host-managed zoned device */
-+#define VIRTIO_BLK_Z_HM        1
-+/* Host-aware zoned device */
-+#define VIRTIO_BLK_Z_HA        2
-+
-+/*
-+ * Zone descriptor. A part of VIRTIO_BLK_T_ZONE_REPORT command reply.
-+ */
-+struct virtio_blk_zone_descriptor {
-+	/* Zone capacity */
-+	__virtio64 z_cap;
-+	/* The starting sector of the zone */
-+	__virtio64 z_start;
-+	/* Zone write pointer position in sectors */
-+	__virtio64 z_wp;
-+	/* Zone type */
-+	__u8 z_type;
-+	/* Zone state */
-+	__u8 z_state;
-+	__u8 reserved[38];
-+};
-+
-+struct virtio_blk_zone_report {
-+	__virtio64 nr_zones;
-+	__u8 reserved[56];
-+	struct virtio_blk_zone_descriptor zones[];
-+};
-+
-+/*
-+ * Supported zone types.
-+ */
-+
-+/* Conventional zone */
-+#define VIRTIO_BLK_ZT_CONV         1
-+/* Sequential Write Required zone */
-+#define VIRTIO_BLK_ZT_SWR          2
-+/* Sequential Write Preferred zone */
-+#define VIRTIO_BLK_ZT_SWP          3
-+
-+/*
-+ * Zone states that are available for zones of all types.
-+ */
-+
-+/* Not a write pointer (conventional zones only) */
-+#define VIRTIO_BLK_ZS_NOT_WP       0
-+/* Empty */
-+#define VIRTIO_BLK_ZS_EMPTY        1
-+/* Implicitly Open */
-+#define VIRTIO_BLK_ZS_IOPEN        2
-+/* Explicitly Open */
-+#define VIRTIO_BLK_ZS_EOPEN        3
-+/* Closed */
-+#define VIRTIO_BLK_ZS_CLOSED       4
-+/* Read-Only */
-+#define VIRTIO_BLK_ZS_RDONLY       13
-+/* Full */
-+#define VIRTIO_BLK_ZS_FULL         14
-+/* Offline */
-+#define VIRTIO_BLK_ZS_OFFLINE      15
-+
- /* Unmap this range (only valid for write zeroes command) */
- #define VIRTIO_BLK_WRITE_ZEROES_FLAG_UNMAP	0x00000001
- 
-@@ -219,4 +317,11 @@ struct virtio_scsi_inhdr {
- #define VIRTIO_BLK_S_OK		0
- #define VIRTIO_BLK_S_IOERR	1
- #define VIRTIO_BLK_S_UNSUPP	2
-+
-+/* Error codes that are specific to zoned block devices */
-+#define VIRTIO_BLK_S_ZONE_INVALID_CMD     3
-+#define VIRTIO_BLK_S_ZONE_UNALIGNED_WP    4
-+#define VIRTIO_BLK_S_ZONE_OPEN_RESOURCE   5
-+#define VIRTIO_BLK_S_ZONE_ACTIVE_RESOURCE 6
-+
- #endif /* _LINUX_VIRTIO_BLK_H */
+ static inline unsigned int block_size(struct block_device *bdev)
 -- 
-2.34.1
+2.25.1
 
