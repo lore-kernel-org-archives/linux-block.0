@@ -2,52 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C90C38A02
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 09:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D977C38A02
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 09:47:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbiJ3Jly (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 05:41:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40368 "EHLO
+        id S229923AbiJ3Jru (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 05:47:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiJ3Jlx (ORCPT
+        with ESMTP id S229853AbiJ3Jrr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 05:41:53 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7DFBC84;
-        Sun, 30 Oct 2022 02:41:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mGekaAOdIja1Coan0T/XXSeb3SnqS47JFAz2HGqAANA=; b=h7eeAKOst8GmseL3Ly3xX57sZP
-        eYrLBzlbIi8+fy2qAhn4gfhf/B3MeoR5WVcg2HPvfckUYTT1MtpvRtk9G8yd3UnqQ/DqGIaWCaLg/
-        i3za0UnvN9m4OCwq80+4TVSmEkE8WIwTID9x3i7UR6c1hnDFuflasw1gjffbkVwQw8D2RNg9ANEvT
-        kTwQiwxgw3MTC3goiJLBZkSWrNXw8R4gy9U2nPRnCxBpZQkMoiXU+Fq0cvEtHciExojvLSmVHEy2m
-        NP82jmZ0jT3u/oEkdCZTnjr4tH6sBdXmZ6Z4NwV4KxZyGa21iHKgGJ/AiT6zBM0ZJae+bi8cxvPMC
-        wBNtQL8Q==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1op4p9-00EvfT-56; Sun, 30 Oct 2022 09:41:47 +0000
-Date:   Sun, 30 Oct 2022 02:41:47 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Yu Kuai <yukuai1@huaweicloud.com>
-Cc:     tj@kernel.org, josef@toxicpanda.com, axboe@kernel.dk,
-        yukuai3@huawei.com, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next 3/5] blk-iocost: don't allow to configure bio based
- device
-Message-ID: <Y15G2zBpor5flDLy@infradead.org>
-References: <20221028101056.1971715-1-yukuai1@huaweicloud.com>
- <20221028101056.1971715-4-yukuai1@huaweicloud.com>
+        Sun, 30 Oct 2022 05:47:47 -0400
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56D0E211;
+        Sun, 30 Oct 2022 02:47:44 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.14.30.251])
+        by mail-app2 (Coremail) with SMTP id by_KCgBn21gzSF5jiVFMBw--.58770S2;
+        Sun, 30 Oct 2022 17:47:39 +0800 (CST)
+From:   Jinlong Chen <nickyc975@zju.edu.cn>
+To:     axboe@kernel.dk
+Cc:     hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
+Subject: [PATCH] blk-mq: move queue_is_mq out of blk_mq_cancel_work_sync
+Date:   Sun, 30 Oct 2022 17:47:30 +0800
+Message-Id: <20221030094730.1275463-1-nickyc975@zju.edu.cn>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221028101056.1971715-4-yukuai1@huaweicloud.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: by_KCgBn21gzSF5jiVFMBw--.58770S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZF4rtFyUCr1fXFWkKr45KFg_yoW8GrW8pF
+        W3J39rta40qayUXFyqqay7XF17GwnxKr1xJrsxAw4Yvr9rGr17Xr18uFyjgF10qrs3ZF4a
+        vrZxXFWfZr18GwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvv1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+        IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+        z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24V
+        AvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
+        McIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
+        v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI
+        7VAKI48JMxAIw28IcVCjz48v1sIEY20_GFWkJr1UJwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+        C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+        wI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
+        v20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+        jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73Uj
+        IFyTuYvjfUFYFADUUUU
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgYTB1ZdtcKYKQAHsa
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good (I actually stubled over this a few days ago as well):
+The only caller that needs queue_is_mq check is del_gendisk, so move the
+check into it.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jinlong Chen <nickyc975@zju.edu.cn>
+---
+ block/blk-mq.c | 12 +++++-------
+ block/genhd.c  |  4 +++-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8ca49530bdf3..e2a332786ebd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -4851,15 +4851,13 @@ EXPORT_SYMBOL(blk_mq_rq_cpu);
+ 
+ void blk_mq_cancel_work_sync(struct request_queue *q)
+ {
+-	if (queue_is_mq(q)) {
+-		struct blk_mq_hw_ctx *hctx;
+-		unsigned long i;
++	struct blk_mq_hw_ctx *hctx;
++	unsigned long i;
+ 
+-		cancel_delayed_work_sync(&q->requeue_work);
++	cancel_delayed_work_sync(&q->requeue_work);
+ 
+-		queue_for_each_hw_ctx(q, hctx, i)
+-			cancel_delayed_work_sync(&hctx->run_work);
+-	}
++	queue_for_each_hw_ctx(q, hctx, i)
++		cancel_delayed_work_sync(&hctx->run_work);
+ }
+ 
+ static int __init blk_mq_init(void)
+diff --git a/block/genhd.c b/block/genhd.c
+index 17b33c62423d..493b93faee9c 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -638,7 +638,9 @@ void del_gendisk(struct gendisk *disk)
+ 
+ 	blk_sync_queue(q);
+ 	blk_flush_integrity();
+-	blk_mq_cancel_work_sync(q);
++
++	if (queue_is_mq(q))
++		blk_mq_cancel_work_sync(q);
+ 
+ 	blk_mq_quiesce_queue(q);
+ 	if (q->elevator) {
+-- 
+2.31.1
+
