@@ -2,52 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F66FA373D
-	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 09:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3499C38A02
+	for <linux-block@archiver.kernel.org>; Sun, 30 Oct 2022 09:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbiJ3J2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 05:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
+        id S229841AbiJ3JeJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 05:34:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229718AbiJ3J2O (ORCPT
+        with ESMTP id S229536AbiJ3JeI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 05:28:14 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F2E248
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 02:28:13 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 6FFEF68AA6; Sun, 30 Oct 2022 10:28:09 +0100 (CET)
-Date:   Sun, 30 Oct 2022 10:28:08 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Chao Leng <lengchao@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 07/17] nvme: remove the NVME_NS_DEAD check in
- nvme_validate_ns
-Message-ID: <20221030092808.GD5643@lst.de>
-References: <20221025144020.260458-1-hch@lst.de> <20221025144020.260458-8-hch@lst.de> <acc757b0-2d4d-6f1a-504e-73eadef59d35@grimberg.me>
+        Sun, 30 Oct 2022 05:34:08 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6C2C22;
+        Sun, 30 Oct 2022 02:34:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=WcJiU5X6PvxdiZPJws4GoHmPGJ
+        31Q47DbjSIjWkG9ULGAOwaBGvgN/tGnUXBmHMaVZfY6AKb69ue3hAyBM1mILHfSfPH4hIBCpxvJQq
+        2/rMSIpi4NfxWn45M6NHlv6XNKMWuo+S+eWRZtYGvT7YERtUCKMogCiZo/vEB38UBGj4DokAh5NYn
+        cqgmgTCRULL9i0lzm92sytat9EnFxbE8HyKzG83F/76A3bkWFB7fHgLmRqD8AUKkPEmSv3CutGPQt
+        Ob4K5Nj1ONTLsevmR2jG62IM1mvAKxBhLOy/hfpoks2DXSamwNTAjwXutyhTnAy6OznWi99hL2dtW
+        g3Ddijkw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1op4hj-00EsLR-LH; Sun, 30 Oct 2022 09:34:07 +0000
+Date:   Sun, 30 Oct 2022 02:34:07 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Chen Zhongjin <chenzhongjin@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk, mcgrof@kernel.org, hare@suse.de
+Subject: Re: [PATCH] block: Fix possible memory leak for rq_wb on add_disk
+ failure
+Message-ID: <Y15FD2yMJlvxCrsR@infradead.org>
+References: <20221029071355.35462-1-chenzhongjin@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <acc757b0-2d4d-6f1a-504e-73eadef59d35@grimberg.me>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20221029071355.35462-1-chenzhongjin@huawei.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 03:52:25PM +0300, Sagi Grimberg wrote:
->
->> We never rescan namespaces after marking them dead, so this check is dead
->> now.
->
-> scan_work can still run, I'd keep this one.
+Looks good:
 
-At this time the controller already has a non-live state, so the
-command won't make it anywhere and thus except for a tiny race we
-won't even get to this call.
-
-That being said if we flush the scan_work earlier this will all become
-moot anyway.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
