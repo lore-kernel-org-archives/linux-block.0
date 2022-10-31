@@ -2,103 +2,246 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46D0ECAAA1
-	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 14:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D85FA3743
+	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 16:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231605AbiJaObL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Oct 2022 10:31:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49128 "EHLO
+        id S231804AbiJaQGt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Oct 2022 12:06:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231596AbiJaObK (ORCPT
+        with ESMTP id S231793AbiJaQGs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2022 10:31:10 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326E265A6
-        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 07:31:09 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id q71so10839436pgq.8
-        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 07:31:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UxCaUCeOv04svZ2y77cTIK0oMsYuJugdQM+dBKql0sI=;
-        b=IRZ7eArpvlGdYkmcQnoG9wRJvZZRYTOjv+75+y7qrqJKP2eRSqTED0/2qbTkhBWLQW
-         qn6F2oOnAkXe27Mlw/oX0MzgGhHNnKSSeUVp1LwXVkfASc9oJmR9NUJDoZLNK/A3QG1B
-         GmbS7ns5SNp/q1n+LLOfa64KEfp0iHYPXHbvbaCa9ITNIC1pR/x7eGt/GQF2iXVRZSqA
-         qomXVk0ErCe9GL1yOpI0pfSEa6Mxrkb4r8R8yFhVatklAs3hKVhzpxNSUak7jLw2GCqM
-         aeScFdmz9vKOOVTOm5EL0jHJ1+f6j4vYA5SoJm/ZacGiQQNgyROHfnSxjZHBastsJFPd
-         +Kag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UxCaUCeOv04svZ2y77cTIK0oMsYuJugdQM+dBKql0sI=;
-        b=1PEtPwTPDiWW4csBXM12cr2Tw4QUEyGU5FlIreQ/nYfEwsJgoTEP/t2A3M3z8iC0Zm
-         ++UMMmKi/AftIuywhkvzJ/wjVbmjqswGQUDcr7hxG8uxEayc/bq/8eKoX2lGJ5PrhDIP
-         Y0GgVdOM2oDkvVG3h0Xa8m2opwoWgbeGY1XPtMkIp5DExcwF9TpQT/PSoUQmXKRFrWxC
-         gmqjDk/lFvWfPOpgLXVTOikJ6HXb8IylfWQv3WTbQH34UxjO/k2VZ4C8TOQ8KkvA9sgQ
-         ZAhmhJxTB7WanHnv8AH0WnFwuVWcHxMJmfIVegOwrd0vn8UyPzGaQia2QpOt8trGUskj
-         nnjg==
-X-Gm-Message-State: ACrzQf3kJT2FXXdUDAsw3b8WDukJutVRRf/u7ljLcZ7o8ZLCBuae3Kan
-        hbld0DMNUxbZ9nJeCrFbR03P2g==
-X-Google-Smtp-Source: AMsMyM6k2sHCrwoWqguXpQcWH+977dJthW1xU3lPj4RysM6XzuN+9vHs092ZksVUjGHPd1nUx3Gv5w==
-X-Received: by 2002:a05:6a00:16c4:b0:535:890:d4a with SMTP id l4-20020a056a0016c400b0053508900d4amr14795660pfc.0.1667226668625;
-        Mon, 31 Oct 2022 07:31:08 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id c12-20020a170902d48c00b0017f36638010sm4552508plg.276.2022.10.31.07.31.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Oct 2022 07:31:08 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Chen Jun <chenjun102@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, will@kernel.org, ming.lei@redhat.com
-Cc:     xuqiang36@huawei.com
-In-Reply-To: <20221031031242.94107-1-chenjun102@huawei.com>
-References: <20221031031242.94107-1-chenjun102@huawei.com>
-Subject: Re: [PATCH] blk-mq: Fix kmemleak in blk_mq_init_allocated_queue
-Message-Id: <166722666769.125558.7022234189834891609.b4-ty@kernel.dk>
-Date:   Mon, 31 Oct 2022 08:31:07 -0600
+        Mon, 31 Oct 2022 12:06:48 -0400
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B816567;
+        Mon, 31 Oct 2022 09:06:47 -0700 (PDT)
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29VDF9eU016097;
+        Mon, 31 Oct 2022 09:06:31 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=s2048-2021-q4;
+ bh=95czJZhq6loHIiOf8lHI37g0H+QwQ+NIeYLwSMYjS8k=;
+ b=epDuTZ7FW+TyVzW0hX4fs+ILzZV7P3MzfFkliSRR3/7+lCu8eKet+CquSWapFnD83aHZ
+ thEs973MWe7QaIV3X2mzs1dnNVnT7e7wsBrpnAdxRZw6MhEhMicCnuLpx19QPm6lcrNd
+ zwtmDH5NkOsckwEAMs/PPVZO7JZGG7O8/CcGPWpaYiRwNwYaZP0iPSAaDVlO5sqhEWoz
+ hTLIEv3coQueadGKnK8j9R2Cc1R6SrNubEBJ2fWaD3SDlN3vH7gUyx0N1sAZ87Wl265I
+ 5fj+IBbsPcGtgWdwPX05GMnhxkEzbMA9d35Bi3lEaxKM7htgbQJwKevOHRR5HbzJVsCV pg== 
+Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1anam02lp2045.outbound.protection.outlook.com [104.47.57.45])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3kh20w0a15-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 31 Oct 2022 09:06:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l50xLfjzs3OrpfNqg5R8El6ahH30LrIC59DQT0unQOGV3AgRb8pEFaRHZwxR1Y4RSR+s0vHV5/aAR4o/LNhdsEI5ocSf/lEmi+eyUCIveUnd2rCWr9iXKtJvNE/WZrJHaANUJHY9snkm40kfHAFI8lr5zpLdIl4qvLVOxtyzCjWg4nbGzgGYsLsFELq47/FqyrVgVkwKcP9LsEPfhN0K5m+pE79l78mXRf/TyUZUyghOPOkSgeV/4/DSbi8S5mzEgqzOkfprg/Cej0GGLKocy9Ng8f+2LoatTbHZjBRJ3xTj+61OaXzY59MKDVNOSEfbMKIh9NhGVedPcRIWzQTDZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=95czJZhq6loHIiOf8lHI37g0H+QwQ+NIeYLwSMYjS8k=;
+ b=of/dLKYcc0iLYcY/Y47HHYr6C4R3rdY92NxPHNs3W/KjdrV/h4gHNQTDK9+SU+UQFTIcnLOfT64r8rdcND+rajMY2dppnsgVZ4/fSp2Qfuuw0iXGZ9hrMbP+9pRY09wEFt17/1ZbVf9x6LgLfX/jGBWbGvBS6wYAyy9VnQE4co3CF80H0qOOtquf/cprgKkVbID7vCbmE5Ju7yglGzr+oxg0M/ToQZJowf8x+7XpjVZ4PjvlJrJEHUz7eu3/rpeiB0wg11eGTjv0ag7lnYKpYzOAxSRMmod9Q5Ce3ule3BqdsCoXmRLXsg9jeJBNrNOaO7iDFQSY3d8B0166DvjEBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
+ dkim=pass header.d=meta.com; arc=none
+Received: from MN2PR15MB4287.namprd15.prod.outlook.com (2603:10b6:208:1b6::13)
+ by BYAPR15MB3191.namprd15.prod.outlook.com (2603:10b6:a03:107::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.16; Mon, 31 Oct
+ 2022 16:06:26 +0000
+Received: from MN2PR15MB4287.namprd15.prod.outlook.com
+ ([fe80::6328:6d95:ed96:b553]) by MN2PR15MB4287.namprd15.prod.outlook.com
+ ([fe80::6328:6d95:ed96:b553%6]) with mapi id 15.20.5769.019; Mon, 31 Oct 2022
+ 16:06:26 +0000
+Message-ID: <2faf79ea-dec4-ea9b-84bf-0ddcda9af279@meta.com>
+Date:   Mon, 31 Oct 2022 12:06:22 -0400
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.4.1
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+To:     dsterba@suse.cz, Steven Rostedt <rostedt@goodmis.org>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+References: <20220901074216.1849941-1-hch@lst.de>
+ <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+ <20221024144411.GA25172@lst.de>
+ <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
+ <20221024171042.GF5824@suse.cz>
+ <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
+ <20221026074145.2be5ca09@gandalf.local.home>
+ <20221031121912.GY5824@twin.jikos.cz>
+Content-Language: en-US
+From:   Chris Mason <clm@meta.com>
+In-Reply-To: <20221031121912.GY5824@twin.jikos.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0074.namprd13.prod.outlook.com
+ (2603:10b6:208:2b8::19) To MN2PR15MB4287.namprd15.prod.outlook.com
+ (2603:10b6:208:1b6::13)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR15MB4287:EE_|BYAPR15MB3191:EE_
+X-MS-Office365-Filtering-Correlation-Id: f9a56ca2-6d89-4e74-9317-08dabb59dd26
+X-FB-Source: Internal
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8PM4bNs22zOf5LJ6UxARZ/oi3Koj8KHu8HkEY1wrj0znGlZiJahS87SLgiMBA62qIv5PLX8TOeqc35qY4Bsl1dtlmBUCC8SB7Z6nFzjlrG7gdZ5M0oC/cXE84g6CmTeuaubBZhd+Aa4GWeH67keJw+VM8Iqp03TE3WYg8ua2EkNi9XfJ3YQJkfKDSyeHbZ7CZfiZClw+tQbTKm0FmwSlFoUht+UiUP5Ig/ahARlC+2IeePfNMn7EcrX3/ICHQrUdwoGfiSW+KQFcU4EWQTEqRo9r3iQLEVWChYWN2IueT3/xWEQa0qgsinyqbaHM+w2Weoyu6qC0GRxre4vj5BsCCDAXegM+jIyNy6jHRbZ8zVqUlGJM+10QjphGGoiTFtiZwSI0Y2V+TH+arFW6KKWto//nm1ZeKUiJ17kDoDk/t2yRQ3a2SUUR2DD0gEUNyMvYb84oUL+aWe+yHOvmezktFcP3J59u81ycNUam/58l0WlzE6G32wUicOZKAAttWdCnoCbE1S82ZzePRYO7/8dcxXf3FZpzUFLVq6yPgGXa42AH3D1xDda7XuNJR5zRrNBA/JuvVEXpXlJuP++RZM7HGZH5QH2mOpglgNnvmKvxASkbH0CV1lixtP1F4W+UudTcZt6WHSxYyrrdQmZuKbGhUw3wOxU60stFm0q8dvt0Le7c0uHUYl7rjG2ZGhvM+GoPC6UNLv4+rvCl2d3gyCd+eXyUaLNTQJPRozTGcrnx05hWNAgpTiszlAPiNTJUIp2G6c3fXHiRpY098IqieywOtOuxYL7S15/e2ErujiOSCvs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR15MB4287.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(396003)(346002)(366004)(376002)(451199015)(8936002)(36756003)(5660300002)(7416002)(41300700001)(38100700002)(6512007)(2906002)(86362001)(186003)(2616005)(83380400001)(31696002)(66946007)(478600001)(316002)(66899015)(31686004)(6916009)(54906003)(6666004)(53546011)(66476007)(6506007)(8676002)(66556008)(4326008)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RWdoOTJpTmR6WFR3TE1hQVR1WHRuVHNXbGJ1ZzloNDRmTzZRb2xYMW9iR2hK?=
+ =?utf-8?B?VlJjeExVM0I1cGcxNDU0UjF6TEFxbWEwZFJJR0RON0N5V2ZTY2Z0MzkyTGJJ?=
+ =?utf-8?B?THRqRk5pNlozRlk1dEwreGRxbHRMbEtheGpZZWlGVDU1NWh5d2planhOb1pB?=
+ =?utf-8?B?VjZiWGphejRyMUNlZVRCNXFkZFBqWW11VzhxckdNazFkSjdMR0xkVVBucXp0?=
+ =?utf-8?B?bXQyVE5uVVJCVEJWTkcxY0tKUGNOdlhQQ3djZTlzVTA1QUZLV0xleEM2MHZF?=
+ =?utf-8?B?aEFNOEI0OE9KQVVSaEoyVGVFQXFocnorbjh1N2xUck9CTlZxTFRFOWJESTNv?=
+ =?utf-8?B?RnhJTVNsaWEwb0xHOWd3TkZvTVJjbDVneVpyeVV4aHdIMWhPdENPZ3kvbkVy?=
+ =?utf-8?B?MXFpMGtuQ2J3d0s0S0QyNHhteW9zSG43MW9jczM1MGk0VEsxL0IzdUZHaCtM?=
+ =?utf-8?B?Q2U5YzJKbjJjVHcyK042OXQvZnhFL1oyekkwSHhzd1BWcXBicVRtOXFLRVpy?=
+ =?utf-8?B?Y3MyS2pYUzZ6L1B5cWcyZ3ZWcUxiTGpJN0JJZ0VxUE11dTd2a0VNbzdoYVhR?=
+ =?utf-8?B?RGlOZU5HZlB2L0hIam8wOWsyVW40Nmd6U1dPMjhuZ2ljWjZnTkFNV2lTTHZP?=
+ =?utf-8?B?dGVJR1ZCOGhpaEw4TWJjVEZDY2lhWmZvblord3lkYjhPZTF3aEdzRHQ3R01z?=
+ =?utf-8?B?S2pyUGU1b1Z3VzFDQUFyblpYV0kxZnc3TUZkMURDWFd1TVdRT2Z6dlVISlZW?=
+ =?utf-8?B?ZVk5SHhycUtXZllOK292S0RlRWNUVVd1MHhxUWp6UGsrOHFxRkExTmdDUHV1?=
+ =?utf-8?B?RzJvMExiZVBsZllDVFhRcURPZ21ENXVjM0NPTFhqcDM0UDh3TTg5WHhqcFpF?=
+ =?utf-8?B?bkM2ZHFNNGVacFg4TGk3VjhpYzdNQlZaN0tHRlZTM2dYT3VSV29nUzNjQkdK?=
+ =?utf-8?B?VG1uVXdlRWd5SzBrdGVIdTRQdFMrdGF3SmFXcmdtZG5McnpVaVdwa3c0Yllt?=
+ =?utf-8?B?R085TkV2WVJCQVlmL2Y1ZUdpQ2cyZ0hBY3FDT3lpbmk2S1pETHQ2VS9CV2FB?=
+ =?utf-8?B?empyeVBrc1pXcDJkRmxlN2cxaS9aREVKbXVEOXRVZURpNWg3UStsRGZrSFhE?=
+ =?utf-8?B?VWZkL3pWUVhoRG5wUXBVUmN3VEFHa2lKeXNFN2ZRb01senVMeUhEanJYcTRI?=
+ =?utf-8?B?eE5LcDhnVTk5bTM0Smh0ZHpNdGQ0UCt2SlQvNWMySWU5ZFV2U0YyaXhzTG5U?=
+ =?utf-8?B?cEllZmVtcFJZQWxsaXoyWTNzY252QmF6SXZEQ251eGNzTW1XVkZPNHFYUUov?=
+ =?utf-8?B?VnUvQjV5TnNrRG1kcW1LVWIyOVhkRWNTUUUvb1dObkZJTklxNC9QZHFIb2lU?=
+ =?utf-8?B?Q3Qram1MTHFNYjRSczhqWE5kM1ZqWGdYVnpBRlE4bGV5V1o0aVhVSlJxUmli?=
+ =?utf-8?B?TGZxcmFVK0xibDFjQ3VpRU9STDNaU0cydDN0YTJHaXNIRTZLRGt0a3poWmk0?=
+ =?utf-8?B?N2d5cjZqQzM4SWVObWQvWU4waFlrZWtrVTQ1cElSVTdRQUhNdnZIUFhRT0tH?=
+ =?utf-8?B?ZXNQaDA0d0lwT09CcEVTNmp2TVRZV3kwdDh0U1NuL0E0SmVzamZVeXM1Vjda?=
+ =?utf-8?B?R3Z2L2lQU3F4czlzNlNCYWk0cDQ2M0t5TStmMEoxV05LSlBrSFF0cUtWaWRK?=
+ =?utf-8?B?M0V4eHFBc3ZvOWxIZUg0dWw4cWhYTnJJK1pyVUp3blBjRzVnemh4d21SOUZY?=
+ =?utf-8?B?a21IYVlUQWlYNEdZc1ZxaWVONjA5WUFsdXFvWlhMbW5FVTN6UWtiT2hxUm5Z?=
+ =?utf-8?B?RnJwOVllRTBZYTlyRGs3WTNoZkhGYXg3LzVzN21VbVViUmpjdERRSDU3OS9Z?=
+ =?utf-8?B?V0N2MXdMak5jK3pQMSthL0h2OWVadjRud040ejhsOGZOMkwzYTdNUDFKQytX?=
+ =?utf-8?B?WHM4S0dKejdCQy9tVHJMdWIra0lwZW9Pc2FIWUM0NXUxWC9oVG1UT0cxcXp2?=
+ =?utf-8?B?dUR1dFhmc0htUjZNbk5jOXJkemtjaUpyTS9yejJ0dS9WanlSSk9SM1E3UEJK?=
+ =?utf-8?B?bVpxb3NYbHVTMmRoZzEyU0JROWVIdXk4SllSUlMxdnQwU2s2TE9STTN1VXRR?=
+ =?utf-8?Q?WxzVo9AWrvKplsbKUqL7P6TQV?=
+X-OriginatorOrg: meta.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9a56ca2-6d89-4e74-9317-08dabb59dd26
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR15MB4287.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2022 16:06:26.5778
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: u1idCOnWJr/mM/LC3glBGaajRrY02RYhhJksxAHVeHviMi2TI5CBGJLLdfuKnpDn
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR15MB3191
+X-Proofpoint-GUID: -HVpb-KndyhUWwyh8m4drYe6V5aVzIWB
+X-Proofpoint-ORIG-GUID: -HVpb-KndyhUWwyh8m4drYe6V5aVzIWB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-31_18,2022-10-31_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 31 Oct 2022 03:12:42 +0000, Chen Jun wrote:
-> There is a kmemleak caused by modprobe null_blk.ko
+On 10/31/22 8:19 AM, David Sterba wrote:
+> On Wed, Oct 26, 2022 at 07:41:45AM -0400, Steven Rostedt wrote:
+>> On Wed, 26 Oct 2022 07:36:45 +0000
+>> Johannes Thumshirn <Johannes.Thumshirn@wdc.com> wrote:
+>>> On 24.10.22 19:11, David Sterba wrote:
+>>>> On Mon, Oct 24, 2022 at 11:25:04AM -0400, Chris Mason wrote:
+>>>>> On 10/24/22 10:44 AM, Christoph Hellwig wrote:
+>>>>>> On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:
+>>>>>>> David, what's your plan to progress with this series?
+>>>>>>
+>>>>>> FYI, I object to merging any of my code into btrfs without a proper
+>>>>>> copyright notice, and I also need to find some time to remove my
+>>>>>> previous significant changes given that the btrfs maintainer
+>>>>>> refuses to take the proper and legally required copyright notice.
+>>>>>>
+>>>>>> So don't waste any of your time on this.
+>>>>>
+>>>>> Christoph's request is well within the norms for the kernel, given that
+>>>>> he's making substantial changes to these files.  I talked this over with
+>>>>> GregKH, who pointed me at:
+>>>>>
+>>>>>
+>>>>> Even if we'd taken up some of the other policies suggested by this doc,
+>>>>> I'd still defer to preferences of developers who have made significant
+>>>>> changes.
+>>>>
+>>>> I've asked for recommendations or best practice similar to the SPDX
+>>>> process. Something that TAB can acknowledge and that is perhaps also
+>>>> consulted with lawyers. And understood within the linux project,
+>>>> not just that some dudes have an argument because it's all clear as mud
+>>>> and people are used to do things differently.
+>>>>
+>>>> The link from linux foundation blog is nice but unless this is codified
+>>>> into the process it's just somebody's blog post. Also there's a paragraph
+>>>> about "Why not list every copyright holder?" that covers several points
+>>>> why I don't want to do that.
+>>>>
+>>>> But, if TAB says so I will do, perhaps spending hours of unproductive
+>>>> time looking up the whole history of contributors and adding year, name,
+>>>> company whatever to files.
+>>
+>> There's no requirement to list every copyright holder, as most developers do
+>> not require it for acceptance. The issue I see here is that there's someone
+>> that does require it for you to accept their code.
 > 
-> unreferenced object 0xffff8881acb1f000 (size 1024):
->   comm "modprobe", pid 836, jiffies 4294971190 (age 27.068s)
->   hex dump (first 32 bytes):
->     00 00 00 00 ad 4e ad de ff ff ff ff 00 00 00 00  .....N..........
->     ff ff ff ff ff ff ff ff 00 53 99 9e ff ff ff ff  .........S......
->   backtrace:
->     [<000000004a10c249>] kmalloc_node_trace+0x22/0x60
->     [<00000000648f7950>] blk_mq_alloc_and_init_hctx+0x289/0x350
->     [<00000000af06de0e>] blk_mq_realloc_hw_ctxs+0x2fe/0x3d0
->     [<00000000e00c1872>] blk_mq_init_allocated_queue+0x48c/0x1440
->     [<00000000d16b4e68>] __blk_mq_alloc_disk+0xc8/0x1c0
->     [<00000000d10c98c3>] 0xffffffffc450d69d
->     [<00000000b9299f48>] 0xffffffffc4538392
->     [<0000000061c39ed6>] do_one_initcall+0xd0/0x4f0
->     [<00000000b389383b>] do_init_module+0x1a4/0x680
->     [<0000000087cf3542>] load_module+0x6249/0x7110
->     [<00000000beba61b8>] __do_sys_finit_module+0x140/0x200
->     [<00000000fdcfff51>] do_syscall_64+0x35/0x80
->     [<000000003c0f1f71>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
+> That this time it is a hard requirement is a first occurrence for me
+> acting as maintainer. In past years we had new code and I asked if the
+> notice needs to be there and asked for resend without it. The reason is
+> that we have git and complete change history, but that is apparently not
+> sufficient for everybody.
 > 
-> [...]
+>> The policy is simple. If someone requires a copyright notice for their
+>> code, you simply add it, or do not take their code. You can be specific
+>> about what that code is that is copyrighted. Perhaps just around the code in
+>> question or a description at the top.
+> 
+> Let's say it's OK for substantial amount of code. What if somebody
+> moves existing code that he did not write to a new file and adds a
+> copyright notice? We got stuck there, both sides have different answer.
+> I see it at minimum as unfair to the original code authors if not
+> completely wrong because it could appear as "stealing" ownership.
 
-Applied, thanks!
+One option is to add a copyright line as suggested by the
+LF blog post "Copyright The Btrfs Contributors", and to make it clear
+the original authors of the old file are welcome to send patches
+if they feel it is required.
 
-[1/1] blk-mq: Fix kmemleak in blk_mq_init_allocated_queue
-      commit: 943f45b9399ed8b2b5190cbc797995edaa97f58f
+> 
+>> Looking over the thread, I'm still confused at what the issue is. Is it
+>> that if you add one copyright notice you must do it for everyone else? Is
+>> everyone else asking for it? If not, just add the one and be done with it.
+> 
+> My motivation is to be fair to all contributors and stick to the project
+> standards (ideally defined in process). Adding a copyright notice after
+> several years of not taking them would rightfully raise questions from
+> past and current contributors what would deserve to be mentioned as
+> copyright holders.
+> 
+> This leaves me with 'all or nothing', where 'all' means to add the
+> notices where applicable and we can continue perhaps with more
+> contributions in the future. But that'll cost time and inventing how to
+> do it so everybody is satisfied with the result.
 
-Best regards,
--- 
-Jens Axboe
+Everyone understands that you're trying to be fair, and I'm sure our
+major contributors are happy to help.  I think the most reasonable
+path forward is to add the blanket Btrfs Contributor copyright line
+above and be open to additional lines for major changes (past or
+present).
 
+I'm definitely not suggesting that you (or anyone else) sit down with
+git history and try to determine the perfect set of copyright lines for
+past contributions.  It's just not required at all.
+
+-chris
 
