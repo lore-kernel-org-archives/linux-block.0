@@ -2,123 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8DB2FA3740
-	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 12:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A151CFA3744
+	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 12:19:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231209AbiJaMHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Oct 2022 08:07:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39168 "EHLO
+        id S229719AbiJaMTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Oct 2022 08:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231215AbiJaMHP (ORCPT
+        with ESMTP id S231294AbiJaMTo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2022 08:07:15 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8532614F
-        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 05:07:12 -0700 (PDT)
-Received: from dggpeml500024.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N1BbX0ZNzzVj7H;
-        Mon, 31 Oct 2022 20:02:16 +0800 (CST)
-Received: from huawei.com (10.175.112.208) by dggpeml500024.china.huawei.com
- (7.185.36.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 31 Oct
- 2022 20:07:10 +0800
-From:   Yuan Can <yuancan@huawei.com>
-To:     <efremov@linux.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>
-CC:     <yuancan@huawei.com>
-Subject: [PATCH] block/floppy: Fix memory leak in do_floppy_init()
-Date:   Mon, 31 Oct 2022 12:04:43 +0000
-Message-ID: <20221031120443.78993-1-yuancan@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 31 Oct 2022 08:19:44 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22BFF58E;
+        Mon, 31 Oct 2022 05:19:31 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 74D4D1F94D;
+        Mon, 31 Oct 2022 12:19:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1667218770;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r0NmLcuK0RtLWfxsYewoTZqt5GInuYF2VLW7qII+j/0=;
+        b=Z6xIAltqg5yCEsY1t1qCKAaQsFCmib9lDkTeek5bj3g67xwB6fw6AADs0QV/DZPQTpeu3G
+        SN9TbkfmvPkhHyjahr2DVj9+BN66G5ZyYtRZDdBkDsEomZikZrgtFr1jHEk0tYpWhBup0N
+        E/jOWXllREehCR0gaYXUOetqs1cGKWc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1667218770;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r0NmLcuK0RtLWfxsYewoTZqt5GInuYF2VLW7qII+j/0=;
+        b=5O7W2TMvqcDLcpbfQsY5xVaG7C8PA0rGGfr8r9XtZDhNtXfReYUVgeqrLoVqEAI6XHqHby
+        JJR+Iy/X589dSIDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 126D613451;
+        Mon, 31 Oct 2022 12:19:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id /2qUA1K9X2M9NwAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Mon, 31 Oct 2022 12:19:30 +0000
+Date:   Mon, 31 Oct 2022 13:19:12 +0100
+From:   David Sterba <dsterba@suse.cz>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "dsterba@suse.cz" <dsterba@suse.cz>, Chris Mason <clm@meta.com>,
+        Christoph Hellwig <hch@lst.de>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Message-ID: <20221031121912.GY5824@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <20220901074216.1849941-1-hch@lst.de>
+ <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+ <20221024144411.GA25172@lst.de>
+ <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
+ <20221024171042.GF5824@suse.cz>
+ <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
+ <20221026074145.2be5ca09@gandalf.local.home>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.112.208]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500024.china.huawei.com (7.185.36.10)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221026074145.2be5ca09@gandalf.local.home>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A memory leak was reported when floppy_alloc_disk() failed in
-do_floppy_init().
+On Wed, Oct 26, 2022 at 07:41:45AM -0400, Steven Rostedt wrote:
+> On Wed, 26 Oct 2022 07:36:45 +0000
+> Johannes Thumshirn <Johannes.Thumshirn@wdc.com> wrote:
+> > On 24.10.22 19:11, David Sterba wrote:
+> > > On Mon, Oct 24, 2022 at 11:25:04AM -0400, Chris Mason wrote:  
+> > >> On 10/24/22 10:44 AM, Christoph Hellwig wrote:  
+> > >>> On Mon, Oct 24, 2022 at 08:12:29AM +0000, Johannes Thumshirn wrote:  
+> > >>>> David, what's your plan to progress with this series?  
+> > >>>
+> > >>> FYI, I object to merging any of my code into btrfs without a proper
+> > >>> copyright notice, and I also need to find some time to remove my
+> > >>> previous significant changes given that the btrfs maintainer
+> > >>> refuses to take the proper and legally required copyright notice.
+> > >>>
+> > >>> So don't waste any of your time on this.  
+> > >>
+> > >> Christoph's request is well within the norms for the kernel, given that 
+> > >> he's making substantial changes to these files.  I talked this over with 
+> > >> GregKH, who pointed me at:
+> > >>
+> > >> https://www.linuxfoundation.org/blog/blog/copyright-notices-in-open-source-software-projects
+> > >>
+> > >> Even if we'd taken up some of the other policies suggested by this doc, 
+> > >> I'd still defer to preferences of developers who have made significant 
+> > >> changes.  
+> > > 
+> > > I've asked for recommendations or best practice similar to the SPDX
+> > > process. Something that TAB can acknowledge and that is perhaps also
+> > > consulted with lawyers. And understood within the linux project,
+> > > not just that some dudes have an argument because it's all clear as mud
+> > > and people are used to do things differently.
+> > > 
+> > > The link from linux foundation blog is nice but unless this is codified
+> > > into the process it's just somebody's blog post. Also there's a paragraph
+> > > about "Why not list every copyright holder?" that covers several points
+> > > why I don't want to do that.
+> > > 
+> > > But, if TAB says so I will do, perhaps spending hours of unproductive
+> > > time looking up the whole history of contributors and adding year, name,
+> > > company whatever to files.
+> 
+> There's no requirement to list every copyright holder, as most developers do
+> not require it for acceptance. The issue I see here is that there's someone
+> that does require it for you to accept their code.
 
-unreferenced object 0xffff888115ed25a0 (size 8):
-  comm "modprobe", pid 727, jiffies 4295051278 (age 25.529s)
-  hex dump (first 8 bytes):
-    00 ac 67 5b 81 88 ff ff                          ..g[....
-  backtrace:
-    [<000000007f457abb>] __kmalloc_node+0x4c/0xc0
-    [<00000000a87bfa9e>] blk_mq_realloc_tag_set_tags.part.0+0x6f/0x180
-    [<000000006f02e8b1>] blk_mq_alloc_tag_set+0x573/0x1130
-    [<0000000066007fd7>] 0xffffffffc06b8b08
-    [<0000000081f5ac40>] do_one_initcall+0xd0/0x4f0
-    [<00000000e26d04ee>] do_init_module+0x1a4/0x680
-    [<000000001bb22407>] load_module+0x6249/0x7110
-    [<00000000ad31ac4d>] __do_sys_finit_module+0x140/0x200
-    [<000000007bddca46>] do_syscall_64+0x35/0x80
-    [<00000000b5afec39>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
-unreferenced object 0xffff88810fc30540 (size 32):
-  comm "modprobe", pid 727, jiffies 4295051278 (age 25.529s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<000000007f457abb>] __kmalloc_node+0x4c/0xc0
-    [<000000006b91eab4>] blk_mq_alloc_tag_set+0x393/0x1130
-    [<0000000066007fd7>] 0xffffffffc06b8b08
-    [<0000000081f5ac40>] do_one_initcall+0xd0/0x4f0
-    [<00000000e26d04ee>] do_init_module+0x1a4/0x680
-    [<000000001bb22407>] load_module+0x6249/0x7110
-    [<00000000ad31ac4d>] __do_sys_finit_module+0x140/0x200
-    [<000000007bddca46>] do_syscall_64+0x35/0x80
-    [<00000000b5afec39>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
+That this time it is a hard requirement is a first occurrence for me
+acting as maintainer. In past years we had new code and I asked if the
+notice needs to be there and asked for resend without it. The reason is
+that we have git and complete change history, but that is apparently not
+sufficient for everybody.
 
-If the floppy_alloc_disk() failed, disks of current drive will not be set,
-thus the lastest allocated set->tag cannot be freed in the error handling
-path. A simple call graph shown as below:
+> The policy is simple. If someone requires a copyright notice for their
+> code, you simply add it, or do not take their code. You can be specific
+> about what that code is that is copyrighted. Perhaps just around the code in
+> question or a description at the top.
 
- floppy_module_init()
-   floppy_init()
-     do_floppy_init()
-       for (drive = 0; drive < N_DRIVE; drive++)
-         blk_mq_alloc_tag_set()
-           blk_mq_alloc_tag_set_tags()
-             blk_mq_realloc_tag_set_tags() # set->tag allocated
-         floppy_alloc_disk()
-           blk_mq_alloc_disk() # error occurred, disks failed to allocated
+Let's say it's OK for substantial amount of code. What if somebody
+moves existing code that he did not write to a new file and adds a
+copyright notice? We got stuck there, both sides have different answer.
+I see it at minimum as unfair to the original code authors if not
+completely wrong because it could appear as "stealing" ownership.
 
-       ->out_put_disk:
-       for (drive = 0; drive < N_DRIVE; drive++)
-         if (!disks[drive][0]) # the last disks is not set and loop break
-           break;
-         blk_mq_free_tag_set() # the latest allocated set->tag leaked
+> Looking over the thread, I'm still confused at what the issue is. Is it
+> that if you add one copyright notice you must do it for everyone else? Is
+> everyone else asking for it? If not, just add the one and be done with it.
 
-Fix this problem by free the set->tag of current drive before jump to
-error handling path.
+My motivation is to be fair to all contributors and stick to the project
+standards (ideally defined in process). Adding a copyright notice after
+several years of not taking them would rightfully raise questions from
+past and current contributors what would deserve to be mentioned as
+copyright holders.
 
-Fixes: 302cfee15029 ("floppy: use a separate gendisk for each media format")
-Signed-off-by: Yuan Can <yuancan@huawei.com>
----
- drivers/block/floppy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+This leaves me with 'all or nothing', where 'all' means to add the
+notices where applicable and we can continue perhaps with more
+contributions in the future. But that'll cost time and inventing how to
+do it so everybody is satisfied with the result.
 
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index ccad3d7b3ddd..487840e3564d 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4593,8 +4593,10 @@ static int __init do_floppy_init(void)
- 			goto out_put_disk;
- 
- 		err = floppy_alloc_disk(drive, 0);
--		if (err)
-+		if (err) {
-+			blk_mq_free_tag_set(&tag_sets[drive]);
- 			goto out_put_disk;
-+		}
- 
- 		timer_setup(&motor_off_timer[drive], motor_off_callback, 0);
- 	}
--- 
-2.17.1
-
+You may have missed the start of the discussions, https://lore.kernel.org/all/20220909101521.GS32411@twin.jikos.cz/ ,
+Bradley Kuhn's reply https://lore.kernel.org/all/YyfNMcUM+OHn5qi8@ebb.org/ ,
+the documented position on the notices https://btrfs.wiki.kernel.org/index.php/Developer%27s_FAQ#Copyright_notices_in_files.2C_SPDX .
