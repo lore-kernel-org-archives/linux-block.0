@@ -2,153 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F154FC38A02
-	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 01:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F2BFA373D
+	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 01:53:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbiJaBwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 21:52:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
+        id S229692AbiJaBxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 21:53:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiJaBwJ (ORCPT
+        with ESMTP id S229457AbiJaBxe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 21:52:09 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567306550
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 18:52:08 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N0x105lR4zl9vT
-        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 09:49:56 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgC3E+ZFKl9jpbbdAQ--.1600S3;
-        Mon, 31 Oct 2022 09:52:06 +0800 (CST)
-Subject: Re: [PATCH 7/7] block: store the holder kobject in bd_holder_disk
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>
-Cc:     Yu Kuai <yukuai1@huaweicloud.com>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, "yukuai (C)" <yukuai3@huawei.com>
-References: <20221030153120.1045101-1-hch@lst.de>
- <20221030153120.1045101-8-hch@lst.de>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <fd409996-e5e1-d7af-b31d-87db943eaa25@huaweicloud.com>
-Date:   Mon, 31 Oct 2022 09:52:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 30 Oct 2022 21:53:34 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF2195AE
+        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 18:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1667181213; x=1698717213;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=X5zEpX6SMAZQugAJoTV81VehZ+el5Q+3olqpJdDoQEM=;
+  b=p923N2GHDUl4eAK67WUcFMv7ubaKPImnpVm6hFUgPwUutdOfDsAMHq6j
+   zweCKtXaHpPrCvAANtMuExsMYYGMU4rXRiD3+OABKGW0D7Ap9yofOHAOU
+   Nl/kGtXazLa8l4xnRuEv6k4N0T9zlbbB/lfMW8OqoOw5NkYUiyskdP0FW
+   hs84A/TOjZGG4R9QmU+7xEXBWKjKtl0JomMuU9VdU4mXQJP9rLj9JQ2xC
+   8qsFo7ouCpRIWK+CsVKoHxQ3CpVt2Gt3wynoxLj4I1k/dCldtOHO85EDq
+   A2oT/0ZW0XKhRUtYWAjQWvXUOV0xb6TUk14YAPnXyxp84Ydugag5Q+nIP
+   w==;
+X-IronPort-AV: E=Sophos;i="5.95,227,1661788800"; 
+   d="scan'208";a="220246014"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 31 Oct 2022 09:53:33 +0800
+IronPort-SDR: G2Nu/8JpOLFX6bJIj8NcXEnC16AAMTc/4MSaGuboet7lJ2OYTSaMQRVXWK7GOxwHzZhN0GbRIU
+ v1SLKI9Oazqvh4gOAx1lalyLF/1uM0Z8YnmdVCdeqRZgoA9x9EvgFNgyeLJDMgVpU9qISSfau6
+ SG/fYRl0H4w0Tr8239dTafLN3RMbtEXOYwlnEYDgoB0Qams0syg+zJEhOELKT2b8hafXgweFb8
+ 26AutXQHksjP5gszxQ7+syoic6YUSTdhrF4sCFoe7RmEjqO15iWsUda4lncm0Euc+DdS3OJK67
+ Bk/M0HAGHbP8x+QmU6vQ4YP4
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Oct 2022 18:07:06 -0700
+IronPort-SDR: 2C9pk5xmD5mts8e5EzVSAkO4+m5dT9mJfnOCeuWBmH5fW41Je7kE6mf54miMMZgBZCg0kEuTQg
+ YoU7SOYBNCojjz3j8tKMhd4gYW6BnvUG51Q6HG/FiCqHA+l1vWYtrHxaaZPmRgz7wSQm4mf15y
+ BaxA5Wka1W7ufIDA/Op5DNuHxUmD9LURXb3Z28PqAs/VfxAIBRh7H8wmeFrHPciTSea9oSiKRJ
+ fMTRtFZaWOjluDd1OmcOgERvDsR+jrrbikpyrcvB1jh4QhUFWzCfeKqF5sUg/xgnQCWDhQd4Im
+ WC0=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Oct 2022 18:53:33 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4N0x586yNxz1RwtC
+        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 18:53:32 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:mime-version
+        :x-mailer:message-id:date:subject:to:from; s=dkim; t=1667181212;
+         x=1669773213; bh=X5zEpX6SMAZQugAJoTV81VehZ+el5Q+3olqpJdDoQEM=; b=
+        sTVLSidPt1Z/gAxxlLa4bRTPqZbgdV37A6eSVzTt38taLgNrhdl60ypH9CJxwkrQ
+        7NMzLX2izJTDlliBO6XRqWVgG3/JyrKcnegg/54jaitdRvwF+JFIpgQ1maninTSD
+        MSiX8OHZGWbPBYielm2Fk7YcsuSoOyauteHZ6xVODMec9kRR0DIn5/8fZA8TOe8y
+        bZKDh1Madaame0dr70jiKSEufaaAeRMfO6Az0Gq99SEn6D1IeKEaUTq3OozobpfM
+        9VwA/4IvPOvjGGiR1+tXAonGxQSHRFM7kiJK0vegWbcJryB0iltJ+oINHnKTbTa+
+        yI7qJgjS0oqRSF+favvPCg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id EuioKxy858u2 for <linux-block@vger.kernel.org>;
+        Sun, 30 Oct 2022 18:53:32 -0700 (PDT)
+Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4N0x573JZfz1RvLy;
+        Sun, 30 Oct 2022 18:53:31 -0700 (PDT)
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+To:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH v4 0/7] 
+Date:   Mon, 31 Oct 2022 10:53:22 +0900
+Message-Id: <20221031015329.141954-1-damien.lemoal@opensource.wdc.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-In-Reply-To: <20221030153120.1045101-8-hch@lst.de>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgC3E+ZFKl9jpbbdAQ--.1600S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxAFWxKw4UGF17GF1DtrWDArb_yoW5Cr1DpF
-        Z8XFyxtrW8Ga1UWw4jgw47uFyjvryYq3W8CFyI9ryS9rZ8Jr1vkr13Jr1UJFWxGrZ7trs0
-        qF47Xws8AF4qkFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUkE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-        JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-        CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-        2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-        W8JwACjcxG0xvEwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7I2V7IY0VAS07AlzVAY
-        IcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-        v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkG
-        c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-        0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j
-        6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHU
-        DUUUUU=
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+These patches cleanup and improve libata support for the FUA device
+feature. Patch 6 enables FUA support by default for any drive that
+reports supporting the feature as well as NCQ.
 
-ÔÚ 2022/10/30 23:31, Christoph Hellwig Ð´µÀ:
-> We hold a reference to the holder kobject for each bd_holder_disk,
-> so to make the code a bit more robust, use a reference to it instead
-> of the block_device.  As long as no one clears ->bd_holder_dir in
-> before freeing the disk, this isn't strictly required, but it does
-> make the code more clear and more robust.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   block/holder.c | 23 ++++++++++-------------
->   1 file changed, 10 insertions(+), 13 deletions(-)
-> 
-> diff --git a/block/holder.c b/block/holder.c
-> index dd9327b43ce05..a8c355b9d0806 100644
-> --- a/block/holder.c
-> +++ b/block/holder.c
-> @@ -4,7 +4,7 @@
->   
->   struct bd_holder_disk {
->   	struct list_head	list;
-> -	struct block_device	*bdev;
-> +	struct kobject		*holder_dir;
->   	int			refcnt;
->   };
->   
-> @@ -14,7 +14,7 @@ static struct bd_holder_disk *bd_find_holder_disk(struct block_device *bdev,
->   	struct bd_holder_disk *holder;
->   
->   	list_for_each_entry(holder, &disk->slave_bdevs, list)
-> -		if (holder->bdev == bdev)
-> +		if (holder->holder_dir == bdev->bd_holder_dir)
->   			return holder;
->   	return NULL;
->   }
-> @@ -82,27 +82,24 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   	}
->   
->   	INIT_LIST_HEAD(&holder->list);
-> -	holder->bdev = bdev;
->   	holder->refcnt = 1;
-> +	holder->holder_dir = kobject_get(bdev->bd_holder_dir);
+Changes from v3:
+- Added patch 1 to prevent any block device user from issuing a
+  REQ_FUA read.
+- Changed patch 5 to remove the check for REQ_FUA read and also remove=20
+  support for ATA_CMD_WRITE_MULTI_FUA_EXT as this command is obsolete
+  in recent ACS specifications.
 
-I wonder is this safe here, if kobject reference is 0 here and
-bd_holder_dir is about to be freed. Here in kobject_get, kref_get() will
-warn about uaf, and kobject_get will return a address that is about to
-be freed.
+Changes from v2:
+ - Added patch 1 and 2 as preparatory patches
+ - Added patch 4 to fix FUA writes handling for the non-ncq case. Note
+   that it is possible that the drives blacklisted in patch 5 are
+   actually OK since the code back in 2012 had the issue with the wrong
+   use of LBA 28 commands for FUA writes.
 
-Thansk,
-Kuai
-> +
->   	ret = add_symlink(disk->slave_dir, bdev_kobj(bdev));
->   	if (ret)
-> -		goto out_free_holder;
-> -	ret = add_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
-> +		goto out_put_holder_dir;
-> +	ret = add_symlink(holder->holder_dir, &disk_to_dev(disk)->kobj);
->   	if (ret)
->   		goto out_del_symlink;
->   	list_add(&holder->list, &disk->slave_bdevs);
->   
-> -	/*
-> -	 * del_gendisk drops the initial reference to bd_holder_dir, so we need
-> -	 * to keep our own here to allow for cleanup past that point.
-> -	 */
-> -	kobject_get(bdev->bd_holder_dir);
->   	mutex_unlock(&disk->open_mutex);
->   	return 0;
->   
->   out_del_symlink:
->   	del_symlink(disk->slave_dir, bdev_kobj(bdev));
-> -out_free_holder:
-> +out_put_holder_dir:
-> +	kobject_put(holder->holder_dir);
->   	kfree(holder);
->   out_unlock:
->   	mutex_unlock(&disk->open_mutex);
-> @@ -131,8 +128,8 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
->   	holder = bd_find_holder_disk(bdev, disk);
->   	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
->   		del_symlink(disk->slave_dir, bdev_kobj(bdev));
-> -		del_symlink(bdev->bd_holder_dir, &disk_to_dev(disk)->kobj);
-> -		kobject_put(bdev->bd_holder_dir);
-> +		del_symlink(holder->holder_dir, &disk_to_dev(disk)->kobj);
-> +		kobject_put(holder->holder_dir);
->   		list_del_init(&holder->list);
->   		kfree(holder);
->   	}
-> 
+Changes from v1:
+ - Removed Maciej's patch 2. Instead, blacklist drives which are known
+   to have a buggy FUA support.
+
+Damien Le Moal (7):
+  block: Prevent the use of REQ_FUA with read operations
+  ata: libata: Introduce ata_ncq_supported()
+  ata: libata: Rename and cleanup ata_rwcmd_protocol()
+  ata: libata: cleanup fua support detection
+  ata: libata: Fix FUA handling in ata_build_rw_tf()
+  ata: libata: blacklist FUA support for known buggy drives
+  ata: libata: Enable fua support by default
+
+ .../admin-guide/kernel-parameters.txt         |  3 +
+ block/blk-flush.c                             | 12 +++
+ drivers/ata/libata-core.c                     | 77 ++++++++++++++-----
+ drivers/ata/libata-scsi.c                     | 30 +-------
+ include/linux/libata.h                        | 34 +++++---
+ 5 files changed, 100 insertions(+), 56 deletions(-)
+
+--=20
+2.38.1
 
