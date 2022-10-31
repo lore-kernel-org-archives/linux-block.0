@@ -2,59 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59744FA3741
-	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 14:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B46D0ECAAA1
+	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 14:31:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbiJaOJF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Oct 2022 10:09:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55098 "EHLO
+        id S231605AbiJaObL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Oct 2022 10:31:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231321AbiJaOJA (ORCPT
+        with ESMTP id S231596AbiJaObK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2022 10:09:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68FF610B47
-        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 07:08:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667225282;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ssV5tIbeaDdUb05cqYH6611+3Ll1a3abXRc3rHIdohQ=;
-        b=DAShlfJd0Xg+nVaCHd7v+1XsFDfum5L92IzMH3ONOoMuRVLObEaB3KdVmo2w15zi6x/A3f
-        22tK81Tx0REVoLH75rWyoR5/rk1DibBX3U0TbY6TqySx4aJCahj12NTaWGnk1MlD2vtdK/
-        N88iRwhz3CEv9BmOZTslWVYYiRuydZc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-500-Z08Maf4fOTmFY7vF07KYhQ-1; Mon, 31 Oct 2022 10:07:58 -0400
-X-MC-Unique: Z08Maf4fOTmFY7vF07KYhQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 600063C0D84B;
-        Mon, 31 Oct 2022 14:07:55 +0000 (UTC)
-Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 22B5A40C2066;
-        Mon, 31 Oct 2022 14:07:50 +0000 (UTC)
-Date:   Mon, 31 Oct 2022 22:07:45 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Chen Jun <chenjun102@huawei.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, will@kernel.org, xuqiang36@huawei.com
-Subject: Re: [PATCH] blk-mq: Fix kmemleak in blk_mq_init_allocated_queue
-Message-ID: <Y1/Wsfo0f5csRhsr@T590>
-References: <20221031031242.94107-1-chenjun102@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        Mon, 31 Oct 2022 10:31:10 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326E265A6
+        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 07:31:09 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id q71so10839436pgq.8
+        for <linux-block@vger.kernel.org>; Mon, 31 Oct 2022 07:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UxCaUCeOv04svZ2y77cTIK0oMsYuJugdQM+dBKql0sI=;
+        b=IRZ7eArpvlGdYkmcQnoG9wRJvZZRYTOjv+75+y7qrqJKP2eRSqTED0/2qbTkhBWLQW
+         qn6F2oOnAkXe27Mlw/oX0MzgGhHNnKSSeUVp1LwXVkfASc9oJmR9NUJDoZLNK/A3QG1B
+         GmbS7ns5SNp/q1n+LLOfa64KEfp0iHYPXHbvbaCa9ITNIC1pR/x7eGt/GQF2iXVRZSqA
+         qomXVk0ErCe9GL1yOpI0pfSEa6Mxrkb4r8R8yFhVatklAs3hKVhzpxNSUak7jLw2GCqM
+         aeScFdmz9vKOOVTOm5EL0jHJ1+f6j4vYA5SoJm/ZacGiQQNgyROHfnSxjZHBastsJFPd
+         +Kag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UxCaUCeOv04svZ2y77cTIK0oMsYuJugdQM+dBKql0sI=;
+        b=1PEtPwTPDiWW4csBXM12cr2Tw4QUEyGU5FlIreQ/nYfEwsJgoTEP/t2A3M3z8iC0Zm
+         ++UMMmKi/AftIuywhkvzJ/wjVbmjqswGQUDcr7hxG8uxEayc/bq/8eKoX2lGJ5PrhDIP
+         Y0GgVdOM2oDkvVG3h0Xa8m2opwoWgbeGY1XPtMkIp5DExcwF9TpQT/PSoUQmXKRFrWxC
+         gmqjDk/lFvWfPOpgLXVTOikJ6HXb8IylfWQv3WTbQH34UxjO/k2VZ4C8TOQ8KkvA9sgQ
+         ZAhmhJxTB7WanHnv8AH0WnFwuVWcHxMJmfIVegOwrd0vn8UyPzGaQia2QpOt8trGUskj
+         nnjg==
+X-Gm-Message-State: ACrzQf3kJT2FXXdUDAsw3b8WDukJutVRRf/u7ljLcZ7o8ZLCBuae3Kan
+        hbld0DMNUxbZ9nJeCrFbR03P2g==
+X-Google-Smtp-Source: AMsMyM6k2sHCrwoWqguXpQcWH+977dJthW1xU3lPj4RysM6XzuN+9vHs092ZksVUjGHPd1nUx3Gv5w==
+X-Received: by 2002:a05:6a00:16c4:b0:535:890:d4a with SMTP id l4-20020a056a0016c400b0053508900d4amr14795660pfc.0.1667226668625;
+        Mon, 31 Oct 2022 07:31:08 -0700 (PDT)
+Received: from [127.0.0.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id c12-20020a170902d48c00b0017f36638010sm4552508plg.276.2022.10.31.07.31.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Oct 2022 07:31:08 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Chen Jun <chenjun102@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, will@kernel.org, ming.lei@redhat.com
+Cc:     xuqiang36@huawei.com
 In-Reply-To: <20221031031242.94107-1-chenjun102@huawei.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+References: <20221031031242.94107-1-chenjun102@huawei.com>
+Subject: Re: [PATCH] blk-mq: Fix kmemleak in blk_mq_init_allocated_queue
+Message-Id: <166722666769.125558.7022234189834891609.b4-ty@kernel.dk>
+Date:   Mon, 31 Oct 2022 08:31:07 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Mailer: b4 0.11.0-dev-d9ed3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 03:12:42AM +0000, Chen Jun wrote:
+On Mon, 31 Oct 2022 03:12:42 +0000, Chen Jun wrote:
 > There is a kmemleak caused by modprobe null_blk.ko
 > 
 > unreferenced object 0xffff8881acb1f000 (size 1024):
@@ -77,48 +90,15 @@ On Mon, Oct 31, 2022 at 03:12:42AM +0000, Chen Jun wrote:
 >     [<00000000fdcfff51>] do_syscall_64+0x35/0x80
 >     [<000000003c0f1f71>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
 > 
-> That is because q->ma_ops is set to NULL before blk_release_queue is
-> called.
-> 
-> blk_mq_init_queue_data
->   blk_mq_init_allocated_queue
->     blk_mq_realloc_hw_ctxs
->       for (i = 0; i < set->nr_hw_queues; i++) {
->         old_hctx = xa_load(&q->hctx_table, i);
->         if (!blk_mq_alloc_and_init_hctx(.., i, ..))		[1]
->           if (!old_hctx)
-> 	    break;
-> 
->       xa_for_each_start(&q->hctx_table, j, hctx, j)
->         blk_mq_exit_hctx(q, set, hctx, j); 			[2]
-> 
->     if (!q->nr_hw_queues)					[3]
->       goto err_hctxs;
-> 
->   err_exit:
->       q->mq_ops = NULL;			  			[4]
-> 
->   blk_put_queue
->     blk_release_queue
->       if (queue_is_mq(q))					[5]
->         blk_mq_release(q);
-> 
-> [1]: blk_mq_alloc_and_init_hctx failed at i != 0.
-> [2]: The hctxs allocated by [1] are moved to q->unused_hctx_list and
-> will be cleaned up in blk_mq_release.
-> [3]: q->nr_hw_queues is 0.
-> [4]: Set q->mq_ops to NULL.
-> [5]: queue_is_mq returns false due to [4]. And blk_mq_release
-> will not be called. The hctxs in q->unused_hctx_list are leaked.
-> 
-> To fix it, call blk_release_queue in exception path.
-> 
-> Fixes: 2f8f1336a48b ("blk-mq: always free hctx after request queue is freed")
-> Signed-off-by: Yuan Can <yuancan@huawei.com>
-> Signed-off-by: Chen Jun <chenjun102@huawei.com>
+> [...]
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Applied, thanks!
 
-Thanks,
-Ming
+[1/1] blk-mq: Fix kmemleak in blk_mq_init_allocated_queue
+      commit: 943f45b9399ed8b2b5190cbc797995edaa97f58f
+
+Best regards,
+-- 
+Jens Axboe
+
 
