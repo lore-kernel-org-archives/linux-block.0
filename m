@@ -2,57 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6EB6FA3742
-	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 12:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F8B6ECAAA1
+	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 13:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbiJaMYb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 31 Oct 2022 08:24:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51294 "EHLO
+        id S231153AbiJaNFm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 31 Oct 2022 09:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231224AbiJaMYa (ORCPT
+        with ESMTP id S231265AbiJaNFl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 31 Oct 2022 08:24:30 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6D01E3;
-        Mon, 31 Oct 2022 05:24:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=+WDg5qNBe76FnzbLrO8nDJQ46OMFpJ0zF+2XMGbgyVw=; b=G2KuZBTUsRRYlM25mWS2OzlfUW
-        vRYmMylWTdj4cHrNo7JgTSQnawMwdiX2LlU1I4+ApxI+kAoZisrbAr8zzcpg/S005SSbFiLHHGUqG
-        143M/86X3wEWKmpvLtPVqr1zYq5diK4PaOJAijthuaIugtmkywdHIz4FognofoOqYu2rhQ3DxCoGg
-        gJY5lWQ8XPUvodlopUo4ayTh4utr4yFpoOaWGXsSjvzd/+CGTzGZZeH2nFk0GBA3O0x66is3Gp3AY
-        JJvY2LLviOSEGgZex8koGgxEfC3gHovSwgpHYmzWnSl24pvHiWjugg9SIzCM8PdhCbDHnJ5NvKZSq
-        X048//cQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1opTq8-00BeDl-3K; Mon, 31 Oct 2022 12:24:28 +0000
-Date:   Mon, 31 Oct 2022 05:24:28 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "Jiri Slaby (SUSE)" <jirislaby@kernel.org>
-Cc:     tj@kernel.org, linux-kernel@vger.kernel.org,
-        Martin Liska <mliska@suse.cz>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Message-ID: <Y1++fLJXkeZgtXR2@infradead.org>
-References: <20221031114520.10518-1-jirislaby@kernel.org>
+        Mon, 31 Oct 2022 09:05:41 -0400
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D670B2632;
+        Mon, 31 Oct 2022 06:05:38 -0700 (PDT)
+Received: by ajax-webmail-mail-app2 (Coremail) ; Mon, 31 Oct 2022 21:05:15
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.14.30.50]
+Date:   Mon, 31 Oct 2022 21:05:15 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
+To:     "kernel test robot" <yujie.liu@intel.com>
+Cc:     oe-lkp@lists.linux.dev, lkp@intel.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, axboe@kernel.dk, kbusch@kernel.org,
+        hch@lst.de, sagi@grimberg.me, bvanassche@acm.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Re: [RESEND PATCH v2 3/3] block: hide back
+ blk_freeze_queue_start and export its blk-mq alias
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
+In-Reply-To: <202210311456.2d2c7899-yujie.liu@intel.com>
+References: <202210311456.2d2c7899-yujie.liu@intel.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031114520.10518-1-jirislaby@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Message-ID: <e316420.15e91d.1842e256c7e.Coremail.nickyc975@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: by_KCgCHz1sLyF9jH0BTBw--.53074W
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgIAB1ZdtcLuXwAAsK
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW5Jw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 12:45:20PM +0100, Jiri Slaby (SUSE) wrote:
-> Cast the enum members to int when printing them.
-> 
-> Alternatively, we can cast them to ulong (to silence gcc < 12) and use %lu.
-> Alternatively, we can move VTIME_PER_SEC away from the enum.
-
-Yes, either split the enum or just use a define.  But casts are a big
-code smell and should be avoided if there is a reasonable alternative.
+Pgo+IEdyZWV0aW5nLAo+IAo+IEZZSSwgd2Ugbm90aWNlZCBXQVJOSU5HOmF0X2Jsb2NrL2Jsay1t
+cS5jOiNibGtfbXFfZnJlZXplX3F1ZXVlIGR1ZSB0byBjb21taXQgKGJ1aWx0IHdpdGggZ2NjLTEx
+KToKPgoKU29ycnkgZm9yIHRoZSBkaXN0dXJiYW5jZS4KClRoZSBwYXRjaCBzZXJpZXMgaXMgZGVw
+cmVjYXRlZC4gUGxlYXNlIGlnbm9yZSB0aGlzLgoKVGhhbmtzIQpKaW5sb25nIENoZW4=
