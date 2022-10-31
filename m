@@ -2,97 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F16E4C38A02
-	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 00:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4A6FA3745
+	for <linux-block@archiver.kernel.org>; Mon, 31 Oct 2022 01:08:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbiJaAf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 30 Oct 2022 20:35:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
+        id S229781AbiJaBIo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 30 Oct 2022 21:08:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJaAf3 (ORCPT
+        with ESMTP id S229893AbiJaBI3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 30 Oct 2022 20:35:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98ED35F99
-        for <linux-block@vger.kernel.org>; Sun, 30 Oct 2022 17:34:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667176470;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nK9JUhdTgb0upsG9+KDhCEy0NCFqRXTlysqwPYilhWA=;
-        b=YAOkHuvoxVgFDV1ORE2nnkamdG2v/rELdhRKqkkKalIaQS5eH9B0dMJPYLrKgbRtRog7hA
-        Ho33r9d3DvQrAndqLvypj/vxKy82Vf4/iZZyMzmKgXF9KvMxnlY85tYkYT3YXm3CH1sxHL
-        q4O3Ywp325b2QSl2RpLw7ViH7kquCtA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-633-YEHptREUO1WcTj8qR0PADA-1; Sun, 30 Oct 2022 20:34:27 -0400
-X-MC-Unique: YEHptREUO1WcTj8qR0PADA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E12BC185A792;
-        Mon, 31 Oct 2022 00:34:26 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 140431759E;
-        Mon, 31 Oct 2022 00:34:21 +0000 (UTC)
-Date:   Mon, 31 Oct 2022 08:34:16 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, David Jeffery <djeffery@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH V3 1/1] blk-mq: avoid double ->queue_rq() because of
- early timeout
-Message-ID: <Y18YCBE/oCvM1+IA@T590>
-References: <20221026051957.358818-1-ming.lei@redhat.com>
+        Sun, 30 Oct 2022 21:08:29 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DC4BE1C;
+        Sun, 30 Oct 2022 18:08:15 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.153])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N0w2M3tCTzl9Ch;
+        Mon, 31 Oct 2022 09:06:03 +0800 (CST)
+Received: from [10.174.176.73] (unknown [10.174.176.73])
+        by APP4 (Coremail) with SMTP id gCh0CgCHluj7H19jjwbcAQ--.21030S3;
+        Mon, 31 Oct 2022 09:08:13 +0800 (CST)
+Subject: Re: [PATCH -nect RFC v2 0/2] block: fix uaf in bd_link_disk_holder()
+To:     Christoph Hellwig <hch@lst.de>, Yu Kuai <yukuai1@huaweicloud.com>
+Cc:     axboe@kernel.dk, willy@infradead.org, kch@nvidia.com,
+        martin.petersen@oracle.com, johannes.thumshirn@wdc.com,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        "yukuai (C)" <yukuai3@huawei.com>
+References: <20221020132049.3947415-1-yukuai3@huawei.com>
+ <20221020164712.GA14773@lst.de>
+ <0ad09045-1012-e86b-41f2-a88d02e8f1ed@huaweicloud.com>
+ <20221030153040.GB9676@lst.de>
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+Message-ID: <bdaec1ab-db1a-59d6-895e-1ac652a68950@huaweicloud.com>
+Date:   Mon, 31 Oct 2022 09:08:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221026051957.358818-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+In-Reply-To: <20221030153040.GB9676@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: gCh0CgCHluj7H19jjwbcAQ--.21030S3
+X-Coremail-Antispam: 1UD129KBjvdXoWrKFy3XryDuFy8WrWDAw1DWrg_yoWDCrb_uF
+        W8Cr1kCr4IkwnYgwsFkr15Zr93Kr1kZ3s3XFZ7tan7W3W2qF47GF45Gr1fZ3s7Wa1rKrn8
+        KFy29a13ur9FgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb3kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+        Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY
+        04v7Mxk0xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0D
+        MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+        VFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 01:19:57PM +0800, Ming Lei wrote:
-> From: David Jeffery <djeffery@redhat.com>
-> 
-> David Jeffery found one double ->queue_rq() issue, so far it can
-> be triggered in VM use case because of long vmexit latency or preempt
-> latency of vCPU pthread or long page fault in vCPU pthread, then block
-> IO req could be timed out before queuing the request to hardware but after
-> calling blk_mq_start_request() during ->queue_rq(), then timeout handler
-> may handle it by requeue, then double ->queue_rq() is caused, and kernel
-> panic.
-> 
-> So far, it is driver's responsibility to cover the race between timeout
-> and completion, so it seems supposed to be solved in driver in theory,
-> given driver has enough knowledge.
-> 
-> But it is really one common problem, lots of driver could have similar
-> issue, and could be hard to fix all affected drivers, even it isn't easy
-> for driver to handle the race. So David suggests this patch by draining
-> in-progress ->queue_rq() for solving this issue.
-> 
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Keith Busch <kbusch@kernel.org>
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Signed-off-by: David Jeffery <djeffery@redhat.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V3:
-> 	- add callback for handle expired only, suggested by Keith Busch
+Hi, Christoph
 
-Hi Jens,
+在 2022/10/30 23:30, Christoph Hellwig 写道:
+> On Fri, Oct 21, 2022 at 11:15:34AM +0800, Yu Kuai wrote:
+>> Hi,
+>>
+>> 在 2022/10/21 0:47, Christoph Hellwig 写道:
+>>> As mentioned before I don't think we should make this even more
+>>> crufty in the block layer.  See the series I just sent to move it int
+>>> dm.
+>>
+>> It seems we had some misunderstanding, the problem I tried to fix here
+>> should not just related to dm, but all the caller of
+>> bd_link_disk_holder().
+> 
+> As far as I can tell the problem was just that patch 1 in my series blows
+> away the bd_holder_dir pointer in part0 on del_gendisk.  Each holder
+> actually holds a reference to the kobject, so the memory for it is
+> still valid, it's just that the pointer got cleared.  I'll send a v2
+> in a bit.
 
-Any chance to merge this fix? Either 6.1 or 6.2 is fine for me.
-
+This is not the real case. In bd_link_disk_hoder(), bd_hodler_dir is
+accessed first by add_symlink(), and then reference is grabed later.
+The reference should be grabed before bd_holder_dir is accessed, like
+what I try to do in patch 2.
 
 Thanks,
-Ming
+Kuai
+> 
+> .
+> 
 
