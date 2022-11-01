@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19842C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA69FA3745
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:34:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230138AbiKAJeY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 05:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39958 "EHLO
+        id S230144AbiKAJeZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 05:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbiKAJeX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:23 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB7918E05;
-        Tue,  1 Nov 2022 02:34:22 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4N1lGM04Flz15MCf;
-        Tue,  1 Nov 2022 17:34:18 +0800 (CST)
+        with ESMTP id S230134AbiKAJeY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:24 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EFF18E05;
+        Tue,  1 Nov 2022 02:34:24 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N1lBL0FpnzpW45;
+        Tue,  1 Nov 2022 17:30:50 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 1 Nov
- 2022 17:34:20 +0800
+ 2022 17:34:21 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <shikemeng@huawei.com>
-Subject: [PATCH 01/20] block, bfq: fix typo in comment
-Date:   Tue, 1 Nov 2022 17:33:58 +0800
-Message-ID: <20221101093417.10540-2-shikemeng@huawei.com>
+Subject: [PATCH 03/20] block, bfq: correct bfq_max_budget and bfq_min_budget
+Date:   Tue, 1 Nov 2022 17:34:00 +0800
+Message-ID: <20221101093417.10540-4-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221101093417.10540-1-shikemeng@huawei.com>
 References: <20221101093417.10540-1-shikemeng@huawei.com>
@@ -41,26 +41,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-IO/ -> I/0
+The budgets_assigned is checked to make sure enough samples have been
+computed for auto-tuning. Ignore budgets_assigned if auto-tuning is
+disabled as bfq_default_max_budget is set by user.
+The bfq_default_max_budget check is added after budgets_assigned check,
+so no extra cost is added for normal branch to return bfqd->bfq_max_budget.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/bfq-iosched.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 7ea427817f7f..25a88ffd997e 100644
+index 13370c41ad36..b21c3711d69d 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -5633,7 +5633,7 @@ bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-  *
-  * Putting these two facts together, this commits merges stably the
-  * bfq_queues associated with these I/O flows, i.e., with the
-- * processes that generate these IO/ flows, regardless of how many the
-+ * processes that generate these I/O flows, regardless of how many the
-  * involved processes are.
-  *
-  * To decide whether a set of bfq_queues is actually associated with
+@@ -1485,7 +1485,8 @@ static int bfq_bfqq_budget_left(struct bfq_queue *bfqq)
+  */
+ static int bfq_max_budget(struct bfq_data *bfqd)
+ {
+-	if (bfqd->budgets_assigned < bfq_stats_min_budgets)
++	if (bfqd->budgets_assigned < bfq_stats_min_budgets &&
++			bfqd->bfq_user_max_budget == 0)
+ 		return bfq_default_max_budget;
+ 	else
+ 		return bfqd->bfq_max_budget;
+@@ -1497,7 +1498,8 @@ static int bfq_max_budget(struct bfq_data *bfqd)
+  */
+ static int bfq_min_budget(struct bfq_data *bfqd)
+ {
+-	if (bfqd->budgets_assigned < bfq_stats_min_budgets)
++	if (bfqd->budgets_assigned < bfq_stats_min_budgets &&
++			bfqd->bfq_user_max_budget == 0)
+ 		return bfq_default_max_budget / 32;
+ 	else
+ 		return bfqd->bfq_max_budget / 32;
 -- 
 2.30.0
 
