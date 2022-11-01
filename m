@@ -2,21 +2,21 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFECC433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2283CC433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:35:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230288AbiKAJfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 05:35:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40640 "EHLO
+        id S230295AbiKAJfP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 05:35:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230214AbiKAJen (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:43 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B0CF1902C;
-        Tue,  1 Nov 2022 02:34:31 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4N1lCD6NPRzJnMm;
-        Tue,  1 Nov 2022 17:31:36 +0800 (CST)
+        with ESMTP id S230216AbiKAJeo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:44 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2233119032;
+        Tue,  1 Nov 2022 02:34:32 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N1lBV20yGzpW3w;
+        Tue,  1 Nov 2022 17:30:58 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 1 Nov
@@ -25,9 +25,9 @@ From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <shikemeng@huawei.com>
-Subject: [PATCH 16/20] block, bfq: remove unnecessary goto tag in __bfq_weights_tree_remove
-Date:   Tue, 1 Nov 2022 17:34:13 +0800
-Message-ID: <20221101093417.10540-17-shikemeng@huawei.com>
+Subject: [PATCH 17/20] block, bfq: remove unnecessary traverse in bfq_add_to_burst
+Date:   Tue, 1 Nov 2022 17:34:14 +0800
+Message-ID: <20221101093417.10540-18-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221101093417.10540-1-shikemeng@huawei.com>
 References: <20221101093417.10540-1-shikemeng@huawei.com>
@@ -41,36 +41,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Do free work if num_active == 0 and remove unnecessary tag
-reset_entity_pointer.
+Do mark burst and remove from list in a single traverse to remove
+unnecessary re-traverse.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- block/bfq-iosched.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ block/bfq-iosched.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index dd9a51255a0f..1402dfd9f448 100644
+index 1402dfd9f448..0864254b8dcd 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -950,13 +950,11 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
- 		return;
+@@ -1255,7 +1255,7 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	bfqd->burst_size++;
  
- 	bfqq->weight_counter->num_active--;
--	if (bfqq->weight_counter->num_active > 0)
--		goto reset_entity_pointer;
+ 	if (bfqd->burst_size == bfqd->bfq_large_burst_thresh) {
+-		struct bfq_queue *pos, *bfqq_item;
++		struct bfq_queue *pos;
+ 		struct hlist_node *n;
+ 
+ 		/*
+@@ -1267,13 +1267,6 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		/*
+ 		 * We can now mark all queues in the burst list as
+ 		 * belonging to a large burst.
+-		 */
+-		hlist_for_each_entry(bfqq_item, &bfqd->burst_list,
+-				     burst_list_node)
+-			bfq_mark_bfqq_in_large_burst(bfqq_item);
+-		bfq_mark_bfqq_in_large_burst(bfqq);
 -
--	rb_erase_cached(&bfqq->weight_counter->weights_node, root);
--	kfree(bfqq->weight_counter);
-+	if (bfqq->weight_counter->num_active == 0) {
-+		rb_erase_cached(&bfqq->weight_counter->weights_node, root);
-+		kfree(bfqq->weight_counter);
-+	}
- 
--reset_entity_pointer:
- 	bfqq->weight_counter = NULL;
- 	bfq_put_queue(bfqq);
- }
+-		/*
+ 		 * From now on, and until the current burst finishes, any
+ 		 * new queue being activated shortly after the last queue
+ 		 * was inserted in the burst can be immediately marked as
+@@ -1281,8 +1274,11 @@ static void bfq_add_to_burst(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 		 * needed any more. Remove it.
+ 		 */
+ 		hlist_for_each_entry_safe(pos, n, &bfqd->burst_list,
+-					  burst_list_node)
++					  burst_list_node) {
++			bfq_mark_bfqq_in_large_burst(pos);
+ 			hlist_del_init(&pos->burst_list_node);
++		}
++		bfq_mark_bfqq_in_large_burst(bfqq);
+ 	} else /*
+ 		* Burst not yet large: add bfqq to the burst list. Do
+ 		* not increment the ref counter for bfqq, because bfqq
 -- 
 2.30.0
 
