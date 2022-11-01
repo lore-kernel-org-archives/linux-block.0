@@ -2,81 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 489BCFA3745
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C20C8FA373D
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 10:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230404AbiKAJkI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 05:40:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47224 "EHLO
+        id S229763AbiKAKCM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 06:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230395AbiKAJjn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:39:43 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4FE19C0B;
-        Tue,  1 Nov 2022 02:39:00 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N1lMH5m6MzHvT0;
-        Tue,  1 Nov 2022 17:38:35 +0800 (CST)
-Received: from [10.174.178.129] (10.174.178.129) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 1 Nov 2022 17:38:53 +0800
-Subject: Re: [PATCH v2 2/3] block: Correct comment for scale_cookie_change
-To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20221018111240.22612-1-shikemeng@huawei.com>
- <20221018111240.22612-3-shikemeng@huawei.com>
-From:   Kemeng Shi <shikemeng@huawei.com>
-Message-ID: <d92907aa-2e57-dd68-c6ce-b8065cd25770@huawei.com>
-Date:   Tue, 1 Nov 2022 17:38:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        with ESMTP id S229928AbiKAKCL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 06:02:11 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC19318E03
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 03:02:10 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id B9CDA68AA6; Tue,  1 Nov 2022 11:02:07 +0100 (CET)
+Date:   Tue, 1 Nov 2022 11:02:07 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/7] block: drop the duplicate check in elv_register
+Message-ID: <20221101100207.GA13209@lst.de>
+References: <20221030100714.876891-1-hch@lst.de> <20221030100714.876891-2-hch@lst.de> <17887101-31f3-fc60-0971-4718c9f6f3b3@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20221018111240.22612-3-shikemeng@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.129]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <17887101-31f3-fc60-0971-4718c9f6f3b3@kernel.dk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Friendly ping.
+On Mon, Oct 31, 2022 at 07:50:02AM -0600, Jens Axboe wrote:
+> >  	list_add_tail(&e->list, &elv_list);
+> >  	spin_unlock(&elv_list_lock);
+> 
+> What's the idea behind this? Yes it'll be harmless and list ordering
+> will dictate which one will be found, leaving the other(s) dead, but why
+> not catch this upfront? I agree likelihood of this ever happening to be
+> tiny, but seems like a good idea to catch and return BUSY for this case.
 
-on 10/18/2022 7:12 PM, Kemeng Shi wrote:
-> Default queue depth of iolatency_grp is unlimited, so we scale down
-> quickly(once by half) in scale_cookie_change. Remove the "subtract
-> 1/16th" part which is not the truth and add the actual way we
-> scale down.
-> 
-> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
-> ---
->  block/blk-iolatency.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> index b24d7b788ba3..2c574f98c8d1 100644
-> --- a/block/blk-iolatency.c
-> +++ b/block/blk-iolatency.c
-> @@ -364,9 +364,11 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
->  }
->  
->  /*
-> - * Change the queue depth of the iolatency_grp.  We add/subtract 1/16th of the
-> + * Change the queue depth of the iolatency_grp.  We add 1/16th of the
->   * queue depth at a time so we don't get wild swings and hopefully dial in to
-> - * fairer distribution of the overall queue depth.
-> + * fairer distribution of the overall queue depth.  We halve the queue depth
-> + * at a time so we can scale down queue depth quickly from default unlimited
-> + * to target.
->   */
->  static void scale_change(struct iolatency_grp *iolat, bool up)
->  {
-> 
-
--- 
-Best wishes
-Kemeng Shi
+Because it's just not very useful code bloat here that I stumbled upon.
+But I can just drop it if you prefer.
