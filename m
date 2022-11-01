@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3D7FA373D
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C58FA373D
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:34:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230179AbiKAJeb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 05:34:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39988 "EHLO
+        id S230199AbiKAJei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 05:34:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230164AbiKAJe2 (ORCPT
+        with ESMTP id S230169AbiKAJe2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:28 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B054918E2C;
-        Tue,  1 Nov 2022 02:34:26 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N1lG70LybzHvXl;
-        Tue,  1 Nov 2022 17:34:07 +0800 (CST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3797218E35;
+        Tue,  1 Nov 2022 02:34:27 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N1lBP3k1czpW4d;
+        Tue,  1 Nov 2022 17:30:53 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 1 Nov
- 2022 17:34:24 +0800
+ 2022 17:34:25 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <shikemeng@huawei.com>
-Subject: [PATCH 08/20] block, bfq: do srt filtering for interactive queues in bfq_completed_request
-Date:   Tue, 1 Nov 2022 17:34:05 +0800
-Message-ID: <20221101093417.10540-9-shikemeng@huawei.com>
+Subject: [PATCH 09/20] block, bfq: remove redundant check if (bfqq->dispatched > 0)
+Date:   Tue, 1 Nov 2022 17:34:06 +0800
+Message-ID: <20221101093417.10540-10-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221101093417.10540-1-shikemeng@huawei.com>
 References: <20221101093417.10540-1-shikemeng@huawei.com>
@@ -41,47 +41,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 20cd32450bcbec ("block, bfq: do not consider interactive queues in
-srt filtering") remove the updating of soft_rt_next_start for bfq_queues
-in interactive weight raising.
 Commit 3c337690d2ebb7 ("block, bfq: avoid spurious switches to soft_rt of
-interactive queues") try to revert the first commit to add back updating of
-soft_rt_next_start for bfq_queues in interactive weight raising and fix
-original problem by reset consumed bandwidth if a bfq_queue switches from
-interactive to normal mode.
-The problem this patch fixes is that first commit is not fully reverted as
-updating of soft_rt_next_start for bfq_queues in interactive weight
-raising is still removed in bfq_completed_request. Fix this by updating
-soft_rt_next_start for bfq_queues in interactive weight raising in
-bfq_completed_request.
+interactive queues") remove bfqq->wr_coeff != bfqd->bfq_wr_coeff check
+along with bfqq->dispatched == 0 to update soft_rt_next_start for
+interactive bfq_queues. So we can remove redundant bfqq->dispatched > 0
+in else branch with current bfqq->dispatched == 0 check.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- block/bfq-iosched.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ block/bfq-iosched.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 15e7d6c6fa83..fa96cbca7814 100644
+index fa96cbca7814..8f6d05258f22 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -6317,14 +6317,11 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
- 	 * isochronous, and both requisites for this condition to hold
- 	 * are now satisfied, then compute soft_rt_next_start (see the
- 	 * comments on the function bfq_bfqq_softrt_next_start()). We
--	 * do not compute soft_rt_next_start if bfqq is in interactive
--	 * weight raising (see the comments in bfq_bfqq_expire() for
--	 * an explanation). We schedule this delayed update when bfqq
--	 * expires, if it still has in-flight requests.
-+	 * schedule this delayed update when bfqq expires, if it still
-+	 * has in-flight requests.
- 	 */
- 	if (bfq_bfqq_softrt_update(bfqq) && bfqq->dispatched == 0 &&
--	    RB_EMPTY_ROOT(&bfqq->sort_list) &&
--	    bfqq->wr_coeff != bfqd->bfq_wr_coeff)
-+	    RB_EMPTY_ROOT(&bfqq->sort_list))
- 		bfqq->soft_rt_next_start =
- 			bfq_bfqq_softrt_next_start(bfqd, bfqq);
- 
+@@ -4375,7 +4375,7 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 		if (bfqq->dispatched == 0)
+ 			bfqq->soft_rt_next_start =
+ 				bfq_bfqq_softrt_next_start(bfqd, bfqq);
+-		else if (bfqq->dispatched > 0) {
++		else {
+ 			/*
+ 			 * Schedule an update of soft_rt_next_start to when
+ 			 * the task may be discovered to be isochronous.
 -- 
 2.30.0
 
