@@ -2,78 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E95C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 489BCFA3745
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:40:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230361AbiKAJfp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 05:35:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40468 "EHLO
+        id S230404AbiKAJkI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 05:40:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230242AbiKAJex (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:53 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391AC19002;
-        Tue,  1 Nov 2022 02:34:33 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4N1lGX6lj2zmVYP;
-        Tue,  1 Nov 2022 17:34:28 +0800 (CST)
-Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
- (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 1 Nov
- 2022 17:34:30 +0800
+        with ESMTP id S230395AbiKAJjn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:39:43 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4FE19C0B;
+        Tue,  1 Nov 2022 02:39:00 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N1lMH5m6MzHvT0;
+        Tue,  1 Nov 2022 17:38:35 +0800 (CST)
+Received: from [10.174.178.129] (10.174.178.129) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 1 Nov 2022 17:38:53 +0800
+Subject: Re: [PATCH v2 2/3] block: Correct comment for scale_cookie_change
+To:     <tj@kernel.org>, <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20221018111240.22612-1-shikemeng@huawei.com>
+ <20221018111240.22612-3-shikemeng@huawei.com>
 From:   Kemeng Shi <shikemeng@huawei.com>
-To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <shikemeng@huawei.com>
-Subject: [PATCH 19/20] block, bfq: remove unnecessary local variable __bfqq in bfq_setup_merge
-Date:   Tue, 1 Nov 2022 17:34:16 +0800
-Message-ID: <20221101093417.10540-20-shikemeng@huawei.com>
-X-Mailer: git-send-email 2.14.1.windows.1
-In-Reply-To: <20221101093417.10540-1-shikemeng@huawei.com>
-References: <20221101093417.10540-1-shikemeng@huawei.com>
+Message-ID: <d92907aa-2e57-dd68-c6ce-b8065cd25770@huawei.com>
+Date:   Tue, 1 Nov 2022 17:38:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20221018111240.22612-3-shikemeng@huawei.com>
+Content-Type: text/plain; charset="gbk"
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.178.129]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemi500016.china.huawei.com (7.221.188.220)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We could traversal bfqq->new_bfqq list without a local variable easily and
-intuitively. So remove unnecessary local variable __bfqq.
+Friendly ping.
 
-Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
----
- block/bfq-iosched.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+on 10/18/2022 7:12 PM, Kemeng Shi wrote:
+> Default queue depth of iolatency_grp is unlimited, so we scale down
+> quickly(once by half) in scale_cookie_change. Remove the "subtract
+> 1/16th" part which is not the truth and add the actual way we
+> scale down.
+> 
+> Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
+> ---
+>  block/blk-iolatency.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index b24d7b788ba3..2c574f98c8d1 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -364,9 +364,11 @@ static void scale_cookie_change(struct blk_iolatency *blkiolat,
+>  }
+>  
+>  /*
+> - * Change the queue depth of the iolatency_grp.  We add/subtract 1/16th of the
+> + * Change the queue depth of the iolatency_grp.  We add 1/16th of the
+>   * queue depth at a time so we don't get wild swings and hopefully dial in to
+> - * fairer distribution of the overall queue depth.
+> + * fairer distribution of the overall queue depth.  We halve the queue depth
+> + * at a time so we can scale down queue depth quickly from default unlimited
+> + * to target.
+>   */
+>  static void scale_change(struct iolatency_grp *iolat, bool up)
+>  {
+> 
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d3f4d995f84a..589ab59abcf5 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2741,7 +2741,6 @@ static struct bfq_queue *
- bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- {
- 	int process_refs, new_process_refs;
--	struct bfq_queue *__bfqq;
- 
- 	/*
- 	 * If there are no process references on the new_bfqq, then it is
-@@ -2753,10 +2752,9 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 		return NULL;
- 
- 	/* Avoid a circular list and skip interim queue merges. */
--	while ((__bfqq = new_bfqq->new_bfqq)) {
--		if (__bfqq == bfqq)
-+	while ((new_bfqq = new_bfqq->new_bfqq)) {
-+		if (new_bfqq == bfqq)
- 			return NULL;
--		new_bfqq = __bfqq;
- 	}
- 
- 	process_refs = bfqq_process_refs(bfqq);
 -- 
-2.30.0
-
+Best wishes
+Kemeng Shi
