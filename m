@@ -2,61 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C27BC4332F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3AB0C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231493AbiKAPOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 11:14:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37058 "EHLO
+        id S231512AbiKAPPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 11:15:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231557AbiKAPOD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:14:03 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C6521EC73;
-        Tue,  1 Nov 2022 08:09:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=N7lnL7FHyu2J8E5a/w9v2ec/Wn33wozwDMPuPkUy2q4=; b=KEB9ZVg+nk0NWYtqmIE/B9+xzz
-        vvTISzxF5kwQaIE9hX/ulRaA9e6sPR/LyMv3m81GplNEF07daeZ9IafejFcUwHsmH62VIxCOUFaEv
-        mBTrPjBk/Jxaku3n7IfoDYFOt9AcPEcU9oYpwjvOrLkirpmeZKa6fiXkEljmjCUwmm6QnFRIQ//dA
-        RW7kHWhjKSe4KMb9+vjPKSanFhaRuRD/9f7t28oo2GnZrg9/AS9rVcTxRbQuC9dSe75M0FabeXjUl
-        rrDGRbgFwqvEyMQh82FVs55p4AjXGdvTKkZQbDLbQrS3Ey0Gqbb/b4VHtX5+fPNmnhTkXHqpq1geC
-        1bCps7DA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1opstk-005kZi-3u; Tue, 01 Nov 2022 15:09:52 +0000
-Date:   Tue, 1 Nov 2022 08:09:52 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v4 1/7] block: Prevent the use of REQ_FUA with read
- operations
-Message-ID: <Y2E2wFnbeUzAPjo0@infradead.org>
-References: <20221031022642.352794-1-damien.lemoal@opensource.wdc.com>
- <20221031022642.352794-2-damien.lemoal@opensource.wdc.com>
+        with ESMTP id S231517AbiKAPPG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:15:06 -0400
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 440EF1BE89;
+        Tue,  1 Nov 2022 08:12:04 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.14.30.251])
+        by mail-app4 (Coremail) with SMTP id cS_KCgCH_k0qN2FjsHmtBw--.39315S2;
+        Tue, 01 Nov 2022 23:11:59 +0800 (CST)
+From:   Jinlong Chen <nickyc975@zju.edu.cn>
+To:     axboe@kernel.dk
+Cc:     hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
+Subject: [PATCH 0/4] some random cleanups for blk-mq.c
+Date:   Tue,  1 Nov 2022 23:11:33 +0800
+Message-Id: <cover.1667314759.git.nickyc975@zju.edu.cn>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221031022642.352794-2-damien.lemoal@opensource.wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: cS_KCgCH_k0qN2FjsHmtBw--.39315S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYV7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+        rcIFxwCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4I
+        kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+        WwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+        0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+        JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYx
+        BIdaVFxhVjvjDU0xZFpf9x0JUQZ23UUUUU=
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgIAB1ZdtcLuXwAEsO
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Oct 31, 2022 at 11:26:36AM +0900, Damien Le Moal wrote:
-> +	/*
-> +	 * REQ_FUA does not apply to read requests because:
-> +	 * - There is no way to reliably force media access for read operations
-> +	 *   with a block device that does not support FUA.
-> +	 * - Not all block devices support FUA for read operations (e.g. ATA
-> +	 *   devices with NCQ support turned off).
-> +	 */
-> +	if (!op_is_write(rq->cmd_flags) && (rq->cmd_flags & REQ_FUA)) {
-> +		blk_mq_end_request(rq, BLK_STS_NOTSUPP);
+Patch 1 updates the outdated comment of blk_mq_quiesce_queue_nowait().
+Patch 2 improves the error handling blk_mq_alloc_rq_map(). Patch 3 and 4
+improve readability of request alloc routines.
 
-How could this even happen?  If we want a debug check,  I think it
-should be in submit_bio and a WARN_ON_ONCE.
+Jinlong Chen (4):
+  blk-mq: update comment for blk_mq_quiesce_queue_nowait()
+  blk-mq: improve error handling in blk_mq_alloc_rq_map()
+  blk-mq: use if-else instead of goto in blk_mq_alloc_cached_request()
+  blk-mq: improve readability of blk_mq_alloc_request()
+
+ block/blk-mq.c | 105 ++++++++++++++++++++++++++++---------------------
+ 1 file changed, 61 insertions(+), 44 deletions(-)
+
+-- 
+2.31.1
+
