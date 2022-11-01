@@ -2,121 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C72D6C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 16:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255F8C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 17:22:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbiKAQqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 12:46:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49786 "EHLO
+        id S230510AbiKARWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 13:22:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbiKAQqj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 12:46:39 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD49712A95;
-        Tue,  1 Nov 2022 09:46:37 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso13375477pjc.5;
-        Tue, 01 Nov 2022 09:46:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8NNV/E5PvWzmIXNGvDSWT/6GgvR8jci+9gjd8ctauYo=;
-        b=LEL4GYFUmS8dUOAT/5nK1/KYd+ZwtOmK9IedlMya1qlOZRx+FuuuuA/CtLRS+eCLRz
-         Nsz6Dr/k/g6GAPFyavmARI1wuovp24HHeB6HGw0lS3IQv+qRkvB0JZ1gKMbi/FLWoeYh
-         H2hrCDdMs7KYEipsyf2LL7i2N5mYxjOCRDArSv1s0QSKfzMKIORCDRuOqdmBpwsohacW
-         6QuUicBqOf+POhLdqmHX7PXtL0vRcyB4s4VBHQpx3CLs1uS4Aad6MGQMTANTDZpWbGKo
-         YyQDpVTaEkJBqnArwECrk8uywmNczFnR0FTUAaZWfA8KK93xKlpBmR2J0DO1TKHyVw0i
-         qwug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8NNV/E5PvWzmIXNGvDSWT/6GgvR8jci+9gjd8ctauYo=;
-        b=XbGmplaJ1I/m10NJJcKSkxbtUGeBcdIwhBOKutqwaMyMsQFi5CBBBcvZscFsW+ffGK
-         Q+tM79u8utZ8kTZdDSZbfBfSdrvAhiuU6uWtC5fVAPP9744hrmbWj+0bImT+rYGd8+T+
-         /SriZiKZ7su6NzVby42YH9GFZyeY8m/1QXP7Xs4p3buxl2tCyhgr7pJpqT2jMnn/7PdF
-         ftDdt40eqbQ11w8C6BzVjVGJ9Ga6KkdnEESvyVgJY+9ZyYFu7k2H0SyhMCK8kSDsDhOK
-         7PcLnXM40INTFl+YLjsZ8TvzPVCepgxJ9wzeHe34OJrk0YFPRsUH2jPyC9CNs/2mucXY
-         GxcA==
-X-Gm-Message-State: ACrzQf2QTJ36zMvC8dkXEsULgwHt5wvP+Aeh+zuodziSRvuKJDmnqyCW
-        zZ6Z7vZW19t+l78hQ8dmUmaEE7RPKLC71A==
-X-Google-Smtp-Source: AMsMyM7gRgdNVhhxA9mKmp7nYeepdqg6rs0kbUI0glNDKNRPfKqztAuA7caGIiSRhU54fNwxObiiuQ==
-X-Received: by 2002:a17:902:d4ce:b0:187:17bd:44d7 with SMTP id o14-20020a170902d4ce00b0018717bd44d7mr14164487plg.84.1667321197086;
-        Tue, 01 Nov 2022 09:46:37 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id n15-20020aa7984f000000b0055f209690c0sm6748817pfq.50.2022.11.01.09.46.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 09:46:36 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 1 Nov 2022 06:46:35 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jiri Slaby <jirislaby@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-kernel@vger.kernel.org, Martin Liska <mliska@suse.cz>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Message-ID: <Y2FNa4bGhJoevRKT@slm.duckdns.org>
-References: <20221031114520.10518-1-jirislaby@kernel.org>
- <Y1++fLJXkeZgtXR2@infradead.org>
- <Y2AMcSPAJpj6obSA@slm.duckdns.org>
- <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
+        with ESMTP id S230516AbiKARW2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 13:22:28 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D081C1B1DA;
+        Tue,  1 Nov 2022 10:22:27 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7BBEEB81E94;
+        Tue,  1 Nov 2022 17:22:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95AF3C43470;
+        Tue,  1 Nov 2022 17:22:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667323345;
+        bh=R3TRmjuGx+CX5AlLSbI9Rvvjf7XA13+5XQn1/SO/l5A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=L/kAMOScwPlrSIF+9gRC70XY3fpqGTMzrt3tXL/NorI0wBHDs8oJu+8+siDIvZ3U+
+         X7YFTBLqTcEAs4KyzWnMYYuDQGzwofeTbQt+bIHTpigOxuYtw5ltL0NGTSpVw4o1AZ
+         ZPTCjZImXmCP9ooRI96Y8WH8oOdpiqyR76XO0pTTjYvB/U7hJXwA7poJgI6GqAE7Is
+         LN3BJAIgO0rzZsgRi74wtYxMkBCqSSjRmxMY1gQTsxQ8+2Qmq3zSOrGsL2DGNdtvti
+         cdHoTgR3qen8cl0FZ+zNpyJKzTXj6iUbeTiPmslAtbz/avpihFxLNXA5+1ev48teOo
+         mMajMspEW1keA==
+Date:   Tue, 1 Nov 2022 11:22:21 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Dmitrii Tcvetkov <me@demsh.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [bisected] RAID1 direct IO redirecting sector loop since 6.0
+Message-ID: <Y2FVzdcro8HCfODK@kbusch-mbp>
+References: <20221101001558.648ee024@xps.demsh.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
+In-Reply-To: <20221101001558.648ee024@xps.demsh.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Tue, Nov 01, 2022 at 06:46:56AM +0100, Jiri Slaby wrote:
-> Yes. The real problem is that using anything else then an INT_MIN <= x <=
-> INT_MAX _constant_ in an enum is undefined in ANSI C < 2x (in particular, 1
-> << x is undefined too). gcc manual defines unsigned int on the top of that
-> as defined too (so this holds for our -std=g*).
+On Tue, Nov 01, 2022 at 12:15:58AM +0300, Dmitrii Tcvetkov wrote:
 > 
-> > I suppose the most reasonable thing to do here is just splitting them into
-> > separate enum definitions. Does anyone know how this behavior change came to
-> > be?
+> # cat /proc/7906/stack
+> [<0>] submit_bio_wait+0xdb/0x140
+> [<0>] blkdev_direct_IO+0x62f/0x770
+> [<0>] blkdev_read_iter+0xc1/0x140
+> [<0>] vfs_read+0x34e/0x3c0
+> [<0>] __x64_sys_pread64+0x74/0xc0
+> [<0>] do_syscall_64+0x6a/0x90
+> [<0>] entry_SYSCALL_64_after_hwframe+0x4b/0xb5
 > 
-> C2x which introduces un/signed long enums. See the bug I linked in the
-> commit log:
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36113
+> After "mdadm --fail" invocation the last line becomes:
+> [pid  7906] pread64(13, 0x627c34c8d200, 4096, 0) = -1 EIO (Input/output error)
 
-I see. So, it was an extension but the new standard is defined differently
-and we're gonna end up with that behavior.
+It looks like something isn't accounting for the IO size correctly when
+there's an offset. It may be something specific to one of the stacking
+drivers in your block setup. Does this still happen without the
+cryptosetup step?
 
-> The change is also turned on in < C2x on purpose. AIUI, unless there is too
-> much breakage. So we'd need to sort it out in (rather distant) future anyway
-> (when we come up to -std=g2x).
+For a different experiment, it may be safer to just force all alignment
+for stacking drivers. Could you try the following and see if that gets
+it working again? 
 
-The part that the new behavior applying to <C2x feels like an odd decision.
-I'm having a hard time seeing the upsides in doing so but maybe that's just
-me not knowing the area well enough.
-
-> > Do we know whether clang is gonna be changed the same way?
-> 
-> In C2x, Likely. In < C2x, dunno what'd be the default.
-
-It looks like we can do one of the following two:
-
-* If gcc actually changes the behavior for <c2x, split the enums according
-  to their sizes. This feels rather silly but I can't think of a better way
-  to cater to divergent compiler behaviors.
-
-* If gcc doesn't change the behavior for <c2x, there's nothing to do for the
-  time being. Later when we switch to -std=g2x, we can just change the
-  format strings to use the now larger types.
-
-Does the above make sense?
-
-Thanks.
-
--- 
-tejun
+---
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 8bb9eef5310e..5c16fdb00c6f 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -646,6 +646,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 		t->misaligned = 1;
+ 		ret = -1;
+ 	}
++	blk_queue_dma_alignment(t, t->logical_block_size - 1);
+ 
+ 	t->max_sectors = blk_round_down_sectors(t->max_sectors, t->logical_block_size);
+ 	t->max_hw_sectors = blk_round_down_sectors(t->max_hw_sectors, t->logical_block_size);
+--
