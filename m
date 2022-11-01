@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A041C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF39C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:08:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231496AbiKAPIR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 11:08:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60522 "EHLO
+        id S230376AbiKAPI3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 11:08:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231356AbiKAPHz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:07:55 -0400
+        with ESMTP id S231132AbiKAPH6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:07:58 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 541F61E709
-        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 08:01:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60C1B1E725
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 08:01:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=VftSGhpevZu6/5y82Vykr3F9H9L8vKbEyML7+10xdA4=; b=sO/Ocqo4arwe7z6saGd3iA1SxP
-        wJhVK1QAXSrMda9/aBLdRa7oCX8GB90Wtx9w0SvtXVPwzym/FhLbp5JYjER3ls3tv5JvnS+z7nbT5
-        S2TYlIqe8tMDJWivUpqGVvPJa8fTOv/xGia6chhB34Tl1Vg5O9eSS2ofGeTThYJ3VhZKVzkl3TlR9
-        17lfU6U+ncDcKrm+6AKKsv2LQGE9NwmAc6SxE8riTPTt1+CVOq+C4fyXZ/SKnwduaV2zjn4x4XDxd
-        pt8LpfyWXpVeT3Skn5sktbU9xcw2AnsBM+QInAtWVmHBjfbhnP7dSNELroe2VXk9DekMQOsxt1bdC
-        p5urW9xg==;
+        bh=PLmgUevMzzrLRuQx97jRlnGVQcnqlnKGWkKm3cCI3M0=; b=CwyOGoskjE+aWQ8ZiBlLYAz1Td
+        zRUxGkWNGJ3w1UADQkUdCAZpEztBPuwRCITBqTfqgBjBU8bzHJzbnArlQlAfi9YIWrAGkgUwopNYe
+        DCEWumWOgVd9TBf6lcRSnfkf36Whd0ZgZtliLJIQBtC49xWdeRlHqw0ys+YLhQJEZm7jeOJ9k08rz
+        w5wyK82f2kpNWXG1mlyQD1An1uNezPCEH22s7/pFJZhruyaWV+bUBX79NJFOMLzH8TRPEEKvDePW/
+        VmvpqZVCRvY9aiIrHBM+Ph3B7FvdTbc5sjHx8v1x4TlA7D3sxY2/LxBACsJqy/wjkd/78imn2DVgS
+        AIn5OYBQ==;
 Received: from [2001:4bb8:180:e42a:50da:325f:4a06:8830] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1opslI-005giM-8a; Tue, 01 Nov 2022 15:01:08 +0000
+        id 1opslN-005gkj-Vh; Tue, 01 Nov 2022 15:01:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
         Sagi Grimberg <sagi@grimberg.me>,
         Chao Leng <lengchao@huawei.com>
 Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 04/14] nvme: remove the NVME_NS_DEAD check in nvme_remove_invalid_namespaces
-Date:   Tue,  1 Nov 2022 16:00:40 +0100
-Message-Id: <20221101150050.3510-5-hch@lst.de>
+Subject: [PATCH 06/14] nvme: don't unquiesce the admin queue in nvme_kill_queues
+Date:   Tue,  1 Nov 2022 16:00:42 +0100
+Message-Id: <20221101150050.3510-7-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221101150050.3510-1-hch@lst.de>
 References: <20221101150050.3510-1-hch@lst.de>
@@ -46,30 +46,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The NVME_NS_DEAD check only made sense when we revalidated namespaces
-in nvme_passthrough_end for commands that affected the namespace inventory.
-These days NVME_NS_DEAD is only set during reset or when tearing down
-namespaces, and we always remove all namespaces right after that.
+None of the callers of nvme_kill_queues needs it to unquiesce the
+admin queues, as all of them already do it themselves:
+
+ 1) nvme_reset_work explicit call nvme_start_admin_queue toward the
+    beginning of the function.  The extra call to nvme_start_admin_queue
+    in nvme_reset_work this won't do anything as
+    NVME_CTRL_ADMIN_Q_STOPPED will already be cleared.
+ 2) nvme_remove calls nvme_dev_disable with shutdown flag set to true at
+    the very beginning of the function if the PCIe device was not present,
+    which is the precondition for the call to nvme_kill_queues.
+    nvme_dev_disable already calls nvme_start_admin_queue toward the
+    end of the function when the shutdown flag is set to true, so the
+    admin queue is already enabled at this point.
+ 3) nvme_remove_dead_ctrl schedules a workqueue to unbind the driver,
+    which will end up in nvme_remove, which calls nvme_dev_disable with
+    the shutdown flag.  This case will call nvme_start_admin_queue a bit
+    later than before.
+ 4) apple_nvme_remove uses the same sequence as nvme_remove_dead_ctrl
+    above.
+ 5) nvme_remove_namespaces only calls nvme_kill_queues when the
+    controller is in the DEAD state.  That can only happen in the PCIe
+    driver, and only from nvme_remove. See item 2) above for the
+    conditions there.
+
+So it is safe to just remove the call to nvme_start_admin_queue in
+nvme_kill_queues without replacement.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/host/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/nvme/host/core.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 35386aa24f589..390f2a2db3238 100644
+index 871a8ab7ec199..bb62803de5b21 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -4407,7 +4407,7 @@ static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
+@@ -5135,10 +5135,6 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
  
- 	down_write(&ctrl->namespaces_rwsem);
- 	list_for_each_entry_safe(ns, next, &ctrl->namespaces, list) {
--		if (ns->head->ns_id > nsid || test_bit(NVME_NS_DEAD, &ns->flags))
-+		if (ns->head->ns_id > nsid)
- 			list_move_tail(&ns->list, &rm_list);
- 	}
- 	up_write(&ctrl->namespaces_rwsem);
+ 	down_read(&ctrl->namespaces_rwsem);
+ 
+-	/* Forcibly unquiesce queues to avoid blocking dispatch */
+-	if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
+-		nvme_start_admin_queue(ctrl);
+-
+ 	list_for_each_entry(ns, &ctrl->namespaces, list)
+ 		nvme_set_queue_dying(ns);
+ 
 -- 
 2.30.2
 
