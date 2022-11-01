@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF81C43219
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E16EC4332F
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbiKAPIE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 11:08:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
+        id S231425AbiKAPIH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 11:08:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231381AbiKAPHo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:07:44 -0400
+        with ESMTP id S231258AbiKAPHs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:07:48 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3739C1CFEC
-        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 08:01:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2177622501
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 08:01:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=RMeBBtuZ6jN1c2xr45VBpasHrL1bqnzj0i7LLV0DoSY=; b=gVn4z3tLk2y8kIsfYRVJuFq3Cp
-        NhHck4o9kuBisUJYWpfDuTm9cOiWA5CrKci7CCkljhWbXhwHxfgs/F/SzXAJ6V7QXcVkrhp6mUNiI
-        d+ytgNVdoQT6fafmdt9BLdGHDbf3kwQM/E4fUkBSCbF1Q/d33Ae8NG2gCQGOFeIP6Pv+/7N6IXM7/
-        osELVWXILNTGsVxWNb/gSx4Y5jeLQwI3rYs7vGERtW5xLNF2SQE0t5WRsOTEClzTr2X2vNrc/vV4Y
-        T29DfXN3V/j5bu/cX5Usl/GzlrqztMIVcDjvQ3NHPsKnnwczaEwICjdK42fR093Q9dq2LYwQZsh43
-        9YL2K9+g==;
+        bh=UWJJITfRoSb//57QGaQg0nyw7JGk+8FSnAd0y+59s9Q=; b=h6jEHoDFnd0GlzMsGzargZA2YN
+        lJxkEkNTpbbDr3bb0dFR00femFT60FCbN1l6wiGG3XiiycpLhXktZI5jfRTEXg6GSva5AMBOy8gxs
+        qI8f7up2Qmr/SiPCqEmnuBB4TbnRwsS5MQiu/G6TBYZU/PwRa683onOj+RIbUQH9DBwwqjhEZ4zw2
+        zEV8uovyboyL9+gcq7hLQZPJqprahSJTZyE4TgEF19nN8t6d/dR0sthTR3qSOU7ypWVeXdZRdRZx8
+        ni+pydZiBK+rioV9vJNeUXvlLabTTd2YYt7UozfUZc+x+JKKUZCwhJUJJSOvSoy/28jhh5oHu9HSs
+        ZZRKCB+g==;
 Received: from [2001:4bb8:180:e42a:50da:325f:4a06:8830] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1opsl9-005ge8-7t; Tue, 01 Nov 2022 15:00:59 +0000
+        id 1opslC-005gex-65; Tue, 01 Nov 2022 15:01:05 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
         Sagi Grimberg <sagi@grimberg.me>,
         Chao Leng <lengchao@huawei.com>
 Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 02/14] nvme-pci: refactor the tagset handling in nvme_reset_work
-Date:   Tue,  1 Nov 2022 16:00:38 +0100
-Message-Id: <20221101150050.3510-3-hch@lst.de>
+Subject: [PATCH 03/14] nvme: don't remove namespaces in nvme_passthru_end
+Date:   Tue,  1 Nov 2022 16:00:39 +0100
+Message-Id: <20221101150050.3510-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20221101150050.3510-1-hch@lst.de>
 References: <20221101150050.3510-1-hch@lst.de>
@@ -46,75 +46,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The code to create, update or delete a tagset and namespaces in
-nvme_reset_work is a bit convoluted.  Refactor it with a two high-level
-conditionals for first probe vs reset and I/O queues vs no I/O queues
-to make the code flow more clear.
+The call to nvme_remove_invalid_namespaces made sense when
+nvme_passthru_end revalidated all namespaces and had to remove those that
+didn't exist any more.  Since we don't revalidate from nvme_passthru_end
+now, this call is entirely spurious.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/host/pci.c | 46 ++++++++++++++++++++++++++---------------
- 1 file changed, 29 insertions(+), 17 deletions(-)
+ drivers/nvme/host/core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 5f1d71ac00865..0e8410edb41bf 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2897,25 +2897,37 @@ static void nvme_reset_work(struct work_struct *work)
- 	result = nvme_setup_io_queues(dev);
- 	if (result)
- 		goto out;
--
--	/*
--	 * Keep the controller around but remove all namespaces if we don't have
--	 * any working I/O queue.
--	 */
--	if (dev->online_queues < 2) {
--		dev_warn(dev->ctrl.device, "IO queues not created\n");
--		nvme_kill_queues(&dev->ctrl);
--		nvme_remove_namespaces(&dev->ctrl);
--		nvme_free_tagset(dev);
-+		
-+	if (dev->ctrl.tagset) {
-+		/*
-+		 * This is a controller reset and we already have a tagset.
-+		 * Freeze and update the number of I/O queues as thos might have
-+		 * changed.  If there are no I/O queues left after this reset,
-+		 * keep the controller around but remove all namespaces.
-+		 */
-+		if (dev->online_queues > 1) {
-+			nvme_start_queues(&dev->ctrl);
-+			nvme_wait_freeze(&dev->ctrl);
-+			nvme_pci_update_nr_queues(dev);
-+			nvme_dbbuf_set(dev);
-+			nvme_unfreeze(&dev->ctrl);
-+		} else {
-+			dev_warn(dev->ctrl.device, "IO queues lost\n");
-+			nvme_kill_queues(&dev->ctrl);
-+			nvme_remove_namespaces(&dev->ctrl);
-+			nvme_free_tagset(dev);
-+		}
- 	} else {
--		nvme_start_queues(&dev->ctrl);
--		nvme_wait_freeze(&dev->ctrl);
--		if (!dev->ctrl.tagset)
-+		/*
-+		 * First probe.  Still allow the controller to show up even if
-+		 * there are no namespaces.
-+		 */
-+		if (dev->online_queues > 1) {
- 			nvme_pci_alloc_tag_set(dev);
--		else
--			nvme_pci_update_nr_queues(dev);
--		nvme_dbbuf_set(dev);
--		nvme_unfreeze(&dev->ctrl);
-+			nvme_dbbuf_set(dev);
-+		} else {
-+			dev_warn(dev->ctrl.device, "IO queues not created\n");
-+		}
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index aea0f89acf409..35386aa24f589 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1118,7 +1118,6 @@ void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects,
+ 		nvme_unfreeze(ctrl);
+ 		nvme_mpath_unfreeze(ctrl->subsys);
+ 		mutex_unlock(&ctrl->subsys->lock);
+-		nvme_remove_invalid_namespaces(ctrl, NVME_NSID_ALL);
+ 		mutex_unlock(&ctrl->scan_lock);
  	}
- 
- 	/*
+ 	if (effects & NVME_CMD_EFFECTS_CCC)
 -- 
 2.30.2
 
