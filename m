@@ -2,87 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72618C4332F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 14:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1F2C4332F
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 14:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230233AbiKAOSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 10:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38292 "EHLO
+        id S229511AbiKAObp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 10:31:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230261AbiKAOR7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 10:17:59 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A8FF1BE8C
-        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 07:17:58 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d10so13579081pfh.6
-        for <linux-block@vger.kernel.org>; Tue, 01 Nov 2022 07:17:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aVsPtY3gVVM6m0QHBZpxv+Y/aCVxmoQdB7+i7F7TWCQ=;
-        b=MM8TAdVEAPrMP4gB+CoMrgeFjUrfg/XOHPXB2QECZc6ixysal1mRzAx+qI0QpzX0Mz
-         gYelXhLGuCHbx9ajsVOu/DG5uzVHmmbVYwGqNyzDvfg12PMKOxP4kxnfb4vP56g+Pr8Z
-         8yqbNT4j14QXmo3RjpT+SElJHRyc97dv/wNR56e6EFusM7TcGLNlos+dmkne+7mjcV7O
-         o87MC8/TvQ5OQdvXlNCmOiL9TuRQI8mMpOzB9gEmbzoNGY4WHkcgN3KaJse/OxNSWd0R
-         WFoxseVM9ZtvF/DbweUs9EuL2pE47WQVZDUE9Q3uWWLnU2fzYjE8zObULHZJPlpSKBKp
-         3fQA==
+        with ESMTP id S230008AbiKAObo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 10:31:44 -0400
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D6CB1B9F4
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 07:31:42 -0700 (PDT)
+Received: by mail-il1-f200.google.com with SMTP id z19-20020a056e02089300b002fffe186ac4so14176116ils.8
+        for <linux-block@vger.kernel.org>; Tue, 01 Nov 2022 07:31:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aVsPtY3gVVM6m0QHBZpxv+Y/aCVxmoQdB7+i7F7TWCQ=;
-        b=MWzQuE+5DKUjaIp0XEGsujvWipLb3DA5vx6coVbh+6t9x5myDP+RiJrRdJqDhDA+97
-         wbWOXc2vCVIelQ1rVpd5kAt3GFha/SUes5LyhTWX2yRGAbFjMQytBxnF96evD/YaUhx2
-         JUxxo3s8o6lWOVauMGMCNRqmzIDPNO+ULe6z4a3Dq//UbxVeexm2b/aSMXim7Y+rYx98
-         PqFenvS2XQ4XSskw/OFUaJrDOgBVu1u5HJtTrJ4v96gNzUDF0r+4CZ1sYMI5QAm9y68F
-         Lvr4si5qztXoIbE5F3QgWdeyut9lJb9YZclBxZAluKuTEEoMCL51YW2p8m246eR4avPf
-         1Zhg==
-X-Gm-Message-State: ACrzQf2CE4aYiKp13Diz3J4ucToNXp4zY4gLV6DUT4sVFYWynp+GkJ5O
-        tO3JiDtYbEffXWNkHVhE35fnjg==
-X-Google-Smtp-Source: AMsMyM72gNO54ErtsjGoUazzXoJi35Y8ynT6N5Dt40dHY6HOEqnAG6xuh0sWSdTndAqizB3NaDV0eQ==
-X-Received: by 2002:a63:4383:0:b0:440:3e0d:b9ec with SMTP id q125-20020a634383000000b004403e0db9ecmr17966187pga.54.1667312277768;
-        Tue, 01 Nov 2022 07:17:57 -0700 (PDT)
-Received: from [127.0.0.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id o6-20020a170902bcc600b00186e2d57f79sm6386770pls.288.2022.11.01.07.17.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 07:17:57 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Kemeng Shi <shikemeng@huawei.com>, josef@toxicpanda.com,
-        tj@kernel.org
-Cc:     linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-In-Reply-To: <20221018111240.22612-1-shikemeng@huawei.com>
-References: <20221018111240.22612-1-shikemeng@huawei.com>
-Subject: Re: [PATCH v2 0/3] A few cleanup patches for blk-iolatency.c
-Message-Id: <166731227683.256723.3065138031958824780.b4-ty@kernel.dk>
-Date:   Tue, 01 Nov 2022 08:17:56 -0600
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ygs0mKB1fjLyPQ63+4R+BXiguqPULsbpNgbQj+PvuGA=;
+        b=SU1Uyaeoz8TTO1AVdVwtiXMWbvQ8YuZ+dNjeOhR7hDYAoHmriaqZgu9q9mPY//mpzs
+         MG3+pTQMFnJTnIB4pkCWsZ8HZ5ul8FkTwqiJ8i2bxdytFivxVIzezEONtia6oO/LbDHm
+         huoBmOv2W2pCQ+t1hmehGV79gTU1PkQRYFzWVA5CIvlCAK2peC7Cn79YDL5YcHreSxvN
+         u8XCUi4BAc99MTHVPKjhyAWW2XOPlYkbyXBkhhCfkJ9KetgAbxQFXpyUixxN3BYswpLO
+         HD59PIf4SMI8+KeH2jDJRdcVo33Tg8D7Dvin8Rk+pl7LrhAhNQC51sHkPZFw3sgLcY25
+         37Dg==
+X-Gm-Message-State: ACrzQf0nAN9F2xZu5774y/BEQ+L0YaPrtxozWNawsIADNfcK2fcdS0fd
+        zRtHXfeUXD20wtPZ4A4At72BZ4b5EvdEr4B2fo06DdJVWHYY
+X-Google-Smtp-Source: AMsMyM6WI4uwOOvmwdAIslkJA7NhvLNZ7L/ZugYyrOs8ZfxMwj/8yj0ztJhRIjuctd9O8DpBgJ3mRj4rJt3Gh70x6Su6deYJWzJN
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Mailer: b4 0.11.0-dev-d9ed3
+X-Received: by 2002:a05:6638:517:b0:375:16d:446b with SMTP id
+ i23-20020a056638051700b00375016d446bmr11807404jar.86.1667313101928; Tue, 01
+ Nov 2022 07:31:41 -0700 (PDT)
+Date:   Tue, 01 Nov 2022 07:31:41 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002b83bf05ec699567@google.com>
+Subject: [syzbot] linux-next boot error: BUG: unable to handle kernel paging
+ request in corrupted
+From:   syzbot <syzbot+4d9bcd45d5ca0a476cf7@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
+        sfr@canb.auug.org.au, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 18 Oct 2022 19:12:37 +0800, Kemeng Shi wrote:
-> This series contains three cleanup patches to remove redundant check,
-> correct comment and simplify struct iolatency_grp in blk-iolatency.c.
-> 
+Hello,
 
-Applied, thanks!
+syzbot found the following issue on:
 
-[1/3] block: Remove redundant parent blkcg_gp check in check_scale_change
-      commit: b6e03072a91ecc815c9f62037871d621b09df2b3
-[2/3] block: Correct comment for scale_cookie_change
-      commit: 77445572e643538019d9919669ddf36efb6a353a
-[3/3] block: Replace struct rq_depth with unsigned int in struct iolatency_grp
-      commit: 718ac0e343f8fd81ab042aa4936d25fe10f6b318
+HEAD commit:    e9d267f752f8 Add linux-next specific files for 20221101
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13c8fdb6880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d67fcb6fc8245f
+dashboard link: https://syzkaller.appspot.com/bug?extid=4d9bcd45d5ca0a476cf7
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Best regards,
--- 
-Jens Axboe
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a6c3145cf385/disk-e9d267f7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3f34d7fed0ff/vmlinux-e9d267f7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/279836b50e84/bzImage-e9d267f7.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4d9bcd45d5ca0a476cf7@syzkaller.appspotmail.com
+
+floppy0: no floppy controllers found
+work still pending
+BUG: unable to handle page fault for address: ffffed1018000000
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 23ffee067 P4D 23ffee067 PUD 13fff5067 PMD 0 
+Oops: 0002 [#1] PREEMPT SMP KASAN
+CPU: 0 PID: 11 Comm: kworker/u4:1 Not tainted 6.1.0-rc3-next-20221101-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/11/2022
+Workqueue: events_unbound async_run_entry_fn
+RIP: 0010:memset_orig-0x7/0xb0
+Code: c1 e9 03 40 0f b6 f6 48 b8 01 01 01 01 01 01 01 01 48 0f af c6 f3 48 ab 89 d1 f3 aa 4c 89 c8 c3 90 49 89 f9 40 88 f0 48 89 d1 <f3> aa 4c 89 c8 c3 90 49 89 fa 40 0f b6 ce 48 b8 01 01 01 01 01 01
+RSP: 0000:ffffc90000107a48 EFLAGS: 00010287
+RAX: dffffc0000000000 RBX: ffff88801cd34100 RCX: fffff11014430738
+RDX: fffff11028a89f18 RSI: 0000000000000000 RDI: ffffed1018000000
+RBP: ffff88814544f8c0 R08: 0000000000000005 R09: ffffed10039a6820
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff81a702a0
+R13: ffff88814544f8c0 R14: 0000000000000007 R15: ffff88801cd34100
+FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffed1018000000 CR3: 000000000bc8e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ kasan_unpoison mm/kasan/shadow.c:138 [inline]
+ kasan_unpoison+0x40/0x70 mm/kasan/shadow.c:115
+ kasan_unpoison_range include/linux/kasan.h:112 [inline]
+ kasan_unpoison_element mm/mempool.c:115 [inline]
+ remove_element mm/mempool.c:134 [inline]
+ mempool_exit+0x1c4/0x320 mm/mempool.c:153
+ bioset_exit+0x2d3/0x640 block/bio.c:1655
+ disk_release+0x143/0x480 block/genhd.c:1169
+ device_release+0x9f/0x240 drivers/base/core.c:2330
+ kobject_cleanup lib/kobject.c:673 [inline]
+ kobject_release lib/kobject.c:704 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1be/0x4c0 lib/kobject.c:721
+ put_device+0x1b/0x30 drivers/base/core.c:3624
+ blk_mark_disk_dead-0xf/0x60
+ do_floppy_init drivers/block/floppy.c:4756 [inline]
+ floppy_async_init+0x2169/0x21ca drivers/block/floppy.c:4765
+ async_run_entry_fn+0x98/0x530 kernel/async.c:127
+ process_one_work+0x9bf/0x1710 kernel/workqueue.c:2289
+ worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+ kthread+0x2e4/0x3a0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
+Modules linked in:
+CR2: ffffed1018000000
+---[ end trace 0000000000000000 ]---
+RIP: 0010:memset_orig-0x7/0xb0
+Code: c1 e9 03 40 0f b6 f6 48 b8 01 01 01 01 01 01 01 01 48 0f af c6 f3 48 ab 89 d1 f3 aa 4c 89 c8 c3 90 49 89 f9 40 88 f0 48 89 d1 <f3> aa 4c 89 c8 c3 90 49 89 fa 40 0f b6 ce 48 b8 01 01 01 01 01 01
+RSP: 0000:ffffc90000107a48 EFLAGS: 00010287
+RAX: dffffc0000000000 RBX: ffff88801cd34100 RCX: fffff11014430738
+RDX: fffff11028a89f18 RSI: 0000000000000000 RDI: ffffed1018000000
+RBP: ffff88814544f8c0 R08: 0000000000000005 R09: ffffed10039a6820
+R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff81a702a0
+R13: ffff88814544f8c0 R14: 0000000000000007 R15: ffff88801cd34100
+FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffed1018000000 CR3: 000000000bc8e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	c1 e9 03             	shr    $0x3,%ecx
+   3:	40 0f b6 f6          	movzbl %sil,%esi
+   7:	48 b8 01 01 01 01 01 	movabs $0x101010101010101,%rax
+   e:	01 01 01
+  11:	48 0f af c6          	imul   %rsi,%rax
+  15:	f3 48 ab             	rep stos %rax,%es:(%rdi)
+  18:	89 d1                	mov    %edx,%ecx
+  1a:	f3 aa                	rep stos %al,%es:(%rdi)
+  1c:	4c 89 c8             	mov    %r9,%rax
+  1f:	c3                   	retq
+  20:	90                   	nop
+  21:	49 89 f9             	mov    %rdi,%r9
+  24:	40 88 f0             	mov    %sil,%al
+  27:	48 89 d1             	mov    %rdx,%rcx
+* 2a:	f3 aa                	rep stos %al,%es:(%rdi) <-- trapping instruction
+  2c:	4c 89 c8             	mov    %r9,%rax
+  2f:	c3                   	retq
+  30:	90                   	nop
+  31:	49 89 fa             	mov    %rdi,%r10
+  34:	40 0f b6 ce          	movzbl %sil,%ecx
+  38:	48                   	rex.W
+  39:	b8 01 01 01 01       	mov    $0x1010101,%eax
+  3e:	01 01                	add    %eax,(%rcx)
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
