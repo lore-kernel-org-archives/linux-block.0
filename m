@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC51BFA373D
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFECC433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 09:35:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229645AbiKAJfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 05:35:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
+        id S230288AbiKAJfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 05:35:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230063AbiKAJen (ORCPT
+        with ESMTP id S230214AbiKAJen (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 05:34:43 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB09119027;
-        Tue,  1 Nov 2022 02:34:30 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4N1l8r705dzRnsb;
-        Tue,  1 Nov 2022 17:29:32 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B0CF1902C;
+        Tue,  1 Nov 2022 02:34:31 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4N1lCD6NPRzJnMm;
+        Tue,  1 Nov 2022 17:31:36 +0800 (CST)
 Received: from huawei.com (10.174.178.129) by kwepemi500016.china.huawei.com
  (7.221.188.220) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Tue, 1 Nov
- 2022 17:34:28 +0800
+ 2022 17:34:29 +0800
 From:   Kemeng Shi <shikemeng@huawei.com>
 To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <shikemeng@huawei.com>
-Subject: [PATCH 15/20] block, bfq: some cleanups for function bfq_pos_tree_add_move
-Date:   Tue, 1 Nov 2022 17:34:12 +0800
-Message-ID: <20221101093417.10540-16-shikemeng@huawei.com>
+Subject: [PATCH 16/20] block, bfq: remove unnecessary goto tag in __bfq_weights_tree_remove
+Date:   Tue, 1 Nov 2022 17:34:13 +0800
+Message-ID: <20221101093417.10540-17-shikemeng@huawei.com>
 X-Mailer: git-send-email 2.14.1.windows.1
 In-Reply-To: <20221101093417.10540-1-shikemeng@huawei.com>
 References: <20221101093417.10540-1-shikemeng@huawei.com>
@@ -41,67 +41,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are three cleanups in this patch:
-1. The oom_bfqq is never inserted to tree, so return immediately for
-oom_bfqq before unnecessary NULL check of bfqq->pos_root.
-2. Only set bfqq->pos_root after bfq_rq_pos_tree_lookup successes rather
-than set bfqq->pos_root unconditionally and reset to NULL if
-bfq_rq_pos_tree_lookup fails.
-3. Remove unnecessary local variable __bfqq which is only used to check
-return value of bfq_rq_pos_tree_lookup.
+Do free work if num_active == 0 and remove unnecessary tag
+reset_entity_pointer.
 
 Signed-off-by: Kemeng Shi <shikemeng@huawei.com>
 ---
- block/bfq-iosched.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ block/bfq-iosched.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 776951156fbc..dd9a51255a0f 100644
+index dd9a51255a0f..1402dfd9f448 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -758,17 +758,16 @@ void __cold
- bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- {
- 	struct rb_node **p, *parent;
--	struct bfq_queue *__bfqq;
-+
-+	/* oom_bfqq does not participate in queue merging */
-+	if (bfqq == &bfqd->oom_bfqq)
-+		return;
- 
- 	if (bfqq->pos_root) {
- 		rb_erase(&bfqq->pos_node, bfqq->pos_root);
- 		bfqq->pos_root = NULL;
- 	}
- 
--	/* oom_bfqq does not participate in queue merging */
--	if (bfqq == &bfqd->oom_bfqq)
--		return;
--
- 	/*
- 	 * bfqq cannot be merged any longer (see comments in
- 	 * bfq_setup_cooperator): no point in adding bfqq into the
-@@ -782,14 +781,13 @@ bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 	if (!bfqq->next_rq)
+@@ -950,13 +950,11 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
  		return;
  
-+	if (bfq_rq_pos_tree_lookup(bfqd, &bfqq_group(bfqq)->rq_pos_tree,
-+			blk_rq_pos(bfqq->next_rq), &parent, &p))
-+		return;
-+
- 	bfqq->pos_root = &bfqq_group(bfqq)->rq_pos_tree;
--	__bfqq = bfq_rq_pos_tree_lookup(bfqd, bfqq->pos_root,
--			blk_rq_pos(bfqq->next_rq), &parent, &p);
--	if (!__bfqq) {
--		rb_link_node(&bfqq->pos_node, parent, p);
--		rb_insert_color(&bfqq->pos_node, bfqq->pos_root);
--	} else
--		bfqq->pos_root = NULL;
-+	rb_link_node(&bfqq->pos_node, parent, p);
-+	rb_insert_color(&bfqq->pos_node, bfqq->pos_root);
- }
+ 	bfqq->weight_counter->num_active--;
+-	if (bfqq->weight_counter->num_active > 0)
+-		goto reset_entity_pointer;
+-
+-	rb_erase_cached(&bfqq->weight_counter->weights_node, root);
+-	kfree(bfqq->weight_counter);
++	if (bfqq->weight_counter->num_active == 0) {
++		rb_erase_cached(&bfqq->weight_counter->weights_node, root);
++		kfree(bfqq->weight_counter);
++	}
  
- /*
+-reset_entity_pointer:
+ 	bfqq->weight_counter = NULL;
+ 	bfq_put_queue(bfqq);
+ }
 -- 
 2.30.0
 
