@@ -2,148 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE590C4332F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C27BC4332F
+	for <linux-block@archiver.kernel.org>; Tue,  1 Nov 2022 15:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231184AbiKAPIx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 11:08:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60106 "EHLO
+        id S231493AbiKAPOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 11:14:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230499AbiKAPIe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:08:34 -0400
+        with ESMTP id S231557AbiKAPOD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 11:14:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97ED1EADA
-        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 08:01:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C6521EC73;
+        Tue,  1 Nov 2022 08:09:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=VbGBWZhiSpQF0UZ5IwyygVVuVA9A0T3gNpvRoR7aO0A=; b=Jq4Wuo20lSTbsmzyFLTWGOKwGQ
-        fRYR4N+VfGeWAv44ZgtoqqFGW9Mre4LUOixpr2l0ui5jKSLGQdtuF0JZ78YUsdcQ+OQDXYLpVtZDA
-        wM72mQtqNIzK4dpT5Pb20ayrfiWQq52jxkqeWabjO8NqrvO33ft8O5jsPIeXp+SYF2D/Za/ycki5e
-        jVAJiD7UlQ/GiPv5p/GShAg2ze3fTLn9bgo5QpoxZzzto2cEE7aRjlMpXj01dCqM37hmvBBbdz67x
-        ebv7oR0/5OedkOdFcXFKsXfUuGhCSYLV/7JgQLg88WMIqSsBDP+EunsV0A04ROO9AOmEQSkXjO5Go
-        4uE6taWA==;
-Received: from [2001:4bb8:180:e42a:50da:325f:4a06:8830] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1opsli-005gy9-Ov; Tue, 01 Nov 2022 15:01:35 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chao Leng <lengchao@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 13/14] blk-mq: add tagset quiesce interface
-Date:   Tue,  1 Nov 2022 16:00:49 +0100
-Message-Id: <20221101150050.3510-14-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20221101150050.3510-1-hch@lst.de>
-References: <20221101150050.3510-1-hch@lst.de>
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=N7lnL7FHyu2J8E5a/w9v2ec/Wn33wozwDMPuPkUy2q4=; b=KEB9ZVg+nk0NWYtqmIE/B9+xzz
+        vvTISzxF5kwQaIE9hX/ulRaA9e6sPR/LyMv3m81GplNEF07daeZ9IafejFcUwHsmH62VIxCOUFaEv
+        mBTrPjBk/Jxaku3n7IfoDYFOt9AcPEcU9oYpwjvOrLkirpmeZKa6fiXkEljmjCUwmm6QnFRIQ//dA
+        RW7kHWhjKSe4KMb9+vjPKSanFhaRuRD/9f7t28oo2GnZrg9/AS9rVcTxRbQuC9dSe75M0FabeXjUl
+        rrDGRbgFwqvEyMQh82FVs55p4AjXGdvTKkZQbDLbQrS3Ey0Gqbb/b4VHtX5+fPNmnhTkXHqpq1geC
+        1bCps7DA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1opstk-005kZi-3u; Tue, 01 Nov 2022 15:09:52 +0000
+Date:   Tue, 1 Nov 2022 08:09:52 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v4 1/7] block: Prevent the use of REQ_FUA with read
+ operations
+Message-ID: <Y2E2wFnbeUzAPjo0@infradead.org>
+References: <20221031022642.352794-1-damien.lemoal@opensource.wdc.com>
+ <20221031022642.352794-2-damien.lemoal@opensource.wdc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221031022642.352794-2-damien.lemoal@opensource.wdc.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chao Leng <lengchao@huawei.com>
+On Mon, Oct 31, 2022 at 11:26:36AM +0900, Damien Le Moal wrote:
+> +	/*
+> +	 * REQ_FUA does not apply to read requests because:
+> +	 * - There is no way to reliably force media access for read operations
+> +	 *   with a block device that does not support FUA.
+> +	 * - Not all block devices support FUA for read operations (e.g. ATA
+> +	 *   devices with NCQ support turned off).
+> +	 */
+> +	if (!op_is_write(rq->cmd_flags) && (rq->cmd_flags & REQ_FUA)) {
+> +		blk_mq_end_request(rq, BLK_STS_NOTSUPP);
 
-Drivers that have shared tagsets may need to quiesce potentially a lot
-of request queues that all share a single tagset (e.g. nvme). Add an
-interface to quiesce all the queues on a given tagset. This interface is
-useful because it can speedup the quiesce by doing it in parallel.
-
-Because some queues should not need to be quiesced (e.g. the nvme
-connect_q) when quiescing the tagset, introduce a
-QUEUE_FLAG_SKIP_TAGSET_QUIESCE flag to allow this new interface to
-ski quiescing a particular queue.
-
-Signed-off-by: Chao Leng <lengchao@huawei.com>
-[hch: simplify for the per-tag_set srcu_struct]
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Reviewed-by: Chao Leng <lengchao@huawei.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
----
- block/blk-mq.c         | 27 +++++++++++++++++++++++++++
- include/linux/blk-mq.h |  2 ++
- include/linux/blkdev.h |  3 +++
- 3 files changed, 32 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b358328a1dce3..f0dd07bbf4c16 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -315,6 +315,33 @@ void blk_mq_unquiesce_queue(struct request_queue *q)
- }
- EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
- 
-+void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set)
-+{
-+	struct request_queue *q;
-+
-+	mutex_lock(&set->tag_list_lock);
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		if (!blk_queue_skip_tagset_quiesce(q))
-+			blk_mq_quiesce_queue_nowait(q);
-+	}
-+	blk_mq_wait_quiesce_done(set);
-+	mutex_unlock(&set->tag_list_lock);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_quiesce_tagset);
-+
-+void blk_mq_unquiesce_tagset(struct blk_mq_tag_set *set)
-+{
-+	struct request_queue *q;
-+
-+	mutex_lock(&set->tag_list_lock);
-+	list_for_each_entry(q, &set->tag_list, tag_set_list) {
-+		if (!blk_queue_skip_tagset_quiesce(q))
-+			blk_mq_unquiesce_queue(q);
-+	}
-+	mutex_unlock(&set->tag_list_lock);
-+}
-+EXPORT_SYMBOL_GPL(blk_mq_unquiesce_tagset);
-+
- void blk_mq_wake_waiters(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 061ea6e7af017..109a0e30c4704 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -881,6 +881,8 @@ void blk_mq_start_stopped_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async);
- void blk_mq_quiesce_queue(struct request_queue *q);
- void blk_mq_wait_quiesce_done(struct blk_mq_tag_set *set);
-+void blk_mq_quiesce_tagset(struct blk_mq_tag_set *set);
-+void blk_mq_unquiesce_tagset(struct blk_mq_tag_set *set);
- void blk_mq_unquiesce_queue(struct request_queue *q);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 6a6fa167fc828..9188aa3f62595 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -571,6 +571,7 @@ struct request_queue {
- #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
- #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
- #define QUEUE_FLAG_SQ_SCHED     30	/* single queue style io dispatch */
-+#define QUEUE_FLAG_SKIP_TAGSET_QUIESCE	31 /* quiesce_tagset skip the queue*/
- 
- #define QUEUE_FLAG_MQ_DEFAULT	((1UL << QUEUE_FLAG_IO_STAT) |		\
- 				 (1UL << QUEUE_FLAG_SAME_COMP) |	\
-@@ -610,6 +611,8 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- #define blk_queue_pm_only(q)	atomic_read(&(q)->pm_only)
- #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
- #define blk_queue_sq_sched(q)	test_bit(QUEUE_FLAG_SQ_SCHED, &(q)->queue_flags)
-+#define blk_queue_skip_tagset_quiesce(q) \
-+	test_bit(QUEUE_FLAG_SKIP_TAGSET_QUIESCE, &(q)->queue_flags)
- 
- extern void blk_set_pm_only(struct request_queue *q);
- extern void blk_clear_pm_only(struct request_queue *q);
--- 
-2.30.2
-
+How could this even happen?  If we want a debug check,  I think it
+should be in submit_bio and a WARN_ON_ONCE.
