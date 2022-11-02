@@ -2,98 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9488FC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:52:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 309D6C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230516AbiKBCw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 22:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42374 "EHLO
+        id S231204AbiKBC6V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 22:58:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230494AbiKBCw5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:52:57 -0400
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.232.28.96])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id 87F26220DE;
-        Tue,  1 Nov 2022 19:52:56 -0700 (PDT)
-Received: from localhost.localdomain (unknown [61.164.42.140])
-        by mail-app2 (Coremail) with SMTP id by_KCgB3ffVv22FjEPFcBw--.14956S3;
-        Wed, 02 Nov 2022 10:52:42 +0800 (CST)
-From:   Jinlong Chen <nickyc975@zju.edu.cn>
-To:     axboe@kernel.dk
-Cc:     hch@lst.de, chaitanyak@nvidia.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
-Subject: [PATCH v2 1/2] blk-mq: improve error handling in blk_mq_alloc_rq_map()
-Date:   Wed,  2 Nov 2022 10:52:29 +0800
-Message-Id: <bbbc2d9b17b137798c7fb92042141ca4cbbc58cc.1667356813.git.nickyc975@zju.edu.cn>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <cover.1667356813.git.nickyc975@zju.edu.cn>
-References: <cover.1667356813.git.nickyc975@zju.edu.cn>
+        with ESMTP id S231202AbiKBC6U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:58:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A862252B
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 19:57:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667357842;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=z/oodAW8tY/A2YDI3YyoMZ1e6KkT5y11OiMXHmNXw00=;
+        b=iNSEsQah0kYGs2GBucQlbBwaKcWva6NsTWVOuq0LPza/e1hiIbeA8nUH/t7mCbunNN+101
+        Psy9km45aHUU2okMB+0yOx4bJt+7MXVVMXFhcVe6YqaOfyx5r6gBk2N9D8C0kzKUtCZFG3
+        6H8i5hXpcgQFEi10WWI5r/eeREH088s=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-375-P9FMepT3P4SbRoX5SEPIFA-1; Tue, 01 Nov 2022 22:57:21 -0400
+X-MC-Unique: P9FMepT3P4SbRoX5SEPIFA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEC58800B30;
+        Wed,  2 Nov 2022 02:57:20 +0000 (UTC)
+Received: from fedora34.. (unknown [10.66.146.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5ECE1422A9;
+        Wed,  2 Nov 2022 02:57:18 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     shinichiro.kawasaki@wdc.com
+Cc:     chaitanyak@nvidia.com, linux-block@vger.kernel.org
+Subject: [PATCH V2 blktests 0/3] fix and improvement for xfs log size change from new xfsprogs version
+Date:   Wed,  2 Nov 2022 10:56:59 +0800
+Message-Id: <20221102025702.1664101-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: by_KCgB3ffVv22FjEPFcBw--.14956S3
-X-Coremail-Antispam: 1UD129KBjvdXoW7GF43Gw13Ar1UCw4UuryxGrg_yoWkZwc_Cr
-        y0kw1vvFyUAr1Fkw4q9r15Ar97CanakF40vFWDK3srJ3s7GanrAa9xZrnxJrZ7Ww4xWFWx
-        Gw1kZr1Fkr15tjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbhAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGwA2048vs2IY02
-        0Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-        wVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJr0_GcWl84
-        ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkE
-        FVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I
-        8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCF
-        s4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1l42
-        xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWU
-        GwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI4
-        8JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4U
-        MIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I
-        8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU5q2MUUUUU
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgoCB1ZdtcNVXAAFs8
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use goto-style error handling like we do elsewhere in the kernel.
+Hi
 
-Signed-off-by: Jinlong Chen <nickyc975@zju.edu.cn>
----
- block/blk-mq.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+The first patch addressed nvme/012 nvme/013 failure which introduced
+from xfsprogs v5.19.0, the minimun xfs log size change to 64m
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 623e8a506539..453ad445a6bd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3274,21 +3274,22 @@ static struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	tags->rqs = kcalloc_node(nr_tags, sizeof(struct request *),
- 				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
- 				 node);
--	if (!tags->rqs) {
--		blk_mq_free_tags(tags);
--		return NULL;
--	}
-+	if (!tags->rqs)
-+		goto err_free_tags;
- 
- 	tags->static_rqs = kcalloc_node(nr_tags, sizeof(struct request *),
- 					GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
- 					node);
--	if (!tags->static_rqs) {
--		kfree(tags->rqs);
--		blk_mq_free_tags(tags);
--		return NULL;
--	}
-+	if (!tags->static_rqs)
-+		goto err_free_rqs;
- 
- 	return tags;
-+
-+err_free_rqs:
-+	kfree(tags->rqs);
-+err_free_tags:
-+	blk_mq_free_tags(tags);
-+	return NULL;
- }
- 
- static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
+The second patch introduced one new function _require_test_dev_size_mb
+
+The third patch add one new parameter to _run_fio_verify_io, this will
+allow fio I/O size definition to the test case
+
+
+V2:
+Update the new function to _require_test_dev_size_mb and nvme/035
+to call it for test dev size checking for the second patch
+Update the title and description for better reflect the change for the
+third patch
+
+V1: https://lore.kernel.org/linux-block/20221024061319.1133470-1-yi.zhang@redhat.com/
+
+Yi Zhang (3):
+  common/xfs: set the minimal log size 64m during mkfs.xfs
+  common/rc: add one function _require_test_dev_size_mb
+  nvme/012,013,035: change fio I/O size and move size definition place
+
+ common/rc      | 10 ++++++++++
+ common/xfs     |  5 +++--
+ tests/nvme/012 |  2 +-
+ tests/nvme/013 |  2 +-
+ tests/nvme/035 |  6 +++++-
+ 5 files changed, 20 insertions(+), 5 deletions(-)
+
 -- 
-2.31.1
+2.34.1
 
