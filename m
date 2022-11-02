@@ -2,84 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB41FC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C82C2C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:19:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbiKBCSR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 22:18:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44740 "EHLO
+        id S229949AbiKBCTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 22:19:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiKBCSQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:18:16 -0400
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B55311EED6;
-        Tue,  1 Nov 2022 19:18:15 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-        by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4N29Tn4cF0z6PYPv;
-        Wed,  2 Nov 2022 10:15:41 +0800 (CST)
-Received: from [10.174.176.73] (unknown [10.174.176.73])
-        by APP4 (Coremail) with SMTP id gCh0CgCX8+Vk02FjQFNMAg--.26377S3;
-        Wed, 02 Nov 2022 10:18:14 +0800 (CST)
-Subject: Re: [PATCH -next v4 1/5] block, bfq: remove set but not used variable
- in __bfq_entity_update_weight_prio
-To:     Jens Axboe <axboe@kernel.dk>, Yu Kuai <yukuai1@huaweicloud.com>,
-        jack@suse.cz, paolo.valente@linaro.org
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        "yukuai (C)" <yukuai3@huawei.com>
-References: <20221102022542.3621219-1-yukuai1@huaweicloud.com>
- <20221102022542.3621219-2-yukuai1@huaweicloud.com>
- <7f7e59cb-e0b8-0db5-7c46-11aea963bcfa@kernel.dk>
- <ee543096-ae21-99d3-f3a5-483deab03a5f@kernel.dk>
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-Message-ID: <61725ff6-6da3-3d3c-4261-7f05c57ab9da@huaweicloud.com>
-Date:   Wed, 2 Nov 2022 10:18:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S230057AbiKBCTa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:19:30 -0400
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 228851EEDD;
+        Tue,  1 Nov 2022 19:19:27 -0700 (PDT)
+Received: by ajax-webmail-mail-app2 (Coremail) ; Wed, 2 Nov 2022 10:19:24
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.14.30.50]
+Date:   Wed, 2 Nov 2022 10:19:24 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
+To:     "Christoph Hellwig" <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH 4/4] blk-mq: improve readability of
+ blk_mq_alloc_request()
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
+In-Reply-To: <20221101173727.GC20690@lst.de>
+References: <cover.1667314759.git.nickyc975@zju.edu.cn>
+ <81fcbc046c9ea96cdfd8e20d1edc8e64c4d08153.1667314759.git.nickyc975@zju.edu.cn>
+ <20221101173727.GC20690@lst.de>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <ee543096-ae21-99d3-f3a5-483deab03a5f@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: gCh0CgCX8+Vk02FjQFNMAg--.26377S3
-X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYz7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E
-        6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28Cjx
-        kF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8I
-        cVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87
-        Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE
-        6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72
-        CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7Mxk0
-        xIA0c2IEe2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
-        1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
-        14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
-        IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY
-        6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-        73UjIFyTuYvjfUoOJ5UUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+Message-ID: <3caa5abc.16387a.1843622d8cf.Coremail.nickyc975@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: by_KCgCHz1us02FjoMxcBw--.54801W
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgoCB1ZdtcNVXAAAs5
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-在 2022/11/02 10:11, Jens Axboe 写道:
-> On 11/1/22 8:09 PM, Jens Axboe wrote:
->> On 11/1/22 8:25 PM, Yu Kuai wrote:
->>> From: Yu Kuai <yukuai3@huawei.com>
->>>
->>> After the patch "block, bfq: cleanup bfq_weights_tree add/remove apis"),
->>> the local variable 'bfqd' is not used anymore, thus remove it.
->>
->> Please add a Fixes tag.
-> 
-> Looks like the rest were good to go, so I added it myself.
-
-Thanks for helping out. I'm not sure which commit id to use since the
-fixed patch is not in linux-next yet, does the commit id stay the same
-when the patch applied from for-6.2 to next ?
-
-Thanks,
-Kuai
-> 
-
+PiBPbiBUdWUsIE5vdiAwMSwgMjAyMiBhdCAxMToxMTozN1BNICswODAwLCBKaW5sb25nIENoZW4g
+d3JvdGU6Cj4gPiBBZGQgYSBoZWxwZXIgYmxrX21xX2FsbG9jX3JlcXVlc3Rfbm9jYWNoZSgpIHRv
+IGFsbG9jIHJlcXVlc3Qgd2l0aG91dAo+ID4gY2FjaGUuIFRoaXMgbWFrZXMgYmxrX21xX2FsbG9j
+X3JlcXVlc3QoKSBtb3JlIHJlYWRhYmxlLgo+ID4gCj4gPiBTaWduZWQtb2ZmLWJ5OiBKaW5sb25n
+IENoZW4gPG5pY2t5Yzk3NUB6anUuZWR1LmNuPgo+ID4gLS0tCj4gPiAgYmxvY2svYmxrLW1xLmMg
+fCA0NyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQo+ID4g
+IDEgZmlsZSBjaGFuZ2VkLCAyOSBpbnNlcnRpb25zKCspLCAxOCBkZWxldGlvbnMoLSkKPiA+IAo+
+ID4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS5jIGIvYmxvY2svYmxrLW1xLmMKPiA+IGluZGV4
+IDg3YTYzNDhhMGQwYS4uMmZhZTExMWE0MmM4IDEwMDY0NAo+ID4gLS0tIGEvYmxvY2svYmxrLW1x
+LmMKPiA+ICsrKyBiL2Jsb2NrL2Jsay1tcS5jCj4gPiBAQCAtNTcyLDM2ICs1NzIsNDcgQEAgc3Rh
+dGljIHN0cnVjdCByZXF1ZXN0ICpibGtfbXFfYWxsb2NfY2FjaGVkX3JlcXVlc3Qoc3RydWN0IHJl
+cXVlc3RfcXVldWUgKnEsCj4gPiAgCXJldHVybiBycTsKPiA+ICB9Cj4gPiAgCj4gPiArc3RhdGlj
+IHN0cnVjdCByZXF1ZXN0ICpibGtfbXFfYWxsb2NfcmVxdWVzdF9ub2NhY2hlKHN0cnVjdCByZXF1
+ZXN0X3F1ZXVlICpxLAo+ID4gKwkJYmxrX29wZl90IG9wZiwgYmxrX21xX3JlcV9mbGFnc190IGZs
+YWdzKQo+IAo+IFRoZSBuYW1lIGlzIGEgYml0IG9kZCwgYnV0IEkgY2FuJ3QgdGhpbmsgb2ZmIGEg
+YmV0dGVyIG9uZS4KPiAKPiA+ICsJc3RydWN0IGJsa19tcV9hbGxvY19kYXRhIGRhdGEgPSB7Cj4g
+PiAgCQkJLnEJCT0gcSwKPiA+ICAJCQkuZmxhZ3MJCT0gZmxhZ3MsCj4gPiAgCQkJLmNtZF9mbGFn
+cwk9IG9wZiwKPiA+ICAJCQkubnJfdGFncwk9IDEsCj4gPiAgCQl9Owo+IAo+IEFuZCB0aGlzIG5v
+dyBoYXMgc3VwZXJmbG91cyBpbmRlbmF0aW9uLiAgT3ZlcmFsbCwgd2hpbGUgdGhlIHNlcGFyYXRl
+Cj4gaGVscGVyIGxvb2tzIG1hcmdpbmFsbHkgbmljZXIsIEknbSBub3QgcmVhbGx5IHN1cmUgaXQg
+aXMgd29ydGggdGhlCj4gY2h1cm4uCgpJJ2xsIGRyb3AgdGhlIHBhdGNoIGlmIHlvdSB0aGluayBp
+dCBpcyBub3Qgd29ydGggdGhlIGNodXJuLiBCdXQgSQpzdGFydGVkIGRvaW5nIHRoaXMgYmVjYXVz
+ZSBvZiB0aGUgZm9sbG93aW5nIGdvdG8gc3RhdGVtZW50OgoKCXJxID0gYmxrX21xX2FsbG9jX2Nh
+Y2hlZF9yZXF1ZXN0KHEsIG9wZiwgZmxhZ3MpOwoJaWYgKCFycSkgewoJCVsuLi5dCgkJcmV0ID0g
+YmxrX3F1ZXVlX2VudGVyKHEsIGZsYWdzKTsKCQlbLi4uXQoJCXJxID0gX19ibGtfbXFfYWxsb2Nf
+cmVxdWVzdHMoJmRhdGEpOwoJCWlmICghcnEpCgkJCWdvdG8gb3V0X3F1ZXVlX2V4aXQ7Cgl9Cglb
+Li4uXQpvdXRfcXVldWVfZXhpdDoKCWJsa19xdWV1ZV9leGl0KHEpOwoJcmV0dXJuIEVSUl9QVFIo
+LUVXT1VMREJMT0NLKTsKClF1ZXVlIGVudGVyaW5nIGhhcyBiZWVuIG1vdmVkIGludG8gdGhlIGZh
+bGxiYWNrIHBhdGgsIGxlZnQgcXVldWUgZXhpdGluZwpvdXRzaWRlLiBTaG91bGQgSSBqdXN0IGVs
+aW1pbmF0ZSB0aGUgZ290byBzdGF0ZW1lbnQgYW5kIG1vdmUgdGhlIGVycm9yCmhhbmRsaW5nIGlu
+dG8gdGhlIGZhbGxiYWNrIHBhdGggdG9vPyBMaWtlOgoKCXJxID0gYmxrX21xX2FsbG9jX2NhY2hl
+ZF9yZXF1ZXN0KHEsIG9wZiwgZmxhZ3MpOwoJaWYgKCFycSkgewoJCVsuLi5dCgkJcmV0ID0gYmxr
+X3F1ZXVlX2VudGVyKHEsIGZsYWdzKTsKCQlbLi4uXQoJCXJxID0gX19ibGtfbXFfYWxsb2NfcmVx
+dWVzdHMoJmRhdGEpOwoJCWlmICghcnEpIHsKCQkJYmxrX3F1ZXVlX2V4aXQocSk7CgkJCXJldHVy
+biBFUlJfUFRSKC1FV09VTERCTE9DSyk7CgkJfQoJfQoKVGhhbmtzIQpKaW5sb25nIENoZW4=
