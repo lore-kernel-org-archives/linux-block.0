@@ -2,47 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8250C43219
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 22:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2D4C43219
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 22:50:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbiKBWrr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 18:47:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44502 "EHLO
+        id S230499AbiKBWuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 18:50:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiKBWrq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 18:47:46 -0400
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43400646E;
-        Wed,  2 Nov 2022 15:47:46 -0700 (PDT)
-Received: by mail-pj1-f42.google.com with SMTP id r61-20020a17090a43c300b00212f4e9cccdso3486136pjg.5;
-        Wed, 02 Nov 2022 15:47:46 -0700 (PDT)
+        with ESMTP id S230196AbiKBWuw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 18:50:52 -0400
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21FCC959B;
+        Wed,  2 Nov 2022 15:50:50 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id h193so104536pgc.10;
+        Wed, 02 Nov 2022 15:50:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o4wIJC4qmLD8sZv7FELeKq1bWLCLMI4X8kEQubd/l6g=;
-        b=l1Y1CG5rrIod/X/S+NH5kEg+D66C1vAqy6osserWaJKvfnXBQRA/jxZ6F56cbx52Og
-         6Nu7AI6FI28f2B6K3A9uIMQTJsJntRDnzD0ZeFj0/sJCunyxXUu07dZS4P9/Ry0p9ZvT
-         BYqbMPVNkV5KKkIYHh3QsZSkKLkdSUKEid3e2fpQDBFQxIoNHBxv1o54a+McmwCNU7ma
-         8U5kkxWycfmrx/at75Bf4qxurxPYaGwO2hSEPRdN0fuQsfrPL+4NOsKqreUH/TLjz2bU
-         hehOqQMXVX9LnOiyLg/w6nwXKK5+yMv5MQXzg5MjTWVRqHZexOyEyA/VGaL7dLoICe+n
-         rJow==
-X-Gm-Message-State: ACrzQf2wRTndNU5QSS98Kn+EwOE9FgAV7b8f/r+k0yjJkgiO66t+/FO/
-        4fS+7HaqTUQ7XtdykuobAwA=
-X-Google-Smtp-Source: AMsMyM7oTR2d5lchMffcmjpS1vJGXh4SAt69GYPXVjFJ2dUHdIGIroDKm3Sonab/kAsDMsRgrqXqvA==
-X-Received: by 2002:a17:902:bf08:b0:178:90fb:8cda with SMTP id bi8-20020a170902bf0800b0017890fb8cdamr26566977plb.9.1667429265258;
-        Wed, 02 Nov 2022 15:47:45 -0700 (PDT)
+        bh=oi/++AM86hQyi+QYKhOHsLnIasDTZEsqZxanEFqTzjY=;
+        b=n8TKHQAVxbAcOckx45tiahsOCldnWRsb18PyqcsxH2JSgQlKQZG1gecSZBSIuTFSau
+         260RKgaIp5mRImixuPxUufxf2JFotfqrFDtyFuWUXsJ/vL4DnMDDt6bIyaChNTnWn8z5
+         CnweVmOCZ34GjeMH30vcLpkwICYo9zG+zDKaDbDwm83BpT0zLEkttZP2t0o3F02tMSxF
+         Wtew8JTMb4B9hBXkBBjL9TUdShIfjZJI0TvQgdCPgugof8XCE5JYIXySXmh9xkT+crIR
+         ihRrWGAvIs+79YsAHZLE8WmNAdj5nt+5vPvWsmGjnKMLtYNi86BinsG/d2+mWRtYsSpQ
+         NPQA==
+X-Gm-Message-State: ACrzQf1KHdLhjoHVqalG+bjez6bH5xTp1JIOaNWclIvUiqG0wZj9S1mQ
+        bRM0q9whZ6IdgjJP4n2KYTo5NbIFKIc=
+X-Google-Smtp-Source: AMsMyM6bPaD6vkm2t6htya5qjFAYxNj4UjVLLKBnOw0YiQYnA2cdZTgepQevyScmNi+GFrRNkBEHRA==
+X-Received: by 2002:a63:5909:0:b0:46e:c98d:e07c with SMTP id n9-20020a635909000000b0046ec98de07cmr23719156pgb.530.1667429449450;
+        Wed, 02 Nov 2022 15:50:49 -0700 (PDT)
 Received: from ?IPV6:2620:15c:211:201:22d3:f380:fa84:4b89? ([2620:15c:211:201:22d3:f380:fa84:4b89])
-        by smtp.gmail.com with ESMTPSA id w22-20020a1709027b9600b0017f7628cbddsm8842988pll.30.2022.11.02.15.47.42
+        by smtp.gmail.com with ESMTPSA id f26-20020aa7969a000000b0056bfd4a2702sm8928050pfk.45.2022.11.02.15.50.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Nov 2022 15:47:44 -0700 (PDT)
-Message-ID: <0123db70-6217-135a-4101-0609512e723b@acm.org>
-Date:   Wed, 2 Nov 2022 15:47:41 -0700
+        Wed, 02 Nov 2022 15:50:48 -0700 (PDT)
+Message-ID: <6faaba2b-5fb3-7121-5796-af2b2f73b6e7@acm.org>
+Date:   Wed, 2 Nov 2022 15:50:46 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.0
-Subject: Re: [PATCH v3 03/19] scsi: Move sd_pr_type to header to share
+Subject: Re: [PATCH v3 01/19] block: Add PR callouts for read keys and
+ reservation
 Content-Language: en-US
 To:     Mike Christie <michael.christie@oracle.com>, hch@lst.de,
         martin.petersen@oracle.com, linux-scsi@vger.kernel.org,
@@ -51,9 +52,9 @@ To:     Mike Christie <michael.christie@oracle.com>, hch@lst.de,
         linux-nvme@lists.infradead.org, chaitanyak@nvidia.com,
         kbusch@kernel.org, target-devel@vger.kernel.org
 References: <20221026231945.6609-1-michael.christie@oracle.com>
- <20221026231945.6609-4-michael.christie@oracle.com>
+ <20221026231945.6609-2-michael.christie@oracle.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20221026231945.6609-4-michael.christie@oracle.com>
+In-Reply-To: <20221026231945.6609-2-michael.christie@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -61,29 +62,43 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 10/26/22 16:19, Mike Christie wrote:
-> +static inline enum scsi_pr_type block_pr_type_to_scsi(enum pr_type type)
-> +{
-> +	switch (type) {
-> +	case PR_WRITE_EXCLUSIVE:
-> +		return SCSI_PR_WRITE_EXCLUSIVE;
-> +	case PR_EXCLUSIVE_ACCESS:
-> +		return SCSI_PR_EXCLUSIVE_ACCESS;
-> +	case PR_WRITE_EXCLUSIVE_REG_ONLY:
-> +		return SCSI_PR_WRITE_EXCLUSIVE_REG_ONLY;
-> +	case PR_EXCLUSIVE_ACCESS_REG_ONLY:
-> +		return SCSI_PR_EXCLUSIVE_ACCESS_REG_ONLY;
-> +	case PR_WRITE_EXCLUSIVE_ALL_REGS:
-> +		return SCSI_PR_WRITE_EXCLUSIVE_ALL_REGS;
-> +	case PR_EXCLUSIVE_ACCESS_ALL_REGS:
-> +		return SCSI_PR_EXCLUSIVE_ACCESS_ALL_REGS;
-> +	default:
-> +		return 0;
-> +	}
+> +struct pr_keys {
+> +	u32	generation;
+> +	u32	num_keys;
+> +	u64	keys[];
 > +};
+> +
+> +struct pr_held_reservation {
+> +	u64		key;
+> +	u32		generation;
+> +	enum pr_type	type;
+> +};
+> +
+>   struct pr_ops {
+>   	int (*pr_register)(struct block_device *bdev, u64 old_key, u64 new_key,
+>   			u32 flags);
+> @@ -14,6 +26,18 @@ struct pr_ops {
+>   	int (*pr_preempt)(struct block_device *bdev, u64 old_key, u64 new_key,
+>   			enum pr_type type, bool abort);
+>   	int (*pr_clear)(struct block_device *bdev, u64 key);
+> +	/*
+> +	 * pr_read_keys - Read the registered keys and return them in the
+> +	 * pr_keys->keys array. The keys array will have been allocated at the
+> +	 * end of the pr_keys struct and is keys_len bytes. If there are more
+> +	 * keys than can fit in the array, success will still be returned and
+> +	 * pr_keys->num_keys will reflect the total number of keys the device
+> +	 * contains, so the caller can retry with a larger array.
+> +	 */
+> +	int (*pr_read_keys)(struct block_device *bdev,
+> +			struct pr_keys *keys_info, u32 keys_len);
+> +	int (*pr_read_reservation)(struct block_device *bdev,
+> +			struct pr_held_reservation *rsv);
+>   };
 
-Please leave out "default: return 0;" from the switch statement and add 
-"return 0;" after the switch statement. That will make the compiler emit 
-a warning if a value is added in enum pr_type but not in the above function.
+Is there any pr_read_keys() implementation that won't have to divide 
+@keys_len by 8? How about leaving out that argument and making callers 
+store the number of elements in the keys[] array in the num_keys member 
+before calling pr_read_keys()?
 
 Thanks,
 
