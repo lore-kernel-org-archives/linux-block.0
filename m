@@ -2,126 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C483C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B164C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:09:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230098AbiKBCEH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 22:04:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34696 "EHLO
+        id S229889AbiKBCJy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 22:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbiKBCED (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:04:03 -0400
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D679A186C9;
-        Tue,  1 Nov 2022 19:04:02 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N299p0BQBzl21b;
-        Wed,  2 Nov 2022 10:01:50 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.127.227])
-        by APP2 (Coremail) with SMTP id Syh0CgCnP9QN0GFjGqzfBA--.48110S9;
-        Wed, 02 Nov 2022 10:04:01 +0800 (CST)
-From:   Yu Kuai <yukuai1@huaweicloud.com>
-To:     jack@suse.cz, axboe@kernel.dk, paolo.valente@linaro.org
+        with ESMTP id S229561AbiKBCJy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:09:54 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36E21D32A
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 19:09:52 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 128so15039807pga.1
+        for <linux-block@vger.kernel.org>; Tue, 01 Nov 2022 19:09:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B/9nbqKAy6prDAS3oMmtklZfg/ZbEspQaEJ48FmeAmc=;
+        b=TrwwCrLqC7JAM1Uu/+yafOAtWgX5dY7pPM2NvZ69AMrgl3UEFM/DscGiTUUHN3pc+L
+         uS7v2QJimbqhm1WnG9dnmFDRtAK7Yte8g4pmcY2GKK2Ytn0tZg9J9Dfz0LlYaXEDDxsx
+         iiTD4UyqQ9/VzWkjBXBux22f7w4atH83ns9iux6Su51579Sjj45hARf3lqY0yH2OoybV
+         v0M5WTlBw12gNGR7yEzNR+v5pJXL2RhLDZb6KkB4LTw9dVwWz1JNVzxYWwMm3Og/CFZy
+         yEUtvs6A3IVvM93m1EbIcurAyJwCjGIC2c1FgMU708u88XVXA0b3UxJKLzPm463agT6c
+         ZJiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B/9nbqKAy6prDAS3oMmtklZfg/ZbEspQaEJ48FmeAmc=;
+        b=N7T0VntqnKgq1ImMYzJmr4PSEXGS/OalXEYGERy0xOZZmEtFvrwAfxrNqoiQSWR0DM
+         +7lDXP3+uwVk/GcRXdlEN87HNNXtgQ6/XYu1GiCUzysr+ggmbfKORvD6ObdQhY5Ml6Mz
+         OyJdJ10GxIUHRus0GICHI35ZjOevJIVKL+106Nej+jyPw4Y8nI5DBLFlaVqsqpA6ws9s
+         dS3Z/APF3CrfjgWht7IPUh9lFkYFmu6/X5GUfTF3hPKEC5ipT55kenRx1SFClWRSzTDK
+         /WIv12ASMUOwlW7bhMEWK2s4Di8oMHH2vT8yYNR0JVouq2yZu17sBQDdHScyoQZsEqcC
+         Tz3Q==
+X-Gm-Message-State: ACrzQf2Ikm5NheJVFxuXyNtxwMteXuBY/iZaVR19ja9QVWEAAkpqa4Po
+        /NGAlppXiigA9gbmkn97UScWhA==
+X-Google-Smtp-Source: AMsMyM6nfZ1Xf117LD/8Qlkj1bOJKmYdrnP9WwitZHJYBeZMfYqBJCmperWW+vBpF2o56y/62TQwcQ==
+X-Received: by 2002:a63:35c6:0:b0:470:d38:7c63 with SMTP id c189-20020a6335c6000000b004700d387c63mr17783pga.249.1667354992155;
+        Tue, 01 Nov 2022 19:09:52 -0700 (PDT)
+Received: from [192.168.1.136] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id k1-20020a170902c40100b0016c9e5f291bsm7018876plk.111.2022.11.01.19.09.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Nov 2022 19:09:51 -0700 (PDT)
+Message-ID: <7f7e59cb-e0b8-0db5-7c46-11aea963bcfa@kernel.dk>
+Date:   Tue, 1 Nov 2022 20:09:44 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH -next v4 1/5] block, bfq: remove set but not used variable
+ in __bfq_entity_update_weight_prio
+To:     Yu Kuai <yukuai1@huaweicloud.com>, jack@suse.cz,
+        paolo.valente@linaro.org
 Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, yukuai3@huawei.com,
-        yukuai1@huaweicloud.com, yi.zhang@huawei.com
-Subject: [PATCH -next v4 5/5] block, bfq: don't declare 'bfqd' as type 'void *' in bfq_group
-Date:   Wed,  2 Nov 2022 10:25:42 +0800
-Message-Id: <20221102022542.3621219-6-yukuai1@huaweicloud.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221102022542.3621219-1-yukuai1@huaweicloud.com>
+        yi.zhang@huawei.com
 References: <20221102022542.3621219-1-yukuai1@huaweicloud.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Syh0CgCnP9QN0GFjGqzfBA--.48110S9
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw4UAFy5Wr47Gw4UCr45ZFb_yoW8tw43p3
-        ZIq3WDWrWftrn3Wr4UA3Wjqr93twn3C34DKa4kX34avFy7trnFqan0yw18Z3W09FZxCrsr
-        Z34j93ykZr17twUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUU9K14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-        kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-        z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-        4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-        3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-        IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-        M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxGrw
-        CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-        14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-        IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAv
-        wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-        v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUOBTYUUUUU
-X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
-X-CFilter-Loop: Reflected
+ <20221102022542.3621219-2-yukuai1@huaweicloud.com>
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20221102022542.3621219-2-yukuai1@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+On 11/1/22 8:25 PM, Yu Kuai wrote:
+> From: Yu Kuai <yukuai3@huawei.com>
+> 
+> After the patch "block, bfq: cleanup bfq_weights_tree add/remove apis"),
+> the local variable 'bfqd' is not used anymore, thus remove it.
 
-Prevent unnecessary format conversion for bfqg->bfqd in multiple
-places.
+Please add a Fixes tag.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Acked-by: Paolo Valente <paolo.valente@unimore.it>
----
- block/bfq-cgroup.c  | 2 +-
- block/bfq-iosched.h | 2 +-
- block/bfq-wf2q.c    | 6 ++----
- 3 files changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 4c37398e0b99..d57872cc05ed 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -224,7 +224,7 @@ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
- {
- 	blkg_rwstat_add(&bfqg->stats.queued, opf, 1);
- 	bfqg_stats_end_empty_time(&bfqg->stats);
--	if (!(bfqq == ((struct bfq_data *)bfqg->bfqd)->in_service_queue))
-+	if (!(bfqq == bfqg->bfqd->in_service_queue))
- 		bfqg_stats_set_start_group_wait_time(bfqg, bfqq_group(bfqq));
- }
- 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 76363841d8ff..9fa89577322d 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -931,7 +931,7 @@ struct bfq_group {
- 	struct bfq_entity entity;
- 	struct bfq_sched_data sched_data;
- 
--	void *bfqd;
-+	struct bfq_data *bfqd;
- 
- 	struct bfq_queue *async_bfqq[2][IOPRIO_NR_LEVELS];
- 	struct bfq_queue *async_idle_bfqq;
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 4d4b84e7bf3e..b02b53658ed4 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -222,9 +222,8 @@ static void bfq_inc_active_entities(struct bfq_entity *entity)
- {
- 	struct bfq_sched_data *sd = entity->sched_data;
- 	struct bfq_group *bfqg = container_of(sd, struct bfq_group, sched_data);
--	struct bfq_data *bfqd = (struct bfq_data *)bfqg->bfqd;
- 
--	if (bfqg != bfqd->root_group)
-+	if (bfqg != bfqg->bfqd->root_group)
- 		bfqg->active_entities++;
- }
- 
-@@ -232,9 +231,8 @@ static void bfq_dec_active_entities(struct bfq_entity *entity)
- {
- 	struct bfq_sched_data *sd = entity->sched_data;
- 	struct bfq_group *bfqg = container_of(sd, struct bfq_group, sched_data);
--	struct bfq_data *bfqd = (struct bfq_data *)bfqg->bfqd;
- 
--	if (bfqg != bfqd->root_group)
-+	if (bfqg != bfqg->bfqd->root_group)
- 		bfqg->active_entities--;
- }
- 
 -- 
-2.31.1
+Jens Axboe
+
 
