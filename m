@@ -2,236 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FBEC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4DDC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:47:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbiKBQmt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 12:42:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
+        id S232027AbiKBQrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 12:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232094AbiKBQmD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 12:42:03 -0400
-Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B672ED45;
-        Wed,  2 Nov 2022 09:37:04 -0700 (PDT)
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id 7717241D4F;
-        Wed,  2 Nov 2022 11:52:12 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1667404332;
-        bh=TyNzmYDcfAr7FLJZ9aVsP79ngrCxgm8xxrHZVRSY9WY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=as62dqzWBh1vxcxNsCa3zF14UgbxfjNje9a6h1T18NtR7lPBPoiK9dYEw8opxRVB5
-         ZA6n2kr85g0sbyf2FLWVUsDr86lAxpSnKev8KNhJLPoi1td5cBkJ3taGEyUP2HP+5d
-         TrddiSS+QHUGCQoo4X6dK9CBHmgVpriV/wJQBOhZoC3skfTHNRc+rej+opKSdmaXUa
-         16ImaiDSeRcRcc5BvuyKNiO1CknlvC1SnAxwgQ50/RmBBW2g7i4Z+qplSR6jirOrcO
-         pj7v4eJBDnP2aZsbYbhFKnKoO2Ey1EHMKz4nPIEnfnxuWingqkW+XN0Xi0Rl9AxjA2
-         Yf3u8skTs20PQ==
-Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
- prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.12; Wed, 2 Nov 2022 16:51:33 +0100
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <hch@infradead.org>,
-        <sergei.shtepa@veeam.com>
-Subject: [PATCH v1 12/17] lock, blksnap: event queue from the difference storage
-Date:   Wed, 2 Nov 2022 16:50:56 +0100
-Message-ID: <20221102155101.4550-13-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221102155101.4550-1-sergei.shtepa@veeam.com>
-References: <20221102155101.4550-1-sergei.shtepa@veeam.com>
+        with ESMTP id S232171AbiKBQrB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 12:47:01 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E88063881;
+        Wed,  2 Nov 2022 09:43:44 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so2384353pjd.4;
+        Wed, 02 Nov 2022 09:43:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IjILPpgQCkdJ4ZJ00jqJd+jDzKRU2FaGMqk858NL3dc=;
+        b=dmYqXsN8lNSxDB0uXZQ6rsGrA/k+VAfEyFqeOxCavCTGaiakcfSobJRaJXd2d44clP
+         vePC8myNAyorRGZlHkyKFDWfDtHP5piVxFEmd2RIXh2alwwo5zzXbMM0gVYAB240ufeC
+         BgwRQpvEbW5ci641cMKU9oeO0uy5YHwABAcwhS+tW9+uFasjdpHBw5kBn4hlu+yvhexy
+         zYdekQFPfwwqLUoR4mMgJ+pjdSLT6VTwv8IL2TQMfn6TVQtNqv5voIx3cG1/YBxQ60Xo
+         X1/4W/XW8zPw9QTSfFsoZeywYppP3uQCxwbKM76sSytyCSMZqvIX5bYdoFsGDSQ29g0O
+         OSDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IjILPpgQCkdJ4ZJ00jqJd+jDzKRU2FaGMqk858NL3dc=;
+        b=t1ITDUzOMVHsvvyGgYCQEGMAJ0L2ozLZlQviJdvdHBh4f/PAsOIhafxkBic1SdjE9l
+         fLEFaphEbZwRobikOgk/qRpUZo9m52ZWz2t3R+nZh3dRTnHXVCc/tLPo3uCBLvD6FFFn
+         juiDQIXTYuu9WPQ6c3KxL6i4Z6CErQQjZOhnU5AooWDdDrFFJ6IQM+/n4bA5UiEDxkw1
+         RPAhmdV6diBTlgWcK+2rLrx5CutVFupsMpgQ6k7CAbBemwyAGUpivQ/LytH4r+1ECbGb
+         pVpvIE81iNXNYwRkrg/FMsbj2rXyCwn51qGN8G6snSqHeQn3hEnaQrNlWx2bo/bRXVMK
+         tNng==
+X-Gm-Message-State: ACrzQf1xVQMtOmscxorfIKyOrjP2k3QwS7yt/fhiCe43uUABPY1PZzCV
+        QAj2TrxH0BsoIIVFZn+cnPM=
+X-Google-Smtp-Source: AMsMyM5+2h1g5QncFyVKf/9QXnl3us6XD14UDGR0pb/Wvj24kswOJM73+P7ddL0Enyhat7ZA1AAn4A==
+X-Received: by 2002:a17:902:da8a:b0:187:3d6:4c60 with SMTP id j10-20020a170902da8a00b0018703d64c60mr25714581plx.117.1667407424152;
+        Wed, 02 Nov 2022 09:43:44 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id p1-20020a170902e74100b001784a45511asm8591248plf.79.2022.11.02.09.43.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 09:43:43 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 2 Nov 2022 06:43:42 -1000
+From:   'Tejun Heo' <tj@kernel.org>
+To:     David Laight <David.Laight@aculab.com>
+Cc:     Jiri Slaby <jirislaby@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Martin Liska <mliska@suse.cz>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
+ prints
+Message-ID: <Y2KePvYRRMOrqzOe@slm.duckdns.org>
+References: <20221031114520.10518-1-jirislaby@kernel.org>
+ <Y1++fLJXkeZgtXR2@infradead.org>
+ <Y2AMcSPAJpj6obSA@slm.duckdns.org>
+ <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
+ <Y2FNa4bGhJoevRKT@slm.duckdns.org>
+ <2b975ee3117e45aaa7882203cf9a4db8@AcuMS.aculab.com>
+ <Y2Kaghnu/sPvl0+g@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.24.10.107]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.128.103) To
- prgmbx01.amust.local (172.24.128.102)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A292403155666726A
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y2Kaghnu/sPvl0+g@slm.duckdns.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Provides transmission of events from the difference storage to the user
-process. Only two events are currently defined. The first is that there
-are few free regions in the difference storage. The second is that the
-request for a free region for storing differences failed with an error,
-since there are no more free regions left in the difference storage
-(the snapshot overflow state).
+On Wed, Nov 02, 2022 at 06:27:46AM -1000, 'Tejun Heo' wrote:
+> On Wed, Nov 02, 2022 at 08:35:34AM +0000, David Laight wrote:
+> > I think the enums have to be split.
+> > There will be other side effects of promoting the constants to 64bit
+> > that are much more difficult to detect than the warnings from printf.
+> 
+> idk, I think I can just add LLU to everything and it should be fine.
+> 
+> > I'm also not sure whether the type is even consistent for 32bit
+> > and 64bit builds.
+> > Casts are (sort of) horrid.
+> 
+> Yeah, I don't think casts are the solution either. Lemme add LLU to
+> everything and see how it works.
 
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- drivers/block/blksnap/event_queue.c | 86 +++++++++++++++++++++++++++++
- drivers/block/blksnap/event_queue.h | 63 +++++++++++++++++++++
- 2 files changed, 149 insertions(+)
- create mode 100644 drivers/block/blksnap/event_queue.c
- create mode 100644 drivers/block/blksnap/event_queue.h
+So adding LLU to initializers don't make the specific enum's type follow
+suit. I guess type determination is really based on the value range. Oh man,
+what a mess.
 
-diff --git a/drivers/block/blksnap/event_queue.c b/drivers/block/blksnap/event_queue.c
-new file mode 100644
-index 000000000000..c91a81b3e3a8
---- /dev/null
-+++ b/drivers/block/blksnap/event_queue.c
-@@ -0,0 +1,86 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define pr_fmt(fmt) KBUILD_MODNAME "-event_queue: " fmt
-+
-+#include <linux/slab.h>
-+#include <linux/sched.h>
-+#include "event_queue.h"
-+
-+void event_queue_init(struct event_queue *event_queue)
-+{
-+	INIT_LIST_HEAD(&event_queue->list);
-+	spin_lock_init(&event_queue->lock);
-+	init_waitqueue_head(&event_queue->wq_head);
-+}
-+
-+void event_queue_done(struct event_queue *event_queue)
-+{
-+	struct event *event;
-+
-+	spin_lock(&event_queue->lock);
-+	while (!list_empty(&event_queue->list)) {
-+		event = list_first_entry(&event_queue->list, struct event,
-+					 link);
-+		list_del(&event->link);
-+		event_free(event);
-+	}
-+	spin_unlock(&event_queue->lock);
-+}
-+
-+int event_gen(struct event_queue *event_queue, gfp_t flags, int code,
-+	      const void *data, int data_size)
-+{
-+	struct event *event;
-+
-+	event = kzalloc(sizeof(struct event) + data_size, flags);
-+	if (!event)
-+		return -ENOMEM;
-+
-+	event->time = ktime_get();
-+	event->code = code;
-+	event->data_size = data_size;
-+	memcpy(event->data, data, data_size);
-+
-+	pr_debug("Generate event: time=%lld code=%d data_size=%d\n",
-+		 event->time, event->code, event->data_size);
-+
-+	spin_lock(&event_queue->lock);
-+	list_add_tail(&event->link, &event_queue->list);
-+	spin_unlock(&event_queue->lock);
-+
-+	wake_up(&event_queue->wq_head);
-+	return 0;
-+}
-+
-+struct event *event_wait(struct event_queue *event_queue,
-+			 unsigned long timeout_ms)
-+{
-+	int ret;
-+
-+	ret = wait_event_interruptible_timeout(event_queue->wq_head,
-+					       !list_empty(&event_queue->list),
-+					       timeout_ms);
-+
-+	if (ret > 0) {
-+		struct event *event;
-+
-+		spin_lock(&event_queue->lock);
-+		event = list_first_entry(&event_queue->list, struct event,
-+					 link);
-+		list_del(&event->link);
-+		spin_unlock(&event_queue->lock);
-+
-+		pr_debug("Event received: time=%lld code=%d\n", event->time,
-+			 event->code);
-+		return event;
-+	}
-+	if (ret == 0)
-+		return ERR_PTR(-ENOENT);
-+
-+	if (ret == -ERESTARTSYS) {
-+		pr_debug("event waiting interrupted\n");
-+		return ERR_PTR(-EINTR);
-+	}
-+
-+	pr_err("Failed to wait event. errno=%d\n", abs(ret));
-+	return ERR_PTR(ret);
-+}
-diff --git a/drivers/block/blksnap/event_queue.h b/drivers/block/blksnap/event_queue.h
-new file mode 100644
-index 000000000000..d9aee081ab51
---- /dev/null
-+++ b/drivers/block/blksnap/event_queue.h
-@@ -0,0 +1,63 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __BLK_SNAP_EVENT_QUEUE_H
-+#define __BLK_SNAP_EVENT_QUEUE_H
-+
-+#include <linux/types.h>
-+#include <linux/ktime.h>
-+#include <linux/list.h>
-+#include <linux/spinlock.h>
-+#include <linux/wait.h>
-+
-+/**
-+ * struct event - An event to be passed to the user space.
-+ * @link:
-+ *	The list header allows to combine events from the queue.
-+ * @time:
-+ *	A timestamp indicates when an event occurred.
-+ * @code:
-+ *	Event code.
-+ * @data_size:
-+ *	The number of bytes in the event data array.
-+ * @data:
-+ *	An array of event data.
-+ *
-+ * Events can be different, so they contain different data. The size of the
-+ * data array is not defined exactly, but it has limitations. The size of
-+ * the event structure may exceed the PAGE_SIZE.
-+ */
-+struct event {
-+	struct list_head link;
-+	ktime_t time;
-+	int code;
-+	int data_size;
-+	char data[1]; /* up to PAGE_SIZE - sizeof(struct blk_snap_snapshot_event) */
-+};
-+
-+/**
-+ * struct event_queue - A queue of &struct event.
-+ * @list:
-+ *	Linked list for storing events.
-+ * @lock:
-+ *	Spinlock allows to guarantee safety of the linked list.
-+ * @wq_head:
-+ *	A wait queue allows to put a user thread in a waiting state until
-+ *	an event appears in the linked list.
-+ */
-+struct event_queue {
-+	struct list_head list;
-+	spinlock_t lock;
-+	struct wait_queue_head wq_head;
-+};
-+
-+void event_queue_init(struct event_queue *event_queue);
-+void event_queue_done(struct event_queue *event_queue);
-+
-+int event_gen(struct event_queue *event_queue, gfp_t flags, int code,
-+	      const void *data, int data_size);
-+struct event *event_wait(struct event_queue *event_queue,
-+			 unsigned long timeout_ms);
-+static inline void event_free(struct event *event)
-+{
-+	kfree(event);
-+};
-+#endif /* __BLK_SNAP_EVENT_QUEUE_H */
+If we end up having to split the enum defs, that's what we'll do but this
+doesn't sense to me. It's one thing to make one time adjustment when we
+adopt -std=g2x. That's fine, but it makes no sense for the compiler to
+change type behavior underneath existing code bases in a way that prevents
+the same code to mean the same thing in adjacent and recent compiler
+versions. Even if gcc goes for that for whatever reason, there gotta be an
+option to keep the original behavior, right?
+
+If so, my suggestion is just sticking with the old behavior until we switch
+to --std=g2x and then make one time adjustment at that point.
+
+Thanks.
+
 -- 
-2.20.1
-
+tejun
