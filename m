@@ -2,114 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4DDC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB76FC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 17:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232027AbiKBQrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 12:47:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49962 "EHLO
+        id S230123AbiKBRDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 13:03:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbiKBQrB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 12:47:01 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E88063881;
-        Wed,  2 Nov 2022 09:43:44 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so2384353pjd.4;
-        Wed, 02 Nov 2022 09:43:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IjILPpgQCkdJ4ZJ00jqJd+jDzKRU2FaGMqk858NL3dc=;
-        b=dmYqXsN8lNSxDB0uXZQ6rsGrA/k+VAfEyFqeOxCavCTGaiakcfSobJRaJXd2d44clP
-         vePC8myNAyorRGZlHkyKFDWfDtHP5piVxFEmd2RIXh2alwwo5zzXbMM0gVYAB240ufeC
-         BgwRQpvEbW5ci641cMKU9oeO0uy5YHwABAcwhS+tW9+uFasjdpHBw5kBn4hlu+yvhexy
-         zYdekQFPfwwqLUoR4mMgJ+pjdSLT6VTwv8IL2TQMfn6TVQtNqv5voIx3cG1/YBxQ60Xo
-         X1/4W/XW8zPw9QTSfFsoZeywYppP3uQCxwbKM76sSytyCSMZqvIX5bYdoFsGDSQ29g0O
-         OSDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IjILPpgQCkdJ4ZJ00jqJd+jDzKRU2FaGMqk858NL3dc=;
-        b=t1ITDUzOMVHsvvyGgYCQEGMAJ0L2ozLZlQviJdvdHBh4f/PAsOIhafxkBic1SdjE9l
-         fLEFaphEbZwRobikOgk/qRpUZo9m52ZWz2t3R+nZh3dRTnHXVCc/tLPo3uCBLvD6FFFn
-         juiDQIXTYuu9WPQ6c3KxL6i4Z6CErQQjZOhnU5AooWDdDrFFJ6IQM+/n4bA5UiEDxkw1
-         RPAhmdV6diBTlgWcK+2rLrx5CutVFupsMpgQ6k7CAbBemwyAGUpivQ/LytH4r+1ECbGb
-         pVpvIE81iNXNYwRkrg/FMsbj2rXyCwn51qGN8G6snSqHeQn3hEnaQrNlWx2bo/bRXVMK
-         tNng==
-X-Gm-Message-State: ACrzQf1xVQMtOmscxorfIKyOrjP2k3QwS7yt/fhiCe43uUABPY1PZzCV
-        QAj2TrxH0BsoIIVFZn+cnPM=
-X-Google-Smtp-Source: AMsMyM5+2h1g5QncFyVKf/9QXnl3us6XD14UDGR0pb/Wvj24kswOJM73+P7ddL0Enyhat7ZA1AAn4A==
-X-Received: by 2002:a17:902:da8a:b0:187:3d6:4c60 with SMTP id j10-20020a170902da8a00b0018703d64c60mr25714581plx.117.1667407424152;
-        Wed, 02 Nov 2022 09:43:44 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id p1-20020a170902e74100b001784a45511asm8591248plf.79.2022.11.02.09.43.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 09:43:43 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 2 Nov 2022 06:43:42 -1000
-From:   'Tejun Heo' <tj@kernel.org>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     Jiri Slaby <jirislaby@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Martin Liska <mliska@suse.cz>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "cgroups@vger.kernel.org" <cgroups@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block/blk-iocost (gcc13): cast enum members to int in
- prints
-Message-ID: <Y2KePvYRRMOrqzOe@slm.duckdns.org>
-References: <20221031114520.10518-1-jirislaby@kernel.org>
- <Y1++fLJXkeZgtXR2@infradead.org>
- <Y2AMcSPAJpj6obSA@slm.duckdns.org>
- <d833ad15-f458-d43d-cab7-de62ff54a939@kernel.org>
- <Y2FNa4bGhJoevRKT@slm.duckdns.org>
- <2b975ee3117e45aaa7882203cf9a4db8@AcuMS.aculab.com>
- <Y2Kaghnu/sPvl0+g@slm.duckdns.org>
+        with ESMTP id S229688AbiKBRDr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 13:03:47 -0400
+Received: from hermod.demsh.org (hermod.demsh.org [45.140.147.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D75C011806
+        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 10:03:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=demsh.org; s=022020;
+        t=1667408618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EV8wHc153Q1Z1Fn4uarOQ24/jG/hSAHDIP/cR4J/lPQ=;
+        b=asbw6jFh1S/ffs4d2qQPQIgKxWI8xdzTEc7v53RYrK+YMt4fPEeO4IbZoMcpztrvafoix9
+        XcsKYhALPoQfFdI3mDwQp22DwbyoXcEC2GfjXNWD3iexxHWta8SF3wyvMUijxeRASvQ6kj
+        MCXt75z/2HbYeY+NVvoQmOqM4qpQYHS1WNbByPUq4OSU6it41IZwO6tqcTsxRB/IK5/inX
+        0ZpX3g6sE0NV2mRparUazCseaS2hUud1HJK+6reVohi/Ck+/HgLXaBB7sn3zgFK/HSegHS
+        3hvX+gF3PIenjs5nYjasWyD5kmPUNuKdl9f0V5JCUtUc4dpICnwudDBMKmuSpQ==
+Received: from xps.demsh.org (algiz.demsh.org [94.103.82.47])
+        by hermod.demsh.org (OpenSMTPD) with ESMTPSA id 35dc3627 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=me;
+        Wed, 2 Nov 2022 17:03:38 +0000 (UTC)
+Date:   Wed, 2 Nov 2022 20:03:45 +0300
+From:   Dmitrii Tcvetkov <me@demsh.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: Regression: wrong DIO alignment check with dm-crypt
+Message-ID: <20221102200345.0800a8bf@xps.demsh.org>
+In-Reply-To: <Y2KXfNZzwPZBJRTW@kbusch-mbp.dhcp.thefacebook.com>
+References: <Y2Hf08vIKBkl5tu0@sol.localdomain>
+        <Y2KEH6OZ0MDf5cSh@kbusch-mbp.dhcp.thefacebook.com>
+        <Y2KXfNZzwPZBJRTW@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2Kaghnu/sPvl0+g@slm.duckdns.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 06:27:46AM -1000, 'Tejun Heo' wrote:
-> On Wed, Nov 02, 2022 at 08:35:34AM +0000, David Laight wrote:
-> > I think the enums have to be split.
-> > There will be other side effects of promoting the constants to 64bit
-> > that are much more difficult to detect than the warnings from printf.
+On Wed, 2 Nov 2022 10:14:52 -0600
+Keith Busch <kbusch@kernel.org> wrote:
+> This is what I'm coming up with. Only compile tested (still setting up
+> an enviroment to actually run it).
 > 
-> idk, I think I can just add LLU to everything and it should be fine.
-> 
-> > I'm also not sure whether the type is even consistent for 32bit
-> > and 64bit builds.
-> > Casts are (sort of) horrid.
-> 
-> Yeah, I don't think casts are the solution either. Lemme add LLU to
-> everything and see how it works.
+> ---
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 159c6806c19b..9334e58a4c9f 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -43,6 +43,7 @@
+>  #include <linux/device-mapper.h>
+>  
+>  #include "dm-audit.h"
+> +#include "dm-core.h"
+>  
+>  #define DM_MSG_PREFIX "crypt"
+>  
+> @@ -3615,7 +3616,9 @@ static int crypt_iterate_devices(struct
+> dm_target *ti, 
+>  static void crypt_io_hints(struct dm_target *ti, struct queue_limits
+> *limits) {
+> +	struct mapped_device *md = dm_table_get_md(ti->table);
+>  	struct crypt_config *cc = ti->private;
+> +	struct request_queue *q = md->queue;
+>  
+>  	/*
+>  	 * Unfortunate constraint that is required to avoid the
+> potential @@ -3630,6 +3633,8 @@ static void crypt_io_hints(struct
+> dm_target *ti, struct queue_limits *limits)
+> limits->physical_block_size = max_t(unsigned,
+> limits->physical_block_size, cc->sector_size); limits->io_min =
+> max_t(unsigned, limits->io_min, cc->sector_size); +
+> +	blk_queue_dma_alignment(q, limits->logical_block_size - 1);
+>  }
+>  
+>  static struct target_type crypt_target = {
+> --
 
-So adding LLU to initializers don't make the specific enum's type follow
-suit. I guess type determination is really based on the value range. Oh man,
-what a mess.
-
-If we end up having to split the enum defs, that's what we'll do but this
-doesn't sense to me. It's one thing to make one time adjustment when we
-adopt -std=g2x. That's fine, but it makes no sense for the compiler to
-change type behavior underneath existing code bases in a way that prevents
-the same code to mean the same thing in adjacent and recent compiler
-versions. Even if gcc goes for that for whatever reason, there gotta be an
-option to keep the original behavior, right?
-
-If so, my suggestion is just sticking with the old behavior until we switch
-to --std=g2x and then make one time adjustment at that point.
-
-Thanks.
-
--- 
-tejun
+Applied on top 6.1-rc3, the issue still reproduces.
