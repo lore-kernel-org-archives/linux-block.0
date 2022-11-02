@@ -2,57 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE34BC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 01:44:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F06C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 02:04:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229546AbiKBBog (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 21:44:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55502 "EHLO
+        id S230027AbiKBCEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 22:04:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbiKBBof (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 21:44:35 -0400
-Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A37B5DED7;
-        Tue,  1 Nov 2022 18:44:33 -0700 (PDT)
-Received: by ajax-webmail-mail-app2 (Coremail) ; Wed, 2 Nov 2022 09:44:30
- +0800 (GMT+08:00)
-X-Originating-IP: [10.14.30.50]
-Date:   Wed, 2 Nov 2022 09:44:30 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   "Jinlong Chen" <nickyc975@zju.edu.cn>
-To:     "Christoph Hellwig" <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: Re: [PATCH 1/4] blk-mq: update comment for
- blk_mq_quiesce_queue_nowait()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
-In-Reply-To: <20221101172720.GA20526@lst.de>
-References: <cover.1667314759.git.nickyc975@zju.edu.cn>
- <489a9322eed1f95f8770752cc715084f1fa961d3.1667314759.git.nickyc975@zju.edu.cn>
- <20221101172720.GA20526@lst.de>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S229516AbiKBCED (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 22:04:03 -0400
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1950A11477;
+        Tue,  1 Nov 2022 19:04:00 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4N299J70l0zKG3f;
+        Wed,  2 Nov 2022 10:01:24 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.175.127.227])
+        by APP2 (Coremail) with SMTP id Syh0CgCnP9QN0GFjGqzfBA--.48110S4;
+        Wed, 02 Nov 2022 10:03:59 +0800 (CST)
+From:   Yu Kuai <yukuai1@huaweicloud.com>
+To:     jack@suse.cz, axboe@kernel.dk, paolo.valente@linaro.org
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com,
+        yukuai1@huaweicloud.com, yi.zhang@huawei.com
+Subject: [PATCH -next v4 0/5] multiple cleanup patches for bfqd
+Date:   Wed,  2 Nov 2022 10:25:37 +0800
+Message-Id: <20221102022542.3621219-1-yukuai1@huaweicloud.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Message-ID: <1f33a768.1635a2.1843602e799.Coremail.nickyc975@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: by_KCgAXz1p+y2FjIKdcBw--.53643W
-X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgIAB1ZdtcLuXwATsZ
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWUCw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: Syh0CgCnP9QN0GFjGqzfBA--.48110S4
+X-Coremail-Antispam: 1UD129KBjvdXoWrKry3Gw15CFW7CF48uw45ZFb_yoW3KFg_Xa
+        s7AFWfCFnrC3W5Ca48AF15Aay0k3yrXw1DKF98trZxJr17tF4jy347tr4xXan0qan7Ga4Y
+        yr1Yvr4fJr1jqjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbz8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j
+        6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+        Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+        rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+        vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
+        x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+        xKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+        67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: 51xn3trlr6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiBPbiBUdWUsIE5vdiAwMSwgMjAyMiBhdCAxMToxMTozNFBNICswODAwLCBKaW5sb25nIENoZW4g
-d3JvdGU6Cj4gPiBibGtfbXFfcXVpZXNjZV9xdWV1ZV9ub3dhaXQoKSBpcyBub3cgcmVhc29uYWJs
-eSB1c2VkIGJ5IHNjc2lfaG9zdF9ibG9jaygpCj4gPiB0byBhdm9pZCBjYWxsaW5nIHN5bmNocm9u
-aXplX3JjdSgpIGZvciBlYWNoIExVTi4gV2Ugc2hvdWxkIG5vdCBjb25zaWRlciB0bwo+ID4gcmVt
-b3ZlIGl0Lgo+IAo+IEkgc3Ryb25nbHkgZGlzYWdyZWUgYWJvdXQgdGhpcyBiZWluZyBhIHJlYXNv
-bmFibGUgdXNlLiAgV2hhdCBTQ1NJIGRpZAo+IHRoZXJlIGlzIGEgaG9ycmlibGUgaGFjayB0aGF0
-IHNob3VsZCBoYXZlIG5ldmVyIGJlZW4gbWVyZ2VkLiAgVGhlCj4gcmlnaHQgdGhpbmcgdG8gZG8g
-aXMgdGhlIHBlci10YWdfc2V0IHF1aWVzY2UgdGhhdCB3ZSd2ZSBiZWVuIHdvcmtpbmcKPiBvbi4K
-Ck9rLCBJIGd1ZXNzIEkgbmVlZCB0byByZWFkIHRoZSBwZXItdGFnX3NldCBxdWllc2NlIHBhdGNo
-IHNlcmllcy4KClRoYW5rcyEKSmlubG9uZyBDaGVuCg==
+From: Yu Kuai <yukuai3@huawei.com>
+
+Changes in v4:
+ - move first two patches from v3 into another thread.
+ - add patch 1
+
+Changes in v3:
+ - resend v2 with new mail address
+
+Changes in v2:
+ - add missing blank line in patch 1.
+ - remove patch 7,8, since they are wrong.
+ - add reviewed-by tag
+
+Yu Kuai (5):
+  block, bfq: remove set but not used variable in
+    __bfq_entity_update_weight_prio
+  block, bfq: factor out code to update 'active_entities'
+  block, bfq: cleanup bfq_activate_requeue_entity()
+  block, bfq: remove dead code for updating 'rq_in_driver'
+  block, bfq: don't declare 'bfqd' as type 'void *' in bfq_group
+
+ block/bfq-cgroup.c  |  2 +-
+ block/bfq-iosched.c | 16 ---------
+ block/bfq-iosched.h |  2 +-
+ block/bfq-wf2q.c    | 88 ++++++++++++++++++---------------------------
+ 4 files changed, 37 insertions(+), 71 deletions(-)
+
+-- 
+2.31.1
+
