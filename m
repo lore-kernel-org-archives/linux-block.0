@@ -2,51 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DB2C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 06:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF52FC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 06:48:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229537AbiKBG3N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 02:29:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43044 "EHLO
+        id S229534AbiKBGs6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 02:48:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiKBG3N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 02:29:13 -0400
+        with ESMTP id S229598AbiKBGs5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 02:48:57 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 077B326112;
-        Tue,  1 Nov 2022 23:29:11 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFFC425F6
+        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 23:48:56 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id C1A206732D; Wed,  2 Nov 2022 07:29:07 +0100 (CET)
-Date:   Wed, 2 Nov 2022 07:29:07 +0100
+        id 426096732D; Wed,  2 Nov 2022 07:48:54 +0100 (CET)
+Date:   Wed, 2 Nov 2022 07:48:54 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     David Sterba <dsterba@suse.cz>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Chris Mason <clm@meta.com>, Christoph Hellwig <hch@lst.de>,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Subject: Re: consolidate btrfs checksumming, repair and bio splitting
-Message-ID: <20221102062907.GA8619@lst.de>
-References: <20220901074216.1849941-1-hch@lst.de> <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com> <20221024144411.GA25172@lst.de> <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com> <20221024171042.GF5824@suse.cz> <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com> <20221026074145.2be5ca09@gandalf.local.home> <20221031121912.GY5824@twin.jikos.cz> <20221102000022.36df0cc1@rorschach.local.home>
+To:     Jens Axboe <axboe@kernel.dk>, Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>
+Cc:     Yu Kuai <yukuai1@huaweicloud.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH 8/7] block: don't claim devices that are not live in
+ bd_link_disk_holder
+Message-ID: <20221102064854.GA8950@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221102000022.36df0cc1@rorschach.local.home>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 02, 2022 at 12:00:22AM -0400, Steven Rostedt wrote:
-> It really comes down to how badly do you want Christoph's code?
+For gendisk that are not live or their partitions, the bd_holder_dir
+pointer is not valid and the kobject might not have been allocated
+yet or freed already.  Check that the disk is live before creating the
+linkage and error out otherwise.
 
-Well, Dave has made it clear implicily that he doesn't seem to care about
-it at all through all this.  The painful part is that I need to come up
-with a series to revert all the code that he refused to add the notice
-for, which is quite involved and includes various bug fixes.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/holder.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/block/holder.c b/block/holder.c
+index a8c355b9d0806..a8806bbed2112 100644
+--- a/block/holder.c
++++ b/block/holder.c
+@@ -66,6 +66,11 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&disk->open_mutex);
++	/* bd_holder_dir is only valid for live disks */
++	if (!disk_live(bdev->bd_disk)) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
+ 
+ 	WARN_ON_ONCE(!bdev->bd_holder);
+ 
+-- 
+2.30.2
+
