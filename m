@@ -2,44 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C586C4321E
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EA1C43217
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 16:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231970AbiKBQbP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S231972AbiKBQbP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 2 Nov 2022 12:31:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49902 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231603AbiKBQab (ORCPT
+        with ESMTP id S231605AbiKBQab (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 12:30:31 -0400
 Received: from mx1.veeam.com (mx1.veeam.com [216.253.77.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C4E2E686;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271E52D75E;
         Wed,  2 Nov 2022 09:27:09 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx1.veeam.com (Postfix) with ESMTPS id C54D441D30;
-        Wed,  2 Nov 2022 11:51:57 -0400 (EDT)
+        by mx1.veeam.com (Postfix) with ESMTPS id 55AB241D0F;
+        Wed,  2 Nov 2022 11:52:10 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx1-2022; t=1667404318;
-        bh=ZMGOS+m+wJpVELl9iyCb9qgX1vLhkJqVy9IL5mNCnTA=;
+        s=mx1-2022; t=1667404330;
+        bh=oyzO0uOIZjrNYi5U/FXmGYXEyMQhWkYfegyObjlxsfM=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=M540Kl+/jpHVwftZ6MJ/+Wo5HYut3iysEAgE/ZOi8nlmAsVm5e+Ca3hVfGZM/VX98
-         5IIEF3ndlHeVQ9j9LG2ViR95HuDk1T+pvKanjG92Y38YcwkN57RSCM3+1mwyX4dgs+
-         IRNN6HESA/O/l3t8nyoHmsIFX/OLI/BRL8tb0FeiXAGSXVD0JRLvzl6z2QC/YLWKs6
-         6svYw3OQR90/YXcndMiBIB7Y9ZS1rCff8IREhR5TMdrkmz8KD0l5y4OZo6IfJ3ad+m
-         paVFRTTbG4NxqL8Iy0xnR0lS2oFQtjrrh/5lJm4u9pq3AXWXVV3dQWMu1WXvjEnohp
-         ub9ZYSMmc6eNA==
+        b=CJKNNrA8oeZ9H7JG3uOyAp15uxhXNYGwNUTqsu9/zpidEwXvXOHmKDO5KYBTRUZ1A
+         mllGF3AIQEO6Spj2ZBRqrEMKRjmoR7/7Ri365NAH14y5YN6UcOGt0JOlQ2bMTg4sLa
+         xymJ2ZpFhkI2GGwg+clDeZ/+8nsxuYqcuNwl5POk3Nj9UlFqooJ9f8G5n1H8fSpgZZ
+         RvSTtvWa4i8FZinQmjS4Ihhg9tKoEnM8rbRMCeBWQvnAXkseeY6bvLyZ0Y82TKIbDk
+         RA2aXqMkEdCvHLimnuxFeDGjHoTgOAAW2RBp97OepRHnfbOlu7+Ayf+y7mTUZP8mJ3
+         J5YnTpWFYMx1A==
 Received: from ssh-deb10-ssd-vb.amust.local (172.24.10.107) by
  prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.12; Wed, 2 Nov 2022 16:51:20 +0100
+ 15.2.1118.12; Wed, 2 Nov 2022 16:51:32 +0100
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <hch@infradead.org>,
         <sergei.shtepa@veeam.com>
-Subject: [PATCH v1 04/17] block, blksnap: init() and exit() functions
-Date:   Wed, 2 Nov 2022 16:50:48 +0100
-Message-ID: <20221102155101.4550-5-sergei.shtepa@veeam.com>
+Subject: [PATCH v1 11/17] block, blksnap: storage for storing difference blocks
+Date:   Wed, 2 Nov 2022 16:50:55 +0100
+Message-ID: <20221102155101.4550-12-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221102155101.4550-1-sergei.shtepa@veeam.com>
 References: <20221102155101.4550-1-sergei.shtepa@veeam.com>
@@ -56,224 +56,415 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Contains callback functions for loading and unloading the module. The
-module parameters and other mandatory declarations for the kernel module
-are also defined.
+Provides management of regions of block devices available for storing
+difference blocks of a snapshot. Contains lists of free and already
+occupied regions.
 
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- drivers/block/blksnap/main.c    | 164 ++++++++++++++++++++++++++++++++
- drivers/block/blksnap/params.h  |  12 +++
- drivers/block/blksnap/version.h |  10 ++
- 3 files changed, 186 insertions(+)
- create mode 100644 drivers/block/blksnap/main.c
- create mode 100644 drivers/block/blksnap/params.h
- create mode 100644 drivers/block/blksnap/version.h
+ drivers/block/blksnap/diff_storage.c | 292 +++++++++++++++++++++++++++
+ drivers/block/blksnap/diff_storage.h |  93 +++++++++
+ 2 files changed, 385 insertions(+)
+ create mode 100644 drivers/block/blksnap/diff_storage.c
+ create mode 100644 drivers/block/blksnap/diff_storage.h
 
-diff --git a/drivers/block/blksnap/main.c b/drivers/block/blksnap/main.c
+diff --git a/drivers/block/blksnap/diff_storage.c b/drivers/block/blksnap/diff_storage.c
 new file mode 100644
-index 000000000000..c64abfe31981
+index 000000000000..d30b7089afdc
 --- /dev/null
-+++ b/drivers/block/blksnap/main.c
-@@ -0,0 +1,164 @@
++++ b/drivers/block/blksnap/diff_storage.c
+@@ -0,0 +1,292 @@
 +// SPDX-License-Identifier: GPL-2.0
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
++#define pr_fmt(fmt) KBUILD_MODNAME "-diff-storage: " fmt
++#include <linux/slab.h>
++#include <linux/sched/mm.h>
++#include <linux/list.h>
++#include <linux/spinlock.h>
 +#include <uapi/linux/blksnap.h>
-+#include "version.h"
 +#include "params.h"
-+#include "ctrl.h"
-+#include "sysfs.h"
-+#include "snapimage.h"
-+#include "snapshot.h"
-+#include "tracker.h"
++#include "chunk.h"
 +#include "diff_io.h"
++#include "diff_buffer.h"
++#include "diff_storage.h"
 +
-+static int __init blk_snap_init(void)
++/**
++ * struct storage_bdev - Information about the opened block device.
++ */
++struct storage_bdev {
++	struct list_head link;
++	dev_t dev_id;
++	struct block_device *bdev;
++};
++
++/**
++ * struct storage_block - A storage unit reserved for storing differences.
++ *
++ */
++struct storage_block {
++	struct list_head link;
++	struct block_device *bdev;
++	sector_t sector;
++	sector_t count;
++	sector_t used;
++};
++
++static inline void diff_storage_event_low(struct diff_storage *diff_storage)
 +{
-+	int result;
++	struct blk_snap_event_low_free_space data = {
++		.requested_nr_sect = diff_storage_minimum,
++	};
 +
-+	pr_info("Loading\n");
-+	pr_debug("Version: %s\n", VERSION_STR);
-+	pr_debug("tracking_block_minimum_shift: %d\n",
-+		 tracking_block_minimum_shift);
-+	pr_debug("tracking_block_maximum_count: %d\n",
-+		 tracking_block_maximum_count);
-+	pr_debug("chunk_minimum_shift: %d\n", chunk_minimum_shift);
-+	pr_debug("chunk_maximum_count: %d\n", chunk_maximum_count);
-+	pr_debug("chunk_maximum_in_cache: %d\n", chunk_maximum_in_cache);
-+	pr_debug("free_diff_buffer_pool_size: %d\n",
-+		 free_diff_buffer_pool_size);
-+	pr_debug("diff_storage_minimum: %d\n", diff_storage_minimum);
-+
-+	result = diff_io_init();
-+	if (result)
-+		return result;
-+
-+	result = snapimage_init();
-+	if (result)
-+		return result;
-+
-+	result = tracker_init();
-+	if (result)
-+		return result;
-+
-+	result = ctrl_init();
-+	if (result)
-+		return result;
-+
-+	result = sysfs_init();
-+	return result;
++	diff_storage->requested += data.requested_nr_sect;
++	pr_debug(
++		"Diff storage low free space. Portion: %llu sectors, requested: %llu\n",
++		data.requested_nr_sect, diff_storage->requested);
++	event_gen(&diff_storage->event_queue, GFP_NOIO,
++		  blk_snap_event_code_low_free_space, &data, sizeof(data));
 +}
 +
-+static void __exit blk_snap_exit(void)
++struct diff_storage *diff_storage_new(void)
 +{
-+	pr_info("Unloading module\n");
++	struct diff_storage *diff_storage;
 +
-+	sysfs_done();
-+	ctrl_done();
++	diff_storage = kzalloc(sizeof(struct diff_storage), GFP_KERNEL);
++	if (!diff_storage)
++		return NULL;
 +
-+	diff_io_done();
-+	snapshot_done();
-+	snapimage_done();
-+	tracker_done();
++	kref_init(&diff_storage->kref);
++	spin_lock_init(&diff_storage->lock);
++	INIT_LIST_HEAD(&diff_storage->storage_bdevs);
++	INIT_LIST_HEAD(&diff_storage->empty_blocks);
++	INIT_LIST_HEAD(&diff_storage->filled_blocks);
 +
-+	pr_info("Module was unloaded\n");
++	event_queue_init(&diff_storage->event_queue);
++	diff_storage_event_low(diff_storage);
++
++	return diff_storage;
 +}
 +
-+module_init(blk_snap_init);
-+module_exit(blk_snap_exit);
++static inline struct storage_block *
++first_empty_storage_block(struct diff_storage *diff_storage)
++{
++	return list_first_entry_or_null(&diff_storage->empty_blocks,
++					struct storage_block, link);
++};
 +
-+/*
-+ * The power of 2 for minimum tracking block size.
-+ * If we make the tracking block size small, we will get detailed information
-+ * about the changes, but the size of the change tracker table will be too
-+ * large, which will lead to inefficient memory usage.
-+ */
-+int tracking_block_minimum_shift = 16;
++static inline struct storage_block *
++first_filled_storage_block(struct diff_storage *diff_storage)
++{
++	return list_first_entry_or_null(&diff_storage->filled_blocks,
++					struct storage_block, link);
++};
 +
-+/*
-+ * The maximum number of tracking blocks.
-+ * A table is created to store information about the status of all tracking
-+ * blocks in RAM. So, if the size of the tracking block is small, then the size
-+ * of the table turns out to be large and memory is consumed inefficiently.
-+ * As the size of the block device grows, the size of the tracking block
-+ * size should also grow. For this purpose, the limit of the maximum
-+ * number of block size is set.
-+ */
-+int tracking_block_maximum_count = 2097152;
++static inline struct storage_bdev *
++first_storage_bdev(struct diff_storage *diff_storage)
++{
++	return list_first_entry_or_null(&diff_storage->storage_bdevs,
++					struct storage_bdev, link);
++};
 +
-+/*
-+ * The power of 2 for minimum chunk size.
-+ * The size of the chunk depends on how much data will be copied to the
-+ * difference storage when at least one sector of the block device is changed.
-+ * If the size is small, then small I/O units will be generated, which will
-+ * reduce performance. Too large a chunk size will lead to inefficient use of
-+ * the difference storage.
-+ */
-+int chunk_minimum_shift = 18;
++void diff_storage_free(struct kref *kref)
++{
++	struct diff_storage *diff_storage =
++		container_of(kref, struct diff_storage, kref);
++	struct storage_block *blk;
++	struct storage_bdev *storage_bdev;
 +
-+/*
-+ * The maximum number of chunks.
-+ * To store information about the state of all the chunks, a table is created
-+ * in RAM. So, if the size of the chunk is small, then the size of the table
-+ * turns out to be large and memory is consumed inefficiently.
-+ * As the size of the block device grows, the size of the chunk should also
-+ * grow. For this purpose, the maximum number of chunks is set.
-+ */
-+int chunk_maximum_count = 2097152;
++	while ((blk = first_empty_storage_block(diff_storage))) {
++		list_del(&blk->link);
++		kfree(blk);
++	}
 +
-+/*
-+ * The maximum number of chunks in memory cache.
-+ * Since reading and writing to snapshots is performed in large chunks,
-+ * a cache is implemented to optimize reading small portions of data
-+ * from the snapshot image. As the number of chunks in the cache
-+ * increases, memory consumption also increases.
-+ * The minimum recommended value is four.
-+ */
-+int chunk_maximum_in_cache = 32;
++	while ((blk = first_filled_storage_block(diff_storage))) {
++		list_del(&blk->link);
++		kfree(blk);
++	}
 +
-+/*
-+ * The size of the pool of preallocated difference buffers.
-+ * A buffer can be allocated for each chunk. After use, this buffer is not
-+ * released immediately, but is sent to the pool of free buffers.
-+ * However, if there are too many free buffers in the pool, then these free
-+ * buffers will be released immediately.
-+ */
-+int free_diff_buffer_pool_size = 128;
++	while ((storage_bdev = first_storage_bdev(diff_storage))) {
++		blkdev_put(storage_bdev->bdev, FMODE_READ | FMODE_WRITE);
++		list_del(&storage_bdev->link);
++		kfree(storage_bdev);
++	}
++	event_queue_done(&diff_storage->event_queue);
 +
-+/*
-+ * The minimum allowable size of the difference storage in sectors.
-+ * The difference storage is a part of the disk space allocated for storing
-+ * snapshot data. If there is less free space in the storage than the minimum,
-+ * an event is generated about the lack of free space.
-+ */
-+int diff_storage_minimum = 2097152;
++	kfree(diff_storage);
++}
 +
-+module_param_named(tracking_block_minimum_shift, tracking_block_minimum_shift,
-+		   int, 0644);
-+MODULE_PARM_DESC(tracking_block_minimum_shift,
-+		 "The power of 2 for minimum tracking block size");
-+module_param_named(tracking_block_maximum_count, tracking_block_maximum_count,
-+		   int, 0644);
-+MODULE_PARM_DESC(tracking_block_maximum_count,
-+		 "The maximum number of tracking blocks");
-+module_param_named(chunk_minimum_shift, chunk_minimum_shift, int, 0644);
-+MODULE_PARM_DESC(chunk_minimum_shift,
-+		 "The power of 2 for minimum chunk size");
-+module_param_named(chunk_maximum_count, chunk_maximum_count, int, 0644);
-+MODULE_PARM_DESC(chunk_maximum_count,
-+		 "The maximum number of chunks");
-+module_param_named(chunk_maximum_in_cache, chunk_maximum_in_cache, int, 0644);
-+MODULE_PARM_DESC(chunk_maximum_in_cache,
-+		 "The maximum number of chunks in memory cache");
-+module_param_named(free_diff_buffer_pool_size, free_diff_buffer_pool_size, int,
-+		   0644);
-+MODULE_PARM_DESC(free_diff_buffer_pool_size,
-+		 "The size of the pool of preallocated difference buffers");
-+module_param_named(diff_storage_minimum, diff_storage_minimum, int, 0644);
-+MODULE_PARM_DESC(diff_storage_minimum,
-+	"The minimum allowable size of the difference storage in sectors");
++static struct block_device *
++diff_storage_bdev_by_id(struct diff_storage *diff_storage, dev_t dev_id)
++{
++	struct block_device *bdev = NULL;
++	struct storage_bdev *storage_bdev;
 +
-+MODULE_DESCRIPTION("Block Layer Snapshot Kernel Module");
-+MODULE_VERSION(VERSION_STR);
-+MODULE_AUTHOR("Veeam Software Group GmbH");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/block/blksnap/params.h b/drivers/block/blksnap/params.h
++	spin_lock(&diff_storage->lock);
++	list_for_each_entry(storage_bdev, &diff_storage->storage_bdevs, link) {
++		if (storage_bdev->dev_id == dev_id) {
++			bdev = storage_bdev->bdev;
++			break;
++		}
++	}
++	spin_unlock(&diff_storage->lock);
++
++	return bdev;
++}
++
++static inline struct block_device *
++diff_storage_add_storage_bdev(struct diff_storage *diff_storage, dev_t dev_id)
++{
++	struct block_device *bdev;
++	struct storage_bdev *storage_bdev;
++
++	bdev = blkdev_get_by_dev(dev_id, FMODE_READ | FMODE_WRITE, NULL);
++	if (IS_ERR(bdev)) {
++		pr_err("Failed to open device. errno=%d\n",
++		       abs((int)PTR_ERR(bdev)));
++		return bdev;
++	}
++
++	storage_bdev = kzalloc(sizeof(struct storage_bdev), GFP_KERNEL);
++	if (!storage_bdev) {
++		blkdev_put(bdev, FMODE_READ | FMODE_WRITE);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	storage_bdev->bdev = bdev;
++	storage_bdev->dev_id = dev_id;
++	INIT_LIST_HEAD(&storage_bdev->link);
++
++	spin_lock(&diff_storage->lock);
++	list_add_tail(&storage_bdev->link, &diff_storage->storage_bdevs);
++	spin_unlock(&diff_storage->lock);
++
++	return bdev;
++}
++
++static inline int diff_storage_add_range(struct diff_storage *diff_storage,
++					 struct block_device *bdev,
++					 sector_t sector, sector_t count)
++{
++	struct storage_block *storage_block;
++
++	pr_debug("Add range to diff storage: [%u:%u] %llu:%llu\n",
++		 MAJOR(bdev->bd_dev), MINOR(bdev->bd_dev), sector, count);
++
++	storage_block = kzalloc(sizeof(struct storage_block), GFP_KERNEL);
++	if (!storage_block)
++		return -ENOMEM;
++
++	INIT_LIST_HEAD(&storage_block->link);
++	storage_block->bdev = bdev;
++	storage_block->sector = sector;
++	storage_block->count = count;
++
++	spin_lock(&diff_storage->lock);
++	list_add_tail(&storage_block->link, &diff_storage->empty_blocks);
++	diff_storage->capacity += count;
++	spin_unlock(&diff_storage->lock);
++
++	return 0;
++}
++
++int diff_storage_append_block(struct diff_storage *diff_storage, dev_t dev_id,
++			      struct blk_snap_block_range __user *ranges,
++			      unsigned int range_count)
++{
++	int ret;
++	int inx;
++	struct block_device *bdev;
++	struct blk_snap_block_range range;
++	const unsigned long range_size = sizeof(struct blk_snap_block_range);
++
++	pr_debug("Append %u blocks\n", range_count);
++
++	bdev = diff_storage_bdev_by_id(diff_storage, dev_id);
++	if (!bdev) {
++		bdev = diff_storage_add_storage_bdev(diff_storage, dev_id);
++		if (IS_ERR(bdev))
++			return PTR_ERR(bdev);
++	}
++
++	for (inx = 0; inx < range_count; inx++) {
++		if (unlikely(copy_from_user(&range, ranges+inx, range_size)))
++			return -EINVAL;
++
++		ret = diff_storage_add_range(diff_storage, bdev,
++					     range.sector_offset,
++					     range.sector_count);
++		if (unlikely(ret))
++			return ret;
++	}
++
++	if (atomic_read(&diff_storage->low_space_flag) &&
++	    (diff_storage->capacity >= diff_storage->requested))
++		atomic_set(&diff_storage->low_space_flag, 0);
++
++	return 0;
++}
++
++struct diff_region *diff_storage_new_region(struct diff_storage *diff_storage,
++					   sector_t count)
++{
++	int ret = 0;
++	struct diff_region *diff_region;
++	sector_t sectors_left;
++
++	if (atomic_read(&diff_storage->overflow_flag))
++		return ERR_PTR(-ENOSPC);
++
++	diff_region = kzalloc(sizeof(struct diff_region), GFP_NOIO);
++	if (!diff_region)
++		return ERR_PTR(-ENOMEM);
++
++	spin_lock(&diff_storage->lock);
++	do {
++		struct storage_block *storage_block;
++		sector_t available;
++
++		storage_block = first_empty_storage_block(diff_storage);
++		if (unlikely(!storage_block)) {
++			atomic_inc(&diff_storage->overflow_flag);
++			ret = -ENOSPC;
++			break;
++		}
++
++		available = storage_block->count - storage_block->used;
++		if (likely(available >= count)) {
++			diff_region->bdev = storage_block->bdev;
++			diff_region->sector =
++				storage_block->sector + storage_block->used;
++			diff_region->count = count;
++
++			storage_block->used += count;
++			diff_storage->filled += count;
++			break;
++		}
++
++		list_del(&storage_block->link);
++		list_add_tail(&storage_block->link,
++			      &diff_storage->filled_blocks);
++		/*
++		 * If there is still free space in the storage block, but
++		 * it is not enough to store a piece, then such a block is
++		 * considered used.
++		 * We believe that the storage blocks are large enough
++		 * to accommodate several pieces entirely.
++		 */
++		diff_storage->filled += available;
++	} while (1);
++	sectors_left = diff_storage->requested - diff_storage->filled;
++	spin_unlock(&diff_storage->lock);
++
++	if (ret) {
++		pr_err("Cannot get empty storage block\n");
++		diff_storage_free_region(diff_region);
++		return ERR_PTR(ret);
++	}
++
++	if ((sectors_left <= diff_storage_minimum) &&
++	    (atomic_inc_return(&diff_storage->low_space_flag) == 1))
++		diff_storage_event_low(diff_storage);
++
++	return diff_region;
++}
+diff --git a/drivers/block/blksnap/diff_storage.h b/drivers/block/blksnap/diff_storage.h
 new file mode 100644
-index 000000000000..9181797545c4
+index 000000000000..efd0525afd01
 --- /dev/null
-+++ b/drivers/block/blksnap/params.h
-@@ -0,0 +1,12 @@
++++ b/drivers/block/blksnap/diff_storage.h
+@@ -0,0 +1,93 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __BLK_SNAP_PARAMS_H
-+#define __BLK_SNAP_PARAMS_H
++#ifndef __BLK_SNAP_DIFF_STORAGE_H
++#define __BLK_SNAP_DIFF_STORAGE_H
 +
-+extern int tracking_block_minimum_shift;
-+extern int tracking_block_maximum_count;
-+extern int chunk_minimum_shift;
-+extern int chunk_maximum_count;
-+extern int chunk_maximum_in_cache;
-+extern int free_diff_buffer_pool_size;
-+extern int diff_storage_minimum;
-+#endif /* __BLK_SNAP_PARAMS_H */
-diff --git a/drivers/block/blksnap/version.h b/drivers/block/blksnap/version.h
-new file mode 100644
-index 000000000000..fc9d97c9f814
---- /dev/null
-+++ b/drivers/block/blksnap/version.h
-@@ -0,0 +1,10 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __BLK_SNAP_VERSION_H
-+#define __BLK_SNAP_VERSION_H
++#include "event_queue.h"
 +
-+#define VERSION_MAJOR 1
-+#define VERSION_MINOR 0
-+#define VERSION_REVISION 0
-+#define VERSION_BUILD 0
-+#define VERSION_STR "1.0.0.0"
-+#endif /* __BLK_SNAP_VERSION_H */
++struct blk_snap_block_range;
++struct diff_region;
++
++/**
++ * struct diff_storage - Difference storage.
++ *
++ * @kref:
++ *	The reference counter.
++ * @lock:
++ *	Spinlock allows to guarantee the safety of linked lists.
++ * @storage_bdevs:
++ *	List of opened block devices. Blocks for storing snapshot data can be
++ *	located on different block devices. So, all opened block devices are
++ *	located in this list. Blocks on opened block devices are allocated for
++ *	storing the chunks data.
++ * @empty_blocks:
++ *	List of empty blocks on storage. This list can be updated while
++ *	holding a snapshot. This allows us to dynamically increase the
++ *	storage size for these snapshots.
++ * @filled_blocks:
++ *	List of filled blocks. When the blocks from the list of empty blocks are filled,
++ *	we move them to the list of filled blocks.
++ * @capacity:
++ *	Total amount of available storage space.
++ * @filled:
++ *	The number of sectors already filled in.
++ * @requested:
++ *	The number of sectors already requested from user space.
++ * @low_space_flag:
++ *	The flag is set if the number of free regions available in the
++ *	difference storage is less than the allowed minimum.
++ * @overflow_flag:
++ *	The request for a free region failed due to the absence of free
++ *	regions in the difference storage.
++ * @event_queue:
++ *	A queue of events to pass events to user space. Diff storage and its
++ *	owner can notify its snapshot about events like snapshot overflow,
++ *	low free space and snapshot terminated.
++ *
++ * The difference storage manages the regions of block devices that are used
++ * to store the data of the original block devices in the snapshot.
++ * The difference storage is created one per snapshot and is used to store
++ * data from all the original snapshot block devices. At the same time, the
++ * difference storage itself can contain regions on various block devices.
++ */
++struct diff_storage {
++	struct kref kref;
++	spinlock_t lock;
++
++	struct list_head storage_bdevs;
++	struct list_head empty_blocks;
++	struct list_head filled_blocks;
++
++	sector_t capacity;
++	sector_t filled;
++	sector_t requested;
++
++	atomic_t low_space_flag;
++	atomic_t overflow_flag;
++
++	struct event_queue event_queue;
++};
++
++struct diff_storage *diff_storage_new(void);
++void diff_storage_free(struct kref *kref);
++
++static inline void diff_storage_get(struct diff_storage *diff_storage)
++{
++	kref_get(&diff_storage->kref);
++};
++static inline void diff_storage_put(struct diff_storage *diff_storage)
++{
++	if (likely(diff_storage))
++		kref_put(&diff_storage->kref, diff_storage_free);
++};
++
++int diff_storage_append_block(struct diff_storage *diff_storage, dev_t dev_id,
++			      struct blk_snap_block_range __user *ranges,
++			      unsigned int range_count);
++struct diff_region *diff_storage_new_region(struct diff_storage *diff_storage,
++					    sector_t count);
++
++static inline void diff_storage_free_region(struct diff_region *region)
++{
++	kfree(region);
++}
++#endif /* __BLK_SNAP_DIFF_STORAGE_H */
 -- 
 2.20.1
 
