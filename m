@@ -2,81 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F3FC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 03:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13472C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 04:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbiKBDLT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 23:11:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60180 "EHLO
+        id S229459AbiKBEAb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 00:00:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230281AbiKBDLS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 23:11:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EAE23BE1
-        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 20:11:17 -0700 (PDT)
+        with ESMTP id S229436AbiKBEAa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 00:00:30 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527ED27171;
+        Tue,  1 Nov 2022 21:00:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 724F961799
-        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 03:11:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6E88C433C1;
-        Wed,  2 Nov 2022 03:11:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667358676;
-        bh=HoBCmdH2JyJ9OFeROhfm/rc1VGnWZyeDz+ImLloggQQ=;
-        h=Date:From:To:Cc:Subject:From;
-        b=Q1n8uOCOSn8oanOriuGLGrlAPM2Ya8VlQLK4LMu+PFybx44K11Y8xq0OgEJ+R3SN/
-         wQt+vQGgKLhZjm6dx0XWRGsMhYRgsWDFtHFocghCzu3xwjnWNCh6UZH/jtcR7/PXCz
-         7d6ZBWDNfmTKnnXtDOBzEHZP4CUf3ztInUE+qRDqwMPE+vCApAi+m4+p2UzhHb3mI2
-         8YIRPzHfDnl6OQOgHxzthO0XojfDglcrJa9vlnvrx7/nEhj27/V5yhr1HbL8jp9wkj
-         isA/xeaRbIUkaRqaXKs9n7leoKz/Ab50SYmIE1gTFx/bT/w8cwxd0Vjp5VKlBN6Bxh
-         61wkAnUHBhicQ==
-Date:   Tue, 1 Nov 2022 20:11:15 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Keith Busch <kbusch@kernel.org>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Regression: wrong DIO alignment check with dm-crypt
-Message-ID: <Y2Hf08vIKBkl5tu0@sol.localdomain>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 09237B80DA8;
+        Wed,  2 Nov 2022 04:00:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2919BC433D6;
+        Wed,  2 Nov 2022 04:00:26 +0000 (UTC)
+Date:   Wed, 2 Nov 2022 00:00:22 -0400
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     David Sterba <dsterba@suse.cz>
+Cc:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Chris Mason <clm@meta.com>, Christoph Hellwig <hch@lst.de>,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>, Qu Wenruo <wqu@suse.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: consolidate btrfs checksumming, repair and bio splitting
+Message-ID: <20221102000022.36df0cc1@rorschach.local.home>
+In-Reply-To: <20221031121912.GY5824@twin.jikos.cz>
+References: <20220901074216.1849941-1-hch@lst.de>
+        <347dc0b3-0388-54ee-6dcb-0c1d0ca08d05@wdc.com>
+        <20221024144411.GA25172@lst.de>
+        <773539e2-b5f1-8386-aa2a-96086f198bf8@meta.com>
+        <20221024171042.GF5824@suse.cz>
+        <9f443843-4145-155b-2fd0-50613a9f7913@wdc.com>
+        <20221026074145.2be5ca09@gandalf.local.home>
+        <20221031121912.GY5824@twin.jikos.cz>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Mon, 31 Oct 2022 13:19:12 +0100
+David Sterba <dsterba@suse.cz> wrote:
 
-I happened to notice the following QEMU bug report:
+> > The policy is simple. If someone requires a copyright notice for their
+> > code, you simply add it, or do not take their code. You can be specific
+> > about what that code is that is copyrighted. Perhaps just around the code in
+> > question or a description at the top.  
+> 
+> Let's say it's OK for substantial amount of code. What if somebody
+> moves existing code that he did not write to a new file and adds a
+> copyright notice? We got stuck there, both sides have different answer.
+> I see it at minimum as unfair to the original code authors if not
+> completely wrong because it could appear as "stealing" ownership.
 
-https://gitlab.com/qemu-project/qemu/-/issues/1290
+Add the commit shas to the copyright, which will explicitly show the
+actual code involved. As it's been pointed out in other places, the git
+commits itself does not actually state who the copyright owner is.
 
-I believe it's a regression from the following kernel commit:
+> 
+> > Looking over the thread, I'm still confused at what the issue is. Is it
+> > that if you add one copyright notice you must do it for everyone else? Is
+> > everyone else asking for it? If not, just add the one and be done with it.  
+> 
+> My motivation is to be fair to all contributors and stick to the project
+> standards (ideally defined in process). Adding a copyright notice after
+> several years of not taking them would rightfully raise questions from
+> past and current contributors what would deserve to be mentioned as
+> copyright holders.
 
-    commit b1a000d3b8ec582da64bb644be633e5a0beffcbf
-    Author: Keith Busch <kbusch@kernel.org>
-    Date:   Fri Jun 10 12:58:29 2022 -0700
+As I stated: "If someone requires a copyright notice for their code,
+you simply add it, or do not take their code."
 
-        block: relax direct io memory alignment
+No one is forcing you to add the copyright. You have an alternative.
+Don't take the code. If your subsystem's policy is that of not adding
+copyright notices, then the submitters should honor it. I see Christoph
+as being OK for not accepting his code because of this policy.
 
-The bug is that if a dm-crypt device is set up with a crypto sector size (and
-thus also a logical_block_size) of 4096, then the block layer now lets through
-direct I/O requests to dm-crypt when the user buffer has only 512-byte
-alignment, instead of the 4096-bytes expected by dm-crypt in that case.  This is
-because the dma_alignment of the device-mapper device is only 511 bytes.
+Just like I will not submit to projects that require me to hand over my
+copyright. It's their right to have that policy. It's my right not to
+submit code to them. Or if I do submit, refuse to conform to their
+policy, and have my code rejected because of it.
 
-This has two effects in this case:
+It really comes down to how badly do you want Christoph's code?
 
-    - The error code for DIO with a misaligned buffer is now EIO, instead of
-      EINVAL as expected and documented.  This is because the I/O reaches
-      dm-crypt instead of being rejected by the block layer.
-
-    - STATX_DIOALIGN reports 512 bytes for stx_dio_mem_align, instead of the
-      correct value of 4096.  (Technically not a regression since STATX_DIOALIGN
-      is new in v6.1, but still a bug.)
-
-Any thoughts on what the correct fix is here?  Maybe the device-mapper layer
-needs to set dma_alignment correctly?  Or maybe the block layer needs to set it
-to 'logical_block_size - 1' by default?
-
-- Eric
+-- Steve
