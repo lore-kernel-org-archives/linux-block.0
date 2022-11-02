@@ -2,205 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9175C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 03:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5C4C43219
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 03:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbiKBDGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Nov 2022 23:06:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54760 "EHLO
+        id S230002AbiKBDGo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Nov 2022 23:06:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiKBDGI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 23:06:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B70623BFD
-        for <linux-block@vger.kernel.org>; Tue,  1 Nov 2022 20:05:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1667358307;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=G5NMWhMkmWxmf5M1uFdOOWDQWXjoBKJy5nQdDufybsA=;
-        b=igTG+h2ib87tCuzQRARNoqIOKHl0AL26AqzJE3bgeHa6nDkt/TZD7GltpsJBVmZeQicTVh
-        knv4Bz5EitWYehrqWBEbvNcoTbepTJNE9zyMkIIJ5t3CMP6qdL8j4ht5QSbuPqqGeNXrEr
-        PGAWGZ6CdC4ekxGSqrFjqQhyVjvBKH8=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-613-HLcauwVcOPq_pwjILyfT4g-1; Tue, 01 Nov 2022 23:05:04 -0400
-X-MC-Unique: HLcauwVcOPq_pwjILyfT4g-1
-Received: by mail-pj1-f72.google.com with SMTP id oo18-20020a17090b1c9200b0020bdba475afso590727pjb.4
-        for <linux-block@vger.kernel.org>; Tue, 01 Nov 2022 20:05:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G5NMWhMkmWxmf5M1uFdOOWDQWXjoBKJy5nQdDufybsA=;
-        b=deCmqFNS/iD4LNwLkbUpFkXO00E8Fyy62dLgxWnqnRdRKmU2uMie3vcUh4zs/ZNkvb
-         W0Ij5iYV/TO7NqicPF0C9sN/v7Jw6y9o6kycNOeLcxRIbOC3IbvHOdbKE38zkwRNWjVL
-         G4u+m/aZ2so0okGClVqP2zK11687RDyOEKa4eE/6fwAL+VZEqi4co1MGjH4AHAT6m4oA
-         q4LL4yoSOwgE1fWtbz4LuQpi8/sbqB7V0f+tv+pOI5jHezTk4w0x6Cisas2njPaifEan
-         F28d83wX7ph7by/WbWNqsBAv5ZaJPD9SctmmTIQt6I1eIju8ynEl5+uw2+hkCpeUwngU
-         vjsg==
-X-Gm-Message-State: ACrzQf2blEDvek97x9v9+LMOObdiES7STgp4Kl5Qqpt4cMK3um7uQhLG
-        tkTfcrwCR9caQyipV3vbyoEDcOoA0HNNEdxt9KrqGs/0wkx6AL1Ts5zt1xlFd9UoY1G89BvNgO0
-        wQRF73i8oh/etmbAi78AOXH/6c6texthfxjJc88o=
-X-Received: by 2002:a17:90a:fa46:b0:20d:5efa:84fc with SMTP id dt6-20020a17090afa4600b0020d5efa84fcmr39580262pjb.20.1667358302890;
-        Tue, 01 Nov 2022 20:05:02 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5Vnp1D1oyvAFre7PKpajAh/v35UnqO0uC/YJk5yqsq92HQY/+ZFUYwuiWD8jdg/bflB3f5qK8IGfcBHgNc5AU=
-X-Received: by 2002:a17:90a:fa46:b0:20d:5efa:84fc with SMTP id
- dt6-20020a17090afa4600b0020d5efa84fcmr39580248pjb.20.1667358302650; Tue, 01
- Nov 2022 20:05:02 -0700 (PDT)
+        with ESMTP id S230159AbiKBDGX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Nov 2022 23:06:23 -0400
+Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EC73E23EB1;
+        Tue,  1 Nov 2022 20:06:22 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.14.30.251])
+        by mail-app2 (Coremail) with SMTP id by_KCgA3PSGf3mFjz_9cBw--.7456S3;
+        Wed, 02 Nov 2022 11:06:16 +0800 (CST)
+From:   Jinlong Chen <nickyc975@zju.edu.cn>
+To:     axboe@kernel.dk
+Cc:     hch@lst.de, chaitanyak@nvidia.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nickyc975@zju.edu.cn
+Subject: [PATCH v3 1/2] blk-mq: improve error handling in blk_mq_alloc_rq_map()
+Date:   Wed,  2 Nov 2022 11:06:04 +0800
+Message-Id: <bbbc2d9b17b137798c7fb92042141ca4cbbc58cc.1667358114.git.nickyc975@zju.edu.cn>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <cover.1667358114.git.nickyc975@zju.edu.cn>
+References: <cover.1667358114.git.nickyc975@zju.edu.cn>
 MIME-Version: 1.0
-References: <20221024061319.1133470-1-yi.zhang@redhat.com> <20221024061319.1133470-4-yi.zhang@redhat.com>
- <20221025024924.mmtyrb34jvbzyotl@shindev>
-In-Reply-To: <20221025024924.mmtyrb34jvbzyotl@shindev>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Wed, 2 Nov 2022 11:04:51 +0800
-Message-ID: <CAHj4cs--m+QYLnHR5Xv5Cbxy0o+JKfo9xcm55Cb8gBgk9ow-NA@mail.gmail.com>
-Subject: Re: [PATCH blktests 3/3] common/xfs: update _xfs_run_fio_verify_io to
- accept the size parameter
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "chaitanyak@nvidia.com" <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: by_KCgA3PSGf3mFjz_9cBw--.7456S3
+X-Coremail-Antispam: 1UD129KBjvdXoW7GF43Gw13Ar1UCw4UuryxGrg_yoWkZwc_Cr
+        y0kw1vvFyUAr1Fkw4q9r15Ar97CanakF40vFWDK3srJ3s7GanrAa9xZrnxJrZ7Ww4xWFWx
+        Gw1kZr1Fkr15tjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUb-8Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
+        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
+        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl6s0DM28EF7xvwVC2z280
+        aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwV
+        AKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+        6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+        0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
+        6r126r1DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_GFWkJr1UJwCFx2IqxV
+        CFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r10
+        6r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxV
+        WUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG
+        6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
+        1UYxBIdaVFxhVjvjDU0xZFpf9x0JUvg4fUUUUU=
+X-CM-SenderInfo: qssqjiaqqzq6lmxovvfxof0/1tbiAgoCB1ZdtcNVXAAMs1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Oct 25, 2022 at 10:49 AM Shinichiro Kawasaki
-<shinichiro.kawasaki@wdc.com> wrote:
->
-> On Oct 24, 2022 / 14:13, Yi Zhang wrote:
-> > This commit alo updated nvme/012 nvme/013 nvme/035 to pass the size
->
-> Let's note why we do this. How about this descprtion?
->
->   Change fio I/O size of nvme/012,013,035 from 950m to 900m, since recent
->   change increased the xfs log size and it caused fio failure with I/O
->   size 950m.
->
->   Also add size parameter to _run_fio_verify_io. This allows to move the
->   fio I/O size definition from common/xfs to the test case, so that device
->   size and fio I/O size are both defined at single place.
->
-> I think the commit title needs to reflect the motivations above, like:
+Use goto-style error handling like we do elsewhere in the kernel.
 
-Agree, updated the title and description in V2.
+Signed-off-by: Jinlong Chen <nickyc975@zju.edu.cn>
+---
+ block/blk-mq.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
->
->   nvme/012,013,035: change fio I/O size and move size definition place
->
-> > parameter to _xfs_run_fio_verify_io
-> >
-> > Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
->
-> How about to add "Link:" tag to refer our discussion?
->
->   Link: https://lore.kernel.org/linux-block/20221019051244.810755-1-yi.zhang@redhat.com/
-
-Added in V2.
-Again, thanks Shinichiro for the review.
-
-
->
->
-> > ---
-> >  common/xfs     | 3 ++-
-> >  tests/nvme/012 | 2 +-
-> >  tests/nvme/013 | 2 +-
-> >  tests/nvme/035 | 9 ++++++++-
-> >  4 files changed, 12 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/common/xfs b/common/xfs
-> > index 846a5ef..2c5d961 100644
-> > --- a/common/xfs
-> > +++ b/common/xfs
-> > @@ -23,10 +23,11 @@ _xfs_mkfs_and_mount() {
-> >  _xfs_run_fio_verify_io() {
-> >       local mount_dir="/mnt/blktests"
-> >       local bdev=$1
-> > +     local sz=$2
-> >
-> >       _xfs_mkfs_and_mount "${bdev}" "${mount_dir}" >> "${FULL}" 2>&1
-> >
-> > -     _run_fio_verify_io --size=950m --directory="${mount_dir}/"
-> > +     _run_fio_verify_io --size="$sz" --directory="${mount_dir}/"
-> >
-> >       umount "${mount_dir}" >> "${FULL}" 2>&1
-> >       rm -fr "${mount_dir}"
-> > diff --git a/tests/nvme/012 b/tests/nvme/012
-> > index c9d2438..e60082c 100755
-> > --- a/tests/nvme/012
-> > +++ b/tests/nvme/012
-> > @@ -44,7 +44,7 @@ test() {
-> >       cat "/sys/block/${nvmedev}n1/uuid"
-> >       cat "/sys/block/${nvmedev}n1/wwid"
-> >
-> > -     _xfs_run_fio_verify_io "/dev/${nvmedev}n1"
-> > +     _xfs_run_fio_verify_io "/dev/${nvmedev}n1" "900m"
-> >
-> >       _nvme_disconnect_subsys "${subsys_name}"
-> >
-> > diff --git a/tests/nvme/013 b/tests/nvme/013
-> > index 265b696..9d60a7d 100755
-> > --- a/tests/nvme/013
-> > +++ b/tests/nvme/013
-> > @@ -41,7 +41,7 @@ test() {
-> >       cat "/sys/block/${nvmedev}n1/uuid"
-> >       cat "/sys/block/${nvmedev}n1/wwid"
-> >
-> > -     _xfs_run_fio_verify_io "/dev/${nvmedev}n1"
-> > +     _xfs_run_fio_verify_io "/dev/${nvmedev}n1" "900m"
-> >
-> >       _nvme_disconnect_subsys "${subsys_name}"
-> >
-> > diff --git a/tests/nvme/035 b/tests/nvme/035
-> > index ee78a75..31de0d1 100755
-> > --- a/tests/nvme/035
-> > +++ b/tests/nvme/035
-> > @@ -21,14 +21,21 @@ test_device() {
-> >       local ctrldev
-> >       local nsdev
-> >       local port
-> > +     local test_dev_sz
-> >
-> >       echo "Running ${TEST_NAME}"
-> >
-> >       _setup_nvmet
-> >       port=$(_nvmet_passthru_target_setup "${subsys}")
-> >       nsdev=$(_nvmet_passthru_target_connect "${nvme_trtype}" "${subsys}")
-> > +     test_dev_sz=$(_get_test_dev_size_mb)
-> >
-> > -     _xfs_run_fio_verify_io "${nsdev}"
-> > +     if (( "$test_dev_sz" < 1024 )); then
-> > +             echo "Test dev: $TEST_DEV should at leat 1024m"
-> > +             return 1
-> > +
-> > +     fi
->
-> As I commented on the second patch, I suggest to move this device size check
-> part to the second patch.
-
-Done in V2.
-
->
-> Other changes looks good tome.
->
-> > +     _xfs_run_fio_verify_io "${nsdev}" "900m"
-> >
-> >       _nvme_disconnect_subsys "${subsys}"
-> >       _nvmet_passthru_target_cleanup "${port}" "${subsys}"
-> > --
-> > 2.34.1
-> >
->
-> --
-> Shin'ichiro Kawasaki
->
-
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 623e8a506539..453ad445a6bd 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3274,21 +3274,22 @@ static struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+ 	tags->rqs = kcalloc_node(nr_tags, sizeof(struct request *),
+ 				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+ 				 node);
+-	if (!tags->rqs) {
+-		blk_mq_free_tags(tags);
+-		return NULL;
+-	}
++	if (!tags->rqs)
++		goto err_free_tags;
+ 
+ 	tags->static_rqs = kcalloc_node(nr_tags, sizeof(struct request *),
+ 					GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
+ 					node);
+-	if (!tags->static_rqs) {
+-		kfree(tags->rqs);
+-		blk_mq_free_tags(tags);
+-		return NULL;
+-	}
++	if (!tags->static_rqs)
++		goto err_free_rqs;
+ 
+ 	return tags;
++
++err_free_rqs:
++	kfree(tags->rqs);
++err_free_tags:
++	blk_mq_free_tags(tags);
++	return NULL;
+ }
+ 
+ static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
 -- 
-Best Regards,
-  Yi Zhang
+2.31.1
 
