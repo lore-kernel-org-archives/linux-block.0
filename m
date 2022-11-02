@@ -2,88 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB76FC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 17:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CBAC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Nov 2022 18:46:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbiKBRDs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Nov 2022 13:03:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33040 "EHLO
+        id S231636AbiKBSqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Nov 2022 14:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbiKBRDr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 13:03:47 -0400
-Received: from hermod.demsh.org (hermod.demsh.org [45.140.147.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D75C011806
-        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 10:03:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=demsh.org; s=022020;
-        t=1667408618;
+        with ESMTP id S231685AbiKBSqM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Nov 2022 14:46:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D5772CDC5
+        for <linux-block@vger.kernel.org>; Wed,  2 Nov 2022 11:45:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1667414714;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EV8wHc153Q1Z1Fn4uarOQ24/jG/hSAHDIP/cR4J/lPQ=;
-        b=asbw6jFh1S/ffs4d2qQPQIgKxWI8xdzTEc7v53RYrK+YMt4fPEeO4IbZoMcpztrvafoix9
-        XcsKYhALPoQfFdI3mDwQp22DwbyoXcEC2GfjXNWD3iexxHWta8SF3wyvMUijxeRASvQ6kj
-        MCXt75z/2HbYeY+NVvoQmOqM4qpQYHS1WNbByPUq4OSU6it41IZwO6tqcTsxRB/IK5/inX
-        0ZpX3g6sE0NV2mRparUazCseaS2hUud1HJK+6reVohi/Ck+/HgLXaBB7sn3zgFK/HSegHS
-        3hvX+gF3PIenjs5nYjasWyD5kmPUNuKdl9f0V5JCUtUc4dpICnwudDBMKmuSpQ==
-Received: from xps.demsh.org (algiz.demsh.org [94.103.82.47])
-        by hermod.demsh.org (OpenSMTPD) with ESMTPSA id 35dc3627 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO) auth=yes user=me;
-        Wed, 2 Nov 2022 17:03:38 +0000 (UTC)
-Date:   Wed, 2 Nov 2022 20:03:45 +0300
-From:   Dmitrii Tcvetkov <me@demsh.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: Regression: wrong DIO alignment check with dm-crypt
-Message-ID: <20221102200345.0800a8bf@xps.demsh.org>
-In-Reply-To: <Y2KXfNZzwPZBJRTW@kbusch-mbp.dhcp.thefacebook.com>
+        bh=o2V7PF5Cvb562gFELbc+jq3ofeoF6yfCR8t9uYJeyqA=;
+        b=P5mABxfvdGEsQE17pXWBb/vT5r0aqr/QrFAzss4nox9CnvSadJOPinZHmPw2l/bzzzyd+6
+        yACs8ehEh4k3utmlbLPnPH64OJTs4oDtScGe2DUQ8AMfolkDjfiCrAnY6AwDT0+c+mMQbW
+        GM5m0D7F9Ln52+R7v4bdS+f3FD398P4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-159-IbZlgl5gMyaCrxxXFUndNQ-1; Wed, 02 Nov 2022 14:45:11 -0400
+X-MC-Unique: IbZlgl5gMyaCrxxXFUndNQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D41973C0D1A7;
+        Wed,  2 Nov 2022 18:45:10 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BCC101121320;
+        Wed,  2 Nov 2022 18:45:10 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 2A2IjAgP003018;
+        Wed, 2 Nov 2022 14:45:10 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 2A2IjATr003014;
+        Wed, 2 Nov 2022 14:45:10 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 2 Nov 2022 14:45:10 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Eric Biggers <ebiggers@kernel.org>
+cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Keith Busch <kbusch@kernel.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [dm-devel] Regression: wrong DIO alignment check with dm-crypt
+In-Reply-To: <Y2Hf08vIKBkl5tu0@sol.localdomain>
+Message-ID: <alpine.LRH.2.21.2211021434180.2087@file01.intranet.prod.int.rdu2.redhat.com>
 References: <Y2Hf08vIKBkl5tu0@sol.localdomain>
-        <Y2KEH6OZ0MDf5cSh@kbusch-mbp.dhcp.thefacebook.com>
-        <Y2KXfNZzwPZBJRTW@kbusch-mbp.dhcp.thefacebook.com>
+User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2 Nov 2022 10:14:52 -0600
-Keith Busch <kbusch@kernel.org> wrote:
-> This is what I'm coming up with. Only compile tested (still setting up
-> an enviroment to actually run it).
-> 
-> ---
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index 159c6806c19b..9334e58a4c9f 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -43,6 +43,7 @@
->  #include <linux/device-mapper.h>
->  
->  #include "dm-audit.h"
-> +#include "dm-core.h"
->  
->  #define DM_MSG_PREFIX "crypt"
->  
-> @@ -3615,7 +3616,9 @@ static int crypt_iterate_devices(struct
-> dm_target *ti, 
->  static void crypt_io_hints(struct dm_target *ti, struct queue_limits
-> *limits) {
-> +	struct mapped_device *md = dm_table_get_md(ti->table);
->  	struct crypt_config *cc = ti->private;
-> +	struct request_queue *q = md->queue;
->  
->  	/*
->  	 * Unfortunate constraint that is required to avoid the
-> potential @@ -3630,6 +3633,8 @@ static void crypt_io_hints(struct
-> dm_target *ti, struct queue_limits *limits)
-> limits->physical_block_size = max_t(unsigned,
-> limits->physical_block_size, cc->sector_size); limits->io_min =
-> max_t(unsigned, limits->io_min, cc->sector_size); +
-> +	blk_queue_dma_alignment(q, limits->logical_block_size - 1);
->  }
->  
->  static struct target_type crypt_target = {
-> --
+Hi
 
-Applied on top 6.1-rc3, the issue still reproduces.
+
+On Tue, 1 Nov 2022, Eric Biggers wrote:
+
+> Hi,
+> 
+> I happened to notice the following QEMU bug report:
+> 
+> https://gitlab.com/qemu-project/qemu/-/issues/1290
+> 
+> I believe it's a regression from the following kernel commit:
+> 
+>     commit b1a000d3b8ec582da64bb644be633e5a0beffcbf
+>     Author: Keith Busch <kbusch@kernel.org>
+>     Date:   Fri Jun 10 12:58:29 2022 -0700
+> 
+>         block: relax direct io memory alignment
+
+I suggest to revert this patch.
+
+> The bug is that if a dm-crypt device is set up with a crypto sector size (and
+> thus also a logical_block_size) of 4096, then the block layer now lets through
+> direct I/O requests to dm-crypt when the user buffer has only 512-byte
+> alignment, instead of the 4096-bytes expected by dm-crypt in that case.  This is
+> because the dma_alignment of the device-mapper device is only 511 bytes.
+
+Propagating dma_alignment through the device mapper stack would be hard 
+(because it is not in struct queue_limits). Perhaps we could set 
+dma_alignment to be the equivalent to logical_block_size, if the above 
+patch could not be reverted - but the we would hit the issue again when 
+someone stacks md or other devices over dm.
+
+> This has two effects in this case:
+> 
+>     - The error code for DIO with a misaligned buffer is now EIO, instead of
+>       EINVAL as expected and documented.  This is because the I/O reaches
+>       dm-crypt instead of being rejected by the block layer.
+> 
+>     - STATX_DIOALIGN reports 512 bytes for stx_dio_mem_align, instead of the
+>       correct value of 4096.  (Technically not a regression since STATX_DIOALIGN
+>       is new in v6.1, but still a bug.)
+> 
+> Any thoughts on what the correct fix is here?  Maybe the device-mapper layer
+> needs to set dma_alignment correctly?  Or maybe the block layer needs to set it
+> to 'logical_block_size - 1' by default?
+> 
+> - Eric
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://listman.redhat.com/mailman/listinfo/dm-devel
+
+Mikulas
+
